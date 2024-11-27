@@ -29,10 +29,10 @@ public abstract class CodeGeneratorBase
         generatedCode = [];
     }
 
-    protected virtual void AddFile(string filename, bool module = false)
+    protected virtual void AddFile(string filename)
     {
         var text = cw.ToString();
-        generatedCode.Add(new GeneratedSource(filename, text, module));
+        generatedCode.Add(new GeneratedSource(filename, text));
         sb.Clear();
         cw.LocalUsings?.Clear();
         cw.CurrentNamespace = null;

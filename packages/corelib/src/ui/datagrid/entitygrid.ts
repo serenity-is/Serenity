@@ -265,9 +265,17 @@ export class EntityGrid<TItem, P = {}> extends DataGrid<TItem, P> {
         return this._service;
     }
 
+    protected getServiceMethod() {
+        return this.getService() + '/List';
+    }
+
+    protected getServiceUrl() {
+        return resolveUrl('~/Services/' + this.getServiceMethod());
+    }
+
     protected getViewOptions(): RemoteViewOptions {
         var opt = super.getViewOptions();
-        opt.url = resolveUrl('~/Services/' + this.getService() + '/List');
+        opt.url = this.getServiceUrl();
         return opt;
     }
 

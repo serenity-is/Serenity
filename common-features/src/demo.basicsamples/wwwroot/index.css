@@ -1,0 +1,26 @@
+.alert.s-sample-info {
+  font-size: 13px;
+  --bs-alert-padding-y: 0.5rem;
+}
+
+.alert.s-sample-info.alert-dismissible .btn-close {
+  padding: 0.5rem 0.75rem;
+}
+
+.alert.s-sample-info p {
+  margin-bottom: 5px;
+}
+
+.alert.s-sample-info .s-sample-sources {
+  text-align: right;
+  margin-bottom: 0;
+}
+
+.alert.s-sample-info .s-sample-premium-source {
+  display: block;
+  font-size: 0.75rem;
+}
+
+:root.pro .alert-dismissible button.close.btn-close {
+  color: transparent;
+}

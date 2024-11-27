@@ -2,5 +2,9 @@
   "Authorization.AccessDenied": "इस अनुरोध के लिए अनुमोदन अस्वीकृत किया गया है!",
   "Authorization.NotLoggedIn": "इस अनुरोध के लिए अधिकृति आवश्यक है!",
   "Db.Shared.RecordId": "आईडी",
-  "Services.GenericErrorMessage": "आपके अनुरोध का प्रक्रिया करते समय त्रुटि हुई।"
+  "Services.GenericErrorMessage": "आपके अनुरोध का प्रक्रिया करते समय त्रुटि हुई।",
+  "Services.HttpError": "HTTP त्रुटि {0}.",
+  "Services.InternalServerError": "आंतरिक सर्वर त्रुटि (500)।",
+  "Services.SeeBrowserConsole": "अधिक जानकारी के लिए ब्राउज़र कंसोल (F12) देखें।",
+  "Services.UnknownConnectionError": "सर्वर से कनेक्ट करते समय एक त्रुटि हुई।"
 }

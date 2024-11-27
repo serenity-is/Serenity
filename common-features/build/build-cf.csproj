@@ -1,0 +1,18 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <OutputType>Exe</OutputType>
+    <AppendTargetFrameworkToOutputPath>false</AppendTargetFrameworkToOutputPath>
+    <OutputPath>bin</OutputPath>
+    <TargetFramework>net8.0</TargetFramework>
+    <RootNamespace>Build</RootNamespace>
+    <DefaultItemExcludes>$(DefaultItemExcludes);artifacts\**</DefaultItemExcludes>
+    <DefineConstants>$(DefineConstants);IsFeatureBuild</DefineConstants>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <PackageReference Include="Newtonsoft.Json" Version="13.0.3" />
+    <PackageReference Include="NuGet.Protocol" Version="6.7.0" />
+  </ItemGroup>
+
+</Project>

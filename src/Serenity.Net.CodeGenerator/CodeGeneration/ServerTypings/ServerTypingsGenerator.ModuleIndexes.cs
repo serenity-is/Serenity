@@ -1,4 +1,4 @@
-﻿namespace Serenity.CodeGeneration;
+namespace Serenity.CodeGeneration;
 
 public partial class ServerTypingsGenerator : TypingsGeneratorBase
 {
@@ -7,7 +7,7 @@ public partial class ServerTypingsGenerator : TypingsGeneratorBase
         var rootNamespace = RootNamespaces.FirstOrDefault(x => x != "Serenity") ?? "App";
 
         var byDirectory = generatedCode
-            .Where(x => x.Module)
+            .Where(x => x.IsTypeScript)
             .ToLookup(type =>
             {
                 var directory = System.IO.Path.GetDirectoryName(type.Filename);
@@ -27,7 +27,7 @@ public partial class ServerTypingsGenerator : TypingsGeneratorBase
 
             if (sb.Length > 0)
             {
-                AddFile(files.Key + ".ts", module: true);
+                AddFile(files.Key + ".ts");
             }
         }
 

@@ -1,0 +1,248 @@
+
+<!DOCTYPE html>
+<!-- saved from url=(0014)about:internet -->
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="Serenity - ASP.NET Core/MVC Application Platform">
+    <meta name="author" content="Volkan Ceylan">
+
+    <title>Welcome to Serenity</title>
+
+    <link href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.5/css/bootstrap.min.css" rel="stylesheet">
+
+    <style type="text/css">
+
+        body {
+          background-color: #f2f2f2;
+            font-family: "Lato";
+            font-weight: 300;
+            font-size: 16px;
+            color: #555;
+
+            -webkit-font-smoothing: antialiased;
+            -webkit-overflow-scrolling: touch;
+        }
+
+        h1, h2, h3, h4, h5, h6 {
+            font-family: "Raleway";
+            font-weight: 300;
+            color: #333;
+        }
+
+        p {
+            line-height: 28px;
+            margin-bottom: 25px;
+        }
+
+        .centered {
+            text-align: center;
+        }
+
+        a {
+            color: #3bc492;
+            word-wrap: break-word;
+
+            -webkit-transition: color 0.1s ease-in, background 0.1s ease-in;
+            -moz-transition: color 0.1s ease-in, background 0.1s ease-in;
+            -ms-transition: color 0.1s ease-in, background 0.1s ease-in;
+            -o-transition: color 0.1s ease-in, background 0.1s ease-in;
+            transition: color 0.1s ease-in, background 0.1s ease-in;
+        }
+
+        a:hover,
+        a:focus {
+            color: #c0392b;
+            text-decoration: none;
+            outline: 0;
+        }
+
+        a:before,
+        a:after {
+            -webkit-transition: color 0.1s ease-in, background 0.1s ease-in;
+            -moz-transition: color 0.1s ease-in, background 0.1s ease-in;
+            -ms-transition: color 0.1s ease-in, background 0.1s ease-in;
+            -o-transition: color 0.1s ease-in, background 0.1s ease-in;
+            transition: color 0.1s ease-in, background 0.1s ease-in;
+        }
+
+         hr {
+            display: block;
+            height: 1px;
+            border: 0;
+            border-top: 1px solid #ccc;
+            margin: 1em 0;
+            padding: 0;
+        }
+
+        #headerwrap {
+            background-color: #34495e;
+            padding-top: 40px;
+        }
+
+        #headerwrap h1 {
+            margin-top: 0px;
+            color: white;
+            font-size: 50px;
+    
+        }
+
+        #headerwrap h3 {
+            color: white;
+            font-size: 20px;
+        }
+
+        #headerwrap h4 {
+            color: lightgreen;
+            font-weight: 700;
+            text-align: left;
+        }
+
+        #headerwrap li {
+            color: #f2f2f2;
+            text-align: left;
+            margin-left: -40px;
+            padding: 0;
+
+        }
+
+        #headerwrap p {
+            text-align: left;
+            color: white
+        }
+
+        #resources i {
+            font-size: 48px;
+        }
+
+        #intro {
+            padding-top: 50px;
+            border-top: #bdc3c7 solid 5px;
+        }
+
+        #features {
+            padding-top: 50px;
+            padding-bottom: 50px;
+        }
+
+        #features .ac a{
+            font-size: 20px;
+        }
+
+        #footerwrap {
+            background-color: #2f2f2f;
+            color: white;
+            padding-top: 40px;
+            padding-bottom: 60px;
+            text-align: left;
+        }
+
+        #footerwrap h3 {
+            font-size: 28px;
+            color: white;
+        }
+
+        #footerwrap p {
+            color: white;
+            font-size: 18px;
+        }
+
+        #c {
+            background: #222222;
+            padding-top: 15px;
+            text-align: right;
+        }
+
+        #c p {
+            color: white
+        }
+    </style>
+   
+    <link href='http://fonts.googleapis.com/css?family=Lato:300,400,700,300italic,400italic' rel='stylesheet' type='text/css'>
+    <link href='http://fonts.googleapis.com/css?family=Raleway:400,300,700' rel='stylesheet' type='text/css'>
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/font-awesome/4.4.0/css/font-awesome.min.css" />
+   
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/2.1.4/jquery.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery-smooth-scroll/1.5.6/jquery.smooth-scroll.min.js"></script>
+    
+
+  </head>
+
+  <body data-spy="scroll" data-offset="0" data-target="#navigation">
+
+    <section id="home" name="home"></section>
+    <div id="headerwrap">
+        <div class="container">
+            <div class="row centered">
+                <div class="col-lg-12">
+                    <h1>Welcome To <b>Serenity</b></h1>
+                    <h3>This is a starter template to build Serenity applications.</h3>
+                    <br />
+                    <div class="alert alert-danger" style="color: white; background-color: indianred">
+                        <b><i class="fa fa-exclamation-circle"></i> Please read <a style="color: yellow; margin: 0 6px 0 6px" href="https://github.com/serenity-is/Serenity/blob/master/INSTALL.md" target="_blank">INSTALLATION INSTRUCTIONS&nbsp;<sup><i class="fa fa-external-link-square"></i></sup></a> for latest requirements and troubleshooting.</b>
+                    </div>
+                </div>
+                
+                <div class="col-lg-5">
+                    <h4>What is Serenity?</h4>
+                    <p><b>Serenity is an ASP.NET Core application platform designed to simplify and shorten development of data-centric business applications with a service based architecture.</b></p>
+                    <p><b>It aims to make development easier while reducing maintenance costs by avoiding boiler-plate code, reducing the time spent on repetitive tasks and applying best software design practices.</b></p>
+                    <h4>What Should I Do Now?</h4>
+                    <p><b>Your application is ready to go. Just press <em style="color: lightgreen">F5 to launch</em>, and the database and tables will be created in SQL LocalDB.</b></p>
+                    <p><b>Use <em style="color: lightgreen">admin</em> as username and <em style="color: lightgreen">serenity</em> as password to login.</b></p>
+                </div>
+                <div class="col-lg-2">
+                </div>
+                <div class="col-lg-5">
+                    <h4>Visual Studio Requirements</h4>
+                    <p><b>Please check your Visual Studio version (2022 with latest updates is required). Also .NET 6 SDK for VS needs to be installed from <a href="https://dotnet.microsoft.com/download/visual-studio-sdks">https://dotnet.microsoft.com/download/visual-studio-sdks</a></b></p>
+                    <p><b>NodeJS v18+ with NPM v8+ is also required for typings and other static content. Get it from <a href="https://nodejs.org/en/download/">https://nodejs.org/en/download/</a></b></p>
+                    <p><b>Also make sure that you have <em style="color: lightgreen">C:\Program Files\nodejs</em> on top of folder list at <i>Tools <i class="fa fa-arrow-right"></i> Options <i class="fa fa-arrow-right"></i> Projects and Solutions <i class="fa fa-arrow-right"></i> External Web Tools.</i></b></p>
+                </div>
+            </div>
+        </div>
+        <br/>
+        <br/>
+    </div>
+
+
+    <section id="resources" name="resources">
+    <!-- INTRO WRAP -->
+    <div id="intro">
+        <div class="container">
+            <div class="row centered">
+                <h1>Resources</h1>
+                <br>
+                <br>
+                <div class="col-lg-4">
+                    <a href="https://serenity.is/docs"><i class="fa fa-book"></i></a>
+                    <h3>Documentation</h3>
+                    <p>See <a href="https://serenity.is/docs"><b>Serenity Developer Guide</b></a> for documentation. Follow step-by-step tutorials to get up quickly to develop your own applications.</p>
+                </div>
+                <div class="col-lg-4">
+                    <a href="https://github.com/serenity-is/Serenity"><i class="fa fa-question-circle"></i></a>
+                    <h3>Have Questions?</h3>
+                    <p>Feel free to open an issue at <a href="https://github.com/serenity-is/Serenity"><b>Serenity GitHub Repository.</b></a> You might also suggest new features, or contribute to project there.</p>
+                </div>
+                <div class="col-lg-4">
+                    <a href="https://github.com/serenity-is/Serenity/blob/master/CHANGELOG.md"><i class="fa fa-history"></i></a>
+                    <h3>Stay Up to Date</h3>
+                    <p>Serenity and this template is updated frequently. See <a href="https://github.com/serenity-is/Serenity/blob/master/CHANGELOG.md"><b>the log</b></a> for a list of changes. You can also update Serenity NuGet packages using Package Manager Console.</p>
+                </div>
+            </div>
+            <br>
+            <hr>
+        </div>
+    </div>
+    </section>
+
+    <div id="c" style="margin-top: 150px;">
+        <div class="container">
+            <p>Copyright (c) <a href="https://github.com/serenity-is/Serenity">Serenity Application Platform</a></p>
+        
+        </div>
+    </div>
+    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.5/js/bootstrap.min.js"></script>
+  </body>
+</html>

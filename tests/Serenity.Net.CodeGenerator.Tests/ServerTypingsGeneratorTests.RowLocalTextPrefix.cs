@@ -1,4 +1,4 @@
-﻿using ServerTypingsTest.SomeModule.Entities;
+using ServerTypingsTest.SomeModule.Entities;
 
 namespace Serenity.Tests.CodeGenerator
 {
@@ -9,7 +9,7 @@ namespace Serenity.Tests.CodeGenerator
         {
             var generator = CreateGenerator(typeof(RowWithLocalTextPrefixSetInCodeRow));
             var result = generator.Run();
-            var code = Assert.Single(result, x => x.Filename == "SomeModule.RowWithLocalTextPrefixSetInCodeRow.ts").Text;
+            var code = Assert.Single(result, x => x.Filename == "SomeModule/RowWithLocalTextPrefixSetInCodeRow.ts").Text;
             Assert.Contains("localTextPrefix = 'Set.InCode'", code);
         }
 
@@ -18,7 +18,7 @@ namespace Serenity.Tests.CodeGenerator
         {
             var generator = CreateGenerator(typeof(RowWithLocalTextPrefixSetInCodeAndAttributeRow));
             var result = generator.Run();
-            var code = Assert.Single(result, x => x.Filename == "SomeModule.RowWithLocalTextPrefixSetInCodeAndAttributeRow.ts").Text;
+            var code = Assert.Single(result, x => x.Filename == "SomeModule/RowWithLocalTextPrefixSetInCodeAndAttributeRow.ts").Text;
             Assert.Contains("localTextPrefix = 'This.ShouldOverride'", code);
         }
 
@@ -27,7 +27,7 @@ namespace Serenity.Tests.CodeGenerator
         {
             var generator = CreateGenerator(typeof(RowWithLocalTextPrefixAttributeRow));
             var result = generator.Run();
-            var code = Assert.Single(result, x => x.Filename == "SomeModule.RowWithLocalTextPrefixAttributeRow.ts").Text;
+            var code = Assert.Single(result, x => x.Filename == "SomeModule/RowWithLocalTextPrefixAttributeRow.ts").Text;
             Assert.Contains("localTextPrefix = 'Attribute.Prefix'", code);
         }
 
@@ -36,7 +36,7 @@ namespace Serenity.Tests.CodeGenerator
         {
             var generator = CreateGenerator(typeof(RowWithModuleAndNoLocalTextPrefixRow));
             var result = generator.Run();
-            var code = Assert.Single(result, x => x.Filename == "SomeModule.RowWithModuleAndNoLocalTextPrefixRow.ts").Text;
+            var code = Assert.Single(result, x => x.Filename == "SomeModule/RowWithModuleAndNoLocalTextPrefixRow.ts").Text;
             Assert.Contains("localTextPrefix = 'ADifferentModule.RowWithModuleAndNoLocalTextPrefix'", code);
         }
 
@@ -45,7 +45,7 @@ namespace Serenity.Tests.CodeGenerator
         {
             var generator = CreateGenerator(typeof(NoModuleNoLocalTextPrefixRow));
             var result = generator.Run();
-            var code = Assert.Single(result, x => x.Filename == "SomeModule.NoModuleNoLocalTextPrefixRow.ts").Text;
+            var code = Assert.Single(result, x => x.Filename == "SomeModule/NoModuleNoLocalTextPrefixRow.ts").Text;
             Assert.Contains("localTextPrefix = 'SomeModule.NoModuleNoLocalTextPrefix'", code);
         }
     }

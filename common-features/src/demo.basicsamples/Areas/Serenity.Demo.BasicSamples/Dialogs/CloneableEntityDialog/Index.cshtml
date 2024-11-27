@@ -1,0 +1,32 @@
+﻿@{
+    ViewData["Title"] = "Cloneable Entity Dialog";
+}
+
+@section ContentHeader {
+    <h1>@ViewData["Title"]<small></small></h1>
+}
+
+<div class="alert alert-info alert-dismissable alert-dismissible s-sample-info">
+    <button type="button" class="close btn-close" data-dismiss="alert" data-bs-dismiss="alert" aria-hidden="true">&times;</button>
+    <p>
+        Product dialog here has a clone button. This is actually an integrated 
+        feature but clone button is invisible by default.
+    </p>
+    <p>
+        Open an existing product and click clone button to create a new copy of it. 
+    </p>
+    <p>
+        See CloneableEntityDialog.ts for information about how to
+        make this button visible and customizing cloned entity.
+    </p>
+
+    <p class="s-sample-sources"><b>Source Files:</b> 
+        @Html.BasicSamplesSourceFile("Index.cshtml"), 
+        @Html.BasicSamplesSourceFile("CloneableEntityDialogPage.ts")
+    </p>
+
+</div>
+
+<div id="GridDiv"></div>
+
+@Html.ModulePageInit(ESM.CloneableEntityDialogPage)

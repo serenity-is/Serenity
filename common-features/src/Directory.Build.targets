@@ -1,0 +1,15 @@
+<Project>
+  <Import Project="$(MSBuildThisFileDirectory)..\build\Feature.Build.targets" />
+  <Target Name="TransformMvc" BeforeTargets="BeforeBuild" DependsOnTargets="$(TransformDependsOn)"
+          Condition="'$(SergenTransform)' == 'mvc'">
+    <Exec Command="$(DotNetSergen) mvc $(SergenTransformArgs)" ContinueOnError="true" />
+  </Target>
+  <Target Name="TransformMvct" BeforeTargets="BeforeBuild" DependsOnTargets="$(TransformDependsOn)"
+          Condition="'$(SergenTransform)' == 'mvct' OR '$(SergenTransform)' == 'all'">
+    <Exec Command="$(DotNetSergen) mvct $(SergenTransformArgs)" ContinueOnError="true" />
+  </Target>
+  <Target Name="TransformServerTypings" AfterTargets="AfterBuild" DependsOnTargets="$(TransformDependsOn)"
+          Condition="'$(SergenTransform)' == 'servertypings' OR '$(SergenTransform)' == 'all'">
+    <Exec Command="$(DotNetSergen) servertypings $(SergenTransformArgs)" ContinueOnError="true" />
+  </Target>
+</Project>

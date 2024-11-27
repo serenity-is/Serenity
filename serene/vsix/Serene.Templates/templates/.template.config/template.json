@@ -1,0 +1,75 @@
+{
+  "$schema": "http://json.schemastore.org/template",
+  "author": "serenity.is",
+  "classifications": [ "Web", "MVC" ],
+  "name": "Serene",
+  "shortName": "serene",
+  "defaultName": "MySerene",
+  "identity": "Serene",
+  "tags": {
+    "language": "C#",
+    "type": "project"
+  },
+  "sourceName": "Serene",
+  "preferNameDirectory": true,
+  "symbols": {
+    "HttpPort": {
+      "type": "parameter",
+      "datatype": "integer",
+      "description": "Port number to use for the HTTP endpoint in launchSettings.json."
+    },
+    "HttpPortGenerated": {
+      "type": "generated",
+      "generator": "port"
+    },
+    "HttpPortReplacer": {
+      "type": "generated",
+      "generator": "coalesce",
+      "parameters": {
+        "sourceVariableName": "HttpPort",
+        "fallbackVariableName": "HttpPortGenerated"
+      },
+      "replaces": "53237"
+    },
+    "HttpsPort": {
+      "type": "parameter",
+      "datatype": "integer",
+      "description": "Port number to use for the HTTPS endpoint in launchSettings.json."
+    },
+    "HttpsPortGenerated": {
+      "type": "generated",
+      "generator": "port",
+      "parameters": {
+        "low": 44300,
+        "high": 44399
+      }
+    },
+    "HttpsPortReplacer": {
+      "type": "generated",
+      "generator": "coalesce",
+      "parameters": {
+        "sourceVariableName": "HttpsPort",
+        "fallbackVariableName": "HttpsPortGenerated"
+      },
+      "replaces": "44380"
+    },
+    "DemoModules": {
+      "type": "parameter",
+      "datatype": "bool",
+      "defaultValue": "true",
+      "description": "Demo Modules (Northwind, Basic Samples)"
+    },
+    "Northwind": {
+      "type": "computed",
+      "value": "DemoModules == true"
+    },
+    "BasicSamples": {
+      "type": "computed",
+      "value": "DemoModules == true"
+    },
+    "UseProjectRefs": {
+      "type": "computed",
+      "value": "false"
+    }
+  }
+}

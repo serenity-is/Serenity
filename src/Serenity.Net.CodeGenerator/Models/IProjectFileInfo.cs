@@ -7,6 +7,7 @@ namespace Serenity.CodeGenerator
 
         string[] GetAssemblyList(string[] configured);
         string GetAssemblyName();
+        string GetEsmAssetBasePath();
         string GetOutDir();
         string GetRootNamespace();
         string GetTargetFramework();

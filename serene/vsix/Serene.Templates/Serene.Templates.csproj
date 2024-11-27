@@ -1,0 +1,46 @@
+<Project Sdk="Microsoft.NET.Sdk">
+  <PropertyGroup>
+    <PackageType>Template</PackageType>
+    <PackageVersion>8.7.4.0</PackageVersion>
+    <PackageId>Serene.Templates</PackageId>
+    <PackageOutputPath>..\.nupkg</PackageOutputPath>
+    <Title>Serene Project Templates</Title>
+    <Authors>serenity.is</Authors>
+    <Description>Serene project template for Serenity applications.</Description>
+    <PackageTags>dotnet-new;templates;Serenity;Serene</PackageTags>
+    <PackageIcon>package-icon.png</PackageIcon>
+    <PackageLicenseExpression>MIT</PackageLicenseExpression>
+    <PackageProjectUrl>https://github.com/serenity-is/Serene</PackageProjectUrl>
+    <PackageReadmeFile>README.md</PackageReadmeFile>
+    <TargetFramework>netstandard2.0</TargetFramework>
+    <IncludeContentInPack>true</IncludeContentInPack>
+    <IncludeBuildOutput>false</IncludeBuildOutput>
+    <ContentTargetFolders>content</ContentTargetFolders>
+    <NoDefaultExcludes>true</NoDefaultExcludes>
+    <SuppressDependenciesWhenPacking>true</SuppressDependenciesWhenPacking>
+    <BeforePack>$(BeforePack);BeforeNuGetPack</BeforePack>
+  </PropertyGroup>
+  <ItemGroup>
+    <Content Include="package-icon.png" PackagePath="package-icon.png" />
+    <Content Include="README.md" PackagePath="README.md" />
+    <Content Include="templates\.template.config\**\*">
+      <PackagePath>content\templates\.template.config\%(RecursiveDir)%(Filename)%(Extension)</PackagePath>
+    </Content>
+    <Content Include="..\..\src\Serene.Web\**\*;" Exclude="**\App_Data\**;**\bin\**;**\dynamic-data\**;**\obj\**;**\node_modules\**;**\PublishProfiles\**;**\TestResults\**;**\*.bak;**\*.log;**\*.orig;**\*.sqlite;**\*.user;**\*.vstemplate;**\*machine.json;**\*.orig;**\*.vstemplate;**\.csslintrc;**\Thumbs.db;**\ErrorLog.db;**\StyleCop.Cache;**\StartSharp.Web.js.map;**\.vs\**;**\.vscode\**;**\esm\**\*.map;**\*.Web\coverage\**;**\*.Web\out\**;**\*.Web\package.json;**\*.Web\package-lock.json;**\*.Web\test\**;**\*.Web\jest.config.js">
+      <Link>templates\Serene.Web\%(RecursiveDir)%(Filename)%(Extension)</Link>
+      <PackagePath>content\templates\Serene.Web\%(RecursiveDir)%(Filename)%(Extension)</PackagePath>
+    </Content>
+    <Content Include="..\..\.vs\package-json-patch\package.json;..\..\.vs\package-json-patch\package-lock.json">
+      <Link>templates\Serene.Web\%(Filename)%(Extension)</Link>
+      <PackagePath>content\templates\Serene.Web\%(Filename)%(Extension)</PackagePath>
+    </Content>
+    <Compile Remove="**\*" />
+  </ItemGroup>
+  <Target Name="BeforeNugetPack">
+    <ItemGroup>
+      <NuGetFilesToDelete Include="..\.nupkg\Serene.Templates*.nupkg" />
+    </ItemGroup>
+    <Delete Files="@(NuGetFilesToDelete)" />
+    <Exec Command="dotnet run --project build-serene.csproj --no-dependencies -- patchpackagejson" Condition="'$(SkipPatchPackageJson)' != 'true'" WorkingDirectory="..\..\build" />
+  </Target>
+</Project>

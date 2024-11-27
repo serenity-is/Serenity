@@ -1,4 +1,5 @@
 artifacts/
+dynamic-data/
 coverage/
 out/
 /*/dist/**/*.js

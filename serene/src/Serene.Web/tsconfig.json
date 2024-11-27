@@ -1,0 +1,42 @@
+{
+  "compileOnSave": true,
+  "compilerOptions": {
+    "allowJs": false,
+    "declaration": false,
+    "emitBOM": true,
+    "esModuleInterop": true,
+    "forceConsistentCasingInFileNames": true,
+    "isolatedModules": true,
+    "jsx": "react-jsx",
+    "jsxImportSource": "jsx-dom/min",
+    "module": "ESNext",
+    "moduleResolution": "Node",
+    "newLine": "lf",
+    "noEmit": true,
+    "noEmitOnError": false,
+    "outDir": "./wwwroot/esm",
+    "paths": {
+      "@serenity-is/*": [ "./node_modules/@serenity-is/*/dist/index", "./node_modules/.dotnet/serenity.*/dist/index" ],
+      "react": [ "./node_modules/preact/compat/" ],
+      "react-dom": [ "./node_modules/preact/compat/" ]
+    },
+    "preserveConstEnums": true,
+    "rootDir": ".",
+    "skipDefaultLibCheck": true,
+    "skipLibCheck": true,
+    "sourceMap": false,
+    "target": "ES2017",
+    "typeRoots": [
+      "./node_modules/@types"
+    ],
+    "types": [
+    ],
+    "useDefineForClassFields": false
+  },
+  "include": [
+    "Modules"
+  ],
+  "typeAcquisition": {
+    "enable": false
+  }
+}

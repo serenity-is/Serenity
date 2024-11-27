@@ -1,0 +1,46 @@
+@inject Serenity.Navigation.INavigationModelFactory NavigationModelFactory
+<!DOCTYPE html>
+@{
+    Func<string, HtmlString> json = x => new HtmlString(Serenity.JSON.Stringify(x));
+var hideNav = (string)Context.Request.Query["hideNav"] == "1";
+var sidebarPaneCollapsed = Context?.Request?.Cookies?["SidebarPaneCollapsed"] == "1" ? " s-sidebar-pane-collapsed" : "";
+}
+<html lang="@System.Globalization.CultureInfo.CurrentUICulture.Name" class="@(hideNav ? " no-navigation" : "")">
+<head>
+    <partial name="@MVC.Views.Shared._LayoutHead" />
+    @RenderSection("Head", false)
+    <title>@(ViewData["Title"]) - Serene</title>
+</head>
+<body id="s-@(ViewData["PageId"])Page" class="@(ViewData["BodyClass"]) @(sidebarPaneCollapsed)">
+<div id="PageBackground" style="display: none"></div>
+@if (hideNav)
+{
+    <script type="text/javascript">
+        $(function () {
+            @RenderSection("PageInitScript", false)
+        });
+    </script>
+    <div id="page-outer-nonav">
+        <div id="page-container" class="page-container-common">
+            @RenderBody()
+        </div>
+    </div>
+}
+else
+{
+    <partial name=@MVC.Views.Shared._Sidebar model=@(NavigationModelFactory.Create()) />
+    <main class="s-main">
+        <section class="content">
+            @if (IsSectionDefined("ContentHeader"))
+        {
+        <section class="content-header">
+                @RenderSection("ContentHeader")
+            </section>
+        }
+
+            @RenderBody()
+        </section>
+    </main>
+}
+</body>
+</html>

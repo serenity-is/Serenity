@@ -6,9 +6,11 @@ namespace Serenity.Abstractions;
 public interface ILanguageFallbacks
 {
     /// <summary>
-    /// Gets the explicitly registered language fallbacks
+    /// Gets the language fallbacks for specified language ID. It returns empty list 
+    /// for invariant language. For other language ID's the last element is always 
+    /// the invariant language ID.
     /// </summary>
-    IDictionary<string, string> GetLanguageFallbacks();
+    IEnumerable<string> GetLanguageFallbacks(string languageID);
 
     /// <summary>
     /// Sets the language fallback of the specified language.

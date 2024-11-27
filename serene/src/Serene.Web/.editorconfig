@@ -1,0 +1,25 @@
+root = true
+
+[*]
+indent_style = space
+indent_size = 4
+end_of_line = lf
+charset = utf-8
+trim_trailing_whitespace = true
+csharp_style_namespace_declarations = file_scoped:silent
+
+[*.json]
+indent_size = 2
+
+[*.cs]
+# IDE0130:Namespace does not match folder structure
+dotnet_diagnostic.IDE0130.severity = none
+
+[*.csproj]
+indent_size = 2
+
+[*.css]
+indent_size = 2
+
+[*.md]
+trim_trailing_whitespace = false

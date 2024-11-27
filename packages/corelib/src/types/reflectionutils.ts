@@ -1,4 +1,4 @@
-﻿export namespace ReflectionUtils {
+export namespace ReflectionUtils {
 
     export function getPropertyValue(o: any, property: string): any {
         var d = o;
@@ -55,13 +55,13 @@
             return s;
         }
         else if (numUppercaseChars > 1) {
-            return s.substr(0, numUppercaseChars - 1).toLowerCase() + s.substr(numUppercaseChars - 1);
+            return s.substring(0, numUppercaseChars - 1).toLowerCase() + s.substring(numUppercaseChars - 1);
         }
         else if (s.length === 1) {
             return s.toLowerCase();
         }
         else {
-            return s.substr(0, 1).toLowerCase() + s.substr(1);
+            return s.substring(0, 1).toLowerCase() + s.substring(1);
         }
     }
 }

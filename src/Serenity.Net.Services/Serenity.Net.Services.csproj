@@ -5,8 +5,9 @@
     <Description>Contains classes for CRUD service / repository implementations...</Description>
   </PropertyGroup>
   <ItemGroup>
-    <ProjectReference Include="..\Serenity.Net.Entity\Serenity.Net.Entity.csproj" />
-    <PackageReference Include="SixLabors.ImageSharp" Version="2.1.9" />
+    <ProjectReference Include="..\Serenity.Net.Core\Serenity.Net.Core.csproj" />
+    <PackageReference Include="Dapper" Version="2.1.35" />
     <PackageReference Include="Microsoft.Extensions.FileProviders.Abstractions" Version="8.0.0" />
+    <PackageReference Include="SixLabors.ImageSharp" Version="2.1.9" />
   </ItemGroup>
 </Project>

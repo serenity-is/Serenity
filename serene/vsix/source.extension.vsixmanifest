@@ -1,0 +1,39 @@
+<PackageManifest Version="2.0.0" xmlns="http://schemas.microsoft.com/developer/vsx-schema/2011" xmlns:d="http://schemas.microsoft.com/developer/vsx-schema-design/2011">
+  <Metadata>
+    <Identity Id="Serene_SerenityApplicationTemplate" Version="8.7.4.0" Language="en-US" Publisher="Volkan Ceylan" />
+    <DisplayName>Serene</DisplayName>
+    <Description xml:space="preserve">Serenity is an ASP.NET Core / TypeScript application platform designed to simplify and shorten development of data-centric business applications with a service based architecture. 
+    Serene is a starter template to build Serenity applications.</Description>
+    <MoreInfo>https://github.com/serenity-is/Serenity</MoreInfo>
+    <License>LICENCE.txt</License>
+    <Icon>icon.png</Icon>
+    <Tags>Serenity</Tags>
+  </Metadata>
+  <Installation InstalledByMsi="false">
+    <InstallationTarget Id="Microsoft.VisualStudio.Community" Version="[16.0,17.0)">
+      <ProductArchitecture>x86</ProductArchitecture>
+    </InstallationTarget>
+    <InstallationTarget Id="Microsoft.VisualStudio.Community" Version="[17.0,18.0)">
+      <ProductArchitecture>amd64</ProductArchitecture>
+    </InstallationTarget>
+    <InstallationTarget Id="Microsoft.VisualStudio.Professional" Version="[16.0,17.0)">
+      <ProductArchitecture>x86</ProductArchitecture>
+    </InstallationTarget>
+    <InstallationTarget Id="Microsoft.VisualStudio.Professional" Version="[17.0,18.0)">
+      <ProductArchitecture>amd64</ProductArchitecture>
+    </InstallationTarget>
+    <InstallationTarget Id="Microsoft.VisualStudio.Enterprise" Version="[16.0,17.0)">
+      <ProductArchitecture>x86</ProductArchitecture>
+    </InstallationTarget>
+    <InstallationTarget Id="Microsoft.VisualStudio.Enterprise" Version="[17.0,18.0)">
+      <ProductArchitecture>amd64</ProductArchitecture>
+    </InstallationTarget>
+  </Installation>
+  <Assets>
+    <Asset Type="Microsoft.VisualStudio.Assembly" d:Source="Project" d:ProjectName="RootProjectWizard" Path="|RootProjectWizard|" AssemblyName="|RootProjectWizard;AssemblyName|" />
+    <Asset Type="Microsoft.VisualStudio.ProjectTemplate" d:Source="File" Path="ProjectTemplates" d:TargetPath="ProjectTemplates\SereneCore.Template.zip" />
+  </Assets>
+  <Prerequisites>
+    <Prerequisite Id="Microsoft.VisualStudio.Component.CoreEditor" Version="[14.0,18.0)" DisplayName="Visual Studio core editor" />
+  </Prerequisites>
+</PackageManifest>

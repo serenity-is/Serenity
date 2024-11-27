@@ -1,0 +1,484 @@
+@model Serene.Common.DashboardPageModel
+@inject ITextLocalizer Localizer
+@{
+    ViewData["Title"] = "Dashboard";
+ViewData["PageId"] = "Dashboard";
+}
+
+@section Head {
+@Html.StyleBundle("Pages/Dashboard")
+@Html.ScriptBundle("Pages/Dashboard")
+}
+
+@section ContentHeader {
+    <h1>@Localizer.Get("Navigation.Dashboard")</h1>
+}
+
+<style>
+.s-dashboard-card, .s-dashboard-card-sm {
+    margin-bottom: var(--bs-gutter-x);
+}
+
+.s-dashboard-card .card-header {
+    padding: 1rem;
+    border-bottom: none;
+    background-color: transparent;
+}
+
+.s-dashboard-card .card-body {
+    border-radius: 0 0 4px 4px;
+    padding: 1rem;
+}
+
+.s-dashboard-card .card-footer {
+    border-top-color: transparent;
+    background-color: transparent;
+    padding: 1rem;
+}
+
+.s-dashboard-card .card-title {
+    margin: 0;
+    font-size: 1.4rem;
+    color: var(--s-table-title);
+}
+
+.s-dashboard-card-sm .card-body {
+    padding: 1rem;
+    border-radius: 4px 4px 0 0;
+    margin: 1px;
+}
+
+.s-dashboard-card-sm .card-footer {
+    color: rgba(var(--s-bright-rgb), 0.8);
+    background-color: var(--bs-body-bg);
+    border-radius: 0 0 4px 4px;
+    border-top: none;
+    margin: 0 1px 1px 1px;
+    padding: 3px 0;
+    text-align: center;
+    text-decoration: none;
+}
+
+.s-dashboard-card-sm h3 {
+    font-size: 38px;
+    font-weight: bold;
+    margin: 0 0 10px 0;
+    white-space: nowrap;
+    padding: 0;
+}
+
+.s-dashboard-card-sm p {
+    font-size: 15px;
+}
+
+.s-dashboard-card-sm p > small {
+    display: block;
+    font-size: 13px;
+    margin-top: 5px;
+}
+
+.s-dashboard-card-sm .icon {
+    transition: all 0.3s linear;
+    position: absolute;
+    top: 13px;
+    color: #fff;
+    opacity: 0.9;
+    right: 10px;
+    font-size: 64px;
+}
+
+.bg-world-map {
+    background: #3c8dbc;
+}
+
+.s-dashboard-card-sm:hover .icon {
+    font-size: 70px;
+}
+</style>
+
+
+<div class="row">
+    <div class="col-lg-3 col-sm-6">
+        <div class="card s-dashboard-card-sm bg-primary bg-opacity-50">
+            <div class="card-body">
+                <h3>@Model.OpenOrders</h3>
+                <p>Open Orders</p>
+            </div>
+            <div class="icon">
+                <i class="fa fa-shopping-cart"></i>
+            </div>
+        </div>
+    </div>
+    <div class="col-lg-3 col-sm-6">
+        <div class="card s-dashboard-card-sm s-alt bg-info bg-opacity-50">
+            <div class="card-body">
+                <h3>@Model.ClosedOrderPercent<sup style="font-size: 20px">%</sup></h3>
+                <p>Closed Orders</p>
+            </div>
+            <div class="icon">
+                <i class="fa fa-truck"></i>
+            </div>
+        </div>
+    </div>
+    <div class="col-lg-3 col-sm-6">
+        <div class="card s-dashboard-card-sm bg-warning bg-opacity-50">
+            <div class="card-body">
+                <h3>@Model.CustomerCount</h3>
+                <p>Total Customers</p>
+            </div>
+            <div class="icon">
+                <i class="fa fa-user-plus"></i>
+            </div>
+        </div>
+    </div>
+    <div class="col-lg-3 col-sm-6">
+        <div class="card s-dashboard-card-sm s-alt bg-success bg-opacity-50">
+            <div class="card-body">
+                <h3>@Model.ProductCount</h3>
+                <p>Product Types</p>
+            </div>
+            <div class="icon">
+                <i class="fa fa-tag"></i>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="row">
+    <section class="col-lg-7">
+        <div class="card s-dashboard-card">
+            <div class="card-body">
+                <ul class="nav nav-tabs" role="tablist">
+                    <li class="header"><h3 class="card-title">Orders</h3></li>
+                    <li class="nav-item ms-auto"><a class="nav-link active" href="#orders-by-quarter-pane" data-bs-toggle="tab">By Quarter</a></li>
+                    <li class="nav-item"><a class="nav-link" href="#orders-by-type-pane" data-bs-toggle="tab">By Type</a></li>
+                </ul>
+                <div class="tab-content no-padding">
+                    <div class="tab-pane fade show active" id="orders-by-quarter-pane">
+                        <canvas id="orders-by-quarter-chart" style="height: 280px;"></canvas>
+                    </div>
+                    <div class="tab-pane fade" id="orders-by-type-pane">
+                        <canvas id="orders-by-type-chart" style="height: 280px; width: 300px; margin: 0 auto;"></canvas>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="card s-dashboard-card">
+            <div class="card-header d-flex">
+                <h3 class="card-title">Traffic &amp; Origin</h3>
+            </div>
+            <div class="card-body">
+                <canvas id="traffic-chart" style="height: 266px;"></canvas>
+            </div>
+            <div class="card-footer no-border">
+                <div class="row">
+                    <div class="col-4 text-center" style="border-right: 1px solid #f4f4f4">
+                        <input type="text" class="knob" data-readonly="true" value="45" data-width="60" data-height="60" data-fgColor="#39a0ff" data-bgColor="#39a0ff50">
+                        <div class="knob-label">Search</div>
+                    </div>
+                    <div class="col-4 text-center" style="border-right: 1px solid #f4f4f4">
+                        <input type="text" class="knob" data-readonly="true" value="20" data-width="60" data-height="60" data-fgColor="#39a0ff" data-bgColor="#39a0ff50">
+                        <div class="knob-label">Social</div>
+                    </div>
+                    <div class="col-4 text-center">
+                        <input type="text" class="knob" data-readonly="true" value="35" data-width="60" data-height="60" data-fgColor="#39a0ff" data-bgColor="#39a0ff50">
+                        <div class="knob-label">Other</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <section class="col-lg-5">
+        <div class="card s-dashboard-card bg-world-map">
+            <div class="card-header d-flex">
+                <h3 class="card-title text-white">
+                    <i class="fa fa-map-marker"></i> Visitors
+                </h3>
+                <div class="ms-auto s-dashboard-card-tools">
+                    <button class="btn btn-primary btn-sm daterange" data-toggle="tooltip" title="Date range"><i class="fa fa-calendar"></i></button>
+                </div>
+            </div>
+            <div class="card-body">
+                <div id="world-map" style="height: 253px; width: 100%;"></div>
+            </div>
+            <div class="card-footer border-top-0">
+                <div class="row">
+                    <div class="col-4 text-center">
+                        <div id="sparkline-1"></div>
+                        <div class="knob-label text-white text-opacity-75">New Visitors</div>
+                    </div>
+                    <div class="col-4 text-center">
+                        <div id="sparkline-2"></div>
+                        <div class="knob-label text-white text-opacity-75">Online</div>
+                    </div>
+                    <div class="col-4 text-center">
+                        <div id="sparkline-3"></div>
+                        <div class="knob-label text-white text-opacity-75">Returning</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="card s-dashboard-card">
+            <div class="card-body p-0">
+                <div id="calendar" style="width: 100%"></div>
+            </div>
+            <div class="card-footer py-4">
+                <div class="row">
+                    <div class="col-sm-6">
+                        <div class="clearfix">
+                            <span class="pull-left">Task #1</span>
+                            <small class="float-end">90%</small>
+                        </div>
+                        <div class="progress xs">
+                            <div class="progress-bar progress-bar-green" style="width: 90%;"></div>
+                        </div>
+                        <div class="clearfix">
+                            <span class="pull-left">Task #2</span>
+                            <small class="float-end">70%</small>
+                        </div>
+                        <div class="progress xs">
+                            <div class="progress-bar progress-bar-green" style="width: 70%;"></div>
+                        </div>
+                    </div>
+                    <div class="col-sm-6">
+                        <div class="clearfix">
+                            <span class="pull-left">Task #3</span>
+                            <small class="float-end">60%</small>
+                        </div>
+                        <div class="progress xs">
+                            <div class="progress-bar progress-bar-green" style="width: 60%;"></div>
+                        </div>
+                        <div class="clearfix">
+                            <span class="pull-left">Task #4</span>
+                            <small class="float-end">40%</small>
+                        </div>
+                        <div class="progress xs">
+                            <div class="progress-bar progress-bar-green" style="width: 40%;"></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+</div>
+
+<script>
+
+    $(function () {
+
+        
+        $('.daterange').daterangepicker({
+            ranges: {
+                'Today': [moment(), moment()],
+                'Yesterday': [moment().subtract(1, 'days'), moment().subtract(1, 'days')],
+                'Last 7 Days': [moment().subtract(6, 'days'), moment()],
+                'Last 30 Days': [moment().subtract(29, 'days'), moment()],
+                'This Month': [moment().startOf('month'), moment().endOf('month')],
+                'Last Month': [moment().subtract(1, 'month').startOf('month'), moment().subtract(1, 'month').endOf('month')]
+            },
+            startDate: moment().subtract(29, 'days'),
+            endDate: moment()
+        }, function (start, end) {
+            window.alert("You chose: " + start.format('MMMM D, YYYY') + ' - ' + end.format('MMMM D, YYYY'));
+        });
+
+        $(".knob").knob();
+
+        var visitorsData = {
+            "US": 398, //USA
+            "SA": 400, //Saudi Arabia
+            "CA": 1000, //Canada
+            "DE": 500, //Germany
+            "FR": 760, //France
+            "CN": 300, //China
+            "AU": 700, //Australia
+            "BR": 600, //Brazil
+            "IN": 800, //India
+            "GB": 320, //Great Britain
+            "RU": 3000 //Russia
+        };
+
+        $('#world-map').vectorMap({
+            map: 'world_mill_en',
+            backgroundColor: "transparent",
+            regionStyle: {
+                initial: {
+                    fill: 'rgba(64, 80, 96, 0.5)',
+                    "fill-opacity": 1,
+                    stroke: 'none',
+                    "stroke-width": 0,
+                    "stroke-opacity": 1
+                }
+            },
+            series: {
+                regions: [{
+                    values: visitorsData,
+                    scale: ["#72b1dc", "#f3f7ff"],
+                    normalizeFunction: 'polynomial'
+                }]
+            },
+            onRegionLabelShow: function (e, el, code) {
+                if (typeof visitorsData[code] != "undefined")
+                    el.html(el.html() + ': ' + visitorsData[code] + ' new visitors');
+            }
+        });
+
+        $("#calendar").datepicker();
+
+        const scaleGrid = {
+            color: 'rgba(140, 142, 150, 0.15)',
+            borderDash: [8, 4]
+        }
+
+        var salesByQuarterChart = new Chart(document.getElementById('orders-by-quarter-chart'), {
+            type: 'line',
+            data: {
+                labels: ['2020 Q1', '2020 Q2', '2020 Q3', '2020 Q4', '2021 Q1', '2021 Q2', '2021 Q3', '2021 Q4' ],
+                datasets: [
+                    {
+                        backgroundColor: 'rgba(75, 192, 192, 0.5)',
+                        borderColor: 'rgb(255, 255, 255, 0.7)',
+                        borderWidth: 4,
+                        radius: 0,
+                        hitRadius: 6,
+                        label: 'Closed Orders',
+                        fill: true,
+                        data: [ 1969, 3597, 1914, 4293, 3795, 5967, 4460, 5713 ]
+                    },
+                    {
+                        label: 'All Orders',
+                        backgroundColor: 'rgba(54, 162, 235, 0.4)',
+                        borderColor: 'rgba(54, 162, 235, 0.2)',
+                        borderWidth: 4,
+                        radius: 0,
+                        hitRadius: 6,
+                        fill: true,
+                        data: [ 4912, 3767, 6810, 5670, 4820, 15073, 10687, 8432 ]
+                    }
+                ]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                scales: {
+                    x: {
+                        ticks: {
+                            color: 'rgb(140, 142, 150)'
+                        },
+                        grid: {
+                            display: false,
+                        }
+                    },
+                    y: {
+                        ticks: {
+                            color: 'rgb(140, 142, 150)'
+                        },
+                        grid: scaleGrid
+                    }
+                }
+            }
+        });
+      
+        var salesByTypeChart = new Chart(document.getElementById('orders-by-type-chart'), {
+            type: 'doughnut',
+            data: {
+                labels: ["Download Sales", "In-Store Sales", "Mail-Order Sales"],
+                datasets: [{
+                    label: 'Sales by Type',
+                    data: [20, 50, 30],
+                    backgroundColor:  [
+                        '#4dc9f6',
+                        '#f67019',
+                        '#f53794'
+                    ]
+                }]
+            },
+            options: {
+                responsive: false,
+                maintainAspectRatio: false
+            }
+        });
+
+        var trafficChart = new Chart(document.getElementById('traffic-chart'), {
+            type: 'bar',
+            data: {
+                labels: Array(37).fill().map(function(x, n) { var d = new Date(); d.setDate(d.getDate() - n); return Q.formatDate(d, 'MMM dd'); }).reverse(),
+                datasets: [
+                    {
+                        label: 'Search',
+                        backgroundColor: "#206bc4", 
+                        barPercentage: 0.7,
+                        data: [1, 0, 0, 0, 0, 1, 1, 0, 0, 0, 2, 12, 5, 8, 22, 6, 8, 6, 4, 1, 8, 24, 29, 51, 40, 47, 23, 26, 50, 26, 41, 22, 46, 47, 81, 46, 6]
+                    },
+                    {
+                        label: 'Social',
+                        backgroundColor: "#79a6dc",
+                        barPercentage: 0.7,
+                        data: [2, 5, 4, 3, 3, 1, 4, 7, 5, 1, 2, 5, 3, 2, 6, 7, 7, 1, 5, 5, 2, 12, 4, 6, 18, 3, 5, 2, 13, 15, 20, 47, 18, 15, 11, 10, 0]
+                    },
+                    {
+                        label: 'Other',
+                        backgroundColor: "#bfe399",
+                        barPercentage: 0.7,
+                        data: [2, 9, 1, 7, 8, 3, 6, 5, 5, 4, 6, 4, 1, 9, 3, 6, 7, 5, 2, 8, 4, 9, 1, 2, 6, 7, 5, 1, 8, 3, 2, 3, 4, 9, 7, 1, 6]
+                    }
+                ]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                plugins: {
+                    legend: {
+                        display: false
+                    }
+                },
+                scales: {
+                    x: {
+                        stacked: true,
+                        ticks: {
+                            callback: function(val, index) {
+                                return index % 4 === 0 ? this.getLabelForValue(val) : '';
+                            },
+                            color: 'rgb(140, 142, 150)'
+                        },
+                        grid: {
+                            color: 'rgba(140, 142, 150, 0.15)',
+                            borderDash: [8, 4]
+                        }
+                    },
+                    y: {
+                        stacked: true,
+                        ticks: {
+                            color: 'rgb(140, 142, 150)'
+                        },
+                        grid: {
+                            color: 'rgba(140, 142, 150, 0.15)',
+                            borderDash: [8, 4]
+                        }
+                    }
+                }
+            }
+        });
+            
+
+        var sparklineOpt = {
+            type: 'bar',
+            barColor: "#f0f0f0",
+            barWidth: 6,
+            barSpacing: 2,
+            height: '40'
+        }
+
+        $('#sparkline-1').sparkline([1000, 1200, 920, 927, 931, 1027, 819, 930, 1021], sparklineOpt);
+        $('#sparkline-2').sparkline([515, 519, 520, 522, 652, 810, 370, 627, 319, 630, 921], sparklineOpt);
+        $('#sparkline-3').sparkline([15, 19, 20, 22, 33, 27, 31, 27, 19, 30, 21], sparklineOpt);
+
+        $('.s-dashboard-card ul.nav a').on('shown.bs.tab', function () {
+            salesByQuarterChart.update();
+            salesByTypeChart.update();
+        });
+    });
+</script>

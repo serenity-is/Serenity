@@ -1,4 +1,4 @@
-﻿using ServerTypingsTest.TypeWithGenericParameters;
+using ServerTypingsTest.TypeWithGenericParameters;
 
 namespace Serenity.Tests.CodeGenerator
 {
@@ -11,10 +11,7 @@ namespace Serenity.Tests.CodeGenerator
             generator.RootNamespaces.Add("Serenity");
             var result = generator.Run();
             var code = Assert.Single(result).Text;
-            Assert.Contains("namespace ServerTypingsTest.TypeWithGenericParameters {", code);
-            Assert.True(
-                code.Contains("export interface TypeWithOneGenericParameter<T> extends ServiceRequest") ||
-                code.Contains("export interface TypeWithOneGenericParameter<T> extends Serenity.ServiceRequest"));
+            Assert.Contains("export interface TypeWithOneGenericParameter<T> extends ServiceRequest", code);
             Assert.Contains("SomeList?: T[];", code);
             Assert.Contains("SomeDictionary?: { [key: string]: T };", code);
         }
@@ -26,10 +23,7 @@ namespace Serenity.Tests.CodeGenerator
             generator.RootNamespaces.Add("Serenity");
             var result = generator.Run();
             var code = Assert.Single(result).Text;
-            Assert.Contains("namespace ServerTypingsTest.TypeWithGenericParameters {", code);
-            Assert.True(
-                code.Contains("export interface TypeWithOneGenericAndBase<T> extends RetrieveResponse<string>") ||
-                code.Contains("export interface TypeWithOneGenericAndBase<T> extends Serenity.RetrieveResponse<string>"));
+            Assert.Contains("export interface TypeWithOneGenericAndBase<T> extends RetrieveResponse<string>", code);
             Assert.Contains("SomeList?: T[];", code);
             Assert.Contains("SomeDictionary?: { [key: string]: T };", code);
         }
@@ -41,10 +35,7 @@ namespace Serenity.Tests.CodeGenerator
             generator.RootNamespaces.Add("Serenity");
             var result = generator.Run();
             var code = Assert.Single(result).Text;
-            Assert.Contains("namespace ServerTypingsTest.TypeWithGenericParameters {", code);
-            Assert.True(
-                code.Contains("export interface TypeWithTwoGenericParameters<T1, T2> extends ServiceRequest") ||
-                code.Contains("export interface TypeWithTwoGenericParameters<T1, T2> extends Serenity.ServiceRequest"));
+            Assert.Contains("export interface TypeWithTwoGenericParameters<T1, T2> extends ServiceRequest", code);
             Assert.Contains("SomeList1?: T1[];", code);
             Assert.Contains("SomeList2?: T2[];", code);
             Assert.Contains("SomeDictionary?: { [key: T1]: T2 };", code);

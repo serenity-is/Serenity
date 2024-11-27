@@ -207,7 +207,7 @@ public static class JSON
             {
                 // Unfortunately System.Text.Json does not read the converter type
                 // from the base type's JsonConverter attribute
-                var rowJsonConverterType = Type.GetType("Serenity.JsonConverters.RowJsonConverter, Serenity.Net.Entity");
+                var rowJsonConverterType = Type.GetType("Serenity.JsonConverters.RowJsonConverter, Serenity.Net.Services");
                 if (rowJsonConverterType != null)
                     rowJsonConverter = (JsonConverter)Activator.CreateInstance(rowJsonConverterType);
             }

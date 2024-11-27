@@ -1,4 +1,5 @@
-﻿import { addEmptyOption, addOption, clearOptions, findElementWithRelativeId, attrEncode, outerHtml, newBodyDiv } from "./html-compat";
+import { addEmptyOption, addOption, clearOptions, findElementWithRelativeId, outerHtml, newBodyDiv } from "./html-compat";
+import * as deprecations from "./html-compat";
 
 describe("addEmptyOption", () => {
     it("adds an option to the select", () => {
@@ -30,8 +31,8 @@ describe("addOption", () => {
 
 describe("attrEncode", () => {
     it("is same with htmlEncode", () => {
-        expect(attrEncode("<div>test</div>")).toBe("&lt;div&gt;test&lt;/div&gt;");
-        expect(attrEncode("'&><\"")).toBe("&#39;&amp;&gt;&lt;&quot;");
+        expect((deprecations as any).attrEncode("<div>test</div>")).toBe("&lt;div&gt;test&lt;/div&gt;");
+        expect((deprecations as any).attrEncode("'&><\"")).toBe("&#39;&amp;&gt;&lt;&quot;");
     });
 });
 

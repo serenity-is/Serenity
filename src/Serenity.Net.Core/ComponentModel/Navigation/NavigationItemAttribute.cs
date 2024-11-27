@@ -87,4 +87,14 @@ public abstract class NavigationItemAttribute : Attribute
     /// Window target to open this link, e.g. _blank etc.
     /// </summary>
     public string? Target { get; set; }
+
+    /// <summary>
+    /// The set of feature toggles that this navigation item depends on.
+    /// </summary>
+    public string[]? RequireFeatures { get; set; }
+
+    /// <summary>
+    /// True to require any of the RequireFeatures to be enabled in order to pass.
+    /// </summary>
+    public bool RequireAnyFeature { get; set; }
 }

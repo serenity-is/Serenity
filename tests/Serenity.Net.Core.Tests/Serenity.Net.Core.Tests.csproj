@@ -1,5 +1,0 @@
-<Project Sdk="Microsoft.NET.Sdk">
-  <ItemGroup>
-    <ProjectReference Include="..\..\src\Serenity.Net.Core\Serenity.Net.Core.csproj" />
-  </ItemGroup>
-</Project>

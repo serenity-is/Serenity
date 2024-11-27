@@ -1,4 +1,4 @@
-﻿import { Decorators } from "../../types/decorators";
+import { Decorators } from "../../types/decorators";
 import { EditorProps } from "./editorwidget";
 import { SelectEditor, SelectEditorOptions } from "./selecteditor";
 
@@ -35,7 +35,7 @@ export class DateYearEditor<P extends DateYearEditorOptions = DateYearEditorOpti
 
         opt.maxYear = (opt.maxYear ?? '+10').toString();
         if (opt.maxYear.startsWith('-')) {
-            maxYear -= parseInt(opt.maxYear.substr(1), 10);
+            maxYear -= parseInt(opt.maxYear.substring(1), 10);
         }
         else if (opt.maxYear.startsWith('+')) {
             maxYear += parseInt(opt.maxYear.substring(1), 10);

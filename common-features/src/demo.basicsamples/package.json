@@ -1,0 +1,18 @@
+{
+  "name": "@serenity-is/demo.basicsamples",
+  "dependencies": {
+    "@serenity-is/demo.northwind": "workspace:*",
+    "@serenity-is/extensions": "workspace:*",
+    "chart.js": "4.4.4"
+  },
+  "main": "wwwroot/index.js",
+  "private": true,
+  "scripts": {
+    "build": "node ./tsbuild.js",
+    "build:watch": "node ./tsbuild.js --watch",
+    "jest": "node ../../../node_modules/jest/bin/jest.js",
+    "test": "node ./tsbuild.js && pnpm jest --coverage",
+    "tsc": "tsc"
+  },
+  "type": "module"
+}

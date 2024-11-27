@@ -1,9 +1,10 @@
-﻿import { endsWith, isEmptyOrNull, isTrimmedEmpty, padLeft, replaceAll, startsWith, toSingleLine, trim, trimEnd, trimStart, trimToEmpty, zeroPad } from "./strings-compat";
+import { isEmptyOrNull, isTrimmedEmpty, padLeft, replaceAll, toSingleLine, trim, trimEnd, trimStart, trimToEmpty, zeroPad } from "./strings-compat";
+import * as deprecations from "./strings-compat";
 
 describe("endsWith", () => {
     it("uses String.prototype.endsWith", () => {
         var endsWithSpy = jest.spyOn(String.prototype, "endsWith");
-        expect(endsWith("abc", "c")).toBe(true);
+        expect((deprecations as any).endsWith("abc", "c")).toBe(true);
         expect(endsWithSpy).toHaveBeenCalled();
     });
 });
@@ -108,7 +109,7 @@ describe("replaceAll", () => {
 describe("startsWith", () => {
     it("uses String.prototype.startsWith", () => {
         var startsWithSpy = jest.spyOn(String.prototype, "startsWith");
-        expect(startsWith("abc", "a")).toBe(true);
+        expect((deprecations as any).startsWith("abc", "a")).toBe(true);
         expect(startsWithSpy).toHaveBeenCalled();
     });
 });

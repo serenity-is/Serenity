@@ -1,0 +1,31 @@
+﻿@{
+    ViewData["Title"] = "Grid Filtered By Criteria";
+}
+
+@section ContentHeader {
+    <h1>@ViewData["Title"]<small></small></h1>
+}
+
+<div class="alert alert-info alert-dismissable alert-dismissible s-sample-info">
+    <button type="button" class="close btn-close" data-dismiss="alert" data-bs-dismiss="alert" aria-hidden="true">&times;</button>
+    <p>
+        There are several ways to filter a grid in Serenity. Quick search box, quick filters
+        and edit filter dialog etc. All of these filtering options are modifiable
+        by end users. Even if you set an initial filter, end user might be able to clear it.
+    </p>
+    <p>
+        Sometimes you may want to prefilter records that are shown in a particular page.
+        ListRequest has a "Criteria" parameter to let you handle this from client
+        side (this parameter is also used by edit filter dialog).
+    </p>
+    <p>
+        Here we show only products that match criteria "UnitsInStock > 10 and Category != Condiments and 
+        Discountinued == false". See @Html.BasicSamplesSourceFile("GridFilteredByCriteriaPage.ts") to see how.
+    </p>
+
+    <p class="s-sample-sources"><b>Source Files:</b> @Html.BasicSamplesSourceFile("Index.cshtml"), @Html.BasicSamplesSourceFile("GridFilteredByCriteriaPage.ts")</p>
+</div>
+
+<div id="GridDiv"></div>
+
+@Html.ModulePageInit(ESM.GridFilteredByCriteriaPage)

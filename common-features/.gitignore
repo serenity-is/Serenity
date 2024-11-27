@@ -1,0 +1,17 @@
+artifacts/
+dynamic-data/
+out/
+/build/.nupkg/
+/src/*/coverage
+/src/*/dist/index.css
+/src/*/dist/index.css.map
+/src/*/dist/index.js
+/src/*/dist/index.min.js
+/src/*/dist/index.js.map
+/src/*/wwwroot/index.js
+/src/*/wwwroot/index.min.js
+/src/*/wwwroot/index.js.map
+/src/*/wwwroot/esm/
+*.csproj.user
+.restore-stamp
+package-lock.json

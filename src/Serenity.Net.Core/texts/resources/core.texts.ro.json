@@ -2,5 +2,9 @@
   "Authorization.AccessDenied": "Această solicitare a fost respinsă!",
   "Authorization.NotLoggedIn": "Autorizarea este necesară pentru această solicitare!",
   "Db.Shared.RecordId": "ID",
-  "Services.GenericErrorMessage": "A apărut o eroare în timpul procesării solicitării dumneavoastră"
+  "Services.GenericErrorMessage": "A apărut o eroare în timpul procesării solicitării dumneavoastră",
+  "Services.HttpError": "Eroare HTTP {0}.",
+  "Services.InternalServerError": "Eroare internă a serverului (500).",
+  "Services.SeeBrowserConsole": "Consultați consola browserului (F12) pentru mai multe informații.",
+  "Services.UnknownConnectionError": "A apărut o eroare în timpul conectării la server."
 }

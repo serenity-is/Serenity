@@ -1,0 +1,12 @@
+{
+  "Data": {
+    "Default": {
+      "ConnectionString": "Data Source=App_Data/Serene_Default_v1.sqlite",
+      "ProviderName": "Microsoft.Data.Sqlite"
+    },
+    "Northwind": {
+      "ConnectionString": "Data Source=App_Data/Serene_Northwind_v1.sqlite",
+      "ProviderName": "Microsoft.Data.Sqlite"
+    }
+  }
+}

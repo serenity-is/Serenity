@@ -1,0 +1,11 @@
+{
+  "__comment__": "Auto generated from the assembly to use as a template for translation. Don't modify. This file is ignored at runtime.",
+  "Authorization.AccessDenied": "Authorization has been denied for this request!",
+  "Authorization.NotLoggedIn": "Authorization is required for this request!",
+  "Db.Shared.RecordId": "ID",
+  "Services.GenericErrorMessage": "An error occurred while processing your request.",
+  "Services.HttpError": "HTTP Error {0}.",
+  "Services.InternalServerError": "Internal Server Error (500).",
+  "Services.SeeBrowserConsole": "See browser console (F12) for more information.",
+  "Services.UnknownConnectionError": "An error occurred while connecting to the server."
+}

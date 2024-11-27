@@ -1,33 +1,34 @@
-import { coalesce, isValue, today } from "./system-compat";
+import { today } from "./system-compat";
+import * as deprecations from "./system-compat"
 
 describe("coalesce", () => {
     it('returns first value if not null', function () {
-        expect(coalesce(1, 2)).toBe(1);
+        expect((deprecations as any).coalesce(1, 2)).toBe(1);
     });
 
     it('returns second value if null', function () {
-        expect(coalesce(null, 2)).toBe(2);
-        expect(coalesce(undefined, 2)).toBe(2);
+        expect((deprecations as any).coalesce(null, 2)).toBe(2);
+        expect((deprecations as any).coalesce(undefined, 2)).toBe(2);
     });
 
     it('returns second if both null', function () {
-        expect(coalesce(null, null)).toBe(null);
-        expect(coalesce(undefined, null)).toBe(null);
-        expect(coalesce(undefined, undefined)).toBe(undefined);
-        expect(coalesce(null, undefined)).toBe(undefined);
+        expect((deprecations as any).coalesce(null, null)).toBe(null);
+        expect((deprecations as any).coalesce(undefined, null)).toBe(null);
+        expect((deprecations as any).coalesce(undefined, undefined)).toBe(undefined);
+        expect((deprecations as any).coalesce(null, undefined)).toBe(undefined);
     });
 });
 
 describe("isValue", () => {
     it('isValue returns false for null or undefined', function () {
-        expect(isValue(null)).toBe(false);
-        expect(isValue(undefined)).toBe(false);
+        expect((deprecations as any).isValue(null)).toBe(false);
+        expect((deprecations as any).isValue(undefined)).toBe(false);
     });
 
     it('isValue returns true for non null or undefined', function () {
-        expect(isValue(true)).toBe(true);
-        expect(isValue(false)).toBe(true);
-        expect(isValue("")).toBe(true);
+        expect((deprecations as any).isValue(true)).toBe(true);
+        expect((deprecations as any).isValue(false)).toBe(true);
+        expect((deprecations as any).isValue("")).toBe(true);
     });
 });
 

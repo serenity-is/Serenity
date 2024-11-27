@@ -1,0 +1,16 @@
+{
+  "compilerOptions": {
+    "noEmit": true,
+    "lib": [
+      "es2015",
+      "dom"
+    ],
+    "outDir": "./out",
+    "types": [
+      "jest"
+    ]
+  },
+  "include": [
+    "."
+  ]
+}

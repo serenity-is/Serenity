@@ -1,0 +1,22 @@
+﻿@{
+    ViewData["Title"] = "Inline Image in Grid";
+}
+
+@section Head {
+}
+
+@section ContentHeader {
+    <h1>@ViewData["Title"]<small></small></h1>
+}
+
+<div class="alert alert-info alert-dismissable alert-dismissible s-sample-info">
+    <button type="button" class="close btn-close" data-dismiss="alert" data-bs-dismiss="alert" aria-hidden="true">&times;</button>
+    <p>Here is how to show a product image inline in grid.</p>
+    <p>If you didn't yet, please upload an image for a product for this demonstration to work.</p>
+
+    <p class="s-sample-sources"><b>Source Files:</b> @Html.BasicSamplesSourceFile("Index.cshtml"), @Html.BasicSamplesSourceFile("InlineImageInGridPage.tsx")</p>
+</div>
+
+<div id="GridDiv"></div>
+
+@Html.ModulePageInit(ESM.InlineImageInGridPage)

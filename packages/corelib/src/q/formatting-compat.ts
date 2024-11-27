@@ -1,4 +1,4 @@
-﻿import { Culture, parseInteger, stringFormat, stringFormatLocale } from "../base";
+import { Culture, parseInteger, stringFormat, stringFormatLocale } from "../base";
 /**
  * A string to lowercase function that handles special Turkish
  * characters like 'ı'. Left in for compatibility reasons.
@@ -21,6 +21,7 @@ export function turkishLocaleToUpper(a: string): string {
 
 /**
  * This is an alias for Culture.stringCompare, left in for compatibility reasons.
+ * @deprecated Use Culture.stringCompare
  */
 export let turkishLocaleCompare = Culture.stringCompare;
 
@@ -66,14 +67,14 @@ export function parseHourAndMin(value: string): number {
         return NaN;
     let h: number, m: number;
     if (v.charAt(1) == ':') {
-        h = parseInteger(v.substr(0, 1));
-        m = parseInteger(v.substr(2, 2));
+        h = parseInteger(v.substring(0, 1));
+        m = parseInteger(v.substring(2, 4));
     }
     else {
         if (v.charAt(2) != ':')
             return NaN;
-        h = parseInteger(v.substr(0, 2));
-        m = parseInteger(v.substr(3, 2));
+        h = parseInteger(v.substring(0, 2));
+        m = parseInteger(v.substring(3, 5));
     }
     if (isNaN(h) || isNaN(m) || h < 0 || h > 23 || m < 0 || m > 59)
         return NaN;

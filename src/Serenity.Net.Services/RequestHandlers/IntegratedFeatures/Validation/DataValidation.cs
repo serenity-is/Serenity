@@ -162,7 +162,7 @@ public static class DataValidation
     public static ValidationError RequiredError(string name, ITextLocalizer localizer, string title = null)
     {
         return new ValidationError("Required", name,
-            Texts.Validation.FieldIsRequired.ToString(localizer),
+            ValidationTexts.FieldIsRequired.ToString(localizer),
             title ?? name);
     }
 
@@ -175,7 +175,7 @@ public static class DataValidation
     public static ValidationError InvalidIdError(IRow row, Field field, ITextLocalizer localizer)
     {
         return new ValidationError("InvalidId", field.Name,
-            Texts.Validation.FieldInvalidValue.ToString(localizer),
+            ValidationTexts.FieldInvalidValue.ToString(localizer),
             field.GetTitle(localizer), field.AsObject(row));
     }
 
@@ -189,7 +189,7 @@ public static class DataValidation
     public static ValidationError InvalidIdError(Field field, long value, ITextLocalizer localizer)
     {
         return new ValidationError("InvalidId", field.Name,
-            Texts.Validation.FieldInvalidValue.ToString(localizer),
+            ValidationTexts.FieldInvalidValue.ToString(localizer),
             field.GetTitle(localizer), value);
     }
 
@@ -202,7 +202,7 @@ public static class DataValidation
     public static ValidationError InvalidDateRangeError(DateTimeField start, DateTimeField finish, ITextLocalizer localizer)
     {
         return new ValidationError("InvalidDateRange", start.Name + "," + finish.Name,
-            Texts.Validation.FieldInvalidDateRange.ToString(localizer),
+            ValidationTexts.FieldInvalidDateRange.ToString(localizer),
             start.GetTitle(localizer), finish.GetTitle(localizer));
     }
 
@@ -213,7 +213,7 @@ public static class DataValidation
     /// <param name="localizer">Text localizer</param>
     public static ValidationError ReadOnlyError(Field field, ITextLocalizer localizer)
     {
-        return new ValidationError("ReadOnly", field.Name, Texts.Validation.FieldIsReadOnly.ToString(localizer),
+        return new ValidationError("ReadOnly", field.Name, ValidationTexts.FieldIsReadOnly.ToString(localizer),
             field.GetTitle(localizer));
     }
 
@@ -227,7 +227,7 @@ public static class DataValidation
     public static ValidationError InvalidValueError(Field field, object value, ITextLocalizer localizer)
     {
         return new ValidationError("InvalidValue", field.Name,
-            Texts.Validation.FieldInvalidValue.ToString(localizer),
+            ValidationTexts.FieldInvalidValue.ToString(localizer),
             Convert.ToString(value, CultureInfo.CurrentCulture), field.GetTitle(localizer));
     }
 
@@ -241,7 +241,7 @@ public static class DataValidation
     public static ValidationError InvalidValueError(IRow row, Field field, ITextLocalizer localizer)
     {
         return new ValidationError("InvalidValue", field.Name,
-            Texts.Validation.FieldInvalidValue.ToString(localizer),
+            ValidationTexts.FieldInvalidValue.ToString(localizer),
             Convert.ToString(field.AsObject(row), CultureInfo.CurrentCulture), field.GetTitle(localizer));
     }
 
@@ -253,7 +253,7 @@ public static class DataValidation
     /// <param name="localizer">Text localizer</param>
     public static ValidationError EntityNotFoundError(IRow row, object id, ITextLocalizer localizer)
     {
-        return new ValidationError("EntityNotFound", null, Texts.Validation.EntityNotFound.ToString(localizer),
+        return new ValidationError("EntityNotFound", null, ValidationTexts.EntityNotFound.ToString(localizer),
             Convert.ToString(id, CultureInfo.CurrentCulture), GetEntitySingular(row.Table, localizer));
     }
 
@@ -266,7 +266,7 @@ public static class DataValidation
     public static ValidationError EntityReadAccessError(IRow row, object id, ITextLocalizer localizer)
     {
         return new ValidationError("EntityReadAccessError", null,
-            Texts.Validation.EntityReadAccessViolation.ToString(localizer),
+            ValidationTexts.EntityReadAccessViolation.ToString(localizer),
             Convert.ToString(id, CultureInfo.CurrentCulture), GetEntitySingular(row.Table, localizer));
     }
 
@@ -279,7 +279,7 @@ public static class DataValidation
     public static ValidationError EntityWriteAccessError(IRow row, long id, ITextLocalizer localizer)
     {
         return new ValidationError("EntityWriteAccessError", null,
-            Texts.Validation.EntityWriteAccessViolation.ToString(localizer),
+            ValidationTexts.EntityWriteAccessViolation.ToString(localizer),
             Convert.ToString(id, CultureInfo.CurrentCulture),
             GetEntitySingular(row.Table, localizer));
     }
@@ -293,7 +293,7 @@ public static class DataValidation
     public static ValidationError RelatedRecordExist(string foreignTable, ITextLocalizer localizer)
     {
         return new ValidationError("RelatedRecordExist", null,
-            Texts.Validation.EntityForeignKeyViolation.ToString(localizer),
+            ValidationTexts.EntityForeignKeyViolation.ToString(localizer),
             GetEntitySingular(foreignTable, localizer));
     }
 
@@ -305,7 +305,7 @@ public static class DataValidation
     public static ValidationError ParentRecordDeleted(string foreignTable, ITextLocalizer localizer)
     {
         return new ValidationError("ParentRecordDeleted", null,
-            Texts.Validation.EntityHasDeletedParent.ToString(localizer),
+            ValidationTexts.EntityHasDeletedParent.ToString(localizer),
             GetEntitySingular(foreignTable, localizer));
     }
 
@@ -317,7 +317,7 @@ public static class DataValidation
     public static ValidationError RecordNotActive(IRow row, ITextLocalizer localizer)
     {
         return new ValidationError("RecordNotActive", null,
-            Texts.Validation.EntityIsNotActive.ToString(localizer),
+            ValidationTexts.EntityIsNotActive.ToString(localizer),
             GetEntitySingular(row.Table, localizer));
     }
 
@@ -328,7 +328,7 @@ public static class DataValidation
     public static ValidationError UnexpectedError(ITextLocalizer localizer)
     {
         return new ValidationError("UnexpectedError", null,
-            Texts.Validation.UnexpectedError.ToString(localizer));
+            ValidationTexts.UnexpectedError.ToString(localizer));
     }
 
     /// <summary>
@@ -350,7 +350,7 @@ public static class DataValidation
     public static ValidationError ArgumentNull(string argument, ITextLocalizer localizer)
     {
         return new ValidationError("ArgumentNull", argument,
-            Texts.Validation.ArgumentIsNull.ToString(localizer), argument);
+            ValidationTexts.ArgumentIsNull.ToString(localizer), argument);
     }
 
     /// <summary>
@@ -362,6 +362,6 @@ public static class DataValidation
     public static ValidationError ArgumentOutOfRange(string argument, ITextLocalizer localizer)
     {
         return new ValidationError("ArgumentOutOfRange", argument,
-            Texts.Validation.ArgumentOutOfRange.ToString(localizer), argument);
+            ValidationTexts.ArgumentOutOfRange.ToString(localizer), argument);
     }
 }

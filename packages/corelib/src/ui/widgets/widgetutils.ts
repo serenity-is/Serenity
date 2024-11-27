@@ -1,4 +1,4 @@
-﻿import { Fluent, NoInfer, getInstanceType, getTypeFullName, isArrayLike, isAssignableFrom, notifyError } from "../../base";
+﻿import { Fluent, SNoInfer, getInstanceType, getTypeFullName, isArrayLike, isAssignableFrom, notifyError } from "../../base";
 
 let elementMap: WeakMap<Element, { [key: string]: { domNode: HTMLElement } }> = new WeakMap();
 
@@ -124,4 +124,4 @@ export type WidgetProps<P> = {
     id?: string;
     class?: string;
     element?: ((el: HTMLElement) => void) | HTMLElement | ArrayLike<HTMLElement> | string;
-} & NoInfer<P>
+} & SNoInfer<P>

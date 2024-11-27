@@ -186,10 +186,12 @@ public static class ServiceCollectionExtensions
 
         collection.AddCaching();
         collection.AddEntities();
+        collection.AddFeatureToggles();
         collection.AddTextRegistry();
         collection.AddServiceBehaviors();
         collection.AddServiceHandlerFactory();
         collection.AddServiceResolver();
+        collection.AddUserProvider();
         collection.AddCustomRequestHandlers(customHandlerTypeSource, customHandlerPredicate);
         collection.AddProxyRequestHandlers();
 

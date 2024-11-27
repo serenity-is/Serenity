@@ -8,10 +8,7 @@ public class Program
     {
         var fileSystem = new PhysicalGeneratorFileSystem();
         var console = new GeneratorConsole();
-        var cli = new Cli(fileSystem, console)
-        {
-            BuildSystemFactory = () => new MSBuild.MSBuildProjectSystem()
-        };
+        var cli = new Cli(fileSystem, console);
 
         try
         {

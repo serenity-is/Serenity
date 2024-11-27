@@ -1,0 +1,1 @@
+﻿const Texts = {} as const;

@@ -1,0 +1,10 @@
+{
+  "solution": {
+    "path": "..\\..\\Serenity.sln",
+    "projects": [
+      "common-features\\src\\demo.basicsamples\\Serenity.Demo.BasicSamples.csproj",
+      "common-features\\src\\demo.northwind\\Serenity.Demo.Northwind.csproj",
+      "common-features\\src\\extensions\\Serenity.Extensions.csproj"
+    ]
+  }
+}

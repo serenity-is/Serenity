@@ -1,0 +1,23 @@
+@{
+    ViewData["Title"] = "Chart in a Dialog";
+}
+
+@section ContentHeader {
+    <h1>@ViewData["Title"]<small></small></h1>
+}
+
+<div class="alert alert-info alert-dismissable alert-dismissible s-sample-info">
+    <button type="button" class="close btn-close" data-dismiss="alert" data-bs-dismiss="alert" aria-hidden="true">&times;</button>
+    <p>This sample demonstrates showing a resizable chart in a dialog. Chart data is populated from Northwind Orders with a service call.</p>
+    <p>Click button below to launch the dialog.</p>
+
+    <p class="s-sample-sources"><b>Source Files:</b> 
+        @Html.BasicSamplesSourceFile("Index.cshtml"),
+        @Html.BasicSamplesSourceFile("ChartInDialogPage.tsx")
+    </p>
+</div>
+
+<div id="SampleRoot">
+</div>
+
+@Html.ModulePageInit(ESM.ChartInDialogPage)

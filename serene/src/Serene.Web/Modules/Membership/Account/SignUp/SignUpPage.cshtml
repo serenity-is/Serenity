@@ -1,0 +1,17 @@
+@inject ITextLocalizer Localizer
+@{
+    ViewData["Title"] = SignUpFormTexts.FormTitle.ToString(Localizer);
+ViewData["PageId"] = "SignUp";
+Layout = MVC.Views.Shared._LayoutNoNavigation;
+}
+
+<div class="s-full-page justify-content-center">
+    <div id="SignUpPanel" class="s-container-narrow">
+    </div>
+</div>
+
+
+<script type="module">
+    import pageInit from '@Html.ResolveWithHash("~/esm/Modules/Membership/Account/SignUp/SignUpPage.js")';
+    pageInit({});
+</script>

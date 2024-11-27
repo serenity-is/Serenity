@@ -1,0 +1,63 @@
+.s-NotesEditor {
+  border: 1px solid var(--bs-border-color, #ccc);
+  border-radius: var(--bs-border-radius);
+  padding: 10px;
+}
+
+.s-NotesEditor ul {
+  padding: 0;
+  min-height: 110px;
+  overflow-y: auto;
+  list-style: none;
+}
+
+.s-NotesEditor li {
+  margin: 10px 0;
+  border-radius: var(--bs-border-radius);
+  border: 1px solid var(--s-card-border, #C3C2C2);
+  background-color: var(--bs-body-bg, #F5E7DC);
+  padding: 8px;
+  position: relative;
+}
+
+.s-NotesEditor .note-text {
+  padding-right: 24px;
+  display: block;
+}
+
+.s-NotesEditor .note-delete {
+  display: block;
+  position: absolute;
+  right: 6px;
+  top: 4px;
+  text-decoration: none;
+}
+
+.s-NotesEditor .note-delete:after {
+  font-family: var(--s-icon-font, "FontAwesome");
+  font-weight: var(--s-icon-solid);
+  color: var(--bs-danger);
+  content: "\f00d";
+  font-size: 1.1em;
+}
+
+.s-NotesEditor .note-delete:hover {
+  opacity: 1;
+}
+
+.s-NotesEditor .note-date {
+  margin-top: 6px;
+  display: block;
+  text-align: right;
+  color: var(--bs-link-color, #2a4084);
+  text-decoration: none;
+  font-style: italic;
+}
+
+.s-NoteDialog > .size {
+  width: 465px;
+}
+
+.s-NoteDialog .ui-dialog-content {
+  padding-bottom: 10px;
+}

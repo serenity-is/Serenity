@@ -1,0 +1,10 @@
+
+.s-Demo-BasicSamples-WrappedHeadersGrid .slick-header-columns {
+  white-space: normal;
+  height: 4em;
+}
+
+.s-Demo-BasicSamples-WrappedHeadersGrid .slick-header-column.ui-state-default {
+  height: 100%;
+  line-height: 1.3em;
+}

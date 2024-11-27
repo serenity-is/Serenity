@@ -1,0 +1,20 @@
+@inject ITextLocalizer Localizer
+@{
+
+    ViewData["Title"] = Localizer.Get(OrderRow.Fields.PageTitle());
+}
+
+@section Head {
+@Html.Script("dynamic://Lookup.Northwind.Customer")
+@Html.Script("dynamic://Lookup.Northwind.CustomerCountry")
+@Html.Script("dynamic://Lookup.Northwind.CustomerCity")
+@Html.Script("dynamic://Lookup.Northwind.Employee")
+@Html.Script("dynamic://Lookup.Northwind.OrderShipCountry")
+@Html.Script("dynamic://Lookup.Northwind.OrderShipCity")
+@Html.Script("dynamic://Lookup.Northwind.Product")
+@Html.Script("dynamic://Lookup.Northwind.Shipper")
+}
+
+<div id="GridDiv"></div>
+
+@Html.ModulePageInit(ESM.OrderPage)

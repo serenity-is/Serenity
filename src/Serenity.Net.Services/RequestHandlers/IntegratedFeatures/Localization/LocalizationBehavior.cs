@@ -21,7 +21,7 @@ public class LocalizationBehavior(IDefaultHandlerFactory handlerFactory) : BaseS
     private int localRowPrefixLength;
     private Field foreignKeyField;
     private Field localRowIdField;
-    private Field cultureIdField;
+    private StringField cultureIdField;
     private ILocalizationRow localRowInstance;
     private BaseCriteria foreignKeyCriteria;
     private Func<IDictionary> dictionaryFactory;
@@ -96,15 +96,33 @@ public class LocalizationBehavior(IDefaultHandlerFactory handlerFactory) : BaseS
         return GetLocalizationMatch(field, localRowInstance, localRowPrefixLength, rowPrefixLength);
     }
 
-    internal static Field GetLocalizationMatch(Field field, ILocalizationRow localRowInstance,
-        int localRowPrefixLength, int rowPrefixLength)
+    /// <summary>
+    /// Gets localization match for a field
+    /// </summary>
+    /// <param name="field">Field</param>
+    /// <param name="localRowInstance">Local row instance</param>
+    /// <param name="localRowPrefixLength">Local row field name prefix length</param>
+    /// <param name="rowPrefixLength">Row field name prefix length</param>
+    public static Field GetLocalizationMatch(Field field, ILocalizationRow localRowInstance,
+        int localRowPrefixLength = 0, int rowPrefixLength = 0)
     {
         if (!field.IsTableField())
             return null;
 
-        var name = field.Name[rowPrefixLength..];
-        name = localRowInstance.IdField.Name[..localRowPrefixLength] + name;
-        var match = localRowInstance.FindField(name);
+        if (field.GetAttribute<LocalizableAttribute>()?.IsLocalizable == false)
+            return null;
+
+        if (ReferenceEquals(field, field.Fields.IdField))
+            return null;
+
+        var searchName = field.Name;
+        if (rowPrefixLength > 0)
+            searchName = searchName[rowPrefixLength..];
+
+        if (localRowPrefixLength > 0)
+            searchName = localRowInstance.IdField.Name[..localRowPrefixLength] + searchName;
+
+        var match = localRowInstance.FindField(searchName);
         if (match is null && field.PropertyName != null)
             match = localRowInstance.FindFieldByPropertyName(field.PropertyName);
 
@@ -112,6 +130,9 @@ public class LocalizationBehavior(IDefaultHandlerFactory handlerFactory) : BaseS
             return null;
 
         if (!match.IsTableField())
+            return null;
+
+        if (match.GetAttribute<LocalizableAttribute>()?.IsLocalizable == false)
             return null;
 
         if (ReferenceEquals(match, localRowInstance.IdField) ||
@@ -139,7 +160,7 @@ public class LocalizationBehavior(IDefaultHandlerFactory handlerFactory) : BaseS
         return match;
     }
 
-    private object GetOldLocalizationRowId(IDbConnection connection, object recordId, object cultureId)
+    private object GetOldLocalizationRowId(IDbConnection connection, object recordId, string cultureId)
     {
         var row = localRowInstance.CreateNew();
         if (new SqlQuery()
@@ -211,7 +232,7 @@ public class LocalizationBehavior(IDefaultHandlerFactory handlerFactory) : BaseS
                 }
             }
 
-            var culture = cultureIdField.AsObject(localRow);
+            var culture = cultureIdField[localRow];
             dictionary[culture == null ? "" : culture.ToString()] = row;
         }
 
@@ -251,12 +272,12 @@ public class LocalizationBehavior(IDefaultHandlerFactory handlerFactory) : BaseS
 
         foreach (DictionaryEntry pair in localizations)
         {
-            var cultureId = cultureIdField.ConvertValue(pair.Key, CultureInfo.InvariantCulture);
+            var cultureId = cultureIdField.ConvertValue(pair.Key, CultureInfo.InvariantCulture)?.ToString();
             var oldId = handler.IsCreate ? null : GetOldLocalizationRowId(handler.UnitOfWork.Connection, masterId, cultureId);
             var localRow = localRowFactory();
             localRow.TrackAssignments = true;
             if (oldId == null)
-                cultureIdField.AsObject(localRow, cultureId);
+                cultureIdField[localRow] = cultureId;
 
             var row = pair.Value as IRow;
 

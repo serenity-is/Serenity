@@ -1,0 +1,23 @@
+﻿@{
+    ViewData["Title"] = "Changing Lookup Text";
+}
+
+@section ContentHeader {
+    <h1>@ViewData["Title"]<small></small></h1>
+}
+
+<div class="alert alert-info alert-dismissable alert-dismissible s-sample-info">
+    <button type="button" class="close btn-close" data-dismiss="alert" data-bs-dismiss="alert" aria-hidden="true">&times;</button>
+    <p>Lookups by default shows name field of your row as text. You might want to override this text to something custom.</p>
+    <p>There are several options to change this text, including setting name field to something else, declaring an expression field etc.</p>
+    <p>But in some cases, such solutions might not be enough. For this, you might define a new editor type deriving from LookupEditor and override its getItemText() method.</p>
+    <p>Here, using a custom lookup editor, we list Supplier Name, Unit Price and Units in Stock information alongside with product name.</p>
+    
+    <p class="s-sample-sources"><b>Source Files:</b> 
+        @Html.BasicSamplesSourceFile("Index.cshtml"), 
+        @Html.BasicSamplesSourceFile("ChangingLookupTextForm.cs")
+        @Html.BasicSamplesSourceFile("ChangingLookupTextPage.ts")
+    </p>
+</div>
+
+@Html.ModulePageInit(ESM.ChangingLookupTextPage)

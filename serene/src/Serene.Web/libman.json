@@ -1,0 +1,21 @@
+{
+  "version": "1.0",
+  "defaultProvider": "cdnjs",
+  "libraries": [
+    {
+      "library": "Chart.js@3.7.0",
+      "destination": "wwwroot/lib/chartjs",
+      "files": [
+        "chart.min.js",
+        "chart.js"
+      ]
+    },
+    {
+      "library": "moment.js@2.29.2",
+      "destination": "wwwroot/lib/moment.js/",
+      "files": [
+        "moment.min.js"
+      ]
+    }
+  ]
+}

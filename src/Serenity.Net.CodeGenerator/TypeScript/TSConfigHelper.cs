@@ -8,9 +8,8 @@ public static class TSConfigHelper
         IFileSystem fileSystem, string configPath, out TSConfig tsConfig,
         CancellationToken cancellationToken = default)
     {
-        tsConfig = Read(fileSystem, configPath);
-        if (tsConfig is null)
-            return LegacyListFiles(fileSystem, configPath, cancellationToken);
+        tsConfig = Read(fileSystem, configPath) ??
+            new TSConfig() { Include = ["Modules"] };
 
         return ListFiles(tsConfig, fileSystem, fileSystem.GetDirectoryName(configPath), cancellationToken);
     }
@@ -29,15 +28,7 @@ public static class TSConfigHelper
                     fileSystem.Combine(rootDir, PathHelper.ToPath(x))));
         }
 
-        var includePatterns = config.Include;
-        if (includePatterns == null)
-        {
-            if (config.Exclude == null || config.Exclude.Length == 0)
-                return LegacyListFiles(fileSystem, 
-                    fileSystem.Combine(rootDir, "tsconfig.json"), cancellationToken);
-
-            includePatterns = ["**/*"];
-        }
+        var includePatterns = config.Include ?? ["**/*"];
 
         var typeRoots = config.CompilerOptions?.TypeRoots?.IsEmptyOrNull() != false ?
             ["./node_modules/@types"] : config.CompilerOptions.TypeRoots;
@@ -158,32 +149,25 @@ public static class TSConfigHelper
         }
     }
 
-    public static void LocateTSConfigFiles(IFileSystem fileSystem,
-        string projectDir, out string modulesPath, out string namespacesPath)
+    public static string LocateTSConfigFile(IFileSystem fileSystem, string projectDir)
     {
-        namespacesPath = null;
-        modulesPath = null;
-
-        foreach (var configPath in new[]
+        foreach (var path in new[]
         {
             fileSystem.Combine(projectDir, "tsconfig.json"),
-            fileSystem.Combine(projectDir, "Namespaces", "tsconfig.json"),
             fileSystem.Combine(projectDir, "Modules", "tsconfig.json")
         })
         {
-            var config = Read(fileSystem, configPath);
+            var config = Read(fileSystem, path);
             if (config is null)
                 continue;
 
             if (config.CompilerOptions?.Module?.ToLowerInvariant() is not (null or "none"))
-                modulesPath ??= configPath;
-            else
-                namespacesPath ??= configPath;
-
-            if (modulesPath is not null &&
-                namespacesPath is not null)
-                break;
+            {
+                return path;
+            }
         }
+
+        return null;
     }
 
     private static readonly char[] wildcards = ['*', '?'];
@@ -229,6 +213,9 @@ public static class TSConfigHelper
     {
         List<string> result = [];
 
+        if (!fileSystem.DirectoryExists(rootDir))
+            return result;
+
         includePatterns = includePatterns.Select(NormalizePattern)
             .Where(x => !string.IsNullOrEmpty(x)).ToArray();
 
@@ -265,8 +252,7 @@ public static class TSConfigHelper
             foreach (var s in scanFolders)
                 scanFoldersSet.Add(s);
 
-            enumerated = enumerated.Concat(fileSystem.GetFiles(rootDir, "*.ts"));
-            enumerated = enumerated.Concat(fileSystem.GetFiles(rootDir, "*.tsx"));
+            enumerated = enumerated.Concat(fileSystem.GetFiles(rootDir, tsMask).Where(HasTSExtension));
 
             foreach (var directory in fileSystem.GetDirectories(rootDir))
             {
@@ -274,19 +260,20 @@ public static class TSConfigHelper
                 if (!scanFoldersSet.Contains(directoryName))
                     continue;
 
-                enumerated = enumerated.Concat(fileSystem.GetFiles(directory, "*.ts", recursive: true));
-                enumerated = enumerated.Concat(fileSystem.GetFiles(directory, "*.tsx", recursive: true));
+                enumerated = enumerated.Concat(fileSystem.GetFiles(directory, tsMask, recursive: true).Where(HasTSExtension));
             }
             enumerated = enumerated.ToArray();
         }
         else
         {
-            enumerated = fileSystem.GetFiles(rootDir, "*.ts", recursive: true);
+            enumerated = fileSystem.GetFiles(rootDir, tsMask, recursive: true).Where(HasTSExtension);
         }
+
+        var byFilename = new HashSet<string>(enumerated, StringComparer.OrdinalIgnoreCase);
 
         enumerated = enumerated.Where(x =>
             !x.EndsWith(".d.ts", StringComparison.OrdinalIgnoreCase) ||
-            !fileSystem.FileExists(x[..^".d.ts".Length] + ".ts"));
+            !byFilename.Contains(x[..^5] + ".ts"));
 
         var includeGlob = new IO.GlobFilter(includePatterns.Select(x => '/' + x));
         var excludeGlob = new IO.GlobFilter(excludePatterns.Select(x => '/' + x));
@@ -299,42 +286,12 @@ public static class TSConfigHelper
         return result.Concat(enumerated);
     }
 
-    private static IEnumerable<string> LegacyListFiles(IFileSystem fileSystem, 
-        string tsConfigPath, CancellationToken cancellationToken)
+    const string tsMask = "*.*ts?";
+
+    public static bool HasTSExtension(string path)
     {
-        // legacy apps
-        var projectDir = fileSystem.GetDirectoryName(tsConfigPath);
-        var directories = new[]
-        {
-                fileSystem.Combine(projectDir, @"Modules"),
-                fileSystem.Combine(projectDir, @"Imports"),
-                fileSystem.Combine(projectDir, @"typings", "serenity"),
-                fileSystem.Combine(projectDir, @"wwwroot", "Scripts", "serenity")
-            }.Where(x => fileSystem.DirectoryExists(x));
-
-        cancellationToken.ThrowIfCancellationRequested();
-
-        var files = directories.SelectMany(x =>
-            fileSystem.GetFiles(x, "*.ts", recursive: true))
-            .Where(x => !x.EndsWith(".d.ts", StringComparison.OrdinalIgnoreCase) ||
-                fileSystem.GetFileName(x).StartsWith("Serenity.", StringComparison.OrdinalIgnoreCase) ||
-                fileSystem.GetFileName(x).StartsWith("Serenity-", StringComparison.OrdinalIgnoreCase));
-
-        cancellationToken.ThrowIfCancellationRequested();
-
-        var corelib = files.Where(x => string.Equals(fileSystem.GetFileName(x),
-            "Serenity.CoreLib.d.ts", StringComparison.OrdinalIgnoreCase));
-
-        static bool corelibUnderTypings(string x) =>
-            x.Replace('\\', '/').EndsWith("/typings/serenity/Serenity.CoreLib.d.ts",
-                StringComparison.OrdinalIgnoreCase);
-
-        if (corelib.Count() > 1 &&
-            corelib.Any(x => !corelibUnderTypings(x)))
-        {
-            files = files.Where(x => !corelibUnderTypings(x));
-        }
-
-        return files.OrderBy(x => x);
+        return path.EndsWith(".ts", StringComparison.OrdinalIgnoreCase) ||
+            path.EndsWith(".tsx", StringComparison.OrdinalIgnoreCase) ||
+            path.EndsWith(".mts", StringComparison.OrdinalIgnoreCase);
     }
 }

@@ -9,7 +9,7 @@ namespace Serenity.Tests.CodeGenerator
             generator.AddTSType(new()
             {
                 Name = "Widget",
-                Namespace = "Serenity",
+                Module = "@serenity-is/corelib",
                 GenericParameters =
                 [
                     new()
@@ -20,28 +20,27 @@ namespace Serenity.Tests.CodeGenerator
             });
             var result = generator.Run();
             var code = Assert.Single(result).Text;
-            Assert.Equal(NormalizeTS(@"
-namespace Serenity.Tests.CodeGenerator {export interface FormWithUnknownEditor {
-        Test: Serenity.Widget<any>;
-    }
+            Assert.Equal(NormalizeTS(@"import { Widget, PrefixedContext, initFormType } from ""@serenity-is/corelib"";
 
-    export class FormWithUnknownEditor extends Serenity.PrefixedContext {
-        static readonly formKey = 'FormWithUnknownEditor';
-        private static init: boolean;
+export interface FormWithUnknownEditor {
+    Test: Widget;
+}
 
-        constructor(prefix: string) {
-            super(prefix);
+export class FormWithUnknownEditor extends PrefixedContext {
+    static readonly formKey = 'FormWithUnknownEditor';
+    private static init: boolean;
 
-            if (!FormWithUnknownEditor.init) {
-                FormWithUnknownEditor.init = true;
+    constructor(prefix: string) {
+        super(prefix);
 
-                var s = Serenity;
-                var w0 = s.Widget;
+        if (!FormWithUnknownEditor.init) {
+            FormWithUnknownEditor.init = true;
 
-                Q.initFormType(FormWithUnknownEditor, [
-                    'Test', w0
-                ]);
-            }
+            var w0 = Widget;
+
+            initFormType(FormWithUnknownEditor, [
+                'Test', w0
+            ]);
         }
     }
 }"), NormalizeTS(code));

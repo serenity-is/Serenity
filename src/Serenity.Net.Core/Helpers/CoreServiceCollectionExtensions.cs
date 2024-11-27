@@ -1,3 +1,4 @@
+using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.DependencyInjection.Extensions;
 using Serenity.Localization;
@@ -56,12 +57,13 @@ public static class CoreServiceCollectionExtensions
     /// </summary>
     /// <param name="services">The services.</param>
     /// <param name="assemblies">List of assembles</param>
-    public static void AddTypeSource(this IServiceCollection services, Assembly[] assemblies)
+    /// <param name="featureToggles">Feature toggles</param>
+    public static void AddTypeSource(this IServiceCollection services, Assembly[] assemblies, IFeatureToggles? featureToggles = null)
     {
         if (services is null)
             throw new ArgumentNullException(nameof(services));
 
-        services.TryAddSingleton<ITypeSource>(new DefaultTypeSource(assemblies));
+        services.TryAddSingleton<ITypeSource>(new DefaultTypeSource(assemblies, featureToggles));
     }
 
     /// <summary>
@@ -74,6 +76,89 @@ public static class CoreServiceCollectionExtensions
             throw new ArgumentNullException(nameof(services));
 
         services.TryAddSingleton(typeof(IServiceResolver<>), typeof(ServiceResolver<>));
+    }
+
+    private static T? GetServiceFromCollection<T>(IServiceCollection services)
+        where T : class
+    {
+        return (T?)services.LastOrDefault(d =>
+            d.ServiceType == typeof(T))?.ImplementationInstance;
+    }
+
+    /// <summary>
+    /// Adds feature togglesservice to the registry.
+    /// </summary>
+    /// <param name="services">The services.</param>
+    /// <param name="configuration">Configuration source</param>
+    public static IServiceCollection AddFeatureToggles(this IServiceCollection services, IConfiguration? configuration = null)
+    {
+        if (services is null)
+            throw new ArgumentNullException(nameof(services));
+
+        configuration ??= GetServiceFromCollection<IConfiguration>(services);
+
+        if (configuration != null)
+        {
+            services.TryAddSingleton<IFeatureToggles>(new ConfigurationFeatureToggles(configuration));
+        }
+        else
+        {
+            services.TryAddSingleton<IFeatureToggles, ConfigurationFeatureToggles>();
+        }
+
+        return services;
+    }
+
+    /// <summary>
+    /// Adds the <see cref="DefaultUserProvider"/> as <see cref="IUserProvider"/> implementation to the service collection.
+    /// Note that it requires IUserRetrieveService, IUserAcessor to be
+    /// registered in the service collection. It also tries to register the DefaultUserClaimCreator.
+    /// </summary>
+    /// <param name="services">The service collection.</param>
+    public static IServiceCollection AddUserProvider(this IServiceCollection services)
+    {
+        if (services is null)
+            throw new ArgumentNullException(nameof(services));
+
+        services.TryAddSingleton<IUserClaimCreator, DefaultUserClaimCreator>();
+        services.TryAddSingleton<IUserProvider, DefaultUserProvider>();
+        return services;
+    }
+
+    /// <summary>
+    /// Adds the <see cref="DefaultUserProvider"/> as <see cref="IUserProvider"/> implementation to the service collection.
+    /// Also registers the given IUserAccessor and IUserRetrieveService implementations and
+    /// tries to register the DefaultUserClaimCreator implementation.
+    /// </summary>
+    /// <param name="services">The service collection.</param>
+    public static IServiceCollection AddUserProvider<TUserAccessor, TUserRetrieveService>(this IServiceCollection services)
+        where TUserAccessor: class, IUserAccessor
+        where TUserRetrieveService : class, IUserRetrieveService
+    {
+        if (services is null)
+            throw new ArgumentNullException(nameof(services));
+
+        services.AddSingleton<IUserAccessor, TUserAccessor>();
+        services.AddSingleton<IUserRetrieveService, TUserRetrieveService>();
+        services.AddUserProvider();
+        return services;
+    }
+
+    /// <summary>
+    /// Adds the <see cref="DefaultUserProvider"/> as <see cref="IUserProvider"/> implementation to the service collection.
+    /// Also registers the given IUserAccessor, IUserRetrieveService and IUserClaimCreator implementations.
+    /// </summary>
+    /// <param name="services">The service collection.</param>
+    public static IServiceCollection AddUserProvider<TUserAccessor, TUserRetrieveService, TUserClaimCreator>(this IServiceCollection services)
+        where TUserAccessor : class, IUserAccessor
+        where TUserRetrieveService : class, IUserRetrieveService
+        where TUserClaimCreator : class, IUserClaimCreator
+    {
+        if (services is null)
+            throw new ArgumentNullException(nameof(services));
+
+        services.AddSingleton<IUserClaimCreator, TUserClaimCreator>();
+        return AddUserProvider<TUserAccessor, TUserRetrieveService>(services);
     }
 
     /// <summary>

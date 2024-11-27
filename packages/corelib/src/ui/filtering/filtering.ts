@@ -1,4 +1,4 @@
-﻿import { Config, Criteria, Fluent, formatDate, getInstanceType, getTypeFullName, isAssignableFrom, localText, parseISODateTime, stringFormat, tryGetText, type PropertyItem } from "../../base";
+import { Config, Criteria, Fluent, formatDate, getInstanceType, getTypeFullName, isAssignableFrom, localText, parseISODateTime, stringFormat, tryGetText, type PropertyItem } from "../../base";
 import { ArgumentNullException, Exception, deepClone, extend, getTypes } from "../../q";
 import { Decorators } from "../../types/decorators";
 import { EditorTypeRegistry } from "../../types/editortyperegistry";
@@ -121,7 +121,9 @@ export abstract class BaseFiltering implements IFiltering, IQuickFiltering {
             case 'le':
             case 'gt':
             case 'ge': {
-                Fluent(this.get_container()).empty().append(Fluent("input").attr("type", "text"));
+                const input = document.createElement("input");
+                input.type = "text";
+                Fluent(this.get_container()).empty().append(input);
                 return;
             }
         }
@@ -717,7 +719,7 @@ export namespace FilteringTypeRegistry {
 
             for (var k of Config.rootNamespaces) {
                 if (fullName.startsWith(k.toLowerCase() + '.')) {
-                    var kx = fullName.substr(k.length + 1).toLowerCase();
+                    var kx = fullName.substring(k.length + 1).toLowerCase();
 
                     if (knownTypes[kx] == null) {
                         knownTypes[kx] = type;

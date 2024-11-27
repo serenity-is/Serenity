@@ -1,4 +1,5 @@
-// Last converted from https://github.com/microsoft/TypeScript/commit/fbcdb8cf4fbbbea0111a9adeb9d0d2983c088b7c on 2023-12-21 
+// Initially converted from https://github.com/microsoft/TypeScript/commit/fbcdb8cf4fbbbea0111a9adeb9d0d2983c088b7c on 2023-12-21 
+// Last updated from commit 9757109cafcb771a35ad9fe09855373cdd82005a on 2024-07-29
 
 using static Serenity.TypeScript.Scanner;
 using static Serenity.TypeScript.Utilities;

@@ -1,4 +1,4 @@
-﻿namespace Serenity.CodeGeneration;
+namespace Serenity.CodeGeneration;
 
 public partial class ServerTypingsGenerator : TypingsGeneratorBase
 {
@@ -13,15 +13,15 @@ public partial class ServerTypingsGenerator : TypingsGeneratorBase
         return enumKey;
     }
 
-    private void GenerateEnum(TypeDefinition enumType, bool module)
+    private void GenerateEnum(TypeDefinition enumType)
     {
-        var codeNamespace = GetNamespace(enumType);
+        var codeNamespace = ScriptNamespaceFor(enumType);
         var enumKey = GetEnumKeyFor(enumType);
 
         cw.Indented("export enum ");
-        var identifier = MakeFriendlyName(enumType, codeNamespace, module);
+        var identifier = MakeFriendlyName(enumType, codeNamespace);
         var fullName = (string.IsNullOrEmpty(codeNamespace) ? "" : codeNamespace + ".") + identifier;
-        RegisterGeneratedType(codeNamespace, identifier, module, typeOnly: false);
+        RegisterGeneratedType(codeNamespace, identifier, typeOnly: false);
 
         cw.InBrace(delegate
         {
@@ -47,15 +47,9 @@ public partial class ServerTypingsGenerator : TypingsGeneratorBase
             sb.AppendLine();
         });
 
-        if (module)
-        {
-            var decorators = ImportFromCorelib("Decorators");
-            cw.Indented($"{decorators}.registerEnumType(");
-        }
-        else
-        {
-            cw.Indented("Serenity.Decorators.registerEnumType(");
-        }
+        var decorators = ImportFromCorelib("Decorators");
+        cw.Indented($"{decorators}.registerEnumType(");
+
         sb.Append(enumType.Name);
         sb.Append(", '");
         sb.Append(fullName);

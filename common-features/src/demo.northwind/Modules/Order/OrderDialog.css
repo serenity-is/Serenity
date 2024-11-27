@@ -1,0 +1,8 @@
+.s-Demo-Northwind-OrderDialog .caption,
+.s-Demo-Northwind-CustomerOrderDialog .caption {
+  width: 130px;
+}
+
+.s-Demo-Northwind-OrderDialog.s-Panel .s-OrderDetailsEditor .grid-container {
+  height: calc(100vh - 600px);
+}

@@ -2,35 +2,36 @@ namespace Serenity.CodeGeneration;
 
 public partial class ServerTypingsGenerator : TypingsGeneratorBase
 {
-    private void GenerateService(TypeDefinition type, string identifier, bool module)
+    private void GenerateService(TypeDefinition type, string identifier)
     {
-        var codeNamespace = GetNamespace(type);
+        var codeNamespace = ScriptNamespaceFor(type);
 
         cw.Indented("export namespace ");
         sb.Append(identifier);
-        RegisterGeneratedType(codeNamespace, identifier, module, typeOnly: false);
+        RegisterGeneratedType(codeNamespace, identifier, typeOnly: false);
 
         cw.InBrace(delegate
         {
             var serviceUrl = GetServiceUrlFromRoute(type);
-            serviceUrl ??= GetNamespace(type).Replace(".", "/", StringComparison.Ordinal);
+            serviceUrl ??= ScriptNamespaceFor(type).Replace(".", "/", StringComparison.Ordinal);
 
             cw.Indented("export const baseUrl = '");
             sb.Append(serviceUrl);
             sb.AppendLine("';");
             sb.AppendLine();
 
+            var methods = type.MethodsOf().Where(method => method.IsPublic() &&
+                !method.IsStatic && !method.IsAbstract)
+#if ISSOURCEGENERATOR
+                    .OrderBy(m => m.DeclaringSyntaxReferences.FirstOrDefault()?.SyntaxTree?.FilePath)
+#endif
+                    .ToList();
 
             var methodNames = new List<string>();
-            foreach (var method in type.MethodsOf())
+            foreach (var method in methods)
             {
-                if (!method.IsPublic() || method.IsStatic || method.IsAbstract)
-                    continue;
-
-                if (methodNames.Contains(method.Name))
-                    continue;
-
-                if (!IsPublicServiceMethod(method, out TypeReference requestType, out TypeReference responseType, out string requestParam))
+                if (methodNames.Contains(method.Name) ||
+                    !IsPublicServiceMethod(method, out TypeReference requestType, out TypeReference responseType, out string requestParam))
                     continue;
 
                 methodNames.Add(method.Name);
@@ -41,31 +42,24 @@ public partial class ServerTypingsGenerator : TypingsGeneratorBase
                 sb.Append("(request: ");
                 if (requestType == null)
                 {
-                    if (module) 
-                    {
-                        var serviceRequest = ImportFromQ("ServiceRequest");
-                        sb.Append(serviceRequest);
-                    }
-                    else
-                        sb.Append(ShortenFullName("Serenity", "ServiceRequest", codeNamespace, module, "Serenity.Net.Core"));
+                    var serviceRequest = ImportFromQ("ServiceRequest");
+                    sb.Append(serviceRequest);
                 }
                 else
-                    HandleMemberType(requestType, codeNamespace, module);
+                    HandleMemberType(requestType, codeNamespace);
 
                 sb.Append(", onSuccess?: (response: ");
-                HandleMemberType(responseType, codeNamespace, module);
-                var serviceOptions = module ? ImportFromQ("ServiceOptions") : "Q.ServiceOptions";
+                HandleMemberType(responseType, codeNamespace);
+                var serviceOptions = ImportFromQ("ServiceOptions");
 
                 sb.Append($") => void, opt?: {serviceOptions}<any>): PromiseLike<");
-                HandleMemberType(responseType, codeNamespace, module);
+                HandleMemberType(responseType, codeNamespace);
                 sb.AppendLine(">;");
             }
 
             sb.AppendLine();
-            cw.Indented($"export {(module ? "const" : "declare const enum")} ");
-            sb.Append("Methods");
-            if (module)
-                sb.Append(" =");
+            cw.Indented($"export const ");
+            sb.Append("Methods =");
 
             cw.InBrace(delegate
             {
@@ -76,7 +70,7 @@ public partial class ServerTypingsGenerator : TypingsGeneratorBase
                         sb.AppendLine(",");
 
                     cw.Indented(methodName);
-                    sb.Append(module ? ": \"" : " = \"");
+                    sb.Append(": \"");
                     sb.Append(serviceUrl);
                     sb.Append('/');
                     sb.Append(methodName);
@@ -86,11 +80,9 @@ public partial class ServerTypingsGenerator : TypingsGeneratorBase
                 }
 
                 sb.AppendLine();
-            }, endLine: !module);
+            }, endLine: false);
 
-            if (module)
-                sb.AppendLine(" as const;");
-
+            sb.AppendLine(" as const;");
             sb.AppendLine();
 
             if (methodNames.Count > 0)
@@ -114,13 +106,8 @@ public partial class ServerTypingsGenerator : TypingsGeneratorBase
                     cw.Indented("(<any>");
                     sb.Append(identifier);
                     sb.AppendLine(")[x] = function (r, s, o) {");
-                    if (module)
-                    {
-                        var serviceRequest = ImportFromQ("serviceRequest");
-                        cw.IndentedLine($"    return {serviceRequest}(baseUrl + '/' + x, r, s, o);");
-                    }
-                    else
-                        cw.IndentedLine("    return Q.serviceRequest(baseUrl + '/' + x, r, s, o);");
+                    var serviceRequest = ImportFromQ("serviceRequest");
+                    cw.IndentedLine($"    return {serviceRequest}(baseUrl + '/' + x, r, s, o);");
                     cw.IndentedLine("};");
                 });
                 cw.IndentedLine("});");

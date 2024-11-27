@@ -1,0 +1,23 @@
+﻿@{
+    ViewData["Title"] = "Dialog Box Types";
+}
+
+@section ContentHeader {
+     <h1>@ViewData["Title"]</h1>
+}
+
+<div class="alert alert-info alert-dismissable alert-dismissible s-sample-info">
+    <button type="button" class="close btn-close" data-dismiss="alert" data-bs-dismiss="alert"
+        aria-hidden="true">&times;</button>
+    <p>Here are some samples for message dialog functions</p>
+    <p>Click buttons below to launch dialogs.</p>
+
+    <p class="s-sample-sources"><b>Source Files:</b>
+        @Html.BasicSamplesSourceFile("Index.cshtml"),
+        @Html.BasicSamplesSourceFile("DialogBoxesPage.tsx")
+    </p>
+</div>
+
+<div id="SampleRoot" class="d-flex gap-1"></div>
+
+@Html.ModulePageInit(ESM.DialogBoxesPage)

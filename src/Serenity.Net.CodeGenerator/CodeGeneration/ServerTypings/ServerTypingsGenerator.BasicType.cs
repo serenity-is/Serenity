@@ -2,31 +2,29 @@ namespace Serenity.CodeGeneration;
 
 public partial class ServerTypingsGenerator : TypingsGeneratorBase
 {
-    protected void GenerateBasicType(TypeDefinition type, bool module)
+    protected void GenerateBasicType(TypeDefinition type)
     {
-        var codeNamespace = module ? null : GetNamespace(type);
-
         cw.Indented("export interface ");
 
-        var identifier = MakeFriendlyName(type, codeNamespace, module);
+        var identifier = MakeFriendlyName(type, codeNamespace: null);
         var baseClass = GetBaseClass(type);
 
-        RegisterGeneratedType(codeNamespace, identifier, module, typeOnly: true);
+        RegisterGeneratedType(ns: null, identifier, typeOnly: true);
 
         if (baseClass != null)
         {
             sb.Append(" extends ");
-            MakeFriendlyReference(baseClass, codeNamespace, module);
+            MakeFriendlyReference(baseClass, codeNamespace: null);
         }
 
         cw.InBrace(delegate
         {
-            GenerateBasicTypeMembers(type, baseClass, codeNamespace, module);
+            GenerateBasicTypeMembers(type, baseClass, codeNamespace: null);
         });
     }
 
     void GenerateBasicTypeMembers(TypeDefinition type, TypeReference baseClass, 
-        string codeNamespace, bool module)
+        string codeNamespace)
     {
         void handleMember(TypeReference memberType, string memberName, IEnumerable<CustomAttribute> a)
         {
@@ -49,7 +47,7 @@ public partial class ServerTypingsGenerator : TypingsGeneratorBase
 
             cw.Indented(memberName);
             sb.Append("?: ");
-            HandleMemberType(memberType, codeNamespace, module);
+            HandleMemberType(memberType, codeNamespace);
             sb.Append(';');
             sb.AppendLine();
         }

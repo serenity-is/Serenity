@@ -1,0 +1,6 @@
+<Project Sdk="Microsoft.NET.Sdk">
+  <ItemGroup>
+    <ProjectReference Include="..\..\..\tests\Serenity.Net.Tests\Serenity.Net.Tests.csproj" />
+    <ProjectReference Include="..\..\src\Serene.Web\Serene.Web.csproj" />
+  </ItemGroup>
+</Project>

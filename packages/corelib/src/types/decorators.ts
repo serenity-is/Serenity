@@ -75,7 +75,7 @@ export namespace Decorators {
         return function (target: Object, propertyKey: string): void {
 
             var isGetSet = propertyKey?.startsWith('get_') || propertyKey?.startsWith('set_');
-            var memberName = isGetSet ? propertyKey.substr(4) : propertyKey;
+            var memberName = isGetSet ? propertyKey.substring(4) : propertyKey;
 
             addTypeMember(target.constructor, {
                 name: memberName,

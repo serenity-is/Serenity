@@ -129,7 +129,7 @@ public class GeneratorConfig
     /// <summary>Used for Newtonsoft.JSON</summary>
     public bool ShouldSerializeMVC() => MVC != null &&
         (!string.IsNullOrEmpty(MVC.OutDir) ||
-         MVC.UseRootNamespace != null ||
+         MVC.InternalAccess != null ||
          MVC.SearchViewPaths?.Length > 0 ||
          MVC.StripViewPaths?.Length > 0 ||
          MVC.SourceGenerator == false);
@@ -142,8 +142,10 @@ public class GeneratorConfig
     /// <summary>
     /// Sergen restore command related configuration
     /// </summary>
+    [Obsolete("Sergen no longer supports restoring static content.")]
     public RestoreConfig Restore { get; set; }
     /// <summary>Used for Newtonsoft.JSON</summary>
+    [Obsolete("Only used for JSON serialization of Restore")]
     public bool ShouldSerializeRestore() => Restore != null &&
         (!Restore.Include.IsEmptyOrNull() ||
          !Restore.Exclude.IsEmptyOrNull());
@@ -423,16 +425,21 @@ public class GeneratorConfig
         /// Generate module typings. Defaults to true if you
         /// have "module" defined in tsconfig.json
         /// </summary>
+        [Obsolete("This flag has no effect as only module typings are generated now.")]
         public bool? ModuleTypings { get; set; }
+
         /// <summary>Used for Newtonsoft.JSON</summary>
+        [Obsolete("Only used for JSON serialization of ModuleTypings")]
         public bool ShouldSerializeModuleTypings() => ModuleTypings != null;
 
         /// <summary>
         /// Generate namespace typings. Defaults to true if you
         /// don't have "module" defined in tsconfig.json
         /// </summary>
+        [Obsolete("Namespaces mode code generation is deprecated.")]
         public bool? NamespaceTypings { get; set; }
         /// <summary>Used for Newtonsoft.JSON</summary>
+        [Obsolete("Only used for JSON serialization of NamespaceTypings")]
         public bool ShouldSerializeNamespaceTypings() => NamespaceTypings != null;
 
         /// <summary>
@@ -498,9 +505,14 @@ public class GeneratorConfig
     public class MVCConfig
     {
         /// <summary>
-        /// Use project root namespace in generated file
+        /// Obsolete. Sergen will now always use the root namespace.
         /// </summary>
+        [Obsolete("Sergen will always use the root namespace to avoid class name clashes.")]
         public bool? UseRootNamespace { get; set; }
+        /// <summary>
+        /// Use internal instead of public for generated top level class (MVC/ESM).
+        /// </summary>
+        public bool? InternalAccess { get; set; }
         /// <summary>
         /// Output directory for MVC.cs
         /// </summary>
@@ -576,7 +588,8 @@ public class GeneratorConfig
     public class TSBuildConfig
     {
         /// <summary>
-        /// List of entry point globs, default is "**/Page.ts", "**/Page.tsx", "**/ScriptInit.ts"
+        /// List of entry point globs, default is "Modules/**/*Page.ts", "Modules/**/*Page.tsx", "Modules/**/ScriptInit.ts"
+        /// Include "+" as the first item to append to default list.
         /// </summary>
         public List<string> EntryPoints { get; set; }
 

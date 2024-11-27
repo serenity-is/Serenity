@@ -150,7 +150,7 @@ export class Uploader {
     }
 
     private isMultiple() {
-        return !!(this.opt.multiple ?? this.opt?.input?.getAttribute("multiple"));
+        return !!(this.opt.multiple ?? (this.opt?.input as HTMLInputElement)?.multiple);
     }
 
     private getTypePredicate(): ((type: string) => boolean) {

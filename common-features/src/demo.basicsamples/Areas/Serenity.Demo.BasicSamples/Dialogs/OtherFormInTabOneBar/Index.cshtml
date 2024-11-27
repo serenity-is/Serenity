@@ -1,0 +1,26 @@
+﻿@{
+    ViewData["Title"] = "Another Form In Tab With One Toolbar";
+}
+
+@section ContentHeader {
+    <h1>@ViewData["Title"]<small></small></h1>
+}
+
+<div class="alert alert-info alert-dismissable alert-dismissible s-sample-info">
+    <button type="button" class="close btn-close" data-dismiss="alert" data-bs-dismiss="alert" aria-hidden="true">&times;</button>
+    <p>Sometimes you may want to display / edit details of a related entity in a tab.</p>
+    <p>Here we show customer details in a tab under order dialog.</p>
+    <p>Note that, customer details are loaded separately from the order itself.</p>
+    <p>In this example Order and Customer entities are saved with same toolbar button.</p>
+
+    <p class="s-sample-sources">
+        <b>Source Files:</b>
+        @Html.BasicSamplesSourceFile("Index.cshtml"),
+        @Html.BasicSamplesSourceFile("OtherFormInTabOneBarPage.tsx")
+    </p>
+</div>
+
+<div id="GridDiv"></div>
+
+
+@Html.ModulePageInit(ESM.OtherFormInTabOneBarPage)

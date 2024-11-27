@@ -14,8 +14,8 @@
       "ES2017",
       "DOM"
     ],
-    "module": "ES2020",
-    "moduleResolution": "Node",
+    "module": "ESNext",
+    "moduleResolution": "Bundler",
     "newLine": "lf",
     "noImplicitAny": true,
     "outDir": "./out",    

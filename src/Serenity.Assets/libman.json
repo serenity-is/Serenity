@@ -7,23 +7,11 @@
       "destination": "wwwroot/bootstrap/",
       "files": [
         "js/bootstrap.bundle.js",
-        "js/bootstrap.bundle.js.map",
         "js/bootstrap.bundle.min.js",
-        "js/bootstrap.bundle.min.js.map",
         "css/bootstrap.css",
         "css/bootstrap.min.css",
         "css/bootstrap.rtl.css",
         "css/bootstrap.rtl.min.css"
-      ]
-    },
-    {
-      "library": "bootstrap-icons@1.11.1",
-      "destination": "wwwroot/bootstrap-icons/",
-      "files": [
-        "font/bootstrap-icons.css",
-        "font/bootstrap-icons.min.css",
-        "font/fonts/bootstrap-icons.woff",
-        "font/fonts/bootstrap-icons.woff2"
       ]
     },
     {
@@ -40,16 +28,6 @@
       "files": [
         "mousetrap.js",
         "mousetrap.min.js"
-      ]
-    },
-    {
-      "library": "toastr.js@2.1.4",
-      "destination": "wwwroot/toastr",
-      "files": [
-        "toastr.css",
-        "toastr.min.js",
-        "toastr.js.map",
-        "toastr.min.css"
       ]
     }
   ]

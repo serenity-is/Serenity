@@ -1,0 +1,12 @@
+{
+  "Extends": "defaults@6.6.0",
+  "RootNamespace": "Serene",
+  "FileScopedNamespaces": true,
+  "ServerTypings": {
+    "LocalTexts": true
+  },
+  "UpgradeInfo": {
+    "InitialType": "Community",
+    "InitialVersion": "8.7.4.0"
+  }
+}

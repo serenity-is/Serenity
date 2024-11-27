@@ -6,7 +6,7 @@ import { FilterStore } from "./filterstore";
 export class FilterWidgetBase<P = {}> extends Widget<P> {
     declare private store: FilterStore;
 
-    private onFilterStoreChanged: () => void;
+    declare private onFilterStoreChanged: () => void;
 
     constructor(props: WidgetProps<P>) {
         super(props);

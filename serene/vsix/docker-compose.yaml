@@ -1,0 +1,5 @@
+services:
+  webapp:
+    build: ./webapp
+    ports:
+      - 5002:5002

@@ -2,13 +2,15 @@ namespace Serenity.CodeGeneration;
 
 public abstract class ImportGeneratorBase : CodeGeneratorBase
 {
-    protected Dictionary<string, ExternalType> tsTypes;
+    private readonly Dictionary<string, ExternalType> tsTypes;
 
     public ImportGeneratorBase()
     {
         RootNamespaces = [ "Serenity" ];
         tsTypes = [];
     }
+
+    public IDictionary<string, ExternalType> TSTypes => tsTypes;
 
     public HashSet<string> RootNamespaces { get; private set; }
 
@@ -19,13 +21,27 @@ public abstract class ImportGeneratorBase : CodeGeneratorBase
         tsTypes[type.FullName] = type;
     }
 
-    protected ExternalType GetScriptType(string fullName)
+    public void AddBuiltinTSTypes()
+    {
+        foreach (var type in BuiltinTSTypes.All)
+            AddTSType(type);
+    }
+
+    protected ExternalType GetScriptType(string fullName, bool fallback = true)
     {
         if (string.IsNullOrEmpty(fullName))
             return null;
 
         if (tsTypes.TryGetValue(fullName, out ExternalType type))
             return type;
+
+        if (fallback &&
+            fullName.StartsWith("@serenity-is/corelib:"))
+        {
+            var name = fullName[9..];
+            if (tsTypes.TryGetValue(name, out type))
+                return type;
+        }
 
         return null;
     }
@@ -73,25 +89,20 @@ public abstract class ImportGeneratorBase : CodeGeneratorBase
         return name;
     }
 
-    protected static string GetPropertyScriptName(ExternalProperty prop, bool preserveMemberCase)
+    protected static string TranslateJSPropertyName(string jsName)
     {
-        var scriptNameAttr = prop.Attributes?.FirstOrDefault(x =>
-            x.Type == "System.Runtime.CompilerServices.ScriptNameAttribute");
+        if (string.IsNullOrEmpty(jsName))
+            return jsName;
 
-        if (scriptNameAttr != null)
-            return scriptNameAttr.Arguments?[0].Value as string;
-        else if (!preserveMemberCase && (prop.Attributes == null || !prop.Attributes.Any(x =>
-                x.Type == "System.Runtime.CompilerServices.PreserveCaseAttribute")))
+        if (char.IsLower(jsName[0]))
         {
-            var propField = prop.Name;
-            if (propField == "ID")
-                return "id";
-            else
-                return propField[..1].ToLowerInvariant()
-                    + propField[1..];
+            if (jsName == "id")
+                return "ID";
+                
+            return char.ToUpperInvariant(jsName[0]) + jsName[1..];
         }
-        else
-            return prop.Name;
+
+        return jsName;
     }
 
     protected static string GetBaseTypeName(ExternalType type)

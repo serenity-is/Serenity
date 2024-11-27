@@ -19,6 +19,11 @@ public partial class ServerTypingsGenerator : TypingsGeneratorBase
 #endif
 
         AddNestedLocalTexts(fromType, prefix ?? "");
+        if (fromType.Name.EndsWith("Texts", StringComparison.Ordinal) &&
+            !localTextNestedClasses.ContainsKey(fromType.Name))
+        {
+            localTextNestedClasses.Add(fromType.Name, prefix ?? "");
+        }
     }
 
     protected void AddNestedLocalTexts(TypeDefinition type, string prefix)
@@ -58,163 +63,182 @@ public partial class ServerTypingsGenerator : TypingsGeneratorBase
             localTextKeys.Add(prefix + prop.Name);
     }
 
-    protected void GenerateTexts(bool module)
+    protected void GenerateTexts()
     {
-        cw.Indented("namespace ");
-        var ns = RootNamespaces.FirstOrDefault(x => x != "Serenity") ?? "App";
-        sb.Append(ns + ".Texts");
-        cw.InBrace(delegate
+        var jwBuilder = new StringBuilder();
+        var jw = new Newtonsoft.Json.JsonTextWriter(new System.IO.StringWriter(jwBuilder))
         {
-            Regex filter = null;
-            if (LocalTextFilters.Count > 0)
+            QuoteName = false,
+            Formatting = Newtonsoft.Json.Formatting.Indented,
+            Indentation = 4
+        };
+
+        Regex filter = null;
+        if (LocalTextFilters.Count > 0)
+        {
+            var fb = new StringBuilder("^(");
+            bool append = false;
+            foreach (string item in LocalTextFilters)
             {
-                var fb = new StringBuilder("^(");
-                bool append = false;
-                foreach (string item in LocalTextFilters)
+                if (append)
+                    fb.Append('|');
+                if (!string.IsNullOrEmpty(item))
                 {
-                    if (append)
-                        fb.Append('|');
-                    if (!string.IsNullOrEmpty(item))
-                    {
-                        if (item[0] == '^' && item[^1] == '$')
-                            fb.Append(item[1..^1]);
-                        else fb.Append(item.Replace(".", "\\."
+                    if (item[0] == '^' && item[^1] == '$')
+                        fb.Append(item[1..^1]);
+                    else fb.Append(item.Replace(".", "\\."
 #if ISSOURCEGENERATOR
-                            ) + ".*");
+                        ) + ".*");
 #else
                             , StringComparison.Ordinal) + ".*");
 #endif
-                        append = true;
-                    }
+                    append = true;
                 }
-                fb.Append(")$");
-                filter = new Regex(fb.ToString(), RegexOptions.Compiled | RegexOptions.IgnoreCase);
             }
+            fb.Append(")$");
+            filter = new Regex(fb.ToString(), RegexOptions.Compiled | RegexOptions.IgnoreCase);
+        }
 
-            var list = localTextKeys.Where(x =>
-                    !string.IsNullOrWhiteSpace(x) &&
-                    (Web.LocalTextPackages.DefaultSitePackageIncludes.IsMatch(x) ||
-                     (filter == null || filter.IsMatch(x))) &&
-                    x.Split('.').All(p => SqlSyntax.IsValidIdentifier(p)))
-                .ToList();
+        var fullClassNames = new HashSet<string>();
+        var list = localTextKeys.Where(x =>
+                !string.IsNullOrWhiteSpace(x) &&
+                (Web.LocalTextPackages.DefaultSitePackageIncludes.IsMatch(x) ||
+                 (filter != null && filter.IsMatch(x))) &&
+                x.Split('.').All(p => SqlSyntax.IsValidIdentifier(p)))
+            .ToList();
 
-            list.Sort((i1, i2) => string.CompareOrdinal(i1, i2));
+        bool exportTexts = localTextNestedClasses.ContainsKey("Texts");
 
-            var jwBuilder = new StringBuilder();
-            var jw = new Newtonsoft.Json.JsonTextWriter(new System.IO.StringWriter(jwBuilder))
+        if (list.Count > 0)
+        {
+            list.Sort(string.CompareOrdinal);
+
+            cw.Indented("namespace texts");
+            cw.InBrace(delegate
             {
-                QuoteName = false,
-                Formatting = Newtonsoft.Json.Formatting.Indented,
-                Indentation = 4
-            };
-            jw.WriteStartObject();
-            List<string> stack = [];
-            int stackCount = 0;
-            for (int i = 0; i < list.Count; i++)
-            {
-                var key = list[i];
-                var parts = key.Split('.');
-
-                int same = 0;
-
-                if (stackCount > 0)
+                jw.WriteStartObject();
+                List<string> stack = [];
+                int stackCount = 0;
+                for (int i = 0; i < list.Count; i++)
                 {
-                    while (same < stackCount && same < parts.Length && stack[same] == parts[same])
-                        same++;
+                    var key = list[i];
+                    var parts = key.Split('.');
 
-                    for (int level = same; level < stackCount; level++)
+                    int same = 0;
+
+                    if (stackCount > 0)
                     {
-                        jw.WriteEndObject();
-                        cw.EndBrace();
+                        while (same < stackCount && same < parts.Length && stack[same] == parts[same])
+                            same++;
+
+                        for (int level = same; level < stackCount; level++)
+                        {
+                            jw.WriteEndObject();
+                            cw.EndBrace();
+                        }
+
+                        stackCount = same;
                     }
 
-                    stackCount = same;
-                }
-
-                for (int level = same; level < parts.Length - 1; level++)
-                {
-                    string part = parts[level];
-                    if (stack.Count > level)
-                        stack[level] = part;
-                    else
-                        stack.Add(part);
-                    jw.WritePropertyName(part);
-                    jw.WriteStartObject();
-                    sb.AppendLine();
-                    if (level == 0)
-                        cw.Indented("export declare namespace ");
-                    else
-                        cw.Indented("namespace ");
-                    sb.Append(part);
-                    cw.StartBrace();
-                }
-                stackCount = parts.Length - 1;
-
-                if (same != parts.Length)
-                {
-                    string part = parts[^1];
-
-                    bool nextStartsWithThis = false;
-                    if (i + 1 < list.Count)
+                    for (int level = same; level < parts.Length - 1; level++)
                     {
-                        var next = list[i + 1];
-                        if (next.StartsWith(key, StringComparison.Ordinal) &&
-                            next.Length > key.Length &&
-                            next[key.Length] == '.')
-                            nextStartsWithThis = true;
-                    }
-
-                    if (nextStartsWithThis)
-                    {
-                        stackCount = parts.Length;
-                        if (stack.Count > stackCount - 1)
-                            stack[stackCount - 1] = part;
+                        string part = parts[level];
+                        if (stack.Count > level)
+                            stack[level] = part;
                         else
                             stack.Add(part);
                         jw.WritePropertyName(part);
                         jw.WriteStartObject();
-                        cw.Indented("namespace ");
+                        sb.AppendLine();
+                        if (level == 0)
+                            cw.Indented("export declare namespace ");
+                        else
+                            cw.Indented("namespace ");
                         sb.Append(part);
+                        fullClassNames.Add(string.Join(".", stack.Take(level + 1)));
                         cw.StartBrace();
-                        jw.WritePropertyName("export const __");
-                        jw.WriteValue(1);
-                        cw.IndentedLine("__: string;");
                     }
-                    else
+                    stackCount = parts.Length - 1;
+
+                    if (same != parts.Length)
                     {
-                        cw.Indented("export const ");
-                        sb.Append(part);
-                        sb.AppendLine(": string;");
+                        string part = parts[^1];
+
+                        bool nextStartsWithThis = false;
+                        if (i + 1 < list.Count)
+                        {
+                            var next = list[i + 1];
+                            if (next.StartsWith(key, StringComparison.Ordinal) &&
+                                next.Length > key.Length &&
+                                next[key.Length] == '.')
+                                nextStartsWithThis = true;
+                        }
+
+                        if (nextStartsWithThis)
+                        {
+                            stackCount = parts.Length;
+                            if (stack.Count > stackCount - 1)
+                                stack[stackCount - 1] = part;
+                            else
+                                stack.Add(part);
+                            fullClassNames.Add(string.Join(".", stack.Take(stackCount)));
+                            jw.WritePropertyName(part);
+                            jw.WriteStartObject();
+                            cw.Indented("namespace ");
+                            sb.Append(part);
+                            cw.StartBrace();
+                            jw.WritePropertyName("export const __");
+                            jw.WriteValue(1);
+                            cw.IndentedLine("__: string;");
+                        }
+                        else
+                        {
+                            cw.Indented("export const ");
+                            sb.Append(part);
+                            sb.AppendLine(": string;");
+                        }
                     }
                 }
-            }
-            for (int i = 0; i < stackCount; i++)
-            {
+                for (int i = 0; i < stackCount; i++)
+                {
+                    jw.WriteEndObject();
+                    cw.EndBrace();
+                    sb.AppendLine();
+                }
                 jw.WriteEndObject();
-                cw.EndBrace();
-                sb.AppendLine();
-            }
-            jw.WriteEndObject();
+            });
 
-            cw.Indented(ns);
-            if (module)
-            {
-                var proxyTexts = ImportFromQ("proxyTexts");
-                sb.Append($"['Texts'] = {proxyTexts}(Texts, '', ");
-            }
-            else
-                sb.Append(@"['Texts'] = Q.proxyTexts(Texts, '', ");
-            jw.Flush();
-            sb.Append(string.Join("\n    ", jwBuilder.ToString().Split('\n')));
-            sb.AppendLine(") as any;");
-        });
-
-        if (module)
-        {
             sb.AppendLine();
-            sb.AppendLine($"export const Texts = {ns}.Texts;");
+            var proxyTexts = ImportFromQ("proxyTexts");
+
+            sb.Append($"{(exportTexts ? "export ": "")}const Texts: typeof texts = {proxyTexts}({{}}, '', ");
+            jw.Flush();
+            sb.Append(string.Join("\n", jwBuilder.ToString().Split('\n')));
+            sb.AppendLine(") as any;");
+        }
+        else
+        {
+            sb.AppendLine($"{(exportTexts ? "export " : "")}const Texts = {{}} as const;");
         }
 
-        AddFile("Texts.ts", module);
+        foreach (var nested in localTextNestedClasses
+            .Where(x => x.Key != "Texts")
+            .OrderBy(x => x.Key, StringComparer.InvariantCultureIgnoreCase))
+        {
+            if (string.IsNullOrEmpty(nested.Value))
+            {
+                sb.AppendLine();
+                sb.AppendLine($"export const {nested.Key} = Texts;");
+            }
+            else if (nested.Value.EndsWith('.') &&
+                fullClassNames.Contains(nested.Value[0..^1]))
+            {
+                sb.AppendLine();
+                sb.AppendLine($"export const {nested.Key} = Texts.{nested.Value[0..^1]};");
+                continue;
+            }
+        }
+
+        AddFile("Texts.ts");
     }
 }

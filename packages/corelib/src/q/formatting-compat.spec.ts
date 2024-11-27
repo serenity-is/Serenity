@@ -118,7 +118,7 @@ describe("turkishLocaleToUpper", () => {
 describe("turkishLocaleCompare", () => {
     it("is same with Culture.stringCompare", async () => {
         var formatting = (await import("./formatting-compat"));
-        expect(formatting.turkishLocaleCompare).toBe((await import("../base")).Culture.stringCompare);
+        expect((formatting as any).turkishLocaleCompare).toBe((await import("../base")).Culture.stringCompare);
     });
 });
 

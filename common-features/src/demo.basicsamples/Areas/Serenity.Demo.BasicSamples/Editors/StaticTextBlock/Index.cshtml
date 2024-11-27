@@ -1,0 +1,23 @@
+﻿@{
+    ViewData["Title"] = "Static Text Block";
+}
+
+@section ContentHeader {
+    <h1>@ViewData["Title"]<small></small></h1>
+}
+
+<div class="alert alert-info alert-dismissable alert-dismissible s-sample-info">
+    <button type="button" class="close btn-close" data-dismiss="alert" data-bs-dismiss="alert" aria-hidden="true">&times;</button>
+    <p>In some forms you might want to display some static text, instead of an editor.</p>
+    <p>StaticTextBlock editor we define for this sample provides this and more.</p>
+    <p>It lets you enter HTML, use a local text as source (recommended), or display the field value as static text.</p>
+    
+    <p class="s-sample-sources"><b>Source Files:</b> 
+        @Html.BasicSamplesSourceFile("Index.cshtml"), 
+        @Html.BasicSamplesSourceFile("/Serenity.Extensions/Modules/Widgets/StaticTextBlock.ts")
+        @Html.BasicSamplesSourceFile("StaticTextBlockForm.cs")
+        @Html.BasicSamplesSourceFile("StaticTextBlockPage.ts")
+    </p>
+</div>
+
+@Html.ModulePageInit(ESM.StaticTextBlockPage)

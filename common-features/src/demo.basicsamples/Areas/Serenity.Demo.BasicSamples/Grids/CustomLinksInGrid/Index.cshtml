@@ -1,0 +1,30 @@
+﻿@{
+    ViewData["Title"] = "Custom Links In Grid";
+}
+
+@section ContentHeader {
+    <h1>@ViewData["Title"]<small></small></h1>
+}
+
+<div class="alert alert-info alert-dismissable alert-dismissible s-sample-info">
+    <button type="button" class="close btn-close" data-dismiss="alert" data-bs-dismiss="alert" aria-hidden="true">&times;</button>
+    <p>
+        Some users asked how to perform custom actions on edit links. It is possible to
+        intercept edit link clicks, just like we do here in Order Id column, by overriding
+        EditItem method. 
+    </p>
+    <p>
+        Another option is to write custom format function to generate &lt;A&gt; elements 
+        and handle their clicks by overriding grid OnClick method. 
+        We demonstrate both here. Try clicking links in all columns.
+    </p>
+
+    <p class="s-sample-sources"><b>Source Files:</b> 
+        @Html.BasicSamplesSourceFile("Index.cshtml"), 
+        @Html.BasicSamplesSourceFile("CustomLinksInGridPage.tsx")
+    </p>
+</div>
+
+<div id="GridDiv"></div>
+
+@Html.ModulePageInit(ESM.CustomLinksInGridPage)

@@ -1,0 +1,20 @@
+{
+  "name": "@serenity-is/demo.northwind",
+  "dependencies": {
+    "@serenity-is/extensions": "workspace:*",
+    "@types/dompurify": "3.0.5",
+    "dompurify": "3.1.6"
+  },
+  "main": "dist/index.js",
+  "private": true,
+  "scripts": {
+    "build": "node ./tsbuild.js",
+    "build:watch": "node ./tsbuild.js --watch",
+    "dts": "pnpm dts-bundle-generator Modules/index.ts -o dist/index.d.ts --no-banner --disable-symlinks-following --inline-declare-global",
+    "jest": "node ../../../node_modules/jest/bin/jest.js",
+    "test": "node ./tsbuild.js && pnpm jest --coverage",
+    "tsc": "tsc"
+  },
+  "type": "module",
+  "types": "dist/index.d.ts"
+}

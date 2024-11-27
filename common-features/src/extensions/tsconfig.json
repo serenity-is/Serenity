@@ -1,0 +1,13 @@
+{
+  "extends": "./tsconfig.base.json",
+  "compilerOptions": {
+    "emitDeclarationOnly": true,
+    "outDir": "./out"
+  },
+  "exclude": [
+    "Modules/index.ts"
+  ],
+  "include": [
+    "Modules"
+  ]
+}

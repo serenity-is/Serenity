@@ -1,4 +1,4 @@
-﻿
+
 namespace Serenity.Data;
 
 /// <summary>
@@ -7,7 +7,7 @@ namespace Serenity.Data;
 public interface ILocalizationRow : IIdRow
 {
     /// <summary>
-    /// Culture ID field, e.g. LanguageID / LanguageKey
+    /// Language ID field (must be a two or four letter culture code, e.g. en-GB)
     /// </summary>
-    Field CultureIdField { get; }
+    StringField CultureIdField { get; }
 }

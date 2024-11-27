@@ -2,5 +2,9 @@
   "Authorization.AccessDenied": "Toto žádosti bylo zamítnuto!",
   "Authorization.NotLoggedIn": "Pro tuto žádost je vyžadováno povolení!",
   "Db.Shared.RecordId": "ID",
-  "Services.GenericErrorMessage": "Při zpracování vašeho požadavku došlo k chybě"
+  "Services.GenericErrorMessage": "Při zpracování vašeho požadavku došlo k chybě",
+  "Services.HttpError": "HTTP chyba {0}.",
+  "Services.InternalServerError": "Interní chyba serveru (500).",
+  "Services.SeeBrowserConsole": "Zkontrolujte konzoli prohlížeče (F12) pro více informací.",
+  "Services.UnknownConnectionError": "Došlo k chybě při připojování k serveru."
 }

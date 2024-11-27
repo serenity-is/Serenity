@@ -8,11 +8,11 @@ namespace Serenity.Services;
 /// <remarks>
 /// Creates an instance of the class
 /// </remarks>
-/// <param name="userRetrieveService"></param>
+/// <param name="userRetriever"></param>
 /// <exception cref="ArgumentNullException"></exception>
-public class DefaultUserClaimCreator(IUserRetrieveService userRetrieveService) : IUserClaimCreator
+public class DefaultUserClaimCreator(IUserRetrieveService userRetriever) : IUserClaimCreator
 {
-    private readonly IUserRetrieveService userRetrieveService = userRetrieveService ?? throw new ArgumentNullException(nameof(userRetrieveService));
+    private readonly IUserRetrieveService userRetriever = userRetriever ?? throw new ArgumentNullException(nameof(userRetriever));
 
     /// <summary>
     /// Add User Claims To Identity
@@ -37,7 +37,7 @@ public class DefaultUserClaimCreator(IUserRetrieveService userRetrieveService) :
         if (username is null)
             throw new ArgumentNullException(nameof(username));
 
-        var user = userRetrieveService.ByUsername(username) ?? 
+        var user = userRetriever.ByUsername(username) ?? 
             throw new ArgumentOutOfRangeException(nameof(username));
         if (authType == null)
             throw new ArgumentNullException(nameof(authType));

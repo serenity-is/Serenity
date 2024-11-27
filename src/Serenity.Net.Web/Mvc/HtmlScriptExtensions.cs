@@ -45,6 +45,47 @@ public static partial class HtmlScriptExtensions
     }
 
     /// <summary>
+    /// Automatically includes corresponding .css file for an ES module if it exists next to
+    /// the .js file
+    /// </summary>
+    /// <param name="helper">HTML helper</param>
+    /// <param name="module">ES module</param>
+    /// <returns></returns>
+    public static HtmlString AutoIncludeModuleCss(this IHtmlHelper helper, string module)
+    {
+        if (string.IsNullOrEmpty(module))
+            return HtmlString.Empty;
+
+        if (module.EndsWith(".js", StringComparison.Ordinal) == true &&
+            module.StartsWith("~/", StringComparison.Ordinal) == true &&
+            helper.ViewContext.HttpContext.RequestServices.GetRequiredService<IWebHostEnvironment>()
+                .WebRootFileProvider?.GetFileInfo(module[2..^3] + ".css")?.Exists == true)
+        {
+            return Stylesheet(helper, module);
+        }
+
+        return HtmlString.Empty;
+    }
+
+    /// <summary>
+    /// Executes default export of a module page, usually pageInit
+    /// </summary>
+    /// <param name="html"></param>
+    /// <param name="module"></param>
+    /// <param name="options"></param>
+    /// <param name="css"></param>
+    /// <returns></returns>
+    public static HtmlString ModulePageInit(this IHtmlHelper html, string module, object options = null, bool css = true)
+    {
+        return new HtmlString(
+            (css ? AutoIncludeModuleCss(html, module) : HtmlString.Empty).Value +
+            $"<script type=\"module\">\n" +
+            $"import pageInit from '{html.ResolveWithHash(module)}';\n" +
+            $"pageInit({(options != null ? JSON.StringifyIndented(options) : "")});\n" +
+            $"</script>");
+    }
+
+    /// <summary>
     /// Renders individual link elements for all CSS files in a bundle if bundling is disabled,
     /// and renders a single link element containing the bundle URL if it is enabled.
     /// </summary>
@@ -189,12 +230,12 @@ public static partial class HtmlScriptExtensions
 
             if (!IsAlreadyIncluded(context.Items, scriptUrl))
             {
-                sb.AppendLine(string.Format(CultureInfo.InvariantCulture, 
+                sb.AppendLine(string.Format(CultureInfo.InvariantCulture,
                     "    <script src=\"{0}\" type=\"text/javascript\"></script>\n",
                     WebUtility.HtmlEncode(contentHashCache.ResolveWithHash(context.Request.PathBase, scriptUrl))));
             }
         }
-        
+
         return new HtmlString(sb.ToString());
     }
 
@@ -212,7 +253,7 @@ public static partial class HtmlScriptExtensions
 
         var included = (HashSet<string>)contextItems[IncludedScriptsAndCssKey];
         if (included == null)
-        { 
+        {
             included = new HashSet<string>(StringComparer.OrdinalIgnoreCase);
             contextItems[IncludedScriptsAndCssKey] = included;
         }

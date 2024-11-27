@@ -1,0 +1,111 @@
+@model Serenity.Demo.Northwind.OrderDetailReportData
+@{
+    Layout = "";
+}
+<html lang="en">
+<head>
+    <!--
+        WKHTML does not properly work with flexbox, e.g. what Bootstrap 5 uses,
+        and reports should not depend on the site styling, or they would break
+        when the site is updated, so we are using Bootstrap 3 directly from a CDN.
+    -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@3.4.1/dist/css/bootstrap.min.css" />
+</head>
+<body>
+    <section class="invoice">
+        <div>
+            <h2 class="page-header">
+                Invoice
+                <small class="pull-right">Date: @DateTime.Now.ToShortDateString()</small>
+            </h2>
+        </div>
+        <div class="row invoice-info">
+            <div class="col-xs-4 invoice-col">
+                From
+                <address>
+                    <strong>Northwind, Inc.</strong><br>
+                    1357 Serenity Road<br>
+                    Visual Studio Gallery, VS 97653<br>
+                    Phone: (804) 123-5432<br>
+                    Email: info@northwind.net
+                </address>
+            </div>
+            <div class="col-xs-4 invoice-col">
+                To
+                <address>
+                    <strong>@Model.Customer.CompanyName</strong><br>
+                    @Model.Customer.Address
+                    Phone: @Model.Customer.Phone<br>
+                    Fax: @Model.Customer.Fax
+                </address>
+            </div>
+            <div class="col-xs-4 invoice-col">
+                <b>Invoice #IX@(Model.Order.OrderID)</b><br>
+                <br>
+                <b>Order ID:</b> @Model.Order.OrderID<br>
+                <b>Payment Due:</b> @Model.Order.OrderDate.Value.ToShortDateString()<br>
+            </div>
+        </div>
+        <div class="row">
+            <div class="col-xs-12 table-responsive">
+                <table class="table table-striped">
+                    <thead>
+                        <tr>
+                            <th>Product</th>
+                            <th>Unit Price</th>
+                            <th>Quantity</th>
+                            <th>Discount</th>
+                            <th>Line Total</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @foreach (var d in Model.Details)
+                        {
+                            <tr>
+                                <td>@d.ProductName</td>
+                                <td>@(d.UnitPrice?.ToString("#,##0.00") ?? "")</td>
+                                <td>@(d.Quantity?.ToString() ?? "")</td>
+                                <td>@(d.Discount?.ToString("#,##0.00") ?? "")</td>
+                                <td>@(d.LineTotal?.ToString("#,##0.00") ?? "")</td>
+                            </tr>
+                        }
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+        <div class="row">
+            <div class="col-xs-6">
+            </div>
+            <div class="col-xs-6">
+                <p class="lead">Amount Due @(Model.Order.OrderDate.Value.AddDays(10).ToShortDateString())</p>
+
+                @{
+                    var subTotal = Model.Details.Sum(x => x.LineTotal ?? 0);
+                }
+
+                <div class="table-responsive">
+                    <table class="table">
+                        <tr>
+                            <th style="width:50%">Subtotal:</th>
+                            <td>$@subTotal.ToString("#,##0.00")</td>
+                        </tr>
+                        <tr>
+                            <th>Tax (9.3%)</th>
+                            <td>$@((subTotal * 0.093m).ToString("#,##0.00"))</td>
+                        </tr>
+                        <tr>
+                            <th>Shipping:</th>
+                            <td>$5.80</td>
+                        </tr>
+                        <tr>
+                            <th>Total:</th>
+                            <td>$@((subTotal * 1.093m).ToString("#,##0.00"))</td>
+                        </tr>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </section>
+</body>
+</html>

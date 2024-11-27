@@ -1,4 +1,4 @@
-﻿namespace Serenity.Data;
+namespace Serenity.Data;
 
 /// <summary>
 /// Maps a row to its localization row
@@ -21,4 +21,13 @@ public class LocalizationRowAttribute(Type localizationRow) : Attribute
     /// Can be automatically determined if not specified.
     /// </summary>
     public string MappedIdField { get; set; }
+
+
+    /// <summary>
+    /// If set to true returns translated values by default for the list handler (available in Pro.Extensions package)
+    /// when ListRequest.Localize is not set, e.g. it is null.
+    /// Note that if this is enabled, Request.Localize parameter must be specified as empty
+    /// string to get original values.
+    /// </summary>
+    public bool LocalizeListByDefault { get; set; }
 }

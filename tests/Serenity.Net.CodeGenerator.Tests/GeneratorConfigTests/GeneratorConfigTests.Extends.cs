@@ -65,7 +65,6 @@ public partial class GeneratorConfigTests
         Assert.True(config.OmitDefaultSchema);
         Assert.NotNull(config.ServerTypings);
         Assert.False(config.ServerTypings.LocalTexts);
-        Assert.Null(config.ServerTypings.ModuleTypings);
         Assert.Equal("OA", config.ServerTypings.OutDir);
     }
 
@@ -114,7 +113,6 @@ public partial class GeneratorConfigTests
         Assert.Equal(new[] { "IC" }, config.IncludeGlobalUsings);
         Assert.Equal(new[] { "XB" }, config.ExcludeGlobalUsings);
         Assert.NotNull(config.ServerTypings);
-        Assert.Null(config.ServerTypings.ModuleTypings);
     }
 #pragma warning restore CA1861 // Avoid constant arrays as arguments
 }

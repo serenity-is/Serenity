@@ -1,4 +1,4 @@
-﻿/**
+/**
  * CriteriaBuilder is a class that allows to build unary or binary criteria with completion support.
  */
 export class CriteriaBuilder extends Array {
@@ -197,7 +197,7 @@ function tokenize(expression: string): Token[] {
             expression.charAt(end) !== "'")
             throw new ParseError(expression, 'unterminated string', index);
 
-        v = expression.substr(index + 1, end - index - 1);
+        v = expression.substring(index + 1, end);
         if (foundDoubles)
             v = v.replace(/''/g, "'");
     }
@@ -234,7 +234,7 @@ function tokenize(expression: string): Token[] {
                 break;
         }
 
-        v = expression.substr(index, end - index + 1);
+        v = expression.substring(index, end + 1);
     }
 
     function readParam() {

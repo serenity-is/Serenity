@@ -1,0 +1,16 @@
+﻿<!DOCTYPE html>
+@{
+var themeCookie = Context.Request.Cookies["ProThemeSelection"];
+var theme = themeCookie != null && !themeCookie.IsEmptyOrNull() ? themeCookie : "azure-light";
+var rtl = System.Globalization.CultureInfo.CurrentUICulture.TextInfo.IsRightToLeft;
+}
+<html lang="@System.Globalization.CultureInfo.CurrentUICulture.Name" class="pro theme-@(theme) no-navigation@(Html.Raw(rtl ? " dir=\"rtl\"" : ""))">
+<head>
+    <partial name="@MVC.Views.Shared._LayoutHead" />
+    @RenderSection("Head", false)
+    <title>@ViewData["Title"]</title>
+</head>
+<body id="s-@(ViewData["PageId"])Page" class="@(ViewData["BodyClass"]) no-navigation@(rtl ? " rtl" : "")">
+    @RenderBody()
+</body>
+</html>

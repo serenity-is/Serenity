@@ -1,9 +1,8 @@
-import { Fluent, toId } from "../../base";
+import { Fluent, setElementReadOnly, toId } from "../../base";
 import { IDoubleValue, IReadOnly, IStringValue } from "../../interfaces";
 import { addOption, zeroPad } from "../../q";
 import { Decorators } from "../../types/decorators";
 import { EditorProps, EditorWidget } from "./editorwidget";
-import { EditorUtils } from "./editorutils";
 
 export interface TimeEditorBaseOptions {
     noEmptyOption?: boolean;
@@ -33,7 +32,9 @@ export class TimeEditorBase<P extends TimeEditorBaseOptions> extends EditorWidge
             addOption(input, "" + h, zeroPad(h, 2));
         }
 
-        this.minutes = Fluent("select").class('editor minute').insertAfter(input);
+        const select = document.createElement("select");
+        select.classList.add("editor", "minute");
+        this.minutes = Fluent(select).insertAfter(input);
         this.minutes.on("change", () => Fluent.trigger(this.domNode, "change"));
 
         for (var m = 0; m <= 59; m += (this.options.intervalMinutes || 5)) {
@@ -54,15 +55,8 @@ export class TimeEditorBase<P extends TimeEditorBaseOptions> extends EditorWidge
     }
 
     set_readOnly(value: boolean): void {
-
         if (value !== this.get_readOnly()) {
-            if (value) {
-                this.element.addClass('readonly').attr('readonly', 'readonly');
-            }
-            else {
-                this.element.removeClass('readonly').removeAttr('readonly');
-            }
-            EditorUtils.setReadonly(this.minutes, value);
+            setElementReadOnly([this.domNode, this.minutes.getNode()], value);
         }
     }
 
