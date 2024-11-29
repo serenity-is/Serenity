@@ -1,35 +1,34 @@
+using ClosedXML.Excel;
 using FastMember;
-using OfficeOpenXml;
-using OfficeOpenXml.Style;
-using OfficeOpenXml.Table;
 using System.Collections;
-using System.Drawing;
+using System.IO;
 
 namespace Serenity.Reporting;
 
 public static class ExcelReportGenerator
 {
     public static byte[] GeneratePackageBytes(List<ReportColumn> columns, IList rows,
-        string sheetName = "Page1", string tableName = "Table1", TableStyles tableStyle = TableStyles.Medium2,
+        string sheetName = "Page1", string tableName = "Table1", XLTableTheme tableStyle = null,
         int startRow = 1, int startCol = 1, int autoFitRows = 250)
     {
         using var package = GeneratePackage(columns, rows, sheetName, tableName, tableStyle,
             startRow, startCol, autoFitRows);
-        return package.GetAsByteArray();
+        using var ms = new MemoryStream();
+        package.SaveAs(ms);
+        return ms.ToArray();
     }
 
-    public static ExcelPackage GeneratePackage(List<ReportColumn> columns, IList rows,
-        string sheetName = "Page1", string tableName = "Table1", TableStyles tableStyle = TableStyles.Medium2,
+    public static XLWorkbook GeneratePackage(List<ReportColumn> columns, IList rows,
+        string sheetName = "Page1", string tableName = "Table1", XLTableTheme tableStyle = null,
         int startRow = 1, int startCol = 1, int autoFitRows = 250)
     {
-        var package = new ExcelPackage();
-        var workbook = package.Workbook;
+        var workbook = new XLWorkbook();
         var worksheet = workbook.Worksheets.Add(sheetName);
 
         PopulateSheet(worksheet, columns, rows, tableName, tableStyle,
             startRow, startCol, autoFitRows);
 
-        return package;
+        return workbook;
     }
 
     private static readonly Type[] DateTimeTypes =
@@ -52,8 +51,8 @@ public static class ExcelReportGenerator
         return format;
     }
 
-    public static void PopulateSheet(ExcelWorksheet worksheet, List<ReportColumn> columns, IList rows,
-        string tableName = "Table1", TableStyles tableStyle = TableStyles.Medium2,
+    public static void PopulateSheet(IXLWorksheet worksheet, List<ReportColumn> columns, IList rows,
+        string tableName = "Table1", XLTableTheme tableStyle = null,
         int startRow = 1, int startCol = 1, int autoFitRows = 250)
     {
         ArgumentNullException.ThrowIfNull(columns);
@@ -69,7 +68,7 @@ public static class ExcelReportGenerator
         int endCol = startCol + colCount - 1;
         int endRow = rows.Count + startRow;
 
-        var header = worksheet.Cells[startRow, startCol, startRow, endCol];
+        var header = worksheet.Row(startRow);
         var columnNames = columns.Select(x => (x.Title ?? x.Name)).ToArray();
         if (!string.IsNullOrEmpty(tableName))
         {
@@ -92,10 +91,10 @@ public static class ExcelReportGenerator
             }
         }
 
-        header.LoadFromArrays(
-        [
-            columnNames
-        ]);
+        for (var i = 0; i < columnNames.Length; i++)
+        {
+            worksheet.Cell(startRow, startCol + i).Value = columnNames[i];
+        }
 
         var dataList = new List<object[]>();
         foreach (var obj in rows)
@@ -171,13 +170,13 @@ public static class ExcelReportGenerator
 
         if (rows.Count > 0)
         {
-            var dataRange = worksheet.Cells[startRow + 1, startCol, endRow, endCol];
-            dataRange.LoadFromArrays(dataList);
+            var dataRange = worksheet.Cell(startRow + 1, startCol);
+            dataRange.InsertData(dataList);
         }
 
         if (!string.IsNullOrEmpty(tableName))
         {
-            var tableRange = worksheet.Cells[startRow, startCol, endRow, endCol];
+            var tableRange = worksheet.Range(startRow, startCol, endRow, endCol);
             string newTableName;
             int x = 0;
             do
@@ -188,8 +187,8 @@ public static class ExcelReportGenerator
             while (worksheet.Workbook.Worksheets.Any(x => x.Tables.Any(t => string.Equals(newTableName, t.Name, StringComparison.OrdinalIgnoreCase))));
             try
             {
-                var table = worksheet.Tables.Add(tableRange, newTableName);
-                table.TableStyle = tableStyle;
+                var table = tableRange.CreateTable(newTableName);
+                table.Theme = tableStyle ?? XLTableTheme.TableStyleMedium2;
             }
             catch
             {
@@ -201,14 +200,14 @@ public static class ExcelReportGenerator
         {
             var column = columns[i - startCol];
             if (!string.IsNullOrEmpty(column.Format))
-                worksheet.Column(i).Style.Numberformat.Format = FixFormatSpecifier(column.Format, column.DataType);
+                worksheet.Column(i).Style.NumberFormat.Format = FixFormatSpecifier(column.Format, column.DataType);
         }
 
         bool gdiErrors = false;
         try
         {
             if (autoFitRows > 0)
-                worksheet.Cells[startRow, 1, Math.Min(endRow, startRow + autoFitRows), endCol].AutoFitColumns(1, 100);
+                worksheet.Columns(1, endCol).AdjustToContents(startRow: startRow, endRow: Math.Min(endRow, startRow + autoFitRows));
         }
         catch (TypeInitializationException)
         {
@@ -267,30 +266,46 @@ public static class ExcelReportGenerator
                         !Equals(decorator.Value, value) ||
                         decorator.Format != null)
                     {
-                        var cell = worksheet.Cells[rowNum, colNum];
+                        var cell = worksheet.Cell(rowNum, colNum);
 
                         if (!gdiErrors)
                         {
                             if (!string.IsNullOrEmpty(decorator.Background))
                             {
-                                cell.Style.Fill.PatternType = ExcelFillStyle.Solid;
-                                cell.Style.Fill.BackgroundColor.SetColor(
-                                    ColorTranslator.FromHtml(decorator.Background));
+                                cell.Style.Fill.PatternType = XLFillPatternValues.Solid;
+                                cell.Style.Fill.SetBackgroundColor(
+                                    XLColor.FromHtml(decorator.Background));
                             }
 
                             if (!string.IsNullOrEmpty(decorator.Foreground))
-                                cell.Style.Font.Color.SetColor(
-                                    ColorTranslator.FromHtml(decorator.Foreground));
+                                cell.Style.Font.SetFontColor(
+                                    XLColor.FromHtml(decorator.Foreground));
                         }
 
                         if (decorator.Format != null)
-                            cell.Style.Numberformat.Format = FixFormatSpecifier(decorator.Format, col.DataType);
+                            cell.Style.NumberFormat.Format = FixFormatSpecifier(decorator.Format, col.DataType);
 
                         if (!Equals(decorator.Value, value))
-                            cell.Value = decorator.Value;
+                            cell.SetValue(XLCellValue.FromObject(decorator.Value));
                     }
                 }
             }
         }
+    }
+
+
+    public static object AsObject(this XLCellValue value)
+    {
+        return value.Type switch
+        {
+            XLDataType.Blank => null,
+            XLDataType.Boolean => value.GetBoolean(),
+            XLDataType.Number => value.GetNumber(),
+            XLDataType.Text => value.GetText(),
+            XLDataType.Error => value.GetError(),
+            XLDataType.DateTime => value.GetDateTime(),
+            XLDataType.TimeSpan => value.GetTimeSpan(),
+            _ => throw new InvalidCastException()
+        };
     }
 }
