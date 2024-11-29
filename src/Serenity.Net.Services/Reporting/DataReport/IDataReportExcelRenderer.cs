@@ -3,7 +3,7 @@ namespace Serenity.Reporting;
 
 /// <summary>
 /// Excel exporter interface for data only reports. This is usually
-/// implemented by EPPlus based exporter. The interface abstracts
+/// implemented by ClosedXML based exporter. The interface abstracts
 /// that dependency.
 /// </summary>
 public interface IDataReportExcelRenderer
