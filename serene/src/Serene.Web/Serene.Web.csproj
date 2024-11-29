@@ -25,7 +25,6 @@
     <Using Include="System.Data.IDbConnection" Alias="IDbConnection" />
   </ItemGroup>
   <ItemGroup>
-    <PackageReference Include="EPPlus" Version="4.5.3.3" />
     <PackageReference Include="FluentMigrator.Runner" Version="6.2.0" />
     <PackageReference Include="Microsoft.Data.Sqlite" Version="9.0.0" />
     <PackageReference Include="Microsoft.Data.SqlClient" Version="5.2.2" />
