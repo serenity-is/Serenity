@@ -233,7 +233,7 @@ export class QuickFilterBar<P extends QuickFilterBarOptions = QuickFilterBarOpti
                     element: el2 => Fluent(el2).insertAfter(el),
                     useUtc: useUtc == null ? undefined : useUtc,
                 });
-                Fluent.on(end.domNode, ".change", () => el.trigger("change"));
+                Fluent.on(end.domNode, "change", () => el.trigger("change"));
                 el.after(<span class="range-separator">-</span>);
             },
             init: function (w) {
