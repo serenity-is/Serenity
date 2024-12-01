@@ -689,7 +689,7 @@ function internalParse(expression: string, getParam?: (name: string) => any) {
  * @param expression The criteria expression.
  * @param params The dictionary containing parameter values like { p1: 10, p2: 20 }.
  * @example
- * parseCriteria('A >= @p1 and B < @p2', { p1: 5, p2: 4 }) // [[[a], '>=' 5], 'and', [[b], '<', 4]]
+ * `parseCriteria('A >= @p1 and B < @p2', { p1: 5, p2: 4 }) // [[[a], '>=' 5], 'and', [[b], '<', 4]]`
  */
 export function parseCriteria(expression: string, params?: any): any[];
 /** 
@@ -840,10 +840,10 @@ Criteria.paren = function parent(c: any[]): any[] {
  * where p1 is a variable in the scope.
  *
  * @example
- * Criteria.parse("A >= @p1 and B < @p2", { p1: 5, p2: 4 }) // [[[a], '>=' 5], 'and', [[b], '<', 4]]
+ * `Criteria.parse("A >= @p1 and B < @p2", { p1: 5, p2: 4 }) // [[[a], '>=' 5], 'and', [[b], '<', 4]]`
  * 
  * @example
- * var a = 5; b = 4;
- * Criteria.parse`A >= ${a} and B < ${b}` // [[[a], '>=' 5], 'and', [[b], '<', 4]]
+ * `var a = 5; b = 4;
+ * Criteria.parse`A >= ${a} and B < ${b}` // [[[a], '>=' 5], 'and', [[b], '<', 4]]`
 */
 Criteria.parse = parseCriteria;

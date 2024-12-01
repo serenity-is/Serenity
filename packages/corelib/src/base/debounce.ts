@@ -34,7 +34,6 @@
  * N milliseconds. 
  * @param immediate If passed, trigger the function on the leading edge, instead of the trailing. 
  *
- * @source underscore.js
  */
 export function debounce<T extends (...args: any) => any>(func: T, wait?: number, immediate?: boolean): DebouncedFunction<T> {
     var timeout: any, args: any, context: any, timestamp: number, result: any;

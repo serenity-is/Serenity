@@ -5,8 +5,6 @@ import { toggleClass as toggleCls } from "./html";
 /**
  * Represents a Fluent object, which is similar to jQuery but works for only one element.
  * It implements the `ArrayLike` interface and can have 0 (null) or 1 element.
- *
- * @typeparam TElement The type of the underlying HTML element.
  */
 export interface Fluent<TElement extends HTMLElement = HTMLElement> extends ArrayLike<TElement> {
 
@@ -139,7 +137,6 @@ export interface Fluent<TElement extends HTMLElement = HTMLElement> extends Arra
     /**
      * Finds all elements that match the specified selector within the element.
      *
-     * @typeparam TElement The type of the found elements.
      * @param selector A CSS selector to match against.
      * @returns An array of elements that match the selector.
      */
@@ -148,7 +145,6 @@ export interface Fluent<TElement extends HTMLElement = HTMLElement> extends Arra
     /**
      * Finds each element that matches the specified selector within the element and executes a callback function for each found element as a Fluent object.
      *
-     * @typeparam TElement The type of the found elements.
      * @param selector A CSS selector to match against.
      * @param callback The callback function to execute for each found element. It receives a Fluent object for each element.
      * @returns The Fluent object itself.
@@ -158,7 +154,6 @@ export interface Fluent<TElement extends HTMLElement = HTMLElement> extends Arra
     /**
      * Finds the first element that matches the specified selector within the element.
      *
-     * @typeparam TElement The type of the found element.
      * @param selector A CSS selector to match against.
      * @returns A Fluent object representing the first element that matches the selector.
      */
@@ -189,7 +184,6 @@ export interface Fluent<TElement extends HTMLElement = HTMLElement> extends Arra
     /**
      * Gets the widget associated with the element.
      *
-     * @typeparam TWidget The type of the widget.
      * @param type Optional. The constructor function of the widget.
      * @returns The widget associated with the element.
      */
@@ -234,7 +228,6 @@ export interface Fluent<TElement extends HTMLElement = HTMLElement> extends Arra
     /**
      * Removes an event listener from the element.
      *
-     * @typeparam K The type of the event.
      * @param type The type of the event. It can include a ".namespace" similar to jQuery.
      * @param listener The event listener to remove.
      * @returns The Fluent object itself.
@@ -247,7 +240,6 @@ export interface Fluent<TElement extends HTMLElement = HTMLElement> extends Arra
     /**
      * Adds an event listener to the element. It is possible to use delegated events like jQuery.
      *
-     * @typeparam K The type of the event.
      * @param type The type of the event. It can include a ".namespace" similar to jQuery.
      * @param listener The event listener to add.
      * @returns The Fluent object itself.
@@ -259,7 +251,6 @@ export interface Fluent<TElement extends HTMLElement = HTMLElement> extends Arra
     /**
      * Adds a one-time event listener to the element. It is possible to use delegated events like jQuery.
      *
-     * @typeparam K The type of the event.
      * @param type The type of the event. It can include a ".namespace" similar to jQuery.
      * @param listener The event listener to add.
      * @returns The Fluent object itself.
@@ -389,7 +380,6 @@ export interface Fluent<TElement extends HTMLElement = HTMLElement> extends Arra
     /**
      * Tries to get the widget associated with the element.
      *
-     * @typeparam TWidget The type of the widget.
      * @param type Optional. The constructor function of the widget.
      * @returns The widget associated with the element, or `null` if no widget is found.
      */
@@ -424,7 +414,6 @@ export namespace Fluent {
     /**
      * Adds an event listener to the element. It is possible to use delegated events like jQuery.
      *
-     * @typeparam K The type of the event.
      * @param element The target element
      * @param type The type of the event. It can include a ".namespace" similar to jQuery.
      * @param listener The event listener to add.
@@ -439,7 +428,6 @@ export namespace Fluent {
     /**
      * Adds a one-time event listener to the element. It is possible to use delegated events like jQuery.
      *
-     * @typeparam K The type of the event.
      * @param element The target element
      * @param type The type of the event. It can include a ".namespace" similar to jQuery.
      * @param listener The event listener to add.
@@ -455,7 +443,6 @@ export namespace Fluent {
      * Removes an event listener from the element.
      *
      * @param element The target element
-     * @typeparam K The type of the event.
      * @param type The type of the event. It can include a ".namespace" similar to jQuery.
      * @param listener The event listener to remove.
      */
