@@ -215,7 +215,7 @@ public sealed class Pack : FrostingTask<BuildContext>
         packer.Pack("Serenity.Net.Web/Serenity.Net.Web.csproj");
         packer.Pack("Serenity.Net.CodeGenerator/Serenity.Net.CodeGenerator.csproj");
         packer.Pack("Serenity.Assets/Serenity.Assets.csproj");
-        packer.Pack("../packages/corelib/Serenity.CoreLib.csproj");
+        packer.Pack("../packages/corelib/Serenity.Corelib.csproj");
     }
 }
 
