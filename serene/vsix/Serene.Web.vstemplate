@@ -20,6 +20,7 @@
         <ProjectItem ReplaceParameters="true" TargetFileName="dotnet-tools.json">dotnet-tools.json</ProjectItem>
       </Folder>
       <ProjectItem ReplaceParameters="false" TargetFileName=".editorconfig">.editorconfig</ProjectItem>
+      <ProjectItem ReplaceParameters="false" TargetFileName=".gitignore">.gitignore</ProjectItem>
       <ProjectItem ReplaceParameters="false" TargetFileName=".npmrc">.npmrc</ProjectItem>
       <ProjectItem ReplaceParameters="true" TargetFileName="appsettings.bundles.json">appsettings.bundles.json</ProjectItem>
       <ProjectItem ReplaceParameters="true" TargetFileName="appsettings.Development.json">appsettings.Development.json</ProjectItem>
@@ -59,7 +60,6 @@
             <ProjectItem ReplaceParameters="true" TargetFileName="LanguageEndpoint.cs">LanguageEndpoint.cs</ProjectItem>
             <ProjectItem ReplaceParameters="true" TargetFileName="LanguageForm.cs">LanguageForm.cs</ProjectItem>
             <ProjectItem ReplaceParameters="true" TargetFileName="LanguageGrid.ts">LanguageGrid.ts</ProjectItem>
-            <ProjectItem ReplaceParameters="true" TargetFileName="LanguageLookup.cs">LanguageLookup.cs</ProjectItem>
             <ProjectItem ReplaceParameters="true" TargetFileName="LanguagePage.cs">LanguagePage.cs</ProjectItem>
             <ProjectItem ReplaceParameters="true" TargetFileName="LanguagePage.ts">LanguagePage.ts</ProjectItem>
             <ProjectItem ReplaceParameters="true" TargetFileName="LanguageRow.cs">LanguageRow.cs</ProjectItem>
@@ -88,7 +88,8 @@
             <ProjectItem ReplaceParameters="true" TargetFileName="RoleRow.cs">RoleRow.cs</ProjectItem>
           </Folder>
           <Folder Name="RolePermission" TargetFolderName="RolePermission">
-            <ProjectItem ReplaceParameters="true" TargetFileName="RolePermissionDialog.ts">RolePermissionDialog.ts</ProjectItem>
+            <ProjectItem ReplaceParameters="true" TargetFileName="RolePermissionDialog.tsx">RolePermissionDialog.tsx</ProjectItem>
+            <ProjectItem ReplaceParameters="true" TargetFileName="RolePermissionDialogTexts.cs">RolePermissionDialogTexts.cs</ProjectItem>
             <ProjectItem ReplaceParameters="true" TargetFileName="RolePermissionEndpoint.cs">RolePermissionEndpoint.cs</ProjectItem>
             <ProjectItem ReplaceParameters="true" TargetFileName="RolePermissionListRequest.cs">RolePermissionListRequest.cs</ProjectItem>
             <ProjectItem ReplaceParameters="true" TargetFileName="RolePermissionListResponse.cs">RolePermissionListResponse.cs</ProjectItem>
@@ -120,6 +121,7 @@
             <ProjectItem ReplaceParameters="true" TargetFileName="UserColumns.cs">UserColumns.cs</ProjectItem>
             <ProjectItem ReplaceParameters="true" TargetFileName="UserDataScript.cs">UserDataScript.cs</ProjectItem>
             <ProjectItem ReplaceParameters="true" TargetFileName="UserDialog.ts">UserDialog.ts</ProjectItem>
+            <ProjectItem ReplaceParameters="true" TargetFileName="UserDialogTexts.cs">UserDialogTexts.cs</ProjectItem>
             <ProjectItem ReplaceParameters="true" TargetFileName="UserEndpoint.cs">UserEndpoint.cs</ProjectItem>
             <ProjectItem ReplaceParameters="true" TargetFileName="UserForm.cs">UserForm.cs</ProjectItem>
             <ProjectItem ReplaceParameters="true" TargetFileName="UserGrid.ts">UserGrid.ts</ProjectItem>
@@ -134,6 +136,7 @@
             <ProjectItem ReplaceParameters="true" TargetFileName="PermissionCheckEditor.tsx">PermissionCheckEditor.tsx</ProjectItem>
             <ProjectItem ReplaceParameters="true" TargetFileName="PermissionKeysDataScript.cs">PermissionKeysDataScript.cs</ProjectItem>
             <ProjectItem ReplaceParameters="true" TargetFileName="UserPermissionDialog.tsx">UserPermissionDialog.tsx</ProjectItem>
+            <ProjectItem ReplaceParameters="true" TargetFileName="UserPermissionDialogTexts.cs">UserPermissionDialogTexts.cs</ProjectItem>
             <ProjectItem ReplaceParameters="true" TargetFileName="UserPermissionEndpoint.cs">UserPermissionEndpoint.cs</ProjectItem>
             <ProjectItem ReplaceParameters="true" TargetFileName="UserPermissionListRequest.cs">UserPermissionListRequest.cs</ProjectItem>
             <ProjectItem ReplaceParameters="true" TargetFileName="UserPermissionRepository.cs">UserPermissionRepository.cs</ProjectItem>
@@ -142,7 +145,6 @@
           </Folder>
           <Folder Name="UserRole" TargetFolderName="UserRole">
             <ProjectItem ReplaceParameters="true" TargetFileName="RoleCheckEditor.ts">RoleCheckEditor.ts</ProjectItem>
-            <ProjectItem ReplaceParameters="true" TargetFileName="UserRoleDialog.ts">UserRoleDialog.ts</ProjectItem>
             <ProjectItem ReplaceParameters="true" TargetFileName="UserRoleEndpoint.cs">UserRoleEndpoint.cs</ProjectItem>
             <ProjectItem ReplaceParameters="true" TargetFileName="UserRoleListRequest.cs">UserRoleListRequest.cs</ProjectItem>
             <ProjectItem ReplaceParameters="true" TargetFileName="UserRoleListResponse.cs">UserRoleListResponse.cs</ProjectItem>
@@ -184,6 +186,7 @@
             <ProjectItem ReplaceParameters="true" TargetFileName="HumanizeSqlExceptionBehavior.cs">HumanizeSqlExceptionBehavior.cs</ProjectItem>
             <ProjectItem ReplaceParameters="true" TargetFileName="LanguageList.ts">LanguageList.ts</ProjectItem>
             <ProjectItem ReplaceParameters="true" TargetFileName="SqlExceptionHelper.cs">SqlExceptionHelper.cs</ProjectItem>
+            <ProjectItem ReplaceParameters="true" TargetFileName="SqlExceptionHelperTexts.cs">SqlExceptionHelperTexts.cs</ProjectItem>
           </Folder>
           <Folder Name="Navigation" TargetFolderName="Navigation">
             <ProjectItem ReplaceParameters="true" TargetFileName="NavigationItems.cs">NavigationItems.cs</ProjectItem>
@@ -199,6 +202,7 @@
             <ProjectItem ReplaceParameters="true" TargetFileName="AccountPanelTitle.tsx">AccountPanelTitle.tsx</ProjectItem>
             <ProjectItem ReplaceParameters="true" TargetFileName="AccountPasswordActionsPage.cs">AccountPasswordActionsPage.cs</ProjectItem>
             <Folder Name="Login" TargetFolderName="Login">
+              <ProjectItem ReplaceParameters="true" TargetFileName="LoginFormTexts.cs">LoginFormTexts.cs</ProjectItem>
               <ProjectItem ReplaceParameters="true" TargetFileName="LoginPage.cshtml">LoginPage.cshtml</ProjectItem>
               <ProjectItem ReplaceParameters="true" TargetFileName="LoginPage.tsx">LoginPage.tsx</ProjectItem>
               <ProjectItem ReplaceParameters="true" TargetFileName="LoginRequest.cs">LoginRequest.cs</ProjectItem>
@@ -208,12 +212,14 @@
               <ProjectItem ReplaceParameters="true" TargetFileName="ActivateEmail.cshtml">ActivateEmail.cshtml</ProjectItem>
               <ProjectItem ReplaceParameters="true" TargetFileName="ActivateEmailModel.cs">ActivateEmailModel.cs</ProjectItem>
               <ProjectItem ReplaceParameters="true" TargetFileName="SignUpForm.cs">SignUpForm.cs</ProjectItem>
+              <ProjectItem ReplaceParameters="true" TargetFileName="SignUpFormTexts.cs">SignUpFormTexts.cs</ProjectItem>
               <ProjectItem ReplaceParameters="true" TargetFileName="SignUpPage.cshtml">SignUpPage.cshtml</ProjectItem>
               <ProjectItem ReplaceParameters="true" TargetFileName="SignUpPage.tsx">SignUpPage.tsx</ProjectItem>
               <ProjectItem ReplaceParameters="true" TargetFileName="SignUpRequest.cs">SignUpRequest.cs</ProjectItem>
               <ProjectItem ReplaceParameters="true" TargetFileName="SignUpResponse.cs">SignUpResponse.cs</ProjectItem>
             </Folder>
           </Folder>
+          <ProjectItem ReplaceParameters="true" TargetFileName="MembershipValidationTexts.cs">MembershipValidationTexts.cs</ProjectItem>
         </Folder>
         <Folder Name="ServerTypes" TargetFolderName="ServerTypes">
           <ProjectItem ReplaceParameters="true" TargetFileName="Administration.ts">Administration.ts</ProjectItem>
@@ -280,7 +286,9 @@
           <ProjectItem ReplaceParameters="true" TargetFileName="site.texts.vi-VN.json">site.texts.vi-VN.json</ProjectItem>
           <ProjectItem ReplaceParameters="true" TargetFileName="site.texts.zh-CN.json">site.texts.zh-CN.json</ProjectItem>
         </Folder>
-        <ProjectItem ReplaceParameters="true" TargetFileName="Texts.cs">Texts.cs</ProjectItem>
+        <ProjectItem ReplaceParameters="true" TargetFileName="SiteFormTexts.cs">SiteFormTexts.cs</ProjectItem>
+        <ProjectItem ReplaceParameters="true" TargetFileName="SiteLayoutTexts.cs">SiteLayoutTexts.cs</ProjectItem>
+        <ProjectItem ReplaceParameters="true" TargetFileName="SiteNavigationTexts.cs">SiteNavigationTexts.cs</ProjectItem>
       </Folder>
       <ProjectItem ReplaceParameters="true" TargetFileName="tsbuild.js">tsbuild.js</ProjectItem>
       <ProjectItem ReplaceParameters="true" TargetFileName="tsconfig.json">tsconfig.json</ProjectItem>
@@ -290,7 +298,9 @@
         <ProjectItem ReplaceParameters="true" TargetFileName="_ViewStart.cshtml">_ViewStart.cshtml</ProjectItem>
         <Folder Name="Errors" TargetFolderName="Errors">
           <ProjectItem ReplaceParameters="true" TargetFileName="AccessDenied.cshtml">AccessDenied.cshtml</ProjectItem>
+          <ProjectItem ReplaceParameters="true" TargetFileName="AccessDeniedViewTexts.cs">AccessDeniedViewTexts.cs</ProjectItem>
           <ProjectItem ReplaceParameters="true" TargetFileName="ValidationError.cshtml">ValidationError.cshtml</ProjectItem>
+          <ProjectItem ReplaceParameters="true" TargetFileName="ValidationErrorViewTexts.cs">ValidationErrorViewTexts.cs</ProjectItem>
         </Folder>
         <Folder Name="Shared" TargetFolderName="Shared">
           <ProjectItem ReplaceParameters="true" TargetFileName="_Layout.cshtml">_Layout.cshtml</ProjectItem>
@@ -312,11 +322,11 @@
         <Folder Name="esm" TargetFolderName="esm">
           <Folder Name="_chunks" TargetFolderName="_chunks">
             <ProjectItem ReplaceParameters="true" TargetFileName="chunk-7V7WNOD5.js">chunk-7V7WNOD5.js</ProjectItem>
-            <ProjectItem ReplaceParameters="true" TargetFileName="chunk-F7ASLS5R.js">chunk-F7ASLS5R.js</ProjectItem>
-            <ProjectItem ReplaceParameters="true" TargetFileName="chunk-IHLQ5LPA.js">chunk-IHLQ5LPA.js</ProjectItem>
-            <ProjectItem ReplaceParameters="true" TargetFileName="chunk-NBZXMVJR.js">chunk-NBZXMVJR.js</ProjectItem>
+            <ProjectItem ReplaceParameters="true" TargetFileName="chunk-NFICFSOA.js">chunk-NFICFSOA.js</ProjectItem>
+            <ProjectItem ReplaceParameters="true" TargetFileName="chunk-P6DKNWMZ.js">chunk-P6DKNWMZ.js</ProjectItem>
+            <ProjectItem ReplaceParameters="true" TargetFileName="chunk-QRBE27F2.js">chunk-QRBE27F2.js</ProjectItem>
             <ProjectItem ReplaceParameters="true" TargetFileName="chunk-VYJLGJ67.js">chunk-VYJLGJ67.js</ProjectItem>
-            <ProjectItem ReplaceParameters="true" TargetFileName="chunk-WMAR3PB6.js">chunk-WMAR3PB6.js</ProjectItem>
+            <ProjectItem ReplaceParameters="true" TargetFileName="chunk-WPT45CK3.js">chunk-WPT45CK3.js</ProjectItem>
           </Folder>
           <Folder Name="Modules" TargetFolderName="Modules">
             <Folder Name="Administration" TargetFolderName="Administration">

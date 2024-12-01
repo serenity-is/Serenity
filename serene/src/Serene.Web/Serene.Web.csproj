@@ -31,15 +31,15 @@
     <PackageReference Include="Microsoft.TypeScript.MSBuild" Version="5.7.1" PrivateAssets="all" IncludeAssets="runtime; build; native; contentfiles; analyzers" />
   </ItemGroup>
   <ItemGroup Condition="'$(UseProjectRefs)' == 'false'">
-    <PackageReference Include="Serenity.Assets" Version="8.7.4" />
-    <PackageReference Include="Serenity.Corelib" Version="8.7.4" />
-    <PackageReference Include="Serenity.Net.Web" Version="8.7.4" />
-    <PackageReference Include="Serenity.Extensions" Version="8.7.4" />
+    <PackageReference Include="Serenity.Assets" Version="8.8.1" />
+    <PackageReference Include="Serenity.Corelib" Version="8.8.1" />
+    <PackageReference Include="Serenity.Net.Web" Version="8.8.1" />
+    <PackageReference Include="Serenity.Extensions" Version="8.8.1" />
     <!--#if (Northwind)-->
-    <PackageReference Include="Serenity.Demo.Northwind" Version="8.7.4" />
+    <PackageReference Include="Serenity.Demo.Northwind" Version="8.8.1" />
     <!--#endif-->
     <!--#if (BasicSamples)-->
-    <PackageReference Include="Serenity.Demo.BasicSamples" Version="8.7.4" />
+    <PackageReference Include="Serenity.Demo.BasicSamples" Version="8.8.1" />
     <!--#endif-->
   </ItemGroup>
   <ItemGroup Condition="'$(UseProjectRefs)' != 'false'">
