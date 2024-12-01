@@ -1,3 +1,9 @@
+## 8.8.1 (2024-12-01)
+
+### Bugfixes
+
+- Fix casing for `Corelib` during build (should not be `CoreLib`) which happened during switch to cake frosting, affecting case sensitive file systems
+
 ## 8.8.0 (2024-11-30)
 
 ### Features
