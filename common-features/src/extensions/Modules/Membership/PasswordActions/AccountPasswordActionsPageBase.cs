@@ -20,7 +20,7 @@ public abstract class AccountPasswordActionsPageBase<TUserRow> : MembershipPageB
         }
 
         return this.PanelPage(ModulePath(nameof(ChangePassword)),
-            ExtensionsTexts.Forms.Membership.ChangePassword.FormTitle);
+            ChangePasswordFormTexts.FormTitle);
     }
 
     [HttpGet, PageAuthorize]
@@ -214,21 +214,21 @@ public abstract class AccountPasswordActionsPageBase<TUserRow> : MembershipPageB
             using var br = HttpContext.RequestServices.GetDataProtector("ResetPassword").UnprotectBinary(t);
             var dt = DateTime.FromBinary(br.ReadInt64());
             if (dt < DateTime.UtcNow)
-                return Error(ExtensionsTexts.Validation.InvalidResetToken.ToString(localizer));
+                return Error(ChangePasswordValidationTexts.InvalidResetToken.ToString(localizer));
 
             userId = new TUserRow().IdField.ConvertValue(br.ReadString(), CultureInfo.InvariantCulture);
             nonce = br.ReadInt32();
         }
         catch (Exception)
         {
-            return Error(ExtensionsTexts.Validation.InvalidResetToken.ToString(localizer));
+            return Error(ChangePasswordValidationTexts.InvalidResetToken.ToString(localizer));
         }
 
         using (var connection = sqlConnections.NewFor<TUserRow>())
         {
             var user = connection.TryById<TUserRow>(userId);
             if (user == null || nonce != GetNonceFor(user))
-                return Error(ExtensionsTexts.Validation.InvalidResetToken.ToString(localizer));
+                return Error(ChangePasswordValidationTexts.InvalidResetToken.ToString(localizer));
         }
 
         return this.PanelPage(GetResetPasswordPageModel(t, options.Value));
@@ -270,7 +270,7 @@ public abstract class AccountPasswordActionsPageBase<TUserRow> : MembershipPageB
 
             var dt = DateTime.FromBinary(br.ReadInt64());
             if (dt < DateTime.UtcNow)
-                throw new ValidationError(ExtensionsTexts.Validation.InvalidResetToken.ToString(localizer));
+                throw new ValidationError(ChangePasswordValidationTexts.InvalidResetToken.ToString(localizer));
 
             var userId = new TUserRow().IdField.ConvertValue(br.ReadString(), CultureInfo.InvariantCulture);
             var nonce = br.ReadInt32();
@@ -279,7 +279,7 @@ public abstract class AccountPasswordActionsPageBase<TUserRow> : MembershipPageB
 
             TUserRow user = uow.Connection.TryById<TUserRow>(userId);
             if (user == null || nonce != GetNonceFor(user))
-                throw new ValidationError(ExtensionsTexts.Validation.InvalidResetToken.ToString(localizer));
+                throw new ValidationError(ChangePasswordValidationTexts.InvalidResetToken.ToString(localizer));
 
             if (request.ConfirmPassword != request.NewPassword)
                 throw new ValidationError("PasswordConfirmMismatch", localizer.Get("Validation.PasswordConfirm"));

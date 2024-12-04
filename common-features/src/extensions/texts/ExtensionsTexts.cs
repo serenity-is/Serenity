@@ -24,7 +24,7 @@ public static class ExtensionsTexts
 
     public static class Validation
     {
-        public static readonly LocalText InvalidResetToken = "Your token to reset your password is invalid or has expired!";
-        public static readonly LocalText PasswordConfirmMismatch = "The passwords entered doesn't match!";
+        public static LocalText InvalidResetToken => ChangePasswordValidationTexts.InvalidResetToken;
+        public static LocalText PasswordConfirmMismatch => ChangePasswordValidationTexts.PasswordConfirmMismatch;
     }
 }

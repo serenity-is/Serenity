@@ -141,6 +141,8 @@ export const BulkServiceActionTexts = Texts.Site.BulkServiceAction;
 
 export const ChangePasswordFormTexts = Texts.Forms.Membership.ChangePassword;
 
+export const ChangePasswordValidationTexts = Texts.Validation;
+
 export const DialogUtilsTexts = Texts.Site.Dialogs;
 
 export const ExtensionsTexts = Texts;
