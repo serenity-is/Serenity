@@ -32,6 +32,7 @@ public partial class Startup
 
     public void ConfigureServices(IServiceCollection services)
     {
+        services.AddFeatureToggles(Configuration);
         services.AddApplicationPartsTypeSource();
         services.ConfigureSections(Configuration);
 
