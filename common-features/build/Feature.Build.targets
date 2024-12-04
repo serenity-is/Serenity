@@ -17,7 +17,15 @@
   <Target Name="CompileProjectTSConfig" AfterTargets="AfterBuild" DependsOnTargets="NpmInstall;RestoreNodeTypes"
           Condition="Exists('tsconfig.json') And '$(BuildingProject)' != 'false' And '$(DesignTimeBuild)' != 'true'">
     <Message Text="Executing TypeScript compiler for $(ProjectName)..." Importance="high"></Message>
+    <ItemGroup>
+      <CleanedEsmFiles Include="wwwroot\esm\**" />
+    </ItemGroup>
     <Exec Command="node &quot;$(TSJavaScriptFile.Replace('build\\..\tools\', 'tools\'))&quot; -p ./tsconfig.json" Condition="!Exists('tsbuild.js')" ContinueOnError="true" />
     <Exec Command="pnpm build" Condition="Exists('tsbuild.js')" ContinueOnError="true" />
+    <ItemGroup>
+      <CleanedEsmFiles Remove="wwwroot\esm\**" />
+      <Content Remove="@(CleanedEsmFiles)" />
+      <Content Include="wwwroot\esm\**\*.js;wwwroot\esm\**\*.css;wwwroot\esm\**\*.map" Exclude="@(Content)" CopyToOutputDirectory="Never" CopyToPublishDirectory="PreserveNewest" ExcludeFromSingleFile="true" />
+    </ItemGroup>
   </Target>
 </Project>
