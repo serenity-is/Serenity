@@ -86,24 +86,27 @@ public static class CoreServiceCollectionExtensions
     }
 
     /// <summary>
-    /// Adds feature togglesservice to the registry.
+    /// Adds IFeatureToggles service to the registry.
     /// </summary>
     /// <param name="services">The services.</param>
     /// <param name="configuration">Configuration source</param>
-    public static IServiceCollection AddFeatureToggles(this IServiceCollection services, IConfiguration? configuration = null)
+    /// <param name="disableByDefault">Features to disable by default, pass ["*"] to disable
+    /// all features by default</param>
+    public static IServiceCollection AddFeatureToggles(this IServiceCollection services, 
+        IConfiguration? configuration = null, 
+        object[]? disableByDefault = null)
     {
         if (services is null)
             throw new ArgumentNullException(nameof(services));
 
         configuration ??= GetServiceFromCollection<IConfiguration>(services);
-
         if (configuration != null)
         {
-            services.TryAddSingleton<IFeatureToggles>(new ConfigurationFeatureToggles(configuration));
+            services.TryAddSingleton<IFeatureToggles>(new ConfigurationFeatureToggles(configuration, disableByDefault));
         }
         else
         {
-            services.TryAddSingleton<IFeatureToggles, ConfigurationFeatureToggles>();
+            services.TryAddSingleton<IFeatureToggles>(s => new ConfigurationFeatureToggles(s.GetRequiredService<IConfiguration>(), disableByDefault));
         }
 
         return services;
