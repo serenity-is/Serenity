@@ -1,6 +1,4 @@
-using Microsoft.AspNetCore.Mvc;
 using Serenity.Reporting;
-using System.Data;
 using MyRow = Serenity.Demo.Northwind.OrderRow;
 
 namespace Serenity.Demo.Northwind.Endpoints;

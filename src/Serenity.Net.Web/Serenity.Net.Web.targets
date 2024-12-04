@@ -136,4 +136,29 @@ catch (Exception ex)
     </PropertyGroup>
     <Message Importance="normal" Text="Transform Arguments: $(SergenTransformArgs)"/>
   </Target>
+  <ItemGroup Condition="'$(SerenityUsings)' != 'false'">
+    <Using Include="Microsoft.AspNetCore.Mvc" />
+    <Using Include="Microsoft.Extensions.Options" />
+    <Using Include="Serenity" />
+    <Using Include="Serenity.Abstractions" />
+    <Using Include="Serenity.ComponentModel" />
+    <Using Include="Serenity.Data" />
+    <Using Include="Serenity.Data.Mapping" />
+    <Using Include="Serenity.Extensions" />
+    <Using Include="Serenity.Services" />
+    <Using Include="Serenity.Web" />
+    <Using Include="System" />
+    <Using Include="System.Collections.Generic" />
+    <Using Include="System.ComponentModel" />
+    <Using Include="System.Data.IDbConnection" Alias="IDbConnection" />
+    <Using Include="System.Globalization.CultureInfo" Alias="CultureInfo" />
+    <Using Include="System.Globalization.DateTimeStyles" Alias="DateTimeStyles" />
+    <Using Include="System.Globalization.NumberStyles" Alias="NumberStyles" />
+    <Using Include="System.Linq" />
+    <Using Include="System.Text" />
+    <Using Include="System.Text.RegularExpressions" />
+    <Using Include="System.Threading" />
+    <Using Include="System.Threading.Tasks" />
+  </ItemGroup>
+  
 </Project>

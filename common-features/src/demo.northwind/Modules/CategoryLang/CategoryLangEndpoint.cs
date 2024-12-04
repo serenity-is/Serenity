@@ -1,5 +1,3 @@
-using Microsoft.AspNetCore.Mvc;
-using System.Data;
 using MyRow = Serenity.Demo.Northwind.CategoryLangRow;
 
 namespace Serenity.Demo.Northwind.Endpoints;

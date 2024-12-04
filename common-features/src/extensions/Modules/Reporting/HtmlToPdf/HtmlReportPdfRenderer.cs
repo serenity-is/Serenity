@@ -1,4 +1,5 @@
 using Microsoft.AspNetCore.Http;
+using System.Reflection;
 
 namespace Serenity.Reporting;
 

@@ -20,9 +20,7 @@
     <TypeScriptCompile Remove="node_modules\**" />
     <EmbeddedResource Include="Migrations\**\*.sql" />
     <Content Update=".eslintrc.json;libman.json;package.json;package-lock.json;sergen.json;tsconfig.json;tslint.json;Modules\tsconfig.json" CopyToOutputDirectory="Never" CopyToPublishDirectory="Never" />
-    <Using Include="Microsoft.AspNetCore.Mvc;Microsoft.Extensions.Options;System;System.Collections.Generic;System.ComponentModel;System.Linq;System.Text;System.Threading" />
-    <Using Include="Serenity;Serenity.Abstractions;Serenity.ComponentModel;Serenity.Data;Serenity.Data.Mapping;Serenity.Extensions;Serenity.Services;Serenity.Web" />
-    <Using Include="System.Data.IDbConnection" Alias="IDbConnection" />
+    <Using Include="Serenity.Extensions" />
   </ItemGroup>
   <ItemGroup>
     <PackageReference Include="FluentMigrator.Runner" Version="6.2.0" />

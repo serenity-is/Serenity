@@ -1,5 +1,6 @@
 
 using Serenity.Localization;
+using System.Reflection;
 
 namespace Serenity.Extensions;
 

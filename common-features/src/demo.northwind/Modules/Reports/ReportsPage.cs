@@ -1,4 +1,3 @@
-using Microsoft.AspNetCore.Mvc;
 using Serenity.Reporting;
 
 namespace Serenity.Demo.Northwind;

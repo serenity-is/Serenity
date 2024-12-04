@@ -16,41 +16,21 @@
     <SergenTransform Condition="'$(SergenTransform)' == ''">none</SergenTransform>
     <StaticWebAssetBasePath>/$(MSBuildProjectName)</StaticWebAssetBasePath>
     <ESMAssetBasePath>$(StaticWebAssetBasePath)/esm</ESMAssetBasePath>
-    <TypeScriptCompileBlocked>true</TypeScriptCompileBlocked>
+    <AccelerateBuildsInVisualStudio>true</AccelerateBuildsInVisualStudio>
+    <AddAutoRefs Condition="'$(AddAutoRefs)' == ''">true</AddAutoRefs>
     <AddRazorSupportForMvc>true</AddRazorSupportForMvc>
     <DefaultItemExcludes>node_modules\**;coverage\**;$(DefaultItemExcludes)</DefaultItemExcludes>
-    <AddAutoRefs>true</AddAutoRefs>
-    <RestoreNodeTypes>false</RestoreNodeTypes>
     <DefineConstants Condition="'$(IsPublicDemo)'=='true'">$(DefineConstants);IsPublicDemo</DefineConstants>
-    <AccelerateBuildsInVisualStudio>true</AccelerateBuildsInVisualStudio>
+    <RestoreNodeTypes>false</RestoreNodeTypes>
+    <TypeScriptCompileBlocked>true</TypeScriptCompileBlocked>
     <UseArtifactsOutput>true</UseArtifactsOutput>
   </PropertyGroup>
   <ItemGroup>
-    <FrameworkReference Include="Microsoft.AspNetCore.App" Condition="'$(UsingMicrosoftNETSdkWeb)' != 'true' and '$(AddAutoRefs)' == 'true'" />
     <PackageReference Include="Serenity.Net.Web" Version="$(SerenityVersion)" Condition="!Exists('$(SerenityWebProj)') and '$(AddAutoRefs)' == 'true'" />
     <ProjectReference Include="$(SerenityWebProj)" Condition="Exists('$(SerenityWebProj)') and '$(AddAutoRefs)' == 'true'" />
     <PackageReference Include="Microsoft.TypeScript.MSBuild" Version="5.7.1" Condition="Exists('$(MSBuildProjectDirectory)\tsconfig.json')">
       <PrivateAssets>all</PrivateAssets>
       <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
     </PackageReference>
-  </ItemGroup>
-  <ItemGroup>
-    <Using Include="Microsoft.Extensions.Options" />
-    <Using Include="System" />
-    <Using Include="System.Collections.Generic" />
-    <Using Include="System.ComponentModel" />
-    <Using Include="System.Globalization" />
-    <Using Include="System.Linq" />
-    <Using Include="System.Reflection" />
-    <Using Include="System.Text" />
-    <Using Include="System.Text.RegularExpressions" />
-    <Using Include="Serenity" />
-    <Using Include="Serenity.Abstractions" />
-    <Using Include="Serenity.ComponentModel" />
-    <Using Include="Serenity.Data" />
-    <Using Include="Serenity.Data.Mapping" />
-    <Using Include="Serenity.Extensions" />
-    <Using Include="Serenity.Services" />
-    <Using Include="Serenity.Web" />
   </ItemGroup>
 </Project>

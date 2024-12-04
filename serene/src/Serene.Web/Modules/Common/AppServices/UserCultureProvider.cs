@@ -1,7 +1,5 @@
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Localization;
-using System.Globalization;
-using System.Threading.Tasks;
 
 namespace Serene.AppServices;
 

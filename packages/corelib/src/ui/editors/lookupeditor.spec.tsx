@@ -452,7 +452,7 @@ describe("LookupEditor", () => {
         });
 
         expect(() => editor.items).toThrow("Can't read items property of an async select editor!");
-        expect(() => editor.items = []).toThrow("Can't set items of an async select editor!");
+        expect(() => { editor.items = [] }).toThrow("Can't set items of an async select editor!");
     });
 
 });

@@ -4,7 +4,6 @@ using FluentMigrator.Runner.Initialization;
 using FluentMigrator.Runner.Processors;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.Extensions.DependencyInjection;
-using System.Globalization;
 using System.IO;
 
 namespace Serene.AppServices;

@@ -1,10 +1,4 @@
-﻿using Serenity;
-using Serenity.ComponentModel;
-using System;
-using System.Collections.Generic;
-using System.ComponentModel;
-
-namespace Serene.Administration;
+﻿namespace Serene.Administration;
 
 public partial class PermissionCheckEditorAttribute : CustomEditorAttribute
 {

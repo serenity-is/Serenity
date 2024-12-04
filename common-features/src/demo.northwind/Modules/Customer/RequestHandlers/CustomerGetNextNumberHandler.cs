@@ -1,5 +1,4 @@
-﻿using System.Data;
-using MyRow = Serenity.Demo.Northwind.CustomerRow;
+﻿using MyRow = Serenity.Demo.Northwind.CustomerRow;
 
 namespace Serenity.Demo.Northwind;
 
