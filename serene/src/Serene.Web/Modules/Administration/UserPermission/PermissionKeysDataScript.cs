@@ -1,11 +1,4 @@
-
 namespace Serene.Administration;
-
-using Serenity.Abstractions;
-using Serenity.ComponentModel;
-using Serenity.Web;
-using System;
-using System.Collections.Generic;
 
 [DataScript("Administration.PermissionKeys", Permission = PermissionKeys.Security)]
 public class PermissionKeysDataScript : DataScript<IEnumerable<string>>

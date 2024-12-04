@@ -1,6 +1,6 @@
-namespace Serenity.JsonConverters;
-
 using System.Text.Json;
+
+namespace Serenity.JsonConverters;
 
 /// <summary>
 /// Provides deserialization for object type similar to Newtonsoft
