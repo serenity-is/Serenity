@@ -1,7 +1,7 @@
 namespace Serenity.Services;
 
 [NestedLocalTexts(Prefix = "Validation.")]
-public static partial class ValidationTexts
+public static partial class DataValidationTexts
 {
     public static readonly LocalText ArgumentIsNull = "Argument {0} is null!";
     public static readonly LocalText ArgumentOutOfRange = "Argument {0} is out of range!";
