@@ -1,5 +1,3 @@
-using SerenityIs.Administration;
-using System.IO;
 using System.Text.Json;
 
 namespace Serenity.Web;
@@ -77,7 +75,7 @@ public class LocalTextScript(ILocalTextRegistry registry, string package, string
         var list = LocalTextDataScript.GetPackageData(registry, includes, languageId, isPending, packageId).ToList();
         list.Sort((i1, i2) => string.CompareOrdinal(i1.Key, i2.Key));
 
-        var ms = new MemoryStream();
+        var ms = new System.IO.MemoryStream();
         var jw = new Utf8JsonWriter(ms);
         jw.WriteStartObject();
         List<string> stack = [];

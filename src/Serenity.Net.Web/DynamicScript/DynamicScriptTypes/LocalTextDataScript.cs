@@ -1,9 +1,8 @@
 using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Options;
 using Serenity.Localization;
-using Serenity.Web;
 
-namespace SerenityIs.Administration;
+namespace Serenity.Web;
 
 /// <summary>
 /// Local text data script to access local texts from an external app like mobile
