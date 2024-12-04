@@ -1,5 +1,4 @@
 using Microsoft.AspNetCore.DataProtection;
-using Microsoft.AspNetCore.Mvc;
 
 namespace Serenity.Extensions;
 

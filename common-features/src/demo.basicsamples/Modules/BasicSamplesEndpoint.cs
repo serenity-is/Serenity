@@ -1,4 +1,3 @@
-using Microsoft.AspNetCore.Mvc;
 using Serenity.Demo.Northwind;
 using System.Data;
 

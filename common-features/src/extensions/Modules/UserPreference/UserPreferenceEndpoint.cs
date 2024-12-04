@@ -1,4 +1,3 @@
-using Microsoft.AspNetCore.Mvc;
 using MyRepository = Serenity.Extensions.Repositories.UserPreferenceRepository;
 using MyRow = Serenity.Extensions.Entities.UserPreferenceRow;
 

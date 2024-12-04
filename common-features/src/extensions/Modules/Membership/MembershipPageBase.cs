@@ -1,4 +1,3 @@
-using Microsoft.AspNetCore.Mvc;
 using Serenity.Web.Providers;
 
 namespace Serenity.Extensions;

@@ -1,5 +1,3 @@
-using Microsoft.AspNetCore.Mvc;
-
 namespace Serenity.Demo.BasicSamples;
 
 [PageAuthorize, Route("BasicSamples/[action]")]

@@ -1,5 +1,3 @@
-using Microsoft.AspNetCore.Mvc;
-
 namespace Serenity.Web;
 
 public static class ModulePageExtensions
