@@ -138,6 +138,7 @@ catch (Exception ex)
   </Target>
   <ItemGroup Condition="'$(SerenityUsings)' != 'false'">
     <Using Include="Microsoft.AspNetCore.Mvc" />
+    <Using Include="Microsoft.Extensions.Logging" />
     <Using Include="Microsoft.Extensions.Options" />
     <Using Include="Serenity" />
     <Using Include="Serenity.Abstractions" />

@@ -1,4 +1,3 @@
-using Microsoft.Extensions.Logging;
 using Serene.Administration;
 
 namespace Serene.AppServices;
