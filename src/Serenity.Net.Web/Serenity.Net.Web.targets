@@ -145,6 +145,7 @@ catch (Exception ex)
     <Using Include="Serenity.Data" />
     <Using Include="Serenity.Data.Mapping" />
     <Using Include="Serenity.Extensions" />
+    <Using Include="Serenity.Navigation" />
     <Using Include="Serenity.Services" />
     <Using Include="Serenity.Web" />
     <Using Include="System" />

@@ -2,7 +2,6 @@ using Microsoft.AspNetCore.Hosting;
 using Microsoft.Extensions.DependencyInjection;
 using Newtonsoft.Json.Linq;
 using Serenity.Localization;
-using Serenity.Navigation;
 using System.IO;
 using System.Reflection;
 

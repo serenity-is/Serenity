@@ -12,7 +12,6 @@ using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
 using Serenity.Extensions.DependencyInjection;
 using Serenity.Localization;
-using Serenity.Navigation;
 using System.Data.Common;
 using System.IO;
 

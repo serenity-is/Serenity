@@ -1,4 +1,3 @@
-using Serenity.Navigation;
 using Administration = Serene.Administration.Pages;
 
 [assembly: NavigationMenu(9000, "Administration", icon: "fa-wrench")]

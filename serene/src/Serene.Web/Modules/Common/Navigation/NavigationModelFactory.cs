@@ -1,6 +1,5 @@
 ﻿using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Http.Extensions;
-using Serenity.Navigation;
 using Serene.Administration;
 
 namespace Serene.AppServices;
