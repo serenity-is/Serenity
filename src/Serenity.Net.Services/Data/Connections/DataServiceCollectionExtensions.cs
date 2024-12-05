@@ -1,4 +1,5 @@
-﻿using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Configuration;
+using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.DependencyInjection.Extensions;
 
 namespace Serenity.Extensions.DependencyInjection;
@@ -39,5 +40,29 @@ public static class DataServiceCollectionExtensions
 
         services.AddSqlConnections();
         services.Configure(setupAction);
+    }
+
+    /// <summary>
+    /// Gets the specified connection string entry from the specified configuration's Data:[name] section.
+    /// Only for use in Startup where IConnectionStrings is not yet available.
+    /// Throws if no such connection is found.
+    /// </summary>
+    /// <param name="configuration">The configuration to enumerate.</param>
+    /// <param name="name">The connection string key.</param>
+    /// <returns>The connection string entry from Data:[name].</returns>
+    public static ConnectionStringEntry GetDataConnectionString(this IConfiguration configuration, string name)
+    {
+        var section = configuration.GetSection("Data:" + name);
+        var connection = new ConnectionStringEntry
+        {
+            ConnectionString = section["ConnectionString"],
+            ProviderName = section["ProviderName"],
+            Dialect = section["Dialect"]
+        };
+
+        if (string.IsNullOrEmpty(connection.ConnectionString))
+            throw new ArgumentException($"No connection string entry found for {name}");
+
+        return connection;
     }
 }
