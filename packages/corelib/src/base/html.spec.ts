@@ -1,4 +1,4 @@
-﻿import { addClass, appendToNode, htmlEncode, removeClass, toggleClass } from "./html";
+﻿import { addClass, appendToNode, getElementReadOnly, htmlEncode, removeClass, sanitizeUrl, setElementReadOnly, toggleClass } from "./html";
 
 describe("htmlEncode", () => {
     it("encodes html", () => {
@@ -228,4 +228,202 @@ describe("appendToNode", () => {
         expect(parent.innerHTML).toBe("[object Object]");
     });
 
+});
+
+describe("getElementReadOnly", () => {
+    it("returns null if element is null", () => {
+        expect(getElementReadOnly(null)).toBeNull();
+    });
+
+    it("returns true if element has readonly class", () => {
+        const el = document.createElement("div");
+        el.classList.add("readonly");
+        expect(getElementReadOnly(el)).toBe(true);
+    });
+
+    it("returns true if element is a select and has disabled attribute", () => {
+        const el = document.createElement("select");
+        el.setAttribute("disabled", "disabled");
+        expect(getElementReadOnly(el)).toBe(true);
+    });
+
+    it("returns true if element is a radio and has disabled attribute", () => {
+        const el = document.createElement("input");
+        el.setAttribute("type", "radio");
+        el.setAttribute("disabled", "disabled");
+        expect(getElementReadOnly(el)).toBe(true);
+    });
+
+    it("returns true if element is a checkbox and has disabled attribute", () => {
+        const el = document.createElement("input");
+        el.setAttribute("type", "checkbox");
+        el.setAttribute("disabled", "disabled");
+        expect(getElementReadOnly(el)).toBe(true);
+    });
+
+    it("returns true if element has readonly attribute", () => {
+        const el = document.createElement("input");
+        el.setAttribute("readonly", "readonly");
+        expect(getElementReadOnly(el)).toBe(true);
+    });
+
+    it("returns false if element does not have readonly class or attributes", () => {
+        const el = document.createElement("input");
+        expect(getElementReadOnly(el)).toBe(false);
+    });
+
+    it("returns false if element is a select without disabled attribute", () => {
+        const el = document.createElement("select");
+        expect(getElementReadOnly(el)).toBe(false);
+    });
+
+    it("returns false if element is a radio without disabled attribute", () => {
+        const el = document.createElement("input");
+        el.setAttribute("type", "radio");
+        expect(getElementReadOnly(el)).toBe(false);
+    });
+
+    it("returns false if element is a checkbox without disabled attribute", () => {
+        const el = document.createElement("input");
+        el.setAttribute("type", "checkbox");
+        expect(getElementReadOnly(el)).toBe(false);
+    });
+});
+
+describe("setElementReadOnly", () => {
+    it("ignores null elements", () => {
+        setElementReadOnly(null, true);
+        setElementReadOnly([null], true);
+    });
+
+    it("sets readonly class and attribute for single element", () => {
+        const el = document.createElement("input");
+        setElementReadOnly(el, true);
+        expect(el.classList.contains("readonly")).toBe(true);
+        expect(el.hasAttribute("readonly")).toBe(true);
+    });
+
+    it("removes readonly class and attribute for single element", () => {
+        const el = document.createElement("input");
+        el.classList.add("readonly");
+        el.setAttribute("readonly", "readonly");
+        setElementReadOnly(el, false);
+        expect(el.classList.contains("readonly")).toBe(false);
+        expect(el.hasAttribute("readonly")).toBe(false);
+    });
+
+    it("sets disabled attribute for select element", () => {
+        const el = document.createElement("select");
+        setElementReadOnly(el, true);
+        expect(el.classList.contains("readonly")).toBe(true);
+        expect(el.hasAttribute("disabled")).toBe(true);
+    });
+
+    it("removes disabled attribute for select element", () => {
+        const el = document.createElement("select");
+        el.classList.add("readonly");
+        el.setAttribute("disabled", "disabled");
+        setElementReadOnly(el, false);
+        expect(el.classList.contains("readonly")).toBe(false);
+        expect(el.hasAttribute("disabled")).toBe(false);
+    });
+
+    it("sets disabled attribute for radio input", () => {
+        const el = document.createElement("input");
+        el.setAttribute("type", "radio");
+        setElementReadOnly(el, true);
+        expect(el.classList.contains("readonly")).toBe(true);
+        expect(el.hasAttribute("disabled")).toBe(true);
+    });
+
+    it("removes disabled attribute for radio input", () => {
+        const el = document.createElement("input");
+        el.setAttribute("type", "radio");
+        el.classList.add("readonly");
+        el.setAttribute("disabled", "disabled");
+        setElementReadOnly(el, false);
+        expect(el.classList.contains("readonly")).toBe(false);
+        expect(el.hasAttribute("disabled")).toBe(false);
+    });
+
+    it("sets disabled attribute for checkbox input", () => {
+        const el = document.createElement("input");
+        el.setAttribute("type", "checkbox");
+        setElementReadOnly(el, true);
+        expect(el.classList.contains("readonly")).toBe(true);
+        expect(el.hasAttribute("disabled")).toBe(true);
+    });
+
+    it("removes disabled attribute for checkbox input", () => {
+        const el = document.createElement("input");
+        el.setAttribute("type", "checkbox");
+        el.classList.add("readonly");
+        el.setAttribute("disabled", "disabled");
+        setElementReadOnly(el, false);
+        expect(el.classList.contains("readonly")).toBe(false);
+        expect(el.hasAttribute("disabled")).toBe(false);
+    });
+
+    it("sets readonly class and attribute for multiple elements", () => {
+        const el1 = document.createElement("input");
+        const el2 = document.createElement("select");
+        setElementReadOnly([el1, el2], true);
+        expect(el1.classList.contains("readonly")).toBe(true);
+        expect(el1.hasAttribute("readonly")).toBe(true);
+        expect(el2.classList.contains("readonly")).toBe(true);
+        expect(el2.hasAttribute("disabled")).toBe(true);
+    });
+
+    it("removes readonly class and attribute for multiple elements", () => {
+        const el1 = document.createElement("input");
+        el1.classList.add("readonly");
+        el1.setAttribute("readonly", "readonly");
+        const el2 = document.createElement("select");
+        el2.classList.add("readonly");
+        el2.setAttribute("disabled", "disabled");
+        setElementReadOnly([el1, el2], false);
+        expect(el1.classList.contains("readonly")).toBe(false);
+        expect(el1.hasAttribute("readonly")).toBe(false);
+        expect(el2.classList.contains("readonly")).toBe(false);
+        expect(el2.hasAttribute("disabled")).toBe(false);
+    });
+});
+
+describe("sanitizeUrl", () => {
+    it("returns 'about:blank' for null, empty string, or 'about:blank'", () => {
+        expect(sanitizeUrl(null)).toBe("about:blank");
+        expect(sanitizeUrl("")).toBe("about:blank");
+        expect(sanitizeUrl("about:blank")).toBe("about:blank");
+    });
+
+    it("returns the same URL if it matches SAFE_URL_PATTERN", () => {
+        expect(sanitizeUrl("http://example.com")).toBe("http://example.com");
+        expect(sanitizeUrl("https://example.com")).toBe("https://example.com");
+        expect(sanitizeUrl("mailto:test@example.com")).toBe("mailto:test@example.com");
+        expect(sanitizeUrl("ftp://example.com")).toBe("ftp://example.com");
+        expect(sanitizeUrl("tel:+1234567890")).toBe("tel:+1234567890");
+        expect(sanitizeUrl("file:///C:/path/to/file")).toBe("file:///C:/path/to/file");
+        expect(sanitizeUrl("sms:+1234567890")).toBe("sms:+1234567890");
+    });
+
+    it("returns the same URL if it matches DATA_URL_PATTERN", () => {
+        expect(sanitizeUrl("data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAUA")).toBe("data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAUA");
+        expect(sanitizeUrl("data:video/mp4;base64,AAAAFGZ0eXBtcDQyAAAAAG1w")).toBe("data:video/mp4;base64,AAAAFGZ0eXBtcDQyAAAAAG1w");
+        expect(sanitizeUrl("data:audio/mp3;base64,SUQzAwAAAAAA")).toBe("data:audio/mp3;base64,SUQzAwAAAAAA");
+    });
+
+    it("returns 'unsafe:' prefixed URL for unsafe URLs", () => {
+        expect(sanitizeUrl("javascript:alert('XSS')")).toBe("unsafe:javascript:alert('XSS')");
+        expect(sanitizeUrl("data:text/html;base64,PHNjcmlwdD5hbGVydCgnWFNTJyk8L3NjcmlwdD4=")).toBe("unsafe:data:text/html;base64,PHNjcmlwdD5hbGVydCgnWFNTJyk8L3NjcmlwdD4=");
+    });
+
+    it("returns 'javascript:void(0)' and 'javascript:;' as is", () => {
+        expect(sanitizeUrl("javascript:void(0)")).toBe("javascript:void(0)");
+        expect(sanitizeUrl("javascript:;")).toBe("javascript:;");
+    });
+
+    it("trims the URL before sanitizing", () => {
+        expect(sanitizeUrl("  http://example.com  ")).toBe("http://example.com");
+        expect(sanitizeUrl("  javascript:alert('XSS')  ")).toBe("unsafe:javascript:alert('XSS')");
+    });
 });
