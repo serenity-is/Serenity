@@ -257,7 +257,6 @@ export let round = (num: number, d?: number) => {
     if (d === 0)
         return Math.round(num) * s;
 
-    //
     const ep = d >= 0 ? ("e+" + d) : ("e" + d);
     const em = d >= 0 ? ("e-" + d) : ("e+" + -d);
     return +(Math.round(num + ep as any) + em) * s;
