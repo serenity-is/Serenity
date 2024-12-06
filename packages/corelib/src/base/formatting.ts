@@ -237,21 +237,30 @@ function _formatObject(obj: any, format: string, fmt?: Locale): string {
 
 /** 
  * Rounds a number to specified digits or an integer number if digits are not specified.
- * @param n the number to round 
+ * Uses away from zero rounding (e.g. 1.5 rounds to 2, -1.5 rounds to -2) unlike Math.round.
+ * @param num the number to round 
  * @param d the number of digits to round to. default is zero.
- * @param rounding whether to use banker's rounding
- * @returns the rounded number 
+ * @returns the rounded number
  */
-export let round = (n: number, d?: number, rounding?: boolean) => {
-    var m = Math.pow(10, d || 0);
-    n *= m;
-    var sign = ((n > 0) as any) | -(n < 0);
-    if (n % 1 === 0.5 * sign) {
-        var f = Math.floor(n);
-        return (f + (rounding ? (sign > 0) as any : (f % 2 * sign))) / m;
-    }
+export let round = (num: number, d?: number) => {
+    if (typeof num == "undefined" || isNaN(num))
+        return Math.round(num);
 
-    return Math.round(n) / m;
+    num = +num;
+    if (num === 0)
+        return 0;
+
+    d = d || 0;
+
+    const s = num < 0 ? -1 : 1;
+    num = num < 0 ? -num : num;
+    if (d === 0)
+        return Math.round(num) * s;
+
+    //
+    const ep = d >= 0 ? ("e+" + d) : ("e" + d);
+    const em = d >= 0 ? ("e-" + d) : ("e+" + -d);
+    return +(Math.round(num + ep as any) + em) * s;
 };
 
 /**

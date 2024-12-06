@@ -954,5 +954,74 @@ describe("ScriptCulture", () => {
     });    
 });
 
+describe("round", () => {
+    it("rounds to nearest integer if no digits specified", async function () {
+        var formatting = (await import("./formatting"));
+        expect(formatting.round(1.5)).toBe(2);
+        expect(formatting.round(1.4)).toBe(1);
+        expect(formatting.round(-1.5)).toBe(-2);
+        expect(formatting.round(-1.4)).toBe(-1);
+    });
+
+    it("rounds to specified number of digits", async function () {
+        var formatting = (await import("./formatting"));
+        expect(formatting.round(1.555, 2)).toBe(1.56);
+        expect(formatting.round(1.554, 2)).toBe(1.55);
+        expect(formatting.round(-1.555, 2)).toBe(-1.56);
+        expect(formatting.round(-1.554, 2)).toBe(-1.55);
+    });
+
+    it("handles edge cases", async function () {
+        var formatting = (await import("./formatting"));
+        expect(formatting.round(0)).toBe(0);
+        expect(formatting.round(-0)).toBe(0);
+        expect(formatting.round(0.5)).toBe(1);
+        expect(formatting.round(-0.5)).toBe(-1);
+        expect(formatting.round(1.005, 2)).toBe(1.01);
+        expect(formatting.round(-1.005, 2)).toBe(-1.01);
+        expect(formatting.round(1.965, 2)).toBe(1.97);
+        expect(formatting.round(-1.965, 2)).toBe(-1.97);
+        expect(formatting.round(-1.965, 2)).toBe(-1.97);
+        expect(formatting.round(1.2345678e+2, 2)).toBe(123.46);     
+        expect(formatting.round(1234.5678, -2)).toBe(1200);
+    });
+});
+
+describe("trunc", () => {
+    it("truncates positive numbers to integer", async function () {
+        var formatting = (await import("./formatting"));
+        expect(formatting.trunc(1.5)).toBe(1);
+        expect(formatting.trunc(1.4)).toBe(1);
+        expect(formatting.trunc(123.456)).toBe(123);
+    });
+
+    it("truncates negative numbers to integer", async function () {
+        var formatting = (await import("./formatting"));
+        expect(formatting.trunc(-1.5)).toBe(-1);
+        expect(formatting.trunc(-1.4)).toBe(-1);
+        expect(formatting.trunc(-123.456)).toBe(-123);
+    });
+
+    it("returns 0 for 0 and -0 for -0", async function () {
+        var formatting = (await import("./formatting"));
+        expect(formatting.trunc(0)).toBe(0);
+        expect(formatting.trunc(-0)).toBe(-0);
+    });
+
+    it("returns null for null and undefined", async function () {
+        var formatting = (await import("./formatting"));
+        expect(formatting.trunc(null)).toBeNull();
+        expect(formatting.trunc(undefined)).toBeNull();
+    });
+
+    it("handles edge cases", async function () {
+        var formatting = (await import("./formatting"));
+        expect(formatting.trunc(1)).toBe(1);
+        expect(formatting.trunc(-1)).toBe(-1);
+        expect(formatting.trunc(1.0000001)).toBe(1);
+        expect(formatting.trunc(-1.0000001)).toBe(-1);
+    });
+});
+
 export { };
 
