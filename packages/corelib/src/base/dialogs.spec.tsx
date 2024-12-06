@@ -1760,6 +1760,17 @@ describe("Static Dialog.onClose", () => {
         expect(onClose1).toHaveBeenCalledTimes(1);
         expect(onClose2).toHaveBeenCalledTimes(1);
     });
+
+    it("calls onClose method of the dialog instance if available", () => {
+        const onClose = jest.fn();
+        const dlg = new Dialog({ element: el, autoOpen: true });
+        Dialog.onClose(el, onClose);
+        expect(onClose).not.toHaveBeenCalled();
+        dlg.close();
+        expect(onClose).toHaveBeenCalledTimes(1);
+        el.dispatchEvent(new Event("dialogclose"));
+        expect(onClose).toHaveBeenCalledTimes(1);
+    });
 });
 
 describe("Dialog.title", () => {

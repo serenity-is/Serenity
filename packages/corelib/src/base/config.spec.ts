@@ -29,7 +29,15 @@
         document.head.appendChild(link);
         const config = (await import("./config")).Config;
         expect(config.applicationPath).toBe("/");
-    });    
+    });
+
+    it("returns Config.applicationPath as defaultReturnUrl", async () => {
+        jest.resetModules();
+        document.head.childNodes.forEach(el => el.remove());
+        const config = (await import("./config")).Config;
+        config.applicationPath = "/mypath/some/";
+        expect(config.defaultReturnUrl()).toBe("/mypath/some/");
+    });
 
 });
 

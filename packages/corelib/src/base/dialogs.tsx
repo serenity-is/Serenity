@@ -112,7 +112,7 @@ export class Dialog {
             typeof opt.element !== "function")
             this.el.classList.remove("hidden");
 
-        if (opt.preferPanel || (!hasBSModal() && !hasUIDialog))
+        if (opt.preferPanel || (!hasBSModal() && !hasUIDialog()))
             this.createPanel(opt);
         else if (hasUIDialog() && (!hasBSModal() || !opt.preferBSModal))
             this.createUIDialog(opt);
