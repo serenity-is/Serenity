@@ -1,5 +1,4 @@
 export * from "./arrays-compat";
-export * from "./authorization";
 export * from "./dialogs-compat";
 export * from "./formatting-compat";
 export * from "./html-compat";
@@ -11,5 +10,4 @@ export * from "./scriptdata-compat";
 export * from "./services-compat";
 export * from "./strings-compat";
 export * from "./system-compat";
-export * from "./userdefinition";
 export * from "./validation";

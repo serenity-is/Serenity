@@ -5,7 +5,7 @@ import { notifyError } from "./notify";
 import { PropertyItemsData } from "./propertyitem";
 import { requestFinished, requestStarting, resolveUrl } from "./services";
 import { scriptDataHashSymbol, scriptDataSymbol } from "./symbols";
-import { getGlobalObject } from "./system";
+import { getGlobalObject, isPromiseLike } from "./system";
 
 /**
  * Gets the known hash value for a given dynamic script name. They are usually
@@ -147,6 +147,59 @@ export async function getScriptData<TData = any>(name: string, reload?: boolean)
 }
 
 /**
+ * Synchronous version of getScriptData for compatibility. Avoid this one where possible, 
+ * as it will block the UI thread.
+ * @param name 
+ * @param dynJS 
+ * @returns 
+ */
+export function ensureScriptDataSync<TData = any>(name: string, dynJS?: boolean): TData {
+    var data = peekScriptData(name);
+    if (data != null)
+        return data;
+
+    data = scriptDataHooks.fetchScriptData?.<TData>(name, true, dynJS);
+    if (data !== void 0) {
+        if (isPromiseLike(data))
+            throw new Error("fetchScriptData hook must return data synchronously when sync is true.");
+        if (name.startsWith("Lookup.") && (data as any)?.Items)
+            data = new Lookup((data as any).Params, (data as any).Items) as any;
+        setScriptData(name, data);
+        return data;
+    }
+
+    var url = resolveUrl(dynJS ? '~/DynJS.axd/' : '~/DynamicData/') + name + (dynJS ? '.js' : '') + '?v=' + (getScriptDataHash(name) ?? new Date().getTime());
+    var xhr = new XMLHttpRequest();
+    xhr.open("GET", url, false);
+    requestStarting();
+    try {
+
+        xhr.send(null);
+        if (xhr.status !== 200)
+            handleScriptDataError(name, xhr.status, xhr.statusText);
+
+        if (dynJS) {
+            var script = document.createElement("script");
+            script.text = xhr.responseText;
+            document.head.appendChild(script).parentNode.removeChild(script);
+            data = peekScriptData(name);
+        }
+        else {
+            data = JSON.parse(xhr.responseText);
+        }
+        if (data == null)
+            handleScriptDataError(name);
+        if (!dynJS && name.startsWith("Lookup."))
+            data = new Lookup(data.Params, data.Items);
+        setScriptData(name, data);
+        return data;
+    }
+    finally {
+        requestFinished();
+    }
+}
+
+/**
  * Gets or loads a [ColumnsScript] data 
  * @param key Form key
  * @returns A property items data object containing items and additionalItems properties
@@ -178,6 +231,14 @@ export async function getLookupAsync<TItem>(key: string): Promise<Lookup<TItem>>
  */
 export async function getRemoteDataAsync<TData = any>(key: string): Promise<TData> {
     return await getScriptData<TData>('RemoteData.' + key);
+}
+
+/**
+ * Synchronous version of getRemoteDataAsync for compatibility
+ * @param key Remote data key
+ */
+export function getRemoteData<TData = any>(key: string): TData {
+    return ensureScriptDataSync('RemoteData.' + key);
 }
 
 /**

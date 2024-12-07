@@ -1,5 +1,6 @@
-﻿import { getRemoteDataAsync, localText, notifyError } from "../base";
-import { getRemoteData } from "./scriptdata-compat";
+﻿import { localText } from "./localtext";
+import { notifyError } from "./notify";
+import { getRemoteData, getRemoteDataAsync } from "./scriptdata";
 import { UserDefinition } from "./userdefinition";
 
 const andOrRegex = /[|&]/;

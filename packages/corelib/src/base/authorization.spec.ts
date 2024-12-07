@@ -16,23 +16,18 @@ function mockUserDefinition(async = false) {
     }
 
     jest.resetModules();
-    jest.mock("../base", () => ({
-        ...jest.requireActual("../base"),
-        getRemoteDataAsync: jest.fn().mockImplementation(async (key: string) => {
-            if (!async)
-                throw new Error(`not expected to call async getRemoteDataAsync for: ${key}!`);
 
-            if (key == "UserData")
-                return userDefinition as any;
-
-            throw new Error(`not expected to load any other data: ${key}`);
-        }),
-        localText: jest.fn(key => key),
+    jest.mock("./notify", () => ({
+        __esModule: true,
         notifyError: jest.fn()
     }));
-
-    jest.mock("./scriptdata-compat", () => ({
-        ...jest.requireActual("./scriptdata-compat"),
+    
+    jest.mock("./localtext", () => ({
+        __esModule: true,
+        localText: jest.fn().mockImplementation((key: string) => key)
+    }));
+    
+    jest.mock("./scriptdata", () => ({
         getRemoteData: function (key: string) {
             if (async)
                 throw new Error(`not expected to call getRemoteData for: ${key}!`);
@@ -41,7 +36,16 @@ function mockUserDefinition(async = false) {
                 return userDefinition as any;
    
             throw new Error(`not expected to load any other data: ${key}`);
-        }
+        },
+        getRemoteDataAsync: jest.fn().mockImplementation(async (key: string) => {
+            if (!async)
+                throw new Error(`not expected to call async getRemoteDataAsync for: ${key}!`);
+
+            if (key == "UserData")
+                return userDefinition as any;
+
+            throw new Error(`not expected to load any other data: ${key}`);
+        })
     }));
 }
 
@@ -427,9 +431,9 @@ describe('Authorization.validatePermissionAsync', () => {
     })
 
     it('throws if no permission', async function () {
-        const base = await import("../base");
-        const localText = base.localText as any;
-        const notifyError = base.notifyError as any;
+        const notify = await import("./notify") as any;
+        const localText = (await import("./localtext")).localText as any;
+        const notifyError = notify.notifyError as any;
     let authorization = (await import("./authorization")).Authorization;
         try {
             var thrown = false;

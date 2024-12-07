@@ -1,10 +1,12 @@
 ﻿import {
-    Lookup, getColumnsScript, getFormScript, getGlobalObject, getLookupAsync, getRemoteDataAsync, getScriptData, getScriptDataHash, handleScriptDataError, isPromiseLike, peekScriptData, reloadLookupAsync,
-    requestFinished, requestStarting,
-    resolveUrl, scriptDataHooks, setScriptData, type PropertyItem, type PropertyItemsData
+    Lookup, ensureScriptDataSync, getColumnsScript, getFormScript, getGlobalObject, getLookupAsync, getRemoteData, getRemoteDataAsync, getScriptData, getScriptDataHash,
+    peekScriptData, reloadLookupAsync, setScriptData, type PropertyItem, type PropertyItemsData
 } from "../base";
 
 export namespace ScriptData {
+    export const canLoad = canLoadScriptData;
+    export const ensure = ensureScriptDataSync;
+    export const set = setScriptData;
 
     export function bindToChange(name: string, onChange: () => void): void | (() => void) {
         if (typeof document !== "undefined" && document.addEventListener) {
@@ -17,54 +19,6 @@ export namespace ScriptData {
         }
     }
 
-    export const canLoad = canLoadScriptData;
-
-    export function ensure<TData = any>(name: string, dynJS?: boolean): TData {
-        var data = peekScriptData(name);
-        if (data != null)
-            return data;
-
-        data = scriptDataHooks.fetchScriptData?.<TData>(name, true, dynJS);
-        if (data !== void 0) {
-            if (isPromiseLike(data))
-                throw new Error("fetchScriptData hook must return data synchronously when sync is true.");
-            if (name.startsWith("Lookup.") && (data as any)?.Items)
-                data = new Lookup((data as any).Params, (data as any).Items) as any;
-            set(name, data);
-            return data;
-        }
-
-        var url = resolveUrl(dynJS ? '~/DynJS.axd/' : '~/DynamicData/') + name + (dynJS ? '.js' : '') + '?v=' + (getScriptDataHash(name) ?? new Date().getTime());
-        var xhr = new XMLHttpRequest();
-        xhr.open("GET", url, false);
-        requestStarting();
-        try {
-
-            xhr.send(null);
-            if (xhr.status !== 200)
-                handleScriptDataError(name, xhr.status, xhr.statusText);
-
-            if (dynJS) {
-                var script = document.createElement("script");
-                script.text = xhr.responseText;
-                document.head.appendChild(script).parentNode.removeChild(script);
-                data = peekScriptData(name);
-            }
-            else {
-                data = JSON.parse(xhr.responseText);
-            }
-            if (data == null)
-                handleScriptDataError(name);
-            if (!dynJS && name.startsWith("Lookup."))
-                data = new Lookup(data.Params, data.Items);
-            set(name, data);
-            return data;
-        }
-        finally {
-            requestFinished();
-        }
-    }
-
     export function reload<TData = any>(name: string, dynJS?: boolean): TData {
         getScriptDataHash(name, true);
         setScriptData(name, null);
@@ -74,8 +28,6 @@ export namespace ScriptData {
     export async function reloadAsync<TData = any>(name: string): Promise<TData> {
         return await getScriptData(name, true);
     }
-
-    export const set = setScriptData;
 }
 
 /**
@@ -86,10 +38,6 @@ export namespace ScriptData {
  */
 export function canLoadScriptData(name: string) {
     return peekScriptData(name) != null || getScriptDataHash(name) != null;
-}
-
-export function getRemoteData<TData = any>(key: string): TData {
-    return ScriptData.ensure('RemoteData.' + key);
 }
 
 export function getLookup<TItem>(key: string): Lookup<TItem> {

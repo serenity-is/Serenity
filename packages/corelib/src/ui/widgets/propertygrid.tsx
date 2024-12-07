@@ -1,5 +1,5 @@
-﻿import { Fluent, addClass, appendToNode, faIcon, getCustomAttribute, getType, isBS3, isPromiseLike, localText, tryGetText, type PropertyItem } from "../../base";
-import { Authorization, extend } from "../../compat";
+﻿import { Authorization, Fluent, addClass, appendToNode, faIcon, getCustomAttribute, getType, isBS3, isPromiseLike, localText, tryGetText, type PropertyItem } from "../../base";
+import { extend } from "../../compat";
 import { OptionsTypeAttribute } from "../../types/attributes";
 import { Decorators } from "../../types/decorators";
 import { EditorType } from "../../types/editortype";
