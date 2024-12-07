@@ -53,13 +53,13 @@ export class Tooltip {
     }
 
     private static existingInstance(el: HTMLElement): any {
-        let $ = getjQuery();
         let instance: any;
         if (typeof bootstrap !== "undefined")
              instance = (bootstrap as any)?.Tooltip?.getInstance?.(el);
         if (instance)
             return instance;
 
+        const $ = getjQuery();
         if ($?.fn?.tooltip)
             return $(el).data()["bs.tooltip"];
         return null;
