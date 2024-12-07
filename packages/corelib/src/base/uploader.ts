@@ -149,7 +149,7 @@ export class Uploader {
         responseType: "json"
     }
 
-    private isMultiple() {
+    isMultiple() {
         return !!(this.opt.multiple ?? (this.opt?.input as HTMLInputElement)?.multiple);
     }
 
@@ -457,9 +457,9 @@ export class Uploader {
         }
     }
 
-    static errorHandler = (data: UploaderErrorData) => {
+    static errorHandler(data: UploaderErrorData)  {
         if (data?.exception) {
-            console.log(data.exception);
+            console.error(data.exception);
             notifyError(data.exception.toString?.() ?? "Exception occured!");
             return;
         }
