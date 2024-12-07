@@ -39,7 +39,8 @@ export function isSameOrigin(url: string) {
         a.protocol == loc.protocol;
 }
 
-function serviceOptions<TResponse>(url: string, options: ServiceOptions<TResponse>) {
+export function getServiceOptions<TResponse>(options: ServiceOptions<TResponse>) {
+
     options = Object.assign(<ServiceOptions<TResponse>>{
         allowRedirect: true,
         async: true,
@@ -47,6 +48,8 @@ function serviceOptions<TResponse>(url: string, options: ServiceOptions<TRespons
         method: 'POST',
     }, options);
 
+    const url = options.url = options.service ? resolveServiceUrl(options.service) : resolveUrl(options.url);
+    delete options.service;
     options.headers ??= {};
     options.headers["Accept"] ??= "application/json";
     options.headers["Content-Type"] ??= "application/json";
@@ -93,8 +96,8 @@ function serviceFetch<TResponse extends ServiceResponse>(options: ServiceOptions
 
     return (async function () {
 
-        let url = options.service ? resolveServiceUrl(options.service) : resolveUrl(options.url);
-        options = serviceOptions(url, options);
+        options = getServiceOptions(options);
+        const url = options.url;
 
         requestStarting();
         try {
@@ -189,8 +192,8 @@ export function serviceCall<TResponse extends ServiceResponse>(options: ServiceO
     let url: string;
     return new Promise((resolve, reject) => {
         try {
-            url = options.service ? resolveServiceUrl(options.service) : resolveUrl(options.url);
-            options = serviceOptions(url, options);
+            options = getServiceOptions(options);
+            url = options.url;
 
             var xhr = new XMLHttpRequest();
             xhr.open(options.method, url, false);
@@ -216,7 +219,7 @@ export function serviceCall<TResponse extends ServiceResponse>(options: ServiceO
                 try {
                     if (xhr.status !== 200) {
                         handleXHRError(xhr, options);
-                        return reject(reason(`HTTP ${xhr.status} error on service call to '${url}': ${xhr.statusText}!`,
+                        return reject(reason(`Service call to '${url}' resulted in HTTP ${xhr.status} error: ${xhr.statusText}!`,
                             "http-error", { status: xhr.status, statusText: xhr.statusText, url }));
                     }
 

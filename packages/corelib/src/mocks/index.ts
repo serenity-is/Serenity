@@ -127,6 +127,7 @@ export type MockFetchInfo = {
     status?: number;
     statusText?: string;
     aborted?: boolean;
+    isXHR?: boolean;
     responseHeaders: Record<string, string>;
 }
 
@@ -261,6 +262,7 @@ class MockXHR {
             requestData,
             status: 200,
             aborted: false,
+            isXHR: true,
             responseHeaders: {
                 "content-type": "application/json"
             }

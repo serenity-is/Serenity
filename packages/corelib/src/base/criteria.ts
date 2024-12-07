@@ -651,13 +651,13 @@ function rpnTokensToCriteria(rpnTokens: Token[], getParam?: (name: string) => an
                         case 'is null':
                         case 'is not null':
                             if (!stack.length)
-                                throw new Error("Unary operator " + token.v + " requires a value!");
+                                throw new Error(`Unary operator "${token.v}" requires a value!`);
 
                             stack.push([token.v, stack.pop()]);
                             break;
                         default:
                             if (stack.length < 2)
-                                throw new Error("Binary operator " + token.v + " requires two values!");
+                                throw new Error(`Binary operator "${token.v}" requires two values!`);
 
                             var r = stack.pop();
                             var l = stack.pop();

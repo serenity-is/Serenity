@@ -227,6 +227,14 @@ describe("Criteria.parse", () => {
     });
 
 
+    it('should throw "unary operator requires a value" for not with empty parens', () => {
+        expect(() => Criteria.parse("not()")).toThrow('Unary operator "not" requires a value');
+    });
+
+    it('should throw "binary operator requires two values" for not with empty parens', () => {
+        expect(() => Criteria.parse("a > ()")).toThrow('Binary operator ">" requires two values');
+    });    
+
     it('should throw expected "null" or "not" error if there isn\'t any identifier after "is"', () => {
         expect(() => Criteria.parse("abc is   0")).toThrow('expected "null" or "not" keyword')
     });

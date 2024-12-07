@@ -1,5 +1,5 @@
 import { mockFetch, unmockFetch } from "../mocks";
-import { isSameOrigin, resolveServiceUrl, resolveUrl, serviceCall } from "./services";
+import { isSameOrigin, requestStarting, resolveServiceUrl, resolveUrl, serviceCall, getServiceOptions, getActiveRequests, requestFinished } from "./services";
 import { getCookie } from "./services";
 import { ServiceError, ServiceOptions, ServiceResponse } from "./servicetypes";
 
@@ -138,7 +138,7 @@ describe("isSameOrigin", () => {
     });
 });
 
-describe("serviceCall", () => {
+describe("async serviceCall", () => {
     beforeEach(() => {
         mockFetch();
     });
@@ -158,52 +158,253 @@ describe("serviceCall", () => {
         }
     });
 
-    describe("serviceCall", () => {
-        it("should make a successful service call and return the response", async () => {
-            const response = { data: "Success" };
-            const options = { url: "/test" };
+    it("should make a successful service call and return the response", async () => {
+        const response = { data: "Success" };
+        const options = { url: "/test" };
 
-            const mockSpy = mockFetch({ "/test": () => response });
+        const mockSpy = mockFetch({ "/test": () => response });
 
-            const result = await serviceCall(options);
+        const result = await serviceCall(options);
 
-            expect(result).toEqual(response);
-            expect(mockSpy.requests.length).toBe(1);
-            expect(mockSpy.requests[0].url).toBe("/test");
+        expect(result).toEqual(response);
+        expect(mockSpy.requests.length).toBe(1);
+        expect(mockSpy.requests[0].url).toBe("/test");
+    });
+
+    it("should handle an error response and throw an error", async () => {
+        let error: ServiceError;
+        const response: ServiceResponse = { Error: { Message: "Error" } };
+        const options: ServiceOptions<any> = { 
+            url: "/test",
+            onError: (resp, inf) => {
+                error = resp?.Error;
+            }
+        };
+
+        const mockSpy = mockFetch({
+            "/test": (info) => {
+                info.status = 403;
+                info.statusText = "Some error"
+                return response;
+            }
         });
 
-        it("should handle an error response and throw an error", async () => {
-            let error: ServiceError;
-            const response: ServiceResponse = { Error: { Message: "Error" } };
-            const options: ServiceOptions<any> = { 
-                url: "/test",
-                onError: (resp, inf) => {
-                    error = resp?.Error;
-                }
-            };
+        const promise = serviceCall(options);
 
-            const mockSpy = mockFetch({
-                "/test": (info) => {
-                    info.status = 403;
-                    info.statusText = "Some error"
-                    return response;
-                }
-            });
+        const old = window.alert;
+        window.alert = () => {};
+        try {
+            await expect(promise).rejects.toThrow("Service fetch to '/test' resulted in HTTP 403 error: Some error!");
+        }
+        finally {
+            window.alert = old;
+        }
+        expect(mockSpy.requests.length).toBe(1);
+        expect(mockSpy.requests[0].url).toBe("/test");
+        expect(mockSpy.requests[0].status).toBe(403);
+        expect(error).toStrictEqual(response.Error);
+    });
+});
 
-            const promise = serviceCall(options);
+describe("getServiceOptions", () => {
+    it("should set default options if not provided", () => {
+        const options = getServiceOptions({});
+        expect(options.allowRedirect).toBe(true);
+        expect(options.async).toBe(true);
+        expect(options.blockUI).toBe(true);
+        expect(options.method).toBe("POST");
+        expect(options.headers["Accept"]).toBe("application/json");
+        expect(options.headers["Content-Type"]).toBe("application/json");
+    });
 
-            const old = window.alert;
-            window.alert = () => {};
+    it("should override default options if provided", () => {
+        const customOptions = {
+            allowRedirect: false,
+            async: false,
+            blockUI: false,
+            method: "GET",
+            headers: {
+                "Accept": "text/plain",
+                "Content-Type": "text/plain"
+            }
+        };
+        const options = getServiceOptions(customOptions);
+        expect(options.allowRedirect).toBe(false);
+        expect(options.async).toBe(false);
+        expect(options.blockUI).toBe(false);
+        expect(options.method).toBe("GET");
+        expect(options.headers["Accept"]).toBe("text/plain");
+        expect(options.headers["Content-Type"]).toBe("text/plain");
+    });
+
+    it("should resolve service URL if service is provided", () => {
+        const options = getServiceOptions({ service: "testService" });
+        expect(options.url).toBe("/app/Services/testService");
+    });
+
+    it("should resolve URL if url is provided", () => {
+        const options = getServiceOptions({ url: "~/testUrl" });
+        expect(options.url).toBe("/app/testUrl");
+    });
+
+    it("should add CSRF token header if same origin", () => {
+        document.cookie = "CSRF-TOKEN=testToken";
+        const options = getServiceOptions({ url: window.location.href });
+        expect(options.headers["X-CSRF-TOKEN"]).toBe("testToken");
+    });
+
+    it("should not add CSRF token header if different origin", () => {
+        document.cookie = "CSRF-TOKEN=testToken";
+        const options = getServiceOptions({ url: "http://example.com" });
+        expect(options.headers["X-CSRF-TOKEN"]).toBeUndefined();
+    });
+});
+
+describe("requestStarting", () => {
+    afterEach(() => {
+        jest.restoreAllMocks();
+    });
+
+    it("should increment activeRequests", () => {
+        const initialActiveRequests = getActiveRequests();
+        requestStarting();
+        try {
+            expect(getActiveRequests()).toBe(initialActiveRequests + 1);
+        }
+        finally {
+            requestFinished();
+        }
+    });
+
+    it("should trigger ajaxStart event if jQuery is available and $.active is 0", () => {
+        const jQuery: any = (window as any).jQuery = jest.fn();
+        try {
+            const eventTriggerSpy = jest.fn();
+            jQuery.active = 0;
+            jQuery.event = { trigger: eventTriggerSpy };
+
+            requestStarting();
             try {
-                await expect(promise).rejects.toThrow("Service fetch to '/test' resulted in HTTP 403 error: Some error!");
+                expect(jQuery.active).toBe(1);
+                expect(eventTriggerSpy).toHaveBeenCalledWith("ajaxStart");
             }
             finally {
-                window.alert = old;
+                requestFinished();
             }
-            expect(mockSpy.requests.length).toBe(1);
-            expect(mockSpy.requests[0].url).toBe("/test");
-            expect(mockSpy.requests[0].status).toBe(403);
-            expect(error).toStrictEqual(response.Error);
-        });
+        }
+        finally {
+            delete (window as any).jQuery;
+        }
     });
+
+    it("should not trigger ajaxStart event if jQuery is available and $.active is not 0", () => {
+        const jQuery: any = (window as any).jQuery = jest.fn();
+        const eventTriggerSpy = jest.fn();
+        jQuery.active = 1;
+        jQuery.event = { trigger: eventTriggerSpy };
+        try {
+            requestStarting();
+            try {
+                expect(jQuery.active).toBe(2);
+                expect(eventTriggerSpy).not.toHaveBeenCalled();
+            }
+            finally {
+                requestFinished();
+            }
+        }
+        finally {
+            delete (window as any).jQuery
+        }
+    });
+
+    it("should trigger ajaxStart event if jQuery is not available and activeRequests is 1", () => {
+        const eventDispatchSpy = jest.spyOn(document, "dispatchEvent");
+
+        requestStarting();
+        try {
+            expect(eventDispatchSpy).toHaveBeenCalledWith(new Event("ajaxStart"));
+        }
+        finally {
+            requestFinished();
+        }
+    });
+
+    it("should not trigger ajaxStart event if jQuery is not available and activeRequests is not 1", () => {
+        requestStarting(); 
+        try {
+            const eventDispatchSpy = jest.spyOn(document, "dispatchEvent");
+            requestStarting();
+            try {
+                expect(eventDispatchSpy).not.toHaveBeenCalled();
+            }
+            finally {
+                requestFinished();
+            }
+        }
+        finally {
+            requestFinished();
+        }
+    });
+});
+
+describe("synchronous serviceCall", () => {
+    beforeEach(() => {
+        mockFetch();
+    });
+
+    afterEach(() => {
+        unmockFetch();
+    });
+
+    it("should make a successful service call and return the response", async () => {
+        const response = { data: "Success" };
+        const options = { url: "/test", async: false };
+
+        const mockSpy = mockFetch({ "/test": () => response });
+
+        const result = await serviceCall(options);
+
+        expect(result).toEqual(response);
+        expect(mockSpy.requests.length).toBe(1);
+        expect(mockSpy.requests[0].url).toBe("/test");
+        expect(mockSpy.requests[0].isXHR).toBe(true);
+    });
+
+    it("should handle an error response and throw an error", async () => {
+        let error: ServiceError;
+        const response: ServiceResponse = { Error: { Message: "Error" } };
+        const options: ServiceOptions<any> = { 
+            async: false,
+            url: "/test",
+            onError: (resp, inf) => {
+                error = resp?.Error;
+            }
+        };
+
+        const mockSpy = mockFetch({
+            "/test": (info) => {
+                info.status = 403;
+                info.statusText = "Some error"
+                return response;
+            }
+        });
+
+        const promise = serviceCall(options);
+
+        const old = window.alert;
+        window.alert = () => {};
+        try {
+            await expect(promise).rejects.toThrow("Service call to '/test' resulted in HTTP 403 error: Some error!");
+        }
+        finally {
+            window.alert = old;
+        }
+        expect(mockSpy.requests.length).toBe(1);
+        expect(mockSpy.requests[0].url).toBe("/test");
+        expect(mockSpy.requests[0].status).toBe(403);
+        expect(mockSpy.requests[0].isXHR).toBe(true);
+        expect(error).toStrictEqual(response.Error);
+    });
+
+
 });
