@@ -1,6 +1,6 @@
 ﻿import { Fluent, PropertyItem, isPromiseLike, localText, setElementReadOnly } from "../../base";
 import { IEditDialog, IGetEditValue, IReadOnly, ISetEditValue, IStringValue } from "../../interfaces";
-import { Authorization, ValidationHelper, isTrimmedEmpty } from "../../q";
+import { Authorization, ValidationHelper, isTrimmedEmpty } from "../../compat";
 import { Decorators } from "../../types/decorators";
 import { DialogType } from "../../types/dialogtype";
 import { DialogTypeRegistry } from "../../types/dialogtyperegistry";

@@ -1,5 +1,5 @@
 ﻿import { PropertyItem, PropertyItemsData, cancelDialogButton, getInstanceType, getTypeFullName, okDialogButton } from "../../base";
-import { ScriptData, getFormData, getFormDataAsync } from "../../q";
+import { ScriptData, getFormData, getFormDataAsync } from "../../compat";
 import { FormKeyAttribute, StaticPanelAttribute } from "../../types/attributes";
 import { Decorators } from "../../types/decorators";
 import { PropertyGrid, PropertyGridOptions } from "../widgets/propertygrid";

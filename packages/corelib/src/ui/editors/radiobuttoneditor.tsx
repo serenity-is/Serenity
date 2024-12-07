@@ -1,6 +1,6 @@
 ﻿import { Enum, Fluent, getCustomAttribute, isPromiseLike, tryGetText } from "../../base";
 import { IReadOnly, IStringValue } from "../../interfaces";
-import { getLookup } from "../../q";
+import { getLookup } from "../../compat";
 import { EnumKeyAttribute } from "../../types/attributes";
 import { Decorators } from "../../types/decorators";
 import { EnumTypeRegistry } from "../../types/enumtyperegistry";

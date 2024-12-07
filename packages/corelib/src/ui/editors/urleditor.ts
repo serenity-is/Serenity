@@ -1,6 +1,6 @@
 ﻿import { Fluent, Validator } from "../../base";
 import { IStringValue } from "../../interfaces";
-import { ValidationHelper } from "../../q";
+import { ValidationHelper } from "../../compat";
 import { Decorators } from "../../types/decorators";
 import { EditorProps } from "./editorwidget";
 import { StringEditor } from "./stringeditor";

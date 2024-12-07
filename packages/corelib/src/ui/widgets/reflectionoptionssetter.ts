@@ -1,5 +1,5 @@
 ﻿import { getInstanceType, isInstanceOfType } from "../../base";
-import { MemberType, TypeMember, getMembers } from "../../q";
+import { MemberType, TypeMember, getMembers } from "../../compat";
 import { DisplayNameAttribute } from "../../types/attributes";
 import { OptionAttribute } from "../../types/decorators";
 import { ReflectionUtils } from "../../types/reflectionutils";

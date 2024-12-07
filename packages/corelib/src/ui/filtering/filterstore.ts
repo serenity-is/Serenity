@@ -1,5 +1,5 @@
 ﻿import { Criteria, Culture, localText, tryGetText, type PropertyItem } from "../../base";
-import { ArgumentNullException } from "../../q";
+import { ArgumentNullException } from "../../compat";
 import { Decorators } from "../../types/decorators";
 import { FilterLine } from "./filterline";
 

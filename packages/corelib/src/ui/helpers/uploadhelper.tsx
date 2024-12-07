@@ -1,5 +1,5 @@
 import { Fluent, ServiceResponse, Uploader, blockUI, blockUndo, getjQuery, htmlEncode, isArrayLike, localText, notifyError, resolveUrl, round, stringFormat } from "../../base";
-import { replaceAll } from "../../q";
+import { replaceAll } from "../../compat";
 
 export namespace UploadHelper {
 

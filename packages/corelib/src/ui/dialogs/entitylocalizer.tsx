@@ -1,5 +1,5 @@
 import { faIcon, Fluent, LanguageList, localText, PropertyItem, SaveRequest, TranslationConfig } from "../../base";
-import { extend } from "../../q/system-compat";
+import { extend } from "../../compat/system-compat";
 import { PropertyGrid, PropertyGridOptions } from "../widgets/propertygrid";
 
 export interface EntityLocalizerOptions {

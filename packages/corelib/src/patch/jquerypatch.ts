@@ -1,5 +1,5 @@
 ﻿import { faIcon, getCookie, getTypeFullName, getjQuery } from "../base";
-import { isMobileView } from "../q";
+import { isMobileView } from "../compat";
 import { getWidgetFrom, tryGetWidget } from "../ui/widgets/widgetutils";
 
 function applyGetWidgetExtensions($: any) {

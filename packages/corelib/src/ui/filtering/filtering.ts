@@ -1,5 +1,5 @@
 import { Config, Criteria, Fluent, formatDate, getInstanceType, getTypeFullName, isAssignableFrom, localText, parseISODateTime, stringFormat, tryGetText, type PropertyItem } from "../../base";
-import { ArgumentNullException, Exception, deepClone, extend, getTypes } from "../../q";
+import { ArgumentNullException, Exception, deepClone, extend, getTypes } from "../../compat";
 import { Decorators } from "../../types/decorators";
 import { EditorTypeRegistry } from "../../types/editortyperegistry";
 import { QuickFilter } from "../datagrid/quickfilter";

@@ -1,6 +1,6 @@
 import { formatNumber, parseInteger } from "../../base";
 import { IDoubleValue } from "../../interfaces";
-import { isTrimmedEmpty } from "../../q";
+import { isTrimmedEmpty } from "../../compat";
 import { Decorators } from "../../types/decorators";
 import { AutoNumeric } from "./autonumeric";
 import { DecimalEditor } from "./decimaleditor";

@@ -1,5 +1,5 @@
 ﻿import { getCustomAttribute, htmlEncode, isEnum, notifyError } from "../base";
-import { Exception } from "../q";
+import { Exception } from "../compat";
 import { EnumKeyAttribute } from "./attributes";
 import { commonTypeRegistry } from "./commontyperegistry";
 

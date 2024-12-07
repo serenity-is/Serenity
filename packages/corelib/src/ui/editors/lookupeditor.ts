@@ -1,5 +1,5 @@
 ﻿import { getInstanceType, getLookupAsync, getTypeFullName, type Lookup } from "../../base";
-import { ScriptData, getLookup, reloadLookup } from "../../q";
+import { ScriptData, getLookup, reloadLookup } from "../../compat";
 import { Decorators } from "../../types/decorators";
 import { ComboboxItem, ComboboxSearchQuery, ComboboxSearchResult } from "./combobox";
 import { ComboboxEditor, ComboboxEditorOptions } from "./comboboxeditor";

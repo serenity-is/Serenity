@@ -1,5 +1,5 @@
 ﻿import { Config, getType, getTypeNameProp, isPromiseLike } from "../base";
-import { getTypes } from "../q";
+import { getTypes } from "../compat";
 
 export function commonTypeRegistry<TType = any>(props: {
     kind: string,

@@ -1,7 +1,7 @@
 ﻿
 import { Fluent, faIcon, getActiveRequests, getInstanceType, getTypeFullName, isPromiseLike, localText, resolveUrl, stringFormat, tryGetText } from "../../base";
 import { IEditDialog } from "../../interfaces";
-import { Authorization, HandleRouteEvent, Router, replaceAll, safeCast } from "../../q";
+import { Authorization, HandleRouteEvent, Router, replaceAll, safeCast } from "../../compat";
 import { RemoteViewOptions } from "../../slick";
 import { DialogTypeAttribute, DisplayNameAttribute, EntityTypeAttribute, ItemNameAttribute, ServiceAttribute } from "../../types/attributes";
 import { Decorators } from "../../types/decorators";

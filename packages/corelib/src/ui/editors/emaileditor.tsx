@@ -1,6 +1,6 @@
 ﻿import { Fluent, ValidatableElement, Validator, setElementReadOnly, tryGetText } from "../../base";
 import { IReadOnly, IStringValue } from "../../interfaces";
-import { ValidationHelper } from "../../q";
+import { ValidationHelper } from "../../compat";
 import { Decorators } from "../../types/decorators";
 import { EditorProps, EditorWidget } from "./editorwidget";
 

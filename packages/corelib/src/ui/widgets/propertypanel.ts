@@ -1,5 +1,5 @@
 ﻿import { PropertyItem, getInstanceType, getTypeFullName } from "../../base";
-import { getForm } from "../../q";
+import { getForm } from "../../compat";
 import { FormKeyAttribute } from "../../types/attributes";
 import { Decorators } from "../../types/decorators";
 import { PropertyGrid, PropertyGridMode, PropertyGridOptions } from "./propertygrid";

@@ -1,5 +1,5 @@
 import { addClass, getjQuery } from "../../base";
-import { isMobileView, layoutFillHeight } from "../../q";
+import { isMobileView, layoutFillHeight } from "../../compat";
 
 function getCssSize(element: HTMLElement, name: string): number {
     var cssSize = getComputedStyle(element).getPropertyValue(name);

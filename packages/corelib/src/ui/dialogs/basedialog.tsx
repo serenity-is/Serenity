@@ -1,6 +1,6 @@
 import { Dialog, DialogButton, DialogOptions, Fluent, Validator, defaultNotifyOptions, getjQuery, positionToastContainer } from "../../base";
 import { IDialog } from "../../interfaces";
-import { isMobileView, validateOptions } from "../../q";
+import { isMobileView, validateOptions } from "../../compat";
 import { CloseButtonAttribute, MaximizableAttribute, PanelAttribute, ResizableAttribute, StaticPanelAttribute } from "../../types/attributes";
 import { Decorators } from "../../types/decorators";
 import { TabsExtensions } from "../helpers/tabsextensions";

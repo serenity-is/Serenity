@@ -1,5 +1,5 @@
 ﻿import { ISlickFormatter, htmlEncode, isAssignableFrom, notifyError } from "../base";
-import { Exception } from "../q";
+import { Exception } from "../compat";
 import { commonTypeRegistry } from "./commontyperegistry";
 import { FormatterType } from "./formattertype";
 

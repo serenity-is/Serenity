@@ -1,6 +1,6 @@
 ﻿import { Culture, DialogTexts, Enum, faIcon, formatDate, formatNumber, getCustomAttribute, getTypeFullName, htmlEncode, iconClassName, isPromiseLike, localText, parseDecimal, parseISODateTime, resolveUrl, stringFormat, tryGetText } from "../../base";
 import { Column, FormatterContext } from "@serenity-is/sleekgrid";
-import { replaceAll } from "../../q";
+import { replaceAll } from "../../compat";
 import { Formatter } from "../../slick";
 import { EnumKeyAttribute } from "../../types/attributes";
 import { Decorators } from "../../types/decorators";

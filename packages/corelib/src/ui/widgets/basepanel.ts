@@ -1,5 +1,5 @@
 ﻿import { Fluent, Validator } from "../../base";
-import { validateOptions } from "../../q";
+import { validateOptions } from "../../compat";
 import { Decorators } from "../../types/decorators";
 import { TabsExtensions } from "../helpers/tabsextensions";
 import { ToolButton, Toolbar } from "./toolbar";

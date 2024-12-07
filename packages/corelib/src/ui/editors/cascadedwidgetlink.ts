@@ -1,5 +1,5 @@
 ﻿import { Fluent, notifyError } from "../../base";
-import { findElementWithRelativeId } from "../../q";
+import { findElementWithRelativeId } from "../../compat";
 import { Decorators } from "../../types/decorators";
 import { Widget } from "../widgets/widget";
 import { tryGetWidget } from "../widgets/widgetutils";

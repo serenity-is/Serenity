@@ -22,7 +22,7 @@
  */
 
 export * from "./base";
-export * from "./q";
+export * from "./compat";
 export * from "./slick";
 export * from "./interfaces";
 export * from "./types";

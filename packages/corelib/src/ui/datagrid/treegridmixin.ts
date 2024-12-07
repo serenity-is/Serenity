@@ -1,6 +1,6 @@
 ﻿import { Fluent, ListResponse, htmlEncode } from "../../base";
 import { Column, FormatterContext } from "@serenity-is/sleekgrid";
-import { toGrouping } from "../../q";
+import { toGrouping } from "../../compat";
 import { SlickFormatting, SlickTreeHelper } from "../helpers/slickhelpers";
 import { DataGrid } from "./datagrid";
 

@@ -1,6 +1,6 @@
 import { Culture, Fluent, Invariant, addValidationRule, formatDate, getjQuery, isArrayLike, localText, parseISODateTime, setElementReadOnly, stringFormat } from "../../base";
 import { IReadOnly, IStringValue } from "../../interfaces";
-import { today } from "../../q";
+import { today } from "../../compat";
 import { Decorators } from "../../types/decorators";
 import { dateInputChangeHandler, dateInputKeyupHandler, flatPickrTrigger, jQueryDatepickerInitialization, jQueryDatepickerZIndexWorkaround } from "../helpers/dateediting";
 import { EditorProps, EditorWidget } from "./editorwidget";

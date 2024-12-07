@@ -1,5 +1,5 @@
 import { Fluent } from "../../base";
-import { ScriptData } from "../../q";
+import { ScriptData } from "../../compat";
 import { LookupEditor } from "./lookupeditor";
 
 let oldWindowAlert: any;

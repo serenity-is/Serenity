@@ -1,6 +1,6 @@
 ﻿import { Fluent, PropertyItem, isArrayLike, isInstanceOfType, localText, parseDecimal, setElementReadOnly, tryGetText } from "../../base";
 import { IBooleanValue, IDoubleValue, IGetEditValue, ISetEditValue, IStringValue, IValidateRequired } from "../../interfaces";
-import { cast, isTrimmedEmpty, safeCast } from "../../q";
+import { cast, isTrimmedEmpty, safeCast } from "../../compat";
 import { type Widget } from "../widgets/widget";
 import { tryGetWidget } from "../widgets/widgetutils";
 import { Combobox } from "./combobox";

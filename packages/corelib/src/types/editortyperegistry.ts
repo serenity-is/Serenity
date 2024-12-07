@@ -1,5 +1,5 @@
 ﻿import { EditorAttribute, hasCustomAttribute, htmlEncode, isAssignableFrom, notifyError } from "../base";
-import { Exception } from "../q";
+import { Exception } from "../compat";
 import { Widget } from "../ui/widgets/widget";
 import { commonTypeRegistry } from "./commontyperegistry";
 import { EditorType } from "./editortype";

@@ -1,6 +1,6 @@
 ﻿import { htmlEncode, isAssignableFrom, notifyError } from "../base";
 import { IDialog } from "../interfaces";
-import { Exception } from "../q";
+import { Exception } from "../compat";
 import { commonTypeRegistry } from "./commontyperegistry";
 import { DialogType } from "./dialogtype";
 
