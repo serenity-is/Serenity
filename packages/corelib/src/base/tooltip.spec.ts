@@ -233,3 +233,201 @@ describe("Tooltip.setTitle", () => {
         tooltip.setTitle("Title");
     });
 });
+
+describe("Tooltip.dispose", () => {
+    it("should dispose the tooltip instance", () => {
+        const instance = {
+            destroy: jest.fn(),
+            dispose: jest.fn()
+        };
+        const bs = (window as any)["bootstrap"] = {
+            Tooltip: function() {
+                return instance;
+            }
+        };
+        (bs.Tooltip as any).getInstance = () => instance;
+        tooltip = new Tooltip(element);
+        tooltip.dispose();
+        expect(instance.dispose).toHaveBeenCalledTimes(1);
+    });
+
+    it("should not throw an error if element is null", () => {
+        tooltip = new Tooltip(null);
+        expect(() => tooltip.dispose()).not.toThrow();
+    });
+
+    it("should not dispose if no existing instance", () => {
+        tooltip = new Tooltip(element);
+        const bs = (window as any)["bootstrap"] = {
+            Tooltip: function() {
+                return null as any;
+            }
+        };
+        (bs.Tooltip as any).getInstance = () => null as any;
+        tooltip.dispose();
+    });
+});
+
+describe("Tooltip.delayedDispose", () => {
+    beforeEach(() => {
+        jest.useFakeTimers();
+    });
+
+    afterEach(() => {
+        jest.useRealTimers();
+    });
+
+    it("should dispose the tooltip instance after the specified delay", () => {
+        const instance = {
+            destroy: jest.fn(),
+            dispose: jest.fn()
+        };
+        const bs = (window as any)["bootstrap"] = {
+            Tooltip: function() {
+                return instance;
+            }
+        };
+        (bs.Tooltip as any).getInstance = () => instance;
+        tooltip = new Tooltip(element);
+        tooltip.delayedDispose(1000);
+
+        jest.advanceTimersByTime(1000);
+        expect(instance.dispose).toHaveBeenCalledTimes(1);
+    });
+
+    it("should not throw an error if element is null", () => {
+        tooltip = new Tooltip(null);
+        expect(() => tooltip.delayedDispose(1000)).not.toThrow();
+    });
+
+    it("should not dispose if no existing instance", () => {
+        tooltip = new Tooltip(element);
+        const bs = (window as any)["bootstrap"] = {
+            Tooltip: function() {
+                return null as any;
+            }
+        };
+        (bs.Tooltip as any).getInstance = () => null as any;
+        tooltip.delayedDispose(1000);
+
+        jest.advanceTimersByTime(1000);
+        expect(() => tooltip.dispose()).not.toThrow();
+    });
+
+    it("should use default delay if no delay is specified", () => {
+        const instance = {
+            destroy: jest.fn(),
+            dispose: jest.fn()
+        };
+        const bs = (window as any)["bootstrap"] = {
+            Tooltip: function() {
+                return instance;
+            }
+        };
+        (bs.Tooltip as any).getInstance = () => instance;
+        tooltip = new Tooltip(element);
+        tooltip.delayedDispose();
+
+        jest.advanceTimersByTime(5000);
+        expect(instance.dispose).toHaveBeenCalledTimes(1);
+    });
+});
+
+describe("Tooltip.delayedHide", () => {
+    beforeEach(() => {
+        jest.useFakeTimers();
+    });
+
+    afterEach(() => {
+        jest.useRealTimers();
+    });
+
+    it("should hide the tooltip instance after the specified delay", () => {
+        const instance = {
+            show: jest.fn(),
+            hide: jest.fn()
+        };
+        const bs = (window as any)["bootstrap"] = {
+            Tooltip: function() {
+                return instance;
+            }
+        };
+        (bs.Tooltip as any).getInstance = () => instance;
+        tooltip = new Tooltip(element);
+        tooltip.delayedHide(1000);
+
+        jest.advanceTimersByTime(1000);
+        expect(instance.hide).toHaveBeenCalledTimes(1);
+    });
+
+    it("should not throw an error if element is null", () => {
+        tooltip = new Tooltip(null);
+        expect(() => tooltip.delayedHide(1000)).not.toThrow();
+    });
+
+    it("should not hide if no existing instance", () => {
+        tooltip = new Tooltip(element);
+        const bs = (window as any)["bootstrap"] = {
+            Tooltip: function() {
+                return null as any;
+            }
+        };
+        (bs.Tooltip as any).getInstance = () => null as any;
+        tooltip.delayedHide(1000);
+
+        jest.advanceTimersByTime(1000);
+        expect(() => tooltip.hide()).not.toThrow();
+    });
+
+    it("should use default delay if no delay is specified", () => {
+        const instance = {
+            show: jest.fn(),
+            hide: jest.fn()
+        };
+        const bs = (window as any)["bootstrap"] = {
+            Tooltip: function() {
+                return instance;
+            }
+        };
+        (bs.Tooltip as any).getInstance = () => instance;
+        tooltip = new Tooltip(element);
+        tooltip.delayedHide();
+
+        jest.advanceTimersByTime(5000);
+        expect(instance.hide).toHaveBeenCalledTimes(1);
+    });
+});
+
+describe("Tooltip.isAvailable", () => {
+    it("should return true if bootstrap tooltip is available", () => {
+        const bs = (window as any)["bootstrap"] = {
+            Tooltip: jest.fn()
+        };
+        expect(Tooltip.isAvailable).toBe(true);
+    });
+
+    it("should return true if jQuery tooltip is available", () => {
+        mockJQuery({
+            tooltip: jest.fn()
+        });
+        expect(Tooltip.isAvailable).toBe(true);
+    });
+
+    it("should return false if neither bootstrap nor jQuery tooltip is available", () => {
+        (window as any)["bootstrap"] = undefined;
+        (window as any)["jQuery"] = undefined;
+        expect(Tooltip.isAvailable).toBe(false);
+    });
+
+    it("should return false if only bootstrap is defined but tooltip is not available", () => {
+        const bs = (window as any)["bootstrap"] = {};
+        expect(Tooltip.isAvailable).toBe(false);
+    });
+
+    it("should return false if only jQuery is defined but tooltip is not available", () => {
+        const $ = (window as any)["jQuery"] = jest.fn().mockReturnValue({
+            fn: {}
+        });
+        expect(Tooltip.isAvailable).toBe(false);
+    });
+});
