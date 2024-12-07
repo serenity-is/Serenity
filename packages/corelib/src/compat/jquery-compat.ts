@@ -1,22 +1,5 @@
-﻿import { faIcon, getCookie, getTypeFullName, getjQuery } from "../base";
-import { isMobileView } from "../compat";
-import { getWidgetFrom, tryGetWidget } from "../ui/widgets/widgetutils";
-
-function applyGetWidgetExtensions($: any) {
-    if (!$ || !$.fn)
-        return;
-
-    $.fn.tryGetWidget = function tryGetWidget$<TWidget>(this: ArrayLike<HTMLElement>, type?: { new(...args: any[]): TWidget }): TWidget {
-        return tryGetWidget(this[0], type);
-    }
-
-    $.fn.getWidget = function getWidget$<TWidget>(this: ArrayLike<HTMLElement>, type?: { new(...args: any[]): TWidget }): TWidget {
-        if (!this?.length)
-            throw new Error(`Searching for widget of type '${getTypeFullName(type)}' on a non-existent element! (${(this as any)?.selector})`);
-
-        return getWidgetFrom(this[0], type);
-    };
-}
+﻿import { Fluent, faIcon, getCookie, getTypeFullName, getjQuery } from "../base";
+import { isMobileView } from ".";
 
 function applyJQueryUIFixes($: any): boolean {
     if (!$ || !$.ui || !$.ui.dialog || !$.ui.dialog.prototype)
@@ -102,7 +85,9 @@ export function jQueryPatch(): boolean {
         return false;
     applyJQueryUIFixes($);
     applyCleanDataPatch($);
-    applyGetWidgetExtensions($);
     applyAjaxCSRFToken($);
     return true;
 }
+
+
+!jQueryPatch() && Fluent.ready(jQueryPatch);

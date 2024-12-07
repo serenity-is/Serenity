@@ -1,4 +1,4 @@
-﻿import { jQueryPatch } from "./jquerypatch";
+﻿import { jQueryPatch } from "./jquery-compat";
 
 afterEach(() => {
     delete (window as any).jQuery;

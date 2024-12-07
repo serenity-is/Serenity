@@ -1,4 +1,4 @@
-﻿import { Fluent, SNoInfer, getInstanceType, getTypeFullName, isArrayLike, isAssignableFrom, notifyError } from "../../base";
+﻿import { Fluent, SNoInfer, getInstanceType, getTypeFullName, getjQuery, isArrayLike, isAssignableFrom, notifyError } from "../../base";
 
 let elementMap: WeakMap<Element, { [key: string]: { domNode: HTMLElement } }> = new WeakMap();
 
@@ -125,3 +125,22 @@ export type WidgetProps<P> = {
     class?: string;
     element?: ((el: HTMLElement) => void) | HTMLElement | ArrayLike<HTMLElement> | string;
 } & SNoInfer<P>
+
+function applyGetWidgetExtensions($: any) {
+    if (!$ || !$.fn)
+        return false;
+
+    $.fn.tryGetWidget = function tryGetWidget$<TWidget>(this: ArrayLike<HTMLElement>, type?: { new(...args: any[]): TWidget }): TWidget {
+        return tryGetWidget(this[0], type);
+    }
+
+    $.fn.getWidget = function getWidget$<TWidget>(this: ArrayLike<HTMLElement>, type?: { new(...args: any[]): TWidget }): TWidget {
+        if (!this?.length)
+            throw new Error(`Searching for widget of type '${getTypeFullName(type)}' on a non-existent element! (${(this as any)?.selector})`);
+
+        return getWidgetFrom(this[0], type);
+    };
+}
+
+!applyGetWidgetExtensions(getjQuery()) && Fluent.ready(() => applyGetWidgetExtensions(getjQuery()));
+

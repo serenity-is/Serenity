@@ -26,7 +26,7 @@ export * from "./compat";
 export * from "./slick";
 export * from "./interfaces";
 export * from "./types";
-export * from "./patch";
+export * from "./compat/jquery-compat";
 export * from "./ui/datagrid/irowdefinition";
 export * from "./ui/datagrid/islickformatter";
 export * from "./ui/helpers/lazyloadhelper";
