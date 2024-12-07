@@ -1,4 +1,5 @@
-﻿import { addClass, appendToNode, getElementReadOnly, htmlEncode, removeClass, sanitizeUrl, setElementReadOnly, toggleClass } from "./html";
+﻿import { Config } from "./config";
+import { addClass, appendToNode, getElementReadOnly, getReturnUrl, htmlEncode, parseQueryString, removeClass, sanitizeUrl, setElementReadOnly, toggleClass } from "./html";
 
 describe("htmlEncode", () => {
     it("encodes html", () => {
@@ -427,3 +428,123 @@ describe("sanitizeUrl", () => {
         expect(sanitizeUrl("  javascript:alert('XSS')  ")).toBe("unsafe:javascript:alert('XSS')");
     });
 });
+
+describe("parseQueryString", () => {
+    it("parses query string into object", () => {
+        const queryString = "param1=value1&param2=value2";
+        const result = parseQueryString(queryString);
+        expect(result).toEqual({ param1: "value1", param2: "value2" });
+    });
+
+    it("decodes URI components", () => {
+        const queryString = "param1=value%201&param2=value%202";
+        const result = parseQueryString(queryString);
+        expect(result).toEqual({ param1: "value 1", param2: "value 2" });
+    });
+
+    it("handles empty query string", () => {
+        const result = parseQueryString("");
+        expect(result).toEqual({});
+    });
+
+    it("handles query string with no value", () => {
+        const queryString = "param1&param2";
+        const result = parseQueryString(queryString);
+        expect(result).toEqual({ param1: "param1", param2: "param2" });
+    });
+
+    it("handles query string with empty value", () => {
+        const queryString = "param1=&param2=";
+        const result = parseQueryString(queryString);
+        expect(result).toEqual({ param1: "", param2: "" });
+    });
+
+    it("handles query string with special characters", () => {
+        const queryString = "param1=value1&param2=value@2&param3=value/3";
+        const result = parseQueryString(queryString);
+        expect(result).toEqual({ param1: "value1", param2: "value@2", param3: "value/3" });
+    });
+
+    it("parses query string from location.search if no argument is provided", () => {
+        var oldLocation = window.location.href;
+        changeJSDOMURL("http://localhost?param1=value1&param2=value2");
+        try {
+            const result = parseQueryString();
+            expect(result).toEqual({ param1: "value1", param2: "value2" });
+        } finally {
+            changeJSDOMURL(oldLocation);
+        }
+    });
+});
+
+describe("getReturnUrl", () => {
+    it("returns returnUrl from query string if it is safe", () => {
+        const oldLocation = window.location.href;
+        changeJSDOMURL("http://localhost?returnUrl=/safe/path");
+        try {
+            const result = getReturnUrl();
+            expect(result).toBe("/safe/path");
+        } finally {
+            changeJSDOMURL(oldLocation);
+        }
+    });
+
+    it("returns null if returnUrl from query string is unsafe", () => {
+        const oldLocation = window.location.href;
+        changeJSDOMURL("http://localhost?returnUrl=http://unsafe.com");
+        try {
+            const result = getReturnUrl();
+            expect(result).toBeNull();
+        } finally {
+            changeJSDOMURL(oldLocation);
+        }
+    });
+
+    it("returns default returnUrl if queryOnly is false and no returnUrl in query string", () => {
+        const oldLocation = window.location.href;
+        changeJSDOMURL("http://localhost");
+        try {
+            const result = getReturnUrl({ queryOnly: false });
+            expect(result).toBe(Config.defaultReturnUrl());
+        } finally {
+            changeJSDOMURL(oldLocation);
+        }
+    });
+
+    it("returns undefined if queryOnly is true and no returnUrl in query string", () => {
+        const oldLocation = window.location.href;
+        changeJSDOMURL("http://localhost");
+        try {
+            const result = getReturnUrl({ queryOnly: true });
+            expect(result).toBeUndefined();
+        } finally {
+            changeJSDOMURL(oldLocation);
+        }
+    });
+
+    it("returns returnUrl from query string if ignoreUnsafe is true", () => {
+        const oldLocation = window.location.href;
+        changeJSDOMURL("http://localhost?returnUrl=http://unsafe.com");
+        try {
+            const result = getReturnUrl({ ignoreUnsafe: true });
+            expect(result).toBe("http://unsafe.com");
+        } finally {
+            changeJSDOMURL(oldLocation);
+        }
+    });
+
+    it("returns default returnUrl with purpose if provided", () => {
+        const oldLocation = window.location.href;
+        changeJSDOMURL("http://localhost");
+        try {
+            const result = getReturnUrl({ purpose: "test" });
+            expect(result).toBe(Config.defaultReturnUrl("test"));
+        } finally {
+            changeJSDOMURL(oldLocation);
+        }
+    });
+});
+
+function changeJSDOMURL(url: string) {
+    (globalThis as any).jsdom.reconfigure({ url: url });
+}

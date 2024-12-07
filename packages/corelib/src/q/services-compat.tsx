@@ -20,22 +20,6 @@ export interface PostToUrlOptions {
     params: any;
 }
 
-export function parseQueryString(s?: string): Record<string, string> {
-    let qs: string;
-    if (s === undefined)
-        qs = location.search.substring(1, location.search.length);
-    else
-        qs = s || '';
-    let result: Record<string, string> = {};
-    let parts = qs.split('&');
-    for (let i = 0; i < parts.length; i++) {
-        let pair = parts[i].split('=');
-        let name = decodeURIComponent(pair[0]);
-        result[name] = (pair.length >= 2 ? decodeURIComponent(pair[1]) : name);
-    }
-    return result;
-}
-
 function postToCommon(url: string, form: HTMLFormElement, target: string) {
 
     if (isSameOrigin(resolveUrl(url))) {
