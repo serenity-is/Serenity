@@ -10,10 +10,10 @@ public class NorthwindDB_20241120_1203_LanguageIdToCode : AutoReversingMigration
         if (!this.IsSqlite())
         {
             Alter.Table("CategoryLang")
-                .AlterColumn("LanguageId").AsString(10).NotNullable();
+                .AlterColumn("LanguageID").AsString(10).NotNullable();
 
             Alter.Table("ProductLang")
-                .AlterColumn("LanguageId").AsString(10).NotNullable();
+                .AlterColumn("LanguageID").AsString(10).NotNullable();
         }
     }
 }
