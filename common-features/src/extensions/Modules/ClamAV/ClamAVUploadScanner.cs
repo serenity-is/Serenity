@@ -1,4 +1,3 @@
-using Microsoft.Extensions.Logging;
 using nClam;
 using System.IO;
 

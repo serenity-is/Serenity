@@ -1,7 +1,6 @@
 using FluentMigrator;
 using FluentMigrator.Builders;
 using FluentMigrator.Builders.Create.Table;
-using System.Data.Common;
 using System.IO;
 
 namespace Serenity.Extensions;

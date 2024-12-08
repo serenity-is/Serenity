@@ -1,5 +1,4 @@
 ﻿using Serenity.Demo.Northwind;
-using Serenity.Navigation;
 
 namespace Serenity.Demo.BasicSamples;
 
