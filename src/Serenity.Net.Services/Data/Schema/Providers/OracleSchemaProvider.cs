@@ -1,4 +1,4 @@
-﻿namespace Serenity.Data.Schema;
+namespace Serenity.Data.Schema;
 
 /// <summary>
 /// Oracle metadata provider.
@@ -92,19 +92,19 @@ public class OracleSchemaProvider : ISchemaProvider
     /// <returns></returns>
     public IEnumerable<string> GetPrimaryKeyFields(IDbConnection connection, string schema, string table)
     {
-        return connection.Query<string>(@"
-                    SELECT cols.column_name
-                    FROM all_constraints cons, all_cons_columns cols
-                    WHERE cols.table_name = :tbl
-                    AND cons.constraint_type = 'P'
-                    AND cons.constraint_name = cols.constraint_name
-                    AND cons.owner = :sch
-                    ORDER BY cols.position;",
-            new
-            {
-                sch = schema,
-                tbl = table
-            });
+        return connection.Query<string>("""
+            SELECT cols.column_name
+            FROM all_constraints cons, all_cons_columns cols
+            WHERE cols.table_name = :tbl
+            AND cons.constraint_type = 'P'
+            AND cons.constraint_name = cols.constraint_name
+            AND cons.owner = :sch
+            ORDER BY cols.position
+            """, new
+        {
+            sch = schema,
+            tbl = table
+        });
     }
 
     /// <summary>
