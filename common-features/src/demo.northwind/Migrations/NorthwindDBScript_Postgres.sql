@@ -1,4 +1,4 @@
-﻿SET statement_timeout = 0;
+SET statement_timeout = 0;
 SET client_encoding = 'UTF8';
 SET standard_conforming_strings = on;
 SET check_function_bodies = false;
@@ -19,21 +19,15 @@ CREATE TABLE "Categories" (
     "Picture" bytea
 );
 
-ALTER TABLE public."Categories" OWNER TO postgres;
-
 CREATE TABLE "CustomerCustomerDemo" (
     "CustomerID" bpchar NOT NULL,
     "CustomerTypeID" bpchar NOT NULL
 );
 
-ALTER TABLE public."CustomerCustomerDemo" OWNER TO postgres;
-
 CREATE TABLE "CustomerDemographics" (
     "CustomerTypeID" bpchar NOT NULL,
     "CustomerDesc" text
 );
-
-ALTER TABLE public."CustomerDemographics" OWNER TO postgres;
 
 CREATE TABLE "Customers" (
     "CustomerID" bpchar NOT NULL,
@@ -48,8 +42,6 @@ CREATE TABLE "Customers" (
     "Phone" character varying(24),
     "Fax" character varying(24)
 );
-
-ALTER TABLE public."Customers" OWNER TO postgres;
 
 CREATE SEQUENCE employees_seq;
 
@@ -75,15 +67,11 @@ CREATE TABLE "Employees" (
 );
 
 
-ALTER TABLE public."Employees" OWNER TO postgres;
-
 CREATE TABLE "EmployeeTerritories" (
     "EmployeeID" smallint NOT NULL,
     "TerritoryID" character varying(20) NOT NULL
 );
 
-
-ALTER TABLE public."EmployeeTerritories" OWNER TO postgres;
 
 CREATE TABLE "Order Details" (
     "OrderID" smallint NOT NULL,
@@ -93,8 +81,6 @@ CREATE TABLE "Order Details" (
     "Discount" real NOT NULL
 );
 
-
-ALTER TABLE public."Order Details" OWNER TO postgres;
 
 CREATE SEQUENCE orders_seq;
 
@@ -116,8 +102,6 @@ CREATE TABLE "Orders" (
 );
 
 
-ALTER TABLE public."Orders" OWNER TO postgres;
-
 CREATE SEQUENCE products_seq;
 
 CREATE TABLE "Products" (
@@ -134,16 +118,12 @@ CREATE TABLE "Products" (
 );
 
 
-ALTER TABLE public."Products" OWNER TO postgres;
-
 CREATE SEQUENCE region_seq;
 
 CREATE TABLE "Region" (
     "RegionID" smallint DEFAULT nextval('region_seq') NOT NULL,
     "RegionDescription" bpchar NOT NULL
 );
-
-ALTER TABLE public."Region" OWNER TO postgres;
 
 CREATE SEQUENCE shippers_seq;
 
@@ -153,8 +133,6 @@ CREATE TABLE "Shippers" (
     "Phone" character varying(24)
 );
 
-
-ALTER TABLE public."Shippers" OWNER TO postgres;
 
 CREATE SEQUENCE suppliers_seq;
 
@@ -174,15 +152,11 @@ CREATE TABLE "Suppliers" (
 );
 
 
-ALTER TABLE public."Suppliers" OWNER TO postgres;
-
 CREATE TABLE "Territories" (
     "TerritoryID" character varying(20) NOT NULL,
     "TerritoryDescription" bpchar NOT NULL,
     "RegionID" smallint NOT NULL
 );
-
-ALTER TABLE public."Territories" OWNER TO postgres;
 
 CREATE SEQUENCE usstates_seq;
 
@@ -192,9 +166,6 @@ CREATE TABLE "UsStates" (
     "StateAbbr" character varying(2),
     "StateRegion" character varying(50)
 );
-
-
-ALTER TABLE public."UsStates" OWNER TO postgres;
 
 
 
@@ -238,6 +209,4 @@ ALTER TABLE ONLY "Territories"
     ADD CONSTRAINT "PK_Territories" PRIMARY KEY ("TerritoryID");
 
 REVOKE ALL ON SCHEMA public FROM PUBLIC;
-REVOKE ALL ON SCHEMA public FROM postgres;
-GRANT ALL ON SCHEMA public TO postgres;
 GRANT ALL ON SCHEMA public TO PUBLIC;
