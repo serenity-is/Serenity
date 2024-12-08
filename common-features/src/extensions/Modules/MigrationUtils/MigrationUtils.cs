@@ -244,7 +244,9 @@ END;", table, id, seq));
                 return;
 
             var database = cb["Database"] as string;
-            if (string.IsNullOrEmpty(database))
+            if (string.IsNullOrEmpty(database) ||
+                string.IsNullOrEmpty(Path.GetDirectoryName(database)) ||
+                database.Contains(':'))
                 return;
 
             database = Path.GetFullPath(database);
@@ -254,9 +256,10 @@ END;", table, id, seq));
 
             using var fbConnection = sqlConnections.New(cb.ConnectionString,
                 cs.ProviderName, cs.Dialect);
-            ((WrappedConnection)fbConnection).ActualConnection.GetType()
-                .GetMethod("CreateDatabase", [typeof(string), typeof(bool)])
-                .Invoke(null, [fbConnection.ConnectionString, false]);
+            var method = ((WrappedConnection)fbConnection).ActualConnection.GetType()
+                .GetMethod("CreateDatabase", [typeof(string), typeof(int), typeof(bool), typeof(bool)]);
+
+            method?.Invoke(null, [fbConnection.ConnectionString, 4096, true, false]);
 
             return;
         }
