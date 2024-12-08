@@ -13,6 +13,7 @@ public class DefaultSqlDialectMapper : ISqlDialectMapper
             { "FirebirdSql.Data.FirebirdClient", FirebirdDialect.Instance },
             { "Npgsql", PostgresDialect.Instance },
             { "MySql.Data.MySqlClient", MySqlDialect.Instance },
+            { "MySqlConnector", MySqlDialect.Instance },
             { "System.Data.SQLite", SqliteDialect.Instance },
             { "Microsoft.Data.SQLite", SqliteDialect.Instance },
             { "System.Data.OracleClient", OracleDialect.Instance },

@@ -179,8 +179,8 @@ public partial class Startup
         // to enable FIREBIRD: add FirebirdSql.Data.FirebirdClient reference, set connections, and uncomment line below
         // DbProviderFactories.RegisterFactory("FirebirdSql.Data.FirebirdClient", FirebirdSql.Data.FirebirdClient.FirebirdClientFactory.Instance);
 
-        // to enable MYSQL: add MySql.Data reference, set connections, and uncomment line below
-        // DbProviderFactories.RegisterFactory("MySql.Data.MySqlClient", MySql.Data.MySqlClient.MySqlClientFactory.Instance);
+        // to enable MYSQL: add MySqlConnector reference, set connections, and uncomment line below
+        // DbProviderFactories.RegisterFactory("MySql.Data.MySqlClient", MySqlConnector.MySqlConnectorFactory.Instance);
 
         // to enable POSTGRES: add Npgsql reference, set connections, and uncomment line below
         // DbProviderFactories.RegisterFactory("Npgsql", Npgsql.NpgsqlFactory.Instance);
