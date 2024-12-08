@@ -55,6 +55,8 @@ public partial class GenerateCommand
             FirebirdSql.Data.FirebirdClient.FirebirdClientFactory.Instance);
         DbProviderFactories.RegisterFactory("MySql.Data.MySqlClient",
             MySqlConnector.MySqlConnectorFactory.Instance);
+        DbProviderFactories.RegisterFactory("Oracle.ManagedDataAccess.Client", 
+            Oracle.ManagedDataAccess.Client.OracleClientFactory.Instance);
     }
 
     private static ConnectionStringOptions ParseConnectionStrings(IFileSystem fileSystem,
