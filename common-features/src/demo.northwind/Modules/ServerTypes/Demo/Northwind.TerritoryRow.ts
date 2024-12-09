@@ -1,7 +1,6 @@
 ﻿import { getLookup, getLookupAsync, fieldsProxy } from "@serenity-is/corelib";
 
 export interface TerritoryRow {
-    ID?: number;
     TerritoryID?: string;
     TerritoryDescription?: string;
     RegionID?: number;
@@ -9,7 +8,7 @@ export interface TerritoryRow {
 }
 
 export abstract class TerritoryRow {
-    static readonly idProperty = 'ID';
+    static readonly idProperty = 'TerritoryID';
     static readonly nameProperty = 'TerritoryID';
     static readonly localTextPrefix = 'Northwind.Territory';
     static readonly lookupKey = 'Northwind.Territory';

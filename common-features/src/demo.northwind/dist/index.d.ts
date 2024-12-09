@@ -903,14 +903,13 @@ export declare namespace SupplierService {
 	};
 }
 export interface TerritoryRow {
-	ID?: number;
 	TerritoryID?: string;
 	TerritoryDescription?: string;
 	RegionID?: number;
 	RegionDescription?: string;
 }
 export declare abstract class TerritoryRow {
-	static readonly idProperty = "ID";
+	static readonly idProperty = "TerritoryID";
 	static readonly nameProperty = "TerritoryID";
 	static readonly localTextPrefix = "Northwind.Territory";
 	static readonly lookupKey = "Northwind.Territory";

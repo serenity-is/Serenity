@@ -7,10 +7,7 @@ namespace Serenity.Demo.Northwind;
 [LookupScript]
 public sealed class TerritoryRow : Row<TerritoryRow.RowFields>, IIdRow, INameRow
 {
-    [DisplayName("ID"), Identity, IdProperty]
-    public int? ID { get => fields.ID[this]; set => fields.ID[this] = value; }
-
-    [DisplayName("Territory ID"), Size(20), PrimaryKey, NotNull, QuickSearch, Updatable(false), NameProperty]
+    [DisplayName("Territory ID"), Size(20), PrimaryKey, NotNull, QuickSearch, Updatable(false), IdProperty, NameProperty]
     public string TerritoryID { get => fields.TerritoryID[this]; set => fields.TerritoryID[this] = value; }
 
     [DisplayName("Territory Description"), Size(50), NotNull, QuickSearch, LookupInclude]
@@ -24,7 +21,6 @@ public sealed class TerritoryRow : Row<TerritoryRow.RowFields>, IIdRow, INameRow
 
     public class RowFields : RowFieldsBase
     {
-        public Int32Field ID;
         public StringField TerritoryID;
         public StringField TerritoryDescription;
         public Int32Field RegionID;

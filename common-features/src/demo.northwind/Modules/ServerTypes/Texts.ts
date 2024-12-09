@@ -239,7 +239,6 @@ namespace texts {
             }
 
             namespace Territory {
-                export const ID: string;
                 export const RegionDescription: string;
                 export const RegionID: string;
                 export const TerritoryDescription: string;
