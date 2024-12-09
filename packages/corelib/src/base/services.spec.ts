@@ -389,11 +389,11 @@ describe("synchronous serviceCall", () => {
             }
         });
 
-        const promise = serviceCall(options);
 
         const old = window.alert;
         window.alert = () => {};
         try {
+            const promise = serviceCall(options);
             await expect(promise).rejects.toThrow("Service call to '/test' resulted in HTTP 403 error: Some error!");
         }
         finally {
