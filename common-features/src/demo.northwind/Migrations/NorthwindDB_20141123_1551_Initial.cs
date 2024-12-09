@@ -1,17 +1,10 @@
 using FluentMigrator;
-using System.IO;
 
 namespace Serenity.Demo.Northwind.Migrations;
 
 [NorthwindDB, MigrationKey(20141123_1551)]
 public class NorthwindDB_20141123_1551_Initial : Migration
 {
-    private string GetScript(string name)
-    {
-        using var sr = new StreamReader(GetType().Assembly.GetManifestResourceStream(name));
-        return sr.ReadToEnd();
-    }
-
     public override void Up()
     {
         Create.Table("Categories")
@@ -117,10 +110,10 @@ public class NorthwindDB_20141123_1551_Initial : Migration
             .WithColumn("EmployeeID").AsInt32().NotNullable().PrimaryKey();
 
         Create.Table("EmployeeTerritories")
-            .WithColumn("ID").AsInt32().AutoIncrement(this)
-            .WithColumn("EmployeeID").AsInt32().NotNullable().PrimaryKey()
+            .WithColumn("ID").AsInt32().IdentityKey(this)
+            .WithColumn("EmployeeID").AsInt32().NotNullable()
                 .ForeignKey("FK_EmployeeTerritories_EmployeeID", "Employees", "EmployeeID")
-            .WithColumn("TerritoryID").AsString(20).NotNullable().PrimaryKey()
+            .WithColumn("TerritoryID").AsString(20).NotNullable()
                 .ForeignKey("FK_EmployeeTerritories_TerritoryID", "Territories", "TerritoryID");
 
         Create.Table("Products")
@@ -205,10 +198,55 @@ public class NorthwindDB_20141123_1551_Initial : Migration
             .WithColumn("Title").AsString(100).NotNullable();
 
         IfDatabase("SqlServer")
-            .Execute.Sql(GetScript("Serenity.Demo.Northwind.Migrations.NorthwindDBScript_SqlServer.sql"));
+            .Execute.Sql("""
+            create view [dbo].[OrderDetailsExtended] AS
+            SELECT OrderDetails.OrderID, OrderDetails.ProductID, Products.ProductName, 
+                OrderDetails.UnitPrice, OrderDetails.Quantity, OrderDetails.Discount, 
+                (CONVERT(money,(OrderDetails.UnitPrice*Quantity*(1-Discount)/100))*100) AS ExtendedPrice
+            FROM Products INNER JOIN OrderDetails ON Products.ProductID = OrderDetails.ProductID
+            GO
+            create view [dbo].[SalesByCategory] AS
+            SELECT Categories.CategoryID, Categories.CategoryName, Products.ProductName, 
+                Sum("OrderDetailsExtended".ExtendedPrice) AS ProductSales
+            FROM 	Categories INNER JOIN 
+                    (Products INNER JOIN 
+                        (Orders INNER JOIN "OrderDetailsExtended" ON Orders.OrderID = "OrderDetailsExtended".OrderID) 
+                    ON Products.ProductID = "OrderDetailsExtended".ProductID) 
+                ON Categories.CategoryID = Products.CategoryID
+            GROUP BY Categories.CategoryID, Categories.CategoryName, Products.ProductName
+            
+            """);
 
         IfDatabase("Sqlite")
-            .Execute.Sql(GetScript("Serenity.Demo.Northwind.Migrations.NorthwindDBScript_Sqlite.sql"));
+            .Execute.Sql("""
+            DROP VIEW IF EXISTS [OrderDetailsExtended];
+            CREATE VIEW [OrderDetailsExtended] AS
+            SELECT [OrderDetails].OrderID,
+                   [OrderDetails].ProductID,
+                   Products.ProductName,
+                   [OrderDetails].UnitPrice,
+                   [OrderDetails].Quantity,
+                   [OrderDetails].Discount,
+                 ([OrderDetails].UnitPrice*Quantity*(1-Discount)/100)*100 AS ExtendedPrice
+            FROM Products 
+                 JOIN [OrderDetails] ON Products.ProductID = [OrderDetails].ProductID;
+
+            DROP VIEW IF EXISTS [SalesByCategory];
+            CREATE VIEW [SalesByCategory] AS
+            SELECT Categories.CategoryID,
+                   Categories.CategoryName,
+                     Products.ProductName,
+               Sum([OrderDetailsExtended].ExtendedPrice) AS ProductSales
+            FROM  Categories 
+                JOIN Products 
+                  ON Categories.CategoryID = Products.CategoryID
+                   JOIN [OrderDetailsExtended] 
+                     ON Products.ProductID = [OrderDetailsExtended].ProductID
+                       JOIN Orders 
+                         ON Orders.OrderID = [OrderDetailsExtended].OrderID 
+            WHERE Orders.OrderDate BETWEEN DATETIME('1997-01-01') And DATETIME('1997-12-31')
+            GROUP BY Categories.CategoryID, Categories.CategoryName, Products.ProductName;
+            """);
     }
 
     public override void Down()
