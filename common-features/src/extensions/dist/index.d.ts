@@ -257,6 +257,7 @@ declare namespace texts {
 export declare const BasicProgressDialogTexts: typeof texts.Site.BasicProgressDialog;
 export declare const BulkServiceActionTexts: typeof texts.Site.BulkServiceAction;
 export declare const ChangePasswordFormTexts: typeof texts.Forms.Membership.ChangePassword;
+export declare const ChangePasswordValidationTexts: typeof texts.Validation;
 export declare const DialogUtilsTexts: typeof texts.Site.Dialogs;
 export declare const ExtensionsTexts: typeof texts;
 export declare const ForgotPasswordFormTexts: typeof texts.Forms.Membership.ForgotPassword;

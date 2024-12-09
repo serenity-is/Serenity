@@ -4,7 +4,7 @@ export interface CategoryRow {
     CategoryID?: number;
     CategoryName?: string;
     Description?: string;
-    Picture?: number[];
+    PicturePath?: string;
 }
 
 export abstract class CategoryRow {

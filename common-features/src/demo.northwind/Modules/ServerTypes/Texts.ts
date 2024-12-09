@@ -10,7 +10,7 @@ namespace texts {
                 export const CategoryID: string;
                 export const CategoryName: string;
                 export const Description: string;
-                export const Picture: string;
+                export const PicturePath: string;
             }
 
             namespace CategoryLang {
@@ -31,7 +31,6 @@ namespace texts {
                 export const CustomerID: string;
                 export const Email: string;
                 export const Fax: string;
-                export const ID: string;
                 export const LastContactDate: string;
                 export const LastContactedBy: string;
                 export const NoteList: string;
@@ -56,8 +55,8 @@ namespace texts {
             }
 
             namespace CustomerDetails {
+                export const CustomerID: string;
                 export const Email: string;
-                export const Id: string;
                 export const LastContactDate: string;
                 export const LastContactedBy: string;
                 export const LastContactedByFullName: string;

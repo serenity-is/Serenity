@@ -1,4 +1,4 @@
-﻿namespace Serenity.Demo.Northwind;
+namespace Serenity.Demo.Northwind;
 
 public class NotesBehavior(IUserRetrieveService userRetriever,
     IServiceResolver<INoteListHandler> listHandlerResolver,
@@ -78,7 +78,7 @@ public class NotesBehavior(IUserRetrieveService userRetriever,
     }
 
     private void SaveNote(IUnitOfWork uow, NoteRow note, string entityType, 
-        long entityId, long? noteId)
+        string entityId, long? noteId)
     {
         note = note.Clone();
         note.NoteId = noteId;
@@ -100,7 +100,7 @@ public class NotesBehavior(IUserRetrieveService userRetriever,
         deleteHandlerResolver.Resolve().Delete(uow, new DeleteRequest { EntityId = noteId });
     }
 
-    private void NoteListSave(IUnitOfWork uow, string entityType, long entityId, 
+    private void NoteListSave(IUnitOfWork uow, string entityType, string entityId, 
         List<NoteRow> oldList, List<NoteRow> newList)
     {
         var row = oldList.Count > 0 ? oldList[0] : 
@@ -189,7 +189,7 @@ public class NotesBehavior(IUserRetrieveService userRetriever,
             return;
 
         var idField = (handler.Row as IIdRow).IdField;
-        var entityId = Convert.ToInt64(idField.AsObject(handler.Row),
+        var entityId = Convert.ToString(idField.AsObject(handler.Row),
             CultureInfo.InvariantCulture);
 
         if (handler.IsCreate)

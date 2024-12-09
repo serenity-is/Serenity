@@ -2,7 +2,6 @@
 import { NoteRow } from "./Northwind.NoteRow";
 
 export interface CustomerRow {
-    ID?: number;
     CustomerID?: string;
     CompanyName?: string;
     ContactName?: string;
@@ -23,7 +22,7 @@ export interface CustomerRow {
 }
 
 export abstract class CustomerRow {
-    static readonly idProperty = 'ID';
+    static readonly idProperty = 'CustomerID';
     static readonly nameProperty = 'CompanyName';
     static readonly localTextPrefix = 'Northwind.Customer';
     static readonly lookupKey = 'Northwind.Customer';

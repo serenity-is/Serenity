@@ -6,7 +6,7 @@ export interface CategoryRow {
 	CategoryID?: number;
 	CategoryName?: string;
 	Description?: string;
-	Picture?: number[];
+	PicturePath?: string;
 }
 export declare abstract class CategoryRow {
 	static readonly idProperty = "CategoryID";
@@ -90,7 +90,7 @@ export declare namespace CategoryService {
 export interface NoteRow {
 	NoteId?: number;
 	EntityType?: string;
-	EntityId?: number;
+	EntityId?: string;
 	Text?: string;
 	InsertUserId?: number;
 	InsertDate?: string;
@@ -107,7 +107,6 @@ export declare abstract class NoteRow {
 	static readonly Fields: Readonly<Record<keyof NoteRow, string>>;
 }
 export interface CustomerRow {
-	ID?: number;
 	CustomerID?: string;
 	CompanyName?: string;
 	ContactName?: string;
@@ -127,7 +126,7 @@ export interface CustomerRow {
 	SendBulletin?: boolean;
 }
 export declare abstract class CustomerRow {
-	static readonly idProperty = "ID";
+	static readonly idProperty = "CustomerID";
 	static readonly nameProperty = "CompanyName";
 	static readonly localTextPrefix = "Northwind.Customer";
 	static readonly lookupKey = "Northwind.Customer";
@@ -189,7 +188,7 @@ export declare abstract class CustomerDemographicRow {
 	static readonly Fields: Readonly<Record<keyof CustomerDemographicRow, string>>;
 }
 export interface CustomerDetailsRow {
-	Id?: number;
+	CustomerID?: string;
 	LastContactDate?: string;
 	LastContactedBy?: number;
 	Email?: string;
@@ -197,7 +196,7 @@ export interface CustomerDetailsRow {
 	LastContactedByFullName?: string;
 }
 export declare abstract class CustomerDetailsRow {
-	static readonly idProperty = "Id";
+	static readonly idProperty = "CustomerID";
 	static readonly nameProperty = "Email";
 	static readonly localTextPrefix = "Northwind.CustomerDetails";
 	static readonly deletePermission = "Northwind:General";
@@ -265,7 +264,7 @@ export declare abstract class CustomerGrossSalesRow {
 }
 export interface CustomerRepresentativesRow {
 	RepresentativeId?: number;
-	CustomerId?: number;
+	CustomerId?: string;
 	EmployeeId?: number;
 }
 export declare abstract class CustomerRepresentativesRow {

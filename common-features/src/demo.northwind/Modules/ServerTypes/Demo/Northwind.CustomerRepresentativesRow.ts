@@ -2,7 +2,7 @@
 
 export interface CustomerRepresentativesRow {
     RepresentativeId?: number;
-    CustomerId?: number;
+    CustomerId?: string;
     EmployeeId?: number;
 }
 

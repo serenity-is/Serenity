@@ -1,5 +1,5 @@
 ﻿import { PopulateLinkedDataForm } from "../../ServerTypes/Demo";
-import { Decorators, EntityDialog, WidgetProps, first, gridPageInit } from "@serenity-is/corelib";
+import { Decorators, EntityDialog, WidgetProps, first, gridPageInit, toId } from "@serenity-is/corelib";
 import { CustomerRow, CustomerService, OrderGrid, OrderRow, OrderService } from "@serenity-is/demo.northwind";
 
 export default () => gridPageInit(PopulateLinkedDataGrid);
@@ -30,20 +30,14 @@ export class PopulateLinkedDataDialog<P = {}> extends EntityDialog<OrderRow, P> 
         // so we prefer "changeSelect2", as initial customer details 
         // will get populated by initial load, we don't want extra call
         this.form.CustomerID.changeSelect2(async e => {
-            var customerID = this.form.CustomerID.value;
+            const customerID = toId(this.form.CustomerID.value);
             if (!customerID) {
                 this.setCustomerDetails({});
                 return;
             }
 
-            // in northwind CustomerID is a string like "ALFKI", 
-            // while its actual integer ID value is 1.
-            // so we need to convert customer ID to ID.
-            // you won't have to do this conversion with your tables
-            var id = first((await CustomerRow.getLookupAsync()).items, x => x.CustomerID == customerID).ID;
-
             CustomerService.Retrieve({
-                EntityId: id
+                EntityId: customerID
             }, response => {
                 this.setCustomerDetails(response.Entity);
             });

@@ -20,13 +20,13 @@ public sealed class CategoryRow : Row<CategoryRow.RowFields>, IIdRow, INameRow
     public string Description { get => fields.Description[this]; set => fields.Description[this] = value; }
 
     [DisplayName("Picture")]
-    public Stream Picture { get => fields.Picture[this]; set => fields.Picture[this] = value; }
+    public string PicturePath { get => fields.PicturePath[this]; set => fields.PicturePath[this] = value; }
 
     public class RowFields : RowFieldsBase
     {
         public Int32Field CategoryID;
         public StringField CategoryName;
         public StringField Description;
-        public StreamField Picture;
+        public StringField PicturePath;
     }
 }

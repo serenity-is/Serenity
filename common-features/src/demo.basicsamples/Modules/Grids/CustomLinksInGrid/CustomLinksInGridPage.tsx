@@ -55,12 +55,7 @@ export class CustomLinksInGrid extends OrderGrid {
                 htmlEncode(item.CustomerCompanyName));
 
             confirmDialog(message, async () => {
-                // CustomerDialog doesn't use CustomerID but ID (identity)
-                // so need to find customer to get its actual ID
-                var customer = first((await CustomerRow.getLookupAsync()).items,
-                    x => x.CustomerID == item.CustomerID);
-
-                new CustomerDialog({}).loadByIdAndOpenDialog(customer.ID);
+                new CustomerDialog({}).loadByIdAndOpenDialog(item.CustomerID);
             },
                 {
                     htmlEncode: false,

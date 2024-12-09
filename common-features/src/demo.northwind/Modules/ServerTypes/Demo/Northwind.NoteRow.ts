@@ -3,7 +3,7 @@
 export interface NoteRow {
     NoteId?: number;
     EntityType?: string;
-    EntityId?: number;
+    EntityId?: string;
     Text?: string;
     InsertUserId?: number;
     InsertDate?: string;

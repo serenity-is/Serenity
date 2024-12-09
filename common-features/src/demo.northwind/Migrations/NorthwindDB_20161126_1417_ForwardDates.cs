@@ -11,7 +11,7 @@ public class NorthwindDB_20161126_1417_ForwardDates : Migration
 
         var dateAdd = "dateadd(day, datediff(day, (select max(orderdate) from Orders), getdate()), ";
 
-        IfDatabase("SqlServer", "SqlServer2000", "SqlServerCe")
+        IfDatabase("SqlServer")
             .Execute.Sql(
                 new SqlUpdate(o.TableName)
                     .SetTo(o.OrderDate, dateAdd + o.OrderDate.Name + ")")

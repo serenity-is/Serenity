@@ -13,7 +13,7 @@ public sealed class NoteRow : Row<NoteRow.RowFields>, IIdRow, INameRow, IInsertL
     public string EntityType { get => fields.EntityType[this]; set => fields.EntityType[this] = value; }
 
     [DisplayName("Entity Id"), Column("EntityID"), Size(100), NotNull, Updatable(false)]
-    public long? EntityId { get => fields.EntityId[this]; set => fields.EntityId[this] = value; }
+    public string EntityId { get => fields.EntityId[this]; set => fields.EntityId[this] = value; }
 
     [DisplayName("Text"), NotNull, QuickSearch]
     public string Text { get => fields.Text[this]; set => fields.Text[this] = value; }
@@ -35,7 +35,7 @@ public sealed class NoteRow : Row<NoteRow.RowFields>, IIdRow, INameRow, IInsertL
     {
         public Int64Field NoteId;
         public StringField EntityType;
-        public Int64Field EntityId;
+        public StringField EntityId;
         public StringField Text;
         public Int32Field InsertUserId;
         public DateTimeField InsertDate;

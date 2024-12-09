@@ -44,7 +44,7 @@ export class InlineActionGrid extends CustomerGrid {
                 case deleteRowAction: {
                     confirmDialog(localText("Controls.EntityDialog.DeleteConfirmation"), () => {
                         CustomerService.Delete({
-                            EntityId: item.ID,
+                            EntityId: item.CustomerID,
                         }, _ => {
                             this.refresh();
                         });
@@ -53,7 +53,7 @@ export class InlineActionGrid extends CustomerGrid {
                 }
 
                 case viewDetailsAction: {
-                    this.editItem(item.ID);
+                    this.editItem(item.CustomerID);
                     break;
                 }
 

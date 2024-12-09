@@ -5,15 +5,12 @@ namespace Serenity.Demo.Northwind;
 [ReadPermission(PermissionKeys.Customer.View)]
 [ModifyPermission(PermissionKeys.Customer.Modify)]
 [DeletePermission(PermissionKeys.Customer.Delete)]
-[LeftJoin("cd", "CustomerDetails", "cd.[ID] = T0.[ID]", RowType = typeof(CustomerDetailsRow), TitlePrefix = "")]
+[LeftJoin("cd", "CustomerDetails", "cd.[CustomerID] = T0.[CustomerID]", RowType = typeof(CustomerDetailsRow), TitlePrefix = "")]
 [UpdatableExtension("cd", typeof(CustomerDetailsRow), CascadeDelete = true)]
 [LookupScript(typeof(Lookups.CustomerLookup))]
 public sealed class CustomerRow : Row<CustomerRow.RowFields>, IIdRow, INameRow
 {
-    [DisplayName("ID"), Identity, IdProperty]
-    public int? ID { get => fields.ID[this]; set => fields.ID[this] = value; }
-
-    [DisplayName("Customer Id"), Size(5), PrimaryKey, NotNull, QuickSearch, Updatable(false), LookupInclude]
+    [DisplayName("Customer Id"), Size(5), PrimaryKey, IdProperty, NotNull, QuickSearch, Updatable(false), LookupInclude]
     public string CustomerID { get => fields.CustomerID[this]; set => fields.CustomerID[this] = value; }
 
     [DisplayName("Company Name"), Size(40), NotNull, QuickSearch, LookupInclude, NameProperty]
@@ -68,7 +65,6 @@ public sealed class CustomerRow : Row<CustomerRow.RowFields>, IIdRow, INameRow
 
     public class RowFields : RowFieldsBase
     {
-        public Int32Field ID;
         public StringField CustomerID;
         public StringField CompanyName;
         public StringField ContactName;

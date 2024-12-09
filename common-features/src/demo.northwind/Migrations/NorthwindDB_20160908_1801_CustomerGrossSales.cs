@@ -25,7 +25,7 @@ BEGIN
         LEFT OUTER JOIN
             Customers c on c.CustomerID = o.CustomerID
         LEFT OUTER JOIN
-            [Order Details] d on d.OrderID = o.OrderID
+            OrderDetails d on d.OrderID = o.OrderID
         LEFT OUTER JOIN
             Products p on p.ProductID = d.ProductID
     WHERE

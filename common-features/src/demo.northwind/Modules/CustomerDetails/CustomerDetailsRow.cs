@@ -1,4 +1,4 @@
-﻿namespace Serenity.Demo.Northwind;
+namespace Serenity.Demo.Northwind;
 
 [ConnectionKey("Northwind"), Module("Northwind"), TableName("CustomerDetails")]
 [DisplayName("CustomerDetails"), InstanceName("CustomerDetails")]
@@ -8,8 +8,8 @@ public sealed class CustomerDetailsRow : Row<CustomerDetailsRow.RowFields>, IIdR
 {
     const string jLastContactedBy = nameof(jLastContactedBy);
 
-    [DisplayName("Id"), Column("ID"), PrimaryKey, IdProperty]
-    public int? Id { get => fields.Id[this]; set => fields.Id[this] = value; }
+    [DisplayName("Customer"), Size(5), PrimaryKey, IdProperty]
+    public string CustomerID { get => fields.CustomerID[this]; set => fields.CustomerID[this] = value; }
 
     [DisplayName("Last Contact Date")]
     public DateTime? LastContactDate { get => fields.LastContactDate[this]; set => fields.LastContactDate[this] = value; }
@@ -28,7 +28,7 @@ public sealed class CustomerDetailsRow : Row<CustomerDetailsRow.RowFields>, IIdR
 
     public class RowFields : RowFieldsBase
     {
-        public Int32Field Id;
+        public StringField CustomerID;
         public DateTimeField LastContactDate;
         public Int32Field LastContactedBy;
         public StringField Email;

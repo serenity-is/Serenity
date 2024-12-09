@@ -1,4 +1,4 @@
-import { Decorators, Fluent, PropertyGrid, TabsExtensions, Toolbar, Validator, WidgetProps, first, getForm, gridPageInit, isEmptyOrNull, localText, notifySuccess, reloadLookup, validateOptions } from "@serenity-is/corelib";
+import { Decorators, Fluent, PropertyGrid, TabsExtensions, Toolbar, Validator, WidgetProps, first, getForm, gridPageInit, isEmptyOrNull, localText, notifySuccess, reloadLookup, toId, validateOptions } from "@serenity-is/corelib";
 import { CustomerForm, CustomerRow, CustomerService, OrderDialog, OrderGrid, OrderRow } from "@serenity-is/demo.northwind";
 
 export default () => gridPageInit(OtherFormInTabGrid);
@@ -29,51 +29,36 @@ export class OtherFormInTabDialog<P = {}> extends OrderDialog<P> {
             if (this.selfChange)
                 return;
 
-            (async () => {
-                var customerID = await this.getCustomerID();
+            const customerId = this.customerId;;
 
-                TabsExtensions.setDisabled(this.tabs, 'Customer', !customerID);
+            TabsExtensions.setDisabled(this.tabs, 'Customer', !customerId);
 
-                if (!customerID) {
-                    // no customer is selected, just load an empty entity
-                    this.customerPropertyGrid.load({});
-                    return;
-                }
+            if (!customerId) {
+                // no customer is selected, just load an empty entity
+                this.customerPropertyGrid.load({});
+                return;
+            }
 
-                // load selected customer into customer form by calling CustomerService
-                CustomerService.Retrieve({
-                    EntityId: customerID
-                }, response => {
-                    this.customerPropertyGrid.load(response.Entity);
-                });
-            })();
-
+            // load selected customer into customer form by calling CustomerService
+            CustomerService.Retrieve({
+                EntityId: customerId
+            }, response => {
+                this.customerPropertyGrid.load(response.Entity);
+            });
         });
     }
 
-    async getCustomerID() {
-        var customerID = this.form.CustomerID.value;
-
-        if (isEmptyOrNull(customerID))
-            return null;
-
-        // unfortunately, CustomerID (a string) used in this form and the ID (auto increment ID) are different, so we need to 
-        // find numeric ID from customer lookups. you'll probably won't need this step.
-        return first((await CustomerRow.getLookupAsync()).items,
-            x => x.CustomerID == customerID).ID;
+    get customerId() {
+        return toId(this.form.CustomerID.value);
     }
 
     loadEntity(entity: OrderRow) {
         super.loadEntity(entity);
-
-        (async () => {
-            TabsExtensions.setDisabled(this.tabs, 'Customer',
-                !(await this.getCustomerID()));
-        })();
+        TabsExtensions.setDisabled(this.tabs, 'Customer', !this.customerId);
     }
 
     private async customerSaveClick() {
-        var id = await this.getCustomerID();
+        const id = this.customerId;
         if (!id)
             return;
 

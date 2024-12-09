@@ -1,7 +1,7 @@
 ﻿import { fieldsProxy } from "@serenity-is/corelib";
 
 export interface CustomerDetailsRow {
-    Id?: number;
+    CustomerID?: string;
     LastContactDate?: string;
     LastContactedBy?: number;
     Email?: string;
@@ -10,7 +10,7 @@ export interface CustomerDetailsRow {
 }
 
 export abstract class CustomerDetailsRow {
-    static readonly idProperty = 'Id';
+    static readonly idProperty = 'CustomerID';
     static readonly nameProperty = 'Email';
     static readonly localTextPrefix = 'Northwind.CustomerDetails';
     static readonly deletePermission = 'Northwind:General';
