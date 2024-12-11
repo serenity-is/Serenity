@@ -36,5 +36,32 @@ public class DefaultTypeSourceTests
         var types = typeSource.GetTypes();
         Assert.Contains(typeof(DefaultTypeSourceTests), types);
     }
+
+    [Fact]
+    public void Takes_Distinct_Over_Assemblies_If_Passed_An_Array()
+    {
+        var assemblies = new[]
+        { 
+            Assembly.GetExecutingAssembly(),
+            Assembly.GetExecutingAssembly()
+        };
+        var typeSource = new DefaultTypeSource(assemblies);
+        var assembly = Assert.Single(typeSource.GetAssemblies());
+        Assert.Equal(Assembly.GetExecutingAssembly(), assembly);
+    }
+
+    [Fact]
+    public void Does_Not_Take_Distinct_Over_Assemblies_If_Not_Passed_An_Array()
+    {
+        var assemblies = new List<Assembly>
+        {
+            Assembly.GetExecutingAssembly(),
+            Assembly.GetExecutingAssembly()
+        };
+        var typeSource = new DefaultTypeSource(assemblies);
+        Assert.Collection(typeSource.GetAssemblies(),
+            a => Assert.Equal(Assembly.GetExecutingAssembly(), a),
+            a => Assert.Equal(Assembly.GetExecutingAssembly(), a));
+    }
 }
 
