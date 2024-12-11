@@ -1,9 +1,7 @@
 using Microsoft.Extensions.Caching.Distributed;
 using Microsoft.Extensions.Caching.Memory;
 using Microsoft.Extensions.Options;
-using Serenity.Extensions;
-
-namespace Serenity.Tests.Extensions;
+namespace Serenity.Extensions;
 
 public class BasePermissionServiceTTests
 {

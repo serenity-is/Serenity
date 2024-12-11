@@ -1,6 +1,6 @@
-﻿using Serenity.CodeGenerator;
+using Serenity.CodeGenerator;
 
-namespace Serenity.Tests.CodeGenerator;
+namespace Serenity.CodeGenerator;
 
 public abstract class BaseTemplateTest
 {

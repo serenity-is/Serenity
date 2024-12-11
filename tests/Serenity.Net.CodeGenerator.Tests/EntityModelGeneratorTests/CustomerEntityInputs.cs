@@ -1,7 +1,5 @@
-﻿
-using Serenity.CodeGenerator;
 
-namespace Serenity.Tests;
+namespace Serenity.CodeGenerator;
 
 public class CustomerEntityInputs : EntityModelInputs
 {

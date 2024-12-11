@@ -1,6 +1,6 @@
 using Serenity.CodeGenerator;
 
-namespace Serenity.Tests;
+namespace Serenity.TestUtils;
 
 public class MockGeneratorConsole : IGeneratorConsole
 {

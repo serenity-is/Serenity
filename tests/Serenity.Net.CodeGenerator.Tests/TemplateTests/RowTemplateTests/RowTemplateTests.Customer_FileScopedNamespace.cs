@@ -1,4 +1,4 @@
-namespace Serenity.Tests.CodeGenerator;
+namespace Serenity.CodeGenerator;
 
 public partial class RowTemplateTests
 {

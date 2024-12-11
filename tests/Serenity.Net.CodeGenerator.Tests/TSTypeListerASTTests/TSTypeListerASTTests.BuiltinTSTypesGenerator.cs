@@ -1,7 +1,6 @@
-using Serenity.CodeGenerator;
 using Serenity.Reflection;
 
-namespace Serenity.Tests.CodeGenerator;
+namespace Serenity.CodeGenerator;
 
 public partial class TSTypeListerASTTests
 {

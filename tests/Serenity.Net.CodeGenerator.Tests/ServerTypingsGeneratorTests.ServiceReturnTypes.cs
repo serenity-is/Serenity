@@ -2,7 +2,7 @@ using Microsoft.AspNetCore.Mvc;
 using System.Threading.Tasks;
 using ServerTypingsTest.ServiceReturnTypes;
 
-namespace Serenity.Tests.CodeGenerator
+namespace Serenity.CodeGeneration
 {
     public partial class ServerTypingsGeneratorTests
     {

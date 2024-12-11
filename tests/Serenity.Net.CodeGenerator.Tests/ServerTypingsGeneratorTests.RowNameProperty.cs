@@ -1,4 +1,4 @@
-namespace Serenity.Tests.CodeGenerator
+namespace Serenity.CodeGeneration
 {
     public partial class ServerTypingsGeneratorTests
     {

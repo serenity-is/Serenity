@@ -1,26 +1,26 @@
-namespace Serenity.Tests.CodeGenerator
+namespace Serenity.CodeGeneration;
+
+public partial class ServerTypingsGeneratorTests
 {
-    public partial class ServerTypingsGeneratorTests
+    [Fact]
+    public void Form_WithUnknownEditorType_Generates_WidgetAny()
     {
-        [Fact]
-        public void Form_WithUnknownEditorType_Generates_WidgetAny()
+        var generator = CreateGenerator(typeof(FormWithUnknownEditor));
+        generator.AddTSType(new()
         {
-            var generator = CreateGenerator(typeof(FormWithUnknownEditor));
-            generator.AddTSType(new()
-            {
-                Name = "Widget",
-                Module = "@serenity-is/corelib",
-                GenericParameters =
-                [
-                    new()
-                    {
-                        Name = "TOptions",
-                    }
-                ]
-            });
-            var result = generator.Run();
-            var code = Assert.Single(result).Text;
-            Assert.Equal(NormalizeTS(@"import { Widget, PrefixedContext, initFormType } from ""@serenity-is/corelib"";
+            Name = "Widget",
+            Module = "@serenity-is/corelib",
+            GenericParameters =
+            [
+                new()
+                {
+                    Name = "TOptions",
+                }
+            ]
+        });
+        var result = generator.Run();
+        var code = Assert.Single(result).Text;
+        Assert.Equal(NormalizeTS(@"import { Widget, PrefixedContext, initFormType } from ""@serenity-is/corelib"";
 
 export interface FormWithUnknownEditor {
     Test: Widget;
@@ -44,13 +44,12 @@ export class FormWithUnknownEditor extends PrefixedContext {
         }
     }
 }"), NormalizeTS(code));
-        }
     }
+}
 
-    [FormScript("FormWithUnknownEditor")]
-    public class FormWithUnknownEditor
-    {
-        [EditorType("UnknownEditorKey")]
-        public string Test { get; set; }
-    }
+[FormScript("FormWithUnknownEditor")]
+public class FormWithUnknownEditor
+{
+    [EditorType("UnknownEditorKey")]
+    public string Test { get; set; }
 }

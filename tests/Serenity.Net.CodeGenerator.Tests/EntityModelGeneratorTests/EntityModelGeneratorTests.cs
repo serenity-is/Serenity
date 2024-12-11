@@ -1,9 +1,8 @@
-using Serenity.CodeGenerator;
-using static Serenity.Tests.CustomerEntityInputs;
+using static Serenity.CodeGenerator.CustomerEntityInputs;
 
-namespace Serenity.Tests.CodeGenerator;
+namespace Serenity.CodeGenerator;
 
-public partial class EntiyModelGeneratorTests
+public partial class EntityModelFactoryTests
 {
     [Fact]
     public void Throws_ArgumentNull_If_Inputs_Is_Null()

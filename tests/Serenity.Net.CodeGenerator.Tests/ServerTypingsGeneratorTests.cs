@@ -1,7 +1,6 @@
 using Mono.Cecil;
-using Serenity.CodeGeneration;
 
-namespace Serenity.Tests.CodeGenerator;
+namespace Serenity.CodeGeneration;
 
 public partial class ServerTypingsGeneratorTests
 {

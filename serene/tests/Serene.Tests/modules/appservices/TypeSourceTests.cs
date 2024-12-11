@@ -1,6 +1,6 @@
 using Microsoft.AspNetCore.Builder;
 
-namespace Serene.Tests;
+namespace Serene;
 
 public class TypeSourceTests
 {

@@ -1,6 +1,6 @@
 using ServerTypingsTest.SomeModule.Entities;
 
-namespace Serenity.Tests.CodeGenerator
+namespace Serenity.CodeGeneration
 {
     public partial class ServerTypingsGeneratorTests
     {

@@ -1,11 +1,10 @@
 using Serenity.JsonConverters;
-using Serenity.TypeScript;
 using System.IO;
 using System.Text.Json;
 using System.Text.Json.Serialization;
 using Xunit.Sdk;
 
-namespace Serenity.Tests.CodeGenerator;
+namespace Serenity.TypeScript;
 
 public partial class TypeScriptTests
 {

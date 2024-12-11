@@ -1,8 +1,7 @@
-using static Serenity.Tests.CustomerEntityInputs;
-using Serenity.CodeGenerator;
+using static Serenity.CodeGenerator.CustomerEntityInputs;
 using Serenity.Data.Schema;
 
-namespace Serenity.Tests;
+namespace Serenity.CodeGenerator;
 
 public class CustomerDataSchema : IEntityDataSchema
 {

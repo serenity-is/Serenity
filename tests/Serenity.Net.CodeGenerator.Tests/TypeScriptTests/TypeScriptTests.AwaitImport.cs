@@ -1,6 +1,4 @@
-using Serenity.TypeScript;
-
-namespace Serenity.Tests.CodeGenerator;
+namespace Serenity.TypeScript;
 
 public partial class TypeScriptTests
 {

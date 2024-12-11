@@ -1,8 +1,7 @@
-using Serenity.CodeGenerator;
 using Xunit.Sdk;
-using CallType = Serenity.Tests.MockGeneratorConsole.CallType;
+using CallType = Serenity.TestUtils.MockGeneratorConsole.CallType;
 
-namespace Serenity.Tests.CodeGenerator;
+namespace Serenity.CodeGenerator;
 
 public partial class CliTests
 {

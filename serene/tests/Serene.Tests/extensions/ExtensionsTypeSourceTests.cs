@@ -1,6 +1,4 @@
-using Serenity.Extensions;
-
-namespace Serenity.Tests.Extensions;
+namespace Serenity.Extensions;
 
 public class ExtensionsTypeSourceTests
 {
