@@ -1,6 +1,6 @@
-namespace Serenity.Tests.ComponentModel;
+namespace Serenity.ComponentModel;
 
-public class DateTimeAttributeTests
+public class DateTimeFormatterAttributeTests
 {
     [Fact]
     public void FormatterType_ShouldBe_DateTime()

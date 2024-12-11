@@ -8,7 +8,7 @@ using SixLabors.ImageSharp.PixelFormats;
 using System.IO;
 using MockFileData = System.IO.Abstractions.TestingHelpers.MockFileData;
 
-namespace Serenity.Tests.Web;
+namespace Serenity.Web;
 
 public partial class DefaultUploadProcessorTests
 {

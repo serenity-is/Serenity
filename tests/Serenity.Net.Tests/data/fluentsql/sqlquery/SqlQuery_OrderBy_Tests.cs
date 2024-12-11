@@ -1,4 +1,4 @@
-namespace Serenity.Tests.Data;
+namespace Serenity.Data;
 
 public partial class SqlQuery_OrderBy_Tests
 {

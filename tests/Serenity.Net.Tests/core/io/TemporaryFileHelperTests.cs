@@ -1,7 +1,6 @@
-using Serenity.IO;
 using MockFile = System.IO.Abstractions.TestingHelpers.MockFileData;
 
-namespace Serenity.Tests.IO;
+namespace Serenity.IO;
 
 public class TemporaryFileHelperTests
 {

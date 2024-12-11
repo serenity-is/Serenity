@@ -1,4 +1,4 @@
-﻿namespace Serenity.Tests.Entities;
+namespace Serenity.TestUtils;
 
 [TableName("ComplexTable")]
 public class ComplexRow : Row<ComplexRow.RowFields>

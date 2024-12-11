@@ -1,4 +1,4 @@
-namespace Serenity.Tests.Data;
+namespace Serenity.Data;
 
 public class SqlQuery_Oracle12cDialect_Tests
 {

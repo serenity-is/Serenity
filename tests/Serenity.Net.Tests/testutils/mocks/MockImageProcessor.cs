@@ -1,6 +1,6 @@
 using System.IO;
 
-namespace Serenity.Tests;
+namespace Serenity.TestUtils;
 
 public class MockUploadProcessor : IUploadProcessor
 {

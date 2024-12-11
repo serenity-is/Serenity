@@ -1,4 +1,4 @@
-namespace Serenity.Tests.ComponentModel;
+namespace Serenity.Web;
 
 public class LocalTextPackagesTests
 {

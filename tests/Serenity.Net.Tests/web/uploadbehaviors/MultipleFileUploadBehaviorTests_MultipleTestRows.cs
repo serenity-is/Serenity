@@ -1,4 +1,4 @@
-namespace Serenity.Tests.Web;
+namespace Serenity.Services;
 
 public partial class MultipleFileUploadBehaviorTests
 {

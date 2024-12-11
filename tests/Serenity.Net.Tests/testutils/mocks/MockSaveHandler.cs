@@ -1,4 +1,4 @@
-﻿namespace Serenity.Tests;
+﻿namespace Serenity.TestUtils;
 
 public class MockSaveHandler<TRow> : ISaveRequestHandler
     where TRow: IRow, new()

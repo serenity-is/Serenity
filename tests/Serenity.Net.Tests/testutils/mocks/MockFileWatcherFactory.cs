@@ -1,4 +1,4 @@
-namespace Serenity.Tests;
+namespace Serenity.TestUtils;
 
 public class MockFileWatcherFactory(System.IO.Abstractions.IFileSystem fileSystem) : IFileWatcherFactory
 {

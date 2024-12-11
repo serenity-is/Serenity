@@ -1,7 +1,7 @@
-﻿using Microsoft.Extensions.Caching.Distributed;
+using Microsoft.Extensions.Caching.Distributed;
 using Microsoft.Extensions.Caching.Memory;
 
-namespace Serenity.Tests.Caching;
+namespace Serenity;
 
 public class TwoLevelCacheTests
 {

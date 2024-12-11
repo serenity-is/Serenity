@@ -1,6 +1,6 @@
 ﻿using System.Data.Common;
 
-namespace Serenity.Tests;
+namespace Serenity.TestUtils;
 
 public class MockDbParameter : DbParameter
 {

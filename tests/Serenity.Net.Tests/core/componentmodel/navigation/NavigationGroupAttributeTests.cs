@@ -1,6 +1,4 @@
-using Serenity.Navigation;
-
-namespace Serenity.Tests.ComponentModel;
+namespace Serenity.Navigation;
 
 public class NavigationGroupAttributeTests
 {

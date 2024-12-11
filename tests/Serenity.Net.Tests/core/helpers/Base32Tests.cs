@@ -1,6 +1,6 @@
 using System.Security.Cryptography;
 
-namespace Serenity.Tests.Helpers;
+namespace Serenity.Data;
 
 public class Base32Tests
 {

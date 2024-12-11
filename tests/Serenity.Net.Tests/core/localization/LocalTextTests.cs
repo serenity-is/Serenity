@@ -1,4 +1,4 @@
-namespace Serenity.Tests.Localization;
+namespace Serenity;
 
 public class LocalTextTests
 {

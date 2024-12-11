@@ -1,4 +1,4 @@
-namespace Serenity.Tests.Authorization;
+namespace Serenity.Web;
 
 public class LogicOperatorPermissionServiceTests
 {

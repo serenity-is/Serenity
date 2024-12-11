@@ -2,7 +2,7 @@
 using System.Threading;
 using System.Threading.Tasks;
 
-namespace Serenity.Tests;
+namespace Serenity.TestUtils;
 
 public class NullDistributedCache : IDistributedCache
 {

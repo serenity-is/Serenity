@@ -1,7 +1,7 @@
 using Microsoft.Extensions.Options;
 using System.IO;
 
-namespace Serenity.Tests.Web;
+namespace Serenity.Web;
 
 public partial class DefaultUploadValidatorTests
 {

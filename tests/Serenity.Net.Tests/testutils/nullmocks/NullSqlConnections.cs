@@ -1,5 +1,5 @@
 
-namespace Serenity.Tests;
+namespace Serenity.TestUtils;
 
 public class NullSqlConnections : ISqlConnections
 {

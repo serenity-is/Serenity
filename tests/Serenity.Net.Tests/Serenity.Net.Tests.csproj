@@ -11,5 +11,6 @@
     <Using Include="Microsoft.AspNetCore.Routing" />
     <Using Include="Microsoft.Extensions.FileProviders" />
     <Using Include="Microsoft.Extensions.Primitives" />
+    <Using Include="Serenity.TestUtils" />
   </ItemGroup>
 </Project>

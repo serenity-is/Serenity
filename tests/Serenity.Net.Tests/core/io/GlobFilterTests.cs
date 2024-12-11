@@ -1,6 +1,4 @@
-﻿using Serenity.IO;
-
-namespace Serenity.Tests.IO;
+namespace Serenity.IO;
 
 public class GlobFilterTests
 {

@@ -4,7 +4,7 @@ using System.Threading.Tasks;
 using TSQL.Statements;
 using TSQL.Tokens;
 
-namespace Serenity.Tests;
+namespace Serenity.TestUtils;
 
 public class MockDbDataReader : DbDataReader
 {

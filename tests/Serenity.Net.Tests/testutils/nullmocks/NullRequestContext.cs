@@ -1,4 +1,4 @@
-namespace Serenity.Tests;
+namespace Serenity.TestUtils;
 
 public class NullRequestContext(IBehaviorProvider behaviors = null,
     ITwoLevelCache cache = null,

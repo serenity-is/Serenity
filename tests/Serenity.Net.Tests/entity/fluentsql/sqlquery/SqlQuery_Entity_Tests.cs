@@ -1,6 +1,4 @@
-using Serenity.Tests.Entities;
-
-namespace Serenity.Tests.Entity;
+namespace Serenity.Data;
 
 public partial class SqlQuery_Entity_Tests
 {

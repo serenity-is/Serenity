@@ -1,6 +1,6 @@
 using System.Collections;
 
-namespace Serenity.Tests;
+namespace Serenity.TestUtils;
 
 public class MockDirectoryContents(System.IO.Abstractions.IFileSystem fileSystem, string path) : IDirectoryContents
 {

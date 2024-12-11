@@ -1,6 +1,6 @@
-﻿using System.Security.Principal;
+using System.Security.Principal;
 
-namespace Serenity.Tests.Authorization;
+namespace Serenity;
 
 public class AuthorizationExtensionsTests
 {
@@ -9,7 +9,6 @@ public class AuthorizationExtensionsTests
     {
         Assert.False(((IUserAccessor)null).IsLoggedIn());
     }
-
 
     [Fact]
     public void IsLoggedIn_Returns_False_If_UserAccessor_User_Property_IsNull()

@@ -1,7 +1,6 @@
-using Serenity.JsonConverters;
 using System.Text.Json;
 
-namespace Serenity.Tests.Json;
+namespace Serenity.JsonConverters;
 
 public partial class JsonLargeLongConverterTests
 {

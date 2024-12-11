@@ -4,5 +4,6 @@
     <ProjectReference Include="..\..\src\Serenity.Net.Web\Serenity.Net.Web.csproj" />
     <PackageReference Include="CSharpMinifier" Version="1.2.1" />
     <Compile Include="..\Serenity.Net.Tests\testutils\mocks\MockFileSystem.cs" Link="testutils/mocks/%(RecursiveDir)%(Filename)%(Extension)"/>
+    <Using Include="Serenity.TestUtils" />
   </ItemGroup>
 </Project>

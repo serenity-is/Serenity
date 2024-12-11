@@ -2,7 +2,7 @@ using Stream = System.IO.Stream;
 using IOException = System.IO.IOException;
 using SearchOption = System.IO.SearchOption;
 
-namespace Serenity.Tests;
+namespace Serenity.TestUtils;
 
 public class MockFileSystem(string currentDirectory = "") : 
     System.IO.Abstractions.TestingHelpers.MockFileSystem(null, currentDirectory), IFileSystem

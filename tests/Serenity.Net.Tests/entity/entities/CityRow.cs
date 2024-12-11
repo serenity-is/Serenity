@@ -1,4 +1,4 @@
-﻿namespace Serenity.Tests.Entities;
+namespace Serenity.TestUtils;
 
 [TableName("Cities")]
 public class CityRow : Row<CityRow.RowFields>, IIdRow, INameRow

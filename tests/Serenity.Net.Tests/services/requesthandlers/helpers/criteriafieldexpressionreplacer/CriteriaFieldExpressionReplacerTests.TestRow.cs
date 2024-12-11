@@ -1,4 +1,4 @@
-﻿namespace Serenity.Tests.Services;
+namespace Serenity.Data;
 
 public partial class CriteriaFieldExpressionReplacerTests
 {

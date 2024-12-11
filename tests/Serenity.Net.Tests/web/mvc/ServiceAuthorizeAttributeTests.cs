@@ -1,4 +1,4 @@
-namespace Serenity.Tests.Web.Mvc;
+namespace Serenity.Services;
 
 public class ServiceAuthorizeAttributeTests
 {

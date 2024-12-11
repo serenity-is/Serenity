@@ -1,7 +1,7 @@
 ﻿using System.Collections;
 using System.Data.Common;
 
-namespace Serenity.Tests;
+namespace Serenity.TestUtils;
 
 public class MockDbParameterCollection : DbParameterCollection
 {

@@ -1,4 +1,4 @@
-namespace Serenity.Tests.ComponentModel;
+namespace Serenity.ComponentModel;
 
 public class LookupFilteringAttributeTests
 {
@@ -37,7 +37,7 @@ public class LookupFilteringAttributeTests
     public void Constructor_AutoGeneratesLookupKey_IfLookupKeyIsNull()
     {
         var attr = new LookupFilteringAttribute(typeof(WithNullKey));
-        Assert.Equal("Tests.ComponentModel.WithNullKey", attr.LookupKey);
+        Assert.Equal("ComponentModel.WithNullKey", attr.LookupKey);
     }
 
     [Fact]

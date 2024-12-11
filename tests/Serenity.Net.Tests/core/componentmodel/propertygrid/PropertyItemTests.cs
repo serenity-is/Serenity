@@ -1,4 +1,4 @@
-namespace Serenity.Tests.ComponentModel;
+namespace Serenity.ComponentModel;
 
 public class PropertyItemTests
 {
@@ -141,8 +141,8 @@ public class PropertyItemTests
     {
         var editorAddons = new List<EditorAddonItem>
         {
-            new EditorAddonItem { },
-            new EditorAddonItem { }
+            new() { },
+            new() { }
         };
         var data = new PropertyItem
         {

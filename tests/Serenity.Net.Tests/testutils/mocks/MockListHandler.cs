@@ -1,4 +1,4 @@
-namespace Serenity.Tests;
+namespace Serenity.TestUtils;
 
 public class MockListHandler<TRow> : IListRequestProcessor, IRequestType<ListRequest>
     where TRow: IRow, new()

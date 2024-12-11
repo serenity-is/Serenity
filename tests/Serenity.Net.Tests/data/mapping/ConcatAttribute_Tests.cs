@@ -1,4 +1,4 @@
-﻿namespace Serenity.Tests.Data;
+namespace Serenity.Data.Mapping;
 
 using Concat = ConcatAttribute;
 

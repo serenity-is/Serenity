@@ -1,4 +1,4 @@
-namespace Serenity.Tests;
+namespace Serenity.TestUtils;
 
 public class MockUploadStorage(DiskUploadStorageOptions options,
     MockDiskUploadFileSystem fileSystem) : DiskUploadStorage(options, fileSystem ?? throw new ArgumentNullException(nameof(fileSystem)))

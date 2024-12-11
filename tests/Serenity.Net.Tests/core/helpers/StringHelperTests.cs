@@ -1,6 +1,6 @@
 using System.Globalization;
 
-namespace Serenity.Tests.Helpers;
+namespace Serenity;
 
 public class StringHelperTests
 {

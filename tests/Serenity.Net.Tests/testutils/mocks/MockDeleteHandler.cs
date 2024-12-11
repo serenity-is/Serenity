@@ -1,4 +1,4 @@
-﻿namespace Serenity.Tests;
+﻿namespace Serenity.TestUtils;
 
 public class MockDeleteHandler<TRow> : IDeleteRequestHandler
     where TRow: IRow, new()

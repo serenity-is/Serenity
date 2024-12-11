@@ -1,4 +1,4 @@
-namespace Serenity.Tests;
+namespace Serenity.TestUtils;
 
 public class MockFileProvider(string root = @"/Testing/Test/", System.IO.Abstractions.IFileSystem fileSystem = null) : IFileProvider
 {

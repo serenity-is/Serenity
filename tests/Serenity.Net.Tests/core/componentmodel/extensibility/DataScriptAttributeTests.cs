@@ -1,4 +1,4 @@
-namespace Serenity.Tests.ComponentModel;
+namespace Serenity.ComponentModel;
 
 public class DataScriptAttributeTests
 {
@@ -108,7 +108,7 @@ public class DataScriptAttributeTests
     {
         var type = typeof(MyClassWithoutModule);
         var result = DataScriptAttribute.AutoKeyFor(type);
-        Assert.Equal("Tests.ComponentModel.MyClassWithoutModule", result);
+        Assert.Equal("ComponentModel.MyClassWithoutModule", result);
     }
 
     [Fact]

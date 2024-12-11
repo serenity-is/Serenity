@@ -1,4 +1,4 @@
-namespace Serenity.Tests.Data;
+namespace Serenity.Data;
 
 public class SqlQuery_Distinct_Tests
 {

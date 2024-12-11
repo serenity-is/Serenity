@@ -4,7 +4,7 @@ using SixLabors.ImageSharp.Formats.Png;
 using SixLabors.ImageSharp.PixelFormats;
 using MockFileData = System.IO.Abstractions.TestingHelpers.MockFileData;
 
-namespace Serenity.Tests.Web;
+namespace Serenity.Services;
 
 public partial class MultipleFileUploadBehaviorTests
 {

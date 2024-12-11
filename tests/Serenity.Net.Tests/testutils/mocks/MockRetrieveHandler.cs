@@ -1,4 +1,4 @@
-﻿namespace Serenity.Tests;
+﻿namespace Serenity.TestUtils;
 
 public class MockRetrieveHandler<TRow> : IRetrieveRequestHandler
     where TRow: IRow, new()

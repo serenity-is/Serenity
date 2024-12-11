@@ -1,4 +1,4 @@
-namespace Serenity.Tests;
+namespace Serenity.TestUtils;
 
 public class MockRequestContext(IBehaviorProvider behaviors = null,
     ITwoLevelCache cache = null,

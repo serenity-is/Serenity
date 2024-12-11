@@ -1,6 +1,6 @@
 using System.Security.Principal;
 
-namespace Serenity.Tests;
+namespace Serenity.TestUtils;
 
 public class MockUserAccessor : IUserAccessor
 {

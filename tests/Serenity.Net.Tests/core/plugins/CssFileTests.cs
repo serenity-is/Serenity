@@ -1,6 +1,4 @@
-using Serenity.Plugins;
-
-namespace Serenity.Tests.Plugins;
+namespace Serenity.Plugins;
 
 public class CssFileTests
 {

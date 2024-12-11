@@ -1,4 +1,4 @@
-﻿namespace Serenity.Tests.Services;
+namespace Serenity.Services;
 
 public partial class ListRequestHandlerTests
 {

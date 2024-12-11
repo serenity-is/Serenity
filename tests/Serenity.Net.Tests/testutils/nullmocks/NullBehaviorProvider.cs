@@ -1,6 +1,6 @@
 ﻿using System.Collections;
 
-namespace Serenity.Tests;
+namespace Serenity.TestUtils;
 
 public class NullBehaviorProvider : IBehaviorProvider
 {

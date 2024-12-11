@@ -1,7 +1,6 @@
 using Serenity.Localization;
-using Serenity.PropertyGrid;
 
-namespace Serenity.Tests.Entity;
+namespace Serenity.PropertyGrid;
 
 public partial class BasicPropertyProcessorTests
 {

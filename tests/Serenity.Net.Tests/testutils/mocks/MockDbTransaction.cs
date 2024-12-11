@@ -1,4 +1,4 @@
-namespace Serenity.Tests;
+namespace Serenity.TestUtils;
 
 internal class MockDbTransaction(IDbConnection dbConnection) : IDbTransaction
 {

@@ -1,6 +1,6 @@
-﻿using Newtonsoft.Json.Converters;
+using Newtonsoft.Json.Converters;
 
-namespace Serenity.Tests.Json;
+namespace Serenity;
 
 public partial class JsonSettingsTests
 {

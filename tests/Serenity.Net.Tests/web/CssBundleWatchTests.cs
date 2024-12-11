@@ -1,4 +1,4 @@
-namespace Serenity.Tests.Web;
+namespace Serenity.Web;
 
 public class CssBundleWatchTests
 {

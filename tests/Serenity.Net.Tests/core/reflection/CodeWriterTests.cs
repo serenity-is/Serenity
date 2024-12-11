@@ -1,6 +1,4 @@
-﻿using Serenity.Reflection;
-
-namespace Serenity.Tests.Reflection;
+namespace Serenity.Reflection;
 
 public class CodeWriterTests
 {

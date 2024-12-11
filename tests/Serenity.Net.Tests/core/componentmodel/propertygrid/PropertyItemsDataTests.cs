@@ -1,4 +1,4 @@
-namespace Serenity.Tests.ComponentModel;
+namespace Serenity.ComponentModel;
 
 public class PropertyItemsDataTests
 {
@@ -6,7 +6,7 @@ public class PropertyItemsDataTests
     [Fact]
     public void Items_ShouldBeInitializedCorrectly()
     {
-        var items = new List<PropertyItem> { new PropertyItem(), new PropertyItem() };
+        var items = new List<PropertyItem> { new(), new() };
         var data = new PropertyItemsData
         {
             Items = items
@@ -17,7 +17,7 @@ public class PropertyItemsDataTests
     [Fact]
     public void AdditionalItems_ShouldBeInitializedCorrectly()
     {
-        var additionalItems = new List<PropertyItem> { new PropertyItem(), new PropertyItem() };
+        var additionalItems = new List<PropertyItem> { new(), new() };
         var data = new PropertyItemsData
         {
             AdditionalItems = additionalItems

@@ -1,4 +1,4 @@
-namespace Serenity.Tests.Entity;
+namespace Serenity.Data;
 
 public class RowDialectExpressionTests
 {

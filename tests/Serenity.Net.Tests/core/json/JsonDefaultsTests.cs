@@ -1,6 +1,6 @@
 using System.Text.Json;
 
-namespace Serenity.Tests.Json;
+namespace Serenity;
 
 public partial class JsonDefaultsTests
 {

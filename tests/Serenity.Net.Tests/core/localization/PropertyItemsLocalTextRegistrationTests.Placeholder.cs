@@ -1,6 +1,4 @@
-using Serenity.Localization;
-
-namespace Serenity.Tests.Localization;
+namespace Serenity.Localization;
 
 public partial class PropertyItemsLocalTextRegistrationTests
 {

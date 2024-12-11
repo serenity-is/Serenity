@@ -1,4 +1,4 @@
-namespace Serenity.Tests.Services;
+namespace Serenity.Extensions.DependencyInjection;
 
 public class ServiceCollectionExtensions_AddCustomRequestHandlersTests
 {
