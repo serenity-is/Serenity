@@ -1,4 +1,5 @@
 import { Decorators, EntityGrid } from "@serenity-is/corelib";
+import { RegionDialog } from "../Region/RegionDialog";
 import { TerritoryColumns, TerritoryRow, TerritoryService } from "../ServerTypes/Demo";
 import { TerritoryDialog } from "./TerritoryDialog";
 
@@ -9,3 +10,5 @@ export class TerritoryGrid<P = {}> extends EntityGrid<TerritoryRow, P> {
     protected getRowDefinition() { return TerritoryRow; }
     protected getService() { return TerritoryService.baseUrl; }
 }
+
+[RegionDialog]
