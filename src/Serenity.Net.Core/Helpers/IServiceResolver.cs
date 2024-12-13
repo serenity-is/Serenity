@@ -12,4 +12,10 @@ public interface IServiceResolver<TService>
     /// </summary>
     /// <returns>TService instance</returns>
     TService Resolve();
+
+    /// <summary>
+    /// Resolves TService using the service provider. If the service was registered as transient, this method acts like a factory.
+    /// </summary>
+    /// <returns>TService instance if it is registered, otherwise null</returns>
+    TService? TryResolve();
 }
