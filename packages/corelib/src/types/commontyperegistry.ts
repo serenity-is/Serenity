@@ -102,6 +102,21 @@ export function commonTypeRegistry<TType = any>(props: {
 
         if (key && Config.lazyTypeLoader) {
             let promise = Config.lazyTypeLoader(key, kind as any);
+
+            if (!promise && suffix) {
+                promise = Config.lazyTypeLoader(key + suffix, kind as any);
+            }
+
+            if (!promise) {
+                for (var ns of Config.rootNamespaces) {
+                    const k = ns + "." + key;
+                    if (promise = Config.lazyTypeLoader(k, kind as any))
+                        break;
+                    if (suffix && (promise = Config.lazyTypeLoader(k + suffix, kind as any)))
+                        break;
+                }                
+            }
+            
             if (isPromiseLike(promise)) {
                 return promise.then(t => {
                     if (t && isMatch(t)) {

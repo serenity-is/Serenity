@@ -1,4 +1,5 @@
 export * from "./ServerTypes/Extensions";
+export * from "./ServerTypes/LazyTypeLoader";
 export * from "./ServerTypes/Reporting";
 export * from "./ServerTypes/Texts";
 export * from "./BulkActions/BasicProgressDialog";

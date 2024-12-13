@@ -9,7 +9,7 @@ namespace Serenity.CodeGeneration
         {
             var generator = CreateGenerator(typeof(TypeWithDynamicMember));
             var files = generator.Run();
-            var actual = Assert.Single(files).Text;
+            var actual = Assert.Single(ExceptGenericFiles(files)).Text;
             Assert.Equal(NormalizeTS(@"export interface TypeWithDynamicMember {
     SomeDynamic?: any;
 }"), NormalizeTS(actual));

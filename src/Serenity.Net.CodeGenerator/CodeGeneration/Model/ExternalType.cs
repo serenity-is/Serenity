@@ -14,6 +14,7 @@ public class ExternalType
     public List<ExternalGenericParameter> GenericParameters { get; set; }
     public bool? IsAbstract { get; set; }
     public bool? IsDeclaration { get; set; }
+    public bool? IsEnum { get; set; }
     public bool? IsInterface { get; set; }
     public bool? IsIntersectionType { get; set; }
 

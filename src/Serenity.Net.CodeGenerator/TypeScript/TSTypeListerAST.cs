@@ -620,7 +620,8 @@ public class TSTypeListerAST
         {
             Namespace = GetNamespace(enumDec),
             Name = GetText(enumDec.Name),
-            IsDeclaration = IsUnderAmbientNamespace(enumDec) ? true : null
+            IsDeclaration = IsUnderAmbientNamespace(enumDec) ? true : null,
+            IsEnum = true
         };
 
         return result;

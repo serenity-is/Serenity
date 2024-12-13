@@ -34,7 +34,8 @@ public partial class ServerTypingsGenerator : TypingsGeneratorBase
 
         if (LocalTexts)
             GenerateTexts();
-        
+
+        GenerateLazyTypeLoader();
         GenerateScriptDataKeys();
 
         if (ModuleReExports)
