@@ -1,7 +1,7 @@
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 
-namespace Serenity.Web;
+namespace Serenity.Extensions.DependencyInjection;
 
 /// <summary>
 /// DI extension methods related to configuration and options

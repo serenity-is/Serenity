@@ -1,8 +1,9 @@
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.DependencyInjection.Extensions;
+using Serenity.Web;
 
-namespace Serenity.Web;
+namespace Serenity.Extensions.DependencyInjection;
 
 /// <summary>
 /// DI extension methods related to upload services

@@ -1,6 +1,7 @@
 using Microsoft.AspNetCore.Builder;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.DependencyInjection.Extensions;
+using Serenity.Extensions.DependencyInjection;
 using Serenity.PropertyGrid;
 using Serenity.Reflection;
 using System.IO;

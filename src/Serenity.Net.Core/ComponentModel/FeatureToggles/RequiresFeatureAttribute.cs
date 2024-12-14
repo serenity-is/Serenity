@@ -13,11 +13,8 @@ public class RequiresFeatureAttribute : Attribute
     /// <param name="features">The names of the features that the attribute will represent.</param>
     public RequiresFeatureAttribute(params string[] features)
     {
-
         if (features == null || features.Length == 0)
-        {
             throw new ArgumentNullException(nameof(features));
-        }
 
         Features = features;
     }
@@ -29,26 +26,9 @@ public class RequiresFeatureAttribute : Attribute
     public RequiresFeatureAttribute(params object[] features)
     {
         if (features == null || features.Length == 0)
-        {
             throw new ArgumentNullException(nameof(features));
-        }
 
-        var fs = new List<string>();
-
-        foreach (object feature in features)
-        {
-            var type = feature.GetType();
-
-            if (!type.IsEnum)
-            {
-                // invalid
-                throw new ArgumentException("The provided features must be enums.", nameof(features));
-            }
-
-            fs.Add(Enum.GetName(feature.GetType(), feature));
-        }
-
-        Features = fs;
+        Features = features.Select(FeatureTogglesExtensions.ToFeatureKey);
     }
 
     /// <summary>

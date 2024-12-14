@@ -13,7 +13,7 @@ public class ConfigurationFeatureToggles(IConfiguration configuration,
     object[]? disableByDefault = null) : IFeatureToggles
 {
     private readonly HashSet<string>? disableByDefault = disableByDefault != null ?
-        new HashSet<string>(disableByDefault.Select(FeatureToString)) : null;
+        new HashSet<string>(disableByDefault.Select(FeatureTogglesExtensions.ToFeatureKey)) : null;
 
     /// <inheritdoc />
     public bool IsEnabled(string feature)
@@ -31,27 +31,6 @@ public class ConfigurationFeatureToggles(IConfiguration configuration,
         }
 
         return b;
-    }
-
-    private static string FeatureToString(object feature)
-    {
-        if (feature == null)
-            throw new ArgumentNullException(nameof(feature));
-
-        if (feature is string s)
-        {
-            if (string.IsNullOrEmpty(s))
-                throw new ArgumentException("Feature key cannot be empty.", nameof(feature));
-
-            return s;
-        }
-
-        var type = feature.GetType();
-
-        if (!type.IsEnum)
-            throw new ArgumentException("The provided features must be enums.", nameof(feature));
-
-        return Enum.GetName(feature.GetType(), feature);
     }
 }
 
