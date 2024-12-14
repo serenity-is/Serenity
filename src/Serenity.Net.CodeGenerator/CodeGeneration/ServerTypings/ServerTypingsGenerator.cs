@@ -35,7 +35,8 @@ public partial class ServerTypingsGenerator : TypingsGeneratorBase
         if (LocalTexts)
             GenerateTexts();
 
-        GenerateLazyTypeLoader();
+        // Disable lazy type loader until excessive chunking is resolved
+        // GenerateLazyTypeLoader();
         GenerateScriptDataKeys();
 
         if (ModuleReExports)
