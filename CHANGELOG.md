@@ -1,3 +1,22 @@
+## 8.8.2 (2024-12-15)
+
+- New `services.AddApplicationPartsFeatureToggles` extension that should be used in Startup instead of `services.AddFeatureToggles`. This also scans enum types with [FeatureKeySet] attribute in application parts, and disables features that have a [DefaultValue(false)] attribute on them by default. It also discovers dependencies between features themselves (for example a DataAuditLog_Services sub feature might depend on a DataAuditLog feature, e.g. disabling it also disables all sub features) so it is recommended to switch to AddApplicationPartsFeatureToggles.
+- Add ability to declare dependencies between feature flags themselves by adding RequiresFeature attribute to the FeatureKeys enum members, or the enum itself. For it to work, AddApplicationPartsFeatureToggles should be used, or the dependencyMap argument of AddFeatureToggles must be passed manually.
+- Add a new argument (disabledByDefault) to AddFeatureToggles method to pass a list of feature toggle keys (enums or strings) to disable by default without having to set in configuration. The default will be used if the flag is not specified in the configuration, e.g. it will not override the configuration setting. It is also possible to pass ["*"] to disable all features by default, but is not recommended as it would mean when we add a new feature flag in the future (not necessarily a new feature, just a new toggle to disable some part of a feature), all users would have to enable it manually in configuration.
+- Take distinct over assemblies for classic type source (DefaultTypeSource) if the passed enumerable of assemblies is an array.
+- Automatically add common namespaces like System.Collections.Generic, Serenity, Serenity.ComponentModel etc. to usings from Serenity.Net.Web.targets (e.g. any project referencing Serenity.Web) unless SerenityUsings property is explicitly set to false. This means most `Using` items from StartSharp/Serene projects might be removed.
+- Add a helper function (GetDataConnectionString) to get data connections string from IConfiguration in Startup where IConnectionStrings is not yet available. Use it only for initialization of exception log.
+- Remove react patching function that checks React is loaded after corelib, as we no longer use global react object
+- Only create databases under App_Data for SqlLocalDB (e.g. `(localdb)`), not for local SQL server etc.
+- Use MySqlConnector instead of MySql.Data which should be faster
+- Add code generation support for Oracle to Sergen
+- Create Northwind tables via fluent syntax instead of manually written SQL scripts. There is no separate autoincrement ID column in Customers table now (e.g. only CustomerID which is a string), and space in "Order Details" is removed, so there are some breaking changes. Northwind sample database should be recreated.
+
+### Bugfixes
+
+- Remove invalid RequiresFeature attribute from Pro.Extensions assembly.
+- Side effect import Region dialog from TerritoryGrid to resolve issue with clicking secondary edit link on Region
+
 ## 8.8.1 (2024-12-01)
 
 ### Bugfixes

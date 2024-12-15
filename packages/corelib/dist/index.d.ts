@@ -1,5 +1,133 @@
 import { Column, EventEmitter, FormatterContext, FormatterResult, Grid, GridOptions, Group, GroupItemMetadataProvider, GroupTotals } from '@serenity-is/sleekgrid';
 
+export interface UserDefinition {
+	/**
+	 * Username of the logged user
+	 */
+	Username?: string;
+	/**
+	 * Display name of the logged user
+	 */
+	DisplayName?: string;
+	/**
+	 * This indicates that the user is a super "admin", e.g. assumed to have all the permissions available.
+	 * It does not mean a member of Administrators, who might not have some of the permissions */
+	IsAdmin?: boolean;
+	/**
+	 * A hashset of permission keys that the current user have, explicitly assigned or via its
+	 * roles. Note that client side permission checks should only be used for UI enable/disable etc.
+	 * You should not rely on client side permission checks and always re-check permissions server side.
+	 */
+	Permissions?: {
+		[key: string]: boolean;
+	};
+}
+/**
+ * Contains permission related functions.
+ *
+ * ## Note
+ * We use a namespace here both for compatibility and for allowing users to override
+ * these functions easily in ES modules environment, which is normally hard to do.
+ */
+export declare namespace Authorization {
+	/**
+	 * Checks if the current user has the permission specified.
+	 * This should only be used for UI purposes and it is strongly recommended to check permissions server side.
+	 *
+	 * > Please prefer the `hasPermissionAsync` variant as this may block the UI thread if the `UserData` script is not already loaded.
+	 * @param permission Permission key. It may contain logical operators like A&B|C.
+	 * @returns `false` for "null or undefined", true for "*", `IsLoggedIn` for "?". For other permissions,
+	 * if the user has the permission or if the user has the `IsAdmin` flag (super admin) `true`, otherwise `false`.
+	 */
+	function hasPermission(permission: string): boolean;
+	/**
+	 * Checks if the current user has the permission specified.
+	 * This should only be used for UI purposes and it is strongly recommended to check permissions server side.
+	 *
+	 * @param permission Permission key. It may contain logical operators like A&B|C.
+	 * @returns `false` for "null or undefined", true for "*", `IsLoggedIn` for "?". For other permissions,
+	 * if the user has the permission or if the user has the `IsAdmin` flag (super admin) `true`, otherwise `false`.
+	 */
+	function hasPermissionAsync(permission: string): Promise<boolean>;
+	/**
+	 * Checks if the hashset contains the specified permission, also handling logical "|" and "&" operators
+	 * @param permissionSet Set of permissions
+	 * @param permission Permission key or a permission expression containing & | operators
+	 * @returns true if set contains permission
+	 */
+	function isPermissionInSet(permissionSet: {
+		[key: string]: boolean;
+	}, permission: string): boolean;
+	/**
+	 * Throws an error if the current user does not have the specified permission.
+	 * Prefer `await validatePermissionAsync()` as this one might block the UI if the `UserData`
+	 * is not already loaded.
+	 * @param permission Permission key. It may contain logical operators like A&B|C.
+	 */
+	function validatePermission(permission: string): void;
+	/**
+	* Throws an error if the current user does not have the specified permission.
+	* @param permission Permission key. It may contain logical operators like A&B|C.
+	* @example
+	* await Authorization.validatePermissionAsync("A&B|C");
+	*/
+	function validatePermissionAsync(permission: string): Promise<void>;
+}
+export declare namespace Authorization {
+	/**
+	 * Checks if the current user is logged in. Prefer `isLoggedInAsync` as this one might block the UI if the `UserData`
+	 * is not already loaded.
+	 * @returns `true` if the user is logged in, `false` otherwise.
+	 * @example
+	 * if (Authorization.isLoggedIn) {
+	 *     // do something
+	 * }
+	 */
+	let isLoggedIn: boolean;
+	/**
+	 * Checks if the current user is logged in.
+	 * @returns `true` if the user is logged in, `false` otherwise.
+	 * @example
+	 * if (await Authorization.isLoggedInAsync) {
+	 *     // do something
+	 * }
+	 */
+	let isLoggedInAsync: Promise<boolean>;
+	/** Returns the username for currently logged user. Prefer `usernameAsync` as this one might block the UI if the `UserData`
+	 * is not already loaded.
+	 * @returns Username for currently logged user.
+	 * @example
+	 * if (Authorization.username) {
+	 *     // do something
+	 * }
+	 */
+	let username: string;
+	/** Returns the username for currently logged user.
+	 * @returns Username for currently logged user.
+	 * @example
+	 * if (await Authorization.usernameAsync) {
+	 *     // do something
+	 * }
+	 */
+	let usernameAsync: Promise<string>;
+	/** Returns the user data for currently logged user. Prefer `userDefinitionAsync` as this one might block the UI if the `UserData`
+	 * is not already loaded.
+	 * @returns User data for currently logged user.
+	 * @example
+	 * if (Authorization.userDefinition.IsAdmin) {
+	 *     // do something
+	 * }
+	 */
+	let userDefinition: UserDefinition;
+	/** Returns the user data for currently logged user.
+	 * @returns User data for currently logged user.
+	 * @example
+	 * if ((await Authorization.userDefinitionAsync).IsAdmin) {
+	 *     // do something
+	 * }
+	 */
+	let userDefinitionAsync: Promise<UserDefinition>;
+}
 /**
  * Tries to block the page
  */
@@ -142,7 +270,7 @@ export declare class CriteriaBuilder extends Array {
  * @param expression The criteria expression.
  * @param params The dictionary containing parameter values like { p1: 10, p2: 20 }.
  * @example
- * parseCriteria('A >= @p1 and B < @p2', { p1: 5, p2: 4 }) // [[[a], '>=' 5], 'and', [[b], '<', 4]]
+ * `parseCriteria('A >= @p1 and B < @p2', { p1: 5, p2: 4 }) // [[[a], '>=' 5], 'and', [[b], '<', 4]]`
  */
 export declare function parseCriteria(expression: string, params?: any): any[];
 /**
@@ -227,7 +355,6 @@ export interface DebouncedFunction<T extends (...args: any[]) => any> {
  * N milliseconds.
  * @param immediate If passed, trigger the function on the leading edge, instead of the trailing.
  *
- * @source underscore.js
  */
 export declare function debounce<T extends (...args: any) => any>(func: T, wait?: number, immediate?: boolean): DebouncedFunction<T>;
 /**
@@ -771,8 +898,6 @@ export declare namespace ErrorHandling {
 /**
  * Represents a Fluent object, which is similar to jQuery but works for only one element.
  * It implements the `ArrayLike` interface and can have 0 (null) or 1 element.
- *
- * @typeparam TElement The type of the underlying HTML element.
  */
 export interface Fluent<TElement extends HTMLElement = HTMLElement> extends ArrayLike<TElement> {
 	/**
@@ -889,7 +1014,6 @@ export interface Fluent<TElement extends HTMLElement = HTMLElement> extends Arra
 	/**
 	 * Finds all elements that match the specified selector within the element.
 	 *
-	 * @typeparam TElement The type of the found elements.
 	 * @param selector A CSS selector to match against.
 	 * @returns An array of elements that match the selector.
 	 */
@@ -897,7 +1021,6 @@ export interface Fluent<TElement extends HTMLElement = HTMLElement> extends Arra
 	/**
 	 * Finds each element that matches the specified selector within the element and executes a callback function for each found element as a Fluent object.
 	 *
-	 * @typeparam TElement The type of the found elements.
 	 * @param selector A CSS selector to match against.
 	 * @param callback The callback function to execute for each found element. It receives a Fluent object for each element.
 	 * @returns The Fluent object itself.
@@ -906,7 +1029,6 @@ export interface Fluent<TElement extends HTMLElement = HTMLElement> extends Arra
 	/**
 	 * Finds the first element that matches the specified selector within the element.
 	 *
-	 * @typeparam TElement The type of the found element.
 	 * @param selector A CSS selector to match against.
 	 * @returns A Fluent object representing the first element that matches the selector.
 	 */
@@ -933,7 +1055,6 @@ export interface Fluent<TElement extends HTMLElement = HTMLElement> extends Arra
 	/**
 	 * Gets the widget associated with the element.
 	 *
-	 * @typeparam TWidget The type of the widget.
 	 * @param type Optional. The constructor function of the widget.
 	 * @returns The widget associated with the element.
 	 */
@@ -974,7 +1095,6 @@ export interface Fluent<TElement extends HTMLElement = HTMLElement> extends Arra
 	/**
 	 * Removes an event listener from the element.
 	 *
-	 * @typeparam K The type of the event.
 	 * @param type The type of the event. It can include a ".namespace" similar to jQuery.
 	 * @param listener The event listener to remove.
 	 * @returns The Fluent object itself.
@@ -986,7 +1106,6 @@ export interface Fluent<TElement extends HTMLElement = HTMLElement> extends Arra
 	/**
 	 * Adds an event listener to the element. It is possible to use delegated events like jQuery.
 	 *
-	 * @typeparam K The type of the event.
 	 * @param type The type of the event. It can include a ".namespace" similar to jQuery.
 	 * @param listener The event listener to add.
 	 * @returns The Fluent object itself.
@@ -997,7 +1116,6 @@ export interface Fluent<TElement extends HTMLElement = HTMLElement> extends Arra
 	/**
 	 * Adds a one-time event listener to the element. It is possible to use delegated events like jQuery.
 	 *
-	 * @typeparam K The type of the event.
 	 * @param type The type of the event. It can include a ".namespace" similar to jQuery.
 	 * @param listener The event listener to add.
 	 * @returns The Fluent object itself.
@@ -1111,7 +1229,6 @@ export interface Fluent<TElement extends HTMLElement = HTMLElement> extends Arra
 	/**
 	 * Tries to get the widget associated with the element.
 	 *
-	 * @typeparam TWidget The type of the widget.
 	 * @param type Optional. The constructor function of the widget.
 	 * @returns The widget associated with the element, or `null` if no widget is found.
 	 */
@@ -1141,7 +1258,6 @@ export declare namespace Fluent {
 	/**
 	 * Adds an event listener to the element. It is possible to use delegated events like jQuery.
 	 *
-	 * @typeparam K The type of the event.
 	 * @param element The target element
 	 * @param type The type of the event. It can include a ".namespace" similar to jQuery.
 	 * @param listener The event listener to add.
@@ -1152,7 +1268,6 @@ export declare namespace Fluent {
 	/**
 	 * Adds a one-time event listener to the element. It is possible to use delegated events like jQuery.
 	 *
-	 * @typeparam K The type of the event.
 	 * @param element The target element
 	 * @param type The type of the event. It can include a ".namespace" similar to jQuery.
 	 * @param listener The event listener to add.
@@ -1164,7 +1279,6 @@ export declare namespace Fluent {
 	 * Removes an event listener from the element.
 	 *
 	 * @param element The target element
-	 * @typeparam K The type of the event.
 	 * @param type The type of the event. It can include a ".namespace" similar to jQuery.
 	 * @param listener The event listener to remove.
 	 */
@@ -1344,12 +1458,12 @@ export declare function stringFormat(format: string, ...prm: any[]): string;
 export declare function stringFormatLocale(l: Locale, format: string, ...prm: any[]): string;
 /**
  * Rounds a number to specified digits or an integer number if digits are not specified.
- * @param n the number to round
+ * Uses away from zero rounding (e.g. 1.5 rounds to 2, -1.5 rounds to -2) unlike Math.round.
+ * @param num the number to round
  * @param d the number of digits to round to. default is zero.
- * @param rounding whether to use banker's rounding
  * @returns the rounded number
  */
-export declare let round: (n: number, d?: number, rounding?: boolean) => number;
+export declare let round: (num: number, d?: number) => number;
 /**
  * Truncates a number to an integer number.
  */
@@ -1487,6 +1601,12 @@ export declare function getElementReadOnly(el: Element): boolean | null;
  * @param value Readonly state
  */
 export declare function setElementReadOnly(elements: Element | ArrayLike<Element>, value: boolean): void;
+export declare function parseQueryString(s?: string): Record<string, string>;
+export declare function getReturnUrl(opt?: {
+	queryOnly?: boolean;
+	ignoreUnsafe?: boolean;
+	purpose?: string;
+}): string;
 export declare function addLocalText(obj: string | Record<string, string | Record<string, any>> | string, pre?: string): void;
 export declare function localText(key: string, defaultText?: string): string;
 export declare function tryGetText(key: string): string;
@@ -1736,6 +1856,14 @@ export declare function fetchScriptData<TData>(name: string): Promise<TData>;
  */
 export declare function getScriptData<TData = any>(name: string, reload?: boolean): Promise<TData>;
 /**
+ * Synchronous version of getScriptData for compatibility. Avoid this one where possible,
+ * as it will block the UI thread.
+ * @param name
+ * @param dynJS
+ * @returns
+ */
+export declare function ensureScriptDataSync<TData = any>(name: string, dynJS?: boolean): TData;
+/**
  * Gets or loads a [ColumnsScript] data
  * @param key Form key
  * @returns A property items data object containing items and additionalItems properties
@@ -1758,6 +1886,11 @@ export declare function getLookupAsync<TItem>(key: string): Promise<Lookup<TItem
  */
 export declare function getRemoteDataAsync<TData = any>(key: string): Promise<TData>;
 /**
+ * Synchronous version of getRemoteDataAsync for compatibility
+ * @param key Remote data key
+ */
+export declare function getRemoteData<TData = any>(key: string): TData;
+/**
  * Shows a suitable error message for errors occured during loading of
  * a dynamic script data.
  * @param name Name of the dynamic script
@@ -1779,6 +1912,7 @@ export declare function resolveUrl(url: string): string;
 export declare function resolveServiceUrl(url: string): string;
 export declare function getCookie(name: string): any;
 export declare function isSameOrigin(url: string): boolean;
+export declare function getServiceOptions<TResponse>(options: ServiceOptions<TResponse>): ServiceOptions<TResponse>;
 export declare function requestStarting(): void;
 export declare function requestFinished(): void;
 export declare function getActiveRequests(): number;
@@ -1957,7 +2091,7 @@ export declare class Uploader {
 	private endBatch;
 	static defaults: Partial<UploaderOptions>;
 	static requestDefaults: Partial<UploaderRequest>;
-	private isMultiple;
+	isMultiple(): boolean;
 	private getTypePredicate;
 	private getMatchingItems;
 	private watchInput;
@@ -1965,7 +2099,7 @@ export declare class Uploader {
 	private arrayApi;
 	private entriesApi;
 	uploadBatch(batch: UploaderBatch, request?: UploaderRequest): Promise<void>;
-	static errorHandler: (data: UploaderErrorData) => void;
+	static errorHandler(data: UploaderErrorData): void;
 }
 /**
  * An `HTMLElement` that can be validated (`input`, `select`, `textarea`, or [contenteditable).
@@ -2351,134 +2485,6 @@ export declare function toGrouping<TItem>(items: TItem[], getKey: (x: TItem) => 
  * tryFirst([1, 2, 3], x => x == 4); // null
  */
 export declare function tryFirst<TItem>(array: TItem[], predicate: (x: TItem) => boolean): TItem;
-export interface UserDefinition {
-	/**
-	 * Username of the logged user
-	 */
-	Username?: string;
-	/**
-	 * Display name of the logged user
-	 */
-	DisplayName?: string;
-	/**
-	 * This indicates that the user is a super "admin", e.g. assumed to have all the permissions available.
-	 * It does not mean a member of Administrators, who might not have some of the permissions */
-	IsAdmin?: boolean;
-	/**
-	 * A hashset of permission keys that the current user have, explicitly assigned or via its
-	 * roles. Note that client side permission checks should only be used for UI enable/disable etc.
-	 * You should not rely on client side permission checks and always re-check permissions server side.
-	 */
-	Permissions?: {
-		[key: string]: boolean;
-	};
-}
-/**
- * Contains permission related functions.
- *
- * ## Note
- * We use a namespace here both for compatibility and for allowing users to override
- * these functions easily in ES modules environment, which is normally hard to do.
- */
-export declare namespace Authorization {
-	/**
-	 * Checks if the current user has the permission specified.
-	 * This should only be used for UI purposes and it is strongly recommended to check permissions server side.
-	 *
-	 * > Please prefer the `hasPermissionAsync` variant as this may block the UI thread if the `UserData` script is not already loaded.
-	 * @param permission Permission key. It may contain logical operators like A&B|C.
-	 * @returns `false` for "null or undefined", true for "*", `IsLoggedIn` for "?". For other permissions,
-	 * if the user has the permission or if the user has the `IsAdmin` flag (super admin) `true`, otherwise `false`.
-	 */
-	function hasPermission(permission: string): boolean;
-	/**
-	 * Checks if the current user has the permission specified.
-	 * This should only be used for UI purposes and it is strongly recommended to check permissions server side.
-	 *
-	 * @param permission Permission key. It may contain logical operators like A&B|C.
-	 * @returns `false` for "null or undefined", true for "*", `IsLoggedIn` for "?". For other permissions,
-	 * if the user has the permission or if the user has the `IsAdmin` flag (super admin) `true`, otherwise `false`.
-	 */
-	function hasPermissionAsync(permission: string): Promise<boolean>;
-	/**
-	 * Checks if the hashset contains the specified permission, also handling logical "|" and "&" operators
-	 * @param permissionSet Set of permissions
-	 * @param permission Permission key or a permission expression containing & | operators
-	 * @returns true if set contains permission
-	 */
-	function isPermissionInSet(permissionSet: {
-		[key: string]: boolean;
-	}, permission: string): boolean;
-	/**
-	 * Throws an error if the current user does not have the specified permission.
-	 * Prefer `await validatePermissionAsync()` as this one might block the UI if the `UserData`
-	 * is not already loaded.
-	 * @param permission Permission key. It may contain logical operators like A&B|C.
-	 */
-	function validatePermission(permission: string): void;
-	/**
-	* Throws an error if the current user does not have the specified permission.
-	* @param permission Permission key. It may contain logical operators like A&B|C.
-	* @example
-	* await Authorization.validatePermissionAsync("A&B|C");
-	*/
-	function validatePermissionAsync(permission: string): Promise<void>;
-}
-export declare namespace Authorization {
-	/**
-	 * Checks if the current user is logged in. Prefer `isLoggedInAsync` as this one might block the UI if the `UserData`
-	 * is not already loaded.
-	 * @returns `true` if the user is logged in, `false` otherwise.
-	 * @example
-	 * if (Authorization.isLoggedIn) {
-	 *     // do something
-	 * }
-	 */
-	let isLoggedIn: boolean;
-	/**
-	 * Checks if the current user is logged in.
-	 * @returns `true` if the user is logged in, `false` otherwise.
-	 * @example
-	 * if (await Authorization.isLoggedInAsync) {
-	 *     // do something
-	 * }
-	 */
-	let isLoggedInAsync: Promise<boolean>;
-	/** Returns the username for currently logged user. Prefer `usernameAsync` as this one might block the UI if the `UserData`
-	 * is not already loaded.
-	 * @returns Username for currently logged user.
-	 * @example
-	 * if (Authorization.username) {
-	 *     // do something
-	 * }
-	 */
-	let username: string;
-	/** Returns the username for currently logged user.
-	 * @returns Username for currently logged user.
-	 * @example
-	 * if (await Authorization.usernameAsync) {
-	 *     // do something
-	 * }
-	 */
-	let usernameAsync: Promise<string>;
-	/** Returns the user data for currently logged user. Prefer `userDefinitionAsync` as this one might block the UI if the `UserData`
-	 * is not already loaded.
-	 * @returns User data for currently logged user.
-	 * @example
-	 * if (Authorization.userDefinition.IsAdmin) {
-	 *     // do something
-	 * }
-	 */
-	let userDefinition: UserDefinition;
-	/** Returns the user data for currently logged user.
-	 * @returns User data for currently logged user.
-	 * @example
-	 * if ((await Authorization.userDefinitionAsync).IsAdmin) {
-	 *     // do something
-	 * }
-	 */
-	let userDefinitionAsync: Promise<UserDefinition>;
-}
 /** @deprecated use alertDialog */
 declare const alert$1: typeof alertDialog;
 /** @deprecated use confirmDialog */
@@ -2556,11 +2562,6 @@ export declare function newBodyDiv(): HTMLDivElement;
  * Returns the outer HTML of the element.
  */
 export declare function outerHtml(element: Element | ArrayLike<HTMLElement>): string;
-export declare function getReturnUrl(opt?: {
-	queryOnly?: boolean;
-	ignoreUnsafe?: boolean;
-	purpose?: string;
-}): string;
 export declare function getWidgetName(type: Function): string;
 export declare function associateWidget(widget: {
 	domNode: HTMLElement;
@@ -2710,12 +2711,12 @@ export declare namespace Router {
 	function ignoreHashChange(expiration?: number): void;
 }
 export declare namespace ScriptData {
-	function bindToChange(name: string, onChange: () => void): void | (() => void);
 	const canLoad: typeof canLoadScriptData;
-	function ensure<TData = any>(name: string, dynJS?: boolean): TData;
+	const ensure: typeof ensureScriptDataSync;
+	const set: typeof setScriptData;
+	function bindToChange(name: string, onChange: () => void): void | (() => void);
 	function reload<TData = any>(name: string, dynJS?: boolean): TData;
 	function reloadAsync<TData = any>(name: string): Promise<TData>;
-	const set: typeof setScriptData;
 }
 /**
  * Check if a dynamic script with provided name is available in the cache
@@ -2724,7 +2725,6 @@ export declare namespace ScriptData {
  * @returns True if already available or registered
  */
 export declare function canLoadScriptData(name: string): boolean;
-export declare function getRemoteData<TData = any>(key: string): TData;
 export declare function getLookup<TItem>(key: string): Lookup<TItem>;
 export declare function reloadLookup<TItem = any>(key: string): Lookup<TItem>;
 export declare function getColumns(key: string): PropertyItem[];
@@ -2747,7 +2747,6 @@ export interface PostToUrlOptions {
 	target?: string;
 	params: any;
 }
-export declare function parseQueryString(s?: string): Record<string, string>;
 export declare function postToService(options: PostToServiceOptions): void;
 export declare function postToUrl(options: PostToUrlOptions): void;
 /**
@@ -3318,7 +3317,6 @@ export declare namespace ReflectionUtils {
 	function makeCamelCase(s: string): string;
 }
 export declare function jQueryPatch(): boolean;
-export declare function reactPatch(): void;
 export interface IRowDefinition {
 	readonly deletePermission?: string;
 	readonly idProperty?: string;
