@@ -1,4 +1,11 @@
+## 8.8.3 (2024-12-15)
+
+### Bugfixes
+- Resolve issue with static web assets and content files in nuget packages
+
 ## 8.8.2 (2024-12-15)
+
+### Features
 
 - New `services.AddApplicationPartsFeatureToggles` extension that should be used in Startup instead of `services.AddFeatureToggles`. This also scans enum types with [FeatureKeySet] attribute in application parts, and disables features that have a [DefaultValue(false)] attribute on them by default. It also discovers dependencies between features themselves (for example a DataAuditLog_Services sub feature might depend on a DataAuditLog feature, e.g. disabling it also disables all sub features) so it is recommended to switch to AddApplicationPartsFeatureToggles.
 - Add ability to declare dependencies between feature flags themselves by adding RequiresFeature attribute to the FeatureKeys enum members, or the enum itself. For it to work, AddApplicationPartsFeatureToggles should be used, or the dependencyMap argument of AddFeatureToggles must be passed manually.
