@@ -8,7 +8,7 @@
     <!--#if (IsNotTemplate)-->
     <CommonSrc>..\..\..\common-features\src\</CommonSrc>
     <SerenitySrc>..\..\..\src\</SerenitySrc>
-    <DotNetSergenDir>$(SerenitySrc)Serenity.Net.CodeGenerator\bin\</DotNetSergenDir>
+    <DotNetSergenDir>$(SerenitySrc)artifacts\sergen\</DotNetSergenDir>
     <DotNetSergen Condition="Exists('$(DotNetSergenDir)sergen')">$(DotNetSergenDir)sergen</DotNetSergen>
     <DotNetSergen Condition="Exists('$(DotNetSergenDir)sergen.exe')">$(DotNetSergenDir)sergen.exe</DotNetSergen>
     <DefineConstants>$(DefineConstants);Northwind;BasicSamples</DefineConstants>
@@ -67,7 +67,7 @@
     </ItemGroup>
   </Target>
   <Target Name="TransformMvcClientTypes" BeforeTargets="BeforeBuild" DependsOnTargets="SetSergenTransformArgs">
-    <Exec Command="dotnet tool restore" ContinueOnError="true" />
+    <Exec Command="dotnet tool restore" ContinueOnError="true" Condition="'$(DotNetSergen)' == 'dotnet sergen'" />
     <Exec Command="$(DotNetSergen) mvct $(SergenTransformArgs)" ContinueOnError="true" />
   </Target>
   <Target Name="TransformServerTypings" AfterTargets="AfterBuild" DependsOnTargets="SetSergenTransformArgs">

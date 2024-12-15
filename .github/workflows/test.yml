@@ -61,17 +61,9 @@ jobs:
       run: npm install
       working-directory: "./serene/src/Serene.Web"
 
-    - name: dotnet build Serenity.Net.CodeGenerator
-      run: dotnet build 
+    - name: dotnet pack Serenity.Net.CodeGenerator
+      run: dotnet pack 
       working-directory: "./src/Serenity.Net.CodeGenerator"
-
-    - name: dotnet tool restore commmon-features
-      run: dotnet tool restore
-      working-directory: "./common-features/src"
-
-    - name: dotnet tool restore Serene
-      run: dotnet tool restore
-      working-directory: "./serene/src/Serene.Web"
 
     - name: dotnet build Serenity.sln
       run: dotnet build /p:SkipNodeScripts=true
