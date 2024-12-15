@@ -19,32 +19,62 @@ public static class ApplicationPartsServiceCollectionExtensions
     /// </summary>
     /// <param name="services">The services.</param>
     /// <param name="configuration">Configuration source</param>
+    /// <param name="applicationPartManager">Optional application part manager to use</param>
     /// <param name="disableByDefault">Features to disable by default, pass ["*"] to disable
     /// all features by default</param>
-    /// <param name="applicationPartManager">Optional application part manager to use</param>
+    /// <param name="dependencyMap">Feature dependency map. Features are dictionary
+    /// keys and the list of features that they depend on (e.g. all must be enabled)
+    /// for that feature to be enabled.</param>/// 
     public static IServiceCollection AddApplicationPartsFeatureToggles(this IServiceCollection services,
         IConfiguration configuration,
         ApplicationPartManager applicationPartManager = null,
-        object[] disableByDefault = null)
+        object[] disableByDefault = null,
+        Dictionary<string, List<RequiresFeatureAttribute>> dependencyMap = null)
     {
         ArgumentNullException.ThrowIfNull(services);
 
         applicationPartManager ??= GetServiceFromCollection<ApplicationPartManager>(services)
             ?? services.AddMvcCore().PartManager;
-        var tempSource = new ApplicationPartsTypeSource(applicationPartManager, topologicalSort: false, featureToggles: null);
         var disableSet = new HashSet<string>(disableByDefault?.Select(FeatureTogglesExtensions.ToFeatureKey) ?? []);
+        var dependencyMapDict = new Dictionary<string, List<RequiresFeatureAttribute>>();
+        if (dependencyMap != null)
+        {
+            foreach (var kvp in dependencyMap)
+                dependencyMapDict[kvp.Key] = new(kvp.Value);
+        }
+
+        var tempSource = new ApplicationPartsTypeSource(applicationPartManager, topologicalSort: true, featureToggles: null);
         foreach (var keySetType in tempSource.GetTypesWithAttribute(typeof(FeatureKeySetAttribute)))
         {
+            var commonDeps = keySetType.GetCustomAttribute<RequiresFeatureAttribute>();
+
             foreach (var member in keySetType.GetMembers())
             {
-                var attr = member.GetCustomAttribute<DefaultValueAttribute>();
-                if (attr != null && attr.Value is bool b && !b)
+                var defAttr = member.GetCustomAttribute<DefaultValueAttribute>();
+                if (defAttr != null && defAttr.Value is bool b && !b)
                     disableSet.Add(member.Name);
-            }
-        }
-        disableByDefault = [.. disableSet];
 
-        return CoreServiceCollectionExtensions.AddFeatureToggles(services, configuration, disableByDefault);
+                var memberDeps = member.GetCustomAttribute<RequiresFeatureAttribute>();
+
+                if (commonDeps != null || memberDeps != null)
+                {
+                    if (!dependencyMapDict.TryGetValue(member.Name, out var deps))
+                        dependencyMapDict[member.Name] = deps = [];
+
+                    if (commonDeps != null &&
+                        commonDeps.Features.Any(x => x != member.Name))
+                        deps.Add(commonDeps);
+
+                    if (memberDeps != null &&
+                        memberDeps.Features.Any(x => x != member.Name))
+                        deps.Add(memberDeps);
+                }
+            }
+
+        }
+
+        disableByDefault = [.. disableSet];
+        return CoreServiceCollectionExtensions.AddFeatureToggles(services, configuration, disableByDefault, dependencyMapDict);
     }
 
     /// <summary>

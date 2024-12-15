@@ -92,9 +92,13 @@ public static class CoreServiceCollectionExtensions
     /// <param name="configuration">Configuration source</param>
     /// <param name="disableByDefault">Features to disable by default, pass ["*"] to disable
     /// all features by default</param>
+    /// <param name="dependencyMap">Feature dependency map. Features are dictionary
+    /// keys and the list of features that they depend on (e.g. all must be enabled)
+    /// for that feature to be enabled.</param>/// 
     public static IServiceCollection AddFeatureToggles(this IServiceCollection services, 
         IConfiguration? configuration = null, 
-        object[]? disableByDefault = null)
+        object[]? disableByDefault = null,
+        Dictionary<string, List<RequiresFeatureAttribute>>? dependencyMap = null)
     {
         if (services is null)
             throw new ArgumentNullException(nameof(services));
@@ -102,11 +106,11 @@ public static class CoreServiceCollectionExtensions
         configuration ??= GetServiceFromCollection<IConfiguration>(services);
         if (configuration != null)
         {
-            services.TryAddSingleton<IFeatureToggles>(new ConfigurationFeatureToggles(configuration, disableByDefault));
+            services.TryAddSingleton<IFeatureToggles>(new ConfigurationFeatureToggles(configuration, disableByDefault, dependencyMap));
         }
         else
         {
-            services.TryAddSingleton<IFeatureToggles>(s => new ConfigurationFeatureToggles(s.GetRequiredService<IConfiguration>(), disableByDefault));
+            services.TryAddSingleton<IFeatureToggles>(s => new ConfigurationFeatureToggles(s.GetRequiredService<IConfiguration>(), disableByDefault, dependencyMap));
         }
 
         return services;
