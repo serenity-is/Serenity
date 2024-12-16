@@ -35,6 +35,16 @@ public static class ApplicationPartsServiceCollectionExtensions
 
         applicationPartManager ??= GetServiceFromCollection<ApplicationPartManager>(services)
             ?? services.AddMvcCore().PartManager;
+
+        var tempSource = new ApplicationPartsTypeSource(applicationPartManager, topologicalSort: true, featureToggles: null);
+        ScanFeatureKeySets(tempSource.GetAssemblies(), ref disableByDefault, ref dependencyMap);
+        return CoreServiceCollectionExtensions.AddFeatureToggles(services, configuration, disableByDefault, dependencyMap);
+    }
+
+    internal static void ScanFeatureKeySets(IEnumerable<Assembly> assemblies,
+        ref object[] disableByDefault,
+        ref Dictionary<string, List<RequiresFeatureAttribute>> dependencyMap)
+    {
         var disableSet = new HashSet<string>(disableByDefault?.Select(FeatureTogglesExtensions.ToFeatureKey) ?? []);
         var dependencyMapDict = new Dictionary<string, List<RequiresFeatureAttribute>>();
         if (dependencyMap != null)
@@ -43,8 +53,8 @@ public static class ApplicationPartsServiceCollectionExtensions
                 dependencyMapDict[kvp.Key] = new(kvp.Value);
         }
 
-        var tempSource = new ApplicationPartsTypeSource(applicationPartManager, topologicalSort: true, featureToggles: null);
-        foreach (var keySetType in tempSource.GetTypesWithAttribute(typeof(FeatureKeySetAttribute)))
+        foreach (var assembly in assemblies)
+        foreach (var keySetType in assembly.GetTypes().Where(x => x.GetAttribute<FeatureKeySetAttribute>() is not null))
         {
             var commonDeps = keySetType.GetCustomAttribute<RequiresFeatureAttribute>();
 
@@ -70,11 +80,10 @@ public static class ApplicationPartsServiceCollectionExtensions
                         deps.Add(memberDeps);
                 }
             }
-
         }
 
         disableByDefault = [.. disableSet];
-        return CoreServiceCollectionExtensions.AddFeatureToggles(services, configuration, disableByDefault, dependencyMapDict);
+        dependencyMap = dependencyMapDict;
     }
 
     /// <summary>

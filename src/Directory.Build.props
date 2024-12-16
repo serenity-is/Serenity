@@ -1,20 +1,21 @@
 <Project>
   <Import Project="$(MSBuildThisFileDirectory)..\build\Package.Build.props" Condition="Exists('$(MSBuildThisFileDirectory)..\build\Package.Build.props')" />
   <PropertyGroup>
-    <TargetFramework>netstandard2.1</TargetFramework>
-    <LangVersion>latest</LangVersion>
-    <GenerateDocumentationFile>true</GenerateDocumentationFile>
-    <PlatformTarget>AnyCPU</PlatformTarget>
-    <ESBuild>$(MSBuildProjectDirectory)\node_modules\.bin\esbuild</ESBuild>
-    <DefaultItemExcludes>$(DefaultItemExcludes);package*.json;sergen.json;tsconfig.json;tsconfig.base.json;libman.json</DefaultItemExcludes>
-    <PublishRepositoryUrl>true</PublishRepositoryUrl>
-    <EmbedUntrackedSources>true</EmbedUntrackedSources>
-    <DebugType>embedded</DebugType>
     <AccelerateBuildsInVisualStudio>true</AccelerateBuildsInVisualStudio>
+    <DebugType>embedded</DebugType>
+    <DefaultItemExcludes>$(DefaultItemExcludes);package*.json;sergen.json;tsconfig.json;tsconfig.base.json;libman.json</DefaultItemExcludes>
+    <EmbedUntrackedSources>true</EmbedUntrackedSources>
+    <ESBuild>$(MSBuildProjectDirectory)\node_modules\.bin\esbuild</ESBuild>
+    <GenerateDocumentationFile>true</GenerateDocumentationFile>
+    <LangVersion>latest</LangVersion>
+    <PlatformTarget>AnyCPU</PlatformTarget>
     <ProduceReferenceAssembly>true</ProduceReferenceAssembly>
+    <PublishRepositoryUrl>true</PublishRepositoryUrl>
+    <TargetFramework>netstandard2.1</TargetFramework>
     <UseArtifactsOutput>true</UseArtifactsOutput>
   </PropertyGroup>
   <ItemGroup>
+    <InternalsVisibleTo Include="Serenity.Net.Tests" />
     <PackageReference Include="Microsoft.SourceLink.GitHub" Version="8.0.0" PrivateAssets="All" />
   </ItemGroup>
   <ItemGroup>
