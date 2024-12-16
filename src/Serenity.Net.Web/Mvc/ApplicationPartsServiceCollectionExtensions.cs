@@ -48,7 +48,7 @@ public static class ApplicationPartsServiceCollectionExtensions
         {
             var commonDeps = keySetType.GetCustomAttribute<RequiresFeatureAttribute>();
 
-            foreach (var member in keySetType.GetMembers())
+            foreach (var member in keySetType.GetMembers(BindingFlags.Static | BindingFlags.Public).Where(x => x.MemberType == MemberTypes.Field))
             {
                 var defAttr = member.GetCustomAttribute<DefaultValueAttribute>();
                 if (defAttr != null && defAttr.Value is bool b && !b)
