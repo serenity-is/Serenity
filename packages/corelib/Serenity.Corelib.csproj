@@ -1,13 +1,11 @@
 <Project Sdk="Microsoft.NET.Sdk.Razor">
   <PropertyGroup>
     <Description>NuGet version of @serenity-is/corelib NPM package</Description>
-    <IdxDist>dist\index.</IdxDist>
-    <IdxGlob>wwwroot\index.global.</IdxGlob>
   </PropertyGroup>
   <ItemGroup>
     <ProjectReference Include="..\sleekgrid\Serenity.SleekGrid.csproj" />
   </ItemGroup>
   <Target Name="TSBuild" Condition="'$(SkipNodeScripts)' != 'true'" AfterTargets="AfterBuild" DependsOnTargets="NpmInstall">
-    <Exec Command="pnpm -r build" WorkingDirectory="..\..\packages" />
+    <Exec Command="pnpm build" />
   </Target>
 </Project>
