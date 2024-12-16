@@ -1,29 +1,22 @@
 <Project>
   <PropertyGroup>
-    <LangVersion>latest</LangVersion>
-    <TargetFramework>net8.0</TargetFramework>
-    <SerenityDir Condition="'$(SerenityDir)' == '' And Exists('$(SolutionDir)Serenity\Serenity.sln')">$(SolutionDir)Serenity\</SerenityDir>
-    <SerenityDir Condition="'$(SerenityDir)' == '' And Exists('$(MSBuildThisFileDirectory)..\Serenity.sln')">$(MSBuildThisFileDirectory)..\</SerenityDir>
-    <SerenityDir Condition="'$(SerenityDir)' == '' And Exists('$(MSBuildThisFileDirectory)..\..\Serenity.sln')">$(MSBuildThisFileDirectory)..\..\</SerenityDir>
-    <SerenitySrc Condition="'$(SerenitySrc)' == ''">$(SerenityDir)src\</SerenitySrc>
-    <SerenityWebProj Condition="'$(SerenityWebProj)' == ''">$(SerenitySrc)Serenity.Net.Web\Serenity.Net.Web.csproj</SerenityWebProj>
-    <StaticWebAssetBasePath>/$(MSBuildProjectName)</StaticWebAssetBasePath>
-    <ESMAssetBasePath>$(StaticWebAssetBasePath)/esm</ESMAssetBasePath>
     <AccelerateBuildsInVisualStudio>true</AccelerateBuildsInVisualStudio>
     <AddAutoRefs Condition="'$(AddAutoRefs)' == ''">true</AddAutoRefs>
     <AddRazorSupportForMvc>true</AddRazorSupportForMvc>
     <DefaultItemExcludes>node_modules\**;coverage\**;$(DefaultItemExcludes)</DefaultItemExcludes>
     <DefineConstants Condition="'$(IsPublicDemo)'=='true'">$(DefineConstants);IsPublicDemo</DefineConstants>
+    <ESMAssetBasePath>/$(MSBuildProjectName)/esm</ESMAssetBasePath>
+    <LangVersion>latest</LangVersion>
     <RestoreNodeTypes>false</RestoreNodeTypes>
+    <SerenitySrc Condition="'$(SerenitySrc)' == ''">$(MSBuildThisFileDirectory)..\..\src\</SerenitySrc>
+    <StaticWebAssetBasePath>/$(MSBuildProjectName)</StaticWebAssetBasePath>
+    <TargetFramework>net8.0</TargetFramework>
     <TypeScriptCompileBlocked>true</TypeScriptCompileBlocked>
     <UseArtifactsOutput>true</UseArtifactsOutput>
   </PropertyGroup>
   <ItemGroup>
-    <PackageReference Include="Serenity.Net.Web" Version="$(SerenityVersion)" Condition="!Exists('$(SerenityWebProj)') and '$(AddAutoRefs)' == 'true'" />
-    <ProjectReference Include="$(SerenityWebProj)" Condition="Exists('$(SerenityWebProj)') and '$(AddAutoRefs)' == 'true'" />
-    <PackageReference Include="Microsoft.TypeScript.MSBuild" Version="5.7.1" Condition="Exists('$(MSBuildProjectDirectory)\tsconfig.json')">
-      <PrivateAssets>all</PrivateAssets>
-      <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
-    </PackageReference>
+    <PackageReference Include="Microsoft.TypeScript.MSBuild" Version="5.7.1" Condition="Exists('$(MSBuildProjectDirectory)\tsconfig.json')" PrivateAssets="all" IncludeAssets="runtime; build; native; contentfiles; analyzers; buildtransitive" />
+    <PackageReference Include="Serenity.Net.Web" Version="$(SerenityVersion)" Condition="!Exists('$(SerenitySrc)Serenity.Net.Web\Serenity.Net.Web.csproj') and '$(AddAutoRefs)' == 'true'" />
+    <ProjectReference Include="$(SerenitySrc)Serenity.Net.Web\Serenity.Net.Web.csproj" Condition="Exists('$(SerenitySrc)Serenity.Net.Web\Serenity.Net.Web.csproj') and '$(AddAutoRefs)' == 'true'" />
   </ItemGroup>
 </Project>
