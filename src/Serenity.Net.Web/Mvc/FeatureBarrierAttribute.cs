@@ -1,4 +1,5 @@
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Mvc.ActionConstraints;
 using Microsoft.AspNetCore.Mvc.Filters;
 using Microsoft.Extensions.DependencyInjection;
 
@@ -9,7 +10,7 @@ namespace Serenity.Web;
 /// Note that if no <see cref="IFeatureToggles"/> service is registered, the feature barrier will always pass.
 /// </summary>
 [AttributeUsage(AttributeTargets.Method | AttributeTargets.Class, AllowMultiple = true)]
-public class FeatureBarrierAttribute : RequiresFeatureAttribute, IActionFilter, IPageFilter
+public class FeatureBarrierAttribute : RequiresFeatureAttribute, IActionConstraint, IPageFilter
 {
     /// <summary>
     /// Creates an attribute that can be used to barrier actions or pages. The barrier can be configured to require all or any of the provided feature(s) to pass.
@@ -28,18 +29,18 @@ public class FeatureBarrierAttribute : RequiresFeatureAttribute, IActionFilter, 
     }
 
     /// <inheritdoc/>
-    public void OnActionExecuted(ActionExecutedContext context)
-    {
-    }
+    public int Order => 0;
 
     /// <inheritdoc/>
-    public void OnActionExecuting(ActionExecutingContext context)
+    public bool Accept(ActionConstraintContext context)
     {
-        var featureToggles = context.HttpContext.RequestServices.GetService<IFeatureToggles>();
-        if (featureToggles != null && !featureToggles.IsEnabled(Features, RequireAny))
-        {
-            context.Result = new NotFoundResult();
-        }
+        var featureToggles = context.RouteContext.HttpContext
+            .RequestServices.GetService<IFeatureToggles>();
+        if (featureToggles != null && 
+            !featureToggles.IsEnabled(Features, RequireAny))
+            return false;
+
+        return true;
     }
 
     /// <inheritdoc/>
