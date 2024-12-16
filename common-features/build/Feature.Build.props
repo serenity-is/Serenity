@@ -2,18 +2,11 @@
   <PropertyGroup>
     <LangVersion>latest</LangVersion>
     <TargetFramework>net8.0</TargetFramework>
-    <SerenityDir Condition="'$(SerenityDir)' == '' And Exists('$(SolutionDir)Serenity\Serenity..sln')">$(SolutionDir)Serenity\</SerenityDir>
+    <SerenityDir Condition="'$(SerenityDir)' == '' And Exists('$(SolutionDir)Serenity\Serenity.sln')">$(SolutionDir)Serenity\</SerenityDir>
     <SerenityDir Condition="'$(SerenityDir)' == '' And Exists('$(MSBuildThisFileDirectory)..\Serenity.sln')">$(MSBuildThisFileDirectory)..\</SerenityDir>
     <SerenityDir Condition="'$(SerenityDir)' == '' And Exists('$(MSBuildThisFileDirectory)..\..\Serenity.sln')">$(MSBuildThisFileDirectory)..\..\</SerenityDir>
     <SerenitySrc Condition="'$(SerenitySrc)' == ''">$(SerenityDir)src\</SerenitySrc>
     <SerenityWebProj Condition="'$(SerenityWebProj)' == ''">$(SerenitySrc)Serenity.Net.Web\Serenity.Net.Web.csproj</SerenityWebProj>
-    <DotNetSergenDir>$(SerenitySrc)artifacts\sergen\</DotNetSergenDir>
-    <DotNetSergen Condition="'$(DotNetSergen)' == '' And Exists('$(DotNetSergenDir)sergen')">$(DotNetSergenDir)sergen</DotNetSergen>
-    <DotNetSergen Condition="'$(DotNetSergen)' == '' And Exists('$(DotNetSergenDir)sergen.exe')">$(DotNetSergenDir)sergen.exe</DotNetSergen>
-    <DotNetSergen Condition="'$(DotNetSergen)' == ''">dotnet sergen</DotNetSergen>
-    <DotnetToolManifestFile>$(MSBuildProjectDirectory)\..\.config\dotnet-tools.json</DotnetToolManifestFile>
-    <DotnetToolRestoreStamp>$(MSBuildProjectDirectory)\..\.config\.restore-stamp</DotnetToolRestoreStamp>
-    <SergenTransform Condition="'$(SergenTransform)' == ''">none</SergenTransform>
     <StaticWebAssetBasePath>/$(MSBuildProjectName)</StaticWebAssetBasePath>
     <ESMAssetBasePath>$(StaticWebAssetBasePath)/esm</ESMAssetBasePath>
     <AccelerateBuildsInVisualStudio>true</AccelerateBuildsInVisualStudio>
