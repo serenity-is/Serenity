@@ -219,8 +219,9 @@ public abstract class TypingsGeneratorBase : ImportGeneratorBase
         var visitedForAnnotations = new HashSet<string>(StringComparer.OrdinalIgnoreCase);
         modularEditorTypeByKey = TSTypes.Values.Select(type =>
         {
-            if (type.IsAbstract != false &&
-                type.IsInterface != false &&
+            if (type.IsAbstract != true &&
+                type.IsInterface != true &&
+                type.IsEnum != true &&
                 !string.IsNullOrEmpty(type.Module))
             {
                 if (type.SourceFile?.EndsWith(".d.ts") == true &&
@@ -252,8 +253,9 @@ public abstract class TypingsGeneratorBase : ImportGeneratorBase
 
         modularFormatterTypeByKey = TSTypes.Values.Select(type =>
         {
-            if (type.IsAbstract != false &&
-                type.IsInterface != false &&
+            if (type.IsAbstract != true &&
+                type.IsEnum != true &&
+                type.IsInterface != true &&
                 !string.IsNullOrEmpty(type.Module))
             {
                 if (type.SourceFile?.EndsWith(".d.ts") == true &&
@@ -285,8 +287,9 @@ public abstract class TypingsGeneratorBase : ImportGeneratorBase
 
         modularDialogTypeByKey = TSTypes.Values.Select(type =>
         {
-            if (type.IsAbstract != false &&
-                type.IsInterface != false &&
+            if (type.IsAbstract != true &&
+                type.IsEnum != true &&
+                type.IsInterface != true &&
                 !string.IsNullOrEmpty(type.Module))
             {
                 if (type.Attributes != null)
@@ -1062,43 +1065,8 @@ public abstract class TypingsGeneratorBase : ImportGeneratorBase
                     .Select(z =>
                 {
                     var from = z.Key.From;
-                    if (!z.Key.External && !from.StartsWith('.'))
-                    {
-                        if (from.StartsWith("@/") &&
-                            !string.IsNullOrEmpty(ModulesPathFolder))
-                            from = "/" + ModulesPathFolder + "/" + from;
-
-                        if (!from.StartsWith('/'))
-                        {
-                            if (System.IO.Path.GetDirectoryName(filename) ==
-                                System.IO.Path.GetDirectoryName(from))
-                                from = "./" + System.IO.Path.GetFileName(from);
-                            else
-                                from = "../" + from;
-                        }
-                        else if (!string.IsNullOrEmpty(ModulesPathFolder) &&
-                            !string.IsNullOrEmpty(ModulesPathAlias) &&
-                            from.StartsWith("/" + ModulesPathFolder + "/", StringComparison.Ordinal))
-                        {
-                            from = ModulesPathAlias + from[(ModulesPathFolder.Length + 2)..];
-                        }
-                        else if (!string.IsNullOrEmpty(RootPathAlias))
-                        {
-                            from = RootPathAlias + from[1..];
-                        }
-                        else
-                        {
-                            var relativeTo = PathHelper.ToPath("/Modules/ServerTypes/") + 
-                                PathHelper.ToPath(System.IO.Path.GetDirectoryName(filename));
-
-#if ISSOURCEGENERATOR
-                            from = PathHelper.GetRelativePath(relativeTo, from);
-#else
-                            from = System.IO.Path.GetRelativePath(relativeTo, from);
-#endif
-                            from = PathHelper.ToUrl(from);
-                        }
-                    }
+                    if (!z.Key.External)
+                        from = RelativeModulePath(filename, from);
 
                     var importList = string.Join(", ", z.Select(p =>
                         p.Name + (p.Alias != p.Name ? (" as " + p.Alias) : "")));
@@ -1113,6 +1081,46 @@ public abstract class TypingsGeneratorBase : ImportGeneratorBase
         }
 
         base.AddFile(filename);
+    }
+
+    protected string RelativeModulePath(string fromModule, string toModule)
+    {
+        if (string.IsNullOrEmpty(toModule) ||
+            toModule.StartsWith('.'))
+            return toModule;
+
+        if (toModule.StartsWith("@/") &&
+            !string.IsNullOrEmpty(ModulesPathFolder))
+            toModule = "/" + ModulesPathFolder + "/" + toModule;
+
+        if (!toModule.StartsWith('/'))
+        {
+            if (System.IO.Path.GetDirectoryName(fromModule) ==
+                System.IO.Path.GetDirectoryName(toModule))
+                return "./" + System.IO.Path.GetFileName(toModule);
+            else
+                return "../" + toModule;
+        }
+
+        if (!string.IsNullOrEmpty(ModulesPathFolder) &&
+            !string.IsNullOrEmpty(ModulesPathAlias) &&
+            toModule.StartsWith("/" + ModulesPathFolder + "/", StringComparison.Ordinal))
+        {
+            return ModulesPathAlias + toModule[(ModulesPathFolder.Length + 2)..];
+        }
+
+        if (!string.IsNullOrEmpty(RootPathAlias))
+            return RootPathAlias + toModule[1..];
+
+        var relativeTo = PathHelper.ToPath("/Modules/ServerTypes/") +
+            PathHelper.ToPath(System.IO.Path.GetDirectoryName(fromModule));
+
+#if ISSOURCEGENERATOR
+        toModule = PathHelper.GetRelativePath(relativeTo, toModule);
+#else
+        toModule = System.IO.Path.GetRelativePath(relativeTo, toModule);
+#endif
+        return PathHelper.ToUrl(toModule);
     }
 
     private static string FromOrderKey(string from)

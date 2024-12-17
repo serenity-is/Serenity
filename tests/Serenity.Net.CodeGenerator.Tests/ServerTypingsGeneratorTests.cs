@@ -10,6 +10,12 @@ public partial class ServerTypingsGeneratorTests
             type.Namespace.StartsWith("ServerTypingsTest.", StringComparison.Ordinal);
     }
 
+    private static List<GeneratedSource> ExceptGenericFiles(List<GeneratedSource> files)
+    {
+        return files.Where(x => x.Filename != "Texts.ts" &&
+            x.Filename != "LazyTypeLoader.ts").ToList();
+    }
+
     private static ServerTypingsGenerator CreateGenerator(params Type[] types)
     {
         var generator = new ServerTypingsGenerator(new MockFileSystem(),

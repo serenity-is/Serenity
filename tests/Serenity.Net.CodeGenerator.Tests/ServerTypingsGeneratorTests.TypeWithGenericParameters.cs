@@ -10,7 +10,7 @@ namespace Serenity.CodeGeneration
             var generator = CreateGenerator(typeof(TypeWithOneGenericParameter<>));
             generator.RootNamespaces.Add("Serenity");
             var result = generator.Run();
-            var code = Assert.Single(result).Text;
+            var code = Assert.Single(ExceptGenericFiles(result)).Text;
             Assert.Contains("export interface TypeWithOneGenericParameter<T> extends ServiceRequest", code);
             Assert.Contains("SomeList?: T[];", code);
             Assert.Contains("SomeDictionary?: { [key: string]: T };", code);
@@ -22,7 +22,7 @@ namespace Serenity.CodeGeneration
             var generator = CreateGenerator(typeof(TypeWithOneGenericAndBase<>));
             generator.RootNamespaces.Add("Serenity");
             var result = generator.Run();
-            var code = Assert.Single(result).Text;
+            var code = Assert.Single(ExceptGenericFiles(result)).Text;
             Assert.Contains("export interface TypeWithOneGenericAndBase<T> extends RetrieveResponse<string>", code);
             Assert.Contains("SomeList?: T[];", code);
             Assert.Contains("SomeDictionary?: { [key: string]: T };", code);
@@ -34,7 +34,7 @@ namespace Serenity.CodeGeneration
             var generator = CreateGenerator(typeof(TypeWithTwoGenericParameters<,>));
             generator.RootNamespaces.Add("Serenity");
             var result = generator.Run();
-            var code = Assert.Single(result).Text;
+            var code = Assert.Single(ExceptGenericFiles(result)).Text;
             Assert.Contains("export interface TypeWithTwoGenericParameters<T1, T2> extends ServiceRequest", code);
             Assert.Contains("SomeList1?: T1[];", code);
             Assert.Contains("SomeList2?: T2[];", code);

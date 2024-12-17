@@ -4,13 +4,9 @@
     <RootNamespace>Serene</RootNamespace>
     <TypeScriptCompileBlocked>true</TypeScriptCompileBlocked>
     <TypeScriptNoEmitOnError>false</TypeScriptNoEmitOnError>
-    <DotNetSergen>dotnet sergen</DotNetSergen>
     <!--#if (IsNotTemplate)-->
     <CommonSrc>..\..\..\common-features\src\</CommonSrc>
     <SerenitySrc>..\..\..\src\</SerenitySrc>
-    <DotNetSergenDir>$(SerenitySrc)Serenity.Net.CodeGenerator\bin\</DotNetSergenDir>
-    <DotNetSergen Condition="Exists('$(DotNetSergenDir)sergen')">$(DotNetSergenDir)sergen</DotNetSergen>
-    <DotNetSergen Condition="Exists('$(DotNetSergenDir)sergen.exe')">$(DotNetSergenDir)sergen.exe</DotNetSergen>
     <DefineConstants>$(DefineConstants);Northwind;BasicSamples</DefineConstants>
     <UseProjectRefs Condition="!Exists('$(SerenitySrc)..\Serenity.sln')">false</UseProjectRefs>
     <!--#endif-->
@@ -67,7 +63,7 @@
     </ItemGroup>
   </Target>
   <Target Name="TransformMvcClientTypes" BeforeTargets="BeforeBuild" DependsOnTargets="SetSergenTransformArgs">
-    <Exec Command="dotnet tool restore" ContinueOnError="true" />
+    <Exec Command="dotnet tool restore" ContinueOnError="true" Condition="'$(DotNetSergen)' == 'dotnet sergen'" />
     <Exec Command="$(DotNetSergen) mvct $(SergenTransformArgs)" ContinueOnError="true" />
   </Target>
   <Target Name="TransformServerTypings" AfterTargets="AfterBuild" DependsOnTargets="SetSergenTransformArgs">

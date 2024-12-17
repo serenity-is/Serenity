@@ -1,5 +1,14 @@
 <Project>
   <Import Project="$(MSBuildThisFileDirectory)..\build\Feature.Build.targets" />
+  <PropertyGroup>
+      <TransformDependsOn>SetSergenTransformArgs;TransformToolRestore</TransformDependsOn>
+  </PropertyGroup>
+  <Target Name="TransformToolRestore" BeforeTargets="BeforeBuild" DependsOnTargets="SetSergenTransformArgs"
+          Inputs="$(DotnetToolManifestFile)" Outputs="$(DotnetToolRestoreStamp)"
+          Condition="Exists('$(DotnetToolManifestFile)') And '$(DotNetSergen)' == 'dotnet sergen' And '$(SergenTransform)' != 'none' And ('$(SergenTransform)' != '' OR Exists('tsconfig.json'))">
+    <Exec Command="dotnet tool restore" ContinueOnError="true" />
+    <Touch Files="$(DotnetToolRestoreStamp)" AlwaysCreate="true" />
+  </Target>
   <Target Name="TransformMvc" BeforeTargets="BeforeBuild" DependsOnTargets="$(TransformDependsOn)"
           Condition="'$(SergenTransform)' == 'mvc'">
     <Exec Command="$(DotNetSergen) mvc $(SergenTransformArgs)" ContinueOnError="true" />

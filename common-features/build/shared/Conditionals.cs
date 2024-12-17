@@ -1,4 +1,7 @@
 #if IsTemplateBuild || IsProjectWizard
+using System;
+using System.Collections.Generic;
+using System.Linq;
 
 namespace Build;
 

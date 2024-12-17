@@ -252,4 +252,83 @@ public abstract class ImportGeneratorBase : CodeGeneratorBase
 
         return null;
     }
+
+    static readonly string[] EditorAttributeNames =
+    [
+        "Serenity.EditorAttribute",
+        "@serenity-is/corelib:EditorAttribute",
+        "Serenity.ElementAttribute",
+        "@serenity-is/corelib:ElementAttribute",
+        "Serenity.Decorators.registerEditor",
+        "@serenity-is/corelib:Decorators.registerEditor",
+        "Decorators.registerEditor",
+        "registerEditor",
+        "Serenity.Decorators.element",
+        "@serenity-is/corelib:Decorators.element",
+        "Decorators.element"
+    ];
+
+    public static readonly string[] EditorBaseClasses =
+    [
+        "Serenity.Extensions.GridEditorBase",
+        "GridEditorBase",
+        "@serenity-is/extensions:GridEditorBase",
+        "Serenity.LookupEditorBase",
+        "LookupEditorBase",
+        "@serenity-is/corelib:LookupEditorBase",
+        "LookupEditor",
+        "@serenity-is/corelib:LookupEditor",
+        "ServiceLookupEditor",
+        "@serenity-is/corelib:ServiceLookupEditor",
+        "ServiceLookupEditorBase",
+        "@serenity-is/corelib:ServiceLookupEditorBase",
+    ];
+
+    protected bool IsEditorType(ExternalType type)
+    {
+        if (type.IsAbstract == true ||
+            type.IsInterface == true ||
+            type.IsEnum == true)
+            return false;
+
+        if (type.GenericParameters?.Any(x => string.IsNullOrEmpty(x.Default)) == true)
+            return false;
+
+        if (HasBaseType(type, EditorBaseClasses))
+            return true;
+
+        if (GetAttribute(type, inherited: true, attributeNames: EditorAttributeNames) != null)
+            return true;
+
+        return false;
+    }
+
+    static readonly string[] FormatterAttributeNames =
+    [
+        "Serenity.Decorators.registerFormatter",
+        "@serenity-is/corelib:Decorators.registerFormatter",
+        "Decorators.registerFormatter",
+        "registerFormatter"
+    ];
+
+    protected bool IsFormatterType(ExternalType type)
+    {
+        if (type.IsAbstract == true ||
+            type.IsEnum == true ||
+            type.IsInterface == true)
+            return false;
+
+        if (type.GenericParameters?.Any(x => string.IsNullOrEmpty(x.Default)) == true)
+            return false;
+
+        if (GetAttribute(type, inherited: true, attributeNames: FormatterAttributeNames) != null)
+            return true;
+
+        return type.Interfaces != null && type.Interfaces.Any(x =>
+            x == "Serenity.ISlickFormatter" ||
+            x == "Slick.Formatter" ||
+            x == "@serenity-is/corelib:Formatter" ||
+            x == "@serenity-is/corelib/slick:Formatter" ||
+            x?.EndsWith("ISlickFormatter", StringComparison.Ordinal) == true);
+    }
 }
