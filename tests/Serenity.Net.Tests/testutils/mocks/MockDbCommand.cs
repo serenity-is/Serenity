@@ -26,36 +26,36 @@ public class MockDbCommand(IDbConnection connection = null) : IDbCommand
         GC.SuppressFinalize(this);
     }
 
-    public MockDbCommand OnExecuteNonQuery(Func<MockDbCommand, int> func)
+    public MockDbCommand OnExecuteNonQuery(Func<int> func)
     {
         onExecuteNonQuery = func;
         return this;
     }
 
-    protected Func<MockDbCommand, int> onExecuteNonQuery;
+    protected Func<int> onExecuteNonQuery;
 
     public int ExecuteNonQuery()
     {
         if (onExecuteNonQuery != null)
-            return onExecuteNonQuery(this);
+            return onExecuteNonQuery();
 
-        return 1;
+        throw new NotImplementedException();
     }
 
     public MockDbCommand OnExecuteReader(Func<DbDataReader> func)
     {
-        onExecuteReader = func;
+        interceptExecuteReader = func;
         return this;
     }
 
-    protected Func<DbDataReader> onExecuteReader;
+    protected Func<DbDataReader> interceptExecuteReader;
 
     public IDataReader ExecuteReader()
     {
-        if (onExecuteReader != null)
-            return onExecuteReader();
+        if (interceptExecuteReader != null)
+            return interceptExecuteReader();
 
-        return new MockDbDataReader();
+        throw new NotImplementedException();
     }
 
     public IDataReader ExecuteReader(CommandBehavior behavior)

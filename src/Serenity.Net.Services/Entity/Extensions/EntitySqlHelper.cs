@@ -1,5 +1,3 @@
-using Dictionary = System.Collections.Generic.Dictionary<string, object>;
-
 namespace Serenity.Data;
 
 /// <summary>
@@ -16,14 +14,12 @@ public static class EntitySqlHelper
     /// <returns>True if any rows returned</returns>
     public static bool GetFirst(this SqlQuery query, IDbConnection connection)
     {
-        using IDataReader reader = SqlHelper.ExecuteReader(connection, query);
-        if (reader.Read())
-        {
-            query.GetFromReader(reader);
-            return true;
-        }
-        else
+        using var reader = query.ExecuteReader(connection);
+        if (!reader.Read())
             return false;
+
+        query.GetFromReader(reader);
+        return true;
     }
 
     /// <summary>
@@ -36,18 +32,16 @@ public static class EntitySqlHelper
     /// <exception cref="InvalidOperationException">Query returned more than one result!</exception>
     public static bool GetSingle(this SqlQuery query, IDbConnection connection)
     {
-        using IDataReader reader = SqlHelper.ExecuteReader(connection, query);
-        if (reader.Read())
-        {
-            query.GetFromReader(reader);
-
-            if (reader.Read())
-                throw new InvalidOperationException("Query returned more than one result!");
-
-            return true;
-        }
-        else
+        using IDataReader reader = query.ExecuteReader(connection);
+        if (!reader.Read())
             return false;
+
+        query.GetFromReader(reader);
+
+        if (reader.Read())
+            throw new InvalidOperationException("Query returned more than one result!");
+
+        return true;
     }
 
     /// <summary>
@@ -68,20 +62,20 @@ public static class EntitySqlHelper
     /// </summary>
     /// <param name="query">The query.</param>
     /// <param name="connection">The connection.</param>
-    /// <param name="callBack">The call back.</param>
+    /// <param name="callback">The call back.</param>
     /// <returns>Number of returned results</returns>
     public static int ForEach(this SqlQuery query, IDbConnection connection,
-        ReaderCallBack callBack)
+        Action<IDataReader> callback)
     {
         int count = 0;
 
         if (connection.GetDialect().MultipleResultsets)
         {
-            using IDataReader reader = SqlHelper.ExecuteReader(connection, query);
+            using IDataReader reader = query.ExecuteReader(connection);
             while (reader.Read())
             {
                 query.GetFromReader(reader);
-                callBack(reader);
+                callback(reader);
             }
 
             if (query.CountRecords && reader.NextResult() && reader.Read())
@@ -97,7 +91,7 @@ public static class EntitySqlHelper
             while (reader.Read())
             {
                 query.GetFromReader(reader);
-                callBack(reader);
+                callback(reader);
             }
         }
 

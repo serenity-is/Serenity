@@ -763,8 +763,9 @@ public partial class FileUploadBehaviorTests
         sut.ActivateFor(row);
 
         var dbConnection = new MockDbConnection();
-        dbConnection.OnExecuteReader(command => new MockDbDataReader(command.CommandText, null));
-        
+        dbConnection.InterceptExecuteReader(args => new MockDbDataReader(args.CommandText, null));
+        dbConnection.InterceptExecuteNonQuery(args => 1);
+
         var uow = new MockUnitOfWork(dbConnection);
         var requestHandler = new MockSaveHandler<TestIIdRow>
         {
@@ -812,14 +813,8 @@ public partial class FileUploadBehaviorTests
 
         sut.ActivateFor(row);
 
-        IDbCommand dbCommand = null;
         var dbConnection = new MockDbConnection();
-        
-        dbConnection.OnExecuteNonQuery(command =>
-        {
-            dbCommand = command;
-            return 1;
-        });
+        dbConnection.InterceptExecuteNonQuery(args => 1);
         
         var uow = new MockUnitOfWork(dbConnection);
         var requestHandler = new MockSaveHandler<TestIIdRow>
@@ -839,8 +834,8 @@ public partial class FileUploadBehaviorTests
         var newFiles = mockFileSystem.AllFiles.Where(NotMeta);
         var newFile = mockFileSystem.GetFileName(Assert.Single(newFiles));
         
-        Assert.NotNull(dbCommand);
-        var updateStatement = (TSQL.Statements.TSQLUpdateStatement)Assert.Single(TSQL.TSQLStatementReader.ParseStatements(dbCommand.CommandText));
+        var nonQueryCall = Assert.Single(dbConnection.ExecuteNonQueryCalls);
+        var updateStatement = (TSQL.Statements.TSQLUpdateStatement)Assert.Single(TSQL.TSQLStatementReader.ParseStatements(nonQueryCall.CommandText));
         
         Assert.Equal("dbo", updateStatement.Update.Tokens[1].Text);
         Assert.Equal(".", updateStatement.Update.Tokens[2].Text);
@@ -849,12 +844,12 @@ public partial class FileUploadBehaviorTests
         Assert.Equal($"[{nameof(TestIIdRow.StringFieldImageUploadEditor)}]", updateStatement.Set.Tokens[1].Text);
         Assert.Equal("=", updateStatement.Set.Tokens[2].Text);
         Assert.Equal("@p1", updateStatement.Set.Tokens[3].Text);
-        Assert.Equal(newFile, mockFileSystem.GetFileName(((IDbDataParameter)dbCommand.Parameters[0]!).Value as string));
+        Assert.Equal(newFile, mockFileSystem.GetFileName(nonQueryCall.Parameters["@p1"] as string));
         
         Assert.Equal("[Id]", updateStatement.Where.Tokens[2].Text);
         Assert.Equal("=", updateStatement.Where.Tokens[3].Text);
         Assert.Equal("@p2", updateStatement.Where.Tokens[4].Text);
-        Assert.Equal(row.Id, ((IDbDataParameter)dbCommand.Parameters[1]!).Value);
+        Assert.Equal(row.Id, nonQueryCall.Parameters["@p2"] as int?);
     }
     
      [Fact]
@@ -874,15 +869,7 @@ public partial class FileUploadBehaviorTests
 
         sut.ActivateFor(row);
 
-        IDbCommand dbCommand = null;
         var dbConnection = new MockDbConnection();
-        
-        dbConnection.OnExecuteNonQuery(command =>
-        {
-            dbCommand = command;
-            return 1;
-        });
-        
         var uow = new MockUnitOfWork(dbConnection);
         var requestHandler = new MockSaveHandler<TestIIdRow>
         {
@@ -896,8 +883,6 @@ public partial class FileUploadBehaviorTests
         sut.OnBeforeSave(requestHandler);
         sut.OnAfterSave(requestHandler);
         uow.Commit();
-
-        Assert.Null(dbCommand);
     }
 
     [Fact]
@@ -921,6 +906,7 @@ public partial class FileUploadBehaviorTests
         sut.ActivateFor(row);
 
         var dbConnection = new MockDbConnection();
+        dbConnection.InterceptExecuteNonQuery(args => 1);
 
         var uow = new MockUnitOfWork(dbConnection);
         var requestHandler = new MockSaveHandler<TestIIdRow>
@@ -1164,9 +1150,9 @@ public partial class FileUploadBehaviorTests
             sut.ActivateFor(row);
 
             var dbConnection = new MockDbConnection();
-            dbConnection.OnExecuteReader(command =>
+            dbConnection.InterceptExecuteReader(args =>
             {
-                var selectFields = MockDbDataReader.ParseSelectFieldAliases(command.CommandText).ToList();
+                var selectFields = MockDbDataReader.ParseSelectFieldAliases(args.CommandText).ToList();
                 var retRow = new TestIIdRow();
 
                 foreach (var field in selectFields)
@@ -1179,8 +1165,9 @@ public partial class FileUploadBehaviorTests
                     ((IRow)retRow)[field] = value;
                 }
 
-                return new MockDbDataReader(command.CommandText, retRow);
+                return new MockDbDataReader(args.CommandText, retRow);
             });
+            dbConnection.InterceptExecuteNonQuery(args => 1);
 
             var uow = new MockUnitOfWork(dbConnection);
             var requestHandler = new MockSaveHandler<TestIIdRow>

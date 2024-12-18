@@ -1,4 +1,4 @@
-﻿namespace Serenity.Data;
+namespace Serenity.Data;
 
 /// <summary>
 /// Contains extension methods to perform entity CRUD operations directly on connections.
@@ -38,6 +38,10 @@ public static class EntityConnectionExtensions
     public static TRow TryById<TRow>(this IDbConnection connection, object id)
         where TRow : class, IRow, IIdRow, new()
     {
+        if (connection is IRowOperationInterceptor interceptor &&
+            interceptor.FindRow(typeof(TRow), id, where: null, editQuery: null, byIdOrSingle: true) is { HasValue: true } intres)
+            return (TRow)intres.Value;
+
         var row = new TRow() { TrackWithChecks = true };
         if (new SqlQuery().From(row)
                 .SelectTableFields()
@@ -62,7 +66,9 @@ public static class EntityConnectionExtensions
     public static TRow ById<TRow>(this IDbConnection connection, object id, Action<SqlQuery> editQuery)
         where TRow : class, IRow, IIdRow, new()
     {
-        var row = TryById<TRow>(connection, id, editQuery) ?? throw new ValidationError("RecordNotFound", string.Format("Can't locate '{0}' record with ID {1}!", new TRow().Table, id));
+        var row = TryById<TRow>(connection, id, editQuery) 
+            ?? throw new ValidationError("RecordNotFound", string.Format(
+                "Can't locate '{0}' record with ID {1}!", new TRow().Table, id));
         return row;
     }
 
@@ -79,6 +85,10 @@ public static class EntityConnectionExtensions
     public static TRow TryById<TRow>(this IDbConnection connection, object id, Action<SqlQuery> editQuery)
         where TRow : class, IRow, IIdRow, new()
     {
+        if (connection is IRowOperationInterceptor interceptor &&
+            interceptor.FindRow(typeof(TRow), id, where: null, editQuery, byIdOrSingle: true) is { HasValue: true } intres)
+            return (TRow)intres.Value;
+
         var row = new TRow() { TrackWithChecks = true };
         var query = new SqlQuery().From(row)
             .Where(new Criteria(row.IdField) == new ValueCriteria(id));
@@ -124,6 +134,10 @@ public static class EntityConnectionExtensions
     public static TRow TrySingle<TRow>(this IDbConnection connection, ICriteria where)
         where TRow : class, IRow, new()
     {
+        if (connection is IRowOperationInterceptor interceptor &&
+            interceptor.FindRow(typeof(TRow), id: default, where, editQuery: null, byIdOrSingle: true) is { HasValue: true } intres)
+            return (TRow)intres.Value;
+
         var row = new TRow() { TrackWithChecks = true };
         if (new SqlQuery().From(row)
                 .SelectTableFields()
@@ -163,6 +177,10 @@ public static class EntityConnectionExtensions
     public static TRow TrySingle<TRow>(this IDbConnection connection, Action<SqlQuery> editQuery)
         where TRow : class, IRow, new()
     {
+        if (connection is IRowOperationInterceptor interceptor &&
+            interceptor.FindRow(typeof(TRow), id: default, where: null, editQuery, byIdOrSingle: true) is { HasValue: true } intres)
+            return (TRow)intres.Value;
+
         var row = new TRow() { TrackWithChecks = true };
         var query = new SqlQuery().From(row);
 
@@ -199,6 +217,10 @@ public static class EntityConnectionExtensions
     public static TRow TryFirst<TRow>(this IDbConnection connection, ICriteria where)
         where TRow : class, IRow, new()
     {
+        if (connection is IRowOperationInterceptor interceptor &&
+            interceptor.FindRow(typeof(TRow), id: default, where, editQuery: null, byIdOrSingle: false) is { HasValue: true } intres)
+            return (TRow)intres.Value;
+
         var row = new TRow() { TrackWithChecks = true };
         if (new SqlQuery().From(row)
                 .SelectTableFields()
@@ -236,6 +258,10 @@ public static class EntityConnectionExtensions
     public static TRow TryFirst<TRow>(this IDbConnection connection, Action<SqlQuery> editQuery)
         where TRow : class, IRow, new()
     {
+        if (connection is IRowOperationInterceptor interceptor &&
+            interceptor.FindRow(typeof(TRow), id: default, where: null, editQuery, byIdOrSingle: false) is { HasValue: true } intres)
+            return (TRow)intres.Value;
+
         var row = new TRow() { TrackWithChecks = true };
         var query = new SqlQuery().From(row);
 
@@ -269,6 +295,10 @@ public static class EntityConnectionExtensions
     public static int Count<TRow>(this IDbConnection connection, ICriteria where)
         where TRow : class, IRow, new()
     {
+        if (connection is IRowOperationInterceptor interceptor &&
+            interceptor.ListRows(typeof(TRow), where, editQuery: null, countOnly: true) is { HasValue: true } intres)
+            return intres.Value?.Count() ?? 0;
+
         var row = new TRow() { TrackWithChecks = true };
 
         return Convert.ToInt32(SqlHelper.ExecuteScalar(connection,
@@ -287,6 +317,10 @@ public static class EntityConnectionExtensions
     public static bool ExistsById<TRow>(this IDbConnection connection, object id)
         where TRow : class, IRow, IIdRow, new()
     {
+        if (connection is IRowOperationInterceptor interceptor &&
+            interceptor.FindRow(typeof(TRow), id, where: null, editQuery: null, byIdOrSingle: false) is { HasValue: true } intres)
+            return intres.Value != null;
+
         var row = new TRow();
         return new SqlQuery()
                 .From(row)
@@ -305,6 +339,10 @@ public static class EntityConnectionExtensions
     public static bool Exists<TRow>(this IDbConnection connection, ICriteria where)
         where TRow : class, IRow, new()
     {
+        if (connection is IRowOperationInterceptor interceptor &&
+            interceptor.FindRow(typeof(TRow), id: default, where: null, editQuery: null, byIdOrSingle: false) is { HasValue: true } intres)
+            return intres.Value != null;
+
         var row = new TRow() { TrackWithChecks = true };
         return new SqlQuery().From(row)
                 .Select("1")
@@ -338,6 +376,10 @@ public static class EntityConnectionExtensions
     public static List<TRow> List<TRow>(this IDbConnection connection, ICriteria where)
         where TRow : class, IRow, new()
     {
+        if (connection is IRowOperationInterceptor interceptor &&
+            interceptor.ListRows(typeof(TRow), where, editQuery: null, countOnly: false) is { HasValue: true } intres)
+            return (List<TRow>)intres.Value;
+
         var row = new TRow() { TrackWithChecks = true };
         return new SqlQuery().From(row)
                 .SelectTableFields()
@@ -356,6 +398,10 @@ public static class EntityConnectionExtensions
     public static List<TRow> List<TRow>(this IDbConnection connection, Action<SqlQuery> editQuery)
         where TRow : class, IRow, new()
     {
+        if (connection is IRowOperationInterceptor interceptor &&
+            interceptor.ListRows(typeof(TRow), where: null, editQuery, countOnly: false) is { HasValue: true } intres)
+            return (List<TRow>)intres.Value;
+
         var row = new TRow() { TrackWithChecks = true };
         var query = new SqlQuery().From(row);
 
@@ -372,8 +418,12 @@ public static class EntityConnectionExtensions
     /// <param name="connection">The connection.</param>
     /// <param name="row">The row.</param>
     public static void Insert<TRow>(this IDbConnection connection, TRow row)
-        where TRow : class, IRow
+        where TRow : IRow
     {
+        if (connection is IRowOperationInterceptor interceptor &&
+            interceptor.ManipulateRow(typeof(TRow), id: default, row, ExpectedRows.Ignore, getNewId: false) is { HasValue: true })
+            return;
+
         ToSqlInsert(row).Execute(connection);
     }
 
@@ -387,8 +437,12 @@ public static class EntityConnectionExtensions
     /// <param name="row">The row.</param>
     /// <returns>The ID of the record inserted.</returns>
     public static long? InsertAndGetID<TRow>(this IDbConnection connection, TRow row)
-        where TRow : IRow
+        where TRow: IRow
     {
+        if (connection is IRowOperationInterceptor interceptor &&
+            interceptor.ManipulateRow(typeof(TRow), id: default, row, ExpectedRows.Ignore, getNewId: true) is { HasValue: true } intres)
+            return intres.Value;
+
         return ToSqlInsert(row).ExecuteAndGetID(connection);
     }
 
@@ -402,7 +456,7 @@ public static class EntityConnectionExtensions
     /// <param name="expectedRows">The expected number of rows to be updated, by default 1.</param>
     /// <exception cref="InvalidOperationException">ID field of row has null value!</exception>
     /// <exception cref="InvalidOperationException">Expected rows and number of updated rows does not match!</exception>
-    public static void UpdateById<TRow>(this IDbConnection connection, TRow row, ExpectedRows expectedRows = ExpectedRows.One)
+    public static int UpdateById<TRow>(this IDbConnection connection, TRow row, ExpectedRows expectedRows = ExpectedRows.One)
         where TRow : IIdRow
     {
         var idField = row.IdField;
@@ -411,7 +465,11 @@ public static class EntityConnectionExtensions
         if (idField.IsNull(r))
             throw new InvalidOperationException("ID field of row has null value!");
 
-        row.ToSqlUpdateById()
+        if (connection is IRowOperationInterceptor interceptor &&
+            interceptor.ManipulateRow(typeof(TRow), id: idField.AsObject(row), row, expectedRows, getNewId: false) is { HasValue: true } intres)
+            return (int)intres.Value;
+
+        return row.ToSqlUpdateById()
             .Execute(connection, expectedRows);
     }
 
@@ -428,6 +486,10 @@ public static class EntityConnectionExtensions
     public static int DeleteById<TRow>(this IDbConnection connection, object id, ExpectedRows expectedRows = ExpectedRows.One)
         where TRow : class, IRow, IIdRow, new()
     {
+        if (connection is IRowOperationInterceptor interceptor &&
+            interceptor.ManipulateRow(typeof(TRow), id, row: null, expectedRows, getNewId: false) is { HasValue: true } intres)
+            return (int)intres.Value;
+
         var row = new TRow();
         return new SqlDelete(row.Table)
             .Where(row.IdField == new ValueCriteria(id))

@@ -1,4 +1,4 @@
-﻿namespace Serenity.TestUtils;
+namespace Serenity.TestUtils;
 
 public class NullDbConnection : IDbConnection
 {
@@ -14,10 +14,9 @@ public class NullDbConnection : IDbConnection
     public void Close() { isOpen = false; }
     public IDbCommand CreateCommand() => throw new System.NotImplementedException();
 
-#pragma warning disable CA1816 // Dispose methods should call SuppressFinalize
     public void Dispose()
-#pragma warning restore CA1816 // Dispose methods should call SuppressFinalize
     {
+        GC.SuppressFinalize(this);
     }
 
     public void Open()

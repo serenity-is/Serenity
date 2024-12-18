@@ -1,6 +1,5 @@
 using Microsoft.Extensions.Logging;
 using System.IO;
-using Dictionary = System.Collections.Generic.Dictionary<string, object>;
 
 namespace Serenity.Data;
 
@@ -226,7 +225,7 @@ public static class SqlHelper
     /// <exception cref="ArgumentNullException">
     /// command is null or command.Connection is null.
     /// </exception>
-    public static int ExecuteNonQuery(IDbCommand command, ILogger logger = null)
+    private static int InternalExecuteNonQuery(IDbCommand command, ILogger logger)
     {
         if (command == null)
             throw new ArgumentNullException("command");
@@ -269,20 +268,6 @@ public static class SqlHelper
         }
     }
 
-
-    /// <summary>
-    /// Executes the statement.
-    /// </summary>
-    /// <param name="connection">The connection.</param>
-    /// <param name="commandText">The command text.</param>
-    /// <param name="logger">Logger</param>
-    /// <returns>Number of affected rows</returns>
-    public static int ExecuteNonQuery(IDbConnection connection, string commandText, ILogger logger = null)
-    {
-        using IDbCommand command = NewCommand(connection, commandText);
-        return ExecuteNonQuery(command, logger);
-    }
-
     /// <summary>
     /// Executes the statement
     /// </summary>
@@ -291,10 +276,13 @@ public static class SqlHelper
     /// <param name="param">The parameters.</param>
     /// <param name="logger">Logger</param>
     /// <returns>Number of affected rows</returns>
-    public static int ExecuteNonQuery(IDbConnection connection, string commandText, IDictionary<string, object> param, ILogger logger = null)
+    public static int ExecuteNonQuery(IDbConnection connection, string commandText, IDictionary<string, object> param = null, ILogger logger = null)
     {
+        if (connection is ISqlOperationInterceptor interceptor &&
+            interceptor.ExecuteNonQuery(commandText, param, ExpectedRows.Ignore, query: null, getNewId: false) is { HasValue: true } intres)
+            return (int)intres.Value;
         using IDbCommand command = NewCommand(connection, commandText, param);
-        return ExecuteNonQuery(command, logger);
+        return InternalExecuteNonQuery(command, logger);
     }
 
     /// <summary>
@@ -304,12 +292,16 @@ public static class SqlHelper
     /// <param name="query">The query.</param>
     /// <param name="connection">The connection.</param>
     /// <param name="logger">Logger</param>
-    /// <returns></returns>
     /// <exception cref="ArgumentNullException">query.IdentityColumn is null</exception>
     /// <exception cref="NotImplementedException">The connection dialect doesn't support returning inserted identity.</exception>
     public static long? ExecuteAndGetID(this SqlInsert query, IDbConnection connection, ILogger logger = null)
     {
         string queryText = query.ToString();
+
+        if (connection is ISqlOperationInterceptor interceptor &&
+            interceptor.ExecuteNonQuery(queryText, query.Params, ExpectedRows.One, query, getNewId: true) is { HasValue: true } intres)
+            return intres.Value;
+
         var dialect = connection.GetDialect();
         if (dialect.UseReturningIdentity || dialect.UseReturningIntoVar)
         {
@@ -325,7 +317,7 @@ public static class SqlHelper
             param.ParameterName = identityColumn;
             param.DbType = DbType.Int64;
             command.Parameters.Add(param);
-            ExecuteNonQuery(command, logger);
+            InternalExecuteNonQuery(command, logger);
             return Convert.ToInt64(param.Value);
         }
 
@@ -335,7 +327,7 @@ public static class SqlHelper
 
             queryText += ";\nSELECT " + scopeIdentityExpression + " AS IDCOLUMNVALUE";
 
-            using IDataReader reader = ExecuteReader(connection, queryText, query.Params, logger);
+            using IDataReader reader = InternalExecuteReader(connection, queryText, query.Params, logger);
             if (reader.Read() &&
                 !reader.IsDBNull(0))
                 return Convert.ToInt64(reader.GetValue(0));
@@ -373,19 +365,13 @@ public static class SqlHelper
     /// <param name="logger">Logger</param>
     public static void Execute(this SqlInsert query, IDbConnection connection, ILogger logger = null)
     {
-        ExecuteNonQuery(connection, query.ToString(), query.Params, logger);
-    }
+        string commandText = query.ToString();
+        if (connection is ISqlOperationInterceptor interceptor &&
+            interceptor.ExecuteNonQuery(commandText, query.Params, ExpectedRows.One, query, true) is { HasValue: true })
+            return;
 
-    /// <summary>
-    /// Executes the query on connection with specified params.
-    /// </summary>
-    /// <param name="query">The query.</param>
-    /// <param name="connection">The connection.</param>
-    /// <param name="param">The parameters.</param>
-    /// <param name="logger">Logger</param>
-    public static void Execute(this SqlInsert query, IDbConnection connection, Dictionary param, ILogger logger = null)
-    {
-        ExecuteNonQuery(connection, query.ToString(), param, logger);
+        using var command = NewCommand(connection, commandText, query.Params);
+        InternalExecuteNonQuery(command, logger);
     }
 
     /// <summary>
@@ -398,7 +384,13 @@ public static class SqlHelper
     /// <returns>Number of affected rows.</returns>
     public static int Execute(this SqlUpdate query, IDbConnection connection, ExpectedRows expectedRows = ExpectedRows.One, ILogger logger = null)
     {
-        return CheckExpectedRows(expectedRows, ExecuteNonQuery(connection, query.ToString(), query.Params, logger));
+        string commandText = query.ToString();
+        if (connection is ISqlOperationInterceptor interceptor &&
+            interceptor.ExecuteNonQuery(commandText, query.Params, ExpectedRows.One, query, true) is { HasValue: true } intres)
+            return (int)intres.Value;
+
+        using var command = NewCommand(connection, commandText, query.Params);
+        return CheckExpectedRows(expectedRows, InternalExecuteNonQuery(command, logger));
     }
 
     /// <summary>
@@ -413,37 +405,20 @@ public static class SqlHelper
     /// </returns>
     public static int Execute(this SqlDelete query, IDbConnection connection, ExpectedRows expectedRows = ExpectedRows.One, ILogger logger = null)
     {
-        return CheckExpectedRows(expectedRows, ExecuteNonQuery(connection, query.ToString(), query.Params, logger));
+        if (query == null)
+            throw new ArgumentNullException(nameof(query));
+
+        var commandText = query.ToString();
+
+        if (connection is ISqlOperationInterceptor interceptor &&
+            interceptor.ExecuteNonQuery(commandText, query.Params, expectedRows, query, getNewId: false) is { HasValue: true } intres)
+            return (int)intres.Value;
+
+        using var command = NewCommand(connection, commandText, query.Params);
+        return CheckExpectedRows(expectedRows, InternalExecuteNonQuery(command, logger));
     }
 
-    /// <summary>
-    /// Executes the specified delete query on connection and returns number of affected rows.
-    /// </summary>
-    /// <param name="query">The query.</param>
-    /// <param name="connection">The connection.</param>
-    /// <param name="param">The parameters.</param>
-    /// <param name="expectedRows">The expected rows. Used to validate expected number of affected rows.</param>
-    /// <param name="logger">Logger</param>
-    /// <returns>
-    /// Number of affected rows.
-    /// </returns>
-    public static int Execute(this SqlDelete query, IDbConnection connection, Dictionary param,
-        ExpectedRows expectedRows = ExpectedRows.One, ILogger logger = null)
-    {
-        return CheckExpectedRows(expectedRows, ExecuteNonQuery(connection, query.ToString(), param, logger));
-    }
-
-    /// <summary>
-    /// Executes the command returning a data reader.
-    /// </summary>
-    /// <param name="connection">The connection.</param>
-    /// <param name="commandText">The command text.</param>
-    /// <param name="param">The parameters.</param>
-    /// <param name="logger">Logger</param>
-    /// <returns></returns>
-    /// <exception cref="ArgumentNullException">connection is null</exception>
-    public static IDataReader ExecuteReader(IDbConnection connection, string commandText,
-        IDictionary<string, object> param, ILogger logger = null)
+    private static IDataReader InternalExecuteReader(IDbConnection connection, string commandText, IDictionary<string, object> param, ILogger logger)
     {
         if (connection == null)
             throw new ArgumentNullException("connection");
@@ -485,6 +460,25 @@ public static class SqlHelper
     }
 
     /// <summary>
+    /// Executes the command returning a data reader.
+    /// </summary>
+    /// <param name="connection">The connection.</param>
+    /// <param name="commandText">The command text.</param>
+    /// <param name="param">The parameters.</param>
+    /// <param name="logger">Logger</param>
+    /// <returns></returns>
+    /// <exception cref="ArgumentNullException">connection is null</exception>
+    public static IDataReader ExecuteReader(IDbConnection connection, string commandText,
+        IDictionary<string, object> param, ILogger logger = null)
+    {
+        if (connection is ISqlOperationInterceptor interceptor &&
+            interceptor.ExecuteReader(commandText, param, query: null) is { HasValue: true } intres)
+            return intres.Value;
+
+        return InternalExecuteReader(connection, commandText, param, logger);
+    }
+
+    /// <summary>
     /// Executes the query.
     /// </summary>
     /// <param name="query">The query.</param>
@@ -493,32 +487,18 @@ public static class SqlHelper
     /// <returns>A data reader with results.</returns>
     public static IDataReader ExecuteReader(this SqlQuery query, IDbConnection connection, ILogger logger = null)
     {
-        return ExecuteReader(connection, query.ToString(), query.Params, logger);
+        if (query == null) 
+            throw new ArgumentNullException("query");
+
+        var commandText = query.ToString();
+        if (connection is ISqlOperationInterceptor interceptor &&
+            interceptor.ExecuteReader(commandText, query.Params, query) is { HasValue: true } intres)
+            return intres.Value;
+
+        return InternalExecuteReader(connection, commandText, query.Params, logger);
     }
 
-    /// <summary>
-    /// Executes the query.
-    /// </summary>
-    /// <param name="query">The query.</param>
-    /// <param name="connection">The connection.</param>
-    /// <param name="param">The parameters.</param>
-    /// <param name="logger">Logger</param>
-    /// <returns>A data reader with results</returns>
-    public static IDataReader ExecuteReader(this SqlQuery query, IDbConnection connection, Dictionary param, ILogger logger = null)
-    {
-        return ExecuteReader(connection, query.ToString(), param, logger);
-    }
-
-    /// <summary>
-    /// Executes the statement returning a scalar value.
-    /// </summary>
-    /// <param name="connection">The connection.</param>
-    /// <param name="commandText">The command text.</param>
-    /// <param name="param">The parameters.</param>
-    /// <param name="logger">Logger</param>
-    /// <returns></returns>
-    /// <exception cref="ArgumentNullException">connection</exception>
-    public static object ExecuteScalar(IDbConnection connection, string commandText, IDictionary<string, object> param, ILogger logger = null)
+    private static object InternalExecuteScalar(IDbConnection connection, string commandText, IDictionary<string, object> param, ILogger logger)
     {
         if (connection == null)
             throw new ArgumentNullException("connection");
@@ -564,89 +544,39 @@ public static class SqlHelper
     /// </summary>
     /// <param name="connection">The connection.</param>
     /// <param name="commandText">The command text.</param>
+    /// <param name="param">The parameters.</param>
     /// <param name="logger">Logger</param>
-    /// <returns>Scalar value</returns>
-    public static object ExecuteScalar(IDbConnection connection, string commandText, ILogger logger = null)
+    /// <returns></returns>
+    /// <exception cref="ArgumentNullException">connection</exception>
+    public static object ExecuteScalar(IDbConnection connection, string commandText, IDictionary<string, object> param = null, ILogger logger = null)
     {
-        return ExecuteScalar(connection, commandText, null, logger);
+        if (connection is ISqlOperationInterceptor interceptor &&
+            interceptor.ExecuteScalar(commandText, param, query: null) is { HasValue: true } intres)
+            return intres.Value;
+
+        return InternalExecuteScalar(connection, commandText, param, logger);
     }
 
     /// <summary>
     /// Executes the statement returning a scalar value.
     /// </summary>
     /// <param name="connection">The connection.</param>
-    /// <param name="selectQuery">The select query.</param>
+    /// <param name="query">The select query.</param>
     /// <param name="logger">Logger</param>
     /// <returns>Scalar value</returns>
     /// <exception cref="ArgumentNullException">selectQuery is null</exception>
-    public static object ExecuteScalar(IDbConnection connection, SqlQuery selectQuery, ILogger logger = null)
+    public static object ExecuteScalar(IDbConnection connection, SqlQuery query, ILogger logger = null)
     {
-        if (selectQuery == null)
-            throw new ArgumentNullException("selectQuery");
+        if (query == null)
+            throw new ArgumentNullException(nameof(query));
 
-        return ExecuteScalar(connection, selectQuery.ToString(), selectQuery.Params, logger);
+        string commandText = query.ToString();
+        if (connection is ISqlOperationInterceptor interceptor &&
+            interceptor.ExecuteReader(commandText, query.Params, query) is { HasValue: true } intres)
+            return intres.Value;
+
+        return InternalExecuteScalar(connection, commandText, query.Params, logger);
     }
-
-    /// <summary>
-    /// Executes the statement returning a scalar value.
-    /// </summary>
-    /// <param name="connection">The connection.</param>
-    /// <param name="selectQuery">The select query.</param>
-    /// <param name="param">The parameters.</param>
-    /// <param name="logger">Logger</param>
-    /// <returns>
-    /// Scalar value
-    /// </returns>
-    /// <exception cref="ArgumentNullException">selectQuery is null</exception>
-    public static object ExecuteScalar(IDbConnection connection, SqlQuery selectQuery, Dictionary param, ILogger logger = null)
-    {
-        if (selectQuery == null)
-            throw new ArgumentNullException("selectQuery");
-
-        return ExecuteScalar(connection, selectQuery.ToString(), param, logger);
-    }
-
-    /// <summary>
-    /// Executes the statement returning a data reader.
-    /// </summary>
-    /// <param name="connection">The connection.</param>
-    /// <param name="commandText">The command text.</param>
-    /// <param name="logger">Logger</param>
-    /// <returns>Data reader with results</returns>
-    public static IDataReader ExecuteReader(IDbConnection connection, string commandText, ILogger logger = null)
-    {
-        return ExecuteReader(connection, commandText, null, logger);
-    }
-
-    /// <summary>
-    /// Executes the statement returning a data reader.
-    /// </summary>
-    /// <param name="connection">The connection.</param>
-    /// <param name="query">The query.</param>
-    /// <param name="logger">Logger</param>
-    /// <returns>
-    /// Data reader with results
-    /// </returns>
-    public static IDataReader ExecuteReader(IDbConnection connection, SqlQuery query, ILogger logger = null)
-    {
-        return ExecuteReader(connection, query.ToString(), query.Params, logger);
-    }
-
-    /// <summary>
-    /// Executes the statement returning a data reader.
-    /// </summary>
-    /// <param name="connection">The connection.</param>
-    /// <param name="query">The query.</param>
-    /// <param name="param">The parameters.</param>
-    /// <param name="logger">Logger</param>
-    /// <returns>
-    /// Data reader with results
-    /// </returns>
-    public static IDataReader ExecuteReader(IDbConnection connection, SqlQuery query, Dictionary param, ILogger logger = null)
-    {
-        return ExecuteReader(connection, query.ToString(), param, logger);
-    }
-
 
     /// <summary>
     /// Executes the query returning true if it has at least one result.
@@ -657,8 +587,7 @@ public static class SqlHelper
     /// <returns>True if query returns one result.</returns>
     public static bool Exists(this SqlQuery query, IDbConnection connection, ILogger logger = null)
     {
-        using IDataReader reader = ExecuteReader(connection, query, logger);
+        using var reader = ExecuteReader(query, connection, logger);
         return reader.Read();
     }
-
 }

@@ -1,4 +1,4 @@
-﻿namespace Serenity.Data;
+namespace Serenity.Data;
 
 /// <summary>
 ///   A static class with helper functions to update display orders of all records or
@@ -28,13 +28,14 @@ public static class DisplayOrderHelper
         if (orderField is null)
             throw new ArgumentNullException("orderField");
 
-        using IDataReader reader = SqlHelper.ExecuteReader(connection,
-            new SqlQuery().Select(
+        using IDataReader reader = new SqlQuery()
+            .Select(
                 Sql.Max(orderField.Name))
             .From(
                 tableName, Alias.T0)
             .Where(
-                filter));
+                filter)
+            .ExecuteReader(connection);
         if (reader.Read() && !reader.IsDBNull(0))
             return Convert.ToInt32(reader.GetValue(0)) + 1;
         else
@@ -124,9 +125,9 @@ public static class DisplayOrderHelper
         query.OrderBy(keyField.Name, desc: descendingKeyOrder);
 
         // read all existing records
-        using (IDataReader reader = SqlHelper.ExecuteReader(connection, query))
+        using (IDataReader reader = query.ExecuteReader(connection))
         {
-            var recordIDStr = recordID == null ? null : 
+            var recordIDStr = recordID == null ? null :
                 IdToSql(recordID, connection.GetDialect());
             while (reader.Read())
             {
@@ -146,7 +147,7 @@ public static class DisplayOrderHelper
                 orderRecords.Add(r);
 
                 // if this is the one that is requested to be changed, hold a link to its entry
-                if (recordID != null && recordIDStr == 
+                if (recordID != null && recordIDStr ==
                         IdToSql(r.recordID, connection.GetDialect()))
                     changing = r;
             }
