@@ -44,16 +44,16 @@ public class MockDbCommand(IDbConnection connection = null) : IDbCommand
 
     public MockDbCommand OnExecuteReader(Func<DbDataReader> func)
     {
-        interceptExecuteReader = func;
+        onExecuteReader = func;
         return this;
     }
 
-    protected Func<DbDataReader> interceptExecuteReader;
+    protected Func<DbDataReader> onExecuteReader;
 
     public IDataReader ExecuteReader()
     {
-        if (interceptExecuteReader != null)
-            return interceptExecuteReader();
+        if (onExecuteReader != null)
+            return onExecuteReader();
 
         throw new NotImplementedException();
     }

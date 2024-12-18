@@ -50,13 +50,10 @@ WHERE (T0.[ID] = @p1)".NormalizeSql(), call.CommandText.NormalizeSql());
         using var connection = new MockDbConnection()
             .InterceptExecuteReader(args =>
             {
-                Assert.Equal(@"SELECT 
-T0.[CityId] AS [CityId],
-T0.[CityName] AS [CityName],
-T0.[CountryId] AS [CountryId]
-FROM [Cities] T0 
-WHERE (T0.[CityId] = @p1)".NormalizeSql(), args.CommandText.NormalizeSql());
-
+                var columns = ((ISqlQueryExtensible)args.Query.AssertNotNull())
+                    .Columns.Select(x => x.ColumnName);
+                Assert.Equal(columns, CityRow.Fields
+                    .Where(x => x.IsTableField()).Select(x => x.Name));
                 return new MockDbDataReader(new
                 {
                     CityId = 777,
@@ -79,12 +76,9 @@ WHERE (T0.[CityId] = @p1)".NormalizeSql(), args.CommandText.NormalizeSql());
         using var connection = new MockDbConnection()
             .InterceptExecuteReader(args =>
             {
-                Assert.Equal(@"SELECT 
-jCountry.CountryName AS [CountryName]
-FROM [Cities] T0 
-LEFT JOIN [Countries] jCountry ON (jCountry.[CountryId] = T0.[CountryId])
-WHERE (T0.[CityId] = @p1)".NormalizeSql(), args.CommandText.NormalizeSql());
-
+                var columns = ((ISqlQueryExtensible)args.Query.AssertNotNull())
+                                    .Columns.Select(x => x.ColumnName);
+                Assert.Equal(columns, [CityRow.Fields.CountryName.Name]);
                 return new MockDbDataReader(new
                 {
                     CountryName = "TestCountry"

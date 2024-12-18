@@ -38,19 +38,19 @@ public class MockDbConnection : IDbConnection, IRowOperationInterceptor, ISqlOpe
     {
         var command = new MockDbCommand(this);
 
-        if (onCommandExecuteReader != null)
+        if (onDbCommandExecuteReader != null)
             command.OnExecuteReader(() => 
             {
                 DbCommandExecuteReaderCallCount++;
-                return onCommandExecuteReader(command);
+                return onDbCommandExecuteReader(command);
             });
 
-        if (onCommandExecuteQuery != null)
+        if (onDbCommandExecuteNonQuery != null)
         {
             command.OnExecuteNonQuery(() => 
             {
                 DbCommandExecuteNonQueryCallCount++;
-                return onCommandExecuteQuery(command);
+                return onDbCommandExecuteNonQuery(command);
             });
         }
 
@@ -61,18 +61,18 @@ public class MockDbConnection : IDbConnection, IRowOperationInterceptor, ISqlOpe
     public int DbCommandExecuteNonQueryCallCount { get; protected set; } = 0;
     public int DbCommandCallCount => DbCommandExecuteReaderCallCount + DbCommandExecuteNonQueryCallCount;
 
-    protected Func<MockDbCommand, DbDataReader> onCommandExecuteReader;
-    protected Func<MockDbCommand, int> onCommandExecuteQuery;
+    protected Func<MockDbCommand, DbDataReader> onDbCommandExecuteReader;
+    protected Func<MockDbCommand, int> onDbCommandExecuteNonQuery;
 
     public MockDbConnection OnDbCommandExecuteReader(Func<MockDbCommand, DbDataReader> func)
     {
-        onCommandExecuteReader = func;
+        onDbCommandExecuteReader = func;
         return this;
     }
 
     public MockDbConnection OnDbCommandExecuteNonQuery(Func<MockDbCommand, int> func)
     {
-        onCommandExecuteQuery = func;
+        onDbCommandExecuteNonQuery = func;
         return this;
     }
 
