@@ -131,6 +131,7 @@ public class StringField(ICollection<Field> collection, string name, LocalText c
                     style = style.Replace("'", "");
 
                 _setValue(row, val.ToString(style, CultureInfo.InvariantCulture));
+                break;
 
             default:
                 throw JsonUnexpectedToken(reader);
