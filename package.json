@@ -1,10 +1,12 @@
 {
   "name": "@serenity-is/workspace-serenity",
   "devDependencies": {
+    "@vitest/browser": "2.1.8",
     "esbuild": "0.23.1",
     "flatpickr": "4.6.13",
     "jsx-dom": "8.1.5",
     "jsdom": "25.0.1",
+    "playwright": "1.49.1",
     "typescript": "5.7.2",
     "vitest": "2.1.8"
   },
