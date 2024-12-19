@@ -1,4 +1,4 @@
-import { loadNSCorelib } from "@/mocks";
+import { loadNSCorelib } from "../mocks";
 
 test('works when jQuery script loaded', function() {
     loadNSCorelib();

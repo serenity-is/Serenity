@@ -142,7 +142,7 @@ test('render document fragments inside', function () {
 });
 
 test('render svg', function () {
-    const createElementNSSpy = jest.spyOn(document, 'createElementNS');
+    const createElementNSSpy = vi.spyOn(document, 'createElementNS');
 
     const element = (
         <svg>
@@ -162,8 +162,8 @@ test('render svg', function () {
 });
 
 test('render mixed html and svg', function () {
-    const createElementSpy = jest.spyOn(document, 'createElement');
-    const createElementNSSpy = jest.spyOn(document, 'createElementNS');
+    const createElementSpy = vi.spyOn(document, 'createElement');
+    const createElementNSSpy = vi.spyOn(document, 'createElementNS');
 
     const element = (
         <div>
@@ -190,7 +190,7 @@ test('render mixed html and svg', function () {
 });
 
 test('create svg links with xlink namespace', function () {
-    const setAttributeNS = jest.spyOn(Element.prototype, 'setAttributeNS');
+    const setAttributeNS = vi.spyOn(Element.prototype, 'setAttributeNS');
 
     const element = (
         <svg>
@@ -331,7 +331,7 @@ test('set html', function () {
 });
 
 test('attach event listeners', function () {
-    const addEventListener = jest.spyOn(EventTarget.prototype, 'addEventListener');
+    const addEventListener = vi.spyOn(EventTarget.prototype, 'addEventListener');
 
     const handleClick = function () { };
     const element = (
@@ -348,7 +348,7 @@ test('attach event listeners', function () {
 });
 
 test('attach event listeners but drop the dash after on', function () {
-    const addEventListener = jest.spyOn(EventTarget.prototype, 'addEventListener');
+    const addEventListener = vi.spyOn(EventTarget.prototype, 'addEventListener');
 
     const handler = function () { };
     const assignProps = { onremoteinput: handler, onRemoteinput: handler };
@@ -374,7 +374,7 @@ test('attach event listeners but drop the dash after on', function () {
 });
 
 test('fragment', function () {
-    const createDocumentFragment = jest.spyOn(document, 'createDocumentFragment');
+    const createDocumentFragment = vi.spyOn(document, 'createDocumentFragment');
 
     const fragment = <>test</>;
 

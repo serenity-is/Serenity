@@ -1,70 +1,72 @@
+// @ts-ignore
+import { type Mock } from "vitest";
 import * as dialogs from "./dialogs";
 import { ErrorHandling } from "./errorhandling";
 import * as notify from "./notify";
 
 beforeEach(() => {
-    jest.restoreAllMocks();
+    vi.restoreAllMocks();
 });
 
 describe("showServiceError", function () {
     it("shows generic message if error is null", () => {
-        var alertSpy = jest.spyOn(dialogs, "alertDialog").mockImplementation();
+        var alertSpy = vi.spyOn(dialogs, "alertDialog").mockImplementation(() => ({} as any));
         ErrorHandling.showServiceError(null);
         expect(alertSpy).toHaveBeenCalledTimes(1);
         expect(alertSpy).toHaveBeenCalledWith("An error occurred while processing your request.");
     });
 
     it("shows generic message if error message and code is null", () => {
-        var alertSpy = jest.spyOn(dialogs, "alertDialog").mockImplementation();
+        var alertSpy = vi.spyOn(dialogs, "alertDialog").mockImplementation(() => ({} as any));
         ErrorHandling.showServiceError({});
         expect(alertSpy).toHaveBeenCalledTimes(1);
         expect(alertSpy).toHaveBeenCalledWith("An error occurred while processing your request.");
     });
 
     it("shows error code if message is undefined", () => {
-        var alertSpy = jest.spyOn(dialogs, "alertDialog").mockImplementation();
+        var alertSpy = vi.spyOn(dialogs, "alertDialog").mockImplementation(() => ({} as any));
         ErrorHandling.showServiceError({ Code: 'Test' });
         expect(alertSpy).toHaveBeenCalledTimes(1);
         expect(alertSpy).toHaveBeenCalledWith("Test");
     });
 
     it("shows message if both message and code is not null", () => {
-        var alertSpy = jest.spyOn(dialogs, "alertDialog").mockImplementation();
+        var alertSpy = vi.spyOn(dialogs, "alertDialog").mockImplementation(() => ({} as any));
         ErrorHandling.showServiceError({ Code: 'TestCode', Message: 'TestMessage' });
         expect(alertSpy).toHaveBeenCalledTimes(1);
         expect(alertSpy).toHaveBeenCalledWith("TestMessage");
     });
 
     it("shows message if code is undefined", () => {
-        var alertSpy = jest.spyOn(dialogs, "alertDialog").mockImplementation();
+        var alertSpy = vi.spyOn(dialogs, "alertDialog").mockImplementation(() => ({} as any));
         ErrorHandling.showServiceError({ Message: 'TestMessage' });
         expect(alertSpy).toHaveBeenCalledTimes(1);
         expect(alertSpy).toHaveBeenCalledWith("TestMessage");
     });
 
     it("shows iframe dialog if errorInfo has responseText", () => {
-        var iframeDialogSpy = jest.spyOn(dialogs, "iframeDialog").mockImplementation();
+        var iframeDialogSpy = vi.spyOn(dialogs, "iframeDialog").mockImplementation(() => ({} as any));
         ErrorHandling.showServiceError(null, { responseText: "<html>Some error message</html>" });
         expect(iframeDialogSpy).toHaveBeenCalledTimes(1);
         expect(iframeDialogSpy).toHaveBeenCalledWith({ html: "<html>Some error message</html>" });
     });
 
     it("shows alert dialog for unknown AJAX connection error", () => {
-        var alertSpy = jest.spyOn(dialogs, "alertDialog").mockImplementation();
+        var alertSpy = vi.spyOn(dialogs, "alertDialog").mockImplementation(() => ({} as any));
         ErrorHandling.showServiceError(null, { statusText: "something" });
         expect(alertSpy).toHaveBeenCalledTimes(1);
         expect(alertSpy).toHaveBeenCalledWith("An error occured while connecting to the server.");
     });
 
     it("shows alert dialog for HTTP 500 error", () => {
-        var alertSpy = jest.spyOn(dialogs, "alertDialog").mockImplementation();
+        var alertSpy = vi.spyOn(dialogs, "alertDialog").mockImplementation(() => ({} as any));
         ErrorHandling.showServiceError(null, { status: 500 });
         expect(alertSpy).toHaveBeenCalledTimes(1);
         expect(alertSpy).toHaveBeenCalledWith("Internal Server Error (500).");
     });
 
     it("shows alert dialog for other HTTP errors", () => {
-        var alertSpy = jest.spyOn(dialogs, "alertDialog").mockImplementation();
+        var alertSpy = vi.spyOn(dialogs, "alertDialog").mockImplementation(() => ({} as any));
         ErrorHandling.showServiceError(null, { status: 404 });
         expect(alertSpy).toHaveBeenCalledTimes(1);
         expect(alertSpy).toHaveBeenCalledWith("HTTP Error 404.");
@@ -126,9 +128,9 @@ describe("isDevelopmentMode", function () {
 
 describe("runtimeErrorHandler", function () {
     it("ignores if isDevelopmentMode() return false", function () {
-        const notifyErrorSpy = jest.spyOn(notify, "notifyError").mockImplementation();
-        const setTimeoutSpy = jest.spyOn(window, "setTimeout").mockImplementation();
-        jest.spyOn(ErrorHandling, "isDevelopmentMode").mockImplementation(() => false);
+        const notifyErrorSpy = vi.spyOn(notify, "notifyError").mockImplementation(() => ({} as any));
+        const setTimeoutSpy = vi.spyOn(window, "setTimeout").mockImplementation(() => ({} as any));
+        vi.spyOn(ErrorHandling, "isDevelopmentMode").mockImplementation(() => false);
 
         ErrorHandling.runtimeErrorHandler("test", "test.js", 1, 2, new Error("test"));
 
@@ -137,9 +139,9 @@ describe("runtimeErrorHandler", function () {
     });
 
     it("displayed text contains the passed error details", function () {
-        const notifyErrorSpy = jest.spyOn(notify, "notifyError").mockImplementation();
-        const setTimeoutSpy = jest.spyOn(window, "setTimeout").mockImplementation((f) => (f as any)());
-        jest.spyOn(ErrorHandling, "isDevelopmentMode").mockImplementation(() => true);
+        const notifyErrorSpy = vi.spyOn(notify, "notifyError").mockImplementation(() => ({} as any));
+        const setTimeoutSpy = vi.spyOn(window, "setTimeout").mockImplementation((f) => (f as any)());
+        vi.spyOn(ErrorHandling, "isDevelopmentMode").mockImplementation(() => true);
 
         ErrorHandling.runtimeErrorHandler("test&><'\"", "test&.js", 13579, 24680);
 
@@ -153,9 +155,9 @@ describe("runtimeErrorHandler", function () {
     });
 
     it("shows error stack if available", function () {
-        const notifyErrorSpy = jest.spyOn(notify, "notifyError").mockImplementation();
-        const setTimeoutSpy = jest.spyOn(window, "setTimeout").mockImplementation((f) => (f as any)());
-        jest.spyOn(ErrorHandling, "isDevelopmentMode").mockImplementation(() => true);
+        const notifyErrorSpy = vi.spyOn(notify, "notifyError").mockImplementation(() => ({} as any));
+        const setTimeoutSpy = vi.spyOn(window, "setTimeout").mockImplementation((f) => (f as any)());
+        vi.spyOn(ErrorHandling, "isDevelopmentMode").mockImplementation(() => true);
 
         ErrorHandling.runtimeErrorHandler("test", "test.js", 1, 2, {
             stack: 'xyz',
@@ -170,9 +172,9 @@ describe("runtimeErrorHandler", function () {
     });
 
     it("shows error.toString() if stack not available", function () {
-        const notifyErrorSpy = jest.spyOn(notify, "notifyError").mockImplementation();
-        const setTimeoutSpy = jest.spyOn(window, "setTimeout").mockImplementation((f) => (f as any)());
-        jest.spyOn(ErrorHandling, "isDevelopmentMode").mockImplementation(() => true);
+        const notifyErrorSpy = vi.spyOn(notify, "notifyError").mockImplementation(() => ({} as any));
+        const setTimeoutSpy = vi.spyOn(window, "setTimeout").mockImplementation((f) => (f as any)());
+        vi.spyOn(ErrorHandling, "isDevelopmentMode").mockImplementation(() => true);
 
         ErrorHandling.runtimeErrorHandler("test", "test.js", 1, 2, {
             toString: () => 'uvw'
@@ -187,13 +189,13 @@ describe("runtimeErrorHandler", function () {
 });
 
 describe("unhandledRejectionHandler", function () {
-    let preventDefault: jest.Mock;
+    let preventDefault: Mock;
     beforeEach(() => {
-         preventDefault = jest.fn(); 
+         preventDefault = vi.fn(); 
     });
 
     it("ignores if err or err.reason is null", function () {
-        const consoleErrorSpy = jest.spyOn(console, "error").mockImplementation();
+        const consoleErrorSpy = vi.spyOn(console, "error").mockImplementation(() => ({} as any));
 
         ErrorHandling.unhandledRejectionHandler(null);
         expect(consoleErrorSpy).not.toHaveBeenCalled();
@@ -205,7 +207,7 @@ describe("unhandledRejectionHandler", function () {
     });
 
     it("ignores if reason.origin is not 'serviceCall'", function () {
-        const consoleErrorSpy = jest.spyOn(console, "error").mockImplementation();
+        const consoleErrorSpy = vi.spyOn(console, "error").mockImplementation(() => ({} as any));
 
         ErrorHandling.unhandledRejectionHandler({ preventDefault, reason: { origin: "other" } } as any);
         expect(consoleErrorSpy).not.toHaveBeenCalled();
@@ -213,7 +215,7 @@ describe("unhandledRejectionHandler", function () {
     });
 
     it("does not log if reason.silent is true and kind is exception", function () {
-        const consoleErrorSpy = jest.spyOn(console, "error").mockImplementation();
+        const consoleErrorSpy = vi.spyOn(console, "error").mockImplementation(() => ({} as any));
 
         ErrorHandling.unhandledRejectionHandler({ preventDefault, reason: { origin: "serviceCall", silent: true, kind: "exception" } } as any);
         expect(consoleErrorSpy).not.toHaveBeenCalled();
@@ -221,7 +223,7 @@ describe("unhandledRejectionHandler", function () {
     });
 
     it("does not log if reason.silent is true and kind is not exception", function () {
-        const consoleErrorSpy = jest.spyOn(console, "error").mockImplementation();
+        const consoleErrorSpy = vi.spyOn(console, "error").mockImplementation(() => ({} as any));
 
         ErrorHandling.unhandledRejectionHandler({ preventDefault, reason: { origin: "serviceCall", silent: true, kind: "other" } } as any);
         expect(consoleErrorSpy).not.toHaveBeenCalled();
@@ -230,7 +232,7 @@ describe("unhandledRejectionHandler", function () {
 
 
     it("does not log if reason.silent is null and kind is not exception", function () {
-        const consoleErrorSpy = jest.spyOn(console, "error").mockImplementation();
+        const consoleErrorSpy = vi.spyOn(console, "error").mockImplementation(() => ({} as any));
 
         ErrorHandling.unhandledRejectionHandler({ preventDefault, reason: { origin: "serviceCall", silent: null, kind: "other" } } as any);
         expect(consoleErrorSpy).not.toHaveBeenCalled();
@@ -238,7 +240,7 @@ describe("unhandledRejectionHandler", function () {
     });    
 
     it("logs error if reason.silent is false and kind is 'exception'", function () {
-        const consoleErrorSpy = jest.spyOn(console, "error").mockImplementation();
+        const consoleErrorSpy = vi.spyOn(console, "error").mockImplementation(() => ({} as any));
 
         ErrorHandling.unhandledRejectionHandler({ preventDefault, reason: { origin: "serviceCall", silent: false, kind: "exception" } } as any);
         expect(consoleErrorSpy).toHaveBeenCalledTimes(1);
@@ -246,7 +248,7 @@ describe("unhandledRejectionHandler", function () {
     });
 
     it("logs error if reason.silent is undefined and kind is 'exception'", function () {
-        const consoleErrorSpy = jest.spyOn(console, "error").mockImplementation();
+        const consoleErrorSpy = vi.spyOn(console, "error").mockImplementation(() => ({} as any));
 
         ErrorHandling.unhandledRejectionHandler({ preventDefault, reason: { origin: "serviceCall", kind: "exception" } } as any);
         expect(consoleErrorSpy).toHaveBeenCalledTimes(1);
@@ -254,7 +256,7 @@ describe("unhandledRejectionHandler", function () {
     });    
 
     it("logs error if reason.silent is undefined and kind is undefined", function () {
-        const consoleErrorSpy = jest.spyOn(console, "error").mockImplementation();
+        const consoleErrorSpy = vi.spyOn(console, "error").mockImplementation(() => ({} as any));
 
         ErrorHandling.unhandledRejectionHandler({ preventDefault, reason: { origin: "serviceCall" } } as any);
         expect(consoleErrorSpy).toHaveBeenCalledTimes(1);

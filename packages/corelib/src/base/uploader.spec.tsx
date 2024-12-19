@@ -2,19 +2,19 @@ import * as dialogs from "./dialogs";
 import * as notify from "./notify";
 import { Uploader, UploaderBatch } from "./uploader";
 
-jest.mock("./dialogs", () => ({
+vi.mock("./dialogs", () => ({
     __esModule: true,
-    iframeDialog: jest.fn()
+    iframeDialog: vi.fn()
 }));
 
 
-jest.mock("./notify", () => ({
+vi.mock("./notify", () => ({
     __esModule: true,
-    notifyError: jest.fn()
+    notifyError: vi.fn()
 }));
 
 afterEach(() => {
-    jest.resetAllMocks();
+    vi.resetAllMocks();
 });
 
 describe("Uploader multiple handling", () => {
@@ -60,7 +60,7 @@ describe("Uploader.errorHandler method", () => {
 
     it("logs data.exception if it is an object", () => {
         const consoleError = console.error;
-        console.error = jest.fn();
+        console.error = vi.fn();
         try {
             Uploader.errorHandler({ exception: "test" });
             expect(console.error).toHaveBeenCalledTimes(1);
@@ -127,20 +127,20 @@ describe("Uploader.uploadBatch", () => {
             formData: new FormData(),
             filePaths: ["test.txt"]
         };
-        orgXHR = window.XMLHttpRequest = jest.fn() as any;
+        orgXHR = window.XMLHttpRequest = vi.fn() as any;
         xhrMock = {
-            open: jest.fn(),
-            setRequestHeader: jest.fn(),
-            send: jest.fn().mockImplementation(function () {
+            open: vi.fn(),
+            setRequestHeader: vi.fn(),
+            send: vi.fn().mockImplementation(function () {
                 this.status = 200;
                 this.responseText = JSON.stringify({ success: true });
                 this.onload();
             }),
-            onload: jest.fn(),
-            onerror: jest.fn(),
-            onprogress: jest.fn()
+            onload: vi.fn(),
+            onerror: vi.fn(),
+            onprogress: vi.fn()
         } as any;        
-        window.XMLHttpRequest = jest.fn(() => xhrMock as any) as any;
+        window.XMLHttpRequest = vi.fn(() => xhrMock as any) as any;
     });
 
     afterEach(() => {
@@ -148,8 +148,8 @@ describe("Uploader.uploadBatch", () => {
     });
 
     it("should call batchStart and batchStop", async () => {
-        const batchStart = jest.fn();
-        const batchStop = jest.fn();
+        const batchStart = vi.fn();
+        const batchStop = vi.fn();
         const uploader = new Uploader({
             batchStart,
             batchStop
@@ -160,8 +160,8 @@ describe("Uploader.uploadBatch", () => {
     });
 
     it("should call batchSuccess on successful upload", async () => {
-        window.XMLHttpRequest = jest.fn(() => xhrMock as any) as any;
-        const batchSuccess = jest.fn();
+        window.XMLHttpRequest = vi.fn(() => xhrMock as any) as any;
+        const batchSuccess = vi.fn();
         const uploader = new Uploader({
             batchSuccess
         });
@@ -178,11 +178,11 @@ describe("Uploader.uploadBatch", () => {
     });
 
     it("should call errorHandler on upload error", async () => {
-        const errorHandler = jest.fn();
+        const errorHandler = vi.fn();
         const uploader = new Uploader({
             errorHandler
         });        
-        xhrMock.send = jest.fn().mockImplementation(function () {
+        xhrMock.send = vi.fn().mockImplementation(function () {
             this.status = 500;
             this.onerror();
         });
@@ -196,11 +196,11 @@ describe("Uploader.uploadBatch", () => {
     });
 
     it("should call batchProgress on upload progress", async () => {
-        const batchProgress = jest.fn();
+        const batchProgress = vi.fn();
         const uploader = new Uploader({
             batchProgress
         });
-        xhrMock.send = jest.fn().mockImplementation(function () {
+        xhrMock.send = vi.fn().mockImplementation(function () {
             this.status = 200;
             this.responseText = JSON.stringify({ success: true });
             this.onprogress({ lengthComputable: true, loaded: 50, total: 100 });
@@ -217,7 +217,7 @@ describe("Uploader.uploadBatch", () => {
 
     it("should handle CSRF token for same origin requests", async () => {
         document.cookie = "CSRF-TOKEN=test-token";
-        xhrMock.send = jest.fn().mockImplementation(function () {
+        xhrMock.send = vi.fn().mockImplementation(function () {
             this.status = 200;
             this.responseText = JSON.stringify({ success: true });
             this.onload();

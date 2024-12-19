@@ -4,7 +4,7 @@
     "noEmit": true,
     "emitDeclarationOnly": false,
     "types": [
-      "vitest/globals"
+      "vitest/globals"      
     ],
     "rootDir": "../",
     "outDir": "../out/test",
@@ -17,9 +17,9 @@
   },
   "include": [
     "../src/base/globals.d.ts",
+    "../test/mocks/**/*.ts",
     "./**/*.spec.ts",
-    "./**/*.spec.tsx",
-    "./mocks/**/*"
+    "./**/*.spec.tsx"
   ],
   "exclude": [],
   "references": [

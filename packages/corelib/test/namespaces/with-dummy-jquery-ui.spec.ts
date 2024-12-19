@@ -1,4 +1,4 @@
-import { loadNSCorelib } from "@/mocks";
+import { loadNSCorelib } from "../mocks";
 
 test('works when a dummy jQuery ui object exists', function() {
     (window as any).jQuery = (window as any).$ = { fn: {} }

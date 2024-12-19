@@ -2,8 +2,8 @@
 
 describe("debounce", function () {
 
-    it("debounces consecutive function calls", function (done) {
-        jest.useFakeTimers();
+    it("debounces consecutive function calls", () => new Promise(done => {
+        vi.useFakeTimers();
 
         var counter = 0;
         const increment = function () { counter++; };
@@ -18,14 +18,14 @@ describe("debounce", function () {
                 debounced.clear();
             }
             finally {
-                done();
+                done(void 0);
             }
         }, 150);
-        jest.runOnlyPendingTimers();
-    });
+        vi.runOnlyPendingTimers();
+    }));
 
-    it('can clear pending invocations', function (done) {
-        jest.useFakeTimers();
+    it('can clear pending invocations', () => new Promise(done => {
+        vi.useFakeTimers();
 
         var counter = 0;
         var increment = function () { counter++; };
@@ -38,14 +38,14 @@ describe("debounce", function () {
                 debounced.clear();
             }
             finally {
-                done();
+                done(void 0);
             }
         }, 150);
-        jest.runOnlyPendingTimers();
-    });
+        vi.runOnlyPendingTimers();
+    }));
 
-    it('can invoke immediately, e.g. leading edge', function (done) {
-        jest.useFakeTimers();
+    it('can invoke immediately, e.g. leading edge', () => new Promise(done => {
+        vi.useFakeTimers();
 
         var a, b, c;
         var counter = 0;
@@ -68,13 +68,13 @@ describe("debounce", function () {
             expect(c).toBe(2);
             expect(counter).toBe(2);
             debounced.clear();
-            done();
+            done(void 0);
         };
-        jest.runAllTimers();
-    });
+        vi.runAllTimers();
+    }));
 
-    it('can clear in immediate mode', function (done) {
-        jest.useFakeTimers();
+    it('can clear in immediate mode', () => new Promise(done => {
+        vi.useFakeTimers();
 
         var a, b;
         var counter = 0;
@@ -96,14 +96,14 @@ describe("debounce", function () {
                 debounced.clear();
             }
             finally {
-                done();
+                done(void 0);
             }
         }, 10);
-        jest.runAllTimers();
-    });
+        vi.runAllTimers();
+    }));
 
-    it('can execute immediate recursively', function (done) {
-        jest.useFakeTimers();
+    it('can execute immediate recursively', () => new Promise(done => {
+        vi.useFakeTimers();
 
         var counter = 0;
         var debounced = debounce(function () {
@@ -119,14 +119,14 @@ describe("debounce", function () {
                 expect(counter).toBe(1);
             }
             finally {
-                done();
+                done(void 0);
             }
         }, 150);
-        jest.runAllTimers();
-    });
+        vi.runAllTimers();
+    }));
 
-    it('can work after system time is set backwards', function (done) {
-        jest.useFakeTimers();
+    it('can work after system time is set backwards', () => new Promise(done => {
+        vi.useFakeTimers();
 
         var counter = 0;
         var debounced = debounce(function () {
@@ -151,14 +151,14 @@ describe("debounce", function () {
             finally {
                 Date.now = originalNowFunc;
                 Date.prototype.getTime = originalGetTimeFunc;
-                done();
+                done(void 0);
             }
         }, 200);
-        jest.runAllTimers();
-    });
+        vi.runAllTimers();
+    }));
 
-    it('works after system time is is not accessible (or in invalid format)', function (done) {
-        jest.useFakeTimers();
+    it('works after system time is is not accessible (or in invalid format)', () => new Promise(done => {
+        vi.useFakeTimers();
 
         var counter = 0;
         var debounced = debounce(function () {
@@ -200,15 +200,15 @@ describe("debounce", function () {
                 expect(counter).toBe(3);
             }
             finally {
-                done();
+                done(void 0);
             }
         }, 400);
 
-        jest.runAllTimers();
-    });
+        vi.runAllTimers();
+    }));
 
-    it('is re-entrant', function (done) {
-        jest.useFakeTimers();
+    it('is re-entrant', () => new Promise(done => {
+        vi.useFakeTimers();
 
         var sequence = [
             ['b1', 'b2']
@@ -230,15 +230,15 @@ describe("debounce", function () {
                 expect(value).toBe('a1a2b1b2');
             }
             finally {
-                done();
+                done(void 0);
             }
         }, 100);
 
-        jest.runAllTimers();
-    });
+        vi.runAllTimers();
+    }));
 
-    it('uses a default wait of 100', (done) => {
-        jest.useFakeTimers();
+    it('uses a default wait of 100', () => new Promise(done => {
+        vi.useFakeTimers();
 
         var counter = 0;
         const increment = function () { counter++; };
@@ -258,19 +258,19 @@ describe("debounce", function () {
                     expect(counter).toBe(1);
                 }
                 finally {
-                    done();
+                    done(void 0);
                 }
             }, 101);
         }
         catch {
-            done();
+            done(void 0);
         }
 
-        jest.runAllTimers();
-    });
+        vi.runAllTimers();
+    }));
 
-    it('supports flush method which calls the function if any pending calls', (done) => {
-        jest.useFakeTimers();
+    it('supports flush method which calls the function if any pending calls', () => new Promise(done => {
+        vi.useFakeTimers();
 
         var counter = 0;
         const increment = function () { counter++; };
@@ -294,15 +294,15 @@ describe("debounce", function () {
                     expect(counter).toBe(1);
                 }
                 finally {
-                    done();
+                    done(void 0);
                 }
             }, 101);
         }
         catch {
-            done();
+            done(void 0);
         }
 
-        jest.runAllTimers();
-    });
+        vi.runAllTimers();
+    }));
 
 });

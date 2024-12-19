@@ -20,7 +20,7 @@ describe("LookupEditor", () => {
 
     test('throws an error if lookupKey is not registered', () => {
         ScriptData.set("Lookup.Test", null);
-        var logSpy = jest.spyOn(window.console, 'log').mockImplementation(() => { });
+        var logSpy = vi.spyOn(window.console, 'log').mockImplementation(() => { });
         var oldXHR = window.XMLHttpRequest
         try {
             window.XMLHttpRequest = class {

@@ -63,7 +63,7 @@ describe("blockUI", () => {
             timeoutCalls++;
             callback();
             return 1;
-        }
+        } as any;
         blockUI({
             useTimeout: true
         });

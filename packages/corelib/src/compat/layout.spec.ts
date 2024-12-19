@@ -1,6 +1,6 @@
 ﻿
 beforeEach(() => {
-    jest.resetModules();
+    vi.resetModules();
 });
 
 function mockUndefinedJQuery() {

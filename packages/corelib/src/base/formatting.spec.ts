@@ -1,6 +1,6 @@
 beforeEach(() => {
-    jest.resetModules();
-    jest.clearAllMocks();
+    vi.resetModules();
+    vi.clearAllMocks();
 });
 
 describe("formatDate", () => {
@@ -155,14 +155,14 @@ describe("parseDate", () => {
 
     it("handles two digit years", async function () {
         var formatting = (await import("./formatting"));
-        jest.useFakeTimers();
+        vi.useFakeTimers();
         try {
-            jest.setSystemTime(new Date(2023, 1, 1));
+            vi.setSystemTime(new Date(2023, 1, 1));
             expect(formatting.parseDate("15/1/01")).toEqual(new Date(2001, 0, 15));
             expect(formatting.parseDate("15/1/99")).toEqual(new Date(1999, 0, 15));
         }
         finally {
-            jest.useRealTimers();
+            vi.useRealTimers();
         }
     });
 

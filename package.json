@@ -1,28 +1,15 @@
 {
   "name": "@serenity-is/workspace-serenity",
   "devDependencies": {
-    "@swc/core": "1.9.2",
-    "@swc/jest": "0.2.37",
-    "@types/jest": "29.5.14",
     "esbuild": "0.23.1",
     "flatpickr": "4.6.13",
-    "jest": "29.7.0",
-    "jest-environment-jsdom": "29.7.0",
     "jsx-dom": "8.1.5",
-    "typescript": "5.6.3"
+    "jsdom": "25.0.1",
+    "typescript": "5.7.2",
+    "vitest": "2.1.8"
   },
   "optionalDependencies": {
     "fsevents": "2.3.3"
-  },
-  "pnpm": {
-    "overrides": {
-      "cross-spawn@7.0.3": "7.0.6",
-      "jsdom@20.0.3": "25.0.1",
-      "glob": "10.4.5",
-      "micromatch@4.0.4": "4.0.8",
-      "ws@8.17.0": "8.17.1",
-      "test-exclude": "7.0.1"
-    }
   },
   "scripts": {
     "all": "pnpm i && pnpm -r build && pnpm -r tsc && pnpm -r jest"

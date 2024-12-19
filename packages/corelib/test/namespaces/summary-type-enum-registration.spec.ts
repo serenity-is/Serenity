@@ -1,7 +1,7 @@
-import { loadNSCorelib } from "@/mocks";
+import { loadNSCorelib } from "../mocks";
 
 beforeEach(() => {
-    jest.resetModules();
+    vi.resetModules();
 });
 
 test('summary type enum is registered', function () {

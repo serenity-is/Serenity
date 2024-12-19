@@ -100,7 +100,7 @@ export function ensureTypeInfo(type: any): TypeInfo<string> {
     if (!Object.prototype.hasOwnProperty.call(type, typeInfoProperty) ||
         !(typeInfo = type[typeInfoProperty])) {
         typeInfo = {} as any;
-        Object.defineProperty(type, typeInfoProperty, { value: typeInfo, configurable: true });
+        Object.defineProperty(type, typeInfoProperty, { value: typeInfo, configurable: true, writable: true });
         return typeInfo;
     }
     if (!typeInfo.registered)

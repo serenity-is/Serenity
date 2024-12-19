@@ -2,7 +2,7 @@
 
 var userDefinition: UserDefinition;
 
-function mockUserDefinition(async = false) {
+function mockUserDefinition() {
     userDefinition = {
         IsAdmin: false,
         Username: "mockuser",
@@ -15,32 +15,26 @@ function mockUserDefinition(async = false) {
         }
     }
 
-    jest.resetModules();
+    vi.resetModules();
 
-    jest.mock("./notify", () => ({
+    vi.mock("./notify", () => ({
         __esModule: true,
-        notifyError: jest.fn()
+        notifyError: vi.fn()
     }));
     
-    jest.mock("./localtext", () => ({
+    vi.mock("./localtext", () => ({
         __esModule: true,
-        localText: jest.fn().mockImplementation((key: string) => key)
+        localText: vi.fn().mockImplementation((key: string) => key)
     }));
     
-    jest.mock("./scriptdata", () => ({
+    vi.mock("./scriptdata", () => ({
         getRemoteData: function (key: string) {
-            if (async)
-                throw new Error(`not expected to call getRemoteData for: ${key}!`);
-   
             if (key == "UserData")
                 return userDefinition as any;
    
             throw new Error(`not expected to load any other data: ${key}`);
         },
-        getRemoteDataAsync: jest.fn().mockImplementation(async (key: string) => {
-            if (!async)
-                throw new Error(`not expected to call async getRemoteDataAsync for: ${key}!`);
-
+        getRemoteDataAsync: vi.fn().mockImplementation(async (key: string) => {
             if (key == "UserData")
                 return userDefinition as any;
 
@@ -50,7 +44,7 @@ function mockUserDefinition(async = false) {
 }
 
 function mockUserDefinitionAsync() {
-    mockUserDefinition(true);
+    mockUserDefinition();
 }
 
 function sharedPermissionSetBasedTests(testMethod: (permissionSet: { [key: string]: any }, permission: string) => Promise<boolean>) {
@@ -240,6 +234,7 @@ function sharedHasPermissionTests(hasPermission: ((key: string) => Promise<boole
 
 describe('Authorization.hasPermission', () => {
     beforeEach(() => {
+        vi.resetAllMocks();
         mockUserDefinition();
     });
 
@@ -248,6 +243,7 @@ describe('Authorization.hasPermission', () => {
 
 describe('Authorization.hasPermissionAsync', () => {
     beforeEach(() => {
+        vi.resetAllMocks();
         mockUserDefinitionAsync();
     });
 

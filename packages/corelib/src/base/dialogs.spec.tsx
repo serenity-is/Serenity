@@ -1,19 +1,21 @@
-import { mockJQuery, unmockBSAndJQuery } from "../mocks";
+// @ts-ignore
+import { type Mock, type MockInstance } from "vitest";
+import { mockJQuery, unmockBSAndJQuery } from "../../test/mocks";
 import { Dialog, alertDialog, cancelDialogButton, confirmDialog, iframeDialog, informationDialog, noDialogButton, okDialogButton, successDialog, uiAndBSButtonNoConflict, warningDialog, yesDialogButton, type MessageDialogOptions } from "./dialogs";
 
 afterEach(function cleanup() {
     document.body.innerHTML = "";
     unmockBSAndJQuery();
-    jest.restoreAllMocks();
+    vi.restoreAllMocks();
 });
 
 function mockBS5Plus() {
-    let modal = jest.fn(function (div: HTMLElement, opt: any) {
+    let modal = vi.fn(function (div: HTMLElement, opt: any) {
         return (div as any).modalInstance = {
             opt: opt,
-            dispose: jest.fn(),
-            show: jest.fn(),
-            hide: jest.fn()
+            dispose: vi.fn(),
+            show: vi.fn(),
+            hide: vi.fn()
         }
     }) as any;
 
@@ -28,7 +30,7 @@ function mockBS5Plus() {
 }
 
 function mockJQueryWithBSModal(): any {
-    let modal = jest.fn(function () {
+    let modal = vi.fn(function () {
         return this;
     }) as any;
 
@@ -42,7 +44,7 @@ function mockJQueryWithBSModal(): any {
 }
 
 function mockJQueryWithUIDialog(): any {
-    let dialog = jest.fn(function (op: any) {
+    let dialog = vi.fn(function (op: any) {
         if (typeof op === "object" && this[0] instanceof HTMLElement && !this[0].parentElement) {
             this[0].classList.add("ui-dialog-content");
             var dlg = document.createElement("div");
@@ -85,8 +87,8 @@ describe("Bootstrap version detection", () => {
         let $ = mockJQueryWithBSModal();
         delete $.fn.modal.Constructor;
         let opt = {
-            onOpen: jest.fn(),
-            onClose: jest.fn()
+            onOpen: vi.fn(),
+            onClose: vi.fn()
         };
         alertDialog("hello", opt);
         expect($.fn.modal).toHaveBeenCalledTimes(2);
@@ -273,7 +275,7 @@ describe("Dialog constructor", () => {
 
 describe("alertDialog", () => {
     it('alertDialog uses window.alert when no BS/jQuery UI loaded', async function () {
-        let alertSpy = jest.spyOn(window, "alert");
+        let alertSpy = vi.spyOn(window, "alert");
         try {
             alertSpy.mockImplementation(() => { });
             alertDialog('test message');
@@ -288,8 +290,8 @@ describe("alertDialog", () => {
     it('calls jQuery ui dialog with expected parameters', async function () {
         let $ = mockJQueryWithUIDialog();
         let opt = {
-            onOpen: jest.fn(),
-            onClose: jest.fn()
+            onOpen: vi.fn(),
+            onClose: vi.fn()
         };
         var dialog = alertDialog("hello", opt);
         expect($.fn.dialog).toHaveBeenCalledTimes(2);
@@ -320,8 +322,8 @@ describe("alertDialog", () => {
     it('returns expected bootstrap.Modal markup', async function () {
         let bootstrap = mockBS5Plus();
         let opt = {
-            onOpen: jest.fn(),
-            onClose: jest.fn()
+            onOpen: vi.fn(),
+            onClose: vi.fn()
         };
         var dialog = alertDialog("hello", opt);
         let modal = document.querySelector<HTMLElement>(".modal");
@@ -375,8 +377,8 @@ describe("alertDialog", () => {
     it('calls localText for title', async function () {
         let $ = mockJQueryWithUIDialog();
         let opt = {
-            onOpen: jest.fn(),
-            onClose: jest.fn()
+            onOpen: vi.fn(),
+            onClose: vi.fn()
         };
         alertDialog("hello", opt);
         expect($.fn.dialog).toHaveBeenCalledTimes(2);
@@ -390,7 +392,7 @@ describe("alertDialog", () => {
 describe("informationDialog", () => {
 
     it('uses window.alert when no BS/jQuery UI loaded', async function () {
-        let alertSpy = jest.spyOn(window, "alert");
+        let alertSpy = vi.spyOn(window, "alert");
         try {
             alertSpy.mockImplementation(() => { });
             informationDialog('test message', () => { });
@@ -405,10 +407,10 @@ describe("informationDialog", () => {
     it('calls jQuery ui dialog with expected parameters', async function () {
         let $ = mockJQueryWithUIDialog();
         let opt = {
-            onOpen: jest.fn(),
-            onClose: jest.fn()
+            onOpen: vi.fn(),
+            onClose: vi.fn()
         };
-        let onOK = jest.fn(function () {
+        let onOK = vi.fn(function () {
         });
         var dialog = informationDialog("hello", onOK, opt);
         expect($.fn.dialog).toHaveBeenCalledTimes(2);
@@ -444,7 +446,7 @@ describe("informationDialog", () => {
 describe("warningDialog", () => {
 
     it('uses window.alert when no BS/jQuery UI loaded', async function () {
-        let alertSpy = jest.spyOn(window, "alert");
+        let alertSpy = vi.spyOn(window, "alert");
         try {
             alertSpy.mockImplementation(() => { });
             warningDialog('test message');
@@ -460,7 +462,7 @@ describe("warningDialog", () => {
 describe("confirmDialog", () => {
 
     it('uses window.confirm when no BS/jQuery UI loaded', async function () {
-        let confirmSpy = jest.spyOn(window, "confirm");
+        let confirmSpy = vi.spyOn(window, "confirm");
         try {
             confirmSpy.mockImplementation(() => true);
             let onYesCalled;
@@ -479,10 +481,10 @@ describe("confirmDialog", () => {
     it('calls jQuery ui dialog with expected parameters', async function () {
         let $ = mockJQueryWithUIDialog();
         let opt = {
-            onOpen: jest.fn(),
-            onClose: jest.fn()
+            onOpen: vi.fn(),
+            onClose: vi.fn()
         };
-        let onYes = jest.fn(function () {
+        let onYes = vi.fn(function () {
         });
         confirmDialog("hello", onYes, opt);
         expect($.fn.dialog).toHaveBeenCalledTimes(2);
@@ -518,11 +520,11 @@ describe("confirmDialog", () => {
     it('returns expected bootstrap.Modal markup with BS5+ and no JQuery', async function () {
         let bootstrap = mockBS5Plus();
         let opt = {
-            onOpen: jest.fn(),
-            onClose: jest.fn(),
+            onOpen: vi.fn(),
+            onClose: vi.fn(),
             cancelButton: true
         };
-        let onYes = jest.fn(function () {
+        let onYes = vi.fn(function () {
         });
         confirmDialog("hello", onYes, opt);
         let modal = document.querySelector<HTMLElement>(".modal");
@@ -582,7 +584,7 @@ describe("confirmDialog", () => {
 describe("successDialog", () => {
 
     it('uses window.alert when no BS/jQuery UI loaded', async function () {
-        let alertSpy = jest.spyOn(window, "alert");
+        let alertSpy = vi.spyOn(window, "alert");
         try {
             alertSpy.mockImplementation(() => { });
             let onOKCalled;
@@ -601,10 +603,10 @@ describe("successDialog", () => {
     it('calls jQuery ui dialog with expected parameters', async function () {
         let $ = mockJQueryWithUIDialog();
         let opt = {
-            onOpen: jest.fn(),
-            onClose: jest.fn()
+            onOpen: vi.fn(),
+            onClose: vi.fn()
         };
-        let onOK = jest.fn(function () {
+        let onOK = vi.fn(function () {
         });
         successDialog("hello", onOK, opt);
         expect($.fn.dialog).toHaveBeenCalledTimes(2);
@@ -639,7 +641,7 @@ describe("successDialog", () => {
 describe("iframeDialog", () => {
 
     it('uses window.alert when no BS/jQuery UI loaded', async function () {
-        var alertSpy = jest.spyOn(window, "alert");
+        var alertSpy = vi.spyOn(window, "alert");
         try {
             alertSpy.mockImplementation(() => { });
             var testHtml = '<html><body>test message<body></html>';
@@ -747,11 +749,11 @@ describe("dialog button result handling", () => {
 
     let dlg: Dialog;
     let okButton: HTMLButtonElement;
-    let okClickSpy: jest.Mock;
-    let closeSpy: jest.SpyInstance;
+    let okClickSpy: Mock;
+    let closeSpy: MockInstance;
 
     beforeEach(() => {
-        okClickSpy = jest.fn();
+        okClickSpy = vi.fn();
         dlg = new Dialog({
             buttons: [
                 okDialogButton({
@@ -763,7 +765,7 @@ describe("dialog button result handling", () => {
             ]
         });
         okButton = dlg.getFooterNode().querySelector<HTMLButtonElement>(".ok-button");
-        closeSpy = jest.spyOn(Dialog.prototype, "close");
+        closeSpy = vi.spyOn(Dialog.prototype, "close");
     });
 
     it("closes the dialog after calling the click handler returns void", async function () {
@@ -1282,7 +1284,7 @@ describe("Dialog panels", () => {
 describe("modal event propagation to modal-body", () => {
 
     it("installs an event propagation handler for show.bs.modal to modal body as modalbeforeopen event", () => {
-        const spy = jest.fn();
+        const spy = vi.fn();
         const body = <div class="modal-body" /> as HTMLElement;
         body.addEventListener("modalbeforeopen", spy);
         const modal = document.body.appendChild(<div class="modal">{body}</div>);
@@ -1291,7 +1293,7 @@ describe("modal event propagation to modal-body", () => {
     });
 
     it("can prevent modal to be shown by calling original event's preventDefault if preventDefault is called on modalbeforeopen ", () => {
-        const spy = jest.fn().mockImplementation(e => {
+        const spy = vi.fn().mockImplementation(e => {
             e.preventDefault();
         });
 
@@ -1306,7 +1308,7 @@ describe("modal event propagation to modal-body", () => {
     });
 
     it("can prevent modal from closing by calling original event's preventDefault if preventDefault is called on modalbeforeclose ", () => {
-        const spy = jest.fn().mockImplementation(e => {
+        const spy = vi.fn().mockImplementation(e => {
             e.preventDefault();
         });
 
@@ -1321,7 +1323,7 @@ describe("modal event propagation to modal-body", () => {
     });
 
     it("installs an event propagation handler for shown.bs.modal to modal body as modalopen event", () => {
-        const spy = jest.fn();
+        const spy = vi.fn();
         const body = <div class="modal-body" /> as HTMLElement;
         body.addEventListener("modalopen", spy);
         const modal = document.body.appendChild(<div class="modal">{body}</div>) as HTMLElement;
@@ -1387,14 +1389,14 @@ describe("Dialog.dispose", () => {
         (dlg as any).el = bodyEl;
         bodyEl.classList.add("ui-dialog-content");
         document.body.appendChild(bodyEl);
-        const destroyMock = jest.fn();
-        const dialogMock = jest.fn((method) => {
+        const destroyMock = vi.fn();
+        const dialogMock = vi.fn((method) => {
             if (method == 'destroy')
                 destroyMock();
             return this;
         });
-        const removeMock = jest.fn();
-        const jQueryMock = (window as any).jQuery = jest.fn(() => ({
+        const removeMock = vi.fn();
+        const jQueryMock = (window as any).jQuery = vi.fn(() => ({
             dialog: dialogMock,
             remove: removeMock
         }));
@@ -1426,7 +1428,7 @@ describe("Dialog.onOpen", () => {
     it("ignores if panel is disposed", () => {
         const dlg = new Dialog({ preferBSModal: false, preferPanel: true });
         dlg.dispose();
-        const onOpen = jest.fn();
+        const onOpen = vi.fn();
         dlg.onOpen(onOpen);
         expect(onOpen).not.toHaveBeenCalled();
     });
@@ -1434,8 +1436,8 @@ describe("Dialog.onOpen", () => {
     it("attaches an event handler for panelopen event", () => {
         const dlg = new Dialog({ preferBSModal: false, preferPanel: true });
         try {
-            const onOpen1 = jest.fn();
-            const onOpen2 = jest.fn();
+            const onOpen1 = vi.fn();
+            const onOpen2 = vi.fn();
             dlg.onOpen(onOpen1);
             dlg.onOpen(onOpen2);
             expect(onOpen1).not.toHaveBeenCalled();
@@ -1452,8 +1454,8 @@ describe("Dialog.onOpen", () => {
     it("attaches an event handler for panelbeforeopen event if second argument is true", () => {
         const dlg = new Dialog({ preferBSModal: false, preferPanel: true });
         try {
-            const beforeOpen1 = jest.fn();
-            const beforeOpen2 = jest.fn();
+            const beforeOpen1 = vi.fn();
+            const beforeOpen2 = vi.fn();
             dlg.onOpen(beforeOpen1, { before: true });
             dlg.onOpen(beforeOpen2, { before: true });
             expect(beforeOpen1).not.toHaveBeenCalled();
@@ -1470,8 +1472,8 @@ describe("Dialog.onOpen", () => {
     it("can abort opening preventDefault is called in panelbeforeopen", () => {
         const dlg = new Dialog({ preferBSModal: false, preferPanel: true, autoOpen: false });
         try {
-            const beforeOpen = jest.fn().mockImplementation((e) => e.preventDefault());
-            const afterOpen = jest.fn();
+            const beforeOpen = vi.fn().mockImplementation((e) => e.preventDefault());
+            const afterOpen = vi.fn();
             dlg.onOpen(beforeOpen, { before: true });
             dlg.open();
             expect(beforeOpen).toHaveBeenCalledTimes(1);
@@ -1486,7 +1488,7 @@ describe("Dialog.onOpen", () => {
     it("has oneOff true by default", () => {
         const dlg = new Dialog({ preferBSModal: false, preferPanel: true, autoOpen: false, autoDispose: false });
         try {
-            const afterOpen = jest.fn();
+            const afterOpen = vi.fn();
             dlg.onOpen(afterOpen);
             dlg.open();
             expect(afterOpen).toHaveBeenCalledTimes(1);
@@ -1505,7 +1507,7 @@ describe("Dialog.onOpen", () => {
     it("is possible to set oneOff to false for after open", () => {
         const dlg = new Dialog({ preferBSModal: false, preferPanel: true, autoOpen: false, autoDispose: false });
         try {
-            const afterOpen = jest.fn();
+            const afterOpen = vi.fn();
             dlg.onOpen(afterOpen, { oneOff: false });
             dlg.open();
             expect(afterOpen).toHaveBeenCalledTimes(1);
@@ -1524,7 +1526,7 @@ describe("Dialog.onOpen", () => {
     it("has oneOff false by default for beforeOpen", () => {
         const dlg = new Dialog({ preferBSModal: false, preferPanel: true, autoOpen: false, autoDispose: false });
         try {
-            const beforeOpen = jest.fn();
+            const beforeOpen = vi.fn();
             dlg.onOpen(beforeOpen, { before: true });
             dlg.open();
             expect(beforeOpen).toHaveBeenCalledTimes(1);
@@ -1543,7 +1545,7 @@ describe("Dialog.onOpen", () => {
     it("is possible to set oneOff to true for beforeOpen", () => {
         const dlg = new Dialog({ preferBSModal: false, preferPanel: true, autoOpen: false, autoDispose: false });
         try {
-            const beforeOpen = jest.fn();
+            const beforeOpen = vi.fn();
             dlg.onOpen(beforeOpen, { before: true, oneOff: true });
             dlg.open();
             expect(beforeOpen).toHaveBeenCalledTimes(1);
@@ -1564,7 +1566,7 @@ describe("Dialog.onClose", () => {
     it("ignores if panel is disposed", () => {
         const dlg = new Dialog({ preferBSModal: false, preferPanel: true });
         dlg.dispose();
-        const onClose = jest.fn();
+        const onClose = vi.fn();
         dlg.onClose(onClose);
         expect(onClose).not.toHaveBeenCalled();
     });
@@ -1572,8 +1574,8 @@ describe("Dialog.onClose", () => {
     it("attaches an event handler for panelclose event", () => {
         const dlg = new Dialog({ preferBSModal: false, preferPanel: true });
         try {
-            const onClose1 = jest.fn();
-            const onClose2 = jest.fn();
+            const onClose1 = vi.fn();
+            const onClose2 = vi.fn();
             dlg.onClose(onClose1);
             dlg.onClose(onClose2);
             dlg.open();
@@ -1591,8 +1593,8 @@ describe("Dialog.onClose", () => {
     it("attaches an event handler for panelbeforeclose event if second argument.before is true", () => {
         const dlg = new Dialog({ preferBSModal: false, preferPanel: true });
         try {
-            const beforeClose1 = jest.fn();
-            const beforeClose2 = jest.fn();
+            const beforeClose1 = vi.fn();
+            const beforeClose2 = vi.fn();
             dlg.onClose(beforeClose1, { before: true });
             dlg.onClose(beforeClose2, { before: true });
             dlg.open();
@@ -1610,8 +1612,8 @@ describe("Dialog.onClose", () => {
     it("can abort closing preventDefault is called in panelbeforeclose", () => {
         const dlg = new Dialog({ preferBSModal: false, preferPanel: true, autoOpen: false });
         try {
-            const beforeClose = jest.fn().mockImplementation((_, e) => e.preventDefault());
-            const afterClose = jest.fn();
+            const beforeClose = vi.fn().mockImplementation((_, e) => e.preventDefault());
+            const afterClose = vi.fn();
             dlg.open();
             dlg.onClose(beforeClose, { before: true });
             dlg.close();
@@ -1627,7 +1629,7 @@ describe("Dialog.onClose", () => {
     it("has oneOff true by default", () => {
         const dlg = new Dialog({ preferBSModal: false, preferPanel: true, autoOpen: false, autoDispose: false });
         try {
-            const afterClose = jest.fn();
+            const afterClose = vi.fn();
             dlg.onClose(afterClose);
             dlg.open();
             dlg.close();
@@ -1647,7 +1649,7 @@ describe("Dialog.onClose", () => {
     it("is possible to set oneOff to false for after open", () => {
         const dlg = new Dialog({ preferBSModal: false, preferPanel: true, autoOpen: false, autoDispose: false });
         try {
-            const afterClose = jest.fn();
+            const afterClose = vi.fn();
             dlg.onOpen(afterClose, { oneOff: false });
             dlg.open();
             expect(afterClose).toHaveBeenCalledTimes(1);
@@ -1666,7 +1668,7 @@ describe("Dialog.onClose", () => {
     it("has oneOff false by default for beforeClose", () => {
         const dlg = new Dialog({ preferBSModal: false, preferPanel: true, autoOpen: false, autoDispose: false });
         try {
-            const beforeClose = jest.fn();
+            const beforeClose = vi.fn();
             dlg.onOpen(beforeClose, { before: true });
             dlg.open();
             expect(beforeClose).toHaveBeenCalledTimes(1);
@@ -1685,7 +1687,7 @@ describe("Dialog.onClose", () => {
     it("is possible to set oneOff to true for beforeClose", () => {
         const dlg = new Dialog({ preferBSModal: false, preferPanel: true, autoOpen: false, autoDispose: false });
         try {
-            const beforeClose = jest.fn();
+            const beforeClose = vi.fn();
             dlg.onOpen(beforeClose, { before: true, oneOff: true });
             dlg.open();
             dlg.close();
@@ -1716,8 +1718,8 @@ describe("Static Dialog.onClose", () => {
     });
 
     it("attaches an event handler for panelclose event", () => {
-        const onClose1 = jest.fn();
-        const onClose2 = jest.fn();
+        const onClose1 = vi.fn();
+        const onClose2 = vi.fn();
         Dialog.onClose(el, onClose1);
         Dialog.onClose(el, onClose2);
         expect(onClose1).not.toHaveBeenCalled();
@@ -1731,8 +1733,8 @@ describe("Static Dialog.onClose", () => {
     });
 
     it("attaches an event handler for dialogclose event", () => {
-        const onClose1 = jest.fn();
-        const onClose2 = jest.fn();
+        const onClose1 = vi.fn();
+        const onClose2 = vi.fn();
         Dialog.onClose(el, onClose1);
         Dialog.onClose(el, onClose2);
         expect(onClose1).not.toHaveBeenCalled();
@@ -1746,8 +1748,8 @@ describe("Static Dialog.onClose", () => {
     });
 
     it("attaches an event handler for modalclose event", () => {
-        const onClose1 = jest.fn();
-        const onClose2 = jest.fn();
+        const onClose1 = vi.fn();
+        const onClose2 = vi.fn();
         Dialog.onClose(el, onClose1);
         Dialog.onClose(el, onClose2);
         expect(onClose1).not.toHaveBeenCalled();
@@ -1762,7 +1764,7 @@ describe("Static Dialog.onClose", () => {
     });
 
     it("calls onClose method of the dialog instance if available", () => {
-        const onClose = jest.fn();
+        const onClose = vi.fn();
         const dlg = new Dialog({ element: el, autoOpen: true });
         Dialog.onClose(el, onClose);
         expect(onClose).not.toHaveBeenCalled();
@@ -1790,7 +1792,7 @@ describe("okDialogButton", () => {
     });
 
     it("should return a dialog button with the specified options", () => {
-        const click = jest.fn();
+        const click = vi.fn();
         const button = okDialogButton({ text: "Confirm", cssClass: "btn-primary", result: "test", click });
         expect(button.text).toBe("Confirm");
         expect(button.cssClass).toBe("btn-primary");
@@ -1808,7 +1810,7 @@ describe("yesDialogButton", () => {
     });
 
     it("should return a dialog button with the specified options", () => {
-        const click = jest.fn();
+        const click = vi.fn();
         const button = yesDialogButton({ text: "Agree", cssClass: "btn-success", result: "test", click });
         expect(button.text).toBe("Agree");
         expect(button.cssClass).toBe("btn-success");
@@ -1826,7 +1828,7 @@ describe("noDialogButton", () => {
     });
 
     it("should return a dialog button with the specified options", () => {
-        const click = jest.fn();
+        const click = vi.fn();
         const button = noDialogButton({ text: "Disagree", cssClass: "btn-danger", result: "test", click });
         expect(button.text).toBe("Disagree");
         expect(button.cssClass).toBe("btn-danger");
@@ -1844,7 +1846,7 @@ describe("cancelDialogButton", () => {
     });
 
     it("should return a dialog button with the specified options", () => {
-        const click = jest.fn();
+        const click = vi.fn();
         const button = cancelDialogButton({ text: "Abort", cssClass: "btn-secondary", result: "test", click });
         expect(button.text).toBe("Abort");
         expect(button.cssClass).toBe("btn-secondary");

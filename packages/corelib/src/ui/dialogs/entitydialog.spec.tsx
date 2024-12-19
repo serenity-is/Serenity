@@ -154,7 +154,7 @@ describe('EntityDialog.getLocalTextDbPrefix', () => {
         @Decorators.registerType()
         class DefaultDialog extends EntityDialog<any, any> {
             getPropertyItemsData() { return mockPropertyItemsData() };
-            static override readonly typeInfo = Decorators.classType('MyProject.TestModule.DefaultDialog');
+            static override typeInfo = Decorators.classType('MyProject.TestModule.DefaultDialog');
         }
 
         var dialog = new DefaultDialog({});
@@ -246,7 +246,7 @@ describe('EntityDialog.getLocalTextPrefix', () => {
 
     it('returns class identifier based on typeInfo property', () => {
         class DefaultDialog extends EntityDialog<any, any> {
-            static readonly typeInfo = classTypeInfo('MyProject.TestModule.DefaultDialog');
+            static typeInfo = classTypeInfo('MyProject.TestModule.DefaultDialog');
             getPropertyItemsData() { return mockPropertyItemsData() };
         }
 
@@ -321,7 +321,7 @@ describe("EntityDialog.destroy", () => {
 
     it("calls destroy on propertyGrid", () => {
         const dialog = new MockDialog();
-        const destroy = jest.fn();
+        const destroy = vi.fn();
         dialog["propertyGrid"] = { destroy } as any;
         dialog.destroy();
         expect(destroy).toHaveBeenCalledTimes(1);
@@ -330,7 +330,7 @@ describe("EntityDialog.destroy", () => {
 
     it("calls destroy on localizer", () => {
         const dialog = new MockDialog();
-        const destroy = jest.fn();
+        const destroy = vi.fn();
         dialog["localizer"] = { destroy } as any;
         dialog.destroy();
         expect(destroy).toHaveBeenCalledTimes(1);

@@ -1,5 +1,5 @@
 import { Tooltip } from "./tooltip";
-import { mockJQuery, unmockBSAndJQuery } from "../mocks";
+import { mockJQuery, unmockBSAndJQuery } from "../../test/mocks";
 
 let element: HTMLElement;
 let tooltip: Tooltip;
@@ -38,7 +38,7 @@ describe("Tooltip constructor", () => {
     });
 
     it("creates a tooltip via jQuery if available", () => {
-        const tooltipSpy = jest.fn();
+        const tooltipSpy = vi.fn();
         mockJQuery({
             data: () => { return {} },
             tooltip: tooltipSpy
@@ -65,8 +65,8 @@ describe("Tooltip.getInstance", () => {
 describe("Tooltip.toggle", () => {
     it("should show the tooltip when toggle(true) is called", () => {
         const instance = {
-            show: jest.fn(),
-            hide: jest.fn()
+            show: vi.fn(),
+            hide: vi.fn()
         }
         const bs = (window as any)["bootstrap"] = {
             Tooltip: function() {
@@ -82,8 +82,8 @@ describe("Tooltip.toggle", () => {
 
     it("should show hide tooltip when toggle(false) is called", () => {
         const instance = {
-            show: jest.fn(),
-            hide: jest.fn()
+            show: vi.fn(),
+            hide: vi.fn()
         }
         const bs = (window as any)["bootstrap"] = {
             Tooltip: function() {
@@ -119,8 +119,8 @@ describe("Tooltip.toggle", () => {
 describe("Tooltip.show", () => {
     it("should show the tooltip", () => {
         const instance = {
-            show: jest.fn(),
-            hide: jest.fn()
+            show: vi.fn(),
+            hide: vi.fn()
         }
         const bs = (window as any)["bootstrap"] = {
             Tooltip: function() {
@@ -154,8 +154,8 @@ describe("Tooltip.show", () => {
 describe("Tooltip.hide", () => {
     it("should hide the tooltip", () => {
         const instance = {
-            show: jest.fn(),
-            hide: jest.fn()
+            show: vi.fn(),
+            hide: vi.fn()
         }
         const bs = (window as any)["bootstrap"] = {
             Tooltip: function() {
@@ -195,13 +195,13 @@ describe("Tooltip.setTitle", () => {
 
     it("should update the tooltip instance with the new title", () => {
         const instance = {
-            show: jest.fn(),
-            hide: jest.fn(),
-            _fixTitle: jest.fn(),
+            show: vi.fn(),
+            hide: vi.fn(),
+            _fixTitle: vi.fn(),
             tip: {
-                querySelector: jest.fn().mockReturnValue({ textContent: "" })
+                querySelector: vi.fn().mockReturnValue({ textContent: "" })
             },
-            update: jest.fn()
+            update: vi.fn()
         };
         const bs = (window as any)["bootstrap"] = {
             Tooltip: function() {
@@ -237,8 +237,8 @@ describe("Tooltip.setTitle", () => {
 describe("Tooltip.dispose", () => {
     it("should dispose the tooltip instance", () => {
         const instance = {
-            destroy: jest.fn(),
-            dispose: jest.fn()
+            destroy: vi.fn(),
+            dispose: vi.fn()
         };
         const bs = (window as any)["bootstrap"] = {
             Tooltip: function() {
@@ -270,17 +270,17 @@ describe("Tooltip.dispose", () => {
 
 describe("Tooltip.delayedDispose", () => {
     beforeEach(() => {
-        jest.useFakeTimers();
+        vi.useFakeTimers();
     });
 
     afterEach(() => {
-        jest.useRealTimers();
+        vi.useRealTimers();
     });
 
     it("should dispose the tooltip instance after the specified delay", () => {
         const instance = {
-            destroy: jest.fn(),
-            dispose: jest.fn()
+            destroy: vi.fn(),
+            dispose: vi.fn()
         };
         const bs = (window as any)["bootstrap"] = {
             Tooltip: function() {
@@ -291,7 +291,7 @@ describe("Tooltip.delayedDispose", () => {
         tooltip = new Tooltip(element);
         tooltip.delayedDispose(1000);
 
-        jest.advanceTimersByTime(1000);
+        vi.advanceTimersByTime(1000);
         expect(instance.dispose).toHaveBeenCalledTimes(1);
     });
 
@@ -310,14 +310,14 @@ describe("Tooltip.delayedDispose", () => {
         (bs.Tooltip as any).getInstance = () => null as any;
         tooltip.delayedDispose(1000);
 
-        jest.advanceTimersByTime(1000);
+        vi.advanceTimersByTime(1000);
         expect(() => tooltip.dispose()).not.toThrow();
     });
 
     it("should use default delay if no delay is specified", () => {
         const instance = {
-            destroy: jest.fn(),
-            dispose: jest.fn()
+            destroy: vi.fn(),
+            dispose: vi.fn()
         };
         const bs = (window as any)["bootstrap"] = {
             Tooltip: function() {
@@ -328,24 +328,24 @@ describe("Tooltip.delayedDispose", () => {
         tooltip = new Tooltip(element);
         tooltip.delayedDispose();
 
-        jest.advanceTimersByTime(5000);
+        vi.advanceTimersByTime(5000);
         expect(instance.dispose).toHaveBeenCalledTimes(1);
     });
 });
 
 describe("Tooltip.delayedHide", () => {
     beforeEach(() => {
-        jest.useFakeTimers();
+        vi.useFakeTimers();
     });
 
     afterEach(() => {
-        jest.useRealTimers();
+        vi.useRealTimers();
     });
 
     it("should hide the tooltip instance after the specified delay", () => {
         const instance = {
-            show: jest.fn(),
-            hide: jest.fn()
+            show: vi.fn(),
+            hide: vi.fn()
         };
         const bs = (window as any)["bootstrap"] = {
             Tooltip: function() {
@@ -356,7 +356,7 @@ describe("Tooltip.delayedHide", () => {
         tooltip = new Tooltip(element);
         tooltip.delayedHide(1000);
 
-        jest.advanceTimersByTime(1000);
+        vi.advanceTimersByTime(1000);
         expect(instance.hide).toHaveBeenCalledTimes(1);
     });
 
@@ -375,14 +375,14 @@ describe("Tooltip.delayedHide", () => {
         (bs.Tooltip as any).getInstance = () => null as any;
         tooltip.delayedHide(1000);
 
-        jest.advanceTimersByTime(1000);
+        vi.advanceTimersByTime(1000);
         expect(() => tooltip.hide()).not.toThrow();
     });
 
     it("should use default delay if no delay is specified", () => {
         const instance = {
-            show: jest.fn(),
-            hide: jest.fn()
+            show: vi.fn(),
+            hide: vi.fn()
         };
         const bs = (window as any)["bootstrap"] = {
             Tooltip: function() {
@@ -393,7 +393,7 @@ describe("Tooltip.delayedHide", () => {
         tooltip = new Tooltip(element);
         tooltip.delayedHide();
 
-        jest.advanceTimersByTime(5000);
+        vi.advanceTimersByTime(5000);
         expect(instance.hide).toHaveBeenCalledTimes(1);
     });
 });
@@ -401,14 +401,14 @@ describe("Tooltip.delayedHide", () => {
 describe("Tooltip.isAvailable", () => {
     it("should return true if bootstrap tooltip is available", () => {
         const bs = (window as any)["bootstrap"] = {
-            Tooltip: jest.fn()
+            Tooltip: vi.fn()
         };
         expect(Tooltip.isAvailable).toBe(true);
     });
 
     it("should return true if jQuery tooltip is available", () => {
         mockJQuery({
-            tooltip: jest.fn()
+            tooltip: vi.fn()
         });
         expect(Tooltip.isAvailable).toBe(true);
     });
@@ -425,7 +425,7 @@ describe("Tooltip.isAvailable", () => {
     });
 
     it("should return false if only jQuery is defined but tooltip is not available", () => {
-        const $ = (window as any)["jQuery"] = jest.fn().mockReturnValue({
+        const $ = (window as any)["jQuery"] = vi.fn().mockReturnValue({
             fn: {}
         });
         expect(Tooltip.isAvailable).toBe(false);

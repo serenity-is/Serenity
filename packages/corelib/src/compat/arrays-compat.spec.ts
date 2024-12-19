@@ -146,7 +146,7 @@ describe("insert", () => {
             insert: function () {
             }
         }
-        var mock = jest.spyOn(obj, "insert");
+        var mock = vi.spyOn(obj, "insert");
         insert(obj, 3, 7);
         expect(mock.mock.calls.length).toEqual(1);
         expect(mock.mock.calls[0]).toEqual([3, 7]);
