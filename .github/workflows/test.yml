@@ -41,9 +41,17 @@ jobs:
     - name: pnpm install
       uses: ./.github/actions/pnpm-install
 
+    - name: sleekgrid build
+      run: pnpm build
+      working-directory: "./packages/sleekgrid"
+
     - name: sleekgrid tests
       run: pnpm test
       working-directory: "./packages/sleekgrid"
+
+    - name: corelib build
+      run: pnpm build
+      working-directory: "./packages/corelib"
 
     - name: corelib tests
       run: pnpm test

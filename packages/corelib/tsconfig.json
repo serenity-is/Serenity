@@ -1,11 +1,14 @@
 ﻿{
   "extends": "./src/tsconfig.json",
   "compilerOptions": {
+    "composite": false,
     "emitDeclarationOnly": false,
+    "noEmit": true,
+    "rootDir": "./src",
+    "tsBuildInfoFile": "./out/tsconfig.test.tsbuildinfo",
     "types": [
       "vitest/globals"
     ],
-    "outDir": "./out/test",
     "noImplicitAny": false
   },
   "include": [

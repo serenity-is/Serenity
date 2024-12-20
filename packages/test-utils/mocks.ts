@@ -1,4 +1,5 @@
 import { ScriptData, scriptDataHooks } from "@serenity-is/corelib";
+import { inject } from "vitest";
 
 let orgFetchScriptData: any;
 
@@ -10,7 +11,8 @@ export function mockDynamicData() {
     orgFetchScriptData = scriptDataHooks.fetchScriptData ?? null;
     scriptDataHooks.fetchScriptData = <TData>(name: string) => {
         try {
-            return jest.requireActual("dynamic-data/" + name + ".json");
+            // @ts-ignore
+            return JSON.parse(inject("dynamic-data/" + name.split("?")[0] + ".json") || "null");
         }
         catch (e) {
             console.warn("Failed to load mock dynamic data for: " + name);
@@ -38,13 +40,13 @@ export type MockFetchInfo = {
 }
 
 var orgFetch: any;
-var fetchSpy: jest.Mock<Promise<any>, [url: string, init: RequestInit], any> & { requests: MockFetchInfo[] }
+var fetchSpy: any;
 var fetchMap: Record<string, (info: MockFetchInfo) => any> = {};
 
 export function mockFetch(map?: { [urlOrService: string]: ((info: MockFetchInfo) => any) }) {
     if (!fetchSpy) {
         orgFetch = (window as any).fetch;
-        fetchSpy = (window as any).fetch = jest.fn(async (url: string, init: RequestInit) => {
+        fetchSpy = (window as any).fetch = ((globalThis as any).vitest !== "undefined" ? (globalThis as any).vitest.fn : (globalThis as any).jest.fn as any)(async (url: string, init: RequestInit) => {
             var callback = fetchMap[url] ?? fetchMap["*"];
             if (!callback) {
                 console.error(`Mock fetch is not configured for URL: (${url})!`);
