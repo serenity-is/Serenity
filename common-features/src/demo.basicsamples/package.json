@@ -11,9 +11,8 @@
     "build": "node ./tsbuild.js",
     "build:watch": "node ./tsbuild.js --watch",
     "coverage": "pnpm run test --coverage",
-    "test": "pnpm build && pnpm vitest run",
-    "tsc": "tsc",
-    "vitest": "node ../../../node_modules/vitest/dist/cli.js"
+    "test": "pnpm build && vitest run",
+    "tsc": "tsc"
   },
   "type": "module"
 }

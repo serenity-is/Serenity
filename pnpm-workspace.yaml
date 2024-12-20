@@ -1,2 +1,7 @@
 packages:
+  - '!**/.*/**'
+  - '!**/artifacts/**'
   - 'packages/*'
+  - 'common-features'
+  - 'common-features/src/*'
+  - 'serene/src/Serene.Web'

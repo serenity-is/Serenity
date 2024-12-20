@@ -9,7 +9,6 @@
     "jsdom": "25.0.1",
     "playwright": "1.49.1",
     "typescript": "5.7.2",
-    "vite-tsconfig-paths": "5.1.4",
     "vitest": "2.1.8"
   },
   "optionalDependencies": {

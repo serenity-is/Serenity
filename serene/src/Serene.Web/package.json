@@ -14,11 +14,12 @@
   },
   "scripts": {
     "build": "npm run tsbuild",
+    "coverage": "pnpm run test --coverage",
+    "pnpm:devPreinstall": "dotnet build -target:RestoreNodeTypes",
     "preinstall": "dotnet build -target:RestoreNodeTypes",
-    "test": "node ./tsbuild.js && npm run vitest run --coverage",
+    "test": "node ./tsbuild.js && pnpm vitest run",
     "tsbuild": "node ./tsbuild.js",
-    "tsbuild:watch": "node ./tsbuild.js --watch",
-    "vitest": "node ../../../node_modules/vitest/dist/cli.js"
+    "tsbuild:watch": "node ./tsbuild.js --watch"
   },
   "private": true,
   "type": "module"
