@@ -2,20 +2,23 @@ import { execSync } from "child_process";
 import { existsSync, readdirSync, readFileSync } from "fs";
 import { basename, join, resolve } from "path";
 import { fileURLToPath } from 'url';
-import { defineConfig, } from "vitest/config";
+import { defineConfig } from "vitest/config";
 
 const testUtils = resolve(join(fileURLToPath(new URL('.', import.meta.url)), './'));
 const serenityRoot = resolve(join(testUtils, "../../"));
+const projectRoot = resolve("./");
 
 export default (opt) => {
-    
-    if ((opt?.dynamicData ?? true) &&
-        !existsSync(`${testUtils}/dynamic-data/Columns.Administration.Language.json`) &&
-        !existsSync(resolve(`./dynamic-data/Columns.Administration.Language.json`))) {
-        if (resolve("./").indexOf('Serene.Web') >= 0 || !tryProject(`${serenityRoot}/..`, "StartSharp"))
-            tryProject(`${serenityRoot}/serene`, "Serene");
+
+    if ((opt?.dynamicData ?? true)) {
+        const isWebProject = projectRoot.indexOf('Serene.Web') || projectRoot.indexOf('StartSharp.Web') >= 0;
+        if ((isWebProject && !existsSync(resolve(`./dynamic-data/Columns.Administration.Language.json`))) ||
+            (!isWebProject && !existsSync(`${testUtils}/dynamic-data/Columns.Administration.Language.json`))) {
+            if (projectRoot.indexOf('Serene.Web') >= 0 || !tryProject(`${serenityRoot}/..`, "StartSharp"))
+                tryProject(`${serenityRoot}/serene`, "Serene");
+        }
     }
-   
+
     const provide = {};
     if (opt?.dynamicData ?? true) {
         for (var folder of [join(testUtils, "dynamic-data"), join(opt?.projectRoot ?? resolve("./"), "dynamic-data")]) {
@@ -30,6 +33,11 @@ export default (opt) => {
     }
 
     return defineConfig({
+        server: {
+            fs: {
+                allow: [serenityRoot, testUtils, projectRoot]
+            }
+        },
         test: {
             environment: "jsdom",
             globals: true,
@@ -38,10 +46,7 @@ export default (opt) => {
                 { find: "jsx-dom/min/jsx-dev-runtime", replacement: "jsx-dom/jsx-runtime.js" },
                 { find: "jsx-dom/jsx-dev-runtime", replacement: "jsx-dom/jsx-runtime.js" }
             ],
-            provide,
-            setupFiles: [
-                "test-utils/vitest-setup.js"
-            ]
+            provide
         }
     });
 }

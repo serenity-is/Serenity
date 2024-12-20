@@ -3,10 +3,11 @@
   "scripts": {
     "build": "node ./tsbuild.js",
     "build:watch": "node ./tsbuild.js --watch",
+    "coverage": "pnpm run test --coverage",
     "dts": "pnpm dts-bundle-generator Modules/index.ts -o dist/index.d.ts --no-banner --disable-symlinks-following --inline-declare-global",
-    "jest": "node ../../../node_modules/jest/bin/jest.js",
-    "test": "node ./tsbuild.js && pnpm jest --coverage",
-    "tsc": "tsc"
+    "test": "pnpm build && pnpm vitest run",
+    "tsc": "tsc",
+    "vitest": "node ../../../node_modules/vitest/dist/cli.js"
   },
   "main": "dist/index.js",
   "private": true,

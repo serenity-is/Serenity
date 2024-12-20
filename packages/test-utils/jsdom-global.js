@@ -16,7 +16,6 @@ export default class JSDOMEnvironmentGlobal extends JSDOMEnvironment {
 }
 
 
-
 function addCSSEscape(window) {
     if (typeof window !== "undefined" && (!window.CSS || !window.CSS.escape)) {
         // https://drafts.csswg.org/cssom/#serialize-an-identifier

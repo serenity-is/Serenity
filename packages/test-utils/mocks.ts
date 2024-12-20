@@ -1,5 +1,5 @@
 import { ScriptData, scriptDataHooks } from "@serenity-is/corelib";
-import { inject } from "vitest";
+import { inject, Mock, vi } from "vitest";
 
 let orgFetchScriptData: any;
 
@@ -40,13 +40,13 @@ export type MockFetchInfo = {
 }
 
 var orgFetch: any;
-var fetchSpy: any;
+var fetchSpy: Mock<(url: string, init: RequestInit) => Promise<any>> & { requests: MockFetchInfo[] }
 var fetchMap: Record<string, (info: MockFetchInfo) => any> = {};
 
 export function mockFetch(map?: { [urlOrService: string]: ((info: MockFetchInfo) => any) }) {
     if (!fetchSpy) {
         orgFetch = (window as any).fetch;
-        fetchSpy = (window as any).fetch = ((globalThis as any).vitest !== "undefined" ? (globalThis as any).vitest.fn : (globalThis as any).jest.fn as any)(async (url: string, init: RequestInit) => {
+        fetchSpy = (window as any).fetch = vi.fn(async (url: string, init: RequestInit) => {
             var callback = fetchMap[url] ?? fetchMap["*"];
             if (!callback) {
                 console.error(`Mock fetch is not configured for URL: (${url})!`);

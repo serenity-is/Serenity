@@ -8,6 +8,7 @@
 import { Config } from "./config";
 import { Fluent } from "./fluent";
 import { parseDate, parseDecimal, parseInteger, stringFormat } from "./formatting";
+import { cssEscape } from "./html";
 import { localText } from "./localtext";
 import { isArrayLike } from "./system";
 
@@ -700,7 +701,7 @@ export class Validator {
         if (element instanceof HTMLInputElement) {
             if (element.type === "radio" || element.type === "checkbox") {
                 if (element.name && element.form) {
-                    var values = Array.from(element.form.querySelectorAll<HTMLInputElement>(`input[name=${CSS.escape(element.name)}]`))
+                    var values = Array.from(element.form.querySelectorAll<HTMLInputElement>(`input[name=${cssEscape(element.name)}]`))
                         .map(el => el.checked ? null : el.value);
 
                     if (values.length > 1)
@@ -1297,13 +1298,13 @@ export class Validator {
 
                 // If the element is not a child of an associated label, then it's necessary
                 // to explicitly apply aria-describedby
-            } else if (!error.closest("label[for='" + CSS.escape(elementID) + "']")) {
+            } else if (!error.closest("label[for='" + cssEscape(elementID) + "']")) {
                 var errorID = error.getAttribute("id");
 
                 // Respect existing non-error aria-describedby
                 if (!describedBy) {
                     describedBy = errorID;
-                } else if (!describedBy.match(new RegExp("\\b" + CSS.escape(errorID) + "\\b"))) {
+                } else if (!describedBy.match(new RegExp("\\b" + cssEscape(errorID) + "\\b"))) {
 
                     // Add to end of list if not already present
                     describedBy += " " + errorID;
@@ -1336,13 +1337,13 @@ export class Validator {
     }
 
     errorsFor(element: ValidatableElement) {
-        var name = CSS.escape(this.idOrName(element)),
+        var name = cssEscape(this.idOrName(element)),
             describer = element.getAttribute("aria-describedby"),
             selector = "label[for='" + name + "'], label[for='" + name + "'] *";
 
         // 'aria-describedby' should directly reference the error element
         if (describer) {
-            selector = selector + ", #" + CSS.escape(describer)
+            selector = selector + ", #" + cssEscape(describer)
                 .replace(/\s+/g, ", #");
         }
 
@@ -1367,7 +1368,7 @@ export class Validator {
     }
 
     findByName(name: string): ValidatableElement[] {
-        return Array.from(this.currentForm.querySelectorAll<ValidatableElement>("[name='" + CSS.escape(name) + "']"));
+        return Array.from(this.currentForm.querySelectorAll<ValidatableElement>("[name='" + cssEscape(name) + "']"));
     }
 
     dependTypes = {

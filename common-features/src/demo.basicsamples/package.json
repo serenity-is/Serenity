@@ -10,9 +10,10 @@
   "scripts": {
     "build": "node ./tsbuild.js",
     "build:watch": "node ./tsbuild.js --watch",
-    "jest": "node ../../../node_modules/jest/bin/jest.js",
-    "test": "node ./tsbuild.js && pnpm jest --coverage",
-    "tsc": "tsc"
+    "coverage": "pnpm run test --coverage",
+    "test": "pnpm build && pnpm vitest run",
+    "tsc": "tsc",
+    "vitest": "node ../../../node_modules/vitest/dist/cli.js"
   },
   "type": "module"
 }

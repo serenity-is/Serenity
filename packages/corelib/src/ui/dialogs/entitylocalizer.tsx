@@ -1,4 +1,4 @@
-import { faIcon, Fluent, LanguageList, localText, PropertyItem, SaveRequest, TranslationConfig } from "../../base";
+import { cssEscape, faIcon, Fluent, LanguageList, localText, PropertyItem, SaveRequest, TranslationConfig } from "../../base";
 import { extend } from "../../compat/system-compat";
 import { PropertyGrid, PropertyGridOptions } from "../widgets/propertygrid";
 
@@ -95,7 +95,7 @@ export class EntityLocalizer {
                     <button class="btn btn-primary btn-sm" title={localText("Site.Translation.TranslateText")} onClick={() => {
                         TranslationConfig.translateTexts({
                             Inputs: [{
-                                SourceText: this.grid.element.findFirst("[name=" + CSS.escape(input.name.split('$')[1]) + "]").val() || input.placeholder,
+                                SourceText: this.grid.element.findFirst("[name=" + cssEscape(input.name.split('$')[1]) + "]").val() || input.placeholder,
                                 TargetLanguageID: input.name.split('$')[0],
                             }]
                         }).then(result => {

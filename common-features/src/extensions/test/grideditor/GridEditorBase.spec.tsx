@@ -1,10 +1,13 @@
-import { GridEditorBase } from "../../Modules/GridEditor/GridEditorBase";
 import { mockFetch, unmockFetch } from "test-utils";
+import { GridEditorBase } from "../../Modules/GridEditor/GridEditorBase";
 
-beforeAll(() => {
+beforeEach(() => {
+    vi.useFakeTimers();
+    mockFetch({ "*": () => ({}) });
 });
 
 afterEach(() => {
+    vi.clearAllTimers();
     unmockFetch();
 });
 

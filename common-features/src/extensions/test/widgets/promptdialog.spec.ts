@@ -16,12 +16,12 @@ function clickOkButton(dlg: PromptDialog) {
 }
 
 beforeEach(() => {
-    jest.useFakeTimers();
+    vi.useFakeTimers();
 });
 
 afterEach(() => {
-    jest.useRealTimers();
-    jest.restoreAllMocks();
+    vi.useRealTimers();
+    vi.restoreAllMocks();
 });
 
 describe("PromptDialog", () => {
@@ -33,11 +33,11 @@ describe("PromptDialog", () => {
             }
         });
         try {
-            const closeSpy = jest.spyOn(Dialog.prototype, "close");
+            const closeSpy = vi.spyOn(Dialog.prototype, "close");
             dlg.dialogOpen();
             expect(closeSpy).not.toHaveBeenCalled();
             clickOkButton(dlg);
-            await jest.runOnlyPendingTimersAsync();
+            await vi.runOnlyPendingTimersAsync();
             expect(closeSpy).toHaveBeenCalledTimes(1);
         }
         finally {
@@ -53,11 +53,11 @@ describe("PromptDialog", () => {
             }
         });
         try {
-            const closeSpy = jest.spyOn(Dialog.prototype, "close");
+            const closeSpy = vi.spyOn(Dialog.prototype, "close");
             dlg.dialogOpen();
             expect(closeSpy).not.toHaveBeenCalled();
             clickOkButton(dlg);
-            await jest.runOnlyPendingTimersAsync();
+            await vi.runOnlyPendingTimersAsync();
             expect(closeSpy).not.toHaveBeenCalled();
         }
         finally {
