@@ -1,4 +1,4 @@
-import { mockFetch } from "../../../test/mocks";
+import { mockFetch } from "../../test/mocks";
 import { addCustomAttribute, classTypeInfo } from "../../base";
 import { IdPropertyAttribute, IsActivePropertyAttribute, LocalTextPrefixAttribute } from "../../types/attributes";
 import { Decorators } from "../../types/decorators";

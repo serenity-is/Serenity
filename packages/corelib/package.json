@@ -41,12 +41,12 @@
   "repository": "https://github.com/serenity-is/serenity/packages/corelib",
   "scripts": {
     "build": "node build/build",
+    "coverage": "vitest run --coverage",
     "doc": "typedoc --plugin typedoc-plugin-markdown --exclude **/lib/**/* --excludePrivate --readme none --githubPages false --hidePageHeader --sourceLinkTemplate https://github.com/serenity-is/serenity/blob/master/{path}#L{line} --out /serenity-is/SerenityIs/SerenityIs.Web/Docs/api/js/corelib --json ./out/typedoc.json src",
-    "dts": "tsc && dts-bundle-generator --project ./tsconfig.dts.json --disable-symlinks-following --export-referenced-types=false --inline-declare-externals --no-banner out/index.d.ts -o dist/index.d.ts",
-    "jest": "jest",
-    "prepublishOnly": "node build/build && jest && npm run dts",
-    "test": "node build/build && jest --coverage",
-    "tsc": "tsc"
+    "dts": "tsc --build && dts-bundle-generator --project ./src/tsconfig.dts.json --disable-symlinks-following --export-referenced-types=false --inline-declare-externals --no-banner out/index.d.ts -o dist/index.d.ts",
+    "prepublishOnly": "node build/build && pnpm coverage && pnpm dts",
+    "test": "vitest run",
+    "tsc": "tsc --build"
   },
   "type": "module"
 }

@@ -1,6 +1,6 @@
 // @ts-ignore
 import { type Mock, type MockInstance } from "vitest";
-import { mockJQuery, unmockBSAndJQuery } from "../../test/mocks";
+import { mockJQuery, unmockBSAndJQuery } from "../test/mocks";
 import { Dialog, alertDialog, cancelDialogButton, confirmDialog, iframeDialog, informationDialog, noDialogButton, okDialogButton, successDialog, uiAndBSButtonNoConflict, warningDialog, yesDialogButton, type MessageDialogOptions } from "./dialogs";
 
 afterEach(function cleanup() {

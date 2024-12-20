@@ -39,7 +39,7 @@ export function isSameOrigin(url: string) {
         a.protocol == loc.protocol;
 }
 
-export function getServiceOptions<TResponse>(options: ServiceOptions<TResponse>) {
+export function getServiceOptions<TResponse extends ServiceResponse>(options: ServiceOptions<TResponse>) {
 
     options = Object.assign(<ServiceOptions<TResponse>>{
         allowRedirect: true,

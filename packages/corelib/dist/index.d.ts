@@ -1912,7 +1912,7 @@ export declare function resolveUrl(url: string): string;
 export declare function resolveServiceUrl(url: string): string;
 export declare function getCookie(name: string): any;
 export declare function isSameOrigin(url: string): boolean;
-export declare function getServiceOptions<TResponse>(options: ServiceOptions<TResponse>): ServiceOptions<TResponse>;
+export declare function getServiceOptions<TResponse extends ServiceResponse>(options: ServiceOptions<TResponse>): ServiceOptions<TResponse>;
 export declare function requestStarting(): void;
 export declare function requestFinished(): void;
 export declare function getActiveRequests(): number;

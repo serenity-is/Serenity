@@ -2,19 +2,21 @@
   "name": "@serenity-is/workspace-serenity",
   "devDependencies": {
     "@vitest/browser": "2.1.8",
+    "@vitest/coverage-v8": "2.1.8",
     "esbuild": "0.23.1",
     "flatpickr": "4.6.13",
     "jsx-dom": "8.1.5",
     "jsdom": "25.0.1",
     "playwright": "1.49.1",
     "typescript": "5.7.2",
+    "vite-tsconfig-paths": "5.1.4",
     "vitest": "2.1.8"
   },
   "optionalDependencies": {
     "fsevents": "2.3.3"
   },
   "scripts": {
-    "all": "pnpm i && pnpm -r build && pnpm -r tsc && pnpm -r jest"
+    "all": "pnpm i && pnpm -r build && pnpm -r tsc && pnpm -r test"
   },
   "private": true,
   "license": "MIT",

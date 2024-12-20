@@ -1,26 +1,5 @@
-// @ts-ignore
-import { readFileSync } from "fs";
-// @ts-ignore
-import { join, resolve } from "path";
 import { Mock, vi } from "vitest";
-import { resolveServiceUrl } from "../../src/base/services";
-
-const root = resolve('./');
-
-const nscorelibPath = "~/wwwroot/index.global.js";
-
-export function loadNSCorelib() {
-    loadExternalScripts(nscorelibPath);
-}
-
-export function loadExternalScripts(...scripts: string[]) {
-    scripts.forEach(path => {
-        if (path.startsWith('~/'))
-            path = join(root, path.substring(2));
-        const src = readFileSync(path, 'utf8');
-        window.eval(src);
-    });
-}
+import { resolveServiceUrl } from "../base/services";
 
 export function mockJQuery(fn: any = {}) {
     let jQuery = function (selector: string | HTMLElement) {

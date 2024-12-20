@@ -132,7 +132,7 @@ describe('Toastr', () => {
         }, 0);
     }));
 
-    it('can does not close if tapToDismiss is false and onClick is null', () => new Promise(done => {
+    it('does not close if tapToDismiss is false and onClick is null', () => new Promise(done => {
         const toast = toastr.info('Test Message', null, {
             tapToDismiss: false,
             timeOut: 1000
@@ -149,5 +149,3 @@ describe('Toastr', () => {
         }, 0);
     }));
 });
-
-
