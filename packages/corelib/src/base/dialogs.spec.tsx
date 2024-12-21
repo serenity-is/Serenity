@@ -824,9 +824,11 @@ describe("dialog button result handling", () => {
     it("does not close the dialog when the promise is rejected if the click handler returns a promise", () => new Promise(async done => {
         const unhandledRejection = () => { 
             done(void 0); 
-            (globalThis.process?.off || window.removeEventListener as any)("unhandledrejection", unhandledRejection);
+            globalThis.process?.off ? globalThis.process.off("unhandledRejection", unhandledRejection) :
+                window.removeEventListener("unhandledrejection", unhandledRejection);
         };        
-        (globalThis.process?.on || window.addEventListener)("unhandledrejection", unhandledRejection);
+        globalThis.process?.on ? globalThis.process.on("unhandledRejection", unhandledRejection) :
+            window.addEventListener("unhandledrejection", unhandledRejection);
         okClickSpy.mockImplementation(() => Promise.reject("test"));
 
         okButton.click();
