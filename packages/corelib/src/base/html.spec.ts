@@ -218,9 +218,11 @@ describe("appendToNode", () => {
         div.innerHTML = "test";
         const unhandledRejection = () => { 
             done(void 0); 
-            (globalThis.process?.off || window.removeEventListener as any)("unhandledrejection", unhandledRejection);
+            globalThis.process?.off ? globalThis.process.off("unhandledRejection", unhandledRejection) :
+            window.removeEventListener("unhandledrejection", unhandledRejection);
         };
-        (globalThis.process?.on || window.addEventListener as any)("unhandledrejection", unhandledRejection);
+        globalThis.process?.on ? globalThis.process.on("unhandledRejection", unhandledRejection) :
+            window.addEventListener("unhandledrejection", unhandledRejection);
         appendToNode(parent, Promise.reject("some reject reason"));
         expect(parent.innerHTML).toBe("<!--Loading content...-->");
         await Promise.resolve();
