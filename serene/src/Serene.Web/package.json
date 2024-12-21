@@ -14,7 +14,6 @@
   },
   "scripts": {
     "build": "npm run tsbuild",
-    "coverage": "pnpm run test --coverage",
     "pnpm:devPreinstall": "dotnet build -target:RestoreNodeTypes",
     "preinstall": "dotnet build -target:RestoreNodeTypes",
     "test": "node ./tsbuild.js && pnpm vitest run",
