@@ -35,7 +35,7 @@ describe("toggleClass", () => {
         expect(el.getAttribute("class")).toBe("test1 test2");
     });
 
-    
+
     it("can toggle single class", () => {
         const el = document.createElement("div");
         el.setAttribute("class", "test1 test2");
@@ -92,7 +92,7 @@ describe("toggleClass", () => {
 
         toggleClass(el, "test1      test2", false);
         expect(el.getAttribute("class")).toBe("");
-    });       
+    });
 });
 
 describe("addClass", () => {
@@ -216,10 +216,18 @@ describe("appendToNode", () => {
         const parent = document.createElement("div");
         const div = document.createElement("div");
         div.innerHTML = "test";
-        appendToNode(parent, Promise.reject("some reject reason"));
-        expect(parent.innerHTML).toBe("<!--Loading content...-->");
-        await Promise.resolve();
-        expect(parent.innerHTML).toBe("<!--Error loading content: some reject reason-->");
+        const unhandledRejection = () => { };
+        globalThis.process.on("unhandledRejection", unhandledRejection);
+        try {
+            appendToNode(parent, Promise.reject("some reject reason"));
+            expect(parent.innerHTML).toBe("<!--Loading content...-->");
+            await Promise.resolve();
+            expect(parent.innerHTML).toBe("<!--Error loading content: some reject reason-->");
+        }
+        finally {
+            await Promise.resolve();
+            setTimeout(() => globalThis.process.off("unhandledRejection", unhandledRejection), 0);
+        }
     });
 
     it("calls append for other content types", () => {

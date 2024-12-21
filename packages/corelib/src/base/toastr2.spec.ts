@@ -65,7 +65,7 @@ describe('Toastr', () => {
     });
 
     it('should subscribe and publish events', () => {
-        const callback = jest.fn();
+        const callback = vi.fn();
         toastr.subscribe(callback);
         toastr.publish(toastr);
         expect(callback).toHaveBeenCalledWith(toastr);
@@ -77,8 +77,8 @@ describe('Toastr', () => {
         expect(toastr.getContainer()).toBeNull();
     });
 
-    it('hides toasts', (done) => {
-        let onHidden = jest.fn(() => {});
+    it('hides toasts', () => new Promise(done => {
+        let onHidden = vi.fn(() => {});
         const toast = toastr.info('Test', null, {
             onHidden,
             timeOut: 1
@@ -88,10 +88,10 @@ describe('Toastr', () => {
                 expect(onHidden).toHaveBeenCalledTimes(1);
             }
             finally {
-                done();
+                done(void 0);
             }
         }, 5);
-    });
+    }));
 
     it('does not create duplicate toast if preventDuplicates is true', () => {
         const toast1 = toastr.info('Test Message', null, {
@@ -112,7 +112,7 @@ describe('Toastr', () => {
         expect(toast.classList.contains("rtl")).toBe(true);
     });
 
-    it('can create a close button', (done) => {
+    it('can create a close button', () => new Promise(done => {
         const toast = toastr.info('Test Message', null, {
             closeButton: true,
             closeClass: 'my-close-button',
@@ -127,12 +127,12 @@ describe('Toastr', () => {
                 expect(toast.parentElement).toBeNull();
             }
             finally {
-                done();
+                done(void 0);
             }
         }, 0);
-    });
+    }));
 
-    it('can does not close if tapToDismiss is false and onClick is null', (done) => {
+    it('does not close if tapToDismiss is false and onClick is null', () => new Promise(done => {
         const toast = toastr.info('Test Message', null, {
             tapToDismiss: false,
             timeOut: 1000
@@ -144,10 +144,8 @@ describe('Toastr', () => {
                 expect(toast.parentElement).not.toBeNull();
             }
             finally {
-                done();
+                done(void 0);
             }
         }, 0);
-    });
+    }));
 });
-
-

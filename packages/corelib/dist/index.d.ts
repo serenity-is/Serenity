@@ -1607,6 +1607,7 @@ export declare function getReturnUrl(opt?: {
 	ignoreUnsafe?: boolean;
 	purpose?: string;
 }): string;
+export declare function cssEscape(selector: string): string;
 export declare function addLocalText(obj: string | Record<string, string | Record<string, any>> | string, pre?: string): void;
 export declare function localText(key: string, defaultText?: string): string;
 export declare function tryGetText(key: string): string;
@@ -1912,7 +1913,7 @@ export declare function resolveUrl(url: string): string;
 export declare function resolveServiceUrl(url: string): string;
 export declare function getCookie(name: string): any;
 export declare function isSameOrigin(url: string): boolean;
-export declare function getServiceOptions<TResponse>(options: ServiceOptions<TResponse>): ServiceOptions<TResponse>;
+export declare function getServiceOptions<TResponse extends ServiceResponse>(options: ServiceOptions<TResponse>): ServiceOptions<TResponse>;
 export declare function requestStarting(): void;
 export declare function requestFinished(): void;
 export declare function getActiveRequests(): number;

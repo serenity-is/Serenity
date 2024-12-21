@@ -46,7 +46,7 @@ describe("EditorUtils.setReadOnly", () => {
 
     it("calls set_readOnly if available in the widget", () => {
         class MyWidget extends Widget {
-            set_readOnly = jest.fn();
+            set_readOnly = vi.fn();
         }
         const widget = new MyWidget({});
         EditorUtils.setReadOnly(widget, true);
@@ -80,7 +80,7 @@ describe("EditorUtils.setReadOnly", () => {
 
     it("finds attached widget from the element", () => {
         class MyWidget extends Widget {
-            set_readOnly = jest.fn();
+            set_readOnly = vi.fn();
         }
         const widget = new MyWidget({});
         EditorUtils.setReadOnly(widget.domNode, true);

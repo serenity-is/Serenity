@@ -1,7 +1,7 @@
 ﻿{
   "compileOnSave": false,
   "compilerOptions": {
-    "declaration": true,
+    "composite": true,
     "emitDeclarationOnly": true,
     "esModuleInterop": true,
     "forceConsistentCasingInFileNames": true,
@@ -18,14 +18,19 @@
     "moduleResolution": "Bundler",
     "newLine": "lf",
     "noImplicitAny": true,
-    "outDir": "./out",    
-    "rootDir": "./src",
+    "outDir": "../out",
     "skipLibCheck": true,
     "sourceMap": true,
     "target": "ES2017",
+    "types": [],
     "useDefineForClassFields": false
   },
   "include": [
-    "src"
+    "**/*"
+  ],
+  "exclude": [
+    "**/*.spec.ts",
+    "**/*.spec.tsx",
+    "test/**/*"
   ]
 }

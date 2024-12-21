@@ -11,8 +11,7 @@
     "build": "node ./tsbuild.js",
     "build:watch": "node ./tsbuild.js --watch",
     "dts": "pnpm dts-bundle-generator Modules/index.ts -o dist/index.d.ts --no-banner --disable-symlinks-following --inline-declare-global",
-    "jest": "node ../../../node_modules/jest/bin/jest.js",
-    "test": "node ./tsbuild.js && pnpm jest --coverage",
+    "test": "pnpm build && vitest run",
     "tsc": "tsc"
   },
   "type": "module",

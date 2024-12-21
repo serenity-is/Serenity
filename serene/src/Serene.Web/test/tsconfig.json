@@ -5,10 +5,11 @@
     "outDir": "../out/test",
     "typeRoots": [
       "../node_modules/@types",
-      "../../../../node_modules/@types"
+      "../../../../node_modules/@types",
+      "../../../../node_modules",
     ],
     "types": [
-      "jest"
+      "vitest/globals"
     ]
   },
   "include": [

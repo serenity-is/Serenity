@@ -12,7 +12,7 @@ export class EntityDialogWrapper<TDialog extends EntityDialog<any, any>> {
             throw "Delete button not found in the dialog!";
         if (button.hasClass("disabled"))
             throw "Delete button is disabled!";
-        const spy = jest.spyOn(window, "confirm").mockReturnValue(true);
+        const spy = ((globalThis as any).vitest || (globalThis as any).jest).spyOn(window, "confirm").mockReturnValue(true);
         button.click();
         spy.mockRestore();
         return waitForAjaxRequests();

@@ -1,16 +1,19 @@
-
-jest.mock("../../base", () => ({
-    ...jest.requireActual("../../base"),
-    tryGetText: jest.fn().mockImplementation((key: string) => key)
-}));
-
 import { addCustomAttribute, registerEnum } from "../../base";
 import { EnumKeyAttribute } from "../../types/attributes";
 import { EnumTypeRegistry } from "../../types/enumtyperegistry";
 import { BooleanFormatter, CheckboxFormatter, DateFormatter, DateTimeFormatter, EnumFormatter, FileDownloadFormatter, MinuteFormatter, NumberFormatter, UrlFormatter } from "./formatters";
 
+vi.mock(import("../../base"), async (importOriginal) => {
+    const actual = await importOriginal();
+    return {
+        ...actual,
+        tryGetText: vi.fn().mockImplementation((key: string) => key)
+    }
+});
+
+
 beforeEach(() => {
-    jest.restoreAllMocks();
+    vi.clearAllMocks();
     EnumTypeRegistry.reset();
 });
 

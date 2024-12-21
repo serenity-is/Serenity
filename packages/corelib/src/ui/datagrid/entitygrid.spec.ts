@@ -1,7 +1,14 @@
+import { mockFetch } from "../../test/mocks";
 import { addCustomAttribute, classTypeInfo } from "../../base";
 import { IdPropertyAttribute, IsActivePropertyAttribute, LocalTextPrefixAttribute } from "../../types/attributes";
 import { Decorators } from "../../types/decorators";
 import { EntityGrid } from "./entitygrid";
+
+beforeEach(() => {
+    mockFetch({
+        "*": () => ({})
+    });
+});
 
 function getIdProperty(grid: EntityGrid<any, any>): string {
     return grid["getIdProperty"]();
@@ -134,7 +141,7 @@ describe('EntityGrid.getLocalTextDbPrefix', () => {
 
     it('returns class identifier based on typeInfo property', () => {
         class DefaultGrid extends EntityGrid<any, any> {
-            static readonly typeInfo = classTypeInfo('MyProject.TestModule.DefaultGrid');
+            static typeInfo = classTypeInfo('MyProject.TestModule.DefaultGrid');
         }
 
         var grid = new DefaultGrid({});
@@ -219,7 +226,7 @@ describe('EntityGrid.getLocalTextPrefix', () => {
 
     it('returns class identifier based on typeInfo property', () => {
         class DefaultGrid extends EntityGrid<any, any> {
-            static readonly typeInfo = classTypeInfo('MyProject.TestModule.DefaultGrid');
+            static typeInfo = classTypeInfo('MyProject.TestModule.DefaultGrid');
         }
 
         var grid = new DefaultGrid({});

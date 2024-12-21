@@ -145,14 +145,18 @@ interface ParseError {
     pos: number;
 }
 
-const ParseError: any = function (expression: string, error: string, position: number) {
-    this.expression = expression;
-    this.error = error;
-    this.position = position;
-    this.toString = function () {
-        return 'Error parsing expression: "' + expression + '", "' +
-            error + ', position: ' + position;
-    };
+class ParseError extends Error {
+    declare expression: string;
+    declare error: string;
+    declare position: number;
+
+    constructor(expression: string, error: string, position: number) {
+        super('Error parsing expression: "' + expression + '", "' +
+            error + ', position: ' + position);
+        this.expression = expression;
+        this.error = error;
+        this.position = position;
+    }
 }
 
 function tokenize(expression: string): Token[] {

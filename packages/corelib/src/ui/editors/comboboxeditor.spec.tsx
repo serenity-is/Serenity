@@ -45,18 +45,18 @@ describe("ComboboxEditor async behavior", () => {
     });
 
     it("should preserve order when some items not found for async initSelection", async () => {
-        jest.useFakeTimers();
+        vi.useFakeTimers();
         try {
             var combo = new ReverseAsyncCombo({
                 filter: x => x !== "2"
             });
             combo.values = ["3", "2", "1"];
             expect(combo.values).toStrictEqual(["3", "2", "1"]);
-            await jest.runAllTimersAsync();
+            await vi.runAllTimersAsync();
             expect(combo.values).toStrictEqual(["3", "1"]);
         }
         finally {
-            jest.useRealTimers();
+            vi.useRealTimers();
         }
     });
 });

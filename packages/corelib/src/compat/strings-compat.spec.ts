@@ -3,7 +3,7 @@ import * as deprecations from "./strings-compat";
 
 describe("endsWith", () => {
     it("uses String.prototype.endsWith", () => {
-        var endsWithSpy = jest.spyOn(String.prototype, "endsWith");
+        var endsWithSpy = vi.spyOn(String.prototype, "endsWith");
         expect((deprecations as any).endsWith("abc", "c")).toBe(true);
         expect(endsWithSpy).toHaveBeenCalled();
     });
@@ -47,7 +47,7 @@ describe("padLeft", () => {
             return;
         }
 
-        var padStartSpy = jest.spyOn(String.prototype as any, "padStart");
+        var padStartSpy = vi.spyOn(String.prototype as any, "padStart");
         expect(padLeft("abc", 5)).toBe("  abc");
         expect(padStartSpy).toHaveBeenCalled();
 
@@ -82,7 +82,7 @@ describe("replaceAll", () => {
             return;
         }
         
-        var replaceAllSpy = jest.spyOn(String.prototype as any, "replaceAll");
+        var replaceAllSpy = vi.spyOn(String.prototype as any, "replaceAll");
         expect(replaceAll("abc", "a", "b")).toBe("bbc");
         expect(replaceAllSpy).toHaveBeenCalled();
     });
@@ -108,7 +108,7 @@ describe("replaceAll", () => {
 
 describe("startsWith", () => {
     it("uses String.prototype.startsWith", () => {
-        var startsWithSpy = jest.spyOn(String.prototype, "startsWith");
+        var startsWithSpy = vi.spyOn(String.prototype, "startsWith");
         expect((deprecations as any).startsWith("abc", "a")).toBe(true);
         expect(startsWithSpy).toHaveBeenCalled();
     });
@@ -134,7 +134,7 @@ describe("toSingleLine", () => {
 
 describe("trim", () => {
     it("uses String.prototype.trim", () => {
-        var trimSpy = jest.spyOn(String.prototype, "trim");
+        var trimSpy = vi.spyOn(String.prototype, "trim");
         expect(trim(" abc ")).toBe("abc");
         expect(trimSpy).toHaveBeenCalled();
     });
@@ -148,7 +148,7 @@ describe("trim", () => {
 describe("trimEnd", () => {
     it("uses String.prototype.trimEnd", () => {
         if ((String.prototype as any).trimEnd) {
-            var trimEndSpy = jest.spyOn(String.prototype as any, "trimEnd");
+            var trimEndSpy = vi.spyOn(String.prototype as any, "trimEnd");
             expect(trimEnd(" abc ")).toBe(" abc");
             expect(trimEndSpy).toHaveBeenCalled();
         }
@@ -177,7 +177,7 @@ describe("trimEnd", () => {
 describe("trimStart", () => {
     it("uses String.prototype.trimStart", () => {
         if ((String.prototype as any).trimStart) {
-            var trimStartSpy = jest.spyOn(String.prototype as any, "trimStart");
+            var trimStartSpy = vi.spyOn(String.prototype as any, "trimStart");
             expect(trimStart(" abc ")).toBe("abc ");
             expect(trimStartSpy).toHaveBeenCalled();
         }
@@ -202,7 +202,7 @@ describe("trimStart", () => {
 
 describe("trimToEmpty", () => {
     it("uses String.prototype.trim", () => {
-        var trimSpy = jest.spyOn(String.prototype, "trim");
+        var trimSpy = vi.spyOn(String.prototype, "trim");
         expect(trimToEmpty(null)).toBe('');
         expect(trimToEmpty(undefined)).toBe('');
         expect(trimToEmpty(" abc ")).toBe("abc");

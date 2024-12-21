@@ -1,8 +1,8 @@
 import { type DateEditorOptions } from "./dateeditor";
-import { mockJQuery } from "../../mocks";
+import { mockJQuery } from "../../test/mocks";
 
 beforeEach(() => {
-    jest.useRealTimers();
+    vi.useRealTimers();
     document.body.innerHTML = "";
     delete (window as any)["$"]
     delete (window as any)["jQuery"];
@@ -29,7 +29,7 @@ function commonTests() {
 
     it("sets value to now if given value is now or today", async () => {
         var editor = await newEditor({});
-        jest.useFakeTimers({ now: new Date(2020, 0, 1) });
+        vi.useFakeTimers({ now: new Date(2020, 0, 1) });
         editor.value = "now";
         expect(editor.value).toEqual("2020-01-01");
         editor.value = "today";
@@ -72,7 +72,7 @@ describe("DateEditor_WithFlatPicker", () => {
 
     it("uses flatpickr date if it is found", async () => {
         var old = (window as any).flatpickr;
-        (window as any).flatpickr = jest.fn().mockImplementation(() => old);
+        (window as any).flatpickr = vi.fn().mockImplementation(() => old);
         var editor = await newEditor({});
         expect(editor.domNode.getAttribute("type")).toBe("text");
         expect((window as any).flatpickr).toHaveBeenCalled();
@@ -86,7 +86,7 @@ describe("DateEditor_WithJQueryDatePicker", () => {
 
     it("uses jquery date if it is found", async () => {
         let $ = mockJQuery({
-            datepicker: jest.fn().mockImplementation(function() { return this })
+            datepicker: vi.fn().mockImplementation(function() { return this })
         });
         var editor = await newEditor({});
         expect(editor.domNode.getAttribute("type")).toBe("text");

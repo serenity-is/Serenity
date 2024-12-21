@@ -1,7 +1,7 @@
 import { addListener, disposeElement, triggerEvent } from "./fluent-events";
 
 beforeEach(() => {
-    jest.restoreAllMocks();
+    vi.restoreAllMocks();
 });
 
 describe("disposeElement", () => {
@@ -24,7 +24,7 @@ describe("disposeElement", () => {
     });
 
     it("clears any events other than disposing", () => {
-        const test = jest.fn();
+        const test = vi.fn();
         addListener(element, "test", test); 
         disposeElement(element);
         expect(test).not.toHaveBeenCalled();
@@ -33,7 +33,7 @@ describe("disposeElement", () => {
     });
 
     it("can't clear externally attached events", () => {
-        const test = jest.fn();
+        const test = vi.fn();
         element.addEventListener("test", test); 
         disposeElement(element);
         expect(test).not.toHaveBeenCalled();
@@ -42,8 +42,8 @@ describe("disposeElement", () => {
     });
 
     it("calls disposing handlers", () => {
-        const disposing1 = jest.fn();
-        const disposing2 = jest.fn();
+        const disposing1 = vi.fn();
+        const disposing2 = vi.fn();
         addListener(element, "disposing", disposing1); 
         addListener(element, "disposing", disposing2); 
         disposeElement(element);
@@ -52,8 +52,8 @@ describe("disposeElement", () => {
     });
 
     it("does not trigger externally attached disposing event", () => {
-        const disposing1 = jest.fn();
-        const disposing2 = jest.fn();
+        const disposing1 = vi.fn();
+        const disposing2 = vi.fn();
         addListener(element, "disposing", disposing1); 
         element.addEventListener("disposing", disposing2); 
         disposeElement(element);
@@ -68,7 +68,7 @@ describe("triggerEvent", () => {
         const element = document.createElement("div");
         document.body.appendChild(element);
 
-        const test = jest.fn();
+        const test = vi.fn();
         addListener(element, "test", test); 
         triggerEvent(element, "test");
         expect(test).toHaveBeenCalled();
@@ -78,7 +78,7 @@ describe("triggerEvent", () => {
         const element = document.createElement("div");
         document.body.appendChild(element);
 
-        const test = jest.fn();
+        const test = vi.fn();
         addListener(element, "test", test); 
         triggerEvent(element, "test",  { custom: 5});
         expect(test).toHaveBeenCalled();
@@ -89,7 +89,7 @@ describe("triggerEvent", () => {
         const element = document.createElement("div");
         document.body.appendChild(element);
 
-        const test = jest.fn();
+        const test = vi.fn();
         addListener(element, "test", test); 
         triggerEvent(element, "test");
         expect(test).toHaveBeenCalled();
@@ -100,7 +100,7 @@ describe("triggerEvent", () => {
         const element = document.createElement("div");
         document.body.appendChild(element);
 
-        const test = jest.fn();
+        const test = vi.fn();
         addListener(element, "test", test); 
         triggerEvent(element, "test",  { bubbles: false });
         expect(test).toHaveBeenCalled();
@@ -111,7 +111,7 @@ describe("triggerEvent", () => {
         const element = document.createElement("div");
         document.body.appendChild(element);
 
-        const test = jest.fn();
+        const test = vi.fn();
         addListener(element, "test", test); 
         triggerEvent(element, "test");
         expect(test).toHaveBeenCalled();
@@ -122,7 +122,7 @@ describe("triggerEvent", () => {
         const element = document.createElement("div");
         document.body.appendChild(element);
 
-        const test = jest.fn();
+        const test = vi.fn();
         addListener(element, "test", test); 
         triggerEvent(element, "test",  { cancelable: false });
         expect(test).toHaveBeenCalled();
@@ -133,7 +133,7 @@ describe("triggerEvent", () => {
         const element = document.createElement("div");
         document.body.appendChild(element);
 
-        const test = jest.fn();
+        const test = vi.fn();
         addListener(document.body, "test", "div", test); 
         triggerEvent(element, "test");
         expect(test).toHaveBeenCalled();

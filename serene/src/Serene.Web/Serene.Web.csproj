@@ -8,6 +8,7 @@
     <CommonSrc>..\..\..\common-features\src\</CommonSrc>
     <SerenitySrc>..\..\..\src\</SerenitySrc>
     <DefineConstants>$(DefineConstants);Northwind;BasicSamples</DefineConstants>
+    <RestoreNodeTypes>false</RestoreNodeTypes>
     <UseProjectRefs Condition="!Exists('$(SerenitySrc)..\Serenity.sln')">false</UseProjectRefs>
     <!--#endif-->
   </PropertyGroup>
@@ -46,9 +47,10 @@
   </ItemGroup>
   <ItemGroup Condition="'$(UseProjectRefs)' == 'false'">
   </ItemGroup>
-  <Target Name="NpmInstall" BeforeTargets="BeforeBuild" Condition="!Exists('node_modules\.bin\esbuild')">
+  <Target Name="NpmInstall" BeforeTargets="BeforeBuild" Condition="!Exists('node_modules\serenity-is\tsbuild\package.json')">
     <Message Text="Installing NPM packages..." Importance="high" />
-    <Exec Command="npm install" />
+    <Exec Command="npm install" Condition="!Exists('..\..\..\pnpm-workspace.yaml')" />
+    <Exec Command="pnpm install" Condition="Exists('..\..\..\pnpm-workspace.yaml')" />
   </Target>
   <Target Name="RunTSBuild" BeforeTargets="BeforeBuild;GenerateStaticWebAssetsManifest" DependsOnTargets="RestoreNodeTypes;NpmInstall" Condition="'$(SkipTSBuild)' != 'true'">
     <Message Text="Executing TypeScript compiler for $(ProjectName)..." Importance="high" />

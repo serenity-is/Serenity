@@ -274,20 +274,20 @@ describe('Fluent instance methods', () => {
         });
 
         it('should trigger click event with no arguments', () => {
-            const onClickSpy = jest.fn();
+            const onClickSpy = vi.fn();
             fluent.getNode().addEventListener("click", onClickSpy);
             fluent.click();
             expect(onClickSpy).toHaveBeenCalledTimes(1);
         });
 
         it("should call elements click method with no arguments", () => {
-            const clickSpy = jest.spyOn(fluent.getNode(), "click");
+            const clickSpy = vi.spyOn(fluent.getNode(), "click");
             fluent.click();
             expect(clickSpy).toHaveBeenCalledTimes(1);
         });
 
         it("should ignore if element has no click method", () => {
-            const onClickSpy = jest.fn();
+            const onClickSpy = vi.fn();
             fluent.getNode().addEventListener("click", onClickSpy);
             fluent.getNode().click = null;
             fluent.click();
@@ -295,7 +295,7 @@ describe('Fluent instance methods', () => {
         });
 
         it('should add click event handler', () => {
-            const clickSpy = jest.fn();
+            const clickSpy = vi.fn();
             fluent.click(clickSpy);
             fluent.getNode().click();
             expect(clickSpy).toHaveBeenCalledTimes(1);
@@ -359,8 +359,8 @@ describe('Fluent instance methods', () => {
         });
 
         it('uses jQuery.remove if available', () => {
-            const empty = jest.fn();
-            (window as any).jQuery = jest.fn().mockReturnValue({ empty });
+            const empty = vi.fn();
+            (window as any).jQuery = vi.fn().mockReturnValue({ empty });
             try {
                 fluent.append(document.createElement('span'));
 
@@ -412,7 +412,7 @@ describe('Fluent instance methods', () => {
                     <span class="item">Item 3</span>
                 `;
 
-            const callback = jest.fn();
+            const callback = vi.fn();
             fluent.findEach('.item', callback);
 
             expect(callback).toHaveBeenCalledTimes(3);
@@ -428,7 +428,7 @@ describe('Fluent instance methods', () => {
                     <span class="item">Item 3</span>
                 `;
 
-            const callback = jest.fn();
+            const callback = vi.fn();
             fluent.findEach('.non-existent', callback);
 
             expect(callback).not.toHaveBeenCalled();
@@ -467,7 +467,7 @@ describe('Fluent instance methods', () => {
         });
 
         it("should call elements focus method", () => {
-            const focusSpy = jest.spyOn(fluent.getNode(), "focus");
+            const focusSpy = vi.spyOn(fluent.getNode(), "focus");
             fluent.focus();
             expect(focusSpy).toHaveBeenCalledTimes(1);
         });
@@ -699,7 +699,7 @@ describe('Fluent instance methods', () => {
 
         it('should ignore when element is null', () => {
             fluent = Fluent(null);
-            const callback = jest.fn();
+            const callback = vi.fn();
             fluent.style(callback);
             expect(callback).not.toHaveBeenCalled();
         });
@@ -945,8 +945,8 @@ describe('Fluent static methods', () => {
         });
 
         it('uses jQuery.remove if available', () => {
-            const empty = jest.fn();
-            (window as any).jQuery = jest.fn().mockReturnValue({ empty });
+            const empty = vi.fn();
+            (window as any).jQuery = vi.fn().mockReturnValue({ empty });
             try {
                 element.appendChild(document.createElement('span'));
 
@@ -1039,7 +1039,7 @@ describe('Fluent static methods', () => {
                     <span class="item">Item 3</span>
                 `;
 
-            const callback = jest.fn();
+            const callback = vi.fn();
             Fluent.findEach('.item', callback);
 
             expect(callback).toHaveBeenCalledTimes(3);
@@ -1056,7 +1056,7 @@ describe('Fluent static methods', () => {
                     <span class="item">Item 3</span>
                 `;
 
-            const callback = jest.fn();
+            const callback = vi.fn();
             Fluent.findEach('.non-existent', callback);
 
             expect(callback).not.toHaveBeenCalled();
@@ -1214,7 +1214,7 @@ describe('Fluent static methods', () => {
         it("should remove event listeners", () => {
             document.body.appendChild(element);
 
-            const listener = jest.fn();
+            const listener = vi.fn();
             Fluent.on(element, "click", listener);
 
             Fluent.remove(element);

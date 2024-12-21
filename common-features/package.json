@@ -1,14 +1,16 @@
 {
   "name": "@serenity-is/workspace-common-features",
   "private": true,
+  "dependencies": {
+    "@serenity-is/corelib": "workspace:*",
+    "@serenity-is/sleekgrid": "workspace:*"
+  },
   "devDependencies": {
-    "@serenity-is/corelib": "../packages/corelib",
-    "@serenity-is/sleekgrid": "../packages/sleekgrid",
-    "@serenity-is/tsbuild": "../packages/tsbuild",
-    "test-utils": "../packages/test-utils"
+    "@serenity-is/tsbuild": "workspace:*",
+    "test-utils": "workspace:*"
   },
   "scripts": {
-    "all": "pnpm i && pnpm -r build && pnpm -r tsc && pnpm -r dts && pnpm -r jest"
+    "all": "pnpm --filter ./** i && pnpm --filter ./** build && pnpm --filter ./** tsc && pnpm --filter ./** dts && pnpm --filter ./** vitest run"
   },
   "type": "module"
 }

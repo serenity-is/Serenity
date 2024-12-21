@@ -1,7 +1,6 @@
 import { getElementReadOnly, setElementReadOnly } from "../../base";
 import { Decorators } from "../../types/decorators";
 import { Widget, WidgetProps } from "../widgets/widget";
-import { EditorUtils } from "./editorutils";
 
 export type EditorProps<T> = WidgetProps<T> & {
     initialValue?: any;

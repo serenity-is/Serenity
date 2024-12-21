@@ -1,9 +1,9 @@
-import { mockFetch, unmockFetch } from "../mocks";
+import { mockFetch, unmockFetch } from "../test/mocks";
 import { isSameOrigin, requestStarting, resolveServiceUrl, resolveUrl, serviceCall, getServiceOptions, getActiveRequests, requestFinished } from "./services";
 import { getCookie } from "./services";
 import { ServiceError, ServiceOptions, ServiceResponse } from "./servicetypes";
 
-jest.mock("./config", () => ({
+vi.mock("./config", () => ({
     __esModule: true,
     Config: {
         applicationPath: "/app/"
@@ -91,9 +91,9 @@ describe("getCookie", () => {
     });
 
     it("should use jQuery.cookie plugin if available", () => {
-        const jQuery = (window as any).jQuery = jest.fn();
+        const jQuery = (window as any).jQuery = vi.fn();
         try {
-            const cookieSpy = (jQuery as any).cookie = jest.fn().mockReturnValue("value");
+            const cookieSpy = (jQuery as any).cookie = vi.fn().mockReturnValue("value");
 
             const cookieValue = getCookie("cookie");
 
@@ -151,7 +151,7 @@ describe("async serviceCall", () => {
         const fetch = window.fetch;
         window.fetch = null;
         try {
-            expect(async () => serviceCall({ url: "http://localhost:1234" })).rejects.toThrow("fetch is not available");
+            await expect(async () => serviceCall({ url: "http://localhost:1234" })).rejects.toThrow("The fetch method is not available");
         }
         finally {
             window.fetch = fetch;
@@ -262,7 +262,7 @@ describe("getServiceOptions", () => {
 
 describe("requestStarting", () => {
     afterEach(() => {
-        jest.restoreAllMocks();
+        vi.restoreAllMocks();
     });
 
     it("should increment activeRequests", () => {
@@ -277,9 +277,9 @@ describe("requestStarting", () => {
     });
 
     it("should trigger ajaxStart event if jQuery is available and $.active is 0", () => {
-        const jQuery: any = (window as any).jQuery = jest.fn();
+        const jQuery: any = (window as any).jQuery = vi.fn();
         try {
-            const eventTriggerSpy = jest.fn();
+            const eventTriggerSpy = vi.fn();
             jQuery.active = 0;
             jQuery.event = { trigger: eventTriggerSpy };
 
@@ -298,8 +298,8 @@ describe("requestStarting", () => {
     });
 
     it("should not trigger ajaxStart event if jQuery is available and $.active is not 0", () => {
-        const jQuery: any = (window as any).jQuery = jest.fn();
-        const eventTriggerSpy = jest.fn();
+        const jQuery: any = (window as any).jQuery = vi.fn();
+        const eventTriggerSpy = vi.fn();
         jQuery.active = 1;
         jQuery.event = { trigger: eventTriggerSpy };
         try {
@@ -318,7 +318,7 @@ describe("requestStarting", () => {
     });
 
     it("should trigger ajaxStart event if jQuery is not available and activeRequests is 1", () => {
-        const eventDispatchSpy = jest.spyOn(document, "dispatchEvent");
+        const eventDispatchSpy = vi.spyOn(document, "dispatchEvent");
 
         requestStarting();
         try {
@@ -332,7 +332,7 @@ describe("requestStarting", () => {
     it("should not trigger ajaxStart event if jQuery is not available and activeRequests is not 1", () => {
         requestStarting(); 
         try {
-            const eventDispatchSpy = jest.spyOn(document, "dispatchEvent");
+            const eventDispatchSpy = vi.spyOn(document, "dispatchEvent");
             requestStarting();
             try {
                 expect(eventDispatchSpy).not.toHaveBeenCalled();

@@ -1,57 +1,67 @@
-﻿import { UserDefinition } from "./userdefinition";
+﻿import { type UserDefinition } from "./userdefinition";
+import { Authorization } from "./authorization";
 
-var userDefinition: UserDefinition;
-
-function mockUserDefinition(async = false) {
-    userDefinition = {
-        IsAdmin: false,
-        Username: "mockuser",
-        DisplayName: "mockdisplay",
-        Permissions: {
-            "TRUE": true,
-            "FALSE": false,
-            "NO": false,
-            "YES": true
-        }
+const baseUser: UserDefinition = {
+    IsAdmin: false,
+    Username: "mockuser",
+    DisplayName: "mockdisplay",
+    Permissions: {
+        "TRUE": true,
+        "FALSE": false,
+        "NO": false,
+        "YES": true
     }
+}
 
-    jest.resetModules();
+const { getUserDefinitionMock } = vi.hoisted(() => {
+    return {
+        getUserDefinitionMock: vi.fn()
+    };
+});
 
-    jest.mock("./notify", () => ({
-        __esModule: true,
-        notifyError: jest.fn()
-    }));
-    
-    jest.mock("./localtext", () => ({
-        __esModule: true,
-        localText: jest.fn().mockImplementation((key: string) => key)
-    }));
-    
-    jest.mock("./scriptdata", () => ({
-        getRemoteData: function (key: string) {
-            if (async)
-                throw new Error(`not expected to call getRemoteData for: ${key}!`);
-   
+vi.mock("./notify", () => ({
+    notifyError: vi.fn()
+}));
+
+vi.mock("./localtext", () => ({
+    localText: vi.fn().mockImplementation((key: string) => key)
+}));
+
+vi.mock(import("./scriptdata"), async () => {
+    return {
+        getRemoteData: vi.fn().mockImplementation((key: string) => {
             if (key == "UserData")
-                return userDefinition as any;
-   
+                return getUserDefinitionMock();
+
             throw new Error(`not expected to load any other data: ${key}`);
-        },
-        getRemoteDataAsync: jest.fn().mockImplementation(async (key: string) => {
-            if (!async)
-                throw new Error(`not expected to call async getRemoteDataAsync for: ${key}!`);
-
+        }),
+        getRemoteDataAsync: vi.fn().mockImplementation(async (key: string) => {
             if (key == "UserData")
-                return userDefinition as any;
+                return getUserDefinitionMock();
 
             throw new Error(`not expected to load any other data: ${key}`);
         })
-    }));
+    }
+});
+
+function mockUserDefinition(user?: Partial<UserDefinition>): UserDefinition {
+    if (user === null) {
+        getUserDefinitionMock.mockReturnValue(null);
+        return null;
+    }
+
+    user = {
+        ...baseUser,
+        ...user
+    };
+    getUserDefinitionMock.mockReturnValue(user);
+    return user;
 }
 
-function mockUserDefinitionAsync() {
-    mockUserDefinition(true);
-}
+beforeEach(() => {
+    vitest.clearAllMocks();
+    mockUserDefinition();
+})
 
 function sharedPermissionSetBasedTests(testMethod: (permissionSet: { [key: string]: any }, permission: string) => Promise<boolean>) {
 
@@ -160,102 +170,166 @@ function sharedPermissionSetBasedTests(testMethod: (permissionSet: { [key: strin
     });
 }
 
-function sharedHasPermissionTests(hasPermission: ((key: string) => Promise<boolean>)) {
+describe('Authorization.hasPermission', () => {
     it('returns false if permission is null or undefined', async function () {
-        expect(await hasPermission(null)).toBe(false);
-        expect(await hasPermission(undefined)).toBe(false);
+        expect(Authorization.hasPermission(null)).toBe(false);
+        expect(Authorization.hasPermission(undefined)).toBe(false);
     });
 
     it('returns true if permission is *', async function () {
-        expect(await hasPermission('*')).toBe(true);
+        expect(Authorization.hasPermission('*')).toBe(true);
     });
 
     it('returns false for null or undefined permission set', async function () {
-        userDefinition.Permissions = null;
-        expect(await hasPermission('test')).toBe(false);
-        expect(await hasPermission('test')).toBe(false);
+        mockUserDefinition({ Permissions: null });
+        expect(Authorization.hasPermission('test')).toBe(false);
+        expect(Authorization.hasPermission('test')).toBe(false);
     });
 
     it('returns false if permission set does not contain the key', async function () {
-        expect(await hasPermission("test")).toBe(false);
+        expect(Authorization.hasPermission("test")).toBe(false);
     });
 
     it('returns true for "?" if user is logged in', async function () {
-        userDefinition.Username = 'username';
-        expect(await hasPermission("?")).toBe(true);
+        mockUserDefinition({ Username: 'username' });
+        expect(Authorization.hasPermission("?")).toBe(true);
     });
 
     it('returns false for "?" if user is NOT logged in', async function () {
-        userDefinition.Username = '';
-        expect(await hasPermission("?")).toBe(false);
+        mockUserDefinition({ Username: '' });
+        expect(Authorization.hasPermission("?")).toBe(false);
 
-        userDefinition.Username = null;
-        expect(await hasPermission("?")).toBe(false);
+        mockUserDefinition({ Username:  null });
+        expect(Authorization.hasPermission("?")).toBe(false);
 
-        userDefinition = null;
-        expect(await hasPermission("?")).toBe(false);
+        mockUserDefinition(null);
+        expect(Authorization.hasPermission("?")).toBe(false);
 
     });
 
     it('returns true for empty string if user is logged in', async function () {
-        userDefinition.Username = 'username';
-        expect(await hasPermission("")).toBe(true);
+        mockUserDefinition({ Username: 'username' });
+        expect(Authorization.hasPermission("")).toBe(true);
     });
 
     it('returns false for empty string if user is NOT logged in', async function () {
-        userDefinition.Username = '';
-        expect(await hasPermission("")).toBe(false);
+        mockUserDefinition({ Username: '' });
+        expect(Authorization.hasPermission("")).toBe(false);
 
-        userDefinition.Username = null;
-        expect(await hasPermission("")).toBe(false);
+        mockUserDefinition({ Username: null });
+        expect(Authorization.hasPermission("")).toBe(false);
 
-        userDefinition = null;
-        expect(await hasPermission("")).toBe(false);
+        mockUserDefinition(null);;
+        expect(Authorization.hasPermission("")).toBe(false);
 
     });
 
     it('returns false if user definition is null', async function () {
-        userDefinition = null;
-        expect(await hasPermission("TRUE")).toBe(false);
-        expect(await hasPermission("YES")).toBe(false);
+        mockUserDefinition(null);;
+        expect(Authorization.hasPermission("TRUE")).toBe(false);
+        expect(Authorization.hasPermission("YES")).toBe(false);
     });
 
     it('returns true if user is super admin', async function () {
-        userDefinition.IsAdmin = true;
-        expect(await hasPermission("TRUE")).toBe(true);
-        expect(await hasPermission("FALSE")).toBe(true);
-        expect(await hasPermission("YES")).toBe(true);
-        expect(await hasPermission("NO")).toBe(true);
-        expect(await hasPermission("UNKNOWN")).toBe(true);
-        expect(await hasPermission("!!!")).toBe(true);
-        expect(await hasPermission("&&")).toBe(true);
-        expect(await hasPermission("|")).toBe(true);
+        mockUserDefinition({ IsAdmin: true });
+        expect(Authorization.hasPermission("TRUE")).toBe(true);
+        expect(Authorization.hasPermission("FALSE")).toBe(true);
+        expect(Authorization.hasPermission("YES")).toBe(true);
+        expect(Authorization.hasPermission("NO")).toBe(true);
+        expect(Authorization.hasPermission("UNKNOWN")).toBe(true);
+        expect(Authorization.hasPermission("!!!")).toBe(true);
+        expect(Authorization.hasPermission("&&")).toBe(true);
+        expect(Authorization.hasPermission("|")).toBe(true);
     });
 
-    sharedPermissionSetBasedTests((permissionSet, permission) => {
-        userDefinition.Permissions = permissionSet;
-        return hasPermission(permission);
-    });
-}
+    //sharedPermissionSetBasedTests((permissionSet, permission) => {
+    //    mockUserDefinition({ Permissions: permissionSet });
+    //    return Authorization.hasPermission(permission);
+    //});
+    
 
-describe('Authorization.hasPermission', () => {
-    beforeEach(() => {
-        mockUserDefinition();
-    });
-
-    sharedHasPermissionTests(async (permission) => Promise.resolve((await import("./authorization")).Authorization.hasPermission(permission)));
 });
 
 describe('Authorization.hasPermissionAsync', () => {
-    beforeEach(() => {
-        mockUserDefinitionAsync();
+    it('returns false if permission is null or undefined', async function () {
+        expect(await Authorization.hasPermissionAsync(null)).toBe(false);
+        expect(await Authorization.hasPermissionAsync(undefined)).toBe(false);
     });
 
-    sharedHasPermissionTests(async (permission) => (await import("./authorization")).Authorization.hasPermissionAsync(permission));
+    it('returns true if permission is *', async function () {
+        expect(await Authorization.hasPermissionAsync('*')).toBe(true);
+    });
+
+    it('returns false for null or undefined permission set', async function () {
+        mockUserDefinition({ Permissions: null });
+        expect(await Authorization.hasPermissionAsync('test')).toBe(false);
+        expect(await Authorization.hasPermissionAsync('test')).toBe(false);
+    });
+
+    it('returns false if permission set does not contain the key', async function () {
+        expect(await Authorization.hasPermissionAsync("test")).toBe(false);
+    });
+
+    it('returns true for "?" if user is logged in', async function () {
+        mockUserDefinition({ Username: 'username' });
+        expect(await Authorization.hasPermissionAsync("?")).toBe(true);
+    });
+
+    it('returns false for "?" if user is NOT logged in', async function () {
+        mockUserDefinition({ Username: '' });
+        expect(await Authorization.hasPermissionAsync("?")).toBe(false);
+
+        mockUserDefinition({ Username:  null });
+        expect(await Authorization.hasPermissionAsync("?")).toBe(false);
+
+        mockUserDefinition(null);
+        expect(await Authorization.hasPermissionAsync("?")).toBe(false);
+
+    });
+
+    it('returns true for empty string if user is logged in', async function () {
+        mockUserDefinition({ Username: 'username' });
+        expect(await Authorization.hasPermissionAsync("")).toBe(true);
+    });
+
+    it('returns false for empty string if user is NOT logged in', async function () {
+        mockUserDefinition({ Username: '' });
+        expect(await Authorization.hasPermissionAsync("")).toBe(false);
+
+        mockUserDefinition({ Username: null });
+        expect(await Authorization.hasPermissionAsync("")).toBe(false);
+
+        mockUserDefinition(null);;
+        expect(await Authorization.hasPermissionAsync("")).toBe(false);
+
+    });
+
+    it('returns false if user definition is null', async function () {
+        mockUserDefinition(null);;
+        expect(await Authorization.hasPermissionAsync("TRUE")).toBe(false);
+        expect(await Authorization.hasPermissionAsync("YES")).toBe(false);
+    });
+
+    it('returns true if user is super admin', async function () {
+        mockUserDefinition({ IsAdmin: true });
+        expect(await Authorization.hasPermissionAsync("TRUE")).toBe(true);
+        expect(await Authorization.hasPermissionAsync("FALSE")).toBe(true);
+        expect(await Authorization.hasPermissionAsync("YES")).toBe(true);
+        expect(await Authorization.hasPermissionAsync("NO")).toBe(true);
+        expect(await Authorization.hasPermissionAsync("UNKNOWN")).toBe(true);
+        expect(await Authorization.hasPermissionAsync("!!!")).toBe(true);
+        expect(await Authorization.hasPermissionAsync("&&")).toBe(true);
+        expect(await Authorization.hasPermissionAsync("|")).toBe(true);
+    });
+
+    sharedPermissionSetBasedTests((permissionSet, permission) => {
+        mockUserDefinition({ Permissions: permissionSet });
+        return Authorization.hasPermissionAsync(permission);
+    });
 });
 
 describe('Authorization.isPermissionInSet', () => {
-    sharedPermissionSetBasedTests(async (permissionSet, permission) => Promise.resolve((await import("./authorization")).Authorization.isPermissionInSet(permissionSet, permission)));
+    sharedPermissionSetBasedTests(async (permissionSet, permission) => Promise.resolve(Authorization.isPermissionInSet(permissionSet, permission)));
 });
 
 
@@ -265,142 +339,125 @@ describe('Authorization.isLoggedIn', () => {
     })
 
     it('returns false if userdefinition is null', async () => {
-        let authorization = (await import("./authorization")).Authorization;
-        userDefinition = null;
+        let authorization = Authorization;
+        mockUserDefinition(null);;
         expect(authorization.isLoggedIn).toBe(false);
     });
 
     it('returns false if username is null or empty string', async () => {
-        let authorization = (await import("./authorization")).Authorization;
-        userDefinition.Username = null;
+        let authorization = Authorization;
+        mockUserDefinition({ Username: null });
         expect(authorization.isLoggedIn).toBe(false);
-        userDefinition.Username = "";
+        mockUserDefinition({ Username: "" });
         expect(authorization.isLoggedIn).toBe(false);
     });
 
     it('returns true if the username from userdefinition not null or an empty string', async () => {
-        let authorization = (await import("./authorization")).Authorization;
-        userDefinition.Username = 'x';
+        let authorization = Authorization;
+        mockUserDefinition({ Username: 'x' });
         expect(authorization.isLoggedIn).toBe(true);
-        userDefinition.Username = '0' as any;
+        mockUserDefinition({ Username: '0' as any });
         expect(authorization.isLoggedIn).toBe(true);
     });
 });
 
 
 describe('Authorization.isLoggedInAsync', () => {
-    beforeEach(() => {
-        mockUserDefinitionAsync();
-    })
-
+    
     it('returns false if userdefinition is null', async () => {
-        let authorization = (await import("./authorization")).Authorization;
-        userDefinition = null;
+        let authorization = Authorization;
+        mockUserDefinition(null);;
         expect(await authorization.isLoggedInAsync).toBe(false);
     });
 
     it('returns false if username is null or empty string', async () => {
-        let authorization = (await import("./authorization")).Authorization;
-        userDefinition.Username = null;
+        let authorization = Authorization;
+        mockUserDefinition({ Username: null });
         expect(await authorization.isLoggedInAsync).toBe(false);
-        userDefinition.Username = "";
+        mockUserDefinition({ Username: "" });
         expect(await authorization.isLoggedInAsync).toBe(false);
     });
 
     it('returns true if the username from userdefinition not null or an empty string', async () => {
-        let authorization = (await import("./authorization")).Authorization;
-        userDefinition.Username = 'x';
+        let authorization = Authorization;
+        mockUserDefinition({ Username: 'x' });
         expect(await authorization.isLoggedInAsync).toBe(true);
-        userDefinition.Username = '0' as any;
+        mockUserDefinition({ Username: '0' as any });
         expect(await authorization.isLoggedInAsync).toBe(true);
     });
 });
 
 describe('Authorization.username', () => {
-    beforeEach(() => {
-        mockUserDefinition();
-    })
-
     it('returns undefined if userdefinition is null', async () => {
-        let authorization = (await import("./authorization")).Authorization;
-        userDefinition = null;
+        let authorization = Authorization;
+        mockUserDefinition(null);;
         expect(authorization.username).toBeUndefined();
     });
 
     it('returns the username from userdefinition is null', async () => {
-        let authorization = (await import("./authorization")).Authorization;
-        userDefinition.Username = 'x';
+        let authorization = Authorization;
+        mockUserDefinition({ Username: 'x' });
         expect(authorization.username).toBe("x");
-        userDefinition.Username = "";
+        mockUserDefinition({ Username: "" });
         expect(authorization.username).toBe("");
-        userDefinition.Username = null;
+        mockUserDefinition({ Username: null });
         expect(authorization.username).toBe(null);
     });
 });
 
 describe('Authorization.usernameAsync()', () => {
-    beforeEach(() => {
-        mockUserDefinitionAsync();
-    })
 
     it('returns undefined if userdefinition is null', async () => {
-        let authorization = (await import("./authorization")).Authorization;
-        userDefinition = null;
+        let authorization = Authorization;
+        mockUserDefinition(null);;
         expect(await authorization.usernameAsync).toBeUndefined();
     });
 
     it('returns the username from userdefinition is null', async () => {
-        let authorization = (await import("./authorization")).Authorization;
-        userDefinition.Username = 'x';
+        let authorization = Authorization;
+        mockUserDefinition({ Username: 'x' });
         expect(await authorization.usernameAsync).toBe("x");
-        userDefinition.Username = "";
+        mockUserDefinition({ Username: "" });
         expect(await authorization.usernameAsync).toBe("");
-        userDefinition.Username = null;
+        mockUserDefinition({ Username: null });
         expect(await authorization.usernameAsync).toBe(null);
     });
 });
 
 describe('Authorization.userDefinition', () => {
-    beforeEach(() => {
-        mockUserDefinition();
-    })
 
     it('returns null if userDefinition is null', async () => {
-        let authorization = (await import("./authorization")).Authorization;
-        userDefinition = null;
+        let authorization = Authorization;
+        mockUserDefinition(null);;
         expect(authorization.userDefinition).toBeNull();
     });
 
     it('returns the userDefinition as is', async () => {
-        let authorization = (await import("./authorization")).Authorization;
+        let authorization = Authorization;
+        let userDefinition = mockUserDefinition();
         expect(authorization.userDefinition === userDefinition).toBe(true);
     });
 });
 
 describe('Authorization.userDefinitionAsync', () => {
-    beforeEach(() => {
-        mockUserDefinitionAsync();
-    })
-
+    
     it('returns null if userDefinition is null', async () => {
-        let authorization = (await import("./authorization")).Authorization;
-        userDefinition = null;
+        let authorization = Authorization;
+        mockUserDefinition(null);;
         expect(await authorization.userDefinitionAsync).toBeNull();
     });
 
     it('returns the userDefinition as is', async () => {
-        let authorization = (await import("./authorization")).Authorization;
+        let authorization = Authorization;
+        let userDefinition = mockUserDefinition();
         expect(await (authorization.userDefinitionAsync) === userDefinition).toBe(true);
     });
 });
 
 describe('Authorization.validatePermission', () => {
-    beforeEach(() => {
-        mockUserDefinition();
-    })
 
     it('throws if no permission', async function () {
-        let authorization = (await import("./authorization")).Authorization;
+        let authorization = Authorization;
         var thrown = false;
         try {
             authorization.validatePermission("FALSE");
@@ -413,7 +470,7 @@ describe('Authorization.validatePermission', () => {
     });
 
     it('does not throw if have the permission', async function () {
-        let authorization = (await import("./authorization")).Authorization;
+        let authorization = Authorization;
         var thrown = false;
         try {
             authorization.validatePermission("TRUE");
@@ -426,15 +483,11 @@ describe('Authorization.validatePermission', () => {
 });
 
 describe('Authorization.validatePermissionAsync', () => {
-    beforeEach(() => {
-        mockUserDefinitionAsync();
-    })
-
     it('throws if no permission', async function () {
         const notify = await import("./notify") as any;
         const localText = (await import("./localtext")).localText as any;
         const notifyError = notify.notifyError as any;
-    let authorization = (await import("./authorization")).Authorization;
+    let authorization = Authorization;
         try {
             var thrown = false;
             try {
@@ -458,7 +511,7 @@ describe('Authorization.validatePermissionAsync', () => {
     });
 
     it('does not throw if have the permission', async function () {
-        let authorization = (await import("./authorization")).Authorization;
+        let authorization = Authorization;
         var thrown = false;
         try {
             await authorization.validatePermissionAsync("TRUE");

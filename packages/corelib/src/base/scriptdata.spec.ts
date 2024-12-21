@@ -3,13 +3,13 @@ import { fetchScriptData, getScriptData, getScriptDataHash, peekScriptData } fro
 import { scriptDataHashSymbol, scriptDataSymbol } from "./symbols";
 import { getGlobalObject } from "./system";
 
-jest.mock("./notify", () => ({
-    notifyError: jest.fn()
+vi.mock("./notify", () => ({
+    notifyError: vi.fn()
 }));
 
 
 beforeEach(() => {
-    jest.clearAllMocks();
+    vi.clearAllMocks();
     delete getGlobalObject()[scriptDataHashSymbol];
     delete getGlobalObject()[scriptDataSymbol];
 });
@@ -242,7 +242,7 @@ describe("fetchScriptData", () => {
         };
         window["fetch"] = mockFetch as any;
         try {
-            const logSpy = jest.spyOn(console, "log").mockImplementation(() => { });
+            const logSpy = vi.spyOn(console, "log").mockImplementation(() => { });
             let notify = await import("./notify");
             await expect(async () => {
                 await fetchScriptData("Lookup.Test")
@@ -261,7 +261,7 @@ describe("getScriptData", () => {
     it("returns data from Serenity.scriptData symbol if available and reload is not true", async () => {
         getGlobalObject()[scriptDataSymbol] = { ["RemoteData.Test"]: "357" };
         let orgFetch = window["fetch"];
-        let mockFetch = jest.fn();
+        let mockFetch = vi.fn();
         window["fetch"] = mockFetch as any;
         try {
             let data = await getScriptData("RemoteData.Test");
@@ -431,7 +431,7 @@ describe("getScriptData", () => {
         };
         window["fetch"] = mockFetch as any;
         try {
-            const logSpy = jest.spyOn(console, "log").mockImplementation(() => { });
+            const logSpy = vi.spyOn(console, "log").mockImplementation(() => { });
             let notify = await import("./notify");
             await expect(async () => {
                 await getScriptData("Lookup.Test")
@@ -450,7 +450,7 @@ describe("peekScriptData", () => {
     it("returns data from scriptDataItem if available", () => {
         getGlobalObject()[scriptDataSymbol] = { ["RemoteData.Test"]: "357" };
         let orgFetch = window["fetch"];
-        let mockFetch = jest.fn();
+        let mockFetch = vi.fn();
         window["fetch"] = mockFetch as any;
         try {
             let data = peekScriptData("RemoteData.Test");
@@ -464,7 +464,7 @@ describe("peekScriptData", () => {
 
     it("returns undefined if data is not set", () => {
         let orgFetch = window["fetch"];
-        let mockFetch = jest.fn();
+        let mockFetch = vi.fn();
         window["fetch"] = mockFetch as any;
         try {
             let data = peekScriptData("RemoteData.Test");

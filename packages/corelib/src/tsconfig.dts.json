@@ -1,0 +1,9 @@
+﻿{
+  "extends": "./tsconfig.json",
+  "compilerOptions": {
+    "composite": false,
+    "noEmit": false,
+    "emitDeclarationOnly": true,
+    "skipLibCheck": false
+  }
+}

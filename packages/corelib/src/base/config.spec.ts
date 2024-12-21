@@ -1,6 +1,6 @@
 ﻿describe("Config", () => {
     it("has sensible defaults", async () => {
-        jest.resetModules();
+        vi.resetModules();
         document.head.childNodes.forEach(el => el.remove());
         const config = (await import("./config")).Config;
         expect(config.applicationPath).toBe("/");
@@ -10,7 +10,7 @@
     });
 
     it("can read applicationPath from a link with ApplicationPath ID", async () => {
-        jest.resetModules();
+        vi.resetModules();
         document.head.childNodes.forEach(el => el.remove());
         const link = document.createElement("link");
         link.href = "/mypath/some/";
@@ -21,7 +21,7 @@
     });
 
     it("ignores links with ID other than ApplicationPath", async () => {
-        jest.resetModules();
+        vi.resetModules();
         document.head.childNodes.forEach(el => el.remove());
         const link = document.createElement("link");
         link.href = "/mypath/some/";
@@ -32,7 +32,7 @@
     });
 
     it("returns Config.applicationPath as defaultReturnUrl", async () => {
-        jest.resetModules();
+        vi.resetModules();
         document.head.childNodes.forEach(el => el.remove());
         const config = (await import("./config")).Config;
         config.applicationPath = "/mypath/some/";

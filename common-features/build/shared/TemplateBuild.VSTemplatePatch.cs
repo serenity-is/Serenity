@@ -43,6 +43,7 @@ public static partial class Shared
         "Thumbs.db",
         "ErrorLog.db",
         "jest.config.js",
+        "vitest.config.ts",
         "StyleCop.Cache",
         "Serene.Web.js.map",
         "StartSharp.Web.js.map",

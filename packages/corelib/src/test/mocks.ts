@@ -1,27 +1,5 @@
-// @ts-ignore
-import { readFileSync } from "fs";
-// @ts-ignore
-import { join, resolve } from "path";
+import { Mock, vi } from "vitest";
 import { resolveServiceUrl } from "../base/services";
-
-const root = resolve('./');
-
-const nscorelibPath = "~/wwwroot/index.global.js";
-
-export function loadNSCorelib() {
-    loadExternalScripts(nscorelibPath);
-}
-
-export function loadExternalScripts(...scripts: string[]) {
-    scripts.forEach(path => {
-        if (path.startsWith('~/'))
-            path = join(root, path.substring(2));
-        const src = readFileSync(path, 'utf8');
-        const scriptEl = window.document.createElement("script");
-        scriptEl.textContent = src;
-        window.document.body.appendChild(scriptEl);
-    });
-}
 
 export function mockJQuery(fn: any = {}) {
     let jQuery = function (selector: string | HTMLElement) {
@@ -132,13 +110,13 @@ export type MockFetchInfo = {
 }
 
 var orgFetch: any;
-var fetchSpy: jest.Mock<Promise<any>, [url: string, init: RequestInit], any> & { requests: MockFetchInfo[] }
+var fetchSpy: Mock<(url: string, init: RequestInit) => Promise<any>> & { requests: MockFetchInfo[] }
 var fetchMap: Record<string, (info: MockFetchInfo) => any> = {};
 
 export function mockFetch(map?: { [urlOrService: string]: ((info: MockFetchInfo) => any) }) {
     if (!fetchSpy) {
         orgFetch = (window as any).fetch;
-        fetchSpy = (window as any).fetch = jest.fn(async (url: string, init: RequestInit) => {
+        fetchSpy = (window as any).fetch = vi.fn(async (url: string, init: RequestInit) => {
             var callback = fetchMap[url] ?? fetchMap["*"];
             if (!callback) {
                 console.error(`Fetch is not configured on the mock fetch implementation: (${url})!`);

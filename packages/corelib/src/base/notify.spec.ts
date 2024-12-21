@@ -1,16 +1,16 @@
 ﻿import { defaultNotifyOptions, notifyError, notifyInfo, notifySuccess, notifyWarning, positionToastContainer } from "./notify";
 
-jest.mock("./toastr2", () => ({
+vi.mock("./toastr2", () => ({
     __esModule: true,
     default: {
-        error: jest.fn(),
-        info: jest.fn(),
-        success: jest.fn(),
-        warning: jest.fn(),
-        clear: jest.fn((options: { containerId: string }) => {
+        error: vi.fn(),
+        info: vi.fn(),
+        success: vi.fn(),
+        warning: vi.fn(),
+        clear: vi.fn((options: { containerId: string }) => {
             document.getElementById(options?.containerId ?? 'toast-container')?.remove();
         }),
-        getContainer: jest.fn((options: { containerId: string, positionClass: string }, create: boolean) => {
+        getContainer: vi.fn((options: { containerId: string, positionClass: string }, create: boolean) => {
             const id = options?.containerId ?? 'toast-container';
             let div = document.getElementById(id);
             if (div)
@@ -25,7 +25,7 @@ jest.mock("./toastr2", () => ({
 }));
 
 beforeEach(() => {
-    jest.clearAllMocks();
+    vi.clearAllMocks();
 });
 
 describe("notifyError", () => {
@@ -192,7 +192,7 @@ describe("positionToastContainer", () => {
         var modal = document.body.appendChild(document.createElement("div"));
         try {
             modal.setAttribute("class", "modal in");
-            jest.spyOn(modal, "getBoundingClientRect");
+            vi.spyOn(modal, "getBoundingClientRect");
             positionToastContainer({ 
                 positionClass: "top-right"
             });
@@ -210,7 +210,7 @@ describe("positionToastContainer", () => {
         try {
             modal.setAttribute("class", "modal in");
             modal.setAttribute("style", "display: none");
-            jest.spyOn(modal, "getBoundingClientRect");
+            vi.spyOn(modal, "getBoundingClientRect");
             modal.setAttribute("style", "display: none");
             positionToastContainer();
             expect(modal.getBoundingClientRect).not.toHaveBeenCalled();
@@ -233,7 +233,7 @@ describe("positionToastContainer", () => {
         var modal = document.body.appendChild(document.createElement("div"));
         try {
             modal.setAttribute("class", "modal in");
-            jest.spyOn(modal, "getBoundingClientRect").mockImplementation(() => ({ top: 100, left: 100, bottom: 400, right: 500 } as any));
+            vi.spyOn(modal, "getBoundingClientRect").mockImplementation(() => ({ top: 100, left: 100, bottom: 400, right: 500 } as any));
             positionToastContainer();
             const container = toastr.getContainer();
             expect(container).toBeDefined();
@@ -255,7 +255,7 @@ describe("positionToastContainer", () => {
         var modal = document.body.appendChild(document.createElement("div"));
         try {
             modal.setAttribute("class", "modal in");
-            jest.spyOn(modal, "getBoundingClientRect").mockImplementation(() => ({ top: 100, left: 100, bottom: 400, right: 500 } as any));
+            vi.spyOn(modal, "getBoundingClientRect").mockImplementation(() => ({ top: 100, left: 100, bottom: 400, right: 500 } as any));
             positionToastContainer();
             const container = toastr.getContainer();
             modal.remove();

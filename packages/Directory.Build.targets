@@ -8,7 +8,7 @@
     <TypeScriptCompile Remove="node_modules\**;obj\**;out\**;dist\**"></TypeScriptCompile>
     <ProjectCapability Include="TypeScriptNuGet" />
     <Content Update="$(MSBuildProjectDirectory)\coverage\**\*;$(MSBuildProjectDirectory)\out\**\*;$(MSBuildProjectDirectory)\package*.json;$(MSBuildProjectDirectory)\sergen*.json;$(MSBuildProjectDirectory)\ts*.json;$(MSBuildProjectDirectory)\test\**\*" CopyToOutputDirectory="Never" CopyToPublishDirectory="Never" Pack="false" />
-    <None Update="$(MSBuildProjectDirectory)\coverage\**\*;$(MSBuildProjectDirectory)\out\**\*;$(MSBuildProjectDirectory)\jest*.js;$(MSBuildProjectDirectory)\tsbuild*.js;$(MSBuildProjectDirectory)\test\**\*" CopyToOutputDirectory="Never" CopyToPublishDirectory="Never" Pack="false" />
+    <None Update="$(MSBuildProjectDirectory)\coverage\**\*;$(MSBuildProjectDirectory)\out\**\*;$(MSBuildProjectDirectory)\jest*.js;$(MSBuildProjectDirectory)\vitest*.*;$(MSBuildProjectDirectory)\tsbuild*.js;$(MSBuildProjectDirectory)\test\**\*" CopyToOutputDirectory="Never" CopyToPublishDirectory="Never" Pack="false" />
     <None Include="$(MSBuildProjectDirectory)\dist\**" CopyToOutputDirectory="Never" CopyToPublishDirectory="Never" Pack="true" PackagePath="dist\" />
   </ItemGroup>
 </Project>
