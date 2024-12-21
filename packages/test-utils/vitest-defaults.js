@@ -14,7 +14,7 @@ export default (opt) => {
     if ((opt?.dynamicData ?? true)) {
         const isWebProject = projectRoot.indexOf('Serene.Web') || projectRoot.indexOf('StartSharp.Web') >= 0;
         if ((isWebProject && !existsSync(resolve(`./dynamic-data/Columns.Administration.Language.json`))) ||
-            (!isWebProject && !existsSync(`${testUtils}/dynamic-data/Columns.Administration.Language.json`))) {
+            (!isWebProject && !existsSync(resolve(`${testUtils}/dynamic-data/Columns.Administration.Language.json`)))) {
             if (projectRoot.indexOf('Serene.Web') >= 0 || !tryProject(`${serenityRoot}/..`, "StartSharp"))
                 tryProject(`${serenityRoot}/serene`, "Serene");
         }
@@ -44,7 +44,6 @@ export default (opt) => {
             environment: "jsdom",
             globals: true,
             alias: [
-                { find: "@serenity-is/corelib", replacement: `${testUtils}/../corelib/dist/index.js` },
                 { find: "jsx-dom/min/jsx-dev-runtime", replacement: "jsx-dom/jsx-runtime.js" },
                 { find: "jsx-dom/jsx-dev-runtime", replacement: "jsx-dom/jsx-runtime.js" }
             ],

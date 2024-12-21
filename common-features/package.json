@@ -10,7 +10,7 @@
     "test-utils": "workspace:*"
   },
   "scripts": {
-    "all": "pnpm i && pnpm -r build && pnpm -r tsc && pnpm -r dts && pnpm -r jest"
+    "all": "pnpm --filter ./** i && pnpm --filter ./** build && pnpm --filter ./** tsc && pnpm --filter ./** dts && pnpm --filter ./** vitest run"
   },
   "type": "module"
 }
