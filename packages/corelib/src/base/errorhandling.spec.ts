@@ -1,75 +1,79 @@
 // @ts-ignore
 import { type Mock } from "vitest";
-import * as dialogs from "./dialogs";
+import { alertDialog, iframeDialog } from "./dialogs";
 import { ErrorHandling } from "./errorhandling";
-import * as notify from "./notify";
+import { notifyError } from "./notify";
+
+vi.mock(import("./dialogs"), async () => {
+    return {
+        alertDialog: vi.fn(),
+        iframeDialog: vi.fn()
+    };
+});
+
+vi.mock(import("./notify"), async () => {
+    return {
+        notifyError: vi.fn()
+    };
+});
 
 beforeEach(() => {
-    vi.restoreAllMocks();
+    vi.clearAllMocks();
 });
 
 describe("showServiceError", function () {
     it("shows generic message if error is null", () => {
-        var alertSpy = vi.spyOn(dialogs, "alertDialog").mockImplementation(() => ({} as any));
         ErrorHandling.showServiceError(null);
-        expect(alertSpy).toHaveBeenCalledTimes(1);
-        expect(alertSpy).toHaveBeenCalledWith("An error occurred while processing your request.");
+        expect(alertDialog).toHaveBeenCalledTimes(1);
+        expect(alertDialog).toHaveBeenCalledWith("An error occurred while processing your request.");
     });
 
     it("shows generic message if error message and code is null", () => {
-        var alertSpy = vi.spyOn(dialogs, "alertDialog").mockImplementation(() => ({} as any));
         ErrorHandling.showServiceError({});
-        expect(alertSpy).toHaveBeenCalledTimes(1);
-        expect(alertSpy).toHaveBeenCalledWith("An error occurred while processing your request.");
+        expect(alertDialog).toHaveBeenCalledTimes(1);
+        expect(alertDialog).toHaveBeenCalledWith("An error occurred while processing your request.");
     });
 
     it("shows error code if message is undefined", () => {
-        var alertSpy = vi.spyOn(dialogs, "alertDialog").mockImplementation(() => ({} as any));
         ErrorHandling.showServiceError({ Code: 'Test' });
-        expect(alertSpy).toHaveBeenCalledTimes(1);
-        expect(alertSpy).toHaveBeenCalledWith("Test");
+        expect(alertDialog).toHaveBeenCalledTimes(1);
+        expect(alertDialog).toHaveBeenCalledWith("Test");
     });
 
     it("shows message if both message and code is not null", () => {
-        var alertSpy = vi.spyOn(dialogs, "alertDialog").mockImplementation(() => ({} as any));
         ErrorHandling.showServiceError({ Code: 'TestCode', Message: 'TestMessage' });
-        expect(alertSpy).toHaveBeenCalledTimes(1);
-        expect(alertSpy).toHaveBeenCalledWith("TestMessage");
+        expect(alertDialog).toHaveBeenCalledTimes(1);
+        expect(alertDialog).toHaveBeenCalledWith("TestMessage");
     });
 
     it("shows message if code is undefined", () => {
-        var alertSpy = vi.spyOn(dialogs, "alertDialog").mockImplementation(() => ({} as any));
         ErrorHandling.showServiceError({ Message: 'TestMessage' });
-        expect(alertSpy).toHaveBeenCalledTimes(1);
-        expect(alertSpy).toHaveBeenCalledWith("TestMessage");
+        expect(alertDialog).toHaveBeenCalledTimes(1);
+        expect(alertDialog).toHaveBeenCalledWith("TestMessage");
     });
 
     it("shows iframe dialog if errorInfo has responseText", () => {
-        var iframeDialogSpy = vi.spyOn(dialogs, "iframeDialog").mockImplementation(() => ({} as any));
         ErrorHandling.showServiceError(null, { responseText: "<html>Some error message</html>" });
-        expect(iframeDialogSpy).toHaveBeenCalledTimes(1);
-        expect(iframeDialogSpy).toHaveBeenCalledWith({ html: "<html>Some error message</html>" });
+        expect(iframeDialog).toHaveBeenCalledTimes(1);
+        expect(iframeDialog).toHaveBeenCalledWith({ html: "<html>Some error message</html>" });
     });
 
     it("shows alert dialog for unknown AJAX connection error", () => {
-        var alertSpy = vi.spyOn(dialogs, "alertDialog").mockImplementation(() => ({} as any));
         ErrorHandling.showServiceError(null, { statusText: "something" });
-        expect(alertSpy).toHaveBeenCalledTimes(1);
-        expect(alertSpy).toHaveBeenCalledWith("An error occured while connecting to the server.");
+        expect(alertDialog).toHaveBeenCalledTimes(1);
+        expect(alertDialog).toHaveBeenCalledWith("An error occured while connecting to the server.");
     });
 
     it("shows alert dialog for HTTP 500 error", () => {
-        var alertSpy = vi.spyOn(dialogs, "alertDialog").mockImplementation(() => ({} as any));
         ErrorHandling.showServiceError(null, { status: 500 });
-        expect(alertSpy).toHaveBeenCalledTimes(1);
-        expect(alertSpy).toHaveBeenCalledWith("Internal Server Error (500).");
+        expect(alertDialog).toHaveBeenCalledTimes(1);
+        expect(alertDialog).toHaveBeenCalledWith("Internal Server Error (500).");
     });
 
     it("shows alert dialog for other HTTP errors", () => {
-        var alertSpy = vi.spyOn(dialogs, "alertDialog").mockImplementation(() => ({} as any));
         ErrorHandling.showServiceError(null, { status: 404 });
-        expect(alertSpy).toHaveBeenCalledTimes(1);
-        expect(alertSpy).toHaveBeenCalledWith("HTTP Error 404.");
+        expect(alertDialog).toHaveBeenCalledTimes(1);
+        expect(alertDialog).toHaveBeenCalledWith("HTTP Error 404.");
     });
 
 });
@@ -78,7 +82,8 @@ describe("isDevelopmentMode", function () {
     it("returns true for localhost and loopback", () => {
         var oldLocation = window.location.href;
         try {
-            changeJSDOMURL("http://localhost");
+            if (!changeJSDOMURL("http://localhost"))
+                return;
             expect(ErrorHandling.isDevelopmentMode()).toBe(true);
             changeJSDOMURL("http://localhost/test");
             expect(ErrorHandling.isDevelopmentMode()).toBe(true);
@@ -99,7 +104,8 @@ describe("isDevelopmentMode", function () {
     it("returns true for domains ending with .local or .localhost", () => {
         var oldLocation = window.location.href;
         try {
-            changeJSDOMURL("http://test.localhost");
+            if (!changeJSDOMURL("http://test.localhost"))
+                return;
             expect(ErrorHandling.isDevelopmentMode()).toBe(true);
             changeJSDOMURL("http://test.local");
             expect(ErrorHandling.isDevelopmentMode()).toBe(true);
@@ -112,7 +118,8 @@ describe("isDevelopmentMode", function () {
     it("returns false for other hosts", () => {
         var oldLocation = window.location.href;
         try {
-            changeJSDOMURL("http://test");
+            if (!changeJSDOMURL("http://test"))
+                return;
             expect(ErrorHandling.isDevelopmentMode()).toBe(false);
             changeJSDOMURL("http://testlocal");
             expect(ErrorHandling.isDevelopmentMode()).toBe(false);
@@ -128,26 +135,25 @@ describe("isDevelopmentMode", function () {
 
 describe("runtimeErrorHandler", function () {
     it("ignores if isDevelopmentMode() return false", function () {
-        const notifyErrorSpy = vi.spyOn(notify, "notifyError").mockImplementation(() => ({} as any));
+        
         const setTimeoutSpy = vi.spyOn(window, "setTimeout").mockImplementation(() => ({} as any));
         vi.spyOn(ErrorHandling, "isDevelopmentMode").mockImplementation(() => false);
 
         ErrorHandling.runtimeErrorHandler("test", "test.js", 1, 2, new Error("test"));
 
-        expect(notifyErrorSpy).not.toHaveBeenCalled();
+        expect(notifyError).not.toHaveBeenCalled();
         expect(setTimeoutSpy).not.toHaveBeenCalled();
     });
 
     it("displayed text contains the passed error details", function () {
-        const notifyErrorSpy = vi.spyOn(notify, "notifyError").mockImplementation(() => ({} as any));
         const setTimeoutSpy = vi.spyOn(window, "setTimeout").mockImplementation((f) => (f as any)());
         vi.spyOn(ErrorHandling, "isDevelopmentMode").mockImplementation(() => true);
 
         ErrorHandling.runtimeErrorHandler("test&><'\"", "test&.js", 13579, 24680);
 
         expect(setTimeoutSpy).toHaveBeenCalledTimes(1);
-        expect(notifyErrorSpy).toHaveBeenCalledTimes(1);
-        var text = notifyErrorSpy.mock.calls[0][0];
+        expect(notifyError).toHaveBeenCalledTimes(1);
+        var text = vi.mocked(notifyError).mock.calls[0][0];
         expect(text).toContain("test&amp;&gt;&lt;&#39;&quot");
         expect(text).toContain("test&amp;.js");
         expect(text).toContain("13579");
@@ -155,7 +161,6 @@ describe("runtimeErrorHandler", function () {
     });
 
     it("shows error stack if available", function () {
-        const notifyErrorSpy = vi.spyOn(notify, "notifyError").mockImplementation(() => ({} as any));
         const setTimeoutSpy = vi.spyOn(window, "setTimeout").mockImplementation((f) => (f as any)());
         vi.spyOn(ErrorHandling, "isDevelopmentMode").mockImplementation(() => true);
 
@@ -165,14 +170,13 @@ describe("runtimeErrorHandler", function () {
         } as any);
 
         expect(setTimeoutSpy).toHaveBeenCalledTimes(1);
-        expect(notifyErrorSpy).toHaveBeenCalledTimes(1);
-        var text = notifyErrorSpy.mock.calls[0][0];
+        expect(notifyError).toHaveBeenCalledTimes(1);
+        var text = vi.mocked(notifyError).mock.calls[0][0];
         expect(text).toContain("xyz");
         expect(text).not.toContain("uvw");
     });
 
     it("shows error.toString() if stack not available", function () {
-        const notifyErrorSpy = vi.spyOn(notify, "notifyError").mockImplementation(() => ({} as any));
         const setTimeoutSpy = vi.spyOn(window, "setTimeout").mockImplementation((f) => (f as any)());
         vi.spyOn(ErrorHandling, "isDevelopmentMode").mockImplementation(() => true);
 
@@ -181,8 +185,8 @@ describe("runtimeErrorHandler", function () {
         } as any);
 
         expect(setTimeoutSpy).toHaveBeenCalledTimes(1);
-        expect(notifyErrorSpy).toHaveBeenCalledTimes(1);
-        var text = notifyErrorSpy.mock.calls[0][0];
+        expect(notifyError).toHaveBeenCalledTimes(1);
+        var text = vi.mocked(notifyError).mock.calls[0][0];
         expect(text).toContain("uvw");
     });
 
@@ -264,7 +268,11 @@ describe("unhandledRejectionHandler", function () {
     });   
 });
 
-
 function changeJSDOMURL(url: string) {
-    (globalThis as any).jsdom.reconfigure({ url: url });
+    if ((globalThis as any).jsdom?.reconfigure) {
+        (globalThis as any).jsdom.reconfigure({ url: url });
+        return true;
+    }
+    else
+        return false;
 }

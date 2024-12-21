@@ -212,23 +212,20 @@ describe("appendToNode", () => {
         expect(parent.innerHTML).toBe("<div>test</div>");
     });
 
-    it("handles rejected promise", async () => {
+    it("handles rejected promise", () => new Promise(async done => {
         const parent = document.createElement("div");
         const div = document.createElement("div");
         div.innerHTML = "test";
-        const unhandledRejection = () => { };
-        globalThis.process.on("unhandledRejection", unhandledRejection);
-        try {
-            appendToNode(parent, Promise.reject("some reject reason"));
-            expect(parent.innerHTML).toBe("<!--Loading content...-->");
-            await Promise.resolve();
-            expect(parent.innerHTML).toBe("<!--Error loading content: some reject reason-->");
-        }
-        finally {
-            await Promise.resolve();
-            setTimeout(() => globalThis.process.off("unhandledRejection", unhandledRejection), 0);
-        }
-    });
+        const unhandledRejection = () => { 
+            done(void 0); 
+            (globalThis.process?.off || window.removeEventListener as any)("unhandledrejection", unhandledRejection);
+        };
+        (globalThis.process?.on || window.addEventListener as any)("unhandledrejection", unhandledRejection);
+        appendToNode(parent, Promise.reject("some reject reason"));
+        expect(parent.innerHTML).toBe("<!--Loading content...-->");
+        await Promise.resolve();
+        expect(parent.innerHTML).toBe("<!--Error loading content: some reject reason-->");
+    }));
 
     it("calls append for other content types", () => {
         const parent = document.createElement("div");
@@ -475,12 +472,13 @@ describe("parseQueryString", () => {
 
     it("parses query string from location.search if no argument is provided", () => {
         var oldLocation = window.location.href;
-        changeJSDOMURL("http://localhost?param1=value1&param2=value2");
-        try {
-            const result = parseQueryString();
-            expect(result).toEqual({ param1: "value1", param2: "value2" });
-        } finally {
-            changeJSDOMURL(oldLocation);
+        if (changeJSDOMURL("http://localhost?param1=value1&param2=value2")) {
+            try {
+                const result = parseQueryString();
+                expect(result).toEqual({ param1: "value1", param2: "value2" });
+            } finally {
+                changeJSDOMURL(oldLocation);
+            }
         }
     });
 });
@@ -488,71 +486,76 @@ describe("parseQueryString", () => {
 describe("getReturnUrl", () => {
     it("returns returnUrl from query string if it is safe", () => {
         const oldLocation = window.location.href;
-        changeJSDOMURL("http://localhost?returnUrl=/safe/path");
-        try {
-            const result = getReturnUrl();
-            expect(result).toBe("/safe/path");
-        } finally {
-            changeJSDOMURL(oldLocation);
-        }
+        if (changeJSDOMURL("http://localhost?returnUrl=/safe/path"))
+            try {
+                const result = getReturnUrl();
+                expect(result).toBe("/safe/path");
+            } finally {
+                changeJSDOMURL(oldLocation);
+            }
     });
 
     it("returns null if returnUrl from query string is unsafe", () => {
         const oldLocation = window.location.href;
-        changeJSDOMURL("http://localhost?returnUrl=http://unsafe.com");
-        try {
-            const result = getReturnUrl();
-            expect(result).toBeNull();
-        } finally {
-            changeJSDOMURL(oldLocation);
-        }
+        if (changeJSDOMURL("http://localhost?returnUrl=http://unsafe.com"))
+            try {
+                const result = getReturnUrl();
+                expect(result).toBeNull();
+            } finally {
+                changeJSDOMURL(oldLocation);
+            }
     });
 
     it("returns default returnUrl if queryOnly is false and no returnUrl in query string", () => {
         const oldLocation = window.location.href;
-        changeJSDOMURL("http://localhost");
-        try {
-            const result = getReturnUrl({ queryOnly: false });
-            expect(result).toBe(Config.defaultReturnUrl());
-        } finally {
-            changeJSDOMURL(oldLocation);
-        }
+        if (changeJSDOMURL("http://localhost"))
+            try {
+                const result = getReturnUrl({ queryOnly: false });
+                expect(result).toBe(Config.defaultReturnUrl());
+            } finally {
+                changeJSDOMURL(oldLocation);
+            }
     });
 
     it("returns undefined if queryOnly is true and no returnUrl in query string", () => {
         const oldLocation = window.location.href;
-        changeJSDOMURL("http://localhost");
-        try {
-            const result = getReturnUrl({ queryOnly: true });
-            expect(result).toBeUndefined();
-        } finally {
-            changeJSDOMURL(oldLocation);
-        }
+        if (changeJSDOMURL("http://localhost"))
+            try {
+                const result = getReturnUrl({ queryOnly: true });
+                expect(result).toBeUndefined();
+            } finally {
+                changeJSDOMURL(oldLocation);
+            }
     });
 
     it("returns returnUrl from query string if ignoreUnsafe is true", () => {
         const oldLocation = window.location.href;
-        changeJSDOMURL("http://localhost?returnUrl=http://unsafe.com");
-        try {
-            const result = getReturnUrl({ ignoreUnsafe: true });
-            expect(result).toBe("http://unsafe.com");
-        } finally {
-            changeJSDOMURL(oldLocation);
-        }
+        if (changeJSDOMURL("http://localhost?returnUrl=http://unsafe.com"))
+            try {
+                const result = getReturnUrl({ ignoreUnsafe: true });
+                expect(result).toBe("http://unsafe.com");
+            } finally {
+                changeJSDOMURL(oldLocation);
+            }
     });
 
     it("returns default returnUrl with purpose if provided", () => {
         const oldLocation = window.location.href;
-        changeJSDOMURL("http://localhost");
-        try {
-            const result = getReturnUrl({ purpose: "test" });
-            expect(result).toBe(Config.defaultReturnUrl("test"));
-        } finally {
-            changeJSDOMURL(oldLocation);
-        }
+        if (changeJSDOMURL("http://localhost"))
+            try {
+                const result = getReturnUrl({ purpose: "test" });
+                expect(result).toBe(Config.defaultReturnUrl("test"));
+            } finally {
+                changeJSDOMURL(oldLocation);
+            }
     });
 });
 
 function changeJSDOMURL(url: string) {
-    (globalThis as any).jsdom.reconfigure({ url: url });
+    if ((globalThis as any).jsdom?.reconfigure) {
+        (globalThis as any).jsdom.reconfigure({ url: url });
+        return true;
+    }
+    else
+        return false;
 }

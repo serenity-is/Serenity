@@ -45,12 +45,17 @@ const Config = {
     notLoggedInHandler: <Function>null
 }
 
-if (typeof document !== 'undefined') {
-    var pathLink = document.querySelector('link#ApplicationPath') as HTMLLinkElement;
-    if (pathLink != null) {
-        Config.applicationPath = pathLink.getAttribute('href');
+export function resetApplicationPath() {
+    Config.applicationPath = '/';
+    if (typeof document !== 'undefined') {
+        var pathLink = document.querySelector('link#ApplicationPath') as HTMLLinkElement;
+        if (pathLink != null) {
+            Config.applicationPath = pathLink.getAttribute('href');
+        }
     }
 }
+
+resetApplicationPath();
 
 export { Config };
 

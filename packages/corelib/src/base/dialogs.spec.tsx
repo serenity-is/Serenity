@@ -821,26 +821,23 @@ describe("dialog button result handling", () => {
         expect(okOrder).toBeLessThan(closeOrder);
     });
 
-    it("does not close the dialog when the promise is rejected if the click handler returns a promise", async function () {
-        const unhandledRejection = () => { };
-        globalThis.process.on("unhandledRejection", unhandledRejection);
-        try {
-            okClickSpy.mockImplementation(() => Promise.reject("test"));
+    it("does not close the dialog when the promise is rejected if the click handler returns a promise", () => new Promise(async done => {
+        const unhandledRejection = () => { 
+            done(void 0); 
+            (globalThis.process?.off || window.removeEventListener as any)("unhandledrejection", unhandledRejection);
+        };        
+        (globalThis.process?.on || window.addEventListener)("unhandledrejection", unhandledRejection);
+        okClickSpy.mockImplementation(() => Promise.reject("test"));
 
-            okButton.click();
+        okButton.click();
 
-            expect(okClickSpy).toHaveBeenCalledTimes(1);
-            expect(closeSpy).not.toHaveBeenCalled();
+        expect(okClickSpy).toHaveBeenCalledTimes(1);
+        expect(closeSpy).not.toHaveBeenCalled();
 
-            await Promise.resolve();
+        await Promise.resolve();
 
-            expect(closeSpy).not.toHaveBeenCalled();
-        }
-        finally {
-            await Promise.resolve();
-            setTimeout(() => globalThis.process.off("unhandledRejection", unhandledRejection), 0);
-        }
-    });
+        expect(closeSpy).not.toHaveBeenCalled();
+    }));
 
     it("does not close the dialog when the promise returns false if the click handler returns a promise", async function () {
         okClickSpy.mockImplementation(() => Promise.resolve(false));

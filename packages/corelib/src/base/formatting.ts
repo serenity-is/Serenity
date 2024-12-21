@@ -92,17 +92,20 @@ export let Invariant: Locale = {
  * the _LayoutHead.cshtml file for Serenity applications, so that the culture
  * settings determined server, can be passed to the client.
  */
-export let Culture: Locale = {
-    decimalSeparator: '.',
-    groupSeparator: ',',
-    dateSeparator: '/',
-    dateOrder: 'dmy',
-    dateFormat: 'dd/MM/yyyy',
-    dateTimeFormat: 'dd/MM/yyyy HH:mm:ss',
-    stringCompare: Invariant.stringCompare
-};
+export let Culture: Locale;
 
-(function () {
+export function resetCultureSettings() {
+
+    Culture = {
+        decimalSeparator: '.',
+        groupSeparator: ',',
+        dateSeparator: '/',
+        dateOrder: 'dmy',
+        dateFormat: 'dd/MM/yyyy',
+        dateTimeFormat: 'dd/MM/yyyy HH:mm:ss',
+        stringCompare: Invariant.stringCompare
+    };
+
     let lang = typeof document !== "undefined" ? document.documentElement?.lang : undefined;
     if (lang == "")
         lang = void 0;
@@ -137,7 +140,9 @@ export let Culture: Locale = {
                 (Culture as any)[k.charAt(0).toLowerCase() + k.substring(1)] = sc[k];
         }
     }
-})();
+}
+
+resetCultureSettings();
 
 function insertGroupSeperator(num: string, dec: string, grp: string, neg: string) {
     var decPart = null;

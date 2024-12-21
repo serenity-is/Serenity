@@ -296,7 +296,7 @@ test('assign booleanish false props', function () {
     const input = <textarea spellCheck={false} /> as HTMLElement;
 
     expect(element.outerHTML).toBe('<span contenteditable=""><a>Download</a></span>');
-    expect(input.outerHTML).toBe('<textarea></textarea>');
+    expect(input.outerHTML).toBe((globalThis as any).jsdom ? '<textarea></textarea>' : '<textarea spellcheck="false"></textarea>');
 });
 
 test('skip undefined and null props', function () {

@@ -38,7 +38,13 @@ describe('isMobileView', () => {
     it('should return false if window is undefined', async () => {
         const isMobileView = (await import('./layout')).isMobileView;
         var oldWindow = window;
-        window = undefined;
+        try {
+            window = undefined;
+        }
+        catch {
+            // fails in browser mode
+            return;
+        }
         try {
             expect(isMobileView()).toBe(false);
         }

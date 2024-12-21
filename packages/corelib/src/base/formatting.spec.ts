@@ -1,11 +1,16 @@
+import * as formatting from "./formatting";
+
 beforeEach(() => {
     vi.resetModules();
     vi.clearAllMocks();
 });
 
+afterEach(() => {
+    formatting.resetCultureSettings();
+});
+
 describe("formatDate", () => {
     it('formats properly based on format string and culture', async function () {
-        var formatting = (await import("./formatting"));
         const Culture = formatting.Culture;
         const formatDate = formatting.formatDate;
         const formatISODateTimeUTC = formatting.formatISODateTimeUTC;
@@ -39,7 +44,6 @@ describe("formatDate", () => {
     });
 
     it('accepts iso datetime strings as input', async function () {
-        var formatting = (await import("./formatting"));
         const Culture = formatting.Culture;
         const formatDate = formatting.formatDate;
         Culture.dateSeparator = '/';
@@ -55,7 +59,6 @@ describe("formatDate", () => {
     });
 
     it('accepts date string as input', async function () {
-        var formatting = (await import("./formatting"));
         const Culture = formatting.Culture;
         const formatDate = formatting.formatDate;
         Culture.dateSeparator = '/';
@@ -69,7 +72,6 @@ describe("formatDate", () => {
 
 describe("Invariant.stringCompare", () => {
     it("uses string js string comparison", async function () {
-        var formatting = (await import("./formatting"));
         const Invariant = formatting.Invariant;
         expect(Invariant.stringCompare("a", "b")).toBe(-1);
         expect(Invariant.stringCompare("b", "a")).toBe(1);
@@ -79,7 +81,6 @@ describe("Invariant.stringCompare", () => {
 
 describe("splitDateString", () => {
     it("returns null for null, undefined and empty string", async function () {
-        var formatting = (await import("./formatting"));
         expect(formatting.splitDateString(null)).toBeNull();
         expect(formatting.splitDateString(undefined)).toBeNull();
         expect(formatting.splitDateString("")).toBeNull();
@@ -87,7 +88,6 @@ describe("splitDateString", () => {
     });
 
     it("can handle '/', '.', '\\', '-' as separator", async function () {
-        var formatting = (await import("./formatting"));
         expect(formatting.splitDateString("2029/01/02")).toEqual(["2029", "01", "02"]);
         expect(formatting.splitDateString("1/2/2029")).toEqual(["1", "2", "2029"]);
         expect(formatting.splitDateString("2029.01.02")).toEqual(["2029", "01", "02"]);
@@ -99,7 +99,6 @@ describe("splitDateString", () => {
     });
 
     it("returns an array with the string if no known separators", async function () {
-        var formatting = (await import("./formatting"));
         expect(formatting.splitDateString("2")).toEqual(["2"]);
         expect(formatting.splitDateString("ab")).toEqual(["ab"]);
     });
@@ -107,7 +106,6 @@ describe("splitDateString", () => {
 
 describe("parseDate", () => {
     it("returns null for null, undefined, empty string and whitespace", async function () {
-        var formatting = (await import("./formatting"));
         expect(formatting.parseDate(null)).toBeNull();
         expect(formatting.parseDate(undefined)).toBeNull();
         expect(formatting.parseDate("")).toBeNull();
@@ -115,31 +113,26 @@ describe("parseDate", () => {
     });
 
     it("returns false for malformed iso date string", async function () {
-        var formatting = (await import("./formatting"));
         expect(formatting.parseDate("2023-00-01")?.valueOf()).toBeNaN();
         expect(formatting.parseDate("2023-01-X1")?.valueOf()).toBeNaN();
     });
 
     it("can handle iso like dates with space between date/time parts", async function () {
-        var formatting = (await import("./formatting"));
         expect(formatting.parseDate("2023-01-05 16:30")).toEqual(new Date(2023, 0, 5, 16, 30));
         expect(formatting.parseDate("2023-00-05 16:30")?.valueOf()).toBeNaN();
     });
 
     it("can handle date only with ymd order", async function () {
-        var formatting = (await import("./formatting"));
         formatting.Culture.dateOrder = "ymd";
         expect(formatting.parseDate("2023/03/05")).toEqual(new Date(2023, 2, 5));
     });
 
     it("can handle date only with mdy order", async function () {
-        var formatting = (await import("./formatting"));
         formatting.Culture.dateOrder = "mdy";
         expect(formatting.parseDate("11/23/2023")).toEqual(new Date(2023, 10, 23));
     });
 
     it("returns NaN if a part is not a number or out of range", async function () {
-        var formatting = (await import("./formatting"));
         formatting.Culture.dateOrder = "dmy";
         expect(formatting.parseDate("01/X1/2023")?.valueOf()).toBeNaN();
         expect(formatting.parseDate("01/01/20X3")?.valueOf()).toBeNaN();
@@ -154,7 +147,6 @@ describe("parseDate", () => {
     });
 
     it("handles two digit years", async function () {
-        var formatting = (await import("./formatting"));
         vi.useFakeTimers();
         try {
             vi.setSystemTime(new Date(2023, 1, 1));
@@ -167,32 +159,27 @@ describe("parseDate", () => {
     });
 
     it("handles JS date string", async function () {
-        var formatting = (await import("./formatting"));
         expect(formatting.parseDate("Tue May 02 2023")).toEqual(new Date(2023, 4, 2));
     });
 });
 
 describe("parseISODateTime", () => {
     it("returns null for null, undefined and empty string", async function () {
-        var formatting = (await import("./formatting"));
         expect(formatting.parseISODateTime(null)).toBeNull();
         expect(formatting.parseISODateTime(undefined)).toBeNull();
         expect(formatting.parseISODateTime("")).toBeNull();
     });
 
     it("returns invalid date for malformed iso date string", async function () {
-        var formatting = (await import("./formatting"));
         expect(formatting.parseISODateTime("2023-00-01")?.valueOf()).toBeNaN();
         expect(formatting.parseISODateTime("2023-01-X1")?.valueOf()).toBeNaN();
     });
 
     it("returns invalid date for non string", async function () {
-        var formatting = (await import("./formatting"));
         expect(formatting.parseISODateTime(5 as any as string)?.valueOf()).toBeNaN();
     });
 
     it("returns false for malformed iso date string", async function () {
-        var formatting = (await import("./formatting"));
         expect(formatting.parseISODateTime("2023-00-01")?.valueOf()).toBeNaN();
         expect(formatting.parseISODateTime("2023-01-X1")?.valueOf()).toBeNaN();
     });
@@ -200,13 +187,11 @@ describe("parseISODateTime", () => {
 
 describe("formatISODateTimeUTC", () => {
     it("returns empty string for null and undefined", async function () {
-        var formatting = (await import("./formatting"));
         expect(formatting.formatISODateTimeUTC(null)).toBe("");
         expect(formatting.formatISODateTimeUTC(undefined)).toBe("");
     });
 
     it("formats in ISO format with UTC timezone", async function () {
-        var formatting = (await import("./formatting"));
         expect(formatting.formatISODateTimeUTC(new Date(Date.UTC(2023, 4, 2, 15, 10, 5, 32)))).toBe("2023-05-02T15:10:05.032Z");
         expect(formatting.formatISODateTimeUTC(new Date(Date.UTC(2023, 4, 2, 15, 10, 5, 150)))).toBe("2023-05-02T15:10:05.15Z");
     });
@@ -214,20 +199,17 @@ describe("formatISODateTimeUTC", () => {
 
 describe("formatDate", () => {
     it("returns empty string for null and undefined", async function () {
-        var formatting = (await import("./formatting"));
         expect(formatting.formatDate(null)).toBe("");
         expect(formatting.formatDate(undefined)).toBe("");
     });
 
     it("returns date in format 'dd.MM.yyyy' by default if order is dmy", async function () {
-        var formatting = (await import("./formatting"));
         formatting.Culture.dateFormat = "dd/MM/yyyy";
         formatting.Culture.dateSeparator = ".";
         expect(formatting.formatDate(new Date(2023, 4, 2, 15, 10, 5, 32))).toBe("02.05.2023");
     });
 
     it("returns date in format 'MM.dd.yyyy' if Culture.dateFormat is MM/dd/yyyy", async function () {
-        var formatting = (await import("./formatting"));
         formatting.Culture.dateFormat = "MM/dd/yyyy";
         formatting.Culture.dateSeparator = ".";
         expect(formatting.formatDate(new Date(2023, 4, 2, 15, 10, 5, 32))).toBe("05.02.2023");
@@ -235,14 +217,12 @@ describe("formatDate", () => {
 
 
     it("returns date in format 'yyyy.mm.dd' by default if order is yyyy/MM/dd", async function () {
-        var formatting = (await import("./formatting"));
         formatting.Culture.dateFormat = "yyyy/MM/dd";
         formatting.Culture.dateSeparator = ".";
         expect(formatting.formatDate(new Date(2023, 4, 2, 15, 10, 5, 32))).toBe("2023.05.02");
     });
 
     it("uses passed locale", async function () {
-        var formatting = (await import("./formatting"));
         var locale = Object.assign({}, formatting.Culture);
         locale.dateOrder = "mdy";
         locale.dateSeparator = "*";
@@ -250,7 +230,6 @@ describe("formatDate", () => {
     });
 
     it("uses Culture.dateFormat if locale.dateFormat is null", async function () {
-        var formatting = (await import("./formatting"));
         var locale = Object.assign({}, formatting.Culture);
         formatting.Culture.dateFormat = "yyyy/MM/dd";
         locale.dateFormat = null;
@@ -259,7 +238,6 @@ describe("formatDate", () => {
     });
 
     it("uses Culture.dateFormat for 'd' if locale.dateFormat is null", async function () {
-        var formatting = (await import("./formatting"));
         var locale = Object.assign({}, formatting.Culture);
         formatting.Culture.dateFormat = "yyyy/MM/dd";
         locale.dateFormat = null;
@@ -268,7 +246,6 @@ describe("formatDate", () => {
     });
 
     it("uses Culture.dateTimeFormat for 'g' if locale.dateTimeFormat is null", async function () {
-        var formatting = (await import("./formatting"));
         var locale = Object.assign({}, formatting.Culture);
         formatting.Culture.dateTimeFormat = "yyyy/MM/dd HH:mm:ss";
         locale.dateTimeFormat = null;
@@ -277,7 +254,6 @@ describe("formatDate", () => {
     });
 
     it("uses Culture.dateTimeFormat for 'G' if locale.dateTimeFormat is null", async function () {
-        var formatting = (await import("./formatting"));
         var locale = Object.assign({}, formatting.Culture);
         formatting.Culture.dateTimeFormat = "yyyy/MM/dd HH:mm:ss";
         locale.dateTimeFormat = null;
@@ -286,32 +262,27 @@ describe("formatDate", () => {
     });
 
     it("uses Culture.dateTimeFormat and Culture.dateFormat for 't'", async function () {
-        var formatting = (await import("./formatting"));
         formatting.Culture.dateTimeFormat = "yyyy/MM/dd H:m";
         formatting.Culture.dateFormat = "yyyy/MM/dd";
         expect(formatting.formatDate(new Date(2023, 4, 2, 3, 9, 5, 32), 't')).toBe("3:9");
     });
 
     it("returns browser toString() for 'i' format", async function () {
-        var formatting = (await import("./formatting"));
         var date = new Date(2023, 4, 2, 15, 10, 5, 32);
         expect(formatting.formatDate(date, "i")).toBe(date.toString());
     });
 
     it("returns browser toDateString() for 'id' format", async function () {
-        var formatting = (await import("./formatting"));
         var date = new Date(2023, 4, 2, 15, 10, 5, 32);
         expect(formatting.formatDate(date, "id")).toBe(date.toDateString());
     });
 
     it("returns browser toTimeString() for 'it' format", async function () {
-        var formatting = (await import("./formatting"));
         var date = new Date(2023, 4, 2, 15, 10, 5, 32);
         expect(formatting.formatDate(date, "it")).toBe(date.toTimeString());
     });
 
     it("can parse strings before formatting", async function () {
-        var formatting = (await import("./formatting"));
         expect(formatting.formatDate("  ")).toBe("");
         expect(formatting.formatDate("\t")).toBe("");
         expect(formatting.formatDate("")).toBe("");
@@ -320,7 +291,6 @@ describe("formatDate", () => {
     });
 
     it("can use custom format strings", async function () {
-        var formatting = (await import("./formatting"));
         var date = new Date(2023, 5, 2, 15, 10, 5, 32);
         var locale = Object.assign({}, formatting.Culture);
         formatting.Culture.dateSeparator = "*";
@@ -408,7 +378,6 @@ describe("formatDate", () => {
 
 describe("toId", () => {
     it("returns null for undefined, null, empty string, whitespace", async function () {
-        var formatting = (await import("./formatting"));
         expect(formatting.toId(undefined)).toBeNull();
         expect(formatting.toId(null)).toBeNull();
         expect(formatting.toId("")).toBeNull();
@@ -416,25 +385,21 @@ describe("toId", () => {
     });
 
     it("returns numbers as is", async function () {
-        var formatting = (await import("./formatting"));
         expect(formatting.toId(5)).toBe(5);
         expect(formatting.toId(-1)).toBe(-1);
         expect(formatting.toId(3.5)).toBe(3.5);
     });
 
     it("returns strings longer than 15 as is", async function () {
-        var formatting = (await import("./formatting"));
         expect(formatting.toId("1234567890123456")).toBe("1234567890123456");
         expect(formatting.toId("ab34567890123456")).toBe("ab34567890123456");
     });
 
     it("returns strings containing non digits as is", async function () {
-        var formatting = (await import("./formatting"));
         expect(formatting.toId("ab3456789")).toBe("ab3456789");
     });
 
     it("returns strings containing all digits as number", async function () {
-        var formatting = (await import("./formatting"));
         expect(formatting.toId("3456789")).toBe(3456789);
         expect(formatting.toId("-1234567890")).toBe(-1234567890);
     });
@@ -443,7 +408,6 @@ describe("toId", () => {
 
 describe("parseDecimal", () => {
     it("returns null for undefined, null, empty string, whitespace", async function () {
-        var formatting = (await import("./formatting"));
         expect(formatting.parseDecimal(undefined)).toBeNull();
         expect(formatting.parseDecimal(null)).toBeNull();
         expect(formatting.parseDecimal("")).toBeNull();
@@ -451,25 +415,21 @@ describe("parseDecimal", () => {
     });
 
     it("returns numbers as is", async function () {
-        var formatting = (await import("./formatting"));
         expect(formatting.parseDecimal("5")).toBe(5);
         expect(formatting.parseDecimal("-1")).toBe(-1);
         expect(formatting.parseDecimal("3.5")).toBe(3.5);
     });
 
     it("trims strings", async function () {
-        var formatting = (await import("./formatting"));
         expect(formatting.parseDecimal(" 5.0 ")).toBe(5);
         expect(formatting.parseDecimal(" 5 ")).toBe(5);
     });
 
     it("returns NaN for strings containing non digits", async function () {
-        var formatting = (await import("./formatting"));
         expect(formatting.parseDecimal("ab3456789")).toBeNaN();
     });
 
     it("can handle group separator", async function () {
-        var formatting = (await import("./formatting"));
         formatting.Culture.groupSeparator = ",";
         formatting.Culture.decimalSeparator = ".";
         expect(formatting.parseDecimal("3,245,148.4")).toBe(3245148.4);
@@ -477,7 +437,6 @@ describe("parseDecimal", () => {
     });
 
     it("can use Culture decimal separator", async function () {
-        var formatting = (await import("./formatting"));
         formatting.Culture.groupSeparator = ".";
         formatting.Culture.decimalSeparator = ",";
         expect(formatting.parseDecimal("3.245.148,4")).toBe(3245148.4);
@@ -488,7 +447,6 @@ describe("parseDecimal", () => {
 
 describe("parseInteger", () => {
     it("returns null for undefined, null, empty string, whitespace", async function () {
-        var formatting = (await import("./formatting"));
         expect(formatting.parseInteger(undefined)).toBeNull();
         expect(formatting.parseInteger(null)).toBeNull();
         expect(formatting.parseInteger("")).toBeNull();
@@ -496,24 +454,20 @@ describe("parseInteger", () => {
     });
 
     it("returns integer numbers as is", async function () {
-        var formatting = (await import("./formatting"));
         expect(formatting.parseInteger("5")).toBe(5);
         expect(formatting.parseInteger("-1")).toBe(-1);
         expect(formatting.parseInteger("3")).toBe(3);
     });
 
     it("trims strings", async function () {
-        var formatting = (await import("./formatting"));
         expect(formatting.parseInteger(" 5 ")).toBe(5);
     });
 
     it("returns NaN for strings containing non digits", async function () {
-        var formatting = (await import("./formatting"));
         expect(formatting.parseInteger("ab3456789")).toBeNaN();
     });
 
     it("can handle group separator", async function () {
-        var formatting = (await import("./formatting"));
         formatting.Culture.groupSeparator = ",";
         formatting.Culture.decimalSeparator = ".";
         expect(formatting.parseInteger("3,245,148")).toBe(3245148);
@@ -521,7 +475,6 @@ describe("parseInteger", () => {
     });
 
     it("can use Culture group separator", async function () {
-        var formatting = (await import("./formatting"));
         formatting.Culture.groupSeparator = ".";
         expect(formatting.parseDecimal("3.245.148")).toBe(3245148);
         expect(formatting.parseDecimal("-3.245.148")).toBe(-3245148);
@@ -532,13 +485,11 @@ describe("parseInteger", () => {
 describe("formatNumber", () => {
 
     it("returns empty string for undefined, null", async function () {
-        var formatting = (await import("./formatting"));
         expect(formatting.formatNumber(undefined)).toBe("");
         expect(formatting.formatNumber(null)).toBe("");
     });
 
     it("returns Culture.nanSymbol string for NaN", async function () {
-        var formatting = (await import("./formatting"));
         formatting.Culture.nanSymbol = "NaN";
         var locale = Object.assign({}, formatting.Culture);
         locale.nanSymbol = "NaNNN";
@@ -548,7 +499,6 @@ describe("formatNumber", () => {
     });
 
     it('formats with "." as decimal separator', async function () {
-        var formatting = (await import("./formatting"));
         const Culture = formatting.Culture;
         const formatNumber = formatting.formatNumber;
         Culture.decimalSeparator = '.';
@@ -562,7 +512,6 @@ describe("formatNumber", () => {
     });
 
     it('formats with "," as decimal separator', async function () {
-        var formatting = (await import("./formatting"));
         const Culture = formatting.Culture;
         const formatNumber = formatting.formatNumber;
         Culture.decimalSeparator = ',';
@@ -577,7 +526,6 @@ describe("formatNumber", () => {
 
 
     it('formats number with prefix and suffix', async function () {
-        var formatting = (await import("./formatting"));
         const formatNumber = formatting.formatNumber;
         const Culture = formatting.Culture;
         Culture.decimalSeparator = '.';
@@ -590,7 +538,6 @@ describe("formatNumber", () => {
     });
 
     it('handles decimal format specifier', async function () {
-        var formatting = (await import("./formatting"));
         const formatNumber = formatting.formatNumber;
         const Culture = formatting.Culture;
         Culture.decimalSeparator = '.';
@@ -602,7 +549,6 @@ describe("formatNumber", () => {
     });
 
     it('handles hex format specifier', async function () {
-        var formatting = (await import("./formatting"));
         const formatNumber = formatting.formatNumber;
         const Culture = formatting.Culture;
         Culture.decimalSeparator = '.';
@@ -616,7 +562,6 @@ describe("formatNumber", () => {
     });
 
     it('handles exponantional format specifier', async function () {
-        var formatting = (await import("./formatting"));
         const formatNumber = formatting.formatNumber;
         const Culture = formatting.Culture;
         Culture.decimalSeparator = '.';
@@ -627,7 +572,6 @@ describe("formatNumber", () => {
     });
 
     it("returns .toString() with decimal replaced if format is null or empty string", async function () {
-        var formatting = (await import("./formatting"));
         formatting.Culture.groupSeparator = "!";
         formatting.Culture.decimalSeparator = "*";
         expect(formatting.formatNumber(5.3, null)).toBe("5*3");
@@ -636,24 +580,20 @@ describe("formatNumber", () => {
     });
 
     it("returns .toString() if format is 'i'", async function () {
-        var formatting = (await import("./formatting"));
         formatting.Culture.groupSeparator = "!";
         formatting.Culture.decimalSeparator = "*";
         expect(formatting.formatNumber(5.3, "i")).toBe("5.3");
     });
 
     it("uses group separator if specified in last argument", async function () {
-        var formatting = (await import("./formatting"));
         expect(formatting.formatNumber(54321, "#,##0", null, "!")).toBe("54!321");
     });
 
     it("uses group separator if specified", async function () {
-        var formatting = (await import("./formatting"));
         expect(formatting.formatNumber(54321.15, "#,##0.00", "!")).toBe("54,321!15");
     });
 
     it("handles fixed point format specifier", async function () {
-        var formatting = (await import("./formatting"));
         const Culture = formatting.Culture;
         Culture.decimalSeparator = '.';
         expect(formatting.formatNumber(1234.567, "f")).toBe("1234.57");
@@ -678,7 +618,6 @@ describe("formatNumber", () => {
     });
 
     it("handles numberic format specifier", async function () {
-        var formatting = (await import("./formatting"));
         const Culture = formatting.Culture;
         Culture.decimalSeparator = '.';
         expect(formatting.formatNumber(1234.567, "n")).toBe("1,234.57");
@@ -705,7 +644,6 @@ describe("formatNumber", () => {
     });
 
     it("handles currency format specifier", async function () {
-        var formatting = (await import("./formatting"));
         const Culture = formatting.Culture;
         Culture.decimalSeparator = '.';
         Culture.currencySymbol = '₺';
@@ -734,7 +672,6 @@ describe("formatNumber", () => {
     });
 
     it("handles currency percent specifier", async function () {
-        var formatting = (await import("./formatting"));
         const Culture = formatting.Culture;
         Culture.decimalSeparator = '.';
         Culture.currencySymbol = '₺';
@@ -762,7 +699,6 @@ describe("formatNumber", () => {
     });
 
     it("handles start zero padding", async function() {
-        var formatting = (await import("./formatting"));
         const Culture = formatting.Culture;
         Culture.decimalSeparator = '.';
         expect(formatting.formatNumber(1.23, "000")).toBe("001");
@@ -771,12 +707,10 @@ describe("formatNumber", () => {
 
 describe("format", () => {
     it("handles double braces", async function () {
-        var formatting = (await import("./formatting"));
         expect(formatting.stringFormat("{{{0}}}", "abc")).toBe("{abc}");
     });
 
     it("formats null and undefined as empty string", async function () {
-        var formatting = (await import("./formatting"));
         expect(formatting.stringFormat("{0}", null)).toBe("");
         expect(formatting.stringFormat("x{0}y", null)).toBe("xy");
         expect(formatting.stringFormat("{0}", undefined)).toBe("");
@@ -784,17 +718,14 @@ describe("format", () => {
     });
 
     it("handles number format specifiers", async function () {
-        var formatting = (await import("./formatting"));
         expect(formatting.stringFormat("{0:000}", 5)).toBe("005");
     });
 
     it("handles date format specifiers", async function () {
-        var formatting = (await import("./formatting"));
         expect(formatting.stringFormat("{0:yyyy-MM-dd}", new Date(2020, 1, 1))).toBe("2020-02-01");
     });
     
     it("calls obj.format if available", async function () {
-        var formatting = (await import("./formatting"));
         expect(formatting.stringFormat("{0:x}", {format: (s: string) => s})).toBe("x");
     });
 });
@@ -802,13 +733,11 @@ describe("format", () => {
 
 describe("localeFormat", () => {
     it("handles double braces", async function () {
-        var formatting = (await import("./formatting"));
         var locale = Object.assign({}, formatting.Culture);
         expect(formatting.stringFormatLocale(locale, "{{{0}}}", "abc")).toBe("{abc}");
     });
 
     it("formats null and undefined as empty string", async function () {
-        var formatting = (await import("./formatting"));
         var locale = Object.assign({}, formatting.Culture);
         expect(formatting.stringFormatLocale(locale, "{0}", null)).toBe("");
         expect(formatting.stringFormatLocale(locale, "x{0}y", null)).toBe("xy");
@@ -817,19 +746,16 @@ describe("localeFormat", () => {
     });
 
     it("handles number format specifiers", async function () {
-        var formatting = (await import("./formatting"));
         var locale = Object.assign({}, formatting.Culture);
         expect(formatting.stringFormatLocale(locale, "{0:000}", 5)).toBe("005");
     });
 
     it("handles date format specifiers", async function () {
-        var formatting = (await import("./formatting"));
         var locale = Object.assign({}, formatting.Culture);
         expect(formatting.stringFormatLocale(locale, "{0:yyyy-MM-dd}", new Date(2020, 1, 1))).toBe("2020-02-01");
     });
     
     it("calls obj.localeFormat if available", async function () {
-        var formatting = (await import("./formatting"));
         var locale = Object.assign({}, formatting.Culture);
         expect(formatting.stringFormatLocale(locale, "{0:x}", {format: (s: string) => s})).toBe("x");
     });
@@ -842,7 +768,7 @@ describe("ScriptCulture", () => {
             script.type = "application/json";
             script.id = "ScriptCulture";
             script.innerText = "    ";
-            var formatting = (await import("./formatting"));
+            formatting.resetCultureSettings();
             expect(formatting.Culture).toBeDefined();
         }
         finally {
@@ -856,7 +782,7 @@ describe("ScriptCulture", () => {
             script.type = "application/json";
             script.id = "ScriptCulture";
             script.innerHTML = "{}";
-            var formatting = (await import("./formatting"));
+            formatting.resetCultureSettings();
             expect(formatting.Culture).toBeDefined();
         }
         finally {
@@ -870,7 +796,7 @@ describe("ScriptCulture", () => {
             script.type = "application/json";
             script.id = "ScriptCulture";
             script.innerHTML = '{ "DecimalSeparator": "&" }';
-            var formatting = (await import("./formatting"));
+            formatting.resetCultureSettings();
             expect(formatting.Culture.decimalSeparator).toBe('&');
         }
         finally {
@@ -884,7 +810,7 @@ describe("ScriptCulture", () => {
             script.type = "application/json";
             script.id = "ScriptCulture";
             script.textContent = '{ "DecimalSeparator": "&", "GroupSeparator": "&" }';
-            var formatting = (await import("./formatting"));
+            formatting.resetCultureSettings();
             expect(formatting.Culture.decimalSeparator).toBe('&');
             expect(formatting.Culture.groupSeparator).toBe(',');
         }
@@ -899,7 +825,7 @@ describe("ScriptCulture", () => {
             script.type = "application/json";
             script.id = "ScriptCulture";
             script.textContent = '{ "GroupSeparator": "." }';
-            var formatting = (await import("./formatting"));
+            formatting.resetCultureSettings();
             expect(formatting.Culture.decimalSeparator).toBe('.');
             expect(formatting.Culture.groupSeparator).toBe(',');
         }
@@ -914,7 +840,7 @@ describe("ScriptCulture", () => {
             script.type = "application/json";
             script.id = "ScriptCulture";
             script.textContent = '{ "DecimalSeparator": "," }';
-            var formatting = (await import("./formatting"));
+            formatting.resetCultureSettings();
             expect(formatting.Culture.decimalSeparator).toBe(',');
             expect(formatting.Culture.groupSeparator).toBe('.');
         }
@@ -929,7 +855,7 @@ describe("ScriptCulture", () => {
             script.type = "application/json";
             script.id = "ScriptCulture";
             script.textContent = '{ "GroupSeparator": "$" }';
-            var formatting = (await import("./formatting"));
+            formatting.resetCultureSettings();
             expect(formatting.Culture.decimalSeparator).toBe('.');
             expect(formatting.Culture.groupSeparator).toBe('$');
         }
@@ -944,7 +870,7 @@ describe("ScriptCulture", () => {
             script.type = "application/json";
             script.id = "ScriptCulture";
             script.textContent = '{ "DateSeparator": "_", "TimeSeparator": "?" }';
-            var formatting = (await import("./formatting"));
+            formatting.resetCultureSettings();
             expect(formatting.Culture.dateSeparator).toBe('_');
             expect(formatting.Culture.timeSeparator).toBe('?');
         }
@@ -956,7 +882,6 @@ describe("ScriptCulture", () => {
 
 describe("round", () => {
     it("rounds to nearest integer if no digits specified", async function () {
-        var formatting = (await import("./formatting"));
         expect(formatting.round(1.5)).toBe(2);
         expect(formatting.round(1.4)).toBe(1);
         expect(formatting.round(-1.5)).toBe(-2);
@@ -964,7 +889,6 @@ describe("round", () => {
     });
 
     it("rounds to specified number of digits", async function () {
-        var formatting = (await import("./formatting"));
         expect(formatting.round(1.555, 2)).toBe(1.56);
         expect(formatting.round(1.554, 2)).toBe(1.55);
         expect(formatting.round(-1.555, 2)).toBe(-1.56);
@@ -972,7 +896,6 @@ describe("round", () => {
     });
 
     it("handles edge cases", async function () {
-        var formatting = (await import("./formatting"));
         expect(formatting.round(0)).toBe(0);
         expect(formatting.round(-0)).toBe(0);
         expect(formatting.round(0.5)).toBe(1);
@@ -989,33 +912,28 @@ describe("round", () => {
 
 describe("trunc", () => {
     it("truncates positive numbers to integer", async function () {
-        var formatting = (await import("./formatting"));
         expect(formatting.trunc(1.5)).toBe(1);
         expect(formatting.trunc(1.4)).toBe(1);
         expect(formatting.trunc(123.456)).toBe(123);
     });
 
     it("truncates negative numbers to integer", async function () {
-        var formatting = (await import("./formatting"));
         expect(formatting.trunc(-1.5)).toBe(-1);
         expect(formatting.trunc(-1.4)).toBe(-1);
         expect(formatting.trunc(-123.456)).toBe(-123);
     });
 
     it("returns 0 for 0 and -0 for -0", async function () {
-        var formatting = (await import("./formatting"));
         expect(formatting.trunc(0)).toBe(0);
         expect(formatting.trunc(-0)).toBe(-0);
     });
 
     it("returns null for null and undefined", async function () {
-        var formatting = (await import("./formatting"));
         expect(formatting.trunc(null)).toBeNull();
         expect(formatting.trunc(undefined)).toBeNull();
     });
 
     it("handles edge cases", async function () {
-        var formatting = (await import("./formatting"));
         expect(formatting.trunc(1)).toBe(1);
         expect(formatting.trunc(-1)).toBe(-1);
         expect(formatting.trunc(1.0000001)).toBe(1);

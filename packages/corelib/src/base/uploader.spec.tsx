@@ -4,6 +4,7 @@ import { Uploader, UploaderBatch } from "./uploader";
 
 vi.mock("./dialogs", () => ({
     __esModule: true,
+    alertDialog: vi.fn(),
     iframeDialog: vi.fn()
 }));
 
