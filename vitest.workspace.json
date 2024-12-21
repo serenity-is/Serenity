@@ -1,0 +1,8 @@
+﻿[
+  "packages/corelib/",
+  "packages/sleekgrid/",
+  "common-features/src/extensions/",
+  "common-features/src/demo.northwind/",
+  "common-features/src/demo.basicsamples/",
+  "serene/src/Serene.Web/"
+]

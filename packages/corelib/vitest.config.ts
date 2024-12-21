@@ -1,7 +1,8 @@
-﻿import { defineConfig } from "vitest/config";
+﻿import { defineProject } from "vitest/config";
 
-export default defineConfig({
+export default defineProject({
     test: {
+        name: "corelib",
         environment: "jsdom",
         alias: {
             "jsx-dom/min/jsx-dev-runtime": "jsx-dom/jsx-runtime.js",

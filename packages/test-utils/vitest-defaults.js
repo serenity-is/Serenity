@@ -39,6 +39,7 @@ export default (opt) => {
             }
         },
         test: {
+            name: opt?.name,
             environment: "jsdom",
             globals: true,
             alias: [

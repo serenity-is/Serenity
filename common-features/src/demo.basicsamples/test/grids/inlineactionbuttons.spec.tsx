@@ -31,10 +31,12 @@ beforeAll(() => {
     mockAdmin();
     mockDynamicData();
     mockGridSize();
+    vi.useFakeTimers();
 });
 
 afterEach(() => {
     vi.clearAllMocks();
+    vi.clearAllTimers();
     Fluent(document.body).empty();
 });
 
@@ -84,7 +86,7 @@ describe("Inline Action Buttons", () => {
         var actions = grid.element.findAll<HTMLAnchorElement>(".inline-action[data-action=delete-row]");
         expect(actions.length).toBe(2);
 
-        const deleteSpy = vi.spyOn(CustomerService, "Delete").mockImplementation();
+        const deleteSpy = vi.spyOn(CustomerService, "Delete").mockImplementation(() => null);
 
         actions[1].click();
         expect(confirmDialog).toHaveBeenCalledTimes(1);
