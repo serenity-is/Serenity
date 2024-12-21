@@ -41,18 +41,19 @@ importers:
         version: 2.1.8(@types/node@20.12.2)(@vitest/browser@2.1.8)(jsdom@25.0.1)(msw@2.7.0(@types/node@20.12.2)(typescript@5.7.2))
 
   common-features:
-    devDependencies:
+    dependencies:
       '@serenity-is/corelib':
-        specifier: ../packages/corelib
+        specifier: workspace:*
         version: link:../packages/corelib
       '@serenity-is/sleekgrid':
-        specifier: ../packages/sleekgrid
+        specifier: workspace:*
         version: link:../packages/sleekgrid
+    devDependencies:
       '@serenity-is/tsbuild':
-        specifier: ../packages/tsbuild
+        specifier: workspace:*
         version: link:../packages/tsbuild
       test-utils:
-        specifier: ../packages/test-utils
+        specifier: workspace:*
         version: link:../packages/test-utils
 
   common-features/src/demo.basicsamples:
@@ -79,7 +80,11 @@ importers:
         specifier: 3.1.6
         version: 3.1.6
 
-  common-features/src/extensions: {}
+  common-features/src/extensions:
+    dependencies:
+      '@serenity-is/corelib':
+        specifier: workspace:*
+        version: link:../../../packages/corelib
 
   packages/corelib:
     dependencies:
@@ -110,17 +115,17 @@ importers:
   serene/src/Serene.Web:
     dependencies:
       '@serenity-is/corelib':
-        specifier: ./node_modules/.dotnet/serenity.corelib
-        version: link:node_modules/.dotnet/serenity.corelib
+        specifier: workspace:*
+        version: link:../../../packages/corelib
       '@serenity-is/demo.northwind':
-        specifier: ./node_modules/.dotnet/serenity.demo.northwind
-        version: link:node_modules/.dotnet/serenity.demo.northwind
+        specifier: workspace:*
+        version: link:../../../common-features/src/demo.northwind
       '@serenity-is/extensions':
-        specifier: ./node_modules/.dotnet/serenity.extensions
-        version: link:node_modules/.dotnet/serenity.extensions
+        specifier: workspace:*
+        version: link:../../../common-features/src/extensions
       '@serenity-is/sleekgrid':
-        specifier: ./node_modules/.dotnet/serenity.sleekgrid
-        version: link:node_modules/.dotnet/serenity.sleekgrid
+        specifier: workspace:*
+        version: link:../../../packages/sleekgrid
       jsx-dom:
         specifier: 8.1.5
         version: 8.1.5

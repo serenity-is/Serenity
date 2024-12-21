@@ -16,7 +16,6 @@
     "moduleResolution": "Bundler",
     "newLine": "lf",
     "preserveConstEnums": true,
-    "preserveSymlinks": true,
     "skipLibCheck": true,
     "sourceMap": true,
     "target": "ES2017",

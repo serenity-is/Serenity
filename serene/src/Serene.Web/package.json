@@ -1,10 +1,10 @@
 {
   "name": "serene.web",
   "dependencies": {
-    "@serenity-is/corelib": "./node_modules/.dotnet/serenity.corelib",
-    "@serenity-is/demo.northwind": "./node_modules/.dotnet/serenity.demo.northwind",
-    "@serenity-is/extensions": "./node_modules/.dotnet/serenity.extensions",
-    "@serenity-is/sleekgrid": "./node_modules/.dotnet/serenity.sleekgrid",
+    "@serenity-is/corelib": "workspace:*",
+    "@serenity-is/demo.northwind": "workspace:*",
+    "@serenity-is/extensions": "workspace:*",
+    "@serenity-is/sleekgrid": "workspace:*",
     "jsx-dom": "8.1.5",
     "preact": "10.24.3"
   },

@@ -1607,6 +1607,7 @@ export declare function getReturnUrl(opt?: {
 	ignoreUnsafe?: boolean;
 	purpose?: string;
 }): string;
+export declare function cssEscape(selector: string): string;
 export declare function addLocalText(obj: string | Record<string, string | Record<string, any>> | string, pre?: string): void;
 export declare function localText(key: string, defaultText?: string): string;
 export declare function tryGetText(key: string): string;

@@ -1,5 +1,8 @@
 {
   "name": "@serenity-is/extensions",
+  "dependencies": {
+    "@serenity-is/corelib": "workspace:*"
+  },
   "scripts": {
     "build": "node ./tsbuild.js",
     "build:watch": "node ./tsbuild.js --watch",
