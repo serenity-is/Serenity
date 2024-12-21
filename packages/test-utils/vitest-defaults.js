@@ -6,9 +6,10 @@ import { defineConfig } from "vitest/config";
 
 const testUtils = resolve(join(fileURLToPath(new URL('.', import.meta.url)), './'));
 const serenityRoot = resolve(join(testUtils, "../../"));
-const projectRoot = resolve("./");
 
 export default (opt) => {
+
+    const projectRoot = resolve(opt?.projectRoot ?? "./");
 
     if ((opt?.dynamicData ?? true)) {
         const isWebProject = projectRoot.indexOf('Serene.Web') || projectRoot.indexOf('StartSharp.Web') >= 0;
