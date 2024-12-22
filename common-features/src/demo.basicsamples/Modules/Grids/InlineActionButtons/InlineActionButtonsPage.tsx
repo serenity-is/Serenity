@@ -1,5 +1,5 @@
-﻿import { Decorators, Fluent, confirmDialog, faIcon, gridPageInit, htmlEncode, localText } from "@serenity-is/corelib";
-import { CustomerGrid, CustomerService, OrderDialog, OrderRow } from "@serenity-is/demo.northwind";
+﻿import { Decorators, Fluent, confirmDialog, faIcon, gridPageInit, localText } from "@serenity-is/corelib";
+import { CustomerGrid, CustomerService, OrderDialog } from "@serenity-is/demo.northwind";
 import { Column } from "@serenity-is/sleekgrid";
 
 export default () => gridPageInit(InlineActionGrid);

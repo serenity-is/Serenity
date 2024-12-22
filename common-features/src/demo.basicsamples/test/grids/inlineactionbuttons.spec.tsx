@@ -9,7 +9,7 @@ vi.mock(import("@serenity-is/corelib"), async (importOriginal) => {
     const actual = await importOriginal();
     return {
         ...actual,
-        confirmDialog: vi.fn().mockImplementation((msg, onYes) => onYes())
+        confirmDialog: vi.fn().mockImplementation((_, onYes) => onYes())
     }
 });
 
