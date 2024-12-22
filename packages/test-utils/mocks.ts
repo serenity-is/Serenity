@@ -12,7 +12,9 @@ export function mockDynamicData() {
     scriptDataHooks.fetchScriptData = <TData>(name: string) => {
         try {
             // @ts-ignore
-            return JSON.parse(inject("dynamic-data/" + name.split("?")[0] + ".json") || "null");
+            const json = inject("dynamic-data/" + name.split("?")[0] + ".json" as any);
+            if (json != null)
+                return JSON.parse(json);
         }
         catch (e) {
             console.warn("Failed to load mock dynamic data for: " + name);

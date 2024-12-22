@@ -22,7 +22,7 @@ export default (opt) => {
 
     const provide = {};
     if (opt?.dynamicData ?? true) {
-        for (var folder of [join(testUtils, "dynamic-data"), join(opt?.projectRoot ?? resolve("./"), "dynamic-data")]) {
+        for (var folder of [join(testUtils, "dynamic-data"), join(projectRoot, "dynamic-data")]) {
             if (existsSync(folder)) {
                 for (var file of readdirSync(folder)) {
                     if (file.endsWith(".json")) {
@@ -47,6 +47,12 @@ export default (opt) => {
                 { find: "jsx-dom/min/jsx-dev-runtime", replacement: "jsx-dom/jsx-runtime.js" },
                 { find: "jsx-dom/jsx-dev-runtime", replacement: "jsx-dom/jsx-runtime.js" }
             ],
+            browser: {
+                provider: 'playwright',
+                instances: [{
+                    browser: "chromium",
+                }]
+            },            
             provide
         }
     });
