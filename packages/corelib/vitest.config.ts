@@ -10,7 +10,9 @@ export default defineProject({
         },
         browser: {
             provider: 'playwright',
-            name: 'chromium',
+            instances: [{
+                browser: "chromium",
+            }]
         },
         globals: true
     }
