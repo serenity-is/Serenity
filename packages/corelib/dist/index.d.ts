@@ -180,6 +180,7 @@ export declare const Config: {
 	 */
 	notLoggedInHandler: Function;
 };
+export declare function resetApplicationPath(): void;
 /**
  * CriteriaBuilder is a class that allows to build unary or binary criteria with completion support.
  */
@@ -1446,6 +1447,7 @@ export declare let Invariant: Locale;
  * settings determined server, can be passed to the client.
  */
 export declare let Culture: Locale;
+export declare function resetCultureSettings(): void;
 /**
  * Formats a string with parameters similar to .NET's String.Format function
  * using current `Culture` locale settings.
