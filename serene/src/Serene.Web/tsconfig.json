@@ -8,7 +8,7 @@
     "forceConsistentCasingInFileNames": true,
     "isolatedModules": true,
     "jsx": "react-jsx",
-    "jsxImportSource": "jsx-dom/min",
+    "jsxImportSource": "jsx-dom",
     "module": "ESNext",
     "moduleResolution": "Node",
     "newLine": "lf",

@@ -5,7 +5,7 @@
     "@serenity-is/demo.northwind": "workspace:*",
     "@serenity-is/extensions": "workspace:*",
     "@serenity-is/sleekgrid": "workspace:*",
-    "jsx-dom": "8.1.5",
+    "jsx-dom": "8.1.6",
     "preact": "10.24.3"
   },
   "devDependencies": {

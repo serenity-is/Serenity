@@ -43,10 +43,6 @@ export default (opt) => {
             name: opt?.name,
             environment: "jsdom",
             globals: true,
-            alias: [
-                { find: "jsx-dom/min/jsx-dev-runtime", replacement: "jsx-dom/jsx-runtime.js" },
-                { find: "jsx-dom/jsx-dev-runtime", replacement: "jsx-dom/jsx-runtime.js" }
-            ],
             browser: {
                 provider: 'playwright',
                 instances: [{

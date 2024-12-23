@@ -28,8 +28,8 @@ importers:
         specifier: 25.0.1
         version: 25.0.1
       jsx-dom:
-        specifier: 8.1.5
-        version: 8.1.5
+        specifier: 8.1.6
+        version: 8.1.6
       playwright:
         specifier: 1.49.1
         version: 1.49.1
@@ -124,8 +124,8 @@ importers:
         specifier: workspace:*
         version: link:../../../packages/sleekgrid
       jsx-dom:
-        specifier: 8.1.5
-        version: 8.1.5
+        specifier: 8.1.6
+        version: 8.1.6
       preact:
         specifier: 10.24.3
         version: 10.24.3
@@ -1033,8 +1033,8 @@ packages:
       canvas:
         optional: true
 
-  jsx-dom@8.1.5:
-    resolution: {integrity: sha512-mu1/YDltqM1Qh9xO4bEKTMHU90v7IV0hdgq6LcK0LRsMtA8/6RcLwkvnxCNqMm9cWpH39xpgLa6NTJUdjTmJ6Q==}
+  jsx-dom@8.1.6:
+    resolution: {integrity: sha512-sB8YM7M1aEirenH391h+/Q10UlPuxPA1Gc9OOeONij1eFGu1vAijwzKO1bNcSjCztznjn6puFX43I6FoG8ePjg==}
 
   loupe@3.1.2:
     resolution: {integrity: sha512-23I4pFZHmAemUnz8WZXbYRSKYj801VDaNv9ETuMh7IrMc7VuVVSo+Z9iLE3ni30+U48iDWfi30d3twAXBYmnCg==}
@@ -2279,7 +2279,7 @@ snapshots:
       - supports-color
       - utf-8-validate
 
-  jsx-dom@8.1.5:
+  jsx-dom@8.1.6:
     dependencies:
       csstype: 3.1.3
 
