@@ -21,7 +21,7 @@
   </ItemGroup>
   <Import Project="$(MSBuildThisFileDirectory)..\CommonDbProviders.props" />
   <ItemGroup>
-    <PackageReference Include="Scriban" Version="5.12.0" />
+    <PackageReference Include="Scriban" Version="5.12.1" />
     <PackageReference Include="Mono.Cecil" Version="0.11.6" />
     <PackageReference Include="Microsoft.Extensions.DependencyModel" Version="9.0.0" />
     <PackageReference Include="Microsoft.Extensions.FileSystemGlobbing" Version="9.0.0" />
