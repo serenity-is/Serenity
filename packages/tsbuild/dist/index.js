@@ -1,23 +1,9 @@
 import esbuild from "esbuild";
 import { existsSync, readdirSync, statSync, mkdirSync, writeFileSync, rmSync, readFileSync } from "fs";
-import { join, relative, resolve } from "path";
-import { exit } from "process";
+import { dirname, join, relative, resolve } from "path";
 import { globSync } from "glob";
 
 export const defaultEntryPointGlobs = ['Modules/**/*Page.ts', 'Modules/**/*Page.tsx', 'Modules/**/ScriptInit.ts'];
-
-export function checkIfTrigger() {
-    if (process.argv.slice(2).some(x => x == "--trigger")) {
-        if (existsSync('typings/serenity.corelib/_trigger.ts'))
-            rmSync('typings/serenity.corelib/_trigger.ts')
-        else {
-            if (!existsSync('typings/serenity.corelib/'))
-                mkdirSync('typings/serenity.corelib/');
-            writeFileSync('typings/serenity.corelib/_trigger.ts', '// for triggering build');
-        }
-        exit(0);
-    }
-}
 
 export const importAsGlobalsMapping = {
     "@serenity-is/base": "Serenity",
@@ -109,6 +95,7 @@ export const esbuildOptions = (opt) => {
 
     delete opt.clean;
     delete opt.importAsGlobals;
+    delete opt.writeIfChanged;
 
     return Object.assign({
         absWorkingDir: resolve('./'),
@@ -208,4 +195,24 @@ export function cleanPlugin() {
             });
         }
     }
+}
+
+export function writeIfChanged() {
+    return {
+        name: "write-if-changed",
+        setup(build) {
+            build.onEnd(result => {
+                result.outputFiles?.forEach(file => {
+                    if (existsSync(file.path)) {
+                        const old = readFileSync(file.path);
+                        if (old.equals(file.contents))
+                            return;
+                        console.log("overwriting " + file.path);
+                        mkdirSync(dirname(file.path), { recursive: true });
+                        writeFileSync(file.path, file.text);
+                    }
+                });
+            });
+        }
+    };
 }

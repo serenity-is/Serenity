@@ -1,5 +1,6 @@
 import esbuild from "esbuild";
-import { join, resolve } from "path";
+import { existsSync, mkdirSync, readFileSync, writeFileSync } from "fs";
+import { dirname, join, resolve } from "path";
 import { fileURLToPath } from 'url';
 
 const root = resolve(join(fileURLToPath(new URL('.', import.meta.url)), '../'));
@@ -44,6 +45,27 @@ export function importAsGlobalsPlugin(mapping) {
     };
 }
 
+export function writeIfChanged() {
+    return {
+        name: "write-if-changed",
+        setup(build) {
+            const write = build.initialOptions.write;
+            build.initialOptions.write = false;
+            build.onEnd(result => {
+                if (write === undefined || write) {
+                    result.outputFiles?.forEach(file => {
+                        if (!existsSync(file.path) ||
+                            readFileSync(file.path, 'utf8') !== file.text) {
+                            mkdirSync(dirname(file.path), { recursive: true });
+                            writeFileSync(file.path, file.text);
+                        }
+                    });
+                }
+            });
+        }
+    };
+}
+
 await esbuild.build({
     ...coreLibBase,
     external: ['@serenity-is/sleekgrid'],
@@ -82,21 +104,25 @@ const corelibGlobalBase = {
     },
     format: 'iife',
     globalName: 'Serenity',
-    outfile: 'wwwroot/index.global.js',
-    plugins: [importAsGlobalsPlugin({
-        "@serenity-is/sleekgrid": "Slick"
-    })]
+    outfile: 'wwwroot/index.global.js'
 };
 
 await esbuild.build({
     ...corelibGlobalBase,
     minify: false,
-    outfile: 'wwwroot/index.global.js'
+    outfile: 'wwwroot/index.global.js',
+    plugins: [importAsGlobalsPlugin({
+        "@serenity-is/sleekgrid": "Slick"
+    }), writeIfChanged()]
 });
 
 await esbuild.build({
     ...corelibGlobalBase,
     lineLimit: 1000,
     minify: true,
-    outfile: 'wwwroot/index.global.min.js'
+    outfile: 'wwwroot/index.global.min.js',
+    plugins: [importAsGlobalsPlugin({
+        "@serenity-is/sleekgrid": "Slick"
+    }), writeIfChanged()]
+
 });
