@@ -47,7 +47,7 @@
   </ItemGroup>
   <ItemGroup Condition="'$(UseProjectRefs)' == 'false'">
   </ItemGroup>
-  <Target Name="NpmInstall" BeforeTargets="BeforeBuild" Condition="!Exists('node_modules\serenity-is\tsbuild\package.json')">
+  <Target Name="NpmInstall" BeforeTargets="BeforeBuild" Condition="!Exists('node_modules\@serenity-is\tsbuild\package.json')">
     <Message Text="Installing NPM packages..." Importance="high" />
     <Exec Command="npm install" Condition="!Exists('..\..\..\pnpm-workspace.yaml')" />
     <Exec Command="pnpm install" Condition="Exists('..\..\..\pnpm-workspace.yaml')" />
