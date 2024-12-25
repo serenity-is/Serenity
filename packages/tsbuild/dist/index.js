@@ -93,6 +93,11 @@ export const esbuildOptions = (opt) => {
             plugins.push(importAsGlobalsPlugin(opt.importAsGlobals ?? importAsGlobalsMapping));
     }
 
+    if (opt.writeIfChanged === undefined || opt.writeIfChanged) {
+        plugins.push(writeIfChanged());
+        opt.write = false;
+    }
+
     delete opt.clean;
     delete opt.importAsGlobals;
     delete opt.writeIfChanged;
