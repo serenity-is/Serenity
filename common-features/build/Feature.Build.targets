@@ -1,7 +1,4 @@
 <Project>
-  <PropertyGroup>
-    <PrepareForBuildDependsOn>CompileProjectTSConfig;$(PrepareForBuildDependsOn)</PrepareForBuildDependsOn>
-  </PropertyGroup>
   <ItemGroup>   
     <TypeScriptCompile Remove="node_modules\**;obj\**;out\**;dist\**"></TypeScriptCompile>
     <ProjectCapability Include="TypeScriptNuGet" />
@@ -11,7 +8,7 @@
   </ItemGroup>
   <Import Project="$(SerenitySrc)Serenity.Net.Web\Serenity.Net.Web.targets" Condition="'$(AddAutoRefs)' != 'false'" />
   <Import Project="$(SerenitySrc)RestoreNpmPackages.targets" />
-  <Target Name="CompileProjectTSConfig" DependsOnTargets="NpmInstall;RestoreNodeTypes"
+  <Target Name="CompileProjectTSConfig" AfterTargets="AfterBuild" DependsOnTargets="NpmInstall;RestoreNodeTypes"
           Condition="Exists('tsconfig.json') And '$(BuildingProject)' != 'false' And '$(DesignTimeBuild)' != 'true'">
     <Message Text="Executing TypeScript compiler for $(ProjectName)..." Importance="high"></Message>
     <Exec Command="node &quot;$(TSJavaScriptFile.Replace('build\\..\tools\', 'tools\'))&quot; -p ./tsconfig.json" Condition="!Exists('tsbuild.js')" ContinueOnError="true" />
