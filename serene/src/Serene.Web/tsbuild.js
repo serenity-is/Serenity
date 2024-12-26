@@ -1,6 +1,4 @@
-import { checkIfTrigger, build } from "@serenity-is/tsbuild";
-
-checkIfTrigger();
+import { build } from "@serenity-is/tsbuild";
 
 await build({
 });
