@@ -9,8 +9,8 @@
     "preact": "10.24.3"
   },
   "devDependencies": {
-    "@serenity-is/tsbuild": "8.7.4",
-    "test-utils": "file:../../../packages/test-utils"
+    "@serenity-is/tsbuild": "workspace:*",
+    "test-utils": "workspace:*"
   },
   "scripts": {
     "build": "npm run tsbuild",

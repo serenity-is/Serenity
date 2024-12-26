@@ -34,9 +34,9 @@ public static partial class Shared
             foreach (var property in dependencies.Properties().ToList())
             {
                 if (!property.Name.StartsWith("@serenity-is/") ||
-                    property.Name != "test-utils" &&
-                    (property.Value.Value<string>()?.StartsWith("file:") != true &&
-                     property.Value.Value<string>()?.StartsWith("../") != true))
+                     (property.Value.Value<string>()?.StartsWith("file:") != true &&
+                      property.Value.Value<string>()?.StartsWith("../") != true &&
+                      property.Value.Value<string>()?.StartsWith("workspace:") != true))
                     continue;
 
                 dependencies[property.Name] = "./node_modules/.dotnet/" + GetPossibleNuGetPackageId(property.Name);

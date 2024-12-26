@@ -131,10 +131,10 @@ importers:
         version: 10.24.3
     devDependencies:
       '@serenity-is/tsbuild':
-        specifier: 8.7.4
-        version: 8.7.4
+        specifier: workspace:*
+        version: link:../../../packages/tsbuild
       test-utils:
-        specifier: file:../../../packages/test-utils
+        specifier: workspace:*
         version: link:../../../packages/test-utils
 
 packages:
@@ -639,9 +639,6 @@ packages:
     resolution: {integrity: sha512-ZvK2jBafvttJjoIdKm/Q/Bh7IJ1Ose9IBOwpOXcOvW3ikGTQGmKDgxTC6oCAzW6PynbkKP8+um1du81XJHZ0JA==}
     cpu: [x64]
     os: [win32]
-
-  '@serenity-is/tsbuild@8.7.4':
-    resolution: {integrity: sha512-O2SWfy/tnXB+JK4IVAKS7Qh09F6O/zTJRFw7O3DYmgPV5mSGXz6Y69Zc1CQng1xfnLVDdCBnvsqrPShnA7NprQ==}
 
   '@testing-library/dom@10.4.0':
     resolution: {integrity: sha512-pemlzrSESWbdAloYml3bAJMEfNh1Z7EduzqPKprCH5S341frlpYnUEW0H72dLxa6IsYr+mPno20GiSm+h9dEdQ==}
@@ -1820,11 +1817,6 @@ snapshots:
 
   '@rollup/rollup-win32-x64-msvc@4.28.1':
     optional: true
-
-  '@serenity-is/tsbuild@8.7.4':
-    dependencies:
-      esbuild: 0.23.1
-      glob: 11.0.0
 
   '@testing-library/dom@10.4.0':
     dependencies:
