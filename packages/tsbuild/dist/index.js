@@ -202,6 +202,10 @@ export function cleanPlugin() {
     }
 }
 
+export function checkIfTrigger() {
+    // nop
+}
+
 export function writeIfChanged() {
     return {
         name: "write-if-changed",
