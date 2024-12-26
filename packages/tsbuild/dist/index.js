@@ -93,6 +93,11 @@ export const esbuildOptions = (opt) => {
             plugins.push(importAsGlobalsPlugin(opt.importAsGlobals ?? importAsGlobalsMapping));
     }
 
+    if (opt.write === undefined && opt.writeIfChanged === undefined || opt.writeIfChanged) {
+        plugins.push(writeIfChanged());
+        opt.write = false;
+    }
+
     delete opt.clean;
     delete opt.importAsGlobals;
     delete opt.writeIfChanged;
@@ -207,10 +212,11 @@ export function writeIfChanged() {
                         const old = readFileSync(file.path);
                         if (old.equals(file.contents))
                             return;
-                        console.log("overwriting " + file.path);
-                        mkdirSync(dirname(file.path), { recursive: true });
-                        writeFileSync(file.path, file.text);
                     }
+                    else {
+                        mkdirSync(dirname(file.path), { recursive: true });
+                    }
+                    writeFileSync(file.path, file.text);
                 });
             });
         }
