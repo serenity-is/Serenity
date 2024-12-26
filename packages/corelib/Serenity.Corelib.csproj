@@ -1,7 +1,7 @@
 <Project Sdk="Microsoft.NET.Sdk.Razor">
   <PropertyGroup>
     <Description>NuGet version of @serenity-is/corelib NPM package</Description>
-    <PrepareForBuildDependsOn>TSBuild;$(PrepareForBuildDependsOn)</PrepareForBuildDependsOn>
+    <GenerateComputedBuildStaticWebAssetsDependsOn>TSBuild;$(GenerateComputedBuildStaticWebAssetsDependsOn)</GenerateComputedBuildStaticWebAssetsDependsOn>
   </PropertyGroup>
   <ItemGroup>
     <ProjectReference Include="..\sleekgrid\Serenity.SleekGrid.csproj" />

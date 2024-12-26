@@ -4,6 +4,7 @@
     <RootNamespace>Serene</RootNamespace>
     <TypeScriptCompileBlocked>true</TypeScriptCompileBlocked>
     <TypeScriptNoEmitOnError>false</TypeScriptNoEmitOnError>
+    <GenerateComputedBuildStaticWebAssetsDependsOn>RunTSBuild;$(GenerateComputedBuildStaticWebAssetsDependsOn)</GenerateComputedBuildStaticWebAssetsDependsOn>
     <!--#if (IsNotTemplate)-->
     <CommonSrc>..\..\..\common-features\src\</CommonSrc>
     <SerenitySrc>..\..\..\src\</SerenitySrc>
@@ -46,12 +47,12 @@
   </ItemGroup>
   <ItemGroup Condition="'$(UseProjectRefs)' == 'false'">
   </ItemGroup>
-  <Target Name="NpmInstall" BeforeTargets="BeforeBuild" Condition="!Exists('node_modules\@serenity-is\tsbuild\package.json')">
-    <Message Text="Installing NPM packages..." Importance="high" />
+  <Target Name="NpmInstall" Condition="!Exists('node_modules\@serenity-is\tsbuild\package.json')">
+    <Message Text="Installing NPM packages for $(ProjectName)..." Importance="high" />
     <Exec Command="npm install" Condition="!Exists('..\..\..\pnpm-workspace.yaml')" />
     <Exec Command="pnpm install" Condition="Exists('..\..\..\pnpm-workspace.yaml')" />
   </Target>
-  <Target Name="RunTSBuild" BeforeTargets="BeforeBuild;GenerateStaticWebAssetsManifest" DependsOnTargets="RestoreNodeTypes;NpmInstall" Condition="'$(SkipTSBuild)' != 'true'">
+  <Target Name="RunTSBuild" DependsOnTargets="RestoreNodeTypes;NpmInstall" Condition="'$(SkipTSBuild)' != 'true'">
     <Message Text="Executing TypeScript compiler for $(ProjectName)..." Importance="high" />
     <ItemGroup>
       <CleanedEsmFiles Include="wwwroot\esm\**" />
