@@ -8,7 +8,6 @@
     <CommonSrc>..\..\..\common-features\src\</CommonSrc>
     <SerenitySrc>..\..\..\src\</SerenitySrc>
     <DefineConstants>$(DefineConstants);Northwind;BasicSamples</DefineConstants>
-    <RestoreNodeTypes>false</RestoreNodeTypes>
     <UseProjectRefs Condition="!Exists('$(SerenitySrc)..\Serenity.sln')">false</UseProjectRefs>
     <!--#endif-->
   </PropertyGroup>
