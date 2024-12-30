@@ -11,11 +11,11 @@ public class PasswordStrengthValidator(IOptions<MembershipSettings> membershipSe
 
     public virtual void Validate(string password)
     {
-        password ??= "";
+        password ??= string.Empty;
 
         var rules = membershipSettings.Value;
 
-        if (password.Length < (rules.MinPasswordLength))
+        if (password.Length < rules.MinPasswordLength)
             throw new ValidationError(nameof(MembershipSettings.MinPasswordLength), "Password",
                 string.Format(CultureInfo.CurrentCulture, PasswordStrengthValidationTexts.MinRequiredPasswordLength.ToString(localizer), 
                 membershipSettings.Value.MinPasswordLength));
@@ -47,9 +47,9 @@ public class PasswordStrengthValidator(IOptions<MembershipSettings> membershipSe
 
         if (rules.RequireLowercase && lowerCount == 0)
             throw new ValidationError(nameof(rules.RequireLowercase), "Password",
-                PasswordStrengthValidationTexts.PasswordStrengthRequireUppercase.ToString(localizer));
+                PasswordStrengthValidationTexts.PasswordStrengthRequireLowercase.ToString(localizer));
 
-        if (rules.RequireDigit && lowerCount == 0)
+        if (rules.RequireDigit && numericCount == 0)
             throw new ValidationError(nameof(rules.RequireDigit), "Password",
                 PasswordStrengthValidationTexts.PasswordStrengthRequireDigit.ToString(localizer));
 
