@@ -47,7 +47,7 @@ public class PasswordStrengthValidator(IOptions<MembershipSettings> membershipSe
 
         if (rules.RequireLowercase && lowerCount == 0)
             throw new ValidationError(nameof(rules.RequireLowercase), "Password",
-                PasswordStrengthValidationTexts.PasswordStrengthRequireUppercase.ToString(localizer));
+                PasswordStrengthValidationTexts.PasswordStrengthRequireLowercase.ToString(localizer));
 
         if (rules.RequireDigit && numericCount == 0)
             throw new ValidationError(nameof(rules.RequireDigit), "Password",
