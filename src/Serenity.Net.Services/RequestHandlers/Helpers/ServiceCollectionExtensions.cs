@@ -148,11 +148,17 @@ public static class ServiceCollectionExtensions
                 if (defaults.Length != 1)
                 {
                     if (defaults.Length == 0)
-                        throw new InvalidProgramException($"There are multiple {pair.Key} request handler types ({string.Join(", ", pair.Value)}). " +
-                            "Please add [DefaultHandler] to one of them!");
+                        defaults = pair.Value.Where(x => x.GetAttribute<DefaultHandlerAttribute>()?.Value != false).ToArray();
 
-                    throw new InvalidProgramException($"There are multiple {pair.Key} request handler types with [DefaultHandler] attribute ({string.Join(", ", (IEnumerable<Type>)defaults)}). " +
-                        "Please use [DefaultHandler] on only one of them!");
+                    if (defaults.Length != 1)
+                    {
+                        if (defaults.Length == 0)
+                            throw new InvalidProgramException($"There are multiple {pair.Key} request handler types ({string.Join(", ", pair.Value)}). " +
+                                "Please add [DefaultHandler] to one of them!");
+
+                        throw new InvalidProgramException($"There are multiple {pair.Key} request handler types with [DefaultHandler] attribute ({string.Join(", ", (IEnumerable<Type>)defaults)}). " +
+                            "Please use [DefaultHandler] on only one of them!");
+                    }
                 }
 
                 collection.AddTransient(pair.Key, defaults[0]);

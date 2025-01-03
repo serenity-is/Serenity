@@ -1,4 +1,4 @@
-﻿namespace Serenity.Services;
+namespace Serenity.Services;
 
 /// <summary>
 /// Default implementation for the <see cref="IDefaultHandlerFactory"/>
@@ -35,6 +35,13 @@ public class DefaultHandlerFactory(IDefaultHandlerRegistry registry, IHandlerAct
         var defaults = handlers.Where(x => x.GetAttribute<DefaultHandlerAttribute>()?.Value == true);
         if (defaults.Count() == 1)
             return defaults.First();
+
+        if (!defaults.Any())
+        {
+            defaults = handlers.Where(x => x.GetAttribute<DefaultHandlerAttribute>()?.Value != false);
+            if (defaults.Count() == 1)
+                return defaults.First();
+        }
 
         throw new InvalidProgramException($"There are multiple {args.handlerInterface.FullName} types " +
             $"for row type {args.rowType.FullName}. Please add [DefaultHandler] to one of them.");
