@@ -38,9 +38,9 @@ public class DefaultHandlerFactory(IDefaultHandlerRegistry registry, IHandlerAct
 
         if (!defaults.Any())
         {
-            defaults = handlers.Where(x => x.GetAttribute<DefaultHandlerAttribute>()?.Value != false);
-            if (defaults.Count() == 1)
-                return defaults.First();
+            var withoutDefaultsFalse = handlers.Where(x => x.GetAttribute<DefaultHandlerAttribute>()?.Value != false);
+            if (withoutDefaultsFalse.Count() == 1)
+                return withoutDefaultsFalse.First();
         }
 
         throw new InvalidProgramException($"There are multiple {args.handlerInterface.FullName} types " +

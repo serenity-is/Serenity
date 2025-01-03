@@ -148,7 +148,11 @@ public static class ServiceCollectionExtensions
                 if (defaults.Length != 1)
                 {
                     if (defaults.Length == 0)
-                        defaults = pair.Value.Where(x => x.GetAttribute<DefaultHandlerAttribute>()?.Value != false).ToArray();
+                    {
+                        var withoutDefaultFalse = pair.Value.Where(x => x.GetAttribute<DefaultHandlerAttribute>()?.Value != false).ToArray();
+                        if (withoutDefaultFalse.Length == 1)
+                            defaults = withoutDefaultFalse;
+                    }
 
                     if (defaults.Length != 1)
                     {
