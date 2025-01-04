@@ -1,22 +1,18 @@
-﻿using Serenity.Extensions.Entities;
+using Serenity.Extensions.Entities;
 using System.Data;
-using MyRow = Serene.Administration.UserRow;
 using MyRequest = Serenity.Services.DeleteRequest;
 using MyResponse = Serenity.Services.DeleteResponse;
+using MyRow = Serene.Administration.UserRow;
 
 namespace Serene.Administration;
 
 public interface IUserDeleteHandler : IDeleteHandler<MyRow, MyRequest, MyResponse> { }
-public class UserDeleteHandler : DeleteRequestHandler<MyRow, MyRequest, MyResponse>, IUserDeleteHandler
-{
-    private readonly IOptions<EnvironmentSettings> environmentOptions;
 
-    public UserDeleteHandler(IRequestContext context, IOptions<EnvironmentSettings> environmentOptions)
-         : base(context)
-    {
-        this.environmentOptions = environmentOptions ?? 
+public class UserDeleteHandler(IRequestContext context, IOptions<EnvironmentSettings> environmentOptions)
+    : DeleteRequestHandler<MyRow, MyRequest, MyResponse>(context), IUserDeleteHandler
+{
+    private readonly IOptions<EnvironmentSettings> environmentOptions = environmentOptions ??
             throw new System.ArgumentNullException(nameof(environmentOptions));
-    }
 
     protected override void ValidateRequest()
     {

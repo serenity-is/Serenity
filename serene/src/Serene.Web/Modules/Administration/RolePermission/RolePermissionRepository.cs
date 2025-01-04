@@ -3,30 +3,22 @@ using MyRow = Serene.Administration.RolePermissionRow;
 
 namespace Serene.Administration.Repositories;
 
-public class RolePermissionRepository : BaseRepository
+public class RolePermissionRepository(IRequestContext context) : BaseRepository(context)
 {
-    public RolePermissionRepository(IRequestContext context)
-         : base(context)
-    {
-    }
-
     private static MyRow.RowFields Fld { get { return MyRow.Fields; } }
 
     public SaveResponse Update(IUnitOfWork uow, RolePermissionUpdateRequest request)
     {
-        if (request is null)
-            throw new ArgumentNullException(nameof(request));
-        if (request.RoleID is null)
-            throw new ArgumentNullException(nameof(request.RoleID));
-        if (request.Permissions is null)
-            throw new ArgumentNullException(nameof(request.Permissions));
+        ArgumentNullException.ThrowIfNull(request);
+        ArgumentNullException.ThrowIfNull(request.RoleID);
+        ArgumentNullException.ThrowIfNull(request.Permissions);
 
         var roleID = request.RoleID.Value;
         var oldList = new HashSet<string>(
             GetExisting(uow.Connection, roleID)
             .Select(x => x.PermissionKey), StringComparer.OrdinalIgnoreCase);
 
-        var newList = new HashSet<string>(request.Permissions.ToList(),
+        var newList = new HashSet<string>([.. request.Permissions],
             StringComparer.OrdinalIgnoreCase);
 
         if (oldList.SetEquals(newList))
@@ -73,8 +65,7 @@ public class RolePermissionRepository : BaseRepository
 
     public RolePermissionListResponse List(IDbConnection connection, RolePermissionListRequest request)
     {
-        if (request is null)
-            throw new ArgumentNullException(nameof(request));
+        ArgumentNullException.ThrowIfNull(request);
         if (request.RoleID is null)
             throw new ArgumentNullException(nameof(request.RoleID));
 

@@ -31,15 +31,10 @@ public abstract class LoggingRow<TFields> : Row<TFields>, ILoggingRow
     DateTimeField IUpdateLogRow.UpdateDateField => fields.UpdateDate;
 }
 
-public class LoggingRowFields : RowFieldsBase
+public class LoggingRowFields(string tableName = null, string fieldPrefix = null) : RowFieldsBase(tableName, fieldPrefix)
 {
     public Int32Field InsertUserId;
     public DateTimeField InsertDate;
     public Int32Field UpdateUserId;
     public DateTimeField UpdateDate;
-
-    public LoggingRowFields(string tableName = null, string fieldPrefix = null)
-        : base(tableName, fieldPrefix)
-    {
-    }
 }

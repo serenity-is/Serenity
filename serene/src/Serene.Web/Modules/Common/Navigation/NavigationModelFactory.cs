@@ -4,30 +4,20 @@ using Serene.Administration;
 
 namespace Serene.AppServices;
 
-public class NavigationModelFactory : INavigationModelFactory
+public class NavigationModelFactory(
+    ITwoLevelCache cache,
+    IHttpContextAccessor httpContextAccessor,
+    IPermissionService permissions,
+    IServiceProvider serviceProvider,
+    ITypeSource typeSource,
+    IUserAccessor userAccessor) : INavigationModelFactory
 {
-    private readonly ITwoLevelCache cache;
-    private readonly IHttpContextAccessor httpContextAccessor;
-    private readonly IPermissionService permissions;
-    private readonly IServiceProvider serviceProvider;
-    private readonly ITypeSource typeSource;
-    private readonly IUserAccessor userAccessor;
-
-    public NavigationModelFactory(
-        ITwoLevelCache cache,
-        IHttpContextAccessor httpContextAccessor,
-        IPermissionService permissions,
-        IServiceProvider serviceProvider,
-        ITypeSource typeSource,
-        IUserAccessor userAccessor)
-    {
-        this.httpContextAccessor = httpContextAccessor ?? throw new ArgumentNullException(nameof(httpContextAccessor));
-        this.cache = cache ?? throw new ArgumentNullException(nameof(cache));
-        this.permissions = permissions ?? throw new ArgumentNullException(nameof(permissions));
-        this.serviceProvider = serviceProvider ?? throw new ArgumentNullException(nameof(serviceProvider));
-        this.typeSource = typeSource ?? throw new ArgumentNullException(nameof(typeSource));
-        this.userAccessor = userAccessor ?? throw new ArgumentNullException(nameof(userAccessor));
-    }
+    private readonly ITwoLevelCache cache = cache ?? throw new ArgumentNullException(nameof(cache));
+    private readonly IHttpContextAccessor httpContextAccessor = httpContextAccessor ?? throw new ArgumentNullException(nameof(httpContextAccessor));
+    private readonly IPermissionService permissions = permissions ?? throw new ArgumentNullException(nameof(permissions));
+    private readonly IServiceProvider serviceProvider = serviceProvider ?? throw new ArgumentNullException(nameof(serviceProvider));
+    private readonly ITypeSource typeSource = typeSource ?? throw new ArgumentNullException(nameof(typeSource));
+    private readonly IUserAccessor userAccessor = userAccessor ?? throw new ArgumentNullException(nameof(userAccessor));
 
     private string ToAbsolute(string url)
     {
@@ -83,8 +73,7 @@ public class NavigationModelFactory : INavigationModelFactory
     private void SearchActivePath(NavigationItem link, string currentUrl,
         ref string bestMatch, ref int bestMatchLength, ref NavigationItem bestLink)
     {
-        if (link == null)
-            throw new ArgumentNullException(nameof(link));
+        ArgumentNullException.ThrowIfNull(link);
 
         var url = link.Url;
 

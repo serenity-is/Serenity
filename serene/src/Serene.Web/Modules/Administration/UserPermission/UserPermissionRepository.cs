@@ -4,19 +4,13 @@ using Microsoft.Extensions.Caching.Memory;
 
 namespace Serene.Administration.Repositories;
 
-public class UserPermissionRepository : BaseRepository
+public class UserPermissionRepository(IRequestContext context) : BaseRepository(context)
 {
-    public UserPermissionRepository(IRequestContext context)
-         : base(context)
-    {
-    }
-
     private static MyRow.RowFields Fld { get { return MyRow.Fields; } }
 
     public SaveResponse Update(IUnitOfWork uow, UserPermissionUpdateRequest request)
     {
-        if (request is null)
-            throw new ArgumentNullException(nameof(request));
+        ArgumentNullException.ThrowIfNull(request);
         if (request.UserID is null)
             throw new ArgumentNullException(nameof(request.UserID));
         if (request.Permissions is null)
@@ -85,8 +79,7 @@ public class UserPermissionRepository : BaseRepository
 
     public ListResponse<MyRow> List(IDbConnection connection, UserPermissionListRequest request)
     {
-        if (request is null)
-            throw new ArgumentNullException(nameof(request));
+        ArgumentNullException.ThrowIfNull(request);
         if (request.UserID is null)
             throw new ArgumentNullException(nameof(request.UserID));
 
@@ -100,8 +93,7 @@ public class UserPermissionRepository : BaseRepository
 
     public ListResponse<string> ListRolePermissions(IDbConnection connection, UserPermissionListRequest request)
     {
-        if (request is null)
-            throw new ArgumentNullException(nameof(request));
+        ArgumentNullException.ThrowIfNull(request);
         if (request.UserID is null)
             throw new ArgumentNullException(nameof(request.UserID));
 

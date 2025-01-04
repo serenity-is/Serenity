@@ -6,15 +6,10 @@ using Microsoft.Extensions.DependencyInjection;
 namespace Serene.Membership.Pages;
 
 [Route("Account/[action]")]
-public partial class AccountPage : Controller
+public partial class AccountPage(ITwoLevelCache cache, ITextLocalizer localizer) : Controller
 {
-    protected ITwoLevelCache Cache { get; }
-    protected ITextLocalizer Localizer { get; }
-    public AccountPage(ITwoLevelCache cache, ITextLocalizer localizer)
-    {
-        Localizer = localizer ?? throw new ArgumentNullException(nameof(localizer));
-        Cache = cache ?? throw new ArgumentNullException(nameof(cache));
-    }
+    protected ITwoLevelCache Cache { get; } = cache ?? throw new ArgumentNullException(nameof(cache));
+    protected ITextLocalizer Localizer { get; } = localizer ?? throw new ArgumentNullException(nameof(localizer));
 
     [HttpGet]
     public ActionResult Login(int? denied, string activated, string returnUrl)
@@ -44,17 +39,14 @@ public partial class AccountPage : Controller
 
         return this.ExecuteMethod(() =>
         {
-            if (request is null)
-                throw new ArgumentNullException(nameof(request));
+            ArgumentNullException.ThrowIfNull(request);
 
             if (string.IsNullOrEmpty(request.Username))
                 throw new ArgumentNullException(nameof(request.Username));
 
-            if (passwordValidator is null)
-                throw new ArgumentNullException(nameof(passwordValidator));
+            ArgumentNullException.ThrowIfNull(passwordValidator);
 
-            if (userClaimCreator is null)
-                throw new ArgumentNullException(nameof(userClaimCreator));
+            ArgumentNullException.ThrowIfNull(userClaimCreator);
 
             var username = request.Username;
             var result = passwordValidator.Validate(ref username, request.Password);

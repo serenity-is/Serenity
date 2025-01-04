@@ -1,4 +1,4 @@
-﻿using MyRow = Serene.Administration.RoleRow;
+using MyRow = Serene.Administration.RoleRow;
 using MyRequest = Serenity.Services.RetrieveRequest;
 using MyResponse = Serenity.Services.RetrieveResponse<Serene.Administration.RoleRow>;
 
@@ -6,10 +6,7 @@ using MyResponse = Serenity.Services.RetrieveResponse<Serene.Administration.Role
 namespace Serene.Administration;
 
 public interface IRoleRetrieveHandler : IRetrieveHandler<MyRow, MyRequest, MyResponse> { }
-public class RoleRetrieveHandler : RetrieveRequestHandler<MyRow, MyRequest, MyResponse>, IRoleRetrieveHandler
+public class RoleRetrieveHandler(IRequestContext context)
+    : RetrieveRequestHandler<MyRow, MyRequest, MyResponse>(context), IRoleRetrieveHandler
 {
-    public RoleRetrieveHandler(IRequestContext context)
-         : base(context)
-    {
-    }
 }

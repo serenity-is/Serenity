@@ -3,19 +3,13 @@ using MyRow = Serene.Administration.UserRoleRow;
 
 namespace Serene.Administration.Repositories;
 
-public class UserRoleRepository : BaseRepository
+public class UserRoleRepository(IRequestContext context) : BaseRepository(context)
 {
-    public UserRoleRepository(IRequestContext context)
-         : base(context)
-    {
-    }
-
     private static MyRow.RowFields Fld { get { return MyRow.Fields; } }
 
     public SaveResponse Update(IUnitOfWork uow, UserRoleUpdateRequest request)
     {
-        if (request is null)
-            throw new ArgumentNullException(nameof(request));
+        ArgumentNullException.ThrowIfNull(request);
         if (request.UserID is null)
             throw new ArgumentNullException(nameof(request.UserID));
         if (request.Roles is null)
@@ -26,7 +20,7 @@ public class UserRoleRepository : BaseRepository
             GetExisting(uow.Connection, userID)
             .Select(x => x.RoleId.Value));
 
-        var newList = new HashSet<int>(request.Roles.ToList());
+        var newList = new HashSet<int>([.. request.Roles]);
 
         if (oldList.SetEquals(newList))
             return new SaveResponse();
@@ -72,8 +66,7 @@ public class UserRoleRepository : BaseRepository
 
     public UserRoleListResponse List(IDbConnection connection, UserRoleListRequest request)
     {
-        if (request is null)
-            throw new ArgumentNullException(nameof(request));
+        ArgumentNullException.ThrowIfNull(request);
         if (request.UserID is null)
             throw new ArgumentNullException(nameof(request.UserID));
 

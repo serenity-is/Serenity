@@ -10,11 +10,9 @@ public class DashboardPage : Controller
 #if (Northwind)
     public ActionResult Index([FromServices] ITwoLevelCache cache, [FromServices] ISqlConnections sqlConnections)
     {
-        if (cache is null)
-        	throw new System.ArgumentNullException(nameof(cache));
+        ArgumentNullException.ThrowIfNull(cache);
 
-        if (sqlConnections is null)
-        	throw new System.ArgumentNullException(nameof(sqlConnections));
+        ArgumentNullException.ThrowIfNull(sqlConnections);
 
         var o = Serenity.Demo.Northwind.OrderRow.Fields;
 

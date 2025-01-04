@@ -5,19 +5,15 @@ using MyResponse = Serenity.Services.SaveResponse;
 namespace Serene.Administration;
 
 public interface IUserSaveHandler : ISaveHandler<MyRow, MyRequest, MyResponse> { }
-public class UserSaveHandler : SaveRequestHandler<MyRow, MyRequest, MyResponse>, IUserSaveHandler
+
+public class UserSaveHandler(IRequestContext context, IOptions<EnvironmentSettings> environmentOptions)
+    : SaveRequestHandler<MyRow, MyRequest, MyResponse>(context), IUserSaveHandler
 {
     private static MyRow.RowFields Fld { get { return MyRow.Fields; } }
 
-    public UserSaveHandler(IRequestContext context, IOptions<EnvironmentSettings> environmentOptions)
-         : base(context)
-    {
-        this.environmentOptions = environmentOptions ??
-            throw new System.ArgumentNullException(nameof(environmentOptions));
-    }
-
     private string password;
-    private readonly IOptions<EnvironmentSettings> environmentOptions;
+    private readonly IOptions<EnvironmentSettings> environmentOptions = environmentOptions ??
+        throw new ArgumentNullException(nameof(environmentOptions));
 
     protected override void GetEditableFields(HashSet<Field> editable)
     {
