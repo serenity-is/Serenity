@@ -20,7 +20,9 @@ public class DefaultHandlerFactory(IDefaultHandlerRegistry registry, IHandlerAct
         var requestHandler = typeof(IRequestHandler<>).MakeGenericType(args.rowType);
 
         var handlers = registry.GetTypes(args.handlerInterface)
-            .Where(requestHandler.IsAssignableFrom)
+            .Where(x => 
+                requestHandler.IsAssignableFrom(x) &&
+                x.GetAttribute<DefaultHandlerAttribute>()?.Value != false)
             .ToArray();
 
         if (handlers.Length == 1)
@@ -35,13 +37,6 @@ public class DefaultHandlerFactory(IDefaultHandlerRegistry registry, IHandlerAct
         var defaults = handlers.Where(x => x.GetAttribute<DefaultHandlerAttribute>()?.Value == true);
         if (defaults.Count() == 1)
             return defaults.First();
-
-        if (!defaults.Any())
-        {
-            var withoutDefaultsFalse = handlers.Where(x => x.GetAttribute<DefaultHandlerAttribute>()?.Value != false);
-            if (withoutDefaultsFalse.Count() == 1)
-                return withoutDefaultsFalse.First();
-        }
 
         throw new InvalidProgramException($"There are multiple {args.handlerInterface.FullName} types " +
             $"for row type {args.rowType.FullName}. Please add [DefaultHandler] to one of them.");
