@@ -40,7 +40,7 @@
   "Site.BulkServiceAction.NothingToProcess": "Bitte wählen Sie einige Datensätze zur Verarbeitung aus!",
   "Site.BulkServiceAction.SomeHadErrorsFormat": "Verarbeitung von {0} Datensätzen erfolgreich abgeschlossen. {1} Datensatz(e) enthielten Fehler!",
   "Site.BulkServiceAction.SuccessCount": "{0} erledigt",
-  "Site.Dialogs.PendingChangesConfirmation": "Sie haben ausstehende Änderunge",
+  "Site.Dialogs.PendingChangesConfirmation": "Sie haben ausstehende Änderungen",
   "Site.Dialogs.PendingChangesUnloadWarning": "Achtung! Ihre Änderungen könnten verloren gehen, wenn Sie fortfahren. Bitte speichern Sie diese, bevor Sie die Seite wechseln.",
   "Site.Translation.AllTextsAlreadyTranslated": "Alle Texte in der Ansicht sind bereits übersetzt!",
   "Site.Translation.Assembly": "Montage",
