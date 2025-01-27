@@ -45,17 +45,8 @@ public partial class SaveRequestHandler_Permission_Tests
 
     [InsertPermission(insertPermission)]
     [UpdatePermission(updatePermission)]
-    private class TestRow : Row<TestRow.RowFields>, IIdRow
+    private class TestRow : IdNameRow<TestRow.RowFields>
     {
-        [IdProperty, Identity]
-        public int? Id { get => fields.Id[this]; set => fields.Id[this] = value; }
-
-        [NameProperty]
-        public string Name { get => fields.Name[this]; set => fields.Name[this] = value; }
-        public class RowFields : RowFieldsBase
-        {
-            public Int32Field Id;
-            public StringField Name;
-        }
+        public class RowFields : IdNameRowFields {}
     }
 }
