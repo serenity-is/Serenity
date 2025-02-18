@@ -47,7 +47,7 @@
     - `Serenity.Net.Data` and `Serenity.Net.Entity` packages are now merged into `Serenity.Net.Services`. Remove references to these packages and update `TypeSource` implementations accordingly. Switching to `ApplicationPartsTypeSource` is recommended.
     - `Serenity.Pro.DataAuditLog` and `Serenity.Pro.EmailQueue` are merged into the `Serenity.Pro.Extensions` package. Remove their assembly references if using a classic type source.
     - `Serenity.Pro.Theme` package contents are merged into `Serenity.Pro.Extensions`. Update references in `appsettings.bundles.json`:
-      - Replace `~/Serenity.Pro.Theme/pro-theme.js` with `~/Serenity.Pro.Extensions/pro-theme.css`.
+      - Replace `~/Serenity.Pro.Theme/pro-theme.js` with `~/Serenity.Pro.Extensions/pro-theme.js`.
       - Replace `~/Serenity.Pro.Theme/pages/dashboard.css` with `~/Serenity.Pro.Extensions/pages/dashboard.css`.
       - Replace `~/Serenity.Pro.Theme/pro-theme{.rtl}.css` with `~/Serenity.Pro.Extensions/pro-theme{.rtl}.css`.
       - Remove `~/Serenity.Pro.Extensions/pro-extensions{.rtl}.css`, as it is merged into `pro-theme.css`.
