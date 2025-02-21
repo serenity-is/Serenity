@@ -23,7 +23,7 @@
     <PackageReference Include="FluentMigrator.Runner" Version="6.2.0" />
     <PackageReference Include="Microsoft.Data.Sqlite" Version="9.0.2" />
     <PackageReference Include="Microsoft.Data.SqlClient" Version="6.0.1" />
-    <PackageReference Include="Microsoft.TypeScript.MSBuild" Version="5.7.1" PrivateAssets="all" IncludeAssets="runtime; build; native; contentfiles; analyzers" />
+    <PackageReference Include="Microsoft.TypeScript.MSBuild" Version="5.7.3" PrivateAssets="all" IncludeAssets="runtime; build; native; contentfiles; analyzers" />
   </ItemGroup>
   <ItemGroup Condition="'$(UseProjectRefs)' == 'false'">
     <PackageReference Include="Serenity.Assets" Version="8.8.1" />
