@@ -27,6 +27,13 @@ public class NullRequestContext(IBehaviorProvider behaviors = null,
         return this;
     }
 
+    public NullRequestContext AsGuest(string identifier)
+    {
+        UserAccessor = new MockUserAccessor(() => TestUser.Guest, () => identifier);
+        Permissions = new MockPermissions(perm => false);
+        return this;
+    }
+
     public NullRequestContext WithPermissions(Func<string, bool> hasPermission)
     {
         Permissions = new MockPermissions(hasPermission);

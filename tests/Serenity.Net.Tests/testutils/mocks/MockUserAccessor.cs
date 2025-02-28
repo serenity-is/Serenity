@@ -5,6 +5,16 @@ namespace Serenity.TestUtils;
 public class MockUserAccessor : IUserAccessor
 {
     private readonly Func<ClaimsPrincipal> getUser;
+    private readonly Func<string> getUsername;
+    private readonly Func<string> getIdentifier;
+    private readonly Action<ClaimsIdentity> configureIdentity;
+
+    public MockUserAccessor(Func<string> getUsername, Func<string> getIdentifier = null, Action<ClaimsIdentity> configureIdentity = null)
+    {
+        this.getUsername = getUsername ?? throw new ArgumentNullException(nameof(getUsername));
+        this.getIdentifier = getIdentifier;
+        this.configureIdentity = configureIdentity;
+    }
 
     public MockUserAccessor(Func<ClaimsPrincipal> getUser)
     {
@@ -32,5 +42,30 @@ public class MockUserAccessor : IUserAccessor
         };
     }
 
-    public ClaimsPrincipal User => getUser();
+    public ClaimsPrincipal User
+    {
+        get
+        {
+            if (getUser != null)
+                return getUser();
+
+            var username = getUsername();
+            if (username == null)
+                return null;
+
+            var identity = new GenericIdentity(username, "Test");
+            var claimsPrincipal = new ClaimsPrincipal(identity);
+
+            if (getIdentifier != null)
+            {
+                var identifier = getIdentifier();
+                if (identifier != null)
+                    identity.AddClaim(new Claim(ClaimTypes.NameIdentifier, getIdentifier()));
+            }
+
+            configureIdentity?.Invoke(identity);
+
+            return claimsPrincipal;
+        }
+    }
 }
