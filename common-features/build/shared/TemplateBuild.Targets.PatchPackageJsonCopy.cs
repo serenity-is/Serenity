@@ -26,17 +26,27 @@ public static partial class Shared
                 return (dependency == null ? json?["version"] : json["dependencies"]?[dependency])?.Value<string>();
             }
 
-            devDependencies["@serenity-is/tsbuild"] = IsPatch ? patchVersion("tsbuild") : 
-                GetLatestNpmPackageVersion("@serenity-is/tsbuild");
+            static bool isFileWorkspaceOrUp(string version)
+            {
+                return 
+                    version != null &&
+                    (version.StartsWith("file:") ||
+                     version.StartsWith("../") ||
+                     version.StartsWith("workspace:"));
+            }
+
+            var tsbuildVer = IsPatch ? patchVersion("tsbuild") : GetLatestNpmPackageVersion("@serenity-is/tsbuild");
+            if (!isFileWorkspaceOrUp(devDependencies["@serenity-is/tsbuild"]?.Value<string>()))
+                devDependencies["@serenity-is/tsbuild"] = tsbuildVer;
 
             File.WriteAllText(PackageJsonFile, root.ToString().Replace("\r", ""));
+
+            devDependencies["@serenity-is/tsbuild"] = tsbuildVer;
 
             foreach (var property in dependencies.Properties().ToList())
             {
                 if (!property.Name.StartsWith("@serenity-is/") ||
-                     (property.Value.Value<string>()?.StartsWith("file:") != true &&
-                      property.Value.Value<string>()?.StartsWith("../") != true &&
-                      property.Value.Value<string>()?.StartsWith("workspace:") != true))
+                    !isFileWorkspaceOrUp(property.Value.Value<string>()))
                     continue;
 
                 dependencies[property.Name] = "./node_modules/.dotnet/" + GetPossibleNuGetPackageId(property.Name);
