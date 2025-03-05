@@ -1,3 +1,20 @@
+## 8.8.4 (2025-03-05)
+
+### Features
+
+- Add ability to intercept some SQL operations done through SqlHelper and EntityConnectionExtensions by implementing ISqlOperationInterceptor and/or IRowOperationInterceptor in the mock connection class.
+- Switched to vitest from jest for javascript tests
+- Try to avoid issue when StringField reads value via Newtonsoft.Json and a DateTime token is received
+- Updated nuget/npm packages
+- New writeIfChanged option in tsbuild to accelerate builds in VS
+- Also allow DefaultHandler(false) to skip a handler when multiple handlers for a type is found
+- AuthorizeRetrieveAttribute that may be used for endpoint Retrieve methods
+- Go back to StackExchange.Exceptional from our temporary fork (Serenity.Exceptional.AspNetCore) as in 3.0.1 version they also switched to Microsoft.Data.SqlClient
+
+
+### Bugfixes
+- Fix PasswordStrengthValidator not correctly validating MembershipSettings.RequireDigit rule (#7306)
+
 ## 8.8.3 (2024-12-15)
 
 ### Bugfixes
