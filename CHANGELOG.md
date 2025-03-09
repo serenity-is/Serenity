@@ -1,3 +1,13 @@
+## 8.8.5 (2025-03-09)
+
+### Features
+
+- Update SixLabors.ImageSharp 2.1.10
+
+### Bugfixes
+
+- Fix quoting of UPPER field expression for case sensitive like dialects
+
 ## 8.8.4 (2025-03-05)
 
 ### Features
