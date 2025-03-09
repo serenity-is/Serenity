@@ -2,7 +2,7 @@
 
 ### Features
 
-- Update SixLabors.ImageSharp 2.1.10
+- Update SixLabors.ImageSharp to 2.1.10
 
 ### Bugfixes
 
