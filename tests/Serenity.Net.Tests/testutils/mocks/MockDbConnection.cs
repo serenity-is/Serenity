@@ -2,7 +2,7 @@ using System.Data.Common;
 
 namespace Serenity.TestUtils;
 
-public class MockDbConnection : IDbConnection, IRowOperationInterceptor, ISqlOperationInterceptor
+public class MockDbConnection : IDbConnection, IRowOperationInterceptor, ISqlOperationInterceptor, IHasDialect
 {
     public virtual string ConnectionString { get; set; }
     public virtual int ConnectionTimeout { get; set; }
@@ -199,6 +199,8 @@ public class MockDbConnection : IDbConnection, IRowOperationInterceptor, ISqlOpe
         ExecuteNonQueryCalls.Count + ExecuteReaderCalls.Count + ExecuteScalarCalls.Count;
 
     public int AllCallCount => DbCommandCallCount + InterceptedCallCount;
+
+    public ISqlDialect Dialect { get; set; }
 }
 
 public record InterceptFindRowArgs(Type Type, OptionalValue<object> Id, ICriteria Where, Action<SqlQuery> EditQuery, bool GetFirst);

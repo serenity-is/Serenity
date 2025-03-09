@@ -137,8 +137,9 @@ public class CriteriaFieldExpressionReplacer(IRow row, IPermissionService permis
         return value != null;
     }
 
-    private bool ShouldHandleLikeCriteria(BinaryCriteria criteria)
+    private bool ShouldHandleLikeCriteria(BinaryCriteria criteria, out Field field)
     {
+        field = null;
         return Dialect.IsLikeCaseSensitive &&
             criteria is not null &&
             (criteria.Operator == CriteriaOperator.Like ||
@@ -146,15 +147,15 @@ public class CriteriaFieldExpressionReplacer(IRow row, IPermissionService permis
              criteria.RightOperand is ValueCriteria right &&
              right.Value is string &&
              criteria.LeftOperand is Criteria left &&
-             FindField(left.Expression) is StringField;
+             ((field = FindField(left.Expression)) is StringField);
     }
 
     /// <inheritdoc/>
     protected override BaseCriteria VisitBinary(BinaryCriteria criteria)
     {
-        if (ShouldHandleLikeCriteria(criteria))
+        if (ShouldHandleLikeCriteria(criteria, out Field fieldToUpper))
         {
-            return new BinaryCriteria(new UpperFunctionCriteria(criteria.LeftOperand), 
+            return new BinaryCriteria(new UpperFunctionCriteria(ToCriteria(fieldToUpper)), 
                 criteria.Operator, new UpperFunctionCriteria(criteria.RightOperand));
         }
 
