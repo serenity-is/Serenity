@@ -1,17 +1,14 @@
 namespace Serenity.TestUtils;
 
-public class MockListHandler<TRow> : IListRequestProcessor, IRequestType<ListRequest>
+public class MockListHandler<TRow>(Action<MockListHandler<TRow>> onProcess) 
+    : IListRequestProcessor, IRequestType<ListRequest>
     where TRow: IRow, new()
 {
-    private readonly Action<MockListHandler<TRow>> onProcess;
+    private readonly Action<MockListHandler<TRow>> onProcess = onProcess ?? throw new ArgumentNullException(nameof(onProcess));
 
     public MockListHandler()
+        : this(_ => { })
     {
-    }
-
-    public MockListHandler(Action<MockListHandler<TRow>> onProcess)
-    {
-        this.onProcess = onProcess ?? throw new ArgumentNullException(nameof(onProcess));
     }
 
     public TRow Row { get; set; } = new TRow();
