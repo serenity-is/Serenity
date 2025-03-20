@@ -1,4 +1,4 @@
-﻿namespace Serenity.Services;
+namespace Serenity.Services;
 
 /// <summary>
 /// Behavior that handles <see cref="UpdatableExtensionAttribute"/>
@@ -224,8 +224,9 @@ public class UpdatableExtensionBehavior(IDefaultHandlerFactory handlerFactory) :
             if (!mappings.Any())
                 continue;
 
-            handler.StateBag["UpdatableExtensionBehavior_Assignments_" + info.Attr.Alias] =
-                mappings;
+            handler.StateBag["UpdatableExtensionBehavior_Assignments_" + info.Attr.Alias] = mappings;
+
+            HandleSave(handler, info, beforeSave: true);
         }
     }
 
@@ -274,8 +275,7 @@ public class UpdatableExtensionBehavior(IDefaultHandlerFactory handlerFactory) :
             else
             {
                 var newRow = row.CreateNew();
-                info.PresenceField.AsObject(newRow, info.PresenceField.ConvertValue(
-                    info.PresenceValue, CultureInfo.InvariantCulture));
+                info.PresenceField.AsInvariant(newRow, info.PresenceValue);
                 if (info.PresenceField.IndexCompare(row, newRow) != 0)
                     return false;
             }
@@ -284,44 +284,76 @@ public class UpdatableExtensionBehavior(IDefaultHandlerFactory handlerFactory) :
         return true;
     }
 
+    private void HandleSave(ISaveRequestHandler handler, RelationInfo info, bool beforeSave)
+    {
+        if (beforeSave && ReferenceEquals(info.ThisKeyField, handler.Row.IdField))
+        {
+            // need to handle this after save, as we need the main row's identity
+            // even if the main row has no auto increment identity, if the extension row
+            // has a fk to the main row, we still need to wait
+            return;
+        }
+
+        string stateKey = "UpdatableExtensionBehavior_Assignments_" + info.Attr.Alias;
+        if (!handler.StateBag.TryGetValue(stateKey, out object mappingsObj))
+            return;
+
+        var mappings = (IEnumerable<Tuple<Field, Field>>)mappingsObj;
+        if (mappings == null || !mappings.Any())
+            return;
+
+        var thisKey = info.ThisKeyField.AsObject(handler.Row);
+        if (!beforeSave && thisKey is null)
+            return;
+
+        object oldID = thisKey == null ? null : GetExistingID(handler.Connection, info, thisKey);
+        if (oldID == null && !CheckPresenceValue(info, handler.Row))
+        {
+            // don't check presence again in after save
+            handler.StateBag.Remove(stateKey);
+            return;
+        }
+
+        var extension = info.RowFactory();
+
+        if (oldID != null)
+            ((IIdRow)extension).IdField.AsInvariant(extension, oldID);
+
+        info.OtherKeyField.AsInvariant(extension, thisKey);
+        info.FilterField?.AsInvariant(extension, info.FilterValue);
+
+        var saveHandler = handlerFactory.CreateHandler<ISaveRequestProcessor>(info.Attr.RowType);
+        var request = saveHandler.CreateRequest();
+        request.Entity = extension;
+        request.EntityId = oldID;
+
+        foreach (var mapping in mappings)
+            mapping.Item2.AsInvariant(extension, mapping.Item1.AsObject(handler.Row));
+
+        var response = saveHandler.Process(handler.UnitOfWork,
+            request, oldID == null ? SaveRequestType.Create : SaveRequestType.Update);
+
+        if (oldID == null &&
+            thisKey == null &&
+            response.EntityId != null &&
+            !ReferenceEquals(info.ThisKeyField, handler.Row.IdField))
+        {
+            info.ThisKeyField.AsInvariant(handler.Row, response.EntityId);
+        }
+
+        if (beforeSave)
+        {
+            // don't try again in after save
+            handler.StateBag.Remove(stateKey);
+        }
+    }
+
     /// <inheritdoc/>
     public override void OnAfterSave(ISaveRequestHandler handler)
     {
         foreach (var info in infoList)
         {
-            if (!handler.StateBag.TryGetValue("UpdatableExtensionBehavior_Assignments_" + info.Attr.Alias, out object mappingsObj))
-                continue;
-
-            var mappings = (IEnumerable<Tuple<Field, Field>>)mappingsObj;
-            if (mappings == null || !mappings.Any())
-                continue;
-
-            var thisKey = info.ThisKeyField.AsObject(handler.Row);
-            if (thisKey is null)
-                continue;
-
-            object oldID = GetExistingID(handler.Connection, info, thisKey);
-            if (oldID == null && !CheckPresenceValue(info, handler.Row))
-                continue;
-
-            var extension = info.RowFactory();
-
-            if (oldID != null)
-                ((IIdRow)extension).IdField.AsObject(extension, oldID);
-
-            info.OtherKeyField.AsObject(extension, thisKey);
-            info.FilterField?.AsObject(extension, info.FilterValue);
-
-            var saveHandler = handlerFactory.CreateHandler<ISaveRequestProcessor>(info.Attr.RowType);
-            var request = saveHandler.CreateRequest();
-            request.Entity = extension;
-            request.EntityId = oldID;
-
-            foreach (var mapping in mappings)
-                mapping.Item2.AsObject(extension, mapping.Item1.AsObject(handler.Row));
-
-            saveHandler.Process(handler.UnitOfWork, 
-                request, oldID == null ? SaveRequestType.Create : SaveRequestType.Update);
+            HandleSave(handler, info, beforeSave: false);
         }
     }
 
