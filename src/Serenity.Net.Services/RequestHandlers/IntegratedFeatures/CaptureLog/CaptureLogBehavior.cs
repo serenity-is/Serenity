@@ -1,4 +1,4 @@
-﻿namespace Serenity.Services;
+namespace Serenity.Services;
 
 /// <summary>
 /// Capture log behavior
@@ -136,8 +136,7 @@ public class CaptureLogBehavior : BaseSaveDeleteBehavior, IImplicitBehavior, IUn
         var mappedIdField = logRow.FindField(mappedIdFieldName) ?? throw new InvalidOperationException($"Can't locate capture log table " +
                 $"mapped ID field for {logRow.Table}!");
         logRow.TrackAssignments = true;
-        logRow.ChangingUserIdField.AsObject(logRow, userId == null ? null :
-        logRow.ChangingUserIdField.ConvertValue(userId, CultureInfo.InvariantCulture));
+        logRow.ChangingUserIdField.AsInvariant(logRow, userId);
 
         var operationType = old == null ? CaptureOperationType.Insert :
             (row == null ? CaptureOperationType.Delete : CaptureOperationType.Before);
@@ -205,8 +204,7 @@ public class CaptureLogBehavior : BaseSaveDeleteBehavior, IImplicitBehavior, IUn
         {
             logRow = (ICaptureLogRow)logRow.CreateNew();
             logRow.TrackAssignments = true;
-            logRow.ChangingUserIdField.AsObject(logRow, userId == null ? null :
-                logRow.ChangingUserIdField.ConvertValue(userId, Invariants.NumberFormat));
+            logRow.ChangingUserIdField.AsInvariant(logRow, userId);
             logRow.OperationTypeField[logRow] = CaptureOperationType.Update;
             logRow.ValidFromField[logRow] = now;
             logRow.ValidUntilField[logRow] = CaptureLogConsts.UntilMax;

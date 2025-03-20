@@ -1,4 +1,4 @@
-﻿namespace Serenity.Services;
+namespace Serenity.Services;
 
 /// <summary>
 /// Behavior class that handles assignment of relevant fields 
@@ -27,7 +27,7 @@ public class UpdateInsertLogBehavior : BaseSaveBehavior, IImplicitBehavior
                 updateLogRow.UpdateDateField.DateTimeKind);
 
             field = updateLogRow.UpdateUserIdField;
-            field.AsObject(row, field.ConvertValue(userId, CultureInfo.InvariantCulture));
+            field.AsInvariant(row, userId);
         }
         else if (insertLogRow != null && handler.IsCreate)
         {
@@ -35,7 +35,7 @@ public class UpdateInsertLogBehavior : BaseSaveBehavior, IImplicitBehavior
                 insertLogRow.InsertDateField.DateTimeKind);
 
             field = insertLogRow.InsertUserIdField;
-            field.AsObject(row, field.ConvertValue(userId, CultureInfo.InvariantCulture));
+            field.AsInvariant(row, userId);
         }
     }
 }

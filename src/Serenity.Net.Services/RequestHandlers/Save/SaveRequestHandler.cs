@@ -1,4 +1,4 @@
-﻿namespace Serenity.Services;
+namespace Serenity.Services;
 
 /// <summary>
 /// Generic base class for save request handlers
@@ -137,7 +137,7 @@ public class SaveRequestHandler<TRow, TSaveRequest, TSaveResponse> : ISaveReques
                 {
                     var entityId = Connection.InsertAndGetID(Row);
                     Response.EntityId = entityId;
-                    Row.IdField.AsObject(Row, Row.IdField.ConvertValue(entityId, CultureInfo.InvariantCulture));
+                    Row.IdField.AsInvariant(Row, entityId);
                 });
             }
             else
@@ -395,7 +395,7 @@ public class SaveRequestHandler<TRow, TSaveRequest, TSaveResponse> : ISaveReques
         if (field.DefaultValue == null)
             return;
 
-        field.AsObject(Row, field.ConvertValue(field.DefaultValue, CultureInfo.InvariantCulture));
+        field.AsInvariant(Row, field.DefaultValue);
     }
 
     /// <summary>

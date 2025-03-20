@@ -271,7 +271,7 @@ public class LinkingSetRelationBehavior(IDefaultHandlerFactory handlerFactory) :
     {
         var detail = rowFactory();
         thisKeyField.AsObject(detail, masterId);
-        itemKeyField.AsObject(detail, itemKeyField.ConvertValue(itemKey, CultureInfo.InvariantCulture));
+        itemKeyField.AsInvariant(detail, itemKey);
         filterField?.AsObject(detail, filterValue);
 
         var saveHandler = handlerFactory.CreateHandler<ISaveRequestProcessor>(rowType);

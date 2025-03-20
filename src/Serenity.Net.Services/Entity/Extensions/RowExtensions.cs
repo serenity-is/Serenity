@@ -1,4 +1,4 @@
-﻿namespace Serenity.Data;
+namespace Serenity.Data;
 
 /// <summary>
 /// Contains extensions for row objects
@@ -37,7 +37,7 @@ public static class RowExtensions
 
             var value = field.DefaultValue;
             if (value != null)
-                field.AsObject(row, field.ConvertValue(value, CultureInfo.InvariantCulture));
+                field.AsInvariant(row, value);
         }
 
         return row;

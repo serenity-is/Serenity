@@ -592,6 +592,16 @@ public abstract partial class Field : IFieldWithJoinInfo
     public abstract object ConvertValue(object source, IFormatProvider provider);
 
     /// <summary>
+    /// Sets the value of this field in specified row as object using ConvertValue with InvariantCulture.
+    /// </summary>
+    /// <param name="row">The row.</param>
+    /// <param name="value">The value to convert and set.</param>
+    public void AsInvariant(IRow row, object value)
+    {
+        AsObject(row, ConvertValue(value, CultureInfo.InvariantCulture));
+    }
+
+    /// <summary>
     /// Compares the field values for two rows for an ascending index sort
     /// </summary>
     /// <param name="row1">The row1.</param>

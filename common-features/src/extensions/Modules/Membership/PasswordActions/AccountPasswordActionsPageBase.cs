@@ -105,7 +105,7 @@ public abstract class AccountPasswordActionsPageBase<TUserRow> : MembershipPageB
 #endif
 
             var row = new TUserRow();
-            row.IdField.AsObject(row, row.IdField.ConvertValue(userId, CultureInfo.InvariantCulture));
+            row.IdField.AsInvariant(row, userId);
             if (row is IUpdateLogRow updateLogRow)
                 updateLogRow.UpdateDateField[row] = DateTime.UtcNow;
             row.PasswordHashField[row] = hash;
