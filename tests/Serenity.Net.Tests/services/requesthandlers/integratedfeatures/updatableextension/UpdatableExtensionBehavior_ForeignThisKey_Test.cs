@@ -3,13 +3,8 @@ namespace Serenity.Services;
 public partial class UpdatableExtensionBehavior_ForeignThisKey_Test
 {
     [Fact]
-    public void ForeignKeyField_CanBeUsedAs_ThisKey()
+    public void ForeignKeyField_CanBeUsedAs_ThisKey_WithManualIdAssigned()
     {
-        var context = new MockRequestContext()
-        {
-            Behaviors = new NullBehaviorProvider(),
-            Permissions = new NullPermissions()
-        };
         bool saveDetailCalled = false;
         var handlerFactory = new MockHandlerFactory((rowType, intfType) =>
         {
@@ -51,6 +46,43 @@ public partial class UpdatableExtensionBehavior_ForeignThisKey_Test
         behavior.OnBeforeSave(handler);
         behavior.OnAfterSave(handler);
         Assert.True(saveDetailCalled);
+    }
+
+    [Fact]
+    public void ForeignKeyField_CanBeUsedAs_ThisKey_WithoutDetailId()
+    {
+        bool saveDetailCalled = false;
+        var handlerFactory = new MockHandlerFactory((rowType, intfType) =>
+        {
+            Assert.Equal(typeof(DetailRow), rowType);
+            Assert.Equal(typeof(ISaveRequestProcessor), intfType);
+            return new MockSaveHandler<DetailRow>(x =>
+            {
+                Assert.Equal(SaveRequestType.Create, x.RequestType);
+                Assert.Null(x.Request?.EntityId);
+                var detail = Assert.IsType<DetailRow>(x.Request.Entity);
+                Assert.Null(detail.Id);
+                Assert.Equal("TestDetail", detail.Text);
+                saveDetailCalled = true;
+                x.Response.EntityId = 1357;
+            });
+        });
+        var row = new MainRow()
+        {
+            DetailText = "TestDetail"
+        };
+        var connection = new MockDbConnection();
+        var handler = new MockSaveHandler<MainRow>()
+        {
+            Connection = connection,
+            Row = row
+        };
+        var behavior = new UpdatableExtensionBehavior(handlerFactory);
+        Assert.True(behavior.ActivateFor(row));
+        behavior.OnBeforeSave(handler);
+        behavior.OnAfterSave(handler);
+        Assert.True(saveDetailCalled);
+        Assert.Equal(1357, row.DetailId);
     }
 
     [TableName("Mains")]
