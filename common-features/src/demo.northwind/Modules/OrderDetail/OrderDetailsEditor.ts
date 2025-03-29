@@ -38,7 +38,7 @@ export class OrderDetailsEditor<P = {}> extends GridEditorBase<OrderDetailRow, P
         };
     }
 
-    private _orderId: number;
+    declare private _orderId: number;
     
     public get orderId() { 
         return this._orderId; 
