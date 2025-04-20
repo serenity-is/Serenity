@@ -63,6 +63,7 @@ public partial class ServerTypingsGenerator : TypingsGeneratorBase
 
         if (isSystem &&
             name == "DateTime" ||
+            name == "DateOnly" ||
             name == "TimeSpan" ||
             name == "DateTimeOffset" ||
             name == "Guid")

@@ -48,7 +48,9 @@ public class JsonServiceClient(string baseUrl)
     protected TResponse InternalPost<TResponse>(string relativeUrl, object request)
         where TResponse : new()
     {
+#pragma warning disable SYSLIB0014 // Type or member is obsolete
         HttpWebRequest wr = (HttpWebRequest)WebRequest.Create(UriHelper.Combine(BaseUrl, relativeUrl));
+#pragma warning restore SYSLIB0014 // Type or member is obsolete
         wr.Method = "POST";
         var r = JSON.Stringify(request, writeNulls: true);
         wr.ContentType = "application/json";

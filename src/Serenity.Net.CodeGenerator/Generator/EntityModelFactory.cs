@@ -32,7 +32,7 @@ public class EntityModelFactory : IEntityModelFactory
         return ft switch
         {
             "Boolean" => "boolean",
-            "String" or "DateTime" or "TimeSpan" or "Guid" => "string",
+            "String" or "DateTime" or "DateOnly" or "TimeSpan" or "Guid" => "string",
             "Int32" or "Int16" or "Int64" or "Single" or "Double" or "Decimal" => "number",
             "Stream" or "ByteArray" => "number[]",
             _ => "any",

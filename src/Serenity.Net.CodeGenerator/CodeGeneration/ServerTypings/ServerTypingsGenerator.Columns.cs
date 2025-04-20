@@ -128,7 +128,8 @@ public partial class ServerTypingsGenerator : TypingsGeneratorBase
 
         if (valueType.NamespaceOf() == "System")
         {
-            if (valueType.Name == "DateTime")
+            if (valueType.Name == "DateTime" ||
+                valueType.Name == "DateOnly")
                 return "Date";
 
             if (valueType.Name == "Boolean")

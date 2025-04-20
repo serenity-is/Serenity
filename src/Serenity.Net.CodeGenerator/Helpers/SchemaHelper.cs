@@ -1,4 +1,4 @@
-﻿using Serenity.Data.Schema;
+using Serenity.Data.Schema;
 
 namespace Serenity.CodeGenerator;
 
@@ -23,7 +23,7 @@ public class SchemaHelper
             { "char", "String" },
             { "character varying", "String" },
             { "character", "String" },
-            { "date", "DateTime" },
+            { "date", "DateOnly" },
             { "datetime", "DateTime" },
             { "datetime2", "DateTime" },
             { "datetimeoffset", "DateTimeOffset" },

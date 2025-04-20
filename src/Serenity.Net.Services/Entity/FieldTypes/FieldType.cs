@@ -1,4 +1,4 @@
-﻿namespace Serenity.Data;
+namespace Serenity.Data;
 
 /// <summary>
 /// Enumeration of field types
@@ -56,5 +56,9 @@ public enum FieldType
     /// <summary>
     /// Other types (Object)
     /// </summary>
-    Object
+    Object,
+    /// <summary>
+    /// DateOnly
+    /// </summary>
+    DateOnly
 }

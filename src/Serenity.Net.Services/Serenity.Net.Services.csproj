@@ -1,6 +1,7 @@
 <Project Sdk="Microsoft.NET.Sdk">
   <PropertyGroup>
     <AssemblyName>Serenity.Net.Services</AssemblyName>
+    <TargetFramework>net8.0</TargetFramework>
     <Title>Serenity Platform - Services Library</Title>
     <Description>Contains classes for CRUD service / repository implementations...</Description>
   </PropertyGroup>

@@ -1,4 +1,4 @@
-﻿namespace Serenity.PropertyGrid;
+namespace Serenity.PropertyGrid;
 
 public partial class BasicPropertyProcessor : PropertyProcessor
 {
@@ -45,6 +45,7 @@ public partial class BasicPropertyProcessor : PropertyProcessor
             case FieldType.Boolean:
                 return 40;
             case FieldType.DateTime:
+            case FieldType.DateOnly:
                 return 85;
             case FieldType.Time:
                 return 70;

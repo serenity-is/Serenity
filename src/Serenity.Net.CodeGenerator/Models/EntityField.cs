@@ -35,7 +35,7 @@ public class EntityField
             {
                 "Int32" or "Int16" or "Int64" => "IntegerEditor",
                 "Single" or "Double" or "Decimal" => "DecimalEditor",
-                "DateTime" => "DateEditor",
+                "DateOnly" or "DateTime" => "DateEditor",
                 "Boolean" => "BooleanEditor",
                 _ => "StringEditor",
             };
