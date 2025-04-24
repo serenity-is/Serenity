@@ -44,6 +44,17 @@ public class ValidationError : Exception, IIsSensitiveMessage
     /// <summary>
     /// Initializes a new instance of the <see cref="ValidationError"/> class.
     /// </summary>
+    /// <param name="localizer">Text localizer</param>
+    /// <param name="errorCode">The error code.</param>
+    /// <param name="errorMessage">The error message.</param>
+    public ValidationError(ITextLocalizer localizer, string errorCode, LocalText errorMessage)
+        : this(errorCode, null, errorMessage.ToString(localizer))
+    {
+    }
+
+    /// <summary>
+    /// Initializes a new instance of the <see cref="ValidationError"/> class.
+    /// </summary>
     /// <param name="errorCode">The error code.</param>
     /// <param name="arguments">The arguments.</param>
     /// <param name="errorMessage">The error message.</param>
@@ -51,6 +62,18 @@ public class ValidationError : Exception, IIsSensitiveMessage
     {
         ErrorCode = errorCode;
         Arguments = arguments;
+    }
+
+    /// <summary>
+    /// Initializes a new instance of the <see cref="ValidationError"/> class.
+    /// </summary>
+    /// <param name="localizer">Text localizer</param>
+    /// <param name="errorCode">The error code.</param>
+    /// <param name="arguments">The arguments.</param>
+    /// <param name="errorMessage">The error message.</param>
+    public ValidationError(ITextLocalizer localizer, string errorCode, string? arguments, LocalText errorMessage)
+        : this(errorCode, arguments, errorMessage.ToString(localizer))
+    {
     }
 
     /// <summary>

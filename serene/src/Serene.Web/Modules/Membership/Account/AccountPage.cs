@@ -59,14 +59,14 @@ public partial class AccountPage(ITwoLevelCache cache, ITextLocalizer localizer)
 
             if (result == PasswordValidationResult.InactiveUser)
             {
-                throw new ValidationError("InactivatedAccount", MembershipValidationTexts.AuthenticationError.ToString(Localizer));
+                throw new ValidationError(Localizer, "InactivatedAccount", MembershipValidationTexts.AuthenticationError);
             }
 
-            throw new ValidationError("AuthenticationError", MembershipValidationTexts.AuthenticationError.ToString(Localizer));
+            throw new ValidationError(Localizer, "AuthenticationError", MembershipValidationTexts.AuthenticationError);
         });
     }
 
-    private ActionResult Error(string message)
+    private ViewResult Error(string message)
     {
         return View(MVC.Views.Errors.ValidationError, new ValidationError(message));
     }
