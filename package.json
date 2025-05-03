@@ -1,15 +1,15 @@
 {
   "name": "@serenity-is/workspace-serenity",
   "devDependencies": {
-    "@vitest/browser": "3.1.1",
-    "@vitest/coverage-v8": "3.1.1",
-    "esbuild": "0.25.2",
+    "@vitest/browser": "3.1.2",
+    "@vitest/coverage-v8": "3.1.2",
+    "esbuild": "0.25.3",
     "flatpickr": "4.6.13",
     "jsx-dom": "8.1.6",
     "jsdom": "26.1.0",
-    "playwright": "1.51.1",
+    "playwright": "1.52.0",
     "typescript": "5.8.3",
-    "vitest": "3.1.1"
+    "vitest": "3.1.2"
   },
   "optionalDependencies": {
     "fsevents": "2.3.3"
