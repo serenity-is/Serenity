@@ -8,4 +8,9 @@ namespace Serenity.ComponentModel;
 [AttributeUsage(AttributeTargets.Class, AllowMultiple = false)]
 public class GenerateInterfaceAttribute : Attribute
 {
+    /// <summary>
+    /// Set of features that will be added via RequiresFeature attribute to the interface
+    /// </summary>
+    public object[]? RequiresFeature { get; set; }
+
 }
