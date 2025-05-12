@@ -14,7 +14,7 @@ public class SchemaHelper
         return (ISchemaProvider)Activator.CreateInstance(providerType);
     }
 
-    private static readonly Dictionary<string, string> SqlTypeToFieldTypeMap = 
+    private static readonly Dictionary<string, string> SqlTypeToFieldTypeMap =
         new(StringComparer.OrdinalIgnoreCase)
         {
             { "bigint", "Int64" },
@@ -58,7 +58,26 @@ public class SchemaHelper
             { "uniqueidentifier", "Guid" },
             { "varbinary", "Stream" },
             { "varchar", "String" },
-            { "varchar2", "String" }
+            { "varchar2", "String" },
+            // Oracle-specific mappings
+            { "bfile", "Stream" },
+            { "blob", "Stream" },
+            { "clob", "String" },
+            { "nclob", "String" },
+            { "long", "String" },
+            { "raw", "ByteArray" },
+            { "long raw", "ByteArray" },
+            { "rowid", "String" },
+            { "urowid", "String" },
+            { "xmltype", "String" },
+            { "number", "Decimal" },
+            { "binary_float", "Single" },
+            { "binary_double", "Double" },
+            { "interval year to month", "TimeSpan" },
+            { "interval day to second", "TimeSpan" },
+            { "timestamp", "DateTime" },
+            { "timestamp with time zone", "DateTimeOffset" },
+            { "timestamp with local time zone", "DateTime" }
         };
 
     public static string SqlTypeNameToFieldType(string sqlTypeName, int size, out string dataType)
