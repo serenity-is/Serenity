@@ -3,7 +3,7 @@ Serenity Application Platform
 
 <img src="https://github.com/serenity-is/Serenity/blob/master/build/assets/package-icon.png" />
 
-[![build](https://github.com/serenity-is/Serenity/actions/workflows/test.yml/badge.svg)](https://github.com/serenity-is/Serenity/actions/workflows/test.yml)  [![version](https://img.shields.io/nuget/v/Serenity.Net.Core.svg?label=version)](http://www.nuget.org/packages/Serenity.Net.Core/)
+[![build](https://github.com/serenity-is/Serenity/actions/workflows/test.yml/badge.svg)](https://github.com/serenity-is/Serenity/actions/workflows/test.yml)  [![version](https://img.shields.io/nuget/v/Serenity.Net.Core.svg?label=version)](http://www.nuget.org/packages/Serenity.Net.Core/) [![Ask DeepWiki](https://deepwiki.com/badge.svg)](https://deepwiki.com/serenity-is/Serenity)
 
 ## What is the Serenity Platform
 
