@@ -1,3 +1,4 @@
+using System.Collections;
 using System.Data.Common;
 
 namespace Serenity.TestUtils;
@@ -107,9 +108,9 @@ public class MockDbConnection : IDbConnection, IRowOperationInterceptor, ISqlOpe
         return interceptFindRow?.Invoke(args) ?? default;
     }
 
-    protected Func<InterceptListRowsArgs, OptionalValue<IList<IRow>>> interceptListRows;
+    protected Func<InterceptListRowsArgs, OptionalValue<IList>> interceptListRows;
 
-    public MockDbConnection InterceptListRows(Func<InterceptListRowsArgs, OptionalValue<IList<IRow>>> callback)
+    public MockDbConnection InterceptListRows(Func<InterceptListRowsArgs, OptionalValue<IList>> callback)
     {
         this.interceptListRows = callback;
         return this;
@@ -117,7 +118,7 @@ public class MockDbConnection : IDbConnection, IRowOperationInterceptor, ISqlOpe
 
     public readonly List<InterceptListRowsArgs> ListRowsCalls = [];
 
-    public OptionalValue<IList<IRow>> ListRows(Type rowType, ICriteria where, Action<SqlQuery> editQuery, bool countOnly)
+    public OptionalValue<IList> ListRows(Type rowType, ICriteria where, Action<SqlQuery> editQuery, bool countOnly)
     {
         var args = new InterceptListRowsArgs(rowType, where, editQuery, countOnly);
         ListRowsCalls.Add(args);
