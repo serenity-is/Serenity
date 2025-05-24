@@ -4,6 +4,7 @@ namespace Serene.Administration;
 [DisplayName("UserRoles"), InstanceName("UserRoles")]
 [ReadPermission(PermissionKeys.Security)]
 [ModifyPermission(PermissionKeys.Security)]
+[TwoLevelCached(typeof(UserPermissionRow))]
 public sealed class UserRoleRow : Row<UserRoleRow.RowFields>, IIdRow, IUserRoleRow
 {
     const string jRole = nameof(jRole);
