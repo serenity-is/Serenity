@@ -1,4 +1,4 @@
-﻿using Microsoft.AspNetCore.Http;
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Http.Extensions;
 using Serene.Administration;
 
@@ -59,6 +59,11 @@ public class NavigationModelFactory(
     private void CalcActivePath(NavigationModel model)
     {
         var currentUrl = httpContextAccessor.HttpContext?.Request.GetEncodedPathAndQuery();
+        if (currentUrl == null)
+        {
+            model.ActiveItem = null;
+            return;
+        }
 
         string bestMatch = null;
         int bestMatchLength = 0;
