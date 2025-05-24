@@ -1,4 +1,4 @@
-﻿namespace Serenity.TestUtils;
+namespace Serenity.TestUtils;
 
 public class MockTypeSource : ITypeSource
 {
@@ -15,6 +15,12 @@ public class MockTypeSource : ITypeSource
     {
         this.attributes = attributes ?? throw new ArgumentNullException(nameof(attributes));
         types = [];
+    }
+
+    public MockTypeSource(Type[] types, Attribute[] attributes)
+    {
+        this.types = types ?? throw new ArgumentNullException(nameof(types));
+        this.attributes = attributes ?? throw new ArgumentNullException(nameof(attributes));
     }
 
     public IEnumerable<Attribute> GetAssemblyAttributes(Type attributeType)
