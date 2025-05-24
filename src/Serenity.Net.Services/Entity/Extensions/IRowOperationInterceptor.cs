@@ -1,3 +1,5 @@
+using System.Collections;
+
 namespace Serenity.Data;
 
 /// <summary>
@@ -25,7 +27,7 @@ public interface IRowOperationInterceptor
     /// <param name="where">The where criteria.</param>
     /// <param name="editQuery">The edit query callback.</param>
     /// <param name="countOnly">True if intercepting Count method.</param>
-    OptionalValue<IList<IRow>> ListRows(Type rowType, ICriteria where, Action<SqlQuery> editQuery, bool countOnly);
+    OptionalValue<IList> ListRows(Type rowType, ICriteria where, Action<SqlQuery> editQuery, bool countOnly);
 
     /// <summary>
     /// Intercepts EntityConnectionExtensions.DeleteById method.

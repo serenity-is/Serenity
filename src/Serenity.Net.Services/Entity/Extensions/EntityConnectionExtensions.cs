@@ -297,7 +297,7 @@ public static class EntityConnectionExtensions
     {
         if (connection is IRowOperationInterceptor interceptor &&
             interceptor.ListRows(typeof(TRow), where, editQuery: null, countOnly: true) is { HasValue: true } intres)
-            return intres.Value?.Count() ?? 0;
+            return intres.Value?.Count ?? 0;
 
         var row = new TRow() { TrackWithChecks = true };
 
