@@ -2,7 +2,7 @@
   <Import Project="$(MSBuildThisFileDirectory)..\build\Package.Build.props" Condition="Exists('$(MSBuildThisFileDirectory)\..\build\Package.Build.props')" />
   <Import Project="$(MSBuildThisFileDirectory)..\build\Feature.Build.props" />
   <PropertyGroup>
-    <SerenityVersion Condition="'$(SerenityVersion)' == ''">8.8.5</SerenityVersion>
+    <SerenityVersion Condition="'$(SerenityVersion)' == ''">8.8.6</SerenityVersion>
     <SergenTransform>all</SergenTransform>
     <TargetFramework>net8.0</TargetFramework>
     <DotnetToolManifestFile>$(MSBuildProjectDirectory)\..\.config\dotnet-tools.json</DotnetToolManifestFile>
