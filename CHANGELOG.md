@@ -1,3 +1,15 @@
+## 8.8.6 (2025-05-31)
+
+### Features
+- A new Interface source generator that may automatically generate relevant service handler interfaces for handler types with `[GenerateInterface]` attribute.
+- Update esbuild to 0.25.5. Warning! Please set `"experimentalDecorators": true` in your tsconfig.json as esbuild has an unresolved bug with decorators and initializers (https://github.com/evanw/esbuild/pull/4092). You may have script errors otherwise!
+- Introduced experimental DateOnlyField type. This required changing target framework of Serenity.Net.Services to net8 (was netstandard2.1).
+- Add Oracle-specific SQL type mappings to SqlTypeToFieldTypeMap (#7363)
+- Add support for partial properties for row fields source generator (requires NET9+)
+
+### Bugfixes
+- Also invalidate UserRole / UserPermission cache group when saving user as LinkingSetRelation might be updating roles 
+
 ## 8.8.5 (2025-03-09)
 
 ### Features

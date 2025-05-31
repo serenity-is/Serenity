@@ -12,7 +12,8 @@ public partial class DoctorCommand(IProjectFileInfo project, IGeneratorConsole c
     static readonly (Version, Version)[] RecommendedTSBuildVersion = [
         (new(0, 0, 0), new(8, 6, 0)),
         (new(8, 7, 1), new(8, 7, 4)),
-        (new(8, 8, 4), new(8, 8, 4))
+        (new(8, 8, 4), new(8, 8, 4)),
+        (new(8, 8, 6), new(8, 8, 6))
     ];
 
     static readonly (Version, Version)[] RecommendedJsxDomVersion = [
