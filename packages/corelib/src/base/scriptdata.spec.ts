@@ -1,5 +1,5 @@
 import { Lookup } from "./lookup";
-import { fetchScriptData, getScriptData, getScriptDataHash, peekScriptData } from "./scriptdata";
+import { fetchScriptData, getScriptData, getScriptDataHash, peekScriptData, scriptDataHooks } from "./scriptdata";
 import { scriptDataHashSymbol, scriptDataSymbol } from "./symbols";
 import { getGlobalObject } from "./system";
 
@@ -254,6 +254,61 @@ describe("fetchScriptData", () => {
         finally {
             window["fetch"] = orgFetch;
         }
+    });
+
+    it("uses scriptDataHooks.fetchScriptData hook if defined (sync, non-lookup)", async () => {
+        const testData = { foo: "bar" };
+        const originalHook = scriptDataHooks?.fetchScriptData;
+        scriptDataHooks.fetchScriptData = (name: string) => {
+            expect(name).toBe("RemoteData.Test");
+            return testData as any;
+        }
+        let data = await fetchScriptData("RemoteData.Test");
+        expect(data).toBe(testData);
+        scriptDataHooks.fetchScriptData = originalHook;
+    });
+    
+    it("uses scriptDataHooks.fetchScriptData hook if defined (async, non-lookup)", async () => {
+        const testData = { foo: "baz" };
+        const originalHook = scriptDataHooks.fetchScriptData;
+        scriptDataHooks.fetchScriptData = async (name: string) => {
+            expect(name).toBe("RemoteData.Test");
+            return Promise.resolve(testData) as any;
+        };
+        let data = await fetchScriptData("RemoteData.Test");
+        expect(data).toBe(testData);
+        scriptDataHooks.fetchScriptData = originalHook;
+    });
+
+    it("uses scriptDataHooks.fetchScriptData hook and converts to Lookup if name starts with Lookup.", async () => {
+        const testLookup = { Params: { idField: "id", textField: "txt" }, Items: [{ id: 1, txt: "A" }] };
+        const originalHook = (globalThis as any).scriptDataHooks?.fetchScriptData;
+        scriptDataHooks.fetchScriptData = (name: string) => {
+            expect(name).toBe("Lookup.Test");
+            return testLookup as any;
+        };
+
+        let data: any = await fetchScriptData("Lookup.Test");
+        expect(data).toBeInstanceOf(Lookup);
+        expect(data.items).toEqual([{ id: 1, txt: "A" }]);
+        expect(data.idField).toBe("id");
+        expect(data.textField).toBe("txt");
+        scriptDataHooks.fetchScriptData = originalHook;
+    });
+
+    it("uses scriptDataHooks.fetchScriptData hook and returns Lookup if Items present but not items/itemById", async () => {
+        const testLookup = { Params: { idField: "id", textField: "txt" }, Items: [{ id: 2, txt: "B" }] };
+        const originalHook = (globalThis as any).scriptDataHooks?.fetchScriptData;
+        scriptDataHooks.fetchScriptData = (name: string) => {
+            expect(name).toBe("Lookup.Test2");
+            return testLookup as any;
+        };
+        let data: any = await fetchScriptData("Lookup.Test2");
+        expect(data).toBeInstanceOf(Lookup);
+        expect(data.items).toEqual([{ id: 2, txt: "B" }]);
+        expect(data.idField).toBe("id");
+        expect(data.textField).toBe("txt");
+        scriptDataHooks.fetchScriptData = originalHook;
     });
 });
 
