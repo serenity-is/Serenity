@@ -1,5 +1,5 @@
 ﻿import { Config } from "./config";
-import { addClass, appendToNode, getElementReadOnly, getReturnUrl, htmlEncode, parseQueryString, removeClass, sanitizeUrl, setElementReadOnly, toggleClass } from "./html";
+import { addClass, appendToNode, cssEscape, getElementReadOnly, getReturnUrl, htmlEncode, parseQueryString, removeClass, sanitizeUrl, setElementReadOnly, toggleClass } from "./html";
 
 describe("htmlEncode", () => {
     it("encodes html", () => {
@@ -561,3 +561,56 @@ function changeJSDOMURL(url: string) {
     else
         return false;
 }
+
+describe("cssEscape", () => {
+    it("escapes leading dash", () => {
+        expect(cssEscape("-")).toBe("\\-");
+        expect(cssEscape("-test")).toBe("-test");
+    });
+
+    it("escapes null character", () => {
+        expect(cssEscape("\u0000")).toBe("\uFFFD");
+        expect(cssEscape("a\u0000b")).toBe("a\uFFFDb");
+    });
+
+    it("escapes control characters and DEL", () => {
+        expect(cssEscape("\u0001")).toBe("\\1 ");
+        expect(cssEscape("\u001F")).toBe("\\1f ");
+        expect(cssEscape("\u007F")).toBe("\\7f ");
+    });
+
+    it("escapes digit at start", () => {
+        expect(cssEscape("1abc")).toBe("\\31 abc");
+        expect(cssEscape("2")).toBe("\\32 ");
+    });
+
+    it("escapes digit at index 1 if first char is dash", () => {
+        expect(cssEscape("-1abc")).toBe("-\\31 abc");
+        expect(cssEscape("-2")).toBe("-\\32 ");
+    });
+
+    it("does not escape ASCII letters, digits (except at start), dash, underscore", () => {
+        expect(cssEscape("abcABC123-_")).toBe("abcABC123-_");
+    });
+
+    it("escapes special characters", () => {
+        expect(cssEscape("a b.c#d:e;f[g]")).toBe("a\\ b\\.c\\#d\\:e\\;f\\[g\\]");
+    });
+
+    it("escapes non-ASCII characters", () => {
+        expect(cssEscape("üñîçødë")).toBe("üñîçødë");
+        expect(cssEscape("测试")).toBe("测试");
+    });
+
+    it("returns empty string for empty input", () => {
+        expect(cssEscape("")).toBe("");
+    });
+
+    it("uses CSS.escape if available", () => {
+        const orig = (globalThis as any).CSS;
+        (globalThis as any).CSS = { escape: (s: string) => "ESCAPED:" + s };
+        expect(cssEscape("test")).toBe("ESCAPED:test");
+        (globalThis as any).CSS = orig;
+    });
+    
+});
