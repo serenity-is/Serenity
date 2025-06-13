@@ -1,4 +1,4 @@
-﻿import { Enum, Fluent, getCustomAttribute, isPromiseLike, tryGetText } from "../../base";
+import { Enum, Fluent, getCustomAttribute, isPromiseLike, tryGetText } from "../../base";
 import { IReadOnly, IStringValue } from "../../interfaces";
 import { getLookup } from "../../compat";
 import { EnumKeyAttribute } from "../../types/attributes";
@@ -100,11 +100,11 @@ export class RadioButtonEditor<P extends RadioButtonEditorOptions = RadioButtonE
         if (this.get_readOnly() !== value) {
             if (value) {
                 this.element.attr('disabled', 'disabled')
-                    .findFirst('input').attr('disabled', 'disabled');
+                    .findEach('input', el => el.attr('disabled', 'disabled'));
             }
             else {
                 this.element.removeAttr('disabled')
-                    .findFirst('input').removeAttr('disabled');
+                    .findEach('input', el => el.removeAttr('disabled'));
             }
         }
     }
