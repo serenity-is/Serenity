@@ -71,7 +71,7 @@
   <Target Name="TransformServerTypings" AfterTargets="AfterBuild" DependsOnTargets="SetSergenTransformArgs">
     <Exec Command="$(DotNetSergen) servertypings $(SergenTransformArgs)" ContinueOnError="true" />
   </Target>
-  <Target Name="TranformRunTSBuild" AfterTargets="AfterBuild" DependsOnTargets="RestoreNodeTypes;NpmInstall;TransformServerTypings" Condition="'$(SkipTSBuild)' != 'true'">
+  <Target Name="TransformRunTSBuild" AfterTargets="AfterBuild" DependsOnTargets="RestoreNodeTypes;NpmInstall;TransformServerTypings" Condition="'$(SkipTSBuild)' != 'true'">
     <Message Text="Executing TypeScript compiler for $(ProjectName)..." Importance="high" />
     <Exec Command="node ./tsbuild.js" ContinueOnError="true" />
   </Target>
