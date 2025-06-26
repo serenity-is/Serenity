@@ -31,7 +31,7 @@ public static class PropertyItemsLocalTextRegistration
             if (GetPropertyItemsTextPrefix(type) is not string textPrefix)
                 continue;
 
-            void addText(string text, string suffix)
+            void addText(string text, string? suffix)
             {
                 if (string.IsNullOrEmpty(text))
                     return;
@@ -44,6 +44,8 @@ public static class PropertyItemsLocalTextRegistration
                 else if (suffix is not null)
                     registry.Add(languageID, textPrefix + suffix, text);
             }
+
+            var addonParams = new Dictionary<string, object?>(StringComparer.Ordinal);
 
             foreach (var member in type.GetMembers(BindingFlags.Instance | BindingFlags.Public))
             {
@@ -61,6 +63,20 @@ public static class PropertyItemsLocalTextRegistration
 
                 if (member.GetCustomAttribute<PlaceholderAttribute>()?.Value is string placeholder)
                     addText(placeholder, member.Name + "_Placeholder");
+
+                foreach (var addonAttr in member.GetCustomAttributes<EditorAddonAttribute>())
+                {
+                    addonParams.Clear();
+                    addonAttr.SetParams(addonParams);
+                    foreach (var pair in addonParams)
+                    {
+                        if (pair.Value is string s &&
+                            addonAttr.IsLocalizableOption(pair.Key))
+                        {
+                            addText(s, suffix: null);
+                        }
+                    }
+                }
             }
         }
     }

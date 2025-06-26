@@ -59,6 +59,19 @@ public class EditorAddonAttribute(string type) : Attribute
     }
 
     /// <summary>
+    /// Gets if the specified option key is localizable.
+    /// </summary>
+    /// <param name="key">Option key</param>
+    public virtual bool IsLocalizableOption(string key)
+    {
+        return key switch
+        {
+            "text" or "hint" => true,
+            _ => false
+        };
+    }
+
+    /// <summary>
     /// Gets the type of the editor.
     /// </summary>
     /// <value>
