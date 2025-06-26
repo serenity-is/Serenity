@@ -97,15 +97,9 @@ export class RadioButtonEditor<P extends RadioButtonEditorOptions = RadioButtonE
     }
 
     set_readOnly(value: boolean): void {
-        if (this.get_readOnly() !== value) {
-            if (value) {
-                this.element.attr('disabled', 'disabled')
-                    .findFirst('input').attr('disabled', 'disabled');
-            }
-            else {
-                this.element.removeAttr('disabled')
-                    .findFirst('input').removeAttr('disabled');
-            }
+        if (this.get_readOnly() !== !!value) {
+            this.element.attr("disabled", value ? 'disabled' : null)
+                .findEach('input[type=radio]', x => x.attr('disabled', value ? 'disabled' : null));
         }
     }
 
