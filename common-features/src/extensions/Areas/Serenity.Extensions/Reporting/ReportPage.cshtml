@@ -1,4 +1,4 @@
-﻿@using Serenity.Extensions
+@using Serenity.Extensions
 @model ReportTree
 @{
     ViewData["Title"] = "Reports";
@@ -91,6 +91,6 @@ if (!category.SubCategories.IsEmptyOrNull() ||
         </ul>
     </div>
 </div>
-<script type="module">
+<script type="module" nonce="@Html.CspNonce()">
 new Serenity.Extensions.ReportPage({ element: "#ReportPage" });
 </script>

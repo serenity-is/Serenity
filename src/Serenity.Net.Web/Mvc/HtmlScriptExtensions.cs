@@ -1,9 +1,11 @@
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Html;
 using Microsoft.AspNetCore.Mvc.Rendering;
+using Microsoft.AspNetCore.WebUtilities;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Options;
 using System.Net;
+using System.Security.Cryptography;
 
 namespace Serenity.Web;
 
@@ -12,6 +14,7 @@ namespace Serenity.Web;
 /// </summary>
 public static partial class HtmlScriptExtensions
 {
+
     /// <summary>
     /// Renders a CSS stylesheet link element. If bundling is enabled, it may contain
     /// the bundle URL instead of the CSS URL. If the bundle containing the CSS file
@@ -79,7 +82,7 @@ public static partial class HtmlScriptExtensions
     {
         return new HtmlString(
             (css ? AutoIncludeModuleCss(html, module) : HtmlString.Empty).Value +
-            $"<script type=\"module\">\n" +
+            $"<script type=\"module\" nonce=\"{html.CspNonce()}\">\n" +
             $"import pageInit from '{html.ResolveWithHash(module)}';\n" +
             $"pageInit({(options != null ? JSON.StringifyIndented(options) : "")});\n" +
             $"</script>");
@@ -240,6 +243,7 @@ public static partial class HtmlScriptExtensions
     }
 
     const string IncludedScriptsAndCssKey = "HtmlScriptExtensions:IncludedScriptsAndCss";
+    const string NonceKey = "HtmlScriptExtensions:Nonce";
 
     static readonly Regex EndingWithVersionRegex = EndingWithVersionRegexGen();
 
@@ -265,6 +269,30 @@ public static partial class HtmlScriptExtensions
         included.Add(url);
         included.Add(urlWithoutVer);
         return false;
+    }
+
+    private static string CspNonce(IDictionary<object, object> contextItems)
+    {
+        ArgumentNullException.ThrowIfNull(contextItems);
+
+        if (contextItems[NonceKey] is string nonce)
+            return nonce;
+
+        using var rng = RandomNumberGenerator.Create();
+        var nonceBytes = new byte[32];
+        rng.GetBytes(nonceBytes);
+        contextItems[NonceKey] = nonce = WebEncoders.Base64UrlEncode(nonceBytes);
+        return nonce;
+    }
+
+    /// <summary>
+    /// Gets a nonce value for use in script and style elements.
+    /// </summary>
+    /// <param name="html">Html helper</param>
+    public static string CspNonce(this IHtmlHelper html)
+    {
+        ArgumentNullException.ThrowIfNull(html);
+        return CspNonce(html.ViewContext?.HttpContext?.Items);
     }
 
     /// <summary>

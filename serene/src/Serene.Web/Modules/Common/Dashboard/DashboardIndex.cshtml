@@ -265,11 +265,11 @@ ViewData["PageId"] = "Dashboard";
     </section>
 </div>
 
-<script>
+<script nonce="@Html.CspNonce()">
 
     $(function () {
 
-        
+
         $('.daterange').daterangepicker({
             ranges: {
                 'Today': [moment(), moment()],
@@ -381,7 +381,7 @@ ViewData["PageId"] = "Dashboard";
                 }
             }
         });
-      
+
         var salesByTypeChart = new Chart(document.getElementById('orders-by-type-chart'), {
             type: 'doughnut',
             data: {
@@ -409,7 +409,7 @@ ViewData["PageId"] = "Dashboard";
                 datasets: [
                     {
                         label: 'Search',
-                        backgroundColor: "#206bc4", 
+                        backgroundColor: "#206bc4",
                         barPercentage: 0.7,
                         data: [1, 0, 0, 0, 0, 1, 1, 0, 0, 0, 2, 12, 5, 8, 22, 6, 8, 6, 4, 1, 8, 24, 29, 51, 40, 47, 23, 26, 50, 26, 41, 22, 46, 47, 81, 46, 6]
                     },
@@ -462,7 +462,7 @@ ViewData["PageId"] = "Dashboard";
                 }
             }
         });
-            
+
 
         var sparklineOpt = {
             type: 'bar',

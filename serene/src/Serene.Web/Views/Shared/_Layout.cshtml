@@ -15,11 +15,6 @@ var sidebarPaneCollapsed = Context?.Request?.Cookies?["SidebarPaneCollapsed"] ==
 <div id="PageBackground" style="display: none"></div>
 @if (hideNav)
 {
-    <script type="text/javascript">
-        $(function () {
-            @RenderSection("PageInitScript", false)
-        });
-    </script>
     <div id="page-outer-nonav">
         <div id="page-container" class="page-container-common">
             @RenderBody()

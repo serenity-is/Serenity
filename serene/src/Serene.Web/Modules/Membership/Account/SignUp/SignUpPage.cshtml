@@ -11,7 +11,7 @@ Layout = MVC.Views.Shared._LayoutNoNavigation;
 </div>
 
 
-<script type="module">
+<script type="module" nonce="@Html.CspNonce()">
     import pageInit from '@Html.ResolveWithHash("~/esm/Modules/Membership/Account/SignUp/SignUpPage.js")';
     pageInit({});
 </script>
