@@ -13,7 +13,11 @@ It aims to make development easier while reducing maintenance costs by avoiding 
 
 <img src="https://github.com/serenity-is/Serene/blob/master/build/assets/SereneAnimation.webp" />
 
-## Quickstart (Serene)
+## Online Demo
+
+https://demo.serenity.is
+
+## Quickstart
 
 > Premium customers should use the StartSharp template which they can download from the [Serenity members area](https://serenity.is/Account/Login/).
 
@@ -34,7 +38,7 @@ Ensure you have the necessary [requirements](https://serenity.is/docs/getting_st
 # Build and run the project.
 > dotnet run
 ```
-That's it! ✨ You can visit `http://localhost:5000` (actual port may vary, check the console after `dotnet run`) to see your running [Serene](https://github.com/serenity-is/Serene) application.
+That's it! ✨ You can visit `http://localhost:5000` (actual port may vary, check the console after `dotnet run`) to access your Serenity application.
 
 ## Documentation and Tutorials
 
@@ -45,10 +49,6 @@ See [Serenity Developer Guide - https://serenity.is/docs](https://serenity.is/do
 
 **Check out the Visual Studio Toolbox Presentation:**
 - [Building Web Apps with the Serenity Platform](https://docs.microsoft.com/en-us/shows/visual-studio-toolbox/building-web-apps-with-the-serenity-platform)
-
-## Online Demo
-
-https://demo.serenity.is
 
 ## Contribute / Spread the Word
 
