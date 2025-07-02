@@ -8,13 +8,18 @@
   </ItemGroup>
   <Import Project="$(SerenitySrc)Serenity.Net.Web\Serenity.Net.Web.targets" Condition="'$(AddAutoRefs)' != 'false'" />
   <Import Project="$(SerenitySrc)RestoreNpmPackages.targets" />
-  <PropertyGroup>
-    <GenerateComputedBuildStaticWebAssetsDependsOn>CompileProjectTSConfig;$(GenerateComputedBuildStaticWebAssetsDependsOn)</GenerateComputedBuildStaticWebAssetsDependsOn>
-  </PropertyGroup>
-  <Target Name="CompileProjectTSConfig" DependsOnTargets="NpmInstall;RestoreNodeTypes"
+  <Target Name="CompileProjectTSConfig" DependsOnTargets="NpmInstall;RestoreNodeTypes" BeforeTargets="ResolveProjectStaticWebAssets"
           Condition="Exists('tsconfig.json') And '$(BuildingProject)' != 'false' And '$(DesignTimeBuild)' != 'true'">
+    <ItemGroup>
+      <CleanedEsmFiles Include="wwwroot\esm\**" />
+    </ItemGroup>
     <Message Text="Executing TypeScript compiler for $(ProjectName)..." Importance="high"></Message>
     <Exec Command="node &quot;$(TSJavaScriptFile.Replace('build\\..\tools\', 'tools\'))&quot; -p ./tsconfig.json" Condition="!Exists('tsbuild.js')" ContinueOnError="true" />
     <Exec Command="pnpm build" Condition="Exists('tsbuild.js')" ContinueOnError="true" />
+    <ItemGroup>
+      <CleanedEsmFiles Remove="wwwroot\esm\**" />
+      <Content Remove="@(CleanedEsmFiles)" />
+      <Content Include="wwwroot\esm\**\*.js;wwwroot\esm\**\*.css;wwwroot\esm\**\*.map" Exclude="@(Content)" CopyToOutputDirectory="Never" CopyToPublishDirectory="PreserveNewest" ExcludeFromSingleFile="true" />
+    </ItemGroup>
   </Target>
 </Project>
