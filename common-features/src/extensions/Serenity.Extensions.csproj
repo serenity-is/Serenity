@@ -1,11 +1,11 @@
 <Project Sdk="Microsoft.NET.Sdk.Razor">
   <ItemGroup>
     <NpmPackageFile Include="..\..\package.json" />
-    <PackageReference Include="ClosedXML" Version="0.104.2" />
+    <PackageReference Include="ClosedXML" Version="0.105.0" />
     <PackageReference Include="FastMember" Version="1.5.0" />
-    <PackageReference Include="FluentMigrator" Version="6.2.0" />
-    <PackageReference Include="FluentMigrator.Extensions.SqlServer" Version="6.2.0" />
-    <PackageReference Include="MailKit" Version="4.10.0" />
+    <PackageReference Include="FluentMigrator" Version="7.1.0" />
+    <PackageReference Include="FluentMigrator.Extensions.SqlServer" Version="7.1.0" />
+    <PackageReference Include="MailKit" Version="4.13.0" />
     <PackageReference Include="nClam" Version="9.0.0" />
     <PackageReference Include="System.Text.RegularExpressions" Version="4.3.1" />
   </ItemGroup>
