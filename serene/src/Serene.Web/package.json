@@ -6,7 +6,7 @@
     "@serenity-is/extensions": "workspace:*",
     "@serenity-is/sleekgrid": "workspace:*",
     "jsx-dom": "8.1.6",
-    "preact": "10.26.8"
+    "preact": "10.26.9"
   },
   "devDependencies": {
     "@serenity-is/tsbuild": "workspace:*",
