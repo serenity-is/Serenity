@@ -11,9 +11,6 @@ importers:
 
   .:
     devDependencies:
-      '@types/node':
-        specifier: 24.0.10
-        version: 24.0.10
       '@vitest/browser':
         specifier: 3.2.4
         version: 3.2.4(msw@2.7.3(@types/node@24.0.10)(typescript@5.8.3))(playwright@1.53.2)(vite@7.0.1(@types/node@24.0.10))(vitest@3.2.4)
@@ -1754,6 +1751,7 @@ snapshots:
   '@types/node@24.0.10':
     dependencies:
       undici-types: 7.8.0
+    optional: true
 
   '@types/statuses@2.0.5':
     optional: true
@@ -2473,7 +2471,8 @@ snapshots:
 
   typescript@5.8.3: {}
 
-  undici-types@7.8.0: {}
+  undici-types@7.8.0:
+    optional: true
 
   universalify@0.2.0:
     optional: true
