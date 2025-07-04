@@ -21,11 +21,11 @@
   </ItemGroup>
   <Import Project="$(MSBuildThisFileDirectory)..\CommonDbProviders.props" />
   <ItemGroup>
-    <PackageReference Include="Scriban" Version="5.12.1" />
+    <PackageReference Include="Scriban" Version="6.2.1" />
     <PackageReference Include="Mono.Cecil" Version="0.11.6" />
-    <PackageReference Include="Microsoft.Extensions.DependencyModel" Version="9.0.2" />
-    <PackageReference Include="Microsoft.Extensions.FileSystemGlobbing" Version="9.0.2" />
-    <PackageReference Include="Spectre.Console" Version="0.49.1" />
+    <PackageReference Include="Microsoft.Extensions.DependencyModel" Version="9.0.6" />
+    <PackageReference Include="Microsoft.Extensions.FileSystemGlobbing" Version="9.0.6" />
+    <PackageReference Include="Spectre.Console" Version="0.50.0" />
   </ItemGroup>
   <Target Name="CopySergenToArtifacts" AfterTargets="Pack">
     <ItemGroup>
