@@ -125,7 +125,7 @@ export class OtherFormOneBarDialog<P = {}> extends OrderDialog<P> {
         this.saveAll(callback);
     }
 
-    renderContents() {
+    renderContents(): any {
         const id = this.useIdPrefix();
         return (<>
             <div id={id.Toolbar} class="s-DialogToolbar">

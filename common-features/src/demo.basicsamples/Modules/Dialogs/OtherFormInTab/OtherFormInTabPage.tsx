@@ -92,7 +92,7 @@ export class OtherFormInTabDialog<P = {}> extends OrderDialog<P> {
         });
     }
 
-    renderContents() {
+    renderContents(): any {
         const id = this.useIdPrefix();
         return (
             <div id={id.Tabs} class="s-DialogContent">
