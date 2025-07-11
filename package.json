@@ -3,13 +3,12 @@
   "devDependencies": {
     "@vitest/browser": "3.2.4",
     "@vitest/coverage-v8": "3.2.4",
-    "esbuild": "0.25.5",
+    "esbuild": "0.25.6",
     "flatpickr": "4.6.13",
     "jsdom": "26.1.0",
     "jsx-dom": "8.1.6",
-    "playwright": "1.53.2",
+    "playwright": "1.54.1",
     "typescript": "5.8.3",
-    "vite": "7.0.1",
     "vitest": "3.2.4"
   },
   "pnpm": {
