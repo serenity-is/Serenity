@@ -66,22 +66,21 @@ export function toSingleLine(str: string) {
  * Trims the whitespace characters from the end of the string
  */
 export var trimEnd = function(s: string) {
-    return (s ?? "" as any).trimEnd?.() ?? s.replace(/\s*$/, '');
+    return (s ?? "" as any).trimEnd();
 };
 
 /**
  * Trims the whitespace characters from the start of the string
  */
 export var trimStart = function(s: string) {
-    return (s ?? "" as any).trimStart?.() ?? s.replace(/^\s*/, '');
+    return (s ?? "" as any).trimStart();
 };
 
 /**
  * Trims the whitespace characters from the start and end of the string
- * This returns empty string even when the string is null or undefined.
- */
+  */
 export function trim(s: string) {
-    return s?.trim() ?? '';
+    return s?.trim();
 }
 
 /**
