@@ -1,8 +1,11 @@
-﻿namespace Serenity.ComponentModel;
+namespace Serenity.ComponentModel;
 
 /// <summary>
 /// Indicates that the target property should use a "Masked" editor
 /// and also defines an automatic lookup script for row fields.
+/// Note that this requires https://www.npmjs.com/package/jquery.maskedinput,
+/// e.g. jquery.maskedinput.js which can be installed via libman or npm, 
+/// and referenced in your scripts (via appsettings.bundles.json).
 /// </summary>
 /// <seealso cref="CustomEditorAttribute" />
 public partial class MaskedEditorAttribute : CustomEditorAttribute

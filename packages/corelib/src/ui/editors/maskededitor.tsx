@@ -20,7 +20,7 @@ export class MaskedEditor<P extends MaskedEditorOptions = MaskedEditorOptions> e
             });
         }
         else {
-            notifyError('MaskedInput requires jQuery masked input plugin ("~/Serenity.Assets/Scripts/jquery.maskedinput.js") to be loaded in the page along with jQuery!');
+            notifyError('MaskedInput requires jQuery masked input plugin (jquery.maskedinput.js, https://www.npmjs.com/package/jquery.maskedinput) to be loaded in the page along with jQuery!');
         }
     }
 
