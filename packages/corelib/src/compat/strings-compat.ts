@@ -71,7 +71,7 @@ export var trimEnd = function(s: string) {
 };
 
 /**
- * @deprecated Use .trimEnd
+ * @deprecated Use .trimStart
  * Trims the whitespace characters from the start of the string
  */
 export var trimStart = function(s: string) {
