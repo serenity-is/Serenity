@@ -5,6 +5,7 @@
     "@serenity-is/demo.northwind": "workspace:*",
     "@serenity-is/extensions": "workspace:*",
     "@serenity-is/sleekgrid": "workspace:*",
+    "flatpickr": "4.6.13",
     "jsx-dom": "8.1.6",
     "preact": "10.26.9"
   },

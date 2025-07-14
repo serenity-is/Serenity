@@ -119,6 +119,9 @@ importers:
       '@serenity-is/sleekgrid':
         specifier: workspace:*
         version: link:../../../packages/sleekgrid
+      flatpickr:
+        specifier: 4.6.13
+        version: 4.6.13
       jsx-dom:
         specifier: 8.1.6
         version: 8.1.6
