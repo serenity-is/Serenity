@@ -246,7 +246,7 @@ export namespace PdfExportHelper {
             }
             then();
         });
-        script.src = resolveUrl("~/Serenity.Assets/Scripts/jspdf.min.js");
+        script.src = "https://cdnjs.cloudflare.com/ajax/libs/jspdf/3.0.1/jspdf.umd.min.js";
         document.head.append(script);
     }
 
@@ -269,7 +269,7 @@ export namespace PdfExportHelper {
             script.addEventListener("load", () => {
                 then();
             });
-            script.src = resolveUrl("~/Serenity.Assets/Scripts/jspdf.plugin.autotable.min.js");
+            script.src = "https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.8.4/jspdf.plugin.autotable.min.js";
             document.head.append(script);
         });
     }
