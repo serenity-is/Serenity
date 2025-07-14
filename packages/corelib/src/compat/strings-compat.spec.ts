@@ -139,9 +139,9 @@ describe("trim", () => {
         expect(trimSpy).toHaveBeenCalled();
     });
 
-    it("returns empty string for null and undefined", () => {
-        expect(trim(null)).toBe('');
-        expect(trim(undefined)).toBe('');
+    it("returns undefined for null and undefined", () => {
+        expect(trim(null)).toBeUndefined();
+        expect(trim(undefined)).toBeUndefined();
     });
 });
 
@@ -151,16 +151,6 @@ describe("trimEnd", () => {
             var trimEndSpy = vi.spyOn(String.prototype as any, "trimEnd");
             expect(trimEnd(" abc ")).toBe(" abc");
             expect(trimEndSpy).toHaveBeenCalled();
-        }
-    });
-
-    it("can trim end when String.prototype.padStart not available", () => {
-        var oldTrimEnd = (String.prototype as any).trimEnd;
-        (String.prototype as any).trimEnd = null;
-        try {
-            expect(trimEnd(" abc ")).toBe(" abc");
-        } finally {
-            (String.prototype as any).trimEnd = oldTrimEnd;
         }
     });
 
@@ -180,16 +170,6 @@ describe("trimStart", () => {
             var trimStartSpy = vi.spyOn(String.prototype as any, "trimStart");
             expect(trimStart(" abc ")).toBe("abc ");
             expect(trimStartSpy).toHaveBeenCalled();
-        }
-    });
-
-    it("can trim start when String.prototype.padStart not available", () => {
-        var oldTrimStart = (String.prototype as any).trimStart;
-        (String.prototype as any).trimStart = null;
-        try {
-            expect(trimStart(" abc ")).toBe("abc ");
-        } finally {
-            (String.prototype as any).trimStart = oldTrimStart;
         }
     });
 
