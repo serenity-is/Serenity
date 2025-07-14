@@ -1,4 +1,4 @@
-﻿import { Fluent, localText, resolveUrl } from "../../base";
+import { Fluent, localText, resolveUrl } from "../../base";
 import { IReadOnly, IStringValue } from "../../interfaces";
 import { isTrimmedEmpty } from "../../compat";
 import { Decorators } from "../../types/decorators";
@@ -205,11 +205,9 @@ export class HtmlContentEditor<P extends HtmlContentEditorOptions = HtmlContentE
                 // @ts-ignore
                 path = CKEDITOR_BASEPATH;
             else
-                return "~/Serenity.Assets/Scripts/ckeditor/";
+                return "https://cdnjs.cloudflare.com/ajax/libs/ckeditor/4.22.1/";
         }
-        if (path.endsWith('/'))
-            return path;
-        return path + '/';
+        return path.endsWith('/') ? path : path + '/';
     }
 
     static includeCKEditor(then: () => void): void {

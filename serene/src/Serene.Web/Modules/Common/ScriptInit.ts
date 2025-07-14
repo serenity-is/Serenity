@@ -6,7 +6,6 @@ import "flatpickr/dist/l10n";
 
 Config.rootNamespaces.push('Serene');
 TranslationConfig.getLanguageList = getLanguageList;
-HtmlContentEditor.CKEditorBasePath = "~/Serenity.Assets/Scripts/ckeditor/";
 gridDefaults.useCssVars = false;
 
 let culture = (document.documentElement?.lang || 'en').toLowerCase();

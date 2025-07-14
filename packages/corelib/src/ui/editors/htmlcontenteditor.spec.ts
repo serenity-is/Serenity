@@ -1,8 +1,8 @@
 import { HtmlContentEditor } from "./htmlcontenteditor";
 
 describe("HtmlContextEditor", () => {
-    test('getCKEditorBasePath returns "~/Serenity.Assets/Scripts/ckeditor/" by default', function () {
-        expect(HtmlContentEditor.getCKEditorBasePath()).toBe("~/Serenity.Assets/Scripts/ckeditor/");
+    test('getCKEditorBasePath returns CDNJS url by default', function () {
+        expect(HtmlContentEditor.getCKEditorBasePath()).toBe("https://cdnjs.cloudflare.com/ajax/libs/ckeditor/4.22.1/");
     });
 
     test('getCKEditorBasePath returns CKEDITOR_BASEPATH if set', function () {
