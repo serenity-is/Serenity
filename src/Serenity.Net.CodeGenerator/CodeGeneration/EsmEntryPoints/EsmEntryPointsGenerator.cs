@@ -8,7 +8,8 @@ public class EsmEntryPointsGenerator()
     public List<string> EntryPoints { get; } = [
         "Modules/**/*Page.ts",
         "Modules/**/*Page.tsx",
-        "Modules/**/ScriptInit.ts"
+        "Modules/**/ScriptInit.ts",
+        "Modules/**/*.mts",
     ];
 
     public string EsmAssetBasePath { get; set; } = "/esm";

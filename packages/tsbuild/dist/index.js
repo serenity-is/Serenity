@@ -3,7 +3,7 @@ import { existsSync, readdirSync, statSync, mkdirSync, writeFileSync, rmSync, re
 import { dirname, join, relative, resolve } from "path";
 import { globSync } from "glob";
 
-export const defaultEntryPointGlobs = ['Modules/**/*Page.ts', 'Modules/**/*Page.tsx', 'Modules/**/ScriptInit.ts'];
+export const defaultEntryPointGlobs = ['Modules/**/*Page.ts', 'Modules/**/*Page.tsx', 'Modules/**/ScriptInit.ts', 'Modules/**/*.mts'];
 
 export const importAsGlobalsMapping = {
     "@serenity-is/base": "Serenity",
@@ -39,8 +39,11 @@ export const esbuildOptions = (opt) => {
             var json = readFileSync('sergen.json', 'utf8').trim();
             var cfg = JSON.parse(json || {});
             globs = cfg?.TSBuild?.EntryPoints;
+            if (globs != null && globs[0] === '+') {
+                globs = [...defaultEntryPointGlobs, ...globs.slice(1)];
+            }
             if (globs === void 0 &&
-                cfg.Extends &&
+                typeof cfg.Extends == "string" &&
                 existsSync(cfg.Extends)) {
                 json = readFileSync(cfg.Extends, 'utf8').trim();
                 cfg = JSON.parse(json || {});

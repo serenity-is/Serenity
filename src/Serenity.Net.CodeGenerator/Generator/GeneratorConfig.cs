@@ -588,7 +588,7 @@ public class GeneratorConfig
     public class TSBuildConfig
     {
         /// <summary>
-        /// List of entry point globs, default is "Modules/**/*Page.ts", "Modules/**/*Page.tsx", "Modules/**/ScriptInit.ts"
+        /// List of entry point globs, default is "Modules/**/*Page.ts", "Modules/**/*Page.tsx", "Modules/**/ScriptInit.ts", "Modules/**/*.mts".
         /// Include "+" as the first item to append to default list.
         /// </summary>
         public List<string> EntryPoints { get; set; }
