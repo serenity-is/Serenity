@@ -82,7 +82,7 @@ export const esbuildOptions = (opt) => {
                     .forEach(p => entryPoints.push(root + '/' + p)));
         }
     }
-
+   
     var splitting = opt.splitting;
     if (splitting === undefined)
         splitting = !process.argv.slice(2).some(x => x == "--nosplit");
@@ -127,6 +127,21 @@ export const esbuildOptions = (opt) => {
 }
 
 export const build = async (opt) => {
+    if (opt?.npmCopy !== false &&
+        existsSync('appsettings.bundles.json')) {
+        const bundlesJson = readFileSync('appsettings.bundles.json', 'utf8').trim();
+        const bundlesCfg = JSON.parse(bundlesJson || {});
+        const bundles = Object.values(bundlesCfg?.CssBundling?.Bundles || {}).concat(Object.values(bundlesCfg?.ScriptBundling?.Bundles || {}));
+        let paths = [];
+        Object.values(bundles).filter(x => x?.length).forEach(bundle => {
+            paths.push(...bundle.filter(f => f?.startsWith('~/npm/')).map(f => f.substring(5)));
+        });
+        paths = paths.filter((v, i, a) => a.indexOf(v) === i); // unique
+        if (paths.length) {
+            npmCopy(paths);
+        }   
+    }
+
     opt = esbuildOptions(opt);
 
     if (opt.watch) {
@@ -233,7 +248,7 @@ export function writeIfChanged() {
 export function npmCopy(paths) {
     paths.forEach(path => {
         const srcFile = join("node_modules", path);
-        const dstfile = join("wwwroot/npm", path.replace("/dist/", "/"));
+        const dstfile = join("wwwroot/npm", path);
         if (!existsSync(srcFile)) {
             console.warn(`Source file not found: ${srcFile}`);
             return;
