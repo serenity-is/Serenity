@@ -60,7 +60,7 @@ public class TemporaryFileHelperTests
     private static MockTemporaryFileSystem CreateTestFileSystem()
     {
         var fileSystem = new MockTemporaryFileSystem();
-        var tempPath = fileSystem.Combine(fileSystem.Path.GetTempPath(), fileSystem.Path.GetTempFileName());
+        var tempPath = fileSystem.Combine(fileSystem.Path.GetTempPath(), fileSystem.Path.GetRandomFileName());
         fileSystem.File.Delete(tempPath);
         fileSystem.Directory.CreateDirectory(tempPath);
         fileSystem.Directory.SetCurrentDirectory(tempPath);
