@@ -59,3 +59,4 @@ export const esbuildOptions: (opt: TSBuildOptions) => any;
 export const build: (opt: TSBuildOptions) => Promise<void>;
 export function importAsGlobalsPlugin(mapping: Record<string, string>): any;
 export function cleanPlugin(): any;
+export function npmCopy(paths: string[], outdir?: string): void;

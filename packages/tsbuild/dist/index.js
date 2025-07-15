@@ -229,3 +229,42 @@ export function writeIfChanged() {
         }
     };
 }
+
+export function npmCopy(paths) {
+    paths.forEach(path => {
+        const srcFile = join("node_modules", path);
+        const dstfile = join("wwwroot/npm", path.replace("/dist/", "/"));
+        if (!existsSync(srcFile)) {
+            console.warn(`Source file not found: ${srcFile}`);
+            return;
+        }
+
+        (function() {
+            const srcContent = readFileSync(srcFile);
+            if (existsSync(dstfile)) {
+                if (readFileSync(dstfile).equals(srcContent))
+                    return;
+            }
+            else {
+                mkdirSync(dirname(dstfile), { recursive: true });
+            }
+            console.log(`Copying ${srcFile} to ${dstfile}`);
+            writeFileSync(dstfile, srcContent);
+        })();
+
+        const js = path.endsWith(".js");
+        if ((js && !path.endsWith(".min.js")) ||
+            (path.endsWith(".css") && !path.endsWith(".min.css"))) {
+            const ext = js ? ".min.js" : ".min.css";
+            const srcMinFile = srcFile.substring(0, srcFile.length - (js ? 3 : 4)) + ext;
+            const dstMinFile = dstfile.substring(0, dstfile.length - (js ? 3 : 4)) + ext;
+            if (existsSync(srcMinFile)) {
+                const srcMinContent = readFileSync(srcMinFile);
+                if (existsSync(dstMinFile) && readFileSync(dstMinFile).equals(srcMinContent))
+                    return;
+                console.log(`Copying ${srcMinFile} to ${dstMinFile}`);
+                writeFileSync(dstMinFile, srcMinContent);
+            }
+        }
+    });
+}

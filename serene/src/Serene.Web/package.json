@@ -5,8 +5,16 @@
     "@serenity-is/demo.northwind": "workspace:*",
     "@serenity-is/extensions": "workspace:*",
     "@serenity-is/sleekgrid": "workspace:*",
+    "bootstrap-datepicker": "1.10.0",
+    "chart.js": "4.5.0",
+    "daterangepicker": "3.1.0",
     "flatpickr": "4.6.13",
+    "jquery-knob": "1.2.11",
+    "jquery-sparkline": "2.4.0",
     "jsx-dom": "8.1.6",
+    "jvectormap-content": "0.1.0",
+    "jvectormap-next": "3.1.1",
+    "moment": "2.30.1",
     "preact": "10.26.9"
   },
   "devDependencies": {
