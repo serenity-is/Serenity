@@ -8,7 +8,6 @@ public static partial class Shared
     public static string Src => Path.Combine(Root, "src");
     public static string PackageOutDir => Path.Combine(Root, "build", ".nupkg");
     public static string SerenityDir => Path.Combine(Root, "..", "Serenity");
-    public static string NugetExePath => Path.Combine(SerenityDir, "build", "tools", "NuGet", "NuGet.exe");
     private static string SolutionFileBase => Path.Combine(Src, Path.GetFileName(Root));
     public static string SolutionFile => File.Exists(SolutionFileBase + ".slnf") ? SolutionFileBase + ".slnf" : SolutionFileBase + ".sln";
     public static string PackageBuildProps => Path.Combine(Root, "build", "Package.Build.props");

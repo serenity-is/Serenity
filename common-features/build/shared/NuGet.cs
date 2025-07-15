@@ -100,10 +100,6 @@ public static partial class Shared
             else if (!File.Exists(metadata))
             {
                 string nuget = "nuget";
-                if (Environment.OSVersion.Platform == PlatformID.Win32NT &&
-                    File.Exists(NugetExePath))
-                    nuget = NugetExePath;
-
                 if (StartProcess(nuget, "init . .", localFeed.Source) != 0)
                     Console.Error.WriteLine("Error while initializing " + localFeed.Source);
                 else if (File.Exists(metadata))
