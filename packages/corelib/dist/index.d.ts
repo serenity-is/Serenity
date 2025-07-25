@@ -2308,7 +2308,7 @@ export declare class Validator {
 	static isContentEditable(element: HTMLElement): boolean;
 	static elementValue(element: HTMLElement): string | number | string[];
 	static valid(element: HTMLFormElement | ValidatableElement | ArrayLike<ValidatableElement>): boolean;
-	static rules(element: ValidatableElement, command?: "add" | "remove", argument?: any): Record<string, any>;
+	static rules(element: ValidatableElement, command?: "add" | "remove", argument?: any): ValidationRules;
 	form(): boolean;
 	checkForm(): boolean;
 	element(element: ValidatableElement): boolean;
@@ -2794,17 +2794,18 @@ export declare function startsWith(s: string, prefix: string): boolean;
  */
 export declare function toSingleLine(str: string): string;
 /**
+ * @deprecated Use .trimEnd
  * Trims the whitespace characters from the end of the string
  */
 export declare var trimEnd: (s: string) => any;
 /**
+ * @deprecated Use .trimStart
  * Trims the whitespace characters from the start of the string
  */
 export declare var trimStart: (s: string) => any;
 /**
  * Trims the whitespace characters from the start and end of the string
- * This returns empty string even when the string is null or undefined.
- */
+  */
 export declare function trim(s: string): string;
 /**
  * Trims the whitespace characters from the start and end of the string
@@ -4410,7 +4411,14 @@ export declare namespace UploadHelper {
 	function hasImageExtension(filename: string): boolean;
 	function thumbFileName(filename: string): string;
 	function dbFileUrl(filename: string): string;
-	function colorBox(link: HTMLElement | ArrayLike<HTMLElement>, options?: any): void;
+	/**
+	 * Creates a lightbox for a single upload thumbnail anchor element.
+	 * It uses one of glightbox, simplelightbox or colorbox if available.
+	 * Override this function to use a different lightbox library.
+	 */
+	function lightbox(link: HTMLElement | ArrayLike<HTMLElement>): void;
+	/** @deprecated use lightbox */
+	const colorBox: typeof lightbox;
 	function populateFileSymbols(c: HTMLElement | ArrayLike<HTMLElement>, items: UploadedFile[], displayOriginalName?: boolean, urlPrefix?: string): void;
 }
 export interface UploadedFile {

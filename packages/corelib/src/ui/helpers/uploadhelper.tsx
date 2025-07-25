@@ -145,10 +145,44 @@ export namespace UploadHelper {
         return resolveUrl('~/upload/') + filename;
     }
 
-    export function colorBox(link: HTMLElement | ArrayLike<HTMLElement>, options?: any): void {
+    /**
+     * Creates a lightbox for a single upload thumbnail anchor element.
+     * It uses one of glightbox, simplelightbox or colorbox if available.
+     * Override this function to use a different lightbox library.
+     */
+    export function lightbox(link: HTMLElement | ArrayLike<HTMLElement>): void {
         link = isArrayLike(link) ? link[0] : link;
         if (!link)
             return;
+
+        const glightbox = (globalThis as any).GLightbox;
+        if (glightbox) {
+            Fluent.on(link, "click", (e: MouseEvent) => {
+                e.preventDefault();
+                const lightbox = glightbox({
+                    elements: [
+                        {
+                            href: link.getAttribute('href') || '',
+                            title: link.getAttribute('title') || ''
+                        }
+                    ],
+                });
+                lightbox.on('close', () => lightbox.destroy());
+                lightbox.open();
+            });
+            return;
+        }
+
+        const simpleLightbox = (globalThis as any).SimpleLightbox;
+        if (simpleLightbox) {
+            simpleLightbox([link], {
+                fileExt: null,
+                history: false,
+                overlayOpacity: 1,
+            });
+            return;
+        }
+
         let $ = getjQuery();
         if (!$)
             return;
@@ -159,6 +193,9 @@ export namespace UploadHelper {
             close: htmlEncode(localText('Controls.ImageUpload.ColorboxClose'))
         });
     }
+
+    /** @deprecated use lightbox */
+    export const colorBox = lightbox;
 
     export function populateFileSymbols(c: HTMLElement | ArrayLike<HTMLElement>, items: UploadedFile[],
         displayOriginalName?: boolean, urlPrefix?: string): void {
@@ -186,7 +223,7 @@ export namespace UploadHelper {
 
             if (isImage) {
                 thumb.style.backgroundImage = "url('" + dbFileUrl(thumbFileName(item.Filename)) + "')";
-                colorBox(thumb, new Object());
+                lightbox(thumb);
             }
 
             container.appendChild(
