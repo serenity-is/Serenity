@@ -63,19 +63,17 @@ export function toSingleLine(str: string) {
 }
 
 /**
- * @deprecated Use .trimEnd
  * Trims the whitespace characters from the end of the string
  */
 export var trimEnd = function(s: string) {
-    return ((s ?? "") as any).trimEnd();
+    return s == null ? "" : ((s as any).trimEnd?.() ?? s.replace(/\s*$/, ''));
 };
 
 /**
- * @deprecated Use .trimStart
  * Trims the whitespace characters from the start of the string
  */
 export var trimStart = function(s: string) {
-    return ((s ?? "") as any).trimStart();
+    return s == null ? "" : ((s as any).trimStart?.() ?? s.replace(/^\s*/, ''));
 };
 
 /**

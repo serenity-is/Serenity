@@ -2794,12 +2794,10 @@ export declare function startsWith(s: string, prefix: string): boolean;
  */
 export declare function toSingleLine(str: string): string;
 /**
- * @deprecated Use .trimEnd
  * Trims the whitespace characters from the end of the string
  */
 export declare var trimEnd: (s: string) => any;
 /**
- * @deprecated Use .trimStart
  * Trims the whitespace characters from the start of the string
  */
 export declare var trimStart: (s: string) => any;

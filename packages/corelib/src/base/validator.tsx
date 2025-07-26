@@ -774,7 +774,7 @@ export class Validator {
         return validator.element(element);
     }
 
-    static rules(element: ValidatableElement, command?: "add" | "remove", argument?: any) {
+    static rules(element: ValidatableElement, command?: "add" | "remove", argument?: any): ValidationRules {
         let isContentEditable = Validator.isContentEditable(element);
         //settings, staticRules, existingRules, data, param, filtered;
 
