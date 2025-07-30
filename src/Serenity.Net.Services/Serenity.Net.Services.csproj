@@ -9,6 +9,6 @@
     <ProjectReference Include="..\Serenity.Net.Core\Serenity.Net.Core.csproj" />
     <PackageReference Include="Dapper" Version="2.1.66" />
     <PackageReference Include="Microsoft.Extensions.FileProviders.Abstractions" Version="9.0.7" />
-    <PackageReference Include="SixLabors.ImageSharp" Version="2.1.10" />
+    <PackageReference Include="SixLabors.ImageSharp" Version="2.1.11" />
   </ItemGroup>
 </Project>
