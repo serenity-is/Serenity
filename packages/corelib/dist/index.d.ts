@@ -2688,9 +2688,6 @@ export declare function executeOnceWhenVisible(el: HTMLElement | ArrayLike<HTMLE
 export declare function executeEverytimeWhenVisible(el: HTMLElement | ArrayLike<HTMLElement>, callback: Function, callNowIfVisible: boolean): void;
 /** @deprecated prefer localText for better discoverability */
 export declare const text: typeof localText;
-export declare function dbText(prefix: string): ((key: string) => string);
-export declare function prefixedText(prefix: string): (text: string, key: string | ((p?: string) => string)) => string;
-export declare function dbTryText(prefix: string): ((key: string) => string);
 export declare namespace LT {
 	/** @deprecated Use addLocalText */
 	const add: typeof addLocalText;
