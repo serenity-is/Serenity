@@ -66,7 +66,7 @@ export function toSingleLine(str: string) {
  * Trims the whitespace characters from the end of the string
  */
 export var trimEnd = function(s: string) {
-    return s == null ? "" : ((s as any).trimEnd?.() ?? s.replace(/\s*$/, ''));
+    return s == null ? "" : ((s as any).trimEnd?.() ?? s.replace(/(?<!\s)\s+$/, ''));
 };
 
 /**
