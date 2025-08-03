@@ -4,7 +4,6 @@ export * from "./formatting-compat";
 export * from "./html-compat";
 export * from "./layout";
 export * from "./layouttimer";
-export * from "./localtext-compat";
 export * from "./router";
 export * from "./scriptdata-compat";
 export * from "./services-compat";

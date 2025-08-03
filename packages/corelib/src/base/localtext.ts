@@ -69,5 +69,17 @@ export const TranslationConfig = {
     translateTexts: null as (opt: TranslateTextsOptions) => PromiseLike<TranslateTextsResult>
 }
 
-let global = getGlobalObject();
-(global.Serenity || (global.Serenity = {})).addLocalText = addLocalText;
+/** @deprecated prefer localText for better discoverability */
+export const text = localText;
+
+export namespace LT {
+    /** @deprecated Use addLocalText */
+    export const add = addLocalText;
+    /** @deprecated Use localText */
+    export const getDefault = localText;
+}
+
+const global = getGlobalObject();
+const serenity = global.Serenity || (global.Serenity = {});
+serenity.LT = serenity.LT || {};
+serenity.LT.add = serenity.addLocalText = addLocalText;
