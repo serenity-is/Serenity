@@ -255,25 +255,24 @@ export function handleScriptDataError(name: string, status?: number, statusText?
     if ((status == null && statusText == null) || (status === 404)) {
         if (isLookup)
             message = 'No lookup with key "' + name.substring(7) + '" is registered. Please make sure you have a' +
-                ' [LookupScript("' + name.substring(7) + '")] attribute in server side code on top of a row / custom lookup and ' +
+                ' [LookupScript("' + name.substring(7) + '")] attribute in server side code on top of a row / custom lookup and' +
                 ' its key is exactly the same.';
         else
-            message = `Can't load dynamic data: ${name}!`;
+            message = `Cannot load dynamic data: ${name}!`;
 
         notifyError(message);
     }
     else if (status == 403 && isLookup) {
-        message = '<p>Access denied while trying to load the lookup: "<b>' +
-            htmlEncode(name.substring(7)) + '</b>". Please check if current user has required permissions for this lookup.</p> ' +
-            '<p><em>Lookups use the ReadPermission of their row by default. You may override that for the lookup ' +
+        message = 'Access denied while trying to load the lookup: "' +
+            htmlEncode(name.substring(7)) + '". Please check if current user has required permissions for this lookup.\n\n' +
+            'Lookups use the ReadPermission of their row by default. You may override that for the lookup ' +
             'like [LookupScript("Some.Lookup", Permission = "?")] to grant all ' +
-            'authenticated users to read it (or use "*" for public).</em></p>' +
-            '<p><em>Note that this might be a security risk if the lookup contains sensitive data, ' +
-            'so it could be better to set a separate permission for lookups, like "MyModule:Lookups".</em></p>';
+            'authenticated users to read it (or use "*" for public).\n\n' +
+            'Note that this might be a security risk if the lookup contains sensitive data, ' +
+            'so it could be better to set a separate permission for lookups, like "MyModule:Lookups".';
 
         notifyError(message, null, {
             timeOut: 10000,
-            escapeHtml: false
         });
     }
     else {

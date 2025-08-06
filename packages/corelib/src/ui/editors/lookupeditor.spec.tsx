@@ -31,7 +31,7 @@ describe("LookupEditor", () => {
             } as any;
             expect(() => new LookupEditor({
                 lookupKey: "Test"
-            })).toThrow('No lookup with key "Test" is registered. Please make sure you have a [LookupScript("Test")] attribute in server side code on top of a row / custom lookup and  its key is exactly the same.');
+            })).toThrow('No lookup with key "Test" is registered. Please make sure you have a [LookupScript("Test")] attribute in server side code on top of a row / custom lookup and its key is exactly the same.');
         }
         finally {
             logSpy.mockRestore();

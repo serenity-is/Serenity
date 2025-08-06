@@ -1,5 +1,6 @@
 import { Lookup } from "./lookup";
-import { fetchScriptData, getScriptData, getScriptDataHash, peekScriptData, scriptDataHooks } from "./scriptdata";
+import { notifyError } from "./notify";
+import { ensureScriptDataSync, fetchScriptData, getScriptData, getScriptDataHash, handleScriptDataError, peekScriptData, scriptDataHooks, setRegisteredScripts, setScriptData } from "./scriptdata";
 import { scriptDataHashSymbol, scriptDataSymbol } from "./symbols";
 import { getGlobalObject } from "./system";
 
@@ -267,7 +268,7 @@ describe("fetchScriptData", () => {
         expect(data).toBe(testData);
         scriptDataHooks.fetchScriptData = originalHook;
     });
-    
+
     it("uses scriptDataHooks.fetchScriptData hook if defined (async, non-lookup)", async () => {
         const testData = { foo: "baz" };
         const originalHook = scriptDataHooks.fetchScriptData;
@@ -529,5 +530,292 @@ describe("peekScriptData", () => {
         finally {
             window["fetch"] = orgFetch;
         }
+    });
+});
+
+describe("setRegisteredScripts", () => {
+    it("sets hashes for the provided scripts", () => {
+        const scripts = {
+            "Script1": "hash1",
+            "Script2": "hash2"
+        };
+
+        setRegisteredScripts(scripts);
+
+        const scriptDataHash = getGlobalObject()[scriptDataHashSymbol];
+        expect(scriptDataHash).toBeDefined();
+        expect(scriptDataHash["Script1"]).toBe("hash1");
+        expect(scriptDataHash["Script2"]).toBe("hash2");
+    });
+
+    it("uses the current timestamp as hash if no hash is provided", () => {
+        const scripts = {
+            "Script1": "",
+            "Script2": null
+        };
+
+        const timestamp = Math.trunc(new Date().getTime());
+        vi.useFakeTimers().setSystemTime(new Date(timestamp));
+        try {
+            setRegisteredScripts(scripts);
+
+            const scriptDataHash = getGlobalObject()[scriptDataHashSymbol];
+            expect(scriptDataHash).toBeDefined();
+            expect(scriptDataHash["Script1"]).toBe(timestamp.toString());
+            expect(scriptDataHash["Script2"]).toBe(timestamp.toString());
+        } finally {
+            vi.useRealTimers();
+        }
+    });
+
+    it("creates the scriptDataHash store if it does not exist", () => {
+        delete getGlobalObject()[scriptDataHashSymbol];
+
+        const scripts = {
+            "Script1": "hash1"
+        };
+
+        setRegisteredScripts(scripts);
+
+        const scriptDataHash = getGlobalObject()[scriptDataHashSymbol];
+        expect(scriptDataHash).toBeDefined();
+        expect(scriptDataHash["Script1"]).toBe("hash1");
+    });
+});
+
+describe("setScriptData", () => {
+
+    it("sets data in the global scriptData store", () => {
+        const testData = { key: "value" };
+        setScriptData("TestKey", testData);
+
+        const scriptDataStore = getGlobalObject()[scriptDataSymbol];
+        expect(scriptDataStore).toBeDefined();
+        expect(scriptDataStore["TestKey"]).toEqual(testData);
+    });
+
+    it("dispatches a scriptdatachange event when data is set", () => {
+        const testData = { key: "value" };
+        const eventSpy = vi.spyOn(document, "dispatchEvent");
+
+        setScriptData("TestKey", testData);
+
+        expect(eventSpy).toHaveBeenCalledTimes(1);
+        expect(eventSpy).toHaveBeenCalledWith(new Event("scriptdatachange.TestKey"));
+    });
+
+    it("creates the scriptData store if it does not exist", () => {
+        delete getGlobalObject()[scriptDataSymbol];
+
+        const testData = { key: "value" };
+        setScriptData("TestKey", testData);
+
+        const scriptDataStore = getGlobalObject()[scriptDataSymbol];
+        expect(scriptDataStore).toBeDefined();
+        expect(scriptDataStore["TestKey"]).toEqual(testData);
+    });
+});
+
+describe("ensureScriptDataSync", () => {
+    it("returns data from scriptData store if available", () => {
+        const testData = { key: "value" };
+        getGlobalObject()[scriptDataSymbol] = { ["TestKey"]: testData };
+
+        const result = ensureScriptDataSync("TestKey");
+        expect(result).toEqual(testData);
+    });
+
+    it("throws an error if fetchScriptData hook returns a promise in sync mode", () => {
+        const originalHook = scriptDataHooks.fetchScriptData;
+        scriptDataHooks.fetchScriptData = () => Promise.resolve(1 as any);
+        try {
+            expect(() => ensureScriptDataSync("TestKey")).toThrow("fetchScriptData hook must return data synchronously when sync is true.");
+        }
+        finally {
+            scriptDataHooks.fetchScriptData = originalHook;
+        }
+    });
+
+    it("when fetchScriptData hook is used response is converted to a lookup for name that starts with Lookup.", async () => {
+        const originalHook = scriptDataHooks.fetchScriptData;
+        scriptDataHooks.fetchScriptData = () => ({ Params: { idField: "x", textField: "t" }, Items: [{ x: 3, t: "T3" }] } as any);
+        try {
+            const data = ensureScriptDataSync("Lookup.Test") as Lookup<any>;
+            expect(data instanceof Lookup).toBe(true);
+            expect(data.items).toEqual([{
+                x: 3,
+                t: "T3"
+            }]);
+            expect(data.itemById).toEqual({
+                "3": {
+                    x: 3,
+                    t: "T3"
+                }
+            });
+            expect(data.idField).toEqual("x");
+            expect(data.textField).toEqual("t");
+        }
+        finally {
+            scriptDataHooks.fetchScriptData = originalHook;
+        }
+    });
+
+    it("converts response to a lookup for name that starts with Lookup.", async () => {
+        const lookupData = { Params: { idField: "x", textField: "t" }, Items: [{ x: 3, t: "T3" }] };
+        const xhrMock = {
+            open: vi.fn(),
+            send: vi.fn(),
+            status: 200,
+            responseText: JSON.stringify(lookupData)
+        };
+        vi.spyOn(window, "XMLHttpRequest").mockImplementation(() => xhrMock as any);
+        const data = ensureScriptDataSync("Lookup.Test") as Lookup<any>;
+        expect(data instanceof Lookup).toBe(true);
+        expect(data.items).toEqual([{
+            x: 3,
+            t: "T3"
+        }]);
+        expect(data.itemById).toEqual({
+            "3": {
+                x: 3,
+                t: "T3"
+            }
+        });
+        expect(data.idField).toEqual("x");
+        expect(data.textField).toEqual("t");
+    });
+
+
+    it("fetches data synchronously via XMLHttpRequest if not in store", () => {
+        const testData = { key: "value" };
+        const xhrMock = {
+            open: vi.fn(),
+            send: vi.fn(),
+            status: 200,
+            responseText: JSON.stringify(testData)
+        };
+        vi.spyOn(window, "XMLHttpRequest").mockImplementation(() => xhrMock as any);
+
+        const result = ensureScriptDataSync("TestKey");
+        expect(xhrMock.open).toHaveBeenCalledWith("GET", expect.stringContaining("/DynamicData/TestKey"), false);
+        expect(xhrMock.send).toHaveBeenCalled();
+        expect(result).toEqual(testData);
+    });
+
+    it("throws an error if XMLHttpRequest returns null", () => {
+        const xhrMock = {
+            open: vi.fn(),
+            send: vi.fn(),
+            status: 200,
+            responseText: JSON.stringify(null)
+        };
+        vi.spyOn(window, "XMLHttpRequest").mockImplementation(() => xhrMock as any);
+        const logSpy = vi.spyOn(console, "log").mockImplementation(() => {});
+
+        expect(() => ensureScriptDataSync("TestKey")).toThrow("Cannot load dynamic data: TestKey!")
+
+        expect(logSpy).not.toHaveBeenCalled();
+        expect(vi.mocked(notifyError)).toHaveBeenCalledExactlyOnceWith("Cannot load dynamic data: TestKey!");
+    });
+
+    it("uses DynJS.axd endpoint if second argument is true", () => {
+        const testData = { key: "value" };
+        const xhrMock = {
+            open: vi.fn(),
+            send: vi.fn(),
+            status: 200,
+            responseText: `(function() {
+            })();`
+        };
+        vi.spyOn(window, "XMLHttpRequest").mockImplementation(() => xhrMock as any);
+        const appendChildSpy = vi.spyOn(window.document.head, "appendChild").mockImplementation(() => {
+            const s = Symbol.for('Serenity.scriptData');
+            globalThis[s] ??= {};
+            globalThis[s]["TestKey"] = testData;
+            const script = document.createElement("div");
+            document.body.append(script);
+            vi.spyOn(document.body, "removeChild").mockImplementation(() => {
+                return null;
+            });
+            return script;
+        });
+
+        const result = ensureScriptDataSync("TestKey", true);
+        expect(xhrMock.open).toHaveBeenCalledWith("GET", expect.stringContaining("/DynJS.axd/TestKey.js"), false);
+        expect(xhrMock.send).toHaveBeenCalled();
+        expect(appendChildSpy).toHaveBeenCalledOnce();
+        expect(result).toEqual(testData);
+    });
+
+    it("throws an error if XMLHttpRequest fails and logs the error", () => {
+        const xhrMock = {
+            open: vi.fn(),
+            send: vi.fn(),
+            status: 500,
+            statusText: "Server Error"
+        };
+        vi.spyOn(window, "XMLHttpRequest").mockImplementation(() => xhrMock as any);
+        const logSpy = vi.spyOn(console, "log").mockImplementation(() => {});
+
+        expect(() => ensureScriptDataSync("TestKey")).toThrow("An error occurred while trying to load dynamic data: \"TestKey\"!.");
+
+        expect(logSpy).toHaveBeenCalledWith("HTTP 500: Connection refused!");
+        expect(vi.mocked(notifyError)).toHaveBeenCalledExactlyOnceWith("An error occurred while trying to load dynamic data: \"TestKey\"!. Please check the error message displayed in the console for more info.");
+    });
+});
+
+describe("handleScriptDataError", () => {
+    it("notifies and throws an error for a missing lookup", () => {
+        const notifySpy = vi.mocked(notifyError);
+
+        expect(() => handleScriptDataError("Lookup.Test", 404)).toThrow(
+            'No lookup with key "Test" is registered. Please make sure you have a [LookupScript("Test")] attribute in server side code on top of a row / custom lookup and its key is exactly the same.'
+        );
+
+        expect(notifySpy).toHaveBeenCalledWith(
+            'No lookup with key "Test" is registered. Please make sure you have a [LookupScript("Test")] attribute in server side code on top of a row / custom lookup and its key is exactly the same.'
+        );
+    });
+
+    it("notifies and throws an error for access denied on a lookup", () => {
+        const notifySpy = vi.mocked(notifyError);
+
+        expect(() => handleScriptDataError("Lookup.Test", 403)).toThrow(expect.stringContaining("Access denied while trying to load the lookup"));
+
+        expect(notifySpy).toHaveBeenCalledWith(
+            expect.stringContaining("Access denied while trying to load the lookup"),
+            null,
+            {
+                timeOut: 10000
+            }
+        );
+    });
+
+    it("logs and throws an error for a server error", () => {
+        const notifySpy = vi.mocked(notifyError);
+        const logSpy = vi.spyOn(console, "log").mockImplementation(() => {});
+
+        expect(() => handleScriptDataError("DynamicData.Test", 500, "Server Error")).toThrow(
+            'An error occurred while trying to load dynamic data: "DynamicData.Test"!. Please check the error message displayed in the console for more info.'
+        );
+
+        expect(logSpy).toHaveBeenCalledWith("HTTP 500: Connection refused!");
+        expect(notifySpy).toHaveBeenCalledWith(
+            'An error occurred while trying to load dynamic data: "DynamicData.Test"!. Please check the error message displayed in the console for more info.'
+        );
+    });
+
+    it("logs and throws an error for an unknown error", () => {
+        const logSpy = vi.spyOn(console, "log").mockImplementation(() => {});
+        const notifySpy = vi.mocked(notifyError);
+
+        expect(() => handleScriptDataError("DynamicData.Test", 0, "Unknown Error")).toThrow(
+            'An error occurred while trying to load dynamic data: "DynamicData.Test"!. Please check the error message displayed in the console for more info.'
+        );
+
+        expect(logSpy).toHaveBeenCalledWith("An unknown connection error occurred!");
+        expect(notifySpy).toHaveBeenCalledWith(
+            'An error occurred while trying to load dynamic data: "DynamicData.Test"!. Please check the error message displayed in the console for more info.'
+        );
     });
 });
