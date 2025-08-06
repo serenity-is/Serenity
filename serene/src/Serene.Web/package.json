@@ -12,10 +12,10 @@
     "jquery-knob": "1.2.11",
     "jquery-sparkline": "2.4.0",
     "jsx-dom": "8.1.6",
-    "jvectormap-content": "0.1.0",
-    "jvectormap-next": "3.1.1",
+    "jvectormap-content": "0.1.1",
+    "jvectormap-next": "3.1.2",
     "moment": "2.30.1",
-    "preact": "10.26.9"
+    "preact": "10.27.0"
   },
   "devDependencies": {
     "@serenity-is/tsbuild": "workspace:*",
