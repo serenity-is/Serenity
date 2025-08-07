@@ -1,4 +1,4 @@
-﻿import { defineConfig } from "vitest/config";
+﻿import { configDefaults, defineConfig } from "vitest/config";
 
 export default defineConfig({
     test: {
@@ -11,6 +11,11 @@ export default defineConfig({
             }]
         },
         coverage: {
+            exclude: [
+                ...(configDefaults?.coverage?.exclude ?? []),
+                "build/**",
+                "src/index.ts"
+            ],
             excludeAfterRemap: true
         },
         globals: true
