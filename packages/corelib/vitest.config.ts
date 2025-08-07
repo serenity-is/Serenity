@@ -1,6 +1,6 @@
-﻿import { defineProject } from "vitest/config";
+﻿import { defineConfig } from "vitest/config";
 
-export default defineProject({
+export default defineConfig({
     test: {
         name: "corelib",
         environment: "jsdom",
@@ -9,6 +9,9 @@ export default defineProject({
             instances: [{
                 browser: "chromium",
             }]
+        },
+        coverage: {
+            excludeAfterRemap: true
         },
         globals: true
     }
