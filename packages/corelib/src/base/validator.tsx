@@ -118,7 +118,7 @@ export interface ValidatorOptions {
      *
      * default: the default message for the method used
      */
-    messages?: Record<string, string> | undefined;
+    messages?: Record<string, string | Record<string, string>> | undefined;
 
     normalizer?: (val: ValidationValue, element: ValidatableElement) => string;
 
