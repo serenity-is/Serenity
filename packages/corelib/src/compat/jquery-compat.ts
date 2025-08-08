@@ -1,15 +1,15 @@
-﻿import { Fluent, faIcon, getCookie, getTypeFullName, getjQuery } from "../base";
-import { isMobileView } from ".";
+﻿import { isMobileView } from ".";
+import { Fluent, faIcon, getCookie, getjQuery } from "../base";
 
 function applyJQueryUIFixes($: any): boolean {
     if (!$ || !$.ui || !$.ui.dialog || !$.ui.dialog.prototype)
         return false;
 
     $.ui.dialog.prototype._allowInteraction = function (event: any) {
-        if ($(event.target).closest(".ui-dialog").length) {
+        if (event.target?.closest?.(".ui-dialog")) {
             return true;
         }
-        return !!$(event.target).closest(".ui-datepicker, .select2-drop, .cke, .cke_dialog, .modal, #support-modal").length;
+        return !!(event.target?.closest?.(".ui-datepicker, .select2-drop, .cke, .cke_dialog, .modal, #support-modal"));
     };
 
     (function (orig) {
