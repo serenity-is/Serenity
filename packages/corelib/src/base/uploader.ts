@@ -236,7 +236,7 @@ export class Uploader {
 
         node.addEventListener("drop", (e) => {
             e.preventDefault();
-            if (e.dataTransfer.items?.[0]?.webkitGetAsEntry()) {
+            if (e.dataTransfer.items?.[0]?.webkitGetAsEntry() || (e.dataTransfer.items?.[0] as any)?.getAsEntry()) {
                 this.entriesApi(e, e.dataTransfer.items);
             } else if (e.dataTransfer.files) {
                 this.arrayApi(e, e.dataTransfer.files);
@@ -246,7 +246,7 @@ export class Uploader {
         });
 
         node.addEventListener("paste", (e) => {
-            if (e.clipboardData.items?.[0]?.webkitGetAsEntry()) {
+            if (e.clipboardData.items?.[0]?.webkitGetAsEntry() || (e.clipboardData.items?.[0] as any)?.getAsEntry()) {
                 this.entriesApi(e, e.clipboardData.items);
             } else if (e.clipboardData.files) {
                 this.arrayApi(e, e.clipboardData.files);
@@ -289,39 +289,43 @@ export class Uploader {
                                 resolve(void 0);
                             }, resolve.bind(void 0));
                         });
-                    } else {
-                        await readDirectory(entry, `${path}/${entry.name}`);
+                    } else if (entry.isDirectory) {
+                        await readDirectory(entry as FileSystemDirectoryEntry, `${path}/${entry.name}`);
                     }
                 }
             });
         }
 
-        let readEntries = async (entry: FileSystemDirectoryEntry, reader: FileSystemDirectoryReader,
-            oldEntries: FileSystemEntry[], cb: (entries: any) => void) => {
+        let readEntries = async (
+            entry: FileSystemDirectoryEntry,
+            reader: FileSystemDirectoryReader,
+            oldEntries: FileSystemEntry[],
+            cb: (entries: FileSystemEntry[]) => void
+        ) => {
             const dirReader = reader || entry.createReader();
+            let allEntries: FileSystemEntry[] = oldEntries ? oldEntries.slice() : [];
 
-            await new Promise((resolve) => {
-                dirReader.readEntries(entries => {
-                    if (skipRest())
-                        return;
-
-                    const newEntries = oldEntries ? oldEntries.concat(entries) : entries;
-                    if (entries.length) {
-                        setTimeout(readEntries.bind(null, entry, dirReader, newEntries, cb), 0);
-                    } else {
-                        cb(newEntries);
-                    }
-
-                    resolve(void 0);
-                }, () => resolve(void 0));
-            });
+            while (true) {
+                const entries: FileSystemEntry[] = await new Promise((resolve) => {
+                    dirReader.readEntries(resolve, () => resolve([]));
+                });
+                if (skipRest()) {
+                    break;
+                }
+                if (entries.length) {
+                    allEntries = allEntries.concat(entries);
+                } else {
+                    break;
+                }
+            }
+            cb(allEntries);
         }
 
         for (var i = 0; i < items.length; i++) {
             if (skipRest())
                 return;
 
-            let entry = items[i].webkitGetAsEntry();
+            let entry = items[i].webkitGetAsEntry?.() ?? (items[i] as any).getAsEntry?.();;
             if (entry) {
                 await new Promise(async (resolve) => {
                     if (entry.isFile) {
