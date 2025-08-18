@@ -21,7 +21,7 @@ public class UpdateInsertLogBehavior : BaseSaveBehavior, IImplicitBehavior
         var insertDateRow = row as IInsertDateRow;
         var insertUserIdRow = row as IInsertUserIdRow;
 
-        if (row is IUpdateDateRow updateDateRow && (handler.IsUpdate || insertDateRow != null))
+        if (row is IUpdateDateRow updateDateRow && (handler.IsUpdate || insertDateRow == null))
         {
             updateDateRow.UpdateDateField[row] = DateTimeField.ToDateTimeKind(DateTime.Now,
                 updateDateRow.UpdateDateField.DateTimeKind);
@@ -32,7 +32,7 @@ public class UpdateInsertLogBehavior : BaseSaveBehavior, IImplicitBehavior
                 insertDateRow.InsertDateField.DateTimeKind);
         }
 
-        if (row is IUpdateUserIdRow updateLogRow && (handler.IsUpdate || insertUserIdRow != null))
+        if (row is IUpdateUserIdRow updateLogRow && (handler.IsUpdate || insertUserIdRow == null))
         {
             updateLogRow.UpdateUserIdField.AsInvariant(row, handler.Context.User?.GetIdentifier());
         }
