@@ -106,8 +106,8 @@ public abstract class AccountPasswordActionsPageBase<TUserRow> : MembershipPageB
 
             var row = new TUserRow();
             row.IdField.AsInvariant(row, userId);
-            if (row is IUpdateLogRow updateLogRow)
-                updateLogRow.UpdateDateField[row] = DateTime.UtcNow;
+            if (row is IUpdateDateRow updateDateRow)
+                updateDateRow.UpdateDateField[row] = DateTime.UtcNow;
             row.PasswordHashField[row] = hash;
             row.PasswordSaltField[row] = salt;
             uow.Connection.UpdateById(row);
@@ -153,12 +153,12 @@ public abstract class AccountPasswordActionsPageBase<TUserRow> : MembershipPageB
                 return new ServiceResponse();
 
             var updateRow = new TUserRow();
-            if (updateRow is IUpdateLogRow updateLog && updateLog.UpdateDateField is not null)
+            if (updateRow is IUpdateDateRow updateDateRow && updateDateRow.UpdateDateField is not null)
             {
                 // set update date to make sure only the latest reset token can be used
                 updateRow.IdField.AsObject(updateRow, user.IdField.AsObject(user));
-                updateLog.UpdateDateField[user] = DateTime.UtcNow;
-                updateLog.UpdateDateField.AsObject(updateRow, updateLog.UpdateDateField.AsObject(user));
+                updateDateRow.UpdateDateField[user] = DateTime.UtcNow;
+                updateDateRow.UpdateDateField.AsObject(updateRow, updateDateRow.UpdateDateField.AsObject(user));
                 uow.Connection.UpdateById(updateRow);
                 cache.InvalidateOnCommit(uow, user.Fields);
             }
@@ -294,8 +294,8 @@ public abstract class AccountPasswordActionsPageBase<TUserRow> : MembershipPageB
 #endif
             var row = new TUserRow();
             row.IdField.AsObject(row, user.IdField.AsObject(user));
-            if (row is IUpdateLogRow updateLogRow)
-                updateLogRow.UpdateDateField[row] = DateTime.UtcNow;
+            if (row is IUpdateDateRow updateDateRow)
+                updateDateRow.UpdateDateField[row] = DateTime.UtcNow;
             row.PasswordHashField[row] = hash;
             row.PasswordSaltField[row] = salt;
             uow.Connection.UpdateById(row);

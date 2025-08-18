@@ -27,9 +27,9 @@ public sealed class NoteRow : Row<NoteRow.RowFields>, IIdRow, INameRow, IInsertL
     [DisplayName("Insert Date"), NotNull, Insertable(false), Updatable(false)]
     public DateTime? InsertDate { get => fields.InsertDate[this]; set => fields.InsertDate[this] = value; }
 
-    public Field InsertUserIdField => Fields.InsertUserId;
+    Field IInsertUserIdRow.InsertUserIdField => Fields.InsertUserId;
 
-    public DateTimeField InsertDateField => Fields.InsertDate;
+    DateTimeField IInsertDateRow.InsertDateField => Fields.InsertDate;
 
     public class RowFields : RowFieldsBase
     {

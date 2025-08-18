@@ -43,8 +43,8 @@ public abstract class MembershipPageBase<TUserRow> : Controller
     protected virtual int GetNonceFor(TUserRow user)
     {
         return GetDeterministicHashCode(
-            ((user as IUpdateLogRow)?.UpdateDateField[user] ??
-             (user as IInsertLogRow)?.InsertDateField[user] ??
+            ((user as IUpdateDateRow)?.UpdateDateField[user] ??
+             (user as IInsertDateRow)?.InsertDateField[user] ??
              DateTime.Today).ToString("s") +
              (user as IPasswordRow)?.PasswordHashField[user] +
              (user as IPasswordRow)?.PasswordSaltField[user]);
