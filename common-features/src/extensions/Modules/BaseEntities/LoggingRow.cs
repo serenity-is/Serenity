@@ -25,10 +25,10 @@ public abstract class LoggingRow<TFields> : Row<TFields>, ILoggingRow
     [Insertable(false), Updatable(false)]
     public DateTime? UpdateDate { get => fields.UpdateDate[this]; set => fields.UpdateDate[this] = value; }
 
-    Field IInsertLogRow.InsertUserIdField => fields.InsertUserId;
-    Field IUpdateLogRow.UpdateUserIdField => fields.UpdateUserId;
-    DateTimeField IInsertLogRow.InsertDateField => fields.InsertDate;
-    DateTimeField IUpdateLogRow.UpdateDateField => fields.UpdateDate;
+    DateTimeField IInsertDateRow.InsertDateField => fields.InsertDate;
+    Field IInsertUserIdRow.InsertUserIdField => fields.InsertUserId;
+    DateTimeField IUpdateDateRow.UpdateDateField => fields.UpdateDate;
+    Field IUpdateUserIdRow.UpdateUserIdField => fields.UpdateUserId;
 }
 
 public class LoggingRowFields(string tableName = null, string fieldPrefix = null) : RowFieldsBase(tableName, fieldPrefix)

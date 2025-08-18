@@ -147,14 +147,20 @@ public class LocalizationBehavior(IDefaultHandlerFactory handlerFactory) : BaseS
             ReferenceEquals(match, idr.IsDeletedField))
             return null;
 
-        if (localRowInstance is IInsertLogRow insertLog && (
-            ReferenceEquals(match, insertLog.InsertUserIdField) ||
-            ReferenceEquals(match, insertLog.InsertDateField)))
+        if (localRowInstance is IInsertDateRow insertDateRow &&
+            ReferenceEquals(match, insertDateRow.InsertDateField))
             return null;
 
-        if (localRowInstance is IUpdateLogRow updateLog && (
-            ReferenceEquals(match, updateLog.UpdateUserIdField) ||
-            ReferenceEquals(match, updateLog.UpdateDateField)))
+        if (localRowInstance is IInsertUserIdRow insertUserIdRow &&
+            ReferenceEquals(match, insertUserIdRow.InsertUserIdField))
+            return null;
+
+        if (localRowInstance is IUpdateDateRow updateDateRow &&
+            ReferenceEquals(match, updateDateRow.UpdateDateField))
+            return null;
+
+        if (localRowInstance is IUpdateUserIdRow updateUserIdRow &&
+            ReferenceEquals(match, updateUserIdRow.UpdateUserIdField))
             return null;
 
         return match;

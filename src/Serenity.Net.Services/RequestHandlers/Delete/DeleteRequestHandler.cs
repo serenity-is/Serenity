@@ -179,11 +179,14 @@ public class DeleteRequestHandler<TRow, TDeleteRequest, TDeleteResponse> : IDele
                                     deleteLogRow.DeleteDateField.DateTimeKind))
                           .Set(deleteLogRow.DeleteUserIdField, User?.GetIdentifier().TryParseID());
                 }
-                else if (Row is IUpdateLogRow updateLogRow)
+                else
                 {
-                    update.Set(updateLogRow.UpdateDateField, DateTimeField.ToDateTimeKind(DateTime.Now,
-                                    updateLogRow.UpdateDateField.DateTimeKind))
-                          .Set(updateLogRow.UpdateUserIdField, User?.GetIdentifier().TryParseID());
+                    if (Row is IUpdateLogRow updateLogRow)
+                    {
+                        update.Set(updateLogRow.UpdateDateField, DateTimeField.ToDateTimeKind(DateTime.Now,
+                                        updateLogRow.UpdateDateField.DateTimeKind))
+                                .Set(updateLogRow.UpdateUserIdField, User?.GetIdentifier().TryParseID());
+                    }
                 }
 
                 InvokeDeleteAction(() =>

@@ -10,32 +10,35 @@ public class UpdateInsertLogBehavior : BaseSaveBehavior, IImplicitBehavior
     /// <inheritdoc/>
     public bool ActivateFor(IRow row)
     {
-        return row is IUpdateLogRow || row is IInsertLogRow;
+        return row is IInsertDateRow || row is IInsertUserIdRow || 
+            row is IUpdateDateRow || row is IUpdateUserIdRow;
     }
 
     /// <inheritdoc/>
     public override void OnSetInternalFields(ISaveRequestHandler handler)
     {
         var row = handler.Row;
-        var insertLogRow = row as IInsertLogRow;
+        var insertDateRow = row as IInsertDateRow;
+        var insertUserIdRow = row as IInsertUserIdRow;
 
-        Field field;
-        var userId = handler.Context.User?.GetIdentifier();
-        if (row is IUpdateLogRow updateLogRow && (handler.IsUpdate || insertLogRow == null))
+        if (row is IUpdateDateRow updateDateRow && (handler.IsUpdate || insertDateRow != null))
         {
-            updateLogRow.UpdateDateField[row] = DateTimeField.ToDateTimeKind(DateTime.Now,
-                updateLogRow.UpdateDateField.DateTimeKind);
-
-            field = updateLogRow.UpdateUserIdField;
-            field.AsInvariant(row, userId);
+            updateDateRow.UpdateDateField[row] = DateTimeField.ToDateTimeKind(DateTime.Now,
+                updateDateRow.UpdateDateField.DateTimeKind);
         }
-        else if (insertLogRow != null && handler.IsCreate)
+        else if (insertDateRow != null && handler.IsCreate)
         {
-            insertLogRow.InsertDateField[row] = DateTimeField.ToDateTimeKind(DateTime.Now,
-                insertLogRow.InsertDateField.DateTimeKind);
+            insertDateRow.InsertDateField[row] = DateTimeField.ToDateTimeKind(DateTime.Now,
+                insertDateRow.InsertDateField.DateTimeKind);
+        }
 
-            field = insertLogRow.InsertUserIdField;
-            field.AsInvariant(row, userId);
+        if (row is IUpdateUserIdRow updateLogRow && (handler.IsUpdate || insertUserIdRow != null))
+        {
+            updateLogRow.UpdateUserIdField.AsInvariant(row, handler.Context.User?.GetIdentifier());
+        }
+        else if (insertUserIdRow != null && handler.IsCreate)
+        {
+            insertUserIdRow.InsertUserIdField.AsInvariant(row, handler.Context.User?.GetIdentifier());
         }
     }
 }

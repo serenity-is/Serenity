@@ -84,17 +84,17 @@ public class CaptureLogBehavior : BaseSaveDeleteBehavior, IImplicitBehavior, IUn
         bool anyChanged = false;
         foreach (var field in handler.Row.GetTableFields())
         {
-            if (handler.Row is IInsertLogRow insertLogRow &&
-                (ReferenceEquals(insertLogRow.InsertDateField, field) ||
-                 ReferenceEquals(insertLogRow.InsertUserIdField, field)))
+            if (handler.Row is IInsertDateRow insertDateRow && ReferenceEquals(insertDateRow.InsertDateField, field))
                 continue;
 
-            if (handler.Row is IUpdateLogRow updateLogRow &&
-                (ReferenceEquals(updateLogRow.UpdateDateField, field) ||
-                 ReferenceEquals(updateLogRow.UpdateUserIdField, field)))
-            {
+            if (handler.Row is IInsertUserIdRow insertUserIdRow && ReferenceEquals(insertUserIdRow.InsertUserIdField, field))
                 continue;
-            }
+
+            if (handler.Row is IUpdateDateRow updateDateRow && ReferenceEquals(updateDateRow.UpdateDateField, field))
+                continue;
+
+            if (handler.Row is IUpdateUserIdRow updateUserIdRow && ReferenceEquals(updateUserIdRow.UpdateUserIdField, field))
+                continue;
 
             if (field.IndexCompare(handler.Old, handler.Row) != 0)
             {
