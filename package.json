@@ -3,7 +3,7 @@
   "devDependencies": {
     "@vitest/browser": "3.2.4",
     "@vitest/coverage-v8": "3.2.4",
-    "esbuild": "0.25.8",
+    "esbuild": "0.25.9",
     "flatpickr": "4.6.13",
     "jsdom": "26.1.0",
     "jsx-dom": "8.1.6",
