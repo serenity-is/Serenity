@@ -321,24 +321,24 @@ export class Uploader {
             cb(allEntries);
         }
 
-        for (var i = 0; i < items.length; i++) {
+        const entries = Array.from(items).map(x => x.webkitGetAsEntry?.() ?? (x as any).getAsEntry?.()).filter(x => !!x);
+
+        for (var i = 0; i < entries.length; i++) {
             if (skipRest())
                 return;
 
-            let entry = items[i].webkitGetAsEntry?.() ?? (items[i] as any).getAsEntry?.();;
-            if (entry) {
-                await new Promise(async (resolve) => {
-                    if (entry.isFile) {
-                        (entry as FileSystemFileEntry).file(async (file) => {
-                            if (!skipRest() && predicate(file.type))
-                                await this.addToBatch(file, file.name);
-                            resolve(void 0);
-                        }, resolve.bind(void 0));
-                    } else if (entry.isDirectory) {
-                        await readDirectory(entry as FileSystemDirectoryEntry, null);
-                    }
-                });
-            }
+            let entry = entries[i];
+            await new Promise(async (resolve) => {
+                if (entry.isFile) {
+                    (entry as FileSystemFileEntry).file(async (file) => {
+                        if (!skipRest() && predicate(file.type))
+                            await this.addToBatch(file, file.name);
+                        resolve(void 0);
+                    }, resolve.bind(void 0));
+                } else if (entry.isDirectory) {
+                    await readDirectory(entry as FileSystemDirectoryEntry, null);
+                }
+            });
         }
 
         this.endBatch(true);

@@ -296,7 +296,7 @@ describe("Uploader.uploadBatch exception handling", () => {
         };
 
         try {
-        await uploader.uploadBatch(batch, {});
+            await uploader.uploadBatch(batch, {});
         }
         catch (e) {
             // Exception is expected, we just want to ensure errorHandler is called
@@ -341,7 +341,7 @@ describe("Uploader constructor", () => {
         expect(watchDropZoneSpy).toHaveBeenCalledTimes(2);
         expect(watchDropZoneSpy).toHaveBeenCalledWith(dropZone1);
         expect(watchDropZoneSpy).toHaveBeenCalledWith(dropZone2);
-    });    
+    });
 });
 
 describe("Uploader.getTypePredicate", () => {
@@ -414,7 +414,101 @@ describe("Uploader.watchDropZone", () => {
         expect(uploadBatchSpy).toHaveBeenCalled();
         expect(dropZone.classList.contains("drop-valid")).toBe(true);
     });
+
+    it("handles drop event with multiple files and calls uploadBatch for each via arrayApi", async () => {
+        const dropZone = document.createElement("div");
+        const batchHandler = vi.fn().mockImplementation((batch: UploaderBatch) => {
+            return Promise.resolve();
+        });
+        const uploader = new Uploader({
+            batchHandler,
+            dropZone,
+            multiple: true
+        });
+
+        const mockFile1 = new File(["content1"], "file1.txt", { type: "text/plain" });
+        const mockFile2 = new File(["content2"], "file2.txt", { type: "text/plain" });
+
+        const dropEvent = new Event("drop");
+        Object.defineProperty(dropEvent, "dataTransfer", {
+            value: {
+                files: [mockFile1, mockFile2],
+                items: []
+            }
+        });
+
+        const arrayApiSpy = vi.spyOn(uploader as any, "arrayApi");
+
+        dropZone.dispatchEvent(dropEvent);
+
+        await flushPromises();
+        expect(arrayApiSpy).toHaveBeenCalledWith(dropEvent, [mockFile1, mockFile2]);
+        expect(batchHandler).toHaveBeenCalledTimes(2);
+        expect(batchHandler).toHaveBeenNthCalledWith(1, expect.objectContaining({
+            filePaths: [mockFile1.name]
+        }), uploader);
+        expect(batchHandler).toHaveBeenNthCalledWith(2, expect.objectContaining({
+            filePaths: [mockFile2.name]
+        }), uploader);
+    });
+
+    it("handles drop event with multiple files and calls uploadBatch for each via entriesApi", async () => {
+        const dropZone = document.createElement("div");
+        const batchHandler = vi.fn().mockImplementation((batch: UploaderBatch) => {
+            return Promise.resolve();
+        });
+        const uploader = new Uploader({
+            batchHandler,
+            dropZone,
+            multiple: true
+        });
+
+        const mockFile1 = new File(["content1"], "file1.txt", { type: "text/plain" });
+        const mockFile2 = new File(["content2"], "file2.txt", { type: "text/plain" });
+
+        const dropEvent = new Event("drop");
+        Object.defineProperty(dropEvent, "dataTransfer", {
+            value: {
+                items: [
+                    {
+                        kind: "file",
+                        type: "text/plain",
+                        webkitGetAsEntry: () => ({
+                            isFile: true,
+                            file: (callback: (file: File) => void) => callback(mockFile1)
+                        })
+                    },
+                    {
+                        kind: "file",
+                        type: "text/plain",
+                        webkitGetAsEntry: () => ({
+                            isFile: true,
+                            file: (callback: (file: File) => void) => callback(mockFile2)
+                        })
+                    }
+                ]
+            }
+        });
+
+        const entriesApiSpy = vi.spyOn(uploader as any, "entriesApi");
+
+        dropZone.dispatchEvent(dropEvent);
+
+        await flushPromises();
+        expect(entriesApiSpy).toHaveBeenCalledWith(dropEvent, (dropEvent as any).dataTransfer.items);
+        expect(batchHandler).toHaveBeenCalledTimes(2);
+        expect(batchHandler).toHaveBeenNthCalledWith(1, expect.objectContaining({
+            filePaths: [mockFile1.name]
+        }), uploader);
+        expect(batchHandler).toHaveBeenNthCalledWith(2, expect.objectContaining({
+            filePaths: [mockFile2.name]
+        }), uploader);
+    });
 });
+
+async function flushPromises() {
+    return new Promise((window as any).setImmediate ?? (window as any).setTimeout);
+}
 
 describe("Uploader.watchDropZone with dataTransfer.files", () => {
     it("handles drop event with files when webkitGetAsEntry is not available", async () => {
