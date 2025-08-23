@@ -1637,6 +1637,14 @@ export declare const TranslationConfig: {
 	getLanguageList: () => LanguageList;
 	translateTexts: (opt: TranslateTextsOptions) => PromiseLike<TranslateTextsResult>;
 };
+/** @deprecated prefer localText for better discoverability */
+export declare const text: typeof localText;
+export declare namespace LT {
+	/** @deprecated Use addLocalText */
+	const add: typeof addLocalText;
+	/** @deprecated Use localText */
+	const getDefault: typeof localText;
+}
 export interface LookupOptions<TItem> {
 	idField?: string;
 	parentIdField?: string;
@@ -2190,7 +2198,7 @@ export interface ValidatorOptions {
 	 *
 	 * default: the default message for the method used
 	 */
-	messages?: Record<string, string> | undefined;
+	messages?: Record<string, string | Record<string, string>> | undefined;
 	normalizer?: (val: ValidationValue, element: ValidatableElement) => string;
 	/**
 	 * Boolean or Function. Validate checkboxes and radio buttons on click. Set to false to disable.
@@ -2686,14 +2694,6 @@ export declare namespace LayoutTimer {
 }
 export declare function executeOnceWhenVisible(el: HTMLElement | ArrayLike<HTMLElement>, callback: Function): void;
 export declare function executeEverytimeWhenVisible(el: HTMLElement | ArrayLike<HTMLElement>, callback: Function, callNowIfVisible: boolean): void;
-/** @deprecated prefer localText for better discoverability */
-export declare const text: typeof localText;
-export declare namespace LT {
-	/** @deprecated Use addLocalText */
-	const add: typeof addLocalText;
-	/** @deprecated Use localText */
-	const getDefault: typeof localText;
-}
 export interface HandleRouteEvent extends Event {
 	route: string;
 	parts: string[];
