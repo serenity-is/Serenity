@@ -11,9 +11,6 @@ importers:
 
   .:
     devDependencies:
-      '@vitest/browser':
-        specifier: 3.2.4
-        version: 3.2.4(playwright@1.54.2)(vite@7.0.4)(vitest@3.2.4)
       '@vitest/coverage-v8':
         specifier: 3.2.4
         version: 3.2.4(@vitest/browser@3.2.4)(vitest@3.2.4)
@@ -29,9 +26,6 @@ importers:
       jsx-dom:
         specifier: 8.1.6
         version: 8.1.6
-      playwright:
-        specifier: 1.54.2
-        version: 1.54.2
       typescript:
         specifier: 5.9.2
         version: 5.9.2
@@ -1255,6 +1249,7 @@ snapshots:
       '@babel/helper-validator-identifier': 7.27.1
       js-tokens: 4.0.0
       picocolors: 1.1.1
+    optional: true
 
   '@babel/helper-string-parser@7.27.1': {}
 
@@ -1264,7 +1259,8 @@ snapshots:
     dependencies:
       '@babel/types': 7.28.0
 
-  '@babel/runtime@7.27.6': {}
+  '@babel/runtime@7.27.6':
+    optional: true
 
   '@babel/types@7.28.0':
     dependencies:
@@ -1407,7 +1403,8 @@ snapshots:
   '@pkgjs/parseargs@0.11.0':
     optional: true
 
-  '@polka/url@1.0.0-next.29': {}
+  '@polka/url@1.0.0-next.29':
+    optional: true
 
   '@rollup/rollup-android-arm-eabi@4.44.2':
     optional: true
@@ -1479,12 +1476,15 @@ snapshots:
       dom-accessibility-api: 0.5.16
       lz-string: 1.5.0
       pretty-format: 27.5.1
+    optional: true
 
   '@testing-library/user-event@14.6.1(@testing-library/dom@10.4.0)':
     dependencies:
       '@testing-library/dom': 10.4.0
+    optional: true
 
-  '@types/aria-query@5.0.4': {}
+  '@types/aria-query@5.0.4':
+    optional: true
 
   '@types/chai@5.2.2':
     dependencies:
@@ -1515,6 +1515,7 @@ snapshots:
       - msw
       - utf-8-validate
       - vite
+    optional: true
 
   '@vitest/coverage-v8@3.2.4(@vitest/browser@3.2.4)(vitest@3.2.4)':
     dependencies:
@@ -1589,13 +1590,15 @@ snapshots:
     dependencies:
       color-convert: 2.0.1
 
-  ansi-styles@5.2.0: {}
+  ansi-styles@5.2.0:
+    optional: true
 
   ansi-styles@6.2.1: {}
 
   aria-query@5.3.0:
     dependencies:
       dequal: 2.0.3
+    optional: true
 
   assertion-error@2.0.1: {}
 
@@ -1629,6 +1632,7 @@ snapshots:
     dependencies:
       ansi-styles: 4.3.0
       supports-color: 7.2.0
+    optional: true
 
   chart.js@4.5.0:
     dependencies:
@@ -1673,9 +1677,11 @@ snapshots:
 
   deep-eql@5.0.2: {}
 
-  dequal@2.0.3: {}
+  dequal@2.0.3:
+    optional: true
 
-  dom-accessibility-api@0.5.16: {}
+  dom-accessibility-api@0.5.16:
+    optional: true
 
   dompurify@3.2.6:
     optionalDependencies:
@@ -1830,7 +1836,8 @@ snapshots:
 
   jquery@3.7.1: {}
 
-  js-tokens@4.0.0: {}
+  js-tokens@4.0.0:
+    optional: true
 
   js-tokens@9.0.1: {}
 
@@ -1877,7 +1884,8 @@ snapshots:
 
   lru-cache@11.1.0: {}
 
-  lz-string@1.5.0: {}
+  lz-string@1.5.0:
+    optional: true
 
   magic-string@0.30.17:
     dependencies:
@@ -1905,7 +1913,8 @@ snapshots:
 
   moment@2.30.1: {}
 
-  mrmime@2.0.1: {}
+  mrmime@2.0.1:
+    optional: true
 
   ms@2.1.3: {}
 
@@ -1939,13 +1948,15 @@ snapshots:
 
   picomatch@4.0.2: {}
 
-  playwright-core@1.54.2: {}
+  playwright-core@1.54.2:
+    optional: true
 
   playwright@1.54.2:
     dependencies:
       playwright-core: 1.54.2
     optionalDependencies:
       fsevents: 2.3.2
+    optional: true
 
   postcss@8.5.6:
     dependencies:
@@ -1960,10 +1971,12 @@ snapshots:
       ansi-regex: 5.0.1
       ansi-styles: 5.2.0
       react-is: 17.0.2
+    optional: true
 
   punycode@2.3.1: {}
 
-  react-is@17.0.2: {}
+  react-is@17.0.2:
+    optional: true
 
   rollup@4.44.2:
     dependencies:
@@ -2016,6 +2029,7 @@ snapshots:
       '@polka/url': 1.0.0-next.29
       mrmime: 2.0.1
       totalist: 3.0.1
+    optional: true
 
   source-map-js@1.2.1: {}
 
@@ -2080,7 +2094,8 @@ snapshots:
     dependencies:
       tldts-core: 6.1.86
 
-  totalist@3.0.1: {}
+  totalist@3.0.1:
+    optional: true
 
   tough-cookie@5.1.2:
     dependencies:

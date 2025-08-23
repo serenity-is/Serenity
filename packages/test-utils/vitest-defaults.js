@@ -43,12 +43,6 @@ export default (opt) => {
             name: opt?.name,
             environment: "jsdom",
             globals: true,
-            browser: {
-                provider: 'playwright',
-                instances: [{
-                    browser: "chromium",
-                }]
-            },            
             provide
         }
     });
