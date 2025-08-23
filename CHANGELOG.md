@@ -1,3 +1,50 @@
+## 8.8.8 (2025-08-23)
+
+### Features
+- Added Html.CspNonce() helper function and made it possible to optionally enable CSP by uncommenting and adjusting Content-Security-Policy meta element in _LayoutHead.cshtml
+- Also register addon option values as local text keys if they match the candidate regex
+- Run TSBuild target before ResolveProjectStaticWebAssets abd clean content items to resolve issues with static web assets issues in NET9 SDK.
+- Add npmCopy helper function to tsbuild that copies files under node_modules/ to wwwroot/npm/ folder. Used it to copy flatpickr, moment, chartjs and other scripts used in DashboardIndex to wwwroot/npm for use in appsetting.bundles.json. The entries in appsettings.bundles.json that start with ~/npm/ will be automatically copied from node_modules/ to wwwroot/npm/ by default.
+- Add Modules/**/*.mts to default entry points
+- Add ability to localize input add-ons text/hint if the value is a local text key
+- Converted UI samples to use .tsx instead of .cshtml files
+- Exception Log page is now using `Administration:ExceptionLog` permission instead of `Administration:Security` permission.
+- Updated .NET libraries including:
+    - ASP.NET Core framework packages to 9.0.8
+    - ClosedXML to 0.105.0
+    - FirebirdSql.Data.FirebirdClient to 10.3.3
+    - FluentMigrator to 7.1.0
+    - Microsoft.Data.SqlClient to 6.1.1
+    - Microsoft.TypeScript.MSBuild to 5.9.2
+    - NUglify to 1.21.17
+    - Npgsql to 9.0.3
+    - SixLabors.ImageSharp to 2.1.11
+- Updated NPM packages including:
+    - chart.js to 4.5.0
+    - dompurify to 3.2.6
+    - esbuild to 0.25.9
+    - glob to 11.0.3
+    - preact to 10.27.1
+    - typescript to 5.9.2
+    - vitest to 3.2.4
+- `**[Breaking Change]**` Split IInsertLogRow into IInsertDateRow and IInsertUserRow subinterfaces. Split IUpdateLogRow similarly. Replace IInsertLogRow.InsertUserIdField with IInsertUserIdRow.InsertUserIdField, IUpdateLogRow.UpdateUserIdField with IUpdateUserIdRow.UpdateUserIdField, IInsertLogRow.InsertDateField with IInsertDateRow.InsertDateField, and IUpdateLogRow.UpdateDateField with IUpdateDateRow.UpdateDateField if you implemented these interfaces in your rows
+- **`[Breaking Change]`** Removed following scripts from Serenity.Assets. If you still need these legacy scripts (e.g. in appsettings.bundles.json) you may install them via npm / libman.json or use them via CDN:
+    - jquery.colorbox (prefer glightbox from npm, we use it in StartSharp now)
+    - jquery.cookie
+    - jquery.event.drag
+    - jquery.maskedinput
+    - jquery-ui
+    - jquery-ui-i18n
+    - jspdf (if not available, PDFExportHelper will try to load it from CDNJS by default)
+    - jspdf.autotable (if not available, PDFExportHelper will try to load it from CDNJS by default)
+
+- **`[Breaking Change]`** Removing ckeditor from Serenity.Assets. HtmlContentEditor will load it (v4.22.1) from CDNJS by default. Please remove line `HtmlContentEditor.CKEditorBasePath = "~/Serenity.Assets/Scripts/ckeditor/"` from ScriptInit.ts.
+
+### Bugfixes
+- Resolve issue with multiple file drag drop on uploader due to event.dataTransfer.items array getting lost during async call
+- Disable each individual radio button for RadioButtonEditor when switching read only, closes #7372
+- Fix extending entry points with "+" does not work in tsbuild
+
 ## 8.8.6 (2025-05-31)
 
 ### Features
