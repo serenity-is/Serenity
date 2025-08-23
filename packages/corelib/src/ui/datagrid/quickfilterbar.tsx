@@ -76,7 +76,7 @@ export class QuickFilterBar<P extends QuickFilterBarOptions = QuickFilterBarOpti
         }
 
         if (opt.cssClass) {
-            qfElement.classList.add(opt.cssClass);
+            Fluent.addClass(qfElement, opt.cssClass);
         }
 
         var widget = Widget.create({
