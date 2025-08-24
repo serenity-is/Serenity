@@ -153,7 +153,7 @@ public sealed class DotNetTests : FrostingTask<BuildContext>
 {
     public override void Run(BuildContext context)
     {
-        var projects = context.GetFiles(context.SerenityDir + "tests/**/*.csproj");
+        var projects = context.GetFiles(context.SerenityDir + "/tests/**/*.csproj");
         foreach (var project in projects)
         {
             context.DotNetTest(project.FullPath, new()
