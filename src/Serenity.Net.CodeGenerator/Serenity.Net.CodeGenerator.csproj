@@ -2,8 +2,7 @@
   <PropertyGroup>
     <AssemblyName>sergen</AssemblyName>
     <OutputType>Exe</OutputType>
-    <OutputPath>bin\</OutputPath>
-    <AppendTargetFrameworkToOutputPath>false</AppendTargetFrameworkToOutputPath>
+    <OutputPath>$(ArtifactsPath)\bin\$(MSBuildProjectName)</OutputPath>
     <GenerateDocumentationFile>false</GenerateDocumentationFile>    
     <RootNamespace>Serenity.CodeGenerator</RootNamespace>
     <TargetFramework>net8.0</TargetFramework>
@@ -31,6 +30,6 @@
     <ItemGroup>
       <_OutputFilesToCopy Include="$(OutDir)\**\*" />
     </ItemGroup>
-    <Copy SourceFiles="@(_OutputFilesToCopy)" DestinationFolder="$(MSBuildProjectDirectory)\..\artifacts\sergen\%(RecursiveDir)" UseHardlinksIfPossible="true" SkipUnchangedFiles="true" OverwriteReadOnlyFiles="true" />
+    <Copy SourceFiles="@(_OutputFilesToCopy)" DestinationFolder="$(MSBuildProjectDirectory)\..\..\artifacts\sergen\%(RecursiveDir)" UseHardlinksIfPossible="true" SkipUnchangedFiles="true" OverwriteReadOnlyFiles="true" />
   </Target>
 </Project>

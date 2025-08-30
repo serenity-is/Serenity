@@ -1,6 +1,7 @@
 <Project>
   <Import Project="$(MSBuildThisFileDirectory)Test.Build.props" />
   <PropertyGroup>
+    <ArtifactsPath>$(MSBuildThisFileDirectory)..\artifacts</ArtifactsPath>
     <RootNamespace>Serenity.Tests</RootNamespace>
   </PropertyGroup>
 </Project>

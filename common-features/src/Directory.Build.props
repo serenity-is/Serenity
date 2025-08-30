@@ -2,6 +2,7 @@
   <Import Project="$(MSBuildThisFileDirectory)..\build\Package.Build.props" Condition="Exists('$(MSBuildThisFileDirectory)\..\build\Package.Build.props')" />
   <Import Project="$(MSBuildThisFileDirectory)..\build\Feature.Build.props" />
   <PropertyGroup>
+    <ArtifactsPath>$(MSBuildThisFileDirectory)..\..\artifacts</ArtifactsPath>
     <SerenityVersion Condition="'$(SerenityVersion)' == ''">8.8.8</SerenityVersion>
     <SergenTransform>all</SergenTransform>
     <TargetFramework>net8.0</TargetFramework>

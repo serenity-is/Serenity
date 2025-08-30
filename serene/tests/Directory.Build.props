@@ -1,6 +1,7 @@
 <Project>
   <Import Project="$(MSBuildThisFileDirectory)..\..\tests\Test.Build.props" />
   <PropertyGroup>
+    <ArtifactsPath>$(MSBuildThisFileDirectory)..\..\artifacts</ArtifactsPath>
     <RootNamespace>Serene.Tests</RootNamespace>
   </PropertyGroup>
 </Project>
