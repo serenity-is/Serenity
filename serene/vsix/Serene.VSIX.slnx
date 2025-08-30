@@ -1,5 +1,0 @@
-<Solution>
-  <Project Path="../build/build-serene.csproj" />
-  <Project Path="RootProjectWizard/RootProjectWizard.csproj" Id="36e47613-1d2e-4b13-86ae-8b73ed1b747e" />
-  <Project Path="Serene.Templates/Serene.Templates.csproj" />
-</Solution>

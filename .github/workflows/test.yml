@@ -20,7 +20,7 @@ jobs:
     - name: setup .net
       uses: actions/setup-dotnet@v4
       with:
-        dotnet-version: 9.0.x
+        dotnet-version: 8.0.x
 
     - name: Nuget package cache
       uses: actions/cache@v4
@@ -51,7 +51,7 @@ jobs:
       run: dotnet pack 
       working-directory: "./src/Serenity.Net.CodeGenerator"
 
-    - name: dotnet build Serenity.slnx
+    - name: dotnet build Serenity.sln
       run: dotnet build /p:SkipNodeScripts=true
 
     - name: dotnet test

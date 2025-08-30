@@ -11,7 +11,7 @@ public static partial class Shared
     public static string ProjectFile => Path.Combine(ProjectFolder, ProjectName + ".csproj");
     public static string PackageJsonFile => Path.Combine(ProjectFolder, "package.json");
     public static string SolutionFolder => IsStartSharp ? Root : SerenityFolder;
-    public static string SolutionFile => IsStartSharp ? Path.Combine(SolutionFolder, ProjectId + ".sln") : Path.Combine(SerenityFolder, "Serenity.slnx");
+    public static string SolutionFile => IsStartSharp ? Path.Combine(SolutionFolder, ProjectId + ".sln") : Path.Combine(SerenityFolder, "Serenity.sln");
     public static string SergenJsonFile => Path.Combine(ProjectFolder, "sergen.json");
     public static string TemplateId => IsStartSharp ? "StartCore" : "SereneCore";
     public static string VSIXTemplateFolder => Path.Combine(Root, "vsix");

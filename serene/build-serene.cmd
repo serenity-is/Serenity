@@ -36,7 +36,7 @@ goto build_vsix_package
 
 :build_vsix_package
 echo *** BUILDING VSIX PACKAGE ***
-"%VSINSTALLDIR%\MSBuild\Current\Bin\MSBuild.exe" "vsix\Serene.VSIX.slnx" -verbosity:m
+"%VSINSTALLDIR%\MSBuild\Current\Bin\MSBuild.exe" "vsix\Serene.VSIX.sln" -verbosity:m
 if %ERRORLEVEL% GEQ 1 GOTO :error
 rem start vsix\bin\Serene.Template.vsix
 goto install_template

@@ -49,13 +49,13 @@ public class BuildContext : FrostingContext
         string tryPath(string relative)
         {
             var path = Path.Combine(workingDir, relative);
-            if (File.Exists(Path.Combine(path, "Serenity.slnx")))
+            if (File.Exists(Path.Combine(path, "Serenity.sln")))
                 return path;
             return null;
         }
 
         SerenityDir = tryPath(".") ?? tryPath("Serenity") ?? tryPath("..") ??
-            throw new Exception("Couldn't locate Serenity.slnx from current directory!");
+            throw new Exception("Couldn't locate Serenity.sln from current directory!");
 
         context.Environment.WorkingDirectory = SerenityDir;
     }

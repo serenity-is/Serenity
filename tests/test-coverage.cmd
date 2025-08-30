@@ -5,7 +5,7 @@ set resultsdir=%mydir%TestResults\
 cd %mydir%
 FOR /d /r . %%d IN ("TestResults") DO @IF EXIST "%%d" rd /s /q "%%d"
 
-dotnet test --collect:"XPlat Code Coverage;Format=json,cobertura" ..\Serenity.slnx
+dotnet test --collect:"XPlat Code Coverage;Format=json,cobertura" ..\Serenity.sln
 
 dotnet tool restore
 dotnet reportgenerator -reports:**/coverage.cobertura.xml -targetdir:./TestResults/coverage -assemblyfilters:-*.Tests;-*.Test
