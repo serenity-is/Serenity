@@ -13,7 +13,7 @@ TestResults/
 *.suo
 *.DotSettings*
 *.user
-build*.sln
+build*.sln*
 Thumbs.db
 ErrorLog.db
 StyleCop.Cache
