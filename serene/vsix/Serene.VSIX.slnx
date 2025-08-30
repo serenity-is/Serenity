@@ -1,0 +1,6 @@
+<Solution>
+  <Project Path="../build/build-serene.csproj" />
+  <Project Path="RootProjectWizard/RootProjectWizard.csproj" />
+  <Project Path="Serene.Templates/Serene.Templates.csproj" />
+  <Project Path="Serene.VSIX.csproj" />
+</Solution>
