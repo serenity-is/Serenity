@@ -1,0 +1,42 @@
+<Solution>
+  <Folder Name="/common-features/">
+    <Project Path="common-features/src/demo.basicsamples/Serenity.Demo.BasicSamples.csproj" />
+    <Project Path="common-features/src/demo.northwind/Serenity.Demo.Northwind.csproj" />
+    <Project Path="common-features/src/extensions/Serenity.Extensions.csproj">
+      <BuildDependency Project="src/Serenity.Net.CodeGenerator/Serenity.Net.CodeGenerator.csproj" />
+    </Project>
+  </Folder>
+  <Folder Name="/common-features/build/">
+    <File Path="common-features/build/Feature.Build.props" />
+    <File Path="common-features/build/Feature.Build.targets" />
+    <File Path="common-features/build/Package.Build.props" />
+    <File Path="common-features/src/.config/sergen.base.json" />
+    <File Path="common-features/src/Directory.Build.props" />
+    <File Path="common-features/src/Directory.Build.targets" />
+  </Folder>
+  <Folder Name="/serenity/">
+    <File Path="build/Package.Build.props" />
+    <File Path="src/Directory.Build.props" />
+    <File Path="src/Directory.Build.targets" />
+    <File Path="src/RestoreNpmPackages.targets" />
+    <File Path="src/Serenity.Net.Web/Serenity.Net.Web.targets" />
+    <File Path="tests/Test.Build.props" />
+    <Project Path="src/Serenity.Assets/Serenity.Assets.csproj" />
+    <Project Path="src/Serenity.Net.CodeGenerator/Serenity.Net.CodeGenerator.csproj" />
+    <Project Path="src/Serenity.Net.Core/Serenity.Net.Core.csproj" />
+    <Project Path="src/Serenity.Net.Services/Serenity.Net.Services.csproj" />
+    <Project Path="src/Serenity.Net.Web/Serenity.Net.Web.csproj" />
+    <Project Path="tests/Serenity.Net.CodeGenerator.Tests/Serenity.Net.CodeGenerator.Tests.csproj" />
+    <Project Path="tests/Serenity.Net.Tests/Serenity.Net.Tests.csproj" />
+  </Folder>
+  <Folder Name="/serenity/npm-packages/">
+    <File Path="packages/Directory.Build.props" />
+    <File Path="packages/Directory.Build.targets" />
+    <Project Path="packages/corelib/Serenity.Corelib.csproj" />
+    <Project Path="packages/sleekgrid/Serenity.SleekGrid.csproj" />
+    <Project Path="packages/test-utils/test-utils.esproj" />
+    <Project Path="packages/tsbuild/tsbuild.esproj" />
+  </Folder>
+  <Project Path="serene/src/Serene.Web/Serene.Web.csproj" />
+  <Project Path="serene/tests/Serene.Tests/Serene.Tests.csproj" />
+</Solution>

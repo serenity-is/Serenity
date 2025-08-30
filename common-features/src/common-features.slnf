@@ -1,6 +1,6 @@
 {
   "solution": {
-    "path": "..\\..\\Serenity.sln",
+    "path": "..\\..\\Serenity.slnx",
     "projects": [
       "common-features\\src\\demo.basicsamples\\Serenity.Demo.BasicSamples.csproj",
       "common-features\\src\\demo.northwind\\Serenity.Demo.Northwind.csproj",
