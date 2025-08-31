@@ -30,6 +30,6 @@
     <ItemGroup>
       <_OutputFilesToCopy Include="$(OutDir)\**\*" />
     </ItemGroup>
-    <Copy SourceFiles="@(_OutputFilesToCopy)" DestinationFolder="$(MSBuildProjectDirectory)\..\..\artifacts\sergen\%(RecursiveDir)" UseHardlinksIfPossible="true" SkipUnchangedFiles="true" OverwriteReadOnlyFiles="true" />
+    <Copy SourceFiles="@(_OutputFilesToCopy)" DestinationFolder="$(ArtifactsPath)\sergen\%(RecursiveDir)" UseHardlinksIfPossible="true" SkipUnchangedFiles="true" OverwriteReadOnlyFiles="true" />
   </Target>
 </Project>
