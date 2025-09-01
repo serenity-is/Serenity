@@ -10,6 +10,7 @@
     <SerenitySrc>..\..\..\src\</SerenitySrc>
     <DefineConstants>$(DefineConstants);Northwind;BasicSamples</DefineConstants>
     <UseProjectRefs Condition="!Exists('$(SerenitySrc)..\Serenity.sln')">false</UseProjectRefs>
+    <AccelerateBuildsInVisualStudio>true</AccelerateBuildsInVisualStudio>
     <!--#endif-->
   </PropertyGroup>
   <Import Project="$(SerenitySrc)Serenity.Net.Web\Serenity.Net.Web.targets" Condition="'$(UseProjectRefs)' != 'false'" />
