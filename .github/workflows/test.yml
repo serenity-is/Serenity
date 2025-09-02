@@ -49,7 +49,7 @@ jobs:
 
     - name: dotnet pack Serenity.Net.CodeGenerator
       run: dotnet pack 
-      working-directory: "./src/Serenity.Net.CodeGenerator"
+      working-directory: "./src/codegenerator"
 
     - name: dotnet build Serenity.sln
       run: dotnet build /p:SkipNodeScripts=true

@@ -213,7 +213,7 @@ public class GeneratorConfig
     /// <summary>
     /// The location of custom templates folder. The files in this folder
     /// will override the default scriban templates in Sergen.
-    /// Their names must match the names at https://github.com/serenity-is/Serenity/tree/master/src/Serenity.Net.CodeGenerator/Templates
+    /// Their names must match the names at https://github.com/serenity-is/Serenity/tree/master/src/codegenerator/Templates
     /// You may also include additional files to be generated
     /// </summary>
     public string CustomTemplates { get; set; }
