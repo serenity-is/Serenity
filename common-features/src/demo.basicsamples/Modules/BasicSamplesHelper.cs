@@ -3,6 +3,7 @@ using Microsoft.AspNetCore.Mvc.Razor;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using System.IO;
+using System.Reflection;
 using System.Xml.Linq;
 using HtmlHelper = Microsoft.AspNetCore.Mvc.Rendering.IHtmlHelper;
 
@@ -67,14 +68,25 @@ public static class BasicSamplesHelper
         if (cachedCommitId != null)
             return cachedCommitId;
 
-        var packageId = typeof(BasicSamplesHelper).Assembly.GetName().Name.ToLowerInvariant();
-        var version = typeof(BasicSamplesHelper).Assembly.GetName().Version;
+        var asm = typeof(BasicSamplesHelper).Assembly;
+
+        var infVersion = asm.GetCustomAttribute<AssemblyInformationalVersionAttribute>().InformationalVersion;
+        if (infVersion != null)
+        {
+            var plus = infVersion.IndexOf('+');
+            if (plus >= 0 && plus < infVersion.Length - 1)
+                return cachedCommitId = infVersion[(plus + 1)..];
+        }
+
+        var packageId = asm.GetName().Name.ToLowerInvariant();
+        var version = asm.GetName().Version;
         try
         {
             if (version == null)
                 return cachedCommitId = "master";
 
-            var nugetFolder = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.UserProfile), ".nuget", "packages");
+            var nugetFolder = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.UserProfile), 
+                ".nuget", "packages");
             var versionStr = version.ToString();
             var nuspecFile = Path.Combine(nugetFolder, packageId, versionStr, packageId + ".nuspec");
             if (!File.Exists(nuspecFile))
