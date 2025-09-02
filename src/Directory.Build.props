@@ -17,7 +17,6 @@
   </PropertyGroup>
   <ItemGroup>
     <InternalsVisibleTo Include="Serenity.Net.Tests" />
-    <PackageReference Include="Microsoft.SourceLink.GitHub" Version="8.0.0" PrivateAssets="All" />
   </ItemGroup>
   <ItemGroup>
     <None Remove="$(MSBuildProjectDirectory)\*.json" />

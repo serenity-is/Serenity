@@ -14,7 +14,6 @@
     <DebugType>embedded</DebugType>
   </PropertyGroup>
   <ItemGroup>
-    <PackageReference Include="Microsoft.SourceLink.GitHub" Version="8.0.0" PrivateAssets="All" />
     <None Include="$(MSBuildThisFileDirectory)assets\package-icon.png" Pack="true" PackagePath="">
       <Link>Properties\package-icon.png</Link>
     </None>
