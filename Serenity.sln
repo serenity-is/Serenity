@@ -3,7 +3,7 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio Version 17
 VisualStudioVersion = 17.0.31919.166
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Serenity.Net.Core", "src\Serenity.Net.Core\Serenity.Net.Core.csproj", "{6F13B7F5-3F1E-4A7F-962D-59EBD3118E83}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Serenity.Net.Core", "src\core\Serenity.Net.Core.csproj", "{6F13B7F5-3F1E-4A7F-962D-59EBD3118E83}"
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Serenity.Net.Services", "src\Serenity.Net.Services\Serenity.Net.Services.csproj", "{D0697A40-5BCB-4B2E-B72C-E371AFEF3BD9}"
 EndProject
