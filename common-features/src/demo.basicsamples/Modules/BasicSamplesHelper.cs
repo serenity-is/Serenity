@@ -3,6 +3,7 @@ using Microsoft.AspNetCore.Mvc.Razor;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using System.IO;
+using System.Xml.Linq;
 using HtmlHelper = Microsoft.AspNetCore.Mvc.Rendering.IHtmlHelper;
 
 namespace Serenity.Demo.BasicSamples;
@@ -20,9 +21,7 @@ public static class BasicSamplesHelper
             return null;
 
         var path = file.StartsWith('/') ? file[1..] : "demo.basicsamples" + GetRelativePathFor(helper, file);
-        var config = helper.ViewContext?.HttpContext?.RequestServices?.GetService<IConfiguration>();
-        var commitId = config?.GetValue<string>("SampleSettings:SerenityCommitId") ?? "master";
-        var href = $"https://github.com/serenity-is/Serenity/blob/{Uri.EscapeDataString(commitId)}/common-features/src/{path}";
+        var href = $"https://github.com/serenity-is/Serenity/blob/{Uri.EscapeDataString(GetCommitId(helper))}/common-features/src/{path}";
         return new HtmlString($"<a target=\"blank\" style=\"font-weight: bold;\" href=\"{helper.Encode(href)}\">{helper.Encode(Path.GetFileName(file))}</a>");
     }
 
@@ -55,4 +54,62 @@ public static class BasicSamplesHelper
 
         return relative;
     }
+
+    private static string cachedCommitId;
+
+    private static string GetCommitId(HtmlHelper helper)
+    {
+        if (cachedCommitId != null)
+            return cachedCommitId;
+
+        var config = helper.ViewContext?.HttpContext?.RequestServices?.GetService<IConfiguration>();
+        cachedCommitId = config?.GetValue<string>("SampleSettings:SerenityCommitId");
+        if (cachedCommitId != null)
+            return cachedCommitId;
+
+        var packageId = typeof(BasicSamplesHelper).Assembly.GetName().Name.ToLowerInvariant();
+        var version = typeof(BasicSamplesHelper).Assembly.GetName().Version;
+        try
+        {
+            if (version == null)
+                return cachedCommitId = "master";
+
+            var nugetFolder = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.UserProfile), ".nuget", "packages");
+            var versionStr = version.ToString();
+            var nuspecFile = Path.Combine(nugetFolder, packageId, versionStr, packageId + ".nuspec");
+            if (!File.Exists(nuspecFile))
+            {
+                if (version.Revision == 0 &&
+                    versionStr.EndsWith(".0", StringComparison.Ordinal))
+                {
+                    versionStr = versionStr[..^2];
+                    nuspecFile = Path.Combine(nugetFolder, packageId, versionStr, packageId + ".nuspec");
+                    if (!File.Exists(nuspecFile))
+                        return cachedCommitId = "master";
+                }
+                else
+                    return cachedCommitId = "master";
+            }
+
+            var doc = XDocument.Load(nuspecFile);
+            XNamespace ns = "http://schemas.microsoft.com/packaging/2013/05/nuspec.xsd";
+            var node = doc.Descendants(ns + "repository").FirstOrDefault();
+            if (node == null)
+                return null;
+            var url = node.Attribute("url")?.Value;
+            var commit = node.Attribute("commit")?.Value;
+            if (!string.IsNullOrEmpty(url) &&
+                !string.IsNullOrEmpty(commit) &&
+                url.Equals("https://github.com/serenity-is/serenity.git", StringComparison.OrdinalIgnoreCase))
+            {
+                return cachedCommitId = commit;
+            }
+        }
+        catch
+        {
+            return cachedCommitId = "master";
+        }
+        return cachedCommitId = "master";
+    }
+
 }
