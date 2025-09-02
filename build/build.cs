@@ -127,7 +127,7 @@ public sealed class Clean : FrostingTask<BuildContext>
     {
         context.CleanDirectory(context.SerenityNupkg);
         context.CreateDirectory(context.SerenityNupkg);
-        context.CleanDirectories(context.SerenitySrc + "/Serenity.*/**/bin/" + context.Configuration);
+        context.CleanDirectories(context.SerenityDir + "/artifacts/bin/");
         context.CleanDirectories(context.SerenityDir + "/tests/**/bin/");
         context.CleanDirectories(context.SerenityDir + "/packages/*/out");
     }
@@ -214,7 +214,7 @@ public sealed class Pack : FrostingTask<BuildContext>
         packer.Pack("Serenity.Net.Services/Serenity.Net.Services.csproj");
         packer.Pack("Serenity.Net.Web/Serenity.Net.Web.csproj");
         packer.Pack("Serenity.Net.CodeGenerator/Serenity.Net.CodeGenerator.csproj");
-        packer.Pack("Serenity.Assets/Serenity.Assets.csproj");
+        packer.Pack("assets/Serenity.Assets.csproj");
         packer.Pack("../packages/corelib/Serenity.Corelib.csproj");
     }
 }

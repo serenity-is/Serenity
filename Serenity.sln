@@ -11,7 +11,7 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Serenity.Net.Web", "src\Ser
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Serenity.Net.CodeGenerator", "src\Serenity.Net.CodeGenerator\Serenity.Net.CodeGenerator.csproj", "{7B2CED35-AD39-42D5-AF64-5AC73D11EEF9}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Serenity.Assets", "src\Serenity.Assets\Serenity.Assets.csproj", "{2A1F8FC5-781A-4928-B811-CE802ABB23AD}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Serenity.Assets", "src\assets\Serenity.Assets.csproj", "{2A1F8FC5-781A-4928-B811-CE802ABB23AD}"
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Serenity.Net.Tests", "tests\Serenity.Net.Tests\Serenity.Net.Tests.csproj", "{17CA1A06-E8A4-4EE7-9D75-DE67024B6CC7}"
 EndProject
