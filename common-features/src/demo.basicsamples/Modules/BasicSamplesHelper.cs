@@ -1,5 +1,7 @@
 using Microsoft.AspNetCore.Html;
 using Microsoft.AspNetCore.Mvc.Razor;
+using Microsoft.Extensions.Configuration;
+using Microsoft.Extensions.DependencyInjection;
 using System.IO;
 using HtmlHelper = Microsoft.AspNetCore.Mvc.Rendering.IHtmlHelper;
 
@@ -17,14 +19,11 @@ public static class BasicSamplesHelper
         if (file == null || file.Length == 0)
             return null;
 
-        string path = file.StartsWith('/') ?
-            file[1..] :
-            "demo.basicsamples" + GetRelativePathFor(helper, file);
-
-        return new HtmlString("<a target=\"blank\" style=\"font-weight: bold;\" href=\"" +
-            helper.Encode("https://github.com/serenity-is/Serenity/" +
-                "blob/master/common-features/src/" + path) +
-            "\">" + helper.Encode(Path.GetFileName(file)) + "</a>");
+        var path = file.StartsWith('/') ? file[1..] : "demo.basicsamples" + GetRelativePathFor(helper, file);
+        var config = helper.ViewContext?.HttpContext?.RequestServices?.GetService<IConfiguration>();
+        var commitId = config?.GetValue<string>("SampleSettings:SerenityCommitId") ?? "master";
+        var href = $"https://github.com/serenity-is/Serenity/blob/{Uri.EscapeDataString(commitId)}/common-features/src/{path}";
+        return new HtmlString($"<a target=\"blank\" style=\"font-weight: bold;\" href=\"{helper.Encode(href)}\">{helper.Encode(Path.GetFileName(file))}</a>");
     }
 
     private static string GetRelativePathFor(HtmlHelper helper, string file)
