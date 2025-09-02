@@ -14,7 +14,7 @@
     <EmbeddedResource Include="Templates\*.scriban" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\Serenity.Net.Services\Serenity.Net.Services.csproj" />
+    <ProjectReference Include="..\services\Serenity.Net.Services.csproj" />
     <InternalsVisibleTo Include="Serenity.Net.CodeGenerator.Tests" />
     <Compile Include="..\typescript\**\*.cs" Link="TypeScript\%(RecursiveDir)%(Filename)%(Extension)" />
   </ItemGroup>
