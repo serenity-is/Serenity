@@ -7,7 +7,7 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Serenity.Net.Core", "src\co
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Serenity.Net.Services", "src\services\Serenity.Net.Services.csproj", "{D0697A40-5BCB-4B2E-B72C-E371AFEF3BD9}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Serenity.Net.Web", "src\Serenity.Net.Web\Serenity.Net.Web.csproj", "{2DB8084A-1CF1-490F-AE59-7DB6AFC29FCA}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Serenity.Net.Web", "src\web\Serenity.Net.Web.csproj", "{2DB8084A-1CF1-490F-AE59-7DB6AFC29FCA}"
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Serenity.Net.CodeGenerator", "src\codegenerator\Serenity.Net.CodeGenerator.csproj", "{7B2CED35-AD39-42D5-AF64-5AC73D11EEF9}"
 EndProject
@@ -30,7 +30,7 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "serenity", "serenity", "{E4
 		src\Directory.Build.targets = src\Directory.Build.targets
 		build\Package.Build.props = build\Package.Build.props
 		src\RestoreNpmPackages.targets = src\RestoreNpmPackages.targets
-		src\Serenity.Net.Web\Serenity.Net.Web.targets = src\Serenity.Net.Web\Serenity.Net.Web.targets
+		src\web\Serenity.Net.Web.targets = src\web\Serenity.Net.Web.targets
 		tests\Test.Build.props = tests\Test.Build.props
 	EndProjectSection
 EndProject

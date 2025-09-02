@@ -6,7 +6,7 @@
     <None Update="$(MSBuildProjectDirectory)\coverage\**\*;$(MSBuildProjectDirectory)\out\**\*;$(MSBuildProjectDirectory)\jest*.js;$(MSBuildProjectDirectory)\tsbuild*.js;$(MSBuildProjectDirectory)\test\**\*" CopyToOutputDirectory="Never" CopyToPublishDirectory="Never" Pack="false" />
     <None Include="$(MSBuildProjectDirectory)\dist\**" CopyToOutputDirectory="Never" CopyToPublishDirectory="Never" Pack="true" PackagePath="dist\" />
   </ItemGroup>
-  <Import Project="$(SerenitySrc)Serenity.Net.Web\Serenity.Net.Web.targets" Condition="'$(AddAutoRefs)' != 'false'" />
+  <Import Project="$(SerenitySrc)web\Serenity.Net.Web.targets" Condition="'$(AddAutoRefs)' != 'false'" />
   <Import Project="$(SerenitySrc)RestoreNpmPackages.targets" />
   <Target Name="CompileProjectTSConfig" DependsOnTargets="NpmInstall;RestoreNodeTypes" BeforeTargets="ResolveProjectStaticWebAssets"
           Condition="Exists('tsconfig.json') And '$(BuildingProject)' != 'false' And '$(DesignTimeBuild)' != 'true'">

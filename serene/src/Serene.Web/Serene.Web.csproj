@@ -13,7 +13,7 @@
     <AccelerateBuildsInVisualStudio>true</AccelerateBuildsInVisualStudio>
     <!--#endif-->
   </PropertyGroup>
-  <Import Project="$(SerenitySrc)Serenity.Net.Web\Serenity.Net.Web.targets" Condition="'$(UseProjectRefs)' != 'false'" />
+  <Import Project="$(SerenitySrc)web\Serenity.Net.Web.targets" Condition="'$(UseProjectRefs)' != 'false'" />
   <ItemGroup>
     <TypeScriptCompile Remove="node_modules\**" />
     <EmbeddedResource Include="Migrations\**\*.sql" />
@@ -40,7 +40,7 @@
   </ItemGroup>
   <ItemGroup Condition="'$(UseProjectRefs)' != 'false'">
     <ProjectReference Include="$(SerenitySrc)assets\Serenity.Assets.csproj" />
-    <ProjectReference Include="$(SerenitySrc)Serenity.Net.Web\Serenity.Net.Web.csproj" />
+    <ProjectReference Include="$(SerenitySrc)web\Serenity.Net.Web.csproj" />
     <ProjectReference Include="$(SerenitySrc)..\packages\corelib\Serenity.Corelib.csproj" />
     <ProjectReference Include="$(CommonSrc)extensions\Serenity.Extensions.csproj" />
     <ProjectReference Include="$(CommonSrc)demo.northwind\Serenity.Demo.Northwind.csproj" />
