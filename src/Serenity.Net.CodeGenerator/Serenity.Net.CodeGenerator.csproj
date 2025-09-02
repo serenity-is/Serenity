@@ -16,7 +16,7 @@
   <ItemGroup>
     <ProjectReference Include="..\Serenity.Net.Services\Serenity.Net.Services.csproj" />
     <InternalsVisibleTo Include="Serenity.Net.CodeGenerator.Tests" />
-    <Compile Include="..\Serenity.TypeScript\**\*.cs" Link="TypeScript\%(RecursiveDir)%(Filename)%(Extension)" />
+    <Compile Include="..\typescript\**\*.cs" Link="TypeScript\%(RecursiveDir)%(Filename)%(Extension)" />
   </ItemGroup>
   <Import Project="$(MSBuildThisFileDirectory)..\CommonDbProviders.props" />
   <ItemGroup>
