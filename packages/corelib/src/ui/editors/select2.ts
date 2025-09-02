@@ -313,7 +313,7 @@ function debounce(quietMillis: number, fn: any, ctx?: any) {
     var timeout: number;
     return function () {
         var args = arguments;
-        window.clearTimeout(timeout);
+        clearTimeout(timeout);
         timeout = window.setTimeout(function () {
             fn.apply(ctx, args);
         }, quietMillis);
@@ -689,7 +689,7 @@ function ajax(options: Select2AjaxOptions) {
         self = this;
 
     return function (query: Select2QueryOptions) {
-        window.clearTimeout(timeout);
+        clearTimeout(timeout);
         timeout = window.setTimeout(function () {
             var data = options.data, // ajax data function
                 url = ajaxUrl, // ajax url string or function

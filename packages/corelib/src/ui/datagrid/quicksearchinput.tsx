@@ -59,7 +59,7 @@ export class QuickSearchInput<P extends QuickSearchInputOptions = QuickSearchInp
 
         Fluent.on(this.domNode, "execute-search." + this.uniqueName, () => {
             if (this.timer)
-                window.clearTimeout(this.timer);
+                clearTimeout(this.timer);
             this.searchNow((this.domNode.value ?? '').trim());
         });
     }
@@ -78,7 +78,7 @@ export class QuickSearchInput<P extends QuickSearchInputOptions = QuickSearchInp
         this.fieldChanged = false;
 
         if (!!this.timer) {
-            window.clearTimeout(this.timer);
+            clearTimeout(this.timer);
         }
 
         var self = this;
@@ -117,7 +117,7 @@ export class QuickSearchInput<P extends QuickSearchInputOptions = QuickSearchInp
         this.domNode.value = value;
         this.lastValue = value;
         if (!!this.timer) {
-            window.clearTimeout(this.timer);
+            clearTimeout(this.timer);
             this.timer = null;
         }
         this.updateInputPlaceHolder();

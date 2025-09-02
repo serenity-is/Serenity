@@ -26,7 +26,7 @@ export namespace LayoutTimer {
 
     function clearTimer() {
         if (timeout != null) {
-            window.clearTimeout(timeout);
+            clearTimeout(timeout);
             timeout = null;
         }
     }
