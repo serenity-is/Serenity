@@ -7,7 +7,7 @@
       "packages\\test-utils\\test-utils.esproj",
       "packages\\tsbuild\\tsbuild.esproj",
       "src\\assets\\Serenity.Assets.csproj",
-      "src\\Serenity.Net.CodeGenerator\\Serenity.Net.CodeGenerator.csproj",
+      "src\\codegenerator\\Serenity.Net.CodeGenerator.csproj",
       "src\\Serenity.Net.Core\\Serenity.Net.Core.csproj",
       "src\\Serenity.Net.Services\\Serenity.Net.Services.csproj",
       "src\\Serenity.Net.Web\\Serenity.Net.Web.csproj",

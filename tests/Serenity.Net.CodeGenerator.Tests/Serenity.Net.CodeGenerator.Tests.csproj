@@ -1,6 +1,6 @@
 <Project Sdk="Microsoft.NET.Sdk">
   <ItemGroup>
-    <ProjectReference Include="..\..\src\Serenity.Net.CodeGenerator\Serenity.Net.CodeGenerator.csproj" />
+    <ProjectReference Include="..\..\src\codegenerator\Serenity.Net.CodeGenerator.csproj" />
     <ProjectReference Include="..\..\src\Serenity.Net.Web\Serenity.Net.Web.csproj" />
     <PackageReference Include="CSharpMinifier" Version="1.2.1" />
     <Compile Include="..\Serenity.Net.Tests\testutils\mocks\MockFileSystem.cs" Link="testutils/mocks/%(RecursiveDir)%(Filename)%(Extension)"/>
