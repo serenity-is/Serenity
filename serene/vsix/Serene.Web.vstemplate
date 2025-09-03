@@ -39,7 +39,6 @@
         <ProjectItem ReplaceParameters="true" TargetFileName="Program.cs">Program.cs</ProjectItem>
         <ProjectItem ReplaceParameters="true" TargetFileName="Startup.cs">Startup.cs</ProjectItem>
       </Folder>
-      <ProjectItem ReplaceParameters="true" TargetFileName="libman.json">libman.json</ProjectItem>
       <Folder Name="Migrations" TargetFolderName="Migrations">
         <Folder Name="DefaultDB" TargetFolderName="DefaultDB">
           <ProjectItem ReplaceParameters="true" TargetFileName="DefaultDB_20141103_1400_Initial.cs">DefaultDB_20141103_1400_Initial.cs</ProjectItem>
@@ -270,7 +269,6 @@
           <ProjectItem ReplaceParameters="true" TargetFileName="Texts.ts">Texts.ts</ProjectItem>
         </Folder>
       </Folder>
-      <ProjectItem ReplaceParameters="true" TargetFileName="package-lock.json">package-lock.json</ProjectItem>
       <ProjectItem ReplaceParameters="true" TargetFileName="package.json">package.json</ProjectItem>
       <ProjectItem ReplaceParameters="true" TargetFileName="sergen.json">sergen.json</ProjectItem>
       <Folder Name="texts" TargetFolderName="texts">
@@ -321,12 +319,12 @@
         </Folder>
         <Folder Name="esm" TargetFolderName="esm">
           <Folder Name="_chunks" TargetFolderName="_chunks">
-            <ProjectItem ReplaceParameters="true" TargetFileName="chunk-7V7WNOD5.js">chunk-7V7WNOD5.js</ProjectItem>
-            <ProjectItem ReplaceParameters="true" TargetFileName="chunk-NFICFSOA.js">chunk-NFICFSOA.js</ProjectItem>
-            <ProjectItem ReplaceParameters="true" TargetFileName="chunk-P6DKNWMZ.js">chunk-P6DKNWMZ.js</ProjectItem>
-            <ProjectItem ReplaceParameters="true" TargetFileName="chunk-QRBE27F2.js">chunk-QRBE27F2.js</ProjectItem>
-            <ProjectItem ReplaceParameters="true" TargetFileName="chunk-VYJLGJ67.js">chunk-VYJLGJ67.js</ProjectItem>
-            <ProjectItem ReplaceParameters="true" TargetFileName="chunk-WPT45CK3.js">chunk-WPT45CK3.js</ProjectItem>
+            <ProjectItem ReplaceParameters="true" TargetFileName="chunk-7FRT2CLB.js">chunk-7FRT2CLB.js</ProjectItem>
+            <ProjectItem ReplaceParameters="true" TargetFileName="chunk-FN3FLLSC.js">chunk-FN3FLLSC.js</ProjectItem>
+            <ProjectItem ReplaceParameters="true" TargetFileName="chunk-HKFAYWVD.js">chunk-HKFAYWVD.js</ProjectItem>
+            <ProjectItem ReplaceParameters="true" TargetFileName="chunk-S6XAJ64G.js">chunk-S6XAJ64G.js</ProjectItem>
+            <ProjectItem ReplaceParameters="true" TargetFileName="chunk-ZJ6GRK5J.js">chunk-ZJ6GRK5J.js</ProjectItem>
+            <ProjectItem ReplaceParameters="true" TargetFileName="chunk-ZRX4IPK7.js">chunk-ZRX4IPK7.js</ProjectItem>
           </Folder>
           <Folder Name="Modules" TargetFolderName="Modules">
             <Folder Name="Administration" TargetFolderName="Administration">
@@ -359,35 +357,52 @@
           </Folder>
         </Folder>
         <ProjectItem ReplaceParameters="false" TargetFileName="favicon.ico">favicon.ico</ProjectItem>
-        <Folder Name="lib" TargetFolderName="lib">
-          <Folder Name="chartjs" TargetFolderName="chartjs">
-            <ProjectItem ReplaceParameters="true" TargetFileName="chart.js">chart.js</ProjectItem>
-            <ProjectItem ReplaceParameters="true" TargetFileName="chart.min.js">chart.min.js</ProjectItem>
+        <Folder Name="npm" TargetFolderName="npm">
+          <Folder Name="bootstrap-datepicker" TargetFolderName="bootstrap-datepicker">
+            <Folder Name="dist" TargetFolderName="dist">
+              <Folder Name="css" TargetFolderName="css">
+                <ProjectItem ReplaceParameters="true" TargetFileName="bootstrap-datepicker.min.css">bootstrap-datepicker.min.css</ProjectItem>
+              </Folder>
+              <Folder Name="js" TargetFolderName="js">
+                <ProjectItem ReplaceParameters="true" TargetFileName="bootstrap-datepicker.min.js">bootstrap-datepicker.min.js</ProjectItem>
+              </Folder>
+            </Folder>
           </Folder>
-          <Folder Name="moment.js" TargetFolderName="moment.js">
-            <ProjectItem ReplaceParameters="true" TargetFileName="moment.min.js">moment.min.js</ProjectItem>
-          </Folder>
-        </Folder>
-        <Folder Name="Scripts" TargetFolderName="Scripts">
-          <Folder Name="datepicker" TargetFolderName="datepicker">
-            <ProjectItem ReplaceParameters="true" TargetFileName="bootstrap-datepicker.js">bootstrap-datepicker.js</ProjectItem>
-            <ProjectItem ReplaceParameters="true" TargetFileName="datepicker3.css">datepicker3.css</ProjectItem>
+          <Folder Name="chart.js" TargetFolderName="chart.js">
+            <Folder Name="dist" TargetFolderName="dist">
+              <ProjectItem ReplaceParameters="true" TargetFileName="chart.umd.js">chart.umd.js</ProjectItem>
+              <ProjectItem ReplaceParameters="true" TargetFileName="chart.umd.min.js">chart.umd.min.js</ProjectItem>
+            </Folder>
           </Folder>
           <Folder Name="daterangepicker" TargetFolderName="daterangepicker">
-            <ProjectItem ReplaceParameters="true" TargetFileName="daterangepicker-bs3.css">daterangepicker-bs3.css</ProjectItem>
+            <ProjectItem ReplaceParameters="true" TargetFileName="daterangepicker.css">daterangepicker.css</ProjectItem>
             <ProjectItem ReplaceParameters="true" TargetFileName="daterangepicker.js">daterangepicker.js</ProjectItem>
           </Folder>
-          <Folder Name="jvectormap" TargetFolderName="jvectormap">
-            <ProjectItem ReplaceParameters="true" TargetFileName="jquery-jvectormap-1.2.2.css">jquery-jvectormap-1.2.2.css</ProjectItem>
-            <ProjectItem ReplaceParameters="true" TargetFileName="jquery-jvectormap-1.2.2.min.js">jquery-jvectormap-1.2.2.min.js</ProjectItem>
-            <ProjectItem ReplaceParameters="true" TargetFileName="jquery-jvectormap-world-mill-en.js">jquery-jvectormap-world-mill-en.js</ProjectItem>
+          <Folder Name="flatpickr" TargetFolderName="flatpickr">
+            <Folder Name="dist" TargetFolderName="dist">
+              <ProjectItem ReplaceParameters="true" TargetFileName="flatpickr.css">flatpickr.css</ProjectItem>
+              <ProjectItem ReplaceParameters="true" TargetFileName="flatpickr.min.css">flatpickr.min.css</ProjectItem>
+            </Folder>
           </Folder>
-          <Folder Name="knob" TargetFolderName="knob">
-            <ProjectItem ReplaceParameters="true" TargetFileName="jquery.knob.js">jquery.knob.js</ProjectItem>
+          <Folder Name="jquery-knob" TargetFolderName="jquery-knob">
+            <Folder Name="dist" TargetFolderName="dist">
+              <ProjectItem ReplaceParameters="true" TargetFileName="jquery.knob.min.js">jquery.knob.min.js</ProjectItem>
+            </Folder>
           </Folder>
-          <Folder Name="sparkline" TargetFolderName="sparkline">
-            <ProjectItem ReplaceParameters="true" TargetFileName="jquery.sparkline.js">jquery.sparkline.js</ProjectItem>
+          <Folder Name="jquery-sparkline" TargetFolderName="jquery-sparkline">
             <ProjectItem ReplaceParameters="true" TargetFileName="jquery.sparkline.min.js">jquery.sparkline.min.js</ProjectItem>
+          </Folder>
+          <Folder Name="jvectormap-content" TargetFolderName="jvectormap-content">
+            <ProjectItem ReplaceParameters="true" TargetFileName="world-mill.js">world-mill.js</ProjectItem>
+          </Folder>
+          <Folder Name="jvectormap-next" TargetFolderName="jvectormap-next">
+            <ProjectItem ReplaceParameters="true" TargetFileName="jquery-jvectormap.css">jquery-jvectormap.css</ProjectItem>
+            <ProjectItem ReplaceParameters="true" TargetFileName="jquery-jvectormap.min.js">jquery-jvectormap.min.js</ProjectItem>
+          </Folder>
+          <Folder Name="moment" TargetFolderName="moment">
+            <Folder Name="min" TargetFolderName="min">
+              <ProjectItem ReplaceParameters="true" TargetFileName="moment.min.js">moment.min.js</ProjectItem>
+            </Folder>
           </Folder>
         </Folder>
       </Folder>

@@ -1,8 +1,8 @@
-import { Config, ErrorHandling, HtmlContentEditor, TranslationConfig } from "@serenity-is/corelib";
+import { Config, ErrorHandling, TranslationConfig } from "@serenity-is/corelib";
 import { gridDefaults } from "@serenity-is/sleekgrid";
-import { getLanguageList } from "./Helpers/LanguageList";
 import flatpickr from "flatpickr";
 import "flatpickr/dist/l10n";
+import { getLanguageList } from "./Helpers/LanguageList";
 
 Config.rootNamespaces.push('Serene');
 TranslationConfig.getLanguageList = getLanguageList;
