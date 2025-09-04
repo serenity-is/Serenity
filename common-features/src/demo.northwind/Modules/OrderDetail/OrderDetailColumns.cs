@@ -1,4 +1,4 @@
-﻿namespace Serenity.Demo.Northwind.Forms;
+namespace Serenity.Demo.Northwind.Forms;
 
 [ColumnsScript("Northwind.OrderDetail")]
 [BasedOnRow(typeof(OrderDetailRow), CheckNames = true)]
@@ -12,6 +12,6 @@ public class OrderDetailColumns
     public short Quantity { get; set; }
     [Width(100)]
     public double Discount { get; set; }
-    [Width(100)]
+    [Width(100), ReadOnly(true)]
     public decimal LineTotal { get; set; }
 }
