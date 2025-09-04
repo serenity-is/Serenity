@@ -1,4 +1,4 @@
-﻿using System.Collections;
+using System.Collections;
 
 namespace Serenity.Data;
 
@@ -65,7 +65,7 @@ public class ValueCriteria(object value) : BaseCriteria
         }
     }
 
-    private bool IsIntegerType(object k)
+    private static bool IsIntegerType(object k)
     {
         if (k == null)
             return false;
@@ -84,7 +84,7 @@ public class ValueCriteria(object value) : BaseCriteria
                k is ulong;
     }
 
-    private Parameter AddParam(IQueryWithParams query, object value)
+    private static Parameter AddParam(IQueryWithParams query, object value)
     {
         var param = query.AutoParam();
         query.AddParam(param.Name, value);

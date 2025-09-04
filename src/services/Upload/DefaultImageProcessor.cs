@@ -1,4 +1,4 @@
-﻿using SixLabors.ImageSharp;
+using SixLabors.ImageSharp;
 using SixLabors.ImageSharp.Formats;
 using SixLabors.ImageSharp.Formats.Gif;
 using SixLabors.ImageSharp.Formats.Jpeg;
@@ -137,7 +137,7 @@ public class DefaultImageProcessor : IImageProcessor
 
     }
 
-    private Image GenerateEmptyBitmap(int width, int height, Color color)
+    private static Image GenerateEmptyBitmap(int width, int height, Color color)
     {
         return new Image<Rgb24>(width, height, color);
     }

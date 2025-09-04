@@ -1,4 +1,4 @@
-﻿namespace Serenity.Data;
+namespace Serenity.Data;
 
 /// <summary>
 /// Fallback row fields provider for cases where a IServiceProvider 
@@ -52,7 +52,7 @@ public class FallbackRowFieldsProvider : IRowFieldsProvider
         return CreateType(fieldsType, null);
     }
 
-    private RowFieldsBase CreateType(Type fieldsType, string alias)
+    private static RowFieldsBase CreateType(Type fieldsType, string alias)
     {
         var fields = (RowFieldsBase)Activator.CreateInstance(fieldsType);
         fields.Initialize(annotations: null, SqlSettings.DefaultDialect);

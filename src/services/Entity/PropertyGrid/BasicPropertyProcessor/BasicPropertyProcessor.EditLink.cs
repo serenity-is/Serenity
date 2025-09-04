@@ -1,8 +1,8 @@
-﻿namespace Serenity.PropertyGrid;
+namespace Serenity.PropertyGrid;
 
 public partial class BasicPropertyProcessor : PropertyProcessor
 {
-    private void SetEditLink(IPropertySource source, PropertyItem item)
+    private static void SetEditLink(IPropertySource source, PropertyItem item)
     {
         var attr = source.GetAttribute<EditLinkAttribute>();
         if (attr == null)

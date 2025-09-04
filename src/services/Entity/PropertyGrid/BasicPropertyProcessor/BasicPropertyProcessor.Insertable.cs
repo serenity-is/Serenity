@@ -1,8 +1,8 @@
-﻿namespace Serenity.PropertyGrid;
+namespace Serenity.PropertyGrid;
 
 public partial class BasicPropertyProcessor : PropertyProcessor
 {
-    private void SetInsertable(IPropertySource source, PropertyItem item)
+    private static void SetInsertable(IPropertySource source, PropertyItem item)
     {
         if (source.Property != null)
         {

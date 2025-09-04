@@ -1,8 +1,8 @@
-﻿namespace Serenity.PropertyGrid;
+namespace Serenity.PropertyGrid;
 
 public partial class BasicPropertyProcessor : PropertyProcessor
 {
-    private void SetGrouping(IPropertySource source, PropertyItem item)
+    private static void SetGrouping(IPropertySource source, PropertyItem item)
     {
         var groupOrderAttr = source.GetAttribute<GroupOrderAttribute>();
         if (groupOrderAttr != null && groupOrderAttr.GroupOrder != 0)

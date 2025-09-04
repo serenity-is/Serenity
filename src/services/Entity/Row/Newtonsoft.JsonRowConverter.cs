@@ -38,7 +38,7 @@ public class JsonRowConverter : JsonConverter
         ToJson(writer, (IRow)value, serializer);
     }
 
-    private void ToJson(JsonWriter writer, IRow row, JsonSerializer serializer)
+    private static void ToJson(JsonWriter writer, IRow row, JsonSerializer serializer)
     {
         writer.WriteStartObject();
 

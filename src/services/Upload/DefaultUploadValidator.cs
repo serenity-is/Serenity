@@ -105,7 +105,7 @@ public class DefaultUploadValidator(IImageProcessor imageProcessor, ITextLocaliz
 
     private static readonly char[] extSep = [',', ';'];
 
-    private bool IsExtensionIn(string extensionList, string extension)
+    private static bool IsExtensionIn(string extensionList, string extension)
     {
         if (string.IsNullOrEmpty(extensionList))
             return false;

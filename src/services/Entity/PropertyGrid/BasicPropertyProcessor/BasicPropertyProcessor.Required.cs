@@ -1,8 +1,8 @@
-﻿namespace Serenity.PropertyGrid;
+namespace Serenity.PropertyGrid;
 
 public partial class BasicPropertyProcessor : PropertyProcessor
 {
-    private void SetRequired(IPropertySource source, PropertyItem item)
+    private static void SetRequired(IPropertySource source, PropertyItem item)
     {
         var attr = source.GetAttribute<RequiredAttribute>();
         if (attr != null)

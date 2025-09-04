@@ -1,8 +1,8 @@
-﻿namespace Serenity.PropertyGrid;
+namespace Serenity.PropertyGrid;
 
 public partial class BasicPropertyProcessor : PropertyProcessor
 {
-    private void SetCollapsible(IPropertySource source, PropertyItem item)
+    private static void SetCollapsible(IPropertySource source, PropertyItem item)
     {
         var attr = source.GetAttribute<CollapsibleAttribute>();
         if (attr != null && attr.Value)

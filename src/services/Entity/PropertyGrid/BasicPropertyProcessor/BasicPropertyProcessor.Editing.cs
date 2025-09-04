@@ -2,7 +2,7 @@ namespace Serenity.PropertyGrid;
 
 public partial class BasicPropertyProcessor : PropertyProcessor
 {
-    private void SetEditing(IPropertySource source, PropertyItem item)
+    private static void SetEditing(IPropertySource source, PropertyItem item)
     {
         var editorTypeAttr = source.GetAttribute<EditorTypeAttribute>();
 

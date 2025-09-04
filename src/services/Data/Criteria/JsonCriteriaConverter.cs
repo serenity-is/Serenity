@@ -29,7 +29,7 @@ public class JsonCriteriaConverter : JsonConverter
         ToJson(writer, (BaseCriteria)value, serializer);
     }
 
-    private void ToJson(JsonWriter writer, BaseCriteria criteria, JsonSerializer serializer)
+    private static void ToJson(JsonWriter writer, BaseCriteria criteria, JsonSerializer serializer)
     {
         if (criteria is null ||
             criteria.IsEmpty)

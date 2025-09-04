@@ -1,4 +1,4 @@
-﻿using System.Collections;
+using System.Collections;
 
 namespace Serenity.Services;
 
@@ -249,7 +249,7 @@ public class MasterDetailRelationBehavior(IDefaultHandlerFactory handlerFactory)
         deleteHandler.Process(uow, deleteRequest);
     }
 
-    private string AsString(object obj)
+    private static string AsString(object obj)
     {
         if (obj == null)
             return null;

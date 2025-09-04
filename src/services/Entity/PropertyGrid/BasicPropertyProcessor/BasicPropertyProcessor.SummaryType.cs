@@ -1,10 +1,10 @@
-﻿using System.IO;
+using System.IO;
 
 namespace Serenity.PropertyGrid;
 
 public partial class BasicPropertyProcessor : PropertyProcessor
 {
-    private void SetSummaryType(IPropertySource source, PropertyItem item)
+    private static void SetSummaryType(IPropertySource source, PropertyItem item)
     {
         var summaryTypeAttr = source.GetAttribute<SummaryTypeAttribute>();
 

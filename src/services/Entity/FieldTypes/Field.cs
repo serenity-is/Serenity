@@ -207,7 +207,7 @@ public abstract partial class Field : IFieldWithJoinInfo
     /// <param name="reader">The reader.</param>
     /// <returns></returns>
     /// <exception cref="Newtonsoft.Json.JsonSerializationException">Unexpected token when deserializing row: " + reader.TokenType</exception>
-    protected Exception JsonUnexpectedToken(Newtonsoft.Json.JsonReader reader)
+    protected static Exception JsonUnexpectedToken(Newtonsoft.Json.JsonReader reader)
     {
         throw new Newtonsoft.Json.JsonSerializationException("Unexpected token when deserializing row: " + reader.TokenType);
     }
@@ -217,7 +217,7 @@ public abstract partial class Field : IFieldWithJoinInfo
     /// Jsons the unexpected token.
     /// </summary>
     /// <param name="reader">The reader.</param>
-    protected Exception UnexpectedJsonToken(ref Utf8JsonReader reader)
+    protected static Exception UnexpectedJsonToken(ref Utf8JsonReader reader)
     {
         throw new JsonException("Unexpected token when deserializing row: " + reader.TokenType);
     }

@@ -262,7 +262,7 @@ public class UpdatableExtensionBehavior(IDefaultHandlerFactory handlerFactory) :
         return ((IRow)existing[0]).IdField.AsObject((IRow)existing[0]);
     }
 
-    private bool CheckPresenceValue(RelationInfo info, IRow row)
+    private static bool CheckPresenceValue(RelationInfo info, IRow row)
     {
         if (info.PresenceField is not null)
         {
