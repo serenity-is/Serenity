@@ -1,4 +1,4 @@
-﻿import { IntegerEditor, StringEditor, PrefixedContext, initFormType } from "@serenity-is/corelib";
+﻿import { initFormType, IntegerEditor, PrefixedContext, StringEditor } from "@serenity-is/corelib";
 
 export interface RegionForm {
     RegionID: IntegerEditor;
@@ -12,7 +12,7 @@ export class RegionForm extends PrefixedContext {
     constructor(prefix: string) {
         super(prefix);
 
-        if (!RegionForm.init)  {
+        if (!RegionForm.init) {
             RegionForm.init = true;
 
             var w0 = IntegerEditor;

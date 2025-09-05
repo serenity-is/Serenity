@@ -1,4 +1,4 @@
-﻿import { StringEditor, ImageUploadEditor, BooleanEditor, LookupEditor, ServiceLookupEditor, DecimalEditor, IntegerEditor, PrefixedContext, initFormType } from "@serenity-is/corelib";
+﻿import { BooleanEditor, DecimalEditor, ImageUploadEditor, initFormType, IntegerEditor, LookupEditor, PrefixedContext, ServiceLookupEditor, StringEditor } from "@serenity-is/corelib";
 import { CategoryDialog } from "../../Category/CategoryDialog";
 import { SupplierDialog } from "../../Supplier/SupplierDialog";
 
@@ -22,7 +22,7 @@ export class ProductForm extends PrefixedContext {
     constructor(prefix: string) {
         super(prefix);
 
-        if (!ProductForm.init)  {
+        if (!ProductForm.init) {
             ProductForm.init = true;
 
             var w0 = StringEditor;

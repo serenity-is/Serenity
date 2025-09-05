@@ -1,6 +1,6 @@
-import { NoteRow } from "../ServerTypes/Demo";
 import { Authorization, Decorators, EditorWidget, IGetEditValue, ISetEditValue, PropertyItem, Toolbar, confirmDialog, formatDate, formatISODateTimeUTC, insert } from "@serenity-is/corelib";
 import DOMPurify from 'dompurify';
+import { NoteRow } from "../ServerTypes/Demo";
 import { NoteDialog } from "./NoteDialog";
 import "./NotesEditor.css";
 

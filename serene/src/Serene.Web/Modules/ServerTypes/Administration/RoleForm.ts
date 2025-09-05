@@ -1,4 +1,4 @@
-﻿import { StringEditor, PrefixedContext, initFormType } from "@serenity-is/corelib";
+﻿import { initFormType, PrefixedContext, StringEditor } from "@serenity-is/corelib";
 
 export interface RoleForm {
     RoleName: StringEditor;
@@ -11,7 +11,7 @@ export class RoleForm extends PrefixedContext {
     constructor(prefix: string) {
         super(prefix);
 
-        if (!RoleForm.init)  {
+        if (!RoleForm.init) {
             RoleForm.init = true;
 
             var w0 = StringEditor;

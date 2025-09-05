@@ -1,4 +1,4 @@
-import { Decorators, Formatter, faIcon, htmlEncode } from "@serenity-is/corelib";
+import { Decorators, Formatter, faIcon } from "@serenity-is/corelib";
 import { FormatterContext } from "@serenity-is/sleekgrid";
 
 @Decorators.registerFormatter('Serenity.Demo.Northwind.FreightFormatter')

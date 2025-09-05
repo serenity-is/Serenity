@@ -1,4 +1,4 @@
-﻿import { SaveRequest, SaveResponse, ServiceOptions, DeleteRequest, DeleteResponse, RetrieveRequest, RetrieveResponse, ListRequest, ListResponse, serviceRequest } from "@serenity-is/corelib";
+﻿import { DeleteRequest, DeleteResponse, ListRequest, ListResponse, RetrieveRequest, RetrieveResponse, SaveRequest, SaveResponse, ServiceOptions, serviceRequest } from "@serenity-is/corelib";
 import { OrderDetailRow } from "./Northwind.OrderDetailRow";
 
 export namespace OrderDetailService {
@@ -19,10 +19,10 @@ export namespace OrderDetailService {
     } as const;
 
     [
-        'Create', 
-        'Update', 
-        'Delete', 
-        'Retrieve', 
+        'Create',
+        'Update',
+        'Delete',
+        'Retrieve',
         'List'
     ].forEach(x => {
         (<any>OrderDetailService)[x] = function (r, s, o) {

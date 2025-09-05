@@ -92,7 +92,7 @@ public partial class ServerTypingsGenerator : TypingsGeneratorBase
                 foreach (var methodName in methodNames)
                 {
                     if (i++ > 0)
-                        sb.AppendLine(", ");
+                        sb.AppendLine(",");
 
                     cw.Indented("    '");
                     sb.Append(methodName);

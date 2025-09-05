@@ -1,5 +1,4 @@
-import { Decorators, WidgetProps } from "@serenity-is/corelib";
-import { toId } from "@serenity-is/corelib";
+import { Decorators, toId, WidgetProps } from "@serenity-is/corelib";
 import { GridEditorDialog } from "@serenity-is/extensions";
 import { OrderDetailForm, OrderDetailRow, OrderDetailService, ProductRow } from "../ServerTypes/Demo";
 

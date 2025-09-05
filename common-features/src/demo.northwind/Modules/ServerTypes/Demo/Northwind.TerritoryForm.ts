@@ -1,4 +1,4 @@
-﻿import { StringEditor, LookupEditor, PrefixedContext, initFormType } from "@serenity-is/corelib";
+﻿import { initFormType, LookupEditor, PrefixedContext, StringEditor } from "@serenity-is/corelib";
 
 export interface TerritoryForm {
     TerritoryID: StringEditor;
@@ -13,7 +13,7 @@ export class TerritoryForm extends PrefixedContext {
     constructor(prefix: string) {
         super(prefix);
 
-        if (!TerritoryForm.init)  {
+        if (!TerritoryForm.init) {
             TerritoryForm.init = true;
 
             var w0 = StringEditor;

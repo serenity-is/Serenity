@@ -8,11 +8,11 @@ export default function pageInit(model: any) {
     var myDialogAsPanel = new EntityDialogAsPanel();
 
     document.querySelector('#SwitchToNewRecordMode').addEventListener('click', () => {
-        myDialogAsPanel.load({}, function() { notifySuccess('Switched to new record mode'); });
+        myDialogAsPanel.load({}, function () { notifySuccess('Switched to new record mode'); });
     });
 
     document.querySelector('#LoadEntityWithId').addEventListener('click', () => {
-        myDialogAsPanel.load(11048, function() { notifySuccess('Loaded entity with ID 11048'); })
+        myDialogAsPanel.load(11048, function () { notifySuccess('Loaded entity with ID 11048'); })
     });
 
     // load a new entity if url doesn't contain an ID, or load order with ID specified in page URL

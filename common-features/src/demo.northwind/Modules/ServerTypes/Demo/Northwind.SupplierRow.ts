@@ -1,4 +1,4 @@
-﻿import { getLookup, getLookupAsync, fieldsProxy } from "@serenity-is/corelib";
+﻿import { fieldsProxy, getLookup, getLookupAsync } from "@serenity-is/corelib";
 
 export interface SupplierRow {
     SupplierID?: number;

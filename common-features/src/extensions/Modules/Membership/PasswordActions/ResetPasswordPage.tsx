@@ -1,8 +1,8 @@
+import { PropertyPanel, TransformInclude, WidgetProps, informationDialog, resolveUrl, serviceCall } from "@serenity-is/corelib";
 import { ResetPasswordForm } from "../../ServerTypes/Extensions/ResetPasswordForm";
 import { ResetPasswordRequest } from "../../ServerTypes/Extensions/ResetPasswordRequest";
-import { ExtensionsTexts, ResetPasswordFormTexts } from "../../ServerTypes/Texts";
-import { PropertyPanel, TransformInclude, WidgetProps, informationDialog, resolveUrl, serviceCall } from "@serenity-is/corelib";
 import { ResetPasswordResponse } from "../../ServerTypes/Extensions/ResetPasswordResponse";
+import { ExtensionsTexts, ResetPasswordFormTexts } from "../../ServerTypes/Texts";
 import { AccountPanelTitle } from "../AccountPanelTitle";
 import { addPasswordStrengthValidation } from "../PasswordStrength/PasswordStrengthValidation";
 

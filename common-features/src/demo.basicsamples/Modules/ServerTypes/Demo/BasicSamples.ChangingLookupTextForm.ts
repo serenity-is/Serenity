@@ -1,4 +1,4 @@
-﻿import { DecimalEditor, IntegerEditor, PrefixedContext, initFormType } from "@serenity-is/corelib";
+﻿import { DecimalEditor, initFormType, IntegerEditor, PrefixedContext } from "@serenity-is/corelib";
 import { ChangingLookupTextEditor } from "../../Editors/ChangingLookupText/ChangingLookupTextPage";
 
 export interface ChangingLookupTextForm {
@@ -15,7 +15,7 @@ export class ChangingLookupTextForm extends PrefixedContext {
     constructor(prefix: string) {
         super(prefix);
 
-        if (!ChangingLookupTextForm.init)  {
+        if (!ChangingLookupTextForm.init) {
             ChangingLookupTextForm.init = true;
 
             var w0 = ChangingLookupTextEditor;

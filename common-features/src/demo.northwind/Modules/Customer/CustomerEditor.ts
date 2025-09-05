@@ -1,5 +1,5 @@
-import { CustomerRow } from "../ServerTypes/Demo";
 import { Decorators, EditorProps, LookupEditorBase, LookupEditorOptions } from "@serenity-is/corelib";
+import { CustomerRow } from "../ServerTypes/Demo";
 
 @Decorators.registerEditor('Serenity.Demo.Northwind.CustomerEditor')
 export class CustomerEditor<P extends LookupEditorOptions = LookupEditorOptions> extends LookupEditorBase<P, CustomerRow> {

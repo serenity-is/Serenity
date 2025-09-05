@@ -1,4 +1,4 @@
-﻿import { StringEditor, PrefixedContext, initFormType } from "@serenity-is/corelib";
+﻿import { initFormType, PrefixedContext, StringEditor } from "@serenity-is/corelib";
 
 export interface CategoryForm {
     CategoryName: StringEditor;
@@ -12,7 +12,7 @@ export class CategoryForm extends PrefixedContext {
     constructor(prefix: string) {
         super(prefix);
 
-        if (!CategoryForm.init)  {
+        if (!CategoryForm.init) {
             CategoryForm.init = true;
 
             var w0 = StringEditor;

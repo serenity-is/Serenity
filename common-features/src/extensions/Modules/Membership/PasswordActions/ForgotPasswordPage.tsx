@@ -1,11 +1,11 @@
-import { ForgotPasswordFormTexts } from "../../ServerTypes/Texts";
 import { PropertyPanel, informationDialog, resolveUrl, serviceCall, toggleClass } from "@serenity-is/corelib";
 import { ForgotPasswordForm } from "../../ServerTypes/Extensions/ForgotPasswordForm";
 import { ForgotPasswordRequest } from "../../ServerTypes/Extensions/ForgotPasswordRequest";
+import { ForgotPasswordFormTexts } from "../../ServerTypes/Texts";
 import { AccountPanelTitle } from "../AccountPanelTitle";
 
 export default function pageInit() {
-    toggleClass(new ForgotPasswordPanel({ element: "#PanelDiv" }).domNode, 
+    toggleClass(new ForgotPasswordPanel({ element: "#PanelDiv" }).domNode,
         "s-full-page justify-content-center s-Form", true);
 }
 

@@ -1,4 +1,4 @@
-﻿import { StringEditor, PrefixedContext, initFormType } from "@serenity-is/corelib";
+﻿import { initFormType, PrefixedContext, StringEditor } from "@serenity-is/corelib";
 import { PhoneEditor } from "../../Shared/PhoneEditor";
 
 export interface ShipperForm {
@@ -13,7 +13,7 @@ export class ShipperForm extends PrefixedContext {
     constructor(prefix: string) {
         super(prefix);
 
-        if (!ShipperForm.init)  {
+        if (!ShipperForm.init) {
             ShipperForm.init = true;
 
             var w0 = StringEditor;

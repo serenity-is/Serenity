@@ -1,6 +1,6 @@
-﻿import { PopulateLinkedDataForm } from "../../ServerTypes/Demo";
-import { Decorators, EntityDialog, WidgetProps, first, gridPageInit, toId } from "@serenity-is/corelib";
+﻿import { Decorators, EntityDialog, WidgetProps, gridPageInit, toId } from "@serenity-is/corelib";
 import { CustomerRow, CustomerService, OrderGrid, OrderRow, OrderService } from "@serenity-is/demo.northwind";
+import { PopulateLinkedDataForm } from "../../ServerTypes/Demo";
 
 export default () => gridPageInit(PopulateLinkedDataGrid);
 

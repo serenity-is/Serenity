@@ -1,7 +1,7 @@
-import { ChangingLookupTextForm } from "../../ServerTypes/Demo";
 import { ComboboxEditor, Decorators, Lookup, LookupEditorBase, LookupEditorOptions, WidgetProps, formatNumber, toId, tryGetWidget } from "@serenity-is/corelib";
 import { OrderDetailRow, ProductRow } from "@serenity-is/demo.northwind";
 import { GridEditorDialog } from "@serenity-is/extensions";
+import { ChangingLookupTextForm } from "../../ServerTypes/Demo";
 
 export default function pageInit() {
     var dlg = new ChangingLookupTextDialog({});
@@ -30,7 +30,7 @@ export class ChangingLookupTextEditor extends LookupEditorBase<LookupEditorOptio
 }
 
 @Decorators.registerClass('Serenity.Demo.BasicSamples.ChangingLookupTextDialog')
-export class ChangingLookupTextDialog<P={}> extends GridEditorDialog<OrderDetailRow, P> {
+export class ChangingLookupTextDialog<P = {}> extends GridEditorDialog<OrderDetailRow, P> {
     protected getFormKey() { return ChangingLookupTextForm.formKey; }
     protected getLocalTextPrefix() { return OrderDetailRow.localTextPrefix; }
 

@@ -1,6 +1,6 @@
 import { SettingStorage } from "@serenity-is/corelib";
-import { UserPreferenceService } from "../ServerTypes/Extensions/UserPreferenceService";
 import { UserPreferenceRetrieveResponse } from "../ServerTypes/Extensions";
+import { UserPreferenceService } from "../ServerTypes/Extensions/UserPreferenceService";
 
 export class UserPreferenceStorage implements SettingStorage {
     async getItem(key: string): Promise<string> {

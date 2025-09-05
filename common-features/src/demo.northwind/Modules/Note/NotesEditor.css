@@ -54,7 +54,7 @@
   font-style: italic;
 }
 
-.s-NoteDialog > .size {
+.s-NoteDialog>.size {
   width: 465px;
 }
 

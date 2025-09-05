@@ -1,4 +1,4 @@
-﻿import { StringEditor, EmailAddressEditor, PasswordEditor, PrefixedContext, initFormType } from "@serenity-is/corelib";
+﻿import { EmailAddressEditor, initFormType, PasswordEditor, PrefixedContext, StringEditor } from "@serenity-is/corelib";
 
 export interface SignUpForm {
     DisplayName: StringEditor;
@@ -15,7 +15,7 @@ export class SignUpForm extends PrefixedContext {
     constructor(prefix: string) {
         super(prefix);
 
-        if (!SignUpForm.init)  {
+        if (!SignUpForm.init) {
             SignUpForm.init = true;
 
             var w0 = StringEditor;

@@ -1,5 +1,4 @@
-
-.s-Demo-BasicSamples-FilteredLookupInDetailDialog > .size {
+.s-Demo-BasicSamples-FilteredLookupInDetailDialog>.size {
   width: 850px;
   height: 550px;
 }
@@ -12,7 +11,7 @@
   overflow-y: auto;
 }
 
-.s-Demo-BasicSamples-FilteredLookupOrderDetailDialog > .size {
+.s-Demo-BasicSamples-FilteredLookupOrderDetailDialog>.size {
   min-width: 450px;
   width: 450px;
 }

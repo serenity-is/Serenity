@@ -1,4 +1,4 @@
-﻿import { IntegerEditor, ServiceLookupEditor, DecimalEditor, PrefixedContext, initFormType } from "@serenity-is/corelib";
+﻿import { DecimalEditor, initFormType, IntegerEditor, PrefixedContext, ServiceLookupEditor } from "@serenity-is/corelib";
 
 export interface OrderDetailForm {
     OrderID: IntegerEditor;
@@ -15,7 +15,7 @@ export class OrderDetailForm extends PrefixedContext {
     constructor(prefix: string) {
         super(prefix);
 
-        if (!OrderDetailForm.init)  {
+        if (!OrderDetailForm.init) {
             OrderDetailForm.init = true;
 
             var w0 = IntegerEditor;

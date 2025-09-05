@@ -1,4 +1,4 @@
-﻿import { PrefixedContext, initFormType } from "@serenity-is/corelib";
+﻿import { initFormType, PrefixedContext } from "@serenity-is/corelib";
 import { HardcodedValuesEditor } from "../../Editors/SelectWithHardcodedValues/SelectWithHardcodedValuesPage";
 
 export interface HardcodedValuesForm {
@@ -12,7 +12,7 @@ export class HardcodedValuesForm extends PrefixedContext {
     constructor(prefix: string) {
         super(prefix);
 
-        if (!HardcodedValuesForm.init)  {
+        if (!HardcodedValuesForm.init) {
             HardcodedValuesForm.init = true;
 
             var w0 = HardcodedValuesEditor;

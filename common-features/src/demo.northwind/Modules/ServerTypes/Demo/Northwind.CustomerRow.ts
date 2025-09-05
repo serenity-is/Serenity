@@ -1,4 +1,4 @@
-﻿import { getLookup, getLookupAsync, fieldsProxy } from "@serenity-is/corelib";
+﻿import { fieldsProxy, getLookup, getLookupAsync } from "@serenity-is/corelib";
 import { NoteRow } from "./Northwind.NoteRow";
 
 export interface CustomerRow {

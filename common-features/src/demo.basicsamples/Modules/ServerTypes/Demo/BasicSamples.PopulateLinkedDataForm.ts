@@ -1,4 +1,4 @@
-﻿import { StringEditor, DateEditor, LookupEditor, PrefixedContext, initFormType } from "@serenity-is/corelib";
+﻿import { DateEditor, initFormType, LookupEditor, PrefixedContext, StringEditor } from "@serenity-is/corelib";
 import { CustomerEditor, OrderDetailsEditor } from "@serenity-is/demo.northwind";
 
 export interface PopulateLinkedDataForm {
@@ -23,7 +23,7 @@ export class PopulateLinkedDataForm extends PrefixedContext {
     constructor(prefix: string) {
         super(prefix);
 
-        if (!PopulateLinkedDataForm.init)  {
+        if (!PopulateLinkedDataForm.init) {
             PopulateLinkedDataForm.init = true;
 
             var w0 = CustomerEditor;

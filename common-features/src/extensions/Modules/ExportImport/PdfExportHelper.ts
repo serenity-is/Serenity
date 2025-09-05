@@ -1,4 +1,4 @@
-import { DataGrid, Fluent, ListRequest, ListResponse, ToolButton, deepClone, formatDate, resolveUrl, serviceCall, stringFormat } from "@serenity-is/corelib";
+import { DataGrid, Fluent, ListRequest, ListResponse, ToolButton, deepClone, formatDate, serviceCall, stringFormat } from "@serenity-is/corelib";
 import { Column, FormatterResult, Grid } from "@serenity-is/sleekgrid";
 
 export interface PdfExportOptions {

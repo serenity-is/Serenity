@@ -9,7 +9,7 @@ export class ShipperFormatter implements Formatter {
             return <>{ctx.value}</>;
         }
 
-        return (<><i class={["text-info", faIcon(ctx.value == "Speedy Express" ? "plane" : 
+        return (<><i class={["text-info", faIcon(ctx.value == "Speedy Express" ? "plane" :
             (ctx.value == "Federal Shipping" ? "ship" : "truck")), "text-opacity-75"]} /> {ctx.value}</>);
     }
 }

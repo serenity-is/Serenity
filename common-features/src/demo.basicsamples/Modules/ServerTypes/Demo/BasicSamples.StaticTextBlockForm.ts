@@ -1,4 +1,4 @@
-﻿import { StringEditor, PrefixedContext, initFormType } from "@serenity-is/corelib";
+﻿import { initFormType, PrefixedContext, StringEditor } from "@serenity-is/corelib";
 import { StaticTextBlock } from "@serenity-is/extensions";
 
 export interface StaticTextBlockForm {
@@ -16,7 +16,7 @@ export class StaticTextBlockForm extends PrefixedContext {
     constructor(prefix: string) {
         super(prefix);
 
-        if (!StaticTextBlockForm.init)  {
+        if (!StaticTextBlockForm.init) {
             StaticTextBlockForm.init = true;
 
             var w0 = StaticTextBlock;

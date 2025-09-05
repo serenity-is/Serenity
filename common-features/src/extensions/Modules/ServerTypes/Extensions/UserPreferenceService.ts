@@ -1,4 +1,4 @@
-﻿import { ServiceResponse, ServiceOptions, serviceRequest } from "@serenity-is/corelib";
+﻿import { ServiceOptions, serviceRequest, ServiceResponse } from "@serenity-is/corelib";
 import { UserPreferenceRetrieveRequest } from "./UserPreferenceRetrieveRequest";
 import { UserPreferenceRetrieveResponse } from "./UserPreferenceRetrieveResponse";
 import { UserPreferenceUpdateRequest } from "./UserPreferenceUpdateRequest";
@@ -15,7 +15,7 @@ export namespace UserPreferenceService {
     } as const;
 
     [
-        'Update', 
+        'Update',
         'Retrieve'
     ].forEach(x => {
         (<any>UserPreferenceService)[x] = function (r, s, o) {

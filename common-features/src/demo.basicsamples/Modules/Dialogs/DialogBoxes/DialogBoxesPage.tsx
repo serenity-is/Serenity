@@ -44,6 +44,6 @@ export default function pageInit() {
         <button class="btn btn-block btn-success" onClick={successClick}>Success</button>
         <button class="btn btn-block btn-warning" onClick={warningClick}>Warning</button>
         <button class="btn btn-block btn-danger" onClick={alertClick}>Alert</button>
-        <button class="btn btn-block btn-danger" onClick={alertWithHtmlClick }>Alert with HTML Content</button>
+        <button class="btn btn-block btn-danger" onClick={alertWithHtmlClick}>Alert with HTML Content</button>
     </>)
 }

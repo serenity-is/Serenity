@@ -53,7 +53,7 @@ export class ReportPage<P = {}> extends Widget<P> {
                 c.setAttribute('aria-expanded', "true");
                 c.classList.remove('collapsed');
             });
-            if (v.parentElement && v.parentElement.classList.contains("collapse") && 
+            if (v.parentElement && v.parentElement.classList.contains("collapse") &&
                 !v.parentElement.classList.contains("show")) {
                 v.parentElement.classList.add("show");
             }

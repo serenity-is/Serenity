@@ -1,4 +1,4 @@
-﻿import { StringEditor, ImageUploadEditor, BooleanEditor, LookupEditor, DecimalEditor, IntegerEditor, PrefixedContext, initFormType } from "@serenity-is/corelib";
+﻿import { BooleanEditor, DecimalEditor, ImageUploadEditor, initFormType, IntegerEditor, LookupEditor, PrefixedContext, StringEditor } from "@serenity-is/corelib";
 import { ProduceSeafoodCategoryEditor } from "../../Editors/LookupFilterByMultipleValues/LookupFilterByMultipleValuesPage";
 
 export interface LookupFilterByMultipleForm {
@@ -21,7 +21,7 @@ export class LookupFilterByMultipleForm extends PrefixedContext {
     constructor(prefix: string) {
         super(prefix);
 
-        if (!LookupFilterByMultipleForm.init)  {
+        if (!LookupFilterByMultipleForm.init) {
             LookupFilterByMultipleForm.init = true;
 
             var w0 = StringEditor;

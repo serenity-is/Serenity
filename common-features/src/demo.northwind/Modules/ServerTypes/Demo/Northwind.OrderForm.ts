@@ -1,4 +1,4 @@
-﻿import { DateEditor, LookupEditor, DecimalEditor, StringEditor, PrefixedContext, initFormType } from "@serenity-is/corelib";
+﻿import { DateEditor, DecimalEditor, initFormType, LookupEditor, PrefixedContext, StringEditor } from "@serenity-is/corelib";
 import { CustomerEditor } from "../../Customer/CustomerEditor";
 import { OrderDetailsEditor } from "../../OrderDetail/OrderDetailsEditor";
 
@@ -26,7 +26,7 @@ export class OrderForm extends PrefixedContext {
     constructor(prefix: string) {
         super(prefix);
 
-        if (!OrderForm.init)  {
+        if (!OrderForm.init) {
             OrderForm.init = true;
 
             var w0 = CustomerEditor;

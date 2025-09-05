@@ -1,6 +1,6 @@
-import { OrderForm, OrderRow, OrderService } from "../ServerTypes/Demo";
 import { Decorators, EntityDialog } from "@serenity-is/corelib";
 import { ReportHelper } from "@serenity-is/extensions";
+import { OrderForm, OrderRow, OrderService } from "../ServerTypes/Demo";
 import "./OrderDialog.css";
 
 @Decorators.registerClass('Serenity.Demo.Northwind.OrderDialog')

@@ -1,4 +1,4 @@
-import { Decorators, DialogTexts, BaseDialog, WidgetProps, localText, Dialog } from "@serenity-is/corelib";
+import { BaseDialog, Decorators, Dialog, DialogTexts, WidgetProps, localText } from "@serenity-is/corelib";
 
 @Decorators.registerClass("Serenity.Extensions.BasicProgressDialog")
 export class BasicProgressDialog<P = {}> extends BaseDialog<P> {

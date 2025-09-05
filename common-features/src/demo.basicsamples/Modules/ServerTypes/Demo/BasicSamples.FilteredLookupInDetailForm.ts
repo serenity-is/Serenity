@@ -1,4 +1,4 @@
-﻿import { DateEditor, LookupEditor, PrefixedContext, initFormType } from "@serenity-is/corelib";
+﻿import { DateEditor, initFormType, LookupEditor, PrefixedContext } from "@serenity-is/corelib";
 import { CustomerEditor } from "@serenity-is/demo.northwind";
 import { FilteredLookupDetailEditor } from "../../Editors/FilteredLookupInDetail/FilteredLookupInDetailPage";
 
@@ -16,7 +16,7 @@ export class FilteredLookupInDetailForm extends PrefixedContext {
     constructor(prefix: string) {
         super(prefix);
 
-        if (!FilteredLookupInDetailForm.init)  {
+        if (!FilteredLookupInDetailForm.init) {
             FilteredLookupInDetailForm.init = true;
 
             var w0 = CustomerEditor;
