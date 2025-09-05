@@ -357,8 +357,7 @@ public partial class ServerTypingsGenerator : TypingsGeneratorBase
                     sb.AppendLine();
                     cw.Indented("if (!");
                     sb.Append(identifier);
-                    sb.Append(".init) ");
-
+                    sb.Append(".init)");
 
                     cw.InBrace(delegate
                     {
