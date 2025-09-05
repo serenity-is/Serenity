@@ -1068,7 +1068,7 @@ public abstract class TypingsGeneratorBase : ImportGeneratorBase
                     if (!z.Key.External)
                         from = RelativeModulePath(filename, from);
 
-                    var importList = string.Join(", ", z.OrderBy(p => p.Name ?? "").Select(p =>
+                    var importList = string.Join(", ", z.OrderBy(p => p.Name ?? "", StringComparer.InvariantCultureIgnoreCase).Select(p =>
                         p.Name + (p.Alias != p.Name ? (" as " + p.Alias) : "")));
 
                     return (from, importList);
