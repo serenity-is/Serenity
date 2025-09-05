@@ -1,6 +1,6 @@
-import { RoleRow, RoleColumns, RoleService } from "../../ServerTypes/Administration";
-import { RoleDialog } from "./RoleDialog";
 import { Decorators, EntityGrid } from "@serenity-is/corelib";
+import { RoleColumns, RoleRow, RoleService } from "../../ServerTypes/Administration";
+import { RoleDialog } from "./RoleDialog";
 
 @Decorators.registerClass('Serene.Administration.RoleGrid')
 export class RoleGrid extends EntityGrid<RoleRow, any> {

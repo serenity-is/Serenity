@@ -38,14 +38,14 @@ public class DataMigrations(ITypeSource typeSource,
     /// </summary>
     private void EnsureDatabase(string databaseKey)
     {
-        MigrationUtils.EnsureDatabase(databaseKey, 
+        MigrationUtils.EnsureDatabase(databaseKey,
             hostEnvironment.ContentRootPath, sqlConnections);
         Microsoft.Data.SqlClient.SqlConnection.ClearAllPools();
     }
 
     private void RunMigrations(string databaseKey)
     {
-        var cs = sqlConnections.TryGetConnectionString(databaseKey) ?? 
+        var cs = sqlConnections.TryGetConnectionString(databaseKey) ??
             throw new ArgumentOutOfRangeException(nameof(databaseKey));
         string serverType = cs.Dialect.ServerType;
         bool isOracle = serverType.StartsWith("Oracle", StringComparison.OrdinalIgnoreCase);

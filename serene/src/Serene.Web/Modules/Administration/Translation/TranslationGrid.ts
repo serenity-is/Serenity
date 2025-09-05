@@ -19,8 +19,7 @@ export class TranslationGrid extends EntityGrid<TranslationItem, any> {
         super(props);
 
         this.element.on('keyup.' + this.uniqueName + ' change.' + this.uniqueName,
-            'input.custom-text', e =>
-        {
+            'input.custom-text', e => {
             var value = trimToNull(Fluent(e.target).val());
             if (value === '') {
                 value = null;

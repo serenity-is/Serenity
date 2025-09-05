@@ -19,10 +19,10 @@ export namespace LanguageService {
     } as const;
 
     [
-        'Create', 
-        'Update', 
-        'Delete', 
-        'Retrieve', 
+        'Create',
+        'Update',
+        'Delete',
+        'Retrieve',
         'List'
     ].forEach(x => {
         (<any>LanguageService)[x] = function (r, s, o) {

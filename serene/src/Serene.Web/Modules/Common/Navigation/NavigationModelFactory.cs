@@ -45,7 +45,7 @@ public class NavigationModelFactory(
         var model = new NavigationModel
         {
             Items = cache.GetLocalStoreOnly("LeftNavigationModel:NavigationItems:" +
-                (userAccessor.User?.GetIdentifier() ?? "-1"), 
+                (userAccessor.User?.GetIdentifier() ?? "-1"),
                 TimeSpan.Zero,
                 UserPermissionRow.Fields.GenerationKey,
                 () => NavigationHelper.GetNavigationItems(permissions, typeSource, serviceProvider, ToAbsolute))

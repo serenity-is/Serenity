@@ -19,9 +19,9 @@ export namespace UserPermissionService {
     } as const;
 
     [
-        'Update', 
-        'List', 
-        'ListRolePermissions', 
+        'Update',
+        'List',
+        'ListRolePermissions',
         'ListPermissionKeys'
     ].forEach(x => {
         (<any>UserPermissionService)[x] = function (r, s, o) {

@@ -4,7 +4,7 @@ import { MembershipValidationTexts, SignUpFormTexts } from "../../../ServerTypes
 import { AccountPanelTitle } from "../AccountPanelTitle";
 
 export default function pageInit(opt: any) {
-    new SignUpPanel({ element: '#SignUpPanel', ...opt});
+    new SignUpPanel({ element: '#SignUpPanel', ...opt });
 }
 
 class SignUpPanel extends PropertyPanel<SignUpRequest, any> {

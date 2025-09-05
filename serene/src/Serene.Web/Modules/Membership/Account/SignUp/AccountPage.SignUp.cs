@@ -13,7 +13,7 @@ public partial class AccountPage : Controller
     }
 
     [HttpPost, JsonRequest]
-    public Result<SignUpResponse> SignUp(SignUpRequest request, 
+    public Result<SignUpResponse> SignUp(SignUpRequest request,
         [FromServices] IEmailSender emailSender,
         [FromServices] IOptions<EnvironmentSettings> environmentOptions,
         [FromServices] IPermissionKeyLister permissionKeyLister,

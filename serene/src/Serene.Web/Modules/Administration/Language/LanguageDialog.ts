@@ -1,5 +1,5 @@
-import { Decorators, EntityDialog } from "@serenity-is/corelib"
-import { LanguageRow, LanguageForm, LanguageService } from "../../ServerTypes/Administration";
+import { Decorators, EntityDialog } from "@serenity-is/corelib";
+import { LanguageForm, LanguageRow, LanguageService } from "../../ServerTypes/Administration";
 
 @Decorators.registerClass('Serene.Administration.LanguageDialog')
 export class LanguageDialog extends EntityDialog<LanguageRow, any> {

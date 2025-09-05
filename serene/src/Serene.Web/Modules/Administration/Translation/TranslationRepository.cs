@@ -16,7 +16,7 @@ public class TranslationRepository(IRequestContext context, IWebHostEnvironment 
 
     public static string GetUserTextsFilePath(IWebHostEnvironment hostEnvironment, string languageID)
     {
-        return Path.Combine(hostEnvironment.ContentRootPath, "App_Data", "texts", 
+        return Path.Combine(hostEnvironment.ContentRootPath, "App_Data", "texts",
             "user.texts." + (languageID.TrimToNull() ?? "invariant") + ".json");
     }
 
@@ -26,10 +26,10 @@ public class TranslationRepository(IRequestContext context, IWebHostEnvironment 
 
         var availableKeys = GetAllAvailableLocalTextKeys();
         var targetLanguageID = request.TargetLanguageID.TrimToNull();
-        
+
         var customTranslations = new Dictionary<string, string>(StringComparer.OrdinalIgnoreCase);
 
-        var textsFilePath = GetUserTextsFilePath(HostEnvironment, targetLanguageID);           
+        var textsFilePath = GetUserTextsFilePath(HostEnvironment, targetLanguageID);
         if (File.Exists(textsFilePath))
         {
             var json = JSON.Parse<Dictionary<string, JToken>>(File.ReadAllText(textsFilePath));

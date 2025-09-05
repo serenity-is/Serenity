@@ -19,10 +19,10 @@ export namespace RoleService {
     } as const;
 
     [
-        'Create', 
-        'Update', 
-        'Delete', 
-        'Retrieve', 
+        'Create',
+        'Update',
+        'Delete',
+        'Retrieve',
         'List'
     ].forEach(x => {
         (<any>RoleService)[x] = function (r, s, o) {

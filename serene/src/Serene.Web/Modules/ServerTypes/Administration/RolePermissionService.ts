@@ -15,7 +15,7 @@ export namespace RolePermissionService {
     } as const;
 
     [
-        'Update', 
+        'Update',
         'List'
     ].forEach(x => {
         (<any>RolePermissionService)[x] = function (r, s, o) {

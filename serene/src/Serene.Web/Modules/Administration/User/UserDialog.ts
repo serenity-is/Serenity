@@ -32,16 +32,14 @@ export class UserDialog extends EntityDialog<UserRow, any> {
         });
     }
 
-    protected getToolbarButtons()
-    {
+    protected getToolbarButtons() {
         let buttons = super.getToolbarButtons();
 
         buttons.push({
             title: UserDialogTexts.EditPermissionsButton,
             cssClass: 'edit-permissions-button',
             icon: 'fa-lock text-green',
-            onClick: () =>
-            {
+            onClick: () => {
                 UserPermissionDialog({
                     userID: this.entity.UserId,
                     username: this.entity.Username

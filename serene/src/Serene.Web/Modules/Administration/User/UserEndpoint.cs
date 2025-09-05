@@ -32,5 +32,5 @@ public class UserEndpoint : ServiceEndpoint
     public ListResponse<MyRow> List(IDbConnection connection, UserListRequest request, [FromServices] IUserListHandler handler)
     {
         return handler.List(connection, request);
-    }       
+    }
 }

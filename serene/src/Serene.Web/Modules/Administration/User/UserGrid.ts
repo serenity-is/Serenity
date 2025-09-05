@@ -1,7 +1,6 @@
-import { Decorators, EntityGrid } from "@serenity-is/corelib";
-import { Lookup, resolveUrl, tryFirst } from "@serenity-is/corelib";
+import { Decorators, EntityGrid, Lookup, tryFirst } from "@serenity-is/corelib";
+import { RoleRow, UserColumns, UserRow, UserService } from "../../ServerTypes/Administration";
 import { UserDialog } from "./UserDialog";
-import { UserRow, UserColumns, UserService, RoleRow } from "../../ServerTypes/Administration";
 
 @Decorators.registerClass()
 export class UserGrid extends EntityGrid<UserRow, any> {

@@ -15,7 +15,7 @@ export namespace TranslationService {
     } as const;
 
     [
-        'List', 
+        'List',
         'Update'
     ].forEach(x => {
         (<any>TranslationService)[x] = function (r, s, o) {

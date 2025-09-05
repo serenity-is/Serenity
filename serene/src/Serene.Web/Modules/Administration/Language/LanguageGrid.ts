@@ -1,6 +1,6 @@
-import { LanguageRow, LanguageColumns, LanguageService } from "../../ServerTypes/Administration";
+import { Decorators, EntityGrid } from "@serenity-is/corelib";
+import { LanguageColumns, LanguageRow, LanguageService } from "../../ServerTypes/Administration";
 import { LanguageDialog } from "./LanguageDialog";
-import { Decorators, EntityGrid } from "@serenity-is/corelib"
 
 @Decorators.registerClass('Serene.Administration.LanguageGrid')
 export class LanguageGrid extends EntityGrid<LanguageRow, any> {

@@ -15,7 +15,7 @@ export namespace UserRoleService {
     } as const;
 
     [
-        'Update', 
+        'Update',
         'List'
     ].forEach(x => {
         (<any>UserRoleService)[x] = function (r, s, o) {
