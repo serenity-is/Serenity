@@ -14,7 +14,7 @@ import { FilterLine } from "../filtering/filterline";
 import { FilterOperators } from "../filtering/filteroperator";
 import { FilterStore } from "../filtering/filterstore";
 import { LazyLoadHelper } from "../helpers/lazyloadhelper";
-import { GridUtils, PropertyItemSlickConverter, SlickFormatting, SlickHelper } from "../helpers/slickhelpers";
+import { EditLink, GridUtils, PropertyItemSlickConverter, SlickFormatting, SlickHelper } from "../helpers/slickhelpers";
 import { ReflectionOptionsSetter } from "../widgets/reflectionoptionssetter";
 import { ToolButton, Toolbar } from "../widgets/toolbar";
 import { Widget, WidgetProps } from "../widgets/widget";
@@ -843,6 +843,62 @@ export class DataGrid<TItem, P = {}> extends Widget<P> implements IDataGrid, IRe
         }
 
         return SlickFormatting.itemLink(itemType, idField, text, cssClass, encode);
+    }
+
+    /**
+     * Renders an edit link for the item in current row. Returns a DocumentFragment for non-data rows, and an anchor element otherwise.
+     */
+    public EditLink = (props: {
+        /**
+         * formatter context (contains item, value etc)
+         */
+        ctx?: FormatterContext,
+        /**
+         * The id of the entity to link to. If not provided it will be taken from ctx.item[idField]
+         */
+        id?: string,
+        /**
+         * The name of the field in item that contains the entity id. Defaults to idProperty. Used if id is not provided.
+         */
+        idField?: string,
+        /**
+         * The item type to link to. Defaults to this.getItemType()
+         */
+        itemType?: string,
+        /**
+         * Extra CSS class to add to the link element besides s-EditLink. Optional.
+         */
+        cssClass?: string,
+        /**
+         * Tab index to add to the link element. Optional.
+         */
+        tabIndex?: number,
+        /**
+         * The link text. If not provided it will be taken from ctx.escape(ctx.value)
+         */
+        children?: any
+    }): any => {
+        let children = props.children;
+        if (children == null && props.ctx != null && props.ctx.escape) {
+            children = props.ctx.escape(props.ctx.value);
+        }
+
+        if ((props?.ctx?.item as any)?.__nonDataRow) {
+            return <>{children}</>;
+        }
+
+        let id = props.id;
+        if (id === void 0 && props.ctx?.item != null) {
+            id = props.ctx.item[props.idField ?? this.getIdProperty()];
+        }
+
+        return EditLink({
+            itemType: props.itemType ?? this.getItemType(),
+            id: id,
+            children: children,
+            cssClass: props.cssClass,
+            tabIndex: props.tabIndex
+        })
     }
 
     protected getColumnsKey(): string {
