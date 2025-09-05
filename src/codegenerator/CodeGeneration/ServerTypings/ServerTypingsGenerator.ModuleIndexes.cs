@@ -22,7 +22,7 @@ public partial class ServerTypingsGenerator : TypingsGeneratorBase
             foreach (var file in files.OrderBy(x => x.Filename))
             {
                 var name = System.IO.Path.GetFileNameWithoutExtension(file.Filename);
-                sb.AppendLine($"export * from \"./{files.Key}/{name}\"");
+                sb.AppendLine($"export * from \"./{files.Key}/{name}\";");
             }
 
             if (sb.Length > 0)
