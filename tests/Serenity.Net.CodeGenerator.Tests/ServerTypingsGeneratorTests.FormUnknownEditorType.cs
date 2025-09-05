@@ -20,7 +20,7 @@ public partial class ServerTypingsGeneratorTests
         });
         var result = generator.Run();
         var code = Assert.Single(ExceptGenericFiles(result)).Text;
-        Assert.Equal(NormalizeTS(@"import { initFormType, Widget, PrefixedContext } from ""@serenity-is/corelib"";
+        Assert.Equal(NormalizeTS(@"import { initFormType, PrefixedContext, Widget } from ""@serenity-is/corelib"";
 
 export interface FormWithUnknownEditor {
     Test: Widget;
