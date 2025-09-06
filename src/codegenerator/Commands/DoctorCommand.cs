@@ -28,6 +28,8 @@ public partial class DoctorCommand(IProjectFileInfo project, IGeneratorConsole c
     public IArgumentReader Arguments { get; set; }
     public List<ExternalType> TsTypes { get; set; }
 
+    private bool hasErrors;
+
     void Info(string label, string text)
     { 
         Console.Write(label + ": ", ConsoleColor.Cyan);
@@ -44,11 +46,12 @@ public partial class DoctorCommand(IProjectFileInfo project, IGeneratorConsole c
     {
         Console.Write("ERROR: ", ConsoleColor.Red);
         Console.WriteLine(message, ConsoleColor.Red);
+        hasErrors = true;
     }
 
     public override ExitCodes Run()
     {
-        var projectFile = System.IO.Path.GetFullPath(ProjectFile);
+        var projectFile = FileSystem.GetFullPath(ProjectFile);
 
         Info("Project File", projectFile);
 
@@ -98,7 +101,7 @@ public partial class DoctorCommand(IProjectFileInfo project, IGeneratorConsole c
         CheckPackageJson(projectDir, serenityVersion);
         CheckTsConfig(projectDir, serenityVersion);
         
-        return ExitCodes.Success;
+        return hasErrors ? ExitCodes.Exception : ExitCodes.Success;
     }
 
     void CheckProjectDirectory(string projectDirectory)
@@ -302,8 +305,8 @@ public partial class DoctorCommand(IProjectFileInfo project, IGeneratorConsole c
         {
             StartInfo = new()
             {
-                FileName = "cmd",
-                Arguments = "/c " + (npm ? "npm.cmd" : "node") + " --version",
+                FileName = OperatingSystem.IsWindows() ? "cmd" : (npm ? "npm" : "node"),
+                Arguments = $"{(OperatingSystem.IsWindows() ? ("/c " + (npm ? "npm " : "node ")) : "")}--version",
                 RedirectStandardOutput = true,
                 UseShellExecute = false
             }
@@ -361,7 +364,7 @@ public partial class DoctorCommand(IProjectFileInfo project, IGeneratorConsole c
         {
             // todo: use npm ls / pnpm ls to get installed versions?
             // or read from node_modules/.package-lock.json or pnpm-lock.yaml
-            packageJson = JSON.ParseTolerant<PackageJson>(System.IO.File.ReadAllText(packageJsonPath).Trim());
+            packageJson = JSON.ParseTolerant<PackageJson>(FileSystem.ReadAllText(packageJsonPath).Trim());
         }
         catch (Exception ex)
         {
@@ -516,8 +519,8 @@ public partial class DoctorCommand(IProjectFileInfo project, IGeneratorConsole c
             StartInfo = new ProcessStartInfo
             {
                 WorkingDirectory = FileSystem.GetDirectoryName(tsconfigPath),
-                FileName = "cmd",
-                Arguments = "/c npx -y --package typescript tsc --showConfig",
+                FileName = OperatingSystem.IsWindows() ? "cmd" : "npx",
+                Arguments = $"{(OperatingSystem.IsWindows() ? "/c npx " : "")}-y --package typescript tsc --showConfig",
                 RedirectStandardOutput = true,
                 UseShellExecute = false
             }

@@ -37,7 +37,7 @@ public class MockFileSystem(string currentDirectory = "") :
     /// <inheritdoc/>
     public bool DirectoryExists(string path)
     {
-        return Directory.Exists(path);
+        return Directory.Exists(path == "\\" ? "/" : path);
     }
 
     /// <inheritdoc/>
