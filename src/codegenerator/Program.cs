@@ -8,7 +8,8 @@ public class Program
     {
         var fileSystem = new PhysicalGeneratorFileSystem();
         var console = new GeneratorConsole();
-        var cli = new Cli(fileSystem, console);
+        var processExecutor = new PhysicalProcessExecutor();
+        var cli = new Cli(fileSystem, console, processExecutor);
 
         try
         {

@@ -2,10 +2,11 @@ using Serenity.CodeGeneration;
 
 namespace Serenity.CodeGenerator;
 
-public class Cli(IFileSystem fileSystem, IGeneratorConsole console)
+public class Cli(IFileSystem fileSystem, IGeneratorConsole console, IProcessExecutor processExecutor)
 {
     private readonly IFileSystem FileSystem = fileSystem ?? throw new ArgumentNullException(nameof(fileSystem));
     private readonly IGeneratorConsole Console = console ?? throw new ArgumentNullException(nameof(console));
+    private readonly IProcessExecutor ProcessExecutor = processExecutor ?? throw new ArgumentNullException(nameof(processExecutor));
 
     public Func<string, Func<string, string>, IProjectFileInfo> ProjectFactory { get; set; }
     public Func<BaseGeneratorCommand, ExitCodes> RunCommandCallback { get; set; }
@@ -77,7 +78,7 @@ public class Cli(IFileSystem fileSystem, IGeneratorConsole console)
 
         if (isCommand(CommandKeys.Doctor))
         {
-            return RunCommand(new DoctorCommand(project, Console)
+            return RunCommand(new DoctorCommand(project, Console, ProcessExecutor)
             {
                 Arguments = arguments
             });

@@ -4,7 +4,8 @@ using System.Text.Json.Nodes;
 
 namespace Serenity.CodeGenerator;
 
-public partial class DoctorCommand(IProjectFileInfo project, IGeneratorConsole console) 
+public partial class DoctorCommand(IProjectFileInfo project, IGeneratorConsole console, 
+    IProcessExecutor processExecutor) 
     : BaseGeneratorCommand(project, console)
 {
     static readonly Version RecommendedNodeVersion = new(20, 11, 0);
@@ -204,11 +205,8 @@ public partial class DoctorCommand(IProjectFileInfo project, IGeneratorConsole c
         ProjectMetadataJson metadata;
         try
         {
-            string output;
             var process = new Process() { StartInfo = startInfo };
-            process.Start();
-            output = process.StandardOutput.ReadToEnd();
-            if (!process.WaitForExit(10000))
+            if (!processExecutor.StartAndWaitForExit(process, 10000, out string output, out _))
                 output = null;
 
             output = (output ?? "").Trim();
@@ -271,10 +269,34 @@ public partial class DoctorCommand(IProjectFileInfo project, IGeneratorConsole c
             }
         }
 
+        if (serenityVersion >= new Version(8, 8, 0) &&
+            metadata.Items.PackageReference?.Any(x => x.Identity == "Serenity.Pro.Theme") == true)
+        {
+            Error("Serenity.Pro.Theme package is deprecated (as it is merged into Serenity.Pro.Extensions)! Please remove the reference from your project. ~/Serenity.Pro.Theme/*** in appsettings.bundles.json should be replaced with ~/Serenity.Pro.Extensions/***");
+        }
+
+        if (serenityVersion >= new Version(8, 8, 0) &&
+            metadata.Items.PackageReference?.Any(x => x.Identity == "Serenity.Pro.DataAuditLog") == true)
+        {
+            Error("Serenity.Pro.DataAuditLog package is deprecated (as it is merged into Serenity.Pro.Extensions)! Please remove the reference from your project!");
+        }
+
+        if (serenityVersion >= new Version(8, 8, 0) &&
+            metadata.Items.PackageReference?.Any(x => x.Identity == "Serenity.Pro.EmailQueue") == true)
+        {
+            Error("Serenity.Pro.EmailQueue package is deprecated (as it is merged into Serenity.Pro.Extensions)! Please remove the reference from your project as it is merged into Serenity.Pro.Extensions!");
+        }
+
+        if (serenityVersion >= new Version(8, 8, 0) &&
+            metadata.Items.PackageReference?.Any(x => x.Identity == "EPPlus") == true)
+        {
+            Warning("EPPlus package is replaced with ClosedXML since 8.8.0! Please remove the reference from your project if don't have a manual dependency.");
+        }
+
         serenityVersion = serenityWebVersion;
     }
 
-    private static Version GetNodeOrNpmVersion(bool npm)
+    private Version GetNodeOrNpmVersion(bool npm)
     {
         var process = new Process()
         {
@@ -287,23 +309,13 @@ public partial class DoctorCommand(IProjectFileInfo project, IGeneratorConsole c
             }
         };
 
-        string output;
-        try
-        {
-            process.Start();
-            output = process.StandardOutput.ReadToEnd();
-            if (!process.WaitForExit(5000))
-                output = null;
-        }
-        catch (Exception)
-        {
+        if (!processExecutor.StartAndWaitForExit(process, 5000, out string output, out _))
             output = null;
-        }
 
         output = (output ?? "").Trim();
 
         if (output.StartsWith("v", StringComparison.OrdinalIgnoreCase))
-            output = output.Substring(1);
+            output = output[1..];
 
         if (Version.TryParse(output, out var version))
             return version;
@@ -452,16 +464,16 @@ public partial class DoctorCommand(IProjectFileInfo project, IGeneratorConsole c
 
         Info("Using TypeScript Config", JSON.StringifyIndented(tsConfig));
 
-        var compilerOptions = tsConfig["compilerOptions"] as JsonObject;
-        if (compilerOptions == null)
+        if (tsConfig["compilerOptions"] is not JsonObject compilerOptions)
         {
             Error("compilerOptions is missing in tsconfig.json!");
             return;
         }
 
-        if (!compilerOptions.TryGetPropertyValue("experimentalDecorators", out var targetToken) ||
-            targetToken == null ||
-            targetToken.GetValue<bool>() != true)
+        if (serenityVersion >= new Version(8, 8, 6) &&
+            (!compilerOptions.TryGetPropertyValue("experimentalDecorators", out var targetToken) ||
+             targetToken == null ||
+             targetToken.GetValue<bool>() != true))
         {
             Warning("experimentalDecorators option in tsconfig.json should be set to true or you may have runtime errors due to an unresolved esbuild bug!");
         }
@@ -509,18 +521,8 @@ public partial class DoctorCommand(IProjectFileInfo project, IGeneratorConsole c
             }
         };
 
-        string tscOutput;
-        try
-        {
-            npmProcess.Start();
-            tscOutput = npmProcess.StandardOutput.ReadToEnd();
-            if (!npmProcess.WaitForExit(50000))
-                tscOutput = null;
-        }
-        catch (Exception)
-        {
+        if (!processExecutor.StartAndWaitForExit(npmProcess, 50000, out string tscOutput, out _))
             tscOutput = null;
-        }
 
         tscOutput = (tscOutput ?? "").Trim();
         if (string.IsNullOrEmpty(tscOutput))

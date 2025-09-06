@@ -34,7 +34,7 @@ public partial class CliTests
 
     private Cli NewCli(Func<BaseGeneratorCommand, ExitCodes> runCommand = null)
     {
-        var cli = new Cli(fileSystem, console)
+        var cli = new Cli(fileSystem, console, new MockProcessExecutor())
         {
             RunCommandCallback = cmd =>
             {
@@ -55,10 +55,13 @@ public partial class CliTests
     public void ThrowsArgumentNull_ForAnyNullArgument()
     {
         Assert.Throws<ArgumentNullException>(() =>
-            new Cli(null, console));
+            new Cli(null, console, new MockProcessExecutor()));
 
         Assert.Throws<ArgumentNullException>(() =>
-            new Cli(fileSystem, null));
+            new Cli(fileSystem, null, new MockProcessExecutor()));
+
+        Assert.Throws<ArgumentNullException>(() =>
+            new Cli(fileSystem, console, null));
     }
 
     [InlineData("/?")]
