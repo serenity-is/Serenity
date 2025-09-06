@@ -359,6 +359,8 @@ public partial class DoctorCommand(IProjectFileInfo project, IGeneratorConsole c
         PackageJson packageJson;
         try
         {
+            // todo: use npm ls / pnpm ls to get installed versions?
+            // or read from node_modules/.package-lock.json or pnpm-lock.yaml
             packageJson = JSON.ParseTolerant<PackageJson>(System.IO.File.ReadAllText(packageJsonPath).Trim());
         }
         catch (Exception ex)
