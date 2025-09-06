@@ -1,5 +1,6 @@
 using Serenity.CodeGeneration;
 using System.Diagnostics;
+using System.Text.Json.Nodes;
 
 namespace Serenity.CodeGenerator;
 
@@ -94,6 +95,7 @@ public partial class DoctorCommand(IProjectFileInfo project, IGeneratorConsole c
 
         CheckNodeAndNpmVersions();
         CheckPackageJson(projectDir, serenityVersion);
+        CheckTsConfig(projectDir, serenityVersion);
         
         return ExitCodes.Success;
     }
@@ -190,6 +192,7 @@ public partial class DoctorCommand(IProjectFileInfo project, IGeneratorConsole c
             FileName = "dotnet",
             Arguments = $"msbuild \"{projectFile}\" " +
                         "-getItem:PackageReference " +
+                        "-getItem:ProjectReference " +
                         "-getProperty:AssemblyName " +
                         "-getProperty:OutDir " +
                         "-getProperty:RootNamespace " +
@@ -234,6 +237,14 @@ public partial class DoctorCommand(IProjectFileInfo project, IGeneratorConsole c
         var serenityWeb = metadata.Items.PackageReference.FirstOrDefault(x => x.Identity == "Serenity.Net.Web");
         if (serenityWeb == null)
         {
+            var projectRef = metadata.Items.ProjectReference?.FirstOrDefault(x => x.Filename == "Serenity.Net.Web");
+            if (projectRef != null)
+            {
+                Info("Serenity.Net.Web", $"is a project reference, assuming Sergen version ({sergenVersion}).");
+                serenityVersion = sergenVersion;
+                return;
+            }
+
             Error($"Can't read Serenity.Net.Web package reference from project file, assuming Sergen version ({sergenVersion})!");
             return;
         }
@@ -356,7 +367,13 @@ public partial class DoctorCommand(IProjectFileInfo project, IGeneratorConsole c
             Warning($"@serenity-is/tsbuild is not found in package.json devDependencies!");
             return;
         }
-        
+
+        if (versionStr.StartsWith("workspace:", StringComparison.Ordinal))
+        {
+            Info("@serenity-is/tsbuild Version", versionStr);
+            return;
+        }
+
         if (!Version.TryParse(versionStr, out Version version))
         {
             Warning($"Can't parse @serenity-is/tsbuild dependency version from package.json!");
@@ -418,6 +435,110 @@ public partial class DoctorCommand(IProjectFileInfo project, IGeneratorConsole c
         }
     }
 
+    private void CheckTsConfig(string projectDir, Version serenityVersion)
+    {
+        var tsconfigPath = FileSystem.Combine(projectDir, "tsconfig.json");
+        if (!FileSystem.FileExists(tsconfigPath))
+        {
+            Warning("tsconfig.json file not found at project directory!");
+            return;
+        }
+
+        JsonObject tsConfig = GetTsConfig(tsconfigPath);
+        if (tsConfig == null)
+            return;
+
+        tsConfig.Remove("files");
+
+        Info("Using TypeScript Config", JSON.StringifyIndented(tsConfig));
+
+        var compilerOptions = tsConfig["compilerOptions"] as JsonObject;
+        if (compilerOptions == null)
+        {
+            Error("compilerOptions is missing in tsconfig.json!");
+            return;
+        }
+
+        if (!compilerOptions.TryGetPropertyValue("experimentalDecorators", out var targetToken) ||
+            targetToken == null ||
+            targetToken.GetValue<bool>() != true)
+        {
+            Warning("experimentalDecorators option in tsconfig.json should be set to true or you may have runtime errors due to an unresolved esbuild bug!");
+        }
+
+        if (!compilerOptions.TryGetPropertyValue("useDefineForClassFields", out targetToken) ||
+            targetToken == null ||
+            targetToken.GetValue<bool>() != false)
+        {
+            Warning("useDefineForClassFields option in tsconfig.json should be set to false or you may have runtime errors!");
+        }
+
+        if (!compilerOptions.TryGetPropertyValue("forceConsistentCasingInFileNames", out targetToken) ||
+            targetToken == null ||
+            targetToken.GetValue<bool>() != true)
+        {
+            Warning("forceConsistentCasingInFileNames option in tsconfig.json should be set to true or you may have errors in case-sensitive filesystems like Linux!");
+        }
+
+        if (!compilerOptions.TryGetPropertyValue("module", out targetToken) ||
+            targetToken == null ||
+            targetToken.GetValue<string>() != "esnext")
+        {
+            Warning($"module option in tsconfig.json is recommended to be 'esnext' (it is {targetToken.GetValue<string>()})!");
+        }
+
+        if (!compilerOptions.TryGetPropertyValue("moduleResolution", out targetToken) ||
+            targetToken == null ||
+            targetToken.GetValue<string>() != "bundler")
+        {
+            Warning($"moduleResolution option in tsconfig.json is recommended to be 'bundler' (it is {targetToken.GetValue<string>()})!");
+        }
+    }
+
+    private JsonObject GetTsConfig(string tsconfigPath)
+    {
+        var npmProcess = new Process()
+        {
+            StartInfo = new ProcessStartInfo
+            {
+                WorkingDirectory = FileSystem.GetDirectoryName(tsconfigPath),
+                FileName = "cmd",
+                Arguments = "/c npx -y --package typescript tsc --showConfig",
+                RedirectStandardOutput = true,
+                UseShellExecute = false
+            }
+        };
+
+        string tscOutput;
+        try
+        {
+            npmProcess.Start();
+            tscOutput = npmProcess.StandardOutput.ReadToEnd();
+            if (!npmProcess.WaitForExit(50000))
+                tscOutput = null;
+        }
+        catch (Exception)
+        {
+            tscOutput = null;
+        }
+
+        tscOutput = (tscOutput ?? "").Trim();
+        if (string.IsNullOrEmpty(tscOutput))
+        {
+            Error("Error while executing 'tsc --showConfig' to get TypeScript configuration!");
+            return null;
+        }
+
+        if (!tscOutput.StartsWith('{') ||
+            !tscOutput.EndsWith('}'))
+        {
+            Error($"Unexpected output from 'tsc --showConfig': {tscOutput}");
+            return null;
+        }
+
+        return JSON.ParseTolerant<JsonObject>(tscOutput);
+    }
+
     private class PackageJson
     {
 #pragma warning disable IDE1006 // Naming Styles
@@ -436,12 +557,18 @@ public partial class DoctorCommand(IProjectFileInfo project, IGeneratorConsole c
     private class ProjectItems
     {
         public PackageReferenceItem[] PackageReference { get; set; }
+        public ProjectReferenceItem[] ProjectReference { get; set; }
     }
 
     private class PackageReferenceItem
     {
         public string Identity { get; set; }
         public string Version { get; set; }
+    }
+
+    private class ProjectReferenceItem
+    {
+        public string Filename { get; set; }
     }
 
     [GeneratedRegex("^[A-Z]")]
