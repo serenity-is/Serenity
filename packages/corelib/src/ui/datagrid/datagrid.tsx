@@ -1,7 +1,7 @@
-import { Authorization, Criteria, Fluent, ListResponse, cssEscape, debounce, getInstanceType, getTypeFullName, getjQuery, htmlEncode, isInstanceOfType, tryGetText, type PropertyItem, type PropertyItemsData } from "../../base";
 import { ArgsCell, AutoTooltips, Column, ColumnSort, FormatterContext, Grid, GridOptions } from "@serenity-is/sleekgrid";
-import { IReadOnly } from "../../interfaces";
+import { Authorization, Criteria, Fluent, ListResponse, cssEscape, debounce, getInstanceType, getTypeFullName, getjQuery, isInstanceOfType, tryGetText, type PropertyItem, type PropertyItemsData } from "../../base";
 import { LayoutTimer, ScriptData, deepClone, extend, getColumnsData, getColumnsDataAsync, setEquality } from "../../compat";
+import { IReadOnly } from "../../interfaces";
 import { Format, PagerOptions, RemoteView, RemoteViewOptions } from "../../slick";
 import { ColumnsKeyAttribute, FilterableAttribute, IdPropertyAttribute, IsActivePropertyAttribute, LocalTextPrefixAttribute } from "../../types/attributes";
 import { Decorators } from "../../types/decorators";
@@ -13,8 +13,11 @@ import { BooleanFiltering, DateFiltering, DateTimeFiltering, FilteringTypeRegist
 import { FilterLine } from "../filtering/filterline";
 import { FilterOperators } from "../filtering/filteroperator";
 import { FilterStore } from "../filtering/filterstore";
+import { EditLink } from "../helpers/editlink";
+import { GridUtils } from "../helpers/gridutils";
 import { LazyLoadHelper } from "../helpers/lazyloadhelper";
-import { EditLink, GridUtils, PropertyItemSlickConverter, SlickFormatting, SlickHelper } from "../helpers/slickhelpers";
+import { PropertyItemSlickConverter } from "../helpers/propertyitemslickconverter";
+import { SlickFormatting } from "../helpers/slickformatting";
 import { ReflectionOptionsSetter } from "../widgets/reflectionoptionssetter";
 import { ToolButton, Toolbar } from "../widgets/toolbar";
 import { Widget, WidgetProps } from "../widgets/widget";
@@ -25,6 +28,7 @@ import { QuickFilter } from "./quickfilter";
 import { QuickFilterBar } from "./quickfilterbar";
 import { QuickSearchField, QuickSearchInput } from "./quicksearchinput";
 import { SlickPager } from "./slickpager";
+import { SlickHelper } from "../helpers/slickhelper";
 
 export interface SettingStorage {
     getItem(key: string): string | Promise<string>;

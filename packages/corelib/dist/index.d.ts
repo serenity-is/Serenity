@@ -4867,6 +4867,50 @@ export interface IDataGrid {
 	getView(): RemoteView<any>;
 	getFilterStore(): FilterStore;
 }
+export declare class ColumnsBase<TRow = any> {
+	constructor(items: Column<TRow>[]);
+	valueOf(): Column<TRow>[];
+}
+export declare function EditLink(props: {
+	/**
+	 * The ID of the item to link to.
+	 */
+	id: any;
+	/**
+	 * The type of the item, e.g. "Northwind.Customer".
+	 */
+	itemType?: string;
+	/**
+	 * Additional CSS class to add to the link (besides s-EditLink and s-[ItemType]Link)
+	 */
+	cssClass?: string;
+	/**
+	 * Tab index for the link. Default is null, which means no tabindex attribute.
+	 */
+	tabIndex?: number;
+	/**
+	 * Child elements or text to be displayed inside the link.
+	 */
+	children?: any;
+}): HTMLAnchorElement;
+export interface GridRadioSelectionMixinOptions {
+	selectable?: (item: any) => boolean;
+}
+export declare class GridRadioSelectionMixin {
+	private idField;
+	private include;
+	private grid;
+	private options;
+	constructor(grid: IDataGrid, options?: GridRadioSelectionMixinOptions);
+	private isSelectable;
+	clear(): void;
+	resetCheckedAndRefresh(): void;
+	getSelectedKey(): string;
+	getSelectedAsInt32(): number;
+	getSelectedAsInt64(): number;
+	setSelectedKey(key: string): void;
+	static createSelectColumn(getMixin: () => GridRadioSelectionMixin): Column;
+}
 export interface GridRowSelectionMixinOptions {
 	selectable?: (item: any) => boolean;
 }
@@ -4886,24 +4930,6 @@ export declare class GridRowSelectionMixin {
 	setSelectedKeys(keys: string[]): void;
 	private isSelectable;
 	static createSelectColumn(getMixin: () => GridRowSelectionMixin): Column;
-}
-export interface GridRadioSelectionMixinOptions {
-	selectable?: (item: any) => boolean;
-}
-export declare class GridRadioSelectionMixin {
-	private idField;
-	private include;
-	private grid;
-	private options;
-	constructor(grid: IDataGrid, options?: GridRadioSelectionMixinOptions);
-	private isSelectable;
-	clear(): void;
-	resetCheckedAndRefresh(): void;
-	getSelectedKey(): string;
-	getSelectedAsInt32(): number;
-	getSelectedAsInt64(): number;
-	setSelectedKey(key: string): void;
-	static createSelectColumn(getMixin: () => GridRadioSelectionMixin): Column;
 }
 export declare namespace GridSelectAllButtonHelper {
 	function update(grid: IDataGrid, getSelected: (p1: any) => boolean): void;
@@ -4944,32 +4970,6 @@ export declare namespace SlickTreeHelper {
 	function setIndents<TItem>(items: TItem[], getId: (x: TItem) => any, getParentId: (x: TItem) => any, setCollapsed?: boolean): void;
 	function toggleClick<TItem>(e: Event, row: number, cell: number, view: RemoteView<TItem>, getId: (x: TItem) => any): void;
 }
-export declare class ColumnsBase<TRow = any> {
-	constructor(items: Column<TRow>[]);
-	valueOf(): Column<TRow>[];
-}
-export declare function EditLink(props: {
-	/**
-	 * The ID of the item to link to.
-	 */
-	id: any;
-	/**
-	 * The type of the item, e.g. "Northwind.Customer".
-	 */
-	itemType?: string;
-	/**
-	 * Additional CSS class to add to the link (besides s-EditLink and s-[ItemType]Link)
-	 */
-	cssClass?: string;
-	/**
-	 * Tab index for the link. Default is null, which means no tabindex attribute.
-	 */
-	tabIndex?: number;
-	/**
-	 * Child elements or text to be displayed inside the link.
-	 */
-	children?: any;
-}): HTMLAnchorElement;
 export interface IInitializeColumn {
 	initializeColumn(column: Column): void;
 }
