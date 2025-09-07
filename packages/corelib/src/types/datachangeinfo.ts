@@ -1,4 +1,4 @@
-﻿export {}
+﻿export { };
 
 export interface DataChangeInfo extends Event {
     operationType: string;

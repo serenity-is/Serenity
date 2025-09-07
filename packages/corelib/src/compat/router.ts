@@ -96,7 +96,7 @@ export namespace Router {
         });
         return visibleDialogs;
     }
-    
+
     let pendingDialogHash: () => string;
     let pendingDialogElement: HTMLElement;
     let pendingDialogOwner: HTMLElement;
@@ -106,7 +106,7 @@ export namespace Router {
         var route = [];
         element = isArrayLike(element) ? element[0] : element;
         if (element &&
-            pendingDialogElement && 
+            pendingDialogElement &&
             (element === pendingDialogElement) || (element.contains(pendingDialogElement))) {
             dialogHash = pendingDialogHash ?? dialogHash;
             ownerEl = pendingDialogOwner;
@@ -184,8 +184,8 @@ export namespace Router {
             newHash = newHash.substring(1);
         var newParts = newHash.split("/+/");
         if (resolvingCurrent &&
-            (hashAnchorClickTime && new Date().getTime() - hashAnchorClickTime < 100) && 
-             hashAnchorClickValue === newHash &&
+            (hashAnchorClickTime && new Date().getTime() - hashAnchorClickTime < 100) &&
+            hashAnchorClickValue === newHash &&
             (newHash != '' || window.location.href.indexOf('#') >= 0) &&
             newParts.length == 1 &&
             !newParts.some(x => mightBeRouteRegex.test(x))) {
@@ -216,8 +216,8 @@ export namespace Router {
                         Dialog.getInstance(x)?.close();
                     }
                 });
-            }            
-            
+            }
+
             for (var i = same; i < dialogs.length; i++) {
                 var d = dialogs[i];
                 Dialog.getInstance(d)?.close("router");
@@ -327,7 +327,7 @@ export namespace Router {
         Fluent.on(document, "dialogopen", ".ui-dialog-content", onDocumentDialogOpen);
         Fluent.on(document, "shown.bs.modal", ".modal", onDocumentDialogOpen);
         Fluent.on(document, "panelopen", ".panel-body", onDocumentDialogOpen);
-        
+
         Fluent.on(document, "click", e => {
             if (!Fluent.isDefaultPrevented(e)) {
                 const a = (e.target as HTMLElement).closest?.('a[href^="#"]') as HTMLAnchorElement;

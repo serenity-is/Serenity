@@ -43,5 +43,5 @@ export * from "./system";
 export * from "./toastr2";
 export * from "./tooltip";
 export * from "./uploader";
-export * from "./validator";
 export * from "./userdefinition";
+export * from "./validator";

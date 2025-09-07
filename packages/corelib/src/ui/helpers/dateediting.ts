@@ -191,7 +191,7 @@ export function jQueryDatepickerZIndexWorkaround(input: HTMLInputElement) {
         return;
     let dialog = input?.closest('.ui-dialog');
     if (!dialog)
-        return; 
+        return;
     var dialogIndex = parseInt(getComputedStyle(dialog).zIndex, 10);
     if (dialogIndex == null || isNaN(dialogIndex))
         return;

@@ -1,6 +1,6 @@
 ﻿export * from "./ibooleanvalue";
-export * from "./idoublevalue";
 export * from "./idialog";
+export * from "./idoublevalue";
 export * from "./ieditdialog";
 export * from "./igeteditvalue";
 export * from "./ireadonly";

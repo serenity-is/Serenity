@@ -1,5 +1,5 @@
+import * as deprecations from "./system-compat";
 import { today } from "./system-compat";
-import * as deprecations from "./system-compat"
 
 describe("coalesce", () => {
     it('returns first value if not null', function () {

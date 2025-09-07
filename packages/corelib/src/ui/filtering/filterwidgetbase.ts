@@ -10,7 +10,7 @@ export class FilterWidgetBase<P = {}> extends Widget<P> {
 
     constructor(props: WidgetProps<P>) {
         super(props);
-        
+
         this.store = new FilterStore([]);
         this.onFilterStoreChanged = () => this.filterStoreChanged();
         this.store.add_changed(this.onFilterStoreChanged);
@@ -36,7 +36,7 @@ export class FilterWidgetBase<P = {}> extends Widget<P> {
 
     set_store(value: FilterStore): void {
         if (this.store !== value) {
-            if (this.store != null) 
+            if (this.store != null)
                 this.store.remove_changed(this.onFilterStoreChanged);
 
             this.store = value || new FilterStore([]);

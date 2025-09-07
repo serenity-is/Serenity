@@ -26,7 +26,7 @@ describe("ToolButton", () => {
         expect(onClick).not.toHaveBeenCalled();
     });
 
-   
+
     it('clicking .button-inner does not call onClick if tool-button element has disabled class', function () {
         const onClick = vi.fn();
         var btn = <ToolbarButton onClick={onClick}></ToolbarButton> as HTMLElement;

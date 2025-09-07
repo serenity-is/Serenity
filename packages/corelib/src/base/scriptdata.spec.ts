@@ -710,7 +710,7 @@ describe("ensureScriptDataSync", () => {
             responseText: JSON.stringify(null)
         };
         vi.spyOn(window, "XMLHttpRequest").mockImplementation(() => xhrMock as any);
-        const logSpy = vi.spyOn(console, "log").mockImplementation(() => {});
+        const logSpy = vi.spyOn(console, "log").mockImplementation(() => { });
 
         expect(() => ensureScriptDataSync("TestKey")).toThrow("Cannot load dynamic data: TestKey!")
 
@@ -755,7 +755,7 @@ describe("ensureScriptDataSync", () => {
             statusText: "Server Error"
         };
         vi.spyOn(window, "XMLHttpRequest").mockImplementation(() => xhrMock as any);
-        const logSpy = vi.spyOn(console, "log").mockImplementation(() => {});
+        const logSpy = vi.spyOn(console, "log").mockImplementation(() => { });
 
         expect(() => ensureScriptDataSync("TestKey")).toThrow("An error occurred while trying to load dynamic data: \"TestKey\"!.");
 
@@ -793,7 +793,7 @@ describe("handleScriptDataError", () => {
 
     it("logs and throws an error for a server error", () => {
         const notifySpy = vi.mocked(notifyError);
-        const logSpy = vi.spyOn(console, "log").mockImplementation(() => {});
+        const logSpy = vi.spyOn(console, "log").mockImplementation(() => { });
 
         expect(() => handleScriptDataError("DynamicData.Test", 500, "Server Error")).toThrow(
             'An error occurred while trying to load dynamic data: "DynamicData.Test"!. Please check the error message displayed in the console for more info.'
@@ -806,7 +806,7 @@ describe("handleScriptDataError", () => {
     });
 
     it("logs and throws an error for an unknown error", () => {
-        const logSpy = vi.spyOn(console, "log").mockImplementation(() => {});
+        const logSpy = vi.spyOn(console, "log").mockImplementation(() => { });
         const notifySpy = vi.mocked(notifyError);
 
         expect(() => handleScriptDataError("DynamicData.Test", 0, "Unknown Error")).toThrow(

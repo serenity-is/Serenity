@@ -78,7 +78,7 @@ describe('Toastr', () => {
     });
 
     it('hides toasts', () => new Promise(done => {
-        let onHidden = vi.fn(() => {});
+        let onHidden = vi.fn(() => { });
         const toast = toastr.info('Test', null, {
             onHidden,
             timeOut: 1

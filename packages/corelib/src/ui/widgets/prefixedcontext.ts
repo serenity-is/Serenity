@@ -9,7 +9,7 @@ export class PrefixedContext {
         return Fluent(document.querySelector('#' + this.idPrefix + id));
     }
 
-    w<TWidget>(id: string, type: { new (...args: any[]): TWidget }): TWidget {
+    w<TWidget>(id: string, type: { new(...args: any[]): TWidget }): TWidget {
         return getWidgetFrom<TWidget>('#' + this.idPrefix + id, type);
     }
 }

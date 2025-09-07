@@ -247,7 +247,7 @@ export function serviceCall<TResponse extends ServiceResponse>(options: ServiceO
             }
         }
         catch (exception) {
-            reject(reason(`Service call to '${url}' thrown exception: ${exception.toString()}`, 
+            reject(reason(`Service call to '${url}' thrown exception: ${exception.toString()}`,
                 "exception", { cause: exception, url }));
         }
     });

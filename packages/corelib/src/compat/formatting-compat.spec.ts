@@ -122,4 +122,4 @@ describe("turkishLocaleCompare", () => {
     });
 });
 
-export {}
+export { };

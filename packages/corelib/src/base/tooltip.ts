@@ -55,7 +55,7 @@ export class Tooltip {
     private static existingInstance(el: HTMLElement): any {
         let instance: any;
         if (typeof bootstrap !== "undefined")
-             instance = (bootstrap as any)?.Tooltip?.getInstance?.(el);
+            instance = (bootstrap as any)?.Tooltip?.getInstance?.(el);
         if (instance)
             return instance;
 
@@ -69,7 +69,7 @@ export class Tooltip {
         let instance = Tooltip.existingInstance(isArrayLike(el) ? el[0] : el);
         if (!instance)
             return null;
-        
+
         return new (Tooltip as any)(el, null, false);
     }
 

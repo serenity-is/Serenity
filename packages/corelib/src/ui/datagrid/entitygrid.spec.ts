@@ -1,5 +1,5 @@
-import { mockFetch } from "../../test/mocks";
 import { addCustomAttribute, classTypeInfo } from "../../base";
+import { mockFetch } from "../../test/mocks";
 import { IdPropertyAttribute, IsActivePropertyAttribute, LocalTextPrefixAttribute } from "../../types/attributes";
 import { Decorators } from "../../types/decorators";
 import { EntityGrid } from "./entitygrid";

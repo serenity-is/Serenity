@@ -1,5 +1,5 @@
-import { ErrorHandling, ListRequest, ListResponse, ServiceOptions, ServiceResponse, htmlEncode, localText, notifyError, serviceCall } from "../base";
 import { EventData, EventEmitter, Grid, Group, GroupItemMetadataProvider, GroupTotals, gridDefaults } from "@serenity-is/sleekgrid";
+import { ListRequest, ListResponse, ServiceOptions, ServiceResponse, htmlEncode, localText, serviceCall } from "../base";
 import { deepClone, extend } from "../compat";
 import { AggregateFormatting } from "./aggregators";
 import { GroupInfo, PagingOptions, SummaryOptions } from "./slicktypes";

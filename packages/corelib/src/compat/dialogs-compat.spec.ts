@@ -28,4 +28,4 @@ describe("successDialog", () => {
     });    
 });
 
-export { }
+export { };

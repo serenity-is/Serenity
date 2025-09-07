@@ -226,9 +226,9 @@ export function initializeTypes(root: any, pre: string, limit: number) {
         if (!getTypeNameProp(obj) &&
             (obj as any)[isInterfaceTypeSymbol] !== void 0 &&
             ((typeof obj === "function" && typeof obj.nodeType !== "number") ||
-             (Object.prototype.hasOwnProperty.call(obj, isInterfaceTypeSymbol) &&
-              (obj as any)[isInterfaceTypeSymbol] !== undefined))) {
-   
+                (Object.prototype.hasOwnProperty.call(obj, isInterfaceTypeSymbol) &&
+                    (obj as any)[isInterfaceTypeSymbol] !== undefined))) {
+
             setTypeNameProp(obj, pre + k);
         }
 

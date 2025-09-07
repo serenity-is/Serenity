@@ -75,7 +75,7 @@ describe("EditorUtils.setReadOnly", () => {
         const widget = new MyWidget({});
         EditorUtils.setReadOnly(widget, true);
         expect(widget.domNode.classList.contains("readonly")).toBeTruthy();
-        expect(widget.domNode.hasAttribute("readonly")).toBeTruthy();        
+        expect(widget.domNode.hasAttribute("readonly")).toBeTruthy();
     });
 
     it("finds attached widget from the element", () => {

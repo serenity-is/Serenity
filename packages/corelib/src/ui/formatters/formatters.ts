@@ -1,5 +1,5 @@
-﻿import { Culture, DialogTexts, Enum, faIcon, formatDate, formatNumber, getCustomAttribute, getTypeFullName, htmlEncode, iconClassName, isPromiseLike, localText, parseDecimal, parseISODateTime, resolveUrl, stringFormat, tryGetText } from "../../base";
-import { Column, FormatterContext } from "@serenity-is/sleekgrid";
+﻿import { Column, FormatterContext } from "@serenity-is/sleekgrid";
+import { Culture, DialogTexts, Enum, faIcon, formatDate, formatNumber, getCustomAttribute, getTypeFullName, htmlEncode, iconClassName, isPromiseLike, localText, parseDecimal, parseISODateTime, resolveUrl, stringFormat, tryGetText } from "../../base";
 import { replaceAll } from "../../compat";
 import { Formatter } from "../../slick";
 import { EnumKeyAttribute } from "../../types/attributes";
@@ -104,7 +104,7 @@ export class EnumFormatter implements Formatter {
         var enumType = EnumTypeRegistry.getOrLoad(this.enumKey);
         if (isPromiseLike(enumType)) {
             const node = document.createElement("span");
-            enumType.then(() => { 
+            enumType.then(() => {
                 const text = new Text(EnumFormatter.format(enumType, ctx.value));
                 node.parentElement && node.replaceWith(text);
             });

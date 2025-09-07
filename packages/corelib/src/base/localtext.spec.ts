@@ -12,7 +12,7 @@ describe('proxyTexts', () => {
         });
 
         const proxyTexts = (await import('./localtext')).proxyTexts;
-        const texts = proxyTexts({}, '', {a: {}}) as any;
+        const texts = proxyTexts({}, '', { a: {} }) as any;
 
         expect(texts.a.b).toEqual('Abc');
     });
@@ -45,7 +45,7 @@ describe('proxyTexts', () => {
         const texts = proxyTexts({}, '', {
             a: {
                 b: {}
-            },  
+            },
             b: {
                 c: {}
             }
@@ -70,7 +70,7 @@ describe('proxyTexts', () => {
             'a': 'Abc',
         });
         const proxyTexts = (await import('./localtext')).proxyTexts;
-        const texts = proxyTexts({}, '', {a: {}}) as any;
+        const texts = proxyTexts({}, '', { a: {} }) as any;
         expect(Object.getOwnPropertyNames(texts)).toEqual(['a']);
     });
 });
@@ -99,7 +99,7 @@ describe('tryGetText', () => {
         expect(tryGetText('b')).toEqual(undefined);
         expect(tryGetText('b.c')).toEqual("BC");
         expect(tryGetText('d')).toEqual(undefined);
-    });    
+    });
 });
 
 describe('localText', () => {
@@ -200,7 +200,7 @@ describe('addLocalTexts', () => {
             'b.c': 'D',
             'b.d': 'E',
             'x': 'Y',
-            'z.u':'W',
+            'z.u': 'W',
             'z.v': 'Z'
         });
     });
@@ -224,7 +224,7 @@ describe('addLocalTexts', () => {
             'b.c': 'D',
             'b.d': 'DD',
             'b.x': 'Y',
-            'b.z.u':'W',
+            'b.z.u': 'W',
             'b.z.v': 'Z'
         });
     });

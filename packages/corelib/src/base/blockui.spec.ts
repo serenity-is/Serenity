@@ -58,7 +58,7 @@ describe("blockUI", () => {
         var oldTimeout = window.setTimeout;
         var timeoutCalls = 0;
         var timeoutMs;
-        window.setTimeout = function(callback: Function, ms) {
+        window.setTimeout = function (callback: Function, ms) {
             timeoutMs = ms;
             timeoutCalls++;
             callback();

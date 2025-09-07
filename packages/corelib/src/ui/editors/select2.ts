@@ -956,7 +956,7 @@ abstract class AbstractSelect2 {
     declare search: HTMLInputElement;
     declare protected selection: HTMLElement;
     declare protected showSearchInput: boolean;
- 
+
     protected abstract createContainer(): HTMLElement;
     abstract data(value?: Select2Item | Select2Item[], triggerChange?: boolean): Select2Item | Select2Item[] | void;
     abstract focus(): void;
@@ -1037,9 +1037,9 @@ abstract class AbstractSelect2 {
             }, { passive: true })
         );
 
-        this.dropdown.addEventListener("touchmove", e => 
+        this.dropdown.addEventListener("touchmove", e =>
             (e.target as HTMLElement).closest?.(resultsSelector) && this.touchMoved(), { passive: true });
-        ["touchstart", "touchend"].forEach(ev => this.dropdown.addEventListener(ev, e => 
+        ["touchstart", "touchend"].forEach(ev => this.dropdown.addEventListener(ev, e =>
             (e.target as HTMLElement).closest?.(resultsSelector) && this.clearTouchMoved(), { passive: true }));
 
         // Waiting for a click event on touch devices to select option and hide dropdown
@@ -2232,19 +2232,19 @@ class SingleSelect2 extends AbstractSelect2 {
         container.classList.add("select2-container");
         container.innerHTML =
             "<a href='javascript:void(0)' class='select2-choice' tabindex='-1'>" +
-                "<span class='select2-chosen'>&#160;</span><abbr class='select2-search-choice-close'></abbr>" +
-                "<span class='select2-arrow' role='presentation'><b role='presentation'></b></span>" +
+            "<span class='select2-chosen'>&#160;</span><abbr class='select2-search-choice-close'></abbr>" +
+            "<span class='select2-arrow' role='presentation'><b role='presentation'></b></span>" +
             "</a>" +
             "<label for='' class='select2-offscreen'></label>" +
             "<input class='select2-focusser select2-offscreen' type='text' aria-haspopup='true' role='button' />" +
             "<div class='select2-drop select2-display-none'>" +
-                "<div class='select2-search'>" + 
-                    "<label for='' class='select2-offscreen'></label>" + 
-                    "<input type='text' autocomplete='off' autocorrect='off' autocapitalize='off' spellcheck='false' class='select2-input' role='combobox' aria-expanded='true'" +
-                        "aria-autocomplete='list' />" + 
-                "</div>" + 
-                "<ul class='select2-results' role='listbox'>" + 
-                "</ul>" +
+            "<div class='select2-search'>" +
+            "<label for='' class='select2-offscreen'></label>" +
+            "<input type='text' autocomplete='off' autocorrect='off' autocapitalize='off' spellcheck='false' class='select2-input' role='combobox' aria-expanded='true'" +
+            "aria-autocomplete='list' />" +
+            "</div>" +
+            "<ul class='select2-results' role='listbox'>" +
+            "</ul>" +
             "</div>";
         return container;
     }
@@ -2832,13 +2832,13 @@ class MultiSelect2 extends AbstractSelect2 {
         container.classList.add("select2-container", "select2-container-multi");
         container.innerHTML = (
             "<ul class='select2-choices'>" +
-                "<li class='select2-search-field'>" + 
-                    "<label for='' class='select2-offscreen'></label>" +
-                    "<input type='text' autocomplete='off' autocorrect='off' autocapitalize='off' spellcheck='false' class='select2-input'>" +
-                "</li>" + 
+            "<li class='select2-search-field'>" +
+            "<label for='' class='select2-offscreen'></label>" +
+            "<input type='text' autocomplete='off' autocorrect='off' autocapitalize='off' spellcheck='false' class='select2-input'>" +
+            "</li>" +
             "</ul>" +
             "<div class='select2-drop select2-drop-multi select2-display-none'>" +
-                "<ul class='select2-results'></ul>" + 
+            "<ul class='select2-results'></ul>" +
             "</div>");
         return container;
     }

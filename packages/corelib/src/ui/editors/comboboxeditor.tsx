@@ -205,7 +205,7 @@ export class ComboboxEditor<P, TItem> extends EditorWidget<P> implements
                 this._itemById ??= {};
                 for (var x of items)
                     this._itemById[x.id] = x;
-                
+
                 return mappedResult;
             });
         }

@@ -265,7 +265,7 @@ export function PropertyCategories(props: {
         }
 
         const fieldElement = <PropertyField item={item} container={categoryEl} idPrefix={idPrefix} localTextPrefix={localTextPrefix} /> as PropertyFieldElement;
-        fieldElements?.push(fieldElement);   
+        fieldElements?.push(fieldElement);
         priorCategory = category;
     }
 

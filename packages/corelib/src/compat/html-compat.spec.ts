@@ -1,5 +1,5 @@
-import { addEmptyOption, addOption, clearOptions, findElementWithRelativeId, outerHtml, newBodyDiv } from "./html-compat";
 import * as deprecations from "./html-compat";
+import { addEmptyOption, addOption, clearOptions, findElementWithRelativeId, newBodyDiv, outerHtml } from "./html-compat";
 
 describe("addEmptyOption", () => {
     it("adds an option to the select", () => {

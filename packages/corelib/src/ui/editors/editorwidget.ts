@@ -20,7 +20,7 @@ export class EditorWidget<P> extends Widget<EditorProps<P>> {
     }
 
     get readOnly(): boolean {
-        return typeof (this as any)?.get_readOnly === "function" ? !!(this as any).get_readOnly() : 
+        return typeof (this as any)?.get_readOnly === "function" ? !!(this as any).get_readOnly() :
             getElementReadOnly(this.domNode);
     }
 

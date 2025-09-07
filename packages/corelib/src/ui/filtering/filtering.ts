@@ -280,7 +280,7 @@ export abstract class BaseFiltering implements IFiltering, IQuickFiltering {
         }
         var value;
         let combobox = Combobox.getInstance(input);
-        if (combobox) {        
+        if (combobox) {
             value = combobox.getSelectedItems()?.join(", ");
         }
         else {

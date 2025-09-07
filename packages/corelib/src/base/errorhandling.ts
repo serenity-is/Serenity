@@ -12,7 +12,7 @@ export namespace ErrorHandling {
      * is null, has no message or code, it shows a generic error message.
      */
     export function showServiceError(error: ServiceError, errorInfo?: RequestErrorInfo, errorMode?: 'alert' | 'notification') {
-        
+
         const showMessage = errorMode == 'notification' ? notifyError : alertDialog;
 
         if (error || !errorInfo) {

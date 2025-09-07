@@ -12,7 +12,7 @@ export interface EntityLocalizerOptions {
     getPropertyGrid: () => Fluent,
     getToolButtons: () => HTMLElement[]
     pgOptions: PropertyGridOptions,
-    retrieveLocalizations: () => PromiseLike<{ [ languageId: string ]: any}>,
+    retrieveLocalizations: () => PromiseLike<{ [languageId: string]: any }>,
     validateForm: () => boolean,
 }
 
@@ -118,7 +118,7 @@ export class EntityLocalizer {
         Fluent.on(this.targetLanguage, "change", () => {
             targetLanguageUpdate();
             localStorage.setItem("EntityLocalizer.TargetLanguage", this.targetLanguage?.value);
-        });        
+        });
     }
 
     destroy() {
@@ -184,7 +184,7 @@ export class EntityLocalizer {
 
         this.options.retrieveLocalizations().then(localizations => {
             const copy = extend(new Object(), this.options.getEntity());
-            Object.entries(localizations ?? {}).forEach(([language, entity]) => 
+            Object.entries(localizations ?? {}).forEach(([language, entity]) =>
                 Object.entries(entity ?? {}).forEach(([field, value]) =>
                     copy[language + '$' + field] = value));
 

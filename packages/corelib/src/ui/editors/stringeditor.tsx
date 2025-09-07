@@ -1,5 +1,4 @@
-﻿import { Fluent } from "../../base";
-import { IStringValue } from "../../interfaces";
+﻿import { IStringValue } from "../../interfaces";
 import { Decorators } from "../../types/decorators";
 import { EditorWidget } from "./editorwidget";
 

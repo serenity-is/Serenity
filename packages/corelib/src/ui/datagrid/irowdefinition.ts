@@ -5,7 +5,7 @@
     readonly isActiveProperty?: string;
     readonly isDeletedProperty?: string;
     readonly localTextPrefix?: string;
-    readonly nameProperty?: string;   
+    readonly nameProperty?: string;
     readonly readPermission?: string;
     readonly updatePermission?: string;
 }

@@ -25,7 +25,7 @@ describe("disposeElement", () => {
 
     it("clears any events other than disposing", () => {
         const test = vi.fn();
-        addListener(element, "test", test); 
+        addListener(element, "test", test);
         disposeElement(element);
         expect(test).not.toHaveBeenCalled();
         element.dispatchEvent(new Event("test"));
@@ -34,7 +34,7 @@ describe("disposeElement", () => {
 
     it("can't clear externally attached events", () => {
         const test = vi.fn();
-        element.addEventListener("test", test); 
+        element.addEventListener("test", test);
         disposeElement(element);
         expect(test).not.toHaveBeenCalled();
         element.dispatchEvent(new Event("test"));
@@ -44,8 +44,8 @@ describe("disposeElement", () => {
     it("calls disposing handlers", () => {
         const disposing1 = vi.fn();
         const disposing2 = vi.fn();
-        addListener(element, "disposing", disposing1); 
-        addListener(element, "disposing", disposing2); 
+        addListener(element, "disposing", disposing1);
+        addListener(element, "disposing", disposing2);
         disposeElement(element);
         expect(disposing1).toHaveBeenCalled();
         expect(disposing2).toHaveBeenCalled();
@@ -54,8 +54,8 @@ describe("disposeElement", () => {
     it("does not trigger externally attached disposing event", () => {
         const disposing1 = vi.fn();
         const disposing2 = vi.fn();
-        addListener(element, "disposing", disposing1); 
-        element.addEventListener("disposing", disposing2); 
+        addListener(element, "disposing", disposing1);
+        element.addEventListener("disposing", disposing2);
         disposeElement(element);
         expect(disposing1).toHaveBeenCalled();
         expect(disposing2).not.toHaveBeenCalled();
@@ -69,7 +69,7 @@ describe("triggerEvent", () => {
         document.body.appendChild(element);
 
         const test = vi.fn();
-        addListener(element, "test", test); 
+        addListener(element, "test", test);
         triggerEvent(element, "test");
         expect(test).toHaveBeenCalled();
     });
@@ -79,8 +79,8 @@ describe("triggerEvent", () => {
         document.body.appendChild(element);
 
         const test = vi.fn();
-        addListener(element, "test", test); 
-        triggerEvent(element, "test",  { custom: 5});
+        addListener(element, "test", test);
+        triggerEvent(element, "test", { custom: 5 });
         expect(test).toHaveBeenCalled();
         expect(test.mock.calls[0][0].custom).toBe(5);
     });
@@ -90,7 +90,7 @@ describe("triggerEvent", () => {
         document.body.appendChild(element);
 
         const test = vi.fn();
-        addListener(element, "test", test); 
+        addListener(element, "test", test);
         triggerEvent(element, "test");
         expect(test).toHaveBeenCalled();
         expect(test.mock.calls[0][0].bubbles).toBe(true);
@@ -101,8 +101,8 @@ describe("triggerEvent", () => {
         document.body.appendChild(element);
 
         const test = vi.fn();
-        addListener(element, "test", test); 
-        triggerEvent(element, "test",  { bubbles: false });
+        addListener(element, "test", test);
+        triggerEvent(element, "test", { bubbles: false });
         expect(test).toHaveBeenCalled();
         expect(test.mock.calls[0][0].bubbles).toBe(false);
     });
@@ -112,7 +112,7 @@ describe("triggerEvent", () => {
         document.body.appendChild(element);
 
         const test = vi.fn();
-        addListener(element, "test", test); 
+        addListener(element, "test", test);
         triggerEvent(element, "test");
         expect(test).toHaveBeenCalled();
         expect(test.mock.calls[0][0].cancelable).toBe(true);
@@ -123,8 +123,8 @@ describe("triggerEvent", () => {
         document.body.appendChild(element);
 
         const test = vi.fn();
-        addListener(element, "test", test); 
-        triggerEvent(element, "test",  { cancelable: false });
+        addListener(element, "test", test);
+        triggerEvent(element, "test", { cancelable: false });
         expect(test).toHaveBeenCalled();
         expect(test.mock.calls[0][0].cancelable).toBe(false);
     });
@@ -134,7 +134,7 @@ describe("triggerEvent", () => {
         document.body.appendChild(element);
 
         const test = vi.fn();
-        addListener(document.body, "test", "div", test); 
+        addListener(document.body, "test", "div", test);
         triggerEvent(element, "test");
         expect(test).toHaveBeenCalled();
     });

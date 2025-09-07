@@ -127,7 +127,7 @@ export function mockFetch(map?: { [urlOrService: string]: ((info: MockFetchInfo)
 
             var info: MockFetchInfo = {
                 url: url,
-                init: init, 
+                init: init,
                 requestData,
                 status: 200,
                 aborted: false,
@@ -213,7 +213,7 @@ class MockXHR {
     getResponseHeader(name: string): string {
         return this._info?.responseHeaders[name];
     }
-    
+
     open(_method: string, url: string, _async?: boolean): void {
         this._info ??= {} as any;
         this._info.url = url;
@@ -250,7 +250,7 @@ class MockXHR {
 
         this._responseData = callback(this._info);
     }
-    
+
     setRequestHeader(name: string, value: string): void {
     }
 }

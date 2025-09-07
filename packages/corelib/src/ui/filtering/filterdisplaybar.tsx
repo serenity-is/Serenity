@@ -1,4 +1,4 @@
-﻿import { Fluent, localText } from "../../base";
+﻿import { localText } from "../../base";
 import { Decorators } from "../../types/decorators";
 import { FilterDialog } from "./filterdialog";
 import { FilterWidgetBase } from "./filterwidgetbase";

@@ -164,7 +164,7 @@ describe("debounce", function () {
         var debounced = debounce(function () {
             counter++;
         }, 100, true);
-        
+
         var originalNowFunc = Date.now;
         var originalGetTimeFunc = Date.prototype.getTime;
         var originalValueOfFunc = Date.prototype.valueOf;
@@ -247,13 +247,13 @@ describe("debounce", function () {
             expect(counter).toBe(0);
             debounced();
             expect(counter).toBe(0);
-            setTimeout(function() {
+            setTimeout(function () {
                 expect(counter).toBe(0);
             }, 50);
-            setTimeout(function() {
+            setTimeout(function () {
                 expect(counter).toBe(0);
             }, 99);
-            setTimeout(function() {
+            setTimeout(function () {
                 try {
                     expect(counter).toBe(1);
                 }
@@ -279,15 +279,15 @@ describe("debounce", function () {
             expect(counter).toBe(0);
             debounced();
             expect(counter).toBe(0);
-            setTimeout(function() {
+            setTimeout(function () {
                 expect(counter).toBe(0);
             }, 50);
-            setTimeout(function() {
+            setTimeout(function () {
                 expect(counter).toBe(0);
                 debounced.flush();
                 expect(counter).toBe(1);
             }, 99);
-            setTimeout(function() {
+            setTimeout(function () {
                 try {
                     expect(counter).toBe(1);
                     debounced.flush();

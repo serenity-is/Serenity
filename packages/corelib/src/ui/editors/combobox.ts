@@ -129,7 +129,7 @@ export class Combobox<TItem = any> {
                     throw e;
                 }
             };
-            
+
             (this.el as any).typeTimeout = setTimeout((this.el as any).typeTimeoutFn, !query.term ? 0 : opt.typeDelay);
         }
 

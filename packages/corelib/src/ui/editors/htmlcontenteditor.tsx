@@ -1,6 +1,6 @@
 import { Fluent, localText, resolveUrl } from "../../base";
-import { IReadOnly, IStringValue } from "../../interfaces";
 import { isTrimmedEmpty } from "../../compat";
+import { IReadOnly, IStringValue } from "../../interfaces";
 import { Decorators } from "../../types/decorators";
 import { LazyLoadHelper } from "../helpers/lazyloadhelper";
 import { EditorProps, EditorWidget } from "./editorwidget";

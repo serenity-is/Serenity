@@ -1,4 +1,4 @@
-﻿import { resetApplicationPath, Config } from "./config";
+﻿import { Config, resetApplicationPath } from "./config";
 
 afterEach(() => {
     document.head.childNodes.forEach(el => el.remove());

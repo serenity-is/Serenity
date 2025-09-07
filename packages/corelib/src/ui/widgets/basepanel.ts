@@ -6,10 +6,10 @@ import { ToolButton, Toolbar } from "./toolbar";
 import { Widget, WidgetProps } from "./widget";
 
 @Decorators.registerClass("Serenity.BasePanel")
-export class BasePanel<P={}> extends Widget<P> {
+export class BasePanel<P = {}> extends Widget<P> {
     constructor(props: WidgetProps<P>) {
         super(props);
-        
+
         this.initValidator();
         this.initTabs();
         this.initToolbar();

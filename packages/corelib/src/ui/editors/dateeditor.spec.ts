@@ -1,5 +1,5 @@
-import { type DateEditorOptions } from "./dateeditor";
 import { mockJQuery } from "../../test/mocks";
+import { type DateEditorOptions } from "./dateeditor";
 
 beforeEach(() => {
     vi.useRealTimers();

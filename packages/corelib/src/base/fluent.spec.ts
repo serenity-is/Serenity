@@ -309,28 +309,28 @@ describe('Fluent instance methods', () => {
             const childElement = document.createElement('p');
             childElement.id = 'child';
             parentElement.appendChild(childElement);
-            
+
             fluent = Fluent(childElement);
             const closestElement = fluent.closest('#parent').getNode();
-    
+
             expect(closestElement).toBe(parentElement);
         });
-        
+
         it('should return null if no matching element is found', () => {
             document.body.innerHTML = `<div id="test"></div>`;
-            
+
             fluent = Fluent(document.getElementById("test"));
             const closestElement = fluent.closest('.not-existing');
-    
+
             expect(closestElement.getNode()).toBeNull();
         });
 
         it('should return the element itself if it matches the selector', () => {
             document.body.innerHTML = '<div id="test"></div>';
-            
+
             fluent = Fluent(document.getElementById("test"));
             const closestElement = fluent.closest('#test');
-    
+
             expect(closestElement.getNode()).toBe(fluent.getNode());
         });
     });
@@ -524,7 +524,7 @@ describe('Fluent instance methods', () => {
             document.body.appendChild(element);
             expect(fluent.parent().getNode()).toBe(document.body);
         });
-        
+
         it('should return null if current element has no parent', () => {
             expect(fluent.parent().getNode()).toBeNull();
         });
@@ -534,22 +534,22 @@ describe('Fluent instance methods', () => {
         it('should prepend child to the element', () => {
             const child = document.createElement('span');
             fluent.prepend(child);
-    
+
             expect(element.firstChild).toBe(child);
         });
-    
+
         it('should prepend string as text child to the element', () => {
             const child = '<span>Test</span>';
             fluent.prepend(child);
-    
+
             expect((element.firstChild as HTMLElement)?.textContent).toBe(child);
         });
-    
+
         it('should prepend Fluent instance as child to the element', () => {
             const childElement = document.createElement('span');
             const childFluent = Fluent(childElement);
             fluent.prepend(childFluent);
-    
+
             expect(element.firstChild).toBe(childElement);
         });
     });

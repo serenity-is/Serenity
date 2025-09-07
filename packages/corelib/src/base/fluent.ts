@@ -47,7 +47,7 @@ export interface Fluent<TElement extends HTMLElement = HTMLElement> extends Arra
      * @returns The value of the attribute.
      */
     attr(name: string): string;
-    
+
     /**
      * Sets the value of the specified attribute. 
      *

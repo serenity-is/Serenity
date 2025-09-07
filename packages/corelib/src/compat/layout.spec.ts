@@ -8,7 +8,7 @@ function mockUndefinedJQuery() {
 
 describe('initFullHeightGridPage', () => {
     it('works without jQuery', async () => {
-        mockUndefinedJQuery();        
+        mockUndefinedJQuery();
         const initFullHeightGridPage = (await import('./layout')).initFullHeightGridPage;
         var div = document.createElement('div');
         initFullHeightGridPage(div, { noRoute: true });
@@ -79,7 +79,7 @@ describe('isMobileView', () => {
 
     it('should check window.width if window.matchMedia not available', async () => {
         const isMobileView = (await import('./layout')).isMobileView;
-        
+
         var matchMedia = window.matchMedia;
         try {
             delete window.matchMedia;

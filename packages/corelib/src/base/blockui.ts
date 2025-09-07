@@ -9,13 +9,13 @@ export function blockUI(options?: { zIndex?: number, useTimeout?: boolean }) {
         if (blockUICount++ > 0 ||
             typeof document === "undefined")
             return;
-    
+
         var div = document.createElement("div");
         div.className = "blockUI blockOverlay";
         div.setAttribute("style", `z-index: ${options?.zIndex ?? 2000}; border: none; margin: 0px; padding: 0px; width: 100%; height: 100%; top: 0px; left: 0px; opacity: 0; cursor: wait; position: fixed;`);
         document.body.appendChild(div);
     }
-    
+
     (options?.useTimeout && (window.setTimeout(block, 0))) || block();
 }
 

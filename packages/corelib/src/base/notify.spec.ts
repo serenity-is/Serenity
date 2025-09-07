@@ -193,7 +193,7 @@ describe("positionToastContainer", () => {
         try {
             modal.setAttribute("class", "modal in");
             vi.spyOn(modal, "getBoundingClientRect");
-            positionToastContainer({ 
+            positionToastContainer({
                 positionClass: "top-right"
             });
             expect(modal.getBoundingClientRect).not.toHaveBeenCalled();

@@ -114,8 +114,8 @@ export class Toastr {
         const target = document.querySelector(targetSelector);
         if (target)
             target.appendChild(container);
-    
-        return container;            
+
+        return container;
     }
 
     public error(
@@ -293,13 +293,13 @@ export class Toastr {
         const handleEvents = (): void => {
             if (opt.closeOnHover) {
 
-                toastElement.addEventListener('mouseover', () => { 
+                toastElement.addEventListener('mouseover', () => {
                     if (intervalId) {
-                        clearTimeout(intervalId); 
+                        clearTimeout(intervalId);
                     }
                 });
 
-                toastElement.addEventListener('mouseout', () => { 
+                toastElement.addEventListener('mouseout', () => {
                     if (opt.timeOut >= 0 && (opt.timeOut > 0 || opt.extendedTimeOut > 0)) {
                         intervalId = setTimeout(hideToast, opt.extendedTimeOut);
                     }

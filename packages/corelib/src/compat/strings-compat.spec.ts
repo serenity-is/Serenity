@@ -1,5 +1,5 @@
-import { isEmptyOrNull, isTrimmedEmpty, padLeft, replaceAll, toSingleLine, trim, trimEnd, trimStart, trimToEmpty, zeroPad } from "./strings-compat";
 import * as deprecations from "./strings-compat";
+import { isEmptyOrNull, isTrimmedEmpty, padLeft, replaceAll, toSingleLine, trim, trimEnd, trimStart, trimToEmpty, zeroPad } from "./strings-compat";
 
 describe("endsWith", () => {
     it("uses String.prototype.endsWith", () => {

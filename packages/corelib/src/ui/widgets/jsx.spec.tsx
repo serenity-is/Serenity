@@ -605,18 +605,18 @@ describe('jsx: widget integration', () => {
     });
 
     it('can create FileUploadEditor with JSX', () => {
-        var el = <FileUploadEditor readOnly={true}  />;
+        var el = <FileUploadEditor readOnly={true} />;
         expect(el).toBeTruthy();
         let input = el.querySelector("input[type=file]");
         expect(input).toBeTruthy();
         expect(input.getAttribute("disabled")).toBe("disabled");
     });
-    
+
     it('can create FileUploadEditor without JSX and no init call', () => {
         var el = new FileUploadEditor({ readOnly: true }).domNode;
         expect(el).toBeTruthy();
         let input = el.querySelector("input[type=file]");
         expect(input).toBeTruthy();
         expect(input.getAttribute("disabled")).toBe("disabled");
-    });    
+    });
 });

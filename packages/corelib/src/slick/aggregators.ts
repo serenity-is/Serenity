@@ -1,5 +1,5 @@
-import { formatNumber, htmlEncode, tryGetText } from "../base";
 import { Column, GroupTotals, NonDataRow, convertCompatFormatter, escapeHtml } from "@serenity-is/sleekgrid";
+import { formatNumber, htmlEncode, tryGetText } from "../base";
 
 export { };
 

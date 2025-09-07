@@ -9,7 +9,7 @@ export namespace Decorators {
     export const formatterType = formatterTypeInfo;
 
     export function registerType() {
-        return function(target: Function & { [typeInfoProperty]: any }, _context?: any): void {
+        return function (target: Function & { [typeInfoProperty]: any }, _context?: any): void {
             if (_context && typeof _context.addInitializer === "function") {
                 _context.addInitializer(() => { regType(target); });
             }

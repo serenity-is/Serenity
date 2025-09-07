@@ -167,7 +167,7 @@ export class FilterStore {
     get_displayText(): string {
         if (this.displayText == null)
             this.displayText = FilterStore.getDisplayTextFor(this.items);
-        
+
         return this.displayText;
     }
 }

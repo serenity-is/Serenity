@@ -114,9 +114,9 @@ export function commonTypeRegistry<TType = any>(props: {
                         break;
                     if (suffix && (promise = Config.lazyTypeLoader(k + suffix, kind as any)))
                         break;
-                }                
+                }
             }
-            
+
             if (isPromiseLike(promise)) {
                 return promise.then(t => {
                     if (t && isMatch(t)) {

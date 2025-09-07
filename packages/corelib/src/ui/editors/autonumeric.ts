@@ -82,7 +82,7 @@ function runCallbacks(input: HTMLInputElement & { autoNumeric?: AutoNumericOptio
      * k = option name example k=aNum
      * val = option value example val=0123456789
      */
-    Object.keys(settings).forEach(function(k) {
+    Object.keys(settings).forEach(function (k) {
         var val = (settings as any)[k];
         if (typeof val === 'function') {
             (settings as any)[k] = val(input, settings, k);
@@ -434,17 +434,17 @@ function autoRound(iv: string, settings: AutoNumericOptions) { /** value to stri
         onePass = true;
     odd = (odd === 0 && (iv.substring(rLength + 2, iv.length) as any > 0)) ? 1 : 0;
     if ((tRound > 4 && settings.mRound === 'S') || /** Round half up symmetric */
-            (tRound > 4 && settings.mRound === 'A' && nSign === '') || /** Round half up asymmetric positive values */
-            (tRound > 5 && settings.mRound === 'A' && nSign === '-') || /** Round half up asymmetric negative values */
-            (tRound > 5 && settings.mRound === 's') || /** Round half down symmetric */
-            (tRound > 5 && settings.mRound === 'a' && nSign === '') || /** Round half down asymmetric positive values */
-            (tRound > 4 && settings.mRound === 'a' && nSign === '-') || /** Round half down asymmetric negative values */
-            (tRound > 5 && settings.mRound === 'B') || /** Round half even "Banker's Rounding" */
-            (tRound === 5 && settings.mRound === 'B' && odd === 1) || /** Round half even "Banker's Rounding" */
-            (tRound > 0 && settings.mRound === 'C' && nSign === '') || /** Round to ceiling toward positive infinite */
-            (tRound > 0 && settings.mRound === 'F' && nSign === '-') || /** Round to floor toward negative infinite */
-            (tRound > 0 && settings.mRound === 'U') ||
-            (settings.mRound === 'CHF')) { /** round up away from zero */
+        (tRound > 4 && settings.mRound === 'A' && nSign === '') || /** Round half up asymmetric positive values */
+        (tRound > 5 && settings.mRound === 'A' && nSign === '-') || /** Round half up asymmetric negative values */
+        (tRound > 5 && settings.mRound === 's') || /** Round half down symmetric */
+        (tRound > 5 && settings.mRound === 'a' && nSign === '') || /** Round half down asymmetric positive values */
+        (tRound > 4 && settings.mRound === 'a' && nSign === '-') || /** Round half down asymmetric negative values */
+        (tRound > 5 && settings.mRound === 'B') || /** Round half even "Banker's Rounding" */
+        (tRound === 5 && settings.mRound === 'B' && odd === 1) || /** Round half even "Banker's Rounding" */
+        (tRound > 0 && settings.mRound === 'C' && nSign === '') || /** Round to ceiling toward positive infinite */
+        (tRound > 0 && settings.mRound === 'F' && nSign === '-') || /** Round to floor toward negative infinite */
+        (tRound > 0 && settings.mRound === 'U') ||
+        (settings.mRound === 'CHF')) { /** round up away from zero */
         for (i = (ivArray.length - 1); i >= 0; i -= 1) { /** Round up the last digit if required, and continue until no more 9's are found */
             if (ivArray[i] !== '.') {
                 if (settings.mRound === 'CHF' && ivArray[i] <= 2 && onePass) {
@@ -504,7 +504,7 @@ class AutoNumericHolder {
         this.settingsClone = autoCode(this.that, this.settings);
         this.value = that.value;
     }
-    
+
     init(e: KeyboardEvent) {
         this.value = this.that.value;
         this.settingsClone = autoCode(this.that, this.settings);
@@ -896,7 +896,7 @@ export class AutoNumeric {
         }
         var settings: AutoNumericOptions = AutoNumeric.getSettings(input), /** attempt to grab 'autoNumeric' settings, if they don't exist returns "undefined". */
             tagData: Record<string, string> = {}; /** attempt to grab HTML5 data, if they don't exist we'll get "undefined".*/
-            Object.keys(input.dataset).forEach(key => tagData[key] = input.dataset[key]);
+        Object.keys(input.dataset).forEach(key => tagData[key] = input.dataset[key]);
         if (typeof settings !== 'object') { /** If we couldn't grab settings, create them from defaults and passed options. */
             var defaults: AutoNumericOptions = {
                 /** allowed numeric values
@@ -1059,7 +1059,7 @@ export class AutoNumeric {
                 holder.formatted = false;
                 return true;
             });
-            
+
             Fluent.on(input, 'keypress.autoNumeric', function (e) {
                 var holder = getHolder(input),
                     processed = holder.processed;

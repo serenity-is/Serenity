@@ -6,7 +6,7 @@ export * from "./dialogtype";
 export * from "./dialogtyperegistry";
 export * from "./editortype";
 export * from "./editortyperegistry";
+export * from "./enumtyperegistry";
 export * from "./formattertype";
 export * from "./formattertyperegistry";
-export * from "./enumtyperegistry";
 export * from "./reflectionutils";

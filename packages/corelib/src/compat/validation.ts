@@ -12,7 +12,7 @@ export function validateOptions(options?: ValidatorOptions): ValidatorOptions {
     let opt: ValidatorOptions = {};
     return extend(extend(opt, {
         errorPlacement: function (place: ArrayLike<HTMLElement> | HTMLElement, elem: ArrayLike<HTMLElement> | HTMLElement) {
-            var element = isArrayLike(elem) ?  elem[0] : elem;
+            var element = isArrayLike(elem) ? elem[0] : elem;
             let field: HTMLElement = null;
             let vx = element.getAttribute('data-vx-id');
             if (vx) {
@@ -42,8 +42,7 @@ export function validateOptions(options?: ValidatorOptions): ValidatorOptions {
                     ":scope > .category-title")?.forEach(el => el.click());
             });
 
-            if (validator.errorList.length)
-            {
+            if (validator.errorList.length) {
                 var el = validator.errorList[0].element as HTMLElement;
                 if (!el)
                     return;
@@ -89,11 +88,11 @@ export namespace ValidationHelper {
             submitHandler?.();
             return false;
         };
-        Fluent.trigger(isArrayLike(form) ? form[0] : form , 'submit');
+        Fluent.trigger(isArrayLike(form) ? form[0] : form, 'submit');
         return true;
     }
 
-    export function submit(form: ArrayLike<HTMLElement> | HTMLElement,  validateBeforeSave: () => boolean, submitHandler: () => void): boolean {
+    export function submit(form: ArrayLike<HTMLElement> | HTMLElement, validateBeforeSave: () => boolean, submitHandler: () => void): boolean {
         var validator = Validator.getInstance(form);
         var valSettings = validator.settings;
         if (valSettings.abortHandler) {

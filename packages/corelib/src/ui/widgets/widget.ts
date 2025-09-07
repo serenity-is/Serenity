@@ -39,7 +39,7 @@ export class Widget<P = {}> {
 
         this.idPrefix = (this.options as any)?.idPrefix ?? (this.uniqueName + '_');
 
-        (this as any)[afterRenderSymbol] = [];        
+        (this as any)[afterRenderSymbol] = [];
         this.addCssClass();
         !this.deferRender() && this.internalRenderContents();
     }
@@ -150,7 +150,7 @@ export class Widget<P = {}> {
         const queue = (this as any)[afterRenderSymbol];
         if (!queue)
             callback();
-        else 
+        else
             queue.push(callback);
     }
 

@@ -2,8 +2,8 @@
 import { getForm } from "../../compat";
 import { FormKeyAttribute } from "../../types/attributes";
 import { Decorators } from "../../types/decorators";
-import { PropertyGrid, PropertyGridMode, PropertyGridOptions } from "./propertygrid";
 import { BasePanel } from "./basepanel";
+import { PropertyGrid, PropertyGridMode, PropertyGridOptions } from "./propertygrid";
 import { WidgetProps } from "./widget";
 
 @Decorators.registerClass('Serenity.PropertyPanel')

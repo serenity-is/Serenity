@@ -1,6 +1,5 @@
 import { mockFetch, unmockFetch } from "../test/mocks";
-import { isSameOrigin, requestStarting, resolveServiceUrl, resolveUrl, serviceCall, getServiceOptions, getActiveRequests, requestFinished } from "./services";
-import { getCookie } from "./services";
+import { getActiveRequests, getCookie, getServiceOptions, isSameOrigin, requestFinished, requestStarting, resolveServiceUrl, resolveUrl, serviceCall } from "./services";
 import { ServiceError, ServiceOptions, ServiceResponse } from "./servicetypes";
 
 vi.mock("./config", () => ({

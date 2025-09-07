@@ -1,5 +1,5 @@
-﻿import { type UserDefinition } from "./userdefinition";
-import { Authorization } from "./authorization";
+﻿import { Authorization } from "./authorization";
+import { type UserDefinition } from "./userdefinition";
 
 const baseUser: UserDefinition = {
     IsAdmin: false,

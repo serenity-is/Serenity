@@ -13,7 +13,7 @@ export interface QuickFilterArgs<TWidget> {
 
 export interface QuickFilter<TWidget extends Widget<P>, P> {
     field?: string;
-    type?: { new (options?: P): TWidget, prototype: TWidget };
+    type?: { new(options?: P): TWidget, prototype: TWidget };
     handler?: (h: QuickFilterArgs<TWidget>) => void;
     title?: string;
     options?: P & WidgetProps<{}>;

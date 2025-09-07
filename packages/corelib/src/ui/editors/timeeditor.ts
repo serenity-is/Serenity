@@ -1,6 +1,6 @@
 import { Fluent, setElementReadOnly, toId } from "../../base";
-import { IDoubleValue, IReadOnly, IStringValue } from "../../interfaces";
 import { addOption, zeroPad } from "../../compat";
+import { IDoubleValue, IReadOnly, IStringValue } from "../../interfaces";
 import { Decorators } from "../../types/decorators";
 import { EditorProps, EditorWidget } from "./editorwidget";
 

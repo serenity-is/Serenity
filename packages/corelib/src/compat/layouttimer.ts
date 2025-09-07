@@ -46,15 +46,15 @@ export namespace LayoutTimer {
                     if ((reg.width && reg.storedWidth !== w) ||
                         (reg.height && reg.storedHeight !== h) ||
                         (!reg.width && !reg.height && (!w !== !reg.storedWidth || !h !== !reg.storedHeight))) {
-                            if (w > 0 && h > 0) {
-                                try {
-                                    reg.handler();
-                                }
-                                finally {
-                                    w = el.offsetWidth;
-                                    h = el.offsetHeight;
-                                }
+                        if (w > 0 && h > 0) {
+                            try {
+                                reg.handler();
                             }
+                            finally {
+                                w = el.offsetWidth;
+                                h = el.offsetHeight;
+                            }
+                        }
                     }
                 }
                 finally {
@@ -125,9 +125,9 @@ export namespace LayoutTimer {
 
     export function off(key: number): number {
         var reg = regs[key];
-        if (!reg) 
+        if (!reg)
             return 0;
-            
+
         delete regs[key];
         regCount--;
         if (regCount <= 0)
@@ -156,7 +156,7 @@ export function executeEverytimeWhenVisible(el: HTMLElement | ArrayLike<HTMLElem
     el = isArrayLike(el) ? el[0] : el;
     if (!el)
         return;
-    
+
     if (callNowIfVisible && el.offsetWidth > 0 && el.offsetHeight > 0) {
         callback();
     }

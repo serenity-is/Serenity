@@ -459,11 +459,11 @@ export class Dialog {
                     opt.fullScreen && "modal-fullscreen" + (typeof opt.fullScreen === "string" ? `-${opt.fullScreen}` : ""),
                     opt.centered && "modal-dialog-centered",
                     opt.scrollable && "modal-scrollable"]}>
-                        <div class="modal-content">
-                            {header}
-                            {this.el}
-                            {footer}
-                        </div>
+                    <div class="modal-content">
+                        {header}
+                        {this.el}
+                        {footer}
+                    </div>
                 </div>
             </div>
         );

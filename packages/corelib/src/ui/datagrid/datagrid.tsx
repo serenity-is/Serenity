@@ -18,6 +18,7 @@ import { GridUtils } from "../helpers/gridutils";
 import { LazyLoadHelper } from "../helpers/lazyloadhelper";
 import { PropertyItemSlickConverter } from "../helpers/propertyitemslickconverter";
 import { SlickFormatting } from "../helpers/slickformatting";
+import { SlickHelper } from "../helpers/slickhelper";
 import { ReflectionOptionsSetter } from "../widgets/reflectionoptionssetter";
 import { ToolButton, Toolbar } from "../widgets/toolbar";
 import { Widget, WidgetProps } from "../widgets/widget";
@@ -28,7 +29,6 @@ import { QuickFilter } from "./quickfilter";
 import { QuickFilterBar } from "./quickfilterbar";
 import { QuickSearchField, QuickSearchInput } from "./quicksearchinput";
 import { SlickPager } from "./slickpager";
-import { SlickHelper } from "../helpers/slickhelper";
 
 export interface SettingStorage {
     getItem(key: string): string | Promise<string>;

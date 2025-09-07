@@ -1,10 +1,9 @@
 import { Culture, Fluent, Invariant, addValidationRule, formatDate, formatISODateTimeUTC, getjQuery, localText, parseDate, parseISODateTime, round, setElementReadOnly, stringFormat, trunc, tryGetText } from "../../base";
-import { IReadOnly, IStringValue } from "../../interfaces";
 import { addOption, today } from "../../compat";
+import { IReadOnly, IStringValue } from "../../interfaces";
 import { Decorators } from "../../types/decorators";
 import { flatPickrTrigger } from "../helpers/dateediting";
 import { DateEditor } from "./dateeditor";
-import { EditorUtils } from "./editorutils";
 import { EditorProps, EditorWidget } from "./editorwidget";
 
 @Decorators.registerEditor('Serenity.DateTimeEditor', [IStringValue, IReadOnly])

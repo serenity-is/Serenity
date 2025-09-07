@@ -1,4 +1,4 @@
-﻿import { Fluent, cancelDialogButton, localText, notifyError, okDialogButton } from "../../base";
+﻿import { cancelDialogButton, localText, notifyError, okDialogButton } from "../../base";
 import { Decorators } from "../../types/decorators";
 import { BaseDialog } from "../dialogs/basedialog";
 import { WidgetProps } from "../widgets/widget";

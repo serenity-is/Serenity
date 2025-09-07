@@ -216,10 +216,10 @@ describe("appendToNode", () => {
         const parent = document.createElement("div");
         const div = document.createElement("div");
         div.innerHTML = "test";
-        const unhandledRejection = () => { 
-            done(void 0); 
+        const unhandledRejection = () => {
+            done(void 0);
             globalThis.process?.off ? globalThis.process.off("unhandledRejection", unhandledRejection) :
-            window.removeEventListener("unhandledrejection", unhandledRejection);
+                window.removeEventListener("unhandledrejection", unhandledRejection);
         };
         globalThis.process?.on ? globalThis.process.on("unhandledRejection", unhandledRejection) :
             window.addEventListener("unhandledrejection", unhandledRejection);
@@ -612,5 +612,5 @@ describe("cssEscape", () => {
         expect(cssEscape("test")).toBe("ESCAPED:test");
         (globalThis as any).CSS = orig;
     });
-    
+
 });

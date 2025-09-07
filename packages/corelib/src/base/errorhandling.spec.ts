@@ -135,7 +135,7 @@ describe("isDevelopmentMode", function () {
 
 describe("runtimeErrorHandler", function () {
     it("ignores if isDevelopmentMode() return false", function () {
-        
+
         const setTimeoutSpy = vi.spyOn(window, "setTimeout").mockImplementation(() => ({} as any));
         vi.spyOn(ErrorHandling, "isDevelopmentMode").mockImplementation(() => false);
 
@@ -195,7 +195,7 @@ describe("runtimeErrorHandler", function () {
 describe("unhandledRejectionHandler", function () {
     let preventDefault: Mock;
     beforeEach(() => {
-         preventDefault = vi.fn(); 
+        preventDefault = vi.fn();
     });
 
     it("ignores if err or err.reason is null", function () {
@@ -241,7 +241,7 @@ describe("unhandledRejectionHandler", function () {
         ErrorHandling.unhandledRejectionHandler({ preventDefault, reason: { origin: "serviceCall", silent: null, kind: "other" } } as any);
         expect(consoleErrorSpy).not.toHaveBeenCalled();
         expect(preventDefault).toHaveBeenCalled();
-    });    
+    });
 
     it("logs error if reason.silent is false and kind is 'exception'", function () {
         const consoleErrorSpy = vi.spyOn(console, "error").mockImplementation(() => ({} as any));
@@ -257,7 +257,7 @@ describe("unhandledRejectionHandler", function () {
         ErrorHandling.unhandledRejectionHandler({ preventDefault, reason: { origin: "serviceCall", kind: "exception" } } as any);
         expect(consoleErrorSpy).toHaveBeenCalledTimes(1);
         expect(preventDefault).toHaveBeenCalled();
-    });    
+    });
 
     it("logs error if reason.silent is undefined and kind is undefined", function () {
         const consoleErrorSpy = vi.spyOn(console, "error").mockImplementation(() => ({} as any));
@@ -265,7 +265,7 @@ describe("unhandledRejectionHandler", function () {
         ErrorHandling.unhandledRejectionHandler({ preventDefault, reason: { origin: "serviceCall" } } as any);
         expect(consoleErrorSpy).toHaveBeenCalledTimes(1);
         expect(preventDefault).toHaveBeenCalled();
-    });   
+    });
 });
 
 function changeJSDOMURL(url: string) {

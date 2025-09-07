@@ -11,7 +11,7 @@ function getTable(): { [key: string]: string } {
 export function addLocalText(obj: string | Record<string, string | Record<string, any>> | string, pre?: string) {
     if (!obj)
         return;
-    
+
     let table = getTable();
 
     if (typeof obj === "string") {

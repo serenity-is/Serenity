@@ -190,7 +190,7 @@ describe("indexOf", () => {
 });
 
 describe("isArray", () => {
-    it('is equal to Array.isArray method', function() {
+    it('is equal to Array.isArray method', function () {
         expect(isArray === Array.isArray).toBe(true);
     });
 });

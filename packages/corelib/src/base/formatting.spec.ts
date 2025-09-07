@@ -698,7 +698,7 @@ describe("formatNumber", () => {
         expect(formatting.formatNumber(12.567, "p", locale)).toBe("1.256,7000?");
     });
 
-    it("handles start zero padding", async function() {
+    it("handles start zero padding", async function () {
         const Culture = formatting.Culture;
         Culture.decimalSeparator = '.';
         expect(formatting.formatNumber(1.23, "000")).toBe("001");
@@ -724,9 +724,9 @@ describe("format", () => {
     it("handles date format specifiers", async function () {
         expect(formatting.stringFormat("{0:yyyy-MM-dd}", new Date(2020, 1, 1))).toBe("2020-02-01");
     });
-    
+
     it("calls obj.format if available", async function () {
-        expect(formatting.stringFormat("{0:x}", {format: (s: string) => s})).toBe("x");
+        expect(formatting.stringFormat("{0:x}", { format: (s: string) => s })).toBe("x");
     });
 });
 
@@ -754,10 +754,10 @@ describe("localeFormat", () => {
         var locale = Object.assign({}, formatting.Culture);
         expect(formatting.stringFormatLocale(locale, "{0:yyyy-MM-dd}", new Date(2020, 1, 1))).toBe("2020-02-01");
     });
-    
+
     it("calls obj.localeFormat if available", async function () {
         var locale = Object.assign({}, formatting.Culture);
-        expect(formatting.stringFormatLocale(locale, "{0:x}", {format: (s: string) => s})).toBe("x");
+        expect(formatting.stringFormatLocale(locale, "{0:x}", { format: (s: string) => s })).toBe("x");
     });
 });
 
@@ -877,7 +877,7 @@ describe("ScriptCulture", () => {
         finally {
             script.remove();
         }
-    });    
+    });
 });
 
 describe("round", () => {
@@ -905,7 +905,7 @@ describe("round", () => {
         expect(formatting.round(1.965, 2)).toBe(1.97);
         expect(formatting.round(-1.965, 2)).toBe(-1.97);
         expect(formatting.round(-1.965, 2)).toBe(-1.97);
-        expect(formatting.round(1.2345678e+2, 2)).toBe(123.46);     
+        expect(formatting.round(1.2345678e+2, 2)).toBe(123.46);
         expect(formatting.round(1234.5678, -2)).toBe(1200);
     });
 });

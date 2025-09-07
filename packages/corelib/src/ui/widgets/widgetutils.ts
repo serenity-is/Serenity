@@ -38,7 +38,7 @@ export function deassociateWidget(widget: { domNode: HTMLElement }) {
     }
 }
 
-export function tryGetWidget<TWidget>(element: Element | ArrayLike<HTMLElement> | string, type?: { new (...args: any[]): TWidget }): TWidget {
+export function tryGetWidget<TWidget>(element: Element | ArrayLike<HTMLElement> | string, type?: { new(...args: any[]): TWidget }): TWidget {
 
     if (typeof element === "string") {
         element = document.querySelector(element);
@@ -74,7 +74,7 @@ export function tryGetWidget<TWidget>(element: Element | ArrayLike<HTMLElement> 
     return null;
 }
 
-export function getWidgetFrom<TWidget>(element: ArrayLike<HTMLElement> | Element | string, type?: { new (...args: any[]): TWidget }): TWidget {
+export function getWidgetFrom<TWidget>(element: ArrayLike<HTMLElement> | Element | string, type?: { new(...args: any[]): TWidget }): TWidget {
     let selector: string;
     if (typeof element === "string") {
         selector = element;
@@ -97,11 +97,11 @@ export function getWidgetFrom<TWidget>(element: ArrayLike<HTMLElement> | Element
     return widget as TWidget;
 }
 
-Fluent.prototype.getWidget = function<TWidget>(this: Fluent, type?: { new (...args: any[]): TWidget }): TWidget {
+Fluent.prototype.getWidget = function <TWidget>(this: Fluent, type?: { new(...args: any[]): TWidget }): TWidget {
     return getWidgetFrom(this, type);
 }
 
-Fluent.prototype.tryGetWidget = function<TWidget>(this: Fluent, type?: { new (...args: any[]): TWidget }): TWidget {
+Fluent.prototype.tryGetWidget = function <TWidget>(this: Fluent, type?: { new(...args: any[]): TWidget }): TWidget {
     return tryGetWidget(this, type);
 }
 

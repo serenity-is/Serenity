@@ -133,8 +133,8 @@ export function getElementReadOnly(el: Element): boolean | null {
     if (el.classList.contains('readonly'))
         return true;
 
-    const type = el.getAttribute('type');        
-    if (el.tagName == 'SELECT' || type === 'radio' || type === 'checkbox') 
+    const type = el.getAttribute('type');
+    if (el.tagName == 'SELECT' || type === 'radio' || type === 'checkbox')
         return el.hasAttribute('disabled');
 
     return el.hasAttribute('readonly');

@@ -194,7 +194,7 @@ export namespace TabsExtensions {
                     }
                 }
 
-                const container = tabs.appendChild(<div class="tab-content"/>);
+                const container = tabs.appendChild(<div class="tab-content" />);
                 tabs.querySelectorAll(":scope>.tab-pane").forEach(pane => {
                     pane.classList.add("pt-3");
                     container.appendChild(pane);
@@ -205,7 +205,7 @@ export namespace TabsExtensions {
             }
 
             if (activeChange) {
-                Fluent.on(tabs, "shown.bs.tab", activeChange); 
+                Fluent.on(tabs, "shown.bs.tab", activeChange);
             }
 
             return Fluent(tabs);

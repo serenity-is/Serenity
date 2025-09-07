@@ -1,5 +1,5 @@
-import { Tooltip } from "./tooltip";
 import { mockJQuery, unmockBSAndJQuery } from "../test/mocks";
+import { Tooltip } from "./tooltip";
 
 let element: HTMLElement;
 let tooltip: Tooltip;

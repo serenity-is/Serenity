@@ -18,7 +18,7 @@ export interface UploaderOptions {
     /** Progress event that is called before first batch start is about to be uploaded */
     allStart?: () => void;
     /** Progress event that is called after last batch is ended uploading or failed */
-    allStop?: () => void;      
+    allStop?: () => void;
     /** Progress event that is called when a batch is about to be uploaded */
     batchStart?: (data: { batch: UploaderBatch }) => void;
     /** Progress event that is called when a batch is ended uploading or failed */
@@ -61,7 +61,7 @@ export interface UploaderBatch {
 
 export interface UploaderSuccessData {
     batch: UploaderBatch;
-    request: UploaderRequest; 
+    request: UploaderRequest;
     event: ProgressEvent;
     xhr: XMLHttpRequest;
     response: any;
@@ -412,7 +412,7 @@ export class Uploader {
                                 resolve(data);
                             }
                             else {
-                                onerror({ event });                                
+                                onerror({ event });
                             }
                         }
                         catch (exception) {
@@ -461,7 +461,7 @@ export class Uploader {
         }
     }
 
-    static errorHandler(data: UploaderErrorData)  {
+    static errorHandler(data: UploaderErrorData) {
         if (data?.exception) {
             console.error(data.exception);
             notifyError(data.exception.toString?.() ?? "Exception occured!");
