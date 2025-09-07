@@ -837,16 +837,7 @@ export class DataGrid<TItem, P = {}> extends Widget<P> implements IDataGrid, IRe
 
     protected itemLink(itemType?: string, idField?: string, text?: Format<TItem>,
         cssClass?: (ctx: FormatterContext) => string, encode: boolean = true): Format<TItem> {
-
-        if (itemType == null) {
-            itemType = this.getItemType();
-        }
-
-        if (idField == null) {
-            idField = this.getIdProperty();
-        }
-
-        return SlickFormatting.itemLink(itemType, idField, text, cssClass, encode);
+        return SlickFormatting.itemLink(itemType ?? this.getItemType(), idField ?? this.getIdProperty(), text, cssClass, encode);
     }
 
     /**
@@ -898,7 +889,7 @@ export class DataGrid<TItem, P = {}> extends Widget<P> implements IDataGrid, IRe
 
         return EditLink({
             itemType: props.itemType ?? this.getItemType(),
-            id: id,
+            itemId: id,
             children: children,
             cssClass: props.cssClass,
             tabIndex: props.tabIndex
@@ -953,7 +944,7 @@ export class DataGrid<TItem, P = {}> extends Widget<P> implements IDataGrid, IRe
         const linkClass = item.editLinkCssClass || null;
         column.format = this.itemLink(itemType, idField,
             ctx => orgFormat != null ? orgFormat(ctx) : ctx.escape(),
-            () => linkClass, false);
+            () => linkClass, /*encode*/false);
 
         if (idField) {
             column.referencedFields = column.referencedFields || [];

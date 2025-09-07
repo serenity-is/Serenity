@@ -3034,16 +3034,16 @@ export interface IBooleanValue {
 	get_value(): boolean;
 	set_value(value: boolean): void;
 }
+export declare class IDialog {
+}
+export interface IDialog {
+	dialogOpen(asPanel?: boolean): void;
+}
 export declare class IDoubleValue {
 }
 export interface IDoubleValue {
 	get_value(): any;
 	set_value(value: any): void;
-}
-export declare class IDialog {
-}
-export interface IDialog {
-	dialogOpen(asPanel?: boolean): void;
 }
 export declare class IEditDialog {
 }
@@ -3293,6 +3293,13 @@ export declare namespace EditorTypeRegistry {
 	let tryGet: (key: string) => EditorType;
 	let tryGetOrLoad: (key: string) => EditorType | PromiseLike<EditorType>;
 }
+export declare namespace EnumTypeRegistry {
+	let get: (key: string) => object;
+	let getOrLoad: (key: string) => object | PromiseLike<object>;
+	let reset: () => void;
+	let tryGet: (key: string) => object;
+	let tryGetOrLoad: (key: string) => object | PromiseLike<object>;
+}
 export type FormatterType = ({
 	new (props?: any): Formatter;
 });
@@ -3302,13 +3309,6 @@ export declare namespace FormatterTypeRegistry {
 	let reset: () => void;
 	let tryGet: (key: string) => FormatterType;
 	let tryGetOrLoad: (key: string) => FormatterType | PromiseLike<FormatterType>;
-}
-export declare namespace EnumTypeRegistry {
-	let get: (key: string) => object;
-	let getOrLoad: (key: string) => object | PromiseLike<object>;
-	let reset: () => void;
-	let tryGet: (key: string) => object;
-	let tryGetOrLoad: (key: string) => object | PromiseLike<object>;
 }
 export declare namespace ReflectionUtils {
 	function getPropertyValue(o: any, property: string): any;
@@ -4871,11 +4871,21 @@ export declare class ColumnsBase<TRow = any> {
 	constructor(items: Column<TRow>[]);
 	valueOf(): Column<TRow>[];
 }
+/**
+ * Renders an edit link for a given item type and ID.
+ * The link will have a CSS class based on the item type and will point to a URL fragment
+ * that includes the item type and ID.
+ * This is similar to SlickHelper.itemLink function, but it doesn't require a grid context
+ * and does not accept FormatterResult (e.g. html string markup) as children.
+ *
+ * @param props - The properties for the edit link.
+ * @returns An HTML anchor element representing the edit link.
+ */
 export declare function EditLink(props: {
 	/**
 	 * The ID of the item to link to.
 	 */
-	id: any;
+	itemId: any;
 	/**
 	 * The type of the item, e.g. "Northwind.Customer".
 	 */
@@ -4949,15 +4959,14 @@ export declare namespace PropertyItemSlickConverter {
 }
 export declare namespace SlickFormatting {
 	function getEnumText(enumKey: string, name: string): string;
-	function treeToggle(getView: () => RemoteView<any>, getId: (x: any) => any, formatter: Format): Format;
 	function date(format?: string): Format;
 	function dateTime(format?: string): Format;
 	function checkBox(): Format;
 	function number(format: string): Format;
 	function getItemType(link: HTMLElement | ArrayLike<HTMLElement>): string;
 	function getItemId(link: HTMLElement | ArrayLike<HTMLElement>): string;
-	function itemLinkText(itemType: string, id: any, text: FormatterResult, extraClass: string, encode: boolean): FormatterResult;
 	function itemLink<TItem = any>(itemType: string, idField: string, getText: Format<TItem>, cssClass?: (ctx: FormatterContext<TItem>) => string, encode?: boolean): Format<TItem>;
+	function treeToggle(getView: () => RemoteView<any>, getId: (x: any) => any, formatter: Format): Format;
 }
 export declare namespace SlickHelper {
 	function setDefaults(columns: Column[], localTextPrefix?: string): any;
