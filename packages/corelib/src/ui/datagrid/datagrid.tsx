@@ -879,8 +879,8 @@ export class DataGrid<TItem, P = {}> extends Widget<P> implements IDataGrid, IRe
         children?: any
     }): any => {
         let children = props.children;
-        if (children == null && props.ctx != null && props.ctx.escape) {
-            children = props.ctx.escape(props.ctx.value);
+        if (children == null && props.ctx != null) {
+            children = props.ctx.value?.toString() ?? "";
         }
 
         if ((props?.ctx?.item as any)?.__nonDataRow) {
