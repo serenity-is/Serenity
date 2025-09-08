@@ -1,7 +1,7 @@
 import { Culture, addLocalText } from "../../base";
 import { PropertyItemSlickConverter } from "./propertyitemslickconverter";
 
-describe('SlickHelpers.toSlickColumn', () => {
+describe('PropertyItemSlickConverter.toSlickColumn', () => {
     it('tries to load a localText with the items name as key', () => {
         var converted = PropertyItemSlickConverter.toSlickColumn({
             name: null,

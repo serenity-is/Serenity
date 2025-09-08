@@ -1,6 +1,5 @@
 import { Column, Grid } from "@serenity-is/sleekgrid";
 import { Authorization, isPromiseLike, tryGetText, type PropertyItem } from "../../base";
-import { safeCast } from "../../compat";
 import { FormatterType } from "../../types/formattertype";
 import { FormatterTypeRegistry } from "../../types/formattertyperegistry";
 import { IInitializeColumn } from "../formatters/formatters";
@@ -61,10 +60,7 @@ export namespace PropertyItemSlickConverter {
                 ReflectionOptionsSetter.set(formatter, item.formatterParams);
             }
 
-            var initializer = safeCast(formatter, IInitializeColumn);
-            if (initializer != null) {
-                initializer.initializeColumn(result);
-            }
+            (formatter as unknown as IInitializeColumn)?.initializeColumn?.(result);
 
             result.format = (ctx) => formatter.format(ctx);
         }
