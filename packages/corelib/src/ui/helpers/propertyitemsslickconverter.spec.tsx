@@ -1,4 +1,4 @@
-import { Culture, addLocalText, getTypeFullName } from "../../base";
+import { Culture, addLocalText } from "../../base";
 import { DateFormatter, DateTimeFormatter } from "../formatters/formatters";
 import { PropertyItemSlickConverter } from "./propertyitemslickconverter";
 
