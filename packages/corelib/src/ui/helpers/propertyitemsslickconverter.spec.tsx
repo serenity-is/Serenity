@@ -1,4 +1,5 @@
-import { Culture, addLocalText } from "../../base";
+import { Culture, addLocalText, getTypeFullName } from "../../base";
+import { DateFormatter, DateTimeFormatter } from "../formatters/formatters";
 import { PropertyItemSlickConverter } from "./propertyitemslickconverter";
 
 describe('PropertyItemSlickConverter.toSlickColumn', () => {
@@ -24,7 +25,7 @@ describe('PropertyItemSlickConverter.toSlickColumn', () => {
         var converted = PropertyItemSlickConverter.toSlickColumn({
             name: null,
             title: 'Test.Local.Text.Key',
-            formatterType: 'Serenity.DateFormatter'
+            formatterType: getTypeFullName(DateFormatter),
         });
 
         Culture.dateSeparator = '/';
@@ -42,7 +43,7 @@ describe('PropertyItemSlickConverter.toSlickColumn', () => {
         var converted = PropertyItemSlickConverter.toSlickColumn({
             name: null,
             title: 'Test.Local.Text.Key',
-            formatterType: 'Serenity.DateTimeFormatter',
+            formatterType: getTypeFullName(DateTimeFormatter),
             formatterParams: {
                 displayFormat: 'g'
             }
