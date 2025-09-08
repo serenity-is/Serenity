@@ -25,7 +25,7 @@ describe('PropertyItemSlickConverter.toSlickColumn', () => {
         var converted = PropertyItemSlickConverter.toSlickColumn({
             name: null,
             title: 'Test.Local.Text.Key',
-            formatterType: getTypeFullName(DateFormatter),
+            formatterType: DateFormatter,
         });
 
         Culture.dateSeparator = '/';
@@ -43,7 +43,7 @@ describe('PropertyItemSlickConverter.toSlickColumn', () => {
         var converted = PropertyItemSlickConverter.toSlickColumn({
             name: null,
             title: 'Test.Local.Text.Key',
-            formatterType: getTypeFullName(DateTimeFormatter),
+            formatterType: DateTimeFormatter,
             formatterParams: {
                 displayFormat: 'g'
             }

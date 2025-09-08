@@ -44,7 +44,7 @@ export interface PropertyItem {
     localizable?: boolean;
     visible?: boolean;
     allowHide?: boolean;
-    formatterType?: string;
+    formatterType?: string | { new(props?: any): { format(ctx: any): string } } | PromiseLike<{ new(props?: any): { format(ctx: any): string } }>;
     formatterParams?: any;
     displayFormat?: string;
     alignment?: string;

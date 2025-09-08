@@ -52,7 +52,9 @@ export namespace PropertyItemSlickConverter {
         if (!item.formatterType)
             return result;
 
-        const formatterType = FormatterTypeRegistry.getOrLoad(item.formatterType);
+        const formatterType = (isPromiseLike(item.formatterType) || typeof item.formatterType === "function")
+            ? item.formatterType : (FormatterTypeRegistry.getOrLoad(item.formatterType));
+
         const then = (formatterType: FormatterType) => {
             var formatter = new formatterType(item.formatterParams ?? {});
 
