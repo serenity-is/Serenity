@@ -669,7 +669,7 @@ export class DataGrid<TItem, P = {}> extends Widget<P> implements IDataGrid, IRe
     /** Renders an edit link for the item in current row. Returns a DocumentFragment for non-data rows, and an anchor element otherwise. */
     public EditLink = (props: {
         /** formatter context (contains item, value etc) */
-        ctx?: FormatterContext,
+        context?: FormatterContext,
         /** The id of the entity to link to. If not provided it will be taken from ctx.item[idField] */
         id?: string,
         /** The name of the field in item that contains the entity id. Defaults to idProperty. Used if id is not provided. */
@@ -684,17 +684,17 @@ export class DataGrid<TItem, P = {}> extends Widget<P> implements IDataGrid, IRe
         children?: any
     }): any => {
         let children = props.children;
-        if (children == null && props.ctx != null) {
-            children = props.ctx.value?.toString() ?? "";
+        if (children == null && props.context != null) {
+            children = props.context.value?.toString() ?? "";
         }
 
-        if ((props?.ctx?.item as any)?.__nonDataRow) {
+        if ((props?.context?.item as any)?.__nonDataRow) {
             return <>{children}</>;
         }
 
         let id = props.id;
-        if (id === void 0 && props.ctx?.item != null) {
-            id = props.ctx.item[props.idField ?? this.getIdProperty()];
+        if (id === void 0 && props.context?.item != null) {
+            id = props.context.item[props.idField ?? this.getIdProperty()];
         }
 
         return EditLink({

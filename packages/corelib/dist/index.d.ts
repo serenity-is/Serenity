@@ -5233,7 +5233,7 @@ export declare class DataGrid<TItem, P = {}> extends Widget<P> implements IDataG
 	/** Renders an edit link for the item in current row. Returns a DocumentFragment for non-data rows, and an anchor element otherwise. */
 	EditLink: (props: {
 		/** formatter context (contains item, value etc) */
-		ctx?: FormatterContext;
+		context?: FormatterContext;
 		/** The id of the entity to link to. If not provided it will be taken from ctx.item[idField] */
 		id?: string;
 		/** The name of the field in item that contains the entity id. Defaults to idProperty. Used if id is not provided. */
