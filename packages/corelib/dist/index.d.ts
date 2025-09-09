@@ -5138,11 +5138,10 @@ export interface GridPersistanceFlags {
 	quickSearch?: boolean;
 	includeDeleted?: boolean;
 }
+export declare const omitAllGridPersistenceFlags: GridPersistanceFlags;
 export declare class DataGrid<TItem, P = {}> extends Widget<P> implements IDataGrid, IReadOnly {
 	private _isDisabled;
 	private _layoutTimer;
-	private _slickGridOnSort;
-	private _slickGridOnClick;
 	protected titleDiv: Fluent;
 	protected toolbar: Toolbar;
 	protected filterBar: FilterDisplayBar;
@@ -5231,37 +5230,21 @@ export declare class DataGrid<TItem, P = {}> extends Widget<P> implements IDataG
 	setTitle(value: string): void;
 	protected getItemType(): string;
 	protected itemLink(itemType?: string, idField?: string, text?: Format<TItem>, cssClass?: (ctx: FormatterContext) => string, encode?: boolean): Format<TItem>;
-	/**
-	 * Renders an edit link for the item in current row. Returns a DocumentFragment for non-data rows, and an anchor element otherwise.
-	 */
+	/** Renders an edit link for the item in current row. Returns a DocumentFragment for non-data rows, and an anchor element otherwise. */
 	EditLink: (props: {
-		/**
-		 * formatter context (contains item, value etc)
-		 */
+		/** formatter context (contains item, value etc) */
 		ctx?: FormatterContext;
-		/**
-		 * The id of the entity to link to. If not provided it will be taken from ctx.item[idField]
-		 */
+		/** The id of the entity to link to. If not provided it will be taken from ctx.item[idField] */
 		id?: string;
-		/**
-		 * The name of the field in item that contains the entity id. Defaults to idProperty. Used if id is not provided.
-		 */
+		/** The name of the field in item that contains the entity id. Defaults to idProperty. Used if id is not provided. */
 		idField?: string;
-		/**
-		 * The item type to link to. Defaults to this.getItemType()
-		 */
+		/** The item type to link to. Defaults to this.getItemType() */
 		itemType?: string;
-		/**
-		 * Extra CSS class to add to the link element besides s-EditLink. Optional.
-		 */
+		/** Extra CSS class to add to the link element besides s-EditLink. Optional. */
 		cssClass?: string;
-		/**
-		 * Tab index to add to the link element. Optional.
-		 */
+		/** Tab index to add to the link element. Optional. */
 		tabIndex?: number;
-		/**
-		 * The link text. If not provided it will be taken from ctx.escape(ctx.value)
-		 */
+		/** The link text. If not provided it will be taken from ctx.escape(ctx.value) */
 		children?: any;
 	}) => any;
 	protected getColumnsKey(): string;
@@ -5315,8 +5298,8 @@ export declare class DataGrid<TItem, P = {}> extends Widget<P> implements IDataG
 	protected getPersistedSettings(): PersistedGridSettings | Promise<PersistedGridSettings>;
 	protected restoreSettings(settings?: PersistedGridSettings, flags?: GridPersistanceFlags): void | Promise<void>;
 	protected restoreSettingsFrom(settings: PersistedGridSettings, flags?: GridPersistanceFlags): void;
-	protected persistSettings(flags?: GridPersistanceFlags): void | Promise<void>;
-	protected getCurrentSettings(flags?: GridPersistanceFlags): PersistedGridSettings;
+	persistSettings(flags?: GridPersistanceFlags): void | Promise<void>;
+	getCurrentSettings(flags?: GridPersistanceFlags): PersistedGridSettings;
 	getElement(): HTMLElement;
 	getGrid(): Grid;
 	getView(): RemoteView<TItem>;

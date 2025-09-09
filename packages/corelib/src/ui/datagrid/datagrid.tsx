@@ -28,6 +28,7 @@ import { QuickSearchField } from "./quicksearchinput";
 import { SlickPager } from "./slickpager";
 
 export type { GridPersistanceFlags, PersistedGridColumn, PersistedGridSettings, SettingStorage } from "./datagrid-persistance";
+export { omitAllGridPersistenceFlags } from "./datagrid-persistance";
 
 @Decorators.registerClass('Serenity.DataGrid', [IReadOnly])
 export class DataGrid<TItem, P = {}> extends Widget<P> implements IDataGrid, IReadOnly {
@@ -340,7 +341,7 @@ export class DataGrid<TItem, P = {}> extends Widget<P> implements IDataGrid, IRe
 
         this.filterBar.get_store().add_changed(() => {
             if (this.restoringSettings <= 0) {
-                this.persistSettings(null);
+                this.persistSettings();
                 this.view && (this.view.seekToPage = 1);
                 this.refresh();
             }
@@ -414,7 +415,7 @@ export class DataGrid<TItem, P = {}> extends Widget<P> implements IDataGrid, IRe
     protected bindToSlickEvents() {
         this.slickGrid.onSort.subscribe((_, p) => {
             slickGridOnSort(this.view, p);
-            this.persistSettings(null);
+            this.persistSettings();
         });
 
         this.slickGrid.onClick.subscribe((e1: MouseEvent, p1: ArgsCell) => {
@@ -422,11 +423,11 @@ export class DataGrid<TItem, P = {}> extends Widget<P> implements IDataGrid, IRe
         });
 
         this.slickGrid.onColumnsReordered.subscribe(() => {
-            return this.persistSettings(null);
+            return this.persistSettings();
         });
 
         this.slickGrid.onColumnsResized.subscribe(() => {
-            return this.persistSettings(null);
+            return this.persistSettings();
         });
     }
 
@@ -987,7 +988,7 @@ export class DataGrid<TItem, P = {}> extends Widget<P> implements IDataGrid, IRe
     }
 
     protected quickFilterChange(e: Event) {
-        this.persistSettings(null);
+        this.persistSettings();
         this.view && (this.view.seekToPage = 1);
         this.refresh();
     }
@@ -1094,7 +1095,7 @@ export class DataGrid<TItem, P = {}> extends Widget<P> implements IDataGrid, IRe
         }
     }
 
-    protected persistSettings(flags?: GridPersistanceFlags): void | Promise<void> {
+    public persistSettings(flags?: GridPersistanceFlags): void | Promise<void> {
         var storage = this.getPersistanceStorage();
         if (!storage) {
             return;
@@ -1104,7 +1105,7 @@ export class DataGrid<TItem, P = {}> extends Widget<P> implements IDataGrid, IRe
         return storage.setItem(this.getPersistanceKey(), JSON.stringify(settings));
     }
 
-    protected getCurrentSettings(flags?: GridPersistanceFlags) {
+    public getCurrentSettings(flags?: GridPersistanceFlags) {
         return getCurrentSettings({
             filterBar: this.filterBar,
             flags: flags || this.gridPersistanceFlags(),

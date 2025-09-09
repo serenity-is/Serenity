@@ -42,6 +42,17 @@ export interface GridPersistanceFlags {
     includeDeleted?: boolean;
 }
 
+export const omitAllGridPersistenceFlags: GridPersistanceFlags = {
+    columnWidths: false,
+    columnVisibility: false,
+    sortColumns: false,
+    filterItems: false,
+    quickFilters: false,
+    quickFilterText: false,
+    quickSearch: false,
+    includeDeleted: false
+};
+
 export function getCurrentSettings(this: void, opt: {
     filterBar: FilterDisplayBar,
     flags: GridPersistanceFlags,
@@ -53,13 +64,13 @@ export function getCurrentSettings(this: void, opt: {
 }): PersistedGridSettings {
 
     const flags = opt.flags || {};
-    var settings: PersistedGridSettings = {};
+    const settings: PersistedGridSettings = {};
     if (flags.columnVisibility !== false || flags.columnWidths !== false || flags.sortColumns !== false) {
         settings.columns = [];
-        var sortColumns = opt.slickGrid.getSortColumns() as any[];
-        var columns = opt.slickGrid.getColumns();
-        for (var column of columns) {
-            var p: PersistedGridColumn = {
+        const sortColumns = opt.slickGrid.getSortColumns() as any[];
+        const columns = opt.slickGrid.getColumns();
+        for (const column of columns) {
+            const p: PersistedGridColumn = {
                 id: column.id
             };
 
@@ -71,15 +82,17 @@ export function getCurrentSettings(this: void, opt: {
             }
 
             if (flags.sortColumns !== false) {
-                var sort = sortColumns.findIndex(x => x.columnId == column.id);
-                p.sort = ((sort >= 0) ? ((sortColumns[sort].sortAsc !== false) ? (sort + 1) : (-sort - 1)) : 0);
+                const sort = sortColumns.findIndex(x => x.columnId == column.id);
+                if (sort >= 0) {
+                    p.sort = sortColumns[sort].sortAsc !== false ? (sort + 1) : (-sort - 1);
+                }
             }
             settings.columns.push(p);
         }
     }
 
-    if (flags.includeDeleted !== false) {
-        settings.includeDeleted = !!opt.includeDeletedToggle?.matches?.(".pressed");
+    if (flags.includeDeleted !== false && opt.includeDeletedToggle) {
+        settings.includeDeleted = opt.includeDeletedToggle.matches(".pressed");
     }
 
     if (flags.filterItems !== false && (opt.filterBar != null) && (opt.filterBar.get_store() != null)) {
@@ -87,9 +100,9 @@ export function getCurrentSettings(this: void, opt: {
     }
 
     if (flags.quickSearch === true) {
-        var qsInput = opt.toolbar?.domNode?.querySelector('.s-QuickSearchInput');
+        const qsInput = opt.toolbar?.domNode?.querySelector('.s-QuickSearchInput');
         if (qsInput) {
-            var qsWidget = tryGetWidget(qsInput, QuickSearchInput);
+            const qsWidget = tryGetWidget(qsInput, QuickSearchInput);
             if (qsWidget) {
                 settings.quickSearchField = qsWidget.get_field();
                 settings.quickSearchText = qsWidget.domNode.value;
@@ -100,25 +113,25 @@ export function getCurrentSettings(this: void, opt: {
     if (flags.quickFilters !== false && (opt.quickFiltersDiv != null) && opt.quickFiltersDiv.length > 0) {
         settings.quickFilters = {};
         opt.quickFiltersDiv.findAll('.quick-filter-item').forEach(e => {
-            var field = e.dataset.qffield;
+            const field = e.dataset.qffield;
             if (!field?.length) {
                 return;
             }
 
-            var widget = tryGetWidget('#' + opt.uniqueName + '_QuickFilter_' + field, Widget);
+            const widget = tryGetWidget('#' + opt.uniqueName + '_QuickFilter_' + field, Widget);
             if (!widget)
                 return;
 
-            var qfElement = e as any;
-            var saveState = qfElement.qfsavestate;
-            var state = typeof saveState === "function" ? saveState(widget) : EditorUtils.getValue(widget);
+            const qfElement = e as any;
+            const saveState = qfElement.qfsavestate;
+            const state = typeof saveState === "function" ? saveState(widget) : EditorUtils.getValue(widget);
             settings.quickFilters[field] = state;
             if (flags.quickFilterText === true && e.classList.contains('quick-filter-active')) {
 
-                var getDisplayText = qfElement.qfdisplaytext;
-                var filterLabel = e.querySelector('.quick-filter-label')?.textContent ?? '';
+                const getDisplayText = qfElement.qfdisplaytext;
+                const filterLabel = e.querySelector('.quick-filter-label')?.textContent ?? '';
 
-                var displayText;
+                let displayText;
                 if (typeof getDisplayText === "function") {
                     displayText = getDisplayText(widget, filterLabel);
                 }
@@ -154,9 +167,9 @@ export function restoreSettingsFrom(this: void, opt: {
     uniqueName: string,
     view: RemoteView<any>
 }) {
-    var columns = opt.slickGrid.getColumns();
-    var colById: { [key: string]: Column } = null;
-    var updateColById = function (cl: Column[]) {
+    let columns = opt.slickGrid.getColumns();
+    let colById: { [key: string]: Column } = null;
+    const initColById = function (cl: Column[]) {
         colById = {};
         for (let c of cl) {
             colById[c.id] = c;
@@ -169,11 +182,11 @@ export function restoreSettingsFrom(this: void, opt: {
     if (settings.columns != null) {
         if (flags.columnVisibility !== false) {
             let allColumns = opt.allColumns();
-            updateColById(allColumns);
-            var newColumns = [];
+            initColById(allColumns);
+            const newColumns = [];
             for (let x of settings.columns) {
                 if (x.id != null && x.visible === true) {
-                    var column = colById[x.id];
+                    const column = colById[x.id];
                     if (opt.canShowColumn(column)) {
                         column.visible = true;
                         newColumns.push(column);
@@ -181,7 +194,7 @@ export function restoreSettingsFrom(this: void, opt: {
                     }
                 }
             }
-            
+
             for (let c2 of allColumns) {
                 if (colById[c2.id] != null) {
                     c2.visible = false;
@@ -195,10 +208,10 @@ export function restoreSettingsFrom(this: void, opt: {
             });
         }
         if (flags.columnWidths !== false) {
-            updateColById(columns);
+            initColById(columns);
             for (let x2 of settings.columns) {
                 if (x2.id != null && x2.width != null && x2.width !== 0) {
-                    var column1 = colById[x2.id];
+                    const column1 = colById[x2.id];
                     if (column1 != null) {
                         column1.width = x2.width;
                     }
@@ -207,9 +220,9 @@ export function restoreSettingsFrom(this: void, opt: {
         }
 
         if (flags.sortColumns !== false) {
-            updateColById(columns);
-            var list = [];
-            var sortColumns = settings.columns.filter(function (x3) {
+            initColById(columns);
+            const list = [];
+            const sortColumns = settings.columns.filter(function (x3) {
                 return x3.id != null && (x3.sort ?? 0) !== 0;
             });
 
@@ -243,7 +256,7 @@ export function restoreSettingsFrom(this: void, opt: {
         flags.filterItems !== false &&
         opt.filterBar != null &&
         opt.filterBar.get_store() != null) {
-        var items = opt.filterBar.get_store().get_items();
+        const items = opt.filterBar.get_store().get_items();
         items.length = 0;
         items.push.apply(items, settings.filterItems);
         opt.filterBar.get_store().raiseChanged();
@@ -261,19 +274,19 @@ export function restoreSettingsFrom(this: void, opt: {
         opt.quickFiltersDiv != null &&
         opt.quickFiltersDiv.length > 0) {
         opt.quickFiltersDiv.findAll('.quick-filter-item').forEach(e => {
-            var field = e.dataset.qffield;
+            const field = e.dataset.qffield;
 
             if (!field?.length) {
                 return;
             }
 
-            var widget = tryGetWidget('#' + cssEscape(opt.uniqueName + '_QuickFilter_' + field), Widget);
+            const widget = tryGetWidget('#' + cssEscape(opt.uniqueName + '_QuickFilter_' + field), Widget);
             if (widget == null) {
                 return;
             }
 
-            var state = settings.quickFilters[field];
-            var loadState = (e as any).qfloadstate;
+            const state = settings.quickFilters[field];
+            const loadState = (e as any).qfloadstate;
             if (typeof loadState === "function") {
                 loadState(widget, state);
             }
@@ -284,9 +297,9 @@ export function restoreSettingsFrom(this: void, opt: {
     }
 
     if (flags.quickSearch === true && (settings.quickSearchField !== undefined || settings.quickSearchText !== undefined)) {
-        var qsInput = opt.toolbar?.domNode?.querySelector('.s-QuickSearchInput');
+        const qsInput = opt.toolbar?.domNode?.querySelector('.s-QuickSearchInput');
         if (qsInput) {
-            var qsWidget = tryGetWidget(qsInput, QuickSearchInput);
+            const qsWidget = tryGetWidget(qsInput, QuickSearchInput);
             qsWidget && qsWidget.restoreState(settings.quickSearchText, settings.quickSearchField);
         }
     }

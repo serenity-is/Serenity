@@ -1,6 +1,7 @@
-﻿import { addCustomAttribute } from "../../base";
+﻿import { Column } from "@serenity-is/sleekgrid";
+import { addCustomAttribute } from "../../base";
 import { IdPropertyAttribute, IsActivePropertyAttribute, LocalTextPrefixAttribute } from "../../types/attributes";
-import { DataGrid } from "./datagrid";
+import { DataGrid, omitAllGridPersistenceFlags } from "./datagrid";
 
 function getIdProperty(grid: DataGrid<any, any>): string {
     return grid["getIdProperty"]();
@@ -240,5 +241,76 @@ describe('DataGrid.getLocalTextPrefix', () => {
 
         var grid = new TestRowGrid({});
         expect(getLocalTextPrefix(grid)).toBeUndefined();
+    });
+});
+
+describe("DataGrid.getCurrentSettings", () => {
+    it("returns an empty object with columns for a default grid", () => {
+        class MyGrid extends DataGrid<any, any> {
+        }
+
+        const grid = new MyGrid({});
+        expect(grid.getCurrentSettings()).toEqual({
+            columns: []
+        });
+    });
+
+    it("does not return columns if flags.columnVisibility is false, flags.columnWidths is false, and flags.sortColumns is false", () => {
+        class MyGrid extends DataGrid<any, any> {
+        }
+
+        const grid = new MyGrid({});
+        expect(grid.getCurrentSettings({
+            ...omitAllGridPersistenceFlags,
+            columnVisibility: false,
+            columnWidths: false,
+            sortColumns: false
+        })).toEqual({
+        });
+    });
+
+    it("sets column visibility only for visible columns", () => {
+        class MyGrid extends DataGrid<any, any> {
+            getColumns(): Column[] {
+                return [
+                    { field: "A" },
+                    { field: "B", visible: false },
+                    { field: "C" }
+                ];
+            }
+        }
+
+        const grid = new MyGrid({});
+        expect(grid.getCurrentSettings({
+            ...omitAllGridPersistenceFlags,
+            columnVisibility: true
+        })).toEqual({
+            columns: [
+                { id: "A", visible: true },
+                { id: "C", visible: true }
+            ]
+        });
+    });
+
+    it("sets column widths", () => {
+        class MyGrid extends DataGrid<any, any> {
+            getColumns(): Column[] {
+                return [
+                    { field: "A", width: 100 },
+                    { field: "B", width: 200 },
+                ];
+            }
+        }
+
+        const grid = new MyGrid({});
+        expect(grid.getCurrentSettings({ 
+            ...omitAllGridPersistenceFlags,
+            columnWidths: true 
+        })).toEqual({
+            columns: [
+                { id: "A", width: 100 },
+                { id: "B", width: 200 }
+            ]
+        });
     });
 });
