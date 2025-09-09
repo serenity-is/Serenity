@@ -1,6 +1,6 @@
 import { Lookup } from "./lookup";
 import { notifyError } from "./notify";
-import { ensureScriptDataSync, fetchScriptData, getScriptData, getScriptDataHash, handleScriptDataError, peekScriptData, scriptDataHooks, setRegisteredScripts, setScriptData } from "./scriptdata";
+import { ensureScriptDataSync, fetchScriptData, getColumnsScript, getFormScript, getLookupAsync, getRemoteDataAsync, getScriptData, getScriptDataHash, handleScriptDataError, peekScriptData, scriptDataHooks, setRegisteredScripts, setScriptData } from "./scriptdata";
 import { scriptDataHashSymbol, scriptDataSymbol } from "./symbols";
 import { getGlobalObject } from "./system";
 
@@ -13,6 +13,7 @@ beforeEach(() => {
     vi.clearAllMocks();
     delete getGlobalObject()[scriptDataHashSymbol];
     delete getGlobalObject()[scriptDataSymbol];
+    delete scriptDataHooks.fetchScriptData;
 });
 
 describe("getScriptDataHash", () => {
@@ -817,5 +818,66 @@ describe("handleScriptDataError", () => {
         expect(notifySpy).toHaveBeenCalledWith(
             'An error occurred while trying to load dynamic data: "DynamicData.Test"!. Please check the error message displayed in the console for more info.'
         );
+    });
+});
+
+describe("getColumnsScript", () => {
+    it("calls getScriptData with 'Columns.' plus passed key", async () => {
+        const hook = vi.fn((name: string) => {
+            return {} as any;
+        })
+        scriptDataHooks.fetchScriptData = hook;
+        await getColumnsScript("TestKey");
+        expect(hook).toHaveBeenCalledOnce();
+        expect(hook).toHaveBeenCalledWith("Columns.TestKey");
+    });
+});
+
+
+describe("getFormScript", () => {
+    it("calls getScriptData with 'Form.' plus passed key", async () => {
+        const hook = vi.fn((name: string) => {
+            return {} as any;
+        })
+        scriptDataHooks.fetchScriptData = hook;
+        await getFormScript("TestKey");
+        expect(hook).toHaveBeenCalledOnce();
+        expect(hook).toHaveBeenCalledWith("Form.TestKey");
+    });
+});
+
+describe("getLookupAsync", () => {
+    it("calls getScriptData with 'Lookup.' plus passed key", async () => {
+        const hook = vi.fn((name: string) => {
+            return {} as any;
+        })
+        scriptDataHooks.fetchScriptData = hook;
+        await getLookupAsync("TestKey");
+        expect(hook).toHaveBeenCalledOnce();
+        expect(hook).toHaveBeenCalledWith("Lookup.TestKey");
+    });
+});
+
+describe("getRemoteDataAsync", () => {
+    it("calls getScriptData with 'RemoteData.' plus passed key", async () => {
+        const hook = vi.fn((name: string) => {
+            return {} as any;
+        })
+        scriptDataHooks.fetchScriptData = hook;
+        await getRemoteDataAsync("TestKey");
+        expect(hook).toHaveBeenCalledOnce();
+        expect(hook).toHaveBeenCalledWith("RemoteData.TestKey");
+    });
+});
+
+describe("getRemoteData", () => {
+    it("calls getScriptData with 'RemoteData.' plus passed key", async () => {
+        const hook = vi.fn((name: string) => {
+            return {} as any;
+        })
+        scriptDataHooks.fetchScriptData = hook;
+        await getRemoteDataAsync("TestKey");
+        expect(hook).toHaveBeenCalledOnce();
+        expect(hook).toHaveBeenCalledWith("RemoteData.TestKey");
     });
 });

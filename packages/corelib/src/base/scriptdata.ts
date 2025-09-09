@@ -204,7 +204,7 @@ export function ensureScriptDataSync<TData = any>(name: string, dynJS?: boolean)
  * @param key Form key
  * @returns A property items data object containing items and additionalItems properties
  */
-export async function getColumnsScript(key: string): Promise<PropertyItemsData> {
+export function getColumnsScript(key: string): Promise<PropertyItemsData> {
     return getScriptData<PropertyItemsData>('Columns.' + key);
 }
 
@@ -213,24 +213,24 @@ export async function getColumnsScript(key: string): Promise<PropertyItemsData> 
  * @param key Form key
  * @returns A property items data object containing items and additionalItems properties
  */
-export async function getFormScript(key: string): Promise<PropertyItemsData> {
-    return await getScriptData<PropertyItemsData>('Form.' + key);
+export function getFormScript(key: string): Promise<PropertyItemsData> {
+    return getScriptData<PropertyItemsData>('Form.' + key);
 }
 
 /**
  * Gets or loads a Lookup
  * @param key Lookup key
  */
-export async function getLookupAsync<TItem>(key: string): Promise<Lookup<TItem>> {
-    return await getScriptData<Lookup<TItem>>('Lookup.' + key);
+export function getLookupAsync<TItem>(key: string): Promise<Lookup<TItem>> {
+    return getScriptData<Lookup<TItem>>('Lookup.' + key);
 }
 
 /**
  * Gets or loads a [RemoteData]
  * @param key Remote data key
  */
-export async function getRemoteDataAsync<TData = any>(key: string): Promise<TData> {
-    return await getScriptData<TData>('RemoteData.' + key);
+export function getRemoteDataAsync<TData = any>(key: string): Promise<TData> {
+    return getScriptData<TData>('RemoteData.' + key);
 }
 
 /**
