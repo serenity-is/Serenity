@@ -277,9 +277,17 @@ export class Validator {
             validator.lastActive = element;
         },
         onfocusout: function (element: ValidatableElement, event: Event, validator: Validator) {
-            if (!Validator.isCheckOrRadio(element) && (element.name in validator.submitted || !Validator.optional(element))) {
-                validator.element(element);
+            if (Validator.isCheckOrRadio(element))
+                return;
+
+            if (!(element.name in validator.submitted)) {
+                const optional = Validator.optional(element);
+                if (optional === "dependency-mismatch" &&
+                    !Validator.rules(validator.validationTargetFor(element) || element)?.required)
+                return;
             }
+
+            validator.element(element);
         },
         onkeyup: function (element: ValidatableElement, event: KeyboardEvent, validator: Validator) {
 
