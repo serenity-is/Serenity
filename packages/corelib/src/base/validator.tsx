@@ -252,9 +252,10 @@ let customValidateRules: WeakMap<ValidatableElement, { [key: string]: ((input: V
 
 export class Validator {
 
-    static optional(element: ValidatableElement) {
-        var val = Validator.elementValue(element);
-        return !Validator.methods.required(val, element) && "dependency-mismatch";
+    static optional(element: ValidatableElement, value?: ValidationValue) {
+        if (value === void 0)
+            value = Validator.elementValue(element);
+        return !Validator.methods.required(value, element) && "dependency-mismatch";
     }
 
     static autoCreateRanges: boolean = false;
@@ -379,7 +380,7 @@ export class Validator {
         },
 
         customValidate: function (value: ValidationValue, element: ValidatableElement) {
-            let result = Validator.optional(element);
+            let result = Validator.optional(element, value);
             if (!element || !!result)
                 return result;
 
@@ -403,7 +404,7 @@ export class Validator {
         },
 
         dateQ: function (value: string, element: any) {
-            var o = Validator.optional(element);
+            var o = Validator.optional(element, value);
             if (o)
                 return o;
 
@@ -417,7 +418,7 @@ export class Validator {
         },
 
         dateTimeQ: function (value: string, element: any) {
-            var o = Validator.optional(element);
+            var o = Validator.optional(element, value);
             if (o)
                 return o;
 
@@ -430,20 +431,20 @@ export class Validator {
 
         /*
         hourAndMin: function (value: string, element: any) {
-            return Validator.optional(element) || !isNaN(parseHourAndMin(value));
+            return Validator.optional(element, value) || !isNaN(parseHourAndMin(value));
         }
     
         dayHourAndMin: function (value: string, element: any) {
-            return Validator.optional(element) || !isNaN(parseDayHourAndMin(value));
+            return Validator.optional(element, value) || !isNaN(parseDayHourAndMin(value));
         });
         */
 
         decimalQ: function (value: string, element: any) {
-            return Validator.optional(element) || !isNaN(parseDecimal(value));
+            return Validator.optional(element, value) || !isNaN(parseDecimal(value));
         },
 
         integerQ: function (value: string, element: any) {
-            return Validator.optional(element) || !isNaN(parseInteger(value));
+            return Validator.optional(element, value) || !isNaN(parseInteger(value));
         },
 
         /**
@@ -479,21 +480,21 @@ export class Validator {
 
         minlength: function (value, element, param: number) {
             var length = Array.isArray(value) ? value.length : Validator.getLength(value, element);
-            return Validator.optional(element) || length >= param;
+            return Validator.optional(element, value) || length >= param;
         },
 
         maxlength: function (value, element, param: number) {
             var length = Array.isArray(value) ? value.length : Validator.getLength(value, element);
-            return Validator.optional(element) || length <= param;
+            return Validator.optional(element, value) || length <= param;
         },
 
         rangelength: function (value, element, param: number[]) {
             var length = Array.isArray(value) ? value.length : Validator.getLength(value, element);
-            return Validator.optional(element) || (length >= param[0] && length <= param[1]);
+            return Validator.optional(element, value) || (length >= param[0] && length <= param[1]);
         },
 
         min: function (value, element, param) {
-            return Validator.optional(element) || value >= param;
+            return Validator.optional(element, value) || value >= param;
         },
 
         max: function (value, element, param) {
@@ -501,11 +502,11 @@ export class Validator {
         },
 
         range: function (value, element, param) {
-            return Validator.optional(element) || (value >= param[0] && value <= param[1]);
+            return Validator.optional(element, value) || (value >= param[0] && value <= param[1]);
         },
 
         url: function (value, element) {
-            return Validator.optional(element) || /^(?:(?:(?:https?|ftp):)?\/\/)(?:(?:[^\]\[?\/<~#`!@$^&*()+=}|:";',>{ ]|%[0-9A-Fa-f]{2})+(?::(?:[^\]\[?\/<~#`!@$^&*()+=}|:";',>{ ]|%[0-9A-Fa-f]{2})*)?@)?(?:(?!(?:10|127)(?:\.\d{1,3}){3})(?!(?:169\.254|192\.168)(?:\.\d{1,3}){2})(?!172\.(?:1[6-9]|2\d|3[0-1])(?:\.\d{1,3}){2})(?:[1-9]\d?|1\d\d|2[01]\d|22[0-3])(?:\.(?:1?\d{1,2}|2[0-4]\d|25[0-5])){2}(?:\.(?:[1-9]\d?|1\d\d|2[0-4]\d|25[0-4]))|(?:(?:[a-z0-9\u00a1-\uffff][a-z0-9\u00a1-\uffff_-]{0,62})?[a-z0-9\u00a1-\uffff]\.)+(?:[a-z\u00a1-\uffff]{2,}\.?))(?::\d{2,5})?(?:[/?#]\S*)?$/i.test(value?.toString());
+            return Validator.optional(element, value) || /^(?:(?:(?:https?|ftp):)?\/\/)(?:(?:[^\]\[?\/<~#`!@$^&*()+=}|:";',>{ ]|%[0-9A-Fa-f]{2})+(?::(?:[^\]\[?\/<~#`!@$^&*()+=}|:";',>{ ]|%[0-9A-Fa-f]{2})*)?@)?(?:(?!(?:10|127)(?:\.\d{1,3}){3})(?!(?:169\.254|192\.168)(?:\.\d{1,3}){2})(?!172\.(?:1[6-9]|2\d|3[0-1])(?:\.\d{1,3}){2})(?:[1-9]\d?|1\d\d|2[01]\d|22[0-3])(?:\.(?:1?\d{1,2}|2[0-4]\d|25[0-5])){2}(?:\.(?:[1-9]\d?|1\d\d|2[0-4]\d|25[0-4]))|(?:(?:[a-z0-9\u00a1-\uffff][a-z0-9\u00a1-\uffff_-]{0,62})?[a-z0-9\u00a1-\uffff]\.)+(?:[a-z\u00a1-\uffff]{2,}\.?))(?::\d{2,5})?(?:[/?#]\S*)?$/i.test(value?.toString());
         }
     }
 
