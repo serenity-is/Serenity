@@ -161,6 +161,11 @@ export function setElementReadOnly(elements: Element | ArrayLike<Element>, value
     }
 }
 
+/**
+ * Parses a query string into an object.
+ * @param s Query string to parse, if not specified, location.search will be used.
+ * @return An object with key/value pairs from the query string.
+ */
 export function parseQueryString(s?: string): Record<string, string> {
     let qs: string;
     if (s === undefined)
@@ -180,9 +185,16 @@ export function parseQueryString(s?: string): Record<string, string> {
     return result;
 }
 
+/**
+ * Gets the return URL from the query string.
+ * @param opt Options for getting the return URL.
+ */
 export function getReturnUrl(opt?: {
+    /** Whether to only consider the query string. If true, the function will not check the default return URL. */
     queryOnly?: boolean;
+    /** Whether to ignore unsafe URLs. If true or null (default), the function will only return safe URLs. */
     ignoreUnsafe?: boolean;
+    /** The purpose of the return URL. This can be used to determine the default return URL if none is found in the query string. */
     purpose?: string;
 }) {
     var q = parseQueryString();
@@ -197,6 +209,10 @@ export function getReturnUrl(opt?: {
     return returnUrl;
 }
 
+/**
+ * Escapes a CSS selector.
+ * @param selector The CSS selector to escape.
+ */
 export function cssEscape(selector: string) {
     if (typeof CSS !== 'undefined' && typeof CSS.escape === "function")
         return CSS.escape(selector);

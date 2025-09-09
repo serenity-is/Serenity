@@ -939,6 +939,10 @@ Object.defineProperty(Fluent.prototype, 0, { get: function () { return this.el; 
 Object.defineProperty(Fluent.prototype, Symbol.iterator, { get: function () { return (this.el ? [this.el] : [])[Symbol.iterator]; } });
 
 
+/**
+ * Executes a callback when the DOM is ready.
+ * @param callback A callback to be executed when DOM is ready
+ */
 Fluent.ready = function (callback: () => void) {
     if (!callback)
         return;

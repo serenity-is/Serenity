@@ -94,6 +94,9 @@ export let Invariant: Locale = {
  */
 export let Culture: Locale;
 
+/**
+ * Resets the culture settings to the default values.
+ */
 export function resetCultureSettings() {
 
     Culture = {

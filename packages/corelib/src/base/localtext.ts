@@ -8,7 +8,12 @@ function getTable(): { [key: string]: string } {
     return localTextTable;
 }
 
-export function addLocalText(obj: string | Record<string, string | Record<string, any>> | string, pre?: string) {
+/**
+ * Adds local text entries to the localization table.
+ * @param obj The object containing key/value pairs to add. If a string is provided, it will be added as a key with the prefix (second argument) as its value.
+ * @param pre The prefix to add to each key. If obj is a string, this will be the value for that key.
+ */
+export function addLocalText(obj: string | Record<string, string | Record<string, any>>, pre?: string) {
     if (!obj)
         return;
 
@@ -32,14 +37,32 @@ export function addLocalText(obj: string | Record<string, string | Record<string
     }
 }
 
+/**
+ * Retrieves a localized string from the localization table.
+ * @param key The key of the localized string.
+ * @param defaultText The default text to return if the key is not found.
+ * @returns The localized string or the default text.
+ */
 export function localText(key: string, defaultText?: string): string {
     return getTable()[key] ?? defaultText ?? key ?? '';
 }
 
+/**
+ * Tries to retrieve a localized string from the localization table.
+ * @param key The key of the localized string.
+ * @returns The localized string or undefined if not found.
+ */
 export function tryGetText(key: string): string {
     return getTable()[key];
 }
 
+/**
+ * Proxies text retrieval for localization.
+ * @param o The original object.
+ * @param p The prefix for the keys.
+ * @param t The translation table.
+ * @returns A proxy object for localized text retrieval.
+ */
 export function proxyTexts(o: Record<string, any>, p: string, t: Record<string, any>): Object {
     return new Proxy(o, {
         get: (_: Object, y: string) => {
@@ -60,12 +83,50 @@ export function proxyTexts(o: Record<string, any>, p: string, t: Record<string, 
     });
 }
 
+/**
+ * A list of languages with their IDs and display texts.
+ */
 export type LanguageList = { id: string, text: string }[];
-export type TranslateTextsOptions = { SourceLanguageID?: string, Inputs: { TextKey?: string, TargetLanguageID?: string, SourceText?: string }[] };
-export type TranslateTextsResult = { Translations?: { TextKey?: string, TargetLanguageID?: string, TranslatedText?: string }[] };
 
+/**
+ * Options for translating texts.
+ */
+export type TranslateTextsOptions = {
+    /** The source language ID */
+    SourceLanguageID?: string,
+    /** An array of inputs for translation */
+    Inputs: {
+        /** The text key to be translated */
+        TextKey?: string,
+        /** The target language ID */
+        TargetLanguageID?: string,
+        /** The source text to be translated */
+        SourceText?: string
+    }[]
+};
+
+/**
+ * The result of a translation operation.
+ */
+export type TranslateTextsResult = {
+    /** An array of resulting translations */
+    Translations?: {
+        /** The text key that was translated */
+        TextKey?: string,
+        /** The target language ID */
+        TargetLanguageID?: string,
+        /** The translated text */
+        TranslatedText?: string
+    }[]
+};
+
+/**
+ * Configuration for translation services.
+ */
 export const TranslationConfig = {
+    /** Retrieves the list of available languages */
     getLanguageList: null as () => LanguageList,
+    /** A function to translate texts based on provided options */
     translateTexts: null as (opt: TranslateTextsOptions) => PromiseLike<TranslateTextsResult>
 }
 
