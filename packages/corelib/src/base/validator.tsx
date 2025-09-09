@@ -498,7 +498,7 @@ export class Validator {
         },
 
         max: function (value, element, param) {
-            return Validator.optional(element) || value <= param;
+            return Validator.optional(element, value) || value <= param;
         },
 
         range: function (value, element, param) {
