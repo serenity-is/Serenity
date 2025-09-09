@@ -82,7 +82,7 @@ describe("DateFormatter", () => {
 
     it("shows formatted date if value type string and it is a date", () => {
         var formatter = new DateFormatter();
-        expect(formatter.format({ value: "2023-01-01T00:00:00.000Z", escape: (s) => s })).toBe("01/01/2023");
+        expect(formatter.format({ value: "2023-01-01T00:00:00.000", escape: (s) => s })).toBe("01/01/2023");
     });
 
     it("shows given value if value type is string and it is not a date", () => {
@@ -98,7 +98,7 @@ describe("DateFormatter", () => {
     it("uses given display format", () => {
         var formatter = new DateFormatter();
         formatter.displayFormat = "dd-MM-yyyy";
-        expect(formatter.format({ value: "2023-01-01T00:00:00.000Z", escape: (s) => s })).toBe("01-01-2023");
+        expect(formatter.format({ value: "2023-01-01T00:00:00.000", escape: (s) => s })).toBe("01-01-2023");
     });
 })
 
