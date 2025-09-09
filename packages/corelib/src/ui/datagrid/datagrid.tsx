@@ -1,17 +1,13 @@
 import { ArgsCell, AutoTooltips, Column, ColumnSort, FormatterContext, Grid, GridOptions } from "@serenity-is/sleekgrid";
-import { Authorization, Criteria, Fluent, ListResponse, cssEscape, debounce, getInstanceType, getTypeFullName, getjQuery, isInstanceOfType, tryGetText, type PropertyItem, type PropertyItemsData } from "../../base";
-import { LayoutTimer, ScriptData, deepClone, extend, getColumnsData, getColumnsDataAsync, setEquality } from "../../compat";
+import { Authorization, Criteria, Fluent, ListResponse, cssEscape, debounce, getInstanceType, getTypeFullName, getjQuery, tryGetText, type PropertyItem, type PropertyItemsData } from "../../base";
+import { LayoutTimer, ScriptData, getColumnsData, getColumnsDataAsync, setEquality } from "../../compat";
 import { IReadOnly } from "../../interfaces";
 import { Format, PagerOptions, RemoteView, RemoteViewOptions } from "../../slick";
 import { ColumnsKeyAttribute, FilterableAttribute, IdPropertyAttribute, IsActivePropertyAttribute, LocalTextPrefixAttribute } from "../../types/attributes";
 import { Decorators } from "../../types/decorators";
 import { DateEditor } from "../editors/dateeditor";
-import { EditorUtils } from "../editors/editorutils";
 import { SelectEditor } from "../editors/selecteditor";
 import { FilterDisplayBar } from "../filtering/filterdisplaybar";
-import { BooleanFiltering, DateFiltering, DateTimeFiltering, FilteringTypeRegistry, IFiltering, IQuickFiltering } from "../filtering/filtering";
-import { FilterLine } from "../filtering/filterline";
-import { FilterOperators } from "../filtering/filteroperator";
 import { FilterStore } from "../filtering/filterstore";
 import { EditLink } from "../helpers/editlink";
 import { GridUtils } from "../helpers/gridutils";
@@ -19,57 +15,25 @@ import { LazyLoadHelper } from "../helpers/lazyloadhelper";
 import { PropertyItemSlickConverter } from "../helpers/propertyitemslickconverter";
 import { SlickFormatting } from "../helpers/slickformatting";
 import { SlickHelper } from "../helpers/slickhelper";
-import { ReflectionOptionsSetter } from "../widgets/reflectionoptionssetter";
 import { ToolButton, Toolbar } from "../widgets/toolbar";
 import { Widget, WidgetProps } from "../widgets/widget";
 import { getWidgetFrom, tryGetWidget } from "../widgets/widgetutils";
+import { getDefaultSortBy, getItemCssClass, propertyItemToQuickFilter, slickGridOnSort } from "./datagrid-internal";
+import { GridPersistanceFlags, PersistedGridSettings, SettingStorage, getCurrentSettings, restoreSettingsFrom } from "./datagrid-persistance";
 import { IDataGrid } from "./idatagrid";
 import { IRowDefinition } from "./irowdefinition";
 import { QuickFilter } from "./quickfilter";
 import { QuickFilterBar } from "./quickfilterbar";
-import { QuickSearchField, QuickSearchInput } from "./quicksearchinput";
+import { QuickSearchField } from "./quicksearchinput";
 import { SlickPager } from "./slickpager";
 
-export interface SettingStorage {
-    getItem(key: string): string | Promise<string>;
-    setItem(key: string, value: string): void | Promise<void>;
-}
-
-export interface PersistedGridColumn {
-    id: string;
-    width?: number;
-    sort?: number;
-    visible?: boolean;
-}
-
-export interface PersistedGridSettings {
-    columns?: PersistedGridColumn[];
-    filterItems?: FilterLine[];
-    quickFilters?: { [key: string]: any };
-    quickFilterText?: string;
-    quickSearchField?: QuickSearchField;
-    quickSearchText?: string;
-    includeDeleted?: boolean;
-}
-
-export interface GridPersistanceFlags {
-    columnWidths?: boolean;
-    columnVisibility?: boolean;
-    sortColumns?: boolean;
-    filterItems?: boolean;
-    quickFilters?: boolean;
-    quickFilterText?: boolean;
-    quickSearch?: boolean;
-    includeDeleted?: boolean;
-}
+export type { GridPersistanceFlags, PersistedGridColumn, PersistedGridSettings, SettingStorage } from "./datagrid-persistance";
 
 @Decorators.registerClass('Serenity.DataGrid', [IReadOnly])
 export class DataGrid<TItem, P = {}> extends Widget<P> implements IDataGrid, IReadOnly {
 
     declare private _isDisabled: boolean;
     declare private _layoutTimer: number;
-    declare private _slickGridOnSort: any;
-    declare private _slickGridOnClick: any;
     declare protected titleDiv: Fluent;
     declare protected toolbar: Toolbar;
     declare protected filterBar: FilterDisplayBar;
@@ -236,58 +200,8 @@ export class DataGrid<TItem, P = {}> extends Widget<P> implements IDataGrid, IRe
             .filter(x => x != null);
     }
 
-    public static propertyItemToQuickFilter(item: PropertyItem) {
-        var quick: any = {};
-
-        var name = item.name;
-        var title = tryGetText(item.title);
-        if (title == null) {
-            title = item.title;
-            if (title == null) {
-                title = name;
-            }
-        }
-
-        var filteringType = FilteringTypeRegistry.get((item.filteringType ?? 'String'));
-        if (filteringType === DateFiltering) {
-            quick = QuickFilterBar.dateRange(name, title);
-        }
-        else if (filteringType === DateTimeFiltering) {
-            quick = QuickFilterBar.dateTimeRange(name, title, item.editorParams?.useUtc);
-        }
-        else if (filteringType === BooleanFiltering) {
-            var q = item.quickFilterParams || {};
-            var f = item.filteringParams || {};
-            var trueText = q['trueText'];
-            if (trueText == null) {
-                trueText = f['trueText'];
-            }
-            var falseText = q['falseText'];
-            if (falseText == null) {
-                falseText = f['falseText'];
-            }
-            quick = QuickFilterBar.boolean(name, title, trueText, falseText);
-        }
-        else {
-            var filtering = new (filteringType as any)(item.filteringParams ?? {}) as IFiltering;
-            if (filtering && isInstanceOfType(filtering, IQuickFiltering)) {
-                ReflectionOptionsSetter.set(filtering, item.filteringParams);
-                filtering.set_field(item);
-                filtering.set_operator({ key: FilterOperators.EQ });
-                (filtering as any).initQuickFilter(quick);
-                quick.options = extend(deepClone(quick.options), item.quickFilterParams);
-            }
-            else {
-                return null;
-            }
-        }
-
-        if (!!item.quickFilterSeparator) {
-            quick.separator = true;
-        }
-
-        quick.cssClass = item.quickFilterCssClass;
-        return quick;
+    public static propertyItemToQuickFilter(item: PropertyItem): QuickFilter<any, any> | null {
+        return propertyItemToQuickFilter(item);
     }
 
     protected findQuickFilter<TWidget>(type: { new(...args: any[]): TWidget }, field: string): TWidget {
@@ -355,36 +269,7 @@ export class DataGrid<TItem, P = {}> extends Widget<P> implements IDataGrid, IRe
     }
 
     protected getItemCssClass(item: TItem, index: number): string {
-        var activeFieldName = this.getIsActiveProperty();
-        var deletedFieldName = this.getIsDeletedProperty();
-        if (activeFieldName && deletedFieldName)
-            return null;
-
-        if (activeFieldName) {
-            var value = (item as any)[activeFieldName];
-            if (value == null) {
-                return null;
-            }
-
-            if (typeof (value) === 'number') {
-                if (value < 0) {
-                    return 'deleted';
-                }
-                else if (value === 0) {
-                    return 'inactive';
-                }
-            }
-            else if (typeof (value) === 'boolean') {
-                if (value === false) {
-                    return 'deleted';
-                }
-            }
-        }
-        else {
-            return (item as any)[deletedFieldName] ? 'deleted' : null;
-        }
-
-        return null;
+        return getItemCssClass(item, this.getIsActiveProperty(), this.getIsDeletedProperty());
     }
 
     protected getItemMetadata(item: TItem, index: number): any {
@@ -527,53 +412,14 @@ export class DataGrid<TItem, P = {}> extends Widget<P> implements IDataGrid, IRe
     }
 
     protected bindToSlickEvents() {
-        var self = this;
-        this._slickGridOnSort = (_: Event, p: any) => {
-            self.view.populateLock();
-            try {
-                var sortBy = [];
-                var col: any;
-                if (!!p.multiColumnSort) {
-                    for (var i = 0; !!(i < p.sortCols.length); i++) {
-                        var x = p.sortCols[i];
-                        col = x.sortCol;
-                        if (col == null) {
-                            col = {};
-                        }
-                        sortBy.push(col.field + (!!x.sortAsc ? '' : ' DESC'));
-                    }
-                }
-                else {
-                    var col = p.sortCol;
-                    if (col == null) {
-                        col = {};
-                    }
-                    sortBy.push(col.field + (!!p.sortAsc ? '' : ' DESC'));
-                }
-
-                self.view.seekToPage = 1;
-                self.view.sortBy = sortBy;
-            }
-            finally {
-                self.view.populateUnlock();
-            }
-
-            if (self.view.getLocalSort && self.view.getLocalSort()) {
-                self.view.sort();
-            }
-            else {
-                self.view.populate();
-            }
+        this.slickGrid.onSort.subscribe((_, p) => {
+            slickGridOnSort(this.view, p);
             this.persistSettings(null);
-        };
+        });
 
-        this.slickGrid.onSort.subscribe(this._slickGridOnSort);
-
-        this._slickGridOnClick = (e1: MouseEvent, p1: ArgsCell) => {
-            self.onClick(e1, p1.row, p1.cell);
-        }
-
-        this.slickGrid.onClick.subscribe(this._slickGridOnClick);
+        this.slickGrid.onClick.subscribe((e1: MouseEvent, p1: ArgsCell) => {
+            this.onClick(e1, p1.row, p1.cell);
+        });
 
         this.slickGrid.onColumnsReordered.subscribe(() => {
             return this.persistSettings(null);
@@ -718,28 +564,7 @@ export class DataGrid<TItem, P = {}> extends Widget<P> implements IDataGrid, IRe
     }
 
     protected getDefaultSortBy(): any[] {
-        if (this.slickGrid) {
-
-            var columns = this.slickGrid.getColumns().filter(function (x) {
-                return x.sortOrder && x.sortOrder !== 0;
-            });
-
-            if (columns.length > 0) {
-                columns.sort(function (x1, y) {
-                    return Math.abs(x1.sortOrder) < Math.abs(y.sortOrder) ? -1 : (Math.abs(x1.sortOrder) > Math.abs(y.sortOrder) ? 1 : 0);
-                });
-
-                var list = [];
-                for (var i = 0; i < columns.length; i++) {
-                    var col = columns[i];
-                    list.push(col.field + ((col.sortOrder < 0) ? ' DESC' : ''));
-                }
-
-                return list;
-            }
-        }
-
-        return [];
+        return getDefaultSortBy(this.slickGrid);
     }
 
     protected usePager(): boolean {
@@ -840,37 +665,21 @@ export class DataGrid<TItem, P = {}> extends Widget<P> implements IDataGrid, IRe
         return SlickFormatting.itemLink(itemType ?? this.getItemType(), idField ?? this.getIdProperty(), text, cssClass, encode);
     }
 
-    /**
-     * Renders an edit link for the item in current row. Returns a DocumentFragment for non-data rows, and an anchor element otherwise.
-     */
+    /** Renders an edit link for the item in current row. Returns a DocumentFragment for non-data rows, and an anchor element otherwise. */
     public EditLink = (props: {
-        /**
-         * formatter context (contains item, value etc)
-         */
+        /** formatter context (contains item, value etc) */
         ctx?: FormatterContext,
-        /**
-         * The id of the entity to link to. If not provided it will be taken from ctx.item[idField]
-         */
+        /** The id of the entity to link to. If not provided it will be taken from ctx.item[idField] */
         id?: string,
-        /**
-         * The name of the field in item that contains the entity id. Defaults to idProperty. Used if id is not provided.
-         */
+        /** The name of the field in item that contains the entity id. Defaults to idProperty. Used if id is not provided. */
         idField?: string,
-        /**
-         * The item type to link to. Defaults to this.getItemType()
-         */
+        /** The item type to link to. Defaults to this.getItemType() */
         itemType?: string,
-        /**
-         * Extra CSS class to add to the link element besides s-EditLink. Optional.
-         */
+        /** Extra CSS class to add to the link element besides s-EditLink. Optional. */
         cssClass?: string,
-        /**
-         * Tab index to add to the link element. Optional.
-         */
+        /** Tab index to add to the link element. Optional. */
         tabIndex?: number,
-        /**
-         * The link text. If not provided it will be taken from ctx.escape(ctx.value)
-         */
+        /** The link text. If not provided it will be taken from ctx.escape(ctx.value) */
         children?: any
     }): any => {
         let children = props.children;
@@ -1257,147 +1066,27 @@ export class DataGrid<TItem, P = {}> extends Widget<P> implements IDataGrid, IRe
         if (!this.slickGrid || !settings)
             return;
 
-        var columns = this.slickGrid.getColumns();
-        var colById: { [key: string]: Column } = null;
-        var updateColById = function (cl: Column[]) {
-            colById = {};
-            for (var $t1 = 0; $t1 < cl.length; $t1++) {
-                var c = cl[$t1];
-                colById[c.id] = c;
-            }
-        };
-
         this.view.beginUpdate();
         this.restoringSettings++;
         try {
-            flags = flags || this.gridPersistanceFlags();
-            if (settings.columns != null) {
-                if (flags.columnVisibility !== false) {
-                    var visible = {};
-                    updateColById(this.allColumns);
-                    var newColumns = [];
-                    for (var $t2 = 0; $t2 < settings.columns.length; $t2++) {
-                        var x = settings.columns[$t2];
-                        if (x.id != null && x.visible === true) {
-                            var column = colById[x.id];
-                            if (this.canShowColumn(column)) {
-                                column.visible = true;
-                                newColumns.push(column);
-                                delete colById[x.id];
-                            }
-                        }
-                    }
-                    for (var $t3 = 0; $t3 < this.allColumns.length; $t3++) {
-                        var c1 = this.allColumns[$t3];
-                        if (colById[c1.id] != null) {
-                            c1.visible = false;
-                            newColumns.push(c1);
-                        }
-                    }
-                    this.allColumns = newColumns;
-                    columns = this.allColumns.filter(function (x1) {
-                        return x1.visible === true;
-                    });
-                }
-                if (flags.columnWidths !== false) {
-                    updateColById(columns);
-                    for (var $t4 = 0; $t4 < settings.columns.length; $t4++) {
-                        var x2 = settings.columns[$t4];
-                        if (x2.id != null && x2.width != null && x2.width !== 0) {
-                            var column1 = colById[x2.id];
-                            if (column1 != null) {
-                                column1.width = x2.width;
-                            }
-                        }
-                    }
-                }
+            restoreSettingsFrom({
+                allColumns: (value: Column[]) => {
+                    if (value == null)
+                        return this.allColumns;
 
-                if (flags.sortColumns !== false) {
-                    updateColById(columns);
-                    var list = [];
-                    var sortColumns = settings.columns.filter(function (x3) {
-                        return x3.id != null && (x3.sort ?? 0) !== 0;
-                    });
-
-                    sortColumns.sort(function (a, b) {
-                        // sort holds two informations:
-                        // absolute value: order of sorting
-                        // sign: positive = ascending, negative = descending
-                        // so we have to compare absolute values here
-                        return Math.abs(a.sort) - Math.abs(b.sort);
-                    });
-
-                    for (var $t5 = 0; $t5 < sortColumns.length; $t5++) {
-                        var x4 = sortColumns[$t5];
-                        var column2 = colById[x4.id];
-                        if (column2 != null) {
-                            list.push({
-                                columnId: x4.id,
-                                sortAsc: x4.sort > 0
-                            });
-                        }
-                    }
-                    this.view.sortBy = list.map(function (x5) {
-                        return x5.columnId + ((x5.sortAsc === false) ? ' DESC' : '');
-                    });
-                    this.slickGrid.setSortColumns(list);
-                }
-                this.slickGrid.setColumns(columns);
-                this.slickGrid.invalidate();
-            }
-
-            if (settings.filterItems != null &&
-                flags.filterItems !== false &&
-                this.filterBar != null &&
-                this.filterBar.get_store() != null) {
-                var items = this.filterBar.get_store().get_items();
-                items.length = 0;
-                items.push.apply(items, settings.filterItems);
-                this.filterBar.get_store().raiseChanged();
-            }
-
-            if (settings.includeDeleted != null &&
-                flags.includeDeleted !== false) {
-                var includeDeletedToggle = this.domNode.querySelector('.s-IncludeDeletedToggle');
-                if (includeDeletedToggle && !!settings.includeDeleted !== includeDeletedToggle.classList.contains('pressed')) {
-                    Fluent.trigger(includeDeletedToggle.querySelector('a'), "click");
-                }
-            }
-
-            if (settings.quickFilters != null &&
-                flags.quickFilters !== false &&
-                this.quickFiltersDiv != null &&
-                this.quickFiltersDiv.length > 0) {
-                this.quickFiltersDiv.findAll('.quick-filter-item').forEach(e => {
-                    var field = e.dataset.qffield;
-
-                    if (!field?.length) {
-                        return;
-                    }
-
-                    var widget = tryGetWidget('#' + cssEscape(this.uniqueName + '_QuickFilter_' + field), Widget);
-                    if (widget == null) {
-                        return;
-                    }
-
-                    var state = settings.quickFilters[field];
-                    var loadState = (e as any).qfloadstate;
-                    if (typeof loadState === "function") {
-                        loadState(widget, state);
-                    }
-                    else {
-                        EditorUtils.setValue(widget, state);
-                    }
-                });
-            }
-
-            if (flags.quickSearch === true && (settings.quickSearchField !== undefined || settings.quickSearchText !== undefined)) {
-                var qsInput = this.toolbar?.domNode?.querySelector('.s-QuickSearchInput');
-                if (qsInput) {
-                    var qsWidget = tryGetWidget(qsInput, QuickSearchInput);
-                    qsWidget && qsWidget.restoreState(settings.quickSearchText, settings.quickSearchField);
-                }
-            }
+                    return this.allColumns = value;
+                },
+                canShowColumn: this.canShowColumn.bind(this),
+                filterBar: this.filterBar,
+                flags: flags || this.gridPersistanceFlags(),
+                includeDeletedToggle: this.domNode.querySelector('.s-IncludeDeletedToggle'),
+                quickFiltersDiv: this.quickFiltersDiv,
+                slickGrid: this.slickGrid,
+                settings: settings,
+                toolbar: this.toolbar,
+                uniqueName: this.uniqueName,
+                view: this.view
+            })
         }
         finally {
             this.restoringSettings--;
@@ -1416,93 +1105,15 @@ export class DataGrid<TItem, P = {}> extends Widget<P> implements IDataGrid, IRe
     }
 
     protected getCurrentSettings(flags?: GridPersistanceFlags) {
-        flags = flags || this.gridPersistanceFlags();
-        var settings: PersistedGridSettings = {};
-        if (flags.columnVisibility !== false || flags.columnWidths !== false || flags.sortColumns !== false) {
-            settings.columns = [];
-            var sortColumns = this.slickGrid.getSortColumns() as any[];
-            var columns = this.slickGrid.getColumns();
-            for (var column of columns) {
-                var p: PersistedGridColumn = {
-                    id: column.id
-                };
-
-                if (flags.columnVisibility !== false) {
-                    p.visible = true;
-                }
-                if (flags.columnWidths !== false) {
-                    p.width = column.width;
-                }
-
-                if (flags.sortColumns !== false) {
-                    var sort = sortColumns.findIndex(x => x.columnId == column.id);
-                    p.sort = ((sort >= 0) ? ((sortColumns[sort].sortAsc !== false) ? (sort + 1) : (-sort - 1)) : 0);
-                }
-                settings.columns.push(p);
-            }
-        }
-
-        if (flags.includeDeleted !== false) {
-            settings.includeDeleted = !!this.domNode.querySelector(".s-IncludeDeletedToggle.pressed");
-        }
-
-        if (flags.filterItems !== false && (this.filterBar != null) && (this.filterBar.get_store() != null)) {
-            settings.filterItems = this.filterBar.get_store().get_items().slice();
-        }
-
-        if (flags.quickSearch === true) {
-            var qsInput = this.toolbar?.domNode?.querySelector('.s-QuickSearchInput');
-            if (qsInput) {
-                var qsWidget = tryGetWidget(qsInput, QuickSearchInput);
-                if (qsWidget) {
-                    settings.quickSearchField = qsWidget.get_field();
-                    settings.quickSearchText = qsWidget.domNode.value;
-                }
-            }
-        }
-
-        if (flags.quickFilters !== false && (this.quickFiltersDiv != null) && this.quickFiltersDiv.length > 0) {
-            settings.quickFilters = {};
-            this.quickFiltersDiv.findAll('.quick-filter-item').forEach(e => {
-                var field = e.dataset.qffield;
-                if (!field?.length) {
-                    return;
-                }
-
-                var widget = tryGetWidget('#' + this.uniqueName + '_QuickFilter_' + field, Widget);
-                if (!widget)
-                    return;
-
-                var qfElement = e as any;
-                var saveState = qfElement.qfsavestate;
-                var state = typeof saveState === "function" ? saveState(widget) : EditorUtils.getValue(widget);
-                settings.quickFilters[field] = state;
-                if (flags.quickFilterText === true && e.classList.contains('quick-filter-active')) {
-
-                    var getDisplayText = qfElement.qfdisplaytext;
-                    var filterLabel = e.querySelector('.quick-filter-label')?.textContent ?? '';
-
-                    var displayText;
-                    if (typeof getDisplayText === "function") {
-                        displayText = getDisplayText(widget, filterLabel);
-                    }
-                    else {
-                        displayText = filterLabel + ' = ' + EditorUtils.getDisplayText(widget);
-                    }
-
-                    if (displayText?.length) {
-                        if (settings.quickFilterText?.length) {
-                            settings.quickFilterText += ' ' + (tryGetText('Controls.FilterPanel.And') ?? 'and') + ' ';
-                            settings.quickFilterText += displayText;
-                        }
-                        else {
-                            settings.quickFilterText = displayText;
-                        }
-                    }
-                }
-            });
-        }
-        return settings;
+        return getCurrentSettings({
+            filterBar: this.filterBar,
+            flags: flags || this.gridPersistanceFlags(),
+            includeDeletedToggle: this.domNode.querySelector('.s-IncludeDeletedToggle'),
+            quickFiltersDiv: this.quickFiltersDiv,
+            slickGrid: this.slickGrid,
+            toolbar: this.toolbar,
+            uniqueName: this.uniqueName
+        })
     }
 
     getElement(): HTMLElement {

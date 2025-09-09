@@ -2289,7 +2289,7 @@ export interface ValidatorOptions {
 	validClass?: string | undefined;
 }
 export declare class Validator {
-	static optional(element: ValidatableElement): "" | "dependency-mismatch";
+	static optional(element: ValidatableElement, value?: ValidationValue): "" | "dependency-mismatch";
 	static autoCreateRanges: boolean;
 	static defaults: ValidatorOptions;
 	static readonly messages: Record<string, string | Function>;
@@ -5172,7 +5172,7 @@ export declare class DataGrid<TItem, P = {}> extends Widget<P> implements IDataG
 	protected ensureQuickFilterBar(): QuickFilterBar;
 	protected createQuickFilters(filters?: QuickFilter<Widget<any>, any>[]): void;
 	protected getQuickFilters(): QuickFilter<Widget<any>, any>[];
-	static propertyItemToQuickFilter(item: PropertyItem): any;
+	static propertyItemToQuickFilter(item: PropertyItem): QuickFilter<any, any> | null;
 	protected findQuickFilter<TWidget>(type: {
 		new (...args: any[]): TWidget;
 	}, field: string): TWidget;
