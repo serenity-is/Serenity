@@ -2,10 +2,20 @@ import { implementedInterfacesSymbol, isAssignableFromSymbol, isInstanceOfTypeSy
 import { StringLiteral, TypeInfo, ensureTypeInfo, getTypeNameProp, getTypeRegistry, globalObject, internalRegisterType, merge, peekTypeInfo, typeInfoProperty } from "./system-internal";
 export { getTypeNameProp, getTypeRegistry, setTypeNameProp, typeInfoProperty, type StringLiteral } from "./system-internal";
 
+/**
+ * Get the global object  (window in browsers, global in node)
+ */
 export function getGlobalObject(): any {
     return globalObject;
 }
 
+/**
+ * Omit undefined properties from an object. Does not modify the original object.
+ * This is useful when using Object.assign to avoid overwriting existing values with undefined
+ * just like jQuery $.extend does.
+ * @param x Object to omit undefined properties from
+ * @returns New object without undefined properties
+ */
 export function omitUndefined(x: { [key: string]: any }) {
     if (x == null)
         return x;
@@ -14,8 +24,17 @@ export function omitUndefined(x: { [key: string]: any }) {
     return obj;
 }
 
+/**
+ * Type alias for a function or object (enum).
+ */
 export type Type = Function | Object;
 
+/**
+ * Get a nested property from an object. Can be used to get nested properties from global object for example by separating names with dots.
+ * @param from Object to get the property from
+ * @param name Name of the property (dot-separated for nested properties)
+ * @returns Value of the property or null if not found
+ */
 export function getNested(from: any, name: string) {
     var a = name.split('.');
     for (var i = 0; i < a.length; i++) {
@@ -26,6 +45,12 @@ export function getNested(from: any, name: string) {
     return from;
 }
 
+/**
+ * Get a type by name from the type registry, global object or a specific target.
+ * @param name Name of the type
+ * @param target Target object to search in (defaults to global object)
+ * @returns The type or null if not found
+ */
 export function getType(name: string, target?: any): Type {
     var type: any;
     if (target == null) {
@@ -43,11 +68,22 @@ export function getType(name: string, target?: any): Type {
     return type;
 }
 
+/**
+ * Get the full name of a type (including namespace if any).
+ * This returns the name from typeInfo.typeName if available (e.g. registered via decorators), 
+ * otherwise tries to get the name from function's name property.
+ * @param type Type to get the name of
+ */
 export function getTypeFullName(type: Type): string {
     return getTypeNameProp(type) || (type as any).name ||
         (type.toString().match(/^\s*function\s*([^\s(]+)/) || [])[1] || 'Object';
 };
 
+/**
+ * Get the short name of a type (without namespace).
+ * @param type Type to get the name of
+ * @returns Short name of the type
+ */
 export function getTypeShortName(type: Type): string {
     var fullName = getTypeFullName(type);
     var bIndex = fullName?.indexOf('[');
@@ -55,6 +91,11 @@ export function getTypeShortName(type: Type): string {
     return nsIndex > 0 ? fullName.substring(nsIndex + 1) : fullName;
 };
 
+/**
+ * Get the instance type of an object.
+ * @param instance Object to get the instance type of
+ * @returns The instance type or Object if not found
+ */
 export function getInstanceType(instance: any): any {
     if (instance == null)
         throw "Can't get instance type of null or undefined!";
@@ -68,16 +109,31 @@ export function getInstanceType(instance: any): any {
     }
 };
 
-export function isAssignableFrom(target: any, type: Type) {
-    if (target === type || (type as any).prototype instanceof target)
+/**
+ * Check if a type is assignable from another type. A type is
+ * assignable from another type if they are the same or if the other type
+ * is derived from it. This also works for interfaces if they are registered
+ * via registerInterface function or decorators.
+ * @param target Target type or interface
+ * @param fromType Type to check assignability from
+ * @returns true if target is assignable from type
+ */
+export function isAssignableFrom(target: any, fromType: Type) {
+    if (target === fromType || (fromType as any).prototype instanceof target)
         return true;
 
     if (typeof target[isAssignableFromSymbol] === 'function')
-        return target[isAssignableFromSymbol](type);
+        return target[isAssignableFromSymbol](fromType);
 
     return false;
 }
 
+/**
+ * Check if an instance is of a specific type.
+ * @param instance Object to check
+ * @param type Type to check against
+ * @returns true if instance is of type
+ */
 export function isInstanceOfType(instance: any, type: Type) {
     if (instance == null)
         return false;
@@ -88,6 +144,11 @@ export function isInstanceOfType(instance: any, type: Type) {
     return isAssignableFrom(type, getInstanceType(instance));
 }
 
+/**
+ * Get the base type of a class or interface.
+ * @param type Type to get the base type of
+ * @returns The base type or null if not found
+ */
 export function getBaseType(type: any) {
     if (type == null ||
         type === Object ||
@@ -108,11 +169,23 @@ function interfaceIsAssignableFrom(from: any) {
                 getTypeNameProp(x) === getTypeNameProp(this)));
 }
 
-export function registerClass(type: any, name: string, intf?: any[]) {
+/**
+ * Register a class with the type system.
+ * @param type Class type to register
+ * @param name Name to register the class under
+ * @param intf Optional interfaces the class implements
+ */
+export function registerClass(type: any, name: string, intf?: any[]): void {
     internalRegisterType(type, name, intf);
     Object.defineProperty(type, isInterfaceTypeSymbol, { value: false, configurable: true });
 }
 
+/**
+ * Register an enum with the type system.
+ * @param type Enum type to register
+ * @param name Name to register the enum under
+ * @param enumKey Optional key to use for the enum
+ */
 export function registerEnum(type: any, name: string, enumKey?: string) {
     internalRegisterType(type, name, undefined);
     if (enumKey && enumKey != name) {
@@ -123,13 +196,30 @@ export function registerEnum(type: any, name: string, enumKey?: string) {
     Object.defineProperty(type, isInterfaceTypeSymbol, { value: null, configurable: true });
 }
 
+/**
+ * Register an interface with the type system. There is no runtime representation of interfaces
+ * in JavaScript, so Serenity uses classes decorated with some special symbols to emulate
+ * interfaces to some degree. This is used by the type system to support isAssignableFrom and 
+ * isInstanceOfType functions for interfaces.
+ * @param type Interface type to register
+ * @param name Name to register the interface under
+ * @param intf Optional interfaces the interface class implements
+ */
 export function registerInterface(type: any, name: string, intf?: any[]) {
     internalRegisterType(type, name, intf);
     Object.defineProperty(type, isInterfaceTypeSymbol, { value: true, configurable: true });
     Object.defineProperty(type, isAssignableFromSymbol, { value: interfaceIsAssignableFrom, configurable: true });
 }
 
+/**
+ * Enum utilities
+ */
 export namespace Enum {
+    /**
+     * Convert an enum value to a string containing enum names.
+     * @param enumType Enum type
+     * @param value Enum value
+     */
     export let toString = (enumType: any, value: number): string => {
         if (value == null)
             return "";
@@ -163,6 +253,11 @@ export namespace Enum {
         }
     };
 
+    /**
+     * Get all numeric values of an enum as an array.
+     * @param enumType 
+     * @returns 
+     */
     export let getValues = (enumType: any) => {
         var parts = [];
         var values = enumType;
@@ -175,11 +270,24 @@ export namespace Enum {
     };
 }
 
+/**
+ * Check if a type is an enum. A type is considered an enum if it is not a function
+ * and it has isInterfaceTypeSymbol property set to null (which is set by registerEnum function).
+ * @param type Type to check
+ * @returns True if the type is an enum
+ */
 export const isEnum = (type: any) => {
     return typeof type !== "function" &&
         type[isInterfaceTypeSymbol] === null;
 };
 
+/**
+ * Initialize a form type. This is used in the XYZForm.ts files that are generated
+ * by the Serenity server typings code generator. It defines getters that call this.w() to
+ * initialize form fields on the prototype of a form class.
+ * @param typ Form type to initialize
+ * @param nameWidgetPairs Array of name-widget pairs
+ */
 export function initFormType(typ: Function, nameWidgetPairs: any[]) {
     for (var i = 0; i < nameWidgetPairs.length - 1; i += 2) {
         (function (name: string, widget: any) {
@@ -196,36 +304,86 @@ export function initFormType(typ: Function, nameWidgetPairs: any[]) {
 
 const _fieldsProxy = new Proxy({}, { get: (_, p) => p }) as any;
 
+/**
+ * Get a proxy for form fields. This proxy returns the field name for any property
+ * accessed on it. This is used in form initialization to avoid having to declare
+ * a variable for the fields type. There is no actual runtime check for field names,
+ * so it is only used to provide intellisense and compile-time checks.
+ * @returns A readonly record of form field names and same string values
+ */
 export function fieldsProxy<TRow>(): Readonly<Record<keyof TRow, string>> {
     return _fieldsProxy
 }
 
+/**
+ * Check if an object is array-like. An object is considered array-like if it is
+ * not null, is of type object, has a numeric length property and does not have
+ * a nodeType property (to exclude DOM nodes).
+ * @param obj Object to check
+ * @returns True if the object is array-like
+ */
 export function isArrayLike(obj: any): obj is ArrayLike<any> {
     return typeof obj === "object" && obj != null && typeof obj.length === "number" && typeof obj.nodeType !== "number";
 }
 
+/**
+ * Check if an object is Promise-like, meaning it is either a native Promise
+ * or an object with then and catch methods (like jQuery Deferred).
+ * @param obj Object to check
+ * @returns True if the object is Promise-like
+ */
 export function isPromiseLike(obj: any): obj is PromiseLike<any> {
     return obj instanceof Promise || ((typeof obj === "object" && obj != null && typeof obj.then === "function" && typeof obj.catch === "function"));
 }
 
+/**
+ * Utility type to prevent type inference in generic types.
+ * TypeScript 5.4 has added a built-in NoInfer<T> type that can be used instead of this.
+ */
 export type SNoInfer<T> = [T][T extends any ? 0 : never];
 
+/**
+ * Attribute class for editors. This is used by the editorTypeInfo function
+ * and registerEditor function to add EditorAttribute to editors.
+ */
 export class EditorAttribute { }
 registerClass(EditorAttribute, 'Serenity.EditorAttribute');
 
+/**
+ * Marker interface for SlickGrid formatters.
+ */
 export class ISlickFormatter { }
 registerInterface(ISlickFormatter, 'Serenity.ISlickFormatter');
 
-export function registerFormatter(type: any, name: string, intf?: any[]) {
-    return registerClass(type, name, merge([ISlickFormatter], intf));
+/**
+ * Register a SlickGrid formatter.
+ * @param type Formatter type
+ * @param name Formatter name
+ * @param intf Optional interface(s) to implement
+ */
+export function registerFormatter(type: any, name: string, intf?: any[]): void {
+    registerClass(type, name, merge([ISlickFormatter], intf));
 }
 
+/**
+ * Register an editor type. Adds EditorAttribute if not already present.
+ * @param type Editor type
+ * @param name Editor name
+ * @param intf Optional interface(s) to implement
+ */
 export function registerEditor(type: any, name: string, intf?: any[]) {
     registerClass(type, name, intf);
     if (!peekTypeInfo(type).customAttributes?.some(x => getInstanceType(x) === x))
         addCustomAttribute(type, new EditorAttribute());
 }
 
+/**
+ * Adds a custom attribute to a type. JavaScript does not have built-in support for attributes,
+ * so Serenity uses a customAttributes array on typeInfo to store them. This is used by
+ * decorators and some helper functions to add attributes to classes.
+ * @param type 
+ * @param attr 
+ */
 export function addCustomAttribute(type: any, attr: any) {
     let typeInfo = ensureTypeInfo(type);
     if (!typeInfo.customAttributes)
@@ -234,6 +392,13 @@ export function addCustomAttribute(type: any, attr: any) {
         typeInfo.customAttributes.push(attr);
 }
 
+/**
+ * Get a custom attribute of a type.
+ * @param type Type to get the attribute from
+ * @param attrType Attribute type to get
+ * @param inherit Indicates whether to search in base types
+ * @returns The custom attribute or null if not found
+ */
 export function getCustomAttribute<TAttr>(type: any, attrType: { new(...args: any[]): TAttr }, inherit: boolean = true): TAttr {
     if (!type || attrType == null)
         return null;
@@ -251,10 +416,24 @@ export function getCustomAttribute<TAttr>(type: any, attrType: { new(...args: an
     while (inherit && (type = getBaseType(type)))
 }
 
+/**
+ * Get whether a type has a specific custom attribute.
+ * @param type Type to check
+ * @param attrType Attribute type to check
+ * @param inherit Indicates whether to search in base types
+ * @returns True if the type has the attribute
+ */
 export function hasCustomAttribute<TAttr>(type: any, attrType: { new(...args: any[]): TAttr }, inherit: boolean = true): boolean {
     return getCustomAttribute(type, attrType, inherit) != null;
 }
 
+/**
+ * Get all custom attributes of a type.
+ * @param type Type to get the attributes from
+ * @param attrType Attribute type to get. If not specified, all attributes are returned.
+ * @param inherit Indicates whether to search in base types
+ * @returns An array of custom attributes
+ */
 export function getCustomAttributes<TAttr>(type: any, attrType: { new(...args: any[]): TAttr }, inherit: boolean = true): TAttr[] {
     if (!type)
         return [];
@@ -277,10 +456,15 @@ export function getCustomAttributes<TAttr>(type: any, attrType: { new(...args: a
 };
 
 export type { TypeInfo } from "./system-internal";
-export type ClassTypeInfo<T> = TypeInfo<T>;
-export type EditorTypeInfo<T> = TypeInfo<T>;
-export type FormatterTypeInfo<T> = TypeInfo<T>;
-export type InterfaceTypeInfo<T> = TypeInfo<T>;
+
+/** Class type information. This is used to make type name available in declaration files unlike decorators that does not show in .d.ts files. */
+export type ClassTypeInfo<TypeName> = TypeInfo<TypeName>;
+/** Editor type information. This is used to make type name available in declaration files unlike decorators that does not show in .d.ts files. */
+export type EditorTypeInfo<TypeName> = TypeInfo<TypeName>;
+/** Formatter type information. This is used to make type name available in declaration files unlike decorators that does not show in .d.ts files. */
+export type FormatterTypeInfo<TypeName> = TypeInfo<TypeName>;
+/** Interface type information. This is used to make type name available in declaration files unlike decorators that does not show in .d.ts files. */
+export type InterfaceTypeInfo<TypeName> = TypeInfo<TypeName>;
 
 export function classTypeInfo<T>(typeName: StringLiteral<T>, interfaces?: any[]): ClassTypeInfo<T> {
     return { typeKind: "class", typeName, interfaces: interfaces }
