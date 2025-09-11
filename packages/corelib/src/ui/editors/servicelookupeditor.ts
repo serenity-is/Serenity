@@ -1,5 +1,4 @@
 ﻿import { ColumnSelection, Criteria, ListRequest, ListResponse, ServiceOptions, resolveServiceUrl, serviceCall } from "../../base";
-import { Decorators } from "../../types/decorators";
 import { ComboboxSearchQuery, ComboboxSearchResult } from "./combobox";
 import { ComboboxEditor, ComboboxEditorOptions } from "./comboboxeditor";
 import { EditorProps } from "./editorwidget";
@@ -20,8 +19,8 @@ export interface ServiceLookupEditorOptions extends ComboboxEditorOptions {
     criteria?: any[];
 }
 
-@Decorators.registerEditor("Serenity.ServiceLookupEditorBase")
 export abstract class ServiceLookupEditorBase<P extends ServiceLookupEditorOptions, TItem> extends ComboboxEditor<P, TItem> {
+    static override typeInfo = this.editorTypeInfo("Serenity.ServiceLookupEditorBase");
 
     protected getDialogTypeKey() {
         var dialogTypeKey = super.getDialogTypeKey();
@@ -185,8 +184,9 @@ export abstract class ServiceLookupEditorBase<P extends ServiceLookupEditorOptio
     }
 }
 
-@Decorators.registerEditor('Serenity.ServiceLookupEditor')
 export class ServiceLookupEditor<P extends ServiceLookupEditorOptions = ServiceLookupEditorOptions, TItem = any> extends ServiceLookupEditorBase<ServiceLookupEditorOptions, TItem> {
+    static override typeInfo = this.editorTypeInfo("Serenity.ServiceLookupEditor");
+
     constructor(props: EditorProps<P>) {
         super(props);
     }

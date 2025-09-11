@@ -1,9 +1,8 @@
-import { Decorators } from "../../types/decorators";
 import { EditorProps } from "./editorwidget";
 import { SelectEditor, SelectEditorOptions } from "./selecteditor";
 
-@Decorators.registerEditor('Serenity.DateYearEditor')
 export class DateYearEditor<P extends DateYearEditorOptions = DateYearEditorOptions> extends SelectEditor<P> {
+    static override typeInfo = this.editorTypeInfo("Serenity.DateYearEditor");
 
     constructor(props: EditorProps<P>) {
         super(props);

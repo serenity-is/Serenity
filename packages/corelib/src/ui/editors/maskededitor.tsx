@@ -1,11 +1,10 @@
 ﻿import { Fluent, getjQuery, notifyError } from "../../base";
 import { IStringValue } from "../../interfaces";
-import { Decorators } from "../../types/decorators";
 import { EditorProps, EditorWidget } from "./editorwidget";
 
 // http://digitalbush.com/projects/masked-input-plugin/
-@Decorators.registerEditor('Serenity.MaskedEditor', [IStringValue])
 export class MaskedEditor<P extends MaskedEditorOptions = MaskedEditorOptions> extends EditorWidget<P> {
+    static override typeInfo = this.editorTypeInfo("Serenity.MaskedEditor", [IStringValue]);
 
     static override createDefaultElement() { return <input type="text" /> as HTMLInputElement; }
     declare readonly domNode: HTMLInputElement;

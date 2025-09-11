@@ -1,5 +1,4 @@
 ﻿import { Fluent, localText } from "../../base";
-import { Decorators } from "../../types/decorators";
 import { Widget, WidgetProps } from "../widgets/widget";
 
 export interface QuickSearchField {
@@ -15,8 +14,9 @@ export interface QuickSearchInputOptions {
     fields?: QuickSearchField[];
 }
 
-@Decorators.registerClass('Serenity.QuickSearchInput')
 export class QuickSearchInput<P extends QuickSearchInputOptions = QuickSearchInputOptions> extends Widget<P> {
+    static override typeInfo = this.classTypeInfo("Serenity.QuickSearchInput");
+    
     static override createDefaultElement() { return <input type="text" /> as HTMLInputElement; }
     declare readonly domNode: HTMLInputElement;
 

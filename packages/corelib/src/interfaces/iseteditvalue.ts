@@ -1,8 +1,7 @@
-﻿import { PropertyItem } from "../base";
-import { Decorators } from "../types/decorators";
+﻿import { interfaceTypeInfo, PropertyItem, registerType } from "../base";
 
-@Decorators.registerInterface("Serenity.ISetEditValue")
 export class ISetEditValue {
+    static typeInfo = interfaceTypeInfo("Serenity.ISetEditValue"); static { registerType(this); }
 }
 
 export interface ISetEditValue {

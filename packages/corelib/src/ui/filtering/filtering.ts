@@ -1,6 +1,5 @@
-import { Config, Criteria, Fluent, formatDate, getInstanceType, getTypeFullName, isAssignableFrom, localText, parseISODateTime, stringFormat, tryGetText, type PropertyItem } from "../../base";
-import { ArgumentNullException, Exception, deepClone, extend, getTypes } from "../../compat";
-import { Decorators } from "../../types/decorators";
+import { ClassTypeInfo, classTypeInfo, Config, Criteria, Fluent, formatDate, getInstanceType, getTypeFullName, interfaceTypeInfo, isAssignableFrom, localText, parseISODateTime, registerType, stringFormat, StringLiteral, tryGetText, typeInfoProperty, type PropertyItem } from "../../base";
+import { ArgumentNullException, deepClone, Exception, extend, getTypes } from "../../compat";
 import { EditorTypeRegistry } from "../../types/editortyperegistry";
 import { QuickFilter } from "../datagrid/quickfilter";
 import { Combobox } from "../editors/combobox";
@@ -30,8 +29,8 @@ export interface IFiltering {
     set_operator(value: FilterOperator): void;
 }
 
-@Decorators.registerInterface('Serenity.IFiltering')
 export class IFiltering {
+    static typeInfo = interfaceTypeInfo("Serenity.IFiltering"); static { registerType(this); }
 }
 
 export interface CriteriaWithText {
@@ -43,11 +42,10 @@ export interface IQuickFiltering {
     initQuickFilter(filter: QuickFilter<Widget<any>, any>): void;
 }
 
-@Decorators.registerInterface('Serenity.IQuickFiltering')
 export class IQuickFiltering {
+    static typeInfo = interfaceTypeInfo("Serenity.IQuickFiltering"); static { registerType(this); }
 }
 
-@Decorators.registerClass('Serenity.BaseFiltering', [IFiltering, IQuickFiltering])
 export abstract class BaseFiltering implements IFiltering, IQuickFiltering {
 
     declare private field: PropertyItem;
@@ -295,14 +293,22 @@ export abstract class BaseFiltering implements IFiltering, IQuickFiltering {
         filter.title = this.getTitle(this.field);
         filter.options = deepClone(this.get_field().quickFilterParams);
     }
+
+    protected static classTypeInfo<T>(typeName: StringLiteral<T>, interfaces?: any[]): ClassTypeInfo<T> {
+        if (Object.prototype.hasOwnProperty.call(this, typeInfoProperty) && this[typeInfoProperty])
+            throw new Error(`Type ${this.name} already has a typeInfo property!`);
+
+        const typeInfo = this.typeInfo = classTypeInfo(typeName, interfaces);
+        registerType(this);
+        return typeInfo;
+    }
+    
+    static typeInfo = this.classTypeInfo("Serenity.BaseFiltering", [IFiltering, IQuickFiltering]);
+    
 }
 
-function Filtering(name: string) {
-    return Decorators.registerClass('Serenity.' + name + 'Filtering')
-}
-
-@Filtering('BaseEditor')
 export abstract class BaseEditorFiltering<TEditor extends Widget<any>> extends BaseFiltering {
+    static override typeInfo = this.classTypeInfo("Serenity.BaseEditorFiltering");
     constructor(public editorTypeRef: any) {
         super();
     }
@@ -399,8 +405,8 @@ export abstract class BaseEditorFiltering<TEditor extends Widget<any>> extends B
     }
 }
 
-@Filtering('Date')
 export class DateFiltering extends BaseEditorFiltering<DateEditor> {
+    static override typeInfo = this.classTypeInfo("Serenity.DateFiltering");
 
     constructor() {
         super(DateEditor)
@@ -411,8 +417,9 @@ export class DateFiltering extends BaseEditorFiltering<DateEditor> {
     }
 }
 
-@Filtering('Boolean')
 export class BooleanFiltering extends BaseFiltering {
+    static override typeInfo = this.classTypeInfo("Serenity.BooleanFiltering");
+
     getOperators() {
         return this.appendNullableOperators([
             { key: FilterOperators.isTrue },
@@ -421,8 +428,8 @@ export class BooleanFiltering extends BaseFiltering {
     }
 }
 
-@Filtering('DateTime')
 export class DateTimeFiltering extends BaseEditorFiltering<DateEditor> {
+    static override typeInfo = this.classTypeInfo("Serenity.DateTimeFiltering");
 
     constructor() {
         super(DateTimeEditor)
@@ -486,8 +493,9 @@ export class DateTimeFiltering extends BaseEditorFiltering<DateEditor> {
     }
 }
 
-@Filtering('Decimal')
 export class DecimalFiltering extends BaseEditorFiltering<DecimalEditor> {
+    static override typeInfo = this.classTypeInfo("Serenity.DecimalFiltering");
+
     constructor() {
         super(DecimalEditor);
     }
@@ -498,8 +506,8 @@ export class DecimalFiltering extends BaseEditorFiltering<DecimalEditor> {
     }
 }
 
-@Filtering('Editor')
 export class EditorFiltering extends BaseEditorFiltering<Widget<any>> {
+    static override typeInfo = this.classTypeInfo("Serenity.EditorFiltering");
 
     constructor(public readonly props: { editorType?: string, useRelative?: boolean, useLike?: boolean } = {}) {
         super(Widget);
@@ -585,8 +593,9 @@ export class EditorFiltering extends BaseEditorFiltering<Widget<any>> {
     }
 }
 
-@Filtering('Enum')
 export class EnumFiltering extends BaseEditorFiltering<EnumEditor> {
+    static override typeInfo = this.classTypeInfo("Serenity.EnumFiltering");
+
     constructor() {
         super(EnumEditor);
     }
@@ -605,8 +614,9 @@ export class EnumFiltering extends BaseEditorFiltering<EnumEditor> {
     }
 }
 
-@Filtering('Integer')
 export class IntegerFiltering extends BaseEditorFiltering<IntegerEditor> {
+    static override typeInfo = this.classTypeInfo("Serenity.IntegerFiltering");
+
     constructor() {
         super(IntegerEditor);
     }
@@ -616,8 +626,8 @@ export class IntegerFiltering extends BaseEditorFiltering<IntegerEditor> {
     }
 }
 
-@Filtering('Lookup')
 export class LookupFiltering extends BaseEditorFiltering<LookupEditor> {
+    static override typeInfo = this.classTypeInfo("Serenity.LookupFiltering");
 
     constructor() {
         super(LookupEditor);
@@ -646,8 +656,8 @@ export class LookupFiltering extends BaseEditorFiltering<LookupEditor> {
     }
 }
 
-@Filtering('ServiceLookup')
 export class ServiceLookupFiltering extends BaseEditorFiltering<ServiceLookupEditor> {
+    static override typeInfo = this.classTypeInfo("Serenity.ServiceLookupFiltering");
 
     constructor() {
         super(ServiceLookupEditor);
@@ -676,8 +686,8 @@ export class ServiceLookupFiltering extends BaseEditorFiltering<ServiceLookupEdi
     }
 }
 
-@Filtering('String')
 export class StringFiltering extends BaseFiltering {
+    static override typeInfo = this.classTypeInfo("Serenity.StringFiltering");
 
     getOperators(): FilterOperator[] {
         var ops = [

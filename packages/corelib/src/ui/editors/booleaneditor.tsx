@@ -1,9 +1,8 @@
 ﻿import { IBooleanValue } from "../../interfaces";
-import { Decorators } from "../../types/decorators";
 import { EditorWidget } from "./editorwidget";
 
-@Decorators.registerEditor('Serenity.BooleanEditor', [IBooleanValue])
 export class BooleanEditor<P = {}> extends EditorWidget<P> {
+    static override typeInfo = this.editorTypeInfo("Serenity.BooleanEditor", [IBooleanValue]);
 
     static override createDefaultElement() { return <input type="checkbox" /> as HTMLInputElement; }
 

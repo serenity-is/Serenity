@@ -1,10 +1,10 @@
-﻿import { Decorators } from "../../types/decorators";
-import { ComboboxItem } from "./combobox";
+﻿import { ComboboxItem } from "./combobox";
 import { ComboboxCommonOptions, ComboboxEditor } from "./comboboxeditor";
 import { EditorProps } from "./editorwidget";
 
-@Decorators.registerClass('Serenity.SelectEditor')
 export class SelectEditor<P extends SelectEditorOptions = SelectEditorOptions> extends ComboboxEditor<P, ComboboxItem> {
+    static override typeInfo = this.editorTypeInfo("Serenity.SelectEditor");
+
     constructor(props: EditorProps<P>) {
         super(props);
 

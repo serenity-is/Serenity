@@ -1,6 +1,5 @@
 import { Enum, getCustomAttribute, isPromiseLike, tryGetText } from "../../base";
 import { EnumKeyAttribute } from "../../types/attributes";
-import { Decorators } from "../../types/decorators";
 import { EnumTypeRegistry } from "../../types/enumtyperegistry";
 import { ComboboxItem } from "./combobox";
 import { ComboboxCommonOptions, ComboboxEditor } from "./comboboxeditor";
@@ -11,8 +10,9 @@ export interface EnumEditorOptions extends ComboboxCommonOptions {
     enumType?: any;
 }
 
-@Decorators.registerEditor('Serenity.EnumEditor')
 export class EnumEditor<P extends EnumEditorOptions = EnumEditorOptions> extends ComboboxEditor<P, ComboboxItem> {
+    static override typeInfo = this.editorTypeInfo("Serenity.EnumEditor");
+
     constructor(props: EditorProps<P>) {
         super(props);
 

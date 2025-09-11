@@ -1,12 +1,11 @@
 ﻿import { Fluent, Validator } from "../../base";
 import { ValidationHelper } from "../../compat";
 import { IStringValue } from "../../interfaces";
-import { Decorators } from "../../types/decorators";
 import { EditorProps } from "./editorwidget";
 import { StringEditor } from "./stringeditor";
 
-@Decorators.registerEditor('Serenity.URLEditor', [IStringValue])
 export class URLEditor<P = {}> extends StringEditor<P> {
+    static override typeInfo = this.editorTypeInfo("Serenity.URLEditor", [IStringValue]);
 
     constructor(props: EditorProps<P>) {
         super(props);

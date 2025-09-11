@@ -484,15 +484,15 @@ export function interfaceTypeInfo<T>(typeName: StringLiteral<T>, interfaces?: an
 
 export function registerType(type: { [typeInfoProperty]: TypeInfo<any>, name: string }) {
     if (!type)
-        throw "Decorators.register is called with null target!";
+        throw "registerType is called with null target!";
 
     // peekTypeInfo should auto handle registration
     let typeInfo: TypeInfo<any> = peekTypeInfo(type);
     if (!typeInfo)
-        throw `Decorators.register is called on type "${type.name}" that does not have a static typeInfo property!`;
+        throw `registerType is called on type "${type.name}" that does not have a static typeInfo property!`;
 
     if (!typeInfo.typeName)
-        throw `Decorators.register is called on type "${type.name}", but it's typeInfo property does not have a typeName!`;
+        throw `registerType is called on type "${type.name}", but it's typeInfo property does not have a typeName!`;
 }
 
 export interface TransformInclude { }

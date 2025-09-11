@@ -1,7 +1,6 @@
 import { formatNumber, parseInteger } from "../../base";
 import { isTrimmedEmpty } from "../../compat";
 import { IDoubleValue } from "../../interfaces";
-import { Decorators } from "../../types/decorators";
 import { AutoNumeric } from "./autonumeric";
 import { DecimalEditor } from "./decimaleditor";
 import { EditorProps, EditorWidget } from "./editorwidget";
@@ -12,8 +11,8 @@ export interface IntegerEditorOptions {
     allowNegatives?: boolean;
 }
 
-@Decorators.registerEditor('Serenity.IntegerEditor', [IDoubleValue])
 export class IntegerEditor<P extends IntegerEditorOptions = IntegerEditorOptions> extends EditorWidget<P> implements IDoubleValue {
+    static override typeInfo = this.editorTypeInfo("Serenity.IntegerEditor", [IDoubleValue]);
 
     static override createDefaultElement() { return <input type="text" /> as HTMLInputElement; }
     declare readonly domNode: HTMLInputElement;

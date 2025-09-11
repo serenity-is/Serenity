@@ -1,7 +1,6 @@
 import { Fluent, setElementReadOnly, toId } from "../../base";
 import { addOption, zeroPad } from "../../compat";
 import { IDoubleValue, IReadOnly, IStringValue } from "../../interfaces";
-import { Decorators } from "../../types/decorators";
 import { EditorProps, EditorWidget } from "./editorwidget";
 
 export interface TimeEditorBaseOptions {
@@ -12,6 +11,7 @@ export interface TimeEditorBaseOptions {
 }
 
 export class TimeEditorBase<P extends TimeEditorBaseOptions> extends EditorWidget<P> {
+    static override typeInfo = this.editorTypeInfo("Serenity.TimeEditorBase");
 
     static override createDefaultElement(): HTMLElement { return document.createElement("select"); }
     declare readonly domNode: HTMLSelectElement;
@@ -100,9 +100,9 @@ export interface TimeEditorOptions extends TimeEditorBaseOptions {
  * 16:30, value will be 990. If you want to use a TimeSpan field
  * use TimeSpanEditor instead.
  */
-@Decorators.registerEditor('Serenity.TimeEditor', [IDoubleValue, IReadOnly])
 export class TimeEditor<P extends TimeEditorOptions = TimeEditorOptions> extends TimeEditorBase<P> {
-    
+    static override typeInfo = this.editorTypeInfo("Serenity.TimeEditor", [IDoubleValue, IReadOnly]);
+
     constructor(props: EditorProps<P>) {
         super(props);
         this.domNode.classList.add("s-TimeEditor");
@@ -152,8 +152,9 @@ export interface TimeSpanEditorOptions extends TimeEditorBaseOptions {
 /**
  * This editor is for TimeSpan fields. It uses a string value in the format "HH:mm".
  */
-@Decorators.registerEditor('Serenity.TimeSpanEditor', [IStringValue, IReadOnly])
 export class TimeSpanEditor<P extends TimeSpanEditorOptions = TimeSpanEditorOptions> extends TimeEditorBase<P> {
+
+    static override typeInfo = this.editorTypeInfo("Serenity.TimeSpanEditor", [IStringValue, IReadOnly]);
 
     constructor(props: EditorProps<P>) {
         super(props);

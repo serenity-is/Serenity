@@ -1,7 +1,6 @@
 import { Fluent, PropertyItem, getjQuery, localText } from "../../base";
 import { ValidationHelper, extend, isTrimmedEmpty, replaceAll } from "../../compat";
 import { IGetEditValue, IReadOnly, ISetEditValue, IValidateRequired } from "../../interfaces";
-import { Decorators } from "../../types/decorators";
 import { FileUploadConstraints, UploadHelper, UploadInputOptions, UploadedFile } from "../helpers/uploadhelper";
 import { ToolButton, Toolbar } from "../widgets/toolbar";
 import { EditorProps, EditorWidget } from "./editorwidget";
@@ -16,9 +15,9 @@ export interface FileUploadEditorOptions extends FileUploadConstraints {
 export interface ImageUploadEditorOptions extends FileUploadEditorOptions {
 }
 
-@Decorators.registerEditor('Serenity.FileUploadEditor', [IReadOnly, IGetEditValue, ISetEditValue, IValidateRequired])
 export class FileUploadEditor<P extends FileUploadEditorOptions = FileUploadEditorOptions> extends EditorWidget<P>
     implements IReadOnly, IGetEditValue, ISetEditValue, IValidateRequired {
+    static override typeInfo = this.editorTypeInfo("Serenity.FileUploadEditor", [IReadOnly, IGetEditValue, ISetEditValue, IValidateRequired]);
 
     constructor(props: EditorProps<P>) {
         super(props);
@@ -256,8 +255,9 @@ export class FileUploadEditor<P extends FileUploadEditorOptions = FileUploadEdit
     declare protected hiddenInput: HTMLInputElement;
 }
 
-@Decorators.registerEditor('Serenity.ImageUploadEditor')
 export class ImageUploadEditor<P extends ImageUploadEditorOptions = ImageUploadEditorOptions> extends FileUploadEditor<P> {
+    static override typeInfo = this.editorTypeInfo("Serenity.ImageUploadEditor");
+
     constructor(props: EditorProps<P>) {
         super(props);
 
@@ -272,9 +272,9 @@ export interface MultipleFileUploadEditorOptions extends FileUploadEditorOptions
     jsonEncodeValue?: boolean;
 }
 
-@Decorators.registerEditor('Serenity.MultipleFileUploadEditor', [IReadOnly, IGetEditValue, ISetEditValue, IValidateRequired])
 export class MultipleFileUploadEditor<P extends MultipleFileUploadEditorOptions = MultipleFileUploadEditorOptions> extends EditorWidget<P>
     implements IReadOnly, IGetEditValue, ISetEditValue, IValidateRequired {
+    static override typeInfo = this.editorTypeInfo("Serenity.MultipleFileUploadEditor", [IReadOnly, IGetEditValue, ISetEditValue, IValidateRequired]);
 
     declare private entities: UploadedFile[];
     declare private toolbar: Toolbar;
@@ -460,8 +460,9 @@ export class MultipleFileUploadEditor<P extends MultipleFileUploadEditorOptions 
     public set jsonEncodeValue(value) { this.options.jsonEncodeValue = value }
 }
 
-@Decorators.registerEditor('Serenity.MultipleImageUploadEditor')
 export class MultipleImageUploadEditor<P extends ImageUploadEditorOptions = ImageUploadEditorOptions> extends MultipleFileUploadEditor<P> {
+    static override typeInfo = this.classTypeInfo("Serenity.MultipleImageUploadEditor");
+    
     constructor(props: EditorProps<P>) {
         super(props);
         this.domNode.classList.add("s-MultipleImageUploadEditor'")

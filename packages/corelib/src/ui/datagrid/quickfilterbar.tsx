@@ -1,6 +1,5 @@
 ﻿import { Criteria, Fluent, ListRequest, formatDate, localText, notifyWarning, parseDate, toId, tryGetText } from "../../base";
 import { ArgumentNullException } from "../../compat";
-import { Decorators } from "../../types/decorators";
 import { DateEditor } from "../editors/dateeditor";
 import { DateTimeEditor, DateTimeEditorOptions } from "../editors/datetimeeditor";
 import { EditorUtils } from "../editors/editorutils";
@@ -16,8 +15,9 @@ export interface QuickFilterBarOptions {
     idPrefix?: string;
 }
 
-@Decorators.registerClass('Serenity.QuickFilterBar')
 export class QuickFilterBar<P extends QuickFilterBarOptions = QuickFilterBarOptions> extends Widget<P> {
+
+    static override typeInfo = this.classTypeInfo("Serenity.QuickFilterBar");
 
     constructor(props: WidgetProps<P>) {
         super(props);

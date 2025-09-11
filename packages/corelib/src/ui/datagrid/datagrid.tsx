@@ -4,7 +4,6 @@ import { LayoutTimer, ScriptData, getColumnsData, getColumnsDataAsync, setEquali
 import { IReadOnly } from "../../interfaces";
 import { Format, PagerOptions, RemoteView, RemoteViewOptions } from "../../slick";
 import { ColumnsKeyAttribute, FilterableAttribute, IdPropertyAttribute, IsActivePropertyAttribute, LocalTextPrefixAttribute } from "../../types/attributes";
-import { Decorators } from "../../types/decorators";
 import { DateEditor } from "../editors/dateeditor";
 import { SelectEditor } from "../editors/selecteditor";
 import { FilterDisplayBar } from "../filtering/filterdisplaybar";
@@ -27,11 +26,12 @@ import { QuickFilterBar } from "./quickfilterbar";
 import { QuickSearchField } from "./quicksearchinput";
 import { SlickPager } from "./slickpager";
 
-export type { GridPersistanceFlags, PersistedGridColumn, PersistedGridSettings, SettingStorage } from "./datagrid-persistance";
 export { omitAllGridPersistenceFlags } from "./datagrid-persistance";
+export type { GridPersistanceFlags, PersistedGridColumn, PersistedGridSettings, SettingStorage } from "./datagrid-persistance";
 
-@Decorators.registerClass('Serenity.DataGrid', [IReadOnly])
 export class DataGrid<TItem, P = {}> extends Widget<P> implements IDataGrid, IReadOnly {
+
+    static override typeInfo = this.classTypeInfo("Serenity.DataGrid", [IReadOnly]);
 
     declare private _isDisabled: boolean;
     declare private _layoutTimer: number;

@@ -1,9 +1,9 @@
-﻿import { Decorators } from "../../types/decorators";
-import { Widget, WidgetProps } from "../widgets/widget";
+﻿import { Widget, WidgetProps } from "../widgets/widget";
 import { FilterStore } from "./filterstore";
 
-@Decorators.registerClass('Serenity.FilterWidgetBase')
 export class FilterWidgetBase<P = {}> extends Widget<P> {
+    static override typeInfo = this.classTypeInfo("Serenity.FilterWidgetBase");
+
     declare private store: FilterStore;
 
     declare private onFilterStoreChanged: () => void;

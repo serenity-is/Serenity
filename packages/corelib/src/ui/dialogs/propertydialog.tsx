@@ -1,14 +1,14 @@
-﻿import { PropertyItem, PropertyItemsData, cancelDialogButton, getInstanceType, getTypeFullName, okDialogButton } from "../../base";
+﻿import { PropertyItem, PropertyItemsData, addCustomAttribute, cancelDialogButton, getInstanceType, getTypeFullName, okDialogButton } from "../../base";
 import { ScriptData, getFormData, getFormDataAsync } from "../../compat";
-import { FormKeyAttribute, StaticPanelAttribute } from "../../types/attributes";
-import { Decorators } from "../../types/decorators";
+import { FormKeyAttribute, PanelAttribute, StaticPanelAttribute } from "../../types/attributes";
 import { PropertyGrid, PropertyGridOptions } from "../widgets/propertygrid";
 import { WidgetProps } from "../widgets/widget";
 import { BaseDialog } from "./basedialog";
 
-@Decorators.registerClass('Serenity.PropertyDialog')
-@Decorators.panel(false)
 export class PropertyDialog<TItem, P> extends BaseDialog<P> {
+    static override typeInfo = this.classTypeInfo("Serenity.PropertyDialog");
+    static { addCustomAttribute(this, new PanelAttribute(false)) }
+
     declare private _entity: TItem;
     declare private _entityId: any;
 

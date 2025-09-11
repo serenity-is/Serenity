@@ -1,4 +1,4 @@
-import { Decorators } from "./decorators";
+import { registerEnum } from "../base";
 import { EnumTypeRegistry } from "./enumtyperegistry";
 
 describe("EnumTypeRegistry", () => {
@@ -8,7 +8,7 @@ describe("EnumTypeRegistry", () => {
             NotShipped = 0,
             Shipped = 1
         }
-        Decorators.registerEnumType(OrderShippingState, 'Serenity.Demo.Northwind.OrderShippingState', 'Northwind.OrderShippingState');
+        registerEnum(OrderShippingState, 'Serenity.Demo.Northwind.OrderShippingState', 'Northwind.OrderShippingState');
 
         var type = EnumTypeRegistry.tryGet("Northwind.OrderShippingState");
         expect(type).toBeTruthy();

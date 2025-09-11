@@ -1,15 +1,15 @@
 ﻿import { Column } from "@serenity-is/sleekgrid";
-import { Authorization, Culture, Dialog, DialogButton, Fluent, cancelDialogButton, faIcon, localText, okDialogButton } from "../../base";
+import { Authorization, Culture, Dialog, DialogButton, Fluent, addCustomAttribute, cancelDialogButton, faIcon, localText, okDialogButton } from "../../base";
 import { Router } from "../../compat";
-import { Decorators } from "../../types/decorators";
+import { ResizableAttribute } from "../../types";
 import { BaseDialog } from "../dialogs/basedialog";
 import { ToolButton } from "../widgets/toolbar";
 import { IDataGrid } from "./idatagrid";
 
-@Decorators.registerClass('Serenity.ColumnPickerDialog')
-@Decorators.resizable()
-@Decorators.responsive()
 export class ColumnPickerDialog<P = {}> extends BaseDialog<P> {
+
+    static override typeInfo = this.classTypeInfo("Serenity.ColumnPickerDialog");
+    static { addCustomAttribute(this, new ResizableAttribute())}
 
     declare private ulVisible: HTMLUListElement;
     declare private ulHidden: HTMLUListElement;

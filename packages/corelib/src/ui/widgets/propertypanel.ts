@@ -1,13 +1,12 @@
 ﻿import { PropertyItem, getInstanceType, getTypeFullName } from "../../base";
 import { getForm } from "../../compat";
 import { FormKeyAttribute } from "../../types/attributes";
-import { Decorators } from "../../types/decorators";
 import { BasePanel } from "./basepanel";
 import { PropertyGrid, PropertyGridMode, PropertyGridOptions } from "./propertygrid";
 import { WidgetProps } from "./widget";
 
-@Decorators.registerClass('Serenity.PropertyPanel')
 export class PropertyPanel<TItem, P> extends BasePanel<P> {
+    static override typeInfo = this.classTypeInfo("Serenity.PropertyPanel");
 
     declare private _entity: TItem;
     declare private _entityId: any;

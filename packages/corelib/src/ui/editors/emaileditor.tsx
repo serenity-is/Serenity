@@ -1,7 +1,6 @@
 ﻿import { Fluent, ValidatableElement, Validator, setElementReadOnly, tryGetText } from "../../base";
 import { ValidationHelper } from "../../compat";
 import { IReadOnly, IStringValue } from "../../interfaces";
-import { Decorators } from "../../types/decorators";
 import { EditorProps, EditorWidget } from "./editorwidget";
 
 export interface EmailEditorOptions {
@@ -9,8 +8,8 @@ export interface EmailEditorOptions {
     readOnlyDomain?: boolean;
 }
 
-@Decorators.registerEditor('Serenity.EmailEditor', [IStringValue, IReadOnly])
 export class EmailEditor<P extends EmailEditorOptions = EmailEditorOptions> extends EditorWidget<P> {
+    static override typeInfo = this.editorTypeInfo("Serenity.EmailEditor", [IStringValue, IReadOnly]);
 
     static override createDefaultElement() { return <input type="text" /> as HTMLInputElement; }
     declare readonly domNode: HTMLInputElement;

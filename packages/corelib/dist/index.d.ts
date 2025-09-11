@@ -3296,28 +3296,33 @@ export declare class RemoteView<TEntity> {
 	constructor(options: RemoteViewOptions);
 }
 export declare class IBooleanValue {
+	static typeInfo: InterfaceTypeInfo<"Serenity.IBooleanValue">;
 }
 export interface IBooleanValue {
 	get_value(): boolean;
 	set_value(value: boolean): void;
 }
 export declare class IDialog {
+	static typeInfo: InterfaceTypeInfo<"Serenity.IDialog">;
 }
 export interface IDialog {
 	dialogOpen(asPanel?: boolean): void;
 }
 export declare class IDoubleValue {
+	static typeInfo: InterfaceTypeInfo<"Serenity.IDoubleValue">;
 }
 export interface IDoubleValue {
 	get_value(): any;
 	set_value(value: any): void;
 }
 export declare class IEditDialog {
+	static typeInfo: InterfaceTypeInfo<"Serenity.IEditDialog">;
 }
 export interface IEditDialog {
 	load(entityOrId: any, done: () => void, fail?: (p1: any) => void): void;
 }
 export declare class IGetEditValue {
+	static typeInfo: InterfaceTypeInfo<"Serenity.IGetEditValue">;
 }
 export interface IGetEditValue {
 	getEditValue(property: PropertyItem, target: any): void;
@@ -3327,13 +3332,16 @@ export interface IReadOnly {
 	set_readOnly(value: boolean): void;
 }
 export declare class IReadOnly {
+	static typeInfo: InterfaceTypeInfo<"Serenity.IReadOnly">;
 }
 export declare class ISetEditValue {
+	static typeInfo: InterfaceTypeInfo<"Serenity.ISetEditValue">;
 }
 export interface ISetEditValue {
 	setEditValue(source: any, property: PropertyItem): void;
 }
 export declare class IStringValue {
+	static typeInfo: InterfaceTypeInfo<"Serenity.IStringValue">;
 }
 export interface IStringValue {
 	get_value(): string;
@@ -3344,6 +3352,7 @@ export interface IValidateRequired {
 	set_required(value: boolean): void;
 }
 export declare class IValidateRequired {
+	static typeInfo: InterfaceTypeInfo<"Serenity.IValidateRequired">;
 }
 export declare class EnumKeyAttribute {
 	value: string;
@@ -3631,6 +3640,7 @@ export interface ToolbarOptions {
 	hotkeyContext?: any;
 }
 export declare class Toolbar<P extends ToolbarOptions = ToolbarOptions> extends Widget<P> {
+	static typeInfo: ClassTypeInfo<"Serenity.Toolbar">;
 	protected renderContents(): any;
 	destroy(): void;
 	protected mouseTrap: any;
@@ -3639,6 +3649,7 @@ export declare class Toolbar<P extends ToolbarOptions = ToolbarOptions> extends 
 	updateInterface(): void;
 }
 export declare class BaseDialog<P> extends Widget<P> {
+	static typeInfo: ClassTypeInfo<"Serenity.BaseDialog">;
 	static createDefaultElement(): HTMLDivElement;
 	protected tabs: Fluent<HTMLElement>;
 	protected toolbar: Toolbar;
@@ -3682,6 +3693,7 @@ export declare class BaseDialog<P> extends Widget<P> {
 /** @deprecated use BaseDialog */
 export declare const TemplatedDialog: typeof BaseDialog;
 export declare class BasePanel<P = {}> extends Widget<P> {
+	static typeInfo: ClassTypeInfo<"Serenity.BasePanel">;
 	constructor(props: WidgetProps<P>);
 	destroy(): void;
 	protected tabs: Fluent;
@@ -3718,6 +3730,7 @@ export declare class CascadedWidgetLink<TParent extends Widget<any>> {
 	private parentType;
 	private widget;
 	private parentChange;
+	static typeInfo: ClassTypeInfo<"Serenity.CascadedWidgetLink">;
 	constructor(parentType: {
 		new (...args: any[]): TParent;
 	}, widget: Widget<any>, parentChange: (p1: TParent) => void);
@@ -3805,6 +3818,7 @@ export declare function PropertyTabs(props: {
 	paneIdPrefix?: string;
 }): DocumentFragment | null;
 export declare class PropertyGrid<P extends PropertyGridOptions = PropertyGridOptions> extends Widget<P> {
+	static typeInfo: ClassTypeInfo<"Serenity.PropertyGrid">;
 	private fieldElements;
 	protected renderContents(): any;
 	destroy(): void;
@@ -3838,6 +3852,7 @@ export interface PropertyGridOptions {
 	mode?: PropertyGridMode;
 }
 export declare class PropertyPanel<TItem, P> extends BasePanel<P> {
+	static typeInfo: ClassTypeInfo<"Serenity.PropertyPanel">;
 	private _entity;
 	private _entityId;
 	constructor(props: WidgetProps<P>);
@@ -3870,6 +3885,7 @@ export declare namespace DialogExtensions {
 	function dialogMaximizable(dialog: HTMLElement | ArrayLike<HTMLElement>): void;
 }
 export declare class PropertyDialog<TItem, P> extends BaseDialog<P> {
+	static typeInfo: ClassTypeInfo<"Serenity.PropertyDialog">;
 	private _entity;
 	private _entityId;
 	protected propertyItemsData: PropertyItemsData;
@@ -3942,6 +3958,7 @@ export interface TextAreaEditorOptions {
 	rows?: number;
 }
 export declare class TextAreaEditor<P extends TextAreaEditorOptions = TextAreaEditorOptions> extends EditorWidget<P> {
+	static typeInfo: EditorTypeInfo<"Serenity.TextAreaEditor">;
 	static createDefaultElement(): HTMLTextAreaElement;
 	constructor(props: EditorProps<P>);
 	get value(): string;
@@ -3950,6 +3967,7 @@ export declare class TextAreaEditor<P extends TextAreaEditorOptions = TextAreaEd
 	protected set_value(value: string): void;
 }
 export declare class BooleanEditor<P = {}> extends EditorWidget<P> {
+	static typeInfo: EditorTypeInfo<"Serenity.BooleanEditor">;
 	static createDefaultElement(): HTMLInputElement;
 	readonly domNode: HTMLInputElement;
 	get value(): boolean;
@@ -4011,6 +4029,7 @@ export interface DecimalEditorOptions {
 	allowNegatives?: boolean;
 }
 export declare class DecimalEditor<P extends DecimalEditorOptions = DecimalEditorOptions> extends EditorWidget<P> implements IDoubleValue {
+	static typeInfo: EditorTypeInfo<"Serenity.DecimalEditor">;
 	static createDefaultElement(): HTMLInputElement;
 	readonly domNode: HTMLInputElement;
 	constructor(props: EditorProps<P>);
@@ -4030,6 +4049,7 @@ export interface IntegerEditorOptions {
 	allowNegatives?: boolean;
 }
 export declare class IntegerEditor<P extends IntegerEditorOptions = IntegerEditorOptions> extends EditorWidget<P> implements IDoubleValue {
+	static typeInfo: EditorTypeInfo<"Serenity.IntegerEditor">;
 	static createDefaultElement(): HTMLInputElement;
 	readonly domNode: HTMLInputElement;
 	constructor(props: EditorProps<P>);
@@ -4049,6 +4069,7 @@ export interface DateEditorOptions {
 	sqlMinMax?: boolean;
 }
 export declare class DateEditor<P extends DateEditorOptions = DateEditorOptions> extends EditorWidget<P> implements IStringValue, IReadOnly {
+	static typeInfo: EditorTypeInfo<"Serenity.DateEditor">;
 	static createDefaultElement(): HTMLInputElement;
 	readonly domNode: HTMLInputElement;
 	constructor(props: EditorProps<P>);
@@ -4082,6 +4103,7 @@ export declare class DateEditor<P extends DateEditorOptions = DateEditorOptions>
 	static uiPickerZIndexWorkaround(el: HTMLElement | ArrayLike<HTMLElement>): void;
 }
 export declare class DateTimeEditor<P extends DateTimeEditorOptions = DateTimeEditorOptions> extends EditorWidget<P> implements IStringValue, IReadOnly {
+	static typeInfo: EditorTypeInfo<"Serenity.DateTimeEditor">;
 	static createDefaultElement(): HTMLInputElement;
 	readonly domNode: HTMLInputElement;
 	private time;
@@ -4135,6 +4157,7 @@ export interface TimeEditorBaseOptions {
 	intervalMinutes?: any;
 }
 export declare class TimeEditorBase<P extends TimeEditorBaseOptions> extends EditorWidget<P> {
+	static typeInfo: EditorTypeInfo<"Serenity.TimeEditorBase">;
 	static createDefaultElement(): HTMLElement;
 	readonly domNode: HTMLSelectElement;
 	protected minutes: Fluent;
@@ -4157,6 +4180,7 @@ export interface TimeEditorOptions extends TimeEditorBaseOptions {
  * use TimeSpanEditor instead.
  */
 export declare class TimeEditor<P extends TimeEditorOptions = TimeEditorOptions> extends TimeEditorBase<P> {
+	static typeInfo: EditorTypeInfo<"Serenity.TimeEditor">;
 	constructor(props: EditorProps<P>);
 	get value(): number;
 	protected get_value(): number;
@@ -4169,6 +4193,7 @@ export interface TimeSpanEditorOptions extends TimeEditorBaseOptions {
  * This editor is for TimeSpan fields. It uses a string value in the format "HH:mm".
  */
 export declare class TimeSpanEditor<P extends TimeSpanEditorOptions = TimeSpanEditorOptions> extends TimeEditorBase<P> {
+	static typeInfo: EditorTypeInfo<"Serenity.TimeSpanEditor">;
 	constructor(props: EditorProps<P>);
 	protected get_value(): string;
 	protected set_value(value: string): void;
@@ -4180,6 +4205,7 @@ export interface EmailEditorOptions {
 	readOnlyDomain?: boolean;
 }
 export declare class EmailEditor<P extends EmailEditorOptions = EmailEditorOptions> extends EditorWidget<P> {
+	static typeInfo: EditorTypeInfo<"Serenity.EmailEditor">;
 	static createDefaultElement(): HTMLInputElement;
 	readonly domNode: HTMLInputElement;
 	private readonly domain;
@@ -4193,10 +4219,12 @@ export declare class EmailEditor<P extends EmailEditorOptions = EmailEditorOptio
 	set_readOnly(value: boolean): void;
 }
 export declare class EmailAddressEditor<P = {}> extends StringEditor<P> {
+	static typeInfo: EditorTypeInfo<"Serenity.EmailAddressEditor">;
 	static createDefaultElement(): HTMLInputElement;
 	constructor(props: EditorProps<P>);
 }
 export declare class URLEditor<P = {}> extends StringEditor<P> {
+	static typeInfo: EditorTypeInfo<"Serenity.URLEditor">;
 	constructor(props: EditorProps<P>);
 }
 export interface RadioButtonEditorOptions {
@@ -4205,6 +4233,7 @@ export interface RadioButtonEditorOptions {
 	lookupKey?: string;
 }
 export declare class RadioButtonEditor<P extends RadioButtonEditorOptions = RadioButtonEditorOptions> extends EditorWidget<P> implements IReadOnly {
+	static typeInfo: EditorTypeInfo<"Serenity.RadioButtonEditor">;
 	constructor(props: EditorProps<P>);
 	protected addRadio(value: string, text: string): void;
 	get_value(): string;
@@ -4298,6 +4327,7 @@ export interface ComboboxInplaceAddOptions {
 export interface ComboboxEditorOptions extends ComboboxFilterOptions, ComboboxInplaceAddOptions, ComboboxCommonOptions {
 }
 export declare class ComboboxEditor<P, TItem> extends EditorWidget<P> implements ISetEditValue, IGetEditValue, IStringValue, IReadOnly {
+	static typeInfo: ClassTypeInfo<"Serenity.ComboboxEditor">;
 	static createDefaultElement(): HTMLInputElement;
 	readonly domNode: HTMLInputElement;
 	private combobox;
@@ -4402,6 +4432,7 @@ export declare class ComboboxEditor<P, TItem> extends EditorWidget<P> implements
 	openDialogAsPanel: boolean;
 }
 export declare class SelectEditor<P extends SelectEditorOptions = SelectEditorOptions> extends ComboboxEditor<P, ComboboxItem> {
+	static typeInfo: EditorTypeInfo<"Serenity.SelectEditor">;
 	constructor(props: EditorProps<P>);
 	getItems(): any[];
 	protected emptyItemText(): string;
@@ -4532,6 +4563,7 @@ export declare class Select2 {
 	static stripDiacritics(str: string): string;
 }
 export declare class DateYearEditor<P extends DateYearEditorOptions = DateYearEditorOptions> extends SelectEditor<P> {
+	static typeInfo: EditorTypeInfo<"Serenity.DateYearEditor">;
 	constructor(props: EditorProps<P>);
 	getItems(): any[];
 }
@@ -4545,6 +4577,7 @@ export interface EnumEditorOptions extends ComboboxCommonOptions {
 	enumType?: any;
 }
 export declare class EnumEditor<P extends EnumEditorOptions = EnumEditorOptions> extends ComboboxEditor<P, ComboboxItem> {
+	static typeInfo: EditorTypeInfo<"Serenity.EnumEditor">;
 	constructor(props: EditorProps<P>);
 	protected updateItems(): void | PromiseLike<void>;
 	protected allowClear(): boolean;
@@ -4554,6 +4587,7 @@ export interface LookupEditorOptions extends ComboboxEditorOptions {
 	async?: boolean;
 }
 export declare abstract class LookupEditorBase<P extends LookupEditorOptions, TItem> extends ComboboxEditor<P, TItem> {
+	static typeInfo: EditorTypeInfo<"Serenity.LookupEditorBase">;
 	private lookupChangeUnbind;
 	constructor(props: EditorProps<P>);
 	hasAsyncSource(): boolean;
@@ -4574,6 +4608,7 @@ export declare abstract class LookupEditorBase<P extends LookupEditorOptions, TI
 	protected editDialogDataChange(): void;
 }
 export declare class LookupEditor<P extends LookupEditorOptions = LookupEditorOptions> extends LookupEditorBase<P, {}> {
+	static typeInfo: EditorTypeInfo<"Serenity.LookupEditor">;
 	constructor(props: EditorProps<P>);
 }
 export interface ServiceLookupEditorOptions extends ComboboxEditorOptions {
@@ -4592,6 +4627,7 @@ export interface ServiceLookupEditorOptions extends ComboboxEditorOptions {
 	criteria?: any[];
 }
 export declare abstract class ServiceLookupEditorBase<P extends ServiceLookupEditorOptions, TItem> extends ComboboxEditor<P, TItem> {
+	static typeInfo: EditorTypeInfo<"Serenity.ServiceLookupEditorBase">;
 	protected getDialogTypeKey(): string;
 	protected getService(): string;
 	protected getServiceUrl(): string;
@@ -4608,6 +4644,7 @@ export declare abstract class ServiceLookupEditorBase<P extends ServiceLookupEdi
 	protected asyncSearch(query: ComboboxSearchQuery): Promise<ComboboxSearchResult<TItem>>;
 }
 export declare class ServiceLookupEditor<P extends ServiceLookupEditorOptions = ServiceLookupEditorOptions, TItem = any> extends ServiceLookupEditorBase<ServiceLookupEditorOptions, TItem> {
+	static typeInfo: EditorTypeInfo<"Serenity.ServiceLookupEditor">;
 	constructor(props: EditorProps<P>);
 }
 export interface HtmlContentEditorOptions {
@@ -4617,6 +4654,7 @@ export interface HtmlContentEditorOptions {
 export interface CKEditorConfig {
 }
 export declare class HtmlContentEditor<P extends HtmlContentEditorOptions = HtmlContentEditorOptions> extends EditorWidget<P> implements IStringValue, IReadOnly {
+	static typeInfo: EditorTypeInfo<"Serenity.HtmlContentEditor">;
 	private _instanceReady;
 	readonly domNode: HTMLTextAreaElement;
 	static createDefaultElement(): HTMLTextAreaElement;
@@ -4638,12 +4676,15 @@ export declare class HtmlContentEditor<P extends HtmlContentEditorOptions = Html
 	static includeCKEditor(then: () => void): void;
 }
 export declare class HtmlNoteContentEditor<P extends HtmlContentEditorOptions = HtmlContentEditorOptions> extends HtmlContentEditor<P> {
+	static typeInfo: EditorTypeInfo<"Serenity.HtmlNoteContentEditor">;
 	protected getConfig(): CKEditorConfig;
 }
 export declare class HtmlReportContentEditor<P extends HtmlContentEditorOptions = HtmlContentEditorOptions> extends HtmlContentEditor<P> {
+	static typeInfo: EditorTypeInfo<"Serenity.HtmlReportContentEditor">;
 	protected getConfig(): CKEditorConfig;
 }
 export declare class MaskedEditor<P extends MaskedEditorOptions = MaskedEditorOptions> extends EditorWidget<P> {
+	static typeInfo: EditorTypeInfo<"Serenity.MaskedEditor">;
 	static createDefaultElement(): HTMLInputElement;
 	readonly domNode: HTMLInputElement;
 	constructor(props: EditorProps<P>);
@@ -4661,6 +4702,7 @@ export interface RecaptchaOptions {
 	language?: string;
 }
 export declare class Recaptcha<P extends RecaptchaOptions = RecaptchaOptions> extends EditorWidget<P> implements IStringValue {
+	static typeInfo: EditorTypeInfo<"Serenity.Recaptcha">;
 	constructor(props: EditorProps<P>);
 	get_value(): string;
 	set_value(value: string): void;
@@ -4723,6 +4765,7 @@ export interface FileUploadEditorOptions extends FileUploadConstraints {
 export interface ImageUploadEditorOptions extends FileUploadEditorOptions {
 }
 export declare class FileUploadEditor<P extends FileUploadEditorOptions = FileUploadEditorOptions> extends EditorWidget<P> implements IReadOnly, IGetEditValue, ISetEditValue, IValidateRequired {
+	static typeInfo: EditorTypeInfo<"Serenity.FileUploadEditor">;
 	constructor(props: EditorProps<P>);
 	protected getUploadInputOptions(): UploadInputOptions;
 	protected addFileButtonText(): string;
@@ -4747,12 +4790,14 @@ export declare class FileUploadEditor<P extends FileUploadEditorOptions = FileUp
 	protected hiddenInput: HTMLInputElement;
 }
 export declare class ImageUploadEditor<P extends ImageUploadEditorOptions = ImageUploadEditorOptions> extends FileUploadEditor<P> {
+	static typeInfo: EditorTypeInfo<"Serenity.ImageUploadEditor">;
 	constructor(props: EditorProps<P>);
 }
 export interface MultipleFileUploadEditorOptions extends FileUploadEditorOptions {
 	jsonEncodeValue?: boolean;
 }
 export declare class MultipleFileUploadEditor<P extends MultipleFileUploadEditorOptions = MultipleFileUploadEditorOptions> extends EditorWidget<P> implements IReadOnly, IGetEditValue, ISetEditValue, IValidateRequired {
+	static typeInfo: EditorTypeInfo<"Serenity.MultipleFileUploadEditor">;
 	private entities;
 	private toolbar;
 	private fileSymbols;
@@ -4779,6 +4824,7 @@ export declare class MultipleFileUploadEditor<P extends MultipleFileUploadEditor
 	set jsonEncodeValue(value: boolean);
 }
 export declare class MultipleImageUploadEditor<P extends ImageUploadEditorOptions = ImageUploadEditorOptions> extends MultipleFileUploadEditor<P> {
+	static typeInfo: ClassTypeInfo<"Serenity.MultipleImageUploadEditor">;
 	constructor(props: EditorProps<P>);
 }
 export interface QuickFilterArgs<TWidget> {
@@ -4813,6 +4859,7 @@ export interface QuickFilterBarOptions {
 	idPrefix?: string;
 }
 export declare class QuickFilterBar<P extends QuickFilterBarOptions = QuickFilterBarOptions> extends Widget<P> {
+	static typeInfo: ClassTypeInfo<"Serenity.QuickFilterBar">;
 	constructor(props: WidgetProps<P>);
 	addSeparator(): void;
 	add<TWidget extends Widget<any>, TOptions>(opt: QuickFilter<TWidget, TOptions>): TWidget;
@@ -4848,6 +4895,7 @@ export interface QuickSearchInputOptions {
 	fields?: QuickSearchField[];
 }
 export declare class QuickSearchInput<P extends QuickSearchInputOptions = QuickSearchInputOptions> extends Widget<P> {
+	static typeInfo: ClassTypeInfo<"Serenity.QuickSearchInput">;
 	static createDefaultElement(): HTMLInputElement;
 	readonly domNode: HTMLInputElement;
 	private lastValue;
@@ -4900,6 +4948,7 @@ export interface FilterLine {
 	state?: any;
 }
 export declare class FilterStore {
+	static typeInfo: ClassTypeInfo<"Serenity.FilterStore">;
 	constructor(fields: PropertyItem[]);
 	static getCriteriaFor(items: FilterLine[]): any[];
 	static getDisplayTextFor(items: FilterLine[]): string;
@@ -4936,6 +4985,7 @@ export interface IFiltering {
 	set_operator(value: FilterOperator): void;
 }
 export declare class IFiltering {
+	static typeInfo: InterfaceTypeInfo<"Serenity.IFiltering">;
 }
 export interface CriteriaWithText {
 	criteria?: any[];
@@ -4945,6 +4995,7 @@ export interface IQuickFiltering {
 	initQuickFilter(filter: QuickFilter<Widget<any>, any>): void;
 }
 export declare class IQuickFiltering {
+	static typeInfo: InterfaceTypeInfo<"Serenity.IQuickFiltering">;
 }
 export declare abstract class BaseFiltering implements IFiltering, IQuickFiltering {
 	private field;
@@ -4973,9 +5024,12 @@ export declare abstract class BaseFiltering implements IFiltering, IQuickFilteri
 	getEditorValue(): string;
 	getEditorText(): string;
 	initQuickFilter(filter: QuickFilter<Widget<any>, any>): void;
+	protected static classTypeInfo<T>(typeName: StringLiteral<T>, interfaces?: any[]): ClassTypeInfo<T>;
+	static typeInfo: ClassTypeInfo<"Serenity.BaseFiltering">;
 }
 export declare abstract class BaseEditorFiltering<TEditor extends Widget<any>> extends BaseFiltering {
 	editorTypeRef: any;
+	static typeInfo: ClassTypeInfo<"Serenity.BaseEditorFiltering">;
 	constructor(editorTypeRef: any);
 	protected useEditor(): boolean;
 	protected editor: TEditor;
@@ -4989,18 +5043,22 @@ export declare abstract class BaseEditorFiltering<TEditor extends Widget<any>> e
 	initQuickFilter(filter: QuickFilter<Widget<any>, any>): void;
 }
 export declare class DateFiltering extends BaseEditorFiltering<DateEditor> {
+	static typeInfo: ClassTypeInfo<"Serenity.DateFiltering">;
 	constructor();
 	getOperators(): FilterOperator[];
 }
 export declare class BooleanFiltering extends BaseFiltering {
+	static typeInfo: ClassTypeInfo<"Serenity.BooleanFiltering">;
 	getOperators(): FilterOperator[];
 }
 export declare class DateTimeFiltering extends BaseEditorFiltering<DateEditor> {
+	static typeInfo: ClassTypeInfo<"Serenity.DateTimeFiltering">;
 	constructor();
 	getOperators(): FilterOperator[];
 	getCriteria(): CriteriaWithText;
 }
 export declare class DecimalFiltering extends BaseEditorFiltering<DecimalEditor> {
+	static typeInfo: ClassTypeInfo<"Serenity.DecimalFiltering">;
 	constructor();
 	getOperators(): FilterOperator[];
 }
@@ -5010,6 +5068,7 @@ export declare class EditorFiltering extends BaseEditorFiltering<Widget<any>> {
 		useRelative?: boolean;
 		useLike?: boolean;
 	};
+	static typeInfo: ClassTypeInfo<"Serenity.EditorFiltering">;
 	constructor(props?: {
 		editorType?: string;
 		useRelative?: boolean;
@@ -5029,15 +5088,18 @@ export declare class EditorFiltering extends BaseEditorFiltering<Widget<any>> {
 	initQuickFilter(filter: QuickFilter<Widget<any>, any>): void;
 }
 export declare class EnumFiltering extends BaseEditorFiltering<EnumEditor> {
+	static typeInfo: ClassTypeInfo<"Serenity.EnumFiltering">;
 	constructor();
 	getOperators(): FilterOperator[];
 	getEditorText(): string;
 }
 export declare class IntegerFiltering extends BaseEditorFiltering<IntegerEditor> {
+	static typeInfo: ClassTypeInfo<"Serenity.IntegerFiltering">;
 	constructor();
 	getOperators(): FilterOperator[];
 }
 export declare class LookupFiltering extends BaseEditorFiltering<LookupEditor> {
+	static typeInfo: ClassTypeInfo<"Serenity.LookupFiltering">;
 	constructor();
 	getOperators(): FilterOperator[];
 	protected useEditor(): boolean;
@@ -5045,6 +5107,7 @@ export declare class LookupFiltering extends BaseEditorFiltering<LookupEditor> {
 	getEditorText(): string;
 }
 export declare class ServiceLookupFiltering extends BaseEditorFiltering<ServiceLookupEditor> {
+	static typeInfo: ClassTypeInfo<"Serenity.ServiceLookupFiltering">;
 	constructor();
 	getOperators(): FilterOperator[];
 	protected useEditor(): boolean;
@@ -5052,6 +5115,7 @@ export declare class ServiceLookupFiltering extends BaseEditorFiltering<ServiceL
 	getEditorText(): string;
 }
 export declare class StringFiltering extends BaseFiltering {
+	static typeInfo: ClassTypeInfo<"Serenity.StringFiltering">;
 	getOperators(): FilterOperator[];
 	validateEditorValue(value: string): string;
 }
@@ -5060,6 +5124,7 @@ export declare namespace FilteringTypeRegistry {
 	function get(key: string): Function;
 }
 export declare class FilterWidgetBase<P = {}> extends Widget<P> {
+	static typeInfo: ClassTypeInfo<"Serenity.FilterWidgetBase">;
 	private store;
 	private onFilterStoreChanged;
 	constructor(props: WidgetProps<P>);
@@ -5072,6 +5137,7 @@ export interface FilterFieldSelectOptions {
 	fields: PropertyItem[];
 }
 export declare class FilterPanel<P = {}> extends FilterWidgetBase<P> {
+	static typeInfo: ClassTypeInfo<"Serenity.FilterPanel">;
 	private rowsDiv;
 	private resetButton;
 	private searchButton;
@@ -5108,6 +5174,7 @@ export declare class FilterPanel<P = {}> extends FilterWidgetBase<P> {
 	protected updateParens(): void;
 }
 export declare class FilterDialog<P = {}> extends BaseDialog<P> {
+	static typeInfo: ClassTypeInfo<"Serenity.FilterDialog">;
 	private filterPanel;
 	constructor(props: WidgetProps<P>);
 	get_filterPanel(): FilterPanel;
@@ -5116,10 +5183,12 @@ export declare class FilterDialog<P = {}> extends BaseDialog<P> {
 	protected getDialogButtons(): DialogButton[];
 }
 export declare class FilterDisplayBar<P = {}> extends FilterWidgetBase<P> {
+	static typeInfo: ClassTypeInfo<"Serenity.FilterDisplayBar">;
 	protected renderContents(): any;
 	protected filterStoreChanged(): void;
 }
 export declare class SlickPager<P extends PagerOptions = PagerOptions> extends Widget<P> {
+	static typeInfo: ClassTypeInfo<"Serenity.SlickPager">;
 	private currentPage;
 	private totalPages;
 	private pageSize;
@@ -5174,6 +5243,7 @@ export interface GridRadioSelectionMixinOptions {
 	selectable?: (item: any) => boolean;
 }
 export declare class GridRadioSelectionMixin {
+	static typeInfo: ClassTypeInfo<"Serenity.GridRadioSelectionMixin">;
 	private idField;
 	private include;
 	private grid;
@@ -5192,6 +5262,7 @@ export interface GridRowSelectionMixinOptions {
 	selectable?: (item: any) => boolean;
 }
 export declare class GridRowSelectionMixin {
+	static typeInfo: ClassTypeInfo<"Serenity.GridRowSelectionMixin">;
 	private idField;
 	private include;
 	private grid;
@@ -5250,17 +5321,19 @@ export interface IInitializeColumn {
 	initializeColumn(column: Column): void;
 }
 export declare class IInitializeColumn {
+	static typeInfo: FormatterTypeInfo<"Serenity.IInitializeColumn">;
 }
 export declare abstract class FormatterBase implements Formatter {
 	abstract format(ctx: FormatterContext): FormatterResult;
 	protected static formatterTypeInfo<T>(typeName: StringLiteral<T>, interfaces?: any[]): FormatterTypeInfo<T>;
 	static typeInfo: FormatterTypeInfo<"Serenity.FormatterBase">;
 }
-export declare class BooleanFormatter implements Formatter {
+export declare class BooleanFormatter extends FormatterBase implements Formatter {
 	readonly props: {
 		falseText?: string;
 		trueText?: string;
 	};
+	static typeInfo: FormatterTypeInfo<"Serenity.BooleanFormatter">;
 	constructor(props?: {
 		falseText?: string;
 		trueText?: string;
@@ -5275,10 +5348,11 @@ export declare class CheckboxFormatter extends FormatterBase {
 	static typeInfo: FormatterTypeInfo<"Serenity.CheckboxFormatter">;
 	format(ctx: FormatterContext): string;
 }
-export declare class DateFormatter implements Formatter {
+export declare class DateFormatter extends FormatterBase implements Formatter {
 	readonly props: {
 		displayFormat?: string;
 	};
+	static typeInfo: FormatterTypeInfo<"Serenity.DateFormatter">;
 	constructor(props?: {
 		displayFormat?: string;
 	});
@@ -5288,14 +5362,16 @@ export declare class DateFormatter implements Formatter {
 	format(ctx: FormatterContext): string;
 }
 export declare class DateTimeFormatter extends DateFormatter {
+	static typeInfo: FormatterTypeInfo<"Serenity.DateTimeFormatter">;
 	constructor(props?: {
 		displayFormat?: string;
 	});
 }
-export declare class EnumFormatter implements Formatter {
+export declare class EnumFormatter extends FormatterBase implements Formatter {
 	readonly props: {
 		enumKey?: string;
 	};
+	static typeInfo: FormatterTypeInfo<"Serenity.EnumFormatter">;
 	constructor(props?: {
 		enumKey?: string;
 	});
@@ -5306,12 +5382,13 @@ export declare class EnumFormatter implements Formatter {
 	static getText(enumKey: string, name: string): string;
 	static getName(enumType: any, value: any): string;
 }
-export declare class FileDownloadFormatter implements Formatter, IInitializeColumn {
+export declare class FileDownloadFormatter extends FormatterBase implements Formatter, IInitializeColumn {
 	readonly props: {
 		displayFormat?: string;
 		originalNameProperty?: string;
 		iconClass?: string;
 	};
+	static typeInfo: FormatterTypeInfo<"Serenity.IFileDownloadFormatter">;
 	constructor(props?: {
 		displayFormat?: string;
 		originalNameProperty?: string;
@@ -5327,14 +5404,16 @@ export declare class FileDownloadFormatter implements Formatter, IInitializeColu
 	get iconClass(): string;
 	set iconClass(value: string);
 }
-export declare class MinuteFormatter implements Formatter {
+export declare class MinuteFormatter extends FormatterBase implements Formatter {
+	static typeInfo: FormatterTypeInfo<"Serenity.MinuteFormatter">;
 	format(ctx: FormatterContext): string;
 	static format(value: number): string;
 }
-export declare class NumberFormatter {
+export declare class NumberFormatter extends FormatterBase implements Formatter {
 	readonly props: {
 		displayFormat?: string;
 	};
+	static typeInfo: FormatterTypeInfo<"Serenity.NumberFormatter">;
 	constructor(props?: {
 		displayFormat?: string;
 	});
@@ -5343,7 +5422,7 @@ export declare class NumberFormatter {
 	get displayFormat(): string;
 	set displayFormat(value: string);
 }
-export declare class UrlFormatter implements Formatter, IInitializeColumn {
+export declare class UrlFormatter extends FormatterBase implements Formatter, IInitializeColumn {
 	readonly props: {
 		displayProperty?: string;
 		displayFormat?: string;
@@ -5351,6 +5430,7 @@ export declare class UrlFormatter implements Formatter, IInitializeColumn {
 		urlFormat?: string;
 		target?: string;
 	};
+	static typeInfo: FormatterTypeInfo<"Serenity.UrlFormatter">;
 	constructor(props?: {
 		displayProperty?: string;
 		displayFormat?: string;
@@ -5404,6 +5484,7 @@ export interface GridPersistanceFlags {
 }
 export declare const omitAllGridPersistenceFlags: GridPersistanceFlags;
 export declare class DataGrid<TItem, P = {}> extends Widget<P> implements IDataGrid, IReadOnly {
+	static typeInfo: ClassTypeInfo<"Serenity.DataGrid">;
 	private _isDisabled;
 	private _layoutTimer;
 	protected titleDiv: Fluent;
@@ -5570,6 +5651,7 @@ export declare class DataGrid<TItem, P = {}> extends Widget<P> implements IDataG
 	getFilterStore(): FilterStore;
 }
 export declare class ColumnPickerDialog<P = {}> extends BaseDialog<P> {
+	static typeInfo: ClassTypeInfo<"Serenity.ColumnPickerDialog">;
 	private ulVisible;
 	private ulHidden;
 	private colById;
@@ -5627,6 +5709,7 @@ export interface CheckTreeItem<TSource> {
 	source?: TSource;
 }
 export declare class CheckTreeEditor<TItem extends CheckTreeItem<TItem>, P = {}> extends DataGrid<TItem, P> implements IGetEditValue, ISetEditValue, IReadOnly {
+	static typeInfo: EditorTypeInfo<"Serenity.CheckTreeEditor">;
 	static createDefaultElement(): HTMLDivElement;
 	private itemById;
 	constructor(props: EditorProps<P>);
@@ -5678,6 +5761,7 @@ export interface CheckLookupEditorOptions {
 	filterValue?: any;
 }
 export declare class CheckLookupEditor<TItem extends CheckTreeItem<TItem> = any, P extends CheckLookupEditorOptions = CheckLookupEditorOptions> extends CheckTreeEditor<CheckTreeItem<TItem>, P> {
+	static typeInfo: EditorTypeInfo<"Serenity.CheckLookupEditor">;
 	private searchText;
 	private enableUpdateItems;
 	private lookupChangeUnbind;
@@ -5719,6 +5803,7 @@ export declare class CheckLookupEditor<TItem extends CheckTreeItem<TItem> = any,
 	set filterValue(value: any);
 }
 export declare class EntityGrid<TItem, P = {}> extends DataGrid<TItem, P> {
+	static typeInfo: ClassTypeInfo<"Serenity.EntityGrid">;
 	constructor(props: WidgetProps<P>);
 	destroy(): void;
 	protected handleRoute(e: HandleRouteEvent): void;
@@ -5801,6 +5886,7 @@ export declare class EntityLocalizer {
 	updateInterface(): void;
 }
 export declare class EntityDialog<TItem, P = {}> extends BaseDialog<P> implements IEditDialog, IReadOnly {
+	static typeInfo: ClassTypeInfo<"Serenity.EntityDialog">;
 	private _entity;
 	private _entityId;
 	protected propertyItemsData: PropertyItemsData;

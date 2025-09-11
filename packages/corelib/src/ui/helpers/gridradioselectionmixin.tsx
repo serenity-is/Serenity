@@ -1,14 +1,15 @@
 import { Column } from "@serenity-is/sleekgrid";
+import { classTypeInfo, registerType } from "../../base";
 import { clearKeys } from "../../compat";
-import { Decorators } from "../../types/decorators";
 import { IDataGrid } from "../datagrid/idatagrid";
 
 export interface GridRadioSelectionMixinOptions {
     selectable?: (item: any) => boolean;
 }
 
-@Decorators.registerClass('GridRadioSelectionMixin')
 export class GridRadioSelectionMixin {
+
+    static typeInfo = classTypeInfo("Serenity.GridRadioSelectionMixin"); static { registerType(this) }
 
     declare private idField: string;
     declare private include: { [key: string]: boolean };

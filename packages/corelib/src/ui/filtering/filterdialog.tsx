@@ -1,11 +1,10 @@
 ﻿import { cancelDialogButton, localText, notifyError, okDialogButton } from "../../base";
-import { Decorators } from "../../types/decorators";
 import { BaseDialog } from "../dialogs/basedialog";
 import { WidgetProps } from "../widgets/widget";
 import { FilterPanel } from "./filterpanel";
 
-@Decorators.registerClass('Serenity.FilterDialog')
 export class FilterDialog<P = {}> extends BaseDialog<P> {
+    static override typeInfo = this.classTypeInfo("Serenity.FilterDialog");
 
     declare private filterPanel: FilterPanel;
 

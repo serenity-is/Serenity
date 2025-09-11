@@ -1,10 +1,10 @@
-﻿import { Decorators } from "../types/decorators";
+﻿import { interfaceTypeInfo, registerType } from "../base";
 
 export interface IValidateRequired {
     get_required(): boolean;
     set_required(value: boolean): void;
 }
 
-@Decorators.registerInterface('Serenity.IValidateRequired')
 export class IValidateRequired {
+    static typeInfo = interfaceTypeInfo("Serenity.IValidateRequired"); static { registerType(this); }
 }

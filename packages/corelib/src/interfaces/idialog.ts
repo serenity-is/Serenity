@@ -1,7 +1,7 @@
-﻿import { Decorators } from "../types/decorators";
+﻿import { interfaceTypeInfo, registerType } from "../base";
 
-@Decorators.registerInterface('Serenity.IDialog')
 export class IDialog {
+    static typeInfo = interfaceTypeInfo("Serenity.IDialog"); static { registerType(this); }
 }
 
 export interface IDialog {

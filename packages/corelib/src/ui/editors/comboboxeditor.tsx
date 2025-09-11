@@ -1,7 +1,6 @@
 ﻿import { Authorization, Fluent, PropertyItem, isPromiseLike, localText, setElementReadOnly } from "../../base";
 import { ValidationHelper, isTrimmedEmpty } from "../../compat";
 import { IEditDialog, IGetEditValue, IReadOnly, ISetEditValue, IStringValue } from "../../interfaces";
-import { Decorators } from "../../types/decorators";
 import { DialogType } from "../../types/dialogtype";
 import { DialogTypeRegistry } from "../../types/dialogtyperegistry";
 import { ReflectionUtils } from "../../types/reflectionutils";
@@ -37,10 +36,9 @@ export interface ComboboxInplaceAddOptions {
 export interface ComboboxEditorOptions extends ComboboxFilterOptions, ComboboxInplaceAddOptions, ComboboxCommonOptions {
 }
 
-@Decorators.registerClass('Serenity.ComboboxEditor',
-    [ISetEditValue, IGetEditValue, IStringValue, IReadOnly])
 export class ComboboxEditor<P, TItem> extends EditorWidget<P> implements
     ISetEditValue, IGetEditValue, IStringValue, IReadOnly {
+    static override typeInfo = this.classTypeInfo("Serenity.ComboboxEditor", [ISetEditValue, IGetEditValue, IStringValue, IReadOnly]);
 
     static override createDefaultElement() { return <input type="hidden" /> as HTMLInputElement; }
     declare readonly domNode: HTMLInputElement;

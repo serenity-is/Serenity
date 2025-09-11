@@ -1,10 +1,9 @@
 ﻿import { localText } from "../../base";
-import { Decorators } from "../../types/decorators";
 import { FilterDialog } from "./filterdialog";
 import { FilterWidgetBase } from "./filterwidgetbase";
 
-@Decorators.registerClass('Serenity.FilterDisplayBar')
 export class FilterDisplayBar<P = {}> extends FilterWidgetBase<P> {
+    static override typeInfo = this.classTypeInfo("Serenity.FilterDisplayBar");
 
     protected renderContents(): any {
         var openFilterDialog = (e: Event) => {

@@ -1,7 +1,6 @@
 import { Culture, Fluent, Invariant, addValidationRule, formatDate, getjQuery, isArrayLike, localText, parseISODateTime, setElementReadOnly, stringFormat } from "../../base";
 import { today } from "../../compat";
 import { IReadOnly, IStringValue } from "../../interfaces";
-import { Decorators } from "../../types/decorators";
 import { dateInputChangeHandler, dateInputKeyupHandler, flatPickrTrigger, jQueryDatepickerInitialization, jQueryDatepickerZIndexWorkaround } from "../helpers/dateediting";
 import { EditorProps, EditorWidget } from "./editorwidget";
 
@@ -12,8 +11,8 @@ export interface DateEditorOptions {
     sqlMinMax?: boolean;
 }
 
-@Decorators.registerEditor('Serenity.DateEditor', [IStringValue, IReadOnly])
 export class DateEditor<P extends DateEditorOptions = DateEditorOptions> extends EditorWidget<P> implements IStringValue, IReadOnly {
+    static override typeInfo = this.editorTypeInfo("Serenity.DateEditor", [IStringValue, IReadOnly]);
 
     static override createDefaultElement() { return <input type="text" /> as HTMLInputElement; }
     declare readonly domNode: HTMLInputElement;

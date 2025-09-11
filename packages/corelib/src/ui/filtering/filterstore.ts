@@ -1,10 +1,9 @@
-﻿import { Criteria, Culture, localText, tryGetText, type PropertyItem } from "../../base";
+﻿import { classTypeInfo, Criteria, Culture, localText, registerType, tryGetText, type PropertyItem } from "../../base";
 import { ArgumentNullException } from "../../compat";
-import { Decorators } from "../../types/decorators";
 import { FilterLine } from "./filterline";
 
-@Decorators.registerClass('Serenity.FilterStore')
 export class FilterStore {
+    static typeInfo = classTypeInfo("Serenity.FilterStore"); static { registerType(this); }
 
     constructor(fields: PropertyItem[]) {
 

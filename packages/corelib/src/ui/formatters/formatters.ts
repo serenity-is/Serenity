@@ -3,20 +3,20 @@ import { Culture, DialogTexts, Enum, faIcon, formatDate, formatNumber, formatter
 import { replaceAll } from "../../compat";
 import { Formatter } from "../../slick";
 import { EnumKeyAttribute } from "../../types/attributes";
-import { Decorators } from "../../types/decorators";
 import { EnumTypeRegistry } from "../../types/enumtyperegistry";
 
 export interface IInitializeColumn {
     initializeColumn(column: Column): void;
 }
 
-@Decorators.registerInterface('Serenity.IInitializeColumn')
 export class IInitializeColumn {
+    static typeInfo = formatterTypeInfo("Serenity.IInitializeColumn");
 }
+
+registerType(IInitializeColumn);
 
 export abstract class FormatterBase implements Formatter {
     abstract format(ctx: FormatterContext): FormatterResult;
-
 
     protected static formatterTypeInfo<T>(typeName: StringLiteral<T>, interfaces?: any[]): FormatterTypeInfo<T> {
         if (Object.prototype.hasOwnProperty.call(this, typeInfoProperty) && this[typeInfoProperty])
@@ -30,9 +30,11 @@ export abstract class FormatterBase implements Formatter {
     static typeInfo: FormatterTypeInfo<"Serenity.FormatterBase">;
 }
 
-@Decorators.registerFormatter('Serenity.BooleanFormatter')
-export class BooleanFormatter implements Formatter {
+export class BooleanFormatter extends FormatterBase implements Formatter {
+    static override typeInfo = this.formatterTypeInfo("Serenity.BooleanFormatter");
+
     constructor(public readonly props: { falseText?: string, trueText?: string } = {}) {
+        super();
         this.props ??= {};
     }
 
@@ -55,7 +57,7 @@ export class BooleanFormatter implements Formatter {
 }
 
 export class CheckboxFormatter extends FormatterBase {
-    static typeInfo = this.formatterTypeInfo("Serenity.CheckboxFormatter");
+    static override typeInfo = this.formatterTypeInfo("Serenity.CheckboxFormatter");
     
     format(ctx: FormatterContext) {
         return '<span class="check-box no-float readonly slick-edit-preclick ' + (!!ctx.value ? ' checked' : '') + '"></span>';
@@ -63,9 +65,11 @@ export class CheckboxFormatter extends FormatterBase {
 
 }
 
-@Decorators.registerFormatter('Serenity.DateFormatter')
-export class DateFormatter implements Formatter {
+export class DateFormatter extends FormatterBase implements Formatter {
+    static override typeInfo = this.formatterTypeInfo("Serenity.DateFormatter");
+
     constructor(public readonly props: { displayFormat?: string } = {}) {
+        super();
         this.props ??= {};
         this.props.displayFormat ??= Culture.dateFormat;
     }
@@ -102,17 +106,18 @@ export class DateFormatter implements Formatter {
     }
 }
 
-@Decorators.registerFormatter('Serenity.DateTimeFormatter')
 export class DateTimeFormatter extends DateFormatter {
+    static override typeInfo = this.formatterTypeInfo("Serenity.DateTimeFormatter");
     constructor(props: { displayFormat?: string } = {}) {
         super({ displayFormat: Culture.dateTimeFormat, ...props });
     }
 }
 
-@Decorators.registerFormatter('Serenity.EnumFormatter')
-export class EnumFormatter implements Formatter {
+export class EnumFormatter extends FormatterBase implements Formatter {
+    static override typeInfo = this.formatterTypeInfo("Serenity.EnumFormatter");
 
     constructor(public readonly props: { enumKey?: string } = {}) {
+        super();
         this.props ??= {};
     }
 
@@ -159,10 +164,11 @@ export class EnumFormatter implements Formatter {
     }
 }
 
-@Decorators.registerFormatter('Serenity.FileDownloadFormatter', [IInitializeColumn])
-export class FileDownloadFormatter implements Formatter, IInitializeColumn {
+export class FileDownloadFormatter extends FormatterBase implements Formatter, IInitializeColumn {
+    static override typeInfo = this.formatterTypeInfo("Serenity.IFileDownloadFormatter", [IInitializeColumn]);
 
     constructor(public readonly props: { displayFormat?: string, originalNameProperty?: string, iconClass?: string } = {}) {
+        super();
         this.props ??= {};
     }
 
@@ -208,8 +214,8 @@ export class FileDownloadFormatter implements Formatter, IInitializeColumn {
     set iconClass(value) { this.props.iconClass = value; }
 }
 
-@Decorators.registerFormatter('Serenity.MinuteFormatter')
-export class MinuteFormatter implements Formatter {
+export class MinuteFormatter extends FormatterBase implements Formatter {
+    static override typeInfo = this.formatterTypeInfo("Serenity.MinuteFormatter");
 
     format(ctx: FormatterContext) {
         return MinuteFormatter.format(ctx.value);
@@ -237,9 +243,11 @@ export class MinuteFormatter implements Formatter {
     }
 }
 
-@Decorators.registerFormatter('Serenity.NumberFormatter')
-export class NumberFormatter {
+export class NumberFormatter extends FormatterBase implements Formatter {
+    static override typeInfo = this.formatterTypeInfo("Serenity.NumberFormatter");
+    
     constructor(public readonly props: { displayFormat?: string } = {}) {
+        super();
         this.props ??= {};
     }
 
@@ -270,10 +278,11 @@ export class NumberFormatter {
     set displayFormat(value) { this.props.displayFormat = value; }
 }
 
-@Decorators.registerFormatter('Serenity.UrlFormatter', [IInitializeColumn])
-export class UrlFormatter implements Formatter, IInitializeColumn {
+export class UrlFormatter extends FormatterBase implements Formatter, IInitializeColumn {
+    static override typeInfo = this.formatterTypeInfo("Serenity.UrlFormatter", [IInitializeColumn]);
 
     constructor(readonly props: { displayProperty?: string, displayFormat?: string, urlProperty?: string, urlFormat?: string, target?: string } = {}) {
+        super();
         this.props ??= {};
     }
 

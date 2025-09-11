@@ -1,7 +1,6 @@
 ﻿import { Authorization, Fluent, addClass, appendToNode, faIcon, getCustomAttribute, getType, isBS3, isPromiseLike, localText, tryGetText, type PropertyItem } from "../../base";
 import { extend } from "../../compat";
 import { OptionsTypeAttribute } from "../../types/attributes";
-import { Decorators } from "../../types/decorators";
 import { EditorType } from "../../types/editortype";
 import { EditorTypeRegistry } from "../../types/editortyperegistry";
 import { EditorUtils } from "../editors/editorutils";
@@ -342,8 +341,9 @@ export function PropertyTabs(props: {
     return container ? null : parentNode as DocumentFragment;
 }
 
-@Decorators.registerClass('Serenity.PropertyGrid')
 export class PropertyGrid<P extends PropertyGridOptions = PropertyGridOptions> extends Widget<P> {
+
+    static override typeInfo = this.classTypeInfo("Serenity.PropertyGrid");
 
     declare private fieldElements: PropertyFieldElement[];
 

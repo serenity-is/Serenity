@@ -4,7 +4,6 @@ import { HandleRouteEvent, Router, replaceAll, safeCast } from "../../compat";
 import { IEditDialog } from "../../interfaces";
 import { RemoteViewOptions } from "../../slick";
 import { DialogTypeAttribute, DisplayNameAttribute, EntityTypeAttribute, ItemNameAttribute, ServiceAttribute } from "../../types/attributes";
-import { Decorators } from "../../types/decorators";
 import { DialogType } from "../../types/dialogtype";
 import { DialogTypeRegistry } from "../../types/dialogtyperegistry";
 import { EditorUtils } from "../editors/editorutils";
@@ -14,8 +13,8 @@ import { Widget, WidgetProps } from "../widgets/widget";
 import { ColumnPickerDialog } from "./columnpickerdialog";
 import { DataGrid } from "./datagrid";
 
-@Decorators.registerClass('Serenity.EntityGrid')
 export class EntityGrid<TItem, P = {}> extends DataGrid<TItem, P> {
+    static override typeInfo = this.classTypeInfo("Serenity.EntityGrid");
 
     constructor(props: WidgetProps<P>) {
         super(props);

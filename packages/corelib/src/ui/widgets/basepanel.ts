@@ -1,12 +1,12 @@
 ﻿import { Fluent, Validator } from "../../base";
 import { validateOptions } from "../../compat";
-import { Decorators } from "../../types/decorators";
 import { TabsExtensions } from "../helpers/tabsextensions";
 import { ToolButton, Toolbar } from "./toolbar";
 import { Widget, WidgetProps } from "./widget";
 
-@Decorators.registerClass("Serenity.BasePanel")
 export class BasePanel<P = {}> extends Widget<P> {
+    static override typeInfo = this.classTypeInfo("Serenity.BasePanel");
+    
     constructor(props: WidgetProps<P>) {
         super(props);
 

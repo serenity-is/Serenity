@@ -1,13 +1,13 @@
 import { Culture, Fluent, Invariant, addValidationRule, formatDate, formatISODateTimeUTC, getjQuery, localText, parseDate, parseISODateTime, round, setElementReadOnly, stringFormat, trunc, tryGetText } from "../../base";
 import { addOption, today } from "../../compat";
 import { IReadOnly, IStringValue } from "../../interfaces";
-import { Decorators } from "../../types/decorators";
 import { flatPickrTrigger } from "../helpers/dateediting";
 import { DateEditor } from "./dateeditor";
 import { EditorProps, EditorWidget } from "./editorwidget";
 
-@Decorators.registerEditor('Serenity.DateTimeEditor', [IStringValue, IReadOnly])
 export class DateTimeEditor<P extends DateTimeEditorOptions = DateTimeEditorOptions> extends EditorWidget<P> implements IStringValue, IReadOnly {
+
+    static override typeInfo = this.editorTypeInfo("Serenity.DateTimeEditor", [IStringValue, IReadOnly]);
 
     static override createDefaultElement() { return <input type="text" /> as HTMLInputElement; }
     declare readonly domNode: HTMLInputElement;

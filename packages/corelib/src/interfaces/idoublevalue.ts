@@ -1,7 +1,7 @@
-﻿import { Decorators } from "../types/decorators";
+﻿import { interfaceTypeInfo, registerType } from "../base";
 
-@Decorators.registerInterface("Serenity.IDoubleValue")
 export class IDoubleValue {
+    static typeInfo = interfaceTypeInfo("Serenity.IDoubleValue"); static { registerType(this); }
 }
 
 export interface IDoubleValue {

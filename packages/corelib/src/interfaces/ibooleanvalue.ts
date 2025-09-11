@@ -1,8 +1,10 @@
-﻿import { Decorators } from "../types/decorators";
+﻿import { interfaceTypeInfo, registerType } from "../base";
 
-@Decorators.registerInterface("Serenity.IBooleanValue")
 export class IBooleanValue {
+    static typeInfo = interfaceTypeInfo("Serenity.IBooleanValue"); static { registerType(this); }
 }
+
+registerType(IBooleanValue);
 
 export interface IBooleanValue {
     get_value(): boolean;

@@ -2,16 +2,15 @@ import { Dialog, DialogButton, DialogOptions, Fluent, Validator, defaultNotifyOp
 import { isMobileView, validateOptions } from "../../compat";
 import { IDialog } from "../../interfaces";
 import { CloseButtonAttribute, MaximizableAttribute, PanelAttribute, ResizableAttribute, StaticPanelAttribute } from "../../types/attributes";
-import { Decorators } from "../../types/decorators";
 import { TabsExtensions } from "../helpers/tabsextensions";
 import { ToolButton, Toolbar } from "../widgets/toolbar";
 import { Widget, WidgetProps } from "../widgets/widget";
 import { applyCssSizes, handleUIDialogResponsive } from "./basedialog-internal";
 import { DialogExtensions } from "./dialogextensions";
 
-@Decorators.registerClass('Serenity.BaseDialog', [IDialog])
 export class BaseDialog<P> extends Widget<P> {
-
+    static override typeInfo = this.classTypeInfo("Serenity.BaseDialog", [IDialog]);
+    
     static override createDefaultElement() { return document.body.appendChild(<div class="hidden" />) as HTMLDivElement; }
 
     declare protected tabs: Fluent<HTMLElement>;

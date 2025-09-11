@@ -12,12 +12,11 @@ export namespace FormatterTypeRegistry {
         suffix: "Formatter",
         loadError: function (key: string) {
             var message = `"${htmlEncode(key)}" formatter class not found! 
-Make sure there is such a formatter type under the project root namespace,
-and its namespace parts start with capital letters like MyProject.MyModule.MyFormatter.
 
-If using ES modules, make sure the formatter type has a decorator like 
-@Decorators.registerFormatter('MyProject.MyModule.MyFormatter') with the full name 
-of your formatter type and "side-effect-import" this formatter class from the current 
+Make sure the formatter type has a line like the following (with the correct full name):
+static override typeInfo = this.formatterTypeInfo("MyProject.MyModule.MyEditor");
+or a decorator like @Decorators.registerFormatter('MyProject.MyModule.MyFormatter') with the full name         
+and "side-effect-import" this formatter class from the current 
 "page.ts/grid.ts/dialog.ts file (import "./path/to/MyFormatter.ts").
 
 After applying fixes, build and run "node ./tsbuild.js" (or "tsc" if using namespaces) 

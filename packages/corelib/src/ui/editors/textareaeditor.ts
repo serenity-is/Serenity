@@ -1,5 +1,4 @@
 ﻿import { IStringValue } from "../../interfaces";
-import { Decorators } from "../../types/decorators";
 import { EditorProps, EditorWidget } from "./editorwidget";
 
 export interface TextAreaEditorOptions {
@@ -7,8 +6,8 @@ export interface TextAreaEditorOptions {
     rows?: number;
 }
 
-@Decorators.registerEditor('Serenity.TextAreaEditor', [IStringValue])
 export class TextAreaEditor<P extends TextAreaEditorOptions = TextAreaEditorOptions> extends EditorWidget<P> {
+    static override typeInfo = this.editorTypeInfo("Serenity.TextAreaEditor", [IStringValue]);
 
     static override createDefaultElement() { return document.createElement("textarea"); }
 

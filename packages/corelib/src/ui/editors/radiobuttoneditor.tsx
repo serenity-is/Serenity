@@ -2,7 +2,6 @@
 import { getLookup } from "../../compat";
 import { IReadOnly, IStringValue } from "../../interfaces";
 import { EnumKeyAttribute } from "../../types/attributes";
-import { Decorators } from "../../types/decorators";
 import { EnumTypeRegistry } from "../../types/enumtyperegistry";
 import { EditorProps, EditorWidget } from "./editorwidget";
 
@@ -12,9 +11,8 @@ export interface RadioButtonEditorOptions {
     lookupKey?: string;
 }
 
-@Decorators.registerEditor('Serenity.RadioButtonEditor', [IStringValue, IReadOnly])
-export class RadioButtonEditor<P extends RadioButtonEditorOptions = RadioButtonEditorOptions> extends EditorWidget<P>
-    implements IReadOnly {
+export class RadioButtonEditor<P extends RadioButtonEditorOptions = RadioButtonEditorOptions> extends EditorWidget<P> implements IReadOnly {
+    static override typeInfo = this.editorTypeInfo("Serenity.RadioButtonEditor", [IStringValue, IReadOnly]);
 
     constructor(props: EditorProps<P>) {
         super(props);

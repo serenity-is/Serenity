@@ -1,15 +1,15 @@
 import { Column } from "@serenity-is/sleekgrid";
-import { Fluent } from "../../base";
+import { classTypeInfo, Fluent, registerType } from "../../base";
 import { clearKeys } from "../../compat";
-import { Decorators } from "../../types/decorators";
 import { IDataGrid } from "../datagrid/idatagrid";
 
 export interface GridRowSelectionMixinOptions {
     selectable?: (item: any) => boolean;
 }
 
-@Decorators.registerClass('Serenity.GridRowSelectionMixin')
 export class GridRowSelectionMixin {
+
+    static typeInfo = classTypeInfo("Serenity.GridRowSelectionMixin"); static { registerType(this); }
 
     declare private idField: string;
     declare private include: { [key: string]: boolean }

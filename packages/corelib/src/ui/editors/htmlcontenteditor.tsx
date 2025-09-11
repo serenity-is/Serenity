@@ -1,7 +1,6 @@
 import { Fluent, localText, resolveUrl } from "../../base";
 import { isTrimmedEmpty } from "../../compat";
 import { IReadOnly, IStringValue } from "../../interfaces";
-import { Decorators } from "../../types/decorators";
 import { LazyLoadHelper } from "../helpers/lazyloadhelper";
 import { EditorProps, EditorWidget } from "./editorwidget";
 
@@ -13,9 +12,9 @@ export interface HtmlContentEditorOptions {
 export interface CKEditorConfig {
 }
 
-@Decorators.registerEditor('Serenity.HtmlContentEditor', [IStringValue, IReadOnly])
 export class HtmlContentEditor<P extends HtmlContentEditorOptions = HtmlContentEditorOptions> extends EditorWidget<P>
     implements IStringValue, IReadOnly {
+    static override typeInfo = this.editorTypeInfo("Serenity.HtmlContentEditor", [IStringValue, IReadOnly]);
 
     declare private _instanceReady: boolean;
     declare readonly domNode: HTMLTextAreaElement;
@@ -227,8 +226,8 @@ export class HtmlContentEditor<P extends HtmlContentEditorOptions = HtmlContentE
     };
 }
 
-@Decorators.registerEditor('Serenity.HtmlNoteContentEditor')
 export class HtmlNoteContentEditor<P extends HtmlContentEditorOptions = HtmlContentEditorOptions> extends HtmlContentEditor<P> {
+    static override typeInfo = this.editorTypeInfo("Serenity.HtmlNoteContentEditor");
 
     protected getConfig(): CKEditorConfig {
         var config = super.getConfig();
@@ -244,8 +243,8 @@ export class HtmlNoteContentEditor<P extends HtmlContentEditorOptions = HtmlCont
     }
 }
 
-@Decorators.registerEditor('Serenity.HtmlReportContentEditor')
 export class HtmlReportContentEditor<P extends HtmlContentEditorOptions = HtmlContentEditorOptions> extends HtmlContentEditor<P> {
+    static override typeInfo = this.editorTypeInfo("Serenity.HtmlReportContentEditor");
 
     protected getConfig(): CKEditorConfig {
         var config = super.getConfig();

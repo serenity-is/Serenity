@@ -2,7 +2,6 @@
 import { Culture, Fluent, ListResponse, tryGetText, type Lookup, type PropertyItem } from "../../base";
 import { ScriptData, getLookup } from "../../compat";
 import { IGetEditValue, IReadOnly, ISetEditValue } from "../../interfaces";
-import { Decorators } from "../../types/decorators";
 import { ReflectionUtils } from "../../types/reflectionutils";
 import { DataGrid } from "../datagrid/datagrid";
 import { GridSelectAllButtonHelper } from "../helpers/gridselectallbuttonhelper";
@@ -27,9 +26,9 @@ export interface CheckTreeItem<TSource> {
     source?: TSource;
 }
 
-@Decorators.registerEditor('Serenity.CheckTreeEditor', [IGetEditValue, ISetEditValue, IReadOnly])
 export class CheckTreeEditor<TItem extends CheckTreeItem<TItem>, P = {}> extends DataGrid<TItem, P>
     implements IGetEditValue, ISetEditValue, IReadOnly {
+    static override typeInfo = this.editorTypeInfo("Serenity.CheckTreeEditor", [IGetEditValue, ISetEditValue, IReadOnly]);
 
     static override createDefaultElement() { return document.createElement("div"); }
 
@@ -475,8 +474,8 @@ export interface CheckLookupEditorOptions {
     filterValue?: any;
 }
 
-@Decorators.registerEditor("Serenity.CheckLookupEditor")
 export class CheckLookupEditor<TItem extends CheckTreeItem<TItem> = any, P extends CheckLookupEditorOptions = CheckLookupEditorOptions> extends CheckTreeEditor<CheckTreeItem<TItem>, P> {
+    static override typeInfo = this.editorTypeInfo("Serenity.CheckLookupEditor");
 
     declare private searchText: string;
     declare private enableUpdateItems: boolean;

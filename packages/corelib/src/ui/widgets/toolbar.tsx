@@ -1,5 +1,4 @@
 import { Fluent, IconClassName, iconClassName, isArrayLike } from "../../base";
-import { Decorators } from "../../types/decorators";
 import { Widget } from "./widget";
 
 export interface ToolButtonProps {
@@ -68,8 +67,8 @@ export interface ToolbarOptions {
     hotkeyContext?: any;
 }
 
-@Decorators.registerClass('Serenity.Toolbar')
 export class Toolbar<P extends ToolbarOptions = ToolbarOptions> extends Widget<P> {
+    static override typeInfo = this.classTypeInfo("Serenity.Toolbar");
 
     protected renderContents(): any {
 
