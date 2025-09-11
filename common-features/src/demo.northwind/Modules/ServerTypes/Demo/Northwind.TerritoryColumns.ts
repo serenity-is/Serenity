@@ -1,4 +1,4 @@
-﻿import { ColumnsBase, fieldsProxy, NumberFormatter } from "@serenity-is/corelib";
+﻿import { ColumnsBase, fieldsProxy } from "@serenity-is/corelib";
 import { Column } from "@serenity-is/sleekgrid";
 import { TerritoryRow } from "./Northwind.TerritoryRow";
 
@@ -12,5 +12,3 @@ export class TerritoryColumns extends ColumnsBase<TerritoryRow> {
     static readonly columnsKey = 'Northwind.Territory';
     static readonly Fields = fieldsProxy<TerritoryColumns>();
 }
-
-[NumberFormatter]; // referenced types

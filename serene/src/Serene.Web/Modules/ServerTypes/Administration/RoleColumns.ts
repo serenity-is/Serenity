@@ -1,4 +1,4 @@
-﻿import { ColumnsBase, fieldsProxy } from "@serenity-is/corelib";
+﻿import { ColumnsBase, fieldsProxy, NumberFormatter } from "@serenity-is/corelib";
 import { Column } from "@serenity-is/sleekgrid";
 import { RoleRow } from "./RoleRow";
 
@@ -11,3 +11,5 @@ export class RoleColumns extends ColumnsBase<RoleRow> {
     static readonly columnsKey = 'Administration.Role';
     static readonly Fields = fieldsProxy<RoleColumns>();
 }
+
+[NumberFormatter]; // referenced types

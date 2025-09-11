@@ -1,4 +1,4 @@
-﻿import { ColumnsBase, fieldsProxy, NumberFormatter } from "@serenity-is/corelib";
+﻿import { ColumnsBase, fieldsProxy } from "@serenity-is/corelib";
 import { Column } from "@serenity-is/sleekgrid";
 import { RegionRow } from "./Northwind.RegionRow";
 
@@ -11,5 +11,3 @@ export class RegionColumns extends ColumnsBase<RegionRow> {
     static readonly columnsKey = 'Northwind.Region';
     static readonly Fields = fieldsProxy<RegionColumns>();
 }
-
-[NumberFormatter]; // referenced types

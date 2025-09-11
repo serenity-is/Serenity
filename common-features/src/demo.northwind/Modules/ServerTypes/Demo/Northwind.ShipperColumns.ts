@@ -1,4 +1,4 @@
-﻿import { ColumnsBase, fieldsProxy, NumberFormatter } from "@serenity-is/corelib";
+﻿import { ColumnsBase, fieldsProxy } from "@serenity-is/corelib";
 import { Column } from "@serenity-is/sleekgrid";
 import { ShipperRow } from "./Northwind.ShipperRow";
 
@@ -12,5 +12,3 @@ export class ShipperColumns extends ColumnsBase<ShipperRow> {
     static readonly columnsKey = 'Northwind.Shipper';
     static readonly Fields = fieldsProxy<ShipperColumns>();
 }
-
-[NumberFormatter]; // referenced types
