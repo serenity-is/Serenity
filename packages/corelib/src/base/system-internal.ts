@@ -22,12 +22,21 @@ export function merge(arr1: any[], arr2: any[]) {
 
 export type StringLiteral<T> = T extends string ? string extends T ? never : T : never;
 
+/**
+ * Type information for a registered type.
+ */
 export type TypeInfo<T> = {
+    /** Type kind, can be "class", "enum", "interface", "editor" or "formatter" */
     typeKind: "class" | "enum" | "interface" | "editor" | "formatter";
+    /** Registered type name */
     typeName: StringLiteral<T> | (string & {});
+    /** Implemented interfaces */
     interfaces?: any[];
+    /** Custom attributes */
     customAttributes?: any[];
+    /** Enum flags */
     enumFlags?: boolean;
+    /** Registered flag */
     registered?: boolean;
 }
 
@@ -42,7 +51,7 @@ function autoRegisterViaTypeInfo(type: any): void {
     if (!Object.prototype.hasOwnProperty.call(type, typeInfoProperty))
         return;
 
-    var typeInfo = type[typeInfoProperty] as TypeInfo<string>;
+    const typeInfo = type[typeInfoProperty] as TypeInfo<string>;
     if (!typeInfo || typeInfo.registered || !typeInfo.typeName)
         return;
 
@@ -74,7 +83,7 @@ function autoRegisterViaTypeInfo(type: any): void {
 }
 
 export function internalRegisterType(type: any, typeName?: string, interfaces?: any[]): TypeInfo<string> {
-    let typeInfo = ensureTypeInfo(type);
+    const typeInfo = ensureTypeInfo(type);
 
     if (typeName && typeName !== typeInfo.typeName)
         typeInfo.typeName = typeName;
@@ -112,7 +121,7 @@ export function peekTypeInfo(type: any): TypeInfo<string> {
     if (!type || !Object.prototype.hasOwnProperty.call(type, typeInfoProperty))
         return void 0;
 
-    var typeInfo = type[typeInfoProperty];
+    const typeInfo = type[typeInfoProperty];
     if (typeInfo && !typeInfo.registered)
         autoRegisterViaTypeInfo(type);
 

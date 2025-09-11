@@ -141,7 +141,7 @@ describe('EntityGrid.getLocalTextDbPrefix', () => {
 
     it('returns class identifier based on typeInfo property', () => {
         class DefaultGrid extends EntityGrid<any, any> {
-            static typeInfo = classTypeInfo('MyProject.TestModule.DefaultGrid');
+            static typeInfo = this.classType('MyProject.TestModule.DefaultGrid');
         }
 
         var grid = new DefaultGrid({});
@@ -226,7 +226,7 @@ describe('EntityGrid.getLocalTextPrefix', () => {
 
     it('returns class identifier based on typeInfo property', () => {
         class DefaultGrid extends EntityGrid<any, any> {
-            static typeInfo = classTypeInfo('MyProject.TestModule.DefaultGrid');
+            static typeInfo = this.classType('MyProject.TestModule.DefaultGrid');
         }
 
         var grid = new DefaultGrid({});

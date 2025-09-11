@@ -1,5 +1,5 @@
-﻿import { Column, FormatterContext } from "@serenity-is/sleekgrid";
-import { Culture, DialogTexts, Enum, faIcon, formatDate, formatNumber, getCustomAttribute, getTypeFullName, htmlEncode, iconClassName, isPromiseLike, localText, parseDecimal, parseISODateTime, resolveUrl, stringFormat, tryGetText } from "../../base";
+﻿import { Column, FormatterContext, FormatterResult } from "@serenity-is/sleekgrid";
+import { Culture, DialogTexts, Enum, faIcon, formatDate, formatNumber, formatterTypeInfo, FormatterTypeInfo, getCustomAttribute, getTypeFullName, htmlEncode, iconClassName, isPromiseLike, localText, parseDecimal, parseISODateTime, registerType, resolveUrl, stringFormat, StringLiteral, tryGetText } from "../../base";
 import { replaceAll } from "../../compat";
 import { Formatter } from "../../slick";
 import { EnumKeyAttribute } from "../../types/attributes";
@@ -12,6 +12,19 @@ export interface IInitializeColumn {
 
 @Decorators.registerInterface('Serenity.IInitializeColumn')
 export class IInitializeColumn {
+}
+
+export abstract class FormatterBase implements Formatter {
+    abstract format(ctx: FormatterContext): FormatterResult;
+
+
+    static formatterType<T>(typeName: StringLiteral<T>, interfaces?: any[]): FormatterTypeInfo<T> {
+        const typeInfo = this.typeInfo = formatterTypeInfo(typeName, interfaces);
+        registerType(this);
+        return typeInfo;
+    }
+
+    static typeInfo: FormatterTypeInfo<"Serenity.FormatterBase">;
 }
 
 @Decorators.registerFormatter('Serenity.BooleanFormatter')
@@ -38,13 +51,13 @@ export class BooleanFormatter implements Formatter {
     public set trueText(value) { this.props.trueText = value; }
 }
 
-@Decorators.registerType()
-export class CheckboxFormatter implements Formatter {
-    static typeInfo = Decorators.formatterType("Serenity.CheckboxFormatter")
-
+export class CheckboxFormatter extends FormatterBase {
+    static typeInfo = this.formatterType("Serenity.CheckboxFormatter");
+    
     format(ctx: FormatterContext) {
         return '<span class="check-box no-float readonly slick-edit-preclick ' + (!!ctx.value ? ' checked' : '') + '"></span>';
     }
+
 }
 
 @Decorators.registerFormatter('Serenity.DateFormatter')

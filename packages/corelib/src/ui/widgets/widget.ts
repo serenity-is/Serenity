@@ -1,15 +1,11 @@
-import { Config, Fluent, addClass, addValidationRule, appendToNode, getCustomAttribute, getInstanceType, getTypeFullName, getTypeShortName, isArrayLike, toggleClass } from "../../base";
-import { Decorators } from "../../types/decorators";
+import { ClassTypeInfo, Config, EditorTypeInfo, Fluent, StringLiteral, addClass, addValidationRule, appendToNode, classTypeInfo, editorTypeInfo, getCustomAttribute, getInstanceType, getTypeFullName, getTypeShortName, isArrayLike, registerType, toggleClass } from "../../base";
 import { ensureParentOrFragment, handleElementProp, isFragmentWorkaround, setElementProps } from "./widgetinternal";
 import { IdPrefixType, associateWidget, deassociateWidget, getWidgetName, useIdPrefix, type WidgetProps } from "./widgetutils";
 export { getWidgetFrom, tryGetWidget, useIdPrefix, type IdPrefixType, type WidgetProps } from "./widgetutils";
 
 const afterRenderSymbol = Symbol();
 
-@Decorators.registerType()
 export class Widget<P = {}> {
-    static typeInfo = Decorators.classType("Serenity.Widget");
-
     private static nextWidgetNumber = 0;
     declare protected readonly options: WidgetProps<P>;
     declare public readonly uniqueName: string;
@@ -221,6 +217,21 @@ export class Widget<P = {}> {
 
     // jsx-dom >= 8.1.5 requires isComponent as a static property
     static readonly isComponent = true;
+
+    static classType<T>(typeName: StringLiteral<T>, interfaces?: any[]): ClassTypeInfo<T> {
+        const typeInfo = this.typeInfo = classTypeInfo(typeName, interfaces);
+        registerType(this);
+        return typeInfo;
+    }
+
+    static editorType<T>(typeName: StringLiteral<T>, interfaces?: any[]): EditorTypeInfo<T> {
+        const typeInfo = editorTypeInfo(typeName, interfaces);
+        this.typeInfo = typeInfo;
+        registerType(this);
+        return typeInfo;
+    }
+
+    static typeInfo = this.classType("Serenity.Widget");
 }
 
 /** @deprecated Use Widget */

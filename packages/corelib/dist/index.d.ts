@@ -1447,6 +1447,9 @@ export declare let Invariant: Locale;
  * settings determined server, can be passed to the client.
  */
 export declare let Culture: Locale;
+/**
+ * Resets the culture settings to the default values.
+ */
 export declare function resetCultureSettings(): void;
 /**
  * Formats a string with parameters similar to .NET's String.Format function
@@ -1603,38 +1606,100 @@ export declare function getElementReadOnly(el: Element): boolean | null;
  * @param value Readonly state
  */
 export declare function setElementReadOnly(elements: Element | ArrayLike<Element>, value: boolean): void;
+/**
+ * Parses a query string into an object.
+ * @param s Query string to parse, if not specified, location.search will be used.
+ * @return An object with key/value pairs from the query string.
+ */
 export declare function parseQueryString(s?: string): Record<string, string>;
+/**
+ * Gets the return URL from the query string.
+ * @param opt Options for getting the return URL.
+ */
 export declare function getReturnUrl(opt?: {
+	/** Whether to only consider the query string. If true, the function will not check the default return URL. */
 	queryOnly?: boolean;
+	/** Whether to ignore unsafe URLs. If true or null (default), the function will only return safe URLs. */
 	ignoreUnsafe?: boolean;
+	/** The purpose of the return URL. This can be used to determine the default return URL if none is found in the query string. */
 	purpose?: string;
 }): string;
+/**
+ * Escapes a CSS selector.
+ * @param selector The CSS selector to escape.
+ */
 export declare function cssEscape(selector: string): string;
-export declare function addLocalText(obj: string | Record<string, string | Record<string, any>> | string, pre?: string): void;
+/**
+ * Adds local text entries to the localization table.
+ * @param obj The object containing key/value pairs to add. If a string is provided, it will be added as a key with the prefix (second argument) as its value.
+ * @param pre The prefix to add to each key. If obj is a string, this will be the value for that key.
+ */
+export declare function addLocalText(obj: string | Record<string, string | Record<string, any>>, pre?: string): void;
+/**
+ * Retrieves a localized string from the localization table.
+ * @param key The key of the localized string.
+ * @param defaultText The default text to return if the key is not found.
+ * @returns The localized string or the default text.
+ */
 export declare function localText(key: string, defaultText?: string): string;
+/**
+ * Tries to retrieve a localized string from the localization table.
+ * @param key The key of the localized string.
+ * @returns The localized string or undefined if not found.
+ */
 export declare function tryGetText(key: string): string;
+/**
+ * Proxies text retrieval for localization.
+ * @param o The original object.
+ * @param p The prefix for the keys.
+ * @param t The translation table.
+ * @returns A proxy object for localized text retrieval.
+ */
 export declare function proxyTexts(o: Record<string, any>, p: string, t: Record<string, any>): Object;
+/**
+ * A list of languages with their IDs and display texts.
+ */
 export type LanguageList = {
 	id: string;
 	text: string;
 }[];
+/**
+ * Options for translating texts.
+ */
 export type TranslateTextsOptions = {
+	/** The source language ID */
 	SourceLanguageID?: string;
+	/** An array of inputs for translation */
 	Inputs: {
+		/** The text key to be translated */
 		TextKey?: string;
+		/** The target language ID */
 		TargetLanguageID?: string;
+		/** The source text to be translated */
 		SourceText?: string;
 	}[];
 };
+/**
+ * The result of a translation operation.
+ */
 export type TranslateTextsResult = {
+	/** An array of resulting translations */
 	Translations?: {
+		/** The text key that was translated */
 		TextKey?: string;
+		/** The target language ID */
 		TargetLanguageID?: string;
+		/** The translated text */
 		TranslatedText?: string;
 	}[];
 };
+/**
+ * Configuration for translation services.
+ */
 export declare const TranslationConfig: {
+	/** Retrieves the list of available languages */
 	getLanguageList: () => LanguageList;
+	/** A function to translate texts based on provided options */
 	translateTexts: (opt: TranslateTextsOptions) => PromiseLike<TranslateTextsResult>;
 };
 /** @deprecated prefer localText for better discoverability */
@@ -1939,65 +2004,257 @@ export declare function serviceCall<TResponse extends ServiceResponse>(options: 
 export declare function serviceRequest<TResponse extends ServiceResponse>(service: string, request?: any, onSuccess?: (response: TResponse) => void, options?: ServiceOptions<TResponse>): PromiseLike<TResponse>;
 export declare const typeInfoProperty = "typeInfo";
 export type StringLiteral<T> = T extends string ? string extends T ? never : T : never;
+/**
+ * Type information for a registered type.
+ */
 export type TypeInfo<T> = {
+	/** Type kind, can be "class", "enum", "interface", "editor" or "formatter" */
 	typeKind: "class" | "enum" | "interface" | "editor" | "formatter";
+	/** Registered type name */
 	typeName: StringLiteral<T> | (string & {});
+	/** Implemented interfaces */
 	interfaces?: any[];
+	/** Custom attributes */
 	customAttributes?: any[];
+	/** Enum flags */
 	enumFlags?: boolean;
+	/** Registered flag */
 	registered?: boolean;
 };
 export declare function getTypeRegistry(): any;
 export declare function getTypeNameProp(type: any): string;
 export declare function setTypeNameProp(type: any, value: string): void;
+/**
+ * Get the global object  (window in browsers, global in node)
+ */
 export declare function getGlobalObject(): any;
+/**
+ * Omit undefined properties from an object. Does not modify the original object.
+ * This is useful when using Object.assign to avoid overwriting existing values with undefined
+ * just like jQuery $.extend does.
+ * @param x Object to omit undefined properties from
+ * @returns New object without undefined properties
+ */
 export declare function omitUndefined(x: {
 	[key: string]: any;
 }): any;
+/**
+ * Type alias for a function or object (enum).
+ */
 export type Type = Function | Object;
+/**
+ * Get a nested property from an object. Can be used to get nested properties from global object for example by separating names with dots.
+ * @param from Object to get the property from
+ * @param name Name of the property (dot-separated for nested properties)
+ * @returns Value of the property or null if not found
+ */
 export declare function getNested(from: any, name: string): any;
+/**
+ * Get a type by name from the type registry, global object or a specific target.
+ * @param name Name of the type
+ * @param target Target object to search in (defaults to global object)
+ * @returns The type or null if not found
+ */
 export declare function getType(name: string, target?: any): Type;
+/**
+ * Get the full name of a type (including namespace if any).
+ * This returns the name from typeInfo.typeName if available (e.g. registered via decorators),
+ * otherwise tries to get the name from function's name property.
+ * @param type Type to get the name of
+ */
 export declare function getTypeFullName(type: Type): string;
+/**
+ * Get the short name of a type (without namespace).
+ * @param type Type to get the name of
+ * @returns Short name of the type
+ */
 export declare function getTypeShortName(type: Type): string;
+/**
+ * Get the instance type of an object.
+ * @param instance Object to get the instance type of
+ * @returns The instance type or Object if not found
+ */
 export declare function getInstanceType(instance: any): any;
-export declare function isAssignableFrom(target: any, type: Type): any;
+/**
+ * Check if a type is assignable from another type. A type is
+ * assignable from another type if they are the same or if the other type
+ * is derived from it. This also works for interfaces if they are registered
+ * via registerInterface function or decorators.
+ * @param target Target type or interface
+ * @param fromType Type to check assignability from
+ * @returns true if target is assignable from type
+ */
+export declare function isAssignableFrom(target: any, fromType: Type): any;
+/**
+ * Check if an instance is of a specific type.
+ * @param instance Object to check
+ * @param type Type to check against
+ * @returns true if instance is of type
+ */
 export declare function isInstanceOfType(instance: any, type: Type): any;
+/**
+ * Get the base type of a class or interface.
+ * @param type Type to get the base type of
+ * @returns The base type or null if not found
+ */
 export declare function getBaseType(type: any): any;
+/**
+ * Register a class with the type system.
+ * @param type Class type to register
+ * @param name Name to register the class under
+ * @param intf Optional interfaces the class implements
+ */
 export declare function registerClass(type: any, name: string, intf?: any[]): void;
+/**
+ * Register an enum with the type system.
+ * @param type Enum type to register
+ * @param name Name to register the enum under
+ * @param enumKey Optional key to use for the enum
+ */
 export declare function registerEnum(type: any, name: string, enumKey?: string): void;
+/**
+ * Register an interface with the type system. There is no runtime representation of interfaces
+ * in JavaScript, so Serenity uses classes decorated with some special symbols to emulate
+ * interfaces to some degree. This is used by the type system to support isAssignableFrom and
+ * isInstanceOfType functions for interfaces.
+ * @param type Interface type to register
+ * @param name Name to register the interface under
+ * @param intf Optional interfaces the interface class implements
+ */
 export declare function registerInterface(type: any, name: string, intf?: any[]): void;
+/**
+ * Enum utilities
+ */
 export declare namespace Enum {
+	/**
+	 * Convert an enum value to a string containing enum names.
+	 * @param enumType Enum type
+	 * @param value Enum value
+	 */
 	let toString: (enumType: any, value: number) => string;
+	/**
+	 * Get all numeric values of an enum as an array.
+	 * @param enumType
+	 * @returns
+	 */
 	let getValues: (enumType: any) => any[];
 }
+/**
+ * Check if a type is an enum. A type is considered an enum if it is not a function
+ * and it has isInterfaceTypeSymbol property set to null (which is set by registerEnum function).
+ * @param type Type to check
+ * @returns True if the type is an enum
+ */
 export declare const isEnum: (type: any) => boolean;
+/**
+ * Initialize a form type. This is used in the XYZForm.ts files that are generated
+ * by the Serenity server typings code generator. It defines getters that call this.w() to
+ * initialize form fields on the prototype of a form class.
+ * @param typ Form type to initialize
+ * @param nameWidgetPairs Array of name-widget pairs
+ */
 export declare function initFormType(typ: Function, nameWidgetPairs: any[]): void;
+/**
+ * Get a proxy for form fields. This proxy returns the field name for any property
+ * accessed on it. This is used in form initialization to avoid having to declare
+ * a variable for the fields type. There is no actual runtime check for field names,
+ * so it is only used to provide intellisense and compile-time checks.
+ * @returns A readonly record of form field names and same string values
+ */
 export declare function fieldsProxy<TRow>(): Readonly<Record<keyof TRow, string>>;
+/**
+ * Check if an object is array-like. An object is considered array-like if it is
+ * not null, is of type object, has a numeric length property and does not have
+ * a nodeType property (to exclude DOM nodes).
+ * @param obj Object to check
+ * @returns True if the object is array-like
+ */
 export declare function isArrayLike(obj: any): obj is ArrayLike<any>;
+/**
+ * Check if an object is Promise-like, meaning it is either a native Promise
+ * or an object with then and catch methods (like jQuery Deferred).
+ * @param obj Object to check
+ * @returns True if the object is Promise-like
+ */
 export declare function isPromiseLike(obj: any): obj is PromiseLike<any>;
+/**
+ * Utility type to prevent type inference in generic types.
+ * TypeScript 5.4 has added a built-in NoInfer<T> type that can be used instead of this.
+ */
 export type SNoInfer<T> = [
 	T
 ][T extends any ? 0 : never];
+/**
+ * Attribute class for editors. This is used by the editorTypeInfo function
+ * and registerEditor function to add EditorAttribute to editors.
+ */
 export declare class EditorAttribute {
 }
+/**
+ * Marker interface for SlickGrid formatters.
+ */
 export declare class ISlickFormatter {
 }
+/**
+ * Register a SlickGrid formatter.
+ * @param type Formatter type
+ * @param name Formatter name
+ * @param intf Optional interface(s) to implement
+ */
 export declare function registerFormatter(type: any, name: string, intf?: any[]): void;
+/**
+ * Register an editor type. Adds EditorAttribute if not already present.
+ * @param type Editor type
+ * @param name Editor name
+ * @param intf Optional interface(s) to implement
+ */
 export declare function registerEditor(type: any, name: string, intf?: any[]): void;
+/**
+ * Adds a custom attribute to a type. JavaScript does not have built-in support for attributes,
+ * so Serenity uses a customAttributes array on typeInfo to store them. This is used by
+ * decorators and some helper functions to add attributes to classes.
+ * @param type
+ * @param attr
+ */
 export declare function addCustomAttribute(type: any, attr: any): void;
+/**
+ * Get a custom attribute of a type.
+ * @param type Type to get the attribute from
+ * @param attrType Attribute type to get
+ * @param inherit Indicates whether to search in base types
+ * @returns The custom attribute or null if not found
+ */
 export declare function getCustomAttribute<TAttr>(type: any, attrType: {
 	new (...args: any[]): TAttr;
 }, inherit?: boolean): TAttr;
+/**
+ * Get whether a type has a specific custom attribute.
+ * @param type Type to check
+ * @param attrType Attribute type to check
+ * @param inherit Indicates whether to search in base types
+ * @returns True if the type has the attribute
+ */
 export declare function hasCustomAttribute<TAttr>(type: any, attrType: {
 	new (...args: any[]): TAttr;
 }, inherit?: boolean): boolean;
+/**
+ * Get all custom attributes of a type.
+ * @param type Type to get the attributes from
+ * @param attrType Attribute type to get. If not specified, all attributes are returned.
+ * @param inherit Indicates whether to search in base types
+ * @returns An array of custom attributes
+ */
 export declare function getCustomAttributes<TAttr>(type: any, attrType: {
 	new (...args: any[]): TAttr;
 }, inherit?: boolean): TAttr[];
-export type ClassTypeInfo<T> = TypeInfo<T>;
-export type EditorTypeInfo<T> = TypeInfo<T>;
-export type FormatterTypeInfo<T> = TypeInfo<T>;
-export type InterfaceTypeInfo<T> = TypeInfo<T>;
+/** Class type information. This is used to make type name available in declaration files unlike decorators that does not show in .d.ts files. */
+export type ClassTypeInfo<TypeName> = TypeInfo<TypeName>;
+/** Editor type information. This is used to make type name available in declaration files unlike decorators that does not show in .d.ts files. */
+export type EditorTypeInfo<TypeName> = TypeInfo<TypeName>;
+/** Formatter type information. This is used to make type name available in declaration files unlike decorators that does not show in .d.ts files. */
+export type FormatterTypeInfo<TypeName> = TypeInfo<TypeName>;
+/** Interface type information. This is used to make type name available in declaration files unlike decorators that does not show in .d.ts files. */
+export type InterfaceTypeInfo<TypeName> = TypeInfo<TypeName>;
 export declare function classTypeInfo<T>(typeName: StringLiteral<T>, interfaces?: any[]): ClassTypeInfo<T>;
 export declare function editorTypeInfo<T>(typeName: StringLiteral<T>, interfaces?: any[]): EditorTypeInfo<T>;
 export declare function formatterTypeInfo<T>(typeName: StringLiteral<T>, interfaces?: any[]): FormatterTypeInfo<T>;
@@ -2608,7 +2865,6 @@ export type WidgetProps<P> = {
 	element?: ((el: HTMLElement) => void) | HTMLElement | ArrayLike<HTMLElement> | string;
 } & SNoInfer<P>;
 export declare class Widget<P = {}> {
-	static typeInfo: ClassTypeInfo<"Serenity.Widget">;
 	private static nextWidgetNumber;
 	protected readonly options: WidgetProps<P>;
 	readonly uniqueName: string;
@@ -2651,6 +2907,9 @@ export declare class Widget<P = {}> {
 	protected syncOrAsyncThen<T>(syncMethod: (() => T), asyncMethod: (() => PromiseLike<T>), then: (v: T) => void): void;
 	protected useIdPrefix(): IdPrefixType;
 	static readonly isComponent = true;
+	static classType<T>(typeName: StringLiteral<T>, interfaces?: any[]): ClassTypeInfo<T>;
+	static editorType<T>(typeName: StringLiteral<T>, interfaces?: any[]): EditorTypeInfo<T>;
+	static typeInfo: ClassTypeInfo<"Serenity.Widget">;
 }
 /** @deprecated Use Widget */
 export declare const TemplatedWidget: typeof Widget;
@@ -4992,6 +5251,11 @@ export interface IInitializeColumn {
 }
 export declare class IInitializeColumn {
 }
+export declare abstract class FormatterBase implements Formatter {
+	abstract format(ctx: FormatterContext): FormatterResult;
+	static formatterType<T>(typeName: StringLiteral<T>, interfaces?: any[]): FormatterTypeInfo<T>;
+	static typeInfo: FormatterTypeInfo<"Serenity.FormatterBase">;
+}
 export declare class BooleanFormatter implements Formatter {
 	readonly props: {
 		falseText?: string;
@@ -5007,7 +5271,7 @@ export declare class BooleanFormatter implements Formatter {
 	get trueText(): string;
 	set trueText(value: string);
 }
-export declare class CheckboxFormatter implements Formatter {
+export declare class CheckboxFormatter extends FormatterBase {
 	static typeInfo: FormatterTypeInfo<"Serenity.CheckboxFormatter">;
 	format(ctx: FormatterContext): string;
 }
