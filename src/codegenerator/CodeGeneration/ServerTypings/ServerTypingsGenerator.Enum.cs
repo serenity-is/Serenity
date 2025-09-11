@@ -47,8 +47,8 @@ public partial class ServerTypingsGenerator : TypingsGeneratorBase
             sb.AppendLine();
         });
 
-        var decorators = ImportFromCorelib("Decorators");
-        cw.Indented($"{decorators}.registerEnumType(");
+        var registerEnum = ImportFromCorelib("registerEnum");
+        cw.Indented($"{registerEnum}(");
 
         sb.Append(enumType.Name);
         sb.Append(", '");
