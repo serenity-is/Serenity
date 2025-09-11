@@ -44,12 +44,12 @@ jobs:
     - name: script build
       run: pnpm -r build
 
-    - name: script tests
-      run: pnpm -r test -- --coverage
-
     - name: dotnet pack Serenity.Net.CodeGenerator
       run: dotnet pack 
       working-directory: "./src/codegenerator"
+
+    - name: script tests
+      run: pnpm -r test -- --coverage
 
     - name: dotnet build Serenity.sln
       run: dotnet build /p:SkipNodeScripts=true
