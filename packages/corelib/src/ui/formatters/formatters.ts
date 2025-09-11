@@ -1,5 +1,5 @@
 ﻿import { Column, FormatterContext, FormatterResult } from "@serenity-is/sleekgrid";
-import { Culture, DialogTexts, Enum, faIcon, formatDate, formatNumber, formatterTypeInfo, FormatterTypeInfo, getCustomAttribute, getTypeFullName, htmlEncode, iconClassName, isPromiseLike, localText, parseDecimal, parseISODateTime, registerType, resolveUrl, stringFormat, StringLiteral, tryGetText } from "../../base";
+import { Culture, DialogTexts, Enum, faIcon, formatDate, formatNumber, formatterTypeInfo, FormatterTypeInfo, getCustomAttribute, getTypeFullName, htmlEncode, iconClassName, isPromiseLike, localText, parseDecimal, parseISODateTime, registerType, resolveUrl, stringFormat, StringLiteral, tryGetText, typeInfoProperty } from "../../base";
 import { replaceAll } from "../../compat";
 import { Formatter } from "../../slick";
 import { EnumKeyAttribute } from "../../types/attributes";
@@ -18,7 +18,10 @@ export abstract class FormatterBase implements Formatter {
     abstract format(ctx: FormatterContext): FormatterResult;
 
 
-    static formatterType<T>(typeName: StringLiteral<T>, interfaces?: any[]): FormatterTypeInfo<T> {
+    protected static formatterTypeInfo<T>(typeName: StringLiteral<T>, interfaces?: any[]): FormatterTypeInfo<T> {
+        if (Object.prototype.hasOwnProperty.call(this, typeInfoProperty) && this[typeInfoProperty])
+            throw new Error(`Type ${this.name} already has a typeInfo property!`);
+                
         const typeInfo = this.typeInfo = formatterTypeInfo(typeName, interfaces);
         registerType(this);
         return typeInfo;
@@ -52,7 +55,7 @@ export class BooleanFormatter implements Formatter {
 }
 
 export class CheckboxFormatter extends FormatterBase {
-    static typeInfo = this.formatterType("Serenity.CheckboxFormatter");
+    static typeInfo = this.formatterTypeInfo("Serenity.CheckboxFormatter");
     
     format(ctx: FormatterContext) {
         return '<span class="check-box no-float readonly slick-edit-preclick ' + (!!ctx.value ? ' checked' : '') + '"></span>';

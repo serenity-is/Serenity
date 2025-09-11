@@ -68,7 +68,7 @@ declare class Widget<TOptions = any> {
 }
 
 declare class StringEditor extends Widget<any> {
-    static readonly __typeName = ""Serenity.StringEditor"";
+    static typeInfo = this.editorTypeInfo(""Serenity.StringEditor"");
     static readonly __bool = false;
 }
 
@@ -120,7 +120,7 @@ export class Type1 extends StringEditor {
                     x =>
                     {
                         Assert.True(x.IsStatic);
-                        Assert.Equal("__typeName", x.Name);
+                        Assert.Equal("typeInfo", x.Name);
                         Assert.Equal("Serenity.StringEditor", x.Value);
                     });
             },

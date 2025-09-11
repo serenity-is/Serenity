@@ -217,6 +217,17 @@ public abstract class TypingsGeneratorBase : ImportGeneratorBase
     protected override void GenerateAll()
     {
         var visitedForAnnotations = new HashSet<string>(StringComparer.OrdinalIgnoreCase);
+
+        static (string, string) extractTypeNameViaTypeInfo(ExternalType type)
+        {
+            var field = type.Fields?.FirstOrDefault(x =>
+                x.IsStatic == true &&
+                x.Value is string &&
+                x.Name == "typeInfo" &&
+                x.Type?.EndsWith("TypeInfo", StringComparison.Ordinal) == true);
+            return (field?.Value as string, field?.Type);
+        }
+
         modularEditorTypeByKey = TSTypes.Values.Select(type =>
         {
             if (type.IsAbstract != true &&
@@ -224,6 +235,11 @@ public abstract class TypingsGeneratorBase : ImportGeneratorBase
                 type.IsEnum != true &&
                 !string.IsNullOrEmpty(type.Module))
             {
+                if (extractTypeNameViaTypeInfo(type) is var (tiKey, tiType) &&
+                    !string.IsNullOrEmpty(tiKey) &&
+                    tiType == "EditorTypeInfo")
+                    return (key: tiKey, type);
+
                 if (type.SourceFile?.EndsWith(".d.ts") == true &&
                     (HasBaseType(type, ClientTypesGenerator.EditorBaseClasses) ||
                      (HasBaseType(type, "@serenity-is/corelib:Widget", "Widget") &&
@@ -258,6 +274,12 @@ public abstract class TypingsGeneratorBase : ImportGeneratorBase
                 type.IsInterface != true &&
                 !string.IsNullOrEmpty(type.Module))
             {
+
+                if (extractTypeNameViaTypeInfo(type) is var (tiKey, tiType) &&
+                    !string.IsNullOrEmpty(tiKey) &&
+                    tiType == "FormatterTypeInfo")
+                    return (key: tiKey, type);
+
                 if (type.SourceFile?.EndsWith(".d.ts") == true &&
                     type.Interfaces != null &&
                     type.Interfaces.Any(x => x == "ISlickFormatter" ||
@@ -287,11 +309,17 @@ public abstract class TypingsGeneratorBase : ImportGeneratorBase
 
         modularDialogTypeByKey = TSTypes.Values.Select(type =>
         {
+            // add dialog base class / IDialog / dialogOpen check?
             if (type.IsAbstract != true &&
                 type.IsEnum != true &&
                 type.IsInterface != true &&
                 !string.IsNullOrEmpty(type.Module))
             {
+                if (extractTypeNameViaTypeInfo(type) is var (tiKey, tiType) &&
+                    !string.IsNullOrEmpty(tiKey) &&
+                    tiType == "ClassTypeInfo")
+                    return (key: tiKey, type);
+
                 if (type.Attributes != null)
                 {
                     foreach (var attr in type.Attributes)

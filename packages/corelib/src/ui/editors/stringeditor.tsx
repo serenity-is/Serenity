@@ -2,7 +2,7 @@
 import { EditorWidget } from "./editorwidget";
 
 export class StringEditor<P = {}> extends EditorWidget<P> {
-    static override typeInfo = this.editorType("Serenity.StringEditor", [IStringValue]);
+    static override typeInfo = this.editorTypeInfo("Serenity.StringEditor", [IStringValue]);
     
     declare readonly domNode: HTMLInputElement;
     

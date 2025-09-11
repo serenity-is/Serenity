@@ -1,4 +1,4 @@
-import { ClassTypeInfo, Config, EditorTypeInfo, Fluent, StringLiteral, addClass, addValidationRule, appendToNode, classTypeInfo, editorTypeInfo, getCustomAttribute, getInstanceType, getTypeFullName, getTypeShortName, isArrayLike, registerType, toggleClass } from "../../base";
+import { ClassTypeInfo, Config, EditorTypeInfo, Fluent, StringLiteral, addClass, addValidationRule, appendToNode, classTypeInfo, editorTypeInfo, getCustomAttribute, getInstanceType, getTypeFullName, getTypeShortName, isArrayLike, registerType, toggleClass, typeInfoProperty } from "../../base";
 import { ensureParentOrFragment, handleElementProp, isFragmentWorkaround, setElementProps } from "./widgetinternal";
 import { IdPrefixType, associateWidget, deassociateWidget, getWidgetName, useIdPrefix, type WidgetProps } from "./widgetutils";
 export { getWidgetFrom, tryGetWidget, useIdPrefix, type IdPrefixType, type WidgetProps } from "./widgetutils";
@@ -218,20 +218,25 @@ export class Widget<P = {}> {
     // jsx-dom >= 8.1.5 requires isComponent as a static property
     static readonly isComponent = true;
 
-    static classType<T>(typeName: StringLiteral<T>, interfaces?: any[]): ClassTypeInfo<T> {
+    protected static classTypeInfo<T>(typeName: StringLiteral<T>, interfaces?: any[]): ClassTypeInfo<T> {
+        if (Object.prototype.hasOwnProperty.call(this, typeInfoProperty) && this[typeInfoProperty])
+            throw new Error(`Type ${this.name} already has a typeInfo property!`);
+
         const typeInfo = this.typeInfo = classTypeInfo(typeName, interfaces);
         registerType(this);
         return typeInfo;
     }
 
-    static editorType<T>(typeName: StringLiteral<T>, interfaces?: any[]): EditorTypeInfo<T> {
-        const typeInfo = editorTypeInfo(typeName, interfaces);
-        this.typeInfo = typeInfo;
+    protected static editorTypeInfo<T>(typeName: StringLiteral<T>, interfaces?: any[]): EditorTypeInfo<T> {
+        if (Object.prototype.hasOwnProperty.call(this, typeInfoProperty) && this[typeInfoProperty])
+            throw new Error(`Type ${this.name} already has a typeInfo property!`);
+        
+        const typeInfo = this.typeInfo = editorTypeInfo(typeName, interfaces);
         registerType(this);
         return typeInfo;
     }
 
-    static typeInfo = this.classType("Serenity.Widget");
+    static typeInfo = this.classTypeInfo("Serenity.Widget");
 }
 
 /** @deprecated Use Widget */

@@ -2907,8 +2907,8 @@ export declare class Widget<P = {}> {
 	protected syncOrAsyncThen<T>(syncMethod: (() => T), asyncMethod: (() => PromiseLike<T>), then: (v: T) => void): void;
 	protected useIdPrefix(): IdPrefixType;
 	static readonly isComponent = true;
-	static classType<T>(typeName: StringLiteral<T>, interfaces?: any[]): ClassTypeInfo<T>;
-	static editorType<T>(typeName: StringLiteral<T>, interfaces?: any[]): EditorTypeInfo<T>;
+	protected static classTypeInfo<T>(typeName: StringLiteral<T>, interfaces?: any[]): ClassTypeInfo<T>;
+	protected static editorTypeInfo<T>(typeName: StringLiteral<T>, interfaces?: any[]): EditorTypeInfo<T>;
 	static typeInfo: ClassTypeInfo<"Serenity.Widget">;
 }
 /** @deprecated Use Widget */
@@ -5253,7 +5253,7 @@ export declare class IInitializeColumn {
 }
 export declare abstract class FormatterBase implements Formatter {
 	abstract format(ctx: FormatterContext): FormatterResult;
-	static formatterType<T>(typeName: StringLiteral<T>, interfaces?: any[]): FormatterTypeInfo<T>;
+	protected static formatterTypeInfo<T>(typeName: StringLiteral<T>, interfaces?: any[]): FormatterTypeInfo<T>;
 	static typeInfo: FormatterTypeInfo<"Serenity.FormatterBase">;
 }
 export declare class BooleanFormatter implements Formatter {

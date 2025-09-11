@@ -129,8 +129,9 @@ public partial class ClientTypesGenerator : ImportGeneratorBase
                 )?.Arguments[0].Value as string ??
                 type.Fields?.FirstOrDefault(x =>
                     x.IsStatic == true &&
-                    x.Name == "__typeName" &&
-                    x.Value is string)?.Value as string;
+                    x.Value is string &&
+                    x.Name == "typeInfo" && 
+                    x.Type?.EndsWith("TypeInfo", StringComparison.Ordinal) == true)?.Value as string;
 
             if (string.IsNullOrEmpty(ns))
             {

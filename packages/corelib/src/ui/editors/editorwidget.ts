@@ -11,7 +11,7 @@ export type EditorProps<T> = WidgetProps<T> & {
 }
 
 export class EditorWidget<P> extends Widget<EditorProps<P>> {
-    static override typeInfo = this.classType("Serenity.EditorWidget");
+    static override typeInfo = this.classTypeInfo("Serenity.EditorWidget");
 
     constructor(props: EditorProps<P>) {
         super(props);

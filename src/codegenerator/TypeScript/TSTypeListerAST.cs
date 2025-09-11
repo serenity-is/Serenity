@@ -18,7 +18,7 @@ public class TSTypeListerAST
     private readonly CancellationToken cancellationToken;
 
     internal TSTypeListerAST(IFileSystem fileSystem, string tsConfigDir,
-        TSConfig tsConfig, ConcurrentDictionary<string, object> astCache = null, 
+        TSConfig tsConfig, ConcurrentDictionary<string, object> astCache = null,
         CancellationToken cancellationToken = default)
     {
         this.fileSystem = fileSystem ?? throw new ArgumentNullException(nameof(fileSystem));
@@ -37,7 +37,7 @@ public class TSTypeListerAST
 
     static bool HasExportModifier(INode node)
     {
-        
+
         return node.HasModifier(SyntaxKind.ExportKeyword);
     }
 
@@ -171,7 +171,7 @@ public class TSTypeListerAST
         return GetTypeReferenceExpression(node, out _, isDecorator);
     }
 
-    string GetTypeReferenceExpression(INode node, out string genericArgs, 
+    string GetTypeReferenceExpression(INode node, out string genericArgs,
         bool isDecorator = false)
     {
         genericArgs = null;
@@ -184,7 +184,7 @@ public class TSTypeListerAST
             if (intersectionType.Types != null &&
                 intersectionType.Types.Count > 0)
             {
-                return '[' + string.Join(",", intersectionType.Types.Select(x => 
+                return '[' + string.Join(",", intersectionType.Types.Select(x =>
                     GetTypeReferenceExpression(x, isDecorator: false))
                         .Where(x => x != null)
                         .Select(x => x.ToDoubleQuoted())) + ']';
@@ -199,7 +199,7 @@ public class TSTypeListerAST
                 typeLiteral.Members.Count > 0)
             {
                 var members = GetInterfaceOrLiteralTypeMembers(typeLiteral.Members);
-                return "{" + string.Join(",", members.Select(x => x.Name.ToDoubleQuoted() 
+                return "{" + string.Join(",", members.Select(x => x.Name.ToDoubleQuoted()
                     + ":" + x.Type.ToDoubleQuoted())) + "}";
             }
 
@@ -210,7 +210,7 @@ public class TSTypeListerAST
         if (text is null || text.Length == 0 || text == "any")
             return null;
 
-        if (text[0] == '(' || 
+        if (text[0] == '(' ||
             text[0] == '{' ||
             text.Contains('|'))
             return null;
@@ -296,7 +296,7 @@ public class TSTypeListerAST
                              GetText((child as ClassDeclaration).Name) == noGeneric) ||
                             (child.Kind == SyntaxKind.InterfaceDeclaration &&
                              GetText((child as InterfaceDeclaration).Name) == noGeneric) ||
-                            (child.Kind == SyntaxKind.EnumDeclaration && 
+                            (child.Kind == SyntaxKind.EnumDeclaration &&
                              GetText((child as EnumDeclaration).Name) == noGeneric))
                             return PrependNamespace(noGeneric.ToString(), child) + functionSuffix;
                     }
@@ -330,7 +330,7 @@ public class TSTypeListerAST
             var idx = ns.LastIndexOf('.');
             if (idx >= 0)
                 ns = ns[..idx];
-            else 
+            else
                 break;
         }
 
@@ -342,12 +342,12 @@ public class TSTypeListerAST
         if (node.HeritageClauses == null)
             return null;
 
-        foreach (var heritage in node.HeritageClauses) 
+        foreach (var heritage in node.HeritageClauses)
         {
             if (heritage.Token == SyntaxKind.ExtendsKeyword &&
-                heritage.Types != null) 
+                heritage.Types != null)
             {
-                foreach (var type in heritage.Types) 
+                foreach (var type in heritage.Types)
                     return GetTypeReferenceExpression(type);
             }
         }
@@ -361,7 +361,7 @@ public class TSTypeListerAST
         if (node.HeritageClauses == null)
             return result;
 
-        foreach (var heritage in node.HeritageClauses) 
+        foreach (var heritage in node.HeritageClauses)
         {
             if (heritage.Token == SyntaxKind.ImplementsKeyword &&
                 heritage.Types != null)
@@ -393,7 +393,7 @@ public class TSTypeListerAST
         return result.Count == 0 ? null : result;
     }
 
-    List<ExternalGenericParameter> TypeParametersToExternal(NodeArray<TypeParameterDeclaration> p) 
+    List<ExternalGenericParameter> TypeParametersToExternal(NodeArray<TypeParameterDeclaration> p)
     {
         if (p == null || p.Count == 0)
             return null;
@@ -406,9 +406,9 @@ public class TSTypeListerAST
         }).ToList();
     }
 
-    static bool IsUnderAmbientNamespace(INode node) 
+    static bool IsUnderAmbientNamespace(INode node)
     {
-        return EnumerateParents(node).Any(x => 
+        return EnumerateParents(node).Any(x =>
             (x.Kind == SyntaxKind.ModuleDeclaration &&
              x.HasModifier(SyntaxKind.DeclareKeyword)) ||
             (x.Kind == SyntaxKind.SourceFile &&
@@ -481,7 +481,7 @@ public class TSTypeListerAST
         if (node.Members == null)
             return result;
 
-        foreach (var member in node.Members) 
+        foreach (var member in node.Members)
         {
 
             if (member.Kind != SyntaxKind.MethodDeclaration &&
@@ -502,7 +502,34 @@ public class TSTypeListerAST
 
                 var pd = (member as PropertyDeclaration);
                 if (pd.Type != null)
-                    externalMember.Type = GetTypeReferenceExpression(pd.Type);
+                {
+                    if (name == "typeInfo" &&
+                        member.HasModifier(SyntaxKind.StaticKeyword) &&
+                        pd.Type is TypeReferenceNode trn &&
+                        trn.TypeName is Identifier trni &&
+                        trn.TypeArguments?.Count == 1 &&
+                        trn.TypeArguments[0] is LiteralTypeNode trnl &&
+                        trnl.Literal is StringLiteral trnll)
+                    {
+                        externalMember.Type = trni.Text;
+                        externalMember.Value = trnll.Text;
+                    }
+                    else
+                        externalMember.Type = GetTypeReferenceExpression(pd.Type);
+                }
+                else if (
+                    name == "typeInfo" &&
+                    member.HasModifier(SyntaxKind.StaticKeyword) &&
+                    pd.Initializer is CallExpression ce &&
+                    ce.Expression is PropertyAccessExpression pae &&
+                    ce.Arguments?.Count >= 1 &&
+                    ce.Arguments[0] is StringLiteral ltns &&
+                    pae.Name?.Text is string paet)
+                {
+                    externalMember.Type = char.ToUpperInvariant(paet[0]) + paet[1..];
+                    externalMember.Value = ltns.Text;
+                }
+
                 if (pd.Initializer is StringLiteral sl)
                     externalMember.Value = sl.Text;
                 else if (pd.Initializer?.Kind == SyntaxKind.FalseKeyword)
@@ -560,11 +587,11 @@ public class TSTypeListerAST
     }
 
     List<ExternalMember> GetInterfaceOrLiteralTypeMembers(NodeArray<ITypeElement> members)
-    { 
+    {
         var result = new List<ExternalMember>();
         var used = new HashSet<string>();
 
-        foreach (var member in members) 
+        foreach (var member in members)
         {
             if (member.Kind != SyntaxKind.PropertySignature &&
                 member.Kind != SyntaxKind.MethodSignature)
@@ -629,7 +656,7 @@ public class TSTypeListerAST
 
     ExternalType ClassToExternalType(ClassDeclaration klass)
     {
-        var result = new ExternalType 
+        var result = new ExternalType
         {
             BaseType = GetBaseType(klass),
             GenericParameters = TypeParametersToExternal(klass.TypeParameters),
@@ -656,7 +683,7 @@ public class TSTypeListerAST
 
     ExternalType InterfaceToExternalType(InterfaceDeclaration intf)
     {
-        var result = new ExternalType 
+        var result = new ExternalType
         {
             GenericParameters = TypeParametersToExternal(intf.TypeParameters),
             Namespace = GetNamespace(intf),
@@ -736,7 +763,7 @@ public class TSTypeListerAST
         if (statements is null)
             return result;
 
-        foreach (var member in statements) 
+        foreach (var member in statements)
         {
             if (member.Kind != SyntaxKind.MethodDeclaration &&
                 member.Kind != SyntaxKind.PropertyDeclaration)
@@ -785,9 +812,9 @@ public class TSTypeListerAST
         return result;
     }
 
-    ExternalType ModuleToExternalType(ModuleDeclaration module) 
+    ExternalType ModuleToExternalType(ModuleDeclaration module)
     {
-        var result = new ExternalType 
+        var result = new ExternalType
         {
             Namespace = GetNamespace(module),
             Name = GetText(module.Name),
@@ -905,7 +932,7 @@ public class TSTypeListerAST
             {
                 case SyntaxKind.ClassDeclaration:
                     var klass = node as ClassDeclaration;
-                    if (sourceFile.IsDeclarationFile || HasExportModifier(node)) 
+                    if (sourceFile.IsDeclarationFile || HasExportModifier(node))
                     {
                         var exportedType = ClassToExternalType(klass);
                         result.Add(exportedType);
@@ -925,7 +952,7 @@ public class TSTypeListerAST
                 case SyntaxKind.InterfaceDeclaration:
                     var intf = node as InterfaceDeclaration;
 
-                    if (sourceFile.IsDeclarationFile || HasExportModifier(node)) 
+                    if (sourceFile.IsDeclarationFile || HasExportModifier(node))
                     {
                         var exportedType = InterfaceToExternalType(intf);
                         result.Add(exportedType);
@@ -944,14 +971,14 @@ public class TSTypeListerAST
                         if (exportedType != null)
                             result.Add(exportedType);
                     }
-                    
+
                     break;
 
                 case SyntaxKind.ModuleDeclaration:
                     var modul = node as ModuleDeclaration;
 
                     if (sourceFile.IsDeclarationFile || HasExportModifier(modul) ||
-                        (!IsUnderAmbientNamespace(modul) && !HasDeclareModifier(modul))) 
+                        (!IsUnderAmbientNamespace(modul) && !HasDeclareModifier(modul)))
                     {
                         var exportedType = ModuleToExternalType(modul);
                         result.Add(exportedType);
