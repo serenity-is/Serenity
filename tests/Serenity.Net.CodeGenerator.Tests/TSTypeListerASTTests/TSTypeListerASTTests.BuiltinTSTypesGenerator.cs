@@ -179,6 +179,6 @@ public partial class TSTypeListerASTTests
             cb.IndentedLine(".ToArray();");
         });
 
-        System.IO.File.WriteAllText(System.IO.Path.Combine(serenityRoot, "src", "Serenity.Net.CodeGenerator", "CodeGeneration", "Model", "BuiltinTSTypes.gen.cs"), cb.ToString());
+        System.IO.File.WriteAllText(System.IO.Path.Combine(serenityRoot, "src", "codegenerator", "CodeGeneration", "Model", "BuiltinTSTypes.gen.cs"), cb.ToString());
     }
 }

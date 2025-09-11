@@ -1,4 +1,4 @@
-﻿import { Column, FormatterContext, FormatterResult } from "@serenity-is/sleekgrid";
+import { Column, FormatterContext, FormatterResult } from "@serenity-is/sleekgrid";
 import { Culture, DialogTexts, Enum, faIcon, formatDate, formatNumber, formatterTypeInfo, FormatterTypeInfo, getCustomAttribute, getTypeFullName, htmlEncode, iconClassName, isPromiseLike, localText, parseDecimal, parseISODateTime, registerType, resolveUrl, stringFormat, StringLiteral, tryGetText, typeInfoProperty } from "../../base";
 import { replaceAll } from "../../compat";
 import { Formatter } from "../../slick";
@@ -56,7 +56,7 @@ export class BooleanFormatter extends FormatterBase implements Formatter {
     public set trueText(value) { this.props.trueText = value; }
 }
 
-export class CheckboxFormatter extends FormatterBase {
+export class CheckboxFormatter extends FormatterBase implements Formatter {
     static override typeInfo = this.formatterTypeInfo("Serenity.CheckboxFormatter");
     
     format(ctx: FormatterContext) {

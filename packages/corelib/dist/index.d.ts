@@ -5344,7 +5344,7 @@ export declare class BooleanFormatter extends FormatterBase implements Formatter
 	get trueText(): string;
 	set trueText(value: string);
 }
-export declare class CheckboxFormatter extends FormatterBase {
+export declare class CheckboxFormatter extends FormatterBase implements Formatter {
 	static typeInfo: FormatterTypeInfo<"Serenity.CheckboxFormatter">;
 	format(ctx: FormatterContext): string;
 }
