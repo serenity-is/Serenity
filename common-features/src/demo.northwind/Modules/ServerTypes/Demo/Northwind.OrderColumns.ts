@@ -1,4 +1,4 @@
-﻿import { ColumnsBase, fieldsProxy } from "@serenity-is/corelib";
+﻿import { ColumnsBase, DateFormatter, EnumFormatter, fieldsProxy } from "@serenity-is/corelib";
 import { Column } from "@serenity-is/sleekgrid";
 import { EmployeeFormatter } from "../../Employee/EmployeeFormatter";
 import { FreightFormatter } from "../../Order/FreightFormatter";
@@ -25,4 +25,4 @@ export class OrderColumns extends ColumnsBase<OrderRow> {
     static readonly Fields = fieldsProxy<OrderColumns>();
 }
 
-[EmployeeFormatter, OrderShippingState, ShipperFormatter, FreightFormatter]; // referenced types
+[DateFormatter, EmployeeFormatter, EnumFormatter, OrderShippingState, ShipperFormatter, FreightFormatter]; // referenced types

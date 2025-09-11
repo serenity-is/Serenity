@@ -1,4 +1,4 @@
-import { Decorators, gridPageInit } from "@serenity-is/corelib";
+import { gridPageInit } from "@serenity-is/corelib";
 import { CustomerDialog, CustomerGrid, CustomerService } from "@serenity-is/demo.northwind";
 import "@serenity-is/demo.northwind/dist/index.css";
 
@@ -7,13 +7,14 @@ export default () => gridPageInit(SerialAutoNumberGrid);
 /**
  * Subclass of CustomerGrid to override dialog type to SerialAutoNumberDialog
  */
-@Decorators.registerClass('Serenity.Demo.BasicSamples.SerialAutoNumberGrid')
 export class SerialAutoNumberGrid extends CustomerGrid {
+    static override typeInfo = this.classTypeInfo("Serenity.Demo.BasicSamples.SerialAutoNumberGrid");
+
     protected getDialogType() { return SerialAutoNumberDialog; }
 }
 
-@Decorators.registerClass('Serenity.Demo.BasicSamples.SerialAutoNumberDialog')
 export class SerialAutoNumberDialog extends CustomerDialog {
+    static override typeInfo = this.classTypeInfo("Serenity.Demo.BasicSamples.SerialAutoNumberDialog");
 
     constructor(props: {}) {
         super(props);

@@ -1,10 +1,10 @@
-﻿import { Decorators, ToolButton, gridPageInit, indexOf } from "@serenity-is/corelib";
+﻿import { ToolButton, gridPageInit, indexOf } from "@serenity-is/corelib";
 import { SupplierGrid } from "@serenity-is/demo.northwind";
 
 export default () => gridPageInit(RemovingAddButton)
 
-@Decorators.registerClass('Serenity.Demo.BasicSamples.RemovingAddButton')
 export class RemovingAddButton extends SupplierGrid {
+    static override typeInfo = this.classTypeInfo("Serenity.Demo.BasicSamples.RemovingAddButton");
 
     /**
      * This method is called to get list of buttons to be created.

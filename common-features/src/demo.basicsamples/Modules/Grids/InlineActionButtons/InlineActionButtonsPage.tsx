@@ -1,4 +1,4 @@
-﻿import { Decorators, Fluent, confirmDialog, faIcon, gridPageInit, localText } from "@serenity-is/corelib";
+﻿import { Fluent, confirmDialog, faIcon, gridPageInit, localText } from "@serenity-is/corelib";
 import { CustomerGrid, CustomerService, OrderDialog } from "@serenity-is/demo.northwind";
 import { Column } from "@serenity-is/sleekgrid";
 
@@ -8,8 +8,8 @@ const deleteRowAction = "delete-row";
 const viewDetailsAction = "view-details";
 const newOrderAction = "new-order";
 
-@Decorators.registerClass('Serenity.Demo.BasicSamples.InlineActionGrid')
 export class InlineActionGrid extends CustomerGrid {
+    static override typeInfo = this.classTypeInfo("Serenity.Demo.BasicSamples.InlineActionGrid");
 
     protected getColumns() {
         var columns = super.getColumns();

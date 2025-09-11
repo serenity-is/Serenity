@@ -1,10 +1,10 @@
-﻿import { Criteria, Decorators, EntityGrid, ListRequest, gridPageInit } from "@serenity-is/corelib";
+﻿import { Criteria, EntityGrid, ListRequest, gridPageInit } from "@serenity-is/corelib";
 import { ProductColumns, ProductDialog, ProductRow, ProductService } from "@serenity-is/demo.northwind";
 
 export default () => gridPageInit(GridFilteredByCriteria);
 
-@Decorators.registerClass('Serenity.Demo.BasicSamples.GridFilteredByCriteria')
 export class GridFilteredByCriteria<P = {}> extends EntityGrid<ProductRow, P> {
+    static override typeInfo = this.classTypeInfo("Serenity.Demo.BasicSamples.GridFilteredByCriteria");
 
     protected getColumnsKey() { return ProductColumns.columnsKey; }
     protected getDialogType() { return ProductDialog; }

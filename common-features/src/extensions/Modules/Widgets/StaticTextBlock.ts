@@ -1,13 +1,11 @@
-import { Decorators, ISetEditValue, PropertyItem, Widget, WidgetProps, localText } from "@serenity-is/corelib";
+import { ISetEditValue, PropertyItem, Widget, WidgetProps, localText } from "@serenity-is/corelib";
 
 /**
-    * This is an editor widget but it only displays a text, not edits it.
-    *  
-    */
-@Decorators.element("<div/>")
-@Decorators.registerEditor('Serenity.Extensions.StaticTextBlock', [ISetEditValue])
-export class StaticTextBlock<P extends StaticTextBlockOptions = StaticTextBlockOptions> extends Widget<P>
-    implements ISetEditValue {
+* This is an editor widget but it only displays a text, not edits it.
+*/
+export class StaticTextBlock<P extends StaticTextBlockOptions = StaticTextBlockOptions> extends Widget<P> implements ISetEditValue {
+    static override typeInfo = this.editorTypeInfo("Serenity.Extensions.StaticTextBlock", [ISetEditValue]);
+    static override createDefaultElement() { return document.createElement("div"); }
 
     declare private value: string;
 

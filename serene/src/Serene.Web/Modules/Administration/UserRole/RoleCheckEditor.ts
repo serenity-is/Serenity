@@ -1,8 +1,8 @@
-import { CheckTreeEditor, CheckTreeItem, Decorators, GridUtils, isEmptyOrNull, stripDiacritics } from "@serenity-is/corelib";
+import { CheckTreeEditor, CheckTreeItem, GridUtils, isEmptyOrNull, stripDiacritics } from "@serenity-is/corelib";
 import { RoleRow } from "../../ServerTypes/Administration/RoleRow";
 
-@Decorators.registerEditor('Serene.Administration.RoleCheckEditor')
 export class RoleCheckEditor extends CheckTreeEditor<CheckTreeItem<any>, any> {
+    static override typeInfo = this.editorTypeInfo("Serene.Administration.RoleCheckEditor");
 
     private searchText: string;
 

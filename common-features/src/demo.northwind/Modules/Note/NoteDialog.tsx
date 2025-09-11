@@ -1,7 +1,7 @@
-import { BaseDialog, Decorators, DialogButton, HtmlContentEditor, HtmlNoteContentEditor, cancelDialogButton, okDialogButton } from "@serenity-is/corelib";
+import { BaseDialog, DialogButton, HtmlContentEditor, HtmlNoteContentEditor, cancelDialogButton, okDialogButton } from "@serenity-is/corelib";
 
-@Decorators.registerClass('Serenity.Demo.Northwind.NoteDialog')
 export class NoteDialog<P = {}> extends BaseDialog<P> {
+    static override typeInfo = this.classTypeInfo("Serenity.Demo.Northwind.NoteDialog");
 
     declare private textEditor: HtmlContentEditor;
 

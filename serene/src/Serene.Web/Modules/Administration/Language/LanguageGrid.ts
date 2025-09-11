@@ -1,9 +1,10 @@
-import { Decorators, EntityGrid } from "@serenity-is/corelib";
+import { EntityGrid } from "@serenity-is/corelib";
 import { LanguageColumns, LanguageRow, LanguageService } from "../../ServerTypes/Administration";
 import { LanguageDialog } from "./LanguageDialog";
 
-@Decorators.registerClass('Serene.Administration.LanguageGrid')
 export class LanguageGrid extends EntityGrid<LanguageRow, any> {
+    static override typeInfo = this.classTypeInfo("Serene.Administration.LanguageGrid");
+
     protected useAsync() { return true; }
     protected getColumnsKey() { return LanguageColumns.columnsKey; }
     protected getDialogType() { return LanguageDialog; }

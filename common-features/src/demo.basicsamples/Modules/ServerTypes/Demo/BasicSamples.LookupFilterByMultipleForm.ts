@@ -1,4 +1,5 @@
 ﻿import { BooleanEditor, DecimalEditor, ImageUploadEditor, initFormType, IntegerEditor, LookupEditor, PrefixedContext, StringEditor } from "@serenity-is/corelib";
+import { SupplierDialog } from "@serenity-is/demo.northwind";
 import { ProduceSeafoodCategoryEditor } from "../../Editors/LookupFilterByMultipleValues/LookupFilterByMultipleValuesPage";
 
 export interface LookupFilterByMultipleForm {
@@ -47,3 +48,5 @@ export class LookupFilterByMultipleForm extends PrefixedContext {
         }
     }
 }
+
+queueMicrotask(() => [SupplierDialog]); // referenced dialogs

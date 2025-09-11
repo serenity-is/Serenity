@@ -1,9 +1,10 @@
-import { Decorators, EntityGrid, Lookup, tryFirst } from "@serenity-is/corelib";
+import { EntityGrid, Lookup, tryFirst } from "@serenity-is/corelib";
 import { RoleRow, UserColumns, UserRow, UserService } from "../../ServerTypes/Administration";
 import { UserDialog } from "./UserDialog";
 
-@Decorators.registerClass()
 export class UserGrid extends EntityGrid<UserRow, any> {
+    static override typeInfo = this.classTypeInfo("Serene.Administration.UserGrid");
+
     protected getColumnsKey() { return UserColumns.columnsKey; }
     protected getDialogType() { return UserDialog; }
     protected getIdProperty() { return UserRow.idProperty; }

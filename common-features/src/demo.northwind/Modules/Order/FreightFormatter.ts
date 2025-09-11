@@ -1,8 +1,9 @@
-import { Decorators, Formatter, faIcon } from "@serenity-is/corelib";
+import { Formatter, FormatterBase, faIcon } from "@serenity-is/corelib";
 import { FormatterContext } from "@serenity-is/sleekgrid";
 
-@Decorators.registerFormatter('Serenity.Demo.Northwind.FreightFormatter')
-export class FreightFormatter implements Formatter {
+export class FreightFormatter extends FormatterBase implements Formatter {
+    static override typeInfo = this.formatterTypeInfo("Serenity.Demo.Northwind.FreightFormatter");
+
     format(ctx: FormatterContext) {
         if (ctx.value == null)
             return "";

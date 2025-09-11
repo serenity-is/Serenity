@@ -1,10 +1,11 @@
-import { Decorators, EditorUtils, EntityDialog, stringFormat } from "@serenity-is/corelib";
+import { EditorUtils, EntityDialog, stringFormat } from "@serenity-is/corelib";
 import { UserForm, UserRow, UserService } from "../../ServerTypes/Administration";
 import { MembershipValidationTexts, UserDialogTexts } from "../../ServerTypes/Texts";
 import { UserPermissionDialog } from "../UserPermission/UserPermissionDialog";
 
-@Decorators.registerClass()
 export class UserDialog extends EntityDialog<UserRow, any> {
+    static override typeInfo = this.classTypeInfo("Serene.Administration.UserDialog");
+
     protected getFormKey() { return UserForm.formKey; }
     protected getIdProperty() { return UserRow.idProperty; }
     protected getIsActiveProperty() { return UserRow.isActiveProperty; }

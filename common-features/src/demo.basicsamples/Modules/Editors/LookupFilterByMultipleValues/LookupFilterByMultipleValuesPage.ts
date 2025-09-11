@@ -8,8 +8,8 @@ export default () => gridPageInit(LookupFilterByMultipleGrid);
 /**
  * Subclass of ProductGrid to override dialog type to CloneableEntityDialog
  */
-@Decorators.registerClass('Serenity.Demo.BasicSamples.LookupFilterByMultipleGrid')
 export class LookupFilterByMultipleGrid<P = {}> extends EntityGrid<ProductRow, P> {
+    static override typeInfo = this.classTypeInfo("Serenity.Demo.BasicSamples.LookupFilterByMultipleGrid");
 
     protected getColumnsKey() { return ProductColumns.columnsKey; }
     protected getDialogType() { return LookupFilterByMultipleDialog; }
@@ -41,8 +41,8 @@ export class LookupFilterByMultipleGrid<P = {}> extends EntityGrid<ProductRow, P
  * This is our custom product dialog that uses a different product form
  * (LookupFilterByMultipleForm) with our special category editor.
  */
-@Decorators.registerClass('Serenity.Demo.BasicSamples.LookupFilterByMultipleDialog')
 export class LookupFilterByMultipleDialog extends ProductDialog {
+    static override typeInfo = this.classTypeInfo("Serenity.Demo.BasicSamples.LookupFilterByMultipleDialog");
 
     protected getFormKey() { return LookupFilterByMultipleForm.formKey; }
 }
@@ -56,9 +56,9 @@ export class LookupFilterByMultipleDialog extends ProductDialog {
  * available in server side to use in our LookupFilterByMultipleForm,
  * which is a version of ProductForm that uses our custom editor.
  */
-@Decorators.registerEditor('Serenity.Demo.BasicSamples.ProduceSeafoodCategoryEditor')
 export class ProduceSeafoodCategoryEditor extends
     LookupEditorBase<LookupEditorOptions, CategoryRow> {
+    static override typeInfo = this.editorTypeInfo("Serenity.Demo.BasicSamples.ProduceSeafoodCategoryEditor");
 
     /**
      * Normally LookupEditor requires a lookup key to determine which set of

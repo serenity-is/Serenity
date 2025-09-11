@@ -1,4 +1,4 @@
-import { Decorators, Fluent, PropertyGrid, SaveResponse, TabsExtensions, Validator, WidgetProps, getForm, gridPageInit, reloadLookup, toId, validateOptions } from "@serenity-is/corelib";
+import { Fluent, PropertyGrid, SaveResponse, TabsExtensions, Validator, WidgetProps, getForm, gridPageInit, reloadLookup, toId, validateOptions } from "@serenity-is/corelib";
 import { CustomerForm, CustomerRow, CustomerService, OrderDialog, OrderGrid, OrderRow } from "@serenity-is/demo.northwind";
 
 export default () => gridPageInit(OtherFormInTabOneBarGrid);
@@ -6,8 +6,9 @@ export default () => gridPageInit(OtherFormInTabOneBarGrid);
 /**
  * Subclass of OrderGrid to override dialog type to OtherFormInTabOneBarDialog
  */
-@Decorators.registerClass('Serenity.Demo.BasicSamples.OtherFormInTabOneBarGrid')
 export class OtherFormInTabOneBarGrid extends OrderGrid {
+    static override typeInfo = this.classTypeInfo("Serenity.Demo.BasicSamples.OtherFormInTabOneBarGrid");
+
     protected override getDialogType() { return OtherFormOneBarDialog; }
 }
 
@@ -15,8 +16,8 @@ export class OtherFormInTabOneBarGrid extends OrderGrid {
  * Our custom order dialog subclass that will have a tab to display and edit selected customer details.
  * With single toolbar for all forms
  */
-@Decorators.registerClass('Serenity.Demo.BasicSamples.OtherFormOneBarDialog')
 export class OtherFormOneBarDialog<P = {}> extends OrderDialog<P> {
+    static override typeInfo = this.classTypeInfo("Serenity.Demo.BasicSamples.OtherFormOneBarDialog");
 
     declare private customerPropertyGrid: PropertyGrid;
     declare private customerValidator: any;

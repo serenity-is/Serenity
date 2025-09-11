@@ -1,10 +1,12 @@
-import { Decorators, Formatter, IInitializeColumn, faIcon, isTrimmedEmpty } from "@serenity-is/corelib";
+import { Formatter, FormatterBase, IInitializeColumn, faIcon, isTrimmedEmpty } from "@serenity-is/corelib";
 import { Column, FormatterContext, FormatterResult } from "@serenity-is/sleekgrid";
 import { Gender } from "../ServerTypes/Demo";
 
-@Decorators.registerFormatter('Serenity.Demo.Northwind.EmployeeFormatter', [IInitializeColumn])
-export class EmployeeFormatter implements Formatter {
+export class EmployeeFormatter extends FormatterBase implements Formatter {
+    static override typeInfo = this.formatterTypeInfo("Serenity.Demo.Northwind.EmployeeFormatter", [IInitializeColumn]);
+
     constructor(public readonly props: { genderProperty?: string } = {}) {
+        super();
         this.props ??= {};
     }
 

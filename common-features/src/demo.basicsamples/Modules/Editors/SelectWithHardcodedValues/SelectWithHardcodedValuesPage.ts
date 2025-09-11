@@ -1,4 +1,4 @@
-import { ComboboxEditor, Decorators, EditorProps, PropertyDialog, WidgetProps, notifySuccess } from "@serenity-is/corelib";
+import { ComboboxEditor, EditorProps, PropertyDialog, WidgetProps, notifySuccess } from "@serenity-is/corelib";
 import { HardcodedValuesForm } from "../../ServerTypes/Demo";
 
 export default function pageInit() {
@@ -22,8 +22,8 @@ export default function pageInit() {
  * and transform templates for it to be available 
  * in server side forms, e.g. [HardCodedValuesEditor]
  */
-@Decorators.registerEditor('Serenity.Demo.BasicSamples.HardcodedValuesEditor')
 export class HardcodedValuesEditor<P = {}> extends ComboboxEditor<P, any> {
+    static override typeInfo = this.editorTypeInfo("Serenity.Demo.BasicSamples.HardcodedValuesEditor");
 
     constructor(props: EditorProps<P>) {
         super(props);
@@ -47,8 +47,9 @@ export class HardcodedValuesEditor<P = {}> extends ComboboxEditor<P, any> {
     }
 }
 
-@Decorators.registerClass('Serenity.Demo.BasicSamples.HardcodedValuesDialog')
 export class HardcodedValuesDialog<P = {}> extends PropertyDialog<any, P> {
+    static override typeInfo = this.classTypeInfo("Serenity.Demo.BasicSamples.HardcodedValuesDialog");
+
     protected getFormKey() { return HardcodedValuesForm.formKey; }
 
     protected form = new HardcodedValuesForm(this.idPrefix);

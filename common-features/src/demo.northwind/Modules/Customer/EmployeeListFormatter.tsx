@@ -1,12 +1,12 @@
-import { Decorators, Formatter, Lookup, faIcon } from "@serenity-is/corelib";
+import { Formatter, FormatterBase, Lookup, faIcon } from "@serenity-is/corelib";
 import { FormatterContext, FormatterResult } from "@serenity-is/sleekgrid";
 import { EmployeeRow } from "../ServerTypes/Demo";
 
 let lookup: Lookup<EmployeeRow>;
 let promise: Promise<Lookup<EmployeeRow>>;
 
-@Decorators.registerFormatter('Serenity.Demo.Northwind.EmployeeListFormatter')
-export class EmployeeListFormatter implements Formatter {
+export class EmployeeListFormatter extends FormatterBase implements Formatter {
+    static override typeInfo = this.formatterTypeInfo("Serenity.Demo.Northwind.EmployeeListFormatter");
 
     format(ctx: FormatterContext): FormatterResult {
 

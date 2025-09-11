@@ -1,5 +1,5 @@
 
-import { Decorators, SubDialogHelper } from "@serenity-is/corelib";
+import { SubDialogHelper } from "@serenity-is/corelib";
 import { Column } from "@serenity-is/sleekgrid";
 import { OrderGrid } from "../Order/OrderGrid";
 import { OrderRow } from "../ServerTypes/Demo";
@@ -7,8 +7,9 @@ import { CustomerOrderDialog } from "./CustomerOrderDialog";
 
 const fld = OrderRow.Fields;
 
-@Decorators.registerClass()
 export class CustomerOrdersGrid<P = {}> extends OrderGrid<P> {
+    static override typeInfo = this.classTypeInfo("Serenity.Demo.Northwind.CustomerOrdersGrid");
+    
     protected getDialogType() { return CustomerOrderDialog; }
 
     protected getColumns(): Column[] {

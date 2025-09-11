@@ -1,4 +1,4 @@
-﻿import { DateEditor, Decorators, EnumEditor, LookupEditor, QuickFilter, Widget, gridPageInit } from "@serenity-is/corelib";
+﻿import { DateEditor, EnumEditor, LookupEditor, QuickFilter, Widget, gridPageInit } from "@serenity-is/corelib";
 import { OrderGrid, OrderRow, OrderShippingState } from "@serenity-is/demo.northwind";
 
 export default () => gridPageInit(InitialValuesForQuickFilters);
@@ -6,8 +6,8 @@ export default () => gridPageInit(InitialValuesForQuickFilters);
 // get a reference to order row field names
 const fld = OrderRow.Fields;
 
-@Decorators.registerClass('Serenity.Demo.BasicSamples.InitialValuesForQuickFilters')
 export class InitialValuesForQuickFilters extends OrderGrid {
+    static override typeInfo = this.classTypeInfo("Serenity.Demo.BasicSamples.InitialValuesForQuickFilters");
 
     /**
      * This method is called to get list of quick filters to be created for this grid.

@@ -1,4 +1,4 @@
-﻿import { Decorators, EntityDialog, WidgetProps, gridPageInit, toId } from "@serenity-is/corelib";
+﻿import { EntityDialog, WidgetProps, gridPageInit, toId } from "@serenity-is/corelib";
 import { CustomerRow, CustomerService, OrderGrid, OrderRow, OrderService } from "@serenity-is/demo.northwind";
 import { PopulateLinkedDataForm } from "../../ServerTypes/Demo";
 
@@ -7,14 +7,14 @@ export default () => gridPageInit(PopulateLinkedDataGrid);
 /**
  * A subclass of OrderGrid that launches PopulateLinkedDataDialog
  */
-@Decorators.registerClass('Serenity.Demo.BasicSamples.PopulateLinkedDataGrid')
 export class PopulateLinkedDataGrid extends OrderGrid {
+    static override typeInfo = this.classTypeInfo("Serenity.Demo.BasicSamples.PopulateLinkedDataGrid");
 
     protected getDialogType() { return PopulateLinkedDataDialog; }
 }
 
-@Decorators.registerClass('Serenity.Demo.BasicSamples.PopulateLinkedDataDialog')
 export class PopulateLinkedDataDialog<P = {}> extends EntityDialog<OrderRow, P> {
+    static override typeInfo = this.classTypeInfo("Serenity.Demo.BasicSamples.PopulateLinkedDataDialog");
 
     protected getFormKey() { return PopulateLinkedDataForm.formKey; }
     protected getRowDefinition() { return OrderRow; }

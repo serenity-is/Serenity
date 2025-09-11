@@ -1,11 +1,10 @@
-import { DataChangeInfo, Decorators, DialogType, EditorProps, EntityGrid, IGetEditValue, ISetEditValue, PropertyItem, SaveRequest, ServiceOptions, ServiceResponse, ToolButton, deepClone, getInstanceType, getTypeFullName, indexOf, serviceCall } from "@serenity-is/corelib";
+import { DataChangeInfo, DialogType, EditorProps, EntityGrid, IGetEditValue, ISetEditValue, PropertyItem, SaveRequest, ServiceOptions, ServiceResponse, ToolButton, deepClone, getInstanceType, getTypeFullName, indexOf, serviceCall } from "@serenity-is/corelib";
 import { GridEditorDialog } from "./GridEditorDialog";
 
-@Decorators.registerClass("Serenity.Extensions.GridEditorBase", [IGetEditValue, ISetEditValue])
-@Decorators.editor()
-@Decorators.element("<div/>")
 export abstract class GridEditorBase<TEntity, P = {}> extends EntityGrid<TEntity, P>
     implements IGetEditValue, ISetEditValue {
+    static override typeInfo = this.editorTypeInfo("Serenity.Extensions.GridEditorBase", [IGetEditValue, ISetEditValue]);
+    static override createDefaultElement() { return document.createElement("div"); }
 
     /** Gets the id property name. Returns it from getRowDefinition() if available, or the default __id.
      * For connected mode, this should be the actual id property name of the entity, or getRowDefinition

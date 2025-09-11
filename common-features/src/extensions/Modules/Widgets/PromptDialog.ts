@@ -1,4 +1,4 @@
-import { Decorators, PropertyDialog, Widget, WidgetProps, cancelDialogButton, getTypeFullName, okDialogButton, toggleClass } from "@serenity-is/corelib";
+import { PropertyDialog, Widget, WidgetProps, cancelDialogButton, getTypeFullName, okDialogButton, toggleClass } from "@serenity-is/corelib";
 
 export interface PromptDialogOptions {
     cssClass?: string;
@@ -12,8 +12,8 @@ export interface PromptDialogOptions {
     validateValue: (v: any) => boolean;
 }
 
-@Decorators.registerClass("Serenity.Extensions.PromptDialog")
 export class PromptDialog<P extends PromptDialogOptions = PromptDialogOptions> extends PropertyDialog<any, P> {
+    static override typeInfo = this.classTypeInfo("Serenity.Extensions.PromptDialog");
 
     constructor(props: WidgetProps<P>) {
         super(props);

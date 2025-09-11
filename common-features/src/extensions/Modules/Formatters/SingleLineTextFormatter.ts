@@ -1,8 +1,9 @@
-import { Decorators, Formatter, htmlEncode, toSingleLine } from "@serenity-is/corelib";
+import { Formatter, FormatterBase, htmlEncode, toSingleLine } from "@serenity-is/corelib";
 import { FormatterContext } from "@serenity-is/sleekgrid";
 
-@Decorators.registerFormatter('Serenity.Extensions.SingleLineTextFormatter')
-export class SingleLineTextFormatter implements Formatter {
+export class SingleLineTextFormatter extends FormatterBase implements Formatter {
+    static override typeInfo = this.formatterTypeInfo("Serenity.Extensions.SingleLineTextFormatter");
+
     format(ctx: FormatterContext) {
         return SingleLineTextFormatter.formatValue(ctx.value);
     }

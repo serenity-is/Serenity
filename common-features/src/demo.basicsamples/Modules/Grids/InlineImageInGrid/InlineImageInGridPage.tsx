@@ -1,15 +1,15 @@
-import { Decorators, EntityGrid, Formatter, IInitializeColumn, gridPageInit, resolveUrl } from "@serenity-is/corelib";
+import { EntityGrid, Formatter, FormatterBase, IInitializeColumn, gridPageInit, resolveUrl } from "@serenity-is/corelib";
 import { ProductDialog, ProductRow, ProductService } from "@serenity-is/demo.northwind";
 import { Column, FormatterContext, FormatterResult, GridOptions } from "@serenity-is/sleekgrid";
 import { InlineImageInGridColumns } from "../../ServerTypes/Demo";
 
 export default () => gridPageInit(InlineImageInGrid);
 
-@Decorators.registerFormatter("Serenity.Demo.BasicSamples.InlineImageFormatter")
-export class InlineImageFormatter
-    implements Formatter, IInitializeColumn {
+export class InlineImageFormatter extends FormatterBase implements Formatter, IInitializeColumn {
+    static override typeInfo = this.formatterTypeInfo("Serenity.Demo.BasicSamples.InlineImageFormatter");
 
     constructor(public readonly props: { fileProperty?: string, thumb?: boolean } = {}) {
+        super();
     }
 
     format(ctx: FormatterContext): FormatterResult {
@@ -35,8 +35,8 @@ export class InlineImageFormatter
     }
 }
 
-@Decorators.registerClass('Serenity.Demo.BasicSamples.InlineImageInGrid')
 export class InlineImageInGrid<P = {}> extends EntityGrid<ProductRow, P> {
+    static override typeInfo = this.classTypeInfo("Serenity.Demo.BasicSamples.InlineImageInGrid");
 
     protected getColumnsKey() { return InlineImageInGridColumns.columnsKey; }
     protected getDialogType() { return ProductDialog; }

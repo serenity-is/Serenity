@@ -1,4 +1,4 @@
-import { Decorators, notifySuccess, SaveInitiator, SaveResponse } from "@serenity-is/corelib";
+import { notifySuccess, PanelAttribute, SaveInitiator, SaveResponse } from "@serenity-is/corelib";
 import { OrderDialog } from "@serenity-is/demo.northwind";
 import "./EntityDialogAsPanelPage.css";
 
@@ -27,10 +27,10 @@ export default function pageInit(model: any) {
 
 
 /**
- * A version of order dialog converted to a panel by adding Serenity.@Decorators.panel decorator.
+ * A version of order dialog converted to a panel by adding PanelAttribute.
  */
-@Decorators.panel()
 export class EntityDialogAsPanel extends OrderDialog {
+    static override typeInfo = this.classTypeInfo("Serenity.Demo.Northwind.EntityDialogAsPanel", [new PanelAttribute()]);
 
     protected updateInterface() {
         super.updateInterface();

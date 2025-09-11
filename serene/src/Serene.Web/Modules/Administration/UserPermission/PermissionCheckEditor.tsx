@@ -1,6 +1,7 @@
 import {
-    Culture, DataGrid, Decorators, Dictionary, Fluent, GridUtils, Grouping, IGetEditValue, ISetEditValue, SlickFormatting, SlickTreeHelper,
-    ToolButton, WidgetProps, count, getRemoteDataAsync, stripDiacritics, toGrouping, tryGetText,
+    Culture, DataGrid,
+    Dictionary, Fluent, GridUtils, Grouping, IGetEditValue, ISetEditValue, SlickFormatting, SlickTreeHelper,
+    ToolButton, WidgetProps, count, getRemoteDataAsync, stripDiacritics, toGrouping, tryGetText
 } from "@serenity-is/corelib";
 import { Column } from "@serenity-is/sleekgrid";
 import { UserPermissionRow } from "../../ServerTypes/Administration";
@@ -22,8 +23,8 @@ export interface PermissionCheckItem {
     GrantRevoke?: boolean;
 }
 
-@Decorators.registerEditor('Serene.Administration.PermissionCheckEditor', [IGetEditValue, ISetEditValue])
 export class PermissionCheckEditor<P extends PermissionCheckEditorOptions = PermissionCheckEditorOptions> extends DataGrid<PermissionCheckItem, P> {
+    static override typeInfo = this.editorTypeInfo("Serene.Administration.PermissionCheckEditor", [IGetEditValue, ISetEditValue]);
 
     protected getIdProperty() { return "Key"; }
 

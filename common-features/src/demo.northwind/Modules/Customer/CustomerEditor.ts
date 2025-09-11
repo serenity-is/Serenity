@@ -1,8 +1,8 @@
-import { Decorators, EditorProps, LookupEditorBase, LookupEditorOptions } from "@serenity-is/corelib";
+import { EditorProps, LookupEditorBase, LookupEditorOptions } from "@serenity-is/corelib";
 import { CustomerRow } from "../ServerTypes/Demo";
 
-@Decorators.registerEditor('Serenity.Demo.Northwind.CustomerEditor')
 export class CustomerEditor<P extends LookupEditorOptions = LookupEditorOptions> extends LookupEditorBase<P, CustomerRow> {
+    static override typeInfo = this.editorTypeInfo("Serenity.Demo.Northwind.CustomerEditor");
 
     constructor(props: EditorProps<P>) {
         super({ async: true, ...props });

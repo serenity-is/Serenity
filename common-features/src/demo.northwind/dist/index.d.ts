@@ -1,4 +1,4 @@
-import { BaseDialog, BooleanEditor, CaptureOperationType, ColumnsBase, DateEditor, DecimalEditor, DeleteRequest, DeleteResponse, DialogButton, EditorProps, EditorWidget, EmailAddressEditor, EntityDialog, EntityGrid, EnumEditor, Formatter, IGetEditValue, ISetEditValue, ImageUploadEditor, IntegerEditor, ListRequest, ListResponse, LookupEditor, LookupEditorBase, LookupEditorOptions, PrefixedContext, PropertyItem, RetrieveRequest, RetrieveResponse, SaveInitiator, SaveRequest, SaveResponse, ServiceLookupEditor, ServiceOptions, StringEditor, ToolButton, WidgetProps } from '@serenity-is/corelib';
+import { BaseDialog, BooleanEditor, CaptureOperationType, ColumnsBase, DateEditor, DecimalEditor, DeleteRequest, DeleteResponse, DialogButton, EditorProps, EditorWidget, EmailAddressEditor, EntityDialog, EntityGrid, EnumEditor, Formatter, FormatterBase, IGetEditValue, ISetEditValue, ImageUploadEditor, IntegerEditor, ListRequest, ListResponse, LookupEditor, LookupEditorBase, LookupEditorOptions, PrefixedContext, PropertyItem, RetrieveRequest, RetrieveResponse, SaveInitiator, SaveRequest, SaveResponse, ServiceLookupEditor, ServiceOptions, StringEditor, ToolButton, WidgetProps } from '@serenity-is/corelib';
 import { GetNextNumberRequest, GetNextNumberResponse, GridEditorBase, GridEditorDialog } from '@serenity-is/extensions';
 import { Column, FormatterContext, FormatterResult } from '@serenity-is/sleekgrid';
 
@@ -206,6 +206,8 @@ export declare abstract class CustomerDetailsRow {
 	static readonly Fields: Readonly<Record<keyof CustomerDetailsRow, string>>;
 }
 export declare class NotesEditor<P = {}> extends EditorWidget<P> implements IGetEditValue, ISetEditValue {
+	static typeInfo: import("@serenity-is/corelib").EditorTypeInfo<"Serenity.Demo.Northwind.NotesEditor">;
+	static createDefaultElement(): HTMLElement;
 	private isDirty;
 	private items;
 	private noteList;
@@ -471,11 +473,13 @@ export declare namespace OrderDetailService {
 	};
 }
 export declare class CustomerEditor<P extends LookupEditorOptions = LookupEditorOptions> extends LookupEditorBase<P, CustomerRow> {
+	static typeInfo: import("@serenity-is/corelib").EditorTypeInfo<"Serenity.Demo.Northwind.CustomerEditor">;
 	constructor(props: EditorProps<P>);
 	protected getLookupKey(): string;
 	protected getItemText(item: any, lookup: any): string;
 }
 export declare class OrderDetailDialog extends GridEditorDialog<OrderDetailRow> {
+	static typeInfo: import("@serenity-is/corelib").ClassTypeInfo<"Serenity.Demo.Northwind.OrderDetailDialog">;
 	protected getFormKey(): string;
 	protected getRowDefinition(): typeof OrderDetailRow;
 	protected getService(): string;
@@ -483,6 +487,7 @@ export declare class OrderDetailDialog extends GridEditorDialog<OrderDetailRow> 
 	constructor(props: WidgetProps<any>);
 }
 export declare class OrderDetailsEditor<P = {}> extends GridEditorBase<OrderDetailRow, P> {
+	static typeInfo: import("@serenity-is/corelib").EditorTypeInfo<"Serenity.Demo.Northwind.OrderDetailsEditor">;
 	protected getColumnsKey(): string;
 	protected getDialogType(): typeof OrderDetailDialog;
 	protected getRowDefinition(): typeof OrderDetailRow;
@@ -792,6 +797,7 @@ export interface PhoneEditorOptions {
 	multiple?: boolean;
 }
 export declare class PhoneEditor<P extends PhoneEditorOptions = PhoneEditorOptions> extends StringEditor<P> {
+	static typeInfo: import("@serenity-is/corelib").EditorTypeInfo<"Serenity.Demo.Northwind.PhoneEditor">;
 	constructor(props: WidgetProps<P>);
 	protected formatValue(): void;
 	protected getFormattedValue(): string;
@@ -957,18 +963,21 @@ export declare namespace TerritoryService {
 	};
 }
 export declare class CategoryDialog<P = {}> extends EntityDialog<CategoryRow, P> {
+	static typeInfo: import("@serenity-is/corelib").ClassTypeInfo<"Serenity.Demo.Northwind.CategoryDialog">;
 	protected getFormKey(): string;
 	protected getRowDefinition(): typeof CategoryRow;
 	protected getService(): string;
 	protected form: CategoryForm;
 }
 export declare class CategoryGrid<P = {}> extends EntityGrid<CategoryRow, P> {
+	static typeInfo: import("@serenity-is/corelib").ClassTypeInfo<"Serenity.Demo.Northwind.CategoryGrid">;
 	protected getColumnsKey(): string;
 	protected getDialogType(): any;
 	protected getRowDefinition(): typeof CategoryRow;
 	protected getService(): string;
 }
 export declare class CustomerDialog<P = {}> extends EntityDialog<CustomerRow, P> {
+	static typeInfo: import("@serenity-is/corelib").ClassTypeInfo<"Serenity.Demo.Northwind.CustomerDialog">;
 	protected getFormKey(): string;
 	protected getRowDefinition(): typeof CustomerRow;
 	protected getService(): string;
@@ -984,12 +993,14 @@ export declare class CustomerDialog<P = {}> extends EntityDialog<CustomerRow, P>
 	renderContents(): any;
 }
 export declare class CustomerGrid<P = {}> extends EntityGrid<CustomerRow, P> {
+	static typeInfo: import("@serenity-is/corelib").ClassTypeInfo<"Serenity.Demo.Norhtwind.CustomerGrid">;
 	protected getColumnsKey(): string;
 	protected getDialogType(): any;
 	protected getRowDefinition(): typeof CustomerRow;
 	protected getService(): string;
 }
 export declare class OrderDialog<P = {}> extends EntityDialog<OrderRow, P> {
+	static typeInfo: import("@serenity-is/corelib").ClassTypeInfo<"Serenity.Demo.Northwind.OrderDialog">;
 	protected getFormKey(): string;
 	protected getRowDefinition(): typeof OrderRow;
 	protected getService(): string;
@@ -999,9 +1010,11 @@ export declare class OrderDialog<P = {}> extends EntityDialog<OrderRow, P> {
 	protected afterLoadEntity(): void;
 }
 export declare class CustomerOrderDialog extends OrderDialog {
+	static typeInfo: import("@serenity-is/corelib").ClassTypeInfo<"Serenity.Demo.Northwind.CustomerOrderDialog">;
 	updateInterface(): void;
 }
 export declare class OrderGrid<P = {}> extends EntityGrid<OrderRow, P> {
+	static typeInfo: import("@serenity-is/corelib").ClassTypeInfo<"Serenity.Demo.Northwind.OrderGrid">;
 	protected getColumnsKey(): string;
 	protected getDialogType(): any;
 	protected getRowDefinition(): typeof OrderRow;
@@ -1016,6 +1029,7 @@ export declare class OrderGrid<P = {}> extends EntityGrid<OrderRow, P> {
 	protected addButtonClick(): void;
 }
 export declare class CustomerOrdersGrid<P = {}> extends OrderGrid<P> {
+	static typeInfo: import("@serenity-is/corelib").ClassTypeInfo<"Serenity.Demo.Northwind.CustomerOrdersGrid">;
 	protected getDialogType(): typeof CustomerOrderDialog;
 	protected getColumns(): Column[];
 	protected initEntityDialog(itemType: any, dialog: any): void;
@@ -1027,13 +1041,15 @@ export declare class CustomerOrdersGrid<P = {}> extends OrderGrid<P> {
 	get customerID(): string;
 	set customerID(value: string);
 }
-export declare class EmployeeListFormatter implements Formatter {
+export declare class EmployeeListFormatter extends FormatterBase implements Formatter {
+	static typeInfo: import("@serenity-is/corelib").FormatterTypeInfo<"Serenity.Demo.Northwind.EmployeeListFormatter">;
 	format(ctx: FormatterContext): FormatterResult;
 }
-export declare class EmployeeFormatter implements Formatter {
+export declare class EmployeeFormatter extends FormatterBase implements Formatter {
 	readonly props: {
 		genderProperty?: string;
 	};
+	static typeInfo: import("@serenity-is/corelib").FormatterTypeInfo<"Serenity.Demo.Northwind.EmployeeFormatter">;
 	constructor(props?: {
 		genderProperty?: string;
 	});
@@ -1041,6 +1057,7 @@ export declare class EmployeeFormatter implements Formatter {
 	initializeColumn(column: Column): void;
 }
 export declare class NoteDialog<P = {}> extends BaseDialog<P> {
+	static typeInfo: import("@serenity-is/corelib").ClassTypeInfo<"Serenity.Demo.Northwind.NoteDialog">;
 	private textEditor;
 	protected renderContents(): any;
 	protected getDialogButtons(): DialogButton[];
@@ -1048,16 +1065,19 @@ export declare class NoteDialog<P = {}> extends BaseDialog<P> {
 	set text(value: string);
 	okClick: () => void;
 }
-export declare class FreightFormatter implements Formatter {
+export declare class FreightFormatter extends FormatterBase implements Formatter {
+	static typeInfo: import("@serenity-is/corelib").FormatterTypeInfo<"Serenity.Demo.Northwind.FreightFormatter">;
 	format(ctx: FormatterContext): string;
 }
 export declare class ProductDialog<P = {}> extends EntityDialog<ProductRow, P> {
+	static typeInfo: import("@serenity-is/corelib").ClassTypeInfo<"Serenity.Demo.Northwind.ProductDialog">;
 	protected getFormKey(): string;
 	protected getRowDefinition(): typeof ProductRow;
 	protected getService(): string;
 	protected form: ProductForm;
 }
 export declare class ProductGrid<P = {}> extends EntityGrid<ProductRow, P> {
+	static typeInfo: import("@serenity-is/corelib").ClassTypeInfo<"Serenity.Demo.Northwind.ProductGrid">;
 	protected getColumnsKey(): string;
 	protected getDialogType(): any;
 	protected getRowDefinition(): typeof ProductRow;
@@ -1085,51 +1105,60 @@ export declare class ProductGrid<P = {}> extends EntityGrid<ProductRow, P> {
 	protected getQuickFilters(): import("@serenity-is/corelib").QuickFilter<import("@serenity-is/corelib").Widget<any>, any>[];
 }
 export declare class RegionDialog<P = {}> extends EntityDialog<RegionRow, P> {
+	static typeInfo: import("@serenity-is/corelib").ClassTypeInfo<"Serenity.Demo.Northwind.RegionDialog">;
 	protected getFormKey(): string;
 	protected getRowDefinition(): typeof RegionRow;
 	protected getService(): string;
 	protected form: RegionForm;
 }
 export declare class RegionGrid<P = {}> extends EntityGrid<RegionRow, P> {
+	static typeInfo: import("@serenity-is/corelib").ClassTypeInfo<"Serenity.Demo.Northwind.RegionGrid">;
 	protected getColumnsKey(): string;
 	protected getDialogType(): any;
 	protected getRowDefinition(): typeof RegionRow;
 	protected getService(): string;
 }
 export declare class ShipperDialog<P = {}> extends EntityDialog<ShipperRow, P> {
+	static typeInfo: import("@serenity-is/corelib").ClassTypeInfo<"Serenity.Demo.Northwind.ShipperDialog">;
 	protected getFormKey(): string;
 	protected getRowDefinition(): typeof ShipperRow;
 	protected getService(): string;
 	protected form: ShipperForm;
 }
-export declare class ShipperFormatter implements Formatter {
+export declare class ShipperFormatter extends FormatterBase implements Formatter {
+	static typeInfo: import("@serenity-is/corelib").FormatterTypeInfo<"Serenity.Demo.Northwind.ShipperFormatter">;
 	format(ctx: FormatterContext): FormatterResult;
 }
 export declare class ShipperGrid<P = {}> extends EntityGrid<ShipperRow, P> {
+	static typeInfo: import("@serenity-is/corelib").ClassTypeInfo<"Serenity.Demo.Northwind.ShipperGrid">;
 	protected getColumnsKey(): string;
 	protected getDialogType(): any;
 	protected getRowDefinition(): typeof ShipperRow;
 	protected getService(): string;
 }
 export declare class SupplierDialog<P = {}> extends EntityDialog<SupplierRow, P> {
+	static typeInfo: import("@serenity-is/corelib").ClassTypeInfo<"Serenity.Demo.Northwind.SupplierDialog">;
 	protected getFormKey(): string;
 	protected getRowDefinition(): typeof SupplierRow;
 	protected getService(): string;
 	protected form: SupplierForm;
 }
 export declare class SupplierGrid<P = {}> extends EntityGrid<SupplierRow, P> {
+	static typeInfo: import("@serenity-is/corelib").ClassTypeInfo<"Serenity.Demo.Northwind.SupplierGrid">;
 	protected getColumnsKey(): string;
 	protected getDialogType(): any;
 	protected getRowDefinition(): typeof SupplierRow;
 	protected getService(): string;
 }
 export declare class TerritoryDialog<P = {}> extends EntityDialog<TerritoryRow, P> {
+	static typeInfo: import("@serenity-is/corelib").ClassTypeInfo<"Serenity.Demo.Northwind.TerritoryDialog">;
 	protected getFormKey(): string;
 	protected getRowDefinition(): typeof TerritoryRow;
 	protected getService(): string;
 	protected form: TerritoryForm;
 }
 export declare class TerritoryGrid<P = {}> extends EntityGrid<TerritoryRow, P> {
+	static typeInfo: import("@serenity-is/corelib").ClassTypeInfo<"Serenity.Demo.Northwind.TerritoryGrid">;
 	protected getColumnsKey(): string;
 	protected getDialogType(): any;
 	protected getRowDefinition(): typeof TerritoryRow;

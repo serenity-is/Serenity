@@ -1,8 +1,8 @@
-import { Decorators, Fluent, QuickSearchInput, Widget, WidgetProps, stripDiacritics } from "@serenity-is/corelib";
+import { Fluent, QuickSearchInput, Widget, WidgetProps, stripDiacritics } from "@serenity-is/corelib";
 import { ReportDialog } from "./ReportDialog";
 
-@Decorators.registerClass("Serenity.Extensions.ReportPage")
 export class ReportPage<P = {}> extends Widget<P> {
+    static override typeInfo = this.classTypeInfo("Serenity.Extensions.ReportPage");
 
     constructor(props: WidgetProps<P>) {
         super(props);

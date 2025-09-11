@@ -1,4 +1,4 @@
-import { BaseDialog, Decorators } from "@serenity-is/corelib";
+import { BaseDialog, MaximizableAttribute, ResizableAttribute } from "@serenity-is/corelib";
 import { BarController, BarElement, CategoryScale, Chart, Legend, LinearScale } from "chart.js";
 import { BasicSamplesService } from "../../ServerTypes/Demo";
 import "./ChartInDialogPage.css";
@@ -15,10 +15,8 @@ export default function pageInit() {
         <button class="btn btn-block btn-primary" onClick={buttonClick}>Launch Dialog</button>);
 }
 
-@Decorators.resizable()
-@Decorators.maximizable()
-@Decorators.registerClass('Serenity.Demo.BasicSamples.ChartInDialog')
 export class ChartInDialog<P = {}> extends BaseDialog<P> {
+    static override typeInfo = this.classTypeInfo("Serenity.Demo.BasicSamples.ChartInDialog", [new ResizableAttribute(), new MaximizableAttribute()]);
 
     declare private canvas: HTMLCanvasElement;
 

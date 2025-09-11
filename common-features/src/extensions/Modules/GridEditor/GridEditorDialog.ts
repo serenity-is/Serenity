@@ -1,8 +1,8 @@
-import { Decorators, DeleteResponse, EntityDialog, SaveInitiator, SaveResponse, ServiceOptions } from "@serenity-is/corelib";
+import { DeleteResponse, EntityDialog, PanelAttribute, SaveInitiator, SaveResponse, ServiceOptions } from "@serenity-is/corelib";
 
-@Decorators.registerClass("Serenity.Extensions.GridEditorDialog")
-@Decorators.panel(false)
 export abstract class GridEditorDialog<TEntity, P = {}> extends EntityDialog<TEntity, P> {
+    static override typeInfo = this.classTypeInfo("Serenity.Extensions.GridEditorDialog", [new PanelAttribute(false)]);
+
     protected getIdProperty() { return this.getRowDefinition()?.idProperty ?? "__id"; }
 
     public onSave: (options: ServiceOptions<SaveResponse>,

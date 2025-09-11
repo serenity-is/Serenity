@@ -1,11 +1,11 @@
-import { Decorators, Fluent, LookupEditor, confirmDialog, count, formatDate, gridPageInit, htmlEncode, notifyInfo, notifySuccess, stringFormat, toId } from "@serenity-is/corelib";
+import { Fluent, LookupEditor, confirmDialog, count, formatDate, gridPageInit, htmlEncode, notifyInfo, notifySuccess, stringFormat, toId } from "@serenity-is/corelib";
 import { CustomerDialog, OrderColumns, OrderDialog, OrderGrid, OrderRow } from "@serenity-is/demo.northwind";
 import { Column } from "@serenity-is/sleekgrid";
 
 export default () => gridPageInit(CustomLinksInGrid);
 
-@Decorators.registerClass('Serenity.Demo.BasicSamples.CustomLinksInGrid')
 export class CustomLinksInGrid extends OrderGrid {
+    static override typeInfo = this.classTypeInfo("Serenity.Demo.BasicSamples.CustomLinksInGrid");
 
     /**
      * We override getColumns() to change format functions for some columns.

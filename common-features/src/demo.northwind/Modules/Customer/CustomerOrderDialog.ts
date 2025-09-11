@@ -1,8 +1,7 @@
-import { Decorators } from "@serenity-is/corelib";
 import { OrderDialog } from "../Order/OrderDialog";
 
-@Decorators.registerClass('Serenity.Demo.Northwind.CustomerOrderDialog')
 export class CustomerOrderDialog extends OrderDialog {
+    static override typeInfo = this.classTypeInfo("Serenity.Demo.Northwind.CustomerOrderDialog");
 
     updateInterface() {
         super.updateInterface();

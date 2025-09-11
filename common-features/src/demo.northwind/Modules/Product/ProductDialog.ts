@@ -1,10 +1,10 @@
-import { Decorators, EntityDialog } from "@serenity-is/corelib";
+import { EntityDialog, MaximizableAttribute } from "@serenity-is/corelib";
 import { ProductForm, ProductRow, ProductService } from "../ServerTypes/Demo";
 import "./ProductDialog.css";
 
-@Decorators.registerClass()
-@Decorators.maximizable()
 export class ProductDialog<P = {}> extends EntityDialog<ProductRow, P> {
+    static override typeInfo = this.classTypeInfo("Serenity.Demo.Northwind.ProductDialog", [new MaximizableAttribute()] );
+
     protected getFormKey() { return ProductForm.formKey; }
     protected getRowDefinition() { return ProductRow; }
     protected getService() { return ProductService.baseUrl; }

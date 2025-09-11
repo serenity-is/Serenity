@@ -1,13 +1,12 @@
-import { Decorators, Dictionary, EditorUtils, EntityGrid, Lookup, WidgetProps, deepClone, formatNumber, htmlEncode, localText, notifyError, parseDecimal, parseInteger, parseQueryString, serviceRequest, toId } from "@serenity-is/corelib";
+import { Dictionary, EditorUtils, EntityGrid, FilterableAttribute, Lookup, WidgetProps, deepClone, formatNumber, htmlEncode, localText, notifyError, parseDecimal, parseInteger, parseQueryString, serviceRequest, toId } from "@serenity-is/corelib";
 import { ExcelExportHelper, PdfExportHelper } from "@serenity-is/extensions";
 import { Column, FormatterContext, NonDataRow } from "@serenity-is/sleekgrid";
 import { CategoryRow, ProductColumns, ProductRow, ProductService, SupplierRow } from "../ServerTypes/Demo";
 import { ProductDialog } from "./ProductDialog";
 import "./ProductGrid.css";
 
-@Decorators.registerClass()
-@Decorators.filterable()
 export class ProductGrid<P = {}> extends EntityGrid<ProductRow, P> {
+    static override typeInfo = this.classTypeInfo("Serenity.Demo.Northwind.ProductGrid", [new FilterableAttribute()]);
     protected getColumnsKey() { return ProductColumns.columnsKey; }
     protected getDialogType() { return <any>ProductDialog; }
     protected getRowDefinition() { return ProductRow; }

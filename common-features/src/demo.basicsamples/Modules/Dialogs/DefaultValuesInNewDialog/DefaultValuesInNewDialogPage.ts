@@ -1,10 +1,10 @@
-import { Decorators, formatDate, gridPageInit } from "@serenity-is/corelib";
+import { formatDate, gridPageInit } from "@serenity-is/corelib";
 import { EmployeeRow, OrderDialog, OrderGrid, OrderRow, ProductRow, ShipperRow } from "@serenity-is/demo.northwind";
 
 export default () => gridPageInit(DefaultValuesInNewGrid);
 
-@Decorators.registerClass('Serenity.Demo.BasicSamples.DefaultValuesInNewGrid')
 export class DefaultValuesInNewGrid extends OrderGrid {
+    static override typeInfo = this.classTypeInfo("Serenity.Demo.BasicSamples.DefaultValuesInNewGrid");
 
     /**
      * This method is called when New Item button is clicked.

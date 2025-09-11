@@ -13,8 +13,9 @@ export class CloneableEntityGrid<P = {}> extends EntityGrid<ProductRow, P> {
     protected getService() { return ProductService.baseUrl; }
 }
 
-@Decorators.registerClass('Serenity.Demo.BasicSamples.CloneableEntityDialog')
 export class CloneableEntityDialog extends ProductDialog {
+    static override typeInfo = this.classTypeInfo("Serenity.Demo.BasicSamples.CloneableEntityDialog");
+
     protected updateInterface() {
 
         // by default cloneButton is hidden in base UpdateInterface method

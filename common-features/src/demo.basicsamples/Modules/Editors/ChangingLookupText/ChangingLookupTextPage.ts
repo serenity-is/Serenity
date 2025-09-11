@@ -1,4 +1,4 @@
-import { ComboboxEditor, Decorators, Lookup, LookupEditorBase, LookupEditorOptions, WidgetProps, formatNumber, toId, tryGetWidget } from "@serenity-is/corelib";
+import { ComboboxEditor, Lookup, LookupEditorBase, LookupEditorOptions, WidgetProps, formatNumber, toId, tryGetWidget } from "@serenity-is/corelib";
 import { OrderDetailRow, ProductRow } from "@serenity-is/demo.northwind";
 import { GridEditorDialog } from "@serenity-is/extensions";
 import { ChangingLookupTextForm } from "../../ServerTypes/Demo";
@@ -12,8 +12,8 @@ export default function pageInit() {
 /**
  * Our custom product editor type
  */
-@Decorators.registerEditor('Serenity.Demo.BasicSamples.ChangingLookupTextEditor')
 export class ChangingLookupTextEditor extends LookupEditorBase<LookupEditorOptions, ProductRow> {
+    static override typeInfo = this.editorTypeInfo("Serenity.Demo.BasicSamples.ChangingLookupTextEditor");
 
     protected getLookupKey() {
         return ProductRow.lookupKey;
@@ -29,8 +29,9 @@ export class ChangingLookupTextEditor extends LookupEditorBase<LookupEditorOptio
     }
 }
 
-@Decorators.registerClass('Serenity.Demo.BasicSamples.ChangingLookupTextDialog')
 export class ChangingLookupTextDialog<P = {}> extends GridEditorDialog<OrderDetailRow, P> {
+    static override typeInfo = this.classTypeInfo("Serenity.Demo.BasicSamples.ChangingLookupTextDialog");
+
     protected getFormKey() { return ChangingLookupTextForm.formKey; }
     protected getLocalTextPrefix() { return OrderDetailRow.localTextPrefix; }
 

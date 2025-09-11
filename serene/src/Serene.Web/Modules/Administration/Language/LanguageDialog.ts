@@ -1,8 +1,9 @@
-import { Decorators, EntityDialog } from "@serenity-is/corelib";
+import { EntityDialog } from "@serenity-is/corelib";
 import { LanguageForm, LanguageRow, LanguageService } from "../../ServerTypes/Administration";
 
-@Decorators.registerClass('Serene.Administration.LanguageDialog')
 export class LanguageDialog extends EntityDialog<LanguageRow, any> {
+    static override typeInfo = this.classTypeInfo("Serene.Administration.LanguageDialog");
+
     protected getFormKey() { return LanguageForm.formKey; }
     protected getIdProperty() { return LanguageRow.idProperty; }
     protected getLocalTextPrefix() { return LanguageRow.localTextPrefix; }
