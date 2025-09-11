@@ -514,6 +514,19 @@ public class TSTypeListerAST
                         externalMember.Type = trni.Text;
                         externalMember.Value = trnll.Text;
                     }
+                    else if (name == "typeInfo" &&
+                        member.HasModifier(SyntaxKind.StaticKeyword) &&
+                        pd.Type is ImportTypeNode itn &&
+                        itn.Argument is LiteralTypeNode itnl &&
+                        itnl.Literal is StringLiteral itnls &&
+                        itn.Qualifier is Identifier itnq &&
+                        itn.TypeArguments?.Count == 1 &&
+                        itn.TypeArguments[0] is LiteralTypeNode itnlt &&
+                        itnlt.Literal is StringLiteral itnlts)
+                    {
+                        externalMember.Type = itnq.GetText();
+                        externalMember.Value = itnlts.Text;
+                    }
                     else
                         externalMember.Type = GetTypeReferenceExpression(pd.Type);
                 }
@@ -524,10 +537,24 @@ public class TSTypeListerAST
                     ce.Expression is PropertyAccessExpression pae &&
                     ce.Arguments?.Count >= 1 &&
                     ce.Arguments[0] is StringLiteral ltns &&
-                    pae.Name?.Text is string paet)
+                    pae.Name?.Text is string paet &&
+                    paet.EndsWith("TypeInfo", StringComparison.Ordinal))
                 {
                     externalMember.Type = char.ToUpperInvariant(paet[0]) + paet[1..];
                     externalMember.Value = ltns.Text;
+                }
+                else if (
+                    name == "typeInfo" &&
+                    member.HasModifier(SyntaxKind.StaticKeyword) &&
+                    pd.Initializer is CallExpression ce2 &&
+                    ce2.Expression is Identifier ce2e &&
+                    ce2e.Text is string ce2et &&
+                    ce2et.EndsWith("TypeInfo", StringComparison.Ordinal) == true &&
+                    ce2.Arguments?.Count >= 1 &&
+                    ce2.Arguments[0] is StringLiteral ce2s)
+                {
+                    externalMember.Type = char.ToUpperInvariant(ce2et[0]) + ce2et[1..];
+                    externalMember.Value = ce2s.Text;
                 }
 
                 if (pd.Initializer is StringLiteral sl)
