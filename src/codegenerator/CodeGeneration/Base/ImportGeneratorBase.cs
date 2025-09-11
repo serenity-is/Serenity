@@ -284,6 +284,12 @@ public abstract class ImportGeneratorBase : CodeGeneratorBase
         "@serenity-is/corelib:ServiceLookupEditorBase",
     ];
 
+    public static readonly string[] FormatterBaseClasses =
+    [
+        "FormatterBase",
+        "@serenity-is/corelib:FormatterBase"
+    ];
+
     protected bool IsEditorType(ExternalType type)
     {
         if (type.IsAbstract == true ||
@@ -293,6 +299,12 @@ public abstract class ImportGeneratorBase : CodeGeneratorBase
 
         if (type.GenericParameters?.Any(x => string.IsNullOrEmpty(x.Default)) == true)
             return false;
+
+        if (type.Fields != null &&
+            type.Fields.Any(x => x.IsStatic == true &&
+                x.Name == "typeInfo" &&
+                x.Type == "EditorTypeInfo"))
+            return true;
 
         if (HasBaseType(type, EditorBaseClasses))
             return true;
@@ -320,6 +332,15 @@ public abstract class ImportGeneratorBase : CodeGeneratorBase
 
         if (type.GenericParameters?.Any(x => string.IsNullOrEmpty(x.Default)) == true)
             return false;
+
+        if (type.Fields != null &&
+            type.Fields.Any(x => x.IsStatic == true &&
+                x.Name == "typeInfo" &&
+                x.Type == "FormatterTypeInfo"))
+            return true;
+        
+        if (HasBaseType(type, FormatterBaseClasses))
+            return true;
 
         if (GetAttribute(type, inherited: true, attributeNames: FormatterAttributeNames) != null)
             return true;
