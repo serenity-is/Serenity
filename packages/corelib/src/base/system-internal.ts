@@ -1,4 +1,4 @@
-﻿import { implementedInterfacesSymbol, isInterfaceTypeSymbol, typeRegistrySymbol } from "./symbols";
+﻿import { implementedInterfacesSymbol, isAssignableFromSymbol, isInterfaceTypeSymbol, typeRegistrySymbol } from "./symbols";
 
 export const typeInfoProperty = "typeInfo";
 
@@ -47,6 +47,16 @@ export function getTypeRegistry() {
     return typeRegistry;
 }
 
+export function interfaceIsAssignableFrom(from: any) {
+    return from != null &&
+        Array.isArray((from as any)[implementedInterfacesSymbol]) &&
+        (from as any)[implementedInterfacesSymbol].some((x: any) =>
+            x === this ||
+            (getTypeNameProp(this) &&
+                x[isInterfaceTypeSymbol] &&
+                getTypeNameProp(x) === getTypeNameProp(this)));
+}
+
 function autoRegisterViaTypeInfo(type: any): void {
     if (!Object.prototype.hasOwnProperty.call(type, typeInfoProperty))
         return;
@@ -75,6 +85,7 @@ function autoRegisterViaTypeInfo(type: any): void {
         }
         else if (typeInfo.typeKind === "interface") {
             Object.defineProperty(type, isInterfaceTypeSymbol, { value: true, configurable: true });
+            Object.defineProperty(type, isAssignableFromSymbol, { value: interfaceIsAssignableFrom, configurable: true });
         }
     }
 

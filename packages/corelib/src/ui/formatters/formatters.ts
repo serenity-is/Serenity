@@ -18,11 +18,11 @@ registerType(IInitializeColumn);
 export abstract class FormatterBase implements Formatter {
     abstract format(ctx: FormatterContext): FormatterResult;
 
-    protected static formatterTypeInfo<T>(typeName: StringLiteral<T>, interfaces?: any[]): FormatterTypeInfo<T> {
+    protected static formatterTypeInfo<T>(typeName: StringLiteral<T>, intfAndAttr?: any[]): FormatterTypeInfo<T> {
         if (Object.prototype.hasOwnProperty.call(this, typeInfoProperty) && this[typeInfoProperty])
             throw new Error(`Type ${this.name} already has a typeInfo property!`);
                 
-        const typeInfo = this.typeInfo = formatterTypeInfo(typeName, interfaces);
+        const typeInfo = this.typeInfo = formatterTypeInfo(typeName, intfAndAttr);
         registerType(this);
         return typeInfo;
     }

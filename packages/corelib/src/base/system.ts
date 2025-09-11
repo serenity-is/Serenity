@@ -1,5 +1,5 @@
 import { implementedInterfacesSymbol, isAssignableFromSymbol, isInstanceOfTypeSymbol, isInterfaceTypeSymbol } from "./symbols";
-import { StringLiteral, TypeInfo, ensureTypeInfo, getTypeNameProp, getTypeRegistry, globalObject, internalRegisterType, merge, peekTypeInfo, typeInfoProperty } from "./system-internal";
+import { StringLiteral, TypeInfo, ensureTypeInfo, getTypeNameProp, getTypeRegistry, globalObject, interfaceIsAssignableFrom, internalRegisterType, merge, peekTypeInfo, typeInfoProperty } from "./system-internal";
 export { getTypeNameProp, getTypeRegistry, setTypeNameProp, typeInfoProperty, type StringLiteral } from "./system-internal";
 
 /**
@@ -157,16 +157,6 @@ export function getBaseType(type: any) {
         return null;
 
     return Object.getPrototypeOf(type.prototype).constructor;
-}
-
-function interfaceIsAssignableFrom(from: any) {
-    return from != null &&
-        Array.isArray((from as any)[implementedInterfacesSymbol]) &&
-        (from as any)[implementedInterfacesSymbol].some((x: any) =>
-            x === this ||
-            (getTypeNameProp(this) &&
-                x[isInterfaceTypeSymbol] &&
-                getTypeNameProp(x) === getTypeNameProp(this)));
 }
 
 /**

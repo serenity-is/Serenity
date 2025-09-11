@@ -5325,7 +5325,7 @@ export declare class IInitializeColumn {
 }
 export declare abstract class FormatterBase implements Formatter {
 	abstract format(ctx: FormatterContext): FormatterResult;
-	protected static formatterTypeInfo<T>(typeName: StringLiteral<T>, interfaces?: any[]): FormatterTypeInfo<T>;
+	protected static formatterTypeInfo<T>(typeName: StringLiteral<T>, intfAndAttr?: any[]): FormatterTypeInfo<T>;
 	static typeInfo: FormatterTypeInfo<"Serenity.FormatterBase">;
 }
 export declare class BooleanFormatter extends FormatterBase implements Formatter {
