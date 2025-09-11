@@ -294,11 +294,11 @@ export abstract class BaseFiltering implements IFiltering, IQuickFiltering {
         filter.options = deepClone(this.get_field().quickFilterParams);
     }
 
-    protected static classTypeInfo<T>(typeName: StringLiteral<T>, interfaces?: any[]): ClassTypeInfo<T> {
+    protected static classTypeInfo<T>(typeName: StringLiteral<T>, intfAndAttr?: any[]): ClassTypeInfo<T> {
         if (Object.prototype.hasOwnProperty.call(this, typeInfoProperty) && this[typeInfoProperty])
             throw new Error(`Type ${this.name} already has a typeInfo property!`);
 
-        const typeInfo = this.typeInfo = classTypeInfo(typeName, interfaces);
+        const typeInfo = this.typeInfo = classTypeInfo(typeName, intfAndAttr);
         registerType(this);
         return typeInfo;
     }

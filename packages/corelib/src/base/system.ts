@@ -466,20 +466,40 @@ export type FormatterTypeInfo<TypeName> = TypeInfo<TypeName>;
 /** Interface type information. This is used to make type name available in declaration files unlike decorators that does not show in .d.ts files. */
 export type InterfaceTypeInfo<TypeName> = TypeInfo<TypeName>;
 
-export function classTypeInfo<T>(typeName: StringLiteral<T>, interfaces?: any[]): ClassTypeInfo<T> {
-    return { typeKind: "class", typeName, interfaces: interfaces }
+export function classTypeInfo<T>(typeName: StringLiteral<T>, intfAndAttr?: any[]): ClassTypeInfo<T> {
+    return {
+        typeKind: "class",
+        typeName,
+        interfaces: intfAndAttr?.filter(x => typeof (x) === "function"),
+        customAttributes: intfAndAttr?.filter(x => typeof (x) !== "function")
+    }
 }
 
-export function editorTypeInfo<T>(typeName: StringLiteral<T>, interfaces?: any[]): EditorTypeInfo<T> {
-    return { typeKind: "editor", typeName, interfaces: interfaces, customAttributes: [new EditorAttribute()] }
+export function editorTypeInfo<T>(typeName: StringLiteral<T>, intfAndAttr?: any[]): EditorTypeInfo<T> {
+    return {
+        typeKind: "editor",
+        typeName,
+        interfaces: intfAndAttr?.filter(x => typeof (x) === "function"),
+        customAttributes: merge([new EditorAttribute()], intfAndAttr?.filter(x => typeof (x) !== "function" && x.prototype !== EditorAttribute.prototype))
+    }
 }
 
-export function formatterTypeInfo<T>(typeName: StringLiteral<T>, interfaces?: any[]): FormatterTypeInfo<T> {
-    return { typeKind: "formatter", typeName, interfaces: merge([ISlickFormatter], interfaces) }
+export function formatterTypeInfo<T>(typeName: StringLiteral<T>, intfAndAttr?: any[]): FormatterTypeInfo<T> {
+    return {
+        typeKind: "formatter",
+        typeName,
+        interfaces: merge([ISlickFormatter], intfAndAttr?.filter(x => typeof (x) === "function")),
+        customAttributes: intfAndAttr?.filter(x => typeof (x) !== "function")
+    }
 }
 
-export function interfaceTypeInfo<T>(typeName: StringLiteral<T>, interfaces?: any[]): InterfaceTypeInfo<T> {
-    return { typeKind: "interface", typeName, interfaces }
+export function interfaceTypeInfo<T>(typeName: StringLiteral<T>, intfAndAttr?: any[]): InterfaceTypeInfo<T> {
+    return {
+        typeKind: "interface",
+        typeName,
+        interfaces: intfAndAttr?.filter(x => typeof (x) === "function"),
+        customAttributes: intfAndAttr?.filter(x => typeof (x) !== "function")
+    }
 }
 
 export function registerType(type: { [typeInfoProperty]: TypeInfo<any>, name: string }) {

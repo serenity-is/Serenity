@@ -218,20 +218,20 @@ export class Widget<P = {}> {
     // jsx-dom >= 8.1.5 requires isComponent as a static property
     static readonly isComponent = true;
 
-    protected static classTypeInfo<T>(typeName: StringLiteral<T>, interfaces?: any[]): ClassTypeInfo<T> {
+    protected static classTypeInfo<T>(typeName: StringLiteral<T>, intfAndAttr?: any[]): ClassTypeInfo<T> {
         if (Object.prototype.hasOwnProperty.call(this, typeInfoProperty) && this[typeInfoProperty])
             throw new Error(`Type ${this.name} already has a typeInfo property!`);
 
-        const typeInfo = this.typeInfo = classTypeInfo(typeName, interfaces);
+        const typeInfo = this.typeInfo = classTypeInfo(typeName, intfAndAttr);
         registerType(this);
         return typeInfo;
     }
 
-    protected static editorTypeInfo<T>(typeName: StringLiteral<T>, interfaces?: any[]): EditorTypeInfo<T> {
+    protected static editorTypeInfo<T>(typeName: StringLiteral<T>, intfAndAttr?: any[]): EditorTypeInfo<T> {
         if (Object.prototype.hasOwnProperty.call(this, typeInfoProperty) && this[typeInfoProperty])
             throw new Error(`Type ${this.name} already has a typeInfo property!`);
-        
-        const typeInfo = this.typeInfo = editorTypeInfo(typeName, interfaces);
+
+        const typeInfo = this.typeInfo = editorTypeInfo(typeName, intfAndAttr);
         registerType(this);
         return typeInfo;
     }

@@ -1,4 +1,4 @@
-import { Authorization, DeleteRequest, DeleteResponse, Fluent, LanguageList, RetrieveColumnSelection, RetrieveRequest, RetrieveResponse, SaveRequest, SaveResponse, ServiceOptions, TranslationConfig, UndeleteRequest, UndeleteResponse, addCustomAttribute, confirmDialog, getInstanceType, getTypeFullName, localText, notifySuccess, serviceCall, stringFormat, tryGetText, type PropertyItem, type PropertyItemsData } from "../../base";
+import { Authorization, DeleteRequest, DeleteResponse, Fluent, LanguageList, RetrieveColumnSelection, RetrieveRequest, RetrieveResponse, SaveRequest, SaveResponse, ServiceOptions, TranslationConfig, UndeleteRequest, UndeleteResponse, confirmDialog, getInstanceType, getTypeFullName, localText, notifySuccess, serviceCall, stringFormat, tryGetText, type PropertyItem, type PropertyItemsData } from "../../base";
 import { Exception, ScriptData, ValidationHelper, extend, getFormData, getFormDataAsync, replaceAll, validatorAbortHandler } from "../../compat";
 import { IEditDialog, IReadOnly } from "../../interfaces";
 import { DataChangeInfo } from "../../types";
@@ -16,8 +16,7 @@ import { SaveInitiator, applyChangesToolButton, cloneToolButton, deleteToolButto
 
 export class EntityDialog<TItem, P = {}> extends BaseDialog<P> implements IEditDialog, IReadOnly {
 
-    static override typeInfo = this.classTypeInfo("Serenity.EntityDialog", [IEditDialog, IReadOnly]);
-    static { addCustomAttribute(this, new PanelAttribute(true)) }
+    static override typeInfo = this.classTypeInfo("Serenity.EntityDialog", [IEditDialog, IReadOnly, new PanelAttribute(true)]);
 
     declare private _entity: TItem;
     declare private _entityId: any;

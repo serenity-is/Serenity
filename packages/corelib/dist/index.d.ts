@@ -2255,10 +2255,10 @@ export type EditorTypeInfo<TypeName> = TypeInfo<TypeName>;
 export type FormatterTypeInfo<TypeName> = TypeInfo<TypeName>;
 /** Interface type information. This is used to make type name available in declaration files unlike decorators that does not show in .d.ts files. */
 export type InterfaceTypeInfo<TypeName> = TypeInfo<TypeName>;
-export declare function classTypeInfo<T>(typeName: StringLiteral<T>, interfaces?: any[]): ClassTypeInfo<T>;
-export declare function editorTypeInfo<T>(typeName: StringLiteral<T>, interfaces?: any[]): EditorTypeInfo<T>;
-export declare function formatterTypeInfo<T>(typeName: StringLiteral<T>, interfaces?: any[]): FormatterTypeInfo<T>;
-export declare function interfaceTypeInfo<T>(typeName: StringLiteral<T>, interfaces?: any[]): InterfaceTypeInfo<T>;
+export declare function classTypeInfo<T>(typeName: StringLiteral<T>, intfAndAttr?: any[]): ClassTypeInfo<T>;
+export declare function editorTypeInfo<T>(typeName: StringLiteral<T>, intfAndAttr?: any[]): EditorTypeInfo<T>;
+export declare function formatterTypeInfo<T>(typeName: StringLiteral<T>, intfAndAttr?: any[]): FormatterTypeInfo<T>;
+export declare function interfaceTypeInfo<T>(typeName: StringLiteral<T>, intfAndAttr?: any[]): InterfaceTypeInfo<T>;
 export declare function registerType(type: {
 	[typeInfoProperty]: TypeInfo<any>;
 	name: string;
@@ -2907,8 +2907,8 @@ export declare class Widget<P = {}> {
 	protected syncOrAsyncThen<T>(syncMethod: (() => T), asyncMethod: (() => PromiseLike<T>), then: (v: T) => void): void;
 	protected useIdPrefix(): IdPrefixType;
 	static readonly isComponent = true;
-	protected static classTypeInfo<T>(typeName: StringLiteral<T>, interfaces?: any[]): ClassTypeInfo<T>;
-	protected static editorTypeInfo<T>(typeName: StringLiteral<T>, interfaces?: any[]): EditorTypeInfo<T>;
+	protected static classTypeInfo<T>(typeName: StringLiteral<T>, intfAndAttr?: any[]): ClassTypeInfo<T>;
+	protected static editorTypeInfo<T>(typeName: StringLiteral<T>, intfAndAttr?: any[]): EditorTypeInfo<T>;
 	static typeInfo: ClassTypeInfo<"Serenity.Widget">;
 }
 /** @deprecated Use Widget */
@@ -5024,7 +5024,7 @@ export declare abstract class BaseFiltering implements IFiltering, IQuickFilteri
 	getEditorValue(): string;
 	getEditorText(): string;
 	initQuickFilter(filter: QuickFilter<Widget<any>, any>): void;
-	protected static classTypeInfo<T>(typeName: StringLiteral<T>, interfaces?: any[]): ClassTypeInfo<T>;
+	protected static classTypeInfo<T>(typeName: StringLiteral<T>, intfAndAttr?: any[]): ClassTypeInfo<T>;
 	static typeInfo: ClassTypeInfo<"Serenity.BaseFiltering">;
 }
 export declare abstract class BaseEditorFiltering<TEditor extends Widget<any>> extends BaseFiltering {
