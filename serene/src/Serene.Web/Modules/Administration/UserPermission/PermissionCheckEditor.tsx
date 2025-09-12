@@ -24,7 +24,7 @@ export interface PermissionCheckItem {
 }
 
 export class PermissionCheckEditor<P extends PermissionCheckEditorOptions = PermissionCheckEditorOptions> extends DataGrid<PermissionCheckItem, P> {
-    static override typeInfo = this.editorTypeInfo("Serene.Administration.PermissionCheckEditor", [IGetEditValue, ISetEditValue]);
+    static override typeInfo = this.registerEditor("Serene.Administration.PermissionCheckEditor", [IGetEditValue, ISetEditValue]);
 
     protected getIdProperty() { return "Key"; }
 

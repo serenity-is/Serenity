@@ -14,7 +14,7 @@ export namespace DialogTypeRegistry {
         loadError: function (key: string) {
             var message = `"${htmlEncode(key)}" dialog class not found! 
 Make sure the dialog type has a line like the following (with the correct full name):
-static override typeInfo = this.classTypeInfo("MyProject.MyModule.MyDialog");
+static override typeInfo = this.registerClass("MyProject.MyModule.MyDialog");
 and "side-effect-import" this dialog class from the current 
 "page.ts/grid.ts/dialog.ts file (import "./path/to/MyDialog.ts").
 

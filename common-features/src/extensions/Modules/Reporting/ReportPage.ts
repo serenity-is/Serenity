@@ -2,7 +2,7 @@ import { Fluent, QuickSearchInput, Widget, WidgetProps, stripDiacritics } from "
 import { ReportDialog } from "./ReportDialog";
 
 export class ReportPage<P = {}> extends Widget<P> {
-    static override typeInfo = this.classTypeInfo("Serenity.Extensions.ReportPage");
+    static override typeInfo = this.registerClass("Serenity.Extensions.ReportPage");
 
     constructor(props: WidgetProps<P>) {
         super(props);

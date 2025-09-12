@@ -9,7 +9,7 @@ const viewDetailsAction = "view-details";
 const newOrderAction = "new-order";
 
 export class InlineActionGrid extends CustomerGrid {
-    static override typeInfo = this.classTypeInfo("Serenity.Demo.BasicSamples.InlineActionGrid");
+    static override typeInfo = this.registerClass("Serenity.Demo.BasicSamples.InlineActionGrid");
 
     protected getColumns() {
         var columns = super.getColumns();

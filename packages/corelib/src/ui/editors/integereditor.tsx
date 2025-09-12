@@ -12,7 +12,7 @@ export interface IntegerEditorOptions {
 }
 
 export class IntegerEditor<P extends IntegerEditorOptions = IntegerEditorOptions> extends EditorWidget<P> implements IDoubleValue {
-    static override typeInfo = this.editorTypeInfo("Serenity.IntegerEditor", [IDoubleValue]);
+    static override typeInfo = this.registerEditor("Serenity.IntegerEditor", [IDoubleValue]);
 
     static override createDefaultElement() { return <input type="text" /> as HTMLInputElement; }
     declare readonly domNode: HTMLInputElement;

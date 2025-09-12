@@ -456,7 +456,7 @@ export type FormatterTypeInfo<TypeName> = TypeInfo<TypeName>;
 /** Interface type information. This is used to make type name available in declaration files unlike decorators that does not show in .d.ts files. */
 export type InterfaceTypeInfo<TypeName> = TypeInfo<TypeName>;
 
-export function classTypeInfo<T>(typeName: StringLiteral<T>, intfAndAttr?: any[]): ClassTypeInfo<T> {
+export function classTypeInfo<TypeName>(typeName: StringLiteral<TypeName>, intfAndAttr?: any[]): ClassTypeInfo<TypeName> {
     return {
         typeKind: "class",
         typeName,
@@ -465,7 +465,7 @@ export function classTypeInfo<T>(typeName: StringLiteral<T>, intfAndAttr?: any[]
     }
 }
 
-export function editorTypeInfo<T>(typeName: StringLiteral<T>, intfAndAttr?: any[]): EditorTypeInfo<T> {
+export function editorTypeInfo<TypeName>(typeName: StringLiteral<TypeName>, intfAndAttr?: any[]): EditorTypeInfo<TypeName> {
     return {
         typeKind: "editor",
         typeName,
@@ -474,7 +474,7 @@ export function editorTypeInfo<T>(typeName: StringLiteral<T>, intfAndAttr?: any[
     }
 }
 
-export function formatterTypeInfo<T>(typeName: StringLiteral<T>, intfAndAttr?: any[]): FormatterTypeInfo<T> {
+export function formatterTypeInfo<TypeName>(typeName: StringLiteral<TypeName>, intfAndAttr?: any[]): FormatterTypeInfo<TypeName> {
     return {
         typeKind: "formatter",
         typeName,
@@ -483,7 +483,7 @@ export function formatterTypeInfo<T>(typeName: StringLiteral<T>, intfAndAttr?: a
     }
 }
 
-export function interfaceTypeInfo<T>(typeName: StringLiteral<T>, intfAndAttr?: any[]): InterfaceTypeInfo<T> {
+export function interfaceTypeInfo<TypeName>(typeName: StringLiteral<TypeName>, intfAndAttr?: any[]): InterfaceTypeInfo<TypeName> {
     return {
         typeKind: "interface",
         typeName,

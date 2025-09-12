@@ -13,7 +13,7 @@ export default function pageInit() {
  * Our custom product editor type
  */
 export class ChangingLookupTextEditor extends LookupEditorBase<LookupEditorOptions, ProductRow> {
-    static override typeInfo = this.editorTypeInfo("Serenity.Demo.BasicSamples.ChangingLookupTextEditor");
+    static override typeInfo = this.registerEditor("Serenity.Demo.BasicSamples.ChangingLookupTextEditor");
 
     protected getLookupKey() {
         return ProductRow.lookupKey;
@@ -30,7 +30,7 @@ export class ChangingLookupTextEditor extends LookupEditorBase<LookupEditorOptio
 }
 
 export class ChangingLookupTextDialog<P = {}> extends GridEditorDialog<OrderDetailRow, P> {
-    static override typeInfo = this.classTypeInfo("Serenity.Demo.BasicSamples.ChangingLookupTextDialog");
+    static override typeInfo = this.registerClass("Serenity.Demo.BasicSamples.ChangingLookupTextDialog");
 
     protected getFormKey() { return ChangingLookupTextForm.formKey; }
     protected getLocalTextPrefix() { return OrderDetailRow.localTextPrefix; }

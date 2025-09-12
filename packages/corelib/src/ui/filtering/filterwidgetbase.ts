@@ -2,7 +2,7 @@
 import { FilterStore } from "./filterstore";
 
 export class FilterWidgetBase<P = {}> extends Widget<P> {
-    static override typeInfo = this.classTypeInfo("Serenity.FilterWidgetBase");
+    static override typeInfo = this.registerClass("Serenity.FilterWidgetBase");
 
     declare private store: FilterStore;
 

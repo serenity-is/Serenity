@@ -5,7 +5,7 @@ import { EditorProps } from "./editorwidget";
 import { StringEditor } from "./stringeditor";
 
 export class URLEditor<P = {}> extends StringEditor<P> {
-    static override typeInfo = this.editorTypeInfo("Serenity.URLEditor", [IStringValue]);
+    static override typeInfo = this.registerEditor("Serenity.URLEditor", [IStringValue]);
 
     constructor(props: EditorProps<P>) {
         super(props);

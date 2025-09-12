@@ -6,7 +6,7 @@ import { CriteriaWithText } from "./criteriawithtext";
 import { FilterOperator } from "./filteroperator";
 
 export class DateTimeFiltering extends BaseEditorFiltering<DateEditor> {
-    static override typeInfo = this.classTypeInfo("Serenity.DateTimeFiltering");
+    static override typeInfo = this.registerClass("Serenity.DateTimeFiltering");
 
     constructor() {
         super(DateTimeEditor)

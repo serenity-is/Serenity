@@ -8,7 +8,7 @@ import { CustomerOrderDialog } from "./CustomerOrderDialog";
 const fld = OrderRow.Fields;
 
 export class CustomerOrdersGrid<P = {}> extends OrderGrid<P> {
-    static override typeInfo = this.classTypeInfo("Serenity.Demo.Northwind.CustomerOrdersGrid");
+    static override typeInfo = this.registerClass("Serenity.Demo.Northwind.CustomerOrdersGrid");
     
     protected getDialogType() { return CustomerOrderDialog; }
 

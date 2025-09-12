@@ -4,7 +4,7 @@ import { TerritoryColumns, TerritoryRow, TerritoryService } from "../ServerTypes
 import { TerritoryDialog } from "./TerritoryDialog";
 
 export class TerritoryGrid<P = {}> extends EntityGrid<TerritoryRow, P> {
-    static override typeInfo = this.classTypeInfo("Serenity.Demo.Northwind.TerritoryGrid");
+    static override typeInfo = this.registerClass("Serenity.Demo.Northwind.TerritoryGrid");
 
     protected getColumnsKey() { return TerritoryColumns.columnsKey; }
     protected getDialogType() { return <any>TerritoryDialog; }

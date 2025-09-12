@@ -3,7 +3,7 @@ import { BaseEditorFiltering } from "./baseeditorfiltering";
 import { FilterOperators } from "./filteroperator";
 
 export class EnumFiltering extends BaseEditorFiltering<EnumEditor> {
-    static override typeInfo = this.classTypeInfo("Serenity.EnumFiltering");
+    static override typeInfo = this.registerClass("Serenity.EnumFiltering");
 
     constructor() {
         super(EnumEditor);

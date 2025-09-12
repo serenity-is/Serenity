@@ -5,7 +5,7 @@ import { Column } from "@serenity-is/sleekgrid";
 export default () => gridPageInit(CustomLinksInGrid);
 
 export class CustomLinksInGrid extends OrderGrid {
-    static override typeInfo = this.classTypeInfo("Serenity.Demo.BasicSamples.CustomLinksInGrid");
+    static override typeInfo = this.registerClass("Serenity.Demo.BasicSamples.CustomLinksInGrid");
 
     /**
      * We override getColumns() to change format functions for some columns.

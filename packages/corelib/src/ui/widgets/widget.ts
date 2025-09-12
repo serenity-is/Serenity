@@ -218,7 +218,7 @@ export class Widget<P = {}> {
     // jsx-dom >= 8.1.5 requires isComponent as a static property
     static readonly isComponent = true;
 
-    protected static classTypeInfo<T>(typeName: StringLiteral<T>, intfAndAttr?: any[]): ClassTypeInfo<T> {
+    protected static registerClass<TypeName>(typeName: StringLiteral<TypeName>, intfAndAttr?: any[]): ClassTypeInfo<TypeName> {
         if (Object.prototype.hasOwnProperty.call(this, typeInfoProperty) && this[typeInfoProperty])
             throw new Error(`Type ${this.name} already has a typeInfo property!`);
 
@@ -227,7 +227,7 @@ export class Widget<P = {}> {
         return typeInfo;
     }
 
-    protected static editorTypeInfo<T>(typeName: StringLiteral<T>, intfAndAttr?: any[]): EditorTypeInfo<T> {
+    protected static registerEditor<TypeName>(typeName: StringLiteral<TypeName>, intfAndAttr?: any[]): EditorTypeInfo<TypeName> {
         if (Object.prototype.hasOwnProperty.call(this, typeInfoProperty) && this[typeInfoProperty])
             throw new Error(`Type ${this.name} already has a typeInfo property!`);
 
@@ -236,7 +236,7 @@ export class Widget<P = {}> {
         return typeInfo;
     }
 
-    static typeInfo = this.classTypeInfo("Serenity.Widget");
+    static typeInfo = this.registerClass("Serenity.Widget");
 }
 
 /** @deprecated Use Widget */

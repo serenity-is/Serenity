@@ -6,7 +6,7 @@ import "./NotesEditor.css";
 
 export class NotesEditor<P = {}> extends EditorWidget<P>
     implements IGetEditValue, ISetEditValue {
-    static override typeInfo = this.editorTypeInfo("Serenity.Demo.Northwind.NotesEditor", [IGetEditValue, ISetEditValue]);
+    static override typeInfo = this.registerEditor("Serenity.Demo.Northwind.NotesEditor", [IGetEditValue, ISetEditValue]);
     static override createDefaultElement() { return <div /> as HTMLElement }
 
     declare private isDirty: boolean;

@@ -68,7 +68,7 @@ export interface ToolbarOptions {
 }
 
 export class Toolbar<P extends ToolbarOptions = ToolbarOptions> extends Widget<P> {
-    static override typeInfo = this.classTypeInfo("Serenity.Toolbar");
+    static override typeInfo = this.registerClass("Serenity.Toolbar");
 
     protected renderContents(): any {
 

@@ -4,7 +4,7 @@ import { ISetEditValue, PropertyItem, Widget, WidgetProps, localText } from "@se
 * This is an editor widget but it only displays a text, not edits it.
 */
 export class StaticTextBlock<P extends StaticTextBlockOptions = StaticTextBlockOptions> extends Widget<P> implements ISetEditValue {
-    static override typeInfo = this.editorTypeInfo("Serenity.Extensions.StaticTextBlock", [ISetEditValue]);
+    static override typeInfo = this.registerEditor("Serenity.Extensions.StaticTextBlock", [ISetEditValue]);
     static override createDefaultElement() { return document.createElement("div"); }
 
     declare private value: string;

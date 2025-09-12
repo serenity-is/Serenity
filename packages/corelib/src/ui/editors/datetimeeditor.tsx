@@ -7,7 +7,7 @@ import { EditorProps, EditorWidget } from "./editorwidget";
 
 export class DateTimeEditor<P extends DateTimeEditorOptions = DateTimeEditorOptions> extends EditorWidget<P> implements IStringValue, IReadOnly {
 
-    static override typeInfo = this.editorTypeInfo("Serenity.DateTimeEditor", [IStringValue, IReadOnly]);
+    static override typeInfo = this.registerEditor("Serenity.DateTimeEditor", [IStringValue, IReadOnly]);
 
     static override createDefaultElement() { return <input type="text" /> as HTMLInputElement; }
     declare readonly domNode: HTMLInputElement;

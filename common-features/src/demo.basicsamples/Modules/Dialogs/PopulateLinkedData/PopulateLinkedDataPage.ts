@@ -8,13 +8,13 @@ export default () => gridPageInit(PopulateLinkedDataGrid);
  * A subclass of OrderGrid that launches PopulateLinkedDataDialog
  */
 export class PopulateLinkedDataGrid extends OrderGrid {
-    static override typeInfo = this.classTypeInfo("Serenity.Demo.BasicSamples.PopulateLinkedDataGrid");
+    static override typeInfo = this.registerClass("Serenity.Demo.BasicSamples.PopulateLinkedDataGrid");
 
     protected getDialogType() { return PopulateLinkedDataDialog; }
 }
 
 export class PopulateLinkedDataDialog<P = {}> extends EntityDialog<OrderRow, P> {
-    static override typeInfo = this.classTypeInfo("Serenity.Demo.BasicSamples.PopulateLinkedDataDialog");
+    static override typeInfo = this.registerClass("Serenity.Demo.BasicSamples.PopulateLinkedDataDialog");
 
     protected getFormKey() { return PopulateLinkedDataForm.formKey; }
     protected getRowDefinition() { return OrderRow; }

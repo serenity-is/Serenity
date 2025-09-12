@@ -6,7 +6,7 @@ import { BaseEditorFiltering } from "./baseeditorfiltering";
 import { FilterOperator, FilterOperators } from "./filteroperator";
 
 export class EditorFiltering extends BaseEditorFiltering<Widget<any>> {
-    static override typeInfo = this.classTypeInfo("Serenity.EditorFiltering");
+    static override typeInfo = this.registerClass("Serenity.EditorFiltering");
 
     constructor(public readonly props: { editorType?: string, useRelative?: boolean, useLike?: boolean } = {}) {
         super(Widget);

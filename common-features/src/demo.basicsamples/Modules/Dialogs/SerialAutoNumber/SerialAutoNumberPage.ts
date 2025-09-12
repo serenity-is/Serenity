@@ -8,13 +8,13 @@ export default () => gridPageInit(SerialAutoNumberGrid);
  * Subclass of CustomerGrid to override dialog type to SerialAutoNumberDialog
  */
 export class SerialAutoNumberGrid extends CustomerGrid {
-    static override typeInfo = this.classTypeInfo("Serenity.Demo.BasicSamples.SerialAutoNumberGrid");
+    static override typeInfo = this.registerClass("Serenity.Demo.BasicSamples.SerialAutoNumberGrid");
 
     protected getDialogType() { return SerialAutoNumberDialog; }
 }
 
 export class SerialAutoNumberDialog extends CustomerDialog {
-    static override typeInfo = this.classTypeInfo("Serenity.Demo.BasicSamples.SerialAutoNumberDialog");
+    static override typeInfo = this.registerClass("Serenity.Demo.BasicSamples.SerialAutoNumberDialog");
 
     constructor(props: {}) {
         super(props);

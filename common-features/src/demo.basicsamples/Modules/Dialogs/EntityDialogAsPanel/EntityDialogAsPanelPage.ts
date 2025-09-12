@@ -30,7 +30,7 @@ export default function pageInit(model: any) {
  * A version of order dialog converted to a panel by adding PanelAttribute.
  */
 export class EntityDialogAsPanel extends OrderDialog {
-    static override typeInfo = this.classTypeInfo("Serenity.Demo.Northwind.EntityDialogAsPanel", [new PanelAttribute()]);
+    static override typeInfo = this.registerClass("Serenity.Demo.Northwind.EntityDialogAsPanel", [new PanelAttribute()]);
 
     protected updateInterface() {
         super.updateInterface();

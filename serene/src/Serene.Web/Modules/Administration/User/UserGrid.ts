@@ -3,7 +3,7 @@ import { RoleRow, UserColumns, UserRow, UserService } from "../../ServerTypes/Ad
 import { UserDialog } from "./UserDialog";
 
 export class UserGrid extends EntityGrid<UserRow, any> {
-    static override typeInfo = this.classTypeInfo("Serene.Administration.UserGrid");
+    static override typeInfo = this.registerClass("Serene.Administration.UserGrid");
 
     protected getColumnsKey() { return UserColumns.columnsKey; }
     protected getDialogType() { return UserDialog; }

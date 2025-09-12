@@ -7,7 +7,7 @@ export interface TextAreaEditorOptions {
 }
 
 export class TextAreaEditor<P extends TextAreaEditorOptions = TextAreaEditorOptions> extends EditorWidget<P> {
-    static override typeInfo = this.editorTypeInfo("Serenity.TextAreaEditor", [IStringValue]);
+    static override typeInfo = this.registerEditor("Serenity.TextAreaEditor", [IStringValue]);
 
     static override createDefaultElement() { return document.createElement("textarea"); }
 

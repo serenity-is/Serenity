@@ -4,7 +4,7 @@ import { MembershipValidationTexts, UserDialogTexts } from "../../ServerTypes/Te
 import { UserPermissionDialog } from "../UserPermission/UserPermissionDialog";
 
 export class UserDialog extends EntityDialog<UserRow, any> {
-    static override typeInfo = this.classTypeInfo("Serene.Administration.UserDialog");
+    static override typeInfo = this.registerClass("Serene.Administration.UserDialog");
 
     protected getFormKey() { return UserForm.formKey; }
     protected getIdProperty() { return UserRow.idProperty; }

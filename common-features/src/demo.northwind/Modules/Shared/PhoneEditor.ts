@@ -5,7 +5,7 @@ export interface PhoneEditorOptions {
 }
 
 export class PhoneEditor<P extends PhoneEditorOptions = PhoneEditorOptions> extends StringEditor<P> {
-    static override typeInfo = this.editorTypeInfo("Serenity.Demo.Northwind.PhoneEditor");
+    static override typeInfo = this.registerEditor("Serenity.Demo.Northwind.PhoneEditor");
 
     constructor(props: WidgetProps<P>) {
         super(props);

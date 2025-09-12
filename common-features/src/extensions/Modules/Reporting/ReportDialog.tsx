@@ -3,7 +3,7 @@ import { ReportRetrieveResult } from "../ServerTypes/Reporting";
 import { ReportHelper } from "./ReportHelper";
 
 export class ReportDialog<P extends ReportDialogOptions = ReportDialogOptions> extends BaseDialog<P> {
-    static override typeInfo = this.classTypeInfo("Serenity.Extensions.ReportDialog");
+    static override typeInfo = this.registerClass("Serenity.Extensions.ReportDialog");
 
     declare private report: ReportRetrieveResult;
     declare private propertyGrid: PropertyGrid;

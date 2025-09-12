@@ -2007,11 +2007,11 @@ export type StringLiteral<T> = T extends string ? string extends T ? never : T :
 /**
  * Type information for a registered type.
  */
-export type TypeInfo<T> = {
+export type TypeInfo<TypeName> = {
 	/** Type kind, can be "class", "enum", "interface", "editor" or "formatter" */
 	typeKind: "class" | "enum" | "interface" | "editor" | "formatter";
 	/** Registered type name */
-	typeName: StringLiteral<T> | (string & {});
+	typeName: StringLiteral<TypeName> | (string & {});
 	/** Implemented interfaces */
 	interfaces?: any[];
 	/** Custom attributes */
@@ -2255,10 +2255,10 @@ export type EditorTypeInfo<TypeName> = TypeInfo<TypeName>;
 export type FormatterTypeInfo<TypeName> = TypeInfo<TypeName>;
 /** Interface type information. This is used to make type name available in declaration files unlike decorators that does not show in .d.ts files. */
 export type InterfaceTypeInfo<TypeName> = TypeInfo<TypeName>;
-export declare function classTypeInfo<T>(typeName: StringLiteral<T>, intfAndAttr?: any[]): ClassTypeInfo<T>;
-export declare function editorTypeInfo<T>(typeName: StringLiteral<T>, intfAndAttr?: any[]): EditorTypeInfo<T>;
-export declare function formatterTypeInfo<T>(typeName: StringLiteral<T>, intfAndAttr?: any[]): FormatterTypeInfo<T>;
-export declare function interfaceTypeInfo<T>(typeName: StringLiteral<T>, intfAndAttr?: any[]): InterfaceTypeInfo<T>;
+export declare function classTypeInfo<TypeName>(typeName: StringLiteral<TypeName>, intfAndAttr?: any[]): ClassTypeInfo<TypeName>;
+export declare function editorTypeInfo<TypeName>(typeName: StringLiteral<TypeName>, intfAndAttr?: any[]): EditorTypeInfo<TypeName>;
+export declare function formatterTypeInfo<TypeName>(typeName: StringLiteral<TypeName>, intfAndAttr?: any[]): FormatterTypeInfo<TypeName>;
+export declare function interfaceTypeInfo<TypeName>(typeName: StringLiteral<TypeName>, intfAndAttr?: any[]): InterfaceTypeInfo<TypeName>;
 export declare function registerType(type: {
 	[typeInfoProperty]: TypeInfo<any>;
 	name: string;
@@ -2907,8 +2907,8 @@ export declare class Widget<P = {}> {
 	protected syncOrAsyncThen<T>(syncMethod: (() => T), asyncMethod: (() => PromiseLike<T>), then: (v: T) => void): void;
 	protected useIdPrefix(): IdPrefixType;
 	static readonly isComponent = true;
-	protected static classTypeInfo<T>(typeName: StringLiteral<T>, intfAndAttr?: any[]): ClassTypeInfo<T>;
-	protected static editorTypeInfo<T>(typeName: StringLiteral<T>, intfAndAttr?: any[]): EditorTypeInfo<T>;
+	protected static registerClass<TypeName>(typeName: StringLiteral<TypeName>, intfAndAttr?: any[]): ClassTypeInfo<TypeName>;
+	protected static registerEditor<TypeName>(typeName: StringLiteral<TypeName>, intfAndAttr?: any[]): EditorTypeInfo<TypeName>;
 	static typeInfo: ClassTypeInfo<"Serenity.Widget">;
 }
 /** @deprecated Use Widget */
@@ -3518,10 +3518,6 @@ export interface DataChangeInfo extends Event {
 	entity: any;
 }
 export declare namespace Decorators {
-	const classType: typeof classTypeInfo;
-	const editorType: typeof editorTypeInfo;
-	const interfaceType: typeof interfaceTypeInfo;
-	const formatterType: typeof formatterTypeInfo;
 	function registerType(): (target: Function & {
 		[typeInfoProperty]: any;
 	}, _context?: any) => void;
@@ -5031,7 +5027,7 @@ export declare abstract class BaseFiltering implements IFiltering, IQuickFilteri
 	getEditorValue(): string;
 	getEditorText(): string;
 	initQuickFilter(filter: QuickFilter<Widget<any>, any>): void;
-	protected static classTypeInfo<T>(typeName: StringLiteral<T>, intfAndAttr?: any[]): ClassTypeInfo<T>;
+	protected static registerClass<TypeName>(typeName: StringLiteral<TypeName>, intfAndAttr?: any[]): ClassTypeInfo<TypeName>;
 	static typeInfo: ClassTypeInfo<"Serenity.BaseFiltering">;
 }
 export declare class BooleanFiltering extends BaseFiltering {
@@ -5317,11 +5313,11 @@ export interface IInitializeColumn {
 	initializeColumn(column: Column): void;
 }
 export declare class IInitializeColumn {
-	static typeInfo: FormatterTypeInfo<"Serenity.IInitializeColumn">;
+	static typeInfo: InterfaceTypeInfo<"Serenity.IInitializeColumn">;
 }
 export declare abstract class FormatterBase implements Formatter {
 	abstract format(ctx: FormatterContext): FormatterResult;
-	protected static formatterTypeInfo<T>(typeName: StringLiteral<T>, intfAndAttr?: any[]): FormatterTypeInfo<T>;
+	protected static registerFormatter<TypeName>(typeName: StringLiteral<TypeName>, intfAndAttr?: any[]): FormatterTypeInfo<TypeName>;
 	static typeInfo: FormatterTypeInfo<"Serenity.FormatterBase">;
 }
 export declare class BooleanFormatter implements Formatter {

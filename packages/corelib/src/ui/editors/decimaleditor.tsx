@@ -12,7 +12,7 @@ export interface DecimalEditorOptions {
 }
 
 export class DecimalEditor<P extends DecimalEditorOptions = DecimalEditorOptions> extends EditorWidget<P> implements IDoubleValue {
-    static override typeInfo = this.editorTypeInfo("Serenity.DecimalEditor", [IDoubleValue]);
+    static override typeInfo = this.registerEditor("Serenity.DecimalEditor", [IDoubleValue]);
 
     static override createDefaultElement() { return <input type="text" /> as HTMLInputElement; }
     declare readonly domNode: HTMLInputElement;

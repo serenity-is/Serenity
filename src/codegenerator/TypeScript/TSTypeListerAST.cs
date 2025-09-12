@@ -538,9 +538,9 @@ public class TSTypeListerAST
                     ce.Arguments?.Count >= 1 &&
                     ce.Arguments[0] is StringLiteral ltns &&
                     pae.Name?.Text is string paet &&
-                    paet.EndsWith("TypeInfo", StringComparison.Ordinal))
+                    paet.StartsWith("register", StringComparison.Ordinal))
                 {
-                    externalMember.Type = char.ToUpperInvariant(paet[0]) + paet[1..];
+                    externalMember.Type = paet[8..] + "TypeInfo";
                     externalMember.Value = ltns.Text;
                 }
                 else if (

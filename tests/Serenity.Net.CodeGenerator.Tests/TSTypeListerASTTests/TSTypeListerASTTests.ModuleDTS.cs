@@ -68,7 +68,7 @@ declare class Widget<TOptions = any> {
 }
 
 declare class StringEditor extends Widget<any> {
-    static typeInfo = this.editorTypeInfo(""Serenity.StringEditor"");
+    static typeInfo = this.registerEditor(""Serenity.StringEditor"");
     static readonly __bool = false;
 }
 

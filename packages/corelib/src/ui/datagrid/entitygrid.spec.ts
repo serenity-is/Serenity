@@ -1,4 +1,4 @@
-import { addCustomAttribute, classTypeInfo } from "../../base";
+import { addCustomAttribute } from "../../base";
 import { mockFetch } from "../../test/mocks";
 import { IdPropertyAttribute, IsActivePropertyAttribute, LocalTextPrefixAttribute } from "../../types/attributes";
 import { Decorators } from "../../types/decorators";
@@ -141,7 +141,7 @@ describe('EntityGrid.getLocalTextDbPrefix', () => {
 
     it('returns class identifier based on typeInfo property', () => {
         class DefaultGrid extends EntityGrid<any, any> {
-            static typeInfo = this.classTypeInfo('MyProject.TestModule.DefaultGrid');
+            static typeInfo = this.registerClass('MyProject.TestModule.DefaultGrid');
         }
 
         var grid = new DefaultGrid({});
@@ -226,7 +226,7 @@ describe('EntityGrid.getLocalTextPrefix', () => {
 
     it('returns class identifier based on typeInfo property', () => {
         class DefaultGrid extends EntityGrid<any, any> {
-            static typeInfo = this.classTypeInfo('MyProject.TestModule.DefaultGrid');
+            static typeInfo = this.registerClass('MyProject.TestModule.DefaultGrid');
         }
 
         var grid = new DefaultGrid({});

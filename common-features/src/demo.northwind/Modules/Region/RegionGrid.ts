@@ -3,7 +3,7 @@ import { RegionColumns, RegionRow, RegionService } from "../ServerTypes/Demo";
 import { RegionDialog } from "./RegionDialog";
 
 export class RegionGrid<P = {}> extends EntityGrid<RegionRow, P> {
-    static override typeInfo = this.classTypeInfo("Serenity.Demo.Northwind.RegionGrid");
+    static override typeInfo = this.registerClass("Serenity.Demo.Northwind.RegionGrid");
 
     protected getColumnsKey() { return RegionColumns.columnsKey; }
     protected getDialogType() { return <any>RegionDialog; }

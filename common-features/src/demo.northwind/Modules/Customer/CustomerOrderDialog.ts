@@ -1,7 +1,7 @@
 import { OrderDialog } from "../Order/OrderDialog";
 
 export class CustomerOrderDialog extends OrderDialog {
-    static override typeInfo = this.classTypeInfo("Serenity.Demo.Northwind.CustomerOrderDialog");
+    static override typeInfo = this.registerClass("Serenity.Demo.Northwind.CustomerOrderDialog");
 
     updateInterface() {
         super.updateInterface();

@@ -4,7 +4,7 @@ import { Column } from "@serenity-is/sleekgrid";
 import { TranslationService } from "../../ServerTypes/Administration";
 
 export class TranslationGrid extends EntityGrid<TranslationItem, any> {
-    static override typeInfo = this.classTypeInfo("Serene.Administration.TranslationGrid");
+    static override typeInfo = this.registerClass("Serene.Administration.TranslationGrid");
 
     protected getIdProperty() { return "Key"; }
     protected getLocalTextPrefix() { return "Administration.Translation"; }

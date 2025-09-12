@@ -14,7 +14,7 @@ export namespace EditorTypeRegistry {
         loadError: function (key: string) {
             var message = `"${htmlEncode(key)}" editor class not found! 
 Make sure the editor type has a line like the following (with the correct full name):
-static override typeInfo = this.editorTypeInfo("MyProject.MyModule.MyEditor");            
+static override typeInfo = this.registerEditor("MyProject.MyModule.MyEditor");            
 and "side-effect-import" this editor class from the current 
 "page.ts/grid.ts/dialog.ts file (import "./path/to/MyEditor.ts").
 

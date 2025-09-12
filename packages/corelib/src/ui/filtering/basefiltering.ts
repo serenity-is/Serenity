@@ -257,7 +257,7 @@ export abstract class BaseFiltering implements IFiltering, IQuickFiltering {
         filter.options = deepClone(this.get_field().quickFilterParams);
     }
 
-    protected static classTypeInfo<T>(typeName: StringLiteral<T>, intfAndAttr?: any[]): ClassTypeInfo<T> {
+    protected static registerClass<TypeName>(typeName: StringLiteral<TypeName>, intfAndAttr?: any[]): ClassTypeInfo<TypeName> {
         if (Object.prototype.hasOwnProperty.call(this, typeInfoProperty) && this[typeInfoProperty])
             throw new Error(`Type ${this.name} already has a typeInfo property!`);
 
@@ -266,7 +266,7 @@ export abstract class BaseFiltering implements IFiltering, IQuickFiltering {
         return typeInfo;
     }
 
-    static typeInfo = this.classTypeInfo("Serenity.BaseFiltering", [IFiltering, IQuickFiltering]);
+    static typeInfo = this.registerClass("Serenity.BaseFiltering", [IFiltering, IQuickFiltering]);
 
 }
 

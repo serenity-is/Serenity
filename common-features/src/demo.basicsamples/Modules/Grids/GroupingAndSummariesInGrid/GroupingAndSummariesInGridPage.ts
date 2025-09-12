@@ -5,7 +5,7 @@ import { GroupItemMetadataProvider } from "@serenity-is/sleekgrid";
 export default () => gridPageInit(GroupingAndSummariesInGrid);
 
 export class GroupingAndSummariesInGrid<P = {}> extends EntityGrid<ProductRow, P> {
-    static override typeInfo = this.classTypeInfo("Serenity.Demo.BasicSamples.GroupingAndSummariesInGrid");
+    static override typeInfo = this.registerClass("Serenity.Demo.BasicSamples.GroupingAndSummariesInGrid");
 
     protected getColumnsKey() { return ProductColumns.columnsKey; }
     protected getDialogType() { return ProductDialog; }

@@ -7,13 +7,13 @@ export default () => gridPageInit(GetInsertedRecordIdGrid);
  * Subclass of CategoryGrid to override dialog type to GetInsertedRecordIdDialog
  */
 export class GetInsertedRecordIdGrid extends CategoryGrid {
-    static override typeInfo = this.classTypeInfo("Serenity.Demo.BasicSamples.GetInsertedRecordIdGrid");
+    static override typeInfo = this.registerClass("Serenity.Demo.BasicSamples.GetInsertedRecordIdGrid");
 
     protected override getDialogType() { return GetInsertedRecordIdDialog; }
 }
 
 export class GetInsertedRecordIdDialog extends CategoryDialog {
-    static override typeInfo = this.classTypeInfo("Serenity.Demo.BasicSamples.GetInsertedRecordIdDialog");
+    static override typeInfo = this.registerClass("Serenity.Demo.BasicSamples.GetInsertedRecordIdDialog");
 
     /**
      * This method is called after the save request to service

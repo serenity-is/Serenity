@@ -6,7 +6,7 @@ import { ProductDialog } from "./ProductDialog";
 import "./ProductGrid.css";
 
 export class ProductGrid<P = {}> extends EntityGrid<ProductRow, P> {
-    static override typeInfo = this.classTypeInfo("Serenity.Demo.Northwind.ProductGrid", [new FilterableAttribute()]);
+    static override typeInfo = this.registerClass("Serenity.Demo.Northwind.ProductGrid", [new FilterableAttribute()]);
     protected getColumnsKey() { return ProductColumns.columnsKey; }
     protected getDialogType() { return <any>ProductDialog; }
     protected getRowDefinition() { return ProductRow; }

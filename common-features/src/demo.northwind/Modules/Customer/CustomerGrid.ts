@@ -3,7 +3,7 @@ import { CustomerColumns, CustomerRow, CustomerService } from "../ServerTypes/De
 import { CustomerDialog } from "./CustomerDialog";
 
 export class CustomerGrid<P = {}> extends EntityGrid<CustomerRow, P> {
-    static override typeInfo = this.classTypeInfo("Serenity.Demo.Norhtwind.CustomerGrid", [new FilterableAttribute()]);
+    static override typeInfo = this.registerClass("Serenity.Demo.Norhtwind.CustomerGrid", [new FilterableAttribute()]);
 
     protected getColumnsKey() { return CustomerColumns.columnsKey; }
     protected getDialogType() { return <any>CustomerDialog; }

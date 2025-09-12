@@ -7,7 +7,7 @@ export default () => gridPageInit(InitialValuesForQuickFilters);
 const fld = OrderRow.Fields;
 
 export class InitialValuesForQuickFilters extends OrderGrid {
-    static override typeInfo = this.classTypeInfo("Serenity.Demo.BasicSamples.InitialValuesForQuickFilters");
+    static override typeInfo = this.registerClass("Serenity.Demo.BasicSamples.InitialValuesForQuickFilters");
 
     /**
      * This method is called to get list of quick filters to be created for this grid.

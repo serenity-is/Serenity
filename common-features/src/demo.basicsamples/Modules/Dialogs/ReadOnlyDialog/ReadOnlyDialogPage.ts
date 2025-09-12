@@ -7,7 +7,7 @@ export default () => gridPageInit(ReadOnlyGrid);
  * A readonly grid that launches ReadOnlyDialog
  */
 export class ReadOnlyGrid extends SupplierGrid {
-    static override typeInfo = this.classTypeInfo("Serenity.Demo.BasicSamples.ReadOnlyGrid");
+    static override typeInfo = this.registerClass("Serenity.Demo.BasicSamples.ReadOnlyGrid");
 
     protected getDialogType() { return ReadOnlyDialog; }
 
@@ -22,7 +22,7 @@ export class ReadOnlyGrid extends SupplierGrid {
 }
 
 export class ReadOnlyDialog extends SupplierDialog {
-    static override typeInfo = this.classTypeInfo("Serenity.Demo.BasicSamples.ReadOnlyDialog");
+    static override typeInfo = this.registerClass("Serenity.Demo.BasicSamples.ReadOnlyDialog");
 
     /**
      * This is the method that gets list of tool 

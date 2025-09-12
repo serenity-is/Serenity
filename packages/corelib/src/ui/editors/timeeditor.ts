@@ -11,7 +11,7 @@ export interface TimeEditorBaseOptions {
 }
 
 export class TimeEditorBase<P extends TimeEditorBaseOptions> extends EditorWidget<P> {
-    static override typeInfo = this.editorTypeInfo("Serenity.TimeEditorBase");
+    static override typeInfo = this.registerEditor("Serenity.TimeEditorBase");
 
     static override createDefaultElement(): HTMLElement { return document.createElement("select"); }
     declare readonly domNode: HTMLSelectElement;
@@ -101,7 +101,7 @@ export interface TimeEditorOptions extends TimeEditorBaseOptions {
  * use TimeSpanEditor instead.
  */
 export class TimeEditor<P extends TimeEditorOptions = TimeEditorOptions> extends TimeEditorBase<P> {
-    static override typeInfo = this.editorTypeInfo("Serenity.TimeEditor", [IDoubleValue, IReadOnly]);
+    static override typeInfo = this.registerEditor("Serenity.TimeEditor", [IDoubleValue, IReadOnly]);
 
     constructor(props: EditorProps<P>) {
         super(props);
@@ -154,7 +154,7 @@ export interface TimeSpanEditorOptions extends TimeEditorBaseOptions {
  */
 export class TimeSpanEditor<P extends TimeSpanEditorOptions = TimeSpanEditorOptions> extends TimeEditorBase<P> {
 
-    static override typeInfo = this.editorTypeInfo("Serenity.TimeSpanEditor", [IStringValue, IReadOnly]);
+    static override typeInfo = this.registerEditor("Serenity.TimeSpanEditor", [IStringValue, IReadOnly]);
 
     constructor(props: EditorProps<P>) {
         super(props);

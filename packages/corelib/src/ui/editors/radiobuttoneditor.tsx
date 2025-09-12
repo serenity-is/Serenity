@@ -12,7 +12,7 @@ export interface RadioButtonEditorOptions {
 }
 
 export class RadioButtonEditor<P extends RadioButtonEditorOptions = RadioButtonEditorOptions> extends EditorWidget<P> implements IReadOnly {
-    static override typeInfo = this.editorTypeInfo("Serenity.RadioButtonEditor", [IStringValue, IReadOnly]);
+    static override typeInfo = this.registerEditor("Serenity.RadioButtonEditor", [IStringValue, IReadOnly]);
 
     constructor(props: EditorProps<P>) {
         super(props);

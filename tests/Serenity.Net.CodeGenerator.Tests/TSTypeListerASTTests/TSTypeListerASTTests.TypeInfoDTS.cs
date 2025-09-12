@@ -12,7 +12,7 @@ public partial class TSTypeListerASTTests
 export type ClassTypeInfo<TypeName> = TypeInfo<TypeName>;
 
 export class Widget<TOptions = any> {
-	protected static classTypeInfo<T>(typeName: StringLiteral<T>, intfAndAttr?: any[]): ClassTypeInfo<T>;
+	protected static registerClass<TypeName>(typeName: StringLiteral<TypeName>, intfAndAttr?: any[]): ClassTypeInfo<TypeName>;
     static typeInfo: ClassTypeInfo<""Serenity.Widget"">;
 }
 ");
@@ -26,7 +26,7 @@ export class Widget<TOptions = any> {
 import { Widget } from '@serenity-is/corelib';
 
 export class Type1 extends Widget {
-    static override typeInfo = this.classTypeInfo(""MyNamespace.MyType1"");
+    static override typeInfo = this.registerClass(""MyNamespace.MyType1"");
 }
 ");
 
@@ -73,7 +73,8 @@ export class Type1 extends Widget {
 export type ClassTypeInfo<TypeName> = TypeInfo<TypeName>;
 
 export class Widget<TOptions = any> {
-	protected static classTypeInfo<T>(typeName: StringLiteral<T>, intfAndAttr?: any[]): ClassTypeInfo<T>;
+	protected static registerClass<TypeName>(typeName: StringLiteral<TypeName>, intfAndAttr?: any[]): ClassTypeInfo<TypeName> {
+    }
     static typeInfo: ClassTypeInfo<""Serenity.Widget"">;
 }
 ");
@@ -134,7 +135,7 @@ export class Type1 extends Widget {
 export type ClassTypeInfo<TypeName> = TypeInfo<TypeName>;
 
 export class Widget<TOptions = any> {
-	protected static classTypeInfo<T>(typeName: StringLiteral<T>, intfAndAttr?: any[]): ClassTypeInfo<T>;
+	protected static registerClass<TypeName>(typeName: StringLiteral<TypeName>, intfAndAttr?: any[]): ClassTypeInfo<TypeName>;
     static typeInfo: ClassTypeInfo<""Serenity.Widget"">;
 }
 ");

@@ -6,7 +6,7 @@ import { PropertyGrid, PropertyGridMode, PropertyGridOptions } from "./propertyg
 import { WidgetProps } from "./widget";
 
 export class PropertyPanel<TItem, P> extends BasePanel<P> {
-    static override typeInfo = this.classTypeInfo("Serenity.PropertyPanel");
+    static override typeInfo = this.registerClass("Serenity.PropertyPanel");
 
     declare private _entity: TItem;
     declare private _entityId: any;

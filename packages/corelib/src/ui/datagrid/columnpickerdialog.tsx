@@ -8,7 +8,7 @@ import { IDataGrid } from "./idatagrid";
 
 export class ColumnPickerDialog<P = {}> extends BaseDialog<P> {
 
-    static override typeInfo = this.classTypeInfo("Serenity.ColumnPickerDialog", [new ResizableAttribute()]);
+    static override typeInfo = this.registerClass("Serenity.ColumnPickerDialog", [new ResizableAttribute()]);
 
     declare private ulVisible: HTMLUListElement;
     declare private ulHidden: HTMLUListElement;

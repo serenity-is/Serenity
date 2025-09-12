@@ -1,7 +1,7 @@
 import { BaseDialog, Dialog, DialogTexts, WidgetProps, localText } from "@serenity-is/corelib";
 
 export class BasicProgressDialog<P = {}> extends BaseDialog<P> {
-    static override typeInfo = this.classTypeInfo("Serenity.Extensions.BasicProgressDialog");
+    static override typeInfo = this.registerClass("Serenity.Extensions.BasicProgressDialog");
 
     declare private progressBar: HTMLElement;
 

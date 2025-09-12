@@ -5,7 +5,7 @@ import { SelectableEntityGrid } from "@serenity-is/extensions";
 export default () => gridPageInit(RowSelectionGrid);
 
 export class RowSelectionGrid<P = {}> extends SelectableEntityGrid<SupplierRow, P> {
-    static override typeInfo = this.classTypeInfo("Serenity.Demo.BasicSamples.RowSelectionGrid");
+    static override typeInfo = this.registerClass("Serenity.Demo.BasicSamples.RowSelectionGrid");
 
     protected getColumnsKey() { return SupplierColumns.columnsKey; }
     protected getDialogType() { return <any>SupplierDialog; }

@@ -3,7 +3,7 @@ import { BaseEditorFiltering } from "./baseeditorfiltering";
 import { FilterOperator } from "./filteroperator";
 
 export class DecimalFiltering extends BaseEditorFiltering<DecimalEditor> {
-    static override typeInfo = this.classTypeInfo("Serenity.DecimalFiltering");
+    static override typeInfo = this.registerClass("Serenity.DecimalFiltering");
 
     constructor() {
         super(DecimalEditor);

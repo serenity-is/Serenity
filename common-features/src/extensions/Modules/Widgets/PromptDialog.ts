@@ -13,7 +13,7 @@ export interface PromptDialogOptions {
 }
 
 export class PromptDialog<P extends PromptDialogOptions = PromptDialogOptions> extends PropertyDialog<any, P> {
-    static override typeInfo = this.classTypeInfo("Serenity.Extensions.PromptDialog");
+    static override typeInfo = this.registerClass("Serenity.Extensions.PromptDialog");
 
     constructor(props: WidgetProps<P>) {
         super(props);

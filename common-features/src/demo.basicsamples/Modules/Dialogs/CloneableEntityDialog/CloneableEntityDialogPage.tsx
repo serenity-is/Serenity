@@ -14,7 +14,7 @@ export class CloneableEntityGrid<P = {}> extends EntityGrid<ProductRow, P> {
 }
 
 export class CloneableEntityDialog extends ProductDialog {
-    static override typeInfo = this.classTypeInfo("Serenity.Demo.BasicSamples.CloneableEntityDialog");
+    static override typeInfo = this.registerClass("Serenity.Demo.BasicSamples.CloneableEntityDialog");
 
     protected updateInterface() {
 

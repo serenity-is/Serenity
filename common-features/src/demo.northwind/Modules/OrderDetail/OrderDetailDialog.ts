@@ -5,7 +5,7 @@ import { OrderDetailForm, OrderDetailRow, OrderDetailService, ProductRow } from 
 import "./OrderDetailDialog.css";
 
 export class OrderDetailDialog extends GridEditorDialog<OrderDetailRow> {
-    static override typeInfo = this.classTypeInfo("Serenity.Demo.Northwind.OrderDetailDialog");
+    static override typeInfo = this.registerClass("Serenity.Demo.Northwind.OrderDetailDialog");
     
     protected getFormKey() { return OrderDetailForm.formKey; }
     protected getRowDefinition() { return OrderDetailRow; }

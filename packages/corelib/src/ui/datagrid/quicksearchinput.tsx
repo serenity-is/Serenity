@@ -15,7 +15,7 @@ export interface QuickSearchInputOptions {
 }
 
 export class QuickSearchInput<P extends QuickSearchInputOptions = QuickSearchInputOptions> extends Widget<P> {
-    static override typeInfo = this.classTypeInfo("Serenity.QuickSearchInput");
+    static override typeInfo = this.registerClass("Serenity.QuickSearchInput");
     
     static override createDefaultElement() { return <input type="text" /> as HTMLInputElement; }
     declare readonly domNode: HTMLInputElement;

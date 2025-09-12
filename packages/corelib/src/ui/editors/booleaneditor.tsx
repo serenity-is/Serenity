@@ -2,7 +2,7 @@
 import { EditorWidget } from "./editorwidget";
 
 export class BooleanEditor<P = {}> extends EditorWidget<P> {
-    static override typeInfo = this.editorTypeInfo("Serenity.BooleanEditor", [IBooleanValue]);
+    static override typeInfo = this.registerEditor("Serenity.BooleanEditor", [IBooleanValue]);
 
     static override createDefaultElement() { return <input type="checkbox" /> as HTMLInputElement; }
 

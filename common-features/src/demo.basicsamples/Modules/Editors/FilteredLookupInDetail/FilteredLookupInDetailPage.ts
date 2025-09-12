@@ -9,7 +9,7 @@ export default () => gridPageInit(FilteredLookupInDetailGrid);
  * Subclass of OrderGrid to override dialog type to FilteredLookupInDetailDialog
  */
 export class FilteredLookupInDetailGrid extends OrderGrid {
-    static override typeInfo = this.classTypeInfo("Serenity.Demo.BasicSamples.FilteredLookupInDetailGrid");
+    static override typeInfo = this.registerClass("Serenity.Demo.BasicSamples.FilteredLookupInDetailGrid");
 
     protected getDialogType() { return FilteredLookupInDetailDialog; }
 }
@@ -19,7 +19,7 @@ export class FilteredLookupInDetailGrid extends OrderGrid {
  * that will be used to set CascadeValue of product editor
  */
 export class FilteredLookupOrderDetailDialog extends OrderDetailDialog {
-    static override typeInfo = this.classTypeInfo("Serenity.Demo.BasicSamples.FilteredLookupOrderDetailDialog");
+    static override typeInfo = this.registerClass("Serenity.Demo.BasicSamples.FilteredLookupOrderDetailDialog");
 
     constructor(props: any) {
         super(props);
@@ -56,7 +56,7 @@ export class FilteredLookupOrderDetailDialog extends OrderDetailDialog {
  * Our subclass of Order Details editor with a CategoryID property
  */
 export class FilteredLookupDetailEditor<P = {}> extends OrderDetailsEditor<P> {
-    static override typeInfo = this.editorTypeInfo("Serenity.Demo.BasicSamples.FilteredLookupDetailEditor");
+    static override typeInfo = this.registerEditor("Serenity.Demo.BasicSamples.FilteredLookupDetailEditor");
 
     protected getDialogType() { return FilteredLookupOrderDetailDialog; }
 
@@ -79,7 +79,7 @@ export class FilteredLookupDetailEditor<P = {}> extends OrderDetailsEditor<P> {
  * Basic order dialog with a category selection
  */
 export class FilteredLookupInDetailDialog<P = {}> extends EntityDialog<OrderRow, P> {
-    static override typeInfo = this.classTypeInfo("Serenity.Demo.BasicSamples.FilteredLookupInDetailDialog");
+    static override typeInfo = this.registerClass("Serenity.Demo.BasicSamples.FilteredLookupInDetailDialog");
 
     protected getFormKey() { return FilteredLookupInDetailForm.formKey; }
     protected getRowDefinition() { return OrderRow; }

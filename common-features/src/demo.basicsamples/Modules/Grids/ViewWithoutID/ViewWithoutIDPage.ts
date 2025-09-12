@@ -5,7 +5,7 @@ import { SalesByCategoryColumns, SalesByCategoryRow, SalesByCategoryService } fr
 export default () => gridPageInit(ViewWithoutIDGrid)
 
 export class ViewWithoutIDGrid<P = {}> extends EntityGrid<SalesByCategoryRow, P> {
-    static override typeInfo = this.classTypeInfo("Serenity.Demo.BasicSamples.ViewWithoutIDGrid");
+    static override typeInfo = this.registerClass("Serenity.Demo.BasicSamples.ViewWithoutIDGrid");
 
     protected getColumnsKey() { return SalesByCategoryColumns.columnsKey; }
     protected getIdProperty() { return "__id"; }

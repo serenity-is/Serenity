@@ -3,7 +3,7 @@ import { GridEditorDialog } from "./GridEditorDialog";
 
 export abstract class GridEditorBase<TEntity, P = {}> extends EntityGrid<TEntity, P>
     implements IGetEditValue, ISetEditValue {
-    static override typeInfo = this.editorTypeInfo("Serenity.Extensions.GridEditorBase", [IGetEditValue, ISetEditValue]);
+    static override typeInfo = this.registerEditor("Serenity.Extensions.GridEditorBase", [IGetEditValue, ISetEditValue]);
     static override createDefaultElement() { return document.createElement("div"); }
 
     /** Gets the id property name. Returns it from getRowDefinition() if available, or the default __id.

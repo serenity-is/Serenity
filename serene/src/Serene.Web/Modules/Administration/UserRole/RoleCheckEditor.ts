@@ -2,7 +2,7 @@ import { CheckTreeEditor, CheckTreeItem, GridUtils, isEmptyOrNull, stripDiacriti
 import { RoleRow } from "../../ServerTypes/Administration/RoleRow";
 
 export class RoleCheckEditor extends CheckTreeEditor<CheckTreeItem<any>, any> {
-    static override typeInfo = this.editorTypeInfo("Serene.Administration.RoleCheckEditor");
+    static override typeInfo = this.registerEditor("Serene.Administration.RoleCheckEditor");
 
     private searchText: string;
 

@@ -5,5 +5,5 @@ import "./WrappedHeadersPage.css";
 export default () => gridPageInit(WrappedHeadersGrid)
 
 export class WrappedHeadersGrid extends OrderGrid {
-    static override typeInfo = this.classTypeInfo("Serenity.Demo.BasicSamples.WrappedHeadersGrid");
+    static override typeInfo = this.registerClass("Serenity.Demo.BasicSamples.WrappedHeadersGrid");
 }

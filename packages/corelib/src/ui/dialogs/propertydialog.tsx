@@ -6,7 +6,7 @@ import { WidgetProps } from "../widgets/widget";
 import { BaseDialog } from "./basedialog";
 
 export class PropertyDialog<TItem, P> extends BaseDialog<P> {
-    static override typeInfo = this.classTypeInfo("Serenity.PropertyDialog", [new PanelAttribute(false)]);
+    static override typeInfo = this.registerClass("Serenity.PropertyDialog", [new PanelAttribute(false)]);
 
     declare private _entity: TItem;
     declare private _entityId: any;

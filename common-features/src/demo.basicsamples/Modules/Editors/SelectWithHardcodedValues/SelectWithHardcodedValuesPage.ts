@@ -23,7 +23,7 @@ export default function pageInit() {
  * in server side forms, e.g. [HardCodedValuesEditor]
  */
 export class HardcodedValuesEditor<P = {}> extends ComboboxEditor<P, any> {
-    static override typeInfo = this.editorTypeInfo("Serenity.Demo.BasicSamples.HardcodedValuesEditor");
+    static override typeInfo = this.registerEditor("Serenity.Demo.BasicSamples.HardcodedValuesEditor");
 
     constructor(props: EditorProps<P>) {
         super(props);
@@ -48,7 +48,7 @@ export class HardcodedValuesEditor<P = {}> extends ComboboxEditor<P, any> {
 }
 
 export class HardcodedValuesDialog<P = {}> extends PropertyDialog<any, P> {
-    static override typeInfo = this.classTypeInfo("Serenity.Demo.BasicSamples.HardcodedValuesDialog");
+    static override typeInfo = this.registerClass("Serenity.Demo.BasicSamples.HardcodedValuesDialog");
 
     protected getFormKey() { return HardcodedValuesForm.formKey; }
 

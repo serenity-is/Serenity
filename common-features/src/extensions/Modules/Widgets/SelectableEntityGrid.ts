@@ -2,7 +2,7 @@ import { EntityGrid } from "@serenity-is/corelib";
 import { Grid, GridOptions, RowSelectionModel } from "@serenity-is/sleekgrid";
 
 export class SelectableEntityGrid<TItem, TOptions> extends EntityGrid<TItem, TOptions> {
-    static override typeInfo = this.classTypeInfo("Serenity.Extensions.SelectableEntityGrid");
+    static override typeInfo = this.registerClass("Serenity.Extensions.SelectableEntityGrid");
 
     protected getSlickOptions(): GridOptions {
         var opt = super.getSlickOptions();

@@ -4,7 +4,7 @@ import { EmployeeRow, OrderDialog, OrderGrid, OrderRow, ProductRow, ShipperRow }
 export default () => gridPageInit(DefaultValuesInNewGrid);
 
 export class DefaultValuesInNewGrid extends OrderGrid {
-    static override typeInfo = this.classTypeInfo("Serenity.Demo.BasicSamples.DefaultValuesInNewGrid");
+    static override typeInfo = this.registerClass("Serenity.Demo.BasicSamples.DefaultValuesInNewGrid");
 
     /**
      * This method is called when New Item button is clicked.

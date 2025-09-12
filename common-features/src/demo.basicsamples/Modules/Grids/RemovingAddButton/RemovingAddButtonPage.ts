@@ -4,7 +4,7 @@ import { SupplierGrid } from "@serenity-is/demo.northwind";
 export default () => gridPageInit(RemovingAddButton)
 
 export class RemovingAddButton extends SupplierGrid {
-    static override typeInfo = this.classTypeInfo("Serenity.Demo.BasicSamples.RemovingAddButton");
+    static override typeInfo = this.registerClass("Serenity.Demo.BasicSamples.RemovingAddButton");
 
     /**
      * This method is called to get list of buttons to be created.

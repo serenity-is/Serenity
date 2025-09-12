@@ -25,11 +25,11 @@ export type StringLiteral<T> = T extends string ? string extends T ? never : T :
 /**
  * Type information for a registered type.
  */
-export type TypeInfo<T> = {
+export type TypeInfo<TypeName> = {
     /** Type kind, can be "class", "enum", "interface", "editor" or "formatter" */
     typeKind: "class" | "enum" | "interface" | "editor" | "formatter";
     /** Registered type name */
-    typeName: StringLiteral<T> | (string & {});
+    typeName: StringLiteral<TypeName> | (string & {});
     /** Implemented interfaces */
     interfaces?: any[];
     /** Custom attributes */

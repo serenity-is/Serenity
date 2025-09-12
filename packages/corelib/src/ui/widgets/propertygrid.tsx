@@ -343,7 +343,7 @@ export function PropertyTabs(props: {
 
 export class PropertyGrid<P extends PropertyGridOptions = PropertyGridOptions> extends Widget<P> {
 
-    static override typeInfo = this.classTypeInfo("Serenity.PropertyGrid");
+    static override typeInfo = this.registerClass("Serenity.PropertyGrid");
 
     declare private fieldElements: PropertyFieldElement[];
 

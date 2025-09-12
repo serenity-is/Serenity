@@ -3,7 +3,7 @@ import { BaseEditorFiltering } from "./baseeditorfiltering";
 import { FilterOperator, FilterOperators } from "./filteroperator";
 
 export class ServiceLookupFiltering extends BaseEditorFiltering<ServiceLookupEditor> {
-    static override typeInfo = this.classTypeInfo("Serenity.ServiceLookupFiltering");
+    static override typeInfo = this.registerClass("Serenity.ServiceLookupFiltering");
 
     constructor() {
         super(ServiceLookupEditor);

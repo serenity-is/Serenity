@@ -1,12 +1,8 @@
-import { EditorAttribute, ISlickFormatter, addCustomAttribute, classTypeInfo, editorTypeInfo, formatterTypeInfo, interfaceTypeInfo, registerClass as regClass, registerEditor as regEditor, registerEnum as regEnum, registerFormatter as regFormatter, registerInterface as regIntf, registerType as regType, typeInfoProperty } from "../base";
+import { EditorAttribute, ISlickFormatter, addCustomAttribute, registerClass as regClass, registerEditor as regEditor, registerEnum as regEnum, registerFormatter as regFormatter, registerInterface as regIntf, registerType as regType, typeInfoProperty } from "../base";
 import { MemberType, addTypeMember } from "../compat";
 import { CloseButtonAttribute, DialogTypeAttribute, ElementAttribute, EnumKeyAttribute, FilterableAttribute, ItemNameAttribute, MaximizableAttribute, OptionAttribute, OptionsTypeAttribute, PanelAttribute, ResizableAttribute, ResponsiveAttribute, ServiceAttribute, StaticPanelAttribute } from "./attributes";
 
 export namespace Decorators {
-    export const classType = classTypeInfo;
-    export const editorType = editorTypeInfo;
-    export const interfaceType = interfaceTypeInfo;
-    export const formatterType = formatterTypeInfo;
 
     export function registerType() {
         return function (target: Function & { [typeInfoProperty]: any }, _context?: any): void {

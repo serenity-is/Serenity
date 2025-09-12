@@ -6,7 +6,7 @@ export default function pageInit() {
 }
 
 export class StaticTextBlockDialog<P = {}> extends PropertyDialog<any, P> {
-    static override typeInfo = this.classTypeInfo("Serenity.Demo.BasicSamples.StaticTextBlockDialog");
+    static override typeInfo = this.registerClass("Serenity.Demo.BasicSamples.StaticTextBlockDialog");
 
     protected getFormKey() { return StaticTextBlockForm.formKey; }
 

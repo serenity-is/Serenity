@@ -1,6 +1,6 @@
 ﻿
 export class {{DialogClassName}} extends {{SERENITYIMPORT "EntityDialog"}}<{{RowClassName}}, any> {
-    static override typeInfo = this.classTypeInfo("{{DialogFullName}}");
+    static override typeInfo = this.registerClass("{{DialogFullName}}");
 
     protected getFormKey() { return {{SERVERTYPEIMPORT FormClassName}}.formKey; }
     protected getRowDefinition() { return {{SERVERTYPEIMPORT RowClassName}}; }

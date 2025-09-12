@@ -16,7 +16,7 @@ export default function pageInit() {
 }
 
 export class ChartInDialog<P = {}> extends BaseDialog<P> {
-    static override typeInfo = this.classTypeInfo("Serenity.Demo.BasicSamples.ChartInDialog", [new ResizableAttribute(), new MaximizableAttribute()]);
+    static override typeInfo = this.registerClass("Serenity.Demo.BasicSamples.ChartInDialog", [new ResizableAttribute(), new MaximizableAttribute()]);
 
     declare private canvas: HTMLCanvasElement;
 

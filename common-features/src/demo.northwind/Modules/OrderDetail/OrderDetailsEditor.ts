@@ -4,7 +4,7 @@ import { OrderDetailColumns, OrderDetailRow, OrderDetailService, ProductRow } fr
 import { OrderDetailDialog } from "./OrderDetailDialog";
 
 export class OrderDetailsEditor<P = {}> extends GridEditorBase<OrderDetailRow, P> {
-    static override typeInfo = this.editorTypeInfo("Serenity.Demo.Northwind.OrderDetailsEditor");
+    static override typeInfo = this.registerEditor("Serenity.Demo.Northwind.OrderDetailsEditor");
     
     protected getColumnsKey() { return OrderDetailColumns.columnsKey; }
     protected getDialogType() { return OrderDetailDialog; }

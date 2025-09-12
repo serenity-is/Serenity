@@ -35,7 +35,7 @@ export class InlineImageFormatter implements Formatter, IInitializeColumn {
 }
 
 export class InlineImageInGrid<P = {}> extends EntityGrid<ProductRow, P> {
-    static override typeInfo = this.classTypeInfo("Serenity.Demo.BasicSamples.InlineImageInGrid");
+    static override typeInfo = this.registerClass("Serenity.Demo.BasicSamples.InlineImageInGrid");
 
     protected getColumnsKey() { return InlineImageInGridColumns.columnsKey; }
     protected getDialogType() { return ProductDialog; }

@@ -3,7 +3,7 @@ import { BaseEditorFiltering } from "./baseeditorfiltering";
 import { FilterOperator } from "./filteroperator";
 
 export class DateFiltering extends BaseEditorFiltering<DateEditor> {
-    static override typeInfo = this.classTypeInfo("Serenity.DateFiltering");
+    static override typeInfo = this.registerClass("Serenity.DateFiltering");
 
     constructor() {
         super(DateEditor)

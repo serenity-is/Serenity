@@ -5,7 +5,7 @@ import "./CustomerDialog.css";
 import { CustomerOrdersGrid } from "./CustomerOrdersGrid";
 
 export class CustomerDialog<P = {}> extends EntityDialog<CustomerRow, P> {
-    static override typeInfo = this.classTypeInfo("Serenity.Demo.Northwind.CustomerDialog");
+    static override typeInfo = this.registerClass("Serenity.Demo.Northwind.CustomerDialog");
 
     protected getFormKey() { return CustomerForm.formKey; }
     protected getRowDefinition() { return CustomerRow; }

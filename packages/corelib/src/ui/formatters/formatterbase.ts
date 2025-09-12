@@ -5,7 +5,7 @@ import { Formatter } from "../../slick";
 export abstract class FormatterBase implements Formatter {
     abstract format(ctx: FormatterContext): FormatterResult;
 
-    protected static formatterTypeInfo<T>(typeName: StringLiteral<T>, intfAndAttr?: any[]): FormatterTypeInfo<T> {
+    protected static registerFormatter<TypeName>(typeName: StringLiteral<TypeName>, intfAndAttr?: any[]): FormatterTypeInfo<TypeName> {
         if (Object.prototype.hasOwnProperty.call(this, typeInfoProperty) && this[typeInfoProperty])
             throw new Error(`Type ${this.name} already has a typeInfo property!`);
                 

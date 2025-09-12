@@ -2,7 +2,7 @@ import { BaseFiltering } from "./basefiltering";
 import { FilterOperators } from "./filteroperator";
 
 export class BooleanFiltering extends BaseFiltering {
-    static override typeInfo = this.classTypeInfo("Serenity.BooleanFiltering");
+    static override typeInfo = this.registerClass("Serenity.BooleanFiltering");
 
     getOperators() {
         return this.appendNullableOperators([

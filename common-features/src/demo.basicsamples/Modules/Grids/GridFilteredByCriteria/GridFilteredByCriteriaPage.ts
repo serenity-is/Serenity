@@ -4,7 +4,7 @@ import { ProductColumns, ProductDialog, ProductRow, ProductService } from "@sere
 export default () => gridPageInit(GridFilteredByCriteria);
 
 export class GridFilteredByCriteria<P = {}> extends EntityGrid<ProductRow, P> {
-    static override typeInfo = this.classTypeInfo("Serenity.Demo.BasicSamples.GridFilteredByCriteria");
+    static override typeInfo = this.registerClass("Serenity.Demo.BasicSamples.GridFilteredByCriteria");
 
     protected getColumnsKey() { return ProductColumns.columnsKey; }
     protected getDialogType() { return ProductDialog; }
