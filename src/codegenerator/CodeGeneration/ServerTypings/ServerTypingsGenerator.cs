@@ -27,6 +27,7 @@ public partial class ServerTypingsGenerator : TypingsGeneratorBase
     protected HashSet<string> localTextKeys = [];
     protected Dictionary<string, string> localTextNestedClasses = [];
     protected Dictionary<string, TypeDefinition> scriptDataKeys = [];
+    protected Dictionary<string, List<string>> namespaceConstants = [];
 
     protected override void GenerateAll()
     {
@@ -41,6 +42,8 @@ public partial class ServerTypingsGenerator : TypingsGeneratorBase
 
         if (ModuleReExports)
             GenerateModuleReExports();
+
+        GenerateNamespaceConstants();
     }
 
     protected override void GenerateCodeFor(TypeDefinition type)
@@ -48,10 +51,39 @@ public partial class ServerTypingsGenerator : TypingsGeneratorBase
         void add(Action<TypeDefinition> action, string fileIdentifier = null)
         {
             var typeNamespace = ScriptNamespaceFor(type);
+            var name = fileIdentifier ?? type.Name;
 
             action(type);
-            var fileName = GetTypingFileNameFor(typeNamespace, fileIdentifier ?? type.Name) + ".ts";
+            var fileName = GetTypingFileNameFor(typeNamespace, name) + ".ts";
             AddFile(fileName);
+
+            if (!string.IsNullOrEmpty(typeNamespace))
+            {
+                var ns = typeNamespace;
+                foreach (var rn in RootNamespaces)
+                {
+                    if (rn == ns)
+                    {
+                        ns = null;
+                        break;
+                    }
+
+                    if (ns.StartsWith(rn + '.', StringComparison.Ordinal))
+                    {
+                        ns = ns[(rn.Length + 1)..];
+                        break;
+                    }
+                }
+
+                if (ns != null)
+                {
+                    if (!namespaceConstants.TryGetValue(ns, out var list))
+                        namespaceConstants[ns] = list = [];
+
+                    if (!list.Contains(typeNamespace, StringComparer.Ordinal))
+                        list.Add(typeNamespace);
+                }
+            }
         }
 
         if (type.IsEnum())
@@ -156,6 +188,7 @@ public partial class ServerTypingsGenerator : TypingsGeneratorBase
 
         localTextKeys.Clear();
         localTextNestedClasses.Clear();
+        namespaceConstants.Clear();
         scriptDataKeys.Clear();
 
     }

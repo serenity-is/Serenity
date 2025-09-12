@@ -1,8 +1,9 @@
 import { EnumTypeRegistry, Formatter, formatterTypeInfo, htmlEncode, localText, registerType, tryGetText } from "@serenity-is/corelib";
 import { FormatterContext } from "@serenity-is/sleekgrid";
+import { nsExtensions } from "../ServerTypes/Namespaces";
 
 export class EnumSelectFormatter implements Formatter {
-    static typeInfo = formatterTypeInfo("Serenity.Extensions.EnumSelectFormatter"); static { registerType(this); }
+    static typeInfo = formatterTypeInfo(nsExtensions); static { registerType(this); }
 
     constructor(public readonly props: { enumKey?: string, allowClear?: boolean, emptyItemText?: string } = {}) {
         this.props ??= {}
