@@ -181,6 +181,10 @@ public class TSTypeListerAST
         if (string.IsNullOrEmpty(identifierName))
             return null;
 
+        // special case for Serenity, no need to parse corelib
+        if (identifierName == "nsSerenity")
+            return "Serenity.";
+
         var parents = EnumerateParents(node).ToArray();
 
         foreach (var parent in parents)
