@@ -4971,6 +4971,10 @@ export declare class FilterStore {
 export declare function delegateCombine(delegate1: any, delegate2: any): any;
 export declare function delegateRemove(delegate1: any, delegate2: any): any;
 export declare function delegateContains(targets: any[], object: any, method: any): boolean;
+interface CriteriaWithText {
+	criteria?: any[];
+	displayText?: string;
+}
 export interface IFiltering {
 	createEditor(): void;
 	getCriteria(): CriteriaWithText;
@@ -4987,15 +4991,18 @@ export interface IFiltering {
 export declare class IFiltering {
 	static typeInfo: InterfaceTypeInfo<"Serenity.IFiltering">;
 }
-export interface CriteriaWithText {
-	criteria?: any[];
-	displayText?: string;
-}
 export interface IQuickFiltering {
 	initQuickFilter(filter: QuickFilter<Widget<any>, any>): void;
 }
 export declare class IQuickFiltering {
 	static typeInfo: InterfaceTypeInfo<"Serenity.IQuickFiltering">;
+}
+export declare namespace FilteringTypeRegistry {
+	let get: (key: string) => Function;
+	let getOrLoad: (key: string) => Function | PromiseLike<Function>;
+	let reset: () => void;
+	let tryGet: (key: string) => Function;
+	let tryGetOrLoad: (key: string) => Function | PromiseLike<Function>;
 }
 export declare abstract class BaseFiltering implements IFiltering, IQuickFiltering {
 	private field;
@@ -5027,6 +5034,10 @@ export declare abstract class BaseFiltering implements IFiltering, IQuickFilteri
 	protected static classTypeInfo<T>(typeName: StringLiteral<T>, intfAndAttr?: any[]): ClassTypeInfo<T>;
 	static typeInfo: ClassTypeInfo<"Serenity.BaseFiltering">;
 }
+export declare class BooleanFiltering extends BaseFiltering {
+	static typeInfo: ClassTypeInfo<"Serenity.BooleanFiltering">;
+	getOperators(): FilterOperator[];
+}
 export declare abstract class BaseEditorFiltering<TEditor extends Widget<any>> extends BaseFiltering {
 	editorTypeRef: any;
 	static typeInfo: ClassTypeInfo<"Serenity.BaseEditorFiltering">;
@@ -5045,10 +5056,6 @@ export declare abstract class BaseEditorFiltering<TEditor extends Widget<any>> e
 export declare class DateFiltering extends BaseEditorFiltering<DateEditor> {
 	static typeInfo: ClassTypeInfo<"Serenity.DateFiltering">;
 	constructor();
-	getOperators(): FilterOperator[];
-}
-export declare class BooleanFiltering extends BaseFiltering {
-	static typeInfo: ClassTypeInfo<"Serenity.BooleanFiltering">;
 	getOperators(): FilterOperator[];
 }
 export declare class DateTimeFiltering extends BaseEditorFiltering<DateEditor> {
@@ -5118,10 +5125,6 @@ export declare class StringFiltering extends BaseFiltering {
 	static typeInfo: ClassTypeInfo<"Serenity.StringFiltering">;
 	getOperators(): FilterOperator[];
 	validateEditorValue(value: string): string;
-}
-export declare namespace FilteringTypeRegistry {
-	function reset(): void;
-	function get(key: string): Function;
 }
 export declare class FilterWidgetBase<P = {}> extends Widget<P> {
 	static typeInfo: ClassTypeInfo<"Serenity.FilterWidgetBase">;
