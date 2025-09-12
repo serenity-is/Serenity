@@ -1,5 +1,6 @@
 ﻿import { EditorUtils, ToolButton, gridPageInit, indexOf } from "@serenity-is/corelib";
 import { SupplierDialog, SupplierGrid } from "@serenity-is/demo.northwind";
+import { nsDemoBasicSamples } from "../../ServerTypes/Namespaces";
 
 export default () => gridPageInit(ReadOnlyGrid);
 
@@ -7,7 +8,7 @@ export default () => gridPageInit(ReadOnlyGrid);
  * A readonly grid that launches ReadOnlyDialog
  */
 export class ReadOnlyGrid extends SupplierGrid {
-    static override typeInfo = this.registerClass("Serenity.Demo.BasicSamples.ReadOnlyGrid");
+    static override typeInfo = this.registerClass(nsDemoBasicSamples);
 
     protected getDialogType() { return ReadOnlyDialog; }
 
@@ -22,7 +23,7 @@ export class ReadOnlyGrid extends SupplierGrid {
 }
 
 export class ReadOnlyDialog extends SupplierDialog {
-    static override typeInfo = this.registerClass("Serenity.Demo.BasicSamples.ReadOnlyDialog");
+    static override typeInfo = this.registerClass(nsDemoBasicSamples);
 
     /**
      * This is the method that gets list of tool 

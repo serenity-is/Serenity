@@ -1,10 +1,11 @@
 import { EntityDialog } from "@serenity-is/corelib";
 import { ReportHelper } from "@serenity-is/extensions";
 import { OrderForm, OrderRow, OrderService } from "../ServerTypes/Demo";
+import { nsDemoNorthwind } from "../ServerTypes/Namespaces";
 import "./OrderDialog.css";
 
 export class OrderDialog<P = {}> extends EntityDialog<OrderRow, P> {
-    static override typeInfo = this.registerClass("Serenity.Demo.Northwind.OrderDialog");
+    static override typeInfo = this.registerClass(nsDemoNorthwind);
 
     protected getFormKey() { return OrderForm.formKey; }
     protected getRowDefinition() { return OrderRow; }

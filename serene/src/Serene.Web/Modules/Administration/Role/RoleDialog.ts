@@ -1,12 +1,13 @@
 import { EntityDialog } from "@serenity-is/corelib";
 import { RoleForm, RoleRow, RoleService } from "../../ServerTypes/Administration";
+import { nsAdministration } from "../../ServerTypes/Namespaces";
 import { RolePermissionDialogTexts } from "../../ServerTypes/Texts";
 import { RolePermissionDialog } from "../RolePermission/RolePermissionDialog";
 
 const editPermissions = "edit-permissions";
 
 export class RoleDialog extends EntityDialog<RoleRow, any> {
-    static override typeInfo = this.registerClass("Serene.Administration.RoleDialog");
+    static override typeInfo = this.registerClass(nsAdministration);
 
     protected getFormKey() { return RoleForm.formKey; }
     protected getIdProperty() { return RoleRow.idProperty; }

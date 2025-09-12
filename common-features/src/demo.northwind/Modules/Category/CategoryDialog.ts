@@ -1,8 +1,9 @@
-import { Decorators, EntityDialog } from "@serenity-is/corelib";
+import { EntityDialog } from "@serenity-is/corelib";
 import { CategoryForm, CategoryRow, CategoryService } from "../ServerTypes/Demo";
+import { nsDemoNorthwind } from "../ServerTypes/Namespaces";
 
 export class CategoryDialog<P = {}> extends EntityDialog<CategoryRow, P> {
-    static override typeInfo = this.registerClass("Serenity.Demo.Northwind.CategoryDialog");
+    static override typeInfo = this.registerClass(nsDemoNorthwind);
 
     protected getFormKey() { return CategoryForm.formKey; }
     protected getRowDefinition() { return CategoryRow; }

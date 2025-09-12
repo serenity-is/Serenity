@@ -1,11 +1,12 @@
 import { Aggregators, EntityGrid, formatNumber, gridPageInit } from "@serenity-is/corelib";
 import { ProductColumns, ProductDialog, ProductRow, ProductService } from "@serenity-is/demo.northwind";
 import { GroupItemMetadataProvider } from "@serenity-is/sleekgrid";
+import { nsDemoBasicSamples } from "../../ServerTypes/Namespaces";
 
 export default () => gridPageInit(GroupingAndSummariesInGrid);
 
 export class GroupingAndSummariesInGrid<P = {}> extends EntityGrid<ProductRow, P> {
-    static override typeInfo = this.registerClass("Serenity.Demo.BasicSamples.GroupingAndSummariesInGrid");
+    static override typeInfo = this.registerClass(nsDemoBasicSamples);
 
     protected getColumnsKey() { return ProductColumns.columnsKey; }
     protected getDialogType() { return ProductDialog; }

@@ -1,11 +1,12 @@
 import { StringEditor, WidgetProps, localText, replaceAll } from "@serenity-is/corelib";
+import { nsDemoNorthwind } from "../ServerTypes/Namespaces";
 
 export interface PhoneEditorOptions {
     multiple?: boolean;
 }
 
 export class PhoneEditor<P extends PhoneEditorOptions = PhoneEditorOptions> extends StringEditor<P> {
-    static override typeInfo = this.registerEditor("Serenity.Demo.Northwind.PhoneEditor");
+    static override typeInfo = this.registerEditor(nsDemoNorthwind);
 
     constructor(props: WidgetProps<P>) {
         super(props);

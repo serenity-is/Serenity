@@ -2,11 +2,12 @@ import { EntityGrid, Formatter, IInitializeColumn, formatterTypeInfo, gridPageIn
 import { ProductDialog, ProductRow, ProductService } from "@serenity-is/demo.northwind";
 import { Column, FormatterContext, FormatterResult, GridOptions } from "@serenity-is/sleekgrid";
 import { InlineImageInGridColumns } from "../../ServerTypes/Demo";
+import { nsDemoBasicSamples } from "../../ServerTypes/Namespaces";
 
 export default () => gridPageInit(InlineImageInGrid);
 
 export class InlineImageFormatter implements Formatter, IInitializeColumn {
-    static typeInfo = formatterTypeInfo("Serenity.Demo.BasicSamples.InlineImageFormatter"); static { registerType(this); }
+    static typeInfo = formatterTypeInfo(nsDemoBasicSamples); static { registerType(this); }
 
     constructor(public readonly props: { fileProperty?: string, thumb?: boolean } = {}) {
     }
@@ -35,7 +36,7 @@ export class InlineImageFormatter implements Formatter, IInitializeColumn {
 }
 
 export class InlineImageInGrid<P = {}> extends EntityGrid<ProductRow, P> {
-    static override typeInfo = this.registerClass("Serenity.Demo.BasicSamples.InlineImageInGrid");
+    static override typeInfo = this.registerClass(nsDemoBasicSamples);
 
     protected getColumnsKey() { return InlineImageInGridColumns.columnsKey; }
     protected getDialogType() { return ProductDialog; }

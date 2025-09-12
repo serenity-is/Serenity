@@ -2,9 +2,10 @@ import { confirmDialog, EntityGrid, Fluent, GridUtils, isEmptyOrNull, isTrimmedE
 import { TranslationItem, TranslationTexts } from "@serenity-is/extensions";
 import { Column } from "@serenity-is/sleekgrid";
 import { TranslationService } from "../../ServerTypes/Administration";
+import { nsAdministration } from "../../ServerTypes/Namespaces";
 
 export class TranslationGrid extends EntityGrid<TranslationItem, any> {
-    static override typeInfo = this.registerClass("Serene.Administration.TranslationGrid");
+    static override typeInfo = this.registerClass(nsAdministration);
 
     protected getIdProperty() { return "Key"; }
     protected getLocalTextPrefix() { return "Administration.Translation"; }

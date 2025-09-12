@@ -1,5 +1,6 @@
 import { ComboboxEditor, EditorProps, PropertyDialog, WidgetProps, notifySuccess } from "@serenity-is/corelib";
 import { HardcodedValuesForm } from "../../ServerTypes/Demo";
+import { nsDemoBasicSamples } from "../../ServerTypes/Namespaces";
 
 export default function pageInit() {
     var dlg = new HardcodedValuesDialog({});
@@ -23,7 +24,7 @@ export default function pageInit() {
  * in server side forms, e.g. [HardCodedValuesEditor]
  */
 export class HardcodedValuesEditor<P = {}> extends ComboboxEditor<P, any> {
-    static override typeInfo = this.registerEditor("Serenity.Demo.BasicSamples.HardcodedValuesEditor");
+    static override typeInfo = this.registerEditor(nsDemoBasicSamples);
 
     constructor(props: EditorProps<P>) {
         super(props);
@@ -48,7 +49,7 @@ export class HardcodedValuesEditor<P = {}> extends ComboboxEditor<P, any> {
 }
 
 export class HardcodedValuesDialog<P = {}> extends PropertyDialog<any, P> {
-    static override typeInfo = this.registerClass("Serenity.Demo.BasicSamples.HardcodedValuesDialog");
+    static override typeInfo = this.registerClass(nsDemoBasicSamples);
 
     protected getFormKey() { return HardcodedValuesForm.formKey; }
 

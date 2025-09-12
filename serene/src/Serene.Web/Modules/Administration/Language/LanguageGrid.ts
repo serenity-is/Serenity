@@ -1,9 +1,10 @@
 import { EntityGrid } from "@serenity-is/corelib";
 import { LanguageColumns, LanguageRow, LanguageService } from "../../ServerTypes/Administration";
+import { nsAdministration } from "../../ServerTypes/Namespaces";
 import { LanguageDialog } from "./LanguageDialog";
 
 export class LanguageGrid extends EntityGrid<LanguageRow, any> {
-    static override typeInfo = this.registerClass("Serene.Administration.LanguageGrid");
+    static override typeInfo = this.registerClass(nsAdministration);
 
     protected useAsync() { return true; }
     protected getColumnsKey() { return LanguageColumns.columnsKey; }

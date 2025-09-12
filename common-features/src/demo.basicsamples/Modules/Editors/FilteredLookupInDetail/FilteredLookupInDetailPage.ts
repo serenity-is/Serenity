@@ -1,6 +1,7 @@
-import { Decorators, EntityDialog, Widget, WidgetProps, gridPageInit, toId } from "@serenity-is/corelib";
+import { EntityDialog, Widget, WidgetProps, gridPageInit, toId } from "@serenity-is/corelib";
 import { OrderDetailDialog, OrderDetailForm, OrderDetailsEditor, OrderGrid, OrderRow, OrderService, ProductRow } from "@serenity-is/demo.northwind";
 import { FilteredLookupInDetailForm } from "../../ServerTypes/Demo";
+import { nsDemoBasicSamples } from "../../ServerTypes/Namespaces";
 import "./FilteredLookupInDetailPage.css";
 
 export default () => gridPageInit(FilteredLookupInDetailGrid);
@@ -9,7 +10,7 @@ export default () => gridPageInit(FilteredLookupInDetailGrid);
  * Subclass of OrderGrid to override dialog type to FilteredLookupInDetailDialog
  */
 export class FilteredLookupInDetailGrid extends OrderGrid {
-    static override typeInfo = this.registerClass("Serenity.Demo.BasicSamples.FilteredLookupInDetailGrid");
+    static override typeInfo = this.registerClass(nsDemoBasicSamples);
 
     protected getDialogType() { return FilteredLookupInDetailDialog; }
 }
@@ -19,7 +20,7 @@ export class FilteredLookupInDetailGrid extends OrderGrid {
  * that will be used to set CascadeValue of product editor
  */
 export class FilteredLookupOrderDetailDialog extends OrderDetailDialog {
-    static override typeInfo = this.registerClass("Serenity.Demo.BasicSamples.FilteredLookupOrderDetailDialog");
+    static override typeInfo = this.registerClass(nsDemoBasicSamples);
 
     constructor(props: any) {
         super(props);
@@ -56,7 +57,7 @@ export class FilteredLookupOrderDetailDialog extends OrderDetailDialog {
  * Our subclass of Order Details editor with a CategoryID property
  */
 export class FilteredLookupDetailEditor<P = {}> extends OrderDetailsEditor<P> {
-    static override typeInfo = this.registerEditor("Serenity.Demo.BasicSamples.FilteredLookupDetailEditor");
+    static override typeInfo = this.registerEditor(nsDemoBasicSamples);
 
     protected getDialogType() { return FilteredLookupOrderDetailDialog; }
 
@@ -79,7 +80,7 @@ export class FilteredLookupDetailEditor<P = {}> extends OrderDetailsEditor<P> {
  * Basic order dialog with a category selection
  */
 export class FilteredLookupInDetailDialog<P = {}> extends EntityDialog<OrderRow, P> {
-    static override typeInfo = this.registerClass("Serenity.Demo.BasicSamples.FilteredLookupInDetailDialog");
+    static override typeInfo = this.registerClass(nsDemoBasicSamples);
 
     protected getFormKey() { return FilteredLookupInDetailForm.formKey; }
     protected getRowDefinition() { return OrderRow; }

@@ -1,9 +1,10 @@
 import { BaseDialog, PropertyGrid, WidgetProps, faIcon, resolveUrl, serviceCall } from "@serenity-is/corelib";
+import { nsExtensions } from "../ServerTypes/Namespaces";
 import { ReportRetrieveResult } from "../ServerTypes/Reporting";
 import { ReportHelper } from "./ReportHelper";
 
 export class ReportDialog<P extends ReportDialogOptions = ReportDialogOptions> extends BaseDialog<P> {
-    static override typeInfo = this.registerClass("Serenity.Extensions.ReportDialog");
+    static override typeInfo = this.registerClass(nsExtensions);
 
     declare private report: ReportRetrieveResult;
     declare private propertyGrid: PropertyGrid;

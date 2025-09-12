@@ -1,12 +1,13 @@
 ﻿import { PropertyDialog, WidgetProps } from "@serenity-is/corelib";
 import { StaticTextBlockForm } from "../../ServerTypes/Demo";
+import { nsDemoBasicSamples } from "../../ServerTypes/Namespaces";
 
 export default function pageInit() {
     new StaticTextBlockDialog({}).dialogOpen();
 }
 
 export class StaticTextBlockDialog<P = {}> extends PropertyDialog<any, P> {
-    static override typeInfo = this.registerClass("Serenity.Demo.BasicSamples.StaticTextBlockDialog");
+    static override typeInfo = this.registerClass(nsDemoBasicSamples);
 
     protected getFormKey() { return StaticTextBlockForm.formKey; }
 

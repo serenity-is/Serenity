@@ -1,10 +1,11 @@
 import { alertDialog, toId } from "@serenity-is/corelib";
 import { GridEditorBase } from "@serenity-is/extensions";
 import { OrderDetailColumns, OrderDetailRow, OrderDetailService, ProductRow } from "../ServerTypes/Demo";
+import { nsDemoNorthwind } from "../ServerTypes/Namespaces";
 import { OrderDetailDialog } from "./OrderDetailDialog";
 
 export class OrderDetailsEditor<P = {}> extends GridEditorBase<OrderDetailRow, P> {
-    static override typeInfo = this.registerEditor("Serenity.Demo.Northwind.OrderDetailsEditor");
+    static override typeInfo = this.registerEditor(nsDemoNorthwind);
     
     protected getColumnsKey() { return OrderDetailColumns.columnsKey; }
     protected getDialogType() { return OrderDetailDialog; }

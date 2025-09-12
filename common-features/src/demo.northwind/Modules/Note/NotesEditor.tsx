@@ -1,12 +1,13 @@
 import { Authorization, EditorWidget, IGetEditValue, ISetEditValue, PropertyItem, Toolbar, confirmDialog, formatDate, formatISODateTimeUTC, insert } from "@serenity-is/corelib";
 import DOMPurify from 'dompurify';
 import { NoteRow } from "../ServerTypes/Demo";
+import { nsDemoNorthwind } from "../ServerTypes/Namespaces";
 import { NoteDialog } from "./NoteDialog";
 import "./NotesEditor.css";
 
 export class NotesEditor<P = {}> extends EditorWidget<P>
     implements IGetEditValue, ISetEditValue {
-    static override typeInfo = this.registerEditor("Serenity.Demo.Northwind.NotesEditor", [IGetEditValue, ISetEditValue]);
+    static override typeInfo = this.registerEditor(nsDemoNorthwind, [IGetEditValue, ISetEditValue]);
     static override createDefaultElement() { return <div /> as HTMLElement }
 
     declare private isDirty: boolean;

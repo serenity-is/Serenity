@@ -1,8 +1,9 @@
 import { Fluent, QuickSearchInput, Widget, WidgetProps, stripDiacritics } from "@serenity-is/corelib";
+import { nsExtensions } from "../ServerTypes/Namespaces";
 import { ReportDialog } from "./ReportDialog";
 
 export class ReportPage<P = {}> extends Widget<P> {
-    static override typeInfo = this.registerClass("Serenity.Extensions.ReportPage");
+    static override typeInfo = this.registerClass(nsExtensions);
 
     constructor(props: WidgetProps<P>) {
         super(props);

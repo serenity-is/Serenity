@@ -1,7 +1,8 @@
 import { DeleteResponse, EntityDialog, PanelAttribute, SaveInitiator, SaveResponse, ServiceOptions } from "@serenity-is/corelib";
+import { nsExtensions } from "../ServerTypes/Namespaces";
 
 export abstract class GridEditorDialog<TEntity, P = {}> extends EntityDialog<TEntity, P> {
-    static override typeInfo = this.registerClass("Serenity.Extensions.GridEditorDialog", [new PanelAttribute(false)]);
+    static override typeInfo = this.registerClass(nsExtensions, [new PanelAttribute(false)]);
 
     protected getIdProperty() { return this.getRowDefinition()?.idProperty ?? "__id"; }
 

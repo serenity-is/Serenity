@@ -2,11 +2,12 @@ import { Dictionary, EditorUtils, EntityGrid, FilterableAttribute, Lookup, Widge
 import { ExcelExportHelper, PdfExportHelper } from "@serenity-is/extensions";
 import { Column, FormatterContext, NonDataRow } from "@serenity-is/sleekgrid";
 import { CategoryRow, ProductColumns, ProductRow, ProductService, SupplierRow } from "../ServerTypes/Demo";
+import { nsDemoNorthwind } from "../ServerTypes/Namespaces";
 import { ProductDialog } from "./ProductDialog";
 import "./ProductGrid.css";
 
 export class ProductGrid<P = {}> extends EntityGrid<ProductRow, P> {
-    static override typeInfo = this.registerClass("Serenity.Demo.Northwind.ProductGrid", [new FilterableAttribute()]);
+    static override typeInfo = this.registerClass(nsDemoNorthwind, [new FilterableAttribute()]);
     protected getColumnsKey() { return ProductColumns.columnsKey; }
     protected getDialogType() { return <any>ProductDialog; }
     protected getRowDefinition() { return ProductRow; }

@@ -1,9 +1,10 @@
 import { DataChangeInfo, DialogType, EditorProps, EntityGrid, IGetEditValue, ISetEditValue, PropertyItem, SaveRequest, ServiceOptions, ServiceResponse, ToolButton, deepClone, getInstanceType, getTypeFullName, indexOf, serviceCall } from "@serenity-is/corelib";
+import { nsExtensions } from "../ServerTypes/Namespaces";
 import { GridEditorDialog } from "./GridEditorDialog";
 
 export abstract class GridEditorBase<TEntity, P = {}> extends EntityGrid<TEntity, P>
     implements IGetEditValue, ISetEditValue {
-    static override typeInfo = this.registerEditor("Serenity.Extensions.GridEditorBase", [IGetEditValue, ISetEditValue]);
+    static override typeInfo = this.registerEditor(nsExtensions, [IGetEditValue, ISetEditValue]);
     static override createDefaultElement() { return document.createElement("div"); }
 
     /** Gets the id property name. Returns it from getRowDefinition() if available, or the default __id.

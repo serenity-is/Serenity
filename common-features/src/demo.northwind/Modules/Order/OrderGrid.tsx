@@ -1,11 +1,12 @@
 import { EntityGrid, EnumEditor, FilterableAttribute, Fluent, LookupEditor, ToolButton, faIcon, toId } from "@serenity-is/corelib";
 import { ExcelExportHelper, PdfExportHelper, ReportHelper } from "@serenity-is/extensions";
 import { OrderColumns, OrderListRequest, OrderRow, OrderService, ProductRow } from "../ServerTypes/Demo";
+import { nsDemoNorthwind } from "../ServerTypes/Namespaces";
 import { OrderDialog } from "./OrderDialog";
 import "./OrderGrid.css";
 
 export class OrderGrid<P = {}> extends EntityGrid<OrderRow, P> {
-    static override typeInfo = this.registerClass("Serenity.Demo.Northwind.OrderGrid", [new FilterableAttribute()]);
+    static override typeInfo = this.registerClass(nsDemoNorthwind, [new FilterableAttribute()]);
 
     protected getColumnsKey() { return OrderColumns.columnsKey; }
     protected getDialogType() { return OrderDialog as any; }

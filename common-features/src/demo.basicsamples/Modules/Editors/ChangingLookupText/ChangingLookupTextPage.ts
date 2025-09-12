@@ -2,6 +2,7 @@ import { ComboboxEditor, Lookup, LookupEditorBase, LookupEditorOptions, WidgetPr
 import { OrderDetailRow, ProductRow } from "@serenity-is/demo.northwind";
 import { GridEditorDialog } from "@serenity-is/extensions";
 import { ChangingLookupTextForm } from "../../ServerTypes/Demo";
+import { nsDemoBasicSamples } from "../../ServerTypes/Namespaces";
 
 export default function pageInit() {
     var dlg = new ChangingLookupTextDialog({});
@@ -13,7 +14,7 @@ export default function pageInit() {
  * Our custom product editor type
  */
 export class ChangingLookupTextEditor extends LookupEditorBase<LookupEditorOptions, ProductRow> {
-    static override typeInfo = this.registerEditor("Serenity.Demo.BasicSamples.ChangingLookupTextEditor");
+    static override typeInfo = this.registerEditor(nsDemoBasicSamples);
 
     protected getLookupKey() {
         return ProductRow.lookupKey;
@@ -30,7 +31,7 @@ export class ChangingLookupTextEditor extends LookupEditorBase<LookupEditorOptio
 }
 
 export class ChangingLookupTextDialog<P = {}> extends GridEditorDialog<OrderDetailRow, P> {
-    static override typeInfo = this.registerClass("Serenity.Demo.BasicSamples.ChangingLookupTextDialog");
+    static override typeInfo = this.registerClass(nsDemoBasicSamples);
 
     protected getFormKey() { return ChangingLookupTextForm.formKey; }
     protected getLocalTextPrefix() { return OrderDetailRow.localTextPrefix; }

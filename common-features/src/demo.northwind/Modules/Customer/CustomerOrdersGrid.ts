@@ -3,12 +3,13 @@ import { SubDialogHelper } from "@serenity-is/corelib";
 import { Column } from "@serenity-is/sleekgrid";
 import { OrderGrid } from "../Order/OrderGrid";
 import { OrderRow } from "../ServerTypes/Demo";
+import { nsDemoNorthwind } from "../ServerTypes/Namespaces";
 import { CustomerOrderDialog } from "./CustomerOrderDialog";
 
 const fld = OrderRow.Fields;
 
 export class CustomerOrdersGrid<P = {}> extends OrderGrid<P> {
-    static override typeInfo = this.registerClass("Serenity.Demo.Northwind.CustomerOrdersGrid");
+    static override typeInfo = this.registerClass(nsDemoNorthwind);
     
     protected getDialogType() { return CustomerOrderDialog; }
 

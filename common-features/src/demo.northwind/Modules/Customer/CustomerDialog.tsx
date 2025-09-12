@@ -1,11 +1,12 @@
 import { EntityDialog, SaveInitiator, SaveResponse, TabsExtensions, WidgetProps, localText, reloadLookup } from "@serenity-is/corelib";
 import { DialogUtils } from "@serenity-is/extensions";
 import { CustomerForm, CustomerRow, CustomerService } from "../ServerTypes/Demo";
+import { nsDemoNorthwind } from "../ServerTypes/Namespaces";
 import "./CustomerDialog.css";
 import { CustomerOrdersGrid } from "./CustomerOrdersGrid";
 
 export class CustomerDialog<P = {}> extends EntityDialog<CustomerRow, P> {
-    static override typeInfo = this.registerClass("Serenity.Demo.Northwind.CustomerDialog");
+    static override typeInfo = this.registerClass(nsDemoNorthwind);
 
     protected getFormKey() { return CustomerForm.formKey; }
     protected getRowDefinition() { return CustomerRow; }

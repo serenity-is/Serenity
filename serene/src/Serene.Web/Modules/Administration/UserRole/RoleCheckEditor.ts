@@ -1,8 +1,9 @@
 import { CheckTreeEditor, CheckTreeItem, GridUtils, isEmptyOrNull, stripDiacritics } from "@serenity-is/corelib";
 import { RoleRow } from "../../ServerTypes/Administration/RoleRow";
+import { nsAdministration } from "../../ServerTypes/Namespaces";
 
 export class RoleCheckEditor extends CheckTreeEditor<CheckTreeItem<any>, any> {
-    static override typeInfo = this.registerEditor("Serene.Administration.RoleCheckEditor");
+    static override typeInfo = this.registerEditor(nsAdministration);
 
     private searchText: string;
 

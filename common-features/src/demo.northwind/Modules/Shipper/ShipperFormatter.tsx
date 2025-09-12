@@ -1,8 +1,9 @@
 import { Formatter, faIcon, formatterTypeInfo, registerType } from "@serenity-is/corelib";
 import { FormatterContext, FormatterResult } from "@serenity-is/sleekgrid";
+import { nsDemoNorthwind } from "../ServerTypes/Namespaces";
 
 export class ShipperFormatter implements Formatter {
-    static typeInfo = formatterTypeInfo("Serenity.Demo.Northwind.ShipperFormatter"); static { registerType(this); }
+    static typeInfo = formatterTypeInfo(nsDemoNorthwind); static { registerType(this); }
     
     format(ctx: FormatterContext): FormatterResult {
 

@@ -1,6 +1,7 @@
 ﻿import { Fluent, confirmDialog, faIcon, gridPageInit, localText } from "@serenity-is/corelib";
 import { CustomerGrid, CustomerService, OrderDialog } from "@serenity-is/demo.northwind";
 import { Column } from "@serenity-is/sleekgrid";
+import { nsDemoBasicSamples } from "../../ServerTypes/Namespaces";
 
 export default () => gridPageInit(InlineActionGrid);
 
@@ -9,7 +10,7 @@ const viewDetailsAction = "view-details";
 const newOrderAction = "new-order";
 
 export class InlineActionGrid extends CustomerGrid {
-    static override typeInfo = this.registerClass("Serenity.Demo.BasicSamples.InlineActionGrid");
+    static override typeInfo = this.registerClass(nsDemoBasicSamples);
 
     protected getColumns() {
         var columns = super.getColumns();

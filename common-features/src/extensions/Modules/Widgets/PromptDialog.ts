@@ -1,4 +1,5 @@
 import { PropertyDialog, Widget, WidgetProps, cancelDialogButton, getTypeFullName, okDialogButton, toggleClass } from "@serenity-is/corelib";
+import { nsExtensions } from "../ServerTypes/Namespaces";
 
 export interface PromptDialogOptions {
     cssClass?: string;
@@ -13,7 +14,7 @@ export interface PromptDialogOptions {
 }
 
 export class PromptDialog<P extends PromptDialogOptions = PromptDialogOptions> extends PropertyDialog<any, P> {
-    static override typeInfo = this.registerClass("Serenity.Extensions.PromptDialog");
+    static override typeInfo = this.registerClass(nsExtensions);
 
     constructor(props: WidgetProps<P>) {
         super(props);

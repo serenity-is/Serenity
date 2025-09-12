@@ -1,6 +1,7 @@
-import { Criteria, Decorators, EntityGrid, ListRequest, Lookup, LookupEditorBase, LookupEditorOptions, gridPageInit } from "@serenity-is/corelib";
+import { Criteria, EntityGrid, ListRequest, Lookup, LookupEditorBase, LookupEditorOptions, gridPageInit } from "@serenity-is/corelib";
 import { CategoryRow, ProductColumns, ProductDialog, ProductRow, ProductService } from "@serenity-is/demo.northwind";
 import { LookupFilterByMultipleForm } from "../../ServerTypes/Demo";
+import { nsDemoBasicSamples } from "../../ServerTypes/Namespaces";
 import "./LookupFilterByMultipleValuesPage.css";
 
 export default () => gridPageInit(LookupFilterByMultipleGrid);
@@ -9,7 +10,7 @@ export default () => gridPageInit(LookupFilterByMultipleGrid);
  * Subclass of ProductGrid to override dialog type to CloneableEntityDialog
  */
 export class LookupFilterByMultipleGrid<P = {}> extends EntityGrid<ProductRow, P> {
-    static override typeInfo = this.registerClass("Serenity.Demo.BasicSamples.LookupFilterByMultipleGrid");
+    static override typeInfo = this.registerClass(nsDemoBasicSamples);
 
     protected getColumnsKey() { return ProductColumns.columnsKey; }
     protected getDialogType() { return LookupFilterByMultipleDialog; }
@@ -42,7 +43,7 @@ export class LookupFilterByMultipleGrid<P = {}> extends EntityGrid<ProductRow, P
  * (LookupFilterByMultipleForm) with our special category editor.
  */
 export class LookupFilterByMultipleDialog extends ProductDialog {
-    static override typeInfo = this.registerClass("Serenity.Demo.BasicSamples.LookupFilterByMultipleDialog");
+    static override typeInfo = this.registerClass(nsDemoBasicSamples);
 
     protected getFormKey() { return LookupFilterByMultipleForm.formKey; }
 }
@@ -58,7 +59,7 @@ export class LookupFilterByMultipleDialog extends ProductDialog {
  */
 export class ProduceSeafoodCategoryEditor extends
     LookupEditorBase<LookupEditorOptions, CategoryRow> {
-    static override typeInfo = this.registerEditor("Serenity.Demo.BasicSamples.ProduceSeafoodCategoryEditor");
+    static override typeInfo = this.registerEditor(nsDemoBasicSamples);
 
     /**
      * Normally LookupEditor requires a lookup key to determine which set of

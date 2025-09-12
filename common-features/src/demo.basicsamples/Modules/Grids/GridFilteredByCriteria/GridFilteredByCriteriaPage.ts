@@ -1,10 +1,11 @@
 ﻿import { Criteria, EntityGrid, ListRequest, gridPageInit } from "@serenity-is/corelib";
 import { ProductColumns, ProductDialog, ProductRow, ProductService } from "@serenity-is/demo.northwind";
+import { nsDemoBasicSamples } from "../../ServerTypes/Namespaces";
 
 export default () => gridPageInit(GridFilteredByCriteria);
 
 export class GridFilteredByCriteria<P = {}> extends EntityGrid<ProductRow, P> {
-    static override typeInfo = this.registerClass("Serenity.Demo.BasicSamples.GridFilteredByCriteria");
+    static override typeInfo = this.registerClass(nsDemoBasicSamples);
 
     protected getColumnsKey() { return ProductColumns.columnsKey; }
     protected getDialogType() { return ProductDialog; }

@@ -5,6 +5,7 @@ import {
 } from "@serenity-is/corelib";
 import { Column } from "@serenity-is/sleekgrid";
 import { UserPermissionRow } from "../../ServerTypes/Administration";
+import { nsAdministration } from "../../ServerTypes/Namespaces";
 import { RemoteDataKeys } from "../../ServerTypes/RemoteDataKeys";
 import { UserPermissionDialogTexts } from "../../ServerTypes/Texts";
 
@@ -24,7 +25,7 @@ export interface PermissionCheckItem {
 }
 
 export class PermissionCheckEditor<P extends PermissionCheckEditorOptions = PermissionCheckEditorOptions> extends DataGrid<PermissionCheckItem, P> {
-    static override typeInfo = this.registerEditor("Serene.Administration.PermissionCheckEditor", [IGetEditValue, ISetEditValue]);
+    static override typeInfo = this.registerEditor(nsAdministration, [IGetEditValue, ISetEditValue]);
 
     protected getIdProperty() { return "Key"; }
 

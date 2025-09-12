@@ -1,11 +1,12 @@
 ﻿import { EntityGrid, ListResponse, gridPageInit } from "@serenity-is/corelib";
 import { SalesByCategoryColumns, SalesByCategoryRow, SalesByCategoryService } from "@serenity-is/demo.northwind";
+import { nsDemoBasicSamples } from "../../ServerTypes/Namespaces";
 
 
 export default () => gridPageInit(ViewWithoutIDGrid)
 
 export class ViewWithoutIDGrid<P = {}> extends EntityGrid<SalesByCategoryRow, P> {
-    static override typeInfo = this.registerClass("Serenity.Demo.BasicSamples.ViewWithoutIDGrid");
+    static override typeInfo = this.registerClass(nsDemoBasicSamples);
 
     protected getColumnsKey() { return SalesByCategoryColumns.columnsKey; }
     protected getIdProperty() { return "__id"; }

@@ -1,5 +1,6 @@
-import { Decorators, EntityGrid, gridPageInit, } from "@serenity-is/corelib";
+import { EntityGrid, gridPageInit } from "@serenity-is/corelib";
 import { ProductColumns, ProductDialog, ProductRow, ProductService } from "@serenity-is/demo.northwind";
+import { nsDemoBasicSamples } from "../../ServerTypes/Namespaces";
 import "./CloneableEntityDialogPage.css";
 
 export default () => gridPageInit(CloneableEntityGrid);
@@ -14,7 +15,7 @@ export class CloneableEntityGrid<P = {}> extends EntityGrid<ProductRow, P> {
 }
 
 export class CloneableEntityDialog extends ProductDialog {
-    static override typeInfo = this.registerClass("Serenity.Demo.BasicSamples.CloneableEntityDialog");
+    static override typeInfo = this.registerClass(nsDemoBasicSamples);
 
     protected updateInterface() {
 
