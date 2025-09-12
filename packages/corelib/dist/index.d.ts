@@ -5299,13 +5299,6 @@ export declare namespace PropertyItemSlickConverter {
 	function toSlickColumn(item: PropertyItem): Column;
 }
 export declare namespace SlickFormatting {
-	function getEnumText(enumKey: string, name: string): string;
-	function date(format?: string): Format;
-	function dateTime(format?: string): Format;
-	function checkBox(): Format;
-	function number(format: string): Format;
-	function getItemType(link: HTMLElement | ArrayLike<HTMLElement>): string;
-	function getItemId(link: HTMLElement | ArrayLike<HTMLElement>): string;
 	function itemLink<TItem = any>(itemType: string, idField: string, getText: Format<TItem>, cssClass?: (ctx: FormatterContext<TItem>) => string, encode?: boolean): Format<TItem>;
 	function treeToggle(getView: () => RemoteView<any>, getId: (x: any) => any, formatter: Format): Format;
 }
@@ -5331,7 +5324,7 @@ export declare abstract class FormatterBase implements Formatter {
 	protected static formatterTypeInfo<T>(typeName: StringLiteral<T>, intfAndAttr?: any[]): FormatterTypeInfo<T>;
 	static typeInfo: FormatterTypeInfo<"Serenity.FormatterBase">;
 }
-export declare class BooleanFormatter extends FormatterBase implements Formatter {
+export declare class BooleanFormatter implements Formatter {
 	readonly props: {
 		falseText?: string;
 		trueText?: string;
@@ -5347,11 +5340,11 @@ export declare class BooleanFormatter extends FormatterBase implements Formatter
 	get trueText(): string;
 	set trueText(value: string);
 }
-export declare class CheckboxFormatter extends FormatterBase implements Formatter {
+export declare class CheckboxFormatter implements Formatter {
 	static typeInfo: FormatterTypeInfo<"Serenity.CheckboxFormatter">;
 	format(ctx: FormatterContext): string;
 }
-export declare class DateFormatter extends FormatterBase implements Formatter {
+export declare class DateFormatter implements Formatter {
 	readonly props: {
 		displayFormat?: string;
 	};
@@ -5370,7 +5363,7 @@ export declare class DateTimeFormatter extends DateFormatter {
 		displayFormat?: string;
 	});
 }
-export declare class EnumFormatter extends FormatterBase implements Formatter {
+export declare class EnumFormatter implements Formatter {
 	readonly props: {
 		enumKey?: string;
 	};
@@ -5385,7 +5378,7 @@ export declare class EnumFormatter extends FormatterBase implements Formatter {
 	static getText(enumKey: string, name: string): string;
 	static getName(enumType: any, value: any): string;
 }
-export declare class FileDownloadFormatter extends FormatterBase implements Formatter, IInitializeColumn {
+export declare class FileDownloadFormatter implements Formatter, IInitializeColumn {
 	readonly props: {
 		displayFormat?: string;
 		originalNameProperty?: string;
@@ -5407,12 +5400,12 @@ export declare class FileDownloadFormatter extends FormatterBase implements Form
 	get iconClass(): string;
 	set iconClass(value: string);
 }
-export declare class MinuteFormatter extends FormatterBase implements Formatter {
+export declare class MinuteFormatter implements Formatter {
 	static typeInfo: FormatterTypeInfo<"Serenity.MinuteFormatter">;
 	format(ctx: FormatterContext): string;
 	static format(value: number): string;
 }
-export declare class NumberFormatter extends FormatterBase implements Formatter {
+export declare class NumberFormatter implements Formatter {
 	readonly props: {
 		displayFormat?: string;
 	};
@@ -5425,7 +5418,7 @@ export declare class NumberFormatter extends FormatterBase implements Formatter 
 	get displayFormat(): string;
 	set displayFormat(value: string);
 }
-export declare class UrlFormatter extends FormatterBase implements Formatter, IInitializeColumn {
+export declare class UrlFormatter implements Formatter, IInitializeColumn {
 	readonly props: {
 		displayProperty?: string;
 		displayFormat?: string;

@@ -1,5 +1,6 @@
 import { Culture, addLocalText } from "../../base";
-import { DateFormatter, DateTimeFormatter } from "../formatters/formatters";
+import { DateFormatter } from "../formatters/dateformatter";
+import { DateTimeFormatter } from "../formatters/datetimeformatter";
 import { PropertyItemSlickConverter } from "./propertyitemslickconverter";
 
 describe('PropertyItemSlickConverter.toSlickColumn', () => {

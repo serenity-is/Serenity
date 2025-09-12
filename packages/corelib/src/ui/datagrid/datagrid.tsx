@@ -464,7 +464,7 @@ export class DataGrid<TItem, P = {}> extends Widget<P> implements IDataGrid, IRe
 
         if (target && target.classList.contains('s-EditLink')) {
             e.preventDefault();
-            this.editItemOfType(SlickFormatting.getItemType(target), SlickFormatting.getItemId(target));
+            this.editItemOfType(target.dataset.itemType, target.dataset.itemId);
         }
     }
 

@@ -1,4 +1,4 @@
-import { BaseDialog, BooleanEditor, CaptureOperationType, ColumnsBase, DateEditor, DecimalEditor, DeleteRequest, DeleteResponse, DialogButton, EditorProps, EditorWidget, EmailAddressEditor, EntityDialog, EntityGrid, EnumEditor, Formatter, FormatterBase, IGetEditValue, ISetEditValue, ImageUploadEditor, IntegerEditor, ListRequest, ListResponse, LookupEditor, LookupEditorBase, LookupEditorOptions, PrefixedContext, PropertyItem, RetrieveRequest, RetrieveResponse, SaveInitiator, SaveRequest, SaveResponse, ServiceLookupEditor, ServiceOptions, StringEditor, ToolButton, WidgetProps } from '@serenity-is/corelib';
+import { BaseDialog, BooleanEditor, CaptureOperationType, ColumnsBase, DateEditor, DecimalEditor, DeleteRequest, DeleteResponse, DialogButton, EditorProps, EditorWidget, EmailAddressEditor, EntityDialog, EntityGrid, EnumEditor, Formatter, IGetEditValue, ISetEditValue, ImageUploadEditor, IntegerEditor, ListRequest, ListResponse, LookupEditor, LookupEditorBase, LookupEditorOptions, PrefixedContext, PropertyItem, RetrieveRequest, RetrieveResponse, SaveInitiator, SaveRequest, SaveResponse, ServiceLookupEditor, ServiceOptions, StringEditor, ToolButton, WidgetProps } from '@serenity-is/corelib';
 import { GetNextNumberRequest, GetNextNumberResponse, GridEditorBase, GridEditorDialog } from '@serenity-is/extensions';
 import { Column, FormatterContext, FormatterResult } from '@serenity-is/sleekgrid';
 
@@ -1041,11 +1041,11 @@ export declare class CustomerOrdersGrid<P = {}> extends OrderGrid<P> {
 	get customerID(): string;
 	set customerID(value: string);
 }
-export declare class EmployeeListFormatter extends FormatterBase implements Formatter {
+export declare class EmployeeListFormatter implements Formatter {
 	static typeInfo: import("@serenity-is/corelib").FormatterTypeInfo<"Serenity.Demo.Northwind.EmployeeListFormatter">;
 	format(ctx: FormatterContext): FormatterResult;
 }
-export declare class EmployeeFormatter extends FormatterBase implements Formatter {
+export declare class EmployeeFormatter implements Formatter {
 	readonly props: {
 		genderProperty?: string;
 	};
@@ -1065,7 +1065,7 @@ export declare class NoteDialog<P = {}> extends BaseDialog<P> {
 	set text(value: string);
 	okClick: () => void;
 }
-export declare class FreightFormatter extends FormatterBase implements Formatter {
+export declare class FreightFormatter implements Formatter {
 	static typeInfo: import("@serenity-is/corelib").FormatterTypeInfo<"Serenity.Demo.Northwind.FreightFormatter">;
 	format(ctx: FormatterContext): string;
 }
@@ -1125,7 +1125,7 @@ export declare class ShipperDialog<P = {}> extends EntityDialog<ShipperRow, P> {
 	protected getService(): string;
 	protected form: ShipperForm;
 }
-export declare class ShipperFormatter extends FormatterBase implements Formatter {
+export declare class ShipperFormatter implements Formatter {
 	static typeInfo: import("@serenity-is/corelib").FormatterTypeInfo<"Serenity.Demo.Northwind.ShipperFormatter">;
 	format(ctx: FormatterContext): FormatterResult;
 }

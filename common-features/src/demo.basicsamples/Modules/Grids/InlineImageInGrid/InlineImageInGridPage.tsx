@@ -1,15 +1,14 @@
-import { EntityGrid, Formatter, FormatterBase, IInitializeColumn, gridPageInit, resolveUrl } from "@serenity-is/corelib";
+import { EntityGrid, Formatter, IInitializeColumn, formatterTypeInfo, gridPageInit, registerType, resolveUrl } from "@serenity-is/corelib";
 import { ProductDialog, ProductRow, ProductService } from "@serenity-is/demo.northwind";
 import { Column, FormatterContext, FormatterResult, GridOptions } from "@serenity-is/sleekgrid";
 import { InlineImageInGridColumns } from "../../ServerTypes/Demo";
 
 export default () => gridPageInit(InlineImageInGrid);
 
-export class InlineImageFormatter extends FormatterBase implements Formatter, IInitializeColumn {
-    static override typeInfo = this.formatterTypeInfo("Serenity.Demo.BasicSamples.InlineImageFormatter");
+export class InlineImageFormatter implements Formatter, IInitializeColumn {
+    static typeInfo = formatterTypeInfo("Serenity.Demo.BasicSamples.InlineImageFormatter"); static { registerType(this); }
 
     constructor(public readonly props: { fileProperty?: string, thumb?: boolean } = {}) {
-        super();
     }
 
     format(ctx: FormatterContext): FormatterResult {

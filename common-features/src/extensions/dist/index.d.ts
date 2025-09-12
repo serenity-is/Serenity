@@ -1,4 +1,4 @@
-import { BaseDialog, DataGrid, DeleteResponse, DialogType, Dictionary, EditorProps, EmailAddressEditor, EntityDialog, EntityGrid, Formatter, FormatterBase, IGetEditValue, ISetEditValue, IconClassName, ListRequest, ListResponse, PasswordEditor, PrefixedContext, PropertyDialog, PropertyItem, SaveInitiator, SaveResponse, ServiceError, ServiceOptions, ServiceRequest, ServiceResponse, SettingStorage, ToolButton, Widget, WidgetProps } from '@serenity-is/corelib';
+import { BaseDialog, DataGrid, DeleteResponse, DialogType, Dictionary, EditorProps, EmailAddressEditor, EntityDialog, EntityGrid, Formatter, IGetEditValue, ISetEditValue, IconClassName, ListRequest, ListResponse, PasswordEditor, PrefixedContext, PropertyDialog, PropertyItem, SaveInitiator, SaveResponse, ServiceError, ServiceOptions, ServiceRequest, ServiceResponse, SettingStorage, ToolButton, Widget, WidgetProps } from '@serenity-is/corelib';
 import { FormatterContext, Grid, GridOptions } from '@serenity-is/sleekgrid';
 
 export interface ChangePasswordForm {
@@ -436,7 +436,7 @@ export declare namespace PdfExportHelper {
 	function exportToPdf(options: PdfExportOptions): void;
 	function createToolButton(options: PdfExportOptions): ToolButton;
 }
-export declare class EnumSelectFormatter extends FormatterBase implements Formatter {
+export declare class EnumSelectFormatter implements Formatter {
 	readonly props: {
 		enumKey?: string;
 		allowClear?: boolean;
@@ -456,7 +456,7 @@ export declare class EnumSelectFormatter extends FormatterBase implements Format
 	get emptyItemText(): string;
 	set emptyItemText(value: string);
 }
-export declare class SingleLineTextFormatter extends FormatterBase implements Formatter {
+export declare class SingleLineTextFormatter implements Formatter {
 	static typeInfo: import("@serenity-is/corelib").FormatterTypeInfo<"Serenity.Extensions.SingleLineTextFormatter">;
 	format(ctx: FormatterContext): string;
 	static formatValue(value: string): string;

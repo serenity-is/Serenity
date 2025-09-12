@@ -2,7 +2,7 @@ import { Column, Grid } from "@serenity-is/sleekgrid";
 import { Authorization, isPromiseLike, tryGetText, type PropertyItem } from "../../base";
 import { FormatterType } from "../../types/formattertype";
 import { FormatterTypeRegistry } from "../../types/formattertyperegistry";
-import { IInitializeColumn } from "../formatters/formatters";
+import { IInitializeColumn } from "../formatters/iinitializecolumn";
 import { ReflectionOptionsSetter } from "../widgets/reflectionoptionssetter";
 
 export namespace PropertyItemSlickConverter {

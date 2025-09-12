@@ -1,11 +1,10 @@
-import { EnumTypeRegistry, Formatter, FormatterBase, htmlEncode, localText, tryGetText } from "@serenity-is/corelib";
+import { EnumTypeRegistry, Formatter, formatterTypeInfo, htmlEncode, localText, registerType, tryGetText } from "@serenity-is/corelib";
 import { FormatterContext } from "@serenity-is/sleekgrid";
 
-export class EnumSelectFormatter extends FormatterBase implements Formatter {
-    static override typeInfo = this.formatterTypeInfo("Serenity.Extensions.EnumSelectFormatter");
+export class EnumSelectFormatter implements Formatter {
+    static typeInfo = formatterTypeInfo("Serenity.Extensions.EnumSelectFormatter"); static { registerType(this); }
 
     constructor(public readonly props: { enumKey?: string, allowClear?: boolean, emptyItemText?: string } = {}) {
-        super();
         this.props ??= {}
         this.props.allowClear ??= true;
     }

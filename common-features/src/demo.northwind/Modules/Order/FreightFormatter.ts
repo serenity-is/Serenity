@@ -1,8 +1,8 @@
-import { Formatter, FormatterBase, faIcon } from "@serenity-is/corelib";
+import { Formatter, faIcon, formatterTypeInfo, registerType } from "@serenity-is/corelib";
 import { FormatterContext } from "@serenity-is/sleekgrid";
 
-export class FreightFormatter extends FormatterBase implements Formatter {
-    static override typeInfo = this.formatterTypeInfo("Serenity.Demo.Northwind.FreightFormatter");
+export class FreightFormatter implements Formatter {
+    static typeInfo = formatterTypeInfo("Serenity.Demo.Northwind.FreightFormatter"); static { registerType(this); }
 
     format(ctx: FormatterContext) {
         if (ctx.value == null)
