@@ -3327,12 +3327,12 @@ export declare class IGetEditValue {
 export interface IGetEditValue {
 	getEditValue(property: PropertyItem, target: any): void;
 }
+export declare class IReadOnly {
+	static typeInfo: InterfaceTypeInfo<"Serenity.IReadOnly">;
+}
 export interface IReadOnly {
 	get_readOnly(): boolean;
 	set_readOnly(value: boolean): void;
-}
-export declare class IReadOnly {
-	static typeInfo: InterfaceTypeInfo<"Serenity.IReadOnly">;
 }
 export declare class ISetEditValue {
 	static typeInfo: InterfaceTypeInfo<"Serenity.ISetEditValue">;
@@ -3347,12 +3347,12 @@ export interface IStringValue {
 	get_value(): string;
 	set_value(value: string): void;
 }
+export declare class IValidateRequired {
+	static typeInfo: InterfaceTypeInfo<"Serenity.IValidateRequired">;
+}
 export interface IValidateRequired {
 	get_required(): boolean;
 	set_required(value: boolean): void;
-}
-export declare class IValidateRequired {
-	static typeInfo: InterfaceTypeInfo<"Serenity.IValidateRequired">;
 }
 export declare class EnumKeyAttribute {
 	value: string;
