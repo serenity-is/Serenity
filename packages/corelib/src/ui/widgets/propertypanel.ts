@@ -1,4 +1,4 @@
-﻿import { PropertyItem, getInstanceType, getTypeFullName } from "../../base";
+﻿import { PropertyItem, getInstanceType, getTypeFullName, nsSerenity } from "../../base";
 import { getForm } from "../../compat";
 import { FormKeyAttribute } from "../../types/attributes";
 import { BasePanel } from "./basepanel";
@@ -6,7 +6,7 @@ import { PropertyGrid, PropertyGridMode, PropertyGridOptions } from "./propertyg
 import { WidgetProps } from "./widget";
 
 export class PropertyPanel<TItem, P> extends BasePanel<P> {
-    static override typeInfo = this.registerClass("Serenity.PropertyPanel");
+    static override typeInfo = this.registerClass(nsSerenity);
 
     declare private _entity: TItem;
     declare private _entityId: any;

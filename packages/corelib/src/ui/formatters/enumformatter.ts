@@ -1,11 +1,11 @@
 import { FormatterContext } from "@serenity-is/sleekgrid";
-import { Enum, formatterTypeInfo, getCustomAttribute, getTypeFullName, htmlEncode, isPromiseLike, registerType, tryGetText } from "../../base";
+import { Enum, formatterTypeInfo, getCustomAttribute, getTypeFullName, htmlEncode, isPromiseLike, nsSerenity, registerType, tryGetText } from "../../base";
 import { Formatter } from "../../slick";
 import { EnumKeyAttribute } from "../../types/attributes";
 import { EnumTypeRegistry } from "../../types/enumtyperegistry";
 
 export class EnumFormatter implements Formatter {
-    static typeInfo = formatterTypeInfo("Serenity.EnumFormatter"); static { registerType(this); }
+    static typeInfo = formatterTypeInfo(nsSerenity); static { registerType(this); }
 
     constructor(public readonly props: { enumKey?: string } = {}) {
         this.props ??= {};

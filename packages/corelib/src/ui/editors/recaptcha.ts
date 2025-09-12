@@ -1,4 +1,4 @@
-﻿import { Fluent, addValidationRule, localText } from "../../base";
+﻿import { Fluent, addValidationRule, localText, nsSerenity } from "../../base";
 import { IStringValue } from "../../interfaces";
 import { EditorProps, EditorWidget } from "./editorwidget";
 
@@ -8,7 +8,7 @@ export interface RecaptchaOptions {
 }
 
 export class Recaptcha<P extends RecaptchaOptions = RecaptchaOptions> extends EditorWidget<P> implements IStringValue {
-    static override typeInfo = this.registerEditor("Serenity.Recaptcha", [IStringValue]);
+    static override typeInfo = this.registerEditor(nsSerenity, [IStringValue]);
 
     constructor(props: EditorProps<P>) {
         super(props);

@@ -1,8 +1,9 @@
-﻿import { IBooleanValue } from "../../interfaces";
+﻿import { nsSerenity } from "../../base";
+import { IBooleanValue } from "../../interfaces";
 import { EditorWidget } from "./editorwidget";
 
 export class BooleanEditor<P = {}> extends EditorWidget<P> {
-    static override typeInfo = this.registerEditor("Serenity.BooleanEditor", [IBooleanValue]);
+    static override typeInfo = this.registerEditor(nsSerenity, [IBooleanValue]);
 
     static override createDefaultElement() { return <input type="checkbox" /> as HTMLInputElement; }
 

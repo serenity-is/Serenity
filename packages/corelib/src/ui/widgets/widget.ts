@@ -1,4 +1,4 @@
-import { ClassTypeInfo, Config, EditorTypeInfo, Fluent, StringLiteral, addClass, addValidationRule, appendToNode, classTypeInfo, editorTypeInfo, getCustomAttribute, getInstanceType, getTypeFullName, getTypeShortName, isArrayLike, registerType, toggleClass, typeInfoProperty } from "../../base";
+import { ClassTypeInfo, Config, EditorTypeInfo, Fluent, StringLiteral, addClass, addValidationRule, appendToNode, classTypeInfo, editorTypeInfo, getCustomAttribute, getInstanceType, getTypeFullName, getTypeShortName, isArrayLike, nsSerenity, registerType, toggleClass, typeInfoProperty } from "../../base";
 import { ensureParentOrFragment, handleElementProp, isFragmentWorkaround, setElementProps } from "./widgetinternal";
 import { IdPrefixType, associateWidget, deassociateWidget, getWidgetName, useIdPrefix, type WidgetProps } from "./widgetutils";
 export { getWidgetFrom, tryGetWidget, useIdPrefix, type IdPrefixType, type WidgetProps } from "./widgetutils";
@@ -236,7 +236,7 @@ export class Widget<P = {}> {
         return typeInfo;
     }
 
-    static typeInfo = this.registerClass("Serenity.Widget");
+    static typeInfo = this.registerClass(nsSerenity);
 }
 
 /** @deprecated Use Widget */

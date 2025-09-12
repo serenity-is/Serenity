@@ -1,4 +1,4 @@
-import { interfaceTypeInfo, registerType } from "../../base";
+import { interfaceTypeInfo, nsSerenity, registerType } from "../../base";
 import { QuickFilter } from "../datagrid/quickfilter";
 import { Widget } from "../widgets/widget";
 
@@ -7,5 +7,5 @@ export interface IQuickFiltering {
 }
 
 export class IQuickFiltering {
-    static typeInfo = interfaceTypeInfo("Serenity.IQuickFiltering"); static { registerType(this); }
+    static typeInfo = interfaceTypeInfo(nsSerenity); static { registerType(this); }
 }

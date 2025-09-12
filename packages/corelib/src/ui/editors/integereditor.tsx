@@ -1,4 +1,4 @@
-import { formatNumber, parseInteger } from "../../base";
+import { formatNumber, nsSerenity, parseInteger } from "../../base";
 import { isTrimmedEmpty } from "../../compat";
 import { IDoubleValue } from "../../interfaces";
 import { AutoNumeric } from "./autonumeric";
@@ -12,7 +12,7 @@ export interface IntegerEditorOptions {
 }
 
 export class IntegerEditor<P extends IntegerEditorOptions = IntegerEditorOptions> extends EditorWidget<P> implements IDoubleValue {
-    static override typeInfo = this.registerEditor("Serenity.IntegerEditor", [IDoubleValue]);
+    static override typeInfo = this.registerEditor(nsSerenity, [IDoubleValue]);
 
     static override createDefaultElement() { return <input type="text" /> as HTMLInputElement; }
     declare readonly domNode: HTMLInputElement;

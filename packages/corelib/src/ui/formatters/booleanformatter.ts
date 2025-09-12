@@ -1,9 +1,9 @@
 import { FormatterContext } from "@serenity-is/sleekgrid";
-import { DialogTexts, formatterTypeInfo, localText, registerType } from "../../base";
+import { DialogTexts, formatterTypeInfo, localText, nsSerenity, registerType } from "../../base";
 import { Formatter } from "../../slick";
 
 export class BooleanFormatter implements Formatter {
-    static typeInfo = formatterTypeInfo("Serenity.BooleanFormatter"); static { registerType(this); }
+    static typeInfo = formatterTypeInfo(nsSerenity); static { registerType(this); }
 
     constructor(public readonly props: { falseText?: string, trueText?: string } = {}) {
         this.props ??= {};

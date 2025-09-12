@@ -1,4 +1,4 @@
-﻿import { Fluent, PropertyItem, localText, tryGetText } from "../../base";
+﻿import { Fluent, PropertyItem, localText, nsSerenity, tryGetText } from "../../base";
 import { Combobox } from "../editors/combobox";
 import { ComboboxEditor } from "../editors/comboboxeditor";
 import { ReflectionOptionsSetter } from "../widgets/reflectionoptionssetter";
@@ -14,7 +14,7 @@ export interface FilterFieldSelectOptions {
 }
 
 class FilterFieldSelect<P extends FilterFieldSelectOptions = FilterFieldSelectOptions> extends ComboboxEditor<P, PropertyItem> {
-    static override typeInfo = this.registerClass("Serenity.FilterFieldSelect");
+    static override typeInfo = this.registerClass(nsSerenity);
 
     constructor(props: WidgetProps<P>) {
         super(props);
@@ -41,7 +41,7 @@ class FilterFieldSelect<P extends FilterFieldSelectOptions = FilterFieldSelectOp
 }
 
 class FilterOperatorSelect extends ComboboxEditor<any, FilterOperator> {
-    static override typeInfo = this.registerClass("Serenity.FilterOperatorSelect");
+    static override typeInfo = this.registerClass(nsSerenity);
 
     constructor(props: WidgetProps<{ source: FilterOperator[] }>) {
         super(props);
@@ -68,7 +68,7 @@ class FilterOperatorSelect extends ComboboxEditor<any, FilterOperator> {
 }
 
 export class FilterPanel<P = {}> extends FilterWidgetBase<P> {
-    static override typeInfo = this.registerClass("Serenity.FilterPanel");
+    static override typeInfo = this.registerClass(nsSerenity);
 
     declare private rowsDiv: HTMLElement;
     declare private resetButton: HTMLButtonElement;

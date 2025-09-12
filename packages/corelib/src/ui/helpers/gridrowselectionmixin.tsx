@@ -1,5 +1,5 @@
 import { Column } from "@serenity-is/sleekgrid";
-import { classTypeInfo, Fluent, registerType } from "../../base";
+import { classTypeInfo, Fluent, nsSerenity, registerType } from "../../base";
 import { clearKeys } from "../../compat";
 import { IDataGrid } from "../datagrid/idatagrid";
 
@@ -9,7 +9,7 @@ export interface GridRowSelectionMixinOptions {
 
 export class GridRowSelectionMixin {
 
-    static typeInfo = classTypeInfo("Serenity.GridRowSelectionMixin"); static { registerType(this); }
+    static typeInfo = classTypeInfo(nsSerenity); static { registerType(this); }
 
     declare private idField: string;
     declare private include: { [key: string]: boolean }

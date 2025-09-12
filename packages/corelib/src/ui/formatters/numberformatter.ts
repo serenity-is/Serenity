@@ -1,9 +1,9 @@
 import { FormatterContext } from "@serenity-is/sleekgrid";
-import { formatNumber, formatterTypeInfo, htmlEncode, parseDecimal, registerType } from "../../base";
+import { formatNumber, formatterTypeInfo, htmlEncode, nsSerenity, parseDecimal, registerType } from "../../base";
 import { Formatter } from "../../slick";
 
 export class NumberFormatter implements Formatter {
-    static typeInfo = formatterTypeInfo("Serenity.NumberFormatter"); static { registerType(this); }
+    static typeInfo = formatterTypeInfo(nsSerenity); static { registerType(this); }
     
     constructor(public readonly props: { displayFormat?: string } = {}) {
         this.props ??= {};

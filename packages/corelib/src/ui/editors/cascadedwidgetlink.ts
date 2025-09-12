@@ -1,11 +1,11 @@
-﻿import { classTypeInfo, Fluent, notifyError, registerType } from "../../base";
+﻿import { classTypeInfo, Fluent, notifyError, nsSerenity, registerType } from "../../base";
 import { findElementWithRelativeId } from "../../compat";
 import { Widget } from "../widgets/widget";
 import { tryGetWidget } from "../widgets/widgetutils";
 
 export class CascadedWidgetLink<TParent extends Widget<any>> {
 
-    static typeInfo = classTypeInfo("Serenity.CascadedWidgetLink"); static { registerType(this);}
+    static typeInfo = classTypeInfo(nsSerenity); static { registerType(this);}
 
     constructor(private parentType: { new(...args: any[]): TParent },
         private widget: Widget<any>,

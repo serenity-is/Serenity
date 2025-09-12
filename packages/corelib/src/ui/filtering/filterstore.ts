@@ -1,9 +1,9 @@
-﻿import { classTypeInfo, Criteria, Culture, localText, registerType, tryGetText, type PropertyItem } from "../../base";
+﻿import { classTypeInfo, Criteria, Culture, localText, nsSerenity, registerType, tryGetText, type PropertyItem } from "../../base";
 import { ArgumentNullException } from "../../compat";
 import { FilterLine } from "./filterline";
 
 export class FilterStore {
-    static typeInfo = classTypeInfo("Serenity.FilterStore"); static { registerType(this); }
+    static typeInfo = classTypeInfo(nsSerenity); static { registerType(this); }
 
     constructor(fields: PropertyItem[]) {
 

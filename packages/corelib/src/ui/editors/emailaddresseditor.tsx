@@ -1,8 +1,9 @@
-﻿import { EditorProps } from "./editorwidget";
+﻿import { nsSerenity } from "../../base";
+import { EditorProps } from "./editorwidget";
 import { StringEditor } from "./stringeditor";
 
 export class EmailAddressEditor<P = {}> extends StringEditor<P> {
-    static override typeInfo = this.registerEditor("Serenity.EmailAddressEditor");
+    static override typeInfo = this.registerEditor(nsSerenity);
 
     static override createDefaultElement() { return <input type="email" /> as HTMLInputElement; }
 

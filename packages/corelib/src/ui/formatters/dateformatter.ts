@@ -1,9 +1,9 @@
 import { FormatterContext } from "@serenity-is/sleekgrid";
-import { Culture, formatDate, formatterTypeInfo, htmlEncode, parseISODateTime, registerType } from "../../base";
+import { Culture, formatDate, formatterTypeInfo, htmlEncode, nsSerenity, parseISODateTime, registerType } from "../../base";
 import { Formatter } from "../../slick";
 
 export class DateFormatter implements Formatter {
-    static typeInfo = formatterTypeInfo("Serenity.DateFormatter"); static { registerType(this); }
+    static typeInfo = formatterTypeInfo(nsSerenity); static { registerType(this); }
 
     constructor(public readonly props: { displayFormat?: string } = {}) {
         this.props ??= {};

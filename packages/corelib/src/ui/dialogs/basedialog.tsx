@@ -1,4 +1,4 @@
-import { Dialog, DialogButton, DialogOptions, Fluent, Validator, defaultNotifyOptions, getjQuery, positionToastContainer } from "../../base";
+import { Dialog, DialogButton, DialogOptions, Fluent, Validator, defaultNotifyOptions, getjQuery, nsSerenity, positionToastContainer } from "../../base";
 import { isMobileView, validateOptions } from "../../compat";
 import { IDialog } from "../../interfaces";
 import { CloseButtonAttribute, MaximizableAttribute, PanelAttribute, ResizableAttribute, StaticPanelAttribute } from "../../types/attributes";
@@ -9,7 +9,7 @@ import { applyCssSizes, handleUIDialogResponsive } from "./basedialog-internal";
 import { DialogExtensions } from "./dialogextensions";
 
 export class BaseDialog<P> extends Widget<P> {
-    static override typeInfo = this.registerClass("Serenity.BaseDialog", [IDialog]);
+    static override typeInfo = this.registerClass(nsSerenity, [IDialog]);
     
     static override createDefaultElement() { return document.body.appendChild(<div class="hidden" />) as HTMLDivElement; }
 

@@ -1,8 +1,9 @@
-﻿import { IStringValue } from "../../interfaces";
+﻿import { nsSerenity } from "../../base";
+import { IStringValue } from "../../interfaces";
 import { EditorWidget } from "./editorwidget";
 
 export class StringEditor<P = {}> extends EditorWidget<P> {
-    static override typeInfo = this.registerEditor("Serenity.StringEditor", [IStringValue]);
+    static override typeInfo = this.registerEditor(nsSerenity, [IStringValue]);
     
     declare readonly domNode: HTMLInputElement;
     

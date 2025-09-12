@@ -1,7 +1,7 @@
-﻿import { interfaceTypeInfo, registerType } from "../base";
+﻿import { interfaceTypeInfo, nsSerenity, registerType } from "../base";
 
 export class IEditDialog {
-    static typeInfo = interfaceTypeInfo("Serenity.IEditDialog"); static { registerType(this); }
+    static typeInfo = interfaceTypeInfo(nsSerenity); static { registerType(this); }
 }
 
 export interface IEditDialog {

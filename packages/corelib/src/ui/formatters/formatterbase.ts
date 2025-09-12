@@ -1,5 +1,5 @@
 import { FormatterContext, FormatterResult } from "@serenity-is/sleekgrid";
-import { formatterTypeInfo, FormatterTypeInfo, registerType, StringLiteral, typeInfoProperty } from "../../base";
+import { formatterTypeInfo, FormatterTypeInfo, nsSerenity, registerType, StringLiteral, typeInfoProperty } from "../../base";
 import { Formatter } from "../../slick";
 
 export abstract class FormatterBase implements Formatter {
@@ -14,5 +14,5 @@ export abstract class FormatterBase implements Formatter {
         return typeInfo;
     }
 
-    static typeInfo: FormatterTypeInfo<"Serenity.FormatterBase">;
+    static typeInfo = formatterTypeInfo(nsSerenity); static { registerType(this); }
 }

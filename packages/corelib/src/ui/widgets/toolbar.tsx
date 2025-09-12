@@ -1,4 +1,4 @@
-import { Fluent, IconClassName, iconClassName, isArrayLike } from "../../base";
+import { Fluent, IconClassName, iconClassName, isArrayLike, nsSerenity } from "../../base";
 import { Widget } from "./widget";
 
 export interface ToolButtonProps {
@@ -68,7 +68,7 @@ export interface ToolbarOptions {
 }
 
 export class Toolbar<P extends ToolbarOptions = ToolbarOptions> extends Widget<P> {
-    static override typeInfo = this.registerClass("Serenity.Toolbar");
+    static override typeInfo = this.registerClass(nsSerenity);
 
     protected renderContents(): any {
 

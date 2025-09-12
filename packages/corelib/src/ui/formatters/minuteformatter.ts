@@ -1,9 +1,9 @@
 import { FormatterContext } from "@serenity-is/sleekgrid";
-import { formatterTypeInfo, registerType, stringFormat } from "../../base";
+import { formatterTypeInfo, nsSerenity, registerType, stringFormat } from "../../base";
 import { Formatter } from "../../slick";
 
 export class MinuteFormatter implements Formatter {
-    static typeInfo = formatterTypeInfo("Serenity.MinuteFormatter"); static { registerType(this); }
+    static typeInfo = formatterTypeInfo(nsSerenity); static { registerType(this); }
 
     format(ctx: FormatterContext) {
         return MinuteFormatter.format(ctx.value);

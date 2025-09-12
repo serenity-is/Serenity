@@ -1,11 +1,11 @@
 import { Column, FormatterContext } from "@serenity-is/sleekgrid";
-import { faIcon, formatterTypeInfo, htmlEncode, iconClassName, registerType, resolveUrl, stringFormat } from "../../base";
+import { faIcon, formatterTypeInfo, htmlEncode, iconClassName, nsSerenity, registerType, resolveUrl, stringFormat } from "../../base";
 import { replaceAll } from "../../compat";
 import { Formatter } from "../../slick";
 import { IInitializeColumn } from "./iinitializecolumn";
 
 export class FileDownloadFormatter implements Formatter, IInitializeColumn {
-    static typeInfo = formatterTypeInfo("Serenity.IFileDownloadFormatter", [IInitializeColumn]); static { registerType(this); }
+    static typeInfo = formatterTypeInfo(nsSerenity, [IInitializeColumn]); static { registerType(this); }
 
     constructor(public readonly props: { displayFormat?: string, originalNameProperty?: string, iconClass?: string } = {}) {
         this.props ??= {};

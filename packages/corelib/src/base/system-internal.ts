@@ -65,6 +65,9 @@ function autoRegisterViaTypeInfo(type: any): void {
     if (!typeInfo || typeInfo.registered || !typeInfo.typeName)
         return;
 
+    if (typeInfo.typeName.endsWith("."))
+        typeInfo.typeName += type.name;
+
     if (!getTypeRegistry()[typeInfo.typeName])
         getTypeRegistry()[typeInfo.typeName] = type;
 
@@ -99,8 +102,12 @@ export function internalRegisterType(type: any, typeName?: string, interfaces?: 
     if (typeName && typeName !== typeInfo.typeName)
         typeInfo.typeName = typeName;
 
-    if (typeInfo.typeName)
+    if (typeInfo.typeName) {
+        if (typeInfo.typeName.endsWith("."))
+            typeInfo.typeName += type.name;
+        
         getTypeRegistry()[typeInfo.typeName] = type;
+    }
 
     if (interfaces?.length && typeInfo.interfaces !== interfaces) {
         interfaces = typeInfo.interfaces = merge(typeInfo.interfaces, interfaces);

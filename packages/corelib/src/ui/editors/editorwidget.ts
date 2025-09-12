@@ -1,4 +1,4 @@
-import { getElementReadOnly, setElementReadOnly } from "../../base";
+import { getElementReadOnly, nsSerenity, setElementReadOnly } from "../../base";
 import { Widget, WidgetProps } from "../widgets/widget";
 
 export type EditorProps<T> = WidgetProps<T> & {
@@ -11,7 +11,7 @@ export type EditorProps<T> = WidgetProps<T> & {
 }
 
 export class EditorWidget<P> extends Widget<EditorProps<P>> {
-    static override typeInfo = this.registerClass("Serenity.EditorWidget");
+    static override typeInfo = this.registerClass(nsSerenity);
 
     constructor(props: EditorProps<P>) {
         super(props);

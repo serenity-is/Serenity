@@ -218,6 +218,14 @@ public abstract class TypingsGeneratorBase : ImportGeneratorBase
     {
         var visitedForAnnotations = new HashSet<string>(StringComparer.OrdinalIgnoreCase);
 
+        static string fixRegName(ExternalType type, string text)
+        {
+            if (text != null && text[^1] == '.' && !string.IsNullOrEmpty(type?.Name))
+                return text + type.Name;
+
+            return text;
+        }
+
         static (string, string) extractTypeNameViaTypeInfo(ExternalType type)
         {
             var field = type.Fields?.FirstOrDefault(x =>
@@ -225,8 +233,9 @@ public abstract class TypingsGeneratorBase : ImportGeneratorBase
                 x.Value is string &&
                 x.Name == "typeInfo" &&
                 x.Type?.EndsWith("TypeInfo", StringComparison.Ordinal) == true);
-            return (field?.Value as string, field?.Type);
+            return (fixRegName(type, field?.Value as string), field?.Type);
         }
+
 
         modularEditorTypeByKey = TSTypes.Values.Select(type =>
         {
@@ -258,7 +267,7 @@ public abstract class TypingsGeneratorBase : ImportGeneratorBase
                             attr.Arguments?.Count > 0 &&
                             attr.Arguments[0]?.Value is string key &&
                             !string.IsNullOrEmpty(key))
-                            return (key, type);
+                            return (key: fixRegName(type, key), type);
                     }
                 }
             }
@@ -274,7 +283,6 @@ public abstract class TypingsGeneratorBase : ImportGeneratorBase
                 type.IsInterface != true &&
                 !string.IsNullOrEmpty(type.Module))
             {
-
                 if (extractTypeNameViaTypeInfo(type) is var (tiKey, tiType) &&
                     !string.IsNullOrEmpty(tiKey) &&
                     tiType == "FormatterTypeInfo")
@@ -298,7 +306,7 @@ public abstract class TypingsGeneratorBase : ImportGeneratorBase
                             attr.Arguments?.Count > 0 &&
                             attr.Arguments[0]?.Value is string key &&
                             !string.IsNullOrEmpty(key))
-                            return (key, type);
+                            return (key: fixRegName(type, key), type);
                     }
                 }
             }
@@ -330,7 +338,7 @@ public abstract class TypingsGeneratorBase : ImportGeneratorBase
                             attr.Arguments?.Count > 0 &&
                             attr.Arguments[0]?.Value is string key &&
                             !string.IsNullOrEmpty(key))
-                            return (key, type);
+                            return (key: fixRegName(type, key), type);
                     }
                 }
             }

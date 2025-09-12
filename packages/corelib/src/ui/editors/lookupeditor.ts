@@ -1,4 +1,4 @@
-﻿import { getInstanceType, getLookupAsync, getTypeFullName, type Lookup } from "../../base";
+﻿import { getInstanceType, getLookupAsync, getTypeFullName, nsSerenity, type Lookup } from "../../base";
 import { ScriptData, getLookup, reloadLookup } from "../../compat";
 import { ComboboxItem, ComboboxSearchQuery, ComboboxSearchResult } from "./combobox";
 import { ComboboxEditor, ComboboxEditorOptions } from "./comboboxeditor";
@@ -11,7 +11,7 @@ export interface LookupEditorOptions extends ComboboxEditorOptions {
 
 export abstract class LookupEditorBase<P extends LookupEditorOptions, TItem> extends ComboboxEditor<P, TItem> {
 
-    static override typeInfo = this.registerEditor("Serenity.LookupEditorBase");
+    static override typeInfo = this.registerEditor(nsSerenity);
 
     declare private lookupChangeUnbind: any;
 
@@ -145,7 +145,7 @@ export abstract class LookupEditorBase<P extends LookupEditorOptions, TItem> ext
 
 export class LookupEditor<P extends LookupEditorOptions = LookupEditorOptions> extends LookupEditorBase<P, {}> {
 
-    static override typeInfo = this.registerEditor("Serenity.LookupEditor");
+    static override typeInfo = this.registerEditor(nsSerenity);
 
     constructor(props: EditorProps<P>) {
         super(props);

@@ -166,6 +166,117 @@ public class TSTypeListerAST
         return node?.GetText();
     }
 
+    string GetTypeNameLiteral(IExpression node)
+    {
+        if (node == null)
+            return null;
+
+        if (node is StringLiteral sl)
+            return sl.Text;
+
+        string identifierName = null;
+        if (node is Identifier identifier)
+            identifierName = identifier.GetText();
+
+        if (string.IsNullOrEmpty(identifierName))
+            return null;
+
+        var parents = EnumerateParents(node).ToArray();
+
+        foreach (var parent in parents)
+        {
+            IEnumerable<INode> children = null;
+            if (parent is ModuleDeclaration md && md.Body is ModuleBlock mb)
+                children = mb.Statements;
+            else if (parent is SourceFile sf)
+                children = sf.Statements;
+
+            foreach (var child in children ?? [])
+            {
+                if (child is VariableStatement vs &&
+                    vs.DeclarationList?.Declarations is { } declarations)
+                {
+                    foreach (var dec in declarations)
+                    {
+                        if (GetText(dec.Name) == identifierName)
+                        {
+                            if (dec.Initializer is StringLiteral decsl)
+                                return decsl.Text;
+
+                            if (dec.Type is LiteralTypeNode declt &&
+                                declt.Literal is StringLiteral decltsl)
+                                return decltsl.Text;
+
+                            return null;
+                        }
+                    }
+                }
+            }
+
+            if (parent is SourceFile sourceFile &&
+                sourceFile.ExternalModuleIndicator is not null)
+            {
+                foreach (var import in children.OfType<ImportDeclaration>())
+                {
+                    if (import.ModuleSpecifier is not StringLiteral id)
+                        continue;
+
+                    /*if (import.ImportClause?.Name is Identifier name &&
+                        name.Text == identifierName)
+                        return id.Text + ":" + name.Text + functionSuffix;*/
+
+                    var elements = (import.ImportClause?.NamedBindings as NamedImports)?.Elements;
+                    if (elements is null)
+                        continue;
+
+                    foreach (var element in elements)
+                    {
+                        if (element.Name is Identifier nameIdentifier &&
+                            nameIdentifier.Text == identifierName)
+                        {
+                            var resolveResult = ResolveModule(id.Text, sourceFile.FileName, false);
+                            if (resolveResult?.FullPath is null)
+                                return null;
+
+                            var subFile = ParseFile(resolveResult.ActualPath ?? resolveResult.FullPath, null, extractExportsOnly: true);
+                            if (subFile is null || subFile.Statements is null || subFile.ExternalModuleIndicator is null)
+                                return null;
+
+                            var statements = subFile.Statements;
+
+                            foreach (var child in statements)
+                            {
+                                if (child is VariableStatement vs &&
+                                    vs.HasModifier(SyntaxKind.ExportKeyword) &&
+                                    vs.DeclarationList?.Declarations is { } declarations)
+                                {
+                                    foreach (var dec in declarations)
+                                    {
+                                        if (GetText(dec.Name) == identifierName)
+                                        {
+                                            if (dec.Initializer is StringLiteral decsl)
+                                                return decsl.Text;
+
+                                            if (dec.Type is LiteralTypeNode declt &&
+                                                declt.Literal is StringLiteral decltsl)
+                                                return decltsl.Text;
+
+                                            return null;
+                                        }
+                                    }
+                                }
+                            }
+
+                            return null;
+                        }
+                    }
+                }
+            }
+        }
+
+        return null;
+    }
+
     string GetTypeReferenceExpression(INode node, bool isDecorator = false)
     {
         return GetTypeReferenceExpression(node, out _, isDecorator);
@@ -496,6 +607,14 @@ public class TSTypeListerAST
 
             ExternalMember externalMember;
 
+            string fixRegName(string text)
+            {
+                if (text != null && text[^1] == '.')
+                    return text + node.Name.GetText();
+
+                return text;
+            }
+
             if (member.Kind == SyntaxKind.PropertyDeclaration)
             {
                 externalMember = new ExternalMember();
@@ -512,7 +631,7 @@ public class TSTypeListerAST
                         trnl.Literal is StringLiteral trnll)
                     {
                         externalMember.Type = trni.Text;
-                        externalMember.Value = trnll.Text;
+                        externalMember.Value = fixRegName(trnll.Text);
                     }
                     else if (name == "typeInfo" &&
                         member.HasModifier(SyntaxKind.StaticKeyword) &&
@@ -524,8 +643,8 @@ public class TSTypeListerAST
                         itn.TypeArguments[0] is LiteralTypeNode itnlt &&
                         itnlt.Literal is StringLiteral itnlts)
                     {
-                        externalMember.Type = itnq.GetText();
-                        externalMember.Value = itnlts.Text;
+                        externalMember.Type = itnq.Text;
+                        externalMember.Value = fixRegName(itnlts.Text);
                     }
                     else
                         externalMember.Type = GetTypeReferenceExpression(pd.Type);
@@ -536,25 +655,25 @@ public class TSTypeListerAST
                     pd.Initializer is CallExpression ce &&
                     ce.Expression is PropertyAccessExpression pae &&
                     ce.Arguments?.Count >= 1 &&
-                    ce.Arguments[0] is StringLiteral ltns &&
                     pae.Name?.Text is string paet &&
-                    paet.StartsWith("register", StringComparison.Ordinal))
+                    paet.StartsWith("register", StringComparison.Ordinal) &&
+                    GetTypeNameLiteral(ce.Arguments[0]) is string ltns)
                 {
                     externalMember.Type = paet[8..] + "TypeInfo";
-                    externalMember.Value = ltns.Text;
+                    externalMember.Value = fixRegName(ltns);
                 }
                 else if (
                     name == "typeInfo" &&
                     member.HasModifier(SyntaxKind.StaticKeyword) &&
                     pd.Initializer is CallExpression ce2 &&
                     ce2.Expression is Identifier ce2e &&
+                    ce2.Arguments?.Count >= 1 &&
                     ce2e.Text is string ce2et &&
                     ce2et.EndsWith("TypeInfo", StringComparison.Ordinal) == true &&
-                    ce2.Arguments?.Count >= 1 &&
-                    ce2.Arguments[0] is StringLiteral ce2s)
+                    GetTypeNameLiteral(ce2.Arguments[0]) is string ce2ets)
                 {
                     externalMember.Type = char.ToUpperInvariant(ce2et[0]) + ce2et[1..];
-                    externalMember.Value = ce2s.Text;
+                    externalMember.Value = fixRegName(ce2ets);
                 }
 
                 if (pd.Initializer is StringLiteral sl)

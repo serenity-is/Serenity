@@ -1,4 +1,4 @@
-import { Enum, getCustomAttribute, isPromiseLike, tryGetText } from "../../base";
+import { Enum, getCustomAttribute, isPromiseLike, nsSerenity, tryGetText } from "../../base";
 import { EnumKeyAttribute } from "../../types/attributes";
 import { EnumTypeRegistry } from "../../types/enumtyperegistry";
 import { ComboboxItem } from "./combobox";
@@ -11,7 +11,7 @@ export interface EnumEditorOptions extends ComboboxCommonOptions {
 }
 
 export class EnumEditor<P extends EnumEditorOptions = EnumEditorOptions> extends ComboboxEditor<P, ComboboxItem> {
-    static override typeInfo = this.registerEditor("Serenity.EnumEditor");
+    static override typeInfo = this.registerEditor(nsSerenity);
 
     constructor(props: EditorProps<P>) {
         super(props);

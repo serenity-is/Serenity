@@ -1,4 +1,4 @@
-import { Criteria, formatDate, parseISODateTime } from "../../base";
+import { Criteria, formatDate, nsSerenity, parseISODateTime } from "../../base";
 import { DateEditor } from "../editors/dateeditor";
 import { DateTimeEditor } from "../editors/datetimeeditor";
 import { BaseEditorFiltering } from "./baseeditorfiltering";
@@ -6,7 +6,7 @@ import { CriteriaWithText } from "./criteriawithtext";
 import { FilterOperator } from "./filteroperator";
 
 export class DateTimeFiltering extends BaseEditorFiltering<DateEditor> {
-    static override typeInfo = this.registerClass("Serenity.DateTimeFiltering");
+    static override typeInfo = this.registerClass(nsSerenity);
 
     constructor() {
         super(DateTimeEditor)

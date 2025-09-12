@@ -1,5 +1,5 @@
 ﻿
-import { Authorization, Fluent, faIcon, getActiveRequests, getInstanceType, getTypeFullName, isPromiseLike, localText, resolveUrl, stringFormat, tryGetText } from "../../base";
+import { Authorization, Fluent, faIcon, getActiveRequests, getInstanceType, getTypeFullName, isPromiseLike, localText, nsSerenity, resolveUrl, stringFormat, tryGetText } from "../../base";
 import { HandleRouteEvent, Router, replaceAll, safeCast } from "../../compat";
 import { IEditDialog } from "../../interfaces";
 import { RemoteViewOptions } from "../../slick";
@@ -14,7 +14,7 @@ import { ColumnPickerDialog } from "./columnpickerdialog";
 import { DataGrid } from "./datagrid";
 
 export class EntityGrid<TItem, P = {}> extends DataGrid<TItem, P> {
-    static override typeInfo = this.registerClass("Serenity.EntityGrid");
+    static override typeInfo = this.registerClass(nsSerenity);
 
     constructor(props: WidgetProps<P>) {
         super(props);

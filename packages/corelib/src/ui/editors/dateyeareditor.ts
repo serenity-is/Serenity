@@ -1,8 +1,9 @@
+import { nsSerenity } from "../../base";
 import { EditorProps } from "./editorwidget";
 import { SelectEditor, SelectEditorOptions } from "./selecteditor";
 
 export class DateYearEditor<P extends DateYearEditorOptions = DateYearEditorOptions> extends SelectEditor<P> {
-    static override typeInfo = this.registerEditor("Serenity.DateYearEditor");
+    static override typeInfo = this.registerEditor(nsSerenity);
 
     constructor(props: EditorProps<P>) {
         super(props);

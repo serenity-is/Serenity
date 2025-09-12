@@ -133,6 +133,9 @@ public partial class ClientTypesGenerator : ImportGeneratorBase
                     x.Name == "typeInfo" && 
                     x.Type?.EndsWith("TypeInfo", StringComparison.Ordinal) == true)?.Value as string;
 
+            if (key != null && key[^1] == '.')
+                key += type.Name;
+
             if (string.IsNullOrEmpty(ns))
             {
                 if (key != null)

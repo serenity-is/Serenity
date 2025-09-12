@@ -1,9 +1,10 @@
+import { nsSerenity } from "../../base";
 import { ServiceLookupEditor } from "../editors/servicelookupeditor";
 import { BaseEditorFiltering } from "./baseeditorfiltering";
 import { FilterOperator, FilterOperators } from "./filteroperator";
 
 export class ServiceLookupFiltering extends BaseEditorFiltering<ServiceLookupEditor> {
-    static override typeInfo = this.registerClass("Serenity.ServiceLookupFiltering");
+    static override typeInfo = this.registerClass(nsSerenity);
 
     constructor() {
         super(ServiceLookupEditor);

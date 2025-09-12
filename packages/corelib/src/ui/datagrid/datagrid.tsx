@@ -1,5 +1,5 @@
 import { ArgsCell, AutoTooltips, Column, ColumnSort, FormatterContext, Grid, GridOptions } from "@serenity-is/sleekgrid";
-import { Authorization, Criteria, Fluent, ListResponse, cssEscape, debounce, getInstanceType, getTypeFullName, getjQuery, tryGetText, type PropertyItem, type PropertyItemsData } from "../../base";
+import { Authorization, Criteria, Fluent, ListResponse, cssEscape, debounce, getInstanceType, getTypeFullName, getjQuery, nsSerenity, tryGetText, type PropertyItem, type PropertyItemsData } from "../../base";
 import { LayoutTimer, ScriptData, getColumnsData, getColumnsDataAsync, setEquality } from "../../compat";
 import { IReadOnly } from "../../interfaces";
 import { Format, PagerOptions, RemoteView, RemoteViewOptions } from "../../slick";
@@ -31,7 +31,7 @@ export type { GridPersistanceFlags, PersistedGridColumn, PersistedGridSettings, 
 
 export class DataGrid<TItem, P = {}> extends Widget<P> implements IDataGrid, IReadOnly {
 
-    static override typeInfo = this.registerClass("Serenity.DataGrid", [IReadOnly]);
+    static override typeInfo = this.registerClass(nsSerenity, [IReadOnly]);
 
     declare private _isDisabled: boolean;
     declare private _layoutTimer: number;

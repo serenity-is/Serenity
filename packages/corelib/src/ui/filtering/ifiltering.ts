@@ -1,4 +1,4 @@
-import { interfaceTypeInfo, registerType, type PropertyItem } from "../../base";
+import { interfaceTypeInfo, nsSerenity, registerType, type PropertyItem } from "../../base";
 import { CriteriaWithText } from "./criteriawithtext";
 import { FilterOperator } from "./filteroperator";
 
@@ -17,5 +17,5 @@ export interface IFiltering {
 }
 
 export class IFiltering {
-    static typeInfo = interfaceTypeInfo("Serenity.IFiltering"); static { registerType(this); }
+    static typeInfo = interfaceTypeInfo(nsSerenity); static { registerType(this); }
 }

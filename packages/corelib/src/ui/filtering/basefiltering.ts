@@ -1,4 +1,4 @@
-import { ClassTypeInfo, classTypeInfo, Criteria, Fluent, getInstanceType, getTypeFullName, localText, registerType, stringFormat, StringLiteral, tryGetText, typeInfoProperty, type PropertyItem } from "../../base";
+import { ClassTypeInfo, classTypeInfo, Criteria, Fluent, getInstanceType, getTypeFullName, localText, nsSerenity, registerType, stringFormat, StringLiteral, tryGetText, typeInfoProperty, type PropertyItem } from "../../base";
 import { deepClone, Exception } from "../../compat";
 import { QuickFilter } from "../datagrid/quickfilter";
 import { Combobox } from "../editors/combobox";
@@ -266,7 +266,7 @@ export abstract class BaseFiltering implements IFiltering, IQuickFiltering {
         return typeInfo;
     }
 
-    static typeInfo = this.registerClass("Serenity.BaseFiltering", [IFiltering, IQuickFiltering]);
+    static typeInfo = this.registerClass(nsSerenity, [IFiltering, IQuickFiltering]);
 
 }
 

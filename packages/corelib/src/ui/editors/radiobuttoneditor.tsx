@@ -1,4 +1,4 @@
-﻿import { Enum, getCustomAttribute, isPromiseLike, tryGetText } from "../../base";
+﻿import { Enum, getCustomAttribute, isPromiseLike, nsSerenity, tryGetText } from "../../base";
 import { getLookup } from "../../compat";
 import { IReadOnly, IStringValue } from "../../interfaces";
 import { EnumKeyAttribute } from "../../types/attributes";
@@ -12,7 +12,7 @@ export interface RadioButtonEditorOptions {
 }
 
 export class RadioButtonEditor<P extends RadioButtonEditorOptions = RadioButtonEditorOptions> extends EditorWidget<P> implements IReadOnly {
-    static override typeInfo = this.registerEditor("Serenity.RadioButtonEditor", [IStringValue, IReadOnly]);
+    static override typeInfo = this.registerEditor(nsSerenity, [IStringValue, IReadOnly]);
 
     constructor(props: EditorProps<P>) {
         super(props);

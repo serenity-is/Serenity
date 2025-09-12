@@ -1,10 +1,10 @@
 import { Column, FormatterContext } from "@serenity-is/sleekgrid";
-import { formatterTypeInfo, htmlEncode, registerType, resolveUrl, stringFormat } from "../../base";
+import { formatterTypeInfo, htmlEncode, nsSerenity, registerType, resolveUrl, stringFormat } from "../../base";
 import { Formatter } from "../../slick";
 import { IInitializeColumn } from "./iinitializecolumn";
 
 export class UrlFormatter implements Formatter, IInitializeColumn {
-    static typeInfo = formatterTypeInfo("Serenity.UrlFormatter", [IInitializeColumn]); static { registerType(this); }
+    static typeInfo = formatterTypeInfo(nsSerenity, [IInitializeColumn]); static { registerType(this); }
 
     constructor(readonly props: { displayProperty?: string, displayFormat?: string, urlProperty?: string, urlFormat?: string, target?: string } = {}) {
         this.props ??= {};

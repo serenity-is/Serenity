@@ -1,6 +1,9 @@
-import { implementedInterfacesSymbol, isAssignableFromSymbol, isInstanceOfTypeSymbol, isInterfaceTypeSymbol } from "./symbols";
+import { isAssignableFromSymbol, isInstanceOfTypeSymbol, isInterfaceTypeSymbol } from "./symbols";
 import { StringLiteral, TypeInfo, ensureTypeInfo, getTypeNameProp, getTypeRegistry, globalObject, interfaceIsAssignableFrom, internalRegisterType, merge, peekTypeInfo, typeInfoProperty } from "./system-internal";
 export { getTypeNameProp, getTypeRegistry, setTypeNameProp, typeInfoProperty, type StringLiteral } from "./system-internal";
+
+export const nsSerenity: "Serenity." = "Serenity.";
+export const SerenityNS: "Serenity" = "Serenity";
 
 /**
  * Get the global object  (window in browsers, global in node)

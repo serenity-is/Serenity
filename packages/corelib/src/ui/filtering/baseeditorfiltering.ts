@@ -1,3 +1,4 @@
+import { nsSerenity } from "../../base";
 import { deepClone, extend } from "../../compat";
 import { QuickFilter } from "../datagrid/quickfilter";
 import { EditorUtils } from "../editors/editorutils";
@@ -5,7 +6,7 @@ import { Widget } from "../widgets/widget";
 import { BaseFiltering } from "./basefiltering";
 
 export abstract class BaseEditorFiltering<TEditor extends Widget<any>> extends BaseFiltering {
-    static override typeInfo = this.registerClass("Serenity.BaseEditorFiltering");
+    static override typeInfo = this.registerClass(nsSerenity);
     constructor(public editorTypeRef: any) {
         super();
     }

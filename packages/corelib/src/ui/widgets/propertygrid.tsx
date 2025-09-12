@@ -1,4 +1,4 @@
-﻿import { Authorization, Fluent, addClass, appendToNode, faIcon, getCustomAttribute, getType, isBS3, isPromiseLike, localText, tryGetText, type PropertyItem } from "../../base";
+﻿import { Authorization, Fluent, addClass, appendToNode, faIcon, getCustomAttribute, getType, isBS3, isPromiseLike, localText, nsSerenity, tryGetText, type PropertyItem } from "../../base";
 import { extend } from "../../compat";
 import { OptionsTypeAttribute } from "../../types/attributes";
 import { EditorType } from "../../types/editortype";
@@ -343,7 +343,7 @@ export function PropertyTabs(props: {
 
 export class PropertyGrid<P extends PropertyGridOptions = PropertyGridOptions> extends Widget<P> {
 
-    static override typeInfo = this.registerClass("Serenity.PropertyGrid");
+    static override typeInfo = this.registerClass(nsSerenity);
 
     declare private fieldElements: PropertyFieldElement[];
 
