@@ -8,7 +8,7 @@ public partial class ServerTypingsGenerator : TypingsGeneratorBase
             .Where(x => x.Value?.Count == 1)
             .ToLookup(x => x.Key.Replace(".", "", StringComparison.Ordinal));
 
-        foreach (var item in keyToNamespace)
+        foreach (var item in keyToNamespace.OrderBy(x => x.Key, StringComparer.Ordinal))
         {
             if (item.Count() > 1)
                 continue;

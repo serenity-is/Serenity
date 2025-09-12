@@ -1,9 +1,10 @@
 import { EntityGrid, Lookup, tryFirst } from "@serenity-is/corelib";
 import { RoleRow, UserColumns, UserRow, UserService } from "../../ServerTypes/Administration";
+import { nsAdministration } from "../../ServerTypes/Namespaces";
 import { UserDialog } from "./UserDialog";
 
 export class UserGrid extends EntityGrid<UserRow, any> {
-    static override typeInfo = this.registerClass("Serene.Administration.UserGrid");
+    static override typeInfo = this.registerClass(nsAdministration);
 
     protected getColumnsKey() { return UserColumns.columnsKey; }
     protected getDialogType() { return UserDialog; }
