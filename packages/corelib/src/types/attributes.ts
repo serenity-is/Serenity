@@ -12,12 +12,6 @@ export class EnumKeyAttribute {
     }
 }
 
-@attr('DisplayName')
-export class DisplayNameAttribute {
-    constructor(public displayName: string) {
-    }
-}
-
 @attr('Category')
 export class CategoryAttribute {
     constructor(public category: string) {

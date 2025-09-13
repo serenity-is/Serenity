@@ -3,7 +3,7 @@ import { Authorization, Fluent, faIcon, getActiveRequests, getInstanceType, getT
 import { HandleRouteEvent, Router, replaceAll, safeCast } from "../../compat";
 import { IEditDialog } from "../../interfaces";
 import { RemoteViewOptions } from "../../slick";
-import { DialogTypeAttribute, DisplayNameAttribute, EntityTypeAttribute, ItemNameAttribute, ServiceAttribute } from "../../types/attributes";
+import { DialogTypeAttribute, EntityTypeAttribute, ItemNameAttribute, ServiceAttribute } from "../../types/attributes";
 import { DialogType } from "../../types/dialogtype";
 import { DialogTypeRegistry } from "../../types/dialogtyperegistry";
 import { EditorUtils } from "../editors/editorutils";
@@ -134,18 +134,7 @@ export class EntityGrid<TItem, P = {}> extends DataGrid<TItem, P> {
         if (this._displayName != null)
             return this._displayName;
 
-        var attr = this.getCustomAttribute(DisplayNameAttribute);
-        if (attr) {
-            this._displayName = attr.displayName;
-            this._displayName = localText(this._displayName, this._displayName);
-        }
-        else {
-            this._displayName = tryGetText(this.getLocalTextDbPrefix() + 'EntityPlural');
-            if (this._displayName == null)
-                this._displayName = this.getEntityType();
-        }
-
-        return this._displayName;
+        return this._displayName = tryGetText(this.getLocalTextDbPrefix() + 'EntityPlural') ?? this.getEntityType();
     }
 
     declare private _itemName: string;

@@ -1,6 +1,5 @@
 ﻿import { getInstanceType, isInstanceOfType } from "../../base";
 import { MemberType, TypeMember, getMembers } from "../../compat";
-import { DisplayNameAttribute } from "../../types/attributes";
 import { OptionAttribute } from "../../types/decorators";
 import { ReflectionUtils } from "../../types/reflectionutils";
 
@@ -17,27 +16,14 @@ export namespace ReflectionOptionsSetter {
         }
 
         var props = getMembers(type, MemberType.property);
-        var propList = props.filter(function (x: any) {
-            return !!x.setter && ((x.attr || []).filter(function (a: any) {
-                return isInstanceOfType(a, OptionAttribute);
-            }).length > 0 || (x.attr || []).filter(function (a: any) {
-                return isInstanceOfType(a, DisplayNameAttribute);
-            }).length > 0);
-        });
-
+        var propList = props.filter(x => !!x.setter && x?.attr?.some(a =>isInstanceOfType(a, OptionAttribute));
         var propByName: Record<string, TypeMember> = {};
         for (var k of propList) {
             propByName[ReflectionUtils.makeCamelCase(k.name)] = k;
         }
 
         var fields = getMembers(type, MemberType.field);
-        var fieldList = fields.filter(function (x1: any) {
-            return (x1.attr || []).filter(function (a: any) {
-                return isInstanceOfType(a, OptionAttribute);
-            }).length > 0 || (x1.attr || []).filter(function (a: any) {
-                return isInstanceOfType(a, DisplayNameAttribute);
-            }).length > 0;
-        });
+        var fieldList = fields.filter(x => x.attr?.some(a => isInstanceOfType(a, OptionAttribute)));
 
         var fieldByName: Record<string, TypeMember> = {};
         for (var $t2 = 0; $t2 < fieldList.length; $t2++) {
