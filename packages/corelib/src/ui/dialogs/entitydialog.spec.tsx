@@ -1,5 +1,4 @@
-import { PropertyItemsData, addCustomAttribute } from "../../base";
-import { Decorators } from "../../types/decorators";
+import { PropertyItemsData } from "../../base";
 import { EntityDialog } from "./entitydialog";
 
 function getIdProperty(dialog: EntityDialog<any, any>): string {
@@ -140,8 +139,8 @@ describe('EntityDialog.getLocalTextDbPrefix', () => {
     });
 
     it('returns class identifier based on registration name', () => {
-        @Decorators.registerClass('MyProject.MyModule.Some.DefaultDialog')
         class DefaultDialog extends EntityDialog<any, any> {
+            static typeInfo = this.registerClass('MyProject.MyModule.Some.DefaultDialog');
             getPropertyItemsData() { return mockPropertyItemsData() };
         }
 
@@ -223,8 +222,8 @@ describe('EntityDialog.getLocalTextPrefix', () => {
     });
 
     it('returns class identifier based on registration name', () => {
-        @Decorators.registerClass('MyProject.MyModule.Some.DefaultDialog')
         class DefaultDialog extends EntityDialog<any, any> {
+            static typeInfo = this.registerClass('MyProject.MyModule.Some.DefaultDialog');
             getPropertyItemsData() { return mockPropertyItemsData() };
         }
 

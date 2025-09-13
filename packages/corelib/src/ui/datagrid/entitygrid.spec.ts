@@ -1,6 +1,4 @@
-import { addCustomAttribute } from "../../base";
 import { mockFetch } from "../../test/mocks";
-import { Decorators } from "../../types/decorators";
 import { EntityGrid } from "./entitygrid";
 
 beforeEach(() => {
@@ -130,8 +128,8 @@ describe('EntityGrid.getLocalTextDbPrefix', () => {
     });
 
     it('returns class identifier based on registration name', () => {
-        @Decorators.registerClass('MyProject.MyModule.Some.DefaultGrid')
         class DefaultGrid extends EntityGrid<any, any> {
+            static typeInfo = this.registerClass('MyProject.MyModule.Some.DefaultGrid');
         }
 
         var grid = new DefaultGrid({});
@@ -206,8 +204,8 @@ describe('EntityGrid.getLocalTextPrefix', () => {
     });
 
     it('returns class identifier based on registration name', () => {
-        @Decorators.registerClass('MyProject.MyModule.Some.DefaultGrid')
         class DefaultGrid extends EntityGrid<any, any> {
+            static typeInfo = this.registerClass('MyProject.MyModule.Some.DefaultGrid');
         }
 
         var grid = new DefaultGrid({});

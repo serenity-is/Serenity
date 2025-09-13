@@ -1,4 +1,4 @@
-import { Decorators, Fluent, PropertyGrid, TabsExtensions, Toolbar, Validator, WidgetProps, getForm, gridPageInit, localText, notifySuccess, reloadLookup, toId, validateOptions } from "@serenity-is/corelib";
+import { Fluent, PropertyGrid, TabsExtensions, Toolbar, Validator, WidgetProps, getForm, gridPageInit, localText, notifySuccess, reloadLookup, toId, validateOptions } from "@serenity-is/corelib";
 import { CustomerForm, CustomerRow, CustomerService, OrderDialog, OrderGrid, OrderRow } from "@serenity-is/demo.northwind";
 import { nsDemoBasicSamples } from "../../ServerTypes/Namespaces";
 

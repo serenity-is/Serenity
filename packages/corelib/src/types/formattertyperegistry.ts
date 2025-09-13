@@ -15,7 +15,7 @@ export namespace FormatterTypeRegistry {
 
 Make sure the formatter type has a line like the following (with the correct full name):
 static typeInfo = formatterTypeInfo("MyProject.MyModule.MyEditor"); static { registerType(this); }
-or a decorator like @Decorators.registerFormatter('MyProject.MyModule.MyFormatter') with the full name         
+or a legacy decorator like @Decorators.registerFormatter('MyProject.MyModule.MyFormatter') with the full name         
 and "side-effect-import" this formatter class from the current 
 "page.ts/grid.ts/dialog.ts file (import "./path/to/MyFormatter.ts").
 

@@ -1,4 +1,4 @@
-import { Decorators, gridPageInit, notifyInfo, notifySuccess, SaveInitiator, SaveResponse } from "@serenity-is/corelib";
+import { gridPageInit, notifyInfo, notifySuccess, SaveInitiator, SaveResponse } from "@serenity-is/corelib";
 import { CategoryDialog, CategoryGrid, CategoryService } from "@serenity-is/demo.northwind";
 import { nsDemoBasicSamples } from "../../ServerTypes/Namespaces";
 
