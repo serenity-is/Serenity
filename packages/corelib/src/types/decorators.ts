@@ -1,6 +1,6 @@
 import { EditorAttribute, ISlickFormatter, addCustomAttribute, registerClass as regClass, registerEditor as regEditor, registerEnum as regEnum, registerFormatter as regFormatter, registerInterface as regIntf, registerType as regType, typeInfoProperty } from "../base";
 import { MemberType, addTypeMember } from "../compat";
-import { CloseButtonAttribute, DialogTypeAttribute, ElementAttribute, EnumKeyAttribute, FilterableAttribute, ItemNameAttribute, MaximizableAttribute, OptionAttribute, OptionsTypeAttribute, PanelAttribute, ResizableAttribute, ResponsiveAttribute, ServiceAttribute, StaticPanelAttribute } from "./attributes";
+import { CloseButtonAttribute, ElementAttribute, EnumKeyAttribute, FilterableAttribute, MaximizableAttribute, OptionAttribute, PanelAttribute, ResizableAttribute, StaticPanelAttribute } from "./attributes";
 
 export namespace Decorators {
 
@@ -89,12 +89,6 @@ export namespace Decorators {
         }
     }
 
-    export function dialogType(value: any) {
-        return function (target: Function, _context?: any) {
-            addCustomAttribute(target, new DialogTypeAttribute(value));
-        }
-    }
-
     export function editor() {
         return function (target: Function, _context?: any) {
             var attr = new EditorAttribute();
@@ -114,21 +108,9 @@ export namespace Decorators {
         }
     }
 
-    export function itemName(value: string) {
-        return function (target: Function, _context?: any) {
-            addCustomAttribute(target, new ItemNameAttribute(value));
-        }
-    }
-
     export function maximizable(value = true) {
         return function (target: Function, _context?: any) {
             addCustomAttribute(target, new MaximizableAttribute(value));
-        }
-    }
-
-    export function optionsType(value: Function, _context?: any) {
-        return function (target: Function, _context?: any) {
-            addCustomAttribute(target, new OptionsTypeAttribute(value));
         }
     }
 
@@ -144,15 +126,12 @@ export namespace Decorators {
         }
     }
 
+    /**
+     * Deprecated as all dialogs are responsive.
+     * @deprecated This is no longer used as all dialogs are responsive.
+     */
     export function responsive(value = true) {
         return function (target: Function, _context?: any) {
-            addCustomAttribute(target, new ResponsiveAttribute(value));
-        }
-    }
-
-    export function service(value: string) {
-        return function (target: Function, _context?: any) {
-            addCustomAttribute(target, new ServiceAttribute(value));
         }
     }
 

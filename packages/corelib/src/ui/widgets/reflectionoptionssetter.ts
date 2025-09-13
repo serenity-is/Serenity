@@ -16,7 +16,7 @@ export namespace ReflectionOptionsSetter {
         }
 
         var props = getMembers(type, MemberType.property);
-        var propList = props.filter(x => !!x.setter && x?.attr?.some(a =>isInstanceOfType(a, OptionAttribute));
+        var propList = props.filter(x => !!x.setter && x?.attr?.some(a => isInstanceOfType(a, OptionAttribute)));
         var propByName: Record<string, TypeMember> = {};
         for (var k of propList) {
             propByName[ReflectionUtils.makeCamelCase(k.name)] = k;

@@ -2,7 +2,7 @@ import { Authorization, DeleteRequest, DeleteResponse, Fluent, LanguageList, Ret
 import { Exception, ScriptData, ValidationHelper, extend, getFormData, getFormDataAsync, replaceAll, validatorAbortHandler } from "../../compat";
 import { IEditDialog, IReadOnly } from "../../interfaces";
 import { DataChangeInfo } from "../../types";
-import { EntityTypeAttribute, FormKeyAttribute, IdPropertyAttribute, IsActivePropertyAttribute, ItemNameAttribute, LocalTextPrefixAttribute, NamePropertyAttribute, PanelAttribute, ServiceAttribute } from "../../types/attributes";
+import { PanelAttribute } from "../../types/attributes";
 import { IRowDefinition } from "../datagrid/irowdefinition";
 import { EditorUtils } from "../editors/editorutils";
 import { SubDialogHelper } from "../helpers/subdialoghelper";
@@ -183,10 +183,6 @@ export class EntityDialog<TItem, P = {}> extends BaseDialog<P> implements IEditD
         if (this._entityType != null)
             return this._entityType;
 
-        const attr = this.getCustomAttribute(EntityTypeAttribute);
-        if (attr)
-            return (this._entityType = attr.value);
-
         let name = getTypeFullName(getInstanceType(this));
         const px = name.indexOf('.');
         if (px >= 0)
@@ -207,8 +203,7 @@ export class EntityDialog<TItem, P = {}> extends BaseDialog<P> implements IEditD
         if (this._formKey != null)
             return this._formKey;
 
-        const attr = this.getCustomAttribute(FormKeyAttribute);
-        return this._formKey = attr ? attr.value : this.getEntityType();
+        return this._formKey = this.getEntityType();
     }
 
     declare private _localTextDbPrefix: string;
@@ -229,8 +224,7 @@ export class EntityDialog<TItem, P = {}> extends BaseDialog<P> implements IEditD
         const rowDefinition = this.getRowDefinition();
         if (rowDefinition)
             return rowDefinition.localTextPrefix;
-        const attr = this.getCustomAttribute(LocalTextPrefixAttribute);
-        return attr ? attr.value : this.getEntityType();
+        return this.getEntityType();
     }
 
     declare private _entitySingular: string;
@@ -239,9 +233,7 @@ export class EntityDialog<TItem, P = {}> extends BaseDialog<P> implements IEditD
         if (this._entitySingular != null)
             return this._entitySingular;
 
-        const attr = this.getCustomAttribute(ItemNameAttribute);
-        return (this._entitySingular = attr ? localText(attr.value, attr.value) :
-            tryGetText(this.getLocalTextDbPrefix() + 'EntitySingular') ?? this.getEntityType());
+        return this._entitySingular = tryGetText(this.getLocalTextDbPrefix() + 'EntitySingular') ?? this.getEntityType();
     }
 
     declare private _nameProperty: string;
@@ -254,8 +246,7 @@ export class EntityDialog<TItem, P = {}> extends BaseDialog<P> implements IEditD
         if (rowDefinition)
             return this._nameProperty = rowDefinition.nameProperty ?? '';
 
-        const attr = this.getCustomAttribute(NamePropertyAttribute);
-        return this._nameProperty = attr ? (attr.value ?? "") : 'Name';
+        return this._nameProperty = 'Name';
     }
 
     declare private _idProperty: string;
@@ -268,8 +259,7 @@ export class EntityDialog<TItem, P = {}> extends BaseDialog<P> implements IEditD
         if (rowDefinition)
             return this._idProperty = rowDefinition.idProperty ?? '';
 
-        const attr = this.getCustomAttribute(IdPropertyAttribute);
-        return this._idProperty = attr ? (attr.value ?? '') : 'ID';
+        return this._idProperty = 'ID';
     }
 
     declare private _isActiveProperty: string;
@@ -279,7 +269,7 @@ export class EntityDialog<TItem, P = {}> extends BaseDialog<P> implements IEditD
             return this._isActiveProperty;
 
         const rowDefinition = this.getRowDefinition();
-        return this._isActiveProperty = rowDefinition ? (rowDefinition.isActiveProperty ?? '') : this.getCustomAttribute(IsActivePropertyAttribute)?.value ?? '';
+        return this._isActiveProperty = rowDefinition ? (rowDefinition.isActiveProperty ?? '') : '';
     }
 
     protected getIsDeletedProperty(): string {
@@ -292,8 +282,7 @@ export class EntityDialog<TItem, P = {}> extends BaseDialog<P> implements IEditD
         if (this._service != null)
             return this._service;
 
-        const attr = this.getCustomAttribute(ServiceAttribute);
-        return this._service = attr ? attr.value : replaceAll(this.getEntityType(), '.', '/');
+        return this._service = replaceAll(this.getEntityType(), '.', '/');
     }
 
     load(entityOrId: any, done: () => void, fail?: (ex: Exception) => void): void {

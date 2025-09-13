@@ -1,6 +1,5 @@
 import { addCustomAttribute } from "../../base";
 import { mockFetch } from "../../test/mocks";
-import { IdPropertyAttribute, IsActivePropertyAttribute, LocalTextPrefixAttribute } from "../../types/attributes";
 import { Decorators } from "../../types/decorators";
 import { EntityGrid } from "./entitygrid";
 
@@ -30,15 +29,6 @@ describe('EntityGrid.getIdProperty', () => {
 
         var grid = new SubClassGrid({});
         expect(getIdProperty(grid)).toBe("subClassId");
-    });
-
-    it('can be overridden in subclass', () => {
-        class AttrGrid extends EntityGrid<any, any> {
-        }
-        addCustomAttribute(AttrGrid, new IdPropertyAttribute("attrId"));
-
-        var grid = new AttrGrid({});
-        expect(getIdProperty(grid)).toBe("attrId");
     });
 
     it('returns value from getRowDefition()', () => {
@@ -88,15 +78,6 @@ describe('EntityGrid.getIsActiveProperty', () => {
 
         var grid = new SubClassGrid({});
         expect(getIsActiveProperty(grid)).toBe("subClassIsActive");
-    });
-
-    it('can be set via attribute', () => {
-        class AttrGrid extends EntityGrid<any, any> {
-        }
-        addCustomAttribute(AttrGrid, new IsActivePropertyAttribute("attrIsActive"));
-
-        var grid = new AttrGrid({});
-        expect(getIsActiveProperty(grid)).toBe("attrIsActive");
     });
 
     it('returns value from getRowDefinition()', () => {
@@ -175,15 +156,6 @@ describe('EntityGrid.getLocalTextDbPrefix', () => {
         expect(getLocalTextDbPrefix(grid)).toBe("Db.MySubClassPrefix.");
     });
 
-    it('can be set via attribute', () => {
-        class AttrGrid extends EntityGrid<any, any> {
-        }
-        addCustomAttribute(AttrGrid, new LocalTextPrefixAttribute("attrPrefix"));
-
-        var grid = new AttrGrid({});
-        expect(getLocalTextDbPrefix(grid)).toBe("Db.attrPrefix.");
-    });
-
     it('returns value from getRowDefinition()', () => {
         class TestRow {
             static readonly localTextPrefix = "prefixForTestRow";
@@ -249,15 +221,6 @@ describe('EntityGrid.getLocalTextPrefix', () => {
 
         var grid = new SubClassGrid({});
         expect(getLocalTextPrefix(grid)).toBe("subClassPrefix");
-    });
-
-    it('can be set via attribute', () => {
-        class AttrGrid extends EntityGrid<any, any> {
-        }
-        addCustomAttribute(AttrGrid, new LocalTextPrefixAttribute("attrPrefix"));
-
-        var grid = new AttrGrid({});
-        expect(getLocalTextPrefix(grid)).toBe("attrPrefix");
     });
 
     it('returns value from getRowDefinition()', () => {

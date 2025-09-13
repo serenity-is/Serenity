@@ -1,5 +1,4 @@
-import { PropertyItemsData, addCustomAttribute, classTypeInfo } from "../../base";
-import { IdPropertyAttribute, IsActivePropertyAttribute, LocalTextPrefixAttribute } from "../../types/attributes";
+import { PropertyItemsData, addCustomAttribute } from "../../base";
 import { Decorators } from "../../types/decorators";
 import { EntityDialog } from "./entitydialog";
 
@@ -32,16 +31,6 @@ describe('EntityDialog.getIdProperty', () => {
 
         var Dialog = new SubClassDialog({});
         expect(getIdProperty(Dialog)).toBe("subClassId");
-    });
-
-    it('can be set via attribute', () => {
-        class AttrDialog extends EntityDialog<any, any> {
-            getPropertyItemsData() { return mockPropertyItemsData() };
-        }
-        addCustomAttribute(AttrDialog, new IdPropertyAttribute("attrId"));
-
-        var Dialog = new AttrDialog({});
-        expect(getIdProperty(Dialog)).toBe("attrId");
     });
 
     it('returns value from getRowDefition()', () => {
@@ -95,16 +84,6 @@ describe('EntityDialog.getIsActiveProperty', () => {
 
         var Dialog = new SubClassDialog({});
         expect(getIsActiveProperty(Dialog)).toBe("subClassIsActive");
-    });
-
-    it('can be set via attribute', () => {
-        class AttrDialog extends EntityDialog<any, any> {
-            getPropertyItemsData() { return mockPropertyItemsData() };
-        }
-        addCustomAttribute(AttrDialog, new IsActivePropertyAttribute("attrIsActive"));
-
-        var Dialog = new AttrDialog({});
-        expect(getIsActiveProperty(Dialog)).toBe("attrIsActive");
     });
 
     it('returns value from getRowDefition()', () => {
@@ -190,16 +169,6 @@ describe('EntityDialog.getLocalTextDbPrefix', () => {
         expect(getLocalTextDbPrefix(dialog)).toBe("Db.MySubClassPrefix.");
     });
 
-    it('can be set via attribute', () => {
-        class AttrDialog extends EntityDialog<any, any> {
-            getPropertyItemsData() { return mockPropertyItemsData() };
-        }
-        addCustomAttribute(AttrDialog, new LocalTextPrefixAttribute("attrPrefix"));
-
-        var dialog = new AttrDialog({});
-        expect(getLocalTextDbPrefix(dialog)).toBe("Db.attrPrefix.");
-    });
-
     it('returns value from getRowDefinition()', () => {
         class TestRow {
             static readonly localTextPrefix = "prefixForTestRow";
@@ -271,16 +240,6 @@ describe('EntityDialog.getLocalTextPrefix', () => {
 
         var dialog = new SubClassDialog({});
         expect(getLocalTextPrefix(dialog)).toBe("subClassPrefix");
-    });
-
-    it('can be set via attribute', () => {
-        class AttrDialog extends EntityDialog<any, any> {
-            getPropertyItemsData() { return mockPropertyItemsData() };
-        }
-        addCustomAttribute(AttrDialog, new LocalTextPrefixAttribute("attrPrefix"));
-
-        var dialog = new AttrDialog({});
-        expect(getLocalTextPrefix(dialog)).toBe("attrPrefix");
     });
 
     it('returns value from getRowDefinition()', () => {

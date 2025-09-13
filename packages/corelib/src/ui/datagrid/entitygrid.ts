@@ -3,7 +3,6 @@ import { Authorization, Fluent, faIcon, getActiveRequests, getInstanceType, getT
 import { HandleRouteEvent, Router, replaceAll, safeCast } from "../../compat";
 import { IEditDialog } from "../../interfaces";
 import { RemoteViewOptions } from "../../slick";
-import { DialogTypeAttribute, EntityTypeAttribute, ItemNameAttribute, ServiceAttribute } from "../../types/attributes";
 import { DialogType } from "../../types/dialogtype";
 import { DialogTypeRegistry } from "../../types/dialogtyperegistry";
 import { EditorUtils } from "../editors/editorutils";
@@ -104,11 +103,6 @@ export class EntityGrid<TItem, P = {}> extends DataGrid<TItem, P> {
         if (this._entityType != null)
             return this._entityType;
 
-        var attr = this.getCustomAttribute(EntityTypeAttribute);
-        if (attr) {
-            return (this._entityType = attr.value);
-        }
-
         var name = getTypeFullName(getInstanceType(this));
 
         var px = name.indexOf('.');
@@ -143,16 +137,9 @@ export class EntityGrid<TItem, P = {}> extends DataGrid<TItem, P> {
         if (this._itemName != null)
             return this._itemName;
 
-        var attr = this.getCustomAttribute(ItemNameAttribute);
-        if (attr) {
-            this._itemName = attr.value;
-            this._itemName = localText(this._itemName, this._itemName);
-        }
-        else {
-            this._itemName = tryGetText(this.getLocalTextDbPrefix() + 'EntitySingular');
-            if (this._itemName == null)
-                this._itemName = this.getEntityType();
-        }
+        this._itemName = tryGetText(this.getLocalTextDbPrefix() + 'EntitySingular');
+        if (this._itemName == null)
+            this._itemName = this.getEntityType();
 
         return this._itemName;
     }
@@ -244,13 +231,7 @@ export class EntityGrid<TItem, P = {}> extends DataGrid<TItem, P> {
         if (this._service != null)
             return this._service;
 
-        var attr = this.getCustomAttribute(ServiceAttribute);
-        if (attr)
-            this._service = attr.value;
-        else
-            this._service = replaceAll(this.getEntityType(), '.', '/');
-
-        return this._service;
+        return this._service = replaceAll(this.getEntityType(), '.', '/');
     }
 
     protected getServiceMethod() {
@@ -372,21 +353,15 @@ export class EntityGrid<TItem, P = {}> extends DataGrid<TItem, P> {
         if (this._dialogType != null)
             return this._dialogType;
 
-        var attr = this.getCustomAttribute(DialogTypeAttribute);
-        if (attr)
-            this._dialogType = attr.value;
-        else {
-            const promise = DialogTypeRegistry.getOrLoad(this.getEntityType());
-            if (isPromiseLike(promise)) {
-                return promise.then(t => {
-                    this._dialogType = t;
-                    return t;
-                });
-            }
-
-            this._dialogType = promise;
+        const promise = DialogTypeRegistry.getOrLoad(this.getEntityType());
+        if (isPromiseLike(promise)) {
+            return promise.then(t => {
+                this._dialogType = t;
+                return t;
+            });
         }
 
+        this._dialogType = promise;
         return this._dialogType;
     }
 }

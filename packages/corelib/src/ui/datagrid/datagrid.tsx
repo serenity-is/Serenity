@@ -3,7 +3,7 @@ import { Authorization, Criteria, Fluent, ListResponse, cssEscape, debounce, get
 import { LayoutTimer, ScriptData, getColumnsData, getColumnsDataAsync, setEquality } from "../../compat";
 import { IReadOnly } from "../../interfaces";
 import { Format, PagerOptions, RemoteView, RemoteViewOptions } from "../../slick";
-import { ColumnsKeyAttribute, FilterableAttribute, IdPropertyAttribute, IsActivePropertyAttribute, LocalTextPrefixAttribute } from "../../types/attributes";
+import { FilterableAttribute } from "../../types/attributes";
 import { DateEditor } from "../editors/dateeditor";
 import { SelectEditor } from "../editors/selecteditor";
 import { FilterDisplayBar } from "../filtering/filterdisplaybar";
@@ -707,7 +707,7 @@ export class DataGrid<TItem, P = {}> extends Widget<P> implements IDataGrid, IRe
     }
 
     protected getColumnsKey(): string {
-        return this.getCustomAttribute(ColumnsKeyAttribute)?.value;
+        return null;
     }
 
     protected getPropertyItems(): PropertyItem[] {
@@ -884,7 +884,7 @@ export class DataGrid<TItem, P = {}> extends Widget<P> implements IDataGrid, IRe
         if (rowDefinition)
             return rowDefinition.localTextPrefix;
 
-        return this.getCustomAttribute(LocalTextPrefixAttribute)?.value;
+        return void 0;
     }
 
     declare private _idProperty: string;
@@ -896,10 +896,6 @@ export class DataGrid<TItem, P = {}> extends Widget<P> implements IDataGrid, IRe
         var rowDefinition = this.getRowDefinition();
         if (rowDefinition)
             return this._idProperty = rowDefinition.idProperty ?? '';
-
-        var attr = this.getCustomAttribute(IdPropertyAttribute);
-        if (attr)
-            return this._idProperty = attr.value ?? '';
 
         return this._idProperty = 'ID';
     }
@@ -917,10 +913,6 @@ export class DataGrid<TItem, P = {}> extends Widget<P> implements IDataGrid, IRe
         var rowDefinition = this.getRowDefinition();
         if (rowDefinition)
             return this._isActiveProperty = rowDefinition.isActiveProperty ?? '';
-
-        var attr = this.getCustomAttribute(IsActivePropertyAttribute);
-        if (attr)
-            return this._isActiveProperty = attr.value ?? '';
 
         return this._isActiveProperty = '';
     }

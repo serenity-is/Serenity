@@ -1,6 +1,5 @@
 ﻿import { Column } from "@serenity-is/sleekgrid";
 import { addCustomAttribute } from "../../base";
-import { IdPropertyAttribute, IsActivePropertyAttribute, LocalTextPrefixAttribute } from "../../types/attributes";
 import { DataGrid, omitAllGridPersistenceFlags } from "./datagrid";
 
 function getIdProperty(grid: DataGrid<any, any>): string {
@@ -23,15 +22,6 @@ describe('DataGrid.getIdProperty', () => {
 
         var grid = new SubClassGrid({});
         expect(getIdProperty(grid)).toBe("subClassId");
-    });
-
-    it('can be set via attribute', () => {
-        class AttrGrid extends DataGrid<any, any> {
-        }
-        addCustomAttribute(AttrGrid, new IdPropertyAttribute("attrId"));
-
-        var grid = new AttrGrid({});
-        expect(getIdProperty(grid)).toBe("attrId");
     });
 
     it('returns value from getRowDefition()', () => {
@@ -81,15 +71,6 @@ describe('DataGrid.getIsActiveProperty', () => {
 
         var grid = new SubClassGrid({});
         expect(getIsActiveProperty(grid)).toBe("subClassIsActive");
-    });
-
-    it('can be set via attribute', () => {
-        class AttrGrid extends DataGrid<any, any> {
-        }
-        addCustomAttribute(AttrGrid, new IsActivePropertyAttribute("attrIsActive"));
-
-        var grid = new AttrGrid({});
-        expect(getIsActiveProperty(grid)).toBe("attrIsActive");
     });
 
     it('returns value from getRowDefinition()', () => {
@@ -150,15 +131,6 @@ describe('DataGrid.getLocalTextDbPrefix', () => {
         expect(getLocalTextDbPrefix(grid)).toBe("Db.MySubClassPrefix.");
     });
 
-    it('can be set via attribute', () => {
-        class AttrGrid extends DataGrid<any, any> {
-        }
-        addCustomAttribute(AttrGrid, new LocalTextPrefixAttribute("attrPrefix"));
-
-        var grid = new AttrGrid({});
-        expect(getLocalTextDbPrefix(grid)).toBe("Db.attrPrefix.");
-    });
-
     it('returns value from getRowDefinition()', () => {
         class TestRow {
             static readonly localTextPrefix = "prefixForTestRow";
@@ -206,15 +178,6 @@ describe('DataGrid.getLocalTextPrefix', () => {
 
         var grid = new SubClassGrid({});
         expect(getLocalTextPrefix(grid)).toBe("subClassPrefix");
-    });
-
-    it('can be set via attribute', () => {
-        class AttrGrid extends DataGrid<any, any> {
-        }
-        addCustomAttribute(AttrGrid, new LocalTextPrefixAttribute("attrPrefix"));
-
-        var grid = new AttrGrid({});
-        expect(getLocalTextPrefix(grid)).toBe("attrPrefix");
     });
 
     it('returns value from getRowDefinition()', () => {

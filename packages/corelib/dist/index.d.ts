@@ -3356,156 +3356,80 @@ export interface IValidateRequired {
 	get_required(): boolean;
 	set_required(value: boolean): void;
 }
+/**
+ * Indicates the enum key of an enum type (by default the name of the enum type is used as key)
+ */
 export declare class EnumKeyAttribute {
 	value: string;
+	static typeInfo: ClassTypeInfo<"Serenity.">;
 	constructor(value: string);
 }
-export declare class DisplayNameAttribute {
-	displayName: string;
-	constructor(displayName: string);
-}
-export declare class CategoryAttribute {
-	category: string;
-	constructor(category: string);
-}
-export declare class ColumnsKeyAttribute {
-	value: string;
-	constructor(value: string);
-}
+/**
+ * Indicates if a dialog should have a close button in its title bar (default true)
+ */
 export declare class CloseButtonAttribute {
 	value: boolean;
+	static typeInfo: ClassTypeInfo<"Serenity.">;
 	constructor(value?: boolean);
 }
-export declare class CssClassAttribute {
-	cssClass: string;
-	constructor(cssClass: string);
-}
-export declare class DefaultValueAttribute {
-	value: any;
-	constructor(value: any);
-}
-export declare class DialogTypeAttribute {
-	value: any;
-	constructor(value: any);
-}
-export declare class EditorOptionAttribute {
-	key: string;
-	value: any;
-	constructor(key: string, value: any);
-}
-export declare class EditorTypeAttributeBase {
-	editorType: string;
-	constructor(editorType: string);
-	setParams(editorParams: any): void;
-}
-export declare class EditorTypeAttribute extends EditorTypeAttributeBase {
-	constructor(editorType: string);
-}
+/**
+ * Indicates the element type of a widget like "div", "span" etc.
+ */
 export declare class ElementAttribute {
 	value: string;
+	static typeInfo: ClassTypeInfo<"Serenity.">;
 	constructor(value: string);
 }
-export declare class EntityTypeAttribute {
-	value: string;
-	constructor(value: string);
-}
+/**
+ * Indicates if a grid should have an advanced filter editor
+ */
 export declare class FilterableAttribute {
 	value: boolean;
+	static typeInfo: ClassTypeInfo<"Serenity.">;
 	constructor(value?: boolean);
 }
-export declare class FlexifyAttribute {
-	value: boolean;
-	constructor(value?: boolean);
-}
-export declare class FormKeyAttribute {
-	value: string;
-	constructor(value: string);
-}
-export declare class GeneratedCodeAttribute {
-	origin?: string;
-	constructor(origin?: string);
-}
-export declare class HiddenAttribute {
-	constructor();
-}
-export declare class HintAttribute {
-	hint: string;
-	constructor(hint: string);
-}
-export declare class IdPropertyAttribute {
-	value: string;
-	constructor(value: string);
-}
-export declare class InsertableAttribute {
-	value: boolean;
-	constructor(value?: boolean);
-}
-export declare class IsActivePropertyAttribute {
-	value: string;
-	constructor(value: string);
-}
-export declare class ItemNameAttribute {
-	value: string;
-	constructor(value: string);
-}
-export declare class LocalTextPrefixAttribute {
-	value: string;
-	constructor(value: string);
-}
+/**
+ * Indicates that a dialog or panel should be maximizable.
+ * Requires jquery ui dialogs and jquery.dialogextend.js.
+ * It does not work with current bootstrap modals.
+ */
 export declare class MaximizableAttribute {
 	value: boolean;
+	static typeInfo: ClassTypeInfo<"Serenity.">;
 	constructor(value?: boolean);
 }
-export declare class MaxLengthAttribute {
-	maxLength: number;
-	constructor(maxLength: number);
-}
-export declare class NamePropertyAttribute {
-	value: string;
-	constructor(value: string);
-}
-export declare class OneWayAttribute {
-}
+/**
+ * Indicates that the property is an option. This is no longer used as JSX
+ * does not support it, but it is kept for backward compatibility.
+ */
 export declare class OptionAttribute {
+	static typeInfo: ClassTypeInfo<"Serenity.">;
 }
-export declare class OptionsTypeAttribute {
-	value: Function;
-	constructor(value: Function);
-}
+/**
+ * Indicates if a dialog should be opened as a panel
+ */
 export declare class PanelAttribute {
 	value: boolean;
+	static typeInfo: ClassTypeInfo<"Serenity.">;
 	constructor(value?: boolean);
 }
-export declare class PlaceholderAttribute {
-	value: string;
-	constructor(value: string);
-}
-export declare class ReadOnlyAttribute {
-	value: boolean;
-	constructor(value?: boolean);
-}
-export declare class RequiredAttribute {
-	isRequired: boolean;
-	constructor(isRequired?: boolean);
-}
+/**
+ * Indicates if a dialog should be resizable, only for jquery ui dialogs.
+ */
 export declare class ResizableAttribute {
 	value: boolean;
+	static typeInfo: ClassTypeInfo<"Serenity.">;
 	constructor(value?: boolean);
 }
-export declare class ResponsiveAttribute {
-	value: boolean;
-	constructor(value?: boolean);
-}
-export declare class ServiceAttribute {
-	value: string;
-	constructor(value: string);
-}
+/**
+ * Indicates if a dialog should be a static panel, which is not a dialog at all,
+ * but a simple div element embedded in the page.
+ * It does not have a title bar, close button or modal behavior.
+ * It is just a way to show a form inside a page, without any dialog stuff.
+ */
 export declare class StaticPanelAttribute {
 	value: boolean;
-	constructor(value?: boolean);
-}
-export declare class UpdatableAttribute {
-	value: boolean;
+	static typeInfo: ClassTypeInfo<"Serenity.">;
 	constructor(value?: boolean);
 }
 export declare enum CaptureOperationType {
@@ -3532,17 +3456,17 @@ export declare namespace Decorators {
 	function enumKey(value: string): (target: Function, _context?: any) => void;
 	function option(): (target: Object, propertyKey: string) => void;
 	function closeButton(value?: boolean): (target: Function, _context?: any) => void;
-	function dialogType(value: any): (target: Function, _context?: any) => void;
 	function editor(): (target: Function, _context?: any) => void;
 	function element(value: string): (target: Function, _context?: any) => void;
 	function filterable(value?: boolean): (target: Function, _context?: any) => void;
-	function itemName(value: string): (target: Function, _context?: any) => void;
 	function maximizable(value?: boolean): (target: Function, _context?: any) => void;
-	function optionsType(value: Function, _context?: any): (target: Function, _context?: any) => void;
 	function panel(value?: boolean): (target: Function, _context?: any) => void;
 	function resizable(value?: boolean): (target: Function, _context?: any) => void;
+	/**
+	 * Deprecated as all dialogs are responsive.
+	 * @deprecated This is no longer used as all dialogs are responsive.
+	 */
 	function responsive(value?: boolean): (target: Function, _context?: any) => void;
-	function service(value: string): (target: Function, _context?: any) => void;
 	function staticPanel(value?: boolean): (target: Function, _context?: any) => void;
 }
 export type DialogType = ({

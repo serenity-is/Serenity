@@ -1,6 +1,5 @@
 ﻿import { PropertyItem, getInstanceType, getTypeFullName, nsSerenity } from "../../base";
 import { getForm } from "../../compat";
-import { FormKeyAttribute } from "../../types/attributes";
 import { BasePanel } from "./basepanel";
 import { PropertyGrid, PropertyGridMode, PropertyGridOptions } from "./propertygrid";
 import { WidgetProps } from "./widget";
@@ -45,10 +44,6 @@ export class PropertyPanel<TItem, P> extends BasePanel<P> {
     }
 
     protected getFormKey(): string {
-        var attr = this.getCustomAttribute(FormKeyAttribute);
-        if (attr) {
-            return attr.value;
-        }
         var name = getTypeFullName(getInstanceType(this));
         var px = name.indexOf('.');
         if (px >= 0) {

@@ -1,6 +1,6 @@
 ﻿import { PropertyItem, PropertyItemsData, cancelDialogButton, getInstanceType, getTypeFullName, nsSerenity, okDialogButton } from "../../base";
 import { ScriptData, getFormData, getFormDataAsync } from "../../compat";
-import { FormKeyAttribute, PanelAttribute, StaticPanelAttribute } from "../../types/attributes";
+import { PanelAttribute, StaticPanelAttribute } from "../../types/attributes";
 import { PropertyGrid, PropertyGridOptions } from "../widgets/propertygrid";
 import { WidgetProps } from "../widgets/widget";
 import { BaseDialog } from "./basedialog";
@@ -93,24 +93,18 @@ export class PropertyDialog<TItem, P> extends BaseDialog<P> {
     }
 
     protected getFormKey(): string {
-        var attr = this.getCustomAttribute(FormKeyAttribute);
-        if (attr) {
-            return attr.value;
+        var name = getTypeFullName(getInstanceType(this));
+        var px = name.indexOf('.');
+        if (px >= 0) {
+            name = name.substring(px + 1);
         }
-        else {
-            var name = getTypeFullName(getInstanceType(this));
-            var px = name.indexOf('.');
-            if (px >= 0) {
-                name = name.substring(px + 1);
-            }
-            if (name.endsWith('Dialog')) {
-                name = name.substring(0, name.length - 6);
-            }
-            else if (name.endsWith('Panel')) {
-                name = name.substring(0, name.length - 5);
-            }
-            return name;
+        if (name.endsWith('Dialog')) {
+            name = name.substring(0, name.length - 6);
         }
+        else if (name.endsWith('Panel')) {
+            name = name.substring(0, name.length - 5);
+        }
+        return name;
     }
 
     protected getPropertyGridOptions(): PropertyGridOptions {

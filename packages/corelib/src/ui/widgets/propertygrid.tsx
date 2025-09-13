@@ -1,6 +1,5 @@
 ﻿import { Authorization, Fluent, addClass, appendToNode, faIcon, getCustomAttribute, getType, isBS3, isPromiseLike, localText, nsSerenity, tryGetText, type PropertyItem } from "../../base";
 import { extend } from "../../compat";
-import { OptionsTypeAttribute } from "../../types/attributes";
 import { EditorType } from "../../types/editortype";
 import { EditorTypeRegistry } from "../../types/editortyperegistry";
 import { EditorUtils } from "../editors/editorutils";
@@ -39,27 +38,15 @@ export function PropertyFieldEditor(props: {
     const { fieldElement, item, idPrefix, localTextPrefix } = props;
 
     const placeHolder = determineText(localTextPrefix, item.placeholder, p => p + item.name + '_Placeholder');
-    let editorParams = item.editorParams;
 
     const editorType = (isPromiseLike(item.editorType) || typeof item.editorType === "function")
         ? item.editorType : (EditorTypeRegistry.getOrLoad(item.editorType ?? 'String'));
     let loadingPoint: Comment;
 
     const then = (editorType: EditorType) => {
-        let optionsType = null;
-        const optionsAttr = getCustomAttribute(editorType, OptionsTypeAttribute);
-        if (optionsAttr) {
-            optionsType = optionsAttr.value as any;
-        }
-        if (optionsType != null) {
-            editorParams = extend(new optionsType(), item.editorParams);
-        }
-        else {
-            editorParams = extend(new Object(), item.editorParams);
-        }
 
         const editor = new editorType({
-            ...editorParams,
+            ...item.editorParams,
             id: idPrefix + item.name,
             element: (el: HTMLElement) => {
                 !el.id && (el.id = idPrefix + item.name);

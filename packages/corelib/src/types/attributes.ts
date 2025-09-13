@@ -1,236 +1,94 @@
-import { registerClass } from "../base";
+import { classTypeInfo, nsSerenity, registerType } from "../base";
 
-function attr(name: string) {
-    return function (target: Function, _context?: any) {
-        return registerClass(target, 'Serenity.' + name + 'Attribute');
-    }
-}
-
-@attr('EnumKey')
+/**
+ * Indicates the enum key of an enum type (by default the name of the enum type is used as key)
+ */
 export class EnumKeyAttribute {
+    static typeInfo = classTypeInfo(nsSerenity); static { registerType(this); }
+
     constructor(public value: string) {
     }
 }
 
-@attr('Category')
-export class CategoryAttribute {
-    constructor(public category: string) {
-    }
-}
-
-@attr('ColumnsKey')
-export class ColumnsKeyAttribute {
-    constructor(public value: string) {
-    }
-}
-
-@attr('CloseButton')
+/**
+ * Indicates if a dialog should have a close button in its title bar (default true)
+ */
 export class CloseButtonAttribute {
+    static typeInfo = classTypeInfo(nsSerenity); static { registerType(this); }
+
     constructor(public value = true) {
     }
 }
 
-@attr('CssClass')
-export class CssClassAttribute {
-    constructor(public cssClass: string) {
-    }
-}
-
-@attr('DefaultValue')
-export class DefaultValueAttribute {
-    constructor(public value: any) {
-    }
-}
-
-@attr('DialogType')
-export class DialogTypeAttribute {
-    constructor(public value: any) {
-    }
-}
-
-@attr('EditorOption')
-export class EditorOptionAttribute {
-    constructor(public key: string, public value: any) {
-    }
-}
-
-export class EditorTypeAttributeBase {
-    constructor(public editorType: string) {
-    }
-
-    public setParams(editorParams: any): void {
-    }
-}
-
-registerClass(EditorTypeAttributeBase, 'Serenity.EditorTypeAttributeBase');
-
-@attr('EditorType')
-export class EditorTypeAttribute extends EditorTypeAttributeBase {
-    constructor(editorType: string) {
-        super(editorType);
-    }
-}
-
-@attr('Element')
+/**
+ * Indicates the element type of a widget like "div", "span" etc.
+ */
 export class ElementAttribute {
+    static typeInfo = classTypeInfo(nsSerenity); static { registerType(this); }
+
     constructor(public value: string) {
     }
 }
 
-@attr('EntityType')
-export class EntityTypeAttribute {
-    constructor(public value: string) {
-    }
-}
-
-@attr('Filterable')
+/**
+ * Indicates if a grid should have an advanced filter editor
+ */
 export class FilterableAttribute {
+    static typeInfo = classTypeInfo(nsSerenity); static { registerType(this); }
+
     constructor(public value = true) {
     }
 }
 
-@attr('Flexify')
-export class FlexifyAttribute {
-    constructor(public value = true) {
-    }
-}
-
-@attr('FormKey')
-export class FormKeyAttribute {
-    constructor(public value: string) {
-    }
-}
-
-@attr('GeneratedCode')
-export class GeneratedCodeAttribute {
-    constructor(public origin?: string) {
-    }
-}
-
-@attr('Hidden')
-export class HiddenAttribute {
-    constructor() {
-    }
-}
-
-@attr('Hint')
-export class HintAttribute {
-    constructor(public hint: string) {
-    }
-}
-
-@attr('IdProperty')
-export class IdPropertyAttribute {
-    constructor(public value: string) {
-    }
-}
-
-@attr('Insertable')
-export class InsertableAttribute {
-    constructor(public value = true) {
-    }
-}
-
-@attr('IsActiveProperty')
-export class IsActivePropertyAttribute {
-    constructor(public value: string) {
-    }
-}
-
-@attr('ItemName')
-export class ItemNameAttribute {
-    constructor(public value: string) {
-    }
-}
-
-@attr('LocalTextPrefix')
-export class LocalTextPrefixAttribute {
-    constructor(public value: string) {
-    }
-}
-
-@attr('Maximizable')
+/**
+ * Indicates that a dialog or panel should be maximizable.
+ * Requires jquery ui dialogs and jquery.dialogextend.js.
+ * It does not work with current bootstrap modals.
+ */
 export class MaximizableAttribute {
+    static typeInfo = classTypeInfo(nsSerenity); static { registerType(this); }
+
     constructor(public value = true) {
     }
 }
 
-@attr('MaxLength')
-export class MaxLengthAttribute {
-    constructor(public maxLength: number) {
-    }
-}
-
-@attr('NameProperty')
-export class NamePropertyAttribute {
-    constructor(public value: string) {
-    }
-}
-
-@attr('OneWay')
-export class OneWayAttribute {
-}
-
-@attr('Option')
+/**
+ * Indicates that the property is an option. This is no longer used as JSX
+ * does not support it, but it is kept for backward compatibility.
+ */
 export class OptionAttribute {
+    static typeInfo = classTypeInfo(nsSerenity); static { registerType(this); }
 }
 
-@attr('OptionsType')
-export class OptionsTypeAttribute {
-    constructor(public value: Function) {
-    }
-}
-
-@attr('Panel')
+/**
+ * Indicates if a dialog should be opened as a panel
+ */
 export class PanelAttribute {
+    static typeInfo = classTypeInfo(nsSerenity); static { registerType(this); }
+
     constructor(public value = true) {
     }
 }
 
-@attr('Placeholder')
-export class PlaceholderAttribute {
-    constructor(public value: string) {
-    }
-}
-
-@attr('ReadOnly')
-export class ReadOnlyAttribute {
-    constructor(public value = true) {
-    }
-}
-
-@attr('Required')
-export class RequiredAttribute {
-    constructor(public isRequired = true) {
-    }
-}
-
-@attr('Resizable')
+/**
+ * Indicates if a dialog should be resizable, only for jquery ui dialogs.
+ */
 export class ResizableAttribute {
+    static typeInfo = classTypeInfo(nsSerenity); static { registerType(this); }
+
     constructor(public value = true) {
     }
 }
 
-@attr('Responsive')
-export class ResponsiveAttribute {
-    constructor(public value = true) {
-    }
-}
-
-@attr('Service')
-export class ServiceAttribute {
-    constructor(public value: string) {
-    }
-}
-
-@attr('StaticPanel')
+/**
+ * Indicates if a dialog should be a static panel, which is not a dialog at all,
+ * but a simple div element embedded in the page.
+ * It does not have a title bar, close button or modal behavior.
+ * It is just a way to show a form inside a page, without any dialog stuff.
+ */
 export class StaticPanelAttribute {
-    constructor(public value = true) {
-    }
-}
+    static typeInfo = classTypeInfo(nsSerenity); static { registerType(this); }
 
-@attr('Updatable')
-export class UpdatableAttribute {
     constructor(public value = true) {
     }
 }
