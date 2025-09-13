@@ -126,7 +126,7 @@ export function ensureTypeInfo(type: any): TypeInfo<string> {
     let typeInfo: TypeInfo<string>;
     if (!Object.prototype.hasOwnProperty.call(type, typeInfoProperty) ||
         !(typeInfo = type[typeInfoProperty])) {
-        typeInfo = {} as any;
+        typeInfo = { typeKind: void 0 } as any;
         Object.defineProperty(type, typeInfoProperty, { value: typeInfo, configurable: true, writable: true });
         return typeInfo;
     }
