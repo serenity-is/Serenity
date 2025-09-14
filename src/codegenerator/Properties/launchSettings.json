@@ -1,8 +1,28 @@
 {
   "profiles": {
-    "Serenity.CodeGenerator": {
+    "northwind-transform": {
+      "commandName": "Project",
+      "commandLineArgs": "t",
+      "workingDirectory": "../../common-features/src/demo.northwind"
+    },
+    "serene-generate": {
       "commandName": "Project",
       "commandLineArgs": "g",
+      "workingDirectory": "../../serene/src/Serene.Web"
+    },
+    "serene-transform": {
+      "commandName": "Project",
+      "commandLineArgs": "t",
+      "workingDirectory": "../../serene/src/Serene.Web"
+    },
+    "startsharp-generate": {
+      "commandName": "Project",
+      "commandLineArgs": "g",
+      "workingDirectory": "../../../src/StartSharp.Web"
+    },
+    "startsharp-transform": {
+      "commandName": "Project",
+      "commandLineArgs": "t",
       "workingDirectory": "../../../src/StartSharp.Web"
     }
   }
