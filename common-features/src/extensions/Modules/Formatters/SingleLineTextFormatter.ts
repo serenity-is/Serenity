@@ -3,7 +3,7 @@ import { FormatterContext } from "@serenity-is/sleekgrid";
 import { nsExtensions } from "../ServerTypes/Namespaces";
 
 export class SingleLineTextFormatter implements Formatter {
-    static typeInfo = formatterTypeInfo(nsExtensions); static { registerType(this); }
+    static [Symbol.typeInfo] = formatterTypeInfo(nsExtensions); static { registerType(this); }
 
     format(ctx: FormatterContext) {
         return SingleLineTextFormatter.formatValue(ctx.value);

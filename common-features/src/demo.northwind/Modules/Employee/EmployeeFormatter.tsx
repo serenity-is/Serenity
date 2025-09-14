@@ -4,7 +4,7 @@ import { Gender } from "../ServerTypes/Demo";
 import { nsDemoNorthwind } from "../ServerTypes/Namespaces";
 
 export class EmployeeFormatter implements Formatter {
-    static typeInfo = formatterTypeInfo(nsDemoNorthwind, [IInitializeColumn]); static { registerType(this); }
+    static [Symbol.typeInfo] = formatterTypeInfo(nsDemoNorthwind, [IInitializeColumn]); static { registerType(this); }
 
     constructor(public readonly props: { genderProperty?: string } = {}) {
         this.props ??= {};

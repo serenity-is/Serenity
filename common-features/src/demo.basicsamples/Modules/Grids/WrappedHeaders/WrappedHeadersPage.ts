@@ -6,5 +6,5 @@ import { nsDemoBasicSamples } from "../../ServerTypes/Namespaces";
 export default () => gridPageInit(WrappedHeadersGrid)
 
 export class WrappedHeadersGrid extends OrderGrid {
-    static override typeInfo = this.registerClass(nsDemoBasicSamples);
+    static [Symbol.typeInfo] = this.registerClass(nsDemoBasicSamples);
 }

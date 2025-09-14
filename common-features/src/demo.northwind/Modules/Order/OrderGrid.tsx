@@ -6,7 +6,7 @@ import { OrderDialog } from "./OrderDialog";
 import "./OrderGrid.css";
 
 export class OrderGrid<P = {}> extends EntityGrid<OrderRow, P> {
-    static override typeInfo = this.registerClass(nsDemoNorthwind, [new FilterableAttribute()]);
+    static [Symbol.typeInfo] = this.registerClass(nsDemoNorthwind, [new FilterableAttribute()]);
 
     protected getColumnsKey() { return OrderColumns.columnsKey; }
     protected getDialogType() { return OrderDialog as any; }

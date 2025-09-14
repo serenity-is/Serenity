@@ -4,7 +4,7 @@ import { nsDemoNorthwind } from "../ServerTypes/Namespaces";
 import "./ProductDialog.css";
 
 export class ProductDialog<P = {}> extends EntityDialog<ProductRow, P> {
-    static override typeInfo = this.registerClass(nsDemoNorthwind, [new MaximizableAttribute()] );
+    static [Symbol.typeInfo] = this.registerClass(nsDemoNorthwind, [new MaximizableAttribute()] );
 
     protected getFormKey() { return ProductForm.formKey; }
     protected getRowDefinition() { return ProductRow; }

@@ -3,7 +3,7 @@ import { FormatterContext, FormatterResult } from "@serenity-is/sleekgrid";
 import { nsDemoNorthwind } from "../ServerTypes/Namespaces";
 
 export class ShipperFormatter implements Formatter {
-    static typeInfo = formatterTypeInfo(nsDemoNorthwind); static { registerType(this); }
+    static [Symbol.typeInfo] = formatterTypeInfo(nsDemoNorthwind); static { registerType(this); }
     
     format(ctx: FormatterContext): FormatterResult {
 

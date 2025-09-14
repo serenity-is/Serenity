@@ -2,7 +2,7 @@ import { BaseDialog, Dialog, DialogTexts, WidgetProps, localText } from "@sereni
 import { nsExtensions } from "../ServerTypes/Namespaces";
 
 export class BasicProgressDialog<P = {}> extends BaseDialog<P> {
-    static override typeInfo = this.registerClass(nsExtensions);
+    static [Symbol.typeInfo] = this.registerClass(nsExtensions);
 
     declare private progressBar: HTMLElement;
 

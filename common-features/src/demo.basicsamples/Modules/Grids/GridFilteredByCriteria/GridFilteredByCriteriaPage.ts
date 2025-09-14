@@ -5,7 +5,7 @@ import { nsDemoBasicSamples } from "../../ServerTypes/Namespaces";
 export default () => gridPageInit(GridFilteredByCriteria);
 
 export class GridFilteredByCriteria<P = {}> extends EntityGrid<ProductRow, P> {
-    static override typeInfo = this.registerClass(nsDemoBasicSamples);
+    static [Symbol.typeInfo] = this.registerClass(nsDemoBasicSamples);
 
     protected getColumnsKey() { return ProductColumns.columnsKey; }
     protected getDialogType() { return ProductDialog; }

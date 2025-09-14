@@ -3,7 +3,7 @@ import { formatterTypeInfo, nsSerenity, registerType, stringFormat } from "../..
 import { Formatter } from "../../slick";
 
 export class MinuteFormatter implements Formatter {
-    static typeInfo = formatterTypeInfo(nsSerenity); static { registerType(this); }
+    static [Symbol.typeInfo] = formatterTypeInfo(nsSerenity); static { registerType(this); }
 
     format(ctx: FormatterContext) {
         return MinuteFormatter.format(ctx.value);

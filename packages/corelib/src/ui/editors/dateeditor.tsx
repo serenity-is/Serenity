@@ -12,7 +12,7 @@ export interface DateEditorOptions {
 }
 
 export class DateEditor<P extends DateEditorOptions = DateEditorOptions> extends EditorWidget<P> implements IStringValue, IReadOnly {
-    static override typeInfo = this.registerEditor(nsSerenity, [IStringValue, IReadOnly]);
+    static [Symbol.typeInfo] = this.registerEditor(nsSerenity, [IStringValue, IReadOnly]);
 
     static override createDefaultElement() { return <input type="text" /> as HTMLInputElement; }
     declare readonly domNode: HTMLInputElement;

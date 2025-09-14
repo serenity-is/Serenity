@@ -4,7 +4,7 @@ import { nsDemoNorthwind } from "../ServerTypes/Namespaces";
 import { RegionDialog } from "./RegionDialog";
 
 export class RegionGrid<P = {}> extends EntityGrid<RegionRow, P> {
-    static override typeInfo = this.registerClass(nsDemoNorthwind);
+    static [Symbol.typeInfo] = this.registerClass(nsDemoNorthwind);
 
     protected getColumnsKey() { return RegionColumns.columnsKey; }
     protected getDialogType() { return <any>RegionDialog; }

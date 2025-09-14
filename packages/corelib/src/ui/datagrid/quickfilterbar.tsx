@@ -17,7 +17,7 @@ export interface QuickFilterBarOptions {
 
 export class QuickFilterBar<P extends QuickFilterBarOptions = QuickFilterBarOptions> extends Widget<P> {
 
-    static override typeInfo = this.registerClass(nsSerenity);
+    static [Symbol.typeInfo] = this.registerClass(nsSerenity);
 
     constructor(props: WidgetProps<P>) {
         super(props);

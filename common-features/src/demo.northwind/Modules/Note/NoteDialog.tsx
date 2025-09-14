@@ -2,7 +2,7 @@ import { BaseDialog, DialogButton, HtmlContentEditor, HtmlNoteContentEditor, can
 import { nsDemoNorthwind } from "../ServerTypes/Namespaces";
 
 export class NoteDialog<P = {}> extends BaseDialog<P> {
-    static override typeInfo = this.registerClass(nsDemoNorthwind);
+    static [Symbol.typeInfo] = this.registerClass(nsDemoNorthwind);
 
     declare private textEditor: HtmlContentEditor;
 

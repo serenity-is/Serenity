@@ -5,7 +5,7 @@ import { Formatter } from "../../slick";
 import { IInitializeColumn } from "./iinitializecolumn";
 
 export class FileDownloadFormatter implements Formatter, IInitializeColumn {
-    static typeInfo = formatterTypeInfo(nsSerenity, [IInitializeColumn]); static { registerType(this); }
+    static [Symbol.typeInfo] = formatterTypeInfo(nsSerenity, [IInitializeColumn]); static { registerType(this); }
 
     constructor(public readonly props: { displayFormat?: string, originalNameProperty?: string, iconClass?: string } = {}) {
         this.props ??= {};

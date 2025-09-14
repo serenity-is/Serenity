@@ -3,7 +3,7 @@ import { nsExtensions } from "../ServerTypes/Namespaces";
 import { ReportDialog } from "./ReportDialog";
 
 export class ReportPage<P = {}> extends Widget<P> {
-    static override typeInfo = this.registerClass(nsExtensions);
+    static [Symbol.typeInfo] = this.registerClass(nsExtensions);
 
     constructor(props: WidgetProps<P>) {
         super(props);

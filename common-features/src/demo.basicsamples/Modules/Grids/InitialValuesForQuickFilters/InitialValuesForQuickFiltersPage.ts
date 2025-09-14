@@ -8,7 +8,7 @@ export default () => gridPageInit(InitialValuesForQuickFilters);
 const fld = OrderRow.Fields;
 
 export class InitialValuesForQuickFilters extends OrderGrid {
-    static override typeInfo = this.registerClass(nsDemoBasicSamples);
+    static [Symbol.typeInfo] = this.registerClass(nsDemoBasicSamples);
 
     /**
      * This method is called to get list of quick filters to be created for this grid.

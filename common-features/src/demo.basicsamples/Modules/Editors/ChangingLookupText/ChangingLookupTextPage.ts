@@ -14,7 +14,7 @@ export default function pageInit() {
  * Our custom product editor type
  */
 export class ChangingLookupTextEditor extends LookupEditorBase<LookupEditorOptions, ProductRow> {
-    static override typeInfo = this.registerEditor(nsDemoBasicSamples);
+    static [Symbol.typeInfo] = this.registerEditor(nsDemoBasicSamples);
 
     protected getLookupKey() {
         return ProductRow.lookupKey;
@@ -31,7 +31,7 @@ export class ChangingLookupTextEditor extends LookupEditorBase<LookupEditorOptio
 }
 
 export class ChangingLookupTextDialog<P = {}> extends GridEditorDialog<OrderDetailRow, P> {
-    static override typeInfo = this.registerClass(nsDemoBasicSamples);
+    static [Symbol.typeInfo] = this.registerClass(nsDemoBasicSamples);
 
     protected getFormKey() { return ChangingLookupTextForm.formKey; }
     protected getLocalTextPrefix() { return OrderDetailRow.localTextPrefix; }

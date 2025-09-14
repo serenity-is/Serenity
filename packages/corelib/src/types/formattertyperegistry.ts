@@ -14,7 +14,7 @@ export namespace FormatterTypeRegistry {
             var message = `"${htmlEncode(key)}" formatter class not found! 
 
 Make sure the formatter type has a line like the following (with the correct full name):
-static typeInfo = formatterTypeInfo("MyProject.MyModule.MyEditor"); static { registerType(this); }
+static [Symbol.typeInfo] = formatterTypeInfo("MyProject.MyModule.MyEditor"); static { registerType(this); }
 or a legacy decorator like @Decorators.registerFormatter('MyProject.MyModule.MyFormatter') with the full name         
 and "side-effect-import" this formatter class from the current 
 "page.ts/grid.ts/dialog.ts file (import "./path/to/MyFormatter.ts").

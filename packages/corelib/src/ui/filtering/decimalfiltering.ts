@@ -4,7 +4,7 @@ import { BaseEditorFiltering } from "./baseeditorfiltering";
 import { FilterOperator } from "./filteroperator";
 
 export class DecimalFiltering extends BaseEditorFiltering<DecimalEditor> {
-    static override typeInfo = this.registerClass(nsSerenity);
+    static [Symbol.typeInfo] = this.registerClass(nsSerenity);
 
     constructor() {
         super(DecimalEditor);

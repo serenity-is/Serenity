@@ -4,7 +4,7 @@ import { Formatter } from "../../slick";
 import { IInitializeColumn } from "./iinitializecolumn";
 
 export class UrlFormatter implements Formatter, IInitializeColumn {
-    static typeInfo = formatterTypeInfo(nsSerenity, [IInitializeColumn]); static { registerType(this); }
+    static [Symbol.typeInfo] = formatterTypeInfo(nsSerenity, [IInitializeColumn]); static { registerType(this); }
 
     constructor(readonly props: { displayProperty?: string, displayFormat?: string, urlProperty?: string, urlFormat?: string, target?: string } = {}) {
         this.props ??= {};

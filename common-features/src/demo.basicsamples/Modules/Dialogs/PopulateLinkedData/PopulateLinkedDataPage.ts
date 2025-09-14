@@ -9,13 +9,13 @@ export default () => gridPageInit(PopulateLinkedDataGrid);
  * A subclass of OrderGrid that launches PopulateLinkedDataDialog
  */
 export class PopulateLinkedDataGrid extends OrderGrid {
-    static override typeInfo = this.registerClass(nsDemoBasicSamples);
+    static [Symbol.typeInfo] = this.registerClass(nsDemoBasicSamples);
 
     protected getDialogType() { return PopulateLinkedDataDialog; }
 }
 
 export class PopulateLinkedDataDialog<P = {}> extends EntityDialog<OrderRow, P> {
-    static override typeInfo = this.registerClass(nsDemoBasicSamples);
+    static [Symbol.typeInfo] = this.registerClass(nsDemoBasicSamples);
 
     protected getFormKey() { return PopulateLinkedDataForm.formKey; }
     protected getRowDefinition() { return OrderRow; }

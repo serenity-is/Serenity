@@ -9,7 +9,7 @@ import { CustomerOrderDialog } from "./CustomerOrderDialog";
 const fld = OrderRow.Fields;
 
 export class CustomerOrdersGrid<P = {}> extends OrderGrid<P> {
-    static override typeInfo = this.registerClass(nsDemoNorthwind);
+    static [Symbol.typeInfo] = this.registerClass(nsDemoNorthwind);
     
     protected getDialogType() { return CustomerOrderDialog; }
 

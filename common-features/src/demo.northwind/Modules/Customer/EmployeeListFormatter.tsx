@@ -7,7 +7,7 @@ let lookup: Lookup<EmployeeRow>;
 let promise: Promise<Lookup<EmployeeRow>>;
 
 export class EmployeeListFormatter implements Formatter {
-    static typeInfo = formatterTypeInfo(nsDemoNorthwind); static { registerType(this); }
+    static [Symbol.typeInfo] = formatterTypeInfo(nsDemoNorthwind); static { registerType(this); }
 
     format(ctx: FormatterContext): FormatterResult {
 

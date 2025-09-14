@@ -4,7 +4,7 @@ import { nsDemoNorthwind } from "../ServerTypes/Namespaces";
 import { SupplierDialog } from "./SupplierDialog";
 
 export class SupplierGrid<P = {}> extends EntityGrid<SupplierRow, P> {
-    static override typeInfo = this.registerClass(nsDemoNorthwind);
+    static [Symbol.typeInfo] = this.registerClass(nsDemoNorthwind);
 
     protected getColumnsKey() { return SupplierColumns.columnsKey; }
     protected getDialogType() { return <any>SupplierDialog; }

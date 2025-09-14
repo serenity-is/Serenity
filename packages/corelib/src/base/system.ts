@@ -1,9 +1,16 @@
-import { enumTypeInfoSymbol, isAssignableFromSymbol, isInstanceOfTypeSymbol } from "./symbols";
-import { StringLiteral, TypeInfo, ensureTypeInfo, getTypeNameProp, getTypeRegistry, globalObject, interfaceIsAssignableFrom, internalRegisterType, merge, peekTypeInfo, typeInfoProperty } from "./system-internal";
-export { getTypeNameProp, getTypeRegistry, setTypeNameProp, typeInfoProperty, type StringLiteral } from "./system-internal";
+import { isAssignableFromSymbol, isInstanceOfTypeSymbol } from "./symbols";
+import { StringLiteral, TypeInfo, ensureTypeInfo, getTypeNameProp, getTypeRegistry, globalObject, interfaceIsAssignableFrom, internalRegisterType, merge, peekTypeInfo } from "./system-internal";
+export { getTypeNameProp, getTypeRegistry, setTypeNameProp, type StringLiteral } from "./system-internal";
 
 export const nsSerenity: "Serenity." = "Serenity.";
 export const SerenityNS: "Serenity" = "Serenity";
+
+declare global {
+  interface SymbolConstructor {
+    readonly typeInfo: unique symbol;
+  }
+}
+
 
 /**
  * Get the global object  (window in browsers, global in node)
@@ -156,7 +163,7 @@ export function getBaseType(type: any) {
     if (type == null ||
         type === Object ||
         !type.prototype ||
-        (type as any)[typeInfoProperty]?.typeKind === "interface")
+        (type as any)[Symbol.typeInfo]?.typeKind === "interface")
         return null;
 
     return Object.getPrototypeOf(type.prototype).constructor;
@@ -185,17 +192,9 @@ export function registerEnum(enumType: any, name: string, enumKey?: string) {
     if (name && name.endsWith("."))
         throw "Enum name cannot end with a dot in registerEnum!";
 
-    const typeInfo: TypeInfo<string> = {
-        typeKind: "enum",
-        typeName: name
-    }
-    Object.defineProperty(enumType, enumTypeInfoSymbol, { value: typeInfo, configurable: true, writable: true });
-    
-    const typeStore = getTypeRegistry();
-    if (name)
-        typeStore[name] = enumType;
-
+    internalRegisterType(enumType, name, undefined, "enum");    
     if (enumKey && enumKey != name) {
+        const typeStore = getTypeRegistry();
         if (!typeStore[enumKey])
             typeStore[enumKey] = enumType;
     }
@@ -282,7 +281,7 @@ export namespace Enum {
  */
 export const isEnum = (type: any) => {
     return typeof type === "object" &&
-        type[enumTypeInfoSymbol] !== void 0;
+        (type[Symbol.typeInfo] as TypeInfo<string>)?.typeKind == "enum";
 };
 
 /**
@@ -534,14 +533,14 @@ export function interfaceTypeInfo<TypeName>(typeName: StringLiteral<TypeName>, i
     return typeInfo;
 }
 
-export function registerType(type: { [typeInfoProperty]: TypeInfo<any>, name: string }) {
+export function registerType(type: { [Symbol.typeInfo]: TypeInfo<any>, name: string }) {
     if (!type)
         throw "registerType is called with null target!";
 
     // peekTypeInfo should auto handle registration
     let typeInfo: TypeInfo<any> = peekTypeInfo(type);
     if (!typeInfo)
-        throw `registerType is called on type "${type.name}" that does not have a static typeInfo property!`;
+        throw `registerType is called on type "${type.name}" that does not have a static [Symbol.typeInfo] property!`;
 
     if (!typeInfo.typeName)
         throw `registerType is called on type "${type.name}", but it's typeInfo property does not have a typeName!`;

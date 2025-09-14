@@ -3,7 +3,7 @@ import { FormatterContext } from "@serenity-is/sleekgrid";
 import { nsExtensions } from "../ServerTypes/Namespaces";
 
 export class EnumSelectFormatter implements Formatter {
-    static typeInfo = formatterTypeInfo(nsExtensions); static { registerType(this); }
+    static [Symbol.typeInfo] = formatterTypeInfo(nsExtensions); static { registerType(this); }
 
     constructor(public readonly props: { enumKey?: string, allowClear?: boolean, emptyItemText?: string } = {}) {
         this.props ??= {}

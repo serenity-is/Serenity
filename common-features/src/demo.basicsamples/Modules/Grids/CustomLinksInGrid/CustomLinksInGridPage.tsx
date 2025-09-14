@@ -6,7 +6,7 @@ import { nsDemoBasicSamples } from "../../ServerTypes/Namespaces";
 export default () => gridPageInit(CustomLinksInGrid);
 
 export class CustomLinksInGrid extends OrderGrid {
-    static override typeInfo = this.registerClass(nsDemoBasicSamples);
+    static [Symbol.typeInfo] = this.registerClass(nsDemoBasicSamples);
 
     /**
      * We override getColumns() to change format functions for some columns.

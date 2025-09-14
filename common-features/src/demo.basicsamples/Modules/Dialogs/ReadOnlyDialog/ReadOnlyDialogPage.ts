@@ -8,7 +8,7 @@ export default () => gridPageInit(ReadOnlyGrid);
  * A readonly grid that launches ReadOnlyDialog
  */
 export class ReadOnlyGrid extends SupplierGrid {
-    static override typeInfo = this.registerClass(nsDemoBasicSamples);
+    static [Symbol.typeInfo] = this.registerClass(nsDemoBasicSamples);
 
     protected getDialogType() { return ReadOnlyDialog; }
 
@@ -23,7 +23,7 @@ export class ReadOnlyGrid extends SupplierGrid {
 }
 
 export class ReadOnlyDialog extends SupplierDialog {
-    static override typeInfo = this.registerClass(nsDemoBasicSamples);
+    static [Symbol.typeInfo] = this.registerClass(nsDemoBasicSamples);
 
     /**
      * This is the method that gets list of tool 

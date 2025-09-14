@@ -3,7 +3,7 @@ import { formatNumber, formatterTypeInfo, htmlEncode, nsSerenity, parseDecimal, 
 import { Formatter } from "../../slick";
 
 export class NumberFormatter implements Formatter {
-    static typeInfo = formatterTypeInfo(nsSerenity); static { registerType(this); }
+    static [Symbol.typeInfo] = formatterTypeInfo(nsSerenity); static { registerType(this); }
     
     constructor(public readonly props: { displayFormat?: string } = {}) {
         this.props ??= {};

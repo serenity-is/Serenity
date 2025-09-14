@@ -9,7 +9,7 @@ import { applyCssSizes, handleUIDialogResponsive } from "./basedialog-internal";
 import { DialogExtensions } from "./dialogextensions";
 
 export class BaseDialog<P> extends Widget<P> {
-    static override typeInfo = this.registerClass(nsSerenity, [IDialog]);
+    static [Symbol.typeInfo] = this.registerClass(nsSerenity, [IDialog]);
     
     static override createDefaultElement() { return document.body.appendChild(<div class="hidden" />) as HTMLDivElement; }
 

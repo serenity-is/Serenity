@@ -5,7 +5,7 @@ import { TranslationService } from "../../ServerTypes/Administration";
 import { nsAdministration } from "../../ServerTypes/Namespaces";
 
 export class TranslationGrid extends EntityGrid<TranslationItem, any> {
-    static override typeInfo = this.registerClass(nsAdministration);
+    static [Symbol.typeInfo] = this.registerClass(nsAdministration);
 
     protected getIdProperty() { return "Key"; }
     protected getLocalTextPrefix() { return "Administration.Translation"; }

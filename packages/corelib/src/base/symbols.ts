@@ -11,7 +11,5 @@ export const scriptDataHashSymbol: unique symbol = Symbol.for("Serenity.scriptDa
 /** @internal */
 export const scriptDataSymbol: unique symbol = Symbol.for("Serenity.scriptData");
 /** @internal */
-export const enumTypeInfoSymbol: unique symbol = Symbol.for("Serenity.enumTypeInfo");
-/** @internal */
 export const typeRegistrySymbol: unique symbol = Symbol.for("Serenity.typeRegistry");
 

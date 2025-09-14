@@ -1,6 +1,6 @@
-﻿import { enumTypeInfoSymbol, implementedInterfacesSymbol, isAssignableFromSymbol, typeRegistrySymbol } from "./symbols";
+import { implementedInterfacesSymbol, isAssignableFromSymbol, typeRegistrySymbol } from "./symbols";
 
-export const typeInfoProperty = "typeInfo";
+(Symbol as any).typeInfo ??= Symbol.for("Serenity.typeInfo");
 
 export const globalObject: any =
     (typeof globalThis !== "undefined" && globalThis) ||
@@ -26,7 +26,7 @@ export type StringLiteral<T> = T extends string ? string extends T ? never : T :
  * Type information for a registered type.
  */
 export type TypeInfo<TypeName> = {
-    /** Type kind, can be "class", "interface", "editor" or "formatter" */
+    /** Type kind, can be "class", "enum", "interface", "editor" or "formatter" */
     typeKind: "class" | "enum" | "interface" | "editor" | "formatter";
     /** Registered type name */
     typeName: StringLiteral<TypeName> | (string & {});
@@ -58,11 +58,10 @@ export function interfaceIsAssignableFrom(from: any) {
 }
 
 function autoRegisterViaTypeInfo(type: any): void {
-    if (!Object.prototype.hasOwnProperty.call(type, typeInfoProperty) &&
-        !Object.prototype.hasOwnProperty.call(type, enumTypeInfoSymbol))
+    if (!Object.prototype.hasOwnProperty.call(type, Symbol.typeInfo))
         return;
 
-    const typeInfo = (type[typeInfoProperty] ?? type[enumTypeInfoSymbol]) as TypeInfo<string>;
+    const typeInfo = type[Symbol.typeInfo] as TypeInfo<string>;
     if (!typeInfo || typeInfo.registered || !typeInfo.typeName)
         return;
 
@@ -89,7 +88,7 @@ function autoRegisterViaTypeInfo(type: any): void {
     return;
 }
 
-export function internalRegisterType(type: any, typeName?: string, interfaces?: any[], kind?: "class" | "interface" | "editor" | "formatter"): TypeInfo<string> {
+export function internalRegisterType(type: any, typeName?: string, interfaces?: any[], kind?: "class" | "enum" | "interface" | "editor" | "formatter"): TypeInfo<string> {
     const typeInfo = ensureTypeInfo(type);
     if (kind)
         typeInfo.typeKind = kind;
@@ -119,11 +118,10 @@ export function internalRegisterType(type: any, typeName?: string, interfaces?: 
 
 export function ensureTypeInfo(type: any): TypeInfo<string> {
     let typeInfo: TypeInfo<string>;
-    if ((!Object.prototype.hasOwnProperty.call(type, typeInfoProperty) &&
-         !Object.prototype.hasOwnProperty.call(type, enumTypeInfoSymbol)) ||
-        !(typeInfo = type[typeInfoProperty] ?? type[enumTypeInfoSymbol])) {
+    if (!Object.prototype.hasOwnProperty.call(type, Symbol.typeInfo) ||
+        !(typeInfo = type[Symbol.typeInfo])) {
         typeInfo = { typeKind: void 0 } as any;
-        Object.defineProperty(type, typeInfoProperty, { value: typeInfo, configurable: true, writable: true });
+        Object.defineProperty(type, Symbol.typeInfo, { value: typeInfo, configurable: true, writable: true });
         return typeInfo;
     }
     if (!typeInfo.registered)
@@ -133,11 +131,10 @@ export function ensureTypeInfo(type: any): TypeInfo<string> {
 
 export function peekTypeInfo(type: any): TypeInfo<string> {
     if (!type || 
-        (!Object.prototype.hasOwnProperty.call(type, typeInfoProperty) &&
-         !Object.prototype.hasOwnProperty.call(type, enumTypeInfoSymbol)))
+        !Object.prototype.hasOwnProperty.call(type, Symbol.typeInfo))
         return void 0;
 
-    const typeInfo = type[typeInfoProperty] ?? type[enumTypeInfoSymbol];
+    const typeInfo = type[Symbol.typeInfo];
     if (typeInfo && !typeInfo.registered)
         autoRegisterViaTypeInfo(type);
 
@@ -152,4 +149,3 @@ export function setTypeNameProp(type: any, value: string) {
     ensureTypeInfo(type).typeName = value;
     autoRegisterViaTypeInfo(type);
 }
-

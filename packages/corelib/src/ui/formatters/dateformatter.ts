@@ -3,7 +3,7 @@ import { Culture, formatDate, formatterTypeInfo, htmlEncode, nsSerenity, parseIS
 import { Formatter } from "../../slick";
 
 export class DateFormatter implements Formatter {
-    static typeInfo = formatterTypeInfo(nsSerenity); static { registerType(this); }
+    static [Symbol.typeInfo] = formatterTypeInfo(nsSerenity); static { registerType(this); }
 
     constructor(public readonly props: { displayFormat?: string } = {}) {
         this.props ??= {};

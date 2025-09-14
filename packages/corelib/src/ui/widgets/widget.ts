@@ -1,4 +1,4 @@
-import { ClassTypeInfo, Config, EditorTypeInfo, Fluent, StringLiteral, addClass, addValidationRule, appendToNode, classTypeInfo, editorTypeInfo, getCustomAttribute, getInstanceType, getTypeFullName, getTypeShortName, isArrayLike, nsSerenity, registerType, toggleClass, typeInfoProperty } from "../../base";
+import { ClassTypeInfo, Config, EditorTypeInfo, Fluent, StringLiteral, addClass, addValidationRule, appendToNode, classTypeInfo, editorTypeInfo, getCustomAttribute, getInstanceType, getTypeFullName, getTypeShortName, isArrayLike, nsSerenity, registerType, toggleClass } from "../../base";
 import { ensureParentOrFragment, handleElementProp, isFragmentWorkaround, setElementProps } from "./widgetinternal";
 import { IdPrefixType, associateWidget, deassociateWidget, getWidgetName, useIdPrefix, type WidgetProps } from "./widgetutils";
 export { getWidgetFrom, tryGetWidget, useIdPrefix, type IdPrefixType, type WidgetProps } from "./widgetutils";
@@ -219,24 +219,24 @@ export class Widget<P = {}> {
     static readonly isComponent = true;
 
     protected static registerClass<TypeName>(typeName: StringLiteral<TypeName>, intfAndAttr?: any[]): ClassTypeInfo<TypeName> {
-        if (Object.prototype.hasOwnProperty.call(this, typeInfoProperty) && this[typeInfoProperty])
+        if (Object.prototype.hasOwnProperty.call(this, Symbol.typeInfo) && this[Symbol.typeInfo])
             throw new Error(`Type ${this.name} already has a typeInfo property!`);
 
-        const typeInfo = this.typeInfo = classTypeInfo(typeName, intfAndAttr);
+        const typeInfo = this[Symbol.typeInfo] = classTypeInfo(typeName, intfAndAttr);
         registerType(this);
         return typeInfo;
     }
 
     protected static registerEditor<TypeName>(typeName: StringLiteral<TypeName>, intfAndAttr?: any[]): EditorTypeInfo<TypeName> {
-        if (Object.prototype.hasOwnProperty.call(this, typeInfoProperty) && this[typeInfoProperty])
+        if (Object.prototype.hasOwnProperty.call(this, Symbol.typeInfo) && this[Symbol.typeInfo])
             throw new Error(`Type ${this.name} already has a typeInfo property!`);
 
-        const typeInfo = this.typeInfo = editorTypeInfo(typeName, intfAndAttr);
+        const typeInfo = this[Symbol.typeInfo] = editorTypeInfo(typeName, intfAndAttr);
         registerType(this);
         return typeInfo;
     }
 
-    static typeInfo = this.registerClass(nsSerenity);
+    static [Symbol.typeInfo] = this.registerClass(nsSerenity);
 }
 
 /** @deprecated Use Widget */

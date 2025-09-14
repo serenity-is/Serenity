@@ -130,7 +130,7 @@ public partial class ClientTypesGenerator : ImportGeneratorBase
                 type.Fields?.FirstOrDefault(x =>
                     x.IsStatic == true &&
                     x.Value is string &&
-                    x.Name == "typeInfo" && 
+                    x.Name == "[Symbol.typeInfo]" && 
                     x.Type?.EndsWith("TypeInfo", StringComparison.Ordinal) == true)?.Value as string;
 
             if (key != null && key[^1] == '.')

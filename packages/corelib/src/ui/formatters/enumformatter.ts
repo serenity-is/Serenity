@@ -5,7 +5,7 @@ import { EnumKeyAttribute } from "../../types/attributes";
 import { EnumTypeRegistry } from "../../types/enumtyperegistry";
 
 export class EnumFormatter implements Formatter {
-    static typeInfo = formatterTypeInfo(nsSerenity); static { registerType(this); }
+    static [Symbol.typeInfo] = formatterTypeInfo(nsSerenity); static { registerType(this); }
 
     constructor(public readonly props: { enumKey?: string } = {}) {
         this.props ??= {};

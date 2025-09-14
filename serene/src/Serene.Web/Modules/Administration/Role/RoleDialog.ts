@@ -7,7 +7,7 @@ import { RolePermissionDialog } from "../RolePermission/RolePermissionDialog";
 const editPermissions = "edit-permissions";
 
 export class RoleDialog extends EntityDialog<RoleRow, any> {
-    static override typeInfo = this.registerClass(nsAdministration);
+    static [Symbol.typeInfo] = this.registerClass(nsAdministration);
 
     protected getFormKey() { return RoleForm.formKey; }
     protected getIdProperty() { return RoleRow.idProperty; }

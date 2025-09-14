@@ -15,7 +15,7 @@ export class CloneableEntityGrid<P = {}> extends EntityGrid<ProductRow, P> {
 }
 
 export class CloneableEntityDialog extends ProductDialog {
-    static override typeInfo = this.registerClass(nsDemoBasicSamples);
+    static [Symbol.typeInfo] = this.registerClass(nsDemoBasicSamples);
 
     protected updateInterface() {
 

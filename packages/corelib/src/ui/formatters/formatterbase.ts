@@ -1,18 +1,18 @@
 import { FormatterContext, FormatterResult } from "@serenity-is/sleekgrid";
-import { formatterTypeInfo, FormatterTypeInfo, nsSerenity, registerType, StringLiteral, typeInfoProperty } from "../../base";
+import { formatterTypeInfo, FormatterTypeInfo, nsSerenity, registerType, StringLiteral } from "../../base";
 import { Formatter } from "../../slick";
 
 export abstract class FormatterBase implements Formatter {
     abstract format(ctx: FormatterContext): FormatterResult;
 
     protected static registerFormatter<TypeName>(typeName: StringLiteral<TypeName>, intfAndAttr?: any[]): FormatterTypeInfo<TypeName> {
-        if (Object.prototype.hasOwnProperty.call(this, typeInfoProperty) && this[typeInfoProperty])
+        if (Object.prototype.hasOwnProperty.call(this, Symbol.typeInfo) && this[Symbol.typeInfo])
             throw new Error(`Type ${this.name} already has a typeInfo property!`);
                 
-        const typeInfo = this.typeInfo = formatterTypeInfo(typeName, intfAndAttr);
+        const typeInfo = this[Symbol.typeInfo] = formatterTypeInfo(typeName, intfAndAttr);
         registerType(this);
         return typeInfo;
     }
 
-    static typeInfo = formatterTypeInfo(nsSerenity); static { registerType(this); }
+    static [Symbol.typeInfo] = formatterTypeInfo(nsSerenity); static { registerType(this); }
 }

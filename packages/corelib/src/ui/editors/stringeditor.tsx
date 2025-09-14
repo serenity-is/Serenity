@@ -3,7 +3,7 @@ import { IStringValue } from "../../interfaces";
 import { EditorWidget } from "./editorwidget";
 
 export class StringEditor<P = {}> extends EditorWidget<P> {
-    static override typeInfo = this.registerEditor(nsSerenity, [IStringValue]);
+    static [Symbol.typeInfo] = this.registerEditor(nsSerenity, [IStringValue]);
     
     declare readonly domNode: HTMLInputElement;
     

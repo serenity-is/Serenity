@@ -11,7 +11,7 @@ export interface LookupEditorOptions extends ComboboxEditorOptions {
 
 export abstract class LookupEditorBase<P extends LookupEditorOptions, TItem> extends ComboboxEditor<P, TItem> {
 
-    static override typeInfo = this.registerEditor(nsSerenity);
+    static [Symbol.typeInfo] = this.registerEditor(nsSerenity);
 
     declare private lookupChangeUnbind: any;
 
@@ -145,7 +145,7 @@ export abstract class LookupEditorBase<P extends LookupEditorOptions, TItem> ext
 
 export class LookupEditor<P extends LookupEditorOptions = LookupEditorOptions> extends LookupEditorBase<P, {}> {
 
-    static override typeInfo = this.registerEditor(nsSerenity);
+    static [Symbol.typeInfo] = this.registerEditor(nsSerenity);
 
     constructor(props: EditorProps<P>) {
         super(props);

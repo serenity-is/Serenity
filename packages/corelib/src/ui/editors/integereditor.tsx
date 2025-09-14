@@ -12,7 +12,7 @@ export interface IntegerEditorOptions {
 }
 
 export class IntegerEditor<P extends IntegerEditorOptions = IntegerEditorOptions> extends EditorWidget<P> implements IDoubleValue {
-    static override typeInfo = this.registerEditor(nsSerenity, [IDoubleValue]);
+    static [Symbol.typeInfo] = this.registerEditor(nsSerenity, [IDoubleValue]);
 
     static override createDefaultElement() { return <input type="text" /> as HTMLInputElement; }
     declare readonly domNode: HTMLInputElement;

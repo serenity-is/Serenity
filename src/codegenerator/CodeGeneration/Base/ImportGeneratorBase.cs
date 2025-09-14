@@ -302,7 +302,7 @@ public abstract class ImportGeneratorBase : CodeGeneratorBase
 
         if (type.Fields != null &&
             type.Fields.Any(x => x.IsStatic == true &&
-                x.Name == "typeInfo" &&
+                x.Name == "[Symbol.typeInfo]" &&
                 x.Type == "EditorTypeInfo"))
             return true;
 
@@ -335,7 +335,7 @@ public abstract class ImportGeneratorBase : CodeGeneratorBase
 
         if (type.Fields != null &&
             type.Fields.Any(x => x.IsStatic == true &&
-                x.Name == "typeInfo" &&
+                x.Name == "[Symbol.typeInfo]" &&
                 x.Type == "FormatterTypeInfo"))
             return true;
         

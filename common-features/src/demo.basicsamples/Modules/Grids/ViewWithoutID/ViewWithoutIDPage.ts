@@ -6,7 +6,7 @@ import { nsDemoBasicSamples } from "../../ServerTypes/Namespaces";
 export default () => gridPageInit(ViewWithoutIDGrid)
 
 export class ViewWithoutIDGrid<P = {}> extends EntityGrid<SalesByCategoryRow, P> {
-    static override typeInfo = this.registerClass(nsDemoBasicSamples);
+    static [Symbol.typeInfo] = this.registerClass(nsDemoBasicSamples);
 
     protected getColumnsKey() { return SalesByCategoryColumns.columnsKey; }
     protected getIdProperty() { return "__id"; }

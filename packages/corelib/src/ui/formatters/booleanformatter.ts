@@ -3,7 +3,7 @@ import { DialogTexts, formatterTypeInfo, localText, nsSerenity, registerType } f
 import { Formatter } from "../../slick";
 
 export class BooleanFormatter implements Formatter {
-    static typeInfo = formatterTypeInfo(nsSerenity); static { registerType(this); }
+    static [Symbol.typeInfo] = formatterTypeInfo(nsSerenity); static { registerType(this); }
 
     constructor(public readonly props: { falseText?: string, trueText?: string } = {}) {
         this.props ??= {};

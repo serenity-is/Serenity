@@ -28,14 +28,14 @@ export class Type1 extends StringEditor {
 }
 ");
 
-        var tl = new TSTypeListerAST(fileSystem, tsConfigDir: fileSystem.Directory.GetCurrentDirectory(), 
+        var tl = new TSTypeListerAST(fileSystem, tsConfigDir: fileSystem.Directory.GetCurrentDirectory(),
             tsConfig: new TSConfig
-        {
-            CompilerOptions = new()
             {
-                Module = "ESNext"
-            }
-        });
+                CompilerOptions = new()
+                {
+                    Module = "ESNext"
+                }
+            });
         tl.AddInputFile(testTS);
 
         var types = tl.ExtractTypes();
@@ -68,7 +68,7 @@ declare class Widget<TOptions = any> {
 }
 
 declare class StringEditor extends Widget<any> {
-    static typeInfo = this.registerEditor(""Serenity.StringEditor"");
+    static [Symbol.typeInfo] = this.registerEditor(""Serenity.StringEditor"");
     static readonly __bool = false;
 }
 
@@ -110,18 +110,18 @@ export class Type1 extends StringEditor {
                 Assert.Equal("Widget", x.BaseType);
                 Assert.True(x.IsDeclaration);
                 Assert.NotNull(x.Fields);
-                Assert.Collection(x.Fields.OrderBy(x => x.Name, StringComparer.Ordinal), 
+                Assert.Collection(x.Fields.OrderBy(x => x.Name, StringComparer.Ordinal),
+                    x =>
+                    {
+                        Assert.True(x.IsStatic);
+                        Assert.Equal("[Symbol.typeInfo]", x.Name);
+                        Assert.Equal("Serenity.StringEditor", x.Value);
+                    },
                     x =>
                     {
                         Assert.True(x.IsStatic);
                         Assert.Equal("__bool", x.Name);
                         Assert.False(x.Value as bool?);
-                    },
-                    x =>
-                    {
-                        Assert.True(x.IsStatic);
-                        Assert.Equal("typeInfo", x.Name);
-                        Assert.Equal("Serenity.StringEditor", x.Value);
                     });
             },
             x =>

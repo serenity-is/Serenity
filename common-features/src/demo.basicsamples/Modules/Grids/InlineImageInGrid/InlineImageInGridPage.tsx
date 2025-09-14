@@ -7,7 +7,7 @@ import { nsDemoBasicSamples } from "../../ServerTypes/Namespaces";
 export default () => gridPageInit(InlineImageInGrid);
 
 export class InlineImageFormatter implements Formatter, IInitializeColumn {
-    static typeInfo = formatterTypeInfo(nsDemoBasicSamples); static { registerType(this); }
+    static [Symbol.typeInfo] = formatterTypeInfo(nsDemoBasicSamples); static { registerType(this); }
 
     constructor(public readonly props: { fileProperty?: string, thumb?: boolean } = {}) {
     }
@@ -36,7 +36,7 @@ export class InlineImageFormatter implements Formatter, IInitializeColumn {
 }
 
 export class InlineImageInGrid<P = {}> extends EntityGrid<ProductRow, P> {
-    static override typeInfo = this.registerClass(nsDemoBasicSamples);
+    static [Symbol.typeInfo] = this.registerClass(nsDemoBasicSamples);
 
     protected getColumnsKey() { return InlineImageInGridColumns.columnsKey; }
     protected getDialogType() { return ProductDialog; }

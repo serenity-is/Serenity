@@ -5,7 +5,7 @@ import { nsDemoNorthwind } from "../ServerTypes/Namespaces";
 import "./OrderDialog.css";
 
 export class OrderDialog<P = {}> extends EntityDialog<OrderRow, P> {
-    static override typeInfo = this.registerClass(nsDemoNorthwind);
+    static [Symbol.typeInfo] = this.registerClass(nsDemoNorthwind);
 
     protected getFormKey() { return OrderForm.formKey; }
     protected getRowDefinition() { return OrderRow; }

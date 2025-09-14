@@ -626,7 +626,7 @@ public class TSTypeListerAST
                 var pd = (member as PropertyDeclaration);
                 if (pd.Type != null)
                 {
-                    if (name == "typeInfo" &&
+                    if (name == "[Symbol.typeInfo]" &&
                         member.HasModifier(SyntaxKind.StaticKeyword) &&
                         pd.Type is TypeReferenceNode trn &&
                         trn.TypeName is Identifier trni &&
@@ -637,7 +637,7 @@ public class TSTypeListerAST
                         externalMember.Type = trni.Text;
                         externalMember.Value = fixRegName(trnll.Text);
                     }
-                    else if (name == "typeInfo" &&
+                    else if (name == "[Symbol.typeInfo]" &&
                         member.HasModifier(SyntaxKind.StaticKeyword) &&
                         pd.Type is ImportTypeNode itn &&
                         itn.Argument is LiteralTypeNode itnl &&
@@ -654,7 +654,7 @@ public class TSTypeListerAST
                         externalMember.Type = GetTypeReferenceExpression(pd.Type);
                 }
                 else if (
-                    name == "typeInfo" &&
+                    name == "[Symbol.typeInfo]" &&
                     member.HasModifier(SyntaxKind.StaticKeyword) &&
                     pd.Initializer is CallExpression ce &&
                     ce.Expression is PropertyAccessExpression pae &&
@@ -667,7 +667,7 @@ public class TSTypeListerAST
                     externalMember.Value = fixRegName(ltns);
                 }
                 else if (
-                    name == "typeInfo" &&
+                    name == "[Symbol.typeInfo]" &&
                     member.HasModifier(SyntaxKind.StaticKeyword) &&
                     pd.Initializer is CallExpression ce2 &&
                     ce2.Expression is Identifier ce2e &&

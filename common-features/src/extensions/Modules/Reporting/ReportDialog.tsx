@@ -4,7 +4,7 @@ import { ReportRetrieveResult } from "../ServerTypes/Reporting";
 import { ReportHelper } from "./ReportHelper";
 
 export class ReportDialog<P extends ReportDialogOptions = ReportDialogOptions> extends BaseDialog<P> {
-    static override typeInfo = this.registerClass(nsExtensions);
+    static [Symbol.typeInfo] = this.registerClass(nsExtensions);
 
     declare private report: ReportRetrieveResult;
     declare private propertyGrid: PropertyGrid;

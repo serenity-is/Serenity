@@ -4,7 +4,7 @@ import { nsAdministration } from "../../ServerTypes/Namespaces";
 import { UserDialog } from "./UserDialog";
 
 export class UserGrid extends EntityGrid<UserRow, any> {
-    static override typeInfo = this.registerClass(nsAdministration);
+    static [Symbol.typeInfo] = this.registerClass(nsAdministration);
 
     protected getColumnsKey() { return UserColumns.columnsKey; }
     protected getDialogType() { return UserDialog; }

@@ -3,7 +3,7 @@ import { PagerOptions } from "../../slick";
 import { Widget, WidgetProps } from "../widgets/widget";
 
 export class SlickPager<P extends PagerOptions = PagerOptions> extends Widget<P> {
-    static override typeInfo = this.registerClass(nsSerenity);
+    static [Symbol.typeInfo] = this.registerClass(nsSerenity);
 
     declare private currentPage: HTMLInputElement;
     declare private totalPages: HTMLSpanElement;

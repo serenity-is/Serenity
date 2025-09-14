@@ -3,7 +3,7 @@ import { BaseFiltering } from "./basefiltering";
 import { FilterOperators } from "./filteroperator";
 
 export class BooleanFiltering extends BaseFiltering {
-    static override typeInfo = this.registerClass(nsSerenity);
+    static [Symbol.typeInfo] = this.registerClass(nsSerenity);
 
     getOperators() {
         return this.appendNullableOperators([

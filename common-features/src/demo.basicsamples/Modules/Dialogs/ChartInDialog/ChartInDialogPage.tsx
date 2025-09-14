@@ -17,7 +17,7 @@ export default function pageInit() {
 }
 
 export class ChartInDialog<P = {}> extends BaseDialog<P> {
-    static override typeInfo = this.registerClass(nsDemoBasicSamples, [new ResizableAttribute(), new MaximizableAttribute()]);
+    static [Symbol.typeInfo] = this.registerClass(nsDemoBasicSamples, [new ResizableAttribute(), new MaximizableAttribute()]);
 
     declare private canvas: HTMLCanvasElement;
 

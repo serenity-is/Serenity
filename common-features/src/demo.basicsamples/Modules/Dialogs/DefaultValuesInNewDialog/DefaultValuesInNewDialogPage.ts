@@ -5,7 +5,7 @@ import { nsDemoBasicSamples } from "../../ServerTypes/Namespaces";
 export default () => gridPageInit(DefaultValuesInNewGrid);
 
 export class DefaultValuesInNewGrid extends OrderGrid {
-    static override typeInfo = this.registerClass(nsDemoBasicSamples);
+    static [Symbol.typeInfo] = this.registerClass(nsDemoBasicSamples);
 
     /**
      * This method is called when New Item button is clicked.

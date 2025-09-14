@@ -13,7 +13,7 @@ import { ColumnPickerDialog } from "./columnpickerdialog";
 import { DataGrid } from "./datagrid";
 
 export class EntityGrid<TItem, P = {}> extends DataGrid<TItem, P> {
-    static override typeInfo = this.registerClass(nsSerenity);
+    static [Symbol.typeInfo] = this.registerClass(nsSerenity);
 
     constructor(props: WidgetProps<P>) {
         super(props);

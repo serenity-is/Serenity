@@ -231,7 +231,7 @@ public abstract class TypingsGeneratorBase : ImportGeneratorBase
             var field = type.Fields?.FirstOrDefault(x =>
                 x.IsStatic == true &&
                 x.Value is string &&
-                x.Name == "typeInfo" &&
+                x.Name == "[Symbol.typeInfo]" &&
                 x.Type?.EndsWith("TypeInfo", StringComparison.Ordinal) == true);
             return (fixRegName(type, field?.Value as string), field?.Type);
         }

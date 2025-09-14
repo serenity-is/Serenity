@@ -2,7 +2,7 @@ import { DeleteResponse, EntityDialog, PanelAttribute, SaveInitiator, SaveRespon
 import { nsExtensions } from "../ServerTypes/Namespaces";
 
 export abstract class GridEditorDialog<TEntity, P = {}> extends EntityDialog<TEntity, P> {
-    static override typeInfo = this.registerClass(nsExtensions, [new PanelAttribute(false)]);
+    static [Symbol.typeInfo] = this.registerClass(nsExtensions, [new PanelAttribute(false)]);
 
     protected getIdProperty() { return this.getRowDefinition()?.idProperty ?? "__id"; }
 

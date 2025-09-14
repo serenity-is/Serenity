@@ -5,7 +5,7 @@ import { nsDemoNorthwind } from "../ServerTypes/Namespaces";
 import { TerritoryDialog } from "./TerritoryDialog";
 
 export class TerritoryGrid<P = {}> extends EntityGrid<TerritoryRow, P> {
-    static override typeInfo = this.registerClass(nsDemoNorthwind);
+    static [Symbol.typeInfo] = this.registerClass(nsDemoNorthwind);
 
     protected getColumnsKey() { return TerritoryColumns.columnsKey; }
     protected getDialogType() { return <any>TerritoryDialog; }

@@ -4,7 +4,7 @@ import { nsAdministration } from "../../ServerTypes/Namespaces";
 import { RoleDialog } from "./RoleDialog";
 
 export class RoleGrid extends EntityGrid<RoleRow, any> {
-    static override typeInfo = this.registerClass(nsAdministration);
+    static [Symbol.typeInfo] = this.registerClass(nsAdministration);
 
     protected getColumnsKey() { return RoleColumns.columnsKey; }
     protected getDialogType() { return RoleDialog; }

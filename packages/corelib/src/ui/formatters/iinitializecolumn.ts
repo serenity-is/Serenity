@@ -6,5 +6,5 @@ export interface IInitializeColumn {
 }
 
 export class IInitializeColumn {
-    static typeInfo = interfaceTypeInfo(nsSerenity); static { registerType(this); }
+    static [Symbol.typeInfo] = interfaceTypeInfo(nsSerenity); static { registerType(this); }
 }

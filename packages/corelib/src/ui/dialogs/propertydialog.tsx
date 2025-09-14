@@ -6,7 +6,7 @@ import { WidgetProps } from "../widgets/widget";
 import { BaseDialog } from "./basedialog";
 
 export class PropertyDialog<TItem, P> extends BaseDialog<P> {
-    static override typeInfo = this.registerClass(nsSerenity, [new PanelAttribute(false)]);
+    static [Symbol.typeInfo] = this.registerClass(nsSerenity, [new PanelAttribute(false)]);
 
     declare private _entity: TItem;
     declare private _entityId: any;

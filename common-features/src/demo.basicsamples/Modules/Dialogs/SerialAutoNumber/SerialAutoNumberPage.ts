@@ -9,13 +9,13 @@ export default () => gridPageInit(SerialAutoNumberGrid);
  * Subclass of CustomerGrid to override dialog type to SerialAutoNumberDialog
  */
 export class SerialAutoNumberGrid extends CustomerGrid {
-    static override typeInfo = this.registerClass(nsDemoBasicSamples);
+    static [Symbol.typeInfo] = this.registerClass(nsDemoBasicSamples);
 
     protected getDialogType() { return SerialAutoNumberDialog; }
 }
 
 export class SerialAutoNumberDialog extends CustomerDialog {
-    static override typeInfo = this.registerClass(nsDemoBasicSamples);
+    static [Symbol.typeInfo] = this.registerClass(nsDemoBasicSamples);
 
     constructor(props: {}) {
         super(props);

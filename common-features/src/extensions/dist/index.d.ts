@@ -266,7 +266,7 @@ export declare const ResetPasswordFormTexts: typeof texts.Forms.Membership.Reset
 export declare const SetPasswordFormTexts: typeof texts.Forms.Membership.SetPassword;
 export declare const TranslationTexts: typeof texts.Site.Translation;
 export declare class BasicProgressDialog<P = {}> extends BaseDialog<P> {
-	static typeInfo: import("@serenity-is/corelib").ClassTypeInfo<"Serenity.Extensions.">;
+	static [Symbol.typeInfo]: import("@serenity-is/corelib").ClassTypeInfo<"Serenity.Extensions.">;
 	private progressBar;
 	constructor(props?: WidgetProps<P>);
 	cancelled: boolean;
@@ -442,7 +442,7 @@ export declare class EnumSelectFormatter implements Formatter {
 		allowClear?: boolean;
 		emptyItemText?: string;
 	};
-	static typeInfo: import("@serenity-is/corelib").FormatterTypeInfo<"Serenity.Extensions.">;
+	static [Symbol.typeInfo]: import("@serenity-is/corelib").FormatterTypeInfo<"Serenity.Extensions.">;
 	constructor(props?: {
 		enumKey?: string;
 		allowClear?: boolean;
@@ -457,12 +457,12 @@ export declare class EnumSelectFormatter implements Formatter {
 	set emptyItemText(value: string);
 }
 export declare class SingleLineTextFormatter implements Formatter {
-	static typeInfo: import("@serenity-is/corelib").FormatterTypeInfo<"Serenity.Extensions.">;
+	static [Symbol.typeInfo]: import("@serenity-is/corelib").FormatterTypeInfo<"Serenity.Extensions.">;
 	format(ctx: FormatterContext): string;
 	static formatValue(value: string): string;
 }
 export declare abstract class GridEditorDialog<TEntity, P = {}> extends EntityDialog<TEntity, P> {
-	static typeInfo: import("@serenity-is/corelib").ClassTypeInfo<"Serenity.Extensions.">;
+	static [Symbol.typeInfo]: import("@serenity-is/corelib").ClassTypeInfo<"Serenity.Extensions.">;
 	protected getIdProperty(): string;
 	onSave: (options: ServiceOptions<SaveResponse>, callback: (response: SaveResponse) => void, initiator: SaveInitiator) => void;
 	onDelete: (options: ServiceOptions<DeleteResponse>, callback: (response: DeleteResponse) => void) => void;
@@ -472,7 +472,7 @@ export declare abstract class GridEditorDialog<TEntity, P = {}> extends EntityDi
 	protected deleteHandler(options: ServiceOptions<DeleteResponse>, callback: (response: DeleteResponse) => void): void;
 }
 export declare abstract class GridEditorBase<TEntity, P = {}> extends EntityGrid<TEntity, P> implements IGetEditValue, ISetEditValue {
-	static typeInfo: import("@serenity-is/corelib").EditorTypeInfo<"Serenity.Extensions.">;
+	static [Symbol.typeInfo]: import("@serenity-is/corelib").EditorTypeInfo<"Serenity.Extensions.">;
 	static createDefaultElement(): HTMLDivElement;
 	/** Gets the id property name. Returns it from getRowDefinition() if available, or the default __id.
 	 * For connected mode, this should be the actual id property name of the entity, or getRowDefinition
@@ -601,7 +601,7 @@ export declare abstract class GridEditorBase<TEntity, P = {}> extends EntityGrid
 	protected checkDialogType(dlg: any): GridEditorDialog<TEntity>;
 }
 export declare class ReportDialog<P extends ReportDialogOptions = ReportDialogOptions> extends BaseDialog<P> {
-	static typeInfo: import("@serenity-is/corelib").ClassTypeInfo<"Serenity.Extensions.">;
+	static [Symbol.typeInfo]: import("@serenity-is/corelib").ClassTypeInfo<"Serenity.Extensions.">;
 	private report;
 	private propertyGrid;
 	constructor(props: WidgetProps<P>);
@@ -646,7 +646,7 @@ export declare namespace ReportHelper {
 	function execute(options: ReportExecuteOptions): void;
 }
 export declare class ReportPage<P = {}> extends Widget<P> {
-	static typeInfo: import("@serenity-is/corelib").ClassTypeInfo<"Serenity.Extensions.">;
+	static [Symbol.typeInfo]: import("@serenity-is/corelib").ClassTypeInfo<"Serenity.Extensions.">;
 	constructor(props: WidgetProps<P>);
 	protected updateMatchFlags(text: string): void;
 	protected reportLinkClick(e: Event): void;
@@ -672,7 +672,7 @@ export interface PromptDialogOptions {
 	validateValue: (v: any) => boolean;
 }
 export declare class PromptDialog<P extends PromptDialogOptions = PromptDialogOptions> extends PropertyDialog<any, P> {
-	static typeInfo: import("@serenity-is/corelib").ClassTypeInfo<"Serenity.Extensions.">;
+	static [Symbol.typeInfo]: import("@serenity-is/corelib").ClassTypeInfo<"Serenity.Extensions.">;
 	constructor(props: WidgetProps<P>);
 	protected getDialogButtons(): import("@serenity-is/corelib").DialogButton[];
 	protected loadInitialEntity(): void;
@@ -687,7 +687,7 @@ export declare class PromptDialog<P extends PromptDialogOptions = PromptDialogOp
 	static prompt(title: string, message: string, value: string, validateValue: (string: any) => boolean): void;
 }
 export declare class SelectableEntityGrid<TItem, TOptions> extends EntityGrid<TItem, TOptions> {
-	static typeInfo: import("@serenity-is/corelib").ClassTypeInfo<"Serenity.Extensions.">;
+	static [Symbol.typeInfo]: import("@serenity-is/corelib").ClassTypeInfo<"Serenity.Extensions.">;
 	protected getSlickOptions(): GridOptions;
 	protected createSlickGrid(): Grid;
 }
@@ -695,7 +695,7 @@ export declare class SelectableEntityGrid<TItem, TOptions> extends EntityGrid<TI
 * This is an editor widget but it only displays a text, not edits it.
 */
 export declare class StaticTextBlock<P extends StaticTextBlockOptions = StaticTextBlockOptions> extends Widget<P> implements ISetEditValue {
-	static typeInfo: import("@serenity-is/corelib").EditorTypeInfo<"Serenity.Extensions.">;
+	static [Symbol.typeInfo]: import("@serenity-is/corelib").EditorTypeInfo<"Serenity.Extensions.">;
 	static createDefaultElement(): HTMLDivElement;
 	private value;
 	constructor(props: WidgetProps<P>);

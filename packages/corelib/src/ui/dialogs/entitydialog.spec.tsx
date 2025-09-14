@@ -131,7 +131,7 @@ describe('EntityDialog.getLocalTextDbPrefix', () => {
     it('returns class identifier based on typeInfo property', () => {
         class DefaultDialog extends EntityDialog<any, any> {
             getPropertyItemsData() { return mockPropertyItemsData() };
-            static override typeInfo = this.registerClass('MyProject.TestModule.DefaultDialog');
+            static [Symbol.typeInfo] = this.registerClass('MyProject.TestModule.DefaultDialog');
         }
 
         var dialog = new DefaultDialog({});
@@ -140,7 +140,7 @@ describe('EntityDialog.getLocalTextDbPrefix', () => {
 
     it('returns class identifier based on registration name', () => {
         class DefaultDialog extends EntityDialog<any, any> {
-            static typeInfo = this.registerClass('MyProject.MyModule.Some.DefaultDialog');
+            static [Symbol.typeInfo] = this.registerClass('MyProject.MyModule.Some.DefaultDialog');
             getPropertyItemsData() { return mockPropertyItemsData() };
         }
 
@@ -213,7 +213,7 @@ describe('EntityDialog.getLocalTextPrefix', () => {
 
     it('returns class identifier based on typeInfo property', () => {
         class DefaultDialog extends EntityDialog<any, any> {
-            static typeInfo = this.registerClass('MyProject.TestModule.DefaultDialog');
+            static [Symbol.typeInfo] = this.registerClass('MyProject.TestModule.DefaultDialog');
             getPropertyItemsData() { return mockPropertyItemsData() };
         }
 
@@ -223,7 +223,7 @@ describe('EntityDialog.getLocalTextPrefix', () => {
 
     it('returns class identifier based on registration name', () => {
         class DefaultDialog extends EntityDialog<any, any> {
-            static typeInfo = this.registerClass('MyProject.MyModule.Some.DefaultDialog');
+            static [Symbol.typeInfo] = this.registerClass('MyProject.MyModule.Some.DefaultDialog');
             getPropertyItemsData() { return mockPropertyItemsData() };
         }
 

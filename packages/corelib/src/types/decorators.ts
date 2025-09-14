@@ -1,11 +1,11 @@
-import { EditorAttribute, ISlickFormatter, addCustomAttribute, registerClass as regClass, registerEditor as regEditor, registerEnum as regEnum, registerFormatter as regFormatter, registerInterface as regIntf, registerType as regType, typeInfoProperty } from "../base";
+import { EditorAttribute, ISlickFormatter, addCustomAttribute, registerClass as regClass, registerEditor as regEditor, registerEnum as regEnum, registerFormatter as regFormatter, registerInterface as regIntf, registerType as regType } from "../base";
 import { MemberType, addTypeMember } from "../compat";
 import { CloseButtonAttribute, ElementAttribute, EnumKeyAttribute, FilterableAttribute, MaximizableAttribute, OptionAttribute, PanelAttribute, ResizableAttribute, StaticPanelAttribute } from "./attributes";
 
 export namespace Decorators {
 
     export function registerType() {
-        return function (target: Function & { [typeInfoProperty]: any }, _context?: any): void {
+        return function (target: Function & { [Symbol.typeInfo]: any }, _context?: any): void {
             if (_context && typeof _context.addInitializer === "function") {
                 _context.addInitializer(() => { regType(target); });
             }

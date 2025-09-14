@@ -9,7 +9,7 @@ export interface GridRowSelectionMixinOptions {
 
 export class GridRowSelectionMixin {
 
-    static typeInfo = classTypeInfo(nsSerenity); static { registerType(this); }
+    static [Symbol.typeInfo] = classTypeInfo(nsSerenity); static { registerType(this); }
 
     declare private idField: string;
     declare private include: { [key: string]: boolean }

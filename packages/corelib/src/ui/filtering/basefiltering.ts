@@ -1,4 +1,4 @@
-import { ClassTypeInfo, classTypeInfo, Criteria, Fluent, getInstanceType, getTypeFullName, localText, nsSerenity, registerType, stringFormat, StringLiteral, tryGetText, typeInfoProperty, type PropertyItem } from "../../base";
+import { ClassTypeInfo, classTypeInfo, Criteria, Fluent, getInstanceType, getTypeFullName, localText, nsSerenity, registerType, stringFormat, StringLiteral, tryGetText, type PropertyItem } from "../../base";
 import { deepClone, Exception } from "../../compat";
 import { QuickFilter } from "../datagrid/quickfilter";
 import { Combobox } from "../editors/combobox";
@@ -258,15 +258,14 @@ export abstract class BaseFiltering implements IFiltering, IQuickFiltering {
     }
 
     protected static registerClass<TypeName>(typeName: StringLiteral<TypeName>, intfAndAttr?: any[]): ClassTypeInfo<TypeName> {
-        if (Object.prototype.hasOwnProperty.call(this, typeInfoProperty) && this[typeInfoProperty])
+        if (Object.prototype.hasOwnProperty.call(this, Symbol.typeInfo) && this[Symbol.typeInfo])
             throw new Error(`Type ${this.name} already has a typeInfo property!`);
 
-        const typeInfo = this.typeInfo = classTypeInfo(typeName, intfAndAttr);
+        const typeInfo = this[Symbol.typeInfo] = classTypeInfo(typeName, intfAndAttr);
         registerType(this);
         return typeInfo;
     }
 
-    static typeInfo = this.registerClass(nsSerenity, [IFiltering, IQuickFiltering]);
-
+    static [Symbol.typeInfo] = this.registerClass(nsSerenity, [IFiltering, IQuickFiltering]);
 }
 

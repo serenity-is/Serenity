@@ -31,7 +31,7 @@ export default function pageInit(model: any) {
  * A version of order dialog converted to a panel by adding PanelAttribute.
  */
 export class EntityDialogAsPanel extends OrderDialog {
-    static override typeInfo = this.registerClass(nsDemoBasicSamples, [new PanelAttribute()]);
+    static [Symbol.typeInfo] = this.registerClass(nsDemoBasicSamples, [new PanelAttribute()]);
 
     protected updateInterface() {
         super.updateInterface();

@@ -5,7 +5,7 @@ import { nsDemoBasicSamples } from "../../ServerTypes/Namespaces";
 export default () => gridPageInit(RemovingAddButton)
 
 export class RemovingAddButton extends SupplierGrid {
-    static override typeInfo = this.registerClass(nsDemoBasicSamples);
+    static [Symbol.typeInfo] = this.registerClass(nsDemoBasicSamples);
 
     /**
      * This method is called to get list of buttons to be created.

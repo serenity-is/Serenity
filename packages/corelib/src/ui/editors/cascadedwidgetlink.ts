@@ -5,7 +5,7 @@ import { tryGetWidget } from "../widgets/widgetutils";
 
 export class CascadedWidgetLink<TParent extends Widget<any>> {
 
-    static typeInfo = classTypeInfo(nsSerenity); static { registerType(this);}
+    static [Symbol.typeInfo] = classTypeInfo(nsSerenity); static { registerType(this);}
 
     constructor(private parentType: { new(...args: any[]): TParent },
         private widget: Widget<any>,

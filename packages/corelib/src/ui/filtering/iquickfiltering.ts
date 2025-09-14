@@ -7,5 +7,5 @@ export interface IQuickFiltering {
 }
 
 export class IQuickFiltering {
-    static typeInfo = interfaceTypeInfo(nsSerenity); static { registerType(this); }
+    static [Symbol.typeInfo] = interfaceTypeInfo(nsSerenity); static { registerType(this); }
 }

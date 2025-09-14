@@ -1,5 +1,5 @@
-import { enumTypeInfoSymbol, implementedInterfacesSymbol, isAssignableFromSymbol, isInstanceOfTypeSymbol } from "./symbols";
-import { Enum, addCustomAttribute, classTypeInfo, editorTypeInfo, fieldsProxy, formatterTypeInfo, getBaseType, getCustomAttribute, getCustomAttributes, getInstanceType, getType, getTypeFullName, getTypeNameProp, getTypeShortName, hasCustomAttribute, initFormType, interfaceTypeInfo, isAssignableFrom, isEnum, isInstanceOfType, registerClass, registerEnum, registerInterface, registerType, typeInfoProperty } from "./system";
+import { implementedInterfacesSymbol, isAssignableFromSymbol, isInstanceOfTypeSymbol } from "./symbols";
+import { Enum, addCustomAttribute, classTypeInfo, editorTypeInfo, fieldsProxy, formatterTypeInfo, getBaseType, getCustomAttribute, getCustomAttributes, getInstanceType, getType, getTypeFullName, getTypeNameProp, getTypeShortName, hasCustomAttribute, initFormType, interfaceTypeInfo, isAssignableFrom, isEnum, isInstanceOfType, registerClass, registerEnum, registerInterface, registerType } from "./system";
 import { ensureTypeInfo, peekTypeInfo } from "./system-internal";
 
 describe("Enum.getValues", () => {
@@ -299,9 +299,9 @@ describe("registerClass", () => {
         expectClassDetails(Test, nameTest, [Intf1, Intf2]);
     });
 
-    it("works with types that already have a static typeInfo property with typeName", () => {
+    it("works with types that already have a static [Symbol.typeInfo] property with typeName", () => {
         class MyClass {
-            static [typeInfoProperty] = classTypeInfo("MyClassName");
+            static [Symbol.typeInfo] = classTypeInfo("MyClassName");
         }
 
         registerClass(MyClass, null);
@@ -312,8 +312,8 @@ describe("registerClass", () => {
 describe("registerEnum", () => {
     function expectTypeDetails(enumObj: any, name: string) {
         expect(isEnum(enumObj)).toBe(true);
-        expect(enumObj[typeInfoProperty]).toBeUndefined();
-        expect(enumObj[enumTypeInfoSymbol]).toBeDefined();
+        expect(enumObj[Symbol.typeInfo]).toBeDefined();
+        expect(peekTypeInfo(enumObj)?.typeKind).toBe("enum");
         expect(enumObj[implementedInterfacesSymbol]).toBeUndefined();
         expect(peekTypeInfo(enumObj)?.enumFlags).toBeUndefined();
 
@@ -555,42 +555,42 @@ describe("registerType", () => {
 
     it("registers type as a class for a class typeInfo", () => {
         class Test {
-            static [typeInfoProperty] = classTypeInfo("MyTestName");
+            static [Symbol.typeInfo] = classTypeInfo("MyTestName");
         }
 
         registerType(Test);
         expect(getTypeFullName(Test)).toBe("MyTestName");
-        expect(Test[typeInfoProperty].typeKind).toBe("class");
+        expect(Test[Symbol.typeInfo].typeKind).toBe("class");
     });
 
     it("registers type as interface for an interface typeInfo", () => {
         class Test {
-            static [typeInfoProperty] = interfaceTypeInfo("MyTestName");
+            static [Symbol.typeInfo] = interfaceTypeInfo("MyTestName");
         }
 
         registerType(Test);
         expect(getTypeFullName(Test)).toBe("MyTestName");
-        expect(Test[typeInfoProperty].typeKind).toBe("interface");
+        expect(Test[Symbol.typeInfo].typeKind).toBe("interface");
     });
 
     it("registers type as editor for an editor typeInfo", () => {
         class Test {
-            static [typeInfoProperty] = editorTypeInfo("MyTestName");
+            static [Symbol.typeInfo] = editorTypeInfo("MyTestName");
         }
 
         registerType(Test);
         expect(getTypeFullName(Test)).toBe("MyTestName");
-        expect(Test[typeInfoProperty].typeKind).toBe("editor");
+        expect(Test[Symbol.typeInfo].typeKind).toBe("editor");
     });
 
     it("registers type as formatter for a formatter typeInfo", () => {
         class Test {
-            static [typeInfoProperty] = formatterTypeInfo("MyTestName");
+            static [Symbol.typeInfo] = formatterTypeInfo("MyTestName");
         }
 
         registerType(Test);
         expect(getTypeFullName(Test)).toBe("MyTestName");
-        expect(Test[typeInfoProperty].typeKind).toBe("formatter");
+        expect(Test[Symbol.typeInfo].typeKind).toBe("formatter");
     });
 });
 

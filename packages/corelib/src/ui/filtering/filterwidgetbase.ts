@@ -3,7 +3,7 @@ import { Widget, WidgetProps } from "../widgets/widget";
 import { FilterStore } from "./filterstore";
 
 export class FilterWidgetBase<P = {}> extends Widget<P> {
-    static override typeInfo = this.registerClass(nsSerenity);
+    static [Symbol.typeInfo] = this.registerClass(nsSerenity);
 
     declare private store: FilterStore;
 

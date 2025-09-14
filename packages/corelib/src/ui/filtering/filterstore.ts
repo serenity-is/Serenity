@@ -3,7 +3,7 @@ import { ArgumentNullException } from "../../compat";
 import { FilterLine } from "./filterline";
 
 export class FilterStore {
-    static typeInfo = classTypeInfo(nsSerenity); static { registerType(this); }
+    static [Symbol.typeInfo] = classTypeInfo(nsSerenity); static { registerType(this); }
 
     constructor(fields: PropertyItem[]) {
 

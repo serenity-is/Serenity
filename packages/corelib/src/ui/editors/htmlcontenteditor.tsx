@@ -14,7 +14,7 @@ export interface CKEditorConfig {
 
 export class HtmlContentEditor<P extends HtmlContentEditorOptions = HtmlContentEditorOptions> extends EditorWidget<P>
     implements IStringValue, IReadOnly {
-    static override typeInfo = this.registerEditor(nsSerenity, [IStringValue, IReadOnly]);
+    static [Symbol.typeInfo] = this.registerEditor(nsSerenity, [IStringValue, IReadOnly]);
 
     declare private _instanceReady: boolean;
     declare readonly domNode: HTMLTextAreaElement;
@@ -227,7 +227,7 @@ export class HtmlContentEditor<P extends HtmlContentEditorOptions = HtmlContentE
 }
 
 export class HtmlNoteContentEditor<P extends HtmlContentEditorOptions = HtmlContentEditorOptions> extends HtmlContentEditor<P> {
-    static override typeInfo = this.registerEditor(nsSerenity);
+    static [Symbol.typeInfo] = this.registerEditor(nsSerenity);
 
     protected getConfig(): CKEditorConfig {
         var config = super.getConfig();
@@ -244,7 +244,7 @@ export class HtmlNoteContentEditor<P extends HtmlContentEditorOptions = HtmlCont
 }
 
 export class HtmlReportContentEditor<P extends HtmlContentEditorOptions = HtmlContentEditorOptions> extends HtmlContentEditor<P> {
-    static override typeInfo = this.registerEditor(nsSerenity);
+    static [Symbol.typeInfo] = this.registerEditor(nsSerenity);
 
     protected getConfig(): CKEditorConfig {
         var config = super.getConfig();

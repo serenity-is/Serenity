@@ -120,7 +120,7 @@ describe('EntityGrid.getLocalTextDbPrefix', () => {
 
     it('returns class identifier based on typeInfo property', () => {
         class DefaultGrid extends EntityGrid<any, any> {
-            static typeInfo = this.registerClass('MyProject.TestModule.DefaultGrid');
+            static [Symbol.typeInfo] = this.registerClass('MyProject.TestModule.DefaultGrid');
         }
 
         var grid = new DefaultGrid({});
@@ -129,7 +129,7 @@ describe('EntityGrid.getLocalTextDbPrefix', () => {
 
     it('returns class identifier based on registration name', () => {
         class DefaultGrid extends EntityGrid<any, any> {
-            static typeInfo = this.registerClass('MyProject.MyModule.Some.DefaultGrid');
+            static [Symbol.typeInfo] = this.registerClass('MyProject.MyModule.Some.DefaultGrid');
         }
 
         var grid = new DefaultGrid({});
@@ -196,7 +196,7 @@ describe('EntityGrid.getLocalTextPrefix', () => {
 
     it('returns class identifier based on typeInfo property', () => {
         class DefaultGrid extends EntityGrid<any, any> {
-            static typeInfo = this.registerClass('MyProject.TestModule.DefaultGrid');
+            static [Symbol.typeInfo] = this.registerClass('MyProject.TestModule.DefaultGrid');
         }
 
         var grid = new DefaultGrid({});
@@ -205,7 +205,7 @@ describe('EntityGrid.getLocalTextPrefix', () => {
 
     it('returns class identifier based on registration name', () => {
         class DefaultGrid extends EntityGrid<any, any> {
-            static typeInfo = this.registerClass('MyProject.MyModule.Some.DefaultGrid');
+            static [Symbol.typeInfo] = this.registerClass('MyProject.MyModule.Some.DefaultGrid');
         }
 
         var grid = new DefaultGrid({});

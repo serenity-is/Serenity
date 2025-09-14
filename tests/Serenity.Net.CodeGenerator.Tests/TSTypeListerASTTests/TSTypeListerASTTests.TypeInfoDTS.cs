@@ -13,7 +13,7 @@ export type ClassTypeInfo<TypeName> = TypeInfo<TypeName>;
 
 export class Widget<TOptions = any> {
 	protected static registerClass<TypeName>(typeName: StringLiteral<TypeName>, intfAndAttr?: any[]): ClassTypeInfo<TypeName>;
-    static typeInfo: ClassTypeInfo<""Serenity.Widget"">;
+    static [Symbol.typeInfo]: ClassTypeInfo<""Serenity.Widget"">;
 }
 ");
         fileSystem.AddFile("node_modules/@serenity-is/corelib/package.json", @"{
@@ -26,7 +26,7 @@ export class Widget<TOptions = any> {
 import { Widget } from '@serenity-is/corelib';
 
 export class Type1 extends Widget {
-    static override typeInfo = this.registerClass(""MyNamespace.MyType1"");
+    static [Symbol.typeInfo] = this.registerClass(""MyNamespace.MyType1"");
 }
 ");
 
@@ -47,7 +47,7 @@ export class Type1 extends Widget {
                 Assert.Equal("/test:Type1", x.FullName);
                 Assert.Equal("@serenity-is/corelib:Widget", x.BaseType);
                 var f = Assert.Single(x.Fields);
-                Assert.Equal("typeInfo", f.Name);
+                Assert.Equal("[Symbol.typeInfo]", f.Name);
                 Assert.Equal("ClassTypeInfo", f.Type);
                 Assert.Equal("MyNamespace.MyType1", f.Value);
                 Assert.True(f.IsStatic);
@@ -57,7 +57,7 @@ export class Type1 extends Widget {
                 Assert.Equal("@serenity-is/corelib:Widget", x.FullName);
                 Assert.True(x.IsDeclaration);
                 var f = Assert.Single(x.Fields);
-                Assert.Equal("typeInfo", f.Name);
+                Assert.Equal("[Symbol.typeInfo]", f.Name);
                 Assert.Equal("ClassTypeInfo", f.Type);
                 Assert.Equal("Serenity.Widget", f.Value);
                 Assert.True(f.IsStatic);
@@ -75,7 +75,7 @@ export type ClassTypeInfo<TypeName> = TypeInfo<TypeName>;
 export class Widget<TOptions = any> {
 	protected static registerClass<TypeName>(typeName: StringLiteral<TypeName>, intfAndAttr?: any[]): ClassTypeInfo<TypeName> {
     }
-    static typeInfo: ClassTypeInfo<""Serenity.Widget"">;
+    static [Symbol.typeInfo]: ClassTypeInfo<""Serenity.Widget"">;
 }
 ");
         fileSystem.AddFile("node_modules/@serenity-is/corelib/package.json", @"{
@@ -88,7 +88,7 @@ export class Widget<TOptions = any> {
 import { Widget } from '@serenity-is/corelib';
 
 export class Type1 extends Widget {
-    static override typeInfo: import(""@serenity-is/corelib"").ClassTypeInfo<""MyNamespace.MyType1"">
+    static [Symbol.typeInfo]: import(""@serenity-is/corelib"").ClassTypeInfo<""MyNamespace.MyType1"">;
 }
 ");
 
@@ -109,7 +109,7 @@ export class Type1 extends Widget {
                 Assert.Equal("/test:Type1", x.FullName);
                 Assert.Equal("@serenity-is/corelib:Widget", x.BaseType);
                 var f = Assert.Single(x.Fields);
-                Assert.Equal("typeInfo", f.Name);
+                Assert.Equal("[Symbol.typeInfo]", f.Name);
                 Assert.Equal("ClassTypeInfo", f.Type);
                 Assert.Equal("MyNamespace.MyType1", f.Value);
                 Assert.True(f.IsStatic);
@@ -119,7 +119,7 @@ export class Type1 extends Widget {
                 Assert.Equal("@serenity-is/corelib:Widget", x.FullName);
                 Assert.True(x.IsDeclaration);
                 var f = Assert.Single(x.Fields);
-                Assert.Equal("typeInfo", f.Name);
+                Assert.Equal("[Symbol.typeInfo]", f.Name);
                 Assert.Equal("ClassTypeInfo", f.Type);
                 Assert.Equal("Serenity.Widget", f.Value);
                 Assert.True(f.IsStatic);
@@ -136,7 +136,7 @@ export type ClassTypeInfo<TypeName> = TypeInfo<TypeName>;
 
 export class Widget<TOptions = any> {
 	protected static registerClass<TypeName>(typeName: StringLiteral<TypeName>, intfAndAttr?: any[]): ClassTypeInfo<TypeName>;
-    static typeInfo: ClassTypeInfo<""Serenity.Widget"">;
+    static [Symbol.typeInfo]: ClassTypeInfo<""Serenity.Widget"">;
 }
 ");
         fileSystem.AddFile("node_modules/@serenity-is/corelib/package.json", @"{
@@ -149,7 +149,7 @@ export class Widget<TOptions = any> {
 import { Widget } from '@serenity-is/corelib';
 
 export class Type1 extends Widget {
-    static override typeInfo = classTypeInfo(""MyNamespace.MyType1""); static { registerType(this); }
+    static [Symbol.typeInfo] = classTypeInfo(""MyNamespace.MyType1""); static { registerType(this); }
 }
 ");
 
@@ -170,7 +170,7 @@ export class Type1 extends Widget {
                 Assert.Equal("/test:Type1", x.FullName);
                 Assert.Equal("@serenity-is/corelib:Widget", x.BaseType);
                 var f = Assert.Single(x.Fields);
-                Assert.Equal("typeInfo", f.Name);
+                Assert.Equal("[Symbol.typeInfo]", f.Name);
                 Assert.Equal("ClassTypeInfo", f.Type);
                 Assert.Equal("MyNamespace.MyType1", f.Value);
                 Assert.True(f.IsStatic);
@@ -180,7 +180,7 @@ export class Type1 extends Widget {
                 Assert.Equal("@serenity-is/corelib:Widget", x.FullName);
                 Assert.True(x.IsDeclaration);
                 var f = Assert.Single(x.Fields);
-                Assert.Equal("typeInfo", f.Name);
+                Assert.Equal("[Symbol.typeInfo]", f.Name);
                 Assert.Equal("ClassTypeInfo", f.Type);
                 Assert.Equal("Serenity.Widget", f.Value);
                 Assert.True(f.IsStatic);
@@ -197,7 +197,7 @@ export type ClassTypeInfo<TypeName> = TypeInfo<TypeName>;
 
 export class Widget<TOptions = any> {
 	protected static registerClass<TypeName>(typeName: StringLiteral<TypeName>, intfAndAttr?: any[]): ClassTypeInfo<TypeName>;
-    static typeInfo: ClassTypeInfo<""Serenity."">;
+    static [Symbol.typeInfo]: ClassTypeInfo<""Serenity."">;
 }
 ");
         fileSystem.AddFile("node_modules/@serenity-is/corelib/package.json", @"{
@@ -210,7 +210,7 @@ export class Widget<TOptions = any> {
 import { Widget } from '@serenity-is/corelib';
 
 export class Type1 extends Widget {
-    static override typeInfo = classTypeInfo(""MyNamespace.""); static { registerType(this); }
+    static [Symbol.typeInfo] = classTypeInfo(""MyNamespace.""); static { registerType(this); }
 }
 ");
 
@@ -231,7 +231,7 @@ export class Type1 extends Widget {
                 Assert.Equal("/test:Type1", x.FullName);
                 Assert.Equal("@serenity-is/corelib:Widget", x.BaseType);
                 var f = Assert.Single(x.Fields);
-                Assert.Equal("typeInfo", f.Name);
+                Assert.Equal("[Symbol.typeInfo]", f.Name);
                 Assert.Equal("ClassTypeInfo", f.Type);
                 Assert.Equal("MyNamespace.Type1", f.Value);
                 Assert.True(f.IsStatic);
@@ -241,7 +241,7 @@ export class Type1 extends Widget {
                 Assert.Equal("@serenity-is/corelib:Widget", x.FullName);
                 Assert.True(x.IsDeclaration);
                 var f = Assert.Single(x.Fields);
-                Assert.Equal("typeInfo", f.Name);
+                Assert.Equal("[Symbol.typeInfo]", f.Name);
                 Assert.Equal("ClassTypeInfo", f.Type);
                 Assert.Equal("Serenity.Widget", f.Value);
                 Assert.True(f.IsStatic);
@@ -273,7 +273,7 @@ export const nsMyNamespace: ""MyNamespace."" = ""MyNamespace."";
 import { Widget, nsMyNamespace } from '@serenity-is/corelib';
 
 export class Type1 extends Widget {
-    static override typeInfo = classTypeInfo(nsMyNamespace); static { registerType(this); }
+    static [Symbol.typeInfo] = classTypeInfo(nsMyNamespace); static { registerType(this); }
 }
 ");
 
@@ -294,7 +294,7 @@ export class Type1 extends Widget {
                 Assert.Equal("/test:Type1", x.FullName);
                 Assert.Equal("@serenity-is/corelib:Widget", x.BaseType);
                 var f = Assert.Single(x.Fields);
-                Assert.Equal("typeInfo", f.Name);
+                Assert.Equal("[Symbol.typeInfo]", f.Name);
                 Assert.Equal("ClassTypeInfo", f.Type);
                 Assert.Equal("MyNamespace.Type1", f.Value);
                 Assert.True(f.IsStatic);
@@ -332,7 +332,7 @@ import { Widget, nsMyNamespace } from '@serenity-is/corelib';
 const nsMyNamespace: ""MyNamespace."" = ""MyNamespace."";
 
 export class Type1 extends Widget {
-    static override typeInfo = classTypeInfo(nsMyNamespace); static { registerType(this); }
+    static [Symbol.typeInfo] = classTypeInfo(nsMyNamespace); static { registerType(this); }
 }
 ");
 
@@ -353,7 +353,7 @@ export class Type1 extends Widget {
                 Assert.Equal("/test:Type1", x.FullName);
                 Assert.Equal("@serenity-is/corelib:Widget", x.BaseType);
                 var f = Assert.Single(x.Fields);
-                Assert.Equal("typeInfo", f.Name);
+                Assert.Equal("[Symbol.typeInfo]", f.Name);
                 Assert.Equal("ClassTypeInfo", f.Type);
                 Assert.Equal("MyNamespace.Type1", f.Value);
                 Assert.True(f.IsStatic);

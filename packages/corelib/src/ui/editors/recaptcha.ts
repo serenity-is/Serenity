@@ -8,7 +8,7 @@ export interface RecaptchaOptions {
 }
 
 export class Recaptcha<P extends RecaptchaOptions = RecaptchaOptions> extends EditorWidget<P> implements IStringValue {
-    static override typeInfo = this.registerEditor(nsSerenity, [IStringValue]);
+    static [Symbol.typeInfo] = this.registerEditor(nsSerenity, [IStringValue]);
 
     constructor(props: EditorProps<P>) {
         super(props);
