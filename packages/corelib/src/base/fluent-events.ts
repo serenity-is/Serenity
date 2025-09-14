@@ -7,7 +7,6 @@
 
 import { getjQuery } from "./environment"
 
-const namespaceRegex = /[^.]*(?=\..*)\.|.*/
 const stripNameRegex = /\..*/
 const stripUidRegex = /::\d+$/
 let uidEvent = 1
@@ -172,7 +171,7 @@ export function addListener(element: EventTarget, originalTypeEvent: string, han
     }
 
     const events = getElementEvents(element);
-    const handlers = events[typeEvent] || (events[typeEvent] = {});
+    const handlers = events[typeEvent] || (events[typeEvent] = Object.create(null));
     const previousFunction = findHandler(handlers, callable, isDelegated ? handler : null);
 
     if (previousFunction) {
@@ -180,7 +179,9 @@ export function addListener(element: EventTarget, originalTypeEvent: string, han
         return;
     }
 
-    const uid = makeEventUid(originalTypeEvent.replace(namespaceRegex, ''))
+    const dotIdx = originalTypeEvent.indexOf('.');
+    const ns = dotIdx > -1 ? originalTypeEvent.substring(0, dotIdx) : '';
+    const uid = makeEventUid(ns)
     const fn = (isDelegated ?
         delegationHandler(element, handler as string, callable) :
         baseHandler(element, callable)) as any as EventHandler;
@@ -189,7 +190,8 @@ export function addListener(element: EventTarget, originalTypeEvent: string, han
     fn.callable = callable;
     fn.oneOff = oneOff;
     fn.uidEvent = uid;
-    handlers[uid] = fn;
+    if (uid !== '__proto__')
+        handlers[uid] = fn;
 
     element.addEventListener(typeEvent, fn as any, isDelegated);
 }
