@@ -11,7 +11,7 @@
     "jsx": "react-jsx",
     "jsxImportSource": "jsx-dom",
     "module": "ESNext",
-    "moduleResolution": "Node",
+    "moduleResolution": "bundler",
     "newLine": "lf",
     "noEmit": true,
     "noEmitOnError": false,
