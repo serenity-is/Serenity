@@ -180,7 +180,7 @@ export function addListener(element: EventTarget, originalTypeEvent: string, han
     }
 
     const dotIdx = originalTypeEvent.indexOf('.');
-    const ns = dotIdx > -1 ? originalTypeEvent.substring(0, dotIdx) : '';
+    const ns = dotIdx > -1 ? originalTypeEvent.substring(dotIdx + 1) : '';
     const uid = makeEventUid(ns)
     const fn = (isDelegated ?
         delegationHandler(element, handler as string, callable) :
