@@ -1,4 +1,4 @@
-import { implementedInterfacesSymbol, isAssignableFromSymbol, isInstanceOfTypeSymbol, isInterfaceTypeSymbol } from "./symbols";
+import { enumTypeInfoSymbol, implementedInterfacesSymbol, isAssignableFromSymbol, isInstanceOfTypeSymbol } from "./symbols";
 import { Enum, addCustomAttribute, classTypeInfo, editorTypeInfo, fieldsProxy, formatterTypeInfo, getBaseType, getCustomAttribute, getCustomAttributes, getInstanceType, getType, getTypeFullName, getTypeNameProp, getTypeShortName, hasCustomAttribute, initFormType, interfaceTypeInfo, isAssignableFrom, isEnum, isInstanceOfType, registerClass, registerEnum, registerInterface, registerType, typeInfoProperty } from "./system";
 import { ensureTypeInfo, peekTypeInfo } from "./system-internal";
 
@@ -312,11 +312,10 @@ describe("registerClass", () => {
 describe("registerEnum", () => {
     function expectTypeDetails(enumObj: any, name: string) {
         expect(isEnum(enumObj)).toBe(true);
-        expect(enumObj[isInterfaceTypeSymbol]).toBeNull();
-
+        expect(enumObj[typeInfoProperty]).toBeUndefined();
+        expect(enumObj[enumTypeInfoSymbol]).toBeDefined();
         expect(enumObj[implementedInterfacesSymbol]).toBeUndefined();
         expect(peekTypeInfo(enumObj)?.enumFlags).toBeUndefined();
-        expect(enumObj[implementedInterfacesSymbol]).toBeUndefined();
 
         if (name != null) {
             expect(getTypeFullName(enumObj)).toBe(name);
@@ -381,7 +380,7 @@ describe("registerInterface", () => {
             expect(klass[implementedInterfacesSymbol]).toBeUndefined();
 
         expect(peekTypeInfo(klass)?.enumFlags).toBeUndefined();
-        expect(klass[isInterfaceTypeSymbol]).toBe(true);
+        expect(peekTypeInfo(klass)?.typeKind).toBe("interface");
 
         if (name != null) {
             expect(getTypeFullName(klass)).toBe(name);

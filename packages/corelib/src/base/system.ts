@@ -1,4 +1,4 @@
-import { isAssignableFromSymbol, isInstanceOfTypeSymbol, isInterfaceTypeSymbol } from "./symbols";
+import { enumTypeInfoSymbol, isAssignableFromSymbol, isInstanceOfTypeSymbol } from "./symbols";
 import { StringLiteral, TypeInfo, ensureTypeInfo, getTypeNameProp, getTypeRegistry, globalObject, interfaceIsAssignableFrom, internalRegisterType, merge, peekTypeInfo, typeInfoProperty } from "./system-internal";
 export { getTypeNameProp, getTypeRegistry, setTypeNameProp, typeInfoProperty, type StringLiteral } from "./system-internal";
 
@@ -156,7 +156,7 @@ export function getBaseType(type: any) {
     if (type == null ||
         type === Object ||
         !type.prototype ||
-        (type as any)[isInterfaceTypeSymbol] === true)
+        (type as any)[typeInfoProperty]?.typeKind === "interface")
         return null;
 
     return Object.getPrototypeOf(type.prototype).constructor;
@@ -169,26 +169,36 @@ export function getBaseType(type: any) {
  * @param intf Optional interfaces the class implements
  */
 export function registerClass(type: any, name: string, intf?: any[]): void {
-    const typeInfo = internalRegisterType(type, name, intf);
-    typeInfo.typeKind ??= "class";
-    Object.defineProperty(type, isInterfaceTypeSymbol, { value: false, configurable: true });
+    internalRegisterType(type, name, intf, "class");
 }
 
 /**
  * Register an enum with the type system.
- * @param type Enum type to register
+ * @param enumType Enum type to register
  * @param name Name to register the enum under
  * @param enumKey Optional key to use for the enum
  */
-export function registerEnum(type: any, name: string, enumKey?: string) {
-    const typeInfo = internalRegisterType(type, name, undefined);
-    typeInfo.typeKind ??= "enum";
-    if (enumKey && enumKey != name) {
-        const typeStore = getTypeRegistry();
-        if (!typeStore[enumKey])
-            typeStore[enumKey] = type;
+export function registerEnum(enumType: any, name: string, enumKey?: string) {
+    if (typeof enumType !== "object" || enumType == null)
+        throw "Enum type is required in registerEnum!";
+
+    if (name && name.endsWith("."))
+        throw "Enum name cannot end with a dot in registerEnum!";
+
+    const typeInfo: TypeInfo<string> = {
+        typeKind: "enum",
+        typeName: name
     }
-    Object.defineProperty(type, isInterfaceTypeSymbol, { value: null, configurable: true });
+    Object.defineProperty(enumType, enumTypeInfoSymbol, { value: typeInfo, configurable: true, writable: true });
+    
+    const typeStore = getTypeRegistry();
+    if (name)
+        typeStore[name] = enumType;
+
+    if (enumKey && enumKey != name) {
+        if (!typeStore[enumKey])
+            typeStore[enumKey] = enumType;
+    }
 }
 
 /**
@@ -201,9 +211,7 @@ export function registerEnum(type: any, name: string, enumKey?: string) {
  * @param intf Optional interfaces the interface class implements
  */
 export function registerInterface(type: any, name: string, intf?: any[]) {
-    const typeInfo = internalRegisterType(type, name, intf);
-    typeInfo.typeKind ??= "interface";
-    Object.defineProperty(type, isInterfaceTypeSymbol, { value: true, configurable: true });
+    internalRegisterType(type, name, intf, "interface");
     Object.defineProperty(type, isAssignableFromSymbol, { value: interfaceIsAssignableFrom, configurable: true });
 }
 
@@ -273,8 +281,8 @@ export namespace Enum {
  * @returns True if the type is an enum
  */
 export const isEnum = (type: any) => {
-    return typeof type !== "function" &&
-        type[isInterfaceTypeSymbol] === null;
+    return typeof type === "object" &&
+        type[enumTypeInfoSymbol] !== void 0;
 };
 
 /**
@@ -521,8 +529,8 @@ export function interfaceTypeInfo<TypeName>(typeName: StringLiteral<TypeName>, i
 
     const attrs = intfAndAttr?.filter(x => typeof (x) !== "function")
     if (attrs?.length)
-        typeInfo.customAttributes = attrs; 
-    
+        typeInfo.customAttributes = attrs;
+
     return typeInfo;
 }
 
