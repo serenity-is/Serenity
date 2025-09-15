@@ -337,8 +337,8 @@ public class ApplicationMetadata : IApplicationMetadata
         {
             private readonly EntityField field = field ?? throw new ArgumentNullException(nameof(field));
 
-            public string ColumnName => field.Name;
-            public string PropertyName => field.PropertyName;
+            public string ColumnName => @field.Name;
+            public string PropertyName => @field.PropertyName;
         }
     }
 }

@@ -167,7 +167,7 @@ public partial class TSModuleResolver
                     fromPath += System.IO.Path.DirectorySeparatorChar;
                 moduleName = '/' + PathHelper.ToUrl(fileSystem.GetRelativePath(fromPath, resolvedPath));
 
-                foreach (var ext in extensions.Reverse())
+                foreach (var ext in Enumerable.Reverse(extensions))
                 {
                     if (moduleName.EndsWith(ext))
                     {
