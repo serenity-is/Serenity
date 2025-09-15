@@ -1532,12 +1532,10 @@ abstract class AbstractSelect2 {
             offset = getOffset(this.container);
             height = this.container.offsetHeight;
             width = this.container.offsetWidth;
-            dropHeight = dropdown.offsetHeight;
             viewPortRight = window.scrollX + windowWidth;
             viewportBottom = window.scrollY + windowHeight;
             dropTop = offset.top + height;
             dropLeft = offset.left;
-            dropWidth = dropdown.offsetWidth;
             enoughRoomOnRight = dropLeft + dropWidth <= viewPortRight;
             Fluent.toggleClass(dropdown, "select2-display-none", false);
 
@@ -1917,23 +1915,28 @@ abstract class AbstractSelect2 {
                     // ignore a response if the select2 has been closed before it was received
                     if (!self.opened()) return;
 
+                    this.dropdown?.classList.add('select2-position-fixed');
+                    try {
+                        self.opts.populateResults.call(this, results, data.results, { term: term, page: page, context: context });
+                        self.postprocessResults(data, false, false);
 
-                    self.opts.populateResults.call(this, results, data.results, { term: term, page: page, context: context });
-                    self.postprocessResults(data, false, false);
-
-                    if (data.more === true) {
-                        results.appendChild(more);
-                        var loadMore = evaluate(self.opts.formatLoadMore, self.opts.element, page + 1);
-                        Fluent.empty(more);
-                        if (loadMore instanceof Node)
-                            more.appendChild(loadMore);
-                        else
-                            more.textContent = loadMore ?? "";
-                        window.setTimeout(function () { self.loadMoreIfNeeded(); }, 10);
-                    } else {
-                        more.remove();
+                        if (data.more === true) {
+                            results.appendChild(more);
+                            var loadMore = evaluate(self.opts.formatLoadMore, self.opts.element, page + 1);
+                            Fluent.empty(more);
+                            if (loadMore instanceof Node)
+                                more.appendChild(loadMore);
+                            else
+                                more.textContent = loadMore ?? "";
+                            window.setTimeout(function () { self.loadMoreIfNeeded(); }, 10);
+                        } else {
+                            more.remove();
+                        }
+                        self.positionDropdown();
                     }
-                    self.positionDropdown();
+                    finally {
+                        this.dropdown?.classList.remove('select2-position-fixed');
+                    }
                     self.resultsPage = page;
                     self.context = data.context;
                     Fluent.trigger(this.opts.element, "select2-loaded", { items: data });
@@ -1994,11 +1997,16 @@ abstract class AbstractSelect2 {
 
 
         function render(klass: string, html?: Select2FormatResult) {
-            Fluent.empty(results);
-            var li = createLi(klass, html);
-            if (li != null)
-                results.appendChild(li);
-            postRender();
+            self.dropdown?.classList.add("select2-position-fixed");
+            try {
+                Fluent.empty(results);
+                var li = createLi(klass, html);
+                if (li != null)
+                    results.appendChild(li);
+                postRender();
+            } finally {
+                self.dropdown?.classList.remove("select2-position-fixed");
+            }
         }
 
         queryNumber = ++this.queryCount;
@@ -2094,17 +2102,23 @@ abstract class AbstractSelect2 {
                     return;
                 }
 
-                Fluent.empty(results);
-                self.opts.populateResults.call(this, results, data.results, { term: search.value, page: this.resultsPage, context: null });
+                this.dropdown?.classList.add("select2-position-fixed");
+                try {
+                    Fluent.empty(results);
+                    self.opts.populateResults.call(this, results, data.results, { term: search.value, page: this.resultsPage, context: null });
 
-                if (data.more === true && checkFormatter(opts.formatLoadMore, "formatLoadMore")) {
-                    results.appendChild(createLi("select2-more-results", evaluate(opts.formatLoadMore, opts.element, this.resultsPage)));
-                    window.setTimeout(function () { self.loadMoreIfNeeded(); }, 10);
+                    if (data.more === true && checkFormatter(opts.formatLoadMore, "formatLoadMore")) {
+                        results.appendChild(createLi("select2-more-results", evaluate(opts.formatLoadMore, opts.element, this.resultsPage)));
+                        window.setTimeout(function () { self.loadMoreIfNeeded(); }, 10);
+                    }
+
+                    this.postprocessResults(data, initial);
+
+                    postRender();
                 }
-
-                this.postprocessResults(data, initial);
-
-                postRender();
+                finally {
+                    this.dropdown?.classList.remove("select2-position-fixed");                    
+                }
 
                 Fluent.trigger(this.opts.element, "select2-loaded", { items: data });
             }
