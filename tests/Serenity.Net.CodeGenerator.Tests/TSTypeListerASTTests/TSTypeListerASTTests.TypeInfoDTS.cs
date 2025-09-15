@@ -233,7 +233,7 @@ export class Type1 extends Widget {
                 var f = Assert.Single(x.Fields);
                 Assert.Equal("[Symbol.typeInfo]", f.Name);
                 Assert.Equal("ClassTypeInfo", f.Type);
-                Assert.Equal("MyNamespace.Type1", f.Value);
+                Assert.Equal("MyNamespace.", f.Value);
                 Assert.True(f.IsStatic);
             },
             x =>
@@ -243,7 +243,7 @@ export class Type1 extends Widget {
                 var f = Assert.Single(x.Fields);
                 Assert.Equal("[Symbol.typeInfo]", f.Name);
                 Assert.Equal("ClassTypeInfo", f.Type);
-                Assert.Equal("Serenity.Widget", f.Value);
+                Assert.Equal("Serenity.", f.Value);
                 Assert.True(f.IsStatic);
             });
     }
@@ -296,7 +296,7 @@ export class Type1 extends Widget {
                 var f = Assert.Single(x.Fields);
                 Assert.Equal("[Symbol.typeInfo]", f.Name);
                 Assert.Equal("ClassTypeInfo", f.Type);
-                Assert.Equal("MyNamespace.Type1", f.Value);
+                Assert.Equal("MyNamespace.", f.Value);
                 Assert.True(f.IsStatic);
             },
             x =>
@@ -355,7 +355,7 @@ export class Type1 extends Widget {
                 var f = Assert.Single(x.Fields);
                 Assert.Equal("[Symbol.typeInfo]", f.Name);
                 Assert.Equal("ClassTypeInfo", f.Type);
-                Assert.Equal("MyNamespace.Type1", f.Value);
+                Assert.Equal("MyNamespace.", f.Value);
                 Assert.True(f.IsStatic);
             },
             x =>
@@ -364,5 +364,4 @@ export class Type1 extends Widget {
                 Assert.True(x.IsDeclaration);
             });
     }
-
 }

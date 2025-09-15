@@ -166,23 +166,53 @@ public class TSTypeListerAST
         return node?.GetText();
     }
 
-    string GetTypeNameLiteral(IExpression node)
+    object GetLiteralValue(IExpression node, bool isTypeInfo = false)
     {
         if (node == null)
             return null;
 
-        if (node is StringLiteral sl)
-            return sl.Text;
+        static bool getBasicLiteralValue(IExpression node, out object value)
+        {
+            if (node is StringLiteral sl)
+            {
+                value = sl.Text;
+                return true;
+            }
+
+            if (node is NumericLiteral nl)
+            {
+                value = double.Parse(nl.Text, CultureInfo.InvariantCulture.NumberFormat);
+                return true;
+            }
+
+            if (node is BooleanLiteral bl)
+            {
+                value = bl.Kind == SyntaxKind.TrueKeyword;
+                return true;
+            }
+
+            if (node is NullLiteral)
+            {
+                value = null;
+                return true;
+            }
+
+            value = null;
+            return false;
+        }
+
+        if (getBasicLiteralValue(node, out var value))
+            return value;
 
         string identifierName = null;
         if (node is Identifier identifier)
-            identifierName = identifier.GetText();
+            identifierName = identifier.Text;
 
         if (string.IsNullOrEmpty(identifierName))
             return null;
 
         // special case for Serenity, no need to parse corelib
-        if (identifierName == "nsSerenity")
+        if (isTypeInfo && identifierName == "nsSerenity")
             return "Serenity.";
 
         var parents = EnumerateParents(node).ToArray();
@@ -204,10 +234,11 @@ public class TSTypeListerAST
                     {
                         if (GetText(dec.Name) == identifierName)
                         {
-                            if (dec.Initializer is StringLiteral decsl)
-                                return decsl.Text;
+                            if (getBasicLiteralValue(dec.Initializer, out var v))
+                                return v;
 
-                            if (dec.Type is LiteralTypeNode declt &&
+                            if (isTypeInfo &&
+                                dec.Type is LiteralTypeNode declt &&
                                 declt.Literal is StringLiteral decltsl)
                                 return decltsl.Text;
 
@@ -224,10 +255,6 @@ public class TSTypeListerAST
                 {
                     if (import.ModuleSpecifier is not StringLiteral id)
                         continue;
-
-                    /*if (import.ImportClause?.Name is Identifier name &&
-                        name.Text == identifierName)
-                        return id.Text + ":" + name.Text + functionSuffix;*/
 
                     var elements = (import.ImportClause?.NamedBindings as NamedImports)?.Elements;
                     if (elements is null)
@@ -258,10 +285,11 @@ public class TSTypeListerAST
                                     {
                                         if (GetText(dec.Name) == identifierName)
                                         {
-                                            if (dec.Initializer is StringLiteral decsl)
-                                                return decsl.Text;
+                                            if (getBasicLiteralValue(dec.Initializer, out var v))
+                                                return v;
 
-                                            if (dec.Type is LiteralTypeNode declt &&
+                                            if (isTypeInfo &&
+                                                dec.Type is LiteralTypeNode declt &&
                                                 declt.Literal is StringLiteral decltsl)
                                                 return decltsl.Text;
 
@@ -554,29 +582,10 @@ public class TSTypeListerAST
 
             foreach (var arg in ce.Arguments)
             {
-                switch (arg.Kind)
+                result.Arguments.Add(new()
                 {
-                    case SyntaxKind.StringLiteral:
-                        result.Arguments.Add(new()
-                        {
-                            Value = (arg as StringLiteral).Text
-                        });
-                        break;
-
-                    case SyntaxKind.NumericLiteral:
-                        result.Arguments.Add(new()
-                        {
-                            Value = double.Parse((arg as LiteralExpressionBase).Text, CultureInfo.InvariantCulture.NumberFormat)
-                        });
-                        break;
-
-                    default:
-                        result.Arguments.Add(new()
-                        {
-                            Value = null
-                        });
-                        break;
-                }
+                    Value = GetLiteralValue(arg)
+                });
             }
         }
         else if (decorator.Expression.Kind == SyntaxKind.PropertyAccessExpression)
@@ -611,14 +620,6 @@ public class TSTypeListerAST
 
             ExternalMember externalMember;
 
-            string fixRegName(string text)
-            {
-                if (text != null && text[^1] == '.')
-                    return text + node.Name.GetText();
-
-                return text;
-            }
-
             if (member.Kind == SyntaxKind.PropertyDeclaration)
             {
                 externalMember = new ExternalMember();
@@ -635,7 +636,7 @@ public class TSTypeListerAST
                         trnl.Literal is StringLiteral trnll)
                     {
                         externalMember.Type = trni.Text;
-                        externalMember.Value = fixRegName(trnll.Text);
+                        externalMember.Value = trnll.Text;
                     }
                     else if (name == "[Symbol.typeInfo]" &&
                         member.HasModifier(SyntaxKind.StaticKeyword) &&
@@ -648,7 +649,7 @@ public class TSTypeListerAST
                         itnlt.Literal is StringLiteral itnlts)
                     {
                         externalMember.Type = itnq.Text;
-                        externalMember.Value = fixRegName(itnlts.Text);
+                        externalMember.Value = itnlts.Text;
                     }
                     else
                         externalMember.Type = GetTypeReferenceExpression(pd.Type);
@@ -661,10 +662,10 @@ public class TSTypeListerAST
                     ce.Arguments?.Count >= 1 &&
                     pae.Name?.Text is string paet &&
                     paet.StartsWith("register", StringComparison.Ordinal) &&
-                    GetTypeNameLiteral(ce.Arguments[0]) is string ltns)
+                    GetLiteralValue(ce.Arguments[0], isTypeInfo: true) is string ltns)
                 {
                     externalMember.Type = paet[8..] + "TypeInfo";
-                    externalMember.Value = fixRegName(ltns);
+                    externalMember.Value = ltns;
                 }
                 else if (
                     name == "[Symbol.typeInfo]" &&
@@ -674,10 +675,10 @@ public class TSTypeListerAST
                     ce2.Arguments?.Count >= 1 &&
                     ce2e.Text is string ce2et &&
                     ce2et.EndsWith("TypeInfo", StringComparison.Ordinal) == true &&
-                    GetTypeNameLiteral(ce2.Arguments[0]) is string ce2ets)
+                    GetLiteralValue(ce2.Arguments[0], isTypeInfo: true) is string ce2ets)
                 {
                     externalMember.Type = char.ToUpperInvariant(ce2et[0]) + ce2et[1..];
-                    externalMember.Value = fixRegName(ce2ets);
+                    externalMember.Value = ce2ets;
                 }
 
                 if (pd.Initializer is StringLiteral sl)
