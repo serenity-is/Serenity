@@ -87,10 +87,9 @@ public class TSTypeListerAST
 
     static string GetNamespace(INode node)
     {
-        return string.Join(".", EnumerateParents(node)
+        return string.Join(".", Enumerable.Reverse(EnumerateParents(node)
             .Where(x => x.Kind == SyntaxKind.ModuleDeclaration)
-            .Select(x => GetText((x as ModuleDeclaration).Name))
-            .Reverse());
+            .Select(x => GetText((x as ModuleDeclaration).Name))));
     }
 
     static string PrependNamespace(string s, INode node)

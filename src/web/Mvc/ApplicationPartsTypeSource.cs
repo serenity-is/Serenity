@@ -58,10 +58,9 @@ public class ApplicationPartsTypeSource(ApplicationPartManager partManager,
     /// <inheritdoc />
     public override IEnumerable<Assembly> GetAssemblies()
     {
-        var assemblies = GetImplicitAssemblies()
+        var assemblies = Enumerable.Reverse(GetImplicitAssemblies()
             .Concat(GetApplicationPartAssemblies()
-                .Where(IsTypeSourceAssembly)
-                .Reverse());
+                .Where(IsTypeSourceAssembly)));
 
         if (!topologicalSort)
             return assemblies;
