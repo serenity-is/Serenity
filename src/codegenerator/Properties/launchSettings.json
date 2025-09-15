@@ -15,6 +15,11 @@
       "commandLineArgs": "t",
       "workingDirectory": "../../serene/src/Serene.Web"
     },
+    "serene-doctor": {
+      "commandName": "Project",
+      "commandLineArgs": "doctor",
+      "workingDirectory": "../../serene/src/Serene.Web"
+    },
     "startsharp-generate": {
       "commandName": "Project",
       "commandLineArgs": "g",
@@ -23,6 +28,11 @@
     "startsharp-transform": {
       "commandName": "Project",
       "commandLineArgs": "t",
+      "workingDirectory": "../../../src/StartSharp.Web"
+    },
+    "startsharp-doctor": {
+      "commandName": "Project",
+      "commandLineArgs": "doctor",
       "workingDirectory": "../../../src/StartSharp.Web"
     }
   }

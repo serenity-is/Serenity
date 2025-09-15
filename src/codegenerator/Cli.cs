@@ -76,8 +76,40 @@ public class Cli(IFileSystem fileSystem, IGeneratorConsole console, IProcessExec
             });
         }
 
+        List<ExternalType> tsTypes = null;
+
+        void ensureTSTypes()
+        {
+            if (tsTypes is not null)
+                return;
+
+            var fileSystem = new TSCachingFileSystem(FileSystem);
+
+            var tsConfigFile = TSConfigHelper.LocateTSConfigFile(fileSystem, projectDir) ??
+                fileSystem.Combine(projectDir, "tsconfig.json");
+
+            var typeLister = new TSTypeLister(fileSystem, tsConfigFile, new());
+            tsTypes = typeLister.List();
+        }
+
         if (isCommand(CommandKeys.Doctor))
         {
+            try
+            {
+                ensureTSTypes();
+                string path = fileSystem.Combine(projectDir, "node_modules", ".sergen", "ts-types.json");
+                fileSystem.CreateDirectory(fileSystem.GetDirectoryName(path));
+                fileSystem.WriteAllText(path,
+                    JSON.StringifyIndented((tsTypes ?? [])
+                        .OrderBy(x => x.Module ?? "", StringComparer.Ordinal)
+                        .ThenBy(x => x.Namespace ?? "", StringComparer.Ordinal)
+                        .ThenBy(x => x.Name ?? "", StringComparer.Ordinal)));
+            }
+            catch
+            {
+                // ignore
+            }
+
             return RunCommand(new DoctorCommand(project, Console, ProcessExecutor)
             {
                 Arguments = arguments
@@ -101,21 +133,6 @@ public class Cli(IFileSystem fileSystem, IGeneratorConsole console, IProcessExec
 
         arguments.ThrowIfRemaining();
 
-        List<ExternalType> tsTypes = null;
-
-        void ensureTSTypes()
-        {
-            if (tsTypes is not null)
-                return;
-
-            var fileSystem = new TSCachingFileSystem(FileSystem);
-
-            var tsConfigFile = TSConfigHelper.LocateTSConfigFile(fileSystem, projectDir) ??
-                fileSystem.Combine(projectDir, "tsconfig.json");
-
-            var typeLister = new TSTypeLister(fileSystem, tsConfigFile, new());
-            tsTypes = typeLister.List();
-        }
 
         ExitCodes? exitCode = null;
         if (mvc)
