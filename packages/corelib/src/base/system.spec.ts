@@ -1,5 +1,5 @@
 import { implementedInterfacesSymbol, isAssignableFromSymbol, isInstanceOfTypeSymbol } from "./symbols";
-import { Enum, addCustomAttribute, classTypeInfo, editorTypeInfo, fieldsProxy, formatterTypeInfo, getBaseType, getCustomAttribute, getCustomAttributes, getInstanceType, getType, getTypeFullName, getTypeNameProp, getTypeShortName, hasCustomAttribute, initFormType, interfaceTypeInfo, isAssignableFrom, isEnum, isInstanceOfType, registerClass, registerEnum, registerInterface, registerType } from "./system";
+import { EditorAttribute, Enum, ISlickFormatter, addCustomAttribute, classTypeInfo, editorTypeInfo, fieldsProxy, formatterTypeInfo, getBaseType, getCustomAttribute, getCustomAttributes, getInstanceType, getType, getTypeFullName, getTypeNameProp, getTypeShortName, hasCustomAttribute, initFormType, interfaceTypeInfo, isAssignableFrom, isEnum, isInstanceOfType, registerClass, registerEnum, registerInterface, registerType } from "./system";
 import { ensureTypeInfo, peekTypeInfo } from "./system-internal";
 
 describe("Enum.getValues", () => {
@@ -580,7 +580,8 @@ describe("registerType", () => {
 
         registerType(Test);
         expect(getTypeFullName(Test)).toBe("MyTestName");
-        expect(Test[Symbol.typeInfo].typeKind).toBe("editor");
+        expect(Test[Symbol.typeInfo].typeKind).toBe("class");
+        expect(Test[Symbol.typeInfo].customAttributes?.some(x => x instanceof EditorAttribute)).toBe(true);
     });
 
     it("registers type as formatter for a formatter typeInfo", () => {
@@ -590,7 +591,9 @@ describe("registerType", () => {
 
         registerType(Test);
         expect(getTypeFullName(Test)).toBe("MyTestName");
-        expect(Test[Symbol.typeInfo].typeKind).toBe("formatter");
+        expect(Test[Symbol.typeInfo].typeKind).toBe("class");
+        expect(Test[Symbol.typeInfo].interfaces).toContain(ISlickFormatter);
+        expect(isAssignableFrom(ISlickFormatter, Test)).toBe(true);
     });
 });
 

@@ -2007,8 +2007,8 @@ export type StringLiteral<T> = T extends string ? string extends T ? never : T :
  * Type information for a registered type.
  */
 export type TypeInfo<TypeName> = {
-	/** Type kind, can be "class", "enum", "interface", "editor" or "formatter" */
-	typeKind: "class" | "enum" | "interface" | "editor" | "formatter";
+	/** Type kind, can be "class", "enum", "interface" */
+	typeKind: "class" | "enum" | "interface";
 	/** Registered type name */
 	typeName: StringLiteral<TypeName> | (string & {});
 	/** Implemented interfaces */
@@ -2205,16 +2205,16 @@ export declare class ISlickFormatter {
  * Register a SlickGrid formatter.
  * @param type Formatter type
  * @param name Formatter name
- * @param intf Optional interface(s) to implement
+ * @param intfAndAttr Optional interface(s) to implement
  */
-export declare function registerFormatter(type: any, name: string, intf?: any[]): void;
+export declare function registerFormatter(type: any, name: string, intfAndAttr?: any[]): void;
 /**
  * Register an editor type. Adds EditorAttribute if not already present.
  * @param type Editor type
  * @param name Editor name
  * @param intf Optional interface(s) to implement
  */
-export declare function registerEditor(type: any, name: string, intf?: any[]): void;
+export declare function registerEditor(type: any, name: string, intfAndAttr?: any[]): void;
 /**
  * Adds a custom attribute to a type. JavaScript does not have built-in support for attributes,
  * so Serenity uses a customAttributes array on typeInfo to store them. This is used by

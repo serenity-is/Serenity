@@ -26,8 +26,8 @@ export type StringLiteral<T> = T extends string ? string extends T ? never : T :
  * Type information for a registered type.
  */
 export type TypeInfo<TypeName> = {
-    /** Type kind, can be "class", "enum", "interface", "editor" or "formatter" */
-    typeKind: "class" | "enum" | "interface" | "editor" | "formatter";
+    /** Type kind, can be "class", "enum", "interface" */
+    typeKind: "class" | "enum" | "interface";
     /** Registered type name */
     typeName: StringLiteral<TypeName> | (string & {});
     /** Implemented interfaces */
@@ -88,7 +88,7 @@ function autoRegisterViaTypeInfo(type: any): void {
     return;
 }
 
-export function internalRegisterType(type: any, typeName?: string, interfaces?: any[], kind?: "class" | "enum" | "interface" | "editor" | "formatter"): TypeInfo<string> {
+export function internalRegisterType(type: any, typeName?: string, interfaces?: any[], kind?: "class" | "enum" | "interface"): TypeInfo<string> {
     const typeInfo = ensureTypeInfo(type);
     if (kind)
         typeInfo.typeKind = kind;

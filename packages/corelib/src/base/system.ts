@@ -362,10 +362,10 @@ registerInterface(ISlickFormatter, 'Serenity.ISlickFormatter');
  * Register a SlickGrid formatter.
  * @param type Formatter type
  * @param name Formatter name
- * @param intf Optional interface(s) to implement
+ * @param intfAndAttr Optional interface(s) to implement
  */
-export function registerFormatter(type: any, name: string, intf?: any[]): void {
-    registerClass(type, name, merge([ISlickFormatter], intf));
+export function registerFormatter(type: any, name: string, intfAndAttr?: any[]): void {
+    registerClass(type, name, merge([ISlickFormatter], intfAndAttr));
 }
 
 /**
@@ -374,12 +374,8 @@ export function registerFormatter(type: any, name: string, intf?: any[]): void {
  * @param name Editor name
  * @param intf Optional interface(s) to implement
  */
-export function registerEditor(type: any, name: string, intf?: any[]) {
-    registerClass(type, name, intf);
-    const typeInfo = peekTypeInfo(type);
-    typeInfo.typeKind = "editor";
-    if (!typeInfo.customAttributes?.some(x => getInstanceType(x) === x))
-        addCustomAttribute(type, new EditorAttribute());
+export function registerEditor(type: any, name: string, intfAndAttr?: any[]) {
+    registerClass(type, name, merge([new EditorAttribute()], intfAndAttr?.filter(x => typeof (x) !== "function" && x.prototype !== EditorAttribute.prototype)));
 }
 
 /**
@@ -490,7 +486,7 @@ export function classTypeInfo<TypeName>(typeName: StringLiteral<TypeName>, intfA
 
 export function editorTypeInfo<TypeName>(typeName: StringLiteral<TypeName>, intfAndAttr?: any[]): EditorTypeInfo<TypeName> {
     const typeInfo: TypeInfo<TypeName> = {
-        typeKind: "editor",
+        typeKind: "class",
         typeName
     };
 
@@ -504,7 +500,7 @@ export function editorTypeInfo<TypeName>(typeName: StringLiteral<TypeName>, intf
 
 export function formatterTypeInfo<TypeName>(typeName: StringLiteral<TypeName>, intfAndAttr?: any[]): FormatterTypeInfo<TypeName> {
     const typeInfo: TypeInfo<TypeName> = {
-        typeKind: "formatter",
+        typeKind: "class",
         typeName,
         interfaces: merge([ISlickFormatter], intfAndAttr?.filter(x => typeof (x) === "function"))
     };
