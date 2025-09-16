@@ -2959,10 +2959,20 @@ export declare function centerDialog(el: HTMLElement | ArrayLike<HTMLElement>): 
 export declare namespace LayoutTimer {
 	function store(key: number): void;
 	function trigger(key: number): void;
-	function onSizeChange(element: () => HTMLElement, handler: () => void, width?: boolean, height?: boolean): number;
-	function onWidthChange(element: () => HTMLElement, handler: () => void): number;
-	function onHeightChange(element: () => HTMLElement, handler: () => void): number;
-	function onShown(element: () => HTMLElement, handler: () => void): number;
+	function onSizeChange(element: () => HTMLElement, handler: () => void, opt?: {
+		width?: boolean;
+		height?: boolean;
+		debounceTimes?: number;
+	}): number;
+	function onWidthChange(element: () => HTMLElement, handler: () => void, opt?: {
+		debounceTimes?: number;
+	}): number;
+	function onHeightChange(element: () => HTMLElement, handler: () => void, opt?: {
+		debounceTimes?: number;
+	}): number;
+	function onShown(element: () => HTMLElement, handler: () => void, opt?: {
+		debounceTimes?: number;
+	}): number;
 	function off(key: number): number;
 }
 export declare function executeOnceWhenVisible(el: HTMLElement | ArrayLike<HTMLElement>, callback: Function): void;
