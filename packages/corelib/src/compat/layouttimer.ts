@@ -67,14 +67,12 @@ export namespace LayoutTimer {
                             h = el.offsetHeight;
                         }
                     }
-                    else {
-                        reg.debouncedTimes = 0;
-                    }
                 }
                 finally {
                     if (!debounced) {
                         reg.storedWidth = w;
                         reg.storedHeight = h;
+                        reg.debouncedTimes = 0;
                     }
                 }
             }
@@ -97,6 +95,7 @@ export namespace LayoutTimer {
 
         reg.storedWidth = el.offsetWidth;
         reg.storedHeight = el.offsetHeight;
+        reg.debouncedTimes = 0;
     }
 
     export function trigger(key: number) {
@@ -104,9 +103,10 @@ export namespace LayoutTimer {
         if (!reg)
             return;
         store(key);
-        if (reg.storedWidth >= 0 &&
-            reg.storedHeight >= 0) {
+        if (reg.storedWidth > 0 &&
+            reg.storedHeight > 0) {
             reg.handler();
+            reg.debouncedTimes = 0;
         }
         store(key);
     }
