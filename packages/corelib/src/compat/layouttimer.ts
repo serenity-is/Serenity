@@ -111,16 +111,16 @@ export namespace LayoutTimer {
         store(key);
     }
 
-    export function onSizeChange(element: () => HTMLElement, handler: () => void, width?: boolean, height?: boolean, debounceTimes?: number): number {
+    export function onSizeChange(element: () => HTMLElement, handler: () => void, opt?: { width?: boolean, height?: boolean, debounceTimes?: number }): number {
         if (handler == null)
             throw "Layout handler can't be null!";
 
         regs[++nextKey] = {
             element: element,
             handler: handler,
-            width: width !== false,
-            height: height !== false,
-            debounceTimes: debounceTimes || 0,
+            width: opt?.width !== false,
+            height: opt?.height !== false,
+            debounceTimes: opt?.debounceTimes || 0,
             debouncedTimes: 0
         }
         regCount++;
@@ -129,16 +129,16 @@ export namespace LayoutTimer {
         return nextKey;
     }
 
-    export function onWidthChange(element: () => HTMLElement, handler: () => void, debounceTimes?: number) {
-        return onSizeChange(element, handler, true, false, debounceTimes);
+    export function onWidthChange(element: () => HTMLElement, handler: () => void, opt?: { debounceTimes?: number }) {
+        return onSizeChange(element, handler, { width: true, height: false, debounceTimes: opt?.debounceTimes });
     }
 
-    export function onHeightChange(element: () => HTMLElement, handler: () => void, debounceTimes?: number) {
-        return onSizeChange(element, handler, false, true, debounceTimes);
+    export function onHeightChange(element: () => HTMLElement, handler: () => void, opt?: { debounceTimes?: number }) {
+        return onSizeChange(element, handler, { width: false, height: true, debounceTimes: opt?.debounceTimes });
     }
 
-    export function onShown(element: () => HTMLElement, handler: () => void, debounceTimes?: number) {
-        return onSizeChange(element, handler, false, false, debounceTimes);
+    export function onShown(element: () => HTMLElement, handler: () => void, opt?: { debounceTimes?: number }) {
+        return onSizeChange(element, handler, { width: false, height: false, debounceTimes: opt?.debounceTimes });
     }
 
     export function off(key: number): number {
