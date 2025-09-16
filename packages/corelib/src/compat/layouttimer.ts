@@ -1,4 +1,4 @@
-﻿import { isArrayLike } from "../base";
+﻿import { debounce, isArrayLike } from "../base";
 
 export { };
 
@@ -9,6 +9,8 @@ interface LayoutTimerReg {
     height: boolean;
     storedWidth?: number;
     storedHeight?: number;
+    debounceTimes?: number;
+    debouncedTimes?: number;
 }
 
 export namespace LayoutTimer {
@@ -41,25 +43,39 @@ export namespace LayoutTimer {
 
                 var w = el.offsetWidth;
                 var h = el.offsetHeight;
+                if (w <= 0 || h <= 0)
+                    continue;
+
+                var debounced = false;
                 try {
 
                     if ((reg.width && reg.storedWidth !== w) ||
                         (reg.height && reg.storedHeight !== h) ||
                         (!reg.width && !reg.height && (!w !== !reg.storedWidth || !h !== !reg.storedHeight))) {
-                        if (w > 0 && h > 0) {
-                            try {
-                                reg.handler();
-                            }
-                            finally {
-                                w = el.offsetWidth;
-                                h = el.offsetHeight;
-                            }
+                        if (reg.debounceTimes > 0 &&
+                            ++reg.debouncedTimes <= reg.debounceTimes) {
+                            debounced = true;
+                            continue;
                         }
+
+                        try {
+                            reg.debouncedTimes = 0;
+                            reg.handler();
+                        }
+                        finally {
+                            w = el.offsetWidth;
+                            h = el.offsetHeight;
+                        }
+                    }
+                    else {
+                        reg.debouncedTimes = 0;
                     }
                 }
                 finally {
-                    reg.storedWidth = w;
-                    reg.storedHeight = h;
+                    if (!debounced) {
+                        reg.storedWidth = w;
+                        reg.storedHeight = h;
+                    }
                 }
             }
             catch (e) {
@@ -95,7 +111,7 @@ export namespace LayoutTimer {
         store(key);
     }
 
-    export function onSizeChange(element: () => HTMLElement, handler: () => void, width?: boolean, height?: boolean): number {
+    export function onSizeChange(element: () => HTMLElement, handler: () => void, width?: boolean, height?: boolean, debounceTimes?: number): number {
         if (handler == null)
             throw "Layout handler can't be null!";
 
@@ -103,7 +119,9 @@ export namespace LayoutTimer {
             element: element,
             handler: handler,
             width: width !== false,
-            height: height !== false
+            height: height !== false,
+            debounceTimes: debounceTimes || 0,
+            debouncedTimes: 0
         }
         regCount++;
         store(nextKey)
@@ -111,16 +129,16 @@ export namespace LayoutTimer {
         return nextKey;
     }
 
-    export function onWidthChange(element: () => HTMLElement, handler: () => void) {
-        return onSizeChange(element, handler, true, false);
+    export function onWidthChange(element: () => HTMLElement, handler: () => void, debounceTimes?: number) {
+        return onSizeChange(element, handler, true, false, debounceTimes);
     }
 
-    export function onHeightChange(element: () => HTMLElement, handler: () => void) {
-        return onSizeChange(element, handler, false, true);
+    export function onHeightChange(element: () => HTMLElement, handler: () => void, debounceTimes?: number) {
+        return onSizeChange(element, handler, false, true, debounceTimes);
     }
 
-    export function onShown(element: () => HTMLElement, handler: () => void) {
-        return onSizeChange(element, handler, false, false);
+    export function onShown(element: () => HTMLElement, handler: () => void, debounceTimes?: number) {
+        return onSizeChange(element, handler, false, false, debounceTimes);
     }
 
     export function off(key: number): number {
