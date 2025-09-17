@@ -2,8 +2,7 @@
   <PropertyGroup>
       <DotNetSergen Condition="'$(DotNetSergen)' == '' And Exists('$(MSBuildThisFileDirectory)..\..\artifacts\sergen\sergen')">$(MSBuildThisFileDirectory)..\..\artifacts\sergen\sergen</DotNetSergen>
       <DotNetSergen Condition="'$(DotNetSergen)' == '' And Exists('$(MSBuildThisFileDirectory)..\..\artifacts\sergen\sergen.exe')">$(MSBuildThisFileDirectory)..\..\artifacts\sergen\sergen.exe</DotNetSergen>
-      <DotNetSergen Condition="'$(DotNetSergen)' == '' And Exists('$(MSBuildThisFileDirectory)..\..\artifacts\bin\Serenity.Net.CodeGenerator\sergen')">$(MSBuildThisFileDirectory)..\..\artifacts\bin\Serenity.Net.CodeGenerator\sergen</DotNetSergen>
-      <DotNetSergen Condition="'$(DotNetSergen)' == '' And Exists('$(MSBuildThisFileDirectory)..\..\artifacts\bin\Serenity.Net.CodeGenerator\sergen.exe')">$(MSBuildThisFileDirectory)..\..\artifacts\bin\Serenity.Net.CodeGenerator\sergen.exe</DotNetSergen>
+      <DotNetSergen Condition="'$(DotNetSergen)' == '' And Exists('$(MSBuildThisFileDirectory)..\codegenerator\Serenity.Net.CodeGenerator.csproj')">dotnet run --project $(MSBuildThisFileDirectory)..\codegenerator\Serenity.Net.CodeGenerator.csproj -- </DotNetSergen>
       <DotNetSergen Condition="'$(DotNetSergen)' == ''">dotnet sergen</DotNetSergen>
   </PropertyGroup>
   <UsingTask TaskName="RestoreNodeTypesTask" TaskFactory="RoslynCodeTaskFactory" AssemblyFile="$(MSBuildToolsPath)\Microsoft.Build.Tasks.Core.dll" >
