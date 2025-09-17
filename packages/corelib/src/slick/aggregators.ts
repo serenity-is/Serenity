@@ -167,7 +167,8 @@ export namespace AggregateFormatting {
                 if (result instanceof Element)
                     return result.outerHTML;
                 else if (result instanceof DocumentFragment)
-                    return Array.from((result as any as DocumentFragment).children).map(x => x.outerHTML).join("")
+                    return Array.from((result as any as DocumentFragment).childNodes)
+                        .map(x => x instanceof Element ? x.outerHTML : (x instanceof Text ? htmlEncode(x.textContent) : '')).join("")
                 return result;
             }
             catch (e) {
