@@ -163,7 +163,7 @@ export namespace AggregateFormatting {
             var item = new NonDataRow();
             (item as any)[column.field] = value;
             try {
-                var result = formatter({ column, escape: escapeHtml, item, value });
+                var result = formatter({ column, escape: escapeHtml, item, value, purpose: "grouptotal" });
                 if (result instanceof Element)
                     return result.outerHTML;
                 else if (result instanceof DocumentFragment)

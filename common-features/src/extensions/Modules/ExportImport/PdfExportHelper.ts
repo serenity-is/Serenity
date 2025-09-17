@@ -54,6 +54,7 @@ export namespace PdfExportHelper {
                 var col = srcColumns[cell];
                 var format = slickGrid.getFormatter(row, col);
                 var ctx = slickGrid.getFormatterContext(row, cell);
+                ctx.purpose = "pdfexport";
                 ctx.item = item;
                 ctx.value = item[col.field];
                 let html: FormatterResult = format ? format(ctx) : '';
