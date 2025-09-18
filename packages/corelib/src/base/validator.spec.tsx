@@ -1,4 +1,6 @@
-import { Validator } from './validator';
+import { Validator, addValidationRule, removeValidationRule } from './validator';
+import { Fluent } from './fluent';
+import { Culture } from './formatting';
 
 describe("Validator.element", () => {
     let form: HTMLFormElement;
@@ -166,6 +168,106 @@ describe("Validator.methods", () => {
         el.value = "https://example.com";
         expect(method("https://example.com", el)).toBe(true);
     });
+
+    it("validates date format (dateQ)", () => {
+        const el = document.createElement("input");
+        const method = Validator.methods.dateQ;
+        el.value = "invalid-date";
+        expect(method("invalid-date", el)).toBe(false);
+        el.value = "2023-12-25";
+        expect(method("2023-12-25", el)).toBe(true);
+        el.value = "2023-12-25T10:30:00";
+        expect(method("2023-12-25T10:30:00", el)).toBe(false); // dateQ requires date-only
+
+        // Test with different date order
+        const originalDateOrder = Culture.dateOrder;
+        try {
+            Culture.dateOrder = 'dmy';
+            el.value = "25/12/2023";
+            expect(method("25/12/2023", el)).toBe(true);
+            el.value = "12/25/2023";
+            expect(method("12/25/2023", el)).toBe(false); // should fail with dmy order
+        } finally {
+            Culture.dateOrder = originalDateOrder;
+        }
+    });
+
+    it("validates date-time format (dateTimeQ)", () => {
+        const el = document.createElement("input");
+        const method = Validator.methods.dateTimeQ;
+        el.value = "invalid-date";
+        expect(method("invalid-date", el)).toBe(false);
+        el.value = "2023-12-25";
+        expect(method("2023-12-25", el)).toBe(true);
+        el.value = "2023-12-25T10:30:00";
+        expect(method("2023-12-25T10:30:00", el)).toBe(true);
+
+        // Test with different date order
+        const originalDateOrder = Culture.dateOrder;
+        try {
+            Culture.dateOrder = 'dmy';
+            el.value = "25/12/2023 10:30:00";
+            expect(method("25/12/2023 10:30:00", el)).toBe(true);
+        } finally {
+            Culture.dateOrder = originalDateOrder;
+        }
+    });
+
+    it("validates decimal format (decimalQ)", () => {
+        const el = document.createElement("input");
+        const method = Validator.methods.decimalQ;
+        el.value = "invalid-decimal";
+        expect(method("invalid-decimal", el)).toBe(false);
+        el.value = "123.45";
+        expect(method("123.45", el)).toBe(true);
+        el.value = "123";
+        expect(method("123", el)).toBe(true);
+        el.value = "123.45.67";
+        expect(method("123.45.67", el)).toBe(false);
+
+        // Test with different decimal separator
+        const originalDecimalSeparator = Culture.decimalSeparator;
+        try {
+            Culture.decimalSeparator = ',';
+            el.value = "123,45";
+            expect(method("123,45", el)).toBe(true);
+            el.value = "123.45";
+            expect(method("123.45", el)).toBe(false); // should fail with comma separator
+        } finally {
+            Culture.decimalSeparator = originalDecimalSeparator;
+        }
+    });
+
+    it("validates integer format (integerQ)", () => {
+        const el = document.createElement("input");
+        const method = Validator.methods.integerQ;
+        el.value = "invalid-integer";
+        expect(method("invalid-integer", el)).toBe(false);
+        el.value = "123";
+        expect(method("123", el)).toBe(true);
+        el.value = "123.45";
+        expect(method("123.45", el)).toBe(false);
+
+        // Test with group separator
+        const originalGroupSeparator = Culture.groupSeparator;
+        try {
+            Culture.groupSeparator = ',';
+            el.value = "1,234";
+            expect(method("1,234", el)).toBe(true);
+            el.value = "1234";
+            expect(method("1234", el)).toBe(true);
+        } finally {
+            Culture.groupSeparator = originalGroupSeparator;
+        }
+    });
+
+    it("validates custom rules (customValidate)", () => {
+        const el = document.createElement("input");
+        const method = Validator.methods.customValidate;
+        el.value = "test";
+        // Without custom rules, should return true
+        expect(method("test", el)).toBe(true);
+    });
 });
 
 describe("Validator.normalizeRules", () => {
@@ -250,6 +352,271 @@ describe("Validator.normalizeRules", () => {
         const el = document.createElement("input");
         const rules = Validator.normalizeRules({}, el as any);
         expect(rules).toEqual({});
+    });
+});
+
+describe("Validator static utility methods", () => {
+    it("optional returns dependency-mismatch for empty required fields", () => {
+        const el = document.createElement("input");
+        el.value = "";
+        expect(Validator.optional(el, "")).toBe("dependency-mismatch");
+    });
+
+    it("optional returns false for non-empty values", () => {
+        const el = document.createElement("input");
+        el.value = "test";
+        expect(Validator.optional(el, "test")).toBe(false);
+    });
+
+    it("valid returns false for non-form elements", () => {
+        const el = document.createElement("input");
+        expect(Validator.valid(el)).toBe(false);
+    });
+
+    it("rules returns empty object for elements without form", () => {
+        const el = document.createElement("input");
+        expect(Validator.rules(el)).toBeUndefined();
+    });
+
+    it("rules can add and remove rules", () => {
+        const form = document.createElement("form");
+        const el = document.createElement("input");
+        el.name = "test";
+        form.appendChild(el);
+        const validator = new Validator(form, { rules: {} });
+
+        // Add rule
+        Validator.rules(el, "add", { required: true });
+        expect(Validator.rules(el)).toEqual({ required: true });
+
+        // Remove rule
+        Validator.rules(el, "remove", "required");
+        expect(Validator.rules(el)).toEqual({});
+    });
+
+    it("addClassRules adds class-based rules", () => {
+        Validator.addClassRules("testClass", { required: true });
+        expect(Validator.classRuleSettings.testClass).toEqual({ required: true });
+
+        // Cleanup
+        delete Validator.classRuleSettings.testClass;
+    });
+
+    it("classRules extracts rules from element classes", () => {
+        const el = document.createElement("input");
+        el.className = "required email";
+        const rules = Validator.classRules(el);
+        expect(rules).toEqual({ required: true, email: true });
+    });
+
+    it("attributeRules extracts rules from element attributes", () => {
+        const el = document.createElement("input");
+        el.setAttribute("required", "");
+        el.setAttribute("minlength", "5");
+        el.setAttribute("type", "text");
+        const rules = Validator.attributeRules(el);
+        expect(rules).toEqual({ required: true, minlength: 5 });
+    });
+
+    it("dataRules extracts rules from data attributes", () => {
+        const el = document.createElement("input");
+        el.dataset.ruleRequired = "";
+        el.dataset.ruleMinlength = "3";
+        const rules = Validator.dataRules(el);
+        expect(rules).toEqual({ required: true, minlength: 3 });
+    });
+
+    it("staticRules returns rules from validator settings", () => {
+        const form = document.createElement("form");
+        const el = document.createElement("input");
+        el.name = "test";
+        form.appendChild(el);
+        const validator = new Validator(form, { rules: { test: { required: true } } });
+
+        const rules = Validator.staticRules(el);
+        expect(rules).toEqual({ required: true });
+    });
+
+    it("normalizeAttributeRule handles different attribute types", () => {
+        const rules: any = {};
+        const el = document.createElement("input");
+        el.setAttribute("type", "number");
+
+        Validator.normalizeAttributeRule(rules, "number", "min", "5");
+        expect(rules.min).toBe(5);
+
+        Validator.normalizeAttributeRule(rules, "number", "max", "10");
+        expect(rules.max).toBe(10);
+
+        Validator.normalizeAttributeRule(rules, "number", "step", "2");
+        expect(rules.step).toBe(2);
+    });
+
+    it("getHighlightTarget returns element by data-vx-highlight", () => {
+        const el = document.createElement("input");
+        el.dataset.vxHighlight = "highlight-target";
+        const target = document.createElement("div");
+        target.id = "highlight-target";
+        document.body.appendChild(target);
+
+        expect(Validator.getHighlightTarget(el)).toBe(target);
+
+        document.body.removeChild(target);
+    });
+
+    it("getHighlightTarget returns s2id element for select2", () => {
+        const el = document.createElement("input");
+        el.className = "select2-offscreen";
+        el.id = "test-select";
+        const target = document.createElement("div");
+        target.id = "s2id_test-select";
+        document.body.appendChild(target);
+
+        expect(Validator.getHighlightTarget(el)).toBe(target);
+
+        document.body.removeChild(target);
+    });
+});
+
+describe("Validator instance methods", () => {
+    it("form validates the entire form and returns validity", () => {
+        const form = document.createElement("form");
+        const input = document.createElement("input");
+        input.name = "test";
+        form.appendChild(input);
+        const validator = new Validator(form, { rules: { test: { required: true } } });
+
+        input.value = "";
+        expect(validator.form()).toBe(false);
+
+        input.value = "value";
+        expect(validator.form()).toBe(true);
+    });
+
+    it("checkForm validates all elements without showing errors", () => {
+        const form = document.createElement("form");
+        const input = document.createElement("input");
+        input.name = "test";
+        form.appendChild(input);
+        const validator = new Validator(form, { rules: { test: { required: true } } });
+
+        input.value = "";
+        expect(validator.checkForm()).toBe(false);
+        expect((validator as any).errorList.length).toBeGreaterThan(0);
+    });
+
+    it("showErrors displays errors using custom showErrors function", () => {
+        const form = document.createElement("form");
+        const input = document.createElement("input");
+        input.name = "test";
+        form.appendChild(input);
+        const validator = new Validator(form, {
+            rules: { test: { required: true } },
+            showErrors: vi.fn()
+        });
+
+        (validator as any).errorMap = { test: "Required" };
+        (validator as any).errorList = [{ message: "Required", element: input }];
+        validator.showErrors();
+
+        expect(validator.settings.showErrors).toHaveBeenCalledWith((validator as any).errorMap, (validator as any).errorList, validator);
+    });
+
+    it("resetForm clears all errors and resets elements", () => {
+        const form = document.createElement("form");
+        const input = document.createElement("input");
+        input.name = "test";
+        form.appendChild(input);
+        const validator = new Validator(form, { rules: { test: { required: true } } });
+
+        input.value = "";
+        validator.element(input); // This should add errors
+        expect((validator as any).errorList.length).toBeGreaterThan(0);
+
+        validator.resetForm();
+        expect((validator as any).errorList.length).toBe(0);
+        expect((validator as any).invalid).toEqual({});
+    });
+
+    it("resetElements removes classes and attributes from elements", () => {
+        const form = document.createElement("form");
+        const input = document.createElement("input");
+        input.name = "test";
+        form.appendChild(input);
+        const validator = new Validator(form, {});
+
+        input.classList.add("error");
+        input.classList.add("valid");
+
+        validator.resetElements([input]);
+        expect(input.classList.contains("error")).toBe(false);
+        expect(input.classList.contains("valid")).toBe(false);
+    });
+
+    it("numberOfInvalids returns count of invalid fields", () => {
+        const form = document.createElement("form");
+        const validator = new Validator(form, {});
+
+        (validator as any).invalid = { field1: "error1", field2: "error2" };
+        expect(validator.numberOfInvalids()).toBe(2);
+
+        (validator as any).invalid = {};
+        expect(validator.numberOfInvalids()).toBe(0);
+    });
+
+    it("hideErrors hides error elements", () => {
+        const form = document.createElement("form");
+        const errorEl = document.createElement("label");
+        errorEl.className = "error";
+        errorEl.style.display = "block";
+        form.appendChild(errorEl);
+        const validator = new Validator(form, {});
+
+        (validator as any).toHide = [errorEl];
+        validator.hideErrors();
+        expect(errorEl.style.display).toBe("none");
+    });
+
+    it("valid returns true when no errors", () => {
+        const form = document.createElement("form");
+        const validator = new Validator(form, {});
+
+        (validator as any).errorList = [];
+        expect(validator.valid()).toBe(true);
+
+        (validator as any).errorList = [{ message: "error", element: document.createElement("input") }];
+        expect(validator.valid()).toBe(false);
+    });
+
+    it("size returns number of errors", () => {
+        const form = document.createElement("form");
+        const validator = new Validator(form, {});
+
+        (validator as any).errorList = [];
+        expect(validator.size()).toBe(0);
+
+        (validator as any).errorList = [{ message: "error", element: document.createElement("input") }];
+        expect(validator.size()).toBe(1);
+    });
+
+    it("focusInvalid focuses the first invalid element", () => {
+        const form = document.createElement("form");
+        const input = document.createElement("input");
+        input.name = "test";
+        form.appendChild(input);
+        document.body.appendChild(form);
+        const validator = new Validator(form, { focusInvalid: true });
+
+        (validator as any).errorList = [{ message: "error", element: input }];
+        const focusSpy = vi.spyOn(input, "focus");
+
+        // Mock isVisibleLike to return true
+        vi.spyOn(Fluent, "isVisibleLike").mockReturnValue(true);
+
+        validator.focusInvalid();
+        expect(focusSpy).toHaveBeenCalled();
+
+        document.body.removeChild(form);
     });
 });
 
@@ -428,6 +795,284 @@ describe("Validator.defaults", () => {
         validator.settings.unhighlight?.call(validator, r1 as any, validator.settings.errorClass!, validator.settings.validClass!);
         expect(r1.classList.contains(validator.settings.validClass!)).toBe(true);
         expect(r2.classList.contains(validator.settings.validClass!)).toBe(true);
+    });
+});
+
+describe("Validator.validatorEventDelegate", () => {
+    it("handles contenteditable elements", () => {
+        const form = document.createElement("form");
+        const div = document.createElement("div");
+        div.setAttribute("contenteditable", "true");
+        div.setAttribute("name", "content");
+        form.appendChild(div);
+        document.body.appendChild(form);
+        try {
+            const validator = new Validator(form, {
+                rules: {
+                    content: {
+                        required: true
+                    },
+                    test: {
+                        required: true
+                    }
+                }
+            });
+
+            div.dispatchEvent(new Event("focusin", { bubbles: true }));
+            expect(validator.lastActive).toBe(div);
+
+            // Test that form is set on contenteditable elements
+            expect((div as any).form).toBe(form);
+        }
+        finally {
+            document.body.removeChild(form);
+        }
+    });
+
+    it("Validator.isValidatableElement correctly identifies validatable elements", () => {
+        const input = document.createElement("input");
+        const select = document.createElement("select");
+        const textarea = document.createElement("textarea");
+        const div = document.createElement("div");
+
+        expect(Validator.isValidatableElement(input)).toBe(true);
+        expect(Validator.isValidatableElement(select)).toBe(true);
+        expect(Validator.isValidatableElement(textarea)).toBe(true);
+        expect(Validator.isValidatableElement(div)).toBe(false);
+    });
+});
+
+describe("Validator.resetAll", () => {
+    it("resets all validation state", () => {
+        const form = document.createElement("form");
+        try {
+            const input = document.createElement("input");
+            input.name = "test";
+            form.appendChild(input);
+            document.body.appendChild(form);
+
+            const validator = new Validator(form, {
+                rules: {
+                    test: { required: true }
+                }
+            });
+
+            // Make it invalid and submitted
+            input.value = "";
+            validator.element(input);
+            (validator as any).submitted[input.name] = true;
+
+            expect(validator.numberOfInvalids()).toBe(1);
+            expect((validator as any).submitted[input.name]).toBe(true);
+
+            validator.resetAll();
+
+            expect(validator.numberOfInvalids()).toBe(0);
+            expect((validator as any).submitted[input.name]).toBeUndefined();
+        } finally {
+            document.body.removeChild(form);
+        }
+    });
+});
+
+describe("Other Validator instance methods", () => {
+    it("validation dependTypes handle different parameter types", () => {
+        const form = document.createElement("form");
+        try {
+            const input = document.createElement("input");
+            input.name = "test";
+            form.appendChild(input);
+            document.body.appendChild(form);
+
+            const validator = new Validator(form, {});
+
+            // Test boolean depend type
+            expect(validator.dependTypes.boolean(true)).toBe(true);
+            expect(validator.dependTypes.boolean(false)).toBe(false);
+
+            // Test string depend type
+            const selectorInput = document.createElement("input");
+            selectorInput.id = "selector";
+            form.appendChild(selectorInput);
+            expect(validator.dependTypes.string("#selector", input)).toBe(true);
+            expect(validator.dependTypes.string("#nonexistent", input)).toBe(false);
+
+            // Test function depend type
+            const testFn = () => true;
+            expect(validator.dependTypes.function(testFn, input)).toBe(true);
+        } finally {
+            document.body.removeChild(form);
+        }
+    });
+
+    it("depend() method handles dependency validation", () => {
+        const form = document.createElement("form");
+        try {
+            const input1 = document.createElement("input");
+            input1.name = "field1";
+            const input2 = document.createElement("input");
+            input2.name = "field2";
+            form.appendChild(input1);
+            form.appendChild(input2);
+            document.body.appendChild(form);
+
+            const validator = new Validator(form, {
+                rules: {
+                    field2: {
+                        required: {
+                            depends: () => input1.value === "enable"
+                        }
+                    }
+                }
+            });
+
+            // When dependency is not met, field2 should not be required
+            input1.value = "disable";
+            input2.value = "";
+            expect(validator.element(input2)).toBe(true);
+
+            // When dependency is met, field2 should be required
+            input1.value = "enable";
+            input2.value = "";
+            expect(validator.element(input2)).toBe(false);
+        } finally {
+            document.body.removeChild(form);
+        }
+    });
+
+    it("startRequest() and stopRequest() manage pending requests", () => {
+        const form = document.createElement("form");
+        try {
+            const input = document.createElement("input");
+            input.name = "test";
+            form.appendChild(input);
+            document.body.appendChild(form);
+
+            const validator = new Validator(form, {});
+
+            expect((validator as any).pendingRequest).toBe(0);
+
+            validator.startRequest(input);
+            expect((validator as any).pendingRequest).toBe(1);
+            expect((validator as any).pending[input.name]).toBeInstanceOf(AbortController);
+
+            validator.stopRequest(input, true);
+            expect((validator as any).pendingRequest).toBe(0);
+            expect((validator as any).pending[input.name]).toBeUndefined();
+        } finally {
+            document.body.removeChild(form);
+        }
+    });
+
+    it("previousValue() tracks previous validation values", () => {
+        const form = document.createElement("form");
+        try {
+            const input = document.createElement("input");
+            input.name = "test";
+            form.appendChild(input);
+            document.body.appendChild(form);
+
+            const validator = new Validator(form, {});
+
+            // Initially returns an object with default values
+            const prevValue = validator.previousValue(input, "required");
+            expect(prevValue).toHaveProperty("old", null);
+            expect(prevValue).toHaveProperty("valid", true);
+            expect(prevValue).toHaveProperty("message");
+
+            // After validation, the previousValue object should still exist
+            // (previousValue is mainly used for remote validation)
+            input.value = "test value";
+            validator.element(input);
+            const prevValue2 = validator.previousValue(input, "required");
+            expect(prevValue2).toHaveProperty("old", null); // old remains null for non-remote validation
+            expect(prevValue2).toHaveProperty("valid", true);
+            expect(prevValue2).toHaveProperty("message");
+        } finally {
+            document.body.removeChild(form);
+        }
+    });
+
+    it("destroy() cleans up validator instance", () => {
+        const form = document.createElement("form");
+        try {
+            const input = document.createElement("input");
+            input.name = "test";
+            form.appendChild(input);
+            document.body.appendChild(form);
+
+            const validator = new Validator(form, {
+                rules: {
+                    test: { required: true }
+                }
+            });
+
+            // Add some state
+            (validator as any).submitted[input.name] = true;
+            (validator as any).invalid[input.name] = "error";
+
+            validator.destroy();
+
+            // Check that state is cleared
+            expect((validator as any).submitted[input.name]).toBeUndefined();
+            expect((validator as any).invalid[input.name]).toBeUndefined();
+            expect((validator as any).currentForm).toBeUndefined();
+        } finally {
+            document.body.removeChild(form);
+        }
+    });
+});
+
+describe("Validator.addCustomRule and removeCustomRule", () => {
+
+    it("adds custom validation rules to elements", () => {
+        const form = document.createElement("form");
+        try {
+            const input = document.createElement("input");
+            input.name = "test";
+            input.value = "xyzabc";
+            form.appendChild(input);
+            document.body.appendChild(form);
+
+            const validator = new Validator(form, {
+                rules: {
+                    test: { required: true, minlength: 5 }
+                }
+            });
+
+            let rules = Validator.rules(input);
+            expect(rules).toEqual({ required: true, minlength: 5 });
+
+            Validator.addCustomRule(input, x => null, "rule1");
+            Validator.addCustomRule(input, x => "fail2", "rule2");
+
+            rules = Validator.rules(input);
+            expect(rules).toEqual({ required: true, minlength: 5, customValidate: true });
+
+            // The custom validation should fail
+            expect(validator.element(input)).toBe(false);
+            expect((validator as any).errorMap[input.name]).toBe("fail2");
+
+            // Remove one custom rule, should still fail
+            Validator.removeCustomRule(input, "rule1");
+
+            rules = Validator.rules(input);
+            expect(rules).toEqual({ required: true, minlength: 5, customValidate: true });
+
+            expect(validator.element(input)).toBe(false);
+            expect((validator as any).errorMap[input.name]).toBe("fail2");
+
+            // Remove the other custom rule, should pass now
+            Validator.removeCustomRule(input, "rule2");
+
+            rules = Validator.rules(input);
+            expect(rules).toEqual({ required: true, minlength: 5 });
+
+            expect(validator.element(input)).toBe(true);
+            expect((validator as any).errorMap[input.name]).toBeUndefined();
+        } finally {
+            document.body.removeChild(form);
+        };
     });
 });
 

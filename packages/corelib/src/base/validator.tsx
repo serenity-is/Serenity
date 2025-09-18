@@ -1671,30 +1671,38 @@ export class Validator {
         else if (el.classList.contains("select2-offscreen") && el.id)
             return document.getElementById('s2id_' + el.id);
     }
-}
 
-export function addValidationRule(element: HTMLElement | ArrayLike<HTMLElement>, rule: (input: ValidatableElement) => string,
-    uniqueName?: string): void {
-    element = isArrayLike(element) ? element[0] : element;
-    if (!element)
-        return;
-    element.classList.add('customValidate');
-    var rules = customValidateRules.get(element);
-    if (!rules)
-        customValidateRules.set(element, rules = {});
-    uniqueName ??= '';
-    rules[uniqueName] ??= [];
-    rules[uniqueName].push(rule);
-}
-
-export function removeValidationRule(element: HTMLElement | ArrayLike<HTMLElement>, uniqueName: string): void {
-    element = isArrayLike(element) ? element[0] : element;
-    if (!element)
-        return;
-    var rules = customValidateRules.get(element);
-    if (rules) {
-        delete rules[uniqueName];
-        if (!Object.keys(rules).length)
-            customValidateRules.delete(element);
+    static addCustomRule(element: HTMLElement | ArrayLike<HTMLElement>, rule: (input: ValidatableElement) => string,
+        uniqueName?: string): void {
+        element = isArrayLike(element) ? element[0] : element;
+        if (!element)
+            return;
+        element.classList.add('customValidate');
+        var rules = customValidateRules.get(element);
+        if (!rules)
+            customValidateRules.set(element, rules = {});
+        uniqueName ??= '';
+        rules[uniqueName] ??= [];
+        rules[uniqueName].push(rule);
     }
+
+    static removeCustomRule(element: HTMLElement | ArrayLike<HTMLElement>, uniqueName: string): void {
+        element = isArrayLike(element) ? element[0] : element;
+        if (!element)
+            return;
+        var rules = customValidateRules.get(element);
+        if (rules) {
+            delete rules[uniqueName];
+            if (!Object.keys(rules).length) {
+                customValidateRules.delete(element);
+                element.classList.remove('customValidate');
+            }
+        }
+        else
+            element.classList.remove('customValidate');
+    }
+
 }
+
+export const addValidationRule = Validator.addCustomRule;
+export const removeValidationRule = Validator.removeCustomRule;
