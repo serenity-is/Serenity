@@ -724,5 +724,146 @@ describe("closeHandler (panel dialogs)", () => {
         expect(panel.dataset.qroute).toBe("!1"); // Should not be deleted
         expect(replaceSpy).not.toHaveBeenCalled();
         expect(replaceLastSpy).not.toHaveBeenCalled();
+    })
+});
+
+describe("Router document click handling", () => {
+    it("should return 'skipped' when resolving current hash after anchor click within 100ms", () => {
+        // Use fake timers
+        vi.useFakeTimers();
+
+        // Click an anchor with hash href
+        const anchor = document.createElement("a");
+        document.body.appendChild(anchor);
+        anchor.setAttribute("href", "#testHash");
+
+        const clickEvent = new MouseEvent("click", {
+            bubbles: true,
+            cancelable: true
+        });
+        anchor.dispatchEvent(clickEvent);
+
+        // Set the current hash to match what was clicked
+        changeJSDOMURL(window.location.href.split('#')[0] + "#testHash");
+
+        // Resolve current hash (resolvingCurrent = true)
+        const result = Router.resolve(null);
+
+        // Should return "skipped" because hash anchor was clicked recently
+        expect(result).toBe("skipped");
+
+        // Restore real timers
+        vi.useRealTimers();
+
+        // Clean up
+        document.body.removeChild(anchor);
+    });
+
+    it("should not return 'skipped' when resolving current hash after anchor click after 100ms", () => {
+        // Use fake timers from the start
+        vi.useFakeTimers();
+
+        // Click an anchor with hash href
+        const anchor = document.createElement("a");
+        document.body.appendChild(anchor);
+        anchor.setAttribute("href", "#testHash");
+
+        const clickEvent = new MouseEvent("click", {
+            bubbles: true,
+            cancelable: true
+        });
+        anchor.dispatchEvent(clickEvent);
+
+        // Advance time by more than 100ms
+        vi.advanceTimersByTime(150);
+
+        // Set the current hash to match what was clicked
+        changeJSDOMURL(window.location.href.split('#')[0] + "#testHash");
+
+        // Resolve current hash
+        const result = Router.resolve(null);
+
+        // Should not return "skipped" because 100ms window passed
+        expect(result).not.toBe("skipped");
+
+        // Restore real timers
+        vi.useRealTimers();
+
+        // Clean up
+        document.body.removeChild(anchor);
+    });
+
+    it("should not return 'skipped' when resolving current hash for route patterns after anchor click", () => {
+        // Click an anchor with hash href that matches mightBeRouteRegex
+        const anchor = document.createElement("a");
+        document.body.appendChild(anchor);
+        anchor.setAttribute("href", "#new");
+
+        const clickEvent = new MouseEvent("click", {
+            bubbles: true,
+            cancelable: true
+        });
+        anchor.dispatchEvent(clickEvent);
+
+        // Set the current hash to match what was clicked
+        changeJSDOMURL(window.location.href.split('#')[0] + "#new");
+
+        // Resolve current hash
+        const result = Router.resolve(null);
+
+        // Should not return "skipped" because "new" matches mightBeRouteRegex
+        expect(result).not.toBe("skipped");
+
+        // Clean up
+        document.body.removeChild(anchor);
+    });
+
+    it("should handle clicking anchor with hash href without error", () => {
+        const anchor = document.createElement("a");
+        document.body.appendChild(anchor);
+        anchor.setAttribute("href", "#testHash");
+
+        // Click the anchor
+        const clickEvent = new MouseEvent("click", {
+            bubbles: true,
+            cancelable: true
+        });
+        expect(() => anchor.dispatchEvent(clickEvent)).not.toThrow();
+
+        // Clean up
+        document.body.removeChild(anchor);
+    });
+
+    it("should handle clicking anchor without hash href without error", () => {
+        const anchor = document.createElement("a");
+        document.body.appendChild(anchor);
+        anchor.setAttribute("href", "/some/path");
+
+        // Click the anchor
+        const clickEvent = new MouseEvent("click", {
+            bubbles: true,
+            cancelable: true
+        });
+        expect(() => anchor.dispatchEvent(clickEvent)).not.toThrow();
+
+        // Clean up
+        document.body.removeChild(anchor);
+    });
+
+    it("should handle clicking anchor when event is default prevented", () => {
+        const anchor = document.createElement("a");
+        document.body.appendChild(anchor);
+        anchor.setAttribute("href", "#testHash");
+
+        // Click the anchor but prevent default
+        const clickEvent = new MouseEvent("click", {
+            bubbles: true,
+            cancelable: true
+        });
+        anchor.addEventListener("click", (e) => e.preventDefault(), { once: true });
+        expect(() => anchor.dispatchEvent(clickEvent)).not.toThrow();
+
+        // Clean up
+        document.body.removeChild(anchor);
     });
 });

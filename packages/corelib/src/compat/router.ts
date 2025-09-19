@@ -171,11 +171,11 @@ export namespace Router {
 
     export let mightBeRouteRegex: RegExp = /^(new$|edit\/|![0-9]+$)/
 
-    export function resolve(newHash?: string) {
+    export function resolve(newHash?: string): "disabled" | "skipped" | "shebang" | "missinghandler" | "calledhandler" {
         resolveIndex++;
 
         if (!enabled) {
-            return;
+            return "disabled";
         }
 
         const resolvingCurrent = newHash == null;
@@ -183,13 +183,14 @@ export namespace Router {
         if (newHash.charAt(0) == '#')
             newHash = newHash.substring(1);
         var newParts = newHash.split("/+/");
+
         if (resolvingCurrent &&
             (hashAnchorClickTime && new Date().getTime() - hashAnchorClickTime < 100) &&
             hashAnchorClickValue === newHash &&
             (newHash != '' || window.location.href.indexOf('#') >= 0) &&
             newParts.length == 1 &&
             !newParts.some(x => mightBeRouteRegex.test(x))) {
-            return;
+            return "skipped";
         }
 
         resolving++;
@@ -248,7 +249,7 @@ export namespace Router {
                     }
 
                     if (!handler)
-                        return;
+                        return "missinghandler";
                 }
 
                 if (!handler) {
@@ -256,7 +257,7 @@ export namespace Router {
                 }
 
                 if (route.startsWith("!"))
-                    return;
+                    return "shebang";
 
                 resolvingPreRoute = newParts.slice(0, i).join("/+/");
                 try {
@@ -270,6 +271,7 @@ export namespace Router {
                 }
                 finally {
                     resolvingPreRoute = null;
+                    return "calledhandler";
                 }
             }
         }
