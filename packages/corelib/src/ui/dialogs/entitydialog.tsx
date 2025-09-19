@@ -1,5 +1,5 @@
 import { Authorization, DeleteRequest, DeleteResponse, Fluent, LanguageList, RetrieveColumnSelection, RetrieveRequest, RetrieveResponse, SaveRequest, SaveResponse, ServiceOptions, TranslationConfig, UndeleteRequest, UndeleteResponse, confirmDialog, getInstanceType, getTypeFullName, localText, notifySuccess, nsSerenity, serviceCall, stringFormat, tryGetText, type PropertyItem, type PropertyItemsData } from "../../base";
-import { ScriptData, ValidationHelper, extend, getFormData, getFormDataAsync, replaceAll, validatorAbortHandler } from "../../compat";
+import { ScriptData, ValidationHelper, getFormData, getFormDataAsync, replaceAll, validatorAbortHandler } from "../../compat";
 import { IEditDialog, IReadOnly } from "../../interfaces";
 import { DataChangeInfo } from "../../types";
 import { PanelAttribute } from "../../types/attributes";
@@ -152,7 +152,7 @@ export class EntityDialog<TItem, P = {}> extends BaseDialog<P> implements IEditD
             EntityId: this.entityId
         };
 
-        const options: ServiceOptions<DeleteResponse> = extend({
+        const options: ServiceOptions<DeleteResponse> = Object.assign({
             service: this.getDeleteServiceMethod(),
             request: request,
             onSuccess: response => {
@@ -164,7 +164,7 @@ export class EntityDialog<TItem, P = {}> extends BaseDialog<P> implements IEditD
                     operationType: 'delete'
                 } satisfies Partial<DataChangeInfo>);
             }
-        }, this.getDeleteOptions(callback));
+        } satisfies ServiceOptions<DeleteResponse>, this.getDeleteOptions(callback));
 
         this.deleteHandler(options, callback);
     }
@@ -633,7 +633,7 @@ export class EntityDialog<TItem, P = {}> extends BaseDialog<P> implements IEditD
 
     protected getCloningEntity(): TItem {
 
-        const clone: any = extend(new Object(), this.entity);
+        const clone: any = Object.assign(Object.create(null), this.entity);
 
         const idField = this.getIdProperty();
         if (idField)
@@ -673,7 +673,7 @@ export class EntityDialog<TItem, P = {}> extends BaseDialog<P> implements IEditD
 
     protected undelete(callback?: (response: UndeleteResponse) => void): void {
         const request: UndeleteRequest = { EntityId: this.entityId };
-        const options: ServiceOptions<UndeleteResponse> = extend({
+        const options: ServiceOptions<UndeleteResponse> = Object.assign({
             service: this.getUndeleteServiceMethod(),
             request,
             onSuccess: response => {
@@ -684,7 +684,7 @@ export class EntityDialog<TItem, P = {}> extends BaseDialog<P> implements IEditD
                     operationType: 'undelete'
                 });
             }
-        }, this.getUndeleteOptions(callback));
+        } satisfies ServiceOptions<UndeleteResponse>, this.getUndeleteOptions(callback));
 
         this.undeleteHandler(options, callback);
     }

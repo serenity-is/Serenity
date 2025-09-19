@@ -1,5 +1,5 @@
 import { nsSerenity } from "../../base";
-import { deepClone, extend } from "../../compat";
+import { deepClone } from "../../compat";
 import { QuickFilter } from "../datagrid/quickfilter";
 import { EditorUtils } from "../editors/editorutils";
 import { Widget } from "../widgets/widget";
@@ -58,7 +58,7 @@ export abstract class BaseEditorFiltering<TEditor extends Widget<any>> extends B
         var opt = deepClone(this.get_field().editorParams || {});
         delete opt['cascadeFrom'];
         // currently can't support cascadeFrom in filtering
-        return extend(opt, this.get_field().filteringParams);
+        return Object.assign(opt, this.get_field().filteringParams);
     }
 
     loadState(state: any) {
@@ -99,6 +99,6 @@ export abstract class BaseEditorFiltering<TEditor extends Widget<any>> extends B
         super.initQuickFilter(filter);
 
         filter.type = this.editorTypeRef;
-        filter.options = extend(extend({}, deepClone(this.getEditorOptions())), deepClone(this.get_field().quickFilterParams));
+        filter.options = Object.assign(Object.create(null), deepClone(this.getEditorOptions()), deepClone(this.get_field().quickFilterParams));
     }
 }

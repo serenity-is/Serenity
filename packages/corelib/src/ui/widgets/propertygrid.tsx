@@ -1,5 +1,4 @@
-﻿import { Authorization, Fluent, addClass, appendToNode, faIcon, getCustomAttribute, getType, isBS3, isPromiseLike, localText, nsSerenity, tryGetText, type PropertyItem } from "../../base";
-import { extend } from "../../compat";
+﻿import { Authorization, Fluent, addClass, appendToNode, faIcon, getType, isBS3, isPromiseLike, localText, nsSerenity, tryGetText, type PropertyItem } from "../../base";
 import { EditorType } from "../../types/editortype";
 import { EditorTypeRegistry } from "../../types/editortyperegistry";
 import { EditorUtils } from "../editors/editorutils";

@@ -1,6 +1,6 @@
 import { EventData, EventEmitter, Grid, Group, GroupItemMetadataProvider, GroupTotals, gridDefaults } from "@serenity-is/sleekgrid";
 import { ListRequest, ListResponse, ServiceOptions, ServiceResponse, htmlEncode, localText, serviceCall } from "../base";
-import { deepClone, extend } from "../compat";
+import { deepClone } from "../compat";
 import { AggregateFormatting } from "./aggregators";
 import { GroupInfo, PagingOptions, SummaryOptions } from "./slicktypes";
 
@@ -480,7 +480,7 @@ export class RemoteView<TEntity> {
             groupingInfos = (groupingInfo instanceof Array) ? groupingInfo : [groupingInfo];
 
             for (var i = 0; i < groupingInfos.length; i++) {
-                var gi = groupingInfos[i] = extend(extend<any>({}, groupingInfoDefaults), deepClone(groupingInfos[i]));
+                var gi = groupingInfos[i] = Object.assign(<any>{}, groupingInfoDefaults, deepClone(groupingInfos[i]));
                 gi.aggregators = gi.aggregators || summaryOptions.aggregators || [];
                 gi.getterIsAFn = typeof gi.getter === "function";
 
@@ -1376,7 +1376,7 @@ export class RemoteView<TEntity> {
             }
 
             if (intf.params) {
-                request = extend(request, intf.params);
+                request = Object.assign(request, intf.params);
             }
 
             const controller = new AbortController();

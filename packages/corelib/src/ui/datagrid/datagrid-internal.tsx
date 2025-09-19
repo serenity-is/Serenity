@@ -1,7 +1,7 @@
 
 import { ArgsSort, Grid } from "@serenity-is/sleekgrid";
 import { isInstanceOfType, PropertyItem, tryGetText } from "../../base";
-import { deepClone, extend } from "../../compat";
+import { deepClone } from "../../compat";
 import { RemoteView } from "../../slick/remoteview";
 import { BooleanFiltering } from "../filtering/booleanfiltering";
 import { DateFiltering } from "../filtering/datefiltering";
@@ -94,7 +94,7 @@ export function propertyItemToQuickFilter(item: PropertyItem): QuickFilter<any, 
             filtering.set_field(item);
             filtering.set_operator({ key: FilterOperators.EQ });
             (filtering as any).initQuickFilter(result);
-            result.options = extend(deepClone(result.options), item.quickFilterParams);
+            result.options = Object.assign(deepClone(result.options), item.quickFilterParams);
         }
         else {
             return null;

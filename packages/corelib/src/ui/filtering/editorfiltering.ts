@@ -1,5 +1,4 @@
 import { nsSerenity } from "../../base";
-import { extend } from "../../compat";
 import { EditorTypeRegistry } from "../../types/editortyperegistry";
 import { QuickFilter } from "../datagrid/quickfilter";
 import { Widget } from "../widgets/widget";
@@ -61,7 +60,7 @@ export class EditorFiltering extends BaseEditorFiltering<Widget<any>> {
     getEditorOptions() {
         var opt = super.getEditorOptions();
         if (this.useEditor() && this.editorType === (this.get_field().editorType ?? 'String')) {
-            opt = extend(opt, this.get_field().editorParams);
+            opt = Object.assign(opt, this.get_field().editorParams);
         }
 
         return opt;

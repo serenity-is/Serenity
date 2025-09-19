@@ -1,5 +1,4 @@
 import { cssEscape, faIcon, Fluent, LanguageList, localText, PropertyItem, SaveRequest, TranslationConfig } from "../../base";
-import { extend } from "../../compat/system-compat";
 import { PropertyGrid, PropertyGridOptions } from "../widgets/propertygrid";
 
 export interface EntityLocalizerOptions {
@@ -183,7 +182,7 @@ export class EntityLocalizer {
         }
 
         this.options.retrieveLocalizations().then(localizations => {
-            const copy = extend(new Object(), this.options.getEntity());
+            const copy = Object.assign(Object.create(null), this.options.getEntity());
             Object.entries(localizations ?? {}).forEach(([language, entity]) =>
                 Object.entries(entity ?? {}).forEach(([field, value]) =>
                     copy[language + '$' + field] = value));

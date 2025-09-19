@@ -1,5 +1,4 @@
 ﻿import { Fluent, Tooltip, Validator, ValidatorOptions, getjQuery, isArrayLike, localText, notifyError } from "../base";
-import { extend } from "./system-compat";
 
 export function validatorAbortHandler(validator: Validator) {
     delete validator.settings.abortHandler;
@@ -10,7 +9,7 @@ export function validatorAbortHandler(validator: Validator) {
 
 export function validateOptions(options?: ValidatorOptions): ValidatorOptions {
     let opt: ValidatorOptions = {};
-    return extend(extend(opt, {
+    return Object.assign(Object.assign(opt, {
         errorPlacement: function (place: ArrayLike<HTMLElement> | HTMLElement, elem: ArrayLike<HTMLElement> | HTMLElement) {
             var element = isArrayLike(elem) ? elem[0] : elem;
             let field: HTMLElement = null;

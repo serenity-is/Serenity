@@ -1,5 +1,5 @@
 import { Fluent, PropertyItem, getjQuery, localText, nsSerenity } from "../../base";
-import { ValidationHelper, extend, isTrimmedEmpty, replaceAll } from "../../compat";
+import { ValidationHelper, isTrimmedEmpty, replaceAll } from "../../compat";
 import { IGetEditValue, IReadOnly, ISetEditValue, IValidateRequired } from "../../interfaces";
 import { FileUploadConstraints, UploadHelper, UploadInputOptions, UploadedFile } from "../helpers/uploadhelper";
 import { ToolButton, Toolbar } from "../widgets/toolbar";
@@ -173,7 +173,7 @@ export class FileUploadEditor<P extends FileUploadEditorOptions = FileUploadEdit
         if (this.entity == null) {
             return null;
         }
-        var copy = extend({}, this.entity);
+        var copy = Object.assign(Object.create(null), this.entity);
         return copy;
     }
 
@@ -204,7 +204,7 @@ export class FileUploadEditor<P extends FileUploadEditorOptions = FileUploadEdit
                 this.entity = null;
             }
             else {
-                this.entity = extend({}, value);
+                this.entity = Object.assign(Object.create(null), value);
             }
         }
         else {
@@ -408,7 +408,7 @@ export class MultipleFileUploadEditor<P extends MultipleFileUploadEditorOptions 
 
     get_value(): UploadedFile[] {
         return this.entities.map(function (x) {
-            return extend({}, x);
+            return Object.assign(Object.create(null), x);
         });
     }
 
@@ -418,7 +418,7 @@ export class MultipleFileUploadEditor<P extends MultipleFileUploadEditorOptions 
 
     set_value(value: UploadedFile[]) {
         this.entities = (value || []).map(function (x) {
-            return extend({}, x);
+            return Object.assign(Object.create(null), x);
         });
         this.populate();
         this.updateInterface();
