@@ -1,4 +1,4 @@
-﻿import { debounce, isArrayLike } from "../base";
+﻿import { isArrayLike } from "../base";
 
 export { };
 
@@ -22,7 +22,7 @@ export namespace LayoutTimer {
 
     function startTimer() {
         if (timeout == null && regCount > 0) {
-            timeout = window.setTimeout(onTimeout, 100);
+            timeout = setTimeout(onTimeout, 100);
         }
     }
 
@@ -43,8 +43,12 @@ export namespace LayoutTimer {
 
                 var w = el.offsetWidth;
                 var h = el.offsetHeight;
-                if (w <= 0 || h <= 0)
+                if (w <= 0 || h <= 0) {
+                    reg.storedWidth = w;
+                    reg.storedHeight = h;
+                    reg.debouncedTimes = 0;
                     continue;
+                }
 
                 var debounced = false;
                 try {
