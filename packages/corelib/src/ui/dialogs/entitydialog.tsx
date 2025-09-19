@@ -1,5 +1,5 @@
 import { Authorization, DeleteRequest, DeleteResponse, Fluent, LanguageList, RetrieveColumnSelection, RetrieveRequest, RetrieveResponse, SaveRequest, SaveResponse, ServiceOptions, TranslationConfig, UndeleteRequest, UndeleteResponse, confirmDialog, getInstanceType, getTypeFullName, localText, notifySuccess, nsSerenity, serviceCall, stringFormat, tryGetText, type PropertyItem, type PropertyItemsData } from "../../base";
-import { Exception, ScriptData, ValidationHelper, extend, getFormData, getFormDataAsync, replaceAll, validatorAbortHandler } from "../../compat";
+import { ScriptData, ValidationHelper, extend, getFormData, getFormDataAsync, replaceAll, validatorAbortHandler } from "../../compat";
 import { IEditDialog, IReadOnly } from "../../interfaces";
 import { DataChangeInfo } from "../../types";
 import { PanelAttribute } from "../../types/attributes";
@@ -285,7 +285,7 @@ export class EntityDialog<TItem, P = {}> extends BaseDialog<P> implements IEditD
         return this._service = replaceAll(this.getEntityType(), '.', '/');
     }
 
-    load(entityOrId: any, done: () => void, fail?: (ex: Exception) => void): void {
+    load(entityOrId: any, done: () => void, fail?: (ex: any) => void): void {
 
         const action = () => {
 
@@ -316,8 +316,7 @@ export class EntityDialog<TItem, P = {}> extends BaseDialog<P> implements IEditD
             action();
         }
         catch (ex1) {
-            const ex = (Exception as any).wrap(ex1);
-            fail(ex);
+            fail(ex1);
         }
     }
 

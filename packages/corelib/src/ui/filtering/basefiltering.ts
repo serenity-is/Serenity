@@ -1,5 +1,5 @@
 import { ClassTypeInfo, classTypeInfo, Criteria, Fluent, getInstanceType, getTypeFullName, localText, nsSerenity, registerType, stringFormat, StringLiteral, tryGetText, type PropertyItem } from "../../base";
-import { deepClone, Exception } from "../../compat";
+import { deepClone } from "../../compat";
 import { QuickFilter } from "../datagrid/quickfilter";
 import { Combobox } from "../editors/combobox";
 import { StringEditor } from "../editors/stringeditor";
@@ -89,7 +89,7 @@ export abstract class BaseFiltering implements IFiltering, IQuickFiltering {
             }
         }
 
-        throw new Exception(stringFormat("Filtering '{0}' has no editor for '{1}' operator",
+        throw new Error(stringFormat("Filtering '{0}' has no editor for '{1}' operator",
             getTypeFullName(getInstanceType(this)), this.get_operator().key));
     }
 
@@ -174,7 +174,7 @@ export abstract class BaseFiltering implements IFiltering, IQuickFiltering {
             }
         }
 
-        throw new Exception(stringFormat("Filtering '{0}' has no handler for '{1}' operator",
+        throw new Error(stringFormat("Filtering '{0}' has no handler for '{1}' operator",
             getTypeFullName(getInstanceType(this)), this.get_operator().key));
     }
 
@@ -214,7 +214,7 @@ export abstract class BaseFiltering implements IFiltering, IQuickFiltering {
     getEditorValue() {
         var inputs = this.get_container().querySelectorAll<HTMLInputElement>(Fluent.inputLikeSelector + ":not(.select2-focusser)");
         if (inputs.length !== 1) {
-            throw new Exception(stringFormat("Couldn't find input in filter container for {0}",
+            throw new Error(stringFormat("Couldn't find input in filter container for {0}",
                 (this.field.title ?? this.field.name)));
         }
         let input = inputs[0];

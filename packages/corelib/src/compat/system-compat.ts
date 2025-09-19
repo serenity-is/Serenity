@@ -236,26 +236,3 @@ export function initializeTypes(root: any, pre: string, limit: number) {
             initializeTypes(obj, pre + k + ".", limit - 1);
     }
 }
-
-export class Exception extends Error {
-    constructor(message: string) {
-        super(message);
-        this.name = "Exception";
-    }
-}
-
-export class ArgumentNullException extends Exception {
-    constructor(paramName: string, message?: string) {
-        super((message || 'Value cannot be null.') + '\nParameter name: ' + paramName);
-        this.name = "ArgumentNullException";
-    }
-}
-
-export class InvalidCastException extends Exception {
-    constructor(message: string) {
-        super(message);
-        this.name = "InvalidCastException";
-    }
-}
-
-export { };

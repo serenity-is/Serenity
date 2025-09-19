@@ -1,5 +1,4 @@
 ﻿import { htmlEncode, isAssignableFrom, notifyError } from "../base";
-import { Exception } from "../compat";
 import { IDialog } from "../interfaces";
 import { commonTypeRegistry } from "./commontyperegistry";
 import { DialogType } from "./dialogtype";
@@ -26,7 +25,7 @@ After applying fixes, build and run "node ./tsbuild.js" (or "tsc" if using names
 from the project folder.`;
 
             notifyError(message.replace(/\r?\n\r?\n/g, '<br/><br/>'), '', { escapeHtml: false, timeOut: 5000 });
-            throw new Exception(message);
+            throw new Error(message);
         }
     });
 

@@ -1,5 +1,4 @@
 ﻿import { classTypeInfo, Criteria, Culture, localText, nsSerenity, registerType, tryGetText, type PropertyItem } from "../../base";
-import { ArgumentNullException } from "../../compat";
 import { FilterLine } from "./filterline";
 
 export class FilterStore {
@@ -9,9 +8,8 @@ export class FilterStore {
 
         this.items = [];
 
-        if (fields == null) {
-            throw new ArgumentNullException('source');
-        }
+        if (fields == null)
+            throw new Error("FilterStore: 'fields' argument is null!");
 
         this.fields = fields.slice();
 

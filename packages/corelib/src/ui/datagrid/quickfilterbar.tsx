@@ -1,5 +1,4 @@
 ﻿import { Criteria, Fluent, ListRequest, formatDate, localText, notifyWarning, nsSerenity, parseDate, toId, tryGetText } from "../../base";
-import { ArgumentNullException } from "../../compat";
 import { DateEditor } from "../editors/dateeditor";
 import { DateTimeEditor, DateTimeEditorOptions } from "../editors/datetimeeditor";
 import { EditorUtils } from "../editors/editorutils";
@@ -39,9 +38,8 @@ export class QuickFilterBar<P extends QuickFilterBarOptions = QuickFilterBarOpti
 
     public add<TWidget extends Widget<any>, TOptions>(opt: QuickFilter<TWidget, TOptions>): TWidget {
 
-        if (opt == null) {
-            throw new ArgumentNullException('opt');
-        }
+        if (opt == null) 
+            throw new Error("QuickFilterBar.add(): 'opt' argument is null!");
 
         if (opt.separator) {
             this.addSeparator();
