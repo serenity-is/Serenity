@@ -245,6 +245,113 @@ describe("Router.resolve", () => {
     it("should accept custom hash parameter", () => {
         expect(() => Router.resolve("custom/route")).not.toThrow();
     });
+
+    it("should handle nested element routing with @ syntax", () => {
+        // Set up a customer dialog
+        const customerDialog = document.createElement("div");
+        customerDialog.dataset.qroute = "edit/ALFKI";
+        customerDialog.classList.add("modal");
+        customerDialog.setAttribute("id", "Dialog357");
+        // Make it "visible" for the test by setting offset dimensions
+        Object.defineProperties(customerDialog, {
+            offsetWidth: { get: () => 100 },
+            offsetHeight: { get: () => 100 }
+        });
+        document.body.appendChild(customerDialog);
+
+        // Set up an orders grid element within the customer dialog
+        // Don't give it route-handler class so it doesn't catch the first route
+        const ordersGrid = document.createElement("div");
+        ordersGrid.setAttribute("id", "Dialog357_OrdersGrid");
+        customerDialog.appendChild(ordersGrid);
+
+        let receivedRoute: string | null = null;
+        let receivedIndex: number | null = null;
+
+        const routeHandler = (e: any) => {
+            receivedRoute = e.route;
+            receivedIndex = e.index;
+        };
+        ordersGrid.addEventListener("handleroute", routeHandler);
+
+        try {
+            // Check if elements exist
+            expect(document.getElementById("Dialog357")).toBe(customerDialog);
+            expect(document.getElementById("Dialog357_OrdersGrid")).toBe(ordersGrid);
+            
+            const result = Router.resolve("#edit/ALFKI/+/OrdersGrid@edit/11011");
+
+            // Should return "calledhandler" and trigger the event on the orders grid
+            expect(result).toBe("calledhandler");
+            expect(receivedRoute).toBe("edit/11011");
+            expect(receivedIndex).toBe(1);
+        } finally {
+            // Clean up
+            document.body.removeChild(customerDialog);
+        }
+    });
+
+    it("should handle nested element routing when dialog ID is not found", () => {
+        // Set up a customer dialog with wrong ID
+        const customerDialog = document.createElement("div");
+        customerDialog.classList.add("modal");
+        customerDialog.setAttribute("id", "Dialog999"); // Wrong ID
+        customerDialog.dataset.qroute = "edit/ALFKI";
+        customerDialog.classList.add("modal");
+
+        Object.defineProperties(customerDialog, {
+            offsetWidth: { get: () => 100 },
+            offsetHeight: { get: () => 100 }
+        });
+        document.body.appendChild(customerDialog);
+
+        // Set up an orders grid element that won't be found
+        const ordersGrid = document.createElement("div");
+        ordersGrid.setAttribute("id", "Dialog357_OrdersGrid"); // Looking for Dialog357 prefix
+        customerDialog.appendChild(ordersGrid);
+
+        let eventTriggered = false;
+        const routeHandler = () => {
+            eventTriggered = true;
+        };
+        ordersGrid.addEventListener("handleroute", routeHandler);
+
+        try {
+            // Resolve hash - should not find the prefixed element
+            const result = Router.resolve("#edit/ALFKI/+/OrdersGrid@edit/11011");
+
+            // Should return "missinghandler" because the prefixed ID element is not found
+            expect(result).toBe("missinghandler");
+            expect(eventTriggered).toBe(false);
+        } finally {
+            // Clean up
+            document.body.removeChild(customerDialog);
+        }
+    });
+
+    it("should handle @ syntax routing to direct element ID", () => {
+        // Set up an element with direct ID (not prefixed)
+        const directElement = document.createElement("div");
+        directElement.classList.add("route-handler");
+        directElement.setAttribute("id", "OrdersGrid");
+        document.body.appendChild(directElement);
+
+        let receivedRoute: string | null = null;
+        const routeHandler = (e: any) => {
+            receivedRoute = e.route;
+        };
+        directElement.addEventListener("handleroute", routeHandler);
+
+        // Resolve hash with @ syntax but no prefix needed
+        const result = Router.resolve("#OrdersGrid@edit/11011");
+
+        // Should find the direct element and trigger the event
+        expect(result).toBe("calledhandler");
+        expect(receivedRoute).toBe("edit/11011");
+
+        // Clean up
+        document.body.removeChild(directElement);
+    });
 });
 
 describe("Router.ignoreHashChange", () => {
