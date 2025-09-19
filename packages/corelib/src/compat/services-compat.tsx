@@ -32,8 +32,8 @@ function postToCommon(url: string, form: HTMLFormElement, target: string) {
     form.method = "POST";
     form.action = url;
     form.appendChild(<input type="submit" />);
-    document.body.appendChild(form);
     target && (form.target = target);
+    document.body.appendChild(form);
     form.submit();
     window.setTimeout(function () {
         form.remove();
