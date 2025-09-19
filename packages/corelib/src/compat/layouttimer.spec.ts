@@ -1,5 +1,4 @@
 ﻿import { LayoutTimer, executeOnceWhenVisible, executeEverytimeWhenVisible } from "./layouttimer";
-import { vi, beforeEach, afterEach, describe, it, expect } from "vitest";
 
 let mockElement: HTMLElement;
 

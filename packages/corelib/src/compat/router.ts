@@ -18,7 +18,7 @@ export namespace Router {
 
     export let enabled: boolean = true;
 
-    function isEqual(url1: string, url2: string) {
+    function isEquivalentUrl(url1: string, url2: string) {
         return url1 == url2 || url1 == url2 + '#' || url2 == url1 + '#';
     }
 
@@ -32,7 +32,7 @@ export namespace Router {
         var newURL = window.location.href.replace(/#$/, '')
             .replace(/#.*$/, '') + newHash;
         if (newURL != window.location.href) {
-            if (tryBack && oldURL != null && isEqual(oldURL, newURL)) {
+            if (tryBack && oldURL != null && isEquivalentUrl(oldURL, newURL)) {
                 if (silent)
                     ignoreHashChange();
 
@@ -73,7 +73,7 @@ export namespace Router {
                 newHash = parts.join("/+/");
             }
         }
-        replace(newHash, tryBack);
+        Router.replace(newHash, tryBack);
     }
 
     const ignoredSelector = '.s-MessageDialog, .s-MessageModal, .s-PromptDialog, .route-ignore';
@@ -152,7 +152,7 @@ export namespace Router {
 
         route.push(value);
         element.dataset.qroute = value;
-        replace(route.join("/+/"));
+        Router.replace(route.join("/+/"));
     }
 
     export function dialog(owner: HTMLElement | ArrayLike<HTMLElement>, element: HTMLElement | ArrayLike<HTMLElement>, dialogHash: () => string) {
@@ -367,9 +367,9 @@ export namespace Router {
             let tryBack = shouldTryBack(e);
 
             if (prhash != null)
-                replace(prhash, tryBack);
+                Router.replace(prhash, tryBack);
             else
-                replaceLast('', tryBack);
+                Router.replaceLast('', tryBack);
         }
 
         Fluent.on(document, "dialogclose.qrouter", closeHandler);
