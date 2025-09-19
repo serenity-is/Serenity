@@ -1,4 +1,5 @@
 import { Type, getBaseType, getTypeFullName, getTypeNameProp, getTypeRegistry, isInstanceOfType, setTypeNameProp } from "../base";
+import { ensureTypeInfo, peekTypeInfo } from "../base/system-internal";
 
 export type Dictionary<TItem> = { [key: string]: TItem };
 
@@ -72,29 +73,26 @@ function getRegExpFlags(regExp: RegExp) {
 
 export interface TypeMember {
     name: string;
-    type: MemberType;
+    kind: TypeMemberKind;
     attr?: any[];
     getter?: string;
     setter?: string;
 }
 
-export enum MemberType {
+export enum TypeMemberKind {
     field = 4,
     property = 16
 }
 
-export function getMembers(type: any, memberTypes: MemberType): TypeMember[] {
-    var result: TypeMember[] = [];
-
-    if (!type)
-        return [];
-
-    var result: TypeMember[] = [];
+export function getTypeMembers(type: any, memberKinds: TypeMemberKind): TypeMember[] {
+    const result: TypeMember[] = [];
     do {
-        let members = Object.prototype.hasOwnProperty.call(type, typeMemberListSymbol) ? type[typeMemberListSymbol] : null;
+        const members = (peekTypeInfo(type) as any)?.["members"] as TypeMember[];
         if (members) {
-            for (var member of members) {
-                if (member && (member.type & memberTypes) && !result.some(x => x.name === member.name))
+            for (const member of members) {
+                if (member &&
+                    (memberKinds == null || (member.kind & memberKinds)) &&
+                    !result.some(x => x.name === member.name))
                     result.push(member);
             }
         }
@@ -114,34 +112,18 @@ function merge(arr1: any[], arr2: any[]) {
     return distinct(arr1.concat(arr2));
 }
 
-const typeMemberListSymbol = "Serenity.typeMemberList";
-
 export function addTypeMember(type: any, member: TypeMember): TypeMember {
-    if (!Object.prototype.hasOwnProperty.call(type, typeMemberListSymbol)) {
-        type[typeMemberListSymbol] = [];
-    }
-    var members = type[typeMemberListSymbol];
-    if (!members)
-        type[typeMemberListSymbol] = members = [];
-    var name = member.name;
+    if (!type)
+        throw new Error("addTypeMember: type is null");
 
-    let existing: TypeMember;
-    for (var m of members) {
-        if (m.name == name) {
-            existing = m;
-            break;
-        }
-    }
-
+    const typeInfo = ensureTypeInfo(type);
+    const members = ((typeInfo as any)["members"] ??= []) as TypeMember[];
+    const existing = members.find(m => m.name === member.name);
     if (existing) {
-        if (member.type != null)
-            existing.type = member.type;
-        if (member.attr != null)
-            existing.attr = merge(existing.attr, member.attr);
-        if (member.getter != null)
-            existing.getter = member.getter;
-        if (member.setter != null)
-            existing.setter = member.setter;
+        existing.kind ??= member.kind;
+        member.attr && (existing.attr = merge(existing.attr, member.attr));
+        member.getter != null && (existing.getter = member.getter);
+        member.setter != null && (existing.setter = member.setter);
         return existing;
     }
     else {

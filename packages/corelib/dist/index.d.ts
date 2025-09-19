@@ -2650,9 +2650,11 @@ export declare class Validator {
 	static normalizeRules(rules: ValidationRules, element: ValidatableElement): ValidationRules;
 	static addMethod(name: string, method: ValidationProvider, message?: string): void;
 	static getHighlightTarget(el: HTMLElement): HTMLElement;
+	static addCustomRule(element: HTMLElement | ArrayLike<HTMLElement>, rule: (input: ValidatableElement) => string, uniqueName?: string): void;
+	static removeCustomRule(element: HTMLElement | ArrayLike<HTMLElement>, uniqueName: string): void;
 }
-export declare function addValidationRule(element: HTMLElement | ArrayLike<HTMLElement>, rule: (input: ValidatableElement) => string, uniqueName?: string): void;
-export declare function removeValidationRule(element: HTMLElement | ArrayLike<HTMLElement>, uniqueName: string): void;
+export declare const addValidationRule: typeof Validator.addCustomRule;
+export declare const removeValidationRule: typeof Validator.removeCustomRule;
 /**
  * Tests if any of array elements matches given predicate. Prefer Array.some() over this function (e.g. `[1, 2, 3].some(predicate)`).
  * @param array Array to test.
@@ -3121,16 +3123,16 @@ export declare function extend<T = any>(a: T, b: T): T;
 export declare function deepClone<T = any>(a: T, a2?: any, a3?: any): T;
 export interface TypeMember {
 	name: string;
-	type: MemberType;
+	kind: TypeMemberKind;
 	attr?: any[];
 	getter?: string;
 	setter?: string;
 }
-export declare enum MemberType {
+export declare enum TypeMemberKind {
 	field = 4,
 	property = 16
 }
-export declare function getMembers(type: any, memberTypes: MemberType): TypeMember[];
+export declare function getTypeMembers(type: any, memberKinds: TypeMemberKind): TypeMember[];
 export declare function addTypeMember(type: any, member: TypeMember): TypeMember;
 export declare function getTypes(from?: any): any[];
 export declare function clearKeys(d: any): void;
@@ -3138,15 +3140,6 @@ export declare function keyOf<T>(prop: keyof T): keyof T;
 export declare function cast(instance: any, type: Type): any;
 export declare function safeCast(instance: any, type: Type): any;
 export declare function initializeTypes(root: any, pre: string, limit: number): void;
-export declare class Exception extends Error {
-	constructor(message: string);
-}
-export declare class ArgumentNullException extends Exception {
-	constructor(paramName: string, message?: string);
-}
-export declare class InvalidCastException extends Exception {
-	constructor(message: string);
-}
 export declare function validatorAbortHandler(validator: Validator): void;
 export declare function validateOptions(options?: ValidatorOptions): ValidatorOptions;
 export declare namespace ValidationHelper {
@@ -5263,22 +5256,54 @@ export declare abstract class FormatterBase implements Formatter {
 export declare class BooleanFormatter implements Formatter {
 	readonly props: {
 		falseText?: string;
+		falseIcon?: IconClassName;
+		nullText?: string;
+		nullIcon?: IconClassName;
 		trueText?: string;
+		trueIcon?: IconClassName;
+		showText?: boolean;
+		showHint?: boolean;
 	};
 	static [Symbol.typeInfo]: FormatterTypeInfo<"Serenity.">;
 	constructor(props?: {
 		falseText?: string;
+		falseIcon?: IconClassName;
+		nullText?: string;
+		nullIcon?: IconClassName;
 		trueText?: string;
+		trueIcon?: IconClassName;
+		showText?: boolean;
+		showHint?: boolean;
 	});
-	format(ctx: FormatterContext): string;
+	format(ctx: FormatterContext): FormatterResult;
 	get falseText(): string;
 	set falseText(value: string);
 	get trueText(): string;
 	set trueText(value: string);
 }
 export declare class CheckboxFormatter implements Formatter {
+	readonly props: {
+		falseText?: string;
+		falseIcon?: IconClassName;
+		nullText?: string;
+		nullIcon?: IconClassName;
+		trueText?: string;
+		trueIcon?: IconClassName;
+		showText?: boolean;
+		showHint?: boolean;
+	};
 	static [Symbol.typeInfo]: FormatterTypeInfo<"Serenity.">;
-	format(ctx: FormatterContext): string;
+	constructor(props?: {
+		falseText?: string;
+		falseIcon?: IconClassName;
+		nullText?: string;
+		nullIcon?: IconClassName;
+		trueText?: string;
+		trueIcon?: IconClassName;
+		showText?: boolean;
+		showHint?: boolean;
+	});
+	format(ctx: FormatterContext): FormatterResult;
 }
 export declare class DateFormatter implements Formatter {
 	readonly props: {
@@ -5874,7 +5899,7 @@ export declare class EntityDialog<TItem, P = {}> extends BaseDialog<P> implement
 	protected getIsDeletedProperty(): string;
 	private _service;
 	protected getService(): string;
-	load(entityOrId: any, done: () => void, fail?: (ex: Exception) => void): void;
+	load(entityOrId: any, done: () => void, fail?: (ex: any) => void): void;
 	loadNewAndOpenDialog(asPanel?: boolean): void;
 	loadEntityAndOpenDialog(entity: TItem, asPanel?: boolean): void;
 	protected loadResponse(data: any): void;

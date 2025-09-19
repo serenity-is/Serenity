@@ -1,5 +1,5 @@
-import { EditorAttribute, ISlickFormatter, addCustomAttribute, registerClass as regClass, registerEditor as regEditor, registerEnum as regEnum, registerFormatter as regFormatter, registerInterface as regIntf, registerType as regType } from "../base";
-import { MemberType, addTypeMember } from "../compat";
+import { addCustomAttribute, EditorAttribute, ISlickFormatter, registerClass as regClass, registerEditor as regEditor, registerEnum as regEnum, registerFormatter as regFormatter, registerInterface as regIntf, registerType as regType } from "../base";
+import { addTypeMember, TypeMemberKind } from "../compat";
 import { CloseButtonAttribute, ElementAttribute, EnumKeyAttribute, FilterableAttribute, MaximizableAttribute, OptionAttribute, PanelAttribute, ResizableAttribute, StaticPanelAttribute } from "./attributes";
 
 export namespace Decorators {
@@ -76,7 +76,7 @@ export namespace Decorators {
             addTypeMember(target.constructor, {
                 name: memberName,
                 attr: [new OptionAttribute()],
-                type: isGetSet ? MemberType.property : MemberType.field,
+                kind: isGetSet ? TypeMemberKind.property : TypeMemberKind.field,
                 getter: isGetSet ? ('get_' + memberName) : null,
                 setter: isGetSet ? ('set_' + memberName) : null
             });

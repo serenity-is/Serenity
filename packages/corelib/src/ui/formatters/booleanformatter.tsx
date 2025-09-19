@@ -1,4 +1,4 @@
-import { FormatterContext } from "@serenity-is/sleekgrid";
+import { FormatterContext, FormatterResult } from "@serenity-is/sleekgrid";
 import { DialogTexts, formatterTypeInfo, iconClassName, IconClassName, localText, nsSerenity, registerType } from "../../base";
 import { Formatter } from "../../slick";
 
@@ -18,7 +18,7 @@ export class BooleanFormatter implements Formatter {
         this.props ??= {};
     }
 
-    format(ctx: FormatterContext) {
+    format(ctx: FormatterContext): FormatterResult {
 
         const text = ctx.value == null ?
             localText(this.props.nullText, this.props.nullText ?? '') :
