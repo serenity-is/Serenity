@@ -88,7 +88,7 @@ export abstract class GridEditorBase<TEntity, P = {}> extends EntityGrid<TEntity
             }
             else {
                 const index = indexOf(items, x => this.itemId(x) === id);
-                items[index] = row = deepClone({} as TEntity, items[index], row);
+                items[index] = row = Object.assign({} as TEntity, deepClone(items[index]), row);
             }
 
             callback?.({});

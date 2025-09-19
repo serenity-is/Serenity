@@ -1,4 +1,4 @@
-import { Type, getBaseType, getTypeFullName, getTypeNameProp, getTypeRegistry, isInstanceOfType, setTypeNameProp } from "../base";
+import { Type, getBaseType, getTypeFullName, getTypeRegistry, isInstanceOfType } from "../base";
 import { ensureTypeInfo, peekTypeInfo } from "../base/system-internal";
 
 export type Dictionary<TItem> = { [key: string]: TItem };
@@ -97,7 +97,7 @@ export enum TypeMemberKind {
  * @returns An array of TypeMember objects.
  * @remarks The members should be registered using addTypeMember function or option decorator.
  */
-export function getTypeMembers(type: any, memberKinds: TypeMemberKind): TypeMember[] {
+export function getTypeMembers(type: any, memberKinds?: TypeMemberKind): TypeMember[] {
     const result: TypeMember[] = [];
     do {
         const members = (peekTypeInfo(type) as any)?.["members"] as TypeMember[];

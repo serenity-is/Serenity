@@ -1,6 +1,5 @@
-import { getTypeNameProp } from "../base";
 import * as deprecations from "./system-compat";
-import { deepClone, getTypes, today } from "./system-compat";
+import { addTypeMember, clearKeys, deepClone, getTypeMembers, getTypes, today, TypeMemberKind } from "./system-compat";
 
 describe("coalesce", () => {
     it('returns first value if not null', function () {
@@ -124,27 +123,27 @@ describe("deepClone", () => {
 
 describe("getTypeMembers", () => {
     it('returns empty array for type with no members', function () {
-        class TestClass {}
-        const members = (deprecations as any).getTypeMembers(TestClass);
+        class TestClass { }
+        const members = getTypeMembers(TestClass);
         expect(members).toEqual([]);
     });
 
     it('returns added members', function () {
-        class TestClass {}
-        const member = { name: 'testProp', kind: (deprecations as any).TypeMemberKind.property };
-        (deprecations as any).addTypeMember(TestClass, member);
-        const members = (deprecations as any).getTypeMembers(TestClass);
+        class TestClass { }
+        const member = { name: 'testProp', kind: TypeMemberKind.property };
+        addTypeMember(TestClass, member);
+        const members = getTypeMembers(TestClass);
         expect(members).toHaveLength(1);
         expect(members[0].name).toBe('testProp');
-        expect(members[0].kind).toBe((deprecations as any).TypeMemberKind.property);
+        expect(members[0].kind).toBe(TypeMemberKind.property);
     });
 
     it('filters by member kind', function () {
-        class TestClass {}
-        (deprecations as any).addTypeMember(TestClass, { name: 'field1', kind: (deprecations as any).TypeMemberKind.field });
-        (deprecations as any).addTypeMember(TestClass, { name: 'prop1', kind: (deprecations as any).TypeMemberKind.property });
-        const fields = (deprecations as any).getTypeMembers(TestClass, (deprecations as any).TypeMemberKind.field);
-        const props = (deprecations as any).getTypeMembers(TestClass, (deprecations as any).TypeMemberKind.property);
+        class TestClass { }
+        addTypeMember(TestClass, { name: 'field1', kind: TypeMemberKind.field });
+        addTypeMember(TestClass, { name: 'prop1', kind: TypeMemberKind.property });
+        const fields = getTypeMembers(TestClass, TypeMemberKind.field);
+        const props = getTypeMembers(TestClass, TypeMemberKind.property);
         expect(fields).toHaveLength(1);
         expect(fields[0].name).toBe('field1');
         expect(props).toHaveLength(1);
@@ -154,28 +153,28 @@ describe("getTypeMembers", () => {
 
 describe("addTypeMember", () => {
     it('adds a new member to a type', function () {
-        class TestClass {}
-        const member = { name: 'testField', kind: (deprecations as any).TypeMemberKind.field };
-        const result = (deprecations as any).addTypeMember(TestClass, member);
+        class TestClass { }
+        const member = { name: 'testField', kind: TypeMemberKind.field };
+        const result = addTypeMember(TestClass, member);
         expect(result).toBe(member);
-        const members = (deprecations as any).getTypeMembers(TestClass);
+        const members = getTypeMembers(TestClass);
         expect(members).toHaveLength(1);
         expect(members[0]).toBe(member);
     });
 
     it('merges attributes when adding existing member', function () {
-        class TestClass {}
-        const member1 = { name: 'testProp', kind: (deprecations as any).TypeMemberKind.property, attr: ['attr1'] };
-        const member2 = { name: 'testProp', kind: (deprecations as any).TypeMemberKind.property, attr: ['attr2'], getter: 'getTest' };
-        (deprecations as any).addTypeMember(TestClass, member1);
-        const result = (deprecations as any).addTypeMember(TestClass, member2);
+        class TestClass { }
+        const member1 = { name: 'testProp', kind: TypeMemberKind.property, attr: ['attr1'] };
+        const member2 = { name: 'testProp', kind: TypeMemberKind.property, attr: ['attr2'], getter: 'getTest' };
+        addTypeMember(TestClass, member1);
+        const result = addTypeMember(TestClass, member2);
         expect(result).toBe(member1);
         expect(result.attr).toEqual(['attr1', 'attr2']);
         expect(result.getter).toBe('getTest');
     });
 
     it('throws error for null type', function () {
-        expect(() => (deprecations as any).addTypeMember(null, { name: 'test' })).toThrow('addTypeMember: type is null');
+        expect(() => addTypeMember(null, { name: 'test', kind: TypeMemberKind.field })).toThrow('addTypeMember: type is null');
     });
 });
 
@@ -195,23 +194,23 @@ describe("getTypes", () => {
 describe("clearKeys", () => {
     it('removes all own properties from object', function () {
         const obj = { a: 1, b: 2, c: 3 };
-        (deprecations as any).clearKeys(obj);
+        clearKeys(obj);
         expect(obj).toEqual({});
     });
 
     it('does not affect prototype properties', function () {
-        function Test() {}
+        function Test() { }
         Test.prototype.protoProp = 'proto';
         const obj = new Test();
         obj.ownProp = 'own';
-        (deprecations as any).clearKeys(obj);
+        clearKeys(obj);
         expect(obj.ownProp).toBeUndefined();
         expect(obj.protoProp).toBe('proto');
     });
 
     it('handles empty object', function () {
         const obj = {};
-        (deprecations as any).clearKeys(obj);
+        clearKeys(obj);
         expect(obj).toEqual({});
     });
 });
@@ -225,21 +224,21 @@ describe("keyOf", () => {
 
 describe("cast", () => {
     it('returns instance if it is of the correct type', function () {
-        class TestClass {}
+        class TestClass { }
         const instance = new TestClass();
         const result = (deprecations as any).cast(instance, TestClass);
         expect(result).toBe(instance);
     });
 
     it('returns null if instance is null', function () {
-        class TestClass {}
+        class TestClass { }
         const result = (deprecations as any).cast(null, TestClass);
         expect(result).toBe(null);
     });
 
     it('throws error if instance is not of the correct type', function () {
-        class TestClass {}
-        class OtherClass {}
+        class TestClass { }
+        class OtherClass { }
         const instance = new OtherClass();
         expect(() => (deprecations as any).cast(instance, TestClass)).toThrow('Cannot cast object to type');
     });
@@ -247,21 +246,21 @@ describe("cast", () => {
 
 describe("safeCast", () => {
     it('returns instance if it is of the correct type', function () {
-        class TestClass {}
+        class TestClass { }
         const instance = new TestClass();
         const result = (deprecations as any).safeCast(instance, TestClass);
         expect(result).toBe(instance);
     });
 
     it('returns null if instance is null', function () {
-        class TestClass {}
+        class TestClass { }
         const result = (deprecations as any).safeCast(null, TestClass);
         expect(result).toBe(null);
     });
 
     it('returns null if instance is not of the correct type', function () {
-        class TestClass {}
-        class OtherClass {}
+        class TestClass { }
+        class OtherClass { }
         const instance = new OtherClass();
         const result = (deprecations as any).safeCast(instance, TestClass);
         expect(result).toBe(null);

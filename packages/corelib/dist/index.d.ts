@@ -2020,7 +2020,9 @@ export type TypeInfo<TypeName> = {
 	/** Registered flag */
 	registered?: boolean;
 };
-export declare function getTypeRegistry(): any;
+export declare function getTypeRegistry(): {
+	[key: string]: any;
+};
 export declare function getTypeNameProp(type: any): string;
 export declare function setTypeNameProp(type: any, value: string): void;
 export declare const nsSerenity: "Serenity.";
@@ -2147,7 +2149,7 @@ export declare namespace Enum {
 }
 /**
  * Check if a type is an enum. A type is considered an enum if it is not a function
- * and it has isInterfaceTypeSymbol property set to null (which is set by registerEnum function).
+ * and it's [Symbol.typeInfo].typeKind is "enum".
  * @param type Type to check
  * @returns True if the type is an enum
  */
@@ -3118,9 +3120,21 @@ export type Dictionary<TItem> = {
 export declare function coalesce(a: any, b: any): any;
 /** @deprecated Use a != null */
 export declare function isValue(a: any): boolean;
-export declare let today: () => Date;
+/** Extends an object with properties from another object similar to Object.assign.
+ * @deprecated Use Object.assign
+ */
 export declare function extend<T = any>(a: T, b: T): T;
-export declare function deepClone<T = any>(a: T, a2?: any, a3?: any): T;
+/** Returns the current date without time part */
+export declare let today: () => Date;
+/**
+ * Deep clones an object or value.
+ * @param a The value to clone.
+ * @param a2 An optional second value to merge into the clone.
+ * @param a3 An optional third value to merge into the clone.
+ * @returns A deep clone of the input value.
+ */
+export declare function deepClone<T = any>(a: T): T;
+/** Type member information, preserved for compatibility as used by legacy option decorator */
 export interface TypeMember {
 	name: string;
 	kind: TypeMemberKind;
@@ -3128,18 +3142,34 @@ export interface TypeMember {
 	getter?: string;
 	setter?: string;
 }
+/** Bitmask for type member kinds */
 export declare enum TypeMemberKind {
 	field = 4,
 	property = 16
 }
-export declare function getTypeMembers(type: any, memberKinds: TypeMemberKind): TypeMember[];
+/** Gets type members including inherited ones. Optionally filters by member kinds.
+ * @param type The type to get members for.
+ * @param memberKinds Optional bitmask of TypeMemberKind to filter by.
+ * @returns An array of TypeMember objects.
+ * @remarks The members should be registered using addTypeMember function or option decorator.
+ */
+export declare function getTypeMembers(type: any, memberKinds?: TypeMemberKind): TypeMember[];
+/**
+ * Adds a new member to a type or updates an existing member.
+ * @param type The type to add the member to.
+ * @param member The member information to add.
+ * @returns The added or updated member.
+ */
 export declare function addTypeMember(type: any, member: TypeMember): TypeMember;
-export declare function getTypes(from?: any): any[];
+/**
+ * Gets all registered types.
+ * @returns All registered types.
+ */
+export declare function getTypes(): any[];
 export declare function clearKeys(d: any): void;
 export declare function keyOf<T>(prop: keyof T): keyof T;
 export declare function cast(instance: any, type: Type): any;
 export declare function safeCast(instance: any, type: Type): any;
-export declare function initializeTypes(root: any, pre: string, limit: number): void;
 export declare function validatorAbortHandler(validator: Validator): void;
 export declare function validateOptions(options?: ValidatorOptions): ValidatorOptions;
 export declare namespace ValidationHelper {
