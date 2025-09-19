@@ -8,8 +8,7 @@ export function validatorAbortHandler(validator: Validator) {
 };
 
 export function validateOptions(options?: ValidatorOptions): ValidatorOptions {
-    let opt: ValidatorOptions = {};
-    return Object.assign(Object.assign(opt, {
+    return Object.assign({} as ValidatorOptions, {
         errorPlacement: function (place: ArrayLike<HTMLElement> | HTMLElement, elem: ArrayLike<HTMLElement> | HTMLElement) {
             var element = isArrayLike(elem) ? elem[0] : elem;
             let field: HTMLElement = null;
@@ -68,7 +67,7 @@ export function validateOptions(options?: ValidatorOptions): ValidatorOptions {
             label = isArrayLike(label) ? label[0] : label;
             label && label.classList.add('checked');
         }
-    }), options);
+    }, options);
 };
 
 
