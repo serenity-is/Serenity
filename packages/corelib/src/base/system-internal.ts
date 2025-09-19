@@ -40,7 +40,7 @@ export type TypeInfo<TypeName> = {
     registered?: boolean;
 }
 
-export function getTypeRegistry() {
+export function getTypeRegistry(): { [key: string]: any } {
     let typeRegistry = globalObject[typeRegistrySymbol];
     if (!typeRegistry)
         typeRegistry = globalObject[typeRegistrySymbol] = {};

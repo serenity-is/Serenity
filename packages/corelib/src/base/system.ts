@@ -275,7 +275,7 @@ export namespace Enum {
 
 /**
  * Check if a type is an enum. A type is considered an enum if it is not a function
- * and it has isInterfaceTypeSymbol property set to null (which is set by registerEnum function).
+ * and it's [Symbol.typeInfo].typeKind is "enum".
  * @param type Type to check
  * @returns True if the type is an enum
  */

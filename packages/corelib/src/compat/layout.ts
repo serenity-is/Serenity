@@ -1,8 +1,7 @@
-﻿import { Config, Fluent, getGlobalObject, getNested, getjQuery, isArrayLike } from "../base";
+﻿import { Fluent, getjQuery, isArrayLike } from "../base";
 import { type CreateWidgetParams, type Widget, type WidgetProps } from "../ui/widgets/widget";
 import { executeEverytimeWhenVisible } from "./layouttimer";
 import { Router } from "./router";
-import { initializeTypes } from "./system-compat";
 
 function initWidgetPage<TWidget extends Widget<P>, P>(widgetOrType: (CreateWidgetParams<TWidget, P>["type"]) | TWidget,
     props?: WidgetProps<P>, defaultElement?: string, noRoute?: boolean): TWidget {
@@ -127,18 +126,6 @@ export function isMobileView() {
         (window.matchMedia?.('(max-width: 767px)')?.matches ??
             window.innerWidth < 768);
 }
-
-function initOnLoad() {
-    if (!Config.rootNamespaces)
-        return;
-    for (var ns of Config.rootNamespaces) {
-        var obj = getNested(getGlobalObject(), ns);
-        if (obj != null)
-            initializeTypes(obj, ns + ".", 3);
-    }
-}
-
-getjQuery()?.(initOnLoad);
 
 export function triggerLayoutOnShow(element: HTMLElement | ArrayLike<HTMLElement>) {
     element = isArrayLike(element) ? element[0] : element;

@@ -13,23 +13,28 @@ export function isValue(a: any): boolean {
     return a != null;
 }
 
+/** Extends an object with properties from another object similar to Object.assign.
+ * @deprecated Use Object.assign
+ */
+export function extend<T = any>(a: T, b: T): T {
+    return Object.assign(a, b);
+}
+
+
+/** Returns the current date without time part */
 export let today = (): Date => {
     var d = new Date();
     return new Date(d.getFullYear(), d.getMonth(), d.getDate());
 }
 
-export function extend<T = any>(a: T, b: T): T {
-    for (var key in b)
-        if (Object.prototype.hasOwnProperty.call(b, key))
-            a[key] = b[key];
-    return a;
-}
-
-export function deepClone<T = any>(a: T, a2?: any, a3?: any): T {
-    // for backward compatibility
-    if (a2 != null || a3 != null) {
-        return extend(extend(deepClone(a || {}), deepClone(a2 || {})), deepClone(a3 || {}));
-    }
+/**
+ * Deep clones an object or value.
+ * @param a The value to clone.
+ * @param a2 An optional second value to merge into the clone.
+ * @param a3 An optional third value to merge into the clone.
+ * @returns A deep clone of the input value.
+ */
+export function deepClone<T = any>(a: T): T {
 
     // https://github.com/angus-c/just/blob/master/packages/collection-clone/index.js
     var result = a;
@@ -71,6 +76,7 @@ function getRegExpFlags(regExp: RegExp) {
     }
 }
 
+/** Type member information, preserved for compatibility as used by legacy option decorator */
 export interface TypeMember {
     name: string;
     kind: TypeMemberKind;
@@ -79,11 +85,18 @@ export interface TypeMember {
     setter?: string;
 }
 
+/** Bitmask for type member kinds */
 export enum TypeMemberKind {
     field = 4,
     property = 16
 }
 
+/** Gets type members including inherited ones. Optionally filters by member kinds.
+ * @param type The type to get members for.
+ * @param memberKinds Optional bitmask of TypeMemberKind to filter by.
+ * @returns An array of TypeMember objects.
+ * @remarks The members should be registered using addTypeMember function or option decorator.
+ */
 export function getTypeMembers(type: any, memberKinds: TypeMemberKind): TypeMember[] {
     const result: TypeMember[] = [];
     do {
@@ -112,6 +125,12 @@ function merge(arr1: any[], arr2: any[]) {
     return distinct(arr1.concat(arr2));
 }
 
+/**
+ * Adds a new member to a type or updates an existing member.
+ * @param type The type to add the member to.
+ * @param member The member information to add.
+ * @returns The added or updated member.
+ */
 export function addTypeMember(type: any, member: TypeMember): TypeMember {
     if (!type)
         throw new Error("addTypeMember: type is null");
@@ -132,30 +151,19 @@ export function addTypeMember(type: any, member: TypeMember): TypeMember {
     }
 }
 
-export function getTypes(from?: any): any[] {
-    const types = getTypeRegistry();
+/**
+ * Gets all registered types.
+ * @returns All registered types.
+ */
+export function getTypes(): any[] {
     var result = [];
-    if (!from) {
-        for (var t in types) {
-            if (Object.prototype.hasOwnProperty.call(types, t))
-                result.push(types[t]);
-        }
-    }
-    else {
-        var traverse = function (s: any, n: string) {
-            for (var c in s) {
-                if (Object.prototype.hasOwnProperty.call(s, c))
-                    traverse(s[c], c);
-            }
-            if (typeof (s) === 'function' &&
-                n.charAt(0).toUpperCase() === n.charAt(0) &&
-                n.charAt(0).toLowerCase() !== n.charAt(0))
-                result.push(s);
-        };
-        traverse(from, '');
+    const types = getTypeRegistry();
+    for (var t in types) {
+        if (Object.prototype.hasOwnProperty.call(types, t))
+            result.push(types[t]);
     }
     return result;
-};
+}
 
 export function clearKeys(d: any) {
     for (var n in d) {
@@ -179,42 +187,3 @@ export function cast(instance: any, type: Type) {
 export function safeCast(instance: any, type: Type) {
     return isInstanceOfType(instance, type) ? instance : null;
 };
-
-// has to duplicate this for now
-const isInterfaceTypeSymbol: unique symbol = Symbol.for("Serenity.isInterfaceType");
-
-export function initializeTypes(root: any, pre: string, limit: number) {
-
-    if (!root)
-        return;
-
-    for (var k of Object.keys(root)) {
-        if (k.charAt(0) < 'A' ||
-            k.charAt(0) > 'Z' ||
-            k.indexOf('$') >= 0 ||
-            !Object.prototype.hasOwnProperty.call(root, k))
-            continue;
-
-        var obj = root[k];
-
-        if (obj == void 0 ||
-            Array.isArray(obj) ||
-            obj instanceof Date ||
-            (typeof obj != "function" && typeof obj != "object"))
-            continue;
-
-        // no explicit typeName, e.g. not registered with a name,
-        // a function but not an html element, or registered without name
-        if (!getTypeNameProp(obj) &&
-            (obj as any)[isInterfaceTypeSymbol] !== void 0 &&
-            ((typeof obj === "function" && typeof obj.nodeType !== "number") ||
-                (Object.prototype.hasOwnProperty.call(obj, isInterfaceTypeSymbol) &&
-                    (obj as any)[isInterfaceTypeSymbol] !== undefined))) {
-
-            setTypeNameProp(obj, pre + k);
-        }
-
-        if (limit > 0)
-            initializeTypes(obj, pre + k + ".", limit - 1);
-    }
-}
