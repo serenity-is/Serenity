@@ -19,7 +19,6 @@ export interface RemoteViewOptions {
     seekToPage?: number;
     onProcessData?: RemoteViewProcessCallback<any>;
     method?: string;
-    inlineFilters?: boolean;
     groupItemMetadataProvider?: GroupItemMetadataProvider;
     onAjaxCall?: RemoteViewAjaxCallback<any>;
     getItemMetadata?: (p1?: any, p2?: number) => any;
@@ -139,8 +138,6 @@ export class RemoteView<TEntity> {
         var prevRefreshHints: any = {};
         var filterArgs: any;
         var filteredItems: any = [];
-        var compiledFilter: any;
-        var compiledFilterWithCaching: any;
         var filterCache: any[] = [];
 
         var groupingInfoDefaults = {
@@ -426,10 +423,6 @@ export class RemoteView<TEntity> {
 
         function setFilter(filterFn: any) {
             filter = filterFn;
-            if (options.inlineFilters) {
-                compiledFilter = compileFilter();
-                compiledFilterWithCaching = compileFilterWithCaching();
-            }
             refresh();
         }
 
@@ -946,94 +939,6 @@ export class RemoteView<TEntity> {
             return fn;
         }
 
-        function compileFilter() {
-            var filterInfo = getFunctionInfo(filter);
-
-            var filterBody = filterInfo.body
-                .replace(/return false\s*([;}]|$)/gi, "{ continue _coreloop; }$1")
-                .replace(/return true\s*([;}]|$)/gi, "{ _retval[_idx++] = $item$; continue _coreloop; }$1")
-                .replace(/return ([^;}]+?)\s*([;}]|$)/gi,
-                "{ if ($1) { _retval[_idx++] = $item$; }; continue _coreloop; }$2");
-
-            // This preserves the function template code after JS compression,
-            // so that replace() commands still work as expected.
-            var tpl = [
-                //"function(_items, _args) { ",
-                "var _retval = [], _idx = 0; ",
-                "var $item$, $args$ = _args; ",
-                "_coreloop: ",
-                "for (var _i = 0, _il = _items.length; _i < _il; _i++) { ",
-                "$item$ = _items[_i]; ",
-                "$filter$; ",
-                "} ",
-                "return _retval; "
-                //"}"
-            ].join("");
-            tpl = tpl.replace(/\$filter\$/gi, filterBody);
-            tpl = tpl.replace(/\$item\$/gi, filterInfo.params[0]);
-            tpl = tpl.replace(/\$args\$/gi, filterInfo.params[1]);
-
-            var fn: any = new Function("_items,_args", tpl);
-            fn.displayName = fn.name = "compiledFilter";
-            return fn;
-        }
-
-        function compileFilterWithCaching() {
-            var filterInfo = getFunctionInfo(filter);
-
-            var filterBody = filterInfo.body
-                .replace(/return false\s*([;}]|$)/gi, "{ continue _coreloop; }$1")
-                .replace(/return true\s*([;}]|$)/gi, "{ _cache[_i] = true;_retval[_idx++] = $item$; continue _coreloop; }$1")
-                .replace(/return ([^;}]+?)\s*([;}]|$)/gi,
-                "{ if ((_cache[_i] = $1)) { _retval[_idx++] = $item$; }; continue _coreloop; }$2");
-
-            // This preserves the function template code after JS compression,
-            // so that replace() commands still work as expected.
-            var tpl = [
-                //"function(_items, _args, _cache) { ",
-                "var _retval = [], _idx = 0; ",
-                "var $item$, $args$ = _args; ",
-                "_coreloop: ",
-                "for (var _i = 0, _il = _items.length; _i < _il; _i++) { ",
-                "$item$ = _items[_i]; ",
-                "if (_cache[_i]) { ",
-                "_retval[_idx++] = $item$; ",
-                "continue _coreloop; ",
-                "} ",
-                "$filter$; ",
-                "} ",
-                "return _retval; "
-                //"}"
-            ].join("");
-            tpl = tpl.replace(/\$filter\$/gi, filterBody);
-            tpl = tpl.replace(/\$item\$/gi, filterInfo.params[0]);
-            tpl = tpl.replace(/\$args\$/gi, filterInfo.params[1]);
-
-            var fn: any = new Function("_items,_args,_cache", tpl);
-            var fnName = "compiledFilterWithCaching";
-            fn.displayName = fnName;
-            fn.name = setFunctionName(fn, fnName);
-            return fn;
-        }
-
-        /**
-         * In ES5 we could set the function name on the fly but in ES6 this is forbidden and we need to set it through differently
-         * We can use Object.defineProperty and set it the property to writable, see MDN for reference
-         * https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Object/defineProperty
-         * @param {string} fn
-         * @param {string} fnName
-         */
-        function setFunctionName(fn: Function, fnName: string) {
-            try {
-                Object.defineProperty(fn, 'name', {
-                    writable: true,
-                    value: fnName
-                });
-            } catch (err) {
-                (fn as any).name = fnName;
-            }
-        }
-
         function uncompiledFilter(items: any[], args: any) {
             var retval: any[] = [], idx = 0;
 
@@ -1064,8 +969,8 @@ export class RemoteView<TEntity> {
 
         function getFilteredAndPagedItems(items: any[]) {
             if (filter) {
-                var batchFilter = options.inlineFilters ? compiledFilter : uncompiledFilter;
-                var batchFilterWithCaching = options.inlineFilters ? compiledFilterWithCaching : uncompiledFilterWithCaching;
+                var batchFilter = uncompiledFilter;
+                var batchFilterWithCaching = uncompiledFilterWithCaching;
 
                 if (refreshHints.isFilterNarrowing) {
                     filteredItems = batchFilter(filteredItems, filterArgs);

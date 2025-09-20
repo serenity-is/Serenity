@@ -3238,7 +3238,6 @@ export interface RemoteViewOptions {
 	seekToPage?: number;
 	onProcessData?: RemoteViewProcessCallback<any>;
 	method?: string;
-	inlineFilters?: boolean;
 	groupItemMetadataProvider?: GroupItemMetadataProvider;
 	onAjaxCall?: RemoteViewAjaxCallback<any>;
 	getItemMetadata?: (p1?: any, p2?: number) => any;

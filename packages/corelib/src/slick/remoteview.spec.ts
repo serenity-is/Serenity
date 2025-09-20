@@ -284,17 +284,6 @@ describe("RemoteView", () => {
             });
         });
 
-        //it("sets paging options", () => {
-        //    const pagingOptions = {
-        //        rowsPerPage: 10,
-        //        page: 2
-        //    };
-        //    view.setPagingOptions(pagingOptions);
-        //    const pagingInfo = view.getPagingInfo();
-        //    expect(pagingInfo.rowsPerPage).toBe(10);
-        //    expect(pagingInfo.page).toBe(2); // Page is 1-based
-        //});
-
         it("gets paging info with correct defaults", () => {
             const pagingInfo = view.getPagingInfo();
             expect(pagingInfo.rowsPerPage).toBe(2);
