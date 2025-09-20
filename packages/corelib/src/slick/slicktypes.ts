@@ -1,5 +1,6 @@
 ﻿import { FormatterContext, FormatterResult, Group } from "@serenity-is/sleekgrid";
 import { PropertyItem } from "../base";
+import { IAggregator } from "./aggregators";
 
 export type Format<TItem = any> = (ctx: FormatterContext<TItem>) => FormatterResult;
 
@@ -16,11 +17,17 @@ export interface Formatter {
 
 export interface GroupInfo<TItem> {
     getter?: any;
+    getterIsAFn?: boolean;
     formatter?: (p1: Group<TItem>) => string;
     comparer?: (a: Group<TItem>, b: Group<TItem>) => number;
-    aggregators?: any[];
+    aggregators?: IAggregator[];
+    aggregateChildGroups?: boolean;
     aggregateCollapsed?: boolean;
+    aggregateEmpty?: boolean;
+    collapsed?: boolean;
+    displayTotalsRow?: boolean;
     lazyTotalsCalculation?: boolean;
+    predefinedValues?: any[];
 }
 
 export interface PagerOptions {
@@ -33,7 +40,7 @@ export interface PagerOptions {
 }
 
 export interface SummaryOptions {
-    aggregators: any[];
+    aggregators: IAggregator[];
 }
 
 export interface PagingOptions {

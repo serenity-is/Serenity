@@ -1,5 +1,5 @@
-import { AggregateFormatting, Aggregators } from "./aggregators";
 import { tryGetText } from "../base";
+import { AggregateFormatting, Aggregators } from "./aggregators";
 
 vi.mock("../base", () => ({
     tryGetText: vi.fn(),
@@ -26,36 +26,35 @@ vi.mock("../base", () => ({
 describe("Aggregators", () => {
     describe("Avg", () => {
         it("initializes with field and type", () => {
-            const avg = new (Aggregators.Avg as any)("price");
-            expect(avg.field_).toBe("price");
-            expect(avg.type_).toBe("Avg");
+            const avg = new Aggregators.Avg("price");
+            expect(avg.field).toBe("price");
         });
 
         it("initializes counters in init", () => {
-            const avg = new (Aggregators.Avg as any)("price");
+            const avg = new Aggregators.Avg("price");
             avg.init();
-            expect(avg.count_).toBe(0);
-            expect(avg.nonNullCount_).toBe(0);
-            expect(avg.sum_).toBe(0);
+            expect(avg.count).toBe(0);
+            expect(avg.nonNullCount).toBe(0);
+            expect(avg.sum).toBe(0);
         });
 
         it("accumulates valid numeric values", () => {
-            const avg = new (Aggregators.Avg as any)("price");
+            const avg = new Aggregators.Avg("price");
             avg.init();
 
             avg.accumulate({ price: 10 });
-            expect(avg.count_).toBe(1);
-            expect(avg.nonNullCount_).toBe(1);
-            expect(avg.sum_).toBe(10);
+            expect(avg.count).toBe(1);
+            expect(avg.nonNullCount).toBe(1);
+            expect(avg.sum).toBe(10);
 
             avg.accumulate({ price: 20 });
-            expect(avg.count_).toBe(2);
-            expect(avg.nonNullCount_).toBe(2);
-            expect(avg.sum_).toBe(30);
+            expect(avg.count).toBe(2);
+            expect(avg.nonNullCount).toBe(2);
+            expect(avg.sum).toBe(30);
         });
 
         it("ignores null, empty, and non-numeric values", () => {
-            const avg = new (Aggregators.Avg as any)("price");
+            const avg = new Aggregators.Avg("price");
             avg.init();
 
             avg.accumulate({ price: null });
@@ -63,13 +62,13 @@ describe("Aggregators", () => {
             avg.accumulate({ price: "abc" });
             avg.accumulate({ price: NaN });
 
-            expect(avg.count_).toBe(4);
-            expect(avg.nonNullCount_).toBe(0);
-            expect(avg.sum_).toBe(0);
+            expect(avg.count).toBe(4);
+            expect(avg.nonNullCount).toBe(0);
+            expect(avg.sum).toBe(0);
         });
 
         it("stores average result in groupTotals", () => {
-            const avg = new (Aggregators.Avg as any)("price");
+            const avg = new Aggregators.Avg("price");
             avg.init();
             avg.accumulate({ price: 10 });
             avg.accumulate({ price: 20 });
@@ -81,48 +80,46 @@ describe("Aggregators", () => {
         });
 
         it("does not store result when no valid values", () => {
-            const avg = new (Aggregators.Avg as any)("price");
+            const avg = new Aggregators.Avg("price");
             avg.init();
             avg.accumulate({ price: null });
 
             const groupTotals: any = {};
             avg.storeResult(groupTotals);
 
-            expect(groupTotals.avg).toEqual({});
-            expect(groupTotals.avg.price).toBeUndefined();
+            expect(groupTotals.avg).toEqual({ price: null});
         });
     });
 
     describe("WeightedAvg", () => {
         it("initializes with field, weightedField and type", () => {
-            const weightedAvg = new (Aggregators.WeightedAvg as any)("price", "weight");
-            expect(weightedAvg.field_).toBe("price");
-            expect(weightedAvg.weightedField_).toBe("weight");
-            expect(weightedAvg.type_).toBe("WeightedAvg");
+            const weightedAvg = new Aggregators.WeightedAvg("price", "weight");
+            expect(weightedAvg.field).toBe("price");
+            expect(weightedAvg.weightedField).toBe("weight");
         });
 
         it("initializes sums in init", () => {
-            const weightedAvg = new (Aggregators.WeightedAvg as any)("price", "weight");
+            const weightedAvg = new Aggregators.WeightedAvg("price", "weight");
             weightedAvg.init();
-            expect(weightedAvg.sum_).toBe(0);
-            expect(weightedAvg.weightedSum_).toBe(0);
+            expect(weightedAvg.sum).toBe(0);
+            expect(weightedAvg.weightedSum).toBe(0);
         });
 
         it("accumulates valid weighted values", () => {
-            const weightedAvg = new (Aggregators.WeightedAvg as any)("price", "weight");
+            const weightedAvg = new Aggregators.WeightedAvg("price", "weight");
             weightedAvg.init();
 
             weightedAvg.accumulate({ price: 10, weight: 2 });
-            expect(weightedAvg.sum_).toBe(20); // 10 * 2
-            expect(weightedAvg.weightedSum_).toBe(2);
+            expect(weightedAvg.sum).toBe(20); // 10 * 2
+            expect(weightedAvg.weightedSum).toBe(2);
 
             weightedAvg.accumulate({ price: 20, weight: 3 });
-            expect(weightedAvg.sum_).toBe(80); // 20 * 3 + 20
-            expect(weightedAvg.weightedSum_).toBe(5); // 2 + 3
+            expect(weightedAvg.sum).toBe(80); // 20 * 3 + 20
+            expect(weightedAvg.weightedSum).toBe(5); // 2 + 3
         });
 
         it("ignores invalid values", () => {
-            const weightedAvg = new (Aggregators.WeightedAvg as any)("price", "weight");
+            const weightedAvg = new Aggregators.WeightedAvg("price", "weight");
             weightedAvg.init();
 
             weightedAvg.accumulate({ price: null, weight: 2 });
@@ -130,12 +127,12 @@ describe("Aggregators", () => {
             weightedAvg.accumulate({ price: "", weight: 2 });
             weightedAvg.accumulate({ price: 10, weight: "" });
 
-            expect(weightedAvg.sum_).toBe(0);
-            expect(weightedAvg.weightedSum_).toBe(0);
+            expect(weightedAvg.sum).toBe(0);
+            expect(weightedAvg.weightedSum).toBe(0);
         });
 
         it("stores weighted average result", () => {
-            const weightedAvg = new (Aggregators.WeightedAvg as any)("price", "weight");
+            const weightedAvg = new Aggregators.WeightedAvg("price", "weight");
             weightedAvg.init();
             weightedAvg.accumulate({ price: 10, weight: 2 }); // 20
             weightedAvg.accumulate({ price: 20, weight: 3 }); // 60, total sum=80, weightedSum=5
@@ -147,61 +144,60 @@ describe("Aggregators", () => {
         });
 
         it("isValid returns true for valid numbers", () => {
-            const weightedAvg = new (Aggregators.WeightedAvg as any)("price", "weight");
-            expect(weightedAvg.isValid(10)).toBe(true);
-            expect(weightedAvg.isValid("10")).toBe(true);
-            expect(weightedAvg.isValid(0)).toBe(true);
+            const weightedAvg = new Aggregators.WeightedAvg("price", "weight");
+            expect(Aggregators.WeightedAvg.isValid(10)).toBe(true);
+            expect(Aggregators.WeightedAvg.isValid("10")).toBe(true);
+            expect(Aggregators.WeightedAvg.isValid(0)).toBe(true);
         });
 
         it("isValid returns false for invalid values", () => {
-            const weightedAvg = new (Aggregators.WeightedAvg as any)("price", "weight");
-            expect(weightedAvg.isValid(null)).toBe(false);
-            expect(weightedAvg.isValid("")).toBe(false);
-            expect(weightedAvg.isValid(NaN)).toBe(false);
-            expect(weightedAvg.isValid("abc")).toBe(false);
+            const weightedAvg = new Aggregators.WeightedAvg("price", "weight");
+            expect(Aggregators.WeightedAvg.isValid(null)).toBe(false);
+            expect(Aggregators.WeightedAvg.isValid("")).toBe(false);
+            expect(Aggregators.WeightedAvg.isValid(NaN)).toBe(false);
+            expect(Aggregators.WeightedAvg.isValid("abc")).toBe(false);
         });
     });
 
     describe("Min", () => {
         it("initializes with field and type", () => {
-            const min = new (Aggregators.Min as any)("price");
-            expect(min.field_).toBe("price");
-            expect(min.type_).toBe("Min");
+            const min = new Aggregators.Min("price");
+            expect(min.field).toBe("price");
         });
 
         it("initializes min to null in init", () => {
-            const min = new (Aggregators.Min as any)("price");
+            const min = new Aggregators.Min("price");
             min.init();
-            expect(min.min_).toBe(null);
+            expect(min.min).toBe(null);
         });
 
         it("finds minimum value", () => {
-            const min = new (Aggregators.Min as any)("price");
+            const min = new Aggregators.Min("price");
             min.init();
 
             min.accumulate({ price: 20 });
-            expect(min.min_).toBe(20);
+            expect(min.min).toBe(20);
 
             min.accumulate({ price: 10 });
-            expect(min.min_).toBe(10);
+            expect(min.min).toBe(10);
 
             min.accumulate({ price: 30 });
-            expect(min.min_).toBe(10);
+            expect(min.min).toBe(10);
         });
 
         it("ignores null, empty, and non-numeric values", () => {
-            const min = new (Aggregators.Min as any)("price");
+            const min = new Aggregators.Min("price");
             min.init();
 
             min.accumulate({ price: null });
             min.accumulate({ price: "" });
             min.accumulate({ price: "abc" });
 
-            expect(min.min_).toBe(null);
+            expect(min.min).toBe(null);
         });
 
         it("stores minimum result", () => {
-            const min = new (Aggregators.Min as any)("price");
+            const min = new Aggregators.Min("price");
             min.init();
             min.accumulate({ price: 20 });
             min.accumulate({ price: 10 });
@@ -215,44 +211,43 @@ describe("Aggregators", () => {
 
     describe("Max", () => {
         it("initializes with field and type", () => {
-            const max = new (Aggregators.Max as any)("price");
-            expect(max.field_).toBe("price");
-            expect(max.type_).toBe("Max");
+            const max = new Aggregators.Max("price");
+            expect(max.field).toBe("price");
         });
 
         it("initializes max to null in init", () => {
-            const max = new (Aggregators.Max as any)("price");
+            const max = new Aggregators.Max("price");
             max.init();
-            expect(max.max_).toBe(null);
+            expect(max.max).toBe(null);
         });
 
         it("finds maximum value", () => {
-            const max = new (Aggregators.Max as any)("price");
+            const max = new Aggregators.Max("price");
             max.init();
 
             max.accumulate({ price: 10 });
-            expect(max.max_).toBe(10);
+            expect(max.max).toBe(10);
 
             max.accumulate({ price: 30 });
-            expect(max.max_).toBe(30);
+            expect(max.max).toBe(30);
 
             max.accumulate({ price: 20 });
-            expect(max.max_).toBe(30);
+            expect(max.max).toBe(30);
         });
 
         it("ignores null, empty, and non-numeric values", () => {
-            const max = new (Aggregators.Max as any)("price");
+            const max = new Aggregators.Max("price");
             max.init();
 
             max.accumulate({ price: null });
             max.accumulate({ price: "" });
             max.accumulate({ price: "abc" });
 
-            expect(max.max_).toBe(null);
+            expect(max.max).toBe(null);
         });
 
         it("stores maximum result", () => {
-            const max = new (Aggregators.Max as any)("price");
+            const max = new Aggregators.Max("price");
             max.init();
             max.accumulate({ price: 10 });
             max.accumulate({ price: 30 });
@@ -266,41 +261,40 @@ describe("Aggregators", () => {
 
     describe("Sum", () => {
         it("initializes with field and type", () => {
-            const sum = new (Aggregators.Sum as any)("price");
-            expect(sum.field_).toBe("price");
-            expect(sum.type_).toBe("Sum");
+            const sum = new Aggregators.Sum("price");
+            expect(sum.field).toBe("price");
         });
 
         it("initializes sum to null in init", () => {
-            const sum = new (Aggregators.Sum as any)("price");
+            const sum = new Aggregators.Sum("price");
             sum.init();
-            expect(sum.sum_).toBe(null);
+            expect(sum.sum).toBe(0);
         });
 
         it("accumulates sum of valid values", () => {
-            const sum = new (Aggregators.Sum as any)("price");
+            const sum = new Aggregators.Sum("price");
             sum.init();
 
             sum.accumulate({ price: 10 });
-            expect(sum.sum_).toBe(10);
+            expect(sum.sum).toBe(10);
 
             sum.accumulate({ price: 20 });
-            expect(sum.sum_).toBe(30);
+            expect(sum.sum).toBe(30);
         });
 
         it("ignores null, empty, and non-numeric values", () => {
-            const sum = new (Aggregators.Sum as any)("price");
+            const sum = new Aggregators.Sum("price");
             sum.init();
 
             sum.accumulate({ price: null });
             sum.accumulate({ price: "" });
             sum.accumulate({ price: "abc" });
 
-            expect(sum.sum_).toBe(null);
+            expect(sum.sum).toBe(0);
         });
 
         it("stores sum result", () => {
-            const sum = new (Aggregators.Sum as any)("price");
+            const sum = new Aggregators.Sum("price");
             sum.init();
             sum.accumulate({ price: 10 });
             sum.accumulate({ price: 20 });

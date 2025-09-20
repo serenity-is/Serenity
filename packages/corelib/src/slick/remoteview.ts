@@ -1,7 +1,7 @@
-import { EventData, EventEmitter, Grid, Group, GroupItemMetadataProvider, GroupTotals, gridDefaults } from "@serenity-is/sleekgrid";
+import { EventData, EventEmitter, Grid, Group, GroupItemMetadataProvider, GroupTotals, IGroupTotals, gridDefaults } from "@serenity-is/sleekgrid";
 import { ListRequest, ListResponse, ServiceOptions, ServiceResponse, htmlEncode, localText, serviceCall } from "../base";
 import { deepClone } from "../compat";
-import { AggregateFormatting } from "./aggregators";
+import { AggregateFormatting, IAggregator } from "./aggregators";
 import { GroupInfo, PagingOptions, SummaryOptions } from "./slicktypes";
 
 export interface RemoteViewOptions {
@@ -39,6 +39,8 @@ export type RemoteViewAjaxCallback<TEntity> = (view: RemoteView<TEntity>, option
 export type RemoteViewFilter<TEntity> = (item: TEntity, view: RemoteView<TEntity>) => boolean;
 export type RemoteViewProcessCallback<TEntity> = (data: ListResponse<TEntity>, view: RemoteView<TEntity>) => ListResponse<TEntity>;
 
+export type GrandTotals = Partial<Pick<GroupTotals, 'avg' | 'sum' | 'min' | 'max' | 'initialized'>>;
+
 export interface RemoteView<TEntity> {
     onSubmit: CancellableViewCallback<TEntity>;
     onDataChanged: EventEmitter;
@@ -67,9 +69,9 @@ export interface RemoteView<TEntity> {
     setItems(items: any[], newIdProperty?: boolean | string): void;
     getIdPropertyName(): string;
     getItemById(id: any): TEntity;
-    getGrandTotals(): any;
+    getGrandTotals(): GrandTotals;
     getGrouping(): GroupInfo<TEntity>[];
-    getGroups(): any[];
+    getGroups(): Group<TEntity>[];
     getRowById(id: any): number;
     getRowByItem(item: any): number;
     getRows(): any[];
@@ -127,7 +129,7 @@ export class RemoteView<TEntity> {
         var rows: any[] = [];
         var idxById: Record<any, number> = {};
         var rowsById: any = null;
-        var filter: any = null;
+        var filter: (item: TEntity, args: any) => boolean = null;
         var updated: any = null;
         var suspend = 0;
 
@@ -140,7 +142,7 @@ export class RemoteView<TEntity> {
         var filteredItems: any = [];
         var filterCache: any[] = [];
 
-        var groupingInfoDefaults = {
+        var groupingInfoDefaults: GroupInfo<TEntity> = {
             getter: <any>null,
             formatter: <any>null,
             comparer: function (a: any, b: any) {
@@ -156,9 +158,11 @@ export class RemoteView<TEntity> {
             displayTotalsRow: true,
             lazyTotalsCalculation: false
         };
-        var summaryOptions: any = {};
-        var groupingInfos: any[] = [];
-        var groups: any[] = [];
+
+        var grandAggregators: IAggregator[];
+        var grandTotals: GrandTotals;
+        var groupingInfos: GroupInfo<TEntity>[] = [];
+        var groups: Group<TEntity>[] = [];
         var toggledGroupsByLevel: any[] = [];
         var groupingDelimiter = ':|:';
 
@@ -260,7 +264,7 @@ export class RemoteView<TEntity> {
 
             idxById = {};
             rowsById = null;
-            summaryOptions.totals = {};
+            grandTotals = { };
             updateIdxById();
             ensureIdUniqueness();
 
@@ -431,35 +435,29 @@ export class RemoteView<TEntity> {
         }
 
         function setSummaryOptions(summary: any) {
-            summary = summary || {};
-            summaryOptions.aggregators = summary.aggregators || [];
-            summaryOptions.compiledAccumulators = [];
-            summaryOptions.totals = {};
-            var idx = summaryOptions.aggregators.length;
-            while (idx--) {
-                summaryOptions.compiledAccumulators[idx] = compileAccumulatorLoop(summaryOptions.aggregators[idx]);
-            }
+            grandAggregators = summary?.aggregators || [];
+            grandTotals = {};
             setGrouping(groupingInfos || []);
         }
 
         function getGrandTotals() {
-            summaryOptions.totals = summaryOptions.totals || {};
+            grandTotals ??= {};
 
-            if (!summaryOptions.totals.initialized) {
-                summaryOptions.aggregators = summaryOptions.aggregators || [];
-                summaryOptions.compiledAccumulators = summaryOptions.compiledAccumulators || [];
-                var agg: any, idx = summaryOptions.aggregators.length;
+            if (!grandTotals.initialized) {
+                grandAggregators ??= [];
+                var agg: IAggregator, idx =grandAggregators.length;
 
                 while (idx--) {
-                    agg = summaryOptions.aggregators[idx];
+                    agg = grandAggregators[idx];
                     agg.init();
-                    summaryOptions.compiledAccumulators[idx].call(agg, items);
-                    agg.storeResult(summaryOptions.totals);
+                    for (const item of items)
+                        agg.accumulate(item);
+                    agg.storeResult(grandTotals);
                 }
-                summaryOptions.totals.initialized = true;
+                grandTotals.initialized = true;
             }
 
-            return summaryOptions.totals;
+            return grandTotals;
         }
 
         function setGrouping(groupingInfo: any) {
@@ -474,16 +472,8 @@ export class RemoteView<TEntity> {
 
             for (var i = 0; i < groupingInfos.length; i++) {
                 var gi = groupingInfos[i] = Object.assign(<any>{}, groupingInfoDefaults, deepClone(groupingInfos[i]));
-                gi.aggregators = gi.aggregators || summaryOptions.aggregators || [];
+                gi.aggregators = gi.aggregators || grandAggregators || [];
                 gi.getterIsAFn = typeof gi.getter === "function";
-
-                // pre-compile accumulator loops
-                gi.compiledAccumulators = [];
-                var idx = gi.aggregators.length;
-                while (idx--) {
-                    gi.compiledAccumulators[idx] = compileAccumulatorLoop(gi.aggregators[idx]);
-                }
-
                 toggledGroupsByLevel[i] = {};
             }
 
@@ -741,7 +731,7 @@ export class RemoteView<TEntity> {
 
         function expandCollapseGroup(args: any, collapse: any) {
             var opts = resolveLevelAndGroupingKey(args);
-            toggledGroupsByLevel[opts.level][opts.groupingKey] = groupingInfos[opts.level].collapsed ^ collapse;
+            toggledGroupsByLevel[opts.level][opts.groupingKey] = !groupingInfos[opts.level].collapsed !== !collapse;
             if (collapse)
                 onGroupCollapsed.notify({ level: opts.level, groupingKey: opts.groupingKey });
             else
@@ -829,11 +819,11 @@ export class RemoteView<TEntity> {
             return groups;
         }
 
-        function calculateTotals(totals: any) {
+        function calculateTotals(totals: IGroupTotals<TEntity>) {
             var group = totals.group;
             var gi = groupingInfos[group.level];
             var isLeafLevel = (group.level == groupingInfos.length);
-            var agg: any, idx = gi.aggregators.length;
+            var agg: IAggregator, idx = gi.aggregators.length;
 
             if (!isLeafLevel && gi.aggregateChildGroups) {
                 // make sure all the subgroups are calculated
@@ -848,17 +838,16 @@ export class RemoteView<TEntity> {
             while (idx--) {
                 agg = gi.aggregators[idx];
                 agg.init();
-                if (!isLeafLevel && gi.aggregateChildGroups) {
-                    gi.compiledAccumulators[idx].call(agg, group.groups);
-                } else {
-                    gi.compiledAccumulators[idx].call(agg, group.rows);
+                const items = !isLeafLevel && gi.aggregateChildGroups ? group.groups : group.rows;
+                for (const item of items) {
+                    agg.accumulate(item);
                 }
                 agg.storeResult(totals);
             }
             totals.initialized = true;
         }
 
-        function addGroupTotals(group: any) {
+        function addGroupTotals(group: Group<TEntity>) {
             var gi = groupingInfos[group.level];
             var totals = new GroupTotals<TEntity>();
             totals.group = group;
@@ -868,12 +857,12 @@ export class RemoteView<TEntity> {
             }
         }
 
-        function addTotals(groups: any[], level?: number) {
+        function addTotals(groups: Group<TEntity>[], level?: number) {
             level = level || 0;
             var gi = groupingInfos[level];
             var groupCollapsed = !!gi?.collapsed;
             var toggledGroups = toggledGroupsByLevel[level];
-            var idx = groups.length, g: any;
+            var idx = groups.length, g: Group<TEntity>;
             while (idx--) {
                 g = groups[idx];
 
@@ -896,10 +885,10 @@ export class RemoteView<TEntity> {
             }
         }
 
-        function flattenGroupedRows(groups: any[], level?: number) {
+        function flattenGroupedRows(groups: Group<TEntity>[], level?: number) {
             level = level || 0;
             var gi = groupingInfos[level];
-            var groupedRows: any[] = [], rows: any[], gl = 0, g: any;
+            var groupedRows: any[] = [], rows: any[], gl = 0, g: Group<TEntity>;
             for (var i = 0, l = groups.length; i < l; i++) {
                 g = groups[i];
                 groupedRows[gl++] = g;
@@ -916,27 +905,6 @@ export class RemoteView<TEntity> {
                 }
             }
             return groupedRows;
-        }
-
-        function getFunctionInfo(fn: any) {
-            var fnRegex = /^function[^(]*\(([^)]*)\)\s*{([\s\S]*)}$/;
-            var matches = fn.toString().match(fnRegex);
-            return {
-                params: matches[1].split(","),
-                body: matches[2]
-            };
-        }
-
-        function compileAccumulatorLoop(aggregator: any) {
-            var accumulatorInfo = getFunctionInfo(aggregator.accumulate);
-            var fn: any = new Function(
-                "_items",
-                "for (var " + accumulatorInfo.params[0] + ", _i=0, _il=_items.length; _i<_il; _i++) {" +
-                accumulatorInfo.params[0] + " = _items[_i]; " +
-                accumulatorInfo.body +
-                "}"
-            );
-            return fn;
         }
 
         function uncompiledFilter(items: any[], args: any) {
@@ -1041,7 +1009,7 @@ export class RemoteView<TEntity> {
             totalRows = filteredItems.totalRows;
             var newRows = filteredItems.rows;
 
-            summaryOptions.totals = {};
+            grandTotals = {};
 
             groups = [];
             if (groupingInfos.length) {

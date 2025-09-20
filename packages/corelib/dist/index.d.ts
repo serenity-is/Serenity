@@ -1,4 +1,4 @@
-import { Column, EventEmitter, FormatterContext, FormatterResult, Grid, GridOptions, Group, GroupItemMetadataProvider, GroupTotals } from '@serenity-is/sleekgrid';
+import { Column, EventEmitter, FormatterContext, FormatterResult, Grid, GridOptions, Group, GroupItemMetadataProvider, GroupTotals, IGroupTotals } from '@serenity-is/sleekgrid';
 
 export interface UserDefinition {
 	/**
@@ -2994,7 +2994,7 @@ export declare namespace Router {
 	function replaceLast(newHash: string, tryBack?: boolean): void;
 	function dialog(owner: HTMLElement | ArrayLike<HTMLElement>, element: HTMLElement | ArrayLike<HTMLElement>, dialogHash: () => string): void;
 	let mightBeRouteRegex: RegExp;
-	function resolve(newHash?: string): void;
+	function resolve(newHash?: string): "disabled" | "skipped" | "shebang" | "missinghandler" | "calledhandler";
 	function ignoreHashChange(expiration?: number): void;
 }
 export declare namespace ScriptData {
@@ -3178,17 +3178,62 @@ export declare namespace ValidationHelper {
 	function getValidator(elem: ArrayLike<HTMLElement> | HTMLElement): Validator;
 	function validateElement(elem: ArrayLike<HTMLElement> | HTMLElement): void;
 }
+export interface IAggregator {
+	init(): void;
+	accumulate(item: any): void;
+	storeResult(totals: IGroupTotals): void;
+}
 export declare namespace Aggregators {
-	function Avg(field: string): void;
-	function WeightedAvg(field: string, weightedField: string): void;
-	function Min(field: string): void;
-	function Max(field: string): void;
-	function Sum(field: string): void;
+	class Avg implements IAggregator {
+		readonly field: string;
+		count: number;
+		nonNullCount: number;
+		sum: number;
+		constructor(field: string);
+		init(): void;
+		accumulate(item: any): void;
+		storeResult(groupTotals: IGroupTotals): void;
+	}
+	class WeightedAvg implements IAggregator {
+		readonly field: string;
+		readonly weightedField: string;
+		sum: number;
+		weightedSum: number;
+		constructor(field: string, weightedField: string);
+		init(): void;
+		accumulate(item: any): void;
+		storeResult(groupTotals: any): void;
+		static isValid(val: any): boolean;
+	}
+	class Min implements IAggregator {
+		readonly field: string;
+		min: any;
+		constructor(field: string);
+		init(): void;
+		accumulate(item: any): void;
+		storeResult(groupTotals: any): void;
+	}
+	class Max implements IAggregator {
+		readonly field: string;
+		max: any;
+		constructor(field: string);
+		init(): void;
+		accumulate(item: any): void;
+		storeResult(groupTotals: any): void;
+	}
+	class Sum implements IAggregator {
+		readonly field: string;
+		sum: number;
+		constructor(field: string);
+		init(): void;
+		accumulate(item: any): void;
+		storeResult(groupTotals: any): void;
+	}
 }
 export declare namespace AggregateFormatting {
-	function formatMarkup<TItem = any>(totals: GroupTotals, column: Column<TItem>, aggType: string): string;
+	function formatMarkup<TItem = any>(totals: IGroupTotals, column: Column<TItem>, aggType: string): string;
 	function formatValue(column: Column, value: number): string;
-	function groupTotalsFormatter<TItem = any>(totals: GroupTotals, column: Column<TItem>): string;
+	function groupTotalsFormatter<TItem = any>(totals: IGroupTotals, column: Column<TItem>): string;
 }
 export type Format<TItem = any> = (ctx: FormatterContext<TItem>) => FormatterResult;
 declare module "@serenity-is/sleekgrid" {
@@ -3202,11 +3247,17 @@ export interface Formatter {
 }
 export interface GroupInfo<TItem> {
 	getter?: any;
+	getterIsAFn?: boolean;
 	formatter?: (p1: Group<TItem>) => string;
 	comparer?: (a: Group<TItem>, b: Group<TItem>) => number;
-	aggregators?: any[];
+	aggregators?: IAggregator[];
+	aggregateChildGroups?: boolean;
 	aggregateCollapsed?: boolean;
+	aggregateEmpty?: boolean;
+	collapsed?: boolean;
+	displayTotalsRow?: boolean;
 	lazyTotalsCalculation?: boolean;
+	predefinedValues?: any[];
 }
 export interface PagerOptions {
 	view?: any;
@@ -3217,7 +3268,7 @@ export interface PagerOptions {
 	onRowsPerPageChange?: (n: number) => void;
 }
 export interface SummaryOptions {
-	aggregators: any[];
+	aggregators: IAggregator[];
 }
 export interface PagingOptions {
 	rowsPerPage?: number;
@@ -3255,6 +3306,7 @@ export type CancellableViewCallback<TEntity> = (view: RemoteView<TEntity>) => bo
 export type RemoteViewAjaxCallback<TEntity> = (view: RemoteView<TEntity>, options: ServiceOptions<ListResponse<TEntity>>) => boolean | void;
 export type RemoteViewFilter<TEntity> = (item: TEntity, view: RemoteView<TEntity>) => boolean;
 export type RemoteViewProcessCallback<TEntity> = (data: ListResponse<TEntity>, view: RemoteView<TEntity>) => ListResponse<TEntity>;
+export type GrandTotals = Partial<Pick<GroupTotals, "avg" | "sum" | "min" | "max" | "initialized">>;
 export interface RemoteView<TEntity> {
 	onSubmit: CancellableViewCallback<TEntity>;
 	onDataChanged: EventEmitter;
@@ -3283,9 +3335,9 @@ export interface RemoteView<TEntity> {
 	setItems(items: any[], newIdProperty?: boolean | string): void;
 	getIdPropertyName(): string;
 	getItemById(id: any): TEntity;
-	getGrandTotals(): any;
+	getGrandTotals(): GrandTotals;
 	getGrouping(): GroupInfo<TEntity>[];
-	getGroups(): any[];
+	getGroups(): Group<TEntity>[];
 	getRowById(id: any): number;
 	getRowByItem(item: any): number;
 	getRows(): any[];

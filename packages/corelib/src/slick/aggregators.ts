@@ -1,155 +1,173 @@
-import { Column, GroupTotals, NonDataRow, convertCompatFormatter, escapeHtml } from "@serenity-is/sleekgrid";
+import { Column, GroupTotals, IGroupTotals, NonDataRow, convertCompatFormatter, escapeHtml } from "@serenity-is/sleekgrid";
 import { formatNumber, htmlEncode, tryGetText } from "../base";
 
-export { };
+export interface IAggregator {
+    init(): void;
+    accumulate(item: any): void;
+    storeResult(totals: IGroupTotals): void;
+}
 
-export namespace Aggregators
-{
-    export function Avg(field: string): void {
-        this.field_ = field;
-        this.type_ = "Avg";
+export namespace Aggregators {
+    export class Avg implements IAggregator {
+        public count: number;
+        public nonNullCount: number;
+        public sum: number;
 
-        this.init = function () {
-            this.count_ = 0;
-            this.nonNullCount_ = 0;
-            this.sum_ = 0;
+        constructor(public readonly field: string) {
+        }
+
+        init() {
+            this.count = 0;
+            this.nonNullCount = 0;
+            this.sum = 0;
         };
 
-        this.accumulate = function (item: any) {
-            var val = item[this.field_];
-            this.count_++;
+        accumulate(item: any) {
+            const val = item[this.field];
+            this.count++;
             if (val != null && val !== "" && !isNaN(val)) {
-                this.nonNullCount_++;
-                this.sum_ += parseFloat(val);
+                this.nonNullCount++;
+                this.sum += typeof val === "number" ? val : parseFloat(val);
             }
-        };
+        }
 
-        this.storeResult = function (groupTotals: any) {
+        storeResult(groupTotals: IGroupTotals) {
             if (!groupTotals.avg) {
                 groupTotals.avg = {};
             }
-            if (this.nonNullCount_ != 0) {
-                groupTotals.avg[this.field_] = this.sum_ / this.nonNullCount_;
-            }
-        };
+            groupTotals.avg[this.field] = this.nonNullCount != 0 ? this.sum / this.nonNullCount : null;
+        }
     }
 
-    export function WeightedAvg(field: string, weightedField: string) {
-        this.field_ = field;
-        this.type_ = "WeightedAvg";
-        this.weightedField_ = weightedField;
+    export class WeightedAvg implements IAggregator {
+        public sum: number;
+        public weightedSum: number;
 
-        this.init = function () {
-            this.sum_ = 0;
-            this.weightedSum_ = 0;
-        };
+        constructor(public readonly field: string,
+            public readonly weightedField: string) {
+        }
 
-        this.accumulate = function (item: any) {
-            var val = item[this.field_];
-            var valWeighted = item[this.weightedField_];
-            if (this.isValid(val) && this.isValid(valWeighted)) {
-                this.weightedSum_ += parseFloat(valWeighted);
-                this.sum_ += parseFloat(val) * parseFloat(valWeighted);
+        init() {
+            this.sum = 0;
+            this.weightedSum = 0;
+        }
+
+        accumulate(item: any) {
+            const val = item[this.field];
+            let valWeighted = item[this.weightedField];
+            if (WeightedAvg.isValid(val) && WeightedAvg.isValid(valWeighted)) {
+                valWeighted = typeof valWeighted === "number" ? valWeighted : parseFloat(valWeighted);
+                this.weightedSum += valWeighted;
+                this.sum += valWeighted * (typeof val === "number" ? val : parseFloat(val));
             }
-        };
+        }
 
-        this.storeResult = function (groupTotals: any) {
+        storeResult(groupTotals: any) {
             if (!groupTotals.avg) {
                 groupTotals.avg = {};
             }
-
-            if (this.sum_ && this.weightedSum_) {
-                groupTotals.avg[this.field_] = this.sum_ / this.weightedSum_;
+            if (this.sum && this.weightedSum) {
+                groupTotals.avg[this.field] = this.sum / this.weightedSum;
             }
-        };
+        }
 
-        this.isValid = function (val: any) {
+        static isValid(val: any): boolean {
             return val !== null && val !== "" && !isNaN(val);
-        };
+        }
     }
 
-    export function Min(field: string): void {
-        this.field_ = field;
-        this.type_ = "Min";
+    export class Min implements IAggregator {
+        public readonly field: string;
+        public min: any;
 
-        this.init = function () {
-            this.min_ = null;
-        };
+        constructor(field: string) {
+            this.field = field;
+        }
 
-        this.accumulate = function (item: any) {
-            var val = item[this.field_];
+        init() {
+            this.min = null;
+        }
+
+        accumulate(item: any) {
+            const val = item[this.field];
             if (val != null && val !== "" && !isNaN(val)) {
-                if (this.min_ == null || val < this.min_) {
-                    this.min_ = val;
+                if (this.min == null || val < this.min) {
+                    this.min = val;
                 }
             }
-        };
+        }
 
-        this.storeResult = function (groupTotals: any) {
+        storeResult(groupTotals: any) {
             if (!groupTotals.min) {
                 groupTotals.min = {};
             }
-            groupTotals.min[this.field_] = this.min_;
+            groupTotals.min[this.field] = this.min;
         }
     }
 
-    export function Max(field: string): void {
-        this.field_ = field;
-        this.type_ = "Max";
+    export class Max implements IAggregator {
+        public max: any;
 
-        this.init = function () {
-            this.max_ = null;
-        };
+        constructor(public readonly field: string) {
+        }
 
-        this.accumulate = function (item: any) {
-            var val = item[this.field_];
+        init() {
+            this.max = null;
+        }
+
+        accumulate(item: any) {
+            const val = item[this.field];
             if (val != null && val !== "" && !isNaN(val)) {
-                if (this.max_ == null || val > this.max_) {
-                    this.max_ = val;
+                if (this.max == null || val > this.max) {
+                    this.max = val;
                 }
             }
-        };
+        }
 
-        this.storeResult = function (groupTotals: any) {
+        storeResult(groupTotals: any) {
             if (!groupTotals.max) {
                 groupTotals.max = {};
             }
-            groupTotals.max[this.field_] = this.max_;
+            groupTotals.max[this.field] = this.max;
         }
     }
 
-    export function Sum(field: string): void {
-        this.field_ = field;
-        this.type_ = "Sum";
+    export class Sum implements IAggregator {
+        public readonly field: string;
+        public sum: number;
 
-        this.init = function () {
-            this.sum_ = null;
-        };
+        constructor(field: string) {
+            this.field = field;
+        }
 
-        this.accumulate = function (item: any) {
-            var val = item[this.field_];
+        init() {
+            this.sum = 0;
+        }
+
+        accumulate(item: any) {
+            const val = item[this.field];
             if (val != null && val !== "" && !isNaN(val)) {
-                this.sum_ += parseFloat(val);
+                this.sum += typeof val === "number" ? val : parseFloat(val);
             }
-        };
+        }
 
-        this.storeResult = function (groupTotals: any) {
+        storeResult(groupTotals: any) {
             if (!groupTotals.sum) {
                 groupTotals.sum = {};
             }
-            groupTotals.sum[this.field_] = this.sum_;
+            groupTotals.sum[this.field] = this.sum;
         }
     }
 }
 
 export namespace AggregateFormatting {
-    export function formatMarkup<TItem = any>(totals: GroupTotals, column: Column<TItem>, aggType: string): string {
+    export function formatMarkup<TItem = any>(totals: IGroupTotals, column: Column<TItem>, aggType: string): string {
         var textKey = (aggType.substring(0, 1).toUpperCase() + aggType.substring(1));
         var text = tryGetText("Enums.Serenity.SummaryType." + textKey) ?? textKey;
-    
+
         var value = (totals as any)[aggType][column.field];
         var formattedValue = formatValue(column, value);
-    
+
         return "<span class='aggregate agg-" + aggType + "'  title='" + htmlEncode(text) + "'>" +
             formattedValue +
             "</span>";
@@ -183,19 +201,19 @@ export namespace AggregateFormatting {
             return htmlEncode(value);
     }
 
-    export function groupTotalsFormatter<TItem = any>(totals: GroupTotals, column: Column<TItem>): string {
+    export function groupTotalsFormatter<TItem = any>(totals: IGroupTotals, column: Column<TItem>): string {
         if (!totals || !column)
             return "";
-    
+
         var text: string = null;
-    
+
         ["sum", "avg", "min", "max", "cnt"].forEach(function (aggType) {
             if (text == null && (totals as any)[aggType] && (totals as any)[aggType][column.field] != null) {
                 text = formatMarkup(totals, column, aggType);
                 return false;
             }
         });
-    
+
         return text || "";
-    }       
+    }
 }
