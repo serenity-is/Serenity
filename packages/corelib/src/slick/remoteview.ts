@@ -878,13 +878,13 @@ export class RemoteView<TEntity> {
         function addTotals(groups: any[], level?: number) {
             level = level || 0;
             var gi = groupingInfos[level];
-            var groupCollapsed = gi.collapsed;
+            var groupCollapsed = !!gi?.collapsed;
             var toggledGroups = toggledGroupsByLevel[level];
             var idx = groups.length, g: any;
             while (idx--) {
                 g = groups[idx];
 
-                if (g.collapsed && !gi.aggregateCollapsed) {
+                if (g.collapsed && !gi?.aggregateCollapsed) {
                     continue;
                 }
 
@@ -898,7 +898,7 @@ export class RemoteView<TEntity> {
                     addGroupTotals(g);
                 }
 
-                g.collapsed = groupCollapsed ^ toggledGroups[g.groupingKey];
+                g.collapsed = groupCollapsed !== !!toggledGroups[g.groupingKey];
                 g.title = gi.formatter ? gi.formatter(g) : htmlEncode(g.value);
             }
         }
