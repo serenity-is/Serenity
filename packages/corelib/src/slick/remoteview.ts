@@ -6,32 +6,32 @@ import { GroupInfo, PagingOptions } from "./slicktypes";
 
 export interface RemoteViewOptions {
     autoLoad?: boolean;
-    idField?: string;
     contentType?: string;
     dataType?: string;
+    errormsg?: string;
     filter?: any;
-    params?: Record<string, object>;
-    onSubmit?: CancellableViewCallback<any>;
-    url?: string;
+    getItemMetadata?: (p1?: any, p2?: number) => any;
+    groupItemMetadataProvider?: GroupItemMetadataProvider;
+    idField?: string;
     localSort?: boolean;
-    sortBy?: any;
+    method?: string;
+    onAjaxCall?: RemoteViewAjaxCallback<any>;
+    onProcessData?: RemoteViewProcessCallback<any>;
+    onSubmit?: CancellableViewCallback<any>;
+    params?: Record<string, object>;
     rowsPerPage?: number;
     seekToPage?: number;
-    onProcessData?: RemoteViewProcessCallback<any>;
-    method?: string;
-    groupItemMetadataProvider?: GroupItemMetadataProvider;
-    onAjaxCall?: RemoteViewAjaxCallback<any>;
-    getItemMetadata?: (p1?: any, p2?: number) => any;
-    errorMsg?: string;
+    sortBy?: any;
+    url?: string;
 }
 
 export interface PagingInfo {
-    rowsPerPage: number;
-    page: number,
-    totalCount: number;
-    loading: boolean,
+    dataView: RemoteView<any>;
     error: string;
-    dataView: RemoteView<any>
+    loading: boolean;
+    page: number;
+    rowsPerPage: number;
+    totalCount: number;
 }
 
 export type CancellableViewCallback<TEntity> = (view: RemoteView<TEntity>) => boolean | void;
@@ -44,59 +44,57 @@ export type GrandTotals = Partial<Pick<GroupTotals, 'avg' | 'sum' | 'min' | 'max
 const groupingDelimiter = ':|:';
 
 export class RemoteView<TEntity = any> {
-    private idProperty: string;
-    private items: any[] = [];
-    private rows: any[] = [];
-    private idxById: Record<any, number> = {};
-    private rowsById: Record<any, number> = null;
+    private contentType: string;
+    private dataType: string;
+    private errormsg: string;
+    private errorMessage: string = null;
     private filter: RemoteViewFilter<TEntity>;
-    private updated: any = null;
-    private suspend = 0;
-    private sortAsc = true;
-    private sortComparer: any;
-    private refreshHints: any = {};
-    private prevRefreshHints: any = {};
-    private filteredItems: any = [];
     private filterCache: any[] = [];
+    private filteredItems: any = [];
     private grandAggregators: IAggregator[];
     private grandTotals: GrandTotals;
     private groupingInfos: GroupInfo<TEntity>[] = [];
+    private groupItemMetadataProvider: GroupItemMetadataProvider;
     private groups: Group<TEntity>[] = [];
-    private toggledGroupsByLevel: any[] = [];
-
+    private idProperty: string;
+    private idxById: Record<any, number> = {};
+    private itemMetadataCallback?: (p1?: any, p2?: number) => any;
+    private items: any[] = [];
+    private loading: AbortController | boolean = false;
+    private localSort: boolean;
+    private method: string;
     private page = 1;
+    private populateCalls = 0;
+    private populateLocks = 0;
+    private prevRefreshHints: any = {};
+    private refreshHints: any = {};
+    private rows: any[] = [];
+    private rowsById: Record<any, number> = null;
+    private rowsPerPage: number;
+    private sortAsc = true;
+    private sortComparer: any;
+    private suspend = 0;
+    private toggledGroupsByLevel: any[] = [];
+    private totalCount: number = null;
     private totalRows = 0;
+    private updated: Record<string, boolean> = null;
+    public params: Record<string, any>;
+    public seekToPage: number;
+    public sortBy: string[];
+    public url: string;
 
     public onAjaxCall: RemoteViewAjaxCallback<any>;
-    public readonly onDataChanged = new EventEmitter();
-    public readonly onDataLoading = new EventEmitter();
-    public readonly onDataLoaded = new EventEmitter();
-    public readonly onGroupExpanded = new EventEmitter();
-    public readonly onGroupCollapsed = new EventEmitter();
-    public readonly onPagingInfoChanged = new EventEmitter();
     public onProcessData: RemoteViewProcessCallback<any>;
+    public onSubmit: CancellableViewCallback<any>;
+    public readonly onDataChanged = new EventEmitter();
+    public readonly onDataLoaded = new EventEmitter();
+    public readonly onDataLoading = new EventEmitter();
+    public readonly onGroupCollapsed = new EventEmitter();
+    public readonly onGroupExpanded = new EventEmitter();
+    public readonly onPagingInfoChanged = new EventEmitter();
     public readonly onRowCountChanged = new EventEmitter();
     public readonly onRowsChanged = new EventEmitter();
     public readonly onRowsOrCountChanged = new EventEmitter();
-    public onSubmit: CancellableViewCallback<any>;
-
-    private loading: AbortController | boolean = false;
-    private errorMessage: string = null;
-    private populateLocks = 0;
-    private populateCalls = 0;
-    private contentType: string;
-    private dataType: string;
-    private totalCount: number = null;
-    private _getItemMetadata?: (p1?: any, p2?: number) => any;
-    private groupItemMetadataProvider: GroupItemMetadataProvider;
-    private localSort: boolean;
-    public readonly params: Record<string, any>;
-    public url: string;
-    private rowsPerPage: number;
-    public seekToPage: number;
-    private errormsg: string;
-    private method: string;
-    public sortBy: string[];
 
     constructor(options: RemoteViewOptions) {
         options ??= {}
@@ -110,7 +108,7 @@ export class RemoteView<TEntity = any> {
         this.contentType = options.contentType ?? "application/json";
         this.dataType = options.dataType ?? 'json';
         this.filter = options.filter ?? null;
-        this._getItemMetadata = options.getItemMetadata;
+        this.itemMetadataCallback = options.getItemMetadata;
         this.params = options.params ?? {};
         this.onSubmit = options.onSubmit ?? null;
         this.url = options.url || null;
@@ -119,7 +117,7 @@ export class RemoteView<TEntity = any> {
         this.onAjaxCall = options.onAjaxCall || null;
         this.onProcessData = options.onProcessData || null;
         this.method = options.method || "POST";
-        this.errormsg = localText("Controls.Pager.DefaultLoadError");
+        this.errormsg = options.errormsg;
         this.sortBy = typeof options.sortBy == "string" ? [options.sortBy] : (options.sortBy || []);
 
         options.url && options.autoLoad && this.populate();
@@ -142,17 +140,17 @@ export class RemoteView<TEntity = any> {
         lazyTotalsCalculation: false
     };
 
-    beginUpdate() {
+    public beginUpdate() {
         this.suspend++;
     }
 
-    endUpdate() {
+    public endUpdate() {
         this.suspend--;
         if (this.suspend <= 0)
             this.refresh();
     }
 
-    setRefreshHints(hints: any) {
+    public setRefreshHints(hints: any) {
         this.refreshHints = hints;
     }
 
@@ -256,7 +254,7 @@ export class RemoteView<TEntity = any> {
         };
     }
 
-    public getSortComparer(): any {
+    private getSortComparer(): (a: any, b: any) => number {
         if (this.sortComparer != null)
             return this.sortComparer;
 
@@ -393,7 +391,7 @@ export class RemoteView<TEntity = any> {
         return this.idxById[id];
     }
 
-    public ensureRowsByIdCache(): void {
+    private ensureRowsByIdCache(): void {
         if (!this.rowsById) {
             this.rowsById = {};
             for (let i = 0, l = this.rows.length; i < l; i++) {
@@ -525,7 +523,7 @@ export class RemoteView<TEntity = any> {
         }
     }
 
-    public sortedIndex(searchItem: any) {
+    private sortedIndex(searchItem: any) {
         let low = 0, high = this.items.length;
         const comparer = this.getSortComparer();
         while (low < high) {
@@ -583,10 +581,10 @@ export class RemoteView<TEntity = any> {
             return this.groupItemMetadataProvider.getTotalsRowMetadata(item);
         }
 
-        return (this._getItemMetadata && this._getItemMetadata(item, i)) || null;
+        return (this.itemMetadataCallback && this.itemMetadataCallback(item, i)) || null;
     }
 
-    public expandCollapseAllGroups(level: number, collapse: boolean) {
+    private expandCollapseAllGroups(level: number, collapse: boolean) {
         if (level == null) {
             for (var i = 0; i < this.groupingInfos.length; i++) {
                 this.toggledGroupsByLevel[i] = {};
@@ -625,7 +623,7 @@ export class RemoteView<TEntity = any> {
         this.expandCollapseAllGroups(level, false);
     }
 
-    public resolveLevelAndGroupingKey(args: any) {
+    private resolveLevelAndGroupingKey(args: any) {
         var arg0 = args[0];
         if (args.length === 1 && arg0.indexOf(groupingDelimiter) !== -1) {
             return { level: arg0.split(groupingDelimiter).length - 1, groupingKey: arg0 };
@@ -634,7 +632,7 @@ export class RemoteView<TEntity = any> {
         }
     }
 
-    public expandCollapseGroup(args: any, collapse: any) {
+    private expandCollapseGroup(args: any, collapse: any) {
         var opts = this.resolveLevelAndGroupingKey(args);
         this.toggledGroupsByLevel[opts.level][opts.groupingKey] = !this.groupingInfos[opts.level].collapsed !== !collapse;
         if (collapse)
@@ -790,7 +788,7 @@ export class RemoteView<TEntity = any> {
         }
     }
 
-    public flattenGroupedRows(groups: Group<TEntity>[], level?: number) {
+    private flattenGroupedRows(groups: Group<TEntity>[], level?: number) {
         level = level || 0;
         var gi = this.groupingInfos[level];
         var groupedRows: any[] = [], rows: any[], gl = 0, g: Group<TEntity>;
@@ -1088,7 +1086,7 @@ export class RemoteView<TEntity = any> {
         this.loading = false;
 
         if (!data) {
-            this.errorMessage = this.errormsg;
+            this.errorMessage = this.errormsg ?? localText("Controls.Pager.DefaultLoadError");
             this.onPagingInfoChanged.notify(this.getPagingInfo());
             return false;
         }

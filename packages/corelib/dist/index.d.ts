@@ -3276,31 +3276,31 @@ export interface PagingOptions {
 }
 export interface RemoteViewOptions {
 	autoLoad?: boolean;
-	idField?: string;
 	contentType?: string;
 	dataType?: string;
+	errormsg?: string;
 	filter?: any;
-	params?: Record<string, object>;
-	onSubmit?: CancellableViewCallback<any>;
-	url?: string;
+	getItemMetadata?: (p1?: any, p2?: number) => any;
+	groupItemMetadataProvider?: GroupItemMetadataProvider;
+	idField?: string;
 	localSort?: boolean;
-	sortBy?: any;
+	method?: string;
+	onAjaxCall?: RemoteViewAjaxCallback<any>;
+	onProcessData?: RemoteViewProcessCallback<any>;
+	onSubmit?: CancellableViewCallback<any>;
+	params?: Record<string, object>;
 	rowsPerPage?: number;
 	seekToPage?: number;
-	onProcessData?: RemoteViewProcessCallback<any>;
-	method?: string;
-	groupItemMetadataProvider?: GroupItemMetadataProvider;
-	onAjaxCall?: RemoteViewAjaxCallback<any>;
-	getItemMetadata?: (p1?: any, p2?: number) => any;
-	errorMsg?: string;
+	sortBy?: any;
+	url?: string;
 }
 export interface PagingInfo {
-	rowsPerPage: number;
-	page: number;
-	totalCount: number;
-	loading: boolean;
-	error: string;
 	dataView: RemoteView<any>;
+	error: string;
+	loading: boolean;
+	page: number;
+	rowsPerPage: number;
+	totalCount: number;
 }
 export type CancellableViewCallback<TEntity> = (view: RemoteView<TEntity>) => boolean | void;
 export type RemoteViewAjaxCallback<TEntity> = (view: RemoteView<TEntity>, options: ServiceOptions<ListResponse<TEntity>>) => boolean | void;
@@ -3308,56 +3308,56 @@ export type RemoteViewFilter<TEntity> = (item: TEntity, view: RemoteView<TEntity
 export type RemoteViewProcessCallback<TEntity> = (data: ListResponse<TEntity>, view: RemoteView<TEntity>) => ListResponse<TEntity>;
 export type GrandTotals = Partial<Pick<GroupTotals, "avg" | "sum" | "min" | "max" | "initialized">>;
 export declare class RemoteView<TEntity = any> {
-	private idProperty;
-	private items;
-	private rows;
-	private idxById;
-	private rowsById;
+	private contentType;
+	private dataType;
+	private errormsg;
+	private errorMessage;
 	private filter;
-	private updated;
-	private suspend;
-	private sortAsc;
-	private sortComparer;
-	private refreshHints;
-	private prevRefreshHints;
-	private filteredItems;
 	private filterCache;
+	private filteredItems;
 	private grandAggregators;
 	private grandTotals;
 	private groupingInfos;
+	private groupItemMetadataProvider;
 	private groups;
-	private toggledGroupsByLevel;
+	private idProperty;
+	private idxById;
+	private itemMetadataCallback?;
+	private items;
+	private loading;
+	private localSort;
+	private method;
 	private page;
+	private populateCalls;
+	private populateLocks;
+	private prevRefreshHints;
+	private refreshHints;
+	private rows;
+	private rowsById;
+	private rowsPerPage;
+	private sortAsc;
+	private sortComparer;
+	private suspend;
+	private toggledGroupsByLevel;
+	private totalCount;
 	private totalRows;
+	private updated;
+	params: Record<string, any>;
+	seekToPage: number;
+	sortBy: string[];
+	url: string;
 	onAjaxCall: RemoteViewAjaxCallback<any>;
-	readonly onDataChanged: EventEmitter<any, import("@serenity-is/sleekgrid").IEventData>;
-	readonly onDataLoading: EventEmitter<any, import("@serenity-is/sleekgrid").IEventData>;
-	readonly onDataLoaded: EventEmitter<any, import("@serenity-is/sleekgrid").IEventData>;
-	readonly onGroupExpanded: EventEmitter<any, import("@serenity-is/sleekgrid").IEventData>;
-	readonly onGroupCollapsed: EventEmitter<any, import("@serenity-is/sleekgrid").IEventData>;
-	readonly onPagingInfoChanged: EventEmitter<any, import("@serenity-is/sleekgrid").IEventData>;
 	onProcessData: RemoteViewProcessCallback<any>;
+	onSubmit: CancellableViewCallback<any>;
+	readonly onDataChanged: EventEmitter<any, import("@serenity-is/sleekgrid").IEventData>;
+	readonly onDataLoaded: EventEmitter<any, import("@serenity-is/sleekgrid").IEventData>;
+	readonly onDataLoading: EventEmitter<any, import("@serenity-is/sleekgrid").IEventData>;
+	readonly onGroupCollapsed: EventEmitter<any, import("@serenity-is/sleekgrid").IEventData>;
+	readonly onGroupExpanded: EventEmitter<any, import("@serenity-is/sleekgrid").IEventData>;
+	readonly onPagingInfoChanged: EventEmitter<any, import("@serenity-is/sleekgrid").IEventData>;
 	readonly onRowCountChanged: EventEmitter<any, import("@serenity-is/sleekgrid").IEventData>;
 	readonly onRowsChanged: EventEmitter<any, import("@serenity-is/sleekgrid").IEventData>;
 	readonly onRowsOrCountChanged: EventEmitter<any, import("@serenity-is/sleekgrid").IEventData>;
-	onSubmit: CancellableViewCallback<any>;
-	private loading;
-	private errorMessage;
-	private populateLocks;
-	private populateCalls;
-	private contentType;
-	private dataType;
-	private totalCount;
-	private _getItemMetadata?;
-	private groupItemMetadataProvider;
-	private localSort;
-	readonly params: Record<string, any>;
-	url: string;
-	private rowsPerPage;
-	seekToPage: number;
-	private errormsg;
-	private method;
-	sortBy: string[];
 	constructor(options: RemoteViewOptions);
 	static readonly groupingInfoDefaults: GroupInfo<any>;
 	beginUpdate(): void;
@@ -3370,7 +3370,7 @@ export declare class RemoteView<TEntity = any> {
 	setItems(data: any[], newIdProperty?: string | boolean): void;
 	setPagingOptions(args: PagingOptions): void;
 	getPagingInfo(): PagingInfo;
-	getSortComparer(): any;
+	private getSortComparer;
 	sort(comparer?: (a: any, b: any) => number, ascending?: boolean): void;
 	getLocalSort(): boolean;
 	setLocalSort(value: boolean): void;
@@ -3384,7 +3384,7 @@ export declare class RemoteView<TEntity = any> {
 	setGrouping(groupingInfo: any): void;
 	getItemByIdx(i: number): any;
 	getIdxById(id: any): number;
-	ensureRowsByIdCache(): void;
+	private ensureRowsByIdCache;
 	getRowByItem(item: any): number;
 	getRowById(id: any): number;
 	getItemById(id: any): TEntity;
@@ -3397,12 +3397,12 @@ export declare class RemoteView<TEntity = any> {
 	deleteItem(id: any): void;
 	sortedAddItem(item: any): void;
 	sortedUpdateItem(id: any, item: any): void;
-	sortedIndex(searchItem: any): number;
+	private sortedIndex;
 	getRows(): any[];
 	getLength(): number;
 	getItem(i: number): any;
 	getItemMetadata(i: number): any;
-	expandCollapseAllGroups(level: number, collapse: boolean): void;
+	private expandCollapseAllGroups;
 	/**
 	 * @param level {Number} Optional level to collapse.  If not specified, applies to all levels.
 	 */
@@ -3411,11 +3411,8 @@ export declare class RemoteView<TEntity = any> {
 	 * @param level {Number} Optional level to expand.  If not specified, applies to all levels.
 	 */
 	expandAllGroups(level: number): void;
-	resolveLevelAndGroupingKey(args: any): {
-		level: number;
-		groupingKey: any;
-	};
-	expandCollapseGroup(args: any, collapse: any): void;
+	private resolveLevelAndGroupingKey;
+	private expandCollapseGroup;
 	/**
 	 * @param varArgs Either a Slick.Group's "groupingKey" property, or a
 	 *     variable argument list of grouping values denoting a unique path to the row.  For
@@ -3436,7 +3433,7 @@ export declare class RemoteView<TEntity = any> {
 	private calculateTotals;
 	private addGroupTotals;
 	private addTotals;
-	flattenGroupedRows(groups: Group<TEntity>[], level?: number): any[];
+	private flattenGroupedRows;
 	private batchFilter;
 	private batchFilterWithCaching;
 	private getFilteredAndPagedItems;
@@ -3469,6 +3466,8 @@ export declare class RemoteView<TEntity = any> {
 	populateUnlock(): void;
 	getGroupItemMetadataProvider(): GroupItemMetadataProvider;
 	setGroupItemMetadataProvider(value: GroupItemMetadataProvider): void;
+	/** Gets the ID property name, for compat, @deprecated */
+	get idField(): string;
 }
 export declare class IBooleanValue {
 	static [Symbol.typeInfo]: InterfaceTypeInfo<"Serenity.">;
