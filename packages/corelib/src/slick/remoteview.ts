@@ -1040,9 +1040,8 @@ export class RemoteView<TEntity> {
          * @return {EventEmitter} An event that notifies when an internal list of selected row ids
          *     changes.  This is useful since, in combination with the above two options, it allows
          *     access to the full list selected row ids, and not just the ones visible to the grid.
-         * @method syncGridSelection
          */
-        function syncGridSelection(grid: any, preserveHidden: boolean, preserveHiddenOnSelectionChange: boolean) {
+        function syncGridSelection(this: RemoteView<any>, grid: Grid, preserveHidden: boolean, preserveHiddenOnSelectionChange: boolean) {
             var self = this;
             var inHandler: any;
             var selectedRowIds = self.mapRowsToIds(grid.getSelectedRows());

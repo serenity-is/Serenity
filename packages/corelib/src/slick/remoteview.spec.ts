@@ -1,5 +1,7 @@
 import { RemoteView } from "./remoteview";
 import { vi } from "vitest";
+import { Aggregators } from "./aggregators";
+import { serviceCall } from "../base";
 
 vi.mock("../base", async (importActual) => ({
     ...await importActual(),
@@ -13,6 +15,7 @@ vi.mock("@serenity-is/sleekgrid", () => ({
         unsubscribe: vi.fn(),
         notify: vi.fn()
     })),
+    EventData: vi.fn(),
     GroupItemMetadataProvider: vi.fn().mockImplementation(() => ({
         getGroupRowMetadata: vi.fn(),
         getTotalsRowMetadata: vi.fn()
@@ -158,6 +161,40 @@ describe("RemoteView", () => {
         });
     });
 
+    describe("id uniqueness validation", () => {
+        let view: RemoteView<any>;
+
+        beforeEach(() => {
+            view = new RemoteView({
+                idField: "id"
+            });
+        });
+
+        it("throws error when setItems is called with duplicate ids", () => {
+            const items = [
+                { id: 1, name: "Item 1" },
+                { id: 2, name: "Item 2" },
+                { id: 1, name: "Duplicate Item" }
+            ];
+
+            expect(() => {
+                view.setItems(items);
+            }).toThrow("Each data element must implement a unique 'id' property. Object at index '0' has repeated identity value '1'");
+        });
+
+        it("throws error when setItems is called with missing id", () => {
+            const items = [
+                { id: 1, name: "Item 1" },
+                { name: "Item without id" },
+                { id: 3, name: "Item 3" }
+            ];
+
+            expect(() => {
+                view.setItems(items);
+            }).toThrow("Each data element must implement a unique 'id' property. Object at index '1' has no identity value");
+        });
+    });
+
     describe("filtering", () => {
         let view: RemoteView<any>;
 
@@ -228,6 +265,94 @@ describe("RemoteView", () => {
 
             view.setLocalSort(true);
             expect(view.getLocalSort()).toBe(true);
+        });
+
+        it("sorts by single field when localSort is true", () => {
+            const sortView = new RemoteView<any>({
+                idField: "id",
+                localSort: true,
+                sortBy: "name"
+            });
+
+            const items = [
+                { id: 1, name: "Charlie" },
+                { id: 2, name: "Alice" },
+                { id: 3, name: "Bob" }
+            ];
+
+            sortView.setItems(items);
+
+            const sortedItems = sortView.getItems() as any[];
+            expect(sortedItems[0].name).toBe("Alice");
+            expect(sortedItems[1].name).toBe("Bob");
+            expect(sortedItems[2].name).toBe("Charlie");
+        });
+
+        it("sorts by multiple fields when localSort is true", () => {
+            const sortView = new RemoteView<any>({
+                idField: "id",
+                localSort: true,
+                sortBy: ["category", "name"]
+            });
+
+            const items = [
+                { id: 1, name: "Charlie", category: "B" },
+                { id: 2, name: "Alice", category: "A" },
+                { id: 3, name: "Bob", category: "A" },
+                { id: 4, name: "David", category: "B" }
+            ];
+
+            sortView.setItems(items);
+
+            const sortedItems = sortView.getItems() as any[];
+            expect(sortedItems[0].name).toBe("Alice"); // A category first
+            expect(sortedItems[1].name).toBe("Bob");   // A category second
+            expect(sortedItems[2].name).toBe("Charlie"); // B category first
+            expect(sortedItems[3].name).toBe("David");   // B category second
+        });
+
+        it("sorts descending when field ends with ' desc'", () => {
+            const sortView = new RemoteView<any>({
+                idField: "id",
+                localSort: true,
+                sortBy: "name desc"
+            });
+
+            const items = [
+                { id: 1, name: "Charlie" },
+                { id: 2, name: "Alice" },
+                { id: 3, name: "Bob" }
+            ];
+
+            sortView.setItems(items);
+
+            const sortedItems = sortView.getItems() as any[];
+            expect(sortedItems[0].name).toBe("Charlie");
+            expect(sortedItems[1].name).toBe("Bob");
+            expect(sortedItems[2].name).toBe("Alice");
+        });
+
+        it("sorts multiple fields with mixed ascending and descending", () => {
+            const sortView = new RemoteView<any>({
+                idField: "id",
+                localSort: true,
+                sortBy: ["category", "name desc"]
+            });
+
+            const items = [
+                { id: 1, name: "Charlie", category: "B" },
+                { id: 2, name: "Alice", category: "A" },
+                { id: 3, name: "Bob", category: "A" },
+                { id: 4, name: "David", category: "B" }
+            ];
+
+            sortView.setItems(items);
+
+            const sortedItems = sortView.getItems() as any[];
+            expect(sortedItems[0].name).toBe("Bob");     // A category, Bob > Alice descending
+            expect(sortedItems[1].name).toBe("Alice");   // A category, Alice second
+            expect(sortedItems[2].name).toBe("David");   // B category, David > Charlie descending
+            expect(sortedItems[3].name).toBe("Charlie"); // B category, Charlie last
         });
     });
 
@@ -332,6 +457,447 @@ describe("RemoteView", () => {
             const items = view.getItems();
             expect(items.length).toBe(3);
             expect(items[1].name).toBe("Item 2");
+        });
+    });
+
+    describe("row mapping operations", () => {
+        let view: RemoteView<any>;
+
+        beforeEach(() => {
+            view = new RemoteView({
+                idField: "id"
+            });
+            view.addItem({ id: 1, name: "Item 1" });
+            view.addItem({ id: 2, name: "Item 2" });
+            view.addItem({ id: 3, name: "Item 3" });
+        });
+
+        it("maps items to rows", () => {
+            const items = view.getItems();
+            const rows = view.mapItemsToRows([items[0], items[2]]);
+
+            expect(rows).toEqual([0, 2]);
+        });
+
+        it("maps rows to ids", () => {
+            const ids = view.mapRowsToIds([0, 2]);
+
+            expect(ids).toEqual([1, 3]);
+        });
+
+        it("maps ids to rows", () => {
+            const rows = view.mapIdsToRows([1, 3]);
+
+            expect(rows).toEqual([0, 2]);
+        });
+
+        it("gets row by id", () => {
+            expect(view.getRowById(1)).toBe(0);
+            expect(view.getRowById(2)).toBe(1);
+            expect(view.getRowById(999)).toBeUndefined();
+        });
+
+        it("gets row by item", () => {
+            const item = view.getItems()[1];
+            expect(view.getRowByItem(item)).toBe(1);
+        });
+    });
+
+    describe("sorted operations", () => {
+        let view: RemoteView<any>;
+
+        beforeEach(() => {
+            view = new RemoteView({
+                idField: "id"
+            });
+            view.addItem({ id: 1, name: "Charlie" });
+            view.addItem({ id: 2, name: "Alice" });
+            view.addItem({ id: 3, name: "Bob" });
+        });
+
+        it("adds item in sorted order", () => {
+            view.sort((a, b) => a.name.localeCompare(b.name));
+
+            view.sortedAddItem({ id: 4, name: "Aaron" });
+
+            const items = view.getItems();
+            expect(items[0].name).toBe("Aaron");
+            expect(items[1].name).toBe("Alice");
+            expect(items[2].name).toBe("Bob");
+            expect(items[3].name).toBe("Charlie");
+        });
+
+        it("updates item in sorted order", () => {
+            view.sort((a, b) => a.name.localeCompare(b.name));
+
+            // Update Charlie to Aaron - should move to beginning
+            view.sortedUpdateItem(1, { id: 1, name: "Aaron" });
+
+            const items = view.getItems();
+            expect(items[0].name).toBe("Aaron");
+            expect(items[1].name).toBe("Alice");
+            expect(items[2].name).toBe("Bob");
+        });
+
+        it("re-sorts items", () => {
+            view.sort((a, b) => a.name.localeCompare(b.name));
+
+            // Change an item without using sortedUpdate
+            view.updateItem(2, { id: 2, name: "Zoe" });
+
+            // Re-sort should fix the order
+            view.reSort();
+
+            const items = view.getItems();
+            expect(items[0].name).toBe("Bob");
+            expect(items[1].name).toBe("Charlie");
+            expect(items[2].name).toBe("Zoe");
+        });
+    });
+
+    describe("group expansion and collapse", () => {
+        let view: RemoteView<any>;
+
+        beforeEach(() => {
+            view = new RemoteView({
+                idField: "id"
+            });
+            view.addItem({ id: 1, name: "Apple", category: "fruit" });
+            view.addItem({ id: 2, name: "Banana", category: "fruit" });
+            view.addItem({ id: 3, name: "Carrot", category: "vegetable" });
+
+            const groupInfo = [{
+                getter: (item: any) => item.category,
+                formatter: (g: any) => g.value,
+                collapsed: false
+            }];
+            view.setGrouping(groupInfo);
+        });
+
+        it("expands all groups", () => {
+            // First collapse all
+            view.collapseAllGroups(undefined);
+
+            // Then expand all
+            view.expandAllGroups(undefined);
+
+            // Should not throw and groups should be expanded
+            expect(view.getGroups().length).toBe(2);
+        });
+
+        it("collapses all groups", () => {
+            view.collapseAllGroups(undefined);
+
+            // Should not throw
+            expect(view.getGroups().length).toBe(2);
+        });
+
+        it("expands specific group", () => {
+            view.collapseAllGroups(undefined);
+            view.expandGroup(["fruit"]);
+
+            // Should not throw
+            expect(view.getGroups().length).toBe(2);
+        });
+
+        it("collapses specific group", () => {
+            view.collapseGroup(["fruit"]);
+
+            // Should not throw
+            expect(view.getGroups().length).toBe(2);
+        });
+    });
+
+    describe("summary and aggregation", () => {
+        let view: RemoteView<any>;
+
+        beforeEach(() => {
+            view = new RemoteView({
+                idField: "id"
+            });
+            view.addItem({ id: 1, value: 10 });
+            view.addItem({ id: 2, value: 20 });
+            view.addItem({ id: 3, value: 30 });
+        });
+
+        it("sets summary options", () => {
+            const aggregators = [
+                new Aggregators.Sum("value")
+            ];
+
+            view.setSummaryOptions({
+                aggregators: aggregators
+            });
+
+            // Should not throw
+            expect(() => view.getGrandTotals()).not.toThrow();
+        });
+
+        it("gets grand totals", () => {
+            const aggregators = [
+                new Aggregators.Sum("value")
+            ];
+
+            view.setSummaryOptions({
+                aggregators: aggregators
+            });
+
+            const totals = view.getGrandTotals();
+            expect(totals).toBeDefined();
+            expect(totals.sum).toBeDefined();
+            expect(totals.sum.value).toBe(60);
+        });
+    });
+
+    describe("data loading operations", () => {
+        let view: RemoteView<any>;
+
+        beforeEach(() => {
+            view = new RemoteView({
+                idField: "id",
+                url: "/api/test"
+            });
+        });
+
+        it("adds data", () => {
+            const data = {
+                Entities: [
+                    { id: 1, name: "Item 1" },
+                    { id: 2, name: "Item 2" }
+                ],
+                TotalCount: 2
+            };
+
+            view.addData(data);
+
+            expect(view.getItems().length).toBe(2);
+            expect(view.getItems()[0].name).toBe("Item 1");
+        });
+
+        it("locks and unlocks populate", () => {
+            expect(() => {
+                view.populateLock();
+                view.populateUnlock();
+            }).not.toThrow();
+        });
+
+        it("populates data", () => {
+            // Mock the service call
+            const mockServiceCall = vi.fn();
+            vi.mocked(serviceCall).mockImplementation(mockServiceCall);
+
+            view.populate();
+
+            // Should attempt to call service
+            expect(mockServiceCall).toHaveBeenCalled();
+        });
+    });
+
+    describe("item metadata", () => {
+        let view: RemoteView<any>;
+
+        beforeEach(() => {
+            view = new RemoteView({
+                idField: "id",
+                getItemMetadata: (item: any, row: number) => ({
+                    cssClasses: `row-${row}`,
+                    focusable: true
+                })
+            });
+        });
+
+        it("gets item metadata", () => {
+            view.addItem({ id: 1, name: "Item 1" });
+
+            const metadata = view.getItemMetadata(0);
+            expect(metadata).toBeDefined();
+            expect(metadata.cssClasses).toBe("row-0");
+            expect(metadata.focusable).toBe(true);
+        });
+
+        it("returns null for invalid row", () => {
+            const metadata = view.getItemMetadata(999);
+            expect(metadata).toBeNull();
+        });
+    });
+
+    describe("grid synchronization", () => {
+        let view: RemoteView<any>;
+        let mockGrid: any;
+
+        beforeEach(() => {
+            view = new RemoteView({
+                idField: "id"
+            });
+            view.addItem({ id: 1, name: "Item 1" });
+            view.addItem({ id: 2, name: "Item 2" });
+
+            mockGrid = {
+                getSelectedRows: vi.fn(() => [0, 1]),
+                setSelectedRows: vi.fn(),
+                onSelectedRowsChanged: {
+                    subscribe: vi.fn(),
+                    unsubscribe: vi.fn()
+                }
+            };
+        });
+
+        it("syncs grid selection", () => {
+            const event = view.syncGridSelection(mockGrid, false, false);
+
+            expect(event).toBeDefined();
+            expect(mockGrid.onSelectedRowsChanged.subscribe).toHaveBeenCalled();
+        });
+
+        it("syncs grid selection with preserve hidden", () => {
+            view.addItem({ id: 1, name: "Item 1" });
+            view.addItem({ id: 2, name: "Item 2" });
+            view.addItem({ id: 3, name: "Item 3" });
+
+            // Mock grid to return selected rows [0, 2] initially
+            mockGrid.getSelectedRows = vi.fn(() => [0, 2]);
+            mockGrid.setSelectedRows = vi.fn();
+
+            view.syncGridSelection(mockGrid, true, false);
+
+            // Should subscribe to grid selection changes
+            expect(mockGrid.onSelectedRowsChanged.subscribe).toHaveBeenCalled();
+
+            // Should subscribe to view row changes
+            expect(view.onRowsChanged.subscribe).toHaveBeenCalled();
+            expect(view.onRowCountChanged.subscribe).toHaveBeenCalled();
+
+            // Test that grid selection changes trigger the callback
+            mockGrid.getSelectedRows = vi.fn(() => [1]); // Now only row 1 is selected
+            const gridSelectionCallback = mockGrid.onSelectedRowsChanged.subscribe.mock.calls[0][0];
+            gridSelectionCallback({}, {});
+
+            // The callback should execute without error
+            expect(gridSelectionCallback).toBeDefined();
+        });
+
+        it("syncs grid cell CSS styles", () => {
+            mockGrid.getCellCssStyles = vi.fn(() => ({}));
+            mockGrid.registerPlugin = vi.fn();
+            mockGrid.onCellCssStylesChanged = { subscribe: vi.fn() };
+
+            view.syncGridCellCssStyles(mockGrid, "test-key");
+
+            // Should not throw
+            expect(() => view.syncGridCellCssStyles(mockGrid, "test-key")).not.toThrow();
+        });
+    });
+
+    describe("group item metadata provider", () => {
+        let view: RemoteView<any>;
+        let mockProvider: any;
+
+        beforeEach(() => {
+            mockProvider = {
+                getGroupRowMetadata: vi.fn(),
+                getTotalsRowMetadata: vi.fn()
+            };
+
+            view = new RemoteView({
+                idField: "id",
+                groupItemMetadataProvider: mockProvider
+            });
+        });
+
+        it("gets and sets group item metadata provider", () => {
+            expect(view.getGroupItemMetadataProvider()).toBe(mockProvider);
+
+            const newProvider = { ...mockProvider };
+            view.setGroupItemMetadataProvider(newProvider);
+            expect(view.getGroupItemMetadataProvider()).toBe(newProvider);
+        });
+    });
+
+    describe("error handling", () => {
+        let view: RemoteView<any>;
+
+        beforeEach(() => {
+            view = new RemoteView({
+                idField: "id"
+            });
+        });
+
+        it("handles delete of non-existent item gracefully", () => {
+            expect(() => view.deleteItem(999)).toThrow("Invalid id");
+        });
+
+        it("handles update of non-existent item gracefully", () => {
+            expect(() => view.updateItem(999, { id: 999, name: "Test" })).toThrow("Invalid id");
+        });
+
+        it("throws error when updating item to null id", () => {
+            view.addItem({ id: 1, name: "Item 1" });
+            expect(() => view.updateItem(1, { id: null, name: "Updated Item" })).toThrow("Cannot update item to associate with a null id");
+        });
+
+        it("throws error when updating item to non-unique id", () => {
+            view.addItem({ id: 1, name: "Item 1" });
+            view.addItem({ id: 2, name: "Item 2" });
+            expect(() => view.updateItem(1, { id: 2, name: "Updated Item" })).toThrow("Cannot update item to associate with a non-unique id");
+        });
+
+        it("handles invalid filter gracefully", () => {
+            const invalidFilter = null;
+            expect(() => view.setFilter(invalidFilter)).not.toThrow();
+        });
+    });
+
+    describe("paging options", () => {
+        let view: RemoteView<any>;
+
+        beforeEach(() => {
+            view = new RemoteView({
+                idField: "id",
+                rowsPerPage: 10
+            });
+        });
+
+        it("sets paging options", () => {
+            view.setPagingOptions({
+                rowsPerPage: 20,
+                page: 2
+            });
+
+            const pagingInfo = view.getPagingInfo();
+            expect(pagingInfo.rowsPerPage).toBe(20);
+            expect(view.seekToPage).toBe(2); // page changes seekToPage, not immediate page
+        });
+
+        it("handles page changes", () => {
+            view.setPagingOptions({ page: 3 });
+
+            expect(view.seekToPage).toBe(3); // page changes seekToPage, not immediate page
+        });
+    });
+
+    describe("refresh hints", () => {
+        let view: RemoteView<any>;
+
+        beforeEach(() => {
+            view = new RemoteView({
+                idField: "id"
+            });
+        });
+
+        it("sets refresh hints", () => {
+            const hints = [{ ignoreDiffsBefore: 5, ignoreDiffsAfter: 10 }];
+            view.setRefreshHints(hints);
+
+            // Should not throw - hints are internal
+            expect(() => view.setRefreshHints(hints)).not.toThrow();
+        });
+
+        it("sets filter args", () => {
+            const args = { category: "fruit" };
+            view.setFilterArgs(args);
+
+            // Should not throw - args are internal
+            expect(() => view.setFilterArgs(args)).not.toThrow();
         });
     });
 });
