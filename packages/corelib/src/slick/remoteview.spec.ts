@@ -1,7 +1,7 @@
-import { RemoteView } from "./remoteview";
 import { vi } from "vitest";
-import { Aggregators } from "./aggregators";
 import { serviceCall } from "../base";
+import { Aggregators } from "./aggregators";
+import { RemoteView } from "./remoteview";
 
 vi.mock("../base", async (importActual) => ({
     ...await importActual(),
@@ -890,14 +890,6 @@ describe("RemoteView", () => {
 
             // Should not throw - hints are internal
             expect(() => view.setRefreshHints(hints)).not.toThrow();
-        });
-
-        it("sets filter args", () => {
-            const args = { category: "fruit" };
-            view.setFilterArgs(args);
-
-            // Should not throw - args are internal
-            expect(() => view.setFilterArgs(args)).not.toThrow();
         });
     });
 });

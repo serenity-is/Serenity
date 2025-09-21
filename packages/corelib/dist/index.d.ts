@@ -3280,7 +3280,7 @@ export interface RemoteViewOptions {
 	contentType?: string;
 	dataType?: string;
 	filter?: any;
-	params?: any;
+	params?: Record<string, object>;
 	onSubmit?: CancellableViewCallback<any>;
 	url?: string;
 	localSort?: boolean;
@@ -3307,83 +3307,168 @@ export type RemoteViewAjaxCallback<TEntity> = (view: RemoteView<TEntity>, option
 export type RemoteViewFilter<TEntity> = (item: TEntity, view: RemoteView<TEntity>) => boolean;
 export type RemoteViewProcessCallback<TEntity> = (data: ListResponse<TEntity>, view: RemoteView<TEntity>) => ListResponse<TEntity>;
 export type GrandTotals = Partial<Pick<GroupTotals, "avg" | "sum" | "min" | "max" | "initialized">>;
-export interface RemoteView<TEntity> {
-	onSubmit: CancellableViewCallback<TEntity>;
-	onDataChanged: EventEmitter;
-	onDataLoading: EventEmitter;
-	onDataLoaded: EventEmitter;
-	onPagingInfoChanged: EventEmitter;
-	onRowCountChanged: EventEmitter;
-	onRowsChanged: EventEmitter;
-	onRowsOrCountChanged: EventEmitter;
-	getPagingInfo(): PagingInfo;
-	onGroupExpanded: EventEmitter;
-	onGroupCollapsed: EventEmitter;
-	onAjaxCall: RemoteViewAjaxCallback<TEntity>;
-	onProcessData: RemoteViewProcessCallback<TEntity>;
-	addData(data: ListResponse<TEntity>): void;
+export declare class RemoteView<TEntity = any> {
+	private idProperty;
+	private items;
+	private rows;
+	private idxById;
+	private rowsById;
+	private filter;
+	private updated;
+	private suspend;
+	private sortAsc;
+	private sortComparer;
+	private refreshHints;
+	private prevRefreshHints;
+	private filteredItems;
+	private filterCache;
+	private grandAggregators;
+	private grandTotals;
+	private groupingInfos;
+	private groups;
+	private toggledGroupsByLevel;
+	private page;
+	private totalRows;
+	onAjaxCall: RemoteViewAjaxCallback<any>;
+	readonly onDataChanged: EventEmitter<any, import("@serenity-is/sleekgrid").IEventData>;
+	readonly onDataLoading: EventEmitter<any, import("@serenity-is/sleekgrid").IEventData>;
+	readonly onDataLoaded: EventEmitter<any, import("@serenity-is/sleekgrid").IEventData>;
+	readonly onGroupExpanded: EventEmitter<any, import("@serenity-is/sleekgrid").IEventData>;
+	readonly onGroupCollapsed: EventEmitter<any, import("@serenity-is/sleekgrid").IEventData>;
+	readonly onPagingInfoChanged: EventEmitter<any, import("@serenity-is/sleekgrid").IEventData>;
+	onProcessData: RemoteViewProcessCallback<any>;
+	readonly onRowCountChanged: EventEmitter<any, import("@serenity-is/sleekgrid").IEventData>;
+	readonly onRowsChanged: EventEmitter<any, import("@serenity-is/sleekgrid").IEventData>;
+	readonly onRowsOrCountChanged: EventEmitter<any, import("@serenity-is/sleekgrid").IEventData>;
+	onSubmit: CancellableViewCallback<any>;
+	private loading;
+	private errorMessage;
+	private populateLocks;
+	private populateCalls;
+	private contentType;
+	private dataType;
+	private totalCount;
+	private _getItemMetadata?;
+	private groupItemMetadataProvider;
+	private localSort;
+	readonly params: Record<string, any>;
+	url: string;
+	private rowsPerPage;
+	seekToPage: number;
+	private errormsg;
+	private method;
+	sortBy: string[];
+	constructor(options: RemoteViewOptions);
+	static readonly groupingInfoDefaults: GroupInfo<any>;
 	beginUpdate(): void;
 	endUpdate(): void;
-	deleteItem(id: any): void;
+	setRefreshHints(hints: any): void;
+	private updateIdxById;
+	private ensureIdUniqueness;
 	getItems(): TEntity[];
-	setFilter(filter: RemoteViewFilter<TEntity>): void;
-	getFilter(): RemoteViewFilter<TEntity>;
-	getFilteredItems(): any;
-	getGroupItemMetadataProvider(): GroupItemMetadataProvider;
-	setGroupItemMetadataProvider(value: GroupItemMetadataProvider): void;
-	fastSort: any;
-	setItems(items: any[], newIdProperty?: boolean | string): void;
 	getIdPropertyName(): string;
-	getItemById(id: any): TEntity;
-	getGrandTotals(): GrandTotals;
-	getGrouping(): GroupInfo<TEntity>[];
-	getGroups(): Group<TEntity>[];
-	getRowById(id: any): number;
-	getRowByItem(item: any): number;
-	getRows(): any[];
-	mapItemsToRows(itemArray: any[]): any[];
-	mapRowsToIds(rowArray: number[]): any[];
-	mapIdsToRows(idAray: any[]): number[];
-	setFilterArgs(args: any): void;
-	setRefreshHints(hints: any[]): void;
-	insertItem(insertBefore: number, item: any): void;
-	sortedAddItem(item: any): void;
-	sortedUpdateItem(id: any, item: any): void;
-	syncGridSelection(grid: any, preserveHidden?: boolean, preserveHiddenOnSelectionChange?: boolean): void;
-	syncGridCellCssStyles(grid: any, key: string): void;
-	getItemMetadata(i: number): any;
-	updateItem(id: any, item: TEntity): void;
-	addItem(item: TEntity): void;
-	getIdxById(id: any): any;
-	getItemByIdx(index: number): any;
-	setGrouping(groupInfo: GroupInfo<TEntity>[]): void;
-	collapseAllGroups(level: number): void;
-	expandAllGroups(level: number): void;
-	expandGroup(keys: any[]): void;
-	collapseGroup(keys: any[]): void;
-	setSummaryOptions(options: SummaryOptions): void;
-	setPagingOptions(options: PagingOptions): void;
-	refresh(): void;
-	populate(): void;
-	populateLock(): void;
-	populateUnlock(): void;
-	getItem(row: number): any;
-	getLength(): number;
-	rowsPerPage: number;
-	errormsg: string;
-	params: any;
+	setItems(data: any[], newIdProperty?: string | boolean): void;
+	setPagingOptions(args: PagingOptions): void;
+	getPagingInfo(): PagingInfo;
+	getSortComparer(): any;
+	sort(comparer?: (a: any, b: any) => number, ascending?: boolean): void;
 	getLocalSort(): boolean;
 	setLocalSort(value: boolean): void;
-	sort(comparer?: (a: any, b: any) => number, ascending?: boolean): void;
 	reSort(): void;
-	sortBy: string[];
-	url: string;
-	method: string;
-	idField: string;
-	seekToPage?: number;
-}
-export declare class RemoteView<TEntity> {
-	constructor(options: RemoteViewOptions);
+	getFilteredItems(): any;
+	getFilter(): RemoteViewFilter<TEntity>;
+	setFilter(filterFn: RemoteViewFilter<TEntity>): void;
+	getGrouping(): GroupInfo<TEntity>[];
+	setSummaryOptions(summary: any): void;
+	getGrandTotals(): GrandTotals;
+	setGrouping(groupingInfo: any): void;
+	getItemByIdx(i: number): any;
+	getIdxById(id: any): number;
+	ensureRowsByIdCache(): void;
+	getRowByItem(item: any): number;
+	getRowById(id: any): number;
+	getItemById(id: any): TEntity;
+	mapItemsToRows(itemArray: any[]): number[];
+	mapIdsToRows(idArray: any[]): any[];
+	mapRowsToIds(rowArray: any[]): any[];
+	updateItem(id: any, item: any): void;
+	insertItem(insertBefore: number, item: any): void;
+	addItem(item: any): void;
+	deleteItem(id: any): void;
+	sortedAddItem(item: any): void;
+	sortedUpdateItem(id: any, item: any): void;
+	sortedIndex(searchItem: any): number;
+	getRows(): any[];
+	getLength(): number;
+	getItem(i: number): any;
+	getItemMetadata(i: number): any;
+	expandCollapseAllGroups(level: number, collapse: boolean): void;
+	/**
+	 * @param level {Number} Optional level to collapse.  If not specified, applies to all levels.
+	 */
+	collapseAllGroups(level: number): void;
+	/**
+	 * @param level {Number} Optional level to expand.  If not specified, applies to all levels.
+	 */
+	expandAllGroups(level: number): void;
+	resolveLevelAndGroupingKey(args: any): {
+		level: number;
+		groupingKey: any;
+	};
+	expandCollapseGroup(args: any, collapse: any): void;
+	/**
+	 * @param varArgs Either a Slick.Group's "groupingKey" property, or a
+	 *     variable argument list of grouping values denoting a unique path to the row.  For
+	 *     example, calling collapseGroup('high', '10%') will collapse the '10%' subgroup of
+	 *     the 'high' group.
+	 */
+	collapseGroup(varArgs: any[]): void;
+	/**
+	 * @param varArgs Either a Slick.Group's "groupingKey" property, or a
+	 *     variable argument list of grouping values denoting a unique path to the row.  For
+	 *     example, calling expandGroup('high', '10%') will expand the '10%' subgroup of
+	 *     the 'high' group.
+	 */
+	expandGroup(varArgs: any[]): void;
+	getGroups(): Group<TEntity>[];
+	private getOrCreateGroup;
+	private extractGroups;
+	private calculateTotals;
+	private addGroupTotals;
+	private addTotals;
+	flattenGroupedRows(groups: Group<TEntity>[], level?: number): any[];
+	private batchFilter;
+	private batchFilterWithCaching;
+	private getFilteredAndPagedItems;
+	private getRowDiffs;
+	private recalc;
+	refresh(): void;
+	/***
+	 * Wires the grid and the DataView together to keep row selection tied to item ids.
+	 * This is useful since, without it, the grid only knows about rows, so if the items
+	 * move around, the same rows stay selected instead of the selection moving along
+	 * with the items.
+	 *
+	 * NOTE:  This doesn't work with cell selection model.
+	 *
+	 * @param grid {Slick.Grid} The grid to sync selection with.
+	 * @param preserveHidden {Boolean} Whether to keep selected items that go out of the
+	 *     view due to them getting filtered out.
+	 * @param preserveHiddenOnSelectionChange {Boolean} Whether to keep selected items
+	 *     that are currently out of the view (see preserveHidden) as selected when selection
+	 *     changes.
+	 * @return {EventEmitter} An event that notifies when an internal list of selected row ids
+	 *     changes.  This is useful since, in combination with the above two options, it allows
+	 *     access to the full list selected row ids, and not just the ones visible to the grid.
+	 */
+	syncGridSelection(grid: Grid, preserveHidden: boolean, preserveHiddenOnSelectionChange: boolean): EventEmitter<any, import("@serenity-is/sleekgrid").IEventData>;
+	syncGridCellCssStyles(grid: Grid, key: string): void;
+	addData(data: any): boolean;
+	populate(): boolean;
+	populateLock(): void;
+	populateUnlock(): void;
+	getGroupItemMetadataProvider(): GroupItemMetadataProvider;
+	setGroupItemMetadataProvider(value: GroupItemMetadataProvider): void;
 }
 export declare class IBooleanValue {
 	static [Symbol.typeInfo]: InterfaceTypeInfo<"Serenity.">;

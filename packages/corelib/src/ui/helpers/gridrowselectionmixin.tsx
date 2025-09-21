@@ -20,7 +20,7 @@ export class GridRowSelectionMixin {
 
         this.include = {};
         this.grid = grid;
-        this.idField = (grid.getView() as any).idField;
+        this.idField = grid.getView().getIdPropertyName();
         this.options = options || {};
 
         grid.getGrid().onClick.subscribe((e, p) => {
