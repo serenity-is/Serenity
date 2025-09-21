@@ -65,7 +65,6 @@ export interface RemoteView<TEntity> {
     getFilteredItems(): any;
     getGroupItemMetadataProvider(): GroupItemMetadataProvider;
     setGroupItemMetadataProvider(value: GroupItemMetadataProvider): void;
-    fastSort: any;
     setItems(items: any[], newIdProperty?: boolean | string): void;
     getIdPropertyName(): string;
     getItemById(id: any): TEntity;
@@ -134,7 +133,6 @@ export class RemoteView<TEntity> {
         var suspend = 0;
 
         var sortAsc = true;
-        var fastSortField: string;
         var sortComparer: any;
         var refreshHints: any = {};
         var prevRefreshHints: any = {};
@@ -355,7 +353,6 @@ export class RemoteView<TEntity> {
 
         function sort(comparer?: (a: any, b: any) => number, ascending?: boolean) {
             sortAsc = ascending;
-            fastSortField = null;
             if (ascending === false) {
                 items.reverse();
             }
@@ -382,39 +379,8 @@ export class RemoteView<TEntity> {
             }
         }
 
-        /***
-         * Provides a workaround for the extremely slow sorting in IE.
-         * Does a [lexicographic] sort on a give column by temporarily overriding Object.prototype.toString
-         * to return the value of that field and then doing a native Array.sort().
-         */
-        function fastSort(field: any, ascending: boolean) {
-            sortAsc = ascending;
-            fastSortField = field;
-            sortComparer = null;
-            var oldToString = Object.prototype.toString;
-            Object.prototype.toString = (typeof field === "function") ? field : function () {
-                return this[field]
-            };
-            // an extra reversal for descending sort keeps the sort stable
-            // (assuming a stable native sort implementation, which isn't true in some cases)
-            if (ascending === false) {
-                items.reverse();
-            }
-            items.sort();
-            Object.prototype.toString = oldToString;
-            if (ascending === false) {
-                items.reverse();
-            }
-            idxById = {};
-            updateIdxById();
-            refresh();
-        }
-
         function reSort() {
-            if (fastSortField)
-                fastSort(fastSortField, sortAsc);
-            else
-                sort(sortComparer, sortAsc);
+            sort(sortComparer, sortAsc);
         }
 
         function getFilteredItems() {
@@ -1331,7 +1297,6 @@ export class RemoteView<TEntity> {
             getFilteredItems: getFilteredItems,
             setFilter: setFilter,
             sort: sort,
-            fastSort: fastSort,
             reSort: reSort,
             getLocalSort: getLocalSort,
             setLocalSort: setLocalSort,
