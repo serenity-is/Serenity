@@ -40,6 +40,7 @@ Critical developer workflows (explicit commands)
 
 - Don't use ` -- ` to pass args to any of the pnpm commands, e.g. use `pnpm test -t MyTest` instead of `pnpm test -- -t MyTest`, use `pnpm test --coverage` instead of `pnpm test -- --coverage`.
 - Check current directory with `pwd` if unsure where you are in the repo or an individual package.
+- Assume working in a windows environment unless otherwise specified, so tools like grep, sed, awk may not be available. Powershell equivalents are preferred.
 
 Important conventions and patterns (repo-specific)
 - Global registration & runtime metadata: The TypeScript corelib relies on symbol-based registration for enums, types and script data. See `packages/corelib/src/base/system.ts` and `scriptdata.ts` (package `@serenity-is/corelib`) for examples. When adding runtime metadata follow existing register/unregister helpers.
@@ -121,7 +122,27 @@ Important conventions and patterns (repo-specific)
 - Packaging: Some packages are consumed via NuGet wrappers that place JS under `node_modules/.dotnet/<package>`; check `packages/corelib/README.md` which documents the hybrid NuGet/NPM usage. The files for referenced projects / NPM packages are automatically copied to the node_modules/.dotnet paths by the `RestoreNodeTypes` target defined in `Serenity.Net.Web.targets` which is executed as `dotnet build -target:RestoreNodeTypes` via the preinstall/pnpm:devPreinstall script in the consuming project's package.json. This target also updates package.json's dependencies list if necessary. Check serene/src/Serene.Web/package.json for an example.
 
 Testing and verification
-- Unit tests for TypeScript use Vitest. See `package.json` dev scripts and `pnpm -r test` to run across workspace. Coverage outputs are in per-package `coverage/` folders. Use clover.xml or covera-final.json files. It is possible to extract line coverage for an individual source file by searching for a corresponding `.html` file under `coverage/` folder. For example, the coverage for `packages/corelib/src/base/authorization.ts` can be found under `packages/corelib/coverage/base/authorization.ts.html` file.
+- Unit tests for TypeScript use Vitest. See `package.json` dev scripts and `pnpm -r test` to run across workspace. Coverage outputs are in per-package `coverage/` folders. Use clover.xml or coverage-final.json files. Uncovered lines can be extracted from coverage/coverage-final.json using Get-Content and ConvertFrom-Json via powershell. It is also possible to extract line coverage for an individual source file by searching for a corresponding `.html` file under `coverage/` folder. For example, the coverage for `packages/corelib/src/base/authorization.ts` can be found under `packages/corelib/coverage/base/authorization.ts.html` file.
+  - To extract uncovered lines for a specific TypeScript file from `coverage-final.json`:
+    ```powershell
+    # Run from the package directory (e.g., packages/corelib) after running tests with coverage
+    $json = Get-Content "coverage/coverage-final.json" | ConvertFrom-Json
+    # The JSON key is the full absolute path to the file (Windows-style with backslashes)
+    # Example for packages/corelib/src/slick/remoteview.ts:
+    $fileKey = "P:\startsharp\Serenity\packages\corelib\src\slick\remoteview.ts"
+    $data = $json.$fileKey
+    $uncovered = @()
+    foreach ($key in $data.s.PSObject.Properties.Name) {
+        if ($data.s.$key -eq 0) {
+            $stmt = $data.statementMap.$key
+            for ($line = $stmt.start.line; $line -le $stmt.end.line; $line++) {
+                $uncovered += $line
+            }
+        }
+    }
+    $uncovered | Sort-Object -Unique
+    ```
+    This outputs a sorted list of line numbers with zero coverage. Adjust `$fileKey` to match the target file's path.
 - .NET tests live under `tests/` and can be run via `dotnet test` for the specific test project.
 
 Examples to copy patterns from
