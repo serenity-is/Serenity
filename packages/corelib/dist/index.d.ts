@@ -3274,39 +3274,101 @@ export interface PagingOptions {
 	rowsPerPage?: number;
 	page?: number;
 }
-export interface RemoteViewOptions {
+/**
+ * Options for configuring a RemoteView instance
+ */
+export interface RemoteViewOptions<TEntity = any> {
+	/** Automatically load data (call populate) on initialization */
 	autoLoad?: boolean;
+	/** HTTP content type for service requests */
 	contentType?: string;
+	/** Expected data type of the service response */
 	dataType?: string;
+	/** Error message to display when requests fail */
 	errormsg?: string;
-	filter?: any;
-	getItemMetadata?: (p1?: any, p2?: number) => any;
+	/** Filter criteria or function to apply to the data */
+	filter?: RemoteViewFilter<TEntity>;
+	/** Callback function to get metadata for individual items */
+	getItemMetadata?: (item: TEntity, row: number) => any;
+	/** Provider for group item metadata in grouped views */
 	groupItemMetadataProvider?: GroupItemMetadataProvider;
+	/** Name of the field containing unique item identifiers */
 	idField?: string;
+	/** Whether to perform sorting locally instead of server-side */
 	localSort?: boolean;
+	/** HTTP method to use for service requests */
 	method?: string;
-	onAjaxCall?: RemoteViewAjaxCallback<any>;
-	onProcessData?: RemoteViewProcessCallback<any>;
-	onSubmit?: CancellableViewCallback<any>;
+	/** Callback function invoked before AJAX calls are made */
+	onAjaxCall?: RemoteViewAjaxCallback<TEntity>;
+	/** Callback function to process data received from the server */
+	onProcessData?: RemoteViewProcessCallback<TEntity>;
+	/** Callback function invoked before submitting service requests */
+	onSubmit?: CancellableViewCallback<TEntity>;
+	/** Additional parameters to include in service requests */
 	params?: Record<string, object>;
+	/** Number of rows to display per page (0 for no paging) */
 	rowsPerPage?: number;
+	/** Initial page number to seek to on first load */
 	seekToPage?: number;
-	sortBy?: any;
+	/** Initial sort criteria for the data */
+	sortBy?: string | string[];
+	/** URL of the service endpoint for data requests */
 	url?: string;
 }
+/**
+ * Information about the current paging state of the view
+ */
 export interface PagingInfo {
+	/** Reference to the RemoteView instance */
 	dataView: RemoteView<any>;
+	/** Current error message, if any */
 	error: string;
+	/** Whether data is currently being loaded */
 	loading: boolean;
+	/** Current page number (1-based) */
 	page: number;
+	/** Number of rows displayed per page */
 	rowsPerPage: number;
+	/** Total number of items available */
 	totalCount: number;
 }
+/**
+ * Callback function that can cancel a view operation
+ * @param view The RemoteView instance
+ * @returns true to continue, false to cancel
+ */
 export type CancellableViewCallback<TEntity> = (view: RemoteView<TEntity>) => boolean | void;
+/**
+ * Callback function for AJAX calls made by the view
+ * @param view The RemoteView instance
+ * @param options The service options for the AJAX call
+ * @returns true to continue, false to cancel
+ */
 export type RemoteViewAjaxCallback<TEntity> = (view: RemoteView<TEntity>, options: ServiceOptions<ListResponse<TEntity>>) => boolean | void;
+/**
+ * Filter function for items in the view
+ * @param item The item to test
+ * @param view The RemoteView instance
+ * @returns true if the item should be included
+ */
 export type RemoteViewFilter<TEntity> = (item: TEntity, view: RemoteView<TEntity>) => boolean;
+/**
+ * Callback function for processing data received from the server
+ * @param data The raw data response
+ * @param view The RemoteView instance
+ * @returns The processed data
+ */
 export type RemoteViewProcessCallback<TEntity> = (data: ListResponse<TEntity>, view: RemoteView<TEntity>) => ListResponse<TEntity>;
+/**
+ * Grand totals for aggregated data across all items
+ */
 export type GrandTotals = Partial<Pick<GroupTotals, "avg" | "sum" | "min" | "max" | "initialized">>;
+/**
+ * A data view that supports remote data loading, sorting, filtering, grouping, and paging.
+ * Extends the functionality of SlickGrid's DataView with server-side data operations.
+ *
+ * @typeparam TEntity The type of entities in the view
+ */
 export declare class RemoteView<TEntity = any> {
 	private contentType;
 	private dataType;
@@ -3342,91 +3404,276 @@ export declare class RemoteView<TEntity = any> {
 	private totalCount;
 	private totalRows;
 	private updated;
+	/** Additional parameters to send with service requests */
 	params: Record<string, any>;
+	/** The page number to seek to when loading data */
 	seekToPage: number;
+	/** Sort expressions for the data */
 	sortBy: string[];
+	/** The URL to fetch data from */
 	url: string;
-	onAjaxCall: RemoteViewAjaxCallback<any>;
-	onProcessData: RemoteViewProcessCallback<any>;
-	onSubmit: CancellableViewCallback<any>;
+	/** Callback invoked before making AJAX calls */
+	onAjaxCall: RemoteViewAjaxCallback<TEntity>;
+	/** Callback invoked to process data received from the server */
+	onProcessData: RemoteViewProcessCallback<TEntity>;
+	/** Callback invoked before submitting a request, can cancel the operation */
+	onSubmit: CancellableViewCallback<TEntity>;
+	/** Event fired when the underlying data changes */
 	readonly onDataChanged: EventEmitter<any, import("@serenity-is/sleekgrid").IEventData>;
+	/** Event fired when data loading completes */
 	readonly onDataLoaded: EventEmitter<any, import("@serenity-is/sleekgrid").IEventData>;
+	/** Event fired when data loading begins */
 	readonly onDataLoading: EventEmitter<any, import("@serenity-is/sleekgrid").IEventData>;
+	/** Event fired when a group is collapsed */
 	readonly onGroupCollapsed: EventEmitter<any, import("@serenity-is/sleekgrid").IEventData>;
+	/** Event fired when a group is expanded */
 	readonly onGroupExpanded: EventEmitter<any, import("@serenity-is/sleekgrid").IEventData>;
+	/** Event fired when paging information changes */
 	readonly onPagingInfoChanged: EventEmitter<any, import("@serenity-is/sleekgrid").IEventData>;
+	/** Event fired when the row count changes */
 	readonly onRowCountChanged: EventEmitter<any, import("@serenity-is/sleekgrid").IEventData>;
+	/** Event fired when specific rows change */
 	readonly onRowsChanged: EventEmitter<any, import("@serenity-is/sleekgrid").IEventData>;
+	/** Event fired when rows or count change */
 	readonly onRowsOrCountChanged: EventEmitter<any, import("@serenity-is/sleekgrid").IEventData>;
-	constructor(options: RemoteViewOptions);
+	constructor(options: RemoteViewOptions<TEntity>);
+	/** Default configuration for grouping information */
 	static readonly groupingInfoDefaults: GroupInfo<any>;
+	/**
+	 * Begins a batch update operation. Multiple changes can be made without triggering refreshes.
+	 * Call endUpdate() to complete the batch and refresh the view.
+	 */
 	beginUpdate(): void;
+	/**
+	 * Ends a batch update operation. If this is the outermost endUpdate call,
+	 * refreshes the view to reflect all changes made during the batch.
+	 */
 	endUpdate(): void;
+	/**
+	 * Sets hints for the next refresh operation to optimize performance.
+	 * @param hints Object containing refresh hints like isFilterNarrowing, isFilterExpanding, etc.
+	 */
 	setRefreshHints(hints: any): void;
 	private updateIdxById;
 	private ensureIdUniqueness;
+	/**
+	 * Gets all items in the view.
+	 * @returns Array of all items
+	 */
 	getItems(): TEntity[];
+	/**
+	 * Gets the name of the property used as the unique identifier for items.
+	 * @returns The ID property name
+	 */
 	getIdPropertyName(): string;
+	/**
+	 * Sets the items in the view and optionally changes the ID property.
+	 * @param data Array of items to set
+	 * @param newIdProperty Optional new ID property name, or boolean to reset
+	 */
 	setItems(data: any[], newIdProperty?: string | boolean): void;
+	/**
+	 * Sets paging options and triggers a data reload if options changed.
+	 * @param args The paging options to set
+	 */
 	setPagingOptions(args: PagingOptions): void;
+	/**
+	 * Gets the current paging information.
+	 * @returns Object containing paging state information
+	 */
 	getPagingInfo(): PagingInfo;
 	private getSortComparer;
+	/**
+	 * Sorts the items using the specified comparer function.
+	 * @param comparer Optional custom comparer function
+	 * @param ascending Whether to sort in ascending order (default true)
+	 */
 	sort(comparer?: (a: any, b: any) => number, ascending?: boolean): void;
+	/**
+	 * Gets whether local sorting is enabled.
+	 * @returns true if local sorting is enabled
+	 */
 	getLocalSort(): boolean;
+	/**
+	 * Sets whether to use local sorting. When enabled, sorting is done client-side.
+	 * @param value Whether to enable local sorting
+	 */
 	setLocalSort(value: boolean): void;
+	/**
+	 * Re-sorts the items using the current sort settings.
+	 */
 	reSort(): void;
+	/**
+	 * Gets the filtered items (after applying the current filter).
+	 * @returns Array of filtered items
+	 */
 	getFilteredItems(): any;
+	/**
+	 * Gets the current filter function.
+	 * @returns The current filter function
+	 */
 	getFilter(): RemoteViewFilter<TEntity>;
+	/**
+	 * Sets the filter function to apply to items.
+	 * @param filterFn The filter function to apply
+	 */
 	setFilter(filterFn: RemoteViewFilter<TEntity>): void;
+	/**
+	 * Gets the current grouping configuration.
+	 * @returns Array of grouping information
+	 */
 	getGrouping(): GroupInfo<TEntity>[];
+	/**
+	 * Sets summary/aggregation options for the view.
+	 * @param summary Object containing aggregators and other summary options
+	 */
 	setSummaryOptions(summary: any): void;
+	/**
+	 * Gets the grand totals for all aggregated data.
+	 * @returns Object containing grand totals
+	 */
 	getGrandTotals(): GrandTotals;
+	/**
+	 * Sets the grouping configuration for the view.
+	 * @param groupingInfo Grouping information or array of grouping information
+	 */
 	setGrouping(groupingInfo: GroupInfo<TEntity> | GroupInfo<TEntity>[]): void;
+	/**
+	 * Gets an item by its index in the items array.
+	 * @param i The index of the item
+	 * @returns The item at the specified index
+	 */
 	getItemByIdx(i: number): any;
+	/**
+	 * Gets the index of an item by its ID.
+	 * @param id The ID of the item
+	 * @returns The index of the item, or undefined if not found
+	 */
 	getIdxById(id: any): number;
 	private ensureRowsByIdCache;
+	/**
+	 * Gets the row index for an item.
+	 * @param item The item to find
+	 * @returns The row index of the item
+	 */
 	getRowByItem(item: any): number;
+	/**
+	 * Gets the row index for an item by its ID.
+	 * @param id The ID of the item
+	 * @returns The row index of the item
+	 */
 	getRowById(id: any): number;
+	/**
+	 * Gets an item by its ID.
+	 * @param id The ID of the item
+	 * @returns The item with the specified ID
+	 */
 	getItemById(id: any): TEntity;
+	/**
+	 * Maps an array of items to their corresponding row indices.
+	 * @param itemArray Array of items to map
+	 * @returns Array of row indices
+	 */
 	mapItemsToRows(itemArray: any[]): number[];
+	/**
+	 * Maps an array of IDs to their corresponding row indices.
+	 * @param idArray Array of item IDs to map
+	 * @returns Array of row indices
+	 */
 	mapIdsToRows(idArray: any[]): any[];
+	/**
+	 * Maps an array of row indices to their corresponding item IDs.
+	 * @param rowArray Array of row indices to map
+	 * @returns Array of item IDs
+	 */
 	mapRowsToIds(rowArray: any[]): any[];
+	/**
+	 * Updates an existing item in the view.
+	 * @param id The ID of the item to update
+	 * @param item The new item data
+	 */
 	updateItem(id: any, item: any): void;
+	/**
+	 * Inserts an item at the specified position.
+	 * @param insertBefore The index to insert before
+	 * @param item The item to insert
+	 */
 	insertItem(insertBefore: number, item: any): void;
+	/**
+	 * Adds an item to the end of the items array.
+	 * @param item The item to add
+	 */
 	addItem(item: any): void;
+	/**
+	 * Deletes an item by its ID.
+	 * @param id The ID of the item to delete
+	 */
 	deleteItem(id: any): void;
+	/**
+	 * Adds an item in sorted order.
+	 * @param item The item to add
+	 */
 	sortedAddItem(item: any): void;
+	/**
+	 * Updates an item while maintaining sorted order.
+	 * @param id The ID of the item to update
+	 * @param item The new item data
+	 */
 	sortedUpdateItem(id: any, item: any): void;
 	private sortedIndex;
-	getRows(): any[];
+	/**
+	 * Gets all rows in the view (including group rows and totals rows).
+	 * @returns Array of all rows
+	 */
+	getRows(): (TEntity | Group<any> | GroupTotals<any>)[];
+	/**
+	 * Gets the total number of rows in the view.
+	 * @returns The number of rows
+	 */
 	getLength(): number;
+	/**
+	 * Gets the item at the specified row index.
+	 * @param i The row index
+	 * @returns The item at the row index
+	 */
 	getItem(i: number): any;
-	getItemMetadata(i: number): any;
+	/**
+	 * Gets metadata for the item at the specified row index.
+	 * @param row The row index
+	 * @returns Metadata object or null
+	 */
+	getItemMetadata(row: number): any;
 	private expandCollapseAllGroups;
 	/**
-	 * @param level {Number} Optional level to collapse.  If not specified, applies to all levels.
+	 * Collapses all groups at the specified level, or all levels if not specified.
+	 * @param level Optional level to collapse. If not specified, applies to all levels.
 	 */
 	collapseAllGroups(level?: number): void;
 	/**
-	 * @param level {Number} Optional level to expand.  If not specified, applies to all levels.
+	 * Expands all groups at the specified level, or all levels if not specified.
+	 * @param level Optional level to expand. If not specified, applies to all levels.
 	 */
 	expandAllGroups(level?: number): void;
 	private resolveLevelAndGroupingKey;
 	private expandCollapseGroup;
 	/**
+	 * Collapses a specific group.
 	 * @param varArgs Either a Slick.Group's "groupingKey" property, or a
-	 *     variable argument list of grouping values denoting a unique path to the row.  For
-	 *     example, calling collapseGroup('high', '10%') will collapse the '10%' subgroup of
-	 *     the 'high' group.
+	 * variable argument list of grouping values denoting a unique path to the row.
+	 * For example, calling collapseGroup('high', '10%') will collapse the '10%' subgroup of the 'high' group.
 	 */
 	collapseGroup(varArgs: any[]): void;
 	/**
+	 * Expands a specific group.
 	 * @param varArgs Either a Slick.Group's "groupingKey" property, or a
-	 *     variable argument list of grouping values denoting a unique path to the row.  For
-	 *     example, calling expandGroup('high', '10%') will expand the '10%' subgroup of
-	 *     the 'high' group.
+	 * variable argument list of grouping values denoting a unique path to the row.
+	 * For example, calling expandGroup('high', '10%') will expand the '10%' subgroup of the 'high' group.
 	 */
 	expandGroup(varArgs: any[]): void;
+	/**
+	 * Gets the current groups.
+	 * @returns Array of groups
+	 */
 	getGroups(): Group<TEntity>[];
 	private getOrCreateGroup;
 	private extractGroups;
@@ -3439,6 +3686,11 @@ export declare class RemoteView<TEntity = any> {
 	private getFilteredAndPagedItems;
 	private getRowDiffs;
 	private recalc;
+	/**
+	 * Refresh the view by recalculating the rows and notifying changes.
+	 * Note that this does not re-fetch the data from the server, use populate
+	 * method for that purpose.
+	 */
 	refresh(): void;
 	/***
 	 * Wires the grid and the DataView together to keep row selection tied to item ids.
@@ -3448,25 +3700,53 @@ export declare class RemoteView<TEntity = any> {
 	 *
 	 * NOTE:  This doesn't work with cell selection model.
 	 *
-	 * @param grid {Slick.Grid} The grid to sync selection with.
-	 * @param preserveHidden {Boolean} Whether to keep selected items that go out of the
+	 * @param grid The grid to sync selection with.
+	 * @param preserveHidden Whether to keep selected items that go out of the
 	 *     view due to them getting filtered out.
-	 * @param preserveHiddenOnSelectionChange {Boolean} Whether to keep selected items
+	 * @param preserveHiddenOnSelectionChange Whether to keep selected items
 	 *     that are currently out of the view (see preserveHidden) as selected when selection
 	 *     changes.
-	 * @return {EventEmitter} An event that notifies when an internal list of selected row ids
+	 * @return An event that notifies when an internal list of selected row ids
 	 *     changes.  This is useful since, in combination with the above two options, it allows
 	 *     access to the full list selected row ids, and not just the ones visible to the grid.
 	 */
 	syncGridSelection(grid: Grid, preserveHidden: boolean, preserveHiddenOnSelectionChange: boolean): EventEmitter<any, import("@serenity-is/sleekgrid").IEventData>;
+	/**
+	 * Syncs cell CSS styles between the grid and the data view.
+	 * @param grid The grid to sync styles with
+	 * @param key The style key to sync
+	 */
 	syncGridCellCssStyles(grid: Grid, key: string): void;
+	/**
+	 * Adds data received from the server to the view.
+	 * @param data The response data from the server
+	 */
 	addData(data: any): boolean;
+	/**
+	 * Loads data from the server using the configured URL and parameters.
+	 * @returns false if the operation was cancelled or no URL is configured
+	 */
 	populate(): boolean;
+	/**
+	 * Locks population to prevent automatic data loading.
+	 * Use this when you want to make multiple changes without triggering loads.
+	 */
 	populateLock(): void;
+	/**
+	 * Unlocks population. If there were pending populate calls while locked, executes them.
+	 */
 	populateUnlock(): void;
+	/**
+	 * Gets the group item metadata provider.
+	 * @returns The metadata provider
+	 */
 	getGroupItemMetadataProvider(): GroupItemMetadataProvider;
+	/**
+	 * Sets the group item metadata provider.
+	 * @param value The metadata provider to set
+	 */
 	setGroupItemMetadataProvider(value: GroupItemMetadataProvider): void;
-	/** Gets the ID property name, for compat, @deprecated */
+	/** @deprecated Gets the ID property name, for compatibility */
 	get idField(): string;
 }
 export declare class IBooleanValue {
@@ -5691,7 +5971,7 @@ export declare class DataGrid<TItem, P = {}> extends Widget<P> implements IDataG
 	protected createFilterBar(): void;
 	protected getPagerOptions(): PagerOptions;
 	protected createPager(): void;
-	protected getViewOptions(): RemoteViewOptions;
+	protected getViewOptions(): RemoteViewOptions<any>;
 	protected createToolbar(buttons: ToolButton[]): void;
 	getTitle(): string;
 	setTitle(value: string): void;

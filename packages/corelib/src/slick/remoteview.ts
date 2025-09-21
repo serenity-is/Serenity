@@ -3,45 +3,110 @@ import { ListRequest, ListResponse, ServiceOptions, ServiceResponse, htmlEncode,
 import { AggregateFormatting, IAggregator } from "./aggregators";
 import { GroupInfo, PagingOptions } from "./slicktypes";
 
-export interface RemoteViewOptions {
+/**
+ * Options for configuring a RemoteView instance
+ */
+export interface RemoteViewOptions<TEntity = any> {
+    /** Automatically load data (call populate) on initialization */
     autoLoad?: boolean;
+    /** HTTP content type for service requests */
     contentType?: string;
+    /** Expected data type of the service response */
     dataType?: string;
+    /** Error message to display when requests fail */
     errormsg?: string;
-    filter?: any;
-    getItemMetadata?: (p1?: any, p2?: number) => any;
+    /** Filter criteria or function to apply to the data */
+    filter?: RemoteViewFilter<TEntity>;
+    /** Callback function to get metadata for individual items */
+    getItemMetadata?: (item: TEntity, row: number) => any;
+    /** Provider for group item metadata in grouped views */
     groupItemMetadataProvider?: GroupItemMetadataProvider;
+    /** Name of the field containing unique item identifiers */
     idField?: string;
+    /** Whether to perform sorting locally instead of server-side */
     localSort?: boolean;
+    /** HTTP method to use for service requests */
     method?: string;
-    onAjaxCall?: RemoteViewAjaxCallback<any>;
-    onProcessData?: RemoteViewProcessCallback<any>;
-    onSubmit?: CancellableViewCallback<any>;
+    /** Callback function invoked before AJAX calls are made */
+    onAjaxCall?: RemoteViewAjaxCallback<TEntity>;
+    /** Callback function to process data received from the server */
+    onProcessData?: RemoteViewProcessCallback<TEntity>;
+    /** Callback function invoked before submitting service requests */
+    onSubmit?: CancellableViewCallback<TEntity>;
+    /** Additional parameters to include in service requests */
     params?: Record<string, object>;
+    /** Number of rows to display per page (0 for no paging) */
     rowsPerPage?: number;
+    /** Initial page number to seek to on first load */
     seekToPage?: number;
-    sortBy?: any;
+    /** Initial sort criteria for the data */
+    sortBy?: string | string[];
+    /** URL of the service endpoint for data requests */
     url?: string;
 }
 
+/**
+ * Information about the current paging state of the view
+ */
 export interface PagingInfo {
+    /** Reference to the RemoteView instance */
     dataView: RemoteView<any>;
+    /** Current error message, if any */
     error: string;
+    /** Whether data is currently being loaded */
     loading: boolean;
+    /** Current page number (1-based) */
     page: number;
+    /** Number of rows displayed per page */
     rowsPerPage: number;
+    /** Total number of items available */
     totalCount: number;
 }
 
+/**
+ * Callback function that can cancel a view operation
+ * @param view The RemoteView instance
+ * @returns true to continue, false to cancel
+ */
 export type CancellableViewCallback<TEntity> = (view: RemoteView<TEntity>) => boolean | void;
+
+/**
+ * Callback function for AJAX calls made by the view
+ * @param view The RemoteView instance
+ * @param options The service options for the AJAX call
+ * @returns true to continue, false to cancel
+ */
 export type RemoteViewAjaxCallback<TEntity> = (view: RemoteView<TEntity>, options: ServiceOptions<ListResponse<TEntity>>) => boolean | void;
+
+/**
+ * Filter function for items in the view
+ * @param item The item to test
+ * @param view The RemoteView instance
+ * @returns true if the item should be included
+ */
 export type RemoteViewFilter<TEntity> = (item: TEntity, view: RemoteView<TEntity>) => boolean;
+
+/**
+ * Callback function for processing data received from the server
+ * @param data The raw data response
+ * @param view The RemoteView instance
+ * @returns The processed data
+ */
 export type RemoteViewProcessCallback<TEntity> = (data: ListResponse<TEntity>, view: RemoteView<TEntity>) => ListResponse<TEntity>;
 
+/**
+ * Grand totals for aggregated data across all items
+ */
 export type GrandTotals = Partial<Pick<GroupTotals, 'avg' | 'sum' | 'min' | 'max' | 'initialized'>>;
 
 const groupingDelimiter = ':|:';
 
+/**
+ * A data view that supports remote data loading, sorting, filtering, grouping, and paging.
+ * Extends the functionality of SlickGrid's DataView with server-side data operations.
+ * 
+ * @typeparam TEntity The type of entities in the view
+ */
 export class RemoteView<TEntity = any> {
     private contentType: string;
     private dataType: string;
@@ -57,8 +122,8 @@ export class RemoteView<TEntity = any> {
     private groups: Group<TEntity>[] = [];
     private idProperty: string;
     private idxById: Record<any, number> = {};
-    private itemMetadataCallback?: (p1?: any, p2?: number) => any;
-    private items: any[] = [];
+    private itemMetadataCallback?: (p1?: TEntity, p2?: number) => any;
+    private items: TEntity[] = [];
     private loading: AbortController | boolean = false;
     private localSort: boolean;
     private method: string;
@@ -67,7 +132,7 @@ export class RemoteView<TEntity = any> {
     private populateLocks = 0;
     private prevRefreshHints: any = {};
     private refreshHints: any = {};
-    private rows: any[] = [];
+    private rows: (TEntity | Group | GroupTotals)[] = [];
     private rowsById: Record<any, number> = null;
     private rowsPerPage: number;
     private sortAsc = true;
@@ -77,25 +142,56 @@ export class RemoteView<TEntity = any> {
     private totalCount: number = null;
     private totalRows = 0;
     private updated: Record<string, boolean> = null;
+
+    /** Additional parameters to send with service requests */
     public params: Record<string, any>;
+
+    /** The page number to seek to when loading data */
     public seekToPage: number;
+
+    /** Sort expressions for the data */
     public sortBy: string[];
+
+    /** The URL to fetch data from */
     public url: string;
 
-    public onAjaxCall: RemoteViewAjaxCallback<any>;
-    public onProcessData: RemoteViewProcessCallback<any>;
-    public onSubmit: CancellableViewCallback<any>;
+    /** Callback invoked before making AJAX calls */
+    public onAjaxCall: RemoteViewAjaxCallback<TEntity>;
+
+    /** Callback invoked to process data received from the server */
+    public onProcessData: RemoteViewProcessCallback<TEntity>;
+
+    /** Callback invoked before submitting a request, can cancel the operation */
+    public onSubmit: CancellableViewCallback<TEntity>;
+
+    /** Event fired when the underlying data changes */
     public readonly onDataChanged = new EventEmitter();
+
+    /** Event fired when data loading completes */
     public readonly onDataLoaded = new EventEmitter();
+
+    /** Event fired when data loading begins */
     public readonly onDataLoading = new EventEmitter();
+
+    /** Event fired when a group is collapsed */
     public readonly onGroupCollapsed = new EventEmitter();
+
+    /** Event fired when a group is expanded */
     public readonly onGroupExpanded = new EventEmitter();
+
+    /** Event fired when paging information changes */
     public readonly onPagingInfoChanged = new EventEmitter();
+
+    /** Event fired when the row count changes */
     public readonly onRowCountChanged = new EventEmitter();
+
+    /** Event fired when specific rows change */
     public readonly onRowsChanged = new EventEmitter();
+
+    /** Event fired when rows or count change */
     public readonly onRowsOrCountChanged = new EventEmitter();
 
-    constructor(options: RemoteViewOptions) {
+    constructor(options: RemoteViewOptions<TEntity>) {
         options ??= {}
         if (gridDefaults != null && gridDefaults.groupTotalsFormatter === void 0)
             gridDefaults.groupTotalsFormatter = AggregateFormatting.groupTotalsFormatter;
@@ -117,11 +213,12 @@ export class RemoteView<TEntity = any> {
         this.onProcessData = options.onProcessData || null;
         this.method = options.method || "POST";
         this.errormsg = options.errormsg;
-        this.sortBy = typeof options.sortBy == "string" ? [options.sortBy] : (options.sortBy || []);
+        this.sortBy = typeof options.sortBy == "string" && options.sortBy !== "" ? [options.sortBy] : (options.sortBy || []);
 
         options.url && options.autoLoad && this.populate();
     }
 
+    /** Default configuration for grouping information */
     static readonly groupingInfoDefaults: GroupInfo<any> = {
         comparer: function (this: void, a: any, b: any) {
             return (a.value === b.value ? 0 :
@@ -137,16 +234,28 @@ export class RemoteView<TEntity = any> {
         predefinedValues: []
     }
 
+    /**
+     * Begins a batch update operation. Multiple changes can be made without triggering refreshes.
+     * Call endUpdate() to complete the batch and refresh the view.
+     */
     public beginUpdate() {
         this.suspend++;
     }
 
+    /**
+     * Ends a batch update operation. If this is the outermost endUpdate call,
+     * refreshes the view to reflect all changes made during the batch.
+     */
     public endUpdate() {
         this.suspend--;
         if (this.suspend <= 0)
             this.refresh();
     }
 
+    /**
+     * Sets hints for the next refresh operation to optimize performance.
+     * @param hints Object containing refresh hints like isFilterNarrowing, isFilterExpanding, etc.
+     */
     public setRefreshHints(hints: any) {
         this.refreshHints = hints;
     }
@@ -155,7 +264,7 @@ export class RemoteView<TEntity = any> {
         startingIndex = startingIndex || 0;
         let id: any;
         for (let i = startingIndex, l = this.items.length; i < l; i++) {
-            id = this.items[i][this.idProperty];
+            id = (this.items[i] as any)[this.idProperty];
             if (id === undefined) {
                 throw (`Each data element must implement a unique '${this.idProperty}' property. ` +
                     `Object at index '${i}' has no identity value: ${JSON.stringify(this.items[i])}`);
@@ -167,7 +276,7 @@ export class RemoteView<TEntity = any> {
     private ensureIdUniqueness(): void {
         let id: any;
         for (let i = 0, l = this.items.length; i < l; i++) {
-            id = this.items[i][this.idProperty];
+            id = (this.items[i] as any)[this.idProperty];
             if (id === undefined || this.idxById[id] !== i) {
                 throw (`Each data element must implement a unique '${this.idProperty}' property. Object at index '${i}' ` +
                     (id == undefined ? "has no identity value: " : "has repeated identity value '" + id + "': ") +
@@ -176,14 +285,27 @@ export class RemoteView<TEntity = any> {
         }
     }
 
+    /**
+     * Gets all items in the view.
+     * @returns Array of all items
+     */
     public getItems(): TEntity[] {
         return this.items;
     }
 
+    /**
+     * Gets the name of the property used as the unique identifier for items.
+     * @returns The ID property name
+     */
     public getIdPropertyName(): string {
         return this.idProperty;
     }
 
+    /**
+     * Sets the items in the view and optionally changes the ID property.
+     * @param data Array of items to set
+     * @param newIdProperty Optional new ID property name, or boolean to reset
+     */
     public setItems(data: any[], newIdProperty?: string | boolean): void {
         if (newIdProperty != null && typeof newIdProperty == "string")
             this.idProperty = newIdProperty;
@@ -209,6 +331,10 @@ export class RemoteView<TEntity = any> {
         this.onDataChanged.notify({ dataView: self }, null, self);
     }
 
+    /**
+     * Sets paging options and triggers a data reload if options changed.
+     * @param args The paging options to set
+     */
     public setPagingOptions(args: PagingOptions): void {
         let anyChange = false;
 
@@ -240,6 +366,10 @@ export class RemoteView<TEntity = any> {
             this.populate();
     }
 
+    /**
+     * Gets the current paging information.
+     * @returns Object containing paging state information
+     */
     public getPagingInfo(): PagingInfo {
         return {
             rowsPerPage: this.rowsPerPage,
@@ -285,6 +415,11 @@ export class RemoteView<TEntity = any> {
         }
     }
 
+    /**
+     * Sorts the items using the specified comparer function.
+     * @param comparer Optional custom comparer function
+     * @param ascending Whether to sort in ascending order (default true)
+     */
     public sort(comparer?: (a: any, b: any) => number, ascending?: boolean): void {
         this.sortAsc = ascending;
         if (ascending === false) {
@@ -302,10 +437,18 @@ export class RemoteView<TEntity = any> {
         this.refresh();
     }
 
+    /**
+     * Gets whether local sorting is enabled.
+     * @returns true if local sorting is enabled
+     */
     public getLocalSort(): boolean {
         return this.localSort;
     }
 
+    /**
+     * Sets whether to use local sorting. When enabled, sorting is done client-side.
+     * @param value Whether to enable local sorting
+     */
     public setLocalSort(value: boolean): void {
         if (this.localSort != value) {
             this.localSort = value;
@@ -313,33 +456,60 @@ export class RemoteView<TEntity = any> {
         }
     }
 
+    /**
+     * Re-sorts the items using the current sort settings.
+     */
     public reSort() {
         this.sort(this.sortComparer, this.sortAsc);
     }
 
+    /**
+     * Gets the filtered items (after applying the current filter).
+     * @returns Array of filtered items
+     */
     public getFilteredItems() {
         return this.filteredItems;
     }
 
+    /**
+     * Gets the current filter function.
+     * @returns The current filter function
+     */
     public getFilter() {
         return this.filter;
     }
 
+    /**
+     * Sets the filter function to apply to items.
+     * @param filterFn The filter function to apply
+     */
     public setFilter(filterFn: RemoteViewFilter<TEntity>): void {
         this.filter = filterFn;
         this.refresh();
     }
 
+    /**
+     * Gets the current grouping configuration.
+     * @returns Array of grouping information
+     */
     public getGrouping() {
         return this.groupingInfos;
     }
 
+    /**
+     * Sets summary/aggregation options for the view.
+     * @param summary Object containing aggregators and other summary options
+     */
     public setSummaryOptions(summary: any): void {
         this.grandAggregators = summary?.aggregators || [];
         this.grandTotals = {};
         this.setGrouping(this.groupingInfos || []);
     }
 
+    /**
+     * Gets the grand totals for all aggregated data.
+     * @returns Object containing grand totals
+     */
     public getGrandTotals(): GrandTotals {
         this.grandTotals ??= {};
 
@@ -360,6 +530,10 @@ export class RemoteView<TEntity = any> {
         return this.grandTotals;
     }
 
+    /**
+     * Sets the grouping configuration for the view.
+     * @param groupingInfo Grouping information or array of grouping information
+     */
     public setGrouping(groupingInfo: GroupInfo<TEntity> | GroupInfo<TEntity>[]): void {
         if (!this.groupItemMetadataProvider) {
             this.groupItemMetadataProvider = new GroupItemMetadataProvider();
@@ -379,10 +553,20 @@ export class RemoteView<TEntity = any> {
         this.refresh();
     }
 
+    /**
+     * Gets an item by its index in the items array.
+     * @param i The index of the item
+     * @returns The item at the specified index
+     */
     public getItemByIdx(i: number): any {
         return this.items[i];
     }
 
+    /**
+     * Gets the index of an item by its ID.
+     * @param id The ID of the item
+     * @returns The index of the item, or undefined if not found
+     */
     public getIdxById(id: any): number {
         return this.idxById[id];
     }
@@ -391,25 +575,45 @@ export class RemoteView<TEntity = any> {
         if (!this.rowsById) {
             this.rowsById = {};
             for (let i = 0, l = this.rows.length; i < l; i++) {
-                this.rowsById[this.rows[i][this.idProperty]] = i;
+                this.rowsById[(this.rows[i] as any)[this.idProperty]] = i;
             }
         }
     }
 
+    /**
+     * Gets the row index for an item.
+     * @param item The item to find
+     * @returns The row index of the item
+     */
     public getRowByItem(item: any): number {
         this.ensureRowsByIdCache();
         return this.rowsById[item[this.idProperty]];
     }
 
+    /**
+     * Gets the row index for an item by its ID.
+     * @param id The ID of the item
+     * @returns The row index of the item
+     */
     public getRowById(id: any): number {
         this.ensureRowsByIdCache();
         return this.rowsById[id];
     }
 
+    /**
+     * Gets an item by its ID.
+     * @param id The ID of the item
+     * @returns The item with the specified ID
+     */
     public getItemById(id: any): TEntity {
         return this.items[this.idxById[id]];
     }
 
+    /**
+     * Maps an array of items to their corresponding row indices.
+     * @param itemArray Array of items to map
+     * @returns Array of row indices
+     */
     public mapItemsToRows(itemArray: any[]) {
         const rows = [];
         this.ensureRowsByIdCache();
@@ -422,6 +626,11 @@ export class RemoteView<TEntity = any> {
         return rows;
     }
 
+    /**
+     * Maps an array of IDs to their corresponding row indices.
+     * @param idArray Array of item IDs to map
+     * @returns Array of row indices
+     */
     public mapIdsToRows(idArray: any[]) {
         const rows: any[] = [];
         this.ensureRowsByIdCache();
@@ -434,16 +643,26 @@ export class RemoteView<TEntity = any> {
         return rows;
     }
 
+    /**
+     * Maps an array of row indices to their corresponding item IDs.
+     * @param rowArray Array of row indices to map
+     * @returns Array of item IDs
+     */
     public mapRowsToIds(rowArray: any[]) {
         const ids: any[] = [];
         for (let i = 0, l = rowArray.length; i < l; i++) {
             if (rowArray[i] < this.rows.length) {
-                ids[ids.length] = this.rows[rowArray[i]][this.idProperty];
+                ids[ids.length] = (this.rows[rowArray[i]] as any)[this.idProperty];
             }
         }
         return ids;
     }
 
+    /**
+     * Updates an existing item in the view.
+     * @param id The ID of the item to update
+     * @param item The new item data
+     */
     public updateItem(id: any, item: any) {
         if (this.idxById[id] === undefined) {
             throw new Error("Invalid id");
@@ -476,18 +695,31 @@ export class RemoteView<TEntity = any> {
         this.refresh();
     }
 
+    /**
+     * Inserts an item at the specified position.
+     * @param insertBefore The index to insert before
+     * @param item The item to insert
+     */
     public insertItem(insertBefore: number, item: any) {
         this.items.splice(insertBefore, 0, item);
         this.updateIdxById(insertBefore);
         this.refresh();
     }
 
+    /**
+     * Adds an item to the end of the items array.
+     * @param item The item to add
+     */
     public addItem(item: any) {
         this.items.push(item);
         this.updateIdxById(this.items.length - 1);
         this.refresh();
     }
 
+    /**
+     * Deletes an item by its ID.
+     * @param id The ID of the item to delete
+     */
     public deleteItem(id: any) {
         const idx = this.idxById[id];
         if (idx === undefined) {
@@ -499,10 +731,19 @@ export class RemoteView<TEntity = any> {
         this.refresh();
     }
 
+    /**
+     * Adds an item in sorted order.
+     * @param item The item to add
+     */
     public sortedAddItem(item: any) {
         this.insertItem(this.sortedIndex(item), item);
     }
 
+    /**
+     * Updates an item while maintaining sorted order.
+     * @param id The ID of the item to update
+     * @param item The new item data
+     */
     public sortedUpdateItem(id: any, item: any) {
         if (this.idxById[id] === undefined || id !== item[this.idProperty]) {
             throw new Error("Invalid or non-matching id " + this.idxById[id]);
@@ -534,50 +775,70 @@ export class RemoteView<TEntity = any> {
         return low;
     }
 
-    public getRows() {
+    /**
+     * Gets all rows in the view (including group rows and totals rows).
+     * @returns Array of all rows
+     */
+    public getRows(): (TEntity | Group<any> | GroupTotals<any>)[] {
         return this.rows;
     }
 
+    /**
+     * Gets the total number of rows in the view.
+     * @returns The number of rows
+     */
     public getLength() {
         return this.rows.length;
     }
 
-    public getItem(i: number) {
+    /**
+     * Gets the item at the specified row index.
+     * @param i The row index
+     * @returns The item at the row index
+     */
+    public getItem(i: number): any {
         var item = this.rows[i];
 
+        const group = item as Group;
+        // if this is a group row, make sure the group is collapsed/expanded as needed
         // if this is a group row, make sure totals are calculated and update the title
-        if (item && item.__group && item.totals && !item.totals.initialized) {
-            var gi = this.groupingInfos[item.level];
+        if (group && group.__group && group.totals && !group.totals.initialized) {
+            var gi = this.groupingInfos[group.level];
             if (!gi.displayTotalsRow) {
-                this.calculateTotals(item.totals);
-                item.title = gi.formatter ? gi.formatter(item) : htmlEncode(item.value);
+                this.calculateTotals(group.totals);
+                group.title = gi.formatter ? gi.formatter(group) : htmlEncode(group.value);
             }
         }
         // if this is a totals row, make sure it's calculated
-        else if (item && item.__groupTotals && !item.initialized) {
+        else if (item && (item as IGroupTotals).__groupTotals && !(item as IGroupTotals).initialized) {
             this.calculateTotals(item);
         }
 
         return item;
     }
 
-    public getItemMetadata(i: number) {
-        var item = this.rows[i];
+    /**
+     * Gets metadata for the item at the specified row index.
+     * @param row The row index
+     * @returns Metadata object or null
+     */
+    public getItemMetadata(row: number) {
+        var item = this.rows[row];
         if (item === undefined) {
             return null;
         }
 
         // overrides for grouping rows
-        if (item.__group) {
-            return this.groupItemMetadataProvider.getGroupRowMetadata(item);
+        if ((item as Group).__group) {
+            return this.groupItemMetadataProvider.getGroupRowMetadata(item as Group);
         }
 
         // overrides for totals rows
-        if (item.__groupTotals) {
+        if ((item as IGroupTotals).__groupTotals) {
             return this.groupItemMetadataProvider.getTotalsRowMetadata(item);
         }
 
-        return (this.itemMetadataCallback && this.itemMetadataCallback(item, i)) || null;
+        return (this.itemMetadataCallback && this.itemMetadataCallback(item as TEntity, row)) || null;
     }
 
     private expandCollapseAllGroups(level: number, collapse: boolean) {
@@ -606,14 +867,16 @@ export class RemoteView<TEntity = any> {
     }
 
     /**
-     * @param level {Number} Optional level to collapse.  If not specified, applies to all levels.
+     * Collapses all groups at the specified level, or all levels if not specified.
+     * @param level Optional level to collapse. If not specified, applies to all levels.
      */
     public collapseAllGroups(level?: number) {
         this.expandCollapseAllGroups(level, true);
     }
 
     /**
-     * @param level {Number} Optional level to expand.  If not specified, applies to all levels.
+     * Expands all groups at the specified level, or all levels if not specified.
+     * @param level Optional level to expand. If not specified, applies to all levels.
      */
     public expandAllGroups(level?: number) {
         this.expandCollapseAllGroups(level, false);
@@ -640,10 +903,10 @@ export class RemoteView<TEntity = any> {
     }
 
     /**
+     * Collapses a specific group.
      * @param varArgs Either a Slick.Group's "groupingKey" property, or a
-     *     variable argument list of grouping values denoting a unique path to the row.  For
-     *     example, calling collapseGroup('high', '10%') will collapse the '10%' subgroup of
-     *     the 'high' group.
+     * variable argument list of grouping values denoting a unique path to the row.
+     * For example, calling collapseGroup('high', '10%') will collapse the '10%' subgroup of the 'high' group.
      */
     public collapseGroup(varArgs: any[]) {
         var args = Array.prototype.slice.call(arguments);
@@ -651,16 +914,20 @@ export class RemoteView<TEntity = any> {
     }
 
     /**
+     * Expands a specific group.
      * @param varArgs Either a Slick.Group's "groupingKey" property, or a
-     *     variable argument list of grouping values denoting a unique path to the row.  For
-     *     example, calling expandGroup('high', '10%') will expand the '10%' subgroup of
-     *     the 'high' group.
+     * variable argument list of grouping values denoting a unique path to the row.
+     * For example, calling expandGroup('high', '10%') will expand the '10%' subgroup of the 'high' group.
      */
     public expandGroup(varArgs: any[]) {
         var args = Array.prototype.slice.call(arguments);
         this.expandCollapseGroup(args, false);
     }
 
+    /**
+     * Gets the current groups.
+     * @returns Array of groups
+     */
     public getGroups() {
         return this.groups;
     }
@@ -924,6 +1191,11 @@ export class RemoteView<TEntity = any> {
         return diff;
     }
 
+    /**
+     * Refresh the view by recalculating the rows and notifying changes.
+     * Note that this does not re-fetch the data from the server, use populate
+     * method for that purpose.
+     */
     public refresh() {
         if (this.suspend) {
             return;
@@ -963,13 +1235,13 @@ export class RemoteView<TEntity = any> {
      *
      * NOTE:  This doesn't work with cell selection model.
      *
-     * @param grid {Slick.Grid} The grid to sync selection with.
-     * @param preserveHidden {Boolean} Whether to keep selected items that go out of the
+     * @param grid The grid to sync selection with.
+     * @param preserveHidden Whether to keep selected items that go out of the
      *     view due to them getting filtered out.
-     * @param preserveHiddenOnSelectionChange {Boolean} Whether to keep selected items
+     * @param preserveHiddenOnSelectionChange Whether to keep selected items
      *     that are currently out of the view (see preserveHidden) as selected when selection
      *     changes.
-     * @return {EventEmitter} An event that notifies when an internal list of selected row ids
+     * @return An event that notifies when an internal list of selected row ids
      *     changes.  This is useful since, in combination with the above two options, it allows
      *     access to the full list selected row ids, and not just the ones visible to the grid.
      */
@@ -1024,6 +1296,11 @@ export class RemoteView<TEntity = any> {
         return onSelectedRowIdsChanged;
     }
 
+    /**
+     * Syncs cell CSS styles between the grid and the data view.
+     * @param grid The grid to sync styles with
+     * @param key The style key to sync
+     */
     public syncGridCellCssStyles(grid: Grid, key: string) {
         var hashById: any;
         var inHandler: any;
@@ -1037,7 +1314,7 @@ export class RemoteView<TEntity = any> {
         function storeCellCssStyles(this: void, hash: any) {
             hashById = {};
             for (var row in hash) {
-                var id: any = self.rows[row as any][self.idProperty];
+                var id: any = (self.rows[row as any] as any)[self.idProperty];
                 hashById[id] = hash[row];
             }
         }
@@ -1074,6 +1351,10 @@ export class RemoteView<TEntity = any> {
         this.onRowsOrCountChanged.subscribe(update);
     }
 
+    /**
+     * Adds data received from the server to the view.
+     * @param data The response data from the server
+     */
     public addData(data: any) {
 
         if (this.onProcessData && data)
@@ -1105,6 +1386,10 @@ export class RemoteView<TEntity = any> {
         this.onPagingInfoChanged.notify(this.getPagingInfo());
     }
 
+    /**
+     * Loads data from the server using the configured URL and parameters.
+     * @returns false if the operation was cancelled or no URL is configured
+     */
     public populate() {
         if (this.populateLocks > 0) {
             this.populateCalls++;
@@ -1190,12 +1475,19 @@ export class RemoteView<TEntity = any> {
         this.loading = controller;
     }
 
+    /**
+     * Locks population to prevent automatic data loading.
+     * Use this when you want to make multiple changes without triggering loads.
+     */
     public populateLock() {
         if (this.populateLocks == 0)
             this.populateCalls = 0;
         this.populateLocks++;
     }
 
+    /**
+     * Unlocks population. If there were pending populate calls while locked, executes them.
+     */
     public populateUnlock() {
         if (this.populateLocks > 0) {
             this.populateLocks--;
@@ -1204,15 +1496,23 @@ export class RemoteView<TEntity = any> {
         }
     }
 
+    /**
+     * Gets the group item metadata provider.
+     * @returns The metadata provider
+     */
     public getGroupItemMetadataProvider() {
         return this.groupItemMetadataProvider;
     }
 
+    /**
+     * Sets the group item metadata provider.
+     * @param value The metadata provider to set
+     */
     public setGroupItemMetadataProvider(value: GroupItemMetadataProvider) {
         this.groupItemMetadataProvider = value;
     }
 
-    /** Gets the ID property name, for compat, @deprecated */
+    /** @deprecated Gets the ID property name, for compatibility */
     get idField(): string {
         return this.idProperty;
     }
