@@ -1,6 +1,5 @@
 import { EventData, EventEmitter, Grid, Group, GroupItemMetadataProvider, GroupTotals, IGroupTotals, gridDefaults } from "@serenity-is/sleekgrid";
 import { ListRequest, ListResponse, ServiceOptions, ServiceResponse, htmlEncode, localText, serviceCall } from "../base";
-import { deepClone } from "../compat";
 import { AggregateFormatting, IAggregator } from "./aggregators";
 import { GroupInfo, PagingOptions } from "./slicktypes";
 
@@ -124,21 +123,19 @@ export class RemoteView<TEntity = any> {
     }
 
     static readonly groupingInfoDefaults: GroupInfo<any> = {
-        getter: <any>null,
-        formatter: <any>null,
         comparer: function (this: void, a: any, b: any) {
             return (a.value === b.value ? 0 :
                 (a.value > b.value ? 1 : -1)
             );
         },
-        predefinedValues: <any[]>[],
         aggregateEmpty: false,
         aggregateCollapsed: false,
         aggregateChildGroups: false,
         collapsed: false,
         displayTotalsRow: true,
-        lazyTotalsCalculation: false
-    };
+        lazyTotalsCalculation: false,
+        predefinedValues: []
+    }
 
     public beginUpdate() {
         this.suspend++;
@@ -363,7 +360,7 @@ export class RemoteView<TEntity = any> {
         return this.grandTotals;
     }
 
-    public setGrouping(groupingInfo: any) {
+    public setGrouping(groupingInfo: GroupInfo<TEntity> | GroupInfo<TEntity>[]): void {
         if (!this.groupItemMetadataProvider) {
             this.groupItemMetadataProvider = new GroupItemMetadataProvider();
         }
@@ -374,9 +371,8 @@ export class RemoteView<TEntity = any> {
         this.groupingInfos = (groupingInfo instanceof Array) ? groupingInfo : [groupingInfo];
 
         for (let i = 0; i < this.groupingInfos.length; i++) {
-            const gi = this.groupingInfos[i] = Object.assign(<any>{}, RemoteView.groupingInfoDefaults, deepClone(this.groupingInfos[i]));
-            gi.aggregators = gi.aggregators || this.grandAggregators || [];
-            gi.getterIsAFn = typeof gi.getter === "function";
+            const gi = this.groupingInfos[i] = Object.assign({}, RemoteView.groupingInfoDefaults, this.groupingInfos[i]);
+            gi.getterIsAFn ??= typeof gi.getter == "function";
             this.toggledGroupsByLevel[i] = {};
         }
 
@@ -612,14 +608,14 @@ export class RemoteView<TEntity = any> {
     /**
      * @param level {Number} Optional level to collapse.  If not specified, applies to all levels.
      */
-    public collapseAllGroups(level: number) {
+    public collapseAllGroups(level?: number) {
         this.expandCollapseAllGroups(level, true);
     }
 
     /**
      * @param level {Number} Optional level to expand.  If not specified, applies to all levels.
      */
-    public expandAllGroups(level: number) {
+    public expandAllGroups(level?: number) {
         this.expandCollapseAllGroups(level, false);
     }
 
@@ -726,7 +722,8 @@ export class RemoteView<TEntity = any> {
         var group = totals.group;
         var gi = this.groupingInfos[group.level];
         var isLeafLevel = (group.level == this.groupingInfos.length);
-        var agg: IAggregator, idx = gi.aggregators.length;
+        const aggregators = (gi.aggregators ?? this.grandAggregators ?? []);
+        var agg: IAggregator, idx = aggregators.length;
 
         if (!isLeafLevel && gi.aggregateChildGroups) {
             // make sure all the subgroups are calculated
@@ -739,7 +736,7 @@ export class RemoteView<TEntity = any> {
         }
 
         while (idx--) {
-            agg = gi.aggregators[idx];
+            agg = aggregators[idx];
             agg.init();
             const items = !isLeafLevel && gi.aggregateChildGroups ? group.groups : group.rows;
             for (const item of items) {
@@ -762,7 +759,8 @@ export class RemoteView<TEntity = any> {
 
     private addTotals(groups: Group<TEntity>[], level?: number) {
         level = level || 0;
-        var gi = this.groupingInfos[level];
+        const gi = this.groupingInfos[level];
+        const aggregators = (gi?.aggregators ?? this.grandAggregators ?? []);
         var groupCollapsed = !!gi?.collapsed;
         var toggledGroups = this.toggledGroupsByLevel[level];
         var idx = groups.length, g: Group<TEntity>;
@@ -778,7 +776,7 @@ export class RemoteView<TEntity = any> {
                 this.addTotals(g.groups, level + 1);
             }
 
-            if (gi.aggregators.length && (
+            if (aggregators.length && (
                 gi.aggregateEmpty || g.rows.length || (g.groups && g.groups.length))) {
                 this.addGroupTotals(g);
             }
@@ -1039,7 +1037,7 @@ export class RemoteView<TEntity = any> {
         function storeCellCssStyles(this: void, hash: any) {
             hashById = {};
             for (var row in hash) {
-                var id: any = (self.rows as any)[row][self.idProperty];
+                var id: any = self.rows[row as any][self.idProperty];
                 hashById[id] = hash[row];
             }
         }

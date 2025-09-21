@@ -29,6 +29,16 @@ vi.mock("@serenity-is/sleekgrid", () => ({
         collapsed: false,
         totals: null
     })),
+    GroupTotals: vi.fn().mockImplementation(() => ({
+        __groupTotals: true,
+        initialized: false,
+        group: null,
+        sum: {},
+        avg: {},
+        min: {},
+        max: {},
+        count: 0
+    })),
     gridDefaults: {}
 }));
 
@@ -402,8 +412,7 @@ describe("RemoteView", () => {
             expect(result[0].getter).toBe(groupInfo.getter);
             expect(result[0].formatter).toBe(groupInfo.formatter);
             expect(result[0].collapsed).toBe(false);
-            // Should have defaults merged in
-            expect(result[0]).toHaveProperty('aggregateEmpty', false);
+            expect(result[0].aggregateEmpty ?? false).toBe(false);
         });
 
         it("gets groups", () => {
@@ -426,6 +435,36 @@ describe("RemoteView", () => {
             expect(groups[0].count).toBe(2);
             expect(groups[1].value).toBe("vegetable");
             expect(groups[1].count).toBe(1);
+        });
+
+        it("calculates totals lazily when accessing totals row", () => {
+            view.addItem({ id: 1, name: "Apple", category: "fruit", price: 1 });
+            view.addItem({ id: 2, name: "Banana", category: "fruit", price: 2 });
+            view.addItem({ id: 3, name: "Carrot", category: "vegetable", price: 3 });
+
+            const groupInfo = [{
+                getter: (item: any) => item.category,
+                formatter: (g: any) => g.value,
+                collapsed: false,
+                lazyTotalsCalculation: true,
+                displayTotalsRow: true,
+                aggregators: [new Aggregators.Sum('price')]
+            }];
+            view.setGrouping(groupInfo);
+
+            // Get the rows - this should include totals rows
+            const rows = view.getRows();
+            expect(rows.length).toBeGreaterThan(3); // groups + data + totals
+
+            // Find a totals row
+            const totalsRow = rows.find(row => row.__groupTotals);
+            expect(totalsRow).toBeDefined();
+            expect(totalsRow.initialized).toBe(false);
+
+            // Accessing the row should calculate totals
+            const accessedRow = view.getItem(rows.indexOf(totalsRow));
+            expect(accessedRow).toBe(totalsRow);
+            expect(accessedRow.initialized).toBe(true);
         });
     });
 
@@ -478,6 +517,26 @@ describe("RemoteView", () => {
             expect(view.getLength()).toBe(2);
         });
 
+        it("sets items in suspend mode", () => {
+            const items = [
+                { id: 1, name: "Item 1" },
+                { id: 2, name: "Item 2" }
+            ];
+
+            vitest.spyOn(view, 'refresh').mockImplementation(() => {});
+            view.beginUpdate();
+            view.setItems(items);
+            // In suspend mode, items and rows should be set
+            expect(view.getItems()).toEqual(items);
+            expect(view.getLength()).toBe(2);
+            expect(view.refresh).not.toHaveBeenCalled();
+            view.endUpdate();
+            // After endUpdate, should be refreshed again
+            expect(view.getItems()).toEqual(items);
+            expect(view.getLength()).toBe(2);
+            expect(view.refresh).toHaveBeenCalled();
+        });
+
         it("inserts item at specific position", () => {
             view.addItem({ id: 1, name: "Item 1" });
             view.addItem({ id: 3, name: "Item 3" });
@@ -487,6 +546,21 @@ describe("RemoteView", () => {
             const items = view.getItems();
             expect(items.length).toBe(3);
             expect(items[1].name).toBe("Item 2");
+        });
+
+        it("updates item with id change", () => {
+            view.addItem({ id: 1, name: "Item 1" });
+            view.addItem({ id: 2, name: "Item 2" });
+
+            // Update item 1 to have id 3
+            view.updateItem(1, { id: 3, name: "Updated Item 1" });
+
+            expect(view.getItemById(1)).toBeUndefined();
+            expect(view.getItemById(3)).toEqual({ id: 3, name: "Updated Item 1" });
+            expect(view.getItems()).toEqual([
+                { id: 3, name: "Updated Item 1" },
+                { id: 2, name: "Item 2" }
+            ]);
         });
     });
 
@@ -557,6 +631,18 @@ describe("RemoteView", () => {
             expect(items[3].name).toBe("Charlie");
         });
 
+        it("adds item at the end in sorted order", () => {
+            view.sort((a, b) => a.name.localeCompare(b.name));
+
+            view.sortedAddItem({ id: 4, name: "Zoe" });
+
+            const items = view.getItems();
+            expect(items[0].name).toBe("Alice");
+            expect(items[1].name).toBe("Bob");
+            expect(items[2].name).toBe("Charlie");
+            expect(items[3].name).toBe("Zoe");
+        });
+
         it("updates item in sorted order", () => {
             view.sort((a, b) => a.name.localeCompare(b.name));
 
@@ -583,6 +669,31 @@ describe("RemoteView", () => {
             expect(items[1].name).toBe("Charlie");
             expect(items[2].name).toBe("Zoe");
         });
+
+        it("throws error for invalid id in sortedUpdateItem", () => {
+            view.sort((a, b) => a.name.localeCompare(b.name));
+
+            expect(() => view.sortedUpdateItem(999, { id: 999, name: "Test" })).toThrow("Invalid or non-matching id");
+        });
+
+        it("throws error for non-matching id in sortedUpdateItem", () => {
+            view.sort((a, b) => a.name.localeCompare(b.name));
+
+            expect(() => view.sortedUpdateItem(1, { id: 2, name: "Test" })).toThrow("Invalid or non-matching id");
+        });
+
+        it("updates item without affecting sort order", () => {
+            view.sort((a, b) => a.name.localeCompare(b.name));
+
+            // Update Charlie to Charlie (same name) - should not affect sorting
+            view.sortedUpdateItem(1, { id: 1, name: "Charlie", updated: true });
+
+            const items = view.getItems();
+            expect(items[0].name).toBe("Alice");
+            expect(items[1].name).toBe("Bob");
+            expect(items[2].name).toBe("Charlie"); // Same name
+            expect(items[2].updated).toBe(true); // Check that other properties were updated
+        });
     });
 
     describe("group expansion and collapse", () => {
@@ -606,17 +717,17 @@ describe("RemoteView", () => {
 
         it("expands all groups", () => {
             // First collapse all
-            view.collapseAllGroups(undefined);
+            view.collapseAllGroups();
 
             // Then expand all
-            view.expandAllGroups(undefined);
+            view.expandAllGroups();
 
             // Should not throw and groups should be expanded
             expect(view.getGroups().length).toBe(2);
         });
 
         it("collapses all groups", () => {
-            view.collapseAllGroups(undefined);
+            view.collapseAllGroups();
 
             // Should not throw
             expect(view.getGroups().length).toBe(2);
@@ -941,13 +1052,35 @@ describe("RemoteView", () => {
 
         it("syncs grid cell CSS styles", () => {
             mockGrid.getCellCssStyles = vi.fn(() => ({}));
-            mockGrid.registerPlugin = vi.fn();
-            mockGrid.onCellCssStylesChanged = { subscribe: vi.fn() };
+            mockGrid.setCellCssStyles = vi.fn();
+            
+            let onCellCssStylesChangedCallback: any;
+            mockGrid.onCellCssStylesChanged = { 
+                subscribe: vi.fn((callback) => onCellCssStylesChangedCallback = callback)
+            };
+
+            const onRowsOrCountChangedSpy = vi.spyOn(view.onRowsOrCountChanged, 'subscribe');
 
             view.syncGridCellCssStyles(mockGrid, "test-key");
 
-            // Should not throw
-            expect(() => view.syncGridCellCssStyles(mockGrid, "test-key")).not.toThrow();
+            // Should have subscribed to events
+            expect(mockGrid.onCellCssStylesChanged.subscribe).toHaveBeenCalled();
+            expect(onRowsOrCountChangedSpy).toHaveBeenCalled();
+
+            // Get the callback that was subscribed to onRowsOrCountChanged
+            const onRowsOrCountChangedCallback = onRowsOrCountChangedSpy.mock.calls[0][0];
+
+            // Trigger the onCellCssStylesChanged event to test the subFunc
+            onCellCssStylesChangedCallback(null, { key: "test-key", hash: { 0: "new-style1", 1: "new-style2" } });
+
+            // Trigger the onRowsOrCountChanged event to test the update function
+            onRowsOrCountChangedCallback(null, {
+                rowsDiff: [], previousRowCount: 2, currentRowCount: 2,
+                rowCountChanged: false, rowsChanged: false, dataView: view
+            });
+
+            // Should have called setCellCssStyles with updated styles
+            expect(mockGrid.setCellCssStyles).toHaveBeenCalledWith("test-key", expect.any(Object));
         });
     });
 

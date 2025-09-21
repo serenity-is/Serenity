@@ -3381,7 +3381,7 @@ export declare class RemoteView<TEntity = any> {
 	getGrouping(): GroupInfo<TEntity>[];
 	setSummaryOptions(summary: any): void;
 	getGrandTotals(): GrandTotals;
-	setGrouping(groupingInfo: any): void;
+	setGrouping(groupingInfo: GroupInfo<TEntity> | GroupInfo<TEntity>[]): void;
 	getItemByIdx(i: number): any;
 	getIdxById(id: any): number;
 	private ensureRowsByIdCache;
@@ -3406,11 +3406,11 @@ export declare class RemoteView<TEntity = any> {
 	/**
 	 * @param level {Number} Optional level to collapse.  If not specified, applies to all levels.
 	 */
-	collapseAllGroups(level: number): void;
+	collapseAllGroups(level?: number): void;
 	/**
 	 * @param level {Number} Optional level to expand.  If not specified, applies to all levels.
 	 */
-	expandAllGroups(level: number): void;
+	expandAllGroups(level?: number): void;
 	private resolveLevelAndGroupingKey;
 	private expandCollapseGroup;
 	/**
