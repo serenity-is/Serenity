@@ -1,4 +1,4 @@
-import { Column, GroupTotals, IGroupTotals, NonDataRow, convertCompatFormatter, escapeHtml } from "@serenity-is/sleekgrid";
+import { Column, IGroupTotals, NonDataRow, convertCompatFormatter, escapeHtml } from "@serenity-is/sleekgrid";
 import { formatNumber, htmlEncode, tryGetText } from "../base";
 
 export interface IAggregator {

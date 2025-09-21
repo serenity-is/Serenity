@@ -38,7 +38,7 @@ Critical developer workflows (explicit commands)
     pnpm test
     ```
 
-- Don't use `--` to pass args to any of the pnpm commands, e.g. use `pnpm test -t MyTest` instead of `pnpm test -- -t MyTest`.
+- Don't use ` -- ` to pass args to any of the pnpm commands, e.g. use `pnpm test -t MyTest` instead of `pnpm test -- -t MyTest`, use `pnpm test --coverage` instead of `pnpm test -- --coverage`.
 - Check current directory with `pwd` if unsure where you are in the repo or an individual package.
 
 Important conventions and patterns (repo-specific)
@@ -121,7 +121,7 @@ Important conventions and patterns (repo-specific)
 - Packaging: Some packages are consumed via NuGet wrappers that place JS under `node_modules/.dotnet/<package>`; check `packages/corelib/README.md` which documents the hybrid NuGet/NPM usage. The files for referenced projects / NPM packages are automatically copied to the node_modules/.dotnet paths by the `RestoreNodeTypes` target defined in `Serenity.Net.Web.targets` which is executed as `dotnet build -target:RestoreNodeTypes` via the preinstall/pnpm:devPreinstall script in the consuming project's package.json. This target also updates package.json's dependencies list if necessary. Check serene/src/Serene.Web/package.json for an example.
 
 Testing and verification
-- Unit tests for TypeScript use Vitest. See `package.json` dev scripts and `pnpm -r test` to run across workspace. Coverage outputs are in per-package `coverage/` folders.
+- Unit tests for TypeScript use Vitest. See `package.json` dev scripts and `pnpm -r test` to run across workspace. Coverage outputs are in per-package `coverage/` folders. Use clover.xml or covera-final.json files. It is possible to extract line coverage for an individual source file by searching for a corresponding `.html` file under `coverage/` folder. For example, the coverage for `packages/corelib/src/base/authorization.ts` can be found under `packages/corelib/coverage/base/authorization.ts.html` file.
 - .NET tests live under `tests/` and can be run via `dotnet test` for the specific test project.
 
 Examples to copy patterns from

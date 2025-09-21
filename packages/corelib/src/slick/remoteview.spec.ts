@@ -58,6 +58,19 @@ describe("RemoteView", () => {
             expect(view.getItems().length).toBe(0);
         });
 
+        it("auto-loads when url and autoLoad are set", () => {
+            const mockServiceCall = vi.fn();
+            vi.mocked(serviceCall).mockImplementation(mockServiceCall);
+
+            const view = new RemoteView({
+                url: "/api/test",
+                autoLoad: true
+            });
+
+            // Should have attempted to load
+            expect(mockServiceCall).toHaveBeenCalled();
+        });
+
         it("sets up event emitters", () => {
             const view = new RemoteView({});
 
@@ -376,6 +389,23 @@ describe("RemoteView", () => {
             expect(view.getGrouping()).toEqual(groupInfo);
         });
 
+        it("sets grouping info with single object", () => {
+            const groupInfo = {
+                getter: (item: any) => item.category,
+                formatter: (g: any) => g.value,
+                collapsed: false
+            };
+
+            view.setGrouping(groupInfo);
+            const result = view.getGrouping();
+            expect(result).toHaveLength(1);
+            expect(result[0].getter).toBe(groupInfo.getter);
+            expect(result[0].formatter).toBe(groupInfo.formatter);
+            expect(result[0].collapsed).toBe(false);
+            // Should have defaults merged in
+            expect(result[0]).toHaveProperty('aggregateEmpty', false);
+        });
+
         it("gets groups", () => {
             view.addItem({ id: 1, name: "Apple", category: "fruit" });
             view.addItem({ id: 2, name: "Banana", category: "fruit" });
@@ -592,6 +622,21 @@ describe("RemoteView", () => {
             expect(view.getGroups().length).toBe(2);
         });
 
+        it("expands all groups at specific level", () => {
+            view.collapseAllGroups(0); // Collapse level 0
+            view.expandAllGroups(0);   // Expand level 0
+
+            // Should not throw
+            expect(view.getGroups().length).toBe(2);
+        });
+
+        it("collapses all groups at specific level", () => {
+            view.collapseAllGroups(0);
+
+            // Should not throw
+            expect(view.getGroups().length).toBe(2);
+        });
+
         it("expands specific group", () => {
             view.collapseAllGroups(undefined);
             view.expandGroup(["fruit"]);
@@ -674,11 +719,72 @@ describe("RemoteView", () => {
             expect(view.getItems()[0].name).toBe("Item 1");
         });
 
+        it("handles null data", () => {
+            const result = view.addData(null);
+            expect(result).toBe(false);
+            expect(view['errorMessage']).toBeDefined();
+            expect(view.getPagingInfo().error).toBeDefined();
+        });
+
+        it("handles undefined data", () => {
+            const result = view.addData(undefined);
+            expect(result).toBe(false);
+            expect(view['errorMessage']).toBeDefined();
+        });
+
+        it("processes data with onProcessData callback", () => {
+            const originalData = {
+                Entities: [{ id: 1, name: "Item 1" }],
+                TotalCount: 1
+            };
+
+            const processedData = {
+                Entities: [{ id: 1, name: "Processed Item 1" }],
+                TotalCount: 1
+            };
+
+            view.onProcessData = vi.fn(() => processedData);
+
+            view.addData(originalData);
+
+            expect(view.onProcessData).toHaveBeenCalledWith(originalData, view);
+            expect(view.getItems()[0].name).toBe("Processed Item 1");
+        });
+
+        it("aborts previous loading request", () => {
+            const mockServiceCall = vi.fn();
+            vi.mocked(serviceCall).mockImplementation(mockServiceCall);
+
+            // First populate call
+            view.populate();
+            const firstController = view['loading'] as AbortController;
+            expect(firstController).toBeInstanceOf(AbortController);
+            expect(firstController.signal.aborted).toBe(false);
+
+            // Second populate call should abort the first
+            view.populate();
+            expect(firstController.signal.aborted).toBe(true);
+            expect(mockServiceCall).toHaveBeenCalledTimes(2);
+        });
+
         it("locks and unlocks populate", () => {
-            expect(() => {
-                view.populateLock();
-                view.populateUnlock();
-            }).not.toThrow();
+            const mockServiceCall = vi.fn();
+            vi.mocked(serviceCall).mockImplementation(mockServiceCall);
+
+            view.populateLock();
+            expect(view['populateLocks']).toBe(1);
+            expect(view['populateCalls']).toBe(0);
+
+            // Call populate while locked - should increment populateCalls and not call service
+            view.populate();
+            expect(view['populateCalls']).toBe(1);
+            expect(mockServiceCall).not.toHaveBeenCalled();
+
+            view.populateUnlock();
+            expect(view['populateLocks']).toBe(0);
+            // Now populate should be called
+            view.populate();
+            expect(mockServiceCall).toHaveBeenCalled();
         });
 
         it("populates data", () => {
@@ -690,6 +796,63 @@ describe("RemoteView", () => {
 
             // Should attempt to call service
             expect(mockServiceCall).toHaveBeenCalled();
+        });
+
+        it("handles onSubmit callback returning false", () => {
+            const mockServiceCall = vi.fn();
+            vi.mocked(serviceCall).mockImplementation(mockServiceCall);
+
+            view.onSubmit = vi.fn(() => false);
+            const result = view.populate();
+
+            expect(result).toBe(false);
+            expect(mockServiceCall).not.toHaveBeenCalled();
+            expect(view.onSubmit).toHaveBeenCalledWith(view);
+        });
+
+        it("handles onSubmit callback returning true", () => {
+            const mockServiceCall = vi.fn();
+            vi.mocked(serviceCall).mockImplementation(mockServiceCall);
+
+            view.onSubmit = vi.fn(() => true);
+            view.populate();
+
+            expect(mockServiceCall).toHaveBeenCalled();
+            expect(view.onSubmit).toHaveBeenCalledWith(view);
+        });
+
+        it("returns false when no URL is set", () => {
+            const viewWithoutUrl = new RemoteView({
+                idField: "id"
+                // no url
+            });
+
+            const result = viewWithoutUrl.populate();
+            expect(result).toBe(false);
+        });
+
+        it("handles onAjaxCall callback returning false", () => {
+            const mockServiceCall = vi.fn();
+            vi.mocked(serviceCall).mockImplementation(mockServiceCall);
+
+            view.onAjaxCall = vi.fn(() => false);
+            const result = view.populate();
+
+            expect(result).toBe(false);
+            expect(mockServiceCall).not.toHaveBeenCalled();
+            expect(view.onAjaxCall).toHaveBeenCalled();
+            expect(view['loading']).toBe(false);
+        });
+
+        it("handles onAjaxCall callback returning true", () => {
+            const mockServiceCall = vi.fn();
+            vi.mocked(serviceCall).mockImplementation(mockServiceCall);
+
+            view.onAjaxCall = vi.fn(() => true);
+            view.populate();
+
+            expect(mockServiceCall).toHaveBeenCalled();
+            expect(view.onAjaxCall).toHaveBeenCalled();
         });
     });
 
@@ -872,6 +1035,29 @@ describe("RemoteView", () => {
             view.setPagingOptions({ page: 3 });
 
             expect(view.seekToPage).toBe(3); // page changes seekToPage, not immediate page
+        });
+
+        it("handles page changes with zero rowsPerPage", () => {
+            const viewNoPaging = new RemoteView({
+                idField: "id",
+                rowsPerPage: 0
+            });
+
+            viewNoPaging.setPagingOptions({ page: 5 });
+            expect(viewNoPaging.seekToPage).toBe(1); // Should set to 1 when rowsPerPage is 0
+        });
+
+        it("handles page changes with totalCount", () => {
+            view['totalCount'] = 100; // Set total count
+            view.setPagingOptions({ page: 20 }); // Try to go beyond max pages
+
+            // Max pages = ceil(100/10) + 1 = 11, so should be clamped to 11
+            expect(view.seekToPage).toBe(11);
+        });
+
+        it("handles negative page numbers", () => {
+            view.setPagingOptions({ page: -1 });
+            expect(view.seekToPage).toBe(1); // Should clamp to 1
         });
     });
 
