@@ -279,68 +279,39 @@ export class FilterPanel<P = {}> extends FilterWidgetBase<P> {
     }
 
     protected addEmptyRow(popupField: boolean): HTMLElement {
-        var emptyRow = this.findEmptyRow();
+        const emptyRow = this.findEmptyRow();
 
         if (emptyRow != null) {
-            emptyRow.querySelector<HTMLInputElement>('input.field-select')?.focus();
-            if (popupField) {
-                Combobox.getInstance(emptyRow?.querySelector("input.field-select"))?.openDropdown();
-            }
+            const fieldSelect = emptyRow.querySelector<HTMLInputElement>('input.field-select');
+            fieldSelect?.focus();
+            popupField && Combobox.getInstance(fieldSelect)?.openDropdown();
             return emptyRow;
         }
 
-        var isLastRowOr = !!this.rowsDiv.lastElementChild?.querySelector('a.andor.or');
-
-        var row = this.rowsDiv.appendChild(document.createElement("div"));
-        row.classList.add("filter-line");
-        row.innerHTML = "<a class='delete'><span></span></a>" +
-            "<div class='l'>" +
-            "<a class='rightparen' href='#'>)</a>" +
-            "<a class='andor' href='#'></a>" +
-            "<a class='leftparen' href='#'>(</a>" +
-            "</div>" +
-            "<div class='f'>" +
-            "<input type='hidden' class='field-select'>" +
-            "</div>" +
-            "<div class='o'></div>" +
-            "<div class='v'></div>" +
-            "<div style='clear: both'></div>";
-
-        var parenDiv = row.querySelector<HTMLElement>('div.l');
-        parenDiv.style.display = "none";
-
-        parenDiv.querySelectorAll('a.leftparen, a.rightparen').forEach(el =>
-            Fluent.on(el, "click", this.leftRightParenClick.bind(this)));
-
-        var andor = parenDiv.querySelector<HTMLElement>('a.andor');
-        andor.setAttribute('title', localText('Controls.FilterPanel.ChangeAndOr'));
-        if (isLastRowOr) {
-            andor.classList.add('or');
-            andor.textContent = localText('Controls.FilterPanel.Or');
-        }
-        else {
-            andor.textContent = localText('Controls.FilterPanel.And');
-        }
-
-        Fluent.on(andor, "click", this.andOrClick.bind(this));
-        var del = row.querySelector('a.delete');
-        del.setAttribute('title', localText('Controls.FilterPanel.RemoveField'));
-        Fluent.on(del, "click", this.deleteRowClick.bind(this));
-
-        new FilterFieldSelect({
-            fields: this.get_store().get_fields(),
-            element: row.querySelector<HTMLInputElement>('div.f input')
-        }).changeSelect2(e => this.onRowFieldChange(e));
-
-        this.updateParens();
+        const isLastRowOr = !!this.rowsDiv.lastElementChild?.querySelector('a.andor.or');
+        const fieldSelect = <input class="field-select" type="hidden" /> as HTMLInputElement;
+        const row = this.rowsDiv.appendChild(
+            <div class="filter-line">
+                <a class="delete" title={localText('Controls.FilterPanel.RemoveField')}
+                    onClick={this.deleteRowClick.bind(this)}><span></span></a>
+                <div class="l" style="display: none">
+                    <a class="rightparen" href="#" onClick={this.leftRightParenClick.bind(this)}>)</a>
+                    <a class={["andor", isLastRowOr && "or"]} href="#"
+                        title={localText('Controls.FilterPanel.ChangeAndOr')} onClick={this.andOrClick.bind(this)}>
+                        {localText('Controls.FilterPanel.' + (isLastRowOr ? 'Or' : 'And'))}
+                    </a>
+                    <a class="leftparen" href="#" onClick={this.leftRightParenClick.bind(this)}>(</a>
+                </div>
+                <div class="f">
+                    {fieldSelect}
+                </div>
+                <div class="o"></div>
+                <div class="v"></div>
+            </div>) as HTMLElement;
+        new FilterFieldSelect({ element: fieldSelect, fields: this.get_store().get_fields() }).changeSelect2(this.onRowFieldChange.bind(this));
         this.updateButtons();
-
-        row.querySelector<HTMLInputElement>('input.field-select')?.focus();
-
-        if (popupField) {
-            Combobox.getInstance(row.querySelector("input.field-select"))?.openDropdown();
-        }
-
+        fieldSelect.focus();
+        popupField && Combobox.getInstance(fieldSelect)?.openDropdown();
         return row;
     }
 
