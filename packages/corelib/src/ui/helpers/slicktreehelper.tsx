@@ -1,4 +1,4 @@
-import { RemoteView } from "../../slick";
+import { IRemoteView, RemoteView } from "../../slick";
 
 export namespace SlickTreeHelper {
     export function filterCustom<TItem>(item: TItem, getParent: (x: TItem) => any): boolean {
@@ -17,7 +17,7 @@ export namespace SlickTreeHelper {
         return true;
     }
 
-    export function filterById<TItem>(item: TItem, view: RemoteView<TItem>,
+    export function filterById<TItem>(item: TItem, view: IRemoteView<TItem>,
         getParentId: (x: TItem) => any): boolean {
         return filterCustom(item, function (x) {
             var parentId = getParentId(x);
@@ -72,13 +72,13 @@ export namespace SlickTreeHelper {
     }
 
     export function toggleClick<TItem>(e: Event, row: number, cell: number,
-        view: RemoteView<TItem>, getId: (x: TItem) => any): void {
+        view: IRemoteView<TItem>, getId: (x: TItem) => any): void {
         var target = e.target as HTMLElement;
         if (!target.classList.contains('s-TreeToggle')) {
             return;
         }
         if (target.classList.contains('s-TreeCollapse') || target.classList.contains('s-TreeExpand')) {
-            var item = view.getItem(row);
+            var item = view.getItem(row) as any;
             if (item != null) {
                 if (!!!item._collapsed) {
                     item._collapsed = true;

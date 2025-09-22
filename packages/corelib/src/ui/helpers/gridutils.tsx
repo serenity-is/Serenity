@@ -1,6 +1,6 @@
-import { Grid, RowMoveManager } from "@serenity-is/sleekgrid";
+import { Grid, IDataView, RowMoveManager } from "@serenity-is/sleekgrid";
 import { Fluent, SaveRequest, isArrayLike, localText, serviceRequest } from "../../base";
-import { RemoteView } from "../../slick";
+import { IRemoteView, RemoteView } from "../../slick";
 import { IDataGrid } from "../datagrid/idatagrid";
 import { QuickSearchField, QuickSearchInput } from "../datagrid/quicksearchinput";
 
@@ -21,13 +21,13 @@ export namespace GridUtils {
     }
 
     export function addIncludeDeletedToggle(toolDiv: HTMLElement | ArrayLike<HTMLElement>,
-        view: RemoteView<any>, hint?: string, initial?: boolean): void {
+        view: IRemoteView<any>, hint?: string, initial?: boolean): void {
 
         var includeDeleted = false;
         var oldSubmit = view.onSubmit;
         view.onSubmit = function (v) {
             v.params.IncludeDeleted = includeDeleted;
-            if (oldSubmit != null) {
+            if (oldSubmit != null) {""
                 return oldSubmit(v);
             }
             return true;
@@ -50,7 +50,7 @@ export namespace GridUtils {
     }
 
     export function addQuickSearchInput(toolDiv: HTMLElement | ArrayLike<HTMLElement>,
-        view: RemoteView<any>, fields?: QuickSearchField[], onChange?: () => void): QuickSearchInput {
+        view: IRemoteView<any>, fields?: QuickSearchField[], onChange?: () => void): QuickSearchInput {
 
         var oldSubmit = view.onSubmit;
         var input: QuickSearchInput;

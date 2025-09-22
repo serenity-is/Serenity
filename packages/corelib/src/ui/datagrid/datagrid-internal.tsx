@@ -2,7 +2,7 @@
 import { ArgsSort, Grid } from "@serenity-is/sleekgrid";
 import { isInstanceOfType, PropertyItem, tryGetText } from "../../base";
 import { deepClone } from "../../compat";
-import { RemoteView } from "../../slick/remoteview";
+import { IRemoteView } from "../../slick/remoteview";
 import { BooleanFiltering } from "../filtering/booleanfiltering";
 import { DateFiltering } from "../filtering/datefiltering";
 import { DateTimeFiltering } from "../filtering/datetimefiltering";
@@ -109,7 +109,7 @@ export function propertyItemToQuickFilter(item: PropertyItem): QuickFilter<any, 
     return result;
 }
 
-export function slickGridOnSort(this: void, view: RemoteView<any>, p: ArgsSort) {
+export function slickGridOnSort(this: void, view: IRemoteView<any>, p: ArgsSort) {
     view.populateLock();
     try {
         var sortBy = [];

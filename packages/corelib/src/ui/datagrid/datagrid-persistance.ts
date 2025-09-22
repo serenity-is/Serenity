@@ -1,6 +1,6 @@
 import { Column, Grid } from "@serenity-is/sleekgrid";
 import { cssEscape, Fluent, localText } from "../../base";
-import { RemoteView } from "../../slick";
+import { IRemoteView } from "../../slick";
 import { EditorUtils } from "../editors/editorutils";
 import { FilterDisplayBar } from "../filtering/filterdisplaybar";
 import { FilterLine } from "../filtering/filterline";
@@ -165,7 +165,7 @@ export function restoreSettingsFrom(this: void, opt: {
     settings: PersistedGridSettings,
     toolbar: Toolbar,
     uniqueName: string,
-    view: RemoteView<any>
+    view: IRemoteView<any>
 }) {
     let columns = opt.slickGrid.getColumns();
     let colById: { [key: string]: Column } = null;

@@ -2,7 +2,7 @@ import { ArgsCell, AutoTooltips, Column, ColumnSort, FormatterContext, Grid, Gri
 import { Authorization, Criteria, Fluent, ListResponse, cssEscape, debounce, getInstanceType, getTypeFullName, getjQuery, nsSerenity, tryGetText, type PropertyItem, type PropertyItemsData } from "../../base";
 import { LayoutTimer, ScriptData, getColumnsData, getColumnsDataAsync, setEquality } from "../../compat";
 import { IReadOnly } from "../../interfaces";
-import { Format, PagerOptions, RemoteView, RemoteViewOptions } from "../../slick";
+import { Format, IRemoteView, PagerOptions, RemoteView, RemoteViewOptions } from "../../slick";
 import { FilterableAttribute } from "../../types/attributes";
 import { DateEditor } from "../editors/dateeditor";
 import { SelectEditor } from "../editors/selecteditor";
@@ -45,7 +45,7 @@ export class DataGrid<TItem, P = {}> extends Widget<P> implements IDataGrid, IRe
     declare protected propertyItemsData: PropertyItemsData;
     declare protected initialSettings: PersistedGridSettings;
     declare protected restoringSettings: number;
-    declare public view: RemoteView<TItem>;
+    declare public view: IRemoteView<TItem>;
     declare public slickGrid: Grid;
     declare public openDialogsAsPanel: boolean;
 
@@ -559,7 +559,7 @@ export class DataGrid<TItem, P = {}> extends Widget<P> implements IDataGrid, IRe
         return Fluent(<div class="grid-container" />).appendTo(this.domNode);
     }
 
-    protected createView(): RemoteView<TItem> {
+    protected createView(): IRemoteView<TItem> {
         var opt = this.getViewOptions();
         return new RemoteView<TItem>(opt) as any;
     }
@@ -1117,7 +1117,7 @@ export class DataGrid<TItem, P = {}> extends Widget<P> implements IDataGrid, IRe
         return this.slickGrid;
     }
 
-    getView(): RemoteView<TItem> {
+    getView(): IRemoteView<TItem> {
         return this.view;
     }
 

@@ -1,7 +1,7 @@
 import { FormatterContext, FormatterResult } from "@serenity-is/sleekgrid";
 import { htmlEncode } from "../../base";
 import { replaceAll } from "../../compat";
-import { Format, RemoteView } from "../../slick";
+import { Format, IRemoteView, RemoteView } from "../../slick";
 
 export namespace SlickFormatting {
     
@@ -43,7 +43,7 @@ export namespace SlickFormatting {
         }
     }
 
-    export function treeToggle(getView: () => RemoteView<any>, getId: (x: any) => any,
+    export function treeToggle(getView: () => IRemoteView<any>, getId: (x: any) => any,
         formatter: Format): Format {
         return function (ctx: FormatterContext): FormatterResult {
             const text = formatter(ctx);
