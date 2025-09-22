@@ -2,7 +2,7 @@
 import { ArgsSort, Grid } from "@serenity-is/sleekgrid";
 import { isInstanceOfType, PropertyItem, tryGetText } from "../../base";
 import { deepClone } from "../../compat";
-import { IRemoteView } from "../../slick/remoteview";
+import { IRemoteView } from "../../slick";
 import { BooleanFiltering } from "../filtering/booleanfiltering";
 import { DateFiltering } from "../filtering/datefiltering";
 import { DateTimeFiltering } from "../filtering/datetimefiltering";

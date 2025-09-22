@@ -3275,91 +3275,6 @@ export interface PagingOptions {
 	page?: number;
 }
 /**
- * Options for configuring a RemoteView instance
- */
-export interface RemoteViewOptions<TItem = any> {
-	/** Automatically load data (call populate) on initialization */
-	autoLoad?: boolean;
-	/** HTTP content type for service requests */
-	contentType?: string;
-	/** Expected data type of the service response */
-	dataType?: string;
-	/** Error message to display when requests fail */
-	errormsg?: string;
-	/** Filter criteria or function to apply to the data */
-	filter?: RemoteViewFilter<TItem>;
-	/** Callback function to get metadata for individual items */
-	getItemMetadata?: (item: TItem, row: number) => ItemMetadata<TItem>;
-	/** Provider for group item metadata in grouped views */
-	groupItemMetadataProvider?: GroupItemMetadataProvider;
-	/** Name of the field containing unique item identifiers */
-	idField?: string;
-	/** Whether to perform sorting locally instead of server-side */
-	localSort?: boolean;
-	/** HTTP method to use for service requests */
-	method?: string;
-	/** Callback function invoked before AJAX calls are made */
-	onAjaxCall?: RemoteViewAjaxCallback<TItem>;
-	/** Callback function to process data received from the server */
-	onProcessData?: RemoteViewProcessCallback<TItem>;
-	/** Callback function invoked before submitting service requests */
-	onSubmit?: CancellableViewCallback<TItem>;
-	/** Additional parameters to include in service requests */
-	params?: Record<string, object>;
-	/** Number of rows to display per page (0 for no paging) */
-	rowsPerPage?: number;
-	/** Initial page number to seek to on first load */
-	seekToPage?: number;
-	/** Initial sort criteria for the data */
-	sortBy?: string | string[];
-	/** URL of the service endpoint for data requests */
-	url?: string;
-}
-/**
- * Information about the current paging state of the view
- */
-export interface PagingInfo {
-	/** Reference to the RemoteView instance */
-	dataView: RemoteView<any>;
-	/** Current error message, if any */
-	error: string;
-	/** Whether data is currently being loaded */
-	loading: boolean;
-	/** Current page number (1-based) */
-	page: number;
-	/** Number of rows displayed per page */
-	rowsPerPage: number;
-	/** Total number of items available */
-	totalCount: number;
-}
-/**
- * Callback function that can cancel a view operation
- * @param view The RemoteView instance
- * @returns true to continue, false to cancel
- */
-export type CancellableViewCallback<TItem> = (view: RemoteView<TItem>) => boolean | void;
-/**
- * Callback function for AJAX calls made by the view
- * @param view The RemoteView instance
- * @param options The service options for the AJAX call
- * @returns true to continue, false to cancel
- */
-export type RemoteViewAjaxCallback<TItem> = (view: RemoteView<TItem>, options: ServiceOptions<ListResponse<TItem>>) => boolean | void;
-/**
- * Filter function for items in the view
- * @param item The item to test
- * @param view The RemoteView instance
- * @returns true if the item should be included
- */
-export type RemoteViewFilter<TItem> = (item: TItem, view: RemoteView<TItem>) => boolean;
-/**
- * Callback function for processing data received from the server
- * @param data The raw data response
- * @param view The RemoteView instance
- * @returns The processed data
- */
-export type RemoteViewProcessCallback<TItem> = (data: ListResponse<TItem>, view: RemoteView<TItem>) => ListResponse<TItem>;
-/**
  * Interface for an extension of IDataView that support remote data loading
  */
 export interface IRemoteView<TItem = any> extends IDataView<TItem> {
@@ -3612,6 +3527,50 @@ export interface IRemoteView<TItem = any> extends IDataView<TItem> {
 	url: string;
 }
 /**
+ * Information about the current paging state of the view
+ */
+export interface PagingInfo {
+	/** Reference to the RemoteView instance */
+	dataView: IRemoteView<any>;
+	/** Current error message, if any */
+	error: string;
+	/** Whether data is currently being loaded */
+	loading: boolean;
+	/** Current page number (1-based) */
+	page: number;
+	/** Number of rows displayed per page */
+	rowsPerPage: number;
+	/** Total number of items available */
+	totalCount: number;
+}
+/**
+ * Callback function that can cancel a view operation
+ * @param view The RemoteView instance
+ * @returns true to continue, false to cancel
+ */
+export type CancellableViewCallback<TItem> = (view: IRemoteView<TItem>) => boolean | void;
+/**
+ * Callback function for AJAX calls made by the view
+ * @param view The RemoteView instance
+ * @param options The service options for the AJAX call
+ * @returns true to continue, false to cancel
+ */
+export type RemoteViewAjaxCallback<TItem> = (view: IRemoteView<TItem>, options: ServiceOptions<ListResponse<TItem>>) => boolean | void;
+/**
+ * Filter function for items in the view
+ * @param item The item to test
+ * @param view The RemoteView instance
+ * @returns true if the item should be included
+ */
+export type RemoteViewFilter<TItem> = (item: TItem, view: IRemoteView<TItem>) => boolean;
+/**
+ * Callback function for processing data received from the server
+ * @param data The raw data response
+ * @param view The RemoteView instance
+ * @returns The processed data
+ */
+export type RemoteViewProcessCallback<TItem> = (data: ListResponse<TItem>, view: IRemoteView<TItem>) => ListResponse<TItem>;
+/**
  * A data view that supports remote data loading, sorting, filtering, grouping, and paging.
  * Extends the functionality of SlickGrid's DataView with server-side data operations.
  *
@@ -3667,23 +3626,23 @@ export declare class RemoteView<TItem = any> implements IRemoteView<TItem> {
 	/** Callback invoked before submitting a request, can cancel the operation */
 	onSubmit: CancellableViewCallback<TItem>;
 	/** Event fired when the underlying data changes */
-	readonly onDataChanged: EventEmitter<any, IEventData>;
+	readonly onDataChanged: EventEmitter<any, import("@serenity-is/sleekgrid").IEventData>;
 	/** Event fired when data loading completes */
-	readonly onDataLoaded: EventEmitter<any, IEventData>;
+	readonly onDataLoaded: EventEmitter<any, import("@serenity-is/sleekgrid").IEventData>;
 	/** Event fired when data loading begins */
-	readonly onDataLoading: EventEmitter<any, IEventData>;
+	readonly onDataLoading: EventEmitter<any, import("@serenity-is/sleekgrid").IEventData>;
 	/** Event fired when a group is collapsed */
-	readonly onGroupCollapsed: EventEmitter<any, IEventData>;
+	readonly onGroupCollapsed: EventEmitter<any, import("@serenity-is/sleekgrid").IEventData>;
 	/** Event fired when a group is expanded */
-	readonly onGroupExpanded: EventEmitter<any, IEventData>;
+	readonly onGroupExpanded: EventEmitter<any, import("@serenity-is/sleekgrid").IEventData>;
 	/** Event fired when paging information changes */
-	readonly onPagingInfoChanged: EventEmitter<any, IEventData>;
+	readonly onPagingInfoChanged: EventEmitter<any, import("@serenity-is/sleekgrid").IEventData>;
 	/** Event fired when the row count changes */
-	readonly onRowCountChanged: EventEmitter<any, IEventData>;
+	readonly onRowCountChanged: EventEmitter<any, import("@serenity-is/sleekgrid").IEventData>;
 	/** Event fired when specific rows change */
-	readonly onRowsChanged: EventEmitter<any, IEventData>;
+	readonly onRowsChanged: EventEmitter<any, import("@serenity-is/sleekgrid").IEventData>;
 	/** Event fired when rows or count change */
-	readonly onRowsOrCountChanged: EventEmitter<any, IEventData>;
+	readonly onRowsOrCountChanged: EventEmitter<any, import("@serenity-is/sleekgrid").IEventData>;
 	constructor(options: RemoteViewOptions<TItem>);
 	/** Default configuration for grouping information */
 	static readonly groupingInfoDefaults: GroupInfo<any>;
@@ -3958,7 +3917,7 @@ export declare class RemoteView<TItem = any> implements IRemoteView<TItem> {
 	 *     changes.  This is useful since, in combination with the above two options, it allows
 	 *     access to the full list selected row ids, and not just the ones visible to the grid.
 	 */
-	syncGridSelection(grid: Grid, preserveHidden: boolean, preserveHiddenOnSelectionChange: boolean): EventEmitter<any, IEventData>;
+	syncGridSelection(grid: Grid, preserveHidden: boolean, preserveHiddenOnSelectionChange: boolean): EventEmitter<any, import("@serenity-is/sleekgrid").IEventData>;
 	/**
 	 * Syncs cell CSS styles between the grid and the data view.
 	 * @param grid The grid to sync styles with
@@ -3996,6 +3955,47 @@ export declare class RemoteView<TItem = any> implements IRemoteView<TItem> {
 	setGroupItemMetadataProvider(value: GroupItemMetadataProvider): void;
 	/** @deprecated Gets the ID property name, for compatibility */
 	get idField(): string;
+}
+/**
+ * Options for configuring a RemoteView instance
+ */
+export interface RemoteViewOptions<TItem = any> {
+	/** Automatically load data (call populate) on initialization */
+	autoLoad?: boolean;
+	/** HTTP content type for service requests */
+	contentType?: string;
+	/** Expected data type of the service response */
+	dataType?: string;
+	/** Error message to display when requests fail */
+	errormsg?: string;
+	/** Filter criteria or function to apply to the data */
+	filter?: RemoteViewFilter<TItem>;
+	/** Callback function to get metadata for individual items */
+	getItemMetadata?: (item: TItem, row: number) => ItemMetadata<TItem>;
+	/** Provider for group item metadata in grouped views */
+	groupItemMetadataProvider?: GroupItemMetadataProvider;
+	/** Name of the field containing unique item identifiers */
+	idField?: string;
+	/** Whether to perform sorting locally instead of server-side */
+	localSort?: boolean;
+	/** HTTP method to use for service requests */
+	method?: string;
+	/** Callback function invoked before AJAX calls are made */
+	onAjaxCall?: RemoteViewAjaxCallback<TItem>;
+	/** Callback function to process data received from the server */
+	onProcessData?: RemoteViewProcessCallback<TItem>;
+	/** Callback function invoked before submitting service requests */
+	onSubmit?: CancellableViewCallback<TItem>;
+	/** Additional parameters to include in service requests */
+	params?: Record<string, object>;
+	/** Number of rows to display per page (0 for no paging) */
+	rowsPerPage?: number;
+	/** Initial page number to seek to on first load */
+	seekToPage?: number;
+	/** Initial sort criteria for the data */
+	sortBy?: string | string[];
+	/** URL of the service endpoint for data requests */
+	url?: string;
 }
 export declare class IBooleanValue {
 	static [Symbol.typeInfo]: InterfaceTypeInfo<"Serenity.">;
