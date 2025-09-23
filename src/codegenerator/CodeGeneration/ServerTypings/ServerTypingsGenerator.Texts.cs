@@ -157,6 +157,10 @@ public partial class ServerTypingsGenerator : TypingsGeneratorBase
                         sb.Append(part);
                         fullClassNames.Add(string.Join(".", stack.Take(level + 1)));
                         cw.StartBrace();
+
+                        cw.IndentedLine($"export function keysOf(): typeof {part};");
+                        cw.IndentedLine($"export function tryGet(): typeof {part};");
+                        cw.AppendLine();
                     }
                     stackCount = parts.Length - 1;
 
@@ -193,7 +197,7 @@ public partial class ServerTypingsGenerator : TypingsGeneratorBase
                         }
                         else
                         {
-                            cw.Indented("export const ");
+                            cw.Indented($"{(CodeWriter.IsJSKeyword(part) ? "// js keyword!: " : "")}export const ");
                             sb.Append(part);
                             sb.AppendLine(": string;");
                         }
@@ -211,7 +215,7 @@ public partial class ServerTypingsGenerator : TypingsGeneratorBase
             sb.AppendLine();
             var proxyTexts = ImportFromQ("proxyTexts");
 
-            sb.Append($"{(exportTexts ? "export ": "")}const Texts: typeof texts = {proxyTexts}({{}}, '', ");
+            sb.Append($"{(exportTexts ? "export " : "")}const Texts: typeof texts = {proxyTexts}({{}}, '', ");
             jw.Flush();
             sb.Append(string.Join("\n", jwBuilder.ToString().Split('\n')));
             sb.AppendLine(") as any;");

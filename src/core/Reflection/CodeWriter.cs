@@ -409,6 +409,86 @@ public class CodeWriter(StringBuilder sb, int tabSize)
     }
 
     /// <summary>
+    /// Returns true if the identifier is a reserved JavaScript keyword
+    /// </summary>
+    /// <param name="identifier">Identifier</param>
+    public static bool IsJSKeyword(string identifier)
+    {
+        return JsReserved.Contains(identifier);
+    }
+
+    private static readonly HashSet<string> JsReserved = [
+        "abstract",
+        "arguments",
+        "as",
+        "async",
+        "await",
+        "boolean",
+        "break",
+        "case",
+        "catch",
+        "class",
+        "const",
+        "continue",
+        "debugger",
+        "default",
+        "delete",
+        "do",
+        "double",
+        "else",
+        "enum",
+        "eval",
+        "export",
+        "extends",
+        "false",
+        "final",
+        "finally",
+        "float",
+        "for",
+        "function",
+        "get",
+        "goto",
+        "if",
+        "implements",
+        "import",
+        "in",
+        "instanceof",
+        "int",
+        "interface",
+        "let",
+        "long",
+        "native",
+        "new",
+        "null",
+        "of",
+        "package",
+        "private",
+        "protected",
+        "public",
+        "return",
+        "set",
+        "short",
+        "static",
+        "super",
+        "switch",
+        "synchronized",
+        "this",
+        "throw",
+        "throws",
+        "transient",
+        "true",
+        "try",
+        "typeof",
+        "var",
+        "void",
+        "volatile",
+        "while",
+        "with",
+        "yield"
+    ];
+
+
+    /// <summary>
     /// Converts primitive class to C# keyword if given class is not a primitive class returns null.
     /// </summary>
     /// <param name="dataType"></param>
