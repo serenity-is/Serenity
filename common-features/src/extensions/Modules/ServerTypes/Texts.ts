@@ -10,6 +10,8 @@ namespace texts {
             namespace UserPreference {
                 export function asKey(): typeof UserPreference;
                 export function asTry(): typeof UserPreference;
+                export const EntityPlural: string;
+                export const EntitySingular: string;
                 export const Name: string;
                 export const PreferenceType: string;
                 export const UserId: string;

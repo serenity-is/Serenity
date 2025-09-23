@@ -13,6 +13,8 @@ namespace texts {
                 export const CategoryID: string;
                 export const CategoryName: string;
                 export const Description: string;
+                export const EntityPlural: string;
+                export const EntitySingular: string;
                 export const PicturePath: string;
             }
             namespace CategoryLang {
@@ -21,6 +23,8 @@ namespace texts {
                 export const CategoryId: string;
                 export const CategoryName: string;
                 export const Description: string;
+                export const EntityPlural: string;
+                export const EntitySingular: string;
                 export const Id: string;
                 export const LanguageId: string;
             }
@@ -35,6 +39,8 @@ namespace texts {
                 export const Country: string;
                 export const CustomerID: string;
                 export const Email: string;
+                export const EntityPlural: string;
+                export const EntitySingular: string;
                 export const Fax: string;
                 export const LastContactDate: string;
                 export const LastContactedBy: string;
@@ -51,6 +57,8 @@ namespace texts {
                 export const CustomerCompanyName: string;
                 export const CustomerID: string;
                 export const CustomerTypeID: string;
+                export const EntityPlural: string;
+                export const EntitySingular: string;
                 export const ID: string;
             }
             namespace CustomerDemographic {
@@ -58,6 +66,8 @@ namespace texts {
                 export function asTry(): typeof CustomerDemographic;
                 export const CustomerDesc: string;
                 export const CustomerTypeID: string;
+                export const EntityPlural: string;
+                export const EntitySingular: string;
                 export const ID: string;
             }
             namespace CustomerDetails {
@@ -65,6 +75,8 @@ namespace texts {
                 export function asTry(): typeof CustomerDetails;
                 export const CustomerID: string;
                 export const Email: string;
+                export const EntityPlural: string;
+                export const EntitySingular: string;
                 export const LastContactDate: string;
                 export const LastContactedBy: string;
                 export const LastContactedByFullName: string;
@@ -75,6 +87,8 @@ namespace texts {
                 export function asTry(): typeof CustomerGrossSales;
                 export const ContactName: string;
                 export const CustomerId: string;
+                export const EntityPlural: string;
+                export const EntitySingular: string;
                 export const GrossAmount: string;
                 export const ProductId: string;
                 export const ProductName: string;
@@ -84,6 +98,8 @@ namespace texts {
                 export function asTry(): typeof CustomerRepresentatives;
                 export const CustomerId: string;
                 export const EmployeeId: string;
+                export const EntityPlural: string;
+                export const EntitySingular: string;
                 export const RepresentativeId: string;
             }
             namespace Employee {
@@ -94,6 +110,8 @@ namespace texts {
                 export const City: string;
                 export const Country: string;
                 export const EmployeeID: string;
+                export const EntityPlural: string;
+                export const EntitySingular: string;
                 export const Extension: string;
                 export const FirstName: string;
                 export const FullName: string;
@@ -116,6 +134,8 @@ namespace texts {
                 export function asTry(): typeof EmployeeTerritory;
                 export const EmployeeFullName: string;
                 export const EmployeeID: string;
+                export const EntityPlural: string;
+                export const EntitySingular: string;
                 export const TerritoryDescription: string;
                 export const TerritoryID: string;
             }
@@ -123,6 +143,8 @@ namespace texts {
                 export function asKey(): typeof Note;
                 export function asTry(): typeof Note;
                 export const EntityId: string;
+                export const EntityPlural: string;
+                export const EntitySingular: string;
                 export const EntityType: string;
                 export const InsertDate: string;
                 export const InsertUserDisplayName: string;
@@ -146,6 +168,8 @@ namespace texts {
                 export const EmployeeFullName: string;
                 export const EmployeeGender: string;
                 export const EmployeeID: string;
+                export const EntityPlural: string;
+                export const EntitySingular: string;
                 export const Freight: string;
                 export const OrderDate: string;
                 export const OrderID: string;
@@ -166,6 +190,8 @@ namespace texts {
                 export function asTry(): typeof OrderDetail;
                 export const DetailID: string;
                 export const Discount: string;
+                export const EntityPlural: string;
+                export const EntitySingular: string;
                 export const LineTotal: string;
                 export const OrderCustomerID: string;
                 export const OrderDate: string;
@@ -182,6 +208,8 @@ namespace texts {
                 export const CategoryID: string;
                 export const CategoryName: string;
                 export const Discontinued: string;
+                export const EntityPlural: string;
+                export const EntitySingular: string;
                 export const ProductID: string;
                 export const ProductImage: string;
                 export const ProductName: string;
@@ -197,6 +225,8 @@ namespace texts {
             namespace ProductLang {
                 export function asKey(): typeof ProductLang;
                 export function asTry(): typeof ProductLang;
+                export const EntityPlural: string;
+                export const EntitySingular: string;
                 export const Id: string;
                 export const LanguageId: string;
                 export const ProductId: string;
@@ -208,6 +238,8 @@ namespace texts {
                 export const CategoryID: string;
                 export const ChangingUserId: string;
                 export const Discontinued: string;
+                export const EntityPlural: string;
+                export const EntitySingular: string;
                 export const OperationType: string;
                 export const ProductID: string;
                 export const ProductImage: string;
@@ -225,6 +257,8 @@ namespace texts {
             namespace Region {
                 export function asKey(): typeof Region;
                 export function asTry(): typeof Region;
+                export const EntityPlural: string;
+                export const EntitySingular: string;
                 export const RegionDescription: string;
                 export const RegionID: string;
             }
@@ -233,6 +267,8 @@ namespace texts {
                 export function asTry(): typeof SalesByCategory;
                 export const CategoryId: string;
                 export const CategoryName: string;
+                export const EntityPlural: string;
+                export const EntitySingular: string;
                 export const ProductName: string;
                 export const ProductSales: string;
             }
@@ -240,6 +276,8 @@ namespace texts {
                 export function asKey(): typeof Shipper;
                 export function asTry(): typeof Shipper;
                 export const CompanyName: string;
+                export const EntityPlural: string;
+                export const EntitySingular: string;
                 export const Phone: string;
                 export const ShipperID: string;
             }
@@ -252,6 +290,8 @@ namespace texts {
                 export const ContactName: string;
                 export const ContactTitle: string;
                 export const Country: string;
+                export const EntityPlural: string;
+                export const EntitySingular: string;
                 export const Fax: string;
                 export const HomePage: string;
                 export const Phone: string;
@@ -262,6 +302,8 @@ namespace texts {
             namespace Territory {
                 export function asKey(): typeof Territory;
                 export function asTry(): typeof Territory;
+                export const EntityPlural: string;
+                export const EntitySingular: string;
                 export const RegionDescription: string;
                 export const RegionID: string;
                 export const TerritoryDescription: string;
@@ -307,4 +349,5 @@ const Texts: typeof texts = proxyTexts({}, '', {
     Validation: {}
 }) as any;
 
-export const NorthwindTexts = Texts;
+export const NorthwindDbTexts = Texts.Db.Northwind;
+export const NorthwindValidationTexts = Texts.Validation;

@@ -1,4 +1,4 @@
-﻿import { Dictionary, ServiceError, confirmDialog, localText, notifyError, notifySuccess, notifyWarning, stringFormat } from "@serenity-is/corelib";
+﻿import { Dictionary, ServiceError, confirmDialog, notifyError, notifySuccess, notifyWarning, stringFormat } from "@serenity-is/corelib";
 import { BasicProgressDialogTexts, BulkServiceActionTexts } from "../ServerTypes/Texts";
 import { BasicProgressDialog } from "./BasicProgressDialog";
 
@@ -70,8 +70,7 @@ export class BulkServiceAction {
         this.pendingRequests--;
         this.completedRequests++;
 
-        var title = localText((this.progressDialog.cancelled ?
-            BasicProgressDialogTexts.CancelTitle : BasicProgressDialogTexts.PleaseWait));
+        var title = this.progressDialog.cancelled ? BasicProgressDialogTexts.CancelTitle : BasicProgressDialogTexts.PleaseWait;
 
         title += ' (';
         if (this.successCount > 0) {

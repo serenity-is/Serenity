@@ -4,6 +4,7 @@ import { CustomerForm, CustomerRow, CustomerService } from "../ServerTypes/Demo"
 import { nsDemoNorthwind } from "../ServerTypes/Namespaces";
 import "./CustomerDialog.css";
 import { CustomerOrdersGrid } from "./CustomerOrdersGrid";
+import { NorthwindDbTexts } from "../ServerTypes/Texts";
 
 export class CustomerDialog<P = {}> extends EntityDialog<CustomerRow, P> {
     static [Symbol.typeInfo] = this.registerClass(nsDemoNorthwind);
@@ -62,9 +63,9 @@ export class CustomerDialog<P = {}> extends EntityDialog<CustomerRow, P> {
         return (
             <div id={id.Tabs} class="s-DialogContent">
                 <ul>
-                    <li><a href={'#' + id.TabInfo}><span>{localText("Db.Northwind.Customer.EntitySingular")}</span></a></li>
-                    <li><a href={'#' + id.TabNotes}><span>{localText("Db.Northwind.Note.EntityPlural")}</span></a></li>
-                    <li><a href={'#' + id.TabOrders}><span>{localText("Db.Northwind.Order.EntityPlural")}</span></a></li>
+                    <li><a href={'#' + id.TabInfo}><span>{NorthwindDbTexts.Customer.EntitySingular}</span></a></li>
+                    <li><a href={'#' + id.TabNotes}><span>{NorthwindDbTexts.Note.EntityPlural}</span></a></li>
+                    <li><a href={'#' + id.TabOrders}><span>{NorthwindDbTexts.Order.EntityPlural}</span></a></li>
                 </ul>
                 <div id={id.TabInfo} class="tab-pane s-TabInfo">
                     <div id={id.Toolbar} class="s-DialogToolbar">

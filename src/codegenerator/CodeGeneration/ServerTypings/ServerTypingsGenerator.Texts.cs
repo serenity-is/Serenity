@@ -61,6 +61,8 @@ public partial class ServerTypingsGenerator : TypingsGeneratorBase
     {
         foreach (var prop in EnumerateFieldProperties(type))
             localTextKeys.Add(prefix + prop.Name);
+        localTextKeys.Add(prefix + "EntityPlural");
+        localTextKeys.Add(prefix + "EntitySingular");
     }
 
     protected void GenerateTexts()

@@ -1,5 +1,6 @@
-import { StringEditor, WidgetProps, localText, replaceAll } from "@serenity-is/corelib";
+import { StringEditor, WidgetProps, replaceAll } from "@serenity-is/corelib";
 import { nsDemoNorthwind } from "../ServerTypes/Namespaces";
+import { NorthwindValidationTexts } from "../ServerTypes/Texts";
 
 export interface PhoneEditorOptions {
     multiple?: boolean;
@@ -55,7 +56,7 @@ export class PhoneEditor<P extends PhoneEditorOptions = PhoneEditorOptions> exte
         if (valid) {
             return null;
         }
-        return localText((isMultiple ? 'Validation.NorthwindPhoneMultiple' : 'Validation.NorthwindPhone'));
+        return isMultiple ? NorthwindValidationTexts.NorthwindPhoneMultiple : NorthwindValidationTexts.NorthwindPhone;
     }
 
     static isValidPhone(phone: string) {

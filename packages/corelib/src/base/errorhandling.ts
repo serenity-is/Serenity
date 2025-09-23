@@ -25,7 +25,7 @@ export namespace ErrorHandling {
         if (!errorInfo.responseText) {
             if (!errorInfo.status) {
                 if (errorInfo.statusText != "abort")
-                    showMessage(localText("Services.UnknownConnectionEror", "An error occured while connecting to the server.") + seeBrowserConsole);
+                    showMessage(localText("Services.UnknownConnectionError", "An error occured while connecting to the server.") + seeBrowserConsole);
             }
             else if (errorInfo.status == 500)
                 showMessage(localText("Services.InternalServerError", "Internal Server Error (500).") + seeBrowserConsole);

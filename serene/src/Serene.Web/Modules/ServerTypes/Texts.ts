@@ -10,18 +10,24 @@ namespace texts {
             namespace Language {
                 export function asKey(): typeof Language;
                 export function asTry(): typeof Language;
+                export const EntityPlural: string;
+                export const EntitySingular: string;
                 export const LanguageId: string;
                 export const LanguageName: string;
             }
             namespace Role {
                 export function asKey(): typeof Role;
                 export function asTry(): typeof Role;
+                export const EntityPlural: string;
+                export const EntitySingular: string;
                 export const RoleId: string;
                 export const RoleName: string;
             }
             namespace RolePermission {
                 export function asKey(): typeof RolePermission;
                 export function asTry(): typeof RolePermission;
+                export const EntityPlural: string;
+                export const EntitySingular: string;
                 export const PermissionKey: string;
                 export const RoleId: string;
                 export const RoleName: string;
@@ -32,6 +38,8 @@ namespace texts {
                 export function asTry(): typeof User;
                 export const DisplayName: string;
                 export const Email: string;
+                export const EntityPlural: string;
+                export const EntitySingular: string;
                 export const InsertDate: string;
                 export const InsertUserId: string;
                 export const IsActive: string;
@@ -51,6 +59,8 @@ namespace texts {
             namespace UserPermission {
                 export function asKey(): typeof UserPermission;
                 export function asTry(): typeof UserPermission;
+                export const EntityPlural: string;
+                export const EntitySingular: string;
                 export const Granted: string;
                 export const PermissionKey: string;
                 export const User: string;
@@ -61,6 +71,8 @@ namespace texts {
             namespace UserRole {
                 export function asKey(): typeof UserRole;
                 export function asTry(): typeof UserRole;
+                export const EntityPlural: string;
+                export const EntitySingular: string;
                 export const RoleId: string;
                 export const RoleName: string;
                 export const User: string;

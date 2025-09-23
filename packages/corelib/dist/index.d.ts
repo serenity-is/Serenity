@@ -2278,7 +2278,7 @@ export declare function registerType(type: {
 }): void;
 export interface TransformInclude {
 }
-declare namespace serenityServicesTexts {
+declare namespace servicesTexts {
 	namespace Controls {
 		function asKey(): typeof Controls;
 		function asTry(): typeof Controls;
@@ -2347,10 +2347,10 @@ declare namespace serenityServicesTexts {
 		const UnexpectedError: string;
 	}
 }
-export declare const DataValidationTexts: typeof serenityServicesTexts.Validation;
-export declare const FileUploadTexts: typeof serenityServicesTexts.Controls.ImageUpload;
-export declare const ImageCheckResultTexts: typeof serenityServicesTexts.Enums.ImageCheckResult;
-declare namespace serenityWebTexts {
+export declare const DataValidationTexts: typeof servicesTexts.Validation;
+export declare const FileUploadTexts: typeof servicesTexts.Controls.ImageUpload;
+export declare const ImageCheckResultTexts: typeof servicesTexts.Enums.ImageCheckResult;
+declare namespace webTexts {
 	namespace Controls {
 		function asKey(): typeof Controls;
 		function asTry(): typeof Controls;
@@ -2405,6 +2405,8 @@ declare namespace serenityWebTexts {
 			const IncludeDeletedToggle: string;
 			const NewButton: string;
 			const RefreshButton: string;
+			const SaveChangesButton: string;
+			const UndoChangesButton: string;
 		}
 		namespace FilterPanel {
 			function asKey(): typeof FilterPanel;
@@ -2550,18 +2552,18 @@ declare namespace serenityWebTexts {
 		const Xss: string;
 	}
 }
-export declare const CheckTreeEditorTexts: typeof serenityWebTexts.Controls.CheckTreeEditor;
-export declare const ColumnPickerDialogTexts: typeof serenityWebTexts.Controls.ColumnPickerDialog;
-export declare const DataGridTexts: typeof serenityWebTexts.Controls.DataGrid;
-export declare const DateTimeEditorTexts: typeof serenityWebTexts.Controls.DateTimeEditor;
-export declare const EntityDialogTexts: typeof serenityWebTexts.Controls.EntityDialog;
-export declare const EntityGridTexts: typeof serenityWebTexts.Controls.EntityGrid;
-export declare const FilterPanelTexts: typeof serenityWebTexts.Controls.FilterPanel;
-export declare const FormValidationTexts: typeof serenityWebTexts.Validation;
-export declare const PagerTexts: typeof serenityWebTexts.Controls.Pager;
-export declare const PropertyGridTexts: typeof serenityWebTexts.Controls.PropertyGrid;
-export declare const QuickSearchTexts: typeof serenityWebTexts.Controls.QuickSearch;
-export declare const SelectEditorTexts: typeof serenityWebTexts.Controls.SelectEditor;
+export declare const CheckTreeEditorTexts: typeof webTexts.Controls.CheckTreeEditor;
+export declare const ColumnPickerDialogTexts: typeof webTexts.Controls.ColumnPickerDialog;
+export declare const DataGridTexts: typeof webTexts.Controls.DataGrid;
+export declare const DateTimeEditorTexts: typeof webTexts.Controls.DateTimeEditor;
+export declare const EntityDialogTexts: typeof webTexts.Controls.EntityDialog;
+export declare const EntityGridTexts: typeof webTexts.Controls.EntityGrid;
+export declare const FilterPanelTexts: typeof webTexts.Controls.FilterPanel;
+export declare const FormValidationTexts: typeof webTexts.Validation;
+export declare const PagerTexts: typeof webTexts.Controls.Pager;
+export declare const PropertyGridTexts: typeof webTexts.Controls.PropertyGrid;
+export declare const QuickSearchTexts: typeof webTexts.Controls.QuickSearch;
+export declare const SelectEditorTexts: typeof webTexts.Controls.SelectEditor;
 export interface TooltipOptions {
 	title?: string;
 	trigger?: string;

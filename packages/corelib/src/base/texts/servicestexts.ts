@@ -1,6 +1,6 @@
 import { proxyTexts } from "../localtext";
 
-namespace serenityServicesTexts {
+namespace servicesTexts {
     export declare namespace Controls {
         export function asKey(): typeof Controls;
         export function asTry(): typeof Controls;
@@ -71,7 +71,7 @@ namespace serenityServicesTexts {
     }
 }
 
-const textsProxy: typeof serenityServicesTexts = proxyTexts({}, '', {
+const textsProxy: typeof servicesTexts = proxyTexts({}, '', {
     Controls: {
         ImageUpload: {}
     },

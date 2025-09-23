@@ -1,6 +1,6 @@
 import { proxyTexts } from "../localtext";
 
-namespace serenityWebTexts {
+namespace webTexts {
     export declare namespace Controls {
         export function asKey(): typeof Controls;
         export function asTry(): typeof Controls;
@@ -56,6 +56,8 @@ namespace serenityWebTexts {
             export const IncludeDeletedToggle: string;
             export const NewButton: string;
             export const RefreshButton: string;
+            export const SaveChangesButton: string;
+            export const UndoChangesButton: string;
         }
         namespace FilterPanel {
             export function asKey(): typeof FilterPanel;
@@ -204,7 +206,7 @@ namespace serenityWebTexts {
     }
 }
 
-const textsProxy: typeof serenityWebTexts = proxyTexts({}, '', {
+const textsProxy: typeof webTexts = proxyTexts({}, '', {
     Controls: {
         CheckTreeEditor: {},
         ColumnPickerDialog: {},
