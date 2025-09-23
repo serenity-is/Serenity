@@ -7,6 +7,10 @@ function changeJSDOMURL(url: string) {
         (globalThis as any).jsdom.reconfigure({ url: url });
         return true;
     }
+    else if ((globalThis as any).happyDOM?.setURL) {
+        (globalThis as any).happyDOM.setURL(url);
+        return true;
+    }
     else
         return false;
 }

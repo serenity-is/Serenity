@@ -1649,20 +1649,21 @@ export declare function localText(key: string, defaultText?: string): string;
  */
 export declare function tryGetText(key: string): string;
 /**
- * Creates a proxy object for localized text retrieval with lazy loading and caching.
- * @param o - The target object to proxy (usually an empty object {})
- * @param p - The key prefix for all text lookups
- * @param t - Template object defining the structure (object properties become nested proxies)
- * @param kind - The lookup strategy: undefined=localText, "asTry"=tryGetText, "asKey"=return key
+ * Creates a proxy object for localized text retrieval.
+ * @param obj - The target object to proxy (usually an empty object {})
+ * @param pfx - The key prefix for all text lookups
+ * @param tpl - Template object defining the structure (object properties become nested proxies)
+ * @param mode - The lookup mode: by default it uses localText, e.g. returns the localized text or the text key if not found,
+ * "asTry"=tryGetText, e.g. returns undefined if not found, "asKey"=return the text key ("Forms.Something.Abc") as is (no lookup)
  * @returns A proxy object that provides localized text access
  *
  * @example
  * const texts = proxyTexts({}, '', { user: { name: {} } });
- * texts.user.name.first // looks up "user.name.first" key
+ * texts.user.name.first // looks up "user.name.first" key, returns "user.name.first" if not found
  * texts.user.asTry().name.first // returns undefined if not found
  * texts.user.asKey().name.first // returns "user.name.first"
  */
-export declare function proxyTexts<T extends Record<string, any> = Record<string, any>>(o: T, p: string, t: Record<string, any>, kind?: "asTry" | "asKey"): Record<string, any> & {
+export declare function proxyTexts<T extends Record<string, any> = Record<string, any>>(obj: T, pfx: string, tpl: Record<string, any>, mode?: "asTry" | "asKey"): Record<string, any> & {
 	asTry(): T;
 	asKey(): T;
 };

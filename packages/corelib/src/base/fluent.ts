@@ -627,11 +627,11 @@ type FluentThis<TElement extends HTMLElement = HTMLElement> = Fluent<TElement> &
 }
 
 function extractNode(element: string | Node | FluentThis): (string | Node) {
-    return (element instanceof EventTarget || typeof element === "string") ? element : element?.el;
+    return (element instanceof Node || typeof element === "string") ? element : element?.el;
 }
 
 function extractElement(element: Element | FluentThis<HTMLElement>): HTMLElement {
-    return (element instanceof EventTarget || typeof element === "string") ? element as HTMLElement : element?.el;
+    return (element instanceof Node || typeof element === "string") ? element as HTMLElement : element?.el;
 }
 
 Fluent.prototype.addClass = function (this: FluentThis, value: string | boolean | (string | boolean)[]) {

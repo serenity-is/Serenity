@@ -74,7 +74,7 @@ describe("postToService", () => {
 
         expect(mockAppendChild).toHaveBeenCalledTimes(1);
         const form = mockAppendChild.mock.calls[0][0] as HTMLFormElement;
-        expect(form.method).toBe("post"); // HTML normalizes to lowercase
+        expect(form.method?.toLowerCase()).toBe("post"); // HTML normalizes to lowercase
         expect(form.action).toContain("/app/Services/MyService");
         expect(form.target).toBe(""); // HTML default when not set
         
@@ -165,7 +165,7 @@ describe("postToUrl", () => {
 
         expect(mockAppendChild).toHaveBeenCalledTimes(1);
         const form = mockAppendChild.mock.calls[0][0] as HTMLFormElement;
-        expect(form.method).toBe("post"); // HTML normalizes to lowercase
+        expect(form.method?.toLowerCase()).toBe("post"); // HTML normalizes to lowercase
         expect(form.action).toContain("/app/MyUrl");
         expect(form.target).toBe(""); // HTML default when not set
         
