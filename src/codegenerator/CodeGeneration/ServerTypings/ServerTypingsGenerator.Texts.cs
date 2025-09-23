@@ -149,7 +149,6 @@ public partial class ServerTypingsGenerator : TypingsGeneratorBase
                             stack.Add(part);
                         jw.WritePropertyName(part);
                         jw.WriteStartObject();
-                        sb.AppendLine();
                         if (level == 0)
                             cw.Indented("export declare namespace ");
                         else
@@ -160,7 +159,6 @@ public partial class ServerTypingsGenerator : TypingsGeneratorBase
 
                         cw.IndentedLine($"export function asKey(): typeof {part};");
                         cw.IndentedLine($"export function asTry(): typeof {part};");
-                        cw.AppendLine();
                     }
                     stackCount = parts.Length - 1;
 
@@ -178,31 +176,11 @@ public partial class ServerTypingsGenerator : TypingsGeneratorBase
                                 nextStartsWithThis = true;
                         }
 
-                        if (nextStartsWithThis)
+                        if (!nextStartsWithThis && part != "asKey" && part != "asTry")
                         {
-                            stackCount = parts.Length;
-                            if (stack.Count > stackCount - 1)
-                                stack[stackCount - 1] = part;
-                            else
-                                stack.Add(part);
-                            fullClassNames.Add(string.Join(".", stack.Take(stackCount)));
-                            jw.WritePropertyName(part);
-                            jw.WriteStartObject();
-                            cw.Indented("namespace ");
+                            cw.Indented($"{(CodeWriter.IsJSKeyword(part) ? "// js keyword!: " : "")}export const ");
                             sb.Append(part);
-                            cw.StartBrace();
-                            jw.WritePropertyName("export const __");
-                            jw.WriteValue(1);
-                            cw.IndentedLine("__: string;");
-                        }
-                        else
-                        {
-                            if (part != "asKey" && part != "asTry")
-                            {
-                                cw.Indented($"{(CodeWriter.IsJSKeyword(part) ? "// js keyword!: " : "")}export const ");
-                                sb.Append(part);
-                                sb.AppendLine(": string;");
-                            }
+                            sb.AppendLine(": string;");
                         }
                     }
                 }
@@ -228,19 +206,19 @@ public partial class ServerTypingsGenerator : TypingsGeneratorBase
             sb.AppendLine($"{(exportTexts ? "export " : "")}const Texts = {{}} as const;");
         }
 
+        sb.AppendLine();
+
         foreach (var nested in localTextNestedClasses
             .Where(x => x.Key != "Texts")
             .OrderBy(x => x.Key, StringComparer.InvariantCultureIgnoreCase))
         {
             if (string.IsNullOrEmpty(nested.Value))
             {
-                sb.AppendLine();
                 sb.AppendLine($"export const {nested.Key} = Texts;");
             }
             else if (nested.Value.EndsWith('.') &&
                 fullClassNames.Contains(nested.Value[0..^1]))
             {
-                sb.AppendLine();
                 sb.AppendLine($"export const {nested.Key} = Texts.{nested.Value[0..^1]};");
                 continue;
             }

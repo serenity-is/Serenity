@@ -1,42 +1,32 @@
 ﻿import { proxyTexts } from "@serenity-is/corelib";
 
 namespace texts {
-
     export declare namespace Db {
         export function asKey(): typeof Db;
         export function asTry(): typeof Db;
-
-
         namespace Northwind {
             export function asKey(): typeof Northwind;
             export function asTry(): typeof Northwind;
-
-
             namespace Category {
                 export function asKey(): typeof Category;
                 export function asTry(): typeof Category;
-
                 export const CategoryID: string;
                 export const CategoryName: string;
                 export const Description: string;
                 export const PicturePath: string;
             }
-
             namespace CategoryLang {
                 export function asKey(): typeof CategoryLang;
                 export function asTry(): typeof CategoryLang;
-
                 export const CategoryId: string;
                 export const CategoryName: string;
                 export const Description: string;
                 export const Id: string;
                 export const LanguageId: string;
             }
-
             namespace Customer {
                 export function asKey(): typeof Customer;
                 export function asTry(): typeof Customer;
-
                 export const Address: string;
                 export const City: string;
                 export const CompanyName: string;
@@ -55,30 +45,24 @@ namespace texts {
                 export const Representatives: string;
                 export const SendBulletin: string;
             }
-
             namespace CustomerCustomerDemo {
                 export function asKey(): typeof CustomerCustomerDemo;
                 export function asTry(): typeof CustomerCustomerDemo;
-
                 export const CustomerCompanyName: string;
                 export const CustomerID: string;
                 export const CustomerTypeID: string;
                 export const ID: string;
             }
-
             namespace CustomerDemographic {
                 export function asKey(): typeof CustomerDemographic;
                 export function asTry(): typeof CustomerDemographic;
-
                 export const CustomerDesc: string;
                 export const CustomerTypeID: string;
                 export const ID: string;
             }
-
             namespace CustomerDetails {
                 export function asKey(): typeof CustomerDetails;
                 export function asTry(): typeof CustomerDetails;
-
                 export const CustomerID: string;
                 export const Email: string;
                 export const LastContactDate: string;
@@ -86,31 +70,25 @@ namespace texts {
                 export const LastContactedByFullName: string;
                 export const SendBulletin: string;
             }
-
             namespace CustomerGrossSales {
                 export function asKey(): typeof CustomerGrossSales;
                 export function asTry(): typeof CustomerGrossSales;
-
                 export const ContactName: string;
                 export const CustomerId: string;
                 export const GrossAmount: string;
                 export const ProductId: string;
                 export const ProductName: string;
             }
-
             namespace CustomerRepresentatives {
                 export function asKey(): typeof CustomerRepresentatives;
                 export function asTry(): typeof CustomerRepresentatives;
-
                 export const CustomerId: string;
                 export const EmployeeId: string;
                 export const RepresentativeId: string;
             }
-
             namespace Employee {
                 export function asKey(): typeof Employee;
                 export function asTry(): typeof Employee;
-
                 export const Address: string;
                 export const BirthDate: string;
                 export const City: string;
@@ -133,21 +111,17 @@ namespace texts {
                 export const Title: string;
                 export const TitleOfCourtesy: string;
             }
-
             namespace EmployeeTerritory {
                 export function asKey(): typeof EmployeeTerritory;
                 export function asTry(): typeof EmployeeTerritory;
-
                 export const EmployeeFullName: string;
                 export const EmployeeID: string;
                 export const TerritoryDescription: string;
                 export const TerritoryID: string;
             }
-
             namespace Note {
                 export function asKey(): typeof Note;
                 export function asTry(): typeof Note;
-
                 export const EntityId: string;
                 export const EntityType: string;
                 export const InsertDate: string;
@@ -156,11 +130,9 @@ namespace texts {
                 export const NoteId: string;
                 export const Text: string;
             }
-
             namespace Order {
                 export function asKey(): typeof Order;
                 export function asTry(): typeof Order;
-
                 export const CustomerCity: string;
                 export const CustomerCompanyName: string;
                 export const CustomerContactName: string;
@@ -189,11 +161,9 @@ namespace texts {
                 export const ShippedDate: string;
                 export const ShippingState: string;
             }
-
             namespace OrderDetail {
                 export function asKey(): typeof OrderDetail;
                 export function asTry(): typeof OrderDetail;
-
                 export const DetailID: string;
                 export const Discount: string;
                 export const LineTotal: string;
@@ -206,11 +176,9 @@ namespace texts {
                 export const Quantity: string;
                 export const UnitPrice: string;
             }
-
             namespace Product {
                 export function asKey(): typeof Product;
                 export function asTry(): typeof Product;
-
                 export const CategoryID: string;
                 export const CategoryName: string;
                 export const Discontinued: string;
@@ -226,21 +194,17 @@ namespace texts {
                 export const UnitsInStock: string;
                 export const UnitsOnOrder: string;
             }
-
             namespace ProductLang {
                 export function asKey(): typeof ProductLang;
                 export function asTry(): typeof ProductLang;
-
                 export const Id: string;
                 export const LanguageId: string;
                 export const ProductId: string;
                 export const ProductName: string;
             }
-
             namespace ProductLog {
                 export function asKey(): typeof ProductLog;
                 export function asTry(): typeof ProductLog;
-
                 export const CategoryID: string;
                 export const ChangingUserId: string;
                 export const Discontinued: string;
@@ -258,38 +222,30 @@ namespace texts {
                 export const ValidFrom: string;
                 export const ValidUntil: string;
             }
-
             namespace Region {
                 export function asKey(): typeof Region;
                 export function asTry(): typeof Region;
-
                 export const RegionDescription: string;
                 export const RegionID: string;
             }
-
             namespace SalesByCategory {
                 export function asKey(): typeof SalesByCategory;
                 export function asTry(): typeof SalesByCategory;
-
                 export const CategoryId: string;
                 export const CategoryName: string;
                 export const ProductName: string;
                 export const ProductSales: string;
             }
-
             namespace Shipper {
                 export function asKey(): typeof Shipper;
                 export function asTry(): typeof Shipper;
-
                 export const CompanyName: string;
                 export const Phone: string;
                 export const ShipperID: string;
             }
-
             namespace Supplier {
                 export function asKey(): typeof Supplier;
                 export function asTry(): typeof Supplier;
-
                 export const Address: string;
                 export const City: string;
                 export const CompanyName: string;
@@ -303,11 +259,9 @@ namespace texts {
                 export const Region: string;
                 export const SupplierID: string;
             }
-
             namespace Territory {
                 export function asKey(): typeof Territory;
                 export function asTry(): typeof Territory;
-
                 export const RegionDescription: string;
                 export const RegionID: string;
                 export const TerritoryDescription: string;
@@ -315,11 +269,9 @@ namespace texts {
             }
         }
     }
-
     export declare namespace Validation {
         export function asKey(): typeof Validation;
         export function asTry(): typeof Validation;
-
         export const NorthwindPhone: string;
         export const NorthwindPhoneMultiple: string;
     }

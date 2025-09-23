@@ -1,16 +1,12 @@
-﻿import { proxyTexts } from "../localtext";
+import { proxyTexts } from "../localtext";
 
 namespace serenityServicesTexts {
-
     export declare namespace Controls {
         export function asKey(): typeof Controls;
         export function asTry(): typeof Controls;
-
-
         namespace ImageUpload {
             export function asKey(): typeof ImageUpload;
             export function asTry(): typeof ImageUpload;
-
             export const AddFileButton: string;
             export const ColorboxClose: string;
             export const ColorboxCurrent: string;
@@ -33,16 +29,12 @@ namespace serenityServicesTexts {
             export const UploadFileTooSmall: string;
         }
     }
-
     export declare namespace Enums {
         export function asKey(): typeof Enums;
         export function asTry(): typeof Enums;
-
-
         namespace ImageCheckResult {
             export function asKey(): typeof ImageCheckResult;
             export function asTry(): typeof ImageCheckResult;
-
             export const DataSizeTooHigh: string;
             export const HeightMismatch: string;
             export const HeightTooHigh: string;
@@ -61,7 +53,6 @@ namespace serenityServicesTexts {
     export declare namespace Validation {
         export function asKey(): typeof Validation;
         export function asTry(): typeof Validation;
-
         export const ArgumentIsNull: string;
         export const ArgumentOutOfRange: string;
         export const EntityForeignKeyViolation: string;
@@ -78,7 +69,6 @@ namespace serenityServicesTexts {
         export const RequestIsNull: string;
         export const UnexpectedError: string;
     }
-
 }
 
 const textsProxy: typeof serenityServicesTexts = proxyTexts({}, '', {
@@ -92,7 +82,5 @@ const textsProxy: typeof serenityServicesTexts = proxyTexts({}, '', {
 }) as any;
 
 export const DataValidationTexts = textsProxy.Validation;
-
 export const FileUploadTexts = textsProxy.Controls.ImageUpload;
-
 export const ImageCheckResultTexts = textsProxy.Enums.ImageCheckResult;
