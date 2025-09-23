@@ -1,4 +1,4 @@
-﻿import { Fluent, localText, nsSerenity } from "../../base";
+﻿import { Fluent, localText, nsSerenity, PagerTexts } from "../../base";
 import { PagerOptions } from "../../slick";
 import { Widget, WidgetProps } from "../widgets/widget";
 
@@ -46,7 +46,7 @@ export class SlickPager<P extends PagerOptions = PagerOptions> extends Widget<P>
                 </Group>
                 <Group id="control">
                     <span class={`${p}control`}>
-                        <span class={`${p}pagetext`}>{localText("Controls.Pager.Page")}</span>
+                        <span class={`${p}pagetext`}>{PagerTexts.Page}</span>
                         {this.currentPage = <input class={`${p}current mx-1`} type="text" size={4} value="1" onKeyDown={e => { if (e.key === "Enter") this._changePage("input"); }} /> as HTMLInputElement}
                         <span class={`${p}pagesep px-1`}>/</span>
                         {this.totalPages = <span class={`${p}total`}>1</span> as HTMLSpanElement}
@@ -127,19 +127,19 @@ export class SlickPager<P extends PagerOptions = PagerOptions> extends Widget<P>
         var stat: string;
 
         if (info.loading) {
-            stat = localText("Controls.Pager.LoadingStatus");
+            stat = PagerTexts.LoadingStatus;
         }
         else if (info.error) {
             stat = info.error;
         }
         else if (info.totalCount > 0) {
-            stat = localText("Controls.Pager.PageStatus");
+            stat = PagerTexts.PageStatus;
             stat = stat.replace(/{from}/, r1 as any);
             stat = stat.replace(/{to}/, r2 as any);
             stat = stat.replace(/{total}/, info.totalCount as any);
         }
         else
-            stat = localText("Controls.Pager.NoRowStatus");
+            stat = PagerTexts.NoRowStatus;
 
         this.stat.textContent = stat;
         this.pageSize && (this.pageSize.value = (info.rowsPerPage || 0).toString());

@@ -1,4 +1,4 @@
-﻿import { Fluent, addValidationRule, localText, nsSerenity } from "../../base";
+﻿import { Fluent, FormValidationTexts, addValidationRule, localText, nsSerenity } from "../../base";
 import { IStringValue } from "../../interfaces";
 import { EditorProps, EditorWidget } from "./editorwidget";
 
@@ -40,7 +40,7 @@ export class Recaptcha<P extends RecaptchaOptions = RecaptchaOptions> extends Ed
 
         addValidationRule(valInput, e => {
             if (!this.get_value()) {
-                return localText('Validation.Required');
+                return FormValidationTexts.Required;
             }
             return null;
         }, this.uniqueName);

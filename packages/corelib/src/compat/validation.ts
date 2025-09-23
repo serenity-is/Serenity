@@ -1,4 +1,4 @@
-﻿import { Fluent, Tooltip, Validator, ValidatorOptions, getjQuery, isArrayLike, localText, notifyError } from "../base";
+﻿import { Fluent, FormValidationTexts, Tooltip, Validator, ValidatorOptions, getjQuery, isArrayLike, localText, notifyError } from "../base";
 
 export function validatorAbortHandler(validator: Validator) {
     delete validator.settings.abortHandler;
@@ -32,7 +32,7 @@ export function validateOptions(options?: ValidatorOptions): ValidatorOptions {
             return false;
         },
         invalidHandler: function (event: any, validator: any) {
-            notifyError(localText("Validation.InvalidFormMessage"));
+            notifyError(FormValidationTexts.InvalidFormMessage);
 
             validator.errorList.forEach((x: any) => {
                 let element: HTMLElement = isArrayLike(x.element) ? x.element[0] : x.element;

@@ -56,28 +56,59 @@ export function tryGetText(key: string): string {
     return getTable()[key];
 }
 
+const proxyTextsPrefixSymbol = Symbol.for("Serenity.proxyTextsPrefix");
+const proxyTextsTemplateSymbol = Symbol.for("Serenity.proxyTextsTemplate");
+const proxyTextsKindSymbol = Symbol.for("Serenity.proxyTextsKind");
+
 /**
  * Proxies text retrieval for localization.
  * @param o The original object.
  * @param p The prefix for the keys.
- * @param t The translation table.
+ * @param t The translation template with objects for sub texts.
+ * @param kind The kind of proxy, either "asTry" or "asKey", or null for normal localText. 
+ * If null, it will use localText; if "asTry", it will use tryGetText; if "asKey", 
+ * it will return the keys of the local texts.
  * @returns A proxy object for localized text retrieval.
  */
-export function proxyTexts(o: Record<string, any>, p: string, t: Record<string, any>): Object {
+export function proxyTexts(o: Record<string, any>, p: string, t: Record<string, any>, kind?: "asTry" | "asKey"): Object {
+    (o as any)[proxyTextsPrefixSymbol] = p ?? '';
+    (o as any)[proxyTextsKindSymbol] = kind;
+    (o as any)[proxyTextsTemplateSymbol] = t;
     return new Proxy(o, {
-        get: (_: Object, y: string) => {
-            if (typeof y === "symbol")
-                return;
-            var tv = t[y];
-            if (tv == null)
-                return localText(p + y);
-            else {
-                var z = o[y];
-                if (z != null)
-                    return z;
-                o[y] = z = proxyTexts({}, p + y + '.', tv);
-                return z;
+        get: (org: Record<string, any>, prop: string | symbol, receiver) => {
+            if (typeof prop !== "string") {
+                return (org as any)[prop];
             }
+
+            const pfx = (org as any)[proxyTextsPrefixSymbol] ?? '';
+            const kind = (org as any)[proxyTextsKindSymbol] as "asTry" | "asKey";
+
+            const tpl = (org as any)[proxyTextsTemplateSymbol];
+            if (!tpl)
+                return undefined;
+
+            if (prop === "asKey" || prop === "asTry") {
+                if (kind === prop) {
+                    return function() {
+                        return receiver;
+                    }
+                }
+
+                return function() {
+                    return proxyTexts({}, pfx, tpl, prop)
+                }
+            }
+
+            const tpmval = tpl[prop];
+            const key = pfx + prop;
+            if (tpmval == null)
+                return kind === "asTry" ? tryGetText(key) : (kind == "asKey" ? key : localText(key));
+
+            const subProxy = org[prop];
+            if (subProxy != null)
+                return subProxy;
+
+            return org[prop] = proxyTexts({}, key + '.', tpmval, kind);
         },
         ownKeys: (_: Object) => Object.keys(t)
     });

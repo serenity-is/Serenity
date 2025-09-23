@@ -1,8 +1,9 @@
-import { tryGetText } from "../base";
+import { localText, tryGetText } from "../base";
 import { AggregateFormatting, Aggregators } from "./aggregators";
 
 vi.mock("../base", () => ({
     tryGetText: vi.fn(),
+    localText: vi.fn(),
     formatNumber: vi.fn((value, format) => {
         if (format === '#,##0.00') {
             return value.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
@@ -409,6 +410,7 @@ describe("AggregateFormatting", () => {
                 field: "price"
             } as any;
 
+            (localText as any).mockReturnValue("Sum");            
             const result = AggregateFormatting.formatMarkup(totals, column, "sum");
 
             expect(result).toContain("class='aggregate agg-sum'");
@@ -418,7 +420,7 @@ describe("AggregateFormatting", () => {
 
         it("uses localized text when available", () => {
             // Mock tryGetText to return localized text
-            (tryGetText as any).mockReturnValue("Total Sum");
+            (localText as any).mockReturnValue("Total Sum");
 
             const totals = {
                 sum: { price: 100 }
@@ -430,7 +432,7 @@ describe("AggregateFormatting", () => {
             const result = AggregateFormatting.formatMarkup(totals, column, "sum");
 
             expect(result).toContain("title='Total Sum'");
-            expect(tryGetText).toHaveBeenCalledWith("Enums.Serenity.SummaryType.Sum");
+            expect(localText).toHaveBeenCalledWith("Enums.Serenity.SummaryType.Sum", "Sum");
         });
     });
 

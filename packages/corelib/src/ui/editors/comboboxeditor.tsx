@@ -1,4 +1,4 @@
-﻿import { Authorization, Fluent, PropertyItem, isPromiseLike, localText, nsSerenity, setElementReadOnly } from "../../base";
+﻿import { Authorization, Fluent, PropertyItem, SelectEditorTexts, isPromiseLike, localText, nsSerenity, setElementReadOnly } from "../../base";
 import { ValidationHelper, isTrimmedEmpty } from "../../compat";
 import { IEditDialog, IGetEditValue, IReadOnly, ISetEditValue, IStringValue } from "../../interfaces";
 import { DialogType } from "../../types/dialogtype";
@@ -73,7 +73,7 @@ export class ComboboxEditor<P, TItem> extends EditorWidget<P> implements
         this.setCascadeFrom((this.options as ComboboxEditorOptions).cascadeFrom);
 
         if (this.useInplaceAdd())
-            this.addInplaceCreate(localText('Controls.SelectEditor.InplaceAdd'), null);
+            this.addInplaceCreate(SelectEditorTexts.InplaceAdd, null);
     }
 
     destroy() {
@@ -99,7 +99,7 @@ export class ComboboxEditor<P, TItem> extends EditorWidget<P> implements
 
     protected emptyItemText() {
         return this.domNode.getAttribute("placeholder") ??
-            localText('Controls.SelectEditor.EmptyItemText');
+            SelectEditorTexts.EmptyItemText;
     }
 
     protected getPageSize(): number {
@@ -310,8 +310,8 @@ export class ComboboxEditor<P, TItem> extends EditorWidget<P> implements
 
     protected addInplaceCreate(addTitle: string, editTitle: string) {
         var self = this;
-        addTitle = (addTitle ?? localText('Controls.SelectEditor.InplaceAdd'));
-        editTitle = (editTitle ?? localText('Controls.SelectEditor.InplaceEdit'));
+        addTitle = (addTitle ?? SelectEditorTexts.InplaceAdd);
+        editTitle = (editTitle ?? SelectEditorTexts.InplaceEdit);
         const inplaceButton = (<a class="inplace-button inplace-create" title={addTitle} onClick={e => {
             self.inplaceCreateClick(e as any);
         }}><b></b></a>) as HTMLElement;
@@ -398,7 +398,7 @@ export class ComboboxEditor<P, TItem> extends EditorWidget<P> implements
 
                 return {
                     id: (-2147483648).toString(),
-                    text: localText('Controls.SelectEditor.NoResultsClickToDefine')
+                    text: SelectEditorTexts.NoResultsClickToDefine
                 };
             }
 
@@ -411,7 +411,7 @@ export class ComboboxEditor<P, TItem> extends EditorWidget<P> implements
 
             return {
                 id: (-2147483648).toString(),
-                text: localText('Controls.SelectEditor.ClickToDefine')
+                text: SelectEditorTexts.ClickToDefine
             };
         }
     }

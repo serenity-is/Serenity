@@ -1,4 +1,4 @@
-﻿import { Fluent, ValidatableElement, Validator, nsSerenity, setElementReadOnly, tryGetText } from "../../base";
+﻿import { Fluent, FormValidationTexts, ValidatableElement, Validator, nsSerenity, setElementReadOnly } from "../../base";
 import { ValidationHelper } from "../../compat";
 import { IReadOnly, IStringValue } from "../../interfaces";
 import { EditorProps, EditorWidget } from "./editorwidget";
@@ -77,7 +77,7 @@ export class EmailEditor<P extends EmailEditorOptions = EmailEditorOptions> exte
             else {
                 return Validator.methods.email(value + '@dummy.com', element);
             }
-        }, tryGetText("Validation.Email"));
+        }, FormValidationTexts.Email);
     }
 
     get_value(): string {

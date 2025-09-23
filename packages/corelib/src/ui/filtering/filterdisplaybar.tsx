@@ -1,4 +1,4 @@
-﻿import { localText, nsSerenity } from "../../base";
+﻿import { FilterPanelTexts, nsSerenity } from "../../base";
 import { FilterDialog } from "./filterdialog";
 import { FilterWidgetBase } from "./filterwidgetbase";
 
@@ -15,14 +15,14 @@ export class FilterDisplayBar<P = {}> extends FilterWidgetBase<P> {
 
         return (
             <div>
-                <a class="reset" title={localText('Controls.FilterPanel.ResetFilterHint')} onClick={(e) => {
+                <a class="reset" title={FilterPanelTexts.ResetFilterHint} onClick={(e) => {
                     e.preventDefault();
                     this.get_store().get_items().length = 0;
                     this.get_store().raiseChanged();
                 }}></a>
-                <a class="edit" onClick={openFilterDialog}>{localText('Controls.FilterPanel.EditFilter')}</a>
+                <a class="edit" onClick={openFilterDialog}>{FilterPanelTexts.EditFilter}</a>
                 <div class="current">
-                    <span class="cap">{localText('Controls.FilterPanel.EffectiveFilter')}</span>
+                    <span class="cap">{FilterPanelTexts.EffectiveFilter}</span>
                     <a class="txt" onClick={openFilterDialog}></a>
                 </div>
             </div>
@@ -38,7 +38,7 @@ export class FilterDisplayBar<P = {}> extends FilterWidgetBase<P> {
         this.element.findFirst('.reset').toggle(displayText != null);
 
         if (displayText == null)
-            displayText = localText('Controls.FilterPanel.EffectiveEmpty');
+            displayText = FilterPanelTexts.EffectiveEmpty;
 
         this.element.findFirst('.txt').text('[' + displayText + ']');
     }

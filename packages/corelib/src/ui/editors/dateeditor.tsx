@@ -1,4 +1,4 @@
-import { Culture, Fluent, Invariant, addValidationRule, formatDate, getjQuery, isArrayLike, localText, nsSerenity, parseISODateTime, setElementReadOnly, stringFormat } from "../../base";
+import { Culture, Fluent, FormValidationTexts, Invariant, addValidationRule, formatDate, getjQuery, isArrayLike, localText, nsSerenity, parseISODateTime, setElementReadOnly, stringFormat } from "../../base";
 import { today } from "../../compat";
 import { IReadOnly, IStringValue } from "../../interfaces";
 import { dateInputChangeHandler, dateInputKeyupHandler, flatPickrTrigger, jQueryDatepickerInitialization, jQueryDatepickerZIndexWorkaround } from "../helpers/dateediting";
@@ -72,11 +72,11 @@ export class DateEditor<P extends DateEditorOptions = DateEditorOptions> extends
             }
 
             if (this.get_minValue() && Invariant.stringCompare(formatDate(value, 'yyyy-MM-dd'), formatDate(this.get_minValue(), 'yyyy-MM-dd')) < 0) {
-                return stringFormat(localText('Validation.MinDate'), formatDate(this.get_minValue(), null));
+                return stringFormat(FormValidationTexts.MinDate, formatDate(this.get_minValue(), null));
             }
 
             if (this.get_maxValue() && Invariant.stringCompare(formatDate(value, 'yyyy-MM-dd'), formatDate(this.get_maxValue(), 'yyyy-MM-dd')) > 0) {
-                return stringFormat(localText('Validation.MaxDate'), formatDate(this.get_maxValue(), null));
+                return stringFormat(FormValidationTexts.MaxDate, formatDate(this.get_maxValue(), null));
             }
 
             return null;

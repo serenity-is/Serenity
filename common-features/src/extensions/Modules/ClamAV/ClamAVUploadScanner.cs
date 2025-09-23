@@ -60,7 +60,7 @@ public class ClamAVUploadScanner(IOptionsMonitor<ClamAVSettings> options,
                         filename);
 
                     throw new ValidationError("InfectedFile",
-                        UploadTexts.Controls.ImageUpload.InfectedFile.ToString(localizer));
+                        FileUploadTexts.InfectedFile.ToString(localizer));
 
                 case ClamScanResults.Unknown:
                 case ClamScanResults.Error:
@@ -71,7 +71,7 @@ public class ClamAVUploadScanner(IOptionsMonitor<ClamAVSettings> options,
                         scanResult.RawResult);
 
                     throw new ValidationError("InfectedFileOrError",
-                        UploadTexts.Controls.ImageUpload.InfectedFileOrError.ToString(localizer));
+                        FileUploadTexts.InfectedFileOrError.ToString(localizer));
             }
         }
         catch (Exception ex) when (ex is not ValidationError)
@@ -79,7 +79,7 @@ public class ClamAVUploadScanner(IOptionsMonitor<ClamAVSettings> options,
             logger?.LogError(ex, "Error occured during AV scan (is ClamAV installed?)");
 
             throw new ValidationError("FailedScan",
-                UploadTexts.Controls.ImageUpload.FailedScan.ToString(localizer));
+                FileUploadTexts.FailedScan.ToString(localizer));
         }
     }
 }

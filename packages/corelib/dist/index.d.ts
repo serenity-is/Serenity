@@ -1652,10 +1652,13 @@ export declare function tryGetText(key: string): string;
  * Proxies text retrieval for localization.
  * @param o The original object.
  * @param p The prefix for the keys.
- * @param t The translation table.
+ * @param t The translation template with objects for sub texts.
+ * @param kind The kind of proxy, either "asTry" or "asKey", or null for normal localText.
+ * If null, it will use localText; if "asTry", it will use tryGetText; if "asKey",
+ * it will return the keys of the local texts.
  * @returns A proxy object for localized text retrieval.
  */
-export declare function proxyTexts(o: Record<string, any>, p: string, t: Record<string, any>): Object;
+export declare function proxyTexts(o: Record<string, any>, p: string, t: Record<string, any>, kind?: "asTry" | "asKey"): Object;
 /**
  * A list of languages with their IDs and display texts.
  */
@@ -2023,6 +2026,8 @@ export type TypeInfo<TypeName> = {
 export declare function getTypeRegistry(): {
 	[key: string]: any;
 };
+export declare function ensureTypeInfo(type: any): TypeInfo<string>;
+export declare function peekTypeInfo(type: any): TypeInfo<string>;
 export declare function getTypeNameProp(type: any): string;
 export declare function setTypeNameProp(type: any, value: string): void;
 export declare const nsSerenity: "Serenity.";
@@ -2273,6 +2278,290 @@ export declare function registerType(type: {
 }): void;
 export interface TransformInclude {
 }
+declare namespace serenityServicesTexts {
+	namespace Controls {
+		function asKey(): typeof Controls;
+		function asTry(): typeof Controls;
+		namespace ImageUpload {
+			function asKey(): typeof ImageUpload;
+			function asTry(): typeof ImageUpload;
+			const AddFileButton: string;
+			const ColorboxClose: string;
+			const ColorboxCurrent: string;
+			const ColorboxNext: string;
+			const ColorboxPrior: string;
+			const DeleteButtonHint: string;
+			const ExtensionBlacklisted: string;
+			const ExtensionNotAllowed: string;
+			const FailedScan: string;
+			const ImageExtensionMismatch: string;
+			const InfectedFile: string;
+			const InfectedFileOrError: string;
+			const MaxHeight: string;
+			const MaxWidth: string;
+			const MinHeight: string;
+			const MinWidth: string;
+			const NotAnImageFile: string;
+			const NotAnImageWithExtensions: string;
+			const UploadFileTooBig: string;
+			const UploadFileTooSmall: string;
+		}
+	}
+	namespace Enums {
+		function asKey(): typeof Enums;
+		function asTry(): typeof Enums;
+		namespace ImageCheckResult {
+			function asKey(): typeof ImageCheckResult;
+			function asTry(): typeof ImageCheckResult;
+			const DataSizeTooHigh: string;
+			const HeightMismatch: string;
+			const HeightTooHigh: string;
+			const HeightTooLow: string;
+			const ImageIsEmpty: string;
+			const InvalidImage: string;
+			const SizeMismatch: string;
+			const StreamReadError: string;
+			const UnsupportedFormat: string;
+			const WidthMismatch: string;
+			const WidthTooHigh: string;
+			const WidthTooLow: string;
+		}
+	}
+	namespace Validation {
+		function asKey(): typeof Validation;
+		function asTry(): typeof Validation;
+		const ArgumentIsNull: string;
+		const ArgumentOutOfRange: string;
+		const EntityForeignKeyViolation: string;
+		const EntityHasDeletedParent: string;
+		const EntityIsNotActive: string;
+		const EntityNotFound: string;
+		const EntityReadAccessViolation: string;
+		const EntityWriteAccessViolation: string;
+		const FieldInvalidDateRange: string;
+		const FieldInvalidValue: string;
+		const FieldIsReadOnly: string;
+		const FieldIsRequired: string;
+		const Recaptcha: string;
+		const RequestIsNull: string;
+		const UnexpectedError: string;
+	}
+}
+export declare const DataValidationTexts: typeof serenityServicesTexts.Validation;
+export declare const FileUploadTexts: typeof serenityServicesTexts.Controls.ImageUpload;
+export declare const ImageCheckResultTexts: typeof serenityServicesTexts.Enums.ImageCheckResult;
+declare namespace serenityWebTexts {
+	namespace Controls {
+		function asKey(): typeof Controls;
+		function asTry(): typeof Controls;
+		namespace CheckTreeEditor {
+			function asKey(): typeof CheckTreeEditor;
+			function asTry(): typeof CheckTreeEditor;
+			const SelectAll: string;
+		}
+		namespace ColumnPickerDialog {
+			function asKey(): typeof ColumnPickerDialog;
+			function asTry(): typeof ColumnPickerDialog;
+			const HiddenColumns: string;
+			const HideHint: string;
+			const RestoreDefaults: string;
+			const ShowHint: string;
+			const Title: string;
+			const VisibleColumns: string;
+		}
+		namespace DataGrid {
+			function asKey(): typeof DataGrid;
+			function asTry(): typeof DataGrid;
+			const NewButton: string;
+		}
+		namespace DateTimeEditor {
+			function asKey(): typeof DateTimeEditor;
+			function asTry(): typeof DateTimeEditor;
+			const SetToNow: string;
+		}
+		namespace EntityDialog {
+			function asKey(): typeof EntityDialog;
+			function asTry(): typeof EntityDialog;
+			const ApplyChangesButton: string;
+			const CloneButton: string;
+			const DeleteButton: string;
+			const DeleteConfirmation: string;
+			const EditButton: string;
+			const EditRecordTitle: string;
+			const LocalizationBack: string;
+			const LocalizationButton: string;
+			const LocalizationConfirmation: string;
+			const NewRecordTitle: string;
+			const SaveButton: string;
+			const SaveSuccessMessage: string;
+			const UndeleteButton: string;
+			const UndeleteConfirmation: string;
+			const UpdateButton: string;
+			const ViewRecordTitle: string;
+		}
+		namespace EntityGrid {
+			function asKey(): typeof EntityGrid;
+			function asTry(): typeof EntityGrid;
+			const IncludeDeletedToggle: string;
+			const NewButton: string;
+			const RefreshButton: string;
+		}
+		namespace FilterPanel {
+			function asKey(): typeof FilterPanel;
+			function asTry(): typeof FilterPanel;
+			const AddFilter: string;
+			const All: string;
+			const And: string;
+			const AndInParens: string;
+			const ApplyGroups: string;
+			const ChangeAndOr: string;
+			const ClearGroups: string;
+			const CurrentFilter: string;
+			const DialogTitle: string;
+			const EditFilter: string;
+			const EffectiveEmpty: string;
+			const EffectiveFilter: string;
+			const FixErrorsMessage: string;
+			const GroupBy: string;
+			const InvalidDate: string;
+			const InvalidNumber: string;
+			const InvalidOperator: string;
+			namespace OperatorFormats {
+				function asKey(): typeof OperatorFormats;
+				function asTry(): typeof OperatorFormats;
+				const bw: string;
+				const contains: string;
+				const eq: string;
+				const ge: string;
+				const gt: string;
+				const isnotnull: string;
+				const isnull: string;
+				const le: string;
+				const lt: string;
+				const ne: string;
+				const startswith: string;
+			}
+			namespace OperatorNames {
+				function asKey(): typeof OperatorNames;
+				function asTry(): typeof OperatorNames;
+				const bw: string;
+				const contains: string;
+				const eq: string;
+				const ge: string;
+				const gt: string;
+				const isnotnull: string;
+				const isnull: string;
+				const le: string;
+				const lt: string;
+				const ne: string;
+				const startswith: string;
+			}
+			const Or: string;
+			const OrInParens: string;
+			const RemoveField: string;
+			const ResetButton: string;
+			const ResetFilterHint: string;
+			const SearchButton: string;
+			const SelectField: string;
+			const ThenBy: string;
+			const ValueRequired: string;
+		}
+		namespace Pager {
+			function asKey(): typeof Pager;
+			function asTry(): typeof Pager;
+			const DefaultLoadError: string;
+			const LoadingStatus: string;
+			const NoRowStatus: string;
+			const Page: string;
+			const PageStatus: string;
+		}
+		namespace PropertyGrid {
+			function asKey(): typeof PropertyGrid;
+			function asTry(): typeof PropertyGrid;
+			const RequiredHint: string;
+		}
+		namespace QuickSearch {
+			function asKey(): typeof QuickSearch;
+			function asTry(): typeof QuickSearch;
+			const FieldSelection: string;
+			const Hint: string;
+			const Placeholder: string;
+		}
+		namespace SelectEditor {
+			function asKey(): typeof SelectEditor;
+			function asTry(): typeof SelectEditor;
+			const AjaxError: string;
+			const ClickToDefine: string;
+			const EmptyItemText: string;
+			const InplaceAdd: string;
+			const InplaceEdit: string;
+			const InputTooLong: string;
+			const InputTooShort: string;
+			const LoadMore: string;
+			const MultipleMatches: string;
+			const NoMatches: string;
+			const NoResultsClickToDefine: string;
+			const Searching: string;
+			const SelectionTooBig: string;
+			const SingleMatch: string;
+		}
+	}
+	namespace Dialogs {
+		function asKey(): typeof Dialogs;
+		function asTry(): typeof Dialogs;
+		const AlertTitle: string;
+		const CancelButton: string;
+		const ConfirmationTitle: string;
+		const InformationTitle: string;
+		const MaximizeHint: string;
+		const NoButton: string;
+		const OkButton: string;
+		const RestoreHint: string;
+		const SuccessTitle: string;
+		const WarningTitle: string;
+		const YesButton: string;
+	}
+	namespace Validation {
+		function asKey(): typeof Validation;
+		function asTry(): typeof Validation;
+		const CaptchaMismatch: string;
+		const DateInvalid: string;
+		const DayHourAndMin: string;
+		const Decimal: string;
+		const Digits: string;
+		const Email: string;
+		const EmailExists: string;
+		const EmailMultiple: string;
+		const HourAndMin: string;
+		const IncorrectPassword: string;
+		const Integer: string;
+		const InvalidFormMessage: string;
+		const MaxDate: string;
+		const MaxLength: string;
+		const MinDate: string;
+		const MinLength: string;
+		const PasswordConfirm: string;
+		const Range: string;
+		const Required: string;
+		const UniqueConstraint: string;
+		const Url: string;
+		const Username: string;
+		const UsernameExists: string;
+		const Xss: string;
+	}
+}
+export declare const CheckTreeEditorTexts: typeof serenityWebTexts.Controls.CheckTreeEditor;
+export declare const ColumnPickerDialogTexts: typeof serenityWebTexts.Controls.ColumnPickerDialog;
+export declare const DataGridTexts: typeof serenityWebTexts.Controls.DataGrid;
+export declare const DateTimeEditorTexts: typeof serenityWebTexts.Controls.DateTimeEditor;
+export declare const EntityDialogTexts: typeof serenityWebTexts.Controls.EntityDialog;
+export declare const EntityGridTexts: typeof serenityWebTexts.Controls.EntityGrid;
+export declare const FilterPanelTexts: typeof serenityWebTexts.Controls.FilterPanel;
+export declare const FormValidationTexts: typeof serenityWebTexts.Validation;
+export declare const PagerTexts: typeof serenityWebTexts.Controls.Pager;
+export declare const PropertyGridTexts: typeof serenityWebTexts.Controls.PropertyGrid;
+export declare const QuickSearchTexts: typeof serenityWebTexts.Controls.QuickSearch;
+export declare const SelectEditorTexts: typeof serenityWebTexts.Controls.SelectEditor;
 export interface TooltipOptions {
 	title?: string;
 	trigger?: string;

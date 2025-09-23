@@ -1,5 +1,5 @@
 ﻿import { Column } from "@serenity-is/sleekgrid";
-import { Authorization, Culture, Dialog, DialogButton, Fluent, cancelDialogButton, faIcon, localText, nsSerenity, okDialogButton } from "../../base";
+import { Authorization, ColumnPickerDialogTexts, Culture, Dialog, DialogButton, Fluent, cancelDialogButton, faIcon, localText, nsSerenity, okDialogButton } from "../../base";
 import { Router } from "../../compat";
 import { ResizableAttribute } from "../../types";
 import { BaseDialog } from "../dialogs/basedialog";
@@ -20,7 +20,7 @@ export class ColumnPickerDialog<P = {}> extends BaseDialog<P> {
     declare public done: () => void;
 
     protected renderContents(): any {
-        this.dialogTitle = localText("Controls.ColumnPickerDialog.Title");
+        this.dialogTitle = ColumnPickerDialogTexts.Title;
 
         return (
             <div class="columns-container">
@@ -28,7 +28,7 @@ export class ColumnPickerDialog<P = {}> extends BaseDialog<P> {
                     <h5>
                         <i class={faIcon("eye")} />
                         {" "}
-                        {localText(localText("Controls.ColumnPickerDialog.VisibleColumns"))}
+                        {ColumnPickerDialogTexts.VisibleColumns}
                     </h5>
                     <ul ref={ref => this.ulVisible = ref} />
                 </div>
@@ -36,7 +36,7 @@ export class ColumnPickerDialog<P = {}> extends BaseDialog<P> {
                     <h5>
                         <i class={faIcon("eye-slash")} />
                         {" "}
-                        {localText(localText("Controls.ColumnPickerDialog.HiddenColumns"))}
+                        {ColumnPickerDialogTexts.HiddenColumns}
                     </h5>
                     <ul ref={ref => this.ulHidden = ref} />
                 </div>
@@ -72,7 +72,7 @@ export class ColumnPickerDialog<P = {}> extends BaseDialog<P> {
         });
 
         return {
-            hint: localText("Controls.ColumnPickerDialog.Title"),
+            hint: ColumnPickerDialogTexts.Title,
             action: 'column-picker',
             cssClass: "column-picker-button",
             icon: faIcon("th-list", "blue"),
@@ -83,7 +83,7 @@ export class ColumnPickerDialog<P = {}> extends BaseDialog<P> {
     protected getDialogButtons(): DialogButton[] {
         return [
             {
-                text: localText("Controls.ColumnPickerDialog.RestoreDefaults"),
+                text: ColumnPickerDialogTexts.RestoreDefaults,
                 cssClass: "btn btn-secondary restore-defaults",
                 click: () => {
                     let liByKey: { [key: string]: HTMLElement } = {};
@@ -165,8 +165,8 @@ export class ColumnPickerDialog<P = {}> extends BaseDialog<P> {
             <li class={!allowHide && "cant-hide"} data-key={col.id} >
                 <span class="drag-handle">☰</span>
                 {this.getTitle(col)}
-                {allowHide && <i class={["js-hide", faIcon("eye-slash")]} title={localText("Controls.ColumnPickerDialog.HideHint")} />}
-                <i class={["js-show", faIcon("eye")]} title={localText("Controls.ColumnPickerDialog.ShowHint")} />
+                {allowHide && <i class={["js-hide", faIcon("eye-slash")]} title={ColumnPickerDialogTexts.HideHint} />}
+                <i class={["js-show", faIcon("eye")]} title={ColumnPickerDialogTexts.ShowHint} />
             </li> as HTMLElement);
     }
 

@@ -1,4 +1,4 @@
-﻿import { Fluent, PropertyItem, localText, nsSerenity, tryGetText } from "../../base";
+﻿import { FilterPanelTexts, Fluent, PropertyItem, localText, nsSerenity } from "../../base";
 import { Combobox } from "../editors/combobox";
 import { ComboboxEditor } from "../editors/comboboxeditor";
 import { ReflectionOptionsSetter } from "../widgets/reflectionoptionssetter";
@@ -20,14 +20,13 @@ class FilterFieldSelect<P extends FilterFieldSelectOptions = FilterFieldSelectOp
         super(props);
 
         for (var field of this.options.fields) {
-            this.addOption(field.name, (tryGetText(field.title) ??
-                field.title ?? field.name), field);
+            this.addOption(field.name, localText(field.title, field.title ?? field.name), field);
         }
     }
 
     emptyItemText() {
         if (!this.value) {
-            return localText('Controls.FilterPanel.SelectField');
+            return FilterPanelTexts.SelectField;
         }
 
         return null;
@@ -47,8 +46,7 @@ class FilterOperatorSelect extends ComboboxEditor<any, FilterOperator> {
         super(props);
 
         for (var op of this.options.source) {
-            var title = (op.title ?? (
-                tryGetText("Controls.FilterPanel.OperatorNames." + op.key) ?? op.key));
+            var title = op.title ?? (FilterPanelTexts.OperatorNames.asTry() as any)[op.key] ?? op.key;
             this.addOption(op.key, title, op);
         }
 
@@ -163,12 +161,12 @@ export class FilterPanel<P = {}> extends FilterWidgetBase<P> {
             <div id={id.Rows} class="filter-lines" />
             <div id={id.Buttons} class="buttons">
                 <button id={id.AddButton} type="button" class="btn btn-primary add" onClick={e => this.addButtonClick(e)}>
-                    {localText('Controls.FilterPanel.AddFilter')}
+                    {FilterPanelTexts.AddFilter}
                 </button>
                 <button id={id.SearchButton} type="button" class="btn btn-success search" onClick={e => this.searchButtonClick(e)} ref={el => this.searchButton = el}>
-                    {localText('Controls.FilterPanel.SearchButton')}</button>
+                    {FilterPanelTexts.SearchButton}</button>
                 <button id={id.ResetButton} type="button" class="btn btn-danger reset" onClick={e => this.resetButtonClick(e)} ref={el => this.resetButton = el}>
-                    {localText('Controls.FilterPanel.ResetButton')}
+                    {FilterPanelTexts.ResetButton}
                 </button>
             </div>
             <div style="clear: both" />
@@ -200,7 +198,7 @@ export class FilterPanel<P = {}> extends FilterWidgetBase<P> {
             var op = getWidgetFrom(row.querySelector('div.o input.op-select'), FilterOperatorSelect).value;
 
             if (op == null || op.length === 0) {
-                errorText = localText('Controls.FilterPanel.InvalidOperator');
+                errorText = FilterPanelTexts.InvalidOperator;
                 break;
             }
 
@@ -292,13 +290,13 @@ export class FilterPanel<P = {}> extends FilterWidgetBase<P> {
         const fieldSelect = <input class="field-select" type="hidden" /> as HTMLInputElement;
         const row = this.rowsDiv.appendChild(
             <div class="filter-line">
-                <a class="delete" title={localText('Controls.FilterPanel.RemoveField')}
+                <a class="delete" title={FilterPanelTexts.RemoveField}
                     onClick={this.deleteRowClick.bind(this)}><span></span></a>
                 <div class="l" style="display: none">
                     <a class="rightparen" href="#" onClick={this.leftRightParenClick.bind(this)}>)</a>
                     <a class={["andor", isLastRowOr && "or"]} href="#"
-                        title={localText('Controls.FilterPanel.ChangeAndOr')} onClick={this.andOrClick.bind(this)}>
-                        {localText('Controls.FilterPanel.' + (isLastRowOr ? 'Or' : 'And'))}
+                        title={FilterPanelTexts.ChangeAndOr} onClick={this.andOrClick.bind(this)}>
+                        {FilterPanelTexts[(isLastRowOr ? 'Or' : 'And')]}
                     </a>
                     <a class="leftparen" href="#" onClick={this.leftRightParenClick.bind(this)}>(</a>
                 </div>
@@ -448,8 +446,7 @@ export class FilterPanel<P = {}> extends FilterWidgetBase<P> {
         e.preventDefault();
         var andor = e.target as HTMLElement;
         andor.classList.toggle('or');
-        andor.textContent = localText('Controls.FilterPanel.' +
-            (andor.classList.contains('or') ? 'Or' : 'And'));
+        andor.textContent = FilterPanelTexts[(andor.classList.contains('or') ? 'Or' : 'And')];
     }
 
     protected leftRightParenClick(e: Event): void {

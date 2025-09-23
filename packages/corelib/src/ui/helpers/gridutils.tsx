@@ -1,6 +1,6 @@
-import { Grid, IDataView, RowMoveManager } from "@serenity-is/sleekgrid";
-import { Fluent, SaveRequest, isArrayLike, localText, serviceRequest } from "../../base";
-import { IRemoteView, RemoteView } from "../../slick";
+import { Grid, RowMoveManager } from "@serenity-is/sleekgrid";
+import { EntityGridTexts, Fluent, SaveRequest, isArrayLike, serviceRequest } from "../../base";
+import { IRemoteView } from "../../slick";
 import { IDataGrid } from "../datagrid/idatagrid";
 import { QuickSearchField, QuickSearchInput } from "../datagrid/quicksearchinput";
 
@@ -34,7 +34,7 @@ export namespace GridUtils {
         };
 
         if (hint == null)
-            hint = localText('Controls.EntityGrid.IncludeDeletedToggle');
+            hint = EntityGridTexts.IncludeDeletedToggle;
 
         addToggleButton(toolDiv, 's-IncludeDeletedToggle',
             function (pressed) {

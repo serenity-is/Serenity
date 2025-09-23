@@ -1,4 +1,4 @@
-import { tryGetText } from "../../base";
+import { CheckTreeEditorTexts } from "../../base";
 import { IDataGrid } from "../datagrid/idatagrid";
 import { ToolButton, Toolbar } from "../widgets/toolbar";
 import { getWidgetFrom } from "../widgets/widgetutils";
@@ -22,8 +22,7 @@ export namespace GridSelectAllButtonHelper {
         text?: string, onClick?: () => void): ToolButton {
 
         if (text == null) {
-            text = tryGetText('Controls.CheckTreeEditor.SelectAll') ??
-                'Select All';
+            text = CheckTreeEditorTexts.SelectAll ?? "Select All";
         }
         return {
             title: text,

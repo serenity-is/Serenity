@@ -1,4 +1,4 @@
-import { Fluent, PropertyGrid, TabsExtensions, Toolbar, Validator, WidgetProps, getForm, gridPageInit, localText, notifySuccess, reloadLookup, toId, validateOptions } from "@serenity-is/corelib";
+import { EntityDialogTexts, Fluent, PropertyGrid, TabsExtensions, Toolbar, Validator, WidgetProps, getForm, gridPageInit, localText, notifySuccess, reloadLookup, toId, validateOptions } from "@serenity-is/corelib";
 import { CustomerForm, CustomerRow, CustomerService, OrderDialog, OrderGrid, OrderRow } from "@serenity-is/demo.northwind";
 import { nsDemoBasicSamples } from "../../ServerTypes/Namespaces";
 
@@ -111,7 +111,7 @@ export class OtherFormInTabDialog<P = {}> extends OrderDialog<P> {
                 <div id={id.TabCustomer} class="tab-pane">
                     <Toolbar class="s-DialogToolbar" buttons={[{
                         cssClass: "apply-changes-button",
-                        title: localText("Controls.EntityDialog.SaveButton"),
+                        title: EntityDialogTexts.SaveButton,
                         onClick: () => this.customerSaveClick()
                     }]} />
                     <form action="" class="s-Form" ref={el => this.customerValidator = new Validator(el, validateOptions())}>

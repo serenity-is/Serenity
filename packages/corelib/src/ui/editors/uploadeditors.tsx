@@ -1,4 +1,4 @@
-import { Fluent, PropertyItem, getjQuery, localText, nsSerenity } from "../../base";
+import { FileUploadTexts, Fluent, PropertyItem, getjQuery, nsSerenity } from "../../base";
 import { ValidationHelper, isTrimmedEmpty, replaceAll } from "../../compat";
 import { IGetEditValue, IReadOnly, ISetEditValue, IValidateRequired } from "../../interfaces";
 import { FileUploadConstraints, UploadHelper, UploadInputOptions, UploadedFile } from "../helpers/uploadhelper";
@@ -82,7 +82,7 @@ export class FileUploadEditor<P extends FileUploadEditorOptions = FileUploadEdit
     }
 
     protected addFileButtonText(): string {
-        return localText('Controls.ImageUpload.AddFileButton');
+        return FileUploadTexts.AddFileButton;
     }
 
     protected getToolButtons(): ToolButton[] {
@@ -96,7 +96,7 @@ export class FileUploadEditor<P extends FileUploadEditorOptions = FileUploadEdit
             },
             {
                 title: '',
-                hint: localText('Controls.ImageUpload.DeleteButtonHint'),
+                hint: FileUploadTexts.DeleteButtonHint,
                 action: 'delete',
                 cssClass: 'delete-button',
                 onClick: () => {
@@ -334,7 +334,7 @@ export class MultipleFileUploadEditor<P extends MultipleFileUploadEditorOptions 
     }
 
     protected addFileButtonText(): string {
-        return localText('Controls.ImageUpload.AddFileButton');
+        return FileUploadTexts.AddFileButton;
     }
 
     protected getToolButtons(): ToolButton[] {

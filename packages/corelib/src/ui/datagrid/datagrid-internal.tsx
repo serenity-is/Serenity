@@ -1,6 +1,6 @@
 
 import { ArgsSort, Grid } from "@serenity-is/sleekgrid";
-import { isInstanceOfType, PropertyItem, tryGetText } from "../../base";
+import { isInstanceOfType, localText, PropertyItem } from "../../base";
 import { deepClone } from "../../compat";
 import { IRemoteView } from "../../slick";
 import { BooleanFiltering } from "../filtering/booleanfiltering";
@@ -73,7 +73,7 @@ export function getItemCssClass(this: void, item: any, activeFieldName: string, 
 export function propertyItemToQuickFilter(item: PropertyItem): QuickFilter<any, any> | null {
     let result: QuickFilter<any, any> = {};
     const name = item.name;
-    const title = tryGetText(item.title) ?? item.title ?? name;
+    const title = localText(item.title, item.title ?? name);
 
     const filteringType = FilteringTypeRegistry.get((item.filteringType ?? 'String'));
     if (filteringType === DateFiltering) {

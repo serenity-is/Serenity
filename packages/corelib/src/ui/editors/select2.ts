@@ -2,7 +2,7 @@
  * Adapted from 3.5.x version of Select2 (https://github.com/select2/select2), removing jQuery dependency
  */
 
-import { Fluent, localText, serviceCall, stringFormat } from "../../base";
+import { Fluent, SelectEditorTexts, serviceCall, stringFormat } from "../../base";
 
 export type Select2Element = HTMLInputElement | HTMLSelectElement;
 export type Select2FormatResult = string | Element | DocumentFragment;
@@ -184,14 +184,6 @@ function getOffset(el: Element) {
         top: box.top + window.scrollY - docElem.clientTop,
         left: box.left + window.scrollX - docElem.clientLeft
     };
-}
-
-function txt(s: string) {
-    return localText("Controls.SelectEditor." + s);
-}
-
-function fmt(s: string, ...prm: any[]) {
-    return stringFormat(localText("Controls.SelectEditor." + s), prm);
 }
 
 function measureScrollbar() {
@@ -603,22 +595,22 @@ export class Select2 {
         dropdownCss: {},
         containerCssClass: "",
         dropdownCssClass: "",
-        formatAjaxError: () => txt("AjaxError"),
-        formatInputTooLong: (input: string, max: number) => fmt("InputTooLong", input.length - max, max, input.length),
-        formatInputTooShort: (input: string, min: number) => fmt("InputTooShort", min - input.length, min, input.length),
-        formatLoadMore: (pageNumber: number) => fmt("LoadMore", pageNumber),
-        formatMatches: (matches: number) => matches === 1 ? txt("SingleMatch") : fmt("MultipleMatches", matches),
-        formatNoMatches: () => txt("NoMatches"),
+        formatAjaxError: () => SelectEditorTexts.AjaxError,
+        formatInputTooLong: (input: string, max: number) => stringFormat(SelectEditorTexts.InputTooLong, input.length - max, max, input.length),
+        formatInputTooShort: (input: string, min: number) => stringFormat(SelectEditorTexts.InputTooShort, min - input.length, min, input.length),
+        formatLoadMore: (pageNumber: number) => stringFormat(SelectEditorTexts.LoadMore, pageNumber),
+        formatMatches: (matches: number) => matches === 1 ? SelectEditorTexts.SingleMatch : stringFormat(SelectEditorTexts.MultipleMatches, matches),
+        formatNoMatches: () => SelectEditorTexts.NoMatches,
         formatResult: function (result, _, query, escapeMarkup) {
             var markup: string[] = [];
             markMatch(result.text, query.term, markup, escapeMarkup);
             return markup.join("");
         },
         formatResultCssClass: function (data) { return data.css; },
-        formatSearching: () => txt("Searching"),
+        formatSearching: () => SelectEditorTexts.Searching,
         formatSelection: (data, _, escapeMarkup) => data ? escapeMarkup(data.text) : undefined,
         formatSelectionCssClass: function () { return undefined; },
-        formatSelectionTooBig: (limit: number) => fmt("SelectionTooBig", limit),
+        formatSelectionTooBig: (limit: number) => stringFormat(SelectEditorTexts.SelectionTooBig, limit),
         sortResults: results => results,
         minimumResultsForSearch: 0,
         minimumInputLength: 0,
@@ -2117,7 +2109,7 @@ abstract class AbstractSelect2 {
                     postRender();
                 }
                 finally {
-                    this.dropdown?.classList.remove("select2-position-fixed");                    
+                    this.dropdown?.classList.remove("select2-position-fixed");
                 }
 
                 Fluent.trigger(this.opts.element, "select2-loaded", { items: data });

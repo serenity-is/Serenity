@@ -1,4 +1,4 @@
-﻿import { Authorization, Fluent, addClass, appendToNode, faIcon, getType, isBS3, isPromiseLike, localText, nsSerenity, tryGetText, type PropertyItem } from "../../base";
+﻿import { Authorization, Fluent, PropertyGridTexts, addClass, appendToNode, faIcon, getType, isBS3, isPromiseLike, nsSerenity, tryGetText, type PropertyItem } from "../../base";
 import { EditorType } from "../../types/editortype";
 import { EditorTypeRegistry } from "../../types/editortyperegistry";
 import { EditorUtils } from "../editors/editorutils";
@@ -22,7 +22,7 @@ export function PropertyFieldCaption(props: {
         <label className="caption" htmlFor={(props.idPrefix ?? "") + props.item.name}
             title={determineText(props.localTextPrefix, props.item.hint, p => p + props.item.name + '_Hint') ?? caption}
             style={!!labelWidth && (labelWidth == "0" ? "display: none" : ("width: " + labelWidth))}>
-            {props.item.required && <sup title={localText('Controls.PropertyGrid.RequiredHint')}>*</sup>}
+            {props.item.required && <sup title={PropertyGridTexts.RequiredHint}>*</sup>}
             {caption}
         </label>
     ) as HTMLLabelElement;

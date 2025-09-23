@@ -1,11 +1,11 @@
-import { htmlEncode, isArrayLike, localText } from "../base";
+import { htmlEncode, isArrayLike, localText, SelectEditorTexts } from "../base";
 
 /**
  * Adds an empty option to the select.
  * @param select the select element
  */
 export function addEmptyOption(select: ArrayLike<HTMLElement> | HTMLSelectElement) {
-    addOption(select, '', localText("Controls.SelectEditor.EmptyItemText"));
+    addOption(select, '', SelectEditorTexts.EmptyItemText);
 }
 
 /**

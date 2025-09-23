@@ -1,4 +1,4 @@
-import { Culture, Fluent, Invariant, addValidationRule, formatDate, formatISODateTimeUTC, getjQuery, localText, nsSerenity, parseDate, parseISODateTime, round, setElementReadOnly, stringFormat, trunc, tryGetText } from "../../base";
+import { Culture, DateTimeEditorTexts, Fluent, FormValidationTexts, Invariant, addValidationRule, formatDate, formatISODateTimeUTC, getjQuery, nsSerenity, parseDate, parseISODateTime, round, setElementReadOnly, stringFormat, trunc } from "../../base";
 import { addOption, today } from "../../compat";
 import { IReadOnly, IStringValue } from "../../interfaces";
 import { flatPickrTrigger } from "../helpers/dateediting";
@@ -89,11 +89,11 @@ export class DateTimeEditor<P extends DateTimeEditorOptions = DateTimeEditorOpti
                 }
 
                 if (this.get_minValue() && Invariant.stringCompare(value, this.get_minValue()) < 0) {
-                    return stringFormat(localText('Validation.MinDate'), formatDate(this.get_minValue(), null));
+                    return stringFormat(FormValidationTexts.MinDate, formatDate(this.get_minValue(), null));
                 }
 
                 if (this.get_maxValue() && Invariant.stringCompare(value, this.get_maxValue()) > 0) {
-                    return stringFormat(localText('Validation.MaxDate'), formatDate(this.get_maxValue(), null));
+                    return stringFormat(FormValidationTexts.MaxDate, formatDate(this.get_maxValue(), null));
                 }
 
                 return null;
@@ -257,7 +257,7 @@ export class DateTimeEditor<P extends DateTimeEditorOptions = DateTimeEditorOpti
     }
 
     private getInplaceNowText(): string {
-        return tryGetText('Controls.DateTimeEditor.SetToNow') ?? 'set to now';
+        return DateTimeEditorTexts.asTry().SetToNow ?? 'set to now';
     }
 
     private getDisplayFormat(): string {

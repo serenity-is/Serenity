@@ -1,5 +1,5 @@
 import { ArgsCell, AutoTooltips, Column, ColumnSort, FormatterContext, Grid, GridOptions } from "@serenity-is/sleekgrid";
-import { Authorization, Criteria, Fluent, ListResponse, cssEscape, debounce, getInstanceType, getTypeFullName, getjQuery, nsSerenity, tryGetText, type PropertyItem, type PropertyItemsData } from "../../base";
+import { Authorization, Criteria, DataGridTexts, Fluent, ListResponse, cssEscape, debounce, getInstanceType, getTypeFullName, getjQuery, nsSerenity, tryGetText, type PropertyItem, type PropertyItemsData } from "../../base";
 import { LayoutTimer, ScriptData, getColumnsData, getColumnsDataAsync, setEquality } from "../../compat";
 import { IReadOnly } from "../../interfaces";
 import { Format, IRemoteView, PagerOptions, RemoteView, RemoteViewOptions } from "../../slick";
@@ -432,7 +432,7 @@ export class DataGrid<TItem, P = {}> extends Widget<P> implements IDataGrid, IRe
     }
 
     protected getAddButtonCaption(): string {
-        return tryGetText('Controls.DataGrid.NewButton') ?? 'New';
+        return DataGridTexts.asTry().NewButton ?? 'New';
     }
 
     protected getButtons(): ToolButton[] {

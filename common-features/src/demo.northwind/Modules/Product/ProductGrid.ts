@@ -1,4 +1,4 @@
-import { Dictionary, EditorUtils, EntityGrid, FilterableAttribute, Lookup, WidgetProps, deepClone, formatNumber, htmlEncode, localText, notifyError, parseDecimal, parseInteger, parseQueryString, serviceRequest, toId } from "@serenity-is/corelib";
+import { Dictionary, EditorUtils, EntityGrid, FilterableAttribute, FormValidationTexts, Lookup, WidgetProps, deepClone, formatNumber, htmlEncode, notifyError, parseDecimal, parseInteger, parseQueryString, serviceRequest, toId } from "@serenity-is/corelib";
 import { ExcelExportHelper, PdfExportHelper } from "@serenity-is/extensions";
 import { Column, FormatterContext, NonDataRow } from "@serenity-is/sleekgrid";
 import { CategoryRow, ProductColumns, ProductRow, ProductService, SupplierRow } from "../ServerTypes/Demo";
@@ -199,7 +199,7 @@ export class ProductGrid<P = {}> extends EntityGrid<ProductRow, P> {
         if (field === 'UnitPrice') {
             value = parseDecimal(txt ?? '');
             if (value == null || isNaN(value)) {
-                notifyError(localText('Validation.Decimal'), '', null);
+                notifyError(FormValidationTexts.Decimal, '', null);
                 input.value = oldText;
                 input.focus();
                 return;
@@ -208,7 +208,7 @@ export class ProductGrid<P = {}> extends EntityGrid<ProductRow, P> {
         else if (input.classList.contains("numeric")) {
             var i = parseInteger(txt ?? '');
             if (isNaN(i) || i > 32767 || i < 0) {
-                notifyError(localText('Validation.Integer'), '', null);
+                notifyError(FormValidationTexts.Integer, '', null);
                 input.value = oldText;
                 input.focus();
                 return;

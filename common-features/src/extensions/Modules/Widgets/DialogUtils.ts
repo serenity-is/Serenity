@@ -1,4 +1,5 @@
 import { Dialog, Fluent, confirmDialog, isArrayLike, localText } from "@serenity-is/corelib";
+import { DialogUtilsTexts } from "../ServerTypes/Texts";
 
 export namespace DialogUtils {
 
@@ -18,7 +19,7 @@ export namespace DialogUtils {
 
             e.preventDefault();
             e.stopImmediatePropagation();
-            confirmDialog(localText('Site.Dialogs.PendingChangesConfirmation'),
+            confirmDialog(DialogUtilsTexts.PendingChangesConfirmation,
                 () => {
                     el.dataset.ackuntil = "" + new Date().getTime() + 1000;
                     el.querySelector<HTMLElement>('div.save-and-close-button')?.click()
@@ -36,8 +37,8 @@ export namespace DialogUtils {
                 return;
 
             e.preventDefault();
-            (e as any).returnValue = localText("Site.Dialogs.PendingChangesUnloadWarning");
-            return localText("Site.Dialogs.PendingChangesUnloadWarning");
+            (e as any).returnValue = DialogUtilsTexts.PendingChangesUnloadWarning;
+            return DialogUtilsTexts.PendingChangesUnloadWarning;
         }
 
         Fluent.on(window, "beforeunload", beforeUnload);

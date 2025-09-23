@@ -1,5 +1,6 @@
-import { BaseDialog, Dialog, DialogTexts, WidgetProps, localText } from "@serenity-is/corelib";
+import { BaseDialog, Dialog, DialogTexts, WidgetProps } from "@serenity-is/corelib";
 import { nsExtensions } from "../ServerTypes/Namespaces";
+import { BasicProgressDialogTexts } from "../ServerTypes/Texts";
 
 export class BasicProgressDialog<P = {}> extends BaseDialog<P> {
     static [Symbol.typeInfo] = this.registerClass(nsExtensions);
@@ -9,7 +10,7 @@ export class BasicProgressDialog<P = {}> extends BaseDialog<P> {
     constructor(props?: WidgetProps<P>) {
         super(props);
 
-        this.dialogTitle = localText('Site.BasicProgressDialog.PleaseWait');
+        this.dialogTitle = BasicProgressDialogTexts.PleaseWait;
     }
 
     declare public cancelled: boolean;
@@ -53,7 +54,7 @@ export class BasicProgressDialog<P = {}> extends BaseDialog<P> {
                     el.style.opacity = '0.5';
                 });
 
-                this.dialogTitle = this.cancelTitle?.trim() || localText('Site.BasicProgressDialog.CancelTitle');
+                this.dialogTitle = this.cancelTitle?.trim() || BasicProgressDialogTexts.CancelTitle;
             }
         }];
     }

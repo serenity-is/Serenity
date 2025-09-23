@@ -1,5 +1,5 @@
-﻿import { Fluent, Tooltip, Validator, getjQuery, isArrayLike, localText, notifyError } from "../base";
-import { validatorAbortHandler, validateOptions, ValidationHelper } from "./validation";
+﻿import { Fluent, FormValidationTexts, localText, notifyError, Tooltip, Validator } from "../base";
+import { validateOptions, ValidationHelper, validatorAbortHandler } from "./validation";
 
 // Mock the imported functions
 vi.mock("../base", () => ({
@@ -17,7 +17,10 @@ vi.mock("../base", () => ({
     getjQuery: vi.fn().mockReturnValue(null),
     isArrayLike: vi.fn((obj) => obj && typeof obj.length === 'number' && !obj.tagName),
     localText: vi.fn((key) => key),
-    notifyError: vi.fn()
+    notifyError: vi.fn(),
+    FormValidationTexts: {
+        InvalidFormMessage: "Validation.InvalidFormMessage"
+    }
 }));
 
 // Mock DOM methods
@@ -188,7 +191,6 @@ describe("validateOptions", () => {
         const result = validateOptions();
         result.invalidHandler({} as any, mockValidator as any);
 
-        expect(localText).toHaveBeenCalledWith("Validation.InvalidFormMessage");
         expect(notifyError).toHaveBeenCalledWith("Validation.InvalidFormMessage");
     });
 

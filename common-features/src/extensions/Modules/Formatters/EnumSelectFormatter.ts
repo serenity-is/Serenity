@@ -1,4 +1,4 @@
-import { EnumTypeRegistry, Formatter, formatterTypeInfo, htmlEncode, localText, registerType, tryGetText } from "@serenity-is/corelib";
+import { EnumTypeRegistry, Formatter, formatterTypeInfo, htmlEncode, localText, registerType, SelectEditorTexts } from "@serenity-is/corelib";
 import { FormatterContext } from "@serenity-is/sleekgrid";
 import { nsExtensions } from "../ServerTypes/Namespaces";
 
@@ -16,7 +16,7 @@ export class EnumSelectFormatter implements Formatter {
         var sb = "<select>";
         if (this.props.allowClear) {
             sb += '<option value="">';
-            sb += htmlEncode(this.props.emptyItemText || localText("Controls.SelectEditor.EmptyItemText"));
+            sb += htmlEncode(this.props.emptyItemText ?? SelectEditorTexts.EmptyItemText);
             sb += '</option>';
         }
 
@@ -26,7 +26,7 @@ export class EnumSelectFormatter implements Formatter {
                 sb += " selected";
             var name = enumType[x];
             sb += ">";
-            sb += htmlEncode(tryGetText("Enums." + this.props.enumKey + "." + name) || name);
+            sb += htmlEncode(localText("Enums." + this.props.enumKey + "." + name, name));
             sb += "</option>";
         }
 

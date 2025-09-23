@@ -1,4 +1,4 @@
-import { cssEscape, faIcon, Fluent, LanguageList, localText, PropertyItem, SaveRequest, TranslationConfig } from "../../base";
+import { cssEscape, EntityDialogTexts, faIcon, Fluent, LanguageList, localText, PropertyItem, SaveRequest, TranslationConfig } from "../../base";
 import { PropertyGrid, PropertyGridOptions } from "../widgets/propertygrid";
 
 export interface EntityLocalizerOptions {
@@ -266,8 +266,8 @@ export class EntityLocalizer {
         const locMode = this.isLocalizationMode();
         Fluent.toggle(this.targetLanguage, locMode);
         const inner = button?.querySelector('.button-inner');
-        inner && (inner.textContent = ((locMode ? localText('Controls.EntityDialog.LocalizationBack') :
-            localText('Controls.EntityDialog.LocalizationButton'))));
+        inner && (inner.textContent = ((locMode ? localText(EntityDialogTexts.LocalizationBack) :
+            localText(EntityDialogTexts.LocalizationButton))));
 
         this.options.getPropertyGrid()?.toggle(!locMode);
         Fluent.toggle(this.grid?.domNode, locMode);

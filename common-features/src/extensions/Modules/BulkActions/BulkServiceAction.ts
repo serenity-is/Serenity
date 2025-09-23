@@ -1,4 +1,5 @@
 ﻿import { Dictionary, ServiceError, confirmDialog, localText, notifyError, notifySuccess, notifyWarning, stringFormat } from "@serenity-is/corelib";
+import { BasicProgressDialogTexts, BulkServiceActionTexts } from "../ServerTypes/Texts";
 import { BasicProgressDialog } from "./BasicProgressDialog";
 
 export class BulkServiceAction {
@@ -22,7 +23,7 @@ export class BulkServiceAction {
     }
 
     protected getConfirmationFormat() {
-        return localText('Site.BulkServiceAction.ConfirmationFormat');
+        return BulkServiceActionTexts.ConfirmationFormat;
     }
 
     protected getConfirmationMessage(targetCount) {
@@ -34,7 +35,7 @@ export class BulkServiceAction {
     }
 
     protected getNothingToProcessMessage() {
-        return localText('Site.BulkServiceAction.NothingToProcess');
+        return BulkServiceActionTexts.NothingToProcess;
     }
 
     protected nothingToProcess() {
@@ -70,11 +71,11 @@ export class BulkServiceAction {
         this.completedRequests++;
 
         var title = localText((this.progressDialog.cancelled ?
-            'Site.BasicProgressDialog.CancelTitle' : 'Site.BasicProgressDialog.PleaseWait'));
+            BasicProgressDialogTexts.CancelTitle : BasicProgressDialogTexts.PleaseWait));
 
         title += ' (';
         if (this.successCount > 0) {
-            title += stringFormat(localText('Site.BulkServiceAction.SuccessCount'), this.successCount);
+            title += stringFormat(BulkServiceActionTexts.SuccessCount, this.successCount);
         }
 
         if (this.errorCount > 0) {
@@ -82,7 +83,7 @@ export class BulkServiceAction {
                 title += ', ';
             }
 
-            title += stringFormat(localText('Site.BulkServiceAction.ErrorCount'), this.errorCount);
+            title += stringFormat(BulkServiceActionTexts.ErrorCount, this.errorCount);
         }
 
         this.progressDialog.title = title + ')';
@@ -126,7 +127,7 @@ export class BulkServiceAction {
     }
 
     protected getAllHadErrorsFormat() {
-        return localText('Site.BulkServiceAction.AllHadErrorsFormat');
+        return BulkServiceActionTexts.AllHadErrorsFormat;
     }
 
     protected showAllHadErrors() {
@@ -134,7 +135,7 @@ export class BulkServiceAction {
     }
 
     protected getSomeHadErrorsFormat() {
-        return localText('Site.BulkServiceAction.SomeHadErrorsFormat');
+        return BulkServiceActionTexts.SomeHadErrorsFormat;
     }
 
     protected showSomeHadErrors() {
@@ -142,7 +143,7 @@ export class BulkServiceAction {
     }
 
     protected getAllSuccessFormat() {
-        return localText('Site.BulkServiceAction.AllSuccessFormat');
+        return BulkServiceActionTexts.AllSuccessFormat;
     }
 
     protected showAllSuccess() {

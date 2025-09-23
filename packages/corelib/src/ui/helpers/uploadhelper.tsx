@@ -1,4 +1,4 @@
-import { Fluent, ServiceResponse, Uploader, blockUI, blockUndo, getjQuery, htmlEncode, isArrayLike, localText, notifyError, resolveUrl, round, stringFormat } from "../../base";
+import { FileUploadTexts, Fluent, ServiceResponse, Uploader, blockUI, blockUndo, getjQuery, htmlEncode, isArrayLike, notifyError, resolveUrl, round, stringFormat } from "../../base";
 import { replaceAll } from "../../compat";
 
 export namespace UploadHelper {
@@ -64,16 +64,16 @@ export namespace UploadHelper {
         opt: FileUploadConstraints): boolean {
 
         if (!file.IsImage && !opt.allowNonImage) {
-            notifyError(localText('Controls.ImageUpload.NotAnImageFile'));
+            notifyError(FileUploadTexts.NotAnImageFile);
             return false;
         }
         if (opt.minSize > 0 && file.Size < opt.minSize) {
-            notifyError(stringFormat(localText('Controls.ImageUpload.UploadFileTooSmall'),
+            notifyError(stringFormat(FileUploadTexts.UploadFileTooSmall,
                 fileSizeDisplay(opt.minSize)));
             return false;
         }
         if (opt.maxSize > 0 && file.Size > opt.maxSize) {
-            notifyError(stringFormat(localText('Controls.ImageUpload.UploadFileTooBig'),
+            notifyError(stringFormat(FileUploadTexts.UploadFileTooBig,
                 fileSizeDisplay(opt.maxSize)));
             return false;
         }
@@ -81,19 +81,19 @@ export namespace UploadHelper {
             return true;
         }
         if (opt.minWidth > 0 && file.Width < opt.minWidth) {
-            notifyError(stringFormat(localText('Controls.ImageUpload.MinWidth'), opt.minWidth));
+            notifyError(stringFormat(FileUploadTexts.MinWidth, opt.minWidth));
             return false;
         }
         if (opt.maxWidth > 0 && file.Width > opt.maxWidth) {
-            notifyError(stringFormat(localText('Controls.ImageUpload.MaxWidth'), opt.maxWidth));
+            notifyError(stringFormat(FileUploadTexts.MaxWidth, opt.maxWidth));
             return false;
         }
         if (opt.minHeight > 0 && file.Height < opt.minHeight) {
-            notifyError(stringFormat(localText('Controls.ImageUpload.MinHeight'), opt.minHeight));
+            notifyError(stringFormat(FileUploadTexts.MinHeight, opt.minHeight));
             return false;
         }
         if (opt.maxHeight > 0 && file.Height > opt.maxHeight) {
-            notifyError(stringFormat(localText('Controls.ImageUpload.MaxHeight'), opt.maxHeight));
+            notifyError(stringFormat(FileUploadTexts.MaxHeight, opt.maxHeight));
             return false;
         }
         return true;
@@ -187,10 +187,10 @@ export namespace UploadHelper {
         if (!$)
             return;
         $(link).colorbox?.({
-            current: htmlEncode(localText('Controls.ImageUpload.ColorboxCurrent')),
-            previous: htmlEncode(localText('Controls.ImageUpload.ColorboxPrior')),
-            next: htmlEncode(localText('Controls.ImageUpload.ColorboxNext')),
-            close: htmlEncode(localText('Controls.ImageUpload.ColorboxClose'))
+            current: htmlEncode(FileUploadTexts.ColorboxCurrent),
+            previous: htmlEncode(FileUploadTexts.ColorboxPrior),
+            next: htmlEncode(FileUploadTexts.ColorboxNext),
+            close: htmlEncode(FileUploadTexts.ColorboxClose)
         });
     }
 

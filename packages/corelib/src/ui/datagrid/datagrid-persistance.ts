@@ -1,5 +1,5 @@
 import { Column, Grid } from "@serenity-is/sleekgrid";
-import { cssEscape, Fluent, localText } from "../../base";
+import { cssEscape, FilterPanelTexts, Fluent, localText } from "../../base";
 import { IRemoteView } from "../../slick";
 import { EditorUtils } from "../editors/editorutils";
 import { FilterDisplayBar } from "../filtering/filterdisplaybar";
@@ -141,7 +141,7 @@ export function getCurrentSettings(this: void, opt: {
 
                 if (displayText?.length) {
                     if (settings.quickFilterText?.length) {
-                        settings.quickFilterText += ' ' + (localText('Controls.FilterPanel.And', 'and')) + ' ';
+                        settings.quickFilterText += ' ' + FilterPanelTexts.And + ' ';
                         settings.quickFilterText += displayText;
                     }
                     else {

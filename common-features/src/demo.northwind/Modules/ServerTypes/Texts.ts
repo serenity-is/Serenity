@@ -3,10 +3,19 @@
 namespace texts {
 
     export declare namespace Db {
+        export function asKey(): typeof Db;
+        export function asTry(): typeof Db;
+
 
         namespace Northwind {
+            export function asKey(): typeof Northwind;
+            export function asTry(): typeof Northwind;
+
 
             namespace Category {
+                export function asKey(): typeof Category;
+                export function asTry(): typeof Category;
+
                 export const CategoryID: string;
                 export const CategoryName: string;
                 export const Description: string;
@@ -14,6 +23,9 @@ namespace texts {
             }
 
             namespace CategoryLang {
+                export function asKey(): typeof CategoryLang;
+                export function asTry(): typeof CategoryLang;
+
                 export const CategoryId: string;
                 export const CategoryName: string;
                 export const Description: string;
@@ -22,6 +34,9 @@ namespace texts {
             }
 
             namespace Customer {
+                export function asKey(): typeof Customer;
+                export function asTry(): typeof Customer;
+
                 export const Address: string;
                 export const City: string;
                 export const CompanyName: string;
@@ -42,6 +57,9 @@ namespace texts {
             }
 
             namespace CustomerCustomerDemo {
+                export function asKey(): typeof CustomerCustomerDemo;
+                export function asTry(): typeof CustomerCustomerDemo;
+
                 export const CustomerCompanyName: string;
                 export const CustomerID: string;
                 export const CustomerTypeID: string;
@@ -49,12 +67,18 @@ namespace texts {
             }
 
             namespace CustomerDemographic {
+                export function asKey(): typeof CustomerDemographic;
+                export function asTry(): typeof CustomerDemographic;
+
                 export const CustomerDesc: string;
                 export const CustomerTypeID: string;
                 export const ID: string;
             }
 
             namespace CustomerDetails {
+                export function asKey(): typeof CustomerDetails;
+                export function asTry(): typeof CustomerDetails;
+
                 export const CustomerID: string;
                 export const Email: string;
                 export const LastContactDate: string;
@@ -64,6 +88,9 @@ namespace texts {
             }
 
             namespace CustomerGrossSales {
+                export function asKey(): typeof CustomerGrossSales;
+                export function asTry(): typeof CustomerGrossSales;
+
                 export const ContactName: string;
                 export const CustomerId: string;
                 export const GrossAmount: string;
@@ -72,12 +99,18 @@ namespace texts {
             }
 
             namespace CustomerRepresentatives {
+                export function asKey(): typeof CustomerRepresentatives;
+                export function asTry(): typeof CustomerRepresentatives;
+
                 export const CustomerId: string;
                 export const EmployeeId: string;
                 export const RepresentativeId: string;
             }
 
             namespace Employee {
+                export function asKey(): typeof Employee;
+                export function asTry(): typeof Employee;
+
                 export const Address: string;
                 export const BirthDate: string;
                 export const City: string;
@@ -102,6 +135,9 @@ namespace texts {
             }
 
             namespace EmployeeTerritory {
+                export function asKey(): typeof EmployeeTerritory;
+                export function asTry(): typeof EmployeeTerritory;
+
                 export const EmployeeFullName: string;
                 export const EmployeeID: string;
                 export const TerritoryDescription: string;
@@ -109,6 +145,9 @@ namespace texts {
             }
 
             namespace Note {
+                export function asKey(): typeof Note;
+                export function asTry(): typeof Note;
+
                 export const EntityId: string;
                 export const EntityType: string;
                 export const InsertDate: string;
@@ -119,6 +158,9 @@ namespace texts {
             }
 
             namespace Order {
+                export function asKey(): typeof Order;
+                export function asTry(): typeof Order;
+
                 export const CustomerCity: string;
                 export const CustomerCompanyName: string;
                 export const CustomerContactName: string;
@@ -149,6 +191,9 @@ namespace texts {
             }
 
             namespace OrderDetail {
+                export function asKey(): typeof OrderDetail;
+                export function asTry(): typeof OrderDetail;
+
                 export const DetailID: string;
                 export const Discount: string;
                 export const LineTotal: string;
@@ -163,6 +208,9 @@ namespace texts {
             }
 
             namespace Product {
+                export function asKey(): typeof Product;
+                export function asTry(): typeof Product;
+
                 export const CategoryID: string;
                 export const CategoryName: string;
                 export const Discontinued: string;
@@ -180,6 +228,9 @@ namespace texts {
             }
 
             namespace ProductLang {
+                export function asKey(): typeof ProductLang;
+                export function asTry(): typeof ProductLang;
+
                 export const Id: string;
                 export const LanguageId: string;
                 export const ProductId: string;
@@ -187,6 +238,9 @@ namespace texts {
             }
 
             namespace ProductLog {
+                export function asKey(): typeof ProductLog;
+                export function asTry(): typeof ProductLog;
+
                 export const CategoryID: string;
                 export const ChangingUserId: string;
                 export const Discontinued: string;
@@ -206,11 +260,17 @@ namespace texts {
             }
 
             namespace Region {
+                export function asKey(): typeof Region;
+                export function asTry(): typeof Region;
+
                 export const RegionDescription: string;
                 export const RegionID: string;
             }
 
             namespace SalesByCategory {
+                export function asKey(): typeof SalesByCategory;
+                export function asTry(): typeof SalesByCategory;
+
                 export const CategoryId: string;
                 export const CategoryName: string;
                 export const ProductName: string;
@@ -218,12 +278,18 @@ namespace texts {
             }
 
             namespace Shipper {
+                export function asKey(): typeof Shipper;
+                export function asTry(): typeof Shipper;
+
                 export const CompanyName: string;
                 export const Phone: string;
                 export const ShipperID: string;
             }
 
             namespace Supplier {
+                export function asKey(): typeof Supplier;
+                export function asTry(): typeof Supplier;
+
                 export const Address: string;
                 export const City: string;
                 export const CompanyName: string;
@@ -239,6 +305,9 @@ namespace texts {
             }
 
             namespace Territory {
+                export function asKey(): typeof Territory;
+                export function asTry(): typeof Territory;
+
                 export const RegionDescription: string;
                 export const RegionID: string;
                 export const TerritoryDescription: string;
@@ -248,6 +317,9 @@ namespace texts {
     }
 
     export declare namespace Validation {
+        export function asKey(): typeof Validation;
+        export function asTry(): typeof Validation;
+
         export const NorthwindPhone: string;
         export const NorthwindPhoneMultiple: string;
     }

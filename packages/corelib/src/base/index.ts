@@ -40,6 +40,8 @@ export * from "./scriptdata";
 export * from "./services";
 export * from "./servicetypes";
 export * from "./system";
+export * from "./texts/servicestexts"
+export * from "./texts/webtexts"
 export * from "./toastr2";
 export * from "./tooltip";
 export * from "./uploader";

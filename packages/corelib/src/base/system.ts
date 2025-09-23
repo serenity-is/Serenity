@@ -1,6 +1,6 @@
 import { isAssignableFromSymbol, isInstanceOfTypeSymbol } from "./symbols";
 import { StringLiteral, TypeInfo, ensureTypeInfo, getTypeNameProp, getTypeRegistry, globalObject, interfaceIsAssignableFrom, internalRegisterType, merge, peekTypeInfo } from "./system-internal";
-export { getTypeNameProp, getTypeRegistry, setTypeNameProp, type StringLiteral } from "./system-internal";
+export { ensureTypeInfo, getTypeNameProp, getTypeRegistry, setTypeNameProp, peekTypeInfo, type StringLiteral } from "./system-internal";
 
 export const nsSerenity: "Serenity." = "Serenity.";
 export const SerenityNS: "Serenity" = "Serenity";

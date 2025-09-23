@@ -1,5 +1,5 @@
 import { Column, IGroupTotals, NonDataRow, convertCompatFormatter, escapeHtml } from "@serenity-is/sleekgrid";
-import { formatNumber, htmlEncode, tryGetText } from "../base";
+import { formatNumber, htmlEncode, localText } from "../base";
 
 export interface IAggregator {
     init(): void;
@@ -163,7 +163,7 @@ export namespace Aggregators {
 export namespace AggregateFormatting {
     export function formatMarkup<TItem = any>(totals: IGroupTotals, column: Column<TItem>, aggType: string): string {
         var textKey = (aggType.substring(0, 1).toUpperCase() + aggType.substring(1));
-        var text = tryGetText("Enums.Serenity.SummaryType." + textKey) ?? textKey;
+        var text = localText("Enums.Serenity.SummaryType." + textKey, textKey);
 
         var value = (totals as any)[aggType][column.field];
         var formattedValue = formatValue(column, value);

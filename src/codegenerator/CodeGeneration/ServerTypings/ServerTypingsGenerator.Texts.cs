@@ -158,8 +158,8 @@ public partial class ServerTypingsGenerator : TypingsGeneratorBase
                         fullClassNames.Add(string.Join(".", stack.Take(level + 1)));
                         cw.StartBrace();
 
-                        cw.IndentedLine($"export function keysOf(): typeof {part};");
-                        cw.IndentedLine($"export function tryGet(): typeof {part};");
+                        cw.IndentedLine($"export function asKey(): typeof {part};");
+                        cw.IndentedLine($"export function asTry(): typeof {part};");
                         cw.AppendLine();
                     }
                     stackCount = parts.Length - 1;
@@ -197,9 +197,12 @@ public partial class ServerTypingsGenerator : TypingsGeneratorBase
                         }
                         else
                         {
-                            cw.Indented($"{(CodeWriter.IsJSKeyword(part) ? "// js keyword!: " : "")}export const ");
-                            sb.Append(part);
-                            sb.AppendLine(": string;");
+                            if (part != "asKey" && part != "asTry")
+                            {
+                                cw.Indented($"{(CodeWriter.IsJSKeyword(part) ? "// js keyword!: " : "")}export const ");
+                                sb.Append(part);
+                                sb.AppendLine(": string;");
+                            }
                         }
                     }
                 }

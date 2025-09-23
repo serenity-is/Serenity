@@ -1,5 +1,5 @@
 ﻿import { Column, FormatterContext, Grid, GridOptions } from "@serenity-is/sleekgrid";
-import { Culture, Fluent, ListResponse, nsSerenity, tryGetText, type Lookup, type PropertyItem } from "../../base";
+import { CheckTreeEditorTexts, Culture, Fluent, ListResponse, nsSerenity, type Lookup, type PropertyItem } from "../../base";
 import { ScriptData, getLookup } from "../../compat";
 import { IGetEditValue, IReadOnly, ISetEditValue } from "../../interfaces";
 import { ReflectionUtils } from "../../types/reflectionutils";
@@ -112,7 +112,7 @@ export class CheckTreeEditor<TItem extends CheckTreeItem<TItem>, P = {}> extends
     }
 
     protected getSelectAllText(): string {
-        return tryGetText('Controls.CheckTreeEditor.SelectAll') ?? 'Select All';
+        return CheckTreeEditorTexts.asTry().SelectAll ?? 'Select All';
     }
 
     protected isThreeStateHierarchy(): boolean {

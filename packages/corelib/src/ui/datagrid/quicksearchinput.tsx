@@ -1,4 +1,4 @@
-﻿import { Fluent, localText, nsSerenity } from "../../base";
+﻿import { Fluent, localText, nsSerenity, QuickSearchTexts } from "../../base";
 import { Widget, WidgetProps } from "../widgets/widget";
 
 export interface QuickSearchField {
@@ -29,8 +29,8 @@ export class QuickSearchInput<P extends QuickSearchInputOptions = QuickSearchInp
     constructor(props: WidgetProps<P>) {
         super(props);
 
-        this.domNode.title = localText('Controls.QuickSearch.Hint');
-        this.domNode.placeholder = localText('Controls.QuickSearch.Placeholder');
+        this.domNode.title = QuickSearchTexts.Hint;
+        this.domNode.placeholder = QuickSearchTexts.Placeholder;
         this.lastValue = (this.domNode.value ?? "").trim();
 
         Fluent.on(this.domNode, "keyup." + this.uniqueName, this.checkIfValueChanged.bind(this));
@@ -41,7 +41,7 @@ export class QuickSearchInput<P extends QuickSearchInputOptions = QuickSearchInp
         if (this.options.fields?.length) {
             this.domNode.before(
                 <div class="dropdown quick-search-field">
-                    <a class="quick-search-field-toggle" title={localText('Controls.QuickSearch.FieldSelection')} data-bs-toggle="dropdown" ref={el => this.fieldLink = el} />
+                    <a class="quick-search-field-toggle" title={QuickSearchTexts.FieldSelection} data-bs-toggle="dropdown" ref={el => this.fieldLink = el} />
                     <ul class="dropdown-menu">
                         {this.options.fields.map(item => <a class="dropdown-item" href="#" onClick={e => {
                             e.preventDefault();

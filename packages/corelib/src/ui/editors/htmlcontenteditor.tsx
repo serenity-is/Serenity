@@ -1,4 +1,4 @@
-import { Fluent, localText, nsSerenity, resolveUrl } from "../../base";
+import { Fluent, FormValidationTexts, localText, nsSerenity, resolveUrl } from "../../base";
 import { isTrimmedEmpty } from "../../compat";
 import { IReadOnly, IStringValue } from "../../interfaces";
 import { LazyLoadHelper } from "../helpers/lazyloadhelper";
@@ -42,7 +42,7 @@ export class HtmlContentEditor<P extends HtmlContentEditorOptions = HtmlContentE
         this.addValidationRule(this.uniqueName, input => {
             if (input.classList.contains('required')) {
                 if (!this.get_value()?.trim())
-                    return localText('Validation.Required');
+                    return FormValidationTexts.Required;
             }
 
             return null;

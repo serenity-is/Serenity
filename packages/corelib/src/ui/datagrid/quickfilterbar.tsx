@@ -1,4 +1,4 @@
-﻿import { Criteria, Fluent, ListRequest, formatDate, localText, notifyWarning, nsSerenity, parseDate, toId, tryGetText } from "../../base";
+﻿import { Criteria, FilterPanelTexts, Fluent, FormValidationTexts, ListRequest, formatDate, localText, notifyWarning, nsSerenity, parseDate, toId, tryGetText } from "../../base";
 import { DateEditor } from "../editors/dateeditor";
 import { DateTimeEditor, DateTimeEditorOptions } from "../editors/datetimeeditor";
 import { EditorUtils } from "../editors/editorutils";
@@ -51,7 +51,7 @@ export class QuickFilterBar<P extends QuickFilterBarOptions = QuickFilterBarOpti
             qfloadstate?: (w: TWidget, state: any) => void;
         }
 
-        var title = tryGetText(opt.title) ?? opt.title;
+        var title = localText(opt.title, opt.title);
         if (title == null) {
             title = this.options.getTitle ? this.options.getTitle(opt) : null;
             if (title == null) {
@@ -157,7 +157,7 @@ export class QuickFilterBar<P extends QuickFilterBarOptions = QuickFilterBarOpti
                 var date1 = parseDate(args.widget.value);
                 if (date1) {
                     if (isNaN(date1.valueOf())) {
-                        notifyWarning(localText('Validation.DateInvalid'), '', null);
+                        notifyWarning(FormValidationTexts.DateInvalid, '', null);
                         args.widget.domNode.value = "";
                         date1 = null;
                     }
@@ -170,7 +170,7 @@ export class QuickFilterBar<P extends QuickFilterBarOptions = QuickFilterBarOpti
                 var date2 = parseDate(end.value);
                 if (date2) {
                     if (isNaN(date2?.valueOf())) {
-                        notifyWarning(localText('Validation.DateInvalid'), '', null);
+                        notifyWarning(FormValidationTexts.DateInvalid, '', null);
                         end.domNode.value = "";
                         date2 = null;
                     }
@@ -192,7 +192,7 @@ export class QuickFilterBar<P extends QuickFilterBarOptions = QuickFilterBarOpti
                 var text1 = l + ' >= ' + v1;
                 var text2 = l + ' <= ' + v2;
                 if (v1 && v2) {
-                    return text1 + ' ' + (tryGetText('Controls.FilterPanel.And') ?? 'and') + ' ' + text2;
+                    return text1 + ' ' + (FilterPanelTexts.asTry().And ?? 'and') + ' ' + text2;
                 }
                 else if (v1) {
                     return text1;
@@ -241,7 +241,7 @@ export class QuickFilterBar<P extends QuickFilterBarOptions = QuickFilterBarOpti
                 var date1 = parseDate(args.widget.value);
                 if (date1) {
                     if (isNaN(date1?.valueOf())) {
-                        notifyWarning(localText('Validation.DateInvalid'), '', null);
+                        notifyWarning(FormValidationTexts.DateInvalid, '', null);
                         args.widget.value = "";
                         date1 = null;
                     }
@@ -254,7 +254,7 @@ export class QuickFilterBar<P extends QuickFilterBarOptions = QuickFilterBarOpti
                 var date2 = parseDate(end.value);
                 if (date2) {
                     if (isNaN(date2?.valueOf())) {
-                        notifyWarning(localText('Validation.DateInvalid'), '', null);
+                        notifyWarning(FormValidationTexts.DateInvalid, '', null);
                         end.value = "";
                         date2 = null;
                     }
@@ -275,7 +275,7 @@ export class QuickFilterBar<P extends QuickFilterBarOptions = QuickFilterBarOpti
                 var text1 = l + ' >= ' + v1;
                 var text2 = l + ' <= ' + v2;
                 if (v1 && v2) {
-                    return text1 + ' ' + (tryGetText('Controls.FilterPanel.And') ?? 'and') + ' ' + text2;
+                    return text1 + ' ' + (FilterPanelTexts.asTry().And ?? 'and') + ' ' + text2;
                 }
                 else if (v1) {
                     return text1;
@@ -308,13 +308,13 @@ export class QuickFilterBar<P extends QuickFilterBarOptions = QuickFilterBarOpti
 
         var trueText = yes;
         if (trueText == null) {
-            trueText = localText('Controls.FilterPanel.OperatorNames.true');
+            trueText = (FilterPanelTexts.OperatorNames as any).true;
         }
         items.push(['1', trueText]);
 
         var falseText = no;
         if (falseText == null) {
-            falseText = localText('Controls.FilterPanel.OperatorNames.false');
+            falseText = (FilterPanelTexts.OperatorNames as any).false;
         }
 
         items.push(['0', falseText]);

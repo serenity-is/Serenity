@@ -1,4 +1,4 @@
-import { Enum, getCustomAttribute, isPromiseLike, nsSerenity, tryGetText } from "../../base";
+import { Enum, getCustomAttribute, isPromiseLike, localText, nsSerenity } from "../../base";
 import { EnumKeyAttribute } from "../../types/attributes";
 import { EnumTypeRegistry } from "../../types/enumtyperegistry";
 import { ComboboxItem } from "./combobox";
@@ -38,7 +38,7 @@ export class EnumEditor<P extends EnumEditorOptions = EnumEditorOptions> extends
             for (var x of values) {
                 var name = Enum.toString(enumType, x);
                 this.addOption(parseInt(x, 10).toString(),
-                    (tryGetText('Enums.' + enumKey + '.' + name) ?? name), null, false);
+                    localText("Enums." + enumKey + "." + name, name), null, false);
             }
         }
 

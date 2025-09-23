@@ -1,4 +1,4 @@
-﻿import { Enum, getCustomAttribute, isPromiseLike, nsSerenity, tryGetText } from "../../base";
+﻿import { Enum, getCustomAttribute, isPromiseLike, localText, nsSerenity } from "../../base";
 import { getLookup } from "../../compat";
 import { IReadOnly, IStringValue } from "../../interfaces";
 import { EnumKeyAttribute } from "../../types/attributes";
@@ -47,8 +47,7 @@ export class RadioButtonEditor<P extends RadioButtonEditorOptions = RadioButtonE
                 var values = Enum.getValues(enumType);
                 for (var x of values) {
                     var name = Enum.toString(enumType, x);
-                    this.addRadio(x.toString(), tryGetText(
-                        'Enums.' + enumKey + '.' + name) ?? name);
+                    this.addRadio(x.toString(), localText("Enums." + enumKey + "." + name, name));
                 }
             }
             if (isPromiseLike(enumType))

@@ -1,4 +1,4 @@
-﻿import { Fluent, PropertyItem, isArrayLike, isInstanceOfType, localText, parseDecimal, setElementReadOnly, tryGetText } from "../../base";
+﻿import { FilterPanelTexts, Fluent, PropertyGridTexts, PropertyItem, isArrayLike, isInstanceOfType, parseDecimal, setElementReadOnly } from "../../base";
 import { cast, isTrimmedEmpty, safeCast } from "../../compat";
 import { IBooleanValue, IDoubleValue, IGetEditValue, ISetEditValue, IStringValue, IValidateRequired } from "../../interfaces";
 import { type Widget } from "../widgets/widget";
@@ -28,8 +28,8 @@ export namespace EditorUtils {
             return value;
 
         if (value instanceof Boolean)
-            return (!!value ? (tryGetText('Controls.FilterPanel.OperatorNames.true') ?? 'True') :
-                (tryGetText('Controls.FilterPanel.OperatorNames.true') ?? 'False'));
+            return (!!value ? ((FilterPanelTexts.asTry().OperatorNames as any)["true"] ?? 'True') :
+                ((FilterPanelTexts.asTry().OperatorNames as any)["false"] ?? 'False'));
 
         return value.toString();
     }
@@ -198,7 +198,7 @@ export namespace EditorUtils {
         var gridField = widget.domNode.closest('.field');
         var hasSupItem = gridField?.querySelector('sup');
         if (isRequired && !hasSupItem && gridField) {
-            Fluent(<sup title={localText('Controls.PropertyGrid.RequiredHint')}>*</sup>)
+            Fluent(<sup title={PropertyGridTexts.RequiredHint}>*</sup>)
                 .prependTo(gridField.querySelector('.caption'));
         }
         else if (!isRequired && hasSupItem) {

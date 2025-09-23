@@ -1,7 +1,7 @@
-import { PropertyPanel, WidgetProps, informationDialog, localText, resolveUrl, serviceCall } from "@serenity-is/corelib";
+import { PropertyPanel, WidgetProps, informationDialog, resolveUrl, serviceCall } from "@serenity-is/corelib";
 import { ChangePasswordForm } from "../../ServerTypes/Extensions/ChangePasswordForm";
 import { ChangePasswordRequest } from "../../ServerTypes/Extensions/ChangePasswordRequest";
-import { ChangePasswordFormTexts } from "../../ServerTypes/Texts";
+import { ChangePasswordFormTexts, ChangePasswordValidationTexts } from "../../ServerTypes/Texts";
 import { addPasswordStrengthValidation } from "../PasswordStrength/PasswordStrengthValidation";
 
 export default function pageInit() {
@@ -21,7 +21,7 @@ class ChangePasswordPanel<P = {}> extends PropertyPanel<ChangePasswordRequest, P
 
         this.form.ConfirmPassword.addValidationRule(this.uniqueName, () => {
             if (this.form.ConfirmPassword.value !== this.form.NewPassword.value) {
-                return localText("Validation.PasswordConfirmMismatch");
+                return ChangePasswordValidationTexts.PasswordConfirmMismatch;
             }
         });
     }

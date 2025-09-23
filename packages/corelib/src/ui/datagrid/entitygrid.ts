@@ -1,5 +1,5 @@
 ﻿
-import { Authorization, Fluent, faIcon, getActiveRequests, getInstanceType, getTypeFullName, isPromiseLike, localText, nsSerenity, resolveUrl, stringFormat, tryGetText } from "../../base";
+import { Authorization, EntityGridTexts, Fluent, faIcon, getActiveRequests, getInstanceType, getTypeFullName, isPromiseLike, localText, nsSerenity, resolveUrl, stringFormat } from "../../base";
 import { HandleRouteEvent, Router, replaceAll, safeCast } from "../../compat";
 import { IEditDialog } from "../../interfaces";
 import { RemoteViewOptions } from "../../slick";
@@ -128,7 +128,7 @@ export class EntityGrid<TItem, P = {}> extends DataGrid<TItem, P> {
         if (this._displayName != null)
             return this._displayName;
 
-        return this._displayName = tryGetText(this.getLocalTextDbPrefix() + 'EntityPlural') ?? this.getEntityType();
+        return this._displayName = localText(this.getLocalTextDbPrefix() + 'EntityPlural', this.getEntityType());
     }
 
     declare private _itemName: string;
@@ -137,15 +137,11 @@ export class EntityGrid<TItem, P = {}> extends DataGrid<TItem, P> {
         if (this._itemName != null)
             return this._itemName;
 
-        this._itemName = tryGetText(this.getLocalTextDbPrefix() + 'EntitySingular');
-        if (this._itemName == null)
-            this._itemName = this.getEntityType();
-
-        return this._itemName;
+        return this._itemName = localText(this.getLocalTextDbPrefix() + "EntitySingular", this.getEntityType());
     }
 
     protected getAddButtonCaption(): string {
-        return stringFormat(localText('Controls.EntityGrid.NewButton'), this.getItemName());
+        return stringFormat(EntityGridTexts.NewButton, this.getItemName());
     }
 
     protected getButtons(): ToolButton[] {
@@ -171,8 +167,8 @@ export class EntityGrid<TItem, P = {}> extends DataGrid<TItem, P> {
 
     protected newRefreshButton(noText?: boolean): ToolButton {
         return {
-            title: (noText ? null : localText('Controls.EntityGrid.RefreshButton')),
-            hint: (noText ? localText('Controls.EntityGrid.RefreshButton') : null),
+            title: (noText ? null : EntityGridTexts.RefreshButton),
+            hint: (noText ? EntityGridTexts.RefreshButton : null),
             icon: faIcon("refresh", "blue"),
             action: 'refresh',
             cssClass: 'refresh-button',

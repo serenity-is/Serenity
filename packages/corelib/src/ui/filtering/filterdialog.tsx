@@ -1,4 +1,4 @@
-﻿import { cancelDialogButton, localText, notifyError, nsSerenity, okDialogButton } from "../../base";
+﻿import { cancelDialogButton, FilterPanelTexts, notifyError, nsSerenity, okDialogButton } from "../../base";
 import { BaseDialog } from "../dialogs/basedialog";
 import { WidgetProps } from "../widgets/widget";
 import { FilterPanel } from "./filterpanel";
@@ -16,7 +16,7 @@ export class FilterDialog<P = {}> extends BaseDialog<P> {
         this.filterPanel.showSearchButton = false;
         this.filterPanel.updateStoreOnReset = false;
 
-        this.dialogTitle = localText('Controls.FilterPanel.DialogTitle');
+        this.dialogTitle = FilterPanelTexts.DialogTitle;
     }
 
     get_filterPanel(): FilterPanel {
@@ -40,7 +40,7 @@ export class FilterDialog<P = {}> extends BaseDialog<P> {
                     this.filterPanel.search();
                     if (this.filterPanel.get_hasErrors()) {
                         e.preventDefault();
-                        notifyError(localText('Controls.FilterPanel.FixErrorsMessage'), '', null);
+                        notifyError(FilterPanelTexts.FixErrorsMessage, '', null);
                         return;
                     }
                 }

@@ -7,7 +7,8 @@ vi.mock(import("../../base"), async (importOriginal) => {
     const actual = await importOriginal();
     return {
         ...actual,
-        tryGetText: vi.fn().mockImplementation((key: string) => key)
+        tryGetText: vi.fn().mockImplementation((key: string) => key),
+        localText: vi.fn().mockImplementation((key: string) => key)
     }
 });
 

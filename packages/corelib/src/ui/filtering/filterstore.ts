@@ -1,4 +1,4 @@
-﻿import { classTypeInfo, Criteria, Culture, localText, nsSerenity, registerType, tryGetText, type PropertyItem } from "../../base";
+﻿import { classTypeInfo, Criteria, Culture, FilterPanelTexts, nsSerenity, registerType, tryGetText, type PropertyItem } from "../../base";
 import { FilterLine } from "./filterline";
 
 export class FilterStore {
@@ -107,8 +107,7 @@ export class FilterStore {
             }
 
             if (displayText.length > 0) {
-                displayText += ' ' + localText('Controls.FilterPanel.' +
-                    (line.isOr ? 'Or' : 'And')) + ' ';
+                displayText += ' ' + FilterPanelTexts[line.isOr ? 'Or' : 'And'] + ' ';
             }
 
             if (line.leftParen) {

@@ -1,7 +1,7 @@
 import {
     Culture, DataGrid,
     Dictionary, Fluent, GridUtils, Grouping, IGetEditValue, ISetEditValue, SlickFormatting, SlickTreeHelper,
-    ToolButton, WidgetProps, count, getRemoteDataAsync, stripDiacritics, toGrouping, tryGetText
+    ToolButton, WidgetProps, count, getRemoteDataAsync, localText, stripDiacritics, toGrouping, tryGetText
 } from "@serenity-is/corelib";
 import { Column } from "@serenity-is/sleekgrid";
 import { UserPermissionRow } from "../../ServerTypes/Administration";
@@ -222,16 +222,13 @@ export class PermissionCheckEditor<P extends PermissionCheckEditorOptions = Perm
                     continue;
                 }
 
-                titleByKey[s] = tryGetText('Permission.' + s) ?? s;
+                titleByKey[s] = localText("Permission." + s, s);
                 let parts = s.split(':');
                 let group = '';
                 let groupTitle = '';
                 for (let i = 0; i < parts.length - 1; i++) {
                     group = group + parts[i] + ':';
-                    let txt = tryGetText('Permission.' + group);
-                    if (txt == null) {
-                        txt = parts[i];
-                    }
+                    let txt = localText("Permission." + group, parts[i]);
                     titleByKey[group] = txt;
                     groupTitle = groupTitle + titleByKey[group] + ':';
                     titleWithGroup[group] = groupTitle;

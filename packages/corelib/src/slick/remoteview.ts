@@ -1,5 +1,5 @@
 import { EventData, EventEmitter, Grid, Group, GroupItemMetadataProvider, GroupTotals, IGroupTotals, ItemMetadata, gridDefaults } from "@serenity-is/sleekgrid";
-import { ListRequest, ListResponse, ServiceOptions, ServiceResponse, htmlEncode, localText, serviceCall } from "../base";
+import { ListRequest, ListResponse, PagerTexts, ServiceOptions, ServiceResponse, htmlEncode, localText, serviceCall } from "../base";
 import { AggregateFormatting, IAggregator } from "./aggregators";
 import { CancellableViewCallback, IRemoteView, PagingInfo, RemoteViewAjaxCallback, RemoteViewFilter, RemoteViewProcessCallback } from "./iremoteview";
 import { GroupInfo, PagingOptions, SummaryOptions } from "./slicktypes";
@@ -1268,7 +1268,7 @@ export class RemoteView<TItem = any> implements IRemoteView<TItem> {
         this.loading = false;
 
         if (!data) {
-            this.errorMessage = this.errormsg ?? localText("Controls.Pager.DefaultLoadError");
+            this.errorMessage = this.errormsg ?? PagerTexts.DefaultLoadError;
             this.onPagingInfoChanged.notify(this.getPagingInfo());
             return false;
         }

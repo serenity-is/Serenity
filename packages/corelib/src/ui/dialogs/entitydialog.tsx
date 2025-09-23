@@ -1,4 +1,4 @@
-import { Authorization, DeleteRequest, DeleteResponse, Fluent, LanguageList, RetrieveColumnSelection, RetrieveRequest, RetrieveResponse, SaveRequest, SaveResponse, ServiceOptions, TranslationConfig, UndeleteRequest, UndeleteResponse, confirmDialog, getInstanceType, getTypeFullName, localText, notifySuccess, nsSerenity, serviceCall, stringFormat, tryGetText, type PropertyItem, type PropertyItemsData } from "../../base";
+import { Authorization, DeleteRequest, DeleteResponse, EntityDialogTexts, Fluent, LanguageList, RetrieveColumnSelection, RetrieveRequest, RetrieveResponse, SaveRequest, SaveResponse, ServiceOptions, TranslationConfig, UndeleteRequest, UndeleteResponse, confirmDialog, getInstanceType, getTypeFullName, localText, notifySuccess, nsSerenity, serviceCall, stringFormat, type PropertyItem, type PropertyItemsData } from "../../base";
 import { ScriptData, ValidationHelper, getFormData, getFormDataAsync, replaceAll, validatorAbortHandler } from "../../compat";
 import { IEditDialog, IReadOnly } from "../../interfaces";
 import { DataChangeInfo } from "../../types";
@@ -93,9 +93,9 @@ export class EntityDialog<TItem, P = {}> extends BaseDialog<P> implements IEditD
 
     protected getEntityTitle(): string {
         if (!this.isEditMode())
-            return stringFormat(localText('Controls.EntityDialog.NewRecordTitle'), this.getEntitySingular());
+            return stringFormat(EntityDialogTexts.NewRecordTitle, this.getEntitySingular());
         const titleFormat = (this.isViewMode() || this.readOnly || !this.hasSavePermission()) ?
-            localText('Controls.EntityDialog.ViewRecordTitle') : localText('Controls.EntityDialog.EditRecordTitle');
+            EntityDialogTexts.ViewRecordTitle : EntityDialogTexts.EditRecordTitle;
         const title = this.getEntityNameFieldValue() ?? '';
         return stringFormat(titleFormat, this.getEntitySingular(), !title ? '' : (' (' + title + ')'));
     }
@@ -233,7 +233,7 @@ export class EntityDialog<TItem, P = {}> extends BaseDialog<P> implements IEditD
         if (this._entitySingular != null)
             return this._entitySingular;
 
-        return this._entitySingular = tryGetText(this.getLocalTextDbPrefix() + 'EntitySingular') ?? this.getEntityType();
+        return this._entitySingular = localText(this.getLocalTextDbPrefix() + 'EntitySingular', this.getEntityType());
     }
 
     declare private _nameProperty: string;
@@ -567,7 +567,7 @@ export class EntityDialog<TItem, P = {}> extends BaseDialog<P> implements IEditD
     }
 
     protected showSaveSuccessMessage(response: SaveResponse, initiator?: SaveInitiator): void {
-        notifySuccess(localText('Controls.EntityDialog.SaveSuccessMessage'), '', null);
+        notifySuccess(EntityDialogTexts.SaveSuccessMessage, '', null);
     }
 
     protected getToolbarButtons(): ToolButton[] {
@@ -585,14 +585,14 @@ export class EntityDialog<TItem, P = {}> extends BaseDialog<P> implements IEditD
                 ref: el => this.applyChangesButton = Fluent(el)
             }),
             deleteToolButton({
-                onClick: () => confirmDialog(localText('Controls.EntityDialog.DeleteConfirmation'),
+                onClick: () => confirmDialog(EntityDialogTexts.DeleteConfirmation,
                     () => this.doDelete(() => this.dialogClose("delete"))),
                 visible: () => this.isEditMode() && !this.isDeleted() && !this.isViewMode(),
                 disabled: () => !this.hasDeletePermission() || this.readOnly,
                 ref: el => this.deleteButton = Fluent(el)
             }),
             undeleteToolButton({
-                onClick: () => this.isDeleted() && confirmDialog(localText('Controls.EntityDialog.UndeleteConfirmation'), () =>
+                onClick: () => this.isDeleted() && confirmDialog(EntityDialogTexts.UndeleteConfirmation, () =>
                     this.undelete(() => this.loadById(this.entityId))),
                 visible: () => this.isEditMode() && this.isDeleted() && !this.isViewMode(),
                 disabled: () => !this.hasDeletePermission() || this.readOnly,

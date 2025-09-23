@@ -1,4 +1,4 @@
-import { ClassTypeInfo, classTypeInfo, Criteria, Fluent, getInstanceType, getTypeFullName, localText, nsSerenity, registerType, stringFormat, StringLiteral, tryGetText, type PropertyItem } from "../../base";
+import { ClassTypeInfo, classTypeInfo, Criteria, FilterPanelTexts, Fluent, getInstanceType, getTypeFullName, localText, nsSerenity, registerType, stringFormat, StringLiteral, type PropertyItem } from "../../base";
 import { deepClone } from "../../compat";
 import { QuickFilter } from "../datagrid/quickfilter";
 import { Combobox } from "../editors/combobox";
@@ -93,15 +93,15 @@ export abstract class BaseFiltering implements IFiltering, IQuickFiltering {
             getTypeFullName(getInstanceType(this)), this.get_operator().key));
     }
 
-    protected operatorFormat(op: FilterOperator) {
-        return op.format ?? tryGetText('Controls.FilterPanel.OperatorFormats.' + op.key) ?? op.key;
+    protected operatorFormat(op: FilterOperator): string {
+        return op.format ?? (FilterPanelTexts.asTry().OperatorFormats as any)[op.key] ?? op.key;
     }
 
-    protected getTitle(field: PropertyItem) {
-        return tryGetText(field.title) ?? (field.title ?? field.name);
+    protected getTitle(field: PropertyItem): string {
+        return localText(field.title, field.title ?? field.name);
     }
 
-    protected displayText(op: FilterOperator, values?: any[]) {
+    protected displayText(op: FilterOperator, values?: any[]): string {
         if (!values || values.length === 0) {
             return stringFormat(this.operatorFormat(op), this.getTitle(this.field));
         }
@@ -113,7 +113,7 @@ export abstract class BaseFiltering implements IFiltering, IQuickFiltering {
         }
     }
 
-    protected getCriteriaField() {
+    protected getCriteriaField(): string {
         return this.field.name;
     }
 
@@ -201,7 +201,7 @@ export abstract class BaseFiltering implements IFiltering, IQuickFiltering {
     }
 
     protected argumentNull() {
-        return new Error(localText('Controls.FilterPanel.ValueRequired'));
+        return new Error(FilterPanelTexts.ValueRequired);
     }
 
     validateEditorValue(value: string) {
