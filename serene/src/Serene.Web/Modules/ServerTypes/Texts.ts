@@ -134,7 +134,7 @@ namespace texts {
 
 
         namespace AccessDenied {
-            export function rawKeys(): typeof AccessDenied;
+            export function asKey(): typeof AccessDenied;
             export function asTry(): typeof AccessDenied;
 
             export const ClickToChangeUser: string;
