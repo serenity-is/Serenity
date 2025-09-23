@@ -1,7 +1,6 @@
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using System.IO;
-using Texts = Serenity.Web.UploadTexts.Controls.ImageUpload;
 
 namespace Serenity.Web;
 
@@ -49,7 +48,7 @@ public class DefaultUploadValidator(IImageProcessor imageProcessor, ITextLocaliz
         {
             throw new ValidationError("ExtensionInBlacklist", 
                 string.Format(CultureInfo.CurrentCulture,
-                Texts.ExtensionBlacklisted.ToString(localizer),
+                FileUploadTexts.ExtensionBlacklisted.ToString(localizer),
                 fileExtension));
         }
 
@@ -59,18 +58,18 @@ public class DefaultUploadValidator(IImageProcessor imageProcessor, ITextLocaliz
              !IsExtensionIn(settings.ExtensionWhitelist, fileExtension)) &&
             !IsExtensionIn(settings.ExtensionWhitelistInclude, fileExtension))
             throw new ValidationError("ExtensionNotInWhitelist", string.Format(CultureInfo.CurrentCulture,
-                Texts.ExtensionBlacklisted.ToString(localizer),
+                FileUploadTexts.ExtensionBlacklisted.ToString(localizer),
                 fileExtension));
 
         var size = stream.Length;
         if (constraints.MinSize != 0 && size < constraints.MinSize)
             throw new ValidationError(string.Format(CultureInfo.CurrentCulture,
-                Texts.UploadFileTooSmall.ToString(localizer),
+                FileUploadTexts.UploadFileTooSmall.ToString(localizer),
                 UploadFormatting.FileSizeDisplay(constraints.MinSize)));
 
         if (constraints.MaxSize != 0 && size > constraints.MaxSize)
             throw new ValidationError(string.Format(CultureInfo.CurrentCulture,
-                Texts.UploadFileTooBig.ToString(localizer),
+                FileUploadTexts.UploadFileTooBig.ToString(localizer),
                 UploadFormatting.FileSizeDisplay(constraints.MaxSize)));
 
         var allowedExtensions = constraints.AllowedExtensions;
@@ -78,7 +77,7 @@ public class DefaultUploadValidator(IImageProcessor imageProcessor, ITextLocaliz
             !IsExtensionIn(allowedExtensions, fileExtension))
         {
             throw new ValidationError(string.Format(CultureInfo.CurrentCulture,
-                Texts.ExtensionNotAllowed.ToString(localizer),
+                FileUploadTexts.ExtensionNotAllowed.ToString(localizer),
                 fileExtension, constraints.AllowedExtensions));
         }
 
@@ -93,10 +92,10 @@ public class DefaultUploadValidator(IImageProcessor imageProcessor, ITextLocaliz
 
             if (string.IsNullOrEmpty(imageExtensions))
                 throw new ValidationError(
-                    Texts.NotAnImageFile.ToString(localizer));
+                    FileUploadTexts.NotAnImageFile.ToString(localizer));
 
             throw new ValidationError(string.Format(CultureInfo.CurrentCulture,
-                Texts.NotAnImageWithExtensions.ToString(localizer),
+                FileUploadTexts.NotAnImageWithExtensions.ToString(localizer),
                 fileExtension, constraints.ImageExtensions));
         }
 
@@ -175,7 +174,7 @@ public class DefaultUploadValidator(IImageProcessor imageProcessor, ITextLocaliz
                     StringComparison.OrdinalIgnoreCase)))
             {
                 throw new ValidationError(string.Format(CultureInfo.CurrentCulture,
-                    Texts.ImageExtensionMismatch.ToString(localizer),
+                    FileUploadTexts.ImageExtensionMismatch.ToString(localizer),
                     fileExtension, formatInfo.MimeType));
             }
         }
