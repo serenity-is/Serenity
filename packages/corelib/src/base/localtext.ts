@@ -110,16 +110,17 @@ const localizationProxyHandler: ProxyHandler<Record<string, any>> = {
 };
 
 /**
- * Creates a proxy object for localized text retrieval with lazy loading and caching.
+ * Creates a proxy object for localized text retrieval.
  * @param obj - The target object to proxy (usually an empty object {})
  * @param pfx - The key prefix for all text lookups
  * @param tpl - Template object defining the structure (object properties become nested proxies)
- * @param mode - The lookup mode: default is localText, "asTry"=tryGetText, "asKey"=return key
+ * @param mode - The lookup mode: by default it uses localText, e.g. returns the localized text or the text key if not found,
+ * "asTry"=tryGetText, e.g. returns undefined if not found, "asKey"=return the text key ("Forms.Something.Abc") as is (no lookup)
  * @returns A proxy object that provides localized text access
  * 
  * @example
  * const texts = proxyTexts({}, '', { user: { name: {} } });
- * texts.user.name.first // looks up "user.name.first" key
+ * texts.user.name.first // looks up "user.name.first" key, returns "user.name.first" if not found
  * texts.user.asTry().name.first // returns undefined if not found
  * texts.user.asKey().name.first // returns "user.name.first"
  */
