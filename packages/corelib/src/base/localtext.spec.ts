@@ -5,6 +5,10 @@ const mockLocalTextTable = (localTexts: Record<string, any>) => {
     return (getGlobalObject()[localTextTableSymbol] = localTexts ?? {});
 }
 
+afterEach(() => {
+    mockLocalTextTable({});
+});
+
 describe('proxyTexts', () => {
     it('proxies simple object', async () => {
         mockLocalTextTable({
@@ -72,6 +76,169 @@ describe('proxyTexts', () => {
         const proxyTexts = (await import('./localtext')).proxyTexts;
         const texts = proxyTexts({}, '', { a: {} }) as any;
         expect(Object.getOwnPropertyNames(texts)).toEqual(['a']);
+    });
+
+    it('asTry returns proxy that uses tryGetText', async () => {
+        mockLocalTextTable({
+            'a.b': 'Abc',
+            'a.c': 'Acd',
+        });
+        const proxyTexts = (await import('./localtext')).proxyTexts;
+        const texts = proxyTexts({}, '', {
+            a: {}
+        }) as any;
+
+        const tryTexts = texts.a.asTry();
+        expect(tryTexts.b).toEqual('Abc');
+        expect(tryTexts.c).toEqual('Acd');
+        expect(tryTexts.d).toEqual(undefined);
+    });
+
+    it('asKey returns proxy that returns raw keys', async () => {
+        mockLocalTextTable({
+            'a.b': 'Abc',
+        });
+        const proxyTexts = (await import('./localtext')).proxyTexts;
+        const texts = proxyTexts({}, '', {
+            a: {}
+        }) as any;
+
+        const keyTexts = texts.a.asKey();
+        expect(keyTexts.b).toEqual('a.b');
+        expect(keyTexts.c).toEqual('a.c');
+    });
+
+    it('asTry returns the same proxy instance on multiple calls', async () => {
+        const proxyTexts = (await import('./localtext')).proxyTexts;
+        const texts = proxyTexts({}, '', {
+            a: {}
+        }) as any;
+
+        const tryTexts1 = texts.a.asTry();
+        const tryTexts2 = texts.a.asTry();
+        expect(tryTexts1).toBe(tryTexts2);
+    });
+
+    it('asKey returns the same proxy instance on multiple calls', async () => {
+        const proxyTexts = (await import('./localtext')).proxyTexts;
+        const texts = proxyTexts({}, '', {
+            a: {}
+        }) as any;
+
+        const keyTexts1 = texts.a.asKey();
+        const keyTexts2 = texts.a.asKey();
+        expect(keyTexts1).toBe(keyTexts2);
+    });
+
+    it('asTry on asTry proxy returns itself', async () => {
+        const proxyTexts = (await import('./localtext')).proxyTexts;
+        const texts = proxyTexts({}, '', {
+            a: {}
+        }) as any;
+
+        const tryTexts = texts.a.asTry();
+        expect(tryTexts.asTry()).toBe(tryTexts);
+    });
+
+    it('asKey on asKey proxy returns itself', async () => {
+        const proxyTexts = (await import('./localtext')).proxyTexts;
+        const texts = proxyTexts({}, '', {
+            a: {}
+        }) as any;
+
+        const keyTexts = texts.a.asKey();
+        expect(keyTexts.asKey()).toBe(keyTexts);
+    });
+
+    it('sub-objects of asTry proxy also have asTry and asKey methods', async () => {
+        mockLocalTextTable({
+            'a.b.c': 'Abc',
+        });
+        const proxyTexts = (await import('./localtext')).proxyTexts;
+        const texts = proxyTexts({}, '', {
+            a: {
+                b: {}
+            }
+        }) as any;
+
+        const tryTexts = texts.a.asTry();
+        expect(tryTexts.b.c).toEqual('Abc');
+        expect(tryTexts.b.d).toEqual(undefined);
+
+        // Sub-object should also have asTry/asKey
+        const subTryTexts = tryTexts.b.asTry();
+        expect(subTryTexts.c).toEqual('Abc');
+        expect(subTryTexts.d).toEqual(undefined);
+
+        const subKeyTexts = tryTexts.b.asKey();
+        expect(subKeyTexts.c).toEqual('a.b.c');
+        expect(subKeyTexts.d).toEqual('a.b.d');
+    });
+
+    it('sub-objects of asKey proxy also have asTry and asKey methods', async () => {
+        const proxyTexts = (await import('./localtext')).proxyTexts;
+        const texts = proxyTexts({}, '', {
+            a: {
+                b: {}
+            }
+        }) as any;
+
+        const keyTexts = texts.a.asKey();
+        expect(keyTexts.b.c).toEqual('a.b.c');
+
+        // Sub-object should also have asTry/asKey
+        const subTryTexts = keyTexts.b.asTry();
+        expect(subTryTexts.c).toBeUndefined(); // no translation
+
+        const subKeyTexts = keyTexts.b.asKey();
+        expect(subKeyTexts.c).toEqual('a.b.c');
+    });
+
+    it('asTry and asKey proxies cache independently', async () => {
+        const proxyTexts = (await import('./localtext')).proxyTexts;
+        const texts = proxyTexts({}, '', {
+            a: {}
+        }) as any;
+
+        const tryTexts = texts.a.asTry();
+        const keyTexts = texts.a.asKey();
+
+        // They should be different objects
+        expect(tryTexts).not.toBe(keyTexts);
+
+        // But each should return itself on repeated calls
+        expect(texts.a.asTry()).toBe(tryTexts);
+        expect(texts.a.asKey()).toBe(keyTexts);
+    });
+
+    it('nested proxies maintain correct behavior', async () => {
+        mockLocalTextTable({
+            'a.b.c': 'AbcValue',
+            'a.b.d': 'AbdValue',
+        });
+        const proxyTexts = (await import('./localtext')).proxyTexts;
+        const texts = proxyTexts({}, '', {
+            a: {
+                b: {}
+            }
+        }) as any;
+
+        // Normal proxy
+        expect(texts.a.b.c).toEqual('AbcValue');
+        expect(texts.a.b.d).toEqual('AbdValue');
+        expect(texts.a.b.e).toEqual('a.b.e'); // fallback to key
+
+        // Try proxy
+        const tryTexts = texts.a.asTry();
+        expect(tryTexts.b.c).toEqual('AbcValue');
+        expect(tryTexts.b.d).toEqual('AbdValue');
+        expect(tryTexts.b.e).toEqual(undefined);
+
+        // Key proxy
+        const keyTexts = texts.a.asKey();
+        expect(keyTexts.b.c).toEqual('a.b.c');
+        expect(keyTexts.b.d).toEqual('a.b.d');
+        expect(keyTexts.b.e).toEqual('a.b.e');
     });
 });
 

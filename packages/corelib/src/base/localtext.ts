@@ -58,60 +58,77 @@ export function tryGetText(key: string): string {
 
 const proxyTextsPrefixSymbol = Symbol.for("Serenity.proxyTextsPrefix");
 const proxyTextsTemplateSymbol = Symbol.for("Serenity.proxyTextsTemplate");
-const proxyTextsKindSymbol = Symbol.for("Serenity.proxyTextsKind");
+const proxyTextsModeSymbol = Symbol.for("Serenity.proxyTextsMode");
+const proxyTextsAsTryCache = new WeakMap<object, Object>();
+const proxyTextsAsKeyCache = new WeakMap<object, Object>();
+
+/** This handler is shared by all localization proxies that are initially created by proxyTexts method */
+const localizationProxyHandler: ProxyHandler<Record<string, any>> = {
+    get: (target: Record<string, any>, property: string | symbol, receiver: any) => {
+        if (typeof property !== "string") {
+            return (target as any)[property];
+        }
+
+        const prefix = (target as any)[proxyTextsPrefixSymbol] ?? '';
+        const mode = (target as any)[proxyTextsModeSymbol] as "asTry" | "asKey";
+
+        const tpl = (target as any)[proxyTextsTemplateSymbol];
+        if (!tpl)
+            return undefined;
+
+        if (property === "asKey" || property === "asTry") {
+            if (mode === property) {
+                // proxy is already in the requested mode
+                return function () {
+                    return receiver;
+                }
+            }
+
+            return function () {
+                const cache = property === "asTry" ? proxyTextsAsTryCache : proxyTextsAsKeyCache;
+                let cached = cache.get(target);
+                if (!cached) {
+                    cached = proxyTexts({}, prefix, tpl, property);
+                    cache.set(target, cached);
+                }
+                return cached;
+            }
+        }
+
+        const tpmval = tpl[property];
+        const key = prefix + property;
+        if (tpmval == null)
+            return mode === "asTry" ? tryGetText(key) : (mode == "asKey" ? key : localText(key));
+
+        const subProxy = target[property];
+        if (subProxy != null)
+            return subProxy;
+
+        return target[property] = proxyTexts({}, key + '.', tpmval, mode);
+    },
+    ownKeys: (target: Record<string, any>) => Object.keys((target as any)[proxyTextsTemplateSymbol])
+};
 
 /**
- * Proxies text retrieval for localization.
- * @param o The original object.
- * @param p The prefix for the keys.
- * @param t The translation template with objects for sub texts.
- * @param kind The kind of proxy, either "asTry" or "asKey", or null for normal localText. 
- * If null, it will use localText; if "asTry", it will use tryGetText; if "asKey", 
- * it will return the keys of the local texts.
- * @returns A proxy object for localized text retrieval.
+ * Creates a proxy object for localized text retrieval with lazy loading and caching.
+ * @param obj - The target object to proxy (usually an empty object {})
+ * @param pfx - The key prefix for all text lookups
+ * @param tpl - Template object defining the structure (object properties become nested proxies)
+ * @param mode - The lookup mode: default is localText, "asTry"=tryGetText, "asKey"=return key
+ * @returns A proxy object that provides localized text access
+ * 
+ * @example
+ * const texts = proxyTexts({}, '', { user: { name: {} } });
+ * texts.user.name.first // looks up "user.name.first" key
+ * texts.user.asTry().name.first // returns undefined if not found
+ * texts.user.asKey().name.first // returns "user.name.first"
  */
-export function proxyTexts(o: Record<string, any>, p: string, t: Record<string, any>, kind?: "asTry" | "asKey"): Object {
-    (o as any)[proxyTextsPrefixSymbol] = p ?? '';
-    (o as any)[proxyTextsKindSymbol] = kind;
-    (o as any)[proxyTextsTemplateSymbol] = t;
-    return new Proxy(o, {
-        get: (org: Record<string, any>, prop: string | symbol, receiver) => {
-            if (typeof prop !== "string") {
-                return (org as any)[prop];
-            }
-
-            const pfx = (org as any)[proxyTextsPrefixSymbol] ?? '';
-            const kind = (org as any)[proxyTextsKindSymbol] as "asTry" | "asKey";
-
-            const tpl = (org as any)[proxyTextsTemplateSymbol];
-            if (!tpl)
-                return undefined;
-
-            if (prop === "asKey" || prop === "asTry") {
-                if (kind === prop) {
-                    return function() {
-                        return receiver;
-                    }
-                }
-
-                return function() {
-                    return proxyTexts({}, pfx, tpl, prop)
-                }
-            }
-
-            const tpmval = tpl[prop];
-            const key = pfx + prop;
-            if (tpmval == null)
-                return kind === "asTry" ? tryGetText(key) : (kind == "asKey" ? key : localText(key));
-
-            const subProxy = org[prop];
-            if (subProxy != null)
-                return subProxy;
-
-            return org[prop] = proxyTexts({}, key + '.', tpmval, kind);
-        },
-        ownKeys: (_: Object) => Object.keys(t)
-    });
+export function proxyTexts<T extends Record<string, any> = Record<string, any>>(obj: T, pfx: string, tpl: Record<string, any>, mode?: "asTry" | "asKey"):
+    Record<string, any> & { asTry(): T; asKey(): T } {
+    (obj as any)[proxyTextsPrefixSymbol] = pfx ?? '';
+    (obj as any)[proxyTextsModeSymbol] = mode;
+    (obj as any)[proxyTextsTemplateSymbol] = tpl;
+    return new Proxy(obj, localizationProxyHandler) as any;
 }
 
 /**
@@ -175,3 +192,4 @@ const global = getGlobalObject();
 const serenity = global.Serenity || (global.Serenity = {});
 serenity.LT = serenity.LT || {};
 serenity.LT.add = serenity.addLocalText = addLocalText;
+

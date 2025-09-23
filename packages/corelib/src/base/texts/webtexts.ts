@@ -94,7 +94,6 @@ namespace webTexts {
                 export const ne: string;
                 export const startswith: string;
             }
-
             namespace OperatorNames {
                 export function asKey(): typeof OperatorNames;
                 export function asTry(): typeof OperatorNames;
@@ -228,25 +227,14 @@ const textsProxy: typeof webTexts = proxyTexts({}, '', {
 }) as any;
 
 export const CheckTreeEditorTexts = textsProxy.Controls.CheckTreeEditor;
-
 export const ColumnPickerDialogTexts = textsProxy.Controls.ColumnPickerDialog;
-
 export const DataGridTexts = textsProxy.Controls.DataGrid;
-
 export const DateTimeEditorTexts = textsProxy.Controls.DateTimeEditor;
-
 export const EntityDialogTexts = textsProxy.Controls.EntityDialog;
-
 export const EntityGridTexts = textsProxy.Controls.EntityGrid;
-
 export const FilterPanelTexts = textsProxy.Controls.FilterPanel;
-
 export const FormValidationTexts = textsProxy.Validation;
-
 export const PagerTexts = textsProxy.Controls.Pager;
-
 export const PropertyGridTexts = textsProxy.Controls.PropertyGrid;
-
 export const QuickSearchTexts = textsProxy.Controls.QuickSearch;
-
 export const SelectEditorTexts = textsProxy.Controls.SelectEditor;
