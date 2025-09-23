@@ -597,6 +597,8 @@ public abstract class TypingsGeneratorBase : ImportGeneratorBase
 
     public static bool CanHandleType(TypeDefinition memberType)
     {
+        if (memberType is null)
+            return false;
 #if ISSOURCEGENERATOR
         if (memberType.TypeKind == TypeKind.Interface)
 #else

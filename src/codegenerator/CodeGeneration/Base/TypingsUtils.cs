@@ -654,6 +654,8 @@ public static class TypingsUtils
             attr = FindAttr(b.GetAttributes(), ns, name);
 #else
             var typeDef = (b as TypeDefinition) ?? b.Resolve();
+            if (typeDef is null)
+                return null;
             attr = FindAttr(typeDef.CustomAttributes, ns, name);
 #endif
             if (attr != null)
