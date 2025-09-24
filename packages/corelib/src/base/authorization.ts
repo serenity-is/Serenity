@@ -36,7 +36,7 @@ export namespace Authorization {
         if (permission == "" || permission == "?")
             return !!Authorization.isLoggedIn;
 
-        var ud = Authorization.userDefinition;
+        const ud = Authorization.userDefinition;
         if (!ud)
             return false;
 
@@ -64,7 +64,7 @@ export namespace Authorization {
         if (permission == "" || permission == "?")
             return await Authorization.isLoggedInAsync;
 
-        var ud = await Authorization.userDefinitionAsync;
+        const ud = await Authorization.userDefinitionAsync;
         if (!ud)
             return false;
 
@@ -90,15 +90,15 @@ export namespace Authorization {
         if (!andOrRegex.test(permission))
             return false;
 
-        var orParts = permission.split('|');
-        for (var r of orParts) {
+        const orParts = permission.split('|');
+        for (const r of orParts) {
             if (!r.length)
                 continue;
 
-            var andParts = r.split('&');
+            const andParts = r.split('&');
 
             let anyFalse = false;
-            for (var n of andParts) {
+            for (const n of andParts) {
                 if (!n || !permissionSet[n]) {
                     anyFalse = true;
                     break;

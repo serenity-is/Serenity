@@ -81,7 +81,7 @@ const initialOptions: ToastrOptions = {
     onclick: () => { },
 }
 
-var initialInstance: Toastr = null;
+let initialInstance: Toastr = null;
 
 export class Toastr {
     declare private listener: any;
@@ -234,7 +234,7 @@ export class Toastr {
 
         this.toastId += 1;
 
-        var container = this.getContainer(opt, true);
+        const container = this.getContainer(opt, true);
 
         let intervalId: number = null;
         const toastElement = document.createElement('div');

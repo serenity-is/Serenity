@@ -84,10 +84,10 @@ export function iconClassName(icon: IconClassName): string {
 
 /*
 Generated from https://icons8.com/line-awesome via following code
-var c = Array.from(document.querySelectorAll('.icons__item')).map(x => x.querySelector('.icons__before i:not(.icons__arrow)').className).filter((x, i, a) => a && (a.indexOf(x) === i));
-[false, true].map(b => { var l = 0; var a = c.filter(x => !!x.startsWith("fab ") == b).map(x => '"' + x.replace("fas fa-", "").replace("fab fa-", "") + '"').sort()
+let c = Array.from(document.querySelectorAll('.icons__item')).map(x => x.querySelector('.icons__before i:not(.icons__arrow)').className).filter((x, i, a) => a && (a.indexOf(x) === i));
+[false, true].map(b => { let l = 0; let a = c.filter(x => !!x.startsWith("fab ") == b).map(x => '"' + x.replace("fas fa-", "").replace("fab fa-", "") + '"').sort()
     .map((x)=>{if (l + x.length > 120) { l = 0; x = x + '\n' } l += x.length; return x}); 
-     var t = (b && "fab") || "fa"; return `export type ${t}Icon =\n${a.join('|')};` }).join('\n\n');
+     let t = (b && "fab") || "fa"; return `export type ${t}Icon =\n${a.join('|')};` }).join('\n\n');
 */
 export type faIconKey =
     "ad" | "address-book" | "address-card" | "adjust" | "air-freshener" | "align-center" | "align-justify" | "align-left" | "align-right" | "allergies" | "ambulance"

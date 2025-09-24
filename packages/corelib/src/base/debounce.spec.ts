@@ -1,11 +1,11 @@
-﻿import { debounce } from "./debounce";
+﻿import { debounce, DebouncedFunction } from "./debounce";
 
 describe("debounce", function () {
 
     it("debounces consecutive function calls", () => new Promise(done => {
         vi.useFakeTimers();
 
-        var counter = 0;
+        let counter = 0;
         const increment = function () { counter++; };
         const debounced = debounce(increment, 100);
         debounced();
@@ -27,9 +27,9 @@ describe("debounce", function () {
     it('can clear pending invocations', () => new Promise(done => {
         vi.useFakeTimers();
 
-        var counter = 0;
-        var increment = function () { counter++; };
-        var debounced = debounce(increment, 100);
+        let counter = 0;
+        const increment = function () { counter++; };
+        const debounced = debounce(increment, 100);
         debounced();
         debounced.clear();
         setTimeout(function () {
@@ -47,10 +47,10 @@ describe("debounce", function () {
     it('can invoke immediately, e.g. leading edge', () => new Promise(done => {
         vi.useFakeTimers();
 
-        var a, b, c;
-        var counter = 0;
-        var increment = function () { return ++counter; };
-        var debounced = debounce(increment, 100, true);
+        let a: number, b: number, c: number;
+        let counter = 0;
+        const increment = function () { return ++counter; };
+        const debounced = debounce(increment, 100, true);
         a = debounced();
         b = debounced();
         expect(a).toBe(1);
@@ -62,7 +62,7 @@ describe("debounce", function () {
             debounced();
             setTimeout(finish, 150);
         }, 50);
-        var finish = function () {
+        const finish = function () {
             expect(counter).toBe(1);
             c = debounced();
             expect(c).toBe(2);
@@ -76,10 +76,10 @@ describe("debounce", function () {
     it('can clear in immediate mode', () => new Promise(done => {
         vi.useFakeTimers();
 
-        var a, b;
-        var counter = 0;
-        var increment = function () { return ++counter; };
-        var debounced = debounce(increment, 100, true);
+        let a: number, b: number;
+        let counter = 0;
+        const increment = function () { return ++counter; };
+        const debounced = debounce(increment, 100, true);
         a = debounced();
         debounced.clear();
         expect(counter).toBe(1);
@@ -105,8 +105,8 @@ describe("debounce", function () {
     it('can execute immediate recursively', () => new Promise(done => {
         vi.useFakeTimers();
 
-        var counter = 0;
-        var debounced = debounce(function () {
+        let counter = 0;
+        const debounced = debounce(function () {
             counter++;
             if (counter < 10)
                 debounced();
@@ -128,13 +128,13 @@ describe("debounce", function () {
     it('can work after system time is set backwards', () => new Promise(done => {
         vi.useFakeTimers();
 
-        var counter = 0;
-        var debounced = debounce(function () {
+        let counter = 0;
+        const debounced = debounce(function () {
             counter++;
         }, 100, true);
 
-        var originalNowFunc = Date.now;
-        var originalGetTimeFunc = Date.prototype.getTime;
+        const originalNowFunc = Date.now;
+        const originalGetTimeFunc = Date.prototype.getTime;
         debounced();
         expect(counter).toBe(1);
         Date.prototype.getTime = function () {
@@ -160,14 +160,14 @@ describe("debounce", function () {
     it('works after system time is is not accessible (or in invalid format)', () => new Promise(done => {
         vi.useFakeTimers();
 
-        var counter = 0;
-        var debounced = debounce(function () {
+        let counter = 0;
+        const debounced = debounce(function () {
             counter++;
         }, 100, true);
 
-        var originalNowFunc = Date.now;
-        var originalGetTimeFunc = Date.prototype.getTime;
-        var originalValueOfFunc = Date.prototype.valueOf;
+        const originalNowFunc = Date.now;
+        const originalGetTimeFunc = Date.prototype.getTime;
+        const originalValueOfFunc = Date.prototype.valueOf;
 
         debounced();
         expect(counter).toBe(1);
@@ -210,14 +210,14 @@ describe("debounce", function () {
     it('is re-entrant', () => new Promise(done => {
         vi.useFakeTimers();
 
-        var sequence = [
+        const sequence = [
             ['b1', 'b2']
         ];
-        var value = '';
-        var debounced: typeof append;
+        let value = '';
+        let debounced: typeof append;
         const append = function (arg: string) {
             value += this + arg;
-            var args = sequence.pop();
+            const args = sequence.pop();
             if (args) {
                 debounced.call(args[0], args[1]);
             }
@@ -240,7 +240,7 @@ describe("debounce", function () {
     it('uses a default wait of 100', () => new Promise(done => {
         vi.useFakeTimers();
 
-        var counter = 0;
+        let counter = 0;
         const increment = function () { counter++; };
         const debounced = debounce(increment);
         try {
@@ -272,7 +272,7 @@ describe("debounce", function () {
     it('supports flush method which calls the function if any pending calls', () => new Promise(done => {
         vi.useFakeTimers();
 
-        var counter = 0;
+        let counter = 0;
         const increment = function () { counter++; };
         const debounced = debounce(increment);
         try {

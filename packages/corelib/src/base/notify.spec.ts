@@ -189,7 +189,7 @@ describe("notifyWarning", () => {
 describe("positionToastContainer", () => {
     it("ignores if container does not have positioned-toast class", async () => {
         const toastr = (await import("./toastr2")).default;
-        var modal = document.body.appendChild(document.createElement("div"));
+        const modal = document.body.appendChild(document.createElement("div"));
         try {
             modal.setAttribute("class", "modal in");
             vi.spyOn(modal, "getBoundingClientRect");
@@ -206,7 +206,7 @@ describe("positionToastContainer", () => {
 
     it("ignores modals with display: none or hidden class", async () => {
         const toastr = (await import("./toastr2")).default;
-        var modal = document.body.appendChild(document.createElement("div"));
+        const modal = document.body.appendChild(document.createElement("div"));
         try {
             modal.setAttribute("class", "modal in");
             modal.setAttribute("style", "display: none");
@@ -230,7 +230,7 @@ describe("positionToastContainer", () => {
 
     it("positions notification container based on modal position", async () => {
         const toastr = (await import("./toastr2")).default;
-        var modal = document.body.appendChild(document.createElement("div"));
+        const modal = document.body.appendChild(document.createElement("div"));
         try {
             modal.setAttribute("class", "modal in");
             vi.spyOn(modal, "getBoundingClientRect").mockImplementation(() => ({ top: 100, left: 100, bottom: 400, right: 500 } as any));
@@ -252,7 +252,7 @@ describe("positionToastContainer", () => {
 
     it("removes positioned-toast related styles in next call without modals", async () => {
         const toastr = (await import("./toastr2")).default;
-        var modal = document.body.appendChild(document.createElement("div"));
+        const modal = document.body.appendChild(document.createElement("div"));
         try {
             modal.setAttribute("class", "modal in");
             vi.spyOn(modal, "getBoundingClientRect").mockImplementation(() => ({ top: 100, left: 100, bottom: 400, right: 500 } as any));

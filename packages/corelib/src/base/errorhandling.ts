@@ -50,7 +50,7 @@ export namespace ErrorHandling {
         try {
             if (!ErrorHandling.isDevelopmentMode())
                 return;
-            var errorInfo = error?.stack ?? error?.toString();
+            const errorInfo = error?.stack ?? error?.toString();
 
             message =
                 '<p></p><p>Message: ' + htmlEncode(message) +
@@ -82,7 +82,7 @@ export namespace ErrorHandling {
      * @returns true if the current environment is development mode, false otherwise. 
      */
     export function isDevelopmentMode() {
-        var hostname = (window.location.hostname ?? "").toLowerCase();
+        const hostname = (window.location.hostname ?? "").toLowerCase();
         return (hostname === "localhost" ||
             hostname === "127.0.0.1" ||
             hostname === "[::1]" ||

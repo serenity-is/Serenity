@@ -160,13 +160,13 @@ class ParseError extends Error {
 }
 
 function tokenize(expression: string): Token[] {
-    var end: number, v: any;
-    var tokens: Token[] = [];
-    var l = expression.length;
-    var l1 = expression.length - 1;
-    var openParens = 0;
-    var index: number;
-    var ch: string;
+    let end: number, v: any;
+    const tokens: Token[] = [];
+    const l = expression.length;
+    const l1 = expression.length - 1;
+    let openParens = 0;
+    let index: number;
+    let ch: string;
 
     function skipWhiteSpace() {
         while (index < l) {
@@ -183,7 +183,7 @@ function tokenize(expression: string): Token[] {
 
     function readString() {
         end = index;
-        var foundDoubles = false;
+        let foundDoubles = false;
         while (end++ < l1) {
             ch = expression.charAt(end);
             if (ch === "'") {
@@ -208,7 +208,7 @@ function tokenize(expression: string): Token[] {
 
     function readNumber() {
         end = index;
-        var foundDot = false;
+        let foundDot = false;
         while (end < l1) {
             ch = expression.charAt(end + 1);
             if ((ch >= '0' && ch <= '9') ||
@@ -327,7 +327,7 @@ function tokenize(expression: string): Token[] {
             (ch >= 'A' && ch <= 'Z') ||
             (ch >= 'a' && ch <= 'z')) {
             readIdentifier();
-            var w = v.toLowerCase();
+            let w = v.toLowerCase();
             if (w == 'is') {
                 index = end + 1;
                 skipWhiteSpace();
@@ -570,18 +570,18 @@ const operatorPrecedence: Record<string, number> = {
 }
 
 function shuntingYard(tokens: Token[]): Token[] {
-    var result: Token[] = [];
-    var stack: Token[] = [];
-    for (var token of tokens) {
+    const result: Token[] = [];
+    const stack: Token[] = [];
+    for (const token of tokens) {
         if (token.t === TOKEN_OPERATOR) {
-            var precedence = operatorPrecedence[token.v];
+            const precedence = operatorPrecedence[token.v];
 
             if (precedence != null) {
                 while (stack.length) {
-                    var prev = stack[stack.length - 1];
+                    const prev = stack[stack.length - 1];
                     if (prev.t !== TOKEN_OPERATOR || prev.v == '(')
                         break;
-                    var prevPrecedence = operatorPrecedence[prev.v];
+                    const prevPrecedence = operatorPrecedence[prev.v];
                     if (prevPrecedence == null || prevPrecedence > precedence)
                         break;
 
@@ -610,7 +610,7 @@ function shuntingYard(tokens: Token[]): Token[] {
     }
 
     while (stack.length) {
-        var tok = stack.pop();
+        const tok = stack.pop();
 
         if (tok.t == TOKEN_OPERATOR &&
             (tok.v === '(' || tok.v === ')'))
@@ -623,9 +623,9 @@ function shuntingYard(tokens: Token[]): Token[] {
 }
 
 function rpnTokensToCriteria(rpnTokens: Token[], getParam?: (name: string) => any): any[] {
-    var stack: any[] = [];
+    const stack: any[] = [];
 
-    for (var token of rpnTokens) {
+    for (const token of rpnTokens) {
         switch (token.t) {
             case TOKEN_IDENTIFIER:
                 {
@@ -643,7 +643,7 @@ function rpnTokensToCriteria(rpnTokens: Token[], getParam?: (name: string) => an
                 {
                     if (!getParam)
                         throw new Error("getParam must be passed for parameterized expressions!");
-                    var prm = getParam(token.v)
+                    const prm = getParam(token.v)
                     stack.push(Array.isArray(prm) ? [prm] : prm);
                     break;
                 }
@@ -663,8 +663,8 @@ function rpnTokensToCriteria(rpnTokens: Token[], getParam?: (name: string) => an
                             if (stack.length < 2)
                                 throw new Error(`Binary operator "${token.v}" requires two values!`);
 
-                            var r = stack.pop();
-                            var l = stack.pop();
+                            const r = stack.pop();
+                            const l = stack.pop();
                             stack.push([l, token.v, r]);
                             break;
                     }
@@ -682,8 +682,8 @@ function rpnTokensToCriteria(rpnTokens: Token[], getParam?: (name: string) => an
 }
 
 function internalParse(expression: string, getParam?: (name: string) => any) {
-    var tokens = tokenize(expression);
-    var rpnTokens = shuntingYard(tokens);
+    const tokens = tokenize(expression);
+    const rpnTokens = shuntingYard(tokens);
     return rpnTokensToCriteria(rpnTokens, getParam);
 }
 
@@ -703,7 +703,7 @@ export function parseCriteria(expression: string, params?: any): any[];
  * @param strings The string fragments.
  * @param values The tagged template arguments.
  * @example 
- * var a = 5, b = 4;
+ * let a = 5, b = 4;
  * parseCriteria`A >= ${a} and B < ${b}` // [[[a], '>=' 5], 'and', [[b], '<', 4]]
  */
 export function parseCriteria(strings: TemplateStringsArray, ...values: any[]): any[];
@@ -718,7 +718,7 @@ export function parseCriteria(exprOrStrings: TemplateStringsArray | string, ...v
     else if (!values.length)
         return internalParse(exprOrStrings.join(''));
 
-    var expression = String.raw({ raw: exprOrStrings }, ...values.map((x, i) => '@__' + i));
+    const expression = String.raw({ raw: exprOrStrings }, ...values.map((x, i) => '@__' + i));
     return internalParse(expression, name => name.startsWith('__') ?
         values[parseInt(name.substring(2), 10)] : void 0);
 }
@@ -752,7 +752,7 @@ export enum CriteriaOperator {
  * @param field The field name.
  */
 export function Criteria(field: string) {
-    var builder = CriteriaBuilder.of(field);
+    const builder = CriteriaBuilder.of(field);
     // workaround for subclassing array until corelib switched to ES6
     !(builder as any).eq && ((builder as any).__proto__ = CriteriaBuilder.prototype);
     return builder as CriteriaBuilder
@@ -765,9 +765,9 @@ export function Criteria(field: string) {
  * @param rest Other criteria.
  */
 Criteria.and = function and(c1: any[], c2: any[], ...rest: any[][]) {
-    var result = Criteria.join(c1, 'and', c2);
+    let result = Criteria.join(c1, 'and', c2);
     if (rest) {
-        for (let k of rest)
+        for (const k of rest)
             result = Criteria.join(result, 'and', k);
     }
 
@@ -817,10 +817,10 @@ Criteria.not = function not(c: any[]) {
  * @param rest Other criteria.
  */
 Criteria.or = function or(c1: any[], c2: any[], ...rest: any[][]) {
-    var result = Criteria.join(c1, 'or', c2);
+    let result = Criteria.join(c1, 'or', c2);
 
     if (rest) {
-        for (let k of rest)
+        for (const k of rest)
             result = Criteria.join(result, 'or', k);
     }
 
@@ -847,7 +847,7 @@ Criteria.paren = function parent(c: any[]): any[] {
  * `Criteria.parse("A >= @p1 and B < @p2", { p1: 5, p2: 4 }) // [[[a], '>=' 5], 'and', [[b], '<', 4]]`
  * 
  * @example
- * `var a = 5; b = 4;
+ * `let a = 5; b = 4;
  * Criteria.parse`A >= ${a} and B < ${b}` // [[[a], '>=' 5], 'and', [[b], '<', 4]]`
 */
 Criteria.parse = parseCriteria;

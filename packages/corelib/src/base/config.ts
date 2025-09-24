@@ -48,7 +48,7 @@ const Config = {
 export function resetApplicationPath() {
     Config.applicationPath = '/';
     if (typeof document !== 'undefined') {
-        var pathLink = document.querySelector('link#ApplicationPath') as HTMLLinkElement;
+        const pathLink = document.querySelector('link#ApplicationPath') as HTMLLinkElement;
         if (pathLink != null) {
             Config.applicationPath = pathLink.getAttribute('href');
         }

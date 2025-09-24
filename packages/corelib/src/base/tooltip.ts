@@ -90,7 +90,7 @@ export class Tooltip {
 
         this.el.setAttribute(`data-${isBS5Plus() ? 'bs-' : ''}original-title`, value ?? '');
         instance?.[isBS3() ? "fixTitle" : "_fixTitle"]?.();
-        var inner = instance?.tip?.querySelector?.(".tooltip-inner");
+        const inner = instance?.tip?.querySelector?.(".tooltip-inner");
         inner && (inner.textContent = value ?? '');
         instance?.update?.();
         return this;

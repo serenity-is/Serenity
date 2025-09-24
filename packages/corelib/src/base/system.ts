@@ -46,8 +46,8 @@ export type Type = Function | Object;
  * @returns Value of the property or null if not found
  */
 export function getNested(from: any, name: string) {
-    var a = name.split('.');
-    for (var i = 0; i < a.length; i++) {
+    const a = name.split('.');
+    for (let i = 0; i < a.length; i++) {
         from = from[a[i]];
         if (from == null)
             return null;
@@ -62,7 +62,7 @@ export function getNested(from: any, name: string) {
  * @returns The type or null if not found
  */
 export function getType(name: string, target?: any): Type {
-    var type: any;
+    let type: any;
     if (target == null) {
         type = getTypeRegistry()[name];
         if (type != null || globalObject == void 0 || name === "Object")
@@ -95,9 +95,9 @@ export function getTypeFullName(type: Type): string {
  * @returns Short name of the type
  */
 export function getTypeShortName(type: Type): string {
-    var fullName = getTypeFullName(type);
-    var bIndex = fullName?.indexOf('[');
-    var nsIndex = fullName?.lastIndexOf('.', bIndex >= 0 ? bIndex : fullName.length);
+    const fullName = getTypeFullName(type);
+    const bIndex = fullName?.indexOf('[');
+    const nsIndex = fullName?.lastIndexOf('.', bIndex >= 0 ? bIndex : fullName.length);
     return nsIndex > 0 ? fullName.substring(nsIndex + 1) : fullName;
 };
 
@@ -230,9 +230,9 @@ export namespace Enum {
         if (typeof value !== "number")
             return "" + value;
 
-        var values = enumType;
+        const values = enumType;
         if (value === 0 || !peekTypeInfo(enumType)?.enumFlags) {
-            for (var i in values) {
+            for (const i in values) {
                 if (values[i] === value) {
                     return i;
                 }
@@ -240,8 +240,8 @@ export namespace Enum {
             return value == null ? "" : value.toString();
         }
         else {
-            var parts: string[] = [];
-            for (var i in values) {
+            const parts: string[] = [];
+            for (const i in values) {
                 if (typeof values[i] !== "number")
                     continue;
 
@@ -262,9 +262,9 @@ export namespace Enum {
      * @returns 
      */
     export let getValues = (enumType: any) => {
-        var parts = [];
-        var values = enumType;
-        for (var i in values) {
+        const parts = [];
+        const values = enumType;
+        for (const i in values) {
             if (Object.prototype.hasOwnProperty.call(values, i) &&
                 typeof values[i] === "number")
                 parts.push(values[i]);
@@ -292,7 +292,7 @@ export const isEnum = (type: any) => {
  * @param nameWidgetPairs Array of name-widget pairs
  */
 export function initFormType(typ: Function, nameWidgetPairs: any[]) {
-    for (var i = 0; i < nameWidgetPairs.length - 1; i += 2) {
+    for (let i = 0; i < nameWidgetPairs.length - 1; i += 2) {
         (function (name: string, widget: any) {
             Object.defineProperty(typ.prototype, name, {
                 get: function () {
@@ -407,7 +407,7 @@ export function getCustomAttribute<TAttr>(type: any, attrType: { new(...args: an
     do {
         let attrs = peekTypeInfo(type)?.customAttributes;
         if (attrs) {
-            for (var i = attrs.length - 1; i >= 0; i--) {
+            for (let i = attrs.length - 1; i >= 0; i--) {
                 let attr = attrs[i];
                 if (attr != null && isInstanceOfType(attr, attrType))
                     return attr;
@@ -440,11 +440,11 @@ export function getCustomAttributes<TAttr>(type: any, attrType: { new(...args: a
         return [];
 
     const allTypes = attrType === void 0;
-    var result: any[] = [];
+    const result: any[] = [];
     do {
         let attrs = peekTypeInfo(type)?.customAttributes;
         if (attrs) {
-            for (var i = attrs.length - 1; i >= 0; i--) {
+            for (let i = attrs.length - 1; i >= 0; i--) {
                 let attr = attrs[i];
                 if (attr && (allTypes || (attrType && isInstanceOfType(attr, attrType)))) {
                     result.push(attr);

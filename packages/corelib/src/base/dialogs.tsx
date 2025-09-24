@@ -193,7 +193,7 @@ export class Dialog {
         this.el && (this.el.dataset.dialogResult = result ?? null);
         this.dialogResult = result ?? null;
 
-        var target = getDialogEventsNode(this.el);
+        const target = getDialogEventsNode(this.el);
         if (!target)
             return;
 
@@ -224,7 +224,7 @@ export class Dialog {
      */
 
     onClose(handler: (result?: string, e?: Event) => void, opt?: { before?: boolean, oneOff?: boolean }): this {
-        var target = getDialogEventsNode(this.el);
+        const target = getDialogEventsNode(this.el);
         if (!target)
             return;
         const before = opt?.before ?? false;
@@ -249,7 +249,7 @@ export class Dialog {
      * The default for oneOff is true unless opt.before is true.
      */
     static onClose(el: HTMLElement | ArrayLike<HTMLElement>, handler: (result?: string, e?: Event) => void, opt?: { before?: boolean, oneOff?: boolean }) {
-        var instance = Dialog.getInstance(el);
+        const instance = Dialog.getInstance(el);
         if (instance) {
             instance.onClose(handler, opt);
             return;
@@ -280,7 +280,7 @@ export class Dialog {
      * @returns The dialog instance
      */
     onOpen(handler: (e?: Event) => void, opt?: { before?: boolean, oneOff?: boolean }): this {
-        var target = getDialogEventsNode(this.el);
+        const target = getDialogEventsNode(this.el);
         if (!target)
             return;
         const before = opt?.before ?? false;
@@ -305,7 +305,7 @@ export class Dialog {
      * @returns The dialog instance
      */
     static onOpen(el: HTMLElement | ArrayLike<HTMLElement>, handler: (e?: Event) => void, opt?: { before?: boolean, oneOff?: boolean }) {
-        var instance = Dialog.getInstance(el);
+        const instance = Dialog.getInstance(el);
         if (instance) {
             instance.onOpen(handler, opt);
             return;
@@ -328,7 +328,7 @@ export class Dialog {
 
     /** Opens the dialog */
     open() {
-        var target = getDialogEventsNode(this.el);
+        const target = getDialogEventsNode(this.el);
         if (!target)
             return;
         if (target.classList.contains("panel-body"))
@@ -363,7 +363,7 @@ export class Dialog {
 
     /** Returns the type of the dialog, or null if no dialog on the current element or if the element is null, e.g. dialog was disposed  */
     get type(): DialogProviderType {
-        var root = getDialogNode(this.el);
+        const root = getDialogNode(this.el);
         if (!root)
             return null;
         if (root.classList.contains("modal"))
@@ -408,7 +408,7 @@ export class Dialog {
             return;
         }
 
-        var value = btn.click(e);
+        const value = btn.click(e);
         if (!btn.result)
             return;
 
@@ -477,9 +477,9 @@ export class Dialog {
             Object.assign(modalOpt, opt.providerOptions("bsmodal", opt));
 
         if (bs5 && bootstrap.Modal) {
-            var modalObj = new bootstrap.Modal(modal, modalOpt);
+            const modalObj = new bootstrap.Modal(modal, modalOpt);
             if (modalObj && modalObj._focustrap && modalObj._focustrap._handleFocusin) {
-                var org: Function = modalObj._focustrap._handleFocusin;
+                const org: Function = modalObj._focustrap._handleFocusin;
                 modalObj._focustrap._handleFocusin = function (event: Event) {
                     if (event.target &&
                         (event.target as any).closest('.ui-datepicker, .select2-drop, .cke, .cke_dialog, .flatpickr-calendar'))
@@ -790,7 +790,7 @@ function closePanel(el: (HTMLElement | ArrayLike<HTMLElement>)) {
     if (!panel || panel.classList.contains("hidden"))
         return;
 
-    var eventsNode = getDialogEventsNode(el) ?? panel;
+    const eventsNode = getDialogEventsNode(el) ?? panel;
 
     let event = Fluent.trigger(eventsNode, "panelbeforeclose");
     if (Fluent.isDefaultPrevented(event))
@@ -916,7 +916,7 @@ function createMessageDialog(opt: {
 }): Partial<Dialog> {
 
     if (!hasBSModal() && !hasUIDialog()) {
-        var result = opt.native(opt.message);
+        const result = opt.native(opt.message);
         opt.options?.onClose(result);
         return {
             result
@@ -1008,7 +1008,7 @@ export function confirmDialog(message: string, onYes: () => void, options?: Conf
             return buttons;
         },
         native: (msg) => {
-            var result = window.confirm(msg);
+            const result = window.confirm(msg);
             if (result) {
                 onYes?.();
                 return 'yes';
@@ -1150,32 +1150,32 @@ export function iframeDialog(options: IFrameDialogOptions): Partial<Dialog> {
 }
 
 const modalShow = (e: Event) => {
-    var body = Dialog.getInstance(e.target as HTMLElement)?.getContentNode();
+    const body = Dialog.getInstance(e.target as HTMLElement)?.getContentNode();
     if (body) {
-        var evt = Fluent.trigger(body, "modalbeforeopen");
+        const evt = Fluent.trigger(body, "modalbeforeopen");
         if (Fluent.isDefaultPrevented(evt))
             e.preventDefault();
     }
 }
 
 const modalShown = (e: Event) => {
-    var body = Dialog.getInstance(e.target as HTMLElement)?.getContentNode();
+    const body = Dialog.getInstance(e.target as HTMLElement)?.getContentNode();
     if (body) {
         Fluent.trigger(body, "modalopen");
     }
 }
 
 const modalHide = (e: Event) => {
-    var body = Dialog.getInstance(e.target as HTMLElement)?.getContentNode();
+    const body = Dialog.getInstance(e.target as HTMLElement)?.getContentNode();
     if (body) {
-        var evt = Fluent.trigger(body, "modalbeforeclose");
+        const evt = Fluent.trigger(body, "modalbeforeclose");
         if (Fluent.isDefaultPrevented(evt))
             e.preventDefault();
     }
 }
 
 const modalHidden = (e: Event) => {
-    var body = Dialog.getInstance(e.target as HTMLElement)?.getContentNode();
+    const body = Dialog.getInstance(e.target as HTMLElement)?.getContentNode();
     if (body) {
         Fluent.trigger(body, "modalclose");
     }

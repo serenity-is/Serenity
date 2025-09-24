@@ -36,11 +36,11 @@
  *
  */
 export function debounce<T extends (...args: any) => any>(func: T, wait?: number, immediate?: boolean): DebouncedFunction<T> {
-    var timeout: any, args: any, context: any, timestamp: number, result: any;
+    let timeout: any, args: any, context: any, timestamp: number, result: any;
     if (null == wait) wait = 100;
 
-    var later = function () {
-        var last = Date.now() - timestamp;
+    const later = function () {
+        const last = Date.now() - timestamp;
 
         if (last < wait && last >= 0) {
             timeout = setTimeout(later, wait - last);
@@ -53,7 +53,7 @@ export function debounce<T extends (...args: any) => any>(func: T, wait?: number
         }
     };
 
-    var debounced = function () {
+    const debounced = function () {
         context = this;
         args = arguments;
         timestamp = Date.now();

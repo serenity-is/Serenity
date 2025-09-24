@@ -473,7 +473,7 @@ describe("parseQueryString", () => {
     });
 
     it("parses query string from location.search if no argument is provided", () => {
-        var oldLocation = window.location.href;
+        const oldLocation = window.location.href;
         if (changeJSDOMURL("http://localhost?param1=value1&param2=value2")) {
             try {
                 const result = parseQueryString();

@@ -5,7 +5,7 @@ describe("blockUI", () => {
     it("blocks the page", async () => {
         blockUI({});
         try {
-            var div = document.querySelector("div.blockUI.blockOverlay") as HTMLDivElement;
+            const div = document.querySelector("div.blockUI.blockOverlay") as HTMLDivElement;
             expect(div).toBeDefined();
             expect(div.style?.length).toBeDefined();
             expect(div.style?.zIndex).toBe("2000");
@@ -13,35 +13,33 @@ describe("blockUI", () => {
         finally {
             blockUndo();
         }
-        div = document.querySelector("div.blockUI.blockOverlay") as HTMLDivElement;
-        expect(div).toBeNull();
+        expect(document.querySelector("div.blockUI.blockOverlay")).toBeNull();
     });
 
     it("if already blocked it just increments counter", async () => {
         blockUI({});
         try {
-            var div = document.querySelector("div.blockUI.blockOverlay") as HTMLDivElement;
+            const div = document.querySelector("div.blockUI.blockOverlay") as HTMLDivElement;
             expect(div).toBeDefined();
             blockUI({});
-            var div2 = document.querySelector("div.blockUI.blockOverlay") as HTMLDivElement;
+            const div2 = document.querySelector("div.blockUI.blockOverlay") as HTMLDivElement;
             expect(document.querySelectorAll("div.blockUI").length).toBe(1);
             expect(div2 === div).toBe(true);
             blockUndo();
-            var div3 = document.querySelector("div.blockUI.blockOverlay") as HTMLDivElement;
+            const div3 = document.querySelector("div.blockUI.blockOverlay") as HTMLDivElement;
             expect(div3 === div).toBe(true);
             expect(document.querySelectorAll("div.blockUI").length).toBe(1);
         }
         finally {
             blockUndo();
         }
-        div = document.querySelector("div.blockUI.blockOverlay") as HTMLDivElement;
-        expect(div).toBeNull();
+        expect(document.querySelector("div.blockUI.blockOverlay")).toBeNull();
     });
 
     it("does not fail if blockUI div is manually removed", async () => {
         blockUI({});
         try {
-            var div = document.querySelector("div.blockUI.blockOverlay") as HTMLDivElement;
+            const div = document.querySelector("div.blockUI.blockOverlay") as HTMLDivElement;
             expect(div).toBeDefined();
             expect(div.style?.length).toBeDefined();
             expect(div.style?.zIndex).toBe("2000");
@@ -50,15 +48,14 @@ describe("blockUI", () => {
         finally {
             blockUndo();
         }
-        div = document.querySelector("div.blockUI.blockOverlay") as HTMLDivElement;
-        expect(div).toBeNull();
+        expect(document.querySelector("div.blockUI.blockOverlay")).toBeNull();
     });
 
     it("uses window.setTimeout if useTimeout is passed as true", async () => {
-        var oldTimeout = window.setTimeout;
-        var timeoutCalls = 0;
-        var timeoutMs;
-        window.setTimeout = function (callback: Function, ms) {
+        const oldTimeout = window.setTimeout;
+        let timeoutCalls = 0;
+        let timeoutMs: number;
+        window.setTimeout = function (callback: Function, ms: number) {
             timeoutMs = ms;
             timeoutCalls++;
             callback();
@@ -70,7 +67,7 @@ describe("blockUI", () => {
         try {
             expect(timeoutCalls).toBe(1);
             expect(timeoutMs).toBe(0);
-            var div = document.querySelector("div.blockUI.blockOverlay") as HTMLDivElement;
+            const div = document.querySelector("div.blockUI.blockOverlay") as HTMLDivElement;
             expect(div).toBeDefined();
             expect(div.style?.length).toBeDefined();
             expect(div.style?.zIndex).toBe("2000");
@@ -80,8 +77,7 @@ describe("blockUI", () => {
             window.setTimeout = oldTimeout;
             blockUndo();
         }
-        div = document.querySelector("div.blockUI.blockOverlay") as HTMLDivElement;
-        expect(div).toBeNull();
+        expect(document.querySelector("div.blockUI.blockOverlay")).toBeNull();
     });
 
     it("ignores multiple blockUndo", () => {

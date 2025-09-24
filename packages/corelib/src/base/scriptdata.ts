@@ -24,9 +24,9 @@ export function getScriptDataHash(name: string, reload?: boolean): string {
         typeof document !== "undefined" &&
         (json = (document.querySelector('script#RegisteredScripts')?.innerHTML ?? '').trim()) &&
         json.charAt(0) == '{') {
-        var regs = JSON.parse(json);
+        const regs = JSON.parse(json);
         getGlobalObject()[scriptDataHashSymbol] = scriptDataHash = {};
-        for (var i in regs) {
+        for (const i in regs) {
             scriptDataHash[i] = regs[i];
         }
     }
@@ -79,7 +79,7 @@ export function fetchScriptData<TData>(name: string): Promise<TData> {
 
     let key = name + '?' + (getScriptDataHash(name) ?? '');
 
-    var promise: Promise<TData> = fetchPromises[key];
+    const promise: Promise<TData> = fetchPromises[key];
     if (promise != null)
         return promise;
 
@@ -95,7 +95,7 @@ export function fetchScriptData<TData>(name: string): Promise<TData> {
 
                 requestStarting();
                 try {
-                    var response = await fetch(url, {
+                    const response = await fetch(url, {
                         method: 'GET',
                         cache: "force-cache",
                         headers: {
@@ -154,7 +154,7 @@ export async function getScriptData<TData = any>(name: string, reload?: boolean)
  * @returns 
  */
 export function ensureScriptDataSync<TData = any>(name: string, dynJS?: boolean): TData {
-    var data = peekScriptData(name);
+    let data = peekScriptData(name);
     if (data != null)
         return data;
 
@@ -168,8 +168,8 @@ export function ensureScriptDataSync<TData = any>(name: string, dynJS?: boolean)
         return data;
     }
 
-    var url = resolveUrl(dynJS ? '~/DynJS.axd/' : '~/DynamicData/') + name + (dynJS ? '.js' : '') + '?v=' + (getScriptDataHash(name) ?? new Date().getTime());
-    var xhr = new XMLHttpRequest();
+    const url = resolveUrl(dynJS ? '~/DynJS.axd/' : '~/DynamicData/') + name + (dynJS ? '.js' : '') + '?v=' + (getScriptDataHash(name) ?? new Date().getTime());
+    const xhr = new XMLHttpRequest();
     xhr.open("GET", url, false);
     requestStarting();
     try {
@@ -179,7 +179,7 @@ export function ensureScriptDataSync<TData = any>(name: string, dynJS?: boolean)
             handleScriptDataError(name, xhr.status, xhr.statusText);
 
         if (dynJS) {
-            var script = document.createElement("script");
+            const script = document.createElement("script");
             script.text = xhr.responseText;
             document.head.appendChild(script).parentNode.removeChild(script);
             data = peekScriptData(name);
@@ -250,8 +250,8 @@ export function getRemoteData<TData = any>(key: string): TData {
  */
 export function handleScriptDataError(name: string, status?: number, statusText?: string, shouldThrow = true): string {
 
-    var isLookup = name?.startsWith("Lookup.");
-    var message: string;
+    const isLookup = name?.startsWith("Lookup.");
+    let message: string;
     if ((status == null && statusText == null) || (status === 404)) {
         if (isLookup)
             message = 'No lookup with key "' + name.substring(7) + '" is registered. Please make sure you have a' +
@@ -310,11 +310,11 @@ export async function reloadLookupAsync<TItem = any>(key: string): Promise<Looku
 }
 
 export function setRegisteredScripts(scripts: Record<string, string>) {
-    var t = new Date().getTime().toString();
-    var scriptDataHash = getGlobalObject()[scriptDataHashSymbol];
+    const t = new Date().getTime().toString();
+    let scriptDataHash = getGlobalObject()[scriptDataHashSymbol];
     if (!scriptDataHash)
         getGlobalObject()[scriptDataHashSymbol] = scriptDataHash = {};
-    for (var k in scripts) {
+    for (const k in scripts) {
         scriptDataHash[k] = scripts[k] || t;
     }
 }

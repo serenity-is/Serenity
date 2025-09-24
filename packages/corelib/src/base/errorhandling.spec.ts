@@ -80,7 +80,7 @@ describe("showServiceError", function () {
 
 describe("isDevelopmentMode", function () {
     it("returns true for localhost and loopback", () => {
-        var oldLocation = window.location.href;
+        const oldLocation = window.location.href;
         try {
             if (!changeJSDOMURL("http://localhost"))
                 return;
@@ -102,7 +102,7 @@ describe("isDevelopmentMode", function () {
     });
 
     it("returns true for domains ending with .local or .localhost", () => {
-        var oldLocation = window.location.href;
+        const oldLocation = window.location.href;
         try {
             if (!changeJSDOMURL("http://test.localhost"))
                 return;
@@ -116,7 +116,7 @@ describe("isDevelopmentMode", function () {
     });
 
     it("returns false for other hosts", () => {
-        var oldLocation = window.location.href;
+        const oldLocation = window.location.href;
         try {
             if (!changeJSDOMURL("http://test"))
                 return;
@@ -153,7 +153,7 @@ describe("runtimeErrorHandler", function () {
 
         expect(setTimeoutSpy).toHaveBeenCalledTimes(1);
         expect(notifyError).toHaveBeenCalledTimes(1);
-        var text = vi.mocked(notifyError).mock.calls[0][0];
+        const text = vi.mocked(notifyError).mock.calls[0][0];
         expect(text).toContain("test&amp;&gt;&lt;&#39;&quot");
         expect(text).toContain("test&amp;.js");
         expect(text).toContain("13579");
@@ -171,7 +171,7 @@ describe("runtimeErrorHandler", function () {
 
         expect(setTimeoutSpy).toHaveBeenCalledTimes(1);
         expect(notifyError).toHaveBeenCalledTimes(1);
-        var text = vi.mocked(notifyError).mock.calls[0][0];
+        const text = vi.mocked(notifyError).mock.calls[0][0];
         expect(text).toContain("xyz");
         expect(text).not.toContain("uvw");
     });
@@ -186,7 +186,7 @@ describe("runtimeErrorHandler", function () {
 
         expect(setTimeoutSpy).toHaveBeenCalledTimes(1);
         expect(notifyError).toHaveBeenCalledTimes(1);
-        var text = vi.mocked(notifyError).mock.calls[0][0];
+        const text = vi.mocked(notifyError).mock.calls[0][0];
         expect(text).toContain("uvw");
     });
 

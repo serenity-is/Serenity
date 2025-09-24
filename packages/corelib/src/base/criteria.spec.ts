@@ -383,8 +383,8 @@ describe("Criteria.parse", () => {
     });
 
     it('can parse tagged like and equal', () => {
-        var a = '5';
-        var b = 'test%';
+        const a = '5';
+        const b = 'test%';
         expect((Criteria.parse`xyz = ${a} and abc like ${b}`)).toEqual(
             [[["xyz"], "=", "5"], "and", [["abc"], "like", "test%"]]);
     });

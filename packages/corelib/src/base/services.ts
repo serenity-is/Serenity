@@ -23,13 +23,13 @@ export function getCookie(name: string) {
         return $.cookie(name);
 
     name += '=';
-    for (var ca = document.cookie.split(/;\s*/), i = ca.length - 1; i >= 0; i--)
+    for (let ca = document.cookie.split(/;\s*/), i = ca.length - 1; i >= 0; i--)
         if (!ca[i].indexOf(name))
             return ca[i].replace(name, '');
 }
 
 export function isSameOrigin(url: string) {
-    var loc = window.location,
+    const loc = window.location,
         a = document.createElement('a');
 
     a.href = url;
@@ -54,7 +54,7 @@ export function getServiceOptions<TResponse extends ServiceResponse>(options: Se
     options.headers["Accept"] ??= "application/json";
     options.headers["Content-Type"] ??= "application/json";
     if (isSameOrigin(url)) {
-        var token = getCookie('CSRF-TOKEN');
+        const token = getCookie('CSRF-TOKEN');
         if (token)
             options.headers["X-CSRF-TOKEN"] = token;
     }
@@ -164,7 +164,7 @@ function serviceFetch<TResponse extends ServiceResponse>(options: ServiceOptions
 }
 
 function reason(message: string, kind: string, extra?: any) {
-    var error: Error;
+    let error: Error;
     if (extra?.cause != null) {
         error = (Error as any)(message, { cause: extra.cause });
     }
@@ -195,7 +195,7 @@ export function serviceCall<TResponse extends ServiceResponse>(options: ServiceO
             options = getServiceOptions(options);
             url = options.url;
 
-            var xhr = new XMLHttpRequest();
+            const xhr = new XMLHttpRequest();
             xhr.open(options.method, url, false);
 
             if (options.cache == "no-store")
@@ -203,7 +203,7 @@ export function serviceCall<TResponse extends ServiceResponse>(options: ServiceO
             else if (options.cache === "no-cache")
                 options.headers["Cache-Control"] ??= "no-cache";
 
-            for (var x in options.headers) {
+            for (const x in options.headers) {
                 xhr.setRequestHeader(x, options.headers[x]);
             }
 
@@ -280,7 +280,7 @@ function handleError(response: any, errorInfo: RequestErrorInfo, options: Servic
 };
 
 function handleRedirect(getHeader: (key: string) => string): boolean {
-    var l: any = null;
+    let l: any = null;
     try {
         l = getHeader('Location');
     }
@@ -299,7 +299,7 @@ async function handleFetchError(response: Response, options: ServiceOptions<any>
         return;
 
     if ((response.headers.get('content-type') || '').toLowerCase().indexOf('json') >= 0) {
-        var json = (await response.json()) as ServiceResponse;
+        const json = (await response.json()) as ServiceResponse;
         if (json && json.Error) {
             handleError(json, {
                 status: response.status,
@@ -322,7 +322,7 @@ function handleXHRError(xhr: XMLHttpRequest, options: ServiceOptions<any>) {
 
     if ((xhr.getResponseHeader('content-type') || '')
         .toLowerCase().indexOf('application/json') >= 0) {
-        var json = JSON.parse(xhr.responseText);
+        const json = JSON.parse(xhr.responseText);
         if (json && json.Error) {
             handleError(json, { status: xhr.status, statusText: xhr.statusText }, options);
             return;

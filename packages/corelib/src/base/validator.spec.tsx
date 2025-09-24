@@ -800,12 +800,12 @@ describe("Validator.defaults", () => {
 
 describe("Validator.validatorEventDelegate", () => {
     it("handles contenteditable elements", () => {
-        const form = document.createElement("form");
+        let form = document.createElement("form");
         const div = document.createElement("div");
         div.setAttribute("contenteditable", "true");
         div.setAttribute("name", "content");
         form.appendChild(div);
-        document.body.appendChild(form);
+        form = document.body.appendChild(form);
         try {
             const validator = new Validator(form, {
                 rules: {

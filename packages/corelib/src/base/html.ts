@@ -42,8 +42,8 @@ export function toggleClass(el: Element, cls: string, add?: boolean) {
         return;
     }
 
-    var k = cls.split(' ').map(x => x.trim()).filter(x => x.length);
-    for (var a of k)
+    const k = cls.split(' ').map(x => x.trim()).filter(x => x.length);
+    for (const a of k)
         el.classList.toggle(a, add);
 }
 
@@ -81,7 +81,7 @@ export function appendToNode(parent: ParentNode, child: any) {
         return;
 
     if (isArrayLike(child)) {
-        for (var i = 0; i < child.length; i++) {
+        for (let i = 0; i < child.length; i++) {
             appendToNode(parent, child[i]);
         }
     } else if (typeof child === "string") {
@@ -150,11 +150,11 @@ export function setElementReadOnly(elements: Element | ArrayLike<Element>, value
     if (!elements)
         return;
     elements = isArrayLike(elements) ? elements : [elements];
-    for (var i = 0; i < elements.length; i++) {
+    for (let i = 0; i < elements.length; i++) {
         let el = elements[i];
         if (!el)
             continue;
-        var type = el.getAttribute('type');
+        const type = el.getAttribute('type');
         el.classList.toggle('readonly', !!value);
         const attr = el.tagName == 'SELECT' || type === 'radio' || type === 'checkbox' ? 'disabled' : 'readonly';
         value ? el.setAttribute(attr, attr) : el.removeAttribute(attr);
@@ -197,8 +197,8 @@ export function getReturnUrl(opt?: {
     /** The purpose of the return URL. This can be used to determine the default return URL if none is found in the query string. */
     purpose?: string;
 }) {
-    var q = parseQueryString();
-    var returnUrl = q['returnUrl'] || q['ReturnUrl'] || q["ReturnURL"] || q["returnURL"];
+    const q = parseQueryString();
+    let returnUrl = q['returnUrl'] || q['ReturnUrl'] || q["ReturnURL"] || q["returnURL"];
 
     if (returnUrl && (!opt?.ignoreUnsafe && !/^\//.test(returnUrl)))
         return null;
@@ -217,12 +217,12 @@ export function cssEscape(selector: string) {
     if (typeof CSS !== 'undefined' && typeof CSS.escape === "function")
         return CSS.escape(selector);
 
-    var string = String(selector);
-    var length = string.length;
-    var index = -1;
-    var codeUnit: number;
-    var result = '';
-    var firstCodeUnit = string.charCodeAt(0);
+    const string = String(selector);
+    const length = string.length;
+    let index = -1;
+    let codeUnit: number;
+    let result = '';
+    const firstCodeUnit = string.charCodeAt(0);
 
     if (length == 1 && firstCodeUnit == 0x002D)
         return '\\' + string;

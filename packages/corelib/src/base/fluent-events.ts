@@ -42,7 +42,7 @@ export function disposeElement(element: EventTarget): void {
 
     eventRegistry.delete(element);
 
-    var disposeHandlers = events["disposing"];
+    const disposeHandlers = events["disposing"];
     if (disposeHandlers) {
         for (const [_, handler] of Object.entries(disposeHandlers)) {
             if (typeof handler.callable === "function") {
@@ -64,7 +64,7 @@ export function disposeElement(element: EventTarget): void {
 }
 
 function getElementEvents(element: EventTarget): ElementEvents {
-    var events = eventRegistry.get(element);
+    let events = eventRegistry.get(element);
     if (!events)
         eventRegistry.set(element, events = {});
     return events;

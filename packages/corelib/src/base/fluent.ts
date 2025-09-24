@@ -848,7 +848,7 @@ Fluent.prototype.matches = function (this: FluentThis, selector?: string): boole
 }
 
 Fluent.prototype.nextSibling = function (this: FluentThis, selector?: string): Fluent<HTMLElement> {
-    var sibling = this.el?.nextElementSibling;
+    let sibling = this.el?.nextElementSibling;
     while (sibling && selector != null && !sibling.matches(selector))
         sibling = sibling.nextElementSibling;
     return new (Fluent as any)(sibling);
@@ -864,7 +864,7 @@ Fluent.prototype.prepend = function (this: FluentThis, child: string | Node | Fl
 }
 
 Fluent.prototype.prevSibling = function (this: FluentThis, selector?: string): Fluent<HTMLElement> {
-    var sibling = this.el?.previousElementSibling;
+    let sibling = this.el?.previousElementSibling;
     while (sibling && selector != null && !sibling.matches(selector))
         sibling = sibling.previousElementSibling;
     return new (Fluent as any)(sibling);

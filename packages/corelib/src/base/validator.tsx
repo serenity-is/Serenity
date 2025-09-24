@@ -284,7 +284,7 @@ export class Validator {
                 const optional = Validator.optional(element);
                 if (optional === "dependency-mismatch" &&
                     !Validator.rules(validator.validationTargetFor(element) || element)?.required)
-                return;
+                    return;
             }
 
             validator.element(element);
@@ -292,7 +292,7 @@ export class Validator {
         onkeyup: function (element: ValidatableElement, event: KeyboardEvent, validator: Validator) {
 
             // Avoid revalidate the field when pressing one of the following keys
-            var excludedKeys = ["Shift", "Control", "Alt", "CapsLock", "End", "Home",
+            const excludedKeys = ["Shift", "Control", "Alt", "CapsLock", "End", "Home",
                 "ArrowLeft", "ArrowUp", "ArrowRight", "ArrowDown", "Insert", "NumLock", "AltGr"];
 
             if (event.key === "Tab" && Validator.elementValue(element) === "" || excludedKeys.includes(event.key)) {
@@ -320,7 +320,7 @@ export class Validator {
                     element.classList.add(errorClass);
                 if (validClass != null && validClass.length)
                     element.classList.remove(validClass);
-                var hl = Validator.getHighlightTarget(element);
+                const hl = Validator.getHighlightTarget(element);
                 if (hl && hl.classList) {
                     if (errorClass != null && errorClass.length)
                         hl.classList.add(errorClass);
@@ -337,7 +337,7 @@ export class Validator {
                     element.classList.remove(errorClass);
                 if (validClass != null && validClass.length)
                     element.classList.add(validClass);
-                var hl = Validator.getHighlightTarget(element);
+                const hl = Validator.getHighlightTarget(element);
                 if (hl && hl.classList) {
                     if (errorClass != null && errorClass.length)
                         hl.classList.remove(errorClass);
@@ -376,7 +376,7 @@ export class Validator {
             if (element instanceof HTMLSelectElement) {
 
                 // Could be an array for select-multiple or a string, both are fine this way
-                var val = Validator.elementValue(element);
+                const val = Validator.elementValue(element);
                 return val && (val as any).length > 0;
             }
 
@@ -412,25 +412,25 @@ export class Validator {
         },
 
         dateQ: function (value: string, element: any) {
-            var o = Validator.optional(element, value);
+            const o = Validator.optional(element, value);
             if (o)
                 return o;
 
-            var d = parseDate(value);
+            const d = parseDate(value);
             if (!d || isNaN(d.valueOf()))
                 return false;
 
-            var z = new Date(d);
+            const z = new Date(d);
             z.setHours(0, 0, 0, 0);
             return z.getTime() === d.getTime();
         },
 
         dateTimeQ: function (value: string, element: any) {
-            var o = Validator.optional(element, value);
+            const o = Validator.optional(element, value);
             if (o)
                 return o;
 
-            var d = parseDate(value);
+            const d = parseDate(value);
             if (!d || isNaN(d.valueOf()))
                 return false;
 
@@ -487,17 +487,17 @@ export class Validator {
         },
 
         minlength: function (value, element, param: number) {
-            var length = Array.isArray(value) ? value.length : Validator.getLength(value, element);
+            const length = Array.isArray(value) ? value.length : Validator.getLength(value, element);
             return Validator.optional(element, value) || length >= param;
         },
 
         maxlength: function (value, element, param: number) {
-            var length = Array.isArray(value) ? value.length : Validator.getLength(value, element);
+            const length = Array.isArray(value) ? value.length : Validator.getLength(value, element);
             return Validator.optional(element, value) || length <= param;
         },
 
         rangelength: function (value, element, param: number[]) {
-            var length = Array.isArray(value) ? value.length : Validator.getLength(value, element);
+            const length = Array.isArray(value) ? value.length : Validator.getLength(value, element);
             return Validator.optional(element, value) || (length >= param[0] && length <= param[1]);
         },
 
@@ -547,11 +547,11 @@ export class Validator {
 
         if (this.settings.onsubmit) {
 
-            var selector = "[type=submit],button:not([type])";
+            const selector = "[type=submit],button:not([type])";
             Fluent.on(this.currentForm, "click.validator", selector, (event: Event) => {
 
                 // jquery and dom returns different results for currentTarget
-                var button = ((event.currentTarget as HTMLElement)?.matches?.(selector) ? event.currentTarget : (event.target as HTMLElement).closest?.(selector) ?? event.target) as HTMLButtonElement;;
+                const button = ((event.currentTarget as HTMLElement)?.matches?.(selector) ? event.currentTarget : (event.target as HTMLElement).closest?.(selector) ?? event.target) as HTMLButtonElement;;
 
                 // Track the used submit button to properly handle scripted
                 // submits later.
@@ -583,7 +583,7 @@ export class Validator {
                 }
 
                 const handle = () => {
-                    var hidden: HTMLInputElement, result;
+                    let hidden: HTMLInputElement, result;
 
                     // Insert a hidden input as a replacement for the missing submit button
                     // The hidden input is inserted in two cases:
@@ -707,10 +707,12 @@ export class Validator {
             return element.textContent;
         }
 
+        let val: any;
+
         if (element instanceof HTMLInputElement) {
             if (element.type === "radio" || element.type === "checkbox") {
                 if (element.name && element.form) {
-                    var values = Array.from(element.form.querySelectorAll<HTMLInputElement>(`input[name=${cssEscape(element.name)}]`))
+                    const values = Array.from(element.form.querySelectorAll<HTMLInputElement>(`input[name=${cssEscape(element.name)}]`))
                         .map(el => el.checked ? null : el.value);
 
                     if (values.length > 1)
@@ -729,7 +731,6 @@ export class Validator {
                     return element.valueAsNumber;
             }
 
-            var val;
             if (element.type === "file") {
 
                 val = element.value ?? "";
@@ -740,7 +741,7 @@ export class Validator {
 
                 // Legacy browsers
                 // Unix-based path
-                var idx = val.lastIndexOf("/");
+                let idx = val.lastIndexOf("/");
                 if (idx >= 0) {
                     return val.substring(idx + 1);
                 }
@@ -802,7 +803,7 @@ export class Validator {
         }
 
         if (command) {
-            var validator = Validator.getInstance(element.form);
+            const validator = Validator.getInstance(element.form);
             if (validator) {
                 let settings = validator.settings;
                 let staticRules = settings.rules;
@@ -823,7 +824,7 @@ export class Validator {
                             delete staticRules[element.name];
                             return existingRules;
                         }
-                        var filtered: Record<string, any> = {};
+                        const filtered: Record<string, any> = {};
                         argument.split(/\s/).forEach((method: string) => {
                             filtered[method] = existingRules[method];
                             delete existingRules[method];
@@ -833,7 +834,7 @@ export class Validator {
             }
         }
 
-        var data = Validator.normalizeRules(
+        let data = Validator.normalizeRules(
             Object.assign({},
                 Validator.classRules(element),
                 Validator.attributeRules(element),
@@ -841,9 +842,10 @@ export class Validator {
                 Validator.staticRules(element)
             ), element);
 
+        let param: any;
         // Make sure required is at front
         if (data.required) {
-            var param = data.required;
+            let param = data.required;
             delete data.required;
             data = Object.assign({ required: param }, data);
         }
@@ -871,16 +873,15 @@ export class Validator {
 
     checkForm() {
         this.prepareForm();
-        for (var i = 0, elements = (this.currentElements = this.elements()); elements[i]; i++) {
+        for (let i = 0, elements = (this.currentElements = this.elements()); elements[i]; i++) {
             this.check(elements[i]);
         }
         return this.valid();
     }
 
     element(element: ValidatableElement) {
-        var checkElement = this.validationTargetFor(element),
-            result = true,
-            rs;
+        const checkElement = this.validationTargetFor(element);
+        let result = true, rs: boolean;
 
         if (checkElement === void 0) {
             delete this.invalid[element.name];
@@ -934,7 +935,7 @@ export class Validator {
         this.submitted = {};
         this.prepareForm();
         this.hideErrors();
-        var elements = this.elements();
+        const elements = this.elements();
         elements.forEach(x => {
             delete (x as any).previousValue;
             x.removeAttribute("aria-invalid");
@@ -944,7 +945,7 @@ export class Validator {
     }
 
     resetElements(elements: ValidatableElement[]) {
-        var i;
+        let i: number;
 
         if (this.settings.unhighlight) {
             for (i = 0; elements[i]; i++) {
@@ -965,8 +966,7 @@ export class Validator {
 
     private static objectLength(obj: Record<string, any>) {
         /* jshint unused: false */
-        var count = 0,
-            i;
+        let count = 0, i: string;
         for (i in obj) {
 
             // This check allows counting elements with empty error
@@ -1003,7 +1003,7 @@ export class Validator {
 
         if (this.settings.focusInvalid) {
             try {
-                var lastActive = this.findLastActive() || (this.errorList.length && this.errorList[0].element);
+                const lastActive = this.findLastActive() || (this.errorList.length && this.errorList[0].element);
                 if (lastActive && Fluent.isVisibleLike(lastActive)) {
                     (lastActive as any).focus?.();
                     // Manually trigger focusin event; without it, focusin handler isn't called, findLastActive won't have anything to find
@@ -1016,12 +1016,12 @@ export class Validator {
     }
 
     findLastActive() {
-        var lastActive = this.lastActive;
+        const lastActive = this.lastActive;
         return lastActive && this.errorList.filter(n => n.element.name === lastActive.name).length === 1 && lastActive;
     }
 
     elements(): ValidatableElement[] {
-        var rulesCache: Record<string, boolean> = {};
+        const rulesCache: Record<string, boolean> = {};
 
         // Select all valid inputs inside the form (no submit or reset buttons)
         return Array.from(this.currentForm.querySelectorAll<HTMLElement>("input, select, textarea, [contenteditable]"))
@@ -1037,8 +1037,8 @@ export class Validator {
                 if (x.matches(this.settings.ignore))
                     return false;
 
-                var name = (x as any).name || x.getAttribute("name"); // For contenteditable
-                var isContentEditable = Validator.isContentEditable(x);
+                const name = (x as any).name || x.getAttribute("name"); // For contenteditable
+                const isContentEditable = Validator.isContentEditable(x);
 
                 if (!name && this.settings.debug && window.console) {
                     console.error("%o has no name assigned", this);
@@ -1066,7 +1066,7 @@ export class Validator {
     }
 
     errors() {
-        var errorClass = this.settings.errorClass.split(" ").join(".");
+        const errorClass = this.settings.errorClass.split(" ").join(".");
         return Array.from(this.currentForm.querySelectorAll<HTMLElement>(this.settings.errorElement + "." + errorClass));
     }
 
@@ -1100,9 +1100,9 @@ export class Validator {
     check(element: ValidatableElement) {
         element = this.validationTargetFor(element);
 
-        var rules = Validator.rules(element),
-            rulesCount = Object.keys(rules).length,
-            dependencyMismatch = false,
+        const rules = Validator.rules(element),
+            rulesCount = Object.keys(rules).length;
+        let dependencyMismatch = false,
             val = Validator.elementValue(element),
             result, method, rule, normalizer;
 
@@ -1141,7 +1141,7 @@ export class Validator {
                 dependencyMismatch = false;
 
                 if (result === "pending") {
-                    var errorsFor = this.errorsFor(element)
+                    const errorsFor = this.errorsFor(element)
                     this.toHide = this.toHide.filter(x => !errorsFor.includes(x));
                     return;
                 }
@@ -1184,13 +1184,13 @@ export class Validator {
 
     // Return the custom message for the given element name and validation method
     customMessage(name: string, method: string) {
-        var m = this.settings.messages[name];
+        const m = this.settings.messages[name];
         return m && (typeof m == "string" ? m : (m as any)[method]);
     }
 
     // Return the first defined argument, allowing empty strings
     findDefined(...args: any[]) {
-        for (var i = 0; i < arguments.length; i++) {
+        for (let i = 0; i < arguments.length; i++) {
             if (arguments[i] !== undefined) {
                 return arguments[i];
             }
@@ -1200,7 +1200,7 @@ export class Validator {
 
     defaultMessage(element: ValidatableElement, rule: { method: string, parameters?: any }) {
 
-        var message = this.findDefined(
+        let message = this.findDefined(
             this.customMessage(element.name, rule.method),
             this.customDataMessage(element, rule.method),
             undefined,
@@ -1221,7 +1221,7 @@ export class Validator {
     }
 
     formatAndAdd(element: ValidatableElement, rule: { method: string, parameters: any }) {
-        var message = this.defaultMessage(element, rule);
+        const message = this.defaultMessage(element, rule);
 
         this.errorList.push({
             message: message,
@@ -1234,7 +1234,7 @@ export class Validator {
     }
 
     defaultShowErrors() {
-        var i, elements, error;
+        let i, elements, error;
         for (i = 0; this.errorList[i]; i++) {
             error = this.errorList[i];
             if (this.settings.highlight) {
@@ -1270,9 +1270,10 @@ export class Validator {
     }
 
     showLabel(element: ValidatableElement, message?: string) {
-        var errors = this.errorsFor(element),
+        let errors = this.errorsFor(element),
             elementID = this.idOrName(element),
-            describedBy = element.getAttribute("aria-describedby");
+            describedBy = element.getAttribute("aria-describedby"),
+            error: HTMLElement;
 
         if (errors.length) {
 
@@ -1284,7 +1285,7 @@ export class Validator {
         } else {
 
             // Create error element
-            var error = Fluent<HTMLElement>(this.settings.errorElement as any)
+            error = Fluent<HTMLElement>(this.settings.errorElement as any)
                 .class(this.settings.errorClass)
                 .attr("id", elementID + "-error")
                 .getNode();
@@ -1292,7 +1293,7 @@ export class Validator {
             error.textContent = message || "";
 
             // Maintain reference to the element to be placed into the DOM
-            var place = error;
+            const place = error;
             if (this.settings.errorPlacement) {
                 this.settings.errorPlacement(place, element, this);
             } else {
@@ -1308,7 +1309,7 @@ export class Validator {
                 // If the element is not a child of an associated label, then it's necessary
                 // to explicitly apply aria-describedby
             } else if (!error.closest("label[for='" + cssEscape(elementID) + "']")) {
-                var errorID = error.getAttribute("id");
+                const errorID = error.getAttribute("id");
 
                 // Respect existing non-error aria-describedby
                 if (!describedBy) {
@@ -1346,9 +1347,9 @@ export class Validator {
     }
 
     errorsFor(element: ValidatableElement) {
-        var name = cssEscape(this.idOrName(element)),
-            describer = element.getAttribute("aria-describedby"),
-            selector = "label[for='" + name + "'], label[for='" + name + "'] *";
+        const name = cssEscape(this.idOrName(element)),
+            describer = element.getAttribute("aria-describedby");
+        let selector = "label[for='" + name + "'], label[for='" + name + "'] *";
 
         // 'aria-describedby' should directly reference the error element
         if (describer) {
@@ -1366,7 +1367,7 @@ export class Validator {
 
     validationTargetFor(element: ValidatableElement) {
 
-        var elements = [element];
+        let elements = [element];
         // If radio/checkbox, validate first element in group instead
         if (Validator.isCheckOrRadio(element)) {
             elements = this.findByName(element.name);
@@ -1519,14 +1520,15 @@ export class Validator {
     }
 
     static attributeRules(element: ValidatableElement) {
-        var rules: ValidationRules = {};
-        var type = element.getAttribute("type");
+        const rules: ValidationRules = {};
+        const type = element.getAttribute("type");
+        let value: any;
 
-        for (var method in Validator.methods) {
+        for (const method in Validator.methods) {
 
             // Support for <input required> in both html5 and older browsers
             if (method === "required") {
-                var value = element.getAttribute(method) as any;
+                value = element.getAttribute(method) as any;
 
                 // Some browsers return an empty string for the required attribute
                 // and non-HTML5 browsers might have required="" markup
@@ -1555,9 +1557,9 @@ export class Validator {
     }
 
     static dataRules(element: ValidatableElement) {
-        var rules = {},
-            type = element.getAttribute("type"),
-            method, value;
+        const rules = {},
+            type = element.getAttribute("type");
+        let method, value;
 
         for (method in Validator.methods) {
             value = element.dataset["rule" + method.charAt(0).toUpperCase() + method.substring(1).toLowerCase()];
@@ -1573,8 +1575,8 @@ export class Validator {
     }
 
     static staticRules(element: ValidatableElement): ValidationRules {
-        var rules: ValidationRules = {};
-        var validator = Validator.getInstance(element.form);
+        let rules: ValidationRules = {};
+        const validator = Validator.getInstance(element.form);
 
         if (validator.settings.rules) {
             rules = validator.settings.rules[element.name] || {};
@@ -1595,7 +1597,7 @@ export class Validator {
                 return;
             }
             if (val.param || val.depends) {
-                var keepRule = true;
+                let keepRule = true;
                 switch (typeof val.depends) {
                     case "string":
                         keepRule = !!element.form.querySelector(val.depends);
@@ -1607,7 +1609,7 @@ export class Validator {
                 if (keepRule) {
                     rules[prop] = val.param !== undefined ? val.param : true;
                 } else {
-                    var validator = Validator.getInstance(element.form);
+                    const validator = Validator.getInstance(element.form);
                     if (validator)
                         validator.resetElements([element]);
                     delete rules[prop];
@@ -1627,7 +1629,7 @@ export class Validator {
             }
         });
         ["rangelength", "range"].forEach(x => {
-            var parts;
+            let parts: string[];
             if (rules[x]) {
                 if (Array.isArray(rules[x])) {
                     rules[x] = [Number(rules[x][0]), Number(rules[x][1])];
@@ -1665,7 +1667,7 @@ export class Validator {
     }
 
     static getHighlightTarget(el: HTMLElement) {
-        var hl = el.dataset.vxHighlight;
+        const hl = el.dataset.vxHighlight;
         if (hl)
             return document.getElementById(hl);
         else if (el.classList.contains("select2-offscreen") && el.id)
@@ -1678,7 +1680,7 @@ export class Validator {
         if (!element)
             return;
         element.classList.add('customValidate');
-        var rules = customValidateRules.get(element);
+        let rules = customValidateRules.get(element);
         if (!rules)
             customValidateRules.set(element, rules = {});
         uniqueName ??= '';
@@ -1690,7 +1692,7 @@ export class Validator {
         element = isArrayLike(element) ? element[0] : element;
         if (!element)
             return;
-        var rules = customValidateRules.get(element);
+        const rules = customValidateRules.get(element);
         if (rules) {
             delete rules[uniqueName];
             if (!Object.keys(rules).length) {

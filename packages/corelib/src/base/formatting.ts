@@ -128,7 +128,7 @@ export function resetCultureSettings() {
             (Culture as any)[k] = (Invariant as any)[k];
 
     if (typeof document !== "undefined" && (k = document.querySelector('script#ScriptCulture')?.textContent?.trim())?.length) {
-        var sc = JSON.parse(k);
+        const sc = JSON.parse(k);
         if (sc.DecimalSeparator != null)
             Culture.decimalSeparator = sc.DecimalSeparator;
         if (sc.GroupSeparator != null && sc.GroupSeparator != Culture.decimalSeparator)
@@ -148,29 +148,29 @@ export function resetCultureSettings() {
 resetCultureSettings();
 
 function insertGroupSeperator(num: string, dec: string, grp: string, neg: string) {
-    var decPart = null;
-    var decIndex = num.indexOf(dec);
+    let decPart: any = null;
+    const decIndex = num.indexOf(dec);
     if (decIndex > 0) {
         decPart = num.substring(decIndex);
         num = num.substring(0, decIndex);
     }
 
-    var negative = num.startsWith(neg);
+    const negative = num.startsWith(neg);
     if (negative) {
         num = num.substring(1);
     }
 
-    var groupSize = 3;
+    let groupSize = 3;
     if (num.length < groupSize) {
         return (negative ? neg : '') + (decPart ? num + decPart : num);
     }
 
-    var index = num.length;
-    var s = '';
-    var done = false;
+    let index = num.length;
+    let s = '';
+    let done = false;
     while (!done) {
-        var length = groupSize;
-        var startIndex = index - length;
+        let length = groupSize;
+        let startIndex = index - length;
         if (startIndex < 0) {
             groupSize += startIndex;
             length += startIndex;
@@ -181,7 +181,7 @@ function insertGroupSeperator(num: string, dec: string, grp: string, neg: string
         if (!length)
             break;
 
-        var part = num.substring(startIndex, startIndex + length);
+        const part = num.substring(startIndex, startIndex + length);
         if (s.length)
             s = part + grp + s;
         else
@@ -194,7 +194,7 @@ function insertGroupSeperator(num: string, dec: string, grp: string, neg: string
     return decPart ? s + decPart : s;
 }
 
-var _formatRE = /\{\{|\}\}|\{[^\}\{]+\}/g;
+const _formatRE = /\{\{|\}\}|\{[^\}\{]+\}/g;
 
 function _formatString(format: string, l: Locale, values: IArguments, from: number) {
 
@@ -202,13 +202,13 @@ function _formatString(format: string, l: Locale, values: IArguments, from: numb
         function (m) {
             if (m === '{{' || m === '}}')
                 return m.charAt(0);
-            var index = parseInt(m.substring(1), 10);
-            var value = values[index + from];
+            const index = parseInt(m.substring(1), 10);
+            const value = values[index + from];
             if (value == null) {
                 return '';
             }
-            var formatSpec = null;
-            var formatIndex = m.indexOf(':');
+            let formatSpec = null;
+            const formatIndex = m.indexOf(':');
             if (formatIndex > 0) {
                 formatSpec = m.substring(formatIndex + 1, m.length - 1);
             }
@@ -287,7 +287,7 @@ export function formatNumber(num: number, format?: string, decOrLoc?: string | N
     if (num == null)
         return "";
 
-    var fmt: NumberFormat = typeof decOrLoc !== "string" ? (decOrLoc ?? Culture) : {
+    const fmt: NumberFormat = typeof decOrLoc !== "string" ? (decOrLoc ?? Culture) : {
         decimalSeparator: decOrLoc,
         groupSeparator: grp ?? (decOrLoc == "," ? "." : ",")
     }
@@ -304,18 +304,18 @@ export function formatNumber(num: number, format?: string, decOrLoc?: string | N
         format = 'g';
     }
 
-    var dec = fmt.decimalSeparator ?? Culture.decimalSeparator;
+    const dec = fmt.decimalSeparator ?? Culture.decimalSeparator;
     grp = grp ?? fmt.groupSeparator ?? Culture.groupSeparator;
-    var neg = fmt.negativeSign ?? Culture.negativeSign;
+    const neg = fmt.negativeSign ?? Culture.negativeSign;
 
-    var s = '';
-    var precision = -1;
+    let s = '';
+    let precision = -1;
 
     if (format.length > 1) {
         precision = parseInt(format.substring(1), 10);
     }
 
-    var fs = format.charAt(0);
+    const fs = format.charAt(0);
     switch (fs) {
         case 'g':
         case 'G':
@@ -359,7 +359,7 @@ export function formatNumber(num: number, format?: string, decOrLoc?: string | N
             }
             s = num.toFixed(precision).toString();
             if (precision && (dec != '.')) {
-                var index = s.indexOf('.');
+                const index = s.indexOf('.');
                 s = s.substring(0, index) + dec + s.substring(index + 1);
             }
             if ((fs == 'n') || (fs == 'N')) {
@@ -371,7 +371,7 @@ export function formatNumber(num: number, format?: string, decOrLoc?: string | N
             if (precision == -1) {
                 precision = fmt.decimalDigits ?? Culture.decimalDigits;
             }
-            var symbol: string;
+            let symbol: string;
             if (fs === 'p' || fs == 'P') {
                 num *= 100;
                 symbol = fmt.percentSymbol ?? Culture.percentSymbol;
@@ -381,27 +381,27 @@ export function formatNumber(num: number, format?: string, decOrLoc?: string | N
             }
             s = num.toFixed(precision).toString();
             if (precision && (dec != '.')) {
-                var index = s.indexOf('.');
+                const index = s.indexOf('.');
                 s = s.substring(0, index) + dec + s.substring(index + 1);
             }
             s = insertGroupSeperator(s, dec, grp, neg) + symbol;
             break;
 
         default:
-            var prefix = '';
-            var mid = '';
-            var suffix = '';
-            var endPrefix = false;
-            var inQuote = false;
-            for (var i = 0; i < format.length; i++) {
-                var c = format.charAt(i);
+            let prefix = '';
+            let mid = '';
+            let suffix = '';
+            let endPrefix = false;
+            let inQuote = false;
+            for (let i = 0; i < format.length; i++) {
+                let c = format.charAt(i);
                 if (c == "'") {
                     inQuote = !inQuote;
                     continue;
                 }
                 else if (!inQuote) {
                     if (c == '\\') {
-                        var c = (format.charAt(i + 1) || '');
+                        c = (format.charAt(i + 1) || '');
                         i++;
                     }
                     else if (c == '#' || c == ',' || c == '.' || c == '0') {
@@ -606,7 +606,7 @@ export function toId(id: any): any {
     return parseInt(id, 10);
 }
 
-var _dateFormatRE = /'.*?[^\\]'|dddd|ddd|dd|d|MMMM|MMM|MM|M|yyyy|yy|y|hh|h|HH|H|mm|m|ss|s|tt|t|fff|ff|f|zzz|zz|z|\//g;
+const _dateFormatRE = /'.*?[^\\]'|dddd|ddd|dd|d|MMMM|MMM|MM|M|yyyy|yy|y|hh|h|HH|H|mm|m|ss|s|tt|t|fff|ff|f|zzz|zz|z|\//g;
 
 /** 
  * Formats a date using the specified format string and optional culture.
@@ -682,22 +682,22 @@ export function formatDate(d: Date | string, format?: string, locale?: Locale) {
         format = format.substring(1);
     }
 
-    var re = _dateFormatRE;
-    var sb = [];
+    const re = _dateFormatRE;
+    const sb = [];
 
     re.lastIndex = 0;
     while (true) {
-        var index = re.lastIndex;
-        var match = re.exec(format);
+        const index = re.lastIndex;
+        const match = re.exec(format);
 
         sb.push(format.slice(index, match ? match.index : format.length));
         if (!match) {
             break;
         }
 
-        var fs = match[0];
-        var part = fs;
-        var n: number;
+        const fs = match[0];
+        let part = fs;
+        let n: number;
         switch (fs) {
             case '/':
                 part = locale.dateSeparator ?? Culture.dateSeparator;
@@ -867,7 +867,7 @@ export function parseDate(s: string, dateOrder?: string): Date {
     }
 
     if (s.indexOf(' ') > 0 && s.indexOf(':') > s.indexOf(' ') + 1) {
-        var datePart = parseDate(s.substring(0, s.indexOf(' ')));
+        const datePart = parseDate(s.substring(0, s.indexOf(' ')));
         if (!datePart || isNaN(datePart.valueOf()))
             return new Date(NaN);
         return parseISODateTime(formatDate(datePart, 'yyyy-MM-dd') + 'T' + s.substring(s.indexOf(' ') + 1).trim());

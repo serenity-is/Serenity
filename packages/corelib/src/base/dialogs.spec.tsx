@@ -47,7 +47,7 @@ function mockJQueryWithUIDialog(): any {
     let dialog = vi.fn(function (op: any) {
         if (typeof op === "object" && this[0] instanceof HTMLElement && !this[0].parentElement) {
             this[0].classList.add("ui-dialog-content");
-            var dlg = document.createElement("div");
+            const dlg = document.createElement("div");
             dlg.classList.add("ui-dialog");
             dlg.appendChild(this[0]);
         }
@@ -293,7 +293,7 @@ describe("alertDialog", () => {
             onOpen: vi.fn(),
             onClose: vi.fn()
         };
-        var dialog = alertDialog("hello", opt);
+        const dialog = alertDialog("hello", opt);
         expect($.fn.dialog).toHaveBeenCalledTimes(2);
         expect($.fn.dialog).toHaveBeenNthCalledWith(2, 'open');
         let x = $.fn.dialog.mock?.calls?.[0]?.[0] as any & MessageDialogOptions;
@@ -325,7 +325,7 @@ describe("alertDialog", () => {
             onOpen: vi.fn(),
             onClose: vi.fn()
         };
-        var dialog = alertDialog("hello", opt);
+        const dialog = alertDialog("hello", opt);
         let modal = document.querySelector<HTMLElement>(".modal");
         try {
             expect(modal).not.toBeNull();
@@ -412,7 +412,7 @@ describe("informationDialog", () => {
         };
         let onOK = vi.fn(function () {
         });
-        var dialog = informationDialog("hello", onOK, opt);
+        const dialog = informationDialog("hello", onOK, opt);
         expect($.fn.dialog).toHaveBeenCalledTimes(2);
         expect($.fn.dialog).toHaveBeenNthCalledWith(2, 'open');
         let x = $.fn.dialog.mock?.calls?.[0]?.[0] as any & MessageDialogOptions;
@@ -641,10 +641,10 @@ describe("successDialog", () => {
 describe("iframeDialog", () => {
 
     it('uses window.alert when no BS/jQuery UI loaded', async function () {
-        var alertSpy = vi.spyOn(window, "alert");
+        const alertSpy = vi.spyOn(window, "alert");
         try {
             alertSpy.mockImplementation(() => { });
-            var testHtml = '<html><body>test message<body></html>';
+            const testHtml = '<html><body>test message<body></html>';
             iframeDialog({
                 html: testHtml
             });
@@ -659,14 +659,14 @@ describe("iframeDialog", () => {
     it('calls jQuery ui dialog with expected parameters', async function () {
         let $ = mockJQueryWithUIDialog();
         const dialogs = await import("./dialogs");
-        var opt = {
+        const opt = {
             html: "<span>test</span>"
         };
         dialogs.iframeDialog(opt);
         expect($.fn.dialog).toHaveBeenCalledTimes(2);
         expect($.fn.dialog).toHaveBeenNthCalledWith(2, 'open');
 
-        var x = $.fn.dialog.mock?.calls?.[0]?.[0] as any & MessageDialogOptions;
+        const x = $.fn.dialog.mock?.calls?.[0]?.[0] as any & MessageDialogOptions;
         expect(x).toBeDefined();
         expect(x.title).toBe("Alert");
         expect(x.modal).toBe(true);
@@ -683,31 +683,31 @@ describe("iframeDialog", () => {
     it('returns expected bootstrap.Modal markup', async function () {
         let bootstrap = mockBS5Plus();
         const dialogs = await import("./dialogs");
-        var opt = {
+        const opt = {
             html: "<span>test</span>",
         };
         dialogs.iframeDialog(opt);
-        var modal = document.querySelector(".modal");
+        const modal = document.querySelector(".modal");
         try {
             expect(modal).not.toBeNull();
             expect(modal.classList).toContain("modal");
             expect(modal.getAttribute("tabIndex")).toBe("-1");
-            var modalDialog = modal.querySelector(".modal-dialog");
+            const modalDialog = modal.querySelector(".modal-dialog");
             expect(modalDialog).not.toBeNull();
             expect(modalDialog.parentElement).toBe(modal);
-            var modalContent = modalDialog.querySelector(".modal-content");
+            const modalContent = modalDialog.querySelector(".modal-content");
             expect(modalContent).not.toBeNull();
             expect(modalContent.parentElement).toBe(modalDialog);
-            var modalHeader = modalContent.querySelector(".modal-header");
+            const modalHeader = modalContent.querySelector(".modal-header");
             expect(modalHeader).not.toBeNull();
             expect(modalHeader.parentElement).toBe(modalContent);
-            var modalTitle = modalContent.querySelector(".modal-title");
+            const modalTitle = modalContent.querySelector(".modal-title");
             expect(modalTitle.tagName).toBe("H5");
 
-            var buttons = modalContent.querySelectorAll(".modal-footer button");
+            const buttons = modalContent.querySelectorAll(".modal-footer button");
             expect(buttons.length).toBe(0);
             expect(bootstrap.Modal).toHaveBeenCalledTimes(1);
-            var div = bootstrap.Modal.mock.calls?.[0]?.[0] as HTMLDivElement;
+            const div = bootstrap.Modal.mock.calls?.[0]?.[0] as HTMLDivElement;
             expect(div).toBeDefined();
             expect((div as any).modalInstance).toBeDefined();
             expect((div as any).modalInstance.show).toHaveBeenCalledTimes(1);
@@ -1264,7 +1264,7 @@ describe("Dialog panels", () => {
     it("creates panels when preferPane is true even if jquery ui and bootstrap are both available", () => {
         mockBS5Plus();
         mockJQueryWithUIDialog();
-        var dlg = new Dialog({ preferPanel: true });
+        const dlg = new Dialog({ preferPanel: true });
         dlg.open();
         expect(dlg.getDialogNode().classList.contains("s-Panel")).toBe(true);
         expect(dlg.getContentNode().classList.contains("panel-body")).toBe(true);
@@ -1272,7 +1272,7 @@ describe("Dialog panels", () => {
 
     it("creates panels when preferPane is true even if jquery ui is available", () => {
         mockJQueryWithUIDialog();
-        var dlg = new Dialog({ preferPanel: true });
+        const dlg = new Dialog({ preferPanel: true });
         dlg.open();
         expect(dlg.getDialogNode().classList.contains("s-Panel")).toBe(true);
         expect(dlg.getContentNode().classList.contains("panel-body")).toBe(true);
@@ -1281,7 +1281,7 @@ describe("Dialog panels", () => {
 
     it("creates panels when preferPane is true even if bootstrap is available", () => {
         mockBS5Plus();
-        var dlg = new Dialog({ preferPanel: true });
+        const dlg = new Dialog({ preferPanel: true });
         dlg.open();
         expect(dlg.getDialogNode().classList.contains("s-Panel")).toBe(true);
         expect(dlg.getContentNode().classList.contains("panel-body")).toBe(true);
@@ -1308,7 +1308,7 @@ describe("modal event propagation to modal-body", () => {
         body.addEventListener("modalbeforeopen", spy);
         const modal = document.body.appendChild(<div class="modal">{body}</div>);
 
-        var e = new Event("show.bs.modal", { bubbles: true, cancelable: true });
+        const e = new Event("show.bs.modal", { bubbles: true, cancelable: true });
         modal.dispatchEvent(e);
         expect(spy).toHaveBeenCalledTimes(1);
         expect(e.defaultPrevented).toBeTruthy();
@@ -1323,7 +1323,7 @@ describe("modal event propagation to modal-body", () => {
         body.addEventListener("modalbeforeclose", spy);
         const modal = document.body.appendChild(<div class="modal">{body}</div>) as HTMLElement;
 
-        var e = new Event("hide.bs.modal", { bubbles: true, cancelable: true });
+        const e = new Event("hide.bs.modal", { bubbles: true, cancelable: true });
         modal.dispatchEvent(e);
         expect(spy).toHaveBeenCalledTimes(1);
         expect(e.defaultPrevented).toBeTruthy();

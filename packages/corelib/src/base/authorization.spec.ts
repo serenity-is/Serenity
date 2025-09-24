@@ -339,13 +339,13 @@ describe('Authorization.isLoggedIn', () => {
     })
 
     it('returns false if userdefinition is null', async () => {
-        let authorization = Authorization;
+        const authorization = Authorization;
         mockUserDefinition(null);;
         expect(authorization.isLoggedIn).toBe(false);
     });
 
     it('returns false if username is null or empty string', async () => {
-        let authorization = Authorization;
+        const authorization = Authorization;
         mockUserDefinition({ Username: null });
         expect(authorization.isLoggedIn).toBe(false);
         mockUserDefinition({ Username: "" });
@@ -458,7 +458,7 @@ describe('Authorization.validatePermission', () => {
 
     it('throws if no permission', async function () {
         let authorization = Authorization;
-        var thrown = false;
+        let thrown = false;
         try {
             authorization.validatePermission("FALSE");
         }
@@ -471,7 +471,7 @@ describe('Authorization.validatePermission', () => {
 
     it('does not throw if have the permission', async function () {
         let authorization = Authorization;
-        var thrown = false;
+        let thrown = false;
         try {
             authorization.validatePermission("TRUE");
         }
@@ -489,7 +489,7 @@ describe('Authorization.validatePermissionAsync', () => {
         const notifyError = notify.notifyError as any;
     let authorization = Authorization;
         try {
-            var thrown = false;
+            let thrown = false;
             try {
                 await authorization.validatePermissionAsync("FALSE");
             }
@@ -511,8 +511,8 @@ describe('Authorization.validatePermissionAsync', () => {
     });
 
     it('does not throw if have the permission', async function () {
-        let authorization = Authorization;
-        var thrown = false;
+        const authorization = Authorization;
+        let thrown = false;
         try {
             await authorization.validatePermissionAsync("TRUE");
         }

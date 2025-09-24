@@ -101,7 +101,7 @@ export class Uploader {
         }
 
         if (isArrayLike(opt.dropZone)) {
-            for (var i = 0; i < opt.dropZone.length; i++)
+            for (let i = 0; i < opt.dropZone.length; i++)
                 opt.dropZone[i] && this.watchDropZone(opt.dropZone[i]);
         }
         else if (opt.dropZone) {
@@ -262,7 +262,7 @@ export class Uploader {
         let filteredFiles = Array.from(fileList).filter(x => predicate(x.type));
         if (!this.isMultiple() && filteredFiles.length > 0)
             filteredFiles = [filteredFiles[0]];
-        for (var file of filteredFiles) {
+        for (const file of filteredFiles) {
             await this.addToBatch(file, file.webkitRelativePath || file.name);
         }
         await this.endBatch(true);
@@ -323,7 +323,7 @@ export class Uploader {
 
         const entries = Array.from(items).map(x => x.webkitGetAsEntry?.() ?? (x as any).getAsEntry?.()).filter(x => !!x);
 
-        for (var i = 0; i < entries.length; i++) {
+        for (let i = 0; i < entries.length; i++) {
             if (skipRest())
                 return;
 
@@ -366,13 +366,13 @@ export class Uploader {
                     let json = request.responseType !== "text";
 
                     if (isSameOrigin(request.url)) {
-                        var token = getCookie('CSRF-TOKEN');
+                        const token = getCookie('CSRF-TOKEN');
                         if (token)
                             xhr.setRequestHeader("X-CSRF-TOKEN", token);
                     }
 
                     if (request.headers) {
-                        for (var name of Object.keys(request.headers)) {
+                        for (const name of Object.keys(request.headers)) {
                             xhr.setRequestHeader(name, request.headers[name]);
                         }
                     }
@@ -400,7 +400,7 @@ export class Uploader {
                     xhr.onload = (event) => {
                         try {
                             if (xhr.status === 200) {
-                                var data: UploaderSuccessData = {
+                                const data: UploaderSuccessData = {
                                     batch,
                                     event,
                                     request,
@@ -479,7 +479,7 @@ export class Uploader {
             return;
         }
 
-        var html = xhr.responseText;
+        const html = xhr.responseText;
         if (html) {
             iframeDialog({ html: html });
             return;

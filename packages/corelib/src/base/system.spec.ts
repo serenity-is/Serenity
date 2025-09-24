@@ -157,7 +157,7 @@ describe("registerClass", () => {
             expect(getType(name)).toStrictEqual(klass);
         }
         else {
-            var fullName = getTypeFullName(klass);
+            const fullName = getTypeFullName(klass);
             expect(fullName).toBe(klass.name);
             expect(getTypeNameProp(klass)).toBeUndefined();
             expect(getType(fullName) == null).toBe(true);
@@ -318,12 +318,13 @@ describe("registerEnum", () => {
         expect(peekTypeInfo(enumObj)?.enumFlags).toBeUndefined();
 
         if (name != null) {
-            expect(getTypeFullName(enumObj)).toBe(name);
+            const fullName = getTypeNameProp(enumObj);
+            expect(fullName).toBe(name);
             expect(enumObj[fullName]).toBe(name);
             expect(getType(name)).toStrictEqual(enumObj);
         }
         else {
-            var fullName = getTypeFullName(enumObj);
+            const fullName = getTypeFullName(enumObj);
             expect(fullName).toBe('Object');
             expect(enumObj[fullName]).toBeUndefined();
             expect(getType(fullName) == null).toBe(true);
@@ -389,7 +390,7 @@ describe("registerInterface", () => {
             expect(getType(name)).toStrictEqual(klass);
         }
         else {
-            var fullName = getTypeFullName(klass);
+            const fullName = getTypeFullName(klass);
             expect(fullName).toBe(klass.name);
             expect(getTypeNameProp(klass));
 
@@ -668,7 +669,7 @@ describe("initFormType", () => {
         }
 
         initFormType(TestForm, ["test1", "1", "test2", "2", "test3", "3"]);
-        var form = new TestForm();
+        const form = new TestForm();
         expect((form as any).test1).toBe("test1_1");
         expect((form as any).test2).toBe("test2_2");
         expect((form as any).test3).toBe("test3_3");
@@ -692,7 +693,7 @@ describe("fieldsProxy", () => {
             declare B: string;
         }
 
-        var proxy = fieldsProxy<Fields>();
+        const proxy = fieldsProxy<Fields>();
         expect(proxy.A).toBe("A");
         expect(proxy.B).toBe("B");
 

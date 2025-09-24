@@ -17,7 +17,7 @@ describe("formatDate", () => {
         Culture.dateSeparator = '/';
         Culture.dateFormat = 'dd/MM/yyyy';
         Culture.dateTimeFormat = 'dd/MM/yyyy HH:mm:ss';
-        var date = new Date(2029, 0, 2, 3, 4, 5, 6);
+        const date = new Date(2029, 0, 2, 3, 4, 5, 6);
         // 02.01.2029 03:04:05.006
         expect(formatDate(date, 'dd/MM/yyyy')).toBe('02/01/2029')
         expect(formatDate(date, 'd/M/yy')).toBe('2/1/29');
@@ -223,14 +223,14 @@ describe("formatDate", () => {
     });
 
     it("uses passed locale", async function () {
-        var locale = Object.assign({}, formatting.Culture);
+        const locale = Object.assign({}, formatting.Culture);
         locale.dateOrder = "mdy";
         locale.dateSeparator = "*";
         expect(formatting.formatDate(new Date(2023, 4, 2, 15, 10, 5, 32), undefined, locale)).toBe("02*05*2023");
     });
 
     it("uses Culture.dateFormat if locale.dateFormat is null", async function () {
-        var locale = Object.assign({}, formatting.Culture);
+        const locale = Object.assign({}, formatting.Culture);
         formatting.Culture.dateFormat = "yyyy/MM/dd";
         locale.dateFormat = null;
         locale.dateSeparator = "*";
@@ -238,7 +238,7 @@ describe("formatDate", () => {
     });
 
     it("uses Culture.dateFormat for 'd' if locale.dateFormat is null", async function () {
-        var locale = Object.assign({}, formatting.Culture);
+        const locale = Object.assign({}, formatting.Culture);
         formatting.Culture.dateFormat = "yyyy/MM/dd";
         locale.dateFormat = null;
         locale.dateSeparator = "*";
@@ -246,7 +246,7 @@ describe("formatDate", () => {
     });
 
     it("uses Culture.dateTimeFormat for 'g' if locale.dateTimeFormat is null", async function () {
-        var locale = Object.assign({}, formatting.Culture);
+        const locale = Object.assign({}, formatting.Culture);
         formatting.Culture.dateTimeFormat = "yyyy/MM/dd HH:mm:ss";
         locale.dateTimeFormat = null;
         locale.dateSeparator = "*";
@@ -254,7 +254,7 @@ describe("formatDate", () => {
     });
 
     it("uses Culture.dateTimeFormat for 'G' if locale.dateTimeFormat is null", async function () {
-        var locale = Object.assign({}, formatting.Culture);
+        const locale = Object.assign({}, formatting.Culture);
         formatting.Culture.dateTimeFormat = "yyyy/MM/dd HH:mm:ss";
         locale.dateTimeFormat = null;
         locale.dateSeparator = "*";
@@ -268,17 +268,17 @@ describe("formatDate", () => {
     });
 
     it("returns browser toString() for 'i' format", async function () {
-        var date = new Date(2023, 4, 2, 15, 10, 5, 32);
+        const date = new Date(2023, 4, 2, 15, 10, 5, 32);
         expect(formatting.formatDate(date, "i")).toBe(date.toString());
     });
 
     it("returns browser toDateString() for 'id' format", async function () {
-        var date = new Date(2023, 4, 2, 15, 10, 5, 32);
+        const date = new Date(2023, 4, 2, 15, 10, 5, 32);
         expect(formatting.formatDate(date, "id")).toBe(date.toDateString());
     });
 
     it("returns browser toTimeString() for 'it' format", async function () {
-        var date = new Date(2023, 4, 2, 15, 10, 5, 32);
+        const date = new Date(2023, 4, 2, 15, 10, 5, 32);
         expect(formatting.formatDate(date, "it")).toBe(date.toTimeString());
     });
 
@@ -291,8 +291,8 @@ describe("formatDate", () => {
     });
 
     it("can use custom format strings", async function () {
-        var date = new Date(2023, 5, 2, 15, 10, 5, 32);
-        var locale = Object.assign({}, formatting.Culture);
+        const date = new Date(2023, 5, 2, 15, 10, 5, 32);
+        const locale = Object.assign({}, formatting.Culture);
         formatting.Culture.dateSeparator = "*";
         locale.dateSeparator = null;
         locale.monthNames = null;
@@ -491,7 +491,7 @@ describe("formatNumber", () => {
 
     it("returns Culture.nanSymbol string for NaN", async function () {
         formatting.Culture.nanSymbol = "NaN";
-        var locale = Object.assign({}, formatting.Culture);
+        const locale = Object.assign({}, formatting.Culture);
         locale.nanSymbol = "NaNNN";
         expect(formatting.formatNumber(NaN, null, locale)).toBe("NaNNN");
         locale.nanSymbol = null;
@@ -609,7 +609,7 @@ describe("formatNumber", () => {
         Culture.decimalDigits = 3;
         expect(formatting.formatNumber(1234.567, "f")).toBe("1234.567");
         Culture.decimalDigits = 4;
-        var locale = Object.assign({}, Culture, {
+        const locale = Object.assign({}, Culture, {
             decimalDigits: null
         });
         expect(formatting.formatNumber(1234.567, "f", locale)).toBe("1234.5670");
@@ -633,7 +633,7 @@ describe("formatNumber", () => {
         Culture.decimalDigits = 3;
         expect(formatting.formatNumber(1234.567, "n")).toBe("1,234.567");
         Culture.decimalDigits = 4;
-        var locale = Object.assign({}, Culture, {
+        const locale = Object.assign({}, Culture, {
             decimalDigits: null
         });
         expect(formatting.formatNumber(1234.567, "n", locale)).toBe("1,234.5670");
@@ -661,7 +661,7 @@ describe("formatNumber", () => {
         expect(formatting.formatNumber(1234.567, "c")).toBe("1,234.567₺");
         Culture.decimalDigits = 4;
         Culture.currencySymbol = '?';
-        var locale = Object.assign({}, Culture, {
+        const locale = Object.assign({}, Culture, {
             decimalDigits: null
         });
         expect(formatting.formatNumber(1234.567, "c", locale)).toBe("1,234.5670?");
@@ -689,7 +689,7 @@ describe("formatNumber", () => {
         expect(formatting.formatNumber(12.567, "p")).toBe("1,256.700%");
         Culture.decimalDigits = 4;
         Culture.percentSymbol = '?';
-        var locale = Object.assign({}, Culture, {
+        const locale = Object.assign({}, Culture, {
             decimalDigits: null
         });
         expect(formatting.formatNumber(12.567, "p", locale)).toBe("1,256.7000?");
@@ -733,12 +733,12 @@ describe("format", () => {
 
 describe("localeFormat", () => {
     it("handles double braces", async function () {
-        var locale = Object.assign({}, formatting.Culture);
+        const locale = Object.assign({}, formatting.Culture);
         expect(formatting.stringFormatLocale(locale, "{{{0}}}", "abc")).toBe("{abc}");
     });
 
     it("formats null and undefined as empty string", async function () {
-        var locale = Object.assign({}, formatting.Culture);
+        const locale = Object.assign({}, formatting.Culture);
         expect(formatting.stringFormatLocale(locale, "{0}", null)).toBe("");
         expect(formatting.stringFormatLocale(locale, "x{0}y", null)).toBe("xy");
         expect(formatting.stringFormatLocale(locale, "{0}", undefined)).toBe("");
@@ -746,24 +746,24 @@ describe("localeFormat", () => {
     });
 
     it("handles number format specifiers", async function () {
-        var locale = Object.assign({}, formatting.Culture);
+        const locale = Object.assign({}, formatting.Culture);
         expect(formatting.stringFormatLocale(locale, "{0:000}", 5)).toBe("005");
     });
 
     it("handles date format specifiers", async function () {
-        var locale = Object.assign({}, formatting.Culture);
+        const locale = Object.assign({}, formatting.Culture);
         expect(formatting.stringFormatLocale(locale, "{0:yyyy-MM-dd}", new Date(2020, 1, 1))).toBe("2020-02-01");
     });
 
     it("calls obj.localeFormat if available", async function () {
-        var locale = Object.assign({}, formatting.Culture);
+        const locale = Object.assign({}, formatting.Culture);
         expect(formatting.stringFormatLocale(locale, "{0:x}", { format: (s: string) => s })).toBe("x");
     });
 });
 
 describe("ScriptCulture", () => {
     it("ignores a script element with ScriptCulture ID but empty content", async () => {
-        var script = document.head.appendChild(document.createElement('script'));
+        const script = document.head.appendChild(document.createElement('script'));
         try {
             script.type = "application/json";
             script.id = "ScriptCulture";
@@ -777,7 +777,7 @@ describe("ScriptCulture", () => {
     });
 
     it("ignores a script element with ScriptCulture ID but empty JSON content", async () => {
-        var script = document.head.appendChild(document.createElement('script'));
+        const script = document.head.appendChild(document.createElement('script'));
         try {
             script.type = "application/json";
             script.id = "ScriptCulture";
@@ -791,7 +791,7 @@ describe("ScriptCulture", () => {
     });
 
     it("uses a script element with ScriptCulture ID", async () => {
-        var script = document.head.appendChild(document.createElement('script'));
+        const script = document.head.appendChild(document.createElement('script'));
         try {
             script.type = "application/json";
             script.id = "ScriptCulture";
@@ -805,7 +805,7 @@ describe("ScriptCulture", () => {
     });
 
     it("can handle when GroupSeparator is specified same with DecimalSeparator", async () => {
-        var script = document.head.appendChild(document.createElement('script'));
+        const script = document.head.appendChild(document.createElement('script'));
         try {
             script.type = "application/json";
             script.id = "ScriptCulture";
@@ -820,7 +820,7 @@ describe("ScriptCulture", () => {
     });
 
     it("can handle when GroupSeparator is specified same with Culture.DecimalSeparator", async () => {
-        var script = document.head.appendChild(document.createElement('script'));
+        const script = document.head.appendChild(document.createElement('script'));
         try {
             script.type = "application/json";
             script.id = "ScriptCulture";
@@ -835,7 +835,7 @@ describe("ScriptCulture", () => {
     });
 
     it("can switch GroupSeparator when DecimalSeparator is specified the same", async () => {
-        var script = document.head.appendChild(document.createElement('script'));
+        const script = document.head.appendChild(document.createElement('script'));
         try {
             script.type = "application/json";
             script.id = "ScriptCulture";
@@ -850,7 +850,7 @@ describe("ScriptCulture", () => {
     });
 
     it("can set GroupSeparator", async () => {
-        var script = document.head.appendChild(document.createElement('script'));
+        const script = document.head.appendChild(document.createElement('script'));
         try {
             script.type = "application/json";
             script.id = "ScriptCulture";
@@ -865,7 +865,7 @@ describe("ScriptCulture", () => {
     });
 
     it("can set other Culture members by lowercasing first letter", async () => {
-        var script = document.head.appendChild(document.createElement('script'));
+        const script = document.head.appendChild(document.createElement('script'));
         try {
             script.type = "application/json";
             script.id = "ScriptCulture";
