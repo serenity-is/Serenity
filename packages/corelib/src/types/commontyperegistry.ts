@@ -1,5 +1,4 @@
-﻿import { Config, getType, getTypeNameProp, isPromiseLike } from "../base";
-import { getTypes } from "../compat";
+﻿import { Config, getType, getTypeRegistry, isPromiseLike } from "../base";
 
 export function commonTypeRegistry<TType = any>(props: {
     kind: string,
@@ -36,11 +35,10 @@ export function commonTypeRegistry<TType = any>(props: {
 
     function init() {
         knownTypes = {};
-        for (var type of getTypes()) {
+        for (var [fullName, type] of Object.entries(getTypeRegistry())) {
             if (!isMatch(type))
                 continue;
 
-            var fullName = getTypeNameProp(type);
             knownTypes[fullName] = type;
 
             var akey = attrKey && attrKey(type);

@@ -8,6 +8,7 @@ export default defineConfig({
             exclude: [
                 ...(configDefaults?.coverage?.exclude ?? []),
                 "build/**",
+                "src/test/**",
                 "src/index.ts"
             ],
             excludeAfterRemap: true
