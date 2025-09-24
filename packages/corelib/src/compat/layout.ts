@@ -55,7 +55,7 @@ export function panelPageInit<TGrid extends Widget<P>, P>(panelOrType: (CreateWi
 }
 
 export function initFullHeightGridPage(gridDiv: HTMLElement | ArrayLike<HTMLElement> | { domNode: HTMLElement }, opt?: { noRoute?: boolean, setHeight?: boolean }) {
-    var el: HTMLElement = isArrayLike(gridDiv) ? gridDiv[0] : gridDiv instanceof HTMLElement ? gridDiv : gridDiv.domNode;
+    const el: HTMLElement = isArrayLike(gridDiv) ? gridDiv[0] : gridDiv instanceof HTMLElement ? gridDiv : gridDiv.domNode;
     document.documentElement.classList.add('full-height-page');
     el.classList.add('responsive-height');
 
@@ -138,7 +138,7 @@ export function triggerLayoutOnShow(element: HTMLElement | ArrayLike<HTMLElement
 
 export function centerDialog(el: HTMLElement | ArrayLike<HTMLElement>) {
     el = isArrayLike(el) ? el[0] : el;
-    var dlg = el.closest(".ui-dialog") as any;
+    let dlg = el.closest(".ui-dialog") as any;
     if (!dlg)
         return;
     dlg = getjQuery()(dlg) as any;

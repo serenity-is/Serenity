@@ -42,15 +42,15 @@ function applyCleanDataPatch($: any) {
 
     $.cleanData = (function (orig) {
         return function (elements: any[]) {
-            var events, element, i;
-            var cloned = elements;
+            let events, element, i;
+            const cloned = elements;
             for (i = 0; (element = cloned[i]) != null; i++) {
                 try {
                     events = ($ as any)._data(element, "events");
                     if (events && events.disposing) {
                         let handlers = events.disposing;
                         delete events.disposing;
-                        for (var x of handlers) {
+                        for (const x of handlers) {
                             if (x && typeof x.handler === "function") {
                                 try {
                                     x.handler.call(element, ({ target: element }));
@@ -71,7 +71,7 @@ function applyAjaxCSRFToken($: any) {
     $?.ajaxSetup?.({
         beforeSend: function (xhr: XMLHttpRequest, opt: any) {
             if (!opt || !opt.crossDomain) {
-                var token = getCookie('CSRF-TOKEN');
+                const token = getCookie('CSRF-TOKEN');
                 if (token)
                     xhr.setRequestHeader('X-CSRF-TOKEN', token);
             }

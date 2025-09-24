@@ -3,7 +3,7 @@ import { isEmptyOrNull, isTrimmedEmpty, padLeft, replaceAll, toSingleLine, trim,
 
 describe("endsWith", () => {
     it("uses String.prototype.endsWith", () => {
-        var endsWithSpy = vi.spyOn(String.prototype, "endsWith");
+        const endsWithSpy = vi.spyOn(String.prototype, "endsWith");
         expect((deprecations as any).endsWith("abc", "c")).toBe(true);
         expect(endsWithSpy).toHaveBeenCalled();
     });
@@ -47,7 +47,7 @@ describe("padLeft", () => {
             return;
         }
 
-        var padStartSpy = vi.spyOn(String.prototype as any, "padStart");
+        const padStartSpy = vi.spyOn(String.prototype as any, "padStart");
         expect(padLeft("abc", 5)).toBe("  abc");
         expect(padStartSpy).toHaveBeenCalled();
 
@@ -61,7 +61,7 @@ describe("padLeft", () => {
     });
 
     it("pads string with given char when String.prototype.padStart not available", () => {
-        var oldPadStart = (String.prototype as any).padStart;
+        const oldPadStart = (String.prototype as any).padStart;
         (String.prototype as any).padStart = null;
         try {
             expect(padLeft("abc", 5, " ")).toBe("  abc");
@@ -82,7 +82,7 @@ describe("replaceAll", () => {
             return;
         }
         
-        var replaceAllSpy = vi.spyOn(String.prototype as any, "replaceAll");
+        const replaceAllSpy = vi.spyOn(String.prototype as any, "replaceAll");
         expect(replaceAll("abc", "a", "b")).toBe("bbc");
         expect(replaceAllSpy).toHaveBeenCalled();
     });
@@ -94,7 +94,7 @@ describe("replaceAll", () => {
     });
 
     it("can replace all occurrences of search string if String.prototype.replaceAll not available", () => {
-        var oldReplaceAll = (String.prototype as any).replaceAll;
+        const oldReplaceAll = (String.prototype as any).replaceAll;
         (String.prototype as any).replaceAll = null;
         try {
             expect(replaceAll("abc", "a", "b")).toBe("bbc");
@@ -108,7 +108,7 @@ describe("replaceAll", () => {
 
 describe("startsWith", () => {
     it("uses String.prototype.startsWith", () => {
-        var startsWithSpy = vi.spyOn(String.prototype, "startsWith");
+        const startsWithSpy = vi.spyOn(String.prototype, "startsWith");
         expect((deprecations as any).startsWith("abc", "a")).toBe(true);
         expect(startsWithSpy).toHaveBeenCalled();
     });
@@ -134,7 +134,7 @@ describe("toSingleLine", () => {
 
 describe("trim", () => {
     it("uses String.prototype.trim", () => {
-        var trimSpy = vi.spyOn(String.prototype, "trim");
+        const trimSpy = vi.spyOn(String.prototype, "trim");
         expect(trim(" abc ")).toBe("abc");
         expect(trimSpy).toHaveBeenCalled();
     });
@@ -148,7 +148,7 @@ describe("trim", () => {
 describe("trimEnd", () => {
     it("uses String.prototype.trimEnd", () => {
         if ((String.prototype as any).trimEnd) {
-            var trimEndSpy = vi.spyOn(String.prototype as any, "trimEnd");
+            const trimEndSpy = vi.spyOn(String.prototype as any, "trimEnd");
             expect(trimEnd(" abc ")).toBe(" abc");
             expect(trimEndSpy).toHaveBeenCalled();
         }
@@ -167,7 +167,7 @@ describe("trimEnd", () => {
 describe("trimStart", () => {
     it("uses String.prototype.trimStart", () => {
         if ((String.prototype as any).trimStart) {
-            var trimStartSpy = vi.spyOn(String.prototype as any, "trimStart");
+            const trimStartSpy = vi.spyOn(String.prototype as any, "trimStart");
             expect(trimStart(" abc ")).toBe("abc ");
             expect(trimStartSpy).toHaveBeenCalled();
         }
@@ -182,7 +182,7 @@ describe("trimStart", () => {
 
 describe("trimToEmpty", () => {
     it("uses String.prototype.trim", () => {
-        var trimSpy = vi.spyOn(String.prototype, "trim");
+        const trimSpy = vi.spyOn(String.prototype, "trim");
         expect(trimToEmpty(null)).toBe('');
         expect(trimToEmpty(undefined)).toBe('');
         expect(trimToEmpty(" abc ")).toBe("abc");

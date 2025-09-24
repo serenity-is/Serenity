@@ -10,7 +10,7 @@ export namespace ScriptData {
 
     export function bindToChange(name: string, onChange: () => void): void | (() => void) {
         if (typeof document !== "undefined" && document.addEventListener) {
-            var unbind = function () {
+            const unbind = function () {
                 onChange && typeof document !== "undefined" && document.removeEventListener?.('scriptdatachange.' + name, onChange);
                 onChange = null;
             }
@@ -76,7 +76,7 @@ export function getFormData(key: string): PropertyItemsData {
 
 export const getFormDataAsync = getFormScript;
 
-var compatExports = {
+const compatExports = {
     canLoadScriptData,
     getColumns,
     getColumnsAsync,
@@ -93,6 +93,6 @@ var compatExports = {
 
 let global = getGlobalObject();
 let serenity = (global.Serenity || (global.Serenity = Object.create(null)));
-for (var i in compatExports)
+for (const i in compatExports)
     if (serenity[i] == null)
         serenity[i] = (compatExports as any)[i];

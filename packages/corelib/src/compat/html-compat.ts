@@ -12,7 +12,7 @@ export function addEmptyOption(select: ArrayLike<HTMLElement> | HTMLSelectElemen
  * Adds an option to the select.
  */
 export function addOption(select: ArrayLike<HTMLElement> | HTMLSelectElement, key: string, text: string) {
-    var option = document.createElement("option");
+    const option = document.createElement("option");
     option.value = key ?? "";
     option.textContent = text ?? "";
     (isArrayLike(select) ? select[0] : select)?.append(option);
@@ -44,7 +44,7 @@ export function findElementWithRelativeId(element: HTMLElement | ArrayLike<HTMLE
     if (from == null)
         return null;
 
-    var noContext = false;
+    let noContext = false;
     if (context === undefined) {
         context = from.getRootNode() as HTMLElement;
         noContext = true;
@@ -52,7 +52,7 @@ export function findElementWithRelativeId(element: HTMLElement | ArrayLike<HTMLE
 
     let fromId = from.id ?? "";
     while (true) {
-        var res = context?.querySelector("#" + fromId + relativeId) as HTMLElement;
+        let res = context?.querySelector("#" + fromId + relativeId) as HTMLElement;
 
         if (!res && noContext)
             res = doc?.getElementById(fromId + relativeId);
@@ -79,7 +79,7 @@ export function findElementWithRelativeId(element: HTMLElement | ArrayLike<HTMLE
  * @returns the new DIV element.
  */
 export function newBodyDiv(): HTMLDivElement {
-    var element = document.createElement("div");
+    const element = document.createElement("div");
     document.body.append(element);
     return element;
 }
@@ -88,7 +88,7 @@ export function newBodyDiv(): HTMLDivElement {
  * Returns the outer HTML of the element.
  */
 export function outerHtml(element: Element | ArrayLike<HTMLElement>) {
-    var el = document.createElement('i');
+    const el = document.createElement('i');
     el.append((isArrayLike(element) ? element[0] : element).cloneNode(true));
     return el.innerHTML;
 }

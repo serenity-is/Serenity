@@ -73,10 +73,10 @@ export function groupBy<TItem>(items: TItem[], getKey: (x: TItem) => any): Group
         inOrder: []
     };
 
-    for (var index = 0; index < items.length; index++) {
-        var item = items[index];
+    for (let index = 0; index < items.length; index++) {
+        const item = items[index];
         let key = getKey(item) ?? "";
-        var group = result.byKey[key];
+        let group = result.byKey[key];
         if (group === undefined) {
             group = {
                 order: result.inOrder.length,
@@ -101,7 +101,7 @@ export function groupBy<TItem>(items: TItem[], getKey: (x: TItem) => any): Group
  * @param predicate Predicate to test elements.
  */
 export function indexOf<TItem>(array: TItem[], predicate: (x: TItem) => boolean): number {
-    for (var i = 0; i < array.length; i++)
+    for (let i = 0; i < array.length; i++)
         if (predicate(array[i]))
             return i;
 

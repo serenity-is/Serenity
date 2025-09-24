@@ -65,14 +65,14 @@ export function toSingleLine(str: string) {
 /**
  * Trims the whitespace characters from the end of the string
  */
-export var trimEnd = function (s: string) {
+export const trimEnd = function (s: string) {
     return s == null ? "" : ((s as any).trimEnd?.() ?? s.replace(/(?<!\s)\s+$/, ''));
 };
 
 /**
  * Trims the whitespace characters from the start of the string
  */
-export var trimStart = function (s: string) {
+export const trimStart = function (s: string) {
     return s == null ? "" : ((s as any).trimStart?.() ?? s.replace(/^\s*/, ''));
 };
 

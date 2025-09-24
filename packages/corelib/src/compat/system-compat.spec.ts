@@ -34,7 +34,7 @@ describe("isValue", () => {
 
 describe("today", () => {
     it('returns a date without time part', function () {
-        var d = today();
+        const d = today();
         expect(d.getHours()).toBe(0);
         expect(d.getMinutes()).toBe(0);
         expect(d.getSeconds()).toBe(0);

@@ -23,7 +23,7 @@ export interface PostToUrlOptions {
 function postToCommon(url: string, form: HTMLFormElement, target: string) {
 
     if (isSameOrigin(resolveUrl(url))) {
-        var csrfToken = getCookie('CSRF-TOKEN');
+        const csrfToken = getCookie('CSRF-TOKEN');
         if (csrfToken) {
             form.appendChild(<input type="hidden" name="__RequestVerificationToken" value={csrfToken} />);
         }

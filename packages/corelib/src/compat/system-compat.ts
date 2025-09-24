@@ -22,7 +22,7 @@ export function extend<T = any>(a: T, b: T): T {
 
 /** Returns the current date without time part */
 export let today = (): Date => {
-    var d = new Date();
+    const d = new Date();
     return new Date(d.getFullYear(), d.getMonth(), d.getDate());
 }
 
@@ -36,8 +36,8 @@ export let today = (): Date => {
 export function deepClone<T = any>(a: T): T {
 
     // https://github.com/angus-c/just/blob/master/packages/collection-clone/index.js
-    var result = a;
-    var type = {}.toString.call(a).slice(8, -1);
+    let result = a;
+    const type = {}.toString.call(a).slice(8, -1);
     if (type == 'Set') {
         return new Set([...(a as any)].map(value => deepClone(value))) as any;
     }
@@ -52,7 +52,7 @@ export function deepClone<T = any>(a: T): T {
     }
     if (type == 'Array' || type == 'Object') {
         result = (Array.isArray(a) ? [] : {}) as any;
-        for (var key in a) {
+        for (const key in a) {
             // include prototype properties
             result[key] = deepClone(a[key]);
         }
@@ -65,7 +65,7 @@ function getRegExpFlags(regExp: RegExp) {
     if (typeof (regExp.source as any).flags == 'string') {
         return (regExp.source as any).flags;
     } else {
-        var flags = [];
+        const flags = [];
         regExp.global && flags.push('g');
         regExp.ignoreCase && flags.push('i');
         regExp.multiline && flags.push('m');
@@ -155,9 +155,9 @@ export function addTypeMember(type: any, member: TypeMember): TypeMember {
  * @returns All registered types.
  */
 export function getTypes(): any[] {
-    var result = [];
+    const result = [];
     const types = getTypeRegistry();
-    for (var t in types) {
+    for (const t in types) {
         if (Object.prototype.hasOwnProperty.call(types, t))
             result.push(types[t]);
     }
@@ -165,7 +165,7 @@ export function getTypes(): any[] {
 }
 
 export function clearKeys(d: any) {
-    for (var n in d) {
+    for (const n in d) {
         if (Object.prototype.hasOwnProperty.call(d, n))
             delete d[n];
     }

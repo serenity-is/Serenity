@@ -15,10 +15,10 @@ interface LayoutTimerReg {
 
 export namespace LayoutTimer {
 
-    var timeout: number;
-    var nextKey: number = 0;
-    var regCount: number = 0;
-    var regs: { [key: number]: LayoutTimerReg; } = {};
+    let timeout: number;
+    let nextKey: number = 0;
+    let regCount: number = 0;
+    const regs: { [key: number]: LayoutTimerReg; } = {};
 
     function startTimer() {
         if (timeout == null && regCount > 0) {
@@ -34,15 +34,15 @@ export namespace LayoutTimer {
     }
 
     function onTimeout() {
-        for (var key in regs) {
-            var reg = regs[key];
+        for (const key in regs) {
+            const reg = regs[key];
             try {
-                var el = reg.element();
+                const el = reg.element();
                 if (!el)
                     continue;
 
-                var w = el.offsetWidth;
-                var h = el.offsetHeight;
+                let w = el.offsetWidth;
+                let h = el.offsetHeight;
                 if (w <= 0 || h <= 0) {
                     reg.storedWidth = w;
                     reg.storedHeight = h;
@@ -50,7 +50,7 @@ export namespace LayoutTimer {
                     continue;
                 }
 
-                var debounced = false;
+                let debounced = false;
                 try {
 
                     if ((reg.width && reg.storedWidth !== w) ||
@@ -89,11 +89,11 @@ export namespace LayoutTimer {
     }
 
     export function store(key: number) {
-        var reg = regs[key];
+        const reg = regs[key];
         if (!reg)
             return;
 
-        var el = reg.element();
+        const el = reg.element();
         if (!el)
             return;
 
@@ -103,7 +103,7 @@ export namespace LayoutTimer {
     }
 
     export function trigger(key: number) {
-        var reg = regs[key];
+        const reg = regs[key];
         if (!reg)
             return;
         store(key);
@@ -146,7 +146,7 @@ export namespace LayoutTimer {
     }
 
     export function off(key: number): number {
-        var reg = regs[key];
+        const reg = regs[key];
         if (!reg)
             return 0;
 
@@ -168,7 +168,7 @@ export function executeOnceWhenVisible(el: HTMLElement | ArrayLike<HTMLElement>,
         return;
     }
 
-    var timer = LayoutTimer.onShown(() => el as HTMLElement, () => {
+    const timer = LayoutTimer.onShown(() => el as HTMLElement, () => {
         LayoutTimer.off(timer);
         callback();
     });

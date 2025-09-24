@@ -29,7 +29,7 @@ export namespace Router {
         newHash = newHash || '';
         newHash = newHash.replace(/^#/, '');
         newHash = (!newHash ? "" : '#' + newHash);
-        var newURL = window.location.href.replace(/#$/, '')
+        const newURL = window.location.href.replace(/#$/, '')
             .replace(/#.*$/, '') + newHash;
         if (newURL != window.location.href) {
             if (tryBack && oldURL != null && isEquivalentUrl(oldURL, newURL)) {
@@ -57,11 +57,11 @@ export namespace Router {
         if (!enabled)
             return;
 
-        var current = window.location.hash || '';
+        let current = window.location.hash || '';
         if (current.charAt(0) == '#')
             current = current.substring(1);
 
-        var parts = current.split('/+/');
+        const parts = current.split('/+/');
 
         if (parts.length > 1) {
             if (newHash && newHash.length) {
@@ -88,7 +88,7 @@ export namespace Router {
     }
 
     function getVisibleOrHiddenByDialogs(): HTMLElement[] {
-        var visibleDialogs = Array.from(document.querySelectorAll<HTMLElement>(".modal, .panel-body, .ui-dialog-content"))
+        const visibleDialogs = Array.from(document.querySelectorAll<HTMLElement>(".modal, .panel-body, .ui-dialog-content"))
             .filter(isVisibleOrHiddenBy)
             .filter(x => !isIgnoredDialog(x));
         visibleDialogs.sort((a: any, b: any) => {
@@ -103,7 +103,7 @@ export namespace Router {
     let pendingDialogPreHash: string;
 
     function onDialogOpen(ownerEl: HTMLElement | ArrayLike<HTMLElement>, element: HTMLElement | ArrayLike<HTMLElement>, dialogHash: () => string) {
-        var route = [];
+        const route = [];
         element = isArrayLike(element) ? element[0] : element;
         if (element &&
             pendingDialogElement &&
@@ -118,17 +118,17 @@ export namespace Router {
         pendingDialogPreHash = null;
 
         ownerEl = isArrayLike(ownerEl) ? ownerEl[0] : ownerEl;
-        var ownerIsDialog = ownerEl?.matches(".ui-dialog-content, .panel-body, .modal-content");
-        var ownerDlgInst = Dialog.getInstance(ownerEl);
-        var value = dialogHash();
+        const ownerIsDialog = ownerEl?.matches(".ui-dialog-content, .panel-body, .modal-content");
+        const ownerDlgInst = Dialog.getInstance(ownerEl);
+        let value = dialogHash();
 
-        var idPrefix: string;
+        let idPrefix: string;
         if (ownerDlgInst) {
-            var dialogs = getVisibleOrHiddenByDialogs();
-            var index = dialogs.indexOf(ownerDlgInst.getEventsNode());
+            const dialogs = getVisibleOrHiddenByDialogs();
+            const index = dialogs.indexOf(ownerDlgInst.getEventsNode());
 
-            for (var i = 0; i <= index; i++) {
-                var q = dialogs[i].dataset.qroute;
+            for (let i = 0; i <= index; i++) {
+                const q = dialogs[i].dataset.qroute;
                 if (q && q.length)
                     route.push(q);
             }
@@ -137,14 +137,14 @@ export namespace Router {
                 idPrefix = ownerDlgInst?.getContentNode()?.getAttribute("id");
                 if (idPrefix) {
                     idPrefix += "_";
-                    var id = ownerEl?.getAttribute("id");
+                    const id = ownerEl?.getAttribute("id");
                     if (id && id.startsWith(idPrefix))
                         value = id.substring(idPrefix.length) + '@' + value;
                 }
             }
         }
         else {
-            var id = ownerEl?.getAttribute("id");
+            const id = ownerEl?.getAttribute("id");
             if (id && (!ownerEl.classList.contains("route-handler") ||
                 document.querySelector('.route-handler')?.getAttribute("id") != id))
                 value = id + "@" + value;
@@ -159,7 +159,7 @@ export namespace Router {
         if (!enabled)
             return;
 
-        var el = isArrayLike(element) ? element[0] : element;
+        const el = isArrayLike(element) ? element[0] : element;
         pendingDialogElement = el;
         pendingDialogHash = dialogHash;
         pendingDialogOwner = isArrayLike(owner) ? owner[0] : owner;
@@ -182,7 +182,7 @@ export namespace Router {
         newHash = newHash ?? window.location.hash ?? '';
         if (newHash.charAt(0) == '#')
             newHash = newHash.substring(1);
-        var newParts = newHash.split("/+/");
+        const newParts = newHash.split("/+/");
 
         if (resolvingCurrent &&
             (hashAnchorClickTime && new Date().getTime() - hashAnchorClickTime < 100) &&
@@ -195,10 +195,10 @@ export namespace Router {
 
         resolving++;
         try {
-            var dialogs = getVisibleOrHiddenByDialogs();
-            var oldParts = dialogs.map((el: any) => el.dataset.qroute);
+            const dialogs = getVisibleOrHiddenByDialogs();
+            const oldParts = dialogs.map((el: any) => el.dataset.qroute);
 
-            var same = 0;
+            let same = 0;
             while (same < dialogs.length &&
                 same < newParts.length &&
                 oldParts[same] == newParts[same]) {
@@ -219,20 +219,20 @@ export namespace Router {
                 });
             }
 
-            for (var i = same; i < dialogs.length; i++) {
-                var d = dialogs[i];
+            for (let i = same; i < dialogs.length; i++) {
+                const d = dialogs[i];
                 Dialog.getInstance(d)?.close("router");
                 closeMessages();
             }
 
-            for (var i = same; i < Math.min(newParts.length, 5); i++) {
-                var route = newParts[i];
-                var routeParts = route.split('@');
-                var handler: HTMLElement;
+            for (let i = same; i < Math.min(newParts.length, 5); i++) {
+                let route = newParts[i];
+                const routeParts = route.split('@');
+                let handler: HTMLElement;
                 if (routeParts.length == 2) {
-                    var dialog = i > 0 ? dialogs[i - 1] : null;
+                    const dialog = i > 0 ? dialogs[i - 1] : null;
                     if (dialog) {
-                        var idPrefix = Dialog.getInstance(dialog)?.getContentNode().getAttribute("id") ?? dialog.getAttribute("id");
+                        const idPrefix = Dialog.getInstance(dialog)?.getContentNode().getAttribute("id") ?? dialog.getAttribute("id");
                         if (idPrefix) {
                             handler = document.querySelector('#' + idPrefix + "_" + routeParts[0]);
                             if (handler) {
@@ -307,7 +307,7 @@ export namespace Router {
             if (!enabled)
                 return;
 
-            var dlg = event.target as HTMLElement;
+            const dlg = event.target as HTMLElement;
             if (!dlg || isIgnoredDialog(dlg))
                 return;
 
@@ -317,7 +317,7 @@ export namespace Router {
                 return;
 
             dlg.dataset.qprhash = resolvingPreRoute ?? pendingDialogPreHash ?? window.location.hash;
-            var owner = getVisibleOrHiddenByDialogs().filter(x => x !== dlg).pop();
+            let owner = getVisibleOrHiddenByDialogs().filter(x => x !== dlg).pop();
             if (!owner)
                 owner = document.documentElement;
 
@@ -360,11 +360,11 @@ export namespace Router {
         }
 
         function closeHandler(e: any) {
-            var dlg = e.target as HTMLElement;
+            const dlg = e.target as HTMLElement;
             if (!dlg || isIgnoredDialog(e.target))
                 return;
             delete dlg.dataset.qroute;
-            var prhash = dlg.dataset.qprhash;
+            const prhash = dlg.dataset.qprhash;
 
             let tryBack = shouldTryBack(e);
 

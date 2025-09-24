@@ -10,7 +10,7 @@ export function validatorAbortHandler(validator: Validator) {
 export function validateOptions(options?: ValidatorOptions): ValidatorOptions {
     return Object.assign({} as ValidatorOptions, {
         errorPlacement: function (place: ArrayLike<HTMLElement> | HTMLElement, elem: ArrayLike<HTMLElement> | HTMLElement) {
-            var element = isArrayLike(elem) ? elem[0] : elem;
+            const element = isArrayLike(elem) ? elem[0] : elem;
             let field: HTMLElement = null;
             let vx = element.getAttribute('data-vx-id');
             if (vx) {
@@ -41,19 +41,19 @@ export function validateOptions(options?: ValidatorOptions): ValidatorOptions {
             });
 
             if (validator.errorList.length) {
-                var el = validator.errorList[0].element as HTMLElement;
+                const el = validator.errorList[0].element as HTMLElement;
                 if (!el)
                     return;
                 let $ = getjQuery();
 
-                var bsPaneId = el.closest('.tab-content>.tab-pane[id]:not(.active)')?.getAttribute('id');
+                const bsPaneId = el.closest('.tab-content>.tab-pane[id]:not(.active)')?.getAttribute('id');
                 if (bsPaneId) {
                     let selector = 'a[href="#' + bsPaneId + '"]';
                     $ && $(selector).click(); // bs3/bs4
                     (document.querySelector<HTMLAnchorElement>(selector))?.click(); // bs5+
                 }
 
-                var uiPaneId = el.closest('.ui-tabs-panel[id]:not(.ui-tabs-panel-active)')?.getAttribute('id');
+                const uiPaneId = el.closest('.ui-tabs-panel[id]:not(.ui-tabs-panel-active)')?.getAttribute('id');
                 if (uiPaneId) {
                     let selector = 'a[href="#' + uiPaneId + '"]';
                     $ ? $(selector).click() : document.querySelector<HTMLAnchorElement>(selector)?.click();
@@ -73,8 +73,8 @@ export function validateOptions(options?: ValidatorOptions): ValidatorOptions {
 
 export namespace ValidationHelper {
     export function asyncSubmit(form: ArrayLike<HTMLElement> | HTMLElement, validateBeforeSave: () => boolean, submitHandler: () => void): boolean {
-        var validator = Validator.getInstance(form);
-        var valSettings = validator.settings;
+        const validator = Validator.getInstance(form);
+        const valSettings = validator.settings;
         if (valSettings.abortHandler) {
             return false;
         }
@@ -91,8 +91,8 @@ export namespace ValidationHelper {
     }
 
     export function submit(form: ArrayLike<HTMLElement> | HTMLElement, validateBeforeSave: () => boolean, submitHandler: () => void): boolean {
-        var validator = Validator.getInstance(form);
-        var valSettings = validator.settings;
+        const validator = Validator.getInstance(form);
+        const valSettings = validator.settings;
         if (valSettings.abortHandler) {
             return false;
         }
@@ -111,7 +111,7 @@ export namespace ValidationHelper {
     }
 
     export function validateElement(elem: ArrayLike<HTMLElement> | HTMLElement): void {
-        var validator = getValidator(elem);
+        const validator = getValidator(elem);
         if (validator)
             validator.element(isArrayLike(elem) ? elem[0] : elem);
     }

@@ -6,7 +6,7 @@ beforeEach(() => {
 describe('initFullHeightGridPage', () => {
     it('works without jQuery', async () => {
         const initFullHeightGridPage = (await import('./layout')).initFullHeightGridPage;
-        var div = document.createElement('div');
+        const div = document.createElement('div');
         initFullHeightGridPage(div, { noRoute: true });
         expect(document.documentElement.classList.contains('full-height-page')).toBe(true);
         expect(div.classList.contains('responsive-height')).toBe(true);
@@ -14,7 +14,7 @@ describe('initFullHeightGridPage', () => {
 
     it('works with jQuery and HTML element', async () => {
         const initFullHeightGridPage = (await import('./layout')).initFullHeightGridPage;
-        var div = document.createElement('div');
+        const div = document.createElement('div');
         initFullHeightGridPage(div, { noRoute: true });
         expect(document.documentElement.classList.contains('full-height-page')).toBe(true);
         expect(div.classList.contains('responsive-height')).toBe(true);
@@ -22,7 +22,7 @@ describe('initFullHeightGridPage', () => {
 
     it('works with jQuery and jQuery wrapped element', async () => {
         const initFullHeightGridPage = (await import('./layout')).initFullHeightGridPage;
-        var div = document.createElement('div');
+        const div = document.createElement('div');
         initFullHeightGridPage(div, { noRoute: true });
         expect(document.documentElement.classList.contains('full-height-page')).toBe(true);
         expect(div.classList.contains('responsive-height')).toBe(true);
@@ -33,7 +33,7 @@ describe('isMobileView', () => {
 
     it('should return false if window is undefined', async () => {
         const isMobileView = (await import('./layout')).isMobileView;
-        var oldWindow = window;
+        const oldWindow = window;
         try {
             window = undefined;
         }
@@ -51,9 +51,9 @@ describe('isMobileView', () => {
 
     it('should return based on window.matchMedia result for "width < 768px"', async () => {
         const isMobileView = (await import('./layout')).isMobileView;
-        var matchMedia = window.matchMedia;
+        const matchMedia = window.matchMedia;
         try {
-            var q: string;
+            let q: string;
             window.matchMedia = (query: string) => {
                 q = query;
                 return { matches: false } as any;
@@ -76,7 +76,7 @@ describe('isMobileView', () => {
     it('should check window.width if window.matchMedia not available', async () => {
         const isMobileView = (await import('./layout')).isMobileView;
 
-        var matchMedia = window.matchMedia;
+        const matchMedia = window.matchMedia;
         try {
             delete window.matchMedia;
             window.innerWidth = 100;
@@ -150,7 +150,7 @@ describe('centerDialog', () => {
         document.body.appendChild(dialog);
 
         // Mock getjQuery to return a mock jQuery function
-        var mockJQuery = globalThis.jQuery = vi.fn(() => ({
+        const mockJQuery = globalThis.jQuery = vi.fn(() => ({
             position: vi.fn(() => ({ left: 0, top: 0 }))
         }));
         try {

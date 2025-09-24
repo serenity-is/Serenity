@@ -48,7 +48,7 @@ describe("clearOptions", () => {
 
 describe("findElementWithRelativeId", () => {
     it("returns null if the from element is null", () => {
-        var target = document.createElement("div");
+        const target = document.createElement("div");
         target.id = "test";
         document.body.append(target);
         try {
@@ -61,7 +61,7 @@ describe("findElementWithRelativeId", () => {
 
     it("returns null if the from element has no id, and no element with the given id in document", () => {
         const from = document.createElement("div");
-        var target = document.createElement("div");
+        const target = document.createElement("div");
         target.id = "test2";
         document.body.append(target);
         document.body.append(from);
@@ -76,7 +76,7 @@ describe("findElementWithRelativeId", () => {
 
     it("returns null if the detached from element has no id, and no element with the given id in document", () => {
         const from = document.createElement("div");
-        var target = document.createElement("div");
+        const target = document.createElement("div");
         target.id = "test2";
         document.body.append(target);
         try {
@@ -89,7 +89,7 @@ describe("findElementWithRelativeId", () => {
     });
 
     it("if the from element has no id finds the element with the given id", () => {
-        var target = document.createElement("div");
+        const target = document.createElement("div");
         const from = document.createElement("div");
         target.id = "test";
         document.body.append(target);
@@ -104,7 +104,7 @@ describe("findElementWithRelativeId", () => {
     });
 
     it("may still find the element with the given id in document if the from element is detached", () => {
-        var target = document.createElement("div");
+        const target = document.createElement("div");
         const from = document.createElement("div");
         target.id = "test";
         document.body.append(target);
@@ -117,7 +117,7 @@ describe("findElementWithRelativeId", () => {
     });
 
     it("won't find the element with the given id in document if the from element is detached and context is passed as null", () => {
-        var target = document.createElement("div");
+        const target = document.createElement("div");
         const from = document.createElement("div");
         target.id = "test";
         document.body.append(target);
@@ -130,7 +130,7 @@ describe("findElementWithRelativeId", () => {
     });
 
     it("may use jQuery if a jQuery like object is passed", () => {
-        var target = document.createElement("div");
+        const target = document.createElement("div");
         const from = document.createElement("div");
         target.id = "test";
         document.body.append(target);
@@ -145,7 +145,7 @@ describe("findElementWithRelativeId", () => {
     });
     
     it("can find element with ID = fromID + searched ID", () => {
-        var target = document.createElement("div");
+        const target = document.createElement("div");
         const from = document.createElement("div");
         from.id = "from";
         target.id = "fromtest";
@@ -159,7 +159,7 @@ describe("findElementWithRelativeId", () => {
     });
 
     it("can find element with ID = fromID + _ + searched ID", () => {
-        var target = document.createElement("div");
+        const target = document.createElement("div");
         const from = document.createElement("div");
         from.id = "from";
         target.id = "from_test";
@@ -173,7 +173,7 @@ describe("findElementWithRelativeId", () => {
     });
 
     it("can find element with ID = fromID splitted by underscore + _ + searched ID", () => {
-        var target = document.createElement("div");
+        const target = document.createElement("div");
         const from = document.createElement("div");
         from.id = "from_my_element";
         target.id = "from_mytest";
@@ -197,9 +197,9 @@ describe("findElementWithRelativeId", () => {
     it("gives more priority to find ID + relative ID than findID + _ + relative ID", () => {
         const from = document.createElement("div");
         from.id = "from";
-        var target1 = document.createElement("div");
+        const target1 = document.createElement("div");
         target1.id = "from_test";
-        var target2 = document.createElement("div");
+        const target2 = document.createElement("div");
         target2.id = "fromtest";
         document.body.append(target1);
         document.body.append(target2);
@@ -215,9 +215,9 @@ describe("findElementWithRelativeId", () => {
     it("gives more priority to longer ID matches", () => {
         const from = document.createElement("div");
         from.id = "from_my_element";
-        var target1 = document.createElement("div");
+        const target1 = document.createElement("div");
         target1.id = "fromtest";
-        var target2 = document.createElement("div");
+        const target2 = document.createElement("div");
         target2.id = "from_mytest";
         document.body.append(target1);
         document.body.append(target2);
@@ -233,7 +233,7 @@ describe("findElementWithRelativeId", () => {
     it("can find quick filter cascade editor ID's", () => {
         const city = document.createElement("div");
         city.id = "Serenity_Demo_Norhtwind_CustomerGrid0_QuickFilter_City";
-        var country = document.createElement("div");
+        const country = document.createElement("div");
         country.id = "Serenity_Demo_Norhtwind_CustomerGrid0_QuickFilter_Country";
         document.body.append(country);
         document.body.append(city);
@@ -249,7 +249,7 @@ describe("findElementWithRelativeId", () => {
     it("can find quick filter cascade editor ID's with jQuery", () => {
         const city = document.createElement("div");
         city.id = "Serenity_Demo_Norhtwind_CustomerGrid0_QuickFilter_City";
-        var country = document.createElement("div");
+        const country = document.createElement("div");
         country.id = "Serenity_Demo_Norhtwind_CustomerGrid0_QuickFilter_Country";
         document.body.append(country);
         document.body.append(city);
@@ -263,7 +263,7 @@ describe("findElementWithRelativeId", () => {
     });    
 
     it("won't search document if the context is passed", () => {
-        var target = document.createElement("div");
+        const target = document.createElement("div");
         const from = document.createElement("div");
         target.id = "test";
         document.body.append(target);

@@ -35,7 +35,7 @@ describe("count", () => {
 
 describe("first", () => {
     it('throws for empty array', function () {
-        var thrown = false;
+        let thrown = false;
         try {
             first([], () => true)
         }
@@ -47,7 +47,7 @@ describe("first", () => {
     });
 
     it('throws if predicate returns false for all', () => {
-        var thrown = false;
+        let thrown = false;
         try {
             first([1, 2, 3], () => false)
         }
@@ -142,11 +142,11 @@ describe("groupBy", () => {
 
 describe("insert", () => {
     it('calls obj.insert if available', function () {
-        var obj = {
+        const obj = {
             insert: function () {
             }
         }
-        var mock = vi.spyOn(obj, "insert");
+        const mock = vi.spyOn(obj, "insert");
         insert(obj, 3, 7);
         expect(mock.mock.calls.length).toEqual(1);
         expect(mock.mock.calls[0]).toEqual([3, 7]);
@@ -160,8 +160,8 @@ describe("insert", () => {
     });
 
     it('throws for other types', function () {
-        var obj = {};
-        var thrown = false;
+        const obj = {};
+        let thrown = false;
         try {
             insert(obj, 3, 5);
         }
@@ -198,7 +198,7 @@ describe("isArray", () => {
 
 describe("single", () => {
     it('throws for empty array', function () {
-        var thrown = false;
+        let thrown = false;
         try {
             single([], () => true)
         }
@@ -210,7 +210,7 @@ describe("single", () => {
     });
 
     it('throws if predicate returns false for all', () => {
-        var thrown = false;
+        let thrown = false;
         try {
             single([1, 2, 3], () => false)
         }
@@ -227,7 +227,7 @@ describe("single", () => {
     });
 
     it('throws if more than one element matches the predicate', () => {
-        var thrown = false;
+        let thrown = false;
         try {
             single([1, 2, 3], x => x % 2 == 1)
         }
