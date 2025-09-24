@@ -1,6 +1,11 @@
 import { implementedInterfacesSymbol, isAssignableFromSymbol, isInstanceOfTypeSymbol } from "./symbols";
 import { EditorAttribute, Enum, ISlickFormatter, addCustomAttribute, classTypeInfo, editorTypeInfo, fieldsProxy, formatterTypeInfo, getBaseType, getCustomAttribute, getCustomAttributes, getInstanceType, getType, getTypeFullName, getTypeNameProp, getTypeShortName, hasCustomAttribute, initFormType, interfaceTypeInfo, isAssignableFrom, isEnum, isInstanceOfType, registerClass, registerEnum, registerInterface, registerType } from "./system";
-import { ensureTypeInfo, peekTypeInfo } from "./system-internal";
+import { ensureTypeInfo, getTypeRegistry, peekTypeInfo } from "./system-internal";
+
+afterEach(() => {
+    const typeRegistry = getTypeRegistry();
+    Object.keys(typeRegistry).forEach(k => delete typeRegistry[k]);
+});
 
 describe("Enum.getValues", () => {
     it('returns correct values', function () {
@@ -996,5 +1001,28 @@ describe("hasCustomAttribute", () => {
         const attr = new MyAttribute();
         addCustomAttribute(MyClass, attr);
         expect(hasCustomAttribute(MyClass, MyAttribute)).toBe(true);
+    });
+});
+
+describe("isEnum", () => {
+    it("correctly identifies enum types", function () {
+        enum TestEnum {
+            A = 1,
+            B = 2
+        }
+
+        class TestClass {
+        }
+
+        registerEnum(TestEnum, 'Test.TestEnum');
+        try {
+
+            expect(isEnum(TestEnum)).toBe(true);
+            expect(isEnum(TestClass)).toBe(false);
+            expect(isEnum({})).toBe(false);
+            expect(isEnum(null)).toBe(false);
+            expect(isEnum(undefined)).toBe(false);
+        } finally {
+        }
     });
 });

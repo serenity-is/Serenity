@@ -280,7 +280,7 @@ export namespace Enum {
  * @returns True if the type is an enum
  */
 export const isEnum = (type: any) => {
-    return typeof type === "object" &&
+    return type != null && typeof type === "object" &&
         (type[Symbol.typeInfo] as TypeInfo<string>)?.typeKind == "enum";
 };
 
