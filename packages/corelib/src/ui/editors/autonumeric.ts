@@ -862,18 +862,6 @@ class AutoNumericHolder {
     }
 }
 
-/** thanks to Anthony & Evan C */
-function autoGet(obj: any) {
-    if (typeof obj === 'string') {
-        obj = obj.replace(/\[/g, "\\[").replace(/\]/g, "\\]");
-        obj = '#' + obj.replace(/(:|\.)/g, '\\$1');
-        /** obj = '#' + obj.replace(/([;&,\.\+\*\~':"\!\^#$%@\[\]\(\)=>\|])/g, '\\$1'); */
-        /** possible modification to replace the above 2 lines */
-        return document.querySelector(obj);
-    }
-    return obj;
-}
-
 function getHolder(that: HTMLInputElement, settings?: AutoNumericOptions, update?: boolean) {
     var data = AutoNumeric.getSettings(that);
     if (!data) {
