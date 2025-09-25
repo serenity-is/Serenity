@@ -186,6 +186,30 @@ export function parseQueryString(s?: string): Record<string, string> {
 }
 
 /**
+ * Checks whether a return URL is safe for redirects. Must be relative, start with a single slash,
+ * and contain only allowed characters (no protocol, no backslashes, no control chars, etc).
+ */
+export function isSafeReturnUrl(url: string): boolean {
+    if (!url || typeof url !== "string") 
+        return false;
+    // Must start with exactly one /
+    if (!/^\//.test(url)) 
+        return false;
+    // Reject any : to prevent protocol-relative and absolute URLs
+    if (url.includes(':')) 
+        return false;
+    // No backslash, control chars, or double slashes after initial /
+    if (url.includes('\\') ||
+        /[\0-\x1F\x7F]/.test(url) ||
+        /\/\//.test(url.substring(1))) 
+        return false;
+    // Only allow URLs of reasonable length and valid characters (path/query)
+    if (!/^\/[\w\-./?&=%]*$/.test(url)) 
+        return false;
+    return true;
+}
+
+/**
  * Gets the return URL from the query string.
  * @param opt Options for getting the return URL.
  */
@@ -200,8 +224,10 @@ export function getReturnUrl(opt?: {
     const q = parseQueryString();
     let returnUrl = q['returnUrl'] || q['ReturnUrl'] || q["ReturnURL"] || q["returnURL"];
 
-    if (returnUrl && (!opt?.ignoreUnsafe && !/^\//.test(returnUrl)))
-        return null;
+    if (returnUrl && (!opt?.ignoreUnsafe)) {
+        if (!isSafeReturnUrl(returnUrl))
+            returnUrl = null;
+    }
 
     if (!returnUrl && !opt?.queryOnly)
         returnUrl = Config.defaultReturnUrl(opt?.purpose);

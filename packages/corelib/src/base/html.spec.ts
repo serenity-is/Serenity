@@ -497,12 +497,12 @@ describe("getReturnUrl", () => {
             }
     });
 
-    it("returns null if returnUrl from query string is unsafe", () => {
+    it("returns defaultReturnUrl if returnUrl from query string is unsafe", () => {
         const oldLocation = window.location.href;
         if (changeJSDOMURL("http://localhost?returnUrl=http://unsafe.com"))
             try {
                 const result = getReturnUrl();
-                expect(result).toBeNull();
+                expect(result).toBe(Config.defaultReturnUrl());
             } finally {
                 changeJSDOMURL(oldLocation);
             }
