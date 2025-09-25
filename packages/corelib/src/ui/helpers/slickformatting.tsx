@@ -25,9 +25,11 @@ export namespace SlickFormatting {
 
             const itemId = (ctx.item as any)?.[idField];
             const extraClass = cssClass == null ? '' : cssClass(ctx)
+            const encItemType = encodeURIComponent(replaceAll(itemType, '.', '-'));
+            const encItemId = itemId != null ? encodeURIComponent(itemId.toString()) : null;
 
             const link = <a class={[`s-EditLink s-${replaceAll(itemType, '.', '-')}Link`, extraClass]}
-                href={itemId != null ? "#" + replaceAll(itemType, '.', '-') + '/' + itemId : null}
+                href={itemId != null ? '#' + encItemType + '/' + encItemId : null}
                 data-item-type={itemType} data-item-id={itemId} /> as HTMLAnchorElement;
 
             if (fmtRes instanceof Node) {
@@ -36,7 +38,7 @@ export namespace SlickFormatting {
             }
 
             if (fmtRes != null && fmtRes !== "") {
-                link.innerHTML = fmtRes;
+                link.innerHTML = ctx.sanitizer?.(fmtRes) ?? fmtRes;
             }
 
             return link;

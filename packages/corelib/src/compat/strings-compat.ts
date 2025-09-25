@@ -110,7 +110,7 @@ export function trimToNull(s: string) {
  * @returns Replaced string.
  */
 export function replaceAll(str: string, find: string, replace: string): string {
-    str = str || '';
+    str = String(str ?? '');
     return (str as any).replaceAll?.(find, replace) ?? str.split(find).join(replace);
 }
 

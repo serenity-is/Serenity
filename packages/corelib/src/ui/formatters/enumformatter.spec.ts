@@ -1,3 +1,4 @@
+import { formatterContext as ctx } from "@serenity-is/sleekgrid";
 import { addCustomAttribute, registerEnum } from "../../base";
 import { EnumKeyAttribute } from "../../types/attributes";
 import { EnumTypeRegistry } from "../../types/enumtyperegistry";
@@ -26,7 +27,7 @@ describe("EnumFormatter", () => {
         registerEnum(TestEnum, "TestEnum", "TestEnum");
         var formatter = new EnumFormatter();
         formatter.enumKey = "TestEnum";
-        expect(formatter.format({ value: null, escape: (s) => s })).toBe("");
+        expect(formatter.format(ctx({ value: null }))).toBe("");
     });
 
     it("shows localized text of enum value", () => {
@@ -36,7 +37,7 @@ describe("EnumFormatter", () => {
         registerEnum(TestEnum, "TestEnum", "TestEnum");
         var formatter = new EnumFormatter();
         formatter.enumKey = "TestEnum";
-        expect(formatter.format({ value: 1, escape: (s) => s })).toBe("Enums.TestEnum.Value1");
+        expect(formatter.format(ctx({ value: 1 }))).toBe("Enums.TestEnum.Value1");
     });
 
     it("uses attribute key instead of enum name", () => {
@@ -47,7 +48,7 @@ describe("EnumFormatter", () => {
         registerEnum(TestEnum, "TestEnum");
         var formatter = new EnumFormatter();
         formatter.enumKey = "TestEnum";
-        expect(formatter.format({ value: 1, escape: (s) => s })).toBe("Enums.TestEnum2.Value1");
+        expect(formatter.format(ctx({ value: 1 }))).toBe("Enums.TestEnum2.Value1");
     });
 
     it("returns name for give enumkey and value", () => {

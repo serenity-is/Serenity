@@ -341,6 +341,7 @@ describe("AggregateFormatting", () => {
             expect(mockFormatter).toHaveBeenCalledWith({
                 column,
                 escape: expect.any(Function),
+                sanitizer: expect.any(Function),
                 item: expect.any(Object),
                 value: 1234.56,
                 purpose: "grouptotal"
