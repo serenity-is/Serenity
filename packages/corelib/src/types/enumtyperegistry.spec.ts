@@ -1,15 +1,16 @@
+import { DialogTypeRegistry } from ".";
 import { addCustomAttribute, getTypeRegistry, registerEnum } from "../base";
 import { EnumKeyAttribute } from "./attributes";
 import { EnumTypeRegistry } from "./enumtyperegistry";
 
-beforeEach(() => { 
+beforeEach(() => {
     const typeRegistry = getTypeRegistry();
     Object.keys(typeRegistry).forEach(k => delete typeRegistry[k]);
     EnumTypeRegistry.reset();
 });
 
 describe("EnumTypeRegistry", () => {
-    test('can find enum type by its key', function () {
+    it('can find enum type by its key', function () {
 
         enum OrderShippingState {
             NotShipped = 0,
@@ -22,7 +23,7 @@ describe("EnumTypeRegistry", () => {
         expect(type === OrderShippingState).toBe(true);
     });
 
-    test('can find enum type by its full name', function () {
+    it('can find enum type by its full name', function () {
         enum OrderStatus {
             Pending = 0,
             Completed = 1
@@ -33,16 +34,16 @@ describe("EnumTypeRegistry", () => {
         expect(type).toBe(OrderStatus);
     });
 
-    test('returns undefined for non-existent enum', function () {
+    it('returns undefined for non-existent enum', function () {
         const type = EnumTypeRegistry.tryGet("NonExistent.Enum");
         expect(type).toBeUndefined();
     });
 
-    test('get throws error for non-existent enum', function () {
+    it('get throws error for non-existent enum', function () {
         expect(() => EnumTypeRegistry.get("NonExistent.Enum")).toThrow();
     });
 
-    test('can find enum with EnumKeyAttribute', function () {
+    it('can find enum with EnumKeyAttribute', function () {
         enum PaymentMethod {
             Cash = 0,
             Card = 1
@@ -57,7 +58,7 @@ describe("EnumTypeRegistry", () => {
         expect(type).toBe(PaymentMethod);
     });
 
-    test('prefers EnumKeyAttribute over registered key', function () {
+    it('prefers EnumKeyAttribute over registered key', function () {
         enum UserRole {
             Admin = 0,
             User = 1
@@ -77,7 +78,7 @@ describe("EnumTypeRegistry", () => {
         expect(type2).toBe(UserRole);
     });
 
-    test('reset clears the registry cache', function () {
+    it('reset clears the registry cache', function () {
         enum Status {
             Active = 0,
             Inactive = 1
@@ -96,7 +97,7 @@ describe("EnumTypeRegistry", () => {
         expect(type2).toBe(Status);
     });
 
-    test('tryGetOrLoad returns enum synchronously when found', function () {
+    it('tryGetOrLoad returns enum synchronously when found', function () {
         enum Priority {
             Low = 0,
             High = 1
@@ -107,7 +108,7 @@ describe("EnumTypeRegistry", () => {
         expect(type).toBe(Priority);
     });
 
-    test('getOrLoad returns enum when found', function () {
+    it('getOrLoad returns enum when found', function () {
         enum Category {
             A = 0,
             B = 1
@@ -118,11 +119,11 @@ describe("EnumTypeRegistry", () => {
         expect(type).toBe(Category);
     });
 
-    test('getOrLoad throws error for non-existent enum', function () {
+    it('getOrLoad throws error for non-existent enum', function () {
         expect(() => EnumTypeRegistry.getOrLoad("NonExistent.Enum")).toThrow();
     });
 
-    test('handles enums with numeric string keys', function () {
+    it('handles enums with numeric string keys', function () {
         enum ErrorCode {
             NotFound = 404,
             Unauthorized = 401
@@ -135,7 +136,7 @@ describe("EnumTypeRegistry", () => {
         expect(type.Unauthorized).toBe(401);
     });
 
-    test('handles enums with string values', function () {
+    it('handles enums with string values', function () {
         enum Color {
             Red = "RED",
             Blue = "BLUE"
@@ -148,7 +149,7 @@ describe("EnumTypeRegistry", () => {
         expect(type.Blue).toBe("BLUE");
     });
 
-    test('works with multiple registered enums', function () {
+    it('works with multiple registered enums', function () {
         enum Status1 {
             New = 0,
             Old = 1
@@ -170,7 +171,7 @@ describe("EnumTypeRegistry", () => {
         expect(type1).not.toBe(type2);
     });
 
-    test('loadError provides helpful error message', function () {
+    it('loadError provides helpful error message', function () {
         const consoleSpy = vi.fn();
         const originalError = console.error;
         console.error = consoleSpy;
@@ -187,7 +188,7 @@ describe("EnumTypeRegistry", () => {
         }
     });
 
-    test('handles enum with no namespace', function () {
+    it('handles enum with no namespace', function () {
         enum SimpleEnum {
             Value1 = 1,
             Value2 = 2
@@ -196,6 +197,21 @@ describe("EnumTypeRegistry", () => {
 
         const type = EnumTypeRegistry.tryGet("SimpleEnum");
         expect(type).toBe(SimpleEnum);
+    });
+
+    it('can find type registered after initialization', function () {
+        const typeRegistry = getTypeRegistry();
+        Object.keys(typeRegistry).forEach(k => delete typeRegistry[k]);
+        enum TestEnum1 { Test = 1 }
+        enum TestEnum2 { Test = 2 }
+        registerEnum(TestEnum1, 'Test.MyEnum1');
+        const type1 = EnumTypeRegistry.tryGet("Test.MyEnum1");
+        expect(type1).toBe(TestEnum1);
+        let type2 = EnumTypeRegistry.tryGet("Test.MyEnum2");
+        expect(type2).toBeUndefined();
+        registerEnum(TestEnum2, 'Test.MyEnum2');
+        type2 = EnumTypeRegistry.tryGet("Test.MyEnum2");
+        expect(type2).toBe(TestEnum2);
     });
 
 });

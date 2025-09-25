@@ -24,7 +24,7 @@ afterEach(() => {
     document.body.innerHTML = "";
 });
 
-test('ServiceLookupEditor loads items from service', () => {
+it('ServiceLookupEditor loads items from service', () => {
     new ServiceLookupEditor({
         idField: "id",
         textField: "text",
@@ -59,7 +59,7 @@ test('ServiceLookupEditor loads items from service', () => {
     expect(options[1].textContent).toBe("Test2");
 });
 
-test('ServiceLookupEditor sets active and searching without search correctly', () => {
+it('ServiceLookupEditor sets active and searching without search correctly', () => {
 
     new ServiceLookupEditor({
         idField: "id",
@@ -91,7 +91,7 @@ test('ServiceLookupEditor sets active and searching without search correctly', (
     expect(document.body.querySelector(".select2-active")).toBeNull();
 });
 
-test('ServiceLookupEditor can search items', () => {
+it('ServiceLookupEditor can search items', () => {
     new ServiceLookupEditor({
         idField: "id",
         textField: "text",
@@ -128,7 +128,7 @@ test('ServiceLookupEditor can search items', () => {
     expect(options[0].textContent).toBe("Test2");
 });
 
-test('ServiceLookupEditor sets active and searching without search correctly while searching', () => {
+it('ServiceLookupEditor sets active and searching without search correctly while searching', () => {
     new ServiceLookupEditor({
         idField: "id",
         textField: "text",
@@ -166,7 +166,7 @@ test('ServiceLookupEditor sets active and searching without search correctly whi
     expect(Array.from(document.body.querySelectorAll(".select2-results li"))).toHaveLength(1);
 });
 
-test('ServiceLookupEditor aborts previous requests', () => {
+it('ServiceLookupEditor aborts previous requests', () => {
 
     const editor = new ServiceLookupEditor({
         idField: "id",
@@ -221,7 +221,7 @@ test('ServiceLookupEditor aborts previous requests', () => {
     expect(containsTexts).toEqual(["Test2", "Test5", "Test7"]);
 });
 
-test('ServiceLookupEditor aborts and set active and searching correctly', () => {
+it('ServiceLookupEditor aborts and set active and searching correctly', () => {
     const editor = new ServiceLookupEditor({
         idField: "id",
         textField: "text",
@@ -297,7 +297,7 @@ test('ServiceLookupEditor aborts and set active and searching correctly', () => 
     expect(containsTexts).toEqual(["Test2", "Test5", "Test6"]);
 });
 
-test('ServiceLookupEditor aborts while request is pending', () => {
+it('ServiceLookupEditor aborts while request is pending', () => {
 
     const editor = new ServiceLookupEditor({
         idField: "id",

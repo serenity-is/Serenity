@@ -18,7 +18,7 @@ afterEach(() => {
 
 describe("LookupEditor", () => {
 
-    test('throws an error if lookupKey is not registered', () => {
+    it('throws an error if lookupKey is not registered', () => {
         ScriptData.set("Lookup.Test", null);
         var logSpy = vi.spyOn(window.console, 'log').mockImplementation(() => { });
         var oldXHR = window.XMLHttpRequest
@@ -39,7 +39,7 @@ describe("LookupEditor", () => {
         }
     });
 
-    test('doesn\'t throw an error if lookupKey is registered', () => {
+    it('doesn\'t throw an error if lookupKey is registered', () => {
         ScriptData.set("Lookup.Test", {
             items: [{ id: 1, text: "Test" }]
         });
@@ -49,7 +49,7 @@ describe("LookupEditor", () => {
         });
     });
 
-    test('sets placeholder to default if its null', () => {
+    it('sets placeholder to default if its null', () => {
         ScriptData.set("Lookup.Test", {
             items: []
         });
@@ -61,7 +61,7 @@ describe("LookupEditor", () => {
         expect(editor.domNode.getAttribute("placeholder")).toBe("Controls.SelectEditor.EmptyItemText");
     });
 
-    test('doesn\'t set placeholder if its not null', () => {
+    it('doesn\'t set placeholder if its not null', () => {
         ScriptData.set("Lookup.Test", {
             items: []
         });
@@ -74,7 +74,7 @@ describe("LookupEditor", () => {
         expect(editor.domNode.getAttribute("placeholder")).toBe("test");
     });
 
-    test('creates inplaceAdd button if its enabled', () => {
+    it('creates inplaceAdd button if its enabled', () => {
         ScriptData.set("Lookup.Test", {
             items: []
         });
@@ -87,7 +87,7 @@ describe("LookupEditor", () => {
         expect(editor.domNode.classList.contains("has-inplace-button")).toBe(true);
     });
 
-    test('doesn\'t create inplaceAdd button if its disabled', () => {
+    it('doesn\'t create inplaceAdd button if its disabled', () => {
         ScriptData.set("Lookup.Test", {
             items: []
         });
@@ -99,7 +99,7 @@ describe("LookupEditor", () => {
         expect(editor.domNode.classList.contains("has-inplace-button")).toBe(false);
     });
 
-    test('inplaceAdd button has correct text depending on selection', () => {
+    it('inplaceAdd button has correct text depending on selection', () => {
         ScriptData.set("Lookup.Test", {
             idField: "id",
             items: [
@@ -121,7 +121,7 @@ describe("LookupEditor", () => {
         expect(select2Container.findFirst(".inplace-button").attr('title')).toBe("Controls.SelectEditor.InplaceEdit");
     });
 
-    test('can load empty lookup', () => {
+    it('can load empty lookup', () => {
         ScriptData.set("Lookup.Test", {
             items: []
         });
@@ -133,7 +133,7 @@ describe("LookupEditor", () => {
         expect(editor.items).toHaveLength(0);
     });
 
-    test('can load lookup with items', () => {
+    it('can load lookup with items', () => {
         ScriptData.set("Lookup.Test", {
             items: [{ id: 1, text: "Test" }]
         });
@@ -145,7 +145,7 @@ describe("LookupEditor", () => {
         expect(editor.items).toHaveLength(1);
     });
 
-    test('can load lookup with multiple items', () => {
+    it('can load lookup with multiple items', () => {
         ScriptData.set("Lookup.Test", {
             items: [
                 { id: 1, text: "Test" },
@@ -160,7 +160,7 @@ describe("LookupEditor", () => {
         expect(editor.items).toHaveLength(2);
     });
 
-    test('appends original lookup item to source', () => {
+    it('appends original lookup item to source', () => {
         ScriptData.set("Lookup.Test", {
             items: [{ id: 1, text: "Test" }]
         });
@@ -173,7 +173,7 @@ describe("LookupEditor", () => {
         expect(editor.items[0].source).toStrictEqual({ id: 1, text: "Test" });
     });
 
-    test('doesn\'t load id if idField is not set', () => {
+    it('doesn\'t load id if idField is not set', () => {
         ScriptData.set("Lookup.Test", {
             items: [{ id: 1, text: "Test" }]
         });
@@ -186,7 +186,7 @@ describe("LookupEditor", () => {
         expect(editor.items[0].id).toBe("");
     });
 
-    test('doesn\'t load text if textField is not set', () => {
+    it('doesn\'t load text if textField is not set', () => {
         ScriptData.set("Lookup.Test", {
             items: [{ id: 1, text: "Test" }]
         });
@@ -199,7 +199,7 @@ describe("LookupEditor", () => {
         expect(editor.items[0].text).toBe("");
     });
 
-    test('can load lookup with idField', () => {
+    it('can load lookup with idField', () => {
         ScriptData.set("Lookup.Test", {
             items: [{ id: 1, text: "Test" }],
             idField: "id"
@@ -213,7 +213,7 @@ describe("LookupEditor", () => {
         expect(editor.items[0].id).toBe("1");
     });
 
-    test('can load lookup with textField', () => {
+    it('can load lookup with textField', () => {
         ScriptData.set("Lookup.Test", {
             items: [{ id: 1, text: "Test" }],
             textField: "text"
@@ -227,7 +227,7 @@ describe("LookupEditor", () => {
         expect(editor.items[0].text).toBe("Test");
     });
 
-    test('can load lookup with idField and textField', () => {
+    it('can load lookup with idField and textField', () => {
         ScriptData.set("Lookup.Test", {
             items: [{ id: 1, text: "Test" }],
             idField: "id",
@@ -243,7 +243,7 @@ describe("LookupEditor", () => {
         expect(editor.items[0].text).toBe("Test");
     });
 
-    test('can cascade lookup with cascadeField', () => {
+    it('can cascade lookup with cascadeField', () => {
         ScriptData.set("Lookup.Test", {
             items: [
                 { id: 1, text: "Test", parentId: 1 },
@@ -260,7 +260,7 @@ describe("LookupEditor", () => {
         expect(editor.items).toHaveLength(1);
     });
 
-    test('can cascade lookup with cascadeFrom', () => {
+    it('can cascade lookup with cascadeFrom', () => {
         ScriptData.set("Lookup.Test", {
             idField: "id",
             items: [
@@ -296,7 +296,7 @@ describe("LookupEditor", () => {
         expect(editor.items[0].id).toBe("1");
     });
 
-    test('can filter lookup', () => {
+    it('can filter lookup', () => {
         ScriptData.set("Lookup.Test", {
             idField: "id",
             items: [
@@ -315,7 +315,7 @@ describe("LookupEditor", () => {
         expect(editor.items[0].id).toBe("2");
     });
 
-    test('can update items when scriptData changes', () => {
+    it('can update items when scriptData changes', () => {
         ScriptData.set("Lookup.Test", {
             idField: "id",
             items: [
@@ -342,7 +342,7 @@ describe("LookupEditor", () => {
         expect(editor.items).toHaveLength(3);
     });
 
-    test('can update items when scriptData changes and cascadeFrom is set', () => {
+    it('can update items when scriptData changes and cascadeFrom is set', () => {
         ScriptData.set("Lookup.Test", {
             idField: "id",
             items: [
@@ -389,7 +389,7 @@ describe("LookupEditor", () => {
         expect(editor.items).toHaveLength(2);
     });
 
-    //    test('can filter items when input value changes', () => {
+    //    it('can filter items when input value changes', () => {
     //        ScriptData.set("Lookup.Test", {
     //            idField: "id",
     //            items: [
@@ -420,7 +420,7 @@ describe("LookupEditor", () => {
     //        expect(options).toHaveLength(1);
     //    });
 
-    test('correctly unbinds from scriptData change event on destroy', () => {
+    it('correctly unbinds from scriptData change event on destroy', () => {
         ScriptData.set("Lookup.Test", {
             idField: "id",
             items: [
@@ -443,7 +443,7 @@ describe("LookupEditor", () => {
         // Should not throw error
     });
 
-    test('throws error if editor is async and items getter or setter is accessed', () => {
+    it('throws error if editor is async and items getter or setter is accessed', () => {
         ScriptData.set("Lookup.Test", { items: [] });
 
         const editor = new LookupEditor({

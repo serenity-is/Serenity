@@ -1,4 +1,5 @@
 ﻿import { Config, ISlickFormatter, getTypeRegistry, isAssignableFrom, notifyError, registerClass } from "../base";
+import { DialogTypeRegistry } from "./dialogtyperegistry";
 import { FormatterTypeRegistry } from "./formattertyperegistry";
 
 vi.mock("../base", async (importActual) => {
@@ -217,5 +218,18 @@ describe("FormatterTypeRegistry", () => {
 
         const type2 = FormatterTypeRegistry.tryGet("AnotherFormatter");
         expect(type2).toBe(TestFormatterWithSuffix);
+    });
+
+    it('can find type registered after initialization', function () {
+        const typeRegistry = getTypeRegistry();
+        Object.keys(typeRegistry).forEach(k => delete typeRegistry[k]);
+        registerClass(TestFormatter1, 'Test.MyFormatter1');
+        const type1 = FormatterTypeRegistry.tryGet("Test.MyFormatter1");
+        expect(type1).toBe(TestFormatter1);
+        let type2 = FormatterTypeRegistry.tryGet("Test.MyFormatter2");
+        expect(type2).toBeUndefined();
+        registerClass(TestFormatter2, 'Test.MyFormatter2');
+        type2 = FormatterTypeRegistry.tryGet("Test.MyFormatter2");
+        expect(type2).toBe(TestFormatter2);
     });
 });

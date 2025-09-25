@@ -1,6 +1,7 @@
 ﻿import { Config, getTypeRegistry, isAssignableFrom, notifyError, registerClass } from "../base";
 import { IDialog } from "../interfaces";
 import { DialogTypeRegistry } from "./dialogtyperegistry";
+import { EditorTypeRegistry } from "./editortyperegistry";
 
 vi.mock("../base", async (importActual) => {
     const actual = await importActual<typeof import("../base")>();
@@ -228,4 +229,18 @@ describe("DialogTypeRegistry", () => {
         const type2 = DialogTypeRegistry.tryGet("AnotherDialog");
         expect(type2).toBe(TestDialogWithSuffix);
     });    
+
+    it('can find type registered after initialization', function () {
+        const typeRegistry = getTypeRegistry();
+        Object.keys(typeRegistry).forEach(k => delete typeRegistry[k]);
+        registerClass(TestDialog1, 'Test.MyDialog1');
+        const type1 = DialogTypeRegistry.tryGet("Test.MyDialog1");
+        expect(type1).toBe(TestDialog1);
+        let type2 = DialogTypeRegistry.tryGet("Test.MyDialog2");
+        expect(type2).toBeUndefined();
+        registerClass(TestDialog2, 'Test.MyDialog2');
+        type2 = DialogTypeRegistry.tryGet("Test.MyDialog2");
+        expect(type2).toBe(TestDialog2);
+    });
+
 });

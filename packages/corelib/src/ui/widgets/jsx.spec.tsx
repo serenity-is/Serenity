@@ -3,13 +3,13 @@ import { StringEditor } from '../editors/stringeditor';
 import { FileUploadEditor } from '../editors/uploadeditors';
 import { PropertyGrid } from './propertygrid';
 
-test('render childless element', function () {
+it('render childless element', function () {
     const element = <br /> as HTMLElement;
 
     expect(element.outerHTML).toBe('<br>');
 });
 
-test('render div with children', function () {
+it('render div with children', function () {
     const element = (
         <div>
             <span />
@@ -19,7 +19,7 @@ test('render div with children', function () {
     expect(element.outerHTML).toBe('<div><span></span></div>');
 });
 
-test('render div with multiple children', function () {
+it('render div with multiple children', function () {
     const element = (
         <div>
             <span />
@@ -30,7 +30,7 @@ test('render div with multiple children', function () {
     expect(element.outerHTML).toBe('<div><span></span><br></div>');
 });
 
-test('render array of children', function () {
+it('render array of children', function () {
     const element = (
         <div>
             {[
@@ -45,13 +45,13 @@ test('render array of children', function () {
     expect(element.outerHTML).toBe('<div><span data-key="0">0</span><span data-key="1">1</span><span>2</span></div>');
 });
 
-test('render number child', function () {
+it('render number child', function () {
     const element = <span>7</span> as HTMLElement;
 
     expect(element.outerHTML).toBe('<span>7</span>');
 });
 
-test('render multiple number children', function () {
+it('render multiple number children', function () {
     const element = (
         <span>
             {1}
@@ -63,13 +63,13 @@ test('render multiple number children', function () {
     expect(element.outerHTML).toBe('<span>123</span>');
 });
 
-test('render string child', function () {
+it('render string child', function () {
     const element = <span>test</span> as HTMLElement;
 
     expect(element.outerHTML).toBe('<span>test</span>');
 });
 
-test('render multiple string children', function () {
+it('render multiple string children', function () {
     const element = (
         <span>
             {'hello'} {'world'}
@@ -79,13 +79,13 @@ test('render multiple string children', function () {
     expect(element.outerHTML).toBe('<span>hello world</span>');
 });
 
-test('render div with TextNode child', function () {
+it('render div with TextNode child', function () {
     const element = <div>{document.createTextNode('Hello')}</div> as HTMLElement;
 
     expect(element.outerHTML).toBe('<div>Hello</div>');
 });
 
-test('skip boolean children', function () {
+it('skip boolean children', function () {
     const element = (
         <span>
             {true}
@@ -96,19 +96,19 @@ test('skip boolean children', function () {
     expect(element.outerHTML).toBe('<span></span>');
 });
 
-test('skip null children', function () {
+it('skip null children', function () {
     const element = <span>{null}</span> as HTMLElement;
 
     expect(element.outerHTML).toBe('<span><!----></span>');
 });
 
-test('skip undefined children', function () {
+it('skip undefined children', function () {
     const element = <span>{undefined}</span> as HTMLElement;
 
     expect(element.outerHTML).toBe('<span></span>');
 });
 
-test('render falsey children', function () {
+it('render falsey children', function () {
     const element = (
         <span>
             {0}
@@ -119,7 +119,7 @@ test('render falsey children', function () {
     expect(element.outerHTML).toBe('<span>0NaN</span>');
 });
 
-test('render other elements inside', function () {
+it('render other elements inside', function () {
     const firstElement = <a href="#first">First</a>;
     const secondElement = <a href="#second">Second</a>;
     const element = (
@@ -132,7 +132,7 @@ test('render other elements inside', function () {
     expect(element.outerHTML).toBe('<div><a href="#first">First</a><a href="#second">Second</a></div>');
 });
 
-test('render document fragments inside', function () {
+it('render document fragments inside', function () {
     const template = document.createElement('template');
     template.innerHTML = 'Hello, <strong>World!</strong> ';
     const fragment = template.content;
@@ -141,7 +141,7 @@ test('render document fragments inside', function () {
     expect(element.outerHTML).toBe('<div>Hello, <strong>World!</strong> </div>');
 });
 
-test('render svg', function () {
+it('render svg', function () {
     const createElementNSSpy = vi.spyOn(document, 'createElementNS');
 
     const element = (
@@ -161,7 +161,7 @@ test('render svg', function () {
     createElementNSSpy.mockClear();
 });
 
-test('render mixed html and svg', function () {
+it('render mixed html and svg', function () {
     const createElementSpy = vi.spyOn(document, 'createElement');
     const createElementNSSpy = vi.spyOn(document, 'createElementNS');
 
@@ -189,7 +189,7 @@ test('render mixed html and svg', function () {
     createElementNSSpy.mockClear();
 });
 
-test('create svg links with xlink namespace', function () {
+it('create svg links with xlink namespace', function () {
     const setAttributeNS = vi.spyOn(Element.prototype, 'setAttributeNS');
 
     const element = (
@@ -212,19 +212,19 @@ test('create svg links with xlink namespace', function () {
     setAttributeNS.mockClear();
 });
 
-test('assign className', function () {
+it('assign className', function () {
     const element = <span className="a b c" /> as HTMLElement;
 
     expect(element.outerHTML).toBe('<span class="a b c"></span>');
 });
 
-test('assign className via class alias', function () {
+it('assign className via class alias', function () {
     const element = <span class="a b c" /> as HTMLElement;
 
     expect(element.outerHTML).toBe('<span class="a b c"></span>');
 });
 
-test('assign styles', function () {
+it('assign styles', function () {
     const style = {
         paddingTop: '10px',
         width: '200px',
@@ -237,7 +237,7 @@ test('assign styles', function () {
     expect(element.outerHTML).toBe('<span style="padding-top: 10px; width: 200px; height: 200px; font-size: 12px;"></span>');
 });
 
-test('assign styles with dashed property names', function () {
+it('assign styles with dashed property names', function () {
     const style = {
         paddingTop: 10,
         fontSize: 12,
@@ -249,13 +249,13 @@ test('assign styles with dashed property names', function () {
     expect(element.outerHTML).toBe('<span style="padding-top: 10px; font-size: 12px;"></span>');
 });
 
-test('assign styles with css variables', function () {
+it('assign styles with css variables', function () {
     const element = <span style="--padding-top: 10; --myCamelCaseVar: red;" /> as HTMLElement;
 
     expect(element.outerHTML).toBe('<span style="--padding-top: 10; --myCamelCaseVar: red;"></span>');
 });
 
-test('assign other props', function () {
+it('assign other props', function () {
     const element = (
         <a href="video.mp4" id="a" referrerPolicy="no-referrer">
             Download
@@ -265,13 +265,13 @@ test('assign other props', function () {
     expect(element.outerHTML).toBe('<a href="video.mp4" id="a" referrerpolicy="no-referrer">Download</a>');
 });
 
-test('assign htmlFor prop', function () {
+it('assign htmlFor prop', function () {
     const element = <label htmlFor="name-input">Full name</label> as HTMLElement;
 
     expect(element.outerHTML).toBe('<label for="name-input">Full name</label>');
 });
 
-test('assign or skip boolean props', function () {
+it('assign or skip boolean props', function () {
     const input = (
         <input disabled={false} /> as HTMLElement
     );
@@ -287,7 +287,7 @@ test('assign or skip boolean props', function () {
     expect(link.outerHTML).toBe('<a download="" contenteditable="">Download</a>');
 });
 
-test('assign booleanish false props', function () {
+it('assign booleanish false props', function () {
     const element = (
         <span contentEditable>
             <a contentEditable={false}>Download</a>
@@ -299,7 +299,7 @@ test('assign booleanish false props', function () {
     expect(input.outerHTML).toBe((globalThis as any).jsdom ? '<textarea></textarea>' : '<textarea spellcheck="false"></textarea>');
 });
 
-test('skip undefined and null props', function () {
+it('skip undefined and null props', function () {
     const element = (
         // ts-expect-error Types don't allow it, but we need to test it
         <a href={undefined} title={null}>
@@ -310,19 +310,19 @@ test('skip undefined and null props', function () {
     expect(element.outerHTML).toBe('<a>Download</a>');
 });
 
-test('escape props', function () {
+it('escape props', function () {
     const element = <a id={'"test"'}>Download</a> as HTMLElement;
 
     expect(element.outerHTML).toBe('<a id="&quot;test&quot;">Download</a>');
 });
 
-test('escape children', function () {
+it('escape children', function () {
     const element = <div>{'<script>alert();</script>'}</div> as HTMLElement;
 
     expect(element.outerHTML).toBe('<div>&lt;script&gt;alert();&lt;/script&gt;</div>');
 });
 
-test('set html', function () {
+it('set html', function () {
     const element = (
         <div dangerouslySetInnerHTML={{ __html: '<script>alert();</script>' }} /> as HTMLElement
     );
@@ -330,7 +330,7 @@ test('set html', function () {
     expect(element.outerHTML).toBe('<div><script>alert();</script></div>');
 });
 
-test('attach event listeners', function () {
+it('attach event listeners', function () {
     const addEventListener = vi.spyOn(EventTarget.prototype, 'addEventListener');
 
     const handleClick = function () { };
@@ -347,7 +347,7 @@ test('attach event listeners', function () {
     addEventListener.mockClear();
 });
 
-test('attach event listeners but drop the dash after on', function () {
+it('attach event listeners but drop the dash after on', function () {
     const addEventListener = vi.spyOn(EventTarget.prototype, 'addEventListener');
 
     const handler = function () { };
@@ -373,7 +373,7 @@ test('attach event listeners but drop the dash after on', function () {
     addEventListener.mockClear();
 });
 
-test('fragment', function () {
+it('fragment', function () {
     const createDocumentFragment = vi.spyOn(document, 'createDocumentFragment');
 
     const fragment = <>test</>;
@@ -385,7 +385,7 @@ test('fragment', function () {
     expect(createDocumentFragment.mock.calls[0]).toEqual([]);
 });
 
-test('fragment 2', function () {
+it('fragment 2', function () {
     const fragment = (
         <>
             <h1>test</h1>
@@ -397,7 +397,7 @@ test('fragment 2', function () {
     expect(fragmentHtml).toBe('<h1>test</h1>');
 });
 
-test('fragment 3', function () {
+it('fragment 3', function () {
     const fragment = (
         <>
             <h1>heading</h1> text
@@ -409,7 +409,7 @@ test('fragment 3', function () {
     expect(fragmentHtml).toBe('<h1>heading</h1> text');
 });
 
-test('div with inner fragment', function () {
+it('div with inner fragment', function () {
     const element = (
         <div>
             <>
@@ -422,7 +422,7 @@ test('div with inner fragment', function () {
     expect(element.outerHTML).toBe('<div><h1>heading</h1> text<span>outside fragment</span></div>');
 });
 
-test('element created by function', function () {
+it('element created by function', function () {
     const Icon = () => <i />;
 
     const element = <Icon /> as HTMLElement;
@@ -430,7 +430,7 @@ test('element created by function', function () {
     expect(element.outerHTML).toBe('<i></i>');
 });
 
-test('element created by function with existing children and attributes', function () {
+it('element created by function with existing children and attributes', function () {
     const Icon = () => <i className="sweet">Gummy <span>bears</span></i>;
 
     const element = <Icon /> as HTMLElement;

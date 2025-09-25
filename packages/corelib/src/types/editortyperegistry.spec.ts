@@ -63,30 +63,30 @@ beforeEach(() => {
 });
 
 describe("EditorTypeRegistry", () => {
-    test('can find editor type by its key', function () {
+    it('can find editor type by its key', function () {
         registerClass(TestEditor1, 'MyProject.TestEditor1');
 
         const type = EditorTypeRegistry.tryGet("MyProject.TestEditor1");
         expect(type).toBe(TestEditor1);
     });
 
-    test('can find editor type by its full name', function () {
+    it('can find editor type by its full name', function () {
         registerClass(TestEditor2, 'MyProject.MyModule.TestEditor2');
 
         const type = EditorTypeRegistry.tryGet("MyProject.MyModule.TestEditor2");
         expect(type).toBe(TestEditor2);
     });
 
-    test('returns undefined for non-existent editor', function () {
+    it('returns undefined for non-existent editor', function () {
         const type = EditorTypeRegistry.tryGet("NonExistent.Editor");
         expect(type).toBeUndefined();
     });
 
-    test('get throws error for non-existent editor', function () {
+    it('get throws error for non-existent editor', function () {
         expect(() => EditorTypeRegistry.get("NonExistent.Editor")).toThrow();
     });
 
-    test('reset clears the registry cache', function () {
+    it('reset clears the registry cache', function () {
         registerClass(TestEditor1, 'Test.Editor1');
 
         // First call should find it
@@ -101,25 +101,25 @@ describe("EditorTypeRegistry", () => {
         expect(type2).toBe(TestEditor1);
     });
 
-    test('tryGetOrLoad returns editor synchronously when found', function () {
+    it('tryGetOrLoad returns editor synchronously when found', function () {
         registerClass(TestEditor1, 'Test.Editor1');
 
         const type = EditorTypeRegistry.tryGetOrLoad("Test.Editor1");
         expect(type).toBe(TestEditor1);
     });
 
-    test('getOrLoad returns editor when found', function () {
+    it('getOrLoad returns editor when found', function () {
         registerClass(TestEditor2, 'Test.Editor2');
 
         const type = EditorTypeRegistry.getOrLoad("Test.Editor2");
         expect(type).toBe(TestEditor2);
     });
 
-    test('getOrLoad throws error for non-existent editor', function () {
+    it('getOrLoad throws error for non-existent editor', function () {
         expect(() => EditorTypeRegistry.getOrLoad("Test.Editor3")).toThrow();
     });
 
-    test('works with multiple registered editors', function () {
+    it('works with multiple registered editors', function () {
         registerClass(TestEditor1, 'Test.Editor1');
         registerClass(TestEditor2, 'Test.Editor2');
 
@@ -131,7 +131,7 @@ describe("EditorTypeRegistry", () => {
         expect(type1).not.toBe(type2);
     });
 
-    test('loadError provides helpful error message for editors', function () {
+    it('loadError provides helpful error message for editors', function () {
         const mockNotifyError = vi.mocked(notifyError);
         mockNotifyError.mockImplementation(() => {});
 
@@ -146,42 +146,42 @@ describe("EditorTypeRegistry", () => {
         );
     });
 
-    test('handles editor with no namespace', function () {
+    it('handles editor with no namespace', function () {
         registerClass(TestEditor1, 'SimpleEditor');
 
         const type = EditorTypeRegistry.tryGet("SimpleEditor");
         expect(type).toBe(TestEditor1);
     });
 
-    test('handles editors with complex namespace paths', function () {
+    it('handles editors with complex namespace paths', function () {
         registerClass(TestEditor2, 'MyCompany.MyProject.MyModule.MyEditor');
 
         const type = EditorTypeRegistry.tryGet("MyCompany.MyProject.MyModule.MyEditor");
         expect(type).toBe(TestEditor2);
     });
 
-    test('returns null for empty or null keys', function () {
+    it('returns null for empty or null keys', function () {
         expect(EditorTypeRegistry.tryGet("")).toBeNull();
         expect(EditorTypeRegistry.tryGet(null as any)).toBeNull();
         expect(EditorTypeRegistry.tryGet(undefined as any)).toBeNull();
     });
 
-    test('getOrLoad throws with proper error message for empty key', function () {
+    it('getOrLoad throws with proper error message for empty key', function () {
         expect(() => EditorTypeRegistry.getOrLoad("")).toThrow();
     });
 
-    test('tryGetOrLoad returns null for empty key', function () {
+    it('tryGetOrLoad returns null for empty key', function () {
         expect(EditorTypeRegistry.tryGetOrLoad("")).toBeNull();
     });
 
-    test('handles editor names with Editor suffix', function () {
+    it('handles editor names with Editor suffix', function () {
         registerClass(TestEditorWithSuffix, 'MyProject.TestEditorWithSuffix');
 
         const type = EditorTypeRegistry.tryGet("MyProject.TestEditorWithSuffix");
         expect(type).toBe(TestEditorWithSuffix);
     });
 
-    test('works with editors registered with different patterns', function () {
+    it('works with editors registered with different patterns', function () {
         registerClass(TestEditor1, 'Editor1');
         registerClass(TestEditor2, 'TestEditor2');
 
@@ -192,7 +192,7 @@ describe("EditorTypeRegistry", () => {
         expect(type2).toBe(TestEditor2);
     });
 
-    test('searches root namespaces for editors', function () {
+    it('searches root namespaces for editors', function () {
         // Store original root namespaces
         const originalNamespaces = [...Config.rootNamespaces];
 
@@ -221,5 +221,18 @@ describe("EditorTypeRegistry", () => {
         // Restore original config
         Config.rootNamespaces.length = 0;
         Config.rootNamespaces.push(...originalNamespaces);
+    });
+
+    it('can find type registered after initialization', function () {
+        const typeRegistry = getTypeRegistry();
+        Object.keys(typeRegistry).forEach(k => delete typeRegistry[k]);
+        registerClass(TestEditor1, 'Test.MyEditor1');
+        const type1 = EditorTypeRegistry.tryGet("Test.MyEditor1");
+        expect(type1).toBe(TestEditor1);
+        let type2 = EditorTypeRegistry.tryGet("Test.MyEditor2");
+        expect(type2).toBeUndefined();
+        registerClass(TestEditor2, 'Test.MyEditor2');
+        type2 = EditorTypeRegistry.tryGet("Test.MyEditor2");
+        expect(type2).toBe(TestEditor2);
     });
 });

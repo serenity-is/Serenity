@@ -1,11 +1,11 @@
 import { HtmlContentEditor } from "./htmlcontenteditor";
 
 describe("HtmlContextEditor", () => {
-    test('getCKEditorBasePath returns CDNJS url by default', function () {
+    it('getCKEditorBasePath returns CDNJS url by default', function () {
         expect(HtmlContentEditor.getCKEditorBasePath()).toBe("https://cdnjs.cloudflare.com/ajax/libs/ckeditor/4.22.1/");
     });
 
-    test('getCKEditorBasePath returns CKEDITOR_BASEPATH if set', function () {
+    it('getCKEditorBasePath returns CKEDITOR_BASEPATH if set', function () {
         (window as any)["CKEDITOR_BASEPATH"] = "/ceb/";
         try {
             expect(HtmlContentEditor.getCKEditorBasePath()).toBe('/ceb/');
@@ -15,7 +15,7 @@ describe("HtmlContextEditor", () => {
         }
     });
 
-    test('getCKEditorBasePath returns HtmlContentEditor.CKEditorBasePath if set', function () {
+    it('getCKEditorBasePath returns HtmlContentEditor.CKEditorBasePath if set', function () {
         HtmlContentEditor.CKEditorBasePath = '~/myck/';
         try {
             expect(HtmlContentEditor.getCKEditorBasePath()).toBe('~/myck/');
@@ -25,7 +25,7 @@ describe("HtmlContextEditor", () => {
         }
     });
 
-    test('getCKEditorBasePath gives priority to HtmlContentEditor.CKEditorBasePath', function () {
+    it('getCKEditorBasePath gives priority to HtmlContentEditor.CKEditorBasePath', function () {
         HtmlContentEditor.CKEditorBasePath = '~/myck2/';
         (window as any)["CKEDITOR_BASEPATH"] = "/ceb/";
         try {
@@ -37,7 +37,7 @@ describe("HtmlContextEditor", () => {
         }
     });
 
-    test('getCKEditorBasePath adds trailing slash to result for global var', function () {
+    it('getCKEditorBasePath adds trailing slash to result for global var', function () {
         (window as any)["CKEDITOR_BASEPATH"] = "/ceb";
         try {
             expect(HtmlContentEditor.getCKEditorBasePath()).toBe('/ceb/');
@@ -47,7 +47,7 @@ describe("HtmlContextEditor", () => {
         }
     });
 
-    test('getCKEditorBasePath adds trailing slash to result for static member', function () {
+    it('getCKEditorBasePath adds trailing slash to result for static member', function () {
         HtmlContentEditor.CKEditorBasePath = '~/myck';
         try {
             expect(HtmlContentEditor.getCKEditorBasePath()).toBe('~/myck/');
