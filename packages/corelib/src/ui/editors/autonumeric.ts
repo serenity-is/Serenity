@@ -260,7 +260,15 @@ function checkValue(value: any, settings: AutoNumericOptions) {
                 if (+parts[1] === 0) {
                     value = parts[0];
                 } else {
-                    parts[1] = parts[1].replace(/0*$/, '');
+                    let dec = parts[1];
+                    let trailingZeros = 0;
+                    for (let i = dec.length - 1; i >= 0; i--) {
+                        if (dec.charAt(i) !== '0') break;
+                        trailingZeros++;
+                    }
+                    if (trailingZeros > 0) {
+                        parts[1] = dec.substring(0, dec.length - trailingZeros);
+                    }
                     value = parts.join('.');
                 }
             }
