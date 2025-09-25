@@ -1,4 +1,4 @@
-﻿/**
+/**
  * --------------------------------------------------------------------------
  * Adapted from: Bootstrap dom/event-handler.js
  * Licensed under MIT (https://github.com/twbs/bootstrap/blob/main/LICENSE)
@@ -146,7 +146,7 @@ export function addListener(element: EventTarget, originalTypeEvent: string, han
 
     const $ = getjQuery();
     if ($) {
-        let $element = $(element);
+        let $element = $(element instanceof Node ? element : null);
         if (oneOff)
             $element.one(originalTypeEvent, handler, delegationFunction);
         else
@@ -230,7 +230,7 @@ export function removeListener(element: EventTarget, originalTypeEvent: string, 
 
     const $ = getjQuery();
     if ($) {
-        $(element).off(originalTypeEvent, handler, delegationHandler);
+        $(element instanceof Node ? element : null).off(originalTypeEvent, handler, delegationHandler);
         return;
     }
 
@@ -280,7 +280,7 @@ export function triggerEvent(element: EventTarget, type: string, args?: any): Ev
 
     if (inNamespace && $) {
         jQueryEvent = $.Event(type, args);
-        $(element).trigger(jQueryEvent);
+        $(element instanceof Node ? element : null).trigger(jQueryEvent);
         bubbles = bubbles && !jQueryEvent.isPropagationStopped();
         nativeDispatch = !jQueryEvent.isImmediatePropagationStopped();
         defaultPrevented = jQueryEvent.isDefaultPrevented();
