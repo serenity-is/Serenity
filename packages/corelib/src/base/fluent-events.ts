@@ -192,10 +192,14 @@ export function addListener(element: EventTarget, originalTypeEvent: string, han
     fn.callable = callable;
     fn.oneOff = oneOff;
     fn.uidEvent = uid;
-    if (uid !== '__proto__')
+    if (!isPollutingKey(uid))
         handlers[uid] = fn;
 
     element.addEventListener(typeEvent, fn as any, isDelegated);
+}
+
+function isPollutingKey(key: string | null | undefined): boolean {
+    return key === '__proto__' || key === 'constructor' || key === 'prototype';
 }
 
 function removeHandler(element: EventTarget, events: ElementEvents, typeEvent: string, handler: any, delegationSelector: string | Function) {
@@ -206,7 +210,8 @@ function removeHandler(element: EventTarget, events: ElementEvents, typeEvent: s
     }
 
     element.removeEventListener(typeEvent, fn as any, Boolean(delegationSelector))
-    delete events[typeEvent][(fn as any).uidEvent]
+    if (!isPollutingKey(typeEvent) && !isPollutingKey((fn as any).uidEvent))
+        delete events[typeEvent][(fn as any).uidEvent]
 }
 
 function removeNamespacedHandlers(element: EventTarget, events: ElementEvents, typeEvent: string, namespace: string) {

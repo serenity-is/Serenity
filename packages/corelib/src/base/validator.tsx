@@ -820,7 +820,7 @@ export class Validator {
                         // Remove messages from rules, but allow them to be set separately
                         delete existingRules.messages;
                         staticRules[element.name] = existingRules;
-                        if (argument.messages) {
+                        if (argument.messages && !isPollutingKey(element.name)) {
                             settings.messages[element.name] = Object.assign(settings.messages[element.name], argument.messages);
                         }
                         break;
@@ -1709,6 +1709,10 @@ export class Validator {
             element.classList.remove('customValidate');
     }
 
+}
+
+function isPollutingKey(key: string | null | undefined): boolean {
+    return key === '__proto__' || key === 'constructor' || key === 'prototype';
 }
 
 export const addValidationRule = Validator.addCustomRule;
