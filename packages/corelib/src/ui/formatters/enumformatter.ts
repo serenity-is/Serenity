@@ -1,5 +1,5 @@
 import { FormatterContext } from "@serenity-is/sleekgrid";
-import { Enum, formatterTypeInfo, getCustomAttribute, getTypeFullName, htmlEncode, isPromiseLike, localText, nsSerenity, registerType, tryGetText } from "../../base";
+import { Enum, formatterTypeInfo, getCustomAttribute, getTypeFullName, htmlEncode, isPromiseLike, localText, nsSerenity, registerType } from "../../base";
 import { Formatter } from "../../slick";
 import { EnumKeyAttribute } from "../../types/attributes";
 import { EnumTypeRegistry } from "../../types/enumtyperegistry";

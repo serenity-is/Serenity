@@ -1,4 +1,4 @@
-import { IRemoteView, RemoteView } from "../../slick";
+import { IRemoteView } from "../../slick";
 
 export namespace SlickTreeHelper {
     export function filterCustom<TItem>(item: TItem, getParent: (x: TItem) => any): boolean {

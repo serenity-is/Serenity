@@ -10,7 +10,7 @@ import { DialogExtensions } from "./dialogextensions";
 
 export class BaseDialog<P> extends Widget<P> {
     static [Symbol.typeInfo] = this.registerClass(nsSerenity, [IDialog]);
-    
+
     static override createDefaultElement() { return document.body.appendChild(<div class="hidden" />) as HTMLDivElement; }
 
     declare protected tabs: Fluent<HTMLElement>;

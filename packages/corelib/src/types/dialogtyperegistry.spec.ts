@@ -1,7 +1,6 @@
 ﻿import { Config, getGlobalTypeRegistry, isAssignableFrom, notifyError, registerClass } from "../base";
 import { IDialog } from "../interfaces";
 import { DialogTypeRegistry } from "./dialogtyperegistry";
-import { EditorTypeRegistry } from "./editortyperegistry";
 
 vi.mock("../base", async (importActual) => {
     const actual = await importActual<typeof import("../base")>();

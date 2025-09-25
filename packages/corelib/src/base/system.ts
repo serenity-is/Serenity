@@ -1,6 +1,6 @@
 import { isAssignableFromSymbol, isInstanceOfTypeSymbol } from "./symbols";
-import { StringLiteral, TypeInfo, ensureTypeInfo, getTypeNameProp, getGlobalTypeRegistry, globalObject, interfaceIsAssignableFrom, internalRegisterType, merge, peekTypeInfo } from "./system-internal";
-export { ensureTypeInfo, getTypeNameProp, getGlobalTypeRegistry, setTypeNameProp, peekTypeInfo, type StringLiteral } from "./system-internal";
+import { StringLiteral, TypeInfo, ensureTypeInfo, getGlobalTypeRegistry, getTypeNameProp, globalObject, interfaceIsAssignableFrom, internalRegisterType, merge, peekTypeInfo } from "./system-internal";
+export { ensureTypeInfo, getGlobalTypeRegistry, getTypeNameProp, peekTypeInfo, setTypeNameProp, type StringLiteral } from "./system-internal";
 
 /** @deprecated Use getGlobalTypeRegistry instead */
 export const getTypeRegistry = getGlobalTypeRegistry;

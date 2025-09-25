@@ -1,4 +1,4 @@
-import { EntityDialogTexts, faIcon, localText } from "../../base";
+import { EntityDialogTexts, faIcon } from "../../base";
 import { ToolButton } from "../widgets/toolbar";
 
 export type SaveInitiator = "save-and-close" | "apply-changes";

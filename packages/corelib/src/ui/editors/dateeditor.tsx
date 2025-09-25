@@ -1,4 +1,4 @@
-import { Culture, Fluent, FormValidationTexts, Invariant, addValidationRule, formatDate, getjQuery, isArrayLike, localText, nsSerenity, parseISODateTime, setElementReadOnly, stringFormat } from "../../base";
+import { Culture, Fluent, FormValidationTexts, Invariant, addValidationRule, formatDate, getjQuery, isArrayLike, nsSerenity, parseISODateTime, setElementReadOnly, stringFormat } from "../../base";
 import { today } from "../../compat";
 import { IReadOnly, IStringValue } from "../../interfaces";
 import { dateInputChangeHandler, dateInputKeyupHandler, flatPickrTrigger, jQueryDatepickerInitialization, jQueryDatepickerZIndexWorkaround } from "../helpers/dateediting";

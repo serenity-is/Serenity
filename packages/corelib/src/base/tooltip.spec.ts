@@ -59,7 +59,7 @@ describe("Tooltip.getInstance", () => {
         new Tooltip(element, { title: "Test" });
         const instance = Tooltip.getInstance(element);
         expect(instance).toBeNull();
-    });    
+    });
 });
 
 describe("Tooltip.toggle", () => {
@@ -69,7 +69,7 @@ describe("Tooltip.toggle", () => {
             hide: vi.fn()
         }
         const bs = (window as any)["bootstrap"] = {
-            Tooltip: function() {
+            Tooltip: function () {
                 return instance;
             }
         };
@@ -86,7 +86,7 @@ describe("Tooltip.toggle", () => {
             hide: vi.fn()
         }
         const bs = (window as any)["bootstrap"] = {
-            Tooltip: function() {
+            Tooltip: function () {
                 return instance;
             }
         };
@@ -95,7 +95,7 @@ describe("Tooltip.toggle", () => {
         tooltip.toggle(false);
         expect(instance.hide).toHaveBeenCalledTimes(1);
         expect(instance.show).not.toHaveBeenCalled();
-    });    
+    });
 
     it("should not throw an error if element is null", () => {
         tooltip = new Tooltip(null);
@@ -106,7 +106,7 @@ describe("Tooltip.toggle", () => {
     it("should not show or hide if no existing instance", () => {
         tooltip = new Tooltip(element);
         const bs = (window as any)["bootstrap"] = {
-            Tooltip: function() {
+            Tooltip: function () {
                 return null as any;
             }
         };
@@ -123,7 +123,7 @@ describe("Tooltip.show", () => {
             hide: vi.fn()
         }
         const bs = (window as any)["bootstrap"] = {
-            Tooltip: function() {
+            Tooltip: function () {
                 return instance;
             }
         };
@@ -142,7 +142,7 @@ describe("Tooltip.show", () => {
     it("should not show if no existing instance", () => {
         tooltip = new Tooltip(element);
         const bs = (window as any)["bootstrap"] = {
-            Tooltip: function() {
+            Tooltip: function () {
                 return null as any;
             }
         };
@@ -158,7 +158,7 @@ describe("Tooltip.hide", () => {
             hide: vi.fn()
         }
         const bs = (window as any)["bootstrap"] = {
-            Tooltip: function() {
+            Tooltip: function () {
                 return instance;
             }
         };
@@ -177,7 +177,7 @@ describe("Tooltip.hide", () => {
     it("should not hide if no existing instance", () => {
         tooltip = new Tooltip(element);
         const bs = (window as any)["bootstrap"] = {
-            Tooltip: function() {
+            Tooltip: function () {
                 return null as any;
             }
         };
@@ -204,7 +204,7 @@ describe("Tooltip.setTitle", () => {
             update: vi.fn()
         };
         const bs = (window as any)["bootstrap"] = {
-            Tooltip: function() {
+            Tooltip: function () {
                 return instance;
             }
         };
@@ -225,7 +225,7 @@ describe("Tooltip.setTitle", () => {
     it("should not update if no existing instance", () => {
         tooltip = new Tooltip(element);
         const bs = (window as any)["bootstrap"] = {
-            Tooltip: function() {
+            Tooltip: function () {
                 return null as any;
             }
         };
@@ -241,7 +241,7 @@ describe("Tooltip.dispose", () => {
             dispose: vi.fn()
         };
         const bs = (window as any)["bootstrap"] = {
-            Tooltip: function() {
+            Tooltip: function () {
                 return instance;
             }
         };
@@ -259,7 +259,7 @@ describe("Tooltip.dispose", () => {
     it("should not dispose if no existing instance", () => {
         tooltip = new Tooltip(element);
         const bs = (window as any)["bootstrap"] = {
-            Tooltip: function() {
+            Tooltip: function () {
                 return null as any;
             }
         };
@@ -283,7 +283,7 @@ describe("Tooltip.delayedDispose", () => {
             dispose: vi.fn()
         };
         const bs = (window as any)["bootstrap"] = {
-            Tooltip: function() {
+            Tooltip: function () {
                 return instance;
             }
         };
@@ -303,7 +303,7 @@ describe("Tooltip.delayedDispose", () => {
     it("should not dispose if no existing instance", () => {
         tooltip = new Tooltip(element);
         const bs = (window as any)["bootstrap"] = {
-            Tooltip: function() {
+            Tooltip: function () {
                 return null as any;
             }
         };
@@ -320,7 +320,7 @@ describe("Tooltip.delayedDispose", () => {
             dispose: vi.fn()
         };
         const bs = (window as any)["bootstrap"] = {
-            Tooltip: function() {
+            Tooltip: function () {
                 return instance;
             }
         };
@@ -348,7 +348,7 @@ describe("Tooltip.delayedHide", () => {
             hide: vi.fn()
         };
         const bs = (window as any)["bootstrap"] = {
-            Tooltip: function() {
+            Tooltip: function () {
                 return instance;
             }
         };
@@ -368,7 +368,7 @@ describe("Tooltip.delayedHide", () => {
     it("should not hide if no existing instance", () => {
         tooltip = new Tooltip(element);
         const bs = (window as any)["bootstrap"] = {
-            Tooltip: function() {
+            Tooltip: function () {
                 return null as any;
             }
         };
@@ -385,7 +385,7 @@ describe("Tooltip.delayedHide", () => {
             hide: vi.fn()
         };
         const bs = (window as any)["bootstrap"] = {
-            Tooltip: function() {
+            Tooltip: function () {
                 return instance;
             }
         };

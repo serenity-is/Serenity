@@ -1,5 +1,5 @@
-import { ScriptData, canLoadScriptData, getLookup, reloadLookup, getColumns, getColumnsAsync, getColumnsData, getForm, getFormAsync, getFormData } from "./scriptdata-compat";
 import * as base from "../base";
+import { ScriptData, canLoadScriptData, getColumns, getColumnsAsync, getColumnsData, getForm, getFormAsync, getFormData, getLookup, reloadLookup } from "./scriptdata-compat";
 
 vi.mock(import("../base"), async () => {
     return {

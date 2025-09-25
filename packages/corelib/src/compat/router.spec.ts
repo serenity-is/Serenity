@@ -1,6 +1,6 @@
-import { Router } from "./router";
-import { Fluent } from "../base";
 import type { MockInstance } from "vitest";
+import { Fluent } from "../base";
+import { Router } from "./router";
 
 function changeJSDOMURL(url: string) {
     if ((globalThis as any).jsdom?.reconfigure) {

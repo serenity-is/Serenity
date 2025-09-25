@@ -8,7 +8,7 @@ export abstract class FormatterBase implements Formatter {
     protected static registerFormatter<TypeName>(typeName: StringLiteral<TypeName>, intfAndAttr?: any[]): FormatterTypeInfo<TypeName> {
         if (Object.prototype.hasOwnProperty.call(this, Symbol.typeInfo) && this[Symbol.typeInfo])
             throw new Error(`Type ${this.name} already has a typeInfo property!`);
-                
+
         const typeInfo = this[Symbol.typeInfo] = formatterTypeInfo(typeName, intfAndAttr);
         registerType(this);
         return typeInfo;

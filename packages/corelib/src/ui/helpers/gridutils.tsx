@@ -27,7 +27,8 @@ export namespace GridUtils {
         var oldSubmit = view.onSubmit;
         view.onSubmit = function (v) {
             v.params.IncludeDeleted = includeDeleted;
-            if (oldSubmit != null) {""
+            if (oldSubmit != null) {
+                ""
                 return oldSubmit(v);
             }
             return true;

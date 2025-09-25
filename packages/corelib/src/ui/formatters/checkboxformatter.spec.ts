@@ -109,10 +109,10 @@ describe("CheckboxFormatter", () => {
     });
 
     it("shows custom icon and text when showText is true with custom trueIcon", () => {
-        const formatter = new CheckboxFormatter({ 
-            showText: true, 
-            trueIcon: "fa fa-check", 
-            trueText: "Enabled" 
+        const formatter = new CheckboxFormatter({
+            showText: true,
+            trueIcon: "fa fa-check",
+            trueText: "Enabled"
         });
         const result = formatter.format({ value: true, escape: (s) => s }) as HTMLElement;
         expect(result.tagName.toLowerCase()).toBe("span");
@@ -121,8 +121,8 @@ describe("CheckboxFormatter", () => {
     });
 
     it("shows text only when showText is true and no icon is specified", () => {
-        const formatter = new CheckboxFormatter({ 
-            showText: true, 
+        const formatter = new CheckboxFormatter({
+            showText: true,
             trueText: "Active",
             showHint: false
         });
@@ -133,8 +133,8 @@ describe("CheckboxFormatter", () => {
     });
 
     it("shows icon with hint when showText is false and showHint is true", () => {
-        const formatter = new CheckboxFormatter({ 
-            showText: false, 
+        const formatter = new CheckboxFormatter({
+            showText: false,
             showHint: true,
             trueText: "Active",
             trueIcon: "fa fa-check"

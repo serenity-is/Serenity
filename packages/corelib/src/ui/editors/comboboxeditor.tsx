@@ -1,4 +1,4 @@
-﻿import { Authorization, Fluent, PropertyItem, SelectEditorTexts, isPromiseLike, localText, nsSerenity, setElementReadOnly } from "../../base";
+﻿import { Authorization, Fluent, PropertyItem, SelectEditorTexts, isPromiseLike, nsSerenity, setElementReadOnly } from "../../base";
 import { ValidationHelper, isTrimmedEmpty } from "../../compat";
 import { IEditDialog, IGetEditValue, IReadOnly, ISetEditValue, IStringValue } from "../../interfaces";
 import { DialogType } from "../../types/dialogtype";

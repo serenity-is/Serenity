@@ -56,7 +56,7 @@ beforeEach(() => {
     mockHasCustomAttribute.mockReturnValue(false); // Default to false
     mockIsAssignableFrom.mockImplementation((baseType: any, derivedType: any) => {
         return baseType === Widget &&
-               (derivedType === TestEditor1 ||
+            (derivedType === TestEditor1 ||
                 derivedType === TestEditor2 ||
                 derivedType === TestEditorWithSuffix);
     });
@@ -133,7 +133,7 @@ describe("EditorTypeRegistry", () => {
 
     it('loadError provides helpful error message for editors', function () {
         const mockNotifyError = vi.mocked(notifyError);
-        mockNotifyError.mockImplementation(() => {});
+        mockNotifyError.mockImplementation(() => { });
 
         expect(() => EditorTypeRegistry.getOrLoad("Test.Editor3")).toThrow(
             '"Test.Editor3" editor class not found!'

@@ -1,4 +1,4 @@
-﻿import { Fluent, localText, nsSerenity, PagerTexts } from "../../base";
+﻿import { Fluent, nsSerenity, PagerTexts } from "../../base";
 import { PagerOptions } from "../../slick";
 import { Widget, WidgetProps } from "../widgets/widget";
 

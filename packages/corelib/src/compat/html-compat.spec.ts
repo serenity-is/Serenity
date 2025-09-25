@@ -8,7 +8,7 @@ describe("addEmptyOption", () => {
         expect(select.children.length).toBe(1);
         expect((select.children[0] as HTMLOptionElement).value).toBe("");
         expect(select.children[0].textContent).toBe("Controls.SelectEditor.EmptyItemText");
-    }); 
+    });
 });
 
 describe("addOption", () => {
@@ -143,7 +143,7 @@ describe("findElementWithRelativeId", () => {
             from.remove();
         }
     });
-    
+
     it("can find element with ID = fromID + searched ID", () => {
         const target = document.createElement("div");
         const from = document.createElement("div");
@@ -260,7 +260,7 @@ describe("findElementWithRelativeId", () => {
             city.remove();
             country.remove();
         }
-    });    
+    });
 
     it("won't search document if the context is passed", () => {
         const target = document.createElement("div");

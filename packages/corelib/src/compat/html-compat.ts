@@ -1,4 +1,4 @@
-import { htmlEncode, isArrayLike, localText, SelectEditorTexts } from "../base";
+import { htmlEncode, isArrayLike, SelectEditorTexts } from "../base";
 
 /**
  * Adds an empty option to the select.

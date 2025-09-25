@@ -4,7 +4,7 @@ describe("informationDialog", () => {
     it('is aliased by obsolete inform', async function () {
         const dialogs = (await import("./dialogs-compat"));
         expect((dialogs as any).information).toBe(informationDialog);
-    });        
+    });
 });
 
 describe("warningDialog", () => {
@@ -25,7 +25,7 @@ describe("successDialog", () => {
     it('is aliased by obsolete success', async function () {
         const dialogs = (await import("./dialogs-compat"));
         expect((dialogs as any).success).toBe(successDialog);
-    });    
+    });
 });
 
 export { };

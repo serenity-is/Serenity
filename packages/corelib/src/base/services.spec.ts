@@ -173,7 +173,7 @@ describe("async serviceCall", () => {
     it("should handle an error response and throw an error", async () => {
         let error: ServiceError;
         const response: ServiceResponse = { Error: { Message: "Error" } };
-        const options: ServiceOptions<any> = { 
+        const options: ServiceOptions<any> = {
             url: "/test",
             onError: (resp, inf) => {
                 error = resp?.Error;
@@ -191,7 +191,7 @@ describe("async serviceCall", () => {
         const promise = serviceCall(options);
 
         const old = window.alert;
-        window.alert = () => {};
+        window.alert = () => { };
         try {
             await expect(promise).rejects.toThrow("Service fetch to '/test' resulted in HTTP 403 error: Some error!");
         }
@@ -329,7 +329,7 @@ describe("requestStarting", () => {
     });
 
     it("should not trigger ajaxStart event if jQuery is not available and activeRequests is not 1", () => {
-        requestStarting(); 
+        requestStarting();
         try {
             const eventDispatchSpy = vi.spyOn(document, "dispatchEvent");
             requestStarting();
@@ -372,7 +372,7 @@ describe("synchronous serviceCall", () => {
     it("should handle an error response and throw an error", async () => {
         let error: ServiceError;
         const response: ServiceResponse = { Error: { Message: "Error" } };
-        const options: ServiceOptions<any> = { 
+        const options: ServiceOptions<any> = {
             async: false,
             url: "/test",
             onError: (resp, inf) => {
@@ -390,7 +390,7 @@ describe("synchronous serviceCall", () => {
 
 
         const old = window.alert;
-        window.alert = () => {};
+        window.alert = () => { };
         try {
             const promise = serviceCall(options);
             await expect(promise).rejects.toThrow("Service call to '/test' resulted in HTTP 403 error: Some error!");

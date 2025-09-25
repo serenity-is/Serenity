@@ -523,7 +523,7 @@ describe("RemoteView", () => {
                 { id: 2, name: "Item 2" }
             ];
 
-            vitest.spyOn(view, 'refresh').mockImplementation(() => {});
+            vitest.spyOn(view, 'refresh').mockImplementation(() => { });
             view.beginUpdate();
             view.setItems(items);
             // In suspend mode, items and rows should be set
@@ -1053,9 +1053,9 @@ describe("RemoteView", () => {
         it("syncs grid cell CSS styles", () => {
             mockGrid.getCellCssStyles = vi.fn(() => ({}));
             mockGrid.setCellCssStyles = vi.fn();
-            
+
             let onCellCssStylesChangedCallback: any;
-            mockGrid.onCellCssStylesChanged = { 
+            mockGrid.onCellCssStylesChanged = {
                 subscribe: vi.fn((callback) => onCellCssStylesChangedCallback = callback)
             };
 

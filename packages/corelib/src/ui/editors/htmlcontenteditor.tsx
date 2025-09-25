@@ -1,4 +1,4 @@
-import { Fluent, FormValidationTexts, localText, nsSerenity, resolveUrl } from "../../base";
+import { Fluent, FormValidationTexts, nsSerenity, resolveUrl } from "../../base";
 import { isTrimmedEmpty } from "../../compat";
 import { IReadOnly, IStringValue } from "../../interfaces";
 import { LazyLoadHelper } from "../helpers/lazyloadhelper";

@@ -1,4 +1,4 @@
-﻿import { LayoutTimer, executeOnceWhenVisible, executeEverytimeWhenVisible } from "./layouttimer";
+﻿import { LayoutTimer, executeEverytimeWhenVisible, executeOnceWhenVisible } from "./layouttimer";
 
 let mockElement: HTMLElement;
 

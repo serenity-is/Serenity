@@ -1,5 +1,5 @@
 ﻿import { Column } from "@serenity-is/sleekgrid";
-import { Authorization, ColumnPickerDialogTexts, Culture, Dialog, DialogButton, Fluent, cancelDialogButton, faIcon, localText, nsSerenity, okDialogButton } from "../../base";
+import { Authorization, ColumnPickerDialogTexts, Culture, Dialog, DialogButton, Fluent, cancelDialogButton, faIcon, nsSerenity, okDialogButton } from "../../base";
 import { Router } from "../../compat";
 import { ResizableAttribute } from "../../types";
 import { BaseDialog } from "../dialogs/basedialog";

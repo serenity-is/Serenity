@@ -37,7 +37,7 @@ export class EnumEditor<P extends EnumEditorOptions = EnumEditorOptions> extends
             var values = Enum.getValues(enumType);
             for (var x of values) {
                 var name = Enum.toString(enumType, x);
-                this.addOption(parseInt(x, 10).toString(),
+                this.addOption(parseInt(x as any, 10).toString(),
                     localText("Enums." + enumKey + "." + name, name), null, false);
             }
         }

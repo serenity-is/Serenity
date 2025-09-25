@@ -1,4 +1,4 @@
-﻿import { Fluent, localText, nsSerenity, QuickSearchTexts } from "../../base";
+﻿import { Fluent, nsSerenity, QuickSearchTexts } from "../../base";
 import { Widget, WidgetProps } from "../widgets/widget";
 
 export interface QuickSearchField {

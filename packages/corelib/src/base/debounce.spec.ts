@@ -1,4 +1,4 @@
-﻿import { debounce, DebouncedFunction } from "./debounce";
+﻿import { debounce } from "./debounce";
 
 describe("debounce", function () {
 

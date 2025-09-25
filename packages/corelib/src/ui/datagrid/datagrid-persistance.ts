@@ -1,5 +1,5 @@
 import { Column, Grid } from "@serenity-is/sleekgrid";
-import { cssEscape, FilterPanelTexts, Fluent, localText } from "../../base";
+import { cssEscape, FilterPanelTexts, Fluent } from "../../base";
 import { IRemoteView } from "../../slick";
 import { EditorUtils } from "../editors/editorutils";
 import { FilterDisplayBar } from "../filtering/filterdisplaybar";

@@ -1,5 +1,5 @@
 ﻿import * as base from "../base";
-import { setEquality, postToService, postToUrl } from "./services-compat";
+import { postToService, postToUrl, setEquality } from "./services-compat";
 
 vi.mock(import("../base"), async () => {
     return {

@@ -1,6 +1,6 @@
-import { Validator, addValidationRule, removeValidationRule } from './validator';
 import { Fluent } from './fluent';
 import { Culture } from './formatting';
+import { Validator } from './validator';
 
 describe("Validator.element", () => {
     let form: HTMLFormElement;

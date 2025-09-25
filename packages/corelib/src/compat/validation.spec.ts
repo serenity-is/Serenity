@@ -1,4 +1,4 @@
-﻿import { Fluent, FormValidationTexts, localText, notifyError, Tooltip, Validator } from "../base";
+﻿import { Fluent, notifyError, Tooltip, Validator } from "../base";
 import { validateOptions, ValidationHelper, validatorAbortHandler } from "./validation";
 
 // Mock the imported functions

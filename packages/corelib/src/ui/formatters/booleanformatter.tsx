@@ -5,7 +5,7 @@ import { Formatter } from "../../slick";
 export class BooleanFormatter implements Formatter {
     static [Symbol.typeInfo] = formatterTypeInfo(nsSerenity); static { registerType(this); }
 
-    constructor(public readonly props: { 
+    constructor(public readonly props: {
         falseText?: string,
         falseIcon?: IconClassName,
         nullText?: string,
@@ -26,7 +26,7 @@ export class BooleanFormatter implements Formatter {
                 localText(this.props.falseText, this.props.falseText ?? DialogTexts.NoButton));
         const showText = this.props?.showText ?? true;
 
-        const hint = (this.props?.showHint ?? !showText) ? text : void 0;                
+        const hint = (this.props?.showHint ?? !showText) ? text : void 0;
         let iconClass = ctx.value == null ? this.props.nullIcon : (ctx.value ? this.props.trueIcon : this.props.falseIcon);
         if (iconClass)
             iconClass = iconClassName(iconClass);

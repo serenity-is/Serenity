@@ -1,5 +1,5 @@
 import { EventData, EventEmitter, Grid, Group, GroupItemMetadataProvider, GroupTotals, IGroupTotals, ItemMetadata, gridDefaults } from "@serenity-is/sleekgrid";
-import { ListRequest, ListResponse, PagerTexts, ServiceOptions, ServiceResponse, htmlEncode, localText, serviceCall } from "../base";
+import { ListRequest, ListResponse, PagerTexts, ServiceOptions, ServiceResponse, htmlEncode, serviceCall } from "../base";
 import { AggregateFormatting, IAggregator } from "./aggregators";
 import { CancellableViewCallback, IRemoteView, PagingInfo, RemoteViewAjaxCallback, RemoteViewFilter, RemoteViewProcessCallback } from "./iremoteview";
 import { GroupInfo, PagingOptions, SummaryOptions } from "./slicktypes";

@@ -1,5 +1,4 @@
 ﻿import { Column } from "@serenity-is/sleekgrid";
-import { addCustomAttribute } from "../../base";
 import { DataGrid, omitAllGridPersistenceFlags } from "./datagrid";
 
 function getIdProperty(grid: DataGrid<any, any>): string {

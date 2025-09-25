@@ -1,4 +1,4 @@
-import { ensureTypeInfo, getBaseType, getTypeFullName, getGlobalTypeRegistry, isInstanceOfType, peekTypeInfo, Type } from "../base";
+import { ensureTypeInfo, getBaseType, getGlobalTypeRegistry, getTypeFullName, isInstanceOfType, peekTypeInfo, Type } from "../base";
 
 export type Dictionary<TItem> = { [key: string]: TItem };
 

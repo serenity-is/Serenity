@@ -1,4 +1,4 @@
-﻿import { Fluent, FormValidationTexts, addValidationRule, localText, nsSerenity } from "../../base";
+﻿import { Fluent, FormValidationTexts, addValidationRule, nsSerenity } from "../../base";
 import { IStringValue } from "../../interfaces";
 import { EditorProps, EditorWidget } from "./editorwidget";
 

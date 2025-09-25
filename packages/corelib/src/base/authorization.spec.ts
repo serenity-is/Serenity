@@ -199,7 +199,7 @@ describe('Authorization.hasPermission', () => {
         mockUserDefinition({ Username: '' });
         expect(Authorization.hasPermission("?")).toBe(false);
 
-        mockUserDefinition({ Username:  null });
+        mockUserDefinition({ Username: null });
         expect(Authorization.hasPermission("?")).toBe(false);
 
         mockUserDefinition(null);
@@ -246,7 +246,7 @@ describe('Authorization.hasPermission', () => {
     //    mockUserDefinition({ Permissions: permissionSet });
     //    return Authorization.hasPermission(permission);
     //});
-    
+
 
 });
 
@@ -279,7 +279,7 @@ describe('Authorization.hasPermissionAsync', () => {
         mockUserDefinition({ Username: '' });
         expect(await Authorization.hasPermissionAsync("?")).toBe(false);
 
-        mockUserDefinition({ Username:  null });
+        mockUserDefinition({ Username: null });
         expect(await Authorization.hasPermissionAsync("?")).toBe(false);
 
         mockUserDefinition(null);
@@ -363,7 +363,7 @@ describe('Authorization.isLoggedIn', () => {
 
 
 describe('Authorization.isLoggedInAsync', () => {
-    
+
     it('returns false if userdefinition is null', async () => {
         let authorization = Authorization;
         mockUserDefinition(null);;
@@ -440,7 +440,7 @@ describe('Authorization.userDefinition', () => {
 });
 
 describe('Authorization.userDefinitionAsync', () => {
-    
+
     it('returns null if userDefinition is null', async () => {
         let authorization = Authorization;
         mockUserDefinition(null);;
@@ -487,7 +487,7 @@ describe('Authorization.validatePermissionAsync', () => {
         const notify = await import("./notify") as any;
         const localText = (await import("./localtext")).localText as any;
         const notifyError = notify.notifyError as any;
-    let authorization = Authorization;
+        let authorization = Authorization;
         try {
             let thrown = false;
             try {

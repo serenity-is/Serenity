@@ -81,7 +81,7 @@ describe("replaceAll", () => {
             expect(true).toBe(true);
             return;
         }
-        
+
         const replaceAllSpy = vi.spyOn(String.prototype as any, "replaceAll");
         expect(replaceAll("abc", "a", "b")).toBe("bbc");
         expect(replaceAllSpy).toHaveBeenCalled();
@@ -177,7 +177,7 @@ describe("trimStart", () => {
         expect(trimStart(null)).toBe('');
         expect(trimStart(undefined)).toBe('');
     });
-    
+
 });
 
 describe("trimToEmpty", () => {

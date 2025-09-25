@@ -1,7 +1,7 @@
 import { FormatterContext, FormatterResult } from "@serenity-is/sleekgrid";
 import { htmlEncode } from "../../base";
 import { replaceAll } from "../../compat";
-import { Format, IRemoteView, RemoteView } from "../../slick";
+import { Format, IRemoteView } from "../../slick";
 
 export namespace SlickFormatting {
     

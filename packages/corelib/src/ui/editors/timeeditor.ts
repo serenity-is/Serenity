@@ -87,7 +87,7 @@ export class TimeEditorBase<P extends TimeEditorBaseOptions> extends EditorWidge
         var parts = value.split(':');
         this.domNode.value = "" + parseInt(parts[0], 10);
         this.minutes.val("" + parseInt(parts[1], 10));
-    }    
+    }
 }
 
 

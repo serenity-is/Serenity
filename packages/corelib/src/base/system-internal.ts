@@ -130,7 +130,7 @@ export function ensureTypeInfo(type: any): TypeInfo<string> {
 }
 
 export function peekTypeInfo(type: any): TypeInfo<string> {
-    if (!type || 
+    if (!type ||
         !Object.prototype.hasOwnProperty.call(type, Symbol.typeInfo))
         return void 0;
 

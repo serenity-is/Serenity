@@ -1,4 +1,4 @@
-﻿import { Config, getType, getGlobalTypeRegistry, isPromiseLike } from "../base";
+﻿import { Config, getGlobalTypeRegistry, getType, isPromiseLike } from "../base";
 import { BaseTypeRegistry } from "./basetyperegistry";
 
 vi.mock("../base", async () => {

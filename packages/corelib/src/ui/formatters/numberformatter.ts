@@ -4,7 +4,7 @@ import { Formatter } from "../../slick";
 
 export class NumberFormatter implements Formatter {
     static [Symbol.typeInfo] = formatterTypeInfo(nsSerenity); static { registerType(this); }
-    
+
     constructor(public readonly props: { displayFormat?: string } = {}) {
         this.props ??= {};
     }

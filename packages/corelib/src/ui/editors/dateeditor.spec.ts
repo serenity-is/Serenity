@@ -86,7 +86,7 @@ describe("DateEditor_WithJQueryDatePicker", () => {
 
     it("uses jquery date if it is found", async () => {
         let $ = mockJQuery({
-            datepicker: vi.fn().mockImplementation(function() { return this })
+            datepicker: vi.fn().mockImplementation(function () { return this })
         });
         var editor = await newEditor({});
         expect(editor.domNode.getAttribute("type")).toBe("text");

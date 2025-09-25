@@ -35,7 +35,7 @@ export class FileUploadEditor<P extends FileUploadEditorOptions = FileUploadEdit
             element: el => this.domNode.appendChild(el)
         }).init();
 
-        this.progress = this.toolbar.domNode.appendChild(<div class="upload-progress"><div/></div> as HTMLElement);
+        this.progress = this.toolbar.domNode.appendChild(<div class="upload-progress"><div /></div> as HTMLElement);
 
         var uio = this.getUploadInputOptions();
         this.uploadInput = UploadHelper.addUploadInput(uio);
@@ -48,7 +48,7 @@ export class FileUploadEditor<P extends FileUploadEditorOptions = FileUploadEdit
             this.domNode.id = this.uniqueName;
         }
 
-        this.hiddenInput = this.domNode.appendChild(<input class="s-offscreen" type="text" name={this.uniqueName + "_Validator"} 
+        this.hiddenInput = this.domNode.appendChild(<input class="s-offscreen" type="text" name={this.uniqueName + "_Validator"}
             data-vx-highlight={this.domNode.id} /> as HTMLInputElement);
 
         this.updateInterface();
@@ -293,7 +293,7 @@ export class MultipleFileUploadEditor<P extends MultipleFileUploadEditorOptions 
             element: el => this.domNode.append(el)
         }).init();
 
-        this.progress = this.toolbar.domNode.appendChild(<div class="upload-progress"><div/></div> as HTMLElement);
+        this.progress = this.toolbar.domNode.appendChild(<div class="upload-progress"><div /></div> as HTMLElement);
 
         this.uploadInput = UploadHelper.addUploadInput(this.getUploadInputOptions());
 
@@ -353,7 +353,7 @@ export class MultipleFileUploadEditor<P extends MultipleFileUploadEditorOptions 
 
         this.fileSymbols.childNodes.forEach((e, i) => {
             var x = i;
-            Fluent(<a class="delete"/>).appendTo(Fluent(e).children().find(x => x.matches('.filename')))
+            Fluent(<a class="delete" />).appendTo(Fluent(e).children().find(x => x.matches('.filename')))
                 .on("click", ev => {
                     ev.preventDefault();
                     this.entities.splice(x, 1);
@@ -462,7 +462,7 @@ export class MultipleFileUploadEditor<P extends MultipleFileUploadEditorOptions 
 
 export class MultipleImageUploadEditor<P extends ImageUploadEditorOptions = ImageUploadEditorOptions> extends MultipleFileUploadEditor<P> {
     static [Symbol.typeInfo] = this.registerClass(nsSerenity);
-    
+
     constructor(props: EditorProps<P>) {
         super(props);
         this.domNode.classList.add("s-MultipleImageUploadEditor'")

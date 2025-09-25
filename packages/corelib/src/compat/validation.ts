@@ -1,4 +1,4 @@
-﻿import { Fluent, FormValidationTexts, Tooltip, Validator, ValidatorOptions, getjQuery, isArrayLike, localText, notifyError } from "../base";
+﻿import { Fluent, FormValidationTexts, Tooltip, Validator, ValidatorOptions, getjQuery, isArrayLike, notifyError } from "../base";
 
 export function validatorAbortHandler(validator: Validator) {
     delete validator.settings.abortHandler;

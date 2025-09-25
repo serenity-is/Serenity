@@ -1,4 +1,4 @@
-import { localText, tryGetText } from "../base";
+import { localText } from "../base";
 import { AggregateFormatting, Aggregators } from "./aggregators";
 
 vi.mock("../base", () => ({

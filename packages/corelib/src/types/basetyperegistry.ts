@@ -1,4 +1,4 @@
-﻿import { Config, getType, getGlobalTypeRegistry, isPromiseLike } from "../base";
+﻿import { Config, getGlobalTypeRegistry, getType, isPromiseLike } from "../base";
 
 /**
  * Base class for type registries that manage registration and lookup of user-defined types.
