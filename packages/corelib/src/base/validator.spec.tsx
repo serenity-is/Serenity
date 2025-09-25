@@ -1,3 +1,4 @@
+import { Config } from "./config";
 import { Fluent } from './fluent';
 import { Culture } from './formatting';
 import { Validator } from './validator';
@@ -92,8 +93,71 @@ describe("Validator.methods", () => {
 
     it("validates email format", () => {
         const method = Validator.methods.email;
-        expect(method("invalid-email", null)).toBe(false);
-        expect(method("test@example.com", null)).toBe(true);
+
+        // Test Unicode emails (when Config.emailAllowOnlyAscii is false)
+        const originalConfig = Config.emailAllowOnlyAscii;
+        try {
+            Config.emailAllowOnlyAscii = true;
+
+            // Test null/undefined/empty values
+            expect(method(null, null)).toBe(false);
+            expect(method(undefined, null)).toBe(false);
+            expect(method("", null)).toBe(false);
+
+            // Test length limit (should reject very long emails)
+            const longEmail = "a".repeat(1000) + "@example.com";
+            expect(method(longEmail, null)).toBe(false);
+
+            // Test invalid email formats
+            expect(method("invalid-email", null)).toBe(false);
+            expect(method("@example.com", null)).toBe(false);
+            expect(method("test@", null)).toBe(false);
+            expect(method("test@.com", null)).toBe(false);
+            expect(method("test..test@example.com", null)).toBe(false);
+            expect(method("test @example.com", null)).toBe(false);
+            expect(method("test@example..com", null)).toBe(false);
+            expect(method("test@example.com ", null)).toBe(false);
+            expect(method(" test@example.com", null)).toBe(false);
+
+            // Test valid ASCII email formats
+            expect(method("test@example.com", null)).toBe(true);
+            expect(method("user.name@example.com", null)).toBe(true);
+            expect(method("user+tag@example.com", null)).toBe(true);
+            expect(method("test.email@example.co.uk", null)).toBe(true);
+            expect(method("123@example.com", null)).toBe(true);
+            expect(method("a@b.co", null)).toBe(true);
+            expect(method("test@subdomain.example.com", null)).toBe(true);
+
+            // Test emails with allowed special characters
+            expect(method("test!#$%&'*+/=?^_`{|}~-@example.com", null)).toBe(true);
+            expect(method("user.name+tag@example-domain.com", null)).toBe(true);
+
+            // Test that Unicode emails are rejected when Config.emailAllowOnlyAscii is true
+            expect(method("tëst@example.com", null)).toBe(false);
+            expect(method("用户@example.com", null)).toBe(false);
+            
+            Config.emailAllowOnlyAscii = false;
+
+            // Unicode in local part
+            expect(method("tëst@example.com", null)).toBe(true);
+            expect(method("用户@example.com", null)).toBe(true);
+            expect(method("test@例え.テスト", null)).toBe(true);
+
+            // Unicode in domain part
+            expect(method("test@пример.испытание", null)).toBe(true);
+            expect(method("test@例え.テスト", null)).toBe(true);
+
+            // Mixed Unicode and ASCII
+            expect(method("tëst@пример.com", null)).toBe(true);
+
+            // Test that control characters are rejected in Unicode mode
+            expect(method("test\x00@example.com", null)).toBe(false);
+            expect(method("test\x7F@example.com", null)).toBe(false);
+            expect(method("test\x80@example.com", null)).toBe(false);
+
+        } finally {
+            Config.emailAllowOnlyAscii = originalConfig;
+        }
     });
 
     it("validates minimum length", () => {
