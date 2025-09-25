@@ -192,7 +192,7 @@ export function parseQueryString(s?: string): Record<string, string> {
 export function getReturnUrl(opt?: {
     /** Whether to only consider the query string. If true, the function will not check the default return URL. */
     queryOnly?: boolean;
-    /** Whether to ignore unsafe URLs. If true or null (default), the function will only return safe URLs. */
+    /** Whether to ignore unsafe URLs. If false or null (default), the function will only return safe URLs. */
     ignoreUnsafe?: boolean;
     /** The purpose of the return URL. This can be used to determine the default return URL if none is found in the query string. */
     purpose?: string;
