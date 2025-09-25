@@ -1,4 +1,4 @@
-﻿import { Config, getTypeRegistry, hasCustomAttribute, isAssignableFrom, notifyError, registerClass } from "../base";
+﻿import { Config, getGlobalTypeRegistry, hasCustomAttribute, isAssignableFrom, notifyError, registerClass } from "../base";
 import { Widget } from "../ui/widgets/widget";
 import { EditorTypeRegistry } from "./editortyperegistry";
 
@@ -35,7 +35,7 @@ class NonEditorClass {
 
 beforeEach(() => {
     Config.rootNamespaces.splice(0);
-    const typeRegistry = getTypeRegistry();
+    const typeRegistry = getGlobalTypeRegistry();
     Object.keys(typeRegistry).forEach(k => delete typeRegistry[k]);
     EditorTypeRegistry.reset();
 
@@ -224,7 +224,7 @@ describe("EditorTypeRegistry", () => {
     });
 
     it('can find type registered after initialization', function () {
-        const typeRegistry = getTypeRegistry();
+        const typeRegistry = getGlobalTypeRegistry();
         Object.keys(typeRegistry).forEach(k => delete typeRegistry[k]);
         registerClass(TestEditor1, 'Test.MyEditor1');
         const type1 = EditorTypeRegistry.tryGet("Test.MyEditor1");

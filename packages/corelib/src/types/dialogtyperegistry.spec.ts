@@ -1,4 +1,4 @@
-﻿import { Config, getTypeRegistry, isAssignableFrom, notifyError, registerClass } from "../base";
+﻿import { Config, getGlobalTypeRegistry, isAssignableFrom, notifyError, registerClass } from "../base";
 import { IDialog } from "../interfaces";
 import { DialogTypeRegistry } from "./dialogtyperegistry";
 import { EditorTypeRegistry } from "./editortyperegistry";
@@ -44,7 +44,7 @@ class NonDialogClass {
 
 beforeEach(() => {
     Config.rootNamespaces.splice(0);
-    const typeRegistry = getTypeRegistry();
+    const typeRegistry = getGlobalTypeRegistry();
     Object.keys(typeRegistry).forEach(k => delete typeRegistry[k]);
     DialogTypeRegistry.reset();
 
@@ -231,7 +231,7 @@ describe("DialogTypeRegistry", () => {
     });    
 
     it('can find type registered after initialization', function () {
-        const typeRegistry = getTypeRegistry();
+        const typeRegistry = getGlobalTypeRegistry();
         Object.keys(typeRegistry).forEach(k => delete typeRegistry[k]);
         registerClass(TestDialog1, 'Test.MyDialog1');
         const type1 = DialogTypeRegistry.tryGet("Test.MyDialog1");

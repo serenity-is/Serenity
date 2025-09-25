@@ -1,15 +1,24 @@
 ﻿import { getCustomAttribute, htmlEncode, isEnum, notifyError } from "../base";
 import { EnumKeyAttribute } from "./attributes";
-import { commonTypeRegistry } from "./commontyperegistry";
+import { BaseTypeRegistry } from "./basetyperegistry";
 
-export namespace EnumTypeRegistry {
+class EnumTypeRegistryImpl extends BaseTypeRegistry<object> {
+    constructor() {
+        super({
+            loadKind: "enum",
+            defaultSuffix: null
+        });
+    }
 
-    let registry = commonTypeRegistry<object>({
-        attrKey: type => getCustomAttribute(type, EnumKeyAttribute, false)?.value,
-        isMatch: isEnum,
-        kind: "enum",
-        suffix: null,
-        loadError: function (key: string) {
+    protected override getSecondaryTypeKey(type: any): string {
+        return getCustomAttribute(type, EnumKeyAttribute, false)?.value;
+    }
+
+    protected override isMatchingType(type: any): boolean {
+        return isEnum(type);
+    }
+
+    protected override loadError(key: string) {
             var message = `Can't find "${htmlEncode(key)}" enum type! 
 
 If you have recently defined this enum type in server side code, 
@@ -28,12 +37,7 @@ from the project folder.`;
 
             notifyError(message.replace(/\r?\n\r?\n/g, '<br/><br/>'), '', { escapeHtml: false, timeOut: 5000 });
             throw new Error(message);
-        }
-    });
-
-    export let get = registry.get;
-    export let getOrLoad = registry.getOrLoad;
-    export let reset = registry.reset;
-    export let tryGet = registry.tryGet;
-    export let tryGetOrLoad = registry.tryGetOrLoad;
+    }
 }
+
+export const EnumTypeRegistry = new EnumTypeRegistryImpl();

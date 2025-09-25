@@ -1,15 +1,15 @@
-import { DialogTypeRegistry } from ".";
-import { addCustomAttribute, getTypeRegistry, registerEnum } from "../base";
+import { addCustomAttribute, getGlobalTypeRegistry, registerEnum } from "../base";
 import { EnumKeyAttribute } from "./attributes";
 import { EnumTypeRegistry } from "./enumtyperegistry";
 
 beforeEach(() => {
-    const typeRegistry = getTypeRegistry();
+    const typeRegistry = getGlobalTypeRegistry();
     Object.keys(typeRegistry).forEach(k => delete typeRegistry[k]);
     EnumTypeRegistry.reset();
 });
 
 describe("EnumTypeRegistry", () => {
+
     it('can find enum type by its key', function () {
 
         enum OrderShippingState {
@@ -200,7 +200,7 @@ describe("EnumTypeRegistry", () => {
     });
 
     it('can find type registered after initialization', function () {
-        const typeRegistry = getTypeRegistry();
+        const typeRegistry = getGlobalTypeRegistry();
         Object.keys(typeRegistry).forEach(k => delete typeRegistry[k]);
         enum TestEnum1 { Test = 1 }
         enum TestEnum2 { Test = 2 }

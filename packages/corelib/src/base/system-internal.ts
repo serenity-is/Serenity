@@ -40,7 +40,7 @@ export type TypeInfo<TypeName> = {
     registered?: boolean;
 }
 
-export function getTypeRegistry(): { [key: string]: any } {
+export function getGlobalTypeRegistry(): { [key: string]: any } {
     let typeRegistry = globalObject[typeRegistrySymbol];
     if (!typeRegistry)
         typeRegistry = globalObject[typeRegistrySymbol] = {};
@@ -68,8 +68,8 @@ function autoRegisterViaTypeInfo(type: any): void {
     if (typeInfo.typeName.endsWith("."))
         typeInfo.typeName += type.name;
 
-    if (!getTypeRegistry()[typeInfo.typeName])
-        getTypeRegistry()[typeInfo.typeName] = type;
+    if (!getGlobalTypeRegistry()[typeInfo.typeName])
+        getGlobalTypeRegistry()[typeInfo.typeName] = type;
 
     if (typeInfo.interfaces?.length &&
         !Object.prototype.hasOwnProperty.call(implementedInterfacesSymbol)) {
@@ -100,7 +100,7 @@ export function internalRegisterType(type: any, typeName?: string, interfaces?: 
         if (typeInfo.typeName.endsWith("."))
             typeInfo.typeName += type.name;
 
-        getTypeRegistry()[typeInfo.typeName] = type;
+        getGlobalTypeRegistry()[typeInfo.typeName] = type;
     }
 
     if (interfaces?.length && typeInfo.interfaces !== interfaces) {

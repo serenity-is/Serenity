@@ -1,9 +1,9 @@
 import { implementedInterfacesSymbol, isAssignableFromSymbol, isInstanceOfTypeSymbol } from "./symbols";
 import { EditorAttribute, Enum, ISlickFormatter, addCustomAttribute, classTypeInfo, editorTypeInfo, fieldsProxy, formatterTypeInfo, getBaseType, getCustomAttribute, getCustomAttributes, getInstanceType, getType, getTypeFullName, getTypeNameProp, getTypeShortName, hasCustomAttribute, initFormType, interfaceTypeInfo, isAssignableFrom, isEnum, isInstanceOfType, registerClass, registerEnum, registerInterface, registerType } from "./system";
-import { ensureTypeInfo, getTypeRegistry, peekTypeInfo } from "./system-internal";
+import { ensureTypeInfo, getGlobalTypeRegistry, peekTypeInfo } from "./system-internal";
 
 afterEach(() => {
-    const typeRegistry = getTypeRegistry();
+    const typeRegistry = getGlobalTypeRegistry();
     Object.keys(typeRegistry).forEach(k => delete typeRegistry[k]);
 });
 

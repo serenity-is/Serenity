@@ -1,5 +1,5 @@
-﻿import { Config, getType, getTypeRegistry, isPromiseLike } from "../base";
-import { commonTypeRegistry } from "./commontyperegistry";
+﻿import { Config, getType, getGlobalTypeRegistry, isPromiseLike } from "../base";
+import { BaseTypeRegistry } from "./basetyperegistry";
 
 vi.mock("../base", async () => {
     return {
@@ -8,7 +8,7 @@ vi.mock("../base", async () => {
             lazyTypeLoader: null as any
         },
         getType: vi.fn(),
-        getTypeRegistry: vi.fn(),
+        getGlobalTypeRegistry: vi.fn(),
         getTypeNameProp: vi.fn(),
         isPromiseLike: vi.fn()
     };
@@ -31,8 +31,31 @@ class TestDialog {
     static [Symbol.typeInfo] = { typeName: "TestDialog" };
 }
 
-describe("commonTypeRegistry", () => {
-    let registry: ReturnType<typeof commonTypeRegistry>;
+describe("BaseTypeRegistry", () => {
+
+    class MyRegistry extends BaseTypeRegistry<any> {
+        constructor() {
+            super({
+                loadKind: "test",
+                defaultSuffix: "Type"
+            });
+        }
+
+        protected override getSecondaryTypeKey(type: any) {
+            return (type as any).secondaryTypeKey;
+        }
+        
+        protected override isMatchingType(type: any) {
+            return type[Symbol.typeInfo]?.typeName?.startsWith("Test");
+        }
+
+        protected override loadError(key: string) {
+            throw new Error(`Type not found: ${key}`);
+        }
+    }
+
+    let registry: MyRegistry;
+
     let originalLazyTypeLoader: any;
 
     beforeEach(() => {
@@ -50,7 +73,7 @@ describe("commonTypeRegistry", () => {
         vi.mocked(isPromiseLike).mockImplementation((obj: any) => obj && typeof obj.then === 'function');
 
         // Mock getTypes to return our test types
-        vi.mocked(getTypeRegistry).mockReturnValue({
+        vi.mocked(getGlobalTypeRegistry).mockReturnValue({
             TestType1: TestType1, 
             TestType2: TestType2,
             TestEditor: TestEditor,
@@ -70,13 +93,7 @@ describe("commonTypeRegistry", () => {
         });
 
         // Create registry for testing
-        registry = commonTypeRegistry({
-            kind: "test",
-            attrKey: (type: any) => (type as any).attrKey,
-            isMatch: (type: any) => type[Symbol.typeInfo]?.typeName?.startsWith("Test"),
-            suffix: "Type",
-            loadError: (key: string) => { throw new Error(`Type not found: ${key}`); }
-        });
+        registry = new MyRegistry();
     });
 
     describe("tryGet", () => {
@@ -91,22 +108,32 @@ describe("commonTypeRegistry", () => {
             expect(result).toBe(TestType1);
         });
 
-        it("finds type by attrKey if available", () => {
-            (TestType1 as any).attrKey = "customKey";
+        it("finds type by secondaryTypeKey if available", () => {
+            (TestType1 as any).secondaryTypeKey = "customKey";
             const result = registry.tryGet("customKey");
             expect(result).toBe(TestType1);
-            delete (TestType1 as any).attrKey;
+            delete (TestType1 as any).secondaryTypeKey;
         });
 
         it("searches in root namespaces", () => {
             // Create a registry that matches TestType1
-            const testRegistry = commonTypeRegistry({
-                kind: "test",
-                attrKey: () => undefined,
-                isMatch: (type: any) => type === TestType1,
-                suffix: "",
-                loadError: () => {}
-            });
+            class TestRegistry extends BaseTypeRegistry<any> {
+                constructor() {
+                    super({
+                        loadKind: "test",
+                        defaultSuffix: ""
+                    });
+                }
+
+                protected override isMatchingType(type: any) {
+                    return type === TestType1;
+                }
+
+                protected override loadError(key: string) {
+                }
+            }
+
+            const testRegistry = new TestRegistry();
 
             // Mock getType to only return for namespaced key
             vi.mocked(getType).mockImplementation((key: string) => {
@@ -127,11 +154,11 @@ describe("commonTypeRegistry", () => {
         it("caches found types", () => {
             registry.tryGet("TestType1");
             // Second call should use cache
-            vi.mocked(getTypeRegistry).mockClear(); // Clear the mock to ensure it's not called again
+            vi.mocked(getGlobalTypeRegistry).mockClear(); // Clear the mock to ensure it's not called again
             const result = registry.tryGet("TestType1");
             expect(result).toBe(TestType1);
             // getTypes should not be called again since it's cached
-            expect(vi.mocked(getTypeRegistry)).not.toHaveBeenCalled();
+            expect(vi.mocked(getGlobalTypeRegistry)).not.toHaveBeenCalled();
         });
     });
 
@@ -203,20 +230,29 @@ describe("commonTypeRegistry", () => {
 
     describe("edge cases", () => {
         it("handles types without typeName", () => {
-            vi.mocked(getTypeRegistry).mockReturnValue({});
+            vi.mocked(getGlobalTypeRegistry).mockReturnValue({});
             registry.reset();
             const result = registry.tryGet("anything");
             expect(result).toBeUndefined();
         });
 
-        it("handles attrKey function returning undefined", () => {
-            const registry2 = commonTypeRegistry({
-                kind: "test",
-                attrKey: () => undefined,
-                isMatch: (type: any) => true,
-                suffix: "",
-                loadError: () => {}
-            });
+        it("handles secondaryTypeKey function returning undefined", () => {
+            class TestRegistry2 extends BaseTypeRegistry<any> {
+                constructor() {
+                    super({
+                        loadKind: "test",
+                        defaultSuffix: ""
+                    });
+                }
+
+                protected override isMatchingType(type: any) {
+                    return type === TestType1;
+                }
+
+                protected override loadError(key: string) {
+                }
+            }
+            const registry2 = new TestRegistry2();
             const result = registry2.tryGet("TestType1");
             expect(result).toBe(TestType1);
         });

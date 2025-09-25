@@ -1,6 +1,9 @@
 import { isAssignableFromSymbol, isInstanceOfTypeSymbol } from "./symbols";
-import { StringLiteral, TypeInfo, ensureTypeInfo, getTypeNameProp, getTypeRegistry, globalObject, interfaceIsAssignableFrom, internalRegisterType, merge, peekTypeInfo } from "./system-internal";
-export { ensureTypeInfo, getTypeNameProp, getTypeRegistry, setTypeNameProp, peekTypeInfo, type StringLiteral } from "./system-internal";
+import { StringLiteral, TypeInfo, ensureTypeInfo, getTypeNameProp, getGlobalTypeRegistry, globalObject, interfaceIsAssignableFrom, internalRegisterType, merge, peekTypeInfo } from "./system-internal";
+export { ensureTypeInfo, getTypeNameProp, getGlobalTypeRegistry, setTypeNameProp, peekTypeInfo, type StringLiteral } from "./system-internal";
+
+/** @deprecated Use getGlobalTypeRegistry instead */
+export const getTypeRegistry = getGlobalTypeRegistry;
 
 export const nsSerenity: "Serenity." = "Serenity.";
 export const SerenityNS: "Serenity" = "Serenity";
@@ -64,7 +67,7 @@ export function getNested(from: any, name: string) {
 export function getType(name: string, target?: any): Type {
     let type: any;
     if (target == null) {
-        type = getTypeRegistry()[name];
+        type = getGlobalTypeRegistry()[name];
         if (type != null || globalObject == void 0 || name === "Object")
             return type;
 
@@ -194,7 +197,7 @@ export function registerEnum(enumType: any, name: string, enumKey?: string) {
 
     internalRegisterType(enumType, name, undefined, "enum");    
     if (enumKey && enumKey != name) {
-        const typeStore = getTypeRegistry();
+        const typeStore = getGlobalTypeRegistry();
         if (!typeStore[enumKey])
             typeStore[enumKey] = enumType;
     }

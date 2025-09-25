@@ -1,4 +1,4 @@
-import { ensureTypeInfo, getBaseType, getTypeFullName, getTypeRegistry, isInstanceOfType, peekTypeInfo, Type } from "../base";
+import { ensureTypeInfo, getBaseType, getTypeFullName, getGlobalTypeRegistry, isInstanceOfType, peekTypeInfo, Type } from "../base";
 
 export type Dictionary<TItem> = { [key: string]: TItem };
 
@@ -156,7 +156,7 @@ export function addTypeMember(type: any, member: TypeMember): TypeMember {
  */
 export function getTypes(): any[] {
     const result = [];
-    const types = getTypeRegistry();
+    const types = getGlobalTypeRegistry();
     for (const t in types) {
         if (Object.prototype.hasOwnProperty.call(types, t))
             result.push(types[t]);

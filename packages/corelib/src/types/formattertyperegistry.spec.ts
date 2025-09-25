@@ -1,5 +1,4 @@
-﻿import { Config, ISlickFormatter, getTypeRegistry, isAssignableFrom, notifyError, registerClass } from "../base";
-import { DialogTypeRegistry } from "./dialogtyperegistry";
+﻿import { Config, ISlickFormatter, getGlobalTypeRegistry, isAssignableFrom, notifyError, registerClass } from "../base";
 import { FormatterTypeRegistry } from "./formattertyperegistry";
 
 vi.mock("../base", async (importActual) => {
@@ -43,7 +42,7 @@ class NonFormatterClass {
 
 beforeEach(() => {
     Config.rootNamespaces.splice(0);
-    const typeRegistry = getTypeRegistry();
+    const typeRegistry = getGlobalTypeRegistry();
     Object.keys(typeRegistry).forEach(k => delete typeRegistry[k]);
     FormatterTypeRegistry.reset();
 
@@ -221,7 +220,7 @@ describe("FormatterTypeRegistry", () => {
     });
 
     it('can find type registered after initialization', function () {
-        const typeRegistry = getTypeRegistry();
+        const typeRegistry = getGlobalTypeRegistry();
         Object.keys(typeRegistry).forEach(k => delete typeRegistry[k]);
         registerClass(TestFormatter1, 'Test.MyFormatter1');
         const type1 = FormatterTypeRegistry.tryGet("Test.MyFormatter1");

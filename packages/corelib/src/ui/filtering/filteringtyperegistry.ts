@@ -1,23 +1,24 @@
 import { htmlEncode, isAssignableFrom, notifyError } from "../../base";
-import { commonTypeRegistry } from "../../types/commontyperegistry";
+import { BaseTypeRegistry } from "../../types/basetyperegistry";
 import { IFiltering } from "./ifiltering";
 
-export namespace FilteringTypeRegistry {
+class FilteringTypeRegistryImpl extends BaseTypeRegistry<Function> {
+    constructor() {
+        super({
+            loadKind: "filtering",
+            defaultSuffix: "Filtering"
+        });
+    }
 
-    const registry = commonTypeRegistry<Function>({
-        attrKey: null,
-        isMatch: type => isAssignableFrom(IFiltering, type),
-        kind: "filtering",
-        suffix: "Filtering",
-        loadError: function (key: string) {
-            const message = `"${htmlEncode(key)}" filtering handler class not found!`;
-            notifyError(message);
-        }
-    });
+    protected override isMatchingType(type: any): boolean {
+        return isAssignableFrom(IFiltering, type);
+    }
 
-    export let get = registry.get;
-    export let getOrLoad = registry.getOrLoad;
-    export let reset = registry.reset;
-    export let tryGet = registry.tryGet;
-    export let tryGetOrLoad = registry.tryGetOrLoad;
+    protected override loadError(key: string) {
+        const message = `"${htmlEncode(key)}" filtering handler class not found!`;
+        notifyError(message);
+        throw new Error(message);
+    }
 }
+
+export const FilteringTypeRegistry = new FilteringTypeRegistryImpl();

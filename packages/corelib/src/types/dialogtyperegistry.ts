@@ -1,17 +1,22 @@
 ﻿import { htmlEncode, isAssignableFrom, notifyError } from "../base";
 import { IDialog } from "../interfaces";
-import { commonTypeRegistry } from "./commontyperegistry";
+import { BaseTypeRegistry } from "./basetyperegistry";
 import { DialogType } from "./dialogtype";
 
-export namespace DialogTypeRegistry {
+class DialogTypeRegistryImpl extends BaseTypeRegistry<DialogType> {
+    constructor() {
+        super({
+            loadKind: "dialog",
+            defaultSuffix: "Dialog"
+        });
+    }
 
-    const registry = commonTypeRegistry<DialogType>({
-        attrKey: null,
-        isMatch: type => isAssignableFrom(IDialog, type),
-        kind: "dialog",
-        suffix: "Dialog",
-        loadError: function (key: string) {
-            var message = `"${htmlEncode(key)}" dialog class not found! 
+    protected override isMatchingType(type: any): boolean {
+        return isAssignableFrom(IDialog, type);
+    }
+
+    protected override loadError(key: string) {
+        const message = `"${htmlEncode(key)}" dialog class not found! 
 Make sure the dialog type has a line like the following (with the correct full name):
 static [Symbol.typeInfo] = this.registerClass("MyProject.MyModule.MyDialog");
 and "side-effect-import" this dialog class from the current 
@@ -24,14 +29,9 @@ Specify the DialogType property in the LookupEditor attribute if it is not.
 After applying fixes, build and run "node ./tsbuild.js" (or "tsc" if using namespaces) 
 from the project folder.`;
 
-            notifyError(message.replace(/\r?\n\r?\n/g, '<br/><br/>'), '', { escapeHtml: false, timeOut: 5000 });
-            throw new Error(message);
-        }
-    });
-
-    export let get = registry.get;
-    export let getOrLoad = registry.getOrLoad;
-    export let reset = registry.reset;
-    export let tryGet = registry.tryGet;
-    export let tryGetOrLoad = registry.tryGetOrLoad;
+        notifyError(message.replace(/\r?\n\r?\n/g, '<br/><br/>'), '', { escapeHtml: false, timeOut: 5000 });
+        throw new Error(message);
+    }
 }
+
+export const DialogTypeRegistry = new DialogTypeRegistryImpl();
