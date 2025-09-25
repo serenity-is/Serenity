@@ -190,21 +190,21 @@ export function parseQueryString(s?: string): Record<string, string> {
  * and contain only allowed characters (no protocol, no backslashes, no control chars, etc).
  */
 export function isSafeReturnUrl(url: string): boolean {
-    if (!url || typeof url !== "string") 
+    if (!url || typeof url !== "string")
         return false;
     // Must start with exactly one /
-    if (!/^\//.test(url)) 
+    if (!/^\//.test(url))
         return false;
     // Reject any : to prevent protocol-relative and absolute URLs
-    if (url.includes(':')) 
+    if (url.includes(':'))
         return false;
     // No backslash, control chars, or double slashes after initial /
     if (url.includes('\\') ||
         /[\0-\x1F\x7F]/.test(url) ||
-        /\/\//.test(url.substring(1))) 
+        /\/\//.test(url.substring(1)))
         return false;
     // Only allow URLs of reasonable length and valid characters (path/query)
-    if (!/^\/[\w\-./?&=%]*$/.test(url)) 
+    if (!/^\/[\w\-./?&=%]*$/.test(url))
         return false;
     return true;
 }

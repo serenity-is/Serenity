@@ -147,8 +147,12 @@ public partial class Startup
             app.UseHsts();
         }
 
-        if (!string.IsNullOrEmpty(Configuration["UsePathBase"]))
-            app.UsePathBase(Configuration["UsePathBase"]);
+        app.Use(async (context, next) =>
+        {
+            context.Response.Headers.XFrameOptions = "SAMEORIGIN";
+            context.Response.Headers.Remove("Server");
+            await next();
+        });
 
         app.UseHttpsRedirection();
         app.UseStaticFiles();
