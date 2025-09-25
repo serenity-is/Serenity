@@ -173,6 +173,9 @@ export function addListener(element: EventTarget, originalTypeEvent: string, han
     }
 
     const events = getElementEvents(element);
+    if (isPollutingKey(typeEvent)) 
+        return;
+
     const handlers = events[typeEvent] || (events[typeEvent] = Object.create(null));
     const previousFunction = findHandler(handlers, callable, isDelegated ? handler : null);
 
@@ -184,6 +187,8 @@ export function addListener(element: EventTarget, originalTypeEvent: string, han
     const dotIdx = originalTypeEvent.indexOf('.');
     const ns = dotIdx > -1 ? originalTypeEvent.substring(dotIdx + 1) : '';
     const uid = makeEventUid(ns)
+    if (isPollutingKey(uid))
+        return;
     const fn = (isDelegated ?
         delegationHandler(element, handler as string, callable) :
         baseHandler(element, callable)) as any as EventHandler;
@@ -192,9 +197,8 @@ export function addListener(element: EventTarget, originalTypeEvent: string, han
     fn.callable = callable;
     fn.oneOff = oneOff;
     fn.uidEvent = uid;
-    if (!isPollutingKey(uid))
-        handlers[uid] = fn;
 
+    handlers[uid] = fn;
     element.addEventListener(typeEvent, fn as any, isDelegated);
 }
 
