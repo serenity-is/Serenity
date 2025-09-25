@@ -49,7 +49,6 @@ namespace servicesTexts {
             export const WidthTooLow: string;
         }
     }
-
     export declare namespace Validation {
         export function asKey(): typeof Validation;
         export function asTry(): typeof Validation;

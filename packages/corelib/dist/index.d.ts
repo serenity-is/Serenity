@@ -281,7 +281,7 @@ export declare function parseCriteria(expression: string, params?: any): any[];
  * @param strings The string fragments.
  * @param values The tagged template arguments.
  * @example
- * var a = 5, b = 4;
+ * let a = 5, b = 4;
  * parseCriteria`A >= ${a} and B < ${b}` // [[[a], '>=' 5], 'and', [[b], '<', 4]]
  */
 export declare function parseCriteria(strings: TemplateStringsArray, ...values: any[]): any[];
@@ -1613,13 +1613,18 @@ export declare function setElementReadOnly(elements: Element | ArrayLike<Element
  */
 export declare function parseQueryString(s?: string): Record<string, string>;
 /**
+ * Checks whether a return URL is safe for redirects. Must be relative, start with a single slash,
+ * and contain only allowed characters (no protocol, no backslashes, no control chars, etc).
+ */
+export declare function isSafeReturnUrl(url: string): boolean;
+/**
  * Gets the return URL from the query string.
  * @param opt Options for getting the return URL.
  */
 export declare function getReturnUrl(opt?: {
 	/** Whether to only consider the query string. If true, the function will not check the default return URL. */
 	queryOnly?: boolean;
-	/** Whether to ignore unsafe URLs. If true or null (default), the function will only return safe URLs. */
+	/** Whether to ignore unsafe URLs. If false or null (default), the function will only return safe URLs. */
 	ignoreUnsafe?: boolean;
 	/** The purpose of the return URL. This can be used to determine the default return URL if none is found in the query string. */
 	purpose?: string;
@@ -2031,13 +2036,15 @@ export type TypeInfo<TypeName> = {
 	/** Registered flag */
 	registered?: boolean;
 };
-export declare function getTypeRegistry(): {
+export declare function getGlobalTypeRegistry(): {
 	[key: string]: any;
 };
 export declare function ensureTypeInfo(type: any): TypeInfo<string>;
 export declare function peekTypeInfo(type: any): TypeInfo<string>;
 export declare function getTypeNameProp(type: any): string;
 export declare function setTypeNameProp(type: any, value: string): void;
+/** @deprecated Use getGlobalTypeRegistry instead */
+export declare const getTypeRegistry: typeof getGlobalTypeRegistry;
 export declare const nsSerenity: "Serenity.";
 export declare const SerenityNS: "Serenity";
 declare global {
@@ -2158,7 +2165,7 @@ export declare namespace Enum {
 	 * @param enumType
 	 * @returns
 	 */
-	let getValues: (enumType: any) => any[];
+	let getValues: (enumType: any) => number[];
 }
 /**
  * Check if a type is an enum. A type is considered an enum if it is not a function
@@ -2886,7 +2893,7 @@ export declare class Validator {
 	static isCheckOrRadio(element: Node): element is HTMLInputElement;
 	static getLength(value: ValidationValue, element: HTMLElement): number;
 	static isContentEditable(element: HTMLElement): boolean;
-	static elementValue(element: HTMLElement): string | number | string[];
+	static elementValue(element: HTMLElement): any;
 	static valid(element: HTMLFormElement | ValidatableElement | ArrayLike<ValidatableElement>): boolean;
 	static rules(element: ValidatableElement, command?: "add" | "remove", argument?: any): ValidationRules;
 	form(): boolean;
@@ -3379,11 +3386,11 @@ export declare function toSingleLine(str: string): string;
 /**
  * Trims the whitespace characters from the end of the string
  */
-export declare var trimEnd: (s: string) => any;
+export declare const trimEnd: (s: string) => any;
 /**
  * Trims the whitespace characters from the start of the string
  */
-export declare var trimStart: (s: string) => any;
+export declare const trimStart: (s: string) => any;
 /**
  * Trims the whitespace characters from the start and end of the string
   */
@@ -3476,6 +3483,66 @@ export declare namespace ValidationHelper {
 	function submit(form: ArrayLike<HTMLElement> | HTMLElement, validateBeforeSave: () => boolean, submitHandler: () => void): boolean;
 	function getValidator(elem: ArrayLike<HTMLElement> | HTMLElement): Validator;
 	function validateElement(elem: ArrayLike<HTMLElement> | HTMLElement): void;
+}
+export declare function jQueryPatch(): boolean;
+export declare class IBooleanValue {
+	static [Symbol.typeInfo]: InterfaceTypeInfo<"Serenity.">;
+}
+export interface IBooleanValue {
+	get_value(): boolean;
+	set_value(value: boolean): void;
+}
+export declare class IDialog {
+	static [Symbol.typeInfo]: InterfaceTypeInfo<"Serenity.">;
+}
+export interface IDialog {
+	dialogOpen(asPanel?: boolean): void;
+}
+export declare class IDoubleValue {
+	static [Symbol.typeInfo]: InterfaceTypeInfo<"Serenity.">;
+}
+export interface IDoubleValue {
+	get_value(): any;
+	set_value(value: any): void;
+}
+export declare class IEditDialog {
+	static [Symbol.typeInfo]: InterfaceTypeInfo<"Serenity.">;
+}
+export interface IEditDialog {
+	load(entityOrId: any, done: () => void, fail?: (p1: any) => void): void;
+}
+export declare class IGetEditValue {
+	static [Symbol.typeInfo]: InterfaceTypeInfo<"Serenity.">;
+}
+export interface IGetEditValue {
+	getEditValue(property: PropertyItem, target: any): void;
+}
+export declare class IReadOnly {
+	static [Symbol.typeInfo]: InterfaceTypeInfo<"Serenity.">;
+}
+export interface IReadOnly {
+	get_readOnly(): boolean;
+	set_readOnly(value: boolean): void;
+}
+export declare class ISetEditValue {
+	static [Symbol.typeInfo]: InterfaceTypeInfo<"Serenity.">;
+}
+export interface ISetEditValue {
+	setEditValue(source: any, property: PropertyItem): void;
+}
+export declare class IStringValue {
+	static [Symbol.typeInfo]: InterfaceTypeInfo<"Serenity.">;
+}
+export interface IStringValue {
+	get_value(): string;
+	set_value(value: string): void;
+}
+export declare class IValidateRequired {
+	static [Symbol.typeInfo]: InterfaceTypeInfo<"Serenity.">;
+}
+export interface IValidateRequired {
+	get_required(): boolean;
+	set_required(value: boolean): void;
 }
 export interface IAggregator {
 	init(): void;
@@ -4296,65 +4363,6 @@ export interface RemoteViewOptions<TItem = any> {
 	/** URL of the service endpoint for data requests */
 	url?: string;
 }
-export declare class IBooleanValue {
-	static [Symbol.typeInfo]: InterfaceTypeInfo<"Serenity.">;
-}
-export interface IBooleanValue {
-	get_value(): boolean;
-	set_value(value: boolean): void;
-}
-export declare class IDialog {
-	static [Symbol.typeInfo]: InterfaceTypeInfo<"Serenity.">;
-}
-export interface IDialog {
-	dialogOpen(asPanel?: boolean): void;
-}
-export declare class IDoubleValue {
-	static [Symbol.typeInfo]: InterfaceTypeInfo<"Serenity.">;
-}
-export interface IDoubleValue {
-	get_value(): any;
-	set_value(value: any): void;
-}
-export declare class IEditDialog {
-	static [Symbol.typeInfo]: InterfaceTypeInfo<"Serenity.">;
-}
-export interface IEditDialog {
-	load(entityOrId: any, done: () => void, fail?: (p1: any) => void): void;
-}
-export declare class IGetEditValue {
-	static [Symbol.typeInfo]: InterfaceTypeInfo<"Serenity.">;
-}
-export interface IGetEditValue {
-	getEditValue(property: PropertyItem, target: any): void;
-}
-export declare class IReadOnly {
-	static [Symbol.typeInfo]: InterfaceTypeInfo<"Serenity.">;
-}
-export interface IReadOnly {
-	get_readOnly(): boolean;
-	set_readOnly(value: boolean): void;
-}
-export declare class ISetEditValue {
-	static [Symbol.typeInfo]: InterfaceTypeInfo<"Serenity.">;
-}
-export interface ISetEditValue {
-	setEditValue(source: any, property: PropertyItem): void;
-}
-export declare class IStringValue {
-	static [Symbol.typeInfo]: InterfaceTypeInfo<"Serenity.">;
-}
-export interface IStringValue {
-	get_value(): string;
-	set_value(value: string): void;
-}
-export declare class IValidateRequired {
-	static [Symbol.typeInfo]: InterfaceTypeInfo<"Serenity.">;
-}
-export interface IValidateRequired {
-	get_required(): boolean;
-	set_required(value: boolean): void;
-}
 /**
  * Indicates the enum key of an enum type (by default the name of the enum type is used as key)
  */
@@ -4473,68 +4481,122 @@ export type DialogType = ({
 		init?: () => void;
 	};
 });
-export declare namespace DialogTypeRegistry {
-	let get: (key: string) => DialogType;
-	let getOrLoad: (key: string) => DialogType | PromiseLike<DialogType>;
-	let reset: () => void;
-	let tryGet: (key: string) => DialogType;
-	let tryGetOrLoad: (key: string) => DialogType | PromiseLike<DialogType>;
+declare abstract class BaseTypeRegistry<TType> {
+	/** The kind of loading this registry performs for lazy loading */
+	protected loadKind: string;
+	/** Default suffix to strip from type names (e.g., "Editor", "Dialog") */
+	protected defaultSuffix: string;
+	/** Cache of registered types indexed by their keys */
+	protected registeredTypes: {
+		[key: string]: TType;
+	};
+	/**
+	 * Creates a new type registry instance.
+	 * @param options Configuration options for the registry
+	 */
+	constructor(options: {
+		/** The kind of loading for lazy type loading */
+		loadKind?: string;
+		/** Default suffix to strip from type names */
+		defaultSuffix?: string;
+	});
+	/**
+	 * Gets a secondary type key for the given type.
+	 * Only enums override this to provide legacy enum key support.
+	 * @param type The type to get a secondary key for
+	 * @returns The secondary key, or undefined if none
+	 */
+	protected getSecondaryTypeKey(type: any): string;
+	/**
+	 * Determines if the given type matches the criteria for this registry.
+	 * Subclasses should override this to define which types they handle.
+	 * @param type The type to check
+	 * @returns True if the type matches this registry's criteria
+	 */
+	protected isMatchingType(type: any): boolean;
+	/**
+	 * Called when a type cannot be found or loaded.
+	 * Subclasses must implement this to provide appropriate error messages.
+	 * @param key The key that could not be found
+	 */
+	protected abstract loadError(key: string): void;
+	/**
+	 * Searches for a type in the global type registry and root namespaces.
+	 * @param key The key to search for
+	 * @returns The found type, or null if not found
+	 */
+	protected searchSystemTypes(key: string): TType;
+	/**
+	 * Initializes the registry by scanning the global type registry
+	 * and building the local cache of matching types.
+	 */
+	protected init(): void;
+	/**
+	 * Gets a type by key, throwing an error if not found.
+	 * @param key The key to look up
+	 * @returns The found type
+	 * @throws When the type is not found
+	 */
+	get(key: string): TType;
+	/**
+	 * Gets a type by key, attempting lazy loading if not found.
+	 * @param key The key to look up
+	 * @returns The found type or a promise that resolves to it
+	 * @throws When the type cannot be found or loaded
+	 */
+	getOrLoad(key: string): TType | PromiseLike<TType>;
+	/**
+	 * Clears the registry cache, forcing re-initialization on next access.
+	 */
+	reset(): void;
+	/**
+	 * Attempts to get a type by key without throwing errors.
+	 * @param key The key to look up
+	 * @returns The found type, or null if not found
+	 */
+	tryGet(key: string): TType;
+	/**
+	 * Attempts to get a type by key, with lazy loading support.
+	 * @param key The key to look up
+	 * @returns The found type, a promise that resolves to it, or null if not found
+	 */
+	tryGetOrLoad(key: string): TType | PromiseLike<TType>;
 }
+declare class DialogTypeRegistryImpl extends BaseTypeRegistry<DialogType> {
+	constructor();
+	protected isMatchingType(type: any): boolean;
+	protected loadError(key: string): void;
+}
+export declare const DialogTypeRegistry: DialogTypeRegistryImpl;
 export type EditorType = {
 	new (props?: WidgetProps<any>): Widget<any>;
 };
-export declare namespace EditorTypeRegistry {
-	let get: (key: string) => EditorType;
-	let getOrLoad: (key: string) => EditorType | PromiseLike<EditorType>;
-	let reset: () => void;
-	let tryGet: (key: string) => EditorType;
-	let tryGetOrLoad: (key: string) => EditorType | PromiseLike<EditorType>;
+declare class EditorTypeRegistryImpl extends BaseTypeRegistry<EditorType> {
+	constructor();
+	protected isMatchingType(type: any): boolean;
+	protected loadError(key: string): void;
 }
-export declare namespace EnumTypeRegistry {
-	let get: (key: string) => object;
-	let getOrLoad: (key: string) => object | PromiseLike<object>;
-	let reset: () => void;
-	let tryGet: (key: string) => object;
-	let tryGetOrLoad: (key: string) => object | PromiseLike<object>;
+export declare const EditorTypeRegistry: EditorTypeRegistryImpl;
+declare class EnumTypeRegistryImpl extends BaseTypeRegistry<object> {
+	constructor();
+	protected getSecondaryTypeKey(type: any): string;
+	protected isMatchingType(type: any): boolean;
+	protected loadError(key: string): void;
 }
+export declare const EnumTypeRegistry: EnumTypeRegistryImpl;
 export type FormatterType = ({
 	new (props?: any): Formatter;
 });
-export declare namespace FormatterTypeRegistry {
-	let get: (key: string) => FormatterType;
-	let getOrLoad: (key: string) => FormatterType | PromiseLike<FormatterType>;
-	let reset: () => void;
-	let tryGet: (key: string) => FormatterType;
-	let tryGetOrLoad: (key: string) => FormatterType | PromiseLike<FormatterType>;
+declare class FormatterTypeRegistryImpl extends BaseTypeRegistry<FormatterType> {
+	constructor();
+	protected isMatchingType(type: any): boolean;
+	protected loadError(key: string): void;
 }
+export declare const FormatterTypeRegistry: FormatterTypeRegistryImpl;
 export declare namespace ReflectionUtils {
 	function getPropertyValue(o: any, property: string): any;
 	function setPropertyValue(o: any, property: string, value: any): void;
 	function makeCamelCase(s: string): string;
-}
-export declare function jQueryPatch(): boolean;
-export interface IRowDefinition {
-	readonly deletePermission?: string;
-	readonly idProperty?: string;
-	readonly insertPermission?: string;
-	readonly isActiveProperty?: string;
-	readonly isDeletedProperty?: string;
-	readonly localTextPrefix?: string;
-	readonly nameProperty?: string;
-	readonly readPermission?: string;
-	readonly updatePermission?: string;
-}
-export declare namespace LazyLoadHelper {
-	const executeOnceWhenShown: typeof executeOnceWhenVisible;
-	const executeEverytimeWhenShown: typeof executeEverytimeWhenVisible;
-}
-export declare class PrefixedContext {
-	readonly idPrefix: string;
-	constructor(idPrefix: string);
-	byId(id: string): Fluent;
-	w<TWidget>(id: string, type: {
-		new (...args: any[]): TWidget;
-	}): TWidget;
 }
 export interface ToolButtonProps {
 	action?: string;
@@ -4613,26 +4675,67 @@ export declare class BaseDialog<P> extends Widget<P> {
 }
 /** @deprecated use BaseDialog */
 export declare const TemplatedDialog: typeof BaseDialog;
-export declare class BasePanel<P = {}> extends Widget<P> {
-	static [Symbol.typeInfo]: ClassTypeInfo<"Serenity.">;
-	constructor(props: WidgetProps<P>);
-	destroy(): void;
-	protected tabs: Fluent;
-	protected toolbar: Toolbar;
-	protected validator: Validator;
-	protected isPanel: boolean;
-	protected responsive: boolean;
-	arrange(): void;
-	protected getToolbarButtons(): ToolButton[];
-	protected getValidatorOptions(): any;
-	protected initTabs(): void;
-	protected initToolbar(): void;
-	protected initValidator(): void;
-	protected resetValidation(): void;
-	protected validateForm(): boolean;
+export interface FilterLine {
+	field?: string;
+	operator?: string;
+	isOr?: boolean;
+	leftParen?: boolean;
+	rightParen?: boolean;
+	validationError?: string;
+	criteria?: any[];
+	displayText?: string;
+	state?: any;
 }
-/** @deprecated use BasePanel */
-export declare const TemplatedPanel: typeof BasePanel;
+export declare class FilterStore {
+	static [Symbol.typeInfo]: ClassTypeInfo<"Serenity.">;
+	constructor(fields: PropertyItem[]);
+	static getCriteriaFor(items: FilterLine[]): any[];
+	static getDisplayTextFor(items: FilterLine[]): string;
+	private changed;
+	private displayText;
+	private fields;
+	private fieldByName;
+	private items;
+	get_fields(): PropertyItem[];
+	get_fieldByName(): {
+		[key: string]: PropertyItem;
+	};
+	get_items(): FilterLine[];
+	raiseChanged(): void;
+	add_changed(value: (e: Event, a: any) => void): void;
+	remove_changed(value: (e: Event, a: any) => void): void;
+	get_activeCriteria(): any[];
+	get_displayText(): string;
+}
+export declare function delegateCombine(delegate1: any, delegate2: any): any;
+export declare function delegateRemove(delegate1: any, delegate2: any): any;
+export declare function delegateContains(targets: any[], object: any, method: any): boolean;
+export interface IDataGrid {
+	getElement(): HTMLElement;
+	getGrid(): Grid;
+	getView(): IRemoteView<any>;
+	getFilterStore(): FilterStore;
+}
+export declare class ColumnPickerDialog<P = {}> extends BaseDialog<P> {
+	static [Symbol.typeInfo]: ClassTypeInfo<"Serenity.">;
+	private ulVisible;
+	private ulHidden;
+	private colById;
+	allColumns: Column[];
+	visibleColumns: string[];
+	defaultColumns: string[];
+	done: () => void;
+	protected renderContents(): any;
+	static createToolButton(grid: IDataGrid): ToolButton;
+	protected getDialogButtons(): DialogButton[];
+	protected getDialogOptions(): DialogOptions;
+	private getTitle;
+	private allowHide;
+	private createLI;
+	private updateListStates;
+	protected setupColumns(): void;
+	protected onDialogOpen(): void;
+}
 export type EditorProps<T> = WidgetProps<T> & {
 	initialValue?: any;
 	maxLength?: number;
@@ -4646,342 +4749,6 @@ export declare class EditorWidget<P> extends Widget<EditorProps<P>> {
 	constructor(props: EditorProps<P>);
 	get readOnly(): boolean;
 	set readOnly(value: boolean);
-}
-export declare class CascadedWidgetLink<TParent extends Widget<any>> {
-	private parentType;
-	private widget;
-	private parentChange;
-	static [Symbol.typeInfo]: ClassTypeInfo<"Serenity.">;
-	constructor(parentType: {
-		new (...args: any[]): TParent;
-	}, widget: Widget<any>, parentChange: (p1: TParent) => void);
-	private _parentID;
-	bind(): TParent;
-	unbind(): TParent;
-	get_parentID(): string;
-	set_parentID(value: string): void;
-}
-export declare namespace TabsExtensions {
-	function setDisabled(tabs: ArrayLike<HTMLElement> | HTMLElement, tabKey: string, isDisabled: boolean): void;
-	function toggle(tabs: ArrayLike<HTMLElement> | HTMLElement, tabKey: string, visible: boolean): void;
-	function activeTabKey(tabs: ArrayLike<HTMLElement> | HTMLElement): string;
-	function indexByKey(tabs: ArrayLike<HTMLElement> | HTMLElement): Record<string, number>;
-	function selectTab(tabs: HTMLElement | ArrayLike<HTMLElement>, tabKey: string | number): void;
-	function initialize(tabs: HTMLElement | ArrayLike<HTMLElement>, activeChange: () => void): Fluent<HTMLElement>;
-	function destroy(tabs: HTMLElement | ArrayLike<HTMLElement>): void;
-}
-export declare namespace ReflectionOptionsSetter {
-	function set(target: any, options: any): void;
-}
-export type PropertyFieldElement = HTMLElement & {
-	editorWidget?: Widget<any>;
-	editorPromise?: PromiseLike<void>;
-	propertyItem?: PropertyItem;
-};
-export declare function PropertyFieldCaption(props: {
-	item: Pick<PropertyItem, "name" | "hint" | "labelWidth" | "required" | "title">;
-	idPrefix?: string;
-	localTextPrefix?: string;
-}): HTMLLabelElement;
-export declare function PropertyFieldEditor(props: {
-	fieldElement: PropertyFieldElement;
-	item: Pick<PropertyItem, "editorCssClass" | "editorType" | "editorParams" | "maxLength" | "name" | "editorAddons" | "placeholder">;
-	idPrefix?: string;
-	localTextPrefix?: string;
-}): void;
-export declare function PropertyFieldLineBreak(props: {
-	item: Pick<PropertyItem, "formCssClass">;
-}): HTMLElement;
-export declare function PropertyField(props: {
-	item: PropertyItem;
-	container?: ParentNode;
-	idPrefix?: string;
-	localTextPrefix?: string;
-}): PropertyFieldElement;
-export declare function PropertyCategoryTitle(props: {
-	category: string;
-	localTextPrefix: string;
-}): HTMLElement;
-export declare function PropertyCategory(props: {
-	category?: string;
-	children?: any;
-	collapsed?: boolean;
-	localTextPrefix?: string;
-}): HTMLElement;
-export declare function PropertyTabItem(props: {
-	title: string;
-	active?: boolean;
-	paneId?: string;
-	localTextPrefix?: string;
-}): HTMLLIElement;
-export declare function PropertyTabPane(props: {
-	active?: boolean;
-	id?: string;
-	children?: any;
-}): HTMLElement;
-export declare function PropertyCategories(props: {
-	items: PropertyItem[];
-	container?: ParentNode;
-	fieldElements?: PropertyFieldElement[];
-	idPrefix?: string;
-	localTextPrefix?: string;
-}): HTMLElement;
-export declare function PropertyTabList(props?: {
-	children?: any;
-}): HTMLElement;
-export declare function PropertyTabPanes(_?: {}): HTMLElement;
-export declare function PropertyTabs(props: {
-	items: PropertyItem[];
-	container?: ParentNode;
-	fieldElements?: PropertyFieldElement[];
-	idPrefix?: string;
-	localTextPrefix?: string;
-	paneIdPrefix?: string;
-}): DocumentFragment | null;
-export declare class PropertyGrid<P extends PropertyGridOptions = PropertyGridOptions> extends Widget<P> {
-	static [Symbol.typeInfo]: ClassTypeInfo<"Serenity.">;
-	private fieldElements;
-	protected renderContents(): any;
-	destroy(): void;
-	get_editors(): Widget<any>[];
-	get_items(): PropertyItem[];
-	get_idPrefix(): string;
-	enumerateItems(callback: (p1: PropertyItem, p2: Widget<any>) => void): void;
-	get_mode(): PropertyGridMode;
-	set_mode(value: PropertyGridMode): void;
-	static loadFieldValue(source: any, fieldElement: PropertyFieldElement, mode?: PropertyGridMode): void;
-	load(source: any): void;
-	static saveFieldValue(target: any, fieldElement: PropertyFieldElement, canModify?: boolean): void;
-	save(target?: any): any;
-	get value(): any;
-	set value(val: any);
-	static canModifyItem(item: PropertyItem, mode?: PropertyGridMode): boolean;
-	protected canModifyItem(item: PropertyItem): boolean;
-	static updateFieldElement(fieldElement: PropertyFieldElement, mode?: PropertyGridMode, canModify?: boolean): void;
-	protected updateFieldElement(fieldElement: PropertyFieldElement): void;
-	updateInterface(): void;
-}
-export declare enum PropertyGridMode {
-	insert = 1,
-	update = 2
-}
-export interface PropertyGridOptions {
-	idPrefix?: string;
-	items: PropertyItem[];
-	localTextPrefix?: string;
-	value?: any;
-	mode?: PropertyGridMode;
-}
-export declare class PropertyPanel<TItem, P> extends BasePanel<P> {
-	static [Symbol.typeInfo]: ClassTypeInfo<"Serenity.">;
-	private _entity;
-	private _entityId;
-	constructor(props: WidgetProps<P>);
-	destroy(): void;
-	protected initPropertyGrid(): void;
-	protected loadInitialEntity(): void;
-	protected getFormKey(): string;
-	protected getPropertyGridOptions(): PropertyGridOptions;
-	protected getPropertyItems(): PropertyItem[];
-	protected getSaveEntity(): TItem;
-	get entity(): TItem;
-	get entityId(): any;
-	protected set entity(value: TItem);
-	protected set entityId(value: any);
-	protected validateBeforeSave(): boolean;
-	protected propertyGrid: PropertyGrid;
-}
-export declare namespace SubDialogHelper {
-	function bindToDataChange(dialog: any, owner: Widget<any>, dataChange: (ev: DataChangeInfo) => void, useTimeout?: boolean): any;
-	function triggerDataChange(dialog: Widget<any>): any;
-	function triggerDataChanged(element: HTMLElement | ArrayLike<HTMLElement>): void;
-	function bubbleDataChange(dialog: any, owner: Widget<any>, useTimeout?: boolean): any;
-	function cascade(cascadedDialog: {
-		domNode: HTMLElement;
-	}, ofElement: HTMLElement | ArrayLike<HTMLElement>): any;
-	function cascadedDialogOffset(element: HTMLElement | ArrayLike<HTMLElement>): any;
-}
-export declare namespace DialogExtensions {
-	function dialogResizable(dialog: HTMLElement | ArrayLike<HTMLElement>, w?: any, h?: any, mw?: any, mh?: any): void;
-	function dialogMaximizable(dialog: HTMLElement | ArrayLike<HTMLElement>): void;
-}
-export declare class PropertyDialog<TItem, P> extends BaseDialog<P> {
-	static [Symbol.typeInfo]: ClassTypeInfo<"Serenity.">;
-	private _entity;
-	private _entityId;
-	protected propertyItemsData: PropertyItemsData;
-	protected isClosable(): boolean;
-	protected isStatic(): boolean;
-	constructor(props?: WidgetProps<P>);
-	protected propertyItemsReady(itemsData: PropertyItemsData): void;
-	protected afterInit(): void;
-	protected useAsync(): boolean;
-	destroy(): void;
-	protected getDialogOptions(): DialogOptions;
-	protected getDialogButtons(): DialogButton[];
-	protected okClick(): void;
-	protected okClickValidated(): void;
-	protected cancelClick(): void;
-	protected initPropertyGrid(): void;
-	protected getFormKey(): string;
-	protected getPropertyGridOptions(): PropertyGridOptions;
-	protected getPropertyItems(): PropertyItem[];
-	protected getPropertyItemsData(): PropertyItemsData;
-	protected getPropertyItemsDataAsync(): Promise<PropertyItemsData>;
-	protected getSaveEntity(): TItem;
-	protected loadInitialEntity(): void;
-	get entity(): TItem;
-	protected set entity(value: TItem);
-	get entityId(): any;
-	protected set entityId(value: any);
-	protected validateBeforeSave(): boolean;
-	protected updateTitle(): void;
-	protected propertyGrid: PropertyGrid;
-	protected renderContents(): any;
-}
-export declare namespace EditorUtils {
-	function getDisplayText(editor: Widget<any>): string;
-	function getValue(editor: Widget<any>): any;
-	function saveValue(editor: Widget<any>, item: PropertyItem, target: any): void;
-	function setValue(editor: Widget<any>, value: any): void;
-	function loadValue(editor: Widget<any>, item: PropertyItem, source: any): void;
-	/**
-	 * This functions sets readonly class and disabled (for select, radio, checkbox) or readonly attribute (for other inputs) on given elements
-	 * or widgets. If a widget is passed and it has set_readOnly method it is called instead of setting readonly class or attributes.
-	 * Note that if an element, instead of the widget attached to it is passed directly, this searchs for a widget attached to it.
-	 * If you don't want this behavior, use setElementReadOnly method.
-	 * @param elements
-	 * @param value
-	 */
-	function setReadonly(elements: Element | Widget<any> | ArrayLike<Element | Widget>, value: boolean): void;
-	/**
-	 * Legacy alias for setReadonly
-	 */
-	const setReadOnly: typeof setReadonly;
-	function setRequired(widget: Widget<any>, isRequired: boolean): void;
-	function setContainerReadOnly(container: ArrayLike<HTMLElement> | HTMLElement, readOnly: boolean): void;
-}
-export declare class StringEditor<P = {}> extends EditorWidget<P> {
-	static [Symbol.typeInfo]: EditorTypeInfo<"Serenity.">;
-	readonly domNode: HTMLInputElement;
-	static createDefaultElement(): HTMLInputElement;
-	get value(): string;
-	protected get_value(): string;
-	set value(value: string);
-	protected set_value(value: string): void;
-}
-export declare class PasswordEditor<TOptions = {}> extends StringEditor<TOptions> {
-	static [Symbol.typeInfo]: EditorTypeInfo<"Serenity.">;
-	static createDefaultElement(): HTMLInputElement;
-}
-export interface TextAreaEditorOptions {
-	cols?: number;
-	rows?: number;
-}
-export declare class TextAreaEditor<P extends TextAreaEditorOptions = TextAreaEditorOptions> extends EditorWidget<P> {
-	static [Symbol.typeInfo]: EditorTypeInfo<"Serenity.">;
-	static createDefaultElement(): HTMLTextAreaElement;
-	constructor(props: EditorProps<P>);
-	get value(): string;
-	protected get_value(): string;
-	set value(value: string);
-	protected set_value(value: string): void;
-}
-export declare class BooleanEditor<P = {}> extends EditorWidget<P> {
-	static [Symbol.typeInfo]: EditorTypeInfo<"Serenity.">;
-	static createDefaultElement(): HTMLInputElement;
-	readonly domNode: HTMLInputElement;
-	get value(): boolean;
-	protected get_value(): boolean;
-	set value(value: boolean);
-	protected set_value(value: boolean): void;
-}
-export interface AutoNumericOptions {
-	aDec?: string;
-	allowedAutoStrip?: RegExp;
-	allowLeading?: boolean;
-	altDec?: string;
-	aForm?: boolean;
-	aNum?: string;
-	aNeg?: string;
-	aSep?: string;
-	aSign?: string;
-	aNegRegAutoStrip?: string;
-	aPad?: boolean;
-	dGroup?: string;
-	/** internal */
-	holder?: any;
-	lZero?: string;
-	mDec?: number;
-	mInt?: number;
-	mRound?: string;
-	nBracket?: string;
-	numRegAutoStrip?: RegExp;
-	oEvent?: any;
-	pSign?: string;
-	/** internal */
-	runOnce?: boolean;
-	skipFirstAutoStrip?: RegExp;
-	skipLastAutoStrip?: RegExp;
-	tagList?: string[];
-	vMax?: any;
-	vMin?: any;
-	wEmpty?: string;
-}
-export declare class AutoNumeric {
-	static init(input: HTMLInputElement, options: AutoNumericOptions): void;
-	/** method to remove settings and stop autoNumeric() */
-	static destroy(input: HTMLInputElement): void;
-	/** method to update settings - can call as many times */
-	static updateOptions(input: HTMLInputElement, options: AutoNumericOptions): void;
-	/** returns a formatted strings for "input:text" fields Uses jQuery's .val() method*/
-	static setValue(input: HTMLInputElement, valueIn: number | string): string;
-	/** method to get the unformatted value from a specific input field, returns a numeric value */
-	static getValue(input: HTMLInputElement): string;
-	/** returns the settings object for those who need to look under the hood */
-	static getSettings(input: HTMLInputElement): AutoNumericOptions;
-	static hasInstance(input: HTMLInputElement): boolean;
-}
-export interface DecimalEditorOptions {
-	minValue?: string;
-	maxValue?: string;
-	decimals?: any;
-	padDecimals?: any;
-	allowNegatives?: boolean;
-}
-export declare class DecimalEditor<P extends DecimalEditorOptions = DecimalEditorOptions> extends EditorWidget<P> implements IDoubleValue {
-	static [Symbol.typeInfo]: EditorTypeInfo<"Serenity.">;
-	static createDefaultElement(): HTMLInputElement;
-	readonly domNode: HTMLInputElement;
-	constructor(props: EditorProps<P>);
-	destroy(): void;
-	protected initAutoNumeric(): void;
-	protected getAutoNumericOptions(): any;
-	get_value(): number;
-	get value(): number;
-	set_value(value: number): void;
-	set value(v: number);
-	get_isValid(): boolean;
-	static defaultAutoNumericOptions(): AutoNumericOptions;
-}
-export interface IntegerEditorOptions {
-	minValue?: number;
-	maxValue?: number;
-	allowNegatives?: boolean;
-}
-export declare class IntegerEditor<P extends IntegerEditorOptions = IntegerEditorOptions> extends EditorWidget<P> implements IDoubleValue {
-	static [Symbol.typeInfo]: EditorTypeInfo<"Serenity.">;
-	static createDefaultElement(): HTMLInputElement;
-	readonly domNode: HTMLInputElement;
-	constructor(props: EditorProps<P>);
-	destroy(): void;
-	protected initAutoNumeric(): void;
-	protected getAutoNumericOptions(): any;
-	get_value(): number;
-	get value(): number;
-	set_value(value: number): void;
-	set value(v: number);
-	get_isValid(): boolean;
 }
 export interface DateEditorOptions {
 	yearRange?: string;
@@ -5022,147 +4789,6 @@ export declare class DateEditor<P extends DateEditorOptions = DateEditorOptions>
 	getFlatpickrOptions(input: HTMLElement): any;
 	createFlatPickrTrigger(): HTMLElement;
 	static uiPickerZIndexWorkaround(el: HTMLElement | ArrayLike<HTMLElement>): void;
-}
-export declare class DateTimeEditor<P extends DateTimeEditorOptions = DateTimeEditorOptions> extends EditorWidget<P> implements IStringValue, IReadOnly {
-	static [Symbol.typeInfo]: EditorTypeInfo<"Serenity.">;
-	static createDefaultElement(): HTMLInputElement;
-	readonly domNode: HTMLInputElement;
-	private time;
-	private lastSetValue;
-	private lastSetValueGet;
-	constructor(props: EditorProps<P>);
-	setToNow(triggerChange?: boolean): void;
-	destroy(): void;
-	getFlatpickrOptions(): any;
-	createFlatPickrTrigger(): HTMLElement;
-	get_value(): string;
-	get value(): string;
-	set_value(value: string): void;
-	private getInplaceNowText;
-	private getDisplayFormat;
-	set value(v: string);
-	private get_valueAsDate;
-	get valueAsDate(): Date;
-	private set_valueAsDate;
-	set valueAsDate(value: Date);
-	get_minValue(): string;
-	set_minValue(value: string): void;
-	get_maxValue(): string;
-	set_maxValue(value: string): void;
-	get_minDate(): Date;
-	set_minDate(value: Date): void;
-	get_maxDate(): Date;
-	set_maxDate(value: Date): void;
-	get_sqlMinMax(): boolean;
-	set_sqlMinMax(value: boolean): void;
-	get_readOnly(): boolean;
-	set_readOnly(value: boolean): void;
-	static roundToMinutes(date: Date, minutesStep: number): Date;
-	static getTimeOptions: (fromHour: number, fromMin: number, toHour: number, toMin: number, stepMins: number) => string[];
-}
-export interface DateTimeEditorOptions {
-	startHour?: any;
-	endHour?: any;
-	intervalMinutes?: any;
-	minValue?: string;
-	maxValue?: string;
-	yearRange?: string;
-	useUtc?: boolean;
-	seconds?: boolean;
-	inputOnly?: boolean;
-}
-export interface TimeEditorBaseOptions {
-	noEmptyOption?: boolean;
-	startHour?: any;
-	endHour?: any;
-	intervalMinutes?: any;
-}
-export declare class TimeEditorBase<P extends TimeEditorBaseOptions> extends EditorWidget<P> {
-	static [Symbol.typeInfo]: EditorTypeInfo<"Serenity.">;
-	static createDefaultElement(): HTMLElement;
-	readonly domNode: HTMLSelectElement;
-	protected minutes: Fluent;
-	constructor(props: EditorProps<P>);
-	get hour(): number;
-	get minute(): number;
-	get_readOnly(): boolean;
-	set_readOnly(value: boolean): void;
-	/** Returns value in HH:mm format */
-	get hourAndMin(): string;
-	/** Sets value in HH:mm format */
-	set hourAndMin(value: string);
-}
-export interface TimeEditorOptions extends TimeEditorBaseOptions {
-	/** Default is 1. Set to 60 to store seconds, 60000 to store ms in an integer field */
-	multiplier?: number;
-}
-/** Note that this editor's value is number of minutes, e.g. for
- * 16:30, value will be 990. If you want to use a TimeSpan field
- * use TimeSpanEditor instead.
- */
-export declare class TimeEditor<P extends TimeEditorOptions = TimeEditorOptions> extends TimeEditorBase<P> {
-	static [Symbol.typeInfo]: EditorTypeInfo<"Serenity.">;
-	constructor(props: EditorProps<P>);
-	get value(): number;
-	protected get_value(): number;
-	set value(value: number);
-	protected set_value(value: number): void;
-}
-export interface TimeSpanEditorOptions extends TimeEditorBaseOptions {
-}
-/**
- * This editor is for TimeSpan fields. It uses a string value in the format "HH:mm".
- */
-export declare class TimeSpanEditor<P extends TimeSpanEditorOptions = TimeSpanEditorOptions> extends TimeEditorBase<P> {
-	static [Symbol.typeInfo]: EditorTypeInfo<"Serenity.">;
-	constructor(props: EditorProps<P>);
-	protected get_value(): string;
-	protected set_value(value: string): void;
-	get value(): string;
-	set value(value: string);
-}
-export interface EmailEditorOptions {
-	domain?: string;
-	readOnlyDomain?: boolean;
-}
-export declare class EmailEditor<P extends EmailEditorOptions = EmailEditorOptions> extends EditorWidget<P> {
-	static [Symbol.typeInfo]: EditorTypeInfo<"Serenity.">;
-	static createDefaultElement(): HTMLInputElement;
-	readonly domNode: HTMLInputElement;
-	private readonly domain;
-	constructor(props: EditorProps<P>);
-	static registerValidationMethods(): void;
-	get_value(): string;
-	get value(): string;
-	set_value(value: string): void;
-	set value(v: string);
-	get_readOnly(): boolean;
-	set_readOnly(value: boolean): void;
-}
-export declare class EmailAddressEditor<P = {}> extends StringEditor<P> {
-	static [Symbol.typeInfo]: EditorTypeInfo<"Serenity.">;
-	static createDefaultElement(): HTMLInputElement;
-	constructor(props: EditorProps<P>);
-}
-export declare class URLEditor<P = {}> extends StringEditor<P> {
-	static [Symbol.typeInfo]: EditorTypeInfo<"Serenity.">;
-	constructor(props: EditorProps<P>);
-}
-export interface RadioButtonEditorOptions {
-	enumKey?: string;
-	enumType?: any;
-	lookupKey?: string;
-}
-export declare class RadioButtonEditor<P extends RadioButtonEditorOptions = RadioButtonEditorOptions> extends EditorWidget<P> implements IReadOnly {
-	static [Symbol.typeInfo]: EditorTypeInfo<"Serenity.">;
-	constructor(props: EditorProps<P>);
-	protected addRadio(value: string, text: string): void;
-	get_value(): string;
-	get value(): string;
-	set_value(value: string): void;
-	set value(v: string);
-	get_readOnly(): boolean;
-	set_readOnly(value: boolean): void;
 }
 export type ComboboxType = "select2";
 export type ComboboxFormatResult = string | Element | DocumentFragment;
@@ -5226,6 +4852,20 @@ export declare class Combobox<TItem = any> {
 	static getInstance(el: Element | ArrayLike<Element>): Combobox;
 }
 export declare function stripDiacritics(str: string): string;
+export declare class CascadedWidgetLink<TParent extends Widget<any>> {
+	private parentType;
+	private widget;
+	private parentChange;
+	static [Symbol.typeInfo]: ClassTypeInfo<"Serenity.">;
+	constructor(parentType: {
+		new (...args: any[]): TParent;
+	}, widget: Widget<any>, parentChange: (p1: TParent) => void);
+	private _parentID;
+	bind(): TParent;
+	unbind(): TParent;
+	get_parentID(): string;
+	set_parentID(value: string): void;
+}
 export interface ComboboxCommonOptions {
 	allowClear?: boolean;
 	delimited?: boolean;
@@ -5363,446 +5003,20 @@ export interface SelectEditorOptions extends ComboboxCommonOptions {
 	items?: any[];
 	emptyOptionText?: string;
 }
-/**
- * Adapted from 3.5.x version of Select2 (https://github.com/select2/select2), removing jQuery dependency
- */
-export type Select2Element = HTMLInputElement | HTMLSelectElement;
-export type Select2FormatResult = string | Element | DocumentFragment;
-export interface Select2QueryOptions {
-	element?: Select2Element;
-	term?: string;
-	page?: number;
-	context?: any;
-	callback?: (p1: Select2Result) => void;
-	matcher?: (p1: any, p2: any, p3?: any) => boolean;
-}
-export interface Select2Item {
-	id?: string;
-	text?: string;
-	source?: any;
-	children?: Select2Item[];
-	disabled?: boolean;
-	locked?: boolean;
-}
-export interface Select2Result {
-	hasError?: boolean;
-	errorInfo?: any;
-	results: Select2Item[];
-	more?: boolean;
-	context?: any;
-}
-export interface Select2AjaxOptions extends RequestInit {
-	headers?: Record<string, string>;
-	url?: string | ((term: string, page: number, context: any) => string);
-	quietMillis?: number;
-	data?: (p1: string, p2: number, p3: any) => any;
-	results?: (p1: any, p2: number, p3: any) => any;
-	params?: (() => any) | any;
-	onError?(response: any, info?: any): void | boolean;
-	onSuccess?(response: any): void;
-}
-export interface Select2Options {
-	element?: Select2Element;
-	width?: any;
-	minimumInputLength?: number;
-	maximumInputLength?: number;
-	minimumResultsForSearch?: number;
-	maximumSelectionSize?: any;
-	placeholder?: string;
-	placeholderOption?: any;
-	separator?: string;
-	allowClear?: boolean;
-	multiple?: boolean;
-	closeOnSelect?: boolean;
-	openOnEnter?: boolean;
-	id?: (p1: any) => string;
-	matcher?: (p1: string, p2: string, p3: HTMLElement) => boolean;
-	sortResults?: (p1: any, p2: HTMLElement, p3: any) => any;
-	formatAjaxError?: (p1: any, p2: any) => Select2FormatResult;
-	formatMatches?: (matches: number) => Select2FormatResult;
-	formatSelection?: (p1: any, p2: HTMLElement, p3: (p1: string) => string) => Select2FormatResult;
-	formatResult?: (p1: any, p2: HTMLElement, p3: any, p4: (p1: string) => string) => Select2FormatResult;
-	formatResultCssClass?: (p1: any) => string;
-	formatSelectionCssClass?: (item: Select2Item, container: HTMLElement) => string;
-	formatNoMatches?: (input: string) => Select2FormatResult;
-	formatLoadMore?: (pageNumber: number) => Select2FormatResult;
-	formatSearching?: () => Select2FormatResult;
-	formatInputTooLong?: (input: string, max: number) => Select2FormatResult;
-	formatInputTooShort?: (input: string, min: number) => Select2FormatResult;
-	formatSelectionTooBig?: (p1: number) => Select2FormatResult;
-	createSearchChoice?: (p1: string) => Select2Item;
-	createSearchChoicePosition?: string | ((list: Select2Item[], item: Select2Item) => void);
-	initSelection?: (p1: HTMLElement, p2: (p1: any) => void) => void;
-	tokenizer?: (p1: string, p2: any, p3: (p1: any) => any, p4: any) => string;
-	tokenSeparators?: any;
-	query?: (p1: Select2QueryOptions) => void;
-	ajax?: Select2AjaxOptions;
-	data?: any;
-	tags?: ((string | Select2Item)[]) | (() => (string | Select2Item)[]);
-	containerCss?: any;
-	containerCssClass?: any;
-	dropdownCss?: any;
-	dropdownCssClass?: any;
-	dropdownAutoWidth?: boolean;
-	dropdownParent?: (input: HTMLElement) => HTMLElement;
-	adaptContainerCssClass?: (p1: string) => string;
-	adaptDropdownCssClass?: (p1: string) => string;
-	escapeMarkup?: (p1: string) => string;
-	searchInputPlaceholder?: string;
-	selectOnBlur?: boolean;
-	blurOnChange?: boolean;
-	loadMorePadding?: number;
-	nextSearchTerm?: (p1: any, p2: string) => string;
-	populateResults?: (container: HTMLElement, results: Select2Item[], query: Select2QueryOptions) => void;
-	shouldFocusInput?: (p1: any) => boolean;
-}
-export declare class Select2 {
-	private el;
-	constructor(opts?: Select2Options);
-	private get instance();
-	close(): void;
-	get container(): HTMLElement;
-	get dropdown(): HTMLElement;
-	destroy(): void;
-	get data(): (Select2Item | Select2Item[]);
-	set data(value: Select2Item | Select2Item[]);
-	disable(): void;
-	enable(enabled?: boolean): void;
-	focus(): void;
-	get isFocused(): boolean;
-	get isMultiple(): boolean;
-	get opened(): boolean;
-	open(): boolean;
-	positionDropdown(): void;
-	readonly(value?: boolean): void;
-	get search(): HTMLInputElement;
-	get val(): (string | string[]);
-	set val(value: string | string[]);
-	static getInstance(el: Select2Element): Select2;
-	static readonly ajaxDefaults: Select2AjaxOptions;
-	static readonly defaults: Select2Options;
-	static stripDiacritics(str: string): string;
-}
-export declare class DateYearEditor<P extends DateYearEditorOptions = DateYearEditorOptions> extends SelectEditor<P> {
-	static [Symbol.typeInfo]: EditorTypeInfo<"Serenity.">;
-	constructor(props: EditorProps<P>);
-	getItems(): any[];
-}
-export interface DateYearEditorOptions extends SelectEditorOptions {
-	minYear?: string;
-	maxYear?: string;
-	descending?: boolean;
-}
-export interface EnumEditorOptions extends ComboboxCommonOptions {
-	enumKey?: string;
-	enumType?: any;
-}
-export declare class EnumEditor<P extends EnumEditorOptions = EnumEditorOptions> extends ComboboxEditor<P, ComboboxItem> {
-	static [Symbol.typeInfo]: EditorTypeInfo<"Serenity.">;
-	constructor(props: EditorProps<P>);
-	protected updateItems(): void | PromiseLike<void>;
-	protected allowClear(): boolean;
-}
-export interface LookupEditorOptions extends ComboboxEditorOptions {
-	lookupKey?: string;
-	async?: boolean;
-}
-export declare abstract class LookupEditorBase<P extends LookupEditorOptions, TItem> extends ComboboxEditor<P, TItem> {
-	static [Symbol.typeInfo]: EditorTypeInfo<"Serenity.">;
-	private lookupChangeUnbind;
-	constructor(props: EditorProps<P>);
-	hasAsyncSource(): boolean;
-	destroy(): void;
-	protected getLookupKey(): string;
-	protected lookup: Lookup<TItem>;
-	protected getLookupAsync(): PromiseLike<Lookup<TItem>>;
-	protected getLookup(): Lookup<TItem>;
-	protected getItems(lookup: Lookup<TItem>): TItem[];
-	protected getIdField(): any;
-	protected getItemText(item: TItem, lookup: Lookup<TItem>): any;
-	protected mapItem(item: TItem): ComboboxItem<TItem>;
-	protected getItemDisabled(item: TItem, lookup: Lookup<TItem>): boolean;
-	updateItems(): void;
-	protected asyncSearch(query: ComboboxSearchQuery): Promise<ComboboxSearchResult<TItem>>;
-	protected getDialogTypeKey(): string;
-	protected setCreateTermOnNewEntity(entity: TItem, term: string): void;
-	protected editDialogDataChange(): void;
-}
-export declare class LookupEditor<P extends LookupEditorOptions = LookupEditorOptions> extends LookupEditorBase<P, {}> {
-	static [Symbol.typeInfo]: EditorTypeInfo<"Serenity.">;
-	constructor(props: EditorProps<P>);
-}
-export interface ServiceLookupEditorOptions extends ComboboxEditorOptions {
-	service?: string;
-	idField?: string;
-	textField?: string;
-	pageSize?: number;
-	minimumResultsForSearch?: any;
-	sort?: string[];
-	columnSelection?: ColumnSelection;
-	includeColumns?: string[];
-	excludeColumns?: string[];
-	includeDeleted?: boolean;
-	containsField?: string;
-	equalityFilter?: any;
-	criteria?: any[];
-}
-export declare abstract class ServiceLookupEditorBase<P extends ServiceLookupEditorOptions, TItem> extends ComboboxEditor<P, TItem> {
-	static [Symbol.typeInfo]: EditorTypeInfo<"Serenity.">;
-	protected getDialogTypeKey(): string;
-	protected getService(): string;
-	protected getServiceUrl(): string;
-	protected getIncludeColumns(): string[];
-	protected getSort(): any[];
-	protected getCascadeCriteria(): any[];
-	protected getFilterCriteria(): any[];
-	protected getIdListCriteria(idList: any[]): any[];
-	protected getCriteria(query: ComboboxSearchQuery): any[];
-	protected getListRequest(query: ComboboxSearchQuery): ListRequest;
-	protected getServiceCallOptions(query: ComboboxSearchQuery): ServiceOptions<ListResponse<TItem>>;
-	protected hasAsyncSource(): boolean;
-	protected canSearch(byId: boolean): boolean;
-	protected asyncSearch(query: ComboboxSearchQuery): Promise<ComboboxSearchResult<TItem>>;
-}
-export declare class ServiceLookupEditor<P extends ServiceLookupEditorOptions = ServiceLookupEditorOptions, TItem = any> extends ServiceLookupEditorBase<ServiceLookupEditorOptions, TItem> {
-	static [Symbol.typeInfo]: EditorTypeInfo<"Serenity.">;
-	constructor(props: EditorProps<P>);
-}
-export interface HtmlContentEditorOptions {
-	cols?: number;
-	rows?: number;
-}
-export interface CKEditorConfig {
-}
-export declare class HtmlContentEditor<P extends HtmlContentEditorOptions = HtmlContentEditorOptions> extends EditorWidget<P> implements IStringValue, IReadOnly {
-	static [Symbol.typeInfo]: EditorTypeInfo<"Serenity.">;
-	private _instanceReady;
-	readonly domNode: HTMLTextAreaElement;
-	static createDefaultElement(): HTMLTextAreaElement;
-	constructor(props: EditorProps<P>);
-	protected instanceReady(x: any): void;
-	protected getLanguage(): string;
-	protected getConfig(): CKEditorConfig;
-	protected getEditorInstance(): any;
-	destroy(): void;
-	get_value(): string;
-	get value(): string;
-	set_value(value: string): void;
-	set value(v: string);
-	get_readOnly(): boolean;
-	set_readOnly(value: boolean): void;
-	static CKEditorVer: string;
-	static CKEditorBasePath: string;
-	static getCKEditorBasePath(): string;
-	static includeCKEditor(then: () => void): void;
-}
-export declare class HtmlNoteContentEditor<P extends HtmlContentEditorOptions = HtmlContentEditorOptions> extends HtmlContentEditor<P> {
-	static [Symbol.typeInfo]: EditorTypeInfo<"Serenity.">;
-	protected getConfig(): CKEditorConfig;
-}
-export declare class HtmlReportContentEditor<P extends HtmlContentEditorOptions = HtmlContentEditorOptions> extends HtmlContentEditor<P> {
-	static [Symbol.typeInfo]: EditorTypeInfo<"Serenity.">;
-	protected getConfig(): CKEditorConfig;
-}
-export declare class MaskedEditor<P extends MaskedEditorOptions = MaskedEditorOptions> extends EditorWidget<P> {
-	static [Symbol.typeInfo]: EditorTypeInfo<"Serenity.">;
-	static createDefaultElement(): HTMLInputElement;
-	readonly domNode: HTMLInputElement;
-	constructor(props: EditorProps<P>);
-	get value(): string;
-	protected get_value(): string;
-	set value(value: string);
-	protected set_value(value: string): void;
-}
-export interface MaskedEditorOptions {
-	mask?: string;
-	placeholder?: string;
-}
-export interface RecaptchaOptions {
-	siteKey?: string;
-	language?: string;
-}
-export declare class Recaptcha<P extends RecaptchaOptions = RecaptchaOptions> extends EditorWidget<P> implements IStringValue {
-	static [Symbol.typeInfo]: EditorTypeInfo<"Serenity.">;
-	constructor(props: EditorProps<P>);
-	get_value(): string;
-	set_value(value: string): void;
-}
-export declare namespace UploadHelper {
-	function addUploadInput(options: UploadInputOptions): Fluent;
-	function checkImageConstraints(file: UploadResponse, opt: FileUploadConstraints): boolean;
-	function fileNameSizeDisplay(name: string, bytes: number): string;
-	function fileSizeDisplay(bytes: number): string;
-	function hasImageExtension(filename: string): boolean;
-	function thumbFileName(filename: string): string;
-	function dbFileUrl(filename: string): string;
-	/**
-	 * Creates a lightbox for a single upload thumbnail anchor element.
-	 * It uses one of glightbox, simplelightbox or colorbox if available.
-	 * Override this function to use a different lightbox library.
-	 */
-	function lightbox(link: HTMLElement | ArrayLike<HTMLElement>): void;
-	/** @deprecated use lightbox */
-	const colorBox: typeof lightbox;
-	function populateFileSymbols(c: HTMLElement | ArrayLike<HTMLElement>, items: UploadedFile[], displayOriginalName?: boolean, urlPrefix?: string): void;
-}
-export interface UploadedFile {
-	Filename?: string;
-	OriginalName?: string;
-}
-export interface UploadInputOptions {
-	container?: HTMLElement | ArrayLike<HTMLElement>;
-	zone?: HTMLElement | ArrayLike<HTMLElement>;
-	progress?: HTMLElement | ArrayLike<HTMLElement>;
-	inputName?: string;
-	allowMultiple?: boolean;
-	uploadIntent?: string;
-	uploadUrl?: string;
-	fileDone?: (p1: UploadResponse, p2: string, p3: any) => void;
-}
-export interface UploadResponse extends ServiceResponse {
-	TemporaryFile: string;
-	Size: number;
-	IsImage: boolean;
-	Width: number;
-	Height: number;
-}
-export interface FileUploadConstraints {
-	minWidth?: number;
-	maxWidth?: number;
-	minHeight?: number;
-	maxHeight?: number;
-	minSize?: number;
-	maxSize?: number;
-	allowNonImage?: boolean;
-	originalNameProperty?: string;
-}
-export interface FileUploadEditorOptions extends FileUploadConstraints {
-	displayFileName?: boolean;
-	uploadIntent?: string;
-	uploadUrl?: string;
-	urlPrefix?: string;
-}
-export interface ImageUploadEditorOptions extends FileUploadEditorOptions {
-}
-export declare class FileUploadEditor<P extends FileUploadEditorOptions = FileUploadEditorOptions> extends EditorWidget<P> implements IReadOnly, IGetEditValue, ISetEditValue, IValidateRequired {
-	static [Symbol.typeInfo]: EditorTypeInfo<"Serenity.">;
-	constructor(props: EditorProps<P>);
-	protected getUploadInputOptions(): UploadInputOptions;
-	protected addFileButtonText(): string;
-	protected getToolButtons(): ToolButton[];
-	protected populate(): void;
-	protected updateInterface(): void;
-	get_readOnly(): boolean;
-	set_readOnly(value: boolean): void;
-	get_required(): boolean;
-	set_required(value: boolean): void;
-	get_value(): UploadedFile;
-	get value(): UploadedFile;
-	set_value(value: UploadedFile): void;
-	set value(v: UploadedFile);
-	getEditValue(property: PropertyItem, target: any): void;
-	setEditValue(source: any, property: PropertyItem): void;
-	protected entity: UploadedFile;
-	protected toolbar: Toolbar;
-	protected progress: HTMLElement;
-	protected fileSymbols: HTMLElement;
-	protected uploadInput: Fluent;
-	protected hiddenInput: HTMLInputElement;
-}
-export declare class ImageUploadEditor<P extends ImageUploadEditorOptions = ImageUploadEditorOptions> extends FileUploadEditor<P> {
-	static [Symbol.typeInfo]: EditorTypeInfo<"Serenity.">;
-	constructor(props: EditorProps<P>);
-}
-export interface MultipleFileUploadEditorOptions extends FileUploadEditorOptions {
-	jsonEncodeValue?: boolean;
-}
-export declare class MultipleFileUploadEditor<P extends MultipleFileUploadEditorOptions = MultipleFileUploadEditorOptions> extends EditorWidget<P> implements IReadOnly, IGetEditValue, ISetEditValue, IValidateRequired {
-	static [Symbol.typeInfo]: EditorTypeInfo<"Serenity.">;
-	private entities;
-	private toolbar;
-	private fileSymbols;
-	private uploadInput;
-	protected progress: HTMLElement;
-	protected hiddenInput: HTMLInputElement;
-	constructor(props: EditorProps<P>);
-	protected getUploadInputOptions(): UploadInputOptions;
-	protected addFileButtonText(): string;
-	protected getToolButtons(): ToolButton[];
-	protected populate(): void;
-	protected updateInterface(): void;
-	get_readOnly(): boolean;
-	set_readOnly(value: boolean): void;
-	get_required(): boolean;
-	set_required(value: boolean): void;
-	get_value(): UploadedFile[];
-	get value(): UploadedFile[];
-	set_value(value: UploadedFile[]): void;
-	set value(v: UploadedFile[]);
-	getEditValue(property: PropertyItem, target: any): void;
-	setEditValue(source: any, property: PropertyItem): void;
-	get jsonEncodeValue(): boolean;
-	set jsonEncodeValue(value: boolean);
-}
-export declare class MultipleImageUploadEditor<P extends ImageUploadEditorOptions = ImageUploadEditorOptions> extends MultipleFileUploadEditor<P> {
+export declare class FilterWidgetBase<P = {}> extends Widget<P> {
 	static [Symbol.typeInfo]: ClassTypeInfo<"Serenity.">;
-	constructor(props: EditorProps<P>);
-}
-export interface QuickFilterArgs<TWidget> {
-	field?: string;
-	widget?: TWidget;
-	request?: ListRequest;
-	equalityFilter?: any;
-	value?: any;
-	active?: boolean;
-	handled?: boolean;
-}
-export interface QuickFilter<TWidget extends Widget<P>, P> {
-	field?: string;
-	type?: {
-		new (options?: P): TWidget;
-		prototype: TWidget;
-	};
-	handler?: (h: QuickFilterArgs<TWidget>) => void;
-	title?: string;
-	options?: P & WidgetProps<{}>;
-	element?: (e: Fluent) => void;
-	init?: (w: TWidget) => void;
-	separator?: boolean;
-	cssClass?: string;
-	loadState?: (w: TWidget, state: any) => void;
-	saveState?: (w: TWidget) => any;
-	displayText?: (w: TWidget, label: string) => string;
-}
-export interface QuickFilterBarOptions {
-	filters: QuickFilter<Widget<any>, any>[];
-	getTitle?: (filter: QuickFilter<Widget<any>, any>) => string;
-	idPrefix?: string;
-}
-export declare class QuickFilterBar<P extends QuickFilterBarOptions = QuickFilterBarOptions> extends Widget<P> {
-	static [Symbol.typeInfo]: ClassTypeInfo<"Serenity.">;
+	private store;
+	private onFilterStoreChanged;
 	constructor(props: WidgetProps<P>);
-	addSeparator(): void;
-	add<TWidget extends Widget<any>, TOptions>(opt: QuickFilter<TWidget, TOptions>): TWidget;
-	addDateRange(field: string, title?: string): DateEditor;
-	static dateRange(field: string, title?: string): QuickFilter<DateEditor, DateTimeEditorOptions>;
-	addDateTimeRange(field: string, title?: string): DateTimeEditor;
-	static dateTimeRange(field: string, title?: string, useUtc?: boolean): QuickFilter<DateTimeEditor, DateTimeEditorOptions>;
-	addBoolean(field: string, title?: string, yes?: string, no?: string): SelectEditor;
-	static boolean(field: string, title?: string, yes?: string, no?: string): QuickFilter<SelectEditor, SelectEditorOptions>;
-	onChange: (e: Event) => void;
-	private submitHandlers;
 	destroy(): void;
-	onSubmit(request: ListRequest): void;
-	protected add_submitHandlers(action: (request: ListRequest) => void): void;
-	protected remove_submitHandlers(action: (request: ListRequest) => void): void;
-	protected clear_submitHandlers(): void;
-	find<TWidget>(type: {
-		new (...args: any[]): TWidget;
-	}, field: string): TWidget;
-	tryFind<TWidget>(type: {
-		new (...args: any[]): TWidget;
-	}, field: string): TWidget;
+	protected filterStoreChanged(): void;
+	get_store(): FilterStore;
+	set_store(value: FilterStore): void;
+}
+export declare class FilterDisplayBar<P = {}> extends FilterWidgetBase<P> {
+	static [Symbol.typeInfo]: ClassTypeInfo<"Serenity.">;
+	protected renderContents(): any;
+	protected filterStoreChanged(): void;
 }
 export interface QuickSearchField {
 	name: string;
@@ -5832,573 +5046,6 @@ export declare class QuickSearchInput<P extends QuickSearchInputOptions = QuickS
 	protected updateInputPlaceHolder(): void;
 	restoreState(value: string, field: QuickSearchField): void;
 	protected searchNow(value: string): void;
-}
-export interface FilterOperator {
-	key?: string;
-	title?: string;
-	format?: string;
-}
-export declare namespace FilterOperators {
-	const isTrue = "true";
-	const isFalse = "false";
-	const contains = "contains";
-	const startsWith = "startswith";
-	const EQ = "eq";
-	const NE = "ne";
-	const GT = "gt";
-	const GE = "ge";
-	const LT = "lt";
-	const LE = "le";
-	const BW = "bw";
-	const IN = "in";
-	const isNull = "isnull";
-	const isNotNull = "isnotnull";
-	const toCriteriaOperator: {
-		[key: string]: string;
-	};
-}
-export interface FilterLine {
-	field?: string;
-	operator?: string;
-	isOr?: boolean;
-	leftParen?: boolean;
-	rightParen?: boolean;
-	validationError?: string;
-	criteria?: any[];
-	displayText?: string;
-	state?: any;
-}
-export declare class FilterStore {
-	static [Symbol.typeInfo]: ClassTypeInfo<"Serenity.">;
-	constructor(fields: PropertyItem[]);
-	static getCriteriaFor(items: FilterLine[]): any[];
-	static getDisplayTextFor(items: FilterLine[]): string;
-	private changed;
-	private displayText;
-	private fields;
-	private fieldByName;
-	private items;
-	get_fields(): PropertyItem[];
-	get_fieldByName(): {
-		[key: string]: PropertyItem;
-	};
-	get_items(): FilterLine[];
-	raiseChanged(): void;
-	add_changed(value: (e: Event, a: any) => void): void;
-	remove_changed(value: (e: Event, a: any) => void): void;
-	get_activeCriteria(): any[];
-	get_displayText(): string;
-}
-export declare function delegateCombine(delegate1: any, delegate2: any): any;
-export declare function delegateRemove(delegate1: any, delegate2: any): any;
-export declare function delegateContains(targets: any[], object: any, method: any): boolean;
-interface CriteriaWithText {
-	criteria?: any[];
-	displayText?: string;
-}
-export interface IFiltering {
-	createEditor(): void;
-	getCriteria(): CriteriaWithText;
-	getOperators(): FilterOperator[];
-	loadState(state: any): void;
-	saveState(): any;
-	get_field(): PropertyItem;
-	set_field(value: PropertyItem): void;
-	get_container(): HTMLElement;
-	set_container(value: HTMLElement): void;
-	get_operator(): FilterOperator;
-	set_operator(value: FilterOperator): void;
-}
-export declare class IFiltering {
-	static [Symbol.typeInfo]: InterfaceTypeInfo<"Serenity.">;
-}
-export interface IQuickFiltering {
-	initQuickFilter(filter: QuickFilter<Widget<any>, any>): void;
-}
-export declare class IQuickFiltering {
-	static [Symbol.typeInfo]: InterfaceTypeInfo<"Serenity.">;
-}
-export declare namespace FilteringTypeRegistry {
-	let get: (key: string) => Function;
-	let getOrLoad: (key: string) => Function | PromiseLike<Function>;
-	let reset: () => void;
-	let tryGet: (key: string) => Function;
-	let tryGetOrLoad: (key: string) => Function | PromiseLike<Function>;
-}
-export declare abstract class BaseFiltering implements IFiltering, IQuickFiltering {
-	private field;
-	get_field(): PropertyItem;
-	set_field(value: PropertyItem): void;
-	private container;
-	get_container(): HTMLElement;
-	set_container(value: HTMLElement): void;
-	private operator;
-	get_operator(): FilterOperator;
-	set_operator(value: FilterOperator): void;
-	abstract getOperators(): FilterOperator[];
-	protected appendNullableOperators(list: FilterOperator[]): FilterOperator[];
-	protected appendComparisonOperators(list: FilterOperator[]): FilterOperator[];
-	protected isNullable(): boolean;
-	createEditor(): void;
-	protected operatorFormat(op: FilterOperator): string;
-	protected getTitle(field: PropertyItem): string;
-	protected displayText(op: FilterOperator, values?: any[]): string;
-	protected getCriteriaField(): string;
-	getCriteria(): CriteriaWithText;
-	loadState(state: any): void;
-	saveState(): string;
-	protected argumentNull(): Error;
-	validateEditorValue(value: string): string;
-	getEditorValue(): string;
-	getEditorText(): string;
-	initQuickFilter(filter: QuickFilter<Widget<any>, any>): void;
-	protected static registerClass<TypeName>(typeName: StringLiteral<TypeName>, intfAndAttr?: any[]): ClassTypeInfo<TypeName>;
-	static [Symbol.typeInfo]: ClassTypeInfo<"Serenity.">;
-}
-export declare class BooleanFiltering extends BaseFiltering {
-	static [Symbol.typeInfo]: ClassTypeInfo<"Serenity.">;
-	getOperators(): FilterOperator[];
-}
-export declare abstract class BaseEditorFiltering<TEditor extends Widget<any>> extends BaseFiltering {
-	editorTypeRef: any;
-	static [Symbol.typeInfo]: ClassTypeInfo<"Serenity.">;
-	constructor(editorTypeRef: any);
-	protected useEditor(): boolean;
-	protected editor: TEditor;
-	createEditor(): void;
-	protected useIdField(): boolean;
-	getCriteriaField(): string;
-	getEditorOptions(): any;
-	loadState(state: any): void;
-	saveState(): any;
-	getEditorValue(): any;
-	initQuickFilter(filter: QuickFilter<Widget<any>, any>): void;
-}
-export declare class DateFiltering extends BaseEditorFiltering<DateEditor> {
-	static [Symbol.typeInfo]: ClassTypeInfo<"Serenity.">;
-	constructor();
-	getOperators(): FilterOperator[];
-}
-export declare class DateTimeFiltering extends BaseEditorFiltering<DateEditor> {
-	static [Symbol.typeInfo]: ClassTypeInfo<"Serenity.">;
-	constructor();
-	getOperators(): FilterOperator[];
-	getCriteria(): CriteriaWithText;
-}
-export declare class DecimalFiltering extends BaseEditorFiltering<DecimalEditor> {
-	static [Symbol.typeInfo]: ClassTypeInfo<"Serenity.">;
-	constructor();
-	getOperators(): FilterOperator[];
-}
-export declare class EditorFiltering extends BaseEditorFiltering<Widget<any>> {
-	readonly props: {
-		editorType?: string;
-		useRelative?: boolean;
-		useLike?: boolean;
-	};
-	static [Symbol.typeInfo]: ClassTypeInfo<"Serenity.">;
-	constructor(props?: {
-		editorType?: string;
-		useRelative?: boolean;
-		useLike?: boolean;
-	});
-	get editorType(): string;
-	set editorType(value: string);
-	get useRelative(): boolean;
-	set useRelative(value: boolean);
-	get useLike(): boolean;
-	set useLike(value: boolean);
-	getOperators(): FilterOperator[];
-	protected useEditor(): boolean;
-	getEditorOptions(): any;
-	createEditor(): void;
-	protected useIdField(): boolean;
-	initQuickFilter(filter: QuickFilter<Widget<any>, any>): void;
-}
-export declare class EnumFiltering extends BaseEditorFiltering<EnumEditor> {
-	static [Symbol.typeInfo]: ClassTypeInfo<"Serenity.">;
-	constructor();
-	getOperators(): FilterOperator[];
-	getEditorText(): string;
-}
-export declare class IntegerFiltering extends BaseEditorFiltering<IntegerEditor> {
-	static [Symbol.typeInfo]: ClassTypeInfo<"Serenity.">;
-	constructor();
-	getOperators(): FilterOperator[];
-}
-export declare class LookupFiltering extends BaseEditorFiltering<LookupEditor> {
-	static [Symbol.typeInfo]: ClassTypeInfo<"Serenity.">;
-	constructor();
-	getOperators(): FilterOperator[];
-	protected useEditor(): boolean;
-	protected useIdField(): boolean;
-	getEditorText(): string;
-}
-export declare class ServiceLookupFiltering extends BaseEditorFiltering<ServiceLookupEditor> {
-	static [Symbol.typeInfo]: ClassTypeInfo<"Serenity.">;
-	constructor();
-	getOperators(): FilterOperator[];
-	protected useEditor(): boolean;
-	protected useIdField(): boolean;
-	getEditorText(): string;
-}
-export declare class StringFiltering extends BaseFiltering {
-	static [Symbol.typeInfo]: ClassTypeInfo<"Serenity.">;
-	getOperators(): FilterOperator[];
-	validateEditorValue(value: string): string;
-}
-export declare class FilterWidgetBase<P = {}> extends Widget<P> {
-	static [Symbol.typeInfo]: ClassTypeInfo<"Serenity.">;
-	private store;
-	private onFilterStoreChanged;
-	constructor(props: WidgetProps<P>);
-	destroy(): void;
-	protected filterStoreChanged(): void;
-	get_store(): FilterStore;
-	set_store(value: FilterStore): void;
-}
-export interface FilterFieldSelectOptions {
-	fields: PropertyItem[];
-}
-export declare class FilterPanel<P = {}> extends FilterWidgetBase<P> {
-	static [Symbol.typeInfo]: ClassTypeInfo<"Serenity.">;
-	private rowsDiv;
-	private resetButton;
-	private searchButton;
-	constructor(props: WidgetProps<P>);
-	private _showInitialLine;
-	get showInitialLine(): boolean;
-	set showInitialLine(value: boolean);
-	protected filterStoreChanged(): void;
-	updateRowsFromStore(): void;
-	private _showSearchButton;
-	get showSearchButton(): boolean;
-	set showSearchButton(value: boolean);
-	updateStoreOnReset: boolean;
-	protected renderContents(): any;
-	protected searchButtonClick(e: Event): void;
-	get_hasErrors(): boolean;
-	search(): void;
-	protected addButtonClick(e: Event): void;
-	protected resetButtonClick(e: Event): void;
-	protected findEmptyRow(): HTMLElement;
-	protected addEmptyRow(popupField: boolean): HTMLElement;
-	protected onRowFieldChange(e: Event): void;
-	protected rowFieldChange(row: HTMLElement): void;
-	protected removeFiltering(row: HTMLElement): void;
-	protected populateOperatorList(row: HTMLElement): void;
-	protected getFieldFor(row: HTMLElement): PropertyItem;
-	protected getFilteringFor(row: HTMLElement): IFiltering;
-	protected onRowOperatorChange(e: Event): void;
-	protected rowOperatorChange(row: HTMLElement): void;
-	protected deleteRowClick(e: Event): void;
-	protected updateButtons(): void;
-	protected andOrClick(e: Event): void;
-	protected leftRightParenClick(e: Event): void;
-	protected updateParens(): void;
-}
-export declare class FilterDialog<P = {}> extends BaseDialog<P> {
-	static [Symbol.typeInfo]: ClassTypeInfo<"Serenity.">;
-	private filterPanel;
-	constructor(props: WidgetProps<P>);
-	get_filterPanel(): FilterPanel;
-	protected renderContents(): any;
-	protected getDialogOptions(): DialogOptions;
-	protected getDialogButtons(): DialogButton[];
-}
-export declare class FilterDisplayBar<P = {}> extends FilterWidgetBase<P> {
-	static [Symbol.typeInfo]: ClassTypeInfo<"Serenity.">;
-	protected renderContents(): any;
-	protected filterStoreChanged(): void;
-}
-export declare class SlickPager<P extends PagerOptions = PagerOptions> extends Widget<P> {
-	static [Symbol.typeInfo]: ClassTypeInfo<"Serenity.">;
-	private currentPage;
-	private totalPages;
-	private pageSize;
-	private stat;
-	constructor(props: WidgetProps<P>);
-	_changePage(ctype: string): boolean;
-	_updatePager(): void;
-}
-export interface IDataGrid {
-	getElement(): HTMLElement;
-	getGrid(): Grid;
-	getView(): IRemoteView<any>;
-	getFilterStore(): FilterStore;
-}
-export declare class ColumnsBase<TRow = any> {
-	constructor(items: Column<TRow>[]);
-	valueOf(): Column<TRow>[];
-}
-/**
- * Renders an edit link for a given item type and ID.
- * The link will have a CSS class based on the item type and will point to a URL fragment
- * that includes the item type and ID.
- * This is similar to SlickHelper.itemLink function, but it doesn't require a grid context
- * and does not accept FormatterResult (e.g. html string markup) as children.
- *
- * @param props - The properties for the edit link.
- * @returns An HTML anchor element representing the edit link.
- */
-export declare function EditLink(props: {
-	/**
-	 * The ID of the item to link to.
-	 */
-	itemId: any;
-	/**
-	 * The type of the item, e.g. "Northwind.Customer".
-	 */
-	itemType?: string;
-	/**
-	 * Additional CSS class to add to the link (besides s-EditLink and s-[ItemType]Link)
-	 */
-	cssClass?: string;
-	/**
-	 * Tab index for the link. Default is null, which means no tabindex attribute.
-	 */
-	tabIndex?: number;
-	/**
-	 * Child elements or text to be displayed inside the link.
-	 */
-	children?: any;
-}): HTMLAnchorElement;
-export interface GridRadioSelectionMixinOptions {
-	selectable?: (item: any) => boolean;
-}
-export declare class GridRadioSelectionMixin {
-	static [Symbol.typeInfo]: ClassTypeInfo<"Serenity.">;
-	private idField;
-	private include;
-	private grid;
-	private options;
-	constructor(grid: IDataGrid, options?: GridRadioSelectionMixinOptions);
-	private isSelectable;
-	clear(): void;
-	resetCheckedAndRefresh(): void;
-	getSelectedKey(): string;
-	getSelectedAsInt32(): number;
-	getSelectedAsInt64(): number;
-	setSelectedKey(key: string): void;
-	static createSelectColumn(getMixin: () => GridRadioSelectionMixin): Column;
-}
-export interface GridRowSelectionMixinOptions {
-	selectable?: (item: any) => boolean;
-}
-export declare class GridRowSelectionMixin {
-	static [Symbol.typeInfo]: ClassTypeInfo<"Serenity.">;
-	private idField;
-	private include;
-	private grid;
-	private options;
-	constructor(grid: IDataGrid, options?: GridRowSelectionMixinOptions);
-	updateSelectAll(): void;
-	clear(): void;
-	resetCheckedAndRefresh(): void;
-	selectKeys(keys: string[]): void;
-	getSelectedKeys(): string[];
-	getSelectedAsInt32(): number[];
-	getSelectedAsInt64(): number[];
-	setSelectedKeys(keys: string[]): void;
-	private isSelectable;
-	static createSelectColumn(getMixin: () => GridRowSelectionMixin): Column;
-}
-export declare namespace GridSelectAllButtonHelper {
-	function update(grid: IDataGrid, getSelected: (p1: any) => boolean): void;
-	function define(getGrid: () => IDataGrid, getId: (p1: any) => any, getSelected: (p1: any) => boolean, setSelected: (p1: any, p2: boolean) => void, text?: string, onClick?: () => void): ToolButton;
-}
-export declare namespace GridUtils {
-	function addToggleButton(toolDiv: HTMLElement | ArrayLike<HTMLElement>, cssClass: string, callback: (p1: boolean) => void, hint: string, initial?: boolean): void;
-	function addIncludeDeletedToggle(toolDiv: HTMLElement | ArrayLike<HTMLElement>, view: IRemoteView<any>, hint?: string, initial?: boolean): void;
-	function addQuickSearchInput(toolDiv: HTMLElement | ArrayLike<HTMLElement>, view: IRemoteView<any>, fields?: QuickSearchField[], onChange?: () => void): QuickSearchInput;
-	function addQuickSearchInputCustom(container: HTMLElement | ArrayLike<HTMLElement>, onSearch: (p1: string, p2: string, done: (p3: boolean) => void) => void, fields?: QuickSearchField[]): QuickSearchInput;
-	function makeOrderable(grid: Grid, handleMove: (rows: number[], insertBefore: number) => void): void;
-	function makeOrderableWithUpdateRequest<TItem = any, TId = any>(grid: IDataGrid, getId: (item: TItem) => TId, getDisplayOrder: (item: TItem) => any, service: string, getUpdateRequest: (id: TId, order: number) => SaveRequest<TItem>): void;
-}
-export declare namespace PropertyItemSlickConverter {
-	function toSlickColumns(items: PropertyItem[]): Column[];
-	function toSlickColumn(item: PropertyItem): Column;
-}
-export declare namespace SlickFormatting {
-	function itemLink<TItem = any>(itemType: string, idField: string, getText: Format<TItem>, cssClass?: (ctx: FormatterContext<TItem>) => string, encode?: boolean): Format<TItem>;
-	function treeToggle(getView: () => IRemoteView<any>, getId: (x: any) => any, formatter: Format): Format;
-}
-export declare namespace SlickHelper {
-	function setDefaults(columns: Column[], localTextPrefix?: string): any;
-}
-export declare namespace SlickTreeHelper {
-	function filterCustom<TItem>(item: TItem, getParent: (x: TItem) => any): boolean;
-	function filterById<TItem>(item: TItem, view: IRemoteView<TItem>, getParentId: (x: TItem) => any): boolean;
-	function setCollapsed<TItem>(items: TItem[], collapsed: boolean): void;
-	function setCollapsedFlag<TItem>(item: TItem, collapsed: boolean): void;
-	function setIndents<TItem>(items: TItem[], getId: (x: TItem) => any, getParentId: (x: TItem) => any, setCollapsed?: boolean): void;
-	function toggleClick<TItem>(e: Event, row: number, cell: number, view: IRemoteView<TItem>, getId: (x: TItem) => any): void;
-}
-export interface IInitializeColumn {
-	initializeColumn(column: Column): void;
-}
-export declare class IInitializeColumn {
-	static [Symbol.typeInfo]: InterfaceTypeInfo<"Serenity.">;
-}
-export declare abstract class FormatterBase implements Formatter {
-	abstract format(ctx: FormatterContext): FormatterResult;
-	protected static registerFormatter<TypeName>(typeName: StringLiteral<TypeName>, intfAndAttr?: any[]): FormatterTypeInfo<TypeName>;
-	static [Symbol.typeInfo]: FormatterTypeInfo<"Serenity.">;
-}
-export declare class BooleanFormatter implements Formatter {
-	readonly props: {
-		falseText?: string;
-		falseIcon?: IconClassName;
-		nullText?: string;
-		nullIcon?: IconClassName;
-		trueText?: string;
-		trueIcon?: IconClassName;
-		showText?: boolean;
-		showHint?: boolean;
-	};
-	static [Symbol.typeInfo]: FormatterTypeInfo<"Serenity.">;
-	constructor(props?: {
-		falseText?: string;
-		falseIcon?: IconClassName;
-		nullText?: string;
-		nullIcon?: IconClassName;
-		trueText?: string;
-		trueIcon?: IconClassName;
-		showText?: boolean;
-		showHint?: boolean;
-	});
-	format(ctx: FormatterContext): FormatterResult;
-	get falseText(): string;
-	set falseText(value: string);
-	get trueText(): string;
-	set trueText(value: string);
-}
-export declare class CheckboxFormatter implements Formatter {
-	readonly props: {
-		falseText?: string;
-		falseIcon?: IconClassName;
-		nullText?: string;
-		nullIcon?: IconClassName;
-		trueText?: string;
-		trueIcon?: IconClassName;
-		showText?: boolean;
-		showHint?: boolean;
-	};
-	static [Symbol.typeInfo]: FormatterTypeInfo<"Serenity.">;
-	constructor(props?: {
-		falseText?: string;
-		falseIcon?: IconClassName;
-		nullText?: string;
-		nullIcon?: IconClassName;
-		trueText?: string;
-		trueIcon?: IconClassName;
-		showText?: boolean;
-		showHint?: boolean;
-	});
-	format(ctx: FormatterContext): FormatterResult;
-}
-export declare class DateFormatter implements Formatter {
-	readonly props: {
-		displayFormat?: string;
-	};
-	static [Symbol.typeInfo]: FormatterTypeInfo<"Serenity.">;
-	constructor(props?: {
-		displayFormat?: string;
-	});
-	static format(value: any, format?: string): any;
-	get displayFormat(): string;
-	set displayFormat(value: string);
-	format(ctx: FormatterContext): string;
-}
-export declare class DateTimeFormatter extends DateFormatter {
-	static [Symbol.typeInfo]: FormatterTypeInfo<"Serenity.">;
-	constructor(props?: {
-		displayFormat?: string;
-	});
-}
-export declare class EnumFormatter implements Formatter {
-	readonly props: {
-		enumKey?: string;
-	};
-	static [Symbol.typeInfo]: FormatterTypeInfo<"Serenity.">;
-	constructor(props?: {
-		enumKey?: string;
-	});
-	format(ctx: FormatterContext): string | Element;
-	get enumKey(): string;
-	set enumKey(value: string);
-	static format(enumType: any, value: any): string;
-	static getText(enumKey: string, name: string): string;
-	static getName(enumType: any, value: any): string;
-}
-export declare class FileDownloadFormatter implements Formatter, IInitializeColumn {
-	readonly props: {
-		displayFormat?: string;
-		originalNameProperty?: string;
-		iconClass?: string;
-	};
-	static [Symbol.typeInfo]: FormatterTypeInfo<"Serenity.">;
-	constructor(props?: {
-		displayFormat?: string;
-		originalNameProperty?: string;
-		iconClass?: string;
-	});
-	format(ctx: FormatterContext): string;
-	static dbFileUrl(filename: string): string;
-	initializeColumn(column: Column): void;
-	get displayFormat(): string;
-	set displayFormat(value: string);
-	get originalNameProperty(): string;
-	set originalNameProperty(value: string);
-	get iconClass(): string;
-	set iconClass(value: string);
-}
-export declare class MinuteFormatter implements Formatter {
-	static [Symbol.typeInfo]: FormatterTypeInfo<"Serenity.">;
-	format(ctx: FormatterContext): string;
-	static format(value: number): string;
-}
-export declare class NumberFormatter implements Formatter {
-	readonly props: {
-		displayFormat?: string;
-	};
-	static [Symbol.typeInfo]: FormatterTypeInfo<"Serenity.">;
-	constructor(props?: {
-		displayFormat?: string;
-	});
-	format(ctx: FormatterContext): string;
-	static format(value: any, format?: string): string;
-	get displayFormat(): string;
-	set displayFormat(value: string);
-}
-export declare class UrlFormatter implements Formatter, IInitializeColumn {
-	readonly props: {
-		displayProperty?: string;
-		displayFormat?: string;
-		urlProperty?: string;
-		urlFormat?: string;
-		target?: string;
-	};
-	static [Symbol.typeInfo]: FormatterTypeInfo<"Serenity.">;
-	constructor(props?: {
-		displayProperty?: string;
-		displayFormat?: string;
-		urlProperty?: string;
-		urlFormat?: string;
-		target?: string;
-	});
-	format(ctx: FormatterContext): string;
-	initializeColumn(column: Column): void;
-	get displayProperty(): string;
-	set displayProperty(value: string);
-	get displayFormat(): string;
-	set displayFormat(value: string);
-	get urlProperty(): string;
-	set urlProperty(value: string);
-	get urlFormat(): string;
-	set urlFormat(value: string);
-	get target(): string;
-	set target(value: string);
 }
 export interface SettingStorage {
 	getItem(key: string): string | Promise<string>;
@@ -6432,6 +5079,121 @@ export interface GridPersistanceFlags {
 	includeDeleted?: boolean;
 }
 export declare const omitAllGridPersistenceFlags: GridPersistanceFlags;
+export interface IRowDefinition {
+	readonly deletePermission?: string;
+	readonly idProperty?: string;
+	readonly insertPermission?: string;
+	readonly isActiveProperty?: string;
+	readonly isDeletedProperty?: string;
+	readonly localTextPrefix?: string;
+	readonly nameProperty?: string;
+	readonly readPermission?: string;
+	readonly updatePermission?: string;
+}
+export interface QuickFilterArgs<TWidget> {
+	field?: string;
+	widget?: TWidget;
+	request?: ListRequest;
+	equalityFilter?: any;
+	value?: any;
+	active?: boolean;
+	handled?: boolean;
+}
+export interface QuickFilter<TWidget extends Widget<P>, P> {
+	field?: string;
+	type?: {
+		new (options?: P): TWidget;
+		prototype: TWidget;
+	};
+	handler?: (h: QuickFilterArgs<TWidget>) => void;
+	title?: string;
+	options?: P & WidgetProps<{}>;
+	element?: (e: Fluent) => void;
+	init?: (w: TWidget) => void;
+	separator?: boolean;
+	cssClass?: string;
+	loadState?: (w: TWidget, state: any) => void;
+	saveState?: (w: TWidget) => any;
+	displayText?: (w: TWidget, label: string) => string;
+}
+export declare class DateTimeEditor<P extends DateTimeEditorOptions = DateTimeEditorOptions> extends EditorWidget<P> implements IStringValue, IReadOnly {
+	static [Symbol.typeInfo]: EditorTypeInfo<"Serenity.">;
+	static createDefaultElement(): HTMLInputElement;
+	readonly domNode: HTMLInputElement;
+	private time;
+	private lastSetValue;
+	private lastSetValueGet;
+	constructor(props: EditorProps<P>);
+	setToNow(triggerChange?: boolean): void;
+	destroy(): void;
+	getFlatpickrOptions(): any;
+	createFlatPickrTrigger(): HTMLElement;
+	get_value(): string;
+	get value(): string;
+	set_value(value: string): void;
+	private getInplaceNowText;
+	private getDisplayFormat;
+	set value(v: string);
+	private get_valueAsDate;
+	get valueAsDate(): Date;
+	private set_valueAsDate;
+	set valueAsDate(value: Date);
+	get_minValue(): string;
+	set_minValue(value: string): void;
+	get_maxValue(): string;
+	set_maxValue(value: string): void;
+	get_minDate(): Date;
+	set_minDate(value: Date): void;
+	get_maxDate(): Date;
+	set_maxDate(value: Date): void;
+	get_sqlMinMax(): boolean;
+	set_sqlMinMax(value: boolean): void;
+	get_readOnly(): boolean;
+	set_readOnly(value: boolean): void;
+	static roundToMinutes(date: Date, minutesStep: number): Date;
+	static getTimeOptions: (fromHour: number, fromMin: number, toHour: number, toMin: number, stepMins: number) => string[];
+}
+export interface DateTimeEditorOptions {
+	startHour?: any;
+	endHour?: any;
+	intervalMinutes?: any;
+	minValue?: string;
+	maxValue?: string;
+	yearRange?: string;
+	useUtc?: boolean;
+	seconds?: boolean;
+	inputOnly?: boolean;
+}
+export interface QuickFilterBarOptions {
+	filters: QuickFilter<Widget<any>, any>[];
+	getTitle?: (filter: QuickFilter<Widget<any>, any>) => string;
+	idPrefix?: string;
+}
+export declare class QuickFilterBar<P extends QuickFilterBarOptions = QuickFilterBarOptions> extends Widget<P> {
+	static [Symbol.typeInfo]: ClassTypeInfo<"Serenity.">;
+	constructor(props: WidgetProps<P>);
+	addSeparator(): void;
+	add<TWidget extends Widget<any>, TOptions>(opt: QuickFilter<TWidget, TOptions>): TWidget;
+	addDateRange(field: string, title?: string): DateEditor;
+	static dateRange(field: string, title?: string): QuickFilter<DateEditor, DateTimeEditorOptions>;
+	addDateTimeRange(field: string, title?: string): DateTimeEditor;
+	static dateTimeRange(field: string, title?: string, useUtc?: boolean): QuickFilter<DateTimeEditor, DateTimeEditorOptions>;
+	addBoolean(field: string, title?: string, yes?: string, no?: string): SelectEditor;
+	static boolean(field: string, title?: string, yes?: string, no?: string): QuickFilter<SelectEditor, SelectEditorOptions>;
+	onChange: (e: Event) => void;
+	private submitHandlers;
+	destroy(): void;
+	onSubmit(request: ListRequest): void;
+	protected add_submitHandlers(action: (request: ListRequest) => void): void;
+	protected remove_submitHandlers(action: (request: ListRequest) => void): void;
+	protected clear_submitHandlers(): void;
+	find<TWidget>(type: {
+		new (...args: any[]): TWidget;
+	}, field: string): TWidget;
+	tryFind<TWidget>(type: {
+		new (...args: any[]): TWidget;
+	}, field: string): TWidget;
+}
 export declare class DataGrid<TItem, P = {}> extends Widget<P> implements IDataGrid, IReadOnly {
 	static [Symbol.typeInfo]: ClassTypeInfo<"Serenity.">;
 	private _isDisabled;
@@ -6599,158 +5361,6 @@ export declare class DataGrid<TItem, P = {}> extends Widget<P> implements IDataG
 	getView(): IRemoteView<TItem>;
 	getFilterStore(): FilterStore;
 }
-export declare class ColumnPickerDialog<P = {}> extends BaseDialog<P> {
-	static [Symbol.typeInfo]: ClassTypeInfo<"Serenity.">;
-	private ulVisible;
-	private ulHidden;
-	private colById;
-	allColumns: Column[];
-	visibleColumns: string[];
-	defaultColumns: string[];
-	done: () => void;
-	protected renderContents(): any;
-	static createToolButton(grid: IDataGrid): ToolButton;
-	protected getDialogButtons(): DialogButton[];
-	protected getDialogOptions(): DialogOptions;
-	private getTitle;
-	private allowHide;
-	private createLI;
-	private updateListStates;
-	protected setupColumns(): void;
-	protected onDialogOpen(): void;
-}
-/**
- * A mixin that can be applied to a DataGrid for tree functionality
- */
-export declare class TreeGridMixin<TItem> {
-	private options;
-	private dataGrid;
-	constructor(options: TreeGridMixinOptions<TItem>);
-	/**
-	 * Expands / collapses all rows in a grid automatically
-	 */
-	toggleAll(): void;
-	collapseAll(): void;
-	expandAll(): void;
-	/**
-	 * Reorders a set of items so that parents comes before their children.
-	 * This method is required for proper tree ordering, as it is not so easy to perform with SQL.
-	 * @param items list of items to be ordered
-	 * @param getId a delegate to get ID of a record (must return same ID with grid identity field)
-	 * @param getParentId a delegate to get parent ID of a record
-	 */
-	static applyTreeOrdering<TItem>(items: TItem[], getId: (item: TItem) => any, getParentId: (item: TItem) => any): TItem[];
-}
-export interface TreeGridMixinOptions<TItem> {
-	grid: DataGrid<TItem, any>;
-	getParentId: (item: TItem) => any;
-	toggleField: string;
-	initialCollapse?: () => boolean;
-}
-export interface CheckTreeItem<TSource> {
-	isSelected?: boolean;
-	hideCheckBox?: boolean;
-	isAllDescendantsSelected?: boolean;
-	id?: string;
-	text?: string;
-	parentId?: string;
-	children?: CheckTreeItem<TSource>[];
-	source?: TSource;
-}
-export declare class CheckTreeEditor<TItem extends CheckTreeItem<TItem>, P = {}> extends DataGrid<TItem, P> implements IGetEditValue, ISetEditValue, IReadOnly {
-	static [Symbol.typeInfo]: EditorTypeInfo<"Serenity.">;
-	static createDefaultElement(): HTMLDivElement;
-	private itemById;
-	constructor(props: EditorProps<P>);
-	protected getIdProperty(): string;
-	protected getTreeItems(): TItem[];
-	protected updateItems(): void;
-	getEditValue(property: PropertyItem, target: any): void;
-	setEditValue(source: any, property: PropertyItem): void;
-	protected getButtons(): ToolButton[];
-	protected itemSelectedChanged(item: TItem): void;
-	protected getSelectAllText(): string;
-	protected isThreeStateHierarchy(): boolean;
-	protected createSlickGrid(): Grid;
-	protected onViewFilter(item: TItem): boolean;
-	protected getInitialCollapse(): boolean;
-	protected onViewProcessData(response: ListResponse<TItem>): ListResponse<TItem>;
-	protected onClick(e: Event, row: number, cell: number): void;
-	protected updateSelectAll(): void;
-	protected updateFlags(): void;
-	protected getDescendantsSelected(item: TItem): boolean;
-	protected setAllSubTreeSelected(item: TItem, selected: boolean): boolean;
-	protected allItemsSelected(): boolean;
-	protected allDescendantsSelected(item: TItem): boolean;
-	protected getDelimited(): boolean;
-	protected anyDescendantsSelected(item: TItem): boolean;
-	protected getColumns(): Column[];
-	protected getItemText(ctx: FormatterContext): string;
-	protected getSlickOptions(): GridOptions;
-	protected sortItems(): void;
-	protected moveSelectedUp(): boolean;
-	private _readOnly;
-	get_readOnly(): boolean;
-	set_readOnly(value: boolean): void;
-	private get_value;
-	get value(): string[];
-	private set_value;
-	set value(v: string[]);
-}
-export interface CheckLookupEditorOptions {
-	lookupKey?: string;
-	checkedOnTop?: boolean;
-	showSelectAll?: boolean;
-	hideSearch?: boolean;
-	delimited?: boolean;
-	cascadeFrom?: string;
-	cascadeField?: string;
-	cascadeValue?: any;
-	filterField?: string;
-	filterValue?: any;
-}
-export declare class CheckLookupEditor<TItem extends CheckTreeItem<TItem> = any, P extends CheckLookupEditorOptions = CheckLookupEditorOptions> extends CheckTreeEditor<CheckTreeItem<TItem>, P> {
-	static [Symbol.typeInfo]: EditorTypeInfo<"Serenity.">;
-	private searchText;
-	private enableUpdateItems;
-	private lookupChangeUnbind;
-	constructor(props: EditorProps<P>);
-	destroy(): void;
-	protected updateItems(): void;
-	protected getLookupKey(): string;
-	protected getButtons(): ToolButton[];
-	protected createToolbarExtensions(): void;
-	protected getSelectAllText(): string;
-	protected cascadeItems(items: TItem[]): TItem[];
-	protected filterItems(items: TItem[]): TItem[];
-	protected getLookupItems(lookup: Lookup<TItem>): TItem[];
-	protected getTreeItems(): CheckTreeItem<TItem>[];
-	protected onViewFilter(item: CheckTreeItem<TItem>): boolean;
-	protected moveSelectedUp(): boolean;
-	protected get_cascadeFrom(): string;
-	get cascadeFrom(): string;
-	protected getCascadeFromValue(parent: Widget<any>): any;
-	protected cascadeLink: CascadedWidgetLink<Widget<any>>;
-	protected setCascadeFrom(value: string): void;
-	protected set_cascadeFrom(value: string): void;
-	set cascadeFrom(value: string);
-	protected get_cascadeField(): string;
-	get cascadeField(): string;
-	protected set_cascadeField(value: string): void;
-	set cascadeField(value: string);
-	protected get_cascadeValue(): any;
-	get cascadeValue(): any;
-	protected set_cascadeValue(value: any): void;
-	set cascadeValue(value: any);
-	protected get_filterField(): string;
-	get filterField(): string;
-	protected set_filterField(value: string): void;
-	set filterField(value: string);
-	protected get_filterValue(): any;
-	get filterValue(): any;
-	protected set_filterValue(value: any): void;
-	set filterValue(value: any);
-}
 export declare class EntityGrid<TItem, P = {}> extends DataGrid<TItem, P> {
 	static [Symbol.typeInfo]: ClassTypeInfo<"Serenity.">;
 	constructor(props: WidgetProps<P>);
@@ -6791,14 +5401,147 @@ export declare class EntityGrid<TItem, P = {}> extends DataGrid<TItem, P> {
 	private _dialogType;
 	protected getDialogType(): DialogType | PromiseLike<DialogType>;
 }
-export type SaveInitiator = "save-and-close" | "apply-changes";
-export declare function saveAndCloseToolButton(opt?: ToolButton): ToolButton;
-export declare function applyChangesToolButton(opt?: ToolButton): ToolButton;
-export declare function deleteToolButton(opt?: ToolButton): ToolButton;
-export declare function undeleteToolButton(opt?: ToolButton): ToolButton;
-export declare function editToolButton(opt?: ToolButton): ToolButton;
-export declare function localizationToolButton(opt?: ToolButton): ToolButton;
-export declare function cloneToolButton(opt?: ToolButton): ToolButton;
+export declare class SlickPager<P extends PagerOptions = PagerOptions> extends Widget<P> {
+	static [Symbol.typeInfo]: ClassTypeInfo<"Serenity.">;
+	private currentPage;
+	private totalPages;
+	private pageSize;
+	private stat;
+	constructor(props: WidgetProps<P>);
+	_changePage(ctype: string): boolean;
+	_updatePager(): void;
+}
+/**
+ * A mixin that can be applied to a DataGrid for tree functionality
+ */
+export declare class TreeGridMixin<TItem> {
+	private options;
+	private dataGrid;
+	constructor(options: TreeGridMixinOptions<TItem>);
+	/**
+	 * Expands / collapses all rows in a grid automatically
+	 */
+	toggleAll(): void;
+	collapseAll(): void;
+	expandAll(): void;
+	/**
+	 * Reorders a set of items so that parents comes before their children.
+	 * This method is required for proper tree ordering, as it is not so easy to perform with SQL.
+	 * @param items list of items to be ordered
+	 * @param getId a delegate to get ID of a record (must return same ID with grid identity field)
+	 * @param getParentId a delegate to get parent ID of a record
+	 */
+	static applyTreeOrdering<TItem>(items: TItem[], getId: (item: TItem) => any, getParentId: (item: TItem) => any): TItem[];
+}
+export interface TreeGridMixinOptions<TItem> {
+	grid: DataGrid<TItem, any>;
+	getParentId: (item: TItem) => any;
+	toggleField: string;
+	initialCollapse?: () => boolean;
+}
+export declare namespace DialogExtensions {
+	function dialogResizable(dialog: HTMLElement | ArrayLike<HTMLElement>, w?: any, h?: any, mw?: any, mh?: any): void;
+	function dialogMaximizable(dialog: HTMLElement | ArrayLike<HTMLElement>): void;
+}
+export type PropertyFieldElement = HTMLElement & {
+	editorWidget?: Widget<any>;
+	editorPromise?: PromiseLike<void>;
+	propertyItem?: PropertyItem;
+};
+export declare function PropertyFieldCaption(props: {
+	item: Pick<PropertyItem, "name" | "hint" | "labelWidth" | "required" | "title">;
+	idPrefix?: string;
+	localTextPrefix?: string;
+}): HTMLLabelElement;
+export declare function PropertyFieldEditor(props: {
+	fieldElement: PropertyFieldElement;
+	item: Pick<PropertyItem, "editorCssClass" | "editorType" | "editorParams" | "maxLength" | "name" | "editorAddons" | "placeholder">;
+	idPrefix?: string;
+	localTextPrefix?: string;
+}): void;
+export declare function PropertyFieldLineBreak(props: {
+	item: Pick<PropertyItem, "formCssClass">;
+}): HTMLElement;
+export declare function PropertyField(props: {
+	item: PropertyItem;
+	container?: ParentNode;
+	idPrefix?: string;
+	localTextPrefix?: string;
+}): PropertyFieldElement;
+export declare function PropertyCategoryTitle(props: {
+	category: string;
+	localTextPrefix: string;
+}): HTMLElement;
+export declare function PropertyCategory(props: {
+	category?: string;
+	children?: any;
+	collapsed?: boolean;
+	localTextPrefix?: string;
+}): HTMLElement;
+export declare function PropertyTabItem(props: {
+	title: string;
+	active?: boolean;
+	paneId?: string;
+	localTextPrefix?: string;
+}): HTMLLIElement;
+export declare function PropertyTabPane(props: {
+	active?: boolean;
+	id?: string;
+	children?: any;
+}): HTMLElement;
+export declare function PropertyCategories(props: {
+	items: PropertyItem[];
+	container?: ParentNode;
+	fieldElements?: PropertyFieldElement[];
+	idPrefix?: string;
+	localTextPrefix?: string;
+}): HTMLElement;
+export declare function PropertyTabList(props?: {
+	children?: any;
+}): HTMLElement;
+export declare function PropertyTabPanes(_?: {}): HTMLElement;
+export declare function PropertyTabs(props: {
+	items: PropertyItem[];
+	container?: ParentNode;
+	fieldElements?: PropertyFieldElement[];
+	idPrefix?: string;
+	localTextPrefix?: string;
+	paneIdPrefix?: string;
+}): DocumentFragment | null;
+export declare class PropertyGrid<P extends PropertyGridOptions = PropertyGridOptions> extends Widget<P> {
+	static [Symbol.typeInfo]: ClassTypeInfo<"Serenity.">;
+	private fieldElements;
+	protected renderContents(): any;
+	destroy(): void;
+	get_editors(): Widget<any>[];
+	get_items(): PropertyItem[];
+	get_idPrefix(): string;
+	enumerateItems(callback: (p1: PropertyItem, p2: Widget<any>) => void): void;
+	get_mode(): PropertyGridMode;
+	set_mode(value: PropertyGridMode): void;
+	static loadFieldValue(source: any, fieldElement: PropertyFieldElement, mode?: PropertyGridMode): void;
+	load(source: any): void;
+	static saveFieldValue(target: any, fieldElement: PropertyFieldElement, canModify?: boolean): void;
+	save(target?: any): any;
+	get value(): any;
+	set value(val: any);
+	static canModifyItem(item: PropertyItem, mode?: PropertyGridMode): boolean;
+	protected canModifyItem(item: PropertyItem): boolean;
+	static updateFieldElement(fieldElement: PropertyFieldElement, mode?: PropertyGridMode, canModify?: boolean): void;
+	protected updateFieldElement(fieldElement: PropertyFieldElement): void;
+	updateInterface(): void;
+}
+export declare enum PropertyGridMode {
+	insert = 1,
+	update = 2
+}
+export interface PropertyGridOptions {
+	idPrefix?: string;
+	items: PropertyItem[];
+	localTextPrefix?: string;
+	value?: any;
+	mode?: PropertyGridMode;
+}
 export interface EntityLocalizerOptions {
 	byId: (id: string) => Fluent;
 	idPrefix: string;
@@ -6834,6 +5577,14 @@ export declare class EntityLocalizer {
 	protected getPendingLocalizations(): any;
 	updateInterface(): void;
 }
+export type SaveInitiator = "save-and-close" | "apply-changes";
+export declare function saveAndCloseToolButton(opt?: ToolButton): ToolButton;
+export declare function applyChangesToolButton(opt?: ToolButton): ToolButton;
+export declare function deleteToolButton(opt?: ToolButton): ToolButton;
+export declare function undeleteToolButton(opt?: ToolButton): ToolButton;
+export declare function editToolButton(opt?: ToolButton): ToolButton;
+export declare function localizationToolButton(opt?: ToolButton): ToolButton;
+export declare function cloneToolButton(opt?: ToolButton): ToolButton;
 export declare class EntityDialog<TItem, P = {}> extends BaseDialog<P> implements IEditDialog, IReadOnly {
 	static [Symbol.typeInfo]: ClassTypeInfo<"Serenity.">;
 	private _entity;
@@ -6951,6 +5702,1339 @@ export declare class EntityDialog<TItem, P = {}> extends BaseDialog<P> implement
 	protected renderContents(): any;
 	static get defaultLanguageList(): string[][];
 	static set defaultLanguageList(value: string[][]);
+}
+export declare class PropertyDialog<TItem, P> extends BaseDialog<P> {
+	static [Symbol.typeInfo]: ClassTypeInfo<"Serenity.">;
+	private _entity;
+	private _entityId;
+	protected propertyItemsData: PropertyItemsData;
+	protected isClosable(): boolean;
+	protected isStatic(): boolean;
+	constructor(props?: WidgetProps<P>);
+	protected propertyItemsReady(itemsData: PropertyItemsData): void;
+	protected afterInit(): void;
+	protected useAsync(): boolean;
+	destroy(): void;
+	protected getDialogOptions(): DialogOptions;
+	protected getDialogButtons(): DialogButton[];
+	protected okClick(): void;
+	protected okClickValidated(): void;
+	protected cancelClick(): void;
+	protected initPropertyGrid(): void;
+	protected getFormKey(): string;
+	protected getPropertyGridOptions(): PropertyGridOptions;
+	protected getPropertyItems(): PropertyItem[];
+	protected getPropertyItemsData(): PropertyItemsData;
+	protected getPropertyItemsDataAsync(): Promise<PropertyItemsData>;
+	protected getSaveEntity(): TItem;
+	protected loadInitialEntity(): void;
+	get entity(): TItem;
+	protected set entity(value: TItem);
+	get entityId(): any;
+	protected set entityId(value: any);
+	protected validateBeforeSave(): boolean;
+	protected updateTitle(): void;
+	protected propertyGrid: PropertyGrid;
+	protected renderContents(): any;
+}
+export interface AutoNumericOptions {
+	aDec?: string;
+	allowedAutoStrip?: RegExp;
+	allowLeading?: boolean;
+	altDec?: string;
+	aForm?: boolean;
+	aNum?: string;
+	aNeg?: string;
+	aSep?: string;
+	aSign?: string;
+	aNegRegAutoStrip?: string;
+	aPad?: boolean;
+	dGroup?: string;
+	/** internal */
+	holder?: any;
+	lZero?: string;
+	mDec?: number;
+	mInt?: number;
+	mRound?: string;
+	nBracket?: string;
+	numRegAutoStrip?: RegExp;
+	oEvent?: any;
+	pSign?: string;
+	/** internal */
+	runOnce?: boolean;
+	skipFirstAutoStrip?: RegExp;
+	skipLastAutoStrip?: RegExp;
+	tagList?: string[];
+	vMax?: any;
+	vMin?: any;
+	wEmpty?: string;
+}
+export declare class AutoNumeric {
+	static init(input: HTMLInputElement, options: AutoNumericOptions): void;
+	/** method to remove settings and stop autoNumeric() */
+	static destroy(input: HTMLInputElement): void;
+	/** method to update settings - can call as many times */
+	static updateOptions(input: HTMLInputElement, options: AutoNumericOptions): void;
+	/** returns a formatted strings for "input:text" fields Uses jQuery's .val() method*/
+	static setValue(input: HTMLInputElement, valueIn: number | string): string;
+	/** method to get the unformatted value from a specific input field, returns a numeric value */
+	static getValue(input: HTMLInputElement): string;
+	/** returns the settings object for those who need to look under the hood */
+	static getSettings(input: HTMLInputElement): AutoNumericOptions;
+	static hasInstance(input: HTMLInputElement): boolean;
+}
+export declare class BooleanEditor<P = {}> extends EditorWidget<P> {
+	static [Symbol.typeInfo]: EditorTypeInfo<"Serenity.">;
+	static createDefaultElement(): HTMLInputElement;
+	readonly domNode: HTMLInputElement;
+	get value(): boolean;
+	protected get_value(): boolean;
+	set value(value: boolean);
+	protected set_value(value: boolean): void;
+}
+export interface CheckTreeItem<TSource> {
+	isSelected?: boolean;
+	hideCheckBox?: boolean;
+	isAllDescendantsSelected?: boolean;
+	id?: string;
+	text?: string;
+	parentId?: string;
+	children?: CheckTreeItem<TSource>[];
+	source?: TSource;
+}
+export declare class CheckTreeEditor<TItem extends CheckTreeItem<TItem>, P = {}> extends DataGrid<TItem, P> implements IGetEditValue, ISetEditValue, IReadOnly {
+	static [Symbol.typeInfo]: EditorTypeInfo<"Serenity.">;
+	static createDefaultElement(): HTMLDivElement;
+	private itemById;
+	constructor(props: EditorProps<P>);
+	protected getIdProperty(): string;
+	protected getTreeItems(): TItem[];
+	protected updateItems(): void;
+	getEditValue(property: PropertyItem, target: any): void;
+	setEditValue(source: any, property: PropertyItem): void;
+	protected getButtons(): ToolButton[];
+	protected itemSelectedChanged(item: TItem): void;
+	protected getSelectAllText(): string;
+	protected isThreeStateHierarchy(): boolean;
+	protected createSlickGrid(): Grid;
+	protected onViewFilter(item: TItem): boolean;
+	protected getInitialCollapse(): boolean;
+	protected onViewProcessData(response: ListResponse<TItem>): ListResponse<TItem>;
+	protected onClick(e: Event, row: number, cell: number): void;
+	protected updateSelectAll(): void;
+	protected updateFlags(): void;
+	protected getDescendantsSelected(item: TItem): boolean;
+	protected setAllSubTreeSelected(item: TItem, selected: boolean): boolean;
+	protected allItemsSelected(): boolean;
+	protected allDescendantsSelected(item: TItem): boolean;
+	protected getDelimited(): boolean;
+	protected anyDescendantsSelected(item: TItem): boolean;
+	protected getColumns(): Column[];
+	protected getItemText(ctx: FormatterContext): string;
+	protected getSlickOptions(): GridOptions;
+	protected sortItems(): void;
+	protected moveSelectedUp(): boolean;
+	private _readOnly;
+	get_readOnly(): boolean;
+	set_readOnly(value: boolean): void;
+	private get_value;
+	get value(): string[];
+	private set_value;
+	set value(v: string[]);
+}
+export interface CheckLookupEditorOptions {
+	lookupKey?: string;
+	checkedOnTop?: boolean;
+	showSelectAll?: boolean;
+	hideSearch?: boolean;
+	delimited?: boolean;
+	cascadeFrom?: string;
+	cascadeField?: string;
+	cascadeValue?: any;
+	filterField?: string;
+	filterValue?: any;
+}
+export declare class CheckLookupEditor<TItem extends CheckTreeItem<TItem> = any, P extends CheckLookupEditorOptions = CheckLookupEditorOptions> extends CheckTreeEditor<CheckTreeItem<TItem>, P> {
+	static [Symbol.typeInfo]: EditorTypeInfo<"Serenity.">;
+	private searchText;
+	private enableUpdateItems;
+	private lookupChangeUnbind;
+	constructor(props: EditorProps<P>);
+	destroy(): void;
+	protected updateItems(): void;
+	protected getLookupKey(): string;
+	protected getButtons(): ToolButton[];
+	protected createToolbarExtensions(): void;
+	protected getSelectAllText(): string;
+	protected cascadeItems(items: TItem[]): TItem[];
+	protected filterItems(items: TItem[]): TItem[];
+	protected getLookupItems(lookup: Lookup<TItem>): TItem[];
+	protected getTreeItems(): CheckTreeItem<TItem>[];
+	protected onViewFilter(item: CheckTreeItem<TItem>): boolean;
+	protected moveSelectedUp(): boolean;
+	protected get_cascadeFrom(): string;
+	get cascadeFrom(): string;
+	protected getCascadeFromValue(parent: Widget<any>): any;
+	protected cascadeLink: CascadedWidgetLink<Widget<any>>;
+	protected setCascadeFrom(value: string): void;
+	protected set_cascadeFrom(value: string): void;
+	set cascadeFrom(value: string);
+	protected get_cascadeField(): string;
+	get cascadeField(): string;
+	protected set_cascadeField(value: string): void;
+	set cascadeField(value: string);
+	protected get_cascadeValue(): any;
+	get cascadeValue(): any;
+	protected set_cascadeValue(value: any): void;
+	set cascadeValue(value: any);
+	protected get_filterField(): string;
+	get filterField(): string;
+	protected set_filterField(value: string): void;
+	set filterField(value: string);
+	protected get_filterValue(): any;
+	get filterValue(): any;
+	protected set_filterValue(value: any): void;
+	set filterValue(value: any);
+}
+export declare class DateYearEditor<P extends DateYearEditorOptions = DateYearEditorOptions> extends SelectEditor<P> {
+	static [Symbol.typeInfo]: EditorTypeInfo<"Serenity.">;
+	constructor(props: EditorProps<P>);
+	getItems(): any[];
+}
+export interface DateYearEditorOptions extends SelectEditorOptions {
+	minYear?: string;
+	maxYear?: string;
+	descending?: boolean;
+}
+export interface DecimalEditorOptions {
+	minValue?: string;
+	maxValue?: string;
+	decimals?: any;
+	padDecimals?: any;
+	allowNegatives?: boolean;
+}
+export declare class DecimalEditor<P extends DecimalEditorOptions = DecimalEditorOptions> extends EditorWidget<P> implements IDoubleValue {
+	static [Symbol.typeInfo]: EditorTypeInfo<"Serenity.">;
+	static createDefaultElement(): HTMLInputElement;
+	readonly domNode: HTMLInputElement;
+	constructor(props: EditorProps<P>);
+	destroy(): void;
+	protected initAutoNumeric(): void;
+	protected getAutoNumericOptions(): any;
+	get_value(): number;
+	get value(): number;
+	set_value(value: number): void;
+	set value(v: number);
+	get_isValid(): boolean;
+	static defaultAutoNumericOptions(): AutoNumericOptions;
+}
+export declare namespace EditorUtils {
+	function getDisplayText(editor: Widget<any>): string;
+	function getValue(editor: Widget<any>): any;
+	function saveValue(editor: Widget<any>, item: PropertyItem, target: any): void;
+	function setValue(editor: Widget<any>, value: any): void;
+	function loadValue(editor: Widget<any>, item: PropertyItem, source: any): void;
+	/**
+	 * This functions sets readonly class and disabled (for select, radio, checkbox) or readonly attribute (for other inputs) on given elements
+	 * or widgets. If a widget is passed and it has set_readOnly method it is called instead of setting readonly class or attributes.
+	 * Note that if an element, instead of the widget attached to it is passed directly, this searchs for a widget attached to it.
+	 * If you don't want this behavior, use setElementReadOnly method.
+	 * @param elements
+	 * @param value
+	 */
+	function setReadonly(elements: Element | Widget<any> | ArrayLike<Element | Widget>, value: boolean): void;
+	/**
+	 * Legacy alias for setReadonly
+	 */
+	const setReadOnly: typeof setReadonly;
+	function setRequired(widget: Widget<any>, isRequired: boolean): void;
+	function setContainerReadOnly(container: ArrayLike<HTMLElement> | HTMLElement, readOnly: boolean): void;
+}
+export declare class StringEditor<P = {}> extends EditorWidget<P> {
+	static [Symbol.typeInfo]: EditorTypeInfo<"Serenity.">;
+	readonly domNode: HTMLInputElement;
+	static createDefaultElement(): HTMLInputElement;
+	get value(): string;
+	protected get_value(): string;
+	set value(value: string);
+	protected set_value(value: string): void;
+}
+export declare class EmailAddressEditor<P = {}> extends StringEditor<P> {
+	static [Symbol.typeInfo]: EditorTypeInfo<"Serenity.">;
+	static createDefaultElement(): HTMLInputElement;
+	constructor(props: EditorProps<P>);
+}
+export interface EmailEditorOptions {
+	domain?: string;
+	readOnlyDomain?: boolean;
+}
+export declare class EmailEditor<P extends EmailEditorOptions = EmailEditorOptions> extends EditorWidget<P> {
+	static [Symbol.typeInfo]: EditorTypeInfo<"Serenity.">;
+	static createDefaultElement(): HTMLInputElement;
+	readonly domNode: HTMLInputElement;
+	private readonly domain;
+	constructor(props: EditorProps<P>);
+	static registerValidationMethods(): void;
+	get_value(): string;
+	get value(): string;
+	set_value(value: string): void;
+	set value(v: string);
+	get_readOnly(): boolean;
+	set_readOnly(value: boolean): void;
+}
+export interface EnumEditorOptions extends ComboboxCommonOptions {
+	enumKey?: string;
+	enumType?: any;
+}
+export declare class EnumEditor<P extends EnumEditorOptions = EnumEditorOptions> extends ComboboxEditor<P, ComboboxItem> {
+	static [Symbol.typeInfo]: EditorTypeInfo<"Serenity.">;
+	constructor(props: EditorProps<P>);
+	protected updateItems(): void | PromiseLike<void>;
+	protected allowClear(): boolean;
+}
+export interface HtmlContentEditorOptions {
+	cols?: number;
+	rows?: number;
+}
+export interface CKEditorConfig {
+}
+export declare class HtmlContentEditor<P extends HtmlContentEditorOptions = HtmlContentEditorOptions> extends EditorWidget<P> implements IStringValue, IReadOnly {
+	static [Symbol.typeInfo]: EditorTypeInfo<"Serenity.">;
+	private _instanceReady;
+	readonly domNode: HTMLTextAreaElement;
+	static createDefaultElement(): HTMLTextAreaElement;
+	constructor(props: EditorProps<P>);
+	protected instanceReady(x: any): void;
+	protected getLanguage(): string;
+	protected getConfig(): CKEditorConfig;
+	protected getEditorInstance(): any;
+	destroy(): void;
+	get_value(): string;
+	get value(): string;
+	set_value(value: string): void;
+	set value(v: string);
+	get_readOnly(): boolean;
+	set_readOnly(value: boolean): void;
+	static CKEditorVer: string;
+	static CKEditorBasePath: string;
+	static getCKEditorBasePath(): string;
+	static includeCKEditor(then: () => void): void;
+}
+export declare class HtmlNoteContentEditor<P extends HtmlContentEditorOptions = HtmlContentEditorOptions> extends HtmlContentEditor<P> {
+	static [Symbol.typeInfo]: EditorTypeInfo<"Serenity.">;
+	protected getConfig(): CKEditorConfig;
+}
+export declare class HtmlReportContentEditor<P extends HtmlContentEditorOptions = HtmlContentEditorOptions> extends HtmlContentEditor<P> {
+	static [Symbol.typeInfo]: EditorTypeInfo<"Serenity.">;
+	protected getConfig(): CKEditorConfig;
+}
+export interface IntegerEditorOptions {
+	minValue?: number;
+	maxValue?: number;
+	allowNegatives?: boolean;
+}
+export declare class IntegerEditor<P extends IntegerEditorOptions = IntegerEditorOptions> extends EditorWidget<P> implements IDoubleValue {
+	static [Symbol.typeInfo]: EditorTypeInfo<"Serenity.">;
+	static createDefaultElement(): HTMLInputElement;
+	readonly domNode: HTMLInputElement;
+	constructor(props: EditorProps<P>);
+	destroy(): void;
+	protected initAutoNumeric(): void;
+	protected getAutoNumericOptions(): any;
+	get_value(): number;
+	get value(): number;
+	set_value(value: number): void;
+	set value(v: number);
+	get_isValid(): boolean;
+}
+export interface LookupEditorOptions extends ComboboxEditorOptions {
+	lookupKey?: string;
+	async?: boolean;
+}
+export declare abstract class LookupEditorBase<P extends LookupEditorOptions, TItem> extends ComboboxEditor<P, TItem> {
+	static [Symbol.typeInfo]: EditorTypeInfo<"Serenity.">;
+	private lookupChangeUnbind;
+	constructor(props: EditorProps<P>);
+	hasAsyncSource(): boolean;
+	destroy(): void;
+	protected getLookupKey(): string;
+	protected lookup: Lookup<TItem>;
+	protected getLookupAsync(): PromiseLike<Lookup<TItem>>;
+	protected getLookup(): Lookup<TItem>;
+	protected getItems(lookup: Lookup<TItem>): TItem[];
+	protected getIdField(): any;
+	protected getItemText(item: TItem, lookup: Lookup<TItem>): any;
+	protected mapItem(item: TItem): ComboboxItem<TItem>;
+	protected getItemDisabled(item: TItem, lookup: Lookup<TItem>): boolean;
+	updateItems(): void;
+	protected asyncSearch(query: ComboboxSearchQuery): Promise<ComboboxSearchResult<TItem>>;
+	protected getDialogTypeKey(): string;
+	protected setCreateTermOnNewEntity(entity: TItem, term: string): void;
+	protected editDialogDataChange(): void;
+}
+export declare class LookupEditor<P extends LookupEditorOptions = LookupEditorOptions> extends LookupEditorBase<P, {}> {
+	static [Symbol.typeInfo]: EditorTypeInfo<"Serenity.">;
+	constructor(props: EditorProps<P>);
+}
+export declare class MaskedEditor<P extends MaskedEditorOptions = MaskedEditorOptions> extends EditorWidget<P> {
+	static [Symbol.typeInfo]: EditorTypeInfo<"Serenity.">;
+	static createDefaultElement(): HTMLInputElement;
+	readonly domNode: HTMLInputElement;
+	constructor(props: EditorProps<P>);
+	get value(): string;
+	protected get_value(): string;
+	set value(value: string);
+	protected set_value(value: string): void;
+}
+export interface MaskedEditorOptions {
+	mask?: string;
+	placeholder?: string;
+}
+export declare class PasswordEditor<TOptions = {}> extends StringEditor<TOptions> {
+	static [Symbol.typeInfo]: EditorTypeInfo<"Serenity.">;
+	static createDefaultElement(): HTMLInputElement;
+}
+export interface RadioButtonEditorOptions {
+	enumKey?: string;
+	enumType?: any;
+	lookupKey?: string;
+}
+export declare class RadioButtonEditor<P extends RadioButtonEditorOptions = RadioButtonEditorOptions> extends EditorWidget<P> implements IReadOnly {
+	static [Symbol.typeInfo]: EditorTypeInfo<"Serenity.">;
+	constructor(props: EditorProps<P>);
+	protected addRadio(value: string, text: string): void;
+	get_value(): string;
+	get value(): string;
+	set_value(value: string): void;
+	set value(v: string);
+	get_readOnly(): boolean;
+	set_readOnly(value: boolean): void;
+}
+export interface RecaptchaOptions {
+	siteKey?: string;
+	language?: string;
+}
+export declare class Recaptcha<P extends RecaptchaOptions = RecaptchaOptions> extends EditorWidget<P> implements IStringValue {
+	static [Symbol.typeInfo]: EditorTypeInfo<"Serenity.">;
+	constructor(props: EditorProps<P>);
+	get_value(): string;
+	set_value(value: string): void;
+}
+/**
+ * Adapted from 3.5.x version of Select2 (https://github.com/select2/select2), removing jQuery dependency
+ */
+export type Select2Element = HTMLInputElement | HTMLSelectElement;
+export type Select2FormatResult = string | Element | DocumentFragment;
+export interface Select2QueryOptions {
+	element?: Select2Element;
+	term?: string;
+	page?: number;
+	context?: any;
+	callback?: (p1: Select2Result) => void;
+	matcher?: (p1: any, p2: any, p3?: any) => boolean;
+}
+export interface Select2Item {
+	id?: string;
+	text?: string;
+	source?: any;
+	children?: Select2Item[];
+	disabled?: boolean;
+	locked?: boolean;
+}
+export interface Select2Result {
+	hasError?: boolean;
+	errorInfo?: any;
+	results: Select2Item[];
+	more?: boolean;
+	context?: any;
+}
+export interface Select2AjaxOptions extends RequestInit {
+	headers?: Record<string, string>;
+	url?: string | ((term: string, page: number, context: any) => string);
+	quietMillis?: number;
+	data?: (p1: string, p2: number, p3: any) => any;
+	results?: (p1: any, p2: number, p3: any) => any;
+	params?: (() => any) | any;
+	onError?(response: any, info?: any): void | boolean;
+	onSuccess?(response: any): void;
+}
+export interface Select2Options {
+	element?: Select2Element;
+	width?: any;
+	minimumInputLength?: number;
+	maximumInputLength?: number;
+	minimumResultsForSearch?: number;
+	maximumSelectionSize?: any;
+	placeholder?: string;
+	placeholderOption?: any;
+	separator?: string;
+	allowClear?: boolean;
+	multiple?: boolean;
+	closeOnSelect?: boolean;
+	openOnEnter?: boolean;
+	id?: (p1: any) => string;
+	matcher?: (p1: string, p2: string, p3: HTMLElement) => boolean;
+	sortResults?: (p1: any, p2: HTMLElement, p3: any) => any;
+	formatAjaxError?: (p1: any, p2: any) => Select2FormatResult;
+	formatMatches?: (matches: number) => Select2FormatResult;
+	formatSelection?: (p1: any, p2: HTMLElement, p3: (p1: string) => string) => Select2FormatResult;
+	formatResult?: (p1: any, p2: HTMLElement, p3: any, p4: (p1: string) => string) => Select2FormatResult;
+	formatResultCssClass?: (p1: any) => string;
+	formatSelectionCssClass?: (item: Select2Item, container: HTMLElement) => string;
+	formatNoMatches?: (input: string) => Select2FormatResult;
+	formatLoadMore?: (pageNumber: number) => Select2FormatResult;
+	formatSearching?: () => Select2FormatResult;
+	formatInputTooLong?: (input: string, max: number) => Select2FormatResult;
+	formatInputTooShort?: (input: string, min: number) => Select2FormatResult;
+	formatSelectionTooBig?: (p1: number) => Select2FormatResult;
+	createSearchChoice?: (p1: string) => Select2Item;
+	createSearchChoicePosition?: string | ((list: Select2Item[], item: Select2Item) => void);
+	initSelection?: (p1: HTMLElement, p2: (p1: any) => void) => void;
+	tokenizer?: (p1: string, p2: any, p3: (p1: any) => any, p4: any) => string;
+	tokenSeparators?: any;
+	query?: (p1: Select2QueryOptions) => void;
+	ajax?: Select2AjaxOptions;
+	data?: any;
+	tags?: ((string | Select2Item)[]) | (() => (string | Select2Item)[]);
+	containerCss?: any;
+	containerCssClass?: any;
+	dropdownCss?: any;
+	dropdownCssClass?: any;
+	dropdownAutoWidth?: boolean;
+	dropdownParent?: (input: HTMLElement) => HTMLElement;
+	adaptContainerCssClass?: (p1: string) => string;
+	adaptDropdownCssClass?: (p1: string) => string;
+	escapeMarkup?: (p1: string) => string;
+	searchInputPlaceholder?: string;
+	selectOnBlur?: boolean;
+	blurOnChange?: boolean;
+	loadMorePadding?: number;
+	nextSearchTerm?: (p1: any, p2: string) => string;
+	populateResults?: (container: HTMLElement, results: Select2Item[], query: Select2QueryOptions) => void;
+	shouldFocusInput?: (p1: any) => boolean;
+}
+export declare class Select2 {
+	private el;
+	constructor(opts?: Select2Options);
+	private get instance();
+	close(): void;
+	get container(): HTMLElement;
+	get dropdown(): HTMLElement;
+	destroy(): void;
+	get data(): (Select2Item | Select2Item[]);
+	set data(value: Select2Item | Select2Item[]);
+	disable(): void;
+	enable(enabled?: boolean): void;
+	focus(): void;
+	get isFocused(): boolean;
+	get isMultiple(): boolean;
+	get opened(): boolean;
+	open(): boolean;
+	positionDropdown(): void;
+	readonly(value?: boolean): void;
+	get search(): HTMLInputElement;
+	get val(): (string | string[]);
+	set val(value: string | string[]);
+	static getInstance(el: Select2Element): Select2;
+	static readonly ajaxDefaults: Select2AjaxOptions;
+	static readonly defaults: Select2Options;
+	static stripDiacritics(str: string): string;
+}
+export interface ServiceLookupEditorOptions extends ComboboxEditorOptions {
+	service?: string;
+	idField?: string;
+	textField?: string;
+	pageSize?: number;
+	minimumResultsForSearch?: any;
+	sort?: string[];
+	columnSelection?: ColumnSelection;
+	includeColumns?: string[];
+	excludeColumns?: string[];
+	includeDeleted?: boolean;
+	containsField?: string;
+	equalityFilter?: any;
+	criteria?: any[];
+}
+export declare abstract class ServiceLookupEditorBase<P extends ServiceLookupEditorOptions, TItem> extends ComboboxEditor<P, TItem> {
+	static [Symbol.typeInfo]: EditorTypeInfo<"Serenity.">;
+	protected getDialogTypeKey(): string;
+	protected getService(): string;
+	protected getServiceUrl(): string;
+	protected getIncludeColumns(): string[];
+	protected getSort(): any[];
+	protected getCascadeCriteria(): any[];
+	protected getFilterCriteria(): any[];
+	protected getIdListCriteria(idList: any[]): any[];
+	protected getCriteria(query: ComboboxSearchQuery): any[];
+	protected getListRequest(query: ComboboxSearchQuery): ListRequest;
+	protected getServiceCallOptions(query: ComboboxSearchQuery): ServiceOptions<ListResponse<TItem>>;
+	protected hasAsyncSource(): boolean;
+	protected canSearch(byId: boolean): boolean;
+	protected asyncSearch(query: ComboboxSearchQuery): Promise<ComboboxSearchResult<TItem>>;
+}
+export declare class ServiceLookupEditor<P extends ServiceLookupEditorOptions = ServiceLookupEditorOptions, TItem = any> extends ServiceLookupEditorBase<ServiceLookupEditorOptions, TItem> {
+	static [Symbol.typeInfo]: EditorTypeInfo<"Serenity.">;
+	constructor(props: EditorProps<P>);
+}
+export interface TextAreaEditorOptions {
+	cols?: number;
+	rows?: number;
+}
+export declare class TextAreaEditor<P extends TextAreaEditorOptions = TextAreaEditorOptions> extends EditorWidget<P> {
+	static [Symbol.typeInfo]: EditorTypeInfo<"Serenity.">;
+	static createDefaultElement(): HTMLTextAreaElement;
+	constructor(props: EditorProps<P>);
+	get value(): string;
+	protected get_value(): string;
+	set value(value: string);
+	protected set_value(value: string): void;
+}
+export interface TimeEditorBaseOptions {
+	noEmptyOption?: boolean;
+	startHour?: any;
+	endHour?: any;
+	intervalMinutes?: any;
+}
+export declare class TimeEditorBase<P extends TimeEditorBaseOptions> extends EditorWidget<P> {
+	static [Symbol.typeInfo]: EditorTypeInfo<"Serenity.">;
+	static createDefaultElement(): HTMLElement;
+	readonly domNode: HTMLSelectElement;
+	protected minutes: Fluent;
+	constructor(props: EditorProps<P>);
+	get hour(): number;
+	get minute(): number;
+	get_readOnly(): boolean;
+	set_readOnly(value: boolean): void;
+	/** Returns value in HH:mm format */
+	get hourAndMin(): string;
+	/** Sets value in HH:mm format */
+	set hourAndMin(value: string);
+}
+export interface TimeEditorOptions extends TimeEditorBaseOptions {
+	/** Default is 1. Set to 60 to store seconds, 60000 to store ms in an integer field */
+	multiplier?: number;
+}
+/** Note that this editor's value is number of minutes, e.g. for
+ * 16:30, value will be 990. If you want to use a TimeSpan field
+ * use TimeSpanEditor instead.
+ */
+export declare class TimeEditor<P extends TimeEditorOptions = TimeEditorOptions> extends TimeEditorBase<P> {
+	static [Symbol.typeInfo]: EditorTypeInfo<"Serenity.">;
+	constructor(props: EditorProps<P>);
+	get value(): number;
+	protected get_value(): number;
+	set value(value: number);
+	protected set_value(value: number): void;
+}
+export interface TimeSpanEditorOptions extends TimeEditorBaseOptions {
+}
+/**
+ * This editor is for TimeSpan fields. It uses a string value in the format "HH:mm".
+ */
+export declare class TimeSpanEditor<P extends TimeSpanEditorOptions = TimeSpanEditorOptions> extends TimeEditorBase<P> {
+	static [Symbol.typeInfo]: EditorTypeInfo<"Serenity.">;
+	constructor(props: EditorProps<P>);
+	protected get_value(): string;
+	protected set_value(value: string): void;
+	get value(): string;
+	set value(value: string);
+}
+export declare namespace UploadHelper {
+	function addUploadInput(options: UploadInputOptions): Fluent;
+	function checkImageConstraints(file: UploadResponse, opt: FileUploadConstraints): boolean;
+	function fileNameSizeDisplay(name: string, bytes: number): string;
+	function fileSizeDisplay(bytes: number): string;
+	function hasImageExtension(filename: string): boolean;
+	function thumbFileName(filename: string): string;
+	function dbFileUrl(filename: string): string;
+	/**
+	 * Creates a lightbox for a single upload thumbnail anchor element.
+	 * It uses one of glightbox, simplelightbox or colorbox if available.
+	 * Override this function to use a different lightbox library.
+	 */
+	function lightbox(link: HTMLElement | ArrayLike<HTMLElement>): void;
+	/** @deprecated use lightbox */
+	const colorBox: typeof lightbox;
+	function populateFileSymbols(c: HTMLElement | ArrayLike<HTMLElement>, items: UploadedFile[], displayOriginalName?: boolean, urlPrefix?: string): void;
+}
+export interface UploadedFile {
+	Filename?: string;
+	OriginalName?: string;
+}
+export interface UploadInputOptions {
+	container?: HTMLElement | ArrayLike<HTMLElement>;
+	zone?: HTMLElement | ArrayLike<HTMLElement>;
+	progress?: HTMLElement | ArrayLike<HTMLElement>;
+	inputName?: string;
+	allowMultiple?: boolean;
+	uploadIntent?: string;
+	uploadUrl?: string;
+	fileDone?: (p1: UploadResponse, p2: string, p3: any) => void;
+}
+export interface UploadResponse extends ServiceResponse {
+	TemporaryFile: string;
+	Size: number;
+	IsImage: boolean;
+	Width: number;
+	Height: number;
+}
+export interface FileUploadConstraints {
+	minWidth?: number;
+	maxWidth?: number;
+	minHeight?: number;
+	maxHeight?: number;
+	minSize?: number;
+	maxSize?: number;
+	allowNonImage?: boolean;
+	originalNameProperty?: string;
+}
+export interface FileUploadEditorOptions extends FileUploadConstraints {
+	displayFileName?: boolean;
+	uploadIntent?: string;
+	uploadUrl?: string;
+	urlPrefix?: string;
+}
+export interface ImageUploadEditorOptions extends FileUploadEditorOptions {
+}
+export declare class FileUploadEditor<P extends FileUploadEditorOptions = FileUploadEditorOptions> extends EditorWidget<P> implements IReadOnly, IGetEditValue, ISetEditValue, IValidateRequired {
+	static [Symbol.typeInfo]: EditorTypeInfo<"Serenity.">;
+	constructor(props: EditorProps<P>);
+	protected getUploadInputOptions(): UploadInputOptions;
+	protected addFileButtonText(): string;
+	protected getToolButtons(): ToolButton[];
+	protected populate(): void;
+	protected updateInterface(): void;
+	get_readOnly(): boolean;
+	set_readOnly(value: boolean): void;
+	get_required(): boolean;
+	set_required(value: boolean): void;
+	get_value(): UploadedFile;
+	get value(): UploadedFile;
+	set_value(value: UploadedFile): void;
+	set value(v: UploadedFile);
+	getEditValue(property: PropertyItem, target: any): void;
+	setEditValue(source: any, property: PropertyItem): void;
+	protected entity: UploadedFile;
+	protected toolbar: Toolbar;
+	protected progress: HTMLElement;
+	protected fileSymbols: HTMLElement;
+	protected uploadInput: Fluent;
+	protected hiddenInput: HTMLInputElement;
+}
+export declare class ImageUploadEditor<P extends ImageUploadEditorOptions = ImageUploadEditorOptions> extends FileUploadEditor<P> {
+	static [Symbol.typeInfo]: EditorTypeInfo<"Serenity.">;
+	constructor(props: EditorProps<P>);
+}
+export interface MultipleFileUploadEditorOptions extends FileUploadEditorOptions {
+	jsonEncodeValue?: boolean;
+}
+export declare class MultipleFileUploadEditor<P extends MultipleFileUploadEditorOptions = MultipleFileUploadEditorOptions> extends EditorWidget<P> implements IReadOnly, IGetEditValue, ISetEditValue, IValidateRequired {
+	static [Symbol.typeInfo]: EditorTypeInfo<"Serenity.">;
+	private entities;
+	private toolbar;
+	private fileSymbols;
+	private uploadInput;
+	protected progress: HTMLElement;
+	protected hiddenInput: HTMLInputElement;
+	constructor(props: EditorProps<P>);
+	protected getUploadInputOptions(): UploadInputOptions;
+	protected addFileButtonText(): string;
+	protected getToolButtons(): ToolButton[];
+	protected populate(): void;
+	protected updateInterface(): void;
+	get_readOnly(): boolean;
+	set_readOnly(value: boolean): void;
+	get_required(): boolean;
+	set_required(value: boolean): void;
+	get_value(): UploadedFile[];
+	get value(): UploadedFile[];
+	set_value(value: UploadedFile[]): void;
+	set value(v: UploadedFile[]);
+	getEditValue(property: PropertyItem, target: any): void;
+	setEditValue(source: any, property: PropertyItem): void;
+	get jsonEncodeValue(): boolean;
+	set jsonEncodeValue(value: boolean);
+}
+export declare class MultipleImageUploadEditor<P extends ImageUploadEditorOptions = ImageUploadEditorOptions> extends MultipleFileUploadEditor<P> {
+	static [Symbol.typeInfo]: ClassTypeInfo<"Serenity.">;
+	constructor(props: EditorProps<P>);
+}
+export declare class URLEditor<P = {}> extends StringEditor<P> {
+	static [Symbol.typeInfo]: EditorTypeInfo<"Serenity.">;
+	constructor(props: EditorProps<P>);
+}
+interface CriteriaWithText {
+	criteria?: any[];
+	displayText?: string;
+}
+export interface FilterOperator {
+	key?: string;
+	title?: string;
+	format?: string;
+}
+export declare namespace FilterOperators {
+	const isTrue = "true";
+	const isFalse = "false";
+	const contains = "contains";
+	const startsWith = "startswith";
+	const EQ = "eq";
+	const NE = "ne";
+	const GT = "gt";
+	const GE = "ge";
+	const LT = "lt";
+	const LE = "le";
+	const BW = "bw";
+	const IN = "in";
+	const isNull = "isnull";
+	const isNotNull = "isnotnull";
+	const toCriteriaOperator: {
+		[key: string]: string;
+	};
+}
+export interface IFiltering {
+	createEditor(): void;
+	getCriteria(): CriteriaWithText;
+	getOperators(): FilterOperator[];
+	loadState(state: any): void;
+	saveState(): any;
+	get_field(): PropertyItem;
+	set_field(value: PropertyItem): void;
+	get_container(): HTMLElement;
+	set_container(value: HTMLElement): void;
+	get_operator(): FilterOperator;
+	set_operator(value: FilterOperator): void;
+}
+export declare class IFiltering {
+	static [Symbol.typeInfo]: InterfaceTypeInfo<"Serenity.">;
+}
+export interface IQuickFiltering {
+	initQuickFilter(filter: QuickFilter<Widget<any>, any>): void;
+}
+export declare class IQuickFiltering {
+	static [Symbol.typeInfo]: InterfaceTypeInfo<"Serenity.">;
+}
+export declare abstract class BaseFiltering implements IFiltering, IQuickFiltering {
+	private field;
+	get_field(): PropertyItem;
+	set_field(value: PropertyItem): void;
+	private container;
+	get_container(): HTMLElement;
+	set_container(value: HTMLElement): void;
+	private operator;
+	get_operator(): FilterOperator;
+	set_operator(value: FilterOperator): void;
+	abstract getOperators(): FilterOperator[];
+	protected appendNullableOperators(list: FilterOperator[]): FilterOperator[];
+	protected appendComparisonOperators(list: FilterOperator[]): FilterOperator[];
+	protected isNullable(): boolean;
+	createEditor(): void;
+	protected operatorFormat(op: FilterOperator): string;
+	protected getTitle(field: PropertyItem): string;
+	protected displayText(op: FilterOperator, values?: any[]): string;
+	protected getCriteriaField(): string;
+	getCriteria(): CriteriaWithText;
+	loadState(state: any): void;
+	saveState(): string;
+	protected argumentNull(): Error;
+	validateEditorValue(value: string): string;
+	getEditorValue(): string;
+	getEditorText(): string;
+	initQuickFilter(filter: QuickFilter<Widget<any>, any>): void;
+	protected static registerClass<TypeName>(typeName: StringLiteral<TypeName>, intfAndAttr?: any[]): ClassTypeInfo<TypeName>;
+	static [Symbol.typeInfo]: ClassTypeInfo<"Serenity.">;
+}
+export declare abstract class BaseEditorFiltering<TEditor extends Widget<any>> extends BaseFiltering {
+	editorTypeRef: any;
+	static [Symbol.typeInfo]: ClassTypeInfo<"Serenity.">;
+	constructor(editorTypeRef: any);
+	protected useEditor(): boolean;
+	protected editor: TEditor;
+	createEditor(): void;
+	protected useIdField(): boolean;
+	getCriteriaField(): string;
+	getEditorOptions(): any;
+	loadState(state: any): void;
+	saveState(): any;
+	getEditorValue(): any;
+	initQuickFilter(filter: QuickFilter<Widget<any>, any>): void;
+}
+export declare class BooleanFiltering extends BaseFiltering {
+	static [Symbol.typeInfo]: ClassTypeInfo<"Serenity.">;
+	getOperators(): FilterOperator[];
+}
+export declare class DateFiltering extends BaseEditorFiltering<DateEditor> {
+	static [Symbol.typeInfo]: ClassTypeInfo<"Serenity.">;
+	constructor();
+	getOperators(): FilterOperator[];
+}
+export declare class DateTimeFiltering extends BaseEditorFiltering<DateEditor> {
+	static [Symbol.typeInfo]: ClassTypeInfo<"Serenity.">;
+	constructor();
+	getOperators(): FilterOperator[];
+	getCriteria(): CriteriaWithText;
+}
+export declare class DecimalFiltering extends BaseEditorFiltering<DecimalEditor> {
+	static [Symbol.typeInfo]: ClassTypeInfo<"Serenity.">;
+	constructor();
+	getOperators(): FilterOperator[];
+}
+export declare class EditorFiltering extends BaseEditorFiltering<Widget<any>> {
+	readonly props: {
+		editorType?: string;
+		useRelative?: boolean;
+		useLike?: boolean;
+	};
+	static [Symbol.typeInfo]: ClassTypeInfo<"Serenity.">;
+	constructor(props?: {
+		editorType?: string;
+		useRelative?: boolean;
+		useLike?: boolean;
+	});
+	get editorType(): string;
+	set editorType(value: string);
+	get useRelative(): boolean;
+	set useRelative(value: boolean);
+	get useLike(): boolean;
+	set useLike(value: boolean);
+	getOperators(): FilterOperator[];
+	protected useEditor(): boolean;
+	getEditorOptions(): any;
+	createEditor(): void;
+	protected useIdField(): boolean;
+	initQuickFilter(filter: QuickFilter<Widget<any>, any>): void;
+}
+export declare class EnumFiltering extends BaseEditorFiltering<EnumEditor> {
+	static [Symbol.typeInfo]: ClassTypeInfo<"Serenity.">;
+	constructor();
+	getOperators(): FilterOperator[];
+	getEditorText(): string;
+}
+export interface FilterFieldSelectOptions {
+	fields: PropertyItem[];
+}
+export declare class FilterPanel<P = {}> extends FilterWidgetBase<P> {
+	static [Symbol.typeInfo]: ClassTypeInfo<"Serenity.">;
+	private rowsDiv;
+	private resetButton;
+	private searchButton;
+	constructor(props: WidgetProps<P>);
+	private _showInitialLine;
+	get showInitialLine(): boolean;
+	set showInitialLine(value: boolean);
+	protected filterStoreChanged(): void;
+	updateRowsFromStore(): void;
+	private _showSearchButton;
+	get showSearchButton(): boolean;
+	set showSearchButton(value: boolean);
+	updateStoreOnReset: boolean;
+	protected renderContents(): any;
+	protected searchButtonClick(e: Event): void;
+	get_hasErrors(): boolean;
+	search(): void;
+	protected addButtonClick(e: Event): void;
+	protected resetButtonClick(e: Event): void;
+	protected findEmptyRow(): HTMLElement;
+	protected addEmptyRow(popupField: boolean): HTMLElement;
+	protected onRowFieldChange(e: Event): void;
+	protected rowFieldChange(row: HTMLElement): void;
+	protected removeFiltering(row: HTMLElement): void;
+	protected populateOperatorList(row: HTMLElement): void;
+	protected getFieldFor(row: HTMLElement): PropertyItem;
+	protected getFilteringFor(row: HTMLElement): IFiltering;
+	protected onRowOperatorChange(e: Event): void;
+	protected rowOperatorChange(row: HTMLElement): void;
+	protected deleteRowClick(e: Event): void;
+	protected updateButtons(): void;
+	protected andOrClick(e: Event): void;
+	protected leftRightParenClick(e: Event): void;
+	protected updateParens(): void;
+}
+export declare class FilterDialog<P = {}> extends BaseDialog<P> {
+	static [Symbol.typeInfo]: ClassTypeInfo<"Serenity.">;
+	private filterPanel;
+	constructor(props: WidgetProps<P>);
+	get_filterPanel(): FilterPanel;
+	protected renderContents(): any;
+	protected getDialogOptions(): DialogOptions;
+	protected getDialogButtons(): DialogButton[];
+}
+declare class FilteringTypeRegistryImpl extends BaseTypeRegistry<Function> {
+	constructor();
+	protected isMatchingType(type: any): boolean;
+	protected loadError(key: string): void;
+}
+export declare const FilteringTypeRegistry: FilteringTypeRegistryImpl;
+export declare class IntegerFiltering extends BaseEditorFiltering<IntegerEditor> {
+	static [Symbol.typeInfo]: ClassTypeInfo<"Serenity.">;
+	constructor();
+	getOperators(): FilterOperator[];
+}
+export declare class LookupFiltering extends BaseEditorFiltering<LookupEditor> {
+	static [Symbol.typeInfo]: ClassTypeInfo<"Serenity.">;
+	constructor();
+	getOperators(): FilterOperator[];
+	protected useEditor(): boolean;
+	protected useIdField(): boolean;
+	getEditorText(): string;
+}
+export declare class ServiceLookupFiltering extends BaseEditorFiltering<ServiceLookupEditor> {
+	static [Symbol.typeInfo]: ClassTypeInfo<"Serenity.">;
+	constructor();
+	getOperators(): FilterOperator[];
+	protected useEditor(): boolean;
+	protected useIdField(): boolean;
+	getEditorText(): string;
+}
+export declare class StringFiltering extends BaseFiltering {
+	static [Symbol.typeInfo]: ClassTypeInfo<"Serenity.">;
+	getOperators(): FilterOperator[];
+	validateEditorValue(value: string): string;
+}
+export declare class BooleanFormatter implements Formatter {
+	readonly props: {
+		falseText?: string;
+		falseIcon?: IconClassName;
+		nullText?: string;
+		nullIcon?: IconClassName;
+		trueText?: string;
+		trueIcon?: IconClassName;
+		showText?: boolean;
+		showHint?: boolean;
+	};
+	static [Symbol.typeInfo]: FormatterTypeInfo<"Serenity.">;
+	constructor(props?: {
+		falseText?: string;
+		falseIcon?: IconClassName;
+		nullText?: string;
+		nullIcon?: IconClassName;
+		trueText?: string;
+		trueIcon?: IconClassName;
+		showText?: boolean;
+		showHint?: boolean;
+	});
+	format(ctx: FormatterContext): FormatterResult;
+	get falseText(): string;
+	set falseText(value: string);
+	get trueText(): string;
+	set trueText(value: string);
+}
+export declare class CheckboxFormatter implements Formatter {
+	readonly props: {
+		falseText?: string;
+		falseIcon?: IconClassName;
+		nullText?: string;
+		nullIcon?: IconClassName;
+		trueText?: string;
+		trueIcon?: IconClassName;
+		showText?: boolean;
+		showHint?: boolean;
+	};
+	static [Symbol.typeInfo]: FormatterTypeInfo<"Serenity.">;
+	constructor(props?: {
+		falseText?: string;
+		falseIcon?: IconClassName;
+		nullText?: string;
+		nullIcon?: IconClassName;
+		trueText?: string;
+		trueIcon?: IconClassName;
+		showText?: boolean;
+		showHint?: boolean;
+	});
+	format(ctx: FormatterContext): FormatterResult;
+}
+export declare class DateFormatter implements Formatter {
+	readonly props: {
+		displayFormat?: string;
+	};
+	static [Symbol.typeInfo]: FormatterTypeInfo<"Serenity.">;
+	constructor(props?: {
+		displayFormat?: string;
+	});
+	static format(value: any, format?: string): any;
+	get displayFormat(): string;
+	set displayFormat(value: string);
+	format(ctx: FormatterContext): string;
+}
+export declare class DateTimeFormatter extends DateFormatter {
+	static [Symbol.typeInfo]: FormatterTypeInfo<"Serenity.">;
+	constructor(props?: {
+		displayFormat?: string;
+	});
+}
+export declare class EnumFormatter implements Formatter {
+	readonly props: {
+		enumKey?: string;
+	};
+	static [Symbol.typeInfo]: FormatterTypeInfo<"Serenity.">;
+	constructor(props?: {
+		enumKey?: string;
+	});
+	format(ctx: FormatterContext): string | Element;
+	get enumKey(): string;
+	set enumKey(value: string);
+	static format(enumType: any, value: any): string;
+	static getText(enumKey: string, name: string): string;
+	static getName(enumType: any, value: any): string;
+}
+export interface IInitializeColumn {
+	initializeColumn(column: Column): void;
+}
+export declare class IInitializeColumn {
+	static [Symbol.typeInfo]: InterfaceTypeInfo<"Serenity.">;
+}
+export declare class FileDownloadFormatter implements Formatter, IInitializeColumn {
+	readonly props: {
+		displayFormat?: string;
+		originalNameProperty?: string;
+		iconClass?: string;
+	};
+	static [Symbol.typeInfo]: FormatterTypeInfo<"Serenity.">;
+	constructor(props?: {
+		displayFormat?: string;
+		originalNameProperty?: string;
+		iconClass?: string;
+	});
+	format(ctx: FormatterContext): string;
+	static dbFileUrl(filename: string): string;
+	initializeColumn(column: Column): void;
+	get displayFormat(): string;
+	set displayFormat(value: string);
+	get originalNameProperty(): string;
+	set originalNameProperty(value: string);
+	get iconClass(): string;
+	set iconClass(value: string);
+}
+export declare abstract class FormatterBase implements Formatter {
+	abstract format(ctx: FormatterContext): FormatterResult;
+	protected static registerFormatter<TypeName>(typeName: StringLiteral<TypeName>, intfAndAttr?: any[]): FormatterTypeInfo<TypeName>;
+	static [Symbol.typeInfo]: FormatterTypeInfo<"Serenity.">;
+}
+export declare class MinuteFormatter implements Formatter {
+	static [Symbol.typeInfo]: FormatterTypeInfo<"Serenity.">;
+	format(ctx: FormatterContext): string;
+	static format(value: number): string;
+}
+export declare class NumberFormatter implements Formatter {
+	readonly props: {
+		displayFormat?: string;
+	};
+	static [Symbol.typeInfo]: FormatterTypeInfo<"Serenity.">;
+	constructor(props?: {
+		displayFormat?: string;
+	});
+	format(ctx: FormatterContext): string;
+	static format(value: any, format?: string): string;
+	get displayFormat(): string;
+	set displayFormat(value: string);
+}
+export declare class UrlFormatter implements Formatter, IInitializeColumn {
+	readonly props: {
+		displayProperty?: string;
+		displayFormat?: string;
+		urlProperty?: string;
+		urlFormat?: string;
+		target?: string;
+	};
+	static [Symbol.typeInfo]: FormatterTypeInfo<"Serenity.">;
+	constructor(props?: {
+		displayProperty?: string;
+		displayFormat?: string;
+		urlProperty?: string;
+		urlFormat?: string;
+		target?: string;
+	});
+	format(ctx: FormatterContext): string;
+	initializeColumn(column: Column): void;
+	get displayProperty(): string;
+	set displayProperty(value: string);
+	get displayFormat(): string;
+	set displayFormat(value: string);
+	get urlProperty(): string;
+	set urlProperty(value: string);
+	get urlFormat(): string;
+	set urlFormat(value: string);
+	get target(): string;
+	set target(value: string);
+}
+export declare class ColumnsBase<TRow = any> {
+	constructor(items: Column<TRow>[]);
+	valueOf(): Column<TRow>[];
+}
+/**
+ * Renders an edit link for a given item type and ID.
+ * The link will have a CSS class based on the item type and will point to a URL fragment
+ * that includes the item type and ID.
+ * This is similar to SlickHelper.itemLink function, but it doesn't require a grid context
+ * and does not accept FormatterResult (e.g. html string markup) as children.
+ *
+ * @param props - The properties for the edit link.
+ * @returns An HTML anchor element representing the edit link.
+ */
+export declare function EditLink(props: {
+	/**
+	 * The ID of the item to link to.
+	 */
+	itemId: any;
+	/**
+	 * The type of the item, e.g. "Northwind.Customer".
+	 */
+	itemType?: string;
+	/**
+	 * Additional CSS class to add to the link (besides s-EditLink and s-[ItemType]Link)
+	 */
+	cssClass?: string;
+	/**
+	 * Tab index for the link. Default is null, which means no tabindex attribute.
+	 */
+	tabIndex?: number;
+	/**
+	 * Child elements or text to be displayed inside the link.
+	 */
+	children?: any;
+}): HTMLAnchorElement;
+export interface GridRadioSelectionMixinOptions {
+	selectable?: (item: any) => boolean;
+}
+export declare class GridRadioSelectionMixin {
+	static [Symbol.typeInfo]: ClassTypeInfo<"Serenity.">;
+	private idField;
+	private include;
+	private grid;
+	private options;
+	constructor(grid: IDataGrid, options?: GridRadioSelectionMixinOptions);
+	private isSelectable;
+	clear(): void;
+	resetCheckedAndRefresh(): void;
+	getSelectedKey(): string;
+	getSelectedAsInt32(): number;
+	getSelectedAsInt64(): number;
+	setSelectedKey(key: string): void;
+	static createSelectColumn(getMixin: () => GridRadioSelectionMixin): Column;
+}
+export interface GridRowSelectionMixinOptions {
+	selectable?: (item: any) => boolean;
+}
+export declare class GridRowSelectionMixin {
+	static [Symbol.typeInfo]: ClassTypeInfo<"Serenity.">;
+	private idField;
+	private include;
+	private grid;
+	private options;
+	constructor(grid: IDataGrid, options?: GridRowSelectionMixinOptions);
+	updateSelectAll(): void;
+	clear(): void;
+	resetCheckedAndRefresh(): void;
+	selectKeys(keys: string[]): void;
+	getSelectedKeys(): string[];
+	getSelectedAsInt32(): number[];
+	getSelectedAsInt64(): number[];
+	setSelectedKeys(keys: string[]): void;
+	private isSelectable;
+	static createSelectColumn(getMixin: () => GridRowSelectionMixin): Column;
+}
+export declare namespace GridSelectAllButtonHelper {
+	function update(grid: IDataGrid, getSelected: (p1: any) => boolean): void;
+	function define(getGrid: () => IDataGrid, getId: (p1: any) => any, getSelected: (p1: any) => boolean, setSelected: (p1: any, p2: boolean) => void, text?: string, onClick?: () => void): ToolButton;
+}
+export declare namespace GridUtils {
+	function addToggleButton(toolDiv: HTMLElement | ArrayLike<HTMLElement>, cssClass: string, callback: (p1: boolean) => void, hint: string, initial?: boolean): void;
+	function addIncludeDeletedToggle(toolDiv: HTMLElement | ArrayLike<HTMLElement>, view: IRemoteView<any>, hint?: string, initial?: boolean): void;
+	function addQuickSearchInput(toolDiv: HTMLElement | ArrayLike<HTMLElement>, view: IRemoteView<any>, fields?: QuickSearchField[], onChange?: () => void): QuickSearchInput;
+	function addQuickSearchInputCustom(container: HTMLElement | ArrayLike<HTMLElement>, onSearch: (p1: string, p2: string, done: (p3: boolean) => void) => void, fields?: QuickSearchField[]): QuickSearchInput;
+	function makeOrderable(grid: Grid, handleMove: (rows: number[], insertBefore: number) => void): void;
+	function makeOrderableWithUpdateRequest<TItem = any, TId = any>(grid: IDataGrid, getId: (item: TItem) => TId, getDisplayOrder: (item: TItem) => any, service: string, getUpdateRequest: (id: TId, order: number) => SaveRequest<TItem>): void;
+}
+export declare namespace LazyLoadHelper {
+	const executeOnceWhenShown: typeof executeOnceWhenVisible;
+	const executeEverytimeWhenShown: typeof executeEverytimeWhenVisible;
+}
+export declare namespace PropertyItemSlickConverter {
+	function toSlickColumns(items: PropertyItem[]): Column[];
+	function toSlickColumn(item: PropertyItem): Column;
+}
+export declare namespace SlickFormatting {
+	function itemLink<TItem = any>(itemType: string, idField: string, getText: Format<TItem>, cssClass?: (ctx: FormatterContext<TItem>) => string, encode?: boolean): Format<TItem>;
+	function treeToggle(getView: () => IRemoteView<any>, getId: (x: any) => any, formatter: Format): Format;
+}
+export declare namespace SlickHelper {
+	function setDefaults(columns: Column[], localTextPrefix?: string): any;
+}
+export declare namespace SlickTreeHelper {
+	function filterCustom<TItem>(item: TItem, getParent: (x: TItem) => any): boolean;
+	function filterById<TItem>(item: TItem, view: IRemoteView<TItem>, getParentId: (x: TItem) => any): boolean;
+	function setCollapsed<TItem>(items: TItem[], collapsed: boolean): void;
+	function setCollapsedFlag<TItem>(item: TItem, collapsed: boolean): void;
+	function setIndents<TItem>(items: TItem[], getId: (x: TItem) => any, getParentId: (x: TItem) => any, setCollapsed?: boolean): void;
+	function toggleClick<TItem>(e: Event, row: number, cell: number, view: IRemoteView<TItem>, getId: (x: TItem) => any): void;
+}
+export declare namespace SubDialogHelper {
+	function bindToDataChange(dialog: any, owner: Widget<any>, dataChange: (ev: DataChangeInfo) => void, useTimeout?: boolean): any;
+	function triggerDataChange(dialog: Widget<any>): any;
+	function triggerDataChanged(element: HTMLElement | ArrayLike<HTMLElement>): void;
+	function bubbleDataChange(dialog: any, owner: Widget<any>, useTimeout?: boolean): any;
+	function cascade(cascadedDialog: {
+		domNode: HTMLElement;
+	}, ofElement: HTMLElement | ArrayLike<HTMLElement>): any;
+	function cascadedDialogOffset(element: HTMLElement | ArrayLike<HTMLElement>): any;
+}
+export declare namespace TabsExtensions {
+	function setDisabled(tabs: ArrayLike<HTMLElement> | HTMLElement, tabKey: string, isDisabled: boolean): void;
+	function toggle(tabs: ArrayLike<HTMLElement> | HTMLElement, tabKey: string, visible: boolean): void;
+	function activeTabKey(tabs: ArrayLike<HTMLElement> | HTMLElement): string;
+	function indexByKey(tabs: ArrayLike<HTMLElement> | HTMLElement): Record<string, number>;
+	function selectTab(tabs: HTMLElement | ArrayLike<HTMLElement>, tabKey: string | number): void;
+	function initialize(tabs: HTMLElement | ArrayLike<HTMLElement>, activeChange: () => void): Fluent<HTMLElement>;
+	function destroy(tabs: HTMLElement | ArrayLike<HTMLElement>): void;
+}
+export declare class BasePanel<P = {}> extends Widget<P> {
+	static [Symbol.typeInfo]: ClassTypeInfo<"Serenity.">;
+	constructor(props: WidgetProps<P>);
+	destroy(): void;
+	protected tabs: Fluent;
+	protected toolbar: Toolbar;
+	protected validator: Validator;
+	protected isPanel: boolean;
+	protected responsive: boolean;
+	arrange(): void;
+	protected getToolbarButtons(): ToolButton[];
+	protected getValidatorOptions(): any;
+	protected initTabs(): void;
+	protected initToolbar(): void;
+	protected initValidator(): void;
+	protected resetValidation(): void;
+	protected validateForm(): boolean;
+}
+/** @deprecated use BasePanel */
+export declare const TemplatedPanel: typeof BasePanel;
+export declare class PrefixedContext {
+	readonly idPrefix: string;
+	constructor(idPrefix: string);
+	byId(id: string): Fluent;
+	w<TWidget>(id: string, type: {
+		new (...args: any[]): TWidget;
+	}): TWidget;
+}
+export declare class PropertyPanel<TItem, P> extends BasePanel<P> {
+	static [Symbol.typeInfo]: ClassTypeInfo<"Serenity.">;
+	private _entity;
+	private _entityId;
+	constructor(props: WidgetProps<P>);
+	destroy(): void;
+	protected initPropertyGrid(): void;
+	protected loadInitialEntity(): void;
+	protected getFormKey(): string;
+	protected getPropertyGridOptions(): PropertyGridOptions;
+	protected getPropertyItems(): PropertyItem[];
+	protected getSaveEntity(): TItem;
+	get entity(): TItem;
+	get entityId(): any;
+	protected set entity(value: TItem);
+	protected set entityId(value: any);
+	protected validateBeforeSave(): boolean;
+	protected propertyGrid: PropertyGrid;
+}
+export declare namespace ReflectionOptionsSetter {
+	function set(target: any, options: any): void;
 }
 export type Constructor<T> = new (...args: any[]) => T;
 

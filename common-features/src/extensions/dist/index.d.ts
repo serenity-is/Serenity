@@ -161,8 +161,16 @@ export interface ReportRetrieveResult extends ServiceResponse {
 }
 declare namespace texts {
 	namespace Db {
+		function asKey(): typeof Db;
+		function asTry(): typeof Db;
 		namespace Common {
+			function asKey(): typeof Common;
+			function asTry(): typeof Common;
 			namespace UserPreference {
+				function asKey(): typeof UserPreference;
+				function asTry(): typeof UserPreference;
+				const EntityPlural: string;
+				const EntitySingular: string;
 				const Name: string;
 				const PreferenceType: string;
 				const UserId: string;
@@ -172,25 +180,37 @@ declare namespace texts {
 		}
 	}
 	namespace Forms {
+		function asKey(): typeof Forms;
+		function asTry(): typeof Forms;
 		namespace Membership {
+			function asKey(): typeof Membership;
+			function asTry(): typeof Membership;
 			namespace ChangePassword {
+				function asKey(): typeof ChangePassword;
+				function asTry(): typeof ChangePassword;
 				const FormTitle: string;
 				const SubmitButton: string;
 				const Success: string;
 			}
 			namespace ForgotPassword {
+				function asKey(): typeof ForgotPassword;
+				function asTry(): typeof ForgotPassword;
 				const FormInfo: string;
 				const FormTitle: string;
 				const SubmitButton: string;
 				const SuccessMessage: string;
 			}
 			namespace ResetPassword {
+				function asKey(): typeof ResetPassword;
+				function asTry(): typeof ResetPassword;
 				const EmailSubject: string;
 				const FormTitle: string;
 				const SubmitButton: string;
 				const Success: string;
 			}
 			namespace SetPassword {
+				function asKey(): typeof SetPassword;
+				function asTry(): typeof SetPassword;
 				const ElevatedActionsMessage: string;
 				const EmailSentMessage: string;
 				const EmailToSetPasswordMessage: string;
@@ -200,11 +220,17 @@ declare namespace texts {
 		}
 	}
 	namespace Site {
+		function asKey(): typeof Site;
+		function asTry(): typeof Site;
 		namespace BasicProgressDialog {
+			function asKey(): typeof BasicProgressDialog;
+			function asTry(): typeof BasicProgressDialog;
 			const CancelTitle: string;
 			const PleaseWait: string;
 		}
 		namespace BulkServiceAction {
+			function asKey(): typeof BulkServiceAction;
+			function asTry(): typeof BulkServiceAction;
 			const AllHadErrorsFormat: string;
 			const AllSuccessFormat: string;
 			const ConfirmationFormat: string;
@@ -214,10 +240,14 @@ declare namespace texts {
 			const SuccessCount: string;
 		}
 		namespace Dialogs {
+			function asKey(): typeof Dialogs;
+			function asTry(): typeof Dialogs;
 			const PendingChangesConfirmation: string;
 			const PendingChangesUnloadWarning: string;
 		}
 		namespace Translation {
+			function asKey(): typeof Translation;
+			function asTry(): typeof Translation;
 			const AllTextsAlreadyTranslated: string;
 			const Assembly: string;
 			const CopyFailMessage: string;
@@ -245,6 +275,8 @@ declare namespace texts {
 		}
 	}
 	namespace Validation {
+		function asKey(): typeof Validation;
+		function asTry(): typeof Validation;
 		const InvalidResetToken: string;
 		const MinRequiredPasswordLength: string;
 		const PasswordConfirmMismatch: string;
