@@ -146,6 +146,8 @@ export function addListener(element: EventTarget, originalTypeEvent: string, han
 
     const $ = getjQuery();
     if ($) {
+        if (!(element instanceof Node))
+            return;
         let $element = $(element instanceof Node ? element : null);
         if (oneOff)
             $element.one(originalTypeEvent, handler, delegationFunction);
@@ -230,7 +232,9 @@ export function removeListener(element: EventTarget, originalTypeEvent: string, 
 
     const $ = getjQuery();
     if ($) {
-        $(element instanceof Node ? element : null).off(originalTypeEvent, handler, delegationHandler);
+        if (element instanceof Node) {
+            $(element).off(originalTypeEvent, handler, delegationHandler);
+        }
         return;
     }
 
@@ -280,7 +284,7 @@ export function triggerEvent(element: EventTarget, type: string, args?: any): Ev
 
     if (inNamespace && $) {
         jQueryEvent = $.Event(type, args);
-        $(element instanceof Node ? element : null).trigger(jQueryEvent);
+        element instanceof Node && $(element).trigger(jQueryEvent);
         bubbles = bubbles && !jQueryEvent.isPropagationStopped();
         nativeDispatch = !jQueryEvent.isImmediatePropagationStopped();
         defaultPrevented = jQueryEvent.isDefaultPrevented();
