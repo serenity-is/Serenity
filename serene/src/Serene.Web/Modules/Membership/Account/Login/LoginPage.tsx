@@ -1,4 +1,4 @@
-import { ErrorHandling, PropertyPanel, WidgetProps, notifyError, parseQueryString, resolveUrl, serviceCall } from "@serenity-is/corelib";
+import { ErrorHandling, PropertyPanel, WidgetProps, getReturnUrl, notifyError, parseQueryString, resolveUrl, serviceCall } from "@serenity-is/corelib";
 import { LoginForm, LoginRequest } from "../../../ServerTypes/Membership";
 import { LoginFormTexts } from "../../../ServerTypes/Texts";
 import { AccountPanelTitle } from "../AccountPanelTitle";
@@ -54,22 +54,8 @@ class LoginPanel extends PropertyPanel<LoginRequest, any> {
 
     }
 
-    protected getReturnUrl() {
-        var q = parseQueryString();
-        return q['returnUrl'] || q['ReturnUrl'];
-    }
-
     protected redirectToReturnUrl() {
-        var returnUrl = this.getReturnUrl();
-        if (returnUrl && /^\//.test(returnUrl)) {
-            var hash = window.location.hash;
-            if (hash != null && hash != '#')
-                returnUrl += hash;
-            window.location.href = returnUrl;
-        }
-        else {
-            window.location.href = resolveUrl('~/');
-        }
+        window.location.href = getReturnUrl({ purpose: "login" });
     }
 
     protected renderContents() {
