@@ -405,7 +405,7 @@ export function Fluent<K extends keyof HTMLElementTagNameMap>(tagOrElement: K | 
         if (typeof tagOrElement === "string") {
             if (validTagRegex.test(tagOrElement))
                 return new (Fluent as any)(document.createElement(tagOrElement));
-            return Fluent(null);
+            return new (Fluent as any)(null);
         }
 
         return new (Fluent as any)(tagOrElement);
