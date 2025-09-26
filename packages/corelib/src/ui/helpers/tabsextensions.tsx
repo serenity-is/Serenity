@@ -1,4 +1,4 @@
-﻿import { Fluent, getjQuery, isArrayLike } from "../../base";
+import { Fluent, getjQuery, isArrayLike } from "../../base";
 
 export { };
 
@@ -20,6 +20,8 @@ export namespace TabsExtensions {
             return;
         }
 
+        if (typeof tabs === "string")
+            return;
         let $ = getjQuery();
         if (!$ || !$(tabs)?.data?.().uiTabs) {
             var anchors = Array.from(tabs.querySelectorAll<HTMLElement>(navLinkSelector));
@@ -56,6 +58,8 @@ export namespace TabsExtensions {
             return;
         }
 
+        if (typeof tabs === "string")
+            return;
         let $ = getjQuery();
         if (!$ || !$(tabs).data?.().uiTabs) {
             var anchors = Array.from(tabs.querySelectorAll<HTMLAnchorElement>(navLinkSelector));
@@ -79,7 +83,7 @@ export namespace TabsExtensions {
 
     export function activeTabKey(tabs: ArrayLike<HTMLElement> | HTMLElement) {
         tabs = isArrayLike(tabs) ? tabs[0] : tabs;
-        if (!tabs)
+        if (!tabs || typeof tabs === "string")
             return;
 
         let $ = getjQuery();
@@ -123,7 +127,7 @@ export namespace TabsExtensions {
 
     export function selectTab(tabs: HTMLElement | ArrayLike<HTMLElement>, tabKey: string | number) {
         tabs = isArrayLike(tabs) ? tabs[0] : tabs;
-        if (!tabs)
+        if (!tabs || typeof tabs === "string")
             return;
 
         var index: number;
@@ -153,7 +157,7 @@ export namespace TabsExtensions {
 
     export function initialize(tabs: HTMLElement | ArrayLike<HTMLElement>, activeChange: () => void): Fluent<HTMLElement> {
         tabs = isArrayLike(tabs) ? tabs[0] : tabs;
-        if (!tabs)
+        if (!tabs || typeof tabs === "string")
             return null;
 
         let $ = getjQuery();
@@ -213,7 +217,7 @@ export namespace TabsExtensions {
     }
 
     export function destroy(tabs: HTMLElement | ArrayLike<HTMLElement>): void {
-        if (!tabs)
+        if (!tabs || typeof tabs === "string")
             return;
 
         let $ = getjQuery();
