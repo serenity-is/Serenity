@@ -29,14 +29,15 @@ export function getCookie(name: string) {
 }
 
 export function isSameOrigin(url: string) {
-    const loc = window.location,
-        a = document.createElement('a');
-
-    a.href = url;
-
-    return a.hostname == loc.hostname &&
-        a.port == loc.port &&
-        a.protocol == loc.protocol;
+    const loc = window.location;
+    try {
+        const u = new URL(url, loc.origin);
+        return u.hostname == loc.hostname &&
+            u.port == loc.port &&
+            u.protocol == loc.protocol;
+    } catch {
+        return false;
+    }
 }
 
 export function getServiceOptions<TResponse extends ServiceResponse>(options: ServiceOptions<TResponse>) {
