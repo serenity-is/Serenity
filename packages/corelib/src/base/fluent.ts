@@ -395,7 +395,7 @@ export interface Fluent<TElement extends HTMLElement = HTMLElement> extends Arra
     val(): string;
 }
 
-const validTagRegex = /^[a-z][a-z0-9\-]*$/;
+const validTagRegex = /^[a-zA-Z][a-zA-Z0-9\-]*$/;
 
 export function Fluent<K extends keyof HTMLElementTagNameMap>(tag: K): Fluent<HTMLElementTagNameMap[K]>;
 export function Fluent<TElement extends HTMLElement>(element: TElement): Fluent<TElement>;
