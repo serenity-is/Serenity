@@ -26,7 +26,7 @@ public class SqlCommandDumper
                 initialized = true;
                 var isSqlServer = parameter.GetType().FullName == "Microsoft.Data.SqlClient.SqlParameter" ||
                     parameter.GetType().FullName == "System.Data.SqlClient.SqlParameter";
-                if (!isSqlServer)
+                if (isSqlServer)
                 {
                     sqlDbTypeProperty = parameter.GetType().GetProperty("SqlDbType");
                     sizeProperty = parameter.GetType().GetProperty("Size");
