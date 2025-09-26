@@ -976,6 +976,7 @@ abstract class AbstractSelect2 {
 
         this.containerId = "s2id_" + (opts.element.getAttribute("id") || "autogen" + nextUid());
         this.containerEventName = this.containerId
+            .replace(/\\/g, '\\\\')
             .replace(/([.])/g, '_')
             .replace(/([;&,\-\.\+\*\~':"\!\^#$%@\[\]\(\)=>\|])/g, '\\$1');
         this.container.setAttribute("id", this.containerId);
