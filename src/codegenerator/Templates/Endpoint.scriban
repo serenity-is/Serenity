@@ -34,7 +34,7 @@ public class {{EndpointClassName}} : ServiceEndpoint
         return handler.Delete(uow, request);
     }
 
-    [HttpPost]
+    [HttpPost, AuthorizeRetrieve(typeof(MyRow))]
     public RetrieveResponse<MyRow> Retrieve(IDbConnection connection, RetrieveRequest request,
         [FromServices] I{{ClassName}}RetrieveHandler handler)
     {
