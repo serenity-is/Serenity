@@ -3597,8 +3597,8 @@ export declare namespace Aggregators {
 	}
 }
 export declare namespace AggregateFormatting {
-	function formatMarkup<TItem = any>(totals: IGroupTotals, column: Column<TItem>, aggType: string): string;
-	function formatValue(column: Column, value: number): string;
+	function groupTotalsFormat(ctx: FormatterContext<IGroupTotals>): FormatterResult;
+	/** @deprecated use groupTotalsFormat */
 	function groupTotalsFormatter<TItem = any>(totals: IGroupTotals, column: Column<TItem>): string;
 }
 export type Format<TItem = any> = (ctx: FormatterContext<TItem>) => FormatterResult;
@@ -3882,7 +3882,7 @@ export interface IRemoteView<TItem = any> extends IDataView<TItem> {
 	/***
 	 * Wires the grid and the DataView together to keep row selection tied to item ids.
 	 */
-	syncGridSelection?(grid: Grid, preserveHidden: boolean, preserveHiddenOnSelectionChange: boolean): EventEmitter<any, IEventData>;
+	syncGridSelection?(grid: Grid, preserveHidden?: boolean, preserveHiddenOnSelectionChange?: boolean): EventEmitter<any, IEventData>;
 	/**
 	 * Updates an existing item in the view.
 	 * @param id The ID of the item to update
@@ -4283,7 +4283,7 @@ export declare class RemoteView<TItem = any> implements IRemoteView<TItem> {
 	 *     changes.  This is useful since, in combination with the above two options, it allows
 	 *     access to the full list selected row ids, and not just the ones visible to the grid.
 	 */
-	syncGridSelection(grid: Grid, preserveHidden: boolean, preserveHiddenOnSelectionChange: boolean): EventEmitter<any, import("@serenity-is/sleekgrid").IEventData>;
+	syncGridSelection(grid: Grid, preserveHidden?: boolean, preserveHiddenOnSelectionChange?: boolean): EventEmitter<any, import("@serenity-is/sleekgrid").IEventData>;
 	/**
 	 * Syncs cell CSS styles between the grid and the data view.
 	 * @param grid The grid to sync styles with

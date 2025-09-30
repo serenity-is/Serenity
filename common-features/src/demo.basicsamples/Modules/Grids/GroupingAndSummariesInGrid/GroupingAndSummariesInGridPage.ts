@@ -34,11 +34,11 @@ export class GroupingAndSummariesInGrid<P = {}> extends EntityGrid<ProductRow, P
     protected getColumns() {
         var columns = new ProductColumns(super.getColumns());
 
-        columns.UnitsOnOrder && (columns.UnitsOnOrder.groupTotalsFormatter = (totals, col) =>
-            (totals.max ? ('max: ' + (totals.max[col.field] ?? '')) : ''));
+        columns.UnitsOnOrder && (columns.UnitsOnOrder.groupTotalsFormat = (ctx) =>
+            (ctx.item.max ? ('max: ' + ctx.escape(ctx.item.max[columns.UnitsOnOrder.field] ?? '')) : ''));
 
-        columns.ReorderLevel && (columns.ReorderLevel.groupTotalsFormatter = (totals, col) =>
-            (totals.avg ? ('avg: ' + (formatNumber(totals.avg[col.field], '0.') ?? '')) : ''));
+        columns.ReorderLevel && (columns.ReorderLevel.groupTotalsFormat = (ctx) =>
+            (ctx.item.avg ? ('avg: ' + ctx.escape(formatNumber(ctx.item.avg[columns.ReorderLevel.field], '0.') ?? '')) : ''));
 
         return columns.valueOf();
     }

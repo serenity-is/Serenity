@@ -1,4 +1,4 @@
-import { Column, IGroupTotals, NonDataRow, convertCompatFormatter, formatterContext } from "@serenity-is/sleekgrid";
+import { Column, FormatterContext, FormatterResult, IGroupTotals, NonDataRow, applyFormatterResultToCellNode, convertCompatFormatter, formatterContext } from "@serenity-is/sleekgrid";
 import { formatNumber, htmlEncode, localText } from "../base";
 
 export interface IAggregator {
@@ -161,59 +161,70 @@ export namespace Aggregators {
 }
 
 export namespace AggregateFormatting {
-    export function formatMarkup<TItem = any>(totals: IGroupTotals, column: Column<TItem>, aggType: string): string {
-        var textKey = (aggType.substring(0, 1).toUpperCase() + aggType.substring(1));
-        var text = localText("Enums.Serenity.SummaryType." + textKey, textKey);
+    function formatMarkup<TItem = any>(ctx: FormatterContext<IGroupTotals<TItem>>, aggType: string): FormatterResult {
+        const textKey = (aggType.substring(0, 1).toUpperCase() + aggType.substring(1));
+        const column = ctx.column;
+        const value = (ctx.item as any)[aggType][column.field];
+        const span = document.createElement("span");
+        span.className = 'aggregate agg-' + aggType;
+        span.title = localText("Enums.Serenity.SummaryType." + textKey, textKey);
+        const formatter = column.format ?? ((column as any).formatter ? convertCompatFormatter((column as any).formatter) : null);
 
-        var value = (totals as any)[aggType][column.field];
-        var formattedValue = formatValue(column, value);
+        function defaultFormatValue() {
+            if (typeof value === "number") {
+                const displayFormat = column.sourceItem?.displayFormat ?? "#,##0.##";
+                return ctx.escape(formatNumber(value, displayFormat));
+            }
+            return ctx.escape(value);
+        }
 
-        return "<span class='aggregate agg-" + aggType + "'  title='" + htmlEncode(text) + "'>" +
-            formattedValue +
-            "</span>";
-    }
-
-    export function formatValue(column: Column, value: number): string {
-
-        var formatter = column.format ?? ((column as any).formatter ? convertCompatFormatter((column as any).formatter) : null);
-
+        let fmtResult: FormatterResult;
         if (formatter != null) {
             var item = new NonDataRow();
             (item as any)[column.field] = value;
             try {
-                var result = formatter(formatterContext({ column, item, value, purpose: "grouptotal" }));
-                if (result instanceof Element)
-                    return result.outerHTML;
-                else if (result instanceof DocumentFragment)
-                    return Array.from((result as any as DocumentFragment).childNodes)
-                        .map(x => x instanceof Element ? x.outerHTML : (x instanceof Text ? htmlEncode(x.textContent) : '')).join("")
-                return result;
+                fmtResult = formatter(formatterContext({ column, item, value, purpose: "grouptotal" }));
             }
             catch (e) {
+                fmtResult = defaultFormatValue();
             }
         }
-
-        if (typeof value === "number") {
-            var displayFormat = column.sourceItem?.displayFormat ?? "#,##0.##";
-            return htmlEncode(formatNumber(value, displayFormat));
+        else {
+            fmtResult = defaultFormatValue();
         }
-        else
-            return htmlEncode(value);
+
+        applyFormatterResultToCellNode(formatterContext({
+            sanitizer: ctx.sanitizer
+        }), fmtResult, span);
+        return span;
     }
 
-    export function groupTotalsFormatter<TItem = any>(totals: IGroupTotals, column: Column<TItem>): string {
-        if (!totals || !column)
+    export function groupTotalsFormat(ctx: FormatterContext<IGroupTotals>): FormatterResult {
+        if (!ctx.item || !ctx.column)
             return "";
 
-        var text: string = null;
+        let text: FormatterResult = null;
 
         ["sum", "avg", "min", "max", "cnt"].forEach(function (aggType) {
-            if (text == null && (totals as any)[aggType] && (totals as any)[aggType][column.field] != null) {
-                text = formatMarkup(totals, column, aggType);
+            if (text == null && (ctx.item as any)[aggType] && (ctx.item as any)[aggType][ctx.column.field] != null) {
+                text = formatMarkup(ctx, aggType);
                 return false;
             }
         });
 
-        return text || "";
+        return text ?? "";
+    }
+
+    /** @deprecated use groupTotalsFormat */
+    export function groupTotalsFormatter<TItem = any>(totals: IGroupTotals, column: Column<TItem>): string {
+        if (!totals || !column)
+            return "";
+
+        const fmtResult = groupTotalsFormat(formatterContext<IGroupTotals<TItem>>({ item: totals, column, purpose: "grouptotal" }));
+        const node = document.createElement("div");
+        applyFormatterResultToCellNode(formatterContext({
+            sanitizer: (dirtyHtml: string) => dirtyHtml
+        }), fmtResult, node);
+        return node.innerHTML;
     }
 }

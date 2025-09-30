@@ -244,7 +244,7 @@ export interface IRemoteView<TItem = any> extends IDataView<TItem> {
     /***
      * Wires the grid and the DataView together to keep row selection tied to item ids.
      */
-    syncGridSelection?(grid: Grid, preserveHidden: boolean, preserveHiddenOnSelectionChange: boolean): EventEmitter<any, IEventData>;
+    syncGridSelection?(grid: Grid, preserveHidden?: boolean, preserveHiddenOnSelectionChange?: boolean): EventEmitter<any, IEventData>;
     /**
      * Updates an existing item in the view.
      * @param id The ID of the item to update

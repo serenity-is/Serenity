@@ -96,8 +96,8 @@ export class RemoteView<TItem = any> implements IRemoteView<TItem> {
 
     constructor(options: RemoteViewOptions<TItem>) {
         options ??= {}
-        if (gridDefaults != null && gridDefaults.groupTotalsFormatter === void 0)
-            gridDefaults.groupTotalsFormatter = AggregateFormatting.groupTotalsFormatter;
+        if (gridDefaults != null && gridDefaults.groupTotalsFormat === void 0)
+            gridDefaults.groupTotalsFormat = AggregateFormatting.groupTotalsFormat;
 
         this.groupItemMetadataProvider = options.groupItemMetadataProvider;
         this.localSort = options.localSort ?? false;
@@ -1148,7 +1148,7 @@ export class RemoteView<TItem = any> implements IRemoteView<TItem> {
      *     changes.  This is useful since, in combination with the above two options, it allows
      *     access to the full list selected row ids, and not just the ones visible to the grid.
      */
-    public syncGridSelection(grid: Grid, preserveHidden: boolean, preserveHiddenOnSelectionChange: boolean) {
+    public syncGridSelection(grid: Grid, preserveHidden?: boolean, preserveHiddenOnSelectionChange?: boolean) {
         var self = this;
         var inHandler: any;
         var selectedRowIds = self.mapRowsToIds(grid.getSelectedRows());
