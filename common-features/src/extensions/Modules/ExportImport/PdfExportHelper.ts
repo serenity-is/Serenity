@@ -1,4 +1,4 @@
-import { DataGrid, Fluent, ListRequest, ListResponse, ToolButton, deepClone, formatDate, serviceCall, stringFormat } from "@serenity-is/corelib";
+import { DataGrid, Fluent, ListRequest, ListResponse, ToolButton, deepClone, formatDate, htmlEncode, serviceCall, stringFormat } from "@serenity-is/corelib";
 import { Column, FormatterResult, Grid } from "@serenity-is/sleekgrid";
 
 export interface PdfExportOptions {
@@ -47,7 +47,6 @@ export namespace PdfExportHelper {
     function toAutoTableData(slickGrid: Grid, entities: any[], keys: string[], srcColumns: Column[]) {
         let el = document.createElement('span');
         let row = 0;
-        const sanitizer = slickGrid?.getOptions()?.sanitizer;
         return entities.map(item => {
             let dst = [];
             for (let cell = 0; cell < srcColumns.length; cell++) {
@@ -66,8 +65,8 @@ export namespace PdfExportHelper {
                         el.appendChild(html);
                     }
                     else {
-                        if (typeof html === "string" && html.length && sanitizer) {
-                            html = sanitizer(html);
+                        if (typeof html === "string" && html.length) {
+                            html = (ctx.sanitizer ?? htmlEncode)(html);
                         }
                         el.innerHTML = html;
                     }

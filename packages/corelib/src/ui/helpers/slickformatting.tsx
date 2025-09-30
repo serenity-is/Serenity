@@ -38,7 +38,7 @@ export namespace SlickFormatting {
             }
 
             if (fmtRes != null && fmtRes !== "") {
-                link.innerHTML = ctx.sanitizer?.(fmtRes) ?? fmtRes;
+                link.innerHTML = (ctx.sanitizer ?? htmlEncode)(fmtRes);
             }
 
             return link;
