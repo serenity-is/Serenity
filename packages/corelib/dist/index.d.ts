@@ -3598,8 +3598,6 @@ export declare namespace Aggregators {
 }
 export declare namespace AggregateFormatting {
 	function groupTotalsFormat(ctx: FormatterContext<IGroupTotals>): FormatterResult;
-	/** @deprecated use groupTotalsFormat */
-	function groupTotalsFormatter<TItem = any>(totals: IGroupTotals, column: Column<TItem>): string;
 }
 export type Format<TItem = any> = (ctx: FormatterContext<TItem>) => FormatterResult;
 declare module "@serenity-is/sleekgrid" {

@@ -1,8 +1,9 @@
 import { EventData, EventEmitter, Grid, Group, GroupItemMetadataProvider, GroupTotals, IGroupTotals, ItemMetadata, gridDefaults } from "@serenity-is/sleekgrid";
 import { ListRequest, ListResponse, PagerTexts, ServiceOptions, ServiceResponse, htmlEncode, serviceCall } from "../base";
-import { AggregateFormatting, IAggregator } from "./aggregators";
+import { IAggregator } from "./aggregators";
 import { CancellableViewCallback, IRemoteView, PagingInfo, RemoteViewAjaxCallback, RemoteViewFilter, RemoteViewProcessCallback } from "./iremoteview";
 import { GroupInfo, PagingOptions, SummaryOptions } from "./slicktypes";
+import { AggregateFormatting } from "./aggregateformatting";
 
 /**
  * A data view that supports remote data loading, sorting, filtering, grouping, and paging.
