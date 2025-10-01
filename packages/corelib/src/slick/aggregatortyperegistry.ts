@@ -9,7 +9,7 @@ export interface IAggregatorConstructor {
 }
 
 export namespace AggregatorTypeRegistry {
-    const byAggregateType: { [key: string]: IAggregatorConstructor } = Object.create(null);
+    let byAggregateType: { [key: string]: IAggregatorConstructor } = Object.create(null);
 
     export function register(cls: IAggregatorConstructor) {
         byAggregateType[cls.aggregateType ?? (cls.name.toLowerCase())] = cls;
@@ -18,6 +18,7 @@ export namespace AggregatorTypeRegistry {
     }
 
     export function reset() {
+        byAggregateType = Object.create(null);
         for (const cls of Object.keys(Aggregators).map(k => (Aggregators as any)[k]) as IAggregatorConstructor[]) {
             if (cls.aggregateType != null || cls.summaryType != null)
                 AggregatorTypeRegistry.register(cls);

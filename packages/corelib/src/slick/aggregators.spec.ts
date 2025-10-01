@@ -1,8 +1,9 @@
 import { Aggregators } from "./aggregators";
+import { SummaryType } from "../base";
 
 vi.mock("../base", () => ({
     tryGetText: vi.fn(),
-    localText: vi.fn(),
+    localText: vi.fn((key, defaultValue) => key.split('.').pop() + 'X' + defaultValue),
     formatNumber: vi.fn((value, format) => {
         if (format === '#,##0.00') {
             return value.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
@@ -20,7 +21,15 @@ vi.mock("../base", () => ({
             .replace(/>/g, '&gt;')
             .replace(/"/g, '&quot;')
             .replace(/'/g, '&#39;');
-    })
+    }),
+    SummaryType: {
+        Disabled: -1,
+        None: 0,
+        Sum: 1,
+        Avg: 2,
+        Min: 3,
+        Max: 4
+    }
 }));
 
 describe("Aggregators", () => {
@@ -303,6 +312,76 @@ describe("Aggregators", () => {
             sum.storeResult(groupTotals);
 
             expect(groupTotals.sum.price).toBe(30);
+        });
+    });
+
+    describe("Static Properties", () => {
+        describe("Avg", () => {
+            it("has correct summaryType", () => {
+                expect(Aggregators.Avg.summaryType).toBe(SummaryType.Avg);
+            });
+
+            it("has correct aggregateType", () => {
+                expect(Aggregators.Avg.aggregateType).toBe("avg");
+            });
+
+            it("has displayName getter", () => {
+                expect(Aggregators.Avg.displayName).toBeDefined();
+                expect(typeof Aggregators.Avg.displayName).toBe("string");
+            });
+        });
+
+        describe("WeightedAvg", () => {
+            it("has correct aggregateType", () => {
+                expect(Aggregators.WeightedAvg.aggregateType).toBe("weightedAvg");
+            });
+
+            it("has displayName getter", () => {
+                expect(Aggregators.WeightedAvg.displayName).toBeDefined();
+                expect(typeof Aggregators.WeightedAvg.displayName).toBe("string");
+            });
+        });
+
+        describe("Min", () => {
+            it("has correct summaryType", () => {
+                expect(Aggregators.Min.summaryType).toBe(SummaryType.Min);
+            });
+
+            it("has correct aggregateType", () => {
+                expect(Aggregators.Min.aggregateType).toBe("min");
+            });
+
+            it("has displayName getter", () => {
+                expect(Aggregators.Min.displayName).toBe("MinXMin");
+            });
+        });
+
+        describe("Max", () => {
+            it("has correct summaryType", () => {
+                expect(Aggregators.Max.summaryType).toBe(SummaryType.Max);
+            });
+
+            it("has correct aggregateType", () => {
+                expect(Aggregators.Max.aggregateType).toBe("max");
+            });
+
+            it("has displayName getter", () => {
+                expect(Aggregators.Max.displayName).toBe("MaxXMax");
+            });
+        });
+
+        describe("Sum", () => {
+            it("has correct summaryType", () => {
+                expect(Aggregators.Sum.summaryType).toBe(SummaryType.Sum);
+            });
+
+            it("has correct aggregateType", () => {
+                expect(Aggregators.Sum.aggregateType).toBe("sum");
+            });
+
+            it("has displayName getter", () => {
+                expect(Aggregators.Sum.displayName).toBe("SumXSum");
+            });
         });
     });
 });

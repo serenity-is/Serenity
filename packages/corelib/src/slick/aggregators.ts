@@ -38,8 +38,8 @@ export namespace Aggregators {
             groupTotals.avg[this.field] = this.nonNullCount != 0 ? this.sum / this.nonNullCount : null;
         }
 
-        static summaryType = SummaryType.Avg;
-        static aggregateType = "avg";
+        static readonly summaryType = SummaryType.Avg;
+        static readonly aggregateType = "avg";
         static get displayName() {
             return localText("Enums.Serenity.SummaryType.Avg")
         }
@@ -81,7 +81,7 @@ export namespace Aggregators {
             return val !== null && val !== "" && !isNaN(val);
         }
 
-        static aggregateType = "weightedAvg";
+        static readonly aggregateType = "weightedAvg";
         static get displayName() {
             return localText("Enums.Serenity.SummaryType.WeightedAvg", "Weighted Avg");
         }
@@ -115,8 +115,8 @@ export namespace Aggregators {
             groupTotals.min[this.field] = this.min;
         }
 
-        static summaryType = SummaryType.Min;
-        static aggregateType = "min";
+        static readonly summaryType = SummaryType.Min;
+        static readonly aggregateType = "min";
         static get displayName() {
             return localText("Enums.Serenity.SummaryType.Min", "Min");
         }
@@ -148,8 +148,8 @@ export namespace Aggregators {
             groupTotals.max[this.field] = this.max;
         }
 
-        static summaryType = SummaryType.Max;
-        static aggregateType = "max";
+        static readonly summaryType = SummaryType.Max;
+        static readonly aggregateType = "max";
         static get displayName() {
             return localText("Enums.Serenity.SummaryType.Max", "Max");
         }
@@ -181,8 +181,8 @@ export namespace Aggregators {
             groupTotals.sum[this.field] = this.sum;
         }
 
-        static summaryType = SummaryType.Sum;
-        static aggregateType = "sum";
+        static readonly summaryType = SummaryType.Sum;
+        static readonly aggregateType = "sum";
         static get displayName() {
             return localText("Enums.Serenity.SummaryType.Sum", "Sum");
         }
