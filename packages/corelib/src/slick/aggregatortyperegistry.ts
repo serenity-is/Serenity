@@ -27,7 +27,10 @@ export namespace AggregatorTypeRegistry {
      * @param cls The aggregator class to register
      */
     export function register(cls: IAggregatorConstructor) {
-        byKey[cls.aggregateKey ?? (cls.name.toLowerCase())] = cls;
+        if (!cls.aggregateKey)
+            throw new Error("Aggregator class must have a static aggregateKey property to be registered.");
+        
+        byKey[cls.aggregateKey] = cls;
         if (cls.summaryType != null && cls.summaryType !== SummaryType.Disabled && cls.summaryType !== SummaryType.None)
             byKey[cls.summaryType] = cls;
     }
@@ -38,7 +41,7 @@ export namespace AggregatorTypeRegistry {
     export function reset() {
         byKey = Object.create(null);
         for (const cls of Object.keys(Aggregators).map(k => (Aggregators as any)[k]) as IAggregatorConstructor[]) {
-            if (cls.aggregateKey != null || cls.summaryType != null)
+            if (cls.aggregateKey)
                 AggregatorTypeRegistry.register(cls);
         }
     }
