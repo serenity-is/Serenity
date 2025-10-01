@@ -1,4 +1,4 @@
-import { EventData, EventEmitter, Grid, Group, GroupItemMetadataProvider, GroupTotals, IGroupTotals, ItemMetadata, gridDefaults } from "@serenity-is/sleekgrid";
+import { EventData, EventEmitter, Grid, Group, GroupItemMetadataProvider, GroupTotals, IGroupTotals, ItemMetadata } from "@serenity-is/sleekgrid";
 import { ListRequest, ListResponse, PagerTexts, ServiceOptions, ServiceResponse, htmlEncode, serviceCall } from "../base";
 import { AggregateFormatting } from "./aggregateformatting";
 import { IAggregator } from "./aggregators";
@@ -97,9 +97,7 @@ export class RemoteView<TItem = any> implements IRemoteView<TItem> {
 
     constructor(options: RemoteViewOptions<TItem>) {
         options ??= {}
-        if (gridDefaults != null && gridDefaults.groupTotalsFormat === void 0)
-            gridDefaults.groupTotalsFormat = AggregateFormatting.groupTotalsFormat;
-
+        AggregateFormatting.initGridDefaults();
         this.groupItemMetadataProvider = options.groupItemMetadataProvider;
         this.localSort = options.localSort ?? false;
 

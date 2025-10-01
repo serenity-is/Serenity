@@ -3559,6 +3559,9 @@ export declare namespace Aggregators {
 		init(): void;
 		accumulate(item: any): void;
 		storeResult(groupTotals: IGroupTotals): void;
+		static summaryType: SummaryType;
+		static aggregateType: string;
+		static get displayName(): string;
 	}
 	class WeightedAvg implements IAggregator {
 		readonly field: string;
@@ -3570,6 +3573,8 @@ export declare namespace Aggregators {
 		accumulate(item: any): void;
 		storeResult(groupTotals: any): void;
 		static isValid(val: any): boolean;
+		static aggregateType: string;
+		static get displayName(): string;
 	}
 	class Min implements IAggregator {
 		readonly field: string;
@@ -3578,6 +3583,9 @@ export declare namespace Aggregators {
 		init(): void;
 		accumulate(item: any): void;
 		storeResult(groupTotals: any): void;
+		static summaryType: SummaryType;
+		static aggregateType: string;
+		static get displayName(): string;
 	}
 	class Max implements IAggregator {
 		readonly field: string;
@@ -3586,6 +3594,9 @@ export declare namespace Aggregators {
 		init(): void;
 		accumulate(item: any): void;
 		storeResult(groupTotals: any): void;
+		static summaryType: SummaryType;
+		static aggregateType: string;
+		static get displayName(): string;
 	}
 	class Sum implements IAggregator {
 		readonly field: string;
@@ -3594,10 +3605,34 @@ export declare namespace Aggregators {
 		init(): void;
 		accumulate(item: any): void;
 		storeResult(groupTotals: any): void;
+		static summaryType: SummaryType;
+		static aggregateType: string;
+		static get displayName(): string;
+	}
+}
+export interface IAggregatorConstructor {
+	new (field: string, ...args: any[]): IAggregator;
+	aggregateType?: string;
+	displayName?: string;
+	summaryType?: SummaryType;
+}
+export declare namespace AggregatorTypeRegistry {
+	function register(cls: IAggregatorConstructor): void;
+	function reset(): void;
+	function tryGet(type: string | SummaryType): IAggregatorConstructor | undefined;
+}
+declare module "@serenity-is/sleekgrid" {
+	interface Column<TItem = any> {
+		summaryType?: SummaryType | string;
 	}
 }
 export declare namespace AggregateFormatting {
 	function groupTotalsFormat(ctx: FormatterContext<IGroupTotals>): FormatterResult;
+	/**
+	 * Call this method to ensure that `gridDefaults.groupTotalsFormat` is set to `AggregateFormatting.groupTotalsFormat`.
+	 * It only sets it when it is not already set to some value. This is normally called by `RemoteView` constructor.
+	 */
+	function initGridDefaults(): void;
 }
 export type Format<TItem = any> = (ctx: FormatterContext<TItem>) => FormatterResult;
 declare module "@serenity-is/sleekgrid" {

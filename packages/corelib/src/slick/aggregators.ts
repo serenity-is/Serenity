@@ -1,4 +1,5 @@
 import { IGroupTotals } from "@serenity-is/sleekgrid";
+import { localText, SummaryType } from "../base";
 
 export interface IAggregator {
     init(): void;
@@ -35,6 +36,12 @@ export namespace Aggregators {
                 groupTotals.avg = {};
             }
             groupTotals.avg[this.field] = this.nonNullCount != 0 ? this.sum / this.nonNullCount : null;
+        }
+
+        static summaryType = SummaryType.Avg;
+        static aggregateType = "avg";
+        static get displayName() {
+            return localText("Enums.Serenity.SummaryType.Avg")
         }
     }
 
@@ -73,6 +80,11 @@ export namespace Aggregators {
         static isValid(val: any): boolean {
             return val !== null && val !== "" && !isNaN(val);
         }
+
+        static aggregateType = "weightedAvg";
+        static get displayName() {
+            return localText("Enums.Serenity.SummaryType.WeightedAvg", "Weighted Avg");
+        }
     }
 
     export class Min implements IAggregator {
@@ -102,6 +114,12 @@ export namespace Aggregators {
             }
             groupTotals.min[this.field] = this.min;
         }
+
+        static summaryType = SummaryType.Min;
+        static aggregateType = "min";
+        static get displayName() {
+            return localText("Enums.Serenity.SummaryType.Min", "Min");
+        }
     }
 
     export class Max implements IAggregator {
@@ -129,6 +147,12 @@ export namespace Aggregators {
             }
             groupTotals.max[this.field] = this.max;
         }
+
+        static summaryType = SummaryType.Max;
+        static aggregateType = "max";
+        static get displayName() {
+            return localText("Enums.Serenity.SummaryType.Max", "Max");
+        }
     }
 
     export class Sum implements IAggregator {
@@ -155,6 +179,12 @@ export namespace Aggregators {
                 groupTotals.sum = {};
             }
             groupTotals.sum[this.field] = this.sum;
+        }
+
+        static summaryType = SummaryType.Sum;
+        static aggregateType = "sum";
+        static get displayName() {
+            return localText("Enums.Serenity.SummaryType.Sum", "Sum");
         }
     }
 }
