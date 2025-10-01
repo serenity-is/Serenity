@@ -1,8 +1,20 @@
 import { applyFormatterResultToCellNode, convertCompatFormatter, formatterContext, FormatterContext, FormatterResult, IGroupTotals, NonDataRow } from "@serenity-is/sleekgrid";
-import { formatNumber, localText } from "../base";
+import { formatNumber, localText, SummaryType } from "../base";
 
 export namespace AggregateFormatting {
     const aggTypeKeys = ["sum", "avg", "min", "max", "weightedAvg"];
+
+    function summaryTypeToAggKey(summaryType: SummaryType): string | null {
+        if (summaryType == null)
+            return null;
+        switch (summaryType) {
+            case SummaryType.Sum: return "sum";
+            case SummaryType.Avg: return "avg";
+            case SummaryType.Min: return "min";
+            case SummaryType.Max: return "max";
+        }
+        return null;
+    }
 
     export function groupTotalsFormat(ctx: FormatterContext<IGroupTotals>): FormatterResult {
         const totals = ctx.item as any;
@@ -11,9 +23,15 @@ export namespace AggregateFormatting {
         if (!totals || !field)
             return "";
 
-        const aggType = aggTypeKeys.find(aggType => totals[aggType]?.[field] != null);
+        const summaryType = (column as any).summaryType;
+        let aggType: string;
+        if (summaryType != null)
+            aggType = summaryTypeToAggKey(summaryType);
+        else
+            aggType ??= aggTypeKeys.find(aggType => totals[aggType]?.[field] != null) ??
+                aggTypeKeys.find(aggType => totals[aggType]?.[field] !== void 0);
         if (!aggType)
-            return;
+            return "";
 
         const value = totals[aggType][field];
         const span = document.createElement("span");
