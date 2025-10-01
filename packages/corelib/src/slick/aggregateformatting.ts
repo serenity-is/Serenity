@@ -8,7 +8,7 @@ export namespace AggregateFormatting {
         const totals = ctx.item as any;
         const column = ctx.column;
         const field = column?.field;
-        if (!totals || field)
+        if (!totals || !field)
             return "";
 
         const aggType = aggTypeKeys.find(aggType => totals[aggType]?.[field] != null);
