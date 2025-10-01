@@ -321,8 +321,8 @@ describe("Aggregators", () => {
                 expect(Aggregators.Avg.summaryType).toBe(SummaryType.Avg);
             });
 
-            it("has correct aggregateType", () => {
-                expect(Aggregators.Avg.aggregateType).toBe("avg");
+            it("has correct aggregateKey", () => {
+                expect(Aggregators.Avg.aggregateKey).toBe("avg");
             });
 
             it("has displayName getter", () => {
@@ -332,8 +332,8 @@ describe("Aggregators", () => {
         });
 
         describe("WeightedAvg", () => {
-            it("has correct aggregateType", () => {
-                expect(Aggregators.WeightedAvg.aggregateType).toBe("weightedAvg");
+            it("has correct aggregateKey", () => {
+                expect(Aggregators.WeightedAvg.aggregateKey).toBe("weightedAvg");
             });
 
             it("has displayName getter", () => {
@@ -347,8 +347,8 @@ describe("Aggregators", () => {
                 expect(Aggregators.Min.summaryType).toBe(SummaryType.Min);
             });
 
-            it("has correct aggregateType", () => {
-                expect(Aggregators.Min.aggregateType).toBe("min");
+            it("has correct aggregateKey", () => {
+                expect(Aggregators.Min.aggregateKey).toBe("min");
             });
 
             it("has displayName getter", () => {
@@ -361,8 +361,8 @@ describe("Aggregators", () => {
                 expect(Aggregators.Max.summaryType).toBe(SummaryType.Max);
             });
 
-            it("has correct aggregateType", () => {
-                expect(Aggregators.Max.aggregateType).toBe("max");
+            it("has correct aggregateKey", () => {
+                expect(Aggregators.Max.aggregateKey).toBe("max");
             });
 
             it("has displayName getter", () => {
@@ -375,8 +375,8 @@ describe("Aggregators", () => {
                 expect(Aggregators.Sum.summaryType).toBe(SummaryType.Sum);
             });
 
-            it("has correct aggregateType", () => {
-                expect(Aggregators.Sum.aggregateType).toBe("sum");
+            it("has correct aggregateKey", () => {
+                expect(Aggregators.Sum.aggregateKey).toBe("sum");
             });
 
             it("has displayName getter", () => {

@@ -17,28 +17,28 @@ export namespace AggregateFormatting {
         if (!totals || !field)
             return "";
 
-        let aggCons: IAggregatorConstructor;
-        let aggType: string;
+        let aggType: IAggregatorConstructor;
+        let aggKey: string;
         if (column.summaryType) {
-            aggCons = AggregatorTypeRegistry.tryGet(column.summaryType);
-            aggType = aggCons?.aggregateType;
+            aggType = AggregatorTypeRegistry.tryGet(column.summaryType);
+            aggKey = aggType?.aggregateKey;
         }
         else {
-            aggType = (Object.keys(totals).find(aggType => totals[aggType]?.[field] != null) ??
-                Object.keys(totals).find(aggType => totals[aggType]?.[field] !== void 0));
-            if (aggType)
-                aggCons = AggregatorTypeRegistry.tryGet(aggType);
+            aggKey = (Object.keys(totals).find(aggKey => totals[aggKey]?.[field] != null) ??
+                Object.keys(totals).find(aggKey => totals[aggKey]?.[field] !== void 0));
+            if (aggKey)
+                aggType = AggregatorTypeRegistry.tryGet(aggKey);
         }
 
-        if (!aggType)
+        if (!aggKey)
             return "";
 
-        const value = totals[aggType][field];
+        const value = totals[aggKey][field];
         const span = document.createElement("span");
-        span.className = 'aggregate agg-' + aggType;
-        let displayName = aggCons?.displayName;
+        span.className = 'aggregate agg-' + aggKey;
+        let displayName = aggType?.displayName;
         if (!displayName) {
-            const textKey = (aggType.substring(0, 1).toUpperCase() + aggType.substring(1));
+            const textKey = (aggKey.substring(0, 1).toUpperCase() + aggKey.substring(1));
             displayName = localText("Enums.Serenity.SummaryType." + textKey, textKey);
         }
         span.innerText = displayName + ": ";

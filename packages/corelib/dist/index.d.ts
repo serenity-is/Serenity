@@ -3559,8 +3559,8 @@ export declare namespace Aggregators {
 		init(): void;
 		accumulate(item: any): void;
 		storeResult(groupTotals: IGroupTotals): void;
-		static summaryType: SummaryType;
-		static aggregateType: string;
+		static readonly summaryType = SummaryType.Avg;
+		static readonly aggregateKey = "avg";
 		static get displayName(): string;
 	}
 	class WeightedAvg implements IAggregator {
@@ -3573,7 +3573,7 @@ export declare namespace Aggregators {
 		accumulate(item: any): void;
 		storeResult(groupTotals: any): void;
 		static isValid(val: any): boolean;
-		static aggregateType: string;
+		static readonly aggregateKey = "weightedAvg";
 		static get displayName(): string;
 	}
 	class Min implements IAggregator {
@@ -3583,8 +3583,8 @@ export declare namespace Aggregators {
 		init(): void;
 		accumulate(item: any): void;
 		storeResult(groupTotals: any): void;
-		static summaryType: SummaryType;
-		static aggregateType: string;
+		static readonly summaryType = SummaryType.Min;
+		static readonly aggregateKey = "min";
 		static get displayName(): string;
 	}
 	class Max implements IAggregator {
@@ -3594,8 +3594,8 @@ export declare namespace Aggregators {
 		init(): void;
 		accumulate(item: any): void;
 		storeResult(groupTotals: any): void;
-		static summaryType: SummaryType;
-		static aggregateType: string;
+		static readonly summaryType = SummaryType.Max;
+		static readonly aggregateKey = "max";
 		static get displayName(): string;
 	}
 	class Sum implements IAggregator {
@@ -3605,21 +3605,44 @@ export declare namespace Aggregators {
 		init(): void;
 		accumulate(item: any): void;
 		storeResult(groupTotals: any): void;
-		static summaryType: SummaryType;
-		static aggregateType: string;
+		static readonly summaryType = SummaryType.Sum;
+		static readonly aggregateKey = "sum";
 		static get displayName(): string;
 	}
 }
 export interface IAggregatorConstructor {
 	new (field: string, ...args: any[]): IAggregator;
-	aggregateType?: string;
+	/**
+	 * A unique key for the aggregator (like 'sum', 'avg', etc.). This is also used in the totals object
+	 * as a property key to store the results of this aggregator.
+	 */
+	aggregateKey?: string;
+	/**
+	 * A user-friendly display name for the aggregator (like "Sum", "Average", etc.)
+	 */
 	displayName?: string;
+	/**
+	 * Corresponding SummaryType enum value (like SummaryType.Sum, SummaryType.Avg, etc.),
+	 * if any.
+	 */
 	summaryType?: SummaryType;
 }
 export declare namespace AggregatorTypeRegistry {
+	/**
+	 * Registers a new aggregator class.
+	 * @param cls The aggregator class to register
+	 */
 	function register(cls: IAggregatorConstructor): void;
+	/**
+	 * Resets the registry by clearing all registered aggregators and re-registering the standard ones.
+	 */
 	function reset(): void;
-	function tryGet(type: string | SummaryType): IAggregatorConstructor | undefined;
+	/**
+	 * Tries to get an aggregator constructor by its SummaryType or unique key.
+	 * @param aggKey The SummaryType enum value or the unique key of the aggregator (like 'sum', 'avg', etc.)
+	 * @returns The corresponding aggregator constructor, or undefined if not found.
+	 */
+	function tryGet(aggKey: string | SummaryType): IAggregatorConstructor | undefined;
 }
 declare module "@serenity-is/sleekgrid" {
 	interface Column<TItem = any> {

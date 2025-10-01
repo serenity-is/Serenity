@@ -39,7 +39,7 @@ export namespace Aggregators {
         }
 
         static readonly summaryType = SummaryType.Avg;
-        static readonly aggregateType = "avg";
+        static readonly aggregateKey = "avg";
         static get displayName() {
             return localText("Enums.Serenity.SummaryType.Avg")
         }
@@ -81,7 +81,7 @@ export namespace Aggregators {
             return val !== null && val !== "" && !isNaN(val);
         }
 
-        static readonly aggregateType = "weightedAvg";
+        static readonly aggregateKey = "weightedAvg";
         static get displayName() {
             return localText("Enums.Serenity.SummaryType.WeightedAvg", "Weighted Avg");
         }
@@ -116,7 +116,7 @@ export namespace Aggregators {
         }
 
         static readonly summaryType = SummaryType.Min;
-        static readonly aggregateType = "min";
+        static readonly aggregateKey = "min";
         static get displayName() {
             return localText("Enums.Serenity.SummaryType.Min", "Min");
         }
@@ -149,7 +149,7 @@ export namespace Aggregators {
         }
 
         static readonly summaryType = SummaryType.Max;
-        static readonly aggregateType = "max";
+        static readonly aggregateKey = "max";
         static get displayName() {
             return localText("Enums.Serenity.SummaryType.Max", "Max");
         }
@@ -182,7 +182,7 @@ export namespace Aggregators {
         }
 
         static readonly summaryType = SummaryType.Sum;
-        static readonly aggregateType = "sum";
+        static readonly aggregateKey = "sum";
         static get displayName() {
             return localText("Enums.Serenity.SummaryType.Sum", "Sum");
         }

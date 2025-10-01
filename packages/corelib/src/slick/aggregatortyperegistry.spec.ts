@@ -8,26 +8,26 @@ describe('AggregatorTypeRegistry', () => {
         for (const type of types) {
             const aggregator = AggregatorTypeRegistry.tryGet(type);
             expect(aggregator).toBeDefined();
-            expect(aggregator?.aggregateType).toBe(type);
+            expect(aggregator?.aggregateKey).toBe(type);
         }
     });
 
     it('should retrieve aggregators by SummaryType', () => {
         const sumAggregator = AggregatorTypeRegistry.tryGet(SummaryType.Sum);
         expect(sumAggregator).toBeDefined();
-        expect(sumAggregator?.aggregateType).toBe('sum');
+        expect(sumAggregator?.aggregateKey).toBe('sum');
 
         const avgAggregator = AggregatorTypeRegistry.tryGet(SummaryType.Avg);
         expect(avgAggregator).toBeDefined();
-        expect(avgAggregator?.aggregateType).toBe('avg');
+        expect(avgAggregator?.aggregateKey).toBe('avg');
 
         const minAggregator = AggregatorTypeRegistry.tryGet(SummaryType.Min);
         expect(minAggregator).toBeDefined();
-        expect(minAggregator?.aggregateType).toBe('min');
+        expect(minAggregator?.aggregateKey).toBe('min');
 
         const maxAggregator = AggregatorTypeRegistry.tryGet(SummaryType.Max);
         expect(maxAggregator).toBeDefined();
-        expect(maxAggregator?.aggregateType).toBe('max');
+        expect(maxAggregator?.aggregateKey).toBe('max');
     });
 
     it('should return undefined for invalid aggregate types', () => {
@@ -44,7 +44,7 @@ describe('AggregatorTypeRegistry', () => {
 
     it('should allow registering custom aggregators', () => {
         class CustomAggregator {
-            static aggregateType = 'custom';
+            static aggregateKey = 'custom';
             constructor(public field: string) {}
             init() {}
             accumulate() {}
@@ -59,7 +59,7 @@ describe('AggregatorTypeRegistry', () => {
     it('should reset the registry and re-register standard aggregators', () => {
         // First, register a custom one
         class TempAggregator {
-            static aggregateType = 'temp';
+            static aggregateKey = 'temp';
             constructor(public field: string) {}
             init() {}
             accumulate() {}
