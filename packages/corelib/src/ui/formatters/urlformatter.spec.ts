@@ -17,30 +17,30 @@ describe("UrlFormatter", () => {
 
     it("shows link if url is specified", () => {
         var formatter = new UrlFormatter();
-        expect(formatter.format(ctx({ value: "test" }))).toContain("'test'");
+        expect((formatter.format(ctx({ value: "test" })) as HTMLElement).outerHTML).toContain("test");
     })
 
     it("formats url if format is specified", () => {
         var formatter = new UrlFormatter();
         formatter.urlFormat = "test/{0}";
-        expect(formatter.format(ctx({ value: "test" }))).toContain("'test/test'");
+        expect((formatter.format(ctx({ value: "test" })) as HTMLElement).outerHTML).toContain("test/test");
     })
 
     it("resolves url if it starts with tilda", () => {
         var formatter = new UrlFormatter();
-        expect(formatter.format(ctx({ value: "~/test" }))).toContain("'/test'");
+        expect((formatter.format(ctx({ value: "~/test" })) as HTMLElement).outerHTML).toContain("/test");
     })
 
     it("uses display format property for showing if specified", () => {
         var formatter = new UrlFormatter();
         formatter.displayFormat = "displayFormat {0}"
-        expect(formatter.format(ctx({ value: "~/test" }))).toContain("displayFormat ~/test");
+        expect((formatter.format(ctx({ value: "~/test" })) as HTMLElement).outerHTML).toContain("displayFormat ~/test");
     })
 
     it("adds target if specified", () => {
         var formatter = new UrlFormatter();
         formatter.target = "_blank"
-        expect(formatter.format(ctx({ value: "~/test" }))).toContain("target='_blank'");
+        expect((formatter.format(ctx({ value: "~/test" })) as HTMLElement).outerHTML).toContain("target=\"_blank\"");
     })
 
     it("adds diplayProperty and UrlProperty to referencedFields if specified", () => {
