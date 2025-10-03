@@ -12,8 +12,6 @@ export type ToastrOptions = ToastContainerOptions & {
     closeButton?: boolean;
     /** CSS class for close button */
     closeClass?: string;
-    /** Close button markup */
-    closeHtml?: string;
     /** If true (default) toast keeps open when hovered, and closes after extendedTimeout when mouse leaves the toast */
     closeOnHover?: boolean;
     /** If closeOnHover is true, the toast closes in extendedTimeout duration after the mouse leaves the toast. Default is 1000 */
@@ -71,7 +69,6 @@ const initialOptions: ToastrOptions = {
     messageClass: 'toast-message',
     escapeHtml: true,
     target: 'body',
-    closeHtml: '<button type="button">&times;</button>',
     closeClass: 'toast-close-button',
     newestOnTop: true,
     preventDuplicates: false,
@@ -241,7 +238,7 @@ export class Toastr {
         const $titleElement = document.createElement('div');
         const $messageElement = document.createElement('div');
         const closeContainer = document.createElement('div');
-        closeContainer.innerHTML = opt.closeHtml.trim();
+        closeContainer.innerHTML = '<button type="button">&times;</button>';
         const closeElement = closeContainer.firstChild as HTMLElement | null;
 
         const response: any = {
