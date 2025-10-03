@@ -6848,7 +6848,7 @@ export declare class FileDownloadFormatter implements Formatter, IInitializeColu
 		originalNameProperty?: string;
 		iconClass?: string;
 	});
-	format(ctx: FormatterContext): string;
+	format(ctx: FormatterContext): FormatterResult;
 	static dbFileUrl(filename: string): string;
 	initializeColumn(column: Column): void;
 	get displayFormat(): string;
@@ -6897,7 +6897,7 @@ export declare class UrlFormatter implements Formatter, IInitializeColumn {
 		urlFormat?: string;
 		target?: string;
 	});
-	format(ctx: FormatterContext): string;
+	format(ctx: FormatterContext): FormatterResult;
 	initializeColumn(column: Column): void;
 	get displayProperty(): string;
 	set displayProperty(value: string);
