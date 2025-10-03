@@ -3616,7 +3616,7 @@ export interface IAggregatorConstructor {
 	 * A unique key for the aggregator (like 'sum', 'avg', etc.). This is also used in the totals object
 	 * as a property key to store the results of this aggregator.
 	 */
-	aggregateKey?: string;
+	aggregateKey: string;
 	/**
 	 * A user-friendly display name for the aggregator (like "Sum", "Average", etc.)
 	 */

@@ -17,7 +17,7 @@ public class SupplierColumns
     [Width(80)]
     public string Region { get; set; }
     [Width(130)]
-    [AsyncLookupEditor(typeof(Lookups.SupplierCountryLookup)), QuickFilter]
+    [AsyncLookupEditor(typeof(Lookups.SupplierCountryLookup)), QuickFilter, CountryWithFlagFormatter]
     public string Country { get; set; }
     [Width(130)]
     public string City { get; set; }

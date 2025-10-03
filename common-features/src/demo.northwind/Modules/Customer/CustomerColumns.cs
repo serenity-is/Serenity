@@ -18,7 +18,7 @@ public class CustomerColumns
     public string Region { get; set; }
     [Width(100)]
     public string PostalCode { get; set; }
-    [Width(130), AsyncLookupEditor(typeof(Lookups.CustomerCountryLookup)), QuickFilter(CssClass = "hidden-xs")]
+    [Width(130), AsyncLookupEditor(typeof(Lookups.CustomerCountryLookup)), QuickFilter(CssClass = "hidden-xs"), CountryWithFlagFormatter]
     public string Country { get; set; }
     [Width(120), AsyncLookupEditor(typeof(Lookups.CustomerCityLookup))]
     [QuickFilter(CssClass = "hidden-xs"), QuickFilterOption("cascadeFrom", "Country")]

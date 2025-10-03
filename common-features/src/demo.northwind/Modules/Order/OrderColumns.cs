@@ -26,7 +26,7 @@ public class OrderColumns
     [Width(140), ShipperFormatter, QuickFilter(CssClass = "hidden-xs"), QuickFilterOption("multiple", true)]
     public string ShipViaCompanyName { get; set; }
 
-    [Width(100), QuickFilter(CssClass = "hidden-xs"), AsyncLookupEditor(typeof(Lookups.OrderShipCountryLookup))]
+    [Width(100), QuickFilter(CssClass = "hidden-xs"), AsyncLookupEditor(typeof(Lookups.OrderShipCountryLookup)), CountryWithFlagFormatter]
     public string ShipCountry { get; set; }
 
     [Width(100), AsyncLookupEditor(typeof(Lookups.OrderShipCityLookup))]

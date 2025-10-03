@@ -2,6 +2,7 @@
 import { Column } from "@serenity-is/sleekgrid";
 import { EmployeeFormatter } from "../../Employee/EmployeeFormatter";
 import { FreightFormatter } from "../../Order/FreightFormatter";
+import { CountryWithFlagFormatter } from "../../Shared/CountryWithFlagFormatter";
 import { ShipperFormatter } from "../../Shipper/ShipperFormatter";
 import { OrderRow } from "./Northwind.OrderRow";
 import { OrderShippingState } from "./Northwind.OrderShippingState";
@@ -25,4 +26,4 @@ export class OrderColumns extends ColumnsBase<OrderRow> {
     static readonly Fields = fieldsProxy<OrderColumns>();
 }
 
-[EmployeeFormatter, OrderShippingState, ShipperFormatter, FreightFormatter]; // referenced types
+[EmployeeFormatter, OrderShippingState, ShipperFormatter, CountryWithFlagFormatter, FreightFormatter]; // referenced types

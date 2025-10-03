@@ -1,6 +1,7 @@
 ﻿import { ColumnsBase, fieldsProxy } from "@serenity-is/corelib";
 import { Column } from "@serenity-is/sleekgrid";
 import { EmployeeListFormatter } from "../../Customer/EmployeeListFormatter";
+import { CountryWithFlagFormatter } from "../../Shared/CountryWithFlagFormatter";
 import { CustomerRow } from "./Northwind.CustomerRow";
 
 export interface CustomerColumns {
@@ -22,4 +23,4 @@ export class CustomerColumns extends ColumnsBase<CustomerRow> {
     static readonly Fields = fieldsProxy<CustomerColumns>();
 }
 
-[EmployeeListFormatter]; // referenced types
+[CountryWithFlagFormatter, EmployeeListFormatter]; // referenced types
