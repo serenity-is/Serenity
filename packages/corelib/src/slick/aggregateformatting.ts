@@ -68,9 +68,7 @@ export namespace AggregateFormatting {
             fmtResult = defaultFormatValue();
         }
 
-        applyFormatterResultToCellNode(formatterContext({
-            sanitizer: ctx.sanitizer
-        }), fmtResult, span);
+        applyFormatterResultToCellNode(ctx, fmtResult, span, { contentOnly: true });
         return span;
     }
 

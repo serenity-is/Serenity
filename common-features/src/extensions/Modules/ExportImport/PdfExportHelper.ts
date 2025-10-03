@@ -1,5 +1,5 @@
 import { DataGrid, Fluent, ListRequest, ListResponse, ToolButton, deepClone, formatDate, htmlEncode, serviceCall, stringFormat } from "@serenity-is/corelib";
-import { Column, FormatterResult, Grid } from "@serenity-is/sleekgrid";
+import { applyFormatterResultToCellNode, Column, formatterContext, FormatterResult, Grid } from "@serenity-is/sleekgrid";
 
 export interface PdfExportOptions {
     grid: DataGrid<any, any>;
@@ -56,20 +56,14 @@ export namespace PdfExportHelper {
                 ctx.purpose = "pdfexport";
                 ctx.item = item;
                 ctx.value = item[col.field];
-                let html: FormatterResult = format ? format(ctx) : '';
-                if (!html || (!(html instanceof Node) && html.indexOf('<') < 0 && html.indexOf('&') < 0))
-                    dst.push(html);
+                let fmtResult: FormatterResult = format ? (format(ctx) ?? "") : '';
+                if (typeof fmtResult === "string" && (!fmtResult.length && (fmtResult.indexOf('<') < 0 || fmtResult.indexOf('&') < 0))) {
+                    dst.push(fmtResult);
+                }
                 else {
                     Fluent.empty(el);
-                    if (html instanceof Node) {
-                        el.appendChild(html);
-                    }
-                    else {
-                        if (typeof html === "string" && html.length) {
-                            html = (ctx.sanitizer ?? htmlEncode)(html);
-                        }
-                        el.innerHTML = html;
-                    }
+                    applyFormatterResultToCellNode(ctx, fmtResult, el, { contentOnly: true });
+                    el.querySelectorAll(".unicode-emoji").forEach(ue => ue.remove());
                     if (el.children.length == 1 &&
                         el.children[0]?.nodeName === 'SELECT') {
                         dst.push(el.children[0].querySelector("[selected]")?.textContent ?? '');
@@ -82,8 +76,9 @@ export namespace PdfExportHelper {
                         el.children[0].classList.contains('.check-box')) {
                         dst.push(el.children[0].classList.contains("checked") ? "X" : "")
                     }
-                    else
+                    else {
                         dst.push(el.textContent || '');
+                    }
                 }
             }
             row++;
