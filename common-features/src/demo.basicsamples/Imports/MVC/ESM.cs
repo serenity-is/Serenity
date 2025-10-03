@@ -7,6 +7,7 @@ public static partial class ESM
     public const string CloneableEntityDialogPage = "~/Serenity.Demo.BasicSamples/esm/Modules/Dialogs/CloneableEntityDialog/CloneableEntityDialogPage.js";
     public const string CustomLinksInGridPage = "~/Serenity.Demo.BasicSamples/esm/Modules/Grids/CustomLinksInGrid/CustomLinksInGridPage.js";
     public const string DefaultValuesInNewDialogPage = "~/Serenity.Demo.BasicSamples/esm/Modules/Dialogs/DefaultValuesInNewDialog/DefaultValuesInNewDialogPage.js";
+    public const string DemoLayout = "~/Serenity.Demo.BasicSamples/esm/Modules/DemoLayout.js";
     public const string DialogBoxesPage = "~/Serenity.Demo.BasicSamples/esm/Modules/Dialogs/DialogBoxes/DialogBoxesPage.js";
     public const string EnablingRowSelectionPage = "~/Serenity.Demo.BasicSamples/esm/Modules/Grids/EnablingRowSelection/EnablingRowSelectionPage.js";
     public const string EntityDialogAsPanelPage = "~/Serenity.Demo.BasicSamples/esm/Modules/Dialogs/EntityDialogAsPanel/EntityDialogAsPanelPage.js";
@@ -31,6 +32,8 @@ public static partial class ESM
 
     public static partial class Modules
     {
+        public const string DemoLayout = "~/Serenity.Demo.BasicSamples/esm/Modules/DemoLayout.js";
+
         public static partial class Dialogs
         {
             public static partial class ChartInDialog
