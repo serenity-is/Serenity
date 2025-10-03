@@ -6,6 +6,7 @@ import { getLanguageList } from "./Helpers/LanguageList";
 
 Config.rootNamespaces.push('Serene');
 TranslationConfig.getLanguageList = getLanguageList;
+gridDefaults.enableHtmlRendering = false;
 gridDefaults.useCssVars = false;
 
 let culture = (document.documentElement?.lang || 'en').toLowerCase();
