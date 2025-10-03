@@ -10,6 +10,10 @@ declare module "@serenity-is/sleekgrid" {
 
 export namespace AggregateFormatting {
 
+    const contentOnly = {
+        contentOnly: true
+    };
+
     export function groupTotalsFormat(ctx: FormatterContext<IGroupTotals>): FormatterResult {
         const totals = ctx.item as any;
         const column = ctx.column;
@@ -68,7 +72,7 @@ export namespace AggregateFormatting {
             fmtResult = defaultFormatValue();
         }
 
-        applyFormatterResultToCellNode(ctx, fmtResult, span, { contentOnly: true });
+        applyFormatterResultToCellNode(ctx, fmtResult, span, contentOnly);
         return span;
     }
 

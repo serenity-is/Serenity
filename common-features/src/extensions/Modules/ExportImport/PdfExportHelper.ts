@@ -19,6 +19,10 @@ export interface PdfExportOptions {
     printDateTimeHeader?: boolean;
 }
 
+const contentOnly = {
+    contentOnly: true
+}
+
 export namespace PdfExportHelper {
 
     function toAutoTableColumns(srcColumns: Column[], columnStyles: { [dataKey: string]: jsPDF.AutoTableStyles; },
@@ -62,7 +66,7 @@ export namespace PdfExportHelper {
                 }
                 else {
                     Fluent.empty(el);
-                    applyFormatterResultToCellNode(ctx, fmtResult, el, { contentOnly: true });
+                    applyFormatterResultToCellNode(ctx, fmtResult, el, contentOnly);
                     el.querySelectorAll(".unicode-emoji").forEach(ue => ue.remove());
                     if (el.children.length == 1 &&
                         el.children[0]?.nodeName === 'SELECT') {
