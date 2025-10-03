@@ -1067,7 +1067,7 @@ export declare class NoteDialog<P = {}> extends BaseDialog<P> {
 }
 export declare class FreightFormatter implements Formatter {
 	static [Symbol.typeInfo]: import("@serenity-is/corelib").FormatterTypeInfo<"Serenity.Demo.Northwind.">;
-	format(ctx: FormatterContext): string;
+	format(ctx: FormatterContext): FormatterResult;
 }
 export declare class ProductDialog<P = {}> extends EntityDialog<ProductRow, P> {
 	static [Symbol.typeInfo]: import("@serenity-is/corelib").ClassTypeInfo<"Serenity.Demo.Northwind.">;
@@ -1086,19 +1086,11 @@ export declare class ProductGrid<P = {}> extends EntityGrid<ProductRow, P> {
 	constructor(props: WidgetProps<P>);
 	protected getButtons(): import("@serenity-is/corelib").ToolButton[];
 	protected onViewProcessData(response: any): import("@serenity-is/corelib").ListResponse<ProductRow>;
-	/**
-	 * It would be nice if we could use autonumeric, Serenity editors etc. here, to control input validation,
-	 * but it's not supported by SlickGrid as we are only allowed to return a string, and should attach
-	 * no event handlers to rendered cell contents
-	 */
 	private numericInputFormatter;
 	private stringInputFormatter;
-	/**
-	 * Sorry but you cannot use LookupEditor, e.g. Select2 here, only possible is a SELECT element
-	 */
 	private selectFormatter;
 	private getEffectiveValue;
-	protected getColumns(): Column<ProductRow>[];
+	protected getColumns(): Column[];
 	private inputsChange;
 	private setSaveButtonState;
 	private saveClick;
@@ -1118,6 +1110,13 @@ export declare class RegionGrid<P = {}> extends EntityGrid<RegionRow, P> {
 	protected getRowDefinition(): typeof RegionRow;
 	protected getService(): string;
 }
+export declare class CountryWithFlagFormatter implements Formatter {
+	static [Symbol.typeInfo]: import("@serenity-is/corelib").FormatterTypeInfo<"Serenity.Demo.Northwind.">;
+	format(ctx: FormatterContext): FormatterResult;
+}
+export declare const iso2CodesByCountryName: Record<string, string>;
+export declare const validIso2CountryCodes: Set<string>;
+export declare function getCountryFlagEmoji(codeOrName: string): string;
 export declare class ShipperDialog<P = {}> extends EntityDialog<ShipperRow, P> {
 	static [Symbol.typeInfo]: import("@serenity-is/corelib").ClassTypeInfo<"Serenity.Demo.Northwind.">;
 	protected getFormKey(): string;

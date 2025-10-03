@@ -1761,8 +1761,6 @@ export type ToastrOptions = ToastContainerOptions & {
 	closeButton?: boolean;
 	/** CSS class for close button */
 	closeClass?: string;
-	/** Close button markup */
-	closeHtml?: string;
 	/** If true (default) toast keeps open when hovered, and closes after extendedTimeout when mouse leaves the toast */
 	closeOnHover?: boolean;
 	/** If closeOnHover is true, the toast closes in extendedTimeout duration after the mouse leaves the toast. Default is 1000 */
@@ -6825,7 +6823,7 @@ export declare class EnumFormatter implements Formatter {
 	constructor(props?: {
 		enumKey?: string;
 	});
-	format(ctx: FormatterContext): string | Element;
+	format(ctx: FormatterContext): FormatterResult;
 	get enumKey(): string;
 	set enumKey(value: string);
 	static format(enumType: any, value: any): string;

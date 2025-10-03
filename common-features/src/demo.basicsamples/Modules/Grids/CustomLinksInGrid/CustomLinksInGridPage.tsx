@@ -1,5 +1,5 @@
 import { Fluent, LookupEditor, confirmDialog, count, formatDate, gridPageInit, htmlEncode, notifyInfo, notifySuccess, stringFormat, toId } from "@serenity-is/corelib";
-import { CustomerDialog, OrderColumns, OrderDialog, OrderGrid, OrderRow } from "@serenity-is/demo.northwind";
+import { CountryWithFlagFormatter, CustomerDialog, OrderColumns, OrderDialog, OrderGrid, OrderRow } from "@serenity-is/demo.northwind";
 import { Column } from "@serenity-is/sleekgrid";
 import { nsDemoBasicSamples } from "../../ServerTypes/Namespaces";
 
@@ -25,7 +25,7 @@ export class CustomLinksInGrid extends OrderGrid {
             ctx => <a href="#" class="employee-link">{ctx.value}</a>);
 
         columns.ShipCountry && (columns.ShipCountry.format =
-            ctx => <a href="#" class="ship-country-link">{ctx.value}</a>);
+            ctx => <a href="#" class="ship-country-link">{new CountryWithFlagFormatter().format(ctx)}</a>);
 
         return columns.valueOf();
     }
@@ -86,7 +86,7 @@ export class CustomLinksInGrid extends OrderGrid {
                 EmployeeID: item.EmployeeID
             });
         }
-        else if (target.classList.contains("ship-country-link")) {
+        else if (target.closest(".ship-country-link")) {
             e.preventDefault();
 
             notifySuccess("Let's filter the grid to orders from " + item.ShipCountry);

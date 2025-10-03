@@ -62,7 +62,15 @@ export namespace AggregateFormatting {
             const cellItem = new NonDataRow();
             (cellItem as any)[field] = value;
             try {
-                fmtResult = formatter(formatterContext({ column, item: cellItem, value, purpose: ctx.purpose ?? "group-totals" }));
+                fmtResult = formatter(formatterContext({ 
+                    grid: ctx.grid,
+                    escape: ctx.escape,
+                    sanitizer: ctx.sanitizer,
+                    column, 
+                    item: cellItem, 
+                    value, 
+                    purpose: ctx.purpose ?? "group-totals" 
+                }));
             }
             catch (e) {
                 fmtResult = defaultFormatValue();

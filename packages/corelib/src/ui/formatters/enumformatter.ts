@@ -1,4 +1,4 @@
-import { FormatterContext } from "@serenity-is/sleekgrid";
+import { FormatterContext, FormatterResult } from "@serenity-is/sleekgrid";
 import { Enum, formatterTypeInfo, getCustomAttribute, getTypeFullName, htmlEncode, isPromiseLike, localText, nsSerenity, registerType } from "../../base";
 import { Formatter } from "../../slick";
 import { EnumKeyAttribute } from "../../types/attributes";
@@ -11,7 +11,7 @@ export class EnumFormatter implements Formatter {
         this.props ??= {};
     }
 
-    format(ctx: FormatterContext): string | Element {
+    format(ctx: FormatterContext): FormatterResult {
         var enumType = EnumTypeRegistry.getOrLoad(this.enumKey);
         if (isPromiseLike(enumType)) {
             const node = document.createElement("span");
