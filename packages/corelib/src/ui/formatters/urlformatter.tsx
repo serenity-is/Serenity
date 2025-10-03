@@ -1,5 +1,5 @@
 import { Column, FormatterContext, FormatterResult } from "@serenity-is/sleekgrid";
-import { formatterTypeInfo, nsSerenity, registerType, resolveUrl, stringFormat } from "../../base";
+import { formatterTypeInfo, nsSerenity, registerType, resolveUrl, sanitizeUrl, stringFormat } from "../../base";
 import { Formatter } from "../../slick";
 import { IInitializeColumn } from "./iinitializecolumn";
 
@@ -22,6 +22,7 @@ export class UrlFormatter implements Formatter, IInitializeColumn {
             url = stringFormat(this.urlFormat, url);
 
         url = resolveUrl(url);
+        url = sanitizeUrl(url);
 
         var display = (this.displayProperty ?
             (ctx.item[this.displayProperty] ?? '').toString() :
