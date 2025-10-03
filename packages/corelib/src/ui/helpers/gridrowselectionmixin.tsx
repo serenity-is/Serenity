@@ -135,8 +135,8 @@ export class GridRowSelectionMixin {
 
     static createSelectColumn(getMixin: () => GridRowSelectionMixin): Column {
         return {
-            name: '<span class="select-all-items check-box no-float "></span>',
-            nameIsHtml: true,
+            name: "[×]",
+            nameFormat: () => <span class="select-all-items check-box no-float"></span>,
             toolTip: ' ',
             field: '__select__',
             width: 27,
@@ -150,7 +150,7 @@ export class GridRowSelectionMixin {
                     return '';
                 }
                 var isChecked = mixin.include[ctx.item[mixin.idField]];
-                return '<span class="select-item check-box no-float ' + (isChecked ? ' checked' : '') + '"></span>';
+                return <span class={'select-item check-box no-float' + (isChecked ? ' checked' : '')}></span>;
             }
         };
     }
