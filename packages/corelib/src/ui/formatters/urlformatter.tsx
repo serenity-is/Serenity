@@ -1,5 +1,5 @@
-import { Column, FormatterContext } from "@serenity-is/sleekgrid";
-import { formatterTypeInfo, htmlEncode, nsSerenity, registerType, resolveUrl, stringFormat } from "../../base";
+import { Column, FormatterContext, FormatterResult } from "@serenity-is/sleekgrid";
+import { formatterTypeInfo, nsSerenity, registerType, resolveUrl, stringFormat } from "../../base";
 import { Formatter } from "../../slick";
 import { IInitializeColumn } from "./iinitializecolumn";
 
@@ -10,7 +10,7 @@ export class UrlFormatter implements Formatter, IInitializeColumn {
         this.props ??= {};
     }
 
-    format(ctx: FormatterContext): string {
+    format(ctx: FormatterContext): FormatterResult {
         var url = (this.urlProperty ?
             (ctx.item[this.urlProperty] ?? '').toString() :
             (ctx.value ?? '').toString());
@@ -30,13 +30,7 @@ export class UrlFormatter implements Formatter, IInitializeColumn {
         if (this.displayFormat)
             display = stringFormat(this.displayFormat, display);
 
-        var s = "<a href='" + htmlEncode(url) + "'";
-        if (this.target)
-            s += " target='" + this.target + "'";
-
-        s += '>' + htmlEncode(display) + '</a>';
-
-        return s;
+        return <a href={url} target={this.target}>{display}</a>;
     }
 
     initializeColumn(column: Column): void {

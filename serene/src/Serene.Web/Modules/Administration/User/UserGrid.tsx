@@ -37,11 +37,11 @@ export class UserGrid extends EntityGrid<UserRow, any> {
 
             roles.format = ctx => {
                 if (!rolesLookup)
-                    return `<i class="fa fa-spinner"></i>`;
+                    return <i class="fa fa-spinner"></i>;
 
                 var roleList = (ctx.value || []).map(x => (rolesLookup.itemById[x] || {}).RoleName || "");
                 roleList.sort();
-                return roleList.join(", ");
+                return roleList.map(x => ctx.escape(x)).join(", ");
             };
         }
 

@@ -1,5 +1,5 @@
-import { Column, FormatterContext } from "@serenity-is/sleekgrid";
-import { faIcon, formatterTypeInfo, htmlEncode, iconClassName, nsSerenity, registerType, resolveUrl, stringFormat } from "../../base";
+import { Column, FormatterContext, FormatterResult } from "@serenity-is/sleekgrid";
+import { faIcon, formatterTypeInfo, iconClassName, nsSerenity, registerType, resolveUrl, stringFormat } from "../../base";
 import { replaceAll } from "../../compat";
 import { Formatter } from "../../slick";
 import { IInitializeColumn } from "./iinitializecolumn";
@@ -11,7 +11,7 @@ export class FileDownloadFormatter implements Formatter, IInitializeColumn {
         this.props ??= {};
     }
 
-    format(ctx: FormatterContext): string {
+    format(ctx: FormatterContext): FormatterResult {
         var dbFile = ctx.value as string;
         if (!dbFile)
             return '';
@@ -26,8 +26,7 @@ export class FileDownloadFormatter implements Formatter, IInitializeColumn {
 
         var iconClass = iconClassName(this.iconClass ?? faIcon("download"));
 
-        return "<a class='file-download-link' target='_blank' href='" +
-            htmlEncode(downloadUrl) + "'><i class='" + iconClass + "'></i> " + htmlEncode(text) + '</a>';
+        return <a class="file-download-link" target="_blank" href={downloadUrl}><i class={iconClass}></i> {text}</a>;
     }
 
     static dbFileUrl(filename: string): string {

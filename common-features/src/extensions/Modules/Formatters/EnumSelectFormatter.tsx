@@ -11,28 +11,20 @@ export class EnumSelectFormatter implements Formatter {
     }
 
     format(ctx: FormatterContext) {
-        var enumType = EnumTypeRegistry.get(this.props.enumKey ?? "EnumKeyOptionNotSpecified!");
+        const enumType = EnumTypeRegistry.get(this.props.enumKey ?? "EnumKeyOptionNotSpecified!");
 
-        var sb = "<select>";
-        if (this.props.allowClear) {
-            sb += '<option value="">';
-            sb += htmlEncode(this.props.emptyItemText ?? SelectEditorTexts.EmptyItemText);
-            sb += '</option>';
-        }
-
-        for (var x of Object.keys(enumType).filter(v => !isNaN(parseInt(v, 10)))) {
-            sb += '<option value="' + htmlEncode(x) + '"';
-            if (x == ctx.value)
-                sb += " selected";
-            var name = enumType[x];
-            sb += ">";
-            sb += htmlEncode(localText("Enums." + this.props.enumKey + "." + name, name));
-            sb += "</option>";
-        }
-
-        sb += "</select>";
-
-        return sb;
+        return (
+            <select>
+                {this.props.allowClear && <option value="">
+                    {htmlEncode(this.props.emptyItemText ?? SelectEditorTexts.EmptyItemText)}
+                </option>}
+                {Object.keys(enumType).filter(v => !isNaN(parseInt(v, 10))).map(x => (
+                    <option value={x} selected={x == ctx.value}>
+                        {localText("Enums." + this.props.enumKey + "." + enumType[x], enumType[x])}
+                    </option>
+                ))}
+            </select>
+        );
     }
 
     get enumKey() { return this.props.enumKey }
