@@ -3,7 +3,6 @@ import { ValidationHelper, isTrimmedEmpty } from "../../compat";
 import { IEditDialog, IGetEditValue, IReadOnly, ISetEditValue, IStringValue } from "../../interfaces";
 import { DialogType } from "../../types/dialogtype";
 import { DialogTypeRegistry } from "../../types/dialogtyperegistry";
-import { ReflectionUtils } from "../../types/reflectionutils";
 import { SubDialogHelper } from "../helpers/subdialoghelper";
 import { Widget } from "../widgets/widget";
 import { CascadedWidgetLink } from "./cascadedwidgetlink";
@@ -700,7 +699,7 @@ export class ComboboxEditor<P, TItem> extends EditorWidget<P> implements
         var fld = this.get_cascadeField();
 
         return items.filter(x => {
-            var itemKey = (x as any)[fld] ?? ReflectionUtils.getPropertyValue(x, fld);
+            var itemKey = (x as any)[fld];
             return !!(itemKey != null && itemKey.toString() === key);
         });
     }
@@ -716,7 +715,7 @@ export class ComboboxEditor<P, TItem> extends EditorWidget<P> implements
         var fld = this.get_filterField();
 
         return items.filter(x => {
-            var itemKey = (x as any)[fld] ?? ReflectionUtils.getPropertyValue(x, fld);
+            var itemKey = (x as any)[fld];
             return !!(itemKey != null && itemKey.toString() === key);
         });
     }

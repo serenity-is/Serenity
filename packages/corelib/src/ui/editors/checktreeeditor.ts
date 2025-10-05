@@ -2,7 +2,7 @@
 import { CheckTreeEditorTexts, Culture, Fluent, ListResponse, nsSerenity, type Lookup, type PropertyItem } from "../../base";
 import { ScriptData, getLookup } from "../../compat";
 import { IGetEditValue, IReadOnly, ISetEditValue } from "../../interfaces";
-import { ReflectionUtils } from "../../types/reflectionutils";
+import { ReflectionOptionsSetter } from "../widgets/reflectionoptionssetter";
 import { DataGrid } from "../datagrid/datagrid";
 import { GridSelectAllButtonHelper } from "../helpers/gridselectallbuttonhelper";
 import { GridUtils } from "../helpers/gridutils";
@@ -545,7 +545,7 @@ export class CheckLookupEditor<TItem extends CheckTreeItem<TItem> = any, P exten
         var fld = this.get_cascadeField();
 
         return items.filter(x => {
-            var itemKey = (x as any)[fld] ?? ReflectionUtils.getPropertyValue(x, fld);
+            var itemKey = (x as any)[fld];
             return !!(itemKey != null && itemKey.toString() === key);
         });
     }
@@ -561,7 +561,7 @@ export class CheckLookupEditor<TItem extends CheckTreeItem<TItem> = any, P exten
         var fld = this.get_filterField();
 
         return items.filter(x => {
-            var itemKey = (x as any)[fld] ?? ReflectionUtils.getPropertyValue(x, fld);
+            var itemKey = (x as any)[fld];
             return !!(itemKey != null && itemKey.toString() === key);
         });
     }

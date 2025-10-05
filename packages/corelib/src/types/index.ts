@@ -9,4 +9,4 @@ export * from "./editortyperegistry";
 export * from "./enumtyperegistry";
 export * from "./formattertype";
 export * from "./formattertyperegistry";
-export * from "./reflectionutils";
+export * from "../ui/widgets/reflectionoptionssetter";
