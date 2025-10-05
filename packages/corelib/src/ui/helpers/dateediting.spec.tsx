@@ -168,7 +168,7 @@ describe("dateInputKeyupHandler", () => {
         mockInput.selectionEnd = 1;
 
         dateInputKeyupHandler(mockEvent);
-        
+
         expect(mockInput.value).toBe('12');
     });
 
@@ -183,7 +183,7 @@ describe("dateInputKeyupHandler", () => {
         expect(mockInput.value).toBe('12/');
     });
 
-    it("should handle slash key (47) at position 2 with dmy", () => {
+    it("should handle slash key at position 2 (d/) with dmy", () => {
         Culture.dateOrder = 'dmy';
         Culture.dateSeparator = '/';
         mockInput.value = '1/';
@@ -195,7 +195,7 @@ describe("dateInputKeyupHandler", () => {
         expect(mockInput.value).toBe('01/');
     });
 
-    it("should handle slash key (47) at position 2 with mdy", () => {
+    it("should handle slash key at position 2 (m/) with mdy", () => {
         Culture.dateOrder = 'mdy';
         Culture.dateSeparator = '/';
         mockInput.value = '1/';
@@ -207,16 +207,52 @@ describe("dateInputKeyupHandler", () => {
         expect(mockInput.value).toBe('01/');
     });
 
-    it("should handle slash key (47) at position 4 with dmy", () => {
+    it("should handle slash key at position 4 (d/m/) with dmy", () => {
         Culture.dateOrder = 'dmy';
         Culture.dateSeparator = '/';
-        mockInput.value = '12/3';
+        mockInput.value = '1/3/';
         mockInput.selectionEnd = 4;
         mockEvent.key = 'slash';
 
         dateInputKeyupHandler(mockEvent);
 
-        expect(mockInput.value).toBe('12/3'); // No change because logic doesn't handle this case
+        expect(mockInput.value).toBe('01/03/');
+    });
+
+    it("should handle slash key at position 4 (m/d/) with mdy", () => {
+        Culture.dateOrder = 'mdy';
+        Culture.dateSeparator = '/';
+        mockInput.value = '12/3/';
+        mockInput.selectionEnd = 4;
+        mockEvent.key = 'slash';
+
+        dateInputKeyupHandler(mockEvent);
+
+        expect(mockInput.value).toBe('12/3/');
+    });
+
+    it("should handle slash key at position 5 (d/mm/) with dmy", () => {
+        Culture.dateOrder = 'dmy';
+        Culture.dateSeparator = '/';
+        mockInput.value = '1/03/';
+        mockInput.selectionEnd = 5;
+        mockEvent.key = 'slash';
+
+        dateInputKeyupHandler(mockEvent);
+
+        expect(mockInput.value).toBe('01/03/');
+    });
+
+    it("should handle slash key at position 5 (m/dd/) with mdy", () => {
+        Culture.dateOrder = 'mdy';
+        Culture.dateSeparator = '/';
+        mockInput.value = '1/03/';
+        mockInput.selectionEnd = 5;
+        mockEvent.key = 'slash';
+
+        dateInputKeyupHandler(mockEvent);
+
+        expect(mockInput.value).toBe('01/03/');
     });
 
     it("should handle numeric input and add separator at position 2", () => {
