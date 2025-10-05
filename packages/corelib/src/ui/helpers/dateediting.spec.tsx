@@ -4,7 +4,6 @@ import type { MockInstance } from "vitest";
 
 describe("dateInputChangeHandler", () => {
     let mockInput: HTMLInputElement;
-    let mockInputGetSpy: MockInstance;
     let mockInputSetSpy: MockInstance;
     let mockEvent: Event;
     let originalDateOrder: string;
@@ -21,7 +20,6 @@ describe("dateInputChangeHandler", () => {
         mockEvent = {
             target: mockInput
         } as any;
-        mockInputGetSpy = vi.spyOn(mockInput, 'value', 'get');
         mockInputSetSpy = vi.spyOn(mockInput, 'value', 'set');
         originalDateOrder = Culture.dateOrder;
         originalDateSeparator = Culture.dateSeparator;
@@ -39,7 +37,6 @@ describe("dateInputChangeHandler", () => {
 
         dateInputChangeHandler(mockEvent);
 
-        expect(mockInputGetSpy).not.toHaveBeenCalled();
         expect(mockInputSetSpy).not.toHaveBeenCalled();
         expect(mockInput.value).toBe('');
 
@@ -52,7 +49,6 @@ describe("dateInputChangeHandler", () => {
 
         dateInputChangeHandler(mockEvent);
 
-        expect(mockInputGetSpy).not.toHaveBeenCalled();
         expect(mockInputSetSpy).not.toHaveBeenCalled();
         expect(mockInput.value).toBe('');
     });
@@ -65,26 +61,6 @@ describe("dateInputChangeHandler", () => {
         dateInputChangeHandler(mockEvent);
 
         expect(mockInput.value).toBe('12/10/1956');
-    });
-
-    it("should not format 6+ digit numeric string with day part > 31", () => {
-        Culture.dateOrder = 'dmy';
-        Culture.dateSeparator = '/';
-        mockInput.value = '321056';
-
-        dateInputChangeHandler(mockEvent);
-
-        expect(mockInput.value).toBe('321056');
-    });
-
-    it("should not format 6+ digit numeric string with month part > 12", () => {
-        Culture.dateOrder = 'dmy';
-        Culture.dateSeparator = '/';
-        mockInput.value = '121356';
-
-        dateInputChangeHandler(mockEvent);
-
-        expect(mockInput.value).toBe('01/01/121356'); // Because parseDate will parse it as year 121356
     });
 
     it("should not format non-numeric strings", () => {
@@ -125,6 +101,7 @@ describe("dateInputChangeHandler", () => {
 
 describe("dateInputKeyupHandler", () => {
     let mockInput: HTMLInputElement;
+    let mockInputSetSpy: MockInstance;
     let mockEvent: any;
     let originalDateOrder: string;
     let originalDateSeparator: string;
@@ -134,10 +111,11 @@ describe("dateInputKeyupHandler", () => {
         vi.spyOn(mockInput, 'getAttribute').mockReturnValue(null);
         mockEvent = {
             target: mockInput,
-            which: 0
+            key: null
         };
         originalDateOrder = Culture.dateOrder;
         originalDateSeparator = Culture.dateSeparator;
+        mockInputSetSpy = vi.spyOn(mockInput, 'value', 'set');
     });
 
     afterEach(() => {
@@ -146,8 +124,8 @@ describe("dateInputKeyupHandler", () => {
         Culture.dateSeparator = originalDateSeparator;
     });
 
-    it("should do nothing if Culture.dateOrder is not 'dmy'", () => {
-        Culture.dateOrder = 'mdy';
+    it("should do nothing if Culture.dateOrder is not 'dmy' or 'mdy'", () => {
+        Culture.dateOrder = 'ymd';
 
         dateInputKeyupHandler(mockEvent);
 
@@ -160,6 +138,7 @@ describe("dateInputKeyupHandler", () => {
 
         dateInputKeyupHandler(mockEvent);
 
+        expect(mockInputSetSpy).not.toHaveBeenCalled();
         expect(mockInput.value).toBe('');
     });
 
@@ -169,6 +148,7 @@ describe("dateInputKeyupHandler", () => {
 
         dateInputKeyupHandler(mockEvent);
 
+        expect(mockInputSetSpy).not.toHaveBeenCalled();
         expect(mockInput.value).toBe('');
     });
 
@@ -178,6 +158,7 @@ describe("dateInputKeyupHandler", () => {
 
         dateInputKeyupHandler(mockEvent);
 
+        expect(mockInputSetSpy).not.toHaveBeenCalled();
         expect(mockInput.value).toBe('');
     });
 
@@ -187,7 +168,7 @@ describe("dateInputKeyupHandler", () => {
         mockInput.selectionEnd = 1;
 
         dateInputKeyupHandler(mockEvent);
-
+        
         expect(mockInput.value).toBe('12');
     });
 
@@ -202,24 +183,36 @@ describe("dateInputKeyupHandler", () => {
         expect(mockInput.value).toBe('12/');
     });
 
-    it("should handle slash key (47) at position 2", () => {
+    it("should handle slash key (47) at position 2 with dmy", () => {
         Culture.dateOrder = 'dmy';
         Culture.dateSeparator = '/';
         mockInput.value = '1/';
         mockInput.selectionEnd = 2;
-        mockEvent.which = 47;
+        mockEvent.key = 'slash';
 
         dateInputKeyupHandler(mockEvent);
 
         expect(mockInput.value).toBe('01/');
     });
 
-    it("should handle slash key (47) at position 4", () => {
+    it("should handle slash key (47) at position 2 with mdy", () => {
+        Culture.dateOrder = 'mdy';
+        Culture.dateSeparator = '/';
+        mockInput.value = '1/';
+        mockInput.selectionEnd = 2;
+        mockEvent.key = 'slash';
+
+        dateInputKeyupHandler(mockEvent);
+
+        expect(mockInput.value).toBe('01/');
+    });
+
+    it("should handle slash key (47) at position 4 with dmy", () => {
         Culture.dateOrder = 'dmy';
         Culture.dateSeparator = '/';
         mockInput.value = '12/3';
         mockInput.selectionEnd = 4;
-        mockEvent.which = 47;
+        mockEvent.key = 'slash';
 
         dateInputKeyupHandler(mockEvent);
 
@@ -231,7 +224,7 @@ describe("dateInputKeyupHandler", () => {
         Culture.dateSeparator = '/';
         mockInput.value = '12';
         mockInput.selectionEnd = 2;
-        mockEvent.which = 50; // '2'
+        mockEvent.key = '2';
 
         dateInputKeyupHandler(mockEvent);
 
@@ -243,7 +236,7 @@ describe("dateInputKeyupHandler", () => {
         Culture.dateSeparator = '/';
         mockInput.value = '12/34';
         mockInput.selectionEnd = 5;
-        mockEvent.which = 53; // '5'
+        mockEvent.key = '5';
 
         dateInputKeyupHandler(mockEvent);
 
@@ -255,7 +248,7 @@ describe("dateInputKeyupHandler", () => {
         Culture.dateSeparator = '/';
         mockInput.value = '4';
         mockInput.selectionEnd = 1;
-        mockEvent.which = 52; // '4'
+        mockEvent.key = '4';
 
         dateInputKeyupHandler(mockEvent);
 

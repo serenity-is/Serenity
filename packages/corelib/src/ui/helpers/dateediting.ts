@@ -1,7 +1,7 @@
 import { Culture, formatDate, getjQuery, parseDate } from "../../base";
 
 export function dateInputChangeHandler(e: Event) {
-    if (Culture.dateOrder !== 'dmy')
+    if (Culture.dateOrder !== 'dmy' && Culture.dateOrder !== 'mdy')
         return;
 
     var input = e.target as HTMLInputElement;
@@ -9,9 +9,8 @@ export function dateInputChangeHandler(e: Event) {
         return;
 
     var val = input.value ?? '';
-    if (val.length >= 6 && val.length <= 8 && /^[0-9]*$/g.test(val) && 
-        parseInt(val.substring(0, 2), 10) <= 31 && parseInt(val.substring(0, 2), 10) > 0 && 
-        parseInt(val.substring(2, 4), 10) <= 12 && parseInt(val.substring(2, 4), 10) > 0) {
+    if (val.length >= 6 && val.length <= 8 && /^[0-9]*$/g.test(val)) {
+        input.value = val.substring(0, 2) + Culture.dateSeparator + val.substring(2, 4) + Culture.dateSeparator + val.substring(4);
         input.value = val.substring(0, 2) + Culture.dateSeparator + val.substring(2, 4) + Culture.dateSeparator + val.substring(4);
     }
 
@@ -23,10 +22,11 @@ export function dateInputChangeHandler(e: Event) {
     }
 }
 
-export function dateInputKeyupHandler(e: KeyboardEvent) {
+function isDigit(c: string): boolean {
+    return c >= '0' && c <= '9';
+}
 
-    if (Culture.dateOrder !== 'dmy')
-        return;
+export function dateInputKeyupHandler(e: KeyboardEvent) {
 
     var input = e.target as HTMLInputElement;
     if (input?.getAttribute("type") == "date") {
@@ -41,29 +41,21 @@ export function dateInputKeyupHandler(e: KeyboardEvent) {
     if (!!(val.length === 0 || input.selectionEnd !== val.length))
         return;
 
-    if (val.indexOf(Culture.dateSeparator + Culture.dateSeparator) !== -1) {
+    if (val.indexOf(Culture.dateSeparator + Culture.dateSeparator) >= 0) {
+        // remove double separator
         input.value = val.split(Culture.dateSeparator + Culture.dateSeparator).join(Culture.dateSeparator);
         return;
     }
 
-    function isNumeric(c: string): boolean {
-        return c >= '0' && c <= '9';
-    }
+    if (e.key === 'slash' || e.key === 'NumpadDivide' || e.key === '/') {
 
-    if ((e as any).which === 47 || (e as any).which === 111) {
-
-        if (val.length >= 2 && val.charAt(val.length - 1) === Culture.dateSeparator &&
-            val.charAt(val.length - 2) === Culture.dateSeparator) {
-            input.value = val.substring(0, val.length - 1);
-            return;
-        }
-
-        if (val.charAt(val.length - 1) !== Culture.dateSeparator)
+        if (val[val.length - 1] !== Culture.dateSeparator)
             return;
 
         switch (val.length) {
             case 2: {
-                if (isNumeric(val.charAt(0))) {
+                if (isDigit(val[0])) {
+                    // 4/ -> 04/
                     val = '0' + val;
                     break;
                 }
@@ -73,11 +65,12 @@ export function dateInputKeyupHandler(e: KeyboardEvent) {
             }
 
             case 4: {
-                if (isNumeric(val.charAt(0)) &&
-                    isNumeric(val.charAt(2)) &&
-                    val.charAt(1) == Culture.dateSeparator) {
-                    val = '0' + val.charAt(0) + Culture.dateSeparator + '0' +
-                        val.charAt(2) + Culture.dateSeparator;
+                if (isDigit(val[0]) &&
+                    isDigit(val[2]) &&
+                    val[1] == Culture.dateSeparator) {
+                    // 4/5/ -> 04/05/
+                    val = '0' + val[0] + Culture.dateSeparator + '0' +
+                        val[2] + Culture.dateSeparator;
                     break;
                 }
                 else {
@@ -86,19 +79,21 @@ export function dateInputKeyupHandler(e: KeyboardEvent) {
             }
 
             case 5: {
-                if (isNumeric(val.charAt(0)) &&
-                    isNumeric(val.charAt(2)) &&
-                    isNumeric(val.charAt(3)) &&
-                    val.charAt(1) === Culture.dateSeparator) {
+                if (isDigit(val[0]) &&
+                    isDigit(val[2]) &&
+                    isDigit(val[3]) &&
+                    val[1] === Culture.dateSeparator) {
+                    // 4/12/ -> 04/12/
                     val = '0' + val;
                     break;
                 }
-                else if (isNumeric(val.charAt(0)) &&
-                    isNumeric(val.charAt(1)) &&
-                    isNumeric(val.charAt(3)) &&
-                    val.charAt(2) === Culture.dateSeparator) {
-                    val = val.charAt(0) + val.charAt(1) +
-                        Culture.dateSeparator + '0' + val.charAt(3) + Culture.dateSeparator;
+                else if (isDigit(val[0]) &&
+                    isDigit(val[1]) &&
+                    isDigit(val[3]) &&
+                    // 12/4/ -> 12/04/
+                    val[2] === Culture.dateSeparator) {
+                    val = val[0] + val[1] +
+                        Culture.dateSeparator + '0' + val[3] + Culture.dateSeparator;
                     break;
                 }
                 else {
@@ -112,8 +107,11 @@ export function dateInputKeyupHandler(e: KeyboardEvent) {
         input.value = val ?? '';
     }
 
-    if (!(val.length < 6 && ((e as any).which >= 48 && (e as any).which <= 57 || (e as any).which >= 96 && (e as any).which <= 105) &&
-        isNumeric(val.charAt(val.length - 1))))
+    if (Culture.dateOrder !== 'dmy')
+        return;    
+
+    if (!(val.length < 6 && (e.key >= '0' && e.key <= '9' || e.key >= 'Numpad0' && e.key <= 'Numpad9') &&
+        isDigit(val[val.length - 1])))
         return;
 
     switch (val.length) {
@@ -124,47 +122,47 @@ export function dateInputKeyupHandler(e: KeyboardEvent) {
             break;
 
         case 2:
-            if (!isNumeric(val.charAt(0)))
+            if (!isDigit(val[0]))
                 return;
             break;
 
         case 3:
-            if (!isNumeric(val.charAt(0)) ||
-                val.charAt(1) !== Culture.dateSeparator ||
+            if (!isDigit(val[0]) ||
+                val[1] !== Culture.dateSeparator ||
                 val.charCodeAt(2) <= 49) {
                 return;
             }
-            val = '0' + val.charAt(0) + Culture.dateSeparator + '0' + val.charAt(2);
+            val = '0' + val[0] + Culture.dateSeparator + '0' + val[2];
             break;
 
         case 4:
-            if (val.charAt(1) == Culture.dateSeparator) {
-                if (!isNumeric(val.charAt(0)) ||
-                    !isNumeric(val.charAt(2))) {
+            if (val[1] == Culture.dateSeparator) {
+                if (!isDigit(val[0]) ||
+                    !isDigit(val[2])) {
                     return;
                 }
 
                 val = '0' + val;
                 break;
             }
-            else if (val.charAt(2) == Culture.dateSeparator) {
-                if (!isNumeric(val.charAt(0)) ||
-                    !isNumeric(val.charAt(1)) ||
+            else if (val[2] == Culture.dateSeparator) {
+                if (!isDigit(val[0]) ||
+                    !isDigit(val[1]) ||
                     val.charCodeAt(3) <= 49) {
                     return;
                 }
 
-                val = val.charAt(0) + val.charAt(1) + Culture.dateSeparator +
-                    '0' + val.charAt(3);
+                val = val[0] + val[1] + Culture.dateSeparator +
+                    '0' + val[3];
                 break;
             }
             else
                 return;
         case 5:
-            if (val.charAt(2) !== Culture.dateSeparator ||
-                !isNumeric(val.charAt(0)) ||
-                !isNumeric(val.charAt(1)) ||
-                !isNumeric(val.charAt(3))) {
+            if (val[2] !== Culture.dateSeparator ||
+                !isDigit(val[0]) ||
+                !isDigit(val[1]) ||
+                !isDigit(val[3])) {
                 return;
             }
             break;
