@@ -9,8 +9,11 @@ export function dateInputChangeHandler(e: Event) {
         return;
 
     var val = input.value ?? '';
-    if (val.length >= 6 && /^[0-9]*$/g.test(val))
-        input.value = val.substring(0, 2) + Culture.dateSeparator + val.substring(2, 2) + Culture.dateSeparator + val.substring(4);
+    if (val.length >= 6 && val.length <= 8 && /^[0-9]*$/g.test(val) && 
+        parseInt(val.substring(0, 2), 10) <= 31 && parseInt(val.substring(0, 2), 10) > 0 && 
+        parseInt(val.substring(2, 4), 10) <= 12 && parseInt(val.substring(2, 4), 10) > 0) {
+        input.value = val.substring(0, 2) + Culture.dateSeparator + val.substring(2, 4) + Culture.dateSeparator + val.substring(4);
+    }
 
     val = input.value ?? '';
     if (val.length >= 5) {
