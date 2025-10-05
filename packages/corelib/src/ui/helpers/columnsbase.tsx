@@ -1,26 +1,29 @@
 import { Column } from "@serenity-is/sleekgrid";
 
 export class ColumnsBase<TRow = any> {
+    declare private __items: Column<TRow>[];
+
     constructor(items: Column<TRow>[]) {
-        (this as any).__items = items;
-        for (var col of items) {
-            let id = col.id;
-            if (id && !(this as any)[id])
-                (this as any)[id] = col;
+        let key: string;
+        this.__items = items ?? [];
+        for (const col of this.__items) {
+            key = col.id;
+            if (key && !(this as any)[key])
+                (this as any)[key] = col;
         }
-        for (var col of items) {
-            let id = col.sourceItem?.name;
-            if (id && !(this as any)[id])
-                (this as any)[id] = col;
+        for (const col of this.__items) {
+            key = col.sourceItem?.name;
+            if (key && !(this as any)[key])
+                (this as any)[key] = col;
         }
-        for (var col of items) {
-            let id = col.field;
-            if (id && !(this as any)[id])
-                (this as any)[id] = col;
+        for (const col of this.__items) {
+            key = col.field;
+            if (key && !(this as any)[key])
+                (this as any)[key] = col;
         }
     }
 
     valueOf(): Column<TRow>[] {
-        return (this as any).__items;
+        return this.__items;
     }
 }
