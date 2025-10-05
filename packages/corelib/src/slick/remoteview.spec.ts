@@ -523,7 +523,7 @@ describe("RemoteView", () => {
                 { id: 2, name: "Item 2" }
             ];
 
-            vitest.spyOn(view, 'refresh').mockImplementation(() => { });
+            vi.spyOn(view, 'refresh').mockImplementation(() => { });
             view.beginUpdate();
             view.setItems(items);
             // In suspend mode, items and rows should be set

@@ -950,6 +950,9 @@ describe("Router document click handling", () => {
         document.body.appendChild(anchor);
         anchor.setAttribute("href", "/some/path");
 
+        // Prevent default to avoid JSDOM navigation error
+        anchor.addEventListener("click", (e) => e.preventDefault(), { once: true });
+
         // Click the anchor
         const clickEvent = new MouseEvent("click", {
             bubbles: true,

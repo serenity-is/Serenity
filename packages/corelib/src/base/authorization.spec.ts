@@ -59,7 +59,7 @@ function mockUserDefinition(user?: Partial<UserDefinition>): UserDefinition {
 }
 
 beforeEach(() => {
-    vitest.clearAllMocks();
+    vi.clearAllMocks();
     mockUserDefinition();
 })
 

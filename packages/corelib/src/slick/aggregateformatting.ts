@@ -28,8 +28,8 @@ export namespace AggregateFormatting {
             aggKey = aggType?.aggregateKey;
         }
         else {
-            aggKey = (Object.keys(totals).find(aggKey => totals[aggKey]?.[field] != null) ??
-                Object.keys(totals).find(aggKey => totals[aggKey]?.[field] !== void 0));
+            aggKey = (Object.keys(totals).find(aggKey => totals[aggKey]?.[field] !== void 0) ??
+                Object.keys(totals).find(aggKey => totals[aggKey]?.[field] !== null));
             if (aggKey)
                 aggType = AggregatorTypeRegistry.tryGet(aggKey);
         }
