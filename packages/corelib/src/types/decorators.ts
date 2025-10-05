@@ -70,8 +70,8 @@ export namespace Decorators {
     export function option() {
         return function (target: Object, propertyKey: string): void {
 
-            var isGetSet = propertyKey?.startsWith('get_') || propertyKey?.startsWith('set_');
-            var memberName = isGetSet ? propertyKey.substring(4) : propertyKey;
+            const isGetSet = propertyKey?.startsWith('get_') || propertyKey?.startsWith('set_');
+            const memberName = isGetSet ? propertyKey.substring(4) : propertyKey;
 
             addTypeMember(target.constructor, {
                 name: memberName,
@@ -91,8 +91,7 @@ export namespace Decorators {
 
     export function editor() {
         return function (target: Function, _context?: any) {
-            var attr = new EditorAttribute();
-            addCustomAttribute(target, attr);
+            addCustomAttribute(target, new EditorAttribute());
         }
     }
 

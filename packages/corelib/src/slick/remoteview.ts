@@ -699,13 +699,13 @@ export class RemoteView<TItem = any> implements IRemoteView<TItem> {
      * @returns The item at the row index
      */
     public getItem(i: number): any {
-        var item = this.rows[i];
+        const item = this.rows[i];
 
         const group = item as Group;
         // if this is a group row, make sure the group is collapsed/expanded as needed
         // if this is a group row, make sure totals are calculated and update the title
         if (group && group.__group && group.totals && !group.totals.initialized) {
-            var gi = this.groupingInfos[group.level];
+            const gi = this.groupingInfos[group.level];
             if (!gi.displayTotalsRow) {
                 this.calculateTotals(group.totals);
                 group.title = gi.formatter ? gi.formatter(group) : htmlEncode(group.value);
@@ -725,7 +725,7 @@ export class RemoteView<TItem = any> implements IRemoteView<TItem> {
      * @returns Metadata object or null
      */
     public getItemMetadata(row: number) {
-        var item = this.rows[row];
+        const item = this.rows[row];
         if (item === undefined) {
             return null;
         }
@@ -745,7 +745,7 @@ export class RemoteView<TItem = any> implements IRemoteView<TItem> {
 
     private expandCollapseAllGroups(level: number, collapse: boolean) {
         if (level == null) {
-            for (var i = 0; i < this.groupingInfos.length; i++) {
+            for (let i = 0; i < this.groupingInfos.length; i++) {
                 this.toggledGroupsByLevel[i] = {};
                 this.groupingInfos[i].collapsed = collapse;
 
@@ -785,7 +785,7 @@ export class RemoteView<TItem = any> implements IRemoteView<TItem> {
     }
 
     private resolveLevelAndGroupingKey(args: any) {
-        var arg0 = args[0];
+        const arg0 = args[0];
         if (args.length === 1 && arg0.indexOf(groupingDelimiter) !== -1) {
             return { level: arg0.split(groupingDelimiter).length - 1, groupingKey: arg0 };
         } else {
@@ -794,7 +794,7 @@ export class RemoteView<TItem = any> implements IRemoteView<TItem> {
     }
 
     private expandCollapseGroup(args: any, collapse: any) {
-        var opts = this.resolveLevelAndGroupingKey(args);
+        const opts = this.resolveLevelAndGroupingKey(args);
         this.toggledGroupsByLevel[opts.level][opts.groupingKey] = !this.groupingInfos[opts.level].collapsed !== !collapse;
         if (collapse)
             this.onGroupCollapsed.notify({ level: opts.level, groupingKey: opts.groupingKey });
@@ -806,23 +806,23 @@ export class RemoteView<TItem = any> implements IRemoteView<TItem> {
 
     /**
      * Collapses a specific group.
-     * @param varArgs Either a Slick.Group's "groupingKey" property, or a
-     * variable argument list of grouping values denoting a unique path to the row.
+     * @param constArgs Either a Slick.Group's "groupingKey" property, or a
+     * constiable argument list of grouping values denoting a unique path to the row.
      * For example, calling collapseGroup('high', '10%') will collapse the '10%' subgroup of the 'high' group.
      */
-    public collapseGroup(varArgs: any[]) {
-        var args = Array.prototype.slice.call(arguments);
+    public collapseGroup(constArgs: any[]) {
+        const args = Array.prototype.slice.call(arguments);
         this.expandCollapseGroup(args, true);
     }
 
     /**
      * Expands a specific group.
-     * @param varArgs Either a Slick.Group's "groupingKey" property, or a
-     * variable argument list of grouping values denoting a unique path to the row.
+     * @param constArgs Either a Slick.Group's "groupingKey" property, or a
+     * constiable argument list of grouping values denoting a unique path to the row.
      * For example, calling expandGroup('high', '10%') will expand the '10%' subgroup of the 'high' group.
      */
-    public expandGroup(varArgs: any[]) {
-        var args = Array.prototype.slice.call(arguments);
+    public expandGroup(constArgs: any[]) {
+        const args = Array.prototype.slice.call(arguments);
         this.expandCollapseGroup(args, false);
     }
 
@@ -835,7 +835,7 @@ export class RemoteView<TItem = any> implements IRemoteView<TItem> {
     }
 
     private getOrCreateGroup(groupsByVal: any, val: any, level: number, parentGroup: any, groups: any[]) {
-        var group = groupsByVal[val];
+        let group = groupsByVal[val];
 
         if (!group) {
             group = new Group<any>();
@@ -850,21 +850,21 @@ export class RemoteView<TItem = any> implements IRemoteView<TItem> {
     }
 
     private extractGroups(rows: any[], parentGroup?: any) {
-        var group: any;
-        var val: any;
-        var groups: any[] = [];
-        var groupsByVal = {};
-        var r: any;
-        var level = parentGroup ? parentGroup.level + 1 : 0;
-        var gi = this.groupingInfos[level];
+        let group: any;
+        let val: any;
+        const groups: any[] = [];
+        const groupsByVal = {};
+        let r: any;
+        const level = parentGroup ? parentGroup.level + 1 : 0;
+        const gi = this.groupingInfos[level];
 
-        for (var i = 0, l: number = gi.predefinedValues.length; i < l; i++) {
-            val = gi.predefinedValues[i];
+        for (let i1 = 0, l: number = gi.predefinedValues.length; i1 < l; i1++) {
+            val = gi.predefinedValues[i1];
             group = this.getOrCreateGroup(groupsByVal, val, level, parentGroup, groups);
         }
 
-        for (var i = 0, l = rows.length; i < l; i++) {
-            r = rows[i];
+        for (let i2 = 0, l = rows.length; i2 < l; i2++) {
+            r = rows[i2];
             val = gi.getterIsAFn ? gi.getter(r) : r[gi.getter];
             group = this.getOrCreateGroup(groupsByVal, val, level, parentGroup, groups);
 
@@ -872,8 +872,8 @@ export class RemoteView<TItem = any> implements IRemoteView<TItem> {
         }
 
         if (level < this.groupingInfos.length - 1) {
-            for (var i = 0; i < groups.length; i++) {
-                group = groups[i];
+            for (let i3 = 0; i3 < groups.length; i3++) {
+                group = groups[i3];
                 group.groups = this.extractGroups(group.rows, group);
             }
         }
@@ -888,15 +888,15 @@ export class RemoteView<TItem = any> implements IRemoteView<TItem> {
     }
 
     private calculateTotals(totals: IGroupTotals<TItem>) {
-        var group = totals.group;
-        var gi = this.groupingInfos[group.level];
-        var isLeafLevel = (group.level == this.groupingInfos.length);
+        const group = totals.group;
+        const gi = this.groupingInfos[group.level];
+        const isLeafLevel = (group.level == this.groupingInfos.length);
         const aggregators = (gi.aggregators ?? this.grandAggregators ?? []);
-        var agg: IAggregator, idx = aggregators.length;
+        let agg: IAggregator, idx = aggregators.length;
 
         if (!isLeafLevel && gi.aggregateChildGroups) {
             // make sure all the subgroups are calculated
-            var i = group.groups.length;
+            let i = group.groups.length;
             while (i--) {
                 if (!group.groups[i].totals.initialized) {
                     this.calculateTotals(group.groups[i].totals);
@@ -917,8 +917,8 @@ export class RemoteView<TItem = any> implements IRemoteView<TItem> {
     }
 
     private addGroupTotals(group: Group<TItem>) {
-        var gi = this.groupingInfos[group.level];
-        var totals = new GroupTotals<TItem>();
+        const gi = this.groupingInfos[group.level];
+        const totals = new GroupTotals<TItem>();
         totals.group = group;
         group.totals = totals;
         if (!gi.lazyTotalsCalculation) {
@@ -930,9 +930,9 @@ export class RemoteView<TItem = any> implements IRemoteView<TItem> {
         level = level || 0;
         const gi = this.groupingInfos[level];
         const aggregators = (gi?.aggregators ?? this.grandAggregators ?? []);
-        var groupCollapsed = !!gi?.collapsed;
-        var toggledGroups = this.toggledGroupsByLevel[level];
-        var idx = groups.length, g: Group<TItem>;
+        const groupCollapsed = !!gi?.collapsed;
+        const toggledGroups = this.toggledGroupsByLevel[level];
+        let idx = groups.length, g: Group<TItem>;
         while (idx--) {
             g = groups[idx];
 
@@ -957,15 +957,16 @@ export class RemoteView<TItem = any> implements IRemoteView<TItem> {
 
     private flattenGroupedRows(groups: Group<TItem>[], level?: number) {
         level = level || 0;
-        var gi = this.groupingInfos[level];
-        var groupedRows: any[] = [], rows: any[], gl = 0, g: Group<TItem>;
-        for (var i = 0, l = groups.length; i < l; i++) {
+        const gi = this.groupingInfos[level];
+        const groupedRows: any[] = [];
+        let rows: any[], gl = 0, g: Group<TItem>;
+        for (let i = 0, l = groups.length; i < l; i++) {
             g = groups[i];
             groupedRows[gl++] = g;
 
             if (!g.collapsed) {
                 rows = g.groups ? this.flattenGroupedRows(g.groups, level + 1) : g.rows;
-                for (var j = 0, jj = rows.length; j < jj; j++) {
+                for (let j = 0, jj = rows.length; j < jj; j++) {
                     groupedRows[gl++] = rows[j];
                 }
             }
@@ -978,9 +979,10 @@ export class RemoteView<TItem = any> implements IRemoteView<TItem> {
     }
 
     private batchFilter(items: any[]) {
-        var retval: any[] = [], idx = 0;
+        const retval: any[] = [];
+        let idx = 0;
 
-        for (var i = 0, ii = items.length; i < ii; i++) {
+        for (let i = 0, ii = items.length; i < ii; i++) {
             if (this.filter(items[i], this)) {
                 retval[idx++] = items[i];
             }
@@ -990,9 +992,10 @@ export class RemoteView<TItem = any> implements IRemoteView<TItem> {
     }
 
     private batchFilterWithCaching(items: any[], cache: any) {
-        var retval: any[] = [], idx = 0, item: any;
+        const retval: any[] = [];
+        let idx = 0, item: any;
 
-        for (var i = 0, ii = items.length; i < ii; i++) {
+        for (let i = 0, ii = items.length; i < ii; i++) {
             item = items[i];
             if (cache[i]) {
                 retval[idx++] = item;
@@ -1026,8 +1029,8 @@ export class RemoteView<TItem = any> implements IRemoteView<TItem> {
     }
 
     private getRowDiffs(rows: any[], newRows: any[]) {
-        var item: any, r: any, eitherIsNonData: boolean, diff: any[] = [];
-        var from = 0, to = newRows.length;
+        let item: any, r: any, eitherIsNonData: boolean, diff: any[] = [];
+        let from = 0, to = newRows.length;
 
         if (this.refreshHints?.ignoreDiffsBefore) {
             from = Math.max(0,
@@ -1039,7 +1042,7 @@ export class RemoteView<TItem = any> implements IRemoteView<TItem> {
                 Math.max(0, this.refreshHints.ignoreDiffsAfter));
         }
 
-        for (var i = from, rl = rows.length; i < to; i++) {
+        for (let i = from, rl = rows.length; i < to; i++) {
             if (i >= rl) {
                 diff[diff.length] = i;
             } else {
@@ -1072,9 +1075,9 @@ export class RemoteView<TItem = any> implements IRemoteView<TItem> {
             this.filterCache = [];
         }
 
-        var filteredItems = this.getFilteredAndPagedItems(_items);
+        const filteredItems = this.getFilteredAndPagedItems(_items);
         this.totalRows = filteredItems.totalRows;
-        var newRows = filteredItems.rows;
+        let newRows = filteredItems.rows;
 
         this.grandTotals = {};
 
@@ -1086,7 +1089,7 @@ export class RemoteView<TItem = any> implements IRemoteView<TItem> {
             }
         }
 
-        var diff = this.getRowDiffs(this.rows, newRows);
+        const diff = this.getRowDiffs(this.rows, newRows);
 
         this.rows = newRows;
 
@@ -1103,10 +1106,10 @@ export class RemoteView<TItem = any> implements IRemoteView<TItem> {
             return;
         }
 
-        var countBefore = this.rows.length;
-        var totalRowsBefore = this.totalRows;
+        const countBefore = this.rows.length;
+        const totalRowsBefore = this.totalRows;
 
-        var diff = this.recalc(this.items); // pass as direct refs to avoid closure perf hit
+        const diff = this.recalc(this.items); // pass as direct refs to avoid closure perf hit
 
         this.updated = null;
         this.prevRefreshHints = this.refreshHints;
@@ -1148,10 +1151,10 @@ export class RemoteView<TItem = any> implements IRemoteView<TItem> {
      *     access to the full list selected row ids, and not just the ones visible to the grid.
      */
     public syncGridSelection(grid: Grid, preserveHidden?: boolean, preserveHiddenOnSelectionChange?: boolean) {
-        var self = this;
-        var inHandler: any;
-        var selectedRowIds = self.mapRowsToIds(grid.getSelectedRows());
-        var onSelectedRowIdsChanged = new EventEmitter();
+        const self = this;
+        let inHandler: boolean;;
+        let selectedRowIds = self.mapRowsToIds(grid.getSelectedRows());
+        const onSelectedRowIdsChanged = new EventEmitter();
 
         function setSelectedRowIds(this: void, rowIds: any[]) {
             if (selectedRowIds.join(",") == rowIds.join(",")) {
@@ -1170,7 +1173,7 @@ export class RemoteView<TItem = any> implements IRemoteView<TItem> {
         function update(this: void) {
             if (selectedRowIds.length > 0) {
                 inHandler = true;
-                var selectedRows = self.mapIdsToRows(selectedRowIds);
+                const selectedRows = self.mapIdsToRows(selectedRowIds);
                 if (!preserveHidden) {
                     setSelectedRowIds(self.mapRowsToIds(selectedRows));
                 }
@@ -1181,12 +1184,12 @@ export class RemoteView<TItem = any> implements IRemoteView<TItem> {
 
         grid.onSelectedRowsChanged.subscribe(function (this: void, e: any, args: any) {
             if (inHandler) { return; }
-            var newSelectedRowIds = self.mapRowsToIds(grid.getSelectedRows());
+            const newSelectedRowIds = self.mapRowsToIds(grid.getSelectedRows());
             if (!preserveHiddenOnSelectionChange || !grid.getOptions().multiSelect) {
                 setSelectedRowIds(newSelectedRowIds);
             } else {
                 // keep the ones that are hidden
-                var existing = selectedRowIds.filter((id: any) => self.getRowById(id) === undefined);
+                const existing = selectedRowIds.filter((id: any) => self.getRowById(id) === undefined);
                 // add the newly selected ones
                 setSelectedRowIds(existing.concat(newSelectedRowIds));
             }
@@ -1204,8 +1207,8 @@ export class RemoteView<TItem = any> implements IRemoteView<TItem> {
      * @param key The style key to sync
      */
     public syncGridCellCssStyles(grid: Grid, key: string) {
-        var hashById: any;
-        var inHandler: any;
+        let hashById: any;
+        let inHandler: boolean;
 
         // since this method can be called after the cell styles have been set,
         // get the existing ones right away
@@ -1215,8 +1218,8 @@ export class RemoteView<TItem = any> implements IRemoteView<TItem> {
 
         function storeCellCssStyles(this: void, hash: any) {
             hashById = {};
-            for (var row in hash) {
-                var id: any = (self.rows[row as any] as any)[self.idProperty];
+            for (const row in hash) {
+                const id: any = (self.rows[row as any] as any)[self.idProperty];
                 hashById[id] = hash[row];
             }
         }
@@ -1225,9 +1228,9 @@ export class RemoteView<TItem = any> implements IRemoteView<TItem> {
             if (hashById) {
                 inHandler = true;
                 self.ensureRowsByIdCache();
-                var newHash: Record<number, any> = {};
-                for (var id in hashById) {
-                    var row = self.rowsById[id];
+                const newHash: Record<number, any> = {};
+                for (const id in hashById) {
+                    const row = self.rowsById[id];
                     if (row != undefined) {
                         newHash[row] = hashById[id];
                     }
@@ -1237,7 +1240,7 @@ export class RemoteView<TItem = any> implements IRemoteView<TItem> {
             }
         }
 
-        var subFunc = function (this: void, e: any, args: any) {
+        const subFunc = function (this: void, e: any, args: any) {
             if (inHandler) { return; }
             if (key != args.key) { return; }
             if (args.hash) {
@@ -1303,7 +1306,7 @@ export class RemoteView<TItem = any> implements IRemoteView<TItem> {
         this.loading && typeof this.loading !== "boolean" && this.loading.abort();
 
         if (this.onSubmit) {
-            var gh = this.onSubmit(this);
+            const gh = this.onSubmit(this);
             if (gh === false)
                 return false;
         }
@@ -1318,9 +1321,9 @@ export class RemoteView<TItem = any> implements IRemoteView<TItem> {
         if (!this.seekToPage)
             this.seekToPage = 1;
 
-        var request: ListRequest = {};
+        let request: ListRequest = {};
 
-        var skip = (this.seekToPage - 1) * this.rowsPerPage;
+        const skip = (this.seekToPage - 1) * this.rowsPerPage;
         if (skip)
             request.Skip = skip;
         if (this.rowsPerPage)
@@ -1364,7 +1367,7 @@ export class RemoteView<TItem = any> implements IRemoteView<TItem> {
         }
 
         if (this.onAjaxCall) {
-            var ah = this.onAjaxCall(this, serviceOptions);
+            const ah = this.onAjaxCall(this, serviceOptions);
             if (ah === false) {
                 this.loading = false;
                 this.onPagingInfoChanged.notify(this.getPagingInfo());

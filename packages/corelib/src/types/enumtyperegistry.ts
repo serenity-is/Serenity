@@ -19,7 +19,7 @@ class EnumTypeRegistryImpl extends BaseTypeRegistry<object> {
     }
 
     protected override loadError(key: string) {
-        var message = `Can't find "${htmlEncode(key)}" enum type! 
+        const message = `Can't find "${htmlEncode(key)}" enum type! 
 
 If you have recently defined this enum type in server side code, 
 make sure your project builds successfully and run "dotnet sergen t".

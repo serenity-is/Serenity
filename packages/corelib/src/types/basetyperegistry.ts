@@ -208,7 +208,7 @@ export abstract class BaseTypeRegistry<TType> {
             }
 
             if (!promise) {
-                for (var ns of Config.rootNamespaces) {
+                for (const ns of Config.rootNamespaces) {
                     const k = ns + "." + key;
                     if (promise = Config.lazyTypeLoader(k, this.loadKind as any))
                         break;
