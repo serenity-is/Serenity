@@ -1,16 +1,21 @@
-﻿{{USING "Serenity.Services"}}
-{{USING "MyRequest = Serenity.Services.ListRequest"}}
-{{USING "MyResponse = Serenity.Services.ListResponse<" + RowFullName + ">"}}
-{{USING "MyRow = " + RowFullName}}
+{{USING "Serenity.Services"}}
 
-{{NAMESPACE ModuleNamespace}}{{capture block~}}
-public interface I{{ClassName}}ListHandler : IListHandler<MyRow, MyRequest, MyResponse> { }
+{{NAMESPACE HandlerNamespace}}{{capture block~}}
+{{~if EnableGenerateInterface~}}
+[GenerateInterface]
+{{~else~}}
+public interface I{{ClassName}}ListHandler : IListHandler<{{RowClassName}}, ListRequest, ListResponse<{{RowClassName}}>> { }
 
-public class {{ClassName}}ListHandler : ListRequestHandler<MyRow, MyRequest, MyResponse>, I{{ClassName}}ListHandler
+{{~end~}}
+public class {{ClassName}}ListHandler{{~if NET8Plus~}}(IRequestContext context){{~end}} :
+    ListRequestHandler<{{RowClassName}}, ListRequest, ListResponse<{{RowClassName}}>>{{~if NET8Plus~}}(context){{~end~}},
+    I{{ClassName}}ListHandler
 {
+{{~if !NET8Plus~}}
     public {{ClassName}}ListHandler(IRequestContext context)
             : base(context)
     {
     }
+{{~end~}}
 }
 {{~end}}{{NAMESPACEBLOCK block~}}

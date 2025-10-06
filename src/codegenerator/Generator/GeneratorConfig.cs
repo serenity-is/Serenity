@@ -40,6 +40,14 @@ public class GeneratorConfig
     public bool? EnableGenerateFields { get; set; }
 
     /// <summary>
+    /// When true, enables usage of [GenerateInterface] attributes on handlers,
+    /// causing the interface to be generated automatically by a source generator.
+    /// Default is false unless EnableGenerateFields is true.
+    /// This should only be used when Serenity.Pro.Coder is enabled in the project.
+    /// </summary>
+    public bool? EnableGenerateInterface { get; set; }
+
+    /// <summary>
     /// When true, enables RowTemplate class generation. This should
     /// only be used when Serenity.Pro.Coder is enabled in the project.
     /// Has no effect when EnableGenerateFields is true.

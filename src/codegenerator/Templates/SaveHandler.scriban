@@ -1,16 +1,21 @@
-﻿{{USING "Serenity.Services"}}
-{{USING "MyRequest = Serenity.Services.SaveRequest<" + RowFullName + ">"}}
-{{USING "MyResponse = Serenity.Services.SaveResponse"}}
-{{USING "MyRow = " + RowFullName}}
+{{USING "Serenity.Services"}}
 
-{{NAMESPACE ModuleNamespace}}{{capture block~}}
-public interface I{{ClassName}}SaveHandler : ISaveHandler<MyRow, MyRequest, MyResponse> { }
+{{NAMESPACE HandlerNamespace}}{{capture block~}}
+{{~if EnableGenerateInterface~}}
+[GenerateInterface]
+{{~else~}}
+public interface I{{ClassName}}SaveHandler : ISaveHandler<{{RowClassName}}, SaveRequest<{{RowClassName}}>, SaveResponse> { }
 
-public class {{ClassName}}SaveHandler : SaveRequestHandler<MyRow, MyRequest, MyResponse>, I{{ClassName}}SaveHandler
+{{~end~}}
+public class {{ClassName}}SaveHandler{{~if NET8Plus~}}(IRequestContext context){{~end}} :
+    SaveRequestHandler<{{RowClassName}}, SaveRequest<{{RowClassName}}>, SaveResponse>{{~if NET8Plus~}}(context){{~end~}},
+    I{{ClassName}}SaveHandler
 {
+{{~if !NET8Plus~}}
     public {{ClassName}}SaveHandler(IRequestContext context)
             : base(context)
     {
     }
+{{~end~}}
 }
 {{~end}}{{~NAMESPACEBLOCK block~}}

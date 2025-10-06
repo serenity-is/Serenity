@@ -22,8 +22,10 @@ public class EntityModel
     public string FieldPrefix { get; set; }
     public bool AspNetCore { get; set; } = true;
     public bool NET5Plus { get; set; } = true;
+    public bool NET8Plus { get; set; } = true;
     public bool DeclareJoinConstants { get; set; }
     public bool EnableGenerateFields { get; set; }
+    public bool EnableGenerateInterface { get; set; }
     public bool EnableRowTemplates { get; set; }
     public bool FileScopedNamespaces { get; set; }
     public bool GenerateListExcel { get; set; }
@@ -77,6 +79,7 @@ public class EntityModel
 
     public string ModuleNamespace => RootNamespaceDotModule;
     private string ModuleNamespaceDot => RootNamespaceDotModuleDot;
+    public string HandlerNamespace => EnableGenerateInterface ? (RootNamespaceDotModule + ".RequestHandlers") : RootNamespaceDotModule;
 
     public string RowFullName => ModuleNamespaceDot + RowClassName;
 

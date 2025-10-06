@@ -19,8 +19,6 @@ public class CustomerEntityModel : EntityModel
         RowBaseClass = "Serenity.Data.Row<CustomerRow.RowFields>";
         NameField = CustomerName;
         FieldPrefix = "";
-        AspNetCore = true;
-        NET5Plus = true;
         DeclareJoinConstants = joinConstants;
 
         Fields.Add(new()

@@ -121,6 +121,10 @@ public partial class GenerateCommand
         Console.WriteLine();
     }
 
-    [GeneratedRegex(@"\<TargetFramework\>.*netcoreapp.*\<\/TargetFramework\>", RegexOptions.Multiline | RegexOptions.Compiled)]
-    private static partial Regex Net5PlusRegex();
+    [GeneratedRegex(@"\<TargetFramework\>\s*netcoreapp\.[^<]<\/TargetFramework\>", RegexOptions.Multiline | RegexOptions.Compiled)]
+    private static partial Regex NetCoreAppRegex();
+
+    [GeneratedRegex(@"\<TargetFramework\>\s*net[5-7]\.[^<]*<\/TargetFramework\>", RegexOptions.Multiline | RegexOptions.Compiled)]
+    private static partial Regex Net567Regex();
+
 }

@@ -10,6 +10,7 @@ public class EntityModelInputs : IEntityModelInputs
     public HashSet<string> GlobalUsings { get; } = [];
     public string Module { get; set; }
     public bool Net5Plus { get; set; } = true;
+    public bool Net8Plus { get; set; } = true;
     public bool SchemaIsDatabase { get; set; }
     public string PermissionKey { get; set; }
     public string Schema { get; set; }

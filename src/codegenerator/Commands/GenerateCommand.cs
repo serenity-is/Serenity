@@ -143,7 +143,8 @@ public partial class GenerateCommand(IProjectFileInfo project, IGeneratorConsole
             connection.EnsureOpen();
 
             var csprojContent = FileSystem.ReadAllText(Project.ProjectFile);
-            inputs.Net5Plus = !Net5PlusRegex().IsMatch(csprojContent);
+            inputs.Net5Plus = !NetCoreAppRegex().IsMatch(csprojContent);
+            inputs.Net8Plus = inputs.Net5Plus && !Net567Regex().IsMatch(csprojContent);
 
             inputs.SchemaIsDatabase = connection.GetDialect().ServerType.StartsWith("MySql",
                 StringComparison.OrdinalIgnoreCase);

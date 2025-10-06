@@ -1,16 +1,21 @@
-﻿{{USING "Serenity.Services"}}
-{{USING "MyRequest = Serenity.Services.DeleteRequest"}}
-{{USING "MyResponse = Serenity.Services.DeleteResponse"}}
-{{USING "MyRow = " + RowFullName }}
+{{USING "Serenity.Services"}}
 
-{{NAMESPACE ModuleNamespace}}{{capture block~}}
-public interface I{{ClassName}}DeleteHandler : IDeleteHandler<MyRow, MyRequest, MyResponse> { }
+{{NAMESPACE HandlerNamespace}}{{capture block~}}
+{{~if EnableGenerateInterface~}}
+[GenerateInterface]
+{{~else~}}
+public interface I{{ClassName}}DeleteHandler : IDeleteHandler<{{RowClassName}}, DeleteRequest, DeleteResponse> { }
 
-public class {{ClassName}}DeleteHandler : DeleteRequestHandler<MyRow, MyRequest, MyResponse>, I{{ClassName}}DeleteHandler
+{{~end~}}
+public class {{ClassName}}DeleteHandler{{~if NET8Plus~}}(IRequestContext context){{~end}} :
+    DeleteRequestHandler<{{RowClassName}}, DeleteRequest, DeleteResponse>{{~if NET8Plus~}}(context){{~end~}},
+    I{{ClassName}}DeleteHandler
 {
+{{~if !NET8Plus~}}
     public {{ClassName}}DeleteHandler(IRequestContext context)
             : base(context)
     {
     }
+{{~end~}}
 }
 {{~end}}{{NAMESPACEBLOCK block~}}

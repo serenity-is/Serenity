@@ -37,7 +37,6 @@ public class CustomerEntityInputs : EntityModelInputs
         ConnectionKey = TestConnection;
         DataSchema = new CustomerDataSchema();
         Module = TestModule;
-        Net5Plus = true;
         PermissionKey = TestPermission;
     }
 }
