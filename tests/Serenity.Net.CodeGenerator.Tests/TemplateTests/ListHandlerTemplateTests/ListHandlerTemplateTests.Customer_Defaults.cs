@@ -7,13 +7,14 @@ public partial class ListHandlerTemplateTests : BaseTemplateTest
     const string Expected_Customer_Defaults =
         """""
         using Serenity.Services;
+        using MyRow = TestNamespace.TestModule.CustomerRow;
 
         namespace TestNamespace.TestModule
         {
-            public interface ICustomerListHandler : IListHandler<CustomerRow, ListRequest, ListResponse<CustomerRow>> { }
+            public interface ICustomerListHandler : IListHandler<MyRow, ListRequest, ListResponse<MyRow>> { }
 
             public class CustomerListHandler(IRequestContext context) :
-                ListRequestHandler<CustomerRow, ListRequest, ListResponse<CustomerRow>>(context),
+                ListRequestHandler<MyRow, ListRequest, ListResponse<MyRow>>(context),
                 ICustomerListHandler
             {
             }

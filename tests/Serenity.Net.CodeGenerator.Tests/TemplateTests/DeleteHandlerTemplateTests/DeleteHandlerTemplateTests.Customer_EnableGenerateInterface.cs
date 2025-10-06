@@ -5,12 +5,13 @@ public partial class DeleteHandlerTemplateTests : BaseTemplateTest
     const string Expected_Customer_EnableGenerateInterface =
         """""
         using Serenity.Services;
+        using MyRow = TestNamespace.TestModule.CustomerRow;
 
         namespace TestNamespace.TestModule.RequestHandlers
         {
             [GenerateInterface]
             public class CustomerDeleteHandler(IRequestContext context) :
-                DeleteRequestHandler<CustomerRow, DeleteRequest, DeleteResponse>(context),
+                DeleteRequestHandler<MyRow, DeleteRequest, DeleteResponse>(context),
                 ICustomerDeleteHandler
             {
             }

@@ -5,12 +5,13 @@ public partial class RetrieveHandlerTemplateTests : BaseTemplateTest
     const string Expected_Customer_EnableGenerateInterface =
         """""
         using Serenity.Services;
+        using MyRow = TestNamespace.TestModule.CustomerRow;
 
         namespace TestNamespace.TestModule.RequestHandlers
         {
             [GenerateInterface]
             public class CustomerRetrieveHandler(IRequestContext context) :
-                RetrieveRequestHandler<CustomerRow, RetrieveRequest, RetrieveResponse<CustomerRow>>(context),
+                RetrieveRequestHandler<MyRow, RetrieveRequest, RetrieveResponse<MyRow>>(context),
                 ICustomerRetrieveHandler
             {
             }

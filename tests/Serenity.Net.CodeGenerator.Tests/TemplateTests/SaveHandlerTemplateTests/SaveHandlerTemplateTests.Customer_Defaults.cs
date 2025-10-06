@@ -7,13 +7,14 @@ public partial class SaveHandlerTemplateTests : BaseTemplateTest
     const string Expected_Customer_Defaults =
         """""
         using Serenity.Services;
+        using MyRow = TestNamespace.TestModule.CustomerRow;
 
         namespace TestNamespace.TestModule
         {
-            public interface ICustomerSaveHandler : ISaveHandler<CustomerRow, SaveRequest<CustomerRow>, SaveResponse> { }
+            public interface ICustomerSaveHandler : ISaveHandler<MyRow, SaveRequest<MyRow>, SaveResponse> { }
 
             public class CustomerSaveHandler(IRequestContext context) :
-                SaveRequestHandler<CustomerRow, SaveRequest<CustomerRow>, SaveResponse>(context),
+                SaveRequestHandler<MyRow, SaveRequest<MyRow>, SaveResponse>(context),
                 ICustomerSaveHandler
             {
             }

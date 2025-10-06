@@ -7,13 +7,14 @@ public partial class RetrieveHandlerTemplateTests : BaseTemplateTest
     const string Expected_Customer_Defaults =
         """""
         using Serenity.Services;
+        using MyRow = TestNamespace.TestModule.CustomerRow;
 
         namespace TestNamespace.TestModule
         {
-            public interface ICustomerRetrieveHandler : IRetrieveHandler<CustomerRow, RetrieveRequest, RetrieveResponse<CustomerRow>> { }
+            public interface ICustomerRetrieveHandler : IRetrieveHandler<MyRow, RetrieveRequest, RetrieveResponse<MyRow>> { }
 
             public class CustomerRetrieveHandler(IRequestContext context) :
-                RetrieveRequestHandler<CustomerRow, RetrieveRequest, RetrieveResponse<CustomerRow>>(context),
+                RetrieveRequestHandler<MyRow, RetrieveRequest, RetrieveResponse<MyRow>>(context),
                 ICustomerRetrieveHandler
             {
             }

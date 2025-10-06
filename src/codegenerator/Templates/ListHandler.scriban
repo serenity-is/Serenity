@@ -1,14 +1,15 @@
 {{USING "Serenity.Services"}}
+{{USING "MyRow = " + RowFullName}}
 
 {{NAMESPACE HandlerNamespace}}{{capture block~}}
 {{~if EnableGenerateInterface~}}
 [GenerateInterface]
 {{~else~}}
-public interface I{{ClassName}}ListHandler : IListHandler<{{RowClassName}}, ListRequest, ListResponse<{{RowClassName}}>> { }
+public interface I{{ClassName}}ListHandler : IListHandler<MyRow, ListRequest, ListResponse<MyRow>> { }
 
 {{~end~}}
 public class {{ClassName}}ListHandler{{~if NET8Plus~}}(IRequestContext context){{~end}} :
-    ListRequestHandler<{{RowClassName}}, ListRequest, ListResponse<{{RowClassName}}>>{{~if NET8Plus~}}(context){{~end~}},
+    ListRequestHandler<MyRow, ListRequest, ListResponse<MyRow>>{{~if NET8Plus~}}(context){{~end~}},
     I{{ClassName}}ListHandler
 {
 {{~if !NET8Plus~}}

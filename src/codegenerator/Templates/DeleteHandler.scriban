@@ -1,14 +1,15 @@
 {{USING "Serenity.Services"}}
+{{USING "MyRow = " + RowFullName}}
 
 {{NAMESPACE HandlerNamespace}}{{capture block~}}
 {{~if EnableGenerateInterface~}}
 [GenerateInterface]
 {{~else~}}
-public interface I{{ClassName}}DeleteHandler : IDeleteHandler<{{RowClassName}}, DeleteRequest, DeleteResponse> { }
+public interface I{{ClassName}}DeleteHandler : IDeleteHandler<MyRow, DeleteRequest, DeleteResponse> { }
 
 {{~end~}}
 public class {{ClassName}}DeleteHandler{{~if NET8Plus~}}(IRequestContext context){{~end}} :
-    DeleteRequestHandler<{{RowClassName}}, DeleteRequest, DeleteResponse>{{~if NET8Plus~}}(context){{~end~}},
+    DeleteRequestHandler<MyRow, DeleteRequest, DeleteResponse>{{~if NET8Plus~}}(context){{~end~}},
     I{{ClassName}}DeleteHandler
 {
 {{~if !NET8Plus~}}

@@ -5,12 +5,13 @@ public partial class SaveHandlerTemplateTests : BaseTemplateTest
     const string Expected_Customer_EnableGenerateInterface =
         """""
         using Serenity.Services;
+        using MyRow = TestNamespace.TestModule.CustomerRow;
 
         namespace TestNamespace.TestModule.RequestHandlers
         {
             [GenerateInterface]
             public class CustomerSaveHandler(IRequestContext context) :
-                SaveRequestHandler<CustomerRow, SaveRequest<CustomerRow>, SaveResponse>(context),
+                SaveRequestHandler<MyRow, SaveRequest<MyRow>, SaveResponse>(context),
                 ICustomerSaveHandler
             {
             }

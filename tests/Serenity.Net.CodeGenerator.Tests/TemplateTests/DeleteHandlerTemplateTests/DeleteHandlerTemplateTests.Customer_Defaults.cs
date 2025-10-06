@@ -7,13 +7,14 @@ public partial class DeleteHandlerTemplateTests : BaseTemplateTest
     const string Expected_Customer_Defaults =
         """""
         using Serenity.Services;
+        using MyRow = TestNamespace.TestModule.CustomerRow;
 
         namespace TestNamespace.TestModule
         {
-            public interface ICustomerDeleteHandler : IDeleteHandler<CustomerRow, DeleteRequest, DeleteResponse> { }
+            public interface ICustomerDeleteHandler : IDeleteHandler<MyRow, DeleteRequest, DeleteResponse> { }
 
             public class CustomerDeleteHandler(IRequestContext context) :
-                DeleteRequestHandler<CustomerRow, DeleteRequest, DeleteResponse>(context),
+                DeleteRequestHandler<MyRow, DeleteRequest, DeleteResponse>(context),
                 ICustomerDeleteHandler
             {
             }
