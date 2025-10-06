@@ -61,7 +61,7 @@ public partial class ArgumentReader(IEnumerable<string> arguments) : IArgumentRe
     }
 
     private IEnumerable<(string name, string value)> EnumerateValueArguments(
-        string[] names, bool required)
+        string[] names, bool requiresValue)
     {
         ArgumentNullException.ThrowIfNull(names);
         if (names.Length == 0)
@@ -90,7 +90,7 @@ public partial class ArgumentReader(IEnumerable<string> arguments) : IArgumentRe
                     }
                 }
 
-                if (required &&
+                if (requiresValue &&
                     string.IsNullOrEmpty(value))
                     throw new ArgumentException($"A value is required when using " +
                         $"the switch '{name}'!", name);
@@ -106,8 +106,7 @@ public partial class ArgumentReader(IEnumerable<string> arguments) : IArgumentRe
     public void ThrowIfRemaining()
     {
         if (arguments.Count != 0)
-            throw new ArgumentException($"Unknown argument: " +
-                $"${arguments[0]}", nameof(arguments));
+            throw new ArgumentException($"Unknown argument: {arguments[0]}", nameof(arguments));
     }
 
     /// <inheritdoc/>
@@ -133,10 +132,10 @@ public partial class ArgumentReader(IEnumerable<string> arguments) : IArgumentRe
     }
 
     /// <inheritdoc/>
-    public string GetString(string[] names, bool required = true)
+    public string GetString(string[] names, bool requiresValue = true)
     {
         string result = null;
-        foreach (var (name, value) in EnumerateValueArguments(names, required))
+        foreach (var (name, value) in EnumerateValueArguments(names, requiresValue))
         {
             if (result != null &&
                 value != result)
@@ -149,10 +148,10 @@ public partial class ArgumentReader(IEnumerable<string> arguments) : IArgumentRe
     }
 
     /// <inheritdoc/>
-    public string[] GetStrings(string[] names, bool required = true)
+    public string[] GetStrings(string[] names, bool requiresValue = true)
     {
         var values = new List<string>();
-        foreach (var (_, value) in EnumerateValueArguments(names, required))
+        foreach (var (_, value) in EnumerateValueArguments(names, requiresValue))
         {
             values.Add(value);
         }

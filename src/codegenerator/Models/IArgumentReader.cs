@@ -10,9 +10,10 @@ namespace Serenity.CodeGenerator
         /// <param name="names"></param>
         /// <param name="separators">Splits switch values by specified chars, so for example 
         /// providing the value in /param:A=B;C=D separated format is possible</param>
+        /// <param name="requiresValue">False to allow empty values. Default is true.</param>
         /// <returns>A dictionary of key value pairs</returns>
         /// <exception cref="ArgumentException">Keys are specified multiple times</exception>
-        Dictionary<string, string> GetDictionary(string[] names, bool required = true,
+        Dictionary<string, string> GetDictionary(string[] names, bool requiresValue = true,
             char[] separators = null);
 
         /// <summary>
@@ -26,20 +27,20 @@ namespace Serenity.CodeGenerator
         /// It removes the argument from the arguments array if it is found.
         /// </summary>
         /// <param name="names">Allowed switch names</param>
-        /// <param name="allowEmpty">True to allow empty values. Default is false.</param>
+        /// <param name="requiresValue">False to allow empty values. Default is true.</param>
         /// <returns>The argument value or null if not found</returns>
         /// <exception cref="ArgumentException">The switch is specified multiple times,
-        /// or its value is empty and allowEmpty is false.</exception>
-        string GetString(string[] names, bool required = true);
+        /// or its value is empty and <see cref="requiresValue" /> is true.</exception>
+        string GetString(string[] names, bool requiresValue = true);
 
         /// <summary>
         /// Gets the value for a switch that can be specified multiple times
+        /// from this list.
         /// </summary>
-        /// from this list.</param>
         /// <param name="names">Allowed switch names.</param>
-        /// <param name="allowEmpty">True to allow empty values. Default is false.</param>
+        /// <param name="requiresValue">False to allow empty values. Default is true.</param>
         /// <returns>The argument values</returns>
-        string[] GetStrings(string[] names, bool required = true);
+        string[] GetStrings(string[] names, bool requiresValue = true);
 
         /// <summary>
         /// Returns true if any of switches are -?, --help, or -h

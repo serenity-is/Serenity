@@ -25,6 +25,20 @@ public class ClientTypesCommand(IProjectFileInfo project, IGeneratorConsole cons
             FileScopedNamespaces = config.FileScopedNamespaces == true
         };
 
+        if (config.ParseGlobalUsings != false)
+        {
+            var globalUsings = Project.GetGlobalUsings();
+            if (globalUsings != null)
+            {
+                foreach (var gu in globalUsings)
+                {
+                    // skip aliased usings
+                    if (string.IsNullOrEmpty(gu.Value))
+                        generator.GlobalUsings.Add(gu.Key);
+                }
+            }
+        }
+
         if (config.IncludeGlobalUsings != null)
             generator.GlobalUsings.AddRange(config.IncludeGlobalUsings);
 

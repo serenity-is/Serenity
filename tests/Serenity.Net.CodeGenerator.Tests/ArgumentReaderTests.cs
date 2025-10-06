@@ -62,7 +62,7 @@ public partial class ArgumentReaderTests
     public void GetString_AllowsEmptyStrings_IfRequired_IsFalse(params string[] arguments)
     {
         var reader = new ArgumentReader(arguments);
-        Assert.Empty(reader.GetString(["test", "alt"], required: false));
+        Assert.Empty(reader.GetString(["test", "alt"], requiresValue: false));
     }
 
     [InlineData("/test", "val")]

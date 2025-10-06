@@ -22,9 +22,10 @@ public class Cli(IFileSystem fileSystem, IGeneratorConsole console, IProcessExec
         }
 
         var projectFile = arguments.GetString(["p", "project"]);
-        var projectRefs = arguments.GetStrings(["projectrefs", "project-refs"]);
+        var globalUsings = arguments.GetString(["globalusings", "global-usings"], requiresValue: false);
+        var projectRefs = arguments.GetStrings(["projectrefs", "project-refs"], requiresValue: false);
         var propertyArgs = arguments.GetDictionary(["prop", "props", "property"],
-            separators: [',', ';']);
+            separators: [',', ';'], requiresValue: false);
 
         var command = arguments.GetCommand();
         if (string.IsNullOrEmpty(command))
@@ -58,7 +59,8 @@ public class Cli(IFileSystem fileSystem, IGeneratorConsole console, IProcessExec
         }
 
         var projectDir = FileSystem.GetDirectoryName(FileSystem.GetFullPath(projectFile));
-        string getPropertyArgument(string name) => propertyArgs.TryGetValue(name, out var value) ? value : null;
+        string getPropertyArgument(string name) => propertyArgs.TryGetValue(name, out var value) ? value : 
+            string.Equals(name, "globalusings", StringComparison.OrdinalIgnoreCase) ? globalUsings : null;
 
         var project = ProjectFactory?.Invoke(projectFile, getPropertyArgument)
             ?? new ProjectFileInfo(fileSystem, projectFile, getPropertyArgument, Console.Error);

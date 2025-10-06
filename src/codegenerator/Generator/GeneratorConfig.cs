@@ -70,15 +70,13 @@ public class GeneratorConfig
 
     /// <summary>
     /// If true, global usings will be tried to be parsed
-    /// from the current project
-    /// Not implemented yet.
+    /// from the current project Default is true.
     /// </summary>
     public bool? ParseGlobalUsings { get; set; }
 
     /// <summary>
     /// If passed, these global usings will be assumed to be present,
     /// even if not parsed from the project.
-    /// Not implemented yet.
     /// </summary>
     public List<string> IncludeGlobalUsings { get; set; }
 

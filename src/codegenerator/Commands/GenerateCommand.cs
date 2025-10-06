@@ -23,10 +23,10 @@ public partial class GenerateCommand(IProjectFileInfo project, IGeneratorConsole
 
         var argsConnectionKey = Arguments.GetString(
             ["cnk", "connkey", "connectionkey", "connection-key"]);
-        var argsModule = Arguments.GetString(["mod", "module"], required: false);
+        var argsModule = Arguments.GetString(["mod", "module"], requiresValue: false);
         var argsIdentifier = Arguments.GetString(["cls", "idn", "identifier"]);
         var argsPermissionKey = Arguments.GetString(
-            ["pms", "permission", "permissionkey", "permission-key"], required: false);
+            ["pms", "permission", "permissionkey", "permission-key"], requiresValue: false);
         var argsTable = Arguments.GetString(["tbl", "table"]);
         var argsWhat = Arguments.GetString(["wtg", "what", "whattogenerate"]);
 
@@ -150,6 +150,24 @@ public partial class GenerateCommand(IProjectFileInfo project, IGeneratorConsole
                 StringComparison.OrdinalIgnoreCase);
 
             inputs.DataSchema = new EntityDataSchema(connection);
+
+            if (config.ParseGlobalUsings != false)
+            {
+                var globalUsings = Project.GetGlobalUsings();
+                if (globalUsings != null)
+                {
+                    foreach (var gu in globalUsings)
+                    {
+                        // skip aliased usings
+                        if (string.IsNullOrEmpty(gu.Value))
+                            inputs.GlobalUsings.Add(gu.Key);
+                    }
+                }
+            }
+
+            if (config.IncludeGlobalUsings != null)
+                inputs.GlobalUsings.AddRange(config.IncludeGlobalUsings);
+
             return modelFactory.Create(inputs);
         }
 
