@@ -1,13 +1,11 @@
 using MyRow = Serene.Administration.UserRow;
-using MyRequest = Serenity.Services.SaveRequest<Serene.Administration.UserRow>;
-using MyResponse = Serenity.Services.SaveResponse;
 
 namespace Serene.Administration;
 
-public interface IUserSaveHandler : ISaveHandler<MyRow, MyRequest, MyResponse> { }
+public interface IUserSaveHandler : ISaveHandler<MyRow> { }
 
 public class UserSaveHandler(IRequestContext context, IOptions<EnvironmentSettings> environmentOptions)
-    : SaveRequestHandler<MyRow, MyRequest, MyResponse>(context), IUserSaveHandler
+    : SaveRequestHandler<MyRow>(context), IUserSaveHandler
 {
     private static MyRow.RowFields Fld { get { return MyRow.Fields; } }
 

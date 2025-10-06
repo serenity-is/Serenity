@@ -1,12 +1,10 @@
-﻿using MyRequest = Serenity.Services.DeleteRequest;
-using MyResponse = Serenity.Services.DeleteResponse;
-using MyRow = Serenity.Demo.Northwind.CategoryLangRow;
+﻿using MyRow = Serenity.Demo.Northwind.CategoryLangRow;
 
 namespace Serenity.Demo.Northwind;
 
-public interface ICategoryLangDeleteHandler : IDeleteHandler<MyRow, MyRequest, MyResponse> { }
+public interface ICategoryLangDeleteHandler : IDeleteHandler<MyRow> { }
 
 public class CategoryLangDeleteHandler(IRequestContext context) :
-    DeleteRequestHandler<MyRow, MyRequest, MyResponse>(context), ICategoryLangDeleteHandler
+    DeleteRequestHandler<MyRow>(context), ICategoryLangDeleteHandler
 {
 }

@@ -1,12 +1,10 @@
-﻿using MyRequest = Serenity.Services.DeleteRequest;
-using MyResponse = Serenity.Services.DeleteResponse;
-using MyRow = Serenity.Demo.Northwind.OrderDetailRow;
+﻿using MyRow = Serenity.Demo.Northwind.OrderDetailRow;
 
 namespace Serenity.Demo.Northwind;
 
-public interface IOrderDetailDeleteHandler : IDeleteHandler<MyRow, MyRequest, MyResponse> { }
+public interface IOrderDetailDeleteHandler : IDeleteHandler<MyRow> { }
 
 public class OrderDetailDeleteHandler(IRequestContext context) :
-    DeleteRequestHandler<MyRow, MyRequest, MyResponse>(context), IOrderDetailDeleteHandler
+    DeleteRequestHandler<MyRow>(context), IOrderDetailDeleteHandler
 {
 }

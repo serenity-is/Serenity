@@ -1,12 +1,10 @@
-﻿using MyRequest = Serenity.Services.DeleteRequest;
-using MyResponse = Serenity.Services.DeleteResponse;
-using MyRow = Serenity.Demo.Northwind.TerritoryRow;
+﻿using MyRow = Serenity.Demo.Northwind.TerritoryRow;
 
 namespace Serenity.Demo.Northwind;
 
-public interface ITerritoryDeleteHandler : IDeleteHandler<MyRow, MyRequest, MyResponse> { }
+public interface ITerritoryDeleteHandler : IDeleteHandler<MyRow> { }
 
 public class TerritoryDeleteHandler(IRequestContext context) :
-    DeleteRequestHandler<MyRow, MyRequest, MyResponse>(context), ITerritoryDeleteHandler
+    DeleteRequestHandler<MyRow>(context), ITerritoryDeleteHandler
 {
 }

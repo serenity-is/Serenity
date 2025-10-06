@@ -434,7 +434,7 @@ public class ListRequestHandler<TRow, TListRequest, TListResponse> : IListReques
         {
             var fields = GetQuickSearchFields(Request.ContainsField.TrimToNull());
             if (fields == null || !fields.Any())
-                throw new ArgumentOutOfRangeException("containsField");
+                throw new ArgumentOutOfRangeException(nameof(containsText), "There are no quick search fields defined in " + typeof(TRow).FullName);
 
             var criteria = Criteria.Empty;
 
