@@ -32,6 +32,9 @@ export interface TSBuildOptions {
     /** True to enable minification. Default is true. */
     minify?: boolean;
 
+    /** False to not call npmCopy automatically for entries in appsettings.bundles.json that start with `~/npm/`. Default is true.*/
+    npmCopy?: boolean;
+
     /** Base directory for calculating output file locations in output directory. Default is "./" */
     outbase?: string;
 

@@ -142,6 +142,8 @@ export const build = async (opt) => {
         }   
     }
 
+    delete opt?.npmCopy;
+
     opt = esbuildOptions(opt);
 
     if (opt.watch) {
