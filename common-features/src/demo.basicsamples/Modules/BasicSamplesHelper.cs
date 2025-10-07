@@ -21,9 +21,9 @@ public static class BasicSamplesHelper
         if (file == null || file.Length == 0)
             return null;
 
-        var path = file.StartsWith('/') ? file[1..] : "demo.basicsamples" + GetRelativePathFor(helper, file);
-        var href = $"https://github.com/serenity-is/Serenity/blob/{Uri.EscapeDataString(GetCommitId(helper))}/common-features/src/{path}";
-        return new HtmlString($"<a target=\"blank\" style=\"font-weight: bold;\" href=\"{helper.Encode(href)}\">{helper.Encode(Path.GetFileName(file))}</a>");
+        var path = file.StartsWith('/') ? file : ("/common-features/src/demo.basicsamples" + GetRelativePathFor(helper, file));
+        var href = $"https://github.com/serenity-is/Serenity/blob/{Uri.EscapeDataString(GetCommitId(helper))}{path}";
+        return new HtmlString($"<a class=\"s-sample-source-link\" target=\"_blank\" style=\"font-weight: bold;\" href=\"{helper.Encode(href)}\">{helper.Encode(Path.GetFileName(file))}</a>");
     }
 
     private static string GetRelativePathFor(HtmlHelper helper, string file)
