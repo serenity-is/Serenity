@@ -100,9 +100,9 @@ describe("Validator.methods", () => {
             Config.emailAllowOnlyAscii = true;
 
             // Test null/undefined/empty values
-            expect(method(null, null)).toBe(false);
-            expect(method(undefined, null)).toBe(false);
-            expect(method("", null)).toBe(false);
+            expect(method(null, null)).toBe("dependency-mismatch");
+            expect(method(undefined, null)).toBe("dependency-mismatch");
+            expect(method("", null)).toBe("dependency-mismatch");
 
             // Test length limit (should reject very long emails)
             const longEmail = "a".repeat(1000) + "@example.com";
