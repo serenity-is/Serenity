@@ -39,6 +39,7 @@ vi.mock("@serenity-is/sleekgrid", async () => {
 });
 
 describe("AggregateFormatting.groupTotalsFormat", () => {
+
     it("should format sum correctly", () => {
         const result = AggregateFormatting.groupTotalsFormat(formatterContext({
             item: {
@@ -104,6 +105,7 @@ describe("AggregateFormatting.groupTotalsFormat", () => {
     });
 
     it("should infer aggregator type when summaryType is not provided", () => {
+        // note that column might not have summaryType if CustomSummaryMixin is not used
         const result = AggregateFormatting.groupTotalsFormat(formatterContext({
             item: {
                 avg: {
@@ -193,6 +195,7 @@ describe("AggregateFormatting.groupTotalsFormat", () => {
     });
 
     it("should return empty string when no totals provided", () => {
+        // note that column might not have summaryType if CustomSummaryMixin is not used
         const result = AggregateFormatting.groupTotalsFormat(formatterContext({
             item: null,
             column: {
@@ -244,6 +247,41 @@ describe("AggregateFormatting.groupTotalsFormat", () => {
             column: {
                 field: "Amount",
                 summaryType: "avg"
+            }
+        }));
+
+        expect(result).toStrictEqual(<span class="aggregate agg-avg" title="Avg"></span>);
+    });
+
+    it("should return empty string when column has no summaryType and no totals for the column are available", () => {
+        // note that column might not have summaryType if CustomSummaryMixin is not used
+        const result = AggregateFormatting.groupTotalsFormat(formatterContext({
+            item: {
+                sum: {
+                    SomeOther: 0,
+                }
+            },
+            column: {
+                field: "Amount"
+            }
+        }));
+
+        expect(result).toBe("");
+    });
+
+    it("falls back to total with null value when no non-null total found and summaryType is not provided", () => {
+        // note that column might not have summaryType if CustomSummaryMixin is not used
+        const result = AggregateFormatting.groupTotalsFormat(formatterContext({
+            item: {
+                sum: {
+                    Amount: void 0
+                },
+                avg: {
+                    Amount: null
+                }
+            },
+            column: {
+                field: "Amount"
             }
         }));
 

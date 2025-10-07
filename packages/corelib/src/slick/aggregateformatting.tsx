@@ -23,13 +23,14 @@ export namespace AggregateFormatting {
 
         let aggType: IAggregatorConstructor;
         let aggKey: string;
-        if (column.summaryType) {
+        if (column.summaryType != null) {
             aggType = AggregatorTypeRegistry.tryGet(column.summaryType);
             aggKey = aggType?.aggregateKey;
         }
         else {
-            aggKey = (Object.keys(totals).find(aggKey => totals[aggKey]?.[field] !== void 0) ??
-                Object.keys(totals).find(aggKey => totals[aggKey]?.[field] !== null));
+            // first try to find an aggregate key that has a value, then fallback to first null value
+            aggKey = (Object.keys(totals).find(aggKey => totals[aggKey]?.[field] != null) ??
+                Object.keys(totals).find(aggKey => totals[aggKey]?.[field] === null));
             if (aggKey)
                 aggType = AggregatorTypeRegistry.tryGet(aggKey);
         }
@@ -38,15 +39,12 @@ export namespace AggregateFormatting {
             return "";
 
         const value = totals[aggKey][field];
-        const span = document.createElement("span");
-        span.className = 'aggregate agg-' + aggKey;
         let displayName = aggType?.displayName;
         if (!displayName) {
             const textKey = (aggKey.substring(0, 1).toUpperCase() + aggKey.substring(1));
             displayName = localText("Enums.Serenity.SummaryType." + textKey, textKey);
         }
-        span.innerText = displayName + ": ";
-        span.title = displayName;
+        const span = <span class={"aggregate agg-" + aggKey} title={displayName}></span> as HTMLElement;
         const formatter = column.format ?? ((column as any).formatter ? convertCompatFormatter((column as any).formatter) : null);
 
         function defaultFormatValue() {
