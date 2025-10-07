@@ -464,8 +464,12 @@ export class Validator {
         /**
          * Validates whether the input value is an email in accordance to RFC822 specification, with a top level domain.
          */
-        email: (value) => {
-            if (!value || typeof value !== "string") {
+        email: (value, element) => {
+            const o = Validator.optional(element, value);
+            if (o)
+                return o;
+
+            if (typeof value !== "string") {
                 return false;
             }
 
