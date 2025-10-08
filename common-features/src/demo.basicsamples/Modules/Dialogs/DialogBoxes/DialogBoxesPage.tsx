@@ -1,4 +1,5 @@
 import { alertDialog, confirmDialog, informationDialog, notifyError, notifyInfo, notifySuccess, successDialog, warningDialog } from "@serenity-is/corelib";
+import { SampleInfo } from "../../sample-info";
 
 export default function pageInit() {
 
@@ -37,7 +38,9 @@ export default function pageInit() {
         htmlEncode: false
     });
 
-    document.getElementById("SampleRoot").append(<>
+    const div = document.getElementById("PanelDiv");
+    div.classList.add("d-flex", "gap-1");
+    div.append(<>
         <button class="btn btn-block btn-primary" onClick={confirmAndButtonsClick}>Confirm Dialog and Buttons</button>
         <button class="btn btn-block btn-primary" onClick={confirmWithCustomTitleClick}>Confirm With Custom Title</button>
         <button class="btn btn-block btn-info" onClick={informationClick}>Information</button>
@@ -46,4 +49,9 @@ export default function pageInit() {
         <button class="btn btn-block btn-danger" onClick={alertClick}>Alert</button>
         <button class="btn btn-block btn-danger" onClick={alertWithHtmlClick}>Alert with HTML Content</button>
     </>)
+
+    return <SampleInfo>
+        <p>Here are some samples for message dialog functions</p>
+        <p>Click buttons below to launch dialogs.</p>
+    </SampleInfo>
 }

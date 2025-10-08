@@ -35,7 +35,7 @@ public partial class BasicSamplesPage : Controller
 
     public ActionResult DialogBoxes()
     {
-        return View(MVC.Views.Dialogs.DialogBoxes.Index);
+        return this.SamplePanelPage(ESM.DialogBoxesPage, "Dialog Box Types");
     }
 
     [PageAuthorize(Northwind.PermissionKeys.General)]
