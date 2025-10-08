@@ -3,6 +3,159 @@ namespace Serenity.Demo.BasicSamples;
 [PageAuthorize, Route("BasicSamples/[action]")]
 public partial class BasicSamplesPage : Controller
 {
+    [PageAuthorize(Northwind.PermissionKeys.General)]
+    public ActionResult ChartInDialog()
+    {
+        return View(MVC.Views.Dialogs.ChartInDialog.Index);
+    }
+
+    [PageAuthorize(Northwind.PermissionKeys.General)]
+    public ActionResult ChangingLookupText()
+    {
+        return View(MVC.Views.Editors.ChangingLookupText.Index);
+    }
+
+    [PageAuthorize(Northwind.PermissionKeys.General)]
+    public ActionResult CloneableEntityDialog()
+    {
+        return View(MVC.Views.Dialogs.CloneableEntityDialog.Index);
+    }
+
+    [PageAuthorize(Northwind.PermissionKeys.General)]
+    public ActionResult CustomLinksInGrid()
+    {
+        return View(MVC.Views.Grids.CustomLinksInGrid.Index);
+    }
+
+    [PageAuthorize(Northwind.PermissionKeys.General)]
+    public ActionResult DefaultValuesInNewDialog()
+    {
+        return View(MVC.Views.Dialogs.DefaultValuesInNewDialog.Index);
+    }
+
+    public ActionResult DialogBoxes()
+    {
+        return View(MVC.Views.Dialogs.DialogBoxes.Index);
+    }
+
+    [PageAuthorize(Northwind.PermissionKeys.General)]
+    public ActionResult EnablingRowSelection()
+    {
+        return View(MVC.Views.Grids.EnablingRowSelection.Index);
+    }
+
+    [Route("{orderID?}")]
+    [PageAuthorize(Northwind.PermissionKeys.General)]
+    public ActionResult EntityDialogAsPanel(int? orderID)
+    {
+        return View(MVC.Views.Dialogs.EntityDialogAsPanel.Index, orderID);
+    }
+
+    [PageAuthorize(Northwind.PermissionKeys.General)]
+    public ActionResult FilteredLookupInDetailDialog()
+    {
+        return View(MVC.Views.Editors.FilteredLookupInDetail.Index);
+    }
+
+    [PageAuthorize(Northwind.PermissionKeys.General)]
+    public ActionResult GetInsertedRecordId()
+    {
+        return View(MVC.Views.Dialogs.GetInsertedRecordId.Index);
+    }
+
+    [PageAuthorize(Northwind.PermissionKeys.General)]
+    public ActionResult GridFilteredByCriteria()
+    {
+        return View(MVC.Views.Grids.GridFilteredByCriteria.Index);
+    }
+
+    [PageAuthorize(Northwind.PermissionKeys.General)]
+    public ActionResult GroupingAndSummariesInGrid()
+    {
+        return View(MVC.Views.Grids.GroupingAndSummariesInGrid.Index);
+    }
+
+    [PageAuthorize(Northwind.PermissionKeys.General)]
+    public ActionResult InitialValuesForQuickFilters()
+    {
+        return View(MVC.Views.Grids.InitialValuesForQuickFilters.Index);
+    }
+
+    [PageAuthorize(Northwind.PermissionKeys.General)]
+    public ActionResult InlineActionButtons()
+    {
+        return View(MVC.Views.Grids.InlineActionButtons.Index);
+    }
+
+    [PageAuthorize(Northwind.PermissionKeys.General)]
+    public ActionResult InlineImageInGrid()
+    {
+        return View(MVC.Views.Grids.InlineImageInGrid.Index);
+    }
+
+    [PageAuthorize(Northwind.PermissionKeys.General)]
+    public ActionResult LookupFilterByMultipleValues()
+    {
+        return View(MVC.Views.Editors.LookupFilterByMultipleValues.Index);
+    }
+
+    [PageAuthorize(Northwind.PermissionKeys.General)]
+    public ActionResult PopulateLinkedData()
+    {
+        return View(MVC.Views.Dialogs.PopulateLinkedData.Index);
+    }
+
+    [PageAuthorize(Northwind.PermissionKeys.General)]
+    public ActionResult ReadOnlyDialog()
+    {
+        return View(MVC.Views.Dialogs.ReadOnlyDialog.Index);
+    }
+
+    [PageAuthorize(Northwind.PermissionKeys.General)]
+    public ActionResult OtherFormInTab()
+    {
+        return View(MVC.Views.Dialogs.OtherFormInTab.Index);
+    }
+
+    [PageAuthorize(Northwind.PermissionKeys.General)]
+    public ActionResult OtherFormInTabOneBar()
+    {
+        return View(MVC.Views.Dialogs.OtherFormInTabOneBar.Index);
+    }
+
+    [PageAuthorize(Northwind.PermissionKeys.General)]
+    public ActionResult RemovingAddButton()
+    {
+        return View(MVC.Views.Grids.RemovingAddButton.Index);
+    }
+
+    public ActionResult SelectWithHardcodedValues()
+    {
+        return View(MVC.Views.Editors.SelectWithHardcodedValues.Index);
+    }
+
+    [PageAuthorize(Northwind.PermissionKeys.General)]
+    public ActionResult SerialAutoNumber()
+    {
+        return View(MVC.Views.Dialogs.SerialAutoNumber.Index);
+    }
+
+    public ActionResult StaticTextBlock()
+    {
+        return View(MVC.Views.Editors.StaticTextBlock.Index);
+    }
+
+    [PageAuthorize(Northwind.PermissionKeys.General)]
+    public ActionResult ViewWithoutID()
+    {
+        return View(MVC.Views.Grids.ViewWithoutID.Index);
+    }
+
+    [PageAuthorize(Northwind.PermissionKeys.General)]
+    public ActionResult WrappedHeaders()
+    {
+        return View(MVC.Views.Grids.WrappedHeaders.Index);
+    }
 }
 
 [Obsolete("Use BasicSamplesPage")]

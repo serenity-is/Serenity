@@ -3,6 +3,7 @@ namespace Serenity.Demo.BasicSamples.MVC;
 
 public static partial class Views
 {
+    public const string BasicSamplesLayout = "~/Modules/BasicSamplesLayout.cshtml";
     public static partial class Dialogs
     {
         public static partial class ChartInDialog

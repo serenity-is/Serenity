@@ -1,0 +1,15 @@
+@namespace Serenity.Demo.BasicSamples
+@{
+    Layout = "_Layout";
+    var modulePageScript = (Model as ModulePageModel)?.Module ?? ViewData["ModulePageScript"] as string;
+}
+@section Head {
+    @Html.Stylesheet(ESM.BasicSamplesLayout)
+    <meta name="repository-blob-url" content="@(Html.GetRepositoryBlobUrl())" />
+    @if (!string.IsNullOrEmpty(modulePageScript))
+    {
+        <meta name="sample-page-path" content="@modulePageScript" />
+    }
+    @RenderSection("Head", required: false)
+}
+@RenderBody()

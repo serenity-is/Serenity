@@ -16,11 +16,6 @@
   margin-bottom: 0;
 }
 
-.alert.s-sample-info .s-sample-premium-source {
-  display: block;
-  font-size: 0.75rem;
-}
-
 :root.pro .alert-dismissible button.close.btn-close {
   color: transparent;
 }

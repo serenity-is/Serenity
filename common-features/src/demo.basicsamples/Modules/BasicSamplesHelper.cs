@@ -11,19 +11,20 @@ namespace Serenity.Demo.BasicSamples;
 
 public static class BasicSamplesHelper
 {
-    public static string BasicSamplesModuleFile(this HtmlHelper helper, string module)
-    {
-        return UriHelper.Combine("~/Serenity.Demo.BasicSamples/esm/", GetRelativePathFor(helper, module));
-    }
-
     public static HtmlString BasicSamplesSourceFile(this HtmlHelper helper, string file)
     {
         if (file == null || file.Length == 0)
             return null;
-
-        var path = file.StartsWith('/') ? file : ("/common-features/src/demo.basicsamples" + GetRelativePathFor(helper, file));
-        var href = $"https://github.com/serenity-is/Serenity/blob/{Uri.EscapeDataString(GetCommitId(helper))}{path}";
+        var path = file.StartsWith('/') ? file[1..] : ("common-features/src/demo.basicsamples" + GetRelativePathFor(helper, file));
+        var href = GetRepositoryBlobUrl(helper) + path;
         return new HtmlString($"<a class=\"s-sample-source-link\" target=\"_blank\" style=\"font-weight: bold;\" href=\"{helper.Encode(href)}\">{helper.Encode(Path.GetFileName(file))}</a>");
+    }
+
+    const string RepositoryUrl = "https://github.com/serenity-is/Serenity";
+
+    public static string GetRepositoryBlobUrl(this HtmlHelper helper)
+    {
+        return $"{RepositoryUrl}/blob/{Uri.EscapeDataString(GetCommitId(helper))}/";
     }
 
     private static string GetRelativePathFor(HtmlHelper helper, string file)
@@ -58,7 +59,7 @@ public static class BasicSamplesHelper
 
     private static string cachedCommitId;
 
-    private static string GetCommitId(HtmlHelper helper)
+    private static string GetCommitId(this HtmlHelper helper)
     {
         if (cachedCommitId != null)
             return cachedCommitId;
@@ -85,7 +86,7 @@ public static class BasicSamplesHelper
             if (version == null)
                 return cachedCommitId = "master";
 
-            var nugetFolder = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.UserProfile), 
+            var nugetFolder = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.UserProfile),
                 ".nuget", "packages");
             var versionStr = version.ToString();
             var nuspecFile = Path.Combine(nugetFolder, packageId, versionStr, packageId + ".nuspec");
@@ -124,4 +125,24 @@ public static class BasicSamplesHelper
         return cachedCommitId = "master";
     }
 
+    public static ModulePageResult SampleGridPage(this Controller controller, string module, LocalText pageTitle,
+        object options = null, string layout = null)
+    {
+        return controller.GridPage(module, pageTitle, options, layout ??
+            MVC.Views.BasicSamplesLayout);
+    }
+
+    public static ModulePageResult SampleGridPage<TRow>(this Controller controller, string module,
+        object options = null, string layout = null, LocalText pageTitle = null)
+        where TRow : IRow, new()
+    {
+        return controller.GridPage<TRow>(module, options, layout ?? MVC.Views.BasicSamplesLayout, pageTitle);
+    }
+
+    public static ModulePageResult SamplePanelPage(this Controller controller, string module, LocalText pageTitle,
+        object options = null, string layout = null)
+    {
+        return controller.PanelPage(module, pageTitle, options, layout ??
+            MVC.Views.BasicSamplesLayout);
+    }
 }
