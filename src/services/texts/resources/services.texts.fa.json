@@ -1,4 +1,10 @@
 {
+  "Controls.ImageUpload.AddFileButton": "فایل را انتخاب کنید",
+  "Controls.ImageUpload.ColorboxClose": "بستن",
+  "Controls.ImageUpload.ColorboxCurrent": "تصویر {فعلی} / {کل}",
+  "Controls.ImageUpload.ColorboxNext": "بعدی",
+  "Controls.ImageUpload.ColorboxPrior": "قبلی",
+  "Controls.ImageUpload.DeleteButtonHint": "حذف کردن",
   "Controls.ImageUpload.ExtensionBlacklisted": "پسوند فایل بارگذاری شده '{0}' مجاز نیست!",
   "Controls.ImageUpload.ExtensionNotAllowed": "پسوند فایل بارگذاری شده '{0}' در لیست پسوندهای مجاز وجود ندارد: '{1}'!",
   "Controls.ImageUpload.FailedScan": "هنگام اسکن فایل آپلود شده برای ویروس، خطایی رخ داده است!",

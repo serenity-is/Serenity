@@ -1,4 +1,10 @@
 {
+  "Controls.ImageUpload.AddFileButton": "Välj fil",
+  "Controls.ImageUpload.ColorboxClose": "Stäng",
+  "Controls.ImageUpload.ColorboxCurrent": "Bild {aktuell} / {totalt}",
+  "Controls.ImageUpload.ColorboxNext": "Nästa",
+  "Controls.ImageUpload.ColorboxPrior": "föregående",
+  "Controls.ImageUpload.DeleteButtonHint": "Ta bort",
   "Controls.ImageUpload.ExtensionBlacklisted": "Uppladdning av filändelsen '{0}' är inte tillåten!",
   "Controls.ImageUpload.ExtensionNotAllowed": "Den uppladdade filändelsen '{0}' finns inte i listan över tillåtna filändelser: '{1}'!",
   "Controls.ImageUpload.FailedScan": "Ett fel inträffade vid skanning av den uppladdade filen för virus!",

@@ -1,4 +1,10 @@
 {
+  "Controls.ImageUpload.AddFileButton": "Dosya Seç",
+  "Controls.ImageUpload.ColorboxClose": "kapat",
+  "Controls.ImageUpload.ColorboxCurrent": "resim {current} / {total}",
+  "Controls.ImageUpload.ColorboxNext": "sonraki",
+  "Controls.ImageUpload.ColorboxPrior": "önceki",
+  "Controls.ImageUpload.DeleteButtonHint": "Kaldır",
   "Controls.ImageUpload.ExtensionBlacklisted": "Yüklenen dosya uzantısına ({0}) izin verilmiyor!",
   "Controls.ImageUpload.ExtensionNotAllowed": "Yüklenen dosya uzantısı ({0}) izin verilen uzantılar listesinde değil: '{1}'!",
   "Controls.ImageUpload.FailedScan": "Yüklenen dosyanın virüs taraması yapılırken bir hata oluştu!",

@@ -1,4 +1,10 @@
 {
+  "Controls.ImageUpload.AddFileButton": "Datei auswählen",
+  "Controls.ImageUpload.ColorboxClose": "Schließen",
+  "Controls.ImageUpload.ColorboxCurrent": "Bild {aktuell} / {insgesamt}",
+  "Controls.ImageUpload.ColorboxNext": "Nächste",
+  "Controls.ImageUpload.ColorboxPrior": "vorher",
+  "Controls.ImageUpload.DeleteButtonHint": "Entfernen",
   "Controls.ImageUpload.ExtensionBlacklisted": "Das Hochladen der Datei-Erweiterung '{0}' ist nicht erlaubt!",
   "Controls.ImageUpload.ExtensionNotAllowed": "Die hochgeladene Dateierweiterung '{0}' ist nicht in der Liste der erlaubten Erweiterungen: '{1}'!",
   "Controls.ImageUpload.FailedScan": "Beim Scannen der hochgeladenen Datei auf Viren ist ein Fehler aufgetreten!",

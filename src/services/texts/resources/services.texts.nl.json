@@ -1,4 +1,10 @@
 {
+  "Controls.ImageUpload.AddFileButton": "Bestand selecteren",
+  "Controls.ImageUpload.ColorboxClose": "Sluiten",
+  "Controls.ImageUpload.ColorboxCurrent": "Afbeelding {huidige} / {totaal}",
+  "Controls.ImageUpload.ColorboxNext": "Volgende",
+  "Controls.ImageUpload.ColorboxPrior": "vooraf",
+  "Controls.ImageUpload.DeleteButtonHint": "Verwijderen",
   "Controls.ImageUpload.ExtensionBlacklisted": "Het uploaden van bestandsextensie '{0}' is niet toegestaan!",
   "Controls.ImageUpload.ExtensionNotAllowed": "Het geüploade bestandsextensie '{0}' staat niet in de lijst met toegestane extensies: '{1}'!",
   "Controls.ImageUpload.FailedScan": "Er is een fout opgetreden bij het scannen van het geüploade bestand op virussen!",

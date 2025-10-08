@@ -1,4 +1,10 @@
 {
+  "Controls.ImageUpload.AddFileButton": "Selectați fișierul",
+  "Controls.ImageUpload.ColorboxClose": "Închide",
+  "Controls.ImageUpload.ColorboxCurrent": "Imagine {curentă} / {total}",
+  "Controls.ImageUpload.ColorboxNext": "Următorul",
+  "Controls.ImageUpload.ColorboxPrior": "anterior",
+  "Controls.ImageUpload.DeleteButtonHint": "Șterge",
   "Controls.ImageUpload.ExtensionBlacklisted": "Încărcarea fișierului cu extensia '{0}' nu este permisă!",
   "Controls.ImageUpload.ExtensionNotAllowed": "Extensia fișierului încărcat '{0}' nu se află în lista extensiilor permise: '{1}'!",
   "Controls.ImageUpload.FailedScan": "A apărut o eroare în timpul scanării fișierului încărcat pentru viruși!",

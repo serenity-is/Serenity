@@ -1,4 +1,10 @@
 {
+  "Controls.ImageUpload.AddFileButton": "Vybrat soubor",
+  "Controls.ImageUpload.ColorboxClose": "Zavřít",
+  "Controls.ImageUpload.ColorboxCurrent": "Obrázek {aktuální} / {celkem}",
+  "Controls.ImageUpload.ColorboxNext": "Další",
+  "Controls.ImageUpload.ColorboxPrior": "předchozí",
+  "Controls.ImageUpload.DeleteButtonHint": "Odstranit",
   "Controls.ImageUpload.ExtensionBlacklisted": "Nahrání souboru s příponou '{0}' není povoleno!",
   "Controls.ImageUpload.ExtensionNotAllowed": "Nahraný soubor s příponou '{0}' není v seznamu povolených přípon: '{1}'!",
   "Controls.ImageUpload.FailedScan": "Při skenování nahrávaného souboru na viry došlo k chybě!",

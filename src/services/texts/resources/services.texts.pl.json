@@ -1,4 +1,10 @@
 {
+  "Controls.ImageUpload.AddFileButton": "Wybierz plik",
+  "Controls.ImageUpload.ColorboxClose": "Zamknij",
+  "Controls.ImageUpload.ColorboxCurrent": "Obraz {bieżący} / {całkowity}",
+  "Controls.ImageUpload.ColorboxNext": "Następny",
+  "Controls.ImageUpload.ColorboxPrior": "poprzedni",
+  "Controls.ImageUpload.DeleteButtonHint": "Usuń",
   "Controls.ImageUpload.ExtensionBlacklisted": "Przesłanie pliku o rozszerzeniu '{0}' nie jest dozwolone!",
   "Controls.ImageUpload.ExtensionNotAllowed": "Rozszerzenie przesłanego pliku '{0}' nie znajduje się na liście dozwolonych rozszerzeń: '{1}'!",
   "Controls.ImageUpload.FailedScan": "Wystąpił błąd podczas skanowania przesłanego pliku pod kątem wirusów!",

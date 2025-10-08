@@ -1,4 +1,10 @@
 {
+  "Controls.ImageUpload.AddFileButton": "Chọn tập tin",
+  "Controls.ImageUpload.ColorboxClose": "Đóng",
+  "Controls.ImageUpload.ColorboxCurrent": "Hình ảnh {hiện tại} / {tổng}",
+  "Controls.ImageUpload.ColorboxNext": "Tiếp theo",
+  "Controls.ImageUpload.ColorboxPrior": "trước",
+  "Controls.ImageUpload.DeleteButtonHint": "Xóa",
   "Controls.ImageUpload.ExtensionBlacklisted": "Tải lên tệp mở rộng '{0}' không được phép!",
   "Controls.ImageUpload.ExtensionNotAllowed": "Phần mở rộng của tệp đã tải lên '{0}' không có trong danh sách các phần mở rộng được phép: '{1}'!",
   "Controls.ImageUpload.FailedScan": "Đã xảy ra lỗi khi quét tệp được tải lên để phát hiện virus!",

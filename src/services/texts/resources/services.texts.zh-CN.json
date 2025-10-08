@@ -1,4 +1,10 @@
 {
+  "Controls.ImageUpload.AddFileButton": "选择文件",
+  "Controls.ImageUpload.ColorboxClose": "关闭",
+  "Controls.ImageUpload.ColorboxCurrent": "图像 {当前} / {总计}",
+  "Controls.ImageUpload.ColorboxNext": "下一个",
+  "Controls.ImageUpload.ColorboxPrior": "先前",
+  "Controls.ImageUpload.DeleteButtonHint": "删除",
   "Controls.ImageUpload.ExtensionBlacklisted": "上传的文件扩展名 '{0}' 不允许！",
   "Controls.ImageUpload.ExtensionNotAllowed": "上传的文件扩展名 '{0}' 不在允许的扩展名列表中: '{1}'!",
   "Controls.ImageUpload.FailedScan": "扫描上传文件时出错！",

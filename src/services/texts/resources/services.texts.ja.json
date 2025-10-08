@@ -1,4 +1,10 @@
 {
+  "Controls.ImageUpload.AddFileButton": "ファイルを選択",
+  "Controls.ImageUpload.ColorboxClose": "閉じる",
+  "Controls.ImageUpload.ColorboxCurrent": "画像 {現在} / {合計}",
+  "Controls.ImageUpload.ColorboxNext": "次へ",
+  "Controls.ImageUpload.ColorboxPrior": "前",
+  "Controls.ImageUpload.DeleteButtonHint": "削除する",
   "Controls.ImageUpload.ExtensionBlacklisted": "アップロードされたファイルの拡張子 '{0}' は許可されていません！",
   "Controls.ImageUpload.ExtensionNotAllowed": "アップロードされたファイルの拡張子 '{0}' は許可された拡張子のリストにありません: '{1}'!",
   "Controls.ImageUpload.FailedScan": "アップロードされたファイルをウイルススキャン中にエラーが発生しました！",

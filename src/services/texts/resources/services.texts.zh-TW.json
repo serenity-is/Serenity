@@ -1,4 +1,10 @@
 {
+  "Controls.ImageUpload.AddFileButton": "選擇檔案",
+  "Controls.ImageUpload.ColorboxClose": "關閉",
+  "Controls.ImageUpload.ColorboxCurrent": "圖像 {目前} / {總計}",
+  "Controls.ImageUpload.ColorboxNext": "下一個",
+  "Controls.ImageUpload.ColorboxPrior": "先前",
+  "Controls.ImageUpload.DeleteButtonHint": "刪除",
   "Controls.ImageUpload.ExtensionBlacklisted": "上傳的檔案副檔名 '{0}' 不被允許！",
   "Controls.ImageUpload.ExtensionNotAllowed": "上傳的檔案副檔名 '{0}' 不在允許的副檔名清單中: '{1}'!",
   "Controls.ImageUpload.FailedScan": "掃描上傳的檔案時出現錯誤！",

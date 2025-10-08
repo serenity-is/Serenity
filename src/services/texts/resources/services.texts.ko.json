@@ -1,4 +1,10 @@
 {
+  "Controls.ImageUpload.AddFileButton": "파일 선택",
+  "Controls.ImageUpload.ColorboxClose": "닫기",
+  "Controls.ImageUpload.ColorboxCurrent": "이미지 {현재} / {총계}",
+  "Controls.ImageUpload.ColorboxNext": "다음",
+  "Controls.ImageUpload.ColorboxPrior": "이전",
+  "Controls.ImageUpload.DeleteButtonHint": "삭제",
   "Controls.ImageUpload.ExtensionBlacklisted": "업로드된 파일 확장자 '{0}'은 허용되지 않습니다!",
   "Controls.ImageUpload.ExtensionNotAllowed": "업로드 된 파일 확장자 '{0}'은 허용된 확장자 목록에 없습니다: '{1}'!",
   "Controls.ImageUpload.FailedScan": "업로드 된 파일을 바이러스 스캔하는 동안 오류가 발생했습니다!",

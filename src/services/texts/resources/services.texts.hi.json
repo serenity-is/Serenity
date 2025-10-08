@@ -1,4 +1,10 @@
 {
+  "Controls.ImageUpload.AddFileButton": "फ़ाइल का चयन करें",
+  "Controls.ImageUpload.ColorboxClose": "बंद करें",
+  "Controls.ImageUpload.ColorboxCurrent": "छवि {वर्तमान} / {कुल}",
+  "Controls.ImageUpload.ColorboxNext": "अगला",
+  "Controls.ImageUpload.ColorboxPrior": "पहले",
+  "Controls.ImageUpload.DeleteButtonHint": "हटाना",
   "Controls.ImageUpload.ExtensionBlacklisted": "अपलोड की गई फ़ाइल एक्सटेंशन '{0}' की अनुमति नहीं है!",
   "Controls.ImageUpload.ExtensionNotAllowed": "अपलोड की गई फ़ाइल एक्सटेंशन '{0}' अनुमतियों की सूची में नहीं है: '{1}'!",
   "Controls.ImageUpload.FailedScan": "वायरस के लिए अपलोड की गई फ़ाइल की स्कैनिंग करते समय एक त्रुटि हुई!",

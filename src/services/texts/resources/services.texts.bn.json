@@ -1,4 +1,10 @@
 {
+  "Controls.ImageUpload.AddFileButton": "ফাইল নির্বাচন করুন",
+  "Controls.ImageUpload.ColorboxClose": "বন্ধ",
+  "Controls.ImageUpload.ColorboxCurrent": "ইমেজ {বর্তমান} / {মোট}",
+  "Controls.ImageUpload.ColorboxNext": "পরবর্তী",
+  "Controls.ImageUpload.ColorboxPrior": "পূর্ববর্তী",
+  "Controls.ImageUpload.DeleteButtonHint": "অপসারণ",
   "Controls.ImageUpload.ExtensionBlacklisted": "আপলোড করা ফাইলের এক্সটেনশন '{0}' অনুমোদিত নয়!",
   "Controls.ImageUpload.ExtensionNotAllowed": "আপলোড করা ফাইলের এক্সটেনশন '{0}' অনুমোদিত এক্সটেনশনের তালিকায় নেই: '{1}'!",
   "Controls.ImageUpload.FailedScan": "ভাইরাসের জন্য আপলোড করা ফাইলটি স্ক্যান করা সময় একটি ত্রুটি ঘটেছে!",

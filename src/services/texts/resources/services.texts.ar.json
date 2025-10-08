@@ -1,4 +1,10 @@
 {
+  "Controls.ImageUpload.AddFileButton": "اختر ملف",
+  "Controls.ImageUpload.ColorboxClose": "إغلاق",
+  "Controls.ImageUpload.ColorboxCurrent": "الصورة {الحالية} / {الإجمالي}",
+  "Controls.ImageUpload.ColorboxNext": "التالي",
+  "Controls.ImageUpload.ColorboxPrior": "السابق",
+  "Controls.ImageUpload.DeleteButtonHint": "إزالة",
   "Controls.ImageUpload.ExtensionBlacklisted": "تم تحميل ملحق الملف '{0}' غير مسموح به!",
   "Controls.ImageUpload.ExtensionNotAllowed": "تم تحميل ملحق الملف '{0}' ليس في قائمة الملحقات المسموح بها: '{1}'!",
   "Controls.ImageUpload.FailedScan": "حدث خطأ أثناء فحص الملف المرفوع للفيروسات!",

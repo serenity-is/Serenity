@@ -1,4 +1,10 @@
 {
+  "Controls.ImageUpload.AddFileButton": "Pilih File",
+  "Controls.ImageUpload.ColorboxClose": "Tutup",
+  "Controls.ImageUpload.ColorboxCurrent": "Gambar {saat ini} / {total}",
+  "Controls.ImageUpload.ColorboxNext": "Berikutnya",
+  "Controls.ImageUpload.ColorboxPrior": "sebelumnya",
+  "Controls.ImageUpload.DeleteButtonHint": "Hapus",
   "Controls.ImageUpload.ExtensionBlacklisted": "Unggahan ekstensi file '{0}' tidak diizinkan!",
   "Controls.ImageUpload.ExtensionNotAllowed": "Ekstensi file yang diunggah '{0}' tidak ada dalam daftar ekstensi yang diizinkan: '{1}'!",
   "Controls.ImageUpload.FailedScan": "Terjadi kesalahan saat memindai file yang diunggah untuk virus!",

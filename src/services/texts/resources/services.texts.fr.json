@@ -1,4 +1,10 @@
 {
+  "Controls.ImageUpload.AddFileButton": "Sélectionner un fichier",
+  "Controls.ImageUpload.ColorboxClose": "Fermer",
+  "Controls.ImageUpload.ColorboxCurrent": "Image {actuelle} / {total}",
+  "Controls.ImageUpload.ColorboxNext": "Suivant",
+  "Controls.ImageUpload.ColorboxPrior": "précédent",
+  "Controls.ImageUpload.DeleteButtonHint": "Supprimer",
   "Controls.ImageUpload.ExtensionBlacklisted": "L'extension de fichier téléchargée '{0}' n'est pas autorisée !",
   "Controls.ImageUpload.ExtensionNotAllowed": "L'extension de fichier téléchargée '{0}' n'est pas dans la liste des extensions autorisées: '{1}'!",
   "Controls.ImageUpload.FailedScan": "Une erreur est survenue lors de l'analyse du fichier téléchargé pour détecter les virus !",

@@ -1,4 +1,10 @@
 {
+  "Controls.ImageUpload.AddFileButton": "Seleziona file",
+  "Controls.ImageUpload.ColorboxClose": "Chiudi",
+  "Controls.ImageUpload.ColorboxCurrent": "Immagine {attuale} / {totale}",
+  "Controls.ImageUpload.ColorboxNext": "Successivo",
+  "Controls.ImageUpload.ColorboxPrior": "precedente",
+  "Controls.ImageUpload.DeleteButtonHint": "Rimuovere",
   "Controls.ImageUpload.ExtensionBlacklisted": "L'estensione del file caricato '{0}' non è consentita!",
   "Controls.ImageUpload.ExtensionNotAllowed": "L'estensione del file caricato '{0}' non è nell'elenco delle estensioni consentite: '{1}'!",
   "Controls.ImageUpload.FailedScan": "Si è verificato un errore durante la scansione del file caricato per virus!",
