@@ -80,6 +80,7 @@ public static partial class HtmlScriptExtensions
     /// <returns></returns>
     public static HtmlString ModulePageInit(this IHtmlHelper html, string module, object options = null, bool css = true)
     {
+        html.ViewData["ModulePageScript"] ??= module;
         return new HtmlString(
             (css ? AutoIncludeModuleCss(html, module) : HtmlString.Empty).Value +
             $"<script type=\"module\" nonce=\"{html.CspNonce()}\">\n" +
