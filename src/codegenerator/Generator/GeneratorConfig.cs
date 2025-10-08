@@ -9,7 +9,7 @@ public class GeneratorConfig
     /// <summary>
     /// If specified, the settings in this file extends
     /// settings in a base file similar to tsconfig.json.
-    /// This can also be a special string like "defaults@6.6.0" to
+    /// This can also be a special string like "defaults@9.0.0" to
     /// apply defaults introduced in a specific Serenity version.
     /// See "GeneratorDefaults.cs" file for a list of possible
     /// version values.
@@ -515,6 +515,16 @@ public class GeneratorConfig
         /// </summary>
         [Obsolete("Sergen will always use the root namespace to avoid class name clashes.")]
         public bool? UseRootNamespace { get; set; }
+        /// <summary>
+        /// Use namespace {RootNamespace}.MVC instead of a MVC class inside the RootNamespace.
+        /// ESM helpers will also be generated in this namespace. Default is false.
+        /// This is useful if to avoid class name clashes with referenced projects. 
+        /// E.g. when add Serenity.Extensions to global usings, its MVC class would
+        /// clash with the MVC class generated for the current project, 
+        /// sometimes causing issues in Razor views without a @namespace directive.
+        /// So this is recommended for feature projects like Serenity.Extensions.
+        /// </summary>
+        public bool AsNamespace { get; set; }
         /// <summary>
         /// Use internal instead of public for generated top level class (MVC/ESM).
         /// </summary>

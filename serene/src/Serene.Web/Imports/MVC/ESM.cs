@@ -1,4 +1,4 @@
-﻿namespace Serene;
+﻿namespace Serene.MVC;
 
 public static partial class ESM
 {

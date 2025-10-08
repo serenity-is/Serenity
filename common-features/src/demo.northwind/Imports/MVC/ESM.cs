@@ -1,4 +1,4 @@
-﻿namespace Serenity.Demo.Northwind;
+﻿namespace Serenity.Demo.Northwind.MVC;
 
 public static partial class ESM
 {

@@ -1,4 +1,4 @@
-﻿namespace Serenity.Demo.BasicSamples;
+﻿namespace Serenity.Demo.BasicSamples.MVC;
 
 public static partial class ESM
 {

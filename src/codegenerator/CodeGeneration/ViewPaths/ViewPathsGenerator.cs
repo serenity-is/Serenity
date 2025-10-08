@@ -30,11 +30,11 @@ public class ViewPathsGenerator(IFileSystem fileSystem,
     }
 
 
-    public void GenerateViews(CodeWriter cw, IEnumerable<string> files)
+    public void GenerateViews(CodeWriter cw, IEnumerable<string> files, string modifiers = "public")
     {
         files = [.. files.OrderBy(GetStrippedName)];
 
-        cw.IndentedLine("public static partial class Views");
+        cw.IndentedLine($"{modifiers} static partial class Views");
         cw.InBrace(() =>
         {
             var last = Array.Empty<string>();

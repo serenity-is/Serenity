@@ -9,4 +9,7 @@
     <DotnetToolManifestFile>$(MSBuildProjectDirectory)\..\.config\dotnet-tools.json</DotnetToolManifestFile>
     <DotnetToolRestoreStamp>$(MSBuildProjectDirectory)\..\.config\.restore-stamp</DotnetToolRestoreStamp>
   </PropertyGroup>
+  <ItemGroup>
+    <Using Include="$(MSBuildProjectName).MVC.ESM" Alias="ESM" />
+  </ItemGroup>
 </Project>

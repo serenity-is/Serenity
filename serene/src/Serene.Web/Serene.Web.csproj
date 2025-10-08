@@ -19,6 +19,7 @@
     <EmbeddedResource Include="Migrations\**\*.sql" />
     <Content Update=".eslintrc.json;libman.json;package.json;package-lock.json;sergen.json;tsconfig.json;tslint.json;Modules\tsconfig.json" CopyToOutputDirectory="Never" CopyToPublishDirectory="Never" />
     <Using Include="Serenity.Extensions" />
+    <Using Include="Serene.MVC.ESM" Alias="ESM" />
   </ItemGroup>
   <ItemGroup>
     <PackageReference Include="FluentMigrator.Runner" Version="7.1.0" />

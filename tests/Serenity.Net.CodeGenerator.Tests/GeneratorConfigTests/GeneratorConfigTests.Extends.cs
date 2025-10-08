@@ -75,7 +75,7 @@ public partial class GeneratorConfigTests
         fileSystem.WriteAllText(@"/a/b/sergen.b.json",
             """""
             {
-                "Extends": "defaults@6.6.0",
+                "Extends": "defaults@9.0.0",
                 "RootNamespace": "B",
                 "IncludeGlobalUsings": ["IB"],
                 "ExcludeGlobalUsings": ["XB"],

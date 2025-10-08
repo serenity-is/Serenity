@@ -43,12 +43,12 @@ public class EsmEntryPointsGenerator()
         if (fileSystem is PhysicalFileSystem)
         {
             var matches = matcher.Execute(new DirectoryInfoWrapper(new System.IO.DirectoryInfo(projectDir))).Files;
-            files = matches.Select(match => match.Path).ToArray();
+            files = [.. matches.Select(match => match.Path)];
         }
         else
         {
             var matches = matcher.Execute(new FileSystemDirectoryWrapper(fileSystem, projectDir)).Files;
-            files = matches.Select(match => match.Path).ToArray();
+            files = [.. matches.Select(match => match.Path)];
         }
 
         string getStrippedName(string s)

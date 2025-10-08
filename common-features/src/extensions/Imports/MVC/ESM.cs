@@ -1,4 +1,4 @@
-﻿namespace Serenity.Extensions;
+﻿namespace Serenity.Extensions.MVC;
 
 public static partial class ESM
 {

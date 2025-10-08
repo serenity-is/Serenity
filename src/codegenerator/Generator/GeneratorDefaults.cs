@@ -2,7 +2,7 @@ namespace Serenity.CodeGenerator;
 
 /// <summary>
 /// Contains list of default versions that can be used in "extends"
-/// setting like "defaults@6.6.0" in sergen.json to apply a specific
+/// setting like "defaults@9.0.0" in sergen.json to apply a specific
 /// set of defaults.
 /// </summary>
 public class GeneratorDefaults
@@ -10,6 +10,7 @@ public class GeneratorDefaults
     private static readonly Dictionary<Version, string> ByVersion = new()
     {
         [new(6, 6, 0)] = v6_6_0,
+        [new(9, 0, 0)] = v9_0_0
     };
 
     private const string v6_6_0 = /*lang=json*/ @"{
@@ -31,11 +32,33 @@ public class GeneratorDefaults
   }
 }";
 
+    private const string v9_0_0 = /*lang=json*/ @"{
+  ""DeclareJoinConstants"": true,
+  ""EndOfLine"": ""LF"",
+  ""FileScopedNamespaces"": true,
+  ""ForeignFieldSelection"": ""NameOnly"",
+  ""OmitDefaultSchema"": true,
+  ""SaveGeneratedTables"": false,
+  ""Restore"": {
+    ""Exclude"": [
+      ""**/*""
+    ],
+    ""Typings"": false
+  },
+  ""MVC"": {
+    ""AsNamespace"": true
+  },
+  ""ServerTypings"": {
+    ""LocalTexts"": true,
+    ""PreferRelativePaths"": true
+  }
+}";
+
     /// <summary>
-    /// Tries to parse "default@6.6.0" type of extends
+    /// Tries to parse "defaults@9.0.0" type of extends
     /// version
     /// </summary>
-    /// <param name="extends">Extends statement like "defaults@6.6.0"</param>
+    /// <param name="extends">Extends statement like "defaults@9.0.0"</param>
     /// <returns></returns>
     public static string TryParse(string extends)
     {

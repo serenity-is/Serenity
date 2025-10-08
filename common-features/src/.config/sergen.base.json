@@ -1,3 +1,6 @@
 {
-  "Extends": "defaults@6.6.0"
+  "Extends": "defaults@6.6.0",
+  "MVC": {
+    "AsNamespace": true
+  }
 }

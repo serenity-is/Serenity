@@ -83,7 +83,7 @@ public partial class DoctorCommandTests
             ["@serenity-is/tsbuild"] = "8.8.8"
         };
 
-        public string SergenExtends { get; set; } = "defaults@6.6.0";
+        public string SergenExtends { get; set; } = "defaults@9.0.0";
         public string SergenRootNamespace { get; set; }
 
         public void WriteSergenJson()
