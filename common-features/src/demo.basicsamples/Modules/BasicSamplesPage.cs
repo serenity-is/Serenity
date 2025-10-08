@@ -6,7 +6,7 @@ public partial class BasicSamplesPage : Controller
     [PageAuthorize(Northwind.PermissionKeys.General)]
     public ActionResult ChartInDialog()
     {
-        return View(MVC.Views.Dialogs.ChartInDialog.Index);
+        return this.SamplePanelPage(ESM.ChartInDialogPage, "Chart in a Dialog");
     }
 
     [PageAuthorize(Northwind.PermissionKeys.General)]
@@ -18,7 +18,7 @@ public partial class BasicSamplesPage : Controller
     [PageAuthorize(Northwind.PermissionKeys.General)]
     public ActionResult CloneableEntityDialog()
     {
-        return View(MVC.Views.Dialogs.CloneableEntityDialog.Index);
+        return this.SampleGridPage(ESM.CloneableEntityDialogPage, "Cloneable Entity Dialog");
     }
 
     [PageAuthorize(Northwind.PermissionKeys.General)]
@@ -30,7 +30,7 @@ public partial class BasicSamplesPage : Controller
     [PageAuthorize(Northwind.PermissionKeys.General)]
     public ActionResult DefaultValuesInNewDialog()
     {
-        return View(MVC.Views.Dialogs.DefaultValuesInNewDialog.Index);
+        return this.SampleGridPage(ESM.DefaultValuesInNewDialogPage, "Default Values In New Dialog");
     }
 
     public ActionResult DialogBoxes()

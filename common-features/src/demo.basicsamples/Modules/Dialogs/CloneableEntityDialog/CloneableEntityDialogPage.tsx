@@ -1,9 +1,19 @@
 import { EntityGrid, gridPageInit } from "@serenity-is/corelib";
 import { ProductColumns, ProductDialog, ProductRow, ProductService } from "@serenity-is/demo.northwind";
 import { nsDemoBasicSamples } from "../../ServerTypes/Namespaces";
-import "./CloneableEntityDialogPage.css";
+import { SampleInfo } from "../../sample-info";
 
-export default () => gridPageInit(CloneableEntityGrid);
+export default () => {
+    gridPageInit(CloneableEntityGrid);
+
+    return <SampleInfo>
+        <p>Product dialog here has a clone button. This is actually an integrated
+            feature but clone button is invisible by default.</p>
+        <p>Open an existing product and click clone button to create a new copy of it. </p>
+        <p>See CloneableEntityDialog.ts for information about how to
+            make this button visible and customizing cloned entity.</p>
+    </SampleInfo>
+}
 
 /** Subclass of ProductGrid to override dialog type to CloneableEntityDialog */
 export class CloneableEntityGrid<P = {}> extends EntityGrid<ProductRow, P> {

@@ -1,8 +1,19 @@
 import { formatDate, gridPageInit } from "@serenity-is/corelib";
 import { EmployeeRow, OrderDialog, OrderGrid, OrderRow, ProductRow, ShipperRow } from "@serenity-is/demo.northwind";
 import { nsDemoBasicSamples } from "../../ServerTypes/Namespaces";
+import { SampleInfo } from "../../sample-info";
 
-export default () => gridPageInit(DefaultValuesInNewGrid);
+export default () => {
+    gridPageInit(DefaultValuesInNewGrid);
+
+    return <SampleInfo>
+        <p>You might want to prefill some fields in new entity dialog.</p>
+        <p>It is possible to set field defaults in row / form server side using [DefaultValue] attributes. For example,
+            in new order dialog, Order Date is set to today using such an attribute in form definition.</p>
+        <p>Here we'll populate some field values client side when default New Order button is clicked.</p>
+        <p>There are also two extra buttons here that does custom things, like setting initial order details.</p>
+    </SampleInfo>
+}
 
 export class DefaultValuesInNewGrid extends OrderGrid {
     static [Symbol.typeInfo] = this.registerClass(nsDemoBasicSamples);
@@ -13,14 +24,14 @@ export class DefaultValuesInNewGrid extends OrderGrid {
      * This is a good place to fill in default values for New Item button.
      */
     protected async addButtonClick() {
-        this.editItem(<OrderRow>{
+        this.editItem({
             CustomerID: 'ANTON',
             RequiredDate: formatDate(new Date(), 'yyyy-MM-dd'),
             EmployeeID: (await EmployeeRow.getLookupAsync()).items
                 .filter(x => x.FullName === 'Robert King')[0].EmployeeID,
             ShipVia: (await ShipperRow.getLookupAsync()).items
                 .filter(x => x.CompanyName === 'Speedy Express')[0].ShipperID
-        });
+        } satisfies OrderRow);
     }
 
     protected getButtons() {
@@ -34,13 +45,13 @@ export class DefaultValuesInNewGrid extends OrderGrid {
             onClick: async () => {
                 // using EditItem method as a shortcut to create a new Order dialog,
                 // bind to its events, load our order row, and open dialog
-                this.editItem(<OrderRow>{
+                this.editItem({
                     CustomerID: 'QUEEN',
                     EmployeeID: (await EmployeeRow.getLookupAsync()).items
                         .filter(x => x.FullName === 'Nancy Davolio')[0].EmployeeID,
                     ShipVia: (await ShipperRow.getLookupAsync()).items
                         .filter(x => x.CompanyName === 'United Package')[0].ShipperID
-                });
+                } satisfies OrderRow);
             }
         });
 
@@ -65,7 +76,7 @@ export class DefaultValuesInNewGrid extends OrderGrid {
                 var lauraCallahanID = (await EmployeeRow.getLookupAsync()).items
                     .filter(x => x.FullName === 'Laura Callahan')[0].EmployeeID;
 
-                dlg.loadEntityAndOpenDialog(<OrderRow>{
+                dlg.loadEntityAndOpenDialog({
                     CustomerID: 'GOURL',
                     EmployeeID: lauraCallahanID,
                     DetailList: [{
@@ -75,7 +86,7 @@ export class DefaultValuesInNewGrid extends OrderGrid {
                         Quantity: 5,
                         LineTotal: chai.UnitPrice * 5
                     }]
-                });
+                } satisfies OrderRow);
             }
         });
 
