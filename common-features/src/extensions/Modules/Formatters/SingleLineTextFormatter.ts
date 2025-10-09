@@ -1,11 +1,11 @@
 import { Formatter, formatterTypeInfo, htmlEncode, registerType, toSingleLine } from "@serenity-is/corelib";
-import { FormatterContext } from "@serenity-is/sleekgrid";
+import { FormatterContext, FormatterResult } from "@serenity-is/sleekgrid";
 import { nsExtensions } from "../ServerTypes/Namespaces";
 
 export class SingleLineTextFormatter implements Formatter {
     static [Symbol.typeInfo] = formatterTypeInfo(nsExtensions); static { registerType(this); }
 
-    format(ctx: FormatterContext) {
+    format(ctx: FormatterContext): FormatterResult {
         return SingleLineTextFormatter.formatValue(ctx.value);
     }
 

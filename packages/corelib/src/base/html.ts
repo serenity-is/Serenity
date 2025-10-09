@@ -1,5 +1,8 @@
-﻿import { Config } from "./config";
+﻿import * as sleekgrid from "@serenity-is/sleekgrid";
+import { Config } from "./config";
 import { isArrayLike, isPromiseLike } from "./system";
+
+export type RenderableContent = string | HTMLElement | SVGElement | DocumentFragment;
 
 const esc: Record<string, string> = {
     '<': '&lt;',
@@ -278,4 +281,114 @@ export function cssEscape(selector: string) {
         result += '\\' + string.charAt(index);
     }
     return result;
+}
+
+const maybeHtmlRegex = /<|>|&|"|'/;
+
+/** 
+ * Sanitizes HTML by removing dangerous elements and attributes.
+ * Need to duplicate basicDomSanitizer logic here as corelib does 
+ * not bundle sleekgrid, and should work standalone with/without 
+ * sleekgrid loaded.
+ * @param dirtyHtml The HTML string to sanitize.
+ * @returns The sanitized HTML string.
+ */
+export function sanitizeHtml(dirtyHtml: string): string {
+    if (!dirtyHtml) {
+        return "";
+    }
+
+    // Fast path: if the input contains no HTML tags or entities, it's safe to return as-is
+    // This avoids the expensive DOMParser overhead for simple text content
+    if (!maybeHtmlRegex.test(dirtyHtml)) {
+        return dirtyHtml;
+    }
+
+    let sanitizer: (dirtyHtml: string) => string;
+    // use sanitizer logic from sleekgrid if available
+    if (typeof sleekgrid !== "undefined") {
+        if (typeof sleekgrid.formatterContext === "function")
+            sanitizer = sleekgrid.formatterContext()?.sanitizer;
+        if (!sanitizer && typeof sleekgrid.gridDefaults?.sanitizer === "function")
+            sanitizer = sleekgrid.gridDefaults.sanitizer;
+    }
+
+    if (!sanitizer && typeof (globalThis as any).DOMPurify?.sanitize === "function")
+        sanitizer = (globalThis as any).DOMPurify.sanitize;
+
+    if (sanitizer)
+        return sanitizer(dirtyHtml);
+
+    // Check if DOMParser is available (should be in all modern browsers)
+    if (typeof DOMParser === 'undefined') {
+        // Fallback to basic escaping if DOMParser is not available
+        return htmlEncode(dirtyHtml);
+    }
+
+    // Pattern for safe URLs - blocks dangerous protocols while allowing safe ones
+    // Based on Bootstrap's implementation but extended to block more dangerous protocols
+    const SAFE_URL_PATTERN = /^(?!javascript:|data:|vbscript:)(?:[a-z0-9+.-]+:|[^&:/?#]*(?:[/?#]|$))/i;
+
+    try {
+        // Use DOMParser for safer HTML parsing than innerHTML
+        const parser = new DOMParser();
+        const doc = parser.parseFromString(dirtyHtml, 'text/html');
+        const body = doc.body || (typeof document !== 'undefined' ? document.createElement('body') : null);
+
+        if (!body) {
+            return htmlEncode(dirtyHtml);
+        }
+
+        // For HTML fragments, DOMParser might put content in different places
+        // If body is empty but we have content, it might be in the document root
+        let targetElement = body;
+        if (body.innerHTML.trim() === '' && doc.documentElement && doc.documentElement.innerHTML.trim()) {
+            // Move content from documentElement to body for consistent processing
+            body.innerHTML = doc.documentElement.innerHTML;
+        }
+
+        // If body is still empty after moving content, the target might be documentElement
+        if (body.innerHTML.trim() === '' && doc.documentElement) {
+            targetElement = doc.documentElement;
+        }
+
+        // Remove potentially dangerous elements completely
+        const dangerousElements = targetElement.querySelectorAll('script, iframe, object, embed, form, input, button, textarea, select, style, link');
+        dangerousElements.forEach(el => el.remove());
+
+        // Remove dangerous attributes from remaining elements
+        const allElements = targetElement.querySelectorAll('*');
+        allElements.forEach(el => {
+            const element = el as HTMLElement;
+            // Remove event handler attributes and dangerous href/src values
+            Array.from(element.attributes).forEach(attr => {
+                const name = attr.name.toLowerCase();
+                const value = attr.value;
+
+                // Remove all event handlers
+                if (name.startsWith('on')) {
+                    element.removeAttribute(attr.name);
+                    return;
+                }
+
+                // Validate href/src/xlink:href attributes with safe URL pattern
+                if (['href', 'src', 'xlink:href'].indexOf(name) >= 0) {
+                    if (!SAFE_URL_PATTERN.test(value)) {
+                        element.removeAttribute(attr.name);
+                        return;
+                    }
+                }
+
+                // Remove any attribute containing javascript anywhere in its value
+                if (value.toLowerCase().indexOf('javascript') >= 0) {
+                    element.removeAttribute(attr.name);
+                }
+            });
+        });
+
+        return targetElement.innerHTML;
+    } catch (e) {
+        // In case of any parsing error, fall back to basic escaping
+        return htmlEncode(dirtyHtml);
+    }
 }

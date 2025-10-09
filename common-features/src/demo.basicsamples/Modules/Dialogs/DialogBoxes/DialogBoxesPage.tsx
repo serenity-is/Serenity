@@ -27,16 +27,14 @@ export default function pageInit() {
     const warningClick = () => warningDialog("Hey, be careful!");
 
     const alertWithHtmlClick = () => alertDialog(
-        `<div style="white-space: initial">
+        <div style="white-space: initial">
             <h4>Here is some HTML content!</h4>
             <ul>
                 <li>Item 1</li>
                 <li>Item 2</li>
                 <li>Visit <a href="https://serenity.is/" target="_blank">https://serenity.is/</a>!</li>
             </ul>
-        </div>`, {
-        htmlEncode: false
-    });
+        </div>)
 
     const div = document.getElementById("PanelDiv");
     div.classList.add("d-flex", "gap-1");

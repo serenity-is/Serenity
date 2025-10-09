@@ -1,5 +1,15 @@
-﻿import { Config } from "./config";
-import { addClass, appendToNode, cssEscape, getElementReadOnly, getReturnUrl, htmlEncode, parseQueryString, removeClass, sanitizeUrl, setElementReadOnly, toggleClass } from "./html";
+﻿import type { FormatterContext } from "@serenity-is/sleekgrid";
+import { Config } from "./config";
+import { addClass, appendToNode, cssEscape, getElementReadOnly, getReturnUrl, htmlEncode, parseQueryString, removeClass, sanitizeHtml, sanitizeUrl, setElementReadOnly, toggleClass } from "./html";
+import * as sleekgrid from "@serenity-is/sleekgrid";
+
+vi.mock("@serenity-is/sleekgrid", async (importActual) => {
+    return {
+        formatterContext: vi.fn(),
+        gridDefaults: { sanitizer: null }
+    };
+});
+
 
 describe("htmlEncode", () => {
     it("encodes html", () => {
@@ -232,7 +242,7 @@ describe("appendToNode", () => {
     it("calls append for other content types", () => {
         const parent = document.createElement("div");
         const content = { abc: 5 };
-        appendToNode(parent, content);
+        appendToNode(parent, content as any);
         expect(parent.innerHTML).toBe("[object Object]");
     });
 
@@ -613,4 +623,234 @@ describe("cssEscape", () => {
         (globalThis as any).CSS = orig;
     });
 
+    describe("sanitizeHtml ", () => {
+        it("uses the sanitizer returned from sleekgrid formatterContext if available", () => {
+            const mockSanitizer = vi.fn((html: string) => "SANITIZED:" + html);
+            const mockFormatterContext = vi.fn(() => ({ sanitizer: mockSanitizer } as unknown as FormatterContext));
+            const mockGridDefaults = { sanitizer: null };
+
+            const sleekgridMocked = vi.mocked(sleekgrid);
+            sleekgridMocked.formatterContext.mockImplementation(mockFormatterContext);
+            sleekgridMocked.gridDefaults = mockGridDefaults;
+            expect(sanitizeHtml("<div>test</div>")).toBe("SANITIZED:<div>test</div>");
+            expect(mockFormatterContext).toHaveBeenCalled();
+            expect(mockSanitizer).toHaveBeenCalledWith("<div>test</div>");
+        });
+
+        it("uses the sanitizer from sleekgrid gridDefaults if available and formatterContext does not provide one", () => {
+            const mockSanitizer = vi.fn((html: string) => "SANITIZED_BY_DEFAULTS:" + html);
+            const mockFormatterContext = vi.fn(() => ({ sanitizer: null } as unknown as FormatterContext));
+            const mockGridDefaults = { sanitizer: mockSanitizer };
+
+            const sleekgridMocked = vi.mocked(sleekgrid);
+            sleekgridMocked.formatterContext.mockImplementation(mockFormatterContext);
+            sleekgridMocked.gridDefaults = mockGridDefaults;
+            expect(sanitizeHtml("<div>test</div>")).toBe("SANITIZED_BY_DEFAULTS:<div>test</div>");
+            expect(mockFormatterContext).toHaveBeenCalled();
+            expect(mockSanitizer).toHaveBeenCalledWith("<div>test</div>");
+        });
+
+        it("uses DOMPurify if available and no sleekgrid sanitizer", () => {
+            const origDOMPurify = (globalThis as any).DOMPurify;
+            (globalThis as any).DOMPurify = { sanitize: (html: string) => "DOMPURIFY_SANITIZED:" + html };
+            const sleekgridMocked = vi.mocked(sleekgrid);
+            sleekgridMocked.formatterContext.mockImplementation(() => ({ sanitizer: null } as unknown as FormatterContext));
+            sleekgridMocked.gridDefaults = { sanitizer: null };
+            expect(sanitizeHtml("<div>test</div>")).toBe("DOMPURIFY_SANITIZED:<div>test</div>");
+            (globalThis as any).DOMPurify = origDOMPurify;
+        });
+
+        it("should return empty string for null/undefined input", () => {
+            expect(sanitizeHtml(null)).toBe('');
+            expect(sanitizeHtml(undefined)).toBe('');
+            expect(sanitizeHtml('')).toBe('');
+        });
+
+        it("should use fast path for plain text without HTML characters", () => {
+            // These should go through the fast path and return as-is
+            expect(sanitizeHtml('Hello World')).toBe('Hello World');
+            expect(sanitizeHtml('123456')).toBe('123456');
+            expect(sanitizeHtml('a-z A-Z 0-9')).toBe('a-z A-Z 0-9');
+            expect(sanitizeHtml('Special chars: @#$%^*()')).toBe('Special chars: @#$%^*()');
+            expect(sanitizeHtml('Unicode: 你好 🌟')).toBe('Unicode: 你好 🌟');
+        });
+
+        it("should preserve safe HTML content", () => {
+            const safe = '<div class="container"><p>Hello <strong>world</strong>!</p></div>';
+            expect(sanitizeHtml(safe)).toBe(safe);
+        });
+
+        it("should remove script tags completely", () => {
+            const dirty = '<div>Safe</div><script>alert("XSS")</script><p>Content</p>';
+            const expected = '<div>Safe</div><p>Content</p>';
+            expect(sanitizeHtml(dirty)).toBe(expected);
+        });
+
+        it("should remove iframe elements", () => {
+            const dirty = '<p>Before</p><iframe src="malicious.com"></iframe><p>After</p>';
+            const expected = '<p>Before</p><p>After</p>';
+            expect(sanitizeHtml(dirty)).toBe(expected);
+        });
+
+        it("should remove dangerous elements", () => {
+            const dangerousElements = ['object', 'embed', 'form', 'input', 'button', 'textarea', 'select', 'style', 'link'];
+            dangerousElements.forEach(tag => {
+                const dirty = `<p>Safe</p><${tag}>dangerous</${tag}><p>Content</p>`;
+                const result = sanitizeHtml(dirty);
+                expect(result).not.toContain(`<${tag}>`);
+                expect(result).not.toContain(`</${tag}>`);
+                expect(result).toContain('<p>Safe</p>');
+                expect(result).toContain('<p>Content</p>');
+            });
+        });
+
+        it("should remove event handler attributes", () => {
+            const dirty = '<div onclick="alert(1)" onload="evil()" onmouseover="bad()">Content</div>';
+            const expected = '<div>Content</div>';
+            expect(sanitizeHtml(dirty)).toBe(expected);
+        });
+
+        it("should remove href attributes with javascript URLs", () => {
+            const dirty = '<a href="javascript:alert(1)">Bad Link</a>';
+            const expected = '<a>Bad Link</a>';
+            expect(sanitizeHtml(dirty)).toBe(expected);
+        });
+
+        it("should remove src attributes with javascript URLs", () => {
+            const dirty = '<img src="javascript:alert(1)">';
+            const expected = '<img>';
+            expect(sanitizeHtml(dirty)).toBe(expected);
+        });
+
+        it("should remove data URL attributes", () => {
+            const dirty = '<img src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVR42mNkYPhfDwAChwGA60e6kgAAAABJRU5ErkJggg==">';
+            const expected = '<img>';
+            expect(sanitizeHtml(dirty)).toBe(expected);
+        });
+
+        it("should preserve safe href attributes", () => {
+            const safe = '<a href="https://example.com">Safe Link</a>';
+            expect(sanitizeHtml(safe)).toBe(safe);
+        });
+
+        it("should preserve safe src attributes", () => {
+            const safe = '<img src="https://example.com/image.jpg" alt="Safe Image">';
+            expect(sanitizeHtml(safe)).toBe(safe);
+        });
+
+        it("should remove attributes containing javascript anywhere", () => {
+            const dirty = '<div data-js="javascript:void(0)" custom="some-javascript-code">Content</div>';
+            const expected = '<div>Content</div>';
+            expect(sanitizeHtml(dirty)).toBe(expected);
+        });
+
+        it("should handle complex nested dangerous content", () => {
+            const dirty = `
+            <div class="safe">
+                <p>Safe paragraph</p>
+                <script>alert('XSS1');</script>
+                <a href="javascript:alert('XSS2')">Bad Link</a>
+                <iframe src="evil.com">
+                    <form action="hack.php">
+                        <input type="hidden" name="csrf" value="stolen">
+                        <button onclick="stealData()">Submit</button>
+                    </form>
+                </iframe>
+                <img src="data:text/html,<script>alert('XSS3')</script>">
+                <span>More safe content</span>
+            </div>
+        `;
+            const result = sanitizeHtml(dirty);
+
+            // Check that dangerous elements are removed
+            expect(result).not.toContain('<script>');
+            expect(result).not.toContain('<iframe>');
+            expect(result).not.toContain('<form>');
+            expect(result).not.toContain('<input>');
+            expect(result).not.toContain('<button>');
+            expect(result).not.toContain('javascript:');
+            expect(result).not.toContain('data:');
+
+            // Check that safe content is preserved
+            expect(result).toContain('<div class="safe">');
+            expect(result).toContain('<p>Safe paragraph</p>');
+            expect(result).toContain('<span>More safe content</span>');
+            expect(result).toContain('Bad Link'); // Text should remain even if href is removed
+        });
+
+        it("should handle malformed HTML gracefully", () => {
+            const malformed = '<div><script>evil</script><p>Unclosed<div><a href="javascript:bad">Bad</a>';
+            // Should not crash and should sanitize what's parseable
+            const result = sanitizeHtml(malformed);
+            expect(result).not.toContain('<script>');
+            expect(result).not.toContain('javascript:');
+            expect(result).toContain('Unclosed');
+        });
+
+        it("should handle HTML entities correctly", () => {
+            const withEntities = '<p>&lt;script&gt;alert(1)&lt;/script&gt;</p>';
+            expect(sanitizeHtml(withEntities)).toBe(withEntities);
+        });
+
+        it("should handle mixed case tags and attributes", () => {
+            const mixedCase = '<DIV><SCRIPT>alert(1)</SCRIPT><A HREF="javascript:bad()">Link</A></DIV>';
+            const expected = '<div><a>Link</a></div>';
+            expect(sanitizeHtml(mixedCase)).toBe(expected);
+        });
+
+        it("should handle xlink:href attributes", () => {
+            const dirty = '<svg><a xlink:href="javascript:alert(1)">Bad SVG Link</a></svg>';
+            const expected = '<svg><a>Bad SVG Link</a></svg>';
+            expect(sanitizeHtml(dirty)).toBe(expected);
+        });
+
+        it("should preserve safe xlink:href attributes", () => {
+            const safe = '<svg><a xlink:href="#anchor">Safe SVG Link</a></svg>';
+            expect(sanitizeHtml(safe)).toBe(safe);
+        });
+
+        it("should validate URLs with improved pattern", () => {
+            // Should allow safe protocols
+            expect(sanitizeHtml('<a href="https://example.com">HTTPS</a>')).toBe('<a href="https://example.com">HTTPS</a>');
+            expect(sanitizeHtml('<a href="http://example.com">HTTP</a>')).toBe('<a href="http://example.com">HTTP</a>');
+            expect(sanitizeHtml('<a href="mailto:test@example.com">Email</a>')).toBe('<a href="mailto:test@example.com">Email</a>');
+            expect(sanitizeHtml('<a href="tel:+1234567890">Phone</a>')).toBe('<a href="tel:+1234567890">Phone</a>');
+
+            // Should allow relative URLs
+            expect(sanitizeHtml('<a href="/path">Relative Path</a>')).toBe('<a href="/path">Relative Path</a>');
+            expect(sanitizeHtml('<a href="?query=value">Query</a>')).toBe('<a href="?query=value">Query</a>');
+            expect(sanitizeHtml('<a href="#anchor">Anchor</a>')).toBe('<a href="#anchor">Anchor</a>');
+
+            // Should block dangerous protocols
+            expect(sanitizeHtml('<a href="javascript:alert(1)">JS</a>')).toBe('<a>JS</a>');
+            expect(sanitizeHtml('<a href="data:text/html,<script>alert(1)</script>">Data</a>')).toBe('<a>Data</a>');
+            expect(sanitizeHtml('<a href="vbscript:msgbox(1)">VBScript</a>')).toBe('<a>VBScript</a>');
+        });
+
+        it("should preserve whitespace between elements", () => {
+            // Test whitespace preservation between safe elements
+            const withSpace = '<i class="fa fa-something"></i> Sometext';
+            expect(sanitizeHtml(withSpace)).toBe(withSpace);
+
+            // Test multiple spaces
+            const multipleSpaces = '<span>Before</span>   <span>After</span>';
+            expect(sanitizeHtml(multipleSpaces)).toBe(multipleSpaces);
+
+            // Test newlines
+            const withNewlines = '<div>Line 1</div>\n<div>Line 2</div>';
+            expect(sanitizeHtml(withNewlines)).toBe(withNewlines);
+
+            // Test whitespace around dangerous elements (should preserve whitespace when elements are removed)
+            const dangerousWithSpace = '<i class="fa fa-something"></i> <script>evil()</script> Sometext';
+            const expectedDangerous = '<i class="fa fa-something"></i>  Sometext';
+            expect(sanitizeHtml(dangerousWithSpace)).toBe(expectedDangerous);
+
+            // Note: DOMParser normalizes invalid self-closing tags for non-void elements
+            // This is expected HTML parsing behavior, not a bug in the sanitizer
+            // Example: '<i class="fa fa-something" /> Sometext' becomes '<i class="fa fa-something"> Sometext</i>'
+            // because <i> is not a void element in HTML5
+        });
+    });
+
 });
+

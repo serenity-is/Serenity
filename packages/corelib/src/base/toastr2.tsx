@@ -1,4 +1,4 @@
-﻿import { addClass, htmlEncode } from "./html";
+﻿import { addClass, type RenderableContent, sanitizeHtml } from "./html";
 
 // adapted from https://github.com/JPeer264/toastr2
 export type ToastContainerOptions = {
@@ -9,14 +9,14 @@ export type ToastContainerOptions = {
 
 export type ToastrOptions = ToastContainerOptions & {
     /** Show a close button, default is false */
-    closeButton?: boolean;
+    closeButton?: boolean | HTMLElement;
     /** CSS class for close button */
     closeClass?: string;
     /** If true (default) toast keeps open when hovered, and closes after extendedTimeout when mouse leaves the toast */
     closeOnHover?: boolean;
     /** If closeOnHover is true, the toast closes in extendedTimeout duration after the mouse leaves the toast. Default is 1000 */
     extendedTimeOut?: number;
-    /** Escape message html, default is true */
+    /** @deprecated Escape message html, default is true. Pass HTML element to message instead */
     escapeHtml?: boolean;
     /** CSS class for icon */
     iconClass?: string;
@@ -28,6 +28,8 @@ export type ToastrOptions = ToastContainerOptions & {
     positionClass?: string;
     /** Prevent duplicates of the same toast, default is false */
     preventDuplicates?: boolean;
+    /** If true the toast message element will have a white-space: pre-wrap style */
+    preWrap?: boolean;
     /** Right to left */
     rtl?: boolean;
     /** The container element id */
@@ -50,32 +52,32 @@ export type ToastrOptions = ToastContainerOptions & {
 export type NotifyMap = {
     type: string;
     iconClass: string;
-    title?: string;
-    message?: string;
+    title?: RenderableContent;
+    message?: RenderableContent;
 }
 
 const initialOptions: ToastrOptions = {
-    tapToDismiss: true,
-    toastClass: 'toast',
-    containerId: 'toast-container',
-    onShown: () => { },
-    onHidden: () => { },
+    closeButton: false,
+    closeClass: 'toast-close-button',
     closeOnHover: true,
+    containerId: 'toast-container',
+    escapeHtml: true,
     extendedTimeOut: 1000,
     iconClass: 'toast-info',
-    positionClass: 'toast-top-right',
-    timeOut: 5000, // Set timeOut to 0 to make it sticky
-    titleClass: 'toast-title',
     messageClass: 'toast-message',
-    escapeHtml: true,
-    target: 'body',
-    closeClass: 'toast-close-button',
     newestOnTop: true,
+    onclick: () => { },
+    onCloseClick: () => { },
+    onHidden: () => { },
+    onShown: () => { },
+    positionClass: 'toast-top-right',
     preventDuplicates: false,
     rtl: false,
-    onCloseClick: () => { },
-    closeButton: false,
-    onclick: () => { },
+    tapToDismiss: true,
+    target: 'body',
+    timeOut: 5000, // Set timeOut to 0 to make it sticky
+    titleClass: 'toast-title',
+    toastClass: 'toast'
 }
 
 let initialInstance: Toastr = null;
@@ -85,7 +87,7 @@ export class Toastr {
 
     declare private toastId;
 
-    declare private previousToast: string | null;
+    declare private previousToast: RenderableContent | null;
 
     declare public options: ToastrOptions;
 
@@ -96,30 +98,16 @@ export class Toastr {
     }
 
     public getContainer(options?: ToastContainerOptions, create = false): HTMLElement {
-        let container = document.getElementById(options?.containerId ?? this.options.containerId);
+        let container = document.getElementById(options?.containerId ?? this.options.containerId) as HTMLElement;
         if (container || !create)
             return container;
 
-        container = document.createElement('div');
-
-        container.setAttribute('id', this.options.containerId);
-        let positionClass = options?.positionClass ?? this.options.positionClass;
-        if (positionClass)
-            addClass(container, positionClass);
-
-        let targetSelector = options?.target ?? this.options.target;
-        const target = document.querySelector(targetSelector);
-        if (target)
-            target.appendChild(container);
-
+        container = <div id={this.options.containerId} class={options?.positionClass ?? this.options.positionClass}></div> as HTMLElement;
+        document.querySelector(options?.target ?? this.options.target)?.appendChild(container);
         return container;
     }
 
-    public error(
-        message?: string,
-        title?: string,
-        opt?: ToastrOptions,
-    ): HTMLElement | null {
+    public error(message?: RenderableContent, title?: RenderableContent, opt?: ToastrOptions): HTMLElement | null {
         return this.notify({
             type: 'error',
             iconClass: 'toast-error',
@@ -128,11 +116,7 @@ export class Toastr {
         }, opt);
     }
 
-    public warning(
-        message?: string,
-        title?: string,
-        opt?: ToastrOptions,
-    ): HTMLElement | null {
+    public warning(message?: RenderableContent, title?: RenderableContent, opt?: ToastrOptions): HTMLElement | null {
         return this.notify({
             type: 'warning',
             iconClass: 'toast-warning',
@@ -141,11 +125,7 @@ export class Toastr {
         }, opt);
     }
 
-    public success(
-        message?: string,
-        title?: string,
-        opt?: ToastrOptions,
-    ): HTMLElement | null {
+    public success(message?: RenderableContent, title?: RenderableContent, opt?: ToastrOptions): HTMLElement | null {
         return this.notify({
             type: 'success',
             iconClass: 'toast-success',
@@ -155,8 +135,8 @@ export class Toastr {
     }
 
     public info(
-        message?: string,
-        title?: string,
+        message?: RenderableContent,
+        title?: RenderableContent,
         opt?: ToastrOptions,
     ): HTMLElement | null {
         return this.notify({
@@ -234,12 +214,11 @@ export class Toastr {
         const container = this.getContainer(opt, true);
 
         let intervalId: number = null;
-        const toastElement = document.createElement('div');
-        const $titleElement = document.createElement('div');
-        const $messageElement = document.createElement('div');
-        const closeContainer = document.createElement('div');
-        closeContainer.innerHTML = '<button type="button">&times;</button>';
-        const closeElement = closeContainer.firstChild as HTMLElement | null;
+        const toastEl = <div/> as HTMLElement;
+        const titleEl = <div/> as HTMLElement;
+        const messageEl = <div/> as HTMLElement;
+        const closeEl = !opt.closeButton ? null :
+            opt.closeButton instanceof HTMLElement ? opt.closeButton : <button type="button">&times;</button> as HTMLElement;
 
         const response: any = {
             toastId: this.toastId,
@@ -251,11 +230,11 @@ export class Toastr {
         };
 
         const hideToast = (override: any = null): void => {
-            if (toastElement === document.activeElement && !override) {
+            if (toastEl === document.activeElement && !override) {
                 return;
             }
 
-            this.removeToast(toastElement);
+            this.removeToast(toastEl);
 
             if (intervalId) {
                 clearTimeout(intervalId);
@@ -284,19 +263,19 @@ export class Toastr {
                     ariaValue = 'assertive';
             }
 
-            toastElement.setAttribute('aria-live', ariaValue);
+            toastEl.setAttribute('aria-live', ariaValue);
         };
 
         const handleEvents = (): void => {
             if (opt.closeOnHover) {
 
-                toastElement.addEventListener('mouseover', () => {
+                toastEl.addEventListener('mouseover', () => {
                     if (intervalId) {
                         clearTimeout(intervalId);
                     }
                 });
 
-                toastElement.addEventListener('mouseout', () => {
+                toastEl.addEventListener('mouseout', () => {
                     if (opt.timeOut >= 0 && (opt.timeOut > 0 || opt.extendedTimeOut > 0)) {
                         intervalId = setTimeout(hideToast, opt.extendedTimeOut);
                     }
@@ -304,11 +283,11 @@ export class Toastr {
             }
 
             if (!opt.onclick && opt.tapToDismiss) {
-                toastElement.addEventListener('click', hideToast);
+                toastEl.addEventListener('click', hideToast);
             }
 
-            if (opt.closeButton && closeElement) {
-                closeElement.addEventListener('click', (event) => {
+            if (closeEl) {
+                closeEl.addEventListener('click', (event) => {
                     event.stopPropagation();
 
                     if (opt.onCloseClick) {
@@ -320,7 +299,7 @@ export class Toastr {
             }
 
             if (opt.onclick) {
-                toastElement.addEventListener('click', (event) => {
+                toastEl.addEventListener('click', (event) => {
                     // ts needs another check here
                     if (opt.onclick) {
                         opt.onclick(event);
@@ -334,43 +313,41 @@ export class Toastr {
 
         const setTitle = (): void => {
             if (map.title) {
-                let suffix = map.title;
-                if (opt.escapeHtml) {
-                    suffix = htmlEncode(map.title);
-                }
-                $titleElement.innerHTML = suffix;
-                addClass($titleElement, opt.titleClass);
-                toastElement.appendChild($titleElement);
+                titleEl.append(map.title);
+                addClass(titleEl, opt.titleClass);
+                toastEl.appendChild(titleEl);
             }
         };
 
         const setMessage = (): void => {
             if (map.message) {
-                let suffix = map.message;
-
-                if (opt.escapeHtml) {
-                    suffix = htmlEncode(map.message);
+                if (typeof map.message === "string" && !((opt as any).escapeHtml ?? true)) {
+                    messageEl.innerHTML = sanitizeHtml(map.message);
                 }
-
-                $messageElement.innerHTML = suffix;
-                addClass($messageElement, opt.messageClass);
-                toastElement.appendChild($messageElement);
+                else {
+                    messageEl.append(map.message);
+                }
+                if (opt.preWrap) {
+                    messageEl.style.whiteSpace = "pre-wrap";
+                }
+                addClass(messageEl, opt.messageClass);
+                toastEl.appendChild(messageEl);
             }
         };
 
         const setCloseButton = (): void => {
-            if (opt.closeButton && closeElement) {
-                addClass(closeElement, opt.closeClass);
-                closeElement.setAttribute('role', 'button');
-                toastElement.insertBefore(closeElement, toastElement.firstChild);
+            if (closeEl) {
+                addClass(closeEl, opt.closeClass);
+                closeEl.setAttribute('role', 'button');
+                toastEl.insertBefore(closeEl, toastEl.firstChild);
             }
         };
 
         const setSequence = (): void => {
             if (opt.newestOnTop) {
-                container.insertBefore(toastElement, container.firstChild);
+                container.insertBefore(toastEl, container.firstChild);
             } else {
-                container.appendChild(toastElement);
+                container.appendChild(toastEl);
             }
         };
 
@@ -386,10 +363,10 @@ export class Toastr {
         };
 
         const personalizeToast = (): void => {
-            toastElement.classList.add('show');
-            opt.rtl && toastElement.classList.add('rtl');
-            opt.toastClass && addClass(toastElement, opt.toastClass);
-            opt.iconClass && addClass(toastElement, opt.iconClass);
+            toastEl.classList.add('show');
+            opt.rtl && toastEl.classList.add('rtl');
+            opt.toastClass && addClass(toastEl, opt.toastClass);
+            opt.iconClass && addClass(toastEl, opt.iconClass);
             setTitle();
             setMessage();
             setCloseButton();
@@ -401,7 +378,7 @@ export class Toastr {
         displayToast();
         handleEvents();
         this.publish(response);
-        return toastElement;
+        return toastEl;
     }
 }
 

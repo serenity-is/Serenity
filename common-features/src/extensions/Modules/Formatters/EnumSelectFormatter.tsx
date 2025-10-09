@@ -1,5 +1,5 @@
 import { EnumTypeRegistry, Formatter, formatterTypeInfo, htmlEncode, localText, registerType, SelectEditorTexts } from "@serenity-is/corelib";
-import { FormatterContext } from "@serenity-is/sleekgrid";
+import { FormatterContext, FormatterResult } from "@serenity-is/sleekgrid";
 import { nsExtensions } from "../ServerTypes/Namespaces";
 
 export class EnumSelectFormatter implements Formatter {
@@ -10,7 +10,7 @@ export class EnumSelectFormatter implements Formatter {
         this.props.allowClear ??= true;
     }
 
-    format(ctx: FormatterContext) {
+    format(ctx: FormatterContext): FormatterResult {
         const enumType = EnumTypeRegistry.get(this.props.enumKey ?? "EnumKeyOptionNotSpecified!");
 
         return (

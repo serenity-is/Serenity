@@ -180,9 +180,9 @@ describe("EnumTypeRegistry", () => {
             EnumTypeRegistry.get("Definitely.Not.Found.Enum");
             expect(true).toBe(false); // Should not reach here
         } catch (e: any) {
-            expect(e.message).toContain("Can't find");
+            expect(e.message).toContain("was not found");
             expect(e.message).toContain("Definitely.Not.Found.Enum");
-            expect(e.message).toContain("dotnet sergen t");
+            expect(e.message).toContain("dotnet sergen servertypings");
         } finally {
             console.error = originalError;
         }

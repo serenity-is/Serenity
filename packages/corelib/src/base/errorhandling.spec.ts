@@ -3,6 +3,7 @@ import { type Mock } from "vitest";
 import { alertDialog, iframeDialog } from "./dialogs";
 import { ErrorHandling } from "./errorhandling";
 import { notifyError } from "./notify";
+import { H } from "vitest/dist/chunks/environment.d.cL3nLXbE.js";
 
 vi.mock(import("./dialogs"), async () => {
     return {
@@ -153,9 +154,9 @@ describe("runtimeErrorHandler", function () {
 
         expect(setTimeoutSpy).toHaveBeenCalledTimes(1);
         expect(notifyError).toHaveBeenCalledTimes(1);
-        const text = vi.mocked(notifyError).mock.calls[0][0];
-        expect(text).toContain("test&amp;&gt;&lt;&#39;&quot");
-        expect(text).toContain("test&amp;.js");
+        const text = (vi.mocked(notifyError).mock.calls[0][0] as HTMLElement)?.textContent ?? "";
+        expect(text).toContain("test&><'\"");
+        expect(text).toContain("test&.js");
         expect(text).toContain("13579");
         expect(text).toContain("24680");
     });
@@ -171,7 +172,7 @@ describe("runtimeErrorHandler", function () {
 
         expect(setTimeoutSpy).toHaveBeenCalledTimes(1);
         expect(notifyError).toHaveBeenCalledTimes(1);
-        const text = vi.mocked(notifyError).mock.calls[0][0];
+        const text = (vi.mocked(notifyError).mock.calls[0][0] as HTMLElement)?.textContent ?? "";
         expect(text).toContain("xyz");
         expect(text).not.toContain("uvw");
     });
@@ -187,7 +188,7 @@ describe("runtimeErrorHandler", function () {
         expect(setTimeoutSpy).toHaveBeenCalledTimes(1);
         expect(notifyError).toHaveBeenCalledTimes(1);
         const text = vi.mocked(notifyError).mock.calls[0][0];
-        expect(text).toContain("uvw");
+        expect((text as HTMLElement).textContent).toContain("uvw");
     });
 
 });

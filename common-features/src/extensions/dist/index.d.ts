@@ -1,5 +1,5 @@
-import { BaseDialog, DataGrid, DeleteResponse, DialogType, Dictionary, EditorProps, EmailAddressEditor, EntityDialog, EntityGrid, Formatter, IGetEditValue, ISetEditValue, IconClassName, ListRequest, ListResponse, PasswordEditor, PrefixedContext, PropertyDialog, PropertyItem, SaveInitiator, SaveResponse, ServiceError, ServiceOptions, ServiceRequest, ServiceResponse, SettingStorage, ToolButton, Widget, WidgetProps } from '@serenity-is/corelib';
-import { FormatterContext, Grid, GridOptions } from '@serenity-is/sleekgrid';
+import { BaseDialog, DataGrid, DeleteResponse, DialogType, Dictionary, EditorProps, EmailAddressEditor, EntityDialog, EntityGrid, Formatter, IGetEditValue, ISetEditValue, IconClassName, ListRequest, ListResponse, PasswordEditor, PrefixedContext, PropertyDialog, PropertyItem, RenderableContent, SaveInitiator, SaveResponse, ServiceError, ServiceOptions, ServiceRequest, ServiceResponse, SettingStorage, ToolButton, Widget, WidgetProps } from '@serenity-is/corelib';
+import { FormatterContext, FormatterResult, Grid, GridOptions } from '@serenity-is/sleekgrid';
 
 export interface ChangePasswordForm {
 	OldPassword: PasswordEditor;
@@ -480,7 +480,7 @@ export declare class EnumSelectFormatter implements Formatter {
 		allowClear?: boolean;
 		emptyItemText?: string;
 	});
-	format(ctx: FormatterContext): string;
+	format(ctx: FormatterContext): FormatterResult;
 	get enumKey(): string;
 	set enumKey(value: string);
 	get allowClear(): boolean;
@@ -490,7 +490,7 @@ export declare class EnumSelectFormatter implements Formatter {
 }
 export declare class SingleLineTextFormatter implements Formatter {
 	static [Symbol.typeInfo]: import("@serenity-is/corelib").FormatterTypeInfo<"Serenity.Extensions.">;
-	format(ctx: FormatterContext): string;
+	format(ctx: FormatterContext): FormatterResult;
 	static formatValue(value: string): string;
 }
 export declare abstract class GridEditorDialog<TEntity, P = {}> extends EntityDialog<TEntity, P> {
@@ -697,7 +697,8 @@ export interface PromptDialogOptions {
 	};
 	editorOptions?: any;
 	title?: string;
-	message?: string;
+	message?: RenderableContent;
+	/** @deprecated, set message as HTML element */
 	isHtml?: boolean;
 	value?: any;
 	required?: boolean;

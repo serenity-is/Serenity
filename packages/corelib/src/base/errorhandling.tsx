@@ -52,16 +52,16 @@ export namespace ErrorHandling {
                 return;
             const errorInfo = error?.stack ?? error?.toString();
 
-            message =
-                '<p></p><p>Message: ' + htmlEncode(message) +
-                '</p><p>File: ' + htmlEncode(filename) +
-                ', Line: ' + lineno + ', Column: ' + colno +
-                (errorInfo ? ('</p><p>' + htmlEncode(errorInfo)) : "") + '</p>';
+            const msg = <div>
+                <p>Message: {message}</p>
+                <p>File: {filename}</p>
+                <p>Line: {lineno}, Column: {colno}</p>
+                {errorInfo && <p>{errorInfo}</p>}
+            </div>
 
             window.setTimeout(function () {
                 try {
-                    notifyError(message, "SCRIPT ERROR! See browser console (F12) for details.", {
-                        escapeHtml: false,
+                    notifyError(msg, "SCRIPT ERROR! See browser console (F12) for details.", {
                         timeOut: 15000
                     });
                 }

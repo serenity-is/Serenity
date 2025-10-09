@@ -1,4 +1,4 @@
-import { PropertyDialog, Widget, WidgetProps, cancelDialogButton, getTypeFullName, okDialogButton, toggleClass } from "@serenity-is/corelib";
+import { PropertyDialog, Widget, WidgetProps, cancelDialogButton, getTypeFullName, okDialogButton, sanitizeHtml, toggleClass, type RenderableContent } from "@serenity-is/corelib";
 import { nsExtensions } from "../ServerTypes/Namespaces";
 
 export interface PromptDialogOptions {
@@ -6,7 +6,8 @@ export interface PromptDialogOptions {
     editorType?: string | { new(props?: any): Widget };
     editorOptions?: any;
     title?: string;
-    message?: string;
+    message?: RenderableContent;
+    /** @deprecated, set message as HTML element */
     isHtml?: boolean;
     value?: any;
     required?: boolean;
@@ -26,10 +27,11 @@ export class PromptDialog<P extends PromptDialogOptions = PromptDialogOptions> e
             var msg = document.createElement("div");
             msg.classList.add("message");
             this.byId("PropertyGrid").prepend(msg);
-            if (this.options.isHtml)
-                msg.innerHTML = this.options.message;
+            if ((this.options as any).isHtml &&
+                typeof this.options.message === "string")
+                msg.innerHTML = sanitizeHtml(this.options.message);
             else
-                msg.textContent = this.options.message;
+                msg.append(this.options.message ?? "");
         }
 
         this.dialogTitle = this.options.title || "Prompt";

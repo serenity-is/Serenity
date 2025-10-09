@@ -48,22 +48,16 @@ export class CustomLinksInGrid extends OrderGrid {
 
         if (target.classList.contains("customer-link")) {
             e.preventDefault();
-
-            let message = stringFormat(
-                "<p>You have clicked an order from customer: {0}.</p>" +
-                "<p>If you click Yes, i'll open Customer dialog.</p>" +
-                "<p>If you click No, i'll open Order dialog.</p>",
-                htmlEncode(item.CustomerCompanyName));
-
-            confirmDialog(message, async () => {
-                new CustomerDialog({}).loadByIdAndOpenDialog(item.CustomerID);
-            },
-                {
-                    htmlEncode: false,
-                    onNo: () => {
-                        new OrderDialog().loadByIdAndOpenDialog(item.OrderID);
-                    }
-                });
+            const message = <>
+                <p>You have clicked an order from customer: {item.CustomerCompanyName}.</p> +
+                <p>If you click Yes, i'll open Customer dialog.</p>
+                <p>If you click No, i'll open Order dialog.</p>
+            </>
+            confirmDialog(message, async () => new CustomerDialog({}).loadByIdAndOpenDialog(item.CustomerID), {
+                onNo: () => {
+                    new OrderDialog().loadByIdAndOpenDialog(item.OrderID);
+                }
+            });
         }
         else if (target.classList.contains("date-link")) {
             e.preventDefault();

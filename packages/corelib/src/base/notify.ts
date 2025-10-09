@@ -1,4 +1,5 @@
-﻿import toastr, { type ToastrOptions } from "./toastr2";
+﻿import { RenderableContent } from "./html";
+import toastr, { type ToastrOptions } from "./toastr2";
 
 export let defaultNotifyOptions: ToastrOptions = {
     timeOut: 5000,
@@ -37,22 +38,22 @@ function getToastrOptions(options: ToastrOptions) {
     return options;
 }
 
-function showToast(type: "error" | "info" | "success" | "warning", message: string, title?: string, options?: ToastrOptions) {
+function showToast(type: "error" | "info" | "success" | "warning", message: RenderableContent, title?: RenderableContent, options?: ToastrOptions) {
     return toastr[type](message, title, getToastrOptions(options));
 }
 
-export function notifyError(message: string, title?: string, options?: ToastrOptions): void {
+export function notifyError(message: RenderableContent, title?: RenderableContent, options?: ToastrOptions): void {
     showToast('error', message, title, options);
 }
 
-export function notifyInfo(message: string, title?: string, options?: ToastrOptions): void {
+export function notifyInfo(message: RenderableContent, title?: RenderableContent, options?: ToastrOptions): void {
     showToast('info', message, title, options);
 }
 
-export function notifySuccess(message: string, title?: string, options?: ToastrOptions): void {
+export function notifySuccess(message: RenderableContent, title?: RenderableContent, options?: ToastrOptions): void {
     showToast('success', message, title, options);
 }
 
-export function notifyWarning(message: string, title?: string, options?: ToastrOptions): void {
+export function notifyWarning(message: RenderableContent, title?: RenderableContent, options?: ToastrOptions): void {
     showToast('warning', message, title, options);
 }

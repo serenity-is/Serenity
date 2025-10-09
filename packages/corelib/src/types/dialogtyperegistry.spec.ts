@@ -146,12 +146,12 @@ describe("DialogTypeRegistry", () => {
             DialogTypeRegistry.get("Definitely.Not.Found.Dialog");
             expect(true).toBe(false); // Should not reach here
         } catch (e: any) {
-            expect(e.message).toContain("dialog class not found");
+            expect(e.message).toContain("was not found");
             expect(e.message).toContain("Definitely.Not.Found.Dialog");
             expect(e.message).toContain("static [Symbol.typeInfo] = this.registerClass");
-            expect(e.message).toContain("side-effect-import");
+            expect(e.message).toContain("side-effect import");
             expect(e.message).toContain("LookupEditor attribute");
-            expect(e.message).toContain("node ./tsbuild.js");
+            expect(e.message).toContain("npm run build");
         }
 
         // Should also call notifyError

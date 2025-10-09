@@ -1,6 +1,6 @@
 ﻿import { getjQuery, isBS3, isBS5Plus } from "./environment";
 import { Fluent } from "./fluent";
-import { htmlEncode } from "./html";
+import { htmlEncode, sanitizeHtml, type RenderableContent } from "./html";
 import { iconClassName, type IconClassName } from "./icons";
 import { localText } from "./localtext";
 import { isArrayLike, isPromiseLike, omitUndefined } from "./system";
@@ -891,19 +891,32 @@ function getDialogContentNode(element: HTMLElement | ArrayLike<HTMLElement>): HT
  * Options that apply to all message dialog types
  */
 export interface MessageDialogOptions extends DialogOptions {
-    /** HTML encode the message, default is true */
+    /** @deprecated HTML encode the message, default is true */
     htmlEncode?: boolean;
     /** Wrap the message in a `<pre>` element, so that line endings are preserved, default is true */
     preWrap?: boolean;
 }
 
-function getMessageBodyHtml(message: string, options?: MessageDialogOptions): string {
-    let encode = options == null || options.htmlEncode == null || options.htmlEncode;
-    if (encode)
-        message = htmlEncode(message);
+function getMessageBodyHtml(message: RenderableContent, options?: MessageDialogOptions): HTMLElement {
+    const div = document.createElement("div");
+    div.className = "message";
+    let preWrap = options == null || (options.preWrap == null && typeof message === "string") || options.preWrap;
+    if (preWrap)
+        div.style.whiteSpace = "pre-wrap";
 
-    let preWrap = options == null || (options.preWrap == null && encode) || options.preWrap;
-    return '<div class="message"' + (preWrap ? ' style="white-space: pre-wrap">' : '>') + message + '</div>';
+    if (typeof message === "string" && message.length) {
+        let encode = options == null || (options as any).htmlEncode == null || (options as any).htmlEncode;
+        if (encode)
+            div.innerText = message;
+        else {
+            div.innerHTML = sanitizeHtml(message);
+        }
+    }
+    else {
+        div.append(message ?? "");
+    }
+
+    return div;
 }
 
 function createMessageDialog(opt: {
@@ -911,13 +924,14 @@ function createMessageDialog(opt: {
     title: string,
     getButtons: () => DialogButton[],
     native: (msg: string) => string,
-    message: string,
+    message: RenderableContent,
     options: MessageDialogOptions
 }): Partial<Dialog> {
 
     if (!hasBSModal() && !hasUIDialog()) {
-        const result = opt.native(opt.message);
-        opt.options?.onClose(result);
+        const msg: string = opt.message == null ? "": typeof opt.message === "string" ? opt.message : opt.message.textContent;
+        const result = opt.native(msg);
+        opt.options?.onClose?.(result);
         return {
             result
         }
@@ -946,7 +960,7 @@ function createMessageDialog(opt: {
     }
 
     if (options.element === void 0) {
-        options.element = el => el.innerHTML = getMessageBodyHtml(opt.message, options);
+        options.element = el => el.append(getMessageBodyHtml(opt.message, options));
     }
 
     return new Dialog(options);
@@ -960,7 +974,7 @@ function createMessageDialog(opt: {
  * @example 
  * alertDialog("An error occured!"); }
  */
-export function alertDialog(message: string, options?: MessageDialogOptions): Partial<Dialog> {
+export function alertDialog(message: RenderableContent, options?: MessageDialogOptions): Partial<Dialog> {
     return createMessageDialog({
         message,
         options,
@@ -995,7 +1009,7 @@ export interface ConfirmDialogOptions extends MessageDialogOptions {
  *     // do something when yes is clicked
  * }
  */
-export function confirmDialog(message: string, onYes: () => void, options?: ConfirmDialogOptions): Partial<Dialog> {
+export function confirmDialog(message: RenderableContent, onYes: () => void, options?: ConfirmDialogOptions): Partial<Dialog> {
     return createMessageDialog({
         message,
         options,
@@ -1032,7 +1046,7 @@ export function confirmDialog(message: string, onYes: () => void, options?: Conf
  *     // do something when OK is clicked
  * }
  */
-export function informationDialog(message: string, onOk?: () => void, options?: MessageDialogOptions): Partial<Dialog> {
+export function informationDialog(message: RenderableContent, onOk?: () => void, options?: MessageDialogOptions): Partial<Dialog> {
     return createMessageDialog({
         message,
         options,
@@ -1058,7 +1072,7 @@ export function informationDialog(message: string, onOk?: () => void, options?: 
  *     // do something when OK is clicked
  * }
  */
-export function successDialog(message: string, onOk?: () => void, options?: MessageDialogOptions): Partial<Dialog> {
+export function successDialog(message: RenderableContent, onOk?: () => void, options?: MessageDialogOptions): Partial<Dialog> {
     return createMessageDialog({
         message,
         options,
@@ -1081,7 +1095,7 @@ export function successDialog(message: string, onOk?: () => void, options?: Mess
  * @example 
  * warningDialog("Something is odd!");
  */
-export function warningDialog(message: string, options?: MessageDialogOptions): Partial<Dialog> {
+export function warningDialog(message: RenderableContent, options?: MessageDialogOptions): Partial<Dialog> {
     return createMessageDialog({
         message,
         options,
@@ -1107,23 +1121,22 @@ export interface IFrameDialogOptions {
 export function iframeDialog(options: IFrameDialogOptions): Partial<Dialog> {
 
     if (!hasBSModal() && !hasUIDialog()) {
-        window.alert(options.html);
+        window.alert(sanitizeHtml(options.html));
         return {
             result: "ok"
         }
     }
 
-    let doc: Document;
     function onOpen(div: HTMLElement) {
         if (div) {
             let iframe = div.appendChild(document.createElement('iframe'));
-            iframe.setAttribute("style", "border: none; width: 100%; height: 100%;");
-            doc = iframe.contentDocument;
-            if (doc) {
-                doc.open();
-                doc.write(options.html);
-                doc.close();
-            }
+            iframe.setAttribute("style", "border: none; width: 100%");
+            let content = sanitizeHtml(options.html);
+            if (content.indexOf('<body') < 0)
+                content = "<body>" + content + "</body>";
+            if (content.indexOf('<html') < 0)
+                content = "<html>" + content + "</html>";
+            iframe.srcdoc = content;
         }
     }
 
@@ -1135,6 +1148,8 @@ export function iframeDialog(options: IFrameDialogOptions): Partial<Dialog> {
         element: el => {
             let div = document.createElement("div");
             div.style.overflow = "hidden";
+            div.style.minHeight = "50vh";
+            div.style.display = "flex";
             el.append(div);
             onOpen(div);
         },

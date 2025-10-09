@@ -1,6 +1,7 @@
 {
   "compileOnSave": true,
   "compilerOptions": {
+    "allowImportingTsExtensions": false,
     "allowJs": false,
     "declaration": false,
     "emitBOM": true,

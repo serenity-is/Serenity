@@ -3,7 +3,7 @@ export * from "./captureoperationtype";
 export * from "./datachangeinfo";
 export * from "./decorators";
 export * from "./dialogtype";
-export * from "./dialogtyperegistry";
+export * from "./dialogtyperegistry.ts";
 export * from "./editortype";
 export * from "./editortyperegistry";
 export * from "./enumtyperegistry";

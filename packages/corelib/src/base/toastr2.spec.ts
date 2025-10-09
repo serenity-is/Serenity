@@ -120,7 +120,7 @@ describe('Toastr', () => {
         });
         expect(toast).toBeDefined();
         let closeButton = toast.querySelector('.my-close-button') as HTMLElement;
-        expect(closeButton).toBeDefined();
+        expect(closeButton).toBeTruthy();
         closeButton.click();
         setTimeout(() => {
             try {

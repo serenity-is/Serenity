@@ -1,4 +1,4 @@
-import { ISetEditValue, PropertyItem, Widget, WidgetProps, localText } from "@serenity-is/corelib";
+import { ISetEditValue, PropertyItem, Widget, WidgetProps, localText, sanitizeHtml } from "@serenity-is/corelib";
 import { nsExtensions } from "../ServerTypes/Namespaces";
 
 /**
@@ -31,7 +31,7 @@ export class StaticTextBlock<P extends StaticTextBlockOptions = StaticTextBlockO
 
         // don't html encode if isHtml option is true
         if (this.options.isHtml)
-            this.domNode.innerHTML = txt;
+            this.domNode.innerHTML = sanitizeHtml(txt);
         else
             this.domNode.textContent = txt;
     }

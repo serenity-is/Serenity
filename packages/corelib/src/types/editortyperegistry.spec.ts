@@ -136,13 +136,13 @@ describe("EditorTypeRegistry", () => {
         mockNotifyError.mockImplementation(() => { });
 
         expect(() => EditorTypeRegistry.getOrLoad("Test.Editor3")).toThrow(
-            '"Test.Editor3" editor class not found!'
+            'The editor class "Test.Editor3" was not found'
         );
 
         expect(mockNotifyError).toHaveBeenCalledWith(
-            expect.stringContaining('editor class not found'),
+            expect.stringContaining('The editor class "Test.Editor3" was not found'),
             '',
-            { escapeHtml: false, timeOut: 5000 }
+            { preWrap: true, timeOut: 5000 }
         );
     });
 

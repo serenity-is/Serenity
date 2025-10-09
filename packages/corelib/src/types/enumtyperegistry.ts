@@ -19,23 +19,18 @@ class EnumTypeRegistryImpl extends BaseTypeRegistry<object> {
     }
 
     protected override loadError(key: string) {
-        const message = `Can't find "${htmlEncode(key)}" enum type! 
+        const message = `The enum type "${key}" was not found.
 
-If you have recently defined this enum type in server side code, 
-make sure your project builds successfully and run "dotnet sergen t".
+If you have recently defined this enum type in server-side code, ensure that your project builds successfully, then run "dotnet sergen servertypings".
 
-Also verify there is such an enum type under the project root namespace,
-and its namespace parts start with capital letters like MyProject.MyModule.MyEnum.
+Also, verify that there is such an enum type under the project root namespace, and its namespace parts start with capital letters, like MyProject.MyModule.MyEnum.
 
-If using ES modules, make sure the enum type is registered with 
-Serenity.registerEnum('MyProject.MyModule.MyDialog') with the full name of 
-your enum type and "side-effect-import" this enum from the current 
-"page.ts/grid.ts/dialog.ts file (import "./path/to/MyEnum.ts").
+If using ES modules, make sure the enum type is registered with Serenity.registerEnum('MyProject.MyModule.MyEnum') (using the full name of your enum type), and side-effect import this enum from the current page.ts, grid.ts, or dialog.ts file. For example:
+import "./path/to/MyEnum.ts";
 
-After applying fixes, build and run "node ./tsbuild.js" (or "tsc" if using namespaces) 
-from the project folder.`;
+After applying the fixes, build the project by running "npm run build" from the project folder.`;
 
-        notifyError(message.replace(/\r?\n\r?\n/g, '<br/><br/>'), '', { escapeHtml: false, timeOut: 5000 });
+        notifyError(message, '', { preWrap: true, timeOut: 5000 });
         throw new Error(message);
     }
 }

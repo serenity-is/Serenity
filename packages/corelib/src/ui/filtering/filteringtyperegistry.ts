@@ -15,7 +15,7 @@ class FilteringTypeRegistryImpl extends BaseTypeRegistry<Function> {
     }
 
     protected override loadError(key: string) {
-        const message = `"${htmlEncode(key)}" filtering handler class not found!`;
+        const message = `The filtering handler class "${key}" was not found!`;
         notifyError(message);
         throw new Error(message);
     }

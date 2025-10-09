@@ -1,5 +1,5 @@
-import { FormatterContext, FormatterResult } from "@serenity-is/sleekgrid";
-import { htmlEncode } from "../../base";
+import { applyFormatterResultToCellNode, FormatterContext, FormatterResult } from "@serenity-is/sleekgrid";
+import { htmlEncode, sanitizeHtml } from "../../base";
 import { replaceAll } from "../../compat";
 import { Format, IRemoteView } from "../../slick";
 
@@ -8,19 +8,19 @@ export namespace SlickFormatting {
     export function itemLink<TItem = any>(itemType: string, idField: string, getText: Format<TItem>,
         cssClass?: (ctx: FormatterContext<TItem>) => string, encode: boolean = true): Format<TItem> {
         return function (ctx: FormatterContext<TItem>) {
-            let fmtRes: FormatterResult;
+            let fmtResult: FormatterResult;
             if (getText == null) {
                 encode = true;
-                fmtRes = ctx.value;
+                fmtResult = ctx.value;
             }
             else {
-                fmtRes = getText(ctx);
+                fmtResult = getText(ctx);
             }
 
-            fmtRes = fmtRes instanceof Node ? fmtRes : encode ? htmlEncode(fmtRes) : (fmtRes ?? '');
+            fmtResult = fmtResult instanceof Node ? fmtResult : encode ? ctx.escape(fmtResult) : (fmtResult ?? '');
 
             if ((ctx.item as any)?.__nonDataRow) {
-                return fmtRes;
+                return fmtResult;
             }
 
             const itemId = (ctx.item as any)?.[idField];
@@ -32,15 +32,7 @@ export namespace SlickFormatting {
                 href={itemId != null ? '#' + encItemType + '/' + encItemId : null}
                 data-item-type={itemType} data-item-id={itemId} /> as HTMLAnchorElement;
 
-            if (fmtRes instanceof Node) {
-                link.append(fmtRes);
-                return link;
-            }
-
-            if (fmtRes != null && fmtRes !== "") {
-                link.innerHTML = (ctx.sanitizer ?? htmlEncode)(fmtRes);
-            }
-
+            applyFormatterResultToCellNode(ctx, fmtResult, link, contentOnly);
             return link;
         }
     }
@@ -85,3 +77,5 @@ export namespace SlickFormatting {
         };
     }
 }
+
+const contentOnly = { contentOnly: true };

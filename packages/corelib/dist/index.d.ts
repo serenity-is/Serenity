@@ -358,6 +358,94 @@ export interface DebouncedFunction<T extends (...args: any[]) => any> {
  *
  */
 export declare function debounce<T extends (...args: any) => any>(func: T, wait?: number, immediate?: boolean): DebouncedFunction<T>;
+export type RenderableContent = string | HTMLElement | SVGElement | DocumentFragment;
+/**
+ * Html encodes a string (encodes single and double quotes, & (ampersand), > and < characters)
+ * @param s String (or number etc.) to be HTML encoded
+ */
+export declare function htmlEncode(s: any): string;
+/**
+ * Toggles the class on the element handling spaces like addClass does.
+ * @param el the element
+ * @param cls the class to toggle
+ * @param add if true, the class will be added, if false the class will be removed, otherwise it will be toggled.
+ */
+export declare function toggleClass(el: Element, cls: string, add?: boolean): void;
+/**
+ * Adds a CSS class to the specified element.
+ *
+ * @param el - The element to add the class to.
+ * @param cls - The CSS class to add.
+ * @returns A boolean value indicating whether the class was successfully added.
+ */
+export declare function addClass(el: Element, cls: string): void;
+/**
+ * Removes a CSS class from an element.
+ *
+ * @param el - The element from which to remove the class.
+ * @param cls - The CSS class to remove.
+ * @returns A boolean indicating whether the class was successfully removed.
+ */
+export declare function removeClass(el: Element, cls: string): void;
+/**
+ * Appends content like DOM nodes, string, number or an array of these to the parent node.
+ * Undefined, null, false values are ignored. Promises are awaited.
+ * @param parent Target parent element
+ * @param child The content
+ */
+export declare function appendToNode(parent: ParentNode, child: any): void;
+export declare function sanitizeUrl(url: string): string;
+/**
+ * Gets readonly state of an element. If the element is null, returns null.
+ * It does not check for attached widgets. It returns true if the element has readonly class,
+ * disabled attribute (select, radio, checkbox) or readonly attribute (other inputs).
+ * @param el element
+ */
+export declare function getElementReadOnly(el: Element): boolean | null;
+/**
+ * Sets readonly class and disabled (for select, radio, checkbox) or readonly attribute (for other inputs) on given element.
+ * It does not check for attached widgets.
+ * @param el Element
+ * @param value Readonly state
+ */
+export declare function setElementReadOnly(elements: Element | ArrayLike<Element>, value: boolean): void;
+/**
+ * Parses a query string into an object.
+ * @param s Query string to parse, if not specified, location.search will be used.
+ * @return An object with key/value pairs from the query string.
+ */
+export declare function parseQueryString(s?: string): Record<string, string>;
+/**
+ * Checks whether a return URL is safe for redirects. Must be relative, start with a single slash,
+ * and contain only allowed characters (no protocol, no backslashes, no control chars, etc).
+ */
+export declare function isSafeReturnUrl(url: string): boolean;
+/**
+ * Gets the return URL from the query string.
+ * @param opt Options for getting the return URL.
+ */
+export declare function getReturnUrl(opt?: {
+	/** Whether to only consider the query string. If true, the function will not check the default return URL. */
+	queryOnly?: boolean;
+	/** Whether to ignore unsafe URLs. If false or null (default), the function will only return safe URLs. */
+	ignoreUnsafe?: boolean;
+	/** The purpose of the return URL. This can be used to determine the default return URL if none is found in the query string. */
+	purpose?: string;
+}): string;
+/**
+ * Escapes a CSS selector.
+ * @param selector The CSS selector to escape.
+ */
+export declare function cssEscape(selector: string): string;
+/**
+ * Sanitizes HTML by removing dangerous elements and attributes.
+ * Need to duplicate basicDomSanitizer logic here as corelib does
+ * not bundle sleekgrid, and should work standalone with/without
+ * sleekgrid loaded.
+ * @param dirtyHtml The HTML string to sanitize.
+ * @returns The sanitized HTML string.
+ */
+export declare function sanitizeHtml(dirtyHtml: string): string;
 /**
  * Represents the utility color options for icons corresponding to Bootstrap contextual colors like primary, secondary, success etc.
  */
@@ -679,7 +767,7 @@ export declare namespace DialogTexts {
  * Options that apply to all message dialog types
  */
 export interface MessageDialogOptions extends DialogOptions {
-	/** HTML encode the message, default is true */
+	/** @deprecated HTML encode the message, default is true */
 	htmlEncode?: boolean;
 	/** Wrap the message in a `<pre>` element, so that line endings are preserved, default is true */
 	preWrap?: boolean;
@@ -692,7 +780,7 @@ export interface MessageDialogOptions extends DialogOptions {
  * @example
  * alertDialog("An error occured!"); }
  */
-export declare function alertDialog(message: string, options?: MessageDialogOptions): Partial<Dialog>;
+export declare function alertDialog(message: RenderableContent, options?: MessageDialogOptions): Partial<Dialog>;
 /** Additional options for confirm dialog */
 export interface ConfirmDialogOptions extends MessageDialogOptions {
 	/** True to also add a cancel button */
@@ -713,7 +801,7 @@ export interface ConfirmDialogOptions extends MessageDialogOptions {
  *     // do something when yes is clicked
  * }
  */
-export declare function confirmDialog(message: string, onYes: () => void, options?: ConfirmDialogOptions): Partial<Dialog>;
+export declare function confirmDialog(message: RenderableContent, onYes: () => void, options?: ConfirmDialogOptions): Partial<Dialog>;
 /**
  * Display an information dialog
  * @param message The message to display
@@ -725,7 +813,7 @@ export declare function confirmDialog(message: string, onYes: () => void, option
  *     // do something when OK is clicked
  * }
  */
-export declare function informationDialog(message: string, onOk?: () => void, options?: MessageDialogOptions): Partial<Dialog>;
+export declare function informationDialog(message: RenderableContent, onOk?: () => void, options?: MessageDialogOptions): Partial<Dialog>;
 /**
  * Display a success dialog
  * @param message The message to display
@@ -737,7 +825,7 @@ export declare function informationDialog(message: string, onOk?: () => void, op
  *     // do something when OK is clicked
  * }
  */
-export declare function successDialog(message: string, onOk?: () => void, options?: MessageDialogOptions): Partial<Dialog>;
+export declare function successDialog(message: RenderableContent, onOk?: () => void, options?: MessageDialogOptions): Partial<Dialog>;
 /**
  * Display a warning dialog
  * @param message The message to display
@@ -746,7 +834,7 @@ export declare function successDialog(message: string, onOk?: () => void, option
  * @example
  * warningDialog("Something is odd!");
  */
-export declare function warningDialog(message: string, options?: MessageDialogOptions): Partial<Dialog>;
+export declare function warningDialog(message: RenderableContent, options?: MessageDialogOptions): Partial<Dialog>;
 /** Options for `iframeDialog` **/
 export interface IFrameDialogOptions {
 	html?: string;
@@ -1557,84 +1645,6 @@ export declare function parseDate(s: string, dateOrder?: string): Date;
  */
 export declare function splitDateString(s: string): string[];
 /**
- * Html encodes a string (encodes single and double quotes, & (ampersand), > and < characters)
- * @param s String (or number etc.) to be HTML encoded
- */
-export declare function htmlEncode(s: any): string;
-/**
- * Toggles the class on the element handling spaces like addClass does.
- * @param el the element
- * @param cls the class to toggle
- * @param add if true, the class will be added, if false the class will be removed, otherwise it will be toggled.
- */
-export declare function toggleClass(el: Element, cls: string, add?: boolean): void;
-/**
- * Adds a CSS class to the specified element.
- *
- * @param el - The element to add the class to.
- * @param cls - The CSS class to add.
- * @returns A boolean value indicating whether the class was successfully added.
- */
-export declare function addClass(el: Element, cls: string): void;
-/**
- * Removes a CSS class from an element.
- *
- * @param el - The element from which to remove the class.
- * @param cls - The CSS class to remove.
- * @returns A boolean indicating whether the class was successfully removed.
- */
-export declare function removeClass(el: Element, cls: string): void;
-/**
- * Appends content like DOM nodes, string, number or an array of these to the parent node.
- * Undefined, null, false values are ignored. Promises are awaited.
- * @param parent Target parent element
- * @param child The content
- */
-export declare function appendToNode(parent: ParentNode, child: any): void;
-export declare function sanitizeUrl(url: string): string;
-/**
- * Gets readonly state of an element. If the element is null, returns null.
- * It does not check for attached widgets. It returns true if the element has readonly class,
- * disabled attribute (select, radio, checkbox) or readonly attribute (other inputs).
- * @param el element
- */
-export declare function getElementReadOnly(el: Element): boolean | null;
-/**
- * Sets readonly class and disabled (for select, radio, checkbox) or readonly attribute (for other inputs) on given element.
- * It does not check for attached widgets.
- * @param el Element
- * @param value Readonly state
- */
-export declare function setElementReadOnly(elements: Element | ArrayLike<Element>, value: boolean): void;
-/**
- * Parses a query string into an object.
- * @param s Query string to parse, if not specified, location.search will be used.
- * @return An object with key/value pairs from the query string.
- */
-export declare function parseQueryString(s?: string): Record<string, string>;
-/**
- * Checks whether a return URL is safe for redirects. Must be relative, start with a single slash,
- * and contain only allowed characters (no protocol, no backslashes, no control chars, etc).
- */
-export declare function isSafeReturnUrl(url: string): boolean;
-/**
- * Gets the return URL from the query string.
- * @param opt Options for getting the return URL.
- */
-export declare function getReturnUrl(opt?: {
-	/** Whether to only consider the query string. If true, the function will not check the default return URL. */
-	queryOnly?: boolean;
-	/** Whether to ignore unsafe URLs. If false or null (default), the function will only return safe URLs. */
-	ignoreUnsafe?: boolean;
-	/** The purpose of the return URL. This can be used to determine the default return URL if none is found in the query string. */
-	purpose?: string;
-}): string;
-/**
- * Escapes a CSS selector.
- * @param selector The CSS selector to escape.
- */
-export declare function cssEscape(selector: string): string;
-/**
  * Adds local text entries to the localization table.
  * @param obj The object containing key/value pairs to add. If a string is provided, it will be added as a key with the prefix (second argument) as its value.
  * @param pre The prefix to add to each key. If obj is a string, this will be the value for that key.
@@ -1758,7 +1768,7 @@ export type ToastContainerOptions = {
 };
 export type ToastrOptions = ToastContainerOptions & {
 	/** Show a close button, default is false */
-	closeButton?: boolean;
+	closeButton?: boolean | HTMLElement;
 	/** CSS class for close button */
 	closeClass?: string;
 	/** If true (default) toast keeps open when hovered, and closes after extendedTimeout when mouse leaves the toast */
@@ -1797,8 +1807,8 @@ export type ToastrOptions = ToastContainerOptions & {
 export type NotifyMap = {
 	type: string;
 	iconClass: string;
-	title?: string;
-	message?: string;
+	title?: RenderableContent;
+	message?: RenderableContent;
 };
 export declare class Toastr {
 	private listener;
@@ -1807,10 +1817,10 @@ export declare class Toastr {
 	options: ToastrOptions;
 	constructor(options?: ToastrOptions);
 	getContainer(options?: ToastContainerOptions, create?: boolean): HTMLElement;
-	error(message?: string, title?: string, opt?: ToastrOptions): HTMLElement | null;
-	warning(message?: string, title?: string, opt?: ToastrOptions): HTMLElement | null;
-	success(message?: string, title?: string, opt?: ToastrOptions): HTMLElement | null;
-	info(message?: string, title?: string, opt?: ToastrOptions): HTMLElement | null;
+	error(message?: RenderableContent, title?: RenderableContent, opt?: ToastrOptions): HTMLElement | null;
+	warning(message?: RenderableContent, title?: RenderableContent, opt?: ToastrOptions): HTMLElement | null;
+	success(message?: RenderableContent, title?: string, opt?: ToastrOptions): HTMLElement | null;
+	info(message?: RenderableContent, title?: RenderableContent, opt?: ToastrOptions): HTMLElement | null;
 	subscribe(callback: (response: Toastr) => void): void;
 	publish(args: Toastr): void;
 	private removeContainerIfEmpty;
@@ -4285,18 +4295,18 @@ export declare class RemoteView<TItem = any> implements IRemoteView<TItem> {
 	private expandCollapseGroup;
 	/**
 	 * Collapses a specific group.
-	 * @param varArgs Either a Slick.Group's "groupingKey" property, or a
-	 * variable argument list of grouping values denoting a unique path to the row.
+	 * @param constArgs Either a Slick.Group's "groupingKey" property, or a
+	 * constiable argument list of grouping values denoting a unique path to the row.
 	 * For example, calling collapseGroup('high', '10%') will collapse the '10%' subgroup of the 'high' group.
 	 */
-	collapseGroup(varArgs: any[]): void;
+	collapseGroup(constArgs: any[]): void;
 	/**
 	 * Expands a specific group.
-	 * @param varArgs Either a Slick.Group's "groupingKey" property, or a
-	 * variable argument list of grouping values denoting a unique path to the row.
+	 * @param constArgs Either a Slick.Group's "groupingKey" property, or a
+	 * constiable argument list of grouping values denoting a unique path to the row.
 	 * For example, calling expandGroup('high', '10%') will expand the '10%' subgroup of the 'high' group.
 	 */
-	expandGroup(varArgs: any[]): void;
+	expandGroup(constArgs: any[]): void;
 	/**
 	 * Gets the current groups.
 	 * @returns Array of groups
@@ -4647,10 +4657,10 @@ declare class FormatterTypeRegistryImpl extends BaseTypeRegistry<FormatterType> 
 	protected loadError(key: string): void;
 }
 export declare const FormatterTypeRegistry: FormatterTypeRegistryImpl;
-export declare namespace ReflectionUtils {
+export declare namespace ReflectionOptionsSetter {
 	function getPropertyValue(o: any, property: string): any;
 	function setPropertyValue(o: any, property: string, value: any): void;
-	function makeCamelCase(s: string): string;
+	function set(target: any, options: any): void;
 }
 export interface ToolButtonProps {
 	action?: string;
@@ -6911,6 +6921,7 @@ export declare class UrlFormatter implements Formatter, IInitializeColumn {
 	set target(value: string);
 }
 export declare class ColumnsBase<TRow = any> {
+	private __items;
 	constructor(items: Column<TRow>[]);
 	valueOf(): Column<TRow>[];
 }
@@ -7086,9 +7097,6 @@ export declare class PropertyPanel<TItem, P> extends BasePanel<P> {
 	protected set entityId(value: any);
 	protected validateBeforeSave(): boolean;
 	protected propertyGrid: PropertyGrid;
-}
-export declare namespace ReflectionOptionsSetter {
-	function set(target: any, options: any): void;
 }
 export type Constructor<T> = new (...args: any[]) => T;
 

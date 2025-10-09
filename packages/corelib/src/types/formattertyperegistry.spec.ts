@@ -141,13 +141,13 @@ describe("FormatterTypeRegistry", () => {
         mockNotifyError.mockImplementation(() => { });
 
         expect(() => FormatterTypeRegistry.getOrLoad("Test.Formatter3")).toThrow(
-            '"Test.Formatter3" formatter class not found!'
+            'The formatter class "Test.Formatter3" was not found'
         );
 
         expect(mockNotifyError).toHaveBeenCalledWith(
-            expect.stringContaining('formatter class not found'),
+            expect.stringContaining('The formatter class "Test.Formatter3" was not found'),
             '',
-            { escapeHtml: false, timeOut: 5000 }
+            { preWrap: true, timeOut: 5000 }
         );
     });
 

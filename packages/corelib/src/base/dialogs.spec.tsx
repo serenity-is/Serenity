@@ -649,7 +649,7 @@ describe("iframeDialog", () => {
                 html: testHtml
             });
             expect(alertSpy).toHaveBeenCalledTimes(1);
-            expect(alertSpy).toHaveBeenCalledWith(testHtml);
+            expect(alertSpy).toHaveBeenCalledWith("test message");
         }
         finally {
             alertSpy.mockRestore();

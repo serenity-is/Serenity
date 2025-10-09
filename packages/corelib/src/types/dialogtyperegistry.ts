@@ -1,4 +1,4 @@
-﻿import { htmlEncode, isAssignableFrom, notifyError } from "../base";
+﻿import { isAssignableFrom, notifyError } from "../base";
 import { IDialog } from "../interfaces";
 import { BaseTypeRegistry } from "./basetyperegistry";
 import { DialogType } from "./dialogtype";
@@ -16,20 +16,19 @@ class DialogTypeRegistryImpl extends BaseTypeRegistry<DialogType> {
     }
 
     protected override loadError(key: string) {
-        const message = `"${htmlEncode(key)}" dialog class not found! 
-Make sure the dialog type has a line like the following (with the correct full name):
+        const message = `The dialog class "${key}" was not found.
+
+Ensure that the dialog type includes a line similar to the following (using the correct full name):
 static [Symbol.typeInfo] = this.registerClass("MyProject.MyModule.MyDialog");
-and "side-effect-import" this dialog class from the current 
-"page.ts/grid.ts/dialog.ts file (import "./path/to/MyDialog.ts").
 
-If you had this error from an editor with the InplaceAdd option, verify that the lookup key
-and dialog type name match case-sensitively, excluding the Dialog suffix.
-Specify the DialogType property in the LookupEditor attribute if it is not.
+Also, side-effect import this dialog class from the current page.ts, grid.ts, or dialog.ts file. For example:
+import "./path/to/MyDialog.ts";
 
-After applying fixes, build and run "node ./tsbuild.js" (or "tsc" if using namespaces) 
-from the project folder.`;
+If you encounter this error from an editor with the InplaceAdd option, verify that the lookup key and dialog type name match case-sensitively, excluding the "Dialog" suffix. Specify the DialogType property in the LookupEditor attribute if it does not match.
 
-        notifyError(message.replace(/\r?\n\r?\n/g, '<br/><br/>'), '', { escapeHtml: false, timeOut: 5000 });
+After applying the fixes, build the project by running "npm run build" from the project folder.`;
+
+        notifyError(message, '', { preWrap: true, timeOut: 5000 });
         throw new Error(message);
     }
 }

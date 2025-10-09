@@ -17,16 +17,17 @@ class EditorTypeRegistryImpl extends BaseTypeRegistry<EditorType> {
     }
 
     protected override loadError(key: string) {
-        const message = `"${htmlEncode(key)}" editor class not found! 
-Make sure the editor type has a line like the following (with the correct full name):
-static [Symbol.typeInfo] = this.registerEditor("MyProject.MyModule.MyEditor");            
-and "side-effect-import" this editor class from the current 
-"page.ts/grid.ts/dialog.ts file (import "./path/to/MyEditor.ts").
+        const message = `The editor class "${key}" was not found.
 
-After applying fixes, build and run "node ./tsbuild.js" (or "tsc" if using namespaces) 
-from the project folder.`;
+Ensure that the editor type includes a line similar to the following (using the correct full name):
+static [Symbol.typeInfo] = this.registerEditor("MyProject.MyModule.MyEditor");
 
-        notifyError(message.replace(/\r?\n\r?\n/g, '<br/><br/>'), '', { escapeHtml: false, timeOut: 5000 });
+Also, side-effect import this editor class from the current page.ts, grid.ts, or dialog.ts file. For example:
+import "./path/to/MyEditor.ts";
+
+After applying the fixes, build the project by running "npm run build" from the project folder.`;
+
+        notifyError(message, '', { preWrap: true, timeOut: 5000 });
         throw new Error(message);
     }
 }

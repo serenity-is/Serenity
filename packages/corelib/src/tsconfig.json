@@ -1,6 +1,7 @@
 ﻿{
   "compileOnSave": false,
   "compilerOptions": {
+    "allowImportingTsExtensions": false,
     "composite": true,
     "emitDeclarationOnly": true,
     "esModuleInterop": true,
