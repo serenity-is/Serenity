@@ -4,7 +4,7 @@ import { HandleRouteEvent, Router, replaceAll, safeCast } from "../../compat";
 import { IEditDialog } from "../../interfaces";
 import { RemoteViewOptions } from "../../slick";
 import { DialogType } from "../../types/dialogtype";
-import { DialogTypeRegistry } from "../../types/dialogtyperegistry.ts";
+import { DialogTypeRegistry } from "../../types/dialogtyperegistry";
 import { EditorUtils } from "../editors/editorutils";
 import { SubDialogHelper } from "../helpers/subdialoghelper";
 import { ToolButton } from "../widgets/toolbar";

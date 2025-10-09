@@ -2,7 +2,7 @@
 import { ValidationHelper, isTrimmedEmpty } from "../../compat";
 import { IEditDialog, IGetEditValue, IReadOnly, ISetEditValue, IStringValue } from "../../interfaces";
 import { DialogType } from "../../types/dialogtype";
-import { DialogTypeRegistry } from "../../types/dialogtyperegistry.ts";
+import { DialogTypeRegistry } from "../../types/dialogtyperegistry";
 import { SubDialogHelper } from "../helpers/subdialoghelper";
 import { Widget } from "../widgets/widget";
 import { CascadedWidgetLink } from "./cascadedwidgetlink";

@@ -1775,7 +1775,7 @@ export type ToastrOptions = ToastContainerOptions & {
 	closeOnHover?: boolean;
 	/** If closeOnHover is true, the toast closes in extendedTimeout duration after the mouse leaves the toast. Default is 1000 */
 	extendedTimeOut?: number;
-	/** Escape message html, default is true */
+	/** @deprecated Escape message html, default is true. Pass HTML element to message instead */
 	escapeHtml?: boolean;
 	/** CSS class for icon */
 	iconClass?: string;
@@ -1787,6 +1787,8 @@ export type ToastrOptions = ToastContainerOptions & {
 	positionClass?: string;
 	/** Prevent duplicates of the same toast, default is false */
 	preventDuplicates?: boolean;
+	/** If true the toast message element will have a white-space: pre-wrap style */
+	preWrap?: boolean;
 	/** Right to left */
 	rtl?: boolean;
 	/** The container element id */
@@ -1819,7 +1821,7 @@ export declare class Toastr {
 	getContainer(options?: ToastContainerOptions, create?: boolean): HTMLElement;
 	error(message?: RenderableContent, title?: RenderableContent, opt?: ToastrOptions): HTMLElement | null;
 	warning(message?: RenderableContent, title?: RenderableContent, opt?: ToastrOptions): HTMLElement | null;
-	success(message?: RenderableContent, title?: string, opt?: ToastrOptions): HTMLElement | null;
+	success(message?: RenderableContent, title?: RenderableContent, opt?: ToastrOptions): HTMLElement | null;
 	info(message?: RenderableContent, title?: RenderableContent, opt?: ToastrOptions): HTMLElement | null;
 	subscribe(callback: (response: Toastr) => void): void;
 	publish(args: Toastr): void;
@@ -1830,10 +1832,10 @@ export declare class Toastr {
 }
 export declare let defaultNotifyOptions: ToastrOptions;
 export declare function positionToastContainer(options?: ToastrOptions, create?: boolean): void;
-export declare function notifyError(message: string, title?: string, options?: ToastrOptions): void;
-export declare function notifyInfo(message: string, title?: string, options?: ToastrOptions): void;
-export declare function notifySuccess(message: string, title?: string, options?: ToastrOptions): void;
-export declare function notifyWarning(message: string, title?: string, options?: ToastrOptions): void;
+export declare function notifyError(message: RenderableContent, title?: RenderableContent, options?: ToastrOptions): void;
+export declare function notifyInfo(message: RenderableContent, title?: RenderableContent, options?: ToastrOptions): void;
+export declare function notifySuccess(message: RenderableContent, title?: RenderableContent, options?: ToastrOptions): void;
+export declare function notifyWarning(message: RenderableContent, title?: RenderableContent, options?: ToastrOptions): void;
 export declare enum SummaryType {
 	Disabled = -1,
 	None = 0,
