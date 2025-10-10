@@ -48,7 +48,7 @@ public partial class BasicSamplesPage : Controller
     [PageAuthorize(Northwind.PermissionKeys.General)]
     public ActionResult EntityDialogAsPanel(int? orderID)
     {
-        return View(MVC.Views.Dialogs.EntityDialogAsPanel.Index, orderID);
+        return this.SamplePanelPage(ESM.EntityDialogAsPanelPage, "Entity Dialog as Panel", options: orderID);
     }
 
     [PageAuthorize(Northwind.PermissionKeys.General)]

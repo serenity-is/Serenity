@@ -6,11 +6,6 @@ public static partial class Views
     public const string BasicSamplesLayout = "~/Modules/BasicSamplesLayout.cshtml";
     public static partial class Dialogs
     {
-        public static partial class EntityDialogAsPanel
-        {
-            public const string Index = "~/Areas/Serenity.Demo.BasicSamples/Dialogs/EntityDialogAsPanel/Index.cshtml";
-        }
-
         public static partial class GetInsertedRecordId
         {
             public const string Index = "~/Areas/Serenity.Demo.BasicSamples/Dialogs/GetInsertedRecordId/Index.cshtml";
