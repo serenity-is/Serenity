@@ -1,6 +1,6 @@
 # CHANGELOG 2018
 
-This changelog documents all Serenity versions published in 2018 (versions 3.3.15 through 3.8.3).
+This changelog documents all Serenity versions published in the year 2018 (versions 3.3.15 through 3.8.3).
 
 ## 3.8.3 (2018-12-29)
 
