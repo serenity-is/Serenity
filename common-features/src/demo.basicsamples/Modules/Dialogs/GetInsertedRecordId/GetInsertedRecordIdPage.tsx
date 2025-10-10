@@ -1,8 +1,18 @@
 import { gridPageInit, notifyInfo, notifySuccess, SaveInitiator, SaveResponse } from "@serenity-is/corelib";
 import { CategoryDialog, CategoryGrid, CategoryService } from "@serenity-is/demo.northwind";
 import { nsDemoBasicSamples } from "../../ServerTypes/Namespaces";
+import { SampleInfo } from "../../sample-info";
 
-export default () => gridPageInit(GetInsertedRecordIdGrid);
+export default () => {
+    gridPageInit(GetInsertedRecordIdGrid);
+
+    return <SampleInfo>
+        <p>You might need to get ID of inserted record from a dialog, show some message,
+            or open another dialog for it. onSaveSuccess is a good place for this.</p>
+        <p>Insert a new category and we'll show a message about inserted record.
+            This will do nothing for updates.</p>
+    </SampleInfo>
+}
 
 /**
  * Subclass of CategoryGrid to override dialog type to GetInsertedRecordIdDialog

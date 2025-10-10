@@ -60,7 +60,7 @@ public partial class BasicSamplesPage : Controller
     [PageAuthorize(Northwind.PermissionKeys.General)]
     public ActionResult GetInsertedRecordId()
     {
-        return View(MVC.Views.Dialogs.GetInsertedRecordId.Index);
+        return this.SampleGridPage(ESM.GetInsertedRecordIdPage, "Get Inserted Record Id From Dialog");
     }
 
     [PageAuthorize(Northwind.PermissionKeys.General)]
