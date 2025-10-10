@@ -67,9 +67,6 @@ importers:
       '@serenity-is/extensions':
         specifier: workspace:*
         version: link:../extensions
-      dompurify:
-        specifier: 3.2.6
-        version: 3.2.6
 
   common-features/src/extensions:
     dependencies:
@@ -123,6 +120,9 @@ importers:
       daterangepicker:
         specifier: 3.1.0
         version: 3.1.0
+      dompurify:
+        specifier: 3.2.7
+        version: 3.2.7
       flatpickr:
         specifier: 4.6.13
         version: 4.6.13
@@ -705,8 +705,8 @@ packages:
   dom-accessibility-api@0.5.16:
     resolution: {integrity: sha512-X7BJ2yElsnOJ30pZF4uIIDfBEVgF4XEBxL9Bxhy6dnrm5hkzqmsWHGTiHqRiITNhMyFLyAiWndIJP7Z1NTteDg==}
 
-  dompurify@3.2.6:
-    resolution: {integrity: sha512-/2GogDQlohXPZe6D6NOgQvXLPSYBqIWMnZ8zzOhn09REE4eyAzb+Hed3jhoM9OkuaJ8P6ZGTTVWQKAi8ieIzfQ==}
+  dompurify@3.2.7:
+    resolution: {integrity: sha512-WhL/YuveyGXJaerVlMYGWhvQswa7myDG17P7Vu65EWC05o8vfeNbvNf4d/BOvH99+ZW+LlQsc1GDKMa1vNK6dw==}
 
   eastasianwidth@0.2.0:
     resolution: {integrity: sha512-I88TYZWc9XiYHRQ4/3c5rjjfgkjhLyW2luGIheGERbNQ6OY7yTybanSpDXZa8y7VUP9YmDcYa+eyq4ca7iLqWA==}
@@ -1701,7 +1701,7 @@ snapshots:
   dom-accessibility-api@0.5.16:
     optional: true
 
-  dompurify@3.2.6:
+  dompurify@3.2.7:
     optionalDependencies:
       '@types/trusted-types': 2.0.7
 
