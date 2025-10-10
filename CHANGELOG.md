@@ -249,4 +249,4 @@ All Serenity versions published in the year 2015 (versions 1.4.7 through 1.8.18)
 
 ## 2014
 
-All Serenity versions published in the year 2014 (versions 1.3.0 through 1.4.6) can be found in [changelog-2023.md](docs/changelog/changelog-2017.md).
+All Serenity versions published in the year 2014 (versions 1.3.0 through 1.4.6) can be found in [changelog-2023.md](docs/changelog/changelog-2014.md).
