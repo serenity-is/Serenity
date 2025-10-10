@@ -1,5 +1,4 @@
-import { Authorization, EditorWidget, IGetEditValue, ISetEditValue, PropertyItem, Toolbar, confirmDialog, formatDate, formatISODateTimeUTC, insert } from "@serenity-is/corelib";
-import DOMPurify from 'dompurify';
+import { Authorization, EditorWidget, IGetEditValue, ISetEditValue, PropertyItem, Toolbar, confirmDialog, formatDate, formatISODateTimeUTC, insert, sanitizeHtml } from "@serenity-is/corelib";
 import { NoteRow } from "../ServerTypes/Demo";
 import { nsDemoNorthwind } from "../ServerTypes/Namespaces";
 import { NoteDialog } from "./NoteDialog";
@@ -33,7 +32,7 @@ export class NotesEditor<P = {}> extends EditorWidget<P>
         this.noteList.innerHTML = '';
         this.noteList.append(<>{(this.items || []).map((item, index) => 
             <li>
-                <div class="note-text" dangerouslySetInnerHTML={{ __html: DOMPurify.sanitize(item.Text ?? '') }}></div>
+                <div class="note-text" dangerouslySetInnerHTML={{ __html: sanitizeHtml(item.Text ?? '') }}></div>
                 <a href="#" class="note-date" data-index={index} onClick={this.editClick.bind(this)}>
                     {item.InsertUserDisplayName + ' - ' + formatDate(item.InsertDate, 'g')}
                 </a>
