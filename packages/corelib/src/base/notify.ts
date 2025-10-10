@@ -13,7 +13,7 @@ export function positionToastContainer(options?: ToastrOptions, create = true) {
         return;
 
     let dialogs = Array.from(document.body.children);
-    let dialogIndex = dialogs.findIndex(x => x.matches('.ui-dialog, .modal.in, .modal.show') && !x.matches('[style*="display:none"], [style*="display: none"], .hidden'));
+    let dialogIndex = dialogs.findIndex(x => x.matches('.ui-dialog, .modal.in, .modal.show') && !x.matches('[style*="display:none"], [style*="display: none"]') && !x.classList.contains('hidden'));
     let dialog = dialogs[dialogIndex];
     if (dialog) {
         const { top, left, right } = dialog.getBoundingClientRect();
