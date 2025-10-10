@@ -217,36 +217,36 @@ All Serenity versions published in the year 2023 (versions 6.4.3 through 8.1.5) 
 
 ## 2022
 
-All Serenity versions published in the year 2022 (versions 5.1.2 through 6.4.2) can be found in [changelog-2023.md](docs/changelog/changelog-2022.md).
+All Serenity versions published in the year 2022 (versions 5.1.2 through 6.4.2) can be found in [changelog-2022.md](docs/changelog/changelog-2022.md).
 
 ## 2021
 
-All Serenity versions published in the year 2021 (versions 5.0.20 through 5.1.1) can be found in [changelog-2023.md](docs/changelog/changelog-2021.md).
+All Serenity versions published in the year 2021 (versions 5.0.20 through 5.1.1) can be found in [changelog-2021.md](docs/changelog/changelog-2021.md).
 
 ## 2020
 
-All Serenity versions published in the year 2020 (versions 3.10.0 through 3.14.5) can be found in [changelog-2023.md](docs/changelog/changelog-2020.md).
+All Serenity versions published in the year 2020 (versions 3.10.0 through 3.14.5) can be found in [changelog-2020.md](docs/changelog/changelog-2020.md).
 
 ## 2019
 
-All Serenity versions published in the year 2019 (versions 3.8.4 through 3.9.14) can be found in [changelog-2023.md](docs/changelog/changelog-2019.md).
+All Serenity versions published in the year 2019 (versions 3.8.4 through 3.9.14) can be found in [changelog-2019.md](docs/changelog/changelog-2019.md).
 
 ## 2018
 
-All Serenity versions published in the year 2018 (versions 3.3.15 through 3.8.3) can be found in [changelog-2023.md](docs/changelog/changelog-2018.md).
+All Serenity versions published in the year 2018 (versions 3.3.15 through 3.8.3) can be found in [changelog-2018.md](docs/changelog/changelog-2018.md).
 
 ## 2017
 
-All Serenity versions published in the year 2017 (versions 2.8.0 through 3.3.14) can be found in [changelog-2023.md](docs/changelog/changelog-2017.md).
+All Serenity versions published in the year 2017 (versions 2.8.0 through 3.3.14) can be found in [changelog-2017.md](docs/changelog/changelog-2017.md).
 
 ## 2016
 
-All Serenity versions published in the year 2016 (versions 1.8.19 through 2.7.2) can be found in [changelog-2023.md](docs/changelog/changelog-2016.md).
+All Serenity versions published in the year 2016 (versions 1.8.19 through 2.7.2) can be found in [changelog-2016.md](docs/changelog/changelog-2016.md).
 
 ## 2015
 
-All Serenity versions published in the year 2015 (versions 1.4.7 through 1.8.18) can be found in [changelog-2023.md](docs/changelog/changelog-2015.md).
+All Serenity versions published in the year 2015 (versions 1.4.7 through 1.8.18) can be found in [changelog-2015.md](docs/changelog/changelog-2015.md).
 
 ## 2014
 
-All Serenity versions published in the year 2014 (versions 1.3.0 through 1.4.6) can be found in [changelog-2023.md](docs/changelog/changelog-2014.md).
+All Serenity versions published in the year 2014 (versions 1.3.0 through 1.4.6) can be found in [changelog-2014.md](docs/changelog/changelog-2014.md).
