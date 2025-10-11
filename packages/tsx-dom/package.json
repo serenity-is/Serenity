@@ -1,0 +1,45 @@
+{
+  "name": "@serenity-is/tsx-dom",
+  "version": "0.0.1",
+  "description": "Use JSX syntax to create DOM elements with full TypeScript support",
+  "type": "module",
+  "types": "dist/index.d.ts",
+  "main": "dist/index.js",
+  "module": "dist/index.js",
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "main": "./dist/index.js",
+      "import": "./dist/index.js"
+    },
+    "./jsx-runtime": "./jsx-runtime.js",
+    "./jsx-dev-runtime": "./jsx-runtime.js"
+  },
+  "files": [
+    "dist/**/*.ts",
+    "dist/**/*.css",
+    "dist/**/*.js",
+    "dist/**/*.map"
+  ],
+  "scripts": {
+    "build": "node build/build",
+    "dts": "npx -yes dts-bundle-generator -o dist/index.d.ts src/index.ts --project=./tsconfig.json --no-banner",
+    "prepublishOnly": "pnpm build && pnpm run test --coverage && pnpm dts",
+    "test": "pnpm build && vitest run",
+    "tsc": "tsc"
+  },
+  "keywords": [
+    "grid",
+    "datagrid",
+    "datatable",
+    "SleekGrid",
+    "SlickGrid",
+    "spreadsheet",
+    "table"
+  ],
+  "author": "Volkan Ceylan, Furkan Evran, Victor Tomaili (https://serenity.is)",
+  "repository": "serenity-is/sleekgrid",
+  "license": "MIT",
+  "bugs": "https://github.com/serenity-is/sleekGrid/issues",
+  "homepage": "https://github.com/serenity-is/sleekGrid#readme"
+}

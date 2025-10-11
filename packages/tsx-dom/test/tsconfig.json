@@ -1,0 +1,17 @@
+﻿{
+    "extends": "../tsconfig.json",
+    "compilerOptions": {
+        "baseUrl": ".",
+        "jsx": "react-jsx",
+        "jsxImportSource": "../src",
+        "noImplicitAny": false,
+        "declaration": false,
+        "sourceMap": true,
+        "types": [
+            "vitest/globals"
+        ]
+    },
+    "include": [
+        "."
+    ]
+}

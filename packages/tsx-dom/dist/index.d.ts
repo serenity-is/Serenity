@@ -1,0 +1,449 @@
+export interface TsxDomTypeConfig {
+	[s: string]: boolean;
+}
+export type IfTsxDomTypeConfig<T extends string, TIF, TELSE> = TsxDomTypeConfig[T] extends false ? TELSE : TIF;
+export type JSXElement = IfTsxDomTypeConfig<"html", HTMLElement, never> | IfTsxDomTypeConfig<"svg", SVGElement, never>;
+export type RefType<T> = {
+	current: T | null;
+};
+export type ClassNameRecord = Record<string, null | undefined | boolean>;
+export type ClassNameEntry = string | null | undefined | false | ClassNameRecord;
+export type ClassNameType = ClassNameEntry | ClassNameEntry[];
+/** CSSStyleDeclaration contains methods, readonly properties and an index signature, which we all need to filter out. */
+export type StyleProperties = Partial<Pick<CSSStyleDeclaration, {
+	[K in keyof CSSStyleDeclaration]: K extends string ? CSSStyleDeclaration[K] extends string ? K : never : never;
+}[keyof CSSStyleDeclaration]>>;
+export interface HTMLAttributes {
+	accept?: string;
+	acceptCharset?: string;
+	accessKey?: string;
+	action?: string;
+	allow?: string;
+	allowFullscreen?: boolean;
+	alt?: string;
+	as?: string;
+	async?: boolean;
+	autocapitalize?: string;
+	autocomplete?: string;
+	autocorrect?: string;
+	autofocus?: boolean;
+	autoplay?: boolean;
+	capture?: boolean | string;
+	cellPadding?: number | string;
+	cellSpacing?: number | string;
+	charset?: string;
+	checked?: boolean;
+	class?: ClassNameType;
+	cols?: number;
+	colSpan?: number;
+	content?: string;
+	contentEditable?: boolean;
+	controls?: boolean;
+	coords?: string;
+	crossOrigin?: string;
+	data?: string;
+	dateTime?: string;
+	default?: boolean;
+	defer?: boolean;
+	dir?: "auto" | "rtl" | "ltr";
+	disabled?: boolean;
+	disableRemotePlayback?: boolean;
+	download?: string;
+	decoding?: "sync" | "async" | "auto";
+	draggable?: "true" | "false";
+	enctype?: string;
+	enterKeyHint?: "enter" | "done" | "go" | "next" | "previous" | "search" | "send";
+	form?: string;
+	formAction?: string;
+	formEnctype?: string;
+	formMethod?: string;
+	formNoValidate?: boolean;
+	formTarget?: string;
+	frameBorder?: number | string;
+	headers?: string;
+	height?: number | string;
+	hidden?: boolean;
+	high?: number;
+	href?: string;
+	hreflang?: string;
+	for?: string;
+	htmlFor?: string;
+	httpEquiv?: string;
+	id?: string;
+	inputMode?: string;
+	integrity?: string;
+	is?: string;
+	kind?: string;
+	label?: string;
+	lang?: string;
+	list?: string;
+	loading?: "eager" | "lazy";
+	loop?: boolean;
+	low?: number;
+	marginHeight?: number;
+	marginWidth?: number;
+	max?: number | string;
+	maxLength?: number;
+	media?: string;
+	method?: string;
+	min?: number | string;
+	minLength?: number;
+	multiple?: boolean;
+	muted?: boolean;
+	name?: string;
+	nonce?: string;
+	noValidate?: boolean;
+	open?: boolean;
+	optimum?: number;
+	pattern?: string;
+	ping?: string;
+	placeholder?: string;
+	playsInline?: boolean;
+	poster?: string;
+	preload?: string;
+	readOnly?: boolean;
+	referrerPolicy?: "no-referrer" | "no-referrer-when-downgrade" | "origin" | "origin-when-cross-origin" | "same-origin" | "strict-origin" | "strict-origin-when-cross-origin" | "unsafe-url";
+	rel?: string;
+	required?: boolean;
+	role?: string;
+	rows?: number;
+	rowSpan?: number;
+	sandbox?: string;
+	scope?: string;
+	scrolling?: string;
+	selected?: boolean;
+	shape?: string;
+	size?: number;
+	sizes?: string;
+	slot?: string;
+	span?: number;
+	spellcheck?: boolean;
+	src?: string;
+	srcdoc?: string;
+	srclang?: string;
+	srcset?: string;
+	start?: number;
+	step?: number | string;
+	style?: string | StyleProperties;
+	summary?: string;
+	tabIndex?: number;
+	target?: string;
+	title?: string;
+	type?: string;
+	useMap?: string;
+	value?: string | string[] | number;
+	volume?: string | number;
+	width?: number | string;
+	wrap?: string;
+}
+export interface SVGAttributes extends HTMLAttributes {
+	accumulate?: "none" | "sum";
+	additive?: "replace" | "sum";
+	amplitude?: number | string;
+	attributeName?: string;
+	attributeType?: string;
+	baseFrequency?: number | string;
+	baseProfile?: number | string;
+	begin?: number | string;
+	by?: number | string;
+	calcMode?: number | string;
+	clipPath?: string;
+	clipPathUnits?: number | string;
+	cursor?: number | string;
+	cx?: number | string;
+	cy?: number | string;
+	d?: string;
+	dur?: number | string;
+	dx?: number | string;
+	dy?: number | string;
+	edgeMode?: number | string;
+	end?: number | string;
+	exponent?: number | string;
+	externalResourcesRequired?: number | string;
+	fill?: string;
+	filter?: string;
+	filterUnits?: number | string;
+	from?: number | string;
+	fx?: number | string;
+	fy?: number | string;
+	gradientTransform?: string;
+	gradientUnits?: string;
+	in2?: number | string;
+	in?: string;
+	intercept?: number | string;
+	k1?: number | string;
+	k2?: number | string;
+	k3?: number | string;
+	k4?: number | string;
+	keyPoints?: number | string;
+	keySplines?: number | string;
+	keyTimes?: number | string;
+	lengthAdjust?: number | string;
+	lightingColor?: number | string;
+	limitingConeAngle?: number | string;
+	markerHeight?: number | string;
+	markerMid?: string;
+	markerStart?: string;
+	markerUnits?: number | string;
+	markerWidth?: number | string;
+	mask?: string;
+	maskContentUnits?: number | string;
+	maskUnits?: number | string;
+	mode?: number | string;
+	numOctaves?: number | string;
+	offset?: number | string;
+	operator?: number | string;
+	orient?: number | string;
+	patternContentUnits?: string;
+	patternTransform?: number | string;
+	patternUnits?: string;
+	points?: string;
+	preserveAspectRatio?: string;
+	primitiveUnits?: number | string;
+	r?: number | string;
+	radius?: number | string;
+	refX?: number | string;
+	refY?: number | string;
+	repeatCount?: number | string;
+	repeatDur?: number | string;
+	requiredExtensions?: number | string;
+	requiredFeatures?: number | string;
+	restart?: number | string;
+	result?: string;
+	rotate?: number | string;
+	rx?: number | string;
+	ry?: number | string;
+	scale?: number | string;
+	seed?: number | string;
+	slope?: number | string;
+	spacing?: number | string;
+	spreadMethod?: string;
+	startOffset?: number | string;
+	stdDeviation?: number | string;
+	stitchTiles?: number | string;
+	stroke?: string;
+	systemLanguage?: number | string;
+	tableValues?: number | string;
+	textLength?: number | string;
+	to?: number | string;
+	transform?: string;
+	values?: string;
+	version?: string;
+	viewBox?: string;
+	viewTarget?: number | string;
+	x1?: number | string;
+	x2?: number | string;
+	x?: number | string;
+	xChannelSelector?: string;
+	xmlns?: string;
+	y1?: number | string;
+	y2?: number | string;
+	y?: number | string;
+	yChannelSelector?: string;
+}
+export type SpecialKeys<T extends Element> = T extends HTMLLabelElement | HTMLOutputElement ? "for" | "class" | "is" : "class" | "is";
+/** Figure out which of the attributes exist for a specific element */
+export type ElementAttributes<TElement extends Element, TAttributes extends HTMLAttributes | SVGAttributes> = {
+	[TKey in (keyof TElement & keyof TAttributes) | SpecialKeys<TElement>]?: TAttributes[TKey];
+};
+export type PropertiesOfFix<TFixes, TName> = TName extends keyof TFixes ? TFixes[TName] : unknown;
+/**
+ * Some tags properties can't be inferred correctly.
+ * To fix these properties, this manual override is defined.
+ * Since it's an interface, users can even override them from outside.
+ */
+export interface HTMLTagFixes {
+	meta: {
+		charset?: string;
+		property?: string;
+	};
+}
+/** Figure out which of the HTML attributes exist for a specific element */
+export type HTMLElementAttributes<TName extends keyof HTMLElementTagNameMap> = ElementAttributes<HTMLElementTagNameMap[TName], HTMLAttributes> & PropertiesOfFix<HTMLTagFixes, TName>;
+/** Figure out which of the SVG attributes exist for a specific element */
+export type SVGElementAttributes<TName extends keyof SVGElementTagNameMap> = ElementAttributes<SVGElementTagNameMap[TName], SVGAttributes>;
+export type SVGOnlyElementKeys = Exclude<keyof SVGElementTagNameMap, SVGAndHTMLElementKeys>;
+export type SVGAndHTMLElementKeys = keyof SVGElementTagNameMap & keyof HTMLElementTagNameMap;
+export type Simplify<T> = {
+	[KeyType in keyof T]: T[KeyType];
+} & {};
+/** Generic event handler type with `currentTarget` and `this` correctly typed */
+export type EventHandler<TTarget extends EventTarget, TEvent extends Event> = (this: TTarget, event: Omit<TEvent, "currentTarget"> & {
+	readonly currentTarget: TTarget;
+}) => void;
+export type WithEventOptions<T extends Record<string, any>> = Simplify<{
+	[TKey in Extract<keyof T, string> as `${TKey}Capture`]?: T[TKey] | {
+		listener: T[TKey];
+		options: AddEventListenerOptions;
+	};
+}>;
+export interface EventAttributesBase<T extends EventTarget> {
+	onLoad?: EventHandler<T, Event>;
+	onError?: EventHandler<T, ErrorEvent>;
+	onCopy?: EventHandler<T, ClipboardEvent>;
+	onCut?: EventHandler<T, ClipboardEvent>;
+	onPaste?: EventHandler<T, ClipboardEvent>;
+	onCompositionEnd?: EventHandler<T, CompositionEvent>;
+	onCompositionStart?: EventHandler<T, CompositionEvent>;
+	onCompositionUpdate?: EventHandler<T, CompositionEvent>;
+	onToggle?: EventHandler<T, Event>;
+	onFocus?: EventHandler<T, FocusEvent>;
+	onFocusIn?: EventHandler<T, FocusEvent>;
+	onFocusOut?: EventHandler<T, FocusEvent>;
+	onBlur?: EventHandler<T, FocusEvent>;
+	onChange?: EventHandler<T, Event>;
+	onInput?: EventHandler<T, Event>;
+	onBeforeInput?: EventHandler<T, InputEvent>;
+	onSearch?: EventHandler<T, Event>;
+	onSubmit?: EventHandler<T, SubmitEvent>;
+	onInvalid?: EventHandler<T, Event>;
+	onReset?: EventHandler<T, Event>;
+	onFormData?: EventHandler<T, FormDataEvent>;
+	onKeyDown?: EventHandler<T, KeyboardEvent>;
+	onKeyPress?: EventHandler<T, KeyboardEvent>;
+	onKeyUp?: EventHandler<T, KeyboardEvent>;
+	onAbort?: EventHandler<T, UIEvent>;
+	onCanPlay?: EventHandler<T, Event>;
+	onCanPlayThrough?: EventHandler<T, Event>;
+	onDurationChange?: EventHandler<T, Event>;
+	onEmptied?: EventHandler<T, Event>;
+	onEncrypted?: EventHandler<T, Event>;
+	onEnded?: EventHandler<T, Event>;
+	onLoadedData?: EventHandler<T, Event>;
+	onLoadedMetadata?: EventHandler<T, Event>;
+	onLoadStart?: EventHandler<T, Event>;
+	onPause?: EventHandler<T, Event>;
+	onPlay?: EventHandler<T, Event>;
+	onPlaying?: EventHandler<T, Event>;
+	onProgress?: EventHandler<T, ProgressEvent>;
+	onRateChange?: EventHandler<T, Event>;
+	onSeeked?: EventHandler<T, Event>;
+	onSeeking?: EventHandler<T, Event>;
+	onStalled?: EventHandler<T, Event>;
+	onSuspend?: EventHandler<T, Event>;
+	onTimeUpdate?: EventHandler<T, Event>;
+	onVolumeChange?: EventHandler<T, Event>;
+	onWaiting?: EventHandler<T, Event>;
+	onClick?: EventHandler<T, MouseEvent>;
+	onContextMenu?: EventHandler<T, MouseEvent>;
+	onDblClick?: EventHandler<T, MouseEvent>;
+	onAuxClick?: EventHandler<T, MouseEvent>;
+	onDrag?: EventHandler<T, DragEvent>;
+	onDragEnd?: EventHandler<T, DragEvent>;
+	onDragEnter?: EventHandler<T, DragEvent>;
+	onDragLeave?: EventHandler<T, DragEvent>;
+	onDragOver?: EventHandler<T, DragEvent>;
+	onDragStart?: EventHandler<T, DragEvent>;
+	onDrop?: EventHandler<T, DragEvent>;
+	onMouseDown?: EventHandler<T, MouseEvent>;
+	onMouseEnter?: EventHandler<T, MouseEvent>;
+	onMouseLeave?: EventHandler<T, MouseEvent>;
+	onMouseMove?: EventHandler<T, MouseEvent>;
+	onMouseOut?: EventHandler<T, MouseEvent>;
+	onMouseOver?: EventHandler<T, MouseEvent>;
+	onMouseUp?: EventHandler<T, MouseEvent>;
+	onSelect?: EventHandler<T, Event>;
+	onSelectionChange?: EventHandler<T, Event>;
+	onSelectStart?: EventHandler<T, Event>;
+	onBeforeToggle?: EventHandler<T, Event>;
+	onDeviceMotion?: EventHandler<T, DeviceMotionEvent>;
+	onDeviceOrientation?: EventHandler<T, DeviceOrientationEvent>;
+	onGamepadConnected?: EventHandler<T, GamepadEvent>;
+	onGamepadDisconnected?: EventHandler<T, GamepadEvent>;
+	onTouchCancel?: EventHandler<T, TouchEvent>;
+	onTouchEnd?: EventHandler<T, TouchEvent>;
+	onTouchMove?: EventHandler<T, TouchEvent>;
+	onTouchStart?: EventHandler<T, TouchEvent>;
+	onPointerOver?: EventHandler<T, PointerEvent>;
+	onPointerEnter?: EventHandler<T, PointerEvent>;
+	onPointerDown?: EventHandler<T, PointerEvent>;
+	onPointerMove?: EventHandler<T, PointerEvent>;
+	onPointerUp?: EventHandler<T, PointerEvent>;
+	onPointerCancel?: EventHandler<T, PointerEvent>;
+	onPointerOut?: EventHandler<T, PointerEvent>;
+	onPointerLeave?: EventHandler<T, PointerEvent>;
+	onGotPointerCapture?: EventHandler<T, PointerEvent>;
+	onLostPointerCapture?: EventHandler<T, PointerEvent>;
+	onPointerLockChange?: EventHandler<T, Event>;
+	onPointerLockError?: EventHandler<T, Event>;
+	onScroll?: EventHandler<T, Event>;
+	onScrollEnd?: EventHandler<T, Event>;
+	onResize?: EventHandler<T, UIEvent>;
+	onOrientationChange?: EventHandler<T, Event>;
+	onFullscreenChange?: EventHandler<T, Event>;
+	onFullscreenError?: EventHandler<T, Event>;
+	onVisibilityChange?: EventHandler<T, Event>;
+	onCueChange?: EventHandler<T, Event>;
+	onWheel?: EventHandler<T, WheelEvent>;
+	onAnimationStart?: EventHandler<T, AnimationEvent>;
+	onAnimationEnd?: EventHandler<T, AnimationEvent>;
+	onAnimationIteration?: EventHandler<T, AnimationEvent>;
+	onAnimationCancel?: EventHandler<T, AnimationEvent>;
+	onTransitionCancel?: EventHandler<T, TransitionEvent>;
+	onTransitionEnd?: EventHandler<T, TransitionEvent>;
+	onTransitionRun?: EventHandler<T, TransitionEvent>;
+	onTransitionStart?: EventHandler<T, TransitionEvent>;
+	onAfterPrint?: EventHandler<T, Event>;
+	onBeforePrint?: EventHandler<T, Event>;
+	onHashChange?: EventHandler<T, HashChangeEvent>;
+	onPopState?: EventHandler<T, PopStateEvent>;
+	onPageHide?: EventHandler<T, PageTransitionEvent>;
+	onPageShow?: EventHandler<T, PageTransitionEvent>;
+	onReadyStateChange?: EventHandler<T, Event>;
+	onUnload?: EventHandler<T, Event>;
+	onBeforeUnload?: EventHandler<T, BeforeUnloadEvent>;
+	onCancel?: EventHandler<T, Event>;
+	onClose?: EventHandler<T, Event>;
+	onSlotChange?: EventHandler<T, Event>;
+	onLanguageChange?: EventHandler<T, Event>;
+	onMessage?: EventHandler<T, MessageEvent>;
+	onMessageError?: EventHandler<T, MessageEvent>;
+	onOffline?: EventHandler<T, Event>;
+	onOnline?: EventHandler<T, Event>;
+	onRejectionHandled?: EventHandler<T, PromiseRejectionEvent>;
+	onUnhandledRejection?: EventHandler<T, PromiseRejectionEvent>;
+	onSecurityPolicyViolation?: EventHandler<T, SecurityPolicyViolationEvent>;
+	onStorage?: EventHandler<T, StorageEvent>;
+}
+export type EventAttributes<T extends EventTarget> = WithEventOptions<EventAttributesBase<T>>;
+export type ComponentChild = ComponentChild[] | JSXElement | string | number | boolean | undefined | null;
+export type ComponentChildren = ComponentChild | ComponentChild[];
+export interface BaseProps {
+	children?: ComponentChildren;
+}
+export interface CustomElementsHTML {
+}
+export interface HTMLComponentProps<T extends Element> extends BaseProps {
+	dangerouslySetInnerHTML?: string;
+	/**
+	 * This is essentially a reverse "is" attribute.
+	 * If you specify it, the generated tag will be tsxTag and it will receive an "is" attribute with the tag you specified in your JSX.
+	 * This is needed because we can't make the is-property associate with the correct component props.
+	 */
+	tsxTag?: keyof HTMLElementTagNameMap | keyof SVGElementTagNameMap;
+	ref?: RefType<T>;
+}
+export type IntrinsicElementsHTML = {
+	[TKey in keyof HTMLElementTagNameMap]?: HTMLElementAttributes<TKey> & HTMLComponentProps<HTMLElementTagNameMap[TKey]> & EventAttributes<HTMLElementTagNameMap[TKey]>;
+};
+export type IntrinsicElementsSVG = {
+	[TKey in SVGOnlyElementKeys]?: SVGElementAttributes<TKey> & HTMLComponentProps<SVGElementTagNameMap[TKey]> & EventAttributes<SVGElementTagNameMap[TKey]>;
+};
+export type IntrinsicElementsCombined = IfTsxDomTypeConfig<"html", IntrinsicElementsHTML, unknown> & IfTsxDomTypeConfig<"svg", IntrinsicElementsSVG, unknown>;
+export interface CustomElementsHTML {
+}
+export declare namespace JSX {
+	type Element = JSXElement;
+	interface ElementAttributesProperty {
+		props: unknown;
+	}
+	interface ElementChildrenAttribute {
+		children: unknown;
+	}
+	interface IntrinsicElements extends IntrinsicElementsCombined, CustomElementsHTML {
+	}
+}
+export declare function jsx(tag: any, props: any): any;
+export declare const Fragment: unique symbol;
+
+export {};
