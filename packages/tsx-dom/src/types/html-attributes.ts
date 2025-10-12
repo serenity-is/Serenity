@@ -1,5 +1,5 @@
-import { ClassNameType } from "./class-name-type";
-import type { StyleProperties } from "./style-properties";
+import { ClassNameType } from "./class-name";
+import type { StyleProperties } from "./style-attributes";
 
 export interface HTMLAttributes {
     accept?: string;

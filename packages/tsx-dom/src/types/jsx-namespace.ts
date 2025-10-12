@@ -1,4 +1,4 @@
-import type { JSXElement } from "./core-types";
+import type { JSXElement } from "./base-types";
 import type { CustomElementsHTML, IntrinsicElementsCombined } from "./intrinsic-elements";
 
 export declare namespace JSX {

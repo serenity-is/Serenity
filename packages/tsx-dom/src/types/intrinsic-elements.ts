@@ -1,18 +1,7 @@
+import type { ConfigureJSXElement, RefType } from "./base-types";
+import type { BaseProps } from "./components";
 import type { HTMLElementAttributes, SVGElementAttributes, SVGOnlyElementKeys } from "./element-attributes";
 import type { EventAttributes } from "./event-attributes";
-import type { IfTsxDomTypeConfig, JSXElement, RefType } from "./core-types";
-import type { StyleAttributes } from "./style-attributes";
-
-
-export type ComponentChild = ComponentChild[] | JSXElement | string | number | boolean | undefined | null;
-export type ComponentChildren = ComponentChild | ComponentChild[];
-export interface BaseProps {
-    children?: ComponentChildren;
-}
-export type FC<T = BaseProps> = (props: T) => JSXElement;
-export type ComponentAttributes = {
-    [s: string]: string | number | boolean | undefined | null | StyleAttributes | EventListenerOrEventListenerObject;
-};
 
 // eslint-disable-next-line @typescript-eslint/no-empty-object-type
 export interface CustomElementsHTML {}
@@ -42,8 +31,8 @@ export type IntrinsicElementsSVG = {
 
 export type IntrinsicElementsHTMLAndSVG = IntrinsicElementsHTML & IntrinsicElementsSVG;
 
-export type IntrinsicElementsCombined = IfTsxDomTypeConfig<"html", IntrinsicElementsHTML, unknown> &
-    IfTsxDomTypeConfig<"svg", IntrinsicElementsSVG, unknown>;
+export type IntrinsicElementsCombined = IntrinsicElementsHTML &
+    (ConfigureJSXElement["svg"] extends false ? IntrinsicElementsHTML : unknown);
 
 // eslint-disable-next-line @typescript-eslint/no-empty-object-type
 export interface CustomElementsHTML {}

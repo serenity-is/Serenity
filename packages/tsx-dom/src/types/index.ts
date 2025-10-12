@@ -1,2 +1,3 @@
-export { type JSXElement, type RefType } from "./core-types";
-export { type JSX } from "./jsx-namespace";
+export * from "./base-types";
+export * from "./components";
+export * from "./jsx-namespace";

@@ -1,18 +1,33 @@
-export interface TsxDomTypeConfig {
-	[s: string]: boolean;
+export interface ConfigureJSXElement {
+	svg: boolean;
 }
-export type IfTsxDomTypeConfig<T extends string, TIF, TELSE> = TsxDomTypeConfig[T] extends false ? TELSE : TIF;
-export type JSXElement = IfTsxDomTypeConfig<"html", HTMLElement, never> | IfTsxDomTypeConfig<"svg", SVGElement, never>;
+export type JSXElement = HTMLElement & (ConfigureJSXElement["svg"] extends false ? never : SVGElement);
 export type RefType<T> = {
 	current: T | null;
 };
-export type ClassNameRecord = Record<string, null | undefined | boolean>;
-export type ClassNameEntry = string | null | undefined | false | ClassNameRecord;
-export type ClassNameType = ClassNameEntry | ClassNameEntry[];
+export type RemoveIndex<T> = {
+	[K in keyof T as string extends K ? never : number extends K ? never : K]: T[K];
+};
+export type ExcludeMethods<T> = Pick<T, {
+	[K in keyof T]: T[K] extends Function ? never : K;
+}[keyof T]>;
+export type StyleAttributes = Partial<ExcludeMethods<RemoveIndex<Omit<CSSStyleDeclaration, "length" | "parentRules">>>>;
 /** CSSStyleDeclaration contains methods, readonly properties and an index signature, which we all need to filter out. */
 export type StyleProperties = Partial<Pick<CSSStyleDeclaration, {
 	[K in keyof CSSStyleDeclaration]: K extends string ? CSSStyleDeclaration[K] extends string ? K : never : never;
 }[keyof CSSStyleDeclaration]>>;
+export type ComponentChild = ComponentChild[] | JSXElement | string | number | boolean | undefined | null;
+export type ComponentChildren = ComponentChild | ComponentChild[];
+export interface BaseProps {
+	children?: ComponentChildren;
+}
+export type FC<T = BaseProps> = (props: T) => JSXElement;
+export type ComponentAttributes = {
+	[s: string]: string | number | boolean | undefined | null | StyleAttributes | EventListenerOrEventListenerObject;
+};
+export type ClassNameRecord = Record<string, null | undefined | boolean>;
+export type ClassNameEntry = string | null | undefined | false | ClassNameRecord;
+export type ClassNameType = ClassNameEntry | ClassNameEntry[];
 export interface HTMLAttributes {
 	accept?: string;
 	acceptCharset?: string;
@@ -248,8 +263,7 @@ export type ElementAttributes<TElement extends Element, TAttributes extends HTML
 };
 export type PropertiesOfFix<TFixes, TName> = TName extends keyof TFixes ? TFixes[TName] : unknown;
 /**
- * Some tags properties can't be inferred correctly.
- * To fix these properties, this manual override is defined.
+ * Some tags properties can't be inferred correctly. To fix these properties, this manual override is defined.
  * Since it's an interface, users can even override them from outside.
  */
 export interface HTMLTagFixes {
@@ -260,10 +274,6 @@ export interface HTMLTagFixes {
 }
 /** Figure out which of the HTML attributes exist for a specific element */
 export type HTMLElementAttributes<TName extends keyof HTMLElementTagNameMap> = ElementAttributes<HTMLElementTagNameMap[TName], HTMLAttributes> & PropertiesOfFix<HTMLTagFixes, TName>;
-/** Figure out which of the SVG attributes exist for a specific element */
-export type SVGElementAttributes<TName extends keyof SVGElementTagNameMap> = ElementAttributes<SVGElementTagNameMap[TName], SVGAttributes>;
-export type SVGOnlyElementKeys = Exclude<keyof SVGElementTagNameMap, SVGAndHTMLElementKeys>;
-export type SVGAndHTMLElementKeys = keyof SVGElementTagNameMap & keyof HTMLElementTagNameMap;
 export type Simplify<T> = {
 	[KeyType in keyof T]: T[KeyType];
 } & {};
@@ -406,11 +416,6 @@ export interface EventAttributesBase<T extends EventTarget> {
 	onStorage?: EventHandler<T, StorageEvent>;
 }
 export type EventAttributes<T extends EventTarget> = WithEventOptions<EventAttributesBase<T>>;
-export type ComponentChild = ComponentChild[] | JSXElement | string | number | boolean | undefined | null;
-export type ComponentChildren = ComponentChild | ComponentChild[];
-export interface BaseProps {
-	children?: ComponentChildren;
-}
 export interface CustomElementsHTML {
 }
 export interface HTMLComponentProps<T extends Element> extends BaseProps {
@@ -426,10 +431,7 @@ export interface HTMLComponentProps<T extends Element> extends BaseProps {
 export type IntrinsicElementsHTML = {
 	[TKey in keyof HTMLElementTagNameMap]?: HTMLElementAttributes<TKey> & HTMLComponentProps<HTMLElementTagNameMap[TKey]> & EventAttributes<HTMLElementTagNameMap[TKey]>;
 };
-export type IntrinsicElementsSVG = {
-	[TKey in SVGOnlyElementKeys]?: SVGElementAttributes<TKey> & HTMLComponentProps<SVGElementTagNameMap[TKey]> & EventAttributes<SVGElementTagNameMap[TKey]>;
-};
-export type IntrinsicElementsCombined = IfTsxDomTypeConfig<"html", IntrinsicElementsHTML, unknown> & IfTsxDomTypeConfig<"svg", IntrinsicElementsSVG, unknown>;
+export type IntrinsicElementsCombined = IntrinsicElementsHTML & (ConfigureJSXElement["svg"] extends false ? IntrinsicElementsHTML : unknown);
 export interface CustomElementsHTML {
 }
 export declare namespace JSX {

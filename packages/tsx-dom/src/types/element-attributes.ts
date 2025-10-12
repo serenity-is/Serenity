@@ -10,14 +10,13 @@ export type ElementAttributes<TElement extends Element, TAttributes extends HTML
     [TKey in (keyof TElement & keyof TAttributes) | SpecialKeys<TElement>]?: TAttributes[TKey];
 };
 
-export type PropertiesOfFix<TFixes, TName> = TName extends keyof TFixes ? TFixes[TName] : unknown;
+type PropertiesOfFix<TFixes, TName> = TName extends keyof TFixes ? TFixes[TName] : unknown;
 
 /**
- * Some tags properties can't be inferred correctly.
- * To fix these properties, this manual override is defined.
+ * Some tags properties can't be inferred correctly. To fix these properties, this manual override is defined.
  * Since it's an interface, users can even override them from outside.
  */
-export interface HTMLTagFixes {
+interface HTMLTagFixes {
     meta: {
         charset?: string;
         property?: string;
@@ -38,4 +37,5 @@ export type SVGElementAttributes<TName extends keyof SVGElementTagNameMap> = Ele
 >;
 
 export type SVGOnlyElementKeys = Exclude<keyof SVGElementTagNameMap, SVGAndHTMLElementKeys>;
+
 export type SVGAndHTMLElementKeys = keyof SVGElementTagNameMap & keyof HTMLElementTagNameMap;
