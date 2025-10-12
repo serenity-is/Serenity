@@ -19,7 +19,9 @@
     "dist/**/*.ts",
     "dist/**/*.css",
     "dist/**/*.js",
-    "dist/**/*.map"
+    "dist/**/*.map",
+    "LICENSE.md",
+    "NOTICE.md"
   ],
   "scripts": {
     "build": "node build/build",
