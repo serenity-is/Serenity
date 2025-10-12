@@ -1,5 +1,6 @@
 import type { JSXElement } from "./jsx-element";
 import type { CustomElementsHTML, IntrinsicElementsCombined } from "./intrinsic-elements";
+import type { Ref } from "./components";
 
 export declare namespace JSX {
     type Element = JSXElement;
@@ -9,7 +10,15 @@ export declare namespace JSX {
     }
 
     interface ElementChildrenAttribute {
-        children: unknown;
+        children: {};
+    }
+
+    interface IntrinsicAttributes {
+
+    }
+
+    interface IntrinsicClassAttributes<T> {
+        ref?: Ref<T>;
     }
 
     interface IntrinsicElements extends IntrinsicElementsCombined, CustomElementsHTML { }

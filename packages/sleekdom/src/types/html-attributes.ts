@@ -1,7 +1,7 @@
-import { ClassNameType } from "./class-name";
+import type { ClassNames } from "./classname";
 import type { StyleProperties } from "./style-attributes";
 
-export interface HTMLAttributes {
+export interface HTMLAttributes<T> {
     accept?: string;
     acceptCharset?: string;
     accessKey?: string;
@@ -21,22 +21,25 @@ export interface HTMLAttributes {
     cellSpacing?: number | string;
     charset?: string;
     checked?: boolean;
-    class?: ClassNameType;
+    class?: ClassNames;
+    className?: ClassNames;
     cols?: number;
     colSpan?: number;
+    colspan?: number;
     content?: string;
     contentEditable?: boolean;
     controls?: boolean;
     coords?: string;
     crossOrigin?: string;
     data?: string;
+    dataset?: { [key: string]: string } | undefined
     dateTime?: string;
     default?: boolean;
     defer?: boolean;
     dir?: "auto" | "rtl" | "ltr";
     disabled?: boolean;
     disableRemotePlayback?: boolean;
-    download?: string;
+    download?: string | boolean;
     decoding?: "sync" | "async" | "auto";
     draggable?: "true" | "false";
     enctype?: string;
@@ -58,6 +61,7 @@ export interface HTMLAttributes {
     htmlFor?: string;
     httpEquiv?: string;
     id?: string;
+    innerText?: string | undefined
     inputMode?: string;
     integrity?: string;
     is?: string;
@@ -91,19 +95,20 @@ export interface HTMLAttributes {
     preload?: string;
     readOnly?: boolean;
     referrerPolicy?:
-        | "no-referrer"
-        | "no-referrer-when-downgrade"
-        | "origin"
-        | "origin-when-cross-origin"
-        | "same-origin"
-        | "strict-origin"
-        | "strict-origin-when-cross-origin"
-        | "unsafe-url";
+    | "no-referrer"
+    | "no-referrer-when-downgrade"
+    | "origin"
+    | "origin-when-cross-origin"
+    | "same-origin"
+    | "strict-origin"
+    | "strict-origin-when-cross-origin"
+    | "unsafe-url";
     rel?: string;
     required?: boolean;
     role?: string;
     rows?: number;
     rowSpan?: number;
+    rowspan?: number;
     sandbox?: string;
     scope?: string;
     scrolling?: string;
@@ -114,6 +119,7 @@ export interface HTMLAttributes {
     slot?: string;
     span?: number;
     spellcheck?: boolean;
+    spellCheck?: boolean;
     src?: string;
     srcdoc?: string;
     srclang?: string;
@@ -123,7 +129,9 @@ export interface HTMLAttributes {
     style?: string | StyleProperties;
     summary?: string;
     tabIndex?: number;
+    tabindex?: number;
     target?: string;
+    textContent?: string | undefined
     title?: string;
     type?: string;
     useMap?: string;

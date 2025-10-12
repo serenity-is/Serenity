@@ -76,9 +76,14 @@ importers:
 
   packages/corelib:
     dependencies:
+      '@serenity-is/sleekdom':
+        specifier: workspace:*
+        version: link:../sleekdom
       '@serenity-is/sleekgrid':
         specifier: workspace:*
         version: link:../sleekgrid
+
+  packages/sleekdom: {}
 
   packages/sleekgrid: {}
 

@@ -3,7 +3,6 @@
     "compilerOptions": {
         "baseUrl": ".",
         "jsx": "react-jsx",
-        "jsxImportSource": "../src",
         "noImplicitAny": false,
         "declaration": false,
         "sourceMap": true,

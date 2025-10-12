@@ -1,4 +1,4 @@
-import { FC } from 'jsx-dom';
+import { FunctionComponent, type ComponentChildren } from '@serenity-is/sleekdom';
 import { StringEditor } from '../editors/stringeditor';
 import { FileUploadEditor } from '../editors/uploadeditors';
 import { PropertyGrid } from './propertygrid';
@@ -195,7 +195,7 @@ it('create svg links with xlink namespace', function () {
     const element = (
         <svg>
             <text id="text">Test</text>
-            <use xlinkHref="#text" />
+            <use xlink-href="#text" />
             <use xlink-invalid-attribute="#text" />
         </svg>
     );
@@ -239,8 +239,8 @@ it('assign styles', function () {
 
 it('assign styles with dashed property names', function () {
     const style = {
-        paddingTop: 10,
-        fontSize: 12,
+        paddingTop: "10",
+        fontSize: "12",
     };
 
     // ts-expect-error TODO: update the types
@@ -445,10 +445,10 @@ function getfragmentHtml(fragment: DocumentFragment): string {
 }
 
 //#region Make sure these typings still work.
-const NoProps: FC = () => <span>foo</span>;
-const OptionalProps: FC<{ foo?: string }> = ({ foo }) => <span>{foo?.length || 0}</span>;
-const RequiredProps: FC<{ foo: string }> = ({ foo }) => <span>{foo.length}</span>;
-const Children: FC = (_, children) => <div>{children}</div>;
+const NoProps: FunctionComponent = () => <span>foo</span>;
+const OptionalProps: FunctionComponent<{ foo?: string }> = ({ foo }) => <span>{foo?.length || 0}</span>;
+const RequiredProps: FunctionComponent<{ foo: string }> = ({ foo }) => <span>{foo.length}</span>;
+const Children: FunctionComponent = ({ children }: { children: ComponentChildren }) => <div>{children}</div>;
 const _ = <>
     some text
     <NoProps />
@@ -460,7 +460,7 @@ const _ = <>
             <input type="button"
                 onClick={console.log}
                 style=""
-                autoCapitalize='off' />
+                autocapitalize='off' />
             <div style={{}} contentEditable></div>
             <svg id='svg'>
                 <g>
@@ -523,7 +523,7 @@ describe('jsx: fragments', () => {
 });
 
 describe('jsx: components', () => {
-    const Foo: FC<{ bar?: string }> = ({ bar, children }) => {
+    const Foo: FunctionComponent<{ bar?: string }> = ({ bar, children }) => {
         return <div>{bar ?? ''} {children}</div>;
     };
 

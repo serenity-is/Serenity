@@ -4,9 +4,13 @@ type Simplify<T> = { [KeyType in keyof T]: T[KeyType] } & {};
 export type EventHandler<TTarget extends EventTarget, TEvent extends Event> =
     (this: TTarget, event: Omit<TEvent, "currentTarget"> & { readonly currentTarget: TTarget }) => void;
 
-export type WithEventOptions<T extends Record<string, any>> = Simplify<{
-    [TKey in Extract<keyof T, string> as `${TKey}Capture`]?: T[TKey] | { listener: T[TKey]; options: AddEventListenerOptions };
-}>;
+export type WithEventCapture<T extends Record<string, any>> = Simplify<
+    T & {
+        // Add an additional <name>Capture property with the same type.
+        [TKey in Extract<keyof T, string> as `${TKey}Capture`]?: T[TKey];
+    }
+>;
+
 
 export interface EventAttributesBase<T extends EventTarget> {
     // Image Events
@@ -75,6 +79,7 @@ export interface EventAttributesBase<T extends EventTarget> {
     onClick?: EventHandler<T, MouseEvent>;
     onContextMenu?: EventHandler<T, MouseEvent>;
     onDblClick?: EventHandler<T, MouseEvent>;
+    onDoubleClick?: EventHandler<T, MouseEvent>;
     onAuxClick?: EventHandler<T, MouseEvent>;
     onDrag?: EventHandler<T, DragEvent>;
     onDragEnd?: EventHandler<T, DragEvent>;
@@ -192,4 +197,6 @@ export interface EventAttributesBase<T extends EventTarget> {
     onStorage?: EventHandler<T, StorageEvent>;
 }
 
-export type EventAttributes<T extends EventTarget> = WithEventOptions<EventAttributesBase<T>>;
+export type EventAttributes<T extends EventTarget> = WithEventCapture<EventAttributesBase<T>>;
+
+

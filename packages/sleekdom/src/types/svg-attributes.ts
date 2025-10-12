@@ -1,6 +1,6 @@
 import { HTMLAttributes } from "./html-attributes";
 
-export interface SVGAttributes extends HTMLAttributes {
+export interface SVGAttributes<T> extends HTMLAttributes<T> {
     accumulate?: "none" | "sum";
     additive?: "replace" | "sum";
     amplitude?: number | string;

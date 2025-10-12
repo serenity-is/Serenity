@@ -1,5 +1,5 @@
 {
-  "name": "@serenity-is/tsx-dom",
+  "name": "@serenity-is/sleekdom",
   "version": "0.0.1",
   "description": "Use JSX syntax to create DOM elements with full TypeScript support",
   "type": "module",
@@ -12,8 +12,8 @@
       "main": "./dist/index.js",
       "import": "./dist/index.js"
     },
-    "./jsx-runtime": "./jsx-runtime.js",
-    "./jsx-dev-runtime": "./jsx-runtime.js"
+    "./jsx-runtime": "./dist/jsx-runtime.js",
+    "./jsx-dev-runtime": "./dist/jsx-runtime.js"
   },
   "files": [
     "dist/**/*.ts",

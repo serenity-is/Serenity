@@ -1,10 +1,23 @@
+export interface BasicClassList {
+	(value: Element): void;
+	readonly size: number;
+	readonly value: string;
+	add(...tokens: string[]): void;
+	remove(...tokens: string[]): void;
+	toggle(token: string, force?: boolean): void;
+	contains(token: string): boolean;
+}
+export type ClassName = string | {
+	[key: string]: boolean;
+} | false | null | undefined | ClassName[];
+export type ClassNames = ClassName | BasicClassList | Iterable<string> | DOMTokenList;
 export interface ConfigureJSXElement {
 	svg: boolean;
 }
-export type JSXElement = HTMLElement & (ConfigureJSXElement["svg"] extends false ? never : SVGElement);
-export type RefType<T> = {
-	current: T | null;
-};
+/**
+ * This technically should include `DocumentFragment` as well, but a lot of web APIs expect an `Element`.
+ */
+export type JSXElement = HTMLElement | (ConfigureJSXElement["svg"] extends false ? never : SVGElement);
 export type RemoveIndex<T> = {
 	[K in keyof T as string extends K ? never : number extends K ? never : K]: T[K];
 };
@@ -16,19 +29,40 @@ export type StyleAttributes = Partial<ExcludeMethods<RemoveIndex<Omit<CSSStyleDe
 export type StyleProperties = Partial<Pick<CSSStyleDeclaration, {
 	[K in keyof CSSStyleDeclaration]: K extends string ? CSSStyleDeclaration[K] extends string ? K : never : never;
 }[keyof CSSStyleDeclaration]>>;
-export type ComponentChild = ComponentChild[] | JSXElement | string | number | boolean | undefined | null;
-export type ComponentChildren = ComponentChild | ComponentChild[];
+export type ShadowRootContainer = {
+	ref: Ref<ShadowRoot> | ((value: ShadowRoot) => void);
+	attr: {
+		mode: ShadowRootMode;
+	};
+	children: any;
+};
+export type ComponentChild = string | number | Iterable<ComponentChild> | Array<ComponentChild> | JSXElement | NodeList | ChildNode | HTMLCollection | ShadowRootContainer | DocumentFragment | Text | Comment | boolean | null | undefined;
+export type ComponentChildren = ComponentChild[] | ComponentChild;
+export interface ComponentClass<P = {}, T extends Node = JSXElement> {
+	new (props: P): ComponentClass<P, T>;
+	render(): JSXElement | null;
+	defaultProps?: Partial<P> | undefined;
+	readonly props?: P & {
+		children?: ComponentChildren;
+	};
+	displayName?: string | undefined;
+}
 export interface BaseProps {
 	children?: ComponentChildren;
 }
-export type FC<T = BaseProps> = (props: T) => JSXElement;
+export type FunctionComponent<P = BaseProps, T extends Node = JSXElement> = (props: P & {
+	children?: ComponentChildren;
+}) => T | null;
+export type ComponentType<P = {}, T extends Node = JSXElement> = ComponentClass<P, T> | FunctionComponent<P, T>;
 export type ComponentAttributes = {
 	[s: string]: string | number | boolean | undefined | null | StyleAttributes | EventListenerOrEventListenerObject;
 };
-export type ClassNameRecord = Record<string, null | undefined | boolean>;
-export type ClassNameEntry = string | null | undefined | false | ClassNameRecord;
-export type ClassNameType = ClassNameEntry | ClassNameEntry[];
-export interface HTMLAttributes {
+export type RefObject<T> = {
+	current: T | null;
+};
+export type RefCallback<T> = (instance: T) => void;
+export type Ref<T> = RefCallback<T> | RefObject<T> | null;
+export interface HTMLAttributes<T> {
 	accept?: string;
 	acceptCharset?: string;
 	accessKey?: string;
@@ -48,22 +82,27 @@ export interface HTMLAttributes {
 	cellSpacing?: number | string;
 	charset?: string;
 	checked?: boolean;
-	class?: ClassNameType;
+	class?: ClassNames;
+	className?: ClassNames;
 	cols?: number;
 	colSpan?: number;
+	colspan?: number;
 	content?: string;
 	contentEditable?: boolean;
 	controls?: boolean;
 	coords?: string;
 	crossOrigin?: string;
 	data?: string;
+	dataset?: {
+		[key: string]: string;
+	} | undefined;
 	dateTime?: string;
 	default?: boolean;
 	defer?: boolean;
 	dir?: "auto" | "rtl" | "ltr";
 	disabled?: boolean;
 	disableRemotePlayback?: boolean;
-	download?: string;
+	download?: string | boolean;
 	decoding?: "sync" | "async" | "auto";
 	draggable?: "true" | "false";
 	enctype?: string;
@@ -85,6 +124,7 @@ export interface HTMLAttributes {
 	htmlFor?: string;
 	httpEquiv?: string;
 	id?: string;
+	innerText?: string | undefined;
 	inputMode?: string;
 	integrity?: string;
 	is?: string;
@@ -123,6 +163,7 @@ export interface HTMLAttributes {
 	role?: string;
 	rows?: number;
 	rowSpan?: number;
+	rowspan?: number;
 	sandbox?: string;
 	scope?: string;
 	scrolling?: string;
@@ -133,6 +174,7 @@ export interface HTMLAttributes {
 	slot?: string;
 	span?: number;
 	spellcheck?: boolean;
+	spellCheck?: boolean;
 	src?: string;
 	srcdoc?: string;
 	srclang?: string;
@@ -142,7 +184,9 @@ export interface HTMLAttributes {
 	style?: string | StyleProperties;
 	summary?: string;
 	tabIndex?: number;
+	tabindex?: number;
 	target?: string;
+	textContent?: string | undefined;
 	title?: string;
 	type?: string;
 	useMap?: string;
@@ -151,7 +195,7 @@ export interface HTMLAttributes {
 	width?: number | string;
 	wrap?: string;
 }
-export interface SVGAttributes extends HTMLAttributes {
+export interface SVGAttributes<T> extends HTMLAttributes<T> {
 	accumulate?: "none" | "sum";
 	additive?: "replace" | "sum";
 	amplitude?: number | string;
@@ -256,9 +300,9 @@ export interface SVGAttributes extends HTMLAttributes {
 	y?: number | string;
 	yChannelSelector?: string;
 }
-export type SpecialKeys<T extends Element> = T extends HTMLLabelElement | HTMLOutputElement ? "for" | "class" | "is" : "class" | "is";
+export type SpecialKeys<T extends Element> = T extends HTMLLabelElement | HTMLOutputElement ? "for" | "class" | "is" : "class" | "is" | "spellCheck";
 /** Figure out which of the attributes exist for a specific element */
-export type ElementAttributes<TElement extends Element, TAttributes extends HTMLAttributes | SVGAttributes> = {
+export type ElementAttributes<TElement extends Element, TAttributes extends HTMLAttributes<TElement> | SVGAttributes<TElement>> = {
 	[TKey in (keyof TElement & keyof TAttributes) | SpecialKeys<TElement>]?: TAttributes[TKey];
 };
 export type PropertiesOfFix<TFixes, TName> = TName extends keyof TFixes ? TFixes[TName] : unknown;
@@ -273,7 +317,11 @@ export interface HTMLTagFixes {
 	};
 }
 /** Figure out which of the HTML attributes exist for a specific element */
-export type HTMLElementAttributes<TName extends keyof HTMLElementTagNameMap> = ElementAttributes<HTMLElementTagNameMap[TName], HTMLAttributes> & PropertiesOfFix<HTMLTagFixes, TName>;
+export type HTMLElementAttributes<TName extends keyof HTMLElementTagNameMap> = ElementAttributes<HTMLElementTagNameMap[TName], HTMLAttributes<HTMLElementTagNameMap[TName]>> & PropertiesOfFix<HTMLTagFixes, TName>;
+/** Figure out which of the SVG attributes exist for a specific element */
+export type SVGElementAttributes<TName extends keyof SVGElementTagNameMap> = ElementAttributes<SVGElementTagNameMap[TName], SVGAttributes<SVGElementTagNameMap[TName]>>;
+export type SVGOnlyElementKeys = Exclude<keyof SVGElementTagNameMap, SVGAndHTMLElementKeys>;
+export type SVGAndHTMLElementKeys = keyof SVGElementTagNameMap & keyof HTMLElementTagNameMap;
 export type Simplify<T> = {
 	[KeyType in keyof T]: T[KeyType];
 } & {};
@@ -281,11 +329,8 @@ export type Simplify<T> = {
 export type EventHandler<TTarget extends EventTarget, TEvent extends Event> = (this: TTarget, event: Omit<TEvent, "currentTarget"> & {
 	readonly currentTarget: TTarget;
 }) => void;
-export type WithEventOptions<T extends Record<string, any>> = Simplify<{
-	[TKey in Extract<keyof T, string> as `${TKey}Capture`]?: T[TKey] | {
-		listener: T[TKey];
-		options: AddEventListenerOptions;
-	};
+export type WithEventCapture<T extends Record<string, any>> = Simplify<T & {
+	[TKey in Extract<keyof T, string> as `${TKey}Capture`]?: T[TKey];
 }>;
 export interface EventAttributesBase<T extends EventTarget> {
 	onLoad?: EventHandler<T, Event>;
@@ -337,6 +382,7 @@ export interface EventAttributesBase<T extends EventTarget> {
 	onClick?: EventHandler<T, MouseEvent>;
 	onContextMenu?: EventHandler<T, MouseEvent>;
 	onDblClick?: EventHandler<T, MouseEvent>;
+	onDoubleClick?: EventHandler<T, MouseEvent>;
 	onAuxClick?: EventHandler<T, MouseEvent>;
 	onDrag?: EventHandler<T, DragEvent>;
 	onDragEnd?: EventHandler<T, DragEvent>;
@@ -415,23 +461,31 @@ export interface EventAttributesBase<T extends EventTarget> {
 	onSecurityPolicyViolation?: EventHandler<T, SecurityPolicyViolationEvent>;
 	onStorage?: EventHandler<T, StorageEvent>;
 }
-export type EventAttributes<T extends EventTarget> = WithEventOptions<EventAttributesBase<T>>;
+export type EventAttributes<T extends EventTarget> = WithEventCapture<EventAttributesBase<T>>;
 export interface CustomElementsHTML {
 }
 export interface HTMLComponentProps<T extends Element> extends BaseProps {
-	dangerouslySetInnerHTML?: string;
+	dangerouslySetInnerHTML?: {
+		__html: string;
+	};
+	on?: Record<string, Function>;
+	onCapture?: Record<string, Function>;
 	/**
 	 * This is essentially a reverse "is" attribute.
 	 * If you specify it, the generated tag will be tsxTag and it will receive an "is" attribute with the tag you specified in your JSX.
 	 * This is needed because we can't make the is-property associate with the correct component props.
 	 */
 	tsxTag?: keyof HTMLElementTagNameMap | keyof SVGElementTagNameMap;
-	ref?: RefType<T>;
+	ref?: Ref<T>;
 }
+export type DOMAttributes<T extends Element> = EventAttributes<T> & HTMLComponentProps<T>;
 export type IntrinsicElementsHTML = {
 	[TKey in keyof HTMLElementTagNameMap]?: HTMLElementAttributes<TKey> & HTMLComponentProps<HTMLElementTagNameMap[TKey]> & EventAttributes<HTMLElementTagNameMap[TKey]>;
 };
-export type IntrinsicElementsCombined = IntrinsicElementsHTML & (ConfigureJSXElement["svg"] extends false ? IntrinsicElementsHTML : unknown);
+export type IntrinsicElementsSVG = {
+	[TKey in SVGOnlyElementKeys]?: SVGElementAttributes<TKey> & HTMLComponentProps<SVGElementTagNameMap[TKey]> & EventAttributes<SVGElementTagNameMap[TKey]>;
+};
+export type IntrinsicElementsCombined = IntrinsicElementsHTML & (ConfigureJSXElement["svg"] extends false ? void : IntrinsicElementsSVG);
 export interface CustomElementsHTML {
 }
 export declare namespace JSX {
@@ -440,12 +494,70 @@ export declare namespace JSX {
 		props: unknown;
 	}
 	interface ElementChildrenAttribute {
-		children: unknown;
+		children: {};
+	}
+	interface IntrinsicAttributes {
+	}
+	interface IntrinsicClassAttributes<T> {
+		ref?: Ref<T>;
 	}
 	interface IntrinsicElements extends IntrinsicElementsCombined, CustomElementsHTML {
 	}
 }
-export declare function jsx(tag: any, props: any): any;
-export declare const Fragment: unique symbol;
+export declare function createFactory(tag: string): any;
+export declare function Fragment(attr: {
+	children?: ComponentChildren | undefined;
+}): any;
+export declare class Component<T = any> {
+	static isComponent: boolean;
+	constructor(props: T & {
+		children?: ComponentChildren;
+		ref?: Ref<any>;
+	});
+	readonly props: T & {
+		children?: ComponentChildren;
+		ref?: Ref<any>;
+	};
+	render(): JSXElement | null;
+}
+export declare function jsx<K extends keyof HTMLElementTagNameMap, T extends HTMLElementTagNameMap[K]>(type: K, props?: (HTMLAttributes<T> & {
+	children?: ComponentChildren;
+	ref?: Ref<T>;
+}) | null, key?: string): T;
+export declare function jsx<K extends keyof SVGElementTagNameMap, T extends SVGElementTagNameMap[K]>(type: K, props?: (SVGAttributes<T> & {
+	children?: ComponentChildren;
+	ref?: Ref<T>;
+}) | null, key?: string): SVGElement;
+export declare function jsx<T extends Element>(type: string, props?: {
+	children?: ComponentChildren;
+	ref?: Ref<T>;
+} & DOMAttributes<T> | null, key?: string): T;
+export declare function jsx<P extends {}, T extends Element>(type: ComponentType<P, T>, props?: P & {
+	children?: ComponentChildren;
+	ref?: Ref<T>;
+} | null, key?: string): T;
+export declare function jsx<T extends Element>(type: string, props?: {
+	children?: ComponentChildren;
+} | null, key?: string): T;
+export declare function createElement(tag: any, attr: any, ...children: any[]): any;
+export declare function createRef<T = any>(): RefObject<T>;
+export declare function useClassList(initialValue?: ClassNames): BasicClassList;
+export declare function useText(initialValue?: string): readonly [
+	Text,
+	(value: string) => void
+];
+declare function identity<T>(value: T): T;
+export declare function useMemo<T>(factory: () => T): T;
+export declare function forwardRef<T = Node, P = {}>(render: (props: P, ref: Ref<T>) => JSXElement): FunctionComponent<P & {
+	ref?: Ref<T>;
+}>;
+export declare function useImperativeHandle<T>(ref: Ref<T>, init: () => T, _deps?: unknown): void;
+
+export {
+	Fragment as StrictMode,
+	createRef as useRef,
+	identity as memo,
+	identity as useCallback,
+};
 
 export {};

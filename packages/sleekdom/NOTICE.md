@@ -1,6 +1,6 @@
 # Third-party notices and license attributions
 
-Package: @serenity-is/tsx-dom
+Package: @serenity-is/sleekdom
 
 Primary license: MIT (see `LICENSE.md`)
 
