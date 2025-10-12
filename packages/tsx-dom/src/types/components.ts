@@ -1,4 +1,4 @@
-import type { JSXElement } from "./base-types";
+import type { JSXElement } from "./jsx-element";
 import type { StyleAttributes } from "./style-attributes";
 
 export type ComponentChild = ComponentChild[] | JSXElement | string | number | boolean | undefined | null;
@@ -14,3 +14,5 @@ export type FC<T = BaseProps> = (props: T) => JSXElement;
 export type ComponentAttributes = {
     [s: string]: string | number | boolean | undefined | null | StyleAttributes | EventListenerOrEventListenerObject;
 };
+
+export type RefType<T> = { current: T | null };

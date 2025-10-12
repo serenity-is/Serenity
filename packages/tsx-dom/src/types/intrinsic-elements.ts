@@ -1,5 +1,5 @@
-import type { ConfigureJSXElement, RefType } from "./base-types";
-import type { BaseProps } from "./components";
+import type { ConfigureJSXElement } from "./jsx-element";
+import type { BaseProps, RefType } from "./components";
 import type { HTMLElementAttributes, SVGElementAttributes, SVGOnlyElementKeys } from "./element-attributes";
 import type { EventAttributes } from "./event-attributes";
 
