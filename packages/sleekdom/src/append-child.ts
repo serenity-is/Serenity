@@ -1,35 +1,35 @@
-import { attachRef } from "./ref"
-import { isShadowRoot } from "./shadow"
-import type { ComponentChildren } from "./types"
-import { isArrayLike, isChildrenHook, isElement, isNumber, isString } from "./util"
+import { attachRef } from "./ref";
+import { isShadowRoot } from "./shadow";
+import type { ComponentChildren } from "./types";
+import { isArrayLike, isChildrenHook, isElement, isNumber, isString } from "./util";
 
-export function appendChild(
-    child: ComponentChildren,
-    node: Node
-) {
-    if (isArrayLike(child)) {
-        for (const c of [...(child as any[])]) {
-            appendChild(c, node)
-        }        
-    } else if (isString(child) || isNumber(child)) {
-        appendChildToNode(document.createTextNode(child as any), node)
-    } else if (child === null) {
-        appendChildToNode(document.createComment(""), node)
-    } else if (isElement(child)) {
-        appendChildToNode(child, node)
-    } else if (isShadowRoot(child)) {
-        const shadowRoot = (node as HTMLElement).attachShadow(child.attr)
-        appendChild(child.children, shadowRoot)
-        attachRef(child.ref, shadowRoot)
-    } else if (isChildrenHook(child)) {
-        appendChild(child.jsxDomChildrenHook.call(child, node), node)
+function appendChild(parent: Node, child: Node) {
+    if (parent instanceof window.HTMLTemplateElement) {
+        parent.content.appendChild(child);
+    } else {
+        parent.appendChild(child);
     }
 }
 
-function appendChildToNode(child: Node, node: Node) {
-    if (node instanceof window.HTMLTemplateElement) {
-        node.content.appendChild(child)
-    } else {
-        node.appendChild(child)
+export function appendChildren(
+    parent: Node,
+    children: ComponentChildren,
+) {
+    if (isArrayLike(children)) {
+        for (const child of [...(children as any[])]) {
+            appendChildren(parent, child);
+        }        
+    } else if (isString(children) || isNumber(children)) {
+        appendChild(parent, document.createTextNode(children as any));
+    } else if (children === null) {
+        appendChild(parent, document.createComment(""));
+    } else if (isElement(children)) {
+        appendChild(parent, children);
+    } else if (isShadowRoot(children)) {
+        const shadowRoot = (parent as HTMLElement).attachShadow(children.attr);
+        appendChildren(shadowRoot, children.children);
+        attachRef(children.ref, shadowRoot);
+    } else if (isChildrenHook(children)) {
+        appendChildren(parent, children.jsxDomChildrenHook.call(children, parent));
     }
 }

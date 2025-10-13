@@ -11,6 +11,7 @@ function normalizeAttribute(s: string, separator: string) {
 }
 
 const propToAttr: Record<string, string> = {
+    className: "class",
     htmlFor: "for",
     tabIndex: "tabindex",
     spellCheck: "spellcheck",
@@ -74,7 +75,6 @@ function setAttribute(key: string, value: any, node: Element & HTMLOrSVGElement)
             return;
 
         case "class":
-        case "className":
             if (isFunction(value)) {
                 value(node)
             } else {
@@ -84,7 +84,7 @@ function setAttribute(key: string, value: any, node: Element & HTMLOrSVGElement)
 
         case "ref":
         case "namespaceURI":
-            return;
+            return; 
 
         case "style":
             setStyle(node, value)

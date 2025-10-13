@@ -1,4 +1,4 @@
-import { appendChild } from "./append-child"
+import { appendChildren } from "./append-child"
 import { initComponentClass } from "./component"
 import { attachRef } from "./ref"
 import { setAttributes } from "./set-attributes"
@@ -47,7 +47,7 @@ export function jsx(tag: any, { children, ...attr }: { children?: ComponentChild
             ? document.createElementNS(attr.namespaceURI, tag)
             : document.createElement(tag)
         setAttributes(attr, node)
-        appendChild(children, node)
+        appendChildren(node, children)
 
         // Select `option` elements in `select`
         if (node instanceof window.HTMLSelectElement && attr.value != null) {
