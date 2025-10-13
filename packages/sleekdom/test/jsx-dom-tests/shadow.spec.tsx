@@ -1,5 +1,5 @@
 /** @jsxImportSource ../../src */
-import { createRef, ShadowRoot as Shadow } from "../../src"
+import { createRef, ShadowRootNode } from "../../src"
 
 describe("shadow", () => {
 
@@ -7,7 +7,7 @@ describe("shadow", () => {
     expect(
       (
         <div>
-          <Shadow mode="open">world</Shadow>
+          <ShadowRootNode mode="open">world</ShadowRootNode>
         </div>
       ).outerHTML
     ).toBe("<div></div>")
@@ -16,9 +16,9 @@ describe("shadow", () => {
   it("supports mode `open`", () => {
     const div = (
       <div>
-        <Shadow mode="open">
+        <ShadowRootNode mode="open">
           <i>world</i>
-        </Shadow>
+        </ShadowRootNode>
       </div>
     ) as HTMLDivElement
 
@@ -32,9 +32,9 @@ describe("shadow", () => {
 
     const div = (
       <div>
-        <Shadow mode="closed" ref={ref}>
+        <ShadowRootNode mode="closed" ref={ref}>
           <b>world</b>
-        </Shadow>
+        </ShadowRootNode>
       </div>
     ) as HTMLDivElement
 
@@ -46,9 +46,9 @@ describe("shadow", () => {
     const ref1 = createRef<ShadowRoot>()
     Object(
       <div>
-        <Shadow ref={ref1} mode="open">
+        <ShadowRootNode ref={ref1} mode="open">
           world
-        </Shadow>
+        </ShadowRootNode>
       </div>
     )
 
@@ -57,9 +57,9 @@ describe("shadow", () => {
     const ref2 = vi.fn<any>()
     Object(
       <div>
-        <Shadow ref={ref2} mode="open">
+        <ShadowRootNode ref={ref2} mode="open">
           world
-        </Shadow>
+        </ShadowRootNode>
       </div>
     )
 

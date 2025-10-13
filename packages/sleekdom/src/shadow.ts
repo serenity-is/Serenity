@@ -6,7 +6,7 @@ const enum SleekDomTypeKeys {
     ShadowRoot = "ShadowRoot",
 }
 
-export function ShadowRoot({
+export function ShadowRootNode({
     children,
     ref,
     ...attr

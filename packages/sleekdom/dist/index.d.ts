@@ -649,6 +649,12 @@ export declare namespace JSX {
 	interface IntrinsicElements extends IntrinsicElementsCombined, CustomElementsHTML {
 	}
 }
+/**
+ * Convert a `value` to a className string.
+ * `value` can be a string, an array or a `Dictionary<boolean>`.
+ */
+export declare function className(value: any): string;
+export declare const SVGNamespace = "http://www.w3.org/2000/svg";
 export declare function createFactory(tag: string): any;
 export declare function Fragment(attr: {
 	children?: ComponentChildren | undefined;
@@ -697,17 +703,18 @@ export declare function forwardRef<T = Node, P = {}>(render: (props: P, ref: Ref
 	ref?: Ref<T>;
 }>;
 export declare function useImperativeHandle<T>(ref: Ref<T>, init: () => T, _deps?: unknown): void;
-declare function ShadowRoot$1({ children, ref, ...attr }: ShadowRootInit & {
+export declare function ShadowRootNode({ children, ref, ...attr }: ShadowRootInit & {
 	ref?: Ref<ShadowRoot>;
 	children?: ComponentChildren;
 }): any;
 
 export {
 	Fragment as StrictMode,
-	ShadowRoot$1 as ShadowRoot,
+	createElement as h,
 	createRef as useRef,
 	identity as memo,
 	identity as useCallback,
+	jsx as jsxs,
 };
 
 export {};

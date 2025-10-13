@@ -1,5 +1,5 @@
 /** @jsxImportSource ../../src */
-import { SVGNamespace } from "../../src/jsx-impl"
+import { SVGNamespace } from "../../src/"
 
 describe("SVG", () => {
   const namespace = SVGNamespace

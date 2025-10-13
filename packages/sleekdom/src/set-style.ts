@@ -4,12 +4,12 @@
  * This source code is licensed under the MIT license found on
  * https://github.com/facebook/react/blob/b87aabdfe1b7461e7331abb3601d9e6bb27544bc/LICENSE
  */
-import { keys } from "./util"
+import { forEach, isNumber, isObject, isString, keys } from "./util"
 
 /**
  * CSS properties which accept numbers but are not in units of "px".
  */
-export const isUnitlessNumber : Record<string, number>= {
+const isUnitlessNumber : Record<string, number>= {
     animationIterationCount: 0,
     borderImageOutset: 0,
     borderImageSlice: 0,
@@ -79,3 +79,25 @@ keys(isUnitlessNumber).forEach((prop) => {
         isUnitlessNumber[prefixKey(prefix, prop)] = 0 // isUnitlessNumber[prop]
     })
 })
+
+export function setStyle(node: Element & HTMLOrSVGElement, value?: any): void {
+    if (value == null || value === false) {
+        return
+    } else if (Array.isArray(value)) {
+        value.forEach(v => setStyle(node, v))
+    } else if (isString(value)) {
+        node.setAttribute("style", value)
+    } else if (isObject(value)) {
+        forEach(value, (val, key) => {
+            if (key.indexOf("-") === 0) {
+                // CSS custom properties (variables) start with `-` (e.g. `--my-variable`)
+                // and must be assigned via `setProperty`.
+                (node as HTMLElement).style.setProperty(key, val)
+            } else if (isNumber(val) && isUnitlessNumber[key] !== 0) {
+                ((node as HTMLElement).style as any)[key] = val + "px"
+            } else {
+                ((node as HTMLElement).style as any)[key] = val
+            }
+        })
+    }
+}

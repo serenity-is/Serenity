@@ -13,7 +13,7 @@
       "import": "./dist/index.js"
     },
     "./jsx-runtime": "./dist/jsx-runtime.js",
-    "./jsx-dev-runtime": "./dist/jsx-runtime.js"
+    "./jsx-dev-runtime": "./dist/jsx-dev-runtime.js"
   },
   "files": [
     "dist/**/*.ts",
