@@ -11,7 +11,7 @@ forth below. Serenity project reserves all other rights not expressly granted, w
 estoppel or otherwise.
 
 -----------------------------------------------------------------
-alex-kinokon/jsx-dom
+jsx-dom
 
 Original source: https://github.com/alex-kinokon/jsx-dom
 
@@ -46,7 +46,7 @@ OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 -----------------------------------------------------------------
-Lusito/tsx-dom
+tsx-dom
 
 Original source: https://github.com/Lusito/tsx-dom
 
