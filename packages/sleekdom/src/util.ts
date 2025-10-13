@@ -59,7 +59,7 @@ export function isChildrenHook(val: any): val is { jsxDomChildrenHook: (parent: 
     return isObject(val) && isFunction(val.jsxDomChildrenHook);
 }
 
-export function isSignalLike<T = any>(val: any): val is SignalLike<T> {
+export function isSignalLike(val: any): val is SignalLike<any> {
     return isObject(val) && isFunction(val.subscribe) && isFunction(val.peek) && 'value' in val;
 }
 

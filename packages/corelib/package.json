@@ -5,10 +5,10 @@
   "bugs": "https://github.com/serenity-is/serenity/issues",
   "description": "Serenity Core Library",
   "dependencies": {
-    "@serenity-is/sleekdom": "workspace:*",
     "@serenity-is/sleekgrid": "workspace:*"
   },
   "devDependencies": {
+    "@serenity-is/sleekdom": "workspace:*"
   },
   "exports": {
     ".": {

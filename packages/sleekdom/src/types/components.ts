@@ -1,4 +1,6 @@
 import type { JSXElement } from "./jsx-element";
+import type { Ref } from "./ref-types";
+import type { Signalish } from "./signal-like";
 import type { StyleAttributes } from "./style-attributes";
 
 export type ShadowRootContainer = {
@@ -19,6 +21,7 @@ type ComponentChild =
     | number
     | Iterable<ComponentChild>
     | Array<ComponentChild>
+    | { value: ComponentChild, peek: () => ComponentChild, subscribe: (cb: (newValue: ComponentChild) => void) => void }
     | JSXElement
     | NodeList
     | ChildNode
@@ -50,9 +53,3 @@ export type ComponentType<P = {}, T extends Node = JSXElement> = ComponentClass<
 export type ComponentAttributes = {
     [s: string]: string | number | boolean | undefined | null | StyleAttributes | EventListenerOrEventListenerObject;
 };
-
-export type RefObject<T> = { current: T | null };
-export type RefCallback<T> = (instance: T) => void
-
-export type Ref<T> = RefCallback<T> | RefObject<T> | null
-

@@ -1,6 +1,6 @@
-import type { JSXElement } from "./jsx-element";
 import type { CustomElementsHTML, IntrinsicElementsCombined } from "./intrinsic-elements";
-import type { Ref } from "./components";
+import type { JSXElement } from "./jsx-element";
+import type { Ref } from "./ref-types";
 
 export declare namespace JSX {
     type Element = JSXElement;

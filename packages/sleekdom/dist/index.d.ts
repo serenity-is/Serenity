@@ -1,3 +1,8 @@
+/**
+ * Convert a `value` to a className string.
+ * `value` can be a string, an array or a `Dictionary<boolean>`.
+ */
+export declare function className(value: any): string;
 export interface BasicClassList {
 	(value: Element): void;
 	readonly size: number;
@@ -18,6 +23,11 @@ export interface ConfigureJSXElement {
  * This technically should include `DocumentFragment` as well, but a lot of web APIs expect an `Element`.
  */
 export type JSXElement = HTMLElement | (ConfigureJSXElement["svg"] extends false ? never : SVGElement);
+export type RefObject<T> = {
+	current: T | null;
+};
+export type RefCallback<T> = (instance: T) => void;
+export type Ref<T> = RefCallback<T> | RefObject<T> | null;
 export type RemoveIndex<T> = {
 	[K in keyof T as string extends K ? never : number extends K ? never : K]: T[K];
 };
@@ -41,7 +51,11 @@ export type ShadowRootContainer = {
 	};
 	children: ComponentChildren;
 };
-export type ComponentChild = string | number | Iterable<ComponentChild> | Array<ComponentChild> | JSXElement | NodeList | ChildNode | HTMLCollection | ShadowRootContainer | DocumentFragment | Text | Comment | boolean | null | undefined;
+export type ComponentChild = string | number | Iterable<ComponentChild> | Array<ComponentChild> | {
+	value: ComponentChild;
+	peek: () => ComponentChild;
+	subscribe: (cb: (newValue: ComponentChild) => void) => void;
+} | JSXElement | NodeList | ChildNode | HTMLCollection | ShadowRootContainer | DocumentFragment | Text | Comment | boolean | null | undefined;
 export type ComponentChildren = ComponentChild[] | ComponentChild;
 export interface ComponentClass<P = {}, T extends Node = JSXElement> {
 	new (props: P): ComponentClass<P, T>;
@@ -62,144 +76,145 @@ export type ComponentType<P = {}, T extends Node = JSXElement> = ComponentClass<
 export type ComponentAttributes = {
 	[s: string]: string | number | boolean | undefined | null | StyleAttributes | EventListenerOrEventListenerObject;
 };
-export type RefObject<T> = {
-	current: T | null;
-};
-export type RefCallback<T> = (instance: T) => void;
-export type Ref<T> = RefCallback<T> | RefObject<T> | null;
+export interface SignalLike<T> {
+	value: T;
+	peek(): T;
+	subscribe(fn: (value: T) => void): () => void;
+}
+export type Signalish<T> = T | SignalLike<T>;
 export interface HTMLAttributes<T> {
-	accept?: string;
-	acceptCharset?: string;
-	accessKey?: string;
-	action?: string;
-	allow?: string;
-	allowFullscreen?: boolean;
-	alt?: string;
-	as?: string;
-	async?: boolean;
-	autocapitalize?: string;
-	autocomplete?: string;
-	autocorrect?: string;
-	autofocus?: boolean;
-	autoplay?: boolean;
-	capture?: boolean | string;
-	cellPadding?: number | string;
-	cellSpacing?: number | string;
-	charset?: string;
-	checked?: boolean;
-	class?: ClassNames;
-	className?: ClassNames;
-	cols?: number;
-	colSpan?: number;
-	colspan?: number;
-	content?: string;
-	contentEditable?: boolean;
-	controls?: boolean;
-	coords?: string;
-	crossOrigin?: string;
-	data?: string;
-	dataset?: {
+	accept?: Signalish<string>;
+	acceptCharset?: Signalish<string>;
+	accessKey?: Signalish<string>;
+	action?: Signalish<string>;
+	allow?: Signalish<string>;
+	allowFullscreen?: Signalish<boolean>;
+	alt?: Signalish<string>;
+	as?: Signalish<string>;
+	async?: Signalish<boolean>;
+	autocapitalize?: Signalish<string>;
+	autocomplete?: Signalish<string>;
+	autocorrect?: Signalish<string>;
+	autofocus?: Signalish<boolean>;
+	autoplay?: Signalish<boolean>;
+	capture?: Signalish<boolean | string>;
+	cellPadding?: Signalish<number | string>;
+	cellSpacing?: Signalish<number | string>;
+	charset?: Signalish<string>;
+	checked?: Signalish<boolean>;
+	class?: Signalish<ClassNames>;
+	className?: Signalish<ClassNames>;
+	cols?: Signalish<number>;
+	colSpan?: Signalish<number>;
+	colspan?: Signalish<number>;
+	content?: Signalish<string>;
+	contentEditable?: Signalish<boolean>;
+	controls?: Signalish<boolean>;
+	coords?: Signalish<string>;
+	crossOrigin?: Signalish<string>;
+	data?: Signalish<string>;
+	dataset?: Signalish<{
 		[key: string]: string;
-	} | undefined;
-	dateTime?: string;
-	default?: boolean;
-	defer?: boolean;
-	dir?: "auto" | "rtl" | "ltr";
-	disabled?: boolean;
-	disableRemotePlayback?: boolean;
-	download?: string | boolean;
-	decoding?: "sync" | "async" | "auto";
-	draggable?: "true" | "false";
-	enctype?: string;
-	enterKeyHint?: "enter" | "done" | "go" | "next" | "previous" | "search" | "send";
-	form?: string;
-	formAction?: string;
-	formEnctype?: string;
-	formMethod?: string;
-	formNoValidate?: boolean;
-	formTarget?: string;
-	frameBorder?: number | string;
-	headers?: string;
-	height?: number | string;
-	hidden?: boolean;
-	high?: number;
-	href?: string;
-	hreflang?: string;
-	for?: string;
-	htmlFor?: string;
-	httpEquiv?: string;
-	id?: string;
-	innerText?: string | undefined;
-	inputMode?: string;
-	integrity?: string;
-	is?: string;
-	kind?: string;
-	label?: string;
-	lang?: string;
-	list?: string;
-	loading?: "eager" | "lazy";
-	loop?: boolean;
-	low?: number;
-	marginHeight?: number;
-	marginWidth?: number;
-	max?: number | string;
-	maxLength?: number;
-	media?: string;
-	method?: string;
-	min?: number | string;
-	minLength?: number;
-	multiple?: boolean;
-	muted?: boolean;
-	name?: string;
-	namespaceURI?: string | undefined;
-	nonce?: string;
-	noValidate?: boolean;
-	open?: boolean;
-	optimum?: number;
-	pattern?: string;
-	ping?: string;
-	placeholder?: string;
-	playsInline?: boolean;
-	poster?: string;
-	preload?: string;
-	readOnly?: boolean;
-	referrerPolicy?: "no-referrer" | "no-referrer-when-downgrade" | "origin" | "origin-when-cross-origin" | "same-origin" | "strict-origin" | "strict-origin-when-cross-origin" | "unsafe-url";
-	rel?: string;
-	required?: boolean;
-	role?: string;
-	rows?: number;
-	rowSpan?: number;
-	rowspan?: number;
-	sandbox?: string;
-	scope?: string;
-	scrolling?: string;
-	selected?: boolean;
-	shape?: string;
-	size?: number;
-	sizes?: string;
-	slot?: string;
-	span?: number;
-	spellcheck?: boolean;
-	spellCheck?: boolean;
-	src?: string;
-	srcdoc?: string;
-	srclang?: string;
-	srcset?: string;
-	start?: number;
-	step?: number | string;
-	style?: string | StyleProperties;
-	summary?: string;
-	tabIndex?: number;
-	tabindex?: number;
-	target?: string;
-	textContent?: string | undefined;
-	title?: string;
-	type?: string;
-	useMap?: string;
-	value?: string | string[] | number;
-	volume?: string | number;
-	width?: number | string;
-	wrap?: string;
+	} | undefined>;
+	dateTime?: Signalish<string>;
+	default?: Signalish<boolean>;
+	defer?: Signalish<boolean>;
+	dir?: Signalish<"auto" | "rtl" | "ltr">;
+	disabled?: Signalish<boolean>;
+	disableRemotePlayback?: Signalish<boolean>;
+	download?: Signalish<string | boolean>;
+	decoding?: Signalish<"sync" | "async" | "auto">;
+	draggable?: Signalish<"true" | "false">;
+	enctype?: Signalish<string>;
+	enterKeyHint?: Signalish<"enter" | "done" | "go" | "next" | "previous" | "search" | "send">;
+	form?: Signalish<string>;
+	formAction?: Signalish<string>;
+	formEnctype?: Signalish<string>;
+	formMethod?: Signalish<string>;
+	formNoValidate?: Signalish<boolean>;
+	formTarget?: Signalish<string>;
+	frameBorder?: Signalish<number | string>;
+	headers?: Signalish<string>;
+	height?: Signalish<number | string>;
+	hidden?: Signalish<boolean>;
+	high?: Signalish<number>;
+	href?: Signalish<string>;
+	hreflang?: Signalish<string>;
+	for?: Signalish<string>;
+	htmlFor?: Signalish<string>;
+	httpEquiv?: Signalish<string>;
+	id?: Signalish<string>;
+	innerText?: Signalish<string | undefined>;
+	inputMode?: Signalish<string>;
+	integrity?: Signalish<string>;
+	is?: Signalish<string>;
+	kind?: Signalish<string>;
+	label?: Signalish<string>;
+	lang?: Signalish<string>;
+	list?: Signalish<string>;
+	loading?: Signalish<"eager" | "lazy">;
+	loop?: Signalish<boolean>;
+	low?: Signalish<number>;
+	marginHeight?: Signalish<number>;
+	marginWidth?: Signalish<number>;
+	max?: Signalish<number | string>;
+	maxLength?: Signalish<number>;
+	media?: Signalish<string>;
+	method?: Signalish<string>;
+	min?: Signalish<number | string>;
+	minLength?: Signalish<number>;
+	multiple?: Signalish<boolean>;
+	muted?: Signalish<boolean>;
+	name?: Signalish<string>;
+	namespaceURI?: Signalish<string | undefined>;
+	nonce?: Signalish<string>;
+	noValidate?: Signalish<boolean>;
+	open?: Signalish<boolean>;
+	optimum?: Signalish<number>;
+	pattern?: Signalish<string>;
+	ping?: Signalish<string>;
+	placeholder?: Signalish<string>;
+	playsInline?: Signalish<boolean>;
+	poster?: Signalish<string>;
+	preload?: Signalish<string>;
+	readOnly?: Signalish<boolean>;
+	referrerPolicy?: Signalish<"no-referrer" | "no-referrer-when-downgrade" | "origin" | "origin-when-cross-origin" | "same-origin" | "strict-origin" | "strict-origin-when-cross-origin" | "unsafe-url">;
+	rel?: Signalish<string>;
+	required?: Signalish<boolean>;
+	role?: Signalish<string>;
+	rows?: Signalish<number>;
+	rowSpan?: Signalish<number>;
+	rowspan?: Signalish<number>;
+	sandbox?: Signalish<string>;
+	scope?: Signalish<string>;
+	scrolling?: Signalish<string>;
+	selected?: Signalish<boolean>;
+	shape?: Signalish<string>;
+	size?: Signalish<number>;
+	sizes?: Signalish<string>;
+	slot?: Signalish<string>;
+	span?: Signalish<number>;
+	spellcheck?: Signalish<boolean>;
+	spellCheck?: Signalish<boolean>;
+	src?: Signalish<string>;
+	srcdoc?: Signalish<string>;
+	srclang?: Signalish<string>;
+	srcset?: Signalish<string>;
+	start?: Signalish<number>;
+	step?: Signalish<number | string>;
+	style?: Signalish<string | StyleProperties>;
+	summary?: Signalish<string>;
+	tabIndex?: Signalish<number>;
+	tabindex?: Signalish<number>;
+	target?: Signalish<string>;
+	textContent?: Signalish<string | undefined>;
+	title?: Signalish<string>;
+	type?: Signalish<string>;
+	useMap?: Signalish<string>;
+	value?: Signalish<string | string[] | number>;
+	volume?: Signalish<string | number>;
+	width?: Signalish<number | string>;
+	wrap?: Signalish<string>;
 }
 export interface SVGAttributes<T> extends HTMLAttributes<T> {
 	accentHeight?: number | string;
@@ -613,6 +628,8 @@ export interface HTMLComponentProps<T extends Element> extends BaseProps {
 	dangerouslySetInnerHTML?: {
 		__html: string;
 	};
+	/** @deprecated This is simply ignored as it only applies to v-dom  */
+	key?: string | number;
 	on?: Record<string, Function>;
 	onCapture?: Record<string, Function>;
 	/**
@@ -649,16 +666,19 @@ export declare namespace JSX {
 	interface IntrinsicElements extends IntrinsicElementsCombined, CustomElementsHTML {
 	}
 }
-/**
- * Convert a `value` to a className string.
- * `value` can be a string, an array or a `Dictionary<boolean>`.
- */
-export declare function className(value: any): string;
-export declare const SVGNamespace = "http://www.w3.org/2000/svg";
-export declare function createFactory(tag: string): any;
 export declare function Fragment(attr: {
 	children?: ComponentChildren | undefined;
 }): any;
+export declare function createRef<T = any>(): RefObject<T>;
+declare function identity<T>(value: T): T;
+export declare function useMemo<T>(factory: () => T): T;
+export declare function forwardRef<T = Node, P = {}>(render: (props: P, ref: Ref<T>) => JSXElement): FunctionComponent<P & {
+	ref?: Ref<T>;
+}>;
+export declare function useImperativeHandle<T>(ref: Ref<T>, init: () => T, _deps?: unknown): void;
+export declare function createElement(tag: any, attr: any, ...children: any[]): any;
+export declare const h: typeof createElement;
+export declare function createFactory(tag: string | FunctionComponent<any>): any;
 export declare class Component<T = any> {
 	static isComponent: boolean;
 	constructor(props: T & {
@@ -671,6 +691,11 @@ export declare class Component<T = any> {
 	};
 	render(): JSXElement | null;
 }
+export declare function useClassList(initialValue?: ClassNames): BasicClassList;
+export declare function useText(initialValue?: string): readonly [
+	Text,
+	(value: string) => void
+];
 export declare function jsx<K extends keyof HTMLElementTagNameMap, T extends HTMLElementTagNameMap[K]>(type: K, props?: (HTMLAttributes<T> & {
 	children?: ComponentChildren;
 	ref?: Ref<T>;
@@ -690,27 +715,14 @@ export declare function jsx<P extends {}, T extends Element>(type: ComponentType
 export declare function jsx<T extends Element>(type: string, props?: {
 	children?: ComponentChildren;
 } | null, key?: string): T;
-export declare function createElement(tag: any, attr: any, ...children: any[]): any;
-export declare function createRef<T = any>(): RefObject<T>;
-export declare function useClassList(initialValue?: ClassNames): BasicClassList;
-export declare function useText(initialValue?: string): readonly [
-	Text,
-	(value: string) => void
-];
-declare function identity<T>(value: T): T;
-export declare function useMemo<T>(factory: () => T): T;
-export declare function forwardRef<T = Node, P = {}>(render: (props: P, ref: Ref<T>) => JSXElement): FunctionComponent<P & {
-	ref?: Ref<T>;
-}>;
-export declare function useImperativeHandle<T>(ref: Ref<T>, init: () => T, _deps?: unknown): void;
 export declare function ShadowRootNode({ children, ref, ...attr }: ShadowRootInit & {
 	ref?: Ref<ShadowRoot>;
 	children?: ComponentChildren;
 }): any;
+export declare const SVGNamespace = "http://www.w3.org/2000/svg";
 
 export {
 	Fragment as StrictMode,
-	createElement as h,
 	createRef as useRef,
 	identity as memo,
 	identity as useCallback,

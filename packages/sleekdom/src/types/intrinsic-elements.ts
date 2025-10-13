@@ -1,13 +1,16 @@
-import type { BaseProps, Ref } from "./components";
+import type { BaseProps } from "./components";
 import type { HTMLElementAttributes, SVGElementAttributes, SVGOnlyElementKeys } from "./element-attributes";
 import type { EventAttributes } from "./event-attributes";
 import type { ConfigureJSXElement } from "./jsx-element";
+import type { Ref } from "./ref-types";
 
 // eslint-disable-next-line @typescript-eslint/no-empty-object-type
 export interface CustomElementsHTML {}
 
 export interface HTMLComponentProps<T extends Element> extends BaseProps {
     dangerouslySetInnerHTML?: { __html: string };
+    /** @deprecated This is simply ignored as it only applies to v-dom  */
+    key?: string | number;
 
     on?: Record<string, Function>;
     onCapture?: Record<string, Function>;

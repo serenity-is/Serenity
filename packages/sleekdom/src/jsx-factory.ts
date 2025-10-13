@@ -1,7 +1,7 @@
-import { appendChildren } from "./append-child"
+import { appendChildren } from "./append-children"
 import { initComponentClass } from "./component"
 import { attachRef } from "./ref"
-import { setAttributes } from "./set-attributes"
+import { setProperties } from "./set-properties"
 import { SVGNamespace, svgTags } from "./svg-consts"
 import type { ComponentChildren, ComponentType, Ref } from "./types"
 import type { HTMLAttributes } from "./types/html-attributes"
@@ -46,14 +46,12 @@ export function jsx(tag: any, { children, ...attr }: { children?: ComponentChild
         node = attr.namespaceURI
             ? document.createElementNS(attr.namespaceURI, tag)
             : document.createElement(tag)
-        setAttributes(attr, node)
+        setProperties(node, attr)
         appendChildren(node, children)
 
-        // Select `option` elements in `select`
         if (node instanceof window.HTMLSelectElement && attr.value != null) {
             if (attr.multiple === true && Array.isArray(attr.value)) {
                 const values = attr.value.map(value => String(value))
-
                 node
                     .querySelectorAll("option")
                     .forEach(option => (option.selected = values.includes(option.value)))
