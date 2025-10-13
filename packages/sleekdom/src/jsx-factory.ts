@@ -3,10 +3,9 @@ import { initComponentClass } from "./component"
 import { attachRef } from "./ref"
 import { setProperties } from "./set-properties"
 import { SVGNamespace, svgTags } from "./svg-consts"
-import type { ComponentChildren, ComponentType, Ref } from "./types"
-import type { HTMLAttributes } from "./types/html-attributes"
-import type { DOMAttributes } from "./types/intrinsic-elements"
-import type { SVGAttributes } from "./types/svg-attributes"
+import type { ComponentType, Ref } from "./types"
+import type { ComponentChildren } from "./types/custom-attributes"
+import type { ElementAttributes, HTMLAttributes, SVGAttributes } from "./types/dom-expressions-jsx"
 import { isComponentClass, isFunction, isObject, isString } from "./util"
 
 // DOM Elements
@@ -22,7 +21,7 @@ export function jsx<K extends keyof SVGElementTagNameMap, T extends SVGElementTa
 ): SVGElement
 export function jsx<T extends Element>(
     type: string,
-    props?: { children?: ComponentChildren; ref?: Ref<T> } & DOMAttributes<T> | null,
+    props?: { children?: ComponentChildren; ref?: Ref<T> } & ElementAttributes<T> | null,
     key?: string
 ): T
 // Custom components

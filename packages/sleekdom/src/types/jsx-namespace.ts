@@ -21,5 +21,6 @@ export declare namespace JSX {
         ref?: Ref<T>;
     }
 
+
     interface IntrinsicElements extends IntrinsicElementsCombined, CustomElementsHTML { }
 }
