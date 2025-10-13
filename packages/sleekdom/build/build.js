@@ -35,7 +35,6 @@ const defaults = {
     color: true,
     logLevel: 'info',
     target: 'es2015',
-    sourcemap: true,
     plugins: [writeIfChanged()]
 }
 
@@ -46,10 +45,26 @@ const esmIndex = {
     outfile: './dist/index.js'
 }
 
+const esmJsxRuntime = {
+    ...defaults,
+    format: 'esm',
+    sourcemap: false,
+    bundle: false,
+    minify: false,
+    entryPoints: ['./src/jsx-runtime.ts'],
+    outfile: './dist/jsx-runtime.js'
+}
+
+const esmJsxDevRuntime = {
+    ...esmJsxRuntime,
+    outfile: './dist/jsx-dev-runtime.js'
+}
 const buildList = [];
 
 buildList.push(
-    esmIndex
+    esmIndex,
+    esmJsxRuntime,
+    esmJsxDevRuntime
 )
 
 for (const buildItem of buildList) {

@@ -3,3 +3,4 @@ export { jsx, Component, Fragment, createElement, createFactory } from "./jsx-im
 export { createRef } from "./ref";
 export * from "./hooks";
 export * from "./react-compat-api";
+export { ShadowRoot } from "./shadow";

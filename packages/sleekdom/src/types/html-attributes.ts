@@ -83,6 +83,7 @@ export interface HTMLAttributes<T> {
     multiple?: boolean;
     muted?: boolean;
     name?: string;
+    namespaceURI?: string | undefined;
     nonce?: string;
     noValidate?: boolean;
     open?: boolean;

@@ -2,11 +2,16 @@ import type { JSXElement } from "./jsx-element";
 import type { StyleAttributes } from "./style-attributes";
 
 export type ShadowRootContainer = {
-    ref: Ref<ShadowRoot> | ((value: ShadowRoot) => void);
+    ref: Ref<ShadowRoot>;
     attr: {
+        clonable?: boolean;
+        customElementRegistry?: CustomElementRegistry;
+        delegatesFocus?: boolean;
         mode: ShadowRootMode;
+        serializable?: boolean;
+        slotAssignment?: SlotAssignmentMode;
     };
-    children: any;
+    children: ComponentChildren;
 }
 
 type ComponentChild =

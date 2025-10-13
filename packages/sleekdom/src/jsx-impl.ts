@@ -260,9 +260,9 @@ function style(node: Element & HTMLOrSVGElement, value?: any) {
                 // and must be assigned via `setProperty`.
                 (node as HTMLElement).style.setProperty(key, val)
             } else if (isNumber(val) && isUnitlessNumber[key] !== 0) {
-                (node as HTMLElement).style.setProperty(key, val + "px")
+                ((node as HTMLElement).style as any)[key] = val + "px"
             } else {
-                (node as HTMLElement).style.setProperty(key, val)
+                ((node as HTMLElement).style as any)[key] = val
             }
         })
     }
@@ -272,11 +272,12 @@ function attribute(key: string, value: any, node: Element & HTMLOrSVGElement) {
     switch (key) {
 
         case "htmlFor":
-            attr(node, "for", value)
-            return
+            key = "for";
+            break;
         case "tabIndex":
         case "tabindex":
-            return attr(node, "tabindex", value)
+            key = "tabindex";
+            break;
         case "dataset":
             forEach(value, (dataValue, dataKey) => {
                 if (dataValue != null) {

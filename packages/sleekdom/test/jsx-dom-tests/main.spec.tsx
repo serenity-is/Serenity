@@ -1,27 +1,26 @@
 /** @jsxImportSource ../../src */
-import { describe, expect, it } from "vitest"
-import * as lib from "../../src"
+import { Component, createElement, createFactory, createRef, forwardRef, Fragment, jsx, useCallback, useImperativeHandle, useMemo, useRef, useText } from "../../src"
 
-describe("tests from jsx-dom", () => {
+describe("jsx-dom main", () => {
     it("creates a <div> element", () => {
         expect((<div id="hello">world</div>).outerHTML).toBe('<div id="hello">world</div>')
     })
 
     describe("supports publicly declared APIs", () => {
         it("supports createFactory", () => {
-            expect(lib.createElement).to.be.a("function")
-            expect(lib.createFactory).to.be.a("function")
-            expect(lib.createRef).to.be.a("function")
-            expect(lib.jsx).to.be.a("function")
-            expect(lib.useCallback).to.be.a("function")
-            expect(lib.useMemo).to.be.a("function")
-            expect(lib.useRef).to.be.a("function")
-            expect(lib.useText).to.be.a("function")
+            expect(createElement).to.be.a("function")
+            expect(createFactory).to.be.a("function")
+            expect(createRef).to.be.a("function")
+            expect(jsx).to.be.a("function")
+            expect(useCallback).to.be.a("function")
+            expect(useMemo).to.be.a("function")
+            expect(useRef).to.be.a("function")
+            expect(useText).to.be.a("function")
 
-            const Div = lib.createFactory("div")
+            const Div = createFactory("div")
             expect((<Div>div tag</Div>).tagName).toBe("DIV")
 
-            const element = lib.jsx("div", { children: "test" })
+            const element = jsx("div", { children: "test" })
 
             function CustomComponent(props: any): any {
                 if (!new.target) return new (CustomComponent as any)(props)
@@ -43,7 +42,7 @@ describe("tests from jsx-dom", () => {
     })
 
     it("supports class components", () => {
-        class MyComponent extends lib.Component<{ a: number; b: number; c: number }> {
+        class MyComponent extends Component<{ a: number; b: number; c: number }> {
             constructor(props: { a: 1; b: 2; c: 3 }) {
                 super(props)
             }
@@ -67,22 +66,22 @@ describe("tests from jsx-dom", () => {
 
     it("supports React automatic runtime", () => {
         expect(
-            lib.jsx("div", {
+            jsx("div", {
                 className: "className",
             }).outerHTML
         ).toBe('<div class="className"></div>')
 
         expect(
-            lib.jsx("div", {
+            jsx("div", {
                 className: "className",
                 children: "One child",
             }).outerHTML
         ).toBe('<div class="className">One child</div>')
 
         expect(
-            lib.jsx("div", {
+            jsx("div", {
                 className: "className",
-                children: ["One child", lib.jsx("div", { className: "child", children: "Two children" })],
+                children: ["One child", jsx("div", { className: "child", children: "Two children" })],
             }).outerHTML
         ).toBe('<div class="className">One child<div class="child">Two children</div></div>')
     })
@@ -209,24 +208,6 @@ describe("tests from jsx-dom", () => {
     })
 
     describe("attributes", () => {
-        describe.skip("supports boolean properties", () => {
-            class MyCustomElement extends HTMLElement {
-                isBoolean: boolean
-                constructor() {
-                    super()
-                }
-            }
-
-            const BooleanTest = "boolean-test" as any;
-            customElements.define(BooleanTest, MyCustomElement)
-            it("shoud attach truly attribute as property", () => {
-                expect((<BooleanTest isBoolean={true} /> as any).isBoolean).toBe(true)
-            })
-
-            it("shoud attach falsy attribute as property", () => {
-                expect((<BooleanTest isBoolean={false} /> as any).isBoolean).toBe(false)
-            })
-        })
 
         it("supports complex objects attributes as properties", () => {
             class MyCustomElement extends HTMLElement {
@@ -292,7 +273,7 @@ describe("tests from jsx-dom", () => {
         })
 
         it("supports React style createRef.", () => {
-            const ref = lib.createRef()
+            const ref = createRef()
             expect(ref).toHaveProperty("current", null)
 
             const div = (
@@ -328,13 +309,13 @@ describe("tests from jsx-dom", () => {
 
         describe("supports forwardRef", () => {
             it("element", () => {
-                const Container = lib.forwardRef<HTMLButtonElement, any>((props, ref) => (
+                const Container = forwardRef<HTMLButtonElement, any>((props, ref) => (
                     <div {...props}>
                         <button ref={ref}>Button</button>
                     </div>
                 ))
 
-                const ref = lib.createRef()
+                const ref = createRef()
                 const node = (
                     <Container className="container" ref={ref}>
                         Click me!
@@ -346,13 +327,13 @@ describe("tests from jsx-dom", () => {
 
             it("component", () => {
                 const Button = props => <button {...props} />
-                const Container = lib.forwardRef<HTMLButtonElement, any>((props, ref) => (
+                const Container = forwardRef<HTMLButtonElement, any>((props, ref) => (
                     <div {...props}>
                         <Button ref={ref}>Button</Button>
                     </div>
                 ))
 
-                const ref = lib.createRef()
+                const ref = createRef()
                 const node = (
                     <Container className="container" ref={ref}>
                         Click me!
@@ -364,13 +345,13 @@ describe("tests from jsx-dom", () => {
 
             // #104
             it("class component with ref", () => {
-                class Button extends lib.Component<{ className: string }> {
+                class Button extends Component<{ className: string }> {
                     render() {
                         return <button className={this.props.className} />
                     }
                 }
 
-                const ref = lib.createRef<Button>()
+                const ref = createRef<Button>()
                 const node = (
                     <Button className="container" ref={ref}>
                         Click me!
@@ -382,14 +363,14 @@ describe("tests from jsx-dom", () => {
         })
 
         it("supports useImperativeHandle", () => {
-            const Button = lib.forwardRef<{ focus: () => string }, any>((props, ref) => {
-                lib.useImperativeHandle(ref, () => ({
+            const Button = forwardRef<{ focus: () => string }, any>((props, ref) => {
+                useImperativeHandle(ref, () => ({
                     focus: () => "ping",
                 }))
                 return <button {...props} />
             })
 
-            const ref = lib.createRef<HTMLButtonElement>()
+            const ref = createRef<HTMLButtonElement>()
             const node = (
                 <Button className="container" ref={ref}>
                     Click me!
@@ -408,7 +389,7 @@ describe("tests from jsx-dom", () => {
         })
 
         it("supports defaultProps in class components", () => {
-            class Button extends lib.Component<{ className: string }> {
+            class Button extends Component<{ className: string }> {
                 static defaultProps = { className: "defaultClass" }
                 render() {
                     return <div className={this.props.className} />
@@ -587,7 +568,7 @@ describe("tests from jsx-dom", () => {
             button.dispatchEvent(new window.Event("dblclick"))
         })
         _it("maps onDoubleClickCapture to dblclick event", done => {
-            const button = (<button onDoubleClickCapture={ () => done()} />) as HTMLButtonElement
+            const button = (<button onDoubleClickCapture={() => done()} />) as HTMLButtonElement
             button.dispatchEvent(new window.Event("dblclick"))
         })
         _it("maps onDblClickCapture to dblclick event", done => {
@@ -598,7 +579,7 @@ describe("tests from jsx-dom", () => {
 
     describe("forwardRef", () => {
         it("supports forwardRef", () => {
-            // const FancyButton = lib.forwardRef((props, ref) => (
+            // const FancyButton = forwardRef((props, ref) => (
             const FancyButton = props => (
                 <button ref={props.ref} className="FancyButton">
                     {props.children}
@@ -606,7 +587,7 @@ describe("tests from jsx-dom", () => {
             )
 
             // You can now get a ref directly to the DOM button:
-            const ref = lib.createRef();
+            const ref = createRef();
             (<FancyButton ref={ref}>Click me!</FancyButton>).toString();
             expect(ref.current).toBeInstanceOf(HTMLButtonElement)
         })
@@ -629,10 +610,10 @@ describe("tests from jsx-dom", () => {
 
         it("supports fragments with explicit tag", () => {
             const frag = (
-                <lib.Fragment>
-                    {[2]    }
+                <Fragment>
+                    {[2]}
                     <span>Bonjour</span>
-                </lib.Fragment>
+                </Fragment>
             )
             const nodes = frag.childNodes
             expect(nodes[0].nodeType).toBe(Node.TEXT_NODE)
