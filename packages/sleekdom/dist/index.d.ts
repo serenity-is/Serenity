@@ -2851,24 +2851,12 @@ export declare function useText(initialValue?: string): readonly [
 	Text,
 	(value: string) => void
 ];
-export declare function jsx<K extends keyof HTMLElementTagNameMap, T extends HTMLElementTagNameMap[K]>(type: K, props?: (HTMLAttributes<T> & {
-	children?: ComponentChildren;
-	ref?: Ref<T>;
-}) | null, key?: string): T;
-export declare function jsx<K extends keyof SVGElementTagNameMap, T extends SVGElementTagNameMap[K]>(type: K, props?: (SVGAttributes<T> & {
-	children?: ComponentChildren;
-	ref?: Ref<T>;
-}) | null, key?: string): SVGElement;
-export declare function jsx<T extends Element>(type: string, props?: {
-	children?: ComponentChildren;
-	ref?: Ref<T>;
-} & ElementAttributes<T> | null, key?: string): T;
+export declare function jsx<K extends keyof HTMLElementTagNameMap, T extends HTMLElementTagNameMap[K]>(type: K, props?: HTMLElementTags[K] | null, key?: string): T;
+export declare function jsx<K extends (keyof SVGElementTagNameMap & keyof SVGElementTags), T extends SVGElementTagNameMap[K]>(type: K, props?: SVGElementTags[K] | null, key?: string): SVGElement;
+export declare function jsx<T extends Element>(type: string, props?: ElementAttributes<T> | null, key?: string): T;
 export declare function jsx<P extends {}, T extends Element>(type: ComponentType<P, T>, props?: P & {
 	children?: ComponentChildren;
 	ref?: Ref<T>;
-} | null, key?: string): T;
-export declare function jsx<T extends Element>(type: string, props?: {
-	children?: ComponentChildren;
 } | null, key?: string): T;
 export declare function ShadowRootNode({ children, ref, ...attr }: ShadowRootInit & {
 	ref?: Ref<ShadowRoot>;

@@ -1,38 +1,33 @@
-import { appendChildren } from "./jsx-append-children"
 import { initComponentClass } from "./component"
-import { attachRef } from "./ref"
+import { appendChildren } from "./jsx-append-children"
 import { setProperties } from "./jsx-set-properties"
+import { attachRef } from "./ref"
 import { SVGNamespace, svgTags } from "./svg-consts"
-import type { ComponentType, Ref } from "./types"
+import type { ComponentType, JSX, Ref } from "./types"
 import type { ComponentChildren } from "./types/custom-attributes"
-import type { ElementAttributes, HTMLAttributes, SVGAttributes } from "./types/dom-expressions-jsx"
+import type { ElementAttributes, HTMLElementTags, SVGElementTags } from "./types/dom-expressions-jsx"
 import { isComponentClass, isFunction, isObject, isString } from "./util"
 
 // DOM Elements
 export function jsx<K extends keyof HTMLElementTagNameMap, T extends HTMLElementTagNameMap[K]>(
     type: K,
-    props?: (HTMLAttributes<T> & { children?: ComponentChildren; ref?: Ref<T> }) | null,
+    props?: HTMLElementTags[K] | null,
     key?: string
 ): T
-export function jsx<K extends keyof SVGElementTagNameMap, T extends SVGElementTagNameMap[K]>(
+export function jsx<K extends (keyof SVGElementTagNameMap & keyof SVGElementTags), T extends SVGElementTagNameMap[K]>(
     type: K,
-    props?: (SVGAttributes<T> & { children?: ComponentChildren; ref?: Ref<T> }) | null,
+    props?: SVGElementTags[K] | null,
     key?: string
 ): SVGElement
 export function jsx<T extends Element>(
     type: string,
-    props?: { children?: ComponentChildren; ref?: Ref<T> } & ElementAttributes<T> | null,
+    props?: ElementAttributes<T> | null,
     key?: string
 ): T
 // Custom components
 export function jsx<P extends {}, T extends Element>(
     type: ComponentType<P, T>,
     props?: P & { children?: ComponentChildren; ref?: Ref<T> } | null,
-    key?: string
-): T
-export function jsx<T extends Element>(
-    type: string,
-    props?: { children?: ComponentChildren } | null,
     key?: string
 ): T
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
