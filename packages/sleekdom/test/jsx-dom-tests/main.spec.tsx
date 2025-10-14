@@ -671,4 +671,30 @@ describe("jsx-dom main", () => {
             expect(nodes[1].textContent).toBe("Bonjour")
         })
     })
+
+    it('attach event listeners but drop the dash after on', function () {
+        const addEventListener = vi.spyOn(EventTarget.prototype, 'addEventListener');
+
+        const handler = function () { };
+        const assignProps = { onremoteinput: handler, onRemoteinput: handler };
+        const element = (
+            <a href="#" {...assignProps}>
+                Download
+            </a>
+        ) as HTMLElement;
+
+        expect(element.outerHTML).toBe('<a href="#">Download</a>');
+
+        expect(addEventListener.mock.calls.length).toBe(2);
+        expect(addEventListener.mock.calls[0]).toEqual([
+            'remoteinput',
+            handler,
+        ]);
+        expect(addEventListener.mock.calls[1]).toEqual([
+            'remoteinput',
+            handler,
+        ]);
+
+        addEventListener.mockClear();
+    });
 })

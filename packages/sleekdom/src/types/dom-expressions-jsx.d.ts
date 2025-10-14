@@ -3,7 +3,7 @@
  * Commit ID: 59823cd3108ee6d17058b90d1ef92b9d9ad103d7
  */
 import { ClassNames as ClassList } from "./classname";
-import { ElementCustomAttributes as CustomAttributes } from "./custom-attributes";
+import { CustomDomAttributes as CustomAttributes } from "./custom-attributes";
 import { Signalish as FunctionMaybe } from "./signal-like";
 import { StyleProperties } from "./style-attributes";
 

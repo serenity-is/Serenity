@@ -40,7 +40,7 @@ export type ComponentChild = string | number | Iterable<ComponentChild> | Array<
 	subscribe: (cb: (newValue: ComponentChild) => void) => void;
 } | JSXElement | NodeList | ChildNode | HTMLCollection | ShadowRootContainer | DocumentFragment | Text | Comment | boolean | null | undefined;
 export type ComponentChildren = ComponentChild[] | ComponentChild;
-export interface ElementCustomAttributes<T> {
+export interface CustomDomAttributes<T> {
 	children?: ComponentChildren;
 	dangerouslySetInnerHTML?: {
 		__html: string;
@@ -61,10 +61,17 @@ export interface ElementCustomAttributes<T> {
 export interface ElementAttributes<T> {
 	className?: Signalish<string | ClassNames | RemoveAttribute>;
 	tabIndex?: Signalish<number | string | RemoveAttribute>;
+	onClickCapture?: EventHandlerUnion<T, MouseEvent> | undefined;
+	onDblClickCapture?: EventHandlerUnion<T, MouseEvent> | undefined;
+	onDoubleClick?: EventHandlerUnion<T, MouseEvent> | undefined;
+	onDoubleClickCapture?: EventHandlerUnion<T, MouseEvent> | undefined;
 }
 export interface HTMLAttributes<T> {
 	contentEditable?: Signalish<EnumeratedPseudoBoolean | EnumeratedAcceptsEmpty | "plaintext-only" | "inherit" | RemoveAttribute>;
 	spellCheck?: Signalish<EnumeratedPseudoBoolean | EnumeratedAcceptsEmpty | RemoveAttribute>;
+	dataset?: {
+		[key: string]: string;
+	} | undefined;
 }
 export interface SVGAttributes<T> {
 	tabIndex?: Signalish<number | string | RemoveAttribute>;
@@ -781,7 +788,7 @@ export interface EventHandlersElement<T> {
  * 1. That's `keys` that are defined BY ALL `HTMLElement/SVGElement/MathMLElement` interfaces.
  * 2. Includes `keys` defined by `Element` and `Node` interfaces.
  */
-export interface ElementAttributes<T> extends ElementCustomAttributes<T>, DirectiveAttributes, DirectiveFunctionAttributes<T>, PropAttributes, OnAttributes<T>, EventHandlersElement<T>, AriaAttributes {
+export interface ElementAttributes<T> extends CustomDomAttributes<T>, DirectiveAttributes, DirectiveFunctionAttributes<T>, PropAttributes, OnAttributes<T>, EventHandlersElement<T>, AriaAttributes {
 	// [key: ClassKeys]: boolean;
 	// properties
 	innerHTML?: Signalish<string>;

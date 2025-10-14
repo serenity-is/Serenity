@@ -1,6 +1,7 @@
 ﻿[
   "packages/corelib/",
   "packages/sleekgrid/",
+  "packages/sleekdom/",
   "common-features/src/extensions/",
   "common-features/src/demo.northwind/",
   "common-features/src/demo.basicsamples/",

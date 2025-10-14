@@ -24,7 +24,7 @@ type ComponentChild =
 
 export type ComponentChildren = ComponentChild[] | ComponentChild;
 
-export interface ElementCustomAttributes<T> {
+export interface CustomDomAttributes<T> {
     children?: ComponentChildren;
     dangerouslySetInnerHTML?: { __html: string };
     ref?: Ref<T>;
@@ -48,11 +48,16 @@ declare module "./dom-expressions-jsx" {
     interface ElementAttributes<T> {
         className?: Signalish<string | ClassNames | RemoveAttribute>;
         tabIndex?: Signalish<number | string | RemoveAttribute>;
+        onClickCapture?: EventHandlerUnion<T, MouseEvent> | undefined;
+        onDblClickCapture?: EventHandlerUnion<T, MouseEvent> | undefined;
+        onDoubleClick?: EventHandlerUnion<T, MouseEvent> | undefined;
+        onDoubleClickCapture?: EventHandlerUnion<T, MouseEvent> | undefined;
     }
 
     interface HTMLAttributes<T> {
         contentEditable?: Signalish<EnumeratedPseudoBoolean | EnumeratedAcceptsEmpty | "plaintext-only" | "inherit" | RemoveAttribute>;
         spellCheck?: Signalish<EnumeratedPseudoBoolean | EnumeratedAcceptsEmpty | RemoveAttribute>;
+        dataset?: { [key: string]: string } | undefined
     }
 
     interface SVGAttributes<T> {

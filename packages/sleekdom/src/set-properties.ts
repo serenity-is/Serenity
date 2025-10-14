@@ -164,7 +164,7 @@ function setProperty(node: Element & HTMLOrSVGElement, key: string, value: any, 
             }
 
             let eventName;
-            if (!useCapture && (node as any)[attribute] !== void 0) {
+            if (!useCapture && ((node as any)[attribute] === null || (prevValue != null && (node as any)[attribute] === prevValue))) {
                 // use property when possible PR #17
                 (node as any)[attribute] = value;
             } else if (useCapture) {
