@@ -3,6 +3,7 @@
     "path": "..\\Serenity.sln",
     "projects": [
       "packages\\corelib\\Serenity.Corelib.csproj",
+      "packages\\sleekgrid\\Serenity.SleekDom.csproj",
       "packages\\sleekgrid\\Serenity.SleekGrid.csproj",
       "packages\\test-utils\\test-utils.esproj",
       "packages\\tsbuild\\tsbuild.esproj",

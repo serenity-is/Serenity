@@ -58,6 +58,8 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "npm-packages", "npm-package
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Serenity.Corelib", "packages\corelib\Serenity.Corelib.csproj", "{0C1D7761-93AB-4361-AD7C-DF200B97B62B}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Serenity.SleekDom", "packages\sleekdom\Serenity.SleekDom.csproj", "{64108D05-5302-DF20-E422-8A05213D3DF0}"
+EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Serenity.SleekGrid", "packages\sleekgrid\Serenity.SleekGrid.csproj", "{9C4591C7-9BC1-497C-BB6F-FB74D739D5E9}"
 EndProject
 Project("{54A90642-561A-4BB1-A94E-469ADEE60C69}") = "test-utils", "packages\test-utils\test-utils.esproj", "{EE167232-372C-4036-AF27-AA3C586EC020}"
@@ -132,6 +134,10 @@ Global
 		{24C790C0-0494-4B88-A8A9-17AB7BC294B2}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{24C790C0-0494-4B88-A8A9-17AB7BC294B2}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{24C790C0-0494-4B88-A8A9-17AB7BC294B2}.Release|Any CPU.Build.0 = Release|Any CPU
+		{64108D05-5302-DF20-E422-8A05213D3DF0}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{64108D05-5302-DF20-E422-8A05213D3DF0}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{64108D05-5302-DF20-E422-8A05213D3DF0}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{64108D05-5302-DF20-E422-8A05213D3DF0}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -153,6 +159,7 @@ Global
 		{0C1D7761-93AB-4361-AD7C-DF200B97B62B} = {4F13A746-0751-4EA0-BE46-A9A85886828F}
 		{9C4591C7-9BC1-497C-BB6F-FB74D739D5E9} = {4F13A746-0751-4EA0-BE46-A9A85886828F}
 		{EE167232-372C-4036-AF27-AA3C586EC020} = {4F13A746-0751-4EA0-BE46-A9A85886828F}
+		{64108D05-5302-DF20-E422-8A05213D3DF0} = {E46C59F2-F5A2-441B-B858-6FDD7674EF5F}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {E2545865-7A32-47F4-A186-EDEBDCEF9EEF}

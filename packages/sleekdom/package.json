@@ -31,13 +31,13 @@
     "tsc": "tsc"
   },
   "keywords": [
-    "grid",
-    "datagrid",
-    "datatable",
-    "SleekGrid",
-    "SlickGrid",
-    "spreadsheet",
-    "table"
+    "dom",
+    "jsx",
+    "typescript",
+    "library",
+    "web",
+    "frontend",
+    "ui"
   ],
   "author": "Volkan Ceylan, Furkan Evran, Victor Tomaili (https://serenity.is)",
   "repository": "serenity-is/sleekgrid",

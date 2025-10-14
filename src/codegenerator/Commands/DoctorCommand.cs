@@ -27,7 +27,7 @@ public partial class DoctorCommand(IProjectFileInfo project, IGeneratorConsole c
 
     static readonly (Version, Version)[] RecommendedSleekDomVersion = [
         (new (0, 0, 0), new(1, 0, 0))
-    ]
+    ];
 
     public IArgumentReader Arguments { get; set; }
     public List<ExternalType> TsTypes { get; set; }
