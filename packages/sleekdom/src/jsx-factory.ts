@@ -37,7 +37,7 @@ export function jsx<T extends Element>(
 ): T
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
 export function jsx(tag: any, { children, ...attr }: { children?: ComponentChildren, [key: string]: any }, _key?: string) {
-    if (!attr.namespaceURI && svgTags[tag] === 0)
+    if (!attr.namespaceURI && svgTags.has(tag))
         attr.namespaceURI = SVGNamespace
 
     let node: HTMLElement | SVGElement

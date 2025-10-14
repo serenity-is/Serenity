@@ -1,10 +1,11 @@
+import { forEach, isNumber, isObject, isString, keys } from "./util"
+
 /**
  * Copyright (c) Facebook, Inc. and its affiliates.
  *
  * This source code is licensed under the MIT license found on
  * https://github.com/facebook/react/blob/b87aabdfe1b7461e7331abb3601d9e6bb27544bc/LICENSE
  */
-import { forEach, isNumber, isObject, isString, keys } from "./util"
 
 /**
  * CSS properties which accept numbers but are not in units of "px".
