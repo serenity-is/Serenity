@@ -9,6 +9,6 @@ export class FreightFormatter implements Formatter {
         if (ctx.value == null)
             return "";
 
-        return <>{ctx.value} <i className={[faIcon("balance-scale", "secondary"), "text-opacity-75"]}></i></>;
+        return <>{ctx.value} <i class={[faIcon("balance-scale", "secondary"), "text-opacity-75"]}></i></>;
     }
 }

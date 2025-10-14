@@ -5364,7 +5364,9 @@ export declare class DataGrid<TItem, P = {}> extends Widget<P> implements IDataG
 		itemType?: string;
 		/** Extra CSS class to add to the link element besides s-EditLink. Optional. */
 		cssClass?: string;
-		/** Tab index to add to the link element. Optional. */
+		/** The tabindex to assign to the link, default is undefined */
+		tabindex?: number;
+		/** @deprecated Use tabindex. */
 		tabIndex?: number;
 		/** The link text. If not provided it will be taken from ctx.escape(ctx.value) */
 		children?: any;
@@ -6953,6 +6955,8 @@ export declare function EditLink(props: {
 	/**
 	 * Tab index for the link. Default is null, which means no tabindex attribute.
 	 */
+	tabindex?: number;
+	/** @deprecated Use tabindex. */
 	tabIndex?: number;
 	/**
 	 * Child elements or text to be displayed inside the link.

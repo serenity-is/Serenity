@@ -19,7 +19,7 @@ export function PropertyFieldCaption(props: {
     const labelWidth = props.item.labelWidth;
     const caption = determineText(props.localTextPrefix, props.item.title, p => p + props.item.name) ?? "";
     return (
-        <label className="caption" for={(props.idPrefix ?? "") + props.item.name}
+        <label class="caption" for={(props.idPrefix ?? "") + props.item.name}
             title={determineText(props.localTextPrefix, props.item.hint, p => p + props.item.name + '_Hint') ?? caption}
             style={!!labelWidth && (labelWidth == "0" ? "display: none" : ("width: " + labelWidth))}>
             {props.item.required && <sup title={PropertyGridTexts.RequiredHint}>*</sup>}
@@ -165,7 +165,7 @@ export function PropertyField(props: {
 
 export function PropertyCategoryTitle(props: { category: string, localTextPrefix: string }): HTMLElement {
     return (
-        <div className="category-title">
+        <div class="category-title">
             {determineText(props.localTextPrefix, props.category, prefix => prefix + 'Categories.' + props.category)}
         </div>
     ) as HTMLElement;
@@ -208,8 +208,8 @@ export function PropertyCategory(props: { category?: string, children?: any, col
 export function PropertyTabItem(props: { title: string, active?: boolean, paneId?: string, localTextPrefix?: string }): HTMLLIElement {
     const bs3 = isBS3();
     return (
-        <li role="tab" className={bs3 ? (props.active ? "active" : "") : "nav-item"}>
-            <a className={bs3 ? "" : `nav-link ${props.active ? "active" : ""}`}
+        <li role="tab" class={bs3 ? (props.active ? "active" : "") : "nav-item"}>
+            <a class={bs3 ? "" : `nav-link ${props.active ? "active" : ""}`}
                 data-bs-toggle="tab"
                 href={!!props.paneId && `#${props.paneId}`}
                 data-tabkey={extractTabKey(props.title)}>
@@ -221,7 +221,7 @@ export function PropertyTabItem(props: { title: string, active?: boolean, paneId
 
 export function PropertyTabPane(props: { active?: boolean, id?: string, children?: any }): HTMLElement {
     return (
-        <div id={props.id} className={`tab-pane fade${props.active ? (isBS3() ? " in active" : " show active") : ""}`} role="tabpanel">
+        <div id={props.id} class={`tab-pane fade${props.active ? (isBS3() ? " in active" : " show active") : ""}`} role="tabpanel">
             {props.children}
         </div>
     ) as HTMLElement;
@@ -260,7 +260,7 @@ export function PropertyCategories(props: {
 
 export function PropertyTabList(props?: { children?: any }): HTMLElement {
     return (
-        <ul className="nav nav-underline property-tabs" role="tablist">
+        <ul class="nav nav-underline property-tabs" role="tablist">
             {props?.children}
         </ul>
     ) as HTMLElement;
@@ -588,7 +588,7 @@ function setMaxLength(widget: Widget<any>, maxLength: number) {
 }
 
 function createLineBreak(klass: string): HTMLElement {
-    return <div className={klass} style="width: 100%" /> as HTMLElement;
+    return <div class={klass} style="width: 100%" /> as HTMLElement;
 }
 
 export enum PropertyGridMode {

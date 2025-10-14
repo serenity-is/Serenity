@@ -26,6 +26,8 @@ export function EditLink(props: {
     /**
      * Tab index for the link. Default is null, which means no tabindex attribute.
      */
+    tabindex?: number,
+    /** @deprecated Use tabindex. */
     tabIndex?: number,
     /**
      * Child elements or text to be displayed inside the link.
@@ -44,7 +46,7 @@ export function EditLink(props: {
         href={"#" + replaceAll(props.itemType ?? "", '.', '-') + '/' + (props.itemId ?? "")}
         data-item-type={props.itemType}
         data-item-id={props.itemId}
-        tabindex={props.tabIndex}>
+        tabindex={props.tabindex ?? (props as any).tabIndex}>
         {props.children}
     </a> as HTMLAnchorElement;
 }

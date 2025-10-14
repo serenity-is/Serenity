@@ -678,7 +678,9 @@ export class DataGrid<TItem, P = {}> extends Widget<P> implements IDataGrid, IRe
         itemType?: string,
         /** Extra CSS class to add to the link element besides s-EditLink. Optional. */
         cssClass?: string,
-        /** Tab index to add to the link element. Optional. */
+        /** The tabindex to assign to the link, default is undefined */
+        tabindex?: number,
+        /** @deprecated Use tabindex. */
         tabIndex?: number,
         /** The link text. If not provided it will be taken from ctx.escape(ctx.value) */
         children?: any
@@ -702,7 +704,7 @@ export class DataGrid<TItem, P = {}> extends Widget<P> implements IDataGrid, IRe
             itemId: id,
             children: children,
             cssClass: props.cssClass,
-            tabIndex: props.tabIndex
+            tabindex: props.tabindex ?? props.tabIndex,
         })
     }
 

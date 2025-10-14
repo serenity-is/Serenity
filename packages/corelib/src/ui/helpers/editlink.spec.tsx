@@ -91,12 +91,12 @@ describe('EditLink', () => {
     });
 
     it('should handle tabindex zero', () => {
-        const link = EditLink({ itemId: 123, tabIndex: 0 });
+        const link = EditLink({ itemId: 123, tabindex: 0 });
         expect(link).toStrictEqual(<a class="s-EditLink" data-item-id="123" href="#/123" tabindex={0} />);
     });
 
     it('should handle negative tabindex', () => {
-        const link = EditLink({ itemId: 123, tabIndex: -1 });
+        const link = EditLink({ itemId: 123, tabindex: -1 });
         expect(link).toStrictEqual(<a class="s-EditLink" data-item-id="123" href="#/123" tabindex={-1} />);
     });
 });

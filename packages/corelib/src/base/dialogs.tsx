@@ -433,7 +433,7 @@ export class Dialog {
         let bs5 = isBS5Plus();
         if (opt.closeButton) {
             const closeButton = <button type="button" class={bs5 ? "btn-close" : "close"} aria-label={DialogTexts.CloseButton}>
-                {!bs5 && <span aria-hidden={true}>✕</span>}
+                {!bs5 && <span aria-hidden="true">✕</span>}
             </button> as HTMLButtonElement;
             closeButton.dataset[bs5 ? "bsDismiss" : "dismiss"] = "modal";
 

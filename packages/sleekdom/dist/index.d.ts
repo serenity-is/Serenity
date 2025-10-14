@@ -67,16 +67,13 @@ export interface ElementAttributes<T> {
 	onDoubleClickCapture?: EventHandlerUnion<T, MouseEvent> | undefined;
 }
 export interface HTMLAttributes<T> {
-	/** @deprecated use contenteditable */
 	contentEditable?: Signalish<EnumeratedPseudoBoolean | EnumeratedAcceptsEmpty | "plaintext-only" | "inherit" | RemoveAttribute>;
-	/** @deprecated use spellcheck */
-	spellCheck?: Signalish<EnumeratedPseudoBoolean | EnumeratedAcceptsEmpty | RemoveAttribute>;
 	dataset?: {
 		[key: string]: string;
 	} | undefined;
+	spellCheck?: Signalish<EnumeratedPseudoBoolean | EnumeratedAcceptsEmpty | RemoveAttribute>;
 }
 export interface SVGAttributes<T> {
-	/** @deprecated use tabindex */
 	tabIndex?: Signalish<number | string | RemoveAttribute>;
 }
 export interface AnchorHTMLAttributes<T> {
@@ -84,27 +81,19 @@ export interface AnchorHTMLAttributes<T> {
 	referrerPolicy?: Signalish<HTMLReferrerPolicy | RemoveAttribute>;
 }
 export interface ButtonHTMLAttributes<T> {
-	/** @deprecated use autofocus */
 	autoFocus?: Signalish<boolean | RemoveAttribute>;
-	/** @deprecated use formnovalidate */
 	formNoValidate?: Signalish<boolean | RemoveAttribute>;
 }
 export interface InputHTMLAttributes<T> {
-	/** @deprecated use maxlength */
-	maxLength?: Signalish<number | RemoveAttribute>;
-	/** @deprecated use minlength */
-	minLength?: Signalish<number | RemoveAttribute>;
-	/** @deprecated use readonly */
+	maxLength?: Signalish<string | number | RemoveAttribute>;
+	minLength?: Signalish<string | number | RemoveAttribute>;
 	readOnly?: Signalish<boolean | RemoveAttribute>;
 }
 export interface LabelHTMLAttributes<T> {
-	/** @deprecated use for */
 	htmlFor?: Signalish<string | RemoveAttribute>;
 }
 export interface TdHTMLAttributes<T> {
-	/** @deprecated use colspan */
 	colSpan?: Signalish<number | string | RemoveAttribute>;
-	/** @deprecated use rowspan */
 	rowSpan?: Signalish<number | string | RemoveAttribute>;
 }
 export interface ComponentClass<P = {}, T extends Node = JSXElement> {
@@ -505,7 +494,7 @@ export interface AriaAttributes {
 	 *
 	 * @see aria-disabled.
 	 */
-	"aria-hidden"?: Signalish<EnumeratedPseudoBoolean | true | RemoveAttribute>;
+	"aria-hidden"?: Signalish<EnumeratedPseudoBoolean | RemoveAttribute>;
 	/**
 	 * Indicates the entered value does not conform to the format expected by the application.
 	 *
@@ -1494,8 +1483,8 @@ export interface WebViewHTMLAttributes<T> extends HTMLAttributes<T> {
 	guestinstance?: Signalish<string | RemoveAttribute>;
 }
 // SVG
-export type SVGPreserveAspectRatio_ = "none" | "xMinYMin" | "xMidYMin" | "xMaxYMin" | "xMinYMid" | "xMidYMid" | "xMaxYMid" | "xMinYMax" | "xMidYMax" | "xMaxYMax" | "xMinYMin meet" | "xMidYMin meet" | "xMaxYMin meet" | "xMinYMid meet" | "xMidYMid meet" | "xMaxYMid meet" | "xMinYMax meet" | "xMidYMax meet" | "xMaxYMax meet" | "xMinYMin slice" | "xMidYMin slice" | "xMaxYMin slice" | "xMinYMid slice" | "xMidYMid slice" | "xMaxYMid slice" | "xMinYMax slice" | "xMidYMax slice" | "xMaxYMax slice";
-export type ImagePreserveAspectRatio = SVGPreserveAspectRatio_ | "defer none" | "defer xMinYMin" | "defer xMidYMin" | "defer xMaxYMin" | "defer xMinYMid" | "defer xMidYMid" | "defer xMaxYMid" | "defer xMinYMax" | "defer xMidYMax" | "defer xMaxYMax" | "defer xMinYMin meet" | "defer xMidYMin meet" | "defer xMaxYMin meet" | "defer xMinYMid meet" | "defer xMidYMid meet" | "defer xMaxYMid meet" | "defer xMinYMax meet" | "defer xMidYMax meet" | "defer xMaxYMax meet" | "defer xMinYMin slice" | "defer xMidYMin slice" | "defer xMaxYMin slice" | "defer xMinYMid slice" | "defer xMidYMid slice" | "defer xMaxYMid slice" | "defer xMinYMax slice" | "defer xMidYMax slice" | "defer xMaxYMax slice";
+export type SVGPreserveAspectRatioValue = "none" | "xMinYMin" | "xMidYMin" | "xMaxYMin" | "xMinYMid" | "xMidYMid" | "xMaxYMid" | "xMinYMax" | "xMidYMax" | "xMaxYMax" | "xMinYMin meet" | "xMidYMin meet" | "xMaxYMin meet" | "xMinYMid meet" | "xMidYMid meet" | "xMaxYMid meet" | "xMinYMax meet" | "xMidYMax meet" | "xMaxYMax meet" | "xMinYMin slice" | "xMidYMin slice" | "xMaxYMin slice" | "xMinYMid slice" | "xMidYMid slice" | "xMaxYMid slice" | "xMinYMax slice" | "xMidYMax slice" | "xMaxYMax slice";
+export type ImagePreserveAspectRatio = SVGPreserveAspectRatioValue | "defer none" | "defer xMinYMin" | "defer xMidYMin" | "defer xMaxYMin" | "defer xMinYMid" | "defer xMidYMid" | "defer xMaxYMid" | "defer xMinYMax" | "defer xMidYMax" | "defer xMaxYMax" | "defer xMinYMin meet" | "defer xMidYMin meet" | "defer xMaxYMin meet" | "defer xMinYMid meet" | "defer xMidYMid meet" | "defer xMaxYMid meet" | "defer xMinYMax meet" | "defer xMidYMax meet" | "defer xMaxYMax meet" | "defer xMinYMin slice" | "defer xMidYMin slice" | "defer xMaxYMin slice" | "defer xMinYMid slice" | "defer xMidYMid slice" | "defer xMaxYMid slice" | "defer xMinYMax slice" | "defer xMidYMax slice" | "defer xMaxYMax slice";
 export type SVGUnits = "userSpaceOnUse" | "objectBoundingBox";
 export interface StylableSVGAttributes {
 	class?: Signalish<string | ClassNames | RemoveAttribute>;
@@ -1630,7 +1619,7 @@ export interface DoubleInputFilterSVGAttributes {
 	in2?: Signalish<string | RemoveAttribute>;
 }
 export interface FitToViewBoxSVGAttributes {
-	preserveAspectRatio?: Signalish<SVGPreserveAspectRatio_ | RemoveAttribute>;
+	preserveAspectRatio?: Signalish<SVGPreserveAspectRatioValue | RemoveAttribute>;
 	viewBox?: Signalish<string | RemoveAttribute>;
 }
 export interface GradientElementSVGAttributes<T> extends SVGAttributes<T>, ExternalResourceSVGAttributes, StylableSVGAttributes {
@@ -1748,7 +1737,7 @@ export interface FeGaussianBlurSVGAttributes<T> extends FilterPrimitiveElementSV
 }
 export interface FeImageSVGAttributes<T> extends FilterPrimitiveElementSVGAttributes<T>, ExternalResourceSVGAttributes, StylableSVGAttributes {
 	href?: Signalish<string | RemoveAttribute>;
-	preserveAspectRatio?: Signalish<SVGPreserveAspectRatio_ | RemoveAttribute>;
+	preserveAspectRatio?: Signalish<SVGPreserveAspectRatioValue | RemoveAttribute>;
 }
 export interface FeMergeSVGAttributes<T> extends FilterPrimitiveElementSVGAttributes<T>, StylableSVGAttributes {
 }
@@ -1906,7 +1895,7 @@ export interface SwitchSVGAttributes<T> extends ContainerElementSVGAttributes<T>
 }
 export interface SymbolSVGAttributes<T> extends ContainerElementSVGAttributes<T>, NewViewportSVGAttributes<T>, ExternalResourceSVGAttributes, StylableSVGAttributes, FitToViewBoxSVGAttributes, Pick<PresentationSVGAttributes, "clip-path"> {
 	height?: Signalish<number | string | RemoveAttribute>;
-	preserveAspectRatio?: Signalish<SVGPreserveAspectRatio_ | RemoveAttribute>;
+	preserveAspectRatio?: Signalish<SVGPreserveAspectRatioValue | RemoveAttribute>;
 	refX?: Signalish<number | string | RemoveAttribute>;
 	refY?: Signalish<number | string | RemoveAttribute>;
 	viewBox?: Signalish<string | RemoveAttribute>;

@@ -446,7 +446,7 @@ interface AriaAttributes {
      *
      * @see aria-disabled.
      */
-    "aria-hidden"?: FunctionMaybe<EnumeratedPseudoBoolean | true | RemoveAttribute>;
+    "aria-hidden"?: FunctionMaybe<EnumeratedPseudoBoolean | RemoveAttribute>;
     /**
      * Indicates the entered value does not conform to the format expected by the application.
      *
@@ -760,7 +760,9 @@ interface EventHandlersElement<T> {
     onCompositionEnd?: EventHandlerUnion<T, CompositionEvent> | undefined;
     onCompositionStart?: EventHandlerUnion<T, CompositionEvent> | undefined;
     onCompositionUpdate?: EventHandlerUnion<T, CompositionEvent> | undefined;
-    onContentVisibilityAutoStateChange?: | EventHandlerUnion<T, ContentVisibilityAutoStateChangeEvent> | undefined;
+    onContentVisibilityAutoStateChange?:
+      | EventHandlerUnion<T, ContentVisibilityAutoStateChangeEvent>
+      | undefined;
     onContextLost?: EventHandlerUnion<T, Event> | undefined;
     onContextMenu?: EventHandlerUnion<T, PointerEvent> | undefined;
     onContextRestored?: EventHandlerUnion<T, Event> | undefined;
@@ -1962,7 +1964,7 @@ interface WebViewHTMLAttributes<T> extends HTMLAttributes<T> {
 
 // SVG
 
-type SVGPreserveAspectRatio_ =
+type SVGPreserveAspectRatioValue =
     | "none"
     | "xMinYMin"
     | "xMidYMin"
@@ -1992,7 +1994,7 @@ type SVGPreserveAspectRatio_ =
     | "xMidYMax slice"
     | "xMaxYMax slice";
 type ImagePreserveAspectRatio =
-    | SVGPreserveAspectRatio_
+    | SVGPreserveAspectRatioValue
     | "defer none"
     | "defer xMinYMin"
     | "defer xMidYMin"
@@ -2242,7 +2244,7 @@ interface DoubleInputFilterSVGAttributes {
     in2?: FunctionMaybe<string | RemoveAttribute>;
 }
 interface FitToViewBoxSVGAttributes {
-    preserveAspectRatio?: FunctionMaybe<SVGPreserveAspectRatio_ | RemoveAttribute>;
+    preserveAspectRatio?: FunctionMaybe<SVGPreserveAspectRatioValue | RemoveAttribute>;
     viewBox?: FunctionMaybe<string | RemoveAttribute>;
 }
 interface GradientElementSVGAttributes<T>
@@ -2499,7 +2501,7 @@ interface FeImageSVGAttributes<T>
     ExternalResourceSVGAttributes,
     StylableSVGAttributes {
     href?: FunctionMaybe<string | RemoveAttribute>;
-    preserveAspectRatio?: FunctionMaybe<SVGPreserveAspectRatio_ | RemoveAttribute>;
+    preserveAspectRatio?: FunctionMaybe<SVGPreserveAspectRatioValue | RemoveAttribute>;
 }
 interface FeMergeSVGAttributes<T>
     extends FilterPrimitiveElementSVGAttributes<T>,
@@ -2766,7 +2768,7 @@ interface SymbolSVGAttributes<T>
     FitToViewBoxSVGAttributes,
     Pick<PresentationSVGAttributes, "clip-path"> {
     height?: FunctionMaybe<number | string | RemoveAttribute>;
-    preserveAspectRatio?: FunctionMaybe<SVGPreserveAspectRatio_ | RemoveAttribute>;
+    preserveAspectRatio?: FunctionMaybe<SVGPreserveAspectRatioValue | RemoveAttribute>;
     refX?: FunctionMaybe<number | string | RemoveAttribute>;
     refY?: FunctionMaybe<number | string | RemoveAttribute>;
     viewBox?: FunctionMaybe<string | RemoveAttribute>;

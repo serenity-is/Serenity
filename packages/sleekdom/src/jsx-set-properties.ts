@@ -1,7 +1,7 @@
 import { className } from "./classname";
 import { setStyle } from "./set-style";
 import { nonPresentationSVGAttributes } from "./svg-consts";
-import { forEach, isAttributeHook, isFunction, isObject, isSignalLike, isVisibleChild, keys } from "./util";
+import { forEach, isFunction, isObject, isSignalLike, isVisibleChild, keys } from "./util";
 
 const XLinkNamespace = "http://www.w3.org/1999/xlink";
 const XMLNamespace = "http://www.w3.org/XML/1998/namespace";
@@ -12,6 +12,7 @@ function normalizeAttribute(s: string, separator: string) {
 
 const propToAttr: Record<string, string> = {
     className: "class",
+    contentEditable: "contenteditable",
     htmlFor: "for",
     tabIndex: "tabindex",
     spellCheck: "spellcheck",
@@ -80,10 +81,6 @@ function setProperty(node: Element & HTMLOrSVGElement, key: string, value: any, 
             // use attribute for other elements
             break;
 
-        case "spellcheck":
-            (node as HTMLInputElement).spellcheck = value;
-            return;
-
         case "class":
             // ideally we should check prevValue and toggle only changed classes
             // to preserve externally added classes but we already have
@@ -98,6 +95,28 @@ function setProperty(node: Element & HTMLOrSVGElement, key: string, value: any, 
                 node.setAttribute("class", className(value));
             }
             return;
+
+        case "spellcheck":
+            (node as HTMLInputElement).spellcheck = value === "" || value === true || value === "true" ? true : (value === false || value === "false") ? false : value;
+            return;
+
+        case "draggable":
+            if (value === false || value === "false")
+                value = "false";
+            else if (value === "")
+                value = null;
+            else if (value === true || value === "true")
+                value = "true";
+            break;
+
+        case "contenteditable":
+            // these attributes are special in that they support
+            // pseudo-boolean values "true" and "false"
+            if (value === false)
+                value = "false";
+            else if (value === "" || value === true)
+                value = "true";
+            break;
 
         case "ref":
         case "namespaceURI":

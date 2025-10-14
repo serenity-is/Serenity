@@ -75,7 +75,7 @@ export class ProductGrid<P = {}> extends EntityGrid<ProductRow, P> {
         const pending = this.pendingChanges[this.itemId(ctx.item)];
         pending && pending[ctx.column.field] !== undefined && (klass += ' dirty');
         const value = this.getEffectiveValue(ctx.item, ctx.column.field) as number;
-        return <input type="text" className={klass} data-field={ctx.column.field} value={formatNumber(value, '0.##')} />;
+        return <input type="text" class={klass} data-field={ctx.column.field} value={formatNumber(value, '0.##')} />;
     }
 
     private stringInputFormatter(ctx: FormatterContext<ProductRow>): FormatterResult {
@@ -87,7 +87,7 @@ export class ProductGrid<P = {}> extends EntityGrid<ProductRow, P> {
         pending && pending[ctx.column.field] !== undefined && (klass += ' dirty');
         const value = this.getEffectiveValue(ctx.item, ctx.column.field) as string;
 
-        return <input type='text' className={klass}
+        return <input type='text' class={klass}
             data-field={ctx.column.field}
             value={value}
             maxlength={ctx.column.sourceItem.maxLength} />;
@@ -102,7 +102,7 @@ export class ProductGrid<P = {}> extends EntityGrid<ProductRow, P> {
         pending && pending[idField] !== undefined && (klass += ' dirty');
 
         const value = this.getEffectiveValue(ctx.item, idField) as string;
-        let markup = <select className={klass} data-field={idField} style={{ width: '100%', maxWidth: '100%' }}>
+        let markup = <select class={klass} data-field={idField} style={{ width: '100%', maxWidth: '100%' }}>
             <option value=''>--</option>;
             {lookup.items.map(c => <option value={c[lookup.idField]} selected={c[lookup.idField] == value}>
                 {c[lookup.textField]}

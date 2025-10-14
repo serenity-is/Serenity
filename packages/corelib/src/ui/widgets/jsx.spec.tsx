@@ -284,7 +284,7 @@ it('assign or skip boolean props', function () {
         </a> as HTMLElement
     );
 
-    expect(link.outerHTML).toBe('<a download="" contenteditable="">Download</a>');
+    expect(link.outerHTML).toBe('<a download="" contenteditable="true">Download</a>');
 });
 
 it('assign booleanish false props', function () {
@@ -295,8 +295,8 @@ it('assign booleanish false props', function () {
     );
     const input = <textarea spellCheck={false} /> as HTMLElement;
 
-    expect(element.outerHTML).toBe('<span contenteditable=""><a>Download</a></span>');
-    expect(input.outerHTML).toBe((globalThis as any).jsdom ? '<textarea></textarea>' : '<textarea spellcheck="false"></textarea>');
+    expect(element.outerHTML).toBe('<span contenteditable="true"><a contenteditable="false">Download</a></span>');
+    expect(input.spellcheck).toBe(false);
 });
 
 it('skip undefined and null props', function () {
