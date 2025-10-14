@@ -36,7 +36,7 @@ export function SampleSourceLink(props: { path: string }) {
     }
     else { 
         const sampleFolder = getSamplePagePath()?.split('/').slice(0, -1).join('/');
-        href += "common-features/src/demo.basicsamples/" + sampleFolder + "/" + filename;
+        href += "common-features/src/demo.basicsamples/" + sampleFolder + "/" + props.path;
     };
     return <a class="s-sample-source-link" target="_blank" href={href}>{filename}</a>
 }
