@@ -2851,13 +2851,10 @@ export declare function useText(initialValue?: string): readonly [
 	Text,
 	(value: string) => void
 ];
-export declare function jsx<K extends keyof HTMLElementTagNameMap, T extends HTMLElementTagNameMap[K]>(type: K, props?: HTMLElementTags[K] | null, key?: string): T;
-export declare function jsx<K extends (keyof SVGElementTagNameMap & keyof SVGElementTags), T extends SVGElementTagNameMap[K]>(type: K, props?: SVGElementTags[K] | null, key?: string): SVGElement;
-export declare function jsx<T extends Element>(type: string, props?: ElementAttributes<T> | null, key?: string): T;
-export declare function jsx<P extends {}, T extends Element>(type: ComponentType<P, T>, props?: P & {
-	children?: ComponentChildren;
-	ref?: Ref<T>;
-} | null, key?: string): T;
+export type DataKeys = `data-${string}`;
+export declare function jsx<THtmlTag extends keyof HTMLElementTagNameMap, TElement extends HTMLElementTagNameMap[THtmlTag]>(type: THtmlTag, props?: (HTMLElementTags[THtmlTag] & Record<DataKeys, string | number>) | null, key?: string): TElement;
+export declare function jsx<TSvgTag extends (keyof SVGElementTagNameMap & keyof SVGElementTags), TElement extends SVGElementTagNameMap[TSvgTag]>(type: TSvgTag, props?: (SVGElementTags[TSvgTag] & Record<DataKeys, string | number>) | null, key?: string): TElement;
+export declare function jsx(type: string, props?: (ElementAttributes<JSXElement> & Record<DataKeys, string | number>) | null, key?: string): JSXElement;
 export declare function ShadowRootNode({ children, ref, ...attr }: ShadowRootInit & {
 	ref?: Ref<ShadowRoot>;
 	children?: ComponentChildren;

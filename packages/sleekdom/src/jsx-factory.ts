@@ -3,33 +3,36 @@ import { appendChildren } from "./jsx-append-children"
 import { setProperties } from "./jsx-set-properties"
 import { attachRef } from "./ref"
 import { SVGNamespace, svgTags } from "./svg-consts"
-import type { ComponentType, JSX, Ref } from "./types"
+import type { ComponentType, JSX, JSXElement, Ref } from "./types"
 import type { ComponentChildren } from "./types/custom-attributes"
 import type { ElementAttributes, HTMLElementTags, SVGElementTags } from "./types/dom-expressions-jsx"
 import { isComponentClass, isFunction, isObject, isString } from "./util"
 
+
+type DataKeys = `data-${string}`
+
 // DOM Elements
-export function jsx<K extends keyof HTMLElementTagNameMap, T extends HTMLElementTagNameMap[K]>(
-    type: K,
-    props?: HTMLElementTags[K] | null,
+export function jsx<THtmlTag extends keyof HTMLElementTagNameMap, TElement extends HTMLElementTagNameMap[THtmlTag]>(
+    type: THtmlTag,
+    props?: (HTMLElementTags[THtmlTag] & Record<DataKeys, string | number>) | null,
     key?: string
-): T
-export function jsx<K extends (keyof SVGElementTagNameMap & keyof SVGElementTags), T extends SVGElementTagNameMap[K]>(
-    type: K,
-    props?: SVGElementTags[K] | null,
+): TElement
+export function jsx<TSvgTag extends (keyof SVGElementTagNameMap & keyof SVGElementTags), TElement extends SVGElementTagNameMap[TSvgTag]>(
+    type: TSvgTag,
+    props?: (SVGElementTags[TSvgTag] & Record<DataKeys, string | number>) | null,
     key?: string
-): SVGElement
-export function jsx<T extends Element>(
+): TElement
+export function jsx(
     type: string,
-    props?: ElementAttributes<T> | null,
+    props?: (ElementAttributes<JSXElement> & Record<DataKeys, string | number>) | null,
     key?: string
-): T
+): JSXElement
 // Custom components
-export function jsx<P extends {}, T extends Element>(
-    type: ComponentType<P, T>,
-    props?: P & { children?: ComponentChildren; ref?: Ref<T> } | null,
-    key?: string
-): T
+//export function jsx<P extends {}, TElement extends JSXElement = JSXElement>(
+//    type: ComponentType<P, TElement>,
+//    props?: P & { children?: ComponentChildren; ref?: Ref<TElement> } | null,
+//    key?: string
+//): TElement
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
 export function jsx(tag: any, { children, ...attr }: { children?: ComponentChildren, [key: string]: any }, _key?: string) {
     if (!attr.namespaceURI && svgTags.has(tag))
