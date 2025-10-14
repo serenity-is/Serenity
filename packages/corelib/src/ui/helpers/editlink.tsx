@@ -44,7 +44,7 @@ export function EditLink(props: {
         href={"#" + replaceAll(props.itemType ?? "", '.', '-') + '/' + (props.itemId ?? "")}
         data-item-type={props.itemType}
         data-item-id={props.itemId}
-        tabIndex={props.tabIndex}>
+        tabindex={props.tabIndex}>
         {props.children}
     </a> as HTMLAnchorElement;
 }

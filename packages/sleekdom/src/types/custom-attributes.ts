@@ -55,31 +55,48 @@ declare module "./dom-expressions-jsx" {
     }
 
     interface HTMLAttributes<T> {
+        /** @deprecated use contenteditable */
         contentEditable?: Signalish<EnumeratedPseudoBoolean | EnumeratedAcceptsEmpty | "plaintext-only" | "inherit" | RemoveAttribute>;
+        /** @deprecated use spellcheck */
         spellCheck?: Signalish<EnumeratedPseudoBoolean | EnumeratedAcceptsEmpty | RemoveAttribute>;
         dataset?: { [key: string]: string } | undefined
     }
 
     interface SVGAttributes<T> {
+        /** @deprecated use tabindex */
         tabIndex?: Signalish<number | string | RemoveAttribute>;
     }
 
     interface AnchorHTMLAttributes<T> {
+        /** @deprecated use referrerpolicy */
         referrerPolicy?: Signalish<HTMLReferrerPolicy | RemoveAttribute>;
     }
 
     interface ButtonHTMLAttributes<T> {
+        /** @deprecated use autofocus */
         autoFocus?: Signalish<boolean | RemoveAttribute>;
+        /** @deprecated use formnovalidate */
         formNoValidate?: Signalish<boolean | RemoveAttribute>;
     }
 
     interface InputHTMLAttributes<T> {
+        /** @deprecated use maxlength */
         maxLength?: Signalish<number | RemoveAttribute>;
+        /** @deprecated use minlength */
         minLength?: Signalish<number | RemoveAttribute>;
+        /** @deprecated use readonly */
         readOnly?: Signalish<boolean | RemoveAttribute>;
     }
 
     interface LabelHTMLAttributes<T> {
+        /** @deprecated use for */
         htmlFor?: Signalish<string | RemoveAttribute>;
+    }
+
+    interface TdHTMLAttributes<T>{
+        /** @deprecated use colspan */
+        colSpan?: Signalish<number | string | RemoveAttribute>;
+        /** @deprecated use rowspan */
+        rowSpan?: Signalish<number | string | RemoveAttribute>;
     }
 }

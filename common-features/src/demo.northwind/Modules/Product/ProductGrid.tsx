@@ -90,7 +90,7 @@ export class ProductGrid<P = {}> extends EntityGrid<ProductRow, P> {
         return <input type='text' className={klass}
             data-field={ctx.column.field}
             value={value}
-            maxLength={ctx.column.sourceItem.maxLength} />;
+            maxlength={ctx.column.sourceItem.maxLength} />;
     }
 
     private selectFormatter(ctx: FormatterContext, idField: string, lookup: Lookup<any>) {

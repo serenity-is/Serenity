@@ -446,7 +446,7 @@ interface AriaAttributes {
      *
      * @see aria-disabled.
      */
-    "aria-hidden"?: FunctionMaybe<EnumeratedPseudoBoolean | RemoveAttribute>;
+    "aria-hidden"?: FunctionMaybe<EnumeratedPseudoBoolean | true | RemoveAttribute>;
     /**
      * Indicates the entered value does not conform to the format expected by the application.
      *

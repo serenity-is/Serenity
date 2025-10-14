@@ -67,29 +67,45 @@ export interface ElementAttributes<T> {
 	onDoubleClickCapture?: EventHandlerUnion<T, MouseEvent> | undefined;
 }
 export interface HTMLAttributes<T> {
+	/** @deprecated use contenteditable */
 	contentEditable?: Signalish<EnumeratedPseudoBoolean | EnumeratedAcceptsEmpty | "plaintext-only" | "inherit" | RemoveAttribute>;
+	/** @deprecated use spellcheck */
 	spellCheck?: Signalish<EnumeratedPseudoBoolean | EnumeratedAcceptsEmpty | RemoveAttribute>;
 	dataset?: {
 		[key: string]: string;
 	} | undefined;
 }
 export interface SVGAttributes<T> {
+	/** @deprecated use tabindex */
 	tabIndex?: Signalish<number | string | RemoveAttribute>;
 }
 export interface AnchorHTMLAttributes<T> {
+	/** @deprecated use referrerpolicy */
 	referrerPolicy?: Signalish<HTMLReferrerPolicy | RemoveAttribute>;
 }
 export interface ButtonHTMLAttributes<T> {
+	/** @deprecated use autofocus */
 	autoFocus?: Signalish<boolean | RemoveAttribute>;
+	/** @deprecated use formnovalidate */
 	formNoValidate?: Signalish<boolean | RemoveAttribute>;
 }
 export interface InputHTMLAttributes<T> {
+	/** @deprecated use maxlength */
 	maxLength?: Signalish<number | RemoveAttribute>;
+	/** @deprecated use minlength */
 	minLength?: Signalish<number | RemoveAttribute>;
+	/** @deprecated use readonly */
 	readOnly?: Signalish<boolean | RemoveAttribute>;
 }
 export interface LabelHTMLAttributes<T> {
+	/** @deprecated use for */
 	htmlFor?: Signalish<string | RemoveAttribute>;
+}
+export interface TdHTMLAttributes<T> {
+	/** @deprecated use colspan */
+	colSpan?: Signalish<number | string | RemoveAttribute>;
+	/** @deprecated use rowspan */
+	rowSpan?: Signalish<number | string | RemoveAttribute>;
 }
 export interface ComponentClass<P = {}, T extends Node = JSXElement> {
 	new (props: P): ComponentClass<P, T>;
@@ -489,7 +505,7 @@ export interface AriaAttributes {
 	 *
 	 * @see aria-disabled.
 	 */
-	"aria-hidden"?: Signalish<EnumeratedPseudoBoolean | RemoveAttribute>;
+	"aria-hidden"?: Signalish<EnumeratedPseudoBoolean | true | RemoveAttribute>;
 	/**
 	 * Indicates the entered value does not conform to the format expected by the application.
 	 *

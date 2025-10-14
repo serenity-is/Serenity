@@ -23,7 +23,7 @@ describe('EditLink', () => {
 
     it('should render with tabIndex', () => {
         const link = EditLink({ itemId: 123, tabIndex: 5 });
-        expect(link).toStrictEqual(<a class="s-EditLink" data-item-id="123" href="#/123" tabIndex={5} />);
+        expect(link).toStrictEqual(<a class="s-EditLink" data-item-id="123" href="#/123" tabindex={5} />);
     });
 
     it('should render with children', () => {
@@ -44,7 +44,7 @@ describe('EditLink', () => {
             tabIndex: 10,
             children: 'Full Edit'
         });
-        expect(link).toStrictEqual(<a class="s-EditLink s-Test-Module-Link btn btn-primary" data-item-type="Test.Module" data-item-id="456" href="#Test-Module/456" tabIndex={10}>Full Edit</a>);
+        expect(link).toStrictEqual(<a class="s-EditLink s-Test-Module-Link btn btn-primary" data-item-type="Test.Module" data-item-id="456" href="#Test-Module/456" tabindex={10}>Full Edit</a>);
     });
 
     it('should handle null itemId', () => {
@@ -90,13 +90,13 @@ describe('EditLink', () => {
         expect(link).toStrictEqual(<a class="s-EditLink class1 class2 class3" data-item-id="123" href="#/123" />);
     });
 
-    it('should handle tabIndex zero', () => {
+    it('should handle tabindex zero', () => {
         const link = EditLink({ itemId: 123, tabIndex: 0 });
-        expect(link).toStrictEqual(<a class="s-EditLink" data-item-id="123" href="#/123" tabIndex={0} />);
+        expect(link).toStrictEqual(<a class="s-EditLink" data-item-id="123" href="#/123" tabindex={0} />);
     });
 
-    it('should handle negative tabIndex', () => {
+    it('should handle negative tabindex', () => {
         const link = EditLink({ itemId: 123, tabIndex: -1 });
-        expect(link).toStrictEqual(<a class="s-EditLink" data-item-id="123" href="#/123" tabIndex={-1} />);
+        expect(link).toStrictEqual(<a class="s-EditLink" data-item-id="123" href="#/123" tabindex={-1} />);
     });
 });

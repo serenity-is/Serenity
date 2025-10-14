@@ -452,7 +452,7 @@ export class Dialog {
         }
 
         const modal = document.body.appendChild(
-            <div class={["modal", opt.dialogClass, opt.fade && "fade"]} tabIndex={-1}>
+            <div class={["modal", opt.dialogClass, opt.fade && "fade"]} tabindex={-1}>
                 <div class={[
                     "modal-dialog",
                     opt.size && "modal-" + opt.size,
