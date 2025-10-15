@@ -34,7 +34,7 @@ const defaults = {
     entryPoints: ['./src/index.ts'],
     color: true,
     logLevel: 'info',
-    target: 'es2015',
+    target: 'es2020',
     plugins: [writeIfChanged()]
 }
 

@@ -14,7 +14,7 @@ export function useMemo<T>(factory: () => T): T {
 export function forwardRef<T = Node, P = {}>(
   render: (props: P, ref: Ref<T>) => JSXElement
 ): FunctionComponent<P & { ref?: Ref<T> }> {
-  return ({ ref, ...props }) => render(props as P, ref ?? createRef<T>())
+  return ({ ref, ...props }) => render(props as P, ref || createRef<T>())
 }
 
 export function useImperativeHandle<T>(ref: Ref<T>, init: () => T, _deps?: unknown) {
