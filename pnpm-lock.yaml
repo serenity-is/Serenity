@@ -12,15 +12,27 @@ catalogs:
     chart.js:
       specifier: 4.5.1
       version: 4.5.1
+    dompurify:
+      specifier: 3.3.0
+      version: 3.3.0
     esbuild:
       specifier: 0.25.11
       version: 0.25.11
+    flatpickr:
+      specifier: 4.6.13
+      version: 4.6.13
     glob:
       specifier: 11.0.3
       version: 11.0.3
     jsdom:
       specifier: 27.0.0
       version: 27.0.0
+    moment:
+      specifier: 2.30.1
+      version: 2.30.1
+    preact:
+      specifier: 10.27.2
+      version: 10.27.2
     typescript:
       specifier: 5.9.3
       version: 5.9.3
@@ -145,16 +157,16 @@ importers:
         specifier: 1.10.1
         version: 1.10.1
       chart.js:
-        specifier: 4.5.1
+        specifier: catalog:serenity
         version: 4.5.1
       daterangepicker:
         specifier: 3.1.0
         version: 3.1.0
       dompurify:
-        specifier: 3.3.0
+        specifier: catalog:serenity
         version: 3.3.0
       flatpickr:
-        specifier: 4.6.13
+        specifier: catalog:serenity
         version: 4.6.13
       jquery-knob:
         specifier: 1.2.11
@@ -169,10 +181,10 @@ importers:
         specifier: 3.1.2
         version: 3.1.2(jquery@3.7.1)
       moment:
-        specifier: 2.30.1
+        specifier: catalog:serenity
         version: 2.30.1
       preact:
-        specifier: 10.27.2
+        specifier: catalog:serenity
         version: 10.27.2
     devDependencies:
       '@serenity-is/tsbuild':

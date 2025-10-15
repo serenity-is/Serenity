@@ -1,8 +1,11 @@
 #if IsTemplateBuild
 using Newtonsoft.Json.Linq;
 using System;
+using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using System.Numerics;
+using YamlDotNet.Serialization;
 
 namespace Build;
 
@@ -26,33 +29,79 @@ public static partial class Shared
                 return (dependency == null ? json?["version"] : json["dependencies"]?[dependency])?.Value<string>();
             }
 
-            static bool isFileWorkspaceOrUp(string version)
+            static bool shouldFixDependencyVersion(string version)
             {
-                return 
+                return
                     version != null &&
                     (version.StartsWith("file:") ||
                      version.StartsWith("../") ||
-                     version.StartsWith("workspace:"));
+                     version.StartsWith("workspace:") ||
+                     version.StartsWith("catalog:"));
             }
 
             var tsbuildVer = IsPatch ? patchVersion("tsbuild") : GetLatestNpmPackageVersion("@serenity-is/tsbuild");
-            if (!isFileWorkspaceOrUp(devDependencies["@serenity-is/tsbuild"]?.Value<string>()))
+            if (!shouldFixDependencyVersion(devDependencies["@serenity-is/tsbuild"]?.Value<string>()))
                 devDependencies["@serenity-is/tsbuild"] = tsbuildVer;
 
             File.WriteAllText(PackageJsonFile, root.ToString().Replace("\r", ""));
 
             devDependencies["@serenity-is/tsbuild"] = tsbuildVer;
+            devDependencies.Remove("test-utils");
 
-            foreach (var property in dependencies.Properties().ToList())
+            PnpmWorkspaceYaml workspaceYaml = null;
+
+            foreach (var deps in new JObject[] { dependencies, devDependencies })
             {
-                if (!property.Name.StartsWith("@serenity-is/") ||
-                    !isFileWorkspaceOrUp(property.Value.Value<string>()))
-                    continue;
+                foreach (var property in deps.Properties().ToList())
+                {
+                    string version = property.Value.Value<string>();
 
-                dependencies[property.Name] = "./node_modules/.dotnet/" + GetPossibleNuGetPackageId(property.Name);
+                    if (!shouldFixDependencyVersion(version))
+                        continue;
+
+                    if (property.Name.StartsWith("@serenity-is/"))
+                    {
+                        deps[property.Name] = "./node_modules/.dotnet/" + GetPossibleNuGetPackageId(property.Name);
+                    }
+                    else if (version.StartsWith("catalog:"))
+                    {
+                        if (workspaceYaml == null)
+                        {
+                            string workspaceFile = Path.Combine(SerenityFolder, "pnpm-workspace.yaml");
+                            if (!File.Exists(workspaceFile))
+                            {
+                                ExitWithError($"File does not exist: {workspaceFile} !");
+                                return;
+                            }
+
+                            var yaml = File.ReadAllText(Path.Combine(SerenityFolder, "pnpm-workspace.yaml"));
+                            var deserializer = new DeserializerBuilder()
+                                .WithNamingConvention(YamlDotNet.Serialization.NamingConventions.NullNamingConvention.Instance)
+                                .IgnoreUnmatchedProperties()
+                                .Build();
+                            workspaceYaml = deserializer.Deserialize<PnpmWorkspaceYaml>(yaml);
+                        }
+
+                        var catalogName = version["catalog:".Length..];
+                        if ((string.IsNullOrEmpty(catalogName) ||
+                             workspaceYaml.catalogs?.TryGetValue(catalogName, out var catalog) != true ||
+                             catalog?.TryGetValue(property.Name, out var catalogVersion) != true) &&
+                             workspaceYaml.catalog?.TryGetValue(property.Name, out catalogVersion) != true)
+                        {
+                            ExitWithError($"Catalog package version not found: {property.Name} in {version} !");
+                            return;
+                        }
+
+                        deps[property.Name] = catalogVersion;
+                    }
+                    else
+                    {
+                        ExitWithError($"Unsupported package version format: {property.Name} : {version} !");
+                        return;
+                    }
+                }
             }
 
-            devDependencies.Remove("test-utils");
             scripts.Remove("jest");
             scripts.Remove("test");
 
@@ -82,7 +131,7 @@ public static partial class Shared
         {
             moduleName = moduleName.ToLowerInvariant();
 
-            string toNamespace(string src)
+            static string toNamespace(string src)
             {
                 return string.Join(".", src.Split(packageIdSplitChars,
                     StringSplitOptions.RemoveEmptyEntries));
@@ -99,6 +148,12 @@ public static partial class Shared
                 company = toNamespace(company);
 
             return company + "." + toNamespace(moduleName[(idx + 1)..]);
+        }
+
+        private class PnpmWorkspaceYaml
+        {
+            public Dictionary<string, string> catalog { get; set; } = [];
+            public Dictionary<string, Dictionary<string, string>> catalogs { get; set; } = [];
         }
     }
 }
