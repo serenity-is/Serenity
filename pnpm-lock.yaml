@@ -10,8 +10,8 @@ catalogs:
       specifier: 3.2.4
       version: 3.2.4
     chart.js:
-      specifier: 4.5.0
-      version: 4.5.0
+      specifier: 4.5.1
+      version: 4.5.1
     esbuild:
       specifier: 0.25.11
       version: 0.25.11
@@ -81,7 +81,7 @@ importers:
         version: link:../extensions
       chart.js:
         specifier: catalog:serenity
-        version: 4.5.0
+        version: 4.5.1
 
   common-features/src/demo.northwind:
     dependencies:
@@ -145,14 +145,14 @@ importers:
         specifier: 1.10.1
         version: 1.10.1
       chart.js:
-        specifier: 4.5.0
-        version: 4.5.0
+        specifier: 4.5.1
+        version: 4.5.1
       daterangepicker:
         specifier: 3.1.0
         version: 3.1.0
       dompurify:
-        specifier: 3.2.7
-        version: 3.2.7
+        specifier: 3.3.0
+        version: 3.3.0
       flatpickr:
         specifier: 4.6.13
         version: 4.6.13
@@ -691,8 +691,8 @@ packages:
     resolution: {integrity: sha512-oKnbhFyRIXpUuez8iBMmyEa4nbj4IOQyuhc/wy9kY7/WVPcwIO9VA668Pu8RkO7+0G76SLROeyw9CpQ061i4mA==}
     engines: {node: '>=10'}
 
-  chart.js@4.5.0:
-    resolution: {integrity: sha512-aYeC/jDgSEx8SHWZvANYMioYMZ2KX02W6f6uVfyteuCGcadDLcYVHdfdygsTQkQ4TKn5lghoojAsPj5pu0SnvQ==}
+  chart.js@4.5.1:
+    resolution: {integrity: sha512-GIjfiT9dbmHRiYi6Nl2yFCq7kkwdkp1W/lp2J99rX0yo9tgJGn3lKQATztIjb5tVtevcBtIdICNWqlq5+E8/Pw==}
     engines: {pnpm: '>=8'}
 
   check-error@2.1.1:
@@ -748,8 +748,8 @@ packages:
   dom-accessibility-api@0.5.16:
     resolution: {integrity: sha512-X7BJ2yElsnOJ30pZF4uIIDfBEVgF4XEBxL9Bxhy6dnrm5hkzqmsWHGTiHqRiITNhMyFLyAiWndIJP7Z1NTteDg==}
 
-  dompurify@3.2.7:
-    resolution: {integrity: sha512-WhL/YuveyGXJaerVlMYGWhvQswa7myDG17P7Vu65EWC05o8vfeNbvNf4d/BOvH99+ZW+LlQsc1GDKMa1vNK6dw==}
+  dompurify@3.3.0:
+    resolution: {integrity: sha512-r+f6MYR1gGN1eJv0TVQbhA7if/U7P87cdPl3HN5rikqaBSBxLiCb/b9O+2eG0cxz0ghyU+mU1QkbsOwERMYlWQ==}
 
   eastasianwidth@0.2.0:
     resolution: {integrity: sha512-I88TYZWc9XiYHRQ4/3c5rjjfgkjhLyW2luGIheGERbNQ6OY7yTybanSpDXZa8y7VUP9YmDcYa+eyq4ca7iLqWA==}
@@ -1702,7 +1702,7 @@ snapshots:
       supports-color: 7.2.0
     optional: true
 
-  chart.js@4.5.0:
+  chart.js@4.5.1:
     dependencies:
       '@kurkle/color': 0.3.4
 
@@ -1757,7 +1757,7 @@ snapshots:
   dom-accessibility-api@0.5.16:
     optional: true
 
-  dompurify@3.2.7:
+  dompurify@3.3.0:
     optionalDependencies:
       '@types/trusted-types': 2.0.7
 
