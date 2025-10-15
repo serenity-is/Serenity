@@ -3368,6 +3368,18 @@ button.panel-titlebar-close::after {
   outline: 0 !important;
 }
 
+.slick-hidden {
+  display: none !important;
+}
+
+.slick-spacer-line {
+  display: block;
+  height: 1px;
+  position: absolute;
+  top: 0;
+  left: 0;
+}
+
 .slick-reorder-proxy {
   display: inline-block;
   background: blue;

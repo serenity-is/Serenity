@@ -7,9 +7,6 @@
   "dependencies": {
     "@serenity-is/sleekgrid": "workspace:*"
   },
-  "devDependencies": {
-    "@serenity-is/sleekdom": "workspace:*"
-  },
   "exports": {
     ".": {
       "types": "./dist/index.d.ts",

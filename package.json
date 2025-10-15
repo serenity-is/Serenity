@@ -1,6 +1,7 @@
 {
   "name": "@serenity-is/workspace-serenity",
   "devDependencies": {
+    "@serenity-is/sleekdom": "workspace:*",
     "@vitest/coverage-v8": "catalog:serenity",
     "esbuild": "catalog:serenity",
     "jsdom": "catalog:serenity",

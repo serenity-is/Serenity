@@ -19,10 +19,6 @@ export function identity<T>(value: T) {
     return value;
 }
 
-export function isBoolean(val: any): val is boolean {
-    return typeof val === "boolean";
-}
-
 export function isElement(val: any): val is Element {
     return val && typeof val.nodeType === "number";
 }
@@ -36,11 +32,7 @@ export function isNumber(val: any): val is number {
 }
 
 export function isObject(val: any) {
-    return typeof val === "object" ? val !== null : isFunction(val);
-}
-
-export function isFunction(val: any): val is Function {
-    return typeof val === "function";
+    return typeof val === "object" && val !== null;
 }
 
 export function isComponentClass(val: Function & { isComponent?: boolean }): val is ComponentClass {
@@ -51,20 +43,13 @@ export function isArrayLike(val: any): val is ArrayLike<any> {
     return isObject(val) && typeof val.length === "number" && typeof val.nodeType !== "number";
 }
 
-export function isAttributeHook(val: any): val is { jsxDomAttributeHook: (node: HTMLElement | SVGElement, attr: string) => any } {
-    return isObject(val) && isFunction(val.jsxDomAttributeHook);
-}
-
-export function isChildrenHook(val: any): val is { jsxDomChildrenHook: (parent: HTMLElement | SVGElement) => any } {
-    return isObject(val) && isFunction(val.jsxDomChildrenHook);
-}
-
 export function isSignalLike(val: any): val is SignalLike<any> {
-    return isObject(val) && isFunction(val.subscribe) && isFunction(val.peek) && 'value' in val;
+    return val != null && typeof val === "object" && typeof val.subscribe === "function" && typeof val.peek === "function" && 'value' in val;
 }
 
 // https://facebook.github.io/react/docs/jsx-in-depth.html#booleans-null-and-undefined-are-ignored
 // Emulate JSX Expression logic to ignore certain type of children or className.
-export function isVisibleChild(value: any): boolean {
-    return !isBoolean(value) && value != null;
+// though unexpected, true is also ignored as per react behavior.
+export function isVisibleChild(val: any): boolean {
+    return val != null && typeof val !== "boolean";
 }

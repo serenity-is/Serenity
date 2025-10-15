@@ -1,7 +1,7 @@
 import { attachRef } from "./ref";
 import { isShadowRoot } from "./shadow";
 import type { ComponentChildren } from "./types";
-import { isArrayLike, isChildrenHook, isElement, isNumber, isSignalLike, isString, type SignalLike } from "./util";
+import { isArrayLike, isElement, isNumber, isSignalLike, isString, type SignalLike } from "./util";
 
 function appendChild(parent: Node, child: Node) {
     if (parent instanceof window.HTMLTemplateElement) {

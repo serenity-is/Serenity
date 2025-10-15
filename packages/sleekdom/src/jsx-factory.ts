@@ -3,10 +3,10 @@ import { appendChildren } from "./jsx-append-children"
 import { setProperties } from "./jsx-set-properties"
 import { attachRef } from "./ref"
 import { SVGNamespace, svgTags } from "./svg-consts"
-import type { ComponentType, JSX, JSXElement, Ref } from "./types"
+import type { JSXElement } from "./types"
 import type { ComponentChildren } from "./types/custom-attributes"
 import type { ElementAttributes, HTMLElementTags, SVGElementTags } from "./types/dom-expressions-jsx"
-import { isComponentClass, isFunction, isObject, isString } from "./util"
+import { isComponentClass, isObject, isString } from "./util"
 
 
 type DataKeys = `data-${string}`
@@ -60,7 +60,7 @@ export function jsx(tag: any, props?: { children?: ComponentChildren, [key: stri
         }
 
         attachRef(attr.ref, node)
-    } else if (isFunction(tag)) {
+    } else if (typeof tag === "function") {
         // Custom elements.
         if (isObject(tag.defaultProps)) {
             attr = { ...tag.defaultProps, ...attr }

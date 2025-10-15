@@ -1,4 +1,4 @@
-import { forEach, isNumber, isObject, isString, isVisibleChild, keys } from "./util"
+import { isObject, isVisibleChild, keys } from "./util"
 
 /**
  * Convert a `value` to a className string.

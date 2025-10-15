@@ -48,6 +48,9 @@ importers:
 
   .:
     devDependencies:
+      '@serenity-is/sleekdom':
+        specifier: workspace:*
+        version: link:packages/sleekdom
       '@vitest/coverage-v8':
         specifier: catalog:serenity
         version: 3.2.4(@vitest/browser@3.2.4)(vitest@3.2.4)
@@ -112,10 +115,6 @@ importers:
       '@serenity-is/sleekgrid':
         specifier: workspace:*
         version: link:../sleekgrid
-    devDependencies:
-      '@serenity-is/sleekdom':
-        specifier: workspace:*
-        version: link:../sleekdom
 
   packages/sleekdom: {}
 

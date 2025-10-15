@@ -1,7 +1,7 @@
 import { className } from "./classname";
 import { setStyle } from "./set-style";
 import { nonPresentationSVGAttributes } from "./svg-consts";
-import { forEach, isFunction, isObject, isSignalLike, isVisibleChild, keys } from "./util";
+import { forEach, isObject, isSignalLike, isVisibleChild, keys } from "./util";
 
 const XLinkNamespace = "http://www.w3.org/1999/xlink";
 const XMLNamespace = "http://www.w3.org/XML/1998/namespace";
@@ -89,7 +89,7 @@ function setProperty(node: Element & HTMLOrSVGElement, key: string, value: any, 
             if (value == null || value === false) {
                 node.removeAttribute("class");
                 return;
-            } else if (isFunction(value)) {
+            } else if (typeof value === "function") {
                 value(node)
             } else {
                 node.setAttribute("class", className(value));
@@ -169,7 +169,7 @@ function setProperty(node: Element & HTMLOrSVGElement, key: string, value: any, 
         // fallthrough
     }
 
-    if (isFunction(value)) {
+    if (typeof value === "function") {
         if (key[0] === "o" && key[1] === "n") {
             if (prevValue != null && prevValue === value)
                 return;
@@ -215,6 +215,10 @@ function setProperty(node: Element & HTMLOrSVGElement, key: string, value: any, 
                 node.addEventListener(eventName, value);
             }
         }
+        else {
+            console.warn(`A function was provided for JSX ${node.tagName} element ${key} which does not start with "on":`, value, node.tagName);
+        }
+        return;
     }
 
     if (isObject(prevValue)) {
