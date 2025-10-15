@@ -4,6 +4,30 @@ settings:
   autoInstallPeers: true
   excludeLinksFromLockfile: false
 
+catalogs:
+  serenity:
+    '@vitest/coverage-v8':
+      specifier: 3.2.4
+      version: 3.2.4
+    chart.js:
+      specifier: 4.5.0
+      version: 4.5.0
+    esbuild:
+      specifier: 0.25.10
+      version: 0.25.10
+    glob:
+      specifier: 11.0.3
+      version: 11.0.3
+    jsdom:
+      specifier: 26.1.0
+      version: 26.1.0
+    typescript:
+      specifier: 5.9.3
+      version: 5.9.3
+    vitest:
+      specifier: 3.2.4
+      version: 3.2.4
+
 overrides:
   brace-expansion@>=2.0.0 <=2.0.1: 2.0.2
   vite@>=7.0.0 <=7.0.6: '>=7.1.5'
@@ -13,22 +37,19 @@ importers:
   .:
     devDependencies:
       '@vitest/coverage-v8':
-        specifier: 3.2.4
+        specifier: catalog:serenity
         version: 3.2.4(@vitest/browser@3.2.4)(vitest@3.2.4)
       esbuild:
-        specifier: 0.25.10
+        specifier: catalog:serenity
         version: 0.25.10
-      flatpickr:
-        specifier: 4.6.13
-        version: 4.6.13
       jsdom:
-        specifier: 26.1.0
+        specifier: catalog:serenity
         version: 26.1.0
       typescript:
-        specifier: 5.9.3
+        specifier: catalog:serenity
         version: 5.9.3
       vitest:
-        specifier: 3.2.4
+        specifier: catalog:serenity
         version: 3.2.4(@vitest/browser@3.2.4)(jsdom@26.1.0)
 
   common-features:
@@ -59,7 +80,7 @@ importers:
         specifier: workspace:*
         version: link:../extensions
       chart.js:
-        specifier: 4.5.0
+        specifier: catalog:serenity
         version: 4.5.0
 
   common-features/src/demo.northwind:
@@ -97,10 +118,10 @@ importers:
   packages/tsbuild:
     dependencies:
       esbuild:
-        specifier: 0.25.10
+        specifier: catalog:serenity
         version: 0.25.10
       glob:
-        specifier: 11.0.3
+        specifier: catalog:serenity
         version: 11.0.3
 
   serene/src/Serene.Web:
@@ -739,14 +760,6 @@ packages:
     resolution: {integrity: sha512-JhFGDVJ7tmDJItKhYgJCGLOWjuK9vPxiXoUFLwLDc99NlmklilbiQJwoctZtt13+xMw91MCk/REan6MWHqDjyA==}
     engines: {node: '>=12.0.0'}
 
-  fdir@6.4.6:
-    resolution: {integrity: sha512-hiFoqpyZcfNm1yc4u8oWCf9A2c4D3QjCrks3zmoVKVxpQRzmPNar1hUJcBG2RQHvEVGDN+Jm81ZheVLAQMK6+w==}
-    peerDependencies:
-      picomatch: ^3 || ^4
-    peerDependenciesMeta:
-      picomatch:
-        optional: true
-
   fdir@6.5.0:
     resolution: {integrity: sha512-tIbYtZbucOs0BRGqPJkshJUYdL+SDH7dVM8gjy+ERp3WAUjLEFJE+02kanyHtwjWOnwrKYBiwAmM0p4kLJAnXg==}
     engines: {node: '>=12.0.0'}
@@ -952,10 +965,6 @@ packages:
   picocolors@1.1.1:
     resolution: {integrity: sha512-xceH2snhtb5M9liqDsmEw56le376mTZkEX/jEb/RxNFyegNul7eNslCXP9FDj/Lcu0X8KEyMceP2ntpaHrDEVA==}
 
-  picomatch@4.0.2:
-    resolution: {integrity: sha512-M7BAV6Rlcy5u+m6oPhAPFgJTzAioX/6B0DxyvDlo9l8+T3nLKbrczg2WLUyzd45L8RqfUMyGPzekbMvX2Ldkwg==}
-    engines: {node: '>=12'}
-
   picomatch@4.0.3:
     resolution: {integrity: sha512-5gTmgEY/sqK6gFXLIsQNH19lWb4ebPDLA4SdLP7dsWkIXHWlG66oPuVvXSGFPppYZz8ZDZq0dYYrbHfBCVUb1Q==}
     engines: {node: '>=12'}
@@ -1072,10 +1081,6 @@ packages:
 
   tinyexec@0.3.2:
     resolution: {integrity: sha512-KQQR9yN7R5+OSwaK0XQoj22pwHoTlgYqmUscPYoknOoWCWfj/5/ABTMRi69FrKU5ffPVh5QcFikpWJI/P1ocHA==}
-
-  tinyglobby@0.2.14:
-    resolution: {integrity: sha512-tX5e7OM1HnYr2+a2C/4V0htOcSQcoSTH9KgJnVvNm5zm/cyEWKJ7j7YutsH9CxMdtOkkLFy2AHrMci9IM8IPZQ==}
-    engines: {node: '>=12.0.0'}
 
   tinyglobby@0.2.15:
     resolution: {integrity: sha512-j2Zq4NyQYG5XMST4cbs02Ak8iJUdxRM0XI5QyxXuZOzKOINmWurp3smXu3y5wDcJrptwpSjgXHzIQxR0omXljQ==}
@@ -1748,10 +1753,6 @@ snapshots:
 
   expect-type@1.2.2: {}
 
-  fdir@6.4.6(picomatch@4.0.2):
-    optionalDependencies:
-      picomatch: 4.0.2
-
   fdir@6.5.0(picomatch@4.0.3):
     optionalDependencies:
       picomatch: 4.0.3
@@ -1962,8 +1963,6 @@ snapshots:
 
   picocolors@1.1.1: {}
 
-  picomatch@4.0.2: {}
-
   picomatch@4.0.3: {}
 
   playwright-core@1.54.2:
@@ -2095,11 +2094,6 @@ snapshots:
 
   tinyexec@0.3.2: {}
 
-  tinyglobby@0.2.14:
-    dependencies:
-      fdir: 6.4.6(picomatch@4.0.2)
-      picomatch: 4.0.2
-
   tinyglobby@0.2.15:
     dependencies:
       fdir: 6.5.0(picomatch@4.0.3)
@@ -2177,11 +2171,11 @@ snapshots:
       expect-type: 1.2.2
       magic-string: 0.30.17
       pathe: 2.0.3
-      picomatch: 4.0.2
+      picomatch: 4.0.3
       std-env: 3.9.0
       tinybench: 2.9.0
       tinyexec: 0.3.2
-      tinyglobby: 0.2.14
+      tinyglobby: 0.2.15
       tinypool: 1.1.1
       tinyrainbow: 2.0.0
       vite: 7.1.5

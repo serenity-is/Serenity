@@ -1,12 +1,11 @@
 {
   "name": "@serenity-is/workspace-serenity",
   "devDependencies": {
-    "@vitest/coverage-v8": "3.2.4",
-    "esbuild": "0.25.10",
-    "flatpickr": "4.6.13",
-    "jsdom": "26.1.0",
-    "typescript": "5.9.3",
-    "vitest": "3.2.4"
+    "@vitest/coverage-v8": "catalog:serenity",
+    "esbuild": "catalog:serenity",
+    "jsdom": "catalog:serenity",
+    "typescript": "catalog:serenity",
+    "vitest": "catalog:serenity"
   },
   "pnpm": {
     "onlyBuiltDependencies": [

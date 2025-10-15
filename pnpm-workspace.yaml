@@ -5,3 +5,13 @@ packages:
   - 'common-features'
   - 'common-features/src/*'
   - 'serene/src/Serene.Web'
+
+catalogs:
+  serenity:
+    "@vitest/coverage-v8": "3.2.4"
+    "chart.js": "4.5.0"
+    "esbuild": "0.25.10"
+    "glob": "11.0.3"
+    "jsdom": "26.1.0"
+    "typescript": "5.9.3"
+    "vitest": "3.2.4"

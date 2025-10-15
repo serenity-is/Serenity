@@ -3,7 +3,7 @@
   "dependencies": {
     "@serenity-is/demo.northwind": "workspace:*",
     "@serenity-is/extensions": "workspace:*",
-    "chart.js": "4.5.0"
+    "chart.js": "catalog:serenity"
   },
   "main": "wwwroot/index.js",
   "private": true,
