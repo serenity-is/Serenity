@@ -1,0 +1,16 @@
+﻿{
+    "extends": "../tsconfig.json",
+    "compilerOptions": {
+        "noImplicitAny": false,
+        "emitDeclarationOnly": false,
+        "jsx": "react-jsx",
+        "jsxImportSource": "@serenity-is/sleekdom",
+        "sourceMap": true,
+        "types": [
+            "vitest/globals"
+        ]
+    },
+    "include": [
+        "."
+    ]
+}

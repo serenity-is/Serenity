@@ -116,6 +116,15 @@ importers:
         specifier: workspace:*
         version: link:../sleekgrid
 
+  packages/signals:
+    devDependencies:
+      '@preact/signals-core':
+        specifier: 1.12.1
+        version: 1.12.1
+      '@serenity-is/sleekdom':
+        specifier: workspace:*
+        version: link:../sleekdom
+
   packages/sleekdom: {}
 
   packages/sleekgrid: {}
@@ -465,6 +474,9 @@ packages:
 
   '@polka/url@1.0.0-next.29':
     resolution: {integrity: sha512-wwQAWhWSuHaag8c4q/KN/vCoeOJYshAIvMQwD4GpSb3OiZklFfvAgmj0VCBBImRpuF/aFgIRzllXlVX93Jevww==}
+
+  '@preact/signals-core@1.12.1':
+    resolution: {integrity: sha512-BwbTXpj+9QutoZLQvbttRg5x3l5468qaV2kufh+51yha1c53ep5dY4kTuZR35+3pAZxpfQerGJiQqg34ZNZ6uA==}
 
   '@rollup/rollup-android-arm-eabi@4.44.2':
     resolution: {integrity: sha512-g0dF8P1e2QYPOj1gu7s/3LVP6kze9A7m6x0BZ9iTdXK8N5c2V7cpBKHV3/9A4Zd8xxavdhK0t4PnqjkqVmUc9Q==}
@@ -1480,6 +1492,8 @@ snapshots:
 
   '@polka/url@1.0.0-next.29':
     optional: true
+
+  '@preact/signals-core@1.12.1': {}
 
   '@rollup/rollup-android-arm-eabi@4.44.2':
     optional: true

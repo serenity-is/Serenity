@@ -1,14 +1,13 @@
-import { PlainSignal } from "./plain-signal";
-import type { ComponentChildren, JSXElement } from "./types";
-import type { SignalOrValue } from "./types/signal-like";
+import type { ComponentChildren, JSXElement, SignalOrValue } from "@serenity-is/sleekdom";
+import { signal } from "./signals";
 import { isSignalLike, observeSignal } from "./util";
 
-type FlowWhen<TWhen> = SignalOrValue<TWhen | undefined | null>;
+type IfCondition<TWhen> = SignalOrValue<TWhen | undefined | null>;
 
 export function Show<TWhen>(props: {
-  when: FlowWhen<TWhen>;
+  when: IfCondition<TWhen>;
   fallback?: ComponentChildren;
-  children: ComponentChildren | ((when: FlowWhen<TWhen>) => ComponentChildren);
+  children: ComponentChildren | ((when: IfCondition<TWhen>) => ComponentChildren);
 }): JSXElement {
 
     function getContent(flag: boolean): JSXElement {
@@ -22,7 +21,7 @@ export function Show<TWhen>(props: {
     }
 
     if (isSignalLike(props.when)) {
-        const sig = new PlainSignal<JSXElement>();        
+        const sig = signal<JSXElement>();
         observeSignal(props.when, (value) => {
             sig.value = getContent(!!value);
         });

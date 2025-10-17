@@ -2846,12 +2846,6 @@ export declare class Component<T = any> {
 	};
 	render(): JSXElement | null;
 }
-export type FlowWhen<TWhen> = SignalOrValue<TWhen | undefined | null>;
-export declare function Show<TWhen>(props: {
-	when: FlowWhen<TWhen>;
-	fallback?: ComponentChildren;
-	children: ComponentChildren | ((when: FlowWhen<TWhen>) => ComponentChildren);
-}): JSXElement;
 export declare function useClassList(initialValue?: ClassNames): BasicClassList;
 export declare function useText(initialValue?: string): readonly [
 	Text,
@@ -2865,27 +2859,6 @@ export declare function ShadowRootNode({ children, ref, ...attr }: ShadowRootIni
 	ref?: Ref<ShadowRoot>;
 	children?: ComponentChildren;
 }): any;
-/**
- * A minimal, non-tracking SignalLike implementation.
- * - No dependency tracking, effects, or batching
- * - Synchronous notifications to subscribed listeners
- */
-export declare class PlainSignal<T = any> implements SignalLike<T> {
-	_value: T;
-	_listeners: Array<(value: T) => void>;
-	constructor(initialValue?: T);
-	get value(): T;
-	set value(newValue: T);
-	peek(): T;
-	/**
-	 * Subscribe to value changes. The callback is called immediately with the current value.
-	 * Note that this does not do any batching or dependency tracking; callbacks are called synchronously when the value changes.
-	 * @param callback
-	 * @returns
-	 */
-	subscribe(callback: (value: T) => void): () => void;
-	unsubscribe(callback: (value: T) => void): void;
-}
 export declare const SVGNamespace = "http://www.w3.org/2000/svg";
 
 export {

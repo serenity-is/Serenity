@@ -1,4 +1,5 @@
-﻿import * as base from "../base";
+﻿import { Mock } from "vitest";
+import * as base from "../base";
 import { postToService, postToUrl, setEquality } from "./services-compat";
 
 vi.mock(import("../base"), async () => {
@@ -11,40 +12,41 @@ vi.mock(import("../base"), async () => {
 });
 
 // Mock DOM methods
-const mockAppendChild = vi.fn();
-const mockSubmit = vi.fn();
-const mockRemove = vi.fn();
-const mockSetTimeout = vi.fn();
-const mockFormAction = vi.fn();
+let mockAppendChild: Mock<any>;
+let mockSubmit: Mock<any>;
+let mockRemove: Mock<any>;
+let mockSetTimeout: Mock<any>;
 
-Object.defineProperty(document.body, 'appendChild', {
-    writable: true,
-    value: mockAppendChild
-});
+beforeEach(() => {
+    mockAppendChild = vi.fn();
+    mockSubmit = vi.fn();
+    mockRemove = vi.fn();
+    mockSetTimeout = vi.fn(() => -1);
 
-Object.defineProperty(window, 'setTimeout', {
-    writable: true,
-    value: mockSetTimeout
-});
+    Object.defineProperty(document.body, 'appendChild', {
+        writable: true,
+        value: mockAppendChild
+    });
 
-// Mock HTMLFormElement prototype
-Object.defineProperty(HTMLFormElement.prototype, 'submit', {
-    writable: true,
-    value: mockSubmit
-});
+    Object.defineProperty(window, 'setTimeout', {
+        writable: true,
+        value: mockSetTimeout
+    });
 
-Object.defineProperty(HTMLFormElement.prototype, 'remove', {
-    writable: true,
-    value: mockRemove
+    // Mock HTMLFormElement prototype
+    Object.defineProperty(HTMLFormElement.prototype, 'submit', {
+        writable: true,
+        value: mockSubmit
+    });
+
+    Object.defineProperty(HTMLFormElement.prototype, 'remove', {
+        writable: true,
+        value: mockRemove
+    });
 });
 
 afterEach(() => {
-    vi.clearAllMocks();
-    mockAppendChild.mockClear();
-    mockSubmit.mockClear();
-    mockRemove.mockClear();
-    mockSetTimeout.mockClear();
-    mockFormAction.mockClear();
+    vi.restoreAllMocks();
     (base.isSameOrigin as any).mockReturnValue(true);
     (base.getCookie as any).mockReturnValue(undefined);
 });
@@ -77,14 +79,14 @@ describe("postToService", () => {
         expect(form.method?.toLowerCase()).toBe("post"); // HTML normalizes to lowercase
         expect(form.action).toContain("/app/Services/MyService");
         expect(form.target).toBe(""); // HTML default when not set
-        
+
         // Check form contains the request input
         const inputs = form.querySelectorAll('input');
         expect(inputs.length).toBe(2); // hidden request input + submit button
         expect(inputs[0].name).toBe("request");
         expect(inputs[0].value).toBe(JSON.stringify({ id: 123 }));
         expect(inputs[1].type).toBe("submit");
-        
+
         expect(mockSubmit).toHaveBeenCalledTimes(1);
         expect(mockSetTimeout).toHaveBeenCalledTimes(1);
         expect(mockRemove).toHaveBeenCalledTimes(0); // remove is called in setTimeout
@@ -168,7 +170,7 @@ describe("postToUrl", () => {
         expect(form.method?.toLowerCase()).toBe("post"); // HTML normalizes to lowercase
         expect(form.action).toContain("/app/MyUrl");
         expect(form.target).toBe(""); // HTML default when not set
-        
+
         // Check form contains the param inputs
         const inputs = form.querySelectorAll('input');
         expect(inputs.length).toBe(4); // two params + csrf + submit button
@@ -179,7 +181,7 @@ describe("postToUrl", () => {
         expect(inputs[2].name).toBe("__RequestVerificationToken");
         expect(inputs[2].value).toBe("csrf-token-456");
         expect(inputs[3].type).toBe("submit");
-        
+
         expect(mockSubmit).toHaveBeenCalledTimes(1);
         expect(mockSetTimeout).toHaveBeenCalledTimes(1);
     });

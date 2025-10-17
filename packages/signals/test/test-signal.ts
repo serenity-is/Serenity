@@ -1,11 +1,11 @@
-import type { SignalLike } from "./types/signal-like";
+import { SignalLike } from "@serenity-is/sleekdom";
 
 /**
  * A minimal, non-tracking SignalLike implementation.
  * - No dependency tracking, effects, or batching
  * - Synchronous notifications to subscribed listeners
  */
-export class PlainSignal<T = any> implements SignalLike<T> {
+export class TestSignal<T = any> implements SignalLike<T> {
     _value: T;
     _listeners: Array<(value: T) => void> = [];
 

@@ -1,0 +1,26 @@
+{
+    "compileOnSave": false,
+    "compilerOptions": {
+      "allowJs": false,
+      "declaration": true,
+      "emitBOM": true,
+      "emitDeclarationOnly": true,
+      "lib": [
+        "ES2017",
+        "DOM"
+      ],
+      "module": "ESNext",
+      "moduleResolution": "Bundler",
+      "newLine": "lf",
+      "noEmit": true,
+      "noEmitHelpers": false,
+      "noImplicitAny": true,
+      "isolatedModules": true,
+      "sourceMap": false,
+      "skipLibCheck": false,
+      "outDir": "./dist",
+      "target": "ESNext",
+      "useDefineForClassFields": false
+    },
+    "include": ["src"]
+  }
