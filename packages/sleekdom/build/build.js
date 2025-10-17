@@ -1,32 +1,12 @@
 
-import esbuild from "esbuild";
-import { existsSync, mkdirSync, readFileSync, writeFileSync } from "fs";
-import { dirname } from "path";
+import { writeIfChanged } from "build-utils";
 import process from 'process';
 
-function writeIfChanged() {
-    return {
-        name: "write-if-changed",
-        setup(build) {
-            const write = build.initialOptions.write;
-            build.initialOptions.write = false;
-            build.onEnd(result => {
-                if (!(write === undefined || write))
-                    return;
-                result.outputFiles?.forEach(file => {
-                    if (existsSync(file.path)) {
-                        const old = readFileSync(file.path);
-                        if (old.equals(file.contents))
-                            return;
-                    }
-                    else {
-                        mkdirSync(dirname(file.path), { recursive: true });
-                    }
-                    writeFileSync(file.path, file.text);
-                });
-            });
-        }
-    };
+const hasDtsArg = process.argv.includes('dts') || process.argv.includes('--dts');
+if (hasDtsArg) {
+    const dtsBundler = (await import("build-utils/dts-bundler.js"));
+    dtsBundler.dtsBundle();
+    process.exit(0);
 }
 
 const defaults = {
@@ -37,6 +17,8 @@ const defaults = {
     target: 'es2020',
     plugins: [writeIfChanged()]
 }
+
+const esbuild = await import("esbuild");
 
 const esmIndex = {
     ...defaults,
@@ -59,13 +41,12 @@ const esmJsxDevRuntime = {
     ...esmJsxRuntime,
     outfile: './dist/jsx-dev-runtime.js'
 }
-const buildList = [];
 
-buildList.push(
+const buildList = [
     esmIndex,
     esmJsxRuntime,
     esmJsxDevRuntime
-)
+];
 
 for (const buildItem of buildList) {
     await esbuild.build({

@@ -1,0 +1,8 @@
+{
+  "name": "build-utils",
+  "private": true,
+  "devDependencies": {
+    "dts-bundle-generator": "catalog:serenity"
+  },
+  "type": "module"
+}

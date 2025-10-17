@@ -1,9 +1,26 @@
-import esbuild from "esbuild";
-import { existsSync, mkdirSync, readFileSync, writeFileSync } from "fs";
-import { dirname, join, resolve } from "path";
+import { writeIfChanged } from "build-utils";
+import { join, resolve } from "path";
 import { fileURLToPath } from 'url';
 
 const root = resolve(join(fileURLToPath(new URL('.', import.meta.url)), '../'));
+
+const hasDtsArg = process.argv.includes('dts') || process.argv.includes('--dts');
+if (hasDtsArg) {
+    const dtsBundler = (await import("build-utils/dts-bundler.js"));
+    dtsBundler.dtsBundle([{
+        filePath: './out/index.d.ts',
+        output: {
+            exportReferencedTypes: false,
+            inlineDeclareExternals: true,
+            inlineDeclareGlobals: true
+        }
+    }], {
+        preferredConfigPath: "./src/tsconfig.dts.json"
+    });
+    process.exit(0);
+}
+
+const esbuild = await import("esbuild");
 
 const coreLibBase = {
     absWorkingDir: resolve(root),
@@ -41,31 +58,6 @@ export function importAsGlobalsPlugin(mapping) {
                 async (args) => {
                     return { contents: `module.exports = ${args.path};`, loader: "js" };
                 });
-        }
-    };
-}
-
-function writeIfChanged() {
-    return {
-        name: "write-if-changed",
-        setup(build) {
-            const write = build.initialOptions.write;
-            build.initialOptions.write = false;
-            build.onEnd(result => {
-                if (!(write === undefined || write))
-                    return;
-                result.outputFiles?.forEach(file => {
-                    if (existsSync(file.path)) {
-                        const old = readFileSync(file.path);
-                        if (old.equals(file.contents))
-                            return;
-                    }
-                    else {
-                        mkdirSync(dirname(file.path), { recursive: true });
-                    }
-                    writeFileSync(file.path, file.text);
-                });
-            });
         }
     };
 }
