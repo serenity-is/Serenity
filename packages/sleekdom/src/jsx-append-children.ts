@@ -1,7 +1,7 @@
 import { attachRef } from "./ref";
 import { isShadowRoot } from "./shadow";
-import type { ComponentChildren } from "./types";
-import { isArrayLike, isElement, isNumber, isSignalLike, isString, type SignalLike } from "./util";
+import type { ComponentChildren, SignalLike } from "./types";
+import { isArrayLike, isElement, isNumber, isSignalLike, isString, observeSignal } from "./util";
 
 function appendChild(parent: Node, child: Node) {
     if (parent instanceof window.HTMLTemplateElement) {
@@ -37,52 +37,52 @@ function wrapAsNode(value: any): Node {
 }
 
 function appendChildrenWithSignal(parent: Node, signal: SignalLike<any>) {
-    let prevValAsNode = wrapAsNode(signal.peek());
-    let immediate = true;
-    signal.subscribe((newValue: any) => {
-        if (immediate) {
+    let prevAsNode: Node;
+    observeSignal(signal, (value) => {
+        if (prevAsNode === void 0) {
+            prevAsNode = wrapAsNode(value);
             return;
         }
-        const newValAsNode = wrapAsNode(newValue);
-        if (prevValAsNode instanceof Comment && prevValAsNode.data.startsWith("__sleekdomfragmentplaceholder")) {
+
+        const valueAsNode = wrapAsNode(value);
+        if (prevAsNode instanceof Comment && prevAsNode.data.startsWith("__sleekdomfragmentplaceholder")) {
             let n: Node;
-            while (n = prevValAsNode.nextSibling) {
+            while (n = prevAsNode.nextSibling) {
                 n.parentNode?.removeChild(n);
-                if (n instanceof Comment && n.data === prevValAsNode.data) {
+                if (n instanceof Comment && n.data === prevAsNode.data) {
                     break;
                 }
             }
         }
 
-        if (newValAsNode instanceof DocumentFragment && 
-            newValAsNode.firstChild instanceof Comment && 
-            newValAsNode.firstChild.data.startsWith(fragmentPlaceholderPrefix)) {
-            const comment = newValAsNode?.firstChild;
-            if (typeof (prevValAsNode as any).replaceWith === "function")
-                (prevValAsNode as any).replaceWith(newValAsNode);
-            else 
-                (prevValAsNode.parentNode)?.replaceChild(newValAsNode, prevValAsNode);
-            prevValAsNode = comment;
+        if (valueAsNode instanceof DocumentFragment &&
+            valueAsNode.firstChild instanceof Comment &&
+            valueAsNode.firstChild.data.startsWith(fragmentPlaceholderPrefix)) {
+            const comment = valueAsNode?.firstChild;
+            if (typeof (prevAsNode as any).replaceWith === "function")
+                (prevAsNode as any).replaceWith(valueAsNode);
+            else
+                (prevAsNode.parentNode)?.replaceChild(valueAsNode, prevAsNode);
+            prevAsNode = comment;
         }
         else {
-            if (typeof (prevValAsNode as any).replaceWith === "function")
-                (prevValAsNode as any).replaceWith(newValAsNode);
-            else 
-                (prevValAsNode.parentNode)?.replaceChild(newValAsNode, prevValAsNode);
-            prevValAsNode = newValAsNode;
+            if (typeof (prevAsNode as any).replaceWith === "function")
+                (prevAsNode as any).replaceWith(valueAsNode);
+            else
+                (prevAsNode.parentNode)?.replaceChild(valueAsNode, prevAsNode);
+            prevAsNode = valueAsNode;
         }
     });
-    immediate = false;
-    
-    if (prevValAsNode instanceof DocumentFragment && 
-        prevValAsNode.firstChild instanceof Comment && 
-        prevValAsNode.firstChild.data.startsWith(fragmentPlaceholderPrefix)) {
-        const o = prevValAsNode;
-        prevValAsNode = o.firstChild;
+
+    if (prevAsNode instanceof DocumentFragment &&
+        prevAsNode.firstChild instanceof Comment &&
+        prevAsNode.firstChild.data.startsWith(fragmentPlaceholderPrefix)) {
+        const o = prevAsNode;
+        prevAsNode = o.firstChild;
         appendChildren(parent, o);
     }
     else
-        appendChildren(parent, prevValAsNode as any);
+        appendChildren(parent, prevAsNode as any);
 }
 
 export function appendChildren(
@@ -92,7 +92,7 @@ export function appendChildren(
     if (isArrayLike(children)) {
         for (const child of [...(children as any[])]) {
             appendChildren(parent, child);
-        }        
+        }
     } else if (isString(children) || isNumber(children)) {
         appendChild(parent, document.createTextNode(children as any));
     } else if (children === null) {

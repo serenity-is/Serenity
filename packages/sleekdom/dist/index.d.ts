@@ -33,7 +33,7 @@ export interface SignalLike<T> {
 	peek(): T;
 	subscribe(fn: (value: T) => void): () => void;
 }
-export type Signalish<T> = T | SignalLike<T>;
+export type SignalOrValue<T> = T | SignalLike<T>;
 export type ComponentChild = string | number | Iterable<ComponentChild> | Array<ComponentChild> | {
 	value: ComponentChild;
 	peek: () => ComponentChild;
@@ -59,42 +59,42 @@ export interface CustomDomAttributes<T> {
 	tsxTag?: keyof HTMLElementTagNameMap | keyof SVGElementTagNameMap;
 }
 export interface ElementAttributes<T> {
-	className?: Signalish<string | ClassNames | RemoveAttribute>;
-	tabIndex?: Signalish<number | string | RemoveAttribute>;
+	className?: SignalOrValue<string | ClassNames | RemoveAttribute>;
+	tabIndex?: SignalOrValue<number | string | RemoveAttribute>;
 	onClickCapture?: EventHandlerUnion<T, MouseEvent> | undefined;
 	onDblClickCapture?: EventHandlerUnion<T, MouseEvent> | undefined;
 	onDoubleClick?: EventHandlerUnion<T, MouseEvent> | undefined;
 	onDoubleClickCapture?: EventHandlerUnion<T, MouseEvent> | undefined;
 }
 export interface HTMLAttributes<T> {
-	contentEditable?: Signalish<EnumeratedPseudoBoolean | EnumeratedAcceptsEmpty | "plaintext-only" | "inherit" | RemoveAttribute>;
+	contentEditable?: SignalOrValue<EnumeratedPseudoBoolean | EnumeratedAcceptsEmpty | "plaintext-only" | "inherit" | RemoveAttribute>;
 	dataset?: {
 		[key: string]: string;
 	} | undefined;
-	spellCheck?: Signalish<EnumeratedPseudoBoolean | EnumeratedAcceptsEmpty | RemoveAttribute>;
+	spellCheck?: SignalOrValue<EnumeratedPseudoBoolean | EnumeratedAcceptsEmpty | RemoveAttribute>;
 }
 export interface SVGAttributes<T> {
-	tabIndex?: Signalish<number | string | RemoveAttribute>;
+	tabIndex?: SignalOrValue<number | string | RemoveAttribute>;
 }
 export interface AnchorHTMLAttributes<T> {
 	/** @deprecated use referrerpolicy */
-	referrerPolicy?: Signalish<HTMLReferrerPolicy | RemoveAttribute>;
+	referrerPolicy?: SignalOrValue<HTMLReferrerPolicy | RemoveAttribute>;
 }
 export interface ButtonHTMLAttributes<T> {
-	autoFocus?: Signalish<boolean | RemoveAttribute>;
-	formNoValidate?: Signalish<boolean | RemoveAttribute>;
+	autoFocus?: SignalOrValue<boolean | RemoveAttribute>;
+	formNoValidate?: SignalOrValue<boolean | RemoveAttribute>;
 }
 export interface InputHTMLAttributes<T> {
-	maxLength?: Signalish<string | number | RemoveAttribute>;
-	minLength?: Signalish<string | number | RemoveAttribute>;
-	readOnly?: Signalish<boolean | RemoveAttribute>;
+	maxLength?: SignalOrValue<string | number | RemoveAttribute>;
+	minLength?: SignalOrValue<string | number | RemoveAttribute>;
+	readOnly?: SignalOrValue<boolean | RemoveAttribute>;
 }
 export interface LabelHTMLAttributes<T> {
-	htmlFor?: Signalish<string | RemoveAttribute>;
+	htmlFor?: SignalOrValue<string | RemoveAttribute>;
 }
 export interface TdHTMLAttributes<T> {
-	colSpan?: Signalish<number | string | RemoveAttribute>;
-	rowSpan?: Signalish<number | string | RemoveAttribute>;
+	colSpan?: SignalOrValue<number | string | RemoveAttribute>;
+	rowSpan?: SignalOrValue<number | string | RemoveAttribute>;
 }
 export interface ComponentClass<P = {}, T extends Node = JSXElement> {
 	new (props: P): ComponentClass<P, T>;
@@ -351,19 +351,19 @@ export interface AriaAttributes {
 	 * Identifies the currently active element when DOM focus is on a composite widget, textbox,
 	 * group, or application.
 	 */
-	"aria-activedescendant"?: Signalish<string | RemoveAttribute>;
+	"aria-activedescendant"?: SignalOrValue<string | RemoveAttribute>;
 	/**
 	 * Indicates whether assistive technologies will present all, or only parts of, the changed
 	 * region based on the change notifications defined by the aria-relevant attribute.
 	 */
-	"aria-atomic"?: Signalish<EnumeratedPseudoBoolean | RemoveAttribute>;
+	"aria-atomic"?: SignalOrValue<EnumeratedPseudoBoolean | RemoveAttribute>;
 	/**
 	 * Similar to the global aria-label. Defines a string value that labels the current element,
 	 * which is intended to be converted into Braille.
 	 *
 	 * @see aria-label.
 	 */
-	"aria-braillelabel"?: Signalish<string | RemoveAttribute>;
+	"aria-braillelabel"?: SignalOrValue<string | RemoveAttribute>;
 	/**
 	 * Defines a human-readable, author-localized abbreviated description for the role of an element
 	 * intended to be converted into Braille. Braille is not a one-to-one transliteration of letters
@@ -377,165 +377,165 @@ export interface AriaAttributes {
 	 *
 	 * @see aria-roledescription.
 	 */
-	"aria-brailleroledescription"?: Signalish<string | RemoveAttribute>;
+	"aria-brailleroledescription"?: SignalOrValue<string | RemoveAttribute>;
 	/**
 	 * Indicates whether inputting text could trigger display of one or more predictions of the
 	 * user's intended value for an input and specifies how predictions would be presented if they
 	 * are made.
 	 */
-	"aria-autocomplete"?: Signalish<"none" | "inline" | "list" | "both" | RemoveAttribute>;
+	"aria-autocomplete"?: SignalOrValue<"none" | "inline" | "list" | "both" | RemoveAttribute>;
 	/**
 	 * Indicates an element is being modified and that assistive technologies MAY want to wait until
 	 * the modifications are complete before exposing them to the user.
 	 */
-	"aria-busy"?: Signalish<EnumeratedPseudoBoolean | RemoveAttribute>;
+	"aria-busy"?: SignalOrValue<EnumeratedPseudoBoolean | RemoveAttribute>;
 	/**
 	 * Indicates the current "checked" state of checkboxes, radio buttons, and other widgets.
 	 *
 	 * @see aria-pressed @see aria-selected.
 	 */
-	"aria-checked"?: Signalish<EnumeratedPseudoBoolean | "mixed" | RemoveAttribute>;
+	"aria-checked"?: SignalOrValue<EnumeratedPseudoBoolean | "mixed" | RemoveAttribute>;
 	/**
 	 * Defines the total number of columns in a table, grid, or treegrid.
 	 *
 	 * @see aria-colindex.
 	 */
-	"aria-colcount"?: Signalish<number | string | RemoveAttribute>;
+	"aria-colcount"?: SignalOrValue<number | string | RemoveAttribute>;
 	/**
 	 * Defines an element's column index or position with respect to the total number of columns
 	 * within a table, grid, or treegrid.
 	 *
 	 * @see aria-colcount @see aria-colspan.
 	 */
-	"aria-colindex"?: Signalish<number | string | RemoveAttribute>;
+	"aria-colindex"?: SignalOrValue<number | string | RemoveAttribute>;
 	/** Defines a human-readable text alternative of the numeric aria-colindex. */
-	"aria-colindextext"?: Signalish<number | string | RemoveAttribute>;
+	"aria-colindextext"?: SignalOrValue<number | string | RemoveAttribute>;
 	/**
 	 * Defines the number of columns spanned by a cell or gridcell within a table, grid, or
 	 * treegrid.
 	 *
 	 * @see aria-colindex @see aria-rowspan.
 	 */
-	"aria-colspan"?: Signalish<number | string | RemoveAttribute>;
+	"aria-colspan"?: SignalOrValue<number | string | RemoveAttribute>;
 	/**
 	 * Identifies the element (or elements) whose contents or presence are controlled by the current
 	 * element.
 	 *
 	 * @see aria-owns.
 	 */
-	"aria-controls"?: Signalish<string | RemoveAttribute>;
+	"aria-controls"?: SignalOrValue<string | RemoveAttribute>;
 	/**
 	 * Indicates the element that represents the current item within a container or set of related
 	 * elements.
 	 */
-	"aria-current"?: Signalish<EnumeratedPseudoBoolean | "page" | "step" | "location" | "date" | "time" | RemoveAttribute>;
+	"aria-current"?: SignalOrValue<EnumeratedPseudoBoolean | "page" | "step" | "location" | "date" | "time" | RemoveAttribute>;
 	/**
 	 * Identifies the element (or elements) that describes the object.
 	 *
 	 * @see aria-labelledby
 	 */
-	"aria-describedby"?: Signalish<string | RemoveAttribute>;
+	"aria-describedby"?: SignalOrValue<string | RemoveAttribute>;
 	/**
 	 * Defines a string value that describes or annotates the current element.
 	 *
 	 * @see aria-describedby
 	 */
-	"aria-description"?: Signalish<string | RemoveAttribute>;
+	"aria-description"?: SignalOrValue<string | RemoveAttribute>;
 	/**
 	 * Identifies the element that provides a detailed, extended description for the object.
 	 *
 	 * @see aria-describedby.
 	 */
-	"aria-details"?: Signalish<string | RemoveAttribute>;
+	"aria-details"?: SignalOrValue<string | RemoveAttribute>;
 	/**
 	 * Indicates that the element is perceivable but disabled, so it is not editable or otherwise
 	 * operable.
 	 *
 	 * @see aria-hidden @see aria-readonly.
 	 */
-	"aria-disabled"?: Signalish<EnumeratedPseudoBoolean | RemoveAttribute>;
+	"aria-disabled"?: SignalOrValue<EnumeratedPseudoBoolean | RemoveAttribute>;
 	/**
 	 * Indicates what functions can be performed when a dragged object is released on the drop
 	 * target.
 	 *
 	 * @deprecated In ARIA 1.1
 	 */
-	"aria-dropeffect"?: Signalish<"none" | "copy" | "execute" | "link" | "move" | "popup" | RemoveAttribute>;
+	"aria-dropeffect"?: SignalOrValue<"none" | "copy" | "execute" | "link" | "move" | "popup" | RemoveAttribute>;
 	/**
 	 * Identifies the element that provides an error message for the object.
 	 *
 	 * @see aria-invalid @see aria-describedby.
 	 */
-	"aria-errormessage"?: Signalish<string | RemoveAttribute>;
+	"aria-errormessage"?: SignalOrValue<string | RemoveAttribute>;
 	/**
 	 * Indicates whether the element, or another grouping element it controls, is currently expanded
 	 * or collapsed.
 	 */
-	"aria-expanded"?: Signalish<EnumeratedPseudoBoolean | RemoveAttribute>;
+	"aria-expanded"?: SignalOrValue<EnumeratedPseudoBoolean | RemoveAttribute>;
 	/**
 	 * Identifies the next element (or elements) in an alternate reading order of content which, at
 	 * the user's discretion, allows assistive technology to override the general default of reading
 	 * in document source order.
 	 */
-	"aria-flowto"?: Signalish<string | RemoveAttribute>;
+	"aria-flowto"?: SignalOrValue<string | RemoveAttribute>;
 	/**
 	 * Indicates an element's "grabbed" state in a drag-and-drop operation.
 	 *
 	 * @deprecated In ARIA 1.1
 	 */
-	"aria-grabbed"?: Signalish<EnumeratedPseudoBoolean | RemoveAttribute>;
+	"aria-grabbed"?: SignalOrValue<EnumeratedPseudoBoolean | RemoveAttribute>;
 	/**
 	 * Indicates the availability and type of interactive popup element, such as menu or dialog,
 	 * that can be triggered by an element.
 	 */
-	"aria-haspopup"?: Signalish<EnumeratedPseudoBoolean | "menu" | "listbox" | "tree" | "grid" | "dialog" | RemoveAttribute>;
+	"aria-haspopup"?: SignalOrValue<EnumeratedPseudoBoolean | "menu" | "listbox" | "tree" | "grid" | "dialog" | RemoveAttribute>;
 	/**
 	 * Indicates whether the element is exposed to an accessibility API.
 	 *
 	 * @see aria-disabled.
 	 */
-	"aria-hidden"?: Signalish<EnumeratedPseudoBoolean | RemoveAttribute>;
+	"aria-hidden"?: SignalOrValue<EnumeratedPseudoBoolean | RemoveAttribute>;
 	/**
 	 * Indicates the entered value does not conform to the format expected by the application.
 	 *
 	 * @see aria-errormessage.
 	 */
-	"aria-invalid"?: Signalish<EnumeratedPseudoBoolean | "grammar" | "spelling" | RemoveAttribute>;
+	"aria-invalid"?: SignalOrValue<EnumeratedPseudoBoolean | "grammar" | "spelling" | RemoveAttribute>;
 	/**
 	 * Indicates keyboard shortcuts that an author has implemented to activate or give focus to an
 	 * element.
 	 */
-	"aria-keyshortcuts"?: Signalish<string | RemoveAttribute>;
+	"aria-keyshortcuts"?: SignalOrValue<string | RemoveAttribute>;
 	/**
 	 * Defines a string value that labels the current element.
 	 *
 	 * @see aria-labelledby.
 	 */
-	"aria-label"?: Signalish<string | RemoveAttribute>;
+	"aria-label"?: SignalOrValue<string | RemoveAttribute>;
 	/**
 	 * Identifies the element (or elements) that labels the current element.
 	 *
 	 * @see aria-describedby.
 	 */
-	"aria-labelledby"?: Signalish<string | RemoveAttribute>;
+	"aria-labelledby"?: SignalOrValue<string | RemoveAttribute>;
 	/** Defines the hierarchical level of an element within a structure. */
-	"aria-level"?: Signalish<number | string | RemoveAttribute>;
+	"aria-level"?: SignalOrValue<number | string | RemoveAttribute>;
 	/**
 	 * Indicates that an element will be updated, and describes the types of updates the user
 	 * agents, assistive technologies, and user can expect from the live region.
 	 */
-	"aria-live"?: Signalish<"off" | "assertive" | "polite" | RemoveAttribute>;
+	"aria-live"?: SignalOrValue<"off" | "assertive" | "polite" | RemoveAttribute>;
 	/** Indicates whether an element is modal when displayed. */
-	"aria-modal"?: Signalish<EnumeratedPseudoBoolean | RemoveAttribute>;
+	"aria-modal"?: SignalOrValue<EnumeratedPseudoBoolean | RemoveAttribute>;
 	/** Indicates whether a text box accepts multiple lines of input or only a single line. */
-	"aria-multiline"?: Signalish<EnumeratedPseudoBoolean | RemoveAttribute>;
+	"aria-multiline"?: SignalOrValue<EnumeratedPseudoBoolean | RemoveAttribute>;
 	/**
 	 * Indicates that the user may select more than one item from the current selectable
 	 * descendants.
 	 */
-	"aria-multiselectable"?: Signalish<EnumeratedPseudoBoolean | RemoveAttribute>;
+	"aria-multiselectable"?: SignalOrValue<EnumeratedPseudoBoolean | RemoveAttribute>;
 	/** Indicates whether the element's orientation is horizontal, vertical, or unknown/ambiguous. */
-	"aria-orientation"?: Signalish<"horizontal" | "vertical" | RemoveAttribute>;
+	"aria-orientation"?: SignalOrValue<"horizontal" | "vertical" | RemoveAttribute>;
 	/**
 	 * Identifies an element (or elements) in order to define a visual, functional, or contextual
 	 * parent/child relationship between DOM elements where the DOM hierarchy cannot be used to
@@ -543,92 +543,92 @@ export interface AriaAttributes {
 	 *
 	 * @see aria-controls.
 	 */
-	"aria-owns"?: Signalish<string | RemoveAttribute>;
+	"aria-owns"?: SignalOrValue<string | RemoveAttribute>;
 	/**
 	 * Defines a short hint (a word or short phrase) intended to aid the user with data entry when
 	 * the control has no value. A hint could be a sample value or a brief description of the
 	 * expected format.
 	 */
-	"aria-placeholder"?: Signalish<string | RemoveAttribute>;
+	"aria-placeholder"?: SignalOrValue<string | RemoveAttribute>;
 	/**
 	 * Defines an element's number or position in the current set of listitems or treeitems. Not
 	 * required if all elements in the set are present in the DOM.
 	 *
 	 * @see aria-setsize.
 	 */
-	"aria-posinset"?: Signalish<number | string | RemoveAttribute>;
+	"aria-posinset"?: SignalOrValue<number | string | RemoveAttribute>;
 	/**
 	 * Indicates the current "pressed" state of toggle buttons.
 	 *
 	 * @see aria-checked @see aria-selected.
 	 */
-	"aria-pressed"?: Signalish<EnumeratedPseudoBoolean | "mixed" | RemoveAttribute>;
+	"aria-pressed"?: SignalOrValue<EnumeratedPseudoBoolean | "mixed" | RemoveAttribute>;
 	/**
 	 * Indicates that the element is not editable, but is otherwise operable.
 	 *
 	 * @see aria-disabled.
 	 */
-	"aria-readonly"?: Signalish<EnumeratedPseudoBoolean | RemoveAttribute>;
+	"aria-readonly"?: SignalOrValue<EnumeratedPseudoBoolean | RemoveAttribute>;
 	/**
 	 * Indicates what notifications the user agent will trigger when the accessibility tree within a
 	 * live region is modified.
 	 *
 	 * @see aria-atomic.
 	 */
-	"aria-relevant"?: Signalish<"additions" | "additions removals" | "additions text" | "all" | "removals" | "removals additions" | "removals text" | "text" | "text additions" | "text removals" | RemoveAttribute>;
+	"aria-relevant"?: SignalOrValue<"additions" | "additions removals" | "additions text" | "all" | "removals" | "removals additions" | "removals text" | "text" | "text additions" | "text removals" | RemoveAttribute>;
 	/** Indicates that user input is required on the element before a form may be submitted. */
-	"aria-required"?: Signalish<EnumeratedPseudoBoolean | RemoveAttribute>;
+	"aria-required"?: SignalOrValue<EnumeratedPseudoBoolean | RemoveAttribute>;
 	/** Defines a human-readable, author-localized description for the role of an element. */
-	"aria-roledescription"?: Signalish<string | RemoveAttribute>;
+	"aria-roledescription"?: SignalOrValue<string | RemoveAttribute>;
 	/**
 	 * Defines the total number of rows in a table, grid, or treegrid.
 	 *
 	 * @see aria-rowindex.
 	 */
-	"aria-rowcount"?: Signalish<number | string | RemoveAttribute>;
+	"aria-rowcount"?: SignalOrValue<number | string | RemoveAttribute>;
 	/**
 	 * Defines an element's row index or position with respect to the total number of rows within a
 	 * table, grid, or treegrid.
 	 *
 	 * @see aria-rowcount @see aria-rowspan.
 	 */
-	"aria-rowindex"?: Signalish<number | string | RemoveAttribute>;
+	"aria-rowindex"?: SignalOrValue<number | string | RemoveAttribute>;
 	/** Defines a human-readable text alternative of aria-rowindex. */
-	"aria-rowindextext"?: Signalish<number | string | RemoveAttribute>;
+	"aria-rowindextext"?: SignalOrValue<number | string | RemoveAttribute>;
 	/**
 	 * Defines the number of rows spanned by a cell or gridcell within a table, grid, or treegrid.
 	 *
 	 * @see aria-rowindex @see aria-colspan.
 	 */
-	"aria-rowspan"?: Signalish<number | string | RemoveAttribute>;
+	"aria-rowspan"?: SignalOrValue<number | string | RemoveAttribute>;
 	/**
 	 * Indicates the current "selected" state of various widgets.
 	 *
 	 * @see aria-checked @see aria-pressed.
 	 */
-	"aria-selected"?: Signalish<EnumeratedPseudoBoolean | RemoveAttribute>;
+	"aria-selected"?: SignalOrValue<EnumeratedPseudoBoolean | RemoveAttribute>;
 	/**
 	 * Defines the number of items in the current set of listitems or treeitems. Not required if all
 	 * elements in the set are present in the DOM.
 	 *
 	 * @see aria-posinset.
 	 */
-	"aria-setsize"?: Signalish<number | string | RemoveAttribute>;
+	"aria-setsize"?: SignalOrValue<number | string | RemoveAttribute>;
 	/** Indicates if items in a table or grid are sorted in ascending or descending order. */
-	"aria-sort"?: Signalish<"none" | "ascending" | "descending" | "other" | RemoveAttribute>;
+	"aria-sort"?: SignalOrValue<"none" | "ascending" | "descending" | "other" | RemoveAttribute>;
 	/** Defines the maximum allowed value for a range widget. */
-	"aria-valuemax"?: Signalish<number | string | RemoveAttribute>;
+	"aria-valuemax"?: SignalOrValue<number | string | RemoveAttribute>;
 	/** Defines the minimum allowed value for a range widget. */
-	"aria-valuemin"?: Signalish<number | string | RemoveAttribute>;
+	"aria-valuemin"?: SignalOrValue<number | string | RemoveAttribute>;
 	/**
 	 * Defines the current value for a range widget.
 	 *
 	 * @see aria-valuetext.
 	 */
-	"aria-valuenow"?: Signalish<number | string | RemoveAttribute>;
+	"aria-valuenow"?: SignalOrValue<number | string | RemoveAttribute>;
 	/** Defines the human readable text alternative of aria-valuenow for a range widget. */
-	"aria-valuetext"?: Signalish<string | RemoveAttribute>;
-	role?: Signalish<"alert" | "alertdialog" | "application" | "article" | "banner" | "button" | "cell" | "checkbox" | "columnheader" | "combobox" | "complementary" | "contentinfo" | "definition" | "dialog" | "directory" | "document" | "feed" | "figure" | "form" | "grid" | "gridcell" | "group" | "heading" | "img" | "link" | "list" | "listbox" | "listitem" | "log" | "main" | "marquee" | "math" | "menu" | "menubar" | "menuitem" | "menuitemcheckbox" | "menuitemradio" | "meter" | "navigation" | "none" | "note" | "option" | "presentation" | "progressbar" | "radio" | "radiogroup" | "region" | "row" | "rowgroup" | "rowheader" | "scrollbar" | "search" | "searchbox" | "separator" | "slider" | "spinbutton" | "status" | "switch" | "tab" | "table" | "tablist" | "tabpanel" | "term" | "textbox" | "timer" | "toolbar" | "tooltip" | "tree" | "treegrid" | "treeitem" | RemoveAttribute>;
+	"aria-valuetext"?: SignalOrValue<string | RemoveAttribute>;
+	role?: SignalOrValue<"alert" | "alertdialog" | "application" | "article" | "banner" | "button" | "cell" | "checkbox" | "columnheader" | "combobox" | "complementary" | "contentinfo" | "definition" | "dialog" | "directory" | "document" | "feed" | "figure" | "form" | "grid" | "gridcell" | "group" | "heading" | "img" | "link" | "list" | "listbox" | "listitem" | "log" | "main" | "marquee" | "math" | "menu" | "menubar" | "menuitem" | "menuitemcheckbox" | "menuitemradio" | "meter" | "navigation" | "none" | "note" | "option" | "presentation" | "progressbar" | "radio" | "radiogroup" | "region" | "row" | "rowgroup" | "rowheader" | "scrollbar" | "search" | "searchbox" | "separator" | "slider" | "spinbutton" | "status" | "switch" | "tab" | "table" | "tablist" | "tabpanel" | "term" | "textbox" | "timer" | "toolbar" | "tooltip" | "tree" | "treegrid" | "treeitem" | RemoveAttribute>;
 }
 // EVENTS
 /**
@@ -796,69 +796,69 @@ export interface EventHandlersElement<T> {
 export interface ElementAttributes<T> extends CustomDomAttributes<T>, DirectiveAttributes, DirectiveFunctionAttributes<T>, PropAttributes, OnAttributes<T>, EventHandlersElement<T>, AriaAttributes {
 	// [key: ClassKeys]: boolean;
 	// properties
-	innerHTML?: Signalish<string>;
-	textContent?: Signalish<string | number>;
+	innerHTML?: SignalOrValue<string>;
+	textContent?: SignalOrValue<string | number>;
 	// attributes
-	autofocus?: Signalish<BooleanAttribute | RemoveAttribute>;
-	class?: Signalish<string | ClassNames | RemoveAttribute>;
-	elementtiming?: Signalish<string | RemoveAttribute>;
-	id?: Signalish<string | RemoveAttribute>;
-	nonce?: Signalish<string | RemoveAttribute>;
-	part?: Signalish<string | RemoveAttribute>;
-	slot?: Signalish<string | RemoveAttribute>;
-	style?: Signalish<CSSProperties | string | RemoveAttribute>;
-	tabindex?: Signalish<number | string | RemoveAttribute>;
+	autofocus?: SignalOrValue<BooleanAttribute | RemoveAttribute>;
+	class?: SignalOrValue<string | ClassNames | RemoveAttribute>;
+	elementtiming?: SignalOrValue<string | RemoveAttribute>;
+	id?: SignalOrValue<string | RemoveAttribute>;
+	nonce?: SignalOrValue<string | RemoveAttribute>;
+	part?: SignalOrValue<string | RemoveAttribute>;
+	slot?: SignalOrValue<string | RemoveAttribute>;
+	style?: SignalOrValue<CSSProperties | string | RemoveAttribute>;
+	tabindex?: SignalOrValue<number | string | RemoveAttribute>;
 }
 /** Global `SVGElement` interface keys only. */
 export interface SVGAttributes<T> extends ElementAttributes<T> {
-	id?: Signalish<string | RemoveAttribute>;
-	lang?: Signalish<string | RemoveAttribute>;
-	tabindex?: Signalish<number | string | RemoveAttribute>;
-	xmlns?: Signalish<string | RemoveAttribute>;
+	id?: SignalOrValue<string | RemoveAttribute>;
+	lang?: SignalOrValue<string | RemoveAttribute>;
+	tabindex?: SignalOrValue<number | string | RemoveAttribute>;
+	xmlns?: SignalOrValue<string | RemoveAttribute>;
 }
 /** Global `HTMLElement` interface keys only. */
 export interface HTMLAttributes<T> extends ElementAttributes<T> {
 	// properties
-	innerText?: Signalish<string | number>;
+	innerText?: SignalOrValue<string | number>;
 	// attributes
-	accesskey?: Signalish<string | RemoveAttribute>;
-	autocapitalize?: Signalish<HTMLAutocapitalize | RemoveAttribute>;
-	autocorrect?: Signalish<"on" | "off" | RemoveAttribute>;
-	contenteditable?: Signalish<EnumeratedPseudoBoolean | EnumeratedAcceptsEmpty | "plaintext-only" | "inherit" | RemoveAttribute>;
-	dir?: Signalish<HTMLDir | RemoveAttribute>;
-	draggable?: Signalish<EnumeratedPseudoBoolean | RemoveAttribute>;
-	enterkeyhint?: Signalish<"enter" | "done" | "go" | "next" | "previous" | "search" | "send" | RemoveAttribute>;
-	exportparts?: Signalish<string | RemoveAttribute>;
-	hidden?: Signalish<EnumeratedAcceptsEmpty | "hidden" | "until-found" | RemoveAttribute>;
-	inert?: Signalish<BooleanAttribute | RemoveAttribute>;
-	inputmode?: Signalish<"decimal" | "email" | "none" | "numeric" | "search" | "tel" | "text" | "url" | RemoveAttribute>;
-	is?: Signalish<string | RemoveAttribute>;
-	lang?: Signalish<string | RemoveAttribute>;
-	popover?: Signalish<EnumeratedAcceptsEmpty | "manual" | "auto" | RemoveAttribute>;
-	spellcheck?: Signalish<EnumeratedPseudoBoolean | EnumeratedAcceptsEmpty | RemoveAttribute>;
-	title?: Signalish<string | RemoveAttribute>;
-	translate?: Signalish<"yes" | "no" | RemoveAttribute>;
+	accesskey?: SignalOrValue<string | RemoveAttribute>;
+	autocapitalize?: SignalOrValue<HTMLAutocapitalize | RemoveAttribute>;
+	autocorrect?: SignalOrValue<"on" | "off" | RemoveAttribute>;
+	contenteditable?: SignalOrValue<EnumeratedPseudoBoolean | EnumeratedAcceptsEmpty | "plaintext-only" | "inherit" | RemoveAttribute>;
+	dir?: SignalOrValue<HTMLDir | RemoveAttribute>;
+	draggable?: SignalOrValue<EnumeratedPseudoBoolean | RemoveAttribute>;
+	enterkeyhint?: SignalOrValue<"enter" | "done" | "go" | "next" | "previous" | "search" | "send" | RemoveAttribute>;
+	exportparts?: SignalOrValue<string | RemoveAttribute>;
+	hidden?: SignalOrValue<EnumeratedAcceptsEmpty | "hidden" | "until-found" | RemoveAttribute>;
+	inert?: SignalOrValue<BooleanAttribute | RemoveAttribute>;
+	inputmode?: SignalOrValue<"decimal" | "email" | "none" | "numeric" | "search" | "tel" | "text" | "url" | RemoveAttribute>;
+	is?: SignalOrValue<string | RemoveAttribute>;
+	lang?: SignalOrValue<string | RemoveAttribute>;
+	popover?: SignalOrValue<EnumeratedAcceptsEmpty | "manual" | "auto" | RemoveAttribute>;
+	spellcheck?: SignalOrValue<EnumeratedPseudoBoolean | EnumeratedAcceptsEmpty | RemoveAttribute>;
+	title?: SignalOrValue<string | RemoveAttribute>;
+	translate?: SignalOrValue<"yes" | "no" | RemoveAttribute>;
 	/** @experimental */
-	virtualkeyboardpolicy?: Signalish<EnumeratedAcceptsEmpty | "auto" | "manual" | RemoveAttribute>;
+	virtualkeyboardpolicy?: SignalOrValue<EnumeratedAcceptsEmpty | "auto" | "manual" | RemoveAttribute>;
 	/** @experimental */
-	writingsuggestions?: Signalish<EnumeratedPseudoBoolean | RemoveAttribute>;
+	writingsuggestions?: SignalOrValue<EnumeratedPseudoBoolean | RemoveAttribute>;
 	// Microdata
-	itemid?: Signalish<string | RemoveAttribute>;
-	itemprop?: Signalish<string | RemoveAttribute>;
-	itemref?: Signalish<string | RemoveAttribute>;
-	itemscope?: Signalish<BooleanAttribute | RemoveAttribute>;
-	itemtype?: Signalish<string | RemoveAttribute>;
+	itemid?: SignalOrValue<string | RemoveAttribute>;
+	itemprop?: SignalOrValue<string | RemoveAttribute>;
+	itemref?: SignalOrValue<string | RemoveAttribute>;
+	itemscope?: SignalOrValue<BooleanAttribute | RemoveAttribute>;
+	itemtype?: SignalOrValue<string | RemoveAttribute>;
 	// RDFa Attributes
-	about?: Signalish<string | RemoveAttribute>;
-	datatype?: Signalish<string | RemoveAttribute>;
-	inlist?: Signalish<any | RemoveAttribute>;
-	prefix?: Signalish<string | RemoveAttribute>;
-	property?: Signalish<string | RemoveAttribute>;
-	resource?: Signalish<string | RemoveAttribute>;
-	typeof?: Signalish<string | RemoveAttribute>;
-	vocab?: Signalish<string | RemoveAttribute>;
+	about?: SignalOrValue<string | RemoveAttribute>;
+	datatype?: SignalOrValue<string | RemoveAttribute>;
+	inlist?: SignalOrValue<any | RemoveAttribute>;
+	prefix?: SignalOrValue<string | RemoveAttribute>;
+	property?: SignalOrValue<string | RemoveAttribute>;
+	resource?: SignalOrValue<string | RemoveAttribute>;
+	typeof?: SignalOrValue<string | RemoveAttribute>;
+	vocab?: SignalOrValue<string | RemoveAttribute>;
 	/** @deprecated */
-	contextmenu?: Signalish<string | RemoveAttribute>;
+	contextmenu?: SignalOrValue<string | RemoveAttribute>;
 }
 // HTML
 export type HTMLAutocapitalize = "off" | "none" | "on" | "sentences" | "words" | "characters";
@@ -871,126 +871,126 @@ export type HTMLReferrerPolicy = "no-referrer" | "no-referrer-when-downgrade" | 
 export type HTMLIframeSandbox = "allow-downloads-without-user-activation" | "allow-downloads" | "allow-forms" | "allow-modals" | "allow-orientation-lock" | "allow-pointer-lock" | "allow-popups" | "allow-popups-to-escape-sandbox" | "allow-presentation" | "allow-same-origin" | "allow-scripts" | "allow-storage-access-by-user-activation" | "allow-top-navigation" | "allow-top-navigation-by-user-activation" | "allow-top-navigation-to-custom-protocols";
 export type HTMLLinkAs = "audio" | "document" | "embed" | "fetch" | "font" | "image" | "object" | "script" | "style" | "track" | "video" | "worker";
 export interface AnchorHTMLAttributes<T> extends HTMLAttributes<T> {
-	download?: Signalish<string | true | RemoveAttribute>;
-	href?: Signalish<string | RemoveAttribute>;
-	hreflang?: Signalish<string | RemoveAttribute>;
-	ping?: Signalish<string | RemoveAttribute>;
-	referrerpolicy?: Signalish<HTMLReferrerPolicy | RemoveAttribute>;
-	rel?: Signalish<string | RemoveAttribute>;
-	target?: Signalish<"_self" | "_blank" | "_parent" | "_top" | (string & {}) | RemoveAttribute>;
-	type?: Signalish<string | RemoveAttribute>;
+	download?: SignalOrValue<string | true | RemoveAttribute>;
+	href?: SignalOrValue<string | RemoveAttribute>;
+	hreflang?: SignalOrValue<string | RemoveAttribute>;
+	ping?: SignalOrValue<string | RemoveAttribute>;
+	referrerpolicy?: SignalOrValue<HTMLReferrerPolicy | RemoveAttribute>;
+	rel?: SignalOrValue<string | RemoveAttribute>;
+	target?: SignalOrValue<"_self" | "_blank" | "_parent" | "_top" | (string & {}) | RemoveAttribute>;
+	type?: SignalOrValue<string | RemoveAttribute>;
 	/** @experimental */
-	attributionsrc?: Signalish<string | RemoveAttribute>;
+	attributionsrc?: SignalOrValue<string | RemoveAttribute>;
 	/** @deprecated */
-	charset?: Signalish<string | RemoveAttribute>;
+	charset?: SignalOrValue<string | RemoveAttribute>;
 	/** @deprecated */
-	coords?: Signalish<string | RemoveAttribute>;
+	coords?: SignalOrValue<string | RemoveAttribute>;
 	/** @deprecated */
-	name?: Signalish<string | RemoveAttribute>;
+	name?: SignalOrValue<string | RemoveAttribute>;
 	/** @deprecated */
-	rev?: Signalish<string | RemoveAttribute>;
+	rev?: SignalOrValue<string | RemoveAttribute>;
 	/** @deprecated */
-	shape?: Signalish<"rect" | "circle" | "poly" | "default" | RemoveAttribute>;
+	shape?: SignalOrValue<"rect" | "circle" | "poly" | "default" | RemoveAttribute>;
 }
 export interface AudioHTMLAttributes<T> extends MediaHTMLAttributes<T> {
 }
 export interface AreaHTMLAttributes<T> extends HTMLAttributes<T> {
-	alt?: Signalish<string | RemoveAttribute>;
-	coords?: Signalish<string | RemoveAttribute>;
-	download?: Signalish<string | RemoveAttribute>;
-	href?: Signalish<string | RemoveAttribute>;
-	ping?: Signalish<string | RemoveAttribute>;
-	referrerpolicy?: Signalish<HTMLReferrerPolicy | RemoveAttribute>;
-	rel?: Signalish<string | RemoveAttribute>;
-	shape?: Signalish<"rect" | "circle" | "poly" | "default" | RemoveAttribute>;
-	target?: Signalish<"_self" | "_blank" | "_parent" | "_top" | (string & {}) | RemoveAttribute>;
+	alt?: SignalOrValue<string | RemoveAttribute>;
+	coords?: SignalOrValue<string | RemoveAttribute>;
+	download?: SignalOrValue<string | RemoveAttribute>;
+	href?: SignalOrValue<string | RemoveAttribute>;
+	ping?: SignalOrValue<string | RemoveAttribute>;
+	referrerpolicy?: SignalOrValue<HTMLReferrerPolicy | RemoveAttribute>;
+	rel?: SignalOrValue<string | RemoveAttribute>;
+	shape?: SignalOrValue<"rect" | "circle" | "poly" | "default" | RemoveAttribute>;
+	target?: SignalOrValue<"_self" | "_blank" | "_parent" | "_top" | (string & {}) | RemoveAttribute>;
 	/** @experimental */
-	attributionsrc?: Signalish<string | RemoveAttribute>;
+	attributionsrc?: SignalOrValue<string | RemoveAttribute>;
 	/** @deprecated */
-	nohref?: Signalish<BooleanAttribute | RemoveAttribute>;
+	nohref?: SignalOrValue<BooleanAttribute | RemoveAttribute>;
 }
 export interface BaseHTMLAttributes<T> extends HTMLAttributes<T> {
-	href?: Signalish<string | RemoveAttribute>;
-	target?: Signalish<"_self" | "_blank" | "_parent" | "_top" | (string & {}) | RemoveAttribute>;
+	href?: SignalOrValue<string | RemoveAttribute>;
+	target?: SignalOrValue<"_self" | "_blank" | "_parent" | "_top" | (string & {}) | RemoveAttribute>;
 }
 export interface BdoHTMLAttributes<T> extends HTMLAttributes<T> {
-	dir?: Signalish<"ltr" | "rtl" | RemoveAttribute>;
+	dir?: SignalOrValue<"ltr" | "rtl" | RemoveAttribute>;
 }
 export interface BlockquoteHTMLAttributes<T> extends HTMLAttributes<T> {
-	cite?: Signalish<string | RemoveAttribute>;
+	cite?: SignalOrValue<string | RemoveAttribute>;
 }
 export interface BodyHTMLAttributes<T> extends HTMLAttributes<T>, EventHandlersWindow<T> {
 }
 export interface ButtonHTMLAttributes<T> extends HTMLAttributes<T> {
-	disabled?: Signalish<BooleanAttribute | RemoveAttribute>;
-	form?: Signalish<string | RemoveAttribute>;
-	formaction?: Signalish<string | SerializableAttributeValue | RemoveAttribute>;
-	formenctype?: Signalish<HTMLFormEncType | RemoveAttribute>;
-	formmethod?: Signalish<HTMLFormMethod | RemoveAttribute>;
-	formnovalidate?: Signalish<BooleanAttribute | RemoveAttribute>;
-	formtarget?: Signalish<"_self" | "_blank" | "_parent" | "_top" | (string & {}) | RemoveAttribute>;
-	name?: Signalish<string | RemoveAttribute>;
-	popovertarget?: Signalish<string | RemoveAttribute>;
-	popovertargetaction?: Signalish<"hide" | "show" | "toggle" | RemoveAttribute>;
-	type?: Signalish<"submit" | "reset" | "button" | "menu" | RemoveAttribute>;
-	value?: Signalish<string | RemoveAttribute>;
+	disabled?: SignalOrValue<BooleanAttribute | RemoveAttribute>;
+	form?: SignalOrValue<string | RemoveAttribute>;
+	formaction?: SignalOrValue<string | SerializableAttributeValue | RemoveAttribute>;
+	formenctype?: SignalOrValue<HTMLFormEncType | RemoveAttribute>;
+	formmethod?: SignalOrValue<HTMLFormMethod | RemoveAttribute>;
+	formnovalidate?: SignalOrValue<BooleanAttribute | RemoveAttribute>;
+	formtarget?: SignalOrValue<"_self" | "_blank" | "_parent" | "_top" | (string & {}) | RemoveAttribute>;
+	name?: SignalOrValue<string | RemoveAttribute>;
+	popovertarget?: SignalOrValue<string | RemoveAttribute>;
+	popovertargetaction?: SignalOrValue<"hide" | "show" | "toggle" | RemoveAttribute>;
+	type?: SignalOrValue<"submit" | "reset" | "button" | "menu" | RemoveAttribute>;
+	value?: SignalOrValue<string | RemoveAttribute>;
 	/** @experimental */
-	command?: Signalish<"show-modal" | "close" | "show-popover" | "hide-popover" | "toggle-popover" | (string & {}) | RemoveAttribute>;
+	command?: SignalOrValue<"show-modal" | "close" | "show-popover" | "hide-popover" | "toggle-popover" | (string & {}) | RemoveAttribute>;
 	/** @experimental */
-	commandfor?: Signalish<string | RemoveAttribute>;
+	commandfor?: SignalOrValue<string | RemoveAttribute>;
 }
 export interface CanvasHTMLAttributes<T> extends HTMLAttributes<T> {
-	height?: Signalish<number | string | RemoveAttribute>;
-	width?: Signalish<number | string | RemoveAttribute>;
+	height?: SignalOrValue<number | string | RemoveAttribute>;
+	width?: SignalOrValue<number | string | RemoveAttribute>;
 	/**
 	 * @deprecated
 	 * @non-standard
 	 */
-	"moz-opaque"?: Signalish<BooleanAttribute | RemoveAttribute>;
+	"moz-opaque"?: SignalOrValue<BooleanAttribute | RemoveAttribute>;
 }
 export interface CaptionHTMLAttributes<T> extends HTMLAttributes<T> {
 	/** @deprecated */
-	align?: Signalish<"left" | "center" | "right" | RemoveAttribute>;
+	align?: SignalOrValue<"left" | "center" | "right" | RemoveAttribute>;
 }
 export interface ColHTMLAttributes<T> extends HTMLAttributes<T> {
-	span?: Signalish<number | string | RemoveAttribute>;
+	span?: SignalOrValue<number | string | RemoveAttribute>;
 	/** @deprecated */
-	align?: Signalish<"left" | "center" | "right" | "justify" | "char" | RemoveAttribute>;
+	align?: SignalOrValue<"left" | "center" | "right" | "justify" | "char" | RemoveAttribute>;
 	/** @deprecated */
-	bgcolor?: Signalish<string | RemoveAttribute>;
+	bgcolor?: SignalOrValue<string | RemoveAttribute>;
 	/** @deprecated */
-	char?: Signalish<string | RemoveAttribute>;
+	char?: SignalOrValue<string | RemoveAttribute>;
 	/** @deprecated */
-	charoff?: Signalish<string | RemoveAttribute>;
+	charoff?: SignalOrValue<string | RemoveAttribute>;
 	/** @deprecated */
-	valign?: Signalish<"baseline" | "bottom" | "middle" | "top" | RemoveAttribute>;
+	valign?: SignalOrValue<"baseline" | "bottom" | "middle" | "top" | RemoveAttribute>;
 	/** @deprecated */
-	width?: Signalish<number | string | RemoveAttribute>;
+	width?: SignalOrValue<number | string | RemoveAttribute>;
 }
 export interface ColgroupHTMLAttributes<T> extends HTMLAttributes<T> {
-	span?: Signalish<number | string | RemoveAttribute>;
+	span?: SignalOrValue<number | string | RemoveAttribute>;
 	/** @deprecated */
-	align?: Signalish<"left" | "center" | "right" | "justify" | "char" | RemoveAttribute>;
+	align?: SignalOrValue<"left" | "center" | "right" | "justify" | "char" | RemoveAttribute>;
 	/** @deprecated */
-	bgcolor?: Signalish<string | RemoveAttribute>;
+	bgcolor?: SignalOrValue<string | RemoveAttribute>;
 	/** @deprecated */
-	char?: Signalish<string | RemoveAttribute>;
+	char?: SignalOrValue<string | RemoveAttribute>;
 	/** @deprecated */
-	charoff?: Signalish<string | RemoveAttribute>;
+	charoff?: SignalOrValue<string | RemoveAttribute>;
 	/** @deprecated */
-	valign?: Signalish<"baseline" | "bottom" | "middle" | "top" | RemoveAttribute>;
+	valign?: SignalOrValue<"baseline" | "bottom" | "middle" | "top" | RemoveAttribute>;
 	/** @deprecated */
-	width?: Signalish<number | string | RemoveAttribute>;
+	width?: SignalOrValue<number | string | RemoveAttribute>;
 }
 export interface DataHTMLAttributes<T> extends HTMLAttributes<T> {
-	value?: Signalish<string | string[] | number | RemoveAttribute>;
+	value?: SignalOrValue<string | string[] | number | RemoveAttribute>;
 }
 export interface DetailsHtmlAttributes<T> extends HTMLAttributes<T> {
-	name?: Signalish<string | RemoveAttribute>;
-	open?: Signalish<BooleanAttribute | RemoveAttribute>;
+	name?: SignalOrValue<string | RemoveAttribute>;
+	open?: SignalOrValue<BooleanAttribute | RemoveAttribute>;
 }
 export interface DialogHtmlAttributes<T> extends HTMLAttributes<T> {
-	open?: Signalish<BooleanAttribute | RemoveAttribute>;
+	open?: SignalOrValue<BooleanAttribute | RemoveAttribute>;
 	/**
 	 * Do not add the `tabindex` property to the `<dialog>` element as it is not interactive and
 	 * does not receive focus. The dialog's contents, including the close button contained in the
@@ -1000,597 +1000,597 @@ export interface DialogHtmlAttributes<T> extends HTMLAttributes<T> {
 	 */
 	tabindex?: never;
 	/** @experimental */
-	closedby?: Signalish<"any" | "closerequest" | "none" | RemoveAttribute>;
+	closedby?: SignalOrValue<"any" | "closerequest" | "none" | RemoveAttribute>;
 }
 export interface EmbedHTMLAttributes<T> extends HTMLAttributes<T> {
-	height?: Signalish<number | string | RemoveAttribute>;
-	src?: Signalish<string | RemoveAttribute>;
-	type?: Signalish<string | RemoveAttribute>;
-	width?: Signalish<number | string | RemoveAttribute>;
+	height?: SignalOrValue<number | string | RemoveAttribute>;
+	src?: SignalOrValue<string | RemoveAttribute>;
+	type?: SignalOrValue<string | RemoveAttribute>;
+	width?: SignalOrValue<number | string | RemoveAttribute>;
 	/** @deprecated */
-	align?: Signalish<"left" | "right" | "justify" | "center" | RemoveAttribute>;
+	align?: SignalOrValue<"left" | "right" | "justify" | "center" | RemoveAttribute>;
 	/** @deprecated */
-	name?: Signalish<string | RemoveAttribute>;
+	name?: SignalOrValue<string | RemoveAttribute>;
 }
 export interface FieldsetHTMLAttributes<T> extends HTMLAttributes<T> {
-	disabled?: Signalish<BooleanAttribute | RemoveAttribute>;
-	form?: Signalish<string | RemoveAttribute>;
-	name?: Signalish<string | RemoveAttribute>;
+	disabled?: SignalOrValue<BooleanAttribute | RemoveAttribute>;
+	form?: SignalOrValue<string | RemoveAttribute>;
+	name?: SignalOrValue<string | RemoveAttribute>;
 }
 export interface FormHTMLAttributes<T> extends HTMLAttributes<T> {
-	"accept-charset"?: Signalish<string | RemoveAttribute>;
-	action?: Signalish<string | SerializableAttributeValue | RemoveAttribute>;
-	autocomplete?: Signalish<"on" | "off" | RemoveAttribute>;
-	encoding?: Signalish<HTMLFormEncType | RemoveAttribute>;
-	enctype?: Signalish<HTMLFormEncType | RemoveAttribute>;
-	method?: Signalish<HTMLFormMethod | RemoveAttribute>;
-	name?: Signalish<string | RemoveAttribute>;
-	novalidate?: Signalish<BooleanAttribute | RemoveAttribute>;
-	rel?: Signalish<string | RemoveAttribute>;
-	target?: Signalish<"_self" | "_blank" | "_parent" | "_top" | (string & {}) | RemoveAttribute>;
+	"accept-charset"?: SignalOrValue<string | RemoveAttribute>;
+	action?: SignalOrValue<string | SerializableAttributeValue | RemoveAttribute>;
+	autocomplete?: SignalOrValue<"on" | "off" | RemoveAttribute>;
+	encoding?: SignalOrValue<HTMLFormEncType | RemoveAttribute>;
+	enctype?: SignalOrValue<HTMLFormEncType | RemoveAttribute>;
+	method?: SignalOrValue<HTMLFormMethod | RemoveAttribute>;
+	name?: SignalOrValue<string | RemoveAttribute>;
+	novalidate?: SignalOrValue<BooleanAttribute | RemoveAttribute>;
+	rel?: SignalOrValue<string | RemoveAttribute>;
+	target?: SignalOrValue<"_self" | "_blank" | "_parent" | "_top" | (string & {}) | RemoveAttribute>;
 	/** @deprecated */
-	accept?: Signalish<string | RemoveAttribute>;
+	accept?: SignalOrValue<string | RemoveAttribute>;
 }
 export interface IframeHTMLAttributes<T> extends HTMLAttributes<T> {
-	allow?: Signalish<string | RemoveAttribute>;
-	allowfullscreen?: Signalish<BooleanAttribute | RemoveAttribute>;
-	height?: Signalish<number | string | RemoveAttribute>;
-	loading?: Signalish<"eager" | "lazy" | RemoveAttribute>;
-	name?: Signalish<string | RemoveAttribute>;
-	referrerpolicy?: Signalish<HTMLReferrerPolicy | RemoveAttribute>;
-	sandbox?: Signalish<HTMLIframeSandbox | string | RemoveAttribute>;
-	src?: Signalish<string | RemoveAttribute>;
-	srcdoc?: Signalish<string | RemoveAttribute>;
-	width?: Signalish<number | string | RemoveAttribute>;
+	allow?: SignalOrValue<string | RemoveAttribute>;
+	allowfullscreen?: SignalOrValue<BooleanAttribute | RemoveAttribute>;
+	height?: SignalOrValue<number | string | RemoveAttribute>;
+	loading?: SignalOrValue<"eager" | "lazy" | RemoveAttribute>;
+	name?: SignalOrValue<string | RemoveAttribute>;
+	referrerpolicy?: SignalOrValue<HTMLReferrerPolicy | RemoveAttribute>;
+	sandbox?: SignalOrValue<HTMLIframeSandbox | string | RemoveAttribute>;
+	src?: SignalOrValue<string | RemoveAttribute>;
+	srcdoc?: SignalOrValue<string | RemoveAttribute>;
+	width?: SignalOrValue<number | string | RemoveAttribute>;
 	/** @experimental */
-	adauctionheaders?: Signalish<BooleanAttribute | RemoveAttribute>;
+	adauctionheaders?: SignalOrValue<BooleanAttribute | RemoveAttribute>;
 	/**
 	 * @non-standard
 	 * @experimental
 	 */
-	browsingtopics?: Signalish<BooleanAttribute | RemoveAttribute>;
+	browsingtopics?: SignalOrValue<BooleanAttribute | RemoveAttribute>;
 	/** @experimental */
-	credentialless?: Signalish<BooleanAttribute | RemoveAttribute>;
+	credentialless?: SignalOrValue<BooleanAttribute | RemoveAttribute>;
 	/** @experimental */
-	csp?: Signalish<string | RemoveAttribute>;
+	csp?: SignalOrValue<string | RemoveAttribute>;
 	/** @experimental */
-	privatetoken?: Signalish<string | RemoveAttribute>;
+	privatetoken?: SignalOrValue<string | RemoveAttribute>;
 	/** @experimental */
-	sharedstoragewritable?: Signalish<BooleanAttribute | RemoveAttribute>;
+	sharedstoragewritable?: SignalOrValue<BooleanAttribute | RemoveAttribute>;
 	/** @deprecated */
-	align?: Signalish<string | RemoveAttribute>;
+	align?: SignalOrValue<string | RemoveAttribute>;
 	/**
 	 * @deprecated
 	 * @non-standard
 	 */
-	allowpaymentrequest?: Signalish<BooleanAttribute | RemoveAttribute>;
+	allowpaymentrequest?: SignalOrValue<BooleanAttribute | RemoveAttribute>;
 	/** @deprecated */
-	allowtransparency?: Signalish<BooleanAttribute | RemoveAttribute>;
+	allowtransparency?: SignalOrValue<BooleanAttribute | RemoveAttribute>;
 	/** @deprecated */
-	frameborder?: Signalish<number | string | RemoveAttribute>;
+	frameborder?: SignalOrValue<number | string | RemoveAttribute>;
 	/** @deprecated */
-	longdesc?: Signalish<string | RemoveAttribute>;
+	longdesc?: SignalOrValue<string | RemoveAttribute>;
 	/** @deprecated */
-	marginheight?: Signalish<number | string | RemoveAttribute>;
+	marginheight?: SignalOrValue<number | string | RemoveAttribute>;
 	/** @deprecated */
-	marginwidth?: Signalish<number | string | RemoveAttribute>;
+	marginwidth?: SignalOrValue<number | string | RemoveAttribute>;
 	/** @deprecated */
-	scrolling?: Signalish<"yes" | "no" | "auto" | RemoveAttribute>;
+	scrolling?: SignalOrValue<"yes" | "no" | "auto" | RemoveAttribute>;
 	/** @deprecated */
-	seamless?: Signalish<BooleanAttribute | RemoveAttribute>;
+	seamless?: SignalOrValue<BooleanAttribute | RemoveAttribute>;
 }
 export interface ImgHTMLAttributes<T> extends HTMLAttributes<T> {
-	alt?: Signalish<string | RemoveAttribute>;
-	browsingtopics?: Signalish<string | RemoveAttribute>;
-	crossorigin?: Signalish<HTMLCrossorigin | RemoveAttribute>;
-	decoding?: Signalish<"sync" | "async" | "auto" | RemoveAttribute>;
-	fetchpriority?: Signalish<"high" | "low" | "auto" | RemoveAttribute>;
-	height?: Signalish<number | string | RemoveAttribute>;
-	ismap?: Signalish<BooleanAttribute | RemoveAttribute>;
-	loading?: Signalish<"eager" | "lazy" | RemoveAttribute>;
-	referrerpolicy?: Signalish<HTMLReferrerPolicy | RemoveAttribute>;
-	sizes?: Signalish<string | RemoveAttribute>;
-	src?: Signalish<string | RemoveAttribute>;
-	srcset?: Signalish<string | RemoveAttribute>;
-	usemap?: Signalish<string | RemoveAttribute>;
-	width?: Signalish<number | string | RemoveAttribute>;
+	alt?: SignalOrValue<string | RemoveAttribute>;
+	browsingtopics?: SignalOrValue<string | RemoveAttribute>;
+	crossorigin?: SignalOrValue<HTMLCrossorigin | RemoveAttribute>;
+	decoding?: SignalOrValue<"sync" | "async" | "auto" | RemoveAttribute>;
+	fetchpriority?: SignalOrValue<"high" | "low" | "auto" | RemoveAttribute>;
+	height?: SignalOrValue<number | string | RemoveAttribute>;
+	ismap?: SignalOrValue<BooleanAttribute | RemoveAttribute>;
+	loading?: SignalOrValue<"eager" | "lazy" | RemoveAttribute>;
+	referrerpolicy?: SignalOrValue<HTMLReferrerPolicy | RemoveAttribute>;
+	sizes?: SignalOrValue<string | RemoveAttribute>;
+	src?: SignalOrValue<string | RemoveAttribute>;
+	srcset?: SignalOrValue<string | RemoveAttribute>;
+	usemap?: SignalOrValue<string | RemoveAttribute>;
+	width?: SignalOrValue<number | string | RemoveAttribute>;
 	/** @experimental */
-	attributionsrc?: Signalish<string | RemoveAttribute>;
+	attributionsrc?: SignalOrValue<string | RemoveAttribute>;
 	/** @experimental */
-	sharedstoragewritable?: Signalish<BooleanAttribute | RemoveAttribute>;
+	sharedstoragewritable?: SignalOrValue<BooleanAttribute | RemoveAttribute>;
 	/** @deprecated */
-	align?: Signalish<"top" | "middle" | "bottom" | "left" | "right" | RemoveAttribute>;
+	align?: SignalOrValue<"top" | "middle" | "bottom" | "left" | "right" | RemoveAttribute>;
 	/** @deprecated */
-	border?: Signalish<string | RemoveAttribute>;
+	border?: SignalOrValue<string | RemoveAttribute>;
 	/** @deprecated */
-	hspace?: Signalish<number | string | RemoveAttribute>;
+	hspace?: SignalOrValue<number | string | RemoveAttribute>;
 	/** @deprecated */
-	intrinsicsize?: Signalish<string | RemoveAttribute>;
+	intrinsicsize?: SignalOrValue<string | RemoveAttribute>;
 	/** @deprecated */
-	longdesc?: Signalish<string | RemoveAttribute>;
+	longdesc?: SignalOrValue<string | RemoveAttribute>;
 	/** @deprecated */
-	lowsrc?: Signalish<string | RemoveAttribute>;
+	lowsrc?: SignalOrValue<string | RemoveAttribute>;
 	/** @deprecated */
-	name?: Signalish<string | RemoveAttribute>;
+	name?: SignalOrValue<string | RemoveAttribute>;
 	/** @deprecated */
-	vspace?: Signalish<number | string | RemoveAttribute>;
+	vspace?: SignalOrValue<number | string | RemoveAttribute>;
 }
 export interface InputHTMLAttributes<T> extends HTMLAttributes<T> {
-	accept?: Signalish<string | RemoveAttribute>;
-	alpha?: Signalish<BooleanAttribute | RemoveAttribute>;
-	alt?: Signalish<string | RemoveAttribute>;
-	autocomplete?: Signalish<HTMLAutocomplete | RemoveAttribute>;
-	capture?: Signalish<"user" | "environment" | RemoveAttribute>;
-	checked?: Signalish<BooleanAttribute | RemoveAttribute>;
-	colorspace?: Signalish<string | RemoveAttribute>;
-	dirname?: Signalish<string | RemoveAttribute>;
-	disabled?: Signalish<BooleanAttribute | RemoveAttribute>;
-	form?: Signalish<string | RemoveAttribute>;
-	formaction?: Signalish<string | SerializableAttributeValue | RemoveAttribute>;
-	formenctype?: Signalish<HTMLFormEncType | RemoveAttribute>;
-	formmethod?: Signalish<HTMLFormMethod | RemoveAttribute>;
-	formnovalidate?: Signalish<BooleanAttribute | RemoveAttribute>;
-	formtarget?: Signalish<string | RemoveAttribute>;
-	height?: Signalish<number | string | RemoveAttribute>;
-	list?: Signalish<string | RemoveAttribute>;
-	max?: Signalish<number | string | RemoveAttribute>;
-	maxlength?: Signalish<number | string | RemoveAttribute>;
-	min?: Signalish<number | string | RemoveAttribute>;
-	minlength?: Signalish<number | string | RemoveAttribute>;
-	multiple?: Signalish<BooleanAttribute | RemoveAttribute>;
-	name?: Signalish<string | RemoveAttribute>;
-	pattern?: Signalish<string | RemoveAttribute>;
-	placeholder?: Signalish<string | RemoveAttribute>;
-	popovertarget?: Signalish<string | RemoveAttribute>;
-	popovertargetaction?: Signalish<"hide" | "show" | "toggle" | RemoveAttribute>;
-	readonly?: Signalish<BooleanAttribute | RemoveAttribute>;
-	required?: Signalish<BooleanAttribute | RemoveAttribute>;
+	accept?: SignalOrValue<string | RemoveAttribute>;
+	alpha?: SignalOrValue<BooleanAttribute | RemoveAttribute>;
+	alt?: SignalOrValue<string | RemoveAttribute>;
+	autocomplete?: SignalOrValue<HTMLAutocomplete | RemoveAttribute>;
+	capture?: SignalOrValue<"user" | "environment" | RemoveAttribute>;
+	checked?: SignalOrValue<BooleanAttribute | RemoveAttribute>;
+	colorspace?: SignalOrValue<string | RemoveAttribute>;
+	dirname?: SignalOrValue<string | RemoveAttribute>;
+	disabled?: SignalOrValue<BooleanAttribute | RemoveAttribute>;
+	form?: SignalOrValue<string | RemoveAttribute>;
+	formaction?: SignalOrValue<string | SerializableAttributeValue | RemoveAttribute>;
+	formenctype?: SignalOrValue<HTMLFormEncType | RemoveAttribute>;
+	formmethod?: SignalOrValue<HTMLFormMethod | RemoveAttribute>;
+	formnovalidate?: SignalOrValue<BooleanAttribute | RemoveAttribute>;
+	formtarget?: SignalOrValue<string | RemoveAttribute>;
+	height?: SignalOrValue<number | string | RemoveAttribute>;
+	list?: SignalOrValue<string | RemoveAttribute>;
+	max?: SignalOrValue<number | string | RemoveAttribute>;
+	maxlength?: SignalOrValue<number | string | RemoveAttribute>;
+	min?: SignalOrValue<number | string | RemoveAttribute>;
+	minlength?: SignalOrValue<number | string | RemoveAttribute>;
+	multiple?: SignalOrValue<BooleanAttribute | RemoveAttribute>;
+	name?: SignalOrValue<string | RemoveAttribute>;
+	pattern?: SignalOrValue<string | RemoveAttribute>;
+	placeholder?: SignalOrValue<string | RemoveAttribute>;
+	popovertarget?: SignalOrValue<string | RemoveAttribute>;
+	popovertargetaction?: SignalOrValue<"hide" | "show" | "toggle" | RemoveAttribute>;
+	readonly?: SignalOrValue<BooleanAttribute | RemoveAttribute>;
+	required?: SignalOrValue<BooleanAttribute | RemoveAttribute>;
 	// https://developer.mozilla.org/en-US/docs/Web/HTML/Element/input/search#results
-	results?: Signalish<number | RemoveAttribute>;
-	size?: Signalish<number | string | RemoveAttribute>;
-	src?: Signalish<string | RemoveAttribute>;
-	step?: Signalish<number | string | RemoveAttribute>;
-	type?: Signalish<"button" | "checkbox" | "color" | "date" | "datetime-local" | "email" | "file" | "hidden" | "image" | "month" | "number" | "password" | "radio" | "range" | "reset" | "search" | "submit" | "tel" | "text" | "time" | "url" | "week" | (string & {}) | RemoveAttribute>;
-	value?: Signalish<string | string[] | number | RemoveAttribute>;
-	width?: Signalish<number | string | RemoveAttribute>;
+	results?: SignalOrValue<number | RemoveAttribute>;
+	size?: SignalOrValue<number | string | RemoveAttribute>;
+	src?: SignalOrValue<string | RemoveAttribute>;
+	step?: SignalOrValue<number | string | RemoveAttribute>;
+	type?: SignalOrValue<"button" | "checkbox" | "color" | "date" | "datetime-local" | "email" | "file" | "hidden" | "image" | "month" | "number" | "password" | "radio" | "range" | "reset" | "search" | "submit" | "tel" | "text" | "time" | "url" | "week" | (string & {}) | RemoveAttribute>;
+	value?: SignalOrValue<string | string[] | number | RemoveAttribute>;
+	width?: SignalOrValue<number | string | RemoveAttribute>;
 	/** @non-standard */
-	incremental?: Signalish<BooleanAttribute | RemoveAttribute>;
+	incremental?: SignalOrValue<BooleanAttribute | RemoveAttribute>;
 	/** @deprecated */
-	align?: Signalish<string | RemoveAttribute>;
+	align?: SignalOrValue<string | RemoveAttribute>;
 	/** @deprecated */
-	usemap?: Signalish<string | RemoveAttribute>;
+	usemap?: SignalOrValue<string | RemoveAttribute>;
 }
 export interface ModHTMLAttributes<T> extends HTMLAttributes<T> {
-	cite?: Signalish<string | RemoveAttribute>;
-	datetime?: Signalish<string | RemoveAttribute>;
+	cite?: SignalOrValue<string | RemoveAttribute>;
+	datetime?: SignalOrValue<string | RemoveAttribute>;
 }
 export interface LabelHTMLAttributes<T> extends HTMLAttributes<T> {
-	for?: Signalish<string | RemoveAttribute>;
+	for?: SignalOrValue<string | RemoveAttribute>;
 }
 export interface LiHTMLAttributes<T> extends HTMLAttributes<T> {
-	value?: Signalish<number | string | RemoveAttribute>;
+	value?: SignalOrValue<number | string | RemoveAttribute>;
 	/** @deprecated */
-	type?: Signalish<"1" | "a" | "A" | "i" | "I" | RemoveAttribute>;
+	type?: SignalOrValue<"1" | "a" | "A" | "i" | "I" | RemoveAttribute>;
 }
 export interface LinkHTMLAttributes<T> extends HTMLAttributes<T> {
-	as?: Signalish<HTMLLinkAs | RemoveAttribute>;
-	blocking?: Signalish<"render" | RemoveAttribute>;
-	color?: Signalish<string | RemoveAttribute>;
-	crossorigin?: Signalish<HTMLCrossorigin | RemoveAttribute>;
-	disabled?: Signalish<BooleanAttribute | RemoveAttribute>;
-	fetchpriority?: Signalish<"high" | "low" | "auto" | RemoveAttribute>;
-	href?: Signalish<string | RemoveAttribute>;
-	hreflang?: Signalish<string | RemoveAttribute>;
-	imagesizes?: Signalish<string | RemoveAttribute>;
-	imagesrcset?: Signalish<string | RemoveAttribute>;
-	integrity?: Signalish<string | RemoveAttribute>;
-	media?: Signalish<string | RemoveAttribute>;
-	referrerpolicy?: Signalish<HTMLReferrerPolicy | RemoveAttribute>;
-	rel?: Signalish<string | RemoveAttribute>;
-	sizes?: Signalish<string | RemoveAttribute>;
-	type?: Signalish<string | RemoveAttribute>;
+	as?: SignalOrValue<HTMLLinkAs | RemoveAttribute>;
+	blocking?: SignalOrValue<"render" | RemoveAttribute>;
+	color?: SignalOrValue<string | RemoveAttribute>;
+	crossorigin?: SignalOrValue<HTMLCrossorigin | RemoveAttribute>;
+	disabled?: SignalOrValue<BooleanAttribute | RemoveAttribute>;
+	fetchpriority?: SignalOrValue<"high" | "low" | "auto" | RemoveAttribute>;
+	href?: SignalOrValue<string | RemoveAttribute>;
+	hreflang?: SignalOrValue<string | RemoveAttribute>;
+	imagesizes?: SignalOrValue<string | RemoveAttribute>;
+	imagesrcset?: SignalOrValue<string | RemoveAttribute>;
+	integrity?: SignalOrValue<string | RemoveAttribute>;
+	media?: SignalOrValue<string | RemoveAttribute>;
+	referrerpolicy?: SignalOrValue<HTMLReferrerPolicy | RemoveAttribute>;
+	rel?: SignalOrValue<string | RemoveAttribute>;
+	sizes?: SignalOrValue<string | RemoveAttribute>;
+	type?: SignalOrValue<string | RemoveAttribute>;
 	/** @deprecated */
-	charset?: Signalish<string | RemoveAttribute>;
+	charset?: SignalOrValue<string | RemoveAttribute>;
 	/** @deprecated */
-	rev?: Signalish<string | RemoveAttribute>;
+	rev?: SignalOrValue<string | RemoveAttribute>;
 	/** @deprecated */
-	target?: Signalish<string | RemoveAttribute>;
+	target?: SignalOrValue<string | RemoveAttribute>;
 }
 export interface MapHTMLAttributes<T> extends HTMLAttributes<T> {
-	name?: Signalish<string | RemoveAttribute>;
+	name?: SignalOrValue<string | RemoveAttribute>;
 }
 export interface MediaHTMLAttributes<T> extends HTMLAttributes<T> {
-	autoplay?: Signalish<BooleanAttribute | RemoveAttribute>;
-	controls?: Signalish<BooleanAttribute | RemoveAttribute>;
-	controlslist?: Signalish<"nodownload" | "nofullscreen" | "noplaybackrate" | "noremoteplayback" | (string & {}) | RemoveAttribute>;
-	crossorigin?: Signalish<HTMLCrossorigin | RemoveAttribute>;
-	disableremoteplayback?: Signalish<BooleanAttribute | RemoveAttribute>;
-	loop?: Signalish<BooleanAttribute | RemoveAttribute>;
-	muted?: Signalish<BooleanAttribute | RemoveAttribute>;
-	preload?: Signalish<"none" | "metadata" | "auto" | EnumeratedAcceptsEmpty | RemoveAttribute>;
-	src?: Signalish<string | RemoveAttribute>;
+	autoplay?: SignalOrValue<BooleanAttribute | RemoveAttribute>;
+	controls?: SignalOrValue<BooleanAttribute | RemoveAttribute>;
+	controlslist?: SignalOrValue<"nodownload" | "nofullscreen" | "noplaybackrate" | "noremoteplayback" | (string & {}) | RemoveAttribute>;
+	crossorigin?: SignalOrValue<HTMLCrossorigin | RemoveAttribute>;
+	disableremoteplayback?: SignalOrValue<BooleanAttribute | RemoveAttribute>;
+	loop?: SignalOrValue<BooleanAttribute | RemoveAttribute>;
+	muted?: SignalOrValue<BooleanAttribute | RemoveAttribute>;
+	preload?: SignalOrValue<"none" | "metadata" | "auto" | EnumeratedAcceptsEmpty | RemoveAttribute>;
+	src?: SignalOrValue<string | RemoveAttribute>;
 	onEncrypted?: EventHandlerUnion<T, MediaEncryptedEvent> | undefined;
 	// "on:encrypted"?: EventHandlerWithOptionsUnion<T, MediaEncryptedEvent> | undefined;
 	onWaitingForKey?: EventHandlerUnion<T, Event> | undefined;
 	// "on:waitingforkey"?: EventHandlerWithOptionsUnion<T, Event> | undefined;
 	/** @deprecated */
-	mediagroup?: Signalish<string | RemoveAttribute>;
+	mediagroup?: SignalOrValue<string | RemoveAttribute>;
 }
 export interface MenuHTMLAttributes<T> extends HTMLAttributes<T> {
 	/** @deprecated */
-	compact?: Signalish<BooleanAttribute | RemoveAttribute>;
+	compact?: SignalOrValue<BooleanAttribute | RemoveAttribute>;
 	/** @deprecated */
-	label?: Signalish<string | RemoveAttribute>;
+	label?: SignalOrValue<string | RemoveAttribute>;
 	/** @deprecated */
-	type?: Signalish<"context" | "toolbar" | RemoveAttribute>;
+	type?: SignalOrValue<"context" | "toolbar" | RemoveAttribute>;
 }
 export interface MetaHTMLAttributes<T> extends HTMLAttributes<T> {
-	"http-equiv"?: Signalish<"content-security-policy" | "content-type" | "default-style" | "x-ua-compatible" | "refresh" | RemoveAttribute>;
-	charset?: Signalish<string | RemoveAttribute>;
-	content?: Signalish<string | RemoveAttribute>;
-	media?: Signalish<string | RemoveAttribute>;
-	name?: Signalish<string | RemoveAttribute>;
+	"http-equiv"?: SignalOrValue<"content-security-policy" | "content-type" | "default-style" | "x-ua-compatible" | "refresh" | RemoveAttribute>;
+	charset?: SignalOrValue<string | RemoveAttribute>;
+	content?: SignalOrValue<string | RemoveAttribute>;
+	media?: SignalOrValue<string | RemoveAttribute>;
+	name?: SignalOrValue<string | RemoveAttribute>;
 	/** @deprecated */
-	scheme?: Signalish<string | RemoveAttribute>;
+	scheme?: SignalOrValue<string | RemoveAttribute>;
 }
 export interface MeterHTMLAttributes<T> extends HTMLAttributes<T> {
-	form?: Signalish<string | RemoveAttribute>;
-	high?: Signalish<number | string | RemoveAttribute>;
-	low?: Signalish<number | string | RemoveAttribute>;
-	max?: Signalish<number | string | RemoveAttribute>;
-	min?: Signalish<number | string | RemoveAttribute>;
-	optimum?: Signalish<number | string | RemoveAttribute>;
-	value?: Signalish<string | string[] | number | RemoveAttribute>;
+	form?: SignalOrValue<string | RemoveAttribute>;
+	high?: SignalOrValue<number | string | RemoveAttribute>;
+	low?: SignalOrValue<number | string | RemoveAttribute>;
+	max?: SignalOrValue<number | string | RemoveAttribute>;
+	min?: SignalOrValue<number | string | RemoveAttribute>;
+	optimum?: SignalOrValue<number | string | RemoveAttribute>;
+	value?: SignalOrValue<string | string[] | number | RemoveAttribute>;
 }
 export interface QuoteHTMLAttributes<T> extends HTMLAttributes<T> {
-	cite?: Signalish<string | RemoveAttribute>;
+	cite?: SignalOrValue<string | RemoveAttribute>;
 }
 export interface ObjectHTMLAttributes<T> extends HTMLAttributes<T> {
-	data?: Signalish<string | RemoveAttribute>;
-	form?: Signalish<string | RemoveAttribute>;
-	height?: Signalish<number | string | RemoveAttribute>;
-	name?: Signalish<string | RemoveAttribute>;
-	type?: Signalish<string | RemoveAttribute>;
-	width?: Signalish<number | string | RemoveAttribute>;
-	wmode?: Signalish<string | RemoveAttribute>;
+	data?: SignalOrValue<string | RemoveAttribute>;
+	form?: SignalOrValue<string | RemoveAttribute>;
+	height?: SignalOrValue<number | string | RemoveAttribute>;
+	name?: SignalOrValue<string | RemoveAttribute>;
+	type?: SignalOrValue<string | RemoveAttribute>;
+	width?: SignalOrValue<number | string | RemoveAttribute>;
+	wmode?: SignalOrValue<string | RemoveAttribute>;
 	/** @deprecated */
-	align?: Signalish<string | RemoveAttribute>;
+	align?: SignalOrValue<string | RemoveAttribute>;
 	/** @deprecated */
-	archive?: Signalish<string | RemoveAttribute>;
+	archive?: SignalOrValue<string | RemoveAttribute>;
 	/** @deprecated */
-	border?: Signalish<string | RemoveAttribute>;
+	border?: SignalOrValue<string | RemoveAttribute>;
 	/** @deprecated */
-	classid?: Signalish<string | RemoveAttribute>;
+	classid?: SignalOrValue<string | RemoveAttribute>;
 	/** @deprecated */
-	code?: Signalish<string | RemoveAttribute>;
+	code?: SignalOrValue<string | RemoveAttribute>;
 	/** @deprecated */
-	codebase?: Signalish<string | RemoveAttribute>;
+	codebase?: SignalOrValue<string | RemoveAttribute>;
 	/** @deprecated */
-	codetype?: Signalish<string | RemoveAttribute>;
+	codetype?: SignalOrValue<string | RemoveAttribute>;
 	/** @deprecated */
-	declare?: Signalish<BooleanAttribute | RemoveAttribute>;
+	declare?: SignalOrValue<BooleanAttribute | RemoveAttribute>;
 	/** @deprecated */
-	hspace?: Signalish<number | string | RemoveAttribute>;
+	hspace?: SignalOrValue<number | string | RemoveAttribute>;
 	/** @deprecated */
-	standby?: Signalish<string | RemoveAttribute>;
+	standby?: SignalOrValue<string | RemoveAttribute>;
 	/** @deprecated */
-	usemap?: Signalish<string | RemoveAttribute>;
+	usemap?: SignalOrValue<string | RemoveAttribute>;
 	/** @deprecated */
-	vspace?: Signalish<number | string | RemoveAttribute>;
+	vspace?: SignalOrValue<number | string | RemoveAttribute>;
 	/** @deprecated */
-	typemustmatch?: Signalish<BooleanAttribute | RemoveAttribute>;
+	typemustmatch?: SignalOrValue<BooleanAttribute | RemoveAttribute>;
 }
 export interface OlHTMLAttributes<T> extends HTMLAttributes<T> {
-	reversed?: Signalish<BooleanAttribute | RemoveAttribute>;
-	start?: Signalish<number | string | RemoveAttribute>;
-	type?: Signalish<"1" | "a" | "A" | "i" | "I" | RemoveAttribute>;
+	reversed?: SignalOrValue<BooleanAttribute | RemoveAttribute>;
+	start?: SignalOrValue<number | string | RemoveAttribute>;
+	type?: SignalOrValue<"1" | "a" | "A" | "i" | "I" | RemoveAttribute>;
 	/**
 	 * @deprecated
 	 * @non-standard
 	 */
-	compact?: Signalish<BooleanAttribute | RemoveAttribute>;
+	compact?: SignalOrValue<BooleanAttribute | RemoveAttribute>;
 }
 export interface OptgroupHTMLAttributes<T> extends HTMLAttributes<T> {
-	disabled?: Signalish<BooleanAttribute | RemoveAttribute>;
-	label?: Signalish<string | RemoveAttribute>;
+	disabled?: SignalOrValue<BooleanAttribute | RemoveAttribute>;
+	label?: SignalOrValue<string | RemoveAttribute>;
 }
 export interface OptionHTMLAttributes<T> extends HTMLAttributes<T> {
-	disabled?: Signalish<BooleanAttribute | RemoveAttribute>;
-	label?: Signalish<string | RemoveAttribute>;
-	selected?: Signalish<BooleanAttribute | RemoveAttribute>;
-	value?: Signalish<string | string[] | number | RemoveAttribute>;
+	disabled?: SignalOrValue<BooleanAttribute | RemoveAttribute>;
+	label?: SignalOrValue<string | RemoveAttribute>;
+	selected?: SignalOrValue<BooleanAttribute | RemoveAttribute>;
+	value?: SignalOrValue<string | string[] | number | RemoveAttribute>;
 }
 export interface OutputHTMLAttributes<T> extends HTMLAttributes<T> {
-	for?: Signalish<string | RemoveAttribute>;
-	form?: Signalish<string | RemoveAttribute>;
-	name?: Signalish<string | RemoveAttribute>;
+	for?: SignalOrValue<string | RemoveAttribute>;
+	form?: SignalOrValue<string | RemoveAttribute>;
+	name?: SignalOrValue<string | RemoveAttribute>;
 }
 export interface ProgressHTMLAttributes<T> extends HTMLAttributes<T> {
-	max?: Signalish<number | string | RemoveAttribute>;
-	value?: Signalish<string | string[] | number | RemoveAttribute>;
+	max?: SignalOrValue<number | string | RemoveAttribute>;
+	value?: SignalOrValue<string | string[] | number | RemoveAttribute>;
 }
 export interface ScriptHTMLAttributes<T> extends HTMLAttributes<T> {
-	async?: Signalish<BooleanAttribute | RemoveAttribute>;
-	blocking?: Signalish<"render" | RemoveAttribute>;
-	crossorigin?: Signalish<HTMLCrossorigin | RemoveAttribute>;
-	defer?: Signalish<BooleanAttribute | RemoveAttribute>;
-	fetchpriority?: Signalish<"high" | "low" | "auto" | RemoveAttribute>;
-	for?: Signalish<string | RemoveAttribute>;
-	integrity?: Signalish<string | RemoveAttribute>;
-	nomodule?: Signalish<BooleanAttribute | RemoveAttribute>;
-	referrerpolicy?: Signalish<HTMLReferrerPolicy | RemoveAttribute>;
-	src?: Signalish<string | RemoveAttribute>;
-	type?: Signalish<"importmap" | "module" | "speculationrules" | (string & {}) | RemoveAttribute>;
+	async?: SignalOrValue<BooleanAttribute | RemoveAttribute>;
+	blocking?: SignalOrValue<"render" | RemoveAttribute>;
+	crossorigin?: SignalOrValue<HTMLCrossorigin | RemoveAttribute>;
+	defer?: SignalOrValue<BooleanAttribute | RemoveAttribute>;
+	fetchpriority?: SignalOrValue<"high" | "low" | "auto" | RemoveAttribute>;
+	for?: SignalOrValue<string | RemoveAttribute>;
+	integrity?: SignalOrValue<string | RemoveAttribute>;
+	nomodule?: SignalOrValue<BooleanAttribute | RemoveAttribute>;
+	referrerpolicy?: SignalOrValue<HTMLReferrerPolicy | RemoveAttribute>;
+	src?: SignalOrValue<string | RemoveAttribute>;
+	type?: SignalOrValue<"importmap" | "module" | "speculationrules" | (string & {}) | RemoveAttribute>;
 	/** @experimental */
-	attributionsrc?: Signalish<string | RemoveAttribute>;
+	attributionsrc?: SignalOrValue<string | RemoveAttribute>;
 	/** @deprecated */
-	charset?: Signalish<string | RemoveAttribute>;
+	charset?: SignalOrValue<string | RemoveAttribute>;
 	/** @deprecated */
-	event?: Signalish<string | RemoveAttribute>;
+	event?: SignalOrValue<string | RemoveAttribute>;
 	/** @deprecated */
-	language?: Signalish<string | RemoveAttribute>;
+	language?: SignalOrValue<string | RemoveAttribute>;
 }
 export interface SelectHTMLAttributes<T> extends HTMLAttributes<T> {
-	autocomplete?: Signalish<HTMLAutocomplete | RemoveAttribute>;
-	disabled?: Signalish<BooleanAttribute | RemoveAttribute>;
-	form?: Signalish<string | RemoveAttribute>;
-	multiple?: Signalish<BooleanAttribute | RemoveAttribute>;
-	name?: Signalish<string | RemoveAttribute>;
-	required?: Signalish<BooleanAttribute | RemoveAttribute>;
-	size?: Signalish<number | string | RemoveAttribute>;
-	value?: Signalish<string | string[] | number | RemoveAttribute>;
+	autocomplete?: SignalOrValue<HTMLAutocomplete | RemoveAttribute>;
+	disabled?: SignalOrValue<BooleanAttribute | RemoveAttribute>;
+	form?: SignalOrValue<string | RemoveAttribute>;
+	multiple?: SignalOrValue<BooleanAttribute | RemoveAttribute>;
+	name?: SignalOrValue<string | RemoveAttribute>;
+	required?: SignalOrValue<BooleanAttribute | RemoveAttribute>;
+	size?: SignalOrValue<number | string | RemoveAttribute>;
+	value?: SignalOrValue<string | string[] | number | RemoveAttribute>;
 }
 export interface HTMLSlotElementAttributes<T> extends HTMLAttributes<T> {
-	name?: Signalish<string | RemoveAttribute>;
+	name?: SignalOrValue<string | RemoveAttribute>;
 }
 export interface SourceHTMLAttributes<T> extends HTMLAttributes<T> {
-	height?: Signalish<number | string | RemoveAttribute>;
-	media?: Signalish<string | RemoveAttribute>;
-	sizes?: Signalish<string | RemoveAttribute>;
-	src?: Signalish<string | RemoveAttribute>;
-	srcset?: Signalish<string | RemoveAttribute>;
-	type?: Signalish<string | RemoveAttribute>;
-	width?: Signalish<number | string | RemoveAttribute>;
+	height?: SignalOrValue<number | string | RemoveAttribute>;
+	media?: SignalOrValue<string | RemoveAttribute>;
+	sizes?: SignalOrValue<string | RemoveAttribute>;
+	src?: SignalOrValue<string | RemoveAttribute>;
+	srcset?: SignalOrValue<string | RemoveAttribute>;
+	type?: SignalOrValue<string | RemoveAttribute>;
+	width?: SignalOrValue<number | string | RemoveAttribute>;
 }
 export interface StyleHTMLAttributes<T> extends HTMLAttributes<T> {
-	blocking?: Signalish<"render" | RemoveAttribute>;
-	media?: Signalish<string | RemoveAttribute>;
+	blocking?: SignalOrValue<"render" | RemoveAttribute>;
+	media?: SignalOrValue<string | RemoveAttribute>;
 	/** @deprecated */
-	scoped?: Signalish<BooleanAttribute | RemoveAttribute>;
+	scoped?: SignalOrValue<BooleanAttribute | RemoveAttribute>;
 	/** @deprecated */
-	type?: Signalish<string | RemoveAttribute>;
+	type?: SignalOrValue<string | RemoveAttribute>;
 }
 export interface TdHTMLAttributes<T> extends HTMLAttributes<T> {
-	colspan?: Signalish<number | string | RemoveAttribute>;
-	headers?: Signalish<string | RemoveAttribute>;
-	rowspan?: Signalish<number | string | RemoveAttribute>;
+	colspan?: SignalOrValue<number | string | RemoveAttribute>;
+	headers?: SignalOrValue<string | RemoveAttribute>;
+	rowspan?: SignalOrValue<number | string | RemoveAttribute>;
 	/** @deprecated */
-	abbr?: Signalish<string | RemoveAttribute>;
+	abbr?: SignalOrValue<string | RemoveAttribute>;
 	/** @deprecated */
-	align?: Signalish<"left" | "center" | "right" | "justify" | "char" | RemoveAttribute>;
+	align?: SignalOrValue<"left" | "center" | "right" | "justify" | "char" | RemoveAttribute>;
 	/** @deprecated */
-	axis?: Signalish<string | RemoveAttribute>;
+	axis?: SignalOrValue<string | RemoveAttribute>;
 	/** @deprecated */
-	bgcolor?: Signalish<string | RemoveAttribute>;
+	bgcolor?: SignalOrValue<string | RemoveAttribute>;
 	/** @deprecated */
-	char?: Signalish<string | RemoveAttribute>;
+	char?: SignalOrValue<string | RemoveAttribute>;
 	/** @deprecated */
-	charoff?: Signalish<string | RemoveAttribute>;
+	charoff?: SignalOrValue<string | RemoveAttribute>;
 	/** @deprecated */
-	height?: Signalish<number | string | RemoveAttribute>;
+	height?: SignalOrValue<number | string | RemoveAttribute>;
 	/** @deprecated */
-	nowrap?: Signalish<BooleanAttribute | RemoveAttribute>;
+	nowrap?: SignalOrValue<BooleanAttribute | RemoveAttribute>;
 	/** @deprecated */
-	scope?: Signalish<"col" | "row" | "rowgroup" | "colgroup" | RemoveAttribute>;
+	scope?: SignalOrValue<"col" | "row" | "rowgroup" | "colgroup" | RemoveAttribute>;
 	/** @deprecated */
-	valign?: Signalish<"baseline" | "bottom" | "middle" | "top" | RemoveAttribute>;
+	valign?: SignalOrValue<"baseline" | "bottom" | "middle" | "top" | RemoveAttribute>;
 	/** @deprecated */
-	width?: Signalish<number | string | RemoveAttribute>;
+	width?: SignalOrValue<number | string | RemoveAttribute>;
 }
 export interface TemplateHTMLAttributes<T> extends HTMLAttributes<T> {
-	shadowrootclonable?: Signalish<BooleanAttribute | RemoveAttribute>;
-	shadowrootdelegatesfocus?: Signalish<BooleanAttribute | RemoveAttribute>;
-	shadowrootmode?: Signalish<"open" | "closed" | RemoveAttribute>;
-	shadowrootcustomelementregistry?: Signalish<BooleanAttribute | RemoveAttribute>;
+	shadowrootclonable?: SignalOrValue<BooleanAttribute | RemoveAttribute>;
+	shadowrootdelegatesfocus?: SignalOrValue<BooleanAttribute | RemoveAttribute>;
+	shadowrootmode?: SignalOrValue<"open" | "closed" | RemoveAttribute>;
+	shadowrootcustomelementregistry?: SignalOrValue<BooleanAttribute | RemoveAttribute>;
 	/** @experimental */
-	shadowrootserializable?: Signalish<BooleanAttribute | RemoveAttribute>;
+	shadowrootserializable?: SignalOrValue<BooleanAttribute | RemoveAttribute>;
 }
 export interface TextareaHTMLAttributes<T> extends HTMLAttributes<T> {
-	autocomplete?: Signalish<HTMLAutocomplete | RemoveAttribute>;
-	cols?: Signalish<number | string | RemoveAttribute>;
-	dirname?: Signalish<string | RemoveAttribute>;
-	disabled?: Signalish<BooleanAttribute | RemoveAttribute>;
-	form?: Signalish<string | RemoveAttribute>;
-	maxlength?: Signalish<number | string | RemoveAttribute>;
-	minlength?: Signalish<number | string | RemoveAttribute>;
-	name?: Signalish<string | RemoveAttribute>;
-	placeholder?: Signalish<string | RemoveAttribute>;
-	readonly?: Signalish<BooleanAttribute | RemoveAttribute>;
-	required?: Signalish<BooleanAttribute | RemoveAttribute>;
-	rows?: Signalish<number | string | RemoveAttribute>;
-	value?: Signalish<string | string[] | number | RemoveAttribute>;
-	wrap?: Signalish<"hard" | "soft" | "off" | RemoveAttribute>;
+	autocomplete?: SignalOrValue<HTMLAutocomplete | RemoveAttribute>;
+	cols?: SignalOrValue<number | string | RemoveAttribute>;
+	dirname?: SignalOrValue<string | RemoveAttribute>;
+	disabled?: SignalOrValue<BooleanAttribute | RemoveAttribute>;
+	form?: SignalOrValue<string | RemoveAttribute>;
+	maxlength?: SignalOrValue<number | string | RemoveAttribute>;
+	minlength?: SignalOrValue<number | string | RemoveAttribute>;
+	name?: SignalOrValue<string | RemoveAttribute>;
+	placeholder?: SignalOrValue<string | RemoveAttribute>;
+	readonly?: SignalOrValue<BooleanAttribute | RemoveAttribute>;
+	required?: SignalOrValue<BooleanAttribute | RemoveAttribute>;
+	rows?: SignalOrValue<number | string | RemoveAttribute>;
+	value?: SignalOrValue<string | string[] | number | RemoveAttribute>;
+	wrap?: SignalOrValue<"hard" | "soft" | "off" | RemoveAttribute>;
 }
 export interface ThHTMLAttributes<T> extends HTMLAttributes<T> {
-	abbr?: Signalish<string | RemoveAttribute>;
-	colspan?: Signalish<number | string | RemoveAttribute>;
-	headers?: Signalish<string | RemoveAttribute>;
-	rowspan?: Signalish<number | string | RemoveAttribute>;
-	scope?: Signalish<"col" | "row" | "rowgroup" | "colgroup" | RemoveAttribute>;
+	abbr?: SignalOrValue<string | RemoveAttribute>;
+	colspan?: SignalOrValue<number | string | RemoveAttribute>;
+	headers?: SignalOrValue<string | RemoveAttribute>;
+	rowspan?: SignalOrValue<number | string | RemoveAttribute>;
+	scope?: SignalOrValue<"col" | "row" | "rowgroup" | "colgroup" | RemoveAttribute>;
 	/** @deprecated */
-	align?: Signalish<"left" | "center" | "right" | "justify" | "char" | RemoveAttribute>;
+	align?: SignalOrValue<"left" | "center" | "right" | "justify" | "char" | RemoveAttribute>;
 	/** @deprecated */
-	axis?: Signalish<string | RemoveAttribute>;
+	axis?: SignalOrValue<string | RemoveAttribute>;
 	/** @deprecated */
-	bgcolor?: Signalish<string | RemoveAttribute>;
+	bgcolor?: SignalOrValue<string | RemoveAttribute>;
 	/** @deprecated */
-	char?: Signalish<string | RemoveAttribute>;
+	char?: SignalOrValue<string | RemoveAttribute>;
 	/** @deprecated */
-	charoff?: Signalish<string | RemoveAttribute>;
+	charoff?: SignalOrValue<string | RemoveAttribute>;
 	/** @deprecated */
-	height?: Signalish<string | RemoveAttribute>;
+	height?: SignalOrValue<string | RemoveAttribute>;
 	/** @deprecated */
-	nowrap?: Signalish<BooleanAttribute | RemoveAttribute>;
+	nowrap?: SignalOrValue<BooleanAttribute | RemoveAttribute>;
 	/** @deprecated */
-	valign?: Signalish<"baseline" | "bottom" | "middle" | "top" | RemoveAttribute>;
+	valign?: SignalOrValue<"baseline" | "bottom" | "middle" | "top" | RemoveAttribute>;
 	/** @deprecated */
-	width?: Signalish<number | string | RemoveAttribute>;
+	width?: SignalOrValue<number | string | RemoveAttribute>;
 }
 export interface TimeHTMLAttributes<T> extends HTMLAttributes<T> {
-	datetime?: Signalish<string | RemoveAttribute>;
+	datetime?: SignalOrValue<string | RemoveAttribute>;
 }
 export interface TrackHTMLAttributes<T> extends HTMLAttributes<T> {
-	default?: Signalish<BooleanAttribute | RemoveAttribute>;
-	kind?: Signalish<"alternative" | "descriptions" | "main" | "main-desc" | "translation" | "commentary" | "subtitles" | "captions" | "chapters" | "metadata" | RemoveAttribute>;
-	label?: Signalish<string | RemoveAttribute>;
-	src?: Signalish<string | RemoveAttribute>;
-	srclang?: Signalish<string | RemoveAttribute>;
+	default?: SignalOrValue<BooleanAttribute | RemoveAttribute>;
+	kind?: SignalOrValue<"alternative" | "descriptions" | "main" | "main-desc" | "translation" | "commentary" | "subtitles" | "captions" | "chapters" | "metadata" | RemoveAttribute>;
+	label?: SignalOrValue<string | RemoveAttribute>;
+	src?: SignalOrValue<string | RemoveAttribute>;
+	srclang?: SignalOrValue<string | RemoveAttribute>;
 	/** @deprecated */
-	mediagroup?: Signalish<string | RemoveAttribute>;
+	mediagroup?: SignalOrValue<string | RemoveAttribute>;
 }
 export interface VideoHTMLAttributes<T> extends MediaHTMLAttributes<T> {
-	disablepictureinpicture?: Signalish<BooleanAttribute | RemoveAttribute>;
-	height?: Signalish<number | string | RemoveAttribute>;
-	playsinline?: Signalish<BooleanAttribute | RemoveAttribute>;
-	poster?: Signalish<string | RemoveAttribute>;
-	width?: Signalish<number | string | RemoveAttribute>;
+	disablepictureinpicture?: SignalOrValue<BooleanAttribute | RemoveAttribute>;
+	height?: SignalOrValue<number | string | RemoveAttribute>;
+	playsinline?: SignalOrValue<BooleanAttribute | RemoveAttribute>;
+	poster?: SignalOrValue<string | RemoveAttribute>;
+	width?: SignalOrValue<number | string | RemoveAttribute>;
 	onEnterPictureInPicture?: EventHandlerUnion<T, PictureInPictureEvent> | undefined;
 	// "on:enterpictureinpicture"?: EventHandlerWithOptionsUnion<T, PictureInPictureEvent> | undefined;
 	onLeavePictureInPicture?: EventHandlerUnion<T, PictureInPictureEvent> | undefined;
 }
 export interface WebViewHTMLAttributes<T> extends HTMLAttributes<T> {
-	allowpopups?: Signalish<BooleanAttribute | RemoveAttribute>;
-	disableblinkfeatures?: Signalish<string | RemoveAttribute>;
-	disablewebsecurity?: Signalish<BooleanAttribute | RemoveAttribute>;
-	enableblinkfeatures?: Signalish<string | RemoveAttribute>;
-	httpreferrer?: Signalish<string | RemoveAttribute>;
-	nodeintegration?: Signalish<BooleanAttribute | RemoveAttribute>;
-	nodeintegrationinsubframes?: Signalish<BooleanAttribute | RemoveAttribute>;
-	partition?: Signalish<string | RemoveAttribute>;
-	plugins?: Signalish<BooleanAttribute | RemoveAttribute>;
-	preload?: Signalish<string | RemoveAttribute>;
-	src?: Signalish<string | RemoveAttribute>;
-	useragent?: Signalish<string | RemoveAttribute>;
-	webpreferences?: Signalish<string | RemoveAttribute>;
+	allowpopups?: SignalOrValue<BooleanAttribute | RemoveAttribute>;
+	disableblinkfeatures?: SignalOrValue<string | RemoveAttribute>;
+	disablewebsecurity?: SignalOrValue<BooleanAttribute | RemoveAttribute>;
+	enableblinkfeatures?: SignalOrValue<string | RemoveAttribute>;
+	httpreferrer?: SignalOrValue<string | RemoveAttribute>;
+	nodeintegration?: SignalOrValue<BooleanAttribute | RemoveAttribute>;
+	nodeintegrationinsubframes?: SignalOrValue<BooleanAttribute | RemoveAttribute>;
+	partition?: SignalOrValue<string | RemoveAttribute>;
+	plugins?: SignalOrValue<BooleanAttribute | RemoveAttribute>;
+	preload?: SignalOrValue<string | RemoveAttribute>;
+	src?: SignalOrValue<string | RemoveAttribute>;
+	useragent?: SignalOrValue<string | RemoveAttribute>;
+	webpreferences?: SignalOrValue<string | RemoveAttribute>;
 	// does this exists?
-	allowfullscreen?: Signalish<BooleanAttribute | RemoveAttribute>;
-	autosize?: Signalish<BooleanAttribute | RemoveAttribute>;
+	allowfullscreen?: SignalOrValue<BooleanAttribute | RemoveAttribute>;
+	autosize?: SignalOrValue<BooleanAttribute | RemoveAttribute>;
 	/** @deprecated */
-	blinkfeatures?: Signalish<string | RemoveAttribute>;
+	blinkfeatures?: SignalOrValue<string | RemoveAttribute>;
 	/** @deprecated */
-	disableguestresize?: Signalish<BooleanAttribute | RemoveAttribute>;
+	disableguestresize?: SignalOrValue<BooleanAttribute | RemoveAttribute>;
 	/** @deprecated */
-	guestinstance?: Signalish<string | RemoveAttribute>;
+	guestinstance?: SignalOrValue<string | RemoveAttribute>;
 }
 // SVG
 export type SVGPreserveAspectRatioValue = "none" | "xMinYMin" | "xMidYMin" | "xMaxYMin" | "xMinYMid" | "xMidYMid" | "xMaxYMid" | "xMinYMax" | "xMidYMax" | "xMaxYMax" | "xMinYMin meet" | "xMidYMin meet" | "xMaxYMin meet" | "xMinYMid meet" | "xMidYMid meet" | "xMaxYMid meet" | "xMinYMax meet" | "xMidYMax meet" | "xMaxYMax meet" | "xMinYMin slice" | "xMidYMin slice" | "xMaxYMin slice" | "xMinYMid slice" | "xMidYMid slice" | "xMaxYMid slice" | "xMinYMax slice" | "xMidYMax slice" | "xMaxYMax slice";
 export type ImagePreserveAspectRatio = SVGPreserveAspectRatioValue | "defer none" | "defer xMinYMin" | "defer xMidYMin" | "defer xMaxYMin" | "defer xMinYMid" | "defer xMidYMid" | "defer xMaxYMid" | "defer xMinYMax" | "defer xMidYMax" | "defer xMaxYMax" | "defer xMinYMin meet" | "defer xMidYMin meet" | "defer xMaxYMin meet" | "defer xMinYMid meet" | "defer xMidYMid meet" | "defer xMaxYMid meet" | "defer xMinYMax meet" | "defer xMidYMax meet" | "defer xMaxYMax meet" | "defer xMinYMin slice" | "defer xMidYMin slice" | "defer xMaxYMin slice" | "defer xMinYMid slice" | "defer xMidYMid slice" | "defer xMaxYMid slice" | "defer xMinYMax slice" | "defer xMidYMax slice" | "defer xMaxYMax slice";
 export type SVGUnits = "userSpaceOnUse" | "objectBoundingBox";
 export interface StylableSVGAttributes {
-	class?: Signalish<string | ClassNames | RemoveAttribute>;
-	style?: Signalish<CSSProperties | string | RemoveAttribute>;
+	class?: SignalOrValue<string | ClassNames | RemoveAttribute>;
+	style?: SignalOrValue<CSSProperties | string | RemoveAttribute>;
 }
 export interface TransformableSVGAttributes {
-	transform?: Signalish<string | RemoveAttribute>;
+	transform?: SignalOrValue<string | RemoveAttribute>;
 }
 export interface ConditionalProcessingSVGAttributes {
-	requiredExtensions?: Signalish<string | RemoveAttribute>;
-	requiredFeatures?: Signalish<string | RemoveAttribute>;
-	systemLanguage?: Signalish<string | RemoveAttribute>;
+	requiredExtensions?: SignalOrValue<string | RemoveAttribute>;
+	requiredFeatures?: SignalOrValue<string | RemoveAttribute>;
+	systemLanguage?: SignalOrValue<string | RemoveAttribute>;
 }
 export interface ExternalResourceSVGAttributes {
-	externalResourcesRequired?: Signalish<EnumeratedPseudoBoolean | RemoveAttribute>;
+	externalResourcesRequired?: SignalOrValue<EnumeratedPseudoBoolean | RemoveAttribute>;
 }
 export interface AnimationTimingSVGAttributes {
-	begin?: Signalish<string | RemoveAttribute>;
-	dur?: Signalish<string | RemoveAttribute>;
-	end?: Signalish<string | RemoveAttribute>;
-	fill?: Signalish<"freeze" | "remove" | RemoveAttribute>;
-	max?: Signalish<string | RemoveAttribute>;
-	min?: Signalish<string | RemoveAttribute>;
-	repeatCount?: Signalish<number | "indefinite" | RemoveAttribute>;
-	repeatDur?: Signalish<string | RemoveAttribute>;
-	restart?: Signalish<"always" | "whenNotActive" | "never" | RemoveAttribute>;
+	begin?: SignalOrValue<string | RemoveAttribute>;
+	dur?: SignalOrValue<string | RemoveAttribute>;
+	end?: SignalOrValue<string | RemoveAttribute>;
+	fill?: SignalOrValue<"freeze" | "remove" | RemoveAttribute>;
+	max?: SignalOrValue<string | RemoveAttribute>;
+	min?: SignalOrValue<string | RemoveAttribute>;
+	repeatCount?: SignalOrValue<number | "indefinite" | RemoveAttribute>;
+	repeatDur?: SignalOrValue<string | RemoveAttribute>;
+	restart?: SignalOrValue<"always" | "whenNotActive" | "never" | RemoveAttribute>;
 }
 export interface AnimationValueSVGAttributes {
-	by?: Signalish<number | string | RemoveAttribute>;
-	calcMode?: Signalish<"discrete" | "linear" | "paced" | "spline" | RemoveAttribute>;
-	from?: Signalish<number | string | RemoveAttribute>;
-	keySplines?: Signalish<string | RemoveAttribute>;
-	keyTimes?: Signalish<string | RemoveAttribute>;
-	to?: Signalish<number | string | RemoveAttribute>;
-	values?: Signalish<string | RemoveAttribute>;
+	by?: SignalOrValue<number | string | RemoveAttribute>;
+	calcMode?: SignalOrValue<"discrete" | "linear" | "paced" | "spline" | RemoveAttribute>;
+	from?: SignalOrValue<number | string | RemoveAttribute>;
+	keySplines?: SignalOrValue<string | RemoveAttribute>;
+	keyTimes?: SignalOrValue<string | RemoveAttribute>;
+	to?: SignalOrValue<number | string | RemoveAttribute>;
+	values?: SignalOrValue<string | RemoveAttribute>;
 }
 export interface AnimationAdditionSVGAttributes {
-	accumulate?: Signalish<"none" | "sum" | RemoveAttribute>;
-	additive?: Signalish<"replace" | "sum" | RemoveAttribute>;
-	attributeName?: Signalish<string | RemoveAttribute>;
+	accumulate?: SignalOrValue<"none" | "sum" | RemoveAttribute>;
+	additive?: SignalOrValue<"replace" | "sum" | RemoveAttribute>;
+	attributeName?: SignalOrValue<string | RemoveAttribute>;
 }
 export interface AnimationAttributeTargetSVGAttributes {
-	attributeName?: Signalish<string | RemoveAttribute>;
-	attributeType?: Signalish<"CSS" | "XML" | "auto" | RemoveAttribute>;
+	attributeName?: SignalOrValue<string | RemoveAttribute>;
+	attributeType?: SignalOrValue<"CSS" | "XML" | "auto" | RemoveAttribute>;
 }
 export interface PresentationSVGAttributes {
-	"alignment-baseline"?: Signalish<"auto" | "baseline" | "before-edge" | "text-before-edge" | "middle" | "central" | "after-edge" | "text-after-edge" | "ideographic" | "alphabetic" | "hanging" | "mathematical" | "inherit" | RemoveAttribute>;
-	"baseline-shift"?: Signalish<number | string | RemoveAttribute>;
-	"clip-path"?: Signalish<string | RemoveAttribute>;
-	"clip-rule"?: Signalish<"nonzero" | "evenodd" | "inherit" | RemoveAttribute>;
-	"color-interpolation"?: Signalish<"auto" | "sRGB" | "linearRGB" | "inherit" | RemoveAttribute>;
-	"color-interpolation-filters"?: Signalish<"auto" | "sRGB" | "linearRGB" | "inherit" | RemoveAttribute>;
-	"color-profile"?: Signalish<string | RemoveAttribute>;
-	"color-rendering"?: Signalish<"auto" | "optimizeSpeed" | "optimizeQuality" | "inherit" | RemoveAttribute>;
-	"dominant-baseline"?: Signalish<"auto" | "text-bottom" | "alphabetic" | "ideographic" | "middle" | "central" | "mathematical" | "hanging" | "text-top" | "inherit" | RemoveAttribute>;
-	"enable-background"?: Signalish<string | RemoveAttribute>;
-	"fill-opacity"?: Signalish<number | string | "inherit" | RemoveAttribute>;
-	"fill-rule"?: Signalish<"nonzero" | "evenodd" | "inherit" | RemoveAttribute>;
-	"flood-color"?: Signalish<string | RemoveAttribute>;
-	"flood-opacity"?: Signalish<number | string | "inherit" | RemoveAttribute>;
-	"font-family"?: Signalish<string | RemoveAttribute>;
-	"font-size"?: Signalish<string | RemoveAttribute>;
-	"font-size-adjust"?: Signalish<number | string | RemoveAttribute>;
-	"font-stretch"?: Signalish<string | RemoveAttribute>;
-	"font-style"?: Signalish<"normal" | "italic" | "oblique" | "inherit" | RemoveAttribute>;
-	"font-variant"?: Signalish<string | RemoveAttribute>;
-	"font-weight"?: Signalish<number | string | RemoveAttribute>;
-	"glyph-orientation-horizontal"?: Signalish<string | RemoveAttribute>;
-	"glyph-orientation-vertical"?: Signalish<string | RemoveAttribute>;
-	"image-rendering"?: Signalish<"auto" | "optimizeQuality" | "optimizeSpeed" | "inherit" | RemoveAttribute>;
-	"letter-spacing"?: Signalish<number | string | RemoveAttribute>;
-	"lighting-color"?: Signalish<string | RemoveAttribute>;
-	"marker-end"?: Signalish<string | RemoveAttribute>;
-	"marker-mid"?: Signalish<string | RemoveAttribute>;
-	"marker-start"?: Signalish<string | RemoveAttribute>;
-	"pointer-events"?: Signalish<"bounding-box" | "visiblePainted" | "visibleFill" | "visibleStroke" | "visible" | "painted" | "color" | "fill" | "stroke" | "all" | "none" | "inherit" | RemoveAttribute>;
-	"shape-rendering"?: Signalish<"auto" | "optimizeSpeed" | "crispEdges" | "geometricPrecision" | "inherit" | RemoveAttribute>;
-	"stop-color"?: Signalish<string | RemoveAttribute>;
-	"stop-opacity"?: Signalish<number | string | "inherit" | RemoveAttribute>;
-	"stroke-dasharray"?: Signalish<string | RemoveAttribute>;
-	"stroke-dashoffset"?: Signalish<number | string | RemoveAttribute>;
-	"stroke-linecap"?: Signalish<"butt" | "round" | "square" | "inherit" | RemoveAttribute>;
-	"stroke-linejoin"?: Signalish<"arcs" | "bevel" | "miter" | "miter-clip" | "round" | "inherit" | RemoveAttribute>;
-	"stroke-miterlimit"?: Signalish<number | string | "inherit" | RemoveAttribute>;
-	"stroke-opacity"?: Signalish<number | string | "inherit" | RemoveAttribute>;
-	"stroke-width"?: Signalish<number | string | RemoveAttribute>;
-	"text-anchor"?: Signalish<"start" | "middle" | "end" | "inherit" | RemoveAttribute>;
-	"text-decoration"?: Signalish<"none" | "underline" | "overline" | "line-through" | "blink" | "inherit" | RemoveAttribute>;
-	"text-rendering"?: Signalish<"auto" | "optimizeSpeed" | "optimizeLegibility" | "geometricPrecision" | "inherit" | RemoveAttribute>;
-	"unicode-bidi"?: Signalish<string | RemoveAttribute>;
-	"word-spacing"?: Signalish<number | string | RemoveAttribute>;
-	"writing-mode"?: Signalish<"lr-tb" | "rl-tb" | "tb-rl" | "lr" | "rl" | "tb" | "inherit" | RemoveAttribute>;
-	clip?: Signalish<string | RemoveAttribute>;
-	color?: Signalish<string | RemoveAttribute>;
-	cursor?: Signalish<string | RemoveAttribute>;
-	direction?: Signalish<"ltr" | "rtl" | "inherit" | RemoveAttribute>;
-	display?: Signalish<string | RemoveAttribute>;
-	fill?: Signalish<string | RemoveAttribute>;
-	filter?: Signalish<string | RemoveAttribute>;
-	kerning?: Signalish<string | RemoveAttribute>;
-	mask?: Signalish<string | RemoveAttribute>;
-	opacity?: Signalish<number | string | "inherit" | RemoveAttribute>;
-	overflow?: Signalish<"visible" | "hidden" | "scroll" | "auto" | "inherit" | RemoveAttribute>;
-	pathLength?: Signalish<string | number | RemoveAttribute>;
-	stroke?: Signalish<string | RemoveAttribute>;
-	visibility?: Signalish<"visible" | "hidden" | "collapse" | "inherit" | RemoveAttribute>;
+	"alignment-baseline"?: SignalOrValue<"auto" | "baseline" | "before-edge" | "text-before-edge" | "middle" | "central" | "after-edge" | "text-after-edge" | "ideographic" | "alphabetic" | "hanging" | "mathematical" | "inherit" | RemoveAttribute>;
+	"baseline-shift"?: SignalOrValue<number | string | RemoveAttribute>;
+	"clip-path"?: SignalOrValue<string | RemoveAttribute>;
+	"clip-rule"?: SignalOrValue<"nonzero" | "evenodd" | "inherit" | RemoveAttribute>;
+	"color-interpolation"?: SignalOrValue<"auto" | "sRGB" | "linearRGB" | "inherit" | RemoveAttribute>;
+	"color-interpolation-filters"?: SignalOrValue<"auto" | "sRGB" | "linearRGB" | "inherit" | RemoveAttribute>;
+	"color-profile"?: SignalOrValue<string | RemoveAttribute>;
+	"color-rendering"?: SignalOrValue<"auto" | "optimizeSpeed" | "optimizeQuality" | "inherit" | RemoveAttribute>;
+	"dominant-baseline"?: SignalOrValue<"auto" | "text-bottom" | "alphabetic" | "ideographic" | "middle" | "central" | "mathematical" | "hanging" | "text-top" | "inherit" | RemoveAttribute>;
+	"enable-background"?: SignalOrValue<string | RemoveAttribute>;
+	"fill-opacity"?: SignalOrValue<number | string | "inherit" | RemoveAttribute>;
+	"fill-rule"?: SignalOrValue<"nonzero" | "evenodd" | "inherit" | RemoveAttribute>;
+	"flood-color"?: SignalOrValue<string | RemoveAttribute>;
+	"flood-opacity"?: SignalOrValue<number | string | "inherit" | RemoveAttribute>;
+	"font-family"?: SignalOrValue<string | RemoveAttribute>;
+	"font-size"?: SignalOrValue<string | RemoveAttribute>;
+	"font-size-adjust"?: SignalOrValue<number | string | RemoveAttribute>;
+	"font-stretch"?: SignalOrValue<string | RemoveAttribute>;
+	"font-style"?: SignalOrValue<"normal" | "italic" | "oblique" | "inherit" | RemoveAttribute>;
+	"font-variant"?: SignalOrValue<string | RemoveAttribute>;
+	"font-weight"?: SignalOrValue<number | string | RemoveAttribute>;
+	"glyph-orientation-horizontal"?: SignalOrValue<string | RemoveAttribute>;
+	"glyph-orientation-vertical"?: SignalOrValue<string | RemoveAttribute>;
+	"image-rendering"?: SignalOrValue<"auto" | "optimizeQuality" | "optimizeSpeed" | "inherit" | RemoveAttribute>;
+	"letter-spacing"?: SignalOrValue<number | string | RemoveAttribute>;
+	"lighting-color"?: SignalOrValue<string | RemoveAttribute>;
+	"marker-end"?: SignalOrValue<string | RemoveAttribute>;
+	"marker-mid"?: SignalOrValue<string | RemoveAttribute>;
+	"marker-start"?: SignalOrValue<string | RemoveAttribute>;
+	"pointer-events"?: SignalOrValue<"bounding-box" | "visiblePainted" | "visibleFill" | "visibleStroke" | "visible" | "painted" | "color" | "fill" | "stroke" | "all" | "none" | "inherit" | RemoveAttribute>;
+	"shape-rendering"?: SignalOrValue<"auto" | "optimizeSpeed" | "crispEdges" | "geometricPrecision" | "inherit" | RemoveAttribute>;
+	"stop-color"?: SignalOrValue<string | RemoveAttribute>;
+	"stop-opacity"?: SignalOrValue<number | string | "inherit" | RemoveAttribute>;
+	"stroke-dasharray"?: SignalOrValue<string | RemoveAttribute>;
+	"stroke-dashoffset"?: SignalOrValue<number | string | RemoveAttribute>;
+	"stroke-linecap"?: SignalOrValue<"butt" | "round" | "square" | "inherit" | RemoveAttribute>;
+	"stroke-linejoin"?: SignalOrValue<"arcs" | "bevel" | "miter" | "miter-clip" | "round" | "inherit" | RemoveAttribute>;
+	"stroke-miterlimit"?: SignalOrValue<number | string | "inherit" | RemoveAttribute>;
+	"stroke-opacity"?: SignalOrValue<number | string | "inherit" | RemoveAttribute>;
+	"stroke-width"?: SignalOrValue<number | string | RemoveAttribute>;
+	"text-anchor"?: SignalOrValue<"start" | "middle" | "end" | "inherit" | RemoveAttribute>;
+	"text-decoration"?: SignalOrValue<"none" | "underline" | "overline" | "line-through" | "blink" | "inherit" | RemoveAttribute>;
+	"text-rendering"?: SignalOrValue<"auto" | "optimizeSpeed" | "optimizeLegibility" | "geometricPrecision" | "inherit" | RemoveAttribute>;
+	"unicode-bidi"?: SignalOrValue<string | RemoveAttribute>;
+	"word-spacing"?: SignalOrValue<number | string | RemoveAttribute>;
+	"writing-mode"?: SignalOrValue<"lr-tb" | "rl-tb" | "tb-rl" | "lr" | "rl" | "tb" | "inherit" | RemoveAttribute>;
+	clip?: SignalOrValue<string | RemoveAttribute>;
+	color?: SignalOrValue<string | RemoveAttribute>;
+	cursor?: SignalOrValue<string | RemoveAttribute>;
+	direction?: SignalOrValue<"ltr" | "rtl" | "inherit" | RemoveAttribute>;
+	display?: SignalOrValue<string | RemoveAttribute>;
+	fill?: SignalOrValue<string | RemoveAttribute>;
+	filter?: SignalOrValue<string | RemoveAttribute>;
+	kerning?: SignalOrValue<string | RemoveAttribute>;
+	mask?: SignalOrValue<string | RemoveAttribute>;
+	opacity?: SignalOrValue<number | string | "inherit" | RemoveAttribute>;
+	overflow?: SignalOrValue<"visible" | "hidden" | "scroll" | "auto" | "inherit" | RemoveAttribute>;
+	pathLength?: SignalOrValue<string | number | RemoveAttribute>;
+	stroke?: SignalOrValue<string | RemoveAttribute>;
+	visibility?: SignalOrValue<"visible" | "hidden" | "collapse" | "inherit" | RemoveAttribute>;
 }
 export interface AnimationElementSVGAttributes<T> extends SVGAttributes<T>, ExternalResourceSVGAttributes, ConditionalProcessingSVGAttributes {
 	// TODO TimeEvent is currently undefined on TS
@@ -1605,35 +1605,35 @@ export interface AnimationElementSVGAttributes<T> extends SVGAttributes<T>, Exte
 export interface ContainerElementSVGAttributes<T> extends SVGAttributes<T>, ShapeElementSVGAttributes<T>, Pick<PresentationSVGAttributes, "clip-path" | "mask" | "cursor" | "opacity" | "filter" | "enable-background" | "color-interpolation" | "color-rendering"> {
 }
 export interface FilterPrimitiveElementSVGAttributes<T> extends SVGAttributes<T>, Pick<PresentationSVGAttributes, "color-interpolation-filters"> {
-	height?: Signalish<number | string | RemoveAttribute>;
-	result?: Signalish<string | RemoveAttribute>;
-	width?: Signalish<number | string | RemoveAttribute>;
-	x?: Signalish<number | string | RemoveAttribute>;
-	y?: Signalish<number | string | RemoveAttribute>;
+	height?: SignalOrValue<number | string | RemoveAttribute>;
+	result?: SignalOrValue<string | RemoveAttribute>;
+	width?: SignalOrValue<number | string | RemoveAttribute>;
+	x?: SignalOrValue<number | string | RemoveAttribute>;
+	y?: SignalOrValue<number | string | RemoveAttribute>;
 }
 export interface SingleInputFilterSVGAttributes {
-	in?: Signalish<string | RemoveAttribute>;
+	in?: SignalOrValue<string | RemoveAttribute>;
 }
 export interface DoubleInputFilterSVGAttributes {
-	in?: Signalish<string | RemoveAttribute>;
-	in2?: Signalish<string | RemoveAttribute>;
+	in?: SignalOrValue<string | RemoveAttribute>;
+	in2?: SignalOrValue<string | RemoveAttribute>;
 }
 export interface FitToViewBoxSVGAttributes {
-	preserveAspectRatio?: Signalish<SVGPreserveAspectRatioValue | RemoveAttribute>;
-	viewBox?: Signalish<string | RemoveAttribute>;
+	preserveAspectRatio?: SignalOrValue<SVGPreserveAspectRatioValue | RemoveAttribute>;
+	viewBox?: SignalOrValue<string | RemoveAttribute>;
 }
 export interface GradientElementSVGAttributes<T> extends SVGAttributes<T>, ExternalResourceSVGAttributes, StylableSVGAttributes {
-	gradientTransform?: Signalish<string | RemoveAttribute>;
-	gradientUnits?: Signalish<SVGUnits | RemoveAttribute>;
-	href?: Signalish<string | RemoveAttribute>;
-	spreadMethod?: Signalish<"pad" | "reflect" | "repeat" | RemoveAttribute>;
+	gradientTransform?: SignalOrValue<string | RemoveAttribute>;
+	gradientUnits?: SignalOrValue<SVGUnits | RemoveAttribute>;
+	href?: SignalOrValue<string | RemoveAttribute>;
+	spreadMethod?: SignalOrValue<"pad" | "reflect" | "repeat" | RemoveAttribute>;
 }
 export interface GraphicsElementSVGAttributes<T> extends SVGAttributes<T>, Pick<PresentationSVGAttributes, "clip-rule" | "mask" | "pointer-events" | "cursor" | "opacity" | "filter" | "display" | "visibility" | "color-interpolation" | "color-rendering"> {
 }
 export interface LightSourceElementSVGAttributes<T> extends SVGAttributes<T> {
 }
 export interface NewViewportSVGAttributes<T> extends SVGAttributes<T>, Pick<PresentationSVGAttributes, "overflow" | "clip"> {
-	viewBox?: Signalish<string | RemoveAttribute>;
+	viewBox?: SignalOrValue<string | RemoveAttribute>;
 }
 export interface ShapeElementSVGAttributes<T> extends SVGAttributes<T>, Pick<PresentationSVGAttributes, "color" | "fill" | "fill-rule" | "fill-opacity" | "stroke" | "stroke-width" | "stroke-linecap" | "stroke-linejoin" | "stroke-miterlimit" | "stroke-dasharray" | "stroke-dashoffset" | "stroke-opacity" | "shape-rendering" | "pathLength"> {
 }
@@ -1644,299 +1644,299 @@ export interface ZoomAndPanSVGAttributes {
 	 * @deprecated
 	 * @non-standard
 	 */
-	zoomAndPan?: Signalish<"disable" | "magnify" | RemoveAttribute>;
+	zoomAndPan?: SignalOrValue<"disable" | "magnify" | RemoveAttribute>;
 }
 export interface AnimateSVGAttributes<T> extends AnimationElementSVGAttributes<T>, AnimationAttributeTargetSVGAttributes, AnimationTimingSVGAttributes, AnimationValueSVGAttributes, AnimationAdditionSVGAttributes, Pick<PresentationSVGAttributes, "color-interpolation" | "color-rendering"> {
 }
 export interface AnimateMotionSVGAttributes<T> extends AnimationElementSVGAttributes<T>, AnimationTimingSVGAttributes, AnimationValueSVGAttributes, AnimationAdditionSVGAttributes {
-	keyPoints?: Signalish<string | RemoveAttribute>;
-	origin?: Signalish<"default" | RemoveAttribute>;
-	path?: Signalish<string | RemoveAttribute>;
-	rotate?: Signalish<number | string | "auto" | "auto-reverse" | RemoveAttribute>;
+	keyPoints?: SignalOrValue<string | RemoveAttribute>;
+	origin?: SignalOrValue<"default" | RemoveAttribute>;
+	path?: SignalOrValue<string | RemoveAttribute>;
+	rotate?: SignalOrValue<number | string | "auto" | "auto-reverse" | RemoveAttribute>;
 }
 export interface AnimateTransformSVGAttributes<T> extends AnimationElementSVGAttributes<T>, AnimationAttributeTargetSVGAttributes, AnimationTimingSVGAttributes, AnimationValueSVGAttributes, AnimationAdditionSVGAttributes {
-	type?: Signalish<"translate" | "scale" | "rotate" | "skewX" | "skewY" | RemoveAttribute>;
+	type?: SignalOrValue<"translate" | "scale" | "rotate" | "skewX" | "skewY" | RemoveAttribute>;
 }
 export interface CircleSVGAttributes<T> extends GraphicsElementSVGAttributes<T>, ShapeElementSVGAttributes<T>, ConditionalProcessingSVGAttributes, StylableSVGAttributes, TransformableSVGAttributes, Pick<PresentationSVGAttributes, "clip-path"> {
-	cx?: Signalish<number | string | RemoveAttribute>;
-	cy?: Signalish<number | string | RemoveAttribute>;
-	r?: Signalish<number | string | RemoveAttribute>;
+	cx?: SignalOrValue<number | string | RemoveAttribute>;
+	cy?: SignalOrValue<number | string | RemoveAttribute>;
+	r?: SignalOrValue<number | string | RemoveAttribute>;
 }
 export interface ClipPathSVGAttributes<T> extends SVGAttributes<T>, ConditionalProcessingSVGAttributes, ExternalResourceSVGAttributes, StylableSVGAttributes, TransformableSVGAttributes, Pick<PresentationSVGAttributes, "clip-path"> {
-	clipPathUnits?: Signalish<SVGUnits | RemoveAttribute>;
+	clipPathUnits?: SignalOrValue<SVGUnits | RemoveAttribute>;
 }
 export interface DefsSVGAttributes<T> extends ContainerElementSVGAttributes<T>, ConditionalProcessingSVGAttributes, ExternalResourceSVGAttributes, StylableSVGAttributes, TransformableSVGAttributes {
 }
 export interface DescSVGAttributes<T> extends SVGAttributes<T>, StylableSVGAttributes {
 }
 export interface EllipseSVGAttributes<T> extends GraphicsElementSVGAttributes<T>, ShapeElementSVGAttributes<T>, ConditionalProcessingSVGAttributes, ExternalResourceSVGAttributes, StylableSVGAttributes, TransformableSVGAttributes, Pick<PresentationSVGAttributes, "clip-path"> {
-	cx?: Signalish<number | string | RemoveAttribute>;
-	cy?: Signalish<number | string | RemoveAttribute>;
-	rx?: Signalish<number | string | RemoveAttribute>;
-	ry?: Signalish<number | string | RemoveAttribute>;
+	cx?: SignalOrValue<number | string | RemoveAttribute>;
+	cy?: SignalOrValue<number | string | RemoveAttribute>;
+	rx?: SignalOrValue<number | string | RemoveAttribute>;
+	ry?: SignalOrValue<number | string | RemoveAttribute>;
 }
 export interface FeBlendSVGAttributes<T> extends FilterPrimitiveElementSVGAttributes<T>, DoubleInputFilterSVGAttributes, StylableSVGAttributes {
-	mode?: Signalish<"normal" | "multiply" | "screen" | "darken" | "lighten" | RemoveAttribute>;
+	mode?: SignalOrValue<"normal" | "multiply" | "screen" | "darken" | "lighten" | RemoveAttribute>;
 }
 export interface FeColorMatrixSVGAttributes<T> extends FilterPrimitiveElementSVGAttributes<T>, SingleInputFilterSVGAttributes, StylableSVGAttributes {
-	type?: Signalish<"matrix" | "saturate" | "hueRotate" | "luminanceToAlpha" | RemoveAttribute>;
-	values?: Signalish<string | RemoveAttribute>;
+	type?: SignalOrValue<"matrix" | "saturate" | "hueRotate" | "luminanceToAlpha" | RemoveAttribute>;
+	values?: SignalOrValue<string | RemoveAttribute>;
 }
 export interface FeComponentTransferSVGAttributes<T> extends FilterPrimitiveElementSVGAttributes<T>, SingleInputFilterSVGAttributes, StylableSVGAttributes {
 }
 export interface FeCompositeSVGAttributes<T> extends FilterPrimitiveElementSVGAttributes<T>, DoubleInputFilterSVGAttributes, StylableSVGAttributes {
-	k1?: Signalish<number | string | RemoveAttribute>;
-	k2?: Signalish<number | string | RemoveAttribute>;
-	k3?: Signalish<number | string | RemoveAttribute>;
-	k4?: Signalish<number | string | RemoveAttribute>;
-	operator?: Signalish<"over" | "in" | "out" | "atop" | "xor" | "arithmetic" | RemoveAttribute>;
+	k1?: SignalOrValue<number | string | RemoveAttribute>;
+	k2?: SignalOrValue<number | string | RemoveAttribute>;
+	k3?: SignalOrValue<number | string | RemoveAttribute>;
+	k4?: SignalOrValue<number | string | RemoveAttribute>;
+	operator?: SignalOrValue<"over" | "in" | "out" | "atop" | "xor" | "arithmetic" | RemoveAttribute>;
 }
 export interface FeConvolveMatrixSVGAttributes<T> extends FilterPrimitiveElementSVGAttributes<T>, SingleInputFilterSVGAttributes, StylableSVGAttributes {
-	bias?: Signalish<number | string | RemoveAttribute>;
-	divisor?: Signalish<number | string | RemoveAttribute>;
-	edgeMode?: Signalish<"duplicate" | "wrap" | "none" | RemoveAttribute>;
-	kernelMatrix?: Signalish<string | RemoveAttribute>;
-	kernelUnitLength?: Signalish<number | string | RemoveAttribute>;
-	order?: Signalish<number | string | RemoveAttribute>;
-	preserveAlpha?: Signalish<EnumeratedPseudoBoolean | RemoveAttribute>;
-	targetX?: Signalish<number | string | RemoveAttribute>;
-	targetY?: Signalish<number | string | RemoveAttribute>;
+	bias?: SignalOrValue<number | string | RemoveAttribute>;
+	divisor?: SignalOrValue<number | string | RemoveAttribute>;
+	edgeMode?: SignalOrValue<"duplicate" | "wrap" | "none" | RemoveAttribute>;
+	kernelMatrix?: SignalOrValue<string | RemoveAttribute>;
+	kernelUnitLength?: SignalOrValue<number | string | RemoveAttribute>;
+	order?: SignalOrValue<number | string | RemoveAttribute>;
+	preserveAlpha?: SignalOrValue<EnumeratedPseudoBoolean | RemoveAttribute>;
+	targetX?: SignalOrValue<number | string | RemoveAttribute>;
+	targetY?: SignalOrValue<number | string | RemoveAttribute>;
 }
 export interface FeDiffuseLightingSVGAttributes<T> extends FilterPrimitiveElementSVGAttributes<T>, SingleInputFilterSVGAttributes, StylableSVGAttributes, Pick<PresentationSVGAttributes, "color" | "lighting-color"> {
-	diffuseConstant?: Signalish<number | string | RemoveAttribute>;
-	kernelUnitLength?: Signalish<number | string | RemoveAttribute>;
-	surfaceScale?: Signalish<number | string | RemoveAttribute>;
+	diffuseConstant?: SignalOrValue<number | string | RemoveAttribute>;
+	kernelUnitLength?: SignalOrValue<number | string | RemoveAttribute>;
+	surfaceScale?: SignalOrValue<number | string | RemoveAttribute>;
 }
 export interface FeDisplacementMapSVGAttributes<T> extends FilterPrimitiveElementSVGAttributes<T>, DoubleInputFilterSVGAttributes, StylableSVGAttributes {
-	scale?: Signalish<number | string | RemoveAttribute>;
-	xChannelSelector?: Signalish<"R" | "G" | "B" | "A" | RemoveAttribute>;
-	yChannelSelector?: Signalish<"R" | "G" | "B" | "A" | RemoveAttribute>;
+	scale?: SignalOrValue<number | string | RemoveAttribute>;
+	xChannelSelector?: SignalOrValue<"R" | "G" | "B" | "A" | RemoveAttribute>;
+	yChannelSelector?: SignalOrValue<"R" | "G" | "B" | "A" | RemoveAttribute>;
 }
 export interface FeDistantLightSVGAttributes<T> extends LightSourceElementSVGAttributes<T> {
-	azimuth?: Signalish<number | string | RemoveAttribute>;
-	elevation?: Signalish<number | string | RemoveAttribute>;
+	azimuth?: SignalOrValue<number | string | RemoveAttribute>;
+	elevation?: SignalOrValue<number | string | RemoveAttribute>;
 }
 export interface FeDropShadowSVGAttributes<T> extends SVGAttributes<T>, FilterPrimitiveElementSVGAttributes<T>, StylableSVGAttributes, Pick<PresentationSVGAttributes, "color" | "flood-color" | "flood-opacity"> {
-	dx?: Signalish<number | string | RemoveAttribute>;
-	dy?: Signalish<number | string | RemoveAttribute>;
-	stdDeviation?: Signalish<number | string | RemoveAttribute>;
+	dx?: SignalOrValue<number | string | RemoveAttribute>;
+	dy?: SignalOrValue<number | string | RemoveAttribute>;
+	stdDeviation?: SignalOrValue<number | string | RemoveAttribute>;
 }
 export interface FeFloodSVGAttributes<T> extends FilterPrimitiveElementSVGAttributes<T>, StylableSVGAttributes, Pick<PresentationSVGAttributes, "color" | "flood-color" | "flood-opacity"> {
 }
 export interface FeFuncSVGAttributes<T> extends SVGAttributes<T> {
-	amplitude?: Signalish<number | string | RemoveAttribute>;
-	exponent?: Signalish<number | string | RemoveAttribute>;
-	intercept?: Signalish<number | string | RemoveAttribute>;
-	offset?: Signalish<number | string | RemoveAttribute>;
-	slope?: Signalish<number | string | RemoveAttribute>;
-	tableValues?: Signalish<string | RemoveAttribute>;
-	type?: Signalish<"identity" | "table" | "discrete" | "linear" | "gamma" | RemoveAttribute>;
+	amplitude?: SignalOrValue<number | string | RemoveAttribute>;
+	exponent?: SignalOrValue<number | string | RemoveAttribute>;
+	intercept?: SignalOrValue<number | string | RemoveAttribute>;
+	offset?: SignalOrValue<number | string | RemoveAttribute>;
+	slope?: SignalOrValue<number | string | RemoveAttribute>;
+	tableValues?: SignalOrValue<string | RemoveAttribute>;
+	type?: SignalOrValue<"identity" | "table" | "discrete" | "linear" | "gamma" | RemoveAttribute>;
 }
 export interface FeGaussianBlurSVGAttributes<T> extends FilterPrimitiveElementSVGAttributes<T>, SingleInputFilterSVGAttributes, StylableSVGAttributes {
-	stdDeviation?: Signalish<number | string | RemoveAttribute>;
+	stdDeviation?: SignalOrValue<number | string | RemoveAttribute>;
 }
 export interface FeImageSVGAttributes<T> extends FilterPrimitiveElementSVGAttributes<T>, ExternalResourceSVGAttributes, StylableSVGAttributes {
-	href?: Signalish<string | RemoveAttribute>;
-	preserveAspectRatio?: Signalish<SVGPreserveAspectRatioValue | RemoveAttribute>;
+	href?: SignalOrValue<string | RemoveAttribute>;
+	preserveAspectRatio?: SignalOrValue<SVGPreserveAspectRatioValue | RemoveAttribute>;
 }
 export interface FeMergeSVGAttributes<T> extends FilterPrimitiveElementSVGAttributes<T>, StylableSVGAttributes {
 }
 export interface FeMergeNodeSVGAttributes<T> extends SVGAttributes<T>, SingleInputFilterSVGAttributes {
 }
 export interface FeMorphologySVGAttributes<T> extends FilterPrimitiveElementSVGAttributes<T>, SingleInputFilterSVGAttributes, StylableSVGAttributes {
-	operator?: Signalish<"erode" | "dilate" | RemoveAttribute>;
-	radius?: Signalish<number | string | RemoveAttribute>;
+	operator?: SignalOrValue<"erode" | "dilate" | RemoveAttribute>;
+	radius?: SignalOrValue<number | string | RemoveAttribute>;
 }
 export interface FeOffsetSVGAttributes<T> extends FilterPrimitiveElementSVGAttributes<T>, SingleInputFilterSVGAttributes, StylableSVGAttributes {
-	dx?: Signalish<number | string | RemoveAttribute>;
-	dy?: Signalish<number | string | RemoveAttribute>;
+	dx?: SignalOrValue<number | string | RemoveAttribute>;
+	dy?: SignalOrValue<number | string | RemoveAttribute>;
 }
 export interface FePointLightSVGAttributes<T> extends LightSourceElementSVGAttributes<T> {
-	x?: Signalish<number | string | RemoveAttribute>;
-	y?: Signalish<number | string | RemoveAttribute>;
-	z?: Signalish<number | string | RemoveAttribute>;
+	x?: SignalOrValue<number | string | RemoveAttribute>;
+	y?: SignalOrValue<number | string | RemoveAttribute>;
+	z?: SignalOrValue<number | string | RemoveAttribute>;
 }
 export interface FeSpecularLightingSVGAttributes<T> extends FilterPrimitiveElementSVGAttributes<T>, SingleInputFilterSVGAttributes, StylableSVGAttributes, Pick<PresentationSVGAttributes, "color" | "lighting-color"> {
-	kernelUnitLength?: Signalish<number | string | RemoveAttribute>;
-	specularConstant?: Signalish<string | RemoveAttribute>;
-	specularExponent?: Signalish<string | RemoveAttribute>;
-	surfaceScale?: Signalish<string | RemoveAttribute>;
+	kernelUnitLength?: SignalOrValue<number | string | RemoveAttribute>;
+	specularConstant?: SignalOrValue<string | RemoveAttribute>;
+	specularExponent?: SignalOrValue<string | RemoveAttribute>;
+	surfaceScale?: SignalOrValue<string | RemoveAttribute>;
 }
 export interface FeSpotLightSVGAttributes<T> extends LightSourceElementSVGAttributes<T> {
-	limitingConeAngle?: Signalish<number | string | RemoveAttribute>;
-	pointsAtX?: Signalish<number | string | RemoveAttribute>;
-	pointsAtY?: Signalish<number | string | RemoveAttribute>;
-	pointsAtZ?: Signalish<number | string | RemoveAttribute>;
-	specularExponent?: Signalish<number | string | RemoveAttribute>;
-	x?: Signalish<number | string | RemoveAttribute>;
-	y?: Signalish<number | string | RemoveAttribute>;
-	z?: Signalish<number | string | RemoveAttribute>;
+	limitingConeAngle?: SignalOrValue<number | string | RemoveAttribute>;
+	pointsAtX?: SignalOrValue<number | string | RemoveAttribute>;
+	pointsAtY?: SignalOrValue<number | string | RemoveAttribute>;
+	pointsAtZ?: SignalOrValue<number | string | RemoveAttribute>;
+	specularExponent?: SignalOrValue<number | string | RemoveAttribute>;
+	x?: SignalOrValue<number | string | RemoveAttribute>;
+	y?: SignalOrValue<number | string | RemoveAttribute>;
+	z?: SignalOrValue<number | string | RemoveAttribute>;
 }
 export interface FeTileSVGAttributes<T> extends FilterPrimitiveElementSVGAttributes<T>, SingleInputFilterSVGAttributes, StylableSVGAttributes {
 }
 export interface FeTurbulanceSVGAttributes<T> extends FilterPrimitiveElementSVGAttributes<T>, StylableSVGAttributes {
-	baseFrequency?: Signalish<number | string | RemoveAttribute>;
-	numOctaves?: Signalish<number | string | RemoveAttribute>;
-	seed?: Signalish<number | string | RemoveAttribute>;
-	stitchTiles?: Signalish<"stitch" | "noStitch" | RemoveAttribute>;
-	type?: Signalish<"fractalNoise" | "turbulence" | RemoveAttribute>;
+	baseFrequency?: SignalOrValue<number | string | RemoveAttribute>;
+	numOctaves?: SignalOrValue<number | string | RemoveAttribute>;
+	seed?: SignalOrValue<number | string | RemoveAttribute>;
+	stitchTiles?: SignalOrValue<"stitch" | "noStitch" | RemoveAttribute>;
+	type?: SignalOrValue<"fractalNoise" | "turbulence" | RemoveAttribute>;
 }
 export interface FilterSVGAttributes<T> extends SVGAttributes<T>, ExternalResourceSVGAttributes, StylableSVGAttributes {
-	filterRes?: Signalish<number | string | RemoveAttribute>;
-	filterUnits?: Signalish<SVGUnits | RemoveAttribute>;
-	height?: Signalish<number | string | RemoveAttribute>;
-	primitiveUnits?: Signalish<SVGUnits | RemoveAttribute>;
-	width?: Signalish<number | string | RemoveAttribute>;
-	x?: Signalish<number | string | RemoveAttribute>;
-	y?: Signalish<number | string | RemoveAttribute>;
+	filterRes?: SignalOrValue<number | string | RemoveAttribute>;
+	filterUnits?: SignalOrValue<SVGUnits | RemoveAttribute>;
+	height?: SignalOrValue<number | string | RemoveAttribute>;
+	primitiveUnits?: SignalOrValue<SVGUnits | RemoveAttribute>;
+	width?: SignalOrValue<number | string | RemoveAttribute>;
+	x?: SignalOrValue<number | string | RemoveAttribute>;
+	y?: SignalOrValue<number | string | RemoveAttribute>;
 }
 export interface ForeignObjectSVGAttributes<T> extends NewViewportSVGAttributes<T>, ConditionalProcessingSVGAttributes, ExternalResourceSVGAttributes, StylableSVGAttributes, TransformableSVGAttributes, Pick<PresentationSVGAttributes, "display" | "visibility"> {
-	height?: Signalish<number | string | RemoveAttribute>;
-	width?: Signalish<number | string | RemoveAttribute>;
-	x?: Signalish<number | string | RemoveAttribute>;
-	y?: Signalish<number | string | RemoveAttribute>;
+	height?: SignalOrValue<number | string | RemoveAttribute>;
+	width?: SignalOrValue<number | string | RemoveAttribute>;
+	x?: SignalOrValue<number | string | RemoveAttribute>;
+	y?: SignalOrValue<number | string | RemoveAttribute>;
 }
 export interface GSVGAttributes<T> extends ContainerElementSVGAttributes<T>, ConditionalProcessingSVGAttributes, ExternalResourceSVGAttributes, StylableSVGAttributes, TransformableSVGAttributes, Pick<PresentationSVGAttributes, "clip-path" | "display" | "visibility"> {
 }
 export interface ImageSVGAttributes<T> extends NewViewportSVGAttributes<T>, GraphicsElementSVGAttributes<T>, ConditionalProcessingSVGAttributes, StylableSVGAttributes, TransformableSVGAttributes, Pick<PresentationSVGAttributes, "clip-path" | "color-profile" | "image-rendering"> {
-	height?: Signalish<number | string | RemoveAttribute>;
-	href?: Signalish<string | RemoveAttribute>;
-	preserveAspectRatio?: Signalish<ImagePreserveAspectRatio | RemoveAttribute>;
-	width?: Signalish<number | string | RemoveAttribute>;
-	x?: Signalish<number | string | RemoveAttribute>;
-	y?: Signalish<number | string | RemoveAttribute>;
+	height?: SignalOrValue<number | string | RemoveAttribute>;
+	href?: SignalOrValue<string | RemoveAttribute>;
+	preserveAspectRatio?: SignalOrValue<ImagePreserveAspectRatio | RemoveAttribute>;
+	width?: SignalOrValue<number | string | RemoveAttribute>;
+	x?: SignalOrValue<number | string | RemoveAttribute>;
+	y?: SignalOrValue<number | string | RemoveAttribute>;
 }
 export interface LineSVGAttributes<T> extends GraphicsElementSVGAttributes<T>, ShapeElementSVGAttributes<T>, ConditionalProcessingSVGAttributes, ExternalResourceSVGAttributes, StylableSVGAttributes, TransformableSVGAttributes, Pick<PresentationSVGAttributes, "clip-path" | "marker-start" | "marker-mid" | "marker-end"> {
-	x1?: Signalish<number | string | RemoveAttribute>;
-	x2?: Signalish<number | string | RemoveAttribute>;
-	y1?: Signalish<number | string | RemoveAttribute>;
-	y2?: Signalish<number | string | RemoveAttribute>;
+	x1?: SignalOrValue<number | string | RemoveAttribute>;
+	x2?: SignalOrValue<number | string | RemoveAttribute>;
+	y1?: SignalOrValue<number | string | RemoveAttribute>;
+	y2?: SignalOrValue<number | string | RemoveAttribute>;
 }
 export interface LinearGradientSVGAttributes<T> extends GradientElementSVGAttributes<T> {
-	x1?: Signalish<number | string | RemoveAttribute>;
-	x2?: Signalish<number | string | RemoveAttribute>;
-	y1?: Signalish<number | string | RemoveAttribute>;
-	y2?: Signalish<number | string | RemoveAttribute>;
+	x1?: SignalOrValue<number | string | RemoveAttribute>;
+	x2?: SignalOrValue<number | string | RemoveAttribute>;
+	y1?: SignalOrValue<number | string | RemoveAttribute>;
+	y2?: SignalOrValue<number | string | RemoveAttribute>;
 }
 export interface MarkerSVGAttributes<T> extends ContainerElementSVGAttributes<T>, ExternalResourceSVGAttributes, StylableSVGAttributes, FitToViewBoxSVGAttributes, Pick<PresentationSVGAttributes, "clip-path" | "overflow" | "clip"> {
-	markerHeight?: Signalish<number | string | RemoveAttribute>;
-	markerUnits?: Signalish<"strokeWidth" | "userSpaceOnUse" | RemoveAttribute>;
-	markerWidth?: Signalish<number | string | RemoveAttribute>;
-	orient?: Signalish<string | RemoveAttribute>;
-	refX?: Signalish<number | string | RemoveAttribute>;
-	refY?: Signalish<number | string | RemoveAttribute>;
+	markerHeight?: SignalOrValue<number | string | RemoveAttribute>;
+	markerUnits?: SignalOrValue<"strokeWidth" | "userSpaceOnUse" | RemoveAttribute>;
+	markerWidth?: SignalOrValue<number | string | RemoveAttribute>;
+	orient?: SignalOrValue<string | RemoveAttribute>;
+	refX?: SignalOrValue<number | string | RemoveAttribute>;
+	refY?: SignalOrValue<number | string | RemoveAttribute>;
 }
 export interface MaskSVGAttributes<T> extends Omit<ContainerElementSVGAttributes<T>, "opacity" | "filter">, ConditionalProcessingSVGAttributes, ExternalResourceSVGAttributes, StylableSVGAttributes, Pick<PresentationSVGAttributes, "clip-path"> {
-	height?: Signalish<number | string | RemoveAttribute>;
-	maskContentUnits?: Signalish<SVGUnits | RemoveAttribute>;
-	maskUnits?: Signalish<SVGUnits | RemoveAttribute>;
-	width?: Signalish<number | string | RemoveAttribute>;
-	x?: Signalish<number | string | RemoveAttribute>;
-	y?: Signalish<number | string | RemoveAttribute>;
+	height?: SignalOrValue<number | string | RemoveAttribute>;
+	maskContentUnits?: SignalOrValue<SVGUnits | RemoveAttribute>;
+	maskUnits?: SignalOrValue<SVGUnits | RemoveAttribute>;
+	width?: SignalOrValue<number | string | RemoveAttribute>;
+	x?: SignalOrValue<number | string | RemoveAttribute>;
+	y?: SignalOrValue<number | string | RemoveAttribute>;
 }
 export interface MetadataSVGAttributes<T> extends SVGAttributes<T> {
 }
 export interface MPathSVGAttributes<T> extends SVGAttributes<T> {
 }
 export interface PathSVGAttributes<T> extends GraphicsElementSVGAttributes<T>, ShapeElementSVGAttributes<T>, ConditionalProcessingSVGAttributes, ExternalResourceSVGAttributes, StylableSVGAttributes, TransformableSVGAttributes, Pick<PresentationSVGAttributes, "clip-path" | "marker-start" | "marker-mid" | "marker-end"> {
-	d?: Signalish<string | RemoveAttribute>;
-	pathLength?: Signalish<number | string | RemoveAttribute>;
+	d?: SignalOrValue<string | RemoveAttribute>;
+	pathLength?: SignalOrValue<number | string | RemoveAttribute>;
 }
 export interface PatternSVGAttributes<T> extends ContainerElementSVGAttributes<T>, ConditionalProcessingSVGAttributes, ExternalResourceSVGAttributes, StylableSVGAttributes, FitToViewBoxSVGAttributes, Pick<PresentationSVGAttributes, "clip-path" | "overflow" | "clip"> {
-	height?: Signalish<number | string | RemoveAttribute>;
-	href?: Signalish<string | RemoveAttribute>;
-	patternContentUnits?: Signalish<SVGUnits | RemoveAttribute>;
-	patternTransform?: Signalish<string | RemoveAttribute>;
-	patternUnits?: Signalish<SVGUnits | RemoveAttribute>;
-	width?: Signalish<number | string | RemoveAttribute>;
-	x?: Signalish<number | string | RemoveAttribute>;
-	y?: Signalish<number | string | RemoveAttribute>;
+	height?: SignalOrValue<number | string | RemoveAttribute>;
+	href?: SignalOrValue<string | RemoveAttribute>;
+	patternContentUnits?: SignalOrValue<SVGUnits | RemoveAttribute>;
+	patternTransform?: SignalOrValue<string | RemoveAttribute>;
+	patternUnits?: SignalOrValue<SVGUnits | RemoveAttribute>;
+	width?: SignalOrValue<number | string | RemoveAttribute>;
+	x?: SignalOrValue<number | string | RemoveAttribute>;
+	y?: SignalOrValue<number | string | RemoveAttribute>;
 }
 export interface PolygonSVGAttributes<T> extends GraphicsElementSVGAttributes<T>, ShapeElementSVGAttributes<T>, ConditionalProcessingSVGAttributes, ExternalResourceSVGAttributes, StylableSVGAttributes, TransformableSVGAttributes, Pick<PresentationSVGAttributes, "clip-path" | "marker-start" | "marker-mid" | "marker-end"> {
-	points?: Signalish<string | RemoveAttribute>;
+	points?: SignalOrValue<string | RemoveAttribute>;
 }
 export interface PolylineSVGAttributes<T> extends GraphicsElementSVGAttributes<T>, ShapeElementSVGAttributes<T>, ConditionalProcessingSVGAttributes, ExternalResourceSVGAttributes, StylableSVGAttributes, TransformableSVGAttributes, Pick<PresentationSVGAttributes, "clip-path" | "marker-start" | "marker-mid" | "marker-end"> {
-	points?: Signalish<string | RemoveAttribute>;
+	points?: SignalOrValue<string | RemoveAttribute>;
 }
 export interface RadialGradientSVGAttributes<T> extends GradientElementSVGAttributes<T> {
-	cx?: Signalish<number | string | RemoveAttribute>;
-	cy?: Signalish<number | string | RemoveAttribute>;
-	fx?: Signalish<number | string | RemoveAttribute>;
-	fy?: Signalish<number | string | RemoveAttribute>;
-	r?: Signalish<number | string | RemoveAttribute>;
+	cx?: SignalOrValue<number | string | RemoveAttribute>;
+	cy?: SignalOrValue<number | string | RemoveAttribute>;
+	fx?: SignalOrValue<number | string | RemoveAttribute>;
+	fy?: SignalOrValue<number | string | RemoveAttribute>;
+	r?: SignalOrValue<number | string | RemoveAttribute>;
 }
 export interface RectSVGAttributes<T> extends GraphicsElementSVGAttributes<T>, ShapeElementSVGAttributes<T>, ConditionalProcessingSVGAttributes, ExternalResourceSVGAttributes, StylableSVGAttributes, TransformableSVGAttributes, Pick<PresentationSVGAttributes, "clip-path"> {
-	height?: Signalish<number | string | RemoveAttribute>;
-	rx?: Signalish<number | string | RemoveAttribute>;
-	ry?: Signalish<number | string | RemoveAttribute>;
-	width?: Signalish<number | string | RemoveAttribute>;
-	x?: Signalish<number | string | RemoveAttribute>;
-	y?: Signalish<number | string | RemoveAttribute>;
+	height?: SignalOrValue<number | string | RemoveAttribute>;
+	rx?: SignalOrValue<number | string | RemoveAttribute>;
+	ry?: SignalOrValue<number | string | RemoveAttribute>;
+	width?: SignalOrValue<number | string | RemoveAttribute>;
+	x?: SignalOrValue<number | string | RemoveAttribute>;
+	y?: SignalOrValue<number | string | RemoveAttribute>;
 }
 export interface SetSVGAttributes<T> extends AnimationElementSVGAttributes<T>, StylableSVGAttributes, AnimationTimingSVGAttributes {
 }
 export interface StopSVGAttributes<T> extends SVGAttributes<T>, StylableSVGAttributes, Pick<PresentationSVGAttributes, "color" | "stop-color" | "stop-opacity"> {
-	offset?: Signalish<number | string | RemoveAttribute>;
+	offset?: SignalOrValue<number | string | RemoveAttribute>;
 }
 export interface SvgSVGAttributes<T> extends ContainerElementSVGAttributes<T>, NewViewportSVGAttributes<T>, ConditionalProcessingSVGAttributes, ExternalResourceSVGAttributes, StylableSVGAttributes, FitToViewBoxSVGAttributes, ZoomAndPanSVGAttributes, PresentationSVGAttributes, EventHandlersWindow<T> {
-	"xmlns:xlink"?: Signalish<string | RemoveAttribute>;
-	contentScriptType?: Signalish<string | RemoveAttribute>;
-	contentStyleType?: Signalish<string | RemoveAttribute>;
-	height?: Signalish<number | string | RemoveAttribute>;
-	width?: Signalish<number | string | RemoveAttribute>;
-	x?: Signalish<number | string | RemoveAttribute>;
-	y?: Signalish<number | string | RemoveAttribute>;
+	"xmlns:xlink"?: SignalOrValue<string | RemoveAttribute>;
+	contentScriptType?: SignalOrValue<string | RemoveAttribute>;
+	contentStyleType?: SignalOrValue<string | RemoveAttribute>;
+	height?: SignalOrValue<number | string | RemoveAttribute>;
+	width?: SignalOrValue<number | string | RemoveAttribute>;
+	x?: SignalOrValue<number | string | RemoveAttribute>;
+	y?: SignalOrValue<number | string | RemoveAttribute>;
 	/** @deprecated */
-	baseProfile?: Signalish<string | RemoveAttribute>;
+	baseProfile?: SignalOrValue<string | RemoveAttribute>;
 	/** @deprecated */
-	version?: Signalish<string | RemoveAttribute>;
+	version?: SignalOrValue<string | RemoveAttribute>;
 }
 export interface SwitchSVGAttributes<T> extends ContainerElementSVGAttributes<T>, ConditionalProcessingSVGAttributes, ExternalResourceSVGAttributes, StylableSVGAttributes, TransformableSVGAttributes, Pick<PresentationSVGAttributes, "display" | "visibility"> {
 }
 export interface SymbolSVGAttributes<T> extends ContainerElementSVGAttributes<T>, NewViewportSVGAttributes<T>, ExternalResourceSVGAttributes, StylableSVGAttributes, FitToViewBoxSVGAttributes, Pick<PresentationSVGAttributes, "clip-path"> {
-	height?: Signalish<number | string | RemoveAttribute>;
-	preserveAspectRatio?: Signalish<SVGPreserveAspectRatioValue | RemoveAttribute>;
-	refX?: Signalish<number | string | RemoveAttribute>;
-	refY?: Signalish<number | string | RemoveAttribute>;
-	viewBox?: Signalish<string | RemoveAttribute>;
-	width?: Signalish<number | string | RemoveAttribute>;
-	x?: Signalish<number | string | RemoveAttribute>;
-	y?: Signalish<number | string | RemoveAttribute>;
+	height?: SignalOrValue<number | string | RemoveAttribute>;
+	preserveAspectRatio?: SignalOrValue<SVGPreserveAspectRatioValue | RemoveAttribute>;
+	refX?: SignalOrValue<number | string | RemoveAttribute>;
+	refY?: SignalOrValue<number | string | RemoveAttribute>;
+	viewBox?: SignalOrValue<string | RemoveAttribute>;
+	width?: SignalOrValue<number | string | RemoveAttribute>;
+	x?: SignalOrValue<number | string | RemoveAttribute>;
+	y?: SignalOrValue<number | string | RemoveAttribute>;
 }
 export interface TextSVGAttributes<T> extends TextContentElementSVGAttributes<T>, GraphicsElementSVGAttributes<T>, ConditionalProcessingSVGAttributes, ExternalResourceSVGAttributes, StylableSVGAttributes, TransformableSVGAttributes, Pick<PresentationSVGAttributes, "clip-path" | "writing-mode" | "text-rendering"> {
-	dx?: Signalish<number | string | RemoveAttribute>;
-	dy?: Signalish<number | string | RemoveAttribute>;
-	lengthAdjust?: Signalish<"spacing" | "spacingAndGlyphs" | RemoveAttribute>;
-	rotate?: Signalish<number | string | RemoveAttribute>;
-	textLength?: Signalish<number | string | RemoveAttribute>;
-	x?: Signalish<number | string | RemoveAttribute>;
-	y?: Signalish<number | string | RemoveAttribute>;
+	dx?: SignalOrValue<number | string | RemoveAttribute>;
+	dy?: SignalOrValue<number | string | RemoveAttribute>;
+	lengthAdjust?: SignalOrValue<"spacing" | "spacingAndGlyphs" | RemoveAttribute>;
+	rotate?: SignalOrValue<number | string | RemoveAttribute>;
+	textLength?: SignalOrValue<number | string | RemoveAttribute>;
+	x?: SignalOrValue<number | string | RemoveAttribute>;
+	y?: SignalOrValue<number | string | RemoveAttribute>;
 }
 export interface TextPathSVGAttributes<T> extends TextContentElementSVGAttributes<T>, ConditionalProcessingSVGAttributes, ExternalResourceSVGAttributes, StylableSVGAttributes, Pick<PresentationSVGAttributes, "alignment-baseline" | "baseline-shift" | "display" | "visibility"> {
-	href?: Signalish<string | RemoveAttribute>;
-	method?: Signalish<"align" | "stretch" | RemoveAttribute>;
-	spacing?: Signalish<"auto" | "exact" | RemoveAttribute>;
-	startOffset?: Signalish<number | string | RemoveAttribute>;
+	href?: SignalOrValue<string | RemoveAttribute>;
+	method?: SignalOrValue<"align" | "stretch" | RemoveAttribute>;
+	spacing?: SignalOrValue<"auto" | "exact" | RemoveAttribute>;
+	startOffset?: SignalOrValue<number | string | RemoveAttribute>;
 }
 export interface TSpanSVGAttributes<T> extends TextContentElementSVGAttributes<T>, ConditionalProcessingSVGAttributes, ExternalResourceSVGAttributes, StylableSVGAttributes, Pick<PresentationSVGAttributes, "alignment-baseline" | "baseline-shift" | "display" | "visibility"> {
-	dx?: Signalish<number | string | RemoveAttribute>;
-	dy?: Signalish<number | string | RemoveAttribute>;
-	lengthAdjust?: Signalish<"spacing" | "spacingAndGlyphs" | RemoveAttribute>;
-	rotate?: Signalish<number | string | RemoveAttribute>;
-	textLength?: Signalish<number | string | RemoveAttribute>;
-	x?: Signalish<number | string | RemoveAttribute>;
-	y?: Signalish<number | string | RemoveAttribute>;
+	dx?: SignalOrValue<number | string | RemoveAttribute>;
+	dy?: SignalOrValue<number | string | RemoveAttribute>;
+	lengthAdjust?: SignalOrValue<"spacing" | "spacingAndGlyphs" | RemoveAttribute>;
+	rotate?: SignalOrValue<number | string | RemoveAttribute>;
+	textLength?: SignalOrValue<number | string | RemoveAttribute>;
+	x?: SignalOrValue<number | string | RemoveAttribute>;
+	y?: SignalOrValue<number | string | RemoveAttribute>;
 }
 /** @see https://developer.mozilla.org/en-US/docs/Web/SVG/Element/use */
 export interface UseSVGAttributes<T> extends SVGAttributes<T>, StylableSVGAttributes, ConditionalProcessingSVGAttributes, GraphicsElementSVGAttributes<T>, PresentationSVGAttributes, ExternalResourceSVGAttributes, TransformableSVGAttributes {
-	height?: Signalish<number | string | RemoveAttribute>;
-	href?: Signalish<string | RemoveAttribute>;
-	width?: Signalish<number | string | RemoveAttribute>;
-	x?: Signalish<number | string | RemoveAttribute>;
-	y?: Signalish<number | string | RemoveAttribute>;
+	height?: SignalOrValue<number | string | RemoveAttribute>;
+	href?: SignalOrValue<string | RemoveAttribute>;
+	width?: SignalOrValue<number | string | RemoveAttribute>;
+	x?: SignalOrValue<number | string | RemoveAttribute>;
+	y?: SignalOrValue<number | string | RemoveAttribute>;
 }
 export interface ViewSVGAttributes<T> extends SVGAttributes<T>, ExternalResourceSVGAttributes, FitToViewBoxSVGAttributes, ZoomAndPanSVGAttributes {
-	viewTarget?: Signalish<string | RemoveAttribute>;
+	viewTarget?: SignalOrValue<string | RemoveAttribute>;
 }
 // TAGS
 /** @type {HTMLElementTagNameMap} */
@@ -2846,6 +2846,12 @@ export declare class Component<T = any> {
 	};
 	render(): JSXElement | null;
 }
+export type FlowWhen<TWhen> = SignalOrValue<TWhen | undefined | null>;
+export declare function Show<TWhen>(props: {
+	when: FlowWhen<TWhen>;
+	fallback?: ComponentChildren;
+	children: ComponentChildren | ((when: FlowWhen<TWhen>) => ComponentChildren);
+}): JSXElement;
 export declare function useClassList(initialValue?: ClassNames): BasicClassList;
 export declare function useText(initialValue?: string): readonly [
 	Text,
@@ -2859,6 +2865,27 @@ export declare function ShadowRootNode({ children, ref, ...attr }: ShadowRootIni
 	ref?: Ref<ShadowRoot>;
 	children?: ComponentChildren;
 }): any;
+/**
+ * A minimal, non-tracking SignalLike implementation.
+ * - No dependency tracking, effects, or batching
+ * - Synchronous notifications to subscribed listeners
+ */
+export declare class PlainSignal<T = any> implements SignalLike<T> {
+	_value: T;
+	_listeners: Array<(value: T) => void>;
+	constructor(initialValue?: T);
+	get value(): T;
+	set value(newValue: T);
+	peek(): T;
+	/**
+	 * Subscribe to value changes. The callback is called immediately with the current value.
+	 * Note that this does not do any batching or dependency tracking; callbacks are called synchronously when the value changes.
+	 * @param callback
+	 * @returns
+	 */
+	subscribe(callback: (value: T) => void): () => void;
+	unsubscribe(callback: (value: T) => void): void;
+}
 export declare const SVGNamespace = "http://www.w3.org/2000/svg";
 
 export {

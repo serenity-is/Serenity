@@ -1,7 +1,7 @@
 import { className } from "./classname";
 import { setStyle } from "./set-style";
 import { nonPresentationSVGAttributes } from "./svg-consts";
-import { forEach, isObject, isSignalLike, isVisibleChild, keys } from "./util";
+import { forEach, isObject, isSignalLike, isVisibleChild, keys, observeSignal } from "./util";
 
 const XLinkNamespace = "http://www.w3.org/1999/xlink";
 const XMLNamespace = "http://www.w3.org/XML/1998/namespace";
@@ -267,19 +267,7 @@ function setProperty(node: Element & HTMLOrSVGElement, key: string, value: any, 
 }
 
 function setPropertyWithSignal(node: Element & HTMLOrSVGElement, key: string, signal: any) {
-    let prevValue = signal.peek();
-    setProperty(node, key, prevValue);
-    let immediate = true;
-    // preact signals executes the callback immediately, so skip the first call.
-    // another signal library may not do that (unsure), so we guard with
-    // `immediate` flag to ensure the first call is skipped
-    const dispose = signal.subscribe((newValue: any) => {
-        if (!immediate) {
-            setProperty(node, key, newValue, prevValue);
-            prevValue = newValue;
-        }
-    });
-    immediate = false;
+    const dispose = observeSignal(signal, (value, prev) => setProperty(node, key, value, prev));
     if (dispose) {
         node.addEventListener("disposing", dispose, { once: true });
     }

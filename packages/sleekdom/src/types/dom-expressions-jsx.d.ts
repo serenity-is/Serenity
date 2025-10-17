@@ -4,7 +4,7 @@
  */
 import { ClassNames as ClassList } from "./classname";
 import { CustomDomAttributes as CustomAttributes } from "./custom-attributes";
-import { Signalish as FunctionMaybe } from "./signal-like";
+import { SignalOrValue as FunctionMaybe } from "./signal-like";
 import { StyleProperties } from "./style-attributes";
 
 //import * as csstype from "csstype";

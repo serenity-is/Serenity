@@ -2,7 +2,7 @@ import type { ClassNames } from "./classname";
 import type { ShadowRootContainer } from "./components";
 import type { JSXElement } from "./jsx-element";
 import type { Ref } from "./ref-types";
-import type { Signalish } from "./signal-like";
+import type { SignalOrValue } from "./signal-like";
 
 type ComponentChild =
     | string
@@ -46,8 +46,8 @@ export interface CustomDomAttributes<T> {
 
 declare module "./dom-expressions-jsx" {
     interface ElementAttributes<T> {
-        className?: Signalish<string | ClassNames | RemoveAttribute>;
-        tabIndex?: Signalish<number | string | RemoveAttribute>;
+        className?: SignalOrValue<string | ClassNames | RemoveAttribute>;
+        tabIndex?: SignalOrValue<number | string | RemoveAttribute>;
         onClickCapture?: EventHandlerUnion<T, MouseEvent> | undefined;
         onDblClickCapture?: EventHandlerUnion<T, MouseEvent> | undefined;
         onDoubleClick?: EventHandlerUnion<T, MouseEvent> | undefined;
@@ -55,37 +55,37 @@ declare module "./dom-expressions-jsx" {
     }
 
     interface HTMLAttributes<T> {
-        contentEditable?: Signalish<EnumeratedPseudoBoolean | EnumeratedAcceptsEmpty | "plaintext-only" | "inherit" | RemoveAttribute>;
+        contentEditable?: SignalOrValue<EnumeratedPseudoBoolean | EnumeratedAcceptsEmpty | "plaintext-only" | "inherit" | RemoveAttribute>;
         dataset?: { [key: string]: string } | undefined
-        spellCheck?: Signalish<EnumeratedPseudoBoolean | EnumeratedAcceptsEmpty | RemoveAttribute>;
+        spellCheck?: SignalOrValue<EnumeratedPseudoBoolean | EnumeratedAcceptsEmpty | RemoveAttribute>;
     }
 
     interface SVGAttributes<T> {
-        tabIndex?: Signalish<number | string | RemoveAttribute>;
+        tabIndex?: SignalOrValue<number | string | RemoveAttribute>;
     }
 
     interface AnchorHTMLAttributes<T> {
         /** @deprecated use referrerpolicy */
-        referrerPolicy?: Signalish<HTMLReferrerPolicy | RemoveAttribute>;
+        referrerPolicy?: SignalOrValue<HTMLReferrerPolicy | RemoveAttribute>;
     }
 
     interface ButtonHTMLAttributes<T> {
-        autoFocus?: Signalish<boolean | RemoveAttribute>;
-        formNoValidate?: Signalish<boolean | RemoveAttribute>;
+        autoFocus?: SignalOrValue<boolean | RemoveAttribute>;
+        formNoValidate?: SignalOrValue<boolean | RemoveAttribute>;
     }
 
     interface InputHTMLAttributes<T> {
-        maxLength?: Signalish<string | number | RemoveAttribute>;
-        minLength?: Signalish<string | number | RemoveAttribute>;
-        readOnly?: Signalish<boolean | RemoveAttribute>;
+        maxLength?: SignalOrValue<string | number | RemoveAttribute>;
+        minLength?: SignalOrValue<string | number | RemoveAttribute>;
+        readOnly?: SignalOrValue<boolean | RemoveAttribute>;
     }
 
     interface LabelHTMLAttributes<T> {
-        htmlFor?: Signalish<string | RemoveAttribute>;
+        htmlFor?: SignalOrValue<string | RemoveAttribute>;
     }
 
     interface TdHTMLAttributes<T>{
-        colSpan?: Signalish<number | string | RemoveAttribute>;
-        rowSpan?: Signalish<number | string | RemoveAttribute>;
+        colSpan?: SignalOrValue<number | string | RemoveAttribute>;
+        rowSpan?: SignalOrValue<number | string | RemoveAttribute>;
     }
 }

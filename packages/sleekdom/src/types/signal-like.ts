@@ -4,4 +4,4 @@ export interface SignalLike<T> {
 	subscribe(fn: (value: T) => void): () => void;
 }
 
-export type Signalish<T> = T | SignalLike<T>;
+export type SignalOrValue<T> = T | SignalLike<T>;

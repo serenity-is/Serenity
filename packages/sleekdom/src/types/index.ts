@@ -4,3 +4,4 @@ export * from "./custom-attributes";
 export * from "./jsx-element";
 export * from "./jsx-namespace";
 export * from "./ref-types";
+export * from "./signal-like";
