@@ -6,6 +6,9 @@ settings:
 
 catalogs:
   serenity:
+    '@preact/signals-core':
+      specifier: 1.12.1
+      version: 1.12.1
     '@vitest/coverage-v8':
       specifier: 3.2.4
       version: 3.2.4
@@ -76,6 +79,9 @@ importers:
         specifier: workspace:*
         version: link:../packages/sleekgrid
     devDependencies:
+      '@serenity-is/signals':
+        specifier: workspace:*
+        version: link:../packages/signals
       '@serenity-is/sleekdom':
         specifier: workspace:*
         version: link:../packages/sleekdom
@@ -119,7 +125,7 @@ importers:
   packages/signals:
     devDependencies:
       '@preact/signals-core':
-        specifier: 1.12.1
+        specifier: catalog:serenity
         version: 1.12.1
       '@serenity-is/sleekdom':
         specifier: workspace:*
@@ -155,6 +161,9 @@ importers:
       '@serenity-is/extensions':
         specifier: workspace:*
         version: link:../../../common-features/src/extensions
+      '@serenity-is/signals':
+        specifier: workspace:*
+        version: link:../../../packages/signals
       '@serenity-is/sleekdom':
         specifier: workspace:*
         version: link:../../../packages/sleekdom

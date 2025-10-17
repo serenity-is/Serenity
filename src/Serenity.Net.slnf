@@ -4,6 +4,7 @@
     "projects": [
       "packages\\corelib\\Serenity.Corelib.csproj",
       "packages\\sleekdom\\Serenity.SleekDom.csproj",
+      "packages\\signals\\Serenity.Signals.csproj",
       "packages\\sleekgrid\\Serenity.SleekGrid.csproj",
       "packages\\test-utils\\test-utils.esproj",
       "packages\\tsbuild\\tsbuild.esproj",

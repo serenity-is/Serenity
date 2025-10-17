@@ -8,7 +8,7 @@
   "module": "dist/index.js",
   "devDependencies": {
     "@serenity-is/sleekdom": "workspace:*",
-    "@preact/signals-core": "1.12.1"
+    "@preact/signals-core": "catalog:serenity"
   },
   "peerDependencies": {
     "@serenity-is/sleekdom": "workspace:*"

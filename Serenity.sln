@@ -60,6 +60,8 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Serenity.Corelib", "package
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Serenity.SleekDom", "packages\sleekdom\Serenity.SleekDom.csproj", "{64108D05-5302-DF20-E422-8A05213D3DF0}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Serenity.Signals", "Serenity\packages\signals\Serenity.Signals.csproj", "{B1988682-A247-E3B5-6AB7-122264795DA2}"
+EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Serenity.SleekGrid", "packages\sleekgrid\Serenity.SleekGrid.csproj", "{9C4591C7-9BC1-497C-BB6F-FB74D739D5E9}"
 EndProject
 Project("{54A90642-561A-4BB1-A94E-469ADEE60C69}") = "test-utils", "packages\test-utils\test-utils.esproj", "{EE167232-372C-4036-AF27-AA3C586EC020}"

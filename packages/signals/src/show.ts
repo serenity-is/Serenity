@@ -2,12 +2,10 @@ import type { ComponentChildren, JSXElement, SignalOrValue } from "@serenity-is/
 import { signal } from "./signals";
 import { isSignalLike, observeSignal } from "./util";
 
-type IfCondition<TWhen> = SignalOrValue<TWhen | undefined | null>;
-
 export function Show<TWhen>(props: {
-  when: IfCondition<TWhen>;
+  when: SignalOrValue<TWhen | undefined | null>;
   fallback?: ComponentChildren;
-  children: ComponentChildren | ((when: IfCondition<TWhen>) => ComponentChildren);
+  children: ComponentChildren | ((when: SignalOrValue<TWhen | undefined | null>) => ComponentChildren);
 }): JSXElement {
 
     function getContent(flag: boolean): JSXElement {
