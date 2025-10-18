@@ -46,7 +46,7 @@ export interface CustomDomAttributes<T> {
 
 declare module "./dom-expressions-jsx" {
     interface ElementAttributes<T> {
-        className?: SignalOrValue<string | ClassNames | RemoveAttribute>;
+        className?: ElementAttributes<T>["class"];
         tabIndex?: SignalOrValue<number | string | RemoveAttribute>;
         onClickCapture?: EventHandlerUnion<T, MouseEvent> | undefined;
         onDblClickCapture?: EventHandlerUnion<T, MouseEvent> | undefined;

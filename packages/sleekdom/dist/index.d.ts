@@ -59,7 +59,7 @@ export interface CustomDomAttributes<T> {
 	tsxTag?: keyof HTMLElementTagNameMap | keyof SVGElementTagNameMap;
 }
 export interface ElementAttributes<T> {
-	className?: SignalOrValue<string | ClassNames | RemoveAttribute>;
+	className?: ElementAttributes<T>["class"];
 	tabIndex?: SignalOrValue<number | string | RemoveAttribute>;
 	onClickCapture?: EventHandlerUnion<T, MouseEvent> | undefined;
 	onDblClickCapture?: EventHandlerUnion<T, MouseEvent> | undefined;
@@ -803,7 +803,9 @@ export interface ElementAttributes<T> extends CustomDomAttributes<T>, DirectiveA
 	textContent?: SignalOrValue<string | number>;
 	// attributes
 	autofocus?: SignalOrValue<BooleanAttribute | RemoveAttribute>;
-	class?: SignalOrValue<string | ClassNames | RemoveAttribute>;
+	class?: SignalOrValue<string | ClassNames | RemoveAttribute> | {
+		[key: string]: SignalOrValue<boolean | RemoveAttribute>;
+	};
 	elementtiming?: SignalOrValue<string | RemoveAttribute>;
 	id?: SignalOrValue<string | RemoveAttribute>;
 	nonce?: SignalOrValue<string | RemoveAttribute>;
@@ -1490,7 +1492,7 @@ export type SVGPreserveAspectRatioValue = "none" | "xMinYMin" | "xMidYMin" | "xM
 export type ImagePreserveAspectRatio = SVGPreserveAspectRatioValue | "defer none" | "defer xMinYMin" | "defer xMidYMin" | "defer xMaxYMin" | "defer xMinYMid" | "defer xMidYMid" | "defer xMaxYMid" | "defer xMinYMax" | "defer xMidYMax" | "defer xMaxYMax" | "defer xMinYMin meet" | "defer xMidYMin meet" | "defer xMaxYMin meet" | "defer xMinYMid meet" | "defer xMidYMid meet" | "defer xMaxYMid meet" | "defer xMinYMax meet" | "defer xMidYMax meet" | "defer xMaxYMax meet" | "defer xMinYMin slice" | "defer xMidYMin slice" | "defer xMaxYMin slice" | "defer xMinYMid slice" | "defer xMidYMid slice" | "defer xMaxYMid slice" | "defer xMinYMax slice" | "defer xMidYMax slice" | "defer xMaxYMax slice";
 export type SVGUnits = "userSpaceOnUse" | "objectBoundingBox";
 export interface StylableSVGAttributes {
-	class?: SignalOrValue<string | ClassNames | RemoveAttribute>;
+	class?: ElementAttributes<Element>["class"];
 	style?: SignalOrValue<CSSProperties | string | RemoveAttribute>;
 }
 export interface TransformableSVGAttributes {

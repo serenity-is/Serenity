@@ -1,4 +1,5 @@
 import { className } from "./classname";
+import { setClassName } from "./jsx-set-classname";
 import { setStyleProperty } from "./jsx-set-style";
 import { nonPresentationSVGAttributes } from "./svg-consts";
 import { forEach, isObject, isSignalLike, isVisibleChild, keys, observeSignal } from "./util";
@@ -82,18 +83,7 @@ function setProperty(node: Element & HTMLOrSVGElement, key: string, value: any, 
             break;
 
         case "class":
-            // ideally we should check prevValue and toggle only changed classes
-            // to preserve externally added classes but we already have
-            // useClassList for that purpose. maybe in future we can implement
-            // a better class merging algorithm here.
-            if (value == null || value === false) {
-                node.removeAttribute("class");
-                return;
-            } else if (typeof value === "function") {
-                value(node)
-            } else {
-                node.setAttribute("class", className(value));
-            }
+            setClassName(node, value, prev);
             return;
 
         case "spellcheck":

@@ -1011,7 +1011,7 @@ interface ElementAttributes<T>
 
     // attributes
     autofocus?: FunctionMaybe<BooleanAttribute | RemoveAttribute>;
-    class?: FunctionMaybe<string | ClassList | RemoveAttribute>;
+    class?: FunctionMaybe<string | ClassList | RemoveAttribute> | { [key: string]: FunctionMaybe<boolean | RemoveAttribute> };
     elementtiming?: FunctionMaybe<string | RemoveAttribute>;
     id?: FunctionMaybe<string | RemoveAttribute>;
     nonce?: FunctionMaybe<string | RemoveAttribute>;
@@ -2026,7 +2026,7 @@ type ImagePreserveAspectRatio =
 type SVGUnits = "userSpaceOnUse" | "objectBoundingBox";
 
 interface StylableSVGAttributes {
-    class?: FunctionMaybe<string | ClassList | RemoveAttribute>;
+    class?: ElementAttributes<Element>["class"];
     style?: FunctionMaybe<CSSProperties | string | RemoveAttribute>;
 }
 interface TransformableSVGAttributes {

@@ -93,17 +93,17 @@ function setStylePropValue(node: Element & HTMLOrSVGElement, key: string, val: a
     }
 }
 
-function clearPreviouslySetStyle(node: Element & HTMLOrSVGElement, value?: any): void {
-    if (value == null || value === false || value === true)
+function clearPrevStyle(node: Element & HTMLOrSVGElement, prev?: any): void {
+    if (prev == null || prev === false || prev === true)
         return;
 
-    if (isString(value)) {
+    if (isString(prev)) {
         node.removeAttribute("style");
         return;
     }
 
-    if (isObject(value)) {
-        Object.keys(value).forEach(key => {
+    if (isObject(prev)) {
+        Object.keys(prev).forEach(key => {
             setStylePropValue(node, key, "");
         });
     }
@@ -111,7 +111,7 @@ function clearPreviouslySetStyle(node: Element & HTMLOrSVGElement, value?: any):
 
 export function setStyleProperty(node: Element & HTMLOrSVGElement, value?: any, prev?: boolean | any): void {
     if (value == null || value === false || value === true) {
-        clearPreviouslySetStyle(node, prev);
+        clearPrevStyle(node, prev);
         return;
     }
 
@@ -129,7 +129,7 @@ export function setStyleProperty(node: Element & HTMLOrSVGElement, value?: any, 
             });
         }
         else
-            clearPreviouslySetStyle(node, prev);
+            clearPrevStyle(node, prev);
 
         Object.entries(value).forEach(([key, val]) => {
             if (isSignalLike(val)) {
