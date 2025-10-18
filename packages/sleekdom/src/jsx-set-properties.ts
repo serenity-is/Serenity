@@ -1,5 +1,5 @@
 import { className } from "./classname";
-import { setStyle } from "./set-style";
+import { setStyleProperty } from "./jsx-set-style";
 import { nonPresentationSVGAttributes } from "./svg-consts";
 import { forEach, isObject, isSignalLike, isVisibleChild, keys, observeSignal } from "./util";
 
@@ -20,7 +20,7 @@ const propToAttr: Record<string, string> = {
     maxLength: "maxlength"
 }
 
-function setProperty(node: Element & HTMLOrSVGElement, key: string, value: any, prevValue?: any) {
+function setProperty(node: Element & HTMLOrSVGElement, key: string, value: any, prev?: any) {
 
     const propAttr = propToAttr[key];
     if (propAttr) {
@@ -29,8 +29,8 @@ function setProperty(node: Element & HTMLOrSVGElement, key: string, value: any, 
 
     switch (key) {
         case "dataset":
-            if (prevValue != null) {
-                forEach(prevValue, (v, k) => {
+            if (prev != null) {
+                forEach(prev, (v, k) => {
                     if (v != null) {
                         delete node.dataset[k];
                     }
@@ -49,7 +49,7 @@ function setProperty(node: Element & HTMLOrSVGElement, key: string, value: any, 
             if (isVisibleChild(value)) {
                 (node as any)[key] = value
             }
-            else if (isVisibleChild(prevValue)) {
+            else if (isVisibleChild(prev)) {
                 // clear only when the previous value was visible
                 (node as any)[key] = ""
             }
@@ -59,7 +59,7 @@ function setProperty(node: Element & HTMLOrSVGElement, key: string, value: any, 
             if (isObject(value)) {
                 node.innerHTML = value["__html"]
             }
-            else if (isObject(prevValue)) {
+            else if (isObject(prev)) {
                 // clear only when the previous value was visible
                 node.innerHTML = ""
             }
@@ -67,7 +67,7 @@ function setProperty(node: Element & HTMLOrSVGElement, key: string, value: any, 
 
         case "value":
             if (value == null) {
-                if (prevValue != null) {
+                if (prev != null) {
                     (node as any)[key] = null;
                 }
                 return;
@@ -123,24 +123,21 @@ function setProperty(node: Element & HTMLOrSVGElement, key: string, value: any, 
             return;
 
         case "style":
-            // again ideally we should diff prevValue and value
-            // and only set changed properties but for now we just
-            // set the whole style object
-            setStyle(node, value)
+            setStyleProperty(node, value, prev)
             return;
 
         case "on":
         case "onCapture":
             const useCapture = key === "onCapture";
-            if (prevValue != null) {
-                forEach(prevValue, (eventHandler, eventName) => {
+            if (prev != null) {
+                forEach(prev, (eventHandler, eventName) => {
                     if (value == null || value[eventName] !== eventHandler) {
                         node.removeEventListener(eventName, eventHandler, useCapture);
                     }
                 });
             }
             forEach(value, (eventHandler, eventName) => {
-                if (prevValue == null || prevValue[eventName] !== eventHandler) {
+                if (prev == null || prev[eventName] !== eventHandler) {
                     node.addEventListener(eventName, eventHandler, useCapture);
                 }
             });
@@ -171,7 +168,7 @@ function setProperty(node: Element & HTMLOrSVGElement, key: string, value: any, 
 
     if (typeof value === "function") {
         if (key[0] === "o" && key[1] === "n") {
-            if (prevValue != null && prevValue === value)
+            if (prev != null && prev === value)
                 return;
 
             let attribute = key.toLowerCase();
@@ -183,13 +180,13 @@ function setProperty(node: Element & HTMLOrSVGElement, key: string, value: any, 
             }
 
             let eventName;
-            if (!useCapture && ((node as any)[attribute] === null || (prevValue != null && (node as any)[attribute] === prevValue))) {
+            if (!useCapture && ((node as any)[attribute] === null || (prev != null && (node as any)[attribute] === prev))) {
                 // use property when possible PR #17
                 (node as any)[attribute] = value;
             } else if (useCapture) {
                 eventName = attribute.substring(2, attribute.length - 7);
-                if (prevValue != null) {
-                    node.removeEventListener(eventName, prevValue);
+                if (prev != null) {
+                    node.removeEventListener(eventName, prev);
                 }
                 node.addEventListener(eventName, value, true);
             } else {
@@ -209,8 +206,8 @@ function setProperty(node: Element & HTMLOrSVGElement, key: string, value: any, 
                     const customEventName = attribute[2] + key.slice(3);
                     eventName = customEventName;
                 }
-                if (prevValue != null) {
-                    node.removeEventListener(eventName, prevValue);
+                if (prev != null) {
+                    node.removeEventListener(eventName, prev);
                 }
                 node.addEventListener(eventName, value);
             }
@@ -221,22 +218,22 @@ function setProperty(node: Element & HTMLOrSVGElement, key: string, value: any, 
         return;
     }
 
-    if (isObject(prevValue)) {
-        if (prevValue === value) {
+    if (isObject(prev)) {
+        if (prev === value) {
             return;
         }
         delete (node as any)[key];
     }
 
-    if (prevValue === true) {
-        if (prevValue === value) {
+    if (prev === true) {
+        if (prev === value) {
             return;
         }
         node.removeAttribute(key);
     }
 
-    if (prevValue !== false && prevValue != null) {
-        if (prevValue === value) {
+    if (prev !== false && prev != null) {
+        if (prev === value) {
             return;
         }
 

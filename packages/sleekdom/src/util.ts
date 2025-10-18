@@ -59,7 +59,7 @@ export function isVisibleChild(val: any): boolean {
  * @returns A function to dispose the effect if the signal library supports unsubscription
  */
 export function observeSignal<T>(signal: SignalLike<T>, 
-    callback: ((value: T, prev: T, initial: boolean) => void)): () => void {
+    callback: ((value: T, prev: T, initial: boolean) => void)) {
     let prev = signal.peek();
     callback(prev, undefined, true);
     let immediate = true;

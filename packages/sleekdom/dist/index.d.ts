@@ -31,7 +31,7 @@ export type Ref<T> = RefCallback<T> | RefObject<T> | null;
 export interface SignalLike<T> {
 	value: T;
 	peek(): T;
-	subscribe(fn: (value: T) => void): () => void;
+	subscribe(fn: (value: T) => void): ((() => void) | null | undefined | void);
 }
 export type SignalOrValue<T> = T | SignalLike<T>;
 export type ComponentChild = string | number | Iterable<ComponentChild> | Array<ComponentChild> | {
@@ -122,9 +122,12 @@ export type ShadowRootContainer = {
 	children: ComponentChildren;
 };
 /** CSSStyleDeclaration contains methods, readonly properties and an index signature, which we all need to filter out. */
-export type StyleProperties = Partial<Pick<CSSStyleDeclaration, {
+export type StylePropertiesBase = Partial<Pick<CSSStyleDeclaration, {
 	[K in keyof CSSStyleDeclaration]: K extends string ? CSSStyleDeclaration[K] extends string ? K : never : never;
 }[keyof CSSStyleDeclaration]>>;
+export type StyleProperties = {
+	[K in keyof StylePropertiesBase]: SignalOrValue<StylePropertiesBase[K]>;
+};
 //import * as csstype from "csstype";
 /**
  * Originally based on JSX types for Surplus and Inferno and adapted for `dom-expressions`.
