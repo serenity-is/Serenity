@@ -1,6 +1,7 @@
 {
   "name": "@serenity-is/workspace-serenity",
   "devDependencies": {
+    "@serenity-is/signals": "workspace:*",
     "@serenity-is/sleekdom": "workspace:*",
     "@vitest/coverage-v8": "catalog:serenity",
     "esbuild": "catalog:serenity",
@@ -12,11 +13,7 @@
     "onlyBuiltDependencies": [
       "esbuild",
       "msw"
-    ],
-    "overrides": {
-      "brace-expansion@>=2.0.0 <=2.0.1": "2.0.2",
-      "vite@>=7.0.0 <=7.0.6": ">=7.1.5"
-    }
+    ]
   },
   "scripts": {
     "all": "pnpm i && pnpm -r build && pnpm -r tsc && pnpm -r test"

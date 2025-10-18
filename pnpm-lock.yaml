@@ -43,14 +43,13 @@ catalogs:
       specifier: 3.2.4
       version: 3.2.4
 
-overrides:
-  brace-expansion@>=2.0.0 <=2.0.1: 2.0.2
-  vite@>=7.0.0 <=7.0.6: '>=7.1.5'
-
 importers:
 
   .:
     devDependencies:
+      '@serenity-is/signals':
+        specifier: workspace:*
+        version: link:packages/signals
       '@serenity-is/sleekdom':
         specifier: workspace:*
         version: link:packages/sleekdom
@@ -643,7 +642,7 @@ packages:
     resolution: {integrity: sha512-46ryTE9RZO/rfDd7pEqFl7etuyzekzEhUbTW3BvmeO/BcCMEgq59BKhek3dXDWgAj4oMK6OZi+vRr1wPW6qjEQ==}
     peerDependencies:
       msw: ^2.4.9
-      vite: '>=7.1.5'
+      vite: ^5.0.0 || ^6.0.0 || ^7.0.0-0
     peerDependenciesMeta:
       msw:
         optional: true
