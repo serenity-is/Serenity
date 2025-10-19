@@ -1,8 +1,8 @@
 import { ComponentChildren, JSXElement, SignalLike, SignalOrValue } from '@serenity-is/sleekdom';
 
-export declare function Show<TWhen>(props: {
+export declare function IfElse<TWhen>(props: {
 	when: SignalOrValue<TWhen | undefined | null>;
-	fallback?: ComponentChildren;
+	else?: ComponentChildren;
 	children: ComponentChildren | ((when: SignalOrValue<TWhen | undefined | null>) => ComponentChildren);
 }): JSXElement;
 export interface Signal<T> extends SignalLike<T> {

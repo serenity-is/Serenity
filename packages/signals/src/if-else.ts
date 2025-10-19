@@ -2,9 +2,9 @@ import { addDisposingListener, removeDisposingListener, type ComponentChildren, 
 import { signal } from "./signals";
 import { isSignalLike, observeSignal } from "./util";
 
-export function Show<TWhen>(props: {
+export function IfElse<TWhen>(props: {
   when: SignalOrValue<TWhen | undefined | null>;
-  fallback?: ComponentChildren;
+  else?: ComponentChildren;
   children: ComponentChildren | ((when: SignalOrValue<TWhen | undefined | null>) => ComponentChildren);
 }): JSXElement {
     let dispose: null | (() => void);
@@ -12,7 +12,7 @@ export function Show<TWhen>(props: {
         let content = props.children;
         if (typeof content === "function")
             content = content(props.when);
-        content = flag ? content : props.fallback;
+        content = flag ? content : props.else;
         content ??= new Text("");
         return content as unknown as JSXElement;
     }
