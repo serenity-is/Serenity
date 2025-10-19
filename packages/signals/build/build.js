@@ -4,26 +4,6 @@ import { existsSync, mkdirSync, readFileSync, writeFileSync } from "fs";
 import { dirname } from "path";
 import process from 'process';
 
-/*
-const dts = process.argv.includes('dts') || process.argv.includes('--dts');
-if (dts) {
-    const dts = (await import('dts-bundle-generator')).generateDtsBundle;
-    const result = dts([{
-        filePath: './src/index.ts',
-        libraries: {
-            importedLibraries: ["@serenity-is/sleekdom"]
-        },
-        output: {
-            noBanner: true,
-        }
-    }], {
-        followSymlinks: false
-    });
-    writeFileSync('./dist/index.d.ts', result[0], "utf8");
-    process.exit(0);
-}
-*/
-
 function writeIfChanged() {
     return {
         name: "write-if-changed",

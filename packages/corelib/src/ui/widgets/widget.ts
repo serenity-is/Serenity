@@ -1,3 +1,4 @@
+import { addDisposingListener } from "@serenity-is/sleekdom";
 import { ClassTypeInfo, Config, EditorTypeInfo, Fluent, StringLiteral, addClass, addValidationRule, appendToNode, classTypeInfo, editorTypeInfo, getCustomAttribute, getInstanceType, getTypeFullName, getTypeShortName, htmlEncode, isArrayLike, nsSerenity, registerType, toggleClass } from "../../base";
 import { ensureParentOrFragment, handleElementProp, isFragmentWorkaround, setElementProps } from "./widgetinternal";
 import { IdPrefixType, associateWidget, deassociateWidget, getWidgetName, useIdPrefix, type WidgetProps } from "./widgetutils";
@@ -29,9 +30,7 @@ export class Widget<P = {}> {
 
         associateWidget(this);
 
-        Fluent.one(this.domNode, 'disposing.' + this.uniqueName, (e) => {
-            this.destroy();
-        });
+        addDisposingListener(this.domNode, this.destroy.bind(this));
 
         this.idPrefix = (this.options as any)?.idPrefix ?? (this.uniqueName + '_');
 

@@ -1,4 +1,5 @@
-﻿import { Fluent, getjQuery, isArrayLike } from "../base";
+﻿import { addDisposingListener } from "@serenity-is/sleekdom";
+import { Fluent, getjQuery, isArrayLike } from "../base";
 import { type CreateWidgetParams, type Widget, type WidgetProps } from "../ui/widgets/widget";
 import { executeEverytimeWhenVisible } from "./layouttimer";
 import { Router } from "./router";
@@ -79,7 +80,7 @@ export function initFullHeightGridPage(gridDiv: HTMLElement | ArrayLike<HTMLElem
 
     layout();
 
-    Fluent.one(el, 'disposing', () => {
+    addDisposingListener(el, () => {
         Fluent.off(window, 'resize', layout);
         Fluent.off(document.body, 'layout', layout);
     });

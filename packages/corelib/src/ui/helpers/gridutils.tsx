@@ -1,5 +1,6 @@
+import { addDisposingListener } from "@serenity-is/sleekdom";
 import { Grid, RowMoveManager } from "@serenity-is/sleekgrid";
-import { EntityGridTexts, Fluent, SaveRequest, isArrayLike, serviceRequest } from "../../base";
+import { EntityGridTexts, SaveRequest, isArrayLike, serviceRequest } from "../../base";
 import { IRemoteView } from "../../slick";
 import { IDataGrid } from "../datagrid/idatagrid";
 import { QuickSearchField, QuickSearchInput } from "../datagrid/quicksearchinput";
@@ -44,7 +45,7 @@ export namespace GridUtils {
                 view.populate();
             }, hint, initial);
 
-        Fluent.one(isArrayLike(toolDiv) ? toolDiv[0] : toolDiv, "disposing", function () {
+        addDisposingListener(isArrayLike(toolDiv) ? toolDiv[0] : toolDiv, function () {
             view.onSubmit = null;
             oldSubmit = null;
         });

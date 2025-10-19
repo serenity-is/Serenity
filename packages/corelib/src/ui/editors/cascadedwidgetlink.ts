@@ -1,4 +1,5 @@
-﻿import { classTypeInfo, Fluent, notifyError, nsSerenity, registerType } from "../../base";
+﻿import { addDisposingListener } from "@serenity-is/sleekdom";
+import { classTypeInfo, Fluent, notifyError, nsSerenity, registerType } from "../../base";
 import { findElementWithRelativeId } from "../../compat";
 import { Widget } from "../widgets/widget";
 import { tryGetWidget } from "../widgets/widgetutils";
@@ -11,7 +12,7 @@ export class CascadedWidgetLink<TParent extends Widget<any>> {
         private widget: Widget<any>,
         private parentChange: (p1: TParent) => void) {
         this.bind();
-        Fluent.one(this.widget.domNode, 'disposing.' + (widget as any).uniqueName + 'cwh', () => {
+        addDisposingListener(this.widget.domNode, () => {
             this.unbind();
             this.widget = null;
             this.parentChange = null;

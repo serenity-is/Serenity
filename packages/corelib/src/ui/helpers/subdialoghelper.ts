@@ -1,4 +1,5 @@
-﻿import { Fluent, getjQuery, isArrayLike } from "../../base";
+﻿import { addDisposingListener } from "@serenity-is/sleekdom";
+import { Fluent, getjQuery, isArrayLike } from "../../base";
 import { DataChangeInfo } from "../../types/datachangeinfo";
 import { Widget } from "../widgets/widget";
 
@@ -19,7 +20,8 @@ export namespace SubDialogHelper {
             else {
                 dataChange(e);
             }
-        }).one('disposing.' + uniqueName, function () {
+        });
+        addDisposingListener(dialog.node, () => function () {
             Fluent.off(dialog.domNode, 'ondatachange.' + uniqueName);
         });
         return dialog;

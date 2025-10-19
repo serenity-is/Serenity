@@ -5,7 +5,8 @@
  * --------------------------------------------------------------------------
  */
 
-import { getjQuery } from "./environment"
+import { addDisposingListener, onElementDisposing } from "@serenity-is/sleekdom";
+import { getjQuery } from "./environment";
 
 const stripNameRegex = /\..*/
 const stripUidRegex = /::\d+$/
@@ -36,6 +37,8 @@ export function disposeDescendants(element: Element) {
 }
 
 export function disposeElement(element: EventTarget): void {
+    onElementDisposing(element);
+
     let events = eventRegistry.get(element);
     if (!events)
         return;
@@ -60,7 +63,6 @@ export function disposeElement(element: EventTarget): void {
             delete handlers[handlerKey];
         }
     }
-
 }
 
 function getElementEvents(element: EventTarget): ElementEvents {
@@ -141,6 +143,11 @@ function normalizeParameters(originalTypeEvent: string, handler: any, delegation
 
 export function addListener(element: EventTarget, originalTypeEvent: string, handler: Function | string, delegationFunction?: Function, oneOff?: boolean) {
     if (typeof originalTypeEvent !== 'string' || !element) {
+        return;
+    }
+
+    if (originalTypeEvent === "disposing" && !delegationFunction && typeof handler === "function") {
+        addDisposingListener(element, handler as () => void);
         return;
     }
 
