@@ -3,11 +3,10 @@ import { signal } from "./signals";
 import { isSignalLike, observeSignal } from "./util";
 
 export function IfElse<TWhen>(props: {
-  when: SignalOrValue<TWhen | undefined | null>;
-  else?: ComponentChildren;
-  children: ComponentChildren | ((when: SignalOrValue<TWhen | undefined | null>) => ComponentChildren);
+    when: SignalOrValue<TWhen | undefined | null>;
+    else?: ComponentChildren;
+    children: ComponentChildren | ((when: SignalOrValue<TWhen | undefined | null>) => ComponentChildren);
 }): JSXElement {
-    let dispose: null | (() => void);
     function getContent(flag: boolean): JSXElement {
         let content = props.children;
         if (typeof content === "function")
@@ -18,6 +17,7 @@ export function IfElse<TWhen>(props: {
     }
 
     if (isSignalLike(props.when)) {
+        let dispose: null | (() => void);
         const sig = signal<JSXElement>();
         dispose = observeSignal(props.when, (value) => {
             const content = getContent(!!value);
