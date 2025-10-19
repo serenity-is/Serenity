@@ -25,7 +25,7 @@
   ],
   "scripts": {
     "build": "node build/build",
-    "dts": "npx -yes dts-bundle-generator -o dist/index.d.ts src/index.ts --project=./tsconfig.json --no-banner --disable-symlinks-following",
+    "dts": "dts-bundle-generator -o dist/index.d.ts src/index.ts --project=./tsconfig.json --no-banner --disable-symlinks-following",
     "prepublishOnly": "pnpm build && pnpm run test --coverage && pnpm dts",
     "test": "pnpm build && vitest run",
     "tsc": "tsc"

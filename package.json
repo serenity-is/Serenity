@@ -4,6 +4,7 @@
     "@serenity-is/signals": "workspace:*",
     "@serenity-is/sleekdom": "workspace:*",
     "@vitest/coverage-v8": "catalog:serenity",
+    "dts-bundle-generator": "catalog:serenity",
     "esbuild": "catalog:serenity",
     "jsdom": "catalog:serenity",
     "typescript": "catalog:serenity",
