@@ -1,8 +1,8 @@
-import { className } from "./classname";
 import { setClassName } from "./jsx-set-classname";
 import { setStyleProperty } from "./jsx-set-style";
+import { observeSignalForNode } from "./observe-signal";
 import { nonPresentationSVGAttributes } from "./svg-consts";
-import { forEach, isObject, isSignalLike, isVisibleChild, keys, observeSignal } from "./util";
+import { forEach, isObject, isSignalLike, isVisibleChild, keys } from "./util";
 
 const XLinkNamespace = "http://www.w3.org/1999/xlink";
 const XMLNamespace = "http://www.w3.org/XML/1998/namespace";
@@ -254,10 +254,7 @@ function setProperty(node: Element & HTMLOrSVGElement, key: string, value: any, 
 }
 
 function setPropertyWithSignal(node: Element & HTMLOrSVGElement, key: string, signal: any) {
-    const dispose = observeSignal(signal, (value, prev) => setProperty(node, key, value, prev));
-    if (dispose) {
-        node.addEventListener("disposing", dispose, { once: true });
-    }
+    observeSignalForNode(signal, node, (value, prev) => setProperty(node, key, value, prev));
 }
 
 export function setProperties(node: HTMLElement | SVGElement, props: Record<string, any>) {

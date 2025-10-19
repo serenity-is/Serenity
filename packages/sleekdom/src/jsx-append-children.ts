@@ -1,7 +1,8 @@
+import { observeSignal } from "./observe-signal";
 import { attachRef } from "./ref";
 import { isShadowRoot } from "./shadow";
 import type { ComponentChildren, SignalLike } from "./types";
-import { isArrayLike, isElement, isNumber, isSignalLike, isString, observeSignal } from "./util";
+import { isArrayLike, isElement, isNumber, isSignalLike, isString } from "./util";
 
 function appendChild(parent: Node, child: Node) {
     if (parent instanceof window.HTMLTemplateElement) {

@@ -1,6 +1,7 @@
 export { className } from "./classname";
 export * from "./compat-api";
 export { Component } from "./component";
+export * from "./disposing-listener";
 export { Fragment } from "./fragment";
 export * from "./hooks";
 export { jsx, jsx as jsxs } from "./jsx-factory";

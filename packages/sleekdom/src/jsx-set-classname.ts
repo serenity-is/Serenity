@@ -1,5 +1,6 @@
 import { className } from "./classname";
-import { isArrayLike, isObject, isSignalLike, isString, isVisibleChild, observeSignal } from "./util";
+import { observeSignalForNode } from "./observe-signal";
+import { isArrayLike, isObject, isSignalLike, isString, isVisibleChild } from "./util";
 
 function clearPrevClass(node: Element & HTMLOrSVGElement, prev?: any): void {
     if (prev == null || prev === false || prev === true)
@@ -63,13 +64,10 @@ export function setClassName(node: Element & HTMLOrSVGElement, value?: any, prev
     if (isArrayLike(value) && Array.from(value).some(x => isSignalLike(x))) {
         value = Array.from(value).filter(x => {
             if (isSignalLike(x)) {
-                const dispose = observeSignal(x, (newVal, prev) => {
+                observeSignalForNode(x, node, (newVal, prev) => {
                     prev && Boolean(prev) && prev !== newVal && node.classList.remove(String(prev));
                     Boolean(newVal) && node.classList.add(String(newVal));
                 });
-                if (dispose) {
-                    node.addEventListener("disposing", dispose, { once: true });
-                }
                 return false;
             }
             return true;
@@ -89,12 +87,9 @@ export function setClassName(node: Element & HTMLOrSVGElement, value?: any, prev
         value = { ...value };
         Object.entries(value).forEach(([key, val]) => {
             if (isSignalLike(val)) {
-                const dispose = observeSignal(val, (newVal) => {
+                observeSignalForNode(val, node, (newVal) => {
                     node.classList.toggle(key, Boolean(newVal));
                 });
-                if (dispose) {
-                    node.addEventListener("disposing", dispose, { once: true });
-                }
                 delete value[key];
             }
         });
