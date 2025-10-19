@@ -1,4 +1,4 @@
-import type { ComponentChildren, JSXElement, SignalOrValue } from "@serenity-is/sleekdom";
+import { addDisposingListener, removeDisposingListener, type ComponentChildren, type JSXElement, type SignalOrValue } from "@serenity-is/sleekdom";
 import { signal } from "./signals";
 import { isSignalLike, observeSignal } from "./util";
 
@@ -7,22 +7,25 @@ export function Show<TWhen>(props: {
   fallback?: ComponentChildren;
   children: ComponentChildren | ((when: SignalOrValue<TWhen | undefined | null>) => ComponentChildren);
 }): JSXElement {
-
+    let dispose: null | (() => void);
     function getContent(flag: boolean): JSXElement {
-        if (typeof props.children === "function")
-            return props.children(props.when) as unknown as JSXElement;
-        
-        if (flag)
-            return props.children as unknown as JSXElement;
-
-        return props.fallback as unknown as JSXElement;
+        let content = props.children;
+        if (typeof content === "function")
+            content = content(props.when);
+        content = flag ? content : props.fallback;
+        content ??= new Text("");
+        return content as unknown as JSXElement;
     }
 
     if (isSignalLike(props.when)) {
         const sig = signal<JSXElement>();
-        observeSignal(props.when, (value) => {
-            sig.value = getContent(!!value);
+        dispose = observeSignal(props.when, (value) => {
+            const content = getContent(!!value);
+            if (sig.peek() !== content && dispose)
+                removeDisposingListener(sig.peek() as any, dispose);
+            sig.value = addDisposingListener(content, dispose);
         });
+        addDisposingListener(sig.peek() as any, dispose);
         return sig as unknown as JSXElement;
     }
 

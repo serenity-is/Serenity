@@ -5,9 +5,9 @@ import { SignalLike } from "@serenity-is/sleekdom";
  * - No dependency tracking, effects, or batching
  * - Synchronous notifications to subscribed listeners
  */
-export class TestSignal<T = any> implements SignalLike<T> {
+export class MockSignal<T = any> implements SignalLike<T> {
     _value: T;
-    _listeners: Array<(value: T) => void> = [];
+    listeners: Array<(value: T) => void> = [];
 
     constructor(initialValue?: T) {
         this._value = initialValue;
@@ -20,7 +20,7 @@ export class TestSignal<T = any> implements SignalLike<T> {
     set value(newValue: T) {
         if (this._value !== newValue) {
             this._value = newValue;
-            for (const listener of this._listeners) {
+            for (const listener of this.listeners) {
                 listener(newValue);
             }
         }
@@ -38,13 +38,13 @@ export class TestSignal<T = any> implements SignalLike<T> {
      */
     subscribe(callback: (value: T) => void): () => void {
         callback(this._value);
-        this._listeners.push(callback);
+        this.listeners.push(callback);
         return () => {
             this.unsubscribe(callback);
         };
     }
 
     unsubscribe(callback: (value: T) => void): void {
-        this._listeners = this._listeners.filter(listener => listener !== callback);
+        this.listeners = this.listeners.filter(listener => listener !== callback);
     }
 }
