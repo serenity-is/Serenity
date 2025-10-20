@@ -1,6 +1,6 @@
 import { className } from "./classname";
-import { observeSignalForNode } from "./observe-signal";
-import { isArrayLike, isObject, isSignalLike, isString, isVisibleChild } from "./util";
+import { isSignalLike, observeSignalForNode } from "./signal-util";
+import { isArrayLike, isObject, isString, isVisibleChild } from "./util";
 
 function clearPrevClass(node: Element & HTMLOrSVGElement, prev?: any): void {
     if (prev == null || prev === false || prev === true)

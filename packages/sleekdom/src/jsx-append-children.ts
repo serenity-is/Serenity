@@ -1,8 +1,9 @@
-import { observeSignal } from "./observe-signal";
+import { addDisposingListener } from "./disposing-listener";
 import { attachRef } from "./ref";
 import { isShadowRoot } from "./shadow";
+import { isSignalLike, observeSignal } from "./signal-util";
 import type { ComponentChildren, SignalLike } from "./types";
-import { isArrayLike, isElement, isNumber, isSignalLike, isString } from "./util";
+import { isArrayLike, isElement, isNumber, isString } from "./util";
 
 function appendChild(parent: Node, child: Node) {
     if (parent instanceof window.HTMLTemplateElement) {
@@ -39,9 +40,9 @@ function wrapAsNode(value: any): Node {
 
 function appendChildrenWithSignal(parent: Node, signal: SignalLike<any>) {
     let prevAsNode: Node;
-    observeSignal(signal, (value) => {
+    const dispose = observeSignal(signal, function(value) {
         if (prevAsNode === void 0) {
-            prevAsNode = wrapAsNode(value);
+            addDisposingListener(prevAsNode = wrapAsNode(value), this?.dispose);
             return;
         }
 
@@ -64,14 +65,14 @@ function appendChildrenWithSignal(parent: Node, signal: SignalLike<any>) {
                 (prevAsNode as any).replaceWith(valueAsNode);
             else
                 (prevAsNode.parentNode)?.replaceChild(valueAsNode, prevAsNode);
-            prevAsNode = comment;
+            prevAsNode = addDisposingListener(comment, this?.dispose);
         }
         else {
             if (typeof (prevAsNode as any).replaceWith === "function")
                 (prevAsNode as any).replaceWith(valueAsNode);
             else
                 (prevAsNode.parentNode)?.replaceChild(valueAsNode, prevAsNode);
-            prevAsNode = valueAsNode;
+            prevAsNode = addDisposingListener(valueAsNode, this?.dispose);
         }
     });
 
@@ -79,11 +80,11 @@ function appendChildrenWithSignal(parent: Node, signal: SignalLike<any>) {
         prevAsNode.firstChild instanceof Comment &&
         prevAsNode.firstChild.data.startsWith(fragmentPlaceholderPrefix)) {
         const o = prevAsNode;
-        prevAsNode = o.firstChild;
+        prevAsNode = addDisposingListener(o.firstChild, dispose);
         appendChildren(parent, o);
     }
     else
-        appendChildren(parent, prevAsNode as any);
+        appendChildren(parent, addDisposingListener(prevAsNode as any, dispose));
 }
 
 export function appendChildren(

@@ -1,5 +1,5 @@
-import { observeSignalForNode } from "./observe-signal"
-import { isNumber, isObject, isSignalLike, isString, keys } from "./util"
+import { isSignalLike, observeSignalForNode } from "./signal-util"
+import { isNumber, isObject, isString, keys } from "./util"
 
 /**
  * Copyright (c) Facebook, Inc. and its affiliates.

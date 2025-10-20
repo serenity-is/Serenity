@@ -1,5 +1,9 @@
 import { addDisposingListener } from "./disposing-listener";
-import { type SignalLike } from "./types";
+import { type EffectDisposer, type SignalLike } from "./types";
+
+export function isSignalLike(val: any): val is SignalLike<any> {
+    return val != null && typeof val === "object" && typeof val.subscribe === "function" && typeof val.peek === "function" && 'value' in val;
+}
 
 /**
  * This calls the callback whenever the signal value changes.
@@ -12,17 +16,32 @@ import { type SignalLike } from "./types";
  * @returns A function to dispose the effect if the signal library supports unsubscription
  */
 export function observeSignal<T>(signal: SignalLike<T>,
-    callback: ((value: T, prev: T, initial: boolean) => void)) {
-    let prev = signal.peek();
-    callback(prev, undefined, true);
+    callback: ((this: { dispose?: EffectDisposer }, value: T, prev: T, initial: boolean) => void)): EffectDisposer {
+    let prev: T;
     let immediate = true;
-    const dispose = signal.subscribe((value: any) => {
-        if (!immediate) {
-            callback(value, prev, false);
-            prev = value;
+    const dispose = signal.subscribe(function (this: { dispose?: EffectDisposer }, value: T) {
+        if (immediate) {
+            if (this.dispose) {
+                immediate = false;
+                callback.call(this, prev = value, undefined, true);
+                return;
+            }
+        }
+        else {
+            try {
+                callback.call({ dispose }, value, prev, false);
+            }
+            finally {
+                prev = value;
+            }
         }
     });
-    immediate = false;
+    if (immediate) {
+        immediate = false;
+        prev = signal.peek();
+        callback.call({ dispose }, prev, undefined, true);
+    }
+
     return dispose;
 }
 
@@ -40,3 +59,5 @@ export function observeSignalForNode<T>(signal: SignalLike<T>, node: EventTarget
         addDisposingListener(node, dispose);
     }
 }   
+
+

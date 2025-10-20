@@ -1,8 +1,8 @@
 import { setClassName } from "./jsx-set-classname";
 import { setStyleProperty } from "./jsx-set-style";
-import { observeSignalForNode } from "./observe-signal";
+import { isSignalLike, observeSignalForNode } from "./signal-util";
 import { nonPresentationSVGAttributes } from "./svg-consts";
-import { forEach, isObject, isSignalLike, isVisibleChild, keys } from "./util";
+import { forEach, isObject, isVisibleChild, keys } from "./util";
 
 const XLinkNamespace = "http://www.w3.org/1999/xlink";
 const XMLNamespace = "http://www.w3.org/XML/1998/namespace";

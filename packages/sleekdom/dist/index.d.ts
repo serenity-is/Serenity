@@ -28,10 +28,11 @@ export type RefObject<T> = {
 };
 export type RefCallback<T> = (instance: T) => void;
 export type Ref<T> = RefCallback<T> | RefObject<T> | null;
+export type EffectDisposer = (() => void) | null;
 export interface SignalLike<T> {
 	value: T;
 	peek(): T;
-	subscribe(fn: (value: T) => void): ((() => void) | null);
+	subscribe(fn: (value: T) => void): EffectDisposer;
 }
 export type SignalOrValue<T> = T | SignalLike<T>;
 export type ComponentChild = string | number | Iterable<ComponentChild> | Array<ComponentChild> | {
@@ -2886,6 +2887,28 @@ export type DataKeys = `data-${string}`;
 export declare function jsx<THtmlTag extends keyof HTMLElementTagNameMap, TElement extends HTMLElementTagNameMap[THtmlTag]>(type: THtmlTag, props?: (HTMLElementTags[THtmlTag] & Record<DataKeys, string | number>) | null, key?: string): TElement;
 export declare function jsx<TSvgTag extends (keyof SVGElementTagNameMap & keyof SVGElementTags), TElement extends SVGElementTagNameMap[TSvgTag]>(type: TSvgTag, props?: (SVGElementTags[TSvgTag] & Record<DataKeys, string | number>) | null, key?: string): TElement;
 export declare function jsx(type: string, props?: (ElementAttributes<JSXElement> & Record<DataKeys, string | number>) | null, key?: string): JSXElement;
+export declare function isSignalLike(val: any): val is SignalLike<any>;
+/**
+ * This calls the callback whenever the signal value changes.
+ * The callback is called immediately upon subscription, whether the signal library
+ * calls it immediately or not.
+ * @param signal Signal to observe
+ * @param callback Callback to call when the signal value changes with new and old value.
+ * It is called immediately with the current value as newValue and prevValue as undefined.
+ * The third parameter 'initial' is true when the callback is called immediately upon subscription.
+ * @returns A function to dispose the effect if the signal library supports unsubscription
+ */
+export declare function observeSignal<T>(signal: SignalLike<T>, callback: ((this: {
+	dispose?: EffectDisposer;
+}, value: T, prev: T, initial: boolean) => void)): EffectDisposer;
+/**
+ * Observes a signal and ties its lifecycle to a node by adding a disposing listener to the node
+ * if the signal library supports unsubscription.
+ * @param signal Signal to observe
+ * @param node Node to tie the signal's lifecycle to
+ * @param callback Callback to call when the signal value changes
+ */
+export declare function observeSignalForNode<T>(signal: SignalLike<T>, node: EventTarget, callback: ((value: T, prev: T, initial: boolean) => void)): void;
 export declare function ShadowRootNode({ children, ref, ...attr }: ShadowRootInit & {
 	ref?: Ref<ShadowRoot>;
 	children?: ComponentChildren;

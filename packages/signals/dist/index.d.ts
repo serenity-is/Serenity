@@ -2,7 +2,7 @@ import { ComponentChildren, JSXElement, SignalLike, SignalOrValue } from '@seren
 
 export declare function IfElse<TWhen>(props: {
 	when: SignalOrValue<TWhen | undefined | null>;
-	else?: ComponentChildren;
+	else?: ComponentChildren | ((when: SignalOrValue<TWhen | undefined | null>) => ComponentChildren);
 	children: ComponentChildren | ((when: SignalOrValue<TWhen | undefined | null>) => ComponentChildren);
 }): JSXElement;
 export interface Signal<T> extends SignalLike<T> {

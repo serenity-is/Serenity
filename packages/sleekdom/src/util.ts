@@ -38,10 +38,6 @@ export function isArrayLike(val: any): val is ArrayLike<any> {
     return isObject(val) && typeof val.length === "number" && typeof val.nodeType !== "number";
 }
 
-export function isSignalLike(val: any): val is SignalLike<any> {
-    return val != null && typeof val === "object" && typeof val.subscribe === "function" && typeof val.peek === "function" && 'value' in val;
-}
-
 // https://facebook.github.io/react/docs/jsx-in-depth.html#booleans-null-and-undefined-are-ignored
 // Emulate JSX Expression logic to ignore certain type of children or className.
 // though unexpected, true is also ignored as per react behavior.
