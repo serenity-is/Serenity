@@ -1,9 +1,8 @@
+import { isSignalLike, onElementDisposing } from "@serenity-is/sleekdom";
 import { describe, expect, it } from "vitest";
-import { MockSignal } from "./mocks/mock-signal";
-import { isSignalLike } from "../src/util";
-import { onElementDisposing } from "@serenity-is/sleekdom";
 import { IfElse } from "../src/if-else";
 import type { Signal } from "../src/signals";
+import { MockSignal } from "./mocks/mock-signal";
 
 describe("Show", () => {
     it("shows else content if when is false", () => {

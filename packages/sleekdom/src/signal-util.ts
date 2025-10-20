@@ -21,7 +21,7 @@ export function observeSignal<T>(signal: SignalLike<T>,
     let immediate = true;
     const dispose = signal.subscribe(function (this: { dispose?: EffectDisposer }, value: T) {
         if (immediate) {
-            if (this.dispose) {
+            if (this?.dispose) {
                 immediate = false;
                 callback.call(this, prev = value, undefined, true);
                 return;
