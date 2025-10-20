@@ -48,7 +48,8 @@ export function addDisposingListener<T extends EventTarget>(target: T, handler: 
     let listeners = disposingListeners.get(target);
     if (!listeners) {
         disposingListeners.set(target, listeners = []);
-        target.addEventListener("disposing", disposingEventListener, { once: true });
+        if (typeof target.addEventListener === "function")
+            target.addEventListener("disposing", disposingEventListener, { once: true });
     }
     listeners.push(handler);
     return target;
