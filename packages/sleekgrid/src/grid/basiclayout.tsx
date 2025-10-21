@@ -226,12 +226,12 @@ export const BasicLayout: { new(): LayoutEngine } = function (): LayoutEngine {
 
     const resizeCanvas = () => {
         var vs = host.getViewportInfo();
-        var _paneTopH = vs.height + vs.topPanelHeight + vs.headerRowHeight + vs.footerRowHeight;
         const options = host.getOptions();
         if (options.autoHeight) {
-            host.getContainerNode().style.height = (_paneTopH + vs.groupingPanelHeight +
-                parsePx(getComputedStyle(headerCols.parentElement).height)) + "px";
-            viewport.style.height = "";
+            const totalHeight = vs.groupingPanelHeight + vs.topPanelHeight + vs.headerRowHeight + vs.footerRowHeight +
+                vs.height + parsePx(getComputedStyle(headerCols.parentElement).height) + "px";
+
+            host.getContainerNode().style.height = totalHeight;
         }
         else
             viewport.style.height = vs.height + "px";

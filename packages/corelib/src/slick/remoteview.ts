@@ -1,4 +1,4 @@
-import { EventData, EventEmitter, Grid, Group, GroupItemMetadataProvider, GroupTotals, IGroupTotals, ItemMetadata } from "@serenity-is/sleekgrid";
+import { convertCompatFormatter, EventData, EventEmitter, Grid, Group, GroupItemMetadataProvider, GroupTotals, IGroupTotals, ItemMetadata, type FormatterContext } from "@serenity-is/sleekgrid";
 import { ListRequest, ListResponse, PagerTexts, ServiceOptions, ServiceResponse, htmlEncode, serviceCall } from "../base";
 import { AggregateFormatting } from "./aggregateformatting";
 import { IAggregator } from "./aggregators";
@@ -708,7 +708,7 @@ export class RemoteView<TItem = any> implements IRemoteView<TItem> {
             const gi = this.groupingInfos[group.level];
             if (!gi.displayTotalsRow) {
                 this.calculateTotals(group.totals);
-                group.title = gi.formatter ? gi.formatter(group) : htmlEncode(group.value);
+                group.formatValue = this.formatGroupValue;
             }
         }
         // if this is a totals row, make sure it's calculated
@@ -834,11 +834,11 @@ export class RemoteView<TItem = any> implements IRemoteView<TItem> {
         return this.groups;
     }
 
-    private getOrCreateGroup(groupsByVal: any, val: any, level: number, parentGroup: any, groups: any[]) {
+    private getOrCreateGroup(groupsByVal: Record<any, Group<TItem>>, val: any, level: number, parentGroup: any, groups: Group<TItem>[]) {
         let group = groupsByVal[val];
 
         if (!group) {
-            group = new Group<any>();
+            group = new Group<TItem>();
             group.value = val;
             group.level = level;
             group.groupingKey = (parentGroup ? parentGroup.groupingKey + groupingDelimiter : '') + val;
@@ -849,26 +849,26 @@ export class RemoteView<TItem = any> implements IRemoteView<TItem> {
         return group;
     }
 
-    private extractGroups(rows: any[], parentGroup?: any) {
-        let group: any;
+    private extractGroups(items: TItem[], parentGroup?: Group<TItem>): Group<TItem>[] {
+        let group: Group<TItem>;
         let val: any;
-        const groups: any[] = [];
-        const groupsByVal = {};
-        let r: any;
+        const groups: Group<TItem>[] = [];
+        const groupsByVal: Record<any, Group<TItem>> = {};
+        let item: TItem;
         const level = parentGroup ? parentGroup.level + 1 : 0;
-        const gi = this.groupingInfos[level];
+        const groupingInfo = this.groupingInfos[level];
 
-        for (let i1 = 0, l: number = gi.predefinedValues.length; i1 < l; i1++) {
-            val = gi.predefinedValues[i1];
+        for (let i1 = 0, l: number = groupingInfo.predefinedValues.length; i1 < l; i1++) {
+            val = groupingInfo.predefinedValues[i1];
             group = this.getOrCreateGroup(groupsByVal, val, level, parentGroup, groups);
         }
 
-        for (let i2 = 0, l = rows.length; i2 < l; i2++) {
-            r = rows[i2];
-            val = gi.getterIsAFn ? gi.getter(r) : r[gi.getter];
+        for (let i2 = 0, l = items.length; i2 < l; i2++) {
+            item = items[i2];
+            val = groupingInfo.getterIsAFn ? (groupingInfo.getter as any)(item) : (item as any)[groupingInfo.getter as string];
             group = this.getOrCreateGroup(groupsByVal, val, level, parentGroup, groups);
 
-            group.rows[group.count++] = r;
+            group.rows[group.count++] = item;
         }
 
         if (level < this.groupingInfos.length - 1) {
@@ -951,7 +951,7 @@ export class RemoteView<TItem = any> implements IRemoteView<TItem> {
             }
 
             g.collapsed = groupCollapsed !== !!toggledGroups[g.groupingKey];
-            g.title = gi.formatter ? gi.formatter(g) : htmlEncode(g.value);
+            g.formatValue = this.formatGroupValue;
         }
     }
 
@@ -1420,6 +1420,32 @@ export class RemoteView<TItem = any> implements IRemoteView<TItem> {
     /** @deprecated Gets the ID property name, for compatibility */
     get idField(): string {
         return this.idProperty;
+    }
+
+    private formatGroupValue = (ctx: FormatterContext<Group<TItem>>) => {
+        // note that grid calls the format function provided via getGroupRowMetadata
+        // so the ctx.item is always a Group and value of the group is in item.value, not ctx.value
+        // as ctx.value is set by the grid to ctx.item["__groupdisplaycolumnfield__"],
+        // so never use or rely on ctx.value here!        
+        if (!ctx.item || ctx.item.level == null) {
+            return ctx.escape(ctx.item?.value);
+        }
+
+        const gi = this.groupingInfos[ctx.item.level];
+        if (!gi) {
+            return ctx.escape(ctx.item?.value);
+        }
+
+        if (!gi.format && gi.formatter) {
+            const formatter = gi.formatter;
+            gi.format = convertCompatFormatter((_1, _2, _3, _4, item) => formatter(item));
+        }
+
+        if (gi.format) {
+            return gi.format(ctx);
+        } else {
+            return ctx.escape(ctx.item?.value);
+        }
     }
 }
 

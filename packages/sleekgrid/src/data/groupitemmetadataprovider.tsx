@@ -1,4 +1,4 @@
-import { Column, ColumnFormat, CompatFormatter, convertCompatFormatter, FormatterContext, FormatterResult, Group, IGroupTotals, ItemMetadata } from "../core";
+import { applyFormatterResultToCellNode, Column, ColumnFormat, CompatFormatter, convertCompatFormatter, FormatterContext, FormatterResult, Group, IGroupTotals, ItemMetadata } from "../core";
 import { ArgsCell, Grid, IPlugin } from "../grid";
 
 export interface GroupItemMetadataProviderOptions {
@@ -52,21 +52,35 @@ export class GroupItemMetadataProvider implements IPlugin {
         totalsFocusable: false
     }
 
-    public static defaultGroupFormat(ctx: FormatterContext, opt?: GroupItemMetadataProviderOptions) {
+    public static defaultGroupFormat(ctx: FormatterContext, opt?: GroupItemMetadataProviderOptions): FormatterResult {
+        // note that grid calls the format function provided via getGroupRowMetadata
+        // so the ctx.item is always a Group and value of the group is in item.value, not ctx.value
+        // as ctx.value is set by the grid to ctx.item["__groupdisplaycolumnfield__"],
+        // so never use or rely on ctx.value here!
         opt ??= GroupItemMetadataProvider.defaults;
-        let item = ctx.item as Group;
-        if (!opt.enableExpandCollapse)
-            return item?.title;
-        let indentation = item.level * opt.groupIndentation;
-        const span = document.createElement("span");
-        span.className = opt.toggleCssClass + " " + (item.collapsed ? opt.toggleCollapsedCssClass : opt.toggleExpandedCssClass);
-        span.style.marginLeft = indentation + "px";
-        const titleSpan = document.createElement("span");
-        titleSpan.className = opt.groupTitleCssClass;
-        titleSpan.setAttribute("level", item.level.toString());
-        titleSpan.textContent = item.title ?? "";
-        span.appendChild(titleSpan);
-        return span;
+        let group = ctx.item as Group;
+        let fmtResultTitle: FormatterResult;
+        if (group?.formatValue) {
+            fmtResultTitle = group.formatValue(ctx);
+        }
+        else {
+            fmtResultTitle = ctx.escape(group?.value);
+        }
+
+        if (!opt.enableExpandCollapse) {
+            return fmtResultTitle;
+        }
+
+        let indentation = group.level * opt.groupIndentation;
+        const titleSpan = <span class={opt.groupTitleCssClass} data-level={group.level.toString()}>
+            {fmtResultTitle}
+        </span> as HTMLElement;
+        applyFormatterResultToCellNode(ctx, fmtResultTitle, titleSpan, contentOnly);
+        return <>
+            <span class={opt.toggleCssClass + " " + (group.collapsed ? opt.toggleCollapsedCssClass : opt.toggleExpandedCssClass)}
+                style={"margin-left:" + indentation + "px"}></span>
+            {titleSpan}
+        </>
     }
 
     public static defaultTotalsFormat(ctx: FormatterContext, grid?: Grid): FormatterResult {
@@ -77,7 +91,7 @@ export class GroupItemMetadataProvider implements IPlugin {
         grid = ctx.grid ?? grid;
         const formatter = grid ? grid.getTotalsFormatter(ctx.column) :
             (ctx.column as any)?.groupTotalsFormatter ? convertCompatFormatter((ctx.column as any)?.groupTotalsFormatter) :
-            ctx.column.groupTotalsFormat;
+                ctx.column.groupTotalsFormat;
 
         if (formatter)
             return formatter(ctx);
@@ -174,7 +188,7 @@ export class GroupItemMetadataProvider implements IPlugin {
 
         const result = {
             cell: 0,
-            colspan: <number | "*">"*"
+            colspan: "*" as (number | "*")
         }
 
         if (!this.options.groupRowTotals ||
@@ -242,4 +256,8 @@ export class GroupItemMetadataProvider implements IPlugin {
         };
     }
 
+}
+
+const contentOnly = {
+    contentOnly: true
 }

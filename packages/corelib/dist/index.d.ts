@@ -3678,9 +3678,16 @@ export interface Formatter {
 	format(ctx: FormatterContext): FormatterResult;
 }
 export interface GroupInfo<TItem> {
-	getter?: any;
+	getter?: string | ((item: TItem) => any);
 	getterIsAFn?: boolean;
-	formatter?: (p1: Group<TItem>) => string;
+	/**
+	 * The format function for the group value. Note that the group item is in ctx.item and its value
+	 * is in ctx.item.value, not in ctx.value as it is set by the grid to ctx.item["__groupdisplaycolumnfield__"]
+	 * so never use or rely on ctx.value here!
+	 */
+	format?: (ctx: FormatterContext<Group<TItem>>) => FormatterResult;
+	/** @obsolete use format */
+	formatter?: (group: Group<TItem>) => string;
 	comparer?: (a: Group<TItem>, b: Group<TItem>) => number;
 	aggregators?: IAggregator[];
 	aggregateChildGroups?: boolean;
@@ -4387,6 +4394,7 @@ export declare class RemoteView<TItem = any> implements IRemoteView<TItem> {
 	setGroupItemMetadataProvider(value: GroupItemMetadataProvider): void;
 	/** @deprecated Gets the ID property name, for compatibility */
 	get idField(): string;
+	private formatGroupValue;
 }
 /**
  * Options for configuring a RemoteView instance

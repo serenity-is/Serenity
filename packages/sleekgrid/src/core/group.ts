@@ -1,4 +1,5 @@
 import { NonDataRow } from "./base";
+import type { FormatterContext, FormatterResult } from "./formatting";
 
 /***
  * Information about a group of rows.
@@ -26,13 +27,6 @@ export class Group<TEntity = any> extends NonDataRow {
      * @type {Object}
      */
     value: any;
-
-    /***
-     * Formatted display value of the group.
-     * @property title
-     * @type {String}
-     */
-    title: string;
 
     /***
      * Whether a group is collapsed.
@@ -70,6 +64,8 @@ export class Group<TEntity = any> extends NonDataRow {
      */
     groupingKey: string;
 
+    /** Returns a text representation of the group value. */
+    formatValue: (ctx: FormatterContext<Group<TEntity>>) => FormatterResult;
 
     /***
      * Compares two Group instances.
@@ -79,8 +75,7 @@ export class Group<TEntity = any> extends NonDataRow {
     equals(group: Group): boolean {
         return this.value === group.value &&
             this.count === group.count &&
-            this.collapsed === group.collapsed &&
-            this.title === group.title;
+            this.collapsed === group.collapsed;
     }
 }
 

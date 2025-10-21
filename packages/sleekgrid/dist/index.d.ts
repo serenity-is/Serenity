@@ -333,12 +333,6 @@ export declare class Group<TEntity = any> extends NonDataRow {
 	 */
 	value: any;
 	/***
-	 * Formatted display value of the group.
-	 * @property title
-	 * @type {String}
-	 */
-	title: string;
-	/***
 	 * Whether a group is collapsed.
 	 * @property collapsed
 	 * @type {Boolean}
@@ -369,6 +363,8 @@ export declare class Group<TEntity = any> extends NonDataRow {
 	 * @type {Object}
 	 */
 	groupingKey: string;
+	/** Returns a text representation of the group value. */
+	formatValue: (ctx: FormatterContext<Group<TEntity>>) => FormatterResult;
 	/***
 	 * Compares two Group instances.
 	 * @return {Boolean}
@@ -1523,7 +1519,7 @@ export declare class GroupItemMetadataProvider implements IPlugin {
 	private options;
 	constructor(opt?: GroupItemMetadataProviderOptions);
 	static readonly defaults: GroupItemMetadataProviderOptions;
-	static defaultGroupFormat(ctx: FormatterContext, opt?: GroupItemMetadataProviderOptions): string | HTMLSpanElement;
+	static defaultGroupFormat(ctx: FormatterContext, opt?: GroupItemMetadataProviderOptions): FormatterResult;
 	static defaultTotalsFormat(ctx: FormatterContext, grid?: Grid): FormatterResult;
 	init(grid: Grid): void;
 	readonly pluginName = "GroupItemMetadataProvider";
@@ -1534,7 +1530,7 @@ export declare class GroupItemMetadataProvider implements IPlugin {
 	handleGridKeyDown: (e: KeyboardEvent, args: ArgsCell) => void;
 	groupCellPosition: () => {
 		cell: number;
-		colspan: number | "*";
+		colspan: (number | "*");
 	};
 	getGroupRowMetadata: ((item: Group) => ItemMetadata);
 	getTotalsRowMetadata: ((item: IGroupTotals) => ItemMetadata);
