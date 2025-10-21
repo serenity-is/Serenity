@@ -1,0 +1,83 @@
+---
+title: 'Formatters'
+
+demonstrates:
+- width, minWidth, maxWidth, resizable, cssClass column attributes
+- custom column formatters
+- an extended formatter setting { addClass, tooltip } context properties, allowing adding classes and a tooltip to the cell.
+
+requires_scripts:
+- dist/compat/slick.editors.js
+- dist/compat/slick.formatters.js
+---
+
+<div id="myGrid"></div>
+
+<script>
+    // a custom formatter returns a HTML string.
+    // you should use ctx.escape() instead of ctx.value to avoid script injection attacks!
+    // ctx (formatter context) contains the escape helper, value, item (data item), row, cell, column, grid properties
+    function linkFormatter(ctx) {
+        return `<a href='#' tabindex='0'>${ctx.escape()}</a>`;
+    }
+
+    // a formatter can optionally set { addClass, tooltip } in context (to be applied to the cell node)
+    function statusFormatter(ctx) {
+        if (ctx.value !== null && ctx.value !== "") {
+            if (ctx.value < 33) {
+                ctx.addClass = "text-danger";
+                ctx.tooltip = "danger zone";
+            } else if (ctx.value < 66) {
+                ctx.addClass = "text-warning";
+                ctx.tooltip = "might want to look at it";
+            } else {
+                ctx.addClass = "text-success";
+                ctx.tooltip = "all good";
+            }
+        }
+        return ctx.escape();
+    }
+
+    var grid;
+    var data = [];
+    var columns = [
+        { field: "title", width: 120, cssClass: "cell-title", format: linkFormatter },
+        { field: "duration" },
+        { field: "percentComplete", name: "% Complete", width: 100, resizable: false, format: Slick.PercentCompleteBarFormatter },
+        { field: "percentComplete", id: "status", name: "Status", width: 70, resizable: false, format: statusFormatter, editor: Slick.TextEditor },
+        { field: "start", minWidth: 90 },
+        { field: "finish", minWidth: 90 },
+        { field: "effortDriven", sortable: false, width: 100, minWidth: 20, maxWidth: 100, cssClass: "cell-effort-driven", format: Slick.CheckmarkFormatter }
+    ];
+
+    for (var i = 0; i < 100; i++) {
+        var d = (data[i] = {});
+
+        d["title"] = "Task " + i;
+        d["duration"] = "5 days";
+        d["percentComplete"] = Math.min(100, Math.round(Math.random() * 110));
+        d["start"] = "01/01/2022";
+        d["finish"] = "01/05/2022";
+        d["effortDriven"] = (i % 3 == 0);
+    }
+
+    grid = new Slick.Grid("#myGrid", data, columns, {
+        editable: true,
+        enableAddRow: false,
+        enableCellNavigation: true
+    });
+</script>
+
+<style>
+    .slick-cell a {
+        color: var(--bs-body-color);
+    }
+
+    .cell-title {
+        font-weight: bold;
+    }
+
+    .cell-effort-driven {
+        text-align: center;
+    }
+</style>

@@ -1,0 +1,10 @@
+{% if page.controls %}
+<div class="example-controls mb-4">
+    <h3>Controls:</h3>
+    <div>
+        {% for c in page.controls %}
+        {{ c }}
+        {% endfor %}
+    </div>
+</div>
+{% endif %}

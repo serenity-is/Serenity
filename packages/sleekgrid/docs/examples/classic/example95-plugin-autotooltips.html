@@ -1,0 +1,39 @@
+---
+title: 'AutoTooltips Plugin'
+about: 'Resize the columns until see ellipsis in column or header. Hover over cell to see tooltip.'
+demonstrates:
+- AutoTooltips plugin
+
+requires_scripts:
+- dist/compat/plugins/slick.autotooltips.js
+---
+
+<div id="myGrid"></div>
+
+<script>
+    const data = [];
+    for (var i = 0; i < 500; i++) {
+        data[i] = {
+            title: "Task " + i + " with some long text",
+            duration: "5 days",
+            percentComplete: Math.round(Math.random() * 100),
+            start: "01/01/2022",
+            finish: "01/05/2022",
+            effortDriven: (i % 5 == 0)
+        };
+    }
+
+    const columns = [
+        { field: "title" },
+        { field: "duration" },
+        { field: "percentComplete", name: "% Complete", width: 90 },
+        { field: "start", width: 100 },
+        { field: "finish", width: 100 },
+        { field: "effortDriven", width: 100 }
+    ];
+
+    var grid = new Slick.Grid("#myGrid", data, columns, {});
+    grid.registerPlugin(new Slick.AutoTooltips({
+        enableForHeaderCells: true
+    }));
+</script>

@@ -1,0 +1,10 @@
+{% if page.demonstrates %}
+<div class="example-demonstrates mb-4">
+    <h3>Demonstrates:</h3>
+    <ul>
+        {% for d in page.demonstrates %}
+        <li>{{ d }}</li>
+        {% endfor %}
+    </ul>
+</div>
+{% endif %}

@@ -1,0 +1,198 @@
+---
+title: Modal Editor Form
+
+demonstrates:
+- using a CompositeEditor to implement modal item edit form
+
+controls:
+- <button onclick="openDetails()">Open Item Edit for active row</button>
+
+requires_scripts:
+- dist/compat/slick.editors.js
+- dist/compat/slick.formatters.js
+
+requires_slick_scripts:
+- slick.compositeeditor.js
+---
+
+<div id="myGrid"></div>
+
+<script>
+    function requiredFieldValidator(value) {
+        if (value == null || value == undefined || !value.length) {
+            return { valid: false, msg: "This is a required field" };
+        } else {
+            return { valid: true, msg: null };
+        }
+    }
+
+    function itemDetailsTemplate(args) {
+        return (
+`<div class='item-details-form'>
+    ${args.columns.map(x =>
+        `<div class='item-details-label'>${x.name}</div>
+         <div class='item-details-editor-container' data-editorid='${x.id}'></div>`).join('\n')}
+    <hr/>
+    <div class='item-details-form-buttons'>
+      <button data-action='save'>Save</button>
+      <button data-action='cancel'>Cancel</button>
+    </div>
+</div>`);
+    }
+
+    var grid;
+    var columns = [
+        { field: "title", width: 120, cssClass: "cell-title", editor: Slick.TextEditor, validator: requiredFieldValidator },
+        { field: "description", width: 150, editor: Slick.TextEditor },
+        { field: "duration", editor: Slick.TextEditor },
+        { field: "percentComplete", name: "% Complete", width: 100, resizable: false, format: Slick.PercentCompleteBarFormatter, editor: Slick.PercentCompleteEditor },
+        { field: "start", minWidth: 110, editor: Slick.Editors.Date },
+        { field: "finish", minWidth: 110, editor: Slick.Editors.Date },
+        { field: "effortDriven", width: 80, minWidth: 20, maxWidth: 80, cssClass: "cell-effort-driven", format: Slick.CheckboxFormatter, editor: Slick.CheckboxEditor }
+    ];
+
+    function openDetails() {
+        if (grid.getEditorLock().isActive() && !grid.getEditorLock().commitCurrentEdit()) {
+            return;
+        }
+
+        var modal = document.createElement('div');
+        modal.className = 'item-details-form';
+        modal.innerHTML = itemDetailsTemplate({
+            context: grid.getDataItem(grid.getActiveCell().row),
+            columns: columns
+        });
+        document.body.appendChild(modal);
+
+        modal.addEventListener('keydown', function (e) {
+            if (e.which == Slick.keyCode.ENTER) {
+                grid.getEditController().commitCurrentEdit();
+                e.stopPropagation();
+                e.preventDefault();
+            } else if (e.which == Slick.keyCode.ESCAPE) {
+                grid.getEditController().cancelCurrentEdit();
+                e.stopPropagation();
+                e.preventDefault();
+            }
+        });
+
+        modal.querySelector("[data-action=save]").addEventListener('click', function () {
+            grid.getEditController().commitCurrentEdit();
+        });
+
+        modal.querySelector("[data-action=cancel]").addEventListener('click', function () {
+            grid.getEditController().cancelCurrentEdit();
+        });
+
+        var containers = columns.map(c => modal.querySelector("[data-editorid=" + c.id + "]"));
+
+        var compositeEditor = new Slick.CompositeEditor(
+            columns,
+            containers,
+            {
+                destroy: function () {
+                    modal.remove();
+                }
+            }
+        );
+
+        grid.editActiveCell(compositeEditor);
+    }
+
+    var data = [];
+    for (var i = 0; i < 500; i++) {
+        var d = (data[i] = {});
+
+        d["title"] = "Task " + i;
+        d["description"] = "This is a sample task description.\n  It can be multiline";
+        d["duration"] = "5 days";
+        d["percentComplete"] = Math.round(Math.random() * 100);
+        d["start"] = "01/01/2009";
+        d["finish"] = "01/05/2009";
+        d["effortDriven"] = (i % 5 == 0);
+    }
+
+    grid = new Slick.Grid("#myGrid", data, columns, {
+        editable: true,
+        enableAddRow: true,
+        enableCellNavigation: true,
+        asyncEditorLoading: false,
+        autoEdit: false
+    });
+
+    grid.onAddNewRow.subscribe(function (e, args) {
+        var item = args.item;
+        var column = args.column;
+        grid.invalidateRow(data.length);
+        data.push(item);
+        grid.updateRowCount();
+        grid.render();
+    });
+
+
+    grid.onValidationError.subscribe(function (e, args) {
+        // handle validation errors originating from the CompositeEditor
+        if (args.editor && (args.editor instanceof Slick.CompositeEditor)) {
+            var err;
+            var idx = args.validationResults.errors.length;
+            while (idx--) {
+                err = args.validationResults.errors[idx];
+                err.container.classList.add('highlight-red');
+            }
+        }
+    });
+
+    grid.setActiveCell(0, 0);
+</script>
+
+
+<style>
+    .cell-title {
+        font-weight: bold;
+    }
+
+    .cell-effort-driven {
+        text-align: center;
+    }
+
+    .item-details-form {
+        z-index: 10000;
+        display: inline-block;
+        border: 1px solid black;
+        margin: 8px;
+        padding: 10px;
+        background: #efefef;
+        box-shadow: 0px 0px 15px black;
+        position: absolute;
+        top: 10px;
+        left: 150px;
+    }
+
+    .item-details-form-buttons {
+        float: right;
+    }
+
+    .item-details-label {
+        margin-left: 10px;
+        margin-top: 20px;
+        display: block;
+        font-weight: bold;
+    }
+
+    .item-details-editor-container {
+        width: 300px;
+        height: calc(1.5em + var(--slick-padding-v) * 2 + 2);
+        border: 1px solid silver;
+        background: white;
+        display: block;
+        margin: 10px;
+        margin-top: 4px;
+        padding: var(--slick-padding-v) var(--slick-padding-h);
+    }
+
+    .item-details-editor-container .editor-text {
+        border: 0;
+        outline: 0;
+        width: 100%;
+    }
+</style>

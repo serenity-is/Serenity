@@ -1,0 +1,83 @@
+---
+title: 'Events'
+
+demonstrates:
+- handling events from the grid
+- right-click the row to open the context menu
+- click the priority cell to toggle values
+
+requires_scripts:
+- dist/compat/slick.editors.js
+---
+
+<div id="myGrid"></div>
+
+<div id="contextMenu" class="dropdown-menu slick-hidden">
+    <b class="p-2">Set priority:</b>
+    <a class="dropdown-item ps-4" href="#" data-priority="Low">Low</a>
+    <a class="dropdown-item ps-4" href="#" data-priority="Medium">Medium</a>
+    <a class="dropdown-item ps-4" href="#" data-priority="High">High</a>
+</div>
+
+<script>
+    var data = [];
+    for (var i = 0; i < 100; i++) {
+        data.push({
+            title: "Task " + i,
+            priority: "Medium"
+        })
+    }
+
+    var columns = [
+        { field: "title", width: 200, cssClass: "cell-title", editor: Slick.TextEditor },
+        { field: "priority", width: 80, selectable: false, resizable: false }
+    ];
+
+    var grid = new Slick.Grid("#myGrid", data, columns, {
+        editable: true,
+        enableAddRow: false,
+        enableCellNavigation: true,
+        asyncEditorLoading: false,
+        rowHeight: 30
+    });
+
+    const contextMenu = document.getElementById('contextMenu');
+
+    function hideContextMenu() {
+        contextMenu.classList.add('slick-hidden');
+        document.body.removeEventListener('click', hideContextMenu);
+    }
+
+    grid.onContextMenu.subscribe(function (e) {
+        e.preventDefault();
+        var cell = grid.getCellFromEvent(e);
+        contextMenu.dataset.row = cell.row;
+        contextMenu.style.top = e.pageY + 'px';
+        contextMenu.style.left = e.pageX + 'px';
+        contextMenu.classList.remove('slick-hidden');
+        document.body.addEventListener('click', hideContextMenu);
+    });
+
+    grid.onClick.subscribe(function (e) {
+        var cell = grid.getCellFromEvent(e);
+        if (grid.getColumns()[cell.cell].id == "priority") {
+            if (!grid.getEditorLock().commitCurrentEdit()) {
+                return;
+            }
+
+            var states = { "Low": "Medium", "Medium": "High", "High": "Low" };
+            data[cell.row].priority = states[data[cell.row].priority];
+            grid.updateRow(cell.row);
+            e.stopPropagation();
+        }
+    });
+
+    contextMenu.addEventListener('click', function(e) {
+        if (!e.target.matches('[data-priority]') || !grid.getEditorLock().commitCurrentEdit())
+            return;
+        var row = parseInt(this.dataset.row);
+        data[row].priority = e.target.dataset.priority;
+        grid.updateRow(row);
+    });
+
+</script>

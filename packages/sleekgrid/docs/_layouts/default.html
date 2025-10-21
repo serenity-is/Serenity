@@ -1,0 +1,15 @@
+<!doctype html>
+<html lang="en">
+
+<head>
+    {% include _layout_head.html %}
+</head>
+
+<body>
+    <section class="container container-xl">
+        <h1 class="page-title">{{ page.title }}</h1>
+        {{ content }}
+        {% include _layout_footer.html %}
+    </section>
+    {% include _layout_js.html %}
+</html>

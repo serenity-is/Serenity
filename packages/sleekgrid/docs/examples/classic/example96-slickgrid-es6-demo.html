@@ -1,0 +1,501 @@
+---
+title: 'SlickGrid-ES6 Demo'
+about: 'This is a reimplementation of <a href="https://dimitarchristoff.github.io/slickgrid-example">slickgrid-es6 sample</a>.'
+fullwidth: true
+
+demonstrates:
+- General setup, sorting, resizing, filtering
+- Editing, custom editors (money etc.)
+- Custom renderers (computed columns like A * B), styling
+- Custom preact components in cells and filters
+- Ticking prices/updates via data view layer
+
+requires_scripts:
+- dist/compat/slick.editors.js
+
+requires_slick_scripts:
+- slick.dataview.js
+- plugins/slick.checkboxselectcolumn.js
+- plugins/slick.rowselectionmodel.js
+---
+<script src="https://cdn.jsdelivr.net/npm/preact@10.10.0/dist/preact.umd.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/preact@10.10.0/hooks/dist/hooks.umd.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/preact@10.10.0/compat/dist/compat.umd.js"></script>
+<script>var React = preactCompat</script> <!-- Required for React Sparklines -->
+<script src="https://cdn.jsdelivr.net/npm/react-sparklines@1.7.0/build/index.min.js"></script>
+<link href="https://cdn.jsdelivr.net/npm/flag-icons@6.6.4/css/flag-icons.min.css" rel="stylesheet">
+
+<style>
+    .slick-cell.full-size {
+        padding: 0;
+    }
+
+    .amount {
+        text-align: right;
+    }
+
+    div.up, div.down {
+        display: flex;
+        align-items: center;
+    }
+
+    div.up::before, div.down::before {
+        font-family: 'Font Awesome 5 Free';
+        font-weight: 900;
+        margin-right: auto;
+    }
+
+    div.up::before {
+        content: "\f077";
+        color: blue;
+    }
+
+    div.down::before {
+        content: "\f078";
+        color: orange;
+    }
+
+    div.green {
+        color: darkgreen;
+    }
+
+    div.red {
+        color: maroon;
+    }
+
+    progress {
+        width: 100%;
+    }
+
+    input.range {
+        width: 100%;
+    }
+</style>
+
+<div id="Home"></div>
+
+<script type="module">
+    import { randCompanyName, randFutureDate, randNumber } from 'https://cdn.jsdelivr.net/npm/@ngneat/falso@6.1.0/+esm';
+
+    const H = preact.createElement;
+
+    const makeArray = (l, cb) => {
+        const r = [];
+        for (var i = 0; i < l; i++)
+            r.push(cb(i));
+        return r;
+    }
+
+    const formatDate = (d) => {
+        if (d == null)
+            return '';
+
+        return $.datepicker.formatDate($.datepicker.regional[""].dateFormat, d);
+    }
+
+    const formatNumber = (n, m) => {
+        if (n == null)
+            return "";
+        if (typeof n !== "number")
+            n = parseFloat(n);
+
+        var s = n.toFixed(m).split('.');
+        return s[0].replace(/\B(?=(\d{3})+(?!\d))/g, ",") + (s.length > 1 ? ('.' + s[1]) : '');
+    }
+
+    const debounce = (func, delay) => {
+        let debounceTimer
+        return function() {
+            const context = this;
+            const args = arguments;
+            clearTimeout(debounceTimer);
+            debounceTimer = setTimeout(() => func.apply(context, args), delay);
+        }
+    }
+
+    const amountFormatter = (ctx) => `<div class="${ctx.value < 500 ? 'green' : 'red'}">$ ${ctx.escape(formatNumber(ctx.value, 2))}</div>`
+
+    const pipFormatter = (ctx) => `<div class="${ctx.escape(ctx.item.direction)}">${ctx.escape(formatNumber(ctx.value, 2))}</div>`;
+
+    const imageFormatter = (ctx) => `<img src="${ctx.escape()}" />`;
+
+    const dateFormatter = (ctx) => ctx.escape(formatDate(new Date(ctx.value)));
+
+    const totalFormatter = (ctx) => '$' + ctx.escape(formatNumber(ctx.item.price * ctx.item.amount, 2));
+
+    const healthFormatter = (ctx) => {
+        const className = ctx.value > 66 ? 'danger' : ''
+        return `<progress value="${ctx.escape()}" max="100" class="${className}">${ctx.escape()}</progress>`
+    }
+
+    const countryFormatter = (ctx) => {
+        const val = ctx.value.substr(0, 2).toLocaleLowerCase()
+        return `<span class="fi fi-${ctx.escape(val)}"></span> ${ctx.escape()}`
+    }
+
+    const style = { stroke: "black", fill: "none" }
+    const dummy = document.createElement('div')
+
+    const historicRenderer = (value, node) => {
+        const S = ReactSparklines;
+        return preact.render(
+            H(S.Sparklines,
+                {
+                    data: value,
+                    limit: 15,
+                    width: 128,
+                    height: 30,
+                    margin: 0
+                },
+                H(S.SparklinesLine,
+                    {
+                        style: style,
+                    }),
+                H(S.SparklinesReferenceLine, null, []),
+                H(S.SparklinesSpots, null, [])), dummy);
+    }
+
+    const historicSyncFormatter = (ctx) => {
+        dummy.innerHTML = '';
+        historicRenderer(ctx.value, dummy);
+        const html = dummy.innerHTML;
+        preact.render(null, dummy);
+        return html;
+    }
+
+    const rates = {
+        "AUD": 1.7443,
+        "CAD": 1.7643,
+        "CHF": 1.2963,
+        "JPY": 146.4,
+        "USD": 1.2854,
+        "EUR": 1.1836
+    }
+
+    const morphRate = (symbol, noSave) => {
+        const rate = rates[symbol];
+        const diff = rate / 100 * random(1, 25) / 100;
+        const newRate = random(0, 1) ? rate + diff : rate - diff;
+        noSave || (rates[symbol] = newRate)
+        return newRate
+    }
+
+    const checkboxSelector = new Slick.CheckboxSelectColumn({
+        cssClass: "slick-cell-checkboxsel"
+    });
+
+    const options = {
+        rowHeight: 32,
+        editable: true,
+        enableAddRow: !true,
+        enableCellNavigation: true,
+        autoEdit: false,
+        showHeaderRow: true,
+        headerRowHeight: 32,
+        explicitInitialization: true,
+        forceFitColumns: true
+    };
+
+    const columnFilters = {};
+    let healthValue = 0
+
+    // data view
+    const view = new Slick.Data.DataView();
+    view.setFilter(item => {
+        let pass = true;
+
+        for (let key in item) {
+            pass = pass && item.health >= healthValue
+            if (key in columnFilters && columnFilters[key].length && key !== 'health') {
+                pass = pass && String(item[key]).match(new RegExp(columnFilters[key], 'ig'));
+            }
+        }
+        return pass;
+    });
+
+    view.getItemMetadata = index => {
+        const row = view.getItem(index);
+        return row.type === 'BUY' ? { cssClasses: 'buy' } : { cssClasses: '' }
+    }
+
+    const columns = [
+        {
+            ...checkboxSelector.getColumnDefinition(),
+        },
+        {
+            field: 'type',
+            sortable: true,
+            width: 60,
+            minWidth: 60,
+            maxWidth: 60
+        },
+        {
+            field: 'counterparty',
+            minWidth: 100,
+            maxWidth: 200,
+            cssClass: 'slick-editable',
+            editor: Slick.TextEditor,
+            sortable: true
+        },
+        {
+            field: 'currency',
+            name: 'CUR',
+            minWidth: 70,
+            maxWidth: 70,
+            sortable: true,
+            format: countryFormatter,
+        },
+        {
+            field: 'price',
+            id: 'price',
+            headerCssClass: 'amount',
+            cssClass: 'amount',
+            format: pipFormatter,
+            sortable: true,
+            minWidth: 80,
+            maxWidth: 80
+        },
+        {
+            field: 'historic',
+            rerenderOnResize: true,
+            format: historicSyncFormatter,
+            cssClass: 'full-size',
+            minWidth: 128,
+            maxWidth: 128
+        },
+        {
+            field: 'amount',
+            headerCssClass: 'amount',
+            cssClass: 'amount slick-editable',
+            sortable: true,
+            format: amountFormatter,
+            editor: Slick.TextEditor,
+            minWidth: 80,
+            maxWidth: 80
+        },
+        {
+            field: 'total',
+            headerCssClass: 'amount',
+            cssClass: 'amount',
+            format: totalFormatter,
+            minWidth: 90,
+            maxWidth: 100
+        },
+        {
+            field: 'paymentDate',
+            name: 'Execution',
+            sortable: true,
+            minWidth: 105,
+            maxWidth: 105,
+            cssClass: 'slick-editable amount',
+            headerCssClass: 'amount',
+            format: dateFormatter,
+            editor: Slick.DateEditor
+        },
+        {
+            field: 'health',
+            cssClass: 'is-hidden-mobile',
+            headerCssClass: 'is-hidden-mobile',
+            format: healthFormatter,
+            sortable: true
+        }
+    ];
+
+    function random(min, max) {
+        min = Math.ceil(min);
+        max = Math.floor(max + 1);
+        return Math.floor(Math.random() * (max - min) + min);
+    }
+
+    const sample = (arr) => arr[random(0, arr.length - 1)];
+
+    // fake data
+    view.setItems(makeArray(300, id => {
+        const currency = sample(['USD', 'AUD', 'CAD', 'EUR', 'JPY', 'CHF']);
+        const data = {
+            id,
+            type: sample(['BUY', 'SELL']),
+            counterparty: randCompanyName(),
+            health: random(0, 100),
+            currency,
+            amount: randNumber({ min: 100, max: 1000, fraction: 2 }),
+            price: rates[currency],
+            paymentDate: formatDate(randFutureDate())
+        };
+
+        data.historic = [data.price]
+        return data
+    }));
+
+    class Filter extends React.Component {
+
+        handleChange = ({ target }) => {
+            const value = target.value.trim()
+            if (value.length) {
+                this.props.columnFilters[this.props.columnId] = value;
+            }
+            else {
+                delete this.props.columnFilters[this.props.columnId]
+            }
+
+            this.props.view.refresh()
+        }
+
+        render() {
+            return H('input',
+                {
+                    defaultValue: this.props.columnFilters[this.props.columnId],
+                    type: 'text',
+                    className: 'slick-editor-text',
+                    onChange: this.handleChange
+                });
+        }
+    }
+
+    class Home extends preact.Component {
+
+        rates = Object.keys(rates)
+
+        historic = this.rates.reduce((acc, cur) => {
+            acc[cur] = [rates[cur]]
+            return acc
+        }, {})
+
+        handleResize = () => {
+            this.grid.setColumns(columns)
+        }
+
+        state = {
+            editing: null
+        }
+
+        componentDidMount = () => {
+            const grid = this.grid = new Slick.Grid(this.gridEl, view, columns, options);
+            columns[7].format = columns[7].format.bind(this.grid)
+
+            grid.setSelectionModel(new Slick.RowSelectionModel({ selectActiveRow: false }));
+            grid.registerPlugin(checkboxSelector);
+
+            const changeFilter = debounce(value => {
+                healthValue = value
+                view.refresh()
+            }, 500)
+
+            grid.onHeaderRowCellRendered.subscribe((e, { node, column }) => {
+                if (['_checkbox_selector', 'historic', 'health'].indexOf(column.id) === -1) {
+                    preact.render(
+                        H(Filter,
+                            {
+                                columnId: column.id,
+                                columnFilters: columnFilters,
+                                view
+                            }), node);
+                    node.classList.add('slick-editable');
+                }
+                else if (column.id === 'health') {
+                    preact.render(
+                        H('input', {
+                            className: 'range',
+                            defaultValue: healthValue,
+                            type: 'range',
+                            onChange: e => changeFilter(e.target.value)
+                        }), node);
+                }
+                else {
+                    node.classList.add('slick-uneditable');
+                }
+                if (column.id === '_checkbox_selector') {
+                    node.innerHTML = '<i class="fa fa-filter" />';
+                }
+            });
+
+            grid.onSort.subscribe(function (e, args) {
+                // args.multiColumnSort indicates whether or not this is a multi-column sort.
+                // If it is, args.sortCols will have an array of {sortCol:..., sortAsc:...} objects.
+                // If not, the sort column and direction will be in args.sortCol & args.sortAsc.
+
+                // We'll use a simple comparer function here.
+                const comparer = function (a, b) {
+                    return (a[args.sortCol.field] > b[args.sortCol.field]) ? 1 : -1;
+                }
+
+                // Delegate the sorting to DataView.
+                // This will fire the change events and update the grid.
+                view.sort(comparer, args.sortAsc);
+            });
+
+            view.onRowCountChanged.subscribe(() => {
+                grid.updateRowCount();
+                grid.render();
+            });
+
+            grid.onBeforeEditCell.subscribe((e, { item }) => {
+                this.setState({ editing: item });
+            });
+
+            grid.onBeforeCellEditorDestroy.subscribe(() => this.setState({ editing: null }));
+
+            grid.onCellChange.subscribe((e, { item }) => {
+                view.updateItem(item.id, item)
+            })
+
+            view.onRowsChanged.subscribe((e, { rows }) => {
+                grid.invalidateRows(rows);
+                grid.render();
+            });
+
+            grid.init();
+
+            window.addEventListener('resize', this.handleResize);
+
+            this.mutate();
+        }
+
+        mutate = () => {
+            const currency = sample(this.rates);
+            const price = morphRate(currency);
+
+            this.historic[currency].push(price);
+            this.historic[currency].length > 15 && this.historic[currency].shift()
+
+            view.getItems().forEach(item => {
+                if (this.state.editing && item.id === this.state.editing.id)
+                    return;
+
+                if (item.currency === currency) {
+                    const row = view.getRowById(item.id);
+                    const dir = price > item.price ? 'up' : 'down';
+                    if (price !== item.price || item.direction !== dir) {
+                        item.direction = dir;
+                        item.price = price;
+                        item.historic = this.historic[currency];
+                        this.grid.updateCell(row, this.grid.getColumnIndex("price"));
+                        this.grid.updateCell(row, this.grid.getColumnIndex("total"));
+                        this.grid.updateCell(row, this.grid.getColumnIndex("historic"));
+                    }
+                }
+            })
+
+            this._timer = setTimeout(this.mutate, random(100, 1000));
+        }
+
+        componentWillUnmount = () => {
+            clearTimeout(this._timer);
+            grid.destroy();
+            window.removeEventListener('resize', this.handleResize);
+        }
+
+        render = () => {
+            return H("div", {
+                style: "height: " + this.props.containerHeight + "px"
+            },
+                H("div", {
+                    id: "myGrid",
+                    className: "slickgrid-container",
+                    ref: el => this.gridEl = el
+                }));
+        }
+    }
+
+    preact.render(H(Home), document.getElementById('Home'));
+</script>

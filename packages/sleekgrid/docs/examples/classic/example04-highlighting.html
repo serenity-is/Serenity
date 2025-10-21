@@ -1,0 +1,115 @@
+---
+title: 'Highlighting and flashing'
+
+about: 'This example simulates a real-time display of CPU utilization in a web farm. Data is updated in real-time, and
+cells with changed data are highlighted. You can also click "Find current server" to scroll the row displaying data for
+the current server into view and flash it.'
+
+demonstrates:
+- setHighlightedCells()
+- flashCell()
+
+controls:
+- '<button class="btn btn-primary" onclick="simulateRealTimeUpdates()">Start simulation</button>'
+- '<button class="btn btn-warning" onclick="findCurrentServer()">Find current server</button>'
+---
+
+<div id="myGrid"></div>
+
+<script>
+    function cpuUtilizationFormatter(ctx) {
+        if (ctx.value > 90)
+            return "<span class='load-hi'>" + ctx.escape() + "%</span>";
+        else if (ctx.value > 70)
+            return "<span class='load-medium'>" + ctx.escape() + "%</span>";
+        else
+            return ctx.escape() + "%";
+    }
+
+    const columns = [
+        { id: "server", name: "Server", field: "server", width: 180 }
+    ];
+
+    for (var i = 0; i < 4; i++) {
+        columns.push({
+            name: "CPU" + i,
+            field: i,
+            width: 80,
+            format: cpuUtilizationFormatter
+        });
+    }
+
+    const data = [];
+    for (var i = 0; i < 500; i++) {
+        var d = (data[i] = {});
+        d.server = "Server " + i;
+        for (var j = 0; j < columns.length; j++) {
+            d[j] = Math.round(Math.random() * 100);
+        }
+    }
+
+    const grid = new Slick.Grid("#myGrid", data, columns, {
+        editable: false,
+        enableAddRow: false,
+        enableCellNavigation: true,
+        cellHighlightCssClass: "changed",
+        cellFlashingCssClass: "current-server"
+    });
+
+    var currentServer = Math.round(Math.random() * (data.length - 1));
+
+    function findCurrentServer() {
+        grid.scrollRowIntoView(currentServer);
+        grid.flashCell(currentServer, grid.getColumnIndex("server"), 100);
+    }
+
+    function simulateRealTimeUpdates() {
+        var changes = {};
+        var numberOfUpdates = Math.round(Math.random() * (data.length / 10));
+        for (var i = 0; i < numberOfUpdates; i++) {
+            var server = Math.round(Math.random() * (data.length - 1));
+            var cpu = Math.round(Math.random() * (columns.length - 1));
+            var delta = Math.round(Math.random() * 50) - 25;
+            var col = grid.getColumnIndex("cpu" + cpu);
+            var val = data[server][col] + delta;
+            val = Math.max(0, val);
+            val = Math.min(100, val);
+
+            data[server][col] = val;
+
+            if (!changes[server]) {
+                changes[server] = {};
+            }
+
+            changes[server]["cpu" + cpu] = "changed";
+
+            grid.invalidateRow(server);
+        }
+
+        grid.setCellCssStyles("highlight", changes);
+        grid.render();
+
+        setTimeout(simulateRealTimeUpdates, 500);
+    }
+</script>
+
+
+<style>
+    .load-medium {
+        color: orange;
+        font-weight: bold;
+    }
+
+    .load-hi {
+        color: red;
+        font-weight: bold;
+    }
+
+    .changed {
+        background: pink;
+    }
+
+    .current-server {
+        background: orange;
+    }
+</style>
