@@ -488,7 +488,7 @@ export class Grid<TItem = any> implements EditorHost {
 
     getActiveCanvasNode(e?: IEventData): HTMLElement {
         if (e) { // compatibility with celldecorator plugin
-            this._activeCanvasNode = (e.target as HTMLElement).closest('.grid-canvas');
+            this._activeCanvasNode = (e.target as HTMLElement)?.closest?.('.grid-canvas');
         }
         return this._activeCanvasNode;
     }
@@ -503,7 +503,7 @@ export class Grid<TItem = any> implements EditorHost {
 
     getActiveViewportNode(e?: IEventData): HTMLElement {
         if (e) { // compatibility with celldecorator plugin
-            this._activeViewportNode = (e.target as HTMLElement).closest('.slick-viewport');
+            this._activeViewportNode = (e.target as HTMLElement)?.closest?.('.slick-viewport');
         }
 
         return this._activeViewportNode;

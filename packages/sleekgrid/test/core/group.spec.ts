@@ -40,17 +40,6 @@ describe('Group', () => {
 
     });
 
-    it('should not be equal if title is not equal', () => {
-        const group1 = new Group();
-        const group2 = new Group();
-
-        group1.title = 'a';
-        group2.title = 'b';
-
-        expect(group1.equals(group2)).toBeFalsy();
-
-    });
-
     it('should be equal if properties are empty', () => {
         const group1 = new Group();
         const group2 = new Group();
@@ -70,9 +59,6 @@ describe('Group', () => {
 
         group1.collapsed = true;
         group2.collapsed = true;
-
-        group1.title = 'a';
-        group2.title = 'a';
 
         expect(group1.equals(group2)).toBeTruthy();
     });

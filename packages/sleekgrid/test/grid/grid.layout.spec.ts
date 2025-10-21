@@ -114,7 +114,7 @@ describe('canvas', () => {
         };
 
         const grid = new Grid(document.createElement('div'), [{ c1: 1, c2: 8 }], [{ field: "c1" }, { field: "c2" }], {
-            rowHeight: -1
+            rowHeight: 20
         });
 
         window.getComputedStyle = oldGetComputedStyle;
@@ -251,7 +251,7 @@ describe('viewport', () => {
         };
 
         const grid = new Grid(document.createElement('div'), [{ c1: 1, c2: 8 }], [{ field: "c1" }, { field: "c2" }], {
-            rowHeight: -1
+            rowHeight: 20
         });
 
         window.getComputedStyle = oldGetComputedStyle;
