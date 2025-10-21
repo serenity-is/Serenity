@@ -1,6 +1,6 @@
 import { initComponentClass } from "./component"
 import { appendChildren } from "./jsx-append-children"
-import { setProperties } from "./jsx-set-properties"
+import { assignProps } from "./jsx-assign-props"
 import { attachRef } from "./ref"
 import { SVGNamespace, svgTags } from "./svg-consts"
 import type { JSXElement } from "./types"
@@ -45,7 +45,7 @@ export function jsx(tag: any, props?: { children?: ComponentChildren, [key: stri
         node = attr.namespaceURI
             ? document.createElementNS(attr.namespaceURI, tag)
             : document.createElement(tag)
-        setProperties(node, attr)
+        assignProps(node, attr)
         appendChildren(node, children)
 
         if (node instanceof window.HTMLSelectElement && attr.value != null) {

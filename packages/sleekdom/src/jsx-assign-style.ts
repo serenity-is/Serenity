@@ -114,7 +114,7 @@ function clearPrevStyle(node: Element & HTMLOrSVGElement, prev?: any): void {
     }
 }
 
-export function setStyleProperty(node: Element & HTMLOrSVGElement, value?: any, prev?: boolean | any): void {
+export function assignStyle(node: Element & HTMLOrSVGElement, value?: any, prev?: boolean | any): void {
     if (value == null || value === false || value === true) {
         clearPrevStyle(node, prev);
         return;

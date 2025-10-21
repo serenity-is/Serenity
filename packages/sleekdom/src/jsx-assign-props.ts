@@ -1,5 +1,5 @@
-import { setClassName } from "./jsx-set-classname";
-import { setStyleProperty } from "./jsx-set-style";
+import { assignClass } from "./jsx-assign-class";
+import { assignStyle } from "./jsx-assign-style";
 import { isSignalLike, observeSignalForNode } from "./signal-util";
 import { nonPresentationSVGAttributes } from "./svg-consts";
 import { forEach, isObject, isVisibleChild, keys } from "./util";
@@ -21,7 +21,7 @@ const propToAttr: Record<string, string> = {
     maxLength: "maxlength"
 }
 
-function setProperty(node: Element & HTMLOrSVGElement, key: string, value: any, prev?: any) {
+function assignProp(node: Element & HTMLOrSVGElement, key: string, value: any, prev?: any) {
 
     const propAttr = propToAttr[key];
     if (propAttr) {
@@ -83,7 +83,7 @@ function setProperty(node: Element & HTMLOrSVGElement, key: string, value: any, 
             break;
 
         case "class":
-            setClassName(node, value, prev);
+            assignClass(node, value, prev);
             return;
 
         case "spellcheck":
@@ -113,7 +113,7 @@ function setProperty(node: Element & HTMLOrSVGElement, key: string, value: any, 
             return;
 
         case "style":
-            setStyleProperty(node, value, prev)
+            assignStyle(node, value, prev)
             return;
 
         case "on":
@@ -171,7 +171,7 @@ function setProperty(node: Element & HTMLOrSVGElement, key: string, value: any, 
 
             let eventName;
             if (!useCapture && ((node as any)[attribute] === null || (prev != null && (node as any)[attribute] === prev))) {
-                // use property when possible PR #17
+                // use property when possible jsx-dom PR #17
                 (node as any)[attribute] = value;
             } else if (useCapture) {
                 eventName = attribute.substring(2, attribute.length - 7);
@@ -253,18 +253,14 @@ function setProperty(node: Element & HTMLOrSVGElement, key: string, value: any, 
     }
 }
 
-function setPropertyWithSignal(node: Element & HTMLOrSVGElement, key: string, signal: any) {
-    observeSignalForNode(signal, node, (value, prev) => setProperty(node, key, value, prev));
-}
-
-export function setProperties(node: HTMLElement | SVGElement, props: Record<string, any>) {
+export function assignProps(node: HTMLElement | SVGElement, props: Record<string, any>) {
     for (const key of keys(props)) {
         let value = props[key];
         if (isSignalLike(value)) {
-            setPropertyWithSignal(node, key, value);
+            observeSignalForNode(value, node, (val, prev) => assignProp(node, key, val, prev));
         }
         else {
-            setProperty(node, key, value);
+            assignProp(node, key, value);
         }
     }
     return node;

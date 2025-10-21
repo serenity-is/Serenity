@@ -38,7 +38,7 @@ function clearPrevClass(node: Element & HTMLOrSVGElement, prev?: any): void {
         node.setAttribute("class", "");
 }
 
-export function setClassName(node: Element & HTMLOrSVGElement, value?: any, prev?: any): void {
+export function assignClass(node: Element & HTMLOrSVGElement, value?: any, prev?: any): void {
     if (value == null || value === false) {
         clearPrevClass(node, prev);
         return;
