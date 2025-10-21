@@ -210,7 +210,7 @@ export function mockGridSize() {
     style.innerHTML = `
     .grid-container { min-height: 10000px !important; height: 10000px !important; min-width: 10000px !important; width: 10000px !important; }
     .slick-header.ui-state-default, .slick-headerrow.ui-state-default, .slick-footerrow.ui-state-default, .slick-group-header.ui-state-default { width: 100%; }
-    .slick-header-columns, .slick-headerrow-columns, .slick-footerrow-columns, .slick-group-header-columns { position: relative; }
+    .slick-header-columns, .slick-headerrow-columns, .slick-footerrow-columns { position: relative; height: 30px; }
     .slick-header-column.ui-state-default, .slick-group-header-column.ui-state-default { position: relative;display: inline-block; height: 16px; line-height: 16px; float: left; }
     .slick-footerrow-column.ui-state-default { border-right: 1px solid silver; float: left; line-height: 20px; }
     .slick-resizable-handle { position: absolute; font-size: 0.1px; display: block; width: 4px; right: 0px; top: 0; height: 100%; }

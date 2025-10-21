@@ -50,7 +50,6 @@ export class DataGrid<TItem, P = {}> extends Widget<P> implements IDataGrid, IRe
     declare public openDialogsAsPanel: boolean;
 
     declare public static defaultRowHeight: number;
-    declare public static defaultHeaderHeight: number;
     declare public static defaultPersistanceStorage: SettingStorage;
     declare public static defaultColumnWidthScale: number;
     declare public static defaultColumnWidthDelta: number;
@@ -787,8 +786,6 @@ export class DataGrid<TItem, P = {}> extends Widget<P> implements IDataGrid, IRe
             opt.emptyNode = Fluent.empty;
             opt.removeNode = Fluent.remove;
         }
-        if (DataGrid.defaultHeaderHeight)
-            opt.headerRowHeight = DataGrid.defaultHeaderHeight;
         if (DataGrid.defaultRowHeight)
             opt.rowHeight = DataGrid.defaultRowHeight;
         return opt;

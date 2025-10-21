@@ -3167,8 +3167,7 @@ button.panel-titlebar-close::after {
 
 .slick-header-columns,
 .slick-headerrow-columns,
-.slick-footerrow-columns,
-.slick-group-header-columns {
+.slick-footerrow-columns {
   position: relative;
   white-space: nowrap;
   overflow: hidden;
@@ -3434,11 +3433,10 @@ button.panel-titlebar-close::after {
   position: relative;
 }
 
-.slick-grouping-panel {
-  height: 30px;
-}
-
-.slick-top-panel {
+.slick-top-panel,
+.slick-grouping-panel,
+.slick-headerrow-columns,
+.slick-footerrow-columns {
   height: 30px;
 }
 
@@ -5138,14 +5136,6 @@ button.toast-close-button {
 
 .sleek-vars .slick-row {
   height: var(--row-height);
-}
-
-.sleek-vars .slick-headerrow-columns {
-  height: var(--sleek-headerrow-height);
-}
-
-.sleek-vars .slick-footerrow-columns {
-  height: var(--sleek-footerrow-height);
 }
 
 /*!rtl:end:ignore*/

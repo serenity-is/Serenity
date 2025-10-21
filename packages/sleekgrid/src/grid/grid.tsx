@@ -1097,6 +1097,14 @@ export class Grid<TItem = any> implements EditorHost {
             const groupingPanel = this._groupingPanel;
             groupingPanel && (groupingPanel.style.height = this._options.groupingPanelHeight + "px");
         }
+        if (this._options.headerRowHeight != null) {
+            const headerRowCols = this._layout.getHeaderRowCols();
+            headerRowCols.forEach(el => el.style.height = this._options.headerRowHeight + "px");
+        }
+        if (this._options.footerRowHeight != null) {
+            const footerRowCols = this._layout.getFooterRowCols();
+            footerRowCols.forEach(el => el.style.height = this._options.footerRowHeight + "px");
+        }
 
         if (this._options.useCssVars) {
             var style = this._container.style;
@@ -1104,8 +1112,6 @@ export class Grid<TItem = any> implements EditorHost {
             style.setProperty("--cell-height", cellHeight + "px");
             style.setProperty("--scrollbar-w", this._scrollDims.width + "px");
             style.setProperty("--scrollbar-h", this._scrollDims.height + "px");
-            style.setProperty("--sleek-headerrow-height", this._options.headerRowHeight + "px");
-            style.setProperty("--sleek-footerrow-height", this._options.footerRowHeight + "px");
             return;
         }
 
@@ -1115,11 +1121,8 @@ export class Grid<TItem = any> implements EditorHost {
             "." + this._uid + " { --cell-height: " + this._options.rowHeight + "px; }",
             "." + this._uid + " { --scrollbar-w: " + this._scrollDims.width + "px; }",
             "." + this._uid + " { --scrollbar-h: " + this._scrollDims.height + "px; }",
-            "." + this._uid + " .slick-headerrow-columns { height:" + this._options.headerRowHeight + "px; }",
             "." + this._uid + " .slick-cell { height:" + cellHeight + "px; }",
-            "." + this._uid + " .slick-row { height:" + this._options.rowHeight + "px; }",
-            "." + this._uid + " .slick-footerrow-columns { height:" + this._options.footerRowHeight + "px; }",
-            "." + this._uid + " .slick-spacer-h { margin-right:" + this._scrollDims.width + "px; }",
+            "." + this._uid + " .slick-row { height:" + this._options.rowHeight + "px; }"
         ];
 
         var cols = this._cols;
@@ -2146,9 +2149,9 @@ export class Grid<TItem = any> implements EditorHost {
         vs.width = getInnerWidth(this._container);
         vs.groupingPanelHeight = (this._options.groupingPanel && this._options.showGroupingPanel) ? this._groupingPanel?.offsetHeight || 0 : 0;
         vs.topPanelHeight = this._options.showTopPanel ? (this._layout.getTopPanel()?.parentElement?.offsetHeight || 0) : 0;
-        vs.headerRowHeight = this._options.showHeaderRow ? (this._options.headerRowHeight + getVBoxDelta(layout.getHeaderRowColsFor(0).parentElement)) : 0;
-        vs.footerRowHeight = this._options.showFooterRow ? (this._options.footerRowHeight + getVBoxDelta(layout.getFooterRowColsFor(0).parentElement)) : 0;
-        vs.headerHeight = (this._options.showColumnHeader) ? (parsePx(getComputedStyle(layout.getHeaderColsFor(0).parentElement).height) + getVBoxDelta(layout.getHeaderColsFor(0).parentElement)) : 0;
+        vs.headerRowHeight = this._options.showHeaderRow ? layout.getHeaderRowColsFor(0)?.parentElement?.offsetHeight || 0 : 0;
+        vs.footerRowHeight = this._options.showFooterRow ? layout.getFooterRowColsFor(0)?.parentElement?.offsetHeight || 0 : 0;
+        vs.headerHeight = (this._options.showColumnHeader) ? this._layout.getHeaderColsFor(0)?.parentElement?.offsetHeight || 0 : 0;
 
         if (this._options.autoHeight) {
             vs.height = this._options.rowHeight * this.getDataLengthIncludingAddNew();

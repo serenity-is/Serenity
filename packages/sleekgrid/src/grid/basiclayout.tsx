@@ -229,7 +229,7 @@ export const BasicLayout: { new(): LayoutEngine } = function (): LayoutEngine {
         const options = host.getOptions();
         if (options.autoHeight) {
             const totalHeight = vs.groupingPanelHeight + vs.topPanelHeight + vs.headerRowHeight + vs.footerRowHeight +
-                vs.height + parsePx(getComputedStyle(headerCols.parentElement).height) + "px";
+                vs.headerHeight + "px";
 
             host.getContainerNode().style.height = totalHeight;
         }

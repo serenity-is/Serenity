@@ -48,11 +48,10 @@ classes should alter those!
   position: relative;
 }
 
-.slick-grouping-panel {
-  height: 30px;
-}
-
-.slick-top-panel {
+.slick-top-panel,
+.slick-grouping-panel,
+.slick-headerrow-columns,
+.slick-footerrow-columns {
   height: 30px;
 }
 
@@ -66,7 +65,6 @@ classes should alter those!
   display: none
 }
 
-.slick-group-header-columns,
 .slick-header-columns,
 .slick-headerrow-columns,
 .slick-footerrow-columns {
@@ -1220,14 +1218,6 @@ button.ui-datepicker-trigger::before {
 
 .sleek-vars .slick-row {
   height: var(--row-height);
-}
-
-.sleek-vars .slick-headerrow-columns {
-  height: var(--sleek-headerrow-height);
-}
-
-.sleek-vars .slick-footerrow-columns {
-  height: var(--sleek-footerrow-height);
 }
 
 /*!rtl:end:ignore*/

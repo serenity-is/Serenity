@@ -523,11 +523,10 @@ export const FrozenLayout: { new(): LayoutEngine } = function (): LayoutEngine {
         viewportTopH = _paneTopH - vs.headerRowHeight - vs.footerRowHeight;
 
         if (options.autoHeight) {
-            host.getContainerNode().style.height = (_paneTopH + vs.groupingPanelHeight + vs.topPanelHeight +
-                parsePx(getComputedStyle(headerColsL.parentElement).height)) + 'px';
+            host.getContainerNode().style.height = _paneTopH + vs.groupingPanelHeight + vs.topPanelHeight + vs.headerHeight + 'px';
         }
 
-        paneTopL.style.top = (vs.groupingPanelHeight + vs.topPanelHeight + (parsePx(getComputedStyle(paneHeaderL).height) || vs.headerHeight)) + "px";
+        paneTopL.style.top = vs.groupingPanelHeight + vs.topPanelHeight + vs.headerHeight + "px";
         paneTopL.style.height = _paneTopH + 'px';
 
         var paneBottomTop = paneTopL.offsetTop + _paneTopH;
