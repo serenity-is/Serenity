@@ -60,7 +60,8 @@ export class GroupingAndSummariesInGrid<P = {}> extends EntityGrid<ProductRow, P
             cssClass: 'expand-all-button',
             onClick: () => this.view.setGrouping(
                 [{
-                    getter: 'CategoryName'
+                    getter: 'CategoryName',
+                    format: ctx => `Category: ${ctx.escape(ctx.item.value)} (${ctx.escape(ctx.item.count)} items)`,
                 }])
         },
         {
@@ -69,10 +70,10 @@ export class GroupingAndSummariesInGrid<P = {}> extends EntityGrid<ProductRow, P
             cssClass: 'expand-all-button',
             onClick: () => this.view.setGrouping(
                 [{
-                    formatter: x => 'Category: ' + x.value + ' (' + x.count + ' items)',
+                    format: ctx => `Category: ${ctx.escape(ctx.item.value)} (${ctx.escape(ctx.item.count)} items)`,
                     getter: 'CategoryName'
                 }, {
-                    formatter: x => 'Supplier: ' + x.value + ' (' + x.count + ' items)',
+                    format: ctx => `Supplier: ${ctx.escape(ctx.item.value)} (${ctx.escape(ctx.item.count)} items)`,
                     getter: 'SupplierCompanyName'
                 }])
         }, {
