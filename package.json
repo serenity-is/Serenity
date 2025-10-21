@@ -1,0 +1,51 @@
+{
+  "name": "@serenity-is/sleekgrid",
+  "version": "1.9.8",
+  "description": "A modern Data Grid / Spreadsheet component",
+  "type": "module",
+  "types": "dist/index.d.ts",
+  "main": "dist/index.js",
+  "module": "dist/index.js",
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "main": "./dist/index.js",
+      "import": "./dist/index.js"
+    }
+  },
+  "files": [
+    "dist/**/*.ts",
+    "dist/**/*.css",
+    "dist/**/*.js",
+    "dist/**/*.map",
+    "lib/**/*.js",
+    "css/**/*.css",
+    "src/**/*.ts",
+    "src/**/*.css",
+    "tsconfig.json"
+  ],
+  "scripts": {
+    "build": "node build/build",
+    "build:full": "node build/build --full",
+    "doc": "typedoc --plugin typedoc-plugin-markdown --exclude **/lib/**/* --excludePrivate --readme none --githubPages false --hidePageHeader --sourceLinkTemplate https://github.com/serenity-is/sleekgrid/blob/master/{path}#L{line} --readme none --out /serenity-is/SerenityIs/SerenityIs.Web/Docs/api/js/sleekgrid --json ./out/typedoc.json src",
+    "dts": "dts-bundle-generator -o dist/index.d.ts src/index.ts --project=./tsconfig.json --no-banner",
+    "prepublishOnly": "pnpm build:full && pnpm run test --coverage && pnpm dts",
+    "test": "pnpm build && vitest run",
+    "tsc": "tsc",
+    "www": "pnpm build:full && cd docs && jekyll serve --livereload --config _config.yml,_config_local.yml"
+  },
+  "keywords": [
+    "grid",
+    "datagrid",
+    "datatable",
+    "SleekGrid",
+    "SlickGrid",
+    "spreadsheet",
+    "table"
+  ],
+  "author": "Volkan Ceylan, Furkan Evran, Victor Tomaili (https://serenity.is)",
+  "repository": "serenity-is/sleekgrid",
+  "license": "MIT",
+  "bugs": "https://github.com/serenity-is/sleekGrid/issues",
+  "homepage": "https://github.com/serenity-is/sleekGrid#readme"
+}

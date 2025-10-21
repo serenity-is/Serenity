@@ -1,0 +1,5 @@
+    <link href="{{ site.packageurl.bootstrap }}/dist/css/bootstrap.min.css"
+        rel="stylesheet" crossorigin="anonymous">
+    <link href="{{ site.baseurl }}/assets/style.css?v={% assign vf_ = site.static_files | where: "path", "/assets/style.css" | first %}{{ vf_.modified_time | replace: "-", "" | replace: " ", "" | replace: ":", "" | replace: "+", "" }}" rel="stylesheet">
+    <link href="https://maxst.icons8.com/vue-static/landings/line-awesome/font-awesome-line-awesome/css/all.min.css"
+        rel="stylesheet">

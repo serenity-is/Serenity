@@ -1,0 +1,133 @@
+---
+title: Compound Editors
+
+demonstrates:
+- compound cell editors driving multiple fields from one cell
+- providing validation from the editor
+- hooking into validation events
+
+requires_scripts:
+- dist/compat/slick.editors.js
+---
+
+<div id="myGrid"></div>
+
+<script>
+    var data = [];
+    for (var i = 0; i < 500; i++) {
+        var d = (data[i] = {});
+
+        d["title"] = "Task " + i;
+        d["from"] = Math.round(Math.random() * 100);
+        d["to"] = d["from"] + Math.round(Math.random() * 100);
+    }
+
+    function NumericRangeFormatter(ctx) {
+        return ctx.escape(ctx.item.from) + " - " + ctx.escape(ctx.item.to);
+    }
+
+    function NumericRangeEditor(args) {
+        var from, to;
+        var scope = this;
+
+        this.init = function () {
+            from = args.container.appendChild(document.createElement('input'));
+            from.type = 'text';
+            from.addEventListener("keydown", scope.handleKeyDown);
+
+            args.container.appendChild(document.createTextNode(" - "));
+
+            to = args.container.appendChild(document.createElement('input'));
+            to.type = 'text';
+            to.addEventListener("keydown", scope.handleKeyDown);
+            scope.focus();
+        };
+
+        this.handleKeyDown = function (e) {
+            if (e.keyCode == Slick.keyCode.LEFT || e.keyCode == Slick.keyCode.RIGHT || e.keyCode == Slick.keyCode.TAB) {
+                e.stopImmediatePropagation();
+            }
+        };
+
+        this.destroy = function () {
+            args.container.innerHTML = '';
+        };
+
+        this.focus = function () {
+            from.focus();
+        };
+
+        this.serializeValue = function () {
+            return { from: parseInt(from.value, 10), to: parseInt(to.value, 10) };
+        };
+
+        this.applyValue = function (item, state) {
+            item.from = state.from;
+            item.to = state.to;
+        };
+
+        this.loadValue = function (item) {
+            from.value = item.from;
+            to.value = item.to;
+        };
+
+        this.isValueChanged = function () {
+            return args.item.from != parseInt(from.value, 10) || args.item.to != parseInt(to.value, 10);
+        };
+
+        this.validate = function () {
+            if (isNaN(parseInt(from.value, 10)) || isNaN(parseInt(to.value, 10))) {
+                return { valid: false, msg: "Please type in valid numbers." };
+            }
+
+            if (parseInt(from.value, 10) > parseInt(to.value, 10)) {
+                return { valid: false, msg: "'from' cannot be greater than 'to'" };
+            }
+
+            return { valid: true, msg: null };
+        };
+
+        this.init();
+    }
+
+    const columns = [
+        { field: "title", width: 120, cssClass: "cell-title", editor: Slick.TextEditor },
+        { id: "range", width: 120, cssClass: "cell-range", format: NumericRangeFormatter, editor: NumericRangeEditor }
+    ];
+
+    grid = new Slick.Grid("#myGrid", data, columns, {
+        editable: true,
+        enableAddRow: false,
+        enableCellNavigation: true,
+        asyncEditorLoading: false
+    });
+
+    grid.onValidationError.subscribe(function (e, args) {
+        alert(args.validationResults.msg);
+    });
+</script>
+
+
+<style>
+    .cell-title {
+        font-weight: bold;
+    }
+
+    .cell-range {
+        text-align: center;
+    }
+
+    .cell-range input {
+        font-weight: inherit;
+        width: calc(50% - 1em);
+        padding: 1px 2px;
+        border: 1px solid #ccc;
+        outline: 0;
+        text-align: left;
+        margin-top: -2px;
+    }
+
+    .cell-range input:first-child {
+        text-align: right;
+    }
+</style>

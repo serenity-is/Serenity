@@ -1,0 +1,9 @@
+<div class="example-sources mb-4">
+    <h3>View Source:</h3>
+    <ul>
+        <li><a href="{{ site.srcurl.docs }}/{{ page.path }}?plain=1" target="_sourcewindow">{{ page.path | replace: "examples/classic/", "" }}</a></li>
+        {% for s in page.sources %}
+        <li><a href="{{ site.srcurl.docs }}/{{ page.path }}{{s}}?plain=1" target="_sourcewindow"> {{ s | replace: "examples/classic/", "" }}</a></li>
+        {% endfor %}
+    </ul>
+</div>

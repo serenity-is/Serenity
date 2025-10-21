@@ -1,0 +1,1234 @@
+/*
+IMPORTANT:
+In order to preserve the uniform grid appearance, all cell styles need to have padding, margin and border sizes.
+No built-in (selected, editable, highlight, flashing, invalid, loading, :focus) or user-specified CSS
+classes should alter those!
+*/
+
+:root {
+  --slick-editable-bg: #ffffff;
+  --slick-header-bg: #f7f7f5;
+  --slick-header-border: #d6d7d6;
+  --slick-cell-border: #d6d7d6;
+  --slick-row-bg: #ffffff;
+  --slick-row-odd-bg: #f9f9f9;
+  --slick-padding-v: 4px;
+  --slick-padding-h: 6px;
+}
+
+.slick-container {
+  border: 1px solid #e7e7e7;
+}
+
+.slick-pane {
+  position: absolute;
+  outline: 0;
+  overflow: hidden;
+  width: 100%;
+}
+
+.slick-viewport {
+  position: relative;
+  outline: 0;
+  width: 100%;
+}
+
+.grid-canvas {
+  position: relative;
+  outline: 0;
+}
+
+.slick-group-header,
+.slick-header,
+.slick-headerrow,
+.slick-footerrow,
+.slick-top-panel-container {
+  width: 100%;
+  overflow: hidden;
+  position: relative;
+}
+
+.slick-header {
+  box-shadow: 0 1px 2px rgb(0 0 0 / 10%);
+}
+
+.slick-header::-webkit-scrollbar,
+.slick-headerrow::-webkit-scrollbar,
+.slick-footerrow::-webkit-scrollbar {
+  display: none
+}
+
+.slick-group-header-columns,
+.slick-header-columns,
+.slick-headerrow-columns,
+.slick-footerrow-columns {
+  position: relative;
+  white-space: nowrap;
+  cursor: default;
+  overflow: hidden;
+  background-color: var(--slick-header-bg);
+}
+
+.slick-header-columns {
+  border-bottom: 1px solid var(--slick-header-border);
+}
+
+.slick-header-columns,
+.slick-header-column {
+  user-select: none;
+}
+
+.slick-group-header,
+.slick-headerrow-column,
+.slick-header-column,
+.slick-footerrow-column {
+  background-color: var(--slick-header-bg);
+}
+
+.slick-group-header,
+.slick-headerrow-column,
+.slick-header-column,
+.slick-footerrow-column,
+.slick-cell {
+  padding: var(--slick-padding-v) var(--slick-padding-h);
+}
+
+.slick-cell.active {
+  background-color: rgba(0, 98, 255, 0.05);
+}
+
+.slick-group-header,
+.slick-header-column,
+.slick-headerrow-column,
+.slick-footerrow-column {
+  float: left;
+  position: relative;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  border-right: 1px solid var(--slick-header-border);
+}
+
+.slick-sort-indicator {
+  margin-left: 3px;
+}
+
+.slick-sort-indicator::before {
+  content: '';
+  display: inline-block;
+  vertical-align: -0.15em;
+  width: 1em;
+  height: 1em;
+  background: no-repeat center center url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='16' height='16' fill='%23bbb' viewBox='0 0 32 32'%3E%3Cpath d='M 16 3.59375 L 15.28125 4.28125 L 7.28125 12.28125 L 5.59375 14 L 26.40625 14 L 24.71875 12.28125 L 16.71875 4.28125 Z M 16 6.4375 L 21.5625 12 L 10.4375 12 Z M 5.59375 18 L 7.28125 19.71875 L 15.28125 27.71875 L 16 28.40625 L 16.71875 27.71875 L 24.71875 19.71875 L 26.40625 18 Z M 10.4375 20 L 21.5625 20 L 16 25.5625 Z'/%3E%3C/svg%3E");
+}
+
+.slick-sort-indicator-asc::before {
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='16' height='16' fill='%23036' viewBox='0 0 16 16'%3E%3Cpath d='M3.5 13.5a.5.5 0 0 1-1 0V4.707L1.354 5.854a.5.5 0 1 1-.708-.708l2-1.999.007-.007a.498.498 0 0 1 .7.006l2 2a.5.5 0 1 1-.707.708L3.5 4.707V13.5zm4-9.5a.5.5 0 0 1 0-1h1a.5.5 0 0 1 0 1h-1zm0 3a.5.5 0 0 1 0-1h3a.5.5 0 0 1 0 1h-3zm0 3a.5.5 0 0 1 0-1h5a.5.5 0 0 1 0 1h-5zM7 12.5a.5.5 0 0 0 .5.5h7a.5.5 0 0 0 0-1h-7a.5.5 0 0 0-.5.5z'/%3E%3C/svg%3E");
+}
+
+.slick-sort-indicator-desc::before {
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='16' height='16' fill='%23036' viewBox='0 0 16 16'%3E%3Cpath d='M3.5 2.5a.5.5 0 0 0-1 0v8.793l-1.146-1.147a.5.5 0 0 0-.708.708l2 1.999.007.007a.497.497 0 0 0 .7-.006l2-2a.5.5 0 0 0-.707-.708L3.5 11.293V2.5zm3.5 1a.5.5 0 0 1 .5-.5h7a.5.5 0 0 1 0 1h-7a.5.5 0 0 1-.5-.5zM7.5 6a.5.5 0 0 0 0 1h5a.5.5 0 0 0 0-1h-5zm0 3a.5.5 0 0 0 0 1h3a.5.5 0 0 0 0-1h-3zm0 3a.5.5 0 0 0 0 1h1a.5.5 0 0 0 0-1h-1z'/%3E%3C/svg%3E");
+}
+
+.slick-resizable-handle {
+  position: absolute;
+  font-size: 0.1px;
+  display: block;
+  cursor: col-resize;
+  width: 9px;
+  right: -5px;
+  top: 0;
+  height: 100%;
+  z-index: 1;
+}
+
+.slick-sortable-placeholder {
+  background: silver;
+}
+
+.slick-row {
+  position: absolute;
+  width: 100%;
+}
+
+.slick-cell,
+.slick-headerrow-column,
+.slick-footerrow-column {
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  border-right: 1px solid var(--slick-cell-border);
+  border-bottom: 1px solid var(--slick-cell-border);
+  overflow: hidden;
+  text-overflow: ellipsis;
+  vertical-align: middle;
+  z-index: 1;
+  margin: 0;
+  white-space: nowrap;
+  cursor: default;
+}
+
+.slick-grouping-panel {
+  overflow-y: hidden;
+  overflow-x: auto;
+  position: relative;
+}
+
+.slick-group-toggle {
+  display: inline-block;
+}
+
+.slick-cell.highlighted {
+  background: rgba(0, 0, 255, 0.2);
+  transition: all 0.5s;
+}
+
+.slick-cell.flashing {
+  border-right-color: 1px solid red !important;
+  border-bottom-color: 1px solid red !important;
+}
+
+.slick-cell.editable {
+  z-index: 11;
+  overflow: visible;
+  background: var(--slick-editable-bg);
+  box-shadow: -1px -1px 2px 1px rgba(0, 0, 0, 0.1);
+}
+
+.slick-cell.invalid {
+  background-color: #ff00001f;
+  box-shadow: 0 0 0px 1px rgb(255 0 0 / 50%);
+}
+
+.slick-cell:focus {
+  outline: none;
+}
+
+.slick-focus-sink {
+  position: fixed;
+  width: 0 !important;
+  height: 0 !important;
+  top: 0;
+  left: 0;
+  outline: 0 !important;
+}
+
+.slick-hidden {
+  display: none !important;
+}
+
+.slick-hscrollspacer,
+.slick-footerrow-columns,
+.slick-headerrow-columns,
+.slick-header-columns {
+  margin-right: var(--sleek-scrollbar-width);
+}
+
+.slick-vscrollspacer {
+  margin-bottom: var(--sleek-scrollbar-height);
+}
+
+.slick-reorder-proxy {
+  display: inline-block;
+  background: blue;
+  opacity: 0.15;
+  filter: alpha(opacity=15);
+  cursor: move;
+}
+
+.slick-reorder-guide {
+  display: inline-block;
+  height: 2px;
+  background: blue;
+  opacity: 0.7;
+  filter: alpha(opacity=70);
+}
+
+.slick-reorder-shadow-row {
+  position: absolute;
+  z-index: 999999;
+  box-shadow: rgb(0 0 0 / 20%) 8px 2px 8px 4px, rgb(0 0 0 / 19%) 2px 2px 0px 0px;
+}
+
+.slick-selection {
+  z-index: 10;
+  position: absolute;
+  border: 2px dashed black;
+}
+
+.slick-editor-text,
+.slick-editor-percentcomplete {
+  width: 100%;
+  height: 100%;
+  border: 0;
+  margin: 0;
+  background: transparent;
+  outline: 0;
+  padding: 0;
+  font-weight: inherit;
+}
+
+.slick-checkbox,
+.slick-editor-checkbox {
+  display: inline-block;
+  width: 1.4em;
+  margin-top: 0.1em;
+  height: 1.4em;
+  border: 1px solid #ccc;
+  border-radius: 2px;
+}
+
+.slick-checkbox.checked,
+.slick-editor-checkbox:checked {
+  background-color: var(--bs-primary, '#f00');
+  border-color: var(--bs-primary, '#f00');
+  background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' width='20' height='20' viewBox='0 0 20 20'%3e%3cpath fill='none' stroke='%23fff' stroke-linecap='round' stroke-linejoin='round' stroke-width='3' d='M6 10l3 3l6-6'/%3e%3c/svg%3e");
+  background-position: center center;
+}
+
+.slick-checkmark {
+  display: inline-block;
+  width: 1.5em;
+  height: 1.5em;
+  background: no-repeat center center url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='24' height='24' fill='%23090' class='bi bi-check-lg' viewBox='0 0 16 16'%3E%3Cpath d='M12.736 3.97a.733.733 0 0 1 1.047 0c.286.289.29.756.01 1.05L7.88 12.01a.733.733 0 0 1-1.065.02L3.217 8.384a.757.757 0 0 1 0-1.06.733.733 0 0 1 1.047 0l3.052 3.093 5.4-6.425a.247.247 0 0 1 .02-.022Z'/%3E%3C/svg%3E");
+}
+
+.slick-editor-checkbox {
+  outline: none;
+  appearance: none;
+}
+
+.slick-percentcomplete-bar {
+  display: inline-block;
+  height: 0.7em;
+  border-radius: 0.35em;
+}
+
+.slick-editor-text.hasDatepicker {
+  width: calc(100% - 18px) !important;
+}
+
+.slick-editor-percentcomplete {
+  width: calc(100% - 19px) !important;
+}
+
+.slick-editor-percentcomplete-picker {
+  position: relative;
+  display: inline-block;
+  height: 100%;
+  overflow: visible;
+  z-index: 1000;
+}
+
+.slick-editor-percentcomplete-picker::before {
+  font-family: 'Font Awesome 5 Free', FontAwesome;
+  font-weight: 900;
+  content: '\f304';
+}
+
+button.ui-datepicker-trigger::before {
+  font-family: 'Font Awesome 5 Free', FontAwesome;
+  font-weight: 900;
+  content: '\f304';
+}
+
+.slick-editor-percentcomplete-helper {
+  border: 0 solid #ccc;
+  position: absolute;
+  top: -2px;
+  left: -9px;
+  padding-left: 9px;
+  width: 130px;
+  height: 140px;
+  display: none;
+  overflow: visible;
+}
+
+.slick-editor-percentcomplete-wrapper {
+  background: beige;
+  padding: 8px;
+  width: 100%;
+  height: 120px;
+  border: 1px solid #ccc;
+}
+
+.slick-editor-percentcomplete-slider {
+  background: white;
+  border-radius: 4px;
+  float: left;
+  border: 1px solid #d3d3d3;
+  width: 0.8em;
+  height: 100px;
+  position: relative;
+  text-align: left;
+  color: #222;
+}
+
+.slick-editor-percentcomplete-picker .ui-slider-handle {
+  border: 1px solid #d3d3d3;
+  background: #e6e6e6;
+  left: -0.3em;
+  margin-left: 0;
+  margin-bottom: -0.6em;
+  position: absolute;
+  z-index: 2;
+  width: 1.2em;
+  height: 1.2em;
+  cursor: default;
+  touch-action: none;
+  border-radius: 4px;
+}
+
+.slick-editor-percentcomplete-buttons {
+  float: right;
+  display: flex;
+  flex-direction: column;
+  align-items: top;
+  margin-top: 10px;
+}
+
+.slick-editor-percentcomplete-buttons button {
+  width: 80px;
+  font-size: 12px;
+  border: 1px solid #ccc;
+  margin-bottom: 8px;
+}
+
+.slick-editor-percentcomplete-picker:hover .slick-editor-percentcomplete-helper {
+  display: block;
+}
+
+.slick-editor-percentcomplete-helper:hover {
+  display: block;
+}
+
+/* ==== shared sleek-vars start ==== */
+/*!rtl:begin:ignore*/
+
+.sleek-vars.ltr .l0 {
+  left: var(--l0);
+}
+
+.sleek-vars.ltr .l1 {
+  left: var(--l1);
+}
+
+.sleek-vars.ltr .l2 {
+  left: var(--l2);
+}
+
+.sleek-vars.ltr .l3 {
+  left: var(--l3);
+}
+
+.sleek-vars.ltr .l4 {
+  left: var(--l4);
+}
+
+.sleek-vars.ltr .l5 {
+  left: var(--l5);
+}
+
+.sleek-vars.ltr .l6 {
+  left: var(--l6);
+}
+
+.sleek-vars.ltr .l7 {
+  left: var(--l7);
+}
+
+.sleek-vars.ltr .l8 {
+  left: var(--l8);
+}
+
+.sleek-vars.ltr .l9 {
+  left: var(--l9);
+}
+
+.sleek-vars.ltr .l10 {
+  left: var(--l10);
+}
+
+.sleek-vars.ltr .l11 {
+  left: var(--l11);
+}
+
+.sleek-vars.ltr .l12 {
+  left: var(--l12);
+}
+
+.sleek-vars.ltr .l13 {
+  left: var(--l13);
+}
+
+.sleek-vars.ltr .l14 {
+  left: var(--l14);
+}
+
+.sleek-vars.ltr .l15 {
+  left: var(--l15);
+}
+
+.sleek-vars.ltr .l16 {
+  left: var(--l16);
+}
+
+.sleek-vars.ltr .l17 {
+  left: var(--l17);
+}
+
+.sleek-vars.ltr .l18 {
+  left: var(--l18);
+}
+
+.sleek-vars.ltr .l19 {
+  left: var(--l19);
+}
+
+.sleek-vars.ltr .l20 {
+  left: var(--l20);
+}
+
+.sleek-vars.ltr .l21 {
+  left: var(--l21);
+}
+
+.sleek-vars.ltr .l22 {
+  left: var(--l22);
+}
+
+.sleek-vars.ltr .l23 {
+  left: var(--l23);
+}
+
+.sleek-vars.ltr .l24 {
+  left: var(--l24);
+}
+
+.sleek-vars.ltr .l25 {
+  left: var(--l25);
+}
+
+.sleek-vars.ltr .l26 {
+  left: var(--l26);
+}
+
+.sleek-vars.ltr .l27 {
+  left: var(--l27);
+}
+
+.sleek-vars.ltr .l28 {
+  left: var(--l28);
+}
+
+.sleek-vars.ltr .l29 {
+  left: var(--l29);
+}
+
+.sleek-vars.ltr .l30 {
+  left: var(--l30);
+}
+
+.sleek-vars.ltr .l31 {
+  left: var(--l31);
+}
+
+.sleek-vars.ltr .l32 {
+  left: var(--l32);
+}
+
+.sleek-vars.ltr .l33 {
+  left: var(--l33);
+}
+
+.sleek-vars.ltr .l34 {
+  left: var(--l34);
+}
+
+.sleek-vars.ltr .l35 {
+  left: var(--l35);
+}
+
+.sleek-vars.ltr .l36 {
+  left: var(--l36);
+}
+
+.sleek-vars.ltr .l37 {
+  left: var(--l37);
+}
+
+.sleek-vars.ltr .l38 {
+  left: var(--l38);
+}
+
+.sleek-vars.ltr .l39 {
+  left: var(--l39);
+}
+
+.sleek-vars.ltr .l40 {
+  left: var(--l40);
+}
+
+.sleek-vars.ltr .l41 {
+  left: var(--l41);
+}
+
+.sleek-vars.ltr .l42 {
+  left: var(--l42);
+}
+
+.sleek-vars.ltr .l43 {
+  left: var(--l43);
+}
+
+.sleek-vars.ltr .l44 {
+  left: var(--l44);
+}
+
+.sleek-vars.ltr .l45 {
+  left: var(--l45);
+}
+
+.sleek-vars.ltr .l46 {
+  left: var(--l46);
+}
+
+.sleek-vars.ltr .l47 {
+  left: var(--l47);
+}
+
+.sleek-vars.ltr .l48 {
+  left: var(--l48);
+}
+
+.sleek-vars.ltr .l49 {
+  left: var(--l49);
+}
+
+
+.sleek-vars.ltr .r0 {
+  right: var(--r0);
+}
+
+.sleek-vars.ltr .r1 {
+  right: var(--r1);
+}
+
+.sleek-vars.ltr .r2 {
+  right: var(--r2);
+}
+
+.sleek-vars.ltr .r3 {
+  right: var(--r3);
+}
+
+.sleek-vars.ltr .r4 {
+  right: var(--r4);
+}
+
+.sleek-vars.ltr .r5 {
+  right: var(--r5);
+}
+
+.sleek-vars.ltr .r6 {
+  right: var(--r6);
+}
+
+.sleek-vars.ltr .r7 {
+  right: var(--r7);
+}
+
+.sleek-vars.ltr .r8 {
+  right: var(--r8);
+}
+
+.sleek-vars.ltr .r9 {
+  right: var(--r9);
+}
+
+.sleek-vars.ltr .r10 {
+  right: var(--r10);
+}
+
+.sleek-vars.ltr .r11 {
+  right: var(--r11);
+}
+
+.sleek-vars.ltr .r12 {
+  right: var(--r12);
+}
+
+.sleek-vars.ltr .r13 {
+  right: var(--r13);
+}
+
+.sleek-vars.ltr .r14 {
+  right: var(--r14);
+}
+
+.sleek-vars.ltr .r15 {
+  right: var(--r15);
+}
+
+.sleek-vars.ltr .r16 {
+  right: var(--r16);
+}
+
+.sleek-vars.ltr .r17 {
+  right: var(--r17);
+}
+
+.sleek-vars.ltr .r18 {
+  right: var(--r18);
+}
+
+.sleek-vars.ltr .r19 {
+  right: var(--r19);
+}
+
+.sleek-vars.ltr .r20 {
+  right: var(--r20);
+}
+
+.sleek-vars.ltr .r21 {
+  right: var(--r21);
+}
+
+.sleek-vars.ltr .r22 {
+  right: var(--r22);
+}
+
+.sleek-vars.ltr .r23 {
+  right: var(--r23);
+}
+
+.sleek-vars.ltr .r24 {
+  right: var(--r24);
+}
+
+.sleek-vars.ltr .r25 {
+  right: var(--r25);
+}
+
+.sleek-vars.ltr .r26 {
+  right: var(--r26);
+}
+
+.sleek-vars.ltr .r27 {
+  right: var(--r27);
+}
+
+.sleek-vars.ltr .r28 {
+  right: var(--r28);
+}
+
+.sleek-vars.ltr .r29 {
+  right: var(--r29);
+}
+
+.sleek-vars.ltr .r30 {
+  right: var(--r30);
+}
+
+.sleek-vars.ltr .r31 {
+  right: var(--r31);
+}
+
+.sleek-vars.ltr .r32 {
+  right: var(--r32);
+}
+
+.sleek-vars.ltr .r33 {
+  right: var(--r33);
+}
+
+.sleek-vars.ltr .r34 {
+  right: var(--r34);
+}
+
+.sleek-vars.ltr .r35 {
+  right: var(--r35);
+}
+
+.sleek-vars.ltr .r36 {
+  right: var(--r36);
+}
+
+.sleek-vars.ltr .r37 {
+  right: var(--r37);
+}
+
+.sleek-vars.ltr .r38 {
+  right: var(--r38);
+}
+
+.sleek-vars.ltr .r39 {
+  right: var(--r39);
+}
+
+.sleek-vars.ltr .r40 {
+  right: var(--r40);
+}
+
+.sleek-vars.ltr .r41 {
+  right: var(--r41);
+}
+
+.sleek-vars.ltr .r42 {
+  right: var(--r42);
+}
+
+.sleek-vars.ltr .r43 {
+  right: var(--r43);
+}
+
+.sleek-vars.ltr .r44 {
+  right: var(--r44);
+}
+
+.sleek-vars.ltr .r45 {
+  right: var(--r45);
+}
+
+.sleek-vars.ltr .r46 {
+  right: var(--r46);
+}
+
+.sleek-vars.ltr .r47 {
+  right: var(--r47);
+}
+
+.sleek-vars.ltr .r48 {
+  right: var(--r48);
+}
+
+.sleek-vars.ltr .r49 {
+  right: var(--r49);
+}
+
+.sleek-vars.rtl .l0 {
+  right: var(--l0);
+}
+
+.sleek-vars.rtl .l1 {
+  right: var(--l1);
+}
+
+.sleek-vars.rtl .l2 {
+  right: var(--l2);
+}
+
+.sleek-vars.rtl .l3 {
+  right: var(--l3);
+}
+
+.sleek-vars.rtl .l4 {
+  right: var(--l4);
+}
+
+.sleek-vars.rtl .l5 {
+  right: var(--l5);
+}
+
+.sleek-vars.rtl .l6 {
+  right: var(--l6);
+}
+
+.sleek-vars.rtl .l7 {
+  right: var(--l7);
+}
+
+.sleek-vars.rtl .l8 {
+  right: var(--l8);
+}
+
+.sleek-vars.rtl .l9 {
+  right: var(--l9);
+}
+
+.sleek-vars.rtl .l10 {
+  right: var(--l10);
+}
+
+.sleek-vars.rtl .l11 {
+  right: var(--l11);
+}
+
+.sleek-vars.rtl .l12 {
+  right: var(--l12);
+}
+
+.sleek-vars.rtl .l13 {
+  right: var(--l13);
+}
+
+.sleek-vars.rtl .l14 {
+  right: var(--l14);
+}
+
+.sleek-vars.rtl .l15 {
+  right: var(--l15);
+}
+
+.sleek-vars.rtl .l16 {
+  right: var(--l16);
+}
+
+.sleek-vars.rtl .l17 {
+  right: var(--l17);
+}
+
+.sleek-vars.rtl .l18 {
+  right: var(--l18);
+}
+
+.sleek-vars.rtl .l19 {
+  right: var(--l19);
+}
+
+.sleek-vars.rtl .l20 {
+  right: var(--l20);
+}
+
+.sleek-vars.rtl .l21 {
+  right: var(--l21);
+}
+
+.sleek-vars.rtl .l22 {
+  right: var(--l22);
+}
+
+.sleek-vars.rtl .l23 {
+  right: var(--l23);
+}
+
+.sleek-vars.rtl .l24 {
+  right: var(--l24);
+}
+
+.sleek-vars.rtl .l25 {
+  right: var(--l25);
+}
+
+.sleek-vars.rtl .l26 {
+  right: var(--l26);
+}
+
+.sleek-vars.rtl .l27 {
+  right: var(--l27);
+}
+
+.sleek-vars.rtl .l28 {
+  right: var(--l28);
+}
+
+.sleek-vars.rtl .l29 {
+  right: var(--l29);
+}
+
+.sleek-vars.rtl .l30 {
+  right: var(--l30);
+}
+
+.sleek-vars.rtl .l31 {
+  right: var(--l31);
+}
+
+.sleek-vars.rtl .l32 {
+  right: var(--l32);
+}
+
+.sleek-vars.rtl .l33 {
+  right: var(--l33);
+}
+
+.sleek-vars.rtl .l34 {
+  right: var(--l34);
+}
+
+.sleek-vars.rtl .l35 {
+  right: var(--l35);
+}
+
+.sleek-vars.rtl .l36 {
+  right: var(--l36);
+}
+
+.sleek-vars.rtl .l37 {
+  right: var(--l37);
+}
+
+.sleek-vars.rtl .l38 {
+  right: var(--l38);
+}
+
+.sleek-vars.rtl .l39 {
+  right: var(--l39);
+}
+
+.sleek-vars.rtl .l40 {
+  right: var(--l40);
+}
+
+.sleek-vars.rtl .l41 {
+  right: var(--l41);
+}
+
+.sleek-vars.rtl .l42 {
+  right: var(--l42);
+}
+
+.sleek-vars.rtl .l43 {
+  right: var(--l43);
+}
+
+.sleek-vars.rtl .l44 {
+  right: var(--l44);
+}
+
+.sleek-vars.rtl .l45 {
+  right: var(--l45);
+}
+
+.sleek-vars.rtl .l46 {
+  right: var(--l46);
+}
+
+.sleek-vars.rtl .l47 {
+  right: var(--l47);
+}
+
+.sleek-vars.rtl .l48 {
+  right: var(--l48);
+}
+
+.sleek-vars.rtl .l49 {
+  right: var(--l49);
+}
+
+
+.sleek-vars.rtl .r0 {
+  left: var(--r0);
+}
+
+.sleek-vars.rtl .r1 {
+  left: var(--r1);
+}
+
+.sleek-vars.rtl .r2 {
+  left: var(--r2);
+}
+
+.sleek-vars.rtl .r3 {
+  left: var(--r3);
+}
+
+.sleek-vars.rtl .r4 {
+  left: var(--r4);
+}
+
+.sleek-vars.rtl .r5 {
+  left: var(--r5);
+}
+
+.sleek-vars.rtl .r6 {
+  left: var(--r6);
+}
+
+.sleek-vars.rtl .r7 {
+  left: var(--r7);
+}
+
+.sleek-vars.rtl .r8 {
+  left: var(--r8);
+}
+
+.sleek-vars.rtl .r9 {
+  left: var(--r9);
+}
+
+.sleek-vars.rtl .r10 {
+  left: var(--r10);
+}
+
+.sleek-vars.rtl .r11 {
+  left: var(--r11);
+}
+
+.sleek-vars.rtl .r12 {
+  left: var(--r12);
+}
+
+.sleek-vars.rtl .r13 {
+  left: var(--r13);
+}
+
+.sleek-vars.rtl .r14 {
+  left: var(--r14);
+}
+
+.sleek-vars.rtl .r15 {
+  left: var(--r15);
+}
+
+.sleek-vars.rtl .r16 {
+  left: var(--r16);
+}
+
+.sleek-vars.rtl .r17 {
+  left: var(--r17);
+}
+
+.sleek-vars.rtl .r18 {
+  left: var(--r18);
+}
+
+.sleek-vars.rtl .r19 {
+  left: var(--r19);
+}
+
+.sleek-vars.rtl .r20 {
+  left: var(--r20);
+}
+
+.sleek-vars.rtl .r21 {
+  left: var(--r21);
+}
+
+.sleek-vars.rtl .r22 {
+  left: var(--r22);
+}
+
+.sleek-vars.rtl .r23 {
+  left: var(--r23);
+}
+
+.sleek-vars.rtl .r24 {
+  left: var(--r24);
+}
+
+.sleek-vars.rtl .r25 {
+  left: var(--r25);
+}
+
+.sleek-vars.rtl .r26 {
+  left: var(--r26);
+}
+
+.sleek-vars.rtl .r27 {
+  left: var(--r27);
+}
+
+.sleek-vars.rtl .r28 {
+  left: var(--r28);
+}
+
+.sleek-vars.rtl .r29 {
+  left: var(--r29);
+}
+
+.sleek-vars.rtl .r30 {
+  left: var(--r30);
+}
+
+.sleek-vars.rtl .r31 {
+  left: var(--r31);
+}
+
+.sleek-vars.rtl .r32 {
+  left: var(--r32);
+}
+
+.sleek-vars.rtl .r33 {
+  left: var(--r33);
+}
+
+.sleek-vars.rtl .r34 {
+  left: var(--r34);
+}
+
+.sleek-vars.rtl .r35 {
+  left: var(--r35);
+}
+
+.sleek-vars.rtl .r36 {
+  left: var(--r36);
+}
+
+.sleek-vars.rtl .r37 {
+  left: var(--r37);
+}
+
+.sleek-vars.rtl .r38 {
+  left: var(--r38);
+}
+
+.sleek-vars.rtl .r39 {
+  left: var(--r39);
+}
+
+.sleek-vars.rtl .r40 {
+  left: var(--r40);
+}
+
+.sleek-vars.rtl .r41 {
+  left: var(--r41);
+}
+
+.sleek-vars.rtl .r42 {
+  left: var(--r42);
+}
+
+.sleek-vars.rtl .r43 {
+  left: var(--r43);
+}
+
+.sleek-vars.rtl .r44 {
+  left: var(--r44);
+}
+
+.sleek-vars.rtl .r45 {
+  left: var(--r45);
+}
+
+.sleek-vars.rtl .r46 {
+  left: var(--r46);
+}
+
+.sleek-vars.rtl .r47 {
+  left: var(--r47);
+}
+
+.sleek-vars.rtl .r48 {
+  left: var(--r48);
+}
+
+.sleek-vars.rtl .r49 {
+  left: var(--r49);
+}
+
+.sleek-vars .slick-cell {
+  height: var(--sleek-cell-height);
+}
+
+.sleek-vars .slick-row {
+  height: var(--sleek-row-height);
+}
+
+.sleek-vars .slick-top-panel {
+  height: var(--sleek-top-panel-height);
+}
+
+.sleek-vars .slick-grouping-panel {
+  height: var(--sleek-grouping-panel-height);
+}
+
+.sleek-vars .slick-headerrow-columns {
+  height: var(--sleek-headerrow-height);
+}
+
+.sleek-vars .slick-footerrow-columns {
+  height: var(--sleek-footerrow-height);
+}
+
+/*!rtl:end:ignore*/
+/* ==== shared sleek-vars end ==== */

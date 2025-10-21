@@ -1,0 +1,78 @@
+---
+title: Editing with Undo
+
+demonstrates:
+- using "editCommandHandler" option to intercept edit commands and implement undo supportl
+
+controls:
+- <button onclick="undo()"><i class="fa fa-undo"></i> Undo</button>
+
+requires_scripts:
+- dist/compat/slick.editors.js
+- dist/compat/slick.formatters.js
+---
+
+<div id="myGrid"></div>
+
+<script>
+    function requiredFieldValidator(value) {
+        if (value == null || value == undefined || !value.length) {
+            return { valid: false, msg: "This is a required field" };
+        } else {
+            return { valid: true, msg: null };
+        }
+    }
+
+    const columns = [
+        { field: "title", width: 120, cssClass: "cell-title", editor: Slick.Editors.Text, validator: requiredFieldValidator },
+        { field: "description", width: 100, editor: Slick.Editors.LongText },
+        { field: "duration", editor: Slick.Editors.Text },
+        { field: "percentComplete", name: "% Complete", width: 80, resizable: false, format: Slick.PercentCompleteBarFormatter, editor: Slick.PercentCompleteEditor },
+        { field: "start", minWidth: 110, editor: Slick.Editors.Date },
+        { field: "finish", minWidth: 110, editor: Slick.Editors.Date },
+        { field: "effortDriven", width: 80, minWidth: 20, maxWidth: 80, cssClass: "cell-effort-driven", format: Slick.CheckboxFormatter, editor: Slick.CheckboxEditor }
+    ];
+
+    var data = [];
+    for (var i = 0; i < 500; i++) {
+        var d = (data[i] = {});
+
+        d["title"] = "Task " + i;
+        d["description"] = "This is a sample task description.\n  It can be multiline";
+        d["duration"] = "5 days";
+        d["percentComplete"] = Math.round(Math.random() * 100);
+        d["start"] = "01/01/2009";
+        d["finish"] = "01/05/2009";
+        d["effortDriven"] = (i % 5 == 0);
+    }
+
+    var commandQueue = [];
+
+    function queueAndExecuteCommand(item, column, editCommand) {
+        commandQueue.push(editCommand);
+        editCommand.execute();
+    }
+
+    function undo() {
+        var command = commandQueue.pop();
+        if (command && Slick.GlobalEditorLock.cancelCurrentEdit()) {
+            command.undo();
+            grid.gotoCell(command.row, command.cell, false);
+        }
+    }
+
+    var grid = new Slick.Grid("#myGrid", data, columns, {
+        editable: true,
+        enableAddRow: false,
+        enableCellNavigation: true,
+        asyncEditorLoading: false,
+        autoEdit: true,
+        editCommandHandler: queueAndExecuteCommand
+    });
+</script>
+
+<style>
+    .cell-effort-driven {
+        text-align: center;
+    }
+</style>

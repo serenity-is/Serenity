@@ -1,0 +1,45 @@
+---
+title: 'Frozen Columns'
+
+demonstrates:
+- basic grid with frozen layout
+
+requires_scripts:
+- dist/compat/slick.formatters.js
+- dist/compat/layouts/slick.frozenlayout.js
+---
+
+<div id="myGrid"></div>
+
+<script>
+    var grid;
+    var columns = [
+        { field: "title", frozen: true },
+        { field: "duration", frozen: true },
+        { field: "description", width: 350 },
+        { field: "percentComplete", name: "% Complete", width: 200, format: Slick.PercentCompleteBarFormatter },
+        { field: "start", width: 150 },
+        { field: "finish", width: 150 },
+        { field: "effortDriven", width: 150 }
+    ];
+
+    var data = [];
+    for (var i = 0; i < 500; i++) {
+        data[i] = {
+            title: "Task " + i,
+            duration: "5 days",
+            description: "Some description for task " +  i,
+            percentComplete: Math.round(Math.random() * 100),
+            start: "01/01/2022",
+            finish: "01/05/2022",
+            effortDriven: (i % 5 == 0)
+        };
+    }
+
+    grid = new Slick.Grid("#myGrid", data, columns, {
+        enableCellNavigation: true,
+        enableColumnReorder: false,
+        layoutEngine: new Slick.FrozenLayout(),
+        frozenRows: 2
+    });
+</script>

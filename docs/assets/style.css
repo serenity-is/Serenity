@@ -1,0 +1,29 @@
+:root {
+  font-size: 14px;
+}
+
+footer {
+  color: #ccc;
+  margin-top: 2rem;
+}
+
+body {
+  padding: 1rem;
+}
+
+.page-title {
+  margin-bottom: 1.5rem;
+  font-size: 2rem;
+}
+
+.active-link {
+  font-weight: bold;
+}
+
+.example-sidenav li {
+  padding: 3px 0;
+}
+
+#myGrid {
+  min-height: 450px;
+}

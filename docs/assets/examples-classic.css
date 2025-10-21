@@ -1,0 +1,38 @@
+.slick-large-editor-text button {
+  border-width: 1px;
+  margin-right: 4px;
+}
+
+.ui-datepicker {
+  background: white;
+  border: 1px solid #ccc;
+}
+
+.ui-datepicker-trigger {
+  vertical-align: -2px;
+}
+
+.ui-datepicker table .ui-state-highlight {
+  border-color: #5F83B9;
+}
+
+.ui-datepicker table .ui-state-hover {
+  background: #5F83B9;
+  color: #FFF;
+  text-shadow: 0 1px 1px #234386;
+  box-shadow: 0 0px 0 rgba(255, 255, 255, 0.6) inset;
+  border-color: #5F83B9;
+}
+
+.ui-datepicker-calendar .ui-state-default {
+  background: transparent;
+  border-color: #FFF;
+}
+
+.ui-datepicker-calendar .ui-state-active {
+  background: #5F83B9;
+  border-color: #5F83B9;
+  color: #FFF;
+  font-weight: bold;
+  text-shadow: 0 1px 1px #234386;
+}

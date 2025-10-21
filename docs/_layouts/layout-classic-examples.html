@@ -1,0 +1,60 @@
+<!doctype html>
+<html lang="en">
+
+<head>
+{% include _layout_head.html %}
+    <link rel="stylesheet" href="{{ site.packageurl.sleekgrid }}/css/slick.grid.css{%if site.local %}?v={% assign vf_ = site.static_files | where: "path", "/assets/local/css/slick.grid.css" | first %}{{ vf_.modified_time | replace: "-", "" | replace: " ", "" | replace: ":", "" | replace: "+", "" }}{% endif %}" type="text/css" />
+    <link rel="stylesheet" href="{{ site.baseurl }}/assets/examples-classic.css?v={% assign vf_ = site.static_files | where: "path", "/assets/examples-classic.css" | first %}{{ vf_.modified_time | replace: "-", "" | replace: " ", "" | replace: ":", "" | replace: "+", "" }}" type="text/css" />
+    <link rel="stylesheet" href="{{ site.packageurl.jqueryui }}/themes/base/datepicker.css" type="text/css" />
+    <script src="{{ site.packageurl.jquery }}/dist/jquery.min.js"
+        integrity="sha256-/xUj+3OJU5yExlq6GSYGSHk7tPXikynS7ogEvDej/m4=" crossorigin="anonymous"></script>
+    <script src="{{ site.packageurl.jqueryui }}/dist/jquery-ui.min.js" crossorigin="anonymous"></script>
+    <script src="{{ site.packageurl.sleekgrid }}/dist/compat/slick.core.js{%if site.local %}?v={% assign vf_ = site.static_files | where: "path", "/assets/local/dist/compat/slick.core.js" | first %}{{ vf_.modified_time | replace: "-", "" | replace: " ", "" | replace: ":", "" | replace: "+", "" }}{% endif %}"></script>
+    <script src="{{ site.packageurl.sleekgrid }}/dist/compat/slick.grid.js{%if site.local %}?v={% assign vf_ = site.static_files | where: "path", "/assets/local/dist/compat/slick.grid.js" | first %}{{ vf_.modified_time | replace: "-", "" | replace: " ", "" | replace: ":", "" | replace: "+", "" }}{% endif %}"></script>
+    {% for x in page.requires_slick_scripts %}
+    <script src="{{ site.packageurl.slickgrid }}/{{ x }}"></script>
+    {% endfor %}
+    {% for x in page.requires_scripts %}
+    <script src="{{ site.packageurl.sleekgrid }}/{{ x }}{%if site.local %}?v={%assign x_ = "/assets/local/" | append: x %}{% assign vf_ = site.static_files | where: "path", x_ | first %}{{ vf_.modified_time | replace: "-", "" | replace: " ", "" | replace: ":", "" | replace: "+", "" }}{% endif %}"></script>
+    {% endfor %}
+</head>
+
+<body>
+    <div class="row">
+        <div class="example-sidenav col-lg-2 d-none d-lg-block">
+            <h5 class="text-muted">Classic Examples</h5>
+            <ul class="m-0 p-0 list-unstyled">
+                {% assign classic_examples_pages = site.pages | where: "dir", "/examples/classic/" %}
+                {% for p in classic_examples_pages %}
+                <li{% if page.url == p.url %} class="active-link"{% endif %}>
+                    <a href="{{ site.baseurl }}{{ p.url | replace: ".html", "" }}">
+                        {{ p.title }}</a>
+                {% endfor %}
+                </li>
+            </ul>
+        </div>
+        <div class="col-lg-10">
+            <section class="{% if page.fullwidth %}{%else%}container container-xxl{% endif %}">
+                <h2 class="mb-4">{{ page.title }}</h2>
+                <div class="row">
+                    <div class="col-lg-9 example-container mb-4">
+                        <div class="example-content">
+                            {{ content }}
+                        </div>
+                    </div>
+                    <div class="col-lg-3 example-info">
+                        {% include _example_about.html %}
+                        {% include _example_demonstrates.html %}
+                        {% include _example_controls.html %}
+                        {% include _example_sources.html %}
+                    </div>
+                </div>
+                {% include _layout_footer.html %}
+            </section>
+        </div>
+    </div>
+
+    {% include _layout_js.html %}
+</body>
+
+</html>

@@ -1,0 +1,14 @@
+﻿{
+    "extends": "../tsconfig.json",
+    "compilerOptions": {
+        "noImplicitAny": false,
+        "declaration": false,
+        "sourceMap": true,
+        "types": [
+            "vitest/globals"
+        ]
+    },
+    "include": [
+        "."
+    ]
+}
