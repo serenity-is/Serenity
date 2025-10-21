@@ -1089,15 +1089,21 @@ export class Grid<TItem = any> implements EditorHost {
             this._options.useCssVars = false;
 
         this._container.classList.toggle('sleek-vars', !!this._options.useCssVars);
+        if (this._options.topPanelHeight != null) {
+            const topPanel = this._layout.getTopPanel();
+            topPanel && (topPanel.style.height = this._options.topPanelHeight + "px");
+        }
+        if (this._options.groupingPanelHeight != null) {
+            const groupingPanel = this._groupingPanel;
+            groupingPanel && (groupingPanel.style.height = this._options.groupingPanelHeight + "px");
+        }
 
         if (this._options.useCssVars) {
             var style = this._container.style;
-            style.setProperty("--sleek-row-height", this._options.rowHeight + "px");
-            style.setProperty("--sleek-cell-height", cellHeight + "px");
-            style.setProperty("--sleek-scrollbar-width", this._scrollDims.width + "px");
-            style.setProperty("--sleek-scrollbar-height", this._scrollDims.height + "px");
-            style.setProperty("--sleek-top-panel-height", this._options.topPanelHeight + "px");
-            style.setProperty("--sleek-grouping-panel-height", this._options.groupingPanelHeight + "px");
+            style.setProperty("--row-height", this._options.rowHeight + "px");
+            style.setProperty("--cell-height", cellHeight + "px");
+            style.setProperty("--scrollbar-w", this._scrollDims.width + "px");
+            style.setProperty("--scrollbar-h", this._scrollDims.height + "px");
             style.setProperty("--sleek-headerrow-height", this._options.headerRowHeight + "px");
             style.setProperty("--sleek-footerrow-height", this._options.footerRowHeight + "px");
             return;
@@ -1106,11 +1112,9 @@ export class Grid<TItem = any> implements EditorHost {
         var el = this._styleNode = document.createElement('style');
         el.dataset.uid = this._uid;
         var rules = [
-            "." + this._uid + " { --sleek-cell-height: " + this._options.rowHeight + "px; }",
-            "." + this._uid + " { --sleek-scrollbar-width: " + this._scrollDims.width + "px; }",
-            "." + this._uid + " { --sleek-scrollbar-height: " + this._scrollDims.height + "px; }",
-            "." + this._uid + " .slick-top-panel { height:" + this._options.topPanelHeight + "px; }",
-            "." + this._uid + " .slick-grouping-panel { height:" + this._options.groupingPanelHeight + "px; }",
+            "." + this._uid + " { --cell-height: " + this._options.rowHeight + "px; }",
+            "." + this._uid + " { --scrollbar-w: " + this._scrollDims.width + "px; }",
+            "." + this._uid + " { --scrollbar-h: " + this._scrollDims.height + "px; }",
             "." + this._uid + " .slick-headerrow-columns { height:" + this._options.headerRowHeight + "px; }",
             "." + this._uid + " .slick-cell { height:" + cellHeight + "px; }",
             "." + this._uid + " .slick-row { height:" + this._options.rowHeight + "px; }",
@@ -1612,7 +1616,7 @@ export class Grid<TItem = any> implements EditorHost {
     }
 
     getTopPanel(): HTMLElement {
-        return this._layout.getTopPanelFor(0);
+        return this._layout.getTopPanel();
     }
 
     setTopPanelVisibility(visible: boolean): void {
@@ -2141,7 +2145,7 @@ export class Grid<TItem = any> implements EditorHost {
         const vs = this._viewportInfo;
         vs.width = getInnerWidth(this._container);
         vs.groupingPanelHeight = (this._options.groupingPanel && this._options.showGroupingPanel) ? (this._options.groupingPanelHeight + getVBoxDelta(this._groupingPanel)) : 0
-        vs.topPanelHeight = this._options.showTopPanel ? (this._options.topPanelHeight + getVBoxDelta(layout.getTopPanelFor(0).parentElement)) : 0;
+        vs.topPanelHeight = this._options.showTopPanel ? (this._layout.getTopPanel()?.parentElement?.offsetHeight || 0) : 0;
         vs.headerRowHeight = this._options.showHeaderRow ? (this._options.headerRowHeight + getVBoxDelta(layout.getHeaderRowColsFor(0).parentElement)) : 0;
         vs.footerRowHeight = this._options.showFooterRow ? (this._options.footerRowHeight + getVBoxDelta(layout.getFooterRowColsFor(0).parentElement)) : 0;
         vs.headerHeight = (this._options.showColumnHeader) ? (parsePx(getComputedStyle(layout.getHeaderColsFor(0).parentElement).height) + getVBoxDelta(layout.getHeaderColsFor(0).parentElement)) : 0;
@@ -2348,7 +2352,7 @@ export class Grid<TItem = any> implements EditorHost {
     private ensureCellNodesInRowsCache(row: number): void {
         var cacheEntry = this._rowsCache[row];
         if (cacheEntry && cacheEntry.cellRenderQueue.length) {
-            for (const rowNode of [cacheEntry.rowNodeE, cacheEntry.rowNodeC, cacheEntry.rowNodeE]) {
+            for (const rowNode of [cacheEntry.rowNodeE, cacheEntry.rowNodeC, cacheEntry.rowNodeS]) {
                 var lastChild = rowNode?.lastElementChild;
                 while (lastChild && cacheEntry.cellRenderQueue.length) {
                     var columnIdx = cacheEntry.cellRenderQueue.pop();

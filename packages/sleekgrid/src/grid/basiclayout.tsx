@@ -173,7 +173,7 @@ export const BasicLayout: { new(): LayoutEngine } = function (): LayoutEngine {
         return host.getRowFromNode(cellNode.parentElement);
     }
 
-    function getTopPanelFor(): HTMLElement {
+    function getTopPanel(): HTMLElement {
         return topPanel;
     }
 
@@ -274,7 +274,7 @@ export const BasicLayout: { new(): LayoutEngine } = function (): LayoutEngine {
         getScrollCanvasY: getCanvasNodeFor,
         getScrollContainerX: getViewportNodeFor,
         getScrollContainerY: getViewportNodeFor,
-        getTopPanelFor,
+        getTopPanel,
         getViewportNodeFor,
         getViewportNodes,
         handleScrollH,

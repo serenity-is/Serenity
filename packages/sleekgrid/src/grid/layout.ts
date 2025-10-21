@@ -65,7 +65,7 @@ export interface LayoutEngine {
     getScrollCanvasY(): HTMLElement;
     getScrollContainerX(): HTMLElement;
     getScrollContainerY(): HTMLElement;
-    getTopPanelFor(arg0: number): HTMLElement;
+    getTopPanel(): HTMLElement;
     getViewportNodeFor(cell: number, row: number): HTMLElement;
     getViewportNodes(): HTMLElement[];
     handleScrollH(): void;

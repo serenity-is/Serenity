@@ -369,7 +369,7 @@ export interface GridOptions<TItem = any> {
     syncColumnCellResize?: boolean;
 
     /**
-     * Defaults to `30`. Height of the top panel in pixels.
+     * Defaults to null which means the top panel height is calculated based on CSS rules which defaults to 30px.
      */
     topPanelHeight?: number;
 
@@ -423,7 +423,7 @@ export const gridDefaults: GridOptions = {
     formatterFactory: null,
     fullWidthRows: false,
     groupingPanel: false,
-    groupingPanelHeight: 30,
+    groupingPanelHeight: null,
     headerRowHeight: 30,
     leaveSpaceForNewRows: false,
     minBuffer: 3,
@@ -439,6 +439,6 @@ export const gridDefaults: GridOptions = {
     showHeaderRow: false,
     showTopPanel: false,
     suppressActiveCellChangeOnEdit: false,
-    topPanelHeight: 30,
+    topPanelHeight: null,
     useCssVars: true
 }

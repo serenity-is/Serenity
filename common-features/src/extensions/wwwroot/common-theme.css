@@ -3381,11 +3381,11 @@ button.panel-titlebar-close::after {
 .slick-footerrow-columns,
 .slick-headerrow-columns,
 .slick-header-columns {
-  margin-right: var(--sleek-scrollbar-width);
+  margin-right: var(--scrollbar-w);
 }
 
 .slick-vscrollspacer {
-  margin-bottom: var(--sleek-scrollbar-height);
+  margin-bottom: var(--scrollbar-h);
 }
 
 .slick-reorder-proxy {
@@ -3429,13 +3429,17 @@ button.panel-titlebar-close::after {
   position: relative;
 }
 
-.slick-top-panel-scroller {
+.slick-top-panel-container {
   overflow: hidden;
   position: relative;
 }
 
+.slick-grouping-panel {
+  height: 30px;
+}
+
 .slick-top-panel {
-  width: 10000px;
+  height: 30px;
 }
 
 .slick-viewport {
@@ -5129,19 +5133,11 @@ button.toast-close-button {
 }
 
 .sleek-vars .slick-cell {
-  height: var(--sleek-cell-height);
+  height: var(--cell-height);
 }
 
 .sleek-vars .slick-row {
-  height: var(--sleek-row-height);
-}
-
-.sleek-vars .slick-top-panel {
-  height: var(--sleek-top-panel-height);
-}
-
-.sleek-vars .slick-grouping-panel {
-  height: var(--sleek-grouping-panel-height);
+  height: var(--row-height);
 }
 
 .sleek-vars .slick-headerrow-columns {

@@ -48,6 +48,14 @@ classes should alter those!
   position: relative;
 }
 
+.slick-grouping-panel {
+  height: 30px;
+}
+
+.slick-top-panel {
+  height: 30px;
+}
+
 .slick-header {
   box-shadow: 0 1px 2px rgb(0 0 0 / 10%);
 }
@@ -220,11 +228,11 @@ classes should alter those!
 .slick-footerrow-columns,
 .slick-headerrow-columns,
 .slick-header-columns {
-  margin-right: var(--sleek-scrollbar-width);
+  margin-right: var(--scrollbar-w);
 }
 
 .slick-vscrollspacer {
-  margin-bottom: var(--sleek-scrollbar-height);
+  margin-bottom: var(--scrollbar-h);
 }
 
 .slick-reorder-proxy {
@@ -1207,19 +1215,11 @@ button.ui-datepicker-trigger::before {
 }
 
 .sleek-vars .slick-cell {
-  height: var(--sleek-cell-height);
+  height: var(--cell-height);
 }
 
 .sleek-vars .slick-row {
-  height: var(--sleek-row-height);
-}
-
-.sleek-vars .slick-top-panel {
-  height: var(--sleek-top-panel-height);
-}
-
-.sleek-vars .slick-grouping-panel {
-  height: var(--sleek-grouping-panel-height);
+  height: var(--row-height);
 }
 
 .sleek-vars .slick-headerrow-columns {

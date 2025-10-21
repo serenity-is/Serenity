@@ -513,7 +513,6 @@ export interface SignalLike<T> {
 	peek(): T;
 	subscribe(fn: (value: T) => void): EffectDisposer;
 }
-export type SignalOrValue<T> = T | SignalLike<T>;
 export interface Signal<T> extends SignalLike<T> {
 }
 export interface ViewportInfo {
@@ -600,7 +599,7 @@ export interface LayoutEngine {
 	getScrollCanvasY(): HTMLElement;
 	getScrollContainerX(): HTMLElement;
 	getScrollContainerY(): HTMLElement;
-	getTopPanelFor(arg0: number): HTMLElement;
+	getTopPanel(): HTMLElement;
 	getViewportNodeFor(cell: number, row: number): HTMLElement;
 	getViewportNodes(): HTMLElement[];
 	handleScrollH(): void;
@@ -914,7 +913,7 @@ export interface GridOptions<TItem = any> {
 	 */
 	syncColumnCellResize?: boolean;
 	/**
-	 * Defaults to `30`. Height of the top panel in pixels.
+	 * Defaults to null which means the top panel height is calculated based on CSS rules which defaults to 30px.
 	 */
 	topPanelHeight?: number;
 	/**
@@ -959,7 +958,6 @@ export declare function escapeHtml(s: any): any;
 export declare function basicDOMSanitizer(dirtyHtml: string): string;
 export declare function disableSelection(target: HTMLElement): void;
 export declare function removeClass(el: Element, cls: string): void;
-export declare function spacerDiv(width: SignalOrValue<string>): HTMLDivElement;
 export declare function parsePx(str: string): number;
 export declare const BasicLayout: {
 	new (): LayoutEngine;

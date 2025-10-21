@@ -32,8 +32,7 @@ export const FrozenLayout: { new(): LayoutEngine } = function (): LayoutEngine {
     let paneTopR: HTMLDivElement;
     let scrollContainerX: HTMLDivElement;
     let scrollContainerY: HTMLDivElement;
-    let topPanelL: HTMLDivElement;
-    let topPanelR: HTMLDivElement;
+    let topPanel: HTMLDivElement;
     let viewportBottomL: HTMLDivElement;
     let viewportBottomR: HTMLDivElement;
     let viewportTopL: HTMLDivElement;
@@ -62,8 +61,8 @@ export const FrozenLayout: { new(): LayoutEngine } = function (): LayoutEngine {
     }
 
     const calcCanvasWidth = () => {
-        var cols = host.getColumns(), i = cols.length;
 
+        var cols = host.getColumns(), i = cols.length;
         canvasWidthL = canvasWidthR = 0;
 
         while (i--) {
@@ -97,15 +96,17 @@ export const FrozenLayout: { new(): LayoutEngine } = function (): LayoutEngine {
                     <div class="slick-header-columns slick-header-columns-right" ref={el => headerColsR = el} />
                 </div>
             </div>
+
+            <IfElse when={optSignals.showTopPanel} else={placeholder("top-panel")}>
+                <div class={"slick-top-panel-container"}>
+                    <div class="slick-top-panel" ref={el => topPanel = el} />
+                </div>
+            </IfElse>
+
             <div class="slick-pane slick-pane-top slick-pane-left" tabindex="0" ref={el => paneTopL = el}>
                 <IfElse when={optSignals.showHeaderRow} else={placeholder("headerrow-left")}>
                     <div class="slick-headerrow">
                         <div class="slick-headerrow-columns slick-headerrow-columns-left" ref={el => headerRowColsL = el} />
-                    </div>
-                </IfElse>
-                <IfElse when={optSignals.showTopPanel} else={placeholder("top-panel-left")}>
-                    <div class={"slick-top-panel-container"}>
-                        <div class="slick-top-panel" ref={el => topPanelL = el} />
                     </div>
                 </IfElse>
                 <div class="slick-viewport slick-viewport-top slick-viewport-left" tabindex="0" ref={el => viewportTopL = el}>
@@ -122,11 +123,6 @@ export const FrozenLayout: { new(): LayoutEngine } = function (): LayoutEngine {
                 <IfElse when={optSignals.showHeaderRow} else={placeholder("headerrow-right")}>
                     <div class="slick-headerrow">
                         <div class="slick-headerrow-columns slick-headerrow-columns-right" ref={el => headerRowColsR = el} />
-                    </div>
-                </IfElse>
-                <IfElse when={optSignals.showTopPanel} else={placeholder("top-panel-right")}>
-                    <div class={"slick-top-panel-container"}>
-                        <div class="slick-top-panel" ref={el => topPanelR = el} />
                     </div>
                 </IfElse>
                 <div class="slick-viewport slick-viewport-top slick-viewport-right" tabindex="0" ref={el => viewportTopR = el}>
@@ -369,7 +365,6 @@ export const FrozenLayout: { new(): LayoutEngine } = function (): LayoutEngine {
         const scrollLeft = host.getScrollLeft();
         if (frozenCols) {
             options.showColumnHeader && (headerColsR.parentElement.scrollLeft = scrollLeft);
-            options.showTopPanel && (topPanelR.parentElement.scrollLeft = scrollLeft);
             options.showHeaderRow && (headerRowColsR.parentElement.scrollLeft = scrollLeft);
             options.showFooterRow && (footerRowColsR.parentElement.scrollLeft = scrollLeft);
             if (frozenRows) {
@@ -377,7 +372,6 @@ export const FrozenLayout: { new(): LayoutEngine } = function (): LayoutEngine {
             }
         } else {
             options.showColumnHeader && (headerColsL.parentElement.scrollLeft = scrollLeft);
-            options.showTopPanel && (topPanelL.parentElement.scrollLeft = scrollLeft);
             options.showHeaderRow && (headerRowColsL.parentElement.scrollLeft = scrollLeft);
             options.showFooterRow && (footerRowColsL.parentElement.scrollLeft = scrollLeft);
             if (frozenRows) {
@@ -498,8 +492,8 @@ export const FrozenLayout: { new(): LayoutEngine } = function (): LayoutEngine {
         }
     }
 
-    const getTopPanelFor = (cell: number) => {
-        return frozenCols > 0 && cell >= frozenCols ? topPanelR : topPanelL;
+    const getTopPanel = () => {
+        return topPanel;
     }
 
     const resizeCanvas = () => {
@@ -522,18 +516,18 @@ export const FrozenLayout: { new(): LayoutEngine } = function (): LayoutEngine {
             _paneTopH = vs.height;
         }
 
-        // The top pane includes the top panel, the header row and the footer row
-        _paneTopH += vs.topPanelHeight + vs.headerRowHeight + vs.footerRowHeight;
+        // The top pane includes the the header row and the footer row
+        _paneTopH += vs.headerRowHeight + vs.footerRowHeight;
 
-        // The top viewport does not contain the top panel, the header row or the footer row
-        viewportTopH = _paneTopH - vs.topPanelHeight - vs.headerRowHeight - vs.footerRowHeight;
+        // The top viewport does not contain the header row or the footer row
+        viewportTopH = _paneTopH - vs.headerRowHeight - vs.footerRowHeight;
 
         if (options.autoHeight) {
-            host.getContainerNode().style.height = (_paneTopH + vs.groupingPanelHeight +
+            host.getContainerNode().style.height = (_paneTopH + vs.groupingPanelHeight + vs.topPanelHeight +
                 parsePx(getComputedStyle(headerColsL.parentElement).height)) + 'px';
         }
 
-        paneTopL.style.top = (vs.groupingPanelHeight + (parsePx(getComputedStyle(paneHeaderL).height) || vs.headerHeight)) + "px";
+        paneTopL.style.top = (vs.groupingPanelHeight + vs.topPanelHeight + (parsePx(getComputedStyle(paneHeaderL).height) || vs.headerHeight)) + "px";
         paneTopL.style.height = _paneTopH + 'px';
 
         var paneBottomTop = paneTopL.offsetTop + _paneTopH;
@@ -790,7 +784,7 @@ export const FrozenLayout: { new(): LayoutEngine } = function (): LayoutEngine {
         getScrollCanvasY,
         getScrollContainerX,
         getScrollContainerY,
-        getTopPanelFor,
+        getTopPanel,
         getViewportNodeFor,
         getViewportNodes,
         handleScrollH,

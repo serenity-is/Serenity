@@ -223,8 +223,9 @@ export function mockGridSize() {
     .slick-pane-header { display: block; }
     .slick-header { position: relative; }
     .slick-headerrow { position: relative; }
-    .slick-top-panel-scroller { position: relative; }
-    .slick-top-panel { width: 10000px }
+    .slick-grouping-panel { height: 30px; }
+    .slick-top-panel-container { position: relative; }
+    .slick-top-panel { height: 30px; }
     .slick-viewport { position: relative; outline: 0; width: 10000px !important; height: 10000px !important; }
     .slick-row { height: 20px !important; width: 10000px !important; }
     .slick-cell { width: 30px !important; height: 20px !important; }
