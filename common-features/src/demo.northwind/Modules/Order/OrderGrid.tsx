@@ -4,6 +4,7 @@ import { OrderColumns, OrderListRequest, OrderRow, OrderService, ProductRow } fr
 import { nsDemoNorthwind } from "../ServerTypes/Namespaces";
 import { OrderDialog } from "./OrderDialog";
 import "./OrderGrid.css";
+import { FrozenLayout } from "@serenity-is/sleekgrid";
 
 export class OrderGrid<P = {}> extends EntityGrid<OrderRow, P> {
     static [Symbol.typeInfo] = this.registerClass(nsDemoNorthwind, [new FilterableAttribute()]);
@@ -106,5 +107,13 @@ export class OrderGrid<P = {}> extends EntityGrid<OrderRow, P> {
         this.editItem({
             CustomerID: eq ? eq.CustomerID : null
         });
+    }
+
+    protected getSlickOptions() {
+        let opt = super.getSlickOptions();
+        opt.frozenColumns = 2;
+        opt.layoutEngine = () => new FrozenLayout();
+        opt.showTopPanel = true;
+        return opt;
     }
 }

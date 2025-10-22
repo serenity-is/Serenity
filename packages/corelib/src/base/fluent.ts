@@ -1,5 +1,5 @@
 ﻿import { getjQuery } from "./environment";
-import { addListener, disposeDescendants, disposeElement, removeListener, triggerEvent } from "./fluent-events";
+import { addListener, notifyDisposingDescendants, notifyDisposingNode, removeListener, triggerEvent } from "./fluent-events";
 import { toggleClass as toggleCls } from "./html";
 
 /**
@@ -489,7 +489,7 @@ export namespace Fluent {
             if ($)
                 $(element).empty();
             else {
-                disposeDescendants(element);
+                notifyDisposingDescendants(element);
                 element.innerHTML = "";
             }
         }
@@ -519,8 +519,8 @@ export namespace Fluent {
             $(element).remove();
         }
         else {
-            disposeDescendants(element);
-            disposeElement(element);
+            notifyDisposingDescendants(element);
+            notifyDisposingNode(element);
             element.remove();
         }
     }
@@ -919,7 +919,7 @@ Fluent.prototype.text = function (this: FluentThis<any>, value?: string) {
         if ($)
             $(this.el).text(value ?? "");
         else {
-            disposeDescendants(this.el);
+            notifyDisposingDescendants(this.el);
             this.el.textContent = value ?? "";
         }
     }

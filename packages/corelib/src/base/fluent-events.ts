@@ -36,15 +36,17 @@ export function getEventRegistry(): WeakMap<EventTarget, ElementEvents> {
     return (globalThis as any)[eventRegistrySymbol] ||= new WeakMap();
 }
 
-export function disposeDescendants(element: Element) {
+export function notifyDisposingDescendants(element: Element) {
+    // we also include comments and text nodes, as sleekdom may use them as placeholders
+    // and use the `disposing` event to cleanup related signals / effects
     const iterator = document.createTreeWalker(element, 
         NodeFilter.SHOW_ELEMENT | NodeFilter.SHOW_COMMENT | NodeFilter.SHOW_TEXT);
     let node;
     while (node = iterator.nextNode())
-        disposeElement(node);
+        notifyDisposingNode(node);
 }
 
-export function disposeElement(element: EventTarget): void {
+export function notifyDisposingNode(element: EventTarget): void {
     if (!element)
         return;
 
