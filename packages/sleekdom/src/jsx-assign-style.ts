@@ -1,4 +1,4 @@
-import { isSignalLike, observeSignalForNode } from "./signal-util"
+import { isSignalLike, observeSignal } from "./signal-util"
 import { isNumber, isObject, isString, keys } from "./util"
 
 /**
@@ -138,8 +138,8 @@ export function assignStyle(node: Element & HTMLOrSVGElement, value?: any, prev?
 
         Object.entries(value).forEach(([key, val]) => {
             if (isSignalLike(val)) {
-                observeSignalForNode(val, node, (newVal) => {
-                    setStylePropValue(node, key, newVal);
+                observeSignal(val, args => setStylePropValue(node, key, args.newValue), { 
+                    lifecycleNode: node 
                 });
             }
             else {

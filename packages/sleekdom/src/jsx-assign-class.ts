@@ -1,5 +1,5 @@
 import { className } from "./classname";
-import { isSignalLike, observeSignalForNode } from "./signal-util";
+import { isSignalLike, observeSignal } from "./signal-util";
 import { isArrayLike, isObject, isString, isVisibleChild } from "./util";
 
 function clearPrevClass(node: Element & HTMLOrSVGElement, prev?: any): void {
@@ -64,9 +64,11 @@ export function assignClass(node: Element & HTMLOrSVGElement, value?: any, prev?
     if (isArrayLike(value) && Array.from(value).some(x => isSignalLike(x))) {
         value = Array.from(value).filter(x => {
             if (isSignalLike(x)) {
-                observeSignalForNode(x, node, (newVal, prev) => {
-                    prev && Boolean(prev) && prev !== newVal && node.classList.remove(String(prev));
-                    Boolean(newVal) && node.classList.add(String(newVal));
+                observeSignal(x, args => {
+                    args.hasChanged && Boolean(args.prevValue) && node.classList.remove(String(args.prevValue));
+                    Boolean(args.newValue) && node.classList.add(String(args.newValue));
+                }, {
+                    lifecycleNode: node
                 });
                 return false;
             }
@@ -87,8 +89,8 @@ export function assignClass(node: Element & HTMLOrSVGElement, value?: any, prev?
         value = { ...value };
         Object.entries(value).forEach(([key, val]) => {
             if (isSignalLike(val)) {
-                observeSignalForNode(val, node, (newVal) => {
-                    node.classList.toggle(key, Boolean(newVal));
+                observeSignal(val, args => node.classList.toggle(key, Boolean(args.newValue)), {
+                    lifecycleNode: node
                 });
                 delete value[key];
             }

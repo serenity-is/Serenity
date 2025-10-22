@@ -1,4 +1,3 @@
-import { addDisposingListener } from "./disposing-listener";
 import { attachRef } from "./ref";
 import { isShadowRoot } from "./shadow";
 import { isSignalLike, observeSignal } from "./signal-util";
@@ -39,56 +38,58 @@ function wrapAsNode(value: any): Node {
 }
 
 function appendChildrenWithSignal(parent: Node, signal: SignalLike<any>) {
-    let prevAsNode: Node;
-    const dispose = observeSignal(signal, (value, prev) => {
-        if (prevAsNode === undefined) {
-            prevAsNode = wrapAsNode(value);
+    let prevValueAsNode: Node;
+    observeSignal(signal, (args) => {
+        if (args.isInitial) {
+            prevValueAsNode = wrapAsNode(args.newValue);
+            if (prevValueAsNode instanceof DocumentFragment &&
+                prevValueAsNode.firstChild instanceof Comment &&
+                prevValueAsNode.firstChild.data.startsWith(fragmentPlaceholderPrefix)) {
+                const o = prevValueAsNode;
+                args.lifecycleNode = (prevValueAsNode = o.firstChild) ?? parent;
+                appendChildren(parent, o);
+            }
+            else {
+                appendChildren(parent, prevValueAsNode as any)
+                args.lifecycleNode = prevValueAsNode ?? parent;
+            }
             return;
         }
 
-        if (value === prev) {
+        if (!args.hasChanged) {
             return;
         }
 
-        const valueAsNode = wrapAsNode(value);
-        if (prevAsNode instanceof Comment && prevAsNode.data.startsWith("__sleekdomfragmentplaceholder")) {
+        const newValueAsNode = wrapAsNode(args.newValue);
+        if (prevValueAsNode instanceof Comment && prevValueAsNode.data.startsWith("__sleekdomfragmentplaceholder")) {
             let n: Node;
-            while (n = prevAsNode.nextSibling) {
+            while (n = prevValueAsNode.nextSibling) {
                 n.parentNode?.removeChild(n);
-                if (n instanceof Comment && n.data === prevAsNode.data) {
+                if (n instanceof Comment && n.data === prevValueAsNode.data) {
                     break;
                 }
             }
         }
 
-        if (valueAsNode instanceof DocumentFragment &&
-            valueAsNode.firstChild instanceof Comment &&
-            valueAsNode.firstChild.data.startsWith(fragmentPlaceholderPrefix)) {
-            const comment = valueAsNode?.firstChild;
-            if (typeof (prevAsNode as any).replaceWith === "function")
-                (prevAsNode as any).replaceWith(valueAsNode);
+        if (newValueAsNode instanceof DocumentFragment &&
+            newValueAsNode.firstChild instanceof Comment &&
+            newValueAsNode.firstChild.data.startsWith(fragmentPlaceholderPrefix)) {
+            const comment = newValueAsNode?.firstChild;
+            if (typeof (prevValueAsNode as any).replaceWith === "function")
+                (prevValueAsNode as any).replaceWith(newValueAsNode);
             else
-                (prevAsNode.parentNode)?.replaceChild(valueAsNode, prevAsNode);
-            prevAsNode = addDisposingListener(comment, this?.dispose);
+                (prevValueAsNode.parentNode)?.replaceChild(newValueAsNode, prevValueAsNode);
+            args.lifecycleNode = (prevValueAsNode = comment) ?? parent;
         }
         else {
-            if (typeof (prevAsNode as any).replaceWith === "function")
-                (prevAsNode as any).replaceWith(valueAsNode);
+            if (typeof (prevValueAsNode as any).replaceWith === "function")
+                (prevValueAsNode as any).replaceWith(newValueAsNode);
             else
-                (prevAsNode.parentNode)?.replaceChild(valueAsNode, prevAsNode);
-            prevAsNode = addDisposingListener(valueAsNode, this?.dispose);
+                (prevValueAsNode.parentNode)?.replaceChild(newValueAsNode, prevValueAsNode);
+            args.lifecycleNode = (prevValueAsNode = newValueAsNode) ?? parent;
         }
     });
 
-    if (prevAsNode instanceof DocumentFragment &&
-        prevAsNode.firstChild instanceof Comment &&
-        prevAsNode.firstChild.data.startsWith(fragmentPlaceholderPrefix)) {
-        const o = prevAsNode;
-        prevAsNode = addDisposingListener(o.firstChild, dispose);
-        appendChildren(parent, o);
-    }
-    else
-        appendChildren(parent, addDisposingListener(prevAsNode as any, dispose));
 }
 
 export function appendChildren(

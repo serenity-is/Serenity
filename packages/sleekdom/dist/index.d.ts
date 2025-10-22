@@ -2894,27 +2894,55 @@ export declare function ShadowRootNode({ children, ref, ...attr }: ShadowRootIni
 	children?: ComponentChildren;
 }): any;
 export declare function isSignalLike(val: any): val is SignalLike<any>;
+export type SignalObserveArgs<T> = {
+	/** True if this is the initial call upon subscription. */
+	isInitial: boolean;
+	/** Previous value of the signal. Undefined if initial call. */
+	prevValue: T | undefined;
+	/** New value of the signal. Undefined if initial call. */
+	newValue: T | undefined;
+	/** True if the value has changed from previous value. False on initial call. */
+	hasChanged: boolean;
+	/** The observed signal. */
+	readonly signal: SignalLike<T>;
+	/**
+	 * Disposes the signal subscription. Only available if the signal library supports unsubscription.
+	 */
+	effectDisposer: EffectDisposer | undefined;
+	/**
+	 * Gets the lifecycle node to tie the signal's lifecycle to.
+	 */
+	get lifecycleNode(): EventTarget | undefined;
+	/**
+	 * Sets the lifecycle node to tie the signal's lifecycle to. If the useDisposableRoot option is true,
+	 * and there is a current disposable root, that node will be used instead and lifecycleNode will
+	 * return that node.
+	 */
+	set lifecycleNode(value: EventTarget | undefined);
+};
+export type ObserveSignalCallback<T> = (args: SignalObserveArgs<T>) => void;
 /**
  * This calls the callback whenever the signal value changes.
  * The callback is called immediately upon subscription, whether the signal library
- * calls it immediately or not.
+ * calls it immediately or not (though unexpected).
  * @param signal Signal to observe
- * @param callback Callback to call when the signal value changes with new and old value.
- * It is called immediately with the current value as newValue and prevValue as undefined.
- * The third parameter 'initial' is true when the callback is called immediately upon subscription.
- * @returns A function to dispose the effect if the signal library supports unsubscription
+ * @param callback Callback to call when the signal value changes with the new value
+ * and a data object containing the previous value, initial flag and the disposer.
+ * It is called immediately and on every change. The data.isInitial is true on the first call.
  */
-export declare function observeSignal<T>(signal: SignalLike<T>, callback: ((this: {
-	dispose?: EffectDisposer;
-}, value: T, prev: T, initial: boolean) => void)): EffectDisposer;
-/**
- * Observes a signal and ties its lifecycle to a node by adding a disposing listener to the node
- * if the signal library supports unsubscription.
- * @param signal Signal to observe
- * @param node Node to tie the signal's lifecycle to
- * @param callback Callback to call when the signal value changes
- */
-export declare function observeSignalForNode<T>(signal: SignalLike<T>, node: EventTarget, callback: ((value: T, prev: T, initial: boolean) => void)): void;
+export declare function observeSignal<T>(signal: SignalLike<T>, callback: ObserveSignalCallback<T>, opt?: {
+	/**
+	 * If true (default), and there is a `currentDisposableRoot()` at the time of subscription,
+	 * the signal's lifecycle will be tied to that node by adding a disposing listener to it,
+	 * instead of the node passed in the `useNode` function.
+	 */
+	useLifecycleRoot?: boolean;
+	/**
+	 * Optional node to tie the signal's lifecycle to. Ignored if useLifecycleRoot is true
+	 * and there is a current lifecycle root.
+	 */
+	lifecycleNode?: EventTarget;
+}): EffectDisposer;
 export declare const SVGNamespace = "http://www.w3.org/2000/svg";
 
 export {

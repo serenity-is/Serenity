@@ -7,7 +7,7 @@ export * from "./hooks";
 export { jsx, jsx as jsxs } from "./jsx-factory";
 export { createRef } from "./ref";
 export { ShadowRootNode } from "./shadow";
-export { isSignalLike, observeSignal, observeSignalForNode } from "./signal-util";
+export { isSignalLike, observeSignal } from "./signal-util";
 export { SVGNamespace } from "./svg-consts";
 export * from "./types";
 

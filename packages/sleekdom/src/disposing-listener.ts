@@ -125,3 +125,19 @@ export function removeDisposingListener<T extends EventTarget>(target: T, handle
     }
     return target;
 }
+
+let lifecycleRoot: Element | null = null;
+
+/**
+ * Sets or gets the current lifecycle root element.
+ * @param args If provided, sets the lifecycle root to the first argument and returns the previous root.
+ * @returns The current lifecycle root element or null if none is set.
+ */
+export function currentLifecycleRoot(...args: Element[]): Element | null {
+    if (args.length > 0) {
+        const prev = lifecycleRoot;
+        lifecycleRoot = args[0] || null;
+        return prev;
+    }
+    return lifecycleRoot;
+}

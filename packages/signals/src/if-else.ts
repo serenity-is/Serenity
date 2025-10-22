@@ -1,4 +1,4 @@
-import { addDisposingListener, removeDisposingListener, isSignalLike, type ComponentChildren, type JSXElement, type SignalOrValue, observeSignal } from "@serenity-is/sleekdom";
+import { isSignalLike, observeSignal, type ComponentChildren, type JSXElement, type SignalOrValue } from "@serenity-is/sleekdom";
 import { signal } from "./signals";
 
 export function IfElse<TWhen>(props: {
@@ -16,11 +16,8 @@ export function IfElse<TWhen>(props: {
 
     if (isSignalLike(props.when)) {
         const sig = signal<JSXElement>();
-        observeSignal(props.when, function(value) {
-            const content = getContent(!!value);
-            if (sig.peek() !== content)
-                removeDisposingListener(sig.peek() as any, this?.dispose);
-            sig.value = addDisposingListener(content, this?.dispose);
+        observeSignal(props.when, function(args) {
+            args.lifecycleNode = (sig.value = getContent(!!args.newValue));
         });
         return sig as unknown as JSXElement;
     }

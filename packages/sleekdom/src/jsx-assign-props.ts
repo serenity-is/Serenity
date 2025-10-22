@@ -1,6 +1,6 @@
 import { assignClass } from "./jsx-assign-class";
 import { assignStyle } from "./jsx-assign-style";
-import { isSignalLike, observeSignalForNode } from "./signal-util";
+import { isSignalLike, observeSignal } from "./signal-util";
 import { nonPresentationSVGAttributes } from "./svg-consts";
 import { forEach, isObject, isVisibleChild, keys } from "./util";
 
@@ -257,7 +257,9 @@ export function assignProps(node: HTMLElement | SVGElement, props: Record<string
     for (const key of keys(props)) {
         let value = props[key];
         if (isSignalLike(value)) {
-            observeSignalForNode(value, node, (val, prev) => assignProp(node, key, val, prev));
+            observeSignal(value, (args) => assignProp(node, key, args.newValue, args.prevValue), {
+                lifecycleNode: node
+            });
         }
         else {
             assignProp(node, key, value);
