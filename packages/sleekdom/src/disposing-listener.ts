@@ -8,27 +8,45 @@ export function getDisposingListeners(): WeakMap<EventTarget, ({
 }
 
 const disposingEventListener = (ev: Event) => {
-    onElementDisposing(ev?.target as EventTarget);
+    if (ev && ev.target && (!ev.currentTarget || ev.currentTarget === ev.target))
+        invokeDisposingListeners(ev?.target);
 };
 
 /**
- * Called when an element is getting disposed. This will invoke all registered disposing listeners for the element.
- * This is normally called automatically when `disposing` event is dispatched on the element.
- * It may also be called internally by Fluent events while disposing an element by `remove`, or `empty` (for descendants).
- * You should not normally call this method directly.
- * @param target The element that is being disposed.
+ * Dispatches a `disposing` event on the target element.
+ * @param target The target element to dispatch the event on.
+ * @param opt Optional parameters for the event.
  */
-export const onElementDisposing = (target: EventTarget) => {
-    if (!target)
+export function dispatchDisposingEvent(target: EventTarget, opt?: { bubbles?: boolean, cancelable?: boolean }): void {
+    if (!target || typeof CustomEvent !== "function")
+        return;
+
+    const event = new CustomEvent("disposing", {
+        bubbles: opt?.bubbles ?? false,
+        cancelable: opt?.cancelable ?? false
+    });
+
+    target.dispatchEvent(event);
+}
+
+/**
+ * Invokes all registered disposing listeners for the element and remove the 
+ * global `disposing` event listener from the element as it is no longer needed.
+ * Note that this does not dispatch a `disposing` event; to do that, 
+ * use `dispatchDisposingEvent` instead.
+ * @param node The node that is being disposed.
+ */
+export function invokeDisposingListeners(node: EventTarget): void {
+    if (!node)
         return;
 
     const disposingListeners = getDisposingListeners();
-    const handlers = disposingListeners.get(target);
-    if (!handlers)
+    const listeners = disposingListeners.get(node);
+    if (!listeners)
         return;
-    disposingListeners.delete(target);
-    target.removeEventListener("disposing", disposingEventListener);
-    for (const disposer of handlers) {
+    disposingListeners.delete(node);
+    node.removeEventListener("disposing", disposingEventListener);
+    for (const disposer of listeners) {
         try {
             disposer.callback();
         } catch {
@@ -53,8 +71,12 @@ export function addDisposingListener<T extends EventTarget>(target: T, handler: 
     if (!listeners) {
         if (typeof target.addEventListener !== "function")
             return target;
-        disposingListeners.set(target, listeners = []);
+        disposingListeners.set(target, listeners = [{
+            callback: handler,
+            regKey
+        }]);
         target.addEventListener("disposing", disposingEventListener, { once: true });
+        return target;
     }
     const existing = listeners.find(x => x.callback === handler);
     if (existing) {

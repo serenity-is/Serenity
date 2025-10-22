@@ -1,24 +1,13 @@
 /** @jsxImportSource ../src */
 import { describe, expect, it } from "vitest";
-import type { SignalLike } from "../src/types/signal-like";
-
-function testSignal<T>(initialValue: T): SignalLike<T> {
-    const signal = {
-        currentValue: initialValue,
-        peek: vi.fn(() => signal.currentValue) as () => T,
-        dispose: vi.fn() as () => void,
-        subscribe: vi.fn(function (callback) { signal.callback = callback; return signal.dispose; }),
-        get value() { return signal.currentValue },
-        set value(val: T) { if (signal.currentValue !== val) { signal.currentValue = val; signal.callback?.(val); } },
-        callback: (value: any) => void {}
-    };
-    return signal;
-}
+import { invokeDisposingListeners } from "../src/disposing-listener";
+import { mockSignal } from "./mocks/mock-signal";
+import { forAllDescendants } from "./mocks/test-helpers";
 
 describe("signal integration", () => {
 
     it("supports signal like as attribute value", () => {
-        const signal = testSignal("signal:initialvalue");
+        const signal = mockSignal("signal:initialvalue");
         const div = <div title={signal} />
         expect(signal.peek).toHaveBeenCalledOnce();
         expect(signal.subscribe).toHaveBeenCalledOnce();
@@ -28,7 +17,7 @@ describe("signal integration", () => {
     });
 
     it("supports signal as sole content", () => {
-        const signal = testSignal("signal:initialvalue");
+        const signal = mockSignal("signal:initialvalue");
         const div = <div>{signal}</div>
         expect(signal.peek).toHaveBeenCalledOnce();
         expect(signal.subscribe).toHaveBeenCalledOnce();
@@ -38,7 +27,7 @@ describe("signal integration", () => {
     });
 
     it("supports signal inside a fragment", () => {
-        const signal = testSignal("signal:initialvalue");
+        const signal = mockSignal("signal:initialvalue");
         const div = <div><><span>before</span>{signal}<span>after</span></></div>
         expect(signal.peek).toHaveBeenCalledOnce();
         expect(signal.subscribe).toHaveBeenCalledOnce();
@@ -49,7 +38,7 @@ describe("signal integration", () => {
     });
 
     it("supports signal as style property value", () => {
-        const signal = testSignal("red");
+        const signal = mockSignal("red");
         const div = <div style={{ color: signal }} />
         expect(signal.peek).toHaveBeenCalledOnce();
         expect(signal.subscribe).toHaveBeenCalledOnce();
@@ -61,7 +50,7 @@ describe("signal integration", () => {
     });
 
     it("supports a mix of signal and non-signal style property value", () => {
-        const signal = testSignal("red");
+        const signal = mockSignal("red");
         const div = <div style={{ color: signal, backgroundColor: "blue" }} />
         expect(signal.peek).toHaveBeenCalledOnce();
         expect(signal.subscribe).toHaveBeenCalledOnce();
@@ -73,7 +62,7 @@ describe("signal integration", () => {
     });
 
     it("supports signal as style object", () => {
-        const signal = testSignal({ color: "red", backgroundColor: "blue" });
+        const signal = mockSignal({ color: "red", backgroundColor: "blue" });
         const div = <div style={signal} />
         expect(signal.peek).toHaveBeenCalledOnce();
         expect(signal.subscribe).toHaveBeenCalledOnce();
@@ -85,7 +74,7 @@ describe("signal integration", () => {
     });
 
     it("clears previously set style properties when signal style value set to false", () => {
-        const signal = testSignal<any>({ color: "red", backgroundColor: "blue" });
+        const signal = mockSignal<any>({ color: "red", backgroundColor: "blue" });
         const div = <div style={signal} />
         expect(signal.peek).toHaveBeenCalledOnce();
         expect(signal.subscribe).toHaveBeenCalledOnce();
@@ -97,7 +86,7 @@ describe("signal integration", () => {
     })
 
     it("does not touch manually set properties when signal value changes", () => {
-        const signal = testSignal<any>({ color: "red" });
+        const signal = mockSignal<any>({ color: "red" });
         const div = <div style={signal} />
         expect(signal.peek).toHaveBeenCalledOnce();
         expect(signal.subscribe).toHaveBeenCalledOnce();
@@ -109,7 +98,7 @@ describe("signal integration", () => {
     });
 
     it("supports signal like as classname value", () => {
-        const signal = testSignal({ active: true, disabled: false, highlighted: true });
+        const signal = mockSignal({ active: true, disabled: false, highlighted: true });
         const div = <div class={signal} />
         expect(signal.peek).toHaveBeenCalledOnce();
         expect(signal.subscribe).toHaveBeenCalledOnce();
@@ -123,9 +112,9 @@ describe("signal integration", () => {
     });
 
     it("supports signal like as classname individual entries", () => {
-        const signalActive = testSignal(true);
-        const signalDisabled = testSignal(false);
-        const signalHighlighted = testSignal(true);
+        const signalActive = mockSignal(true);
+        const signalDisabled = mockSignal(false);
+        const signalHighlighted = mockSignal(true);
         const div = <div class={{ active: signalActive, disabled: signalDisabled, highlighted: signalHighlighted }} />
         expect(signalActive.peek).toHaveBeenCalledOnce();
         expect(signalActive.subscribe).toHaveBeenCalledOnce();
@@ -145,7 +134,7 @@ describe("signal integration", () => {
     });
 
     it("supports a mix of signal and non-signal classname entries", () => {
-        const signalActive = testSignal(true);
+        const signalActive = mockSignal(true);
         const div = <div class={{ active: signalActive, disabled: false, highlighted: true }} />
         expect(signalActive.peek).toHaveBeenCalledOnce();
         expect(signalActive.subscribe).toHaveBeenCalledOnce();
@@ -159,7 +148,7 @@ describe("signal integration", () => {
     });
 
     it("supports signal like array as classname value", () => {
-        const signal = testSignal(["active", "highlighted"]);
+        const signal = mockSignal(["active", "highlighted"]);
         const div = <div class={signal} />
         expect(signal.peek).toHaveBeenCalledOnce();
         expect(signal.subscribe).toHaveBeenCalledOnce();
@@ -173,8 +162,8 @@ describe("signal integration", () => {
     });
 
     it("supports an array of signal and non-signal classname entries", () => {
-        const signalActive = testSignal<string | boolean>("active");
-        const signalDisabled = testSignal<string | boolean>(false);
+        const signalActive = mockSignal<string | boolean>("active");
+        const signalDisabled = mockSignal<string | boolean>(false);
         const div = <div class={ [signalDisabled as any, signalActive as any, "highlighted"] } />
         expect(signalActive.peek).toHaveBeenCalledOnce();
         expect(signalActive.subscribe).toHaveBeenCalledOnce();
@@ -191,7 +180,7 @@ describe("signal integration", () => {
     });
 
     it("does not touch manually added classnames when signal value changes", () => {
-        const signal = testSignal(["active"]);
+        const signal = mockSignal(["active"]);
         const div = <div class={signal} />
         expect(signal.peek).toHaveBeenCalledOnce();
         expect(signal.subscribe).toHaveBeenCalledOnce();
@@ -201,5 +190,15 @@ describe("signal integration", () => {
         expect(div.classList.contains("active")).toBe(false);
         expect(div.classList.contains("disabled")).toBe(true);
         expect(div.classList.contains("highlighted")).toBe(true);
+    });
+
+    it("disposes signal subscriptions when element is disposed", () => {
+        const signal = mockSignal("signal:initialvalue");
+        const div = <div>{signal}</div>
+        expect(signal.peek).toHaveBeenCalledOnce();
+        expect(signal.subscribe).toHaveBeenCalledOnce();
+        expect(div.textContent).toBe("signal:initialvalue");
+        forAllDescendants(div, invokeDisposingListeners);
+        expect(signal.unsubscribe).toHaveBeenCalledOnce();
     });
 })

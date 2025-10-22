@@ -2853,13 +2853,13 @@ export declare class Component<T = any> {
 	render(): JSXElement | null;
 }
 /**
- * Called when an element is getting disposed. This will invoke all registered disposing listeners for the element.
- * This is normally called automatically when `disposing` event is dispatched on the element.
- * It may also be called internally by Fluent events while disposing an element by `remove`, or `empty` (for descendants).
- * You should not normally call this method directly.
- * @param target The element that is being disposed.
+ * Invokes all registered disposing listeners for the element and remove the
+ * global `disposing` event listener from the element as it is no longer needed.
+ * Note that this does not dispatch a `disposing` event; to do that,
+ * use `dispatchDisposingEvent` instead.
+ * @param node The node that is being disposed.
  */
-export declare const onElementDisposing: (target: EventTarget) => void;
+export declare function invokeDisposingListeners(node: EventTarget): void;
 /**
  * Adds a disposing listener to an element. Note that the listener itself is not added as an event listener,
  * but will be called when the `disposing` event is dispatched on the element, along with other disposing listeners.
@@ -2889,6 +2889,10 @@ export type DataKeys = `data-${string}`;
 export declare function jsx<THtmlTag extends keyof HTMLElementTagNameMap, TElement extends HTMLElementTagNameMap[THtmlTag]>(type: THtmlTag, props?: (HTMLElementTags[THtmlTag] & Record<DataKeys, string | number>) | null, key?: string): TElement;
 export declare function jsx<TSvgTag extends (keyof SVGElementTagNameMap & keyof SVGElementTags), TElement extends SVGElementTagNameMap[TSvgTag]>(type: TSvgTag, props?: (SVGElementTags[TSvgTag] & Record<DataKeys, string | number>) | null, key?: string): TElement;
 export declare function jsx(type: string, props?: (ElementAttributes<JSXElement> & Record<DataKeys, string | number>) | null, key?: string): JSXElement;
+export declare function ShadowRootNode({ children, ref, ...attr }: ShadowRootInit & {
+	ref?: Ref<ShadowRoot>;
+	children?: ComponentChildren;
+}): any;
 export declare function isSignalLike(val: any): val is SignalLike<any>;
 /**
  * This calls the callback whenever the signal value changes.
@@ -2911,10 +2915,6 @@ export declare function observeSignal<T>(signal: SignalLike<T>, callback: ((this
  * @param callback Callback to call when the signal value changes
  */
 export declare function observeSignalForNode<T>(signal: SignalLike<T>, node: EventTarget, callback: ((value: T, prev: T, initial: boolean) => void)): void;
-export declare function ShadowRootNode({ children, ref, ...attr }: ShadowRootInit & {
-	ref?: Ref<ShadowRoot>;
-	children?: ComponentChildren;
-}): any;
 export declare const SVGNamespace = "http://www.w3.org/2000/svg";
 
 export {

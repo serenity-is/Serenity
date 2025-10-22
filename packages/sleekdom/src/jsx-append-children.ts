@@ -40,9 +40,13 @@ function wrapAsNode(value: any): Node {
 
 function appendChildrenWithSignal(parent: Node, signal: SignalLike<any>) {
     let prevAsNode: Node;
-    const dispose = observeSignal(signal, function(value) {
-        if (prevAsNode === void 0) {
-            addDisposingListener(prevAsNode = wrapAsNode(value), this?.dispose);
+    const dispose = observeSignal(signal, (value, prev) => {
+        if (prevAsNode === undefined) {
+            prevAsNode = wrapAsNode(value);
+            return;
+        }
+
+        if (value === prev) {
             return;
         }
 

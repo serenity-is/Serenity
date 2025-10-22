@@ -1,5 +1,4 @@
-import { ad } from "vitest/dist/chunks/reporters.d.BFLkQcL6.js";
-import { addDisposingListener, removeDisposingListener, onElementDisposing, getDisposingListeners } from "../src/disposing-listener";
+import { addDisposingListener, getDisposingListeners, invokeDisposingListeners, removeDisposingListener } from "../src/disposing-listener";
 
 let el: HTMLElement;
 
@@ -142,21 +141,21 @@ describe("removeDisposingListener", () => {
     });
 });
 
-describe("onElementDisposing", () => {
+describe("invokeDisposingListeners", () => {
     it("should call the callback when the disposing event is dispatched", () => {
         const callback = vi.fn();
         addDisposingListener(el, () => callback());
-        onElementDisposing(el);
+        invokeDisposingListeners(el);
         el.dispatchEvent(new Event("disposing"));
         expect(callback).toHaveBeenCalledOnce();
     });
 
     it("should not fail if there are no disposing listeners", () => {
-        expect(() => onElementDisposing(el)).not.toThrow();
+        expect(() => invokeDisposingListeners(el)).not.toThrow();
     });
 
     it("should not fail if the target is not an EventTarget", () => {
-        expect(() => onElementDisposing({} as any)).not.toThrow();
+        expect(() => invokeDisposingListeners({} as any)).not.toThrow();
     });
 
     it("removes global listener", () => {
@@ -165,12 +164,12 @@ describe("onElementDisposing", () => {
         addDisposingListener(el, listener1);
         addDisposingListener(el, listener2);
         expect(el.addEventListener).toHaveBeenCalledOnce();
-        onElementDisposing(el);
+        invokeDisposingListeners(el);
         expect(el.removeEventListener).toHaveBeenCalledWith("disposing", (el.addEventListener as any).mock.calls[0][1]);
     });
 
     it("does not try to remove global listener if no listeners", () => {
-        onElementDisposing(el);
+        invokeDisposingListeners(el);
         expect(el.removeEventListener).not.toHaveBeenCalled();
     });
 
@@ -179,18 +178,18 @@ describe("onElementDisposing", () => {
         const listener2 = vi.fn();
         addDisposingListener(el, listener1);
         addDisposingListener(el, listener2);
-        expect(() => onElementDisposing(el)).not.toThrow();
+        expect(() => invokeDisposingListeners(el)).not.toThrow();
         expect(listener2).toHaveBeenCalledOnce();
     });
 
     it("does not stack overflow if disposing event is re-dispatched", () => {
         const listener1 = vi.fn(() => {
-            onElementDisposing(el);
+            invokeDisposingListeners(el);
         });
         const listener2 = vi.fn();
         addDisposingListener(el, listener1);
         addDisposingListener(el, listener2);
-        expect(() => onElementDisposing(el)).not.toThrow();
+        expect(() => invokeDisposingListeners(el)).not.toThrow();
         expect(listener2).toHaveBeenCalledOnce();
     });
 
@@ -200,7 +199,7 @@ describe("onElementDisposing", () => {
         addDisposingListener(el, listener1);
         addDisposingListener(el, listener2);
         expect(el.addEventListener).toHaveBeenCalledOnce();
-        expect(() => onElementDisposing(el)).not.toThrow();
+        invokeDisposingListeners(el);
         expect(el.removeEventListener).toHaveBeenCalledWith("disposing", (el.addEventListener as any).mock.calls[0][1]);
     });
 });

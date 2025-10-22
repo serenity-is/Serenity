@@ -1,4 +1,4 @@
-﻿import { onElementDisposing } from "@serenity-is/sleekdom";
+﻿import { invokeDisposingListeners } from "@serenity-is/sleekdom";
 import { isMobileView } from ".";
 import { Fluent, faIcon, getCookie, getjQuery } from "../base";
 
@@ -47,7 +47,7 @@ function applyCleanDataPatch($: any) {
             const cloned = elements;
             for (i = 0; (element = cloned[i]) != null; i++) {
                 try {
-                    onElementDisposing(element);
+                    invokeDisposingListeners(element);
                     events = ($ as any)._data(element, "events");
                     if (events && events.disposing) {
                         let handlers = events.disposing;

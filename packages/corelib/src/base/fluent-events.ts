@@ -5,7 +5,7 @@
  * --------------------------------------------------------------------------
  */
 
-import { addDisposingListener, onElementDisposing, removeDisposingListener } from "@serenity-is/sleekdom";
+import { addDisposingListener, invokeDisposingListeners, removeDisposingListener } from "@serenity-is/sleekdom";
 import { getjQuery } from "./environment";
 
 const stripNameRegex = /\..*/
@@ -37,14 +37,18 @@ export function getEventRegistry(): WeakMap<EventTarget, ElementEvents> {
 }
 
 export function disposeDescendants(element: Element) {
-    element.querySelectorAll("*").forEach(node => disposeElement(node));
+    const iterator = document.createTreeWalker(element, 
+        NodeFilter.SHOW_ELEMENT | NodeFilter.SHOW_COMMENT | NodeFilter.SHOW_TEXT);
+    let node;
+    while (node = iterator.nextNode())
+        disposeElement(node);
 }
 
 export function disposeElement(element: EventTarget): void {
     if (!element)
         return;
 
-    onElementDisposing(element);
+    invokeDisposingListeners(element);
 
     const eventRegistry = getEventRegistry();
     let events = eventRegistry.get(element);
