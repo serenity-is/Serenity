@@ -13,7 +13,7 @@ beforeEach(() => {
     vi.restoreAllMocks();
 });
 
-describe("disposeElement", () => {
+describe("notifyDisposingNode", () => {
     let element: HTMLElement;
     beforeEach(() => {
         element = document.createElement("div");
@@ -61,7 +61,7 @@ describe("disposeElement", () => {
         addListener(element, "disposing", disposing2);
         expect(addDisposingListener).toHaveBeenCalledWith(element, disposing2);
         notifyDisposingNode(element);
-        expect(invokeDisposingListeners).toHaveBeenCalledExactlyOnceWith(element);
+        expect(invokeDisposingListeners).toHaveBeenCalledExactlyOnceWith(element, void 0);
     });
 
     it("does not trigger externally attached disposing event", () => {
@@ -70,7 +70,7 @@ describe("disposeElement", () => {
         addListener(element, "disposing", disposing1);
         element.addEventListener("disposing", disposing2);
         notifyDisposingNode(element);
-        expect(invokeDisposingListeners).toHaveBeenCalledExactlyOnceWith(element);
+        expect(invokeDisposingListeners).toHaveBeenCalledExactlyOnceWith(element, void 0);
         expect(disposing2).not.toHaveBeenCalled();
     });
     
@@ -81,7 +81,7 @@ describe("disposeElement", () => {
         const disposing1 = vi.fn();
         addListener(element, "disposing", disposing1);
         notifyDisposingNode(element);
-        expect(invokeDisposingListeners).toHaveBeenCalledExactlyOnceWith(element);
+        expect(invokeDisposingListeners).toHaveBeenCalledExactlyOnceWith(element, void 0);
         // as the module is mocked, removeDisposingListener will not be called
         expect(removeDisposingListener).not.toHaveBeenCalled();
         element.dispatchEvent(new Event("test"));

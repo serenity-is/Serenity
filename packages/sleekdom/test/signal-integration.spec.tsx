@@ -2,7 +2,6 @@
 import { describe, expect, it } from "vitest";
 import { invokeDisposingListeners } from "../src/disposing-listener";
 import { mockSignal } from "./mocks/mock-signal";
-import { forAllDescendants } from "./mocks/test-helpers";
 
 describe("signal integration", () => {
 
@@ -180,7 +179,7 @@ describe("signal integration", () => {
         const div = <div>{signal}</div>
         expect(signal.subscribe).toHaveBeenCalledOnce();
         expect(div.textContent).toBe("signal:initialvalue");
-        forAllDescendants(div, invokeDisposingListeners);
+        invokeDisposingListeners(div, { descendants: true });
         expect(signal.unsubscribe).toHaveBeenCalledOnce();
     });
 })

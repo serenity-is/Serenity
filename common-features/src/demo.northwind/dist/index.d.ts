@@ -1027,7 +1027,6 @@ export declare class OrderGrid<P = {}> extends EntityGrid<OrderRow, P> {
 	protected onClick(e: Event, row: number, cell: number): void;
 	set_shippingState(value: number): void;
 	protected addButtonClick(): void;
-	protected getSlickOptions(): import("@serenity-is/sleekgrid").GridOptions<any>;
 }
 export declare class CustomerOrdersGrid<P = {}> extends OrderGrid<P> {
 	static [Symbol.typeInfo]: import("@serenity-is/corelib").ClassTypeInfo<"Serenity.Demo.Northwind.">;

@@ -36,46 +36,55 @@ export function getEventRegistry(): WeakMap<EventTarget, ElementEvents> {
     return (globalThis as any)[eventRegistrySymbol] ||= new WeakMap();
 }
 
-export function notifyDisposingDescendants(element: Element) {
-    // we also include comments and text nodes, as sleekdom may use them as placeholders
-    // and use the `disposing` event to cleanup related signals / effects
-    const iterator = document.createTreeWalker(element, 
-        NodeFilter.SHOW_ELEMENT | NodeFilter.SHOW_COMMENT | NodeFilter.SHOW_TEXT);
-    let node;
-    while (node = iterator.nextNode())
-        notifyDisposingNode(node);
-}
-
-export function notifyDisposingNode(element: EventTarget): void {
-    if (!element)
+export function notifyDisposingNode(node: EventTarget, opt?: {
+    descendants?: boolean,
+    excludeSelf?: boolean
+}): void {
+    if (!node)
         return;
 
-    invokeDisposingListeners(element);
+    invokeDisposingListeners(node, opt);
 
     const eventRegistry = getEventRegistry();
-    let events = eventRegistry.get(element);
-    if (!events)
-        return;
 
-    eventRegistry.delete(element);
+    function invokeFor(el: EventTarget) {   
+        const events = eventRegistry.get(el);
+        if (!events)
+            return;
 
-    const disposeHandlers = events["disposing"];
-    if (disposeHandlers) {
-        for (const [_, handler] of Object.entries(disposeHandlers)) {
-            if (typeof handler.callable === "function") {
-                try {
-                    handler.callable.call(element, { target: element });
-                }
-                catch {
+        eventRegistry.delete(el);
+
+        const disposeHandlers = events["disposing"];
+        if (disposeHandlers) {
+            for (const [_, handler] of Object.entries(disposeHandlers)) {
+                if (typeof handler.callable === "function") {
+                    try {
+                        handler.callable.call(el, { target: el });
+                    }
+                    catch {
+                    }
                 }
             }
         }
-    }
-    for (const [typeEvent, handlers] of Object.entries(events)) {
-        for (const [handlerKey, handler] of Object.entries(handlers)) {
-            element.removeEventListener(typeEvent, handler as any, Boolean(handler.delegationSelector));
-            delete handlers[handlerKey];
+        for (const [typeEvent, handlers] of Object.entries(events)) {
+            for (const [handlerKey, handler] of Object.entries(handlers)) {
+                el.removeEventListener(typeEvent, handler as any, Boolean(handler.delegationSelector));
+                delete handlers[handlerKey];
+            }
         }
+    }
+
+    if (opt?.descendants && node instanceof Element && node.hasChildNodes()) {
+        const iterator = document.createNodeIterator(
+            node as Node, NodeFilter.SHOW_ELEMENT);
+        let currentNode: Node | null;
+        while (currentNode = iterator.nextNode()) {
+            invokeFor(currentNode);
+        }
+    }
+
+    if (!opt?.excludeSelf) {
+        invokeFor(node);
     }
 }
 

@@ -2853,13 +2853,25 @@ export declare class Component<T = any> {
 	render(): JSXElement | null;
 }
 /**
+ * Dispatches a `disposing` event on the target element.
+ * @param target The target element to dispatch the event on.
+ * @param opt Optional parameters for the event.
+ */
+export declare function dispatchDisposingEvent(target: EventTarget, opt?: {
+	bubbles?: boolean;
+	cancelable?: boolean;
+}): void;
+/**
  * Invokes all registered disposing listeners for the element and remove the
  * global `disposing` event listener from the element as it is no longer needed.
  * Note that this does not dispatch a `disposing` event; to do that,
  * use `dispatchDisposingEvent` instead.
  * @param node The node that is being disposed.
  */
-export declare function invokeDisposingListeners(node: EventTarget): void;
+export declare function invokeDisposingListeners(node: EventTarget, opt?: {
+	descendants?: boolean;
+	excludeSelf?: boolean;
+}): void;
 /**
  * Adds a disposing listener to an element. Note that the listener itself is not added as an event listener,
  * but will be called when the `disposing` event is dispatched on the element, along with other disposing listeners.
@@ -2880,6 +2892,12 @@ export declare function addDisposingListener<T extends EventTarget>(target: T, h
  * @returns The element that the listener was removed from.
  */
 export declare function removeDisposingListener<T extends EventTarget>(target: T, handler: () => void, regKey?: string): T;
+/**
+ * Sets or gets the current lifecycle root element.
+ * @param args If provided, sets the lifecycle root to the first argument and returns the previous root.
+ * @returns The current lifecycle root element or null if none is set.
+ */
+export declare function currentLifecycleRoot(...args: Element[]): Element | null;
 export declare function useClassList(initialValue?: ClassNames): BasicClassList;
 export declare function useText(initialValue?: string): readonly [
 	Text,

@@ -229,6 +229,7 @@ export class Grid<TItem = any> implements EditorHost {
             getScrollLeft: () => this._scrollLeft,
             getScrollTop: () => this._scrollTop,
             getViewportInfo: () => this._viewportInfo,
+            removeNode: this._removeNode,
             renderRows: this.renderRows.bind(this)
         });
 
@@ -1215,6 +1216,7 @@ export class Grid<TItem = any> implements EditorHost {
         else
             canvasNodes.forEach(el => el && this._removeNode(el));
 
+        this._emptyNode(this._container);
         this._eventDisposer?.abort();
 
         for (var k in this) {

@@ -1,8 +1,7 @@
-import { computed, IfElse, signal } from "@serenity-is/signals";
-import { Column, parsePx } from "../core";
+import { computed, IfElse } from "@serenity-is/signals";
+import { currentLifecycleRoot } from "@serenity-is/sleekdom";
+import { Column } from "../core";
 import { LayoutEngine, LayoutHost } from "./layout";
-import { invokeDisposingListeners } from "@serenity-is/sleekdom";
-import { forAllDescendants } from "./internal";
 
 export const BasicLayout: { new(): LayoutEngine } = function (): LayoutEngine {
     let host: LayoutHost;
@@ -18,35 +17,40 @@ export const BasicLayout: { new(): LayoutEngine } = function (): LayoutEngine {
 
     function init(hostGrid: LayoutHost) {
         host = hostGrid;
-        const options = host.getOptions();
         const optSignals = host.getOptionSignals();
         const hideColumnHeader = computed(() => !optSignals.showColumnHeader.value);
+        const prevLifecycleRoot = currentLifecycleRoot(host.getContainerNode());
+        try {
 
-        host.getContainerNode().append(<>
-            <div class={{ "slick-header": true, "slick-hidden": hideColumnHeader }}>
-                <div class="slick-header-columns" ref={el => headerCols = el} />
-            </div>
-            <IfElse when={optSignals.showHeaderRow} else={__("headerrow")}>
-                <div class="slick-headerrow slick-spacer-h">
-                    <div class="slick-headerrow-columns" ref={el => headerRowCols = el} />
+            host.getContainerNode().append(<>
+                <div class={{ "slick-header": true, "slick-hidden": hideColumnHeader }}>
+                    <div class="slick-header-columns" ref={el => headerCols = el} />
                 </div>
-            </IfElse>
-            <IfElse when={optSignals.showTopPanel} else={__("toppanel")}>
-                <div class="slick-top-panel-container">
-                    <div class="slick-top-panel" ref={el => topPanel = el} />
+                <IfElse when={optSignals.showHeaderRow} else={__("headerrow")}>
+                    <div class="slick-headerrow slick-spacer-h">
+                        <div class="slick-headerrow-columns" ref={el => headerRowCols = el} />
+                    </div>
+                </IfElse>
+                <IfElse when={optSignals.showTopPanel} else={__("toppanel")}>
+                    <div class="slick-top-panel-container">
+                        <div class="slick-top-panel" ref={el => topPanel = el} />
+                    </div>
+                </IfElse>
+                <div class="slick-viewport" tabindex="0" ref={el => viewport = el}>
+                    <div class="grid-canvas" tabindex="0" ref={el => canvas = el} />
                 </div>
-            </IfElse>
-            <div class="slick-viewport" tabindex="0" ref={el => viewport = el}>
-                <div class="grid-canvas" tabindex="0" ref={el => canvas = el} />
-            </div>
-            <IfElse when={optSignals.showFooterRow} else={__("footerrow")}>
-                <div class="slick-footerrow">
-                    <div class="slick-footerrow-columns" ref={el => footerRowCols = el} />
-                </div>
-            </IfElse>
-        </>);
+                <IfElse when={optSignals.showFooterRow} else={__("footerrow")}>
+                    <div class="slick-footerrow">
+                        <div class="slick-footerrow-columns" ref={el => footerRowCols = el} />
+                    </div>
+                </IfElse>
+            </>);
 
-        updateHeadersWidth();
+            updateHeadersWidth();
+        }
+        finally {
+            currentLifecycleRoot(prevLifecycleRoot);
+        }
     }
 
     function appendCachedRow(_: number, _rowNodeS: HTMLDivElement, rowNodeC: HTMLDivElement, _rowNodeE: HTMLDivElement): void {
@@ -120,27 +124,7 @@ export const BasicLayout: { new(): LayoutEngine } = function (): LayoutEngine {
     }
 
     const destroy = () => {
-
-        headerCols = null;
-        headerRowCols = null;
-        canvas = null;
-        topPanel = null;
-        viewport = null;
-        footerRowCols = null;
-
-        for (let child of Array.from(host?.getContainerNode().children || [])) {
-            if (child.matches?.(".slick-header, .slick-headerrow, .slick-footerrow, .slick-top-pane-container, .slick-viewport")) {
-                forAllDescendants(child, invokeDisposingListeners);
-                invokeDisposingListeners(child);
-                child.remove();
-            }
-            else if (child instanceof Comment && (child as Comment).data.startsWith("placeholder:") ||
-                child instanceof Text && (child as Text).data === "") {
-                invokeDisposingListeners(child);
-                child.remove();
-            }
-        }
-        host = null;
+        headerCols = headerRowCols = canvas = topPanel = viewport = footerRowCols = host = null;
     }
 
     function getCanvasNodeFor(): HTMLElement {

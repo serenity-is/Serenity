@@ -29,6 +29,7 @@ export interface LayoutHost {
     getScrollLeft(): number;
     getScrollTop(): number;
     getViewportInfo(): ViewportInfo;
+    removeNode(node: HTMLElement): void;
     renderRows(range: ViewRange): void;
 }
 

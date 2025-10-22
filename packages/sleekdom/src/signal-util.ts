@@ -94,7 +94,7 @@ export function observeSignal<T>(signal: SignalLike<T>, callback: ObserveSignalC
         if (args.isInitial) {
             this?.dispose && (args.effectDisposer = this.dispose.bind(this));
         }
-        args.hasChanged = args.prevValue !== args.newValue;
+        args.hasChanged = !args.isInitial && args.prevValue !== args.newValue;
         try {
             callback(args);
         }

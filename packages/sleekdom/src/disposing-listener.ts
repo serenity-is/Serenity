@@ -36,22 +36,43 @@ export function dispatchDisposingEvent(target: EventTarget, opt?: { bubbles?: bo
  * use `dispatchDisposingEvent` instead.
  * @param node The node that is being disposed.
  */
-export function invokeDisposingListeners(node: EventTarget): void {
+export function invokeDisposingListeners(node: EventTarget, opt?: {
+    descendants?: boolean,
+    excludeSelf?: boolean,
+}): void {
     if (!node)
         return;
 
     const disposingListeners = getDisposingListeners();
-    const listeners = disposingListeners.get(node);
-    if (!listeners)
-        return;
-    disposingListeners.delete(node);
-    node.removeEventListener("disposing", disposingEventListener);
-    for (const disposer of listeners) {
-        try {
-            disposer.callback();
-        } catch {
-            // ignore
+
+    function invokeFor(el: EventTarget) {   
+        const listeners = disposingListeners.get(el);
+        if (!listeners)
+            return;
+        disposingListeners.delete(el);
+        el.removeEventListener("disposing", disposingEventListener);
+        for (const disposer of listeners) {
+            try {
+                disposer.callback();
+            } catch {
+                // ignore
+            }
         }
+    }
+
+    if (opt?.descendants && node instanceof Element && node.hasChildNodes()) {
+        const iterator = document.createNodeIterator(
+            node as Node,
+            NodeFilter.SHOW_ELEMENT | NodeFilter.SHOW_TEXT | NodeFilter.SHOW_COMMENT);
+        let currentNode: Node | null;
+        while (currentNode = iterator.nextNode()) {
+            invokeFor(currentNode);
+        }
+    }
+
+
+    if (!opt?.excludeSelf) {
+        invokeFor(node);
     }
 };
 

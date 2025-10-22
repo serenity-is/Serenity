@@ -1,9 +1,13 @@
 import { gridDefaults, ViewportInfo, type Column, type RowCell } from "../../src/core";
 import { GridOptions } from "../../src/core/gridoptions";
-import type { GridOptionSignals } from "../../src/grid/layout";
+import type { GridOptionSignals, LayoutHost } from "../../src/grid/layout";
 import { mockSignal } from "./mock-signal";
 
-export function mockLayoutHost() {
+export function mockLayoutHost(): LayoutHost & {
+    optSignals: GridOptionSignals,
+    opt: GridOptions<any>,
+    container: HTMLDivElement
+} {
     const host = {
         container: document.createElement("div"),
         opt: {
@@ -38,6 +42,7 @@ export function mockLayoutHost() {
         getScrollLeft: vi.fn(() => 0),
         getScrollTop: vi.fn(() => 0),
         getViewportInfo: vi.fn(() => ({} as ViewportInfo)),
+        removeNode: vi.fn(),
         renderRows: vi.fn()
     };
     return host;

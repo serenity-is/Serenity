@@ -560,6 +560,7 @@ export interface LayoutHost {
 	getScrollLeft(): number;
 	getScrollTop(): number;
 	getViewportInfo(): ViewportInfo;
+	removeNode(node: HTMLElement): void;
 	renderRows(range: ViewRange): void;
 }
 export interface LayoutEngine {
@@ -1037,6 +1038,7 @@ export declare class Grid<TItem = any> implements EditorHost {
 	private _styleNode;
 	private _stylesheet;
 	private _tabbingDirection;
+	private static _nextUid;
 	private _uid;
 	private _viewportInfo;
 	private _vScrollDir;
@@ -1045,6 +1047,7 @@ export declare class Grid<TItem = any> implements EditorHost {
 	private _focusSink1;
 	private _focusSink2;
 	private _groupingPanel;
+	private _eventDisposer;
 	readonly onActiveCellChanged: EventEmitter<ArgsCell, IEventData>;
 	readonly onActiveCellPositionChanged: EventEmitter<ArgsGrid, IEventData>;
 	readonly onAddNewRow: EventEmitter<ArgsAddNewRow, IEventData>;
@@ -1084,6 +1087,7 @@ export declare class Grid<TItem = any> implements EditorHost {
 	constructor(container: string | HTMLElement | ArrayLike<HTMLElement>, data: any, columns: Column<TItem>[], options: GridOptions<TItem>);
 	private createGroupingPanel;
 	private bindAncestorScroll;
+	private onEvent;
 	init(): void;
 	registerPlugin(plugin: IPlugin): void;
 	unregisterPlugin(plugin: IPlugin): void;
