@@ -108,12 +108,4 @@ export class OrderGrid<P = {}> extends EntityGrid<OrderRow, P> {
             CustomerID: eq ? eq.CustomerID : null
         });
     }
-
-    protected getSlickOptions() {
-        let opt = super.getSlickOptions();
-        opt.frozenColumns = 2;
-        opt.layoutEngine = () => new FrozenLayout();
-        opt.showTopPanel = true;
-        return opt;
-    }
 }

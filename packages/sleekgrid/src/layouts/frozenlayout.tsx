@@ -1,6 +1,8 @@
 import { IfElse, signal } from "@serenity-is/signals";
 import { Column, GridOptions, parsePx, ViewRange } from "../core";
 import { LayoutEngine, LayoutHost } from "../grid";
+import { invokeDisposingListeners } from "@serenity-is/sleekdom";
+import { forAllDescendants } from "../grid/internal";
 
 export const FrozenLayout: { new(): LayoutEngine } = function (): LayoutEngine {
     let canvasWidth: number;
@@ -747,6 +749,42 @@ export const FrozenLayout: { new(): LayoutEngine } = function (): LayoutEngine {
     }
 
     function destroy(): void {
+        canvasBottomL = null;
+        canvasBottomR = null;
+        canvasTopL = null;
+        canvasTopR = null;
+        headerColsL = null;
+        headerColsR = null;
+        headerRowColsL = null;
+        headerRowColsR = null;
+        footerRowColsL = null;
+        footerRowColsR = null;
+        paneBottomL = null;
+        paneBottomR = null;
+        paneHeaderL = null;
+        paneHeaderR = null;
+        paneTopL = null;
+        paneTopR = null;
+        scrollContainerX = null;
+        scrollContainerY = null;
+        topPanel = null;
+        viewportBottomL = null;
+        viewportBottomR = null;
+        viewportTopL = null;
+        viewportTopR = null;
+        for (let pane of Array.from(host?.getContainerNode().children || [])) {
+            if (pane.classList.contains("slick-pane") ||
+                pane.classList.contains("slick-top-panel-container")) {
+                forAllDescendants(pane, invokeDisposingListeners);
+                invokeDisposingListeners(pane);
+                pane.remove();
+            }
+            else if (pane instanceof Comment && (pane as Comment).data.startsWith("placeholder:") ||
+                pane instanceof Text && (pane as Text).data === "") {
+                invokeDisposingListeners(pane);
+                pane.remove();
+            }
+        }
         host = null;
     }
 

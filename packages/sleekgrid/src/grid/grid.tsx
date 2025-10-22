@@ -6,7 +6,7 @@ import { BasicLayout } from "./basiclayout";
 import { CellNavigator } from "./cellnavigator";
 import { Draggable } from "./draggable";
 import { ArgsAddNewRow, ArgsCell, ArgsCellChange, ArgsCellEdit, ArgsColumn, ArgsColumnNode, ArgsCssStyle, ArgsEditorDestroy, ArgsGrid, ArgsScroll, ArgsSelectedRowsChange, ArgsSort, ArgsValidationError } from "./eventargs";
-import { CachedRow, PostProcessCleanupEntry, absBox, autosizeColumns, calcMinMaxPageXOnDragStart, getInnerWidth, getMaxSupportedCssHeight, getScrollBarDimensions, getVBoxDelta, shrinkOrStretchColumn, simpleArrayEquals, sortToDesiredOrderAndKeepRest } from "./internal";
+import { CachedRow, PostProcessCleanupEntry, absBox, autosizeColumns, calcMinMaxPageXOnDragStart, getInnerWidth, getMaxSupportedCssHeight, getScrollBarDimensions, shrinkOrStretchColumn, simpleArrayEquals, sortToDesiredOrderAndKeepRest } from "./internal";
 import { LayoutEngine, type GridOptionSignals } from "./layout";
 import { IPlugin, SelectionModel } from "./types";
 
@@ -84,7 +84,8 @@ export class Grid<TItem = any> implements EditorHost {
     declare private _styleNode: HTMLStyleElement;
     declare private _stylesheet: any;
     private _tabbingDirection: number = 1;
-    private _uid: string = "sleekgrid_" + Math.round(1000000 * Math.random());
+    declare private static _nextUid: number;
+    private _uid: string = "sleekgrid_" + (Grid._nextUid = (Grid._nextUid || 0) + 1);
     private _viewportInfo: ViewportInfo = {} as any;
     private _vScrollDir: number = 1;
 
@@ -93,6 +94,7 @@ export class Grid<TItem = any> implements EditorHost {
     declare private _focusSink1: HTMLElement;
     declare private _focusSink2: HTMLElement;
     declare private _groupingPanel: HTMLElement;
+    declare private _eventDisposer: AbortController;
 
     readonly onActiveCellChanged = new EventEmitter<ArgsCell>();
     readonly onActiveCellPositionChanged = new EventEmitter<ArgsGrid>();
@@ -133,6 +135,7 @@ export class Grid<TItem = any> implements EditorHost {
 
     constructor(container: string | HTMLElement | ArrayLike<HTMLElement>, data: any, columns: Column<TItem>[], options: GridOptions<TItem>) {
 
+
         this._data = data;
         this._colDefaults = Object.assign({}, columnDefaults);
 
@@ -156,6 +159,7 @@ export class Grid<TItem = any> implements EditorHost {
         }
 
         this._container.classList.add('slick-container');
+        this._eventDisposer = new AbortController();
 
         this._emptyNode = options.emptyNode ?? (this._jQuery ? (function (node: Element) { this(node).empty(); }).bind(this._jQuery) : (function (node: Element) { node.innerHTML = ""; }));
         this._removeNode = options.removeNode ?? (this._jQuery ? (function (node: Element) { this(node).remove(); }).bind(this._jQuery) : (function (node: Element) { node.remove(); }));
@@ -187,10 +191,7 @@ export class Grid<TItem = any> implements EditorHost {
             "cancelCurrentEdit": this.cancelCurrentEdit.bind(this)
         };
 
-        if (this._jQuery)
-            this._jQuery(this._container).empty();
-        else
-            this._container.innerHTML = '';
+        this._emptyNode(this._container);
 
         this._container.style.overflow = "hidden";
         this._container.style.outline = "0";
@@ -255,11 +256,22 @@ export class Grid<TItem = any> implements EditorHost {
     }
 
     private bindAncestorScroll(elem: HTMLElement) {
-        if (this._jQuery)
-            this._jQuery(elem).on('scroll', this.handleActiveCellPositionChange);
-        else
-            elem.addEventListener('scroll', this.handleActiveCellPositionChange);
+        this.onEvent(elem, 'scroll', this.handleActiveCellPositionChange);
         this._boundAncestorScroll.push(elem);
+    }
+
+    private onEvent<K extends keyof HTMLElementEventMap>(el: HTMLElement, type: K,
+        listener: (this: HTMLElement, ev: HTMLElementEventMap[K]) => any,
+        args?: { capture?: boolean }): void {
+        if (!args?.capture && this._jQuery) {
+            this._jQuery(el).on(type + "." + this._uid, listener as any);
+        }
+        else {
+            el.addEventListener(type, listener, {
+                signal: this._eventDisposer.signal,
+                ...args
+            });
+        }
     }
 
     init(): void {
@@ -296,19 +308,11 @@ export class Grid<TItem = any> implements EditorHost {
         this.resizeCanvas();
         this._layout.bindAncestorScrollEvents();
 
-        const onEvent = <K extends keyof HTMLElementEventMap>(el: HTMLElement, type: K,
-            listener: (this: HTMLElement, ev: HTMLElementEventMap[K]) => any) => {
-            if (this._jQuery)
-                this._jQuery(el).on(type, listener as any);
-            else
-                el.addEventListener(type, listener);
-        }
-
-        onEvent(this._container, "resize", this.resizeCanvas);
+        this.onEvent(this._container, "resize", this.resizeCanvas);
 
         viewports.forEach(vp => {
             var scrollTicking = false;
-            onEvent(vp, "scroll", (e) => {
+            this.onEvent(vp, "scroll", (e) => {
                 if (!scrollTicking) {
                     scrollTicking = true;
 
@@ -322,44 +326,44 @@ export class Grid<TItem = any> implements EditorHost {
 
         const handleMouseWheel = this.handleMouseWheel.bind(this);
         viewports.forEach(vp => {
-            onEvent(vp, "wheel", handleMouseWheel);
-            onEvent(vp, "mousewheel" as any, handleMouseWheel);
+            this.onEvent(vp, "wheel", handleMouseWheel);
+            this.onEvent(vp, "mousewheel" as any, handleMouseWheel);
         });
 
         this._layout.getHeaderCols().forEach(hs => {
             hs.onselectstart = () => false;
-            onEvent(hs, "contextmenu", this.handleHeaderContextMenu.bind(this));
-            onEvent(hs, "click", this.handleHeaderClick.bind(this));
+            this.onEvent(hs, "contextmenu", this.handleHeaderContextMenu.bind(this));
+            this.onEvent(hs, "click", this.handleHeaderClick.bind(this));
             if (this._jQuery) {
                 this._jQuery(hs)
-                    .on('mouseenter', '.slick-header-column', this.handleHeaderMouseEnter.bind(this))
-                    .on('mouseleave', '.slick-header-column', this.handleHeaderMouseLeave.bind(this));
+                    .on('mouseenter.' + this._uid, '.slick-header-column', this.handleHeaderMouseEnter.bind(this))
+                    .on('mouseleave.' + this._uid, '.slick-header-column', this.handleHeaderMouseLeave.bind(this));
             }
             else {
                 // need to reimplement this similar to jquery events
-                hs.addEventListener("mouseenter", e => (e.target as HTMLElement).closest(".slick-header-column") &&
+                this.onEvent(hs, "mouseenter", e => (e.target as HTMLElement).closest(".slick-header-column") &&
                     this.handleHeaderMouseEnter(e));
-                hs.addEventListener("mouseleave", e => (e.target as HTMLElement).closest(".slick-header-column") &&
+                this.onEvent(hs, "mouseleave", e => (e.target as HTMLElement).closest(".slick-header-column") &&
                     this.handleHeaderMouseLeave(e));
             }
         });
 
         this._layout.getHeaderRowCols().forEach(el => {
-            el && onEvent(el.parentElement, 'scroll', this.handleHeaderFooterRowScroll.bind(this));
+            el && this.onEvent(el.parentElement, 'scroll', this.handleHeaderFooterRowScroll.bind(this));
         });
 
         this._layout.getFooterRowCols().forEach(el => {
-            el && onEvent(el.parentElement, 'scroll', this.handleHeaderFooterRowScroll.bind(this));
+            el && this.onEvent(el.parentElement, 'scroll', this.handleHeaderFooterRowScroll.bind(this));
         });
 
-        [this._focusSink1, this._focusSink2].forEach(fs => onEvent(fs, "keydown", this.handleKeyDown.bind(this)));
+        [this._focusSink1, this._focusSink2].forEach(fs => this.onEvent(fs, "keydown", this.handleKeyDown.bind(this)));
 
         var canvases = Array.from<HTMLElement>(this.getCanvases());
         canvases.forEach(canvas => {
-            onEvent(canvas, "keydown", this.handleKeyDown.bind(this))
-            onEvent(canvas, "click", this.handleClick.bind(this))
-            onEvent(canvas, "dblclick", this.handleDblClick.bind(this))
-            onEvent(canvas, "contextmenu", this.handleContextMenu.bind(this));
+            this.onEvent(canvas, "keydown", this.handleKeyDown.bind(this))
+            this.onEvent(canvas, "click", this.handleClick.bind(this))
+            this.onEvent(canvas, "dblclick", this.handleDblClick.bind(this))
+            this.onEvent(canvas, "contextmenu", this.handleContextMenu.bind(this));
         });
 
         if (this._jQuery && (this._jQuery.fn as any).drag) {
@@ -386,12 +390,12 @@ export class Grid<TItem = any> implements EditorHost {
         canvases.forEach(canvas => {
             if (this._jQuery) {
                 this._jQuery(canvas)
-                    .on('mouseenter', '.slick-cell', this.handleMouseEnter.bind(this))
-                    .on('mouseleave', '.slick-cell', this.handleMouseLeave.bind(this));
+                    .on('mouseenter' + this._uid, '.slick-cell', this.handleMouseEnter.bind(this))
+                    .on('mouseleave' + this._uid, '.slick-cell', this.handleMouseLeave.bind(this));
             }
             else {
-                canvas.addEventListener("mouseenter", e => (e.target as HTMLElement)?.classList?.contains("slick-cell") && this.handleMouseEnter(e), { capture: true });
-                canvas.addEventListener("mouseleave", e => (e.target as HTMLElement)?.classList?.contains("slick-cell") && this.handleMouseLeave(e), { capture: true });
+                this.onEvent(canvas, "mouseenter", e => (e.target as HTMLElement)?.classList?.contains("slick-cell") && this.handleMouseEnter(e), { capture: true });
+                this.onEvent(canvas, "mouseleave", e => (e.target as HTMLElement)?.classList?.contains("slick-cell") && this.handleMouseLeave(e), { capture: true });
             }
         });
 
@@ -400,8 +404,8 @@ export class Grid<TItem = any> implements EditorHost {
             navigator.userAgent.toLowerCase().match(/macintosh/)) {
             const handleMouseWheel = this.handleMouseWheel.bind(this);
             canvases.forEach(c => {
-                onEvent(c, "wheel", handleMouseWheel);
-                onEvent(c, "mousewheel" as any, handleMouseWheel);
+                this.onEvent(c, "wheel", handleMouseWheel);
+                this.onEvent(c, "mousewheel" as any, handleMouseWheel);
             });
         }
     }
@@ -640,11 +644,7 @@ export class Grid<TItem = any> implements EditorHost {
                     }
                 })
 
-            if (this._jQuery) {
-                this._jQuery(frc).empty();
-            }
-            else
-                frc.innerHTML = '';
+            this._emptyNode(frc);
         });
 
         var cols = this._cols;
@@ -701,11 +701,7 @@ export class Grid<TItem = any> implements EditorHost {
                         });
                     }
                 });
-            if (this._jQuery) {
-                this._jQuery(hrc).empty();
-            } else {
-                hrc.innerHTML = "";
-            }
+            this._emptyNode(hrc);
         });
 
         const cols = this._cols, pinnedStartLast = this._layout.getPinnedStartLastCol(), pinnedEndFirst = this._layout.getPinnedEndFirstCol();
@@ -820,10 +816,7 @@ export class Grid<TItem = any> implements EditorHost {
         };
 
         this._layout.getHeaderCols().forEach(el => {
-            if (this._jQuery)
-                this._jQuery(el).on('click', handler as any);
-            else
-                el.addEventListener("click", handler);
+            this.onEvent(el, 'click', handler as any);
         });
     }
 
@@ -964,7 +957,7 @@ export class Grid<TItem = any> implements EditorHost {
                         lastDragOverPos = { pageX: z.pageX, pageY: z.pageY };
                         z.preventDefault();
                     }
-                    document.addEventListener('dragover', docDragOver);
+                    this.onEvent(document as any, 'dragover', docDragOver);
                 }
 
                 pageX = e.pageX;
@@ -1027,16 +1020,16 @@ export class Grid<TItem = any> implements EditorHost {
             }
 
             if (noJQueryDrag) {
-                handle.addEventListener("dragstart", dragStart);
-                handle.addEventListener("drag", drag);
-                handle.addEventListener("dragend", dragEnd);
-                handle.addEventListener("dragover", (e: any) => { e.preventDefault(); e.dataTransfer.effectAllowed = "move"; });
+                this.onEvent(handle, "dragstart", dragStart);
+                this.onEvent(handle, "drag", drag);
+                this.onEvent(handle, "dragend", dragEnd);
+                this.onEvent(handle, "dragover", (e: any) => { e.preventDefault(); e.dataTransfer.effectAllowed = "move"; });
             }
             else {
                 (this._jQuery(handle) as any)
-                    .on("dragstart", dragStart)
-                    .on("drag", drag)
-                    .on("dragend", dragEnd);
+                    .on("dragstart." + this._uid, dragStart)
+                    .on("drag." + this._uid, drag)
+                    .on("dragend." + this._uid, dragEnd);
             }
         });
     }
@@ -1213,12 +1206,16 @@ export class Grid<TItem = any> implements EditorHost {
         this.unregisterSelectionModel();
         this._jQuery?.(this._container).off(".slickgrid");
         this.removeCssRules();
+        this._layout?.destroy();
+        this.sortableColInstances?.forEach(instance => { try { instance.destroy() } catch (e) { console.warn(e); } });
 
         var canvasNodes = this._layout.getCanvasNodes();
         if (this._jQuery)
             this._jQuery(canvasNodes).off("draginit dragstart dragend drag");
         else
-            canvasNodes.forEach(el => this._removeNode(el));
+            canvasNodes.forEach(el => el && this._removeNode(el));
+
+        this._eventDisposer?.abort();
 
         for (var k in this) {
             if (!Object.prototype.hasOwnProperty.call(this, k))
@@ -2404,7 +2401,7 @@ export class Grid<TItem = any> implements EditorHost {
             if (this._postCleanupActive && this._postProcessedRows[row] && this._postProcessedRows[row][cellToRemove]) {
                 this.queuePostProcessedCellForCleanup(node, cellToRemove, row);
             } else {
-                this._removeNode(node);
+                node && this._removeNode(node);
             }
 
             delete cacheEntry.cellColSpans[cellToRemove];

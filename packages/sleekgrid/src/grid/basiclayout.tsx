@@ -1,6 +1,8 @@
 import { computed, IfElse, signal } from "@serenity-is/signals";
 import { Column, parsePx } from "../core";
 import { LayoutEngine, LayoutHost } from "./layout";
+import { invokeDisposingListeners } from "@serenity-is/sleekdom";
+import { forAllDescendants } from "./internal";
 
 export const BasicLayout: { new(): LayoutEngine } = function (): LayoutEngine {
     let host: LayoutHost;
@@ -118,6 +120,26 @@ export const BasicLayout: { new(): LayoutEngine } = function (): LayoutEngine {
     }
 
     const destroy = () => {
+
+        headerCols = null;
+        headerRowCols = null;
+        canvas = null;
+        topPanel = null;
+        viewport = null;
+        footerRowCols = null;
+
+        for (let child of Array.from(host?.getContainerNode().children || [])) {
+            if (child.matches?.(".slick-header, .slick-headerrow, .slick-footerrow, .slick-top-pane-container, .slick-viewport")) {
+                forAllDescendants(child, invokeDisposingListeners);
+                invokeDisposingListeners(child);
+                child.remove();
+            }
+            else if (child instanceof Comment && (child as Comment).data.startsWith("placeholder:") ||
+                child instanceof Text && (child as Text).data === "") {
+                invokeDisposingListeners(child);
+                child.remove();
+            }
+        }
         host = null;
     }
 

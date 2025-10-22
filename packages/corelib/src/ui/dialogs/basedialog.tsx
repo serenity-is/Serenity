@@ -37,6 +37,7 @@ export class BaseDialog<P> extends Widget<P> {
         }
 
         if (this.validator) {
+            this.validator?.destroy?.();
             this.byId('Form').remove();
             this.validator = null;
         }
