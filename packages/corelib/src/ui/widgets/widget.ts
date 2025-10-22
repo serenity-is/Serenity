@@ -30,7 +30,7 @@ export class Widget<P = {}> {
 
         associateWidget(this);
 
-        addDisposingListener(this.domNode, this.destroy.bind(this));
+        addDisposingListener(this.domNode, this.destroy.bind(this), this.uniqueName);
 
         this.idPrefix = (this.options as any)?.idPrefix ?? (this.uniqueName + '_');
 

@@ -5,7 +5,7 @@
  * --------------------------------------------------------------------------
  */
 
-import { addDisposingListener, onElementDisposing } from "@serenity-is/sleekdom";
+import { addDisposingListener, onElementDisposing, removeDisposingListener } from "@serenity-is/sleekdom";
 import { getjQuery } from "./environment";
 
 const stripNameRegex = /\..*/
@@ -30,15 +30,23 @@ type EventHandler = Function & {
 type EventHandlers = Record<string, EventHandler>;
 type ElementEvents = Record<string, EventHandlers>;
 
-const eventRegistry: WeakMap<EventTarget, ElementEvents> = new WeakMap();
+const eventRegistrySymbol = Symbol.for("Serenity.eventRegistry");
+
+export function getEventRegistry(): WeakMap<EventTarget, ElementEvents> {
+    return (globalThis as any)[eventRegistrySymbol] ||= new WeakMap();
+}
 
 export function disposeDescendants(element: Element) {
     element.querySelectorAll("*").forEach(node => disposeElement(node));
 }
 
 export function disposeElement(element: EventTarget): void {
+    if (!element)
+        return;
+
     onElementDisposing(element);
 
+    const eventRegistry = getEventRegistry();
     let events = eventRegistry.get(element);
     if (!events)
         return;
@@ -66,6 +74,7 @@ export function disposeElement(element: EventTarget): void {
 }
 
 function getElementEvents(element: EventTarget): ElementEvents {
+    const eventRegistry = getEventRegistry();
     let events = eventRegistry.get(element);
     if (!events)
         eventRegistry.set(element, events = {});
@@ -151,6 +160,11 @@ export function addListener(element: EventTarget, originalTypeEvent: string, han
         return;
     }
 
+    if (originalTypeEvent.startsWith("disposing.") && !delegationFunction && typeof handler === "function") {
+        addDisposingListener(element, handler as () => void, originalTypeEvent.substring(9));
+        return;
+    }
+
     const $ = getjQuery();
     if ($) {
         if (typeof element === 'string')
@@ -180,7 +194,7 @@ export function addListener(element: EventTarget, originalTypeEvent: string, han
     }
 
     const events = getElementEvents(element);
-    if (isPollutingKey(typeEvent)) 
+    if (isPollutingKey(typeEvent))
         return;
 
     const handlers = events[typeEvent] || (events[typeEvent] = Object.create(null));
@@ -243,7 +257,22 @@ function getTypeEvent(event: string) {
 
 export function removeListener(element: EventTarget, originalTypeEvent: string, handler?: any, delegationHandler?: Function): void {
     if (typeof originalTypeEvent !== 'string' || !element) {
-        return
+        return;
+    }
+
+    if (originalTypeEvent === "disposing" && !delegationHandler && typeof handler === "function") {
+        removeDisposingListener(element, handler as () => void);
+        return;
+    }
+
+    if (originalTypeEvent.startsWith("disposing.") && !delegationHandler && typeof handler === "function") {
+        removeDisposingListener(element, handler as () => void, originalTypeEvent.substring(9));
+        return;
+    }
+
+    if (originalTypeEvent.startsWith(".")) {
+        removeDisposingListener(element, null, originalTypeEvent.substring(1));
+        // continue to remove other event handlers in the namespace
     }
 
     const $ = getjQuery();

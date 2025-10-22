@@ -1,6 +1,9 @@
-const disposingListenersSymbol = Symbol("sleekdom:disposingListeners");
+const disposingListenersSymbol = Symbol.for("Serenity.disposingListeners");
 
-function getDisposingListeners(): WeakMap<EventTarget, (() => void)[]> {
+export function getDisposingListeners(): WeakMap<EventTarget, ({
+    callback: () => void,
+    regKey?: string
+})[]> {
     return (globalThis as any)[disposingListenersSymbol] ||= new WeakMap();
 }
 
@@ -23,15 +26,15 @@ export const onElementDisposing = (target: EventTarget) => {
     const handlers = disposingListeners.get(target);
     if (!handlers)
         return;
+    disposingListeners.delete(target);
+    target.removeEventListener("disposing", disposingEventListener);
     for (const disposer of handlers) {
         try {
-            disposer();
+            disposer.callback();
         } catch {
             // ignore
         }
     }
-    disposingListeners.delete(target);
-    target.removeEventListener("disposing", disposingEventListener);
 };
 
 /**
@@ -39,19 +42,32 @@ export const onElementDisposing = (target: EventTarget) => {
  * but will be called when the `disposing` event is dispatched on the element, along with other disposing listeners.
  * @param target The element to add the listener to.
  * @param handler The disposing listener to add.
+ * @param regKey An optional registration key to identify the listener.
  * @returns The element that the listener was added to.
  */
-export function addDisposingListener<T extends EventTarget>(target: T, handler: () => void): T {
+export function addDisposingListener<T extends EventTarget>(target: T, handler: () => void, regKey?: string): T {
     if (!target || !handler)
         return target;
     const disposingListeners = getDisposingListeners();
     let listeners = disposingListeners.get(target);
     if (!listeners) {
+        if (typeof target.addEventListener !== "function")
+            return target;
         disposingListeners.set(target, listeners = []);
-        if (typeof target.addEventListener === "function")
-            target.addEventListener("disposing", disposingEventListener, { once: true });
+        target.addEventListener("disposing", disposingEventListener, { once: true });
     }
-    listeners.push(handler);
+    const existing = listeners.find(x => x.callback === handler);
+    if (existing) {
+        if (existing.regKey && regKey &&
+            existing.regKey !== regKey) {
+            throw new Error("A disposing listener with the same callback but different regKey is already registered on the target element.");
+        }
+        if (regKey && !existing.regKey) {
+            existing.regKey = regKey;
+        }
+        return target;
+    }
+    listeners.push({ callback: handler, regKey });
     return target;
 }
 
@@ -62,20 +78,27 @@ export function addDisposingListener<T extends EventTarget>(target: T, handler: 
  * removed from the element.
  * @param target The element to remove the listener from.
  * @param handler The disposing listener to remove.
+ * @param regKey An optional registration key to identify the listener.
  * @returns The element that the listener was removed from.
  */
-export function removeDisposingListener<T extends EventTarget>(target: T, handler: () => void): T {
-    if (!target || !handler)
+export function removeDisposingListener<T extends EventTarget>(target: T, handler: () => void, regKey?: string): T {
+    if (!target || (!handler && !regKey))
         return target;
     const disposingListeners = getDisposingListeners();
     const listeners = disposingListeners.get(target);
     if (listeners) {
-        const index = listeners.indexOf(handler);
-        if (index >= 0) {
-            listeners.splice(index, 1);
+        for (let index = listeners.length - 1; index >= 0; index--) {
+            const listener = listeners[index];
+            if ((regKey && listener.regKey === regKey) ||
+                (handler && handler === listener.callback)) {
+                listeners.splice(index, 1);
+            }
         }
         if (listeners.length === 0) {
             disposingListeners.delete(target);
+            if (typeof target.removeEventListener === "function") {
+                target.removeEventListener("disposing", disposingEventListener);
+            }
         }
     }
     return target;

@@ -23,7 +23,7 @@ export namespace SubDialogHelper {
         });
         addDisposingListener(dialog.node, () => function () {
             Fluent.off(dialog.domNode, 'ondatachange.' + uniqueName);
-        });
+        }, dialog.uniqueName);
         return dialog;
     }
 

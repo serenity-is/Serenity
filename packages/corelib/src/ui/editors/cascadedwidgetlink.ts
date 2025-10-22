@@ -16,7 +16,7 @@ export class CascadedWidgetLink<TParent extends Widget<any>> {
             this.unbind();
             this.widget = null;
             this.parentChange = null;
-        });
+        }, this.widget.uniqueName);
     }
 
     declare private _parentID: string;

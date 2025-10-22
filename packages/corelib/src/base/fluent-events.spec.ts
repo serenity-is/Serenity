@@ -1,4 +1,12 @@
-import { addListener, disposeElement, triggerEvent } from "./fluent-events";
+import { addListener, disposeElement, getEventRegistry, triggerEvent } from "./fluent-events";
+import { onElementDisposing, addDisposingListener, removeDisposingListener } from "@serenity-is/sleekdom";
+vi.mock(import("@serenity-is/sleekdom"), async () => {
+    return {
+        onElementDisposing: vi.fn(),
+        addDisposingListener: vi.fn(),
+        removeDisposingListener: vi.fn()
+    }
+});
 
 beforeEach(() => {
     vi.restoreAllMocks();
@@ -17,16 +25,19 @@ describe("disposeElement", () => {
 
     it("ignores if element is null", () => {
         disposeElement(null);
+        expect(onElementDisposing).not.toHaveBeenCalled();
     });
 
-    it("ignores if element has no attached handlers", () => {
+    it("calls onElementDisposing if element has no attached handlers", () => {
         disposeElement(element);
+        expect(onElementDisposing).toHaveBeenCalledOnce();
     });
 
     it("clears any events other than disposing", () => {
         const test = vi.fn();
         addListener(element, "test", test);
         disposeElement(element);
+        expect(onElementDisposing).toHaveBeenCalledOnce();
         expect(test).not.toHaveBeenCalled();
         element.dispatchEvent(new Event("test"));
         expect(test).not.toHaveBeenCalled();
@@ -41,14 +52,15 @@ describe("disposeElement", () => {
         expect(test).toHaveBeenCalled();
     });
 
-    it("calls disposing handlers", () => {
+    it("calls disposing handlers via onElementDisposing", () => {
         const disposing1 = vi.fn();
         const disposing2 = vi.fn();
         addListener(element, "disposing", disposing1);
+        expect(addDisposingListener).toHaveBeenCalledWith(element, disposing1);
         addListener(element, "disposing", disposing2);
+        expect(addDisposingListener).toHaveBeenCalledWith(element, disposing2);
         disposeElement(element);
-        expect(disposing1).toHaveBeenCalled();
-        expect(disposing2).toHaveBeenCalled();
+        expect(onElementDisposing).toHaveBeenCalledExactlyOnceWith(element);
     });
 
     it("does not trigger externally attached disposing event", () => {
@@ -57,9 +69,27 @@ describe("disposeElement", () => {
         addListener(element, "disposing", disposing1);
         element.addEventListener("disposing", disposing2);
         disposeElement(element);
-        expect(disposing1).toHaveBeenCalled();
+        expect(onElementDisposing).toHaveBeenCalledExactlyOnceWith(element);
         expect(disposing2).not.toHaveBeenCalled();
     });
+    
+    it("removes all element listeners from registry after disposing", () => {
+        const test = vi.fn();
+        addListener(element, "test", test);
+        const removeEventListener = vi.spyOn(element, "removeEventListener");
+        const disposing1 = vi.fn();
+        addListener(element, "disposing", disposing1);
+        disposeElement(element);
+        expect(onElementDisposing).toHaveBeenCalledExactlyOnceWith(element);
+        // onElementDisposing calls removeDisposingListener internally
+        expect(removeDisposingListener).not.toHaveBeenCalled();
+        element.dispatchEvent(new Event("test"));
+        expect(test).not.toHaveBeenCalled();
+        expect(removeEventListener).toHaveBeenCalledExactlyOnceWith("test", expect.any(Function), false);
+        expect((removeEventListener.mock.calls[0][1] as any).callable).toBe(test);
+        expect(getEventRegistry().has(element)).toBeFalsy();
+    });
+
 
 });
 

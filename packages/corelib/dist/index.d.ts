@@ -5286,7 +5286,6 @@ export declare class DataGrid<TItem, P = {}> extends Widget<P> implements IDataG
 	slickGrid: Grid;
 	openDialogsAsPanel: boolean;
 	static defaultRowHeight: number;
-	static defaultHeaderHeight: number;
 	static defaultPersistanceStorage: SettingStorage;
 	static defaultColumnWidthScale: number;
 	static defaultColumnWidthDelta: number;

@@ -751,7 +751,7 @@ export interface GridOptions<TItem = any> {
 	 */
 	explicitInitialization?: boolean;
 	/**
-	 * Defaults to `30`. Height of the footer row in pixels.
+	 * Defaults to null which means the footer row height is calculated based on CSS rules.
 	 */
 	footerRowHeight?: number;
 	/**
@@ -793,7 +793,7 @@ export interface GridOptions<TItem = any> {
 	 */
 	groupingPanel?: boolean;
 	/**
-	 * Defaults to `30`. Height of the grouping panel in pixels.
+	 * Defaults to null, e.g. calculated based on CSS. Height of the grouping panel in pixels.
 	 */
 	groupingPanelHeight?: number;
 	/**
@@ -806,7 +806,7 @@ export interface GridOptions<TItem = any> {
 	 */
 	groupTotalsFormatter?: (totals?: IGroupTotals<TItem>, column?: Column<TItem>, grid?: any) => string;
 	/**
-	 * Defaults to `30`. Height of the header row in pixels.
+	 * Defaults to null, e.g. calculated based on CSS. Height of the header row in pixels.
 	 */
 	headerRowHeight?: number;
 	/**
@@ -909,7 +909,7 @@ export interface GridOptions<TItem = any> {
 	 */
 	syncColumnCellResize?: boolean;
 	/**
-	 * Defaults to null which means the top panel height is calculated based on CSS rules which defaults to 30px.
+	 * Defaults to null which means the top panel height is calculated based on CSS rules.
 	 */
 	topPanelHeight?: number;
 	/**

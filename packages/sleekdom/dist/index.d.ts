@@ -2865,9 +2865,10 @@ export declare const onElementDisposing: (target: EventTarget) => void;
  * but will be called when the `disposing` event is dispatched on the element, along with other disposing listeners.
  * @param target The element to add the listener to.
  * @param handler The disposing listener to add.
+ * @param regKey An optional registration key to identify the listener.
  * @returns The element that the listener was added to.
  */
-export declare function addDisposingListener<T extends EventTarget>(target: T, handler: () => void): T;
+export declare function addDisposingListener<T extends EventTarget>(target: T, handler: () => void, regKey?: string): T;
 /**
  * Removes a disposing listener from an element. Note that this does not remove an event listener from the element,
  * but removes the listener from the list of disposing listeners that will be called when the `disposing` event
@@ -2875,9 +2876,10 @@ export declare function addDisposingListener<T extends EventTarget>(target: T, h
  * removed from the element.
  * @param target The element to remove the listener from.
  * @param handler The disposing listener to remove.
+ * @param regKey An optional registration key to identify the listener.
  * @returns The element that the listener was removed from.
  */
-export declare function removeDisposingListener<T extends EventTarget>(target: T, handler: () => void): T;
+export declare function removeDisposingListener<T extends EventTarget>(target: T, handler: () => void, regKey?: string): T;
 export declare function useClassList(initialValue?: ClassNames): BasicClassList;
 export declare function useText(initialValue?: string): readonly [
 	Text,
