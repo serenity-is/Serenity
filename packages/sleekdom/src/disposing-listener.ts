@@ -1,4 +1,5 @@
 const disposingListenersSymbol = Symbol.for("Serenity.disposingListeners");
+const lifecycleRootSymbol = Symbol.for("Serenity.lifecycleRoot");
 
 export function getDisposingListeners(): WeakMap<EventTarget, ({
     callback: () => void,
@@ -147,8 +148,6 @@ export function removeDisposingListener<T extends EventTarget>(target: T, handle
     return target;
 }
 
-let lifecycleRoot: Element | null = null;
-
 /**
  * Sets or gets the current lifecycle root element.
  * @param args If provided, sets the lifecycle root to the first argument and returns the previous root.
@@ -156,9 +155,9 @@ let lifecycleRoot: Element | null = null;
  */
 export function currentLifecycleRoot(...args: Element[]): Element | null {
     if (args.length > 0) {
-        const prev = lifecycleRoot;
-        lifecycleRoot = args[0] || null;
+        const prev: Element = (globalThis as any)[lifecycleRootSymbol] || null;
+        (globalThis as any)[lifecycleRootSymbol] = args[0] || null;
         return prev;
     }
-    return lifecycleRoot;
+    return (globalThis as any)[lifecycleRootSymbol] || null;
 }

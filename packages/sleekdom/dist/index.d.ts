@@ -2927,27 +2927,27 @@ export type SignalObserveArgs<T> = {
 	 * Disposes the signal subscription. Only available if the signal library supports unsubscription.
 	 */
 	effectDisposer: EffectDisposer | undefined;
+	/**
+	 * Gets the lifecycle root at the time of subscription if useLifecycleRoot option was true.
+	 */
 	readonly lifecycleRoot: EventTarget | undefined;
 	/**
 	 * Gets the lifecycle node to tie the signal's lifecycle to.
 	 */
 	get lifecycleNode(): EventTarget | undefined;
 	/**
-	 * Sets the lifecycle node to tie the signal's lifecycle to. If the useDisposableRoot option is true,
-	 * and there is a current disposable root, that node will be used instead and lifecycleNode will
-	 * return that node.
+	 * Sets the lifecycle node to tie the signal's lifecycle to.
 	 */
 	set lifecycleNode(value: EventTarget | undefined);
 };
 export type ObserveSignalCallback<T> = (args: SignalObserveArgs<T>) => void;
 /**
- * This calls the callback whenever the signal value changes.
- * The callback is called immediately upon subscription, whether the signal library
- * calls it immediately or not (though unexpected).
+ * This calls the callback whenever the signal value changes. It is
+ * called immediately upon subscription with the current value. The callback
+ * is called with an argument object that provides information about the signal
+ * and the change.
  * @param signal Signal to observe
- * @param callback Callback to call when the signal value changes with the new value
- * and a data object containing the previous value, initial flag and the disposer.
- * It is called immediately and on every change. The data.isInitial is true on the first call.
+ * @param callback Callback to execute when the signal value changes.
  */
 export declare function observeSignal<T>(signal: SignalLike<T>, callback: ObserveSignalCallback<T>, opt?: {
 	/**

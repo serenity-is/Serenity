@@ -7,7 +7,7 @@ import { CellNavigator } from "./cellnavigator";
 import { Draggable } from "./draggable";
 import { ArgsAddNewRow, ArgsCell, ArgsCellChange, ArgsCellEdit, ArgsColumn, ArgsColumnNode, ArgsCssStyle, ArgsEditorDestroy, ArgsGrid, ArgsScroll, ArgsSelectedRowsChange, ArgsSort, ArgsValidationError } from "./eventargs";
 import { CachedRow, PostProcessCleanupEntry, absBox, autosizeColumns, calcMinMaxPageXOnDragStart, getInnerWidth, getMaxSupportedCssHeight, getScrollBarDimensions, shrinkOrStretchColumn, simpleArrayEquals, sortToDesiredOrderAndKeepRest } from "./internal";
-import { LayoutEngine, type GridOptionSignals } from "./layout";
+import { LayoutEngine, type GridSignals } from "./layout";
 import { IPlugin, SelectionModel } from "./types";
 
 export class Grid<TItem = any> implements EditorHost {
@@ -32,6 +32,7 @@ export class Grid<TItem = any> implements EditorHost {
     declare private _currentEditor: Editor;
     declare private _data: IDataView<TItem> | TItem[];
     declare private _draggableInstance: { destroy: () => void };
+
     declare private _editController: EditController;
     declare private _emptyNode: (node: Element) => void;
     private _headerColumnWidthDiff: number = 0;
@@ -49,11 +50,11 @@ export class Grid<TItem = any> implements EditorHost {
     declare private _layout: LayoutEngine;
     declare private _numberOfPages: number;
     declare private _options: GridOptions<TItem>;
-    private _optionSignals: GridOptionSignals = {
-        showTopPanel: signal<boolean>(),
-        showColumnHeader: signal<boolean>(),
-        showHeaderRow: signal<boolean>(),
-        showFooterRow: signal<boolean>(),
+    private _signals: GridSignals = {
+        hideTopPanel: signal<boolean>(),
+        hideColumnHeader: signal<boolean>(),
+        hideHeaderRow: signal<boolean>(),
+        hideFooterRow: signal<boolean>(),
     };
     private _page: number = 0;
     declare private _pageHeight: number;
@@ -135,7 +136,6 @@ export class Grid<TItem = any> implements EditorHost {
 
     constructor(container: string | HTMLElement | ArrayLike<HTMLElement>, data: any, columns: Column<TItem>[], options: GridOptions<TItem>) {
 
-
         this._data = data;
         this._colDefaults = Object.assign({}, columnDefaults);
 
@@ -183,7 +183,7 @@ export class Grid<TItem = any> implements EditorHost {
             this._container.classList.add('ltr');
 
         this.validateAndEnforceOptions();
-        this.setOptionSignals();
+        this.setOptionDependentSignals();
         this._colDefaults.width = options.defaultColumnWidth;
 
         this._editController = {
@@ -223,7 +223,7 @@ export class Grid<TItem = any> implements EditorHost {
             getContainerNode: this.getContainerNode.bind(this),
             getDataLength: this.getDataLength.bind(this),
             getOptions: this.getOptions.bind(this),
-            getOptionSignals: () => this._optionSignals,
+            getSignals: () => this._signals,
             getRowFromNode: this.getRowFromNode.bind(this),
             getScrollDims: this.getScrollBarDimensions.bind(this),
             getScrollLeft: () => this._scrollLeft,
@@ -349,13 +349,10 @@ export class Grid<TItem = any> implements EditorHost {
             }
         });
 
-        this._layout.getHeaderRowCols().forEach(el => {
-            el && this.onEvent(el.parentElement, 'scroll', this.handleHeaderFooterRowScroll.bind(this));
-        });
-
-        this._layout.getFooterRowCols().forEach(el => {
-            el && this.onEvent(el.parentElement, 'scroll', this.handleHeaderFooterRowScroll.bind(this));
-        });
+        this._layout.getHeaderRowCols().filter(x => x != null).forEach(el =>
+            this.onEvent(el.parentElement, 'scroll', this.handleHeaderFooterRowScroll.bind(this)));
+        this._layout.getFooterRowCols().filter(x => x != null).forEach(el =>
+            this.onEvent(el.parentElement, 'scroll', this.handleHeaderFooterRowScroll.bind(this)));
 
         [this._focusSink1, this._focusSink2].forEach(fs => this.onEvent(fs, "keydown", this.handleKeyDown.bind(this)));
 
@@ -632,8 +629,7 @@ export class Grid<TItem = any> implements EditorHost {
     }
 
     private createColumnFooters(): void {
-        var footerRowCols = this._layout.getFooterRowCols();
-        footerRowCols.forEach(frc => {
+        this._layout.getFooterRowCols().filter(x => x != null).forEach(frc => {
             frc.querySelectorAll(".slick-footerrow-column")
                 .forEach((el) => {
                     var columnDef = this.getColumnFromNode(el);
@@ -650,6 +646,9 @@ export class Grid<TItem = any> implements EditorHost {
 
         var cols = this._cols;
         for (var i = 0; i < cols.length; i++) {
+            const footerRowColsNode = this._layout.getFooterRowColsFor(i);
+            if (!footerRowColsNode)
+                continue;
             var m = cols[i];
 
             const footerRowCell = <div class={"slick-footerrow-column l" + i + " r" + i} /> as HTMLElement;
@@ -661,7 +660,7 @@ export class Grid<TItem = any> implements EditorHost {
             else if (m.cssClass)
                 addClass(footerRowCell, m.cssClass);
 
-            this._layout.getFooterRowColsFor(i).appendChild(footerRowCell);
+            footerRowColsNode.appendChild(footerRowCell);
 
             this.trigger(this.onFooterRowCellRendered, {
                 node: footerRowCell,
@@ -689,7 +688,7 @@ export class Grid<TItem = any> implements EditorHost {
 
         this._layout.updateHeadersWidth();
 
-        const headerRowCols = this._layout.getHeaderRowCols();
+        const headerRowCols = this._layout.getHeaderRowCols().filter(x => x != null);
         headerRowCols.forEach(hrc => {
             hrc.querySelectorAll(".slick-headerrow-column")
                 .forEach((el) => {
@@ -736,7 +735,10 @@ export class Grid<TItem = any> implements EditorHost {
             this.trigger(this.onHeaderCellRendered, { node: header, column: m });
 
             if (this._options.showHeaderRow) {
-                const headerRowCell = this._layout.getHeaderRowColsFor(i).appendChild(
+                const headerRowColsNode = this._layout.getHeaderRowColsFor(i);
+                if (!headerRowColsNode)
+                    continue;
+                const headerRowCell = headerRowColsNode.appendChild(
                     <div class={"slick-headerrow-column l" + i + " r" + i} data-c={i} /> as HTMLElement);
                 this._jQuery?.(headerRowCell).data("column", m);
                 this.trigger(this.onHeaderRowCellRendered, { node: headerRowCell, column: m });
@@ -1092,12 +1094,10 @@ export class Grid<TItem = any> implements EditorHost {
             groupingPanel && (groupingPanel.style.height = this._options.groupingPanelHeight + "px");
         }
         if (this._options.headerRowHeight != null) {
-            const headerRowCols = this._layout.getHeaderRowCols();
-            headerRowCols.forEach(el => el.style.height = this._options.headerRowHeight + "px");
+            this._layout.getHeaderRowCols().filter(x => x != null).forEach(el => el.style.height = this._options.headerRowHeight + "px");
         }
         if (this._options.footerRowHeight != null) {
-            const footerRowCols = this._layout.getFooterRowCols();
-            footerRowCols.forEach(el => el.style.height = this._options.footerRowHeight + "px");
+            this._layout.getFooterRowCols().filter(x => x != null).forEach(el => el.style.height = this._options.footerRowHeight + "px");
         }
 
         if (this._options.useCssVars) {
@@ -1517,7 +1517,7 @@ export class Grid<TItem = any> implements EditorHost {
 
         this._options = Object.assign(this._options, args);
         this.validateAndEnforceOptions();
-        this.setOptionSignals();
+        this.setOptionDependentSignals();
         this._layout.afterSetOptions(args);
 
         if (args.columns && !suppressColumnSet) {
@@ -1539,12 +1539,13 @@ export class Grid<TItem = any> implements EditorHost {
         }
     }
 
-    private setOptionSignals() {
-        const sig = this._optionSignals;
+    private setOptionDependentSignals() {
+        const sig = this._signals;
         const opt = this._options;
-        for (let k in sig) {
-            (sig as any)[k].value = (opt as any)[k];
-        }
+        sig.hideColumnHeader.value = !opt.showColumnHeader;
+        sig.hideTopPanel.value = !opt.showTopPanel;
+        sig.hideHeaderRow.value = !opt.showHeaderRow;
+        sig.hideFooterRow.value = !opt.showFooterRow;
     }
 
     private viewOnRowCountChanged = () => {
@@ -1622,23 +1623,22 @@ export class Grid<TItem = any> implements EditorHost {
     }
 
     setTopPanelVisibility(visible: boolean): void {
-        if (this._options.showTopPanel != visible) {
-            this._options.showTopPanel = this._optionSignals.showTopPanel.value = !!visible;
+        if (!this._options.showTopPanel != !visible) {
+            this._signals.hideTopPanel.value = !(this._options.showTopPanel = !!visible);
             this.resizeCanvas();
         }
     }
 
     setColumnHeaderVisibility(visible: boolean) {
-        if (this._options.showColumnHeader != visible) {
-            this._options.showColumnHeader = visible;
-            this._layout.getHeaderCols().forEach(n => n.parentElement?.classList.toggle("slick-hidden", !visible));
+        if (!this._options.showColumnHeader != !visible) {
+            this._signals.hideColumnHeader.value = !(this._options.showColumnHeader = !!visible);
             this.resizeCanvas();
         }
     }
 
     setFooterRowVisibility(visible: boolean): void {
-        if (this._options.showFooterRow != visible) {
-            this._options.showFooterRow = this._optionSignals.showFooterRow.value = !!visible;
+        if (!this._options.showFooterRow != !visible) {
+            this._signals.hideFooterRow.value = !(this._options.showFooterRow = !!visible);
             this.resizeCanvas();
         }
     }
@@ -1656,8 +1656,8 @@ export class Grid<TItem = any> implements EditorHost {
     }
 
     setHeaderRowVisibility(visible: boolean): void {
-        if (this._options.showHeaderRow != visible) {
-            this._options.showHeaderRow = this._optionSignals.showHeaderRow.value = !!visible;
+        if (!this._options.showHeaderRow != !visible) {
+            this._signals.hideHeaderRow.value = !(this._options.showHeaderRow = !!visible);
             this.resizeCanvas();
         }
     }

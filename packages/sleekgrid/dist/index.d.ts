@@ -531,11 +531,11 @@ export interface ViewRange {
 	leftPx?: number;
 	rightPx?: number;
 }
-export interface GridOptionSignals {
-	showColumnHeader: Signal<boolean>;
-	showHeaderRow: Signal<boolean>;
-	showFooterRow: Signal<boolean>;
-	showTopPanel: Signal<boolean>;
+export interface GridSignals {
+	hideColumnHeader: Signal<boolean>;
+	hideHeaderRow: Signal<boolean>;
+	hideFooterRow: Signal<boolean>;
+	hideTopPanel: Signal<boolean>;
 }
 export interface LayoutHost {
 	bindAncestorScroll(el: HTMLElement): void;
@@ -551,7 +551,7 @@ export interface LayoutHost {
 	getContainerNode(): HTMLElement;
 	getDataLength(): number;
 	getOptions(): GridOptions;
-	getOptionSignals(): GridOptionSignals;
+	getSignals(): GridSignals;
 	getRowFromNode(rowNode: HTMLElement): number;
 	getScrollDims(): {
 		width: number;
@@ -1008,7 +1008,7 @@ export declare class Grid<TItem = any> implements EditorHost {
 	private _layout;
 	private _numberOfPages;
 	private _options;
-	private _optionSignals;
+	private _signals;
 	private _page;
 	private _pageHeight;
 	private _pageOffset;
@@ -1165,7 +1165,7 @@ export declare class Grid<TItem = any> implements EditorHost {
 	getOptions(): GridOptions<TItem>;
 	setOptions(args: GridOptions<TItem>, suppressRender?: boolean, suppressColumnSet?: boolean, suppressSetOverflow?: boolean): void;
 	private validateAndEnforceOptions;
-	private setOptionSignals;
+	private setOptionDependentSignals;
 	private viewOnRowCountChanged;
 	private viewOnRowsChanged;
 	private viewOnDataChanged;

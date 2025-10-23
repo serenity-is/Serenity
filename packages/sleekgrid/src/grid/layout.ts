@@ -5,11 +5,11 @@ import { GridOptions } from "../core/gridoptions";
 import { ViewportInfo } from "../core/viewportinfo";
 import { ViewRange } from "../core/viewrange";
 
-export interface GridOptionSignals {
-    showColumnHeader: Signal<boolean>;
-    showHeaderRow: Signal<boolean>;
-    showFooterRow: Signal<boolean>;
-    showTopPanel: Signal<boolean>;
+export interface GridSignals {
+    hideColumnHeader: Signal<boolean>;
+    hideHeaderRow: Signal<boolean>;
+    hideFooterRow: Signal<boolean>;
+    hideTopPanel: Signal<boolean>;
 }
 
 export interface LayoutHost {
@@ -23,7 +23,7 @@ export interface LayoutHost {
     getContainerNode(): HTMLElement;
     getDataLength(): number;
     getOptions(): GridOptions;
-    getOptionSignals(): GridOptionSignals;
+    getSignals(): GridSignals;
     getRowFromNode(rowNode: HTMLElement): number;
     getScrollDims(): { width: number, height: number };
     getScrollLeft(): number;

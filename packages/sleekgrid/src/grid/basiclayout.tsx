@@ -1,4 +1,3 @@
-import { computed, IfElse } from "@serenity-is/signals";
 import { currentLifecycleRoot } from "@serenity-is/sleekdom";
 import { Column } from "../core";
 import { LayoutEngine, LayoutHost } from "./layout";
@@ -17,33 +16,25 @@ export const BasicLayout: { new(): LayoutEngine } = function (): LayoutEngine {
 
     function init(hostGrid: LayoutHost) {
         host = hostGrid;
-        const optSignals = host.getOptionSignals();
-        const hideColumnHeader = computed(() => !optSignals.showColumnHeader.value);
+        const optSignals = host.getSignals();
         const prevLifecycleRoot = currentLifecycleRoot(host.getContainerNode());
         try {
-
             host.getContainerNode().append(<>
-                <div class={{ "slick-header": true, "slick-hidden": hideColumnHeader }}>
+                <div class={{ "slick-header": true, "slick-hidden": optSignals.hideColumnHeader }}>
                     <div class="slick-header-columns" ref={el => headerCols = el} />
                 </div>
-                <IfElse when={optSignals.showHeaderRow} else={__("headerrow")}>
-                    <div class="slick-headerrow slick-spacer-h">
-                        <div class="slick-headerrow-columns" ref={el => headerRowCols = el} />
-                    </div>
-                </IfElse>
-                <IfElse when={optSignals.showTopPanel} else={__("toppanel")}>
-                    <div class="slick-top-panel-container">
-                        <div class="slick-top-panel" ref={el => topPanel = el} />
-                    </div>
-                </IfElse>
+                <div class={{ "slick-headerrow": true, "slick-hidden": optSignals.hideHeaderRow }}>
+                    <div class="slick-headerrow-columns" ref={el => headerRowCols = el} />
+                </div>
+                <div class={{ "slick-top-panel-container": true, "slick-hidden": optSignals.hideTopPanel }}>
+                    <div class="slick-top-panel" ref={el => topPanel = el} />
+                </div>
                 <div class="slick-viewport" tabindex="0" ref={el => viewport = el}>
                     <div class="grid-canvas" tabindex="0" ref={el => canvas = el} />
                 </div>
-                <IfElse when={optSignals.showFooterRow} else={__("footerrow")}>
-                    <div class="slick-footerrow">
-                        <div class="slick-footerrow-columns" ref={el => footerRowCols = el} />
-                    </div>
-                </IfElse>
+                <div class={{ "slick-footerrow": true, "slick-hidden": optSignals.hideFooterRow }}>
+                    <div class="slick-footerrow-columns" ref={el => footerRowCols = el} />
+                </div>
             </>);
 
             updateHeadersWidth();
@@ -148,7 +139,7 @@ export const BasicLayout: { new(): LayoutEngine } = function (): LayoutEngine {
     }
 
     function getHeaderRowCols(): HTMLElement[] {
-        return exceptNull([headerRowCols])
+        return [headerRowCols]
     }
 
     function getHeaderRowColumn(cell: number): HTMLElement {
@@ -172,7 +163,7 @@ export const BasicLayout: { new(): LayoutEngine } = function (): LayoutEngine {
     }
 
     function getFooterRowCols(): HTMLElement[] {
-        return exceptNull([footerRowCols]);
+        return [footerRowCols];
     }
 
     function getRowFromCellNode(cellNode: HTMLElement): number {
@@ -222,15 +213,15 @@ export const BasicLayout: { new(): LayoutEngine } = function (): LayoutEngine {
         const vpi = host.getViewportInfo();
         var canvasWidthPx = canvasWidth + "px"
         canvas.style.width = canvasWidthPx;
-        headerRowCols.style.width = canvasWidthPx;
-        footerRowCols.style.width = canvasWidthPx;
+        headerRowCols && (headerRowCols.style.width = canvasWidthPx);
+        footerRowCols && (footerRowCols.style.width = canvasWidthPx);
         updateHeadersWidth();
         vpi.hasHScroll = (canvasWidth > host.getViewportInfo().width - scrollWidth);
 
         return canvasWidth != oldCanvasWidth;
     }
 
-    const resizeCanvas = () => {
+    function resizeCanvas(): void {
         var vs = host.getViewportInfo();
         const options = host.getOptions();
         if (options.autoHeight) {
@@ -273,9 +264,9 @@ export const BasicLayout: { new(): LayoutEngine } = function (): LayoutEngine {
         getHeaderRowColumn,
         getRowFromCellNode,
         getFrozenTopLastRow: () => -1,
-        getFrozenBottomFirstRow: () => Infinity,
+        getFrozenBottomFirstRow: returnInfinity,
         getPinnedStartLastCol: () => -1,
-        getPinnedEndFirstCol: () => Infinity,
+        getPinnedEndFirstCol: returnInfinity,
         getFrozenRowOffset: returnZero,
         getScrollCanvasY: getCanvasNodeFor,
         getScrollContainerX: getViewportNodeFor,
@@ -299,7 +290,6 @@ export const BasicLayout: { new(): LayoutEngine } = function (): LayoutEngine {
     return intf;
 } as any;
 
-function exceptNull<T>(x: T[]) { return x.filter(y => y != null); }
 function noop(): void { }
 function returnFalse(): boolean { return false; }
-function __(comment?: string): HTMLElement { return new Comment("placeholder:" + comment) as unknown as HTMLElement; }
+function returnInfinity(): number { return Infinity; }

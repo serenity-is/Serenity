@@ -1,31 +1,31 @@
+import { signal } from "@serenity-is/signals";
 import { gridDefaults, ViewportInfo, type Column, type RowCell } from "../../src/core";
 import { GridOptions } from "../../src/core/gridoptions";
-import type { GridOptionSignals, LayoutHost } from "../../src/grid/layout";
-import { mockSignal } from "./mock-signal";
+import type { GridSignals, LayoutHost } from "../../src/grid/layout";
 
 export function mockLayoutHost(): LayoutHost & {
-    optSignals: GridOptionSignals,
+    signals: GridSignals,
     opt: GridOptions<any>,
     container: HTMLDivElement
 } {
     const host = {
         container: document.createElement("div"),
         opt: {
-            get showColumnHeader() { return host.optSignals.showColumnHeader.peek(); },
-            set showColumnHeader(value: boolean) { host.optSignals.showColumnHeader.value = value; },
-            get showHeaderRow() { return host.optSignals.showHeaderRow.peek(); },
-            set showHeaderRow(value: boolean) { host.optSignals.showHeaderRow.value = value; },
-            get showFooterRow() { return host.optSignals.showFooterRow.peek(); },
-            set showFooterRow(value: boolean) { host.optSignals.showFooterRow.value = value; },
-            get showTopPanel() { return host.optSignals.showTopPanel.peek(); },
-            set showTopPanel(value: boolean) { host.optSignals.showTopPanel.value = value; }
+            get showColumnHeader() { return !host.signals.hideColumnHeader.peek(); },
+            set showColumnHeader(value: boolean) { host.signals.hideColumnHeader.value = !value; },
+            get showHeaderRow() { return !host.signals.hideHeaderRow.peek(); },
+            set showHeaderRow(value: boolean) { host.signals.hideHeaderRow.value = !value; },
+            get showFooterRow() { return !host.signals.hideFooterRow.peek(); },
+            set showFooterRow(value: boolean) { host.signals.hideFooterRow.value = !value; },
+            get showTopPanel() { return !host.signals.hideTopPanel.peek(); },
+            set showTopPanel(value: boolean) { host.signals.hideTopPanel.value = !value; }
         } as GridOptions<any>,
-        optSignals: {
-            showColumnHeader: mockSignal(gridDefaults.showColumnHeader),
-            showHeaderRow: mockSignal(gridDefaults.showHeaderRow),
-            showFooterRow: mockSignal(gridDefaults.showFooterRow),
-            showTopPanel: mockSignal(gridDefaults.showTopPanel)
-        } satisfies GridOptionSignals,
+        signals: {
+            hideColumnHeader: signal(!gridDefaults.showColumnHeader),
+            hideHeaderRow: signal(!gridDefaults.showHeaderRow),
+            hideFooterRow: signal(!gridDefaults.showFooterRow),
+            hideTopPanel: signal(!gridDefaults.showTopPanel)
+        } satisfies GridSignals,
         bindAncestorScroll: vi.fn(),
         cleanUpAndRenderCells: vi.fn(),
         getAvailableWidth: vi.fn(() => 1000),
@@ -36,7 +36,7 @@ export function mockLayoutHost(): LayoutHost & {
         getContainerNode: vi.fn(() => host.container),
         getDataLength: vi.fn(() => 0),
         getOptions: vi.fn(() => host.opt),
-        getOptionSignals: vi.fn(() => host.optSignals),
+        getSignals: vi.fn(() => host.signals),
         getRowFromNode: vi.fn(() => null),
         getScrollDims: vi.fn(() => ({ width: 0, height: 0 })),
         getScrollLeft: vi.fn(() => 0),

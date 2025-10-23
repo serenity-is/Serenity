@@ -1,7 +1,6 @@
-import { IfElse, signal } from "@serenity-is/signals";
+import { IfElse } from "@serenity-is/signals";
 import { Column, GridOptions, parsePx, ViewRange } from "../core";
 import { LayoutEngine, LayoutHost } from "../grid";
-import { invokeDisposingListeners } from "@serenity-is/sleekdom";
 
 export const FrozenLayout: { new(): LayoutEngine } = function (): LayoutEngine {
     let canvasWidth: number;
@@ -83,11 +82,11 @@ export const FrozenLayout: { new(): LayoutEngine } = function (): LayoutEngine {
     function init(hostGrid: LayoutHost) {
         host = hostGrid;
         const options = host.getOptions();
-        const optSignals = host.getOptionSignals();
+        const signals = host.getSignals();
 
         host.getContainerNode().append(<>
             <div class="slick-pane slick-pane-header slick-pane-left" tabindex="0" ref={el => paneHeaderL = el}>
-                <div class={["slick-header slick-header-left", !options.showColumnHeader && "slick-hidden"]} onSelectStart={returnFalse}>
+                <div class={{ "slick-header slick-header-left": true, "slick-hidden": signals.hideColumnHeader }} onSelectStart={returnFalse}>
                     <div class="slick-header-columns slick-header-columns-left" ref={el => headerColsL = el} />
                 </div>
             </div>
@@ -98,42 +97,32 @@ export const FrozenLayout: { new(): LayoutEngine } = function (): LayoutEngine {
                 </div>
             </div>
 
-            <IfElse when={optSignals.showTopPanel} else={placeholder("top-panel")}>
-                <div class={"slick-top-panel-container"}>
-                    <div class="slick-top-panel" ref={el => topPanel = el} />
-                </div>
-            </IfElse>
+            <div class={{ "slick-top-panel-container": true, "slick-hidden": signals.hideTopPanel }}>
+                <div class="slick-top-panel" ref={el => topPanel = el} />
+            </div>
 
             <div class="slick-pane slick-pane-top slick-pane-left" tabindex="0" ref={el => paneTopL = el}>
-                <IfElse when={optSignals.showHeaderRow} else={placeholder("headerrow-left")}>
-                    <div class="slick-headerrow">
-                        <div class="slick-headerrow-columns slick-headerrow-columns-left" ref={el => headerRowColsL = el} />
-                    </div>
-                </IfElse>
+                <div class={{ "slick-headerrow": true, "slick-hidden": signals.hideHeaderRow }}>
+                    <div class="slick-headerrow-columns slick-headerrow-columns-left" ref={el => headerRowColsL = el} />
+                </div>
                 <div class="slick-viewport slick-viewport-top slick-viewport-left" tabindex="0" ref={el => viewportTopL = el}>
                     <div class="grid-canvas grid-canvas-top grid-canvas-left" tabindex="0" ref={el => canvasTopL = el} />
                 </div>
-                <IfElse when={optSignals.showFooterRow} else={placeholder("footerrow-left")}>
-                    <div class="slick-footerrow">
-                        <div class="slick-footerrow-columns slick-footerrow-columns-left" ref={el => footerRowColsL = el} />
-                    </div>
-                </IfElse>
+                <div class={{ "slick-footerrow": true, "slick-hidden": signals.hideFooterRow }}>
+                    <div class="slick-footerrow-columns slick-footerrow-columns-left" ref={el => footerRowColsL = el} />
+                </div>
             </div>
 
             <div class="slick-pane slick-pane-top slick-pane-right" tabindex="0" ref={el => paneTopR = el}>
-                <IfElse when={optSignals.showHeaderRow} else={placeholder("headerrow-right")}>
-                    <div class="slick-headerrow">
-                        <div class="slick-headerrow-columns slick-headerrow-columns-right" ref={el => headerRowColsR = el} />
-                    </div>
-                </IfElse>
+                <div class={{ "slick-headerrow": true, "slick-hidden": signals.hideHeaderRow }}>
+                    <div class="slick-headerrow-columns slick-headerrow-columns-right" ref={el => headerRowColsR = el} />
+                </div>
                 <div class="slick-viewport slick-viewport-top slick-viewport-right" tabindex="0" ref={el => viewportTopR = el}>
                     <div class="grid-canvas grid-canvas-top grid-canvas-right" tabindex="0" ref={el => canvasTopR = el} />
                 </div>
-                <IfElse when={optSignals.showFooterRow} else={new Comment("footerrow-right")}>
-                    <div class={"slick-footerrow"}>
-                        <div class="slick-footerrow-columns slick-footerrow-columns-right" ref={el => footerRowColsR = el} />
-                    </div>
-                </IfElse>
+                <div class={{ "slick-footerrow": true, "slick-hidden": signals.hideFooterRow }}>
+                    <div class="slick-footerrow-columns slick-footerrow-columns-right" ref={el => footerRowColsR = el} />
+                </div>
             </div>
 
             <div class="slick-pane slick-pane-bottom slick-pane-left" tabindex="0" ref={el => paneBottomL = el}>
@@ -157,11 +146,11 @@ export const FrozenLayout: { new(): LayoutEngine } = function (): LayoutEngine {
     }
 
     function getHeaderRowCols() {
-        return exceptNull([headerRowColsL, headerRowColsR]);
+        return [headerRowColsL, headerRowColsR];
     }
 
     function getFooterRowCols() {
-        return exceptNull([footerRowColsL, footerRowColsR]);
+        return [footerRowColsL, footerRowColsR];
     }
 
     const getCanvasNodeFor = (cell: number, row: number) => {
@@ -805,6 +794,5 @@ export const FrozenLayout: { new(): LayoutEngine } = function (): LayoutEngine {
     }
 } as any;
 
-function exceptNull<T>(x: T[]) { return x.filter(y => y != null); }
 function placeholder(text: string) { return new Comment("placeholder:" + text); }
 function returnFalse(): boolean { return false; }
