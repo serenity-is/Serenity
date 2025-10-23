@@ -160,6 +160,10 @@ describe("signal integration", () => {
         expect(div.classList.contains("active")).toBe(false);
         expect(div.classList.contains("highlighted")).toBe(true);
         expect(div.classList.contains("disabled")).toBe(true);
+        signalActive.value = "active";
+        expect(div.classList.contains("active")).toBe(true);
+        expect(div.classList.contains("highlighted")).toBe(true);
+        expect(div.classList.contains("disabled")).toBe(true);
     });
 
     it("does not touch manually added classnames when signal value changes", () => {

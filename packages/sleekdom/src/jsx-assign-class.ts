@@ -1,41 +1,46 @@
 import { className } from "./classname";
 import { isSignalLike, observeSignal } from "./signal-util";
-import { isArrayLike, isObject, isString, isVisibleChild } from "./util";
+import { isArrayLike, isObject } from "./util";
+
+function unsignalizePrevClass(prev: any): any {
+    if (prev == null)
+        return prev;
+
+    if (isArrayLike(prev)) {
+        prev = Array.from(prev).map(item => {
+            if (isSignalLike(item))
+                return item.peek();
+            return item;
+        });
+    }
+    else if (isObject(prev)) {
+        prev = { ...prev };
+        Object.entries(prev).forEach(([key, val]) => {
+            if (isSignalLike(val))
+                prev[key] = val.peek();
+        });
+    }
+
+    return prev;
+}
 
 function clearPrevClass(node: Element & HTMLOrSVGElement, prev?: any): void {
     if (prev == null || prev === false || prev === true)
         return;
 
-    if (isString(prev)) {
-        for (let cls of prev.split(" ")) {
-            cls && node.classList.remove(cls);
-        }
+    if (typeof prev === "function") {
+        node.setAttribute("class", "");
         return;
     }
 
-    if (isObject(prev)) {
-        Object.entries(prev).forEach(([key, val]) => {
-            if (isSignalLike(val))
-                val = val.peek();
-            if (Boolean(val))
-                node.classList.remove(key);
-        });
-    }
+    prev = unsignalizePrevClass(prev);
 
-    if (isArrayLike(prev)) {
-        Array.from(prev).forEach(item => {
-            if (isSignalLike(item))
-                item = item.peek();
-            if (isVisibleChild(item)) {
-                const cls = String(item);
-                if (cls)
-                    node.classList.remove(cls);
-            }
-        });
+    const prevClassNames = (className(prev) ?? "").split(" ");
+    for (let cls of prevClassNames) {
+        if (cls) {
+            node.classList.remove(cls);
+        }
     }
-
-    if (typeof prev === "function")
-        node.setAttribute("class", "");
 }
 
 export function assignClass(node: Element & HTMLOrSVGElement, value?: any, prev?: any): void {
@@ -52,59 +57,56 @@ export function assignClass(node: Element & HTMLOrSVGElement, value?: any, prev?
         return;
     }
 
-    if (isArrayLike(prev) && prev !== value) {
-        prev = Array.from(prev).map(x => {
-            if (isSignalLike(x)) {
-                return x.peek();
-            }
-            return x;
-        });
-    }
+    prev = unsignalizePrevClass(prev);
 
-    if (isArrayLike(value) && Array.from(value).some(x => isSignalLike(x))) {
-        value = Array.from(value).filter(x => {
+    if (isArrayLike(value)) {
+        value = Array.from(value).map(x => {
+            let val = x;
             if (isSignalLike(x)) {
                 observeSignal(x, args => {
-                    args.hasChanged && Boolean(args.prevValue) && node.classList.remove(String(args.prevValue));
-                    Boolean(args.newValue) && node.classList.add(String(args.newValue));
+                    if (args.isInitial) {
+                        val = args.newValue;
+                        return;
+                    }
+                    applyClassName(node, args.newValue, args.prevValue);
                 }, {
                     lifecycleNode: node
                 });
-                return false;
             }
-            return true;
+            return val;
         });
     }
-
-    if (isObject(prev) && prev !== value && Object.values(prev).some(v => isSignalLike(v))) {
-        prev = { ...prev };
-        Object.entries(prev).forEach(([key, val]) => {
-            if (isSignalLike(val)) {
-                delete prev[key];
-            }
-        });
-    }
-
-    if (isObject(value) && Object.values(value).some(v => isSignalLike(v))) {
+    else if (isObject(value)) {
         value = { ...value };
         Object.entries(value).forEach(([key, val]) => {
             if (isSignalLike(val)) {
-                observeSignal(val, args => node.classList.toggle(key, Boolean(args.newValue)), {
+                observeSignal(val, args => {
+                    if (args.isInitial) {
+                        value[key] = args.newValue;
+                        return;
+                    }
+                    applyClassName(node, Boolean(args.newValue) && key, Boolean(args.prevValue) && key)
+                }, {
                     lifecycleNode: node
                 });
-                delete value[key];
             }
         });
     }
 
-    const classNames = (className(value) ?? "").split(" ");
-    const oldClassNames = (className(prev) ?? "").split(" ");
-    for (let cls of oldClassNames) {
-        if (cls && !classNames.includes(cls)) {
-            node.classList.remove(cls);
+    applyClassName(node, value, prev);
+}
+
+function applyClassName(node: Element & HTMLOrSVGElement, value: any, prev?: any): void {
+    const newList = (className(value) ?? "").split(" ");
+    if (prev) {
+        const prevList = (className(prev) ?? "").split(" ");
+        for (let cls of prevList) {
+            if (cls && !newList.includes(cls)) {
+                node.classList.remove(cls);
+            }
         }
     }
-    for (let cls of classNames) {
+    for (let cls of newList) {
         cls && node.classList.add(cls);
     }
 }
