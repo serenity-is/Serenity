@@ -1,6 +1,6 @@
-import { IfElse } from "@serenity-is/signals";
 import { Column, GridOptions, parsePx, ViewRange } from "../core";
 import { LayoutEngine, LayoutHost } from "../grid";
+import type { GridLayoutHRefs, GridLayoutRefs } from "./layout-refs";
 
 export const FrozenLayout: { new(): LayoutEngine } = function (): LayoutEngine {
     let canvasWidth: number;
@@ -30,8 +30,6 @@ export const FrozenLayout: { new(): LayoutEngine } = function (): LayoutEngine {
     let paneHeaderR: HTMLDivElement;
     let paneTopL: HTMLDivElement;
     let paneTopR: HTMLDivElement;
-    let scrollContainerX: HTMLDivElement;
-    let scrollContainerY: HTMLDivElement;
     let topPanel: HTMLDivElement;
     let viewportBottomL: HTMLDivElement;
     let viewportBottomR: HTMLDivElement;
@@ -141,18 +139,6 @@ export const FrozenLayout: { new(): LayoutEngine } = function (): LayoutEngine {
         adjustFrozenRowsOption();
     }
 
-    function getHeaderCols() {
-        return [headerColsL, headerColsR];
-    }
-
-    function getHeaderRowCols() {
-        return [headerRowColsL, headerRowColsR];
-    }
-
-    function getFooterRowCols() {
-        return [footerRowColsL, footerRowColsR];
-    }
-
     const getCanvasNodeFor = (cell: number, row: number) => {
         if (row == null && cell == null)
             return canvasTopL;
@@ -169,18 +155,6 @@ export const FrozenLayout: { new(): LayoutEngine } = function (): LayoutEngine {
         return canvasWidth;
     }
 
-    function getCanvasNodes() {
-        return [canvasTopL, canvasTopR, canvasBottomL, canvasBottomR];
-    }
-
-    function getScrollContainerX() {
-        return scrollContainerX;
-    }
-
-    function getScrollContainerY() {
-        return scrollContainerY;
-    }
-
     function getViewportNodeFor(cell: number, row: number) {
         if (row == null && cell == null)
             return canvasTopL;
@@ -191,10 +165,6 @@ export const FrozenLayout: { new(): LayoutEngine } = function (): LayoutEngine {
             return rightSide ? canvasBottomR : canvasBottomL;
 
         return rightSide ? canvasTopR : canvasTopL;
-    }
-
-    function getViewportNodes() {
-        return [viewportTopL, viewportTopR, viewportBottomL, viewportBottomR];
     }
 
     const updateCanvasWidth = () => {
@@ -380,32 +350,6 @@ export const FrozenLayout: { new(): LayoutEngine } = function (): LayoutEngine {
         }
     }
 
-    const setScroller = () => {
-        if (frozenCols) {
-            if (frozenRows) {
-                if (frozenBottom) {
-                    scrollContainerX = viewportBottomR;
-                    scrollContainerY = viewportTopR;
-                } else {
-                    scrollContainerX = scrollContainerY = viewportBottomR;
-                }
-            } else {
-                scrollContainerX = scrollContainerY = viewportTopR;
-            }
-        } else {
-            if (frozenRows) {
-                if (frozenBottom) {
-                    scrollContainerX = viewportBottomL;
-                    scrollContainerY = viewportTopL;
-                } else {
-                    scrollContainerX = scrollContainerY = viewportBottomL;
-                }
-            } else {
-                scrollContainerX = scrollContainerY = viewportTopL;
-            }
-        }
-    }
-
     const setPaneVisibility = () => {
         paneHeaderR.classList.toggle("slick-hidden", !frozenCols);
         paneTopR.classList.toggle("slick-hidden", !frozenCols);
@@ -426,14 +370,8 @@ export const FrozenLayout: { new(): LayoutEngine } = function (): LayoutEngine {
         viewportBottomR.style.overflowY = (alwaysVS) ? 'scroll' : 'auto';
     }
 
-    const bindAncestorScrollEvents = () => {
-        var elem: HTMLElement = (frozenRows && !frozenBottom) ? canvasBottomL : canvasTopL;
-        while ((elem = elem.parentNode as HTMLElement) != document.body && elem != null) {
-            // bind to scroll containers only
-            if (elem == viewportTopL || elem.scrollWidth != elem.clientWidth || elem.scrollHeight != elem.clientHeight) {
-                host.bindAncestorScroll(elem);
-            }
-        }
+    const setScroller = () => {
+
     }
 
     const afterHeaderColumnDrag = () => {
@@ -480,10 +418,6 @@ export const FrozenLayout: { new(): LayoutEngine } = function (): LayoutEngine {
                 x += w;
             }
         }
-    }
-
-    const getTopPanel = () => {
-        return topPanel;
     }
 
     const resizeCanvas = () => {
@@ -590,10 +524,7 @@ export const FrozenLayout: { new(): LayoutEngine } = function (): LayoutEngine {
         }
 
         var frozenColumns = viewCols.filter(x => x.frozen);
-        const scrollChange = (frozenCols > 0) !== (frozenColumns.length > 0);
         frozenCols = frozenColumns.length;
-        if (scrollChange)
-            setScroller();
         if (frozenCols)
             return frozenColumns.concat(viewCols.filter(x => !x.frozen));
         return null;
@@ -621,10 +552,6 @@ export const FrozenLayout: { new(): LayoutEngine } = function (): LayoutEngine {
         if (frozenRows) {
             frozenRowIdx = options.frozenBottom ? (host.getDataLength() - frozenRows) : (frozenRows - 1);
         }
-    }
-
-    function getScrollCanvasY() {
-        return frozenRows && !frozenBottom ? canvasBottomL : canvasTopL;
     }
 
     function realScrollHeightChange() {
@@ -736,63 +663,92 @@ export const FrozenLayout: { new(): LayoutEngine } = function (): LayoutEngine {
         return frozenBottom ? frozenRowIdx : Infinity;
     }
 
-    function destroy(): void {
-        canvasBottomL = canvasBottomR = canvasTopL = canvasTopR = headerColsL = headerColsR = null;
-        headerRowColsL = headerRowColsR = footerRowColsL = footerRowColsR = null;
-        paneBottomL = paneBottomR = paneHeaderL = paneHeaderR = paneTopL = paneTopR = null;
-        scrollContainerX = scrollContainerY = topPanel = null;
-        viewportBottomL = viewportBottomR = viewportTopL = viewportTopR = host = null;
+    function getRefs(): GridLayoutRefs {
+        const topLRefs: GridLayoutHRefs = {
+            headerCols: headerColsL,
+            topPanel: topPanel,
+            headerRowCols: headerRowColsL,
+            body: {
+                pane: paneTopL,
+                canvas: canvasTopL,
+                viewport: viewportTopL
+            },
+            footerRowCols: footerRowColsL
+        };
+
+        if (!frozenRows && !frozenCols) {
+            return {
+                main: topLRefs
+            }
+        }
+
+        if (frozenCols && !frozenRows) {
+            delete topLRefs.topPanel;
+            return {
+                start: topLRefs,
+                main: {
+                    headerCols: headerColsR,
+                    topPanel: topPanel,
+                    headerRowCols: headerRowColsR,
+                    body: {
+                        pane: paneTopR,
+                        canvas: canvasTopR,
+                        viewport: viewportTopR
+                    },
+                    footerRowCols: footerRowColsR,
+                }
+            }
+        }
+
     }
 
-    return {
-        afterHeaderColumnDrag,
-        afterRenderRows,
-        afterSetOptions,
-        appendCachedRow,
-        applyColumnWidths,
-        bindAncestorScrollEvents,
-        beforeCleanupAndRenderCells,
-        calcCanvasWidth,
-        updateHeadersWidth: calcHeaderWidths,
-        isFrozenRow,
-        destroy,
-        getCanvasNodeFor,
-        getCanvasNodes,
-        getCanvasWidth,
-        getFooterRowCols,
-        getFooterRowColsFor,
-        getFooterRowColumn,
-        getPinnedStartLastCol,
-        getPinnedEndFirstCol,
-        getFrozenTopLastRow,
-        getFrozenBottomFirstRow,
-        getHeaderCols,
-        getHeaderColsFor,
-        getHeaderColumn,
-        getHeaderRowCols,
-        getHeaderRowColsFor,
-        getHeaderRowColumn,
-        getRowFromCellNode,
-        getFrozenRowOffset: getRowOffset,
-        getScrollCanvasY,
-        getScrollContainerX,
-        getScrollContainerY,
-        getTopPanel,
-        getViewportNodeFor,
-        getViewportNodes,
-        handleScrollH,
-        handleScrollV,
-        init,
-        layoutName: "frozen",
-        realScrollHeightChange,
-        reorderViewColumns,
-        resizeCanvas,
-        setPaneVisibility,
-        setScroller,
-        setOverflow,
-        updateCanvasWidth
-    }
+function destroy(): void {
+    canvasBottomL = canvasBottomR = canvasTopL = canvasTopR = headerColsL = headerColsR = null;
+    headerRowColsL = headerRowColsR = footerRowColsL = footerRowColsR = null;
+    paneBottomL = paneBottomR = paneHeaderL = paneHeaderR = paneTopL = paneTopR = null;
+    topPanel = null;
+    viewportBottomL = viewportBottomR = viewportTopL = viewportTopR = host = null;
+}
+
+return {
+    afterHeaderColumnDrag,
+    afterRenderRows,
+    afterSetOptions,
+    appendCachedRow,
+    applyColumnWidths,
+    beforeCleanupAndRenderCells,
+    calcCanvasWidth,
+    updateHeadersWidth: calcHeaderWidths,
+    isFrozenRow,
+    destroy,
+    getCanvasNodeFor,
+    getCanvasWidth,
+    getFooterRowColsFor,
+    getFooterRowColumn,
+    getPinnedStartLastCol,
+    getPinnedEndFirstCol,
+    getFrozenTopLastRow,
+    getFrozenBottomFirstRow,
+    getHeaderColsFor,
+    getHeaderColumn,
+    getHeaderRowColsFor,
+    getHeaderRowColumn,
+    getRowFromCellNode,
+    getFrozenRowOffset: getRowOffset,
+    getViewportNodeFor,
+    handleScrollH,
+    handleScrollV,
+    init,
+    getRefs,
+    layoutName: "frozen",
+    realScrollHeightChange,
+    reorderViewColumns,
+    resizeCanvas,
+    setPaneVisibility,
+    setScroller, // todo
+    setOverflow,
+    updateCanvasWidth
+}
 } as any;
 
-function placeholder(text: string) { return new Comment("placeholder:" + text); }
 function returnFalse(): boolean { return false; }

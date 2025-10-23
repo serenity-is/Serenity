@@ -1,3 +1,4 @@
+import { invokeDisposingListeners } from "@serenity-is/sleekdom";
 import { Column, parsePx, Position } from "../core";
 
 // shared across all grids on the page
@@ -396,3 +397,34 @@ export interface PostProcessCleanupEntry {
     rowIdx?: number;
 }
 
+export const defaultRemoveNode = (node: HTMLElement) => {
+    if (!node)
+        return;
+    invokeDisposingListeners(node, { descendants: true });
+    node.remove();
+}
+
+export const defaultEmptyNode = (node: HTMLElement) => {
+    if (!node)
+        return;
+    invokeDisposingListeners(node, { descendants: true, excludeSelf: true });
+    node.innerHTML = "";
+}
+
+export function defaultJQueryEmptyNode(this: any, node: HTMLElement) {
+    if (!node)
+        return;
+    if (!this || this.fn)
+        defaultEmptyNode(node);
+    else
+        this(node).empty();
+}
+
+export function defaultJQueryRemoveNode(this: any, node: HTMLElement) {
+    if (!node)
+        return;
+    if (!this || this.fn)
+        defaultRemoveNode(node);
+    else
+        this(node).remove();
+}

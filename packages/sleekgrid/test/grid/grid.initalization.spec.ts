@@ -300,7 +300,7 @@ describe('layout', () => {
         layoutEngine.init = function (grid: LayoutHost) {
             layoutHostGrid = grid;
 
-            oldInit(grid);
+            oldInit.call(layoutEngine, grid);
         };
 
         const container = document.createElement("div");
@@ -316,11 +316,6 @@ describe('layout', () => {
 
     it('should add viewport classes to every viewport node', () => {
         const layoutEngine = new BasicLayout();
-        const viewportNodes = [document.createElement("div"), document.createElement("div")];
-
-        layoutEngine.getViewportNodes = () => {
-            return viewportNodes;
-        };
 
         const container = document.createElement("div");
         new Grid(container, [], [], {
@@ -328,8 +323,7 @@ describe('layout', () => {
             viewportClass: "test-viewport-class"
         });
 
-        expect(viewportNodes[0].classList.contains("test-viewport-class")).toBe(true);
-        expect(viewportNodes[1].classList.contains("test-viewport-class")).toBe(true);
+        expect(layoutEngine.getRefs().main.body.viewport.classList.contains("test-viewport-class")).toBe(true);
     });
 });
 

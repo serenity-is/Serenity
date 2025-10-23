@@ -1,4 +1,4 @@
-import { FrozenLayout } from "../../src/layouts/frozenlayout";
+import { FrozenLayout } from "../../src/layouts/frozen-layout";
 import { mockLayoutHost } from "../mocks/mock-layout-host";
 
 describe("FrozenLayout", () => {

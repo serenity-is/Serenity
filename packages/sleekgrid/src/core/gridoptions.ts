@@ -1,4 +1,4 @@
-import { type LayoutEngine } from "../grid/layout";
+import { type LayoutEngine } from "../layouts/layout-engine";
 import { type Column } from "./column";
 import { GlobalEditorLock, type EditCommand, type EditorFactory, type EditorLock } from "./editing";
 import { defaultColumnFormat, type ColumnFormat, type CompatFormatter, type FormatterContext, type FormatterFactory, type FormatterResult } from "./formatting";

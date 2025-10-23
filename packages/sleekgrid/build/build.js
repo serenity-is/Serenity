@@ -107,15 +107,6 @@ const compatEditors = {
     })]
 }
 
-const compatLayoutsFrozen = {
-    ...compatDefaults,
-    entryPoints: ['./src/layouts/frozenlayout.tsx'],
-    outfile: './dist/compat/layouts/slick.frozenlayout.js',
-    plugins: [globalExternals(/\.\.\/core/, {
-        Slick: ["disableSelection", "H", "parsePx", "spacerDiv"]
-    })]
-}
-
 const compatPluginsAutoTooltips = {
     ...compatDefaults,
     entryPoints: ['./src/plugins/autotooltips.ts'],
@@ -191,7 +182,6 @@ if (process.argv.includes('--compat') ||
         compatGrid,
         compatFormatters,
         compatEditors,
-        compatLayoutsFrozen,
         compatDataGroupItemMetadataProvider,
         compatPluginsAutoTooltips,
         compatPluginsRowMoveManager,

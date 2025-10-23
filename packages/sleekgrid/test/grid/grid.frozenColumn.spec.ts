@@ -1,6 +1,6 @@
 ﻿import { Column } from "../../src/core/column";
 import { Grid } from "../../src/grid/grid";
-import { FrozenLayout } from "../../src/layouts/frozenlayout";
+import { FrozenLayout } from "../../src/layouts/frozen-layout";
 
 const slickPaneRight = "slick-pane-right";
 const slickPaneLeft = "slick-pane-left";
@@ -182,13 +182,13 @@ describe('options.frozenColumns', () => {
         const viewportTopRight = div.querySelector(`.${slickPaneTop}.${slickPaneRight} > .slick-viewport`) as HTMLDivElement;
         expect(viewportTopLeft).toBeDefined();
         expect(viewportTopRight).toBeDefined();
-        expect(layout.getScrollContainerX()).toBe(viewportTopRight);
-        expect(layout.getScrollContainerY()).toBe(viewportTopRight);
+        expect(grid.getScrollContainerX()).toBe(viewportTopRight);
+        expect(grid.getScrollContainerY()).toBe(viewportTopRight);
         grid.setOptions({
             frozenColumns: 0
         });
-        expect(layout.getScrollContainerX()).toBe(viewportTopLeft);
-        expect(layout.getScrollContainerY()).toBe(viewportTopLeft);
+        expect(grid.getScrollContainerX()).toBe(viewportTopLeft);
+        expect(grid.getScrollContainerY()).toBe(viewportTopLeft);
         const cols2 = grid.getColumns();
         expect(cols2[0].frozen).toBeFalsy();
         expect(cols2[1].frozen).toBeFalsy();
@@ -211,13 +211,13 @@ describe('options.frozenColumns', () => {
         const viewportTopRight = div.querySelector(`.${slickPaneTop}.${slickPaneRight} > .slick-viewport`) as HTMLDivElement;
         expect(viewportTopLeft).toBeDefined();
         expect(viewportTopRight).toBeDefined();
-        expect(layout.getScrollContainerX()).toBe(viewportTopLeft);
-        expect(layout.getScrollContainerY()).toBe(viewportTopLeft);
+        expect(grid.getScrollContainerX()).toBe(viewportTopLeft);
+        expect(grid.getScrollContainerY()).toBe(viewportTopLeft);
         grid.setOptions({
             frozenColumns: 2
         });
-        expect(layout.getScrollContainerX()).toBe(viewportTopRight);
-        expect(layout.getScrollContainerY()).toBe(viewportTopRight);
+        expect(grid.getScrollContainerX()).toBe(viewportTopRight);
+        expect(grid.getScrollContainerY()).toBe(viewportTopRight);
         const cols2 = grid.getColumns();
         expect(cols2[0].frozen).toBe(true);
         expect(cols2[1].frozen).toBe(true);

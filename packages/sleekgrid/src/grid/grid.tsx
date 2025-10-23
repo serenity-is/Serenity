@@ -2,12 +2,15 @@ import { computed, signal } from "@serenity-is/signals";
 import { CellRange, CellStylesHash, Column, ColumnFormat, ColumnMetadata, ColumnSort, EditCommand, EditController, Editor, EditorClass, EditorHost, EditorLock, EventData, EventEmitter, FormatterContext, FormatterResult, IEventData, IGroupTotals, ItemMetadata, Position, RowCell, ViewRange, ViewportInfo, addClass, applyFormatterResultToCellNode, columnDefaults, convertCompatFormatter, defaultColumnFormat, escapeHtml, formatterContext, initializeColumns, parsePx, preClickClassName, removeClass } from "../core";
 import { GridOptions, gridDefaults } from "../core/gridoptions";
 import { IDataView } from "../core/idataview";
-import { BasicLayout } from "./basiclayout";
+import { BasicLayout } from "../layouts/basic-layout";
+import type { HBand } from "../layouts/layout-consts";
+import { LayoutEngine } from "../layouts/layout-engine";
+import { disposeLayoutHRefs, getAllCanvasNodes, layoutRefsForEach, mapLayoutRefs, type GridLayoutHRefs } from "../layouts/layout-refs";
 import { CellNavigator } from "./cellnavigator";
 import { Draggable } from "./draggable";
 import { ArgsAddNewRow, ArgsCell, ArgsCellChange, ArgsCellEdit, ArgsColumn, ArgsColumnNode, ArgsCssStyle, ArgsEditorDestroy, ArgsGrid, ArgsScroll, ArgsSelectedRowsChange, ArgsSort, ArgsValidationError } from "./eventargs";
-import { CachedRow, PostProcessCleanupEntry, absBox, autosizeColumns, calcMinMaxPageXOnDragStart, getInnerWidth, getMaxSupportedCssHeight, getScrollBarDimensions, shrinkOrStretchColumn, simpleArrayEquals, sortToDesiredOrderAndKeepRest } from "./internal";
-import { LayoutEngine, type GridSignals } from "./layout";
+import type { GridSignals } from "./grid-signals";
+import { CachedRow, PostProcessCleanupEntry, absBox, autosizeColumns, calcMinMaxPageXOnDragStart, defaultEmptyNode, defaultJQueryEmptyNode, defaultJQueryRemoveNode, defaultRemoveNode, getInnerWidth, getMaxSupportedCssHeight, getScrollBarDimensions, shrinkOrStretchColumn, simpleArrayEquals, sortToDesiredOrderAndKeepRest } from "./internal";
 import { IPlugin, SelectionModel } from "./types";
 
 export class Grid<TItem = any> implements EditorHost {
@@ -156,8 +159,8 @@ export class Grid<TItem = any> implements EditorHost {
         this._container.classList.add('slick-container');
         this._eventDisposer = new AbortController();
 
-        this._emptyNode = options.emptyNode ?? (this._jQuery ? (function (node: Element) { this(node).empty(); }).bind(this._jQuery) : (function (node: Element) { node.innerHTML = ""; }));
-        this._removeNode = options.removeNode ?? (this._jQuery ? (function (node: Element) { this(node).remove(); }).bind(this._jQuery) : (function (node: Element) { node.remove(); }));
+        this._emptyNode = options.emptyNode ?? (this._jQuery ? defaultJQueryEmptyNode.bind(this._jQuery) : defaultEmptyNode);
+        this._removeNode = options.removeNode ?? (this._jQuery ? defaultJQueryRemoveNode.bind(this._jQuery) : defaultRemoveNode);
 
         if (options?.createPreHeaderPanel) {
             // for compat, as draggable grouping plugin expects preHeaderPanel for grouping
@@ -227,7 +230,6 @@ export class Grid<TItem = any> implements EditorHost {
 
         this._layout.init({
             cleanUpAndRenderCells: this.cleanUpAndRenderCells.bind(this),
-            bindAncestorScroll: this.bindAncestorScroll.bind(this),
             getAvailableWidth: this.getAvailableWidth.bind(this),
             getCellFromPoint: this.getCellFromPoint.bind(this),
             getColumnCssRules: this.getColumnCssRules.bind(this),
@@ -269,11 +271,6 @@ export class Grid<TItem = any> implements EditorHost {
         this._focusSink1?.insertAdjacentElement("afterend", this._groupingPanel);
     }
 
-    private bindAncestorScroll(elem: HTMLElement) {
-        this.onEvent(elem, 'scroll', this.handleActiveCellPositionChange);
-        this._boundAncestorScroll.push(elem);
-    }
-
     private onEvent<K extends keyof HTMLElementEventMap>(el: HTMLElement, type: K,
         listener: (this: HTMLElement, ev: HTMLElementEventMap[K]) => any,
         args?: { capture?: boolean }): void {
@@ -286,6 +283,14 @@ export class Grid<TItem = any> implements EditorHost {
                 ...args
             });
         }
+    }
+
+    private refsForEach(fn: (hRefs: GridLayoutHRefs, hband: HBand) => void): void {
+        layoutRefsForEach(this._layout.getRefs(), fn);
+    }
+
+    private mapRefs<T>(fn: (hRefs: GridLayoutHRefs, hband: HBand) => T, skipNullReturns = true): T[] {
+        return mapLayoutRefs(this._layout.getRefs(), fn);
     }
 
     init(): void {
@@ -320,7 +325,7 @@ export class Grid<TItem = any> implements EditorHost {
         this.setupColumnSort();
         this.createCssRules();
         this.resizeCanvas();
-        this._layout.bindAncestorScrollEvents();
+        this.bindAncestorScrollEvents();
 
         this.onEvent(this._container, "resize", this.resizeCanvas);
 
@@ -344,28 +349,29 @@ export class Grid<TItem = any> implements EditorHost {
             this.onEvent(vp, "mousewheel" as any, handleMouseWheel);
         });
 
-        this._layout.getHeaderCols().forEach(hs => {
-            hs.onselectstart = () => false;
-            this.onEvent(hs, "contextmenu", this.handleHeaderContextMenu.bind(this));
-            this.onEvent(hs, "click", this.handleHeaderClick.bind(this));
-            if (this._jQuery) {
-                this._jQuery(hs)
-                    .on('mouseenter.' + this._uid, '.slick-header-column', this.handleHeaderMouseEnter.bind(this))
-                    .on('mouseleave.' + this._uid, '.slick-header-column', this.handleHeaderMouseLeave.bind(this));
+        this.refsForEach(hRefs => {
+            const hs = hRefs.headerCols;
+            if (hs) {
+                hs.onselectstart = () => false;
+                this.onEvent(hs, "contextmenu", this.handleHeaderContextMenu.bind(this));
+                this.onEvent(hs, "click", this.handleHeaderClick.bind(this));
+                if (this._jQuery) {
+                    this._jQuery(hs)
+                        .on('mouseenter.' + this._uid, '.slick-header-column', this.handleHeaderMouseEnter.bind(this))
+                        .on('mouseleave.' + this._uid, '.slick-header-column', this.handleHeaderMouseLeave.bind(this));
+                }
+                else {
+                    // need to reimplement this similar to jquery events
+                    this.onEvent(hs, "mouseenter", e => (e.target as HTMLElement).closest(".slick-header-column") &&
+                        this.handleHeaderMouseEnter(e));
+                    this.onEvent(hs, "mouseleave", e => (e.target as HTMLElement).closest(".slick-header-column") &&
+                        this.handleHeaderMouseLeave(e));
+                }
             }
-            else {
-                // need to reimplement this similar to jquery events
-                this.onEvent(hs, "mouseenter", e => (e.target as HTMLElement).closest(".slick-header-column") &&
-                    this.handleHeaderMouseEnter(e));
-                this.onEvent(hs, "mouseleave", e => (e.target as HTMLElement).closest(".slick-header-column") &&
-                    this.handleHeaderMouseLeave(e));
-            }
-        });
 
-        this._layout.getHeaderRowCols().filter(x => x != null).forEach(el =>
-            this.onEvent(el.parentElement, 'scroll', this.handleHeaderFooterRowScroll.bind(this)));
-        this._layout.getFooterRowCols().filter(x => x != null).forEach(el =>
-            this.onEvent(el.parentElement, 'scroll', this.handleHeaderFooterRowScroll.bind(this)));
+            hRefs.headerRowCols && this.onEvent(hRefs.headerRowCols.parentElement, 'scroll', this.handleHeaderFooterRowScroll.bind(this));
+            hRefs.footerRowCols && this.onEvent(hRefs.footerRowCols.parentElement, 'scroll', this.handleHeaderFooterRowScroll.bind(this));
+        });
 
         [this._focusSink1, this._focusSink2].forEach(fs => this.onEvent(fs, "keydown", this.handleKeyDown.bind(this)));
 
@@ -497,7 +503,7 @@ export class Grid<TItem = any> implements EditorHost {
     }
 
     getCanvases(): any | HTMLElement[] {
-        var canvases = this._layout.getCanvasNodes();
+        const canvases = getAllCanvasNodes(this._layout.getRefs());
         return this._jQuery ? this._jQuery(canvases) : canvases;
     }
 
@@ -513,7 +519,7 @@ export class Grid<TItem = any> implements EditorHost {
     }
 
     private getViewports(): HTMLElement[] {
-        return this._layout.getViewportNodes();
+        return this.mapRefs(refs => refs.body.viewport);
     }
 
     getActiveViewportNode(e?: IEventData): HTMLElement {
@@ -533,6 +539,19 @@ export class Grid<TItem = any> implements EditorHost {
 
         if (widthChanged || forceColumnWidthsUpdate) {
             this._layout.applyColumnWidths();
+        }
+    }
+
+    private bindAncestorScrollEvents() {
+        const refs = this._layout.getRefs();
+        const pane = refs.main.body;
+        let elem = pane.canvas as HTMLElement;
+        while ((elem = elem?.parentNode as HTMLElement) != document.body && elem != null) {
+            // bind to scroll containers only
+            if (elem == pane.viewport || elem.scrollWidth != elem.clientWidth || elem.scrollHeight != elem.clientHeight) {
+                this.onEvent(elem, 'scroll', this.handleActiveCellPositionChange);
+                this._boundAncestorScroll.push(elem);
+            }
         }
     }
 
@@ -598,7 +617,7 @@ export class Grid<TItem = any> implements EditorHost {
     }
 
     getHeader(): HTMLElement {
-        return this._layout.getHeaderCols()[0];
+        return this._layout.getRefs().main.headerCols;
     }
 
     getHeaderColumn(columnIdOrIdx: string | number): HTMLElement {
@@ -618,7 +637,7 @@ export class Grid<TItem = any> implements EditorHost {
     }
 
     getHeaderRow(): HTMLElement {
-        return this._layout.getHeaderRowCols()[0];
+        return this._layout.getRefs().main.headerRowCols;
     }
 
     getHeaderRowColumn(columnIdOrIdx: string | number): HTMLElement {
@@ -630,7 +649,7 @@ export class Grid<TItem = any> implements EditorHost {
     }
 
     getFooterRow(): HTMLElement {
-        return this._layout.getFooterRowCols()[0];
+        return this._layout.getRefs().main.footerRowCols;
     }
 
     getFooterRowColumn(columnIdOrIdx: string | number): HTMLElement {
@@ -642,7 +661,7 @@ export class Grid<TItem = any> implements EditorHost {
     }
 
     private createColumnFooters(): void {
-        this._layout.getFooterRowCols().filter(x => x != null).forEach(frc => {
+        this.mapRefs(refs => refs.footerRowCols).forEach(frc => {
             frc.querySelectorAll(".slick-footerrow-column")
                 .forEach((el) => {
                     var columnDef = this.getColumnFromNode(el);
@@ -683,8 +702,7 @@ export class Grid<TItem = any> implements EditorHost {
     }
 
     private createColumnHeaders(): void {
-        const headerCols = this._layout.getHeaderCols();
-        headerCols.forEach(hc => {
+        this.mapRefs(refs => refs.headerCols).forEach(hc => {
             hc.querySelectorAll(".slick-header-column")
                 .forEach((el) => {
                     var columnDef = this.getColumnFromNode(el);
@@ -701,8 +719,7 @@ export class Grid<TItem = any> implements EditorHost {
 
         this._layout.updateHeadersWidth();
 
-        const headerRowCols = this._layout.getHeaderRowCols().filter(x => x != null);
-        headerRowCols.forEach(hrc => {
+        this.mapRefs(refs => refs.headerRowCols).forEach(hrc => {
             hrc.querySelectorAll(".slick-headerrow-column")
                 .forEach((el) => {
                     var columnDef = this.getColumnFromNode(el);
@@ -763,7 +780,7 @@ export class Grid<TItem = any> implements EditorHost {
         if (this._options.enableColumnReorder) {
             this.setupColumnReorder();
             // sortable js removes draggable attribute after disposing / recreating
-            this._layout.getHeaderCols().forEach(el => el.querySelectorAll<HTMLDivElement>(".slick-resizable-handle").forEach(x => x.draggable = true));
+            this.mapRefs(refs => refs.headerCols).forEach(el => el.querySelectorAll<HTMLDivElement>(".slick-resizable-handle").forEach(x => x.draggable = true));
         }
     }
 
@@ -831,7 +848,7 @@ export class Grid<TItem = any> implements EditorHost {
             }
         };
 
-        this._layout.getHeaderCols().forEach(el => {
+        this.mapRefs(refs => refs.headerCols).forEach(el => {
             this.onEvent(el, 'click', handler as any);
         });
     }
@@ -862,8 +879,8 @@ export class Grid<TItem = any> implements EditorHost {
         this.sortableColInstances?.forEach(x => x.destroy());
         let columnScrollTimer: number = null;
 
-        const scrollColumnsLeft = () => this._layout.getScrollContainerX().scrollLeft = this._layout.getScrollContainerX().scrollLeft + 10;
-        const scrollColumnsRight = () => this._layout.getScrollContainerX().scrollLeft = this._layout.getScrollContainerX().scrollLeft - 10;
+        const scrollColumnsLeft = () => this.getScrollContainerX().scrollLeft = this.getScrollContainerX().scrollLeft + 10;
+        const scrollColumnsRight = () => this.getScrollContainerX().scrollLeft = this.getScrollContainerX().scrollLeft - 10;
 
         let canDragScroll;
         const hasPinnedCols = this.hasPinnedCols();
@@ -880,13 +897,13 @@ export class Grid<TItem = any> implements EditorHost {
             scroll: !hasPinnedCols,
             onStart: (e: { item: any; originalEvent: MouseEvent; }) => {
                 canDragScroll = !hasPinnedCols ||
-                    Grid.offset(e.item)!.left > Grid.offset(this._layout.getScrollContainerX())!.left;
+                    Grid.offset(e.item)!.left > Grid.offset(this.getScrollContainerX())!.left;
 
                 if (canDragScroll && e.originalEvent && e.originalEvent.pageX > this._container.clientWidth) {
                     if (!(columnScrollTimer)) {
                         columnScrollTimer = setInterval(scrollColumnsRight, 100);
                     }
-                } else if (canDragScroll && e.originalEvent && e.originalEvent.pageX < Grid.offset(this._layout.getScrollContainerX())!.left) {
+                } else if (canDragScroll && e.originalEvent && e.originalEvent.pageX < Grid.offset(this.getScrollContainerX())!.left) {
                     if (!(columnScrollTimer)) {
                         columnScrollTimer = setInterval(scrollColumnsLeft, 100);
                     }
@@ -904,7 +921,7 @@ export class Grid<TItem = any> implements EditorHost {
                 }
 
                 var reorderedCols;
-                this._layout.getHeaderCols().forEach((el, i) => reorderedCols = sortToDesiredOrderAndKeepRest(
+                this.mapRefs(refs => refs.headerCols).forEach((_, i) => reorderedCols = sortToDesiredOrderAndKeepRest(
                     this._initCols,
                     (this.sortableColInstances[i]?.toArray?.() ?? [])
                 ));
@@ -919,21 +936,24 @@ export class Grid<TItem = any> implements EditorHost {
             }
         }
 
-        // @ts-ignore
-        this.sortableColInstances = this._layout.getHeaderCols().map(x => Sortable.create(x, sortableOptions));
+        this.sortableColInstances = this.mapRefs(refs => refs.headerCols).map(x =>
+            // @ts-ignore
+            Sortable.create(x, sortableOptions));
     }
 
     private setupColumnResize(): void {
 
         var minPageX: number, pageX: number, maxPageX: number, cols = this._cols;
         var columnElements: Element[] = [];
-        this._layout.getHeaderCols().forEach(el => {
-            columnElements = columnElements.concat(Array.from(el.children));
+        this.mapRefs(refs => refs.headerCols).forEach(el => {
+            columnElements = columnElements.concat(Array.from(el.children).filter(x => x.classList.contains("slick-header-column")));
         });
 
         var j: number, c: Column<TItem>, pageX: number, minPageX: number, maxPageX: number, firstResizable: number, lastResizable: number, cols = this._cols;
         var firstResizable: number, lastResizable: number;
         columnElements.forEach((el, i) => {
+            if (i > cols.length)
+                return;
             var handle = el.querySelector(".slick-resizable-handle");
             handle && this._removeNode(handle);
             if (cols[i].resizable) {
@@ -1099,7 +1119,7 @@ export class Grid<TItem = any> implements EditorHost {
 
         this._container.classList.toggle('sleek-vars', !!this._options.useCssVars);
         if (this._options.topPanelHeight != null) {
-            const topPanel = this._layout.getTopPanel();
+            const topPanel = this._layout.getRefs().main.topPanel
             topPanel && (topPanel.style.height = this._options.topPanelHeight + "px");
         }
         if (this._options.groupingPanelHeight != null) {
@@ -1107,10 +1127,10 @@ export class Grid<TItem = any> implements EditorHost {
             groupingPanel && (groupingPanel.style.height = this._options.groupingPanelHeight + "px");
         }
         if (this._options.headerRowHeight != null) {
-            this._layout.getHeaderRowCols().filter(x => x != null).forEach(el => el.style.height = this._options.headerRowHeight + "px");
+            this.mapRefs(refs => refs.headerRowCols).forEach(hrc => hrc.style.height = this._options.headerRowHeight + "px");
         }
         if (this._options.footerRowHeight != null) {
-            this._layout.getFooterRowCols().filter(x => x != null).forEach(el => el.style.height = this._options.footerRowHeight + "px");
+            this.mapRefs(refs => refs.footerRowCols).forEach(frc => frc.style.height = this._options.footerRowHeight + "px");
         }
 
         if (this._options.useCssVars) {
@@ -1212,7 +1232,7 @@ export class Grid<TItem = any> implements EditorHost {
         }
 
         if (this._options.enableColumnReorder && this._jQuery && (this._jQuery.fn as any).sortable) {
-            (this._jQuery(this._layout.getHeaderCols()).filter(":ui-sortable") as any).sortable("destroy");
+            (this._jQuery(this.mapRefs(refs => refs.headerCols)).filter(":ui-sortable") as any).sortable("destroy");
         }
 
         this.unbindAncestorScrollEvents();
@@ -1220,14 +1240,17 @@ export class Grid<TItem = any> implements EditorHost {
         this.unregisterSelectionModel();
         this._jQuery?.(this._container).off(".slickgrid");
         this.removeCssRules();
-        this._layout?.destroy();
         this.sortableColInstances?.forEach(instance => { try { instance.destroy() } catch (e) { console.warn(e); } });
 
-        var canvasNodes = this._layout.getCanvasNodes();
+        const refs = this._layout?.getRefs();
+        const canvasNodes = getAllCanvasNodes(refs);
         if (this._jQuery)
             this._jQuery(canvasNodes).off("draginit dragstart dragend drag");
         else
             canvasNodes.forEach(el => el && this._removeNode(el));
+
+        this._layout?.destroy();
+        layoutRefsForEach(refs, (hRefs) => disposeLayoutHRefs(hRefs, this._removeNode));
 
         this._emptyNode(this._container);
         this._eventDisposer?.abort();
@@ -1323,7 +1346,7 @@ export class Grid<TItem = any> implements EditorHost {
         this._sortColumns = cols || [];
 
         var headerColumnEls: Element[] = [];
-        this._layout.getHeaderCols().forEach(el => headerColumnEls = headerColumnEls.concat(Array.from(el.children)));
+        this.mapRefs(refs => refs.headerCols).forEach(el => headerColumnEls = headerColumnEls.concat(Array.from(el.children)));
         headerColumnEls.forEach(hel => {
             hel.classList.remove("slick-header-column-sorted");
             var si = hel.querySelector(".slick-sort-indicator");
@@ -1632,7 +1655,7 @@ export class Grid<TItem = any> implements EditorHost {
     }
 
     getTopPanel(): HTMLElement {
-        return this._layout.getTopPanel();
+        return this._layout.getRefs().main.topPanel;
     }
 
     setTopPanelVisibility(visible: boolean): void {
@@ -1644,7 +1667,7 @@ export class Grid<TItem = any> implements EditorHost {
 
     setColumnHeaderVisibility(visible: boolean) {
         if (!this._options.showColumnHeader != !visible) {
-            this._signals.showColumnHeader.value = this._options.showColumnHeader = !!visible  ;
+            this._signals.showColumnHeader.value = this._options.showColumnHeader = !!visible;
             this.resizeCanvas();
         }
     }
@@ -1697,7 +1720,7 @@ export class Grid<TItem = any> implements EditorHost {
     private scrollTo(y: number): void {
         const vpi = this._viewportInfo;
         y = Math.max(y, 0);
-        y = Math.min(y, vpi.virtualHeight - Math.round(this._layout.getScrollContainerY().clientHeight) + ((vpi.hasHScroll || this.hasPinnedCols()) ? this._scrollDims.height : 0));
+        y = Math.min(y, vpi.virtualHeight - Math.round(this.getScrollContainerY().clientHeight) + ((vpi.hasHScroll || this.hasPinnedCols()) ? this._scrollDims.height : 0));
 
         var oldOffset = this._pageOffset;
 
@@ -1717,7 +1740,7 @@ export class Grid<TItem = any> implements EditorHost {
             this._scrollTopRendered = (this._scrollTop = this._scrollTopPrev = newScrollTop);
 
             this._layout.handleScrollV();
-            this._layout.getScrollContainerY().scrollTop = newScrollTop;
+            this.getScrollContainerY().scrollTop = newScrollTop;
 
             this.trigger(this.onViewportChanged);
         }
@@ -2157,10 +2180,11 @@ export class Grid<TItem = any> implements EditorHost {
 
     private calcViewportSize(): void {
         const layout = this._layout;
+        const refs = layout.getRefs().main;
         const vs = this._viewportInfo;
         vs.width = getInnerWidth(this._container);
         vs.groupingPanelHeight = (this._options.groupingPanel && this._options.showGroupingPanel) ? this._groupingPanel?.offsetHeight || 0 : 0;
-        vs.topPanelHeight = this._options.showTopPanel ? (this._layout.getTopPanel()?.parentElement?.offsetHeight || 0) : 0;
+        vs.topPanelHeight = this._options.showTopPanel ? (refs.topPanel?.parentElement?.offsetHeight || 0) : 0;
         vs.headerRowHeight = this._options.showHeaderRow ? layout.getHeaderRowColsFor(0)?.parentElement?.offsetHeight || 0 : 0;
         vs.footerRowHeight = this._options.showFooterRow ? layout.getFooterRowColsFor(0)?.parentElement?.offsetHeight || 0 : 0;
         vs.headerHeight = (this._options.showColumnHeader) ? this._layout.getHeaderColsFor(0)?.parentElement?.offsetHeight || 0 : 0;
@@ -2213,13 +2237,21 @@ export class Grid<TItem = any> implements EditorHost {
         this._pagingIsLastPage = (pagingInfo.pageNum == pagingInfo.totalPages - 1);
     }
 
+    public getScrollContainerX() {
+        return this._layout.getRefs().main.body.viewport;
+    }
+
+    public getScrollContainerY() {
+        return this._layout.getRefs().main.body.viewport;
+    }
+
     updateRowCount(): void {
         if (!this._initialized) {
             return;
         }
 
         var dataLengthIncludingAddNew = this.getDataLengthIncludingAddNew();
-        var scrollCanvas = this._layout.getScrollCanvasY();
+        var scrollCanvas = this._layout.getRefs().main.body.canvas;
         var oldH = Math.round(parsePx(getComputedStyle(scrollCanvas).height));
 
         var numberOfRows;
@@ -2232,7 +2264,7 @@ export class Grid<TItem = any> implements EditorHost {
             numberOfRows = dataLengthIncludingAddNew + (this._options.leaveSpaceForNewRows ? this._viewportInfo.numVisibleRows - 1 : 0);
         }
 
-        var tempViewportH = Math.round(parsePx(getComputedStyle(this._layout.getScrollContainerY()).height));
+        var tempViewportH = Math.round(parsePx(getComputedStyle(this.getScrollContainerY()).height));
         const vpi = this._viewportInfo;
         var oldViewportHasVScroll = vpi.hasVScroll;
         // with autoHeight, we do not need to accommodate the vertical scroll bar
@@ -2273,7 +2305,7 @@ export class Grid<TItem = any> implements EditorHost {
 
         if (vpi.realScrollHeight !== oldH) {
             this._layout.realScrollHeightChange();
-            this._scrollTop = this._layout.getScrollContainerY().scrollTop;
+            this._scrollTop = this.getScrollContainerY().scrollTop;
         }
 
         var oldScrollTopInRange = (this._scrollTop + this._pageOffset <= vpi.virtualHeight - tempViewportH);
@@ -2717,8 +2749,8 @@ export class Grid<TItem = any> implements EditorHost {
             return;
 
         var scrollLeft = (e.target as HTMLElement).scrollLeft;
-        if (scrollLeft != this._layout.getScrollContainerX().scrollLeft) {
-            this._layout.getScrollContainerX().scrollLeft = scrollLeft;
+        if (scrollLeft != this.getScrollContainerX().scrollLeft) {
+            this.getScrollContainerX().scrollLeft = scrollLeft;
         }
     }
 
@@ -2749,16 +2781,16 @@ export class Grid<TItem = any> implements EditorHost {
             deltaX = -1 * e.wheelDeltaX / 120;
         }
 
-        this._scrollTop = Math.max(0, this._layout.getScrollContainerY().scrollTop - (deltaY * this._options.rowHeight));
-        this._scrollLeft = this._layout.getScrollContainerX().scrollLeft + (deltaX * 10);
+        this._scrollTop = Math.max(0, this.getScrollContainerY().scrollTop - (deltaY * this._options.rowHeight));
+        this._scrollLeft = this.getScrollContainerX().scrollLeft + (deltaX * 10);
         if (this._handleScroll(true)) {
             e.preventDefault();
         }
     }
 
     private handleScroll() {
-        this._scrollTop = this._layout.getScrollContainerY().scrollTop;
-        this._scrollLeft = this._layout.getScrollContainerX().scrollLeft;
+        this._scrollTop = this.getScrollContainerY().scrollTop;
+        this._scrollLeft = this.getScrollContainerX().scrollLeft;
         this._handleScroll();
     }
 
@@ -2773,7 +2805,7 @@ export class Grid<TItem = any> implements EditorHost {
         if (hScrollDist) {
             this._scrollLeftPrev = this._scrollLeft;
 
-            this._layout.getScrollContainerX().scrollLeft = this._scrollLeft;
+            this.getScrollContainerX().scrollLeft = this._scrollLeft;
             this._layout.handleScrollH();
         }
 
@@ -2784,7 +2816,7 @@ export class Grid<TItem = any> implements EditorHost {
             this._scrollTopPrev = this._scrollTop;
 
             if (isMouseWheel === true) {
-                this._layout.getScrollContainerY().scrollTop = this._scrollTop;
+                this.getScrollContainerY().scrollTop = this._scrollTop;
             }
 
             this._layout.handleScrollV();
@@ -3386,18 +3418,18 @@ export class Grid<TItem = any> implements EditorHost {
 
     private internalScrollColumnIntoView(left: number, right: number): void {
 
-        var scrollRight = this._scrollLeft + parsePx(getComputedStyle(this._layout.getScrollContainerX()).width) -
+        var scrollRight = this._scrollLeft + parsePx(getComputedStyle(this.getScrollContainerX()).width) -
             (this._viewportInfo.hasVScroll ? this._scrollDims.width : 0);
 
         var target;
         if (left < this._scrollLeft)
             target = left;
         else if (right > scrollRight)
-            target = Math.min(left, right - this._layout.getScrollContainerX().clientWidth);
+            target = Math.min(left, right - this.getScrollContainerX().clientWidth);
         else
             return;
 
-        this._layout.getScrollContainerX().scrollLeft = target;
+        this.getScrollContainerX().scrollLeft = target;
         this.handleScroll();
         this.render();
     }
@@ -3667,7 +3699,7 @@ export class Grid<TItem = any> implements EditorHost {
 
         if (!this._layout.isFrozenRow(row)) {
 
-            var viewportScrollH = Math.round(parsePx(getComputedStyle(this._layout.getScrollContainerY()).height));
+            var viewportScrollH = Math.round(parsePx(getComputedStyle(this.getScrollContainerY()).height));
 
             var rowNumber = this._layout.getFrozenTopLastRow() >= 0 ? (row - this._layout.getFrozenTopLastRow() + 1) : row;
 

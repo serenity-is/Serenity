@@ -1,7 +1,7 @@
 import { computed, signal } from "@serenity-is/signals";
 import { gridDefaults, ViewportInfo, type Column, type RowCell } from "../../src/core";
 import { GridOptions } from "../../src/core/gridoptions";
-import type { GridSignals, LayoutHost } from "../../src/grid/layout";
+import type { GridSignals, LayoutHost } from "../../src/layouts/layout-engine";
 
 export function mockLayoutHost(): LayoutHost & {
     signals: GridSignals,
