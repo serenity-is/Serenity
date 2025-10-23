@@ -1,4 +1,4 @@
-import type { Signal } from "@serenity-is/signals";
+import type { ReadonlySignal, Signal } from "@serenity-is/signals";
 import { RowCell } from "../core";
 import { Column } from "../core/column";
 import { GridOptions } from "../core/gridoptions";
@@ -6,10 +6,14 @@ import { ViewportInfo } from "../core/viewportinfo";
 import { ViewRange } from "../core/viewrange";
 
 export interface GridSignals {
-    hideColumnHeader: Signal<boolean>;
-    hideHeaderRow: Signal<boolean>;
-    hideFooterRow: Signal<boolean>;
-    hideTopPanel: Signal<boolean>;
+    readonly showColumnHeader: Signal<boolean>;
+    readonly hideColumnHeader: ReadonlySignal<boolean>;
+    readonly showTopPanel: Signal<boolean>;
+    readonly hideTopPanel: ReadonlySignal<boolean>;
+    readonly showHeaderRow: Signal<boolean>;
+    readonly hideHeaderRow: ReadonlySignal<boolean>;
+    readonly showFooterRow: Signal<boolean>;
+    readonly hideFooterRow: ReadonlySignal<boolean>;
 }
 
 export interface LayoutHost {

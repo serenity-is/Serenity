@@ -1,4 +1,4 @@
-import { signal } from "@serenity-is/signals";
+import { computed, signal } from "@serenity-is/signals";
 import { CellRange, CellStylesHash, Column, ColumnFormat, ColumnMetadata, ColumnSort, EditCommand, EditController, Editor, EditorClass, EditorHost, EditorLock, EventData, EventEmitter, FormatterContext, FormatterResult, IEventData, IGroupTotals, ItemMetadata, Position, RowCell, ViewRange, ViewportInfo, addClass, applyFormatterResultToCellNode, columnDefaults, convertCompatFormatter, defaultColumnFormat, escapeHtml, formatterContext, initializeColumns, parsePx, preClickClassName, removeClass } from "../core";
 import { GridOptions, gridDefaults } from "../core/gridoptions";
 import { IDataView } from "../core/idataview";
@@ -50,12 +50,7 @@ export class Grid<TItem = any> implements EditorHost {
     declare private _layout: LayoutEngine;
     declare private _numberOfPages: number;
     declare private _options: GridOptions<TItem>;
-    private _signals: GridSignals = {
-        hideTopPanel: signal<boolean>(),
-        hideColumnHeader: signal<boolean>(),
-        hideHeaderRow: signal<boolean>(),
-        hideFooterRow: signal<boolean>(),
-    };
+    declare private _signals: GridSignals;
     private _page: number = 0;
     declare private _pageHeight: number;
     private _pageOffset: number = 0;
@@ -183,9 +178,27 @@ export class Grid<TItem = any> implements EditorHost {
             this._container.classList.add('ltr');
 
         this.validateAndEnforceOptions();
+        const showColumnHeader = signal<boolean>();
+        const hideColumnHeader = computed(() => !showColumnHeader.value);
+        const showHeaderRow = signal<boolean>();
+        const hideHeaderRow = computed(() => !showHeaderRow.value);
+        const showFooterRow = signal<boolean>();
+        const hideFooterRow = computed(() => !showFooterRow.value);
+        const showTopPanel = signal<boolean>();
+        const hideTopPanel = computed(() => !showTopPanel.value);
+        this._signals = {
+            showColumnHeader,
+            hideColumnHeader,
+            showTopPanel,
+            hideTopPanel,
+            showHeaderRow,
+            hideHeaderRow,
+            showFooterRow,
+            hideFooterRow
+        };
         this.setOptionDependentSignals();
-        this._colDefaults.width = options.defaultColumnWidth;
 
+        this._colDefaults.width = options.defaultColumnWidth;
         this._editController = {
             "commitCurrentEdit": this.commitCurrentEdit.bind(this),
             "cancelCurrentEdit": this.cancelCurrentEdit.bind(this)
@@ -1542,10 +1555,10 @@ export class Grid<TItem = any> implements EditorHost {
     private setOptionDependentSignals() {
         const sig = this._signals;
         const opt = this._options;
-        sig.hideColumnHeader.value = !opt.showColumnHeader;
-        sig.hideTopPanel.value = !opt.showTopPanel;
-        sig.hideHeaderRow.value = !opt.showHeaderRow;
-        sig.hideFooterRow.value = !opt.showFooterRow;
+        sig.showColumnHeader.value = opt.showColumnHeader;
+        sig.showTopPanel.value = opt.showTopPanel;
+        sig.showHeaderRow.value = opt.showHeaderRow;
+        sig.showFooterRow.value = opt.showFooterRow;
     }
 
     private viewOnRowCountChanged = () => {
@@ -1624,21 +1637,21 @@ export class Grid<TItem = any> implements EditorHost {
 
     setTopPanelVisibility(visible: boolean): void {
         if (!this._options.showTopPanel != !visible) {
-            this._signals.hideTopPanel.value = !(this._options.showTopPanel = !!visible);
+            this._signals.showTopPanel.value = this._options.showTopPanel = !!visible;
             this.resizeCanvas();
         }
     }
 
     setColumnHeaderVisibility(visible: boolean) {
         if (!this._options.showColumnHeader != !visible) {
-            this._signals.hideColumnHeader.value = !(this._options.showColumnHeader = !!visible);
+            this._signals.showColumnHeader.value = this._options.showColumnHeader = !!visible  ;
             this.resizeCanvas();
         }
     }
 
     setFooterRowVisibility(visible: boolean): void {
         if (!this._options.showFooterRow != !visible) {
-            this._signals.hideFooterRow.value = !(this._options.showFooterRow = !!visible);
+            this._signals.showFooterRow.value = this._options.showFooterRow = !!visible;
             this.resizeCanvas();
         }
     }
@@ -1657,7 +1670,7 @@ export class Grid<TItem = any> implements EditorHost {
 
     setHeaderRowVisibility(visible: boolean): void {
         if (!this._options.showHeaderRow != !visible) {
-            this._signals.hideHeaderRow.value = !(this._options.showHeaderRow = !!visible);
+            this._signals.showHeaderRow.value = this._options.showHeaderRow = !!visible;
             this.resizeCanvas();
         }
     }

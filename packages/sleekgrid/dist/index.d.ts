@@ -505,12 +505,14 @@ export interface IDataView<TItem = any> {
 }
 export type EffectDisposer = (() => void) | null;
 export interface SignalLike<T> {
-	value: T;
+	get value(): T;
 	peek(): T;
 	subscribe(fn: (value: T) => void): EffectDisposer;
 }
 export interface Signal<T> extends SignalLike<T> {
+	set value(value: T);
 }
+export type ReadonlySignal<T> = SignalLike<T>;
 export interface ViewportInfo {
 	height: number;
 	width: number;
@@ -532,10 +534,14 @@ export interface ViewRange {
 	rightPx?: number;
 }
 export interface GridSignals {
-	hideColumnHeader: Signal<boolean>;
-	hideHeaderRow: Signal<boolean>;
-	hideFooterRow: Signal<boolean>;
-	hideTopPanel: Signal<boolean>;
+	readonly showColumnHeader: Signal<boolean>;
+	readonly hideColumnHeader: ReadonlySignal<boolean>;
+	readonly showTopPanel: Signal<boolean>;
+	readonly hideTopPanel: ReadonlySignal<boolean>;
+	readonly showHeaderRow: Signal<boolean>;
+	readonly hideHeaderRow: ReadonlySignal<boolean>;
+	readonly showFooterRow: Signal<boolean>;
+	readonly hideFooterRow: ReadonlySignal<boolean>;
 }
 export interface LayoutHost {
 	bindAncestorScroll(el: HTMLElement): void;

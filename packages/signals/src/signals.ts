@@ -2,6 +2,7 @@ import * as signals from "@preact/signals-core";
 import { type SignalLike } from "@serenity-is/sleekdom";
 
 export interface Signal<T> extends SignalLike<T> {
+    set value(value: T);
 }
 
 export interface SignalOptions<T> {
@@ -14,7 +15,7 @@ export interface EffectOptions {
     name?: string;
 }
 
-export type ReadonlySignal<T> = Readonly<Signal<T>>;
+export type ReadonlySignal<T> = SignalLike<T>;
 
 type EffectFn = ((this: {
     dispose: () => void;

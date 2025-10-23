@@ -1,4 +1,4 @@
-import { signal } from "@serenity-is/signals";
+import { computed, signal } from "@serenity-is/signals";
 import { gridDefaults, ViewportInfo, type Column, type RowCell } from "../../src/core";
 import { GridOptions } from "../../src/core/gridoptions";
 import type { GridSignals, LayoutHost } from "../../src/grid/layout";
@@ -11,20 +11,24 @@ export function mockLayoutHost(): LayoutHost & {
     const host = {
         container: document.createElement("div"),
         opt: {
-            get showColumnHeader() { return !host.signals.hideColumnHeader.peek(); },
-            set showColumnHeader(value: boolean) { host.signals.hideColumnHeader.value = !value; },
-            get showHeaderRow() { return !host.signals.hideHeaderRow.peek(); },
-            set showHeaderRow(value: boolean) { host.signals.hideHeaderRow.value = !value; },
-            get showFooterRow() { return !host.signals.hideFooterRow.peek(); },
-            set showFooterRow(value: boolean) { host.signals.hideFooterRow.value = !value; },
+            get showColumnHeader() { return host.signals.showColumnHeader.peek(); },
+            set showColumnHeader(value: boolean) { host.signals.showColumnHeader.value = value; },
+            get showHeaderRow() { return host.signals.showHeaderRow.peek(); },
+            set showHeaderRow(value: boolean) { host.signals.showHeaderRow.value = value; },
+            get showFooterRow() { return host.signals.showFooterRow.peek(); },
+            set showFooterRow(value: boolean) { host.signals.showFooterRow.value = value; },
             get showTopPanel() { return !host.signals.hideTopPanel.peek(); },
-            set showTopPanel(value: boolean) { host.signals.hideTopPanel.value = !value; }
+            set showTopPanel(value: boolean) { host.signals.showTopPanel.value = value; }
         } as GridOptions<any>,
         signals: {
-            hideColumnHeader: signal(!gridDefaults.showColumnHeader),
-            hideHeaderRow: signal(!gridDefaults.showHeaderRow),
-            hideFooterRow: signal(!gridDefaults.showFooterRow),
-            hideTopPanel: signal(!gridDefaults.showTopPanel)
+            showColumnHeader: signal(gridDefaults.showColumnHeader),
+            hideColumnHeader: computed(() => !host.signals.showColumnHeader.value),
+            showTopPanel: signal(gridDefaults.showTopPanel),
+            hideTopPanel: computed(() => !host.signals.showTopPanel.value),
+            showHeaderRow: signal(gridDefaults.showHeaderRow),
+            hideHeaderRow: computed(() => !host.signals.showHeaderRow.value),
+            showFooterRow: signal(gridDefaults.showFooterRow),
+            hideFooterRow: computed(() => !host.signals.showFooterRow.value),
         } satisfies GridSignals,
         bindAncestorScroll: vi.fn(),
         cleanUpAndRenderCells: vi.fn(),

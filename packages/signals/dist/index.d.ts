@@ -6,6 +6,7 @@ export declare function IfElse<TWhen>(props: {
 	children: ComponentChildren | ((when: SignalOrValue<TWhen | undefined | null>) => ComponentChildren);
 }): JSXElement;
 export interface Signal<T> extends SignalLike<T> {
+	set value(value: T);
 }
 export interface SignalOptions<T> {
 	watched?: (this: Signal<T>) => void;
@@ -15,7 +16,7 @@ export interface SignalOptions<T> {
 export interface EffectOptions {
 	name?: string;
 }
-export type ReadonlySignal<T> = Readonly<Signal<T>>;
+export type ReadonlySignal<T> = SignalLike<T>;
 export type EffectFn = ((this: {
 	dispose: () => void;
 }) => void | (() => void)) | (() => void | (() => void));
