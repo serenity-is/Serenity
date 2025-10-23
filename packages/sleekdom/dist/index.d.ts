@@ -2927,6 +2927,7 @@ export type SignalObserveArgs<T> = {
 	 * Disposes the signal subscription. Only available if the signal library supports unsubscription.
 	 */
 	effectDisposer: EffectDisposer | undefined;
+	readonly lifecycleRoot: EventTarget | undefined;
 	/**
 	 * Gets the lifecycle node to tie the signal's lifecycle to.
 	 */
@@ -2950,14 +2951,12 @@ export type ObserveSignalCallback<T> = (args: SignalObserveArgs<T>) => void;
  */
 export declare function observeSignal<T>(signal: SignalLike<T>, callback: ObserveSignalCallback<T>, opt?: {
 	/**
-	 * If true (default), and there is a `currentDisposableRoot()` at the time of subscription,
-	 * the signal's lifecycle will be tied to that node by adding a disposing listener to it,
-	 * instead of the node passed in the `useNode` function.
+	 * If true, `currentLifecycleRoot()` at the time of subscription will be recorded
+	 * to be potentially used as the lifecycle node.
 	 */
 	useLifecycleRoot?: boolean;
 	/**
-	 * Optional node to tie the signal's lifecycle to. Ignored if useLifecycleRoot is true
-	 * and there is a current lifecycle root.
+	 * Optional node to tie the signal's lifecycle to.
 	 */
 	lifecycleNode?: EventTarget;
 }): EffectDisposer;

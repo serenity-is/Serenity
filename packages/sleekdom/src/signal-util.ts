@@ -21,13 +21,15 @@ export type SignalObserveArgs<T> = {
      */
     effectDisposer: EffectDisposer | undefined;
     /**
+     * Gets the lifecycle root at the time of subscription if useLifecycleRoot option was true.
+     */
+    readonly lifecycleRoot: EventTarget | undefined;
+    /**
      * Gets the lifecycle node to tie the signal's lifecycle to.
      */
     get lifecycleNode(): EventTarget | undefined,
     /**
-     * Sets the lifecycle node to tie the signal's lifecycle to. If the useDisposableRoot option is true,
-     * and there is a current disposable root, that node will be used instead and lifecycleNode will
-     * return that node.
+     * Sets the lifecycle node to tie the signal's lifecycle to.
      */
     set lifecycleNode(value: EventTarget | undefined),
 }
@@ -40,13 +42,13 @@ class SignalObserveArgsImpl<T> implements SignalObserveArgs<T> {
     declare hasChanged: boolean;
     declare effectDisposer: EffectDisposer | undefined;
     declare private _lifecycleNode: EventTarget | undefined;
-    declare private _lifecycleRoot: EventTarget | undefined;
+    declare lifecycleRoot: EventTarget | undefined;
 
     constructor(signal: SignalLike<T>, lifecycleRoot: EventTarget | undefined, lifecycleNode: EventTarget | undefined) {
         this.signal = signal;
         this.isInitial = true;
         this.hasChanged = false;
-        this._lifecycleRoot = lifecycleRoot;
+        this.lifecycleRoot = lifecycleRoot;
         this._lifecycleNode = lifecycleNode;
     }
 
@@ -55,44 +57,44 @@ class SignalObserveArgsImpl<T> implements SignalObserveArgs<T> {
     }
 
     set lifecycleNode(value: EventTarget | undefined) {
-        if (this._lifecycleRoot || value === this._lifecycleNode) return;
-        removeDisposingListener(this._lifecycleNode, this.effectDisposer);
-        this._lifecycleNode = value;
-        addDisposingListener(this._lifecycleNode, this.effectDisposer);
+        if (value !== this._lifecycleNode)
+        {
+            removeDisposingListener(this._lifecycleNode, this.effectDisposer);
+            this._lifecycleNode = value;
+            addDisposingListener(this._lifecycleNode, this.effectDisposer);
+        }
     }
 }
 
 export type ObserveSignalCallback<T> = (args: SignalObserveArgs<T>) => void;
 
 /**
- * This calls the callback whenever the signal value changes.
- * The callback is called immediately upon subscription, whether the signal library
- * calls it immediately or not (though unexpected).
+ * This calls the callback whenever the signal value changes. It is 
+ * called immediately upon subscription with the current value. The callback
+ * is called with an argument object that provides information about the signal
+ * and the change.
  * @param signal Signal to observe
- * @param callback Callback to call when the signal value changes with the new value
- * and a data object containing the previous value, initial flag and the disposer.
- * It is called immediately and on every change. The data.isInitial is true on the first call.
+ * @param callback Callback to execute when the signal value changes.
  */
 export function observeSignal<T>(signal: SignalLike<T>, callback: ObserveSignalCallback<T>, opt?: {
     /** 
-     * If true (default), and there is a `currentDisposableRoot()` at the time of subscription,
-     * the signal's lifecycle will be tied to that node by adding a disposing listener to it,
-     * instead of the node passed in the `useNode` function.
+     * If true, `currentLifecycleRoot()` at the time of subscription will be recorded
+     * to be potentially used as the lifecycle node.
      */
     useLifecycleRoot?: boolean,
     /**
-     * Optional node to tie the signal's lifecycle to. Ignored if useLifecycleRoot is true
-     * and there is a current lifecycle root.
+     * Optional node to tie the signal's lifecycle to.
      */
     lifecycleNode?: EventTarget
 }): EffectDisposer {
 
-    const lifecycleRoot = (opt?.useLifecycleRoot ?? true) ? currentLifecycleRoot() : void 0;
-    const args = new SignalObserveArgsImpl(signal, lifecycleRoot, lifecycleRoot ?? opt?.lifecycleNode);
-    const disposer = args.signal.subscribe(function (this: { dispose?: EffectDisposer }, value: T) {
+    const lifecycleRoot = opt?.useLifecycleRoot ? currentLifecycleRoot() : void 0;
+    const args = new SignalObserveArgsImpl(signal, lifecycleRoot, opt?.lifecycleNode);
+    const disposer = args.signal.subscribe(function (this: { dispose: EffectDisposer }, value: T) {
         args.newValue = value;
-        if (args.isInitial) {
-            this?.dispose && (args.effectDisposer = this.dispose.bind(this));
+        if (args.isInitial && this?.dispose) {
+            args.effectDisposer = this.dispose.bind(this);
+            args.lifecycleNode && addDisposingListener(args.lifecycleNode, args.effectDisposer);
         }
         args.hasChanged = !args.isInitial && args.prevValue !== args.newValue;
         try {
@@ -104,9 +106,8 @@ export function observeSignal<T>(signal: SignalLike<T>, callback: ObserveSignalC
         }
     });
     if (disposer && !args.effectDisposer) {
-        if (args.lifecycleNode) {
-            addDisposingListener(args.lifecycleNode, args.effectDisposer = disposer);
-        }
+        args.effectDisposer = disposer;
+        args.lifecycleNode && addDisposingListener(args.lifecycleNode, args.effectDisposer);
     }
     return args.effectDisposer;
 }
