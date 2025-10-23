@@ -8,7 +8,7 @@ export function getDisposingListeners(): WeakMap<EventTarget, ({
     return (globalThis as any)[disposingListenersSymbol] ||= new WeakMap();
 }
 
-const disposingEventListener = (ev: Event) => {
+function disposingEventListener(ev: Event): void {
     if (ev && ev.target && (!ev.currentTarget || ev.currentTarget === ev.target))
         invokeDisposingListeners(ev?.target);
 };
@@ -62,15 +62,20 @@ export function invokeDisposingListeners(node: EventTarget, opt?: {
     }
 
     if (opt?.descendants && node instanceof Element && node.hasChildNodes()) {
+        const descendants = [];
         const iterator = document.createNodeIterator(
             node as Node,
             NodeFilter.SHOW_ELEMENT | NodeFilter.SHOW_TEXT | NodeFilter.SHOW_COMMENT);
         let currentNode: Node | null;
         while (currentNode = iterator.nextNode()) {
-            invokeFor(currentNode);
+            if (currentNode !== node) {
+                descendants.push(currentNode);
+            }
+        }
+        for (let i = 0; i < descendants.length; i++) {
+            invokeFor(descendants[i]);
         }
     }
-
 
     if (!opt?.excludeSelf) {
         invokeFor(node);

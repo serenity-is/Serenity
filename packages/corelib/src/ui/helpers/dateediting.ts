@@ -1,3 +1,4 @@
+import { addDisposingListener } from "@serenity-is/sleekdom";
 import { Culture, formatDate, getjQuery, parseDate } from "../../base";
 
 export function dateInputChangeHandler(e: Event) {
@@ -177,12 +178,16 @@ export function flatPickrTrigger(input: HTMLInputElement): HTMLElement {
     var button = document.createElement("button");
     button.type = "button";
     button.classList.add("ui-datepicker-trigger");
-    button.addEventListener("click", () => {
+    const listener = () => {
         if (!input.classList.contains('readonly') && input.getAttribute('readonly') == null) {
             (input as any)._flatpickr?.open?.();
             (input as any)._flatpickr?.calendarContainer?.focus?.();
         }
-    });
+    };
+    button.addEventListener("click", listener);
+    const removeListener = () => button.removeEventListener("click", listener);
+    addDisposingListener(button, removeListener);
+    addDisposingListener(input, removeListener);
     return button;
 }
 

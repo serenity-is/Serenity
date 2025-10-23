@@ -221,9 +221,22 @@ export namespace TabsExtensions {
             return;
 
         let $ = getjQuery();
-        if (!$ || !$(tabs).data?.().uiTabs)
+        if ($?.(tabs).data?.().uiTabs) {
+            $(tabs)?.tabs?.("destroy");
             return;
+        }
 
-        $(tabs)?.tabs?.("destroy");
+        if (isArrayLike(tabs))
+            tabs = tabs[0];
+
+        if (tabs && typeof bootstrap !== "undefined" && bootstrap?.Tab?.getInstance) {
+            for (const anchor of Array.from(tabs.querySelectorAll<HTMLElement>(navLinkSelector))) {
+                const inst = bootstrap.Tab.getInstance(anchor);
+                if (inst && typeof inst.dispose === "function") {
+                    inst.dispose();
+                    break;
+                }
+            }
+        }
     }
 }

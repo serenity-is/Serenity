@@ -376,6 +376,8 @@ export class PropertyGrid<P extends PropertyGridOptions = PropertyGridOptions> e
             this.fieldElements = null;
         }
 
+        Fluent.empty(this.domNode);
+
         super.destroy();
     }
 

@@ -78,8 +78,14 @@ export function notifyDisposingNode(node: EventTarget, opt?: {
         const iterator = document.createNodeIterator(
             node as Node, NodeFilter.SHOW_ELEMENT);
         let currentNode: Node | null;
+        const descendants = [];
         while (currentNode = iterator.nextNode()) {
-            invokeFor(currentNode);
+            if (currentNode !== node) {
+                descendants.push(currentNode);
+            }
+        }
+        for (let i = 0; i < descendants.length; i++) {
+            invokeFor(descendants[i]);
         }
     }
 

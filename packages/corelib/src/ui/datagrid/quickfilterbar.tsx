@@ -150,7 +150,7 @@ export class QuickFilterBar<P extends QuickFilterBarOptions = QuickFilterBarOpti
             title: title,
             element: function (el) {
                 end = new DateEditor({ element: el2 => Fluent(el2).insertAfter(el) });
-                Fluent.on(end.domNode, "change", () => el.trigger("change"));
+                Fluent.on(end.domNode, "change." + end.uniqueName, () => el.trigger("change"));
                 el.after(<span class="range-separator">-</span>);
             },
             handler: function (args) {
@@ -231,7 +231,7 @@ export class QuickFilterBar<P extends QuickFilterBarOptions = QuickFilterBarOpti
                     element: el2 => Fluent(el2).insertAfter(el),
                     useUtc: useUtc == null ? undefined : useUtc,
                 });
-                Fluent.on(end.domNode, "change", () => el.trigger("change"));
+                Fluent.on(end.domNode, "change." + end.uniqueName, () => el.trigger("change"));
                 el.after(<span class="range-separator">-</span>);
             },
             init: function (w) {

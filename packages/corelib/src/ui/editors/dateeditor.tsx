@@ -91,8 +91,9 @@ export class DateEditor<P extends DateEditorOptions = DateEditorOptions> extends
     }    
 
     destroy() {
-        if (this.domNode && (this.domNode as any)._flatpickr && (this.domNode as any)._flatpickr.destroy) {
-            (this.domNode as any)._flatpickr.destroy();
+        if (this.domNode && (this.domNode as any)._flatpickr) {
+            (this.domNode as any)._flatpickr.destroy?.();
+            delete (this.domNode as any)._flatpickr;
         }
         super.destroy();
     }

@@ -96,6 +96,12 @@ export class Toolbar<P extends ToolbarOptions = ToolbarOptions> extends Widget<P
     destroy() {
         this.domNode.querySelectorAll('div.tool-button').forEach(el => Fluent.off(el, 'click'));
         if (this.mouseTrap) {
+            if (this.mouseTrap.__listeners) {
+                this.mouseTrap.__listeners.forEach((li: { node: Element, type: string; fn: EventListenerOrEventListenerObject; }) => {
+                    li.node.removeEventListener(li.type, li.fn);
+                });
+                this.mouseTrap.__listeners = null;
+            }
             if (!!this.mouseTrap.destroy) {
                 this.mouseTrap.destroy();
             }
@@ -124,9 +130,22 @@ export class Toolbar<P extends ToolbarOptions = ToolbarOptions> extends Widget<P
         container.append(button);
 
         if (tb.hotkey && window['Mousetrap' as any] != null) {
-            this.mouseTrap = this.mouseTrap || (window['Mousetrap' as any] as any)(
-                tb.hotkeyContext || this.options.hotkeyContext || window.document.documentElement);
-
+            if (!this.mouseTrap) {
+                const mouseTrap = (window['Mousetrap' as any] as any);
+                const el = (tb.hotkeyContext || this.options.hotkeyContext || window.document.documentElement) as Element;
+                const prevAddEventListener = el.addEventListener;
+                const listeners: Array<{ node: Element, type: string, fn: EventListenerOrEventListenerObject }> = [];
+                el.addEventListener = function (type: string, fn: EventListenerOrEventListenerObject, flag: boolean) {
+                    listeners.push({ node: this, type, fn });
+                    prevAddEventListener.call(this, type, fn, flag);
+                }
+                this.mouseTrap = mouseTrap(el);
+                this.mouseTrap.__listeners = listeners;
+                delete el.addEventListener;
+                if (el.addEventListener !== prevAddEventListener) {
+                    el.addEventListener = prevAddEventListener;
+                }
+            }
             this.mouseTrap.bind(tb.hotkey, function () {
                 if (button.style.display != "none") {
                     Fluent.trigger(button, "click");

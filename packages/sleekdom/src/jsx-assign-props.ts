@@ -1,3 +1,4 @@
+import { addDisposingListener } from "./disposing-listener";
 import { assignClass } from "./jsx-assign-class";
 import { assignStyle } from "./jsx-assign-style";
 import { isSignalLike, observeSignal } from "./signal-util";
@@ -173,6 +174,7 @@ function assignProp(node: Element & HTMLOrSVGElement, key: string, value: any, p
             if (!useCapture && ((node as any)[attribute] === null || (prev != null && (node as any)[attribute] === prev))) {
                 // use property when possible jsx-dom PR #17
                 (node as any)[attribute] = value;
+                addDisposingListener(node, nodeEventPropDisposer.bind(node, attribute));
             } else if (useCapture) {
                 eventName = attribute.substring(2, attribute.length - 7);
                 if (prev != null) {
@@ -266,4 +268,8 @@ export function assignProps(node: HTMLElement | SVGElement, props: Record<string
         }
     }
     return node;
+}
+
+function nodeEventPropDisposer(key: string) {
+    (this as any)[key] = null;
 }
