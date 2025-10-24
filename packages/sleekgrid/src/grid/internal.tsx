@@ -1,5 +1,5 @@
 import { invokeDisposingListeners } from "@serenity-is/sleekdom";
-import { Column, parsePx, Position } from "../core";
+import { Column, EventData, parsePx, Position, type ArgsGrid, type EventEmitter, type IEventData } from "../core";
 
 // shared across all grids on the page
 let maxSupportedCssHeight: number;  // browser's breaking point
@@ -427,4 +427,12 @@ export function defaultJQueryRemoveNode(this: any, node: HTMLElement) {
         defaultRemoveNode(node);
     else
         this(node).remove();
+}
+
+export function trigger<TArgs extends ArgsGrid, TEventData extends IEventData = IEventData>(
+    evt: EventEmitter<TArgs, TEventData>, args?: TArgs, e?: TEventData) {
+    e = e || new EventData() as any;
+    args = args || {} as any;
+    args.grid = this;
+    return evt.notify(args, e, this);
 }

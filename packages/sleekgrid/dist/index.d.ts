@@ -625,7 +625,6 @@ export interface LayoutEngine {
 	getRowFromCellNode(cellNode: HTMLElement, clientX: number, clientY: number): number;
 	getRefs(): GridLayoutRefs;
 	getViewportNodeFor(cell: number, row: number): HTMLElement;
-	isFrozenRow(row: number): boolean;
 	realScrollHeightChange(): void;
 	/** this might be called before init, chicken egg situation */
 	reorderViewColumns(viewCols: Column[], options?: GridOptions): Column[];
@@ -1236,7 +1235,6 @@ export declare class BasicLayout implements LayoutEngine {
 	afterSetOptions(): void;
 	beforeCleanupAndRenderCells(): void;
 	getFrozenRowOffset(): number;
-	isFrozenRow(): boolean;
 	reorderViewColumns(_: Column[]): Column[];
 	setPaneVisibility(): void;
 	setScroller(): void;
@@ -1504,6 +1502,7 @@ export declare class Grid<TItem = any> implements IGrid<TItem> {
 	getVisibleRange(viewportTop?: number, viewportLeft?: number): ViewRange;
 	getRenderedRange(viewportTop?: number, viewportLeft?: number): ViewRange;
 	private ensureCellNodesInRowsCache;
+	private isFrozenRow;
 	private cleanUpCells;
 	private cleanUpAndRenderCells;
 	private renderRows;

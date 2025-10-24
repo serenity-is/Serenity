@@ -153,7 +153,6 @@ export class BasicLayout implements LayoutEngine {
     public afterSetOptions(): void { }
     public beforeCleanupAndRenderCells(): void { }
     public getFrozenRowOffset(): number { return 0; }
-    public isFrozenRow(): boolean { return false; }
     public reorderViewColumns(_: Column[]): Column[] { return null; }
     public setPaneVisibility(): void { }
     public setScroller(): void { }

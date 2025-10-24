@@ -27,7 +27,6 @@ export interface LayoutEngine {
     getRowFromCellNode(cellNode: HTMLElement, clientX: number, clientY: number): number;
     getRefs(): GridLayoutRefs;
     getViewportNodeFor(cell: number, row: number): HTMLElement;
-    isFrozenRow(row: number): boolean;
     realScrollHeightChange(): void;
     /** this might be called before init, chicken egg situation */
     reorderViewColumns(viewCols: Column[], options?: GridOptions): Column[];

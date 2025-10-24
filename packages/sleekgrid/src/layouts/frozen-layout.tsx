@@ -500,10 +500,6 @@ export const FrozenLayout: { new(): LayoutEngine } = function (): LayoutEngine {
         }
     }
 
-    function isFrozenRow(row: number) {
-        return frozenRows && ((frozenBottom && row >= frozenRowIdx) || (!frozenBottom && row <= frozenRowIdx));
-    }
-
     function beforeCleanupAndRenderCells(rendered: ViewRange) {
         if (frozenRows) {
 
@@ -579,22 +575,6 @@ export const FrozenLayout: { new(): LayoutEngine } = function (): LayoutEngine {
         return row;
     }
 
-    function getPinnedStartLastCol() {
-        return frozenCols - 1;
-    }
-
-    function getPinnedEndFirstCol() {
-        return Infinity;
-    }
-
-    function getFrozenTopLastRow() {
-        return frozenBottom ? -1 : frozenRowIdx;
-    }
-
-    function getFrozenBottomFirstRow() {
-        return frozenBottom ? frozenRowIdx : Infinity;
-    }
-
     function getRefs(): GridLayoutRefs {
         const topLRefs: GridLayoutHRefs = {
             headerCols: headerColsL,
@@ -658,7 +638,6 @@ return {
     beforeCleanupAndRenderCells,
     calcCanvasWidth,
     updateHeadersWidth: calcHeaderWidths,
-    isFrozenRow,
     destroy,
     getCanvasNodeFor,
     getCanvasWidth,

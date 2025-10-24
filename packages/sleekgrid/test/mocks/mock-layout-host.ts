@@ -45,8 +45,6 @@ export function mockLayoutHost(): LayoutHost & {
         getSignals: vi.fn(() => host.signals),
         getRowFromNode: vi.fn(() => null),
         getScrollDims: vi.fn(() => ({ width: 0, height: 0 })),
-        getScrollLeft: vi.fn(() => 0),
-        getScrollTop: vi.fn(() => 0),
         getViewportInfo: vi.fn(() => ({} as ViewportInfo)),
         removeNode: vi.fn(),
         renderRows: vi.fn()

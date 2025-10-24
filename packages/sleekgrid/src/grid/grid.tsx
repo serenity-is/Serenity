@@ -5,7 +5,7 @@ import { CellRange } from "../core/cellrange";
 import { columnDefaults, initializeColumns, type Column, type ColumnMetadata, type ColumnSort, type ItemMetadata } from "../core/column";
 import { Draggable } from "../core/draggable";
 import type { EditCommand, EditController, Editor, EditorClass, EditorLock, Position, RowCell } from "../core/editing";
-import { EventData, EventEmitter, type IEventData } from "../core/event";
+import { EventEmitter, type IEventData } from "../core/event";
 import type { ArgsAddNewRow, ArgsCell, ArgsCellChange, ArgsCellEdit, ArgsColumn, ArgsColumnNode, ArgsCssStyle, ArgsEditorDestroy, ArgsGrid, ArgsScroll, ArgsSelectedRowsChange, ArgsSort, ArgsValidationError } from "../core/eventargs";
 import { applyFormatterResultToCellNode, convertCompatFormatter, defaultColumnFormat, formatterContext, type CellStylesHash, type ColumnFormat, type FormatterContext, type FormatterResult } from "../core/formatting";
 import type { GridSignals } from "../core/grid-signals";
@@ -23,7 +23,11 @@ import { applyColumnWidths, applyLegacyHeightOptions } from "../layouts/layout-c
 import type { LayoutEngine } from "../layouts/layout-engine";
 import { disposeLayoutHRefs, getAllCanvasNodes, getAllHScrollContainers, getAllViewportNodes, getAllVScrollContainers, layoutRefsForEach, mapLayoutRefs, type GridLayoutHRefs } from "../layouts/layout-refs";
 import { CellNavigator } from "./cellnavigator";
-import { PostProcessCleanupEntry, absBox, autosizeColumns, calcMinMaxPageXOnDragStart, defaultEmptyNode, defaultJQueryEmptyNode, defaultJQueryRemoveNode, defaultRemoveNode, getInnerWidth, getMaxSupportedCssHeight, getScrollBarDimensions, shrinkOrStretchColumn, simpleArrayEquals, sortToDesiredOrderAndKeepRest, type CachedRow } from "./internal";
+import { triggerGridEvent } from "./event-utils";
+import { absBox, autosizeColumns, calcMinMaxPageXOnDragStart, defaultEmptyNode, defaultJQueryEmptyNode, defaultJQueryRemoveNode, defaultRemoveNode, getInnerWidth, getMaxSupportedCssHeight, getScrollBarDimensions, PostProcessCleanupEntry, shrinkOrStretchColumn, simpleArrayEquals, sortToDesiredOrderAndKeepRest, type CachedRow } from "./internal";
+import type { RowCellRenderArgs } from "./render-args";
+import { renderCell } from "./render-cell";
+import { renderRow } from "./render-row";
 import { createCssRules, findStylesheetByUID } from "./style-utils";
 
 export class Grid<TItem = any> implements IGrid<TItem> {
@@ -175,6 +179,33 @@ export class Grid<TItem = any> implements IGrid<TItem> {
         this._emptyNode = options.emptyNode ?? (this._jQuery ? defaultJQueryEmptyNode.bind(this._jQuery) : defaultEmptyNode);
         this._removeNode = options.removeNode ?? (this._jQuery ? defaultJQueryRemoveNode.bind(this._jQuery) : defaultRemoveNode);
 
+        this.asyncPostProcessRows = this.asyncPostProcessRows.bind(this);
+        this.asyncPostProcessCleanupRows = this.asyncPostProcessCleanupRows.bind(this);
+        this.cancelCurrentEdit = this.cancelCurrentEdit.bind(this);
+        this.commitCurrentEdit = this.commitCurrentEdit.bind(this);
+        this.commitEditAndSetFocus = this.commitEditAndSetFocus.bind(this);
+        this.cancelEditAndSetFocus = this.cancelEditAndSetFocus.bind(this);
+        this.canCellBeActive = this.canCellBeActive.bind(this);
+        this.getColspan = this.getColspan.bind(this);
+        this.getRowTop = this.getRowTop.bind(this);
+        this.handleClick = this.handleClick.bind(this);
+        this.handleContextMenu = this.handleContextMenu.bind(this);
+        this.handleDblClick = this.handleDblClick.bind(this);
+        this.handleDragInit = this.handleDragInit.bind(this);
+        this.handleDragStart = this.handleDragStart.bind(this);
+        this.handleDrag = this.handleDrag.bind(this);
+        this.handleDragEnd = this.handleDragEnd.bind(this);
+        this.handleHeaderClick = this.handleHeaderClick.bind(this);
+        this.handleHeaderContextMenu = this.handleHeaderContextMenu.bind(this);
+        this.handleHeaderFooterRowScroll = this.handleHeaderFooterRowScroll.bind(this);
+        this.handleHeaderMouseEnter = this.handleHeaderMouseEnter.bind(this);
+        this.handleHeaderMouseLeave = this.handleHeaderMouseLeave.bind(this);
+        this.handleKeyDown = this.handleKeyDown.bind(this);
+        this.handleKeyDown = this.handleKeyDown.bind(this);
+        this.handleMouseEnter = this.handleMouseEnter.bind(this);
+        this.handleMouseLeave = this.handleMouseLeave.bind(this);
+        this.handleMouseWheel = this.handleMouseWheel.bind(this);
+
         if (options?.createPreHeaderPanel) {
             // for compat, as draggable grouping plugin expects preHeaderPanel for grouping
             options.groupingPanel ??= true;
@@ -216,8 +247,8 @@ export class Grid<TItem = any> implements IGrid<TItem> {
 
         this._colDefaults.width = options.defaultColumnWidth;
         this._editController = {
-            "commitCurrentEdit": this.commitCurrentEdit.bind(this),
-            "cancelCurrentEdit": this.cancelCurrentEdit.bind(this)
+            "commitCurrentEdit": this.commitCurrentEdit,
+            "cancelCurrentEdit": this.cancelCurrentEdit
         };
 
         this._emptyNode(this._container);
@@ -244,22 +275,20 @@ export class Grid<TItem = any> implements IGrid<TItem> {
         const prevLifecycleRoot = currentLifecycleRoot(this._container);
         try {
             this._layout.init({
-                cleanUpAndRenderCells: this.cleanUpAndRenderCells.bind(this),
-                getAvailableWidth: this.getAvailableWidth.bind(this),
-                getCellFromPoint: this.getCellFromPoint.bind(this),
-                getColumns: this.getColumns.bind(this),
-                getInitialColumns: this.getInitialColumns.bind(this),
-                getContainerNode: this.getContainerNode.bind(this),
-                getDataLength: this.getDataLength.bind(this),
-                getOptions: this.getOptions.bind(this),
-                getSignals: () => this._signals,
-                getRowFromNode: this.getRowFromNode.bind(this),
-                getScrollDims: this.getScrollBarDimensions.bind(this),
-                getScrollLeft: () => this._scrollLeft,
-                getScrollTop: () => this._scrollTop,
-                getViewportInfo: () => this._viewportInfo,
+                cleanUpAndRenderCells: (this.cleanUpAndRenderCells = this.cleanUpAndRenderCells.bind(this)),
+                getAvailableWidth: (this.getAvailableWidth = this.getAvailableWidth.bind(this)),
+                getCellFromPoint: (this.getCellFromPoint = this.getCellFromPoint.bind(this)),
+                getColumns: (this.getColumns = this.getColumns.bind(this)),
+                getContainerNode: (this.getContainerNode = this.getContainerNode.bind(this)),
+                getDataLength: (this.getDataLength = this.getDataLength.bind(this)),
+                getInitialColumns: (this.getInitialColumns = this.getInitialColumns.bind(this)),
+                getOptions: (this.getOptions = this.getOptions.bind(this)),
+                getRowFromNode: (this.getRowFromNode = this.getRowFromNode.bind(this)),
+                getScrollDims: (this.getScrollBarDimensions = this.getScrollBarDimensions.bind(this)),
+                getSignals: (this.getSignals = this.getSignals.bind(this)),
+                getViewportInfo: (this.getViewportInfo = this.getViewportInfo.bind(this)),
                 removeNode: this._removeNode,
-                renderRows: this.renderRows.bind(this)
+                renderRows: (this.renderRows = this.renderRows.bind(this))
             });
 
             this.applyLegacyHeightOptions();
@@ -307,6 +336,10 @@ export class Grid<TItem = any> implements IGrid<TItem> {
                 ...args
             });
         }
+    }
+
+    private getSignals(): GridSignals {
+        return this._signals;
     }
 
     private refsForEach(fn: (hRefs: GridLayoutHRefs) => void): void {
@@ -359,22 +392,21 @@ export class Grid<TItem = any> implements IGrid<TItem> {
             });
         });
 
-        const handleMouseWheel = this.handleMouseWheel.bind(this);
         viewports.forEach(vp => {
-            this.onEvent(vp, "wheel", handleMouseWheel);
-            this.onEvent(vp, "mousewheel" as any, handleMouseWheel);
+            this.onEvent(vp, "wheel", this.handleMouseWheel as any);
+            this.onEvent(vp, "mousewheel" as any, this.handleMouseWheel);
         });
 
         this.refsForEach(hRefs => {
             const hs = hRefs.headerCols;
             if (hs) {
                 hs.onselectstart = () => false;
-                this.onEvent(hs, "contextmenu", this.handleHeaderContextMenu.bind(this));
-                this.onEvent(hs, "click", this.handleHeaderClick.bind(this));
+                this.onEvent(hs, "contextmenu", this.handleHeaderContextMenu);
+                this.onEvent(hs, "click", this.handleHeaderClick);
                 if (this._jQuery) {
                     this._jQuery(hs)
-                        .on('mouseenter.' + this._uid, '.slick-header-column', this.handleHeaderMouseEnter.bind(this))
-                        .on('mouseleave.' + this._uid, '.slick-header-column', this.handleHeaderMouseLeave.bind(this));
+                        .on('mouseenter.' + this._uid, '.slick-header-column', this.handleHeaderMouseEnter)
+                        .on('mouseleave.' + this._uid, '.slick-header-column', this.handleHeaderMouseLeave);
                 }
                 else {
                     // need to reimplement this similar to jquery events
@@ -385,26 +417,26 @@ export class Grid<TItem = any> implements IGrid<TItem> {
                 }
             }
 
-            hRefs.headerRowCols && this.onEvent(hRefs.headerRowCols.parentElement, 'scroll', this.handleHeaderFooterRowScroll.bind(this));
-            hRefs.footerRowCols && this.onEvent(hRefs.footerRowCols.parentElement, 'scroll', this.handleHeaderFooterRowScroll.bind(this));
+            hRefs.headerRowCols && this.onEvent(hRefs.headerRowCols.parentElement, 'scroll', this.handleHeaderFooterRowScroll);
+            hRefs.footerRowCols && this.onEvent(hRefs.footerRowCols.parentElement, 'scroll', this.handleHeaderFooterRowScroll);
         });
 
-        [this._focusSink1, this._focusSink2].forEach(fs => this.onEvent(fs, "keydown", this.handleKeyDown.bind(this)));
+        [this._focusSink1, this._focusSink2].forEach(fs => this.onEvent(fs, "keydown", this.handleKeyDown));
 
         var canvases = Array.from<HTMLElement>(this.getCanvases());
         canvases.forEach(canvas => {
-            this.onEvent(canvas, "keydown", this.handleKeyDown.bind(this))
-            this.onEvent(canvas, "click", this.handleClick.bind(this))
-            this.onEvent(canvas, "dblclick", this.handleDblClick.bind(this))
-            this.onEvent(canvas, "contextmenu", this.handleContextMenu.bind(this));
+            this.onEvent(canvas, "keydown", this.handleKeyDown)
+            this.onEvent(canvas, "click", this.handleClick)
+            this.onEvent(canvas, "dblclick", this.handleDblClick)
+            this.onEvent(canvas, "contextmenu", this.handleContextMenu);
         });
 
         if (this._jQuery && (this._jQuery.fn as any).drag) {
             this._jQuery(canvases)
-                .on("draginit", this.handleDragInit.bind(this))
-                .on("dragstart", { distance: 3 }, this.handleDragStart.bind(this))
-                .on("drag", this.handleDrag.bind(this))
-                .on("dragend", this.handleDragEnd.bind(this))
+                .on("draginit", this.handleDragInit)
+                .on("dragstart", { distance: 3 }, this.handleDragStart)
+                .on("drag", this.handleDrag)
+                .on("dragend", this.handleDragEnd)
         }
         else {
             this._draggableInstance = Draggable({
@@ -413,18 +445,18 @@ export class Grid<TItem = any> implements IGrid<TItem> {
                 // the slick cell parent must always contain `.dnd` and/or `.cell-reorder` class to be identified as draggable
                 //allowDragFromClosest: 'div.slick-cell.dnd, div.slick-cell.cell-reorder',
                 preventDragFromKeys: ['ctrlKey', 'metaKey'],
-                onDragInit: this.handleDragInit.bind(this),
-                onDragStart: this.handleDragStart.bind(this),
-                onDrag: this.handleDrag.bind(this),
-                onDragEnd: this.handleDragEnd.bind(this)
+                onDragInit: this.handleDragInit,
+                onDragStart: this.handleDragStart,
+                onDrag: this.handleDrag,
+                onDragEnd: this.handleDragEnd
             });
         }
 
         canvases.forEach(canvas => {
             if (this._jQuery) {
                 this._jQuery(canvas)
-                    .on('mouseenter' + this._uid, '.slick-cell', this.handleMouseEnter.bind(this))
-                    .on('mouseleave' + this._uid, '.slick-cell', this.handleMouseLeave.bind(this));
+                    .on('mouseenter' + this._uid, '.slick-cell', this.handleMouseEnter)
+                    .on('mouseleave' + this._uid, '.slick-cell', this.handleMouseLeave);
             }
             else {
                 this.onEvent(canvas, "mouseenter", e => (e.target as HTMLElement)?.classList?.contains("slick-cell") && this.handleMouseEnter(e), { capture: true });
@@ -435,10 +467,9 @@ export class Grid<TItem = any> implements IGrid<TItem> {
         // Work around http://crbug.com/312427.
         if (navigator.userAgent.toLowerCase().match(/webkit/) &&
             navigator.userAgent.toLowerCase().match(/macintosh/)) {
-            const handleMouseWheel = this.handleMouseWheel.bind(this);
             canvases.forEach(c => {
-                this.onEvent(c, "wheel", handleMouseWheel);
-                this.onEvent(c, "mousewheel" as any, handleMouseWheel);
+                this.onEvent(c, "wheel" as any, this.handleMouseWheel as any);
+                this.onEvent(c, "mousewheel" as any, this.handleMouseWheel as any);
             });
         }
     }
@@ -532,6 +563,10 @@ export class Grid<TItem = any> implements IGrid<TItem> {
 
     getViewportNode(columnIdOrIdx?: string | number, row?: number): HTMLElement {
         return this._layout.getViewportNodeFor(this.colIdOrIdxToCell(columnIdOrIdx || 0), row || 0);
+    }
+
+    private getViewportInfo() {
+        return this._viewportInfo;
     }
 
     private getViewports(): HTMLElement[] {
@@ -1222,13 +1257,7 @@ export class Grid<TItem = any> implements IGrid<TItem> {
     //////////////////////////////////////////////////////////////////////////////////////////////
     // General
 
-    private trigger<TArgs extends ArgsGrid, TEventData extends IEventData = IEventData>(
-        evt: EventEmitter<TArgs, TEventData>, args?: TArgs, e?: TEventData) {
-        e = e || new EventData() as any;
-        args = args || {} as any;
-        args.grid = this;
-        return evt.notify(args, e, this);
-    }
+    private trigger = triggerGridEvent;
 
     getEditorLock(): EditorLock {
         return this._options.editorLock;
@@ -1797,179 +1826,12 @@ export class Grid<TItem = any> implements IGrid<TItem> {
         return (item as any)[columnDef.field];
     }
 
-    private appendRowHtml(sbStart: string[], sbCenter: string[], sbEnd: string[], row: number, range: ViewRange, dataLength: number): void {
-        var d = this.getDataItem(row);
-        var dataLoading = row < dataLength && !d;
-        var rowCss = "slick-row" +
-            (this._layout.isFrozenRow(row) ? ' frozen' : '') +
-            (dataLoading ? " loading" : "") +
-            (row === this._activeRow ? " active" : "") +
-            (row % 2 == 1 ? " odd" : " even");
-
-        if (!d) {
-            rowCss += " " + this._options.addNewRowCssClass;
-        }
-
-        var itemMetadata = (this._data as IDataView).getItemMetadata?.(row);
-
-        if (itemMetadata && itemMetadata.cssClasses) {
-            rowCss += " " + itemMetadata.cssClasses;
-        }
-
-        var rowOffset = this._layout.getFrozenRowOffset(row);
-
-        var rowHtml = "<div class='" + rowCss + "' style='top:"
-            + (this.getRowTop(row) - rowOffset)
-            + "px'>";
-
-        sbCenter.push(rowHtml);
-
-        const { pinnedStartLast, pinnedEndFirst } = this._layout.getRefs();
-
-        if (pinnedStartLast >= 0) {
-            sbStart.push(rowHtml);
-        }
-
-        if (pinnedEndFirst != Infinity) {
-            sbEnd.push(rowHtml);
-        }
-
-        var colspan, m, cols = this._cols;
-        for (var i = 0, ii = cols.length; i < ii; i++) {
-            var columnData: ColumnMetadata = null;
-            m = cols[i];
-            colspan = 1;
-            if (itemMetadata && itemMetadata.columns) {
-                columnData = itemMetadata.columns[m.id] || itemMetadata.columns[i];
-                colspan = (columnData && columnData.colspan) || 1;
-                if (colspan === "*") {
-                    colspan = ii - i;
-                }
-            }
-
-            const pinnedStart = pinnedStartLast >= 0 && i <= pinnedStartLast;
-            const pinnedEnd = pinnedEndFirst != Infinity && i >= pinnedEndFirst;
-            // Do not render cells outside of the viewport.
-            if (pinnedStart || pinnedEnd || this._colRight[Math.min(ii - 1, i + colspan - 1)] > range.leftPx) {
-                if (!(pinnedStart || pinnedEnd) && this._colLeft[i] > range.rightPx) {
-                    // All columns to the right are outside the range.
-                    if (pinnedEndFirst != Infinity)
-                        break;
-                    i = pinnedEndFirst - 1;
-                    continue;
-                }
-
-                this.appendCellHtml(pinnedStart ? sbStart : pinnedEnd ? sbEnd : sbCenter, row, i, colspan, d, columnData);
-            }
-
-            if (colspan > 1) {
-                i += (colspan - 1);
-            }
-        }
-
-        sbCenter.push("</div>");
-
-        if (pinnedStartLast >= 0) {
-            sbStart.push("</div>");
-        }
-
-        if (pinnedEndFirst != Infinity) {
-            sbEnd.push("</div>");
-        }
-    }
-
-    private appendCellHtml(sb: string[], row: number, cell: number, colspan: number, item: TItem, metadata: ColumnMetadata): void {
-        var cols = this._cols, column = cols[cell];
-        var { pinnedStartLast, pinnedEndFirst } = this._layout.getRefs();
-        var klass = "slick-cell l" + cell + " r" + Math.min(cols.length - 1, cell + colspan - 1) +
-            (column.cssClass ? " " + column.cssClass : "");
-
-        if (cell <= pinnedStartLast)
-            klass += ' frozen pinned-start';
-        else if (cell >= pinnedEndFirst)
-            klass += ' frozen pinned-end';
-
-        if (row === this._activeRow && cell === this._activeCell)
-            klass += " active";
-
-        if (metadata && metadata.cssClasses) {
-            klass += " " + metadata.cssClasses;
-        }
-
-        for (var key in this._cellCssClasses) {
-            if (this._cellCssClasses[key][row] && (this._cellCssClasses[key][row] as any)[column.id]) {
-                klass += (" " + this._cellCssClasses[key][row][column.id]);
-            }
-        }
-
-        // if there is a corresponding row (if not, this is the Add New row or this data hasn't been loaded yet)
-        var fmtResult: FormatterResult;
-        const ctx = formatterContext<TItem>({
-            cell,
-            column,
-            grid: this,
-            item,
-            row
-        });
-
-        if (item) {
-            ctx.value = this.getDataItemValueForColumn(item, column);
-            fmtResult = this.getFormatter(row, column)(ctx);
-            if (typeof fmtResult === "string" && fmtResult.length) {
-                if (ctx.enableHtmlRendering)
-                    fmtResult = (ctx.sanitizer ?? escapeHtml)(fmtResult);
-                else
-                    fmtResult = escapeHtml(fmtResult);
-            }
-        }
-
-        klass = escapeHtml(klass);
-
-        if (ctx.addClass?.length || ctx.addAttrs?.length || ctx.tooltip?.length) {
-            if (ctx.addClass?.length)
-                klass += (" " + escapeHtml(ctx.addClass));
-
-            sb.push('<div class="' + klass + '"');
-
-            if (ctx.addClass?.length)
-                sb.push(' data-fmtcls="' + escapeHtml(ctx.addClass) + '"');
-
-            var attrs = ctx.addAttrs;
-            if (attrs != null) {
-                var ks = [];
-                for (var k in attrs) {
-                    sb.push(k + '="' + escapeHtml(attrs[k]) + '"');
-                    ks.push(k);
-                }
-                sb.push(' data-fmtatt="' + escapeHtml(ks.join(',')) + '"');
-            }
-
-            var toolTip = ctx.tooltip;
-            if (toolTip != null && toolTip.length)
-                sb.push('tooltip="' + escapeHtml(toolTip) + '"');
-
-            if (fmtResult != null && !(fmtResult instanceof Node))
-                sb.push('>' + fmtResult + '</div>');
-            else
-                sb.push('></div>');
-        }
-        else if (fmtResult != null && !(fmtResult instanceof Node))
-            sb.push('<div class="' + klass + '">' + fmtResult + '</div>');
-        else
-            sb.push('<div class="' + klass + '"></div>');
-
-        var cache = this._rowsCache[row];
-        cache.cellRenderQueue.push(cell);
-        cache.cellRenderContent.push(fmtResult instanceof Node ? fmtResult : void 0);
-        this._rowsCache[row].cellColSpans[cell] = colspan;
-    }
-
     private cleanupRows(rangeToKeep: ViewRange): void {
         var i: number;
         for (var x in this._rowsCache) {
             i = parseInt(x, 10);
             if (i !== this._activeRow && (i < rangeToKeep.top || i > rangeToKeep.bottom)
-                && !this._layout.isFrozenRow(i))
+                && !this.isFrozenRow(i))
                 this.removeRowFromCache(i);
         }
 
@@ -2360,9 +2222,13 @@ export class Grid<TItem = any> implements IGrid<TItem> {
         }
     }
 
+    private isFrozenRow(row: number): boolean {
+        const { frozenTopLast, frozenBottomFirst } = this._layout.getRefs();
+        return row <= frozenTopLast || row >= frozenBottomFirst;
+    }
+
     private cleanUpCells(rangeToKeep: ViewRange, row: number): void {
-        // Ignore frozen rows
-        if (this._layout.isFrozenRow(row))
+        if (this.isFrozenRow(row))
             return;
 
         var cacheEntry = this._rowsCache[row];
@@ -2407,15 +2273,15 @@ export class Grid<TItem = any> implements IGrid<TItem> {
 
     private cleanUpAndRenderCells(range: ViewRange) {
         var cacheEntry;
-        var stringArray: string[] = [];
         var processedRows = [];
         var cellsAdded;
         var colspan;
         var cols = this._cols;
-        var cellContents: Element[] = [];
+
+        const args = this.createRowCellRenderArgs(null, -1); // cell != null indicates cell rendering mode
 
         for (var row = range.top, btm = range.bottom; row <= btm; row++) {
-            cacheEntry = this._rowsCache[row];
+            args.cachedRow = cacheEntry = this._rowsCache[row];
             if (!cacheEntry) {
                 continue;
             }
@@ -2431,37 +2297,40 @@ export class Grid<TItem = any> implements IGrid<TItem> {
             var itemMetadata = (this._data as IDataView).getItemMetadata?.(row);
             var colsMetadata = itemMetadata && itemMetadata.columns;
 
-            var d = this.getDataItem(row);
-
             // TODO:  shorten this loop (index? heuristics? binary search?)
-            for (var i = 0, ii = cols.length; i < ii; i++) {
+            for (var cell = 0, colCount = cols.length; cell < colCount; cell++) {
                 // Cells to the right are outside the range.
-                if (this._colLeft[i] > range.rightPx) {
+                if (this._colLeft[cell] > range.rightPx) {
                     break;
                 }
 
                 // Already rendered.
-                if ((colspan = cacheEntry.cellColSpans[i]) != null) {
-                    i += (colspan > 1 ? colspan - 1 : 0);
+                if ((colspan = cacheEntry.cellColSpans[cell]) != null) {
+                    cell += (colspan > 1 ? colspan - 1 : 0);
                     continue;
                 }
 
-                var columnData: ColumnMetadata = null;
+                var colMetadata: ColumnMetadata = null;
                 colspan = 1;
                 if (colsMetadata) {
-                    columnData = colsMetadata[cols[i].id] || colsMetadata[i];
-                    colspan = (columnData && columnData.colspan) || 1;
+                    colMetadata = colsMetadata[cols[cell].id] || colsMetadata[cell];
+                    colspan = (colMetadata && colMetadata.colspan) || 1;
                     if (colspan === "*") {
-                        colspan = ii - i;
+                        colspan = colCount - cell;
                     }
                 }
 
-                if (this._colRight[Math.min(ii - 1, i + colspan - 1)] > range.leftPx) {
-                    this.appendCellHtml(stringArray, row, i, colspan, d, columnData);
+                if (args.colRight[Math.min(colCount - 1, cell + colspan - 1)] > range.leftPx) {
+                    args.item = this.getDataItem(row);
+                    args.row = row;
+                    args.cell = cell;
+                    args.colspan = colspan;
+                    args.colMetadata = colMetadata;
+                    renderCell(args);
                     cellsAdded++;
                 }
 
-                i += (colspan > 1 ? colspan - 1 : 0);
+                cell += (colspan > 1 ? colspan - 1 : 0);
             }
 
             if (cellsAdded) {
@@ -2469,16 +2338,16 @@ export class Grid<TItem = any> implements IGrid<TItem> {
             }
         }
 
-        if (!stringArray.length) {
+        if (!args.sb.length) {
             return;
         }
 
         var x = document.createElement("div");
-        x.innerHTML = stringArray.join("");
+        x.innerHTML = args.sb.join("");
 
         var processedRow;
         var node: HTMLElement;
-        const { pinnedStartLast, pinnedEndFirst } = this._layout.getRefs();
+        const { pinnedStartLast, pinnedEndFirst } = args.frozenPinned;
         while ((processedRow = processedRows.pop()) != null) {
             cacheEntry = this._rowsCache[processedRow];
             var columnIdx;
@@ -2501,27 +2370,52 @@ export class Grid<TItem = any> implements IGrid<TItem> {
         }
     }
 
+    private createRowCellRenderArgs(row: number, cell: number): RowCellRenderArgs<TItem> {
+        const rowRendering = cell == null;
+        return {
+            activeCell: this._activeCell,
+            activeRow: this._activeRow,
+            cellCssClasses: this._cellCssClasses,
+            frozenPinned: this._layout.getRefs(),
+            grid: this,
+            item: row != null ? this.getDataItem(row) : null,
+            row: row,
+            // row only args
+            colLeft: rowRendering ? this._colLeft : null,
+            colRight: rowRendering ? this._colRight : null,
+            range: null,
+            sbCenter: rowRendering ? [] : null,
+            sbEnd: rowRendering ? [] : null,
+            sbStart: rowRendering ? [] : null,
+            getFrozenRowOffset: rowRendering ? this._layout.getFrozenRowOffset.bind(this._layout) : null,
+            getRowTop: rowRendering ? this.getRowTop : null,
+            // cell only args
+            cachedRow: row != null ? this._rowsCache[row] : null,
+            cell: cell,
+            colMetadata: null,
+            colspan: null,
+            sb: rowRendering ? null : []
+        };
+    }
+
     private renderRows(range: ViewRange): void {
-        var sbStart: string[] = [],
-            sbCenter: string[] = [],
-            sbEnd: string[] = [],
-            rows = [],
-            needToReselectCell = false,
-            dataLength = this.getDataLength();
+        const args = this.createRowCellRenderArgs(null, null);
+        args.range = range;
+        const rows: number[] = [];
+        let needToReselectCell = false;
+        const { frozenBottomFirst } = this._layout.getRefs();
 
-        const { frozenBottomFirst} = this._layout.getRefs();
+        for (let row = range.top, rangeBottom = range.bottom; row <= rangeBottom; row++) {
 
-        for (var i = range.top, ii = range.bottom; i <= ii; i++) {
-
-            if (this._rowsCache[i] || (frozenBottomFirst != Infinity && i == dataLength)) {
+            if (this._rowsCache[row] || (frozenBottomFirst != Infinity && row == this.getDataLength())) {
                 continue;
             }
 
-            rows.push(i);
+            rows.push(row);
 
             // Create an entry right away so that appendRowHtml() can
             // start populatating it.
-            this._rowsCache[i] = {
+            args.cachedRow = this._rowsCache[row] = {
                 rowNodeS: null,
                 rowNodeC: null,
                 rowNodeE: null,
@@ -2541,8 +2435,11 @@ export class Grid<TItem = any> implements IGrid<TItem> {
                 cellRenderContent: []
             };
 
-            this.appendRowHtml(sbStart, sbCenter, sbEnd, i, range, dataLength);
-            if (this._activeCellNode && this._activeRow === i) {
+            args.row = row;
+            args.item = this.getDataItem(row);
+            renderRow(args);
+
+            if (this._activeCellNode && args.activeRow === row) {
                 needToReselectCell = true;
             }
         }
@@ -2555,13 +2452,13 @@ export class Grid<TItem = any> implements IGrid<TItem> {
             c = document.createElement("div"),
             e = document.createElement("div");
 
-        s.innerHTML = sbStart.join("");
-        c.innerHTML = sbCenter.join("");
-        e.innerHTML = sbEnd.join("");
+        s.innerHTML = args.sbStart.join("");
+        c.innerHTML = args.sbCenter.join("");
+        e.innerHTML = args.sbEnd.join("");
 
         const layout = this._layout;
-        for (var i = 0, ii = rows.length; i < ii; i++) {
-            var row = rows[i];
+        for (let i = 0, rowCount = rows.length; i < rowCount; i++) {
+            const row = rows[i];
             var cache = this._rowsCache[row];
             cache.rowNodeS = s.firstElementChild as HTMLElement;
             cache.rowNodeC = c.firstElementChild as HTMLElement;
@@ -2601,7 +2498,7 @@ export class Grid<TItem = any> implements IGrid<TItem> {
             this.asyncPostProcessCleanupRows();
         }
         else {
-            this._hPostRenderCleanup = setTimeout(this.asyncPostProcessCleanupRows.bind(this), this._options.asyncPostCleanupDelay);
+            this._hPostRenderCleanup = setTimeout(this.asyncPostProcessCleanupRows, this._options.asyncPostCleanupDelay);
         }
     }
 
@@ -2872,7 +2769,7 @@ export class Grid<TItem = any> implements IGrid<TItem> {
 
             // call this function again after the specified delay
             if (this._options.asyncPostRenderDelay >= 0) {
-                this._hPostRenderCleanup = setTimeout(this.asyncPostProcessCleanupRows.bind(this), this._options.asyncPostCleanupDelay);
+                this._hPostRenderCleanup = setTimeout(this.asyncPostProcessCleanupRows, this._options.asyncPostCleanupDelay);
                 return;
             }
         }
@@ -3555,8 +3452,8 @@ export class Grid<TItem = any> implements IGrid<TItem> {
             item: item || {},
             event: e,
             editorCellNavOnLRKeys: this._options.editorCellNavOnLRKeys,
-            commitChanges: this.commitEditAndSetFocus.bind(this),
-            cancelChanges: this.cancelEditAndSetFocus.bind(this)
+            commitChanges: this.commitEditAndSetFocus,
+            cancelChanges: this.cancelEditAndSetFocus
         });
 
         if (item) {
@@ -3646,7 +3543,7 @@ export class Grid<TItem = any> implements IGrid<TItem> {
     scrollRowIntoView(row: number, doPaging?: boolean): void {
 
         const { frozenTopLast, frozenBottomFirst } = this._layout.getRefs();
-        if (!this._layout.isFrozenRow(row)) {
+        if (!this.isFrozenRow(row)) {
 
             var viewportScrollH = Math.round(parsePx(getComputedStyle(this.getScrollContainerY()).height));
 
@@ -3831,8 +3728,8 @@ export class Grid<TItem = any> implements IGrid<TItem> {
             this._cellNavigator = new CellNavigator({
                 getColumnCount: () => this._cols.length,
                 getRowCount: () => this.getDataLengthIncludingAddNew(),
-                getColspan: this.getColspan.bind(this),
-                canCellBeActive: this.canCellBeActive.bind(this),
+                getColspan: this.getColspan,
+                canCellBeActive: this.canCellBeActive,
                 setTabbingDirection: dir => this._tabbingDirection = dir,
                 isRTL: () => this._options.rtl
             });
@@ -3847,7 +3744,7 @@ export class Grid<TItem = any> implements IGrid<TItem> {
 
             var isAddNewRow = (pos.row == this.getDataLength());
 
-            if (!this._layout.isFrozenRow(pos.row)) {
+            if (!this.isFrozenRow(pos.row)) {
                 this.scrollCellIntoView(pos.row, pos.cell, !isAddNewRow);
             }
 
