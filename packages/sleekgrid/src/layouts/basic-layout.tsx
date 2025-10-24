@@ -1,5 +1,5 @@
-import { currentLifecycleRoot } from "@serenity-is/sleekdom";
 import { Column } from "../core";
+import { FooterRow, Header, HeaderRow, TopPanel, Viewport } from "./layout-components";
 import { LayoutEngine } from "./layout-engine";
 import type { LayoutHost } from "./layout-host";
 import type { GridLayoutRefs } from "./layout-refs";
@@ -10,73 +10,24 @@ export class BasicLayout implements LayoutEngine {
     protected host: LayoutHost;
     protected bodyRefs: GridLayoutRefs["main"]["body"] = {};
     protected mainRefs: GridLayoutRefs["main"] = { body: this.bodyRefs };
-    protected refs: GridLayoutRefs = { main: this.mainRefs };
+    protected refs: GridLayoutRefs = { main: this.mainRefs, pinnedStartLast: -Infinity, pinnedEndFirst: Infinity, frozenTopLast: -Infinity, frozenBottomFirst: Infinity };
 
-    init(hostGrid: LayoutHost) {
-        this.host = hostGrid;
-        const optSignals = this.host.getSignals();
-        const prevLifecycleRoot = currentLifecycleRoot(this.host.getContainerNode());
-        const mainRefs = this.mainRefs;
-        const bodyRefs = this.bodyRefs;
-        try {
-            this.host.getContainerNode().append(<>
-                <div class={{ "slick-header": true, "slick-hidden": optSignals.hideColumnHeader }}>
-                    <div class="slick-header-columns" ref={el => mainRefs.headerCols = el} />
-                </div>
-                <div class={{ "slick-headerrow": true, "slick-hidden": optSignals.hideHeaderRow }}>
-                    <div class="slick-headerrow-columns" ref={el => mainRefs.headerRowCols = el} />
-                </div>
-                <div class={{ "slick-top-panel-container": true, "slick-hidden": optSignals.hideTopPanel }}>
-                    <div class="slick-top-panel" ref={el => mainRefs.topPanel = el} />
-                </div>
-                <div class="slick-viewport" tabindex="0" ref={el => bodyRefs.viewport = el}>
-                    <div class="grid-canvas" tabindex="0" ref={el => bodyRefs.canvas = el} />
-                </div>
-                <div class={{ "slick-footerrow": true, "slick-hidden": optSignals.hideFooterRow }}>
-                    <div class="slick-footerrow-columns" ref={el => mainRefs.footerRowCols = el} />
-                </div>
-            </>);
-
-            this.updateHeadersWidth();
-        }
-        finally {
-            currentLifecycleRoot(prevLifecycleRoot);
-        }
+    init(host: LayoutHost) {
+        this.host = host;
+        const signals = host.getSignals();
+        const refs = this.refs;
+        this.host.getContainerNode().append(<>
+            <Header hband="main" refs={refs} signals={signals} />
+            <TopPanel refs={refs} signals={signals} />
+            <HeaderRow hband="main" refs={refs} signals={signals} />
+            <Viewport hband="main" vband="body" refs={refs} />
+            <FooterRow hband="main" refs={refs} signals={signals} />
+        </>);
+        this.updateHeadersWidth();
     }
 
     public appendCachedRow(_: number, _rowNodeS: HTMLDivElement, rowNodeC: HTMLDivElement, _rowNodeE: HTMLDivElement): void {
         rowNodeC && this.bodyRefs.canvas.appendChild(rowNodeC);
-    }
-
-    public applyColumnWidths(): void {
-        var x = 0, w, rule, cols = this.host.getColumns(), opts = this.host.getOptions(), rtl = opts.rtl;
-
-        if (opts.useCssVars) {
-            var styles = this.host.getContainerNode().style;
-            for (var i = 0; i < cols.length; i++) {
-                w = cols[i].width;
-                var prop = "--l" + i;
-                var oldVal = styles.getPropertyValue(prop);
-                var newVal = x + "px";
-                if (oldVal !== newVal)
-                    styles.setProperty(prop, newVal);
-                prop = "--r" + i;
-                oldVal = styles.getPropertyValue(prop);
-                newVal = (this.canvasWidth - x - w) + "px"
-                if (oldVal !== newVal)
-                    styles.setProperty(prop, newVal);
-                x += w;
-            }
-        }
-        else {
-            for (var i = 0; i < cols.length; i++) {
-                w = cols[i].width;
-                rule = this.host.getColumnCssRules(i);
-                rule[rtl ? "right" : "left"].style[rtl ? "right" : "left"] = x + "px";
-                rule[rtl ? "left" : "right"].style[rtl ? "left" : "right"] = (this.canvasWidth - x - w) + "px";
-                x += w;
-            }
-        }
     }
 
     public calcCanvasWidth(): number {
@@ -99,8 +50,7 @@ export class BasicLayout implements LayoutEngine {
             this.headersWidth += cols[i].width;
         }
 
-        this.headersWidth += scrollWidth;
-        this.headersWidth = Math.max(this.headersWidth, this.host.getViewportInfo().width) + 1000;
+        this.headersWidth = Math.max(this.headersWidth, this.host.getViewportInfo().width);
         this.mainRefs.headerCols.style.width = this.headersWidth + "px";
     }
 
@@ -111,10 +61,6 @@ export class BasicLayout implements LayoutEngine {
 
     public getCanvasNodeFor(cell: number, row: number): HTMLElement {
         return this.bodyRefs.canvas;
-    }
-
-    public getCanvasNodes(): HTMLElement[] {
-        return [this.bodyRefs.canvas];
     }
 
     public getCanvasWidth(): number {
@@ -159,13 +105,6 @@ export class BasicLayout implements LayoutEngine {
 
     public getViewportNodeFor(_row: number, _cell: number): HTMLElement {
         return this.bodyRefs.viewport;
-    }
-
-    public handleScrollH(): void {
-        this.mainRefs.headerCols && (this.mainRefs.headerCols.parentElement.scrollLeft = this.host.getScrollLeft());
-        this.mainRefs.topPanel && (this.mainRefs.topPanel.parentElement.scrollLeft = this.host.getScrollLeft());
-        this.mainRefs.headerRowCols && (this.mainRefs.headerRowCols.parentElement.scrollLeft = this.host.getScrollLeft());
-        this.mainRefs.footerRowCols && (this.mainRefs.footerRowCols.parentElement.scrollLeft = this.host.getScrollLeft());
     }
 
     public realScrollHeightChange(): void {
@@ -213,14 +152,9 @@ export class BasicLayout implements LayoutEngine {
     public afterRenderRows(): void { }
     public afterSetOptions(): void { }
     public beforeCleanupAndRenderCells(): void { }
-    public getFrozenBottomFirstRow(): number { return Infinity; }
     public getFrozenRowOffset(): number { return 0; }
-    public getFrozenTopLastRow(): number { return -1; }
-    public getPinnedEndFirstCol(): number { return Infinity; }
-    public getPinnedStartLastCol(): number { return -1; }
-    public handleScrollV(): void { }
     public isFrozenRow(): boolean { return false; }
-    public reorderViewColumns(_: Column[]): Column[] { return null;}
+    public reorderViewColumns(_: Column[]): Column[] { return null; }
     public setPaneVisibility(): void { }
     public setScroller(): void { }
 

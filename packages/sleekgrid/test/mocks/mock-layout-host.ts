@@ -1,7 +1,10 @@
 import { computed, signal } from "@serenity-is/signals";
-import { gridDefaults, ViewportInfo, type Column, type RowCell } from "../../src/core";
-import { GridOptions } from "../../src/core/gridoptions";
-import type { GridSignals, LayoutHost } from "../../src/layouts/layout-engine";
+import type { Column } from "../../src/core/column";
+import type { RowCell } from "../../src/core/editing";
+import type { GridSignals } from "../../src/core/grid-signals";
+import { gridDefaults, GridOptions } from "../../src/core/gridoptions";
+import type { ViewportInfo } from "../../src/core/viewportinfo";
+import type { LayoutHost } from "../../src/layouts/layout-host";
 
 export function mockLayoutHost(): LayoutHost & {
     signals: GridSignals,
@@ -34,7 +37,6 @@ export function mockLayoutHost(): LayoutHost & {
         cleanUpAndRenderCells: vi.fn(),
         getAvailableWidth: vi.fn(() => 1000),
         getCellFromPoint: vi.fn(() => ({ row: 0, cell: 0 } as RowCell)),
-        getColumnCssRules: vi.fn(() => ({ right: '', left: '' })),
         getColumns: vi.fn(() => [] as Column[]),
         getInitialColumns: vi.fn(() => [] as Column[]),
         getContainerNode: vi.fn(() => host.container),

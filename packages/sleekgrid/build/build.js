@@ -85,7 +85,7 @@ const compatGrid = {
     entryPoints: ['./src/grid/index.ts'],
     outfile: './dist/compat/slick.grid.js',
     plugins: [globalExternals(/\.\.\/core/, {
-        Slick: ["addClass", "applyFormatterResultToCellNode", "basicRegexSanitizer", "columnDefaults", "convertCompatFormatter", "ensureUniqueColumnIds", "escapeHtml", "defaultColumnFormat", "disableSelection", "EventEmitter", "EventData", "formatterContext", "gridDefaults", "GlobalEditorLock", "initializeColumns", "H", "keyCode", "NonDataRow", "parsePx", "preClickClassName", "CellRange", "removeClass", "RowCell", "spacerDiv", "titleize"]
+        Slick: ["addClass", "applyFormatterResultToCellNode", "basicRegexSanitizer", "columnDefaults", "convertCompatFormatter", "ensureUniqueColumnIds", "escapeHtml", "defaultColumnFormat", "disableSelection", "Draggable", "EventEmitter", "EventData", "formatterContext", "gridDefaults", "GlobalEditorLock", "initializeColumns", "H", "keyCode", "NonDataRow", "parsePx", "preClickClassName", "CellRange", "removeClass", "RowCell", "spacerDiv", "titleize"]
     })]
 }
 
@@ -136,10 +136,10 @@ const compatPluginsRowSelectionModel = {
 
 const compatDataGroupItemMetadataProvider = {
     ...compatDefaults,
-    entryPoints: ['./src/data/groupitemmetadataprovider.ts'],
+    entryPoints: ['./src/data/groupitemmetadataprovider.tsx'],
     outfile: './dist/compat/slick.groupitemmetadataprovider.js',
     plugins: [globalExternals(/\.\.\/(core|grid)/, {
-        Slick: [ "convertCompatFormatter", "Group" ]
+        Slick: [ "convertCompatFormatter", "Group", "applyFormatterResultToCellNode" ]
     })],
     footer: {
         js: compatDefaults.footer.js + " Slick.Data = Slick.Data || {}; Slick.Data.GroupItemMetadataProvider = Slick.GroupItemMetadataProvider;"

@@ -1,12 +1,13 @@
-import { IPlugin } from "../../src/grid/";
+import type { IGrid } from "../../src/core/igrid";
+import type { IPlugin } from "../../src/core/iplugin";
 import { Grid } from "../../src/grid/grid";
 
 it('should call plugin init with grid instance', () => {
     const grid = new Grid(document.createElement('div'), [], [], {});
 
-    let pluginInitGrid: Grid | null = null;
+    let pluginInitGrid: IGrid | null = null;
     const plugin: IPlugin = {
-        init: (grid: Grid) => {
+        init: (grid: IGrid) => {
             pluginInitGrid = grid;
         }
     }
@@ -20,7 +21,7 @@ it('should be able to get plugin by name if it exists', () => {
     const grid = new Grid(document.createElement('div'), [], [], {});
 
     const plugin: IPlugin = {
-        init: (_grid: Grid) => {},
+        init: (_grid: IGrid) => {},
         pluginName: 'test'
     }
 
@@ -34,7 +35,7 @@ it('should be able to unregister a plugin', () => {
 
     let pluginDestroyCalled = false;
     const plugin: IPlugin = {
-        init: (_grid: Grid) => {},
+        init: (_grid: IGrid) => {},
         destroy: () => {
             pluginDestroyCalled = true;
         },
@@ -55,7 +56,7 @@ it('should call plugin.destroy if it exists', () => {
 
     let pluginDestroyCalled = false;
     const plugin: IPlugin = {
-        init: (_grid: Grid) => {},
+        init: (_grid: IGrid) => {},
         destroy: () => {
             pluginDestroyCalled = true;
         }
@@ -71,7 +72,7 @@ it('should be able to get plugins without names', () => {
     const grid = new Grid(document.createElement('div'), [], [], {});
 
     const newPlugin = (): IPlugin => ({
-        init: (_grid: Grid) => {
+        init: (_grid: IGrid) => {
         }
     });
 

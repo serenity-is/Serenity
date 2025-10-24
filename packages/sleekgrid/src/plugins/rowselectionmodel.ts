@@ -1,5 +1,4 @@
-import { CellRange, EventEmitter, EventSubscriber, IEventData } from "../core";
-import { ArgsCell, Grid, IPlugin, SelectionModel } from "../grid";
+import { CellRange, EventEmitter, EventSubscriber, IEventData, type ArgsCell, type IGrid, type IPlugin, type SelectionModel } from "../core";
 
 export interface RowSelectionModelOptions {
     selectActiveRow?: boolean;
@@ -27,7 +26,7 @@ function rangesToRows(ranges: CellRange[]) {
 }
 
 export class RowSelectionModel implements IPlugin, SelectionModel {
-    declare private grid: Grid;
+    declare private grid: IGrid;
     private handler = new EventSubscriber();
     declare private options: RowSelectionModelOptions;
     declare private ranges: CellRange[];
@@ -41,7 +40,7 @@ export class RowSelectionModel implements IPlugin, SelectionModel {
         selectActiveRow: true
     }
 
-    init(grid: Grid): void {
+    init(grid: IGrid): void {
         this.grid = grid;
         this.handler.subscribe(grid.onActiveCellChanged, this.wrapHandler(this.handleActiveCellChange));
         this.handler.subscribe(grid.onKeyDown, this.wrapHandler(this.handleKeyDown));

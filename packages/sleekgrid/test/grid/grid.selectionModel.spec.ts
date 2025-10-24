@@ -7,7 +7,7 @@ it('should selectionModel init with grid', () => {
 
     let selectionModelInitGrid: Grid | null = null;
     const selectionModel: SelectionModel = {
-        init: (grid: Grid) => {
+        init: (grid: IGrid) => {
             selectionModelInitGrid = grid;
         },
         setSelectedRanges: (_ranges: CellRange[]) => {
@@ -33,7 +33,7 @@ it('should subscribe to selectionModel.onSelectedRangesChanged', () => {
     };
 
     const selectionModel: SelectionModel = {
-        init: (_grid: Grid) => {},
+        init: (_grid: IGrid) => {},
         setSelectedRanges: (_ranges: CellRange[]) => {
         },
         refreshSelections: () => {
@@ -56,7 +56,7 @@ it('should unsubscribe from selectionModel.onSelectedRangesChanged on destroy', 
     };
 
     const selectionModel: SelectionModel = {
-        init: (_grid: Grid) => {},
+        init: (_grid: IGrid) => {},
         setSelectedRanges: (_ranges: CellRange[]) => {
         },
         refreshSelections: () => {
@@ -80,7 +80,7 @@ it('should unsubscribe from selectionModel.onSelectedRangesChanged when setting 
     };
 
     const selectionModel: SelectionModel = {
-        init: (_grid: Grid) => {},
+        init: (_grid: IGrid) => {},
         setSelectedRanges: (_ranges: CellRange[]) => {
         },
         refreshSelections: () => {
@@ -90,7 +90,7 @@ it('should unsubscribe from selectionModel.onSelectedRangesChanged when setting 
 
     grid.setSelectionModel(selectionModel);
     grid.setSelectionModel({
-        init: (_grid: Grid) => {},
+        init: (_grid: IGrid) => {},
         setSelectedRanges: (_ranges: CellRange[]) => {
         },
         refreshSelections: () => {
@@ -104,7 +104,7 @@ it('should return current selectionModel on getSelectionModel', () => {
     const grid = new Grid(document.createElement('div'), [], [], {});
 
     const selectionModel: SelectionModel = {
-        init: (_grid: Grid) => {},
+        init: (_grid: IGrid) => {},
         setSelectedRanges: (_ranges: CellRange[]) => {
         },
         refreshSelections: () => {

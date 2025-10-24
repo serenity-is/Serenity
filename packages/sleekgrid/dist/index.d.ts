@@ -1,3 +1,5 @@
+import { ReadonlySignal, Signal } from '@serenity-is/signals';
+
 /***
  * A base class that all special / non-data rows (like Group and GroupTotals) derive from.
  */
@@ -5,6 +7,29 @@ export declare class NonDataRow {
 	__nonDataRow: boolean;
 }
 export declare const preClickClassName = "slick-edit-preclick";
+export declare class CellRange {
+	fromRow: number;
+	fromCell: number;
+	toRow: number;
+	toCell: number;
+	constructor(fromRow: number, fromCell: number, toRow?: number, toCell?: number);
+	/***
+	 * Returns whether a range represents a single row.
+	 */
+	isSingleRow(): boolean;
+	/***
+	 * Returns whether a range represents a single cell.
+	 */
+	isSingleCell(): boolean;
+	/***
+	 * Returns whether a range contains a given cell.
+	 */
+	contains(row: number, cell: number): boolean;
+	/***
+	 * Returns a readable representation of a range.
+	 */
+	toString(): string;
+}
 export interface IEventData {
 	readonly type?: string;
 	currentTarget?: EventTarget | null;
@@ -487,32 +512,29 @@ export interface ItemMetadata<TItem = any> {
 }
 export declare function initializeColumns(columns: Column[], defaults: Partial<Column<any>>): void;
 export declare function titleize(str: string): string;
-export interface IDataView<TItem = any> {
-	/** Gets the grand totals for all aggregated data. */
-	getGrandTotals(): IGroupTotals;
-	/** Gets the total number of rows in the view. */
-	getLength(): number;
-	/** Gets the item at the specified row index. */
-	getItem(row: number): (TItem | Group<TItem> | IGroupTotals);
-	/** Gets metadata for the item at the specified row index. */
-	getItemMetadata?(row: number): ItemMetadata<TItem>;
-	/** Event fired when the underlying data changes */
-	readonly onDataChanged?: EventEmitter<any, IEventData>;
-	/** Event fired when the row count changes */
-	readonly onRowCountChanged?: EventEmitter<any, IEventData>;
-	/** Event fired when specific rows change */
-	readonly onRowsChanged?: EventEmitter<any, IEventData>;
+export type CellNavigationDirection = "up" | "down" | "left" | "right" | "next" | "prev" | "home" | "end";
+export interface CellNavigation {
+	navigateBottom(): void;
+	navigateDown(): boolean;
+	navigateLeft(): boolean;
+	navigateNext(): boolean;
+	navigatePageDown(): void;
+	navigatePageUp(): void;
+	navigatePrev(): boolean;
+	navigateRight(): boolean;
+	navigateRowEnd(): boolean;
+	navigateRowStart(): boolean;
+	navigateTop(): void;
+	navigateToRow(row: number): boolean;
+	navigateUp(): boolean;
+	navigate(dir: CellNavigationDirection): boolean;
 }
-export type EffectDisposer = (() => void) | null;
-export interface SignalLike<T> {
-	get value(): T;
-	peek(): T;
-	subscribe(fn: (value: T) => void): EffectDisposer;
+export interface ViewRange {
+	top?: number;
+	bottom?: number;
+	leftPx?: number;
+	rightPx?: number;
 }
-export interface Signal<T> extends SignalLike<T> {
-	set value(value: T);
-}
-export type ReadonlySignal<T> = SignalLike<T>;
 export interface ViewportInfo {
 	height: number;
 	width: number;
@@ -527,12 +549,6 @@ export interface ViewportInfo {
 	footerRowHeight: number;
 	numVisibleRows: number;
 }
-export interface ViewRange {
-	top?: number;
-	bottom?: number;
-	leftPx?: number;
-	rightPx?: number;
-}
 export interface GridSignals {
 	readonly showColumnHeader: Signal<boolean>;
 	readonly hideColumnHeader: ReadonlySignal<boolean>;
@@ -544,14 +560,9 @@ export interface GridSignals {
 	readonly hideFooterRow: ReadonlySignal<boolean>;
 }
 export interface LayoutHost {
-	bindAncestorScroll(el: HTMLElement): void;
 	cleanUpAndRenderCells(range: ViewRange): void;
 	getAvailableWidth(): number;
 	getCellFromPoint(x: number, y: number): RowCell;
-	getColumnCssRules(idx: number): {
-		right: any;
-		left: any;
-	};
 	getColumns(): Column[];
 	getInitialColumns(): Column[];
 	getContainerNode(): HTMLElement;
@@ -569,54 +580,61 @@ export interface LayoutHost {
 	removeNode(node: HTMLElement): void;
 	renderRows(range: ViewRange): void;
 }
+export interface ViewportPaneRefs {
+	pane?: HTMLElement;
+	viewport?: HTMLElement;
+	canvas?: HTMLElement;
+}
+export interface GridLayoutHRefs {
+	headerCols?: HTMLElement;
+	topPanel?: HTMLElement;
+	headerRowCols?: HTMLElement;
+	top?: ViewportPaneRefs;
+	body: ViewportPaneRefs;
+	bottom?: ViewportPaneRefs;
+	footerRowCols?: HTMLElement;
+}
+export type GridLayoutRefs = {
+	main: GridLayoutHRefs;
+	start?: GridLayoutHRefs;
+	end?: GridLayoutHRefs;
+	pinnedStartLast: number;
+	pinnedEndFirst: number;
+	frozenTopLast: number;
+	frozenBottomFirst: number;
+};
 export interface LayoutEngine {
-	appendCachedRow(row: number, rowNodeS: HTMLElement, rowNodeC: HTMLElement, rowNodeE: HTMLElement): void;
-	afterHeaderColumnDrag(): void;
-	afterSetOptions(args: GridOptions): void;
-	applyColumnWidths(): void;
-	beforeCleanupAndRenderCells(rendered: ViewRange): void;
-	afterRenderRows(rendered: ViewRange): void;
-	bindAncestorScrollEvents(): void;
-	calcCanvasWidth(): number;
-	updateHeadersWidth(): void;
-	isFrozenRow(row: number): boolean;
+	layoutName: string;
+	init(host: LayoutHost): void;
 	destroy(): void;
+	afterHeaderColumnDrag(): void;
+	afterRenderRows(rendered: ViewRange): void;
+	afterSetOptions(args: GridOptions): void;
+	appendCachedRow(row: number, rowNodeS: HTMLElement, rowNodeC: HTMLElement, rowNodeE: HTMLElement): void;
+	beforeCleanupAndRenderCells(rendered: ViewRange): void;
+	calcCanvasWidth(): number;
 	getCanvasNodeFor(cell: number, row: number): HTMLElement;
-	getCanvasNodes(): HTMLElement[];
 	getCanvasWidth(): number;
-	getRowFromCellNode(cellNode: HTMLElement, clientX: number, clientY: number): number;
-	getFooterRowCols(): HTMLElement[];
 	getFooterRowColsFor(cell: number): HTMLElement;
 	getFooterRowColumn(cell: number): HTMLElement;
-	getFrozenTopLastRow(): number;
-	getFrozenBottomFirstRow(): number;
 	getFrozenRowOffset(row: number): number;
-	getPinnedStartLastCol(): number;
-	getPinnedEndFirstCol(): number;
-	getHeaderCols(): HTMLElement[];
 	getHeaderColsFor(cell: number): HTMLElement;
 	getHeaderColumn(cell: number): HTMLElement;
-	getHeaderRowCols(): HTMLElement[];
 	getHeaderRowColsFor(cell: number): HTMLElement;
 	getHeaderRowColumn(cell: number): HTMLElement;
-	getScrollCanvasY(): HTMLElement;
-	getScrollContainerX(): HTMLElement;
-	getScrollContainerY(): HTMLElement;
-	getTopPanel(): HTMLElement;
+	getRowFromCellNode(cellNode: HTMLElement, clientX: number, clientY: number): number;
+	getRefs(): GridLayoutRefs;
 	getViewportNodeFor(cell: number, row: number): HTMLElement;
-	getViewportNodes(): HTMLElement[];
-	handleScrollH(): void;
-	handleScrollV(): void;
-	init(host: LayoutHost): void;
-	layoutName: string;
+	isFrozenRow(row: number): boolean;
 	realScrollHeightChange(): void;
 	/** this might be called before init, chicken egg situation */
 	reorderViewColumns(viewCols: Column[], options?: GridOptions): Column[];
 	resizeCanvas(): void;
+	setOverflow(): void;
 	setPaneVisibility(): void;
 	setScroller(): void;
-	setOverflow(): void;
 	updateCanvasWidth(): boolean;
+	updateHeadersWidth(): void;
 }
 /**
  * Configuration options for the SleekGrid component.
@@ -924,49 +942,20 @@ export interface GridOptions<TItem = any> {
 	 */
 	useLegacyUI?: boolean;
 	/**
-	 * Defaults to `false`. If `true`, uses CSS variables for styling.
+	 * Defaults to `true` which is equivalent to 50. If `true`, uses CSS variables for styling (for up to 50 cols).
+	 * If set to a number, enables CSS variables only if column count is less than or equal to that number.
+	 * This is dependent on the stylesheet which only supports up to 50 columns by default.
+	 * But if you defined your own stylesheet with more columns, you can set this to a higher number.
 	 */
-	useCssVars?: boolean;
+	useCssVars?: boolean | number;
 	/**
 	 * CSS class applied to the viewport container. Default is `undefined`.
 	 */
 	viewportClass?: string;
 }
 export declare const gridDefaults: GridOptions;
-export declare class CellRange {
-	fromRow: number;
-	fromCell: number;
-	toRow: number;
-	toCell: number;
-	constructor(fromRow: number, fromCell: number, toRow?: number, toCell?: number);
-	/***
-	 * Returns whether a range represents a single row.
-	 */
-	isSingleRow(): boolean;
-	/***
-	 * Returns whether a range represents a single cell.
-	 */
-	isSingleCell(): boolean;
-	/***
-	 * Returns whether a range contains a given cell.
-	 */
-	contains(row: number, cell: number): boolean;
-	/***
-	 * Returns a readable representation of a range.
-	 */
-	toString(): string;
-}
-export declare function addClass(el: Element, cls: string): void;
-export declare function escapeHtml(s: any): any;
-export declare function basicDOMSanitizer(dirtyHtml: string): string;
-export declare function disableSelection(target: HTMLElement): void;
-export declare function removeClass(el: Element, cls: string): void;
-export declare function parsePx(str: string): number;
-export declare const BasicLayout: {
-	new (): LayoutEngine;
-};
 export interface IPlugin {
-	init(grid: Grid): void;
+	init(grid: IGrid): void;
 	pluginName?: string;
 	destroy?: () => void;
 }
@@ -975,7 +964,288 @@ export interface SelectionModel extends IPlugin {
 	onSelectedRangesChanged: EventEmitter<CellRange[]>;
 	refreshSelections?(): void;
 }
-export declare class Grid<TItem = any> implements EditorHost {
+export interface IGrid<TItem = any> extends EditorHost, CellNavigation {
+	readonly onActiveCellChanged: EventEmitter<ArgsCell, IEventData>;
+	readonly onActiveCellPositionChanged: EventEmitter<ArgsGrid, IEventData>;
+	readonly onAddNewRow: EventEmitter<ArgsAddNewRow, IEventData>;
+	readonly onBeforeCellEditorDestroy: EventEmitter<ArgsEditorDestroy, IEventData>;
+	readonly onBeforeDestroy: EventEmitter<ArgsGrid, IEventData>;
+	readonly onBeforeEditCell: EventEmitter<ArgsCellEdit, IEventData>;
+	readonly onBeforeFooterRowCellDestroy: EventEmitter<ArgsColumnNode, IEventData>;
+	readonly onBeforeHeaderCellDestroy: EventEmitter<ArgsColumnNode, IEventData>;
+	readonly onBeforeHeaderRowCellDestroy: EventEmitter<ArgsColumnNode, IEventData>;
+	readonly onCellChange: EventEmitter<ArgsCellChange, IEventData>;
+	readonly onCellCssStylesChanged: EventEmitter<ArgsCssStyle, IEventData>;
+	readonly onClick: EventEmitter<ArgsCell, MouseEvent>;
+	readonly onColumnsReordered: EventEmitter<ArgsGrid, IEventData>;
+	readonly onColumnsResized: EventEmitter<ArgsGrid, IEventData>;
+	readonly onContextMenu: EventEmitter<ArgsGrid, UIEvent>;
+	readonly onDblClick: EventEmitter<ArgsCell, MouseEvent>;
+	readonly onDrag: EventEmitter<ArgsGrid, UIEvent>;
+	readonly onDragEnd: EventEmitter<ArgsGrid, UIEvent>;
+	readonly onDragInit: EventEmitter<ArgsGrid, UIEvent>;
+	readonly onDragStart: EventEmitter<ArgsGrid, UIEvent>;
+	readonly onFooterRowCellRendered: EventEmitter<ArgsColumnNode, IEventData>;
+	readonly onHeaderCellRendered: EventEmitter<ArgsColumnNode, IEventData>;
+	readonly onHeaderClick: EventEmitter<ArgsColumn, IEventData>;
+	readonly onHeaderContextMenu: EventEmitter<ArgsColumn, IEventData>;
+	readonly onHeaderMouseEnter: EventEmitter<ArgsColumn, MouseEvent>;
+	readonly onHeaderMouseLeave: EventEmitter<ArgsColumn, MouseEvent>;
+	readonly onHeaderRowCellRendered: EventEmitter<ArgsColumnNode, IEventData>;
+	readonly onKeyDown: EventEmitter<ArgsCell, KeyboardEvent>;
+	readonly onMouseEnter: EventEmitter<ArgsGrid, MouseEvent>;
+	readonly onMouseLeave: EventEmitter<ArgsGrid, MouseEvent>;
+	readonly onScroll: EventEmitter<ArgsScroll, IEventData>;
+	readonly onSelectedRowsChanged: EventEmitter<ArgsSelectedRowsChange, IEventData>;
+	readonly onSort: EventEmitter<ArgsSort, IEventData>;
+	readonly onValidationError: EventEmitter<ArgsValidationError, IEventData>;
+	readonly onViewportChanged: EventEmitter<ArgsGrid, IEventData>;
+	init(): void;
+	addCellCssStyles(key: string, hash: CellStylesHash): void;
+	autosizeColumns(): void;
+	canCellBeActive(row: number, cell: number): boolean;
+	canCellBeSelected(row: number, cell: number): boolean;
+	clearTextSelection(): void;
+	columnsResized(invalidate?: boolean): void;
+	commitCurrentEdit(): boolean;
+	destroy(): void;
+	editActiveCell(editor?: EditorClass): void;
+	flashCell(row: number, cell: number, speed?: number): void;
+	focus(): void;
+	getAbsoluteColumnMinWidth(): number;
+	getActiveCanvasNode(e?: IEventData): HTMLElement;
+	getActiveCellNode(): HTMLElement;
+	getActiveViewportNode(e?: IEventData): HTMLElement;
+	getCanvases(): any | HTMLElement[];
+	getCanvasNode(columnIdOrIdx?: string | number, row?: number): HTMLElement;
+	getCellCssStyles(key: string): CellStylesHash;
+	getCellEditor(): Editor;
+	getCellFromEvent(e: any): {
+		row: number;
+		cell: number;
+	};
+	getCellFromNode(cellNode: Element): number;
+	getCellFromPoint(x: number, y: number): {
+		row: number;
+		cell: number;
+	};
+	getCellNode(row: number, cell: number): HTMLElement;
+	getCellNodeBox(row: number, cell: number): {
+		top: number;
+		right: number;
+		bottom: number;
+		left: number;
+	};
+	getColspan(row: number, cell: number): number;
+	getColumnById(id: string): Column<TItem>;
+	getColumnFromNode(cellNode: Element): Column<TItem>;
+	getColumnIndex(id: string): number;
+	getColumns(): Column<TItem>[];
+	getContainerNode(): HTMLElement;
+	getData(): any;
+	getDataItem(row: number): TItem;
+	getDataItemValueForColumn(item: TItem, columnDef: Column<TItem>): any;
+	getDataLength(): number;
+	getDisplayedScrollbarDimensions(): {
+		width: number;
+		height: number;
+	};
+	getEditController(): EditController;
+	getEditorLock(): EditorLock;
+	getFooterRow(): HTMLElement;
+	getFooterRowColumn(columnIdOrIdx: string | number): HTMLElement;
+	getFormatter(row: number, column: Column<TItem>): ColumnFormat<TItem>;
+	getFormatterContext(row: number, cell: number): FormatterContext;
+	getGridPosition(): Position;
+	getGroupingPanel(): HTMLElement;
+	getHeader(): HTMLElement;
+	getHeaderColumn(columnIdOrIdx: string | number): HTMLElement;
+	getHeaderRow(): HTMLElement;
+	getHeaderRowColumn(columnIdOrIdx: string | number): HTMLElement;
+	getInitialColumnIndex(id: string): number;
+	getInitialColumns(): Column<TItem>[];
+	getOptions(): GridOptions<TItem>;
+	getPluginByName(name: string): IPlugin;
+	getPreHeaderPanel(): HTMLElement;
+	getRenderedRange(viewportTop?: number, viewportLeft?: number): ViewRange;
+	getRowFromNode(rowNode: Element): number;
+	getScrollBarDimensions(): {
+		width: number;
+		height: number;
+	};
+	getSelectedRows(): number[];
+	getSelectionModel(): SelectionModel;
+	getSortColumns(): ColumnSort[];
+	getTopPanel(): HTMLElement;
+	getTotalsFormatter(column: Column<TItem>): ColumnFormat<TItem>;
+	getUID(): string;
+	getViewport(viewportTop?: number, viewportLeft?: number): ViewRange;
+	getViewportNode(columnIdOrIdx?: string | number, row?: number): HTMLElement;
+	getVisibleColumnById(id: string): Column<TItem>;
+	getVisibleRange(viewportTop?: number, viewportLeft?: number): ViewRange;
+	gotoCell(row: number, cell: number, forceEdit?: boolean): void;
+	invalidate(): void;
+	invalidateAllRows(): void;
+	invalidateRow(row: number): void;
+	invalidateRows(rows: number[]): void;
+	registerPlugin(plugin: IPlugin): void;
+	removeCellCssStyles(key: string): void;
+	render: () => void;
+	resetActiveCell(): void;
+	resizeCanvas: () => void;
+	scrollActiveCellIntoView(): void;
+	scrollCellIntoView(row: number, cell: number, doPaging?: boolean): void;
+	scrollColumnIntoView(cell: number): void;
+	scrollRowIntoView(row: number, doPaging?: boolean): void;
+	scrollRowToTop(row: number): void;
+	setActiveCell(row: number, cell: number): void;
+	setActiveRow(row: number, cell: number, suppressScrollIntoView?: boolean): void;
+	setCellCssStyles(key: string, hash: CellStylesHash): void;
+	setColumnHeaderVisibility(visible: boolean): void;
+	setColumns(columns: Column<TItem>[]): void;
+	setData(newData: any, scrollToTop?: boolean): void;
+	setFooterRowVisibility(visible: boolean): void;
+	setGroupingPanelVisibility(visible: boolean): void;
+	setHeaderRowVisibility(visible: boolean): void;
+	setOptions(args: GridOptions<TItem>, suppressRender?: boolean, suppressColumnSet?: boolean, suppressSetOverflow?: boolean): void;
+	setPreHeaderPanelVisibility(visible: boolean): void;
+	setSelectedRows(rows: number[]): void;
+	setSelectionModel(model: SelectionModel): void;
+	setSortColumn(columnId: string, ascending: boolean): void;
+	setSortColumns(cols: ColumnSort[]): void;
+	setTopPanelVisibility(visible: boolean): void;
+	unregisterPlugin(plugin: IPlugin): void;
+	updateCell(row: number, cell: number): void;
+	updateColumnHeader(columnId: string, title?: string | ColumnFormat<any>, toolTip?: string): void;
+	updatePagingStatusFromView(pagingInfo: {
+		pageSize: number;
+		pageNum: number;
+		totalPages: number;
+	}): void;
+	updateRow(row: number): void;
+	updateRowCount(): void;
+}
+export interface ArgsGrid {
+	grid?: IGrid;
+}
+export interface ArgsColumn extends ArgsGrid {
+	column: Column;
+}
+export interface ArgsColumnNode extends ArgsColumn {
+	node: HTMLElement;
+}
+export type ArgsSortCol = {
+	sortCol: Column;
+	sortAsc: boolean;
+};
+export interface ArgsSort extends ArgsGrid {
+	multiColumnSort: boolean;
+	sortAsc?: boolean;
+	sortCol?: Column;
+	sortCols?: ArgsSortCol[];
+}
+export interface ArgsSelectedRowsChange extends ArgsGrid {
+	rows: number[];
+	changedSelectedRows?: number[];
+	changedUnselectedRows?: number[];
+	previousSelectedRows?: number[];
+	caller: any;
+}
+export interface ArgsScroll extends ArgsGrid {
+	scrollLeft: number;
+	scrollTop: number;
+}
+export interface ArgsCssStyle extends ArgsGrid {
+	key: string;
+	hash: CellStylesHash;
+}
+export interface ArgsCell extends ArgsGrid {
+	row: number;
+	cell: number;
+}
+export interface ArgsCellChange extends ArgsCell {
+	item: any;
+}
+export interface ArgsCellEdit extends ArgsCellChange {
+	column: Column;
+}
+export interface ArgsAddNewRow extends ArgsColumn {
+	item: any;
+}
+export interface ArgsEditorDestroy extends ArgsGrid {
+	editor: Editor;
+}
+export interface ArgsValidationError extends ArgsCell {
+	editor: Editor;
+	column: Column;
+	cellNode: HTMLElement;
+	validationResults: ValidationResult;
+}
+export interface IDataView<TItem = any> {
+	/** Gets the grand totals for all aggregated data. */
+	getGrandTotals(): IGroupTotals;
+	/** Gets the total number of rows in the view. */
+	getLength(): number;
+	/** Gets the item at the specified row index. */
+	getItem(row: number): (TItem | Group<TItem> | IGroupTotals);
+	/** Gets metadata for the item at the specified row index. */
+	getItemMetadata?(row: number): ItemMetadata<TItem>;
+	/** Event fired when the underlying data changes */
+	readonly onDataChanged?: EventEmitter<any, IEventData>;
+	/** Event fired when the row count changes */
+	readonly onRowCountChanged?: EventEmitter<any, IEventData>;
+	/** Event fired when specific rows change */
+	readonly onRowsChanged?: EventEmitter<any, IEventData>;
+}
+export declare function addClass(el: Element, cls: string): void;
+export declare function escapeHtml(s: any): any;
+export declare function basicDOMSanitizer(dirtyHtml: string): string;
+export declare function disableSelection(target: HTMLElement): void;
+export declare function removeClass(el: Element, cls: string): void;
+export declare function parsePx(str: string): number;
+export declare class BasicLayout implements LayoutEngine {
+	protected canvasWidth: number;
+	protected headersWidth: number;
+	protected host: LayoutHost;
+	protected bodyRefs: GridLayoutRefs["main"]["body"];
+	protected mainRefs: GridLayoutRefs["main"];
+	protected refs: GridLayoutRefs;
+	init(host: LayoutHost): void;
+	appendCachedRow(_: number, _rowNodeS: HTMLDivElement, rowNodeC: HTMLDivElement, _rowNodeE: HTMLDivElement): void;
+	calcCanvasWidth(): number;
+	updateHeadersWidth(): void;
+	destroy(): void;
+	getCanvasNodeFor(cell: number, row: number): HTMLElement;
+	getCanvasWidth(): number;
+	getHeaderColumn(cell: number): HTMLElement;
+	getHeaderRowColumn(cell: number): HTMLElement;
+	getHeaderRowColsFor(): HTMLElement;
+	getFooterRowColumn(cell: number): HTMLElement;
+	getFooterRowColsFor(): HTMLElement;
+	getHeaderColsFor(): HTMLElement;
+	getRefs(): GridLayoutRefs;
+	getRowFromCellNode(cellNode: HTMLElement): number;
+	getTopPanel(): HTMLElement;
+	getViewportNodeFor(_row: number, _cell: number): HTMLElement;
+	realScrollHeightChange(): void;
+	setOverflow(): void;
+	updateCanvasWidth(): boolean;
+	resizeCanvas(): void;
+	afterHeaderColumnDrag(): void;
+	afterRenderRows(): void;
+	afterSetOptions(): void;
+	beforeCleanupAndRenderCells(): void;
+	getFrozenRowOffset(): number;
+	isFrozenRow(): boolean;
+	reorderViewColumns(_: Column[]): Column[];
+	setPaneVisibility(): void;
+	setScroller(): void;
+	readonly layoutName = "basic";
+}
+export declare const FrozenLayout: {
+	new (): LayoutEngine;
+};
+export declare class Grid<TItem = any> implements IGrid<TItem> {
 	private _absoluteColMinWidth;
 	private _activeCanvasNode;
 	private _activeCell;
@@ -992,8 +1262,8 @@ export declare class Grid<TItem = any> implements EditorHost {
 	private _colLeft;
 	private _colRight;
 	private _cols;
-	private _columnCssRulesL;
-	private _columnCssRulesR;
+	private _colCssRulesL;
+	private _colCssRulesR;
 	private _currentEditor;
 	private _data;
 	private _draggableInstance;
@@ -1091,9 +1361,11 @@ export declare class Grid<TItem = any> implements EditorHost {
 	readonly onValidationError: EventEmitter<ArgsValidationError, IEventData>;
 	readonly onViewportChanged: EventEmitter<ArgsGrid, IEventData>;
 	constructor(container: string | HTMLElement | ArrayLike<HTMLElement>, data: any, columns: Column<TItem>[], options: GridOptions<TItem>);
+	private applyLegacyHeightOptions;
 	private createGroupingPanel;
-	private bindAncestorScroll;
 	private onEvent;
+	private refsForEach;
+	private mapRefs;
 	init(): void;
 	registerPlugin(plugin: IPlugin): void;
 	unregisterPlugin(plugin: IPlugin): void;
@@ -1118,7 +1390,9 @@ export declare class Grid<TItem = any> implements EditorHost {
 	private getViewports;
 	getActiveViewportNode(e?: IEventData): HTMLElement;
 	private getAvailableWidth;
+	applyColumnWidths(): void;
 	private updateCanvasWidth;
+	private bindAncestorScrollEvents;
 	private unbindAncestorScrollEvents;
 	updateColumnHeader(columnId: string, title?: string | ColumnFormat<any>, toolTip?: string): void;
 	getHeader(): HTMLElement;
@@ -1140,9 +1414,8 @@ export declare class Grid<TItem = any> implements EditorHost {
 	columnsResized(invalidate?: boolean): void;
 	private setOverflow;
 	private measureCellPaddingAndBorder;
-	private createCssRules;
-	private getColumnCssRules;
 	private removeCssRules;
+	private createCssRules;
 	destroy(): void;
 	private trigger;
 	getEditorLock(): EditorLock;
@@ -1219,6 +1492,8 @@ export declare class Grid<TItem = any> implements EditorHost {
 		pageNum: number;
 		totalPages: number;
 	}): void;
+	getScrollContainerX(): HTMLElement;
+	getScrollContainerY(): HTMLElement;
 	updateRowCount(): void;
 	/**
 	 * @param viewportTop optional viewport top
@@ -1339,65 +1614,6 @@ export declare class Grid<TItem = any> implements EditorHost {
 	getSelectedRows(): number[];
 	setSelectedRows(rows: number[]): void;
 }
-export interface ArgsGrid {
-	grid?: Grid;
-}
-export interface ArgsColumn extends ArgsGrid {
-	column: Column;
-}
-export interface ArgsColumnNode extends ArgsColumn {
-	node: HTMLElement;
-}
-export type ArgsSortCol = {
-	sortCol: Column;
-	sortAsc: boolean;
-};
-export interface ArgsSort extends ArgsGrid {
-	multiColumnSort: boolean;
-	sortAsc?: boolean;
-	sortCol?: Column;
-	sortCols?: ArgsSortCol[];
-}
-export interface ArgsSelectedRowsChange extends ArgsGrid {
-	rows: number[];
-	changedSelectedRows?: number[];
-	changedUnselectedRows?: number[];
-	previousSelectedRows?: number[];
-	caller: any;
-}
-export interface ArgsScroll extends ArgsGrid {
-	scrollLeft: number;
-	scrollTop: number;
-}
-export interface ArgsCssStyle extends ArgsGrid {
-	key: string;
-	hash: CellStylesHash;
-}
-export interface ArgsCell extends ArgsGrid {
-	row: number;
-	cell: number;
-}
-export interface ArgsCellChange extends ArgsCell {
-	item: any;
-}
-export interface ArgsCellEdit extends ArgsCellChange {
-	column: Column;
-}
-export interface ArgsAddNewRow extends ArgsColumn {
-	item: any;
-}
-export interface ArgsEditorDestroy extends ArgsGrid {
-	editor: Editor;
-}
-export interface ArgsValidationError extends ArgsCell {
-	editor: Editor;
-	column: Column;
-	cellNode: HTMLElement;
-	validationResults: ValidationResult;
-}
-export declare const FrozenLayout: {
-	new (): LayoutEngine;
-};
 export declare function PercentCompleteFormatter(ctx: FormatterContext): HTMLSpanElement | "-";
 export declare function PercentCompleteBarFormatter(ctx: FormatterContext): FormatterResult;
 export declare function YesNoFormatter(ctx: FormatterContext): FormatterResult;
@@ -1525,13 +1741,13 @@ export interface GroupItemMetadataProviderOptions {
 	totalsFormatter?: CompatFormatter<IGroupTotals>;
 }
 export declare class GroupItemMetadataProvider implements IPlugin {
-	protected grid: Grid;
+	protected grid: IGrid;
 	private options;
 	constructor(opt?: GroupItemMetadataProviderOptions);
 	static readonly defaults: GroupItemMetadataProviderOptions;
 	static defaultGroupFormat(ctx: FormatterContext, opt?: GroupItemMetadataProviderOptions): FormatterResult;
-	static defaultTotalsFormat(ctx: FormatterContext, grid?: Grid): FormatterResult;
-	init(grid: Grid): void;
+	static defaultTotalsFormat(ctx: FormatterContext, grid?: IGrid): FormatterResult;
+	init(grid: IGrid): void;
 	readonly pluginName = "GroupItemMetadataProvider";
 	destroy(): void;
 	getOptions(): GroupItemMetadataProviderOptions;
@@ -1556,7 +1772,7 @@ export declare class AutoTooltips implements IPlugin {
 	private options;
 	constructor(options?: AutoTooltipsOptions);
 	static readonly defaults: AutoTooltipsOptions;
-	init(grid: Grid): void;
+	init(grid: IGrid): void;
 	destroy(): void;
 	private handleMouseEnter;
 	private handleHeaderMouseEnter;
@@ -1578,7 +1794,7 @@ export declare class RowMoveManager implements IPlugin {
 	onMoveRows: EventEmitter<ArgsMoveRows, IEventData>;
 	constructor(options?: RowMoveManagerOptions);
 	static readonly defaults: RowMoveManagerOptions;
-	init(grid: Grid): void;
+	init(grid: IGrid): void;
 	destroy(): void;
 	private handleDragInit;
 	private handleDragStart;
@@ -1596,7 +1812,7 @@ export declare class RowSelectionModel implements IPlugin, SelectionModel {
 	onSelectedRangesChanged: EventEmitter<CellRange[], IEventData>;
 	constructor(options?: RowSelectionModelOptions);
 	static readonly defaults: RowSelectionModelOptions;
-	init(grid: Grid): void;
+	init(grid: IGrid): void;
 	destroy(): void;
 	private wrapHandler;
 	private rowsToRanges;

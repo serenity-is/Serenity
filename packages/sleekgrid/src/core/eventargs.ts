@@ -1,8 +1,8 @@
-import type { CellStylesHash, Column, Editor, ValidationResult } from "../core";
-import type { Grid } from "./grid";
+import type { CellStylesHash, Column, Editor, ValidationResult } from ".";
+import type { IGrid } from "./igrid";
 
 export interface ArgsGrid {
-    grid?: Grid;
+    grid?: IGrid;
 }
 
 export interface ArgsColumn extends ArgsGrid {

@@ -1,19 +1,32 @@
 import { computed, signal } from "@serenity-is/signals";
-import { CellRange, CellStylesHash, Column, ColumnFormat, ColumnMetadata, ColumnSort, EditCommand, EditController, Editor, EditorClass, EditorHost, EditorLock, EventData, EventEmitter, FormatterContext, FormatterResult, IEventData, IGroupTotals, ItemMetadata, Position, RowCell, ViewRange, ViewportInfo, addClass, applyFormatterResultToCellNode, columnDefaults, convertCompatFormatter, defaultColumnFormat, escapeHtml, formatterContext, initializeColumns, parsePx, preClickClassName, removeClass } from "../core";
-import { GridOptions, gridDefaults } from "../core/gridoptions";
-import { IDataView } from "../core/idataview";
+import { currentLifecycleRoot } from "@serenity-is/sleekdom";
+import { preClickClassName } from "../core/base";
+import { CellRange } from "../core/cellrange";
+import { columnDefaults, initializeColumns, type Column, type ColumnMetadata, type ColumnSort, type ItemMetadata } from "../core/column";
+import { Draggable } from "../core/draggable";
+import type { EditCommand, EditController, Editor, EditorClass, EditorLock, Position, RowCell } from "../core/editing";
+import { EventData, EventEmitter, type IEventData } from "../core/event";
+import type { ArgsAddNewRow, ArgsCell, ArgsCellChange, ArgsCellEdit, ArgsColumn, ArgsColumnNode, ArgsCssStyle, ArgsEditorDestroy, ArgsGrid, ArgsScroll, ArgsSelectedRowsChange, ArgsSort, ArgsValidationError } from "../core/eventargs";
+import { applyFormatterResultToCellNode, convertCompatFormatter, defaultColumnFormat, formatterContext, type CellStylesHash, type ColumnFormat, type FormatterContext, type FormatterResult } from "../core/formatting";
+import type { GridSignals } from "../core/grid-signals";
+import { gridDefaults, type GridOptions } from "../core/gridoptions";
+import type { IGroupTotals } from "../core/group";
+import { type IDataView } from "../core/idataview";
+import type { IGrid } from "../core/igrid";
+import type { IPlugin } from "../core/iplugin";
+import type { SelectionModel } from "../core/selection-model";
+import { addClass, escapeHtml, parsePx, removeClass } from "../core/util";
+import type { ViewportInfo } from "../core/viewportinfo";
+import type { ViewRange } from "../core/viewrange";
 import { BasicLayout } from "../layouts/basic-layout";
-import type { HBand } from "../layouts/layout-consts";
-import { LayoutEngine } from "../layouts/layout-engine";
-import { disposeLayoutHRefs, getAllCanvasNodes, layoutRefsForEach, mapLayoutRefs, type GridLayoutHRefs } from "../layouts/layout-refs";
+import { applyColumnWidths, applyLegacyHeightOptions } from "../layouts/layout-calculations";
+import type { LayoutEngine } from "../layouts/layout-engine";
+import { disposeLayoutHRefs, getAllCanvasNodes, getAllHScrollContainers, getAllViewportNodes, getAllVScrollContainers, layoutRefsForEach, mapLayoutRefs, type GridLayoutHRefs } from "../layouts/layout-refs";
 import { CellNavigator } from "./cellnavigator";
-import { Draggable } from "./draggable";
-import { ArgsAddNewRow, ArgsCell, ArgsCellChange, ArgsCellEdit, ArgsColumn, ArgsColumnNode, ArgsCssStyle, ArgsEditorDestroy, ArgsGrid, ArgsScroll, ArgsSelectedRowsChange, ArgsSort, ArgsValidationError } from "./eventargs";
-import type { GridSignals } from "./grid-signals";
-import { CachedRow, PostProcessCleanupEntry, absBox, autosizeColumns, calcMinMaxPageXOnDragStart, defaultEmptyNode, defaultJQueryEmptyNode, defaultJQueryRemoveNode, defaultRemoveNode, getInnerWidth, getMaxSupportedCssHeight, getScrollBarDimensions, shrinkOrStretchColumn, simpleArrayEquals, sortToDesiredOrderAndKeepRest } from "./internal";
-import { IPlugin, SelectionModel } from "./types";
+import { PostProcessCleanupEntry, absBox, autosizeColumns, calcMinMaxPageXOnDragStart, defaultEmptyNode, defaultJQueryEmptyNode, defaultJQueryRemoveNode, defaultRemoveNode, getInnerWidth, getMaxSupportedCssHeight, getScrollBarDimensions, shrinkOrStretchColumn, simpleArrayEquals, sortToDesiredOrderAndKeepRest, type CachedRow } from "./internal";
+import { createCssRules, findStylesheetByUID } from "./style-utils";
 
-export class Grid<TItem = any> implements EditorHost {
+export class Grid<TItem = any> implements IGrid<TItem> {
     declare private _absoluteColMinWidth: number;
     declare private _activeCanvasNode: HTMLElement;
     declare private _activeCell: number;
@@ -30,8 +43,8 @@ export class Grid<TItem = any> implements EditorHost {
     private _colLeft: number[] = [];
     private _colRight: number[] = [];
     declare private _cols: Column<TItem>[];
-    declare private _columnCssRulesL: any;
-    declare private _columnCssRulesR: any;
+    declare private _colCssRulesL: Record<number, CSSStyleRule>;
+    declare private _colCssRulesR: Record<number, CSSStyleRule>;
     declare private _currentEditor: Editor;
     declare private _data: IDataView<TItem> | TItem[];
     declare private _draggableInstance: { destroy: () => void };
@@ -81,7 +94,7 @@ export class Grid<TItem = any> implements EditorHost {
     declare private _serializedEditorValue: any;
     private _sortColumns: ColumnSort[] = [];
     declare private _styleNode: HTMLStyleElement;
-    declare private _stylesheet: any;
+    declare private _stylesheet: CSSStyleSheet;
     private _tabbingDirection: number = 1;
     declare private static _nextUid: number;
     private _uid: string = "sleekgrid_" + (Grid._nextUid = (Grid._nextUid || 0) + 1);
@@ -228,25 +241,32 @@ export class Grid<TItem = any> implements EditorHost {
             this.createGroupingPanel();
         }
 
-        this._layout.init({
-            cleanUpAndRenderCells: this.cleanUpAndRenderCells.bind(this),
-            getAvailableWidth: this.getAvailableWidth.bind(this),
-            getCellFromPoint: this.getCellFromPoint.bind(this),
-            getColumnCssRules: this.getColumnCssRules.bind(this),
-            getColumns: this.getColumns.bind(this),
-            getInitialColumns: this.getInitialColumns.bind(this),
-            getContainerNode: this.getContainerNode.bind(this),
-            getDataLength: this.getDataLength.bind(this),
-            getOptions: this.getOptions.bind(this),
-            getSignals: () => this._signals,
-            getRowFromNode: this.getRowFromNode.bind(this),
-            getScrollDims: this.getScrollBarDimensions.bind(this),
-            getScrollLeft: () => this._scrollLeft,
-            getScrollTop: () => this._scrollTop,
-            getViewportInfo: () => this._viewportInfo,
-            removeNode: this._removeNode,
-            renderRows: this.renderRows.bind(this)
-        });
+        const prevLifecycleRoot = currentLifecycleRoot(this._container);
+        try {
+            this._layout.init({
+                cleanUpAndRenderCells: this.cleanUpAndRenderCells.bind(this),
+                getAvailableWidth: this.getAvailableWidth.bind(this),
+                getCellFromPoint: this.getCellFromPoint.bind(this),
+                getColumns: this.getColumns.bind(this),
+                getInitialColumns: this.getInitialColumns.bind(this),
+                getContainerNode: this.getContainerNode.bind(this),
+                getDataLength: this.getDataLength.bind(this),
+                getOptions: this.getOptions.bind(this),
+                getSignals: () => this._signals,
+                getRowFromNode: this.getRowFromNode.bind(this),
+                getScrollDims: this.getScrollBarDimensions.bind(this),
+                getScrollLeft: () => this._scrollLeft,
+                getScrollTop: () => this._scrollTop,
+                getViewportInfo: () => this._viewportInfo,
+                removeNode: this._removeNode,
+                renderRows: this.renderRows.bind(this)
+            });
+
+            this.applyLegacyHeightOptions();
+        }
+        finally {
+            currentLifecycleRoot(prevLifecycleRoot);
+        }
 
         this._container.append(this._focusSink2 = this._focusSink1.cloneNode() as HTMLElement);
 
@@ -258,6 +278,10 @@ export class Grid<TItem = any> implements EditorHost {
         }
 
         this.bindToData();
+    }
+
+    private applyLegacyHeightOptions() {
+        applyLegacyHeightOptions({ groupingPanel: this._groupingPanel, opt: this._options, refs: this._layout.getRefs() });
     }
 
     private createGroupingPanel() {
@@ -285,11 +309,11 @@ export class Grid<TItem = any> implements EditorHost {
         }
     }
 
-    private refsForEach(fn: (hRefs: GridLayoutHRefs, hband: HBand) => void): void {
+    private refsForEach(fn: (hRefs: GridLayoutHRefs) => void): void {
         layoutRefsForEach(this._layout.getRefs(), fn);
     }
 
-    private mapRefs<T>(fn: (hRefs: GridLayoutHRefs, hband: HBand) => T, skipNullReturns = true): T[] {
+    private mapRefs<T>(fn: (h: GridLayoutHRefs) => T, skipNullReturns = true): T[] {
         return mapLayoutRefs(this._layout.getRefs(), fn);
     }
 
@@ -306,14 +330,6 @@ export class Grid<TItem = any> implements EditorHost {
         this.measureCellPaddingAndBorder();
 
         var viewports = this.getViewports();
-
-        if (this._jQuery && !this._options.enableTextSelectionOnCells) {
-            // disable text selection in grid cells except in input and textarea elements
-            // (this is IE-specific, because selectstart event will only fire in IE)
-            this._jQuery(viewports).on("selectstart.ui", () => {
-                return this._jQuery(this).is("input,textarea");
-            });
-        }
 
         this._layout.setPaneVisibility();
         this._layout.setScroller();
@@ -519,7 +535,7 @@ export class Grid<TItem = any> implements EditorHost {
     }
 
     private getViewports(): HTMLElement[] {
-        return this.mapRefs(refs => refs.body.viewport);
+        return getAllViewportNodes(this._layout.getRefs());
     }
 
     getActiveViewportNode(e?: IEventData): HTMLElement {
@@ -534,11 +550,30 @@ export class Grid<TItem = any> implements EditorHost {
         return this._viewportInfo.hasVScroll ? this._viewportInfo.width - this._scrollDims.width : this._viewportInfo.width;
     }
 
+    applyColumnWidths(): void {
+
+        if (this._styleNode != null && this._stylesheet == null) {
+            const res = findStylesheetByUID(this._uid, this._styleNode);
+            this._stylesheet = res.stylesheet;
+            this._colCssRulesL = res.colCssRulesL;
+            this._colCssRulesR = res.colCssRulesR;
+        }
+
+        applyColumnWidths({
+            cols: this.getColumns(),
+            colCSSRulesL: this._colCssRulesL,
+            colCSSRulesR: this._colCssRulesR,
+            container: this._container,
+            opts: this.getOptions(),
+            refs: this._layout.getRefs()
+        });
+    }
+
     private updateCanvasWidth(forceColumnWidthsUpdate?: boolean): void {
         const widthChanged = this._layout.updateCanvasWidth();
 
         if (widthChanged || forceColumnWidthsUpdate) {
-            this._layout.applyColumnWidths();
+            this.applyColumnWidths();
         }
     }
 
@@ -661,7 +696,7 @@ export class Grid<TItem = any> implements EditorHost {
     }
 
     private createColumnFooters(): void {
-        this.mapRefs(refs => refs.footerRowCols).forEach(frc => {
+        this.mapRefs(h => h.footerRowCols).forEach(frc => {
             frc.querySelectorAll(".slick-footerrow-column")
                 .forEach((el) => {
                     var columnDef = this.getColumnFromNode(el);
@@ -702,7 +737,7 @@ export class Grid<TItem = any> implements EditorHost {
     }
 
     private createColumnHeaders(): void {
-        this.mapRefs(refs => refs.headerCols).forEach(hc => {
+        this.mapRefs(h => h.headerCols).forEach(hc => {
             hc.querySelectorAll(".slick-header-column")
                 .forEach((el) => {
                     var columnDef = this.getColumnFromNode(el);
@@ -719,7 +754,7 @@ export class Grid<TItem = any> implements EditorHost {
 
         this._layout.updateHeadersWidth();
 
-        this.mapRefs(refs => refs.headerRowCols).forEach(hrc => {
+        this.mapRefs(h => h.headerRowCols).forEach(hrc => {
             hrc.querySelectorAll(".slick-headerrow-column")
                 .forEach((el) => {
                     var columnDef = this.getColumnFromNode(el);
@@ -734,7 +769,7 @@ export class Grid<TItem = any> implements EditorHost {
             this._emptyNode(hrc);
         });
 
-        const cols = this._cols, pinnedStartLast = this._layout.getPinnedStartLastCol(), pinnedEndFirst = this._layout.getPinnedEndFirstCol();
+        const cols = this._cols, refs = this._layout.getRefs();
         for (let i = 0; i < cols.length; i++) {
             const m = cols[i];
 
@@ -749,6 +784,8 @@ export class Grid<TItem = any> implements EditorHost {
             }
             else
                 nameSpan.textContent = m.name ?? '';
+
+            const { pinnedStartLast, pinnedEndFirst } = refs;
 
             const header = this._layout.getHeaderColsFor(i).appendChild(
                 <div class={["slick-header-column", m.headerCssClass,
@@ -780,7 +817,7 @@ export class Grid<TItem = any> implements EditorHost {
         if (this._options.enableColumnReorder) {
             this.setupColumnReorder();
             // sortable js removes draggable attribute after disposing / recreating
-            this.mapRefs(refs => refs.headerCols).forEach(el => el.querySelectorAll<HTMLDivElement>(".slick-resizable-handle").forEach(x => x.draggable = true));
+            this.mapRefs(h => h.headerCols).forEach(el => el.querySelectorAll<HTMLDivElement>(".slick-resizable-handle").forEach(x => x.draggable = true));
         }
     }
 
@@ -848,7 +885,7 @@ export class Grid<TItem = any> implements EditorHost {
             }
         };
 
-        this.mapRefs(refs => refs.headerCols).forEach(el => {
+        this.mapRefs(h => h.headerCols).forEach(el => {
             this.onEvent(el, 'click', handler as any);
         });
     }
@@ -867,7 +904,8 @@ export class Grid<TItem = any> implements EditorHost {
     declare private sortableColInstances: any[];
 
     private hasPinnedCols(): boolean {
-        return this._layout.getPinnedStartLastCol() >= 0 || this._layout.getPinnedEndFirstCol() != Infinity;
+        const { pinnedStartLast, pinnedEndFirst } = this._layout.getRefs();
+        return pinnedStartLast >= 0 || pinnedEndFirst != Infinity;
     }
 
     private setupColumnReorder(): void {
@@ -921,7 +959,7 @@ export class Grid<TItem = any> implements EditorHost {
                 }
 
                 var reorderedCols;
-                this.mapRefs(refs => refs.headerCols).forEach((_, i) => reorderedCols = sortToDesiredOrderAndKeepRest(
+                this.mapRefs(h => h.headerCols).forEach((_, i) => reorderedCols = sortToDesiredOrderAndKeepRest(
                     this._initCols,
                     (this.sortableColInstances[i]?.toArray?.() ?? [])
                 ));
@@ -936,7 +974,7 @@ export class Grid<TItem = any> implements EditorHost {
             }
         }
 
-        this.sortableColInstances = this.mapRefs(refs => refs.headerCols).map(x =>
+        this.sortableColInstances = this.mapRefs(h => h.headerCols).map(x =>
             // @ts-ignore
             Sortable.create(x, sortableOptions));
     }
@@ -945,7 +983,7 @@ export class Grid<TItem = any> implements EditorHost {
 
         var minPageX: number, pageX: number, maxPageX: number, cols = this._cols;
         var columnElements: Element[] = [];
-        this.mapRefs(refs => refs.headerCols).forEach(el => {
+        this.mapRefs(h => h.headerCols).forEach(el => {
             columnElements = columnElements.concat(Array.from(el.children).filter(x => x.classList.contains("slick-header-column")));
         });
 
@@ -1034,7 +1072,7 @@ export class Grid<TItem = any> implements EditorHost {
 
                 this.applyColumnHeaderWidths();
                 if (this._options.syncColumnCellResize) {
-                    this._layout.applyColumnWidths();
+                    this.applyColumnWidths();
                 }
             }
 
@@ -1072,7 +1110,7 @@ export class Grid<TItem = any> implements EditorHost {
 
     public columnsResized(invalidate = true) {
         this.applyColumnHeaderWidths();
-        this._layout.applyColumnWidths();
+        this.applyColumnWidths();
         invalidate && this.invalidateAllRows();
         this.updateCanvasWidth(true);
         this.render();
@@ -1111,109 +1149,22 @@ export class Grid<TItem = any> implements EditorHost {
         this._absoluteColMinWidth = Math.max(this._headerColumnWidthDiff, this._cellWidthDiff);
     }
 
-    private createCssRules() {
-        var cellHeight = (this._options.rowHeight - this._cellHeightDiff);
-
-        if (this._options.useCssVars && this.getColumns().length > 50)
-            this._options.useCssVars = false;
-
-        this._container.classList.toggle('sleek-vars', !!this._options.useCssVars);
-        if (this._options.topPanelHeight != null) {
-            const topPanel = this._layout.getRefs().main.topPanel
-            topPanel && (topPanel.style.height = this._options.topPanelHeight + "px");
-        }
-        if (this._options.groupingPanelHeight != null) {
-            const groupingPanel = this._groupingPanel;
-            groupingPanel && (groupingPanel.style.height = this._options.groupingPanelHeight + "px");
-        }
-        if (this._options.headerRowHeight != null) {
-            this.mapRefs(refs => refs.headerRowCols).forEach(hrc => hrc.style.height = this._options.headerRowHeight + "px");
-        }
-        if (this._options.footerRowHeight != null) {
-            this.mapRefs(refs => refs.footerRowCols).forEach(frc => frc.style.height = this._options.footerRowHeight + "px");
-        }
-
-        if (this._options.useCssVars) {
-            var style = this._container.style;
-            style.setProperty("--row-height", this._options.rowHeight + "px");
-            style.setProperty("--cell-height", cellHeight + "px");
-            style.setProperty("--scrollbar-w", this._scrollDims.width + "px");
-            style.setProperty("--scrollbar-h", this._scrollDims.height + "px");
-            return;
-        }
-
-        var el = this._styleNode = document.createElement('style');
-        el.dataset.uid = this._uid;
-        var rules = [
-            "." + this._uid + " { --cell-height: " + this._options.rowHeight + "px; }",
-            "." + this._uid + " { --scrollbar-w: " + this._scrollDims.width + "px; }",
-            "." + this._uid + " { --scrollbar-h: " + this._scrollDims.height + "px; }",
-            "." + this._uid + " .slick-cell { height:" + cellHeight + "px; }",
-            "." + this._uid + " .slick-row { height:" + this._options.rowHeight + "px; }"
-        ];
-
-        var cols = this._cols;
-        for (var i = 0; i < cols.length; i++) {
-            rules.push("." + this._uid + " .l" + i + " { }");
-            rules.push("." + this._uid + " .r" + i + " { }");
-        }
-
-        el.appendChild(document.createTextNode(rules.join(" ")));
-        document.head.appendChild(el);
-    }
-
-    private getColumnCssRules(idx: number): { right: any; left: any; } {
-        if (this._options.useCssVars)
-            return null;
-
-        if (!this._stylesheet) {
-            var stylesheetFromUid = document.querySelector("style[data-uid='" + this._uid + "']") as any
-            if (stylesheetFromUid && stylesheetFromUid.sheet) {
-                this._stylesheet = stylesheetFromUid.sheet;
-            } else {
-                var sheets = document.styleSheets;
-                for (var i = 0; i < sheets.length; i++) {
-                    if ((sheets[i].ownerNode || (sheets[i] as any).owningElement) == this._styleNode) {
-                        this._stylesheet = sheets[i];
-                        break;
-                    }
-                }
-            }
-
-            if (!this._stylesheet) {
-                throw new Error("Cannot find stylesheet.");
-            }
-
-            // find and cache column CSS rules
-            this._columnCssRulesL = [];
-            this._columnCssRulesR = [];
-            var cssRules = (this._stylesheet.cssRules || this._stylesheet.rules);
-            var matches, columnIdx;
-            for (var i = 0; i < cssRules.length; i++) {
-                var selector = cssRules[i].selectorText;
-                if (matches = /\.l\d+/.exec(selector)) {
-                    columnIdx = parseInt(matches[0].substring(2, matches[0].length), 10);
-                    this._columnCssRulesL[columnIdx] = cssRules[i];
-                } else if (matches = /\.r\d+/.exec(selector)) {
-                    columnIdx = parseInt(matches[0].substring(2, matches[0].length), 10);
-                    this._columnCssRulesR[columnIdx] = cssRules[i];
-                }
-            }
-        }
-
-        return this._options.rtl ? {
-            "right": this._columnCssRulesL[idx],
-            "left": this._columnCssRulesR[idx]
-        } : {
-            "left": this._columnCssRulesL[idx],
-            "right": this._columnCssRulesR[idx]
-        }
-    }
 
     private removeCssRules() {
         this._styleNode?.remove();
         this._styleNode = null;
         this._stylesheet = null;
+    }
+
+    private createCssRules() {
+        this._styleNode = createCssRules({
+            opt: this._options,
+            uid: this._uid,
+            container: this._container,
+            scrollDims: this._scrollDims,
+            cellHeightDiff: this._cellHeightDiff,
+            colCount: this._cols.length
+        })?.styleNode;
     }
 
     destroy() {
@@ -1232,7 +1183,7 @@ export class Grid<TItem = any> implements EditorHost {
         }
 
         if (this._options.enableColumnReorder && this._jQuery && (this._jQuery.fn as any).sortable) {
-            (this._jQuery(this.mapRefs(refs => refs.headerCols)).filter(":ui-sortable") as any).sortable("destroy");
+            (this._jQuery(this.mapRefs(h => h.headerCols)).filter(":ui-sortable") as any).sortable("destroy");
         }
 
         this.unbindAncestorScrollEvents();
@@ -1346,7 +1297,7 @@ export class Grid<TItem = any> implements EditorHost {
         this._sortColumns = cols || [];
 
         var headerColumnEls: Element[] = [];
-        this.mapRefs(refs => refs.headerCols).forEach(el => headerColumnEls = headerColumnEls.concat(Array.from(el.children)));
+        this.mapRefs(h => h.headerCols).forEach(el => headerColumnEls = headerColumnEls.concat(Array.from(el.children)));
         headerColumnEls.forEach(hel => {
             hel.classList.remove("slick-header-column-sorted");
             var si = hel.querySelector(".slick-sort-indicator");
@@ -1443,14 +1394,14 @@ export class Grid<TItem = any> implements EditorHost {
     private updateViewColLeftRight(): void {
         this._colLeft = [];
         this._colRight = [];
-        var x = 0, r: number, cols = this._cols, i: number, l: number = cols.length,
-            pinnedStartLast = this._layout.getPinnedStartLastCol(), pinnedEndFirst = this._layout.getPinnedEndFirstCol();
-        for (var i = 0; i < l; i++) {
-            if (pinnedStartLast === i || pinnedEndFirst === i)
+        var x = 0, r: number, cols = this._cols, c: number, l: number = cols.length;
+        const { pinnedStartLast, pinnedEndFirst } = this._layout.getRefs();
+        for (var c = 0; c < l; c++) {
+            if (pinnedStartLast + 1 === c || pinnedEndFirst === c)
                 x = 0;
-            r = x + cols[i].width;
-            this._colLeft[i] = x;
-            this._colRight[i] = r;
+            r = x + cols[c].width;
+            this._colLeft[c] = x;
+            this._colRight[c] = r;
             x = r;
         }
     }
@@ -1521,7 +1472,7 @@ export class Grid<TItem = any> implements EditorHost {
             this.createCssRules();
             this.resizeCanvas();
             this.updateCanvasWidth();
-            this._layout.applyColumnWidths();
+            this.applyColumnWidths();
             this.handleScroll();
             this.getSelectionModel()?.refreshSelections?.();
         }
@@ -1736,12 +1687,8 @@ export class Grid<TItem = any> implements EditorHost {
 
         if (this._scrollTopPrev != newScrollTop) {
             this._vScrollDir = (this._scrollTopPrev + oldOffset < newScrollTop + this._pageOffset) ? 1 : -1;
-
             this._scrollTopRendered = (this._scrollTop = this._scrollTopPrev = newScrollTop);
-
-            this._layout.handleScrollV();
-            this.getScrollContainerY().scrollTop = newScrollTop;
-
+            getAllVScrollContainers(this._layout.getRefs()).forEach(sc => sc.scrollTop = newScrollTop);
             this.trigger(this.onViewportChanged);
         }
     }
@@ -1877,8 +1824,7 @@ export class Grid<TItem = any> implements EditorHost {
 
         sbCenter.push(rowHtml);
 
-        const pinnedStartLast = this._layout.getPinnedStartLastCol();
-        const pinnedEndFirst = this._layout.getPinnedEndFirstCol();
+        const { pinnedStartLast, pinnedEndFirst } = this._layout.getRefs();
 
         if (pinnedStartLast >= 0) {
             sbStart.push(rowHtml);
@@ -1933,7 +1879,8 @@ export class Grid<TItem = any> implements EditorHost {
     }
 
     private appendCellHtml(sb: string[], row: number, cell: number, colspan: number, item: TItem, metadata: ColumnMetadata): void {
-        var cols = this._cols, pinnedStartLast = this._layout.getPinnedStartLastCol(), pinnedEndFirst = this._layout.getPinnedEndFirstCol(), column = cols[cell];
+        var cols = this._cols, column = cols[cell];
+        var { pinnedStartLast, pinnedEndFirst } = this._layout.getRefs();
         var klass = "slick-cell l" + cell + " r" + Math.min(cols.length - 1, cell + colspan - 1) +
             (column.cssClass ? " " + column.cssClass : "");
 
@@ -2255,8 +2202,7 @@ export class Grid<TItem = any> implements EditorHost {
         var oldH = Math.round(parsePx(getComputedStyle(scrollCanvas).height));
 
         var numberOfRows;
-        const frozenTopLast = this._layout.getFrozenTopLastRow();
-        const frozenBottomFirst = this._layout.getFrozenBottomFirstRow();
+        const { frozenTopLast, frozenBottomFirst } = this._layout.getRefs();
         const dataLength = this.getDataLength();
         if (frozenTopLast >= 0 || frozenBottomFirst != Infinity) {
             numberOfRows = dataLength - (frozenTopLast + 1) - (dataLength - frozenBottomFirst - 1);
@@ -2422,13 +2368,13 @@ export class Grid<TItem = any> implements EditorHost {
         var cacheEntry = this._rowsCache[row];
 
         // Remove cells outside the range.
-        var cellsToRemove = [], pinnedStartLast = this._layout.getPinnedStartLastCol(), pinnedEndFirst = this._layout.getPinnedEndFirstCol();
+        const cellsToRemove = [], { pinnedStartLast, pinnedEndFirst } = this._layout.getRefs();
         for (var x in cacheEntry.cellNodesByColumnIdx) {
 
             var i = parseInt(x, 10);
 
             // Ignore frozen columns
-            if (i < pinnedStartLast || i > pinnedEndFirst) {
+            if (i <= pinnedStartLast || i >= pinnedEndFirst) {
                 continue;
             }
 
@@ -2531,7 +2477,8 @@ export class Grid<TItem = any> implements EditorHost {
         x.innerHTML = stringArray.join("");
 
         var processedRow;
-        var node: HTMLElement, pinnedStartLast = this._layout.getPinnedStartLastCol(), pinnedEndFirst = this._layout.getPinnedEndFirstCol();
+        var node: HTMLElement;
+        const { pinnedStartLast, pinnedEndFirst } = this._layout.getRefs();
         while ((processedRow = processedRows.pop()) != null) {
             cacheEntry = this._rowsCache[processedRow];
             var columnIdx;
@@ -2541,7 +2488,7 @@ export class Grid<TItem = any> implements EditorHost {
                 if (element instanceof Node)
                     node.appendChild(element);
 
-                if (pinnedStartLast >= 0 && columnIdx <= pinnedStartLast) {
+                if (columnIdx <= pinnedStartLast) {
                     cacheEntry.rowNodeS.appendChild(node);
                 } else if (pinnedEndFirst != Infinity && columnIdx >= pinnedEndFirst) {
                     cacheEntry.rowNodeE.appendChild(node);
@@ -2562,9 +2509,11 @@ export class Grid<TItem = any> implements EditorHost {
             needToReselectCell = false,
             dataLength = this.getDataLength();
 
+        const { frozenBottomFirst} = this._layout.getRefs();
+
         for (var i = range.top, ii = range.bottom; i <= ii; i++) {
 
-            if (this._rowsCache[i] || (this._layout.getFrozenBottomFirstRow() != Infinity && i == dataLength)) {
+            if (this._rowsCache[i] || (frozenBottomFirst != Infinity && i == dataLength)) {
                 continue;
             }
 
@@ -2803,33 +2752,32 @@ export class Grid<TItem = any> implements EditorHost {
             this._ignoreScrollUntil = new Date().getTime() + 100;
 
         if (hScrollDist) {
-            this._scrollLeftPrev = this._scrollLeft;
-
-            this.getScrollContainerX().scrollLeft = this._scrollLeft;
-            this._layout.handleScrollH();
+            const scrollLeft = this._scrollLeftPrev = this._scrollLeft;
+            getAllHScrollContainers(this._layout.getRefs()).forEach(sc => sc.scrollLeft = scrollLeft);
         }
 
         const vpi = this._viewportInfo;
 
         if (vScrollDist) {
             this._vScrollDir = this._scrollTopPrev < this._scrollTop ? 1 : -1;
-            this._scrollTopPrev = this._scrollTop;
+            const scrollTop = this._scrollTopPrev = this._scrollTop;
 
+            const scrollContainerY = this.getScrollContainerY();
             if (isMouseWheel === true) {
-                this.getScrollContainerY().scrollTop = this._scrollTop;
+                scrollContainerY.scrollTop = scrollTop;
             }
 
-            this._layout.handleScrollV();
+            getAllVScrollContainers(this._layout.getRefs()).forEach(sc => sc !== scrollContainerY && (sc.scrollTop = scrollTop));
 
             // switch virtual pages if needed
             if (vScrollDist < this._viewportInfo.height) {
-                this.scrollTo(this._scrollTop + this._pageOffset);
+                this.scrollTo(scrollTop + this._pageOffset);
             } else {
                 var oldOffset = this._pageOffset;
                 if (vpi.realScrollHeight == vpi.height) {
                     this._page = 0;
                 } else {
-                    this._page = Math.min(this._numberOfPages - 1, Math.floor(this._scrollTop * ((vpi.virtualHeight - this._viewportInfo.height) / (vpi.realScrollHeight - this._viewportInfo.height)) * (1 / this._pageHeight)));
+                    this._page = Math.min(this._numberOfPages - 1, Math.floor(scrollTop * ((vpi.virtualHeight - this._viewportInfo.height) / (vpi.realScrollHeight - this._viewportInfo.height)) * (1 / this._pageHeight)));
                 }
                 this._pageOffset = Math.round(this._page * this._jumpinessCoefficient);
                 if (oldOffset != this._pageOffset) {
@@ -3357,13 +3305,13 @@ export class Grid<TItem = any> implements EditorHost {
         }
 
         var rowOffset = this._layout.getFrozenRowOffset(row);
-        var cols = this._cols, pinnedStartLast = this._layout.getPinnedStartLastCol(), pinnedEndFirst = this._layout.getPinnedEndFirstCol();
+        const cols = this._cols, { pinnedStartLast, pinnedEndFirst } = this._layout.getRefs();
         var y1 = this.getRowTop(row) - rowOffset;
         var y2 = y1 + this._options.rowHeight - 1;
         var x1 = 0;
         for (var i = 0; i < cell; i++) {
             x1 += cols[i].width;
-            if (i === pinnedStartLast || i === pinnedEndFirst - 1) {
+            if (i === pinnedStartLast + 1 || i === pinnedEndFirst) {
                 x1 = 0;
             }
         }
@@ -3403,9 +3351,9 @@ export class Grid<TItem = any> implements EditorHost {
 
     scrollCellIntoView(row: number, cell: number, doPaging?: boolean): void {
         this.scrollRowIntoView(row, doPaging);
+        const { pinnedStartLast, pinnedEndFirst } = this._layout.getRefs();
 
-        if (cell <= this._layout.getPinnedStartLastCol() ||
-            cell >= this._layout.getPinnedEndFirstCol())
+        if (cell <= pinnedStartLast || cell >= pinnedEndFirst)
             return;
 
         var colspan = this.getColspan(row, cell);
@@ -3453,7 +3401,7 @@ export class Grid<TItem = any> implements EditorHost {
 
             var rowOffset = Math.floor(this._activeCellNode.closest('.grid-canvas')?.getBoundingClientRect().top ?? 0 + document.body.scrollTop);
             var isBottom = this._activeCellNode.closest('.grid-canvas-bottom') != null;
-            const frozenBottomFirst = this._layout.getFrozenBottomFirstRow();
+            const { frozenBottomFirst } = this._layout.getRefs();
             if (frozenBottomFirst != Infinity && isBottom) {
                 rowOffset -= (this._options.frozenBottom)
                     ? Math.round(parsePx(getComputedStyle(this._layout.getCanvasNodeFor(0, 0)).height))
@@ -3697,11 +3645,12 @@ export class Grid<TItem = any> implements EditorHost {
 
     scrollRowIntoView(row: number, doPaging?: boolean): void {
 
+        const { frozenTopLast, frozenBottomFirst } = this._layout.getRefs();
         if (!this._layout.isFrozenRow(row)) {
 
             var viewportScrollH = Math.round(parsePx(getComputedStyle(this.getScrollContainerY()).height));
 
-            var rowNumber = this._layout.getFrozenTopLastRow() >= 0 ? (row - this._layout.getFrozenTopLastRow() + 1) : row;
+            const rowNumber = frozenTopLast >= 0 ? (row - frozenTopLast + 1) : row;
 
             // if frozen row on top subtract number of frozen row
             var rowAtTop = rowNumber * this._options.rowHeight;
@@ -3891,7 +3840,8 @@ export class Grid<TItem = any> implements EditorHost {
 
         var pos = this._cellNavigator.navigate(dir, this._activeRow, this._activeCell, this._activePosX);
         if (pos) {
-            if (this._layout.getFrozenBottomFirstRow() != Infinity && pos.row == this.getDataLength()) {
+            const { frozenBottomFirst } = this._layout.getRefs();
+            if (frozenBottomFirst != Infinity && pos.row == this.getDataLength()) {
                 return;
             }
 

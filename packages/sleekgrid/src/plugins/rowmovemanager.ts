@@ -1,5 +1,4 @@
-import { EventEmitter, EventSubscriber } from "../core";
-import { Grid, IPlugin } from "../grid";
+import { EventEmitter, EventSubscriber, type IGrid, type IPlugin } from "../core";
 
 export interface RowMoveManagerOptions {
     cancelEditOnDrag?: boolean;
@@ -19,7 +18,7 @@ interface ArgsMoveRows {
 }
 
 export class RowMoveManager implements IPlugin {
-    declare private grid: Grid;
+    declare private grid: IGrid;
     declare private options: RowMoveManagerOptions;
     declare private dragging: boolean;
     private handler = new EventSubscriber();
@@ -34,7 +33,7 @@ export class RowMoveManager implements IPlugin {
         cancelEditOnDrag: false
     }
 
-    init(grid: Grid) {
+    init(grid: IGrid) {
         this.grid = grid;
         this.handler.subscribe(grid.onDragInit, this.handleDragInit.bind(this))
             .subscribe(grid.onDragStart, this.handleDragStart.bind(this))

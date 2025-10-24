@@ -343,7 +343,9 @@ it('attach event listeners', function () {
     expect(element.outerHTML).toBe('<a href="#">Download</a>');
 
     expect(element.onclick).toBe(handleClick);
-    expect(addEventListener.mock.calls.length).toEqual(0);
+    expect(addEventListener.mock.calls.length).toEqual(1);
+    // sleekdom attaches global disposing listener
+    expect(addEventListener.mock.calls[0][0]).toBe("disposing");
     addEventListener.mockClear();
 });
 

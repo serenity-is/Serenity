@@ -3,13 +3,12 @@ import { Column } from "../core/column";
 import { GridOptions } from "../core/gridoptions";
 import { ViewportInfo } from "../core/viewportinfo";
 import { ViewRange } from "../core/viewrange";
-import type { GridSignals } from "../grid/grid-signals";
+import type { GridSignals } from "../core/grid-signals";
 
 export interface LayoutHost {
     cleanUpAndRenderCells(range: ViewRange): void;
     getAvailableWidth(): number;
     getCellFromPoint(x: number, y: number): RowCell;
-    getColumnCssRules(idx: number): { right: any; left: any; }
     getColumns(): Column[];
     getInitialColumns(): Column[];
     getContainerNode(): HTMLElement;

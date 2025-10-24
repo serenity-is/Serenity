@@ -1,5 +1,6 @@
 import { Column, GridOptions, parsePx, ViewRange } from "../core";
-import { LayoutEngine, LayoutHost } from "../grid";
+import type { LayoutEngine } from "./layout-engine";
+import type { LayoutHost } from "./layout-host";
 import type { GridLayoutHRefs, GridLayoutRefs } from "./layout-refs";
 
 export const FrozenLayout: { new(): LayoutEngine } = function (): LayoutEngine {
@@ -10,8 +11,6 @@ export const FrozenLayout: { new(): LayoutEngine } = function (): LayoutEngine {
     let frozenRowIdx: number;
     let frozenCols: number;
     let frozenRows: number;
-    let headersWidthL: number;
-    let headersWidthR: number;
     let viewportTopH: number;
 
     let canvasBottomL: HTMLDivElement;
@@ -84,12 +83,12 @@ export const FrozenLayout: { new(): LayoutEngine } = function (): LayoutEngine {
 
         host.getContainerNode().append(<>
             <div class="slick-pane slick-pane-header slick-pane-left" tabindex="0" ref={el => paneHeaderL = el}>
-                <div class={{ "slick-header slick-header-left": true, "slick-hidden": signals.hideColumnHeader }} onSelectStart={returnFalse}>
+                <div class={{ "slick-header slick-header-left": true, "slick-hidden": signals.hideColumnHeader }}>
                     <div class="slick-header-columns slick-header-columns-left" ref={el => headerColsL = el} />
                 </div>
             </div>
 
-            <div class="slick-pane slick-pane-header slick-pane-right" tabindex="0" ref={el => paneHeaderR = el} onSelectStart={() => false}>
+            <div class="slick-pane slick-pane-header slick-pane-right" tabindex="0" ref={el => paneHeaderR = el}>
                 <div class={["slick-header slick-header-right", !options.showColumnHeader && "slick-hidden"]}>
                     <div class="slick-header-columns slick-header-columns-right" ref={el => headerColsR = el} />
                 </div>
@@ -287,7 +286,7 @@ export const FrozenLayout: { new(): LayoutEngine } = function (): LayoutEngine {
     }
 
     const calcHeaderWidths = () => {
-        headersWidthL = headersWidthR = 0;
+        var headersWidthL = 0, headersWidthR = 0;
 
         var scrollWidth = host.getScrollDims().width;
         var cols = host.getColumns();
@@ -320,36 +319,6 @@ export const FrozenLayout: { new(): LayoutEngine } = function (): LayoutEngine {
         return frozenCols > 0 && cell >= frozenCols ? headerColsR : headerColsL;
     }
 
-    const handleScrollH = () => {
-        const options = host.getOptions();
-        const scrollLeft = host.getScrollLeft();
-        if (frozenCols) {
-            options.showColumnHeader && (headerColsR.parentElement.scrollLeft = scrollLeft);
-            options.showHeaderRow && (headerRowColsR.parentElement.scrollLeft = scrollLeft);
-            options.showFooterRow && (footerRowColsR.parentElement.scrollLeft = scrollLeft);
-            if (frozenRows) {
-                viewportTopR.scrollLeft = scrollLeft;
-            }
-        } else {
-            options.showColumnHeader && (headerColsL.parentElement.scrollLeft = scrollLeft);
-            options.showHeaderRow && (headerRowColsL.parentElement.scrollLeft = scrollLeft);
-            options.showFooterRow && (footerRowColsL.parentElement.scrollLeft = scrollLeft);
-            if (frozenRows) {
-                viewportTopL.scrollLeft = scrollLeft;
-            }
-        }
-    }
-
-    const handleScrollV = () => {
-        if (frozenCols) {
-            if (frozenRows && !frozenBottom) {
-                viewportBottomL.scrollTop = host.getScrollTop();
-            } else {
-                viewportTopL.scrollTop = host.getScrollTop();
-            }
-        }
-    }
-
     const setPaneVisibility = () => {
         paneHeaderR.classList.toggle("slick-hidden", !frozenCols);
         paneTopR.classList.toggle("slick-hidden", !frozenCols);
@@ -380,43 +349,6 @@ export const FrozenLayout: { new(): LayoutEngine } = function (): LayoutEngine {
         if (frozenCols && canvasWidthL != oldCanvasWidthL) {
             headerColsL.style.width = canvasWidthL + 1000 + 'px';
             paneHeaderR.style[host.getOptions().rtl ? 'right' : 'left'] = canvasWidthL + 'px';
-        }
-    }
-
-    const applyColumnWidths = () => {
-        var x = 0, w, rule, cols = host.getColumns(), opts = host.getOptions(), rtl = opts.rtl,
-            s = rtl ? 'right' : 'left',
-            e = rtl ? 'left' : 'right';
-
-        if (opts.useCssVars) {
-            var styles = host.getContainerNode().style;
-            for (var i = 0; i < cols.length; i++) {
-                if (frozenCols == i)
-                    x = 0;
-                w = cols[i].width;
-                var prop = "--l" + i;
-                var oldVal = styles.getPropertyValue(prop);
-                var newVal = x + "px";
-                if (oldVal !== newVal)
-                    styles.setProperty(prop, newVal);
-                prop = "--r" + i;
-                oldVal = styles.getPropertyValue(prop);
-                newVal = (((frozenCols > 0 && i >= frozenCols) ? canvasWidthR : canvasWidthL) - x - w) + "px"
-                if (oldVal !== newVal)
-                    styles.setProperty(prop, newVal);
-                x += w;
-            }
-        }
-        else {
-            for (var i = 0; i < cols.length; i++) {
-                if (frozenCols == i)
-                    x = 0;
-                w = cols[i].width;
-                rule = host.getColumnCssRules(i);
-                (rule as any)[s].style[s] = x + "px";
-                (rule as any)[e].style[e] = (((frozenCols > 0 && i >= frozenCols) ? canvasWidthR : canvasWidthL) - x - w) + "px";
-                x += w;
-            }
         }
     }
 
@@ -678,7 +610,11 @@ export const FrozenLayout: { new(): LayoutEngine } = function (): LayoutEngine {
 
         if (!frozenRows && !frozenCols) {
             return {
-                main: topLRefs
+                main: topLRefs,
+                pinnedStartLast: -Infinity,
+                pinnedEndFirst: Infinity,
+                frozenTopLast: -Infinity,
+                frozenBottomFirst: Infinity
             }
         }
 
@@ -696,7 +632,11 @@ export const FrozenLayout: { new(): LayoutEngine } = function (): LayoutEngine {
                         viewport: viewportTopR
                     },
                     footerRowCols: footerRowColsR,
-                }
+                },
+                pinnedStartLast: frozenCols - 1,
+                pinnedEndFirst: Infinity,
+                frozenTopLast: -Infinity,
+                frozenBottomFirst: Infinity
             }
         }
 
@@ -715,7 +655,6 @@ return {
     afterRenderRows,
     afterSetOptions,
     appendCachedRow,
-    applyColumnWidths,
     beforeCleanupAndRenderCells,
     calcCanvasWidth,
     updateHeadersWidth: calcHeaderWidths,
@@ -725,10 +664,6 @@ return {
     getCanvasWidth,
     getFooterRowColsFor,
     getFooterRowColumn,
-    getPinnedStartLastCol,
-    getPinnedEndFirstCol,
-    getFrozenTopLastRow,
-    getFrozenBottomFirstRow,
     getHeaderColsFor,
     getHeaderColumn,
     getHeaderRowColsFor,
@@ -736,8 +671,6 @@ return {
     getRowFromCellNode,
     getFrozenRowOffset: getRowOffset,
     getViewportNodeFor,
-    handleScrollH,
-    handleScrollV,
     init,
     getRefs,
     layoutName: "frozen",
@@ -751,4 +684,3 @@ return {
 }
 } as any;
 
-function returnFalse(): boolean { return false; }

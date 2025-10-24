@@ -1,4 +1,4 @@
-import { ArgsColumn, Grid, IPlugin } from "../grid";
+import type { ArgsColumn, IGrid, IPlugin } from "../core";
 
 export interface AutoTooltipsOptions {
     enableForCells?: boolean;
@@ -9,7 +9,7 @@ export interface AutoTooltipsOptions {
 
 export class AutoTooltips implements IPlugin {
 
-    declare private grid: Grid;
+    declare private grid: IGrid;
     declare private options: AutoTooltipsOptions;
 
     constructor(options?: AutoTooltipsOptions) {
@@ -23,7 +23,7 @@ export class AutoTooltips implements IPlugin {
         replaceExisting: true
     }
 
-    init(grid: Grid) {
+    init(grid: IGrid) {
         this.grid = grid;
 
         if (this.options.enableForCells)

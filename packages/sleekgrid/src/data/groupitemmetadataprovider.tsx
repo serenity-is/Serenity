@@ -1,5 +1,4 @@
-import { applyFormatterResultToCellNode, Column, ColumnFormat, CompatFormatter, convertCompatFormatter, FormatterContext, FormatterResult, Group, IGroupTotals, ItemMetadata } from "../core";
-import { ArgsCell, Grid, IPlugin } from "../grid";
+import { applyFormatterResultToCellNode, Column, ColumnFormat, CompatFormatter, convertCompatFormatter, FormatterContext, FormatterResult, Group, IGroupTotals, ItemMetadata, type ArgsCell, type IGrid, type IPlugin } from "../core";
 
 export interface GroupItemMetadataProviderOptions {
     enableExpandCollapse?: boolean;
@@ -25,7 +24,7 @@ export interface GroupItemMetadataProviderOptions {
 }
 
 export class GroupItemMetadataProvider implements IPlugin {
-    declare protected grid: Grid;
+    declare protected grid: IGrid;
     declare private options: GroupItemMetadataProviderOptions;
 
     constructor(opt?: GroupItemMetadataProviderOptions) {
@@ -83,7 +82,7 @@ export class GroupItemMetadataProvider implements IPlugin {
         </>
     }
 
-    public static defaultTotalsFormat(ctx: FormatterContext, grid?: Grid): FormatterResult {
+    public static defaultTotalsFormat(ctx: FormatterContext, grid?: IGrid): FormatterResult {
         let item = ctx.item as IGroupTotals;
         if (!item.__groupTotals && (item as any).totals)
             ctx.item = item = (item as any).totals;
@@ -99,7 +98,7 @@ export class GroupItemMetadataProvider implements IPlugin {
         return "";
     }
 
-    init(grid: Grid) {
+    init(grid: IGrid) {
         this.grid = grid;
         grid.onClick.subscribe(this.handleGridClick);
         grid.onKeyDown.subscribe(this.handleGridKeyDown);
