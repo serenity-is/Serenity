@@ -15,7 +15,6 @@ export interface LayoutEngine {
     appendCachedRow(row: number, rowNodeS: HTMLElement, rowNodeC: HTMLElement, rowNodeE: HTMLElement): void;
     beforeCleanupAndRenderCells(rendered: ViewRange): void;
     calcCanvasWidth(): number;
-    getCanvasNodeFor(cell: number, row: number): HTMLElement;
     getCanvasWidth(): number;
     getFooterRowColsFor(cell: number): HTMLElement;
     getFooterRowColumn(cell: number): HTMLElement;
@@ -25,7 +24,6 @@ export interface LayoutEngine {
     getHeaderRowColumn(cell: number): HTMLElement;
     getRowFromCellNode(cellNode: HTMLElement, clientX: number, clientY: number): number;
     getRefs(): GridLayoutRefs;
-    getViewportNodeFor(cell: number, row: number): HTMLElement;
     realScrollHeightChange(): void;
     /** this might be called before init, chicken egg situation */
     reorderViewColumns(viewCols: Column[], options?: GridOptions): Column[];

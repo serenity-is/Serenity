@@ -21,7 +21,7 @@ import type { ViewRange } from "../core/viewrange";
 import { BasicLayout } from "../layouts/basic-layout";
 import { applyColumnWidths, applyLegacyHeightOptions } from "../layouts/layout-calculations";
 import type { LayoutEngine } from "../layouts/layout-engine";
-import { disposeLayoutHRefs, getAllCanvasNodes, getAllHScrollContainers, getAllViewportNodes, getAllVScrollContainers, layoutRefsForEach, mapLayoutRefs, type GridLayoutHRefs } from "../layouts/layout-refs";
+import { disposeLayoutHRefs, getAllCanvasNodes, getAllHScrollContainers, getAllViewportNodes, getAllVScrollContainers, layoutRefsForEach, mapLayoutRefs, type GridLayoutHRefs, type ViewportPaneRefs } from "../layouts/layout-refs";
 import { CellNavigator } from "./cellnavigator";
 import { autosizeColumns, shrinkOrStretchColumn } from "./column-resizing";
 import { columnSortHandler, sortToDesiredOrderAndKeepRest } from "./column-sorting";
@@ -506,18 +506,35 @@ export class Grid<TItem = any> implements IGrid<TItem> {
         return this._selectionModel;
     }
 
-    private colIdOrIdxToCell(columnIdOrIdx: string | number): number {
-        if (columnIdOrIdx == null)
-            return null;
-
-        if (typeof columnIdOrIdx !== "number")
-            return this.getColumnIndex(columnIdOrIdx);
-
-        return columnIdOrIdx;
+    private getHRefsForCell(cell: number): GridLayoutHRefs {
+        const refs = this._layout.getRefs();
+        if (cell == null) {
+            if (refs.pinnedEndFirst >= 0 && cell <= refs.pinnedEndFirst)
+                return refs.start;
+            if (refs.pinnedStartLast != Infinity && cell >= refs.pinnedStartLast)
+                return refs.end;
+        }
+        return refs.main;
     }
 
-    getCanvasNode(columnIdOrIdx?: string | number, row?: number): HTMLElement {
-        return this._layout.getCanvasNodeFor(this.colIdOrIdxToCell(columnIdOrIdx || 0), row || 0);
+    private getViewportPane(row?: number, cell?: number): ViewportPaneRefs {
+        const h = this.getHRefsForCell(cell);
+        if (!h)
+            return null;
+
+        if (row != null) {
+            const { frozenBottomFirst, frozenTopLast } = this._layout.getRefs();
+            if (frozenBottomFirst >= 0 && row >= frozenBottomFirst)
+                return h.top;
+            if (frozenTopLast != Infinity && row <= frozenTopLast)
+                return h.bottom;
+        }
+
+        return h.body;
+    }
+
+    getCanvasNode(row?: number, cell?: number): HTMLElement {
+        return this.getViewportPane(row, cell)?.canvas;
     }
 
     getCanvases(): any | HTMLElement[] {
@@ -532,8 +549,8 @@ export class Grid<TItem = any> implements IGrid<TItem> {
         return this._activeCanvasNode;
     }
 
-    getViewportNode(columnIdOrIdx?: string | number, row?: number): HTMLElement {
-        return this._layout.getViewportNodeFor(this.colIdOrIdxToCell(columnIdOrIdx || 0), row || 0);
+    getViewportNode(row?: number, cell?: number): HTMLElement {
+        return this.getViewportPane(row, cell)?.viewport;
     }
 
     private getViewportInfo() {
@@ -661,8 +678,10 @@ export class Grid<TItem = any> implements IGrid<TItem> {
         return this._layout.getRefs().main.headerCols;
     }
 
-    getHeaderColumn(columnIdOrIdx: string | number): HTMLElement {
-        var cell = this.colIdOrIdxToCell(columnIdOrIdx);
+    getHeaderColumn(cell: number | string): HTMLElement {
+        if (typeof cell === "string")
+            cell = this.getColumnIndex(cell);
+
         if (cell == null)
             return null;
 
@@ -681,8 +700,10 @@ export class Grid<TItem = any> implements IGrid<TItem> {
         return this._layout.getRefs().main.headerRowCols;
     }
 
-    getHeaderRowColumn(columnIdOrIdx: string | number): HTMLElement {
-        var cell = this.colIdOrIdxToCell(columnIdOrIdx);
+    getHeaderRowColumn(cell: string | number): HTMLElement {
+        if (typeof cell === "string")
+            cell = this.getColumnIndex(cell);
+
         if (cell == null)
             return;
 
@@ -693,8 +714,10 @@ export class Grid<TItem = any> implements IGrid<TItem> {
         return this._layout.getRefs().main.footerRowCols;
     }
 
-    getFooterRowColumn(columnIdOrIdx: string | number): HTMLElement {
-        var cell = this.colIdOrIdxToCell(columnIdOrIdx);
+    getFooterRowColumn(cell: string | number): HTMLElement {
+        if (typeof cell === "string")
+            cell = this.getColumnIndex(cell);
+
         if (cell == null)
             return null;
 
@@ -1080,7 +1103,7 @@ export class Grid<TItem = any> implements IGrid<TItem> {
             h.forEach(val => this._headerColumnWidthDiff += parsePx(cs.getPropertyValue(val)) || 0);
         el.remove();
 
-        const r = this._layout.getCanvasNodeFor(0, 0).appendChild(<div class="slick-row">
+        const r = this.getCanvasNode().appendChild(<div class="slick-row">
             {el = <div class="slick-cell" id="" style="visibility: hidden" /> as HTMLElement};
         </div>);
         el.innerHTML = "-";
@@ -2329,7 +2352,9 @@ export class Grid<TItem = any> implements IGrid<TItem> {
         args.range = range;
         const rows: number[] = [];
         let needToReselectCell = false;
-        const { frozenBottomFirst } = this._layout.getRefs();
+        const { start, main, end, pinnedStartLast, pinnedEndFirst, frozenBottomFirst, frozenTopLast } = this._layout.getRefs();
+        const pinnedStart = pinnedStartLast >= 0;
+        const pinnedEnd = pinnedEndFirst != Infinity;
 
         for (let row = range.top, rangeBottom = range.bottom; row <= rangeBottom; row++) {
 
@@ -2382,6 +2407,7 @@ export class Grid<TItem = any> implements IGrid<TItem> {
         c.innerHTML = args.sbCenter.join("");
         e.innerHTML = args.sbEnd.join("");
 
+
         const layout = this._layout;
         for (let i = 0, rowCount = rows.length; i < rowCount; i++) {
             const row = rows[i];
@@ -2389,7 +2415,30 @@ export class Grid<TItem = any> implements IGrid<TItem> {
             cache.rowNodeS = s.firstElementChild as HTMLElement;
             cache.rowNodeC = c.firstElementChild as HTMLElement;
             cache.rowNodeE = e.firstElementChild as HTMLElement;
-            layout.appendCachedRow(row, cache.rowNodeS, cache.rowNodeC, cache.rowNodeE);
+            if (pinnedStart && cache.rowNodeS) {
+                if (row <= frozenTopLast)
+                    start.top?.canvas?.appendChild(cache.rowNodeS);
+                else if (row >= frozenBottomFirst)
+                    end.top?.canvas?.appendChild(cache.rowNodeS);
+                else
+                    main.top?.canvas?.appendChild(cache.rowNodeS);
+            }
+            if (cache.rowNodeC) {
+                if (row <= frozenTopLast)
+                    start.body?.canvas?.appendChild(cache.rowNodeC);
+                else if (row >= frozenBottomFirst)
+                    end.body?.canvas?.appendChild(cache.rowNodeC);
+                else
+                    main.body?.canvas?.appendChild(cache.rowNodeC);
+            }
+            if (pinnedEnd && cache.rowNodeE) {
+                if (row <= frozenTopLast)
+                    start.bottom?.canvas?.appendChild(cache.rowNodeE);
+                else if (row >= frozenBottomFirst)
+                    end.bottom?.canvas?.appendChild(cache.rowNodeE);
+                else
+                    main.bottom?.canvas?.appendChild(cache.rowNodeE);
+            }
             if (cache.cellRenderContent.some(x => x instanceof Node))
                 this.ensureCellNodesInRowsCache(row);
         }
@@ -3226,7 +3275,7 @@ export class Grid<TItem = any> implements IGrid<TItem> {
             const { frozenBottomFirst } = this._layout.getRefs();
             if (frozenBottomFirst != Infinity && isBottom) {
                 rowOffset -= (this._options.frozenBottom)
-                    ? Math.round(parsePx(getComputedStyle(this._layout.getCanvasNodeFor(0, 0)).height))
+                    ? Math.round(parsePx(getComputedStyle(this.getCanvasNode(0, 0)).height))
                     : (this.getDataLength() - frozenBottomFirst) * this._options.rowHeight;
             }
 

@@ -1,4 +1,3 @@
-import type { HBand, } from "./layout-consts";
 
 export interface ViewportPaneRefs {
     pane?: HTMLElement;

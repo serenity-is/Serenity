@@ -138,32 +138,8 @@ export const FrozenLayout: { new(): LayoutEngine } = function (): LayoutEngine {
         adjustFrozenRowsOption();
     }
 
-    const getCanvasNodeFor = (cell: number, row: number) => {
-        if (row == null && cell == null)
-            return canvasTopL;
-
-        var rightSide = cell >= frozenCols;
-
-        if (frozenRows > 0 && (row >= frozenRowIdx + (frozenBottom ? 0 : 1)))
-            return rightSide ? canvasBottomR : canvasBottomL;
-
-        return rightSide ? canvasTopR : canvasTopL;
-    }
-
     function getCanvasWidth() {
         return canvasWidth;
-    }
-
-    function getViewportNodeFor(cell: number, row: number) {
-        if (row == null && cell == null)
-            return canvasTopL;
-
-        var rightSide = cell >= frozenCols;
-
-        if (frozenRows > 0 && (row >= frozenRowIdx + (frozenBottom ? 0 : 1)))
-            return rightSide ? canvasBottomR : canvasBottomL;
-
-        return rightSide ? canvasTopR : canvasTopL;
     }
 
     const updateCanvasWidth = () => {
@@ -626,7 +602,6 @@ return {
     calcCanvasWidth,
     updateHeadersWidth: calcHeaderWidths,
     destroy,
-    getCanvasNodeFor,
     getCanvasWidth,
     getFooterRowColsFor,
     getFooterRowColumn,
@@ -635,7 +610,6 @@ return {
     getHeaderRowColsFor,
     getHeaderRowColumn,
     getRowFromCellNode,
-    getViewportNodeFor,
     init,
     getRefs,
     layoutName: "frozen",

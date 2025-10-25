@@ -62,7 +62,7 @@ export interface IGrid<TItem = any> extends EditorHost, CellNavigation {
     getActiveCellNode(): HTMLElement;
     getActiveViewportNode(e?: IEventData): HTMLElement;
     getCanvases(): any | HTMLElement[];
-    getCanvasNode(columnIdOrIdx?: string | number, row?: number): HTMLElement;
+    getCanvasNode(row?: number, cell?: number): HTMLElement;
     getCellCssStyles(key: string): CellStylesHash;
     getCellEditor(): Editor;
     getCellFromEvent(e: any): { row: number; cell: number; };
@@ -108,7 +108,7 @@ export interface IGrid<TItem = any> extends EditorHost, CellNavigation {
     getTotalsFormatter(column: Column<TItem>): ColumnFormat<TItem>;
     getUID(): string;
     getViewport(viewportTop?: number, viewportLeft?: number): ViewRange;
-    getViewportNode(columnIdOrIdx?: string | number, row?: number): HTMLElement;
+    getViewportNode(row?: number, cell?: number): HTMLElement;
     getVisibleColumnById(id: string): Column<TItem>;
     getVisibleRange(viewportTop?: number, viewportLeft?: number): ViewRange;
     gotoCell(row: number, cell: number, forceEdit?: boolean): void;

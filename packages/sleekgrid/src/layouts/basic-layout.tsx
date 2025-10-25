@@ -59,10 +59,6 @@ export class BasicLayout implements LayoutEngine {
         this.refs = this.bodyRefs = this.mainRefs = null;
     }
 
-    public getCanvasNodeFor(cell: number, row: number): HTMLElement {
-        return this.bodyRefs.canvas;
-    }
-
     public getCanvasWidth(): number {
         return this.canvasWidth;
     }
@@ -103,14 +99,9 @@ export class BasicLayout implements LayoutEngine {
         return this.mainRefs.topPanel;
     }
 
-    public getViewportNodeFor(_row: number, _cell: number): HTMLElement {
-        return this.bodyRefs.viewport;
-    }
-
     public realScrollHeightChange(): void {
         this.bodyRefs.canvas.style.height = this.host.getViewportInfo().realScrollHeight + "px"
     }
-
 
     public setOverflow(): void {
         var alwaysVS = this.host.getOptions().alwaysShowVerticalScroll;
