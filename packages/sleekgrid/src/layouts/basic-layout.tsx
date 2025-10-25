@@ -1,21 +1,22 @@
-import { Column } from "../core";
 import { FooterRow, Header, HeaderRow, TopPanel, Viewport } from "./layout-components";
 import { LayoutEngine } from "./layout-engine";
 import type { LayoutHost } from "./layout-host";
-import type { GridLayoutRefs } from "./layout-refs";
+import { type GridLayoutHRefs, type GridLayoutRefs, type ViewportPaneRefs } from "./layout-refs";
 
 export class BasicLayout implements LayoutEngine {
     protected canvasWidth: number;
     protected headersWidth: number;
     protected host: LayoutHost;
-    protected bodyRefs: GridLayoutRefs["main"]["body"] = {};
-    protected mainRefs: GridLayoutRefs["main"] = { body: this.bodyRefs };
-    protected refs: GridLayoutRefs = { main: this.mainRefs, pinnedStartLast: -Infinity, pinnedEndFirst: Infinity, frozenTopLast: -Infinity, frozenBottomFirst: Infinity };
+    protected bodyRefs: ViewportPaneRefs;
+    protected mainRefs: GridLayoutHRefs;
+    protected refs: GridLayoutRefs;
 
     init(host: LayoutHost) {
         this.host = host;
         const signals = host.getSignals();
-        const refs = this.refs;
+        const refs = this.refs = host.refs;
+        this.bodyRefs = (this.mainRefs = refs.main).body;
+
         this.host.getContainerNode().append(<>
             <Header hband="main" refs={refs} signals={signals} />
             <TopPanel refs={refs} signals={signals} />
@@ -24,10 +25,6 @@ export class BasicLayout implements LayoutEngine {
             <FooterRow hband="main" refs={refs} signals={signals} />
         </>);
         this.updateHeadersWidth();
-    }
-
-    public appendCachedRow(_: number, _rowNodeS: HTMLDivElement, rowNodeC: HTMLDivElement, _rowNodeE: HTMLDivElement): void {
-        rowNodeC && this.bodyRefs.canvas.appendChild(rowNodeC);
     }
 
     public calcCanvasWidth(): number {
@@ -55,40 +52,11 @@ export class BasicLayout implements LayoutEngine {
     }
 
     public destroy(): void {
-        this.host = null;
-        this.refs = this.bodyRefs = this.mainRefs = null;
+        this.host = this.refs = this.mainRefs = this.bodyRefs = null;
     }
 
     public getCanvasWidth(): number {
         return this.canvasWidth;
-    }
-
-    public getHeaderColumn(cell: number): HTMLElement {
-        return this.mainRefs.headerCols.children.item(cell) as HTMLElement;
-    }
-
-    public getHeaderRowColumn(cell: number): HTMLElement {
-        return this.mainRefs.headerRowCols?.childNodes.item(cell) as HTMLElement;
-    }
-
-    public getHeaderRowColsFor(): HTMLElement {
-        return this.mainRefs.headerRowCols;
-    }
-
-    public getFooterRowColumn(cell: number): HTMLElement {
-        return this.mainRefs.footerRowCols?.childNodes.item(cell) as HTMLElement;
-    }
-
-    public getFooterRowColsFor(): HTMLElement {
-        return this.mainRefs.footerRowCols;
-    }
-
-    public getHeaderColsFor(): HTMLElement {
-        return this.mainRefs.headerCols;
-    }
-
-    public getRefs(): GridLayoutRefs {
-        return this.refs;
     }
 
     public getRowFromCellNode(cellNode: HTMLElement): number {
@@ -143,9 +111,6 @@ export class BasicLayout implements LayoutEngine {
     public afterRenderRows(): void { }
     public afterSetOptions(): void { }
     public beforeCleanupAndRenderCells(): void { }
-    public reorderViewColumns(_: Column[]): Column[] { return null; }
-    public setPaneVisibility(): void { }
-    public setScroller(): void { }
 
     readonly layoutName = "basic";
 }

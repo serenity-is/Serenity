@@ -9,16 +9,16 @@ export interface GridLayoutHRefs {
     headerCols?: HTMLElement;
     topPanel?: HTMLElement;
     headerRowCols?: HTMLElement;
-    top?: ViewportPaneRefs;
-    body: ViewportPaneRefs;
-    bottom?: ViewportPaneRefs;
+    readonly top: ViewportPaneRefs;
+    readonly body: ViewportPaneRefs;
+    readonly bottom: ViewportPaneRefs;
     footerRowCols?: HTMLElement;
 }
 
 export type GridLayoutRefs = {
-    main: GridLayoutHRefs;
-    start?: GridLayoutHRefs;
-    end?: GridLayoutHRefs;
+    readonly main: GridLayoutHRefs;
+    readonly start: GridLayoutHRefs;
+    readonly end: GridLayoutHRefs;
     pinnedStartLast: number;
     pinnedEndFirst: number;
     frozenTopLast: number;
@@ -66,9 +66,9 @@ export function disposeLayoutHRefs(refs: GridLayoutHRefs, removeNode: (node: HTM
 export function getAllCanvasNodes(refs: GridLayoutRefs): HTMLElement[] {
     const canvasNodes: HTMLElement[] = [];
     layoutRefsForEach(refs, (h) => {
-        h.top?.canvas && canvasNodes.push(h.top.canvas);
-        h.body?.canvas && canvasNodes.push(h.body.canvas);
-        h.bottom?.canvas && canvasNodes.push(h.bottom.canvas);
+        h.top.canvas && canvasNodes.push(h.top.canvas);
+        h.body.canvas && canvasNodes.push(h.body.canvas);
+        h.bottom.canvas && canvasNodes.push(h.bottom.canvas);
     });
     return canvasNodes;
 }
@@ -76,9 +76,9 @@ export function getAllCanvasNodes(refs: GridLayoutRefs): HTMLElement[] {
 export function getAllViewportNodes(refs: GridLayoutRefs): HTMLElement[] {
     const viewportNodes: HTMLElement[] = [];
     layoutRefsForEach(refs, (h) => {
-        h.top?.viewport && viewportNodes.push(h.top.viewport);
-        h.body?.viewport && viewportNodes.push(h.body.viewport);
-        h.bottom?.viewport && viewportNodes.push(h.bottom.viewport);
+        h.top.viewport && viewportNodes.push(h.top.viewport);
+        h.body.viewport && viewportNodes.push(h.body.viewport);
+        h.bottom.viewport && viewportNodes.push(h.bottom.viewport);
     });
     return viewportNodes;
 }
@@ -86,12 +86,12 @@ export function getAllViewportNodes(refs: GridLayoutRefs): HTMLElement[] {
 export function getAllHScrollContainers(refs: GridLayoutRefs): HTMLElement[] {
     const hScrollableNodes: HTMLElement[] = [];
     const main = refs.main;;
-    main.body?.viewport && hScrollableNodes.push(main.body.viewport);
+    main.body.viewport && hScrollableNodes.push(main.body.viewport);
     main.headerCols?.parentElement && hScrollableNodes.push(main.headerCols.parentElement);
     main.topPanel?.parentElement && hScrollableNodes.push(main.topPanel.parentElement);
     main.headerRowCols?.parentElement && hScrollableNodes.push(main.headerRowCols.parentElement);
-    main.top?.viewport && hScrollableNodes.push(main.top.viewport);
-    main.bottom?.viewport && hScrollableNodes.push(main.bottom.viewport);
+    main.top.viewport && hScrollableNodes.push(main.top.viewport);
+    main.bottom.viewport && hScrollableNodes.push(main.bottom.viewport);
     main.footerRowCols?.parentElement && hScrollableNodes.push(main.footerRowCols.parentElement);
     return hScrollableNodes;
 }
@@ -99,7 +99,8 @@ export function getAllHScrollContainers(refs: GridLayoutRefs): HTMLElement[] {
 export function getAllVScrollContainers(refs: GridLayoutRefs): HTMLElement[] {
     const vScrollableNodes: HTMLElement[] = [];
     layoutRefsForEach(refs, (h) => {
-        h.body?.viewport && vScrollableNodes.push(h.body.viewport);
+        h.body.viewport && vScrollableNodes.push(h.body.viewport);
     });
     return vScrollableNodes;
 }
+

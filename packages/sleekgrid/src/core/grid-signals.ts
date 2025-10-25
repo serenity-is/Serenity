@@ -9,4 +9,8 @@ export interface GridSignals {
     readonly hideHeaderRow: ReadonlySignal<boolean>;
     readonly showFooterRow: Signal<boolean>;
     readonly hideFooterRow: ReadonlySignal<boolean>;
+    readonly pinnedStartLast: Signal<number>;
+    readonly pinnedEndFirst: Signal<number>;
+    readonly frozenTopLast: Signal<number>;
+    readonly frozenBottomFirst: Signal<number>;
 }

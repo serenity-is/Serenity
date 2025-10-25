@@ -1,9 +1,9 @@
-import { computed, signal } from "@serenity-is/signals";
 import type { Column } from "../../src/core/column";
 import type { RowCell } from "../../src/core/editing";
 import type { GridSignals } from "../../src/core/grid-signals";
-import { gridDefaults, GridOptions } from "../../src/core/gridoptions";
+import { GridOptions } from "../../src/core/gridoptions";
 import type { ViewportInfo } from "../../src/core/viewportinfo";
+import { createGridSignalsAndRefs } from "../../src/grid/internal";
 import type { LayoutHost } from "../../src/layouts/layout-host";
 
 export function mockLayoutHost(): LayoutHost & {
@@ -11,6 +11,7 @@ export function mockLayoutHost(): LayoutHost & {
     opt: GridOptions<any>,
     container: HTMLDivElement
 } {
+    const { signals, refs } = createGridSignalsAndRefs();
     const host = {
         container: document.createElement("div"),
         opt: {
@@ -23,16 +24,8 @@ export function mockLayoutHost(): LayoutHost & {
             get showTopPanel() { return !host.signals.hideTopPanel.peek(); },
             set showTopPanel(value: boolean) { host.signals.showTopPanel.value = value; }
         } as GridOptions<any>,
-        signals: {
-            showColumnHeader: signal(gridDefaults.showColumnHeader),
-            hideColumnHeader: computed(() => !host.signals.showColumnHeader.value),
-            showTopPanel: signal(gridDefaults.showTopPanel),
-            hideTopPanel: computed(() => !host.signals.showTopPanel.value),
-            showHeaderRow: signal(gridDefaults.showHeaderRow),
-            hideHeaderRow: computed(() => !host.signals.showHeaderRow.value),
-            showFooterRow: signal(gridDefaults.showFooterRow),
-            hideFooterRow: computed(() => !host.signals.showFooterRow.value),
-        } satisfies GridSignals,
+        refs,
+        signals,
         bindAncestorScroll: vi.fn(),
         cleanUpAndRenderCells: vi.fn(),
         getAvailableWidth: vi.fn(() => 1000),

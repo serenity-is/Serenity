@@ -1,4 +1,3 @@
-import { computed, signal } from "@serenity-is/signals";
 import { currentLifecycleRoot } from "@serenity-is/sleekdom";
 import { preClickClassName } from "../core/base";
 import { CellRange } from "../core/cellrange";
@@ -21,16 +20,16 @@ import type { ViewRange } from "../core/viewrange";
 import { BasicLayout } from "../layouts/basic-layout";
 import { applyColumnWidths, applyLegacyHeightOptions } from "../layouts/layout-calculations";
 import type { LayoutEngine } from "../layouts/layout-engine";
-import { disposeLayoutHRefs, getAllCanvasNodes, getAllHScrollContainers, getAllViewportNodes, getAllVScrollContainers, layoutRefsForEach, mapLayoutRefs, type GridLayoutHRefs, type ViewportPaneRefs } from "../layouts/layout-refs";
+import { disposeLayoutHRefs, getAllCanvasNodes, getAllHScrollContainers, getAllViewportNodes, getAllVScrollContainers, layoutRefsForEach, mapLayoutRefs, type GridLayoutHRefs, type GridLayoutRefs, type ViewportPaneRefs } from "../layouts/layout-refs";
 import { CellNavigator } from "./cellnavigator";
 import { autosizeColumns, shrinkOrStretchColumn } from "./column-resizing";
 import { columnSortHandler, sortToDesiredOrderAndKeepRest } from "./column-sorting";
-import { absBox, createCssRules, findStylesheetByUID, getInnerWidth, getMaxSupportedCssHeight, getScrollBarDimensions } from "./style-utils";
 import { addListener, removeListener, triggerGridEvent } from "./event-utils";
-import { bindPrototypeMethods, calcMinMaxPageXOnDragStart, defaultEmptyNode, defaultJQueryEmptyNode, defaultJQueryRemoveNode, defaultRemoveNode, PostProcessCleanupEntry, simpleArrayEquals, type CachedRow } from "./internal";
+import { bindPrototypeMethods, calcMinMaxPageXOnDragStart, createGridSignalsAndRefs, defaultEmptyNode, defaultJQueryEmptyNode, defaultJQueryRemoveNode, defaultRemoveNode, PostProcessCleanupEntry, simpleArrayEquals, type CachedRow } from "./internal";
 import type { RowCellRenderArgs } from "./render-args";
 import { renderCell } from "./render-cell";
 import { renderRow } from "./render-row";
+import { absBox, createCssRules, findStylesheetByUID, getInnerWidth, getMaxSupportedCssHeight, getScrollBarDimensions } from "./style-utils";
 
 export class Grid<TItem = any> implements IGrid<TItem> {
     declare private _absoluteColMinWidth: number;
@@ -89,6 +88,9 @@ export class Grid<TItem = any> implements IGrid<TItem> {
     private _postProcessGroupId: number = 0;
     declare private _postProcessToRow: number;
     declare private _postRenderActive: boolean;
+    private _refs: GridLayoutRefs;
+    private _mapRefs: <T>(fn: (h: GridLayoutHRefs) => T) => T[];
+    private _refsForEach: (hRefsCallback: (hRefs: GridLayoutHRefs) => void) => void;
     declare private _removeNode: (node: Element) => void;
     private _rowsCache: { [key: number]: CachedRow } = {};
     declare private _scrollDims: { width: number, height: number };
@@ -209,25 +211,14 @@ export class Grid<TItem = any> implements IGrid<TItem> {
         else
             this._container.classList.add('ltr');
 
+
+        const { signals, refs } = createGridSignalsAndRefs();
+        this._refs = refs;
+        this._mapRefs = mapLayoutRefs.bind(null, refs);
+        this._refsForEach = layoutRefsForEach.bind(null, refs);
+        this._signals = signals;
+
         this.validateAndEnforceOptions();
-        const showColumnHeader = signal<boolean>();
-        const hideColumnHeader = computed(() => !showColumnHeader.value);
-        const showHeaderRow = signal<boolean>();
-        const hideHeaderRow = computed(() => !showHeaderRow.value);
-        const showFooterRow = signal<boolean>();
-        const hideFooterRow = computed(() => !showFooterRow.value);
-        const showTopPanel = signal<boolean>();
-        const hideTopPanel = computed(() => !showTopPanel.value);
-        this._signals = {
-            showColumnHeader,
-            hideColumnHeader,
-            showTopPanel,
-            hideTopPanel,
-            showHeaderRow,
-            hideHeaderRow,
-            showFooterRow,
-            hideFooterRow
-        };
         this.setOptionDependentSignals();
 
         this._colDefaults.width = options.defaultColumnWidth;
@@ -250,6 +241,7 @@ export class Grid<TItem = any> implements IGrid<TItem> {
         this._container.appendChild(<div class="slick-focus-sink" tabindex={0} ref={el => this._focusSink1 = el} />);
 
         this._layout = typeof options.layoutEngine === "function" ? options.layoutEngine() : (options.layoutEngine ?? new BasicLayout());
+
         this.setInitialCols(columns);
         this._scrollDims = getScrollBarDimensions();
 
@@ -260,20 +252,21 @@ export class Grid<TItem = any> implements IGrid<TItem> {
         const prevLifecycleRoot = currentLifecycleRoot(this._container);
         try {
             this._layout.init({
-                cleanUpAndRenderCells: (this.cleanUpAndRenderCells = this.cleanUpAndRenderCells.bind(this)),
-                getAvailableWidth: (this.getAvailableWidth = this.getAvailableWidth.bind(this)),
-                getCellFromPoint: (this.getCellFromPoint = this.getCellFromPoint.bind(this)),
-                getColumns: (this.getColumns = this.getColumns.bind(this)),
-                getContainerNode: (this.getContainerNode = this.getContainerNode.bind(this)),
-                getDataLength: (this.getDataLength = this.getDataLength.bind(this)),
-                getInitialColumns: (this.getInitialColumns = this.getInitialColumns.bind(this)),
-                getOptions: (this.getOptions = this.getOptions.bind(this)),
-                getRowFromNode: (this.getRowFromNode = this.getRowFromNode.bind(this)),
-                getScrollDims: (this.getScrollBarDimensions = this.getScrollBarDimensions.bind(this)),
-                getSignals: (this.getSignals = this.getSignals.bind(this)),
-                getViewportInfo: (this.getViewportInfo = this.getViewportInfo.bind(this)),
+                cleanUpAndRenderCells: this.cleanUpAndRenderCells,
+                getAvailableWidth: this.getAvailableWidth,
+                getCellFromPoint: this.getCellFromPoint,
+                getColumns: this.getColumns,
+                getContainerNode: this.getContainerNode,
+                getDataLength: this.getDataLength,
+                getInitialColumns: this.getInitialColumns,
+                getOptions: this.getOptions,
+                getRowFromNode: this.getRowFromNode,
+                getScrollDims: this.getScrollBarDimensions,
+                getSignals: this.getSignals,
+                getViewportInfo: this.getViewportInfo,
+                refs: this._refs,
                 removeNode: this._removeNode,
-                renderRows: (this.renderRows = this.renderRows.bind(this))
+                renderRows: this.renderRows
             });
 
             this.applyLegacyHeightOptions();
@@ -295,7 +288,7 @@ export class Grid<TItem = any> implements IGrid<TItem> {
     }
 
     private applyLegacyHeightOptions() {
-        applyLegacyHeightOptions({ groupingPanel: this._groupingPanel, opt: this._options, refs: this._layout.getRefs() });
+        applyLegacyHeightOptions({ groupingPanel: this._groupingPanel, opt: this._options, refs: this._refs });
     }
 
     private createGroupingPanel() {
@@ -313,14 +306,6 @@ export class Grid<TItem = any> implements IGrid<TItem> {
         return this._signals;
     }
 
-    private refsForEach(fn: (hRefs: GridLayoutHRefs) => void): void {
-        layoutRefsForEach(this._layout.getRefs(), fn);
-    }
-
-    private mapRefs<T>(fn: (h: GridLayoutHRefs) => T, skipNullReturns = true): T[] {
-        return mapLayoutRefs(this._layout.getRefs(), fn);
-    }
-
     init(): void {
         if (this._initialized)
             return;
@@ -335,8 +320,7 @@ export class Grid<TItem = any> implements IGrid<TItem> {
 
         var viewports = this.getViewports();
 
-        this._layout.setPaneVisibility();
-        this._layout.setScroller();
+        this._layout.setPaneVisibility?.();
         this.setOverflow();
 
         this.updateViewColLeftRight();
@@ -368,7 +352,7 @@ export class Grid<TItem = any> implements IGrid<TItem> {
             this._on(vp, "mousewheel" as any, this.handleMouseWheel);
         });
 
-        this.refsForEach(h => {
+        this._refsForEach(h => {
             const hs = h.headerCols;
             if (hs) {
                 hs.onselectstart = () => false;
@@ -506,30 +490,27 @@ export class Grid<TItem = any> implements IGrid<TItem> {
         return this._selectionModel;
     }
 
-    private getHRefsForCell(cell: number): GridLayoutHRefs {
-        const refs = this._layout.getRefs();
-        if (cell == null) {
-            if (refs.pinnedEndFirst >= 0 && cell <= refs.pinnedEndFirst)
-                return refs.start;
-            if (refs.pinnedStartLast != Infinity && cell >= refs.pinnedStartLast)
-                return refs.end;
+    private getHRefsForCell(cell: number): { h: GridLayoutHRefs, idx: number } {
+        const refs = this._refs;
+        if (cell != null) {
+            if (refs.pinnedStartLast >= 0 && cell <= refs.pinnedStartLast)
+                return { h: refs.start, idx: cell };
+            if (refs.pinnedEndFirst != Infinity && cell >= refs.pinnedEndFirst)
+                return { h: refs.end, idx: cell - refs.pinnedEndFirst };
         }
-        return refs.main;
+        return { h: refs.main, idx: refs.pinnedEndFirst >= 0 ? cell - refs.pinnedEndFirst - 1 : cell };
     }
 
     private getViewportPane(row?: number, cell?: number): ViewportPaneRefs {
-        const h = this.getHRefsForCell(cell);
-        if (!h)
-            return null;
-
+        const refs = this._refs;
+        let h = this.getHRefsForCell(cell).h;
         if (row != null) {
-            const { frozenBottomFirst, frozenTopLast } = this._layout.getRefs();
+            const { frozenBottomFirst, frozenTopLast } = this._refs;
             if (frozenBottomFirst >= 0 && row >= frozenBottomFirst)
                 return h.top;
             if (frozenTopLast != Infinity && row <= frozenTopLast)
                 return h.bottom;
         }
-
         return h.body;
     }
 
@@ -538,7 +519,7 @@ export class Grid<TItem = any> implements IGrid<TItem> {
     }
 
     getCanvases(): any | HTMLElement[] {
-        const canvases = getAllCanvasNodes(this._layout.getRefs());
+        const canvases = getAllCanvasNodes(this._refs);
         return this._jQuery ? this._jQuery(canvases) : canvases;
     }
 
@@ -558,7 +539,7 @@ export class Grid<TItem = any> implements IGrid<TItem> {
     }
 
     private getViewports(): HTMLElement[] {
-        return getAllViewportNodes(this._layout.getRefs());
+        return getAllViewportNodes(this._refs);
     }
 
     getActiveViewportNode(e?: IEventData): HTMLElement {
@@ -588,7 +569,7 @@ export class Grid<TItem = any> implements IGrid<TItem> {
             colCSSRulesR: this._colCssRulesR,
             container: this._container,
             opts: this.getOptions(),
-            refs: this._layout.getRefs()
+            refs: this._refs
         });
     }
 
@@ -601,7 +582,7 @@ export class Grid<TItem = any> implements IGrid<TItem> {
     }
 
     private bindAncestorScrollEvents() {
-        const refs = this._layout.getRefs();
+        const refs = this._refs;
         const pane = refs.main.body;
         let elem = pane.canvas as HTMLElement;
         while ((elem = elem?.parentNode as HTMLElement) != document.body && elem != null) {
@@ -632,7 +613,7 @@ export class Grid<TItem = any> implements IGrid<TItem> {
         }
 
         var columnDef = this._cols[idx];
-        var header = this._layout.getHeaderColumn(idx);
+        var header = this.getHeaderColumn(idx);
         if (!header)
             return;
 
@@ -675,7 +656,7 @@ export class Grid<TItem = any> implements IGrid<TItem> {
     }
 
     getHeader(): HTMLElement {
-        return this._layout.getRefs().main.headerCols;
+        return this._refs.main.headerCols;
     }
 
     getHeaderColumn(cell: number | string): HTMLElement {
@@ -685,7 +666,8 @@ export class Grid<TItem = any> implements IGrid<TItem> {
         if (cell == null)
             return null;
 
-        return this._layout.getHeaderColumn(cell);
+        const { h, idx } = this.getHRefsForCell(cell);
+        return h?.headerCols?.children.item(idx) as HTMLDivElement;
     }
 
     getGroupingPanel(): HTMLElement {
@@ -697,7 +679,7 @@ export class Grid<TItem = any> implements IGrid<TItem> {
     }
 
     getHeaderRow(): HTMLElement {
-        return this._layout.getRefs().main.headerRowCols;
+        return this._refs.main.headerRowCols;
     }
 
     getHeaderRowColumn(cell: string | number): HTMLElement {
@@ -707,11 +689,12 @@ export class Grid<TItem = any> implements IGrid<TItem> {
         if (cell == null)
             return;
 
-        return this._layout.getHeaderRowColumn(cell);
+        const { h, idx } = this.getHRefsForCell(cell);
+        return h?.headerRowCols?.children.item(idx) as HTMLDivElement;
     }
 
     getFooterRow(): HTMLElement {
-        return this._layout.getRefs().main.footerRowCols;
+        return this._refs.main.footerRowCols;
     }
 
     getFooterRowColumn(cell: string | number): HTMLElement {
@@ -721,11 +704,12 @@ export class Grid<TItem = any> implements IGrid<TItem> {
         if (cell == null)
             return null;
 
-        return this._layout.getFooterRowColumn(cell);
+        const { h, idx } = this.getHRefsForCell(cell);
+        return h?.footerRowCols?.children.item(idx) as HTMLDivElement;
     }
 
     private createColumnFooters(): void {
-        this.mapRefs(h => h.footerRowCols).forEach(frc => {
+        this._mapRefs(h => h.footerRowCols).forEach(frc => {
             frc.querySelectorAll(".slick-footerrow-column")
                 .forEach((el) => {
                     var columnDef = this.getColumnFromNode(el);
@@ -742,7 +726,7 @@ export class Grid<TItem = any> implements IGrid<TItem> {
 
         var cols = this._cols;
         for (var i = 0; i < cols.length; i++) {
-            const footerRowColsNode = this._layout.getFooterRowColsFor(i);
+            const footerRowColsNode = this.getHRefsForCell(i).h.footerRowCols;
             if (!footerRowColsNode)
                 continue;
             var m = cols[i];
@@ -766,7 +750,7 @@ export class Grid<TItem = any> implements IGrid<TItem> {
     }
 
     private createColumnHeaders(): void {
-        this.mapRefs(h => h.headerCols).forEach(hc => {
+        this._mapRefs(h => h.headerCols).forEach(hc => {
             hc.querySelectorAll(".slick-header-column")
                 .forEach((el) => {
                     var columnDef = this.getColumnFromNode(el);
@@ -783,7 +767,7 @@ export class Grid<TItem = any> implements IGrid<TItem> {
 
         this._layout.updateHeadersWidth();
 
-        this.mapRefs(h => h.headerRowCols).forEach(hrc => {
+        this._mapRefs(h => h.headerRowCols).forEach(hrc => {
             hrc.querySelectorAll(".slick-headerrow-column")
                 .forEach((el) => {
                     var columnDef = this.getColumnFromNode(el);
@@ -798,7 +782,7 @@ export class Grid<TItem = any> implements IGrid<TItem> {
             this._emptyNode(hrc);
         });
 
-        const cols = this._cols, refs = this._layout.getRefs();
+        const cols = this._cols, refs = this._refs;
         for (let i = 0; i < cols.length; i++) {
             const m = cols[i];
 
@@ -816,7 +800,7 @@ export class Grid<TItem = any> implements IGrid<TItem> {
 
             const { pinnedStartLast, pinnedEndFirst } = refs;
 
-            const header = this._layout.getHeaderColsFor(i).appendChild(
+            const header = this.getHRefsForCell(i).h.headerCols.appendChild(
                 <div class={["slick-header-column", m.headerCssClass,
                     i <= pinnedStartLast && "frozen pinned-start",
                     i >= pinnedEndFirst && "frozen pinned-end",
@@ -831,7 +815,7 @@ export class Grid<TItem = any> implements IGrid<TItem> {
             this._trigger(this.onHeaderCellRendered, { node: header, column: m });
 
             if (this._options.showHeaderRow) {
-                const headerRowColsNode = this._layout.getHeaderRowColsFor(i);
+                const headerRowColsNode = this.getHRefsForCell(i).h.headerRowCols;
                 if (!headerRowColsNode)
                     continue;
                 const headerRowCell = headerRowColsNode.appendChild(
@@ -846,7 +830,7 @@ export class Grid<TItem = any> implements IGrid<TItem> {
         if (this._options.enableColumnReorder) {
             this.setupColumnReorder();
             // sortable js removes draggable attribute after disposing / recreating
-            this.mapRefs(h => h.headerCols).forEach(el => el.querySelectorAll<HTMLDivElement>(".slick-resizable-handle").forEach(x => x.draggable = true));
+            this._mapRefs(h => h.headerCols).forEach(el => el.querySelectorAll<HTMLDivElement>(".slick-resizable-handle").forEach(x => x.draggable = true));
         }
     }
 
@@ -856,7 +840,7 @@ export class Grid<TItem = any> implements IGrid<TItem> {
             trigger: this._trigger,
         });
 
-        this.mapRefs(h => h.headerCols).forEach(el => this._on(el, 'click', this._columnSortHandler));
+        this._mapRefs(h => h.headerCols).forEach(el => this._on(el, 'click', this._columnSortHandler));
     }
 
     private static offset(el: HTMLElement | null) {
@@ -873,7 +857,7 @@ export class Grid<TItem = any> implements IGrid<TItem> {
     declare private sortableColInstances: any[];
 
     private hasPinnedCols(): boolean {
-        const { pinnedStartLast, pinnedEndFirst } = this._layout.getRefs();
+        const { pinnedStartLast, pinnedEndFirst } = this._refs;
         return pinnedStartLast >= 0 || pinnedEndFirst != Infinity;
     }
 
@@ -928,7 +912,7 @@ export class Grid<TItem = any> implements IGrid<TItem> {
                 }
 
                 var reorderedCols;
-                this.mapRefs(h => h.headerCols).forEach((_, i) => reorderedCols = sortToDesiredOrderAndKeepRest(
+                this._mapRefs(h => h.headerCols).forEach((_, i) => reorderedCols = sortToDesiredOrderAndKeepRest(
                     this._initCols,
                     (this.sortableColInstances[i]?.toArray?.() ?? [])
                 ));
@@ -943,7 +927,7 @@ export class Grid<TItem = any> implements IGrid<TItem> {
             }
         }
 
-        this.sortableColInstances = this.mapRefs(h => h.headerCols).map(x =>
+        this.sortableColInstances = this._mapRefs(h => h.headerCols).map(x =>
             // @ts-ignore
             Sortable.create(x, sortableOptions));
     }
@@ -952,7 +936,7 @@ export class Grid<TItem = any> implements IGrid<TItem> {
 
         var minPageX: number, pageX: number, maxPageX: number, cols = this._cols;
         var columnElements: Element[] = [];
-        this.mapRefs(h => h.headerCols).forEach(el => {
+        this._mapRefs(h => h.headerCols).forEach(el => {
             columnElements = columnElements.concat(Array.from(el.children).filter(x => x.classList.contains("slick-header-column")));
         });
 
@@ -1096,7 +1080,7 @@ export class Grid<TItem = any> implements IGrid<TItem> {
         const h = ["border-left-width", "border-right-width", "padding-left", "padding-right"];
         const v = ["border-top-width", "border-bottom-width", "padding-top", "padding-bottom"];
 
-        let el = this._layout.getHeaderColsFor(0).appendChild(<div class="slick-header-column" style="visibility: hidden" /> as HTMLElement);
+        let el = this._refs.main.headerCols.appendChild(<div class="slick-header-column" style="visibility: hidden" /> as HTMLElement);
         this._headerColumnWidthDiff = 0;
         let cs = getComputedStyle(el);
         if (cs.boxSizing != "border-box")
@@ -1152,7 +1136,7 @@ export class Grid<TItem = any> implements IGrid<TItem> {
         }
 
         if (this._options.enableColumnReorder && this._jQuery && (this._jQuery.fn as any).sortable) {
-            (this._jQuery(this.mapRefs(h => h.headerCols)).filter(":ui-sortable") as any).sortable("destroy");
+            (this._jQuery(this._mapRefs(h => h.headerCols)).filter(":ui-sortable") as any).sortable("destroy");
         }
 
         this.unbindAncestorScrollEvents();
@@ -1162,14 +1146,14 @@ export class Grid<TItem = any> implements IGrid<TItem> {
             this._jQuery(this._container).off("." + this._uid);
             this._jQuery(document).off("." + this._uid);
             this._jQuery(this._container).find(".slick-header-column,. slick-headerrow-column, .slick-footerrow-column, .slick-focus-sink").off("." + this._uid);
-            this._jQuery(this.mapRefs(h => h.headerCols)).off("." + this._uid);
-            this._jQuery(this.mapRefs(h => h.headerRowCols)).off("." + this._uid);
-            this._jQuery(this.mapRefs(h => h.footerRowCols)).off("." + this._uid);
+            this._jQuery(this._mapRefs(h => h.headerCols)).off("." + this._uid);
+            this._jQuery(this._mapRefs(h => h.headerRowCols)).off("." + this._uid);
+            this._jQuery(this._mapRefs(h => h.footerRowCols)).off("." + this._uid);
         }
         this.removeCssRules();
         this.sortableColInstances?.forEach(instance => { try { instance.destroy() } catch (e) { console.warn(e); } });
 
-        const refs = this._layout?.getRefs();
+        const refs = this._refs;
         const canvasNodes = getAllCanvasNodes(refs);
         if (this._jQuery)
             this._jQuery(canvasNodes).off("draginit dragstart dragend drag");
@@ -1245,7 +1229,7 @@ export class Grid<TItem = any> implements IGrid<TItem> {
 
         var h: HTMLElement;
         for (var i = 0, cols = this._cols, colCount = cols.length, diff = this._headerColumnWidthDiff; i < colCount; i++) {
-            h = this._layout.getHeaderColumn(i);
+            h = this.getHeaderColumn(i);
             if (h) {
                 var target = cols[i].width - diff;
                 if (h.offsetWidth !== target) {
@@ -1265,7 +1249,7 @@ export class Grid<TItem = any> implements IGrid<TItem> {
         this._sortColumns = cols || [];
 
         var headerColumnEls: Element[] = [];
-        this.mapRefs(h => h.headerCols).forEach(el => headerColumnEls = headerColumnEls.concat(Array.from(el.children)));
+        this._mapRefs(h => h.headerCols).forEach(el => headerColumnEls = headerColumnEls.concat(Array.from(el.children)));
         headerColumnEls.forEach(hel => {
             hel.classList.remove("slick-header-column-sorted");
             var si = hel.querySelector(".slick-sort-indicator");
@@ -1363,7 +1347,7 @@ export class Grid<TItem = any> implements IGrid<TItem> {
         this._colLeft = [];
         this._colRight = [];
         var x = 0, r: number, cols = this._cols, c: number, l: number = cols.length;
-        const { pinnedStartLast, pinnedEndFirst } = this._layout.getRefs();
+        const { pinnedStartLast, pinnedEndFirst } = this._refs;
         for (var c = 0; c < l; c++) {
             if (pinnedStartLast + 1 === c || pinnedEndFirst === c)
                 x = 0;
@@ -1389,7 +1373,8 @@ export class Grid<TItem = any> implements IGrid<TItem> {
                 viewCols.push(m);
         }
 
-        viewCols = this._layout.reorderViewColumns(viewCols, this._options) ?? viewCols;
+        this.adjustLegacyFrozenColumns(viewCols, this._options);
+        viewCols = this._layout.reorderViewColumns?.(viewCols, this._refs) ?? viewCols;
 
         this._postRenderActive = this._options.enableAsyncPostRender ?? false;
         this._postCleanupActive = this._options.enableAsyncPostRenderCleanup ?? false;
@@ -1406,6 +1391,27 @@ export class Grid<TItem = any> implements IGrid<TItem> {
         this._initColById = initColById;
         this._cols = viewCols;
         this._colById = viewColById;
+    }
+
+    private adjustLegacyFrozenColumns(viewCols: Column[], options?: GridOptions) {
+        if (options?.frozenColumns == null) {
+            delete options?.frozenColumns;
+        }
+        else {
+            let toFreezeStart = options.frozenColumns;
+            options.frozenColumns = 0;
+            let i = 0;
+            while (i < viewCols.length) {
+                const col = viewCols[i++];
+                if (toFreezeStart > 0 && col.visible !== false) {
+                    col.frozen = true;
+                    options.frozenColumns++;
+                    toFreezeStart--;
+                }
+                else if (col.frozen !== undefined)
+                    delete col.frozen;
+            }
+        }
     }
 
     setColumns(columns: Column<TItem>[]): void {
@@ -1429,7 +1435,7 @@ export class Grid<TItem = any> implements IGrid<TItem> {
         this.updateViewColLeftRight();
 
         if (this._initialized) {
-            this._layout.setPaneVisibility();
+            this._layout.setPaneVisibility?.();
             this.setOverflow();
 
             this.invalidateAllRows();
@@ -1473,6 +1479,7 @@ export class Grid<TItem = any> implements IGrid<TItem> {
         this._options = Object.assign(this._options, args);
         this.validateAndEnforceOptions();
         this.setOptionDependentSignals();
+        this.adjustLegacyFrozenColumns(this._cols, args);
         this._layout.afterSetOptions(args);
 
         if (args.columns && !suppressColumnSet) {
@@ -1483,7 +1490,6 @@ export class Grid<TItem = any> implements IGrid<TItem> {
             this.setOverflow();
         }
 
-        this._layout.setScroller();
         if (!suppressRender)
             this.render();
     }
@@ -1574,7 +1580,7 @@ export class Grid<TItem = any> implements IGrid<TItem> {
     }
 
     getTopPanel(): HTMLElement {
-        return this._layout.getRefs().main.topPanel;
+        return this._refs.main.topPanel;
     }
 
     setTopPanelVisibility(visible: boolean): void {
@@ -1629,7 +1635,7 @@ export class Grid<TItem = any> implements IGrid<TItem> {
     // Rendering / Scrolling
 
     private getRowTop(row: number): number {
-        const { frozenTopLast, frozenBottomFirst } = this._layout.getRefs();
+        const { frozenTopLast, frozenBottomFirst } = this._refs;
         const rowHeight = this._options.rowHeight;
         if (row <= frozenTopLast)
             return rowHeight * row;
@@ -1667,7 +1673,7 @@ export class Grid<TItem = any> implements IGrid<TItem> {
         if (this._scrollTopPrev != newScrollTop) {
             this._vScrollDir = (this._scrollTopPrev + oldOffset < newScrollTop + this._pageOffset) ? 1 : -1;
             this._scrollTopRendered = (this._scrollTop = this._scrollTopPrev = newScrollTop);
-            getAllVScrollContainers(this._layout.getRefs()).forEach(sc => sc.scrollTop = newScrollTop);
+            getAllVScrollContainers(this._refs).forEach(sc => sc.scrollTop = newScrollTop);
             this._trigger(this.onViewportChanged);
         }
     }
@@ -1939,14 +1945,14 @@ export class Grid<TItem = any> implements IGrid<TItem> {
 
     private calcViewportSize(): void {
         const layout = this._layout;
-        const refs = layout.getRefs().main;
+        const refs = this._refs;
         const vs = this._viewportInfo;
         vs.width = getInnerWidth(this._container);
         vs.groupingPanelHeight = (this._options.groupingPanel && this._options.showGroupingPanel) ? this._groupingPanel?.offsetHeight || 0 : 0;
-        vs.topPanelHeight = this._options.showTopPanel ? (refs.topPanel?.parentElement?.offsetHeight || 0) : 0;
-        vs.headerRowHeight = this._options.showHeaderRow ? layout.getHeaderRowColsFor(0)?.parentElement?.offsetHeight || 0 : 0;
-        vs.footerRowHeight = this._options.showFooterRow ? layout.getFooterRowColsFor(0)?.parentElement?.offsetHeight || 0 : 0;
-        vs.headerHeight = (this._options.showColumnHeader) ? this._layout.getHeaderColsFor(0)?.parentElement?.offsetHeight || 0 : 0;
+        vs.topPanelHeight = this._options.showTopPanel ? (refs.main.topPanel?.parentElement?.offsetHeight || 0) : 0;
+        vs.headerRowHeight = this._options.showHeaderRow ? refs.main.headerRowCols?.parentElement?.offsetHeight || 0 : 0;
+        vs.footerRowHeight = this._options.showFooterRow ? refs.main.footerRowCols?.parentElement?.offsetHeight || 0 : 0;
+        vs.headerHeight = (this._options.showColumnHeader) ? refs.main.headerCols?.parentElement?.offsetHeight || 0 : 0;
 
         if (this._options.autoHeight) {
             vs.height = this._options.rowHeight * this.getDataLengthIncludingAddNew();
@@ -1997,11 +2003,11 @@ export class Grid<TItem = any> implements IGrid<TItem> {
     }
 
     public getScrollContainerX() {
-        return this._layout.getRefs().main.body.viewport;
+        return this._refs.main.body.viewport;
     }
 
     public getScrollContainerY() {
-        return this._layout.getRefs().main.body.viewport;
+        return this._refs.main.body.viewport;
     }
 
     updateRowCount(): void {
@@ -2010,11 +2016,11 @@ export class Grid<TItem = any> implements IGrid<TItem> {
         }
 
         var dataLengthIncludingAddNew = this.getDataLengthIncludingAddNew();
-        var scrollCanvas = this._layout.getRefs().main.body.canvas;
+        var scrollCanvas = this._refs.main.body.canvas;
         var oldH = Math.round(parsePx(getComputedStyle(scrollCanvas).height));
 
         var numberOfRows;
-        const { frozenTopLast, frozenBottomFirst } = this._layout.getRefs();
+        const { frozenTopLast, frozenBottomFirst } = this._refs;
         const dataLength = this.getDataLength();
         if (frozenTopLast >= 0 || frozenBottomFirst != Infinity) {
             numberOfRows = dataLength - (frozenTopLast + 1) - (dataLength - frozenBottomFirst - 1);
@@ -2173,7 +2179,7 @@ export class Grid<TItem = any> implements IGrid<TItem> {
     }
 
     private isFrozenRow(row: number): boolean {
-        const { frozenTopLast, frozenBottomFirst } = this._layout.getRefs();
+        const { frozenTopLast, frozenBottomFirst } = this._refs;
         return row <= frozenTopLast || row >= frozenBottomFirst;
     }
 
@@ -2184,7 +2190,7 @@ export class Grid<TItem = any> implements IGrid<TItem> {
         var cacheEntry = this._rowsCache[row];
 
         // Remove cells outside the range.
-        const cellsToRemove = [], { pinnedStartLast, pinnedEndFirst } = this._layout.getRefs();
+        const cellsToRemove = [], { pinnedStartLast, pinnedEndFirst } = this._refs;
         for (var x in cacheEntry.cellNodesByColumnIdx) {
 
             var i = parseInt(x, 10);
@@ -2326,7 +2332,7 @@ export class Grid<TItem = any> implements IGrid<TItem> {
             activeCell: this._activeCell,
             activeRow: this._activeRow,
             cellCssClasses: this._cellCssClasses,
-            frozenPinned: this._layout.getRefs(),
+            frozenPinned: this._refs,
             getRowTop: this.getRowTop,
             grid: this,
             item: row != null ? this.getDataItem(row) : null,
@@ -2352,7 +2358,7 @@ export class Grid<TItem = any> implements IGrid<TItem> {
         args.range = range;
         const rows: number[] = [];
         let needToReselectCell = false;
-        const { start, main, end, pinnedStartLast, pinnedEndFirst, frozenBottomFirst, frozenTopLast } = this._layout.getRefs();
+        const { start, main, end, pinnedStartLast, pinnedEndFirst, frozenBottomFirst, frozenTopLast } = this._refs;
         const pinnedStart = pinnedStartLast >= 0;
         const pinnedEnd = pinnedEndFirst != Infinity;
 
@@ -2417,27 +2423,27 @@ export class Grid<TItem = any> implements IGrid<TItem> {
             cache.rowNodeE = e.firstElementChild as HTMLElement;
             if (pinnedStart && cache.rowNodeS) {
                 if (row <= frozenTopLast)
-                    start.top?.canvas?.appendChild(cache.rowNodeS);
+                    start.top.canvas?.appendChild(cache.rowNodeS);
                 else if (row >= frozenBottomFirst)
-                    end.top?.canvas?.appendChild(cache.rowNodeS);
+                    end.top.canvas?.appendChild(cache.rowNodeS);
                 else
-                    main.top?.canvas?.appendChild(cache.rowNodeS);
+                    main.top.canvas?.appendChild(cache.rowNodeS);
             }
             if (cache.rowNodeC) {
                 if (row <= frozenTopLast)
-                    start.body?.canvas?.appendChild(cache.rowNodeC);
+                    start.body.canvas?.appendChild(cache.rowNodeC);
                 else if (row >= frozenBottomFirst)
-                    end.body?.canvas?.appendChild(cache.rowNodeC);
+                    end.body.canvas?.appendChild(cache.rowNodeC);
                 else
-                    main.body?.canvas?.appendChild(cache.rowNodeC);
+                    main.body.canvas?.appendChild(cache.rowNodeC);
             }
             if (pinnedEnd && cache.rowNodeE) {
                 if (row <= frozenTopLast)
-                    start.bottom?.canvas?.appendChild(cache.rowNodeE);
+                    start.bottom.canvas?.appendChild(cache.rowNodeE);
                 else if (row >= frozenBottomFirst)
-                    end.bottom?.canvas?.appendChild(cache.rowNodeE);
+                    end.bottom.canvas?.appendChild(cache.rowNodeE);
                 else
-                    main.bottom?.canvas?.appendChild(cache.rowNodeE);
+                    main.bottom.canvas?.appendChild(cache.rowNodeE);
             }
             if (cache.cellRenderContent.some(x => x instanceof Node))
                 this.ensureCellNodesInRowsCache(row);
@@ -2553,7 +2559,11 @@ export class Grid<TItem = any> implements IGrid<TItem> {
 
         // render missing rows
         this.renderRows(rendered);
-        this._layout.afterRenderRows(rendered);
+
+        // render frozen rows, need to check if still required
+        const { frozenTopLast, frozenBottomFirst } = this._refs;
+        frozenTopLast >= 0 && this.renderRows({ top: 0, bottom: frozenTopLast, leftPx: rendered.leftPx, rightPx: rendered.rightPx });
+        frozenBottomFirst != Infinity && this.renderRows({ top: frozenBottomFirst, bottom: this.getDataLength() - 1, leftPx: rendered.leftPx, rightPx: rendered.rightPx });
 
         this._postProcessFromRow = visible.top;
         this._postProcessToRow = Math.min(this.getDataLengthIncludingAddNew() - 1, visible.bottom);
@@ -2625,7 +2635,7 @@ export class Grid<TItem = any> implements IGrid<TItem> {
 
         if (hScrollDist) {
             const scrollLeft = this._scrollLeftPrev = this._scrollLeft;
-            getAllHScrollContainers(this._layout.getRefs()).forEach(sc => sc.scrollLeft = scrollLeft);
+            getAllHScrollContainers(this._refs).forEach(sc => sc.scrollLeft = scrollLeft);
         }
 
         const vpi = this._viewportInfo;
@@ -2639,7 +2649,7 @@ export class Grid<TItem = any> implements IGrid<TItem> {
                 scrollContainerY.scrollTop = scrollTop;
             }
 
-            getAllVScrollContainers(this._layout.getRefs()).forEach(sc => sc !== scrollContainerY && (sc.scrollTop = scrollTop));
+            getAllVScrollContainers(this._refs).forEach(sc => sc !== scrollContainerY && (sc.scrollTop = scrollTop));
 
             // switch virtual pages if needed
             if (vScrollDist < this._viewportInfo.height) {
@@ -3176,7 +3186,7 @@ export class Grid<TItem = any> implements IGrid<TItem> {
             return null;
         }
 
-        const cols = this._cols, { pinnedStartLast, pinnedEndFirst } = this._layout.getRefs();
+        const cols = this._cols, { pinnedStartLast, pinnedEndFirst } = this._refs;
         var y1 = this.getRowTop(row);
         var y2 = y1 + this._options.rowHeight - 1;
         var x1 = 0;
@@ -3222,7 +3232,7 @@ export class Grid<TItem = any> implements IGrid<TItem> {
 
     scrollCellIntoView(row: number, cell: number, doPaging?: boolean): void {
         this.scrollRowIntoView(row, doPaging);
-        const { pinnedStartLast, pinnedEndFirst } = this._layout.getRefs();
+        const { pinnedStartLast, pinnedEndFirst } = this._refs;
 
         if (cell <= pinnedStartLast || cell >= pinnedEndFirst)
             return;
@@ -3272,7 +3282,7 @@ export class Grid<TItem = any> implements IGrid<TItem> {
 
             var rowOffset = Math.floor(this._activeCellNode.closest('.grid-canvas')?.getBoundingClientRect().top ?? 0 + document.body.scrollTop);
             var isBottom = this._activeCellNode.closest('.grid-canvas-bottom') != null;
-            const { frozenBottomFirst } = this._layout.getRefs();
+            const { frozenBottomFirst } = this._refs;
             if (frozenBottomFirst != Infinity && isBottom) {
                 rowOffset -= (this._options.frozenBottom)
                     ? Math.round(parsePx(getComputedStyle(this.getCanvasNode(0, 0)).height))
@@ -3516,7 +3526,7 @@ export class Grid<TItem = any> implements IGrid<TItem> {
 
     scrollRowIntoView(row: number, doPaging?: boolean): void {
 
-        const { frozenTopLast, frozenBottomFirst } = this._layout.getRefs();
+        const { frozenTopLast, frozenBottomFirst } = this._refs;
         if (!this.isFrozenRow(row)) {
 
             var viewportScrollH = Math.round(parsePx(getComputedStyle(this.getScrollContainerY()).height));
@@ -3711,7 +3721,7 @@ export class Grid<TItem = any> implements IGrid<TItem> {
 
         var pos = this._cellNavigator.navigate(dir, this._activeRow, this._activeCell, this._activePosX);
         if (pos) {
-            const { frozenBottomFirst } = this._layout.getRefs();
+            const { frozenBottomFirst } = this._refs;
             if (frozenBottomFirst != Infinity && pos.row == this.getDataLength()) {
                 return;
             }

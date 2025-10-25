@@ -323,7 +323,7 @@ describe('layout', () => {
             viewportClass: "test-viewport-class"
         });
 
-        expect(layoutEngine.getRefs().main.body.viewport.classList.contains("test-viewport-class")).toBe(true);
+        expect(container.querySelector(".slick-viewport").classList.contains("test-viewport-class")).toBe(true);
     });
 });
 

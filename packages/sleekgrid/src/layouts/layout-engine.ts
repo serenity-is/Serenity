@@ -10,27 +10,17 @@ export interface LayoutEngine {
     destroy(): void;
 
     afterHeaderColumnDrag(): void;
-    afterRenderRows(rendered: ViewRange): void;
     afterSetOptions(args: GridOptions): void;
-    appendCachedRow(row: number, rowNodeS: HTMLElement, rowNodeC: HTMLElement, rowNodeE: HTMLElement): void;
     beforeCleanupAndRenderCells(rendered: ViewRange): void;
     calcCanvasWidth(): number;
     getCanvasWidth(): number;
-    getFooterRowColsFor(cell: number): HTMLElement;
-    getFooterRowColumn(cell: number): HTMLElement;
-    getHeaderColsFor(cell: number): HTMLElement;
-    getHeaderColumn(cell: number): HTMLElement;
-    getHeaderRowColsFor(cell: number): HTMLElement;
-    getHeaderRowColumn(cell: number): HTMLElement;
     getRowFromCellNode(cellNode: HTMLElement, clientX: number, clientY: number): number;
-    getRefs(): GridLayoutRefs;
     realScrollHeightChange(): void;
     /** this might be called before init, chicken egg situation */
-    reorderViewColumns(viewCols: Column[], options?: GridOptions): Column[];
+    reorderViewColumns?(viewCols: Column[], refs: GridLayoutRefs): Column[];
     resizeCanvas(): void;
     setOverflow(): void;
-    setPaneVisibility(): void;
-    setScroller(): void;
+    setPaneVisibility?(): void;
     updateCanvasWidth(): boolean;
     updateHeadersWidth(): void;
 }

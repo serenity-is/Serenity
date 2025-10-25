@@ -1,5 +1,7 @@
+import { computed, signal } from "@serenity-is/signals";
 import { invokeDisposingListeners } from "@serenity-is/sleekdom";
-import { Column } from "../core";
+import { Column, type GridSignals } from "../core";
+import type { GridLayoutRefs } from "../layouts/layout-refs";
 
 export function simpleArrayEquals(arr1: number[], arr2: number[]) {
     if (!Array.isArray(arr1) || !Array.isArray(arr2) || arr1.length !== arr2.length)
@@ -153,4 +155,47 @@ export function bindPrototypeMethods(instance: any, filter?: (key: string | symb
             }
         }
     } while ((object = Reflect.getPrototypeOf(object)) && object !== Object.prototype);
+}
+
+export function createGridSignalsAndRefs(): { signals: GridSignals; refs: GridLayoutRefs } {
+    const showColumnHeader = signal<boolean>();
+    const hideColumnHeader = computed(() => !showColumnHeader.value);
+    const showHeaderRow = signal<boolean>();
+    const hideHeaderRow = computed(() => !showHeaderRow.value);
+    const showFooterRow = signal<boolean>();
+    const hideFooterRow = computed(() => !showFooterRow.value);
+    const showTopPanel = signal<boolean>();
+    const hideTopPanel = computed(() => !showTopPanel.value);
+    let pinnedStartFirst = -Infinity;
+    let pinnedEndFirst = Infinity;
+    let frozenTopLast = -Infinity;
+    let frozenBottomFirst = Infinity;
+    const signals: GridSignals = {
+        showColumnHeader,
+        hideColumnHeader,
+        showTopPanel,
+        hideTopPanel,
+        showHeaderRow,
+        hideHeaderRow,
+        showFooterRow,
+        hideFooterRow,
+        pinnedStartLast: signal(pinnedStartFirst),
+        pinnedEndFirst: signal(pinnedEndFirst),
+        frozenTopLast: signal(frozenTopLast),
+        frozenBottomFirst: signal(frozenBottomFirst),
+    };
+    const refs: GridLayoutRefs = {
+        start: { body: {}, top: {}, bottom: {} },
+        main: { body: {}, top: {}, bottom: {} },
+        end: { body: {}, top: {}, bottom: {} },
+        get pinnedEndFirst() { return pinnedEndFirst; },
+        set pinnedEndFirst(value) { pinnedEndFirst = value; signals.pinnedEndFirst.value = value; },
+        get pinnedStartLast() { return pinnedStartFirst; },
+        set pinnedStartLast(value) { pinnedStartFirst = value; signals.pinnedStartLast.value = value; },
+        get frozenTopLast() { return frozenTopLast; },
+        set frozenTopLast(value) { frozenTopLast = value; signals.frozenTopLast.value = value; },
+        get frozenBottomFirst() { return frozenBottomFirst; },
+        set frozenBottomFirst(value) { frozenBottomFirst = value; signals.frozenBottomFirst.value = value; },
+    };
+    return { signals, refs };
 }

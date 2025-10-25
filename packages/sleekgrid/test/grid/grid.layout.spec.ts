@@ -32,8 +32,6 @@ describe('canvas', () => {
 
         const layoutEngine = new BasicLayout();
 
-        const canvasNodes = [document.createElement('div'), document.createElement('div')];
-
         const gridOptions: GridOptions = {
             jQuery: MockJQueryStatic as any,
             layoutEngine
@@ -42,22 +40,9 @@ describe('canvas', () => {
         const container = new (MockJQueryStatic as any)(document.createElement("div"));
         const grid = new Grid(container as any, [], [], gridOptions);
 
-        layoutEngine.getRefs = () => {
-            return {
-                main: { body: { canvas: canvasNodes[0] } },
-                end: { body: { canvas: canvasNodes[1] } },
-                pinnedEndFirst: 1,
-                pinnedStartLast: -Infinity,
-                frozenTopLast: -Infinity,
-                frozenBottomFirst: Infinity
-            };
-        };
-
         const canvases = grid.getCanvases();
         expect(canvases).toBeInstanceOf(MockJQueryStatic);
-        expect(canvases.length).toBe(2);
-        expect(canvases[0]).toBe(canvasNodes[0]);
-        expect(canvases[1]).toBe(canvasNodes[1]);
+        expect(canvases.length).toBe(1);
     });
 
     it('should return activeCanvasNode as null if its not set', () => {
@@ -110,36 +95,6 @@ describe('canvas', () => {
 
         expect(grid.getActiveCanvasNode()).toBeFalsy();
     });
-
-    it('should get removed from the document tree on destroy', () => {
-        const layoutEngine = new BasicLayout();
-        const canvasNodes = [document.createElement('div'), document.createElement('div')];
-
-        const documentFragment = document.createDocumentFragment();
-        canvasNodes.forEach(canvasNode => documentFragment.appendChild(canvasNode));
-        expect(documentFragment.childNodes.length).toBe(2);
-
-        const grid = new Grid(document.createElement('div'), [], [], { layoutEngine });
-
-        layoutEngine.getRefs = () => {
-            return {
-                main: { body: { canvas: canvasNodes[0] } },
-                end: { body: { canvas: canvasNodes[1] } },
-                pinnedEndFirst: 1,
-                pinnedStartLast: -Infinity,
-                frozenTopLast: -Infinity,
-                frozenBottomFirst: Infinity
-            };
-        };
-
-        expect(canvasNodes[0].parentNode).toBe(documentFragment);
-        expect(canvasNodes[1].parentNode).toBe(documentFragment);
-
-        grid.destroy();
-
-        expect(canvasNodes[0].parentNode).toBeFalsy();
-        expect(canvasNodes[1].parentNode).toBeFalsy();
-    });
 });
 
 describe('viewport', () => {
@@ -174,7 +129,7 @@ describe('viewport', () => {
 
         const oldGetComputedStyles = window.getComputedStyle;
         window.getComputedStyle = (el: HTMLElement) => {
-            if (el === layoutEngine.getRefs().main.body.viewport)
+            if (el.classList.contains("slick-viewport-body"))
                 return { height: viewportHeight + 'px' } as any;
 
             return oldGetComputedStyles(el);
@@ -284,145 +239,5 @@ describe('viewport', () => {
 
         if (!asserted)
             throw "assertion not made";
-    });
-});
-
-describe('headers', () => {
-    it('should return first header from the layout on getHeader', () => {
-        const layoutEngine = new BasicLayout();
-        const headerCols = [document.createElement('div'), document.createElement('div')];
-
-
-        const grid = new Grid(document.createElement('div'), [], [], { layoutEngine });
-        layoutEngine.getRefs = () => {
-            return {
-                start: { headerCols: headerCols[1], body: null },
-                main: { headerCols: headerCols[0], body: null },
-                pinnedEndFirst: Infinity,
-                pinnedStartLast: 0,
-                frozenTopLast: -Infinity,
-                frozenBottomFirst: Infinity
-            }
-        };
-
-        expect(grid.getHeader()).toBe(headerCols[0]);
-    });
-
-    describe('getHeaderColumn', () => {
-        it('should return specific header column', () => {
-            const layoutEngine = new BasicLayout();
-            const headerCols = [document.createElement('div'), document.createElement('div')];
-
-            layoutEngine.getHeaderColumn = (cell) => headerCols[cell];
-
-            const grid = new Grid(document.createElement('div'), [], [], { layoutEngine });
-
-            expect(grid.getHeaderColumn(1)).toBe(headerCols[1]);
-        });
-
-        it('should return null if header column is not found', () => {
-            const layoutEngine = new BasicLayout();
-
-            layoutEngine.getHeaderColumn = () => null;
-
-            const grid = new Grid(document.createElement('div'), [], [], { layoutEngine });
-
-            expect(grid.getHeaderColumn(1)).toBeNull();
-        });
-    });
-
-    it('should return first row header from the layout on getHeaderRow', () => {
-        const layoutEngine = new BasicLayout();
-        const headerCols = [document.createElement('div'), document.createElement('div')];
-        const headerParent = document.createElement('div'); // There are events that are bound to the parent of the header
-        headerCols.forEach(col => headerParent.appendChild(col));
-
-        const grid = new Grid(document.createElement('div'), [], [], { layoutEngine });
-        layoutEngine.getRefs = () => {
-            return {
-                start: { headerRowCols: headerCols[1], body: null },
-                main: { headerRowCols: headerCols[0], body: null },
-                pinnedEndFirst: Infinity,
-                pinnedStartLast: 0,
-                frozenTopLast: -Infinity,
-                frozenBottomFirst: Infinity
-
-
-            }
-        }
-
-        expect(grid.getHeaderRow()).toBe(headerCols[0]);
-    });
-
-    describe('getHeaderRowColumn', () => {
-        it('should return specific header row column', () => {
-            const layoutEngine = new BasicLayout();
-            const headerCols = [document.createElement('div'), document.createElement('div')];
-            const headerParent = document.createElement('div');
-            headerCols.forEach(col => headerParent.appendChild(col));
-
-            layoutEngine.getHeaderRowColumn = (cell) => headerCols[cell];
-
-            const grid = new Grid(document.createElement('div'), [], [], { layoutEngine });
-
-            expect(grid.getHeaderRowColumn(1)).toBe(headerCols[1]);
-        });
-
-        it('should return null if header row column is not found', () => {
-            const layoutEngine = new BasicLayout();
-
-            layoutEngine.getHeaderRowColumn = () => null;
-
-            const grid = new Grid(document.createElement('div'), [], [], { layoutEngine });
-
-            expect(grid.getHeaderRowColumn(1)).toBeNull();
-        });
-    });
-
-    it('should return first footer row col from the layout on getFooterRow', () => {
-        const layoutEngine = new BasicLayout();
-        const footerCols = [document.createElement('div'), document.createElement('div')];
-        const footerParent = document.createElement('div');
-        footerCols.forEach(col => footerParent.appendChild(col));
-
-        const grid = new Grid(document.createElement('div'), [], [], { layoutEngine });
-
-        layoutEngine.getRefs = () => {
-            return {
-                start: { footerRowCols: footerCols[1], body: null },
-                main: { footerRowCols: footerCols[0], body: null },
-                pinnedEndFirst: Infinity,
-                pinnedStartLast: 0,
-                frozenTopLast: -Infinity,
-                frozenBottomFirst: Infinity
-            }
-        };
-
-        expect(grid.getFooterRow()).toBe(footerCols[0]);
-    });
-
-    describe('getFooterRowColumn', () => {
-        it('should return specific footer row column', () => {
-            const layoutEngine = new BasicLayout();
-            const footerCols = [document.createElement('div'), document.createElement('div')];
-            const footerParent = document.createElement('div');
-            footerCols.forEach(col => footerParent.appendChild(col));
-
-            layoutEngine.getFooterRowColumn = (cell) => footerCols[cell];
-
-            const grid = new Grid(document.createElement('div'), [], [], { layoutEngine });
-
-            expect(grid.getFooterRowColumn(1)).toBe(footerCols[1]);
-        });
-
-        it('should return null if footer row column is not found', () => {
-            const layoutEngine = new BasicLayout();
-
-            layoutEngine.getFooterRowColumn = () => null;
-
-            const grid = new Grid(document.createElement('div'), [], [], { layoutEngine });
-
-            expect(grid.getFooterRowColumn(1)).toBeNull();
-        });
     });
 });
