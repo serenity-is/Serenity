@@ -23,12 +23,14 @@ import { applyColumnWidths, applyLegacyHeightOptions } from "../layouts/layout-c
 import type { LayoutEngine } from "../layouts/layout-engine";
 import { disposeLayoutHRefs, getAllCanvasNodes, getAllHScrollContainers, getAllViewportNodes, getAllVScrollContainers, layoutRefsForEach, mapLayoutRefs, type GridLayoutHRefs } from "../layouts/layout-refs";
 import { CellNavigator } from "./cellnavigator";
-import { triggerGridEvent } from "./event-utils";
-import { absBox, autosizeColumns, calcMinMaxPageXOnDragStart, defaultEmptyNode, defaultJQueryEmptyNode, defaultJQueryRemoveNode, defaultRemoveNode, getInnerWidth, getMaxSupportedCssHeight, getScrollBarDimensions, PostProcessCleanupEntry, shrinkOrStretchColumn, simpleArrayEquals, sortToDesiredOrderAndKeepRest, type CachedRow } from "./internal";
+import { autosizeColumns, shrinkOrStretchColumn } from "./column-resizing";
+import { columnSortHandler, sortToDesiredOrderAndKeepRest } from "./column-sorting";
+import { absBox, createCssRules, findStylesheetByUID, getInnerWidth, getMaxSupportedCssHeight, getScrollBarDimensions } from "./style-utils";
+import { addListener, removeListener, triggerGridEvent } from "./event-utils";
+import { bindPrototypeMethods, calcMinMaxPageXOnDragStart, defaultEmptyNode, defaultJQueryEmptyNode, defaultJQueryRemoveNode, defaultRemoveNode, PostProcessCleanupEntry, simpleArrayEquals, type CachedRow } from "./internal";
 import type { RowCellRenderArgs } from "./render-args";
 import { renderCell } from "./render-cell";
 import { renderRow } from "./render-row";
-import { createCssRules, findStylesheetByUID } from "./style-utils";
 
 export class Grid<TItem = any> implements IGrid<TItem> {
     declare private _absoluteColMinWidth: number;
@@ -49,6 +51,7 @@ export class Grid<TItem = any> implements IGrid<TItem> {
     declare private _cols: Column<TItem>[];
     declare private _colCssRulesL: Record<number, CSSStyleRule>;
     declare private _colCssRulesR: Record<number, CSSStyleRule>;
+    declare private _columnSortHandler: (e: MouseEvent) => void;
     declare private _currentEditor: Editor;
     declare private _data: IDataView<TItem> | TItem[];
     declare private _draggableInstance: { destroy: () => void };
@@ -69,6 +72,8 @@ export class Grid<TItem = any> implements IGrid<TItem> {
     declare private _lastRenderTime: number;
     declare private _layout: LayoutEngine;
     declare private _numberOfPages: number;
+    declare private _on: OmitThisParameter<typeof addListener>;
+    declare private _off: OmitThisParameter<typeof removeListener>;
     declare private _options: GridOptions<TItem>;
     declare private _signals: GridSignals;
     private _page: number = 0;
@@ -100,8 +105,9 @@ export class Grid<TItem = any> implements IGrid<TItem> {
     declare private _styleNode: HTMLStyleElement;
     declare private _stylesheet: CSSStyleSheet;
     private _tabbingDirection: number = 1;
+    declare private _trigger: typeof triggerGridEvent;
     declare private static _nextUid: number;
-    private _uid: string = "sleekgrid_" + (Grid._nextUid = (Grid._nextUid || 0) + 1);
+    private _uid: string = "_sleekgrid_" + (Grid._nextUid = (Grid._nextUid || 0) + 1) + "_";
     private _viewportInfo: ViewportInfo = {} as any;
     private _vScrollDir: number = 1;
 
@@ -174,37 +180,16 @@ export class Grid<TItem = any> implements IGrid<TItem> {
         }
 
         this._container.classList.add('slick-container');
-        this._eventDisposer = new AbortController();
 
         this._emptyNode = options.emptyNode ?? (this._jQuery ? defaultJQueryEmptyNode.bind(this._jQuery) : defaultEmptyNode);
         this._removeNode = options.removeNode ?? (this._jQuery ? defaultJQueryRemoveNode.bind(this._jQuery) : defaultRemoveNode);
 
-        this.asyncPostProcessRows = this.asyncPostProcessRows.bind(this);
-        this.asyncPostProcessCleanupRows = this.asyncPostProcessCleanupRows.bind(this);
-        this.cancelCurrentEdit = this.cancelCurrentEdit.bind(this);
-        this.commitCurrentEdit = this.commitCurrentEdit.bind(this);
-        this.commitEditAndSetFocus = this.commitEditAndSetFocus.bind(this);
-        this.cancelEditAndSetFocus = this.cancelEditAndSetFocus.bind(this);
-        this.canCellBeActive = this.canCellBeActive.bind(this);
-        this.getColspan = this.getColspan.bind(this);
-        this.getRowTop = this.getRowTop.bind(this);
-        this.handleClick = this.handleClick.bind(this);
-        this.handleContextMenu = this.handleContextMenu.bind(this);
-        this.handleDblClick = this.handleDblClick.bind(this);
-        this.handleDragInit = this.handleDragInit.bind(this);
-        this.handleDragStart = this.handleDragStart.bind(this);
-        this.handleDrag = this.handleDrag.bind(this);
-        this.handleDragEnd = this.handleDragEnd.bind(this);
-        this.handleHeaderClick = this.handleHeaderClick.bind(this);
-        this.handleHeaderContextMenu = this.handleHeaderContextMenu.bind(this);
-        this.handleHeaderFooterRowScroll = this.handleHeaderFooterRowScroll.bind(this);
-        this.handleHeaderMouseEnter = this.handleHeaderMouseEnter.bind(this);
-        this.handleHeaderMouseLeave = this.handleHeaderMouseLeave.bind(this);
-        this.handleKeyDown = this.handleKeyDown.bind(this);
-        this.handleKeyDown = this.handleKeyDown.bind(this);
-        this.handleMouseEnter = this.handleMouseEnter.bind(this);
-        this.handleMouseLeave = this.handleMouseLeave.bind(this);
-        this.handleMouseWheel = this.handleMouseWheel.bind(this);
+        this._eventDisposer = new AbortController();
+        this._on = addListener.bind({ eventDisposer: this._eventDisposer, jQuery: this._jQuery, uid: this._uid });
+        this._off = removeListener.bind({ jQuery: this._jQuery, uid: this._uid });
+        this._trigger = triggerGridEvent.bind(this);
+
+        bindPrototypeMethods(this);
 
         if (options?.createPreHeaderPanel) {
             // for compat, as draggable grouping plugin expects preHeaderPanel for grouping
@@ -324,20 +309,6 @@ export class Grid<TItem = any> implements IGrid<TItem> {
         this._focusSink1?.insertAdjacentElement("afterend", this._groupingPanel);
     }
 
-    private onEvent<K extends keyof HTMLElementEventMap>(el: HTMLElement, type: K,
-        listener: (this: HTMLElement, ev: HTMLElementEventMap[K]) => any,
-        args?: { capture?: boolean }): void {
-        if (!args?.capture && this._jQuery) {
-            this._jQuery(el).on(type + "." + this._uid, listener as any);
-        }
-        else {
-            el.addEventListener(type, listener, {
-                signal: this._eventDisposer.signal,
-                ...args
-            });
-        }
-    }
-
     private getSignals(): GridSignals {
         return this._signals;
     }
@@ -376,11 +347,11 @@ export class Grid<TItem = any> implements IGrid<TItem> {
         this.resizeCanvas();
         this.bindAncestorScrollEvents();
 
-        this.onEvent(this._container, "resize", this.resizeCanvas);
+        this._on(this._container, "resize", this.resizeCanvas);
 
         viewports.forEach(vp => {
             var scrollTicking = false;
-            this.onEvent(vp, "scroll", (e) => {
+            this._on(vp, "scroll", (e) => {
                 if (!scrollTicking) {
                     scrollTicking = true;
 
@@ -393,16 +364,16 @@ export class Grid<TItem = any> implements IGrid<TItem> {
         });
 
         viewports.forEach(vp => {
-            this.onEvent(vp, "wheel", this.handleMouseWheel as any);
-            this.onEvent(vp, "mousewheel" as any, this.handleMouseWheel);
+            this._on(vp, "wheel", this.handleMouseWheel as any);
+            this._on(vp, "mousewheel" as any, this.handleMouseWheel);
         });
 
-        this.refsForEach(hRefs => {
-            const hs = hRefs.headerCols;
+        this.refsForEach(h => {
+            const hs = h.headerCols;
             if (hs) {
                 hs.onselectstart = () => false;
-                this.onEvent(hs, "contextmenu", this.handleHeaderContextMenu);
-                this.onEvent(hs, "click", this.handleHeaderClick);
+                this._on(hs, "contextmenu", this.handleHeaderContextMenu);
+                this._on(hs, "click", this.handleHeaderClick);
                 if (this._jQuery) {
                     this._jQuery(hs)
                         .on('mouseenter.' + this._uid, '.slick-header-column', this.handleHeaderMouseEnter)
@@ -410,25 +381,25 @@ export class Grid<TItem = any> implements IGrid<TItem> {
                 }
                 else {
                     // need to reimplement this similar to jquery events
-                    this.onEvent(hs, "mouseenter", e => (e.target as HTMLElement).closest(".slick-header-column") &&
+                    this._on(hs, "mouseenter", e => (e.target as HTMLElement).closest(".slick-header-column") &&
                         this.handleHeaderMouseEnter(e));
-                    this.onEvent(hs, "mouseleave", e => (e.target as HTMLElement).closest(".slick-header-column") &&
+                    this._on(hs, "mouseleave", e => (e.target as HTMLElement).closest(".slick-header-column") &&
                         this.handleHeaderMouseLeave(e));
                 }
             }
 
-            hRefs.headerRowCols && this.onEvent(hRefs.headerRowCols.parentElement, 'scroll', this.handleHeaderFooterRowScroll);
-            hRefs.footerRowCols && this.onEvent(hRefs.footerRowCols.parentElement, 'scroll', this.handleHeaderFooterRowScroll);
+            h.headerRowCols && this._on(h.headerRowCols.parentElement, 'scroll', this.handleHeaderFooterRowScroll);
+            h.footerRowCols && this._on(h.footerRowCols.parentElement, 'scroll', this.handleHeaderFooterRowScroll);
         });
 
-        [this._focusSink1, this._focusSink2].forEach(fs => this.onEvent(fs, "keydown", this.handleKeyDown));
+        [this._focusSink1, this._focusSink2].forEach(fs => this._on(fs, "keydown", this.handleKeyDown));
 
         var canvases = Array.from<HTMLElement>(this.getCanvases());
         canvases.forEach(canvas => {
-            this.onEvent(canvas, "keydown", this.handleKeyDown)
-            this.onEvent(canvas, "click", this.handleClick)
-            this.onEvent(canvas, "dblclick", this.handleDblClick)
-            this.onEvent(canvas, "contextmenu", this.handleContextMenu);
+            this._on(canvas, "keydown", this.handleKeyDown)
+            this._on(canvas, "click", this.handleClick)
+            this._on(canvas, "dblclick", this.handleDblClick)
+            this._on(canvas, "contextmenu", this.handleContextMenu);
         });
 
         if (this._jQuery && (this._jQuery.fn as any).drag) {
@@ -459,8 +430,8 @@ export class Grid<TItem = any> implements IGrid<TItem> {
                     .on('mouseleave' + this._uid, '.slick-cell', this.handleMouseLeave);
             }
             else {
-                this.onEvent(canvas, "mouseenter", e => (e.target as HTMLElement)?.classList?.contains("slick-cell") && this.handleMouseEnter(e), { capture: true });
-                this.onEvent(canvas, "mouseleave", e => (e.target as HTMLElement)?.classList?.contains("slick-cell") && this.handleMouseLeave(e), { capture: true });
+                this._on(canvas, "mouseenter", e => (e.target as HTMLElement)?.classList?.contains("slick-cell") && this.handleMouseEnter(e), { capture: true });
+                this._on(canvas, "mouseleave", e => (e.target as HTMLElement)?.classList?.contains("slick-cell") && this.handleMouseLeave(e), { capture: true });
             }
         });
 
@@ -468,8 +439,8 @@ export class Grid<TItem = any> implements IGrid<TItem> {
         if (navigator.userAgent.toLowerCase().match(/webkit/) &&
             navigator.userAgent.toLowerCase().match(/macintosh/)) {
             canvases.forEach(c => {
-                this.onEvent(c, "wheel" as any, this.handleMouseWheel as any);
-                this.onEvent(c, "mousewheel" as any, this.handleMouseWheel as any);
+                this._on(c, "wheel" as any, this.handleMouseWheel as any);
+                this._on(c, "mousewheel" as any, this.handleMouseWheel as any);
             });
         }
     }
@@ -619,7 +590,7 @@ export class Grid<TItem = any> implements IGrid<TItem> {
         while ((elem = elem?.parentNode as HTMLElement) != document.body && elem != null) {
             // bind to scroll containers only
             if (elem == pane.viewport || elem.scrollWidth != elem.clientWidth || elem.scrollHeight != elem.clientHeight) {
-                this.onEvent(elem, 'scroll', this.handleActiveCellPositionChange);
+                this._on(elem, 'scroll', this.handleActiveCellPositionChange);
                 this._boundAncestorScroll.push(elem);
             }
         }
@@ -628,7 +599,7 @@ export class Grid<TItem = any> implements IGrid<TItem> {
     private unbindAncestorScrollEvents(): void {
         if (this._boundAncestorScroll) {
             for (var x of this._boundAncestorScroll)
-                x.removeEventListener('scroll', this.handleActiveCellPositionChange);
+                this._off(x, 'scroll', this.handleActiveCellPositionChange);
         }
         this._boundAncestorScroll = [];
     }
@@ -658,7 +629,7 @@ export class Grid<TItem = any> implements IGrid<TItem> {
             columnDef.toolTip = toolTip;
         }
 
-        this.trigger(this.onBeforeHeaderCellDestroy, {
+        this._trigger(this.onBeforeHeaderCellDestroy, {
             node: header,
             column: columnDef
         });
@@ -680,7 +651,7 @@ export class Grid<TItem = any> implements IGrid<TItem> {
                 nameSpan.textContent = columnDef.name ?? '';
         }
 
-        this.trigger(this.onHeaderCellRendered, {
+        this._trigger(this.onHeaderCellRendered, {
             node: header,
             column: columnDef
         });
@@ -736,7 +707,7 @@ export class Grid<TItem = any> implements IGrid<TItem> {
                 .forEach((el) => {
                     var columnDef = this.getColumnFromNode(el);
                     if (columnDef) {
-                        this.trigger(this.onBeforeFooterRowCellDestroy, {
+                        this._trigger(this.onBeforeFooterRowCellDestroy, {
                             node: el as HTMLElement,
                             column: columnDef
                         });
@@ -764,7 +735,7 @@ export class Grid<TItem = any> implements IGrid<TItem> {
 
             footerRowColsNode.appendChild(footerRowCell);
 
-            this.trigger(this.onFooterRowCellRendered, {
+            this._trigger(this.onFooterRowCellRendered, {
                 node: footerRowCell,
                 column: m
             });
@@ -777,7 +748,7 @@ export class Grid<TItem = any> implements IGrid<TItem> {
                 .forEach((el) => {
                     var columnDef = this.getColumnFromNode(el);
                     if (columnDef) {
-                        this.trigger(this.onBeforeHeaderCellDestroy, {
+                        this._trigger(this.onBeforeHeaderCellDestroy, {
                             node: el as HTMLElement,
                             column: columnDef
                         });
@@ -794,7 +765,7 @@ export class Grid<TItem = any> implements IGrid<TItem> {
                 .forEach((el) => {
                     var columnDef = this.getColumnFromNode(el);
                     if (columnDef) {
-                        this.trigger(this.onBeforeHeaderRowCellDestroy, {
+                        this._trigger(this.onBeforeHeaderRowCellDestroy, {
                             node: el as HTMLElement,
                             column: columnDef,
                             grid: this
@@ -834,7 +805,7 @@ export class Grid<TItem = any> implements IGrid<TItem> {
                 </div> as HTMLElement);
 
             this._jQuery?.(header).data("column", m);
-            this.trigger(this.onHeaderCellRendered, { node: header, column: m });
+            this._trigger(this.onHeaderCellRendered, { node: header, column: m });
 
             if (this._options.showHeaderRow) {
                 const headerRowColsNode = this._layout.getHeaderRowColsFor(i);
@@ -843,7 +814,7 @@ export class Grid<TItem = any> implements IGrid<TItem> {
                 const headerRowCell = headerRowColsNode.appendChild(
                     <div class={"slick-headerrow-column l" + i + " r" + i} data-c={i} /> as HTMLElement);
                 this._jQuery?.(headerRowCell).data("column", m);
-                this.trigger(this.onHeaderRowCellRendered, { node: headerRowCell, column: m });
+                this._trigger(this.onHeaderRowCellRendered, { node: headerRowCell, column: m });
             }
         }
 
@@ -857,72 +828,12 @@ export class Grid<TItem = any> implements IGrid<TItem> {
     }
 
     private setupColumnSort(): void {
-        const handler = (e: MouseEvent) => {
-            var tgt = e.target as Element;
-            if (tgt.classList.contains("slick-resizable-handle")) {
-                return;
-            }
-
-            var colNode = tgt.closest(".slick-header-column");
-            if (!colNode) {
-                return;
-            }
-
-            var column = this.getColumnFromNode(colNode);
-            if (column.sortable) {
-                if (!this.getEditorLock().commitCurrentEdit()) {
-                    return;
-                }
-
-                var sortOpts = null;
-                var i = 0;
-                for (; i < this._sortColumns.length; i++) {
-                    if (this._sortColumns[i].columnId == column.id) {
-                        sortOpts = this._sortColumns[i];
-                        sortOpts.sortAsc = !sortOpts.sortAsc;
-                        break;
-                    }
-                }
-
-                if (e.metaKey && this._options.multiColumnSort) {
-                    if (sortOpts) {
-                        this._sortColumns.splice(i, 1);
-                    }
-                }
-                else {
-                    if ((!e.shiftKey && !e.metaKey) || !this._options.multiColumnSort) {
-                        this._sortColumns = [];
-                    }
-
-                    if (!sortOpts) {
-                        sortOpts = { columnId: column.id, sortAsc: column.defaultSortAsc };
-                        this._sortColumns.push(sortOpts);
-                    } else if (this._sortColumns.length == 0) {
-                        this._sortColumns.push(sortOpts);
-                    }
-                }
-
-                this.setSortColumns(this._sortColumns);
-
-                if (!this._options.multiColumnSort) {
-                    this.trigger(this.onSort, {
-                        multiColumnSort: false,
-                        sortCol: column,
-                        sortAsc: sortOpts.sortAsc
-                    }, e);
-                } else {
-                    var cols = this._initCols;
-                    this.trigger(this.onSort, {
-                        multiColumnSort: true,
-                        sortCols: this._sortColumns.map(col => ({ sortCol: cols[this.getInitialColumnIndex(col.columnId)], sortAsc: col.sortAsc }))
-                    }, e);
-                }
-            }
-        };
-
-        this.mapRefs(h => h.headerCols).forEach(el => {
-            this.onEvent(el, 'click', handler as any);
+        this._columnSortHandler ??= columnSortHandler.bind({
+            grid: this,
+            trigger: this._trigger,
         });
+
+        this.mapRefs(h => h.headerCols).forEach(el => this._on(el, 'click', this._columnSortHandler));
     }
 
     private static offset(el: HTMLElement | null) {
@@ -1000,7 +911,7 @@ export class Grid<TItem = any> implements IGrid<TItem> {
                 ));
 
                 this.setColumns(reorderedCols);
-                this.trigger(this.onColumnsReordered, {});
+                this._trigger(this.onColumnsReordered, {});
                 e.stopPropagation();
                 this.setupColumnResize();
                 if (this._activeCellNode) {
@@ -1066,7 +977,7 @@ export class Grid<TItem = any> implements IGrid<TItem> {
                         lastDragOverPos = { pageX: z.pageX, pageY: z.pageY };
                         z.preventDefault();
                     }
-                    this.onEvent(document as any, 'dragover', docDragOver);
+                    this._on(document as any, 'dragover', docDragOver);
                 }
 
                 pageX = e.pageX;
@@ -1129,10 +1040,10 @@ export class Grid<TItem = any> implements IGrid<TItem> {
             }
 
             if (noJQueryDrag) {
-                this.onEvent(handle, "dragstart", dragStart);
-                this.onEvent(handle, "drag", drag);
-                this.onEvent(handle, "dragend", dragEnd);
-                this.onEvent(handle, "dragover", (e: any) => { e.preventDefault(); e.dataTransfer.effectAllowed = "move"; });
+                this._on(handle, "dragstart", dragStart);
+                this._on(handle, "drag", drag);
+                this._on(handle, "dragend", dragEnd);
+                this._on(handle, "dragover", (e: any) => { e.preventDefault(); e.dataTransfer.effectAllowed = "move"; });
             }
             else {
                 (this._jQuery(handle) as any)
@@ -1149,7 +1060,7 @@ export class Grid<TItem = any> implements IGrid<TItem> {
         invalidate && this.invalidateAllRows();
         this.updateCanvasWidth(true);
         this.render();
-        this.trigger(this.onColumnsResized);
+        this._trigger(this.onColumnsResized);
     }
 
     private setOverflow(): void {
@@ -1205,7 +1116,7 @@ export class Grid<TItem = any> implements IGrid<TItem> {
     destroy() {
         this.getEditorLock().cancelCurrentEdit();
 
-        this.trigger(this.onBeforeDestroy);
+        this._trigger(this.onBeforeDestroy);
 
         var i = this._plugins.length;
         while (i--) {
@@ -1224,7 +1135,14 @@ export class Grid<TItem = any> implements IGrid<TItem> {
         this.unbindAncestorScrollEvents();
         this.unbindFromData();
         this.unregisterSelectionModel();
-        this._jQuery?.(this._container).off(".slickgrid");
+        if (this._jQuery) {
+            this._jQuery(this._container).off("." + this._uid);
+            this._jQuery(document).off("." + this._uid);
+            this._jQuery(this._container).find(".slick-header-column,. slick-headerrow-column, .slick-footerrow-column, .slick-focus-sink").off("." + this._uid);
+            this._jQuery(this.mapRefs(h => h.headerCols)).off("." + this._uid);
+            this._jQuery(this.mapRefs(h => h.headerRowCols)).off("." + this._uid);
+            this._jQuery(this.mapRefs(h => h.footerRowCols)).off("." + this._uid);
+        }
         this.removeCssRules();
         this.sortableColInstances?.forEach(instance => { try { instance.destroy() } catch (e) { console.warn(e); } });
 
@@ -1256,8 +1174,6 @@ export class Grid<TItem = any> implements IGrid<TItem> {
 
     //////////////////////////////////////////////////////////////////////////////////////////////
     // General
-
-    private trigger = triggerGridEvent;
 
     getEditorLock(): EditorLock {
         return this._options.editorLock;
@@ -1356,7 +1272,7 @@ export class Grid<TItem = any> implements IGrid<TItem> {
     private handleSelectedRangesChanged = (e: IEventData, ranges: CellRange[]): void => {
         var previousSelectedRows = this._selectedRows.slice(0); // shallow copy previously selected rows for later comparison
         this._selectedRows = [];
-        var hash: any = {}, cols = this._cols;
+        var hash: any = Object.create(null), cols = this._cols;
         for (var i = 0; i < ranges.length; i++) {
             for (var j = ranges[i].fromRow; j <= ranges[i].toRow; j++) {
                 if (!hash[j]) {  // prevent duplicates
@@ -1366,7 +1282,7 @@ export class Grid<TItem = any> implements IGrid<TItem> {
                 for (var k = ranges[i].fromCell; k <= ranges[i].toCell; k++) {
                     if (this.canCellBeSelected(j, k)) {
                         const cid = cols[k].id;
-                        if (!isPollutingKey(cid)) {
+                        if (!isPollutingKey(j as any) && !isPollutingKey(cid)) {
                             hash[j][cid] = this._options.selectedCellCssClass;
                         }
                     }
@@ -1381,7 +1297,7 @@ export class Grid<TItem = any> implements IGrid<TItem> {
             var newSelectedAdditions = this._selectedRows.filter(i => previousSelectedRows.indexOf(i) < 0);
             var newSelectedDeletions = previousSelectedRows.filter(i => this._selectedRows.indexOf(i) < 0);
 
-            this.trigger(this.onSelectedRowsChanged, {
+            this._trigger(this.onSelectedRowsChanged, {
                 rows: this.getSelectedRows(),
                 previousSelectedRows: previousSelectedRows,
                 caller: caller,
@@ -1391,7 +1307,7 @@ export class Grid<TItem = any> implements IGrid<TItem> {
         }
 
         this._selectedRows = [];
-        hash = {}, cols = this._cols;
+        hash = Object.create(null), cols = this._cols;
         for (var i = 0; i < ranges.length; i++) {
             for (var j = ranges[i].fromRow; j <= ranges[i].toRow; j++) {
                 if (!hash[j]) {  // prevent duplicates
@@ -1401,7 +1317,7 @@ export class Grid<TItem = any> implements IGrid<TItem> {
                 for (var k = ranges[i].fromCell; k <= ranges[i].toCell; k++) {
                     if (this.canCellBeSelected(j, k)) {
                         const cid = cols[k].id;
-                        if (!isPollutingKey(cid)) {
+                        if (!isPollutingKey(j as any) && !isPollutingKey(cid)) {
                             hash[j][cid] = this._options.selectedCellCssClass;
                         }
                     }
@@ -1690,7 +1606,18 @@ export class Grid<TItem = any> implements IGrid<TItem> {
     // Rendering / Scrolling
 
     private getRowTop(row: number): number {
-        return this._options.rowHeight * row - this._pageOffset;
+        const { frozenTopLast, frozenBottomFirst } = this._layout.getRefs();
+        const rowHeight = this._options.rowHeight;
+        if (row <= frozenTopLast)
+            return rowHeight * row;
+
+        if (row >= frozenBottomFirst)
+            return rowHeight * (row - frozenBottomFirst);
+
+        if (frozenTopLast >= 0)
+            row -= (frozenTopLast + 1);
+
+        return rowHeight * row - this._pageOffset;
     }
 
     private getRowFromPosition(y: number): number {
@@ -1718,7 +1645,7 @@ export class Grid<TItem = any> implements IGrid<TItem> {
             this._vScrollDir = (this._scrollTopPrev + oldOffset < newScrollTop + this._pageOffset) ? 1 : -1;
             this._scrollTopRendered = (this._scrollTop = this._scrollTopPrev = newScrollTop);
             getAllVScrollContainers(this._layout.getRefs()).forEach(sc => sc.scrollTop = newScrollTop);
-            this.trigger(this.onViewportChanged);
+            this._trigger(this.onViewportChanged);
         }
     }
 
@@ -2377,18 +2304,17 @@ export class Grid<TItem = any> implements IGrid<TItem> {
             activeRow: this._activeRow,
             cellCssClasses: this._cellCssClasses,
             frozenPinned: this._layout.getRefs(),
+            getRowTop: this.getRowTop,
             grid: this,
             item: row != null ? this.getDataItem(row) : null,
             row: row,
+            colLeft: this._colLeft,
+            colRight: this._colRight,
             // row only args
-            colLeft: rowRendering ? this._colLeft : null,
-            colRight: rowRendering ? this._colRight : null,
             range: null,
             sbCenter: rowRendering ? [] : null,
             sbEnd: rowRendering ? [] : null,
             sbStart: rowRendering ? [] : null,
-            getFrozenRowOffset: rowRendering ? this._layout.getFrozenRowOffset.bind(this._layout) : null,
-            getRowTop: rowRendering ? this.getRowTop : null,
             // cell only args
             cachedRow: row != null ? this._rowsCache[row] : null,
             cell: cell,
@@ -2700,11 +2626,11 @@ export class Grid<TItem = any> implements IGrid<TItem> {
                     this._hRender = setTimeout(this.render, 50);
                 }
 
-                this.trigger(this.onViewportChanged);
+                this._trigger(this.onViewportChanged);
             }
         }
 
-        this.trigger(this.onScroll, { scrollLeft: this._scrollLeft, scrollTop: this._scrollTop });
+        this._trigger(this.onScroll, { scrollLeft: this._scrollLeft, scrollTop: this._scrollTop });
 
         return !!(hScrollDist || vScrollDist);
     }
@@ -2815,7 +2741,7 @@ export class Grid<TItem = any> implements IGrid<TItem> {
         this._cellCssClasses[key] = hash;
         this.updateCellCssStylesOnRenderedRows(hash, null);
 
-        this.trigger(this.onCellCssStylesChanged, { key: key, hash: hash });
+        this._trigger(this.onCellCssStylesChanged, { key: key, hash: hash });
     }
 
     removeCellCssStyles(key: string): void {
@@ -2826,7 +2752,7 @@ export class Grid<TItem = any> implements IGrid<TItem> {
         this.updateCellCssStylesOnRenderedRows(null, this._cellCssClasses[key]);
         delete this._cellCssClasses[key];
 
-        this.trigger(this.onCellCssStylesChanged, { key: key, hash: null });
+        this._trigger(this.onCellCssStylesChanged, { key: key, hash: null });
     }
 
     setCellCssStyles(key: string, hash: CellStylesHash): void {
@@ -2835,7 +2761,7 @@ export class Grid<TItem = any> implements IGrid<TItem> {
         this._cellCssClasses[key] = hash;
         this.updateCellCssStylesOnRenderedRows(hash, prevHash);
 
-        this.trigger(this.onCellCssStylesChanged, { key: key, hash: hash });
+        this._trigger(this.onCellCssStylesChanged, { key: key, hash: hash });
     }
 
     getCellCssStyles(key: string): CellStylesHash {
@@ -2873,7 +2799,7 @@ export class Grid<TItem = any> implements IGrid<TItem> {
             return false;
         }
 
-        var retval = this.trigger(this.onDragInit, dd, e);
+        var retval = this._trigger(this.onDragInit, dd, e);
         if ((e as IEventData).isImmediatePropagationStopped && (e as IEventData).isImmediatePropagationStopped()) {
             e.preventDefault();
             return retval;
@@ -2890,7 +2816,7 @@ export class Grid<TItem = any> implements IGrid<TItem> {
             return false;
         }
 
-        var retval = this.trigger(this.onDragStart, dd, e);
+        var retval = this._trigger(this.onDragStart, dd, e);
         if ((e as IEventData).isImmediatePropagationStopped && (e as IEventData).isImmediatePropagationStopped()) {
             return retval;
         }
@@ -2899,15 +2825,15 @@ export class Grid<TItem = any> implements IGrid<TItem> {
     }
 
     private handleDrag(e: UIEvent, dd: any): any {
-        return this.trigger(this.onDrag, dd, e);
+        return this._trigger(this.onDrag, dd, e);
     }
 
     private handleDragEnd(e: UIEvent, dd: any): void {
-        this.trigger(this.onDragEnd, dd, e);
+        this._trigger(this.onDragEnd, dd, e);
     }
 
     private handleKeyDown(e: KeyboardEvent): void {
-        this.trigger(this.onKeyDown, { row: this._activeRow, cell: this._activeCell }, e);
+        this._trigger(this.onKeyDown, { row: this._activeRow, cell: this._activeCell }, e);
         var handled = (e as IEventData).isImmediatePropagationStopped && (e as IEventData).isImmediatePropagationStopped();
 
         if (!handled) {
@@ -3041,7 +2967,7 @@ export class Grid<TItem = any> implements IGrid<TItem> {
             return;
         }
 
-        this.trigger(this.onClick, { row: cell.row, cell: cell.cell }, e);
+        this._trigger(this.onClick, { row: cell.row, cell: cell.cell }, e);
         if ((e as IEventData).isImmediatePropagationStopped && (e as IEventData).isImmediatePropagationStopped()) {
             return;
         }
@@ -3068,7 +2994,7 @@ export class Grid<TItem = any> implements IGrid<TItem> {
             return;
         }
 
-        this.trigger(this.onContextMenu, {}, e);
+        this._trigger(this.onContextMenu, {}, e);
     }
 
     private handleDblClick(e: MouseEvent): void {
@@ -3077,7 +3003,7 @@ export class Grid<TItem = any> implements IGrid<TItem> {
             return;
         }
 
-        this.trigger(this.onDblClick, { row: cell.row, cell: cell.cell }, e);
+        this._trigger(this.onDblClick, { row: cell.row, cell: cell.cell }, e);
         if ((e as IEventData).isImmediatePropagationStopped && (e as IEventData).isImmediatePropagationStopped()) {
             return;
         }
@@ -3087,34 +3013,34 @@ export class Grid<TItem = any> implements IGrid<TItem> {
         }
     }
 
-    private handleHeaderMouseEnter(e: MouseEvent): void {
+    private handleHeaderMouseEnter(e: Event): void {
         const column = this.getColumnFromNode(e.target as HTMLElement)
-        column && this.trigger(this.onHeaderMouseEnter, { column }, e);
+        column && this._trigger(this.onHeaderMouseEnter, { column }, e);
     }
 
-    private handleHeaderMouseLeave(e: MouseEvent): void {
+    private handleHeaderMouseLeave(e: Event): void {
         const column = this.getColumnFromNode(e.target as HTMLElement)
-        column && this.trigger(this.onHeaderMouseLeave, { column }, e);
+        column && this._trigger(this.onHeaderMouseLeave, { column }, e);
     }
 
     private handleHeaderContextMenu(e: any): void {
         var header = e.target.closest(".slick-header-column");
         var column = this.getColumnFromNode(header);
-        column && this.trigger(this.onHeaderContextMenu, { column }, e);
+        column && this._trigger(this.onHeaderContextMenu, { column }, e);
     }
 
     private handleHeaderClick(e: any): void {
         var header = e.target.closest(".slick-header-column");
         var column = this.getColumnFromNode(header);
-        column && this.trigger(this.onHeaderClick, { column: column }, e);
+        column && this._trigger(this.onHeaderClick, { column: column }, e);
     }
 
-    private handleMouseEnter(e: MouseEvent): void {
-        this.trigger(this.onMouseEnter, {}, e);
+    private handleMouseEnter(e: Event): void {
+        this._trigger(this.onMouseEnter, {}, e);
     }
 
-    private handleMouseLeave(e: MouseEvent): void {
-        this.trigger(this.onMouseLeave, {}, e);
+    private handleMouseLeave(e: Event): void {
+        this._trigger(this.onMouseLeave, {}, e);
     }
 
     private cellExists(row: number, cell: number): boolean {
@@ -3201,9 +3127,8 @@ export class Grid<TItem = any> implements IGrid<TItem> {
             return null;
         }
 
-        var rowOffset = this._layout.getFrozenRowOffset(row);
         const cols = this._cols, { pinnedStartLast, pinnedEndFirst } = this._layout.getRefs();
-        var y1 = this.getRowTop(row) - rowOffset;
+        var y1 = this.getRowTop(row);
         var y2 = y1 + this._options.rowHeight - 1;
         var x1 = 0;
         for (var i = 0; i < cell; i++) {
@@ -3340,7 +3265,7 @@ export class Grid<TItem = any> implements IGrid<TItem> {
         }
 
         if (!suppressActiveCellChangedEvent) {
-            this.trigger(this.onActiveCellChanged, this.getActiveCell() as ArgsCell);
+            this._trigger(this.onActiveCellChanged, this.getActiveCell() as ArgsCell);
         }
     }
 
@@ -3382,7 +3307,7 @@ export class Grid<TItem = any> implements IGrid<TItem> {
         if (!this._currentEditor) {
             return;
         }
-        this.trigger(this.onBeforeCellEditorDestroy, { editor: this._currentEditor });
+        this._trigger(this.onBeforeCellEditorDestroy, { editor: this._currentEditor });
         this._currentEditor.destroy();
         this._currentEditor = null;
 
@@ -3423,7 +3348,7 @@ export class Grid<TItem = any> implements IGrid<TItem> {
         var columnDef = this._cols[this._activeCell];
         var item = this.getDataItem(this._activeRow);
 
-        if (this.trigger(this.onBeforeEditCell, { row: this._activeRow, cell: this._activeCell, item: item, column: columnDef }) === false) {
+        if (this._trigger(this.onBeforeEditCell, { row: this._activeRow, cell: this._activeCell, item: item, column: columnDef }) === false) {
             this.setFocus();
             return;
         }
@@ -3500,7 +3425,7 @@ export class Grid<TItem = any> implements IGrid<TItem> {
             return;
         }
 
-        this.trigger(this.onActiveCellPositionChanged, {});
+        this._trigger(this.onActiveCellPositionChanged, {});
 
         if (this._currentEditor) {
             var cellBox = this.getActiveCellPosition();
@@ -3880,7 +3805,7 @@ export class Grid<TItem = any> implements IGrid<TItem> {
                             execute: function () {
                                 this.editor.applyValue(item, this.serializedValue);
                                 self.updateRow(this.row);
-                                self.trigger(self.onCellChange, {
+                                self._trigger(self.onCellChange, {
                                     row: this.activeRow,
                                     cell: self._activeCell,
                                     item: item
@@ -3889,7 +3814,7 @@ export class Grid<TItem = any> implements IGrid<TItem> {
                             undo: function () {
                                 this.editor.applyValue(item, this.prevSerializedValue);
                                 self.updateRow(this.row);
-                                self.trigger(self.onCellChange, {
+                                self._trigger(self.onCellChange, {
                                     row: this.activeRow,
                                     cell: self._activeCell,
                                     item: item
@@ -3909,7 +3834,7 @@ export class Grid<TItem = any> implements IGrid<TItem> {
                         var newItem = {} as TItem;
                         this._currentEditor.applyValue(newItem, this._currentEditor.serializeValue());
                         this.makeActiveCellNormal();
-                        this.trigger(this.onAddNewRow, { item: newItem, column: column });
+                        this._trigger(this.onAddNewRow, { item: newItem, column: column });
                     }
 
                     // check whether the lock has been re-acquired by event handlers
@@ -3920,7 +3845,7 @@ export class Grid<TItem = any> implements IGrid<TItem> {
                     this._activeCellNode.offsetWidth;  // force layout
                     this._activeCellNode.classList.add("invalid");
 
-                    this.trigger(this.onValidationError, {
+                    this._trigger(this.onValidationError, {
                         editor: this._currentEditor,
                         cellNode: this._activeCellNode,
                         validationResults: validationResults,

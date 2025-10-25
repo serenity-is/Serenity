@@ -541,19 +541,6 @@ export const FrozenLayout: { new(): LayoutEngine } = function (): LayoutEngine {
         }
     }
 
-    function getRowOffset(row: number): number {
-        if (!frozenRows || (frozenBottom && row < frozenRowIdx) || (!frozenBottom && row <= frozenRowIdx))
-            return 0;
-
-        if (!frozenBottom)
-            return frozenRows * host.getOptions().rowHeight;
-
-        var realScrollHeight = host.getViewportInfo().realScrollHeight;
-        if (realScrollHeight >= viewportTopH)
-            return realScrollHeight;
-
-        return frozenRowIdx * host.getOptions().rowHeight;
-    }
 
     function getRowFromCellNode(cellNode: HTMLElement, clientX: number, clientY: number): number {
         var row = host.getRowFromNode(cellNode.parentNode as HTMLElement);
@@ -648,7 +635,6 @@ return {
     getHeaderRowColsFor,
     getHeaderRowColumn,
     getRowFromCellNode,
-    getFrozenRowOffset: getRowOffset,
     getViewportNodeFor,
     init,
     getRefs,

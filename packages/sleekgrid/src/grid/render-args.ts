@@ -8,11 +8,13 @@ export interface RowCellCommonRenderArgs<TItem> {
     activeRow: number;
     cachedRow?: CachedRow;
     cellCssClasses?: Record<string, CellStylesHash>;
+    colLeft: number[];
+    colRight: number[];
     frozenPinned: {
-        frozenBottomFirst: number,
-        frozenTopLast: number,
-        pinnedStartLast: number,
-        pinnedEndFirst: number
+        frozenBottomFirst: number;
+        frozenTopLast: number;
+        pinnedStartLast: number;
+        pinnedEndFirst: number;
     };
     grid: Pick<IGrid<TItem>, "getColumns" | "getData" | "getDataItemValueForColumn" | "getDataLength" | "getFormatter"> & {
         getOptions: () => { addNewRowCssClass?: string }
@@ -22,13 +24,10 @@ export interface RowCellCommonRenderArgs<TItem> {
 }
 
 export interface RowRenderArgs<TItem> extends RowCellCommonRenderArgs<TItem> {
-    colLeft: number[];
-    colRight: number[];
     range: ViewRange;
     sbCenter: string[];
     sbEnd: string[];
     sbStart: string[];
-    getFrozenRowOffset: (row: number) => number;
     getRowTop: (row: number) => number;
 }
 

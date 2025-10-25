@@ -19,7 +19,6 @@ export interface LayoutEngine {
     getCanvasWidth(): number;
     getFooterRowColsFor(cell: number): HTMLElement;
     getFooterRowColumn(cell: number): HTMLElement;
-    getFrozenRowOffset(row: number): number;
     getHeaderColsFor(cell: number): HTMLElement;
     getHeaderColumn(cell: number): HTMLElement;
     getHeaderRowColsFor(cell: number): HTMLElement;
