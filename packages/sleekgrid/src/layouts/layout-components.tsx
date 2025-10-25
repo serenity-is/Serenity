@@ -15,13 +15,13 @@ function hiddenH(hband: HBand, hide: SignalLike<boolean>, signals: Pick<GridSign
     );
 }
 
-function hiddenVH(vband: VBand, hband: HBand, signals: Pick<GridSignals, "pinnedStartLast" | "pinnedEndFirst" | "frozenTopLast" | "frozenBottomFirst">): boolean | SignalLike<boolean> {
+function hiddenVH(vband: VBand, hband: HBand, signals: Pick<GridSignals, "pinnedStartLast" | "pinnedEndFirst" | "frozenTopLast" | "frozenBottomFirst" | "hideFooterRow" | "hideHeaderRow">): boolean | SignalLike<boolean> {
     if (vband === "body" && hband === "main")
         return false;
 
     return computed(() =>
-        (vband === "top" && signals.frozenTopLast.value < 0) ||
-        (vband === "body" && signals.frozenBottomFirst.value === Infinity) ||
+        (vband === "top" && signals.hideHeaderRow && signals.frozenTopLast.value < 0) ||
+        (vband === "bottom" && signals.hideFooterRow && signals.frozenBottomFirst.value === Infinity) ||
         (hband === "start" && signals.pinnedStartLast.value < 0) ||
         (hband === "end" && signals.pinnedEndFirst.value == Infinity));
 }

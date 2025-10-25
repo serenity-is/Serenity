@@ -1,5 +1,5 @@
 import { Column, GridOptions, ViewRange } from "../core";
-import { BodyPane, HeaderPane, TopPane, TopPanel } from "./layout-components";
+import { BodyPane, BottomPane, HeaderPane, TopPane, TopPanel } from "./layout-components";
 import type { LayoutEngine } from "./layout-engine";
 import type { LayoutHost } from "./layout-host";
 import type { GridLayoutHRefs, GridLayoutRefs } from "./layout-refs";
@@ -31,6 +31,8 @@ export const FrozenLayout: { new(): LayoutEngine } = function (): LayoutEngine {
             <TopPane hband="main" refs={refs} signals={signals} />
             <BodyPane hband="start" refs={refs} signals={signals} />
             <BodyPane hband="main" refs={refs} signals={signals} />
+            <BottomPane hband="start" refs={refs} signals={signals} />
+            <BottomPane hband="main" refs={refs} signals={signals} />
         </>);
 
         adjustFrozenRowsOption();
