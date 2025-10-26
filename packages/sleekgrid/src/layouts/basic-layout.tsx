@@ -69,8 +69,8 @@ export class BasicLayout implements LayoutEngine {
     public setOverflow(): void {
         var alwaysVS = this.host.getOptions().alwaysShowVerticalScroll;
 
-        this.mainRefs.canvas.body.style.overflowX = "auto";
-        this.mainRefs.canvas.body.style.overflowY = alwaysVS ? "scroll" : (this.host.getOptions().autoHeight ? "hidden" : "auto");
+        this.mainRefs.canvas.body.parentElement.style.overflowX = "auto";
+        this.mainRefs.canvas.body.parentElement.style.overflowY = alwaysVS ? "scroll" : (this.host.getOptions().autoHeight ? "hidden" : "auto");
     }
 
     public updateCanvasWidth(): boolean {
