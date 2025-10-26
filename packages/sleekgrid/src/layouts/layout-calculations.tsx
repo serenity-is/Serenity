@@ -1,5 +1,5 @@
 import type { Column } from "../core/column";
-import { mapLayoutRefs, type GridLayoutRefs } from "./layout-refs";
+import { mapBands, type GridLayoutRefs } from "./layout-refs";
 
 export function isStartOfMainOrEnd(colIndex: number, refs: GridLayoutRefs): boolean {
     return (refs.pinnedStartLast + 1 === colIndex) ||
@@ -56,16 +56,16 @@ export function applyLegacyHeightOptions(this: void, { groupingPanel, opt, refs 
     refs: GridLayoutRefs,
 }) {
     if (opt.topPanelHeight != null) {
-        const topPanel = refs.main.topPanel
+        const topPanel = refs.topPanel
         topPanel && (topPanel.style.height = opt.topPanelHeight + "px");
     }
     if (opt.groupingPanelHeight != null) {
         groupingPanel && (groupingPanel.style.height = opt.groupingPanelHeight + "px");
     }
     if (opt.headerRowHeight != null) {
-        mapLayoutRefs(refs, h => h.headerRowCols).forEach(hrc => hrc.style.height = opt.headerRowHeight + "px");
+        mapBands(refs, band => band.headerRowCols).forEach(hrc => hrc.style.height = opt.headerRowHeight + "px");
     }
     if (opt.footerRowHeight != null) {
-        mapLayoutRefs(refs, h => h.footerRowCols).forEach(frc => frc.style.height = opt.footerRowHeight + "px");
+        mapBands(refs, band => band.footerRowCols).forEach(frc => frc.style.height = opt.footerRowHeight + "px");
     }
 }

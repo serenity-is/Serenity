@@ -1,14 +1,14 @@
 import { FooterRow, Header, HeaderRow, TopPanel, Viewport } from "./layout-components";
 import { LayoutEngine } from "./layout-engine";
 import type { LayoutHost } from "./layout-host";
-import { type GridLayoutHRefs, type GridLayoutRefs, type ViewportPaneRefs } from "./layout-refs";
+import { type GridBandRefs, type GridLayoutRefs, type DataPaneRefs } from "./layout-refs";
 
 export class BasicLayout implements LayoutEngine {
     protected canvasWidth: number;
     protected headersWidth: number;
     protected host: LayoutHost;
-    protected bodyRefs: ViewportPaneRefs;
-    protected mainRefs: GridLayoutHRefs;
+    protected bodyRefs: DataPaneRefs;
+    protected mainRefs: GridBandRefs;
     protected refs: GridLayoutRefs;
 
     init(host: LayoutHost) {
@@ -18,11 +18,11 @@ export class BasicLayout implements LayoutEngine {
         this.bodyRefs = (this.mainRefs = refs.main).body;
 
         this.host.getContainerNode().append(<>
-            <Header hband="main" refs={refs} signals={signals} />
+            <Header band="main" refs={refs} signals={signals} />
             <TopPanel refs={refs} signals={signals} />
-            <HeaderRow hband="main" refs={refs} signals={signals} />
-            <Viewport hband="main" vband="body" refs={refs} />
-            <FooterRow hband="main" refs={refs} signals={signals} />
+            <HeaderRow band="main" refs={refs} signals={signals} />
+            <Viewport band="main" pane="body" refs={refs} />
+            <FooterRow band="main" refs={refs} signals={signals} />
         </>);
         this.updateHeadersWidth();
     }
@@ -59,12 +59,8 @@ export class BasicLayout implements LayoutEngine {
         return this.canvasWidth;
     }
 
-    public getRowFromCellNode(cellNode: HTMLElement): number {
-        return this.host.getRowFromNode(cellNode.parentElement);
-    }
-
     public getTopPanel(): HTMLElement {
-        return this.mainRefs.topPanel;
+        return this.refs.topPanel;
     }
 
     public realScrollHeightChange(): void {
@@ -110,7 +106,6 @@ export class BasicLayout implements LayoutEngine {
     public afterHeaderColumnDrag(): void { }
     public afterRenderRows(): void { }
     public afterSetOptions(): void { }
-    public beforeCleanupAndRenderCells(): void { }
 
     readonly layoutName = "basic";
 }

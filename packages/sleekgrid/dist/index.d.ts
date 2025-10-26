@@ -529,12 +529,6 @@ export interface CellNavigation {
 	navigateUp(): boolean;
 	navigate(dir: CellNavigationDirection): boolean;
 }
-export interface ViewRange {
-	top?: number;
-	bottom?: number;
-	leftPx?: number;
-	rightPx?: number;
-}
 export interface ViewportInfo {
 	height: number;
 	width: number;
@@ -549,6 +543,12 @@ export interface ViewportInfo {
 	footerRowHeight: number;
 	numVisibleRows: number;
 }
+export interface ViewRange {
+	top?: number;
+	bottom?: number;
+	leftPx?: number;
+	rightPx?: number;
+}
 export interface GridSignals {
 	readonly showColumnHeader: Signal<boolean>;
 	readonly hideColumnHeader: ReadonlySignal<boolean>;
@@ -558,7 +558,34 @@ export interface GridSignals {
 	readonly hideHeaderRow: ReadonlySignal<boolean>;
 	readonly showFooterRow: Signal<boolean>;
 	readonly hideFooterRow: ReadonlySignal<boolean>;
+	readonly pinnedStartLast: Signal<number>;
+	readonly pinnedEndFirst: Signal<number>;
+	readonly frozenTopLast: Signal<number>;
+	readonly frozenBottomFirst: Signal<number>;
 }
+export interface DataPaneRefs {
+	pane?: HTMLElement;
+	viewport?: HTMLElement;
+	canvas?: HTMLElement;
+}
+export interface GridBandRefs {
+	headerCols?: HTMLElement;
+	headerRowCols?: HTMLElement;
+	readonly top: DataPaneRefs;
+	readonly body: DataPaneRefs;
+	readonly bottom: DataPaneRefs;
+	footerRowCols?: HTMLElement;
+}
+export type GridLayoutRefs = {
+	readonly start: GridBandRefs;
+	readonly main: GridBandRefs;
+	readonly end: GridBandRefs;
+	topPanel?: HTMLElement;
+	pinnedStartLast: number;
+	pinnedEndFirst: number;
+	frozenTopLast: number;
+	frozenBottomFirst: number;
+};
 export interface LayoutHost {
 	cleanUpAndRenderCells(range: ViewRange): void;
 	getAvailableWidth(): number;
@@ -569,69 +596,29 @@ export interface LayoutHost {
 	getDataLength(): number;
 	getOptions(): GridOptions;
 	getSignals(): GridSignals;
-	getRowFromNode(rowNode: HTMLElement): number;
 	getScrollDims(): {
 		width: number;
 		height: number;
 	};
-	getScrollLeft(): number;
-	getScrollTop(): number;
 	getViewportInfo(): ViewportInfo;
+	readonly refs: GridLayoutRefs;
 	removeNode(node: HTMLElement): void;
 	renderRows(range: ViewRange): void;
 }
-export interface ViewportPaneRefs {
-	pane?: HTMLElement;
-	viewport?: HTMLElement;
-	canvas?: HTMLElement;
-}
-export interface GridLayoutHRefs {
-	headerCols?: HTMLElement;
-	topPanel?: HTMLElement;
-	headerRowCols?: HTMLElement;
-	top?: ViewportPaneRefs;
-	body: ViewportPaneRefs;
-	bottom?: ViewportPaneRefs;
-	footerRowCols?: HTMLElement;
-}
-export type GridLayoutRefs = {
-	main: GridLayoutHRefs;
-	start?: GridLayoutHRefs;
-	end?: GridLayoutHRefs;
-	pinnedStartLast: number;
-	pinnedEndFirst: number;
-	frozenTopLast: number;
-	frozenBottomFirst: number;
-};
 export interface LayoutEngine {
 	layoutName: string;
 	init(host: LayoutHost): void;
 	destroy(): void;
 	afterHeaderColumnDrag(): void;
-	afterRenderRows(rendered: ViewRange): void;
 	afterSetOptions(args: GridOptions): void;
-	appendCachedRow(row: number, rowNodeS: HTMLElement, rowNodeC: HTMLElement, rowNodeE: HTMLElement): void;
-	beforeCleanupAndRenderCells(rendered: ViewRange): void;
 	calcCanvasWidth(): number;
-	getCanvasNodeFor(cell: number, row: number): HTMLElement;
 	getCanvasWidth(): number;
-	getFooterRowColsFor(cell: number): HTMLElement;
-	getFooterRowColumn(cell: number): HTMLElement;
-	getFrozenRowOffset(row: number): number;
-	getHeaderColsFor(cell: number): HTMLElement;
-	getHeaderColumn(cell: number): HTMLElement;
-	getHeaderRowColsFor(cell: number): HTMLElement;
-	getHeaderRowColumn(cell: number): HTMLElement;
-	getRowFromCellNode(cellNode: HTMLElement, clientX: number, clientY: number): number;
-	getRefs(): GridLayoutRefs;
-	getViewportNodeFor(cell: number, row: number): HTMLElement;
 	realScrollHeightChange(): void;
 	/** this might be called before init, chicken egg situation */
-	reorderViewColumns(viewCols: Column[], options?: GridOptions): Column[];
+	reorderViewColumns?(viewCols: Column[], refs: GridLayoutRefs): Column[];
 	resizeCanvas(): void;
 	setOverflow(): void;
-	setPaneVisibility(): void;
-	setScroller(): void;
+	setPaneVisibility?(): void;
 	updateCanvasWidth(): boolean;
 	updateHeadersWidth(): void;
 }
@@ -1016,7 +1003,7 @@ export interface IGrid<TItem = any> extends EditorHost, CellNavigation {
 	getActiveCellNode(): HTMLElement;
 	getActiveViewportNode(e?: IEventData): HTMLElement;
 	getCanvases(): any | HTMLElement[];
-	getCanvasNode(columnIdOrIdx?: string | number, row?: number): HTMLElement;
+	getCanvasNode(row?: number, cell?: number): HTMLElement;
 	getCellCssStyles(key: string): CellStylesHash;
 	getCellEditor(): Editor;
 	getCellFromEvent(e: any): {
@@ -1079,7 +1066,7 @@ export interface IGrid<TItem = any> extends EditorHost, CellNavigation {
 	getTotalsFormatter(column: Column<TItem>): ColumnFormat<TItem>;
 	getUID(): string;
 	getViewport(viewportTop?: number, viewportLeft?: number): ViewRange;
-	getViewportNode(columnIdOrIdx?: string | number, row?: number): HTMLElement;
+	getViewportNode(row?: number, cell?: number): HTMLElement;
 	getVisibleColumnById(id: string): Column<TItem>;
 	getVisibleRange(viewportTop?: number, viewportLeft?: number): ViewRange;
 	gotoCell(row: number, cell: number, forceEdit?: boolean): void;
@@ -1206,26 +1193,15 @@ export declare class BasicLayout implements LayoutEngine {
 	protected canvasWidth: number;
 	protected headersWidth: number;
 	protected host: LayoutHost;
-	protected bodyRefs: GridLayoutRefs["main"]["body"];
-	protected mainRefs: GridLayoutRefs["main"];
+	protected bodyRefs: DataPaneRefs;
+	protected mainRefs: GridBandRefs;
 	protected refs: GridLayoutRefs;
 	init(host: LayoutHost): void;
-	appendCachedRow(_: number, _rowNodeS: HTMLDivElement, rowNodeC: HTMLDivElement, _rowNodeE: HTMLDivElement): void;
 	calcCanvasWidth(): number;
 	updateHeadersWidth(): void;
 	destroy(): void;
-	getCanvasNodeFor(cell: number, row: number): HTMLElement;
 	getCanvasWidth(): number;
-	getHeaderColumn(cell: number): HTMLElement;
-	getHeaderRowColumn(cell: number): HTMLElement;
-	getHeaderRowColsFor(): HTMLElement;
-	getFooterRowColumn(cell: number): HTMLElement;
-	getFooterRowColsFor(): HTMLElement;
-	getHeaderColsFor(): HTMLElement;
-	getRefs(): GridLayoutRefs;
-	getRowFromCellNode(cellNode: HTMLElement): number;
 	getTopPanel(): HTMLElement;
-	getViewportNodeFor(_row: number, _cell: number): HTMLElement;
 	realScrollHeightChange(): void;
 	setOverflow(): void;
 	updateCanvasWidth(): boolean;
@@ -1233,11 +1209,6 @@ export declare class BasicLayout implements LayoutEngine {
 	afterHeaderColumnDrag(): void;
 	afterRenderRows(): void;
 	afterSetOptions(): void;
-	beforeCleanupAndRenderCells(): void;
-	getFrozenRowOffset(): number;
-	reorderViewColumns(_: Column[]): Column[];
-	setPaneVisibility(): void;
-	setScroller(): void;
 	readonly layoutName = "basic";
 }
 export declare const FrozenLayout: {
@@ -1262,6 +1233,7 @@ export declare class Grid<TItem = any> implements IGrid<TItem> {
 	private _cols;
 	private _colCssRulesL;
 	private _colCssRulesR;
+	private _columnSortHandler;
 	private _currentEditor;
 	private _data;
 	private _draggableInstance;
@@ -1281,6 +1253,8 @@ export declare class Grid<TItem = any> implements IGrid<TItem> {
 	private _lastRenderTime;
 	private _layout;
 	private _numberOfPages;
+	private _on;
+	private _off;
 	private _options;
 	private _signals;
 	private _page;
@@ -1296,6 +1270,9 @@ export declare class Grid<TItem = any> implements IGrid<TItem> {
 	private _postProcessGroupId;
 	private _postProcessToRow;
 	private _postRenderActive;
+	private _refs;
+	private _mapBands;
+	private _forEachBand;
 	private _removeNode;
 	private _rowsCache;
 	private _scrollDims;
@@ -1312,6 +1289,7 @@ export declare class Grid<TItem = any> implements IGrid<TItem> {
 	private _styleNode;
 	private _stylesheet;
 	private _tabbingDirection;
+	private _trigger;
 	private static _nextUid;
 	private _uid;
 	private _viewportInfo;
@@ -1361,9 +1339,7 @@ export declare class Grid<TItem = any> implements IGrid<TItem> {
 	constructor(container: string | HTMLElement | ArrayLike<HTMLElement>, data: any, columns: Column<TItem>[], options: GridOptions<TItem>);
 	private applyLegacyHeightOptions;
 	private createGroupingPanel;
-	private onEvent;
-	private refsForEach;
-	private mapRefs;
+	private getSignals;
 	init(): void;
 	registerPlugin(plugin: IPlugin): void;
 	unregisterPlugin(plugin: IPlugin): void;
@@ -1380,11 +1356,13 @@ export declare class Grid<TItem = any> implements IGrid<TItem> {
 	};
 	getAbsoluteColumnMinWidth(): number;
 	getSelectionModel(): SelectionModel;
-	private colIdOrIdxToCell;
-	getCanvasNode(columnIdOrIdx?: string | number, row?: number): HTMLElement;
+	private getHRefsForCell;
+	private getViewportPane;
+	getCanvasNode(row?: number, cell?: number): HTMLElement;
 	getCanvases(): any | HTMLElement[];
 	getActiveCanvasNode(e?: IEventData): HTMLElement;
-	getViewportNode(columnIdOrIdx?: string | number, row?: number): HTMLElement;
+	getViewportNode(row?: number, cell?: number): HTMLElement;
+	private getViewportInfo;
 	private getViewports;
 	getActiveViewportNode(e?: IEventData): HTMLElement;
 	private getAvailableWidth;
@@ -1394,13 +1372,13 @@ export declare class Grid<TItem = any> implements IGrid<TItem> {
 	private unbindAncestorScrollEvents;
 	updateColumnHeader(columnId: string, title?: string | ColumnFormat<any>, toolTip?: string): void;
 	getHeader(): HTMLElement;
-	getHeaderColumn(columnIdOrIdx: string | number): HTMLElement;
+	getHeaderColumn(cell: number | string): HTMLElement;
 	getGroupingPanel(): HTMLElement;
 	getPreHeaderPanel(): HTMLElement;
 	getHeaderRow(): HTMLElement;
-	getHeaderRowColumn(columnIdOrIdx: string | number): HTMLElement;
+	getHeaderRowColumn(cell: string | number): HTMLElement;
 	getFooterRow(): HTMLElement;
-	getFooterRowColumn(columnIdOrIdx: string | number): HTMLElement;
+	getFooterRowColumn(cell: string | number): HTMLElement;
 	private createColumnFooters;
 	private createColumnHeaders;
 	private setupColumnSort;
@@ -1415,7 +1393,6 @@ export declare class Grid<TItem = any> implements IGrid<TItem> {
 	private removeCssRules;
 	private createCssRules;
 	destroy(): void;
-	private trigger;
 	getEditorLock(): EditorLock;
 	getEditController(): EditController;
 	/** Gets a column by its ID. May also return non visible columns */
@@ -1438,6 +1415,7 @@ export declare class Grid<TItem = any> implements IGrid<TItem> {
 	getInitialColumns(): Column<TItem>[];
 	private updateViewColLeftRight;
 	private setInitialCols;
+	private handleFrozenColsOption;
 	setColumns(columns: Column<TItem>[]): void;
 	getOptions(): GridOptions<TItem>;
 	setOptions(args: GridOptions<TItem>, suppressRender?: boolean, suppressColumnSet?: boolean, suppressSetOverflow?: boolean): void;
@@ -1470,8 +1448,6 @@ export declare class Grid<TItem = any> implements IGrid<TItem> {
 	getTotalsFormatter(column: Column<TItem>): ColumnFormat<TItem>;
 	private getEditor;
 	getDataItemValueForColumn(item: TItem, columnDef: Column<TItem>): any;
-	private appendRowHtml;
-	private appendCellHtml;
 	private cleanupRows;
 	invalidate(): void;
 	invalidateAllRows(): void;
@@ -1505,6 +1481,7 @@ export declare class Grid<TItem = any> implements IGrid<TItem> {
 	private isFrozenRow;
 	private cleanUpCells;
 	private cleanUpAndRenderCells;
+	private createRowCellRenderArgs;
 	private renderRows;
 	private startPostProcessing;
 	private startPostProcessingCleanup;

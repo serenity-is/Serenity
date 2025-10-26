@@ -2,17 +2,16 @@ import { Column, GridOptions, ViewRange } from "../core";
 import { BodyPane, BottomPane, HeaderPane, TopPane, TopPanel } from "./layout-components";
 import type { LayoutEngine } from "./layout-engine";
 import type { LayoutHost } from "./layout-host";
-import type { GridLayoutHRefs, GridLayoutRefs } from "./layout-refs";
+import type { GridBandRefs, GridLayoutRefs } from "./layout-refs";
 
 export const FrozenLayout: { new(): LayoutEngine } = function (): LayoutEngine {
     let canvasWidth: number;
     let canvasWidthS: number;
     let canvasWidthC: number;
-    let viewportTopH: number;
 
     var host: LayoutHost;
-    let startRefs: GridLayoutHRefs
-    let mainRefs: GridLayoutHRefs
+    let startRefs: GridBandRefs
+    let mainRefs: GridBandRefs
     let refs: GridLayoutRefs;
 
     function init(hostGrid: LayoutHost) {
@@ -24,15 +23,15 @@ export const FrozenLayout: { new(): LayoutEngine } = function (): LayoutEngine {
         const signals = host.getSignals();
 
         host.getContainerNode().append(<>
-            <HeaderPane hband="start" refs={refs} signals={signals} />
-            <HeaderPane hband="main" refs={refs} signals={signals} />
+            <HeaderPane band="start" refs={refs} signals={signals} />
+            <HeaderPane band="main" refs={refs} signals={signals} />
             <TopPanel refs={refs} signals={signals} />
-            <TopPane hband="start" refs={refs} signals={signals} />
-            <TopPane hband="main" refs={refs} signals={signals} />
-            <BodyPane hband="start" refs={refs} signals={signals} />
-            <BodyPane hband="main" refs={refs} signals={signals} />
-            <BottomPane hband="start" refs={refs} signals={signals} />
-            <BottomPane hband="main" refs={refs} signals={signals} />
+            <TopPane band="start" refs={refs} signals={signals} />
+            <TopPane band="main" refs={refs} signals={signals} />
+            <BodyPane band="start" refs={refs} signals={signals} />
+            <BodyPane band="main" refs={refs} signals={signals} />
+            <BottomPane band="start" refs={refs} signals={signals} />
+            <BottomPane band="main" refs={refs} signals={signals} />
         </>);
 
         adjustFrozenRowsOption();
@@ -325,45 +324,6 @@ export const FrozenLayout: { new(): LayoutEngine } = function (): LayoutEngine {
         //}
     }
 
-    function beforeCleanupAndRenderCells(rendered: ViewRange) {
-        //if (frozenRows) {
-//
-        //    var renderedFrozenRows = Object.assign({}, rendered);
-//
-        //    if (frozenBottom) {
-        //        renderedFrozenRows.top = frozenRowIdx;
-        //        renderedFrozenRows.bottom = host.getDataLength() - 1;
-        //    }
-        //    else {
-//
-        //        renderedFrozenRows.top = 0;
-        //        renderedFrozenRows.bottom = frozenRowIdx;
-        //    }
-//
-        //    host.cleanUpAndRenderCells(renderedFrozenRows);
-        //}
-    }
-
-    function getRowFromCellNode(cellNode: HTMLElement, clientX: number, clientY: number): number {
-        var row = host.getRowFromNode(cellNode.parentNode as HTMLElement);
-
-        //if (frozenRows) {
-//
-        //    var bcr = cellNode.closest('.grid-canvas').getBoundingClientRect();
-//
-        //    var rowOffset = 0;
-        //    var isBottom = cellNode.closest('.grid-canvas-bottom') != null;
-//
-        //    if (isBottom) {
-        //        rowOffset = frozenBottom ? Math.round(parsePx(getComputedStyle(canvasTopL).height)) : (frozenRows * host.getOptions().rowHeight);
-        //    }
-//
-        //    return host.getCellFromPoint(clientX - bcr[host.getOptions().rtl ? 'right' : 'left'] - document.body.scrollLeft, clientY - bcr.top + document.body.scrollTop + rowOffset + document.body.scrollTop).row;
-        //}
-
-        return row;
-    }
-
     function destroy(): void {
         host = startRefs = mainRefs = null;
     }
@@ -371,12 +331,10 @@ export const FrozenLayout: { new(): LayoutEngine } = function (): LayoutEngine {
     return {
         afterHeaderColumnDrag,
         afterSetOptions,
-        beforeCleanupAndRenderCells,
         calcCanvasWidth,
         updateHeadersWidth: calcHeaderWidths,
         destroy,
         getCanvasWidth,
-        getRowFromCellNode,
         init,
         layoutName: "frozen",
         realScrollHeightChange,

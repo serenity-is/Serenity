@@ -16,7 +16,6 @@ export interface LayoutHost {
     getDataLength(): number;
     getOptions(): GridOptions;
     getSignals(): GridSignals;
-    getRowFromNode(rowNode: HTMLElement): number;
     getScrollDims(): { width: number, height: number };
     getViewportInfo(): ViewportInfo;
     readonly refs: GridLayoutRefs;

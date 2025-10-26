@@ -20,7 +20,7 @@ import type { ViewRange } from "../core/viewrange";
 import { BasicLayout } from "../layouts/basic-layout";
 import { applyColumnWidths, applyLegacyHeightOptions } from "../layouts/layout-calculations";
 import type { LayoutEngine } from "../layouts/layout-engine";
-import { disposeLayoutHRefs, getAllCanvasNodes, getAllHScrollContainers, getAllViewportNodes, getAllVScrollContainers, layoutRefsForEach, mapLayoutRefs, type GridLayoutHRefs, type GridLayoutRefs, type ViewportPaneRefs } from "../layouts/layout-refs";
+import { disposeBandRefs, getAllCanvasNodes, getAllHScrollContainers, getAllViewportNodes, getAllVScrollContainers, forEachBand, mapBands, type GridBandRefs, type GridLayoutRefs, type DataPaneRefs } from "../layouts/layout-refs";
 import { CellNavigator } from "./cellnavigator";
 import { autosizeColumns, shrinkOrStretchColumn } from "./column-resizing";
 import { columnSortHandler, sortToDesiredOrderAndKeepRest } from "./column-sorting";
@@ -89,8 +89,8 @@ export class Grid<TItem = any> implements IGrid<TItem> {
     declare private _postProcessToRow: number;
     declare private _postRenderActive: boolean;
     private _refs: GridLayoutRefs;
-    private _mapRefs: <T>(fn: (h: GridLayoutHRefs) => T) => T[];
-    private _refsForEach: (hRefsCallback: (hRefs: GridLayoutHRefs) => void) => void;
+    private _mapBands: <T>(fn: (band: GridBandRefs) => T) => T[];
+    private _forEachBand: (fn: (band: GridBandRefs) => void) => void;
     declare private _removeNode: (node: Element) => void;
     private _rowsCache: { [key: number]: CachedRow } = {};
     declare private _scrollDims: { width: number, height: number };
@@ -214,8 +214,8 @@ export class Grid<TItem = any> implements IGrid<TItem> {
 
         const { signals, refs } = createGridSignalsAndRefs();
         this._refs = refs;
-        this._mapRefs = mapLayoutRefs.bind(null, refs);
-        this._refsForEach = layoutRefsForEach.bind(null, refs);
+        this._mapBands = mapBands.bind(null, refs);
+        this._forEachBand = forEachBand.bind(null, refs);
         this._signals = signals;
 
         this.validateAndEnforceOptions();
@@ -260,7 +260,6 @@ export class Grid<TItem = any> implements IGrid<TItem> {
                 getDataLength: this.getDataLength,
                 getInitialColumns: this.getInitialColumns,
                 getOptions: this.getOptions,
-                getRowFromNode: this.getRowFromNode,
                 getScrollDims: this.getScrollBarDimensions,
                 getSignals: this.getSignals,
                 getViewportInfo: this.getViewportInfo,
@@ -352,8 +351,8 @@ export class Grid<TItem = any> implements IGrid<TItem> {
             this._on(vp, "mousewheel" as any, this.handleMouseWheel);
         });
 
-        this._refsForEach(h => {
-            const hs = h.headerCols;
+        this._forEachBand(band => {
+            const hs = band.headerCols;
             if (hs) {
                 hs.onselectstart = () => false;
                 this._on(hs, "contextmenu", this.handleHeaderContextMenu);
@@ -372,8 +371,8 @@ export class Grid<TItem = any> implements IGrid<TItem> {
                 }
             }
 
-            h.headerRowCols && this._on(h.headerRowCols.parentElement, 'scroll', this.handleHeaderFooterRowScroll);
-            h.footerRowCols && this._on(h.footerRowCols.parentElement, 'scroll', this.handleHeaderFooterRowScroll);
+            band.headerRowCols && this._on(band.headerRowCols.parentElement, 'scroll', this.handleHeaderFooterRowScroll);
+            band.footerRowCols && this._on(band.footerRowCols.parentElement, 'scroll', this.handleHeaderFooterRowScroll);
         });
 
         [this._focusSink1, this._focusSink2].forEach(fs => this._on(fs, "keydown", this.handleKeyDown));
@@ -490,7 +489,7 @@ export class Grid<TItem = any> implements IGrid<TItem> {
         return this._selectionModel;
     }
 
-    private getHRefsForCell(cell: number): { h: GridLayoutHRefs, idx: number } {
+    private getHRefsForCell(cell: number): { h: GridBandRefs, idx: number } {
         const refs = this._refs;
         if (cell != null) {
             if (refs.pinnedStartLast >= 0 && cell <= refs.pinnedStartLast)
@@ -501,7 +500,7 @@ export class Grid<TItem = any> implements IGrid<TItem> {
         return { h: refs.main, idx: refs.pinnedEndFirst >= 0 ? cell - refs.pinnedEndFirst - 1 : cell };
     }
 
-    private getViewportPane(row?: number, cell?: number): ViewportPaneRefs {
+    private getViewportPane(row?: number, cell?: number): DataPaneRefs {
         const refs = this._refs;
         let h = this.getHRefsForCell(cell).h;
         if (row != null) {
@@ -709,7 +708,7 @@ export class Grid<TItem = any> implements IGrid<TItem> {
     }
 
     private createColumnFooters(): void {
-        this._mapRefs(h => h.footerRowCols).forEach(frc => {
+        this._mapBands(band => band.footerRowCols).forEach(frc => {
             frc.querySelectorAll(".slick-footerrow-column")
                 .forEach((el) => {
                     var columnDef = this.getColumnFromNode(el);
@@ -750,7 +749,7 @@ export class Grid<TItem = any> implements IGrid<TItem> {
     }
 
     private createColumnHeaders(): void {
-        this._mapRefs(h => h.headerCols).forEach(hc => {
+        this._mapBands(band => band.headerCols).forEach(hc => {
             hc.querySelectorAll(".slick-header-column")
                 .forEach((el) => {
                     var columnDef = this.getColumnFromNode(el);
@@ -767,7 +766,7 @@ export class Grid<TItem = any> implements IGrid<TItem> {
 
         this._layout.updateHeadersWidth();
 
-        this._mapRefs(h => h.headerRowCols).forEach(hrc => {
+        this._mapBands(band => band.headerRowCols).forEach(hrc => {
             hrc.querySelectorAll(".slick-headerrow-column")
                 .forEach((el) => {
                     var columnDef = this.getColumnFromNode(el);
@@ -830,7 +829,8 @@ export class Grid<TItem = any> implements IGrid<TItem> {
         if (this._options.enableColumnReorder) {
             this.setupColumnReorder();
             // sortable js removes draggable attribute after disposing / recreating
-            this._mapRefs(h => h.headerCols).forEach(el => el.querySelectorAll<HTMLDivElement>(".slick-resizable-handle").forEach(x => x.draggable = true));
+            this._mapBands(band => band.headerCols).forEach(el =>
+                el.querySelectorAll<HTMLDivElement>(".slick-resizable-handle").forEach(x => x.draggable = true));
         }
     }
 
@@ -840,7 +840,7 @@ export class Grid<TItem = any> implements IGrid<TItem> {
             trigger: this._trigger,
         });
 
-        this._mapRefs(h => h.headerCols).forEach(el => this._on(el, 'click', this._columnSortHandler));
+        this._mapBands(band => band.headerCols).forEach(el => this._on(el, 'click', this._columnSortHandler));
     }
 
     private static offset(el: HTMLElement | null) {
@@ -912,7 +912,7 @@ export class Grid<TItem = any> implements IGrid<TItem> {
                 }
 
                 var reorderedCols;
-                this._mapRefs(h => h.headerCols).forEach((_, i) => reorderedCols = sortToDesiredOrderAndKeepRest(
+                this._mapBands(band => band.headerCols).forEach((_, i) => reorderedCols = sortToDesiredOrderAndKeepRest(
                     this._initCols,
                     (this.sortableColInstances[i]?.toArray?.() ?? [])
                 ));
@@ -927,7 +927,7 @@ export class Grid<TItem = any> implements IGrid<TItem> {
             }
         }
 
-        this.sortableColInstances = this._mapRefs(h => h.headerCols).map(x =>
+        this.sortableColInstances = this._mapBands(band => band.headerCols).map(x =>
             // @ts-ignore
             Sortable.create(x, sortableOptions));
     }
@@ -936,7 +936,7 @@ export class Grid<TItem = any> implements IGrid<TItem> {
 
         var minPageX: number, pageX: number, maxPageX: number, cols = this._cols;
         var columnElements: Element[] = [];
-        this._mapRefs(h => h.headerCols).forEach(el => {
+        this._mapBands(band => band.headerCols).forEach(el => {
             columnElements = columnElements.concat(Array.from(el.children).filter(x => x.classList.contains("slick-header-column")));
         });
 
@@ -1136,7 +1136,7 @@ export class Grid<TItem = any> implements IGrid<TItem> {
         }
 
         if (this._options.enableColumnReorder && this._jQuery && (this._jQuery.fn as any).sortable) {
-            (this._jQuery(this._mapRefs(h => h.headerCols)).filter(":ui-sortable") as any).sortable("destroy");
+            (this._jQuery(this._mapBands(band => band.headerCols)).filter(":ui-sortable") as any).sortable("destroy");
         }
 
         this.unbindAncestorScrollEvents();
@@ -1146,9 +1146,9 @@ export class Grid<TItem = any> implements IGrid<TItem> {
             this._jQuery(this._container).off("." + this._uid);
             this._jQuery(document).off("." + this._uid);
             this._jQuery(this._container).find(".slick-header-column,. slick-headerrow-column, .slick-footerrow-column, .slick-focus-sink").off("." + this._uid);
-            this._jQuery(this._mapRefs(h => h.headerCols)).off("." + this._uid);
-            this._jQuery(this._mapRefs(h => h.headerRowCols)).off("." + this._uid);
-            this._jQuery(this._mapRefs(h => h.footerRowCols)).off("." + this._uid);
+            this._jQuery(this._mapBands(band => band.headerCols)).off("." + this._uid);
+            this._jQuery(this._mapBands(band => band.headerRowCols)).off("." + this._uid);
+            this._jQuery(this._mapBands(band => band.footerRowCols)).off("." + this._uid);
         }
         this.removeCssRules();
         this.sortableColInstances?.forEach(instance => { try { instance.destroy() } catch (e) { console.warn(e); } });
@@ -1161,7 +1161,9 @@ export class Grid<TItem = any> implements IGrid<TItem> {
             canvasNodes.forEach(el => el && this._removeNode(el));
 
         this._layout?.destroy();
-        layoutRefsForEach(refs, (hRefs) => disposeLayoutHRefs(hRefs, this._removeNode));
+        forEachBand(refs, band => disposeBandRefs(band, this._removeNode));
+        this._removeNode(refs.topPanel);
+        refs.topPanel = null;
 
         this._emptyNode(this._container);
         this._eventDisposer?.abort();
@@ -1249,7 +1251,7 @@ export class Grid<TItem = any> implements IGrid<TItem> {
         this._sortColumns = cols || [];
 
         var headerColumnEls: Element[] = [];
-        this._mapRefs(h => h.headerCols).forEach(el => headerColumnEls = headerColumnEls.concat(Array.from(el.children)));
+        this._mapBands(band => band.headerCols).forEach(el => headerColumnEls = headerColumnEls.concat(Array.from(el.children)));
         headerColumnEls.forEach(hel => {
             hel.classList.remove("slick-header-column-sorted");
             var si = hel.querySelector(".slick-sort-indicator");
@@ -1373,7 +1375,7 @@ export class Grid<TItem = any> implements IGrid<TItem> {
                 viewCols.push(m);
         }
 
-        this.adjustLegacyFrozenColumns(viewCols, this._options);
+        this.handleFrozenColsOption(viewCols, this._options);
         viewCols = this._layout.reorderViewColumns?.(viewCols, this._refs) ?? viewCols;
 
         this._postRenderActive = this._options.enableAsyncPostRender ?? false;
@@ -1393,7 +1395,7 @@ export class Grid<TItem = any> implements IGrid<TItem> {
         this._colById = viewColById;
     }
 
-    private adjustLegacyFrozenColumns(viewCols: Column[], options?: GridOptions) {
+    private handleFrozenColsOption(viewCols: Column[], options?: GridOptions) {
         if (options?.frozenColumns == null) {
             delete options?.frozenColumns;
         }
@@ -1479,7 +1481,7 @@ export class Grid<TItem = any> implements IGrid<TItem> {
         this._options = Object.assign(this._options, args);
         this.validateAndEnforceOptions();
         this.setOptionDependentSignals();
-        this.adjustLegacyFrozenColumns(this._cols, args);
+        this.handleFrozenColsOption(this._cols, args);
         this._layout.afterSetOptions(args);
 
         if (args.columns && !suppressColumnSet) {
@@ -1580,7 +1582,7 @@ export class Grid<TItem = any> implements IGrid<TItem> {
     }
 
     getTopPanel(): HTMLElement {
-        return this._refs.main.topPanel;
+        return this._refs.topPanel;
     }
 
     setTopPanelVisibility(visible: boolean): void {
@@ -1949,7 +1951,7 @@ export class Grid<TItem = any> implements IGrid<TItem> {
         const vs = this._viewportInfo;
         vs.width = getInnerWidth(this._container);
         vs.groupingPanelHeight = (this._options.groupingPanel && this._options.showGroupingPanel) ? this._groupingPanel?.offsetHeight || 0 : 0;
-        vs.topPanelHeight = this._options.showTopPanel ? (refs.main.topPanel?.parentElement?.offsetHeight || 0) : 0;
+        vs.topPanelHeight = this._options.showTopPanel ? (refs.topPanel?.parentElement?.offsetHeight || 0) : 0;
         vs.headerRowHeight = this._options.showHeaderRow ? refs.main.headerRowCols?.parentElement?.offsetHeight || 0 : 0;
         vs.footerRowHeight = this._options.showFooterRow ? refs.main.footerRowCols?.parentElement?.offsetHeight || 0 : 0;
         vs.headerHeight = (this._options.showColumnHeader) ? refs.main.headerCols?.parentElement?.offsetHeight || 0 : 0;
@@ -2551,9 +2553,24 @@ export class Grid<TItem = any> implements IGrid<TItem> {
         // remove rows no longer in the viewport
         this.cleanupRows(rendered);
 
+        const { frozenTopLast, frozenBottomFirst } = this._refs;
+
         // add new rows & missing cells in existing rows
         if (this._scrollLeftRendered != this._scrollLeft) {
-            this._layout.beforeCleanupAndRenderCells(rendered);
+            if (frozenTopLast >= 0) {
+                const renderedFrozenTop = Object.assign({}, rendered);
+                renderedFrozenTop.top = 0;
+                renderedFrozenTop.bottom = frozenTopLast;
+                this.cleanUpAndRenderCells(renderedFrozenTop);
+            }
+            const dataLength = this.getDataLength();
+            if (frozenBottomFirst != Infinity) {
+                const renderedFrozenBottom = Object.assign({}, rendered);
+                renderedFrozenBottom.top = frozenBottomFirst;
+                renderedFrozenBottom.bottom = dataLength - 1;
+                this.cleanUpAndRenderCells(renderedFrozenBottom);
+            }
+
             this.cleanUpAndRenderCells(rendered);
         }
 
@@ -2561,7 +2578,6 @@ export class Grid<TItem = any> implements IGrid<TItem> {
         this.renderRows(rendered);
 
         // render frozen rows, need to check if still required
-        const { frozenTopLast, frozenBottomFirst } = this._refs;
         frozenTopLast >= 0 && this.renderRows({ top: 0, bottom: frozenTopLast, leftPx: rendered.leftPx, rightPx: rendered.rightPx });
         frozenBottomFirst != Infinity && this.renderRows({ top: frozenBottomFirst, bottom: this.getDataLength() - 1, leftPx: rendered.leftPx, rightPx: rendered.rightPx });
 
@@ -3152,6 +3168,9 @@ export class Grid<TItem = any> implements IGrid<TItem> {
 
     getRowFromNode(rowNode: Element): number {
         if (rowNode != null) {
+            const srow = (rowNode as HTMLElement).dataset?.row;
+            if (srow != null)
+                return parseInt(srow, 10);
             for (var row in this._rowsCache) {
                 var c = this._rowsCache[row];
                 if (c.rowNodeS === rowNode || c.rowNodeC === rowNode || c.rowNodeE === rowNode)
@@ -3168,7 +3187,7 @@ export class Grid<TItem = any> implements IGrid<TItem> {
             return null;
         }
 
-        row = this._layout.getRowFromCellNode(cellEl, e.clientX, e.clientY);
+        row = this.getRowFromNode(cellEl.parentElement);
         cell = this.getCellFromNode(cellEl);
 
         if (row == null || cell == null) {

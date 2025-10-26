@@ -1,51 +1,50 @@
 import { computed } from "@serenity-is/signals";
 import type { SignalLike, SignalOrValue } from "@serenity-is/sleekdom";
 import type { GridSignals } from "../core";
-import type { HBand, VBand } from "./layout-consts";
-import type { GridLayoutRefs } from "./layout-refs";
+import type { BandKey, GridLayoutRefs, PaneKey } from "./layout-refs";
 
 type PaneSignalSet = Pick<GridSignals, "hideColumnHeader" | "hideHeaderRow" | "hideFooterRow" | "pinnedStartLast" | "pinnedEndFirst" | "frozenTopLast" | "frozenBottomFirst">;
 
-function hiddenH(hband: HBand, hide: SignalLike<boolean>, signals: Pick<GridSignals, "pinnedStartLast" | "pinnedEndFirst">): SignalLike<boolean> {
-    if (hband === "main")
+function bandHidden(band: BandKey, hide: SignalLike<boolean>, signals: Pick<GridSignals, "pinnedStartLast" | "pinnedEndFirst">): SignalLike<boolean> {
+    if (band === "main")
         return hide;
     return computed(() => hide.value ||
-        (hband === "start" && signals.pinnedStartLast.value < 0) ||
-        (hband === "end" && signals.pinnedEndFirst.value == Infinity)
+        (band === "start" && signals.pinnedStartLast.value < 0) ||
+        (band === "end" && signals.pinnedEndFirst.value == Infinity)
     );
 }
 
-function hiddenVH(vband: VBand, hband: HBand, signals: Pick<GridSignals, "pinnedStartLast" | "pinnedEndFirst" | "frozenTopLast" | "frozenBottomFirst" | "hideFooterRow" | "hideHeaderRow">): boolean | SignalLike<boolean> {
-    if (vband === "body" && hband === "main")
+function paneBandHidden(pane: PaneKey, band: BandKey, signals: Pick<GridSignals, "pinnedStartLast" | "pinnedEndFirst" | "frozenTopLast" | "frozenBottomFirst" | "hideFooterRow" | "hideHeaderRow">): boolean | SignalLike<boolean> {
+    if (pane === "body" && band === "main")
         return false;
 
     return computed(() =>
-        (vband === "top" && signals.hideHeaderRow && signals.frozenTopLast.value < 0) ||
-        (vband === "bottom" && signals.hideFooterRow && signals.frozenBottomFirst.value === Infinity) ||
-        (hband === "start" && signals.pinnedStartLast.value < 0) ||
-        (hband === "end" && signals.pinnedEndFirst.value == Infinity));
+        (pane === "top" && signals.hideHeaderRow && signals.frozenTopLast.value < 0) ||
+        (pane === "bottom" && signals.hideFooterRow && signals.frozenBottomFirst.value === Infinity) ||
+        (band === "start" && signals.pinnedStartLast.value < 0) ||
+        (band === "end" && signals.pinnedEndFirst.value == Infinity));
 }
 
-export const Header = ({ hband, refs, signals }: {
-    hband: HBand,
+export const Header = ({ band, refs, signals }: {
+    band: BandKey,
     refs: GridLayoutRefs,
     signals: Pick<GridSignals, "hideColumnHeader" | "pinnedStartLast" | "pinnedEndFirst">
 }) => {
-    const hRefs = refs[hband];
-    return <div class={{ [`slick-header slick-header-${hband}`]: true, "slick-hidden": hiddenH(hband, signals.hideColumnHeader, signals) }}>
-        <div class={`slick-header-columns slick-header-columns-${hband}`}
-            ref={el => { hRefs.headerCols = el }} />
+    const bandRefs = refs[band];
+    return <div class={{ [`slick-header slick-header-${band}`]: true, "slick-hidden": bandHidden(band, signals.hideColumnHeader, signals) }}>
+        <div class={`slick-header-columns slick-header-columns-${band}`}
+            ref={el => { bandRefs.headerCols = el }} />
     </div>;
 }
 
-export const HeaderRow = ({ hband, refs, signals }: {
-    hband: HBand,
+export const HeaderRow = ({ band, refs, signals }: {
+    band: BandKey,
     refs: GridLayoutRefs,
     signals: Pick<GridSignals, "hideHeaderRow" | "pinnedStartLast" | "pinnedEndFirst">
 }) => {
-    const hRefs = refs[hband];
-    return <div class={{ [`slick-headerrow slick-headerrow-${hband}`]: true, "slick-hidden": hiddenH(hband, signals.hideHeaderRow, signals) }}>
-        <div class={`slick-headerrow-columns slick-headerrow-columns-${hband}`} ref={el => hRefs.headerRowCols = el} />
+    const bandRefs = refs[band];
+    return <div class={{ [`slick-headerrow slick-headerrow-${band}`]: true, "slick-hidden": bandHidden(band, signals.hideHeaderRow, signals) }}>
+        <div class={`slick-headerrow-columns slick-headerrow-columns-${band}`} ref={el => bandRefs.headerRowCols = el} />
     </div>
 }
 
@@ -53,87 +52,87 @@ export const TopPanel = ({ refs, signals }: {
     refs: GridLayoutRefs,
     signals: Pick<GridSignals, "hideTopPanel">
 }) => {
-    const hRefs = refs["main"];
+    const bandRefs = refs["main"];
     return <div class={{ [`slick-top-panel-container`]: true, "slick-hidden": signals.hideTopPanel }}>
-        <div class="slick-top-panel" ref={el => hRefs.topPanel = el} />
+        <div class="slick-top-panel" ref={el => refs.topPanel = el} />
     </div>;
 }
 
-export const Viewport = ({ hband, vband, refs }: {
-    hband: HBand,
-    vband: VBand,
+export const Viewport = ({ band, pane, refs }: {
+    band: BandKey,
+    pane: PaneKey,
     refs: GridLayoutRefs
 }) => {
-    const pRefs = refs[hband][vband];
-    return <div class={`slick-viewport slick-viewport-${vband} slick-viewport-${hband}`} tabindex="0" ref={el => pRefs.viewport = el}>
-        <div class={`grid-canvas grid-canvas-${vband} grid-canvas-${hband}`} tabindex="0" ref={el => pRefs.canvas = el} />
+    const pRefs = refs[band][pane];
+    return <div class={`slick-viewport slick-viewport-${pane} slick-viewport-${band}`} tabindex="0" ref={el => pRefs.viewport = el}>
+        <div class={`grid-canvas grid-canvas-${pane} grid-canvas-${band}`} tabindex="0" ref={el => pRefs.canvas = el} />
     </div>;
 }
 
-export const FooterRow = ({ hband, refs, signals }: {
-    hband: HBand, refs: GridLayoutRefs,
+export const FooterRow = ({ band, refs, signals }: {
+    band: BandKey, refs: GridLayoutRefs,
     signals: Pick<GridSignals, "hideFooterRow" | "pinnedStartLast" | "pinnedEndFirst">
 }) => {
-    const hRefs = refs[hband];
-    return <div class={{ [`slick-footerrow slick-footerrow-${hband}`]: true, "slick-hidden": hiddenH(hband, signals.hideFooterRow, signals) }}>
-        <div class={`slick-footerrow-columns slick-footerrow-columns-${hband}`} ref={el => hRefs.footerRowCols = el} />
+    const bandRefs = refs[band];
+    return <div class={{ [`slick-footerrow slick-footerrow-${band}`]: true, "slick-hidden": bandHidden(band, signals.hideFooterRow, signals) }}>
+        <div class={`slick-footerrow-columns slick-footerrow-columns-${band}`} ref={el => bandRefs.footerRowCols = el} />
     </div>
 }
 
-export const Pane = ({ hband, vband, children, refs, signals }: {
-    hband: HBand,
-    vband: VBand | "header",
+export const Pane = ({ band, pane, children, refs, signals }: {
+    band: BandKey,
+    pane: PaneKey | "header",
     children?: any,
     refs: GridLayoutRefs,
     signals: PaneSignalSet
 }) => {
-    const hidden = vband == "header" ? hiddenH(hband, signals.hideColumnHeader, signals) : hiddenVH(vband, hband, signals);
-    const hRefs = refs[hband];
-    return <div class={{ [`slick-pane slick-pane-${vband} slick-pane-${hband}`]: true, "slick-hidden": hidden }} tabindex="0"
-        ref={el => vband !== "header" && (hRefs[vband].pane = el)}>
+    const hidden = pane == "header" ? bandHidden(band, signals.hideColumnHeader, signals) : paneBandHidden(pane, band, signals);
+    const bandRefs = refs[band];
+    return <div class={{ [`slick-pane slick-pane-${pane} slick-pane-${band}`]: true, "slick-hidden": hidden }} tabindex="0"
+        ref={el => pane !== "header" && (bandRefs[pane].pane = el)}>
         {children}
     </div>;
 }
 
-export const HeaderPane = ({ hband, children, refs, signals }: {
-    hband: HBand,
+export const HeaderPane = ({ band, children, refs, signals }: {
+    band: BandKey,
     children?: any,
     refs: GridLayoutRefs,
     signals: PaneSignalSet
 }) =>
-    <Pane hband={hband} vband="header" refs={refs} signals={signals}>
-        {children == null || children.length === 0 ? <Header hband={hband} refs={refs} signals={signals} /> : children}
+    <Pane band={band} pane="header" refs={refs} signals={signals}>
+        {children == null || children.length === 0 ? <Header band={band} refs={refs} signals={signals} /> : children}
     </Pane>;
 
 
-export const TopPane = ({ hband, headerRow, refs, signals }: {
-    hband: HBand,
+export const TopPane = ({ band, headerRow, refs, signals }: {
+    band: BandKey,
     headerRow?: any,
     refs: GridLayoutRefs,
     signals: PaneSignalSet, hidden?: SignalOrValue<boolean>
 }) =>
-    <Pane hband={hband} vband="top" refs={refs} signals={signals}>
-        {headerRow ?? <HeaderRow hband={hband} refs={refs} signals={signals} />}
-        <Viewport hband={hband} vband="top" refs={refs} />
+    <Pane band={band} pane="top" refs={refs} signals={signals}>
+        {headerRow ?? <HeaderRow band={band} refs={refs} signals={signals} />}
+        <Viewport band={band} pane="top" refs={refs} />
     </Pane>;
 
-export const BodyPane = ({ hband, children, refs, signals }: {
-    hband: HBand,
+export const BodyPane = ({ band, children, refs, signals }: {
+    band: BandKey,
     children?: any,
     refs: GridLayoutRefs,
     signals: PaneSignalSet
 }) =>
-    <Pane hband={hband} vband="body" refs={refs} signals={signals}>
-        {children ?? <Viewport hband={hband} vband="body" refs={refs} />}
+    <Pane band={band} pane="body" refs={refs} signals={signals}>
+        {children ?? <Viewport band={band} pane="body" refs={refs} />}
     </Pane>;
 
-export const BottomPane = ({ hband, footerRow, refs, signals }: {
-    hband: HBand,
+export const BottomPane = ({ band, footerRow, refs, signals }: {
+    band: BandKey,
     footerRow?: any,
     refs: GridLayoutRefs,
     signals: PaneSignalSet
 }) =>
-    <Pane hband={hband} vband="bottom" refs={refs} signals={signals}>
-        {footerRow ?? <FooterRow hband={hband} refs={refs} signals={signals} />}
-        <Viewport hband={hband} vband="bottom" refs={refs} />
+    <Pane band={band} pane="bottom" refs={refs} signals={signals}>
+        {footerRow ?? <FooterRow band={band} refs={refs} signals={signals} />}
+        <Viewport band={band} pane="bottom" refs={refs} />
     </Pane>;
