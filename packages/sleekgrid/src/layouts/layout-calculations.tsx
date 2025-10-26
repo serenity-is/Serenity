@@ -20,9 +20,9 @@ export function applyColumnWidths(this: void, { cols, colCSSRulesL, colCSSRulesR
     refs: GridLayoutRefs
 }): void {
     let x = 0, w, rule, start = opts.rtl ? 'right' : 'left', end = opts.rtl ? 'left' : 'right',
-        cwStart = refs.start.body.canvas?.clientWidth || 0,
-        cwMain = refs.main.body.canvas?.clientWidth || 0,
-        cwEnd = refs.end.body.canvas?.clientWidth || 0,
+        cwStart = refs.start.canvas.body?.clientWidth || 0,
+        cwMain = refs.main.canvas.body?.clientWidth || 0,
+        cwEnd = refs.end.canvas.body?.clientWidth || 0,
         styles = container.style;
 
 

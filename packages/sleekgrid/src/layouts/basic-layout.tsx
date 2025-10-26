@@ -1,13 +1,12 @@
 import { FooterRow, Header, HeaderRow, TopPanel, Viewport } from "./layout-components";
 import { LayoutEngine } from "./layout-engine";
 import type { LayoutHost } from "./layout-host";
-import { type GridBandRefs, type GridLayoutRefs, type DataPaneRefs } from "./layout-refs";
+import { type GridBandRefs, type GridLayoutRefs } from "./layout-refs";
 
 export class BasicLayout implements LayoutEngine {
     protected canvasWidth: number;
     protected headersWidth: number;
     protected host: LayoutHost;
-    protected bodyRefs: DataPaneRefs;
     protected mainRefs: GridBandRefs;
     protected refs: GridLayoutRefs;
 
@@ -15,7 +14,7 @@ export class BasicLayout implements LayoutEngine {
         this.host = host;
         const signals = host.getSignals();
         const refs = this.refs = host.refs;
-        this.bodyRefs = (this.mainRefs = refs.main).body;
+        this.mainRefs = refs.main;
 
         this.host.getContainerNode().append(<>
             <Header band="main" refs={refs} signals={signals} />
@@ -52,7 +51,7 @@ export class BasicLayout implements LayoutEngine {
     }
 
     public destroy(): void {
-        this.host = this.refs = this.mainRefs = this.bodyRefs = null;
+        this.host = this.refs = this.mainRefs = null;
     }
 
     public getCanvasWidth(): number {
@@ -64,14 +63,14 @@ export class BasicLayout implements LayoutEngine {
     }
 
     public realScrollHeightChange(): void {
-        this.bodyRefs.canvas.style.height = this.host.getViewportInfo().realScrollHeight + "px"
+        this.mainRefs.canvas.body.style.height = this.host.getViewportInfo().realScrollHeight + "px"
     }
 
     public setOverflow(): void {
         var alwaysVS = this.host.getOptions().alwaysShowVerticalScroll;
 
-        this.bodyRefs.viewport.style.overflowX = "auto";
-        this.bodyRefs.viewport.style.overflowY = alwaysVS ? "scroll" : (this.host.getOptions().autoHeight ? "hidden" : "auto");
+        this.mainRefs.canvas.body.style.overflowX = "auto";
+        this.mainRefs.canvas.body.style.overflowY = alwaysVS ? "scroll" : (this.host.getOptions().autoHeight ? "hidden" : "auto");
     }
 
     public updateCanvasWidth(): boolean {
@@ -81,7 +80,7 @@ export class BasicLayout implements LayoutEngine {
 
         const vpi = this.host.getViewportInfo();
         var canvasWidthPx = this.canvasWidth + "px"
-        this.bodyRefs.canvas.style.width = canvasWidthPx;
+        this.mainRefs.canvas.body.style.width = canvasWidthPx;
         this.mainRefs.headerRowCols && (this.mainRefs.headerRowCols.style.width = canvasWidthPx);
         this.mainRefs.footerRowCols && (this.mainRefs.footerRowCols.style.width = canvasWidthPx);
         this.updateHeadersWidth();
@@ -100,7 +99,7 @@ export class BasicLayout implements LayoutEngine {
             this.host.getContainerNode().style.height = totalHeight;
         }
         else
-            this.bodyRefs.viewport.style.height = vs.height + "px";
+            this.mainRefs.canvas.body.parentElement.style.height = vs.height + "px";
     }
 
     public afterHeaderColumnDrag(): void { }

@@ -1,19 +1,17 @@
 export type BandKey = "start" | "main" | "end";
 export type PaneKey = "top" | "body" | "bottom";
 
-export interface DataPaneRefs {
-    pane?: HTMLElement;
-    viewport?: HTMLElement;
-    canvas?: HTMLElement;
-}
-
 export interface GridBandRefs {
+    key: BandKey;
     headerCols?: HTMLElement;
     headerRowCols?: HTMLElement;
-    readonly top: DataPaneRefs;
-    readonly body: DataPaneRefs;
-    readonly bottom: DataPaneRefs;
+    canvas: {
+        top?: HTMLElement;
+        body: HTMLElement;
+        bottom?: HTMLElement;
+    },
     footerRowCols?: HTMLElement;
+    readonly firstCol: number;
 }
 
 export type GridLayoutRefs = {
@@ -44,13 +42,7 @@ export function mapBands<T>(refs: GridLayoutRefs, callback: (band: GridBandRefs)
     return result;
 }
 
-function disposeDataPaneRefs(refs: DataPaneRefs, removeNode: (node: HTMLElement) => void): void {
-    if (!refs) return;
-    removeNode(refs.canvas);
-    removeNode(refs.viewport);
-    removeNode(refs.pane);
-    refs.canvas = refs.viewport = refs.pane = null;
-}
+const paneKeys: PaneKey[] = ["top", "body", "bottom"];
 
 export function disposeBandRefs(refs: GridBandRefs, removeNode: (node: HTMLElement) => void): void {
     if (!refs) return;
@@ -59,47 +51,57 @@ export function disposeBandRefs(refs: GridBandRefs, removeNode: (node: HTMLEleme
     removeNode(refs.headerRowCols?.parentElement);
     removeNode(refs.footerRowCols?.parentElement);
     refs.headerCols = refs.headerRowCols = refs.footerRowCols = null;
-    disposeDataPaneRefs(refs.top, removeNode);
-    disposeDataPaneRefs(refs.body, removeNode);
-    disposeDataPaneRefs(refs.bottom, removeNode);
+    for (const paneKey of paneKeys) {
+        const canvas = refs.canvas[paneKey];
+        if (canvas) {
+            const viewport = canvas.parentElement;
+            removeNode(canvas);
+            removeNode(viewport);
+            refs.canvas[paneKey] = null;
+        }
+    }
 }
 
 export function getAllCanvasNodes(refs: GridLayoutRefs): HTMLElement[] {
     const canvasNodes: HTMLElement[] = [];
-    forEachBand(refs, (h) => {
-        h.top.canvas && canvasNodes.push(h.top.canvas);
-        h.body.canvas && canvasNodes.push(h.body.canvas);
-        h.bottom.canvas && canvasNodes.push(h.bottom.canvas);
-    });
+    forEachBand(refs, (h) => paneKeys.forEach(pane => {
+        const canvas = h.canvas[pane];
+        if (canvas)
+            canvasNodes.push(canvas);
+    }));
     return canvasNodes;
 }
 
 export function getAllViewportNodes(refs: GridLayoutRefs): HTMLElement[] {
     const viewportNodes: HTMLElement[] = [];
-    forEachBand(refs, (h) => {
-        h.top.viewport && viewportNodes.push(h.top.viewport);
-        h.body.viewport && viewportNodes.push(h.body.viewport);
-        h.bottom.viewport && viewportNodes.push(h.bottom.viewport);
-    });
+    forEachBand(refs, (h) => paneKeys.forEach(pane => {
+        const viewport = h.canvas[pane]?.parentElement;
+        if (viewport)
+            viewportNodes.push(viewport);
+    }));
     return viewportNodes;
 }
 
 export function getAllHScrollContainers(refs: GridLayoutRefs): HTMLElement[] {
     const hScrollableNodes: HTMLElement[] = [];
-    const main = refs.main;;
-    main.body.viewport && hScrollableNodes.push(main.body.viewport);
+    const main = refs.main;
     main.headerCols?.parentElement && hScrollableNodes.push(main.headerCols.parentElement);
     main.headerRowCols?.parentElement && hScrollableNodes.push(main.headerRowCols.parentElement);
-    main.top.viewport && hScrollableNodes.push(main.top.viewport);
-    main.bottom.viewport && hScrollableNodes.push(main.bottom.viewport);
+    paneKeys.forEach(pane => {
+        const viewport = main.canvas[pane]?.parentElement;
+        if (viewport)
+            hScrollableNodes.push(viewport);
+    });
     main.footerRowCols?.parentElement && hScrollableNodes.push(main.footerRowCols.parentElement);
     return hScrollableNodes;
 }
 
 export function getAllVScrollContainers(refs: GridLayoutRefs): HTMLElement[] {
     const vScrollableNodes: HTMLElement[] = [];
-    forEachBand(refs, (h) => {
-        h.body.viewport && vScrollableNodes.push(h.body.viewport);
+    forEachBand(refs, (band) => {
+        const viewport = band.canvas.body?.parentElement;
+        if (viewport)
+            vScrollableNodes.push(viewport);
     });
     return vScrollableNodes;
 }

@@ -563,18 +563,19 @@ export interface GridSignals {
 	readonly frozenTopLast: Signal<number>;
 	readonly frozenBottomFirst: Signal<number>;
 }
-export interface DataPaneRefs {
-	pane?: HTMLElement;
-	viewport?: HTMLElement;
-	canvas?: HTMLElement;
-}
+export type BandKey = "start" | "main" | "end";
+export type PaneKey = "top" | "body" | "bottom";
 export interface GridBandRefs {
+	key: BandKey;
 	headerCols?: HTMLElement;
 	headerRowCols?: HTMLElement;
-	readonly top: DataPaneRefs;
-	readonly body: DataPaneRefs;
-	readonly bottom: DataPaneRefs;
+	canvas: {
+		top?: HTMLElement;
+		body: HTMLElement;
+		bottom?: HTMLElement;
+	};
 	footerRowCols?: HTMLElement;
+	readonly firstCol: number;
 }
 export type GridLayoutRefs = {
 	readonly start: GridBandRefs;
@@ -1193,7 +1194,6 @@ export declare class BasicLayout implements LayoutEngine {
 	protected canvasWidth: number;
 	protected headersWidth: number;
 	protected host: LayoutHost;
-	protected bodyRefs: DataPaneRefs;
 	protected mainRefs: GridBandRefs;
 	protected refs: GridLayoutRefs;
 	init(host: LayoutHost): void;
@@ -1356,8 +1356,7 @@ export declare class Grid<TItem = any> implements IGrid<TItem> {
 	};
 	getAbsoluteColumnMinWidth(): number;
 	getSelectionModel(): SelectionModel;
-	private getHRefsForCell;
-	private getViewportPane;
+	private getBandRefsForCell;
 	getCanvasNode(row?: number, cell?: number): HTMLElement;
 	getCanvases(): any | HTMLElement[];
 	getActiveCanvasNode(e?: IEventData): HTMLElement;

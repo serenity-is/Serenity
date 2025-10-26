@@ -166,7 +166,7 @@ export function createGridSignalsAndRefs(): { signals: GridSignals; refs: GridLa
     const hideFooterRow = computed(() => !showFooterRow.value);
     const showTopPanel = signal<boolean>();
     const hideTopPanel = computed(() => !showTopPanel.value);
-    let pinnedStartFirst = -Infinity;
+    let pinnedStartLast = -Infinity;
     let pinnedEndFirst = Infinity;
     let frozenTopLast = -Infinity;
     let frozenBottomFirst = Infinity;
@@ -179,23 +179,66 @@ export function createGridSignalsAndRefs(): { signals: GridSignals; refs: GridLa
         hideHeaderRow,
         showFooterRow,
         hideFooterRow,
-        pinnedStartLast: signal(pinnedStartFirst),
+        pinnedStartLast: signal(pinnedStartLast),
         pinnedEndFirst: signal(pinnedEndFirst),
         frozenTopLast: signal(frozenTopLast),
         frozenBottomFirst: signal(frozenBottomFirst),
     };
     const refs: GridLayoutRefs = {
-        start: { body: {}, top: {}, bottom: {} },
-        main: { body: {}, top: {}, bottom: {} },
-        end: { body: {}, top: {}, bottom: {} },
-        get pinnedEndFirst() { return pinnedEndFirst; },
-        set pinnedEndFirst(value) { pinnedEndFirst = value; signals.pinnedEndFirst.value = value; },
-        get pinnedStartLast() { return pinnedStartFirst; },
-        set pinnedStartLast(value) { pinnedStartFirst = value; signals.pinnedStartLast.value = value; },
-        get frozenTopLast() { return frozenTopLast; },
-        set frozenTopLast(value) { frozenTopLast = value; signals.frozenTopLast.value = value; },
-        get frozenBottomFirst() { return frozenBottomFirst; },
-        set frozenBottomFirst(value) { frozenBottomFirst = value; signals.frozenBottomFirst.value = value; },
+        start: {
+            key: "start",
+            canvas: {
+                body: null
+            },
+            firstCol: -Infinity
+        },
+        main: {
+            key: "main",
+            canvas: { body: null },
+            firstCol: 0
+        },
+        end: {
+            key: "end",
+            canvas: {
+                body: null
+            },
+            firstCol: Infinity
+        },
+        get pinnedStartLast() {
+            return pinnedStartLast;
+        },
+        set pinnedStartLast(value) {
+            if (pinnedStartLast !== value) {
+                pinnedStartLast = value;
+                (refs.start as any).firstCol = value >= -Infinity ? -Infinity : value + 1;
+                (refs.main as any).firstCol = value >= 0 ? value + 1 : 0;
+                signals.pinnedStartLast.value = value;
+            }
+        },
+        get pinnedEndFirst() {
+            return pinnedEndFirst;
+        },
+        set pinnedEndFirst(value) {
+            if (pinnedEndFirst !== value) {
+                pinnedEndFirst = value;
+                (refs.end as any).firstCol = value;
+            }
+            signals.pinnedEndFirst.value = value;
+        },
+        get frozenTopLast() {
+            return frozenTopLast;
+        },
+        set frozenTopLast(value) {
+            frozenTopLast = value;
+            signals.frozenTopLast.value = value;
+        },
+        get frozenBottomFirst() {
+            return frozenBottomFirst;
+        },
+        set frozenBottomFirst(value) {
+            frozenBottomFirst = value;
+            signals.frozenBottomFirst.value = value;
+        }
     };
     return { signals, refs };
 }

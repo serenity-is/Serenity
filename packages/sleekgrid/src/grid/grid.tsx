@@ -20,7 +20,7 @@ import type { ViewRange } from "../core/viewrange";
 import { BasicLayout } from "../layouts/basic-layout";
 import { applyColumnWidths, applyLegacyHeightOptions } from "../layouts/layout-calculations";
 import type { LayoutEngine } from "../layouts/layout-engine";
-import { disposeBandRefs, getAllCanvasNodes, getAllHScrollContainers, getAllViewportNodes, getAllVScrollContainers, forEachBand, mapBands, type GridBandRefs, type GridLayoutRefs, type DataPaneRefs } from "../layouts/layout-refs";
+import { disposeBandRefs, forEachBand, getAllCanvasNodes, getAllHScrollContainers, getAllViewportNodes, getAllVScrollContainers, mapBands, type GridBandRefs, type GridLayoutRefs } from "../layouts/layout-refs";
 import { CellNavigator } from "./cellnavigator";
 import { autosizeColumns, shrinkOrStretchColumn } from "./column-resizing";
 import { columnSortHandler, sortToDesiredOrderAndKeepRest } from "./column-sorting";
@@ -489,32 +489,28 @@ export class Grid<TItem = any> implements IGrid<TItem> {
         return this._selectionModel;
     }
 
-    private getHRefsForCell(cell: number): { h: GridBandRefs, idx: number } {
+    private getBandRefsForCell(cell: number): GridBandRefs {
         const refs = this._refs;
         if (cell != null) {
             if (refs.pinnedStartLast >= 0 && cell <= refs.pinnedStartLast)
-                return { h: refs.start, idx: cell };
+                return refs.start;
             if (refs.pinnedEndFirst != Infinity && cell >= refs.pinnedEndFirst)
-                return { h: refs.end, idx: cell - refs.pinnedEndFirst };
+                return refs.end;
         }
-        return { h: refs.main, idx: refs.pinnedEndFirst >= 0 ? cell - refs.pinnedEndFirst - 1 : cell };
-    }
-
-    private getViewportPane(row?: number, cell?: number): DataPaneRefs {
-        const refs = this._refs;
-        let h = this.getHRefsForCell(cell).h;
-        if (row != null) {
-            const { frozenBottomFirst, frozenTopLast } = this._refs;
-            if (frozenBottomFirst >= 0 && row >= frozenBottomFirst)
-                return h.top;
-            if (frozenTopLast != Infinity && row <= frozenTopLast)
-                return h.bottom;
-        }
-        return h.body;
+        return refs.main;
     }
 
     getCanvasNode(row?: number, cell?: number): HTMLElement {
-        return this.getViewportPane(row, cell)?.canvas;
+        const refs = this._refs;
+        let band = this.getBandRefsForCell(cell);
+        if (row != null) {
+            const { frozenBottomFirst, frozenTopLast } = this._refs;
+            if (frozenBottomFirst >= 0 && row >= frozenBottomFirst)
+                return band.canvas.top;
+            if (frozenTopLast != Infinity && row <= frozenTopLast)
+                return band.canvas.bottom;
+        }
+        return band.canvas.body;
     }
 
     getCanvases(): any | HTMLElement[] {
@@ -530,7 +526,7 @@ export class Grid<TItem = any> implements IGrid<TItem> {
     }
 
     getViewportNode(row?: number, cell?: number): HTMLElement {
-        return this.getViewportPane(row, cell)?.viewport;
+        return this.getCanvasNode(row, cell)?.parentElement;
     }
 
     private getViewportInfo() {
@@ -582,11 +578,11 @@ export class Grid<TItem = any> implements IGrid<TItem> {
 
     private bindAncestorScrollEvents() {
         const refs = this._refs;
-        const pane = refs.main.body;
-        let elem = pane.canvas as HTMLElement;
+        const canvas = refs.main.canvas.body;
+        let elem = canvas as HTMLElement;
         while ((elem = elem?.parentNode as HTMLElement) != document.body && elem != null) {
             // bind to scroll containers only
-            if (elem == pane.viewport || elem.scrollWidth != elem.clientWidth || elem.scrollHeight != elem.clientHeight) {
+            if (elem == canvas.parentElement || elem.scrollWidth != elem.clientWidth || elem.scrollHeight != elem.clientHeight) {
                 this._on(elem, 'scroll', this.handleActiveCellPositionChange);
                 this._boundAncestorScroll.push(elem);
             }
@@ -665,8 +661,8 @@ export class Grid<TItem = any> implements IGrid<TItem> {
         if (cell == null)
             return null;
 
-        const { h, idx } = this.getHRefsForCell(cell);
-        return h?.headerCols?.children.item(idx) as HTMLDivElement;
+        const band = this.getBandRefsForCell(cell);
+        return band.headerCols?.children.item(cell - band.firstCol) as HTMLDivElement;
     }
 
     getGroupingPanel(): HTMLElement {
@@ -688,8 +684,8 @@ export class Grid<TItem = any> implements IGrid<TItem> {
         if (cell == null)
             return;
 
-        const { h, idx } = this.getHRefsForCell(cell);
-        return h?.headerRowCols?.children.item(idx) as HTMLDivElement;
+        const band = this.getBandRefsForCell(cell);
+        return band.headerRowCols?.children.item(cell - band.firstCol) as HTMLDivElement;
     }
 
     getFooterRow(): HTMLElement {
@@ -703,8 +699,8 @@ export class Grid<TItem = any> implements IGrid<TItem> {
         if (cell == null)
             return null;
 
-        const { h, idx } = this.getHRefsForCell(cell);
-        return h?.footerRowCols?.children.item(idx) as HTMLDivElement;
+        const band = this.getBandRefsForCell(cell);
+        return band.footerRowCols?.children.item(cell - band.firstCol) as HTMLDivElement;
     }
 
     private createColumnFooters(): void {
@@ -725,7 +721,7 @@ export class Grid<TItem = any> implements IGrid<TItem> {
 
         var cols = this._cols;
         for (var i = 0; i < cols.length; i++) {
-            const footerRowColsNode = this.getHRefsForCell(i).h.footerRowCols;
+            const footerRowColsNode = this.getBandRefsForCell(i).footerRowCols;
             if (!footerRowColsNode)
                 continue;
             var m = cols[i];
@@ -799,7 +795,7 @@ export class Grid<TItem = any> implements IGrid<TItem> {
 
             const { pinnedStartLast, pinnedEndFirst } = refs;
 
-            const header = this.getHRefsForCell(i).h.headerCols.appendChild(
+            const header = this.getBandRefsForCell(i).headerCols.appendChild(
                 <div class={["slick-header-column", m.headerCssClass,
                     i <= pinnedStartLast && "frozen pinned-start",
                     i >= pinnedEndFirst && "frozen pinned-end",
@@ -814,7 +810,7 @@ export class Grid<TItem = any> implements IGrid<TItem> {
             this._trigger(this.onHeaderCellRendered, { node: header, column: m });
 
             if (this._options.showHeaderRow) {
-                const headerRowColsNode = this.getHRefsForCell(i).h.headerRowCols;
+                const headerRowColsNode = this.getBandRefsForCell(i).headerRowCols;
                 if (!headerRowColsNode)
                     continue;
                 const headerRowCell = headerRowColsNode.appendChild(
@@ -2005,11 +2001,11 @@ export class Grid<TItem = any> implements IGrid<TItem> {
     }
 
     public getScrollContainerX() {
-        return this._refs.main.body.viewport;
+        return this._refs.main.canvas.body.parentElement;
     }
 
     public getScrollContainerY() {
-        return this._refs.main.body.viewport;
+        return this._refs.main.canvas.body.parentElement;
     }
 
     updateRowCount(): void {
@@ -2018,7 +2014,7 @@ export class Grid<TItem = any> implements IGrid<TItem> {
         }
 
         var dataLengthIncludingAddNew = this.getDataLengthIncludingAddNew();
-        var scrollCanvas = this._refs.main.body.canvas;
+        var scrollCanvas = this._refs.main.canvas.body;
         var oldH = Math.round(parsePx(getComputedStyle(scrollCanvas).height));
 
         var numberOfRows;
@@ -2425,27 +2421,27 @@ export class Grid<TItem = any> implements IGrid<TItem> {
             cache.rowNodeE = e.firstElementChild as HTMLElement;
             if (pinnedStart && cache.rowNodeS) {
                 if (row <= frozenTopLast)
-                    start.top.canvas?.appendChild(cache.rowNodeS);
+                    start.canvas.top?.appendChild(cache.rowNodeS);
                 else if (row >= frozenBottomFirst)
-                    end.top.canvas?.appendChild(cache.rowNodeS);
+                    end.canvas.top?.appendChild(cache.rowNodeS);
                 else
-                    main.top.canvas?.appendChild(cache.rowNodeS);
+                    main.canvas.top?.appendChild(cache.rowNodeS);
             }
             if (cache.rowNodeC) {
                 if (row <= frozenTopLast)
-                    start.body.canvas?.appendChild(cache.rowNodeC);
+                    start.canvas.body?.appendChild(cache.rowNodeC);
                 else if (row >= frozenBottomFirst)
-                    end.body.canvas?.appendChild(cache.rowNodeC);
+                    end.canvas.body?.appendChild(cache.rowNodeC);
                 else
-                    main.body.canvas?.appendChild(cache.rowNodeC);
+                    main.canvas.body?.appendChild(cache.rowNodeC);
             }
             if (pinnedEnd && cache.rowNodeE) {
                 if (row <= frozenTopLast)
-                    start.bottom.canvas?.appendChild(cache.rowNodeE);
+                    start.canvas.bottom?.appendChild(cache.rowNodeE);
                 else if (row >= frozenBottomFirst)
-                    end.bottom.canvas?.appendChild(cache.rowNodeE);
+                    end.canvas.bottom?.appendChild(cache.rowNodeE);
                 else
-                    main.bottom.canvas?.appendChild(cache.rowNodeE);
+                    main.canvas.bottom?.appendChild(cache.rowNodeE);
             }
             if (cache.cellRenderContent.some(x => x instanceof Node))
                 this.ensureCellNodesInRowsCache(row);

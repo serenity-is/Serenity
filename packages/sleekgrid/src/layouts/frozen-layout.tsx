@@ -86,9 +86,9 @@ export const FrozenLayout: { new(): LayoutEngine } = function (): LayoutEngine {
                 //mainRefs.headerRowCols.style.width = canvasWidth + "px";
                 //mainRefs.footerRowCols.parentElement.style.width = "100%";
                 //mainRefs.footerRowCols.style.width = canvasWidth + "px";
-                mainRefs.body.pane.style.width = "100%";
-                mainRefs.body.viewport.style.width = "100%";
-                mainRefs.body.canvas.style.width = cwcPX;
+                //mainRefs.body.pane.style.width = "100%";
+                //mainRefs.body.viewport.style.width = "100%";
+                //mainRefs.body.canvas.style.width = cwcPX;
 //
                 //if (frozenRows) {
                 //    mainRefs.top.pane.style.width = "100%";
@@ -100,14 +100,14 @@ export const FrozenLayout: { new(): LayoutEngine } = function (): LayoutEngine {
                 const rtl = host.getOptions().rtl;
                 const startKey = rtl ? "right" : "left";
 
-                mainRefs.body.canvas.style.width = cwcPX;
+                //mainRefs.body.canvas.style.width = cwcPX;
                 startRefs.headerCols.parentElement.parentElement.style.width = cwsPX;
                 mainRefs.headerCols.parentElement.parentElement.style[startKey] = cwsPX;
                 mainRefs.headerCols.parentElement.parentElement.style.width = vpminusPX;
 
-                startRefs.body.pane.style.width = cwsPX;
-                mainRefs.body.pane.style[startKey] = cwsPX;
-                mainRefs.body.pane.style.width = vpminusPX;
+                //startRefs.body.pane.style.width = cwsPX;
+                //mainRefs.body.pane.style[startKey] = cwsPX;
+                //mainRefs.body.pane.style.width = vpminusPX;
 
                 startRefs.headerRowCols.style.width = cwsPX;
                 startRefs.headerRowCols.parentElement.style.width = cwsPX;

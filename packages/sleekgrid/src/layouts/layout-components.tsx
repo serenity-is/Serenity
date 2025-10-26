@@ -63,9 +63,9 @@ export const Viewport = ({ band, pane, refs }: {
     pane: PaneKey,
     refs: GridLayoutRefs
 }) => {
-    const pRefs = refs[band][pane];
-    return <div class={`slick-viewport slick-viewport-${pane} slick-viewport-${band}`} tabindex="0" ref={el => pRefs.viewport = el}>
-        <div class={`grid-canvas grid-canvas-${pane} grid-canvas-${band}`} tabindex="0" ref={el => pRefs.canvas = el} />
+    const bandRefs = refs[band];
+    return <div class={`slick-viewport slick-viewport-${pane} slick-viewport-${band}`} tabindex="0">
+        <div class={`grid-canvas grid-canvas-${pane} grid-canvas-${band}`} tabindex="0" ref={el => bandRefs.canvas[pane] = el} />
     </div>;
 }
 
@@ -87,9 +87,7 @@ export const Pane = ({ band, pane, children, refs, signals }: {
     signals: PaneSignalSet
 }) => {
     const hidden = pane == "header" ? bandHidden(band, signals.hideColumnHeader, signals) : paneBandHidden(pane, band, signals);
-    const bandRefs = refs[band];
-    return <div class={{ [`slick-pane slick-pane-${pane} slick-pane-${band}`]: true, "slick-hidden": hidden }} tabindex="0"
-        ref={el => pane !== "header" && (bandRefs[pane].pane = el)}>
+    return <div class={{ [`slick-pane slick-pane-${pane} slick-pane-${band}`]: true, "slick-hidden": hidden }} tabindex="0">
         {children}
     </div>;
 }
