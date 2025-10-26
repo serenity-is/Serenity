@@ -3160,28 +3160,8 @@ button.panel-titlebar-close::after {
   text-decoration: underline;
 }
 
-.slick-header,
-.slick-headerrow,
-.slick-footerrow,
-.slick-group-header {
-  overflow: hidden;
-}
-
-.slick-header-columns,
-.slick-headerrow-columns,
-.slick-footerrow-columns {
-  position: relative;
-  white-space: nowrap;
-  overflow: hidden;
-}
-
 .slick-header {
   border-bottom: 2px solid var(--s-column-header-border);
-}
-
-.slick-header-columns,
-.slick-header-column {
-  user-select: none;
 }
 
 .slick-footerrow {
@@ -3190,11 +3170,8 @@ button.panel-titlebar-close::after {
 
 .slick-header-column,
 .slick-group-header-column {
-  position: relative;
   display: flex;
-  overflow: hidden;
   line-height: 26px;
-  float: left;
   font-weight: 500;
   color: var(--s-column-header);
 }
@@ -3253,10 +3230,6 @@ button.panel-titlebar-close::after {
 }
 
 .slick-resizable-handle {
-  position: absolute;
-  font-size: 0.1px;
-  display: block;
-  cursor: col-resize;
   width: 4px;
   right: 0px;
   top: 0;
@@ -3269,17 +3242,6 @@ button.panel-titlebar-close::after {
 
 .slick-sortable-placeholder {
   background: rgba(var(--s-body-bg-grb) 0.5);
-}
-
-.grid-canvas {
-  position: relative;
-  outline: 0;
-  overflow: hidden;
-}
-
-.slick-row {
-  position: absolute;
-  width: 100%;
 }
 
 .slick-row.odd {
@@ -3297,14 +3259,7 @@ button.panel-titlebar-close::after {
 .slick-cell,
 .slick-headerrow-column,
 .slick-footerrow-column {
-  position: absolute;
   border: 1px solid transparent;
-  overflow: hidden;
-  text-overflow: ellipsis;
-  vertical-align: middle;
-  margin: 0;
-  white-space: nowrap;
-  cursor: default;
 }
 
 .slick-cell.has-dropdown {
@@ -3374,21 +3329,6 @@ button.panel-titlebar-close::after {
   outline: 0 !important;
 }
 
-.slick-hidden {
-  display: none !important;
-}
-
-.slick-hscrollspacer,
-.slick-footerrow-columns,
-.slick-headerrow-columns,
-.slick-header-columns {
-  margin-right: var(--scrollbar-w);
-}
-
-.slick-vscrollspacer {
-  margin-bottom: var(--scrollbar-h);
-}
-
 .slick-reorder-proxy {
   display: inline-block;
   background: blue;
@@ -3426,11 +3366,6 @@ button.panel-titlebar-close::after {
 }
 
 .slick-headerrow {
-  overflow: hidden;
-  position: relative;
-}
-
-.slick-top-panel-container {
   overflow: hidden;
   position: relative;
 }
@@ -3633,8 +3568,6 @@ button.panel-titlebar-close::after {
 }
 
 .slick-cell.editable {
-  z-index: 11;
-  overflow: visible;
   background-color: var(--s-card-bg);
   border: 1px solid rgba(var(--s-bright-rgb), 0.3);
   padding: 2px 5px;
@@ -3646,10 +3579,6 @@ button.panel-titlebar-close::after {
 .slick-cell.invalid {
   background-color: #ff000040;
   box-shadow: 0 0 0 1px rgba(255, 0, 0, 0.8);
-}
-
-.slick-cell:focus {
-  outline: none;
 }
 
 .slick-row.active .slick-cell-dirty:not(.editable) {
