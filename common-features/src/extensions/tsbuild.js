@@ -1,4 +1,6 @@
-import { build } from "@serenity-is/tsbuild";
+import { build, writeIfChanged } from "@serenity-is/tsbuild";
+import { build as esbuild } from "esbuild";
+import { existsSync, readFileSync, writeFileSync } from "fs";
 
 const buildOpt = {
     entryPoints: ['./Modules/index.ts'],
@@ -29,3 +31,21 @@ await build(Object.assign({}, buildOpt, {
     globalName: 'Serenity._',
     outdir: 'wwwroot/'
 }));
+
+await esbuild({
+    assetNames: 'assets/[name]-[hash]',
+    bundle: true,
+    entryPoints: [
+        { in: "wwwroot/style/bundle.css", out: "common-theme" }
+    ],
+    legalComments: "inline",
+    loader: { 
+        ".jpg": "file" 
+    },
+    outdir: "wwwroot/",
+    write: false,
+    plugins: [
+        writeIfChanged()
+    ],
+    target: "es6",
+});
