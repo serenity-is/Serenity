@@ -54,17 +54,16 @@ export const FrozenLayout: { new(): LayoutEngine } = function (): LayoutEngine {
     }
 
     function adjustFrozenRowsOption(): void {
+        const { autoHeight } = host.getOptions();
+        let frozenTopLast = -Infinity;
         const options = host.getOptions();
-        //if (options.autoHeight) {
-        //    frozenRows = 0;
-        //    return;
-        //}
-//
-        //frozenRows = (options.frozenRows > 0 && options.frozenRows <= host.getViewportInfo().numVisibleRows) ? options.frozenRows : 0;
-//
-        //if (frozenRows) {
-        //    frozenRowIdx = options.frozenBottom ? (host.getDataLength() - frozenRows) : (frozenRows - 1);
-        //}
+        if (!options.autoHeight) {
+            let availRows = host.getViewportInfo().numVisibleRows;
+            let frozenTopRows = options.frozenBottom === true ? 0 : (options.frozenRows ?? 0);
+            frozenTopRows = (frozenTopRows > 0 && options.frozenRows <= availRows) ? frozenTopRows : 0;
+            frozenTopLast = frozenTopRows > 0 ? frozenTopRows - 1 : -Infinity;
+        }
+        refs.frozenTopLast = frozenTopLast;
     }
 
     function destroy(): void {
@@ -79,4 +78,3 @@ export const FrozenLayout: { new(): LayoutEngine } = function (): LayoutEngine {
         reorderViewColumns
     }
 } as any;
-

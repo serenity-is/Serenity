@@ -582,9 +582,10 @@ export class Grid<TItem = any> implements IGrid<TItem> {
 
         const style = this._cssVarRules?.style ?? this._container.style;
         const refs = this._refs;
-        setStyleProp(style, "--sg-canvas-start-width", refs.start.canvasWidth + "px");
-        setStyleProp(style, "--sg-canvas-main-width", refs.main.canvasWidth + "px");
-        setStyleProp(style, "--sg-canvas-end-width", refs.end.canvasWidth + "px");
+        setStyleProp(style, "--sg-start-width", refs.start.canvasWidth + "px");
+        setStyleProp(style, "--sg-virtual-width", refs.main.canvasWidth + "px");
+        setStyleProp(style, "--sg-end-width", refs.end.canvasWidth + "px");
+        setStyleProp(style, "--sg-main-width", this._viewportInfo.width - refs.start.canvasWidth - refs.end.canvasWidth + "px");
         return widthChanged;
     }
 
@@ -2466,25 +2467,25 @@ export class Grid<TItem = any> implements IGrid<TItem> {
                 if (row <= frozenTopLast)
                     start.canvas.top?.appendChild(cache.rowNodeS);
                 else if (row >= frozenBottomFirst)
-                    end.canvas.top?.appendChild(cache.rowNodeS);
+                    start.canvas.bottom?.appendChild(cache.rowNodeS);
                 else
-                    main.canvas.top?.appendChild(cache.rowNodeS);
+                    start.canvas.body?.appendChild(cache.rowNodeS);
             }
             if (cache.rowNodeC) {
                 if (row <= frozenTopLast)
-                    start.canvas.body?.appendChild(cache.rowNodeC);
+                    main.canvas.top?.appendChild(cache.rowNodeC);
                 else if (row >= frozenBottomFirst)
-                    end.canvas.body?.appendChild(cache.rowNodeC);
+                    main.canvas.bottom?.appendChild(cache.rowNodeC);
                 else
                     main.canvas.body?.appendChild(cache.rowNodeC);
             }
             if (pinnedEnd && cache.rowNodeE) {
                 if (row <= frozenTopLast)
-                    start.canvas.bottom?.appendChild(cache.rowNodeE);
+                    end.canvas.top?.appendChild(cache.rowNodeE);
                 else if (row >= frozenBottomFirst)
                     end.canvas.bottom?.appendChild(cache.rowNodeE);
                 else
-                    main.canvas.bottom?.appendChild(cache.rowNodeE);
+                    end.canvas.body?.appendChild(cache.rowNodeE);
             }
             if (cache.cellRenderContent.some(x => x instanceof Node))
                 this.ensureCellNodesInRowsCache(row);
