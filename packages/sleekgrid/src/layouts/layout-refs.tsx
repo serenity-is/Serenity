@@ -12,6 +12,7 @@ export interface GridBandRefs {
     },
     footerRowCols?: HTMLElement;
     readonly firstCol: number;
+    canvasWidth: number;
 }
 
 export type GridLayoutRefs = {

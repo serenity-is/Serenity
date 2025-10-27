@@ -4,7 +4,6 @@ import { OrderColumns, OrderListRequest, OrderRow, OrderService, ProductRow } fr
 import { nsDemoNorthwind } from "../ServerTypes/Namespaces";
 import { OrderDialog } from "./OrderDialog";
 import "./OrderGrid.css";
-import { FrozenLayout } from "@serenity-is/sleekgrid";
 
 export class OrderGrid<P = {}> extends EntityGrid<OrderRow, P> {
     static [Symbol.typeInfo] = this.registerClass(nsDemoNorthwind, [new FilterableAttribute()]);

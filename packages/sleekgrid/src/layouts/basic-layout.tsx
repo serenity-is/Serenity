@@ -18,8 +18,8 @@ export class BasicLayout implements LayoutEngine {
 
         this.host.getContainerNode().append(<>
             <Header band="main" refs={refs} signals={signals} />
-            <TopPanel refs={refs} signals={signals} />
             <HeaderRow band="main" refs={refs} signals={signals} />
+            <TopPanel refs={refs} signals={signals} />
             <Viewport band="main" pane="body" refs={refs} />
             <FooterRow band="main" refs={refs} signals={signals} />
         </>);
@@ -60,46 +60,6 @@ export class BasicLayout implements LayoutEngine {
 
     public getTopPanel(): HTMLElement {
         return this.refs.topPanel;
-    }
-
-    public realScrollHeightChange(): void {
-        this.mainRefs.canvas.body.style.height = this.host.getViewportInfo().realScrollHeight + "px"
-    }
-
-    public setOverflow(): void {
-        var alwaysVS = this.host.getOptions().alwaysShowVerticalScroll;
-
-        this.mainRefs.canvas.body.parentElement.style.overflowX = "auto";
-        this.mainRefs.canvas.body.parentElement.style.overflowY = alwaysVS ? "scroll" : (this.host.getOptions().autoHeight ? "hidden" : "auto");
-    }
-
-    public updateCanvasWidth(): boolean {
-        var oldCanvasWidth = this.canvasWidth;
-        this.canvasWidth = this.calcCanvasWidth();
-        var scrollWidth = this.host.getScrollDims().width;
-
-        const vpi = this.host.getViewportInfo();
-        var canvasWidthPx = this.canvasWidth + "px"
-        this.mainRefs.canvas.body.style.width = canvasWidthPx;
-        this.mainRefs.headerRowCols && (this.mainRefs.headerRowCols.style.width = canvasWidthPx);
-        this.mainRefs.footerRowCols && (this.mainRefs.footerRowCols.style.width = canvasWidthPx);
-        this.updateHeadersWidth();
-        vpi.hasHScroll = (this.canvasWidth > this.host.getViewportInfo().width - scrollWidth);
-
-        return this.canvasWidth != oldCanvasWidth;
-    }
-
-    public resizeCanvas(): void {
-        var vs = this.host.getViewportInfo();
-        const options = this.host.getOptions();
-        if (options.autoHeight) {
-            const totalHeight = vs.groupingPanelHeight + vs.topPanelHeight + vs.headerRowHeight + vs.footerRowHeight +
-                vs.headerHeight + "px";
-
-            this.host.getContainerNode().style.height = totalHeight;
-        }
-        else
-            this.mainRefs.canvas.body.parentElement.style.height = vs.height + "px";
     }
 
     public afterHeaderColumnDrag(): void { }

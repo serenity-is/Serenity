@@ -1,10 +1,92 @@
+.slick-container {
+  display: grid;
+  grid-template-columns: var(--sg-canvas-start-width, 0) 1fr var(--sg-canvas-end-width, 0);
+  grid-template-rows: max-content max-content max-content max-content var(--sg-top-height, max-content) var(--sg-body-height, 1fr) var(--sg-bottom-height, max-content) max-content;
+  grid-template-areas:
+    "grouping-panel grouping-panel grouping-panel"
+    "header-start header-main header-end"
+    "headerrow-start headerrow-main headerrow-end"
+    "top-panel top-panel top-panel"
+    "viewport-top-start viewport-top-main viewport-top-end"
+    "viewport-body-start viewport-body-main viewport-body-end"
+    "viewport-bottom-start viewport-bottom-main viewport-bottom-end"
+    "footerrow-start footerrow-main footerrow-end";
+}
 
+.slick-header-start {
+  grid-area: header-start;
+}
 
-.slick-pane {
-  position: absolute;
-  outline: 0;
-  overflow: hidden;
-  width: 100%;
+.slick-header-main {
+  grid-area: header-main;
+}
+
+.slick-header-end {
+  grid-area: header-end;
+}
+
+.slick-headerrow-start {
+  grid-area: headerrow-start;
+}
+
+.slick-headerrow-main {
+  grid-area: headerrow-main;
+}
+
+.slick-headerrow-end {
+  grid-area: headerrow-end;
+}
+
+.slick-top-panel {
+  grid-area: top-panel;
+}
+
+.slick-viewport-top.slick-viewport-start {
+  grid-area: viewport-top-start;
+}
+
+.slick-viewport-top.slick-viewport-main {
+  grid-area: viewport-top-main;
+}
+
+.slick-viewport-top.slick-viewport-end {
+  grid-area: viewport-top-end;
+}
+
+.slick-viewport-body.slick-viewport-start {
+  grid-area: viewport-body-start;
+}
+
+.slick-viewport-body.slick-viewport-main {
+  grid-area: viewport-body-main;
+}
+
+.slick-viewport-body.slick-viewport-end {
+  grid-area: viewport-body-end;
+}
+
+.slick-viewport-bottom.slick-viewport-start {
+  grid-area: viewport-bottom-start;
+}
+
+.slick-viewport-bottom.slick-viewport-main {
+  grid-area: viewport-bottom-main;
+}
+
+.slick-viewport-bottom.slick-viewport-end {
+  grid-area: viewport-bottom-end;
+}
+
+.slick-footerrow-start {
+  grid-area: footerrow-start;
+}
+
+.slick-footerrow-main {
+  grid-area: footerrow-main;
+}
+
+.slick-footerrow-end {
+  grid-area: footerrow-end;
 }
 
 .slick-viewport {
@@ -17,6 +99,29 @@
   position: relative;
   outline: 0;
   overflow: hidden;
+}
+
+.grid-canvas-main,
+.slick-header-columns,
+.slick-headerrow-columns,
+.slick-footerrow-columns {
+  width: var(--sg-canvas-main-width);
+}
+
+.slick-viewport-top {
+  height: var(--sg-top-height, 0);
+}
+
+.slick-viewport-bottom {
+  height: var(--sg-bottom-height, 0);
+}
+
+.slick-viewport-body {
+  height: var(--sg-body-height, auto);
+}
+
+.grid-canvas-body {
+  height: var(--sg-virtual-height);
 }
 
 .slick-group-header,
@@ -33,7 +138,7 @@
 .slick-grouping-panel,
 .slick-headerrow-columns,
 .slick-footerrow-columns {
-  height: var(--row-height, 30px);
+  height: var(--sg-row-height, 30px);
 }
 
 .slick-header::-webkit-scrollbar,
@@ -127,7 +232,7 @@
 .slick-footerrow-columns,
 .slick-headerrow-columns,
 .slick-header-columns {
-  margin-right: var(--scrollbar-w);
+  margin-right: var(--sg-scrollbar-w);
 }
 
 .slick-cell.editable {
@@ -157,7 +262,7 @@
 }
 
 .slick-vscrollspacer {
-  margin-bottom: var(--scrollbar-h);
+  margin-bottom: var(--sg-scrollbar-h);
 }
 
 /*!rtl:begin:ignore*/
@@ -361,7 +466,6 @@
 .sleek-vars.ltr .l49 {
   left: var(--l49);
 }
-
 
 .sleek-vars.ltr .r0 {
   right: var(--r0);
@@ -965,11 +1069,11 @@
 }
 
 .sleek-vars .slick-cell {
-  height: var(--cell-height);
+  height: var(--sg-cell-height);
 }
 
 .sleek-vars .slick-row {
-  height: var(--row-height);
+  height: var(--sg-row-height);
 }
 
 /*!rtl:end:ignore*/

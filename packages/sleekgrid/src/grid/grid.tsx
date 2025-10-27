@@ -18,7 +18,7 @@ import { addClass, escapeHtml, parsePx, removeClass } from "../core/util";
 import type { ViewportInfo } from "../core/viewportinfo";
 import type { ViewRange } from "../core/viewrange";
 import { BasicLayout } from "../layouts/basic-layout";
-import { applyColumnWidths, applyLegacyHeightOptions } from "../layouts/layout-calculations";
+import { applyColumnWidths, applyLegacyHeightOptions, createCssRules, findStylesheetByUID } from "../layouts/layout-calculations";
 import type { LayoutEngine } from "../layouts/layout-engine";
 import { disposeBandRefs, forEachBand, getAllCanvasNodes, getAllHScrollContainers, getAllViewportNodes, getAllVScrollContainers, mapBands, type GridBandRefs, type GridLayoutRefs } from "../layouts/layout-refs";
 import { CellNavigator } from "./cellnavigator";
@@ -29,7 +29,8 @@ import { bindPrototypeMethods, calcMinMaxPageXOnDragStart, createGridSignalsAndR
 import type { RowCellRenderArgs } from "./render-args";
 import { renderCell } from "./render-cell";
 import { renderRow } from "./render-row";
-import { absBox, createCssRules, findStylesheetByUID, getInnerWidth, getMaxSupportedCssHeight, getScrollBarDimensions } from "./style-utils";
+import { absBox, getInnerWidth, getMaxSupportedCssHeight, getScrollBarDimensions, setStyleProp } from "./style-utils";
+import { TopPane } from "../layouts/layout-components";
 
 export class Grid<TItem = any> implements IGrid<TItem> {
     declare private _absoluteColMinWidth: number;
@@ -48,8 +49,9 @@ export class Grid<TItem = any> implements IGrid<TItem> {
     private _colLeft: number[] = [];
     private _colRight: number[] = [];
     declare private _cols: Column<TItem>[];
-    declare private _colCssRulesL: Record<number, CSSStyleRule>;
-    declare private _colCssRulesR: Record<number, CSSStyleRule>;
+    declare private _cssColRulesL: Record<number, CSSStyleRule>;
+    declare private _cssColRulesR: Record<number, CSSStyleRule>;
+    declare private _cssVarRules: CSSStyleRule;
     declare private _columnSortHandler: (e: MouseEvent) => void;
     declare private _currentEditor: Editor;
     declare private _data: IDataView<TItem> | TItem[];
@@ -316,23 +318,19 @@ export class Grid<TItem = any> implements IGrid<TItem> {
         // header columns and cells may have different padding/border skewing width calculations (box-sizing, hello?)
         // calculate the diff so we can set consistent sizes
         this.measureCellPaddingAndBorder();
-
-        var viewports = this.getViewports();
-
-        this._layout.setPaneVisibility?.();
         this.setOverflow();
-
         this.updateViewColLeftRight();
+        this.createCssRules();
         this.createColumnHeaders();
         this.createColumnFooters();
+        this.applyColumnWidths()
         this.setupColumnSort();
-        this.createCssRules();
         this.resizeCanvas();
         this.bindAncestorScrollEvents();
 
         this._on(this._container, "resize", this.resizeCanvas);
 
-        viewports.forEach(vp => {
+        this.getViewports().forEach(vp => {
             var scrollTicking = false;
             this._on(vp, "scroll", (e) => {
                 if (!scrollTicking) {
@@ -344,9 +342,6 @@ export class Grid<TItem = any> implements IGrid<TItem> {
                     });
                 }
             });
-        });
-
-        viewports.forEach(vp => {
             this._on(vp, "wheel", this.handleMouseWheel as any);
             this._on(vp, "mousewheel" as any, this.handleMouseWheel);
         });
@@ -551,26 +546,50 @@ export class Grid<TItem = any> implements IGrid<TItem> {
 
     applyColumnWidths(): void {
 
-        if (this._styleNode != null && this._stylesheet == null) {
-            const res = findStylesheetByUID(this._uid, this._styleNode);
-            this._stylesheet = res.stylesheet;
-            this._colCssRulesL = res.colCssRulesL;
-            this._colCssRulesR = res.colCssRulesR;
-        }
-
         applyColumnWidths({
             cols: this.getColumns(),
-            colCSSRulesL: this._colCssRulesL,
-            colCSSRulesR: this._colCssRulesR,
+            cssColRulesL: this._cssColRulesL,
+            cssColRulesR: this._cssColRulesR,
             container: this._container,
             opts: this.getOptions(),
             refs: this._refs
         });
     }
 
-    private updateCanvasWidth(forceColumnWidthsUpdate?: boolean): void {
-        const widthChanged = this._layout.updateCanvasWidth();
+    private updateBandCanvasWidths(): boolean {
+        const oldCanvasWidths = this._mapBands(x => { const w = x.canvasWidth; x.canvasWidth = 0; return w; });
+        const cols = this._cols;
+        const { pinnedStartLast, pinnedEndFirst, start, main, end } = this._refs;
+        let c = cols.length;
+        while (c--) {
+            if (c <= pinnedStartLast) {
+                start.canvasWidth += cols[c].width;
+            }
+            else if (c >= pinnedEndFirst) {
+                end.canvasWidth += cols[c].width;
+            }
+            else {
+                main.canvasWidth += cols[c].width;
+            }
+        }
+        const widthChanged = start.canvasWidth !== oldCanvasWidths[0] ||
+            main.canvasWidth !== oldCanvasWidths[1] ||
+            end.canvasWidth !== oldCanvasWidths[2];
 
+        if (widthChanged) {
+            this._viewportInfo.hasHScroll = (main.canvasWidth > this._viewportInfo.width - this._scrollDims.width);
+        }
+
+        const style = this._cssVarRules?.style ?? this._container.style;
+        const refs = this._refs;
+        setStyleProp(style, "--sg-canvas-start-width", refs.start.canvasWidth + "px");
+        setStyleProp(style, "--sg-canvas-main-width", refs.main.canvasWidth + "px");
+        setStyleProp(style, "--sg-canvas-end-width", refs.end.canvasWidth + "px");
+        return widthChanged;
+    }
+
+    private updateCanvasWidth(forceColumnWidthsUpdate?: boolean): void {
+        const widthChanged = this.updateBandCanvasWidths();
         if (widthChanged || forceColumnWidthsUpdate) {
             this.applyColumnWidths();
         }
@@ -760,7 +779,7 @@ export class Grid<TItem = any> implements IGrid<TItem> {
             this._emptyNode(hc);
         });
 
-        this._layout.updateHeadersWidth();
+        this.updateBandCanvasWidths();
 
         this._mapBands(band => band.headerRowCols).forEach(hrc => {
             hrc.querySelectorAll(".slick-headerrow-column")
@@ -831,11 +850,7 @@ export class Grid<TItem = any> implements IGrid<TItem> {
     }
 
     private setupColumnSort(): void {
-        this._columnSortHandler ??= columnSortHandler.bind({
-            grid: this,
-            trigger: this._trigger,
-        });
-
+        this._columnSortHandler ??= columnSortHandler.bind(this);
         this._mapBands(band => band.headerCols).forEach(el => this._on(el, 'click', this._columnSortHandler));
     }
 
@@ -1017,8 +1032,7 @@ export class Grid<TItem = any> implements IGrid<TItem> {
                 }
                 shrinkOrStretchColumn(cols, colIdx, dist, this._options.forceFitColumns, this._absoluteColMinWidth);
 
-                this._layout.afterHeaderColumnDrag();
-
+                this.updateCanvasWidth(false)
                 this.applyColumnHeaderWidths();
                 if (this._options.syncColumnCellResize) {
                     this.applyColumnWidths();
@@ -1067,7 +1081,13 @@ export class Grid<TItem = any> implements IGrid<TItem> {
     }
 
     private setOverflow(): void {
-        this._layout.setOverflow();
+        const alwaysHS = this._options.alwaysAllowHorizontalScroll;
+        const alwaysVS = this._options.alwaysShowVerticalScroll;
+        const autoHeight = this._options.autoHeight;
+
+        this._refs.main.canvas.body.parentElement.style.overflowX = alwaysHS ? "scroll" : "auto";
+        this._refs.main.canvas.body.parentElement.style.overflowY = alwaysVS ? "scroll" : autoHeight ? "hidden" : "auto";
+
         if (this._options.viewportClass)
             this.getViewports().forEach(vp => addClass(vp, this._options.viewportClass));
     }
@@ -1114,6 +1134,14 @@ export class Grid<TItem = any> implements IGrid<TItem> {
             cellHeightDiff: this._cellHeightDiff,
             colCount: this._cols.length
         })?.styleNode;
+
+        if (this._styleNode != null && this._stylesheet == null) {
+            const res = findStylesheetByUID(this._uid, this._styleNode);
+            this._stylesheet = res.stylesheet;
+            this._cssColRulesL = res.colCssRulesL;
+            this._cssColRulesR = res.colCssRulesR;
+            this._cssVarRules = res.varRule;
+        }
     }
 
     destroy() {
@@ -1433,9 +1461,7 @@ export class Grid<TItem = any> implements IGrid<TItem> {
         this.updateViewColLeftRight();
 
         if (this._initialized) {
-            this._layout.setPaneVisibility?.();
             this.setOverflow();
-
             this.invalidateAllRows();
             this.createColumnHeaders();
             this.createColumnFooters();
@@ -1443,8 +1469,7 @@ export class Grid<TItem = any> implements IGrid<TItem> {
             this.removeCssRules();
             this.createCssRules();
             this.resizeCanvas();
-            this.updateCanvasWidth();
-            this.applyColumnWidths();
+            this.updateCanvasWidth(true);
             this.handleScroll();
             this.getSelectionModel()?.refreshSelections?.();
         }
@@ -1945,6 +1970,7 @@ export class Grid<TItem = any> implements IGrid<TItem> {
         const layout = this._layout;
         const refs = this._refs;
         const vs = this._viewportInfo;
+        this.updateBandCanvasWidths();
         vs.width = getInnerWidth(this._container);
         vs.groupingPanelHeight = (this._options.groupingPanel && this._options.showGroupingPanel) ? this._groupingPanel?.offsetHeight || 0 : 0;
         vs.topPanelHeight = this._options.showTopPanel ? (refs.topPanel?.parentElement?.offsetHeight || 0) : 0;
@@ -1954,8 +1980,9 @@ export class Grid<TItem = any> implements IGrid<TItem> {
 
         if (this._options.autoHeight) {
             vs.height = this._options.rowHeight * this.getDataLengthIncludingAddNew();
-            if (this._layout.calcCanvasWidth() > vs.width)
+            if (this._refs.main.canvasWidth > vs.width) {
                 vs.height += this._scrollDims.height;
+            }
         } else {
 
             var style = getComputedStyle(this._container);
@@ -1978,7 +2005,7 @@ export class Grid<TItem = any> implements IGrid<TItem> {
         }
 
         this.calcViewportSize();
-        this._layout.resizeCanvas();
+        this.setPaneHeights();
 
         if (!this._scrollDims || !this._scrollDims.width) {
             this._scrollDims = getScrollBarDimensions(true);
@@ -2066,7 +2093,7 @@ export class Grid<TItem = any> implements IGrid<TItem> {
         }
 
         if (vpi.realScrollHeight !== oldH) {
-            this._layout.realScrollHeightChange();
+            this.setVirtualHeight();
             this._scrollTop = this.getScrollContainerY().scrollTop;
         }
 
@@ -2090,6 +2117,22 @@ export class Grid<TItem = any> implements IGrid<TItem> {
             this.autosizeColumns();
         }
         this.updateCanvasWidth(false);
+    }
+
+    private setPaneHeights() {
+        const style = this._cssVarRules?.style ?? this._container.style;
+        const { frozenTopLast, frozenBottomFirst } = this._refs;
+        const topHeight = (frozenTopLast >= 0 ? (frozenTopLast + 1) * this._options.rowHeight : 0);
+        const bottomHeight = (frozenBottomFirst != Infinity ? (this.getDataLength() - frozenBottomFirst) * this._options.rowHeight : 0);
+        setStyleProp(style, '--sg-top-height', topHeight + "px");
+        setStyleProp(style, '--sg-bottom-height', bottomHeight + "px");
+        setStyleProp(style, '--sg-body-height', (this._viewportInfo.height - topHeight - bottomHeight) + "px");
+        this.setVirtualHeight();
+    }
+
+    private setVirtualHeight() {
+        const style = this._cssVarRules?.style ?? this._container.style;
+        setStyleProp(style, '--sg-virtual-height', this._viewportInfo.realScrollHeight + "px");
     }
 
     /**
@@ -2145,14 +2188,14 @@ export class Grid<TItem = any> implements IGrid<TItem> {
 
         if (this._options.renderAllCells) {
             range.leftPx = 0;
-            range.rightPx = this._layout.getCanvasWidth();
+            range.rightPx = this._refs.main.canvasWidth;
         }
         else {
             range.leftPx -= this._viewportInfo.width;
             range.rightPx += this._viewportInfo.width;
 
             range.leftPx = Math.max(0, range.leftPx);
-            range.rightPx = Math.min(this._layout.getCanvasWidth(), range.rightPx);
+            range.rightPx = Math.min(this._refs.main.canvasWidth, range.rightPx);
         }
 
         return range;

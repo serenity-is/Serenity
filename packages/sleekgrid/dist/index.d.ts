@@ -576,6 +576,7 @@ export interface GridBandRefs {
 	};
 	footerRowCols?: HTMLElement;
 	readonly firstCol: number;
+	canvasWidth: number;
 }
 export type GridLayoutRefs = {
 	readonly start: GridBandRefs;
@@ -610,18 +611,9 @@ export interface LayoutEngine {
 	layoutName: string;
 	init(host: LayoutHost): void;
 	destroy(): void;
-	afterHeaderColumnDrag(): void;
 	afterSetOptions(args: GridOptions): void;
-	calcCanvasWidth(): number;
-	getCanvasWidth(): number;
-	realScrollHeightChange(): void;
 	/** this might be called before init, chicken egg situation */
 	reorderViewColumns?(viewCols: Column[], refs: GridLayoutRefs): Column[];
-	resizeCanvas(): void;
-	setOverflow(): void;
-	setPaneVisibility?(): void;
-	updateCanvasWidth(): boolean;
-	updateHeadersWidth(): void;
 }
 /**
  * Configuration options for the SleekGrid component.
@@ -1202,10 +1194,6 @@ export declare class BasicLayout implements LayoutEngine {
 	destroy(): void;
 	getCanvasWidth(): number;
 	getTopPanel(): HTMLElement;
-	realScrollHeightChange(): void;
-	setOverflow(): void;
-	updateCanvasWidth(): boolean;
-	resizeCanvas(): void;
 	afterHeaderColumnDrag(): void;
 	afterRenderRows(): void;
 	afterSetOptions(): void;
@@ -1231,8 +1219,9 @@ export declare class Grid<TItem = any> implements IGrid<TItem> {
 	private _colLeft;
 	private _colRight;
 	private _cols;
-	private _colCssRulesL;
-	private _colCssRulesR;
+	private _cssColRulesL;
+	private _cssColRulesR;
+	private _cssVarRules;
 	private _columnSortHandler;
 	private _currentEditor;
 	private _data;
@@ -1366,6 +1355,7 @@ export declare class Grid<TItem = any> implements IGrid<TItem> {
 	getActiveViewportNode(e?: IEventData): HTMLElement;
 	private getAvailableWidth;
 	applyColumnWidths(): void;
+	private updateBandCanvasWidths;
 	private updateCanvasWidth;
 	private bindAncestorScrollEvents;
 	private unbindAncestorScrollEvents;
@@ -1468,6 +1458,7 @@ export declare class Grid<TItem = any> implements IGrid<TItem> {
 	getScrollContainerX(): HTMLElement;
 	getScrollContainerY(): HTMLElement;
 	updateRowCount(): void;
+	private realScrollHeightChange;
 	/**
 	 * @param viewportTop optional viewport top
 	 * @param viewportLeft optional viewport left

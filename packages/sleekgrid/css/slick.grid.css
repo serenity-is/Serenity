@@ -8,14 +8,14 @@ classes should alter those!
 */
 
 :root {
-  --slick-editable-bg: #ffffff;
-  --slick-header-bg: #f7f7f5;
-  --slick-header-border: #d6d7d6;
-  --slick-cell-border: #d6d7d6;
-  --slick-padding-v: 4px;
-  --slick-padding-h: 6px;
-  --slick-row-bg: #ffffff;
-  --slick-row-odd-bg: #f9f9f9;
+  --sg-editable-bg: #ffffff;
+  --sg-header-bg: #f7f7f5;
+  --sg-header-border: #d6d7d6;
+  --sg-cell-border: #d6d7d6;
+  --sg-padding-v: 4px;
+  --sg-padding-h: 6px;
+  --sg-row-bg: #ffffff;
+  --sg-row-odd-bg: #f9f9f9;
 }
 
 .slick-container {
@@ -29,18 +29,18 @@ classes should alter those!
 .slick-header-columns,
 .slick-headerrow-columns,
 .slick-footerrow-columns {
-  background-color: var(--slick-header-bg);
+  background-color: var(--sg-header-bg);
 }
 
 .slick-header-columns {
-  border-bottom: 1px solid var(--slick-header-border);
+  border-bottom: 1px solid var(--sg-header-border);
 }
 
 .slick-group-header,
 .slick-headerrow-column,
 .slick-header-column,
 .slick-footerrow-column {
-  background-color: var(--slick-header-bg);
+  background-color: var(--sg-header-bg);
 }
 
 .slick-cell.active {
@@ -51,7 +51,7 @@ classes should alter those!
 .slick-header-column,
 .slick-headerrow-column,
 .slick-footerrow-column {
-  border-right: 1px solid var(--slick-header-border);
+  border-right: 1px solid var(--sg-header-border);
 }
 
 .slick-sort-indicator {
@@ -84,14 +84,14 @@ classes should alter those!
 .slick-header-column,
 .slick-footerrow-column,
 .slick-cell {
-  padding: var(--slick-padding-v) var(--slick-padding-h);
+  padding: var(--sg-padding-v) var(--sg-padding-h);
 }
 
 .slick-cell,
 .slick-headerrow-column,
 .slick-footerrow-column {
-  border-right: 1px solid var(--slick-cell-border);
-  border-bottom: 1px solid var(--slick-cell-border);
+  border-right: 1px solid var(--sg-cell-border);
+  border-bottom: 1px solid var(--sg-cell-border);
 }
 
 .slick-cell.highlighted {
@@ -105,7 +105,7 @@ classes should alter those!
 }
 
 .slick-cell.editable {
-  background: var(--slick-editable-bg);
+  background: var(--sg-editable-bg);
   box-shadow: -1px -1px 2px 1px rgba(0, 0, 0, 0.1);
 }
 

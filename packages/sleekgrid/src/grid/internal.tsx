@@ -190,19 +190,22 @@ export function createGridSignalsAndRefs(): { signals: GridSignals; refs: GridLa
             canvas: {
                 body: null
             },
-            firstCol: -Infinity
+            firstCol: -Infinity,
+            canvasWidth: 0
         },
         main: {
             key: "main",
             canvas: { body: null },
-            firstCol: 0
+            firstCol: 0,
+            canvasWidth: 0
         },
         end: {
             key: "end",
             canvas: {
                 body: null
             },
-            firstCol: Infinity
+            firstCol: Infinity,
+            canvasWidth: 0
         },
         get pinnedStartLast() {
             return pinnedStartLast;
