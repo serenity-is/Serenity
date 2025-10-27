@@ -71,6 +71,7 @@ export const FrozenLayout: { new(): LayoutEngine } = function (): LayoutEngine {
     }
 
     return {
+        adjustFrozenRowsOption,
         afterSetOptions,
         destroy,
         init,

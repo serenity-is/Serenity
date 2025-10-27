@@ -109,6 +109,11 @@
   margin-bottom: var(--sg-scrollbar-h);
 }
 
+.slick-viewport-top.slick-viewport-main,
+.slick-viewport-bottom.slick-viewport-main {
+  overflow: hidden;
+}
+
 .grid-canvas {
   position: relative;
   outline: 0;
@@ -122,11 +127,13 @@
   width: var(--sg-virtual-width);
 }
 
-.slick-viewport-top {
+.slick-viewport-top,
+.grid-canvas-top {
   height: var(--sg-top-height, 0);
 }
 
-.slick-viewport-bottom {
+.slick-viewport-bottom,
+.grid-canvas-bottom {
   height: var(--sg-bottom-height, 0);
 }
 
@@ -247,7 +254,9 @@
 .slick-hscrollspacer,
 .slick-footerrow-columns,
 .slick-headerrow-columns,
-.slick-header-columns {
+.slick-header-columns,
+.grid-canvas-top.grid-canvas-main,
+.grid-canvas-bottom.grid-canvas-main {
   margin-right: var(--sg-scrollbar-w);
 }
 

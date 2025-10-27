@@ -314,6 +314,7 @@ export class Grid<TItem = any> implements IGrid<TItem> {
         this._initialized = true;
 
         this.calcViewportSize();
+        this._layout.adjustFrozenRowsOption?.();
 
         // header columns and cells may have different padding/border skewing width calculations (box-sizing, hello?)
         // calculate the diff so we can set consistent sizes
@@ -2045,13 +2046,14 @@ export class Grid<TItem = any> implements IGrid<TItem> {
         var scrollCanvas = this._refs.main.canvas.body;
         var oldH = Math.round(parsePx(getComputedStyle(scrollCanvas).height));
 
-        var numberOfRows;
+        let numberOfRows = dataLengthIncludingAddNew + (this._options.leaveSpaceForNewRows ? this._viewportInfo.numVisibleRows - 1 : 0);
         const { frozenTopLast, frozenBottomFirst } = this._refs;
         const dataLength = this.getDataLength();
-        if (frozenTopLast >= 0 || frozenBottomFirst != Infinity) {
-            numberOfRows = dataLength - (frozenTopLast + 1) - (dataLength - frozenBottomFirst - 1);
-        } else {
-            numberOfRows = dataLengthIncludingAddNew + (this._options.leaveSpaceForNewRows ? this._viewportInfo.numVisibleRows - 1 : 0);
+        if (frozenTopLast >= 0) {
+            numberOfRows -= frozenTopLast + 1;
+        }
+        if (frozenBottomFirst < dataLength) {
+            numberOfRows -= (dataLength - frozenBottomFirst - 1);
         }
 
         var tempViewportH = Math.round(parsePx(getComputedStyle(this.getScrollContainerY()).height));
