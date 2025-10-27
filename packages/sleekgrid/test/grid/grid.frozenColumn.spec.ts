@@ -151,19 +151,19 @@ describe('options.frozenColumns', () => {
 
         //const paneTopLeft = div.querySelector(`.${slickPaneTop}.${slickPaneStart}`) as HTMLDivElement;
         //expect(paneTopLeft).toBeDefined();
-        //expect(paneTopLeft.classList.contains("slick-hidden")).toBe(false);
+        //expect(paneTopLeft.classList.contains("sg-hidden")).toBe(false);
 //
         //const paneTopRight = div.querySelector(`.${slickPaneTop}.${slickPaneMain}`) as HTMLDivElement;
         //expect(paneTopRight).toBeDefined();
-        //expect(paneTopRight.classList.contains("slick-hidden")).toBe(false);
+        //expect(paneTopRight.classList.contains("sg-hidden")).toBe(false);
 //
         //const paneBottomLeft = div.querySelector(`.${slickPaneBottom}.${slickPaneStart}`) as HTMLDivElement;
         //expect(paneBottomLeft).toBeDefined();
-        //expect(paneBottomLeft.classList.contains("slick-hidden")).toBe(true);
+        //expect(paneBottomLeft.classList.contains("sg-hidden")).toBe(true);
 //
         //const paneBottomRight = div.querySelector(`.${slickPaneBottom}.${slickPaneMain}`) as HTMLDivElement;
         //expect(paneBottomRight).toBeDefined();
-        //expect(paneBottomRight.classList.contains("slick-hidden")).toBe(true);
+        //expect(paneBottomRight.classList.contains("sg-hidden")).toBe(true);
     });
 
     it("switches scroll containers when setting frozen columns back to 0 at runtime", () => {

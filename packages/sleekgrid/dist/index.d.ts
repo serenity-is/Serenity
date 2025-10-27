@@ -611,6 +611,7 @@ export interface LayoutEngine {
 	layoutName: string;
 	init(host: LayoutHost): void;
 	destroy(): void;
+	adjustFrozenRowsOption?(): void;
 	afterSetOptions(args: GridOptions): void;
 	/** this might be called before init, chicken egg situation */
 	reorderViewColumns?(viewCols: Column[], refs: GridLayoutRefs): Column[];
@@ -1183,25 +1184,50 @@ export declare function disableSelection(target: HTMLElement): void;
 export declare function removeClass(el: Element, cls: string): void;
 export declare function parsePx(str: string): number;
 export declare class BasicLayout implements LayoutEngine {
-	protected canvasWidth: number;
-	protected headersWidth: number;
 	protected host: LayoutHost;
-	protected mainRefs: GridBandRefs;
 	protected refs: GridLayoutRefs;
 	init(host: LayoutHost): void;
 	calcCanvasWidth(): number;
-	updateHeadersWidth(): void;
 	destroy(): void;
-	getCanvasWidth(): number;
 	getTopPanel(): HTMLElement;
-	afterHeaderColumnDrag(): void;
-	afterRenderRows(): void;
 	afterSetOptions(): void;
 	readonly layoutName = "basic";
 }
-export declare const FrozenLayout: {
-	new (): LayoutEngine;
-};
+export declare class FrozenLayout implements LayoutEngine {
+	private host;
+	private refs;
+	init(host: LayoutHost): void;
+	reorderViewColumns(viewCols: Column[], refs: GridLayoutRefs): Column[];
+	afterSetOptions(arg: GridOptions): void;
+	adjustFrozenRowsOption(): void;
+	destroy(): void;
+	readonly layoutName = "frozen";
+}
+export declare const Header: ({ band, refs, signals }: {
+	band: BandKey;
+	refs: GridLayoutRefs;
+	signals: Pick<GridSignals, "hideColumnHeader" | "pinnedStartLast" | "pinnedEndFirst">;
+}) => import("@serenity-is/sleekdom").JSXElement;
+export declare const HeaderRow: ({ band, refs, signals }: {
+	band: BandKey;
+	refs: GridLayoutRefs;
+	signals: Pick<GridSignals, "hideHeaderRow" | "pinnedStartLast" | "pinnedEndFirst">;
+}) => import("@serenity-is/sleekdom").JSXElement;
+export declare const TopPanel: ({ refs, signals }: {
+	refs: GridLayoutRefs;
+	signals: Pick<GridSignals, "hideTopPanel">;
+}) => import("@serenity-is/sleekdom").JSXElement;
+export declare const Viewport: ({ band, pane, refs, signals }: {
+	band: BandKey;
+	pane: PaneKey;
+	refs: GridLayoutRefs;
+	signals: Pick<GridSignals, "frozenTopLast" | "frozenBottomFirst" | "pinnedStartLast" | "pinnedEndFirst">;
+}) => import("@serenity-is/sleekdom").JSXElement;
+export declare const FooterRow: ({ band, refs, signals }: {
+	band: BandKey;
+	refs: GridLayoutRefs;
+	signals: Pick<GridSignals, "hideFooterRow" | "pinnedStartLast" | "pinnedEndFirst">;
+}) => import("@serenity-is/sleekdom").JSXElement;
 export declare class Grid<TItem = any> implements IGrid<TItem> {
 	private _absoluteColMinWidth;
 	private _activeCanvasNode;
@@ -1458,7 +1484,8 @@ export declare class Grid<TItem = any> implements IGrid<TItem> {
 	getScrollContainerX(): HTMLElement;
 	getScrollContainerY(): HTMLElement;
 	updateRowCount(): void;
-	private realScrollHeightChange;
+	private setPaneHeights;
+	private setVirtualHeight;
 	/**
 	 * @param viewportTop optional viewport top
 	 * @param viewportLeft optional viewport left

@@ -288,7 +288,7 @@ describe('layout', () => {
         const container = document.createElement("div");
         new Grid(container, [], [], { groupingPanel: true, showGroupingPanel: false });
 
-        expect(container.querySelector<HTMLElement>(".slick-grouping-panel")?.classList.contains("slick-hidden")).toBe(true);
+        expect(container.querySelector<HTMLElement>(".slick-grouping-panel")?.classList.contains("sg-hidden")).toBe(true);
     });
 
     it('should bind grid instance to the layout functions', () => {

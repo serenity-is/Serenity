@@ -17,27 +17,27 @@
   grid-area: grouping-panel;
 }
 
-.slick-header-start {
+.slick-header.sg-start {
   grid-area: header-start;
 }
 
-.slick-header-main {
+.slick-header.sg-main {
   grid-area: header-main;
 }
 
-.slick-header-end {
+.slick-header.sg-end {
   grid-area: header-end;
 }
 
-.slick-headerrow-start {
+.slick-headerrow.sg-start {
   grid-area: headerrow-start;
 }
 
-.slick-headerrow-main {
+.slick-headerrow.sg-main {
   grid-area: headerrow-main;
 }
 
-.slick-headerrow-end {
+.slick-headerrow.sg-end {
   grid-area: headerrow-end;
 }
 
@@ -45,51 +45,51 @@
   grid-area: top-panel;
 }
 
-.slick-viewport-top.slick-viewport-start {
+.slick-viewport.sg-top.sg-start {
   grid-area: viewport-top-start;
 }
 
-.slick-viewport-top.slick-viewport-main {
+.slick-viewport.sg-top.sg-main {
   grid-area: viewport-top-main;
 }
 
-.slick-viewport-top.slick-viewport-end {
+.slick-viewport.sg-top.sg-end {
   grid-area: viewport-top-end;
 }
 
-.slick-viewport-body.slick-viewport-start {
+.slick-viewport.sg-body.sg-start {
   grid-area: viewport-body-start;
 }
 
-.slick-viewport-body.slick-viewport-main {
+.slick-viewport.sg-body.sg-main {
   grid-area: viewport-body-main;
 }
 
-.slick-viewport-body.slick-viewport-end {
+.slick-viewport.sg-body.sg-end {
   grid-area: viewport-body-end;
 }
 
-.slick-viewport-bottom.slick-viewport-start {
+.slick-viewport.sg-bottom.sg-start {
   grid-area: viewport-bottom-start;
 }
 
-.slick-viewport-bottom.slick-viewport-main {
+.slick-viewport.sg-bottom.sg-main {
   grid-area: viewport-bottom-main;
 }
 
-.slick-viewport-bottom.slick-viewport-end {
+.slick-viewport.sg-bottom.sg-end {
   grid-area: viewport-bottom-end;
 }
 
-.slick-footerrow-start {
+.slick-footerrow.sg-start {
   grid-area: footerrow-start;
 }
 
-.slick-footerrow-main {
+.slick-footerrow.sg-main {
   grid-area: footerrow-main;
 }
 
-.slick-footerrow-end {
+.slick-footerrow.sg-end {
   grid-area: footerrow-end;
 }
 
@@ -99,18 +99,18 @@
   width: 100%;
 }
 
-.slick-viewport-body.slick-viewport-start,
-.slick-viewport-body.slick-viewport-end {
+.slick-viewport.sg-body.sg-start,
+.slick-viewport.sg-body.sg-end {
   overflow-y: hidden;
 }
 
-.slick-viewport-body.slick-viewport-start .grid-canvas,
-.slick-viewport-body.slick-viewport-end .grid-canvas {
+.grid-canvas.sg-body.sg-start,
+.grid-canvas.sg-body.sg-end {
   margin-bottom: var(--sg-scrollbar-h);
 }
 
-.slick-viewport-top.slick-viewport-main,
-.slick-viewport-bottom.slick-viewport-main {
+.slick-viewport.sg-top.sg-main,
+.slick-viewport.sg-bottom.sg-main {
   overflow: hidden;
 }
 
@@ -120,28 +120,28 @@
   overflow: hidden;
 }
 
-.grid-canvas-main,
+.grid-canvas.sg-main,
 .slick-header-columns,
 .slick-headerrow-columns,
 .slick-footerrow-columns {
   width: var(--sg-virtual-width);
 }
 
-.slick-viewport-top,
-.grid-canvas-top {
+.slick-viewport.sg-top,
+.grid-canvas.sg-top {
   height: var(--sg-top-height, 0);
 }
 
-.slick-viewport-bottom,
-.grid-canvas-bottom {
+.slick-viewport.sg-bottom,
+.grid-canvas.sg-bottom {
   height: var(--sg-bottom-height, 0);
 }
 
-.slick-viewport-body {
+.slick-viewport.sg-body {
   height: var(--sg-body-height, auto);
 }
 
-.grid-canvas-body {
+.grid-canvas.sg-body {
   height: var(--sg-virtual-height);
 }
 
@@ -247,7 +247,7 @@
   outline: 0 !important;
 }
 
-.slick-hidden {
+.sg-hidden {
   display: none !important;
 }
 

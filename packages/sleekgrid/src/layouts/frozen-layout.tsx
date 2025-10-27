@@ -2,21 +2,17 @@ import { Column, GridOptions } from "../core";
 import { FooterRow, Header, HeaderRow, TopPanel, Viewport } from "./layout-components";
 import type { LayoutEngine } from "./layout-engine";
 import type { LayoutHost } from "./layout-host";
-import type { GridBandRefs, GridLayoutRefs } from "./layout-refs";
+import type { GridLayoutRefs } from "./layout-refs";
 
-export const FrozenLayout: { new(): LayoutEngine } = function (): LayoutEngine {
-    var host: LayoutHost;
-    let startRefs: GridBandRefs
-    let mainRefs: GridBandRefs
-    let refs: GridLayoutRefs;
+export class FrozenLayout implements LayoutEngine {
+    private host: LayoutHost;
+    private refs: GridLayoutRefs;
 
-    function init(hostGrid: LayoutHost) {
-        host = hostGrid;
-        refs = host.refs;
-        startRefs = refs.start;
-        mainRefs = refs.main;
+    init(host: LayoutHost) {
+        this.host = host;
+        this.refs = host.refs;
         const signals = host.getSignals();
-        const common = { refs, signals};
+        const common = { refs: this.refs, signals };
 
         host.getContainerNode().append(<>
             <Header band="start" {...common} />
@@ -32,50 +28,42 @@ export const FrozenLayout: { new(): LayoutEngine } = function (): LayoutEngine {
             <FooterRow band="main" {...common} />
         </>);
 
-        adjustFrozenRowsOption();
+        this.adjustFrozenRowsOption();
     }
 
-    function reorderViewColumns(viewCols: Column[], refs: GridLayoutRefs): Column[] {
+    public reorderViewColumns(viewCols: Column[], refs: GridLayoutRefs): Column[] {
         const pinnedStartCols = viewCols.filter(x => x.frozen && x.frozen !== 'end');
-        refs.pinnedStartLast = pinnedStartCols.length - 1;
+        refs.pinnedStartLast = pinnedStartCols.length > 0 ? pinnedStartCols.length - 1 : -Infinity;
         if (pinnedStartCols.length > 0)
             return pinnedStartCols.concat(viewCols.filter(x => !x.frozen));
         return null;
     }
 
-    function afterSetOptions(arg: GridOptions) {
+    public afterSetOptions(arg: GridOptions) {
         if (arg.frozenRows != null || arg.frozenBottom != null)
-            adjustFrozenRowsOption();
+            this.adjustFrozenRowsOption();
         if (arg.frozenColumns != null && arg.columns == null) {
-            const columns = reorderViewColumns(host.getInitialColumns(), refs);
+            const columns = this.reorderViewColumns(this.host.getInitialColumns(), this.refs);
             if (columns != null)
                 arg.columns = columns;
         }
     }
 
-    function adjustFrozenRowsOption(): void {
-        const { autoHeight } = host.getOptions();
+    public adjustFrozenRowsOption(): void {
+        const { autoHeight, frozenRows, frozenBottom } = this.host.getOptions();
         let frozenTopLast = -Infinity;
-        const options = host.getOptions();
-        if (!options.autoHeight) {
-            let availRows = host.getViewportInfo().numVisibleRows;
-            let frozenTopRows = options.frozenBottom === true ? 0 : (options.frozenRows ?? 0);
-            frozenTopRows = (frozenTopRows > 0 && options.frozenRows <= availRows) ? frozenTopRows : 0;
+        if (!autoHeight) {
+            let availRows = this.host.getViewportInfo().numVisibleRows;
+            let frozenTopRows = frozenBottom === true ? 0 : (frozenRows ?? 0);
+            frozenTopRows = (frozenTopRows > 0 && frozenRows <= availRows) ? frozenTopRows : 0;
             frozenTopLast = frozenTopRows > 0 ? frozenTopRows - 1 : -Infinity;
         }
-        refs.frozenTopLast = frozenTopLast;
+        this.refs.frozenTopLast = frozenTopLast;
     }
 
-    function destroy(): void {
-        host = startRefs = mainRefs = null;
+    public destroy(): void {
+        this.host = null;
     }
 
-    return {
-        adjustFrozenRowsOption,
-        afterSetOptions,
-        destroy,
-        init,
-        layoutName: "frozen",
-        reorderViewColumns
-    }
-} as any;
+    readonly layoutName = "frozen";
+}

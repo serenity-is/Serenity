@@ -129,7 +129,7 @@ describe('viewport', () => {
 
         const oldGetComputedStyles = window.getComputedStyle;
         window.getComputedStyle = (el: HTMLElement) => {
-            if (el.classList.contains("slick-viewport-body"))
+            if (el.matches(".slick-viewport.sg-body"))
                 return { height: viewportHeight + 'px' } as any;
 
             return oldGetComputedStyles(el);

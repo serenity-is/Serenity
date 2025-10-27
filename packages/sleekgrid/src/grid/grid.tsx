@@ -30,7 +30,6 @@ import type { RowCellRenderArgs } from "./render-args";
 import { renderCell } from "./render-cell";
 import { renderRow } from "./render-row";
 import { absBox, getInnerWidth, getMaxSupportedCssHeight, getScrollBarDimensions, setStyleProp } from "./style-utils";
-import { TopPane } from "../layouts/layout-components";
 
 export class Grid<TItem = any> implements IGrid<TItem> {
     declare private _absoluteColMinWidth: number;
@@ -296,7 +295,7 @@ export class Grid<TItem = any> implements IGrid<TItem> {
         if (this._groupingPanel)
             return;
 
-        this._groupingPanel = <div class={["slick-grouping-panel", !this._options.showGroupingPanel && "slick-hidden"]}>
+        this._groupingPanel = <div class={["slick-grouping-panel", !this._options.showGroupingPanel && "sg-hidden"]}>
             {this._options.createPreHeaderPanel && <div class="slick-preheader-panel" />}
         </div> as HTMLElement;
 
@@ -1436,7 +1435,7 @@ export class Grid<TItem = any> implements IGrid<TItem> {
                     options.frozenColumns++;
                     toFreezeStart--;
                 }
-                else if (col.frozen !== undefined)
+                else if (col.frozen !== undefined && col.frozen !== "end")
                     delete col.frozen;
             }
         }
@@ -1632,7 +1631,7 @@ export class Grid<TItem = any> implements IGrid<TItem> {
     setGroupingPanelVisibility(visible: boolean): void {
         if (this._options.showGroupingPanel != visible) {
             this._options.showGroupingPanel = visible;
-            this._groupingPanel?.classList.toggle("slick-hidden", !visible);
+            this._groupingPanel?.classList.toggle("sg-hidden", !visible);
             this.resizeCanvas();
         }
     }
@@ -2047,8 +2046,9 @@ export class Grid<TItem = any> implements IGrid<TItem> {
         var oldH = Math.round(parsePx(getComputedStyle(scrollCanvas).height));
 
         let numberOfRows = dataLengthIncludingAddNew + (this._options.leaveSpaceForNewRows ? this._viewportInfo.numVisibleRows - 1 : 0);
-        const { frozenTopLast, frozenBottomFirst } = this._refs;
         const dataLength = this.getDataLength();
+        this._layout.adjustFrozenRowsOption?.();
+        const { frozenTopLast, frozenBottomFirst } = this._refs;
         if (frozenTopLast >= 0) {
             numberOfRows -= frozenTopLast + 1;
         }
@@ -2126,7 +2126,8 @@ export class Grid<TItem = any> implements IGrid<TItem> {
         const style = this._cssVarRules?.style ?? this._container.style;
         const { frozenTopLast, frozenBottomFirst } = this._refs;
         const topHeight = (frozenTopLast >= 0 ? (frozenTopLast + 1) * this._options.rowHeight : 0);
-        const bottomHeight = (frozenBottomFirst != Infinity ? (this.getDataLength() - frozenBottomFirst) * this._options.rowHeight : 0);
+        const dataLength = this.getDataLength();
+        const bottomHeight = (frozenBottomFirst < dataLength ? (this.getDataLength() - frozenBottomFirst) * this._options.rowHeight : 0);
         setStyleProp(style, '--sg-top-height', topHeight + "px");
         setStyleProp(style, '--sg-bottom-height', bottomHeight + "px");
         setStyleProp(style, '--sg-body-height', (this._viewportInfo.height - topHeight - bottomHeight) + "px");

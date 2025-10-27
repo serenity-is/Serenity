@@ -1,11 +1,10 @@
-import { CellRange, EventEmitter } from "../../src/core";
-import { SelectionModel } from "../../src/grid";
+import { CellRange, EventEmitter, type IGrid, type SelectionModel } from "../../src/core";
 import { Grid } from "../../src/grid/grid";
 
 it('should selectionModel init with grid', () => {
     const grid = new Grid(document.createElement('div'), [], [], {});
 
-    let selectionModelInitGrid: Grid | null = null;
+    let selectionModelInitGrid: IGrid | null = null;
     const selectionModel: SelectionModel = {
         init: (grid: IGrid) => {
             selectionModelInitGrid = grid;
