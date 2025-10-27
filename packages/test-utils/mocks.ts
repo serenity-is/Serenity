@@ -219,8 +219,6 @@ export function mockGridSize() {
     .slick-cell, .slick-headerrow-column, .slick-footerrow-column { position: absolute; }
     .slick-group-toggle { display: inline-block; }
     .slick-selection { z-index: 10; position: absolute; }
-    .slick-pane { position: absolute; outline: 0; width: 100%; }
-    .slick-pane-header { display: block; }
     .slick-header { position: relative; }
     .slick-headerrow { position: relative; }
     .slick-grouping-panel { height: 30px; }

@@ -13,6 +13,10 @@
     "footerrow-start footerrow-main footerrow-end";
 }
 
+.slick-grouping-panel {
+  grid-area: grouping-panel;
+}
+
 .slick-header-start {
   grid-area: header-start;
 }
@@ -155,6 +159,9 @@
 .slick-header-columns,
 .slick-headerrow-columns,
 .slick-footerrow-columns {
+  display: flex;
+  flex-direction: row;
+  flex-wrap: nowrap;;
   position: relative;
   white-space: nowrap;
   cursor: default;
@@ -165,7 +172,6 @@
 .slick-header-column,
 .slick-headerrow-column,
 .slick-footerrow-column {
-  float: left;
   position: relative;
   overflow: hidden;
   text-overflow: ellipsis;
