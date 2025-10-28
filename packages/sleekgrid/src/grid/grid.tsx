@@ -1322,13 +1322,12 @@ export class Grid<TItem = any> implements IGrid<TItem> {
         }
         else {
             let toFreezeStart = options.frozenColumns;
-            options.frozenColumns = 0;
+            delete options.frozenColumns;
             let i = 0;
             while (i < viewCols.length) {
                 const col = viewCols[i++];
                 if (toFreezeStart > 0 && col.visible !== false) {
                     col.frozen = true;
-                    options.frozenColumns++;
                     toFreezeStart--;
                 }
                 else if (col.frozen !== undefined && col.frozen !== "end")
