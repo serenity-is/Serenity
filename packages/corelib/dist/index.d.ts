@@ -1882,6 +1882,10 @@ export interface PropertyItem {
 	hideOnUpdate?: boolean;
 	readOnly?: boolean;
 	readPermission?: string;
+	skipOnLoad?: boolean;
+	skipOnSave?: boolean;
+	unbound?: boolean;
+	/** @deprecated use skipOnSave instead */
 	oneWay?: boolean;
 	defaultValue?: any;
 	localizable?: boolean;

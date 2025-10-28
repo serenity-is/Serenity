@@ -167,7 +167,7 @@ export function createGridSignalsAndRefs(): { signals: GridSignals; refs: GridLa
         set pinnedStartLast(value) {
             if (pinnedStartLast !== value) {
                 pinnedStartLast = value;
-                (refs.start as any).firstCol = value >= -Infinity ? -Infinity : value + 1;
+                (refs.start as any).firstCol = value >= 0 ? 0 : -Infinity;
                 (refs.main as any).firstCol = value >= 0 ? value + 1 : 0;
                 signals.pinnedStartLast.value = value;
             }

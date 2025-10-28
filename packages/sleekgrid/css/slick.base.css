@@ -121,9 +121,9 @@
 }
 
 .grid-canvas.sg-main,
-.slick-header-columns,
-.slick-headerrow-columns,
-.slick-footerrow-columns {
+.slick-header-columns.sg-main,
+.slick-headerrow-columns.sg-main,
+.slick-footerrow-columns.sg-main {
   width: var(--sg-virtual-width);
 }
 
@@ -257,9 +257,9 @@
 }
 
 .slick-hscrollspacer,
-.slick-footerrow-columns,
-.slick-headerrow-columns,
-.slick-header-columns,
+.slick-footerrow-columns.sg-main,
+.slick-headerrow-columns.sg-main,
+.slick-header-columns.sg-main,
 .grid-canvas-top.grid-canvas-main,
 .grid-canvas-bottom.grid-canvas-main {
   margin-right: var(--sg-scrollbar-w);

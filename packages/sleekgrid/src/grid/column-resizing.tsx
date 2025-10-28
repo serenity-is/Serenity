@@ -192,7 +192,7 @@ export function autosizeColumns(cols: Column[], availWidth: number, absoluteColM
     return reRender;
 }
 
-function shrinkOrStretchColumn({ absoluteColMinWidth, cols, dist, cell: colIdx, forceFit }: {
+function shrinkOrStretchColumn({ absoluteColMinWidth, cols, dist, cell: cell, forceFit }: {
     absoluteColMinWidth: number,
     cols: Column[],
     cell: number,
@@ -204,7 +204,7 @@ function shrinkOrStretchColumn({ absoluteColMinWidth, cols, dist, cell: colIdx, 
     if (dist < 0) { // shrink column
         x = dist;
 
-        for (j = colIdx; j >= 0; j--) {
+        for (j = cell; j >= 0; j--) {
             c = cols[j];
             if (c.resizable) {
                 actualMinWidth = Math.max(c.minWidth || 0, absoluteColMinWidth);
@@ -220,7 +220,7 @@ function shrinkOrStretchColumn({ absoluteColMinWidth, cols, dist, cell: colIdx, 
 
         if (forceFit) {
             x = -dist;
-            for (j = colIdx + 1; j < cols.length; j++) {
+            for (j = cell + 1; j < cols.length; j++) {
                 c = cols[j];
                 if (c.resizable) {
                     if (x && c.maxWidth && (c.maxWidth - c.previousWidth < x)) {
@@ -233,25 +233,27 @@ function shrinkOrStretchColumn({ absoluteColMinWidth, cols, dist, cell: colIdx, 
                 }
             }
         }
-    } else { // stretch column
+    } else if (dist > 0) { // stretch column
         x = dist;
 
-        for (j = colIdx; j >= 0; j--) {
+        for (j = cell; j >= 0; j--) {
             c = cols[j];
             if (c.resizable) {
-                if (x && c.maxWidth && (c.maxWidth - c.previousWidth < x)) {
-                    x -= c.maxWidth - c.previousWidth;
+                if (x && c.maxWidth && (c.maxWidth - (c.previousWidth || 0) < x)) {
+                    x -= c.maxWidth - (c.previousWidth || 0);
                     c.width = c.maxWidth;
                 } else {
-                    c.width = c.previousWidth + x;
+                    c.width = (c.previousWidth || 0) + x;
                     x = 0;
+                    if (x == 0)
+                        break;
                 }
             }
         }
 
         if (forceFit) {
             x = -dist;
-            for (j = colIdx + 1; j < cols.length; j++) {
+            for (j = cell + 1; j < cols.length; j++) {
                 c = cols[j];
                 if (c.resizable) {
                     actualMinWidth = Math.max(c.minWidth || 0, absoluteColMinWidth);
