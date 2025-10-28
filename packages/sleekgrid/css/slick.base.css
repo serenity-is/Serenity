@@ -282,6 +282,11 @@
   position: absolute;
 }
 
+.slick-sort-indicator sub {
+  top: 0;
+}
+
+
 .slick-selection {
   z-index: 10;
   position: absolute;
@@ -290,6 +295,7 @@
 .slick-vscrollspacer {
   margin-bottom: var(--sg-scrollbar-h);
 }
+
 
 /*!rtl:begin:ignore*/
 

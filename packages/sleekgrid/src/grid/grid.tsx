@@ -823,7 +823,7 @@ export class Grid<TItem = any> implements IGrid<TItem> {
                     data-id={m.id} data-c={i} id={`${this._uid}${m.id}`} title={m.toolTip || ""}
                     style={{ width: `${m.width - this._headerColumnWidthDiff}px` }}>
                     {nameSpan}
-                    {m.sortable && <span class="slick-sort-indicator" />}
+                    {m.sortable && <span class="slick-sort-indicator"><sub></sub></span>}
                 </div> as HTMLElement);
 
             this._jQuery?.(header).data("column", m);
@@ -1279,11 +1279,11 @@ export class Grid<TItem = any> implements IGrid<TItem> {
         this._mapBands(band => band.headerCols).forEach(el => headerColumnEls = headerColumnEls.concat(Array.from(el.children)));
         headerColumnEls.forEach(hel => {
             hel.classList.remove("slick-header-column-sorted");
-            var si = hel.querySelector(".slick-sort-indicator");
+            const si = hel.querySelector(".slick-sort-indicator");
             si && si.classList.remove("slick-sort-indicator-asc", "slick-sort-indicator-desc");
         });
 
-        this._sortColumns.forEach(col => {
+        this._sortColumns.forEach((col, i) => {
             if (col.sortAsc == null) {
                 col.sortAsc = true;
             }
@@ -1294,6 +1294,8 @@ export class Grid<TItem = any> implements IGrid<TItem> {
                     header.classList.add("slick-header-column-sorted");
                     var si = header.querySelector(".slick-sort-indicator");
                     si && si.classList.add(col.sortAsc ? "slick-sort-indicator-asc" : "slick-sort-indicator-desc");
+                    const sub = si.querySelector("sub");
+                    sub && (sub.textContent = this._sortColumns.length > 1 ? (i + 1).toString() : "");
                 }
             }
         });
