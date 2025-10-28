@@ -887,7 +887,7 @@ export class Grid<TItem = any> implements IGrid<TItem> {
         const sortableOptions: any = {
             animation: 50,
             direction: 'horizontal',
-            chosenClass: 'slick-header-column-active',
+            chosenClass: 'slick-header-column-dragging',
             ghostClass: 'slick-sortable-placeholder',
             draggable: '.slick-header-column',
             filter: ".slick-resizable-handle",
@@ -911,9 +911,11 @@ export class Grid<TItem = any> implements IGrid<TItem> {
                     clearInterval(columnScrollTimer);
                     columnScrollTimer = null;
                 }
+                this._container.classList.add('slick-column-reordering');
             },
             onEnd: (e: MouseEvent & { item: any; originalEvent: MouseEvent; }) => {
                 const cancel = false;
+                this._container.classList.remove('slick-column-reordering');
                 clearInterval(columnScrollTimer);
                 columnScrollTimer = null;
                 if (cancel || !this.getEditorLock()?.commitCurrentEdit()) {
