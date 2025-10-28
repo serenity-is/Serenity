@@ -1,11 +1,11 @@
 namespace Serenity.ComponentModel;
 
-public class OneWayAttributeTests
+public class SkipOnSaveAttributeTests
 {
     [Fact]
     public void IsSubClassOf_Attribute()
     {
-        var attribute = new OneWayAttribute();
+        var attribute = new SkipOnSaveAttribute();
         Assert.IsAssignableFrom<Attribute>(attribute);
     }
 }

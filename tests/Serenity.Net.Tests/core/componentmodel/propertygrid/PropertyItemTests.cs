@@ -664,20 +664,20 @@ public class PropertyItemTests
     }
 
     [Fact]
-    public void OneWay_IsNull_ByDefault()
+    public void SkipOnSave_IsNull_ByDefault()
     {
         var attribute = new PropertyItem();
-        Assert.Null(attribute.OneWay);
+        Assert.Null(attribute.SkipOnSave);
     }
 
     [Fact]
-    public void OneWay_CanBeSet_ToTrue()
+    public void SkipOnSave_CanBeSet_ToTrue()
     {
         var attribute = new PropertyItem()
         {
-            OneWay = true
+            SkipOnSave = true
         };
-        Assert.True(attribute.OneWay);
+        Assert.True(attribute.SkipOnSave);
     }
 
     [Fact]
@@ -685,9 +685,9 @@ public class PropertyItemTests
     {
         var attribute = new PropertyItem()
         {
-            OneWay = false
+            SkipOnSave = false
         };
-        Assert.False(attribute.OneWay);
+        Assert.False(attribute.SkipOnSave);
     }
 
     [Fact]
@@ -695,9 +695,9 @@ public class PropertyItemTests
     {
         var attribute = new PropertyItem()
         {
-            OneWay = null
+            SkipOnSave = null
         };
-        Assert.Null(attribute.OneWay);
+        Assert.Null(attribute.SkipOnSave);
     }
 
     [Fact]

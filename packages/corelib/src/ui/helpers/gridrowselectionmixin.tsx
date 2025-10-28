@@ -138,7 +138,7 @@ export class GridRowSelectionMixin {
             name: "[×]",
             nameFormat: () => <span class="select-all-items check-box no-float"></span>,
             toolTip: ' ',
-            field: '__select__',
+            id: '__select__',
             width: 27,
             minWidth: 27,
             headerCssClass: 'select-all-header',

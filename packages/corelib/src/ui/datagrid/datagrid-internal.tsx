@@ -19,7 +19,7 @@ export function getDefaultSortBy(this: void, slickGrid: Grid): string[] {
         return [];
 
     var columns = slickGrid.getColumns().filter(function (x) {
-        return x.sortOrder && x.sortOrder !== 0;
+        return x.sortOrder && x.sortOrder !== 0 && x.field != null;
     });
 
     if (columns.length > 0) {

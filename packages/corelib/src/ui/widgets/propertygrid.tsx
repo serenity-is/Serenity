@@ -421,6 +421,9 @@ export class PropertyGrid<P extends PropertyGridOptions = PropertyGridOptions> e
             source[item.name] = item.defaultValue;
         }
 
+        if (item.unbound ?? item.skipOnLoad)
+            return;
+
         var editor = fieldElement.editorWidget;
         if (!editor && fieldElement.editorPromise) {
             fieldElement.editorPromise.then(() => {
@@ -441,7 +444,7 @@ export class PropertyGrid<P extends PropertyGridOptions = PropertyGridOptions> e
 
     static saveFieldValue(target: any, fieldElement: PropertyFieldElement, canModify?: boolean): void {
         var item = fieldElement.propertyItem;
-        if (item.oneWay !== true && (canModify ?? PropertyGrid.canModifyItem(item))) {
+        if ((item.unbound ?? item.skipOnSave ?? (item as any).oneWay) !== true && (canModify ?? PropertyGrid.canModifyItem(item))) {
             var editor = fieldElement.editorWidget;
             if (!editor && fieldElement.editorPromise)
                 throw `Editor for "${item.name}" is not loaded yet.`;

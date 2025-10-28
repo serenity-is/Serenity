@@ -25,7 +25,7 @@ public sealed class BasedOnRowAttribute(Type rowType) : Attribute
     /// Gets or sets a value indicating whether to check names.
     /// If this is true (by default false), if a property name doesn't
     /// exactly match a property in the RowType row, Serenity will
-    /// raise error. In that case you might add [IgnoreName] attribute 
+    /// raise error. In that case you might add [SkipNameCheck] attribute 
     /// to properties that shouldn't be checked.
     /// </summary>
     /// <value>

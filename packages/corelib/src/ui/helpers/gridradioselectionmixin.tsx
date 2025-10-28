@@ -106,7 +106,7 @@ export class GridRadioSelectionMixin {
         return {
             name: '',
             toolTip: ' ',
-            field: '__select__',
+            id: '__select__',
             width: 27,
             minWidth: 27,
             headerCssClass: '',

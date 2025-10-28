@@ -1,4 +1,4 @@
-﻿using Serenity.Demo.Northwind;
+using Serenity.Demo.Northwind;
 
 namespace Serenity.Demo.BasicSamples.Forms;
 
@@ -14,13 +14,13 @@ public class FilteredLookupInDetailForm
     public DateTime OrderDate { get; set; }
 
     /// <summary>
-    /// We use OneWay here for this sample, because we don't
+    /// We use <see cref="SkipOnSaveAttribute" /> here for this sample, because we don't
     /// actually have a CategoryID field in order row.
     /// Otherwise it would be serialized to JSON on save, 
     /// and as we didn't have such a field in OrderRow,
     /// it would raise an error on deserialization.
     /// </summary>
-    [DisplayName("Category"), LookupEditor(typeof(CategoryRow)), OneWay, IgnoreName]
+    [DisplayName("Category"), LookupEditor(typeof(CategoryRow)), SkipOnSave, SkipNameCheck]
     public Int32? CategoryID { get; set; }
 
     [Category("Order Details")]

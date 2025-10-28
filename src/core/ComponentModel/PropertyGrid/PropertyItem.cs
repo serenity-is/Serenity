@@ -284,15 +284,37 @@ public class PropertyItem
     public bool? HideOnUpdate { get; set; }
 
     /// <summary>
-    /// Gets or sets the one way flag, which when true field 
+    /// Gets or sets the ignore on loadflag, which when true field 
+    /// won't be read from the entity on load.
+    /// </summary>
+    [Newtonsoft.Json.JsonProperty("skipOnLoad")]
+    [JsonPropertyName("skipOnLoad")]
+    public bool? SkipOnLoad { get; set; }
+
+    /// <summary>
+    /// Gets or sets the ignore on save flag, which when true field 
     /// won't be serialized back to entity on save.
     /// </summary>
-    /// <value>
-    /// The one way.
-    /// </value>
-    [Newtonsoft.Json.JsonProperty("oneWay")]
-    [JsonPropertyName("oneWay")]
-    public bool? OneWay { get; set; }
+    [Newtonsoft.Json.JsonProperty("skipOnSave")]
+    [JsonPropertyName("skipOnSave")]
+    public bool? SkipOnSave { get; set; }
+
+    /// <summary>
+    /// Prefer SkipOnSave instead.
+    /// </summary>
+    [Newtonsoft.Json.JsonIgnore]
+    [System.Text.Json.Serialization.JsonIgnore]
+    [Obsolete("Use skipOnSave")]
+    public bool? OneWay => SkipOnSave;
+
+    /// <summary>
+    /// Gets or sets the unbound flag, which when true the generated
+    /// field won't have a field name and the grid / form won't try to load
+    /// or save any value for it.
+    /// </summary>
+    [Newtonsoft.Json.JsonProperty("unbound")]
+    [JsonPropertyName("unbound")]
+    public bool? Unbound { get; set; }
 
     /// <summary>
     /// Gets or sets the default value of the property in 

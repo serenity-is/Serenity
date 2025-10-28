@@ -1,4 +1,4 @@
-﻿import { registerEnum } from "./system";
+import { registerEnum } from "./system";
 
 export enum SummaryType {
     Disabled = -1,
@@ -39,6 +39,10 @@ export interface PropertyItem {
     hideOnUpdate?: boolean;
     readOnly?: boolean;
     readPermission?: string;
+    skipOnLoad?: boolean;
+    skipOnSave?: boolean;
+    unbound?: boolean;
+    /** @deprecated use skipOnSave instead */
     oneWay?: boolean;
     defaultValue?: any;
     localizable?: boolean;

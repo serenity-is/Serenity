@@ -55,7 +55,7 @@ export class EntityLocalizer {
 
             if (item.localizable === true) {
                 items.push(Object.assign({} as PropertyItem, item, {
-                    oneWay: true,
+                    skipOnSave: true,
                     readOnly: true,
                     required: false,
                     defaultValue: null
@@ -68,7 +68,7 @@ export class EntityLocalizer {
                         cssClass: Fluent.toClassName([item.cssClass, 'translation', 'language-' + lang.id]),
                         insertable: true,
                         updatable: true,
-                        oneWay: false,
+                        skipOnSave: false,
                         required: false,
                         localizable: false,
                         defaultValue: null

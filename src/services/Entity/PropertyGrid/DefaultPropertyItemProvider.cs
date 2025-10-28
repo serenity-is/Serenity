@@ -59,7 +59,7 @@ public partial class DefaultPropertyItemProvider(IServiceProvider provider, ITyp
             var source = new PropertyInfoSource(property, basedOnRow);
             if (checkNames &&
                 property.GetCustomAttribute<NotMappedAttribute>() == null &&
-                property.GetCustomAttribute<IgnoreNameAttribute>() == null)
+                property.GetCustomAttribute<SkipNameCheckAttribute>() == null)
             {
                 if (source.BasedOnField is null)
                 {
@@ -68,7 +68,7 @@ public partial class DefaultPropertyItemProvider(IServiceProvider provider, ITyp
                         "doesn't have a matching field with the same property/field name in the row.\n\n" +
                         "Please check if the property is named correctly.\n\n" +
                         "To remove this validation, you may set CheckNames to false in the [BasedOnRow] attribute.\n\n" +
-                        "To disable checking for this specific property, add an [IgnoreName] attribute to the property itself.",
+                        "To disable checking for this specific property, add an [SkipNameCheck] attribute to the property itself.",
                         type.FullName, property.Name, basedOnRow.GetType().FullName));
                 }
                 else if (
@@ -82,7 +82,7 @@ public partial class DefaultPropertyItemProvider(IServiceProvider provider, ITyp
                             "doesn't match the property/field name '{2}' in the row.\n\n" +
                             "Property names must match case sensitively. Please change the property name to '{2}'.\n\n" +
                             "To remove this validation, you may set CheckNames to false in the [BasedOnRow] attribute.\n\n" +
-                            "To disable check for this specific property, add an [IgnoreName] attribute to the property itself.",
+                            "To disable check for this specific property, add an [SkipNameCheck] attribute to the property itself.",
                             type.FullName, property.Name, source.BasedOnField.PropertyName.TrimToNull() ??
                                 source.BasedOnField.Name, basedOnRow.GetType().FullName));
                 }

@@ -16,6 +16,7 @@ export class InlineActionGrid extends CustomerGrid {
         var columns = super.getColumns();
 
         let inlineAction = (actionKey: string, hint, iconClass: string): Column => ({
+            id: "inline_action_" + actionKey,
             name: '',
             width: 24,
             format: () => <a class="inline-action" data-action={actionKey} title={hint}><i class={iconClass}></i></a>,

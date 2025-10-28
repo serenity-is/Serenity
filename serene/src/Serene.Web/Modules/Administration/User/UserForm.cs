@@ -1,4 +1,4 @@
-﻿namespace Serene.Administration.Forms;
+namespace Serene.Administration.Forms;
 
 [FormScript("Administration.User")]
 [BasedOnRow(typeof(UserRow), CheckNames = true)]
@@ -16,7 +16,7 @@ public class UserForm
     public string Password { get; set; }
     [PasswordEditor, Required(true)]
     public string PasswordConfirm { get; set; }
-    [OneWay]
+    [SkipOnSave]
     public string Source { get; set; }
     public bool IsActive { get; set;  }
 }

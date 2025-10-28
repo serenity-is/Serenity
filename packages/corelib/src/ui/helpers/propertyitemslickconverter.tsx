@@ -20,7 +20,8 @@ export namespace PropertyItemSlickConverter {
 
     export function toSlickColumn(item: PropertyItem): Column {
         var result: Column = {
-            field: item.name,
+            field: item.unbound ? null : item.name,
+            id: item.unbound ? item.name : null,
             sourceItem: item,
             cssClass: item.cssClass,
             headerCssClass: item.headerCssClass,

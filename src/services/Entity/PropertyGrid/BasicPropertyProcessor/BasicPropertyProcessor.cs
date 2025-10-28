@@ -30,9 +30,10 @@ public partial class BasicPropertyProcessor : PropertyProcessor
         SetHideOnInsert(source, item);
         SetHideOnUpdate(source, item);
         SetHint(source, item);
+        SetSkipOnLoad(source, item);
+        SetSkipOnSave(source, item);
         SetInsertable(source, item);
         SetInsertPermission(source, item);
-        SetOneWay(source, item);
         SetPlaceholder(source, item);
         SetReadOnly(source, item);
         SetReadPermission(source, item);
@@ -41,6 +42,7 @@ public partial class BasicPropertyProcessor : PropertyProcessor
         SetSorting(source, item);
         SetSummaryType(source, item);
         SetTitle(source, item);
+        SetUnbound(source, item);
         SetUpdatable(source, item);
         SetUpdatePermission(source, item);
         SetVisible(source, item);
