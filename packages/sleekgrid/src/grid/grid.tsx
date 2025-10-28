@@ -920,13 +920,16 @@ export class Grid<TItem = any> implements IGrid<TItem> {
                     return;
                 }
 
-                var reorderedCols;
-                this._mapBands(band => band.headerCols).forEach((_, i) => reorderedCols = sortToDesiredOrderAndKeepRest(
-                    this._initCols,
-                    (this.sortableColInstances[i]?.toArray?.() ?? [])
-                ));
+                let reorderedCols: Column<TItem>[] = [];
+                this._mapBands(band => band.headerCols).forEach((headerCols, i) => {
+                    if (!headerCols.contains(e.item))
+                        return;
+                    reorderedCols = sortToDesiredOrderAndKeepRest(
+                        this._initCols,
+                        (this.sortableColInstances[i]?.toArray?.() ?? []));
+                });
 
-                this.setColumns(reorderedCols);
+                reorderedCols && this.setColumns(reorderedCols);
                 this._trigger(this.onColumnsReordered, {});
                 e.stopPropagation();
                 this.setupColumnResize();
