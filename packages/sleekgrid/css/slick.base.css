@@ -205,7 +205,7 @@
 }
 
 .slick-resizable-handle {
-  cursor: e-resize;
+  cursor: ew-resize;
   display: block;
   font-size: 0.1px;
   position: absolute;
@@ -215,6 +215,10 @@
   height: 100%;
   z-index: 1;
   touch-action: none;
+}
+
+.slick-container.slick-column-resizing * {
+  cursor: ew-resize !important;
 }
 
 .slick-cell,

@@ -3,8 +3,8 @@ import type { RowCell } from "../../src/core/editing";
 import type { GridSignals } from "../../src/core/grid-signals";
 import { GridOptions } from "../../src/core/gridoptions";
 import type { ViewportInfo } from "../../src/core/viewportinfo";
-import { createGridSignalsAndRefs } from "../../src/grid/internal";
 import type { LayoutHost } from "../../src/layouts/layout-host";
+import { createGridSignalsAndRefs } from "../../src/layouts/layout-refs";
 
 export function mockLayoutHost(): LayoutHost & {
     signals: GridSignals,

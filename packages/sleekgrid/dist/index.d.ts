@@ -1310,6 +1310,7 @@ export declare class Grid<TItem = any> implements IGrid<TItem> {
 	private _viewportInfo;
 	private _vScrollDir;
 	private _boundAncestorScroll;
+	private _colResizeDisposer;
 	private _container;
 	private _focusSink1;
 	private _focusSink2;
@@ -1380,7 +1381,7 @@ export declare class Grid<TItem = any> implements IGrid<TItem> {
 	private getViewports;
 	getActiveViewportNode(e?: IEventData): HTMLElement;
 	private getAvailableWidth;
-	applyColumnWidths(): void;
+	private applyColumnWidths;
 	private updateBandCanvasWidths;
 	private updateCanvasWidth;
 	private bindAncestorScrollEvents;

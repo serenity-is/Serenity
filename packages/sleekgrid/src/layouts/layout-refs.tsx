@@ -1,3 +1,6 @@
+import { computed, signal } from "@serenity-is/signals";
+import type { GridSignals } from "../core/grid-signals";
+
 export type BandKey = "start" | "main" | "end";
 export type PaneKey = "top" | "body" | "bottom";
 
@@ -107,3 +110,92 @@ export function getAllVScrollContainers(refs: GridLayoutRefs): HTMLElement[] {
     return vScrollableNodes;
 }
 
+
+export function createGridSignalsAndRefs(): { signals: GridSignals; refs: GridLayoutRefs } {
+    const showColumnHeader = signal<boolean>();
+    const hideColumnHeader = computed(() => !showColumnHeader.value);
+    const showHeaderRow = signal<boolean>();
+    const hideHeaderRow = computed(() => !showHeaderRow.value);
+    const showFooterRow = signal<boolean>();
+    const hideFooterRow = computed(() => !showFooterRow.value);
+    const showTopPanel = signal<boolean>();
+    const hideTopPanel = computed(() => !showTopPanel.value);
+    let pinnedStartLast = -Infinity;
+    let pinnedEndFirst = Infinity;
+    let frozenTopLast = -Infinity;
+    let frozenBottomFirst = Infinity;
+    const signals: GridSignals = {
+        showColumnHeader,
+        hideColumnHeader,
+        showTopPanel,
+        hideTopPanel,
+        showHeaderRow,
+        hideHeaderRow,
+        showFooterRow,
+        hideFooterRow,
+        pinnedStartLast: signal(pinnedStartLast),
+        pinnedEndFirst: signal(pinnedEndFirst),
+        frozenTopLast: signal(frozenTopLast),
+        frozenBottomFirst: signal(frozenBottomFirst),
+    };
+    const refs: GridLayoutRefs = {
+        start: {
+            key: "start",
+            canvas: {
+                body: null
+            },
+            firstCol: -Infinity,
+            canvasWidth: 0
+        },
+        main: {
+            key: "main",
+            canvas: { body: null },
+            firstCol: 0,
+            canvasWidth: 0
+        },
+        end: {
+            key: "end",
+            canvas: {
+                body: null
+            },
+            firstCol: Infinity,
+            canvasWidth: 0
+        },
+        get pinnedStartLast() {
+            return pinnedStartLast;
+        },
+        set pinnedStartLast(value) {
+            if (pinnedStartLast !== value) {
+                pinnedStartLast = value;
+                (refs.start as any).firstCol = value >= -Infinity ? -Infinity : value + 1;
+                (refs.main as any).firstCol = value >= 0 ? value + 1 : 0;
+                signals.pinnedStartLast.value = value;
+            }
+        },
+        get pinnedEndFirst() {
+            return pinnedEndFirst;
+        },
+        set pinnedEndFirst(value) {
+            if (pinnedEndFirst !== value) {
+                pinnedEndFirst = value;
+                (refs.end as any).firstCol = value;
+            }
+            signals.pinnedEndFirst.value = value;
+        },
+        get frozenTopLast() {
+            return frozenTopLast;
+        },
+        set frozenTopLast(value) {
+            frozenTopLast = value;
+            signals.frozenTopLast.value = value;
+        },
+        get frozenBottomFirst() {
+            return frozenBottomFirst;
+        },
+        set frozenBottomFirst(value) {
+            frozenBottomFirst = value;
+            signals.frozenBottomFirst.value = value;
+        }
+    };
+    return { signals, refs };
+}

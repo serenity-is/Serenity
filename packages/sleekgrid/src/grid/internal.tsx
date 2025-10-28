@@ -1,6 +1,6 @@
 import { computed, signal } from "@serenity-is/signals";
 import { invokeDisposingListeners } from "@serenity-is/sleekdom";
-import { Column, type GridSignals } from "../core";
+import { type GridSignals } from "../core";
 import type { GridLayoutRefs } from "../layouts/layout-refs";
 
 export function simpleArrayEquals(arr1: number[], arr2: number[]) {
@@ -13,60 +13,6 @@ export function simpleArrayEquals(arr1: number[], arr2: number[]) {
             return false;
     }
     return true;
-}
-
-export function calcMinMaxPageXOnDragStart(cols: Column[], colIdx: number, pageX: number, forceFit: boolean, absoluteColMinWidth: number): { maxPageX: number; minPageX: number; } {
-    var shrinkLeewayOnRight = null, stretchLeewayOnRight = null, j: number, c: Column;
-    if (forceFit) {
-        shrinkLeewayOnRight = 0;
-        stretchLeewayOnRight = 0;
-        // colums on right affect maxPageX/minPageX
-        for (j = colIdx + 1; j < cols.length; j++) {
-            c = cols[j];
-            if (c.resizable) {
-                if (stretchLeewayOnRight != null) {
-                    if (c.maxWidth) {
-                        stretchLeewayOnRight += c.maxWidth - c.previousWidth;
-                    } else {
-                        stretchLeewayOnRight = null;
-                    }
-                }
-                shrinkLeewayOnRight += c.previousWidth - Math.max(c.minWidth || 0, absoluteColMinWidth);
-            }
-        }
-    }
-    var shrinkLeewayOnLeft = 0, stretchLeewayOnLeft = 0;
-    for (j = 0; j <= colIdx; j++) {
-        // columns on left only affect minPageX
-        c = cols[j];
-        if (c.resizable) {
-            if (stretchLeewayOnLeft != null) {
-                if (c.maxWidth) {
-                    stretchLeewayOnLeft += c.maxWidth - c.previousWidth;
-                } else {
-                    stretchLeewayOnLeft = null;
-                }
-            }
-            shrinkLeewayOnLeft += c.previousWidth - Math.max(c.minWidth || 0, absoluteColMinWidth);
-        }
-    }
-    if (shrinkLeewayOnRight === null) {
-        shrinkLeewayOnRight = 100000;
-    }
-    if (shrinkLeewayOnLeft === null) {
-        shrinkLeewayOnLeft = 100000;
-    }
-    if (stretchLeewayOnRight === null) {
-        stretchLeewayOnRight = 100000;
-    }
-    if (stretchLeewayOnLeft === null) {
-        stretchLeewayOnLeft = 100000;
-    }
-
-    return {
-        maxPageX: pageX + Math.min(shrinkLeewayOnRight, stretchLeewayOnLeft),
-        minPageX: pageX - Math.min(shrinkLeewayOnLeft, stretchLeewayOnRight)
-    }
 }
 
 export interface CachedRow {
@@ -155,93 +101,4 @@ export function bindPrototypeMethods(instance: any, filter?: (key: string | symb
             }
         }
     } while ((object = Reflect.getPrototypeOf(object)) && object !== Object.prototype);
-}
-
-export function createGridSignalsAndRefs(): { signals: GridSignals; refs: GridLayoutRefs } {
-    const showColumnHeader = signal<boolean>();
-    const hideColumnHeader = computed(() => !showColumnHeader.value);
-    const showHeaderRow = signal<boolean>();
-    const hideHeaderRow = computed(() => !showHeaderRow.value);
-    const showFooterRow = signal<boolean>();
-    const hideFooterRow = computed(() => !showFooterRow.value);
-    const showTopPanel = signal<boolean>();
-    const hideTopPanel = computed(() => !showTopPanel.value);
-    let pinnedStartLast = -Infinity;
-    let pinnedEndFirst = Infinity;
-    let frozenTopLast = -Infinity;
-    let frozenBottomFirst = Infinity;
-    const signals: GridSignals = {
-        showColumnHeader,
-        hideColumnHeader,
-        showTopPanel,
-        hideTopPanel,
-        showHeaderRow,
-        hideHeaderRow,
-        showFooterRow,
-        hideFooterRow,
-        pinnedStartLast: signal(pinnedStartLast),
-        pinnedEndFirst: signal(pinnedEndFirst),
-        frozenTopLast: signal(frozenTopLast),
-        frozenBottomFirst: signal(frozenBottomFirst),
-    };
-    const refs: GridLayoutRefs = {
-        start: {
-            key: "start",
-            canvas: {
-                body: null
-            },
-            firstCol: -Infinity,
-            canvasWidth: 0
-        },
-        main: {
-            key: "main",
-            canvas: { body: null },
-            firstCol: 0,
-            canvasWidth: 0
-        },
-        end: {
-            key: "end",
-            canvas: {
-                body: null
-            },
-            firstCol: Infinity,
-            canvasWidth: 0
-        },
-        get pinnedStartLast() {
-            return pinnedStartLast;
-        },
-        set pinnedStartLast(value) {
-            if (pinnedStartLast !== value) {
-                pinnedStartLast = value;
-                (refs.start as any).firstCol = value >= -Infinity ? -Infinity : value + 1;
-                (refs.main as any).firstCol = value >= 0 ? value + 1 : 0;
-                signals.pinnedStartLast.value = value;
-            }
-        },
-        get pinnedEndFirst() {
-            return pinnedEndFirst;
-        },
-        set pinnedEndFirst(value) {
-            if (pinnedEndFirst !== value) {
-                pinnedEndFirst = value;
-                (refs.end as any).firstCol = value;
-            }
-            signals.pinnedEndFirst.value = value;
-        },
-        get frozenTopLast() {
-            return frozenTopLast;
-        },
-        set frozenTopLast(value) {
-            frozenTopLast = value;
-            signals.frozenTopLast.value = value;
-        },
-        get frozenBottomFirst() {
-            return frozenBottomFirst;
-        },
-        set frozenBottomFirst(value) {
-            frozenBottomFirst = value;
-            signals.frozenBottomFirst.value = value;
-        }
-    };
-    return { signals, refs };
 }

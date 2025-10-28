@@ -1,4 +1,123 @@
+import type { GridOptions } from "../core";
 import type { Column } from "../core/column";
+import type { EditorLock } from "../core/editing";
+
+export function setupColumnResize<TItem>(this: void, { absoluteColMinWidth, container,
+    cols, colResizing, colResized, disposer, headerColsElements, getEditorLock, options, removeNode
+}: {
+    absoluteColMinWidth: number,
+    disposer: AbortController
+    cols: Column<TItem>[],
+    colResizing: (cell: number) => void,
+    colResized: (invalidateAll: boolean, cell: number) => void,
+    container: HTMLElement,
+    getEditorLock: () => EditorLock,
+    headerColsElements: HTMLElement[],
+    options: Pick<GridOptions, "forceFitColumns">,
+    removeNode: (node: Element) => void,
+}) {
+    let resizingCell: number, pageX: number, minPageX: number, maxPageX: number;
+
+    let headerColEls: Element[] = [];
+    headerColsElements.forEach(hcols => {
+        headerColEls = headerColEls.concat(Array.from(hcols.children)
+            .filter(x => x.classList.contains("slick-header-column")));
+    });
+
+    let firstResizable: number, lastResizable: number;
+    headerColEls.forEach((el, i) => {
+        if (i > cols.length)
+            return;
+        const handle = el.querySelector(".slick-resizable-handle");
+        handle && removeNode(handle);
+        if (cols[i].resizable) {
+            if (firstResizable === undefined) {
+                firstResizable = i;
+            }
+            lastResizable = i;
+        }
+    });
+
+    if (firstResizable === undefined) {
+        return;
+    }
+
+    const docMouseMove = (e: MouseEvent) => {
+        if (resizingCell == null)
+            return;
+        var dist;
+        var thisPageX = e.pageX;
+        dist = Math.min(maxPageX, Math.max(minPageX, thisPageX)) - pageX;
+        if (isNaN(dist)) {
+            return;
+        }
+        shrinkOrStretchColumn({
+            cols: cols,
+            cell: resizingCell,
+            dist,
+            forceFit: options.forceFitColumns,
+            absoluteColMinWidth: absoluteColMinWidth
+        });
+        colResizing(resizingCell);
+    };
+
+    const docMouseUp = (e: any) => {
+        document.removeEventListener('mousemove', docMouseMove);
+        document.removeEventListener('mouseup', docMouseUp);
+        container.classList.remove('slick-column-resizing');
+        let invalidateAll = false;
+        for (let j = 0; j < headerColEls.length; j++) {
+            const c = cols[j];
+            const newWidth = (headerColEls[j] as HTMLElement).offsetWidth;
+
+            if (c.previousWidth !== newWidth && c.rerenderOnResize) {
+                invalidateAll = true;
+            }
+        }
+        colResized(invalidateAll, resizingCell);
+        resizingCell = null;
+    };
+
+    const mouseDown = (e: MouseEvent) => {
+        if (!getEditorLock().commitCurrentEdit()) {
+            e.preventDefault();
+            return;
+        }
+
+        resizingCell = Number((e.target as HTMLElement)?.closest?.<HTMLElement>(".slick-header-column")?.dataset?.c ?? "");
+        if (isNaN(resizingCell)) {
+            return;
+        }
+
+        pageX = e.pageX;
+
+        // lock each column's width option to current width
+        headerColEls.forEach((e, z) => {
+            cols[z].previousWidth = (e as HTMLElement).offsetWidth;
+        });
+
+        ({ maxPageX, minPageX } = calcMinMaxPageXOnDragStart({
+            cols: cols,
+            cell: resizingCell,
+            pageX,
+            absoluteColMinWidth,
+            forceFit: options.forceFitColumns
+        }));
+        document.addEventListener('mousemove', docMouseMove, { signal: disposer.signal });
+        document.addEventListener('mouseup', docMouseUp, { signal: disposer.signal });
+        container.classList.add("slick-column-resizing");
+        e.preventDefault();
+    };
+
+    headerColEls.forEach((headerEl, cell) => {
+        if (cell < firstResizable || (options.forceFitColumns && cell >= lastResizable)) {
+            return;
+        }
+
+        const handle = headerEl.appendChild(<div class="slick-resizable-handle" /> as HTMLElement);
+        handle.addEventListener("mousedown", mouseDown, { signal: disposer.signal });
+    });
+}
 
 export function autosizeColumns(cols: Column[], availWidth: number, absoluteColMinWidth: number): boolean {
     var i, c,
@@ -73,12 +192,17 @@ export function autosizeColumns(cols: Column[], availWidth: number, absoluteColM
     return reRender;
 }
 
-
-export function shrinkOrStretchColumn(cols: Column[], colIdx: number, d: number, forceFit: boolean, absoluteColMinWidth: number): void {
+function shrinkOrStretchColumn({ absoluteColMinWidth, cols, dist, cell: colIdx, forceFit }: {
+    absoluteColMinWidth: number,
+    cols: Column[],
+    cell: number,
+    dist: number,
+    forceFit: boolean
+}): void {
     var c: Column, j: number, x: number, actualMinWidth: number;
 
-    if (d < 0) { // shrink column
-        x = d;
+    if (dist < 0) { // shrink column
+        x = dist;
 
         for (j = colIdx; j >= 0; j--) {
             c = cols[j];
@@ -95,7 +219,7 @@ export function shrinkOrStretchColumn(cols: Column[], colIdx: number, d: number,
         }
 
         if (forceFit) {
-            x = -d;
+            x = -dist;
             for (j = colIdx + 1; j < cols.length; j++) {
                 c = cols[j];
                 if (c.resizable) {
@@ -110,7 +234,7 @@ export function shrinkOrStretchColumn(cols: Column[], colIdx: number, d: number,
             }
         }
     } else { // stretch column
-        x = d;
+        x = dist;
 
         for (j = colIdx; j >= 0; j--) {
             c = cols[j];
@@ -126,7 +250,7 @@ export function shrinkOrStretchColumn(cols: Column[], colIdx: number, d: number,
         }
 
         if (forceFit) {
-            x = -d;
+            x = -dist;
             for (j = colIdx + 1; j < cols.length; j++) {
                 c = cols[j];
                 if (c.resizable) {
@@ -142,5 +266,65 @@ export function shrinkOrStretchColumn(cols: Column[], colIdx: number, d: number,
                 }
             }
         }
+    }
+}
+
+function calcMinMaxPageXOnDragStart({ absoluteColMinWidth, cols, cell, forceFit, pageX }: {
+    absoluteColMinWidth: number,
+    cols: Column[],
+    cell: number,
+    forceFit: boolean,
+    pageX: number
+}): { maxPageX: number; minPageX: number; } {
+    var shrinkLeewayOnRight = null, stretchLeewayOnRight = null, j: number, c: Column;
+    if (forceFit) {
+        shrinkLeewayOnRight = 0;
+        stretchLeewayOnRight = 0;
+        // colums on right affect maxPageX/minPageX
+        for (j = cell + 1; j < cols.length; j++) {
+            c = cols[j];
+            if (c.resizable) {
+                if (stretchLeewayOnRight != null) {
+                    if (c.maxWidth) {
+                        stretchLeewayOnRight += c.maxWidth - c.previousWidth;
+                    } else {
+                        stretchLeewayOnRight = null;
+                    }
+                }
+                shrinkLeewayOnRight += c.previousWidth - Math.max(c.minWidth || 0, absoluteColMinWidth);
+            }
+        }
+    }
+    var shrinkLeewayOnLeft = 0, stretchLeewayOnLeft = 0;
+    for (j = 0; j <= cell; j++) {
+        // columns on left only affect minPageX
+        c = cols[j];
+        if (c.resizable) {
+            if (stretchLeewayOnLeft != null) {
+                if (c.maxWidth) {
+                    stretchLeewayOnLeft += c.maxWidth - c.previousWidth;
+                } else {
+                    stretchLeewayOnLeft = null;
+                }
+            }
+            shrinkLeewayOnLeft += c.previousWidth - Math.max(c.minWidth || 0, absoluteColMinWidth);
+        }
+    }
+    if (shrinkLeewayOnRight === null) {
+        shrinkLeewayOnRight = 100000;
+    }
+    if (shrinkLeewayOnLeft === null) {
+        shrinkLeewayOnLeft = 100000;
+    }
+    if (stretchLeewayOnRight === null) {
+        stretchLeewayOnRight = 100000;
+    }
+    if (stretchLeewayOnLeft === null) {
+        stretchLeewayOnLeft = 100000;
+    }
+
+    return {
+        maxPageX: pageX + Math.min(shrinkLeewayOnRight, stretchLeewayOnLeft),
+        minPageX: pageX - Math.min(shrinkLeewayOnLeft, stretchLeewayOnRight)
     }
 }

@@ -20,12 +20,12 @@ import type { ViewRange } from "../core/viewrange";
 import { BasicLayout } from "../layouts/basic-layout";
 import { applyColumnWidths, applyLegacyHeightOptions, createCssRules, findStylesheetByUID } from "../layouts/layout-calculations";
 import type { LayoutEngine } from "../layouts/layout-engine";
-import { disposeBandRefs, forEachBand, getAllCanvasNodes, getAllHScrollContainers, getAllViewportNodes, getAllVScrollContainers, mapBands, type GridBandRefs, type GridLayoutRefs } from "../layouts/layout-refs";
+import { createGridSignalsAndRefs, disposeBandRefs, forEachBand, getAllCanvasNodes, getAllHScrollContainers, getAllViewportNodes, getAllVScrollContainers, mapBands, type GridBandRefs, type GridLayoutRefs } from "../layouts/layout-refs";
 import { CellNavigator } from "./cellnavigator";
-import { autosizeColumns, shrinkOrStretchColumn } from "./column-resizing";
+import { autosizeColumns, setupColumnResize } from "./column-resizing";
 import { columnSortHandler, sortToDesiredOrderAndKeepRest } from "./column-sorting";
 import { addListener, removeListener, triggerGridEvent } from "./event-utils";
-import { bindPrototypeMethods, calcMinMaxPageXOnDragStart, createGridSignalsAndRefs, defaultEmptyNode, defaultJQueryEmptyNode, defaultJQueryRemoveNode, defaultRemoveNode, PostProcessCleanupEntry, simpleArrayEquals, type CachedRow } from "./internal";
+import { bindPrototypeMethods, defaultEmptyNode, defaultJQueryEmptyNode, defaultJQueryRemoveNode, defaultRemoveNode, PostProcessCleanupEntry, simpleArrayEquals, type CachedRow } from "./internal";
 import type { RowCellRenderArgs } from "./render-args";
 import { renderCell } from "./render-cell";
 import { renderRow } from "./render-row";
@@ -115,6 +115,7 @@ export class Grid<TItem = any> implements IGrid<TItem> {
     private _vScrollDir: number = 1;
 
     private _boundAncestorScroll: HTMLElement[] = [];
+    declare private _colResizeDisposer: AbortController;
     declare private _container: HTMLElement;
     declare private _focusSink1: HTMLElement;
     declare private _focusSink2: HTMLElement;
@@ -544,7 +545,7 @@ export class Grid<TItem = any> implements IGrid<TItem> {
         return this._viewportInfo.hasVScroll ? this._viewportInfo.width - this._scrollDims.width : this._viewportInfo.width;
     }
 
-    applyColumnWidths(): void {
+    private applyColumnWidths(): void {
 
         applyColumnWidths({
             cols: this.getColumns(),
@@ -844,9 +845,6 @@ export class Grid<TItem = any> implements IGrid<TItem> {
         this.setupColumnResize();
         if (this._options.enableColumnReorder) {
             this.setupColumnReorder();
-            // sortable js removes draggable attribute after disposing / recreating
-            this._mapBands(band => band.headerCols).forEach(el =>
-                el.querySelectorAll<HTMLDivElement>(".slick-resizable-handle").forEach(x => x.draggable = true));
         }
     }
 
@@ -874,7 +872,6 @@ export class Grid<TItem = any> implements IGrid<TItem> {
     }
 
     private setupColumnReorder(): void {
-
         // @ts-ignore
         if (typeof Sortable === "undefined")
             return;
@@ -945,130 +942,23 @@ export class Grid<TItem = any> implements IGrid<TItem> {
     }
 
     private setupColumnResize(): void {
-
-        var minPageX: number, pageX: number, maxPageX: number, cols = this._cols;
-        var columnElements: Element[] = [];
-        this._mapBands(band => band.headerCols).forEach(el => {
-            columnElements = columnElements.concat(Array.from(el.children).filter(x => x.classList.contains("slick-header-column")));
-        });
-
-        var j: number, c: Column<TItem>, pageX: number, minPageX: number, maxPageX: number, firstResizable: number, lastResizable: number, cols = this._cols;
-        var firstResizable: number, lastResizable: number;
-        columnElements.forEach((el, i) => {
-            if (i > cols.length)
-                return;
-            var handle = el.querySelector(".slick-resizable-handle");
-            handle && this._removeNode(handle);
-            if (cols[i].resizable) {
-                if (firstResizable === undefined) {
-                    firstResizable = i;
-                }
-                lastResizable = i;
-            }
-        });
-
-        if (firstResizable === undefined) {
-            return;
-        }
-
-        const noJQueryDrag = !this._jQuery || !this._jQuery.fn || !(this._jQuery.fn as any).drag;
-        columnElements.forEach((el, colIdx) => {
-
-            if (colIdx < firstResizable || (this._options.forceFitColumns && colIdx >= lastResizable)) {
-                return;
-            }
-
-            const handle = el.appendChild(document.createElement('div'));
-            handle.classList.add('slick-resizable-handle');
-            handle.draggable = true;
-
-            var docDragOver: any = null;
-            var lastDragOverPos: any = null;
-
-            const dragStart = (e: DragEvent) => {
-                if (!this.getEditorLock().commitCurrentEdit()) {
-                    !noJQueryDrag && e.preventDefault();
-                    return;
-                }
-
-                if (noJQueryDrag) {
-                    docDragOver = (z: DragEvent) => {
-                        lastDragOverPos = { pageX: z.pageX, pageY: z.pageY };
-                        z.preventDefault();
-                    }
-                    this._on(document as any, 'dragover', docDragOver);
-                }
-
-                pageX = e.pageX;
-                (e.target as HTMLElement).parentElement?.classList.add("slick-header-column-active");
-
-                // lock each column's width option to current width
-                columnElements.forEach((e, z) => {
-                    cols[z].previousWidth = (e as HTMLElement).offsetWidth;
-                });
-
-                const minMax = calcMinMaxPageXOnDragStart(cols, colIdx, pageX, this._options.forceFitColumns, this._absoluteColMinWidth);
-                maxPageX = minMax.maxPageX;
-                minPageX = minMax.minPageX;
-
-                noJQueryDrag && (e.dataTransfer.effectAllowed = 'move');
-            };
-
-            const drag = (e: DragEvent) => {
-                var dist;
-                if (noJQueryDrag) {
-                    var thisPageX = (!e.pageX && !e.pageY) ? lastDragOverPos?.pageX : e.pageX;
-                    var thisPageY = (!e.pageX && !e.pageY) ? lastDragOverPos?.pageY : e.pageY;
-                    if (!thisPageX && !e.clientX && !thisPageY && !e.clientY)
-                        return;
-                    dist = Math.min(maxPageX, Math.max(minPageX, thisPageX)) - pageX;
-                    e.dataTransfer.effectAllowed = 'none';
-                    e.preventDefault();
-                }
-                else {
-                    dist = Math.min(maxPageX, Math.max(minPageX, e.pageX)) - pageX;
-                }
-                if (isNaN(dist)) {
-                    return;
-                }
-                shrinkOrStretchColumn(cols, colIdx, dist, this._options.forceFitColumns, this._absoluteColMinWidth);
-
-                this.updateCanvasWidth(false)
+        this._colResizeDisposer && this._colResizeDisposer.abort();
+        this._colResizeDisposer = new AbortController();
+        setupColumnResize({
+            absoluteColMinWidth: this._absoluteColMinWidth,
+            disposer: this._colResizeDisposer,
+            colResized: this.columnsResized,
+            colResizing: () => {
+                this.updateCanvasWidth(false);
                 this.applyColumnHeaderWidths();
-                if (this._options.syncColumnCellResize) {
-                    this.applyColumnWidths();
-                }
-            }
-
-            const dragEnd = (e: any) => {
-                if (docDragOver) {
-                    document.removeEventListener('dragover', docDragOver);
-                    docDragOver = null;
-                }
-                (e.target.parentElement as HTMLElement)?.classList.remove("slick-header-column-active");
-                for (j = 0; j < columnElements.length; j++) {
-                    c = cols[j];
-                    var newWidth = (columnElements[j] as HTMLElement).offsetWidth;
-
-                    if (c.previousWidth !== newWidth && c.rerenderOnResize) {
-                        this.invalidateAllRows();
-                    }
-                }
-                this.columnsResized(false);
-            }
-
-            if (noJQueryDrag) {
-                this._on(handle, "dragstart", dragStart);
-                this._on(handle, "drag", drag);
-                this._on(handle, "dragend", dragEnd);
-                this._on(handle, "dragover", (e: any) => { e.preventDefault(); e.dataTransfer.effectAllowed = "move"; });
-            }
-            else {
-                (this._jQuery(handle) as any)
-                    .on("dragstart." + this._uid, dragStart)
-                    .on("drag." + this._uid, drag)
-                    .on("dragend." + this._uid, dragEnd);
-            }
+                this._options.syncColumnCellResize && this.applyColumnWidths();
+            },
+            cols: this._cols,
+            container: this._container,
+            headerColsElements: this._mapBands(band => band.headerCols),
+            getEditorLock: this.getEditorLock,
+            removeNode: this._removeNode,
+            options: this._options
         });
     }
 
@@ -1192,6 +1082,7 @@ export class Grid<TItem = any> implements IGrid<TItem> {
 
         this._emptyNode(this._container);
         this._eventDisposer?.abort();
+        this._colResizeDisposer?.abort();
 
         for (var k in this) {
             if (!Object.prototype.hasOwnProperty.call(this, k))
