@@ -178,7 +178,7 @@
 .slick-footerrow-columns {
   display: flex;
   flex-direction: row;
-  flex-wrap: nowrap;;
+  flex-wrap: nowrap;
   position: relative;
   white-space: nowrap;
   cursor: default;
@@ -205,15 +205,16 @@
 }
 
 .slick-resizable-handle {
-  position: absolute;
-  font-size: 0.1px;
+  cursor: e-resize;
   display: block;
-  cursor: col-resize;
+  font-size: 0.1px;
+  position: absolute;
   width: 9px;
   right: -5px;
   top: 0;
   height: 100%;
   z-index: 1;
+  touch-action: none;
 }
 
 .slick-cell,
