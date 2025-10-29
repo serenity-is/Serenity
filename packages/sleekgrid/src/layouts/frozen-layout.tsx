@@ -65,5 +65,5 @@ export class FrozenLayout implements LayoutEngine {
         this.host = null;
     }
 
-    readonly layoutName = "frozen";
+    readonly layoutName = "FrozenLayout";
 }

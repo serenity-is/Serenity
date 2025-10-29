@@ -482,7 +482,7 @@ export class Dialog {
                 const org: Function = modalObj._focustrap._handleFocusin;
                 modalObj._focustrap._handleFocusin = function (event: Event) {
                     if (event.target &&
-                        (event.target as any).closest('.ui-datepicker, .select2-drop, .cke, .cke_dialog, .flatpickr-calendar'))
+                        (event.target as any).closest('.dropdown-menu, .s-dropdown-menu, .ui-datepicker, .select2-drop, .cke, .cke_dialog, .flatpickr-calendar'))
                         return;
                     org.apply(this, arguments);
                 }

@@ -1,4 +1,4 @@
-import { applyFormatterResultToCellNode, Column, ColumnFormat, CompatFormatter, convertCompatFormatter, FormatterContext, FormatterResult, Group, IGroupTotals, ItemMetadata, type ArgsCell, type IGrid, type IPlugin } from "../core";
+import { applyFormatterResultToCellNode, Column, ColumnFormat, CompatFormatter, convertCompatFormatter, FormatterContext, FormatterResult, Group, IGroupTotals, ItemMetadata, type ArgsCell, type IGrid, type GridPlugin } from "../core";
 
 export interface GroupItemMetadataProviderOptions {
     enableExpandCollapse?: boolean;
@@ -23,7 +23,7 @@ export interface GroupItemMetadataProviderOptions {
     totalsFormatter?: CompatFormatter<IGroupTotals>;
 }
 
-export class GroupItemMetadataProvider implements IPlugin {
+export class GroupItemMetadataProvider implements GridPlugin {
     declare protected grid: IGrid;
     declare private options: GroupItemMetadataProviderOptions;
 

@@ -55,6 +55,8 @@ describe("jQuery UI Fixes", () => {
 
         expect(ui.dialog.prototype._allowInteraction).toBeDefined();
         const allowInteraction = ui.dialog.prototype._allowInteraction;
+        expect(allowInteraction({ target: (<div class="s-dropdown-menu"><div></div></div>).firstChild })).toBe(true);
+        expect(allowInteraction({ target: (<div class="dropdown-menu"><div></div></div>).firstChild })).toBe(true);
         expect(allowInteraction({ target: (<div class="ui-dialog"><div></div></div>).firstChild })).toBe(true);
         expect(allowInteraction({ target: (<div class="another-div"><div></div></div>).firstChild })).toBe(false);
         expect(allowInteraction({ target: (<div class="ui-datepicker"><div></div></div>).firstChild })).toBe(true);

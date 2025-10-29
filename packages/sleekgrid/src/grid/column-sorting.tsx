@@ -22,33 +22,40 @@ export function columnSortHandler(this: Pick<IGrid, "getColumnFromNode" | "getEd
             return;
         }
 
-        let sortColumns = this.getSortColumns();
+        let sortColumns = this.getSortColumns().slice();
+        const altOrMeta = e.altKey || e.metaKey;
 
-        var sortOpts = null;
-        var i = 0;
+        let sortOpts = null;
+        let i = 0;
+        let skipAdd = false;
         for (; i < sortColumns.length; i++) {
             if (sortColumns[i].columnId == column.id) {
                 sortOpts = sortColumns[i];
-                sortOpts.sortAsc = !sortOpts.sortAsc;
+                if (!altOrMeta && !e.shiftKey && !e.ctrlKey && sortColumns.length == 1 && sortOpts.sortAsc == false) {
+                    sortColumns.splice(i, 1);
+                    skipAdd = true;
+                }
+                else
+                    sortOpts.sortAsc = !sortOpts.sortAsc;
                 break;
             }
         }
 
         const multiColumnSort = this.getOptions().multiColumnSort;
-        if (e.metaKey && multiColumnSort) {
+        if (altOrMeta && multiColumnSort) {
             if (sortOpts) {
                 sortColumns.splice(i, 1);
             }
         }
         else {
-            if ((!e.shiftKey && !e.metaKey) || !multiColumnSort) {
+            if ((!e.shiftKey && !altOrMeta) || !multiColumnSort) {
                 sortColumns = [];
             }
 
             if (!sortOpts) {
                 sortOpts = { columnId: column.id, sortAsc: column.defaultSortAsc };
                 sortColumns.push(sortOpts);
-            } else if (sortColumns.length == 0) {
+            } else if (sortColumns.length == 0 && !skipAdd) {
                 sortColumns.push(sortOpts);
             }
         }
@@ -66,15 +73,13 @@ export function columnSortHandler(this: Pick<IGrid, "getColumnFromNode" | "getEd
             triggerGridEvent.call(this as IGrid, this.onSort, {
                 multiColumnSort: true,
                 sortCols: this.getSortColumns().map(col => ({
-                    sortCol:
-                        cols[this.getInitialColumnIndex(col.columnId)],
+                    sortCol: cols[this.getInitialColumnIndex(col.columnId)],
                     sortAsc: col.sortAsc
                 }))
             }, e);
         }
     }
 };
-
 
 /**
  * Helper to sort visible cols, while keeping invisible cols sticky to

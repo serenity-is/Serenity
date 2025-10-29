@@ -4813,6 +4813,9 @@ export declare class ColumnPickerDialog<P = {}> extends BaseDialog<P> {
 	private updateListStates;
 	protected setupColumns(): void;
 	protected onDialogOpen(): void;
+	static openDialog({ grid }: {
+		grid: IDataGrid;
+	}): void;
 }
 export type EditorProps<T> = WidgetProps<T> & {
 	initialValue?: any;

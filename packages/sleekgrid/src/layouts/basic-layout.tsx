@@ -22,17 +22,6 @@ export class BasicLayout implements LayoutEngine {
         </>);
     }
 
-    public calcCanvasWidth(): number {
-        var cols = this.host.getColumns(), i = cols.length;
-        var rowWidth = 0;
-        while (i--) {
-            rowWidth += cols[i].width;
-        }
-
-        return this.host.getOptions().fullWidthRows ? Math.max(rowWidth,
-            this.host.getAvailableWidth()) : rowWidth;
-    }
-
     public destroy(): void {
         this.host = this.refs = null;
     }
@@ -43,5 +32,5 @@ export class BasicLayout implements LayoutEngine {
 
     public afterSetOptions(): void { }
 
-    readonly layoutName = "basic";
+    readonly layoutName = "BasicLayout";
 }

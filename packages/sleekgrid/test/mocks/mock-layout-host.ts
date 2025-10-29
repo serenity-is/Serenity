@@ -40,7 +40,10 @@ export function mockLayoutHost(): LayoutHost & {
         getScrollDims: vi.fn(() => ({ width: 0, height: 0 })),
         getViewportInfo: vi.fn(() => ({} as ViewportInfo)),
         removeNode: vi.fn(),
-        renderRows: vi.fn()
+        renderRows: vi.fn(),
+        registerPlugin: vi.fn(),
+        unregisterPlugin: vi.fn(),
+        getPluginByName: vi.fn(() => null)
     };
     return host;
 }

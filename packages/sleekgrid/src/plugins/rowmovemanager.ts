@@ -1,4 +1,4 @@
-import { EventEmitter, EventSubscriber, type IGrid, type IPlugin } from "../core";
+import { EventEmitter, EventSubscriber, type IGrid, type GridPlugin } from "../core";
 
 export interface RowMoveManagerOptions {
     cancelEditOnDrag?: boolean;
@@ -17,7 +17,7 @@ interface ArgsMoveRows {
     insertBefore: number;
 }
 
-export class RowMoveManager implements IPlugin {
+export class RowMoveManager implements GridPlugin {
     declare private grid: IGrid;
     declare private options: RowMoveManagerOptions;
     declare private dragging: boolean;

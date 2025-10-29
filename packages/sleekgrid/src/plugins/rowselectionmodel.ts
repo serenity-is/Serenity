@@ -1,4 +1,4 @@
-import { CellRange, EventEmitter, EventSubscriber, IEventData, type ArgsCell, type IGrid, type IPlugin, type SelectionModel } from "../core";
+import { CellRange, EventEmitter, EventSubscriber, IEventData, type ArgsCell, type IGrid, type GridPlugin, type SelectionModel } from "../core";
 
 export interface RowSelectionModelOptions {
     selectActiveRow?: boolean;
@@ -25,7 +25,7 @@ function rangesToRows(ranges: CellRange[]) {
     return rows;
 }
 
-export class RowSelectionModel implements IPlugin, SelectionModel {
+export class RowSelectionModel implements GridPlugin, SelectionModel {
     declare private grid: IGrid;
     private handler = new EventSubscriber();
     declare private options: RowSelectionModelOptions;

@@ -1,4 +1,4 @@
-import type { ArgsColumn, IGrid, IPlugin } from "../core";
+import type { ArgsColumn, GridPlugin, IGrid } from "../core";
 
 export interface AutoTooltipsOptions {
     enableForCells?: boolean;
@@ -7,7 +7,7 @@ export interface AutoTooltipsOptions {
     replaceExisting?: boolean;
 }
 
-export class AutoTooltips implements IPlugin {
+export class AutoTooltips implements GridPlugin {
 
     declare private grid: IGrid;
     declare private options: AutoTooltipsOptions;

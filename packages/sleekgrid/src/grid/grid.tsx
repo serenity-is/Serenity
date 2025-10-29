@@ -7,18 +7,17 @@ import type { EditCommand, EditController, Editor, EditorClass, EditorLock, Posi
 import { EventEmitter, type IEventData } from "../core/event";
 import type { ArgsAddNewRow, ArgsCell, ArgsCellChange, ArgsCellEdit, ArgsColumn, ArgsColumnNode, ArgsCssStyle, ArgsEditorDestroy, ArgsGrid, ArgsScroll, ArgsSelectedRowsChange, ArgsSort, ArgsValidationError } from "../core/eventargs";
 import { applyFormatterResultToCellNode, convertCompatFormatter, defaultColumnFormat, formatterContext, type CellStylesHash, type ColumnFormat, type FormatterContext, type FormatterResult } from "../core/formatting";
+import type { GridPlugin } from "../core/grid-plugin";
 import type { GridSignals } from "../core/grid-signals";
 import { gridDefaults, type GridOptions } from "../core/gridoptions";
 import type { IGroupTotals } from "../core/group";
 import { type IDataView } from "../core/idataview";
 import type { IGrid } from "../core/igrid";
-import type { IPlugin } from "../core/iplugin";
 import type { SelectionModel } from "../core/selection-model";
 import { addClass, escapeHtml, parsePx, removeClass } from "../core/util";
 import type { ViewportInfo } from "../core/viewportinfo";
 import type { ViewRange } from "../core/viewrange";
 import { BasicLayout } from "../layouts/basic-layout";
-import { applyColumnWidths, applyLegacyHeightOptions, createCssRules, findStylesheetByUID } from "../layouts/layout-calculations";
 import type { LayoutEngine } from "../layouts/layout-engine";
 import { createGridSignalsAndRefs, disposeBandRefs, forEachBand, getAllCanvasNodes, getAllHScrollContainers, getAllViewportNodes, getAllVScrollContainers, mapBands, type GridBandRefs, type GridLayoutRefs } from "../layouts/layout-refs";
 import { CellNavigator } from "./cellnavigator";
@@ -29,7 +28,7 @@ import { bindPrototypeMethods, defaultEmptyNode, defaultJQueryEmptyNode, default
 import type { RowCellRenderArgs } from "./render-args";
 import { renderCell } from "./render-cell";
 import { renderRow } from "./render-row";
-import { absBox, getInnerWidth, getMaxSupportedCssHeight, getScrollBarDimensions, setStyleProp } from "./style-utils";
+import { absBox, applyColumnWidths, applyLegacyHeightOptions, createCssRules, findStylesheetByUID, getInnerWidth, getMaxSupportedCssHeight, getScrollBarDimensions, setStyleProp } from "./style-utils";
 
 export class Grid<TItem = any> implements IGrid<TItem> {
     declare private _absoluteColMinWidth: number;
@@ -81,7 +80,7 @@ export class Grid<TItem = any> implements IGrid<TItem> {
     private _pageOffset: number = 0;
     private _pagingActive: boolean = false;
     private _pagingIsLastPage: boolean = false;
-    private _plugins: IPlugin[] = [];
+    private _plugins: GridPlugin[] = [];
     declare private _postCleanupActive: boolean;
     private _postProcessCleanupQueue: PostProcessCleanupEntry[] = [];
     private _postProcessedRows: { [row: number]: { [cell: number]: string } } = {};
@@ -125,6 +124,7 @@ export class Grid<TItem = any> implements IGrid<TItem> {
     readonly onActiveCellChanged = new EventEmitter<ArgsCell>();
     readonly onActiveCellPositionChanged = new EventEmitter<ArgsGrid>();
     readonly onAddNewRow = new EventEmitter<ArgsAddNewRow>();
+    readonly onAfterInit = new EventEmitter<ArgsGrid>();
     readonly onBeforeCellEditorDestroy = new EventEmitter<ArgsEditorDestroy>();
     readonly onBeforeDestroy = new EventEmitter<ArgsGrid>();
     readonly onBeforeEditCell = new EventEmitter<ArgsCellEdit>();
@@ -254,20 +254,19 @@ export class Grid<TItem = any> implements IGrid<TItem> {
         const prevLifecycleRoot = currentLifecycleRoot(this._container);
         try {
             this._layout.init({
-                cleanUpAndRenderCells: this.cleanUpAndRenderCells,
-                getAvailableWidth: this.getAvailableWidth,
-                getCellFromPoint: this.getCellFromPoint,
+                onAfterInit: this.onAfterInit,
                 getColumns: this.getColumns,
                 getContainerNode: this.getContainerNode,
                 getDataLength: this.getDataLength,
                 getInitialColumns: this.getInitialColumns,
                 getOptions: this.getOptions,
-                getScrollDims: this.getScrollBarDimensions,
                 getSignals: this.getSignals,
                 getViewportInfo: this.getViewportInfo,
                 refs: this._refs,
                 removeNode: this._removeNode,
-                renderRows: this.renderRows
+                registerPlugin: this.registerPlugin,
+                unregisterPlugin: this.unregisterPlugin,
+                getPluginByName: this.getPluginByName
             });
 
             this.applyLegacyHeightOptions();
@@ -422,14 +421,16 @@ export class Grid<TItem = any> implements IGrid<TItem> {
                 this._on(c, "mousewheel" as any, this.handleMouseWheel as any);
             });
         }
+
+        this.onAfterInit.notify({ grid: this });
     }
 
-    registerPlugin(plugin: IPlugin): void {
+    registerPlugin(plugin: GridPlugin): void {
         this._plugins.unshift(plugin);
         plugin.init(this);
     }
 
-    unregisterPlugin(plugin: IPlugin): void {
+    unregisterPlugin(plugin: GridPlugin): void {
         for (var i = this._plugins.length; i >= 0; i--) {
             if (this._plugins[i] === plugin) {
                 if (this._plugins[i].destroy) {
@@ -441,7 +442,7 @@ export class Grid<TItem = any> implements IGrid<TItem> {
         }
     }
 
-    getPluginByName(name: string): IPlugin {
+    getPluginByName(name: string): GridPlugin {
         for (var i = this._plugins.length - 1; i >= 0; i--) {
             if (this._plugins[i].pluginName === name)
                 return this._plugins[i];
@@ -494,6 +495,18 @@ export class Grid<TItem = any> implements IGrid<TItem> {
                 return refs.end;
         }
         return refs.main;
+    }
+
+    public getLayoutInfo(): { frozenTopRows: number, frozenBottomRows: number, pinnedStartCols: number, pinnedEndCols: number } {
+        const { frozenTopLast, frozenBottomFirst, pinnedStartLast, pinnedEndFirst } = this._refs;
+        const dataLength = this.getDataLength();
+        const colCount = this.getColumns().length;
+        return {
+            frozenTopRows: frozenTopLast >= 0 ? frozenTopLast + 1 : 0,
+            frozenBottomRows: frozenBottomFirst >= 0 && frozenBottomFirst < dataLength ? dataLength - frozenBottomFirst : 0,
+            pinnedStartCols: pinnedStartLast >= 0 ? pinnedStartLast + 1 : 0,
+            pinnedEndCols: pinnedEndFirst >= 0 && pinnedEndFirst < colCount ? colCount - pinnedEndFirst : 0
+        };
     }
 
     getCanvasNode(row?: number, cell?: number): HTMLElement {
@@ -890,7 +903,7 @@ export class Grid<TItem = any> implements IGrid<TItem> {
             chosenClass: 'slick-header-column-dragging',
             ghostClass: 'slick-sortable-placeholder',
             draggable: '.slick-header-column',
-            filter: ".slick-resizable-handle",
+            filter: ".slick-resizable-handle, .no-drag",
             preventOnFilter: false,
             dragoverBubble: false,
             revertClone: true,

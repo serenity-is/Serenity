@@ -46,23 +46,7 @@ export class ColumnPickerDialog<P = {}> extends BaseDialog<P> {
 
     public static createToolButton(grid: IDataGrid): ToolButton {
         function onClick() {
-            var picker = new ColumnPickerDialog({});
-            picker.allColumns = (grid as any).allColumns;
-            if ((grid as any).initialSettings) {
-                var initialSettings = (grid as any).initialSettings;
-                if (initialSettings.columns && initialSettings.columns.length)
-                    picker.defaultColumns = initialSettings.columns.map((x: any) => x.id);
-            }
-            picker.visibleColumns = grid.getGrid().getColumns().map(x => x.id);
-            picker.done = () => {
-                (grid as any).allColumns = picker.allColumns;
-                var visible = picker.allColumns.filter(x => x.visible === true);
-                grid.getGrid().setColumns(visible);
-                Promise.resolve((grid as any).persistSettings()).then(() => grid.getView().populate());
-            };
-
-            Router && Router.dialog && Router.dialog((grid as any).element, picker.domNode, () => "columns");
-            picker.dialogOpen();
+            ColumnPickerDialog.openDialog({ grid });
         }
 
         (grid as any).element.on('handleroute.' + (grid as any).uniqueName, (e: any, arg: any) => {
@@ -262,5 +246,25 @@ export class ColumnPickerDialog<P = {}> extends BaseDialog<P> {
         if (restoreButton)
             (restoreButton.nextElementSibling as HTMLElement)?.focus?.();
 
+    }
+
+    static openDialog({ grid }: { grid: IDataGrid }) {
+        var picker = new ColumnPickerDialog({});
+        picker.allColumns = (grid as any).allColumns;
+        if ((grid as any).initialSettings) {
+            var initialSettings = (grid as any).initialSettings;
+            if (initialSettings.columns && initialSettings.columns.length)
+                picker.defaultColumns = initialSettings.columns.map((x: any) => x.id);
+        }
+        picker.visibleColumns = grid.getGrid().getColumns().map(x => x.id);
+        picker.done = () => {
+            (grid as any).allColumns = picker.allColumns;
+            var visible = picker.allColumns.filter(x => x.visible === true);
+            grid.getGrid().setColumns(visible);
+            Promise.resolve((grid as any).persistSettings()).then(() => grid.getView().populate());
+        };
+
+        Router && Router.dialog && Router.dialog((grid as any).element, picker.domNode, () => "columns");
+        picker.dialogOpen();
     }
 }

@@ -529,25 +529,18 @@ export interface CellNavigation {
 	navigateUp(): boolean;
 	navigate(dir: CellNavigationDirection): boolean;
 }
-export interface ViewportInfo {
-	height: number;
-	width: number;
-	hasVScroll: boolean;
-	hasHScroll: boolean;
-	headerHeight: number;
-	groupingPanelHeight: number;
-	virtualHeight: number;
-	realScrollHeight: number;
-	topPanelHeight: number;
-	headerRowHeight: number;
-	footerRowHeight: number;
-	numVisibleRows: number;
+export interface GridPlugin {
+	init(grid: IGrid): void;
+	pluginName?: string;
+	destroy?: () => void;
 }
-export interface ViewRange {
-	top?: number;
-	bottom?: number;
-	leftPx?: number;
-	rightPx?: number;
+/** @deprecated Use GridPlugin instead */
+export interface IPlugin extends GridPlugin {
+}
+export interface GridPluginHost {
+	getPluginByName(name: string): GridPlugin;
+	registerPlugin(plugin: GridPlugin): void;
+	unregisterPlugin(plugin: GridPlugin): void;
 }
 export interface GridSignals {
 	readonly showColumnHeader: Signal<boolean>;
@@ -562,6 +555,20 @@ export interface GridSignals {
 	readonly pinnedEndFirst: Signal<number>;
 	readonly frozenTopLast: Signal<number>;
 	readonly frozenBottomFirst: Signal<number>;
+}
+export interface ViewportInfo {
+	height: number;
+	width: number;
+	hasVScroll: boolean;
+	hasHScroll: boolean;
+	headerHeight: number;
+	groupingPanelHeight: number;
+	virtualHeight: number;
+	realScrollHeight: number;
+	topPanelHeight: number;
+	headerRowHeight: number;
+	footerRowHeight: number;
+	numVisibleRows: number;
 }
 export type BandKey = "start" | "main" | "end";
 export type PaneKey = "top" | "body" | "bottom";
@@ -588,24 +595,11 @@ export type GridLayoutRefs = {
 	frozenTopLast: number;
 	frozenBottomFirst: number;
 };
-export interface LayoutHost {
-	cleanUpAndRenderCells(range: ViewRange): void;
-	getAvailableWidth(): number;
-	getCellFromPoint(x: number, y: number): RowCell;
-	getColumns(): Column[];
-	getInitialColumns(): Column[];
-	getContainerNode(): HTMLElement;
-	getDataLength(): number;
-	getOptions(): GridOptions;
+export interface LayoutHost extends Pick<IGrid, "getColumns" | "getInitialColumns" | "getOptions" | "getContainerNode" | "getDataLength" | "onAfterInit">, GridPluginHost {
 	getSignals(): GridSignals;
-	getScrollDims(): {
-		width: number;
-		height: number;
-	};
 	getViewportInfo(): ViewportInfo;
-	readonly refs: GridLayoutRefs;
 	removeNode(node: HTMLElement): void;
-	renderRows(range: ViewRange): void;
+	readonly refs: GridLayoutRefs;
 }
 export interface LayoutEngine {
 	layoutName: string;
@@ -934,20 +928,22 @@ export interface GridOptions<TItem = any> {
 	viewportClass?: string;
 }
 export declare const gridDefaults: GridOptions;
-export interface IPlugin {
-	init(grid: IGrid): void;
-	pluginName?: string;
-	destroy?: () => void;
-}
-export interface SelectionModel extends IPlugin {
+export interface SelectionModel extends GridPlugin {
 	setSelectedRanges(ranges: CellRange[]): void;
 	onSelectedRangesChanged: EventEmitter<CellRange[]>;
 	refreshSelections?(): void;
 }
-export interface IGrid<TItem = any> extends EditorHost, CellNavigation {
+export interface ViewRange {
+	top?: number;
+	bottom?: number;
+	leftPx?: number;
+	rightPx?: number;
+}
+export interface IGrid<TItem = any> extends CellNavigation, EditorHost, GridPluginHost {
 	readonly onActiveCellChanged: EventEmitter<ArgsCell, IEventData>;
 	readonly onActiveCellPositionChanged: EventEmitter<ArgsGrid, IEventData>;
 	readonly onAddNewRow: EventEmitter<ArgsAddNewRow, IEventData>;
+	readonly onAfterInit: EventEmitter<ArgsGrid, IEventData>;
 	readonly onBeforeCellEditorDestroy: EventEmitter<ArgsEditorDestroy, IEventData>;
 	readonly onBeforeDestroy: EventEmitter<ArgsGrid, IEventData>;
 	readonly onBeforeEditCell: EventEmitter<ArgsCellEdit, IEventData>;
@@ -1044,8 +1040,13 @@ export interface IGrid<TItem = any> extends EditorHost, CellNavigation {
 	getHeaderRowColumn(columnIdOrIdx: string | number): HTMLElement;
 	getInitialColumnIndex(id: string): number;
 	getInitialColumns(): Column<TItem>[];
+	getLayoutInfo(): {
+		frozenTopRows: number;
+		frozenBottomRows: number;
+		pinnedStartCols: number;
+		pinnedEndCols: number;
+	};
 	getOptions(): GridOptions<TItem>;
-	getPluginByName(name: string): IPlugin;
 	getPreHeaderPanel(): HTMLElement;
 	getRenderedRange(viewportTop?: number, viewportLeft?: number): ViewRange;
 	getRowFromNode(rowNode: Element): number;
@@ -1068,7 +1069,6 @@ export interface IGrid<TItem = any> extends EditorHost, CellNavigation {
 	invalidateAllRows(): void;
 	invalidateRow(row: number): void;
 	invalidateRows(rows: number[]): void;
-	registerPlugin(plugin: IPlugin): void;
 	removeCellCssStyles(key: string): void;
 	render: () => void;
 	resetActiveCell(): void;
@@ -1094,7 +1094,6 @@ export interface IGrid<TItem = any> extends EditorHost, CellNavigation {
 	setSortColumn(columnId: string, ascending: boolean): void;
 	setSortColumns(cols: ColumnSort[]): void;
 	setTopPanelVisibility(visible: boolean): void;
-	unregisterPlugin(plugin: IPlugin): void;
 	updateCell(row: number, cell: number): void;
 	updateColumnHeader(columnId: string, title?: string | ColumnFormat<any>, toolTip?: string): void;
 	updatePagingStatusFromView(pagingInfo: {
@@ -1187,11 +1186,10 @@ export declare class BasicLayout implements LayoutEngine {
 	protected host: LayoutHost;
 	protected refs: GridLayoutRefs;
 	init(host: LayoutHost): void;
-	calcCanvasWidth(): number;
 	destroy(): void;
 	getTopPanel(): HTMLElement;
 	afterSetOptions(): void;
-	readonly layoutName = "basic";
+	readonly layoutName = "BasicLayout";
 }
 export declare class FrozenLayout implements LayoutEngine {
 	private host;
@@ -1201,7 +1199,7 @@ export declare class FrozenLayout implements LayoutEngine {
 	afterSetOptions(arg: GridOptions): void;
 	adjustFrozenRowsOption(): void;
 	destroy(): void;
-	readonly layoutName = "frozen";
+	readonly layoutName = "FrozenLayout";
 }
 export declare const Header: ({ band, refs, signals }: {
 	band: BandKey;
@@ -1319,6 +1317,7 @@ export declare class Grid<TItem = any> implements IGrid<TItem> {
 	readonly onActiveCellChanged: EventEmitter<ArgsCell, IEventData>;
 	readonly onActiveCellPositionChanged: EventEmitter<ArgsGrid, IEventData>;
 	readonly onAddNewRow: EventEmitter<ArgsAddNewRow, IEventData>;
+	readonly onAfterInit: EventEmitter<ArgsGrid, IEventData>;
 	readonly onBeforeCellEditorDestroy: EventEmitter<ArgsEditorDestroy, IEventData>;
 	readonly onBeforeDestroy: EventEmitter<ArgsGrid, IEventData>;
 	readonly onBeforeEditCell: EventEmitter<ArgsCellEdit, IEventData>;
@@ -1357,9 +1356,9 @@ export declare class Grid<TItem = any> implements IGrid<TItem> {
 	private createGroupingPanel;
 	private getSignals;
 	init(): void;
-	registerPlugin(plugin: IPlugin): void;
-	unregisterPlugin(plugin: IPlugin): void;
-	getPluginByName(name: string): IPlugin;
+	registerPlugin(plugin: GridPlugin): void;
+	unregisterPlugin(plugin: GridPlugin): void;
+	getPluginByName(name: string): GridPlugin;
 	setSelectionModel(model: SelectionModel): void;
 	private unregisterSelectionModel;
 	getScrollBarDimensions(): {
@@ -1373,6 +1372,12 @@ export declare class Grid<TItem = any> implements IGrid<TItem> {
 	getAbsoluteColumnMinWidth(): number;
 	getSelectionModel(): SelectionModel;
 	private getBandRefsForCell;
+	getLayoutInfo(): {
+		frozenTopRows: number;
+		frozenBottomRows: number;
+		pinnedStartCols: number;
+		pinnedEndCols: number;
+	};
 	getCanvasNode(row?: number, cell?: number): HTMLElement;
 	getCanvases(): any | HTMLElement[];
 	getActiveCanvasNode(e?: IEventData): HTMLElement;
@@ -1734,7 +1739,7 @@ export interface GroupItemMetadataProviderOptions {
 	/** @deprecated see @use totalsFormat */
 	totalsFormatter?: CompatFormatter<IGroupTotals>;
 }
-export declare class GroupItemMetadataProvider implements IPlugin {
+export declare class GroupItemMetadataProvider implements GridPlugin {
 	protected grid: IGrid;
 	private options;
 	constructor(opt?: GroupItemMetadataProviderOptions);
@@ -1761,7 +1766,7 @@ export interface AutoTooltipsOptions {
 	maxToolTipLength?: number;
 	replaceExisting?: boolean;
 }
-export declare class AutoTooltips implements IPlugin {
+export declare class AutoTooltips implements GridPlugin {
 	private grid;
 	private options;
 	constructor(options?: AutoTooltipsOptions);
@@ -1779,7 +1784,7 @@ export interface ArgsMoveRows {
 	rows: number[];
 	insertBefore: number;
 }
-export declare class RowMoveManager implements IPlugin {
+export declare class RowMoveManager implements GridPlugin {
 	private grid;
 	private options;
 	private dragging;
@@ -1798,7 +1803,7 @@ export declare class RowMoveManager implements IPlugin {
 export interface RowSelectionModelOptions {
 	selectActiveRow?: boolean;
 }
-export declare class RowSelectionModel implements IPlugin, SelectionModel {
+export declare class RowSelectionModel implements GridPlugin, SelectionModel {
 	private grid;
 	private handler;
 	private options;

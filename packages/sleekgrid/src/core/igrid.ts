@@ -4,15 +4,16 @@ import type { EditController, Editor, EditorClass, EditorHost, EditorLock, Posit
 import type { EventEmitter, IEventData } from "./event";
 import type { ArgsAddNewRow, ArgsCell, ArgsCellChange, ArgsCellEdit, ArgsColumn, ArgsColumnNode, ArgsCssStyle, ArgsEditorDestroy, ArgsGrid, ArgsScroll, ArgsSelectedRowsChange, ArgsSort, ArgsValidationError } from "./eventargs";
 import type { CellStylesHash, ColumnFormat, FormatterContext } from "./formatting";
+import type { GridPluginHost } from "./grid-plugin";
 import type { GridOptions } from "./gridoptions";
-import type { IPlugin } from "./iplugin";
 import type { SelectionModel } from "./selection-model";
 import type { ViewRange } from "./viewrange";
 
-export interface IGrid<TItem = any> extends EditorHost, CellNavigation {
+export interface IGrid<TItem = any> extends CellNavigation, EditorHost, GridPluginHost {
     readonly onActiveCellChanged: EventEmitter<ArgsCell, IEventData>;
     readonly onActiveCellPositionChanged: EventEmitter<ArgsGrid, IEventData>;
     readonly onAddNewRow: EventEmitter<ArgsAddNewRow, IEventData>;
+    readonly onAfterInit: EventEmitter<ArgsGrid, IEventData>;
     readonly onBeforeCellEditorDestroy: EventEmitter<ArgsEditorDestroy, IEventData>;
     readonly onBeforeDestroy: EventEmitter<ArgsGrid, IEventData>;
     readonly onBeforeEditCell: EventEmitter<ArgsCellEdit, IEventData>;
@@ -95,8 +96,8 @@ export interface IGrid<TItem = any> extends EditorHost, CellNavigation {
     getHeaderRowColumn(columnIdOrIdx: string | number): HTMLElement;
     getInitialColumnIndex(id: string): number;
     getInitialColumns(): Column<TItem>[];
+    getLayoutInfo(): { frozenTopRows: number, frozenBottomRows: number, pinnedStartCols: number, pinnedEndCols: number };
     getOptions(): GridOptions<TItem>;
-    getPluginByName(name: string): IPlugin;
     getPreHeaderPanel(): HTMLElement;
     getRenderedRange(viewportTop?: number, viewportLeft?: number): ViewRange;
     getRowFromNode(rowNode: Element): number;
@@ -116,7 +117,6 @@ export interface IGrid<TItem = any> extends EditorHost, CellNavigation {
     invalidateAllRows(): void;
     invalidateRow(row: number): void;
     invalidateRows(rows: number[]): void;
-    registerPlugin(plugin: IPlugin): void;
     removeCellCssStyles(key: string): void;
     render: () => void;
     resetActiveCell(): void;
@@ -142,7 +142,6 @@ export interface IGrid<TItem = any> extends EditorHost, CellNavigation {
     setSortColumn(columnId: string, ascending: boolean): void;
     setSortColumns(cols: ColumnSort[]): void;
     setTopPanelVisibility(visible: boolean): void;
-    unregisterPlugin(plugin: IPlugin): void;
     updateCell(row: number, cell: number): void;
     updateColumnHeader(columnId: string, title?: string | ColumnFormat<any>, toolTip?: string): void;
     updatePagingStatusFromView(pagingInfo: { pageSize: number; pageNum: number; totalPages: number; }): void;

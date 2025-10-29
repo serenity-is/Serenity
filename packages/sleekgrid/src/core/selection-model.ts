@@ -1,7 +1,7 @@
 import type { CellRange, EventEmitter } from ".";
-import type { IPlugin } from "./iplugin";
+import type { GridPlugin } from "./grid-plugin";
 
-export interface SelectionModel extends IPlugin {
+export interface SelectionModel extends GridPlugin {
     setSelectedRanges(ranges: CellRange[]): void;
     onSelectedRangesChanged: EventEmitter<CellRange[]>;
     refreshSelections?(): void;

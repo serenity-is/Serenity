@@ -10,7 +10,7 @@ function applyJQueryUIFixes($: any): boolean {
         if (event.target?.closest?.(".ui-dialog")) {
             return true;
         }
-        return !!(event.target?.closest?.(".ui-datepicker, .select2-drop, .cke, .cke_dialog, .modal, #support-modal"));
+        return !!(event.target?.closest?.(".dropdown-menu, .s-dropdown-menu, .ui-datepicker, .select2-drop, .cke, .cke_dialog, .modal, #support-modal"));
     };
 
     (function (orig) {
