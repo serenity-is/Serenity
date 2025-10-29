@@ -19,6 +19,7 @@ export interface PersistedGridColumn {
     width?: number;
     sort?: number;
     visible?: boolean;
+    pinned?: "start" | "end" | false;
 }
 
 export interface PersistedGridSettings {
@@ -32,6 +33,7 @@ export interface PersistedGridSettings {
 }
 
 export interface GridPersistanceFlags {
+    columnPinning?: boolean;
     columnWidths?: boolean;
     columnVisibility?: boolean;
     sortColumns?: boolean;
@@ -43,6 +45,7 @@ export interface GridPersistanceFlags {
 }
 
 export const omitAllGridPersistenceFlags: GridPersistanceFlags = {
+    columnPinning: false,
     columnWidths: false,
     columnVisibility: false,
     sortColumns: false,
@@ -65,7 +68,10 @@ export function getCurrentSettings(this: void, opt: {
 
     const flags = opt.flags || {};
     const settings: PersistedGridSettings = {};
-    if (flags.columnVisibility !== false || flags.columnWidths !== false || flags.sortColumns !== false) {
+    if (flags.columnVisibility !== false ||
+        flags.columnWidths !== false ||
+        flags.columnPinning !== false ||
+        flags.sortColumns !== false) {
         settings.columns = [];
         const sortColumns = opt.slickGrid.getSortColumns() as any[];
         const columns = opt.slickGrid.getColumns();
@@ -73,6 +79,10 @@ export function getCurrentSettings(this: void, opt: {
             const p: PersistedGridColumn = {
                 id: column.id
             };
+
+            if (flags.columnPinning !== false && column.frozen) {
+                p.pinned = column.frozen !== "end" ? "start" : "end";
+            }
 
             if (flags.columnVisibility !== false) {
                 p.visible = true;
@@ -88,6 +98,11 @@ export function getCurrentSettings(this: void, opt: {
                 }
             }
             settings.columns.push(p);
+        }
+
+        if (flags.columnPinning && !settings.columns.some(x => "pinned" in x && settings.columns.length)) {
+            // ensure at least one column has pinned info so that while restoring we know pinning flag was used
+            settings.columns[0].pinned = false;
         }
     }
 
@@ -207,6 +222,21 @@ export function restoreSettingsFrom(this: void, opt: {
                 return x1.visible === true;
             });
         }
+
+        if (flags.columnPinning !== false &&
+            settings.columns.some(x => "pinned" in x)) {
+            initColById(columns);
+            for (let x1 of settings.columns) {
+                if (x1.id != null) {
+                    const column = colById[x1.id];
+                    if (column != null) {
+                        column.frozen = x1.pinned === "start" ||
+                            x1.pinned === "end" ? x1.pinned : null;
+                    }
+                }
+            }
+        }
+
         if (flags.columnWidths !== false) {
             initColById(columns);
             for (let x2 of settings.columns) {
