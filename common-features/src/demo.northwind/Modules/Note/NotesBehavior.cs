@@ -231,7 +231,7 @@ public class NotesBehavior(IUserRetrieveService userRetriever,
                 .Select(fld.NoteId)
                 .Where(
                     fld.EntityType == handler.Row.Table &
-                    fld.EntityId == Convert.ToInt64(idField.AsObject(handler.Row), 
+                    fld.EntityId == Convert.ToString(idField.AsObject(handler.Row), 
                         CultureInfo.InvariantCulture))
                 .ForEach(handler.Connection, () =>
                 {

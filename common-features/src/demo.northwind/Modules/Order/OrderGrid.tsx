@@ -60,20 +60,12 @@ export class OrderGrid<P = {}> extends EntityGrid<OrderRow, P> {
     }
 
     protected getColumns() {
-        var columns = super.getColumns();
+        var columns = new OrderColumns(super.getColumns());
 
-        columns.splice(1, 0, {
-            id: 'Print Invoice',
-            field: null,
-            name: '',
-            cssClass: 'align-center',
-            format: () => <a class="inline-action" data-action="print-invoice" title="invoice"><i class={faIcon("file-pdf", "red")}></i></a>,
-            width: 36,
-            minWidth: 36,
-            maxWidth: 36
-        });
+        columns.PrintInvoice.format = () => <a class="inline-action" data-action="print-invoice" title="invoice">
+            <i class={faIcon("file-pdf", "red")}></i></a>;
 
-        return columns;
+        return columns.valueOf();
     }
 
     protected onClick(e: Event, row: number, cell: number) {
@@ -106,5 +98,6 @@ export class OrderGrid<P = {}> extends EntityGrid<OrderRow, P> {
         this.editItem({
             CustomerID: eq ? eq.CustomerID : null
         });
+
     }
 }

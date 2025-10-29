@@ -10,6 +10,9 @@ public class OrderColumns
     [EditLink, Width(200), QuickFilter]
     public string CustomerCompanyName { get; set; }
 
+    [DisplayName(""), AlignCenter, Unbound, Width(36, Max = 36, Min = 36)]
+    public string PrintInvoice { get; set; }
+
     [EditLink, QuickFilter(CssClass = "hidden-xs")]
     public DateTime? OrderDate { get; set; }
 
