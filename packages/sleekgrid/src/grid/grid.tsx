@@ -596,10 +596,32 @@ export class Grid<TItem = any> implements IGrid<TItem> {
 
         const style = this._cssVarRules?.style ?? this._container.style;
         const refs = this._refs;
-        setStyleProp(style, "--sg-start-width", refs.start.canvasWidth + "px");
+        let mainWidth = this._viewportInfo.width - refs.start.canvasWidth - refs.end.canvasWidth;
+        let startWidth = refs.start.canvasWidth;
+        let endWidth = refs.end.canvasWidth;
+        if (mainWidth < 0) {
+            if (startWidth > 0 && endWidth > 0) {
+                let reduceStart = Math.min(startWidth, (startWidth / (startWidth + endWidth)) * -mainWidth);
+                let reduceEnd = Math.min(endWidth, (endWidth / (startWidth + endWidth)) * -mainWidth);
+                startWidth -= reduceStart;
+                endWidth -= reduceEnd;
+                mainWidth += (reduceStart + reduceEnd);
+            }
+            if (mainWidth < 0 && startWidth > 0) {
+                let reduceStart = Math.min(startWidth, -mainWidth);
+                startWidth -= reduceStart;
+                mainWidth += reduceStart;
+            }
+            if (mainWidth < 0 && endWidth > 0) {
+                let reduceEnd = Math.min(endWidth, -mainWidth);
+                endWidth -= reduceEnd;
+                mainWidth += reduceEnd;
+            }
+        }
+        setStyleProp(style, "--sg-start-width", startWidth + "px");
         setStyleProp(style, "--sg-virtual-width", refs.main.canvasWidth + "px");
-        setStyleProp(style, "--sg-end-width", refs.end.canvasWidth + "px");
-        setStyleProp(style, "--sg-main-width", this._viewportInfo.width - refs.start.canvasWidth - refs.end.canvasWidth + "px");
+        setStyleProp(style, "--sg-end-width", endWidth + "px");
+        setStyleProp(style, "--sg-main-width", mainWidth + "px");
         return widthChanged;
     }
 
