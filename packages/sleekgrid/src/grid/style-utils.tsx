@@ -49,6 +49,8 @@ export function absBox(elem: HTMLElement): Position {
 }
 
 export function getInnerWidth(el: HTMLElement): number {
+    if (!el)
+        return 0;
     var style = getComputedStyle(el);
     var width = parsePx(style.width) ?? 0;
     if (style.boxSizing != 'border-box')
@@ -77,21 +79,6 @@ export function getScrollBarDimensions(recalc?: boolean): { width: number; heigh
         c.remove();
     }
     return scrollbarDimensions;
-}
-
-export function getVBoxDelta(el: HTMLElement): number {
-    if (!el)
-        return 0;
-
-    var style = getComputedStyle(el);
-    if (style.boxSizing === 'border-box')
-        return 0;
-
-    var p = ["border-top-width", "border-bottom-width", "padding-top", "padding-bottom"];
-    var delta = 0;
-    for (var val of p)
-        delta += parsePx(style.getPropertyValue(val)) || 0;
-    return delta;
 }
 
 export function setStyleProp(this: void, styles: CSSStyleDeclaration, prop: string, value: string): void {

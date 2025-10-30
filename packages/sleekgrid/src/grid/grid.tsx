@@ -596,12 +596,15 @@ export class Grid<TItem = any> implements IGrid<TItem> {
 
         const style = this._cssVarRules?.style ?? this._container.style;
         const refs = this._refs;
-        let mainWidth = this._viewportInfo.width - refs.start.canvasWidth - refs.end.canvasWidth;
-        let startWidth = refs.start.canvasWidth;
-        let endWidth = refs.end.canvasWidth;
+        const startViewport = refs.start.canvas.body?.parentElement;
+        const endViewport = refs.end.canvas.body?.parentElement;
+        let startWidth = refs.start.canvasWidth + ((startViewport?.offsetWidth || 0) - (startViewport?.clientWidth || 0)); // include pinned start border
+        let endWidth = refs.end.canvasWidth + ((endViewport?.offsetWidth || 0) - (endViewport?.clientWidth || 0)); // include pinned end border
+        let mainWidth = this._viewportInfo.width - startWidth - endWidth;
         if (mainWidth < 0) {
             mainWidth = 0;
         }
+
         setStyleProp(style, "--sg-start-width", startWidth + "px");
         setStyleProp(style, "--sg-virtual-width", refs.main.canvasWidth + "px");
         setStyleProp(style, "--sg-end-width", endWidth + "px");
