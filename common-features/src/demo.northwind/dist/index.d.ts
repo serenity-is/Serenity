@@ -420,6 +420,7 @@ export declare abstract class OrderRow {
 export interface OrderColumns {
 	OrderID: Column<OrderRow>;
 	CustomerCompanyName: Column<OrderRow>;
+	PrintInvoice: Column<OrderRow>;
 	OrderDate: Column<OrderRow>;
 	EmployeeFullName: Column<OrderRow>;
 	RequiredDate: Column<OrderRow>;

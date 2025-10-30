@@ -4,14 +4,14 @@ namespace Serenity.Demo.Northwind.Columns;
 [BasedOnRow(typeof(OrderRow), CheckNames = true)]
 public class OrderColumns
 {
-    [EditLink, AlignRight, SortOrder(1, descending: true), Width(70)]
+    [EditLink, AlignRight, SortOrder(1, descending: true), Width(70), PinToStart]
     public string OrderID { get; set; }
 
-    [EditLink, Width(200), QuickFilter]
-    public string CustomerCompanyName { get; set; }
-
-    [DisplayName(""), AlignCenter, Unbound, Width(36, Max = 36, Min = 36)]
+    [DisplayName(""), AlignCenter, Unbound, FixedWidth(15), PinToStart]
     public string PrintInvoice { get; set; }
+
+    [EditLink, Width(200), QuickFilter, PinToStart]
+    public string CustomerCompanyName { get; set; }
 
     [EditLink, QuickFilter(CssClass = "hidden-xs")]
     public DateTime? OrderDate { get; set; }

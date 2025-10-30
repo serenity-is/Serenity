@@ -17,8 +17,9 @@ public partial class BasicPropertyProcessor : PropertyProcessor
             return;
         }
 
-        if (source.BasedOnField is not null &&
-            source.BasedOnField.Flags.HasFlag(FieldFlags.NotMapped))
+        if ((source.BasedOnField is not null &&
+             source.BasedOnField.Flags.HasFlag(FieldFlags.NotMapped)) ||
+            (source.GetAttribute<UnboundAttribute>() != null))
             item.Sortable = false;
     }
 }

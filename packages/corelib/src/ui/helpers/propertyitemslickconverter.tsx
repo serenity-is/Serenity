@@ -50,6 +50,10 @@ export namespace PropertyItemSlickConverter {
             }
         }
 
+        if (item.pin != null && item.pin as any !== false) {
+            result.frozen = item.pin === "end" ? "end" : "start";
+        }
+
         if (!item.formatterType)
             return result;
 

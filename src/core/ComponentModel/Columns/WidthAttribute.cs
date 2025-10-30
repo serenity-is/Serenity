@@ -1,37 +1,16 @@
-﻿namespace Serenity.ComponentModel;
-
 /// <summary>
-/// Sets column width
+/// Sets a fixed column width that cannot be resized (min = max = width).
 /// </summary>
-/// <seealso cref="Attribute" />
-/// <remarks>
-/// Initializes a new instance of the <see cref="WidthAttribute"/> class.
-/// </remarks>
-/// <param name="value">The value.</param>
-public class WidthAttribute(int value) : Attribute
+public class FixedWidthAttribute : WidthAttribute
 {
-
     /// <summary>
-    /// Gets the column width.
+    /// Creates a new fixed width attribute
     /// </summary>
-    /// <value>
-    /// The column width.
-    /// </value>
-    public int Value { get; private set; } = value;
-
-    /// <summary>
-    /// Gets or sets the minimum width.
-    /// </summary>
-    /// <value>
-    /// The minimum width.
-    /// </value>
-    public int Min { get; set; }
-
-    /// <summary>
-    /// Gets or sets the maximum width.
-    /// </summary>
-    /// <value>
-    /// The maximum width.
-    /// </value>
-    public int Max { get; set; }
+    /// <param name="width"></param>
+    public FixedWidthAttribute(int width) 
+        : base(width)
+    {
+        Min = width;
+        Max = width;
+    }
 }

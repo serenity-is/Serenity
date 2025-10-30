@@ -1903,6 +1903,7 @@ export interface PropertyItem {
 	formatterParams?: any;
 	displayFormat?: string;
 	alignment?: string;
+	pin?: "start" | "end" | boolean;
 	width?: number;
 	widthSet?: boolean;
 	minWidth?: number;
@@ -5137,6 +5138,7 @@ export interface PersistedGridColumn {
 	width?: number;
 	sort?: number;
 	visible?: boolean;
+	pin?: "start" | "end" | false;
 }
 export interface PersistedGridSettings {
 	columns?: PersistedGridColumn[];
@@ -5150,6 +5152,7 @@ export interface PersistedGridSettings {
 	includeDeleted?: boolean;
 }
 export interface GridPersistanceFlags {
+	columnPinning?: boolean;
 	columnWidths?: boolean;
 	columnVisibility?: boolean;
 	sortColumns?: boolean;

@@ -52,6 +52,7 @@ export interface PropertyItem {
     formatterParams?: any;
     displayFormat?: string;
     alignment?: string;
+    pin?: "start" | "end" | boolean;
     width?: number;
     widthSet?: boolean;
     minWidth?: number;

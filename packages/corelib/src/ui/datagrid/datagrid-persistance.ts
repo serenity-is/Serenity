@@ -19,7 +19,7 @@ export interface PersistedGridColumn {
     width?: number;
     sort?: number;
     visible?: boolean;
-    pinned?: "start" | "end" | false;
+    pin?: "start" | "end" | false;
 }
 
 export interface PersistedGridSettings {
@@ -81,7 +81,7 @@ export function getCurrentSettings(this: void, opt: {
             };
 
             if (flags.columnPinning !== false && column.frozen) {
-                p.pinned = column.frozen !== "end" ? "start" : "end";
+                p.pin = column.frozen !== "end" ? "start" : "end";
             }
 
             if (flags.columnVisibility !== false) {
@@ -102,7 +102,7 @@ export function getCurrentSettings(this: void, opt: {
 
         if (flags.columnPinning && !settings.columns.some(x => "pinned" in x && settings.columns.length)) {
             // ensure at least one column has pinned info so that while restoring we know pinning flag was used
-            settings.columns[0].pinned = false;
+            settings.columns[0].pin = false;
         }
     }
 
@@ -230,8 +230,8 @@ export function restoreSettingsFrom(this: void, opt: {
                 if (x1.id != null) {
                     const column = colById[x1.id];
                     if (column != null) {
-                        column.frozen = x1.pinned === "start" ||
-                            x1.pinned === "end" ? x1.pinned : null;
+                        column.frozen = x1.pin === "start" ||
+                            x1.pin === "end" ? x1.pin : null;
                     }
                 }
             }

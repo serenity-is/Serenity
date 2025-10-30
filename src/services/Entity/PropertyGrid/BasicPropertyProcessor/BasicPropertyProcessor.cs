@@ -34,6 +34,7 @@ public partial class BasicPropertyProcessor : PropertyProcessor
         SetSkipOnSave(source, item);
         SetInsertable(source, item);
         SetInsertPermission(source, item);
+        SetPin(source, item);
         SetPlaceholder(source, item);
         SetReadOnly(source, item);
         SetReadPermission(source, item);

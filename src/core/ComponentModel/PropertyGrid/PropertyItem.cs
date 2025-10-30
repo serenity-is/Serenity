@@ -405,6 +405,17 @@ public class PropertyItem
     public string? Alignment { get; set; }
 
     /// <summary>
+    /// Gets or sets the pinning side (start/end) of the column.
+    /// </summary>
+    /// <value>
+    /// The pinning side (start or end).
+    /// </value>
+    [Newtonsoft.Json.JsonProperty("pin")]
+    [JsonPropertyName("pin")]
+    public string? Pin { get; set; }
+
+
+    /// <summary>
     /// Gets or sets the width of the column.
     /// Does not apply to forms.
     /// </summary>

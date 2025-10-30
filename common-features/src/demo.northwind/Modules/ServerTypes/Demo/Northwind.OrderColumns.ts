@@ -9,8 +9,8 @@ import { OrderShippingState } from "./Northwind.OrderShippingState";
 
 export interface OrderColumns {
     OrderID: Column<OrderRow>;
-    CustomerCompanyName: Column<OrderRow>;
     PrintInvoice: Column<OrderRow>;
+    CustomerCompanyName: Column<OrderRow>;
     OrderDate: Column<OrderRow>;
     EmployeeFullName: Column<OrderRow>;
     RequiredDate: Column<OrderRow>;
