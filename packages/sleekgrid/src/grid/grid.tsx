@@ -600,23 +600,7 @@ export class Grid<TItem = any> implements IGrid<TItem> {
         let startWidth = refs.start.canvasWidth;
         let endWidth = refs.end.canvasWidth;
         if (mainWidth < 0) {
-            if (startWidth > 0 && endWidth > 0) {
-                let reduceStart = Math.min(startWidth, (startWidth / (startWidth + endWidth)) * -mainWidth);
-                let reduceEnd = Math.min(endWidth, (endWidth / (startWidth + endWidth)) * -mainWidth);
-                startWidth -= reduceStart;
-                endWidth -= reduceEnd;
-                mainWidth += (reduceStart + reduceEnd);
-            }
-            if (mainWidth < 0 && startWidth > 0) {
-                let reduceStart = Math.min(startWidth, -mainWidth);
-                startWidth -= reduceStart;
-                mainWidth += reduceStart;
-            }
-            if (mainWidth < 0 && endWidth > 0) {
-                let reduceEnd = Math.min(endWidth, -mainWidth);
-                endWidth -= reduceEnd;
-                mainWidth += reduceEnd;
-            }
+            mainWidth = 0;
         }
         setStyleProp(style, "--sg-start-width", startWidth + "px");
         setStyleProp(style, "--sg-virtual-width", refs.main.canvasWidth + "px");

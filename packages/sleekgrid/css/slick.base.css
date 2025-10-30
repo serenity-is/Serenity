@@ -1,7 +1,7 @@
 .slick-container {
   display: grid;
-  grid-template-columns: var(--sg-start-width, 0) var(--sg-main-width, 1fr) var(--sg-end-width, 0);
-  grid-template-rows: max-content max-content max-content max-content var(--sg-top-height, max-content) var(--sg-body-height, 1fr) var(--sg-bottom-height, max-content) max-content;
+  grid-template-columns: max-content minmax(0, 1fr) max-content;
+  grid-template-rows: max-content max-content max-content max-content max-content minmax(0, 1fr) max-content max-content;
   grid-template-areas:
     "grouping-panel grouping-panel grouping-panel"
     "header-start header-main header-end"
@@ -127,14 +127,35 @@
   width: var(--sg-virtual-width);
 }
 
+.slick-viewport.sg-start,
+.grid-canvas.sg-start,
+.slick-header.sg-start {
+  width: var(--sg-start-width, fit-content);
+  min-width: var(--sg-start-width, fit-content);
+  max-width: var(--sg-start-width, fit-content);
+}
+
+.slick-viewport.sg-end,
+.grid-canvas.sg-end,
+.slick-header.sg-end {
+  width: var(--sg-end-width, fit-content);
+  min-width: var(--sg-end-width, fit-content);
+  max-width: var(--sg-end-width, fit-content);
+}
+
 .slick-viewport.sg-top,
 .grid-canvas.sg-top {
-  height: var(--sg-top-height, 0);
+  height: var(--sg-top-height, fit-content);
+  min-height: var(--sg-top-height, fit-content);
+  max-height: var(--sg-top-height, fit-content);
+  ;
 }
 
 .slick-viewport.sg-bottom,
 .grid-canvas.sg-bottom {
-  height: var(--sg-bottom-height, 0);
+  height: var(--sg-bottom-height, fit-content);
+  min-height: var(--sg-bottom-height, fit-content);
+  max-height: var(--sg-bottom-height, fit-content);
 }
 
 .slick-viewport.sg-body {
