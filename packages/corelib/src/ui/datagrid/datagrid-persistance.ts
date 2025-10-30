@@ -100,7 +100,7 @@ export function getCurrentSettings(this: void, opt: {
             settings.columns.push(p);
         }
 
-        if (flags.columnPinning && !settings.columns.some(x => "pinned" in x && settings.columns.length)) {
+        if (flags.columnPinning && !settings.columns.some(x => "pin" in x && settings.columns.length)) {
             // ensure at least one column has pinned info so that while restoring we know pinning flag was used
             settings.columns[0].pin = false;
         }
@@ -224,7 +224,7 @@ export function restoreSettingsFrom(this: void, opt: {
         }
 
         if (flags.columnPinning !== false &&
-            settings.columns.some(x => "pinned" in x)) {
+            settings.columns.some(x => "pin" in x)) {
             initColById(columns);
             for (let x1 of settings.columns) {
                 if (x1.id != null) {
