@@ -3,7 +3,7 @@
   "defaultProvider": "cdnjs",
   "libraries": [
     {
-      "library": "bootstrap@5.3.2",
+      "library": "bootstrap@5.3.8",
       "destination": "wwwroot/bootstrap/",
       "files": [
         "js/bootstrap.bundle.js",
