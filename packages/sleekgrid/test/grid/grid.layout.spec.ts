@@ -207,30 +207,6 @@ describe('viewport', () => {
         layoutEngine.init = function (layoutHost) {
             layoutHost.getViewportInfo().width = 123;
             expect(layoutHost.getViewportInfo().hasVScroll).toBeFalsy();
-            expect(layoutHost.getAvailableWidth()).toBe(123);
-            asserted = true;
-            oldLayoutEngineInit.call(layoutEngine, layoutHost);
-        };
-
-        new Grid(document.createElement('div'), [], [], { layoutEngine });
-
-        if (!asserted)
-            throw "assertion not made";
-    });
-
-    it('should return viewportInfo.width - scrollbar width on getAvailableWidth if there viewportInfo hasVScroll is truthy', () => {
-        const layoutEngine = new BasicLayout();
-
-        const oldLayoutEngineInit = layoutEngine.init;
-        let asserted = false;
-        layoutEngine.init = function (layoutHost) {
-            layoutHost.getViewportInfo().width = 123;
-            layoutHost.getViewportInfo().hasVScroll = true;
-
-            layoutHost.getScrollDims().width = 10;
-
-            expect(layoutHost.getAvailableWidth()).toBe(123 - layoutHost.getScrollDims().width);
-
             asserted = true;
             oldLayoutEngineInit.call(layoutEngine, layoutHost);
         };

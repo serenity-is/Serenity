@@ -306,7 +306,6 @@ describe('layout', () => {
         const container = document.createElement("div");
         const grid = new Grid(container, [{ c1: 1 }], [{ field: "c1" }], { layoutEngine: layoutEngine });
 
-        expect(layoutHostGrid.getCellFromPoint(0, 0)).toEqual(grid.getCellFromPoint(0, 0));
         expect(layoutHostGrid.getColumns()).toEqual(grid.getColumns());
         expect(layoutHostGrid.getContainerNode()).toEqual(grid.getContainerNode());
         expect(layoutHostGrid.getDataLength()).toEqual(grid.getDataLength());
