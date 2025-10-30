@@ -24,7 +24,7 @@ export class CheckboxFormatter implements Formatter {
             (ctx.value ? localText(this.props.trueText, this.props.trueText ?? DialogTexts.YesButton) :
                 localText(this.props.falseText, this.props.falseText ?? DialogTexts.NoButton));
 
-        const showText = this.props?.showText ?? ctx.purpose === "headerfilter";
+        const showText = this.props?.showText ?? ctx.purpose === "header-filter";
 
         const hint = (this.props?.showHint ?? (!showText && (this.props?.trueText || this.props?.falseText || this.props?.nullText))) ? text : void 0;
         let iconClass = ctx.value == null ? this.props.nullIcon : (ctx.value ? this.props.trueIcon : this.props.falseIcon);
@@ -32,7 +32,7 @@ export class CheckboxFormatter implements Formatter {
             iconClass = iconClassName(iconClass);
 
         const icon = iconClass == "" ? "" : iconClass ? <i class={[iconClass, "slick-edit-preclick"]} title={hint} /> :
-            (ctx.value == null || ctx.purpose === "headerfilter" ? null :
+            (ctx.value == null || ctx.purpose === "header-filter" ? null :
                 <span class={["check-box no-float readonly slick-edit-preclick", ctx.value && 'checked']} title={hint} />);
 
         if (!showText)

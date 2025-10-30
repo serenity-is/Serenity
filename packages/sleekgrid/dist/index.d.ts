@@ -295,9 +295,9 @@ export interface FormatterContext<TItem = any> {
 	 */
 	item?: TItem;
 	/**
-	 * Purpose of the call, e.g. "autowidth", "excelexport", "groupheader", "headerfilter", "pdfexport", "print".
+	 * Purpose of the call, e.g. "auto-width", "excel-export", "group-header", "header-filter", "pdf-export", "print".
 	 */
-	purpose?: "autowidth" | "excelexport" | "groupheader" | "grand-totals" | "group-totals" | "headerfilter" | "pdfexport" | "print";
+	purpose?: "auto-width" | "excel-export" | "group-header" | "grand-totals" | "group-totals" | "header-filter" | "pdf-export" | "print";
 	/**
 	 * Sanitizer function to clean up dirty HTML.
 	 */

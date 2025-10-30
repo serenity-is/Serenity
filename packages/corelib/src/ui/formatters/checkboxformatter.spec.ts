@@ -37,9 +37,9 @@ describe("CheckboxFormatter", () => {
 
     it("shows text value if called with a purpose of headerfilter", () => {
         const formatter = new CheckboxFormatter();
-        expect(formatter.format(ctx({ value: true, purpose: "headerfilter" }))).toBe("Yes");
-        expect(formatter.format(ctx({ value: false, purpose: "headerfilter" }))).toBe("No");
-        expect(formatter.format(ctx({ value: null, purpose: "headerfilter" }))).toBe("");
+        expect(formatter.format(ctx({ value: true, purpose: "header-filter" }))).toBe("Yes");
+        expect(formatter.format(ctx({ value: false, purpose: "header-filter" }))).toBe("No");
+        expect(formatter.format(ctx({ value: null, purpose: "header-filter" }))).toBe("");
     });
 
     it("shows text alongside icon when showText is true for true value", () => {

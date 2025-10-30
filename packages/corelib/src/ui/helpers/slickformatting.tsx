@@ -20,7 +20,7 @@ export namespace SlickFormatting {
             fmtResult = fmtResult instanceof Node ? fmtResult : encode ? ctx.escape(fmtResult) : (fmtResult ?? '');
 
             if ((ctx.item as any)?.__nonDataRow ||
-                ctx.purpose === "groupheader" ||
+                ctx.purpose === "group-header" ||
                 ctx.purpose === "group-totals" ||
                 ctx.purpose === "grand-totals") {
                 return fmtResult;

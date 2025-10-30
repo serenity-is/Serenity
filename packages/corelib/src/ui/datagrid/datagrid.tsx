@@ -690,7 +690,7 @@ export class DataGrid<TItem, P = {}> extends Widget<P> implements IDataGrid, IRe
         }
 
         if ((props?.context?.item as any)?.__nonDataRow ||
-            props.context?.purpose === "groupheader" ||
+            props.context?.purpose === "group-header" ||
             props.context?.purpose === "group-totals" ||
             props.context?.purpose === "grand-totals") {
             return <>{children}</>;
