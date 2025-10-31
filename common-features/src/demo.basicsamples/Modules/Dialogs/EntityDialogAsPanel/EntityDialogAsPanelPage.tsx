@@ -13,7 +13,7 @@ export default (model: number | OrderRow) => {
     // here we use done event in second parameter, to be sure operation succeeded before showing the panel
     myDialogAsPanel.load(model || {}, function () {
         // if we didn't reach here, probably there is no order with specified ID in url
-        myDialogAsPanel.domNode.classList.remove('hidden');
+        myDialogAsPanel.domNode.hidden = false;
         document.querySelector('#PanelDiv').append(myDialogAsPanel.domNode);
         myDialogAsPanel.arrange();
     });

@@ -11,7 +11,7 @@ import { DialogExtensions } from "./dialogextensions";
 export class BaseDialog<P> extends Widget<P> {
     static [Symbol.typeInfo] = this.registerClass(nsSerenity, [IDialog]);
 
-    static override createDefaultElement() { return document.body.appendChild(<div class="hidden" />) as HTMLDivElement; }
+    static override createDefaultElement() { return document.body.appendChild(<div hidden />) as HTMLDivElement; }
 
     declare protected tabs: Fluent<HTMLElement>;
     declare protected toolbar: Toolbar;
@@ -95,7 +95,7 @@ export class BaseDialog<P> extends Widget<P> {
     }
 
     protected initDialog(): void {
-        this.domNode.classList.remove("hidden");
+        this.domNode.hidden = false;
 
         if (this.dialog?.type == "uidialog") {
             this.initUIDialog();

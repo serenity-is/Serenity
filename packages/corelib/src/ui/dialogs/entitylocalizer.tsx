@@ -110,7 +110,7 @@ export class EntityLocalizer {
 
         const targetLanguageUpdate = () => {
             const val = this.targetLanguage?.value;
-            this.grid.element.findAll('.translation').forEach(x => x.closest(".field")?.classList.toggle('hidden', !!val && !x.classList.contains('language-' + val)));
+            this.grid.element.findAll('.translation').forEach(x => Fluent.toggle(x.closest(".field"), !val || x.classList.contains('language-' + val)));
         }
         targetLanguageUpdate();
 
@@ -276,12 +276,14 @@ export class EntityLocalizer {
         const buttons = this.options.getToolButtons().filter(x => x !== button);
         if (locMode) {
             buttons?.filter(x => !x.classList.contains("localization-hidden")).forEach(el => {
-                el.classList.add('localization-hidden', 'hidden');
+                el.classList.add('localization-hidden');
+                el.hidden = true;
             });
         }
         else {
             buttons?.filter(x => x.classList.contains("localization-hidden")).forEach(el => {
-                el.classList.remove('localization-hidden', 'hidden');
+                el.classList.remove('localization-hidden');
+                el.hidden = false;
             });
         }
     }

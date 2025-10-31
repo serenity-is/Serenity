@@ -12,7 +12,7 @@ requires_scripts:
 
 <div id="myGrid"></div>
 
-<div id="contextMenu" class="dropdown-menu sg-hidden">
+<div id="contextMenu" hidden class="dropdown-menu">
     <b class="p-2">Set priority:</b>
     <a class="dropdown-item ps-4" href="#" data-priority="Low">Low</a>
     <a class="dropdown-item ps-4" href="#" data-priority="Medium">Medium</a>
@@ -44,7 +44,7 @@ requires_scripts:
     const contextMenu = document.getElementById('contextMenu');
 
     function hideContextMenu() {
-        contextMenu.classList.add('sg-hidden');
+        contextMenu.hidden = true;
         document.body.removeEventListener('click', hideContextMenu);
     }
 
@@ -54,7 +54,7 @@ requires_scripts:
         contextMenu.dataset.row = cell.row;
         contextMenu.style.top = e.pageY + 'px';
         contextMenu.style.left = e.pageX + 'px';
-        contextMenu.classList.remove('sg-hidden');
+        contextMenu.hidden = false;
         document.body.addEventListener('click', hideContextMenu);
     });
 

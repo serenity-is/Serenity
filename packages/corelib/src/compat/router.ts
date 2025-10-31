@@ -84,7 +84,7 @@ export namespace Router {
 
     function isVisibleOrHiddenBy(el: HTMLElement): boolean {
         return (el.offsetWidth > 0 && el.offsetHeight > 0) ||  // if visible
-            !!(!el.closest(".hidden") && el.closest("[data-hiddenby]")) // or temporarily hidden by another panel
+            !!(!el.closest(".hidden, [hidden]") && el.closest("[data-hiddenby]")) // or temporarily hidden by another panel
     }
 
     function getVisibleOrHiddenByDialogs(): HTMLElement[] {

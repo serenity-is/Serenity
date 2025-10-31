@@ -249,15 +249,15 @@ describe("Dialog constructor", () => {
         dlg.dispose();
     });
 
-    it("removes hidden class from the element", () => {
+    it("removes hidden attribute from the element", () => {
         const body = document.createElement("div");
-        body.classList.add("hidden");
+        body.hidden = true;
 
         const dlg = new Dialog({
             element: [body]
         })
         expect(dlg.getContentNode()).toBe(body);
-        expect(body.classList.contains("hidden")).toBe(false);
+        expect(body.hidden).toBe(false);
         dlg.dispose();
     });
 
@@ -985,15 +985,16 @@ describe("Dialog.close", () => {
         div.className = "test";
         Dialog.getInstance(div)?.close();
         expect(div.classList.contains("test")).toBe(true);
-        expect(div.classList.contains("hidden")).toBe(false);
+        expect(div.hidden).toBe(false);
     });
 
-    it("ignores when element already has hidden class", async function () {
+    it("ignores when element already has hidden attribute", async function () {
         let div = document.createElement("div");
-        div.className = "s-Panel hidden test";
+        div.className = "s-Panel test";
+        div.hidden = true;
         Dialog.getInstance(div)?.close();
         expect(div.classList.contains("test")).toBe(true);
-        expect(div.classList.contains("hidden")).toBe(true);
+        expect(div.hidden).toBe(true);
     });
 
     it("can close panel via jQuery", async function () {
@@ -1010,7 +1011,7 @@ describe("Dialog.close", () => {
         window.addEventListener('panelclose', panelClose);
         try {
             Dialog.getInstance(jQuery(body)).close();
-            expect(panel.classList.contains("hidden")).toBe(true);
+            expect(panel.hidden).toBe(true);
             expect(closingPanel).toBe(body);
             expect(closedPanel).toBe(body);
         }
@@ -1034,7 +1035,7 @@ describe("Dialog.close", () => {
         window.addEventListener('panelclose', panelClose);
         try {
             Dialog.getInstance(body).close();
-            expect(panel.classList.contains("hidden")).toBe(true);
+            expect(panel.hidden).toBe(true);
             expect(closingPanel).toBe(body);
             expect(closedPanel).toBe(body);
         }
@@ -1056,7 +1057,7 @@ describe("Dialog.close", () => {
             });
             Dialog.getInstance(body).close();
             expect(panel.dataset.hiddenby).toBeFalsy();
-            expect(panel.classList.contains("hidden")).toBe(false);
+            expect(panel.hidden).toBe(false);
         }
         finally {
             panel.remove();
@@ -1074,7 +1075,7 @@ describe("Dialog.close", () => {
     //        let dialogs = (await import("./dialogs"));
     //        dialogs.Dialog.getInstance(jQuery(div)).close();
     //        expect(div.dataset.hiddenby).toBeFalsy();
-    //        expect(div.classList.contains("hidden")).toBe(false);
+    //        expect(div.hidden).toBe(false);
     //    }
     //    finally {
     //        div.remove();
@@ -1101,7 +1102,7 @@ describe("Dialog.close", () => {
     //        dialogs.Dialog.getInstance(div3).close();
     //        expect(div1.attr("data-hiddenby")).toBeFalsy();
     //        expect(div2.attr("data-hiddenby")).toBeTruthy();
-    //        expect(div3.hasClass("hidden")).toBe(true);
+    //        expect(div3.hidden).toBe(true);
     //        expect(div3.attr("data-hiddenby")).toBeFalsy();
     //    }
     //    finally {
@@ -1133,7 +1134,7 @@ describe("Dialog.close", () => {
     //        dialogs.Dialog.getInstance(div3).close();
     //        expect(div1.dataset.hiddenby).toBeFalsy();
     //        expect(div2.dataset.hiddenby).toBeTruthy();
-    //        expect(div3.classList.contains("hidden")).toBe(true);
+    //        expect(div3.hidden).toBe(true);
     //        expect(div3.dataset.hiddenby).toBeFalsy();
     //    }
     //    finally {
@@ -1218,7 +1219,7 @@ describe("Dialog panels", () => {
             expect(openedPanel).toStrictEqual(body2);
             expect(panel1.dataset.hiddenby).toBeTruthy();
             expect(panel2.dataset.paneluniquename).toBe(panel1.dataset.hiddenby);
-            expect(panel2.classList.contains("hidden")).toBe(false);
+            expect(panel2.hidden).toBe(false);
             expect(panel2.dataset.hiddenby).toBeFalsy();
         }
         finally {
@@ -1250,7 +1251,7 @@ describe("Dialog panels", () => {
             expect(openedPanel).toBe(body2);
             expect(panel1.dataset.hiddenby).toBeTruthy();
             expect(panel2.dataset.paneluniquename).toBe(panel1.dataset.hiddenby);
-            expect(panel2.classList.contains("hidden")).toBe(false);
+            expect(panel2.hidden).toBe(false);
             expect(panel2.dataset.hiddenby).toBeFalsy();
         }
         finally {
@@ -1485,7 +1486,7 @@ describe("Dialog.onOpen", () => {
             dlg.open();
             expect(beforeOpen).toHaveBeenCalledTimes(1);
             expect(afterOpen).not.toHaveBeenCalled();
-            expect(dlg.getDialogNode().classList.contains("hidden")).toBe(true);
+            expect(dlg.getDialogNode().hidden).toBe(true);
         }
         finally {
             dlg.dispose();
@@ -1500,11 +1501,11 @@ describe("Dialog.onOpen", () => {
             dlg.open();
             expect(afterOpen).toHaveBeenCalledTimes(1);
             dlg.close();
-            expect(dlg.getDialogNode().classList.contains("hidden")).toBe(true);
+            expect(dlg.getDialogNode().hidden).toBe(true);
             expect(afterOpen).toHaveBeenCalledTimes(1);
             dlg.open();
             expect(afterOpen).toHaveBeenCalledTimes(1);
-            expect(dlg.getDialogNode().classList.contains("hidden")).toBe(false);
+            expect(dlg.getDialogNode().hidden).toBe(false);
         }
         finally {
             dlg.dispose();
@@ -1519,11 +1520,11 @@ describe("Dialog.onOpen", () => {
             dlg.open();
             expect(afterOpen).toHaveBeenCalledTimes(1);
             dlg.close();
-            expect(dlg.getDialogNode().classList.contains("hidden")).toBe(true);
+            expect(dlg.getDialogNode().hidden).toBe(true);
             expect(afterOpen).toHaveBeenCalledTimes(1);
             dlg.open();
             expect(afterOpen).toHaveBeenCalledTimes(2);
-            expect(dlg.getDialogNode().classList.contains("hidden")).toBe(false);
+            expect(dlg.getDialogNode().hidden).toBe(false);
         }
         finally {
             dlg.dispose();
@@ -1538,11 +1539,11 @@ describe("Dialog.onOpen", () => {
             dlg.open();
             expect(beforeOpen).toHaveBeenCalledTimes(1);
             dlg.close();
-            expect(dlg.getDialogNode().classList.contains("hidden")).toBe(true);
+            expect(dlg.getDialogNode().hidden).toBe(true);
             expect(beforeOpen).toHaveBeenCalledTimes(1);
             dlg.open();
             expect(beforeOpen).toHaveBeenCalledTimes(2);
-            expect(dlg.getDialogNode().classList.contains("hidden")).toBe(false);
+            expect(dlg.getDialogNode().hidden).toBe(false);
         }
         finally {
             dlg.dispose();
@@ -1557,11 +1558,11 @@ describe("Dialog.onOpen", () => {
             dlg.open();
             expect(beforeOpen).toHaveBeenCalledTimes(1);
             dlg.close();
-            expect(dlg.getDialogNode().classList.contains("hidden")).toBe(true);
+            expect(dlg.getDialogNode().hidden).toBe(true);
             expect(beforeOpen).toHaveBeenCalledTimes(1);
             dlg.open();
             expect(beforeOpen).toHaveBeenCalledTimes(1);
-            expect(dlg.getDialogNode().classList.contains("hidden")).toBe(false);
+            expect(dlg.getDialogNode().hidden).toBe(false);
         }
         finally {
             dlg.dispose();
@@ -1626,7 +1627,7 @@ describe("Dialog.onClose", () => {
             dlg.close();
             expect(beforeClose).toHaveBeenCalledTimes(1);
             expect(afterClose).not.toHaveBeenCalled();
-            expect(dlg.getDialogNode().classList.contains("hidden")).toBe(false);
+            expect(dlg.getDialogNode().hidden).toBe(false);
         }
         finally {
             dlg.dispose();
@@ -1641,12 +1642,12 @@ describe("Dialog.onClose", () => {
             dlg.open();
             dlg.close();
             expect(afterClose).toHaveBeenCalledTimes(1);
-            expect(dlg.getDialogNode().classList.contains("hidden")).toBe(true);
+            expect(dlg.getDialogNode().hidden).toBe(true);
             expect(afterClose).toHaveBeenCalledTimes(1);
             dlg.open();
             dlg.close();
             expect(afterClose).toHaveBeenCalledTimes(1);
-            expect(dlg.getDialogNode().classList.contains("hidden")).toBe(true);
+            expect(dlg.getDialogNode().hidden).toBe(true);
         }
         finally {
             dlg.dispose();
@@ -1661,11 +1662,11 @@ describe("Dialog.onClose", () => {
             dlg.open();
             expect(afterClose).toHaveBeenCalledTimes(1);
             dlg.close();
-            expect(dlg.getDialogNode().classList.contains("hidden")).toBe(true);
+            expect(dlg.getDialogNode().hidden).toBe(true);
             expect(afterClose).toHaveBeenCalledTimes(1);
             dlg.open();
             expect(afterClose).toHaveBeenCalledTimes(2);
-            expect(dlg.getDialogNode().classList.contains("hidden")).toBe(false);
+            expect(dlg.getDialogNode().hidden).toBe(false);
         }
         finally {
             dlg.dispose();
@@ -1680,11 +1681,11 @@ describe("Dialog.onClose", () => {
             dlg.open();
             expect(beforeClose).toHaveBeenCalledTimes(1);
             dlg.close();
-            expect(dlg.getDialogNode().classList.contains("hidden")).toBe(true);
+            expect(dlg.getDialogNode().hidden).toBe(true);
             expect(beforeClose).toHaveBeenCalledTimes(1);
             dlg.open();
             expect(beforeClose).toHaveBeenCalledTimes(2);
-            expect(dlg.getDialogNode().classList.contains("hidden")).toBe(false);
+            expect(dlg.getDialogNode().hidden).toBe(false);
         }
         finally {
             dlg.dispose();
@@ -1699,11 +1700,11 @@ describe("Dialog.onClose", () => {
             dlg.open();
             dlg.close();
             expect(beforeClose).toHaveBeenCalledTimes(1);
-            expect(dlg.getDialogNode().classList.contains("hidden")).toBe(true);
+            expect(dlg.getDialogNode().hidden).toBe(true);
             dlg.open();
             dlg.close();
             expect(beforeClose).toHaveBeenCalledTimes(1);
-            expect(dlg.getDialogNode().classList.contains("hidden")).toBe(true);
+            expect(dlg.getDialogNode().hidden).toBe(true);
         }
         finally {
             dlg.dispose();

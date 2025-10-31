@@ -204,7 +204,7 @@ describe("positionToastContainer", () => {
         }
     });
 
-    it("ignores modals with display: none or hidden class", async () => {
+    it("ignores modals with display: none or hidden class or attribute", async () => {
         const toastr = (await import("./toastr2")).default;
         const modal = document.body.appendChild(document.createElement("div"));
         try {
@@ -219,6 +219,10 @@ describe("positionToastContainer", () => {
             expect(modal.getBoundingClientRect).not.toHaveBeenCalled();
             modal.setAttribute("style", "");
             modal.classList.add("hidden");
+            positionToastContainer();
+            expect(modal.getBoundingClientRect).not.toHaveBeenCalled();
+            modal.classList.remove("hidden");
+            modal.hidden = true;
             positionToastContainer();
             expect(modal.getBoundingClientRect).not.toHaveBeenCalled();
         }

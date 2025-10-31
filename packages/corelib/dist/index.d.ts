@@ -1136,7 +1136,20 @@ export interface Fluent<TElement extends HTMLElement = HTMLElement> extends Arra
 	 */
 	hasClass(klass: string): boolean;
 	/**
-	 * Hides the element by setting its display property to "none".
+	 * Gets the value of the hidden attribute/property.
+	 *
+	 * @returns The value of the hidden attribute/property
+	 */
+	hidden(name: string): boolean;
+	/**
+	 * Sets the value of the hidden property/attribute.
+	 *
+	 * @param value The value of the attribute. If the value is falsy the attribute is removed.
+	 * @returns The Fluent object itself if a value is provided.
+	 */
+	hidden(value: boolean): this;
+	/**
+	 * Hides the element by setting its hidden property to true.
 	 *
 	 * @returns The Fluent object itself.
 	 */

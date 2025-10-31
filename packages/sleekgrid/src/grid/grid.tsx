@@ -296,7 +296,7 @@ export class Grid<TItem = any> implements IGrid<TItem> {
         if (this._groupingPanel)
             return;
 
-        this._groupingPanel = <div class={["slick-grouping-panel", !this._options.showGroupingPanel && "sg-hidden"]}>
+        this._groupingPanel = <div hidden={!this._options.showGroupingPanel} class="slick-grouping-panel">
             {this._options.createPreHeaderPanel && <div class="slick-preheader-panel" />}
         </div> as HTMLElement;
 
@@ -1559,7 +1559,7 @@ export class Grid<TItem = any> implements IGrid<TItem> {
     setGroupingPanelVisibility(visible: boolean): void {
         if (this._options.showGroupingPanel != visible) {
             this._options.showGroupingPanel = visible;
-            this._groupingPanel?.classList.toggle("sg-hidden", !visible);
+            this._groupingPanel && (this._groupingPanel.hidden = !visible);
             this.resizeCanvas();
         }
     }

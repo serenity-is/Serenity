@@ -175,7 +175,23 @@ export interface Fluent<TElement extends HTMLElement = HTMLElement> extends Arra
     hasClass(klass: string): boolean;
 
     /**
-     * Hides the element by setting its display property to "none".
+     * Gets the value of the hidden attribute/property. 
+     *
+     * @returns The value of the hidden attribute/property
+     */
+    hidden(name: string): boolean;
+
+    
+    /**
+     * Sets the value of the hidden property/attribute.
+     *
+     * @param value The value of the attribute. If the value is falsy the attribute is removed.
+     * @returns The Fluent object itself if a value is provided.
+     */
+    hidden(value: boolean): this;
+
+    /**
+     * Hides the element by setting its hidden property to true.
      *
      * @returns The Fluent object itself.
      */
@@ -330,7 +346,7 @@ export interface Fluent<TElement extends HTMLElement = HTMLElement> extends Arra
     removeClass(value: string | boolean | (string | boolean)[]): this;
 
     /**
-     * Shows the element by setting its display property to empty string.
+     * Shows the element by setting its hidden property to false.
      *
      * @returns The Fluent object itself.
      */
@@ -542,7 +558,12 @@ export namespace Fluent {
      * @returns The Fluent object itself.
      */
     export function toggle(element: Element, flag?: boolean): void {
-        element && (element as any).style && ((element as any).style.display = flag ? "" : (flag != null && !flag) ? "none" : (element as any).style.display == "none" ? "" : "none");
+        if (element) {
+            if ("hidden" in element)
+                element.hidden = flag != null ? !flag : !element.hidden;
+            else
+                toggleClass(element, "hidden", flag);
+        }
     }
 
     /**
@@ -843,7 +864,16 @@ Fluent.prototype.findEach = function (this: FluentThis, selector: string, callba
 }
 
 Fluent.prototype.hide = function (this: FluentThis) {
-    this.el && (this.el.style.display = "none");
+    return this.toggle(false);
+}
+
+Fluent.prototype.hidden = function (this: FluentThis<any>, value?: boolean) {
+    if (value === void 0 && arguments.length < 1)
+        return this.el?.hidden;
+
+    if (this.el)
+        this.el.hidden = !!value;
+
     return this;
 }
 
@@ -880,8 +910,7 @@ Fluent.prototype.remove = function (this: FluentThis<any>) {
 }
 
 Fluent.prototype.show = function (this: FluentThis) {
-    this.el && (this.el.style.display = "");
-    return this;
+    return this.toggle(true);
 }
 
 Fluent.prototype.style = function (this: FluentThis, callback: (css: CSSStyleDeclaration) => void) {

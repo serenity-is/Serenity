@@ -18,7 +18,7 @@ export function applyCssSizes(opt: any, dialogClass: string) {
     let size: number;
     let dialog = document.createElement("div");
     try {
-        dialog.style.display = "none";
+        dialog.hidden = true;
         addClass(dialog, dialogClass);
         document.body.append(dialog);
 

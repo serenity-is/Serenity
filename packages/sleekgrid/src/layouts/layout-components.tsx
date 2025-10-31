@@ -29,7 +29,7 @@ export const Header = ({ band, refs, signals }: {
     signals: Pick<GridSignals, "hideColumnHeader" | "pinnedStartLast" | "pinnedEndFirst">
 }) => {
     const bandRefs = refs[band];
-    return <div class={{ "sg-hidden": bandHidden(band, signals.hideColumnHeader, signals), [`sg-${band} slick-header`]: true }}>
+    return <div hidden={bandHidden(band, signals.hideColumnHeader, signals)} class={`sg-${band} slick-header`}>
         <div class={`sg-${band} slick-header-columns`} ref={el => { bandRefs.headerCols = el }} />
     </div>;
 }
@@ -40,7 +40,7 @@ export const HeaderRow = ({ band, refs, signals }: {
     signals: Pick<GridSignals, "hideHeaderRow" | "pinnedStartLast" | "pinnedEndFirst">
 }) => {
     const bandRefs = refs[band];
-    return <div class={{ "sg-hidden": bandHidden(band, signals.hideHeaderRow, signals), [`sg-${band} slick-headerrow`]: true }}>
+    return <div hidden={bandHidden(band, signals.hideHeaderRow, signals)} class={`sg-${band} slick-headerrow`}>
         <div class={`sg-${band} slick-headerrow-columns`} ref={el => bandRefs.headerRowCols = el} />
     </div>
 }
@@ -50,7 +50,7 @@ export const TopPanel = ({ refs, signals }: {
     signals: Pick<GridSignals, "hideTopPanel">
 }) => {
     const bandRefs = refs["main"];
-    return <div class={{ "sg-hidden": signals.hideTopPanel, [`slick-top-panel-container`]: true, }}>
+    return <div hidden={signals.hideTopPanel} class={`slick-top-panel-container`}>
         <div class="slick-top-panel" ref={el => refs.topPanel = el} />
     </div>;
 }
@@ -62,7 +62,7 @@ export const Viewport = ({ band, pane, refs, signals }: {
     signals: Pick<GridSignals, "frozenTopLast" | "frozenBottomFirst" | "pinnedStartLast" | "pinnedEndFirst">
 }) => {
     const bandRefs = refs[band];
-    return <div class={{ "sg-hidden": paneBandHidden(pane, band, signals), [`sg-${pane} sg-${band} slick-viewport`]: true }} tabindex="0">
+    return <div hidden={paneBandHidden(pane, band, signals)} class={`sg-${pane} sg-${band} slick-viewport`} tabindex="0">
         <div class={`sg-${pane} sg-${band} grid-canvas`} tabindex="0" ref={el => bandRefs.canvas[pane] = el} />
     </div>;
 }
@@ -72,7 +72,7 @@ export const FooterRow = ({ band, refs, signals }: {
     signals: Pick<GridSignals, "hideFooterRow" | "pinnedStartLast" | "pinnedEndFirst">
 }) => {
     const bandRefs = refs[band];
-    return <div class={{ "sg-hidden": bandHidden(band, signals.hideFooterRow, signals), [`sg-${band} slick-footerrow`]: true }}>
+    return <div hidden={bandHidden(band, signals.hideFooterRow, signals)} class={`sg-${band} slick-footerrow`}>
         <div class={`sg-${band} slick-footerrow-columns`} ref={el => bandRefs.footerRowCols = el} />
     </div>;
 }

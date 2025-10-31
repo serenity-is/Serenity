@@ -1650,7 +1650,7 @@ abstract class AbstractSelect2 {
             mask = document.createElement("div");
             mask.setAttribute("id", "select2-drop-mask");
             mask.setAttribute("class", "select2-drop-mask");
-            mask.style.display = "none";
+            mask.hidden = true;
             document.body.appendChild(mask);
             ["mousedown", "touchstart", "click"].forEach(ev => mask.addEventListener(ev, function (e) {
                 // Prevent IE from generating a click event on the body
@@ -3568,7 +3568,7 @@ class MultiSelect2 extends AbstractSelect2 {
         // collapse search field into 0 width so its container can be collapsed as well
         this.search.style.width = "0px";
         // hide the container
-        this.searchContainer.style.display = "none";
+        this.searchContainer.hidden = true;
     }
 
     protected onSortEnd() {
@@ -3576,7 +3576,7 @@ class MultiSelect2 extends AbstractSelect2 {
         var val: string[] = [], self = this;
 
         // show search and move it to the end of the list
-        this.searchContainer.style.display = "";
+        this.searchContainer.hidden = false;
         // make sure the search container is the last item in the list
         Fluent(this.searchContainer.parentElement).append(this.searchContainer);
         // since we collapsed the width in dragStarted, we resize it here

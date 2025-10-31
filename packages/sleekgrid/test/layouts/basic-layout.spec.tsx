@@ -106,9 +106,9 @@ describe("BasicLayout", () => {
 });
 
 function isHidden(element: HTMLElement | null): boolean {
-    return !element || element.classList.contains("sg-hidden") || element.style.display === "none";
+    return !element || element.hidden || element.style.display === "none";
 }
 
 function isVisible(element: HTMLElement | null): boolean {
-    return element != null && !element.classList.contains("sg-hidden") && element.style.display !== "none";
+    return element != null && !element.hidden && element.style.display !== "none";
 }

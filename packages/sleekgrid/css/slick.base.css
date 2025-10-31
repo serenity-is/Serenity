@@ -275,7 +275,7 @@
   outline: 0 !important;
 }
 
-.sg-hidden {
+[hidden][hidden] {
   display: none !important;
 }
 

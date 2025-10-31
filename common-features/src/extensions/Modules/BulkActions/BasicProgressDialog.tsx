@@ -68,7 +68,7 @@ export class BasicProgressDialog<P = {}> extends BaseDialog<P> {
     protected override initDialog() {
         super.initDialog();
         var close = this.domNode.closest('.ui-dialog')?.querySelector('.ui-dialog-titlebar-close') as HTMLElement;
-        close && (close.style.display = 'none');
+        close && (close.hidden = true);
     }
 
     protected override renderContents(): any {

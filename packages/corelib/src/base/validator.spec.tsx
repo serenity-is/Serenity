@@ -632,13 +632,13 @@ describe("Validator instance methods", () => {
         const form = document.createElement("form");
         const errorEl = document.createElement("label");
         errorEl.className = "error";
-        errorEl.style.display = "block";
+        errorEl.hidden = false;
         form.appendChild(errorEl);
         const validator = new Validator(form, {});
 
         (validator as any).toHide = [errorEl];
         validator.hideErrors();
-        expect(errorEl.style.display).toBe("none");
+        expect(errorEl.hidden).toBe(true);
     });
 
     it("valid returns true when no errors", () => {

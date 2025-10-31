@@ -649,12 +649,12 @@ describe('Fluent instance methods', () => {
             expect(result).toBe(fluent);
         });
 
-        it('should set the display property to the default value', () => {
-            element.style.display = 'none';
+        it('should set the hidden property to false', () => {
+            element.hidden = true;
 
             const result = fluent.show();
 
-            expect(element.style.display).toBe('');
+            expect(element.hidden).toBe(false);
             expect(result).toBe(fluent);
         });
     });
@@ -753,45 +753,45 @@ describe('Fluent instance methods', () => {
         it('should hide the element if it is visible', () => {
             fluent.toggle();
 
-            expect(element.style.display).toBe('none');
+            expect(element.hidden).toBe(true);
         });
 
         it('should show the element if it is hidden', () => {
-            element.style.display = 'none';
+            element.hidden = true;
 
             fluent.toggle();
 
-            expect(element.style.display).toBe('');
+            expect(element.hidden).toBe(false);
         });
 
         it('should hide the element if the flag is false', () => {
             fluent.toggle(false);
 
-            expect(element.style.display).toBe('none');
+            expect(element.hidden).toBe(true);
         });
 
         it('should show the element if the flag is true', () => {
-            element.style.display = 'none';
+            element.hidden = true;
 
             fluent.toggle(true);
 
-            expect(element.style.display).toBe('');
+            expect(element.hidden).toBe(false);
         });
 
         it('should hide the element if the flag is not provided and it is visible', () => {
-            element.style.display = 'block';
+            element.hidden = false;
 
             fluent.toggle();
 
-            expect(element.style.display).toBe('none');
+            expect(element.hidden).toBe(true);
         });
 
         it('should show the element if the flag is not provided and it is hidden', () => {
-            element.style.display = 'none';
+            element.hidden = true;
 
             fluent.toggle();
 
-            expect(element.style.display).toBe('');
+            expect(element.hidden).toBe(false);
         });
     });
 

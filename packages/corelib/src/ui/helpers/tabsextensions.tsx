@@ -69,7 +69,7 @@ export namespace TabsExtensions {
                     if (newIndex >= 0)
                         anchors[newIndex].click();
                 }
-                anchors[index].style.display = visible ? "" : "none";
+                anchors[index].hidden = !visible;
             }
             return;
         }

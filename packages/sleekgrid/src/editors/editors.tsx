@@ -416,11 +416,11 @@ export class LongTextCellEdit extends BaseCellEdit {
     }
 
     hide() {
-        this._wrapper.classList.add("sg-hidden");
+        this._wrapper.hidden = true;
     }
 
     show() {
-        this._wrapper.classList.remove("sg-hidden");
+        this._wrapper.hidden = false;
     }
 
     position(position: Position) {

@@ -465,12 +465,12 @@ export class FilterPanel<P = {}> extends FilterWidgetBase<P> {
             var divL = row.querySelector<HTMLElement>('div.l');
             if (!divL)
                 return;
-            divL.style.display = ((rows.length === 1) ? 'none' : 'block');
+            divL.hidden = ((rows.length === 1) ? true : false);
             if (index === 0)
-                divL.querySelectorAll<HTMLElement>('a.rightparen, a.andor').forEach(el => el.style.visibility = "hidden");
+                divL.querySelectorAll<HTMLElement>('a.rightparen, a.andor').forEach(el => el.hidden = true);
             else {
-                divL.style.display = "block";
-                divL.querySelectorAll<HTMLElement>('a.lefparen, a.andor').forEach(el => el.style.visibility = 'visible');
+                divL.hidden = false;
+                divL.querySelectorAll<HTMLElement>('a.lefparen, a.andor').forEach(el => el.hidden = false);
             }
 
             var lp = divL.querySelector('a.leftparen');

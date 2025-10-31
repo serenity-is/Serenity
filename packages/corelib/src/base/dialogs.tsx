@@ -108,9 +108,9 @@ export class Dialog {
         if (typeof opt.element === "function")
             opt.element(this.el);
 
-        if (this.el.classList.contains("hidden") &&
+        if (this.el.hidden &&
             typeof opt.element !== "function")
-            this.el.classList.remove("hidden");
+            this.el.hidden = false;
 
         if (opt.preferPanel || (!hasBSModal() && !hasUIDialog()))
             this.createPanel(opt);
@@ -495,7 +495,7 @@ export class Dialog {
 
     private createPanel(opt: DialogOptions) {
 
-        const panel = <div class={["s-Panel", "hidden", opt.dialogClass]}>
+        const panel = <div hidden class={["s-Panel", opt.dialogClass]}>
             <div class="panel-titlebar">
                 <div class="panel-titlebar-text"></div>
                 {opt.closeButton && <button type="button" class="panel-titlebar-close" onClick={this.close.bind(this, null)}></button>}
@@ -787,7 +787,7 @@ export namespace DialogTexts {
 function closePanel(el: (HTMLElement | ArrayLike<HTMLElement>)) {
 
     let panel = getDialogNode(el);
-    if (!panel || panel.classList.contains("hidden"))
+    if (!panel || panel.hidden)
         return;
 
     const eventsNode = getDialogEventsNode(el) ?? panel;
@@ -795,7 +795,7 @@ function closePanel(el: (HTMLElement | ArrayLike<HTMLElement>)) {
     let event = Fluent.trigger(eventsNode, "panelbeforeclose");
     if (Fluent.isDefaultPrevented(event))
         return;
-    panel.classList.add("hidden");
+    panel.hidden = true;
 
     let uniqueName = panel.dataset.paneluniquename;
     if (uniqueName) {
@@ -833,7 +833,7 @@ function openPanel(element: HTMLElement | ArrayLike<HTMLElement>, uniqueName?: s
         if (e === panel ||
             e.tagName === "LINK" ||
             e.tagName === "SCRIPT" ||
-            e.classList.contains("hidden") ||
+            e.hidden ||
             e.dataset.hiddenby ||
             (container && e.parentElement !== container) && !Fluent.isVisibleLike(e))
             return;
@@ -851,7 +851,7 @@ function openPanel(element: HTMLElement | ArrayLike<HTMLElement>, uniqueName?: s
 
     document.querySelectorAll('.ui-dialog, .ui-widget-overlay, .modal.show, .modal.in').forEach(setHideBy);
 
-    panel.classList.remove("hidden");
+    panel.hidden = false;
     delete panel.dataset.hiddenby;
 
     Fluent.trigger(eventNode, "panelopen");

@@ -68,7 +68,8 @@ html {
   color: var(--s-disabled);
 }
 
-.hidden,
+.hidden.hidden,
+[hidden][hidden],
 :root .hidden {
   display: none !important;
 }
