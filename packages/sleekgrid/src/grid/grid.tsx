@@ -3271,7 +3271,7 @@ export class Grid<TItem = any> implements IGrid<TItem> {
             var bcl = this._activeCellNode.getBoundingClientRect();
 
             var rowOffset = Math.floor(this._activeCellNode.closest('.grid-canvas')?.getBoundingClientRect().top ?? 0 + document.body.scrollTop);
-            var isBottom = this._activeCellNode.closest('.grid-canvas-bottom') != null;
+            var isBottom = this._activeCellNode.closest('.grid-canvas.sg-bottom') != null;
             const { frozenBottomFirst } = this._refs;
             if (frozenBottomFirst != Infinity && isBottom) {
                 rowOffset -= (this._options.frozenBottom)

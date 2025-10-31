@@ -283,8 +283,8 @@
 .slick-footerrow-columns.sg-main,
 .slick-headerrow-columns.sg-main,
 .slick-header-columns.sg-main,
-.grid-canvas-top.grid-canvas-main,
-.grid-canvas-bottom.grid-canvas-main {
+.grid-canvas.sg-top.sg-main,
+.grid-canvas.sg-bottom.sg-main {
   margin-right: var(--sg-scrollbar-w);
 }
 
