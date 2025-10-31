@@ -38,6 +38,7 @@ export class Grid<TItem = any> implements IGrid<TItem> {
     declare private _activePosX: number;
     declare private _activeRow: number;
     declare private _activeViewportNode: HTMLElement;
+    declare private _bind: Grid;
     private _cellCssClasses: Record<string, CellStylesHash> = {};
     private _cellHeightDiff: number = 0;
     private _cellWidthDiff: number = 0;
@@ -124,6 +125,7 @@ export class Grid<TItem = any> implements IGrid<TItem> {
     readonly onActiveCellChanged = new EventEmitter<ArgsCell>();
     readonly onActiveCellPositionChanged = new EventEmitter<ArgsGrid>();
     readonly onAddNewRow = new EventEmitter<ArgsAddNewRow>();
+    static readonly onAfterInit = new EventEmitter<ArgsGrid>();
     readonly onAfterInit = new EventEmitter<ArgsGrid>();
     readonly onBeforeCellEditorDestroy = new EventEmitter<ArgsEditorDestroy>();
     readonly onBeforeDestroy = new EventEmitter<ArgsGrid>();
@@ -158,8 +160,6 @@ export class Grid<TItem = any> implements IGrid<TItem> {
     readonly onSort = new EventEmitter<ArgsSort>();
     readonly onValidationError = new EventEmitter<ArgsValidationError>();
     readonly onViewportChanged = new EventEmitter<ArgsGrid>();
-
-    private _bind: Grid;
 
     constructor(container: string | HTMLElement | ArrayLike<HTMLElement>, data: any, columns: Column<TItem>[], options: GridOptions<TItem>) {
 
@@ -423,6 +423,7 @@ export class Grid<TItem = any> implements IGrid<TItem> {
             });
         }
 
+        Grid.onAfterInit.notify({ grid: this });
         this.onAfterInit.notify({ grid: this });
     }
 

@@ -1234,6 +1234,7 @@ export declare class Grid<TItem = any> implements IGrid<TItem> {
 	private _activePosX;
 	private _activeRow;
 	private _activeViewportNode;
+	private _bind;
 	private _cellCssClasses;
 	private _cellHeightDiff;
 	private _cellWidthDiff;
@@ -1406,7 +1407,10 @@ export declare class Grid<TItem = any> implements IGrid<TItem> {
 	private static offset;
 	private sortableColInstances;
 	private hasPinnedCols;
+	private scrollColumnsLeft;
+	private scrollColumnsRight;
 	private setupColumnReorder;
+	private colResizing;
 	private setupColumnResize;
 	columnsResized(invalidate?: boolean): void;
 	private setOverflow;
@@ -1596,6 +1600,9 @@ export declare class Grid<TItem = any> implements IGrid<TItem> {
 	navigatePrev(): boolean;
 	navigateRowStart(): boolean;
 	navigateRowEnd(): boolean;
+	private getColumnCount;
+	private isRTL;
+	private setTabbingDirection;
 	/**
 	 * @param {string} dir Navigation direction.
 	 * @return {boolean} Whether navigation resulted in a change of active cell.
