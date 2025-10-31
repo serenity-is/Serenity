@@ -1,3 +1,5 @@
+export declare function bindThis<T>(obj: T): T;
+export declare function bindPrototypeMethods(instance: any): void;
 /**
  * Convert a `value` to a className string.
  * `value` can be a string, an array or a `Dictionary<boolean>`.

@@ -1,7 +1,4 @@
-import { computed, signal } from "@serenity-is/signals";
 import { invokeDisposingListeners } from "@serenity-is/sleekdom";
-import { type GridSignals } from "../core";
-import type { GridLayoutRefs } from "../layouts/layout-refs";
 
 export function simpleArrayEquals(arr1: number[], arr2: number[]) {
     if (!Array.isArray(arr1) || !Array.isArray(arr2) || arr1.length !== arr2.length)
@@ -81,24 +78,4 @@ export function defaultJQueryRemoveNode(this: { (node: HTMLElement): { remove: (
         defaultRemoveNode(node);
     else
         this(node).remove();
-}
-
-export function bindPrototypeMethods(instance: any, filter?: (key: string | symbol, func: Function) => boolean) {
-    // adapted from https://github.com/sindresorhus/auto-bind
-    let object = instance.constructor.prototype;
-    do {
-        for (const key of Reflect.ownKeys(object)) {
-            if (key === 'constructor' || Reflect.hasOwnProperty(key))
-                continue;
-
-            const descriptor = Reflect.getOwnPropertyDescriptor(object, key);
-            if (descriptor && typeof descriptor.value === 'function' &&
-                !Reflect.getOwnPropertyDescriptor(instance, key)) {
-                const func = instance[key];
-                if (filter && !filter(key, func))
-                    continue;
-                instance[key] = func.bind(instance);
-            }
-        }
-    } while ((object = Reflect.getPrototypeOf(object)) && object !== Object.prototype);
 }

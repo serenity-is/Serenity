@@ -1,4 +1,4 @@
-import { ArgsCell, AutoTooltips, Column, ColumnSort, FormatterContext, Grid, GridOptions, type IGrid } from "@serenity-is/sleekgrid";
+import { ArgsCell, AutoTooltips, Column, ColumnSort, EventEmitter, FormatterContext, Grid, GridOptions, type IGrid } from "@serenity-is/sleekgrid";
 import { Authorization, Criteria, DataGridTexts, Fluent, ListResponse, cssEscape, debounce, getInstanceType, getTypeFullName, getjQuery, nsSerenity, tryGetText, type PropertyItem, type PropertyItemsData } from "../../base";
 import { LayoutTimer, ScriptData, getColumnsData, getColumnsDataAsync, setEquality } from "../../compat";
 import { IReadOnly } from "../../interfaces";
@@ -54,6 +54,8 @@ export class DataGrid<TItem, P = {}> extends Widget<P> implements IDataGrid, IRe
     declare public static defaultColumnWidthScale: number;
     declare public static defaultColumnWidthDelta: number;
 
+    public static readonly onAfterInit = new EventEmitter<{ dataGrid: DataGrid<any, any>, grid: IGrid }>();
+
     constructor(props: WidgetProps<P>) {
         super(props);
 
@@ -83,7 +85,6 @@ export class DataGrid<TItem, P = {}> extends Widget<P> implements IDataGrid, IRe
 
         this.syncOrAsyncThen(this.getPropertyItemsData, this.getPropertyItemsDataAsync, itemsData => {
             this.propertyItemsReady(itemsData);
-            this.afterInit();
         });
     }
 
@@ -92,7 +93,7 @@ export class DataGrid<TItem, P = {}> extends Widget<P> implements IDataGrid, IRe
         this.allColumns = this.allColumns ?? this.getColumns();
         this.slickGrid = this.createSlickGrid();
         this.initSlickGrid();
-        
+
         if (this.enableFiltering()) {
             this.createFilterBar();
         }
@@ -108,9 +109,13 @@ export class DataGrid<TItem, P = {}> extends Widget<P> implements IDataGrid, IRe
         }
 
         this.createQuickFilters();
-
+        
         this.updateDisabledState();
         this.updateInterface();
+        
+        // call before restoring settings so global handlers can add mixins/plugins before that
+        DataGrid.onAfterInit.notify({ dataGrid: this, grid: this.slickGrid }, null, this);
+        this.afterInit();
 
         this.initialSettings = this.getCurrentSettings(null);
 

@@ -1,3 +1,4 @@
+export { bindPrototypeMethods, bindThis } from "./bind-util";
 export { className } from "./classname";
 export * from "./compat-api";
 export { Component } from "./component";

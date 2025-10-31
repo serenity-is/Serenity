@@ -1,4 +1,4 @@
-import { currentLifecycleRoot } from "@serenity-is/sleekdom";
+import { bindThis, currentLifecycleRoot } from "@serenity-is/sleekdom";
 import { preClickClassName } from "../core/base";
 import { CellRange } from "../core/cellrange";
 import { columnDefaults, initializeColumns, type Column, type ColumnMetadata, type ColumnSort, type ItemMetadata } from "../core/column";
@@ -24,7 +24,7 @@ import { CellNavigator } from "./cellnavigator";
 import { autosizeColumns, setupColumnResize } from "./column-resizing";
 import { columnSortHandler, sortToDesiredOrderAndKeepRest } from "./column-sorting";
 import { addListener, removeListener, triggerGridEvent } from "./event-utils";
-import { bindPrototypeMethods, defaultEmptyNode, defaultJQueryEmptyNode, defaultJQueryRemoveNode, defaultRemoveNode, PostProcessCleanupEntry, simpleArrayEquals, type CachedRow } from "./internal";
+import { defaultEmptyNode, defaultJQueryEmptyNode, defaultJQueryRemoveNode, defaultRemoveNode, PostProcessCleanupEntry, simpleArrayEquals, type CachedRow } from "./internal";
 import type { RowCellRenderArgs } from "./render-args";
 import { renderCell } from "./render-cell";
 import { renderRow } from "./render-row";
@@ -159,6 +159,8 @@ export class Grid<TItem = any> implements IGrid<TItem> {
     readonly onValidationError = new EventEmitter<ArgsValidationError>();
     readonly onViewportChanged = new EventEmitter<ArgsGrid>();
 
+    private _bind: Grid;
+
     constructor(container: string | HTMLElement | ArrayLike<HTMLElement>, data: any, columns: Column<TItem>[], options: GridOptions<TItem>) {
 
         this._data = data;
@@ -188,12 +190,11 @@ export class Grid<TItem = any> implements IGrid<TItem> {
         this._emptyNode = options.emptyNode ?? (this._jQuery ? defaultJQueryEmptyNode.bind(this._jQuery) : defaultEmptyNode);
         this._removeNode = options.removeNode ?? (this._jQuery ? defaultJQueryRemoveNode.bind(this._jQuery) : defaultRemoveNode);
 
+        this._bind = bindThis(this);
         this._eventDisposer = new AbortController();
         this._on = addListener.bind({ eventDisposer: this._eventDisposer, jQuery: this._jQuery, uid: this._uid });
         this._off = removeListener.bind({ jQuery: this._jQuery, uid: this._uid });
         this._trigger = triggerGridEvent.bind(this);
-
-        bindPrototypeMethods(this);
 
         if (options?.createPreHeaderPanel) {
             // for compat, as draggable grouping plugin expects preHeaderPanel for grouping
@@ -225,8 +226,8 @@ export class Grid<TItem = any> implements IGrid<TItem> {
 
         this._colDefaults.width = options.defaultColumnWidth;
         this._editController = {
-            "commitCurrentEdit": this.commitCurrentEdit,
-            "cancelCurrentEdit": this.cancelCurrentEdit
+            "commitCurrentEdit": this._bind.commitCurrentEdit,
+            "cancelCurrentEdit": this._bind.cancelCurrentEdit
         };
 
         this._emptyNode(this._container);
@@ -255,18 +256,18 @@ export class Grid<TItem = any> implements IGrid<TItem> {
         try {
             this._layout.init({
                 onAfterInit: this.onAfterInit,
-                getColumns: this.getColumns,
-                getContainerNode: this.getContainerNode,
-                getDataLength: this.getDataLength,
-                getInitialColumns: this.getInitialColumns,
-                getOptions: this.getOptions,
-                getSignals: this.getSignals,
-                getViewportInfo: this.getViewportInfo,
+                getColumns: this._bind.getColumns,
+                getContainerNode: this._bind.getContainerNode,
+                getDataLength: this._bind.getDataLength,
+                getInitialColumns: this._bind.getInitialColumns,
+                getOptions: this._bind.getOptions,
+                getSignals: this._bind.getSignals,
+                getViewportInfo: this._bind.getViewportInfo,
                 refs: this._refs,
                 removeNode: this._removeNode,
-                registerPlugin: this.registerPlugin,
-                unregisterPlugin: this.unregisterPlugin,
-                getPluginByName: this.getPluginByName
+                registerPlugin: this._bind.registerPlugin,
+                unregisterPlugin: this._bind.unregisterPlugin,
+                getPluginByName: this._bind.getPluginByName
             });
 
             this.applyLegacyHeightOptions();
@@ -328,7 +329,7 @@ export class Grid<TItem = any> implements IGrid<TItem> {
         this.resizeCanvas();
         this.bindAncestorScrollEvents();
 
-        this._on(this._container, "resize", this.resizeCanvas);
+        this._on(this._container, "resize", this._bind.resizeCanvas);
 
         this.getViewports().forEach(vp => {
             var scrollTicking = false;
@@ -342,50 +343,50 @@ export class Grid<TItem = any> implements IGrid<TItem> {
                     });
                 }
             });
-            this._on(vp, "wheel", this.handleMouseWheel as any);
-            this._on(vp, "mousewheel" as any, this.handleMouseWheel);
+            this._on(vp, "wheel", this._bind.handleMouseWheel as any);
+            this._on(vp, "mousewheel" as any, this._bind.handleMouseWheel);
         });
 
         this._forEachBand(band => {
             const hs = band.headerCols;
             if (hs) {
                 hs.onselectstart = () => false;
-                this._on(hs, "contextmenu", this.handleHeaderContextMenu);
-                this._on(hs, "click", this.handleHeaderClick);
+                this._on(hs, "contextmenu", this._bind.handleHeaderContextMenu);
+                this._on(hs, "click", this._bind.handleHeaderClick);
                 if (this._jQuery) {
                     this._jQuery(hs)
-                        .on('mouseenter.' + this._uid, '.slick-header-column', this.handleHeaderMouseEnter)
-                        .on('mouseleave.' + this._uid, '.slick-header-column', this.handleHeaderMouseLeave);
+                        .on('mouseenter.' + this._uid, '.slick-header-column', this._bind.handleHeaderMouseEnter)
+                        .on('mouseleave.' + this._uid, '.slick-header-column', this._bind.handleHeaderMouseLeave);
                 }
                 else {
                     // need to reimplement this similar to jquery events
                     this._on(hs, "mouseenter", e => (e.target as HTMLElement).closest(".slick-header-column") &&
-                        this.handleHeaderMouseEnter(e));
+                        this._bind.handleHeaderMouseEnter(e));
                     this._on(hs, "mouseleave", e => (e.target as HTMLElement).closest(".slick-header-column") &&
-                        this.handleHeaderMouseLeave(e));
+                        this._bind.handleHeaderMouseLeave(e));
                 }
             }
 
-            band.headerRowCols && this._on(band.headerRowCols.parentElement, 'scroll', this.handleHeaderFooterRowScroll);
-            band.footerRowCols && this._on(band.footerRowCols.parentElement, 'scroll', this.handleHeaderFooterRowScroll);
+            band.headerRowCols && this._on(band.headerRowCols.parentElement, 'scroll', this._bind.handleHeaderFooterRowScroll);
+            band.footerRowCols && this._on(band.footerRowCols.parentElement, 'scroll', this._bind.handleHeaderFooterRowScroll);
         });
 
-        [this._focusSink1, this._focusSink2].forEach(fs => this._on(fs, "keydown", this.handleKeyDown));
+        [this._focusSink1, this._focusSink2].forEach(fs => this._on(fs, "keydown", this._bind.handleKeyDown));
 
         var canvases = Array.from<HTMLElement>(this.getCanvases());
         canvases.forEach(canvas => {
-            this._on(canvas, "keydown", this.handleKeyDown)
-            this._on(canvas, "click", this.handleClick)
-            this._on(canvas, "dblclick", this.handleDblClick)
-            this._on(canvas, "contextmenu", this.handleContextMenu);
+            this._on(canvas, "keydown", this._bind.handleKeyDown)
+            this._on(canvas, "click", this._bind.handleClick)
+            this._on(canvas, "dblclick", this._bind.handleDblClick)
+            this._on(canvas, "contextmenu", this._bind.handleContextMenu);
         });
 
         if (this._jQuery && (this._jQuery.fn as any).drag) {
             this._jQuery(canvases)
-                .on("draginit", this.handleDragInit)
-                .on("dragstart", { distance: 3 }, this.handleDragStart)
-                .on("drag", this.handleDrag)
-                .on("dragend", this.handleDragEnd)
+                .on("draginit", this._bind.handleDragInit)
+                .on("dragstart", { distance: 3 }, this._bind.handleDragStart)
+                .on("drag", this._bind.handleDrag)
+                .on("dragend", this._bind.handleDragEnd)
         }
         else {
             this._draggableInstance = Draggable({
@@ -394,22 +395,22 @@ export class Grid<TItem = any> implements IGrid<TItem> {
                 // the slick cell parent must always contain `.dnd` and/or `.cell-reorder` class to be identified as draggable
                 //allowDragFromClosest: 'div.slick-cell.dnd, div.slick-cell.cell-reorder',
                 preventDragFromKeys: ['ctrlKey', 'metaKey'],
-                onDragInit: this.handleDragInit,
-                onDragStart: this.handleDragStart,
-                onDrag: this.handleDrag,
-                onDragEnd: this.handleDragEnd
+                onDragInit: this._bind.handleDragInit,
+                onDragStart: this._bind.handleDragStart,
+                onDrag: this._bind.handleDrag,
+                onDragEnd: this._bind.handleDragEnd
             });
         }
 
         canvases.forEach(canvas => {
             if (this._jQuery) {
                 this._jQuery(canvas)
-                    .on('mouseenter' + this._uid, '.slick-cell', this.handleMouseEnter)
-                    .on('mouseleave' + this._uid, '.slick-cell', this.handleMouseLeave);
+                    .on('mouseenter' + this._uid, '.slick-cell', this._bind.handleMouseEnter)
+                    .on('mouseleave' + this._uid, '.slick-cell', this._bind.handleMouseLeave);
             }
             else {
-                this._on(canvas, "mouseenter", e => (e.target as HTMLElement)?.classList?.contains("slick-cell") && this.handleMouseEnter(e), { capture: true });
-                this._on(canvas, "mouseleave", e => (e.target as HTMLElement)?.classList?.contains("slick-cell") && this.handleMouseLeave(e), { capture: true });
+                this._on(canvas, "mouseenter", e => (e.target as HTMLElement)?.classList?.contains("slick-cell") && this._bind.handleMouseEnter(e), { capture: true });
+                this._on(canvas, "mouseleave", e => (e.target as HTMLElement)?.classList?.contains("slick-cell") && this._bind.handleMouseLeave(e), { capture: true });
             }
         });
 
@@ -417,8 +418,8 @@ export class Grid<TItem = any> implements IGrid<TItem> {
         if (navigator.userAgent.toLowerCase().match(/webkit/) &&
             navigator.userAgent.toLowerCase().match(/macintosh/)) {
             canvases.forEach(c => {
-                this._on(c, "wheel" as any, this.handleMouseWheel as any);
-                this._on(c, "mousewheel" as any, this.handleMouseWheel as any);
+                this._on(c, "wheel" as any, this._bind.handleMouseWheel as any);
+                this._on(c, "mousewheel" as any, this._bind.handleMouseWheel as any);
             });
         }
 
@@ -455,7 +456,7 @@ export class Grid<TItem = any> implements IGrid<TItem> {
         this._selectionModel = model;
         if (this._selectionModel) {
             this._selectionModel.init(this);
-            this._selectionModel.onSelectedRangesChanged.subscribe(this.handleSelectedRangesChanged);
+            this._selectionModel.onSelectedRangesChanged.subscribe(this._bind.handleSelectedRangesChanged);
         }
     }
 
@@ -463,7 +464,7 @@ export class Grid<TItem = any> implements IGrid<TItem> {
         if (!this._selectionModel)
             return;
 
-        this._selectionModel.onSelectedRangesChanged.unsubscribe(this.handleSelectedRangesChanged);
+        this._selectionModel.onSelectedRangesChanged.unsubscribe(this._bind.handleSelectedRangesChanged);
         this._selectionModel.destroy?.();
     }
 
@@ -626,7 +627,7 @@ export class Grid<TItem = any> implements IGrid<TItem> {
         while ((elem = elem?.parentNode as HTMLElement) != document.body && elem != null) {
             // bind to scroll containers only
             if (elem == canvas.parentElement || elem.scrollWidth != elem.clientWidth || elem.scrollHeight != elem.clientHeight) {
-                this._on(elem, 'scroll', this.handleActiveCellPositionChange);
+                this._on(elem, 'scroll', this._bind.handleActiveCellPositionChange);
                 this._boundAncestorScroll.push(elem);
             }
         }
@@ -635,7 +636,7 @@ export class Grid<TItem = any> implements IGrid<TItem> {
     private unbindAncestorScrollEvents(): void {
         if (this._boundAncestorScroll) {
             for (var x of this._boundAncestorScroll)
-                this._off(x, 'scroll', this.handleActiveCellPositionChange);
+                this._off(x, 'scroll', this._bind.handleActiveCellPositionChange);
         }
         this._boundAncestorScroll = [];
     }
@@ -893,6 +894,14 @@ export class Grid<TItem = any> implements IGrid<TItem> {
         return pinnedStartLast >= 0 || pinnedEndFirst != Infinity;
     }
 
+    private scrollColumnsLeft(): void {
+        this.getScrollContainerX().scrollLeft = this.getScrollContainerX().scrollLeft - 10;
+    }
+
+    private scrollColumnsRight(): void {
+        this.getScrollContainerX().scrollLeft = this.getScrollContainerX().scrollLeft + 10;
+    }
+
     private setupColumnReorder(): void {
         // @ts-ignore
         if (typeof Sortable === "undefined")
@@ -900,9 +909,6 @@ export class Grid<TItem = any> implements IGrid<TItem> {
 
         this.sortableColInstances?.forEach(x => x.destroy());
         let columnScrollTimer: number = null;
-
-        const scrollColumnsLeft = () => this.getScrollContainerX().scrollLeft = this.getScrollContainerX().scrollLeft + 10;
-        const scrollColumnsRight = () => this.getScrollContainerX().scrollLeft = this.getScrollContainerX().scrollLeft - 10;
 
         let canDragScroll;
         const hasPinnedCols = this.hasPinnedCols();
@@ -923,11 +929,11 @@ export class Grid<TItem = any> implements IGrid<TItem> {
 
                 if (canDragScroll && e.originalEvent && e.originalEvent.pageX > this._container.clientWidth) {
                     if (!(columnScrollTimer)) {
-                        columnScrollTimer = setInterval(scrollColumnsRight, 100);
+                        columnScrollTimer = setInterval(this._bind.scrollColumnsLeft, 100);
                     }
                 } else if (canDragScroll && e.originalEvent && e.originalEvent.pageX < Grid.offset(this.getScrollContainerX())!.left) {
                     if (!(columnScrollTimer)) {
-                        columnScrollTimer = setInterval(scrollColumnsLeft, 100);
+                        columnScrollTimer = setInterval(this._bind.scrollColumnsRight, 100);
                     }
                 } else {
                     clearInterval(columnScrollTimer);
@@ -968,22 +974,24 @@ export class Grid<TItem = any> implements IGrid<TItem> {
             Sortable.create(x, sortableOptions));
     }
 
+    private colResizing() {
+        this.updateCanvasWidth(false);
+        this.applyColumnHeaderWidths();
+        this._options.syncColumnCellResize && this.applyColumnWidths();
+    }
+
     private setupColumnResize(): void {
         this._colResizeDisposer && this._colResizeDisposer.abort();
         this._colResizeDisposer = new AbortController();
         setupColumnResize({
             absoluteColMinWidth: this._absoluteColMinWidth,
             disposer: this._colResizeDisposer,
-            colResized: this.columnsResized,
-            colResizing: () => {
-                this.updateCanvasWidth(false);
-                this.applyColumnHeaderWidths();
-                this._options.syncColumnCellResize && this.applyColumnWidths();
-            },
+            colResized: this._bind.columnsResized,
+            colResizing: this._bind.colResizing,
             cols: this._cols,
             container: this._container,
             headerColsElements: this._mapBands(band => band.headerCols),
-            getEditorLock: this.getEditorLock,
+            getEditorLock: this._bind.getEditorLock,
             removeNode: this._removeNode,
             options: this._options
         });
@@ -1452,18 +1460,18 @@ export class Grid<TItem = any> implements IGrid<TItem> {
         sig.showFooterRow.value = opt.showFooterRow;
     }
 
-    private viewOnRowCountChanged = () => {
+    private viewOnRowCountChanged() {
         this.updateRowCount();
         this.render();
     }
 
-    private viewOnRowsChanged = (_: any, args: { rows: number[] }): void => {
+    private viewOnRowsChanged(_: any, args: { rows: number[] }) {
         this.invalidateRows(args.rows);
         this.render();
         this.updateGrandTotals();
     }
 
-    private viewOnDataChanged = (): void => {
+    private viewOnDataChanged() {
         this.invalidate();
         this.render();
     }
@@ -1471,18 +1479,18 @@ export class Grid<TItem = any> implements IGrid<TItem> {
     private bindToData(): void {
         const view = this._data as IDataView;
         if (view) {
-            view.onRowCountChanged && view.onRowCountChanged.subscribe(this.viewOnRowCountChanged);
-            view.onRowsChanged && view.onRowsChanged.subscribe(this.viewOnRowsChanged);
-            view.onDataChanged && view.onDataChanged.subscribe(this.viewOnDataChanged);
+            view.onRowCountChanged && view.onRowCountChanged.subscribe(this._bind.viewOnRowCountChanged);
+            view.onRowsChanged && view.onRowsChanged.subscribe(this._bind.viewOnRowsChanged);
+            view.onDataChanged && view.onDataChanged.subscribe(this._bind.viewOnDataChanged);
         }
     }
 
     private unbindFromData(): void {
         const view = this._data as IDataView;
         if (view) {
-            view.onRowCountChanged && view.onRowCountChanged.unsubscribe(this.viewOnRowCountChanged);
-            view.onRowsChanged && view.onRowsChanged.unsubscribe(this.viewOnRowsChanged);
-            view.onDataChanged && view.onDataChanged.unsubscribe(this.viewOnDataChanged);
+            view.onRowCountChanged && view.onRowCountChanged.unsubscribe(this._bind.viewOnRowCountChanged);
+            view.onRowsChanged && view.onRowsChanged.unsubscribe(this._bind.viewOnRowsChanged);
+            view.onDataChanged && view.onDataChanged.unsubscribe(this._bind.viewOnDataChanged);
         }
     }
 
@@ -2297,7 +2305,7 @@ export class Grid<TItem = any> implements IGrid<TItem> {
             activeRow: this._activeRow,
             cellCssClasses: this._cellCssClasses,
             frozenPinned: this._refs,
-            getRowTop: this.getRowTop,
+            getRowTop: this._bind.getRowTop,
             grid: this,
             item: row != null ? this.getDataItem(row) : null,
             row: row,
@@ -2428,7 +2436,7 @@ export class Grid<TItem = any> implements IGrid<TItem> {
         if (this._options.asyncPostRenderDelay < 0) {
             this.asyncPostProcessRows();
         } else {
-            this._hPostRender = setTimeout(this.asyncPostProcessRows, this._options.asyncPostRenderDelay);
+            this._hPostRender = setTimeout(this._bind.asyncPostProcessRows, this._options.asyncPostRenderDelay);
         }
     }
 
@@ -2672,7 +2680,7 @@ export class Grid<TItem = any> implements IGrid<TItem> {
         return !!(hScrollDist || vScrollDist);
     }
 
-    private asyncPostProcessRows = () => {
+    private asyncPostProcessRows() {
         var dataLength = this.getDataLength();
         var cols = this._cols;
         while (this._postProcessFromRow <= this._postProcessToRow) {
@@ -2704,7 +2712,7 @@ export class Grid<TItem = any> implements IGrid<TItem> {
             }
 
             if (this._options.asyncPostRenderDelay >= 0) {
-                this._hPostRender = setTimeout(this.asyncPostProcessRows, this._options.asyncPostRenderDelay);
+                this._hPostRender = setTimeout(this._bind.asyncPostProcessRows, this._options.asyncPostRenderDelay);
                 return;
             }
         }
@@ -3417,8 +3425,8 @@ export class Grid<TItem = any> implements IGrid<TItem> {
             item: item || {},
             event: e,
             editorCellNavOnLRKeys: this._options.editorCellNavOnLRKeys,
-            commitChanges: this.commitEditAndSetFocus,
-            cancelChanges: this.cancelEditAndSetFocus
+            commitChanges: this._bind.commitEditAndSetFocus,
+            cancelChanges: this._bind.cancelEditAndSetFocus
         });
 
         if (item) {
@@ -3670,6 +3678,18 @@ export class Grid<TItem = any> implements IGrid<TItem> {
         return this.navigate("end");
     }
 
+    private getColumnCount(): number {
+        return this._cols.length;
+    }
+
+    private isRTL(): boolean {
+        return this._options.rtl;
+    }
+
+    private setTabbingDirection(dir: number): void {
+        this._tabbingDirection = dir;
+    }
+
     /**
      * @param {string} dir Navigation direction.
      * @return {boolean} Whether navigation resulted in a change of active cell.
@@ -3691,12 +3711,12 @@ export class Grid<TItem = any> implements IGrid<TItem> {
 
         if (!this._cellNavigator) {
             this._cellNavigator = new CellNavigator({
-                getColumnCount: () => this._cols.length,
-                getRowCount: () => this.getDataLengthIncludingAddNew(),
-                getColspan: this.getColspan,
-                canCellBeActive: this.canCellBeActive,
-                setTabbingDirection: dir => this._tabbingDirection = dir,
-                isRTL: () => this._options.rtl
+                getColumnCount: this._bind.getColumnCount,
+                getRowCount: this._bind.getDataLengthIncludingAddNew,
+                getColspan: this._bind.getColspan,
+                canCellBeActive: this._bind.canCellBeActive,
+                setTabbingDirection: this._bind.setTabbingDirection,
+                isRTL: this._bind.isRTL
             });
         }
 

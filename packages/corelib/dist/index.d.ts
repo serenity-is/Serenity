@@ -1,4 +1,4 @@
-import { Column, EventEmitter, FormatterContext, FormatterResult, Grid, GridOptions, Group, GroupItemMetadataProvider, GroupTotals, IDataView, IEventData, IGroupTotals, ItemMetadata } from '@serenity-is/sleekgrid';
+import { Column, EventEmitter, FormatterContext, FormatterResult, Grid, GridOptions, Group, GroupItemMetadataProvider, GroupTotals, IDataView, IEventData, IGrid, IGroupTotals, ItemMetadata } from '@serenity-is/sleekgrid';
 
 export interface UserDefinition {
 	/**
@@ -5299,6 +5299,10 @@ export declare class DataGrid<TItem, P = {}> extends Widget<P> implements IDataG
 	static defaultPersistanceStorage: SettingStorage;
 	static defaultColumnWidthScale: number;
 	static defaultColumnWidthDelta: number;
+	static readonly onAfterInit: EventEmitter<{
+		dataGrid: DataGrid<any, any>;
+		grid: IGrid;
+	}, import("@serenity-is/sleekgrid").IEventData>;
 	constructor(props: WidgetProps<P>);
 	protected propertyItemsReady(itemsData: PropertyItemsData): void;
 	protected afterInit(): void;
