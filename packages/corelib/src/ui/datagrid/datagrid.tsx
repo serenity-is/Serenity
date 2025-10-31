@@ -1,4 +1,4 @@
-import { ArgsCell, AutoTooltips, Column, ColumnSort, FormatterContext, Grid, GridOptions } from "@serenity-is/sleekgrid";
+import { ArgsCell, AutoTooltips, Column, ColumnSort, FormatterContext, Grid, GridOptions, type IGrid } from "@serenity-is/sleekgrid";
 import { Authorization, Criteria, DataGridTexts, Fluent, ListResponse, cssEscape, debounce, getInstanceType, getTypeFullName, getjQuery, nsSerenity, tryGetText, type PropertyItem, type PropertyItemsData } from "../../base";
 import { LayoutTimer, ScriptData, getColumnsData, getColumnsDataAsync, setEquality } from "../../compat";
 import { IReadOnly } from "../../interfaces";
@@ -91,7 +91,8 @@ export class DataGrid<TItem, P = {}> extends Widget<P> implements IDataGrid, IRe
         this.propertyItemsData = itemsData;
         this.allColumns = this.allColumns ?? this.getColumns();
         this.slickGrid = this.createSlickGrid();
-
+        this.initSlickGrid();
+        
         if (this.enableFiltering()) {
             this.createFilterBar();
         }
@@ -364,6 +365,9 @@ export class DataGrid<TItem, P = {}> extends Widget<P> implements IDataGrid, IRe
         this.setInitialSortOrder();
 
         return grid;
+    }
+
+    protected initSlickGrid(): void {
     }
 
     protected setInitialSortOrder(): void {

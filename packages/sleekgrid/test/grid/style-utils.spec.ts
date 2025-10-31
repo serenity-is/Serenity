@@ -1,45 +1,8 @@
 import {
     absBox,
     getInnerWidth,
-    getMaxSupportedCssHeight,
-    getVBoxDelta
+    getMaxSupportedCssHeight
 } from '../../src/grid/style-utils';
-
-describe('getVBoxDelta', () => {
-    const style = {
-        boxSizing: 'content-box',
-        ['border-top-width']: '1px',
-        ['border-bottom-width']: '2px',
-        ['padding-top']: '4px',
-        ['padding-bottom']: '8px',
-        getPropertyValue: (property: string) => style[property]
-    };
-    const totalVBoxDelta = 1 + 2 + 4 + 8;
-
-    let oldGetComputedStyle: any;
-    beforeAll(() => {
-        oldGetComputedStyle = window.getComputedStyle;
-        window.getComputedStyle = () => style as any;
-    });
-
-    afterAll(() => {
-        window.getComputedStyle = oldGetComputedStyle;
-    });
-
-    it('should return 0 if box-sizing is border-box', () => {
-        const element = document.createElement('div');
-        style.boxSizing = 'border-box';
-
-        expect(getVBoxDelta(element)).toBe(0);
-    });
-
-    it('should return total if box-sizing is not border-box', () => {
-        const element = document.createElement('div');
-        style.boxSizing = 'content-box';
-
-        expect(getVBoxDelta(element)).toBe(totalVBoxDelta);
-    });
-});
 
 describe('getInnerWidth', () => {
     const style = {

@@ -5330,6 +5330,7 @@ export declare class DataGrid<TItem, P = {}> extends Widget<P> implements IDataG
 	protected canFilterColumn(column: Column): boolean;
 	protected initializeFilterBar(): void;
 	protected createSlickGrid(): Grid;
+	protected initSlickGrid(): void;
 	protected setInitialSortOrder(): void;
 	itemAt(row: number): TItem;
 	itemId(item: TItem): any;
