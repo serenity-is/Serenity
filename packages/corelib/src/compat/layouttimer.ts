@@ -159,31 +159,33 @@ export namespace LayoutTimer {
     }
 }
 
-export function executeOnceWhenVisible(el: HTMLElement | ArrayLike<HTMLElement>, callback: Function): void {
+export function executeOnceWhenVisible(el: HTMLElement | ArrayLike<HTMLElement>, callback: Function): number {
     el = isArrayLike(el) ? el[0] : el;
     if (!el)
-        return;
+        return null;
     if (el.offsetWidth > 0 && el.offsetHeight > 0) {
         callback();
-        return;
+        return null;
     }
 
     const timer = LayoutTimer.onShown(() => el as HTMLElement, () => {
         LayoutTimer.off(timer);
         callback();
     });
+    return timer;
 }
 
-export function executeEverytimeWhenVisible(el: HTMLElement | ArrayLike<HTMLElement>, callback: Function, callNowIfVisible: boolean): void {
+export function executeEverytimeWhenVisible(el: HTMLElement | ArrayLike<HTMLElement>, callback: Function, callNowIfVisible: boolean): number {
     el = isArrayLike(el) ? el[0] : el;
     if (!el)
-        return;
+        return null;
 
     if (callNowIfVisible && el.offsetWidth > 0 && el.offsetHeight > 0) {
         callback();
     }
 
-    LayoutTimer.onShown(() => el as HTMLElement, () => {
+    const timer = LayoutTimer.onShown(() => el as HTMLElement, () => {
         callback();
     });
+    return timer;
 }

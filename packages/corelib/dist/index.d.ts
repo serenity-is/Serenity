@@ -3300,8 +3300,8 @@ export declare namespace LayoutTimer {
 	}): number;
 	function off(key: number): number;
 }
-export declare function executeOnceWhenVisible(el: HTMLElement | ArrayLike<HTMLElement>, callback: Function): void;
-export declare function executeEverytimeWhenVisible(el: HTMLElement | ArrayLike<HTMLElement>, callback: Function, callNowIfVisible: boolean): void;
+export declare function executeOnceWhenVisible(el: HTMLElement | ArrayLike<HTMLElement>, callback: Function): number;
+export declare function executeEverytimeWhenVisible(el: HTMLElement | ArrayLike<HTMLElement>, callback: Function, callNowIfVisible: boolean): number;
 export interface HandleRouteEvent extends Event {
 	route: string;
 	parts: string[];
