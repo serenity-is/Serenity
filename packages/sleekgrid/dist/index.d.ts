@@ -1318,6 +1318,7 @@ export declare class Grid<TItem = any> implements IGrid<TItem> {
 	readonly onActiveCellChanged: EventEmitter<ArgsCell, IEventData>;
 	readonly onActiveCellPositionChanged: EventEmitter<ArgsGrid, IEventData>;
 	readonly onAddNewRow: EventEmitter<ArgsAddNewRow, IEventData>;
+	static readonly onAfterInit: EventEmitter<ArgsGrid, IEventData>;
 	readonly onAfterInit: EventEmitter<ArgsGrid, IEventData>;
 	readonly onBeforeCellEditorDestroy: EventEmitter<ArgsEditorDestroy, IEventData>;
 	readonly onBeforeDestroy: EventEmitter<ArgsGrid, IEventData>;
