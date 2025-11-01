@@ -1,13 +1,12 @@
-import { EventData, type EventEmitter, type IEventData } from "../core/event";
+import { type EventEmitter, type IEventData } from "../core/event";
 import type { ArgsGrid } from "../core/eventargs";
 import type { IGrid } from "../core/igrid";
 
 export function triggerGridEvent<TArgs extends ArgsGrid, TEventData extends IEventData = IEventData>(this: IGrid,
-    evt: EventEmitter<TArgs, TEventData>, args?: TArgs, e?: TEventData) {
-    e = e || new EventData() as any;
-    args = args || {} as any;
-    args.grid = this;
-    return evt.notify(args, e, this);
+    evt: EventEmitter<TArgs, TEventData>, args?: Omit<TArgs, "grid">, e?: TEventData): any {
+    args ??= {} as any;
+    (args as TArgs).grid = this;
+    return evt.notify(args as TArgs, e, this);
 }
 
 export function addListener<K extends keyof HTMLElementEventMap>(this: {

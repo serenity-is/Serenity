@@ -2,10 +2,10 @@ import { bindThis, currentLifecycleRoot } from "@serenity-is/sleekdom";
 import { preClickClassName } from "../core/base";
 import { CellRange } from "../core/cellrange";
 import { columnDefaults, initializeColumns, type Column, type ColumnMetadata, type ColumnSort, type ItemMetadata } from "../core/column";
-import { Draggable } from "../core/draggable";
+import { Draggable, type DragPosition } from "../core/draggable";
 import type { EditCommand, EditController, Editor, EditorClass, EditorLock, Position, RowCell } from "../core/editing";
-import { EventEmitter, type IEventData } from "../core/event";
-import type { ArgsAddNewRow, ArgsCell, ArgsCellChange, ArgsCellEdit, ArgsColumn, ArgsColumnNode, ArgsCssStyle, ArgsEditorDestroy, ArgsGrid, ArgsScroll, ArgsSelectedRowsChange, ArgsSort, ArgsValidationError } from "../core/eventargs";
+import { EventData, EventEmitter, type IEventData } from "../core/event";
+import type { ArgsAddNewRow, ArgsCell, ArgsCellChange, ArgsCellEdit, ArgsColumn, ArgsColumnNode, ArgsCssStyle, ArgsDrag, ArgsEditorDestroy, ArgsGrid, ArgsScroll, ArgsSelectedRowsChange, ArgsSort, ArgsValidationError } from "../core/eventargs";
 import { applyFormatterResultToCellNode, convertCompatFormatter, defaultColumnFormat, formatterContext, type CellStylesHash, type ColumnFormat, type FormatterContext, type FormatterResult } from "../core/formatting";
 import type { GridPlugin } from "../core/grid-plugin";
 import type { GridSignals } from "../core/grid-signals";
@@ -140,14 +140,14 @@ export class Grid<TItem = any> implements IGrid<TItem> {
     readonly onCompositeEditorChange = new EventEmitter<ArgsGrid>();
     readonly onContextMenu = new EventEmitter<ArgsGrid, UIEvent>();
     readonly onDblClick = new EventEmitter<ArgsCell, MouseEvent>();
-    readonly onDrag = new EventEmitter<ArgsGrid, UIEvent>();
-    readonly onDragEnd = new EventEmitter<ArgsGrid, UIEvent>();
-    readonly onDragInit = new EventEmitter<ArgsGrid, UIEvent>();
-    readonly onDragStart = new EventEmitter<ArgsGrid, UIEvent>();
+    readonly onDrag = new EventEmitter<ArgsDrag, UIEvent>();
+    readonly onDragEnd = new EventEmitter<ArgsDrag, UIEvent>();
+    readonly onDragInit = new EventEmitter<ArgsDrag, UIEvent>();
+    readonly onDragStart = new EventEmitter<ArgsDrag, UIEvent>();
     readonly onFooterRowCellRendered = new EventEmitter<ArgsColumnNode>();
     readonly onHeaderCellRendered = new EventEmitter<ArgsColumnNode>();
-    readonly onHeaderClick = new EventEmitter<ArgsColumn>();
-    readonly onHeaderContextMenu = new EventEmitter<ArgsColumn>();
+    readonly onHeaderClick = new EventEmitter<ArgsColumn, MouseEvent>();
+    readonly onHeaderContextMenu = new EventEmitter<ArgsColumn, MouseEvent>();
     readonly onHeaderMouseEnter = new EventEmitter<ArgsColumn, MouseEvent>();
     readonly onHeaderMouseLeave = new EventEmitter<ArgsColumn, MouseEvent>();
     readonly onHeaderRowCellRendered = new EventEmitter<ArgsColumnNode>();
@@ -381,26 +381,17 @@ export class Grid<TItem = any> implements IGrid<TItem> {
             this._on(canvas, "contextmenu", boundThis.handleContextMenu);
         });
 
-        if (this._jQuery && (this._jQuery.fn as any).drag) {
-            this._jQuery(canvases)
-                .on("draginit", boundThis.handleDragInit)
-                .on("dragstart", { distance: 3 }, boundThis.handleDragStart)
-                .on("drag", boundThis.handleDrag)
-                .on("dragend", boundThis.handleDragEnd)
-        }
-        else {
-            this._draggableInstance = Draggable({
-                containerElement: this._container,
-                //allowDragFrom: 'div.slick-cell',
-                // the slick cell parent must always contain `.dnd` and/or `.cell-reorder` class to be identified as draggable
-                //allowDragFromClosest: 'div.slick-cell.dnd, div.slick-cell.cell-reorder',
-                preventDragFromKeys: ['ctrlKey', 'metaKey'],
-                onDragInit: boundThis.handleDragInit,
-                onDragStart: boundThis.handleDragStart,
-                onDrag: boundThis.handleDrag,
-                onDragEnd: boundThis.handleDragEnd
-            });
-        }
+        this._draggableInstance = Draggable({
+            containerElement: this._container,
+            //allowDragFrom: 'div.slick-cell',
+            // the slick cell parent must always contain `.dnd` and/or `.cell-reorder` class to be identified as draggable
+            //allowDragFromClosest: 'div.slick-cell.dnd, div.slick-cell.cell-reorder',
+            preventDragFromKeys: ['ctrlKey', 'metaKey'],
+            onDragInit: boundThis.handleDragInit,
+            onDragStart: boundThis.handleDragStart,
+            onDrag: boundThis.handleDrag,
+            onDragEnd: boundThis.handleDragEnd
+        });
 
         canvases.forEach(canvas => {
             if (this._jQuery) {
@@ -814,8 +805,7 @@ export class Grid<TItem = any> implements IGrid<TItem> {
                     if (columnDef) {
                         this._trigger(this.onBeforeHeaderRowCellDestroy, {
                             node: el as HTMLElement,
-                            column: columnDef,
-                            grid: this
+                            column: columnDef
                         });
                     }
                 });
@@ -1467,8 +1457,8 @@ export class Grid<TItem = any> implements IGrid<TItem> {
         this.render();
     }
 
-    private viewOnRowsChanged(_: any, args: { rows: number[] }) {
-        this.invalidateRows(args.rows);
+    private viewOnRowsChanged(e: { rows: number[] }) {
+        this.invalidateRows(e.rows);
         this.render();
         this.updateGrandTotals();
     }
@@ -2841,16 +2831,16 @@ export class Grid<TItem = any> implements IGrid<TItem> {
     //////////////////////////////////////////////////////////////////////////////////////////////
     // Interactivity
 
-    private handleDragInit(e: UIEvent, dd: any): boolean {
+    private handleDragInit(e: UIEvent, dd: DragPosition): boolean {
         var cell = this.getCellFromEvent(e);
         if (!cell || !this.cellExists(cell.row, cell.cell)) {
             return false;
         }
 
-        var retval = this._trigger(this.onDragInit, dd, e);
+        this._trigger(this.onDragInit, dd as ArgsDrag, e);
         if ((e as IEventData).isImmediatePropagationStopped && (e as IEventData).isImmediatePropagationStopped()) {
             e.preventDefault();
-            return retval;
+            return true;
         }
 
         // if nobody claims to be handling drag'n'drop by stopping immediate propagation,
@@ -2858,26 +2848,26 @@ export class Grid<TItem = any> implements IGrid<TItem> {
         return false;
     }
 
-    private handleDragStart(e: UIEvent, dd: any): boolean {
+    private handleDragStart(e: DragEvent, dd: DragPosition): boolean {
         var cell = this.getCellFromEvent(e);
         if (!cell || !this.cellExists(cell.row, cell.cell)) {
             return false;
         }
 
-        var retval = this._trigger(this.onDragStart, dd, e);
+        this._trigger(this.onDragStart, dd as ArgsDrag, e);
         if ((e as IEventData).isImmediatePropagationStopped && (e as IEventData).isImmediatePropagationStopped()) {
-            return retval;
+            return true
         }
 
         return false;
     }
 
-    private handleDrag(e: UIEvent, dd: any): any {
-        return this._trigger(this.onDrag, dd, e);
+    private handleDrag(e: DragEvent & { dragData: DragPosition }): any {
+        return this._trigger(this.onDrag, null, e);
     }
 
-    private handleDragEnd(e: UIEvent, dd: any): void {
-        this._trigger(this.onDragEnd, dd, e);
+    private handleDragEnd(e: DragEvent & { dragData: DragPosition }): void {
+        this._trigger(this.onDragEnd, null, e);
     }
 
     private handleKeyDown(e: KeyboardEvent): void {
@@ -3071,14 +3061,14 @@ export class Grid<TItem = any> implements IGrid<TItem> {
         column && this._trigger(this.onHeaderMouseLeave, { column }, e);
     }
 
-    private handleHeaderContextMenu(e: any): void {
-        var header = e.target.closest(".slick-header-column");
+    private handleHeaderContextMenu(e: MouseEvent): void {
+        var header = (e.target as Element)?.closest?.(".slick-header-column");
         var column = this.getColumnFromNode(header);
         column && this._trigger(this.onHeaderContextMenu, { column }, e);
     }
 
-    private handleHeaderClick(e: any): void {
-        var header = e.target.closest(".slick-header-column");
+    private handleHeaderClick(e: MouseEvent): void {
+        var header = (e.target as Element)?.closest?.(".slick-header-column");
         var column = this.getColumnFromNode(header);
         column && this._trigger(this.onHeaderClick, { column: column }, e);
     }
@@ -3399,7 +3389,8 @@ export class Grid<TItem = any> implements IGrid<TItem> {
         var columnDef = this._cols[this._activeCell];
         var item = this.getDataItem(this._activeRow);
 
-        if (this._trigger(this.onBeforeEditCell, { row: this._activeRow, cell: this._activeCell, item: item, column: columnDef }) === false) {
+        const ev = new EventData();
+        if (this._trigger(this.onBeforeEditCell, { row: this._activeRow, cell: this._activeCell, item: item, column: columnDef }, ev) === false || ev.defaultPrevented) {
             this.setFocus();
             return;
         }

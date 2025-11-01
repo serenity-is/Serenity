@@ -1,4 +1,4 @@
-import type { ArgsColumn, GridPlugin, IGrid } from "../core";
+import type { GridPlugin, HeaderColumnEvent, IGrid } from "../core";
 
 export interface AutoTooltipsOptions {
     enableForCells?: boolean;
@@ -64,8 +64,8 @@ export class AutoTooltips implements GridPlugin {
         node = null;
     }
 
-    private handleHeaderMouseEnter = (e: MouseEvent, args: ArgsColumn) => {
-        var column = args.column;
+    private handleHeaderMouseEnter = (e: HeaderColumnEvent) => {
+        var column = e.column;
         if (column && !column.toolTip) {
             var node = (e.target as HTMLElement).closest(".slick-header-column") as HTMLElement;
             node && (node.title = (node.clientWidth < node.scrollWidth ? (typeof column.name === "string" ? column.name : "") : ""));

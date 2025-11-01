@@ -1,4 +1,4 @@
-import { CellRange, EventEmitter, EventSubscriber, IEventData, type ArgsCell, type IGrid, type GridPlugin, type SelectionModel } from "../core";
+import { CellRange, EventEmitter, EventSubscriber, IEventData, type ArgsCell, type IGrid, type GridPlugin, type SelectionModel, type CellEvent } from "../core";
 
 export interface RowSelectionModelOptions {
     selectActiveRow?: boolean;
@@ -91,9 +91,9 @@ export class RowSelectionModel implements GridPlugin, SelectionModel {
         return this.ranges;
     }
 
-    private handleActiveCellChange(_: IEventData, data: ArgsCell) {
-        if (this.options.selectActiveRow && data.row != null) {
-            this.setSelectedRanges([new CellRange(data.row, 0, data.row, this.grid.getColumns().length - 1)]);
+    private handleActiveCellChange({ row }: CellEvent) {
+        if (this.options.selectActiveRow && row != null) {
+            this.setSelectedRanges([new CellRange(row, 0, row, this.grid.getColumns().length - 1)]);
         }
     }
 

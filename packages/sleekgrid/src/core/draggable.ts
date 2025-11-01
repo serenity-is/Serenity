@@ -1,14 +1,17 @@
 // Adapted from https://github.com/6pac/SlickGrid/blob/master/src/slick.interactions.ts to replace jquery.event.drag
 
-export interface DragItem {
+export interface DragPosition {
+    startX: number;
+    startY: number;
+    range: DragRange;
+}
+
+export interface DragItem extends DragPosition {
     dragSource: HTMLElement | Document | null;
     dragHandle: HTMLElement | null;
     deltaX: number;
     deltaY: number;
-    range: DragRange;
     target: HTMLElement;
-    startX: number;
-    startY: number;
 }
 
 export interface DragRange {
@@ -29,11 +32,6 @@ function windowScrollPosition() {
     };
 }
 
-export interface DragPosition {
-    startX: number;
-    startY: number;
-    range: DragRange;
-}
 
 export interface DraggableOption {
     /** container DOM element, defaults to "document" */
@@ -75,7 +73,7 @@ export function Draggable(options: DraggableOption) {
         containerElement = document.body;
     }
 
-    let originaldd: Partial<DragItem> = {
+    let dragData: Partial<DragItem> = {
         dragSource: containerElement,
         dragHandle: null,
     };
@@ -87,9 +85,9 @@ export function Draggable(options: DraggableOption) {
         }
     }
 
-    function executeDragCallbackWhenDefined(callback?: (e: DragEvent, dd: DragItem) => boolean | void, evt?: MouseEvent | Touch | TouchEvent | KeyboardEvent, dd?: DragItem) {
+    function executeDragCallbackWhenDefined(callback?: (e: UIEvent, dragData: DragPosition) => boolean | void, evt?: MouseEvent | TouchEvent | KeyboardEvent, dragData?: Partial<DragPosition>) {
         if (typeof callback === 'function') {
-            return callback(evt as DragEvent, dd);
+            return callback(evt, dragData as DragPosition);
         }
     }
 
@@ -119,15 +117,17 @@ export function Draggable(options: DraggableOption) {
             const targetEvent: MouseEvent | Touch = ((event as TouchEvent)?.touches?.[0] ?? event) as any;
             const { target } = targetEvent;
 
-            if (!options.allowDragFrom || (options.allowDragFrom && (element.matches(options.allowDragFrom)) || (options.allowDragFromClosest && element.closest(options.allowDragFromClosest)))) {
-                originaldd.dragHandle = element as HTMLElement;
+            if (!options.allowDragFrom ||
+                (options.allowDragFrom && (element.matches(options.allowDragFrom)) ||
+                (options.allowDragFromClosest && element.closest(options.allowDragFromClosest)))) {
+                dragData.dragHandle = element as HTMLElement;
                 const winScrollPos = windowScrollPosition();
                 startX = winScrollPos.left + targetEvent.clientX;
                 startY = winScrollPos.top + targetEvent.clientY;
                 deltaX = targetEvent.clientX - targetEvent.clientX;
                 deltaY = targetEvent.clientY - targetEvent.clientY;
-                originaldd = Object.assign(originaldd, { deltaX, deltaY, startX, startY, target });
-                const result = executeDragCallbackWhenDefined(onDragInit as (e: DragEvent, dd: DragPosition) => boolean | void, event, originaldd as DragItem);
+                dragData = Object.assign(dragData, { deltaX, deltaY, startX, startY, target });
+                const result = executeDragCallbackWhenDefined(onDragInit, event, dragData);
 
                 if (result !== false) {
                     document.body.addEventListener('mousemove', userMoved);
@@ -148,13 +148,13 @@ export function Draggable(options: DraggableOption) {
             const { target } = targetEvent;
 
             if (!dragStarted) {
-                originaldd = Object.assign(originaldd, { deltaX, deltaY, startX, startY, target });
-                executeDragCallbackWhenDefined(onDragStart, event, originaldd as DragItem);
+                dragData = Object.assign(dragData, { deltaX, deltaY, startX, startY, target });
+                executeDragCallbackWhenDefined(onDragStart, event, dragData);
                 dragStarted = true;
             }
 
-            originaldd = Object.assign(originaldd, { deltaX, deltaY, startX, startY, target });
-            executeDragCallbackWhenDefined(onDrag, event, originaldd as DragItem);
+            dragData = Object.assign(dragData, { deltaX, deltaY, startX, startY, target });
+            executeDragCallbackWhenDefined(onDrag, event, dragData);
         }
     }
 
@@ -168,8 +168,8 @@ export function Draggable(options: DraggableOption) {
         // trigger a dragEnd event only after dragging started and stopped
         if (dragStarted) {
             const { target } = event;
-            originaldd = Object.assign(originaldd, { target });
-            executeDragCallbackWhenDefined(onDragEnd, event, originaldd as DragItem);
+            dragData = Object.assign(dragData, { target });
+            executeDragCallbackWhenDefined(onDragEnd, event, dragData as DragItem);
             dragStarted = false;
         }
     }

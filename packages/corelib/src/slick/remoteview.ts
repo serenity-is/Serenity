@@ -5,6 +5,36 @@ import { IAggregator } from "./aggregators";
 import { CancellableViewCallback, IRemoteView, PagingInfo, RemoteViewAjaxCallback, RemoteViewFilter, RemoteViewProcessCallback } from "./iremoteview";
 import { GroupInfo, PagingOptions, SummaryOptions } from "./slicktypes";
 
+export interface ArgsDataView {
+    dataView: RemoteView;
+}
+
+export interface ArgsGroupToggle extends ArgsDataView {
+    groupingKey: string;
+    level: number;
+}
+
+export interface ArgsPagingInfo extends ArgsDataView {
+    pagingInfo: PagingInfo;
+}
+
+export interface ArgsRowCountChanged extends ArgsDataView {
+    previous: number;
+    current: number;
+}
+
+export interface ArgsRowsChanged extends ArgsDataView {
+    rows: number[];
+}
+
+export interface ArgsRowsOrCountChanged extends ArgsDataView {
+    rowsDiff: number[];
+    previousRowCount: number;
+    currentRowCount: number;
+    rowCountChanged: boolean;
+    rowsChanged: boolean;
+}
+
 /**
  * A data view that supports remote data loading, sorting, filtering, grouping, and paging.
  * Extends the functionality of SlickGrid's DataView with server-side data operations.
@@ -18,7 +48,7 @@ export class RemoteView<TItem = any> implements IRemoteView<TItem> {
     private errorMessage: string = null;
     private filter: RemoteViewFilter<TItem>;
     private filterCache: any[] = [];
-    private filteredItems: any = [];
+    private filteredItems: any[] = [];
     private grandAggregators: IAggregator[];
     private grandTotals: IGroupTotals;
     private groupingInfos: GroupInfo<TItem>[] = [];
@@ -69,31 +99,31 @@ export class RemoteView<TItem = any> implements IRemoteView<TItem> {
     public onSubmit: CancellableViewCallback<TItem>;
 
     /** Event fired when the underlying data changes */
-    public readonly onDataChanged = new EventEmitter();
+    public readonly onDataChanged = new EventEmitter<ArgsDataView>();
 
     /** Event fired when data loading completes */
-    public readonly onDataLoaded = new EventEmitter();
+    public readonly onDataLoaded = new EventEmitter<ArgsDataView>();
 
     /** Event fired when data loading begins */
-    public readonly onDataLoading = new EventEmitter();
+    public readonly onDataLoading = new EventEmitter<ArgsDataView>();
 
     /** Event fired when a group is collapsed */
-    public readonly onGroupCollapsed = new EventEmitter();
+    public readonly onGroupCollapsed = new EventEmitter<ArgsGroupToggle>();
 
     /** Event fired when a group is expanded */
-    public readonly onGroupExpanded = new EventEmitter();
+    public readonly onGroupExpanded = new EventEmitter<ArgsGroupToggle>();
 
     /** Event fired when paging information changes */
-    public readonly onPagingInfoChanged = new EventEmitter();
+    public readonly onPagingInfoChanged = new EventEmitter<ArgsPagingInfo>();
 
     /** Event fired when the row count changes */
-    public readonly onRowCountChanged = new EventEmitter();
+    public readonly onRowCountChanged = new EventEmitter<ArgsRowCountChanged>();
 
     /** Event fired when specific rows change */
-    public readonly onRowsChanged = new EventEmitter();
+    public readonly onRowsChanged = new EventEmitter<ArgsRowsChanged>();
 
     /** Event fired when rows or count change */
-    public readonly onRowsOrCountChanged = new EventEmitter();
+    public readonly onRowsOrCountChanged = new EventEmitter<ArgsRowsOrCountChanged>();
 
     constructor(options: RemoteViewOptions<TItem>) {
         options ??= {}
@@ -230,7 +260,7 @@ export class RemoteView<TItem = any> implements IRemoteView<TItem> {
             this.refresh();
         }
 
-        this.onDataChanged.notify({ dataView: self }, null, self);
+        this.onDataChanged.notify({ dataView: this }, null, this);
     }
 
     /**
@@ -369,7 +399,7 @@ export class RemoteView<TItem = any> implements IRemoteView<TItem> {
      * Gets the filtered items (after applying the current filter).
      * @returns Array of filtered items
      */
-    public getFilteredItems() {
+    public getFilteredItems(): any[] {
         return this.filteredItems;
     }
 
@@ -750,9 +780,9 @@ export class RemoteView<TItem = any> implements IRemoteView<TItem> {
                 this.groupingInfos[i].collapsed = collapse;
 
                 if (collapse === true) {
-                    this.onGroupCollapsed.notify({ level: i, groupingKey: null });
+                    this.onGroupCollapsed.notify({ level: i, groupingKey: null, dataView: this }, null, this);
                 } else {
-                    this.onGroupExpanded.notify({ level: i, groupingKey: null });
+                    this.onGroupExpanded.notify({ level: i, groupingKey: null, dataView: this }, null, this);
                 }
             }
         } else {
@@ -760,9 +790,9 @@ export class RemoteView<TItem = any> implements IRemoteView<TItem> {
             this.groupingInfos[level].collapsed = collapse;
 
             if (collapse === true) {
-                this.onGroupCollapsed.notify({ level: level, groupingKey: null });
+                this.onGroupCollapsed.notify({ level: level, groupingKey: null, dataView: this }, null, this);
             } else {
-                this.onGroupExpanded.notify({ level: level, groupingKey: null });
+                this.onGroupExpanded.notify({ level: level, groupingKey: null, dataView: this }, null, this);
             }
         }
         this.refresh();
@@ -797,9 +827,9 @@ export class RemoteView<TItem = any> implements IRemoteView<TItem> {
         const opts = this.resolveLevelAndGroupingKey(args);
         this.toggledGroupsByLevel[opts.level][opts.groupingKey] = !this.groupingInfos[opts.level].collapsed !== !collapse;
         if (collapse)
-            this.onGroupCollapsed.notify({ level: opts.level, groupingKey: opts.groupingKey });
+            this.onGroupCollapsed.notify({ level: opts.level, groupingKey: opts.groupingKey, dataView: this }, null, this);
         else
-            this.onGroupExpanded.notify({ level: opts.level, groupingKey: opts.groupingKey });
+            this.onGroupExpanded.notify({ level: opts.level, groupingKey: opts.groupingKey, dataView: this }, null, this);
 
         this.refresh();
     }
@@ -1028,8 +1058,8 @@ export class RemoteView<TItem = any> implements IRemoteView<TItem> {
         return { totalRows: this.filteredItems.length, rows: this.filteredItems };
     }
 
-    private getRowDiffs(rows: any[], newRows: any[]) {
-        let item: any, r: any, eitherIsNonData: boolean, diff: any[] = [];
+    private getRowDiffs(rows: any[], newRows: any[]): number[] {
+        let item: any, r: any, eitherIsNonData: boolean, diff: number[] = [];
         let from = 0, to = newRows.length;
 
         if (this.refreshHints?.ignoreDiffsBefore) {
@@ -1067,7 +1097,7 @@ export class RemoteView<TItem = any> implements IRemoteView<TItem> {
         return diff;
     }
 
-    private recalc(_items: any[]) {
+    private recalc(_items: any[]): number[] {
         this.rowsById = null;
 
         if (this.refreshHints?.isFilterNarrowing != this.prevRefreshHints?.isFilterNarrowing ||
@@ -1116,19 +1146,23 @@ export class RemoteView<TItem = any> implements IRemoteView<TItem> {
         this.refreshHints = {};
 
         if (totalRowsBefore !== this.totalRows) {
-            this.onPagingInfoChanged.notify(this.getPagingInfo(), null, self);
+            this.onPagingInfoChanged.notify({ pagingInfo: this.getPagingInfo(), dataView: this }, null, this);
         }
         if (countBefore !== this.rows.length) {
-            this.onRowCountChanged.notify({ previous: countBefore, current: this.rows.length, dataView: self }, null, self);
+            this.onRowCountChanged.notify({ previous: countBefore, current: this.rows.length, dataView: this }, null, this);
         }
         if (diff.length > 0) {
-            this.onRowsChanged.notify({ rows: diff, dataView: self }, null, self);
+            this.onRowsChanged.notify({ rows: diff, dataView: this }, null, this);
         }
         if (countBefore !== this.rows.length || diff.length > 0) {
             this.onRowsOrCountChanged.notify({
-                rowsDiff: diff, previousRowCount: countBefore, currentRowCount: this.rows.length,
-                rowCountChanged: countBefore !== this.rows.length, rowsChanged: diff.length > 0, dataView: self
-            }, null, self);
+                rowsDiff: diff,
+                previousRowCount: countBefore,
+                currentRowCount: this.rows.length,
+                rowCountChanged: countBefore !== this.rows.length,
+                rowsChanged: diff.length > 0,
+                dataView: this
+            }, null, this);
         }
     }
 
@@ -1151,11 +1185,11 @@ export class RemoteView<TItem = any> implements IRemoteView<TItem> {
      *     access to the full list selected row ids, and not just the ones visible to the grid.
      */
     public syncGridSelection(grid: Grid, preserveHidden?: boolean, preserveHiddenOnSelectionChange?: boolean) {
-        const self = this;
         let inHandler: boolean;;
-        let selectedRowIds = self.mapRowsToIds(grid.getSelectedRows());
+        let selectedRowIds = this.mapRowsToIds(grid.getSelectedRows());
         const onSelectedRowIdsChanged = new EventEmitter();
 
+        const self = this;
         function setSelectedRowIds(this: void, rowIds: any[]) {
             if (selectedRowIds.join(",") == rowIds.join(",")) {
                 return;
@@ -1166,7 +1200,7 @@ export class RemoteView<TItem = any> implements IRemoteView<TItem> {
             onSelectedRowIdsChanged.notify({
                 "grid": grid,
                 "ids": selectedRowIds,
-                "dataView": self
+                "dataView": this
             }, new EventData(), self);
         }
 
@@ -1182,7 +1216,7 @@ export class RemoteView<TItem = any> implements IRemoteView<TItem> {
             }
         }
 
-        grid.onSelectedRowsChanged.subscribe(function (this: void, e: any, args: any) {
+        grid.onSelectedRowsChanged.subscribe(function (this: void) {
             if (inHandler) { return; }
             const newSelectedRowIds = self.mapRowsToIds(grid.getSelectedRows());
             if (!preserveHiddenOnSelectionChange || !grid.getOptions().multiSelect) {
@@ -1271,7 +1305,10 @@ export class RemoteView<TItem = any> implements IRemoteView<TItem> {
 
         if (!data) {
             this.errorMessage = this.errormsg ?? PagerTexts.DefaultLoadError;
-            this.onPagingInfoChanged.notify(this.getPagingInfo());
+            this.onPagingInfoChanged.notify({
+                dataView: this,
+                pagingInfo: this.getPagingInfo()
+            });
             return false;
         }
 
@@ -1288,7 +1325,7 @@ export class RemoteView<TItem = any> implements IRemoteView<TItem> {
 
         this.setItems(data.Entities);
 
-        this.onPagingInfoChanged.notify(this.getPagingInfo());
+        this.onPagingInfoChanged.notify({ pagingInfo: this.getPagingInfo(), dataView: this });
     }
 
     /**
@@ -1311,7 +1348,7 @@ export class RemoteView<TItem = any> implements IRemoteView<TItem> {
                 return false;
         }
 
-        this.onDataLoading.notify(this);
+        this.onDataLoading.notify({ dataView: this });
 
         if (!this.url)
             return false;
@@ -1361,8 +1398,8 @@ export class RemoteView<TItem = any> implements IRemoteView<TItem> {
             },
             onCleanup: function (this: void) {
                 self.loading = false;
-                self.onPagingInfoChanged.notify(self.getPagingInfo());
-                self.onDataLoaded.notify(self);
+                self.onPagingInfoChanged.notify({ pagingInfo: self.getPagingInfo(), dataView: self });
+                self.onDataLoaded.notify({ dataView: self });
             }
         }
 
@@ -1370,13 +1407,13 @@ export class RemoteView<TItem = any> implements IRemoteView<TItem> {
             const ah = this.onAjaxCall(this, serviceOptions);
             if (ah === false) {
                 this.loading = false;
-                this.onPagingInfoChanged.notify(this.getPagingInfo());
+                this.onPagingInfoChanged.notify({ pagingInfo: this.getPagingInfo(), dataView: this });
                 return false;
             }
         }
 
         serviceCall(serviceOptions);
-        this.onPagingInfoChanged.notify(this.getPagingInfo());
+        this.onPagingInfoChanged.notify({ pagingInfo: this.getPagingInfo(), dataView: this });
         this.loading = controller;
     }
 

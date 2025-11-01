@@ -40,12 +40,12 @@ export class GridRowSelectionMixin {
         this.options = null;
     }
 
-    private handleGridClick(e: MouseEvent, p: ArgsCell): void {
+    private handleGridClick(e: Event & Partial<ArgsCell>): void {
         if (!(e.target as HTMLElement).classList.contains('select-item'))
             return;
         const grid = this.grid;
         e.preventDefault();
-        var item = grid.getView().getItem(p.row);
+        var item = grid.getView().getItem(e.row);
         var id = item[this.idField].toString();
 
         if (this.include[id]) {
@@ -62,7 +62,7 @@ export class GridRowSelectionMixin {
         this.updateSelectAll();
     }
 
-    private handleHeaderClick(e: MouseEvent): void {
+    private handleHeaderClick(e: Event): void {
         if (Fluent.isDefaultPrevented(e))
             return;
 

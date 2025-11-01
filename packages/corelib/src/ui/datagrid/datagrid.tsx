@@ -1,5 +1,5 @@
 import { bindThis } from "@serenity-is/sleekdom";
-import { ArgsCell, AutoTooltips, Column, ColumnSort, EventEmitter, FormatterContext, Grid, GridOptions, type IGrid } from "@serenity-is/sleekgrid";
+import { ArgsCell, AutoTooltips, Column, ColumnSort, EventEmitter, FormatterContext, Grid, GridOptions, type CellMouseEvent, type IGrid } from "@serenity-is/sleekgrid";
 import { Authorization, Criteria, DataGridTexts, Fluent, ListResponse, cssEscape, debounce, getInstanceType, getTypeFullName, getjQuery, nsSerenity, tryGetText, type PropertyItem, type PropertyItemsData } from "../../base";
 import { LayoutTimer, ScriptData, getColumnsData, getColumnsDataAsync, setEquality } from "../../compat";
 import { IReadOnly } from "../../interfaces";
@@ -428,8 +428,8 @@ export class DataGrid<TItem, P = {}> extends Widget<P> implements IDataGrid, IRe
             this.persistSettings();
         });
 
-        this.slickGrid.onClick.subscribe((e1: MouseEvent, p1: ArgsCell) => {
-            this.onClick(e1, p1.row, p1.cell);
+        this.slickGrid.onClick.subscribe((e: CellMouseEvent) => {
+            this.onClick(e, e.row, e.cell);
         });
 
         this.slickGrid.onColumnsReordered.subscribe(() => {

@@ -4027,6 +4027,30 @@ export type RemoteViewFilter<TItem> = (item: TItem, view: IRemoteView<TItem>) =>
  * @returns The processed data
  */
 export type RemoteViewProcessCallback<TItem> = (data: ListResponse<TItem>, view: IRemoteView<TItem>) => ListResponse<TItem>;
+export interface ArgsDataView {
+	dataView: RemoteView;
+}
+export interface ArgsGroupToggle extends ArgsDataView {
+	groupingKey: string;
+	level: number;
+}
+export interface ArgsPagingInfo extends ArgsDataView {
+	pagingInfo: PagingInfo;
+}
+export interface ArgsRowCountChanged extends ArgsDataView {
+	previous: number;
+	current: number;
+}
+export interface ArgsRowsChanged extends ArgsDataView {
+	rows: number[];
+}
+export interface ArgsRowsOrCountChanged extends ArgsDataView {
+	rowsDiff: number[];
+	previousRowCount: number;
+	currentRowCount: number;
+	rowCountChanged: boolean;
+	rowsChanged: boolean;
+}
 /**
  * A data view that supports remote data loading, sorting, filtering, grouping, and paging.
  * Extends the functionality of SlickGrid's DataView with server-side data operations.
@@ -4083,23 +4107,23 @@ export declare class RemoteView<TItem = any> implements IRemoteView<TItem> {
 	/** Callback invoked before submitting a request, can cancel the operation */
 	onSubmit: CancellableViewCallback<TItem>;
 	/** Event fired when the underlying data changes */
-	readonly onDataChanged: EventEmitter<any, import("@serenity-is/sleekgrid").IEventData>;
+	readonly onDataChanged: EventEmitter<ArgsDataView, import("@serenity-is/sleekgrid").IEventData>;
 	/** Event fired when data loading completes */
-	readonly onDataLoaded: EventEmitter<any, import("@serenity-is/sleekgrid").IEventData>;
+	readonly onDataLoaded: EventEmitter<ArgsDataView, import("@serenity-is/sleekgrid").IEventData>;
 	/** Event fired when data loading begins */
-	readonly onDataLoading: EventEmitter<any, import("@serenity-is/sleekgrid").IEventData>;
+	readonly onDataLoading: EventEmitter<ArgsDataView, import("@serenity-is/sleekgrid").IEventData>;
 	/** Event fired when a group is collapsed */
-	readonly onGroupCollapsed: EventEmitter<any, import("@serenity-is/sleekgrid").IEventData>;
+	readonly onGroupCollapsed: EventEmitter<ArgsGroupToggle, import("@serenity-is/sleekgrid").IEventData>;
 	/** Event fired when a group is expanded */
-	readonly onGroupExpanded: EventEmitter<any, import("@serenity-is/sleekgrid").IEventData>;
+	readonly onGroupExpanded: EventEmitter<ArgsGroupToggle, import("@serenity-is/sleekgrid").IEventData>;
 	/** Event fired when paging information changes */
-	readonly onPagingInfoChanged: EventEmitter<any, import("@serenity-is/sleekgrid").IEventData>;
+	readonly onPagingInfoChanged: EventEmitter<ArgsPagingInfo, import("@serenity-is/sleekgrid").IEventData>;
 	/** Event fired when the row count changes */
-	readonly onRowCountChanged: EventEmitter<any, import("@serenity-is/sleekgrid").IEventData>;
+	readonly onRowCountChanged: EventEmitter<ArgsRowCountChanged, import("@serenity-is/sleekgrid").IEventData>;
 	/** Event fired when specific rows change */
-	readonly onRowsChanged: EventEmitter<any, import("@serenity-is/sleekgrid").IEventData>;
+	readonly onRowsChanged: EventEmitter<ArgsRowsChanged, import("@serenity-is/sleekgrid").IEventData>;
 	/** Event fired when rows or count change */
-	readonly onRowsOrCountChanged: EventEmitter<any, import("@serenity-is/sleekgrid").IEventData>;
+	readonly onRowsOrCountChanged: EventEmitter<ArgsRowsOrCountChanged, import("@serenity-is/sleekgrid").IEventData>;
 	constructor(options: RemoteViewOptions<TItem>);
 	/** Default configuration for grouping information */
 	static readonly groupingInfoDefaults: GroupInfo<any>;
@@ -4171,7 +4195,7 @@ export declare class RemoteView<TItem = any> implements IRemoteView<TItem> {
 	 * Gets the filtered items (after applying the current filter).
 	 * @returns Array of filtered items
 	 */
-	getFilteredItems(): any;
+	getFilteredItems(): any[];
 	/**
 	 * Gets the current filter function.
 	 * @returns The current filter function

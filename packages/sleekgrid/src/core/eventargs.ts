@@ -1,12 +1,21 @@
-import type { CellStylesHash, Column, Editor, ValidationResult } from ".";
+import type { CellStylesHash, Column, Editor, IEventData, ValidationResult } from ".";
+import type { DragPosition } from "./draggable";
 import type { IGrid } from "./igrid";
 
 export interface ArgsGrid {
-    grid?: IGrid;
+    grid: IGrid;
 }
 
 export interface ArgsColumn extends ArgsGrid {
     column: Column;
+}
+
+export interface ArgsDrag extends ArgsGrid, DragPosition {
+    mode: string;
+    row: number;
+    cell: number;
+    item: any;
+    helper: HTMLElement;
 }
 
 export interface ArgsColumnNode extends ArgsColumn {
@@ -20,16 +29,16 @@ export type ArgsSortCol = {
 
 export interface ArgsSort extends ArgsGrid {
     multiColumnSort: boolean;
-    sortAsc?: boolean;
-    sortCol?: Column;
-    sortCols?: ArgsSortCol[];
+    sortAsc: boolean;
+    sortCol: Column;
+    sortCols: ArgsSortCol[];
 }
 
 export interface ArgsSelectedRowsChange extends ArgsGrid {
     rows: number[];
-    changedSelectedRows?: number[];
-    changedUnselectedRows?: number[];
-    previousSelectedRows?: number[];
+    changedSelectedRows: number[];
+    changedUnselectedRows: number[];
+    previousSelectedRows: number[];
     caller: any;
 }
 
@@ -70,3 +79,18 @@ export interface ArgsValidationError extends ArgsCell {
     cellNode: HTMLElement;
     validationResults: ValidationResult;
 }
+
+export type CellEvent = IEventData & ArgsCell;
+export type CellKeyboardEvent = KeyboardEvent & ArgsCell;
+export type CellMouseEvent = MouseEvent & ArgsCell;
+export type HeaderColumnEvent = IEventData & ArgsColumn;
+export type HeaderMouseEvent = MouseEvent & ArgsColumn;
+export type HeaderRenderEvent = IEventData & ArgsColumnNode;
+export type FooterColumnEvent = HeaderColumnEvent;
+export type FooterMouseEvent = HeaderMouseEvent;
+export type FooterRenderEvent = HeaderRenderEvent;
+export type GridEvent = IEventData & ArgsGrid;
+export type GridDragEvent = UIEvent & ArgsDrag;
+export type GridMouseEvent = MouseEvent & ArgsGrid;
+
+

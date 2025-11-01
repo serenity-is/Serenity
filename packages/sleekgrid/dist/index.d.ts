@@ -50,6 +50,7 @@ export interface IEventData {
 export declare class EventData implements IEventData {
 	private _isPropagationStopped;
 	private _isImmediatePropagationStopped;
+	defaultPrevented?: boolean;
 	/***
 	 * Stops event from propagating up the DOM tree.
 	 */
@@ -78,12 +79,12 @@ export declare class EventEmitter<TArgs = any, TEventData extends IEventData = I
 	 * object the event was fired with.<p>
 	 * @param fn {Function} Event handler.
 	 */
-	subscribe(fn: ((e: TEventData, args: TArgs) => void)): void;
+	subscribe(fn: ((e: TEventData & TArgs, args?: TArgs) => void)): void;
 	/***
 	 * Removes an event handler added with <code>subscribe(fn)</code>.
 	 * @param fn {Function} Event handler to be removed.
 	 */
-	unsubscribe(fn: ((e: TEventData, args: TArgs) => void)): void;
+	unsubscribe(fn: ((e: TEventData & TArgs, args?: TArgs) => void)): void;
 	/***
 	 * Fires an event notifying all subscribers.
 	 * @param args {Object} Additional data object to be passed to all handlers.
@@ -96,13 +97,13 @@ export declare class EventEmitter<TArgs = any, TEventData extends IEventData = I
 	 *      The scope ("this") within which the handler will be executed.
 	 *      If not specified, the scope will be set to the <code>Event</code> instance.
 	 */
-	notify(args?: any, e?: TEventData, scope?: object): any;
+	notify(args?: TArgs, e?: TEventData, scope?: object): any;
 	clear(): void;
 }
 export declare class EventSubscriber<TArgs = any, TEventData extends IEventData = IEventData> {
 	private _handlers;
-	subscribe(event: EventEmitter<TArgs, TEventData>, handler: ((e: TEventData, args: TArgs) => void)): this;
-	unsubscribe(event: EventEmitter<TArgs, TEventData>, handler: ((e: TEventData, args: TArgs) => void)): this;
+	subscribe(event: EventEmitter<TArgs, TEventData>, handler: ((e: TEventData & TArgs, args?: TArgs) => void)): this;
+	unsubscribe(event: EventEmitter<TArgs, TEventData>, handler: ((e: TEventData & TArgs, args?: TArgs) => void)): this;
 	unsubscribeAll(): EventSubscriber<TArgs, TEventData>;
 }
 /** @deprecated */
@@ -512,6 +513,21 @@ export interface ItemMetadata<TItem = any> {
 }
 export declare function initializeColumns(columns: Column[], defaults: Partial<Column<any>>): void;
 export declare function titleize(str: string): string;
+export interface DragPosition {
+	startX: number;
+	startY: number;
+	range: DragRange;
+}
+export interface DragRange {
+	start: {
+		row?: number;
+		cell?: number;
+	};
+	end: {
+		row?: number;
+		cell?: number;
+	};
+}
 export type CellNavigationDirection = "up" | "down" | "left" | "right" | "next" | "prev" | "home" | "end";
 export interface CellNavigation {
 	navigateBottom(): void;
@@ -957,10 +973,10 @@ export interface IGrid<TItem = any> extends CellNavigation, EditorHost, GridPlug
 	readonly onColumnsResized: EventEmitter<ArgsGrid, IEventData>;
 	readonly onContextMenu: EventEmitter<ArgsGrid, UIEvent>;
 	readonly onDblClick: EventEmitter<ArgsCell, MouseEvent>;
-	readonly onDrag: EventEmitter<ArgsGrid, UIEvent>;
-	readonly onDragEnd: EventEmitter<ArgsGrid, UIEvent>;
-	readonly onDragInit: EventEmitter<ArgsGrid, UIEvent>;
-	readonly onDragStart: EventEmitter<ArgsGrid, UIEvent>;
+	readonly onDrag: EventEmitter<ArgsDrag, UIEvent>;
+	readonly onDragEnd: EventEmitter<ArgsDrag, UIEvent>;
+	readonly onDragInit: EventEmitter<ArgsDrag, UIEvent>;
+	readonly onDragStart: EventEmitter<ArgsDrag, UIEvent>;
 	readonly onFooterRowCellRendered: EventEmitter<ArgsColumnNode, IEventData>;
 	readonly onHeaderCellRendered: EventEmitter<ArgsColumnNode, IEventData>;
 	readonly onHeaderClick: EventEmitter<ArgsColumn, IEventData>;
@@ -1105,10 +1121,17 @@ export interface IGrid<TItem = any> extends CellNavigation, EditorHost, GridPlug
 	updateRowCount(): void;
 }
 export interface ArgsGrid {
-	grid?: IGrid;
+	grid: IGrid;
 }
 export interface ArgsColumn extends ArgsGrid {
 	column: Column;
+}
+export interface ArgsDrag extends ArgsGrid, DragPosition {
+	mode: string;
+	row: number;
+	cell: number;
+	item: any;
+	helper: HTMLElement;
 }
 export interface ArgsColumnNode extends ArgsColumn {
 	node: HTMLElement;
@@ -1119,15 +1142,15 @@ export type ArgsSortCol = {
 };
 export interface ArgsSort extends ArgsGrid {
 	multiColumnSort: boolean;
-	sortAsc?: boolean;
-	sortCol?: Column;
-	sortCols?: ArgsSortCol[];
+	sortAsc: boolean;
+	sortCol: Column;
+	sortCols: ArgsSortCol[];
 }
 export interface ArgsSelectedRowsChange extends ArgsGrid {
 	rows: number[];
-	changedSelectedRows?: number[];
-	changedUnselectedRows?: number[];
-	previousSelectedRows?: number[];
+	changedSelectedRows: number[];
+	changedUnselectedRows: number[];
+	previousSelectedRows: number[];
 	caller: any;
 }
 export interface ArgsScroll extends ArgsGrid {
@@ -1160,6 +1183,18 @@ export interface ArgsValidationError extends ArgsCell {
 	cellNode: HTMLElement;
 	validationResults: ValidationResult;
 }
+export type CellEvent = IEventData & ArgsCell;
+export type CellKeyboardEvent = KeyboardEvent & ArgsCell;
+export type CellMouseEvent = MouseEvent & ArgsCell;
+export type HeaderColumnEvent = IEventData & ArgsColumn;
+export type HeaderMouseEvent = MouseEvent & ArgsColumn;
+export type HeaderRenderEvent = IEventData & ArgsColumnNode;
+export type FooterColumnEvent = HeaderColumnEvent;
+export type FooterMouseEvent = HeaderMouseEvent;
+export type FooterRenderEvent = HeaderRenderEvent;
+export type GridEvent = IEventData & ArgsGrid;
+export type GridDragEvent = UIEvent & ArgsDrag;
+export type GridMouseEvent = MouseEvent & ArgsGrid;
 export interface IDataView<TItem = any> {
 	/** Gets the grand totals for all aggregated data. */
 	getGrandTotals(): IGroupTotals;
@@ -1333,14 +1368,14 @@ export declare class Grid<TItem = any> implements IGrid<TItem> {
 	readonly onCompositeEditorChange: EventEmitter<ArgsGrid, IEventData>;
 	readonly onContextMenu: EventEmitter<ArgsGrid, UIEvent>;
 	readonly onDblClick: EventEmitter<ArgsCell, MouseEvent>;
-	readonly onDrag: EventEmitter<ArgsGrid, UIEvent>;
-	readonly onDragEnd: EventEmitter<ArgsGrid, UIEvent>;
-	readonly onDragInit: EventEmitter<ArgsGrid, UIEvent>;
-	readonly onDragStart: EventEmitter<ArgsGrid, UIEvent>;
+	readonly onDrag: EventEmitter<ArgsDrag, UIEvent>;
+	readonly onDragEnd: EventEmitter<ArgsDrag, UIEvent>;
+	readonly onDragInit: EventEmitter<ArgsDrag, UIEvent>;
+	readonly onDragStart: EventEmitter<ArgsDrag, UIEvent>;
 	readonly onFooterRowCellRendered: EventEmitter<ArgsColumnNode, IEventData>;
 	readonly onHeaderCellRendered: EventEmitter<ArgsColumnNode, IEventData>;
-	readonly onHeaderClick: EventEmitter<ArgsColumn, IEventData>;
-	readonly onHeaderContextMenu: EventEmitter<ArgsColumn, IEventData>;
+	readonly onHeaderClick: EventEmitter<ArgsColumn, MouseEvent>;
+	readonly onHeaderContextMenu: EventEmitter<ArgsColumn, MouseEvent>;
 	readonly onHeaderMouseEnter: EventEmitter<ArgsColumn, MouseEvent>;
 	readonly onHeaderMouseLeave: EventEmitter<ArgsColumn, MouseEvent>;
 	readonly onHeaderRowCellRendered: EventEmitter<ArgsColumnNode, IEventData>;
@@ -1758,8 +1793,8 @@ export declare class GroupItemMetadataProvider implements GridPlugin {
 	destroy(): void;
 	getOptions(): GroupItemMetadataProviderOptions;
 	setOptions(value: GroupItemMetadataProviderOptions): void;
-	handleGridClick: (e: MouseEvent, args: ArgsCell) => void;
-	handleGridKeyDown: (e: KeyboardEvent, args: ArgsCell) => void;
+	handleGridClick: (e: CellMouseEvent) => void;
+	handleGridKeyDown: (e: CellKeyboardEvent) => void;
 	groupCellPosition: () => {
 		cell: number;
 		colspan: (number | "*");

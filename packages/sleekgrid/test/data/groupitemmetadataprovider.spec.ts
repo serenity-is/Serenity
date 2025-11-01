@@ -1,4 +1,4 @@
-import { ColumnFormat, CompatFormatter, formatterContext as ctx, Group } from "../../src/core";
+import { ColumnFormat, CompatFormatter, formatterContext as ctx, Group, type IGrid } from "../../src/core";
 import { GroupItemMetadataProvider } from "../../src/data/groupitemmetadataprovider";
 
 describe("GroupItemMetadataProvider.defaults", () => {
@@ -139,7 +139,7 @@ describe("GroupItemMetadataProvider.setOptions", () => {
     });
 });
 
-function mockEvent() {
+function mockEvent(args: any) {
     var ev = {
         stopImmediatePropagationCalls: 0,
         stopImmediatePropagation: function() {
@@ -164,7 +164,8 @@ function mockEvent() {
                     ev.target.classNames.splice(idx, 1);
                 }
             }
-        }
+        },
+        ...args
     }
     return ev;
 }
@@ -265,8 +266,8 @@ describe("GroupItemMetadataProvider.handleGridClick", () => {
     it("ignores when args does not include grid", () => {
         var plugin = new GroupItemMetadataProvider();
         var grid = mockGrid();
-        var event = mockEvent();
-        plugin.handleGridClick(event as any, {} as any);
+        var event = mockEvent({});
+        plugin.handleGridClick(event);
         expect(grid.getDataItemCalls).toBe(0);
         expect(event.stopImmediatePropagationCalls).toBe(0);
         expect(event.preventDefaultCalls).toBe(0);
@@ -275,9 +276,9 @@ describe("GroupItemMetadataProvider.handleGridClick", () => {
     it("uses initializing grid when args does not include grid", () => {
         var plugin = new GroupItemMetadataProvider();
         var grid = mockGrid();
-        var event = mockEvent();
+        var event = mockEvent({ row: -1 });
         plugin.init(grid);
-        plugin.handleGridClick(event as any, { row: -1 } as any);
+        plugin.handleGridClick(event);
         expect(grid.getDataItemCalls).toBe(1);
         expect(event.stopImmediatePropagationCalls).toBe(0);
         expect(event.preventDefaultCalls).toBe(0);
@@ -286,9 +287,9 @@ describe("GroupItemMetadataProvider.handleGridClick", () => {
     it("ignores when no item for args.row", () => {
         var plugin = new GroupItemMetadataProvider();
         var grid = mockGrid();
-        var event = mockEvent();
+        var event = mockEvent({ row: -1 });
         plugin.init(grid);
-        plugin.handleGridClick(event as any, { row: -1 } as any);
+        plugin.handleGridClick(event);
         expect(grid.getDataItemCalls).toBe(1);
         expect(event.stopImmediatePropagationCalls).toBe(0);
         expect(event.preventDefaultCalls).toBe(0);
@@ -297,9 +298,9 @@ describe("GroupItemMetadataProvider.handleGridClick", () => {
     it("ignores when item at args.row is not an instance of Group", () => {
         var plugin = new GroupItemMetadataProvider();
         var grid = mockGrid();
-        var event = mockEvent();
+        var event = mockEvent({ row: 333 });
         plugin.init(grid);
-        plugin.handleGridClick(event as any, { row: 333 } as any);
+        plugin.handleGridClick(event);
         expect(grid.getDataItemCalls).toBe(1);
         expect(event.stopImmediatePropagationCalls).toBe(0);
         expect(event.preventDefaultCalls).toBe(0);
@@ -308,10 +309,10 @@ describe("GroupItemMetadataProvider.handleGridClick", () => {
     it("ignores when event target does not contain toggle class", () => {
         var plugin = new GroupItemMetadataProvider();
         var grid = mockGrid();
-        var event = mockEvent();
+        var event = mockEvent({ row: 1 });
         event.target.classNames = ["xyz"];
         plugin.init(grid);
-        plugin.handleGridClick(event as any, { row: 1 } as any);
+        plugin.handleGridClick(event);
         expect(grid.getDataItemCalls).toBe(1);
         expect(event.stopImmediatePropagationCalls).toBe(0);
         expect(event.preventDefaultCalls).toBe(0);
@@ -320,9 +321,9 @@ describe("GroupItemMetadataProvider.handleGridClick", () => {
     it("calls stopImmediatePropagation, preventDefault and setRefreshHints", () => {
         var plugin = new GroupItemMetadataProvider();
         var grid = mockGrid();
-        var event = mockEvent();
+        var event = mockEvent({ row: 1 });
         plugin.init(grid);
-        plugin.handleGridClick(event as any, { row: 1 } as any);
+        plugin.handleGridClick(event);
         expect(grid.getDataItemCalls).toBe(1);
         expect(event.stopImmediatePropagationCalls).toBe(1);
         expect(event.preventDefaultCalls).toBe(1);
@@ -333,9 +334,9 @@ describe("GroupItemMetadataProvider.handleGridClick", () => {
     it("calls stopImmediatePropagation, preventDefault and setRefreshHints", () => {
         var plugin = new GroupItemMetadataProvider();
         var grid = mockGrid();
-        var event = mockEvent();
+        var event = mockEvent({ row: 1 });
         plugin.init(grid);
-        plugin.handleGridClick(event as any, { row: 1 } as any);
+        plugin.handleGridClick(event);
         expect(grid.getDataItemCalls).toBe(1);
         expect(event.stopImmediatePropagationCalls).toBe(1);
         expect(event.preventDefaultCalls).toBe(1);
@@ -346,9 +347,9 @@ describe("GroupItemMetadataProvider.handleGridClick", () => {
     it("calls expandGroup if collapsed is true", () => {
         var plugin = new GroupItemMetadataProvider();
         var grid = mockGrid();
-        var event = mockEvent();
+        var event = mockEvent({ row: 1 });
         plugin.init(grid);
-        plugin.handleGridClick(event as any, { row: 1 } as any);
+        plugin.handleGridClick(event);
         expect(grid.__data.collapseGroupCalls.length).toBe(0);
         expect(grid.__data.expandGroupCalls.length).toBe(1);
         expect(grid.__data.expandGroupCalls[0]).toBe("gk1");
@@ -357,9 +358,9 @@ describe("GroupItemMetadataProvider.handleGridClick", () => {
     it("calls collapseGroup if collapsed is falsy", () => {
         var plugin = new GroupItemMetadataProvider();
         var grid = mockGrid();
-        var event = mockEvent();
+        var event = mockEvent({ row: 3 });
         plugin.init(grid);
-        plugin.handleGridClick(event as any, { row: 3 } as any);
+        plugin.handleGridClick(event);
         expect(grid.__data.expandGroupCalls.length).toBe(0);
         expect(grid.__data.collapseGroupCalls.length).toBe(1);
         expect(grid.__data.collapseGroupCalls[0]).toBe("gk3");

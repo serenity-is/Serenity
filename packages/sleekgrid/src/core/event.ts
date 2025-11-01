@@ -19,6 +19,7 @@ export interface IEventData {
 export class EventData implements IEventData {
     private _isPropagationStopped = false;
     private _isImmediatePropagationStopped = false;
+    declare defaultPrevented?: boolean;
 
     /***
      * Stops event from propagating up the DOM tree.
@@ -54,7 +55,7 @@ export class EventData implements IEventData {
  */
 export class EventEmitter<TArgs = any, TEventData extends IEventData = IEventData> {
 
-    private _handlers: ((e: TEventData, args: TArgs) => void)[] = [];
+    private _handlers: ((e: TEventData & TArgs, args?: TArgs) => void)[] = [];
 
     /***
      * Adds an event handler to be called when the event is fired.
@@ -62,7 +63,7 @@ export class EventEmitter<TArgs = any, TEventData extends IEventData = IEventDat
      * object the event was fired with.<p>
      * @param fn {Function} Event handler.
      */
-    subscribe(fn: ((e: TEventData, args: TArgs) => void)) {
+    subscribe(fn: ((e: TEventData & TArgs, args?: TArgs) => void)) {
         this._handlers.push(fn);
     }
 
@@ -70,7 +71,7 @@ export class EventEmitter<TArgs = any, TEventData extends IEventData = IEventDat
      * Removes an event handler added with <code>subscribe(fn)</code>.
      * @param fn {Function} Event handler to be removed.
      */
-    unsubscribe(fn: ((e: TEventData, args: TArgs) => void)) {
+    unsubscribe(fn: ((e: TEventData & TArgs, args?: TArgs) => void)) {
         for (var i = this._handlers.length - 1; i >= 0; i--) {
             if (this._handlers[i] === fn) {
                 this._handlers.splice(i, 1);
@@ -90,16 +91,28 @@ export class EventEmitter<TArgs = any, TEventData extends IEventData = IEventDat
      *      The scope ("this") within which the handler will be executed.
      *      If not specified, the scope will be set to the <code>Event</code> instance.
      */
-    notify(args?: any, e?: TEventData, scope?: object) {
-        e = patchEvent(e) || new EventData() as any;
+    notify(args?: TArgs, e?: TEventData, scope?: object): any {
+        const event = (patchEvent(e) || new EventData()) as TEventData & TArgs;
+
+        if (args != null) {
+            for (let key in args) {
+                if (args.hasOwnProperty(key) && !(key in event)) {
+                    Object.defineProperty(event, key, {
+                        get: () => args[key],
+                        set: (value) => { args[key] = value; },
+                        enumerable: true,
+                        configurable: true
+                    });
+                }
+            }
+        }
         scope = scope || this;
 
-        var returnValue;
-        for (var i = 0; i < this._handlers.length && !(e.isPropagationStopped() || e.isImmediatePropagationStopped()); i++) {
-            returnValue = this._handlers[i].call(scope, e, args);
+        var lastReturnValue; // for compatibility, not used
+        for (var i = 0; i < this._handlers.length && !(event.isPropagationStopped() || event.isImmediatePropagationStopped()); i++) {
+            lastReturnValue = this._handlers[i].call(scope, event, args);
         }
-
-        return returnValue;
+        return lastReturnValue;
     }
 
     clear() {
@@ -115,7 +128,7 @@ interface EventSubscriberEntry<TArgs = any, TEventData extends IEventData = IEve
 export class EventSubscriber<TArgs = any, TEventData extends IEventData = IEventData> {
     private _handlers: EventSubscriberEntry<TArgs, TEventData>[] = [];
 
-    subscribe(event: EventEmitter<TArgs, TEventData>, handler: ((e: TEventData, args: TArgs) => void)): this {
+    subscribe(event: EventEmitter<TArgs, TEventData>, handler: ((e: TEventData & TArgs, args?: TArgs) => void)): this {
         this._handlers.push({
             event: event,
             handler: handler
@@ -125,7 +138,7 @@ export class EventSubscriber<TArgs = any, TEventData extends IEventData = IEvent
         return this;
     }
 
-    unsubscribe(event: EventEmitter<TArgs, TEventData>, handler: ((e: TEventData, args: TArgs) => void)): this {
+    unsubscribe(event: EventEmitter<TArgs, TEventData>, handler: ((e: TEventData & TArgs, args?: TArgs) => void)): this {
         var i = this._handlers.length;
         while (i--) {
             if (this._handlers[i].event === event &&
@@ -181,7 +194,17 @@ export function patchEvent(e: IEventData) {
     if (e == null)
         return e;
 
-    if (!e.isDefaultPrevented && e.preventDefault)
+    if (!("defaultPrevented" in e) && e.isDefaultPrevented) {
+        Object.defineProperty(e, "defaultPrevented", {
+            get: function () {
+                return e.isDefaultPrevented();
+            },
+            writable: true,
+            enumerable: true,
+            configurable: true
+        });
+    }
+    else if (!e.isDefaultPrevented && e.preventDefault)
         e.isDefaultPrevented = function () { return this.defaultPrevented; }
 
     var org1: () => void, org2: () => void;

@@ -191,7 +191,7 @@ describe('EventEmitter', () => {
         expect(callCount).toBe(1);
     });
 
-    it('notify returns last handlers returned value', () => {
+    it('notify returns last handlers returned value for compatibility', () => {
         const event = new EventEmitter();
         let callCount = 0;
 

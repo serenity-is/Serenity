@@ -1,4 +1,4 @@
-import { applyFormatterResultToCellNode, Column, ColumnFormat, CompatFormatter, convertCompatFormatter, FormatterContext, FormatterResult, Group, IGroupTotals, ItemMetadata, type ArgsCell, type IGrid, type GridPlugin } from "../core";
+import { applyFormatterResultToCellNode, Column, ColumnFormat, CompatFormatter, convertCompatFormatter, FormatterContext, FormatterResult, Group, IGroupTotals, ItemMetadata, type CellKeyboardEvent, type CellMouseEvent, type GridPlugin, type IGrid } from "../core";
 
 export interface GroupItemMetadataProviderOptions {
     enableExpandCollapse?: boolean;
@@ -121,11 +121,11 @@ export class GroupItemMetadataProvider implements GridPlugin {
         Object.assign(this.options, value);
     }
 
-    handleGridClick = (e: MouseEvent, args: ArgsCell) => {
-        let grid = args?.grid ?? this.grid;
+    handleGridClick = (e: CellMouseEvent) => {
+        let grid = e?.grid ?? this.grid;
         if (!grid)
             return;
-        var item = grid.getDataItem(args.row);
+        var item = grid.getDataItem(e.row);
         if (!item ||
             !(item instanceof Group) ||
             !this.options.toggleCssClass ||
@@ -147,12 +147,12 @@ export class GroupItemMetadataProvider implements GridPlugin {
             grid.getData().collapseGroup?.(item.groupingKey);
     }
 
-    handleGridKeyDown = (e: KeyboardEvent, args: ArgsCell) => {
+    handleGridKeyDown = (e: CellKeyboardEvent) => {
         if (!this.options.enableExpandCollapse ||
             (e.key !== " " && e.key !== "-" && e.key !== "+"))
             return;
 
-        let grid = args?.grid ?? this.grid;
+        let grid = e?.grid ?? this.grid;
         if (!grid)
             return;
 
