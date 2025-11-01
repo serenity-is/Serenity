@@ -5,7 +5,7 @@ import { columnDefaults, initializeColumns, type Column, type ColumnMetadata, ty
 import { Draggable, type DragPosition } from "../core/draggable";
 import type { EditCommand, EditController, Editor, EditorClass, EditorLock, Position, RowCell } from "../core/editing";
 import { EventData, EventEmitter, type IEventData } from "../core/event";
-import type { ArgsAddNewRow, ArgsCell, ArgsCellChange, ArgsCellEdit, ArgsColumn, ArgsColumnNode, ArgsCssStyle, ArgsDrag, ArgsEditorDestroy, ArgsGrid, ArgsScroll, ArgsSelectedRowsChange, ArgsSort, ArgsValidationError } from "../core/eventargs";
+import type { ArgsAddNewRow, ArgsCell, ArgsCellChange, ArgsCellEdit, ArgsColumn, ArgsColumnNode, ArgsCssStyle, ArgsEditorDestroy, ArgsGrid, ArgsScroll, ArgsSelectedRowsChange, ArgsSort, ArgsValidationError, DragData } from "../core/eventargs";
 import { applyFormatterResultToCellNode, convertCompatFormatter, defaultColumnFormat, formatterContext, type CellStylesHash, type ColumnFormat, type FormatterContext, type FormatterResult } from "../core/formatting";
 import type { GridPlugin } from "../core/grid-plugin";
 import type { GridSignals } from "../core/grid-signals";
@@ -140,10 +140,10 @@ export class Grid<TItem = any> implements IGrid<TItem> {
     readonly onCompositeEditorChange = new EventEmitter<ArgsGrid>();
     readonly onContextMenu = new EventEmitter<ArgsGrid, UIEvent>();
     readonly onDblClick = new EventEmitter<ArgsCell, MouseEvent>();
-    readonly onDrag = new EventEmitter<ArgsDrag, UIEvent>();
-    readonly onDragEnd = new EventEmitter<ArgsDrag, UIEvent>();
-    readonly onDragInit = new EventEmitter<ArgsDrag, UIEvent>();
-    readonly onDragStart = new EventEmitter<ArgsDrag, UIEvent>();
+    readonly onDrag = new EventEmitter<ArgsGrid, UIEvent & { dragData: DragData }>();
+    readonly onDragEnd = new EventEmitter<ArgsGrid, UIEvent & { dragData: DragData }>();
+    readonly onDragInit = new EventEmitter<ArgsGrid, UIEvent & { dragData: DragData }>();
+    readonly onDragStart = new EventEmitter<ArgsGrid, UIEvent & { dragData: DragData }>();
     readonly onFooterRowCellRendered = new EventEmitter<ArgsColumnNode>();
     readonly onHeaderCellRendered = new EventEmitter<ArgsColumnNode>();
     readonly onHeaderClick = new EventEmitter<ArgsColumn, MouseEvent>();
@@ -2837,10 +2837,11 @@ export class Grid<TItem = any> implements IGrid<TItem> {
             return false;
         }
 
-        this._trigger(this.onDragInit, dd as ArgsDrag, e);
+        (e as any).dragData = dd;
+        const retval = this._trigger(this.onDragInit as any, dd, e, false);
         if ((e as IEventData).isImmediatePropagationStopped && (e as IEventData).isImmediatePropagationStopped()) {
             e.preventDefault();
-            return true;
+            return retval;
         }
 
         // if nobody claims to be handling drag'n'drop by stopping immediate propagation,
@@ -2854,7 +2855,8 @@ export class Grid<TItem = any> implements IGrid<TItem> {
             return false;
         }
 
-        this._trigger(this.onDragStart, dd as ArgsDrag, e);
+        (e as any).dragData = dd;
+        this._trigger(this.onDragStart as any, dd, e, false);
         if ((e as IEventData).isImmediatePropagationStopped && (e as IEventData).isImmediatePropagationStopped()) {
             return true
         }
@@ -2862,12 +2864,14 @@ export class Grid<TItem = any> implements IGrid<TItem> {
         return false;
     }
 
-    private handleDrag(e: DragEvent & { dragData: DragPosition }): any {
-        return this._trigger(this.onDrag, null, e);
+    private handleDrag(e: DragEvent, dd: DragPosition): any {
+        (e as any).dragData = dd;
+        return this._trigger(this.onDrag as any, dd, e, false);
     }
 
-    private handleDragEnd(e: DragEvent & { dragData: DragPosition }): void {
-        this._trigger(this.onDragEnd, null, e);
+    private handleDragEnd(e: DragEvent, dd: DragPosition): void {
+        (e as any).dragData = dd;
+        this._trigger(this.onDragEnd as any, dd, e, false);
     }
 
     private handleKeyDown(e: KeyboardEvent): void {

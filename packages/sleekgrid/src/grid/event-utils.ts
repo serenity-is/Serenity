@@ -3,10 +3,15 @@ import type { ArgsGrid } from "../core/eventargs";
 import type { IGrid } from "../core/igrid";
 
 export function triggerGridEvent<TArgs extends ArgsGrid, TEventData extends IEventData = IEventData>(this: IGrid,
-    evt: EventEmitter<TArgs, TEventData>, args?: Omit<TArgs, "grid">, e?: TEventData): any {
+    evt: EventEmitter<TArgs, TEventData>, args?: Omit<TArgs, "grid">, e?: TEventData, mergeArgs = true): any {
     args ??= {} as any;
     (args as TArgs).grid = this;
-    return evt.notify(args as TArgs, e, this);
+    if (!mergeArgs && e) {
+        e ??= {} as TEventData;
+        (e as any).grid = this;
+    }
+
+    return evt.notify(args as TArgs, e, this, mergeArgs);
 }
 
 export function addListener<K extends keyof HTMLElementEventMap>(this: {

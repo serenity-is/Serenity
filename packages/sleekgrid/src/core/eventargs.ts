@@ -1,5 +1,5 @@
 import type { CellStylesHash, Column, Editor, IEventData, ValidationResult } from ".";
-import type { DragPosition } from "./draggable";
+import type { DragItem, DragPosition } from "./draggable";
 import type { IGrid } from "./igrid";
 
 export interface ArgsGrid {
@@ -10,7 +10,7 @@ export interface ArgsColumn extends ArgsGrid {
     column: Column;
 }
 
-export interface ArgsDrag extends ArgsGrid, DragPosition {
+export interface DragData extends DragItem {
     mode: string;
     row: number;
     cell: number;
@@ -90,7 +90,7 @@ export type FooterColumnEvent = HeaderColumnEvent;
 export type FooterMouseEvent = HeaderMouseEvent;
 export type FooterRenderEvent = HeaderRenderEvent;
 export type GridEvent = IEventData & ArgsGrid;
-export type GridDragEvent = UIEvent & ArgsDrag;
+export type GridDragEvent = UIEvent & { dragData: DragData };
 export type GridMouseEvent = MouseEvent & ArgsGrid;
 
 

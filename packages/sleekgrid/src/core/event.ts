@@ -91,10 +91,10 @@ export class EventEmitter<TArgs = any, TEventData extends IEventData = IEventDat
      *      The scope ("this") within which the handler will be executed.
      *      If not specified, the scope will be set to the <code>Event</code> instance.
      */
-    notify(args?: TArgs, e?: TEventData, scope?: object): any {
+    notify(args?: TArgs, e?: TEventData, scope?: object, mergeArgs = true): any {
         const event = (patchEvent(e) || new EventData()) as TEventData & TArgs;
 
-        if (args != null) {
+        if (args != null && mergeArgs) {
             for (let key in args) {
                 if (args.hasOwnProperty(key) && !(key in event)) {
                     Object.defineProperty(event, key, {

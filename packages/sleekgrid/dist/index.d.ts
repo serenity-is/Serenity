@@ -97,7 +97,7 @@ export declare class EventEmitter<TArgs = any, TEventData extends IEventData = I
 	 *      The scope ("this") within which the handler will be executed.
 	 *      If not specified, the scope will be set to the <code>Event</code> instance.
 	 */
-	notify(args?: TArgs, e?: TEventData, scope?: object): any;
+	notify(args?: TArgs, e?: TEventData, scope?: object, mergeArgs?: boolean): any;
 	clear(): void;
 }
 export declare class EventSubscriber<TArgs = any, TEventData extends IEventData = IEventData> {
@@ -517,6 +517,13 @@ export interface DragPosition {
 	startX: number;
 	startY: number;
 	range: DragRange;
+}
+export interface DragItem extends DragPosition {
+	dragSource: HTMLElement | Document | null;
+	dragHandle: HTMLElement | null;
+	deltaX: number;
+	deltaY: number;
+	target: HTMLElement;
 }
 export interface DragRange {
 	start: {
@@ -973,10 +980,18 @@ export interface IGrid<TItem = any> extends CellNavigation, EditorHost, GridPlug
 	readonly onColumnsResized: EventEmitter<ArgsGrid, IEventData>;
 	readonly onContextMenu: EventEmitter<ArgsGrid, UIEvent>;
 	readonly onDblClick: EventEmitter<ArgsCell, MouseEvent>;
-	readonly onDrag: EventEmitter<ArgsDrag, UIEvent>;
-	readonly onDragEnd: EventEmitter<ArgsDrag, UIEvent>;
-	readonly onDragInit: EventEmitter<ArgsDrag, UIEvent>;
-	readonly onDragStart: EventEmitter<ArgsDrag, UIEvent>;
+	readonly onDrag: EventEmitter<ArgsGrid, UIEvent & {
+		dragData: DragData;
+	}>;
+	readonly onDragEnd: EventEmitter<ArgsGrid, UIEvent & {
+		dragData: DragData;
+	}>;
+	readonly onDragInit: EventEmitter<ArgsGrid, UIEvent & {
+		dragData: DragData;
+	}>;
+	readonly onDragStart: EventEmitter<ArgsGrid, UIEvent & {
+		dragData: DragData;
+	}>;
 	readonly onFooterRowCellRendered: EventEmitter<ArgsColumnNode, IEventData>;
 	readonly onHeaderCellRendered: EventEmitter<ArgsColumnNode, IEventData>;
 	readonly onHeaderClick: EventEmitter<ArgsColumn, IEventData>;
@@ -1126,7 +1141,7 @@ export interface ArgsGrid {
 export interface ArgsColumn extends ArgsGrid {
 	column: Column;
 }
-export interface ArgsDrag extends ArgsGrid, DragPosition {
+export interface DragData extends DragItem {
 	mode: string;
 	row: number;
 	cell: number;
@@ -1193,7 +1208,9 @@ export type FooterColumnEvent = HeaderColumnEvent;
 export type FooterMouseEvent = HeaderMouseEvent;
 export type FooterRenderEvent = HeaderRenderEvent;
 export type GridEvent = IEventData & ArgsGrid;
-export type GridDragEvent = UIEvent & ArgsDrag;
+export type GridDragEvent = UIEvent & {
+	dragData: DragData;
+};
 export type GridMouseEvent = MouseEvent & ArgsGrid;
 export interface IDataView<TItem = any> {
 	/** Gets the grand totals for all aggregated data. */
@@ -1368,10 +1385,18 @@ export declare class Grid<TItem = any> implements IGrid<TItem> {
 	readonly onCompositeEditorChange: EventEmitter<ArgsGrid, IEventData>;
 	readonly onContextMenu: EventEmitter<ArgsGrid, UIEvent>;
 	readonly onDblClick: EventEmitter<ArgsCell, MouseEvent>;
-	readonly onDrag: EventEmitter<ArgsDrag, UIEvent>;
-	readonly onDragEnd: EventEmitter<ArgsDrag, UIEvent>;
-	readonly onDragInit: EventEmitter<ArgsDrag, UIEvent>;
-	readonly onDragStart: EventEmitter<ArgsDrag, UIEvent>;
+	readonly onDrag: EventEmitter<ArgsGrid, UIEvent & {
+		dragData: DragData;
+	}>;
+	readonly onDragEnd: EventEmitter<ArgsGrid, UIEvent & {
+		dragData: DragData;
+	}>;
+	readonly onDragInit: EventEmitter<ArgsGrid, UIEvent & {
+		dragData: DragData;
+	}>;
+	readonly onDragStart: EventEmitter<ArgsGrid, UIEvent & {
+		dragData: DragData;
+	}>;
 	readonly onFooterRowCellRendered: EventEmitter<ArgsColumnNode, IEventData>;
 	readonly onHeaderCellRendered: EventEmitter<ArgsColumnNode, IEventData>;
 	readonly onHeaderClick: EventEmitter<ArgsColumn, MouseEvent>;
