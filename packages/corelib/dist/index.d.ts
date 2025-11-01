@@ -1287,7 +1287,7 @@ export interface Fluent<TElement extends HTMLElement = HTMLElement> extends Arra
 	 */
 	removeClass(value: string | boolean | (string | boolean)[]): this;
 	/**
-	 * Shows the element by setting its display property to empty string.
+	 * Shows the element by setting its hidden property to false.
 	 *
 	 * @returns The Fluent object itself.
 	 */
@@ -5317,6 +5317,7 @@ export declare class DataGrid<TItem, P = {}> extends Widget<P> implements IDataG
 		grid: IGrid;
 	}, import("@serenity-is/sleekgrid").IEventData>;
 	constructor(props: WidgetProps<P>);
+	private layoutTimerCallback;
 	protected propertyItemsReady(itemsData: PropertyItemsData): void;
 	protected afterInit(): void;
 	protected useAsync(): boolean;
@@ -5961,7 +5962,7 @@ export declare class CheckLookupEditor<TItem extends CheckTreeItem<TItem> = any,
 	static [Symbol.typeInfo]: EditorTypeInfo<"Serenity.">;
 	private searchText;
 	private enableUpdateItems;
-	private lookupChangeUnbind;
+	private lookupChangeOff;
 	constructor(props: EditorProps<P>);
 	destroy(): void;
 	protected updateItems(): void;
@@ -6156,7 +6157,7 @@ export interface LookupEditorOptions extends ComboboxEditorOptions {
 }
 export declare abstract class LookupEditorBase<P extends LookupEditorOptions, TItem> extends ComboboxEditor<P, TItem> {
 	static [Symbol.typeInfo]: EditorTypeInfo<"Serenity.">;
-	private lookupChangeUnbind;
+	private lookupChangeOff;
 	constructor(props: EditorProps<P>);
 	hasAsyncSource(): boolean;
 	destroy(): void;
@@ -7027,6 +7028,9 @@ export declare class GridRowSelectionMixin {
 	private grid;
 	private options;
 	constructor(grid: IDataGrid, options?: GridRowSelectionMixinOptions);
+	destroy(): void;
+	private handleGridClick;
+	private handleHeaderClick;
 	updateSelectAll(): void;
 	clear(): void;
 	resetCheckedAndRefresh(): void;

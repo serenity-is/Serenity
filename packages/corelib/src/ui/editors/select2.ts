@@ -914,7 +914,7 @@ function defaultTokenizer(input: string, selection: string | any[], selectCallba
     if (original !== input) return input;
 }
 
-function cleanupJQueryElements() {
+function cleanupElements() {
     var self = this;
 
     Array.from(arguments).forEach(function (element) {
@@ -1143,7 +1143,7 @@ abstract class AbstractSelect2 {
             Fluent.off(this.dropdown, "mouseup", resultsSelector, this.handleDropdownMouseUp);
         }
 
-        cleanupJQueryElements.call(this,
+        cleanupElements.call(this,
             "container",
             "dropdown",
             "results",
@@ -2388,7 +2388,7 @@ class SingleSelect2 extends AbstractSelect2 {
             'for', this.opts.element.getAttribute("id"));
         super.destroy();
 
-        cleanupJQueryElements.call(this,
+        cleanupElements.call(this,
             "selection",
             "focusser"
         );
@@ -2968,7 +2968,7 @@ class MultiSelect2 extends AbstractSelect2 {
 
         super.destroy();
 
-        cleanupJQueryElements.call(this,
+        cleanupElements.call(this,
             "searchContainer",
             "selection"
         );
