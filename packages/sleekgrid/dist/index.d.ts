@@ -1234,7 +1234,6 @@ export declare class Grid<TItem = any> implements IGrid<TItem> {
 	private _activePosX;
 	private _activeRow;
 	private _activeViewportNode;
-	private _bind;
 	private _cellCssClasses;
 	private _cellHeightDiff;
 	private _cellWidthDiff;

@@ -1,5 +1,5 @@
 import { bindThis } from "@serenity-is/sleekdom";
-import { Column } from "@serenity-is/sleekgrid";
+import { Column, type ArgsCell } from "@serenity-is/sleekgrid";
 import { classTypeInfo, Fluent, nsSerenity, registerType } from "../../base";
 import { clearKeys } from "../../compat";
 import type { IRemoteView } from "../../slick/iremoteview";
@@ -40,7 +40,7 @@ export class GridRowSelectionMixin {
         this.options = null;
     }
 
-    private handleGridClick(e: MouseEvent): void {
+    private handleGridClick(e: MouseEvent, p: ArgsCell): void {
         if (!(e.target as HTMLElement).classList.contains('select-item'))
             return;
         const grid = this.grid;
