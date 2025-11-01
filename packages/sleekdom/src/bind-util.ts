@@ -1,10 +1,9 @@
 
-const bindThisProxySymbol = Symbol.for("Serenity.bindThisProxy");
 const hasOwnProperty = Object.hasOwnProperty;
 const getOwnPropertyNames = Object.getOwnPropertyNames;
 
 const bindThisHandler: ProxyHandler<any> = {
-    get: (target: Record<string, any>, property: string | symbol, receiver: any) => {
+    get: (target: Record<string, any>, property: string | symbol) => {
         if (hasOwnProperty.call(target, property)) {
             return target[property as keyof typeof target];
         }
@@ -18,8 +17,15 @@ const bindThisHandler: ProxyHandler<any> = {
     }
 }
 
+const bindThisProxyMap = new WeakMap<any, any>();
+
 export function bindThis<T>(obj: T): T {
-    return (obj as any)[bindThisProxySymbol] || ((obj as any)[bindThisProxySymbol] = new Proxy(obj as any, bindThisHandler));
+    let proxy = bindThisProxyMap.get(obj);
+    if (!proxy) {
+        proxy = new Proxy(obj as any, bindThisHandler);
+        bindThisProxyMap.set(obj, proxy);
+    }
+    return proxy;
 }
 
 export function bindPrototypeMethods(instance: any) {
