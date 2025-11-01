@@ -1,4 +1,5 @@
 ﻿
+import { bindThis } from "@serenity-is/sleekdom";
 import { Authorization, EntityGridTexts, Fluent, faIcon, getActiveRequests, getInstanceType, getTypeFullName, isPromiseLike, localText, nsSerenity, resolveUrl, stringFormat } from "../../base";
 import { HandleRouteEvent, Router, replaceAll, safeCast } from "../../compat";
 import { IEditDialog } from "../../interfaces";
@@ -18,7 +19,7 @@ export class EntityGrid<TItem, P = {}> extends DataGrid<TItem, P> {
     constructor(props: WidgetProps<P>) {
         super(props);
         this.domNode.classList.add('route-handler');
-        Fluent.on(this.domNode, "handleroute." + this.uniqueName, this.handleRoute.bind(this));
+        Fluent.on(this.domNode, "handleroute." + this.uniqueName, bindThis(this).handleRoute);
     }
 
     destroy() {

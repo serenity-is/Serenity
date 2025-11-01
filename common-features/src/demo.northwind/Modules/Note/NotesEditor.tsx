@@ -3,6 +3,7 @@ import { NoteRow } from "../ServerTypes/Demo";
 import { nsDemoNorthwind } from "../ServerTypes/Namespaces";
 import { NoteDialog } from "./NoteDialog";
 import "./NotesEditor.css";
+import { bindThis } from "@serenity-is/sleekdom";
 
 export class NotesEditor<P = {}> extends EditorWidget<P>
     implements IGetEditValue, ISetEditValue {
@@ -30,13 +31,14 @@ export class NotesEditor<P = {}> extends EditorWidget<P>
 
     protected updateContent() {
         this.noteList.innerHTML = '';
+        const boundThis = bindThis(this);
         this.noteList.append(<>{(this.items || []).map((item, index) => 
             <li>
                 <div class="note-text" dangerouslySetInnerHTML={{ __html: sanitizeHtml(item.Text ?? '') }}></div>
-                <a href="#" class="note-date" data-index={index} onClick={this.editClick.bind(this)}>
+                <a href="#" class="note-date" data-index={index} onClick={boundThis.editClick}>
                     {item.InsertUserDisplayName + ' - ' + formatDate(item.InsertDate, 'g')}
                 </a>
-                <a href="#" class="note-delete" data-index={index} title="delete note" onClick={this.deleteClick.bind(this)} />
+                <a href="#" class="note-delete" data-index={index} title="delete note" onClick={boundThis.deleteClick} />
             </li>
         )}</>);
     }

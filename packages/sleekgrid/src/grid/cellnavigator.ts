@@ -1,3 +1,4 @@
+import { bindThis } from "@serenity-is/sleekdom";
 import { GoToResult } from "./internal";
 
 export interface CellNavigatorHost {
@@ -253,19 +254,20 @@ export class CellNavigator {
 
         this.host.setTabbingDirection(tabbingDirections[dir]);
 
+        const boundThis = bindThis(this);
         var stepFunctions: Record<string, Function> = {
-            up: this.gotoUp,
-            down: this.gotoDown,
-            prev: this.gotoPrev,
-            next: this.gotoNext,
-            home: this.gotoRowStart,
-            end: this.gotoRowEnd
+            up: boundThis.gotoUp,
+            down: boundThis.gotoDown,
+            prev: boundThis.gotoPrev,
+            next: boundThis.gotoNext,
+            home: boundThis.gotoRowStart,
+            end: boundThis.gotoRowEnd
         };
 
-        stepFunctions[rtl ? 'right' : 'left'] = this.gotoLeft;
-        stepFunctions[rtl ? 'left' : 'right'] = this.gotoRight;
+        stepFunctions[rtl ? 'right' : 'left'] = boundThis.gotoLeft;
+        stepFunctions[rtl ? 'left' : 'right'] = boundThis.gotoRight;
 
-        var stepFn = stepFunctions[dir].bind(this);
+        var stepFn = stepFunctions[dir];
         return stepFn(activeRow, activeCell, activePosX) as GoToResult;
     }
 }

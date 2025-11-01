@@ -1,6 +1,5 @@
 
 const hasOwnProperty = Object.hasOwnProperty;
-const getOwnPropertyNames = Object.getOwnPropertyNames;
 
 const bindThisHandler: ProxyHandler<any> = {
     get: (target: Record<string, any>, property: string | symbol) => {

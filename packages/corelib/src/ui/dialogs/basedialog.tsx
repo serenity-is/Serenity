@@ -1,3 +1,4 @@
+import { bindThis } from "@serenity-is/sleekdom";
 import { Dialog, DialogButton, DialogOptions, Fluent, Validator, defaultNotifyOptions, getjQuery, nsSerenity, positionToastContainer } from "../../base";
 import { isMobileView, validateOptions } from "../../compat";
 import { IDialog } from "../../interfaces";
@@ -99,7 +100,7 @@ export class BaseDialog<P> extends Widget<P> {
 
         if (this.dialog?.type == "uidialog") {
             this.initUIDialog();
-            Fluent.on(this.domNode.closest(".ui-dialog"), "resize." + this.uniqueName, this.arrange.bind(this));
+            Fluent.on(this.domNode.closest(".ui-dialog"), "resize." + this.uniqueName, bindThis(this).arrange);
         }
     }
 
@@ -110,7 +111,7 @@ export class BaseDialog<P> extends Widget<P> {
             if (element.width() > 0 && element.height() > 0)
                 this.handleResponsive();
         });
-        Fluent.on(this.domNode, "dialogopen." + this.uniqueName, this.handleResponsive.bind(this));
+        Fluent.on(this.domNode, "dialogopen." + this.uniqueName, bindThis(this).handleResponsive);
 
         if (this.getCustomAttribute(MaximizableAttribute)?.value) {
             DialogExtensions.dialogMaximizable(element);
@@ -220,7 +221,7 @@ export class BaseDialog<P> extends Widget<P> {
         var tabsDiv = this.findById('Tabs');
         if (!tabsDiv)
             return;
-        this.tabs = TabsExtensions.initialize(tabsDiv, this.arrange.bind(this));
+        this.tabs = TabsExtensions.initialize(tabsDiv, bindThis(this).arrange);
     }
 
     protected handleResponsive(): void {

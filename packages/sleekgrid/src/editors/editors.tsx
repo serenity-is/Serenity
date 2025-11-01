@@ -1,3 +1,4 @@
+import { bindThis } from "@serenity-is/sleekdom";
 import { Editor, EditorOptions, parsePx, Position } from "../core";
 
 abstract class BaseCellEdit {
@@ -359,18 +360,19 @@ export class LongTextCellEdit extends BaseCellEdit {
         const isComposite = this._args.compositeEditorOptions;
         this._container = isComposite ? this._args.container : document.body;
 
+        const boundThis = bindThis(this);
         this._wrapper = this._container.appendChild(<div class="large-editor-text slick-large-editor-text"
             style={`z-index:10000; background:white; padding:5px; border:3px solid gray; border-radius:10px;${isComposite ? "position: relative; padding: 0; border: 0" : "position: absolute"}`}>
             <textarea rows={5} style={{ background: "white", width: "250px", height: "80px", border: "0", outline: "0" }}
-                onKeyDown={this.handleKeyDown.bind(this)} ref={el => this._input = el} />
+                onKeyDown={boundThis.handleKeyDown} ref={el => this._input = el} />
         </div> as HTMLDivElement);
 
         if (isComposite)
             addCompositeChangeListener(this, this._args, this._input)
         else {
             this._wrapper.appendChild(<div style={{ textAlign: "right" }}>
-                <button onClick={this.save.bind(this)}>Save</button>
-                <button onClick={this.cancel.bind(this)}>Cancel</button>
+                <button onClick={boundThis.save}>Save</button>
+                <button onClick={boundThis.cancel}>Cancel</button>
             </div>);
 
             this.position(this._args.position);

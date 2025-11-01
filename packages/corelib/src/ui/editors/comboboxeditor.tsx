@@ -1,4 +1,5 @@
-﻿import { Authorization, Fluent, PropertyItem, SelectEditorTexts, isPromiseLike, nsSerenity, setElementReadOnly } from "../../base";
+﻿import { bindThis } from "@serenity-is/sleekdom";
+import { Authorization, Fluent, PropertyItem, SelectEditorTexts, isPromiseLike, nsSerenity, setElementReadOnly } from "../../base";
 import { ValidationHelper, isTrimmedEmpty } from "../../compat";
 import { IEditDialog, IGetEditValue, IReadOnly, ISetEditValue, IStringValue } from "../../interfaces";
 import { DialogType } from "../../types/dialogtype";
@@ -141,7 +142,7 @@ export class ComboboxEditor<P, TItem> extends EditorWidget<P> implements
     }
 
     protected mapItems(items: TItem[]): ComboboxItem[] {
-        return items.map(this.mapItem.bind(this));
+        return items.map(bindThis(this).mapItem);
     }
 
     protected allowClear() {

@@ -1,4 +1,5 @@
-﻿import { getjQuery, isBS3, isBS5Plus } from "./environment";
+﻿import { bindThis } from "@serenity-is/sleekdom";
+import { getjQuery, isBS3, isBS5Plus } from "./environment";
 import { isArrayLike } from "./system";
 
 export interface TooltipOptions {
@@ -45,11 +46,11 @@ export class Tooltip {
     }
 
     delayedDispose(delay: number = 5000) {
-        setTimeout(this.dispose.bind(this), delay);
+        setTimeout(bindThis(this).dispose, delay);
     }
 
     delayedHide(delay: number = 5000): void {
-        setTimeout(this.hide.bind(this), delay);
+        setTimeout(bindThis(this).hide, delay);
     }
 
     private static existingInstance(el: HTMLElement): any {

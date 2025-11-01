@@ -1,3 +1,4 @@
+import { bindThis } from "@serenity-is/sleekdom";
 import { EventEmitter, EventSubscriber, type IGrid, type GridPlugin } from "../core";
 
 export interface RowMoveManagerOptions {
@@ -35,10 +36,11 @@ export class RowMoveManager implements GridPlugin {
 
     init(grid: IGrid) {
         this.grid = grid;
-        this.handler.subscribe(grid.onDragInit, this.handleDragInit.bind(this))
-            .subscribe(grid.onDragStart, this.handleDragStart.bind(this))
-            .subscribe(grid.onDrag, this.handleDrag.bind(this))
-            .subscribe(grid.onDragEnd, this.handleDragEnd.bind(this));
+        const boundThis = bindThis(this);
+        this.handler.subscribe(grid.onDragInit, boundThis.handleDragInit)
+            .subscribe(grid.onDragStart, boundThis.handleDragStart)
+            .subscribe(grid.onDrag, boundThis.handleDrag)
+            .subscribe(grid.onDragEnd, boundThis.handleDragEnd);
     }
 
     destroy() {

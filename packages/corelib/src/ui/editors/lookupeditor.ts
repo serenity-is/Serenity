@@ -1,4 +1,5 @@
-﻿import { getInstanceType, getLookupAsync, getTypeFullName, nsSerenity, type Lookup } from "../../base";
+﻿import { bindThis } from "@serenity-is/sleekdom";
+import { getInstanceType, getLookupAsync, getTypeFullName, nsSerenity, type Lookup } from "../../base";
 import { ScriptData, getLookup, reloadLookup } from "../../compat";
 import { ComboboxItem, ComboboxSearchQuery, ComboboxSearchResult } from "./combobox";
 import { ComboboxEditor, ComboboxEditorOptions } from "./comboboxeditor";
@@ -13,14 +14,14 @@ export abstract class LookupEditorBase<P extends LookupEditorOptions, TItem> ext
 
     static [Symbol.typeInfo] = this.registerEditor(nsSerenity);
 
-    declare private lookupChangeUnbind: any;
+    declare private lookupChangeOff: any;
 
     constructor(props: EditorProps<P>) {
         super(props);
 
         if (!this.hasAsyncSource()) {
             this.updateItems();
-            this.lookupChangeUnbind = ScriptData.bindToChange('Lookup.' + this.getLookupKey(), this.updateItems.bind(this));
+            this.lookupChangeOff = ScriptData.bindToChange('Lookup.' + this.getLookupKey(), bindThis(this).updateItems);
         }
     }
 
@@ -29,9 +30,9 @@ export abstract class LookupEditorBase<P extends LookupEditorOptions, TItem> ext
     }
 
     destroy(): void {
-        if (this.lookupChangeUnbind) {
-            this.lookupChangeUnbind();
-            this.lookupChangeUnbind = null;
+        if (this.lookupChangeOff) {
+            this.lookupChangeOff();
+            this.lookupChangeOff = null;
         }
 
         super.destroy();
@@ -114,11 +115,9 @@ export abstract class LookupEditorBase<P extends LookupEditorOptions, TItem> ext
             items = items.filter(x => query.idList.indexOf(this.itemId(x)) >= 0);
         }
 
-        function getText(item: TItem) {
-            return this.getItemText(item, this.lookup);
-        }
+        const getText = (item: TItem) => this.getItemText(item, this.lookup);
 
-        items = ComboboxEditor.filterByText(items, getText.bind(this), query.searchTerm);
+        items = ComboboxEditor.filterByText(items, getText, query.searchTerm);
 
         return {
             items: items.slice(query.skip, query.take ? (query.skip + query.take) : items.length),

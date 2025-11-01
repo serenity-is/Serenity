@@ -465,7 +465,7 @@ export class Grid<TItem = any> implements IGrid<TItem> {
         if (!this._selectionModel)
             return;
 
-        this._selectionModel.onSelectedRangesChanged.unsubscribe(bindThis(this).handleSelectedRangesChanged);
+        this._selectionModel.onSelectedRangesChanged.unsubscribe(this.handleSelectedRangesChanged);
         this._selectionModel.destroy?.();
     }
 
@@ -1491,10 +1491,9 @@ export class Grid<TItem = any> implements IGrid<TItem> {
     private unbindFromData(): void {
         const view = this._data as IDataView;
         if (view) {
-            const boundThis = bindThis(this);
-            view.onRowCountChanged && view.onRowCountChanged.unsubscribe(boundThis.viewOnRowCountChanged);
-            view.onRowsChanged && view.onRowsChanged.unsubscribe(boundThis.viewOnRowsChanged);
-            view.onDataChanged && view.onDataChanged.unsubscribe(boundThis.viewOnDataChanged);
+            view.onRowCountChanged && view.onRowCountChanged.unsubscribe(this.viewOnRowCountChanged);
+            view.onRowsChanged && view.onRowsChanged.unsubscribe(this.viewOnRowsChanged);
+            view.onDataChanged && view.onDataChanged.unsubscribe(this.viewOnDataChanged);
         }
     }
 

@@ -1,4 +1,5 @@
 import { Fluent, QuickSearchInput, Widget, WidgetProps, stripDiacritics } from "@serenity-is/corelib";
+import { bindThis } from "@serenity-is/sleekdom";
 import { nsExtensions } from "../ServerTypes/Namespaces";
 import { ReportDialog } from "./ReportDialog";
 
@@ -8,7 +9,7 @@ export class ReportPage<P = {}> extends Widget<P> {
     constructor(props: WidgetProps<P>) {
         super(props);
 
-        Fluent.on(this.domNode, "click", ".report-link", this.reportLinkClick.bind(this));
+        Fluent.on(this.domNode, "click", ".report-link", bindThis(this).reportLinkClick);
 
         new QuickSearchInput({
             element: this.domNode.querySelector('.s-QuickSearchBar input') as HTMLElement,

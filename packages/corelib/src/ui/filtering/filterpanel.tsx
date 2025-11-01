@@ -1,4 +1,5 @@
-﻿import { FilterPanelTexts, Fluent, PropertyItem, localText, nsSerenity } from "../../base";
+﻿import { bindThis } from "@serenity-is/sleekdom";
+import { FilterPanelTexts, Fluent, PropertyItem, localText, nsSerenity } from "../../base";
 import { Combobox } from "../editors/combobox";
 import { ComboboxEditor } from "../editors/comboboxeditor";
 import { ReflectionOptionsSetter } from "../widgets/reflectionoptionssetter";
@@ -286,19 +287,20 @@ export class FilterPanel<P = {}> extends FilterWidgetBase<P> {
             return emptyRow;
         }
 
+        const boundThis = bindThis(this);
         const isLastRowOr = !!this.rowsDiv.lastElementChild?.querySelector('a.andor.or');
         const fieldSelect = <input class="field-select" type="hidden" /> as HTMLInputElement;
         const row = this.rowsDiv.appendChild(
             <div class="filter-line">
                 <a class="delete" title={FilterPanelTexts.RemoveField}
-                    onClick={this.deleteRowClick.bind(this)}><span></span></a>
+                    onClick={boundThis.deleteRowClick}><span></span></a>
                 <div class="l" style="display: none">
-                    <a class="rightparen" href="#" onClick={this.leftRightParenClick.bind(this)}>)</a>
+                    <a class="rightparen" href="#" onClick={boundThis.leftRightParenClick}>)</a>
                     <a class={["andor", isLastRowOr && "or"]} href="#"
-                        title={FilterPanelTexts.ChangeAndOr} onClick={this.andOrClick.bind(this)}>
+                        title={FilterPanelTexts.ChangeAndOr} onClick={boundThis.andOrClick}>
                         {FilterPanelTexts[(isLastRowOr ? 'Or' : 'And')]}
                     </a>
-                    <a class="leftparen" href="#" onClick={this.leftRightParenClick.bind(this)}>(</a>
+                    <a class="leftparen" href="#" onClick={boundThis.leftRightParenClick}>(</a>
                 </div>
                 <div class="f">
                     {fieldSelect}
@@ -306,7 +308,7 @@ export class FilterPanel<P = {}> extends FilterWidgetBase<P> {
                 <div class="o"></div>
                 <div class="v"></div>
             </div>) as HTMLElement;
-        new FilterFieldSelect({ element: fieldSelect, fields: this.get_store().get_fields() }).changeSelect2(this.onRowFieldChange.bind(this));
+        new FilterFieldSelect({ element: fieldSelect, fields: this.get_store().get_fields() }).changeSelect2(bindThis(this).onRowFieldChange);
         this.updateButtons();
         fieldSelect.focus();
         popupField && Combobox.getInstance(fieldSelect)?.openDropdown();
@@ -345,7 +347,7 @@ export class FilterPanel<P = {}> extends FilterWidgetBase<P> {
 
         var operators = filtering.getOperators();
         var opSelect = new FilterOperatorSelect({ element: hidden, source: operators });
-        opSelect.changeSelect2(this.onRowOperatorChange.bind(this));
+        opSelect.changeSelect2(bindThis(this).onRowOperatorChange);
     }
 
     protected getFieldFor(row: HTMLElement) {

@@ -1,4 +1,5 @@
-﻿import { getjQuery, isBS3, isBS5Plus } from "./environment";
+﻿import { bindThis } from "@serenity-is/sleekdom";
+import { getjQuery, isBS3, isBS5Plus } from "./environment";
 import { Fluent } from "./fluent";
 import { htmlEncode, sanitizeHtml, type RenderableContent } from "./html";
 import { iconClassName, type IconClassName } from "./icons";
@@ -127,7 +128,7 @@ export class Dialog {
             this.onClose(opt.onClose);
 
         if (opt.autoDispose)
-            this.onClose(() => setTimeout(this.dispose.bind(this), 0));
+            this.onClose(() => setTimeout(bindThis(this).dispose, 0));
 
         if (opt.title !== void 0) {
             this.title(opt.title);

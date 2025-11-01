@@ -2,6 +2,7 @@
  * Adapted from 3.5.x version of Select2 (https://github.com/select2/select2), removing jQuery dependency
  */
 
+import { bindThis } from "@serenity-is/sleekdom";
 import { Fluent, SelectEditorTexts, serviceCall, stringFormat } from "../../base";
 
 export type Select2Element = HTMLInputElement | HTMLSelectElement;
@@ -922,11 +923,12 @@ function cleanupJQueryElements() {
     });
 }
 
+const resultsSelector = ".select2-results";
+
 abstract class AbstractSelect2 {
 
     declare private _enabled: boolean;
     declare private _readonly: boolean;
-    declare private _sync: () => void;
     declare private _touchEvent: boolean;
     declare private _touchMoved: boolean;
 
@@ -960,7 +962,7 @@ abstract class AbstractSelect2 {
     abstract val(value?: string | string[]): string | string[];
 
     init(opts: Select2Options) {
-        var results: HTMLElement, search: HTMLInputElement, resultsSelector = ".select2-results";
+        var results: HTMLElement, search: HTMLInputElement;
 
         // prepare options
         this.opts = opts = this.prepareOpts(opts);
@@ -1020,32 +1022,20 @@ abstract class AbstractSelect2 {
 
         installFilteredMouseMove(this.results);
 
-        Fluent.on(this.dropdown, "mousemove-filtered", resultsSelector, this.highlightUnderEvent.bind(this));
+        const boundThis = bindThis(this);
 
-        ["touchstart", "touchmove", "touchend"].forEach(ev =>
-            this.dropdown.addEventListener(ev, (e: Event) => {
-                if ((e.target as HTMLElement).closest?.(resultsSelector)) {
-                    this._touchEvent = true;
-                }
-            }, { passive: true })
-        );
+        Fluent.on(this.dropdown, "mousemove-filtered", resultsSelector, boundThis.highlightUnderEvent);
 
-        this.dropdown.addEventListener("touchmove", e =>
-            (e.target as HTMLElement).closest?.(resultsSelector) && this.touchMoved(), { passive: true });
-        ["touchstart", "touchend"].forEach(ev => this.dropdown.addEventListener(ev, e =>
-            (e.target as HTMLElement).closest?.(resultsSelector) && this.clearTouchMoved(), { passive: true }));
+        ["touchstart", "touchmove", "touchend"].forEach(ev => this.dropdown.addEventListener(ev, boundThis.handleDropdownTouchStartMoveEnd, { passive: true }));
+        this.dropdown.addEventListener("touchmove", boundThis.handleDropdownTouchMove, { passive: true });
+        ["touchstart", "touchend"].forEach(ev => this.dropdown.addEventListener(ev, boundThis.handleDropdownTouchStartEnd), { passive: true });
 
         // Waiting for a click event on touch devices to select option and hide dropdown
         // otherwise click will be triggered on an underlying element
-        Fluent.on(this.dropdown, 'click', event => {
-            if (this._touchEvent) {
-                this._touchEvent = false;
-                this.selectHighlighted();
-            }
-        });
+        Fluent.on(this.dropdown, 'click', boundThis.handleDropdownClick);
 
         installDebouncedScroll(80, this.results);
-        Fluent.on(this.dropdown, "scroll-debounced", resultsSelector, this.loadMoreIfNeeded.bind(this));
+        Fluent.on(this.dropdown, "scroll-debounced", resultsSelector, boundThis.loadMoreIfNeeded);
 
         // do not propagate change event from the search field out of the component
         Fluent.on(this.container, "change", ".select2-input", function (e: Event) { e.stopPropagation(); });
@@ -1066,22 +1056,17 @@ abstract class AbstractSelect2 {
         //}
 
         installKeyUpChangeEvent(search);
-        ["keyup-change", "input", "paste"].forEach(ev => Fluent.on(search, ev, this.updateResults.bind(this)));
-        Fluent.on(search, "focus", function () { search.classList.add("select2-focused"); });
-        Fluent.on(search, "blur", function () { search.classList.remove("select2-focused"); });
+        ["keyup-change", "input", "paste"].forEach(ev => Fluent.on(search, ev, boundThis.handleSearchInput));
+        Fluent.on(search, "focus", boundThis.handleSearchFocus);
+        Fluent.on(search, "blur", boundThis.handleSearchBlur);
 
-        Fluent.on(this.dropdown, "mouseup", resultsSelector, (e: Event) => {
-            if ((e.target as HTMLElement).closest(".select2-result-selectable")) {
-                this.highlightUnderEvent(e);
-                this.selectHighlighted(e);
-            }
-        });
+        Fluent.on(this.dropdown, "mouseup", resultsSelector, boundThis.handleDropdownMouseUp);
 
         // trap all mouse events from leaving the dropdown. sometimes there may be a modal that is listening
         // for mouse events outside of itself so it can close itself. since the dropdown is now outside the select2's
         // dom it will trigger the popup close, which is not what we want
         // focusin can cause focus wars between modals and select2 since the dropdown is outside the modal.
-        ["click mouseup mousedown touchstart touchend focusin"].forEach(ev => Fluent.on(this.dropdown, ev, function (e) { e.stopPropagation(); }));
+        ["click mouseup mousedown touchstart touchend focusin"].forEach(ev => Fluent.on(this.dropdown, ev, handleDropdownTrap));
 
         this.nextSearchTerm = undefined;
 
@@ -1122,13 +1107,12 @@ abstract class AbstractSelect2 {
         this.close();
 
         if (element && (element as any).detachEvent) {
-            (element as any).detachEvent("onpropertychange", self._sync);
+            (element as any).detachEvent("onpropertychange", this.handleMonitorSync);
         }
         if (this.propertyObserver) {
             this.propertyObserver.disconnect();
             this.propertyObserver = null;
         }
-        this._sync = null;
 
         if (select2 !== undefined) {
             select2.container?.remove();
@@ -1145,6 +1129,18 @@ abstract class AbstractSelect2 {
                 element.removeAttribute("tabindex");
             }
             delete element.style.display;
+        }
+
+        if (this.search) {
+            ["keyup-change", "input", "paste"].forEach(ev => Fluent.off(this.search, ev, this.handleSearchInput));
+            Fluent.off(this.search, "focus", this.handleSearchFocus);
+            Fluent.off(this.search, "blur", this.handleSearchBlur);
+        }
+
+        if (this.dropdown) {
+            Fluent.off(this.dropdown, "mousemove-filtered", this.highlightUnderEvent);
+            ["click mouseup mousedown touchstart touchend focusin"].forEach(ev => Fluent.off(this.dropdown, ev, handleDropdownTrap));
+            Fluent.off(this.dropdown, "mouseup", resultsSelector, this.handleDropdownMouseUp);
         }
 
         cleanupJQueryElements.call(this,
@@ -1176,6 +1172,34 @@ abstract class AbstractSelect2 {
     }
 
     declare protected select: HTMLSelectElement;
+
+    private handleDropdownMouseUp(e: Event) {
+        if ((e.target as HTMLElement).closest(".select2-result-selectable")) {
+            this.highlightUnderEvent(e);
+            this.selectHighlighted(e);
+        }
+    }
+
+    private handleDropdownTouchStartMoveEnd(e: Event) {
+        if ((e.target as HTMLElement).closest?.(resultsSelector)) {
+            this._touchEvent = true;
+        }
+    }
+
+    private handleDropdownTouchMove(e: Event) {
+        (e.target as HTMLElement).closest?.(resultsSelector) && this.touchMoved();
+    }
+
+    private handleDropdownTouchStartEnd(e: Event) {
+        (e.target as HTMLElement).closest?.(resultsSelector) && this.clearTouchMoved();
+    }
+
+    private handleDropdownClick(e: Event) {
+        if (this._touchEvent) {
+            this._touchEvent = false;
+            this.selectHighlighted();
+        }
+    }
 
     protected prepareOpts(opts: Select2Options): Select2Options {
         var element: HTMLInputElement | HTMLSelectElement, select: HTMLSelectElement, idKey: string, ajaxUrl: string, self = this;
@@ -1360,44 +1384,47 @@ abstract class AbstractSelect2 {
         return opts;
     }
 
+    private handleMonitorFocus(e: Event) {
+        this.focus();
+    }
+
+    private handleMonitorChange(e: Event) {
+        if (this.opts.element.dataset.select2ChangeTriggered !== "true") {
+            this.initSelection();
+        }
+    }
+
+    private handleMonitorSync() {
+        // sync enabled state
+        const el = this.opts.element;
+        var disabled = el.disabled;
+        if (disabled === undefined) disabled = false;
+        this.enable(!disabled);
+
+        var readonly = (el as any).readOnly;
+        if (readonly === undefined) readonly = false;
+        this.readonly(readonly);
+
+        syncCssClasses(this.container, this.opts.element, this.opts.adaptContainerCssClass);
+        Fluent.addClass(this.container, evaluate(this.opts.containerCssClass, this.opts.element));
+
+        syncCssClasses(this.dropdown, this.opts.element, this.opts.adaptDropdownCssClass);
+        Fluent.addClass(this.dropdown, evaluate(this.opts.dropdownCssClass, this.opts.element));
+    }
+
     /**
      * Monitor the original element for changes and update select2 accordingly
      */
     protected monitorSource(): void {
-        var el = this.opts.element, observer, self = this;
+        var el = this.opts.element, observer;
 
-        Fluent.on(el, "change.select2", function (this: AbstractSelect2, e: Event) {
-            if (this.opts.element.dataset.select2ChangeTriggered !== "true") {
-                this.initSelection();
-            }
-        }.bind(this));
-
-        Fluent.on(el, "focus.select2", function (this: AbstractSelect2, e: Event) {
-            this.focus();
-        }.bind(this));
-
-        this._sync = () => {
-
-            // sync enabled state
-            var disabled = el.disabled;
-            if (disabled === undefined) disabled = false;
-            this.enable(!disabled);
-
-            var readonly = (el as any).readOnly;
-            if (readonly === undefined) readonly = false;
-            this.readonly(readonly);
-
-            syncCssClasses(this.container, this.opts.element, this.opts.adaptContainerCssClass);
-            Fluent.addClass(this.container, evaluate(this.opts.containerCssClass, this.opts.element));
-
-            syncCssClasses(this.dropdown, this.opts.element, this.opts.adaptDropdownCssClass);
-            Fluent.addClass(this.dropdown, evaluate(this.opts.dropdownCssClass, this.opts.element));
-
-        };
+        const boundThis = bindThis(this);
+        Fluent.on(el, "change.select2", boundThis.handleMonitorChange);
+        Fluent.on(el, "focus.select2", boundThis.handleMonitorFocus);
 
         // IE8-10 (IE9/10 won't fire propertyChange via attachEventListener)
         if (el && (el as any).attachEvent) {
-            (el as any).attachEvent("onpropertychange", self._sync);
+            (el as any).attachEvent("onpropertychange", boundThis.handleMonitorSync);
         }
 
         // safari, chrome, firefox, IE11
@@ -1405,7 +1432,7 @@ abstract class AbstractSelect2 {
         if (observer !== undefined) {
             if (this.propertyObserver) { delete this.propertyObserver; this.propertyObserver = null; }
             this.propertyObserver = new observer(function (mutations) {
-                mutations.forEach(self._sync);
+                mutations.forEach(boundThis.handleMonitorSync);
             });
             this.propertyObserver.observe(el, { attributes: true, subtree: false });
         }
@@ -1943,6 +1970,18 @@ abstract class AbstractSelect2 {
      */
     protected tokenize(): string {
         return undefined;
+    }
+
+    protected handleSearchInput() {
+        this.updateResults();
+    }
+
+    protected handleSearchFocus() {
+        this.search?.classList.add("select2-focused");
+    }
+
+    protected handleSearchBlur() {
+        this.search?.classList.remove("select2-focused");
     }
 
     /**
@@ -3226,7 +3265,7 @@ class MultiSelect2 extends AbstractSelect2 {
 
     protected tokenize(): string {
         var input = this.search.value;
-        input = this.opts.tokenizer.call(this, input, this.data(), this.onSelect.bind(this), this.opts);
+        input = this.opts.tokenizer.call(this, input, this.data(), bindThis(this).onSelect, this.opts);
         if (input != null && input != undefined) {
             this.search.value = input ?? "";
             if (input.length > 0) {
@@ -3538,7 +3577,7 @@ class MultiSelect2 extends AbstractSelect2 {
         this.setVal(val);
 
         if (this.select) {
-            this.opts.initSelection(this.select, this.updateSelection.bind(this));
+            this.opts.initSelection(this.select, bindThis(this).updateSelection);
             if (triggerChange) {
                 this.triggerChange(this.buildChangeDetails(oldData, this.data()));
             }
@@ -3614,3 +3653,7 @@ class MultiSelect2 extends AbstractSelect2 {
     }
 }
 
+
+function handleDropdownTrap(e: Event) {
+    e.stopPropagation();
+}

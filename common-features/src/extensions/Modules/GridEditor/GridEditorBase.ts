@@ -1,6 +1,7 @@
 import { DataChangeInfo, DialogType, EditorProps, EntityGrid, IGetEditValue, ISetEditValue, PropertyItem, SaveRequest, ServiceOptions, ServiceResponse, ToolButton, deepClone, getInstanceType, getTypeFullName, indexOf, serviceCall } from "@serenity-is/corelib";
 import { nsExtensions } from "../ServerTypes/Namespaces";
 import { GridEditorDialog } from "./GridEditorDialog";
+import { bindThis } from "@serenity-is/sleekdom";
 
 export abstract class GridEditorBase<TEntity, P = {}> extends EntityGrid<TEntity, P>
     implements IGetEditValue, ISetEditValue {
@@ -190,8 +191,9 @@ export abstract class GridEditorBase<TEntity, P = {}> extends EntityGrid<TEntity
         this.createEntityDialog(this.getItemType(), dlg => {
             const dialog = this.checkDialogType(dlg);
             this.transferDialogReadOnly(dialog);
-            dialog.onDelete = this.delete.bind(this);
-            dialog.onSave = this.save.bind(this);
+            const boundThis = bindThis(this);
+            dialog.onDelete = boundThis.delete;
+            dialog.onSave = boundThis.save;
 
             if (this.connectedMode) {
                 if (byId) {

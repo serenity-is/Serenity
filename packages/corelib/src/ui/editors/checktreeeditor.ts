@@ -14,6 +14,7 @@ import { CascadedWidgetLink } from "./cascadedwidgetlink";
 import { stripDiacritics } from "./combobox";
 import { EditorUtils } from "./editorutils";
 import { EditorProps } from "./editorwidget";
+import { bindThis } from "@serenity-is/sleekdom";
 
 export interface CheckTreeItem<TSource> {
     isSelected?: boolean;
@@ -479,7 +480,7 @@ export class CheckLookupEditor<TItem extends CheckTreeItem<TItem> = any, P exten
 
     declare private searchText: string;
     declare private enableUpdateItems: boolean;
-    declare private lookupChangeUnbind: any;
+    declare private lookupChangeOff: any;
 
     constructor(props: EditorProps<P>) {
         super(props);
@@ -487,13 +488,13 @@ export class CheckLookupEditor<TItem extends CheckTreeItem<TItem> = any, P exten
         this.enableUpdateItems = true;
         this.setCascadeFrom(this.options.cascadeFrom);
         this.updateItems();
-        this.lookupChangeUnbind = ScriptData.bindToChange('Lookup.' + this.getLookupKey(), this.updateItems.bind(this));
+        this.lookupChangeOff = ScriptData.bindToChange('Lookup.' + this.getLookupKey(), bindThis(this).updateItems);
     }
 
     public destroy(): void {
-        if (this.lookupChangeUnbind) {
-            this.lookupChangeUnbind();
-            this.lookupChangeUnbind = null;
+        if (this.lookupChangeOff) {
+            this.lookupChangeOff();
+            this.lookupChangeOff = null;
         }
 
         super.destroy();

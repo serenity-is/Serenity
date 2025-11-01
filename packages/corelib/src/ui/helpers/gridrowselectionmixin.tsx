@@ -1,6 +1,8 @@
+import { bindThis } from "@serenity-is/sleekdom";
 import { Column } from "@serenity-is/sleekgrid";
 import { classTypeInfo, Fluent, nsSerenity, registerType } from "../../base";
 import { clearKeys } from "../../compat";
+import type { IRemoteView } from "../../slick/iremoteview";
 import { IDataGrid } from "../datagrid/idatagrid";
 
 export interface GridRowSelectionMixinOptions {
@@ -22,52 +24,67 @@ export class GridRowSelectionMixin {
         this.grid = grid;
         this.idField = grid.getView().getIdPropertyName();
         this.options = options || {};
+        const boundThis = bindThis(this);
+        grid.getGrid().onClick.subscribe(boundThis.handleGridClick);
+        grid.getGrid().onHeaderClick.subscribe(boundThis.handleHeaderClick);
+        (grid.getView() as IRemoteView).onRowsChanged?.subscribe(boundThis.updateSelectAll);
+    }
 
-        grid.getGrid().onClick.subscribe((e, p) => {
-            if ((e.target as HTMLElement).classList.contains('select-item')) {
-                e.preventDefault();
-                var item = grid.getView().getItem(p.row);
-                var id = item[this.idField].toString();
+    destroy(): void {
+        this.include = {};
+        this.grid?.getGrid()?.onClick?.unsubscribe(this.handleGridClick);
+        this.grid?.getGrid()?.onHeaderClick?.unsubscribe(this.handleHeaderClick);
+        (this.grid?.getView() as IRemoteView).onRowsChanged?.unsubscribe(this.updateSelectAll);
+        delete this.grid;
+        delete this.options?.selectable;
+        this.options = null;
+    }
 
-                if (this.include[id]) {
-                    delete this.include[id];
-                }
-                else {
-                    this.include[id] = true;
-                }
+    private handleGridClick(e: MouseEvent): void {
+        if (!(e.target as HTMLElement).classList.contains('select-item'))
+            return;
+        const grid = this.grid;
+        e.preventDefault();
+        var item = grid.getView().getItem(p.row);
+        var id = item[this.idField].toString();
 
-                for (var i = 0; i < (grid.getView() as any).getLength(); i++) {
-                    grid.getGrid().updateRow(i);
-                }
+        if (this.include[id]) {
+            delete this.include[id];
+        }
+        else {
+            this.include[id] = true;
+        }
 
-                this.updateSelectAll();
+        for (var i = 0; i < (grid.getView() as any).getLength(); i++) {
+            grid.getGrid().updateRow(i);
+        }
+
+        this.updateSelectAll();
+    }
+
+    private handleHeaderClick(e: MouseEvent): void {
+        if (Fluent.isDefaultPrevented(e))
+            return;
+
+        if (!(e.target as HTMLElement).classList.contains('select-all-items'))
+            return;
+
+        e.preventDefault();
+        
+        const grid = this.grid;
+        if (Object.keys(this.include).length > 0) {
+            clearKeys(this.include);
+        }
+        else {
+            var items = grid.getView().getItems();
+            for (var x of items.filter(bindThis(this).isSelectable)) {
+                var id1 = x[this.idField];
+                this.include[id1] = true;
             }
-        });
-
-        grid.getGrid().onHeaderClick.subscribe((e1) => {
-            if (Fluent.isDefaultPrevented(e1))
-                return;
-            if ((e1.target as HTMLElement).classList.contains('select-all-items')) {
-                e1.preventDefault();
-                if (Object.keys(this.include).length > 0) {
-                    clearKeys(this.include);
-                }
-                else {
-                    var items = grid.getView().getItems();
-                    for (var x of items.filter(this.isSelectable.bind(this))) {
-                        var id1 = x[this.idField];
-                        this.include[id1] = true;
-                    }
-                }
-                this.updateSelectAll();
-                grid.getView().setItems(grid.getView().getItems(), true);
-                setTimeout(this.updateSelectAll.bind(this), 0);
-            }
-        });
-
-        (grid.getView() as any).onRowsChanged.subscribe(() => {
-            return this.updateSelectAll();
-        });
+        }
+        this.updateSelectAll();
+        grid.getView().setItems(grid.getView().getItems(), true);
+        setTimeout(bindThis(this).updateSelectAll, 0);
     }
 
     updateSelectAll(): void {
@@ -79,7 +96,7 @@ export class GridRowSelectionMixin {
             selectAllButton.classList.toggle('checked',
                 keys.length > 0 &&
                 this.grid.getView().getItems().filter(
-                    this.isSelectable.bind(this)).length <= keys.length);
+                    bindThis(this).isSelectable).length <= keys.length);
         }
     }
 

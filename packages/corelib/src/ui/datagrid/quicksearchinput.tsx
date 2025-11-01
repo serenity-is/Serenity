@@ -1,4 +1,5 @@
-﻿import { Fluent, nsSerenity, QuickSearchTexts } from "../../base";
+﻿import { bindThis } from "@serenity-is/sleekdom";
+import { Fluent, nsSerenity, QuickSearchTexts } from "../../base";
 import { Widget, WidgetProps } from "../widgets/widget";
 
 export interface QuickSearchField {
@@ -33,8 +34,9 @@ export class QuickSearchInput<P extends QuickSearchInputOptions = QuickSearchInp
         this.domNode.placeholder = QuickSearchTexts.Placeholder;
         this.lastValue = (this.domNode.value ?? "").trim();
 
-        Fluent.on(this.domNode, "keyup." + this.uniqueName, this.checkIfValueChanged.bind(this));
-        Fluent.on(this.domNode, "change." + this.uniqueName, this.checkIfValueChanged.bind(this));
+        const boundThis = bindThis(this);
+        Fluent.on(this.domNode, "keyup." + this.uniqueName, boundThis.checkIfValueChanged);
+        Fluent.on(this.domNode, "change." + this.uniqueName, boundThis.checkIfValueChanged);
 
         this.domNode.before(<span class="quick-search-icon"><i /></span>)
 

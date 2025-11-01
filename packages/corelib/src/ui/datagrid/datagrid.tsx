@@ -1,3 +1,4 @@
+import { bindThis } from "@serenity-is/sleekdom";
 import { ArgsCell, AutoTooltips, Column, ColumnSort, EventEmitter, FormatterContext, Grid, GridOptions, type IGrid } from "@serenity-is/sleekgrid";
 import { Authorization, Criteria, DataGridTexts, Fluent, ListResponse, cssEscape, debounce, getInstanceType, getTypeFullName, getjQuery, nsSerenity, tryGetText, type PropertyItem, type PropertyItemsData } from "../../base";
 import { LayoutTimer, ScriptData, getColumnsData, getColumnsDataAsync, setEquality } from "../../compat";
@@ -62,12 +63,7 @@ export class DataGrid<TItem, P = {}> extends Widget<P> implements IDataGrid, IRe
         this.restoringSettings = 0;
         this.domNode.classList.add('s-DataGrid');
 
-        var layout = function () {
-            this.layout();
-            if (this._layoutTimer != null)
-                LayoutTimer.store(this._layoutTimer);
-        }.bind(this);
-
+        const layout = bindThis(this).layoutTimerCallback;
         this.element.addClass('require-layout').on('layout.' + this.uniqueName, layout);
 
         if (this.useLayoutTimer())
@@ -86,6 +82,12 @@ export class DataGrid<TItem, P = {}> extends Widget<P> implements IDataGrid, IRe
         this.syncOrAsyncThen(this.getPropertyItemsData, this.getPropertyItemsDataAsync, itemsData => {
             this.propertyItemsReady(itemsData);
         });
+    }
+
+    private layoutTimerCallback() {
+        this.layout();
+        if (this._layoutTimer != null)
+            LayoutTimer.store(this._layoutTimer);
     }
 
     protected propertyItemsReady(itemsData: PropertyItemsData) {
@@ -109,10 +111,10 @@ export class DataGrid<TItem, P = {}> extends Widget<P> implements IDataGrid, IRe
         }
 
         this.createQuickFilters();
-        
+
         this.updateDisabledState();
         this.updateInterface();
-        
+
         // call before restoring settings so global handlers can add mixins/plugins before that
         DataGrid.onAfterInit.notify({ dataGrid: this, grid: this.slickGrid }, null, this);
         this.afterInit();
@@ -1080,7 +1082,7 @@ export class DataGrid<TItem, P = {}> extends Widget<P> implements IDataGrid, IRe
 
                     return this.allColumns = value;
                 },
-                canShowColumn: this.canShowColumn.bind(this),
+                canShowColumn: bindThis(this).canShowColumn,
                 filterBar: this.filterBar,
                 flags: flags || this.gridPersistanceFlags(),
                 includeDeletedToggle: this.domNode.querySelector('.s-IncludeDeletedToggle'),
