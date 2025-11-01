@@ -106,9 +106,9 @@ describe("BasicLayout", () => {
 });
 
 function isHidden(element: HTMLElement | null): boolean {
-    return !element || element.hidden || element.style.display === "none";
+    return !element || element.hidden || getComputedStyle(element).display === "none";
 }
 
 function isVisible(element: HTMLElement | null): boolean {
-    return element != null && !element.hidden && element.style.display !== "none";
+    return element != null && !element.hidden && getComputedStyle(element).display !== "none";
 }

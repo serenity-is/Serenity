@@ -147,7 +147,7 @@ export class Toolbar<P extends ToolbarOptions = ToolbarOptions> extends Widget<P
                 }
             }
             this.mouseTrap.bind(tb.hotkey, function () {
-                if (button.style.display != "none") {
+                if (getComputedStyle(button).display !== "none") {
                     Fluent.trigger(button, "click");
                 }
                 return tb.hotkeyAllowDefault;

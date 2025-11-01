@@ -65,7 +65,7 @@ export namespace TabsExtensions {
             var anchors = Array.from(tabs.querySelectorAll<HTMLAnchorElement>(navLinkSelector));
             if (index < anchors.length) {
                 if (!visible && anchors[index].classList.contains("active")) {
-                    var newIndex = anchors.findIndex((x, i) => i !== index && !x.classList.contains("disabled") && x.style.display !== "none");
+                    var newIndex = anchors.findIndex((x, i) => i !== index && !x.classList.contains("disabled") && getComputedStyle(x).display !== "none");
                     if (newIndex >= 0)
                         anchors[newIndex].click();
                 }
