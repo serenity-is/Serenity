@@ -27,16 +27,3 @@ export function bindThis<T>(obj: T): T {
     }
     return proxy;
 }
-
-export function bindPrototypeMethods(instance: any) {
-    let proto = instance.constructor.prototype;
-    do {
-        for (const key of getOwnPropertyNames(proto)) {
-            if (!hasOwnProperty.call(instance, key) &&
-                typeof proto[key] === "function" &&
-                key !== "constructor") {
-                instance[key] = instance[key].bind(instance);
-            }
-        }
-    } while ((proto = Reflect.getPrototypeOf(proto)) && proto !== Object.prototype);
-}

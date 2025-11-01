@@ -3715,14 +3715,14 @@ export class Grid<TItem = any> implements IGrid<TItem> {
         this.setFocus();
 
         if (!this._cellNavigator) {
-            const bound = bindThis(this);
+            const boundThis = bindThis(this);
             this._cellNavigator = new CellNavigator({
-                getColumnCount: bound.getColumnCount,
-                getRowCount: bound.getDataLengthIncludingAddNew,
-                getColspan: bound.getColspan,
-                canCellBeActive: bound.canCellBeActive,
-                setTabbingDirection: bound.setTabbingDirection,
-                isRTL: bound.isRTL
+                getColumnCount: boundThis.getColumnCount,
+                getRowCount: boundThis.getDataLengthIncludingAddNew,
+                getColspan: boundThis.getColspan,
+                canCellBeActive: boundThis.canCellBeActive,
+                setTabbingDirection: boundThis.setTabbingDirection,
+                isRTL: boundThis.isRTL
             });
         }
 
