@@ -6,7 +6,6 @@
     "@serenity-is/sleekgrid": "workspace:*"
   },
   "devDependencies": {
-    "@serenity-is/signals": "workspace:*",
     "@serenity-is/sleekdom": "workspace:*",
     "@serenity-is/tsbuild": "workspace:*",
     "test-utils": "workspace:*"

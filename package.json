@@ -2,7 +2,6 @@
   "name": "@serenity-is/workspace-serenity",
   "devDependencies": {
     "@preact/signals-core": "catalog:serenity",
-    "@serenity-is/signals": "workspace:*",
     "@serenity-is/sleekdom": "workspace:*",
     "@vitest/coverage-v8": "catalog:serenity",
     "dts-bundle-generator": "catalog:serenity",

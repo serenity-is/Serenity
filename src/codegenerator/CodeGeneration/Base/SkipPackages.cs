@@ -47,7 +47,6 @@ public static class SkipPackages
             string.Equals(packageId, "Serenity.Assets", StringComparison.OrdinalIgnoreCase) ||
             string.Equals(packageId, "Serenity.Corelib") ||
             string.Equals(packageId, "Serenity.SleekDom") ||
-            string.Equals(packageId, "Serenity.Signals") ||
             string.Equals(packageId, "Serenity.SleekGrid");
     }
 }

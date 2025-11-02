@@ -4,7 +4,6 @@
     "@serenity-is/corelib": "workspace:*",
     "@serenity-is/demo.northwind": "workspace:*",
     "@serenity-is/extensions": "workspace:*",
-    "@serenity-is/signals": "workspace:*",
     "@serenity-is/sleekdom": "workspace:*",
     "@serenity-is/sleekgrid": "workspace:*",
     "bootstrap-datepicker": "1.10.1",

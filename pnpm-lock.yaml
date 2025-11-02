@@ -57,9 +57,6 @@ importers:
       '@preact/signals-core':
         specifier: catalog:serenity
         version: 1.12.1
-      '@serenity-is/signals':
-        specifier: workspace:*
-        version: link:packages/signals
       '@serenity-is/sleekdom':
         specifier: workspace:*
         version: link:packages/sleekdom
@@ -91,9 +88,6 @@ importers:
         specifier: workspace:*
         version: link:../packages/sleekgrid
     devDependencies:
-      '@serenity-is/signals':
-        specifier: workspace:*
-        version: link:../packages/signals
       '@serenity-is/sleekdom':
         specifier: workspace:*
         version: link:../packages/sleekdom
@@ -134,15 +128,6 @@ importers:
         specifier: workspace:*
         version: link:../sleekgrid
 
-  packages/signals:
-    devDependencies:
-      '@preact/signals-core':
-        specifier: catalog:serenity
-        version: 1.12.1
-      '@serenity-is/sleekdom':
-        specifier: workspace:*
-        version: link:../sleekdom
-
   packages/sleekdom: {}
 
   packages/sleekgrid: {}
@@ -173,9 +158,6 @@ importers:
       '@serenity-is/extensions':
         specifier: workspace:*
         version: link:../../../common-features/src/extensions
-      '@serenity-is/signals':
-        specifier: workspace:*
-        version: link:../../../packages/signals
       '@serenity-is/sleekdom':
         specifier: workspace:*
         version: link:../../../packages/sleekdom

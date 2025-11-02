@@ -1,4 +1,4 @@
-import { computed, signal } from "@serenity-is/signals";
+import { computed, signal } from "@preact/signals-core";
 import type { GridSignals } from "../core/grid-signals";
 
 export type BandKey = "start" | "main" | "end";

@@ -1,4 +1,4 @@
-import { ReadonlySignal, Signal } from '@serenity-is/signals';
+import { ReadonlySignal, Signal } from '@preact/signals-core';
 
 /***
  * A base class that all special / non-data rows (like Group and GroupTotals) derive from.

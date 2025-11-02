@@ -4,7 +4,6 @@
   </PropertyGroup>
   <ItemGroup>
     <ProjectReference Include="..\sleekdom\Serenity.SleekDom.csproj" />
-    <ProjectReference Include="..\signals\Serenity.Signals.csproj" />
     <ProjectReference Include="..\sleekgrid\Serenity.SleekGrid.csproj" />
   </ItemGroup>
   <Target Name="RunTSBuild" Condition="'$(SkipNodeScripts)' != 'true'" BeforeTargets="ResolveProjectStaticWebAssets" DependsOnTargets="NpmInstall">
