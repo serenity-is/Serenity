@@ -1,4 +1,4 @@
-import { bindThis } from "@serenity-is/sleekdom";
+import { bindThis } from "@serenity-is/wisdom";
 import { AutoTooltips, Column, ColumnSort, FormatterContext, Grid, GridOptions, type CellMouseEvent } from "@serenity-is/sleekgrid";
 import { Authorization, Criteria, DataGridTexts, Fluent, ListResponse, cssEscape, debounce, getInstanceType, getTypeFullName, getjQuery, nsSerenity, tryGetText, type PropertyItem, type PropertyItemsData } from "../../base";
 import { PubSub } from "../../base/pubsub";

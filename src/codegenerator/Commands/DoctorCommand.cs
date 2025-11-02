@@ -25,7 +25,7 @@ public partial class DoctorCommand(IProjectFileInfo project, IGeneratorConsole c
         (new(8, 8, 4), new(8, 1, 6))
     ];
 
-    static readonly (Version, Version)[] RecommendedSleekDomVersion = [
+    static readonly (Version, Version)[] RecommendedWisDomVersion = [
         (new (0, 0, 0), new(1, 0, 0))
     ];
 
@@ -432,13 +432,13 @@ public partial class DoctorCommand(IProjectFileInfo project, IGeneratorConsole c
 
         if (versionStr.StartsWith("./node_modules/.dotnet/", StringComparison.Ordinal))
         {
-            Info("@serenity-is/sleekdom Version", versionStr);
+            Info("@serenity-is/wisdom Version", versionStr);
             return;
         }
 
         if (versionStr.StartsWith("workspace:", StringComparison.Ordinal))
         {
-            Info("@serenity-is/sleekdom Version", versionStr);
+            Info("@serenity-is/wisdom Version", versionStr);
             return;
         }
 
@@ -469,38 +469,38 @@ public partial class DoctorCommand(IProjectFileInfo project, IGeneratorConsole c
     }
 
     
-    void CheckSleekDomVersion(PackageJson packageJson, Version serenityVersion)
+    void CheckWisDomVersion(PackageJson packageJson, Version serenityVersion)
     {
-        if (packageJson.dependencies?.TryGetValue("@serenity-is/sleekdom", out var versionStr) != true &&
-            packageJson.devDependencies?.TryGetValue("@serenity-is/sleekdom", out versionStr) != true)
+        if (packageJson.dependencies?.TryGetValue("@serenity-is/wisdom", out var versionStr) != true &&
+            packageJson.devDependencies?.TryGetValue("@serenity-is/wisdom", out versionStr) != true)
         {
-            Warning($"@serenity-is/sleekdom package not found in package.json dependencies!");
+            Warning($"@serenity-is/wisdom package not found in package.json dependencies!");
             return;
         }
 
         if (!Version.TryParse(versionStr, out Version version))
         {
-            Warning($"Can't parse @serenity-is/sleekdom dependency version from package.json!");
+            Warning($"Can't parse @serenity-is/wisdom dependency version from package.json!");
             return;
         }
 
-        var recommendedVersion = RecommendedSleekDomVersion.LastOrDefault(x =>
+        var recommendedVersion = RecommendedWisDomVersion.LastOrDefault(x =>
             serenityVersion >= x.Item1).Item2;
 
         if (version != null && version < recommendedVersion)
         {
-            Error($"@serenity-is/sleekdom version in package.json is {version}, " +
-                $"please update to {RecommendedSleekDomVersion} for better support.");
+            Error($"@serenity-is/wisdom version in package.json is {version}, " +
+                $"please update to {RecommendedWisDomVersion} for better support.");
         }
         else if (version != null && version > recommendedVersion)
         {
-            Warning($"The @serenity-is/sleekdom version in package.json is {version}, " +
+            Warning($"The @serenity-is/wisdom version in package.json is {version}, " +
                 $"which is newer than the recommended version {recommendedVersion} " +
                 $"for Serenity {serenityVersion}. Please check docs as it may include breaking changes.");
         }
         else
         {
-            Info("@serenity-is/sleekdom Version", version.ToString());
+            Info("@serenity-is/wisdom Version", version.ToString());
         }
     }
 

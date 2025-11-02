@@ -1,4 +1,4 @@
-﻿import { bindThis } from "@serenity-is/sleekdom";
+﻿import { bindThis } from "@serenity-is/wisdom";
 import { Authorization, Fluent, PropertyItem, SelectEditorTexts, isPromiseLike, nsSerenity, setElementReadOnly } from "../../base";
 import { ValidationHelper, isTrimmedEmpty } from "../../compat";
 import { IEditDialog, IGetEditValue, IReadOnly, ISetEditValue, IStringValue } from "../../interfaces";

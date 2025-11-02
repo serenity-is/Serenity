@@ -1,4 +1,4 @@
-﻿import { addDisposingListener } from "@serenity-is/sleekdom";
+﻿import { addDisposingListener } from "@serenity-is/wisdom";
 import { Fluent, getjQuery, isArrayLike } from "../../base";
 import { DataChangeInfo } from "../../types/datachangeinfo";
 import { Widget } from "../widgets/widget";

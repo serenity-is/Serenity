@@ -1,4 +1,4 @@
-import { bindThis } from "@serenity-is/sleekdom";
+import { bindThis } from "@serenity-is/wisdom";
 import { EventEmitter, EventSubscriber, type IGrid, type GridPlugin } from "../core";
 
 export interface RowMoveManagerOptions {

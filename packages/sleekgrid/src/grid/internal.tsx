@@ -1,4 +1,4 @@
-import { invokeDisposingListeners } from "@serenity-is/sleekdom";
+import { invokeDisposingListeners } from "@serenity-is/wisdom";
 
 export function simpleArrayEquals(arr1: number[], arr2: number[]) {
     if (!Array.isArray(arr1) || !Array.isArray(arr2) || arr1.length !== arr2.length)

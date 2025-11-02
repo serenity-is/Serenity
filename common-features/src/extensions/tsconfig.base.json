@@ -9,7 +9,7 @@
     "inlineSources": true,
     "isolatedModules": true,
     "jsx": "react-jsx",
-    "jsxImportSource": "@serenity-is/sleekdom",
+    "jsxImportSource": "@serenity-is/wisdom",
     "lib": [
       "ES2017",
       "DOM"

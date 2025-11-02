@@ -1,6 +1,6 @@
 # Third-party notices and license attributions
 
-Package: @serenity-is/sleekdom
+Package: @serenity-is/wisdom
 
 Primary license: MIT (see `LICENSE.md`)
 

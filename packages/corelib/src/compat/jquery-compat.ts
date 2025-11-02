@@ -1,4 +1,4 @@
-﻿import { invokeDisposingListeners } from "@serenity-is/sleekdom";
+﻿import { invokeDisposingListeners } from "@serenity-is/wisdom";
 import { isMobileView } from ".";
 import { Fluent, faIcon, getCookie, getjQuery } from "../base";
 

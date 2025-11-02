@@ -5,7 +5,7 @@
  * --------------------------------------------------------------------------
  */
 
-import { addDisposingListener, invokeDisposingListeners, removeDisposingListener } from "@serenity-is/sleekdom";
+import { addDisposingListener, invokeDisposingListeners, removeDisposingListener } from "@serenity-is/wisdom";
 import { getjQuery } from "./environment";
 
 const stripNameRegex = /\..*/

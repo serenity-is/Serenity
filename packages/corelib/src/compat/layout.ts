@@ -1,4 +1,4 @@
-﻿import { addDisposingListener } from "@serenity-is/sleekdom";
+﻿import { addDisposingListener } from "@serenity-is/wisdom";
 import { Fluent, getjQuery, isArrayLike } from "../base";
 import { type CreateWidgetParams, type Widget, type WidgetProps } from "../ui/widgets/widget";
 import { executeEverytimeWhenVisible } from "./layouttimer";

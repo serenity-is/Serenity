@@ -1,7 +1,7 @@
 <Project Sdk="Microsoft.NET.Sdk.Razor">
   <PropertyGroup>
     <Version>1.0.0</Version>
-    <Description>NuGet version of @serenity-is/sleekdom NPM package</Description>
+    <Description>NuGet version of @serenity-is/wisdom NPM package</Description>
   </PropertyGroup>
   <ItemGroup>
       <Content Update="$(MSBuildProjectDirectory)\docs\**\*" CopyToOutputDirectory="Never" CopyToPublishDirectory="Never" Pack="false" />

@@ -1,4 +1,4 @@
-﻿import { bindThis } from "@serenity-is/sleekdom";
+﻿import { bindThis } from "@serenity-is/wisdom";
 import { getjQuery, isBS3, isBS5Plus } from "./environment";
 import { Fluent } from "./fluent";
 import { htmlEncode, sanitizeHtml, type RenderableContent } from "./html";

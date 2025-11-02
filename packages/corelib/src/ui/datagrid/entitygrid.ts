@@ -1,5 +1,5 @@
 ﻿
-import { bindThis } from "@serenity-is/sleekdom";
+import { bindThis } from "@serenity-is/wisdom";
 import { Authorization, EntityGridTexts, Fluent, faIcon, getActiveRequests, getInstanceType, getTypeFullName, isPromiseLike, localText, nsSerenity, resolveUrl, stringFormat } from "../../base";
 import { HandleRouteEvent, Router, replaceAll, safeCast } from "../../compat";
 import { IEditDialog } from "../../interfaces";

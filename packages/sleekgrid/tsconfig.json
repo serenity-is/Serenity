@@ -9,7 +9,7 @@
         "DOM"
       ],
       "jsx": "react-jsx",
-      "jsxImportSource": "@serenity-is/sleekdom",
+      "jsxImportSource": "@serenity-is/wisdom",
       "module": "ESNext",
       "moduleResolution": "Bundler",
       "newLine": "lf",

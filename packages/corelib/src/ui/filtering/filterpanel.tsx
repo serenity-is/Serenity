@@ -1,4 +1,4 @@
-﻿import { bindThis } from "@serenity-is/sleekdom";
+﻿import { bindThis } from "@serenity-is/wisdom";
 import { FilterPanelTexts, Fluent, PropertyItem, localText, nsSerenity } from "../../base";
 import { Combobox } from "../editors/combobox";
 import { ComboboxEditor } from "../editors/comboboxeditor";

@@ -1,7 +1,7 @@
-import { addDisposingListener, invokeDisposingListeners, removeDisposingListener } from "@serenity-is/sleekdom";
+import { addDisposingListener, invokeDisposingListeners, removeDisposingListener } from "@serenity-is/wisdom";
 import { addListener, notifyDisposingNode, getEventRegistry, triggerEvent } from "./fluent-events";
 
-vi.mock(import("@serenity-is/sleekdom"), async () => {
+vi.mock(import("@serenity-is/wisdom"), async () => {
     return {
         invokeDisposingListeners: vi.fn(),
         addDisposingListener: vi.fn(),

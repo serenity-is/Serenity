@@ -1,4 +1,4 @@
-import { FunctionComponent, type ComponentChildren } from '@serenity-is/sleekdom';
+import { FunctionComponent, type ComponentChildren } from '@serenity-is/wisdom';
 import { StringEditor } from '../editors/stringeditor';
 import { FileUploadEditor } from '../editors/uploadeditors';
 import { PropertyGrid } from './propertygrid';
@@ -344,7 +344,7 @@ it('attach event listeners', function () {
 
     expect(element.onclick).toBe(handleClick);
     expect(addEventListener.mock.calls.length).toEqual(1);
-    // sleekdom attaches global disposing listener
+    // wisdom attaches global disposing listener
     expect(addEventListener.mock.calls[0][0]).toBe("disposing");
     addEventListener.mockClear();
 });

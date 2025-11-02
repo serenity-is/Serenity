@@ -57,9 +57,9 @@ importers:
       '@preact/signals-core':
         specifier: catalog:serenity
         version: 1.12.1
-      '@serenity-is/sleekdom':
+      '@serenity-is/wisdom':
         specifier: workspace:*
-        version: link:packages/sleekdom
+        version: link:packages/wisdom
       '@vitest/coverage-v8':
         specifier: catalog:serenity
         version: 3.2.4(@vitest/browser@3.2.4)(vitest@3.2.4)
@@ -88,12 +88,12 @@ importers:
         specifier: workspace:*
         version: link:../packages/sleekgrid
     devDependencies:
-      '@serenity-is/sleekdom':
-        specifier: workspace:*
-        version: link:../packages/sleekdom
       '@serenity-is/tsbuild':
         specifier: workspace:*
         version: link:../packages/tsbuild
+      '@serenity-is/wisdom':
+        specifier: workspace:*
+        version: link:../packages/wisdom
       test-utils:
         specifier: workspace:*
         version: link:../packages/test-utils
@@ -128,8 +128,6 @@ importers:
         specifier: workspace:*
         version: link:../sleekgrid
 
-  packages/sleekdom: {}
-
   packages/sleekgrid: {}
 
   packages/test-utils:
@@ -147,6 +145,8 @@ importers:
         specifier: catalog:serenity
         version: 11.0.3
 
+  packages/wisdom: {}
+
   serene/src/Serene.Web:
     dependencies:
       '@serenity-is/corelib':
@@ -158,12 +158,12 @@ importers:
       '@serenity-is/extensions':
         specifier: workspace:*
         version: link:../../../common-features/src/extensions
-      '@serenity-is/sleekdom':
-        specifier: workspace:*
-        version: link:../../../packages/sleekdom
       '@serenity-is/sleekgrid':
         specifier: workspace:*
         version: link:../../../packages/sleekgrid
+      '@serenity-is/wisdom':
+        specifier: workspace:*
+        version: link:../../../packages/wisdom
       bootstrap-datepicker:
         specifier: 1.10.1
         version: 1.10.1

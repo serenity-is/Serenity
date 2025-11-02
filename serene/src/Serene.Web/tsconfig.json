@@ -10,7 +10,7 @@
     "forceConsistentCasingInFileNames": true,
     "isolatedModules": true,
     "jsx": "react-jsx",
-    "jsxImportSource": "@serenity-is/sleekdom",
+    "jsxImportSource": "@serenity-is/wisdom",
     "module": "ESNext",
     "moduleResolution": "bundler",
     "newLine": "lf",

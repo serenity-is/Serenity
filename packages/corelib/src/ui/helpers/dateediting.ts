@@ -1,4 +1,4 @@
-import { addDisposingListener } from "@serenity-is/sleekdom";
+import { addDisposingListener } from "@serenity-is/wisdom";
 import { Culture, formatDate, getjQuery, parseDate } from "../../base";
 
 export function dateInputChangeHandler(e: Event) {
