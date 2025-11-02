@@ -15,6 +15,7 @@
       "noEmitHelpers": false,
       "noImplicitAny": true,
       "isolatedModules": true,
+      "rootDir": "./src",
       "sourceMap": false,
       "skipLibCheck": false,
       "outDir": "./dist",

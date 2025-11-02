@@ -13,7 +13,22 @@ function appendChild(parent: Node, child: Node) {
 }
 
 let fragmentPlaceholderIdx = 0;
-const fragmentPlaceholderPrefix = "__sleekdomfragmentplaceholder";
+const placeholderPrefix = "__sleekdomfrag_";
+
+function isPlaceholder(node: Node): node is Comment {
+    return node instanceof Comment && node.data.startsWith(placeholderPrefix);
+}
+
+function isFragmentWithPlaceholder(node: Node): node is DocumentFragment {
+    return node instanceof DocumentFragment && isPlaceholder(node.firstChild);
+}
+
+function replaceNode(oldNode: Node, newNode: Node) {
+    if (typeof (oldNode as any).replaceWith === "function")
+        (oldNode as any).replaceWith(newNode);
+    else
+        (oldNode.parentNode)?.replaceChild(newNode, oldNode);
+}
 
 function wrapAsNode(value: any): Node {
     if (typeof value === "string") {
@@ -24,8 +39,8 @@ function wrapAsNode(value: any): Node {
     }
     if (value instanceof DocumentFragment) {
         ++fragmentPlaceholderIdx;
-        value.prepend(document.createComment(fragmentPlaceholderPrefix + fragmentPlaceholderIdx));
-        value.append(document.createComment(fragmentPlaceholderPrefix + fragmentPlaceholderIdx));
+        value.prepend(document.createComment(placeholderPrefix + fragmentPlaceholderIdx));
+        value.append(document.createComment(placeholderPrefix + fragmentPlaceholderIdx));
         return value;
     }
     if (value instanceof Node) {
@@ -38,21 +53,13 @@ function wrapAsNode(value: any): Node {
 }
 
 function appendChildrenWithSignal(parent: Node, signal: SignalLike<any>) {
-    let prevValueAsNode: Node;
+    let prevNode: Node;
     observeSignal(signal, (args) => {
         if (args.isInitial) {
-            prevValueAsNode = wrapAsNode(args.newValue);
-            if (prevValueAsNode instanceof DocumentFragment &&
-                prevValueAsNode.firstChild instanceof Comment &&
-                prevValueAsNode.firstChild.data.startsWith(fragmentPlaceholderPrefix)) {
-                const o = prevValueAsNode;
-                args.lifecycleNode = (prevValueAsNode = o.firstChild) ?? parent;
-                appendChildren(parent, o);
-            }
-            else {
-                appendChildren(parent, prevValueAsNode as any)
-                args.lifecycleNode = prevValueAsNode ?? parent;
-            }
+            prevNode = wrapAsNode(args.newValue);
+            let prevNodeNew = isFragmentWithPlaceholder(prevNode) ? prevNode.firstChild : prevNode;
+            appendChildren(parent, prevNode as any);
+            args.lifecycleNode = (prevNode = prevNodeNew) ?? parent;
             return;
         }
 
@@ -60,34 +67,19 @@ function appendChildrenWithSignal(parent: Node, signal: SignalLike<any>) {
             return;
         }
 
-        const newValueAsNode = wrapAsNode(args.newValue);
-        if (prevValueAsNode instanceof Comment && prevValueAsNode.data.startsWith("__sleekdomfragmentplaceholder")) {
+        const newNode = wrapAsNode(args.newValue);
+        if (isPlaceholder(prevNode)) {
             let n: Node;
-            while (n = prevValueAsNode.nextSibling) {
+            while (n = prevNode.nextSibling) {
                 n.parentNode?.removeChild(n);
-                if (n instanceof Comment && n.data === prevValueAsNode.data) {
+                if (n instanceof Comment && n.data === prevNode.data) {
                     break;
                 }
             }
         }
-
-        if (newValueAsNode instanceof DocumentFragment &&
-            newValueAsNode.firstChild instanceof Comment &&
-            newValueAsNode.firstChild.data.startsWith(fragmentPlaceholderPrefix)) {
-            const comment = newValueAsNode?.firstChild;
-            if (typeof (prevValueAsNode as any).replaceWith === "function")
-                (prevValueAsNode as any).replaceWith(newValueAsNode);
-            else
-                (prevValueAsNode.parentNode)?.replaceChild(newValueAsNode, prevValueAsNode);
-            args.lifecycleNode = (prevValueAsNode = comment) ?? parent;
-        }
-        else {
-            if (typeof (prevValueAsNode as any).replaceWith === "function")
-                (prevValueAsNode as any).replaceWith(newValueAsNode);
-            else
-                (prevValueAsNode.parentNode)?.replaceChild(newValueAsNode, prevValueAsNode);
-            args.lifecycleNode = (prevValueAsNode = newValueAsNode) ?? parent;
-        }
+        let prevNodeNew = isFragmentWithPlaceholder(newNode) ? newNode.firstChild : newNode;
+        replaceNode(prevNode, newNode);
+        args.lifecycleNode = (prevNode = prevNodeNew) ?? parent;
     });
 
 }

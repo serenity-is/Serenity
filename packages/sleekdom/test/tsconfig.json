@@ -2,9 +2,11 @@
     "extends": "../tsconfig.json",
     "compilerOptions": {
         "jsx": "react-jsx",
+        "jsxImportSource": "#src",
         "noImplicitAny": false,
         "declaration": false,
         "sourceMap": true,
+        "rootDir": "../",
         "types": [
             "vitest/globals"
         ]

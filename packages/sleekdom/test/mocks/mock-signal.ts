@@ -1,6 +1,6 @@
-import { SignalLike } from "../../src/types/signal-like";
+import { ReadOnlySignalLike } from "../../src/types/signal-like";
 
-export function mockSignal<T>(initialValue: T): SignalLike<T> & {
+export function mockSignal<T>(initialValue: T): ReadOnlySignalLike<T> & {
     set value(value: T),
     unsubscribe: (callback: (value: T) => void) => void,
     listeners: Array<(value: T) => void>,

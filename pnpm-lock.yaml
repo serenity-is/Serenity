@@ -54,6 +54,9 @@ importers:
 
   .:
     devDependencies:
+      '@preact/signals-core':
+        specifier: catalog:serenity
+        version: 1.12.1
       '@serenity-is/signals':
         specifier: workspace:*
         version: link:packages/signals

@@ -31,7 +31,7 @@ export type RefCallback<T> = (instance: T) => void;
 export type Ref<T> = RefCallback<T> | RefObject<T> | null;
 export type EffectDisposer = (() => void) | null;
 export interface SignalLike<T> {
-	get value(): T;
+	readonly value: T;
 	peek(): T;
 	subscribe(fn: (value: T) => void): EffectDisposer;
 }

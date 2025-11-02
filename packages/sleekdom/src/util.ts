@@ -1,5 +1,4 @@
-import { addDisposingListener } from "./disposing-listener";
-import { type ComponentClass, type SignalLike } from "./types";
+import { type ComponentClass } from "./types";
 
 export const keys: <T>(obj: T) => Array<keyof T> = Object.keys as any;
 

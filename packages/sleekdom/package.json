@@ -6,6 +6,7 @@
   "types": "dist/index.d.ts",
   "main": "dist/index.js",
   "module": "dist/index.js",
+  "sideEffects": false,
   "exports": {
     ".": {
       "types": "./dist/index.d.ts",
@@ -14,6 +15,10 @@
     },
     "./jsx-runtime": "./dist/jsx-runtime.js",
     "./jsx-dev-runtime": "./dist/jsx-dev-runtime.js"
+  },
+  "imports": {
+    "#src/jsx-runtime": "./src/jsx-runtime.ts",
+    "#src/jsx-dev-runtime": "./src/jsx-dev-runtime.ts"
   },
   "files": [
     "dist/**/*.ts",
