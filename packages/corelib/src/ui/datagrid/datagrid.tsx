@@ -1,6 +1,7 @@
 import { bindThis } from "@serenity-is/sleekdom";
-import { ArgsCell, AutoTooltips, Column, ColumnSort, EventEmitter, FormatterContext, Grid, GridOptions, type CellMouseEvent, type IGrid } from "@serenity-is/sleekgrid";
+import { AutoTooltips, Column, ColumnSort, FormatterContext, Grid, GridOptions, type CellMouseEvent } from "@serenity-is/sleekgrid";
 import { Authorization, Criteria, DataGridTexts, Fluent, ListResponse, cssEscape, debounce, getInstanceType, getTypeFullName, getjQuery, nsSerenity, tryGetText, type PropertyItem, type PropertyItemsData } from "../../base";
+import { PubSub } from "../../base/pubsub";
 import { LayoutTimer, ScriptData, getColumnsData, getColumnsDataAsync, setEquality } from "../../compat";
 import { IReadOnly } from "../../interfaces";
 import { Format, IRemoteView, PagerOptions, RemoteView, RemoteViewOptions } from "../../slick";
@@ -19,7 +20,7 @@ import { ToolButton, Toolbar } from "../widgets/toolbar";
 import { Widget, WidgetProps } from "../widgets/widget";
 import { getWidgetFrom, tryGetWidget } from "../widgets/widgetutils";
 import { getDefaultSortBy, getItemCssClass, propertyItemToQuickFilter, slickGridOnSort } from "./datagrid-internal";
-import { GridPersistanceFlags, PersistedGridSettings, SettingStorage, getCurrentSettings, restoreSettingsFrom } from "./datagrid-persistance";
+import { GridPersistenceFlags, PersistedGridSettings, SettingStorage, getCurrentSettings, restoreSettingsFrom } from "./datagrid-persistence";
 import { IDataGrid } from "./idatagrid";
 import { IRowDefinition } from "./irowdefinition";
 import { QuickFilter } from "./quickfilter";
@@ -27,8 +28,8 @@ import { QuickFilterBar } from "./quickfilterbar";
 import { QuickSearchField } from "./quicksearchinput";
 import { SlickPager } from "./slickpager";
 
-export { omitAllGridPersistenceFlags } from "./datagrid-persistance";
-export type { GridPersistanceFlags, PersistedGridColumn, PersistedGridSettings, SettingStorage } from "./datagrid-persistance";
+export { omitAllGridPersistenceFlags } from "./datagrid-persistence";
+export type { GridPersistenceFlags, PersistedGridColumn, PersistedGridSettings, SettingStorage } from "./datagrid-persistence";
 
 export class DataGrid<TItem, P = {}> extends Widget<P> implements IDataGrid, IReadOnly {
 
@@ -51,11 +52,15 @@ export class DataGrid<TItem, P = {}> extends Widget<P> implements IDataGrid, IRe
     declare public openDialogsAsPanel: boolean;
 
     declare public static defaultRowHeight: number;
-    declare public static defaultPersistanceStorage: SettingStorage;
+    declare public static defaultPersistenceStorage: SettingStorage;
+
     declare public static defaultColumnWidthScale: number;
     declare public static defaultColumnWidthDelta: number;
 
-    public static readonly onAfterInit = new EventEmitter<{ dataGrid: DataGrid<any, any>, grid: IGrid }>();
+    public static readonly onAfterInit = new PubSub<DataGridInitEvent>();
+    public readonly onAfterInit = new PubSub<DataGridInitEvent>();
+    public readonly onDataChanged = new PubSub<DataGridChangeEvent>();
+    public readonly onPersistence = new PubSub<GridPersistenceEvent>();
 
     constructor(props: WidgetProps<P>) {
         super(props);
@@ -116,7 +121,8 @@ export class DataGrid<TItem, P = {}> extends Widget<P> implements IDataGrid, IRe
         this.updateInterface();
 
         // call before restoring settings so global handlers can add mixins/plugins before that
-        DataGrid.onAfterInit.notify({ dataGrid: this, grid: this.slickGrid }, null, this);
+        DataGrid.onAfterInit.notify({ dataGrid: this });
+        this.onAfterInit.notify({ dataGrid: this });
         this.afterInit();
 
         this.initialSettings = this.getCurrentSettings(null);
@@ -243,6 +249,11 @@ export class DataGrid<TItem, P = {}> extends Widget<P> implements IDataGrid, IRe
     }
 
     public destroy() {
+
+        this.onAfterInit?.clear();
+        this.onDataChanged?.clear();
+        this.onPersistence?.clear();
+
         if (this._layoutTimer) {
             this._layoutTimer = LayoutTimer.off(this._layoutTimer);
         }
@@ -479,6 +490,7 @@ export class DataGrid<TItem, P = {}> extends Widget<P> implements IDataGrid, IRe
     }
 
     protected viewDataChanged(e: any, rows: TItem[]): void {
+        this.onDataChanged.notify({ dataGrid: this });
         this.markupReady();
         this.layout();
     }
@@ -490,15 +502,15 @@ export class DataGrid<TItem, P = {}> extends Widget<P> implements IDataGrid, IRe
             return self.viewDataChanged(e, d);
         });
 
-        this.view.onSubmit = function (view) {
+        this.view.onSubmit = function () {
             return self.onViewSubmit();
         };
 
-        this.view.setFilter(function (item, view1) {
+        this.view.setFilter(function (item) {
             return self.onViewFilter(item);
         });
 
-        this.view.onProcessData = function (response, view2) {
+        this.view.onProcessData = function (response) {
             return self.onViewProcessData(response);
         }
     }
@@ -563,6 +575,7 @@ export class DataGrid<TItem, P = {}> extends Widget<P> implements IDataGrid, IRe
     }
 
     protected markupReady(): void {
+
     }
 
     protected createSlickContainer(): Fluent {
@@ -998,11 +1011,15 @@ export class DataGrid<TItem, P = {}> extends Widget<P> implements IDataGrid, IRe
         this.refresh();
     }
 
-    protected getPersistanceStorage(): SettingStorage {
-        return DataGrid.defaultPersistanceStorage;
+    protected getPersistenceStorage(): SettingStorage {
+        if ((this as any).getPersistanceStorage) return (this as any).getPersistanceStorage(); // compat
+        
+        return DataGrid.defaultPersistenceStorage;
     }
 
-    protected getPersistanceKey(): string {
+    protected getPersistenceKey(): string {
+        if ((this as any).getPersistanceKey) return ((this as any).getPersistanceKey); // compat
+
         var key = 'GridSettings:';
         var path = window.location.pathname;
         if (path) {
@@ -1013,7 +1030,9 @@ export class DataGrid<TItem, P = {}> extends Widget<P> implements IDataGrid, IRe
         return key;
     }
 
-    protected gridPersistanceFlags(): GridPersistanceFlags {
+    protected gridPersistenceFlags(): GridPersistenceFlags {
+        if ((this as any).gridPersistanceFlags) return (this as any).gridPersistanceFlags; // compat
+
         return {};
     }
 
@@ -1039,7 +1058,7 @@ export class DataGrid<TItem, P = {}> extends Widget<P> implements IDataGrid, IRe
     }
 
     protected getPersistedSettings(): PersistedGridSettings | Promise<PersistedGridSettings> {
-        var storage = this.getPersistanceStorage();
+        var storage = this.getPersistenceStorage();
         if (storage == null)
             return null;
 
@@ -1050,14 +1069,14 @@ export class DataGrid<TItem, P = {}> extends Widget<P> implements IDataGrid, IRe
             return null;
         }
 
-        var jsonOrPromise = storage.getItem(this.getPersistanceKey());
+        var jsonOrPromise = storage.getItem(this.getPersistenceKey());
         if ((jsonOrPromise as any)?.then)
             return (jsonOrPromise as Promise<string>).then(json => fromJson(json));
 
         return fromJson(jsonOrPromise as string);
     }
 
-    protected restoreSettings(settings?: PersistedGridSettings, flags?: GridPersistanceFlags): void | Promise<void> {
+    protected restoreSettings(settings?: PersistedGridSettings, flags?: GridPersistenceFlags): void | Promise<void> {
         if (settings != null)
             return this.restoreSettingsFrom(settings, flags);
 
@@ -1068,13 +1087,29 @@ export class DataGrid<TItem, P = {}> extends Widget<P> implements IDataGrid, IRe
         this.restoreSettingsFrom(settingsOrPromise as PersistedGridSettings);
     }
 
-    protected restoreSettingsFrom(settings: PersistedGridSettings, flags?: GridPersistanceFlags): void {
+    protected restoreSettingsFrom(settings: PersistedGridSettings, flags?: GridPersistenceFlags): void {
         if (!this.slickGrid || !settings)
             return;
 
         this.view.beginUpdate();
         this.restoringSettings++;
         try {
+
+            const flagsDefault = this.gridPersistenceFlags();
+            const event: GridPersistenceEvent = {
+                after: false,
+                dataGrid: this,
+                flagsArgument: flags,
+                flagsDefault,
+                flagsToUse: flags || flagsDefault,
+                restoring: true,
+                persisting: false,
+                settings,
+            };
+
+            this.onPersistence.notify(event);
+            event.flagsToUse ??= event.flagsDefault;
+
             restoreSettingsFrom({
                 allColumns: (value: Column[]) => {
                     if (value == null)
@@ -1084,15 +1119,18 @@ export class DataGrid<TItem, P = {}> extends Widget<P> implements IDataGrid, IRe
                 },
                 canShowColumn: bindThis(this).canShowColumn,
                 filterBar: this.filterBar,
-                flags: flags || this.gridPersistanceFlags(),
+                flags: event.flagsToUse,
                 includeDeletedToggle: this.domNode.querySelector('.s-IncludeDeletedToggle'),
                 quickFiltersDiv: this.quickFiltersDiv,
                 slickGrid: this.slickGrid,
-                settings: settings,
+                settings: event.settings,
                 toolbar: this.toolbar,
                 uniqueName: this.uniqueName,
                 view: this.view
-            })
+            });
+
+            event.after = true;
+            this.onPersistence.notify(event);
         }
         finally {
             this.restoringSettings--;
@@ -1100,26 +1138,57 @@ export class DataGrid<TItem, P = {}> extends Widget<P> implements IDataGrid, IRe
         }
     }
 
-    public persistSettings(flags?: GridPersistanceFlags): void | Promise<void> {
-        var storage = this.getPersistanceStorage();
+    private _persistenceLock: number = 0;
+
+    public persistenceLock() {
+        this._persistenceLock++;
+    }
+
+    public persistenceUnlock() {
+        this._persistenceLock--;
+    }
+
+    public persistSettings(flags?: GridPersistenceFlags): void | Promise<void> {
+        if (this._persistenceLock > 0)
+            return;
+
+        var storage = this.getPersistenceStorage();
         if (!storage) {
             return;
         }
 
         var settings = this.getCurrentSettings(flags);
-        return storage.setItem(this.getPersistanceKey(), JSON.stringify(settings));
+        return storage.setItem(this.getPersistenceKey(), JSON.stringify(settings));
     }
 
-    public getCurrentSettings(flags?: GridPersistanceFlags) {
-        return getCurrentSettings({
+    public getCurrentSettings(flags?: GridPersistenceFlags) {
+
+        const flagsDefault = this.gridPersistenceFlags();
+        const event: GridPersistenceEvent = {
+            after: false,
+            dataGrid: this,
+            flagsArgument: flags,
+            flagsDefault,
+            flagsToUse: flags || flagsDefault,
+            restoring: false,
+            persisting: true,
+            settings: null
+        }
+
+        event.flagsToUse ||= event.flagsDefault;
+
+        event.settings = getCurrentSettings({
             filterBar: this.filterBar,
-            flags: flags || this.gridPersistanceFlags(),
+            flags,
             includeDeletedToggle: this.domNode.querySelector('.s-IncludeDeletedToggle'),
             quickFiltersDiv: this.quickFiltersDiv,
             slickGrid: this.slickGrid,
             toolbar: this.toolbar,
             uniqueName: this.uniqueName
-        })
+        });
+        event.after = true;
+        this.onPersistence.notify(event);
+        return event.settings;
     }
 
     getElement(): HTMLElement {
@@ -1137,4 +1206,26 @@ export class DataGrid<TItem, P = {}> extends Widget<P> implements IDataGrid, IRe
     getFilterStore(): FilterStore {
         return (this.filterBar == null) ? null : this.filterBar.get_store();
     }
+
+    /** @obsolete use defaultPersistenceStorage, this one has a typo */
+    public static get defaultPersistanceStorage(): SettingStorage { return DataGrid.defaultPersistenceStorage; }
+    /** @obsolete use defaultPersistenceStorage, this one has a typo */
+    public static set defaultPersistanceStorage(value: SettingStorage) { DataGrid.defaultPersistenceStorage = value; }
+}
+
+export interface DataGridEvent {
+    dataGrid: DataGrid<any>;
+}
+
+export type DataGridChangeEvent = DataGridEvent;
+export type DataGridInitEvent = DataGridEvent;
+
+export interface GridPersistenceEvent extends DataGridEvent {
+    after: boolean;
+    flagsArgument: GridPersistenceFlags;
+    flagsDefault: GridPersistenceFlags;
+    flagsToUse: GridPersistenceFlags;
+    settings: PersistedGridSettings;
+    readonly restoring: boolean;
+    readonly persisting: boolean;
 }

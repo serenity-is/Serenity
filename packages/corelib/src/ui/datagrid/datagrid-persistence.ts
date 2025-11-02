@@ -32,7 +32,7 @@ export interface PersistedGridSettings {
     includeDeleted?: boolean;
 }
 
-export interface GridPersistanceFlags {
+export interface GridPersistenceFlags {
     columnPinning?: boolean;
     columnWidths?: boolean;
     columnVisibility?: boolean;
@@ -44,7 +44,10 @@ export interface GridPersistanceFlags {
     includeDeleted?: boolean;
 }
 
-export const omitAllGridPersistenceFlags: GridPersistanceFlags = {
+/** @deprecated Use GridPersistenceFlags, this one has a typo in the name */
+export type GridPersistanceFlags = GridPersistenceFlags;
+
+export const omitAllGridPersistenceFlags: GridPersistenceFlags = {
     columnPinning: false,
     columnWidths: false,
     columnVisibility: false,
@@ -58,7 +61,7 @@ export const omitAllGridPersistenceFlags: GridPersistanceFlags = {
 
 export function getCurrentSettings(this: void, opt: {
     filterBar: FilterDisplayBar,
-    flags: GridPersistanceFlags,
+    flags: GridPersistenceFlags,
     includeDeletedToggle: HTMLElement,
     quickFiltersDiv: Fluent,
     slickGrid: Grid,
@@ -173,7 +176,7 @@ export function restoreSettingsFrom(this: void, opt: {
     allColumns: (value?: Column[]) => Column[],
     canShowColumn: (column: Column) => boolean,
     filterBar: FilterDisplayBar,
-    flags: GridPersistanceFlags,
+    flags: GridPersistenceFlags,
     includeDeletedToggle: HTMLElement,
     quickFiltersDiv: Fluent,
     slickGrid: Grid,

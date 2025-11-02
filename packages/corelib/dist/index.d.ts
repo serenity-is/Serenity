@@ -1,4 +1,4 @@
-import { Column, EventEmitter, FormatterContext, FormatterResult, Grid, GridOptions, Group, GroupItemMetadataProvider, GroupTotals, IDataView, IEventData, IGrid, IGroupTotals, ItemMetadata } from '@serenity-is/sleekgrid';
+import { Column, EventEmitter, FormatterContext, FormatterResult, Grid, GridOptions, Group, GroupItemMetadataProvider, GroupTotals, IDataView, IEventData, IGroupTotals, ItemMetadata } from '@serenity-is/sleekgrid';
 
 export interface UserDefinition {
 	/**
@@ -4855,6 +4855,13 @@ export declare class ColumnPickerDialog<P = {}> extends BaseDialog<P> {
 		grid: IDataGrid;
 	}): void;
 }
+declare class PubSub<TEvent = {}> {
+	private handlers;
+	subscribe(fn: (e: TEvent) => void): void;
+	unsubscribe(fn: (e: TEvent) => void): void;
+	notify(e: TEvent): void;
+	clear(): void;
+}
 export type EditorProps<T> = WidgetProps<T> & {
 	initialValue?: any;
 	maxLength?: number;
@@ -5188,7 +5195,7 @@ export interface PersistedGridSettings {
 	quickSearchText?: string;
 	includeDeleted?: boolean;
 }
-export interface GridPersistanceFlags {
+export interface GridPersistenceFlags {
 	columnPinning?: boolean;
 	columnWidths?: boolean;
 	columnVisibility?: boolean;
@@ -5199,7 +5206,7 @@ export interface GridPersistanceFlags {
 	quickSearch?: boolean;
 	includeDeleted?: boolean;
 }
-export declare const omitAllGridPersistenceFlags: GridPersistanceFlags;
+export declare const omitAllGridPersistenceFlags: GridPersistenceFlags;
 export interface IRowDefinition {
 	readonly deletePermission?: string;
 	readonly idProperty?: string;
@@ -5333,13 +5340,13 @@ export declare class DataGrid<TItem, P = {}> extends Widget<P> implements IDataG
 	slickGrid: Grid;
 	openDialogsAsPanel: boolean;
 	static defaultRowHeight: number;
-	static defaultPersistanceStorage: SettingStorage;
+	static defaultPersistenceStorage: SettingStorage;
 	static defaultColumnWidthScale: number;
 	static defaultColumnWidthDelta: number;
-	static readonly onAfterInit: EventEmitter<{
-		dataGrid: DataGrid<any, any>;
-		grid: IGrid;
-	}, import("@serenity-is/sleekgrid").IEventData>;
+	static readonly onAfterInit: PubSub<DataGridEvent>;
+	readonly onAfterInit: PubSub<DataGridEvent>;
+	readonly onDataChanged: PubSub<DataGridEvent>;
+	readonly onPersistence: PubSub<GridPersistenceEvent>;
 	constructor(props: WidgetProps<P>);
 	private layoutTimerCallback;
 	protected propertyItemsReady(itemsData: PropertyItemsData): void;
@@ -5475,19 +5482,40 @@ export declare class DataGrid<TItem, P = {}> extends Widget<P> implements IDataG
 	protected booleanQuickFilter(field: string, title?: string, yes?: string, no?: string): QuickFilter<SelectEditor<SelectEditorOptions>, SelectEditorOptions>;
 	protected invokeSubmitHandlers(): void;
 	protected quickFilterChange(e: Event): void;
-	protected getPersistanceStorage(): SettingStorage;
-	protected getPersistanceKey(): string;
-	protected gridPersistanceFlags(): GridPersistanceFlags;
+	protected getPersistenceStorage(): SettingStorage;
+	protected getPersistenceKey(): string;
+	protected gridPersistenceFlags(): GridPersistenceFlags;
 	protected canShowColumn(column: Column): boolean;
 	protected getPersistedSettings(): PersistedGridSettings | Promise<PersistedGridSettings>;
-	protected restoreSettings(settings?: PersistedGridSettings, flags?: GridPersistanceFlags): void | Promise<void>;
-	protected restoreSettingsFrom(settings: PersistedGridSettings, flags?: GridPersistanceFlags): void;
-	persistSettings(flags?: GridPersistanceFlags): void | Promise<void>;
-	getCurrentSettings(flags?: GridPersistanceFlags): PersistedGridSettings;
+	protected restoreSettings(settings?: PersistedGridSettings, flags?: GridPersistenceFlags): void | Promise<void>;
+	protected restoreSettingsFrom(settings: PersistedGridSettings, flags?: GridPersistenceFlags): void;
+	private _persistenceLock;
+	persistenceLock(): void;
+	persistenceUnlock(): void;
+	persistSettings(flags?: GridPersistenceFlags): void | Promise<void>;
+	getCurrentSettings(flags?: GridPersistenceFlags): PersistedGridSettings;
 	getElement(): HTMLElement;
 	getGrid(): Grid;
 	getView(): IRemoteView<TItem>;
 	getFilterStore(): FilterStore;
+	/** @obsolete use defaultPersistenceStorage, this one has a typo */
+	static get defaultPersistanceStorage(): SettingStorage;
+	/** @obsolete use defaultPersistenceStorage, this one has a typo */
+	static set defaultPersistanceStorage(value: SettingStorage);
+}
+export interface DataGridEvent {
+	dataGrid: DataGrid<any>;
+}
+export type DataGridChangeEvent = DataGridEvent;
+export type DataGridInitEvent = DataGridEvent;
+export interface GridPersistenceEvent extends DataGridEvent {
+	after: boolean;
+	flagsArgument: GridPersistenceFlags;
+	flagsDefault: GridPersistenceFlags;
+	flagsToUse: GridPersistenceFlags;
+	settings: PersistedGridSettings;
+	readonly restoring: boolean;
+	readonly persisting: boolean;
 }
 export declare class EntityGrid<TItem, P = {}> extends DataGrid<TItem, P> {
 	static [Symbol.typeInfo]: ClassTypeInfo<"Serenity.">;
