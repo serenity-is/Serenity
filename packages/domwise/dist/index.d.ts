@@ -36,6 +36,11 @@ export interface SignalLike<T> {
 	peek(): T;
 	subscribe(fn: (value: T) => void): EffectDisposer;
 }
+export interface Signal<T> extends SignalLike<T> {
+	set value(value: T);
+}
+export interface Computed<T> extends SignalLike<T> {
+}
 export type SignalOrValue<T> = T | SignalLike<T>;
 type ComponentChild = string | number | Iterable<ComponentChild> | Array<ComponentChild> | {
 	value: ComponentChild;
@@ -2306,11 +2311,6 @@ export declare function observeSignal<T>(signal: SignalLike<T>, callback: Observ
 	 */
 	lifecycleNode?: EventTarget;
 }): EffectDisposer;
-export interface Signal<T> extends SignalLike<T> {
-	set value(value: T);
-}
-export interface Computed<T> extends SignalLike<T> {
-}
 export interface SignalOptions<T> {
 	watched?: (this: SignalLike<T>) => void;
 	unwatched?: (this: SignalLike<T>) => void;

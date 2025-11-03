@@ -1,12 +1,5 @@
 import * as signals from "@preact/signals-core";
-import { type SignalLike } from "./types/signal-like";
-
-export interface Signal<T> extends SignalLike<T> {
-    set value(value: T);
-}
-
-export interface Computed<T> extends SignalLike<T> {
-}
+import { type Computed, type Signal, type SignalLike } from "./types/signal-like";
 
 export interface SignalOptions<T> {
     watched?: (this: SignalLike<T>) => void;
