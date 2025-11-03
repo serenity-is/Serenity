@@ -1,4 +1,4 @@
-import { bindThis } from "@serenity-is/wizdom";
+import { bindThis } from "@serenity-is/domwise";
 import { GoToResult } from "./internal";
 
 export interface CellNavigatorHost {

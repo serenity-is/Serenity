@@ -1,4 +1,4 @@
-import { bindThis } from "@serenity-is/wizdom";
+import { bindThis } from "@serenity-is/domwise";
 import { Dialog, DialogButton, DialogOptions, Fluent, Validator, defaultNotifyOptions, getjQuery, nsSerenity, positionToastContainer } from "../../base";
 import { isMobileView, validateOptions } from "../../compat";
 import { IDialog } from "../../interfaces";

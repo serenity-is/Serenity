@@ -1,4 +1,4 @@
-import { FunctionComponent, type ComponentChildren } from '@serenity-is/wizdom';
+import { FunctionComponent, type ComponentChildren } from '@serenity-is/domwise';
 import { StringEditor } from '../editors/stringeditor';
 import { FileUploadEditor } from '../editors/uploadeditors';
 import { PropertyGrid } from './propertygrid';
@@ -344,7 +344,7 @@ it('attach event listeners', function () {
 
     expect(element.onclick).toBe(handleClick);
     expect(addEventListener.mock.calls.length).toEqual(1);
-    // wizdom attaches global disposing listener
+    // domwise attaches global disposing listener
     expect(addEventListener.mock.calls[0][0]).toBe("disposing");
     addEventListener.mockClear();
 });

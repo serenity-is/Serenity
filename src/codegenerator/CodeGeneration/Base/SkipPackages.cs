@@ -46,7 +46,7 @@ public static class SkipPackages
             packageId.StartsWith("Serenity.Net.", StringComparison.OrdinalIgnoreCase) ||
             string.Equals(packageId, "Serenity.Assets", StringComparison.OrdinalIgnoreCase) ||
             string.Equals(packageId, "Serenity.Corelib") ||
-            string.Equals(packageId, "Serenity.WizDom") ||
+            string.Equals(packageId, "Serenity.DomWise") ||
             string.Equals(packageId, "Serenity.SleekGrid");
     }
 }

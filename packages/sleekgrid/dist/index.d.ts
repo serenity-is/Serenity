@@ -1257,27 +1257,27 @@ export declare const Header: ({ band, refs, signals }: {
 	band: BandKey;
 	refs: GridLayoutRefs;
 	signals: Pick<GridSignals, "hideColumnHeader" | "pinnedStartLast" | "pinnedEndFirst">;
-}) => import("@serenity-is/wizdom").JSXElement;
+}) => import("@serenity-is/domwise").JSXElement;
 export declare const HeaderRow: ({ band, refs, signals }: {
 	band: BandKey;
 	refs: GridLayoutRefs;
 	signals: Pick<GridSignals, "hideHeaderRow" | "pinnedStartLast" | "pinnedEndFirst">;
-}) => import("@serenity-is/wizdom").JSXElement;
+}) => import("@serenity-is/domwise").JSXElement;
 export declare const TopPanel: ({ refs, signals }: {
 	refs: GridLayoutRefs;
 	signals: Pick<GridSignals, "hideTopPanel">;
-}) => import("@serenity-is/wizdom").JSXElement;
+}) => import("@serenity-is/domwise").JSXElement;
 export declare const Viewport: ({ band, pane, refs, signals }: {
 	band: BandKey;
 	pane: PaneKey;
 	refs: GridLayoutRefs;
 	signals: Pick<GridSignals, "frozenTopLast" | "frozenBottomFirst" | "pinnedStartLast" | "pinnedEndFirst">;
-}) => import("@serenity-is/wizdom").JSXElement;
+}) => import("@serenity-is/domwise").JSXElement;
 export declare const FooterRow: ({ band, refs, signals }: {
 	band: BandKey;
 	refs: GridLayoutRefs;
 	signals: Pick<GridSignals, "hideFooterRow" | "pinnedStartLast" | "pinnedEndFirst">;
-}) => import("@serenity-is/wizdom").JSXElement;
+}) => import("@serenity-is/domwise").JSXElement;
 export declare class Grid<TItem = any> implements IGrid<TItem> {
 	private _absoluteColMinWidth;
 	private _activeCanvasNode;

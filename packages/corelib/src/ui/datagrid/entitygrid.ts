@@ -1,5 +1,5 @@
 ﻿
-import { bindThis } from "@serenity-is/wizdom";
+import { bindThis } from "@serenity-is/domwise";
 import { Authorization, EntityGridTexts, Fluent, faIcon, getActiveRequests, getInstanceType, getTypeFullName, isPromiseLike, localText, nsSerenity, resolveUrl, stringFormat } from "../../base";
 import { HandleRouteEvent, Router, replaceAll, safeCast } from "../../compat";
 import { IEditDialog } from "../../interfaces";

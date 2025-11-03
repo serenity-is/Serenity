@@ -58,7 +58,7 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "npm-packages", "npm-package
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Serenity.Corelib", "packages\corelib\Serenity.Corelib.csproj", "{0C1D7761-93AB-4361-AD7C-DF200B97B62B}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Serenity.WizDom", "packages\wizdom\Serenity.WizDom.csproj", "{64108D05-5302-DF20-E422-8A05213D3DF0}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Serenity.DomWise", "packages\domwise\Serenity.DomWise.csproj", "{64108D05-5302-DF20-E422-8A05213D3DF0}"
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Serenity.SleekGrid", "packages\sleekgrid\Serenity.SleekGrid.csproj", "{9C4591C7-9BC1-497C-BB6F-FB74D739D5E9}"
 EndProject

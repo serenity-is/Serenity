@@ -1,6 +1,6 @@
 # Third-party notices and license attributions
 
-Package: @serenity-is/wizdom
+Package: @serenity-is/domwise
 
 Primary license: MIT (see `LICENSE.md`)
 

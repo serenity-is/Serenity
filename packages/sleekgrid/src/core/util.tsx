@@ -1,4 +1,4 @@
-import type { SignalOrValue } from "@serenity-is/wizdom";
+import type { SignalOrValue } from "@serenity-is/domwise";
 
 export function addClass(el: Element, cls: string) {
     if (cls == null || !cls.length)

@@ -1,5 +1,5 @@
 import { Fluent, QuickSearchInput, Widget, WidgetProps, stripDiacritics } from "@serenity-is/corelib";
-import { bindThis } from "@serenity-is/wizdom";
+import { bindThis } from "@serenity-is/domwise";
 import { nsExtensions } from "../ServerTypes/Namespaces";
 import { ReportDialog } from "./ReportDialog";
 

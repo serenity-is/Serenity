@@ -1,4 +1,4 @@
-﻿import { bindThis } from "@serenity-is/wizdom";
+﻿import { bindThis } from "@serenity-is/domwise";
 import { Fluent, nsSerenity, QuickSearchTexts } from "../../base";
 import { Widget, WidgetProps } from "../widgets/widget";
 

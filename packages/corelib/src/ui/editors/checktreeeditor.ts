@@ -14,7 +14,7 @@ import { CascadedWidgetLink } from "./cascadedwidgetlink";
 import { stripDiacritics } from "./combobox";
 import { EditorUtils } from "./editorutils";
 import { EditorProps } from "./editorwidget";
-import { bindThis } from "@serenity-is/wizdom";
+import { bindThis } from "@serenity-is/domwise";
 
 export interface CheckTreeItem<TSource> {
     isSelected?: boolean;

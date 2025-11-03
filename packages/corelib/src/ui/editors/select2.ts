@@ -2,7 +2,7 @@
  * Adapted from 3.5.x version of Select2 (https://github.com/select2/select2), removing jQuery dependency
  */
 
-import { bindThis } from "@serenity-is/wizdom";
+import { bindThis } from "@serenity-is/domwise";
 import { Fluent, SelectEditorTexts, serviceCall, stringFormat } from "../../base";
 
 export type Select2Element = HTMLInputElement | HTMLSelectElement;

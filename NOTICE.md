@@ -2,7 +2,7 @@
 
 The Serenity project (https://github.com/serenity-is/Serenity) incorporates or is derived 
 from third-party material from the projects listed below. Package-level notices live under 
-each package directory (for example `packages/wizdom/NOTICE.md`). The original copyright 
+each package directory (for example `packages/domwise/NOTICE.md`). The original copyright 
 notice and the license under which Serenity received such third party material are set 
 forth below. Serenity project reserves all other rights not expressly granted, whether by 
 implication, estoppel or otherwise.

@@ -1,4 +1,4 @@
-import { bindThis, currentLifecycleRoot } from "@serenity-is/wizdom";
+import { bindThis, currentLifecycleRoot } from "@serenity-is/domwise";
 import { preClickClassName } from "../core/base";
 import { CellRange } from "../core/cellrange";
 import { columnDefaults, initializeColumns, type Column, type ColumnMetadata, type ColumnSort, type ItemMetadata } from "../core/column";

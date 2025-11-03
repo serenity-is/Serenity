@@ -1,4 +1,4 @@
-﻿import { addDisposingListener } from "@serenity-is/wizdom";
+﻿import { addDisposingListener } from "@serenity-is/domwise";
 import { Fluent, getjQuery, isArrayLike } from "../../base";
 import { DataChangeInfo } from "../../types/datachangeinfo";
 import { Widget } from "../widgets/widget";

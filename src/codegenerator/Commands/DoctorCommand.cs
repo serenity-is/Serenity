@@ -25,7 +25,7 @@ public partial class DoctorCommand(IProjectFileInfo project, IGeneratorConsole c
         (new(8, 8, 4), new(8, 1, 6))
     ];
 
-    static readonly (Version, Version)[] RecommendedWizDomVersion = [
+    static readonly (Version, Version)[] RecommendedDomWiseVersion = [
         (new (0, 0, 0), new(1, 0, 0))
     ];
 
@@ -432,13 +432,13 @@ public partial class DoctorCommand(IProjectFileInfo project, IGeneratorConsole c
 
         if (versionStr.StartsWith("./node_modules/.dotnet/", StringComparison.Ordinal))
         {
-            Info("@serenity-is/wizdom Version", versionStr);
+            Info("@serenity-is/domwise Version", versionStr);
             return;
         }
 
         if (versionStr.StartsWith("workspace:", StringComparison.Ordinal))
         {
-            Info("@serenity-is/wizdom Version", versionStr);
+            Info("@serenity-is/domwise Version", versionStr);
             return;
         }
 
@@ -469,38 +469,38 @@ public partial class DoctorCommand(IProjectFileInfo project, IGeneratorConsole c
     }
 
     
-    void CheckWizDomVersion(PackageJson packageJson, Version serenityVersion)
+    void CheckDomWiseVersion(PackageJson packageJson, Version serenityVersion)
     {
-        if (packageJson.dependencies?.TryGetValue("@serenity-is/wizdom", out var versionStr) != true &&
-            packageJson.devDependencies?.TryGetValue("@serenity-is/wizdom", out versionStr) != true)
+        if (packageJson.dependencies?.TryGetValue("@serenity-is/domwise", out var versionStr) != true &&
+            packageJson.devDependencies?.TryGetValue("@serenity-is/domwise", out versionStr) != true)
         {
-            Warning($"@serenity-is/wizdom package not found in package.json dependencies!");
+            Warning($"@serenity-is/domwise package not found in package.json dependencies!");
             return;
         }
 
         if (!Version.TryParse(versionStr, out Version version))
         {
-            Warning($"Can't parse @serenity-is/wizdom dependency version from package.json!");
+            Warning($"Can't parse @serenity-is/domwise dependency version from package.json!");
             return;
         }
 
-        var recommendedVersion = RecommendedWizDomVersion.LastOrDefault(x =>
+        var recommendedVersion = RecommendedDomWiseVersion.LastOrDefault(x =>
             serenityVersion >= x.Item1).Item2;
 
         if (version != null && version < recommendedVersion)
         {
-            Error($"@serenity-is/wizdom version in package.json is {version}, " +
-                $"please update to {RecommendedWizDomVersion} for better support.");
+            Error($"@serenity-is/domwise version in package.json is {version}, " +
+                $"please update to {RecommendedDomWiseVersion} for better support.");
         }
         else if (version != null && version > recommendedVersion)
         {
-            Warning($"The @serenity-is/wizdom version in package.json is {version}, " +
+            Warning($"The @serenity-is/domwise version in package.json is {version}, " +
                 $"which is newer than the recommended version {recommendedVersion} " +
                 $"for Serenity {serenityVersion}. Please check docs as it may include breaking changes.");
         }
         else
         {
-            Info("@serenity-is/wizdom Version", version.ToString());
+            Info("@serenity-is/domwise Version", version.ToString());
         }
     }
 
