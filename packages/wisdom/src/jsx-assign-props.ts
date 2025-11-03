@@ -3,6 +3,7 @@ import { assignClass } from "./jsx-assign-class";
 import { assignStyle } from "./jsx-assign-style";
 import { isSignalLike, observeSignal } from "./signal-util";
 import { nonPresentationSVGAttributes } from "./svg-consts";
+import type { JSXElement } from "./types/jsx-element";
 import { forEach, isObject, isVisibleChild, keys } from "./util";
 
 const XLinkNamespace = "http://www.w3.org/1999/xlink";
@@ -22,7 +23,7 @@ const propToAttr: Record<string, string> = {
     maxLength: "maxlength"
 }
 
-function assignProp(node: Element & HTMLOrSVGElement, key: string, value: any, prev?: any) {
+function assignProp(node: JSXElement, key: string, value: any, prev?: any) {
 
     const propAttr = propToAttr[key];
     if (propAttr) {
@@ -255,7 +256,7 @@ function assignProp(node: Element & HTMLOrSVGElement, key: string, value: any, p
     }
 }
 
-export function assignProps(node: HTMLElement | SVGElement, props: Record<string, any>) {
+export function assignProps(node: JSXElement, props: Record<string, any>) {
     for (const key of keys(props)) {
         let value = props[key];
         if (isSignalLike(value)) {

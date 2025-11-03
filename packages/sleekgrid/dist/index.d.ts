@@ -310,7 +310,7 @@ export interface FormatterContext<TItem = any> {
 	/** when returning a formatter result as HTML string, prefer ctx.escape() to avoid script injection attacks! */
 	value?: any;
 }
-export type FormatterResult = (string | HTMLElement | SVGElement | DocumentFragment);
+export type FormatterResult = (string | HTMLElement | SVGElement | MathMLElement | DocumentFragment);
 export type ColumnFormat<TItem = any> = (ctx: FormatterContext<TItem>) => FormatterResult;
 export interface CompatFormatterResult {
 	addClasses?: string;

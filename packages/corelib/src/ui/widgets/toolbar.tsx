@@ -3,7 +3,7 @@ import { Widget } from "./widget";
 
 export interface ToolButtonProps {
     action?: string;
-    title?: string | HTMLElement | SVGElement | DocumentFragment;
+    title?: string | HTMLElement | SVGElement | MathMLElement | DocumentFragment;
     hint?: string;
     cssClass?: string;
     icon?: IconClassName;

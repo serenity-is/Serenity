@@ -1,17 +1,11 @@
 
-export const svgTags = /*#__PURE__*/ new Set([
+export const svgOnlyTags = /*#__PURE__*/ new Set([
     // "a",
-    "altGlyph",
-    "altGlyphDef",
-    "altGlyphItem",
     "animate",
-    "animateColor",
     "animateMotion",
     "animateTransform",
     "circle",
     "clipPath",
-    "color-profile",
-    "cursor",
     "defs",
     "desc",
     "ellipse",
@@ -41,24 +35,14 @@ export const svgTags = /*#__PURE__*/ new Set([
     "feTile",
     "feTurbulence",
     "filter",
-    "font",
-    "font-face",
-    "font-face-format",
-    "font-face-name",
-    "font-face-src",
-    "font-face-uri",
     "foreignObject",
     "g",
-    "glyph",
-    "glyphRef",
-    "hkern",
     "image",
     "line",
     "linearGradient",
     "marker",
     "mask",
     "metadata",
-    "missing-glyph",
     "mpath",
     "path",
     "pattern",
@@ -79,8 +63,7 @@ export const svgTags = /*#__PURE__*/ new Set([
     "tref",
     "tspan",
     "use",
-    "view",
-    "vkern"
+    "view"
 ]);
 
 export const nonPresentationSVGAttributes =

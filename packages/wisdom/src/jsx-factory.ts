@@ -1,8 +1,10 @@
 import { initComponentClass } from "./component"
 import { appendChildren } from "./jsx-append-children"
 import { assignProps } from "./jsx-assign-props"
+import { MathMLNamespace, mathMLOnlyTags as mathMLOnlyTags } from "./mathml-consts"
+import { currentNamespaceURI } from "./in-namespace-uri"
 import { attachRef } from "./ref"
-import { SVGNamespace, svgTags } from "./svg-consts"
+import { SVGNamespace, svgOnlyTags as svgOnlyTags } from "./svg-consts"
 import type { JSXElement } from "./types"
 import type { ComponentChildren } from "./types/custom-attributes"
 import type { ElementAttributes, HTMLElementTags, SVGElementTags } from "./types/dom-expressions-jsx"
@@ -17,9 +19,9 @@ export function jsx<THtmlTag extends keyof HTMLElementTagNameMap, TElement exten
     props?: (HTMLElementTags[THtmlTag] & Record<DataKeys, string | number>) | null,
     key?: string
 ): TElement
-export function jsx<TSvgTag extends (keyof SVGElementTagNameMap & keyof SVGElementTags), TElement extends SVGElementTagNameMap[TSvgTag]>(
-    type: TSvgTag,
-    props?: (SVGElementTags[TSvgTag] & Record<DataKeys, string | number>) | null,
+export function jsx<TSVGTag extends (keyof SVGElementTagNameMap & keyof SVGElementTags), TElement extends SVGElementTagNameMap[TSVGTag]>(
+    type: TSVGTag,
+    props?: (SVGElementTags[TSVGTag] & Record<DataKeys, string | number>) | null,
     key?: string
 ): TElement
 export function jsx(
@@ -37,13 +39,19 @@ export function jsx(
 export function jsx(tag: any, props?: { children?: ComponentChildren, [key: string]: any }, _key?: string) {
 
     let { children, ...attr } = props || {};
-    if (!attr.namespaceURI && svgTags.has(tag))
-        attr.namespaceURI = SVGNamespace
-
+    let ns = attr.namespaceURI;
+    if (!ns) {
+        if (svgOnlyTags.has(tag))
+            ns = SVGNamespace;
+        else if (mathMLOnlyTags.has(tag))
+            ns = MathMLNamespace;
+        else
+            ns = currentNamespaceURI();
+    }
     let node: HTMLElement | SVGElement
     if (isString(tag)) {
-        node = attr.namespaceURI
-            ? document.createElementNS(attr.namespaceURI, tag)
+        node = ns
+            ? document.createElementNS(ns, tag)
             : document.createElement(tag)
         assignProps(node, attr)
         appendChildren(node, children)

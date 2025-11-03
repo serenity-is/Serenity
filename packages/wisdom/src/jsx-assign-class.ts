@@ -1,5 +1,6 @@
 import { className } from "./classname";
 import { isSignalLike, observeSignal } from "./signal-util";
+import type { JSXElement } from "./types/jsx-element";
 import { isArrayLike, isObject } from "./util";
 
 function unsignalizePrevClass(prev: any): any {
@@ -24,7 +25,7 @@ function unsignalizePrevClass(prev: any): any {
     return prev;
 }
 
-function clearPrevClass(node: Element & HTMLOrSVGElement, prev?: any): void {
+function clearPrevClass(node: JSXElement, prev?: any): void {
     if (prev == null || prev === false || prev === true)
         return;
 
@@ -43,7 +44,7 @@ function clearPrevClass(node: Element & HTMLOrSVGElement, prev?: any): void {
     }
 }
 
-export function assignClass(node: Element & HTMLOrSVGElement, value?: any, prev?: any): void {
+export function assignClass(node: JSXElement, value?: any, prev?: any): void {
     if (value == null || value === false) {
         clearPrevClass(node, prev);
         return;
@@ -96,7 +97,7 @@ export function assignClass(node: Element & HTMLOrSVGElement, value?: any, prev?
     applyClassName(node, value, prev);
 }
 
-function applyClassName(node: Element & HTMLOrSVGElement, value: any, prev?: any): void {
+function applyClassName(node: JSXElement, value: any, prev?: any): void {
     const newList = (className(value) ?? "").split(" ");
     if (prev) {
         const prevList = (className(prev) ?? "").split(" ");

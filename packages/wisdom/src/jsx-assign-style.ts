@@ -1,5 +1,6 @@
-import { isSignalLike, observeSignal } from "./signal-util"
-import { isNumber, isObject, isString, keys } from "./util"
+import { isSignalLike, observeSignal } from "./signal-util";
+import type { JSXElement } from "./types";
+import { isNumber, isObject, isString, keys } from "./util";
 
 /**
  * Copyright (c) Facebook, Inc. and its affiliates.
@@ -86,7 +87,7 @@ let isUnitlessNumber = /*#__PURE__*/ (() => {
     return rec;
 })();
 
-function setStylePropValue(node: Element & HTMLOrSVGElement, key: string, val: any): void {
+function setStylePropValue(node: JSXElement, key: string, val: any): void {
     if (key.indexOf("-") === 0) {
         // CSS custom properties (variables) start with `-` (e.g. `--my-variable`)
         // and must be assigned via `setProperty`.
@@ -98,7 +99,7 @@ function setStylePropValue(node: Element & HTMLOrSVGElement, key: string, val: a
     }
 }
 
-function clearPrevStyle(node: Element & HTMLOrSVGElement, prev?: any): void {
+function clearPrevStyle(node: JSXElement, prev?: any): void {
     if (prev == null || prev === false || prev === true)
         return;
 
@@ -114,7 +115,7 @@ function clearPrevStyle(node: Element & HTMLOrSVGElement, prev?: any): void {
     }
 }
 
-export function assignStyle(node: Element & HTMLOrSVGElement, value?: any, prev?: boolean | any): void {
+export function assignStyle(node: JSXElement, value?: any, prev?: boolean | any): void {
     if (value == null || value === false || value === true) {
         clearPrevStyle(node, prev);
         return;

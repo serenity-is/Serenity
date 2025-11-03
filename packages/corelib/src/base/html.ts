@@ -2,7 +2,7 @@
 import { Config } from "./config";
 import { isArrayLike, isPromiseLike } from "./system";
 
-export type RenderableContent = string | HTMLElement | SVGElement | DocumentFragment;
+export type RenderableContent = string | HTMLElement | SVGElement | MathMLElement | DocumentFragment;
 
 const esc: Record<string, string> = {
     '<': '&lt;',

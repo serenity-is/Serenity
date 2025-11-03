@@ -6,6 +6,8 @@ export { addDisposingListener, currentLifecycleRoot, dispatchDisposingEvent, inv
 export { Fragment } from "./fragment";
 export * from "./hooks";
 export { jsx, jsx as jsxs } from "./jsx-factory";
+export { MathMLNamespace } from "./mathml-consts";
+export * from "./in-namespace-uri";
 export { createRef } from "./ref";
 export { ShadowRootNode } from "./shadow";
 export { isSignalLike, observeSignal } from "./signal-util";

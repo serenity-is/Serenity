@@ -358,7 +358,7 @@ export interface DebouncedFunction<T extends (...args: any[]) => any> {
  *
  */
 export declare function debounce<T extends (...args: any) => any>(func: T, wait?: number, immediate?: boolean): DebouncedFunction<T>;
-export type RenderableContent = string | HTMLElement | SVGElement | DocumentFragment;
+export type RenderableContent = string | HTMLElement | SVGElement | MathMLElement | DocumentFragment;
 /**
  * Html encodes a string (encodes single and double quotes, & (ampersand), > and < characters)
  * @param s String (or number etc.) to be HTML encoded
@@ -4716,7 +4716,7 @@ export declare namespace ReflectionOptionsSetter {
 }
 export interface ToolButtonProps {
 	action?: string;
-	title?: string | HTMLElement | SVGElement | DocumentFragment;
+	title?: string | HTMLElement | SVGElement | MathMLElement | DocumentFragment;
 	hint?: string;
 	cssClass?: string;
 	icon?: IconClassName;

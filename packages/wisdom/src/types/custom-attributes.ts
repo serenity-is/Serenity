@@ -48,6 +48,7 @@ declare module "./dom-expressions-jsx" {
     interface ElementAttributes<T> {
         className?: ElementAttributes<T>["class"];
         tabIndex?: SignalOrValue<number | string | RemoveAttribute>;
+        namespaceURI?: string | undefined;
         onClickCapture?: EventHandlerUnion<T, MouseEvent> | undefined;
         onDblClickCapture?: EventHandlerUnion<T, MouseEvent> | undefined;
         onDoubleClick?: EventHandlerUnion<T, MouseEvent> | undefined;

@@ -78,7 +78,7 @@ export interface FormatterContext<TItem = any> {
     value?: any;
 }
 
-export type FormatterResult = (string | HTMLElement | SVGElement | DocumentFragment);
+export type FormatterResult = (string | HTMLElement | SVGElement | MathMLElement | DocumentFragment);
 export type ColumnFormat<TItem = any> = (ctx: FormatterContext<TItem>) => FormatterResult;
 
 export interface CompatFormatterResult {
