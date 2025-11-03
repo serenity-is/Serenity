@@ -2334,33 +2334,20 @@ export class Grid<TItem = any> implements IGrid<TItem> {
             }
 
             rows.push(row);
-
             // Create an entry right away so that appendRowHtml() can
             // start populatating it.
             args.cachedRow = this._rowsCache[row] = {
                 rowNodeS: null,
                 rowNodeC: null,
                 rowNodeE: null,
-
-                // ColSpans of rendered cells (by column idx).
-                // Can also be used for checking whether a cell has been rendered.
                 cellColSpans: [],
-
-                // Cell nodes (by column idx).  Lazy-populated by ensureCellNodesInRowsCache().
                 cellNodesByColumnIdx: [],
-
-                // Column indices of cell nodes that have been rendered, but not yet indexed in
-                // cellNodesByColumnIdx.  These are in the same order as cell nodes added at the
-                // end of the row.
                 cellRenderQueue: [],
-
                 cellRenderContent: []
             };
-
             args.row = row;
             args.item = this.getDataItem(row);
             renderRow(args);
-
             if (this._activeCellNode && args.activeRow === row) {
                 needToReselectCell = true;
             }
@@ -2370,46 +2357,17 @@ export class Grid<TItem = any> implements IGrid<TItem> {
             return;
         }
 
-        var s = document.createElement("div"),
-            c = document.createElement("div"),
-            e = document.createElement("div");
+        const s = document.createElement("div"), c = document.createElement("div"), e = document.createElement("div");
+        s.innerHTML = args.sbStart.join(""); c.innerHTML = args.sbCenter.join(""); e.innerHTML = args.sbEnd.join("");
 
-        s.innerHTML = args.sbStart.join("");
-        c.innerHTML = args.sbCenter.join("");
-        e.innerHTML = args.sbEnd.join("");
-
-
-        const layout = this._layout;
-        for (let i = 0, rowCount = rows.length; i < rowCount; i++) {
-            const row = rows[i];
-            var cache = this._rowsCache[row];
-            cache.rowNodeS = s.firstElementChild as HTMLElement;
-            cache.rowNodeC = c.firstElementChild as HTMLElement;
-            cache.rowNodeE = e.firstElementChild as HTMLElement;
-            if (pinnedStart && cache.rowNodeS) {
-                if (row <= frozenTopLast)
-                    start.canvas.top?.appendChild(cache.rowNodeS);
-                else if (row >= frozenBottomFirst)
-                    start.canvas.bottom?.appendChild(cache.rowNodeS);
-                else
-                    start.canvas.body?.appendChild(cache.rowNodeS);
+        for (let row of rows) {
+            const cache = this._rowsCache[row];
+            function append(canvas: GridBandRefs["canvas"], rowNode: HTMLElement) {
+                canvas[row <= frozenTopLast ? "top" : row >= frozenBottomFirst ? "bottom" : "body"]?.appendChild(rowNode);
             }
-            if (cache.rowNodeC) {
-                if (row <= frozenTopLast)
-                    main.canvas.top?.appendChild(cache.rowNodeC);
-                else if (row >= frozenBottomFirst)
-                    main.canvas.bottom?.appendChild(cache.rowNodeC);
-                else
-                    main.canvas.body?.appendChild(cache.rowNodeC);
-            }
-            if (pinnedEnd && cache.rowNodeE) {
-                if (row <= frozenTopLast)
-                    end.canvas.top?.appendChild(cache.rowNodeE);
-                else if (row >= frozenBottomFirst)
-                    end.canvas.bottom?.appendChild(cache.rowNodeE);
-                else
-                    end.canvas.body?.appendChild(cache.rowNodeE);
-            }
+            (cache.rowNodeS = s.firstElementChild as HTMLElement) && pinnedStart && append(start.canvas, cache.rowNodeS);
+            (cache.rowNodeC = c.firstElementChild as HTMLElement) && append(main.canvas, cache.rowNodeC);
+            (cache.rowNodeE = e.firstElementChild as HTMLElement) && pinnedEnd && append(end.canvas, cache.rowNodeE);
             if (cache.cellRenderContent.some(x => x instanceof Node))
                 this.ensureCellNodesInRowsCache(row);
         }
