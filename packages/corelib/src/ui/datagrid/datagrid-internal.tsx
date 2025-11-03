@@ -14,11 +14,11 @@ import { ReflectionOptionsSetter } from "../widgets/reflectionoptionssetter";
 import { QuickFilter } from "./quickfilter";
 import { QuickFilterBar } from "./quickfilterbar";
 
-export function getDefaultSortBy(this: void, slickGrid: Grid): string[] {
-    if (!slickGrid)
+export function getDefaultSortBy(this: void, sleekGrid: Grid): string[] {
+    if (!sleekGrid)
         return [];
 
-    var columns = slickGrid.getColumns().filter(function (x) {
+    var columns = sleekGrid.getColumns().filter(function (x) {
         return x.sortOrder && x.sortOrder !== 0 && x.field != null;
     });
 

@@ -33,7 +33,7 @@ public sealed class ProductRow : Row<ProductRow.RowFields>, IIdRow, INameRow
     [DisplayName("Quantity Per Unit"), Size(20)]
     public string QuantityPerUnit { get => fields.QuantityPerUnit[this]; set => fields.QuantityPerUnit[this] = value; }
 
-    [DisplayName("Unit Price"), Scale(4), LookupInclude]
+    [DisplayName("Unit Price"), Scale(4), LookupInclude, SummaryType(SummaryType.Avg)]
     public decimal? UnitPrice { get => fields.UnitPrice[this]; set => fields.UnitPrice[this] = value; }
 
     [DisplayName("Units In Stock"), NotNull, DefaultValue(0), LookupInclude]

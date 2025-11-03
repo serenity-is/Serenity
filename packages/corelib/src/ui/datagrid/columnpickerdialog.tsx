@@ -250,7 +250,7 @@ export class ColumnPickerDialog<P = {}> extends BaseDialog<P> {
 
     static openDialog({ grid }: { grid: IDataGrid }) {
         var picker = new ColumnPickerDialog({});
-        picker.allColumns = (grid as any).allColumns;
+        picker.allColumns = (grid as any).getAllColumns?.() || grid.getGrid().getInitialColumns();
         if ((grid as any).initialSettings) {
             var initialSettings = (grid as any).initialSettings;
             if (initialSettings.columns && initialSettings.columns.length)
@@ -258,7 +258,7 @@ export class ColumnPickerDialog<P = {}> extends BaseDialog<P> {
         }
         picker.visibleColumns = grid.getGrid().getColumns().map(x => x.id);
         picker.done = () => {
-            (grid as any).allColumns = picker.allColumns;
+            (grid as any).setAllColumns?.(picker.allColumns);
             var visible = picker.allColumns.filter(x => x.visible === true);
             grid.getGrid().setColumns(visible);
             Promise.resolve((grid as any).persistSettings()).then(() => grid.getView().populate());

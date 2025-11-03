@@ -48,15 +48,15 @@ export namespace PdfExportHelper {
         });
     }
 
-    function toAutoTableData(slickGrid: Grid, entities: any[], keys: string[], srcColumns: Column[]) {
+    function toAutoTableData(sleekGrid: Grid, entities: any[], keys: string[], srcColumns: Column[]) {
         let el = document.createElement('span');
         let row = 0;
         return entities.map(item => {
             let dst = [];
             for (let cell = 0; cell < srcColumns.length; cell++) {
                 const col = srcColumns[cell];
-                const format = slickGrid.getFormatter(row, col);
-                const ctx = slickGrid.getFormatterContext(row, cell);
+                const format = sleekGrid.getFormatter(row, col);
+                const ctx = sleekGrid.getFormatterContext(row, cell);
                 ctx.purpose = "pdf-export";
                 ctx.item = item;
                 ctx.value = item[col.field];

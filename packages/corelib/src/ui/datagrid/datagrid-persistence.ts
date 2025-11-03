@@ -64,7 +64,7 @@ export function getCurrentSettings(this: void, opt: {
     flags: GridPersistenceFlags,
     includeDeletedToggle: HTMLElement,
     quickFiltersDiv: Fluent,
-    slickGrid: Grid,
+    sleekGrid: Grid,
     toolbar: Toolbar,
     uniqueName: string
 }): PersistedGridSettings {
@@ -76,8 +76,8 @@ export function getCurrentSettings(this: void, opt: {
         flags.columnPinning !== false ||
         flags.sortColumns !== false) {
         settings.columns = [];
-        const sortColumns = opt.slickGrid.getSortColumns() as any[];
-        const columns = opt.slickGrid.getColumns();
+        const sortColumns = opt.sleekGrid.getSortColumns() as any[];
+        const columns = opt.sleekGrid.getColumns();
         for (const column of columns) {
             const p: PersistedGridColumn = {
                 id: column.id
@@ -179,13 +179,13 @@ export function restoreSettingsFrom(this: void, opt: {
     flags: GridPersistenceFlags,
     includeDeletedToggle: HTMLElement,
     quickFiltersDiv: Fluent,
-    slickGrid: Grid,
+    sleekGrid: Grid,
     settings: PersistedGridSettings,
     toolbar: Toolbar,
     uniqueName: string,
     view: IRemoteView<any>
 }) {
-    let columns = opt.slickGrid.getColumns();
+    let columns = opt.sleekGrid.getColumns();
     let colById: { [key: string]: Column } = null;
     const initColById = function (cl: Column[]) {
         colById = {};
@@ -279,10 +279,10 @@ export function restoreSettingsFrom(this: void, opt: {
             opt.view.sortBy = list.map(function (x5) {
                 return x5.columnId + ((x5.sortAsc === false) ? ' DESC' : '');
             });
-            opt.slickGrid.setSortColumns(list);
+            opt.sleekGrid.setSortColumns(list);
         }
-        opt.slickGrid.setColumns(columns);
-        opt.slickGrid.invalidate();
+        opt.sleekGrid.setColumns(columns);
+        opt.sleekGrid.invalidate();
     }
 
     if (settings.filterItems != null &&
