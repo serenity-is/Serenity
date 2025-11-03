@@ -1,5 +1,5 @@
 import { computed } from "@preact/signals-core";
-import type { SignalLike } from "@serenity-is/wisdom";
+import type { SignalLike } from "@serenity-is/wizdom";
 import type { GridSignals } from "../core";
 import type { BandKey, GridLayoutRefs, PaneKey } from "./layout-refs";
 

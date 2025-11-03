@@ -3,7 +3,7 @@ import { NoteRow } from "../ServerTypes/Demo";
 import { nsDemoNorthwind } from "../ServerTypes/Namespaces";
 import { NoteDialog } from "./NoteDialog";
 import "./NotesEditor.css";
-import { bindThis } from "@serenity-is/wisdom";
+import { bindThis } from "@serenity-is/wizdom";
 
 export class NotesEditor<P = {}> extends EditorWidget<P>
     implements IGetEditValue, ISetEditValue {

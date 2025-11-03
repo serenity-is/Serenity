@@ -1,4 +1,4 @@
-﻿import { bindThis } from "@serenity-is/wisdom";
+﻿import { bindThis } from "@serenity-is/wizdom";
 import { getjQuery, isBS3, isBS5Plus } from "./environment";
 import { isArrayLike } from "./system";
 

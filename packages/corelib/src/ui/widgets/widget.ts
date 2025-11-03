@@ -1,4 +1,4 @@
-import { addDisposingListener, bindThis, removeDisposingListener } from "@serenity-is/wisdom";
+import { addDisposingListener, bindThis, removeDisposingListener } from "@serenity-is/wizdom";
 import { ClassTypeInfo, Config, EditorTypeInfo, Fluent, StringLiteral, addClass, addValidationRule, appendToNode, classTypeInfo, editorTypeInfo, getCustomAttribute, getInstanceType, getTypeFullName, getTypeShortName, htmlEncode, isArrayLike, nsSerenity, registerType, toggleClass } from "../../base";
 import { ensureParentOrFragment, handleElementProp, isFragmentWorkaround, setElementProps } from "./widgetinternal";
 import { IdPrefixType, associateWidget, deassociateWidget, getWidgetName, useIdPrefix, type WidgetProps } from "./widgetutils";

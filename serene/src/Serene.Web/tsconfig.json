@@ -10,7 +10,7 @@
     "forceConsistentCasingInFileNames": true,
     "isolatedModules": true,
     "jsx": "react-jsx",
-    "jsxImportSource": "@serenity-is/wisdom",
+    "jsxImportSource": "@serenity-is/wizdom",
     "module": "ESNext",
     "moduleResolution": "bundler",
     "newLine": "lf",

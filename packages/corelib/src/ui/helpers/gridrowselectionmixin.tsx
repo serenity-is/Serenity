@@ -1,4 +1,4 @@
-import { bindThis } from "@serenity-is/wisdom";
+import { bindThis } from "@serenity-is/wizdom";
 import { Column, type ArgsCell } from "@serenity-is/sleekgrid";
 import { classTypeInfo, Fluent, nsSerenity, registerType } from "../../base";
 import { clearKeys } from "../../compat";

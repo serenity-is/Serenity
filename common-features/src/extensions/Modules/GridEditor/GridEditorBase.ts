@@ -1,7 +1,7 @@
 import { DataChangeInfo, DialogType, EditorProps, EntityGrid, IGetEditValue, ISetEditValue, PropertyItem, SaveRequest, ServiceOptions, ServiceResponse, ToolButton, deepClone, getInstanceType, getTypeFullName, indexOf, serviceCall } from "@serenity-is/corelib";
 import { nsExtensions } from "../ServerTypes/Namespaces";
 import { GridEditorDialog } from "./GridEditorDialog";
-import { bindThis } from "@serenity-is/wisdom";
+import { bindThis } from "@serenity-is/wizdom";
 
 export abstract class GridEditorBase<TEntity, P = {}> extends EntityGrid<TEntity, P>
     implements IGetEditValue, ISetEditValue {

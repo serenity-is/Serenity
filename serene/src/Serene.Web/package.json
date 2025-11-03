@@ -5,7 +5,7 @@
     "@serenity-is/demo.northwind": "workspace:*",
     "@serenity-is/extensions": "workspace:*",
     "@serenity-is/sleekgrid": "workspace:*",
-    "@serenity-is/wisdom": "workspace:*",
+    "@serenity-is/wizdom": "workspace:*",
     "bootstrap-datepicker": "1.10.1",
     "chart.js": "catalog:serenity",
     "daterangepicker": "3.1.0",

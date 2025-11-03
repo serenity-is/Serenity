@@ -1,5 +1,5 @@
 import { addClass, basicDOMSanitizer, disableSelection, escapeHtml, removeClass } from "../../src/core/util";
-import { jsx as H } from "@serenity-is/wisdom";
+import { jsx as H } from "@serenity-is/wizdom";
 
 describe('addClass', () => {
     it('should not do anything if classes to add is null or undefined', () => {

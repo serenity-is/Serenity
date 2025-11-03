@@ -2,7 +2,7 @@
 
 export default defineConfig({
     test: {
-        name: "wisdom",
+        name: "wizdom",
         environment: "jsdom",
         coverage: {
             exclude: [

@@ -13,7 +13,7 @@ function appendChild(parent: Node, child: Node) {
 }
 
 let fragmentPlaceholderIdx = 0;
-const placeholderPrefix = "__wisdomfrag_";
+const placeholderPrefix = "__wizdomfrag_";
 
 function isPlaceholder(node: Node): node is Comment {
     return node instanceof Comment && node.data.startsWith(placeholderPrefix);

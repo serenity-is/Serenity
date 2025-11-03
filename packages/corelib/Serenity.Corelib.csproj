@@ -3,7 +3,7 @@
     <Description>NuGet version of @serenity-is/corelib NPM package</Description>
   </PropertyGroup>
   <ItemGroup>
-    <ProjectReference Include="..\wisdom\Serenity.WisDom.csproj" />
+    <ProjectReference Include="..\wizdom\Serenity.WizDom.csproj" />
     <ProjectReference Include="..\sleekgrid\Serenity.SleekGrid.csproj" />
   </ItemGroup>
   <Target Name="RunTSBuild" Condition="'$(SkipNodeScripts)' != 'true'" BeforeTargets="ResolveProjectStaticWebAssets" DependsOnTargets="NpmInstall">

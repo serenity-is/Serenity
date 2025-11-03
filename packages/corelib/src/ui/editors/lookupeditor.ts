@@ -1,4 +1,4 @@
-﻿import { bindThis } from "@serenity-is/wisdom";
+﻿import { bindThis } from "@serenity-is/wizdom";
 import { getInstanceType, getLookupAsync, getTypeFullName, nsSerenity, type Lookup } from "../../base";
 import { ScriptData, getLookup, reloadLookup } from "../../compat";
 import { ComboboxItem, ComboboxSearchQuery, ComboboxSearchResult } from "./combobox";

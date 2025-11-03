@@ -10,7 +10,7 @@
     "inlineSources": true,
     "isolatedModules": true,
     "jsx": "react-jsx",
-    "jsxImportSource": "@serenity-is/wisdom",
+    "jsxImportSource": "@serenity-is/wizdom",
     "lib": [
       "ES2017",
       "DOM"

@@ -1,4 +1,4 @@
-import { bindThis } from "@serenity-is/wisdom";
+import { bindThis } from "@serenity-is/wizdom";
 import { Editor, EditorOptions, parsePx, Position } from "../core";
 
 abstract class BaseCellEdit {

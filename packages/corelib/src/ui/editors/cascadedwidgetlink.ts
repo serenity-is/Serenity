@@ -1,4 +1,4 @@
-﻿import { addDisposingListener } from "@serenity-is/wisdom";
+﻿import { addDisposingListener } from "@serenity-is/wizdom";
 import { classTypeInfo, Fluent, notifyError, nsSerenity, registerType } from "../../base";
 import { findElementWithRelativeId } from "../../compat";
 import { Widget } from "../widgets/widget";

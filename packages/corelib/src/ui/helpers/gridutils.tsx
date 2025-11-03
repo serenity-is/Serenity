@@ -1,4 +1,4 @@
-import { addDisposingListener } from "@serenity-is/wisdom";
+import { addDisposingListener } from "@serenity-is/wizdom";
 import { Grid, RowMoveManager } from "@serenity-is/sleekgrid";
 import { EntityGridTexts, SaveRequest, isArrayLike, serviceRequest } from "../../base";
 import { IRemoteView } from "../../slick";
