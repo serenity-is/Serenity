@@ -1,6 +1,5 @@
 /**
- * Adapted from https://raw.githubusercontent.com/ryansolid/dom-expressions/refs/heads/main/packages/dom-expressions/src/jsx-h.d.ts
- * Commit ID: 59823cd3108ee6d17058b90d1ef92b9d9ad103d7
+ * Adapted from https://github.com/ryansolid/dom-expressions/blob/59823cd3108ee6d17058b90d1ef92b9d9ad103d7/packages/dom-expressions/src/jsx-h.d.ts
  */
 import { ClassNames as ClassList } from "./classname";
 import { CustomDomAttributes as CustomAttributes } from "./custom-attributes";
