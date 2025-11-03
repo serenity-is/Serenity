@@ -130,7 +130,7 @@ export function observeSignal<T>(signal: SignalLike<T>, callback: ObserveSignalC
 }
 
 export interface DerivedSignalLike<T> extends SignalLike<T> {
-    derivedDisposer?: EffectDisposer;
+    derivedDisposer?: () => void;
 }
 
 export function derivedSignal<TDerived, TInput = any>(input: SignalLike<TInput>, fn: (value: TInput) => TDerived): DerivedSignalLike<TDerived> {

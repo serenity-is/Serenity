@@ -1,7 +1,7 @@
 export type EffectDisposer = (() => void) | null;
 
 export interface SignalLike<T> {
-	readonly value: T;
+	get value(): T;
 	peek(): T;
 	subscribe(fn: (value: T) => void): EffectDisposer;
 }

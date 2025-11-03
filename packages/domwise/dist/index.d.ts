@@ -13,7 +13,7 @@ export interface BasicClassList {
 	toggle(token: string, force?: boolean): void;
 	contains(token: string): boolean;
 }
-export type ClassName = string | {
+type ClassName = string | {
 	[key: string]: boolean;
 } | false | null | undefined | ClassName[];
 export type ClassNames = ClassName | BasicClassList | Iterable<string> | DOMTokenList;
@@ -32,12 +32,12 @@ export type RefCallback<T> = (instance: T) => void;
 export type Ref<T> = RefCallback<T> | RefObject<T> | null;
 export type EffectDisposer = (() => void) | null;
 export interface SignalLike<T> {
-	readonly value: T;
+	get value(): T;
 	peek(): T;
 	subscribe(fn: (value: T) => void): EffectDisposer;
 }
 export type SignalOrValue<T> = T | SignalLike<T>;
-export type ComponentChild = string | number | Iterable<ComponentChild> | Array<ComponentChild> | {
+type ComponentChild = string | number | Iterable<ComponentChild> | Array<ComponentChild> | {
 	value: ComponentChild;
 	peek: () => ComponentChild;
 	subscribe: (cb: (newValue: ComponentChild) => void) => void;
@@ -61,7 +61,7 @@ export interface CustomDomAttributes<T> {
 	 */
 	tsxTag?: keyof HTMLElementTagNameMap | keyof SVGElementTagNameMap;
 }
-export interface ElementAttributes<T> {
+interface ElementAttributes<T> {
 	className?: ElementAttributes<T>["class"];
 	tabIndex?: SignalOrValue<number | string | RemoveAttribute>;
 	namespaceURI?: string | undefined;
@@ -70,33 +70,33 @@ export interface ElementAttributes<T> {
 	onDoubleClick?: EventHandlerUnion<T, MouseEvent> | undefined;
 	onDoubleClickCapture?: EventHandlerUnion<T, MouseEvent> | undefined;
 }
-export interface HTMLAttributes<T> {
+interface HTMLAttributes<T> {
 	contentEditable?: SignalOrValue<EnumeratedPseudoBoolean | EnumeratedAcceptsEmpty | "plaintext-only" | "inherit" | RemoveAttribute>;
 	dataset?: {
 		[key: string]: string;
 	} | undefined;
 	spellCheck?: SignalOrValue<EnumeratedPseudoBoolean | EnumeratedAcceptsEmpty | RemoveAttribute>;
 }
-export interface SVGAttributes<T> {
+interface SVGAttributes<T> {
 	tabIndex?: SignalOrValue<number | string | RemoveAttribute>;
 }
-export interface AnchorHTMLAttributes<T> {
+interface AnchorHTMLAttributes<T> {
 	/** @deprecated use referrerpolicy */
 	referrerPolicy?: SignalOrValue<HTMLReferrerPolicy | RemoveAttribute>;
 }
-export interface ButtonHTMLAttributes<T> {
+interface ButtonHTMLAttributes<T> {
 	autoFocus?: SignalOrValue<boolean | RemoveAttribute>;
 	formNoValidate?: SignalOrValue<boolean | RemoveAttribute>;
 }
-export interface InputHTMLAttributes<T> {
+interface InputHTMLAttributes<T> {
 	maxLength?: SignalOrValue<string | number | RemoveAttribute>;
 	minLength?: SignalOrValue<string | number | RemoveAttribute>;
 	readOnly?: SignalOrValue<boolean | RemoveAttribute>;
 }
-export interface LabelHTMLAttributes<T> {
+interface LabelHTMLAttributes<T> {
 	htmlFor?: SignalOrValue<string | RemoveAttribute>;
 }
-export interface TdHTMLAttributes<T> {
+interface TdHTMLAttributes<T> {
 	colSpan?: SignalOrValue<number | string | RemoveAttribute>;
 	rowSpan?: SignalOrValue<number | string | RemoveAttribute>;
 }
@@ -125,59 +125,56 @@ export type ShadowRootContainer = {
 	};
 	children: ComponentChildren;
 };
-/** CSSStyleDeclaration contains methods, readonly properties and an index signature, which we all need to filter out. */
-export type StylePropertiesBase = Partial<Pick<CSSStyleDeclaration, {
+type StylePropertiesBase = Partial<Pick<CSSStyleDeclaration, {
 	[K in keyof CSSStyleDeclaration]: K extends string ? CSSStyleDeclaration[K] extends string ? K : never : never;
 }[keyof CSSStyleDeclaration]>>;
-export type StyleProperties = {
+type StyleProperties = {
 	[K in keyof StylePropertiesBase]: SignalOrValue<StylePropertiesBase[K]>;
 };
-export type DOMElement = Element;
-// event handlers
-export interface EventHandler<T, E extends Event> {
+type DOMElement = Element;
+interface EventHandler<T, E extends Event> {
 	(e: E & {
 		currentTarget: T;
 		target: DOMElement;
 	}): void;
 }
-export type EventHandlerUnion<T, E extends Event, EHandler extends EventHandler<T, any> = EventHandler<T, E>> = EHandler;
-export interface InputEventHandler<T, E extends InputEvent> {
+type EventHandlerUnion<T, E extends Event, EHandler extends EventHandler<T, any> = EventHandler<T, E>> = EHandler;
+interface InputEventHandler<T, E extends InputEvent> {
 	(e: E & {
 		currentTarget: T;
 		target: T extends HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement ? T : DOMElement;
 	}): void;
 }
-export type InputEventHandlerUnion<T, E extends InputEvent> = EventHandlerUnion<T, E, InputEventHandler<T, E>>;
-export interface ChangeEventHandler<T, E extends Event> {
+type InputEventHandlerUnion<T, E extends InputEvent> = EventHandlerUnion<T, E, InputEventHandler<T, E>>;
+interface ChangeEventHandler<T, E extends Event> {
 	(e: E & {
 		currentTarget: T;
 		target: T extends HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement ? T : DOMElement;
 	}): void;
 }
-export type ChangeEventHandlerUnion<T, E extends Event> = EventHandlerUnion<T, E, ChangeEventHandler<T, E>>;
-export interface FocusEventHandler<T, E extends FocusEvent> {
+type ChangeEventHandlerUnion<T, E extends Event> = EventHandlerUnion<T, E, ChangeEventHandler<T, E>>;
+interface FocusEventHandler<T, E extends FocusEvent> {
 	(e: E & {
 		currentTarget: T;
 		target: T extends HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement ? T : DOMElement;
 	}): void;
 }
-export type FocusEventHandlerUnion<T, E extends FocusEvent> = EventHandlerUnion<T, E, FocusEventHandler<T, E>>;
-// end event handlers
-export interface SerializableAttributeValue {
+type FocusEventHandlerUnion<T, E extends FocusEvent> = EventHandlerUnion<T, E, FocusEventHandler<T, E>>;
+interface SerializableAttributeValue {
 	toString(): string;
 }
-export type Accessor<T> = () => T;
-export interface Directives {
+type Accessor<T> = () => T;
+interface Directives {
 }
-export interface DirectiveFunctions {
+interface DirectiveFunctions {
 	[x: string]: (el: DOMElement, accessor: Accessor<any>) => void;
 }
-export interface ExplicitProperties {
+interface ExplicitProperties {
 }
-export type DirectiveAttributes = {
+type DirectiveAttributes = {
 	[Key in keyof Directives as `use:${Key}`]?: Directives[Key];
 };
-export type DirectiveFunctionAttributes<T> = {
+type DirectiveFunctionAttributes<T> = {
 	[K in keyof DirectiveFunctions as string extends K ? never : `use:${K}`]?: DirectiveFunctions[K] extends (el: infer E, // will be unknown if not provided
 	...rest: infer R // use rest so that we can check whether it's provided or not
 	) => void ? T extends E // everything extends unknown if E is unknown
@@ -190,26 +187,16 @@ export type DirectiveFunctionAttributes<T> = {
 	 : never // T is the wrong element
 	 : never;
 };
-export type PropAttributes = {
+type PropAttributes = {
 	[Key in keyof ExplicitProperties as `prop:${Key}`]?: ExplicitProperties[Key];
 };
-export type OnAttributes<T> = {};
-// CSS
-export type CSSProperties = StyleProperties;
-// BOOLEAN
-/**
- * Boolean and Pseudo-Boolean Attributes Helpers.
- *
- * Please use the helpers to describe boolean and pseudo boolean attributes to make this file and
- * also the typings easier to understand and explain.
- */
-export type BooleanAttribute = true | false | "";
-export type EnumeratedPseudoBoolean = "false" | "true";
-export type EnumeratedAcceptsEmpty = "" | true;
-export type RemoveAttribute = undefined | false;
-// ARIA
-// All the WAI-ARIA 1.1 attributes from https://www.w3.org/TR/wai-aria-1.1/
-export interface AriaAttributes {
+type OnAttributes<T> = {};
+type CSSProperties = StyleProperties;
+type BooleanAttribute = true | false | "";
+type EnumeratedPseudoBoolean = "false" | "true";
+type EnumeratedAcceptsEmpty = "" | true;
+type RemoveAttribute = undefined | false;
+interface AriaAttributes {
 	/**
 	 * Identifies the currently active element when DOM focus is on a composite widget, textbox,
 	 * group, or application.
@@ -493,14 +480,7 @@ export interface AriaAttributes {
 	"aria-valuetext"?: SignalOrValue<string | RemoveAttribute>;
 	role?: SignalOrValue<"alert" | "alertdialog" | "application" | "article" | "banner" | "button" | "cell" | "checkbox" | "columnheader" | "combobox" | "complementary" | "contentinfo" | "definition" | "dialog" | "directory" | "document" | "feed" | "figure" | "form" | "grid" | "gridcell" | "group" | "heading" | "img" | "link" | "list" | "listbox" | "listitem" | "log" | "main" | "marquee" | "math" | "menu" | "menubar" | "menuitem" | "menuitemcheckbox" | "menuitemradio" | "meter" | "navigation" | "none" | "note" | "option" | "presentation" | "progressbar" | "radio" | "radiogroup" | "region" | "row" | "rowgroup" | "rowheader" | "scrollbar" | "search" | "searchbox" | "separator" | "slider" | "spinbutton" | "status" | "switch" | "tab" | "table" | "tablist" | "tabpanel" | "term" | "textbox" | "timer" | "toolbar" | "tooltip" | "tree" | "treegrid" | "treeitem" | RemoveAttribute>;
 }
-// EVENTS
-/**
- * `Window` events, defined for `<body>`, `<svg>`, `<frameset>` tags.
- *
- * Excluding `EventHandlersElement` events already defined as globals that all tags share, such as
- * `onblur`.
- */
-export interface EventHandlersWindow<T> {
+interface EventHandlersWindow<T> {
 	onAfterPrint?: EventHandlerUnion<T, Event> | undefined;
 	onBeforePrint?: EventHandlerUnion<T, Event> | undefined;
 	onBeforeUnload?: EventHandlerUnion<T, BeforeUnloadEvent> | undefined;
@@ -524,15 +504,7 @@ export interface EventHandlersWindow<T> {
 	onUnhandledRejection?: EventHandlerUnion<T, PromiseRejectionEvent> | undefined;
 	onUnload?: EventHandlerUnion<T, Event> | undefined;
 }
-/**
- * Global `EventHandlersElement`, defined for all tags.
- *
- * That's events defined and shared BY ALL of the `HTMLElement/SVGElement/MathMLElement`
- * interfaces.
- *
- * Includes events defined for the `Element` interface.
- */
-export interface EventHandlersElement<T> {
+interface EventHandlersElement<T> {
 	onAbort?: EventHandlerUnion<T, UIEvent> | undefined;
 	onAnimationCancel?: EventHandlerUnion<T, AnimationEvent> | undefined;
 	onAnimationEnd?: EventHandlerUnion<T, AnimationEvent> | undefined;
@@ -647,14 +619,7 @@ export interface EventHandlersElement<T> {
 	onWaiting?: EventHandlerUnion<T, Event> | undefined;
 	onWheel?: EventHandlerUnion<T, WheelEvent> | undefined;
 }
-// GLOBAL ATTRIBUTES
-/**
- * Global `Element` + `Node` interface keys, shared by all tags regardless of their namespace:
- *
- * 1. That's `keys` that are defined BY ALL `HTMLElement/SVGElement/MathMLElement` interfaces.
- * 2. Includes `keys` defined by `Element` and `Node` interfaces.
- */
-export interface ElementAttributes<T> extends CustomDomAttributes<T>, DirectiveAttributes, DirectiveFunctionAttributes<T>, PropAttributes, OnAttributes<T>, EventHandlersElement<T>, AriaAttributes {
+interface ElementAttributes<T> extends CustomDomAttributes<T>, DirectiveAttributes, DirectiveFunctionAttributes<T>, PropAttributes, OnAttributes<T>, EventHandlersElement<T>, AriaAttributes {
 	// [key: ClassKeys]: boolean;
 	// properties
 	innerHTML?: SignalOrValue<string>;
@@ -672,15 +637,13 @@ export interface ElementAttributes<T> extends CustomDomAttributes<T>, DirectiveA
 	style?: SignalOrValue<CSSProperties | string | RemoveAttribute>;
 	tabindex?: SignalOrValue<number | string | RemoveAttribute>;
 }
-/** Global `SVGElement` interface keys only. */
-export interface SVGAttributes<T> extends ElementAttributes<T> {
+interface SVGAttributes<T> extends ElementAttributes<T> {
 	id?: SignalOrValue<string | RemoveAttribute>;
 	lang?: SignalOrValue<string | RemoveAttribute>;
 	tabindex?: SignalOrValue<number | string | RemoveAttribute>;
 	xmlns?: SignalOrValue<string | RemoveAttribute>;
 }
-/** Global `MathMLElement` interface keys only. */
-export interface MathMLAttributes<T> extends ElementAttributes<T> {
+interface MathMLAttributes<T> extends ElementAttributes<T> {
 	dir?: SignalOrValue<HTMLDir | RemoveAttribute>;
 	displaystyle?: SignalOrValue<BooleanAttribute | RemoveAttribute>;
 	scriptlevel?: SignalOrValue<string | RemoveAttribute>;
@@ -694,8 +657,7 @@ export interface MathMLAttributes<T> extends ElementAttributes<T> {
 	/** @deprecated */
 	mathsize?: SignalOrValue<string | RemoveAttribute>;
 }
-/** Global `HTMLElement` interface keys only. */
-export interface HTMLAttributes<T> extends ElementAttributes<T> {
+interface HTMLAttributes<T> extends ElementAttributes<T> {
 	// properties
 	innerText?: SignalOrValue<string | number>;
 	// attributes
@@ -738,17 +700,16 @@ export interface HTMLAttributes<T> extends ElementAttributes<T> {
 	/** @deprecated */
 	contextmenu?: SignalOrValue<string | RemoveAttribute>;
 }
-// HTML
-export type HTMLAutocapitalize = "off" | "none" | "on" | "sentences" | "words" | "characters";
-export type HTMLAutocomplete = "additional-name" | "address-level1" | "address-level2" | "address-level3" | "address-level4" | "address-line1" | "address-line2" | "address-line3" | "bday" | "bday-day" | "bday-month" | "bday-year" | "billing" | "cc-additional-name" | "cc-csc" | "cc-exp" | "cc-exp-month" | "cc-exp-year" | "cc-family-name" | "cc-given-name" | "cc-name" | "cc-number" | "cc-type" | "country" | "country-name" | "current-password" | "email" | "family-name" | "fax" | "given-name" | "home" | "honorific-prefix" | "honorific-suffix" | "impp" | "language" | "mobile" | "name" | "new-password" | "nickname" | "off" | "on" | "organization" | "organization-title" | "pager" | "photo" | "postal-code" | "sex" | "shipping" | "street-address" | "tel" | "tel-area-code" | "tel-country-code" | "tel-extension" | "tel-local" | "tel-local-prefix" | "tel-local-suffix" | "tel-national" | "transaction-amount" | "transaction-currency" | "url" | "username" | "work" | (string & {});
-export type HTMLDir = "ltr" | "rtl" | "auto";
-export type HTMLFormEncType = "application/x-www-form-urlencoded" | "multipart/form-data" | "text/plain";
-export type HTMLFormMethod = "post" | "get" | "dialog";
-export type HTMLCrossorigin = "anonymous" | "use-credentials" | EnumeratedAcceptsEmpty;
-export type HTMLReferrerPolicy = "no-referrer" | "no-referrer-when-downgrade" | "origin" | "origin-when-cross-origin" | "same-origin" | "strict-origin" | "strict-origin-when-cross-origin" | "unsafe-url";
-export type HTMLIframeSandbox = "allow-downloads-without-user-activation" | "allow-downloads" | "allow-forms" | "allow-modals" | "allow-orientation-lock" | "allow-pointer-lock" | "allow-popups" | "allow-popups-to-escape-sandbox" | "allow-presentation" | "allow-same-origin" | "allow-scripts" | "allow-storage-access-by-user-activation" | "allow-top-navigation" | "allow-top-navigation-by-user-activation" | "allow-top-navigation-to-custom-protocols";
-export type HTMLLinkAs = "audio" | "document" | "embed" | "fetch" | "font" | "image" | "object" | "script" | "style" | "track" | "video" | "worker";
-export interface AnchorHTMLAttributes<T> extends HTMLAttributes<T> {
+type HTMLAutocapitalize = "off" | "none" | "on" | "sentences" | "words" | "characters";
+type HTMLAutocomplete = "additional-name" | "address-level1" | "address-level2" | "address-level3" | "address-level4" | "address-line1" | "address-line2" | "address-line3" | "bday" | "bday-day" | "bday-month" | "bday-year" | "billing" | "cc-additional-name" | "cc-csc" | "cc-exp" | "cc-exp-month" | "cc-exp-year" | "cc-family-name" | "cc-given-name" | "cc-name" | "cc-number" | "cc-type" | "country" | "country-name" | "current-password" | "email" | "family-name" | "fax" | "given-name" | "home" | "honorific-prefix" | "honorific-suffix" | "impp" | "language" | "mobile" | "name" | "new-password" | "nickname" | "off" | "on" | "organization" | "organization-title" | "pager" | "photo" | "postal-code" | "sex" | "shipping" | "street-address" | "tel" | "tel-area-code" | "tel-country-code" | "tel-extension" | "tel-local" | "tel-local-prefix" | "tel-local-suffix" | "tel-national" | "transaction-amount" | "transaction-currency" | "url" | "username" | "work" | (string & {});
+type HTMLDir = "ltr" | "rtl" | "auto";
+type HTMLFormEncType = "application/x-www-form-urlencoded" | "multipart/form-data" | "text/plain";
+type HTMLFormMethod = "post" | "get" | "dialog";
+type HTMLCrossorigin = "anonymous" | "use-credentials" | EnumeratedAcceptsEmpty;
+type HTMLReferrerPolicy = "no-referrer" | "no-referrer-when-downgrade" | "origin" | "origin-when-cross-origin" | "same-origin" | "strict-origin" | "strict-origin-when-cross-origin" | "unsafe-url";
+type HTMLIframeSandbox = "allow-downloads-without-user-activation" | "allow-downloads" | "allow-forms" | "allow-modals" | "allow-orientation-lock" | "allow-pointer-lock" | "allow-popups" | "allow-popups-to-escape-sandbox" | "allow-presentation" | "allow-same-origin" | "allow-scripts" | "allow-storage-access-by-user-activation" | "allow-top-navigation" | "allow-top-navigation-by-user-activation" | "allow-top-navigation-to-custom-protocols";
+type HTMLLinkAs = "audio" | "document" | "embed" | "fetch" | "font" | "image" | "object" | "script" | "style" | "track" | "video" | "worker";
+interface AnchorHTMLAttributes<T> extends HTMLAttributes<T> {
 	download?: SignalOrValue<string | true | RemoveAttribute>;
 	href?: SignalOrValue<string | RemoveAttribute>;
 	hreflang?: SignalOrValue<string | RemoveAttribute>;
@@ -770,9 +731,9 @@ export interface AnchorHTMLAttributes<T> extends HTMLAttributes<T> {
 	/** @deprecated */
 	shape?: SignalOrValue<"rect" | "circle" | "poly" | "default" | RemoveAttribute>;
 }
-export interface AudioHTMLAttributes<T> extends MediaHTMLAttributes<T> {
+interface AudioHTMLAttributes<T> extends MediaHTMLAttributes<T> {
 }
-export interface AreaHTMLAttributes<T> extends HTMLAttributes<T> {
+interface AreaHTMLAttributes<T> extends HTMLAttributes<T> {
 	alt?: SignalOrValue<string | RemoveAttribute>;
 	coords?: SignalOrValue<string | RemoveAttribute>;
 	download?: SignalOrValue<string | RemoveAttribute>;
@@ -787,19 +748,19 @@ export interface AreaHTMLAttributes<T> extends HTMLAttributes<T> {
 	/** @deprecated */
 	nohref?: SignalOrValue<BooleanAttribute | RemoveAttribute>;
 }
-export interface BaseHTMLAttributes<T> extends HTMLAttributes<T> {
+interface BaseHTMLAttributes<T> extends HTMLAttributes<T> {
 	href?: SignalOrValue<string | RemoveAttribute>;
 	target?: SignalOrValue<"_self" | "_blank" | "_parent" | "_top" | (string & {}) | RemoveAttribute>;
 }
-export interface BdoHTMLAttributes<T> extends HTMLAttributes<T> {
+interface BdoHTMLAttributes<T> extends HTMLAttributes<T> {
 	dir?: SignalOrValue<"ltr" | "rtl" | RemoveAttribute>;
 }
-export interface BlockquoteHTMLAttributes<T> extends HTMLAttributes<T> {
+interface BlockquoteHTMLAttributes<T> extends HTMLAttributes<T> {
 	cite?: SignalOrValue<string | RemoveAttribute>;
 }
-export interface BodyHTMLAttributes<T> extends HTMLAttributes<T>, EventHandlersWindow<T> {
+interface BodyHTMLAttributes<T> extends HTMLAttributes<T>, EventHandlersWindow<T> {
 }
-export interface ButtonHTMLAttributes<T> extends HTMLAttributes<T> {
+interface ButtonHTMLAttributes<T> extends HTMLAttributes<T> {
 	disabled?: SignalOrValue<BooleanAttribute | RemoveAttribute>;
 	form?: SignalOrValue<string | RemoveAttribute>;
 	formaction?: SignalOrValue<string | SerializableAttributeValue | RemoveAttribute>;
@@ -817,17 +778,17 @@ export interface ButtonHTMLAttributes<T> extends HTMLAttributes<T> {
 	/** @experimental */
 	commandfor?: SignalOrValue<string | RemoveAttribute>;
 }
-export interface CanvasHTMLAttributes<T> extends HTMLAttributes<T> {
+interface CanvasHTMLAttributes<T> extends HTMLAttributes<T> {
 	height?: SignalOrValue<number | string | RemoveAttribute>;
 	width?: SignalOrValue<number | string | RemoveAttribute>;
 	/**@deprecated @non-standard*/
 	"moz-opaque"?: SignalOrValue<BooleanAttribute | RemoveAttribute>;
 }
-export interface CaptionHTMLAttributes<T> extends HTMLAttributes<T> {
+interface CaptionHTMLAttributes<T> extends HTMLAttributes<T> {
 	/** @deprecated */
 	align?: SignalOrValue<"left" | "center" | "right" | RemoveAttribute>;
 }
-export interface ColHTMLAttributes<T> extends HTMLAttributes<T> {
+interface ColHTMLAttributes<T> extends HTMLAttributes<T> {
 	span?: SignalOrValue<number | string | RemoveAttribute>;
 	/** @deprecated */
 	align?: SignalOrValue<"left" | "center" | "right" | "justify" | "char" | RemoveAttribute>;
@@ -842,7 +803,7 @@ export interface ColHTMLAttributes<T> extends HTMLAttributes<T> {
 	/** @deprecated */
 	width?: SignalOrValue<number | string | RemoveAttribute>;
 }
-export interface ColgroupHTMLAttributes<T> extends HTMLAttributes<T> {
+interface ColgroupHTMLAttributes<T> extends HTMLAttributes<T> {
 	span?: SignalOrValue<number | string | RemoveAttribute>;
 	/** @deprecated */
 	align?: SignalOrValue<"left" | "center" | "right" | "justify" | "char" | RemoveAttribute>;
@@ -857,14 +818,14 @@ export interface ColgroupHTMLAttributes<T> extends HTMLAttributes<T> {
 	/** @deprecated */
 	width?: SignalOrValue<number | string | RemoveAttribute>;
 }
-export interface DataHTMLAttributes<T> extends HTMLAttributes<T> {
+interface DataHTMLAttributes<T> extends HTMLAttributes<T> {
 	value?: SignalOrValue<string | string[] | number | RemoveAttribute>;
 }
-export interface DetailsHtmlAttributes<T> extends HTMLAttributes<T> {
+interface DetailsHtmlAttributes<T> extends HTMLAttributes<T> {
 	name?: SignalOrValue<string | RemoveAttribute>;
 	open?: SignalOrValue<BooleanAttribute | RemoveAttribute>;
 }
-export interface DialogHtmlAttributes<T> extends HTMLAttributes<T> {
+interface DialogHtmlAttributes<T> extends HTMLAttributes<T> {
 	open?: SignalOrValue<BooleanAttribute | RemoveAttribute>;
 	/**
 	 * Do not add the `tabindex` property to the `<dialog>` element as it is not interactive and
@@ -877,7 +838,7 @@ export interface DialogHtmlAttributes<T> extends HTMLAttributes<T> {
 	/** @experimental */
 	closedby?: SignalOrValue<"any" | "closerequest" | "none" | RemoveAttribute>;
 }
-export interface EmbedHTMLAttributes<T> extends HTMLAttributes<T> {
+interface EmbedHTMLAttributes<T> extends HTMLAttributes<T> {
 	height?: SignalOrValue<number | string | RemoveAttribute>;
 	src?: SignalOrValue<string | RemoveAttribute>;
 	type?: SignalOrValue<string | RemoveAttribute>;
@@ -887,12 +848,12 @@ export interface EmbedHTMLAttributes<T> extends HTMLAttributes<T> {
 	/** @deprecated */
 	name?: SignalOrValue<string | RemoveAttribute>;
 }
-export interface FieldsetHTMLAttributes<T> extends HTMLAttributes<T> {
+interface FieldsetHTMLAttributes<T> extends HTMLAttributes<T> {
 	disabled?: SignalOrValue<BooleanAttribute | RemoveAttribute>;
 	form?: SignalOrValue<string | RemoveAttribute>;
 	name?: SignalOrValue<string | RemoveAttribute>;
 }
-export interface FormHTMLAttributes<T> extends HTMLAttributes<T> {
+interface FormHTMLAttributes<T> extends HTMLAttributes<T> {
 	"accept-charset"?: SignalOrValue<string | RemoveAttribute>;
 	action?: SignalOrValue<string | SerializableAttributeValue | RemoveAttribute>;
 	autocomplete?: SignalOrValue<"on" | "off" | RemoveAttribute>;
@@ -906,7 +867,7 @@ export interface FormHTMLAttributes<T> extends HTMLAttributes<T> {
 	/** @deprecated */
 	accept?: SignalOrValue<string | RemoveAttribute>;
 }
-export interface IframeHTMLAttributes<T> extends HTMLAttributes<T> {
+interface IframeHTMLAttributes<T> extends HTMLAttributes<T> {
 	allow?: SignalOrValue<string | RemoveAttribute>;
 	allowfullscreen?: SignalOrValue<BooleanAttribute | RemoveAttribute>;
 	height?: SignalOrValue<number | string | RemoveAttribute>;
@@ -951,7 +912,7 @@ export interface IframeHTMLAttributes<T> extends HTMLAttributes<T> {
 	/** @deprecated */
 	seamless?: SignalOrValue<BooleanAttribute | RemoveAttribute>;
 }
-export interface ImgHTMLAttributes<T> extends HTMLAttributes<T> {
+interface ImgHTMLAttributes<T> extends HTMLAttributes<T> {
 	alt?: SignalOrValue<string | RemoveAttribute>;
 	browsingtopics?: SignalOrValue<string | RemoveAttribute>;
 	crossorigin?: SignalOrValue<HTMLCrossorigin | RemoveAttribute>;
@@ -987,7 +948,7 @@ export interface ImgHTMLAttributes<T> extends HTMLAttributes<T> {
 	/** @deprecated */
 	vspace?: SignalOrValue<number | string | RemoveAttribute>;
 }
-export interface InputHTMLAttributes<T> extends HTMLAttributes<T> {
+interface InputHTMLAttributes<T> extends HTMLAttributes<T> {
 	accept?: SignalOrValue<string | RemoveAttribute>;
 	alpha?: SignalOrValue<BooleanAttribute | RemoveAttribute>;
 	alt?: SignalOrValue<string | RemoveAttribute>;
@@ -1032,19 +993,19 @@ export interface InputHTMLAttributes<T> extends HTMLAttributes<T> {
 	/** @deprecated */
 	usemap?: SignalOrValue<string | RemoveAttribute>;
 }
-export interface ModHTMLAttributes<T> extends HTMLAttributes<T> {
+interface ModHTMLAttributes<T> extends HTMLAttributes<T> {
 	cite?: SignalOrValue<string | RemoveAttribute>;
 	datetime?: SignalOrValue<string | RemoveAttribute>;
 }
-export interface LabelHTMLAttributes<T> extends HTMLAttributes<T> {
+interface LabelHTMLAttributes<T> extends HTMLAttributes<T> {
 	for?: SignalOrValue<string | RemoveAttribute>;
 }
-export interface LiHTMLAttributes<T> extends HTMLAttributes<T> {
+interface LiHTMLAttributes<T> extends HTMLAttributes<T> {
 	value?: SignalOrValue<number | string | RemoveAttribute>;
 	/** @deprecated */
 	type?: SignalOrValue<"1" | "a" | "A" | "i" | "I" | RemoveAttribute>;
 }
-export interface LinkHTMLAttributes<T> extends HTMLAttributes<T> {
+interface LinkHTMLAttributes<T> extends HTMLAttributes<T> {
 	as?: SignalOrValue<HTMLLinkAs | RemoveAttribute>;
 	blocking?: SignalOrValue<"render" | RemoveAttribute>;
 	color?: SignalOrValue<string | RemoveAttribute>;
@@ -1068,10 +1029,10 @@ export interface LinkHTMLAttributes<T> extends HTMLAttributes<T> {
 	/** @deprecated */
 	target?: SignalOrValue<string | RemoveAttribute>;
 }
-export interface MapHTMLAttributes<T> extends HTMLAttributes<T> {
+interface MapHTMLAttributes<T> extends HTMLAttributes<T> {
 	name?: SignalOrValue<string | RemoveAttribute>;
 }
-export interface MediaHTMLAttributes<T> extends HTMLAttributes<T> {
+interface MediaHTMLAttributes<T> extends HTMLAttributes<T> {
 	autoplay?: SignalOrValue<BooleanAttribute | RemoveAttribute>;
 	controls?: SignalOrValue<BooleanAttribute | RemoveAttribute>;
 	controlslist?: SignalOrValue<"nodownload" | "nofullscreen" | "noplaybackrate" | "noremoteplayback" | (string & {}) | RemoveAttribute>;
@@ -1088,7 +1049,7 @@ export interface MediaHTMLAttributes<T> extends HTMLAttributes<T> {
 	/** @deprecated */
 	mediagroup?: SignalOrValue<string | RemoveAttribute>;
 }
-export interface MenuHTMLAttributes<T> extends HTMLAttributes<T> {
+interface MenuHTMLAttributes<T> extends HTMLAttributes<T> {
 	/** @deprecated */
 	compact?: SignalOrValue<BooleanAttribute | RemoveAttribute>;
 	/** @deprecated */
@@ -1096,7 +1057,7 @@ export interface MenuHTMLAttributes<T> extends HTMLAttributes<T> {
 	/** @deprecated */
 	type?: SignalOrValue<"context" | "toolbar" | RemoveAttribute>;
 }
-export interface MetaHTMLAttributes<T> extends HTMLAttributes<T> {
+interface MetaHTMLAttributes<T> extends HTMLAttributes<T> {
 	"http-equiv"?: SignalOrValue<"content-security-policy" | "content-type" | "default-style" | "x-ua-compatible" | "refresh" | RemoveAttribute>;
 	charset?: SignalOrValue<string | RemoveAttribute>;
 	content?: SignalOrValue<string | RemoveAttribute>;
@@ -1105,7 +1066,7 @@ export interface MetaHTMLAttributes<T> extends HTMLAttributes<T> {
 	/** @deprecated */
 	scheme?: SignalOrValue<string | RemoveAttribute>;
 }
-export interface MeterHTMLAttributes<T> extends HTMLAttributes<T> {
+interface MeterHTMLAttributes<T> extends HTMLAttributes<T> {
 	form?: SignalOrValue<string | RemoveAttribute>;
 	high?: SignalOrValue<number | string | RemoveAttribute>;
 	low?: SignalOrValue<number | string | RemoveAttribute>;
@@ -1114,10 +1075,10 @@ export interface MeterHTMLAttributes<T> extends HTMLAttributes<T> {
 	optimum?: SignalOrValue<number | string | RemoveAttribute>;
 	value?: SignalOrValue<string | string[] | number | RemoveAttribute>;
 }
-export interface QuoteHTMLAttributes<T> extends HTMLAttributes<T> {
+interface QuoteHTMLAttributes<T> extends HTMLAttributes<T> {
 	cite?: SignalOrValue<string | RemoveAttribute>;
 }
-export interface ObjectHTMLAttributes<T> extends HTMLAttributes<T> {
+interface ObjectHTMLAttributes<T> extends HTMLAttributes<T> {
 	data?: SignalOrValue<string | RemoveAttribute>;
 	form?: SignalOrValue<string | RemoveAttribute>;
 	height?: SignalOrValue<number | string | RemoveAttribute>;
@@ -1152,33 +1113,33 @@ export interface ObjectHTMLAttributes<T> extends HTMLAttributes<T> {
 	/** @deprecated */
 	typemustmatch?: SignalOrValue<BooleanAttribute | RemoveAttribute>;
 }
-export interface OlHTMLAttributes<T> extends HTMLAttributes<T> {
+interface OlHTMLAttributes<T> extends HTMLAttributes<T> {
 	reversed?: SignalOrValue<BooleanAttribute | RemoveAttribute>;
 	start?: SignalOrValue<number | string | RemoveAttribute>;
 	type?: SignalOrValue<"1" | "a" | "A" | "i" | "I" | RemoveAttribute>;
 	/**@deprecated @non-standard*/
 	compact?: SignalOrValue<BooleanAttribute | RemoveAttribute>;
 }
-export interface OptgroupHTMLAttributes<T> extends HTMLAttributes<T> {
+interface OptgroupHTMLAttributes<T> extends HTMLAttributes<T> {
 	disabled?: SignalOrValue<BooleanAttribute | RemoveAttribute>;
 	label?: SignalOrValue<string | RemoveAttribute>;
 }
-export interface OptionHTMLAttributes<T> extends HTMLAttributes<T> {
+interface OptionHTMLAttributes<T> extends HTMLAttributes<T> {
 	disabled?: SignalOrValue<BooleanAttribute | RemoveAttribute>;
 	label?: SignalOrValue<string | RemoveAttribute>;
 	selected?: SignalOrValue<BooleanAttribute | RemoveAttribute>;
 	value?: SignalOrValue<string | string[] | number | RemoveAttribute>;
 }
-export interface OutputHTMLAttributes<T> extends HTMLAttributes<T> {
+interface OutputHTMLAttributes<T> extends HTMLAttributes<T> {
 	for?: SignalOrValue<string | RemoveAttribute>;
 	form?: SignalOrValue<string | RemoveAttribute>;
 	name?: SignalOrValue<string | RemoveAttribute>;
 }
-export interface ProgressHTMLAttributes<T> extends HTMLAttributes<T> {
+interface ProgressHTMLAttributes<T> extends HTMLAttributes<T> {
 	max?: SignalOrValue<number | string | RemoveAttribute>;
 	value?: SignalOrValue<string | string[] | number | RemoveAttribute>;
 }
-export interface ScriptHTMLAttributes<T> extends HTMLAttributes<T> {
+interface ScriptHTMLAttributes<T> extends HTMLAttributes<T> {
 	async?: SignalOrValue<BooleanAttribute | RemoveAttribute>;
 	blocking?: SignalOrValue<"render" | RemoveAttribute>;
 	crossorigin?: SignalOrValue<HTMLCrossorigin | RemoveAttribute>;
@@ -1199,7 +1160,7 @@ export interface ScriptHTMLAttributes<T> extends HTMLAttributes<T> {
 	/** @deprecated */
 	language?: SignalOrValue<string | RemoveAttribute>;
 }
-export interface SelectHTMLAttributes<T> extends HTMLAttributes<T> {
+interface SelectHTMLAttributes<T> extends HTMLAttributes<T> {
 	autocomplete?: SignalOrValue<HTMLAutocomplete | RemoveAttribute>;
 	disabled?: SignalOrValue<BooleanAttribute | RemoveAttribute>;
 	form?: SignalOrValue<string | RemoveAttribute>;
@@ -1209,10 +1170,10 @@ export interface SelectHTMLAttributes<T> extends HTMLAttributes<T> {
 	size?: SignalOrValue<number | string | RemoveAttribute>;
 	value?: SignalOrValue<string | string[] | number | RemoveAttribute>;
 }
-export interface HTMLSlotElementAttributes<T> extends HTMLAttributes<T> {
+interface HTMLSlotElementAttributes<T> extends HTMLAttributes<T> {
 	name?: SignalOrValue<string | RemoveAttribute>;
 }
-export interface SourceHTMLAttributes<T> extends HTMLAttributes<T> {
+interface SourceHTMLAttributes<T> extends HTMLAttributes<T> {
 	height?: SignalOrValue<number | string | RemoveAttribute>;
 	media?: SignalOrValue<string | RemoveAttribute>;
 	sizes?: SignalOrValue<string | RemoveAttribute>;
@@ -1221,7 +1182,7 @@ export interface SourceHTMLAttributes<T> extends HTMLAttributes<T> {
 	type?: SignalOrValue<string | RemoveAttribute>;
 	width?: SignalOrValue<number | string | RemoveAttribute>;
 }
-export interface StyleHTMLAttributes<T> extends HTMLAttributes<T> {
+interface StyleHTMLAttributes<T> extends HTMLAttributes<T> {
 	blocking?: SignalOrValue<"render" | RemoveAttribute>;
 	media?: SignalOrValue<string | RemoveAttribute>;
 	/** @deprecated */
@@ -1229,7 +1190,7 @@ export interface StyleHTMLAttributes<T> extends HTMLAttributes<T> {
 	/** @deprecated */
 	type?: SignalOrValue<string | RemoveAttribute>;
 }
-export interface TdHTMLAttributes<T> extends HTMLAttributes<T> {
+interface TdHTMLAttributes<T> extends HTMLAttributes<T> {
 	colspan?: SignalOrValue<number | string | RemoveAttribute>;
 	headers?: SignalOrValue<string | RemoveAttribute>;
 	rowspan?: SignalOrValue<number | string | RemoveAttribute>;
@@ -1256,7 +1217,7 @@ export interface TdHTMLAttributes<T> extends HTMLAttributes<T> {
 	/** @deprecated */
 	width?: SignalOrValue<number | string | RemoveAttribute>;
 }
-export interface TemplateHTMLAttributes<T> extends HTMLAttributes<T> {
+interface TemplateHTMLAttributes<T> extends HTMLAttributes<T> {
 	shadowrootclonable?: SignalOrValue<BooleanAttribute | RemoveAttribute>;
 	shadowrootdelegatesfocus?: SignalOrValue<BooleanAttribute | RemoveAttribute>;
 	shadowrootmode?: SignalOrValue<"open" | "closed" | RemoveAttribute>;
@@ -1264,7 +1225,7 @@ export interface TemplateHTMLAttributes<T> extends HTMLAttributes<T> {
 	/** @experimental */
 	shadowrootserializable?: SignalOrValue<BooleanAttribute | RemoveAttribute>;
 }
-export interface TextareaHTMLAttributes<T> extends HTMLAttributes<T> {
+interface TextareaHTMLAttributes<T> extends HTMLAttributes<T> {
 	autocomplete?: SignalOrValue<HTMLAutocomplete | RemoveAttribute>;
 	cols?: SignalOrValue<number | string | RemoveAttribute>;
 	dirname?: SignalOrValue<string | RemoveAttribute>;
@@ -1280,7 +1241,7 @@ export interface TextareaHTMLAttributes<T> extends HTMLAttributes<T> {
 	value?: SignalOrValue<string | string[] | number | RemoveAttribute>;
 	wrap?: SignalOrValue<"hard" | "soft" | "off" | RemoveAttribute>;
 }
-export interface ThHTMLAttributes<T> extends HTMLAttributes<T> {
+interface ThHTMLAttributes<T> extends HTMLAttributes<T> {
 	abbr?: SignalOrValue<string | RemoveAttribute>;
 	colspan?: SignalOrValue<number | string | RemoveAttribute>;
 	headers?: SignalOrValue<string | RemoveAttribute>;
@@ -1305,10 +1266,10 @@ export interface ThHTMLAttributes<T> extends HTMLAttributes<T> {
 	/** @deprecated */
 	width?: SignalOrValue<number | string | RemoveAttribute>;
 }
-export interface TimeHTMLAttributes<T> extends HTMLAttributes<T> {
+interface TimeHTMLAttributes<T> extends HTMLAttributes<T> {
 	datetime?: SignalOrValue<string | RemoveAttribute>;
 }
-export interface TrackHTMLAttributes<T> extends HTMLAttributes<T> {
+interface TrackHTMLAttributes<T> extends HTMLAttributes<T> {
 	default?: SignalOrValue<BooleanAttribute | RemoveAttribute>;
 	kind?: SignalOrValue<"alternative" | "descriptions" | "main" | "main-desc" | "translation" | "commentary" | "subtitles" | "captions" | "chapters" | "metadata" | RemoveAttribute>;
 	label?: SignalOrValue<string | RemoveAttribute>;
@@ -1317,7 +1278,7 @@ export interface TrackHTMLAttributes<T> extends HTMLAttributes<T> {
 	/** @deprecated */
 	mediagroup?: SignalOrValue<string | RemoveAttribute>;
 }
-export interface VideoHTMLAttributes<T> extends MediaHTMLAttributes<T> {
+interface VideoHTMLAttributes<T> extends MediaHTMLAttributes<T> {
 	disablepictureinpicture?: SignalOrValue<BooleanAttribute | RemoveAttribute>;
 	height?: SignalOrValue<number | string | RemoveAttribute>;
 	playsinline?: SignalOrValue<BooleanAttribute | RemoveAttribute>;
@@ -1327,7 +1288,7 @@ export interface VideoHTMLAttributes<T> extends MediaHTMLAttributes<T> {
 	// "on:enterpictureinpicture"?: EventHandlerWithOptionsUnion<T, PictureInPictureEvent> | undefined;
 	onLeavePictureInPicture?: EventHandlerUnion<T, PictureInPictureEvent> | undefined;
 }
-export interface WebViewHTMLAttributes<T> extends HTMLAttributes<T> {
+interface WebViewHTMLAttributes<T> extends HTMLAttributes<T> {
 	allowpopups?: SignalOrValue<BooleanAttribute | RemoveAttribute>;
 	disableblinkfeatures?: SignalOrValue<string | RemoveAttribute>;
 	disablewebsecurity?: SignalOrValue<BooleanAttribute | RemoveAttribute>;
@@ -1351,26 +1312,25 @@ export interface WebViewHTMLAttributes<T> extends HTMLAttributes<T> {
 	/** @deprecated */
 	guestinstance?: SignalOrValue<string | RemoveAttribute>;
 }
-// SVG
-export type SVGPreserveAspectRatioValue = "none" | "xMinYMin" | "xMidYMin" | "xMaxYMin" | "xMinYMid" | "xMidYMid" | "xMaxYMid" | "xMinYMax" | "xMidYMax" | "xMaxYMax" | "xMinYMin meet" | "xMidYMin meet" | "xMaxYMin meet" | "xMinYMid meet" | "xMidYMid meet" | "xMaxYMid meet" | "xMinYMax meet" | "xMidYMax meet" | "xMaxYMax meet" | "xMinYMin slice" | "xMidYMin slice" | "xMaxYMin slice" | "xMinYMid slice" | "xMidYMid slice" | "xMaxYMid slice" | "xMinYMax slice" | "xMidYMax slice" | "xMaxYMax slice";
-export type ImagePreserveAspectRatio = SVGPreserveAspectRatioValue | "defer none" | "defer xMinYMin" | "defer xMidYMin" | "defer xMaxYMin" | "defer xMinYMid" | "defer xMidYMid" | "defer xMaxYMid" | "defer xMinYMax" | "defer xMidYMax" | "defer xMaxYMax" | "defer xMinYMin meet" | "defer xMidYMin meet" | "defer xMaxYMin meet" | "defer xMinYMid meet" | "defer xMidYMid meet" | "defer xMaxYMid meet" | "defer xMinYMax meet" | "defer xMidYMax meet" | "defer xMaxYMax meet" | "defer xMinYMin slice" | "defer xMidYMin slice" | "defer xMaxYMin slice" | "defer xMinYMid slice" | "defer xMidYMid slice" | "defer xMaxYMid slice" | "defer xMinYMax slice" | "defer xMidYMax slice" | "defer xMaxYMax slice";
-export type SVGUnits = "userSpaceOnUse" | "objectBoundingBox";
-export interface StylableSVGAttributes {
+type SVGPreserveAspectRatioValue = "none" | "xMinYMin" | "xMidYMin" | "xMaxYMin" | "xMinYMid" | "xMidYMid" | "xMaxYMid" | "xMinYMax" | "xMidYMax" | "xMaxYMax" | "xMinYMin meet" | "xMidYMin meet" | "xMaxYMin meet" | "xMinYMid meet" | "xMidYMid meet" | "xMaxYMid meet" | "xMinYMax meet" | "xMidYMax meet" | "xMaxYMax meet" | "xMinYMin slice" | "xMidYMin slice" | "xMaxYMin slice" | "xMinYMid slice" | "xMidYMid slice" | "xMaxYMid slice" | "xMinYMax slice" | "xMidYMax slice" | "xMaxYMax slice";
+type ImagePreserveAspectRatio = SVGPreserveAspectRatioValue | "defer none" | "defer xMinYMin" | "defer xMidYMin" | "defer xMaxYMin" | "defer xMinYMid" | "defer xMidYMid" | "defer xMaxYMid" | "defer xMinYMax" | "defer xMidYMax" | "defer xMaxYMax" | "defer xMinYMin meet" | "defer xMidYMin meet" | "defer xMaxYMin meet" | "defer xMinYMid meet" | "defer xMidYMid meet" | "defer xMaxYMid meet" | "defer xMinYMax meet" | "defer xMidYMax meet" | "defer xMaxYMax meet" | "defer xMinYMin slice" | "defer xMidYMin slice" | "defer xMaxYMin slice" | "defer xMinYMid slice" | "defer xMidYMid slice" | "defer xMaxYMid slice" | "defer xMinYMax slice" | "defer xMidYMax slice" | "defer xMaxYMax slice";
+type SVGUnits = "userSpaceOnUse" | "objectBoundingBox";
+interface StylableSVGAttributes {
 	class?: ElementAttributes<Element>["class"];
 	style?: SignalOrValue<CSSProperties | string | RemoveAttribute>;
 }
-export interface TransformableSVGAttributes {
+interface TransformableSVGAttributes {
 	transform?: SignalOrValue<string | RemoveAttribute>;
 }
-export interface ConditionalProcessingSVGAttributes {
+interface ConditionalProcessingSVGAttributes {
 	requiredExtensions?: SignalOrValue<string | RemoveAttribute>;
 	requiredFeatures?: SignalOrValue<string | RemoveAttribute>;
 	systemLanguage?: SignalOrValue<string | RemoveAttribute>;
 }
-export interface ExternalResourceSVGAttributes {
+interface ExternalResourceSVGAttributes {
 	externalResourcesRequired?: SignalOrValue<EnumeratedPseudoBoolean | RemoveAttribute>;
 }
-export interface AnimationTimingSVGAttributes {
+interface AnimationTimingSVGAttributes {
 	begin?: SignalOrValue<string | RemoveAttribute>;
 	dur?: SignalOrValue<string | RemoveAttribute>;
 	end?: SignalOrValue<string | RemoveAttribute>;
@@ -1381,7 +1341,7 @@ export interface AnimationTimingSVGAttributes {
 	repeatDur?: SignalOrValue<string | RemoveAttribute>;
 	restart?: SignalOrValue<"always" | "whenNotActive" | "never" | RemoveAttribute>;
 }
-export interface AnimationValueSVGAttributes {
+interface AnimationValueSVGAttributes {
 	by?: SignalOrValue<number | string | RemoveAttribute>;
 	calcMode?: SignalOrValue<"discrete" | "linear" | "paced" | "spline" | RemoveAttribute>;
 	from?: SignalOrValue<number | string | RemoveAttribute>;
@@ -1390,16 +1350,16 @@ export interface AnimationValueSVGAttributes {
 	to?: SignalOrValue<number | string | RemoveAttribute>;
 	values?: SignalOrValue<string | RemoveAttribute>;
 }
-export interface AnimationAdditionSVGAttributes {
+interface AnimationAdditionSVGAttributes {
 	accumulate?: SignalOrValue<"none" | "sum" | RemoveAttribute>;
 	additive?: SignalOrValue<"replace" | "sum" | RemoveAttribute>;
 	attributeName?: SignalOrValue<string | RemoveAttribute>;
 }
-export interface AnimationAttributeTargetSVGAttributes {
+interface AnimationAttributeTargetSVGAttributes {
 	attributeName?: SignalOrValue<string | RemoveAttribute>;
 	attributeType?: SignalOrValue<"CSS" | "XML" | "auto" | RemoveAttribute>;
 }
-export interface PresentationSVGAttributes {
+interface PresentationSVGAttributes {
 	"alignment-baseline"?: SignalOrValue<"auto" | "baseline" | "before-edge" | "text-before-edge" | "middle" | "central" | "after-edge" | "text-after-edge" | "ideographic" | "alphabetic" | "hanging" | "mathematical" | "inherit" | RemoveAttribute>;
 	"baseline-shift"?: SignalOrValue<number | string | RemoveAttribute>;
 	"clip-path"?: SignalOrValue<string | RemoveAttribute>;
@@ -1461,7 +1421,7 @@ export interface PresentationSVGAttributes {
 	stroke?: SignalOrValue<string | RemoveAttribute>;
 	visibility?: SignalOrValue<"visible" | "hidden" | "collapse" | "inherit" | RemoveAttribute>;
 }
-export interface AnimationElementSVGAttributes<T> extends SVGAttributes<T>, ExternalResourceSVGAttributes, ConditionalProcessingSVGAttributes {
+interface AnimationElementSVGAttributes<T> extends SVGAttributes<T>, ExternalResourceSVGAttributes, ConditionalProcessingSVGAttributes {
 	// TODO TimeEvent is currently undefined on TS
 	onBegin?: EventHandlerUnion<T, Event> | undefined;
 	// "on:begin"?: EventHandlerWithOptionsUnion<T, Event> | undefined;
@@ -1471,93 +1431,93 @@ export interface AnimationElementSVGAttributes<T> extends SVGAttributes<T>, Exte
 	// TODO TimeEvent is currently undefined on TS
 	onRepeat?: EventHandlerUnion<T, Event> | undefined;
 }
-export interface ContainerElementSVGAttributes<T> extends SVGAttributes<T>, ShapeElementSVGAttributes<T>, Pick<PresentationSVGAttributes, "clip-path" | "mask" | "cursor" | "opacity" | "filter" | "enable-background" | "color-interpolation" | "color-rendering"> {
+interface ContainerElementSVGAttributes<T> extends SVGAttributes<T>, ShapeElementSVGAttributes<T>, Pick<PresentationSVGAttributes, "clip-path" | "mask" | "cursor" | "opacity" | "filter" | "enable-background" | "color-interpolation" | "color-rendering"> {
 }
-export interface FilterPrimitiveElementSVGAttributes<T> extends SVGAttributes<T>, Pick<PresentationSVGAttributes, "color-interpolation-filters"> {
+interface FilterPrimitiveElementSVGAttributes<T> extends SVGAttributes<T>, Pick<PresentationSVGAttributes, "color-interpolation-filters"> {
 	height?: SignalOrValue<number | string | RemoveAttribute>;
 	result?: SignalOrValue<string | RemoveAttribute>;
 	width?: SignalOrValue<number | string | RemoveAttribute>;
 	x?: SignalOrValue<number | string | RemoveAttribute>;
 	y?: SignalOrValue<number | string | RemoveAttribute>;
 }
-export interface SingleInputFilterSVGAttributes {
+interface SingleInputFilterSVGAttributes {
 	in?: SignalOrValue<string | RemoveAttribute>;
 }
-export interface DoubleInputFilterSVGAttributes {
+interface DoubleInputFilterSVGAttributes {
 	in?: SignalOrValue<string | RemoveAttribute>;
 	in2?: SignalOrValue<string | RemoveAttribute>;
 }
-export interface FitToViewBoxSVGAttributes {
+interface FitToViewBoxSVGAttributes {
 	preserveAspectRatio?: SignalOrValue<SVGPreserveAspectRatioValue | RemoveAttribute>;
 	viewBox?: SignalOrValue<string | RemoveAttribute>;
 }
-export interface GradientElementSVGAttributes<T> extends SVGAttributes<T>, ExternalResourceSVGAttributes, StylableSVGAttributes {
+interface GradientElementSVGAttributes<T> extends SVGAttributes<T>, ExternalResourceSVGAttributes, StylableSVGAttributes {
 	gradientTransform?: SignalOrValue<string | RemoveAttribute>;
 	gradientUnits?: SignalOrValue<SVGUnits | RemoveAttribute>;
 	href?: SignalOrValue<string | RemoveAttribute>;
 	spreadMethod?: SignalOrValue<"pad" | "reflect" | "repeat" | RemoveAttribute>;
 }
-export interface GraphicsElementSVGAttributes<T> extends SVGAttributes<T>, Pick<PresentationSVGAttributes, "clip-rule" | "mask" | "pointer-events" | "cursor" | "opacity" | "filter" | "display" | "visibility" | "color-interpolation" | "color-rendering"> {
+interface GraphicsElementSVGAttributes<T> extends SVGAttributes<T>, Pick<PresentationSVGAttributes, "clip-rule" | "mask" | "pointer-events" | "cursor" | "opacity" | "filter" | "display" | "visibility" | "color-interpolation" | "color-rendering"> {
 }
-export interface LightSourceElementSVGAttributes<T> extends SVGAttributes<T> {
+interface LightSourceElementSVGAttributes<T> extends SVGAttributes<T> {
 }
-export interface NewViewportSVGAttributes<T> extends SVGAttributes<T>, Pick<PresentationSVGAttributes, "overflow" | "clip"> {
+interface NewViewportSVGAttributes<T> extends SVGAttributes<T>, Pick<PresentationSVGAttributes, "overflow" | "clip"> {
 	viewBox?: SignalOrValue<string | RemoveAttribute>;
 }
-export interface ShapeElementSVGAttributes<T> extends SVGAttributes<T>, Pick<PresentationSVGAttributes, "color" | "fill" | "fill-rule" | "fill-opacity" | "stroke" | "stroke-width" | "stroke-linecap" | "stroke-linejoin" | "stroke-miterlimit" | "stroke-dasharray" | "stroke-dashoffset" | "stroke-opacity" | "shape-rendering" | "pathLength"> {
+interface ShapeElementSVGAttributes<T> extends SVGAttributes<T>, Pick<PresentationSVGAttributes, "color" | "fill" | "fill-rule" | "fill-opacity" | "stroke" | "stroke-width" | "stroke-linecap" | "stroke-linejoin" | "stroke-miterlimit" | "stroke-dasharray" | "stroke-dashoffset" | "stroke-opacity" | "shape-rendering" | "pathLength"> {
 }
-export interface TextContentElementSVGAttributes<T> extends SVGAttributes<T>, Pick<PresentationSVGAttributes, "font-family" | "font-style" | "font-variant" | "font-weight" | "font-stretch" | "font-size" | "font-size-adjust" | "kerning" | "letter-spacing" | "word-spacing" | "text-decoration" | "glyph-orientation-horizontal" | "glyph-orientation-vertical" | "direction" | "unicode-bidi" | "text-anchor" | "dominant-baseline" | "color" | "fill" | "fill-rule" | "fill-opacity" | "stroke" | "stroke-width" | "stroke-linecap" | "stroke-linejoin" | "stroke-miterlimit" | "stroke-dasharray" | "stroke-dashoffset" | "stroke-opacity"> {
+interface TextContentElementSVGAttributes<T> extends SVGAttributes<T>, Pick<PresentationSVGAttributes, "font-family" | "font-style" | "font-variant" | "font-weight" | "font-stretch" | "font-size" | "font-size-adjust" | "kerning" | "letter-spacing" | "word-spacing" | "text-decoration" | "glyph-orientation-horizontal" | "glyph-orientation-vertical" | "direction" | "unicode-bidi" | "text-anchor" | "dominant-baseline" | "color" | "fill" | "fill-rule" | "fill-opacity" | "stroke" | "stroke-width" | "stroke-linecap" | "stroke-linejoin" | "stroke-miterlimit" | "stroke-dasharray" | "stroke-dashoffset" | "stroke-opacity"> {
 }
-export interface ZoomAndPanSVGAttributes {
+interface ZoomAndPanSVGAttributes {
 	/**@deprecated @non-standard*/
 	zoomAndPan?: SignalOrValue<"disable" | "magnify" | RemoveAttribute>;
 }
-export interface AnimateSVGAttributes<T> extends AnimationElementSVGAttributes<T>, AnimationAttributeTargetSVGAttributes, AnimationTimingSVGAttributes, AnimationValueSVGAttributes, AnimationAdditionSVGAttributes, Pick<PresentationSVGAttributes, "color-interpolation" | "color-rendering"> {
+interface AnimateSVGAttributes<T> extends AnimationElementSVGAttributes<T>, AnimationAttributeTargetSVGAttributes, AnimationTimingSVGAttributes, AnimationValueSVGAttributes, AnimationAdditionSVGAttributes, Pick<PresentationSVGAttributes, "color-interpolation" | "color-rendering"> {
 }
-export interface AnimateMotionSVGAttributes<T> extends AnimationElementSVGAttributes<T>, AnimationTimingSVGAttributes, AnimationValueSVGAttributes, AnimationAdditionSVGAttributes {
+interface AnimateMotionSVGAttributes<T> extends AnimationElementSVGAttributes<T>, AnimationTimingSVGAttributes, AnimationValueSVGAttributes, AnimationAdditionSVGAttributes {
 	keyPoints?: SignalOrValue<string | RemoveAttribute>;
 	origin?: SignalOrValue<"default" | RemoveAttribute>;
 	path?: SignalOrValue<string | RemoveAttribute>;
 	rotate?: SignalOrValue<number | string | "auto" | "auto-reverse" | RemoveAttribute>;
 }
-export interface AnimateTransformSVGAttributes<T> extends AnimationElementSVGAttributes<T>, AnimationAttributeTargetSVGAttributes, AnimationTimingSVGAttributes, AnimationValueSVGAttributes, AnimationAdditionSVGAttributes {
+interface AnimateTransformSVGAttributes<T> extends AnimationElementSVGAttributes<T>, AnimationAttributeTargetSVGAttributes, AnimationTimingSVGAttributes, AnimationValueSVGAttributes, AnimationAdditionSVGAttributes {
 	type?: SignalOrValue<"translate" | "scale" | "rotate" | "skewX" | "skewY" | RemoveAttribute>;
 }
-export interface CircleSVGAttributes<T> extends GraphicsElementSVGAttributes<T>, ShapeElementSVGAttributes<T>, ConditionalProcessingSVGAttributes, StylableSVGAttributes, TransformableSVGAttributes, Pick<PresentationSVGAttributes, "clip-path"> {
+interface CircleSVGAttributes<T> extends GraphicsElementSVGAttributes<T>, ShapeElementSVGAttributes<T>, ConditionalProcessingSVGAttributes, StylableSVGAttributes, TransformableSVGAttributes, Pick<PresentationSVGAttributes, "clip-path"> {
 	cx?: SignalOrValue<number | string | RemoveAttribute>;
 	cy?: SignalOrValue<number | string | RemoveAttribute>;
 	r?: SignalOrValue<number | string | RemoveAttribute>;
 }
-export interface ClipPathSVGAttributes<T> extends SVGAttributes<T>, ConditionalProcessingSVGAttributes, ExternalResourceSVGAttributes, StylableSVGAttributes, TransformableSVGAttributes, Pick<PresentationSVGAttributes, "clip-path"> {
+interface ClipPathSVGAttributes<T> extends SVGAttributes<T>, ConditionalProcessingSVGAttributes, ExternalResourceSVGAttributes, StylableSVGAttributes, TransformableSVGAttributes, Pick<PresentationSVGAttributes, "clip-path"> {
 	clipPathUnits?: SignalOrValue<SVGUnits | RemoveAttribute>;
 }
-export interface DefsSVGAttributes<T> extends ContainerElementSVGAttributes<T>, ConditionalProcessingSVGAttributes, ExternalResourceSVGAttributes, StylableSVGAttributes, TransformableSVGAttributes {
+interface DefsSVGAttributes<T> extends ContainerElementSVGAttributes<T>, ConditionalProcessingSVGAttributes, ExternalResourceSVGAttributes, StylableSVGAttributes, TransformableSVGAttributes {
 }
-export interface DescSVGAttributes<T> extends SVGAttributes<T>, StylableSVGAttributes {
+interface DescSVGAttributes<T> extends SVGAttributes<T>, StylableSVGAttributes {
 }
-export interface EllipseSVGAttributes<T> extends GraphicsElementSVGAttributes<T>, ShapeElementSVGAttributes<T>, ConditionalProcessingSVGAttributes, ExternalResourceSVGAttributes, StylableSVGAttributes, TransformableSVGAttributes, Pick<PresentationSVGAttributes, "clip-path"> {
+interface EllipseSVGAttributes<T> extends GraphicsElementSVGAttributes<T>, ShapeElementSVGAttributes<T>, ConditionalProcessingSVGAttributes, ExternalResourceSVGAttributes, StylableSVGAttributes, TransformableSVGAttributes, Pick<PresentationSVGAttributes, "clip-path"> {
 	cx?: SignalOrValue<number | string | RemoveAttribute>;
 	cy?: SignalOrValue<number | string | RemoveAttribute>;
 	rx?: SignalOrValue<number | string | RemoveAttribute>;
 	ry?: SignalOrValue<number | string | RemoveAttribute>;
 }
-export interface FeBlendSVGAttributes<T> extends FilterPrimitiveElementSVGAttributes<T>, DoubleInputFilterSVGAttributes, StylableSVGAttributes {
+interface FeBlendSVGAttributes<T> extends FilterPrimitiveElementSVGAttributes<T>, DoubleInputFilterSVGAttributes, StylableSVGAttributes {
 	mode?: SignalOrValue<"normal" | "multiply" | "screen" | "darken" | "lighten" | RemoveAttribute>;
 }
-export interface FeColorMatrixSVGAttributes<T> extends FilterPrimitiveElementSVGAttributes<T>, SingleInputFilterSVGAttributes, StylableSVGAttributes {
+interface FeColorMatrixSVGAttributes<T> extends FilterPrimitiveElementSVGAttributes<T>, SingleInputFilterSVGAttributes, StylableSVGAttributes {
 	type?: SignalOrValue<"matrix" | "saturate" | "hueRotate" | "luminanceToAlpha" | RemoveAttribute>;
 	values?: SignalOrValue<string | RemoveAttribute>;
 }
-export interface FeComponentTransferSVGAttributes<T> extends FilterPrimitiveElementSVGAttributes<T>, SingleInputFilterSVGAttributes, StylableSVGAttributes {
+interface FeComponentTransferSVGAttributes<T> extends FilterPrimitiveElementSVGAttributes<T>, SingleInputFilterSVGAttributes, StylableSVGAttributes {
 }
-export interface FeCompositeSVGAttributes<T> extends FilterPrimitiveElementSVGAttributes<T>, DoubleInputFilterSVGAttributes, StylableSVGAttributes {
+interface FeCompositeSVGAttributes<T> extends FilterPrimitiveElementSVGAttributes<T>, DoubleInputFilterSVGAttributes, StylableSVGAttributes {
 	k1?: SignalOrValue<number | string | RemoveAttribute>;
 	k2?: SignalOrValue<number | string | RemoveAttribute>;
 	k3?: SignalOrValue<number | string | RemoveAttribute>;
 	k4?: SignalOrValue<number | string | RemoveAttribute>;
 	operator?: SignalOrValue<"over" | "in" | "out" | "atop" | "xor" | "arithmetic" | RemoveAttribute>;
 }
-export interface FeConvolveMatrixSVGAttributes<T> extends FilterPrimitiveElementSVGAttributes<T>, SingleInputFilterSVGAttributes, StylableSVGAttributes {
+interface FeConvolveMatrixSVGAttributes<T> extends FilterPrimitiveElementSVGAttributes<T>, SingleInputFilterSVGAttributes, StylableSVGAttributes {
 	bias?: SignalOrValue<number | string | RemoveAttribute>;
 	divisor?: SignalOrValue<number | string | RemoveAttribute>;
 	edgeMode?: SignalOrValue<"duplicate" | "wrap" | "none" | RemoveAttribute>;
@@ -1568,28 +1528,28 @@ export interface FeConvolveMatrixSVGAttributes<T> extends FilterPrimitiveElement
 	targetX?: SignalOrValue<number | string | RemoveAttribute>;
 	targetY?: SignalOrValue<number | string | RemoveAttribute>;
 }
-export interface FeDiffuseLightingSVGAttributes<T> extends FilterPrimitiveElementSVGAttributes<T>, SingleInputFilterSVGAttributes, StylableSVGAttributes, Pick<PresentationSVGAttributes, "color" | "lighting-color"> {
+interface FeDiffuseLightingSVGAttributes<T> extends FilterPrimitiveElementSVGAttributes<T>, SingleInputFilterSVGAttributes, StylableSVGAttributes, Pick<PresentationSVGAttributes, "color" | "lighting-color"> {
 	diffuseConstant?: SignalOrValue<number | string | RemoveAttribute>;
 	kernelUnitLength?: SignalOrValue<number | string | RemoveAttribute>;
 	surfaceScale?: SignalOrValue<number | string | RemoveAttribute>;
 }
-export interface FeDisplacementMapSVGAttributes<T> extends FilterPrimitiveElementSVGAttributes<T>, DoubleInputFilterSVGAttributes, StylableSVGAttributes {
+interface FeDisplacementMapSVGAttributes<T> extends FilterPrimitiveElementSVGAttributes<T>, DoubleInputFilterSVGAttributes, StylableSVGAttributes {
 	scale?: SignalOrValue<number | string | RemoveAttribute>;
 	xChannelSelector?: SignalOrValue<"R" | "G" | "B" | "A" | RemoveAttribute>;
 	yChannelSelector?: SignalOrValue<"R" | "G" | "B" | "A" | RemoveAttribute>;
 }
-export interface FeDistantLightSVGAttributes<T> extends LightSourceElementSVGAttributes<T> {
+interface FeDistantLightSVGAttributes<T> extends LightSourceElementSVGAttributes<T> {
 	azimuth?: SignalOrValue<number | string | RemoveAttribute>;
 	elevation?: SignalOrValue<number | string | RemoveAttribute>;
 }
-export interface FeDropShadowSVGAttributes<T> extends SVGAttributes<T>, FilterPrimitiveElementSVGAttributes<T>, StylableSVGAttributes, Pick<PresentationSVGAttributes, "color" | "flood-color" | "flood-opacity"> {
+interface FeDropShadowSVGAttributes<T> extends SVGAttributes<T>, FilterPrimitiveElementSVGAttributes<T>, StylableSVGAttributes, Pick<PresentationSVGAttributes, "color" | "flood-color" | "flood-opacity"> {
 	dx?: SignalOrValue<number | string | RemoveAttribute>;
 	dy?: SignalOrValue<number | string | RemoveAttribute>;
 	stdDeviation?: SignalOrValue<number | string | RemoveAttribute>;
 }
-export interface FeFloodSVGAttributes<T> extends FilterPrimitiveElementSVGAttributes<T>, StylableSVGAttributes, Pick<PresentationSVGAttributes, "color" | "flood-color" | "flood-opacity"> {
+interface FeFloodSVGAttributes<T> extends FilterPrimitiveElementSVGAttributes<T>, StylableSVGAttributes, Pick<PresentationSVGAttributes, "color" | "flood-color" | "flood-opacity"> {
 }
-export interface FeFuncSVGAttributes<T> extends SVGAttributes<T> {
+interface FeFuncSVGAttributes<T> extends SVGAttributes<T> {
 	amplitude?: SignalOrValue<number | string | RemoveAttribute>;
 	exponent?: SignalOrValue<number | string | RemoveAttribute>;
 	intercept?: SignalOrValue<number | string | RemoveAttribute>;
@@ -1598,37 +1558,37 @@ export interface FeFuncSVGAttributes<T> extends SVGAttributes<T> {
 	tableValues?: SignalOrValue<string | RemoveAttribute>;
 	type?: SignalOrValue<"identity" | "table" | "discrete" | "linear" | "gamma" | RemoveAttribute>;
 }
-export interface FeGaussianBlurSVGAttributes<T> extends FilterPrimitiveElementSVGAttributes<T>, SingleInputFilterSVGAttributes, StylableSVGAttributes {
+interface FeGaussianBlurSVGAttributes<T> extends FilterPrimitiveElementSVGAttributes<T>, SingleInputFilterSVGAttributes, StylableSVGAttributes {
 	stdDeviation?: SignalOrValue<number | string | RemoveAttribute>;
 }
-export interface FeImageSVGAttributes<T> extends FilterPrimitiveElementSVGAttributes<T>, ExternalResourceSVGAttributes, StylableSVGAttributes {
+interface FeImageSVGAttributes<T> extends FilterPrimitiveElementSVGAttributes<T>, ExternalResourceSVGAttributes, StylableSVGAttributes {
 	href?: SignalOrValue<string | RemoveAttribute>;
 	preserveAspectRatio?: SignalOrValue<SVGPreserveAspectRatioValue | RemoveAttribute>;
 }
-export interface FeMergeSVGAttributes<T> extends FilterPrimitiveElementSVGAttributes<T>, StylableSVGAttributes {
+interface FeMergeSVGAttributes<T> extends FilterPrimitiveElementSVGAttributes<T>, StylableSVGAttributes {
 }
-export interface FeMergeNodeSVGAttributes<T> extends SVGAttributes<T>, SingleInputFilterSVGAttributes {
+interface FeMergeNodeSVGAttributes<T> extends SVGAttributes<T>, SingleInputFilterSVGAttributes {
 }
-export interface FeMorphologySVGAttributes<T> extends FilterPrimitiveElementSVGAttributes<T>, SingleInputFilterSVGAttributes, StylableSVGAttributes {
+interface FeMorphologySVGAttributes<T> extends FilterPrimitiveElementSVGAttributes<T>, SingleInputFilterSVGAttributes, StylableSVGAttributes {
 	operator?: SignalOrValue<"erode" | "dilate" | RemoveAttribute>;
 	radius?: SignalOrValue<number | string | RemoveAttribute>;
 }
-export interface FeOffsetSVGAttributes<T> extends FilterPrimitiveElementSVGAttributes<T>, SingleInputFilterSVGAttributes, StylableSVGAttributes {
+interface FeOffsetSVGAttributes<T> extends FilterPrimitiveElementSVGAttributes<T>, SingleInputFilterSVGAttributes, StylableSVGAttributes {
 	dx?: SignalOrValue<number | string | RemoveAttribute>;
 	dy?: SignalOrValue<number | string | RemoveAttribute>;
 }
-export interface FePointLightSVGAttributes<T> extends LightSourceElementSVGAttributes<T> {
+interface FePointLightSVGAttributes<T> extends LightSourceElementSVGAttributes<T> {
 	x?: SignalOrValue<number | string | RemoveAttribute>;
 	y?: SignalOrValue<number | string | RemoveAttribute>;
 	z?: SignalOrValue<number | string | RemoveAttribute>;
 }
-export interface FeSpecularLightingSVGAttributes<T> extends FilterPrimitiveElementSVGAttributes<T>, SingleInputFilterSVGAttributes, StylableSVGAttributes, Pick<PresentationSVGAttributes, "color" | "lighting-color"> {
+interface FeSpecularLightingSVGAttributes<T> extends FilterPrimitiveElementSVGAttributes<T>, SingleInputFilterSVGAttributes, StylableSVGAttributes, Pick<PresentationSVGAttributes, "color" | "lighting-color"> {
 	kernelUnitLength?: SignalOrValue<number | string | RemoveAttribute>;
 	specularConstant?: SignalOrValue<string | RemoveAttribute>;
 	specularExponent?: SignalOrValue<string | RemoveAttribute>;
 	surfaceScale?: SignalOrValue<string | RemoveAttribute>;
 }
-export interface FeSpotLightSVGAttributes<T> extends LightSourceElementSVGAttributes<T> {
+interface FeSpotLightSVGAttributes<T> extends LightSourceElementSVGAttributes<T> {
 	limitingConeAngle?: SignalOrValue<number | string | RemoveAttribute>;
 	pointsAtX?: SignalOrValue<number | string | RemoveAttribute>;
 	pointsAtY?: SignalOrValue<number | string | RemoveAttribute>;
@@ -1638,16 +1598,16 @@ export interface FeSpotLightSVGAttributes<T> extends LightSourceElementSVGAttrib
 	y?: SignalOrValue<number | string | RemoveAttribute>;
 	z?: SignalOrValue<number | string | RemoveAttribute>;
 }
-export interface FeTileSVGAttributes<T> extends FilterPrimitiveElementSVGAttributes<T>, SingleInputFilterSVGAttributes, StylableSVGAttributes {
+interface FeTileSVGAttributes<T> extends FilterPrimitiveElementSVGAttributes<T>, SingleInputFilterSVGAttributes, StylableSVGAttributes {
 }
-export interface FeTurbulanceSVGAttributes<T> extends FilterPrimitiveElementSVGAttributes<T>, StylableSVGAttributes {
+interface FeTurbulanceSVGAttributes<T> extends FilterPrimitiveElementSVGAttributes<T>, StylableSVGAttributes {
 	baseFrequency?: SignalOrValue<number | string | RemoveAttribute>;
 	numOctaves?: SignalOrValue<number | string | RemoveAttribute>;
 	seed?: SignalOrValue<number | string | RemoveAttribute>;
 	stitchTiles?: SignalOrValue<"stitch" | "noStitch" | RemoveAttribute>;
 	type?: SignalOrValue<"fractalNoise" | "turbulence" | RemoveAttribute>;
 }
-export interface FilterSVGAttributes<T> extends SVGAttributes<T>, ExternalResourceSVGAttributes, StylableSVGAttributes {
+interface FilterSVGAttributes<T> extends SVGAttributes<T>, ExternalResourceSVGAttributes, StylableSVGAttributes {
 	filterRes?: SignalOrValue<number | string | RemoveAttribute>;
 	filterUnits?: SignalOrValue<SVGUnits | RemoveAttribute>;
 	height?: SignalOrValue<number | string | RemoveAttribute>;
@@ -1656,15 +1616,15 @@ export interface FilterSVGAttributes<T> extends SVGAttributes<T>, ExternalResour
 	x?: SignalOrValue<number | string | RemoveAttribute>;
 	y?: SignalOrValue<number | string | RemoveAttribute>;
 }
-export interface ForeignObjectSVGAttributes<T> extends NewViewportSVGAttributes<T>, ConditionalProcessingSVGAttributes, ExternalResourceSVGAttributes, StylableSVGAttributes, TransformableSVGAttributes, Pick<PresentationSVGAttributes, "display" | "visibility"> {
+interface ForeignObjectSVGAttributes<T> extends NewViewportSVGAttributes<T>, ConditionalProcessingSVGAttributes, ExternalResourceSVGAttributes, StylableSVGAttributes, TransformableSVGAttributes, Pick<PresentationSVGAttributes, "display" | "visibility"> {
 	height?: SignalOrValue<number | string | RemoveAttribute>;
 	width?: SignalOrValue<number | string | RemoveAttribute>;
 	x?: SignalOrValue<number | string | RemoveAttribute>;
 	y?: SignalOrValue<number | string | RemoveAttribute>;
 }
-export interface GSVGAttributes<T> extends ContainerElementSVGAttributes<T>, ConditionalProcessingSVGAttributes, ExternalResourceSVGAttributes, StylableSVGAttributes, TransformableSVGAttributes, Pick<PresentationSVGAttributes, "clip-path" | "display" | "visibility"> {
+interface GSVGAttributes<T> extends ContainerElementSVGAttributes<T>, ConditionalProcessingSVGAttributes, ExternalResourceSVGAttributes, StylableSVGAttributes, TransformableSVGAttributes, Pick<PresentationSVGAttributes, "clip-path" | "display" | "visibility"> {
 }
-export interface ImageSVGAttributes<T> extends NewViewportSVGAttributes<T>, GraphicsElementSVGAttributes<T>, ConditionalProcessingSVGAttributes, StylableSVGAttributes, TransformableSVGAttributes, Pick<PresentationSVGAttributes, "clip-path" | "color-profile" | "image-rendering"> {
+interface ImageSVGAttributes<T> extends NewViewportSVGAttributes<T>, GraphicsElementSVGAttributes<T>, ConditionalProcessingSVGAttributes, StylableSVGAttributes, TransformableSVGAttributes, Pick<PresentationSVGAttributes, "clip-path" | "color-profile" | "image-rendering"> {
 	height?: SignalOrValue<number | string | RemoveAttribute>;
 	href?: SignalOrValue<string | RemoveAttribute>;
 	preserveAspectRatio?: SignalOrValue<ImagePreserveAspectRatio | RemoveAttribute>;
@@ -1672,19 +1632,19 @@ export interface ImageSVGAttributes<T> extends NewViewportSVGAttributes<T>, Grap
 	x?: SignalOrValue<number | string | RemoveAttribute>;
 	y?: SignalOrValue<number | string | RemoveAttribute>;
 }
-export interface LineSVGAttributes<T> extends GraphicsElementSVGAttributes<T>, ShapeElementSVGAttributes<T>, ConditionalProcessingSVGAttributes, ExternalResourceSVGAttributes, StylableSVGAttributes, TransformableSVGAttributes, Pick<PresentationSVGAttributes, "clip-path" | "marker-start" | "marker-mid" | "marker-end"> {
+interface LineSVGAttributes<T> extends GraphicsElementSVGAttributes<T>, ShapeElementSVGAttributes<T>, ConditionalProcessingSVGAttributes, ExternalResourceSVGAttributes, StylableSVGAttributes, TransformableSVGAttributes, Pick<PresentationSVGAttributes, "clip-path" | "marker-start" | "marker-mid" | "marker-end"> {
 	x1?: SignalOrValue<number | string | RemoveAttribute>;
 	x2?: SignalOrValue<number | string | RemoveAttribute>;
 	y1?: SignalOrValue<number | string | RemoveAttribute>;
 	y2?: SignalOrValue<number | string | RemoveAttribute>;
 }
-export interface LinearGradientSVGAttributes<T> extends GradientElementSVGAttributes<T> {
+interface LinearGradientSVGAttributes<T> extends GradientElementSVGAttributes<T> {
 	x1?: SignalOrValue<number | string | RemoveAttribute>;
 	x2?: SignalOrValue<number | string | RemoveAttribute>;
 	y1?: SignalOrValue<number | string | RemoveAttribute>;
 	y2?: SignalOrValue<number | string | RemoveAttribute>;
 }
-export interface MarkerSVGAttributes<T> extends ContainerElementSVGAttributes<T>, ExternalResourceSVGAttributes, StylableSVGAttributes, FitToViewBoxSVGAttributes, Pick<PresentationSVGAttributes, "clip-path" | "overflow" | "clip"> {
+interface MarkerSVGAttributes<T> extends ContainerElementSVGAttributes<T>, ExternalResourceSVGAttributes, StylableSVGAttributes, FitToViewBoxSVGAttributes, Pick<PresentationSVGAttributes, "clip-path" | "overflow" | "clip"> {
 	markerHeight?: SignalOrValue<number | string | RemoveAttribute>;
 	markerUnits?: SignalOrValue<"strokeWidth" | "userSpaceOnUse" | RemoveAttribute>;
 	markerWidth?: SignalOrValue<number | string | RemoveAttribute>;
@@ -1692,7 +1652,7 @@ export interface MarkerSVGAttributes<T> extends ContainerElementSVGAttributes<T>
 	refX?: SignalOrValue<number | string | RemoveAttribute>;
 	refY?: SignalOrValue<number | string | RemoveAttribute>;
 }
-export interface MaskSVGAttributes<T> extends Omit<ContainerElementSVGAttributes<T>, "opacity" | "filter">, ConditionalProcessingSVGAttributes, ExternalResourceSVGAttributes, StylableSVGAttributes, Pick<PresentationSVGAttributes, "clip-path"> {
+interface MaskSVGAttributes<T> extends Omit<ContainerElementSVGAttributes<T>, "opacity" | "filter">, ConditionalProcessingSVGAttributes, ExternalResourceSVGAttributes, StylableSVGAttributes, Pick<PresentationSVGAttributes, "clip-path"> {
 	height?: SignalOrValue<number | string | RemoveAttribute>;
 	maskContentUnits?: SignalOrValue<SVGUnits | RemoveAttribute>;
 	maskUnits?: SignalOrValue<SVGUnits | RemoveAttribute>;
@@ -1700,15 +1660,15 @@ export interface MaskSVGAttributes<T> extends Omit<ContainerElementSVGAttributes
 	x?: SignalOrValue<number | string | RemoveAttribute>;
 	y?: SignalOrValue<number | string | RemoveAttribute>;
 }
-export interface MetadataSVGAttributes<T> extends SVGAttributes<T> {
+interface MetadataSVGAttributes<T> extends SVGAttributes<T> {
 }
-export interface MPathSVGAttributes<T> extends SVGAttributes<T> {
+interface MPathSVGAttributes<T> extends SVGAttributes<T> {
 }
-export interface PathSVGAttributes<T> extends GraphicsElementSVGAttributes<T>, ShapeElementSVGAttributes<T>, ConditionalProcessingSVGAttributes, ExternalResourceSVGAttributes, StylableSVGAttributes, TransformableSVGAttributes, Pick<PresentationSVGAttributes, "clip-path" | "marker-start" | "marker-mid" | "marker-end"> {
+interface PathSVGAttributes<T> extends GraphicsElementSVGAttributes<T>, ShapeElementSVGAttributes<T>, ConditionalProcessingSVGAttributes, ExternalResourceSVGAttributes, StylableSVGAttributes, TransformableSVGAttributes, Pick<PresentationSVGAttributes, "clip-path" | "marker-start" | "marker-mid" | "marker-end"> {
 	d?: SignalOrValue<string | RemoveAttribute>;
 	pathLength?: SignalOrValue<number | string | RemoveAttribute>;
 }
-export interface PatternSVGAttributes<T> extends ContainerElementSVGAttributes<T>, ConditionalProcessingSVGAttributes, ExternalResourceSVGAttributes, StylableSVGAttributes, FitToViewBoxSVGAttributes, Pick<PresentationSVGAttributes, "clip-path" | "overflow" | "clip"> {
+interface PatternSVGAttributes<T> extends ContainerElementSVGAttributes<T>, ConditionalProcessingSVGAttributes, ExternalResourceSVGAttributes, StylableSVGAttributes, FitToViewBoxSVGAttributes, Pick<PresentationSVGAttributes, "clip-path" | "overflow" | "clip"> {
 	height?: SignalOrValue<number | string | RemoveAttribute>;
 	href?: SignalOrValue<string | RemoveAttribute>;
 	patternContentUnits?: SignalOrValue<SVGUnits | RemoveAttribute>;
@@ -1718,20 +1678,20 @@ export interface PatternSVGAttributes<T> extends ContainerElementSVGAttributes<T
 	x?: SignalOrValue<number | string | RemoveAttribute>;
 	y?: SignalOrValue<number | string | RemoveAttribute>;
 }
-export interface PolygonSVGAttributes<T> extends GraphicsElementSVGAttributes<T>, ShapeElementSVGAttributes<T>, ConditionalProcessingSVGAttributes, ExternalResourceSVGAttributes, StylableSVGAttributes, TransformableSVGAttributes, Pick<PresentationSVGAttributes, "clip-path" | "marker-start" | "marker-mid" | "marker-end"> {
+interface PolygonSVGAttributes<T> extends GraphicsElementSVGAttributes<T>, ShapeElementSVGAttributes<T>, ConditionalProcessingSVGAttributes, ExternalResourceSVGAttributes, StylableSVGAttributes, TransformableSVGAttributes, Pick<PresentationSVGAttributes, "clip-path" | "marker-start" | "marker-mid" | "marker-end"> {
 	points?: SignalOrValue<string | RemoveAttribute>;
 }
-export interface PolylineSVGAttributes<T> extends GraphicsElementSVGAttributes<T>, ShapeElementSVGAttributes<T>, ConditionalProcessingSVGAttributes, ExternalResourceSVGAttributes, StylableSVGAttributes, TransformableSVGAttributes, Pick<PresentationSVGAttributes, "clip-path" | "marker-start" | "marker-mid" | "marker-end"> {
+interface PolylineSVGAttributes<T> extends GraphicsElementSVGAttributes<T>, ShapeElementSVGAttributes<T>, ConditionalProcessingSVGAttributes, ExternalResourceSVGAttributes, StylableSVGAttributes, TransformableSVGAttributes, Pick<PresentationSVGAttributes, "clip-path" | "marker-start" | "marker-mid" | "marker-end"> {
 	points?: SignalOrValue<string | RemoveAttribute>;
 }
-export interface RadialGradientSVGAttributes<T> extends GradientElementSVGAttributes<T> {
+interface RadialGradientSVGAttributes<T> extends GradientElementSVGAttributes<T> {
 	cx?: SignalOrValue<number | string | RemoveAttribute>;
 	cy?: SignalOrValue<number | string | RemoveAttribute>;
 	fx?: SignalOrValue<number | string | RemoveAttribute>;
 	fy?: SignalOrValue<number | string | RemoveAttribute>;
 	r?: SignalOrValue<number | string | RemoveAttribute>;
 }
-export interface RectSVGAttributes<T> extends GraphicsElementSVGAttributes<T>, ShapeElementSVGAttributes<T>, ConditionalProcessingSVGAttributes, ExternalResourceSVGAttributes, StylableSVGAttributes, TransformableSVGAttributes, Pick<PresentationSVGAttributes, "clip-path"> {
+interface RectSVGAttributes<T> extends GraphicsElementSVGAttributes<T>, ShapeElementSVGAttributes<T>, ConditionalProcessingSVGAttributes, ExternalResourceSVGAttributes, StylableSVGAttributes, TransformableSVGAttributes, Pick<PresentationSVGAttributes, "clip-path"> {
 	height?: SignalOrValue<number | string | RemoveAttribute>;
 	rx?: SignalOrValue<number | string | RemoveAttribute>;
 	ry?: SignalOrValue<number | string | RemoveAttribute>;
@@ -1739,12 +1699,12 @@ export interface RectSVGAttributes<T> extends GraphicsElementSVGAttributes<T>, S
 	x?: SignalOrValue<number | string | RemoveAttribute>;
 	y?: SignalOrValue<number | string | RemoveAttribute>;
 }
-export interface SetSVGAttributes<T> extends AnimationElementSVGAttributes<T>, StylableSVGAttributes, AnimationTimingSVGAttributes {
+interface SetSVGAttributes<T> extends AnimationElementSVGAttributes<T>, StylableSVGAttributes, AnimationTimingSVGAttributes {
 }
-export interface StopSVGAttributes<T> extends SVGAttributes<T>, StylableSVGAttributes, Pick<PresentationSVGAttributes, "color" | "stop-color" | "stop-opacity"> {
+interface StopSVGAttributes<T> extends SVGAttributes<T>, StylableSVGAttributes, Pick<PresentationSVGAttributes, "color" | "stop-color" | "stop-opacity"> {
 	offset?: SignalOrValue<number | string | RemoveAttribute>;
 }
-export interface SvgSVGAttributes<T> extends ContainerElementSVGAttributes<T>, NewViewportSVGAttributes<T>, ConditionalProcessingSVGAttributes, ExternalResourceSVGAttributes, StylableSVGAttributes, FitToViewBoxSVGAttributes, ZoomAndPanSVGAttributes, PresentationSVGAttributes, EventHandlersWindow<T> {
+interface SvgSVGAttributes<T> extends ContainerElementSVGAttributes<T>, NewViewportSVGAttributes<T>, ConditionalProcessingSVGAttributes, ExternalResourceSVGAttributes, StylableSVGAttributes, FitToViewBoxSVGAttributes, ZoomAndPanSVGAttributes, PresentationSVGAttributes, EventHandlersWindow<T> {
 	"xmlns:xlink"?: SignalOrValue<string | RemoveAttribute>;
 	contentScriptType?: SignalOrValue<string | RemoveAttribute>;
 	contentStyleType?: SignalOrValue<string | RemoveAttribute>;
@@ -1757,9 +1717,9 @@ export interface SvgSVGAttributes<T> extends ContainerElementSVGAttributes<T>, N
 	/** @deprecated */
 	version?: SignalOrValue<string | RemoveAttribute>;
 }
-export interface SwitchSVGAttributes<T> extends ContainerElementSVGAttributes<T>, ConditionalProcessingSVGAttributes, ExternalResourceSVGAttributes, StylableSVGAttributes, TransformableSVGAttributes, Pick<PresentationSVGAttributes, "display" | "visibility"> {
+interface SwitchSVGAttributes<T> extends ContainerElementSVGAttributes<T>, ConditionalProcessingSVGAttributes, ExternalResourceSVGAttributes, StylableSVGAttributes, TransformableSVGAttributes, Pick<PresentationSVGAttributes, "display" | "visibility"> {
 }
-export interface SymbolSVGAttributes<T> extends ContainerElementSVGAttributes<T>, NewViewportSVGAttributes<T>, ExternalResourceSVGAttributes, StylableSVGAttributes, FitToViewBoxSVGAttributes, Pick<PresentationSVGAttributes, "clip-path"> {
+interface SymbolSVGAttributes<T> extends ContainerElementSVGAttributes<T>, NewViewportSVGAttributes<T>, ExternalResourceSVGAttributes, StylableSVGAttributes, FitToViewBoxSVGAttributes, Pick<PresentationSVGAttributes, "clip-path"> {
 	height?: SignalOrValue<number | string | RemoveAttribute>;
 	preserveAspectRatio?: SignalOrValue<SVGPreserveAspectRatioValue | RemoveAttribute>;
 	refX?: SignalOrValue<number | string | RemoveAttribute>;
@@ -1769,7 +1729,7 @@ export interface SymbolSVGAttributes<T> extends ContainerElementSVGAttributes<T>
 	x?: SignalOrValue<number | string | RemoveAttribute>;
 	y?: SignalOrValue<number | string | RemoveAttribute>;
 }
-export interface TextSVGAttributes<T> extends TextContentElementSVGAttributes<T>, GraphicsElementSVGAttributes<T>, ConditionalProcessingSVGAttributes, ExternalResourceSVGAttributes, StylableSVGAttributes, TransformableSVGAttributes, Pick<PresentationSVGAttributes, "clip-path" | "writing-mode" | "text-rendering"> {
+interface TextSVGAttributes<T> extends TextContentElementSVGAttributes<T>, GraphicsElementSVGAttributes<T>, ConditionalProcessingSVGAttributes, ExternalResourceSVGAttributes, StylableSVGAttributes, TransformableSVGAttributes, Pick<PresentationSVGAttributes, "clip-path" | "writing-mode" | "text-rendering"> {
 	dx?: SignalOrValue<number | string | RemoveAttribute>;
 	dy?: SignalOrValue<number | string | RemoveAttribute>;
 	lengthAdjust?: SignalOrValue<"spacing" | "spacingAndGlyphs" | RemoveAttribute>;
@@ -1778,13 +1738,13 @@ export interface TextSVGAttributes<T> extends TextContentElementSVGAttributes<T>
 	x?: SignalOrValue<number | string | RemoveAttribute>;
 	y?: SignalOrValue<number | string | RemoveAttribute>;
 }
-export interface TextPathSVGAttributes<T> extends TextContentElementSVGAttributes<T>, ConditionalProcessingSVGAttributes, ExternalResourceSVGAttributes, StylableSVGAttributes, Pick<PresentationSVGAttributes, "alignment-baseline" | "baseline-shift" | "display" | "visibility"> {
+interface TextPathSVGAttributes<T> extends TextContentElementSVGAttributes<T>, ConditionalProcessingSVGAttributes, ExternalResourceSVGAttributes, StylableSVGAttributes, Pick<PresentationSVGAttributes, "alignment-baseline" | "baseline-shift" | "display" | "visibility"> {
 	href?: SignalOrValue<string | RemoveAttribute>;
 	method?: SignalOrValue<"align" | "stretch" | RemoveAttribute>;
 	spacing?: SignalOrValue<"auto" | "exact" | RemoveAttribute>;
 	startOffset?: SignalOrValue<number | string | RemoveAttribute>;
 }
-export interface TSpanSVGAttributes<T> extends TextContentElementSVGAttributes<T>, ConditionalProcessingSVGAttributes, ExternalResourceSVGAttributes, StylableSVGAttributes, Pick<PresentationSVGAttributes, "alignment-baseline" | "baseline-shift" | "display" | "visibility"> {
+interface TSpanSVGAttributes<T> extends TextContentElementSVGAttributes<T>, ConditionalProcessingSVGAttributes, ExternalResourceSVGAttributes, StylableSVGAttributes, Pick<PresentationSVGAttributes, "alignment-baseline" | "baseline-shift" | "display" | "visibility"> {
 	dx?: SignalOrValue<number | string | RemoveAttribute>;
 	dy?: SignalOrValue<number | string | RemoveAttribute>;
 	lengthAdjust?: SignalOrValue<"spacing" | "spacingAndGlyphs" | RemoveAttribute>;
@@ -1793,58 +1753,56 @@ export interface TSpanSVGAttributes<T> extends TextContentElementSVGAttributes<T
 	x?: SignalOrValue<number | string | RemoveAttribute>;
 	y?: SignalOrValue<number | string | RemoveAttribute>;
 }
-/** @see https://developer.mozilla.org/en-US/docs/Web/SVG/Element/use */
-export interface UseSVGAttributes<T> extends SVGAttributes<T>, StylableSVGAttributes, ConditionalProcessingSVGAttributes, GraphicsElementSVGAttributes<T>, PresentationSVGAttributes, ExternalResourceSVGAttributes, TransformableSVGAttributes {
+interface UseSVGAttributes<T> extends SVGAttributes<T>, StylableSVGAttributes, ConditionalProcessingSVGAttributes, GraphicsElementSVGAttributes<T>, PresentationSVGAttributes, ExternalResourceSVGAttributes, TransformableSVGAttributes {
 	height?: SignalOrValue<number | string | RemoveAttribute>;
 	href?: SignalOrValue<string | RemoveAttribute>;
 	width?: SignalOrValue<number | string | RemoveAttribute>;
 	x?: SignalOrValue<number | string | RemoveAttribute>;
 	y?: SignalOrValue<number | string | RemoveAttribute>;
 }
-export interface ViewSVGAttributes<T> extends SVGAttributes<T>, ExternalResourceSVGAttributes, FitToViewBoxSVGAttributes, ZoomAndPanSVGAttributes {
+interface ViewSVGAttributes<T> extends SVGAttributes<T>, ExternalResourceSVGAttributes, FitToViewBoxSVGAttributes, ZoomAndPanSVGAttributes {
 	viewTarget?: SignalOrValue<string | RemoveAttribute>;
 }
-// MATH
-export interface MathMLAnnotationElementAttributes<T> extends MathMLAttributes<T> {
+interface MathMLAnnotationElementAttributes<T> extends MathMLAttributes<T> {
 	encoding?: SignalOrValue<string | RemoveAttribute>;
 	/** @deprecated */
 	src?: SignalOrValue<string | RemoveAttribute>;
 }
-export interface MathMLAnnotationXmlElementAttributes<T> extends MathMLAttributes<T> {
+interface MathMLAnnotationXmlElementAttributes<T> extends MathMLAttributes<T> {
 	encoding?: SignalOrValue<string | RemoveAttribute>;
 	/** @deprecated */
 	src?: SignalOrValue<string | RemoveAttribute>;
 }
-export interface MathMLMactionElementAttributes<T> extends MathMLAttributes<T> {
+interface MathMLMactionElementAttributes<T> extends MathMLAttributes<T> {
 	/**@deprecated @non-standard*/
 	actiontype?: SignalOrValue<"statusline" | "toggle" | RemoveAttribute>;
 	/**@deprecated @non-standard*/
 	selection?: SignalOrValue<string | RemoveAttribute>;
 }
-export interface MathMLMathElementAttributes<T> extends MathMLAttributes<T> {
+interface MathMLMathElementAttributes<T> extends MathMLAttributes<T> {
 	display?: SignalOrValue<"block" | "inline" | RemoveAttribute>;
 }
-export interface MathMLMerrorElementAttributes<T> extends MathMLAttributes<T> {
+interface MathMLMerrorElementAttributes<T> extends MathMLAttributes<T> {
 }
-export interface MathMLMfracElementAttributes<T> extends MathMLAttributes<T> {
+interface MathMLMfracElementAttributes<T> extends MathMLAttributes<T> {
 	linethickness?: SignalOrValue<string | RemoveAttribute>;
 	/**@deprecated @non-standard*/
 	denomalign?: SignalOrValue<"center" | "left" | "right" | RemoveAttribute>;
 	/**@deprecated @non-standard*/
 	numalign?: SignalOrValue<"center" | "left" | "right" | RemoveAttribute>;
 }
-export interface MathMLMiElementAttributes<T> extends MathMLAttributes<T> {
+interface MathMLMiElementAttributes<T> extends MathMLAttributes<T> {
 	mathvariant?: SignalOrValue<"normal" | RemoveAttribute>;
 }
-export interface MathMLMmultiscriptsElementAttributes<T> extends MathMLAttributes<T> {
+interface MathMLMmultiscriptsElementAttributes<T> extends MathMLAttributes<T> {
 	/**@deprecated @non-standard*/
 	subscriptshift?: SignalOrValue<string | RemoveAttribute>;
 	/**@deprecated @non-standard*/
 	superscriptshift?: SignalOrValue<string | RemoveAttribute>;
 }
-export interface MathMLMnElementAttributes<T> extends MathMLAttributes<T> {
+interface MathMLMnElementAttributes<T> extends MathMLAttributes<T> {
 }
-export interface MathMLMoElementAttributes<T> extends MathMLAttributes<T> {
+interface MathMLMoElementAttributes<T> extends MathMLAttributes<T> {
 	fence?: SignalOrValue<BooleanAttribute | RemoveAttribute>;
 	form?: SignalOrValue<"prefix" | "infix" | "postfix" | RemoveAttribute>;
 	largeop?: SignalOrValue<BooleanAttribute | RemoveAttribute>;
@@ -1859,38 +1817,38 @@ export interface MathMLMoElementAttributes<T> extends MathMLAttributes<T> {
 	/** @non-standard */
 	accent?: SignalOrValue<BooleanAttribute | RemoveAttribute>;
 }
-export interface MathMLMoverElementAttributes<T> extends MathMLAttributes<T> {
+interface MathMLMoverElementAttributes<T> extends MathMLAttributes<T> {
 	accent?: SignalOrValue<BooleanAttribute | RemoveAttribute>;
 }
-export interface MathMLMpaddedElementAttributes<T> extends MathMLAttributes<T> {
+interface MathMLMpaddedElementAttributes<T> extends MathMLAttributes<T> {
 	depth?: SignalOrValue<string | RemoveAttribute>;
 	height?: SignalOrValue<string | RemoveAttribute>;
 	lspace?: SignalOrValue<string | RemoveAttribute>;
 	voffset?: SignalOrValue<string | RemoveAttribute>;
 	width?: SignalOrValue<string | RemoveAttribute>;
 }
-export interface MathMLMphantomElementAttributes<T> extends MathMLAttributes<T> {
+interface MathMLMphantomElementAttributes<T> extends MathMLAttributes<T> {
 }
-export interface MathMLMprescriptsElementAttributes<T> extends MathMLAttributes<T> {
+interface MathMLMprescriptsElementAttributes<T> extends MathMLAttributes<T> {
 }
-export interface MathMLMrootElementAttributes<T> extends MathMLAttributes<T> {
+interface MathMLMrootElementAttributes<T> extends MathMLAttributes<T> {
 }
-export interface MathMLMrowElementAttributes<T> extends MathMLAttributes<T> {
+interface MathMLMrowElementAttributes<T> extends MathMLAttributes<T> {
 }
-export interface MathMLMsElementAttributes<T> extends MathMLAttributes<T> {
+interface MathMLMsElementAttributes<T> extends MathMLAttributes<T> {
 	/** @deprecated */
 	lquote?: SignalOrValue<string | RemoveAttribute>;
 	/** @deprecated */
 	rquote?: SignalOrValue<string | RemoveAttribute>;
 }
-export interface MathMLMspaceElementAttributes<T> extends MathMLAttributes<T> {
+interface MathMLMspaceElementAttributes<T> extends MathMLAttributes<T> {
 	depth?: SignalOrValue<string | RemoveAttribute>;
 	height?: SignalOrValue<string | RemoveAttribute>;
 	width?: SignalOrValue<string | RemoveAttribute>;
 }
-export interface MathMLMsqrtElementAttributes<T> extends MathMLAttributes<T> {
+interface MathMLMsqrtElementAttributes<T> extends MathMLAttributes<T> {
 }
-export interface MathMLMstyleElementAttributes<T> extends MathMLAttributes<T> {
+interface MathMLMstyleElementAttributes<T> extends MathMLAttributes<T> {
 	/**@deprecated @non-standard*/
 	background?: SignalOrValue<string | RemoveAttribute>;
 	/**@deprecated @non-standard*/
@@ -1906,21 +1864,21 @@ export interface MathMLMstyleElementAttributes<T> extends MathMLAttributes<T> {
 	/** @deprecated */
 	scriptsizemultiplier?: SignalOrValue<string | RemoveAttribute>;
 }
-export interface MathMLMsubElementAttributes<T> extends MathMLAttributes<T> {
+interface MathMLMsubElementAttributes<T> extends MathMLAttributes<T> {
 	/**@deprecated @non-standard*/
 	subscriptshift?: SignalOrValue<string | RemoveAttribute>;
 }
-export interface MathMLMsubsupElementAttributes<T> extends MathMLAttributes<T> {
+interface MathMLMsubsupElementAttributes<T> extends MathMLAttributes<T> {
 	/**@deprecated @non-standard*/
 	subscriptshift?: SignalOrValue<string | RemoveAttribute>;
 	/**@deprecated @non-standard*/
 	superscriptshift?: SignalOrValue<string | RemoveAttribute>;
 }
-export interface MathMLMsupElementAttributes<T> extends MathMLAttributes<T> {
+interface MathMLMsupElementAttributes<T> extends MathMLAttributes<T> {
 	/**@deprecated @non-standard*/
 	superscriptshift?: SignalOrValue<string | RemoveAttribute>;
 }
-export interface MathMLMtableElementAttributes<T> extends MathMLAttributes<T> {
+interface MathMLMtableElementAttributes<T> extends MathMLAttributes<T> {
 	/** @non-standard */
 	align?: SignalOrValue<"axis" | "baseline" | "bottom" | "center" | "top" | RemoveAttribute>;
 	/** @non-standard */
@@ -1942,7 +1900,7 @@ export interface MathMLMtableElementAttributes<T> extends MathMLAttributes<T> {
 	/** @non-standard */
 	width?: SignalOrValue<string | RemoveAttribute>;
 }
-export interface MathMLMtdElementAttributes<T> extends MathMLAttributes<T> {
+interface MathMLMtdElementAttributes<T> extends MathMLAttributes<T> {
 	columnspan?: SignalOrValue<number | string | RemoveAttribute>;
 	rowspan?: SignalOrValue<number | string | RemoveAttribute>;
 	/** @non-standard */
@@ -1950,35 +1908,33 @@ export interface MathMLMtdElementAttributes<T> extends MathMLAttributes<T> {
 	/** @non-standard */
 	rowalign?: SignalOrValue<"axis" | "baseline" | "bottom" | "center" | "top" | RemoveAttribute>;
 }
-export interface MathMLMtextElementAttributes<T> extends MathMLAttributes<T> {
+interface MathMLMtextElementAttributes<T> extends MathMLAttributes<T> {
 }
-export interface MathMLMtrElementAttributes<T> extends MathMLAttributes<T> {
+interface MathMLMtrElementAttributes<T> extends MathMLAttributes<T> {
 	/** @non-standard */
 	columnalign?: SignalOrValue<"center" | "left" | "right" | RemoveAttribute>;
 	/** @non-standard */
 	rowalign?: SignalOrValue<"axis" | "baseline" | "bottom" | "center" | "top" | RemoveAttribute>;
 }
-export interface MathMLMunderElementAttributes<T> extends MathMLAttributes<T> {
+interface MathMLMunderElementAttributes<T> extends MathMLAttributes<T> {
 	accentunder?: SignalOrValue<BooleanAttribute | RemoveAttribute>;
 }
-export interface MathMLMunderoverElementAttributes<T> extends MathMLAttributes<T> {
+interface MathMLMunderoverElementAttributes<T> extends MathMLAttributes<T> {
 	accent?: SignalOrValue<BooleanAttribute | RemoveAttribute>;
 	accentunder?: SignalOrValue<BooleanAttribute | RemoveAttribute>;
 }
-export interface MathMLSemanticsElementAttributes<T> extends MathMLAttributes<T> {
+interface MathMLSemanticsElementAttributes<T> extends MathMLAttributes<T> {
 }
-export interface MathMLMencloseElementAttributes<T> extends MathMLAttributes<T> {
+interface MathMLMencloseElementAttributes<T> extends MathMLAttributes<T> {
 	/** @non-standard */
 	notation?: SignalOrValue<string | RemoveAttribute>;
 }
-export interface MathMLMfencedElementAttributes<T> extends MathMLAttributes<T> {
+interface MathMLMfencedElementAttributes<T> extends MathMLAttributes<T> {
 	close?: SignalOrValue<string | RemoveAttribute>;
 	open?: SignalOrValue<string | RemoveAttribute>;
 	separators?: SignalOrValue<string | RemoveAttribute>;
 }
-// TAGS
-/** @type {HTMLElementTagNameMap} */
-export interface HTMLElementTags {
+interface HTMLElementTags {
 	a: AnchorHTMLAttributes<HTMLAnchorElement>;
 	abbr: HTMLAttributes<HTMLElement>;
 	address: HTMLAttributes<HTMLElement>;
@@ -2094,8 +2050,7 @@ export interface HTMLElementTags {
 	/** @url https://www.electronjs.org/docs/latest/api/webview-tag */
 	webview: WebViewHTMLAttributes<HTMLElement>;
 }
-/** @type {SVGElementTagNameMap} */
-export interface SVGElementTags {
+interface SVGElementTags {
 	animate: AnimateSVGAttributes<SVGAnimateElement>;
 	animateMotion: AnimateMotionSVGAttributes<SVGAnimateMotionElement>;
 	animateTransform: AnimateTransformSVGAttributes<SVGAnimateTransformElement>;
@@ -2156,7 +2111,7 @@ export interface SVGElementTags {
 	use: UseSVGAttributes<SVGUseElement>;
 	view: ViewSVGAttributes<SVGViewElement>;
 }
-export interface MathMLElementTags {
+interface MathMLElementTags {
 	annotation: MathMLAnnotationElementAttributes<MathMLElement>;
 	"annotation-xml": MathMLAnnotationXmlElementAttributes<MathMLElement>;
 	math: MathMLMathElementAttributes<MathMLElement>;
@@ -2193,8 +2148,8 @@ export interface MathMLElementTags {
 	/**@deprecated @non-standard*/
 	mfenced: MathMLMfencedElementAttributes<MathMLElement>;
 }
-export type IntrinsicElementsCombined = HTMLElementTags & (ConfigureJSXElement["svg"] extends false ? void : SVGElementTags) & (ConfigureJSXElement["mathml"] extends false ? void : MathMLElementTags);
-export interface CustomElementsHTML {
+type IntrinsicElementsCombined = HTMLElementTags & (ConfigureJSXElement["svg"] extends false ? void : SVGElementTags) & (ConfigureJSXElement["mathml"] extends false ? void : MathMLElementTags);
+interface CustomElementsHTML {
 }
 export declare namespace JSX {
 	type Element = JSXElement;
@@ -2288,22 +2243,22 @@ export declare function useText(initialValue?: string): readonly [
 	Text,
 	(value: string) => void
 ];
-export type DataKeys = `data-${string}`;
-export declare function jsx<THtmlTag extends keyof HTMLElementTagNameMap, TElement extends HTMLElementTagNameMap[THtmlTag]>(type: THtmlTag, props?: (HTMLElementTags[THtmlTag] & Record<DataKeys, string | number>) | null, key?: string): TElement;
-export declare function jsx<TSVGTag extends (keyof SVGElementTagNameMap & keyof SVGElementTags), TElement extends SVGElementTagNameMap[TSVGTag]>(type: TSVGTag, props?: (SVGElementTags[TSVGTag] & Record<DataKeys, string | number>) | null, key?: string): TElement;
-export declare function jsx(type: string, props?: (ElementAttributes<JSXElement> & Record<DataKeys, string | number>) | null, key?: string): JSXElement;
-export declare const MathMLNamespace = "http://www.w3.org/1998/Math/MathML";
 export declare function currentNamespaceURI(value?: string): string;
 export declare function inNamespaceURI(namespaceURI: string | null, children: () => ComponentChildren): ComponentChildren;
 export declare function inSVGNamespace(fn: () => ComponentChildren): ComponentChildren;
 export declare function inMathMLNamespace(fn: () => ComponentChildren): ComponentChildren;
 export declare function inHTMLNamespace(fn: () => ComponentChildren): ComponentChildren;
+type DataKeys = `data-${string}`;
+export declare function jsx<THtmlTag extends keyof HTMLElementTagNameMap, TElement extends HTMLElementTagNameMap[THtmlTag]>(type: THtmlTag, props?: (HTMLElementTags[THtmlTag] & Record<DataKeys, string | number>) | null, key?: string): TElement;
+export declare function jsx<TSVGTag extends (keyof SVGElementTagNameMap & keyof SVGElementTags), TElement extends SVGElementTagNameMap[TSVGTag]>(type: TSVGTag, props?: (SVGElementTags[TSVGTag] & Record<DataKeys, string | number>) | null, key?: string): TElement;
+export declare function jsx(type: string, props?: (ElementAttributes<JSXElement> & Record<DataKeys, string | number>) | null, key?: string): JSXElement;
+export declare const MathMLNamespace = "http://www.w3.org/1998/Math/MathML";
 export declare function ShadowRootNode({ children, ref, ...attr }: ShadowRootInit & {
 	ref?: Ref<ShadowRoot>;
 	children?: ComponentChildren;
 }): any;
 export declare function isSignalLike(val: any): val is SignalLike<any>;
-export type SignalObserveArgs<T> = {
+type SignalObserveArgs<T> = {
 	/** True if this is the initial call upon subscription. */
 	isInitial: boolean;
 	/** Previous value of the signal. Undefined if initial call. */
@@ -2331,7 +2286,7 @@ export type SignalObserveArgs<T> = {
 	 */
 	set lifecycleNode(value: EventTarget | undefined);
 };
-export type ObserveSignalCallback<T> = (args: SignalObserveArgs<T>) => void;
+type ObserveSignalCallback<T> = (args: SignalObserveArgs<T>) => void;
 /**
  * This calls the callback whenever the signal value changes. It is
  * called immediately upon subscription with the current value. The callback
@@ -2351,6 +2306,30 @@ export declare function observeSignal<T>(signal: SignalLike<T>, callback: Observ
 	 */
 	lifecycleNode?: EventTarget;
 }): EffectDisposer;
+export interface Signal<T> extends SignalLike<T> {
+	set value(value: T);
+}
+export interface Computed<T> extends SignalLike<T> {
+}
+export interface SignalOptions<T> {
+	watched?: (this: SignalLike<T>) => void;
+	unwatched?: (this: SignalLike<T>) => void;
+	name?: string;
+}
+export interface EffectOptions {
+	name?: string;
+}
+type EffectFn = ((this: {
+	dispose: () => void;
+}) => void | (() => void)) | (() => void | (() => void));
+export declare const signal: {
+	<T>(value: T, options?: SignalOptions<T>): Signal<T>;
+	<T = undefined>(): Signal<T | undefined>;
+};
+export declare const computed: (<T>(fn: () => T, options?: SignalOptions<T>) => Computed<T>);
+export declare const effect: ((fn: EffectFn, options?: EffectOptions) => () => void);
+export declare const batch: (<T>(fn: () => T) => T);
+export declare const untracked: (<T>(fn: () => T) => T);
 export declare const SVGNamespace = "http://www.w3.org/2000/svg";
 
 export {

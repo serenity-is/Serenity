@@ -1,4 +1,4 @@
-import { computed, signal } from "@preact/signals-core";
+import { computed, signal } from "@serenity-is/domwise";
 import type { GridSignals } from "../core/grid-signals";
 
 export type BandKey = "start" | "main" | "end";
@@ -112,13 +112,13 @@ export function getAllVScrollContainers(refs: GridLayoutRefs): HTMLElement[] {
 
 
 export function createGridSignalsAndRefs(): { signals: GridSignals; refs: GridLayoutRefs } {
-    const showColumnHeader = signal<boolean>();
+    const showColumnHeader = signal();
     const hideColumnHeader = computed(() => !showColumnHeader.value);
-    const showHeaderRow = signal<boolean>();
+    const showHeaderRow = signal();
     const hideHeaderRow = computed(() => !showHeaderRow.value);
-    const showFooterRow = signal<boolean>();
+    const showFooterRow = signal();
     const hideFooterRow = computed(() => !showFooterRow.value);
-    const showTopPanel = signal<boolean>();
+    const showTopPanel = signal();
     const hideTopPanel = computed(() => !showTopPanel.value);
     let pinnedStartLast = -Infinity;
     let pinnedEndFirst = Infinity;
