@@ -1,10 +1,7 @@
 import type { ComponentChildren, Ref, ShadowRootContainer } from "./types"
 
-const sleekDomTypeSymbol = Symbol.for("wisdom:type")
-
-const enum WisDomTypeKeys {
-    ShadowRoot = "ShadowRoot",
-}
+const jsxTypeKeySymbol = Symbol.for("Serenity.jsxTypeKey")
+const shadowRootKey = "ShadowRoot";
 
 export function ShadowRootNode({
     children,
@@ -15,7 +12,7 @@ export function ShadowRootNode({
     children?: ComponentChildren
 }) {
     return {
-        [sleekDomTypeSymbol]: WisDomTypeKeys.ShadowRoot,
+        [jsxTypeKeySymbol]: shadowRootKey,
         ref,
         attr,
         children,
@@ -23,5 +20,5 @@ export function ShadowRootNode({
 }
 
 export function isShadowRoot(el: any): el is ShadowRootContainer {
-    return el != null && el[sleekDomTypeSymbol] === WisDomTypeKeys.ShadowRoot
+    return el != null && el[jsxTypeKeySymbol] === shadowRootKey
 }

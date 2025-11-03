@@ -1,186 +1,24 @@
 /**
  * Adapted from https://github.com/ryansolid/dom-expressions/blob/59823cd3108ee6d17058b90d1ef92b9d9ad103d7/packages/dom-expressions/src/jsx-h.d.ts
  */
-import { ClassNames as ClassList } from "./classname";
-import { CustomDomAttributes as CustomAttributes } from "./custom-attributes";
-import { SignalOrValue as FunctionMaybe } from "./signal-like";
+import { ClassNames } from "./classname";
+import { CustomDomAttributes } from "./custom-attributes";
+import { SignalOrValue } from "./signal-like";
 import { StyleProperties } from "./style-attributes";
-
-/**
- * Originally based on JSX types for Surplus and Inferno and adapted for `dom-expressions`.
- *
- * - https://github.com/adamhaile/surplus/blob/master/index.d.ts
- * - https://github.com/infernojs/inferno/blob/master/packages/inferno/src/core/types.ts
- *
- * MathML typings coming mostly from Preact
- *
- * - https://github.com/preactjs/preact/blob/07dc9f324e58569ce66634aa03fe8949b4190358/src/jsx.d.ts#L2575
- *
- * Checked against other frameworks via the following table:
- *
- * - https://potahtml.github.io/namespace-jsx-project/index.html
- *
- * # Typings on elements
- *
- * ## Attributes
- *
- * - Typings include attributes and not properties (unless the property Is special-cased, such
- *   textContent, event handlers, etc).
- * - Attributes are lowercase to avoid confusion with properties.
- * - Attributes are used "as is" and won't be transformed in any way (such to `lowercase` or from
- *   `dashed-case` to `camelCase`).
- *
- * ## Event Handlers
- *
- * - Event handlers use `camelCase` such `onClick` and will be delegated when possible, bubbling
- *   through the component tree, not the dom tree.
- * - Native event handlers use the namespace `on:` such `on:click`, and wont be delegated. bubbling
- *   the dom tree.
- * - A global case-insensitive event handler can be added by extending `EventHandlersElement<T>`
- * - A native `on:` event handler can be added by extending `CustomEvents<T>` interface
- *
- * ## Boolean Attributes (property setter that accepts `true | false`):
- *
- * - `(bool)true` adds the attribute `<video autoplay={true}/>` or in JSX as `<video autoplay/>`
- * - `(bool)false` removes the attribute from the DOM `<video autoplay={false}/>`
- * - `=""` may be accepted for the sake of parity with html `<video autoplay=""/>`
- * - `"true" | "false"` are NOT allowed, these are strings that evaluate to `(bool)true`
- *
- * ## Enumerated Attributes (attribute accepts 1 string value out of many)
- *
- * - Accepts any of the enumerated values, such: `"perhaps" | "maybe"`
- * - When one of the possible values is empty(in html that's for the attribute to be present), then it
- *   will also accept `(bool)true` to make it consistent with boolean attributes.
- *
- * Such `popover` attribute provides `"" | "manual" | "auto" | "hint"`.
- *
- * By NOT allowing `(bool)true` we will have to write `<div popover="" />`. Therefore, To make it
- * consistent with Boolean Attributes we accept `true | "" | "manual" | "auto" | "hint"`, such as:
- * `<div popover={true} />` or in JSX `<div popover />` is allowed and equivalent to `<div
- * popover="" />`
- *
- * ## Pseudo-Boolean Attributes (enumerated attributes that happen to accept the strings `"true" | "false"`)
- *
- * - Such `<div draggable="true"/>` or `<div draggable="false"/>`. The value of the attribute is a
- *   string not a boolean.
- * - `<div draggable={true}/>` is not valid because `(bool)true` is NOT transformed to the string
- *   `"true"`. Likewise `<div draggable={false}/>` removes the attribute from the element.
- * - MDN documentation https://developer.mozilla.org/en-US/docs/Web/HTML/Global_attributes/draggable
- *
- * ## All Of The Above In a nutshell
- *
- * - `(bool)true` adds an empty attribute
- * - `(bool)false` removes the attribute
- * - Attributes are lowercase
- * - Event handlers are camelCase
- * - Anything else is a `string` and used "as is"
- * - Additionally, an attribute may be removed by `undefined`
- *
- * ## Using Properties
- *
- * - The namespace `prop:` could be used to directly set properties in native elements and
- *   custom-elements. `<custom-element prop:myProp={true}/>` equivalent to `el.myProp = true`
- *
- * ## Interfaces
- *
- * Events
- *
- * 1. An event handler goes in `EventHandlersElement` when:
- *
- *    - `event` is global, that's to be defined in `HTMLElement` AND `SVGElement` AND `MathMLElement`
- *    - `event` is defined in `Element` (as `HTMLElement/MathMLElement/SVGElement` -> `Element`)
- * 2. `<body>`, `<svg>`, `<framesete>` are special as these include `window` events
- * 3. Any other event is special for its own tag.
- *
- * Browser Hierarchy
- *
- * - $Element (ex HTMLDivElement <div>) -> ... -> HTMLElement -> Element -> Node
- * - $Element (all math elements are MathMLElement) MathMLElement -> Element -> Node
- * - $Element`(ex SVGMaskElement <mask>) -> ... -> SVGElement -> Element -> Node
- *
- * Attributes
- *
- *      <div> -> ... -> HTMLAttributes -> ElementAttributes
- *      <svg> -> ... -> SVGAttributes -> ElementAttributes
- *      <math> -> ... -> MathMLAttributes -> ElementAttributes
- *
- *      ElementAttributes = `Element` + `Node` attributes (aka global attributes)
- *
- *      HTMLAttributes = `HTMLElement` attributes (aka HTML global attributes)
- *      SVGAttributes = `SVGElement` attributes (aka SVG global attributes)
- *      MathMLAttributes = `MathMLElement` attributes (aka MATH global attributes)
- *
- *      CustomAttributes = Framework attributes
- */
 
 type DOMElement = Element;
 
-// Event handlers
+// event handlers
+interface EventHandler<T, E extends Event> { (e: E & { currentTarget: T; target: DOMElement; }): void; }
+type EventHandlerUnion<T, E extends Event, EHandler extends EventHandler<T, any> = EventHandler<T, E>> = EHandler;
+interface InputEventHandler<T, E extends InputEvent> { (e: E & { currentTarget: T; target: T extends HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement ? T : DOMElement; }): void; }
+type InputEventHandlerUnion<T, E extends InputEvent> = EventHandlerUnion<T, E, InputEventHandler<T, E>>;
+interface ChangeEventHandler<T, E extends Event> { (e: E & { currentTarget: T; target: T extends HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement ? T : DOMElement; }): void; }
+type ChangeEventHandlerUnion<T, E extends Event> = EventHandlerUnion<T, E, ChangeEventHandler<T, E>>;
 
-interface EventHandler<T, E extends Event> {
-    (
-        e: E & {
-            currentTarget: T;
-            target: DOMElement;
-        }
-    ): void;
-}
-
-type EventHandlerUnion<
-    T,
-    E extends Event,
-    EHandler extends EventHandler<T, any> = EventHandler<T, E>
-> = EHandler;
-
-interface InputEventHandler<T, E extends InputEvent> {
-    (
-        e: E & {
-            currentTarget: T;
-            target: T extends HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement
-            ? T
-            : DOMElement;
-        }
-    ): void;
-}
-type InputEventHandlerUnion<T, E extends InputEvent> = EventHandlerUnion<
-    T,
-    E,
-    InputEventHandler<T, E>
->;
-
-interface ChangeEventHandler<T, E extends Event> {
-    (
-        e: E & {
-            currentTarget: T;
-            target: T extends HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement
-            ? T
-            : DOMElement;
-        }
-    ): void;
-}
-type ChangeEventHandlerUnion<T, E extends Event> = EventHandlerUnion<
-    T,
-    E,
-    ChangeEventHandler<T, E>
->;
-
-interface FocusEventHandler<T, E extends FocusEvent> {
-    (
-        e: E & {
-            currentTarget: T;
-            target: T extends HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement
-            ? T
-            : DOMElement;
-        }
-    ): void;
-}
-type FocusEventHandlerUnion<T, E extends FocusEvent> = EventHandlerUnion<
-    T,
-    E,
-    FocusEventHandler<T, E>
->;
+interface FocusEventHandler<T, E extends FocusEvent> { (e: E & { currentTarget: T; target: T extends HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement ? T : DOMElement; }): void; }
+type FocusEventHandlerUnion<T, E extends FocusEvent> = EventHandlerUnion<T, E, FocusEventHandler<T, E>>;
 // end event handlers
-
 
 interface SerializableAttributeValue {
     toString(): string;
@@ -251,19 +89,19 @@ interface AriaAttributes {
      * Identifies the currently active element when DOM focus is on a composite widget, textbox,
      * group, or application.
      */
-    "aria-activedescendant"?: FunctionMaybe<string | RemoveAttribute>;
+    "aria-activedescendant"?: SignalOrValue<string | RemoveAttribute>;
     /**
      * Indicates whether assistive technologies will present all, or only parts of, the changed
      * region based on the change notifications defined by the aria-relevant attribute.
      */
-    "aria-atomic"?: FunctionMaybe<EnumeratedPseudoBoolean | RemoveAttribute>;
+    "aria-atomic"?: SignalOrValue<EnumeratedPseudoBoolean | RemoveAttribute>;
     /**
      * Similar to the global aria-label. Defines a string value that labels the current element,
      * which is intended to be converted into Braille.
      *
      * @see aria-label.
      */
-    "aria-braillelabel"?: FunctionMaybe<string | RemoveAttribute>;
+    "aria-braillelabel"?: SignalOrValue<string | RemoveAttribute>;
     /**
      * Defines a human-readable, author-localized abbreviated description for the role of an element
      * intended to be converted into Braille. Braille is not a one-to-one transliteration of letters
@@ -277,173 +115,165 @@ interface AriaAttributes {
      *
      * @see aria-roledescription.
      */
-    "aria-brailleroledescription"?: FunctionMaybe<string | RemoveAttribute>;
+    "aria-brailleroledescription"?: SignalOrValue<string | RemoveAttribute>;
     /**
      * Indicates whether inputting text could trigger display of one or more predictions of the
      * user's intended value for an input and specifies how predictions would be presented if they
      * are made.
      */
-    "aria-autocomplete"?: FunctionMaybe<"none" | "inline" | "list" | "both" | RemoveAttribute>;
+    "aria-autocomplete"?: SignalOrValue<"none" | "inline" | "list" | "both" | RemoveAttribute>;
     /**
      * Indicates an element is being modified and that assistive technologies MAY want to wait until
      * the modifications are complete before exposing them to the user.
      */
-    "aria-busy"?: FunctionMaybe<EnumeratedPseudoBoolean | RemoveAttribute>;
+    "aria-busy"?: SignalOrValue<EnumeratedPseudoBoolean | RemoveAttribute>;
     /**
      * Indicates the current "checked" state of checkboxes, radio buttons, and other widgets.
      *
      * @see aria-pressed @see aria-selected.
      */
-    "aria-checked"?: FunctionMaybe<EnumeratedPseudoBoolean | "mixed" | RemoveAttribute>;
+    "aria-checked"?: SignalOrValue<EnumeratedPseudoBoolean | "mixed" | RemoveAttribute>;
     /**
      * Defines the total number of columns in a table, grid, or treegrid.
      *
      * @see aria-colindex.
      */
-    "aria-colcount"?: FunctionMaybe<number | string | RemoveAttribute>;
+    "aria-colcount"?: SignalOrValue<number | string | RemoveAttribute>;
     /**
      * Defines an element's column index or position with respect to the total number of columns
      * within a table, grid, or treegrid.
      *
      * @see aria-colcount @see aria-colspan.
      */
-    "aria-colindex"?: FunctionMaybe<number | string | RemoveAttribute>;
+    "aria-colindex"?: SignalOrValue<number | string | RemoveAttribute>;
     /** Defines a human-readable text alternative of the numeric aria-colindex. */
-    "aria-colindextext"?: FunctionMaybe<number | string | RemoveAttribute>;
+    "aria-colindextext"?: SignalOrValue<number | string | RemoveAttribute>;
     /**
      * Defines the number of columns spanned by a cell or gridcell within a table, grid, or
      * treegrid.
      *
      * @see aria-colindex @see aria-rowspan.
      */
-    "aria-colspan"?: FunctionMaybe<number | string | RemoveAttribute>;
+    "aria-colspan"?: SignalOrValue<number | string | RemoveAttribute>;
     /**
      * Identifies the element (or elements) whose contents or presence are controlled by the current
      * element.
      *
      * @see aria-owns.
      */
-    "aria-controls"?: FunctionMaybe<string | RemoveAttribute>;
+    "aria-controls"?: SignalOrValue<string | RemoveAttribute>;
     /**
      * Indicates the element that represents the current item within a container or set of related
      * elements.
      */
-    "aria-current"?: FunctionMaybe<
-        EnumeratedPseudoBoolean | "page" | "step" | "location" | "date" | "time" | RemoveAttribute
-    >;
+    "aria-current"?: SignalOrValue<EnumeratedPseudoBoolean | "page" | "step" | "location" | "date" | "time" | RemoveAttribute>;
     /**
      * Identifies the element (or elements) that describes the object.
      *
      * @see aria-labelledby
      */
-    "aria-describedby"?: FunctionMaybe<string | RemoveAttribute>;
+    "aria-describedby"?: SignalOrValue<string | RemoveAttribute>;
     /**
      * Defines a string value that describes or annotates the current element.
      *
      * @see aria-describedby
      */
-    "aria-description"?: FunctionMaybe<string | RemoveAttribute>;
+    "aria-description"?: SignalOrValue<string | RemoveAttribute>;
     /**
      * Identifies the element that provides a detailed, extended description for the object.
      *
      * @see aria-describedby.
      */
-    "aria-details"?: FunctionMaybe<string | RemoveAttribute>;
+    "aria-details"?: SignalOrValue<string | RemoveAttribute>;
     /**
      * Indicates that the element is perceivable but disabled, so it is not editable or otherwise
      * operable.
      *
      * @see aria-hidden @see aria-readonly.
      */
-    "aria-disabled"?: FunctionMaybe<EnumeratedPseudoBoolean | RemoveAttribute>;
+    "aria-disabled"?: SignalOrValue<EnumeratedPseudoBoolean | RemoveAttribute>;
     /**
      * Indicates what functions can be performed when a dragged object is released on the drop
      * target.
      *
      * @deprecated In ARIA 1.1
      */
-    "aria-dropeffect"?: FunctionMaybe<
-        "none" | "copy" | "execute" | "link" | "move" | "popup" | RemoveAttribute
-    >;
+    "aria-dropeffect"?: SignalOrValue<"none" | "copy" | "execute" | "link" | "move" | "popup" | RemoveAttribute>;
     /**
      * Identifies the element that provides an error message for the object.
      *
      * @see aria-invalid @see aria-describedby.
      */
-    "aria-errormessage"?: FunctionMaybe<string | RemoveAttribute>;
+    "aria-errormessage"?: SignalOrValue<string | RemoveAttribute>;
     /**
      * Indicates whether the element, or another grouping element it controls, is currently expanded
      * or collapsed.
      */
-    "aria-expanded"?: FunctionMaybe<EnumeratedPseudoBoolean | RemoveAttribute>;
+    "aria-expanded"?: SignalOrValue<EnumeratedPseudoBoolean | RemoveAttribute>;
     /**
      * Identifies the next element (or elements) in an alternate reading order of content which, at
      * the user's discretion, allows assistive technology to override the general default of reading
      * in document source order.
      */
-    "aria-flowto"?: FunctionMaybe<string | RemoveAttribute>;
+    "aria-flowto"?: SignalOrValue<string | RemoveAttribute>;
     /**
      * Indicates an element's "grabbed" state in a drag-and-drop operation.
      *
      * @deprecated In ARIA 1.1
      */
-    "aria-grabbed"?: FunctionMaybe<EnumeratedPseudoBoolean | RemoveAttribute>;
+    "aria-grabbed"?: SignalOrValue<EnumeratedPseudoBoolean | RemoveAttribute>;
     /**
      * Indicates the availability and type of interactive popup element, such as menu or dialog,
      * that can be triggered by an element.
      */
-    "aria-haspopup"?: FunctionMaybe<
-        EnumeratedPseudoBoolean | "menu" | "listbox" | "tree" | "grid" | "dialog" | RemoveAttribute
-    >;
+    "aria-haspopup"?: SignalOrValue<EnumeratedPseudoBoolean | "menu" | "listbox" | "tree" | "grid" | "dialog" | RemoveAttribute>;
     /**
      * Indicates whether the element is exposed to an accessibility API.
      *
      * @see aria-disabled.
      */
-    "aria-hidden"?: FunctionMaybe<EnumeratedPseudoBoolean | RemoveAttribute>;
+    "aria-hidden"?: SignalOrValue<EnumeratedPseudoBoolean | RemoveAttribute>;
     /**
      * Indicates the entered value does not conform to the format expected by the application.
      *
      * @see aria-errormessage.
      */
-    "aria-invalid"?: FunctionMaybe<
-        EnumeratedPseudoBoolean | "grammar" | "spelling" | RemoveAttribute
-    >;
+    "aria-invalid"?: SignalOrValue<EnumeratedPseudoBoolean | "grammar" | "spelling" | RemoveAttribute>;
     /**
      * Indicates keyboard shortcuts that an author has implemented to activate or give focus to an
      * element.
      */
-    "aria-keyshortcuts"?: FunctionMaybe<string | RemoveAttribute>;
+    "aria-keyshortcuts"?: SignalOrValue<string | RemoveAttribute>;
     /**
      * Defines a string value that labels the current element.
      *
      * @see aria-labelledby.
      */
-    "aria-label"?: FunctionMaybe<string | RemoveAttribute>;
+    "aria-label"?: SignalOrValue<string | RemoveAttribute>;
     /**
      * Identifies the element (or elements) that labels the current element.
      *
      * @see aria-describedby.
      */
-    "aria-labelledby"?: FunctionMaybe<string | RemoveAttribute>;
+    "aria-labelledby"?: SignalOrValue<string | RemoveAttribute>;
     /** Defines the hierarchical level of an element within a structure. */
-    "aria-level"?: FunctionMaybe<number | string | RemoveAttribute>;
+    "aria-level"?: SignalOrValue<number | string | RemoveAttribute>;
     /**
      * Indicates that an element will be updated, and describes the types of updates the user
      * agents, assistive technologies, and user can expect from the live region.
      */
-    "aria-live"?: FunctionMaybe<"off" | "assertive" | "polite" | RemoveAttribute>;
+    "aria-live"?: SignalOrValue<"off" | "assertive" | "polite" | RemoveAttribute>;
     /** Indicates whether an element is modal when displayed. */
-    "aria-modal"?: FunctionMaybe<EnumeratedPseudoBoolean | RemoveAttribute>;
+    "aria-modal"?: SignalOrValue<EnumeratedPseudoBoolean | RemoveAttribute>;
     /** Indicates whether a text box accepts multiple lines of input or only a single line. */
-    "aria-multiline"?: FunctionMaybe<EnumeratedPseudoBoolean | RemoveAttribute>;
+    "aria-multiline"?: SignalOrValue<EnumeratedPseudoBoolean | RemoveAttribute>;
     /**
      * Indicates that the user may select more than one item from the current selectable
      * descendants.
      */
-    "aria-multiselectable"?: FunctionMaybe<EnumeratedPseudoBoolean | RemoveAttribute>;
+    "aria-multiselectable"?: SignalOrValue<EnumeratedPseudoBoolean | RemoveAttribute>;
     /** Indicates whether the element's orientation is horizontal, vertical, or unknown/ambiguous. */
-    "aria-orientation"?: FunctionMaybe<"horizontal" | "vertical" | RemoveAttribute>;
+    "aria-orientation"?: SignalOrValue<"horizontal" | "vertical" | RemoveAttribute>;
     /**
      * Identifies an element (or elements) in order to define a visual, functional, or contextual
      * parent/child relationship between DOM elements where the DOM hierarchy cannot be used to
@@ -451,177 +281,92 @@ interface AriaAttributes {
      *
      * @see aria-controls.
      */
-    "aria-owns"?: FunctionMaybe<string | RemoveAttribute>;
+    "aria-owns"?: SignalOrValue<string | RemoveAttribute>;
     /**
      * Defines a short hint (a word or short phrase) intended to aid the user with data entry when
      * the control has no value. A hint could be a sample value or a brief description of the
      * expected format.
      */
-    "aria-placeholder"?: FunctionMaybe<string | RemoveAttribute>;
+    "aria-placeholder"?: SignalOrValue<string | RemoveAttribute>;
     /**
      * Defines an element's number or position in the current set of listitems or treeitems. Not
      * required if all elements in the set are present in the DOM.
      *
      * @see aria-setsize.
      */
-    "aria-posinset"?: FunctionMaybe<number | string | RemoveAttribute>;
+    "aria-posinset"?: SignalOrValue<number | string | RemoveAttribute>;
     /**
      * Indicates the current "pressed" state of toggle buttons.
      *
      * @see aria-checked @see aria-selected.
      */
-    "aria-pressed"?: FunctionMaybe<EnumeratedPseudoBoolean | "mixed" | RemoveAttribute>;
+    "aria-pressed"?: SignalOrValue<EnumeratedPseudoBoolean | "mixed" | RemoveAttribute>;
     /**
      * Indicates that the element is not editable, but is otherwise operable.
      *
      * @see aria-disabled.
      */
-    "aria-readonly"?: FunctionMaybe<EnumeratedPseudoBoolean | RemoveAttribute>;
+    "aria-readonly"?: SignalOrValue<EnumeratedPseudoBoolean | RemoveAttribute>;
     /**
      * Indicates what notifications the user agent will trigger when the accessibility tree within a
      * live region is modified.
      *
      * @see aria-atomic.
      */
-    "aria-relevant"?: FunctionMaybe<
-        | "additions"
-        | "additions removals"
-        | "additions text"
-        | "all"
-        | "removals"
-        | "removals additions"
-        | "removals text"
-        | "text"
-        | "text additions"
-        | "text removals"
-        | RemoveAttribute
-    >;
+    "aria-relevant"?: SignalOrValue<"additions" | "additions removals" | "additions text" | "all" | "removals" | "removals additions" | "removals text" | "text" | "text additions" | "text removals" | RemoveAttribute>;
     /** Indicates that user input is required on the element before a form may be submitted. */
-    "aria-required"?: FunctionMaybe<EnumeratedPseudoBoolean | RemoveAttribute>;
+    "aria-required"?: SignalOrValue<EnumeratedPseudoBoolean | RemoveAttribute>;
     /** Defines a human-readable, author-localized description for the role of an element. */
-    "aria-roledescription"?: FunctionMaybe<string | RemoveAttribute>;
+    "aria-roledescription"?: SignalOrValue<string | RemoveAttribute>;
     /**
      * Defines the total number of rows in a table, grid, or treegrid.
      *
      * @see aria-rowindex.
      */
-    "aria-rowcount"?: FunctionMaybe<number | string | RemoveAttribute>;
+    "aria-rowcount"?: SignalOrValue<number | string | RemoveAttribute>;
     /**
      * Defines an element's row index or position with respect to the total number of rows within a
      * table, grid, or treegrid.
      *
      * @see aria-rowcount @see aria-rowspan.
      */
-    "aria-rowindex"?: FunctionMaybe<number | string | RemoveAttribute>;
+    "aria-rowindex"?: SignalOrValue<number | string | RemoveAttribute>;
     /** Defines a human-readable text alternative of aria-rowindex. */
-    "aria-rowindextext"?: FunctionMaybe<number | string | RemoveAttribute>;
-
+    "aria-rowindextext"?: SignalOrValue<number | string | RemoveAttribute>;
     /**
      * Defines the number of rows spanned by a cell or gridcell within a table, grid, or treegrid.
      *
      * @see aria-rowindex @see aria-colspan.
      */
-    "aria-rowspan"?: FunctionMaybe<number | string | RemoveAttribute>;
+    "aria-rowspan"?: SignalOrValue<number | string | RemoveAttribute>;
     /**
      * Indicates the current "selected" state of various widgets.
      *
      * @see aria-checked @see aria-pressed.
      */
-    "aria-selected"?: FunctionMaybe<EnumeratedPseudoBoolean | RemoveAttribute>;
+    "aria-selected"?: SignalOrValue<EnumeratedPseudoBoolean | RemoveAttribute>;
     /**
      * Defines the number of items in the current set of listitems or treeitems. Not required if all
      * elements in the set are present in the DOM.
      *
      * @see aria-posinset.
      */
-    "aria-setsize"?: FunctionMaybe<number | string | RemoveAttribute>;
+    "aria-setsize"?: SignalOrValue<number | string | RemoveAttribute>;
     /** Indicates if items in a table or grid are sorted in ascending or descending order. */
-    "aria-sort"?: FunctionMaybe<"none" | "ascending" | "descending" | "other" | RemoveAttribute>;
+    "aria-sort"?: SignalOrValue<"none" | "ascending" | "descending" | "other" | RemoveAttribute>;
     /** Defines the maximum allowed value for a range widget. */
-    "aria-valuemax"?: FunctionMaybe<number | string | RemoveAttribute>;
+    "aria-valuemax"?: SignalOrValue<number | string | RemoveAttribute>;
     /** Defines the minimum allowed value for a range widget. */
-    "aria-valuemin"?: FunctionMaybe<number | string | RemoveAttribute>;
+    "aria-valuemin"?: SignalOrValue<number | string | RemoveAttribute>;
     /**
      * Defines the current value for a range widget.
      *
      * @see aria-valuetext.
      */
-    "aria-valuenow"?: FunctionMaybe<number | string | RemoveAttribute>;
+    "aria-valuenow"?: SignalOrValue<number | string | RemoveAttribute>;
     /** Defines the human readable text alternative of aria-valuenow for a range widget. */
-    "aria-valuetext"?: FunctionMaybe<string | RemoveAttribute>;
-    role?: FunctionMaybe<
-        | "alert"
-        | "alertdialog"
-        | "application"
-        | "article"
-        | "banner"
-        | "button"
-        | "cell"
-        | "checkbox"
-        | "columnheader"
-        | "combobox"
-        | "complementary"
-        | "contentinfo"
-        | "definition"
-        | "dialog"
-        | "directory"
-        | "document"
-        | "feed"
-        | "figure"
-        | "form"
-        | "grid"
-        | "gridcell"
-        | "group"
-        | "heading"
-        | "img"
-        | "link"
-        | "list"
-        | "listbox"
-        | "listitem"
-        | "log"
-        | "main"
-        | "marquee"
-        | "math"
-        | "menu"
-        | "menubar"
-        | "menuitem"
-        | "menuitemcheckbox"
-        | "menuitemradio"
-        | "meter"
-        | "navigation"
-        | "none"
-        | "note"
-        | "option"
-        | "presentation"
-        | "progressbar"
-        | "radio"
-        | "radiogroup"
-        | "region"
-        | "row"
-        | "rowgroup"
-        | "rowheader"
-        | "scrollbar"
-        | "search"
-        | "searchbox"
-        | "separator"
-        | "slider"
-        | "spinbutton"
-        | "status"
-        | "switch"
-        | "tab"
-        | "table"
-        | "tablist"
-        | "tabpanel"
-        | "term"
-        | "textbox"
-        | "timer"
-        | "toolbar"
-        | "tooltip"
-        | "tree"
-        | "treegrid"
-        | "treeitem"
-        | RemoveAttribute
-    >;
+    "aria-valuetext"?: SignalOrValue<string | RemoveAttribute>;
+    role?: SignalOrValue<"alert" | "alertdialog" | "application" | "article" | "banner" | "button" | "cell" | "checkbox" | "columnheader" | "combobox" | "complementary" | "contentinfo" | "definition" | "dialog" | "directory" | "document" | "feed" | "figure" | "form" | "grid" | "gridcell" | "group" | "heading" | "img" | "link" | "list" | "listbox" | "listitem" | "log" | "main" | "marquee" | "math" | "menu" | "menubar" | "menuitem" | "menuitemcheckbox" | "menuitemradio" | "meter" | "navigation" | "none" | "note" | "option" | "presentation" | "progressbar" | "radio" | "radiogroup" | "region" | "row" | "rowgroup" | "rowheader" | "scrollbar" | "search" | "searchbox" | "separator" | "slider" | "spinbutton" | "status" | "switch" | "tab" | "table" | "tablist" | "tabpanel" | "term" | "textbox" | "timer" | "toolbar" | "tooltip" | "tree" | "treegrid" | "treeitem" | RemoveAttribute>;
 }
 
 // EVENTS
@@ -692,8 +437,8 @@ interface EventHandlersElement<T> {
     onCompositionStart?: EventHandlerUnion<T, CompositionEvent> | undefined;
     onCompositionUpdate?: EventHandlerUnion<T, CompositionEvent> | undefined;
     onContentVisibilityAutoStateChange?:
-      | EventHandlerUnion<T, ContentVisibilityAutoStateChangeEvent>
-      | undefined;
+    | EventHandlerUnion<T, ContentVisibilityAutoStateChangeEvent>
+    | undefined;
     onContextLost?: EventHandlerUnion<T, Event> | undefined;
     onContextMenu?: EventHandlerUnion<T, PointerEvent> | undefined;
     onContextRestored?: EventHandlerUnion<T, Event> | undefined;
@@ -809,7 +554,7 @@ type EventType =
  * 2. Includes `keys` defined by `Element` and `Node` interfaces.
  */
 interface ElementAttributes<T>
-    extends CustomAttributes<T>,
+    extends CustomDomAttributes<T>,
     DirectiveAttributes,
     DirectiveFunctionAttributes<T>,
     PropAttributes,
@@ -819,358 +564,221 @@ interface ElementAttributes<T>
     // [key: ClassKeys]: boolean;
 
     // properties
-    innerHTML?: FunctionMaybe<string>;
-    textContent?: FunctionMaybe<string | number>;
+    innerHTML?: SignalOrValue<string>;
+    textContent?: SignalOrValue<string | number>;
 
     // attributes
-    autofocus?: FunctionMaybe<BooleanAttribute | RemoveAttribute>;
-    class?: FunctionMaybe<string | ClassList | RemoveAttribute> | { [key: string]: FunctionMaybe<boolean | RemoveAttribute> };
-    elementtiming?: FunctionMaybe<string | RemoveAttribute>;
-    id?: FunctionMaybe<string | RemoveAttribute>;
-    nonce?: FunctionMaybe<string | RemoveAttribute>;
-    part?: FunctionMaybe<string | RemoveAttribute>;
-    slot?: FunctionMaybe<string | RemoveAttribute>;
-    style?: FunctionMaybe<CSSProperties | string | RemoveAttribute>;
-    tabindex?: FunctionMaybe<number | string | RemoveAttribute>;
+    autofocus?: SignalOrValue<BooleanAttribute | RemoveAttribute>;
+    class?: SignalOrValue<string | ClassNames | RemoveAttribute> | { [key: string]: SignalOrValue<boolean | RemoveAttribute> };
+    elementtiming?: SignalOrValue<string | RemoveAttribute>;
+    id?: SignalOrValue<string | RemoveAttribute>;
+    nonce?: SignalOrValue<string | RemoveAttribute>;
+    part?: SignalOrValue<string | RemoveAttribute>;
+    slot?: SignalOrValue<string | RemoveAttribute>;
+    style?: SignalOrValue<CSSProperties | string | RemoveAttribute>;
+    tabindex?: SignalOrValue<number | string | RemoveAttribute>;
 }
 /** Global `SVGElement` interface keys only. */
 interface SVGAttributes<T> extends ElementAttributes<T> {
-    id?: FunctionMaybe<string | RemoveAttribute>;
-    lang?: FunctionMaybe<string | RemoveAttribute>;
-    tabindex?: FunctionMaybe<number | string | RemoveAttribute>;
-    xmlns?: FunctionMaybe<string | RemoveAttribute>;
+    id?: SignalOrValue<string | RemoveAttribute>;
+    lang?: SignalOrValue<string | RemoveAttribute>;
+    tabindex?: SignalOrValue<number | string | RemoveAttribute>;
+    xmlns?: SignalOrValue<string | RemoveAttribute>;
 }
 /** Global `MathMLElement` interface keys only. */
 interface MathMLAttributes<T> extends ElementAttributes<T> {
-    dir?: FunctionMaybe<HTMLDir | RemoveAttribute>;
-    displaystyle?: FunctionMaybe<BooleanAttribute | RemoveAttribute>;
-    scriptlevel?: FunctionMaybe<string | RemoveAttribute>;
-    xmlns?: FunctionMaybe<string | RemoveAttribute>;
+    dir?: SignalOrValue<HTMLDir | RemoveAttribute>;
+    displaystyle?: SignalOrValue<BooleanAttribute | RemoveAttribute>;
+    scriptlevel?: SignalOrValue<string | RemoveAttribute>;
+    xmlns?: SignalOrValue<string | RemoveAttribute>;
 
     /** @deprecated */
-    href?: FunctionMaybe<string | RemoveAttribute>;
+    href?: SignalOrValue<string | RemoveAttribute>;
     /** @deprecated */
-    mathbackground?: FunctionMaybe<string | RemoveAttribute>;
+    mathbackground?: SignalOrValue<string | RemoveAttribute>;
     /** @deprecated */
-    mathcolor?: FunctionMaybe<string | RemoveAttribute>;
+    mathcolor?: SignalOrValue<string | RemoveAttribute>;
     /** @deprecated */
-    mathsize?: FunctionMaybe<string | RemoveAttribute>;
+    mathsize?: SignalOrValue<string | RemoveAttribute>;
 }
 /** Global `HTMLElement` interface keys only. */
 interface HTMLAttributes<T> extends ElementAttributes<T> {
     // properties
-    innerText?: FunctionMaybe<string | number>;
-
+    innerText?: SignalOrValue<string | number>;
     // attributes
-    accesskey?: FunctionMaybe<string | RemoveAttribute>;
-    autocapitalize?: FunctionMaybe<HTMLAutocapitalize | RemoveAttribute>;
-    autocorrect?: FunctionMaybe<"on" | "off" | RemoveAttribute>;
-    contenteditable?: FunctionMaybe<
-        | EnumeratedPseudoBoolean
-        | EnumeratedAcceptsEmpty
-        | "plaintext-only"
-        | "inherit"
-        | RemoveAttribute
-    >;
-    dir?: FunctionMaybe<HTMLDir | RemoveAttribute>;
-    draggable?: FunctionMaybe<EnumeratedPseudoBoolean | RemoveAttribute>;
-    enterkeyhint?: FunctionMaybe<
-        "enter" | "done" | "go" | "next" | "previous" | "search" | "send" | RemoveAttribute
-    >;
-    exportparts?: FunctionMaybe<string | RemoveAttribute>;
-    hidden?: FunctionMaybe<EnumeratedAcceptsEmpty | "hidden" | "until-found" | RemoveAttribute>;
-    inert?: FunctionMaybe<BooleanAttribute | RemoveAttribute>;
-    inputmode?: FunctionMaybe<
-        "decimal" | "email" | "none" | "numeric" | "search" | "tel" | "text" | "url" | RemoveAttribute
-    >;
-    is?: FunctionMaybe<string | RemoveAttribute>;
-    lang?: FunctionMaybe<string | RemoveAttribute>;
-    popover?: FunctionMaybe<EnumeratedAcceptsEmpty | "manual" | "auto" | RemoveAttribute>;
-    spellcheck?: FunctionMaybe<EnumeratedPseudoBoolean | EnumeratedAcceptsEmpty | RemoveAttribute>;
-    title?: FunctionMaybe<string | RemoveAttribute>;
-    translate?: FunctionMaybe<"yes" | "no" | RemoveAttribute>;
-
+    accesskey?: SignalOrValue<string | RemoveAttribute>;
+    autocapitalize?: SignalOrValue<HTMLAutocapitalize | RemoveAttribute>;
+    autocorrect?: SignalOrValue<"on" | "off" | RemoveAttribute>;
+    contenteditable?: SignalOrValue<EnumeratedPseudoBoolean | EnumeratedAcceptsEmpty | "plaintext-only" | "inherit" | RemoveAttribute>;
+    dir?: SignalOrValue<HTMLDir | RemoveAttribute>;
+    draggable?: SignalOrValue<EnumeratedPseudoBoolean | RemoveAttribute>;
+    enterkeyhint?: SignalOrValue<"enter" | "done" | "go" | "next" | "previous" | "search" | "send" | RemoveAttribute>;
+    exportparts?: SignalOrValue<string | RemoveAttribute>;
+    hidden?: SignalOrValue<EnumeratedAcceptsEmpty | "hidden" | "until-found" | RemoveAttribute>;
+    inert?: SignalOrValue<BooleanAttribute | RemoveAttribute>;
+    inputmode?: SignalOrValue<"decimal" | "email" | "none" | "numeric" | "search" | "tel" | "text" | "url" | RemoveAttribute>;
+    is?: SignalOrValue<string | RemoveAttribute>;
+    lang?: SignalOrValue<string | RemoveAttribute>;
+    popover?: SignalOrValue<EnumeratedAcceptsEmpty | "manual" | "auto" | RemoveAttribute>;
+    spellcheck?: SignalOrValue<EnumeratedPseudoBoolean | EnumeratedAcceptsEmpty | RemoveAttribute>;
+    title?: SignalOrValue<string | RemoveAttribute>;
+    translate?: SignalOrValue<"yes" | "no" | RemoveAttribute>;
     /** @experimental */
-    virtualkeyboardpolicy?: FunctionMaybe<
-        EnumeratedAcceptsEmpty | "auto" | "manual" | RemoveAttribute
-    >;
+    virtualkeyboardpolicy?: SignalOrValue<EnumeratedAcceptsEmpty | "auto" | "manual" | RemoveAttribute>;
     /** @experimental */
-    writingsuggestions?: FunctionMaybe<EnumeratedPseudoBoolean | RemoveAttribute>;
-
+    writingsuggestions?: SignalOrValue<EnumeratedPseudoBoolean | RemoveAttribute>;
     // Microdata
-    itemid?: FunctionMaybe<string | RemoveAttribute>;
-    itemprop?: FunctionMaybe<string | RemoveAttribute>;
-    itemref?: FunctionMaybe<string | RemoveAttribute>;
-    itemscope?: FunctionMaybe<BooleanAttribute | RemoveAttribute>;
-    itemtype?: FunctionMaybe<string | RemoveAttribute>;
-
+    itemid?: SignalOrValue<string | RemoveAttribute>;
+    itemprop?: SignalOrValue<string | RemoveAttribute>;
+    itemref?: SignalOrValue<string | RemoveAttribute>;
+    itemscope?: SignalOrValue<BooleanAttribute | RemoveAttribute>;
+    itemtype?: SignalOrValue<string | RemoveAttribute>;
     // RDFa Attributes
-    about?: FunctionMaybe<string | RemoveAttribute>;
-    datatype?: FunctionMaybe<string | RemoveAttribute>;
-    inlist?: FunctionMaybe<any | RemoveAttribute>;
-    prefix?: FunctionMaybe<string | RemoveAttribute>;
-    property?: FunctionMaybe<string | RemoveAttribute>;
-    resource?: FunctionMaybe<string | RemoveAttribute>;
-    typeof?: FunctionMaybe<string | RemoveAttribute>;
-    vocab?: FunctionMaybe<string | RemoveAttribute>;
-
+    about?: SignalOrValue<string | RemoveAttribute>;
+    datatype?: SignalOrValue<string | RemoveAttribute>;
+    inlist?: SignalOrValue<any | RemoveAttribute>;
+    prefix?: SignalOrValue<string | RemoveAttribute>;
+    property?: SignalOrValue<string | RemoveAttribute>;
+    resource?: SignalOrValue<string | RemoveAttribute>;
+    typeof?: SignalOrValue<string | RemoveAttribute>;
+    vocab?: SignalOrValue<string | RemoveAttribute>;
     /** @deprecated */
-    contextmenu?: FunctionMaybe<string | RemoveAttribute>;
+    contextmenu?: SignalOrValue<string | RemoveAttribute>;
 }
 
 // HTML
-
 type HTMLAutocapitalize = "off" | "none" | "on" | "sentences" | "words" | "characters";
-type HTMLAutocomplete =
-    | "additional-name"
-    | "address-level1"
-    | "address-level2"
-    | "address-level3"
-    | "address-level4"
-    | "address-line1"
-    | "address-line2"
-    | "address-line3"
-    | "bday"
-    | "bday-day"
-    | "bday-month"
-    | "bday-year"
-    | "billing"
-    | "cc-additional-name"
-    | "cc-csc"
-    | "cc-exp"
-    | "cc-exp-month"
-    | "cc-exp-year"
-    | "cc-family-name"
-    | "cc-given-name"
-    | "cc-name"
-    | "cc-number"
-    | "cc-type"
-    | "country"
-    | "country-name"
-    | "current-password"
-    | "email"
-    | "family-name"
-    | "fax"
-    | "given-name"
-    | "home"
-    | "honorific-prefix"
-    | "honorific-suffix"
-    | "impp"
-    | "language"
-    | "mobile"
-    | "name"
-    | "new-password"
-    | "nickname"
-    | "off"
-    | "on"
-    | "organization"
-    | "organization-title"
-    | "pager"
-    | "photo"
-    | "postal-code"
-    | "sex"
-    | "shipping"
-    | "street-address"
-    | "tel"
-    | "tel-area-code"
-    | "tel-country-code"
-    | "tel-extension"
-    | "tel-local"
-    | "tel-local-prefix"
-    | "tel-local-suffix"
-    | "tel-national"
-    | "transaction-amount"
-    | "transaction-currency"
-    | "url"
-    | "username"
-    | "work"
-    | (string & {});
+type HTMLAutocomplete = "additional-name" | "address-level1" | "address-level2" | "address-level3" | "address-level4" | "address-line1" | "address-line2" | "address-line3" | "bday" | "bday-day" | "bday-month" | "bday-year" | "billing" | "cc-additional-name" | "cc-csc" | "cc-exp" | "cc-exp-month" | "cc-exp-year" | "cc-family-name" | "cc-given-name" | "cc-name" | "cc-number" | "cc-type" | "country" | "country-name" | "current-password" | "email" | "family-name" | "fax" | "given-name" | "home" | "honorific-prefix" | "honorific-suffix" | "impp" | "language" | "mobile" | "name" | "new-password" | "nickname" | "off" | "on" | "organization" | "organization-title" | "pager" | "photo" | "postal-code" | "sex" | "shipping" | "street-address" | "tel" | "tel-area-code" | "tel-country-code" | "tel-extension" | "tel-local" | "tel-local-prefix" | "tel-local-suffix" | "tel-national" | "transaction-amount" | "transaction-currency" | "url" | "username" | "work" | (string & {});
 type HTMLDir = "ltr" | "rtl" | "auto";
 type HTMLFormEncType = "application/x-www-form-urlencoded" | "multipart/form-data" | "text/plain";
 type HTMLFormMethod = "post" | "get" | "dialog";
 type HTMLCrossorigin = "anonymous" | "use-credentials" | EnumeratedAcceptsEmpty;
-type HTMLReferrerPolicy =
-    | "no-referrer"
-    | "no-referrer-when-downgrade"
-    | "origin"
-    | "origin-when-cross-origin"
-    | "same-origin"
-    | "strict-origin"
-    | "strict-origin-when-cross-origin"
-    | "unsafe-url";
-type HTMLIframeSandbox =
-    | "allow-downloads-without-user-activation"
-    | "allow-downloads"
-    | "allow-forms"
-    | "allow-modals"
-    | "allow-orientation-lock"
-    | "allow-pointer-lock"
-    | "allow-popups"
-    | "allow-popups-to-escape-sandbox"
-    | "allow-presentation"
-    | "allow-same-origin"
-    | "allow-scripts"
-    | "allow-storage-access-by-user-activation"
-    | "allow-top-navigation"
-    | "allow-top-navigation-by-user-activation"
-    | "allow-top-navigation-to-custom-protocols";
-type HTMLLinkAs =
-    | "audio"
-    | "document"
-    | "embed"
-    | "fetch"
-    | "font"
-    | "image"
-    | "object"
-    | "script"
-    | "style"
-    | "track"
-    | "video"
-    | "worker";
+type HTMLReferrerPolicy = "no-referrer" | "no-referrer-when-downgrade" | "origin" | "origin-when-cross-origin" | "same-origin" | "strict-origin" | "strict-origin-when-cross-origin" | "unsafe-url";
+type HTMLIframeSandbox = "allow-downloads-without-user-activation" | "allow-downloads" | "allow-forms" | "allow-modals" | "allow-orientation-lock" | "allow-pointer-lock" | "allow-popups" | "allow-popups-to-escape-sandbox" | "allow-presentation" | "allow-same-origin" | "allow-scripts" | "allow-storage-access-by-user-activation" | "allow-top-navigation" | "allow-top-navigation-by-user-activation" | "allow-top-navigation-to-custom-protocols";
+type HTMLLinkAs = "audio" | "document" | "embed" | "fetch" | "font" | "image" | "object" | "script" | "style" | "track" | "video" | "worker";
 
 interface AnchorHTMLAttributes<T> extends HTMLAttributes<T> {
-    download?: FunctionMaybe<string | true | RemoveAttribute>;
-    href?: FunctionMaybe<string | RemoveAttribute>;
-    hreflang?: FunctionMaybe<string | RemoveAttribute>;
-    ping?: FunctionMaybe<string | RemoveAttribute>;
-    referrerpolicy?: FunctionMaybe<HTMLReferrerPolicy | RemoveAttribute>;
-    rel?: FunctionMaybe<string | RemoveAttribute>;
-    target?: FunctionMaybe<
-        "_self" | "_blank" | "_parent" | "_top" | (string & {}) | RemoveAttribute
-    >;
-    type?: FunctionMaybe<string | RemoveAttribute>;
+    download?: SignalOrValue<string | true | RemoveAttribute>;
+    href?: SignalOrValue<string | RemoveAttribute>;
+    hreflang?: SignalOrValue<string | RemoveAttribute>;
+    ping?: SignalOrValue<string | RemoveAttribute>;
+    referrerpolicy?: SignalOrValue<HTMLReferrerPolicy | RemoveAttribute>;
+    rel?: SignalOrValue<string | RemoveAttribute>;
+    target?: SignalOrValue<"_self" | "_blank" | "_parent" | "_top" | (string & {}) | RemoveAttribute>;
+    type?: SignalOrValue<string | RemoveAttribute>;
 
     /** @experimental */
-    attributionsrc?: FunctionMaybe<string | RemoveAttribute>;
+    attributionsrc?: SignalOrValue<string | RemoveAttribute>;
 
     /** @deprecated */
-    charset?: FunctionMaybe<string | RemoveAttribute>;
+    charset?: SignalOrValue<string | RemoveAttribute>;
     /** @deprecated */
-    coords?: FunctionMaybe<string | RemoveAttribute>;
+    coords?: SignalOrValue<string | RemoveAttribute>;
     /** @deprecated */
-    name?: FunctionMaybe<string | RemoveAttribute>;
+    name?: SignalOrValue<string | RemoveAttribute>;
     /** @deprecated */
-    rev?: FunctionMaybe<string | RemoveAttribute>;
+    rev?: SignalOrValue<string | RemoveAttribute>;
     /** @deprecated */
-    shape?: FunctionMaybe<"rect" | "circle" | "poly" | "default" | RemoveAttribute>;
+    shape?: SignalOrValue<"rect" | "circle" | "poly" | "default" | RemoveAttribute>;
 }
 interface AudioHTMLAttributes<T> extends MediaHTMLAttributes<T> { }
 interface AreaHTMLAttributes<T> extends HTMLAttributes<T> {
-    alt?: FunctionMaybe<string | RemoveAttribute>;
-    coords?: FunctionMaybe<string | RemoveAttribute>;
-    download?: FunctionMaybe<string | RemoveAttribute>;
-    href?: FunctionMaybe<string | RemoveAttribute>;
-    ping?: FunctionMaybe<string | RemoveAttribute>;
-    referrerpolicy?: FunctionMaybe<HTMLReferrerPolicy | RemoveAttribute>;
-    rel?: FunctionMaybe<string | RemoveAttribute>;
-    shape?: FunctionMaybe<"rect" | "circle" | "poly" | "default" | RemoveAttribute>;
-    target?: FunctionMaybe<
-        "_self" | "_blank" | "_parent" | "_top" | (string & {}) | RemoveAttribute
-    >;
-
+    alt?: SignalOrValue<string | RemoveAttribute>;
+    coords?: SignalOrValue<string | RemoveAttribute>;
+    download?: SignalOrValue<string | RemoveAttribute>;
+    href?: SignalOrValue<string | RemoveAttribute>;
+    ping?: SignalOrValue<string | RemoveAttribute>;
+    referrerpolicy?: SignalOrValue<HTMLReferrerPolicy | RemoveAttribute>;
+    rel?: SignalOrValue<string | RemoveAttribute>;
+    shape?: SignalOrValue<"rect" | "circle" | "poly" | "default" | RemoveAttribute>;
+    target?: SignalOrValue<"_self" | "_blank" | "_parent" | "_top" | (string & {}) | RemoveAttribute>;
     /** @experimental */
-    attributionsrc?: FunctionMaybe<string | RemoveAttribute>;
-
+    attributionsrc?: SignalOrValue<string | RemoveAttribute>;
     /** @deprecated */
-    nohref?: FunctionMaybe<BooleanAttribute | RemoveAttribute>;
+    nohref?: SignalOrValue<BooleanAttribute | RemoveAttribute>;
 }
 interface BaseHTMLAttributes<T> extends HTMLAttributes<T> {
-    href?: FunctionMaybe<string | RemoveAttribute>;
-    target?: FunctionMaybe<
-        "_self" | "_blank" | "_parent" | "_top" | (string & {}) | RemoveAttribute
-    >;
+    href?: SignalOrValue<string | RemoveAttribute>;
+    target?: SignalOrValue<"_self" | "_blank" | "_parent" | "_top" | (string & {}) | RemoveAttribute>;
 }
 interface BdoHTMLAttributes<T> extends HTMLAttributes<T> {
-    dir?: FunctionMaybe<"ltr" | "rtl" | RemoveAttribute>;
+    dir?: SignalOrValue<"ltr" | "rtl" | RemoveAttribute>;
 }
 interface BlockquoteHTMLAttributes<T> extends HTMLAttributes<T> {
-    cite?: FunctionMaybe<string | RemoveAttribute>;
+    cite?: SignalOrValue<string | RemoveAttribute>;
 }
 interface BodyHTMLAttributes<T> extends HTMLAttributes<T>, EventHandlersWindow<T> { }
 interface ButtonHTMLAttributes<T> extends HTMLAttributes<T> {
-    disabled?: FunctionMaybe<BooleanAttribute | RemoveAttribute>;
-    form?: FunctionMaybe<string | RemoveAttribute>;
-    formaction?: FunctionMaybe<string | SerializableAttributeValue | RemoveAttribute>;
-    formenctype?: FunctionMaybe<HTMLFormEncType | RemoveAttribute>;
-    formmethod?: FunctionMaybe<HTMLFormMethod | RemoveAttribute>;
-    formnovalidate?: FunctionMaybe<BooleanAttribute | RemoveAttribute>;
-    formtarget?: FunctionMaybe<
-        "_self" | "_blank" | "_parent" | "_top" | (string & {}) | RemoveAttribute
-    >;
-    name?: FunctionMaybe<string | RemoveAttribute>;
-    popovertarget?: FunctionMaybe<string | RemoveAttribute>;
-    popovertargetaction?: FunctionMaybe<"hide" | "show" | "toggle" | RemoveAttribute>;
-    type?: FunctionMaybe<"submit" | "reset" | "button" | "menu" | RemoveAttribute>;
-    value?: FunctionMaybe<string | RemoveAttribute>;
+    disabled?: SignalOrValue<BooleanAttribute | RemoveAttribute>;
+    form?: SignalOrValue<string | RemoveAttribute>;
+    formaction?: SignalOrValue<string | SerializableAttributeValue | RemoveAttribute>;
+    formenctype?: SignalOrValue<HTMLFormEncType | RemoveAttribute>;
+    formmethod?: SignalOrValue<HTMLFormMethod | RemoveAttribute>;
+    formnovalidate?: SignalOrValue<BooleanAttribute | RemoveAttribute>;
+    formtarget?: SignalOrValue<"_self" | "_blank" | "_parent" | "_top" | (string & {}) | RemoveAttribute>;
+    name?: SignalOrValue<string | RemoveAttribute>;
+    popovertarget?: SignalOrValue<string | RemoveAttribute>;
+    popovertargetaction?: SignalOrValue<"hide" | "show" | "toggle" | RemoveAttribute>;
+    type?: SignalOrValue<"submit" | "reset" | "button" | "menu" | RemoveAttribute>;
+    value?: SignalOrValue<string | RemoveAttribute>;
 
     /** @experimental */
-    command?: FunctionMaybe<
-        | "show-modal"
-        | "close"
-        | "show-popover"
-        | "hide-popover"
-        | "toggle-popover"
-        | (string & {})
-        | RemoveAttribute
-    >;
+    command?: SignalOrValue<"show-modal" | "close" | "show-popover" | "hide-popover" | "toggle-popover" | (string & {}) | RemoveAttribute>;
     /** @experimental */
-    commandfor?: FunctionMaybe<string | RemoveAttribute>;
+    commandfor?: SignalOrValue<string | RemoveAttribute>;
 }
 interface CanvasHTMLAttributes<T> extends HTMLAttributes<T> {
-    height?: FunctionMaybe<number | string | RemoveAttribute>;
-    width?: FunctionMaybe<number | string | RemoveAttribute>;
+    height?: SignalOrValue<number | string | RemoveAttribute>;
+    width?: SignalOrValue<number | string | RemoveAttribute>;
 
-    /**
-     * @deprecated
-     * @non-standard
-     */
-    "moz-opaque"?: FunctionMaybe<BooleanAttribute | RemoveAttribute>;
+    /**@deprecated @non-standard*/
+    "moz-opaque"?: SignalOrValue<BooleanAttribute | RemoveAttribute>;
 }
 interface CaptionHTMLAttributes<T> extends HTMLAttributes<T> {
     /** @deprecated */
-    align?: FunctionMaybe<"left" | "center" | "right" | RemoveAttribute>;
+    align?: SignalOrValue<"left" | "center" | "right" | RemoveAttribute>;
 }
 interface ColHTMLAttributes<T> extends HTMLAttributes<T> {
-    span?: FunctionMaybe<number | string | RemoveAttribute>;
+    span?: SignalOrValue<number | string | RemoveAttribute>;
 
     /** @deprecated */
-    align?: FunctionMaybe<"left" | "center" | "right" | "justify" | "char" | RemoveAttribute>;
+    align?: SignalOrValue<"left" | "center" | "right" | "justify" | "char" | RemoveAttribute>;
     /** @deprecated */
-    bgcolor?: FunctionMaybe<string | RemoveAttribute>;
+    bgcolor?: SignalOrValue<string | RemoveAttribute>;
     /** @deprecated */
-    char?: FunctionMaybe<string | RemoveAttribute>;
+    char?: SignalOrValue<string | RemoveAttribute>;
     /** @deprecated */
-    charoff?: FunctionMaybe<string | RemoveAttribute>;
+    charoff?: SignalOrValue<string | RemoveAttribute>;
     /** @deprecated */
-    valign?: FunctionMaybe<"baseline" | "bottom" | "middle" | "top" | RemoveAttribute>;
+    valign?: SignalOrValue<"baseline" | "bottom" | "middle" | "top" | RemoveAttribute>;
     /** @deprecated */
-    width?: FunctionMaybe<number | string | RemoveAttribute>;
+    width?: SignalOrValue<number | string | RemoveAttribute>;
 }
 interface ColgroupHTMLAttributes<T> extends HTMLAttributes<T> {
-    span?: FunctionMaybe<number | string | RemoveAttribute>;
+    span?: SignalOrValue<number | string | RemoveAttribute>;
 
     /** @deprecated */
-    align?: FunctionMaybe<"left" | "center" | "right" | "justify" | "char" | RemoveAttribute>;
+    align?: SignalOrValue<"left" | "center" | "right" | "justify" | "char" | RemoveAttribute>;
     /** @deprecated */
-    bgcolor?: FunctionMaybe<string | RemoveAttribute>;
+    bgcolor?: SignalOrValue<string | RemoveAttribute>;
     /** @deprecated */
-    char?: FunctionMaybe<string | RemoveAttribute>;
+    char?: SignalOrValue<string | RemoveAttribute>;
     /** @deprecated */
-    charoff?: FunctionMaybe<string | RemoveAttribute>;
+    charoff?: SignalOrValue<string | RemoveAttribute>;
     /** @deprecated */
-    valign?: FunctionMaybe<"baseline" | "bottom" | "middle" | "top" | RemoveAttribute>;
+    valign?: SignalOrValue<"baseline" | "bottom" | "middle" | "top" | RemoveAttribute>;
     /** @deprecated */
-    width?: FunctionMaybe<number | string | RemoveAttribute>;
+    width?: SignalOrValue<number | string | RemoveAttribute>;
 }
 interface DataHTMLAttributes<T> extends HTMLAttributes<T> {
-    value?: FunctionMaybe<string | string[] | number | RemoveAttribute>;
+    value?: SignalOrValue<string | string[] | number | RemoveAttribute>;
 }
 interface DetailsHtmlAttributes<T> extends HTMLAttributes<T> {
-    name?: FunctionMaybe<string | RemoveAttribute>;
-    open?: FunctionMaybe<BooleanAttribute | RemoveAttribute>;
+    name?: SignalOrValue<string | RemoveAttribute>;
+    open?: SignalOrValue<BooleanAttribute | RemoveAttribute>;
 }
 interface DialogHtmlAttributes<T> extends HTMLAttributes<T> {
-    open?: FunctionMaybe<BooleanAttribute | RemoveAttribute>;
+    open?: SignalOrValue<BooleanAttribute | RemoveAttribute>;
     /**
      * Do not add the `tabindex` property to the `<dialog>` element as it is not interactive and
      * does not receive focus. The dialog's contents, including the close button contained in the
@@ -1181,275 +789,236 @@ interface DialogHtmlAttributes<T> extends HTMLAttributes<T> {
     tabindex?: never;
 
     /** @experimental */
-    closedby?: FunctionMaybe<"any" | "closerequest" | "none" | RemoveAttribute>;
+    closedby?: SignalOrValue<"any" | "closerequest" | "none" | RemoveAttribute>;
 }
 interface EmbedHTMLAttributes<T> extends HTMLAttributes<T> {
-    height?: FunctionMaybe<number | string | RemoveAttribute>;
-    src?: FunctionMaybe<string | RemoveAttribute>;
-    type?: FunctionMaybe<string | RemoveAttribute>;
-    width?: FunctionMaybe<number | string | RemoveAttribute>;
+    height?: SignalOrValue<number | string | RemoveAttribute>;
+    src?: SignalOrValue<string | RemoveAttribute>;
+    type?: SignalOrValue<string | RemoveAttribute>;
+    width?: SignalOrValue<number | string | RemoveAttribute>;
 
     /** @deprecated */
-    align?: FunctionMaybe<"left" | "right" | "justify" | "center" | RemoveAttribute>;
+    align?: SignalOrValue<"left" | "right" | "justify" | "center" | RemoveAttribute>;
     /** @deprecated */
-    name?: FunctionMaybe<string | RemoveAttribute>;
+    name?: SignalOrValue<string | RemoveAttribute>;
 }
 interface FieldsetHTMLAttributes<T> extends HTMLAttributes<T> {
-    disabled?: FunctionMaybe<BooleanAttribute | RemoveAttribute>;
-    form?: FunctionMaybe<string | RemoveAttribute>;
-    name?: FunctionMaybe<string | RemoveAttribute>;
+    disabled?: SignalOrValue<BooleanAttribute | RemoveAttribute>;
+    form?: SignalOrValue<string | RemoveAttribute>;
+    name?: SignalOrValue<string | RemoveAttribute>;
 }
 interface FormHTMLAttributes<T> extends HTMLAttributes<T> {
-    "accept-charset"?: FunctionMaybe<string | RemoveAttribute>;
-    action?: FunctionMaybe<string | SerializableAttributeValue | RemoveAttribute>;
-    autocomplete?: FunctionMaybe<"on" | "off" | RemoveAttribute>;
-    encoding?: FunctionMaybe<HTMLFormEncType | RemoveAttribute>;
-    enctype?: FunctionMaybe<HTMLFormEncType | RemoveAttribute>;
-    method?: FunctionMaybe<HTMLFormMethod | RemoveAttribute>;
-    name?: FunctionMaybe<string | RemoveAttribute>;
-    novalidate?: FunctionMaybe<BooleanAttribute | RemoveAttribute>;
-    rel?: FunctionMaybe<string | RemoveAttribute>;
-    target?: FunctionMaybe<
-        "_self" | "_blank" | "_parent" | "_top" | (string & {}) | RemoveAttribute
-    >;
+    "accept-charset"?: SignalOrValue<string | RemoveAttribute>;
+    action?: SignalOrValue<string | SerializableAttributeValue | RemoveAttribute>;
+    autocomplete?: SignalOrValue<"on" | "off" | RemoveAttribute>;
+    encoding?: SignalOrValue<HTMLFormEncType | RemoveAttribute>;
+    enctype?: SignalOrValue<HTMLFormEncType | RemoveAttribute>;
+    method?: SignalOrValue<HTMLFormMethod | RemoveAttribute>;
+    name?: SignalOrValue<string | RemoveAttribute>;
+    novalidate?: SignalOrValue<BooleanAttribute | RemoveAttribute>;
+    rel?: SignalOrValue<string | RemoveAttribute>;
+    target?: SignalOrValue<"_self" | "_blank" | "_parent" | "_top" | (string & {}) | RemoveAttribute>;
 
     /** @deprecated */
-    accept?: FunctionMaybe<string | RemoveAttribute>;
+    accept?: SignalOrValue<string | RemoveAttribute>;
 }
 interface IframeHTMLAttributes<T> extends HTMLAttributes<T> {
-    allow?: FunctionMaybe<string | RemoveAttribute>;
-    allowfullscreen?: FunctionMaybe<BooleanAttribute | RemoveAttribute>;
-    height?: FunctionMaybe<number | string | RemoveAttribute>;
-    loading?: FunctionMaybe<"eager" | "lazy" | RemoveAttribute>;
-    name?: FunctionMaybe<string | RemoveAttribute>;
-    referrerpolicy?: FunctionMaybe<HTMLReferrerPolicy | RemoveAttribute>;
-    sandbox?: FunctionMaybe<HTMLIframeSandbox | string | RemoveAttribute>;
-    src?: FunctionMaybe<string | RemoveAttribute>;
-    srcdoc?: FunctionMaybe<string | RemoveAttribute>;
-    width?: FunctionMaybe<number | string | RemoveAttribute>;
+    allow?: SignalOrValue<string | RemoveAttribute>;
+    allowfullscreen?: SignalOrValue<BooleanAttribute | RemoveAttribute>;
+    height?: SignalOrValue<number | string | RemoveAttribute>;
+    loading?: SignalOrValue<"eager" | "lazy" | RemoveAttribute>;
+    name?: SignalOrValue<string | RemoveAttribute>;
+    referrerpolicy?: SignalOrValue<HTMLReferrerPolicy | RemoveAttribute>;
+    sandbox?: SignalOrValue<HTMLIframeSandbox | string | RemoveAttribute>;
+    src?: SignalOrValue<string | RemoveAttribute>;
+    srcdoc?: SignalOrValue<string | RemoveAttribute>;
+    width?: SignalOrValue<number | string | RemoveAttribute>;
 
     /** @experimental */
-    adauctionheaders?: FunctionMaybe<BooleanAttribute | RemoveAttribute>;
+    adauctionheaders?: SignalOrValue<BooleanAttribute | RemoveAttribute>;
     /**
      * @non-standard
      * @experimental
      */
-    browsingtopics?: FunctionMaybe<BooleanAttribute | RemoveAttribute>;
+    browsingtopics?: SignalOrValue<BooleanAttribute | RemoveAttribute>;
     /** @experimental */
-    credentialless?: FunctionMaybe<BooleanAttribute | RemoveAttribute>;
+    credentialless?: SignalOrValue<BooleanAttribute | RemoveAttribute>;
     /** @experimental */
-    csp?: FunctionMaybe<string | RemoveAttribute>;
+    csp?: SignalOrValue<string | RemoveAttribute>;
     /** @experimental */
-    privatetoken?: FunctionMaybe<string | RemoveAttribute>;
+    privatetoken?: SignalOrValue<string | RemoveAttribute>;
     /** @experimental */
-    sharedstoragewritable?: FunctionMaybe<BooleanAttribute | RemoveAttribute>;
+    sharedstoragewritable?: SignalOrValue<BooleanAttribute | RemoveAttribute>;
 
     /** @deprecated */
-    align?: FunctionMaybe<string | RemoveAttribute>;
-    /**
-     * @deprecated
-     * @non-standard
-     */
-    allowpaymentrequest?: FunctionMaybe<BooleanAttribute | RemoveAttribute>;
+    align?: SignalOrValue<string | RemoveAttribute>;
+    /**@deprecated @non-standard*/
+    allowpaymentrequest?: SignalOrValue<BooleanAttribute | RemoveAttribute>;
     /** @deprecated */
-    allowtransparency?: FunctionMaybe<BooleanAttribute | RemoveAttribute>;
+    allowtransparency?: SignalOrValue<BooleanAttribute | RemoveAttribute>;
     /** @deprecated */
-    frameborder?: FunctionMaybe<number | string | RemoveAttribute>;
+    frameborder?: SignalOrValue<number | string | RemoveAttribute>;
     /** @deprecated */
-    longdesc?: FunctionMaybe<string | RemoveAttribute>;
+    longdesc?: SignalOrValue<string | RemoveAttribute>;
     /** @deprecated */
-    marginheight?: FunctionMaybe<number | string | RemoveAttribute>;
+    marginheight?: SignalOrValue<number | string | RemoveAttribute>;
     /** @deprecated */
-    marginwidth?: FunctionMaybe<number | string | RemoveAttribute>;
+    marginwidth?: SignalOrValue<number | string | RemoveAttribute>;
     /** @deprecated */
-    scrolling?: FunctionMaybe<"yes" | "no" | "auto" | RemoveAttribute>;
+    scrolling?: SignalOrValue<"yes" | "no" | "auto" | RemoveAttribute>;
     /** @deprecated */
-    seamless?: FunctionMaybe<BooleanAttribute | RemoveAttribute>;
+    seamless?: SignalOrValue<BooleanAttribute | RemoveAttribute>;
 }
 interface ImgHTMLAttributes<T> extends HTMLAttributes<T> {
-    alt?: FunctionMaybe<string | RemoveAttribute>;
-    browsingtopics?: FunctionMaybe<string | RemoveAttribute>;
-    crossorigin?: FunctionMaybe<HTMLCrossorigin | RemoveAttribute>;
-    decoding?: FunctionMaybe<"sync" | "async" | "auto" | RemoveAttribute>;
-    fetchpriority?: FunctionMaybe<"high" | "low" | "auto" | RemoveAttribute>;
-    height?: FunctionMaybe<number | string | RemoveAttribute>;
-    ismap?: FunctionMaybe<BooleanAttribute | RemoveAttribute>;
-    loading?: FunctionMaybe<"eager" | "lazy" | RemoveAttribute>;
-    referrerpolicy?: FunctionMaybe<HTMLReferrerPolicy | RemoveAttribute>;
-    sizes?: FunctionMaybe<string | RemoveAttribute>;
-    src?: FunctionMaybe<string | RemoveAttribute>;
-    srcset?: FunctionMaybe<string | RemoveAttribute>;
-    usemap?: FunctionMaybe<string | RemoveAttribute>;
-    width?: FunctionMaybe<number | string | RemoveAttribute>;
+    alt?: SignalOrValue<string | RemoveAttribute>;
+    browsingtopics?: SignalOrValue<string | RemoveAttribute>;
+    crossorigin?: SignalOrValue<HTMLCrossorigin | RemoveAttribute>;
+    decoding?: SignalOrValue<"sync" | "async" | "auto" | RemoveAttribute>;
+    fetchpriority?: SignalOrValue<"high" | "low" | "auto" | RemoveAttribute>;
+    height?: SignalOrValue<number | string | RemoveAttribute>;
+    ismap?: SignalOrValue<BooleanAttribute | RemoveAttribute>;
+    loading?: SignalOrValue<"eager" | "lazy" | RemoveAttribute>;
+    referrerpolicy?: SignalOrValue<HTMLReferrerPolicy | RemoveAttribute>;
+    sizes?: SignalOrValue<string | RemoveAttribute>;
+    src?: SignalOrValue<string | RemoveAttribute>;
+    srcset?: SignalOrValue<string | RemoveAttribute>;
+    usemap?: SignalOrValue<string | RemoveAttribute>;
+    width?: SignalOrValue<number | string | RemoveAttribute>;
 
     /** @experimental */
-    attributionsrc?: FunctionMaybe<string | RemoveAttribute>;
+    attributionsrc?: SignalOrValue<string | RemoveAttribute>;
     /** @experimental */
-    sharedstoragewritable?: FunctionMaybe<BooleanAttribute | RemoveAttribute>;
+    sharedstoragewritable?: SignalOrValue<BooleanAttribute | RemoveAttribute>;
 
     /** @deprecated */
-    align?: FunctionMaybe<"top" | "middle" | "bottom" | "left" | "right" | RemoveAttribute>;
+    align?: SignalOrValue<"top" | "middle" | "bottom" | "left" | "right" | RemoveAttribute>;
     /** @deprecated */
-    border?: FunctionMaybe<string | RemoveAttribute>;
+    border?: SignalOrValue<string | RemoveAttribute>;
     /** @deprecated */
-    hspace?: FunctionMaybe<number | string | RemoveAttribute>;
+    hspace?: SignalOrValue<number | string | RemoveAttribute>;
     /** @deprecated */
-    intrinsicsize?: FunctionMaybe<string | RemoveAttribute>;
+    intrinsicsize?: SignalOrValue<string | RemoveAttribute>;
     /** @deprecated */
-    longdesc?: FunctionMaybe<string | RemoveAttribute>;
+    longdesc?: SignalOrValue<string | RemoveAttribute>;
     /** @deprecated */
-    lowsrc?: FunctionMaybe<string | RemoveAttribute>;
+    lowsrc?: SignalOrValue<string | RemoveAttribute>;
     /** @deprecated */
-    name?: FunctionMaybe<string | RemoveAttribute>;
+    name?: SignalOrValue<string | RemoveAttribute>;
     /** @deprecated */
-    vspace?: FunctionMaybe<number | string | RemoveAttribute>;
+    vspace?: SignalOrValue<number | string | RemoveAttribute>;
 }
 interface InputHTMLAttributes<T> extends HTMLAttributes<T> {
-    accept?: FunctionMaybe<string | RemoveAttribute>;
-    alpha?: FunctionMaybe<BooleanAttribute | RemoveAttribute>;
-    alt?: FunctionMaybe<string | RemoveAttribute>;
-    autocomplete?: FunctionMaybe<HTMLAutocomplete | RemoveAttribute>;
-    capture?: FunctionMaybe<"user" | "environment" | RemoveAttribute>;
-    checked?: FunctionMaybe<BooleanAttribute | RemoveAttribute>;
-    colorspace?: FunctionMaybe<string | RemoveAttribute>;
-    dirname?: FunctionMaybe<string | RemoveAttribute>;
-    disabled?: FunctionMaybe<BooleanAttribute | RemoveAttribute>;
-    form?: FunctionMaybe<string | RemoveAttribute>;
-    formaction?: FunctionMaybe<string | SerializableAttributeValue | RemoveAttribute>;
-    formenctype?: FunctionMaybe<HTMLFormEncType | RemoveAttribute>;
-    formmethod?: FunctionMaybe<HTMLFormMethod | RemoveAttribute>;
-    formnovalidate?: FunctionMaybe<BooleanAttribute | RemoveAttribute>;
-    formtarget?: FunctionMaybe<string | RemoveAttribute>;
-    height?: FunctionMaybe<number | string | RemoveAttribute>;
-    list?: FunctionMaybe<string | RemoveAttribute>;
-    max?: FunctionMaybe<number | string | RemoveAttribute>;
-    maxlength?: FunctionMaybe<number | string | RemoveAttribute>;
-    min?: FunctionMaybe<number | string | RemoveAttribute>;
-    minlength?: FunctionMaybe<number | string | RemoveAttribute>;
-    multiple?: FunctionMaybe<BooleanAttribute | RemoveAttribute>;
-    name?: FunctionMaybe<string | RemoveAttribute>;
-    pattern?: FunctionMaybe<string | RemoveAttribute>;
-    placeholder?: FunctionMaybe<string | RemoveAttribute>;
-    popovertarget?: FunctionMaybe<string | RemoveAttribute>;
-    popovertargetaction?: FunctionMaybe<"hide" | "show" | "toggle" | RemoveAttribute>;
-    readonly?: FunctionMaybe<BooleanAttribute | RemoveAttribute>;
-    required?: FunctionMaybe<BooleanAttribute | RemoveAttribute>;
+    accept?: SignalOrValue<string | RemoveAttribute>;
+    alpha?: SignalOrValue<BooleanAttribute | RemoveAttribute>;
+    alt?: SignalOrValue<string | RemoveAttribute>;
+    autocomplete?: SignalOrValue<HTMLAutocomplete | RemoveAttribute>;
+    capture?: SignalOrValue<"user" | "environment" | RemoveAttribute>;
+    checked?: SignalOrValue<BooleanAttribute | RemoveAttribute>;
+    colorspace?: SignalOrValue<string | RemoveAttribute>;
+    dirname?: SignalOrValue<string | RemoveAttribute>;
+    disabled?: SignalOrValue<BooleanAttribute | RemoveAttribute>;
+    form?: SignalOrValue<string | RemoveAttribute>;
+    formaction?: SignalOrValue<string | SerializableAttributeValue | RemoveAttribute>;
+    formenctype?: SignalOrValue<HTMLFormEncType | RemoveAttribute>;
+    formmethod?: SignalOrValue<HTMLFormMethod | RemoveAttribute>;
+    formnovalidate?: SignalOrValue<BooleanAttribute | RemoveAttribute>;
+    formtarget?: SignalOrValue<string | RemoveAttribute>;
+    height?: SignalOrValue<number | string | RemoveAttribute>;
+    list?: SignalOrValue<string | RemoveAttribute>;
+    max?: SignalOrValue<number | string | RemoveAttribute>;
+    maxlength?: SignalOrValue<number | string | RemoveAttribute>;
+    min?: SignalOrValue<number | string | RemoveAttribute>;
+    minlength?: SignalOrValue<number | string | RemoveAttribute>;
+    multiple?: SignalOrValue<BooleanAttribute | RemoveAttribute>;
+    name?: SignalOrValue<string | RemoveAttribute>;
+    pattern?: SignalOrValue<string | RemoveAttribute>;
+    placeholder?: SignalOrValue<string | RemoveAttribute>;
+    popovertarget?: SignalOrValue<string | RemoveAttribute>;
+    popovertargetaction?: SignalOrValue<"hide" | "show" | "toggle" | RemoveAttribute>;
+    readonly?: SignalOrValue<BooleanAttribute | RemoveAttribute>;
+    required?: SignalOrValue<BooleanAttribute | RemoveAttribute>;
     // https://developer.mozilla.org/en-US/docs/Web/HTML/Element/input/search#results
-    results?: FunctionMaybe<number | RemoveAttribute>;
-    size?: FunctionMaybe<number | string | RemoveAttribute>;
-    src?: FunctionMaybe<string | RemoveAttribute>;
-    step?: FunctionMaybe<number | string | RemoveAttribute>;
-    type?: FunctionMaybe<
-        | "button"
-        | "checkbox"
-        | "color"
-        | "date"
-        | "datetime-local"
-        | "email"
-        | "file"
-        | "hidden"
-        | "image"
-        | "month"
-        | "number"
-        | "password"
-        | "radio"
-        | "range"
-        | "reset"
-        | "search"
-        | "submit"
-        | "tel"
-        | "text"
-        | "time"
-        | "url"
-        | "week"
-        | (string & {})
-        | RemoveAttribute
-    >;
-    value?: FunctionMaybe<string | string[] | number | RemoveAttribute>;
-    width?: FunctionMaybe<number | string | RemoveAttribute>;
+    results?: SignalOrValue<number | RemoveAttribute>;
+    size?: SignalOrValue<number | string | RemoveAttribute>;
+    src?: SignalOrValue<string | RemoveAttribute>;
+    step?: SignalOrValue<number | string | RemoveAttribute>;
+    type?: SignalOrValue<"button" | "checkbox" | "color" | "date" | "datetime-local" | "email" | "file" | "hidden" | "image" | "month" | "number" | "password" | "radio" | "range" | "reset" | "search" | "submit" | "tel" | "text" | "time" | "url" | "week" | (string & {}) | RemoveAttribute>;
+    value?: SignalOrValue<string | string[] | number | RemoveAttribute>;
+    width?: SignalOrValue<number | string | RemoveAttribute>;
 
     /** @non-standard */
-    incremental?: FunctionMaybe<BooleanAttribute | RemoveAttribute>;
+    incremental?: SignalOrValue<BooleanAttribute | RemoveAttribute>;
 
     /** @deprecated */
-    align?: FunctionMaybe<string | RemoveAttribute>;
+    align?: SignalOrValue<string | RemoveAttribute>;
     /** @deprecated */
-    usemap?: FunctionMaybe<string | RemoveAttribute>;
+    usemap?: SignalOrValue<string | RemoveAttribute>;
 }
 interface ModHTMLAttributes<T> extends HTMLAttributes<T> {
-    cite?: FunctionMaybe<string | RemoveAttribute>;
-    datetime?: FunctionMaybe<string | RemoveAttribute>;
+    cite?: SignalOrValue<string | RemoveAttribute>;
+    datetime?: SignalOrValue<string | RemoveAttribute>;
 }
 interface KeygenHTMLAttributes<T> extends HTMLAttributes<T> {
     /** @deprecated */
-    challenge?: FunctionMaybe<string | RemoveAttribute>;
+    challenge?: SignalOrValue<string | RemoveAttribute>;
     /** @deprecated */
-    disabled?: FunctionMaybe<BooleanAttribute | RemoveAttribute>;
+    disabled?: SignalOrValue<BooleanAttribute | RemoveAttribute>;
     /** @deprecated */
-    form?: FunctionMaybe<string | RemoveAttribute>;
+    form?: SignalOrValue<string | RemoveAttribute>;
     /** @deprecated */
-    keyparams?: FunctionMaybe<string | RemoveAttribute>;
+    keyparams?: SignalOrValue<string | RemoveAttribute>;
     /** @deprecated */
-    keytype?: FunctionMaybe<string | RemoveAttribute>;
+    keytype?: SignalOrValue<string | RemoveAttribute>;
     /** @deprecated */
-    name?: FunctionMaybe<string | RemoveAttribute>;
+    name?: SignalOrValue<string | RemoveAttribute>;
 }
 interface LabelHTMLAttributes<T> extends HTMLAttributes<T> {
-    for?: FunctionMaybe<string | RemoveAttribute>;
+    for?: SignalOrValue<string | RemoveAttribute>;
 }
 interface LiHTMLAttributes<T> extends HTMLAttributes<T> {
-    value?: FunctionMaybe<number | string | RemoveAttribute>;
+    value?: SignalOrValue<number | string | RemoveAttribute>;
 
     /** @deprecated */
-    type?: FunctionMaybe<"1" | "a" | "A" | "i" | "I" | RemoveAttribute>;
+    type?: SignalOrValue<"1" | "a" | "A" | "i" | "I" | RemoveAttribute>;
 }
 interface LinkHTMLAttributes<T> extends HTMLAttributes<T> {
-    as?: FunctionMaybe<HTMLLinkAs | RemoveAttribute>;
-    blocking?: FunctionMaybe<"render" | RemoveAttribute>;
-    color?: FunctionMaybe<string | RemoveAttribute>;
-    crossorigin?: FunctionMaybe<HTMLCrossorigin | RemoveAttribute>;
-    disabled?: FunctionMaybe<BooleanAttribute | RemoveAttribute>;
-    fetchpriority?: FunctionMaybe<"high" | "low" | "auto" | RemoveAttribute>;
-    href?: FunctionMaybe<string | RemoveAttribute>;
-    hreflang?: FunctionMaybe<string | RemoveAttribute>;
-    imagesizes?: FunctionMaybe<string | RemoveAttribute>;
-    imagesrcset?: FunctionMaybe<string | RemoveAttribute>;
-    integrity?: FunctionMaybe<string | RemoveAttribute>;
-    media?: FunctionMaybe<string | RemoveAttribute>;
-    referrerpolicy?: FunctionMaybe<HTMLReferrerPolicy | RemoveAttribute>;
-    rel?: FunctionMaybe<string | RemoveAttribute>;
-    sizes?: FunctionMaybe<string | RemoveAttribute>;
-    type?: FunctionMaybe<string | RemoveAttribute>;
+    as?: SignalOrValue<HTMLLinkAs | RemoveAttribute>;
+    blocking?: SignalOrValue<"render" | RemoveAttribute>;
+    color?: SignalOrValue<string | RemoveAttribute>;
+    crossorigin?: SignalOrValue<HTMLCrossorigin | RemoveAttribute>;
+    disabled?: SignalOrValue<BooleanAttribute | RemoveAttribute>;
+    fetchpriority?: SignalOrValue<"high" | "low" | "auto" | RemoveAttribute>;
+    href?: SignalOrValue<string | RemoveAttribute>;
+    hreflang?: SignalOrValue<string | RemoveAttribute>;
+    imagesizes?: SignalOrValue<string | RemoveAttribute>;
+    imagesrcset?: SignalOrValue<string | RemoveAttribute>;
+    integrity?: SignalOrValue<string | RemoveAttribute>;
+    media?: SignalOrValue<string | RemoveAttribute>;
+    referrerpolicy?: SignalOrValue<HTMLReferrerPolicy | RemoveAttribute>;
+    rel?: SignalOrValue<string | RemoveAttribute>;
+    sizes?: SignalOrValue<string | RemoveAttribute>;
+    type?: SignalOrValue<string | RemoveAttribute>;
 
     /** @deprecated */
-    charset?: FunctionMaybe<string | RemoveAttribute>;
+    charset?: SignalOrValue<string | RemoveAttribute>;
     /** @deprecated */
-    rev?: FunctionMaybe<string | RemoveAttribute>;
+    rev?: SignalOrValue<string | RemoveAttribute>;
     /** @deprecated */
-    target?: FunctionMaybe<string | RemoveAttribute>;
+    target?: SignalOrValue<string | RemoveAttribute>;
 }
 interface MapHTMLAttributes<T> extends HTMLAttributes<T> {
-    name?: FunctionMaybe<string | RemoveAttribute>;
+    name?: SignalOrValue<string | RemoveAttribute>;
 }
 interface MediaHTMLAttributes<T> extends HTMLAttributes<T> {
-    autoplay?: FunctionMaybe<BooleanAttribute | RemoveAttribute>;
-    controls?: FunctionMaybe<BooleanAttribute | RemoveAttribute>;
-    controlslist?: FunctionMaybe<
-        | "nodownload"
-        | "nofullscreen"
-        | "noplaybackrate"
-        | "noremoteplayback"
-        | (string & {})
-        | RemoveAttribute
-    >;
-    crossorigin?: FunctionMaybe<HTMLCrossorigin | RemoveAttribute>;
-    disableremoteplayback?: FunctionMaybe<BooleanAttribute | RemoveAttribute>;
-    loop?: FunctionMaybe<BooleanAttribute | RemoveAttribute>;
-    muted?: FunctionMaybe<BooleanAttribute | RemoveAttribute>;
-    preload?: FunctionMaybe<
-        "none" | "metadata" | "auto" | EnumeratedAcceptsEmpty | RemoveAttribute
-    >;
-    src?: FunctionMaybe<string | RemoveAttribute>;
+    autoplay?: SignalOrValue<BooleanAttribute | RemoveAttribute>;
+    controls?: SignalOrValue<BooleanAttribute | RemoveAttribute>;
+    controlslist?: SignalOrValue<"nodownload" | "nofullscreen" | "noplaybackrate" | "noremoteplayback" | (string & {}) | RemoveAttribute>;
+    crossorigin?: SignalOrValue<HTMLCrossorigin | RemoveAttribute>;
+    disableremoteplayback?: SignalOrValue<BooleanAttribute | RemoveAttribute>;
+    loop?: SignalOrValue<BooleanAttribute | RemoveAttribute>;
+    muted?: SignalOrValue<BooleanAttribute | RemoveAttribute>;
+    preload?: SignalOrValue<"none" | "metadata" | "auto" | EnumeratedAcceptsEmpty | RemoveAttribute>;
+    src?: SignalOrValue<string | RemoveAttribute>;
 
     onEncrypted?: EventHandlerUnion<T, MediaEncryptedEvent> | undefined;
     // "on:encrypted"?: EventHandlerWithOptionsUnion<T, MediaEncryptedEvent> | undefined;
@@ -1458,288 +1027,264 @@ interface MediaHTMLAttributes<T> extends HTMLAttributes<T> {
     // "on:waitingforkey"?: EventHandlerWithOptionsUnion<T, Event> | undefined;
 
     /** @deprecated */
-    mediagroup?: FunctionMaybe<string | RemoveAttribute>;
+    mediagroup?: SignalOrValue<string | RemoveAttribute>;
 }
 interface MenuHTMLAttributes<T> extends HTMLAttributes<T> {
     /** @deprecated */
-    compact?: FunctionMaybe<BooleanAttribute | RemoveAttribute>;
+    compact?: SignalOrValue<BooleanAttribute | RemoveAttribute>;
     /** @deprecated */
-    label?: FunctionMaybe<string | RemoveAttribute>;
+    label?: SignalOrValue<string | RemoveAttribute>;
     /** @deprecated */
-    type?: FunctionMaybe<"context" | "toolbar" | RemoveAttribute>;
+    type?: SignalOrValue<"context" | "toolbar" | RemoveAttribute>;
 }
 interface MetaHTMLAttributes<T> extends HTMLAttributes<T> {
-    "http-equiv"?: FunctionMaybe<
-        | "content-security-policy"
-        | "content-type"
-        | "default-style"
-        | "x-ua-compatible"
-        | "refresh"
-        | RemoveAttribute
-    >;
-    charset?: FunctionMaybe<string | RemoveAttribute>;
-    content?: FunctionMaybe<string | RemoveAttribute>;
-    media?: FunctionMaybe<string | RemoveAttribute>;
-    name?: FunctionMaybe<string | RemoveAttribute>;
+    "http-equiv"?: SignalOrValue<"content-security-policy" | "content-type" | "default-style" | "x-ua-compatible" | "refresh" | RemoveAttribute>;
+    charset?: SignalOrValue<string | RemoveAttribute>;
+    content?: SignalOrValue<string | RemoveAttribute>;
+    media?: SignalOrValue<string | RemoveAttribute>;
+    name?: SignalOrValue<string | RemoveAttribute>;
 
     /** @deprecated */
-    scheme?: FunctionMaybe<string | RemoveAttribute>;
+    scheme?: SignalOrValue<string | RemoveAttribute>;
 }
 interface MeterHTMLAttributes<T> extends HTMLAttributes<T> {
-    form?: FunctionMaybe<string | RemoveAttribute>;
-    high?: FunctionMaybe<number | string | RemoveAttribute>;
-    low?: FunctionMaybe<number | string | RemoveAttribute>;
-    max?: FunctionMaybe<number | string | RemoveAttribute>;
-    min?: FunctionMaybe<number | string | RemoveAttribute>;
-    optimum?: FunctionMaybe<number | string | RemoveAttribute>;
-    value?: FunctionMaybe<string | string[] | number | RemoveAttribute>;
+    form?: SignalOrValue<string | RemoveAttribute>;
+    high?: SignalOrValue<number | string | RemoveAttribute>;
+    low?: SignalOrValue<number | string | RemoveAttribute>;
+    max?: SignalOrValue<number | string | RemoveAttribute>;
+    min?: SignalOrValue<number | string | RemoveAttribute>;
+    optimum?: SignalOrValue<number | string | RemoveAttribute>;
+    value?: SignalOrValue<string | string[] | number | RemoveAttribute>;
 }
 interface QuoteHTMLAttributes<T> extends HTMLAttributes<T> {
-    cite?: FunctionMaybe<string | RemoveAttribute>;
+    cite?: SignalOrValue<string | RemoveAttribute>;
 }
 interface ObjectHTMLAttributes<T> extends HTMLAttributes<T> {
-    data?: FunctionMaybe<string | RemoveAttribute>;
-    form?: FunctionMaybe<string | RemoveAttribute>;
-    height?: FunctionMaybe<number | string | RemoveAttribute>;
-    name?: FunctionMaybe<string | RemoveAttribute>;
-    type?: FunctionMaybe<string | RemoveAttribute>;
-    width?: FunctionMaybe<number | string | RemoveAttribute>;
-    wmode?: FunctionMaybe<string | RemoveAttribute>;
+    data?: SignalOrValue<string | RemoveAttribute>;
+    form?: SignalOrValue<string | RemoveAttribute>;
+    height?: SignalOrValue<number | string | RemoveAttribute>;
+    name?: SignalOrValue<string | RemoveAttribute>;
+    type?: SignalOrValue<string | RemoveAttribute>;
+    width?: SignalOrValue<number | string | RemoveAttribute>;
+    wmode?: SignalOrValue<string | RemoveAttribute>;
 
     /** @deprecated */
-    align?: FunctionMaybe<string | RemoveAttribute>;
+    align?: SignalOrValue<string | RemoveAttribute>;
     /** @deprecated */
-    archive?: FunctionMaybe<string | RemoveAttribute>;
+    archive?: SignalOrValue<string | RemoveAttribute>;
     /** @deprecated */
-    border?: FunctionMaybe<string | RemoveAttribute>;
+    border?: SignalOrValue<string | RemoveAttribute>;
     /** @deprecated */
-    classid?: FunctionMaybe<string | RemoveAttribute>;
+    classid?: SignalOrValue<string | RemoveAttribute>;
     /** @deprecated */
-    code?: FunctionMaybe<string | RemoveAttribute>;
+    code?: SignalOrValue<string | RemoveAttribute>;
     /** @deprecated */
-    codebase?: FunctionMaybe<string | RemoveAttribute>;
+    codebase?: SignalOrValue<string | RemoveAttribute>;
     /** @deprecated */
-    codetype?: FunctionMaybe<string | RemoveAttribute>;
+    codetype?: SignalOrValue<string | RemoveAttribute>;
     /** @deprecated */
-    declare?: FunctionMaybe<BooleanAttribute | RemoveAttribute>;
+    declare?: SignalOrValue<BooleanAttribute | RemoveAttribute>;
     /** @deprecated */
-    hspace?: FunctionMaybe<number | string | RemoveAttribute>;
+    hspace?: SignalOrValue<number | string | RemoveAttribute>;
     /** @deprecated */
-    standby?: FunctionMaybe<string | RemoveAttribute>;
+    standby?: SignalOrValue<string | RemoveAttribute>;
     /** @deprecated */
-    usemap?: FunctionMaybe<string | RemoveAttribute>;
+    usemap?: SignalOrValue<string | RemoveAttribute>;
     /** @deprecated */
-    vspace?: FunctionMaybe<number | string | RemoveAttribute>;
+    vspace?: SignalOrValue<number | string | RemoveAttribute>;
     /** @deprecated */
-    typemustmatch?: FunctionMaybe<BooleanAttribute | RemoveAttribute>;
+    typemustmatch?: SignalOrValue<BooleanAttribute | RemoveAttribute>;
 }
 interface OlHTMLAttributes<T> extends HTMLAttributes<T> {
-    reversed?: FunctionMaybe<BooleanAttribute | RemoveAttribute>;
-    start?: FunctionMaybe<number | string | RemoveAttribute>;
-    type?: FunctionMaybe<"1" | "a" | "A" | "i" | "I" | RemoveAttribute>;
+    reversed?: SignalOrValue<BooleanAttribute | RemoveAttribute>;
+    start?: SignalOrValue<number | string | RemoveAttribute>;
+    type?: SignalOrValue<"1" | "a" | "A" | "i" | "I" | RemoveAttribute>;
 
-    /**
-     * @deprecated
-     * @non-standard
-     */
-    compact?: FunctionMaybe<BooleanAttribute | RemoveAttribute>;
+    /**@deprecated @non-standard*/
+    compact?: SignalOrValue<BooleanAttribute | RemoveAttribute>;
 }
 interface OptgroupHTMLAttributes<T> extends HTMLAttributes<T> {
-    disabled?: FunctionMaybe<BooleanAttribute | RemoveAttribute>;
-    label?: FunctionMaybe<string | RemoveAttribute>;
+    disabled?: SignalOrValue<BooleanAttribute | RemoveAttribute>;
+    label?: SignalOrValue<string | RemoveAttribute>;
 }
 interface OptionHTMLAttributes<T> extends HTMLAttributes<T> {
-    disabled?: FunctionMaybe<BooleanAttribute | RemoveAttribute>;
-    label?: FunctionMaybe<string | RemoveAttribute>;
-    selected?: FunctionMaybe<BooleanAttribute | RemoveAttribute>;
-    value?: FunctionMaybe<string | string[] | number | RemoveAttribute>;
+    disabled?: SignalOrValue<BooleanAttribute | RemoveAttribute>;
+    label?: SignalOrValue<string | RemoveAttribute>;
+    selected?: SignalOrValue<BooleanAttribute | RemoveAttribute>;
+    value?: SignalOrValue<string | string[] | number | RemoveAttribute>;
 }
 interface OutputHTMLAttributes<T> extends HTMLAttributes<T> {
-    for?: FunctionMaybe<string | RemoveAttribute>;
-    form?: FunctionMaybe<string | RemoveAttribute>;
-    name?: FunctionMaybe<string | RemoveAttribute>;
+    for?: SignalOrValue<string | RemoveAttribute>;
+    form?: SignalOrValue<string | RemoveAttribute>;
+    name?: SignalOrValue<string | RemoveAttribute>;
 }
 interface ParamHTMLAttributes<T> extends HTMLAttributes<T> {
     /** @deprecated */
-    name?: FunctionMaybe<string | RemoveAttribute>;
+    name?: SignalOrValue<string | RemoveAttribute>;
     /** @deprecated */
-    type?: FunctionMaybe<string | RemoveAttribute>;
+    type?: SignalOrValue<string | RemoveAttribute>;
     /** @deprecated */
-    value?: FunctionMaybe<string | number | RemoveAttribute>;
+    value?: SignalOrValue<string | number | RemoveAttribute>;
     /** @deprecated */
-    valuetype?: FunctionMaybe<"data" | "ref" | "object" | RemoveAttribute>;
+    valuetype?: SignalOrValue<"data" | "ref" | "object" | RemoveAttribute>;
 }
 interface ProgressHTMLAttributes<T> extends HTMLAttributes<T> {
-    max?: FunctionMaybe<number | string | RemoveAttribute>;
-    value?: FunctionMaybe<string | string[] | number | RemoveAttribute>;
+    max?: SignalOrValue<number | string | RemoveAttribute>;
+    value?: SignalOrValue<string | string[] | number | RemoveAttribute>;
 }
 interface ScriptHTMLAttributes<T> extends HTMLAttributes<T> {
-    async?: FunctionMaybe<BooleanAttribute | RemoveAttribute>;
-    blocking?: FunctionMaybe<"render" | RemoveAttribute>;
-    crossorigin?: FunctionMaybe<HTMLCrossorigin | RemoveAttribute>;
-    defer?: FunctionMaybe<BooleanAttribute | RemoveAttribute>;
-    fetchpriority?: FunctionMaybe<"high" | "low" | "auto" | RemoveAttribute>;
-    for?: FunctionMaybe<string | RemoveAttribute>;
-    integrity?: FunctionMaybe<string | RemoveAttribute>;
-    nomodule?: FunctionMaybe<BooleanAttribute | RemoveAttribute>;
-    referrerpolicy?: FunctionMaybe<HTMLReferrerPolicy | RemoveAttribute>;
-    src?: FunctionMaybe<string | RemoveAttribute>;
-    type?: FunctionMaybe<
-        "importmap" | "module" | "speculationrules" | (string & {}) | RemoveAttribute
-    >;
+    async?: SignalOrValue<BooleanAttribute | RemoveAttribute>;
+    blocking?: SignalOrValue<"render" | RemoveAttribute>;
+    crossorigin?: SignalOrValue<HTMLCrossorigin | RemoveAttribute>;
+    defer?: SignalOrValue<BooleanAttribute | RemoveAttribute>;
+    fetchpriority?: SignalOrValue<"high" | "low" | "auto" | RemoveAttribute>;
+    for?: SignalOrValue<string | RemoveAttribute>;
+    integrity?: SignalOrValue<string | RemoveAttribute>;
+    nomodule?: SignalOrValue<BooleanAttribute | RemoveAttribute>;
+    referrerpolicy?: SignalOrValue<HTMLReferrerPolicy | RemoveAttribute>;
+    src?: SignalOrValue<string | RemoveAttribute>;
+    type?: SignalOrValue<"importmap" | "module" | "speculationrules" | (string & {}) | RemoveAttribute>;
 
     /** @experimental */
-    attributionsrc?: FunctionMaybe<string | RemoveAttribute>;
+    attributionsrc?: SignalOrValue<string | RemoveAttribute>;
 
     /** @deprecated */
-    charset?: FunctionMaybe<string | RemoveAttribute>;
+    charset?: SignalOrValue<string | RemoveAttribute>;
     /** @deprecated */
-    event?: FunctionMaybe<string | RemoveAttribute>;
+    event?: SignalOrValue<string | RemoveAttribute>;
     /** @deprecated */
-    language?: FunctionMaybe<string | RemoveAttribute>;
+    language?: SignalOrValue<string | RemoveAttribute>;
 }
 interface SelectHTMLAttributes<T> extends HTMLAttributes<T> {
-    autocomplete?: FunctionMaybe<HTMLAutocomplete | RemoveAttribute>;
-    disabled?: FunctionMaybe<BooleanAttribute | RemoveAttribute>;
-    form?: FunctionMaybe<string | RemoveAttribute>;
-    multiple?: FunctionMaybe<BooleanAttribute | RemoveAttribute>;
-    name?: FunctionMaybe<string | RemoveAttribute>;
-    required?: FunctionMaybe<BooleanAttribute | RemoveAttribute>;
-    size?: FunctionMaybe<number | string | RemoveAttribute>;
-    value?: FunctionMaybe<string | string[] | number | RemoveAttribute>;
+    autocomplete?: SignalOrValue<HTMLAutocomplete | RemoveAttribute>;
+    disabled?: SignalOrValue<BooleanAttribute | RemoveAttribute>;
+    form?: SignalOrValue<string | RemoveAttribute>;
+    multiple?: SignalOrValue<BooleanAttribute | RemoveAttribute>;
+    name?: SignalOrValue<string | RemoveAttribute>;
+    required?: SignalOrValue<BooleanAttribute | RemoveAttribute>;
+    size?: SignalOrValue<number | string | RemoveAttribute>;
+    value?: SignalOrValue<string | string[] | number | RemoveAttribute>;
 }
 interface HTMLSlotElementAttributes<T> extends HTMLAttributes<T> {
-    name?: FunctionMaybe<string | RemoveAttribute>;
+    name?: SignalOrValue<string | RemoveAttribute>;
 }
 interface SourceHTMLAttributes<T> extends HTMLAttributes<T> {
-    height?: FunctionMaybe<number | string | RemoveAttribute>;
-    media?: FunctionMaybe<string | RemoveAttribute>;
-    sizes?: FunctionMaybe<string | RemoveAttribute>;
-    src?: FunctionMaybe<string | RemoveAttribute>;
-    srcset?: FunctionMaybe<string | RemoveAttribute>;
-    type?: FunctionMaybe<string | RemoveAttribute>;
-    width?: FunctionMaybe<number | string | RemoveAttribute>;
+    height?: SignalOrValue<number | string | RemoveAttribute>;
+    media?: SignalOrValue<string | RemoveAttribute>;
+    sizes?: SignalOrValue<string | RemoveAttribute>;
+    src?: SignalOrValue<string | RemoveAttribute>;
+    srcset?: SignalOrValue<string | RemoveAttribute>;
+    type?: SignalOrValue<string | RemoveAttribute>;
+    width?: SignalOrValue<number | string | RemoveAttribute>;
 }
 interface StyleHTMLAttributes<T> extends HTMLAttributes<T> {
-    blocking?: FunctionMaybe<"render" | RemoveAttribute>;
-    media?: FunctionMaybe<string | RemoveAttribute>;
+    blocking?: SignalOrValue<"render" | RemoveAttribute>;
+    media?: SignalOrValue<string | RemoveAttribute>;
 
     /** @deprecated */
-    scoped?: FunctionMaybe<BooleanAttribute | RemoveAttribute>;
+    scoped?: SignalOrValue<BooleanAttribute | RemoveAttribute>;
     /** @deprecated */
-    type?: FunctionMaybe<string | RemoveAttribute>;
+    type?: SignalOrValue<string | RemoveAttribute>;
 }
 interface TdHTMLAttributes<T> extends HTMLAttributes<T> {
-    colspan?: FunctionMaybe<number | string | RemoveAttribute>;
-    headers?: FunctionMaybe<string | RemoveAttribute>;
-    rowspan?: FunctionMaybe<number | string | RemoveAttribute>;
+    colspan?: SignalOrValue<number | string | RemoveAttribute>;
+    headers?: SignalOrValue<string | RemoveAttribute>;
+    rowspan?: SignalOrValue<number | string | RemoveAttribute>;
 
     /** @deprecated */
-    abbr?: FunctionMaybe<string | RemoveAttribute>;
+    abbr?: SignalOrValue<string | RemoveAttribute>;
     /** @deprecated */
-    align?: FunctionMaybe<"left" | "center" | "right" | "justify" | "char" | RemoveAttribute>;
+    align?: SignalOrValue<"left" | "center" | "right" | "justify" | "char" | RemoveAttribute>;
     /** @deprecated */
-    axis?: FunctionMaybe<string | RemoveAttribute>;
+    axis?: SignalOrValue<string | RemoveAttribute>;
     /** @deprecated */
-    bgcolor?: FunctionMaybe<string | RemoveAttribute>;
+    bgcolor?: SignalOrValue<string | RemoveAttribute>;
     /** @deprecated */
-    char?: FunctionMaybe<string | RemoveAttribute>;
+    char?: SignalOrValue<string | RemoveAttribute>;
     /** @deprecated */
-    charoff?: FunctionMaybe<string | RemoveAttribute>;
+    charoff?: SignalOrValue<string | RemoveAttribute>;
     /** @deprecated */
-    height?: FunctionMaybe<number | string | RemoveAttribute>;
+    height?: SignalOrValue<number | string | RemoveAttribute>;
     /** @deprecated */
-    nowrap?: FunctionMaybe<BooleanAttribute | RemoveAttribute>;
+    nowrap?: SignalOrValue<BooleanAttribute | RemoveAttribute>;
     /** @deprecated */
-    scope?: FunctionMaybe<"col" | "row" | "rowgroup" | "colgroup" | RemoveAttribute>;
+    scope?: SignalOrValue<"col" | "row" | "rowgroup" | "colgroup" | RemoveAttribute>;
     /** @deprecated */
-    valign?: FunctionMaybe<"baseline" | "bottom" | "middle" | "top" | RemoveAttribute>;
+    valign?: SignalOrValue<"baseline" | "bottom" | "middle" | "top" | RemoveAttribute>;
     /** @deprecated */
-    width?: FunctionMaybe<number | string | RemoveAttribute>;
+    width?: SignalOrValue<number | string | RemoveAttribute>;
 }
 interface TemplateHTMLAttributes<T> extends HTMLAttributes<T> {
-    shadowrootclonable?: FunctionMaybe<BooleanAttribute | RemoveAttribute>;
-    shadowrootdelegatesfocus?: FunctionMaybe<BooleanAttribute | RemoveAttribute>;
-    shadowrootmode?: FunctionMaybe<"open" | "closed" | RemoveAttribute>;
-    shadowrootcustomelementregistry?: FunctionMaybe<BooleanAttribute | RemoveAttribute>;
+    shadowrootclonable?: SignalOrValue<BooleanAttribute | RemoveAttribute>;
+    shadowrootdelegatesfocus?: SignalOrValue<BooleanAttribute | RemoveAttribute>;
+    shadowrootmode?: SignalOrValue<"open" | "closed" | RemoveAttribute>;
+    shadowrootcustomelementregistry?: SignalOrValue<BooleanAttribute | RemoveAttribute>;
 
     /** @experimental */
-    shadowrootserializable?: FunctionMaybe<BooleanAttribute | RemoveAttribute>;
+    shadowrootserializable?: SignalOrValue<BooleanAttribute | RemoveAttribute>;
 }
 interface TextareaHTMLAttributes<T> extends HTMLAttributes<T> {
-    autocomplete?: FunctionMaybe<HTMLAutocomplete | RemoveAttribute>;
-    cols?: FunctionMaybe<number | string | RemoveAttribute>;
-    dirname?: FunctionMaybe<string | RemoveAttribute>;
-    disabled?: FunctionMaybe<BooleanAttribute | RemoveAttribute>;
+    autocomplete?: SignalOrValue<HTMLAutocomplete | RemoveAttribute>;
+    cols?: SignalOrValue<number | string | RemoveAttribute>;
+    dirname?: SignalOrValue<string | RemoveAttribute>;
+    disabled?: SignalOrValue<BooleanAttribute | RemoveAttribute>;
 
-    form?: FunctionMaybe<string | RemoveAttribute>;
-    maxlength?: FunctionMaybe<number | string | RemoveAttribute>;
-    minlength?: FunctionMaybe<number | string | RemoveAttribute>;
-    name?: FunctionMaybe<string | RemoveAttribute>;
-    placeholder?: FunctionMaybe<string | RemoveAttribute>;
-    readonly?: FunctionMaybe<BooleanAttribute | RemoveAttribute>;
-    required?: FunctionMaybe<BooleanAttribute | RemoveAttribute>;
-    rows?: FunctionMaybe<number | string | RemoveAttribute>;
-    value?: FunctionMaybe<string | string[] | number | RemoveAttribute>;
-    wrap?: FunctionMaybe<"hard" | "soft" | "off" | RemoveAttribute>;
+    form?: SignalOrValue<string | RemoveAttribute>;
+    maxlength?: SignalOrValue<number | string | RemoveAttribute>;
+    minlength?: SignalOrValue<number | string | RemoveAttribute>;
+    name?: SignalOrValue<string | RemoveAttribute>;
+    placeholder?: SignalOrValue<string | RemoveAttribute>;
+    readonly?: SignalOrValue<BooleanAttribute | RemoveAttribute>;
+    required?: SignalOrValue<BooleanAttribute | RemoveAttribute>;
+    rows?: SignalOrValue<number | string | RemoveAttribute>;
+    value?: SignalOrValue<string | string[] | number | RemoveAttribute>;
+    wrap?: SignalOrValue<"hard" | "soft" | "off" | RemoveAttribute>;
 }
 interface ThHTMLAttributes<T> extends HTMLAttributes<T> {
-    abbr?: FunctionMaybe<string | RemoveAttribute>;
-    colspan?: FunctionMaybe<number | string | RemoveAttribute>;
-    headers?: FunctionMaybe<string | RemoveAttribute>;
-    rowspan?: FunctionMaybe<number | string | RemoveAttribute>;
-    scope?: FunctionMaybe<"col" | "row" | "rowgroup" | "colgroup" | RemoveAttribute>;
+    abbr?: SignalOrValue<string | RemoveAttribute>;
+    colspan?: SignalOrValue<number | string | RemoveAttribute>;
+    headers?: SignalOrValue<string | RemoveAttribute>;
+    rowspan?: SignalOrValue<number | string | RemoveAttribute>;
+    scope?: SignalOrValue<"col" | "row" | "rowgroup" | "colgroup" | RemoveAttribute>;
 
     /** @deprecated */
-    align?: FunctionMaybe<"left" | "center" | "right" | "justify" | "char" | RemoveAttribute>;
+    align?: SignalOrValue<"left" | "center" | "right" | "justify" | "char" | RemoveAttribute>;
     /** @deprecated */
-    axis?: FunctionMaybe<string | RemoveAttribute>;
+    axis?: SignalOrValue<string | RemoveAttribute>;
     /** @deprecated */
-    bgcolor?: FunctionMaybe<string | RemoveAttribute>;
+    bgcolor?: SignalOrValue<string | RemoveAttribute>;
     /** @deprecated */
-    char?: FunctionMaybe<string | RemoveAttribute>;
+    char?: SignalOrValue<string | RemoveAttribute>;
     /** @deprecated */
-    charoff?: FunctionMaybe<string | RemoveAttribute>;
+    charoff?: SignalOrValue<string | RemoveAttribute>;
     /** @deprecated */
-    height?: FunctionMaybe<string | RemoveAttribute>;
+    height?: SignalOrValue<string | RemoveAttribute>;
     /** @deprecated */
-    nowrap?: FunctionMaybe<BooleanAttribute | RemoveAttribute>;
+    nowrap?: SignalOrValue<BooleanAttribute | RemoveAttribute>;
     /** @deprecated */
-    valign?: FunctionMaybe<"baseline" | "bottom" | "middle" | "top" | RemoveAttribute>;
+    valign?: SignalOrValue<"baseline" | "bottom" | "middle" | "top" | RemoveAttribute>;
     /** @deprecated */
-    width?: FunctionMaybe<number | string | RemoveAttribute>;
+    width?: SignalOrValue<number | string | RemoveAttribute>;
 }
 interface TimeHTMLAttributes<T> extends HTMLAttributes<T> {
-    datetime?: FunctionMaybe<string | RemoveAttribute>;
+    datetime?: SignalOrValue<string | RemoveAttribute>;
 }
 interface TrackHTMLAttributes<T> extends HTMLAttributes<T> {
-    default?: FunctionMaybe<BooleanAttribute | RemoveAttribute>;
-    kind?: FunctionMaybe<
-        | "alternative"
-        | "descriptions"
-        | "main"
-        | "main-desc"
-        | "translation"
-        | "commentary"
-        | "subtitles"
-        | "captions"
-        | "chapters"
-        | "metadata"
-        | RemoveAttribute
-    >;
-    label?: FunctionMaybe<string | RemoveAttribute>;
-    src?: FunctionMaybe<string | RemoveAttribute>;
-    srclang?: FunctionMaybe<string | RemoveAttribute>;
+    default?: SignalOrValue<BooleanAttribute | RemoveAttribute>;
+    kind?: SignalOrValue<"alternative" | "descriptions" | "main" | "main-desc" | "translation" | "commentary" | "subtitles" | "captions" | "chapters" | "metadata" | RemoveAttribute>;
+    label?: SignalOrValue<string | RemoveAttribute>;
+    src?: SignalOrValue<string | RemoveAttribute>;
+    srclang?: SignalOrValue<string | RemoveAttribute>;
 
     /** @deprecated */
-    mediagroup?: FunctionMaybe<string | RemoveAttribute>;
+    mediagroup?: SignalOrValue<string | RemoveAttribute>;
 }
 interface VideoHTMLAttributes<T> extends MediaHTMLAttributes<T> {
-    disablepictureinpicture?: FunctionMaybe<BooleanAttribute | RemoveAttribute>;
-    height?: FunctionMaybe<number | string | RemoveAttribute>;
-    playsinline?: FunctionMaybe<BooleanAttribute | RemoveAttribute>;
-    poster?: FunctionMaybe<string | RemoveAttribute>;
-    width?: FunctionMaybe<number | string | RemoveAttribute>;
+    disablepictureinpicture?: SignalOrValue<BooleanAttribute | RemoveAttribute>;
+    height?: SignalOrValue<number | string | RemoveAttribute>;
+    playsinline?: SignalOrValue<BooleanAttribute | RemoveAttribute>;
+    poster?: SignalOrValue<string | RemoveAttribute>;
+    width?: SignalOrValue<number | string | RemoveAttribute>;
 
     onEnterPictureInPicture?: EventHandlerUnion<T, PictureInPictureEvent> | undefined;
     // "on:enterpictureinpicture"?: EventHandlerWithOptionsUnion<T, PictureInPictureEvent> | undefined;
@@ -1749,266 +1294,143 @@ interface VideoHTMLAttributes<T> extends MediaHTMLAttributes<T> {
 }
 
 interface WebViewHTMLAttributes<T> extends HTMLAttributes<T> {
-    allowpopups?: FunctionMaybe<BooleanAttribute | RemoveAttribute>;
-    disableblinkfeatures?: FunctionMaybe<string | RemoveAttribute>;
-    disablewebsecurity?: FunctionMaybe<BooleanAttribute | RemoveAttribute>;
-    enableblinkfeatures?: FunctionMaybe<string | RemoveAttribute>;
-    httpreferrer?: FunctionMaybe<string | RemoveAttribute>;
-    nodeintegration?: FunctionMaybe<BooleanAttribute | RemoveAttribute>;
-    nodeintegrationinsubframes?: FunctionMaybe<BooleanAttribute | RemoveAttribute>;
-    partition?: FunctionMaybe<string | RemoveAttribute>;
-    plugins?: FunctionMaybe<BooleanAttribute | RemoveAttribute>;
-    preload?: FunctionMaybe<string | RemoveAttribute>;
-    src?: FunctionMaybe<string | RemoveAttribute>;
-    useragent?: FunctionMaybe<string | RemoveAttribute>;
-    webpreferences?: FunctionMaybe<string | RemoveAttribute>;
+    allowpopups?: SignalOrValue<BooleanAttribute | RemoveAttribute>;
+    disableblinkfeatures?: SignalOrValue<string | RemoveAttribute>;
+    disablewebsecurity?: SignalOrValue<BooleanAttribute | RemoveAttribute>;
+    enableblinkfeatures?: SignalOrValue<string | RemoveAttribute>;
+    httpreferrer?: SignalOrValue<string | RemoveAttribute>;
+    nodeintegration?: SignalOrValue<BooleanAttribute | RemoveAttribute>;
+    nodeintegrationinsubframes?: SignalOrValue<BooleanAttribute | RemoveAttribute>;
+    partition?: SignalOrValue<string | RemoveAttribute>;
+    plugins?: SignalOrValue<BooleanAttribute | RemoveAttribute>;
+    preload?: SignalOrValue<string | RemoveAttribute>;
+    src?: SignalOrValue<string | RemoveAttribute>;
+    useragent?: SignalOrValue<string | RemoveAttribute>;
+    webpreferences?: SignalOrValue<string | RemoveAttribute>;
 
     // does this exists?
-    allowfullscreen?: FunctionMaybe<BooleanAttribute | RemoveAttribute>;
-    autosize?: FunctionMaybe<BooleanAttribute | RemoveAttribute>;
+    allowfullscreen?: SignalOrValue<BooleanAttribute | RemoveAttribute>;
+    autosize?: SignalOrValue<BooleanAttribute | RemoveAttribute>;
 
     /** @deprecated */
-    blinkfeatures?: FunctionMaybe<string | RemoveAttribute>;
+    blinkfeatures?: SignalOrValue<string | RemoveAttribute>;
     /** @deprecated */
-    disableguestresize?: FunctionMaybe<BooleanAttribute | RemoveAttribute>;
+    disableguestresize?: SignalOrValue<BooleanAttribute | RemoveAttribute>;
     /** @deprecated */
-    guestinstance?: FunctionMaybe<string | RemoveAttribute>;
+    guestinstance?: SignalOrValue<string | RemoveAttribute>;
 }
 
 // SVG
 
-type SVGPreserveAspectRatioValue =
-    | "none"
-    | "xMinYMin"
-    | "xMidYMin"
-    | "xMaxYMin"
-    | "xMinYMid"
-    | "xMidYMid"
-    | "xMaxYMid"
-    | "xMinYMax"
-    | "xMidYMax"
-    | "xMaxYMax"
-    | "xMinYMin meet"
-    | "xMidYMin meet"
-    | "xMaxYMin meet"
-    | "xMinYMid meet"
-    | "xMidYMid meet"
-    | "xMaxYMid meet"
-    | "xMinYMax meet"
-    | "xMidYMax meet"
-    | "xMaxYMax meet"
-    | "xMinYMin slice"
-    | "xMidYMin slice"
-    | "xMaxYMin slice"
-    | "xMinYMid slice"
-    | "xMidYMid slice"
-    | "xMaxYMid slice"
-    | "xMinYMax slice"
-    | "xMidYMax slice"
-    | "xMaxYMax slice";
-type ImagePreserveAspectRatio =
-    | SVGPreserveAspectRatioValue
-    | "defer none"
-    | "defer xMinYMin"
-    | "defer xMidYMin"
-    | "defer xMaxYMin"
-    | "defer xMinYMid"
-    | "defer xMidYMid"
-    | "defer xMaxYMid"
-    | "defer xMinYMax"
-    | "defer xMidYMax"
-    | "defer xMaxYMax"
-    | "defer xMinYMin meet"
-    | "defer xMidYMin meet"
-    | "defer xMaxYMin meet"
-    | "defer xMinYMid meet"
-    | "defer xMidYMid meet"
-    | "defer xMaxYMid meet"
-    | "defer xMinYMax meet"
-    | "defer xMidYMax meet"
-    | "defer xMaxYMax meet"
-    | "defer xMinYMin slice"
-    | "defer xMidYMin slice"
-    | "defer xMaxYMin slice"
-    | "defer xMinYMid slice"
-    | "defer xMidYMid slice"
-    | "defer xMaxYMid slice"
-    | "defer xMinYMax slice"
-    | "defer xMidYMax slice"
-    | "defer xMaxYMax slice";
+type SVGPreserveAspectRatioValue = "none" | "xMinYMin" | "xMidYMin" | "xMaxYMin" | "xMinYMid" | "xMidYMid" | "xMaxYMid" | "xMinYMax" | "xMidYMax" | "xMaxYMax" | "xMinYMin meet" | "xMidYMin meet" | "xMaxYMin meet" | "xMinYMid meet" | "xMidYMid meet" | "xMaxYMid meet" | "xMinYMax meet" | "xMidYMax meet" | "xMaxYMax meet" | "xMinYMin slice" | "xMidYMin slice" | "xMaxYMin slice" | "xMinYMid slice" | "xMidYMid slice" | "xMaxYMid slice" | "xMinYMax slice" | "xMidYMax slice" | "xMaxYMax slice";
+type ImagePreserveAspectRatio = SVGPreserveAspectRatioValue | "defer none" | "defer xMinYMin" | "defer xMidYMin" | "defer xMaxYMin" | "defer xMinYMid" | "defer xMidYMid" | "defer xMaxYMid" | "defer xMinYMax" | "defer xMidYMax" | "defer xMaxYMax" | "defer xMinYMin meet" | "defer xMidYMin meet" | "defer xMaxYMin meet" | "defer xMinYMid meet" | "defer xMidYMid meet" | "defer xMaxYMid meet" | "defer xMinYMax meet" | "defer xMidYMax meet" | "defer xMaxYMax meet" | "defer xMinYMin slice" | "defer xMidYMin slice" | "defer xMaxYMin slice" | "defer xMinYMid slice" | "defer xMidYMid slice" | "defer xMaxYMid slice" | "defer xMinYMax slice" | "defer xMidYMax slice" | "defer xMaxYMax slice";
 type SVGUnits = "userSpaceOnUse" | "objectBoundingBox";
 
 interface StylableSVGAttributes {
     class?: ElementAttributes<Element>["class"];
-    style?: FunctionMaybe<CSSProperties | string | RemoveAttribute>;
+    style?: SignalOrValue<CSSProperties | string | RemoveAttribute>;
 }
 interface TransformableSVGAttributes {
-    transform?: FunctionMaybe<string | RemoveAttribute>;
+    transform?: SignalOrValue<string | RemoveAttribute>;
 }
 interface ConditionalProcessingSVGAttributes {
-    requiredExtensions?: FunctionMaybe<string | RemoveAttribute>;
-    requiredFeatures?: FunctionMaybe<string | RemoveAttribute>;
-    systemLanguage?: FunctionMaybe<string | RemoveAttribute>;
+    requiredExtensions?: SignalOrValue<string | RemoveAttribute>;
+    requiredFeatures?: SignalOrValue<string | RemoveAttribute>;
+    systemLanguage?: SignalOrValue<string | RemoveAttribute>;
 }
 interface ExternalResourceSVGAttributes {
-    externalResourcesRequired?: FunctionMaybe<EnumeratedPseudoBoolean | RemoveAttribute>;
+    externalResourcesRequired?: SignalOrValue<EnumeratedPseudoBoolean | RemoveAttribute>;
 }
 interface AnimationTimingSVGAttributes {
-    begin?: FunctionMaybe<string | RemoveAttribute>;
-    dur?: FunctionMaybe<string | RemoveAttribute>;
-    end?: FunctionMaybe<string | RemoveAttribute>;
-    fill?: FunctionMaybe<"freeze" | "remove" | RemoveAttribute>;
-    max?: FunctionMaybe<string | RemoveAttribute>;
-    min?: FunctionMaybe<string | RemoveAttribute>;
-    repeatCount?: FunctionMaybe<number | "indefinite" | RemoveAttribute>;
-    repeatDur?: FunctionMaybe<string | RemoveAttribute>;
-    restart?: FunctionMaybe<"always" | "whenNotActive" | "never" | RemoveAttribute>;
+    begin?: SignalOrValue<string | RemoveAttribute>;
+    dur?: SignalOrValue<string | RemoveAttribute>;
+    end?: SignalOrValue<string | RemoveAttribute>;
+    fill?: SignalOrValue<"freeze" | "remove" | RemoveAttribute>;
+    max?: SignalOrValue<string | RemoveAttribute>;
+    min?: SignalOrValue<string | RemoveAttribute>;
+    repeatCount?: SignalOrValue<number | "indefinite" | RemoveAttribute>;
+    repeatDur?: SignalOrValue<string | RemoveAttribute>;
+    restart?: SignalOrValue<"always" | "whenNotActive" | "never" | RemoveAttribute>;
 }
 interface AnimationValueSVGAttributes {
-    by?: FunctionMaybe<number | string | RemoveAttribute>;
-    calcMode?: FunctionMaybe<"discrete" | "linear" | "paced" | "spline" | RemoveAttribute>;
-    from?: FunctionMaybe<number | string | RemoveAttribute>;
-    keySplines?: FunctionMaybe<string | RemoveAttribute>;
-    keyTimes?: FunctionMaybe<string | RemoveAttribute>;
-    to?: FunctionMaybe<number | string | RemoveAttribute>;
-    values?: FunctionMaybe<string | RemoveAttribute>;
+    by?: SignalOrValue<number | string | RemoveAttribute>;
+    calcMode?: SignalOrValue<"discrete" | "linear" | "paced" | "spline" | RemoveAttribute>;
+    from?: SignalOrValue<number | string | RemoveAttribute>;
+    keySplines?: SignalOrValue<string | RemoveAttribute>;
+    keyTimes?: SignalOrValue<string | RemoveAttribute>;
+    to?: SignalOrValue<number | string | RemoveAttribute>;
+    values?: SignalOrValue<string | RemoveAttribute>;
 }
 interface AnimationAdditionSVGAttributes {
-    accumulate?: FunctionMaybe<"none" | "sum" | RemoveAttribute>;
-    additive?: FunctionMaybe<"replace" | "sum" | RemoveAttribute>;
-    attributeName?: FunctionMaybe<string | RemoveAttribute>;
+    accumulate?: SignalOrValue<"none" | "sum" | RemoveAttribute>;
+    additive?: SignalOrValue<"replace" | "sum" | RemoveAttribute>;
+    attributeName?: SignalOrValue<string | RemoveAttribute>;
 }
 interface AnimationAttributeTargetSVGAttributes {
-    attributeName?: FunctionMaybe<string | RemoveAttribute>;
-    attributeType?: FunctionMaybe<"CSS" | "XML" | "auto" | RemoveAttribute>;
+    attributeName?: SignalOrValue<string | RemoveAttribute>;
+    attributeType?: SignalOrValue<"CSS" | "XML" | "auto" | RemoveAttribute>;
 }
 interface PresentationSVGAttributes {
-    "alignment-baseline"?: FunctionMaybe<
-        | "auto"
-        | "baseline"
-        | "before-edge"
-        | "text-before-edge"
-        | "middle"
-        | "central"
-        | "after-edge"
-        | "text-after-edge"
-        | "ideographic"
-        | "alphabetic"
-        | "hanging"
-        | "mathematical"
-        | "inherit"
-        | RemoveAttribute
-    >;
-    "baseline-shift"?: FunctionMaybe<number | string | RemoveAttribute>;
-    "clip-path"?: FunctionMaybe<string | RemoveAttribute>;
-    "clip-rule"?: FunctionMaybe<"nonzero" | "evenodd" | "inherit" | RemoveAttribute>;
-    "color-interpolation"?: FunctionMaybe<
-        "auto" | "sRGB" | "linearRGB" | "inherit" | RemoveAttribute
-    >;
-    "color-interpolation-filters"?: FunctionMaybe<
-        "auto" | "sRGB" | "linearRGB" | "inherit" | RemoveAttribute
-    >;
-    "color-profile"?: FunctionMaybe<string | RemoveAttribute>;
-    "color-rendering"?: FunctionMaybe<
-        "auto" | "optimizeSpeed" | "optimizeQuality" | "inherit" | RemoveAttribute
-    >;
-    "dominant-baseline"?: FunctionMaybe<
-        | "auto"
-        | "text-bottom"
-        | "alphabetic"
-        | "ideographic"
-        | "middle"
-        | "central"
-        | "mathematical"
-        | "hanging"
-        | "text-top"
-        | "inherit"
-        | RemoveAttribute
-    >;
-    "enable-background"?: FunctionMaybe<string | RemoveAttribute>;
-    "fill-opacity"?: FunctionMaybe<number | string | "inherit" | RemoveAttribute>;
-    "fill-rule"?: FunctionMaybe<"nonzero" | "evenodd" | "inherit" | RemoveAttribute>;
-    "flood-color"?: FunctionMaybe<string | RemoveAttribute>;
-    "flood-opacity"?: FunctionMaybe<number | string | "inherit" | RemoveAttribute>;
-    "font-family"?: FunctionMaybe<string | RemoveAttribute>;
-    "font-size"?: FunctionMaybe<string | RemoveAttribute>;
-    "font-size-adjust"?: FunctionMaybe<number | string | RemoveAttribute>;
-    "font-stretch"?: FunctionMaybe<string | RemoveAttribute>;
-    "font-style"?: FunctionMaybe<"normal" | "italic" | "oblique" | "inherit" | RemoveAttribute>;
-    "font-variant"?: FunctionMaybe<string | RemoveAttribute>;
-    "font-weight"?: FunctionMaybe<number | string | RemoveAttribute>;
-    "glyph-orientation-horizontal"?: FunctionMaybe<string | RemoveAttribute>;
-    "glyph-orientation-vertical"?: FunctionMaybe<string | RemoveAttribute>;
-    "image-rendering"?: FunctionMaybe<
-        "auto" | "optimizeQuality" | "optimizeSpeed" | "inherit" | RemoveAttribute
-    >;
-    "letter-spacing"?: FunctionMaybe<number | string | RemoveAttribute>;
-    "lighting-color"?: FunctionMaybe<string | RemoveAttribute>;
-    "marker-end"?: FunctionMaybe<string | RemoveAttribute>;
-    "marker-mid"?: FunctionMaybe<string | RemoveAttribute>;
-    "marker-start"?: FunctionMaybe<string | RemoveAttribute>;
-    "pointer-events"?: FunctionMaybe<
-        | "bounding-box"
-        | "visiblePainted"
-        | "visibleFill"
-        | "visibleStroke"
-        | "visible"
-        | "painted"
-        | "color"
-        | "fill"
-        | "stroke"
-        | "all"
-        | "none"
-        | "inherit"
-        | RemoveAttribute
-    >;
-    "shape-rendering"?: FunctionMaybe<
-        "auto" | "optimizeSpeed" | "crispEdges" | "geometricPrecision" | "inherit" | RemoveAttribute
-    >;
-    "stop-color"?: FunctionMaybe<string | RemoveAttribute>;
-    "stop-opacity"?: FunctionMaybe<number | string | "inherit" | RemoveAttribute>;
-    "stroke-dasharray"?: FunctionMaybe<string | RemoveAttribute>;
-    "stroke-dashoffset"?: FunctionMaybe<number | string | RemoveAttribute>;
-    "stroke-linecap"?: FunctionMaybe<"butt" | "round" | "square" | "inherit" | RemoveAttribute>;
-    "stroke-linejoin"?: FunctionMaybe<
-        "arcs" | "bevel" | "miter" | "miter-clip" | "round" | "inherit" | RemoveAttribute
-    >;
-    "stroke-miterlimit"?: FunctionMaybe<number | string | "inherit" | RemoveAttribute>;
-    "stroke-opacity"?: FunctionMaybe<number | string | "inherit" | RemoveAttribute>;
-    "stroke-width"?: FunctionMaybe<number | string | RemoveAttribute>;
-    "text-anchor"?: FunctionMaybe<"start" | "middle" | "end" | "inherit" | RemoveAttribute>;
-    "text-decoration"?: FunctionMaybe<
-        "none" | "underline" | "overline" | "line-through" | "blink" | "inherit" | RemoveAttribute
-    >;
-    "text-rendering"?: FunctionMaybe<
-        | "auto"
-        | "optimizeSpeed"
-        | "optimizeLegibility"
-        | "geometricPrecision"
-        | "inherit"
-        | RemoveAttribute
-    >;
-    "unicode-bidi"?: FunctionMaybe<string | RemoveAttribute>;
-    "word-spacing"?: FunctionMaybe<number | string | RemoveAttribute>;
-    "writing-mode"?: FunctionMaybe<
-        "lr-tb" | "rl-tb" | "tb-rl" | "lr" | "rl" | "tb" | "inherit" | RemoveAttribute
-    >;
-    clip?: FunctionMaybe<string | RemoveAttribute>;
-    color?: FunctionMaybe<string | RemoveAttribute>;
-    cursor?: FunctionMaybe<string | RemoveAttribute>;
-    direction?: FunctionMaybe<"ltr" | "rtl" | "inherit" | RemoveAttribute>;
-    display?: FunctionMaybe<string | RemoveAttribute>;
-    fill?: FunctionMaybe<string | RemoveAttribute>;
-    filter?: FunctionMaybe<string | RemoveAttribute>;
-    kerning?: FunctionMaybe<string | RemoveAttribute>;
-    mask?: FunctionMaybe<string | RemoveAttribute>;
-    opacity?: FunctionMaybe<number | string | "inherit" | RemoveAttribute>;
-    overflow?: FunctionMaybe<
-        "visible" | "hidden" | "scroll" | "auto" | "inherit" | RemoveAttribute
-    >;
-    pathLength?: FunctionMaybe<string | number | RemoveAttribute>;
-    stroke?: FunctionMaybe<string | RemoveAttribute>;
-    visibility?: FunctionMaybe<"visible" | "hidden" | "collapse" | "inherit" | RemoveAttribute>;
+    "alignment-baseline"?: SignalOrValue<"auto" | "baseline" | "before-edge" | "text-before-edge" | "middle" | "central" | "after-edge" | "text-after-edge" | "ideographic" | "alphabetic" | "hanging" | "mathematical" | "inherit" | RemoveAttribute>;
+    "baseline-shift"?: SignalOrValue<number | string | RemoveAttribute>;
+    "clip-path"?: SignalOrValue<string | RemoveAttribute>;
+    "clip-rule"?: SignalOrValue<"nonzero" | "evenodd" | "inherit" | RemoveAttribute>;
+    "color-interpolation"?: SignalOrValue<"auto" | "sRGB" | "linearRGB" | "inherit" | RemoveAttribute>;
+    "color-interpolation-filters"?: SignalOrValue<"auto" | "sRGB" | "linearRGB" | "inherit" | RemoveAttribute>;
+    "color-profile"?: SignalOrValue<string | RemoveAttribute>;
+    "color-rendering"?: SignalOrValue<"auto" | "optimizeSpeed" | "optimizeQuality" | "inherit" | RemoveAttribute>;
+    "dominant-baseline"?: SignalOrValue<"auto" | "text-bottom" | "alphabetic" | "ideographic" | "middle" | "central" | "mathematical" | "hanging" | "text-top" | "inherit" | RemoveAttribute>;
+    "enable-background"?: SignalOrValue<string | RemoveAttribute>;
+    "fill-opacity"?: SignalOrValue<number | string | "inherit" | RemoveAttribute>;
+    "fill-rule"?: SignalOrValue<"nonzero" | "evenodd" | "inherit" | RemoveAttribute>;
+    "flood-color"?: SignalOrValue<string | RemoveAttribute>;
+    "flood-opacity"?: SignalOrValue<number | string | "inherit" | RemoveAttribute>;
+    "font-family"?: SignalOrValue<string | RemoveAttribute>;
+    "font-size"?: SignalOrValue<string | RemoveAttribute>;
+    "font-size-adjust"?: SignalOrValue<number | string | RemoveAttribute>;
+    "font-stretch"?: SignalOrValue<string | RemoveAttribute>;
+    "font-style"?: SignalOrValue<"normal" | "italic" | "oblique" | "inherit" | RemoveAttribute>;
+    "font-variant"?: SignalOrValue<string | RemoveAttribute>;
+    "font-weight"?: SignalOrValue<number | string | RemoveAttribute>;
+    "glyph-orientation-horizontal"?: SignalOrValue<string | RemoveAttribute>;
+    "glyph-orientation-vertical"?: SignalOrValue<string | RemoveAttribute>;
+    "image-rendering"?: SignalOrValue<"auto" | "optimizeQuality" | "optimizeSpeed" | "inherit" | RemoveAttribute>;
+    "letter-spacing"?: SignalOrValue<number | string | RemoveAttribute>;
+    "lighting-color"?: SignalOrValue<string | RemoveAttribute>;
+    "marker-end"?: SignalOrValue<string | RemoveAttribute>;
+    "marker-mid"?: SignalOrValue<string | RemoveAttribute>;
+    "marker-start"?: SignalOrValue<string | RemoveAttribute>;
+    "pointer-events"?: SignalOrValue<"bounding-box" | "visiblePainted" | "visibleFill" | "visibleStroke" | "visible" | "painted" | "color" | "fill" | "stroke" | "all" | "none" | "inherit" | RemoveAttribute>;
+    "shape-rendering"?: SignalOrValue<"auto" | "optimizeSpeed" | "crispEdges" | "geometricPrecision" | "inherit" | RemoveAttribute>;
+    "stop-color"?: SignalOrValue<string | RemoveAttribute>;
+    "stop-opacity"?: SignalOrValue<number | string | "inherit" | RemoveAttribute>;
+    "stroke-dasharray"?: SignalOrValue<string | RemoveAttribute>;
+    "stroke-dashoffset"?: SignalOrValue<number | string | RemoveAttribute>;
+    "stroke-linecap"?: SignalOrValue<"butt" | "round" | "square" | "inherit" | RemoveAttribute>;
+    "stroke-linejoin"?: SignalOrValue<"arcs" | "bevel" | "miter" | "miter-clip" | "round" | "inherit" | RemoveAttribute>;
+    "stroke-miterlimit"?: SignalOrValue<number | string | "inherit" | RemoveAttribute>;
+    "stroke-opacity"?: SignalOrValue<number | string | "inherit" | RemoveAttribute>;
+    "stroke-width"?: SignalOrValue<number | string | RemoveAttribute>;
+    "text-anchor"?: SignalOrValue<"start" | "middle" | "end" | "inherit" | RemoveAttribute>;
+    "text-decoration"?: SignalOrValue<"none" | "underline" | "overline" | "line-through" | "blink" | "inherit" | RemoveAttribute>;
+    "text-rendering"?: SignalOrValue<"auto" | "optimizeSpeed" | "optimizeLegibility" | "geometricPrecision" | "inherit" | RemoveAttribute>;
+    "unicode-bidi"?: SignalOrValue<string | RemoveAttribute>;
+    "word-spacing"?: SignalOrValue<number | string | RemoveAttribute>;
+    "writing-mode"?: SignalOrValue<"lr-tb" | "rl-tb" | "tb-rl" | "lr" | "rl" | "tb" | "inherit" | RemoveAttribute>;
+    clip?: SignalOrValue<string | RemoveAttribute>;
+    color?: SignalOrValue<string | RemoveAttribute>;
+    cursor?: SignalOrValue<string | RemoveAttribute>;
+    direction?: SignalOrValue<"ltr" | "rtl" | "inherit" | RemoveAttribute>;
+    display?: SignalOrValue<string | RemoveAttribute>;
+    fill?: SignalOrValue<string | RemoveAttribute>;
+    filter?: SignalOrValue<string | RemoveAttribute>;
+    kerning?: SignalOrValue<string | RemoveAttribute>;
+    mask?: SignalOrValue<string | RemoveAttribute>;
+    opacity?: SignalOrValue<number | string | "inherit" | RemoveAttribute>;
+    overflow?: SignalOrValue<"visible" | "hidden" | "scroll" | "auto" | "inherit" | RemoveAttribute>;
+    pathLength?: SignalOrValue<string | number | RemoveAttribute>;
+    stroke?: SignalOrValue<string | RemoveAttribute>;
+    visibility?: SignalOrValue<"visible" | "hidden" | "collapse" | "inherit" | RemoveAttribute>;
 }
 interface AnimationElementSVGAttributes<T>
     extends SVGAttributes<T>,
@@ -2029,126 +1451,58 @@ interface AnimationElementSVGAttributes<T>
 interface ContainerElementSVGAttributes<T>
     extends SVGAttributes<T>,
     ShapeElementSVGAttributes<T>,
-    Pick<
-        PresentationSVGAttributes,
-        | "clip-path"
-        | "mask"
-        | "cursor"
-        | "opacity"
-        | "filter"
-        | "enable-background"
-        | "color-interpolation"
-        | "color-rendering"
-    > { }
+    Pick<PresentationSVGAttributes, "clip-path" | "mask" | "cursor" | "opacity" | "filter" | "enable-background" | "color-interpolation" | "color-rendering"> {
+}
 interface FilterPrimitiveElementSVGAttributes<T>
     extends SVGAttributes<T>,
     Pick<PresentationSVGAttributes, "color-interpolation-filters"> {
-    height?: FunctionMaybe<number | string | RemoveAttribute>;
-    result?: FunctionMaybe<string | RemoveAttribute>;
-    width?: FunctionMaybe<number | string | RemoveAttribute>;
-    x?: FunctionMaybe<number | string | RemoveAttribute>;
-    y?: FunctionMaybe<number | string | RemoveAttribute>;
+    height?: SignalOrValue<number | string | RemoveAttribute>;
+    result?: SignalOrValue<string | RemoveAttribute>;
+    width?: SignalOrValue<number | string | RemoveAttribute>;
+    x?: SignalOrValue<number | string | RemoveAttribute>;
+    y?: SignalOrValue<number | string | RemoveAttribute>;
 }
 interface SingleInputFilterSVGAttributes {
-    in?: FunctionMaybe<string | RemoveAttribute>;
+    in?: SignalOrValue<string | RemoveAttribute>;
 }
 interface DoubleInputFilterSVGAttributes {
-    in?: FunctionMaybe<string | RemoveAttribute>;
-    in2?: FunctionMaybe<string | RemoveAttribute>;
+    in?: SignalOrValue<string | RemoveAttribute>;
+    in2?: SignalOrValue<string | RemoveAttribute>;
 }
 interface FitToViewBoxSVGAttributes {
-    preserveAspectRatio?: FunctionMaybe<SVGPreserveAspectRatioValue | RemoveAttribute>;
-    viewBox?: FunctionMaybe<string | RemoveAttribute>;
+    preserveAspectRatio?: SignalOrValue<SVGPreserveAspectRatioValue | RemoveAttribute>;
+    viewBox?: SignalOrValue<string | RemoveAttribute>;
 }
 interface GradientElementSVGAttributes<T>
     extends SVGAttributes<T>,
     ExternalResourceSVGAttributes,
     StylableSVGAttributes {
-    gradientTransform?: FunctionMaybe<string | RemoveAttribute>;
-    gradientUnits?: FunctionMaybe<SVGUnits | RemoveAttribute>;
-    href?: FunctionMaybe<string | RemoveAttribute>;
-    spreadMethod?: FunctionMaybe<"pad" | "reflect" | "repeat" | RemoveAttribute>;
+    gradientTransform?: SignalOrValue<string | RemoveAttribute>;
+    gradientUnits?: SignalOrValue<SVGUnits | RemoveAttribute>;
+    href?: SignalOrValue<string | RemoveAttribute>;
+    spreadMethod?: SignalOrValue<"pad" | "reflect" | "repeat" | RemoveAttribute>;
 }
 interface GraphicsElementSVGAttributes<T>
     extends SVGAttributes<T>,
-    Pick<
-        PresentationSVGAttributes,
-        | "clip-rule"
-        | "mask"
-        | "pointer-events"
-        | "cursor"
-        | "opacity"
-        | "filter"
-        | "display"
-        | "visibility"
-        | "color-interpolation"
-        | "color-rendering"
-    > { }
+    Pick<PresentationSVGAttributes, | "clip-rule" | "mask" | "pointer-events" | "cursor" | "opacity" | "filter" | "display" | "visibility" | "color-interpolation" | "color-rendering"> {
+}
 interface LightSourceElementSVGAttributes<T> extends SVGAttributes<T> { }
 interface NewViewportSVGAttributes<T>
     extends SVGAttributes<T>,
     Pick<PresentationSVGAttributes, "overflow" | "clip"> {
-    viewBox?: FunctionMaybe<string | RemoveAttribute>;
+    viewBox?: SignalOrValue<string | RemoveAttribute>;
 }
-interface ShapeElementSVGAttributes<T>
+export interface ShapeElementSVGAttributes<T>
     extends SVGAttributes<T>,
-    Pick<
-        PresentationSVGAttributes,
-        | "color"
-        | "fill"
-        | "fill-rule"
-        | "fill-opacity"
-        | "stroke"
-        | "stroke-width"
-        | "stroke-linecap"
-        | "stroke-linejoin"
-        | "stroke-miterlimit"
-        | "stroke-dasharray"
-        | "stroke-dashoffset"
-        | "stroke-opacity"
-        | "shape-rendering"
-        | "pathLength"
-    > { }
-interface TextContentElementSVGAttributes<T>
+    Pick<PresentationSVGAttributes, "color" | "fill" | "fill-rule" | "fill-opacity" | "stroke" | "stroke-width" | "stroke-linecap" | "stroke-linejoin" | "stroke-miterlimit" | "stroke-dasharray" | "stroke-dashoffset" | "stroke-opacity" | "shape-rendering" | "pathLength"> {
+}
+export interface TextContentElementSVGAttributes<T>
     extends SVGAttributes<T>,
-    Pick<
-        PresentationSVGAttributes,
-        | "font-family"
-        | "font-style"
-        | "font-variant"
-        | "font-weight"
-        | "font-stretch"
-        | "font-size"
-        | "font-size-adjust"
-        | "kerning"
-        | "letter-spacing"
-        | "word-spacing"
-        | "text-decoration"
-        | "glyph-orientation-horizontal"
-        | "glyph-orientation-vertical"
-        | "direction"
-        | "unicode-bidi"
-        | "text-anchor"
-        | "dominant-baseline"
-        | "color"
-        | "fill"
-        | "fill-rule"
-        | "fill-opacity"
-        | "stroke"
-        | "stroke-width"
-        | "stroke-linecap"
-        | "stroke-linejoin"
-        | "stroke-miterlimit"
-        | "stroke-dasharray"
-        | "stroke-dashoffset"
-        | "stroke-opacity"
-    > { }
+    Pick<PresentationSVGAttributes, "font-family" | "font-style" | "font-variant" | "font-weight" | "font-stretch" | "font-size" | "font-size-adjust" | "kerning" | "letter-spacing" | "word-spacing" | "text-decoration" | "glyph-orientation-horizontal" | "glyph-orientation-vertical" | "direction" | "unicode-bidi" | "text-anchor" | "dominant-baseline" | "color" | "fill" | "fill-rule" | "fill-opacity" | "stroke" | "stroke-width" | "stroke-linecap" | "stroke-linejoin" | "stroke-miterlimit" | "stroke-dasharray" | "stroke-dashoffset" | "stroke-opacity"> {
+}
 interface ZoomAndPanSVGAttributes {
-    /**
-     * @deprecated
-     * @non-standard
-     */
-    zoomAndPan?: FunctionMaybe<"disable" | "magnify" | RemoveAttribute>;
+    /**@deprecated @non-standard*/
+    zoomAndPan?: SignalOrValue<"disable" | "magnify" | RemoveAttribute>;
 }
 interface AnimateSVGAttributes<T>
     extends AnimationElementSVGAttributes<T>,
@@ -2162,10 +1516,10 @@ interface AnimateMotionSVGAttributes<T>
     AnimationTimingSVGAttributes,
     AnimationValueSVGAttributes,
     AnimationAdditionSVGAttributes {
-    keyPoints?: FunctionMaybe<string | RemoveAttribute>;
-    origin?: FunctionMaybe<"default" | RemoveAttribute>;
-    path?: FunctionMaybe<string | RemoveAttribute>;
-    rotate?: FunctionMaybe<number | string | "auto" | "auto-reverse" | RemoveAttribute>;
+    keyPoints?: SignalOrValue<string | RemoveAttribute>;
+    origin?: SignalOrValue<"default" | RemoveAttribute>;
+    path?: SignalOrValue<string | RemoveAttribute>;
+    rotate?: SignalOrValue<number | string | "auto" | "auto-reverse" | RemoveAttribute>;
 }
 interface AnimateTransformSVGAttributes<T>
     extends AnimationElementSVGAttributes<T>,
@@ -2173,7 +1527,7 @@ interface AnimateTransformSVGAttributes<T>
     AnimationTimingSVGAttributes,
     AnimationValueSVGAttributes,
     AnimationAdditionSVGAttributes {
-    type?: FunctionMaybe<"translate" | "scale" | "rotate" | "skewX" | "skewY" | RemoveAttribute>;
+    type?: SignalOrValue<"translate" | "scale" | "rotate" | "skewX" | "skewY" | RemoveAttribute>;
 }
 interface CircleSVGAttributes<T>
     extends GraphicsElementSVGAttributes<T>,
@@ -2182,9 +1536,9 @@ interface CircleSVGAttributes<T>
     StylableSVGAttributes,
     TransformableSVGAttributes,
     Pick<PresentationSVGAttributes, "clip-path"> {
-    cx?: FunctionMaybe<number | string | RemoveAttribute>;
-    cy?: FunctionMaybe<number | string | RemoveAttribute>;
-    r?: FunctionMaybe<number | string | RemoveAttribute>;
+    cx?: SignalOrValue<number | string | RemoveAttribute>;
+    cy?: SignalOrValue<number | string | RemoveAttribute>;
+    r?: SignalOrValue<number | string | RemoveAttribute>;
 }
 interface ClipPathSVGAttributes<T>
     extends SVGAttributes<T>,
@@ -2193,7 +1547,7 @@ interface ClipPathSVGAttributes<T>
     StylableSVGAttributes,
     TransformableSVGAttributes,
     Pick<PresentationSVGAttributes, "clip-path"> {
-    clipPathUnits?: FunctionMaybe<SVGUnits | RemoveAttribute>;
+    clipPathUnits?: SignalOrValue<SVGUnits | RemoveAttribute>;
 }
 interface DefsSVGAttributes<T>
     extends ContainerElementSVGAttributes<T>,
@@ -2210,25 +1564,23 @@ interface EllipseSVGAttributes<T>
     StylableSVGAttributes,
     TransformableSVGAttributes,
     Pick<PresentationSVGAttributes, "clip-path"> {
-    cx?: FunctionMaybe<number | string | RemoveAttribute>;
-    cy?: FunctionMaybe<number | string | RemoveAttribute>;
-    rx?: FunctionMaybe<number | string | RemoveAttribute>;
-    ry?: FunctionMaybe<number | string | RemoveAttribute>;
+    cx?: SignalOrValue<number | string | RemoveAttribute>;
+    cy?: SignalOrValue<number | string | RemoveAttribute>;
+    rx?: SignalOrValue<number | string | RemoveAttribute>;
+    ry?: SignalOrValue<number | string | RemoveAttribute>;
 }
 interface FeBlendSVGAttributes<T>
     extends FilterPrimitiveElementSVGAttributes<T>,
     DoubleInputFilterSVGAttributes,
     StylableSVGAttributes {
-    mode?: FunctionMaybe<"normal" | "multiply" | "screen" | "darken" | "lighten" | RemoveAttribute>;
+    mode?: SignalOrValue<"normal" | "multiply" | "screen" | "darken" | "lighten" | RemoveAttribute>;
 }
 interface FeColorMatrixSVGAttributes<T>
     extends FilterPrimitiveElementSVGAttributes<T>,
     SingleInputFilterSVGAttributes,
     StylableSVGAttributes {
-    type?: FunctionMaybe<
-        "matrix" | "saturate" | "hueRotate" | "luminanceToAlpha" | RemoveAttribute
-    >;
-    values?: FunctionMaybe<string | RemoveAttribute>;
+    type?: SignalOrValue<"matrix" | "saturate" | "hueRotate" | "luminanceToAlpha" | RemoveAttribute>;
+    values?: SignalOrValue<string | RemoveAttribute>;
 }
 interface FeComponentTransferSVGAttributes<T>
     extends FilterPrimitiveElementSVGAttributes<T>,
@@ -2238,83 +1590,81 @@ interface FeCompositeSVGAttributes<T>
     extends FilterPrimitiveElementSVGAttributes<T>,
     DoubleInputFilterSVGAttributes,
     StylableSVGAttributes {
-    k1?: FunctionMaybe<number | string | RemoveAttribute>;
-    k2?: FunctionMaybe<number | string | RemoveAttribute>;
-    k3?: FunctionMaybe<number | string | RemoveAttribute>;
-    k4?: FunctionMaybe<number | string | RemoveAttribute>;
-    operator?: FunctionMaybe<
-        "over" | "in" | "out" | "atop" | "xor" | "arithmetic" | RemoveAttribute
-    >;
+    k1?: SignalOrValue<number | string | RemoveAttribute>;
+    k2?: SignalOrValue<number | string | RemoveAttribute>;
+    k3?: SignalOrValue<number | string | RemoveAttribute>;
+    k4?: SignalOrValue<number | string | RemoveAttribute>;
+    operator?: SignalOrValue<"over" | "in" | "out" | "atop" | "xor" | "arithmetic" | RemoveAttribute>;
 }
 interface FeConvolveMatrixSVGAttributes<T>
     extends FilterPrimitiveElementSVGAttributes<T>,
     SingleInputFilterSVGAttributes,
     StylableSVGAttributes {
-    bias?: FunctionMaybe<number | string | RemoveAttribute>;
-    divisor?: FunctionMaybe<number | string | RemoveAttribute>;
-    edgeMode?: FunctionMaybe<"duplicate" | "wrap" | "none" | RemoveAttribute>;
-    kernelMatrix?: FunctionMaybe<string | RemoveAttribute>;
-    kernelUnitLength?: FunctionMaybe<number | string | RemoveAttribute>;
-    order?: FunctionMaybe<number | string | RemoveAttribute>;
-    preserveAlpha?: FunctionMaybe<EnumeratedPseudoBoolean | RemoveAttribute>;
-    targetX?: FunctionMaybe<number | string | RemoveAttribute>;
-    targetY?: FunctionMaybe<number | string | RemoveAttribute>;
+    bias?: SignalOrValue<number | string | RemoveAttribute>;
+    divisor?: SignalOrValue<number | string | RemoveAttribute>;
+    edgeMode?: SignalOrValue<"duplicate" | "wrap" | "none" | RemoveAttribute>;
+    kernelMatrix?: SignalOrValue<string | RemoveAttribute>;
+    kernelUnitLength?: SignalOrValue<number | string | RemoveAttribute>;
+    order?: SignalOrValue<number | string | RemoveAttribute>;
+    preserveAlpha?: SignalOrValue<EnumeratedPseudoBoolean | RemoveAttribute>;
+    targetX?: SignalOrValue<number | string | RemoveAttribute>;
+    targetY?: SignalOrValue<number | string | RemoveAttribute>;
 }
 interface FeDiffuseLightingSVGAttributes<T>
     extends FilterPrimitiveElementSVGAttributes<T>,
     SingleInputFilterSVGAttributes,
     StylableSVGAttributes,
     Pick<PresentationSVGAttributes, "color" | "lighting-color"> {
-    diffuseConstant?: FunctionMaybe<number | string | RemoveAttribute>;
-    kernelUnitLength?: FunctionMaybe<number | string | RemoveAttribute>;
-    surfaceScale?: FunctionMaybe<number | string | RemoveAttribute>;
+    diffuseConstant?: SignalOrValue<number | string | RemoveAttribute>;
+    kernelUnitLength?: SignalOrValue<number | string | RemoveAttribute>;
+    surfaceScale?: SignalOrValue<number | string | RemoveAttribute>;
 }
 interface FeDisplacementMapSVGAttributes<T>
     extends FilterPrimitiveElementSVGAttributes<T>,
     DoubleInputFilterSVGAttributes,
     StylableSVGAttributes {
-    scale?: FunctionMaybe<number | string | RemoveAttribute>;
-    xChannelSelector?: FunctionMaybe<"R" | "G" | "B" | "A" | RemoveAttribute>;
-    yChannelSelector?: FunctionMaybe<"R" | "G" | "B" | "A" | RemoveAttribute>;
+    scale?: SignalOrValue<number | string | RemoveAttribute>;
+    xChannelSelector?: SignalOrValue<"R" | "G" | "B" | "A" | RemoveAttribute>;
+    yChannelSelector?: SignalOrValue<"R" | "G" | "B" | "A" | RemoveAttribute>;
 }
 interface FeDistantLightSVGAttributes<T> extends LightSourceElementSVGAttributes<T> {
-    azimuth?: FunctionMaybe<number | string | RemoveAttribute>;
-    elevation?: FunctionMaybe<number | string | RemoveAttribute>;
+    azimuth?: SignalOrValue<number | string | RemoveAttribute>;
+    elevation?: SignalOrValue<number | string | RemoveAttribute>;
 }
 interface FeDropShadowSVGAttributes<T>
     extends SVGAttributes<T>,
     FilterPrimitiveElementSVGAttributes<T>,
     StylableSVGAttributes,
     Pick<PresentationSVGAttributes, "color" | "flood-color" | "flood-opacity"> {
-    dx?: FunctionMaybe<number | string | RemoveAttribute>;
-    dy?: FunctionMaybe<number | string | RemoveAttribute>;
-    stdDeviation?: FunctionMaybe<number | string | RemoveAttribute>;
+    dx?: SignalOrValue<number | string | RemoveAttribute>;
+    dy?: SignalOrValue<number | string | RemoveAttribute>;
+    stdDeviation?: SignalOrValue<number | string | RemoveAttribute>;
 }
 interface FeFloodSVGAttributes<T>
     extends FilterPrimitiveElementSVGAttributes<T>,
     StylableSVGAttributes,
     Pick<PresentationSVGAttributes, "color" | "flood-color" | "flood-opacity"> { }
 interface FeFuncSVGAttributes<T> extends SVGAttributes<T> {
-    amplitude?: FunctionMaybe<number | string | RemoveAttribute>;
-    exponent?: FunctionMaybe<number | string | RemoveAttribute>;
-    intercept?: FunctionMaybe<number | string | RemoveAttribute>;
-    offset?: FunctionMaybe<number | string | RemoveAttribute>;
-    slope?: FunctionMaybe<number | string | RemoveAttribute>;
-    tableValues?: FunctionMaybe<string | RemoveAttribute>;
-    type?: FunctionMaybe<"identity" | "table" | "discrete" | "linear" | "gamma" | RemoveAttribute>;
+    amplitude?: SignalOrValue<number | string | RemoveAttribute>;
+    exponent?: SignalOrValue<number | string | RemoveAttribute>;
+    intercept?: SignalOrValue<number | string | RemoveAttribute>;
+    offset?: SignalOrValue<number | string | RemoveAttribute>;
+    slope?: SignalOrValue<number | string | RemoveAttribute>;
+    tableValues?: SignalOrValue<string | RemoveAttribute>;
+    type?: SignalOrValue<"identity" | "table" | "discrete" | "linear" | "gamma" | RemoveAttribute>;
 }
 interface FeGaussianBlurSVGAttributes<T>
     extends FilterPrimitiveElementSVGAttributes<T>,
     SingleInputFilterSVGAttributes,
     StylableSVGAttributes {
-    stdDeviation?: FunctionMaybe<number | string | RemoveAttribute>;
+    stdDeviation?: SignalOrValue<number | string | RemoveAttribute>;
 }
 interface FeImageSVGAttributes<T>
     extends FilterPrimitiveElementSVGAttributes<T>,
     ExternalResourceSVGAttributes,
     StylableSVGAttributes {
-    href?: FunctionMaybe<string | RemoveAttribute>;
-    preserveAspectRatio?: FunctionMaybe<SVGPreserveAspectRatioValue | RemoveAttribute>;
+    href?: SignalOrValue<string | RemoveAttribute>;
+    preserveAspectRatio?: SignalOrValue<SVGPreserveAspectRatioValue | RemoveAttribute>;
 }
 interface FeMergeSVGAttributes<T>
     extends FilterPrimitiveElementSVGAttributes<T>,
@@ -2324,40 +1674,40 @@ interface FeMorphologySVGAttributes<T>
     extends FilterPrimitiveElementSVGAttributes<T>,
     SingleInputFilterSVGAttributes,
     StylableSVGAttributes {
-    operator?: FunctionMaybe<"erode" | "dilate" | RemoveAttribute>;
-    radius?: FunctionMaybe<number | string | RemoveAttribute>;
+    operator?: SignalOrValue<"erode" | "dilate" | RemoveAttribute>;
+    radius?: SignalOrValue<number | string | RemoveAttribute>;
 }
 interface FeOffsetSVGAttributes<T>
     extends FilterPrimitiveElementSVGAttributes<T>,
     SingleInputFilterSVGAttributes,
     StylableSVGAttributes {
-    dx?: FunctionMaybe<number | string | RemoveAttribute>;
-    dy?: FunctionMaybe<number | string | RemoveAttribute>;
+    dx?: SignalOrValue<number | string | RemoveAttribute>;
+    dy?: SignalOrValue<number | string | RemoveAttribute>;
 }
 interface FePointLightSVGAttributes<T> extends LightSourceElementSVGAttributes<T> {
-    x?: FunctionMaybe<number | string | RemoveAttribute>;
-    y?: FunctionMaybe<number | string | RemoveAttribute>;
-    z?: FunctionMaybe<number | string | RemoveAttribute>;
+    x?: SignalOrValue<number | string | RemoveAttribute>;
+    y?: SignalOrValue<number | string | RemoveAttribute>;
+    z?: SignalOrValue<number | string | RemoveAttribute>;
 }
 interface FeSpecularLightingSVGAttributes<T>
     extends FilterPrimitiveElementSVGAttributes<T>,
     SingleInputFilterSVGAttributes,
     StylableSVGAttributes,
     Pick<PresentationSVGAttributes, "color" | "lighting-color"> {
-    kernelUnitLength?: FunctionMaybe<number | string | RemoveAttribute>;
-    specularConstant?: FunctionMaybe<string | RemoveAttribute>;
-    specularExponent?: FunctionMaybe<string | RemoveAttribute>;
-    surfaceScale?: FunctionMaybe<string | RemoveAttribute>;
+    kernelUnitLength?: SignalOrValue<number | string | RemoveAttribute>;
+    specularConstant?: SignalOrValue<string | RemoveAttribute>;
+    specularExponent?: SignalOrValue<string | RemoveAttribute>;
+    surfaceScale?: SignalOrValue<string | RemoveAttribute>;
 }
 interface FeSpotLightSVGAttributes<T> extends LightSourceElementSVGAttributes<T> {
-    limitingConeAngle?: FunctionMaybe<number | string | RemoveAttribute>;
-    pointsAtX?: FunctionMaybe<number | string | RemoveAttribute>;
-    pointsAtY?: FunctionMaybe<number | string | RemoveAttribute>;
-    pointsAtZ?: FunctionMaybe<number | string | RemoveAttribute>;
-    specularExponent?: FunctionMaybe<number | string | RemoveAttribute>;
-    x?: FunctionMaybe<number | string | RemoveAttribute>;
-    y?: FunctionMaybe<number | string | RemoveAttribute>;
-    z?: FunctionMaybe<number | string | RemoveAttribute>;
+    limitingConeAngle?: SignalOrValue<number | string | RemoveAttribute>;
+    pointsAtX?: SignalOrValue<number | string | RemoveAttribute>;
+    pointsAtY?: SignalOrValue<number | string | RemoveAttribute>;
+    pointsAtZ?: SignalOrValue<number | string | RemoveAttribute>;
+    specularExponent?: SignalOrValue<number | string | RemoveAttribute>;
+    x?: SignalOrValue<number | string | RemoveAttribute>;
+    y?: SignalOrValue<number | string | RemoveAttribute>;
+    z?: SignalOrValue<number | string | RemoveAttribute>;
 }
 interface FeTileSVGAttributes<T>
     extends FilterPrimitiveElementSVGAttributes<T>,
@@ -2366,23 +1716,23 @@ interface FeTileSVGAttributes<T>
 interface FeTurbulanceSVGAttributes<T>
     extends FilterPrimitiveElementSVGAttributes<T>,
     StylableSVGAttributes {
-    baseFrequency?: FunctionMaybe<number | string | RemoveAttribute>;
-    numOctaves?: FunctionMaybe<number | string | RemoveAttribute>;
-    seed?: FunctionMaybe<number | string | RemoveAttribute>;
-    stitchTiles?: FunctionMaybe<"stitch" | "noStitch" | RemoveAttribute>;
-    type?: FunctionMaybe<"fractalNoise" | "turbulence" | RemoveAttribute>;
+    baseFrequency?: SignalOrValue<number | string | RemoveAttribute>;
+    numOctaves?: SignalOrValue<number | string | RemoveAttribute>;
+    seed?: SignalOrValue<number | string | RemoveAttribute>;
+    stitchTiles?: SignalOrValue<"stitch" | "noStitch" | RemoveAttribute>;
+    type?: SignalOrValue<"fractalNoise" | "turbulence" | RemoveAttribute>;
 }
 interface FilterSVGAttributes<T>
     extends SVGAttributes<T>,
     ExternalResourceSVGAttributes,
     StylableSVGAttributes {
-    filterRes?: FunctionMaybe<number | string | RemoveAttribute>;
-    filterUnits?: FunctionMaybe<SVGUnits | RemoveAttribute>;
-    height?: FunctionMaybe<number | string | RemoveAttribute>;
-    primitiveUnits?: FunctionMaybe<SVGUnits | RemoveAttribute>;
-    width?: FunctionMaybe<number | string | RemoveAttribute>;
-    x?: FunctionMaybe<number | string | RemoveAttribute>;
-    y?: FunctionMaybe<number | string | RemoveAttribute>;
+    filterRes?: SignalOrValue<number | string | RemoveAttribute>;
+    filterUnits?: SignalOrValue<SVGUnits | RemoveAttribute>;
+    height?: SignalOrValue<number | string | RemoveAttribute>;
+    primitiveUnits?: SignalOrValue<SVGUnits | RemoveAttribute>;
+    width?: SignalOrValue<number | string | RemoveAttribute>;
+    x?: SignalOrValue<number | string | RemoveAttribute>;
+    y?: SignalOrValue<number | string | RemoveAttribute>;
 }
 interface ForeignObjectSVGAttributes<T>
     extends NewViewportSVGAttributes<T>,
@@ -2391,10 +1741,10 @@ interface ForeignObjectSVGAttributes<T>
     StylableSVGAttributes,
     TransformableSVGAttributes,
     Pick<PresentationSVGAttributes, "display" | "visibility"> {
-    height?: FunctionMaybe<number | string | RemoveAttribute>;
-    width?: FunctionMaybe<number | string | RemoveAttribute>;
-    x?: FunctionMaybe<number | string | RemoveAttribute>;
-    y?: FunctionMaybe<number | string | RemoveAttribute>;
+    height?: SignalOrValue<number | string | RemoveAttribute>;
+    width?: SignalOrValue<number | string | RemoveAttribute>;
+    x?: SignalOrValue<number | string | RemoveAttribute>;
+    y?: SignalOrValue<number | string | RemoveAttribute>;
 }
 interface GSVGAttributes<T>
     extends ContainerElementSVGAttributes<T>,
@@ -2410,12 +1760,12 @@ interface ImageSVGAttributes<T>
     StylableSVGAttributes,
     TransformableSVGAttributes,
     Pick<PresentationSVGAttributes, "clip-path" | "color-profile" | "image-rendering"> {
-    height?: FunctionMaybe<number | string | RemoveAttribute>;
-    href?: FunctionMaybe<string | RemoveAttribute>;
-    preserveAspectRatio?: FunctionMaybe<ImagePreserveAspectRatio | RemoveAttribute>;
-    width?: FunctionMaybe<number | string | RemoveAttribute>;
-    x?: FunctionMaybe<number | string | RemoveAttribute>;
-    y?: FunctionMaybe<number | string | RemoveAttribute>;
+    height?: SignalOrValue<number | string | RemoveAttribute>;
+    href?: SignalOrValue<string | RemoveAttribute>;
+    preserveAspectRatio?: SignalOrValue<ImagePreserveAspectRatio | RemoveAttribute>;
+    width?: SignalOrValue<number | string | RemoveAttribute>;
+    x?: SignalOrValue<number | string | RemoveAttribute>;
+    y?: SignalOrValue<number | string | RemoveAttribute>;
 }
 interface LineSVGAttributes<T>
     extends GraphicsElementSVGAttributes<T>,
@@ -2425,16 +1775,16 @@ interface LineSVGAttributes<T>
     StylableSVGAttributes,
     TransformableSVGAttributes,
     Pick<PresentationSVGAttributes, "clip-path" | "marker-start" | "marker-mid" | "marker-end"> {
-    x1?: FunctionMaybe<number | string | RemoveAttribute>;
-    x2?: FunctionMaybe<number | string | RemoveAttribute>;
-    y1?: FunctionMaybe<number | string | RemoveAttribute>;
-    y2?: FunctionMaybe<number | string | RemoveAttribute>;
+    x1?: SignalOrValue<number | string | RemoveAttribute>;
+    x2?: SignalOrValue<number | string | RemoveAttribute>;
+    y1?: SignalOrValue<number | string | RemoveAttribute>;
+    y2?: SignalOrValue<number | string | RemoveAttribute>;
 }
 interface LinearGradientSVGAttributes<T> extends GradientElementSVGAttributes<T> {
-    x1?: FunctionMaybe<number | string | RemoveAttribute>;
-    x2?: FunctionMaybe<number | string | RemoveAttribute>;
-    y1?: FunctionMaybe<number | string | RemoveAttribute>;
-    y2?: FunctionMaybe<number | string | RemoveAttribute>;
+    x1?: SignalOrValue<number | string | RemoveAttribute>;
+    x2?: SignalOrValue<number | string | RemoveAttribute>;
+    y1?: SignalOrValue<number | string | RemoveAttribute>;
+    y2?: SignalOrValue<number | string | RemoveAttribute>;
 }
 interface MarkerSVGAttributes<T>
     extends ContainerElementSVGAttributes<T>,
@@ -2442,12 +1792,12 @@ interface MarkerSVGAttributes<T>
     StylableSVGAttributes,
     FitToViewBoxSVGAttributes,
     Pick<PresentationSVGAttributes, "clip-path" | "overflow" | "clip"> {
-    markerHeight?: FunctionMaybe<number | string | RemoveAttribute>;
-    markerUnits?: FunctionMaybe<"strokeWidth" | "userSpaceOnUse" | RemoveAttribute>;
-    markerWidth?: FunctionMaybe<number | string | RemoveAttribute>;
-    orient?: FunctionMaybe<string | RemoveAttribute>;
-    refX?: FunctionMaybe<number | string | RemoveAttribute>;
-    refY?: FunctionMaybe<number | string | RemoveAttribute>;
+    markerHeight?: SignalOrValue<number | string | RemoveAttribute>;
+    markerUnits?: SignalOrValue<"strokeWidth" | "userSpaceOnUse" | RemoveAttribute>;
+    markerWidth?: SignalOrValue<number | string | RemoveAttribute>;
+    orient?: SignalOrValue<string | RemoveAttribute>;
+    refX?: SignalOrValue<number | string | RemoveAttribute>;
+    refY?: SignalOrValue<number | string | RemoveAttribute>;
 }
 interface MaskSVGAttributes<T>
     extends Omit<ContainerElementSVGAttributes<T>, "opacity" | "filter">,
@@ -2455,12 +1805,12 @@ interface MaskSVGAttributes<T>
     ExternalResourceSVGAttributes,
     StylableSVGAttributes,
     Pick<PresentationSVGAttributes, "clip-path"> {
-    height?: FunctionMaybe<number | string | RemoveAttribute>;
-    maskContentUnits?: FunctionMaybe<SVGUnits | RemoveAttribute>;
-    maskUnits?: FunctionMaybe<SVGUnits | RemoveAttribute>;
-    width?: FunctionMaybe<number | string | RemoveAttribute>;
-    x?: FunctionMaybe<number | string | RemoveAttribute>;
-    y?: FunctionMaybe<number | string | RemoveAttribute>;
+    height?: SignalOrValue<number | string | RemoveAttribute>;
+    maskContentUnits?: SignalOrValue<SVGUnits | RemoveAttribute>;
+    maskUnits?: SignalOrValue<SVGUnits | RemoveAttribute>;
+    width?: SignalOrValue<number | string | RemoveAttribute>;
+    x?: SignalOrValue<number | string | RemoveAttribute>;
+    y?: SignalOrValue<number | string | RemoveAttribute>;
 }
 interface MetadataSVGAttributes<T> extends SVGAttributes<T> { }
 interface MPathSVGAttributes<T> extends SVGAttributes<T> { }
@@ -2472,8 +1822,8 @@ interface PathSVGAttributes<T>
     StylableSVGAttributes,
     TransformableSVGAttributes,
     Pick<PresentationSVGAttributes, "clip-path" | "marker-start" | "marker-mid" | "marker-end"> {
-    d?: FunctionMaybe<string | RemoveAttribute>;
-    pathLength?: FunctionMaybe<number | string | RemoveAttribute>;
+    d?: SignalOrValue<string | RemoveAttribute>;
+    pathLength?: SignalOrValue<number | string | RemoveAttribute>;
 }
 interface PatternSVGAttributes<T>
     extends ContainerElementSVGAttributes<T>,
@@ -2482,14 +1832,14 @@ interface PatternSVGAttributes<T>
     StylableSVGAttributes,
     FitToViewBoxSVGAttributes,
     Pick<PresentationSVGAttributes, "clip-path" | "overflow" | "clip"> {
-    height?: FunctionMaybe<number | string | RemoveAttribute>;
-    href?: FunctionMaybe<string | RemoveAttribute>;
-    patternContentUnits?: FunctionMaybe<SVGUnits | RemoveAttribute>;
-    patternTransform?: FunctionMaybe<string | RemoveAttribute>;
-    patternUnits?: FunctionMaybe<SVGUnits | RemoveAttribute>;
-    width?: FunctionMaybe<number | string | RemoveAttribute>;
-    x?: FunctionMaybe<number | string | RemoveAttribute>;
-    y?: FunctionMaybe<number | string | RemoveAttribute>;
+    height?: SignalOrValue<number | string | RemoveAttribute>;
+    href?: SignalOrValue<string | RemoveAttribute>;
+    patternContentUnits?: SignalOrValue<SVGUnits | RemoveAttribute>;
+    patternTransform?: SignalOrValue<string | RemoveAttribute>;
+    patternUnits?: SignalOrValue<SVGUnits | RemoveAttribute>;
+    width?: SignalOrValue<number | string | RemoveAttribute>;
+    x?: SignalOrValue<number | string | RemoveAttribute>;
+    y?: SignalOrValue<number | string | RemoveAttribute>;
 }
 interface PolygonSVGAttributes<T>
     extends GraphicsElementSVGAttributes<T>,
@@ -2499,7 +1849,7 @@ interface PolygonSVGAttributes<T>
     StylableSVGAttributes,
     TransformableSVGAttributes,
     Pick<PresentationSVGAttributes, "clip-path" | "marker-start" | "marker-mid" | "marker-end"> {
-    points?: FunctionMaybe<string | RemoveAttribute>;
+    points?: SignalOrValue<string | RemoveAttribute>;
 }
 interface PolylineSVGAttributes<T>
     extends GraphicsElementSVGAttributes<T>,
@@ -2509,14 +1859,14 @@ interface PolylineSVGAttributes<T>
     StylableSVGAttributes,
     TransformableSVGAttributes,
     Pick<PresentationSVGAttributes, "clip-path" | "marker-start" | "marker-mid" | "marker-end"> {
-    points?: FunctionMaybe<string | RemoveAttribute>;
+    points?: SignalOrValue<string | RemoveAttribute>;
 }
 interface RadialGradientSVGAttributes<T> extends GradientElementSVGAttributes<T> {
-    cx?: FunctionMaybe<number | string | RemoveAttribute>;
-    cy?: FunctionMaybe<number | string | RemoveAttribute>;
-    fx?: FunctionMaybe<number | string | RemoveAttribute>;
-    fy?: FunctionMaybe<number | string | RemoveAttribute>;
-    r?: FunctionMaybe<number | string | RemoveAttribute>;
+    cx?: SignalOrValue<number | string | RemoveAttribute>;
+    cy?: SignalOrValue<number | string | RemoveAttribute>;
+    fx?: SignalOrValue<number | string | RemoveAttribute>;
+    fy?: SignalOrValue<number | string | RemoveAttribute>;
+    r?: SignalOrValue<number | string | RemoveAttribute>;
 }
 interface RectSVGAttributes<T>
     extends GraphicsElementSVGAttributes<T>,
@@ -2526,12 +1876,12 @@ interface RectSVGAttributes<T>
     StylableSVGAttributes,
     TransformableSVGAttributes,
     Pick<PresentationSVGAttributes, "clip-path"> {
-    height?: FunctionMaybe<number | string | RemoveAttribute>;
-    rx?: FunctionMaybe<number | string | RemoveAttribute>;
-    ry?: FunctionMaybe<number | string | RemoveAttribute>;
-    width?: FunctionMaybe<number | string | RemoveAttribute>;
-    x?: FunctionMaybe<number | string | RemoveAttribute>;
-    y?: FunctionMaybe<number | string | RemoveAttribute>;
+    height?: SignalOrValue<number | string | RemoveAttribute>;
+    rx?: SignalOrValue<number | string | RemoveAttribute>;
+    ry?: SignalOrValue<number | string | RemoveAttribute>;
+    width?: SignalOrValue<number | string | RemoveAttribute>;
+    x?: SignalOrValue<number | string | RemoveAttribute>;
+    y?: SignalOrValue<number | string | RemoveAttribute>;
 }
 interface SetSVGAttributes<T>
     extends AnimationElementSVGAttributes<T>,
@@ -2541,7 +1891,7 @@ interface StopSVGAttributes<T>
     extends SVGAttributes<T>,
     StylableSVGAttributes,
     Pick<PresentationSVGAttributes, "color" | "stop-color" | "stop-opacity"> {
-    offset?: FunctionMaybe<number | string | RemoveAttribute>;
+    offset?: SignalOrValue<number | string | RemoveAttribute>;
 }
 interface SvgSVGAttributes<T>
     extends ContainerElementSVGAttributes<T>,
@@ -2553,18 +1903,18 @@ interface SvgSVGAttributes<T>
     ZoomAndPanSVGAttributes,
     PresentationSVGAttributes,
     EventHandlersWindow<T> {
-    "xmlns:xlink"?: FunctionMaybe<string | RemoveAttribute>;
-    contentScriptType?: FunctionMaybe<string | RemoveAttribute>;
-    contentStyleType?: FunctionMaybe<string | RemoveAttribute>;
-    height?: FunctionMaybe<number | string | RemoveAttribute>;
-    width?: FunctionMaybe<number | string | RemoveAttribute>;
-    x?: FunctionMaybe<number | string | RemoveAttribute>;
-    y?: FunctionMaybe<number | string | RemoveAttribute>;
+    "xmlns:xlink"?: SignalOrValue<string | RemoveAttribute>;
+    contentScriptType?: SignalOrValue<string | RemoveAttribute>;
+    contentStyleType?: SignalOrValue<string | RemoveAttribute>;
+    height?: SignalOrValue<number | string | RemoveAttribute>;
+    width?: SignalOrValue<number | string | RemoveAttribute>;
+    x?: SignalOrValue<number | string | RemoveAttribute>;
+    y?: SignalOrValue<number | string | RemoveAttribute>;
 
     /** @deprecated */
-    baseProfile?: FunctionMaybe<string | RemoveAttribute>;
+    baseProfile?: SignalOrValue<string | RemoveAttribute>;
     /** @deprecated */
-    version?: FunctionMaybe<string | RemoveAttribute>;
+    version?: SignalOrValue<string | RemoveAttribute>;
 }
 interface SwitchSVGAttributes<T>
     extends ContainerElementSVGAttributes<T>,
@@ -2580,14 +1930,14 @@ interface SymbolSVGAttributes<T>
     StylableSVGAttributes,
     FitToViewBoxSVGAttributes,
     Pick<PresentationSVGAttributes, "clip-path"> {
-    height?: FunctionMaybe<number | string | RemoveAttribute>;
-    preserveAspectRatio?: FunctionMaybe<SVGPreserveAspectRatioValue | RemoveAttribute>;
-    refX?: FunctionMaybe<number | string | RemoveAttribute>;
-    refY?: FunctionMaybe<number | string | RemoveAttribute>;
-    viewBox?: FunctionMaybe<string | RemoveAttribute>;
-    width?: FunctionMaybe<number | string | RemoveAttribute>;
-    x?: FunctionMaybe<number | string | RemoveAttribute>;
-    y?: FunctionMaybe<number | string | RemoveAttribute>;
+    height?: SignalOrValue<number | string | RemoveAttribute>;
+    preserveAspectRatio?: SignalOrValue<SVGPreserveAspectRatioValue | RemoveAttribute>;
+    refX?: SignalOrValue<number | string | RemoveAttribute>;
+    refY?: SignalOrValue<number | string | RemoveAttribute>;
+    viewBox?: SignalOrValue<string | RemoveAttribute>;
+    width?: SignalOrValue<number | string | RemoveAttribute>;
+    x?: SignalOrValue<number | string | RemoveAttribute>;
+    y?: SignalOrValue<number | string | RemoveAttribute>;
 }
 interface TextSVGAttributes<T>
     extends TextContentElementSVGAttributes<T>,
@@ -2597,13 +1947,13 @@ interface TextSVGAttributes<T>
     StylableSVGAttributes,
     TransformableSVGAttributes,
     Pick<PresentationSVGAttributes, "clip-path" | "writing-mode" | "text-rendering"> {
-    dx?: FunctionMaybe<number | string | RemoveAttribute>;
-    dy?: FunctionMaybe<number | string | RemoveAttribute>;
-    lengthAdjust?: FunctionMaybe<"spacing" | "spacingAndGlyphs" | RemoveAttribute>;
-    rotate?: FunctionMaybe<number | string | RemoveAttribute>;
-    textLength?: FunctionMaybe<number | string | RemoveAttribute>;
-    x?: FunctionMaybe<number | string | RemoveAttribute>;
-    y?: FunctionMaybe<number | string | RemoveAttribute>;
+    dx?: SignalOrValue<number | string | RemoveAttribute>;
+    dy?: SignalOrValue<number | string | RemoveAttribute>;
+    lengthAdjust?: SignalOrValue<"spacing" | "spacingAndGlyphs" | RemoveAttribute>;
+    rotate?: SignalOrValue<number | string | RemoveAttribute>;
+    textLength?: SignalOrValue<number | string | RemoveAttribute>;
+    x?: SignalOrValue<number | string | RemoveAttribute>;
+    y?: SignalOrValue<number | string | RemoveAttribute>;
 }
 interface TextPathSVGAttributes<T>
     extends TextContentElementSVGAttributes<T>,
@@ -2614,27 +1964,24 @@ interface TextPathSVGAttributes<T>
         PresentationSVGAttributes,
         "alignment-baseline" | "baseline-shift" | "display" | "visibility"
     > {
-    href?: FunctionMaybe<string | RemoveAttribute>;
-    method?: FunctionMaybe<"align" | "stretch" | RemoveAttribute>;
-    spacing?: FunctionMaybe<"auto" | "exact" | RemoveAttribute>;
-    startOffset?: FunctionMaybe<number | string | RemoveAttribute>;
+    href?: SignalOrValue<string | RemoveAttribute>;
+    method?: SignalOrValue<"align" | "stretch" | RemoveAttribute>;
+    spacing?: SignalOrValue<"auto" | "exact" | RemoveAttribute>;
+    startOffset?: SignalOrValue<number | string | RemoveAttribute>;
 }
 interface TSpanSVGAttributes<T>
     extends TextContentElementSVGAttributes<T>,
     ConditionalProcessingSVGAttributes,
     ExternalResourceSVGAttributes,
     StylableSVGAttributes,
-    Pick<
-        PresentationSVGAttributes,
-        "alignment-baseline" | "baseline-shift" | "display" | "visibility"
-    > {
-    dx?: FunctionMaybe<number | string | RemoveAttribute>;
-    dy?: FunctionMaybe<number | string | RemoveAttribute>;
-    lengthAdjust?: FunctionMaybe<"spacing" | "spacingAndGlyphs" | RemoveAttribute>;
-    rotate?: FunctionMaybe<number | string | RemoveAttribute>;
-    textLength?: FunctionMaybe<number | string | RemoveAttribute>;
-    x?: FunctionMaybe<number | string | RemoveAttribute>;
-    y?: FunctionMaybe<number | string | RemoveAttribute>;
+    Pick<PresentationSVGAttributes, "alignment-baseline" | "baseline-shift" | "display" | "visibility"> {
+    dx?: SignalOrValue<number | string | RemoveAttribute>;
+    dy?: SignalOrValue<number | string | RemoveAttribute>;
+    lengthAdjust?: SignalOrValue<"spacing" | "spacingAndGlyphs" | RemoveAttribute>;
+    rotate?: SignalOrValue<number | string | RemoveAttribute>;
+    textLength?: SignalOrValue<number | string | RemoveAttribute>;
+    x?: SignalOrValue<number | string | RemoveAttribute>;
+    y?: SignalOrValue<number | string | RemoveAttribute>;
 }
 /** @see https://developer.mozilla.org/en-US/docs/Web/SVG/Element/use */
 interface UseSVGAttributes<T>
@@ -2645,106 +1992,88 @@ interface UseSVGAttributes<T>
     PresentationSVGAttributes,
     ExternalResourceSVGAttributes,
     TransformableSVGAttributes {
-    height?: FunctionMaybe<number | string | RemoveAttribute>;
-    href?: FunctionMaybe<string | RemoveAttribute>;
-    width?: FunctionMaybe<number | string | RemoveAttribute>;
-    x?: FunctionMaybe<number | string | RemoveAttribute>;
-    y?: FunctionMaybe<number | string | RemoveAttribute>;
+    height?: SignalOrValue<number | string | RemoveAttribute>;
+    href?: SignalOrValue<string | RemoveAttribute>;
+    width?: SignalOrValue<number | string | RemoveAttribute>;
+    x?: SignalOrValue<number | string | RemoveAttribute>;
+    y?: SignalOrValue<number | string | RemoveAttribute>;
 }
 interface ViewSVGAttributes<T>
     extends SVGAttributes<T>,
     ExternalResourceSVGAttributes,
     FitToViewBoxSVGAttributes,
     ZoomAndPanSVGAttributes {
-    viewTarget?: FunctionMaybe<string | RemoveAttribute>;
+    viewTarget?: SignalOrValue<string | RemoveAttribute>;
 }
 
 // MATH
 
 interface MathMLAnnotationElementAttributes<T> extends MathMLAttributes<T> {
-    encoding?: FunctionMaybe<string | RemoveAttribute>;
+    encoding?: SignalOrValue<string | RemoveAttribute>;
 
     /** @deprecated */
-    src?: FunctionMaybe<string | RemoveAttribute>;
+    src?: SignalOrValue<string | RemoveAttribute>;
 }
 interface MathMLAnnotationXmlElementAttributes<T> extends MathMLAttributes<T> {
-    encoding?: FunctionMaybe<string | RemoveAttribute>;
+    encoding?: SignalOrValue<string | RemoveAttribute>;
 
     /** @deprecated */
-    src?: FunctionMaybe<string | RemoveAttribute>;
+    src?: SignalOrValue<string | RemoveAttribute>;
 }
 interface MathMLMactionElementAttributes<T> extends MathMLAttributes<T> {
-    /**
-     * @deprecated
-     * @non-standard
-     */
-    actiontype?: FunctionMaybe<"statusline" | "toggle" | RemoveAttribute>;
-    /**
-     * @deprecated
-     * @non-standard
-     */
-    selection?: FunctionMaybe<string | RemoveAttribute>;
+    /**@deprecated @non-standard*/
+    actiontype?: SignalOrValue<"statusline" | "toggle" | RemoveAttribute>;
+    /**@deprecated @non-standard*/
+    selection?: SignalOrValue<string | RemoveAttribute>;
 }
 interface MathMLMathElementAttributes<T> extends MathMLAttributes<T> {
-    display?: FunctionMaybe<"block" | "inline" | RemoveAttribute>;
+    display?: SignalOrValue<"block" | "inline" | RemoveAttribute>;
 }
 interface MathMLMerrorElementAttributes<T> extends MathMLAttributes<T> { }
 interface MathMLMfracElementAttributes<T> extends MathMLAttributes<T> {
-    linethickness?: FunctionMaybe<string | RemoveAttribute>;
+    linethickness?: SignalOrValue<string | RemoveAttribute>;
 
-    /**
-     * @deprecated
-     * @non-standard
-     */
-    denomalign?: FunctionMaybe<"center" | "left" | "right" | RemoveAttribute>;
-    /**
-     * @deprecated
-     * @non-standard
-     */
-    numalign?: FunctionMaybe<"center" | "left" | "right" | RemoveAttribute>;
+    /**@deprecated @non-standard*/
+    denomalign?: SignalOrValue<"center" | "left" | "right" | RemoveAttribute>;
+    /**@deprecated @non-standard*/
+    numalign?: SignalOrValue<"center" | "left" | "right" | RemoveAttribute>;
 }
 interface MathMLMiElementAttributes<T> extends MathMLAttributes<T> {
-    mathvariant?: FunctionMaybe<"normal" | RemoveAttribute>;
+    mathvariant?: SignalOrValue<"normal" | RemoveAttribute>;
 }
 
 interface MathMLMmultiscriptsElementAttributes<T> extends MathMLAttributes<T> {
-    /**
-     * @deprecated
-     * @non-standard
-     */
-    subscriptshift?: FunctionMaybe<string | RemoveAttribute>;
-    /**
-     * @deprecated
-     * @non-standard
-     */
-    superscriptshift?: FunctionMaybe<string | RemoveAttribute>;
+    /**@deprecated @non-standard*/
+    subscriptshift?: SignalOrValue<string | RemoveAttribute>;
+    /**@deprecated @non-standard*/
+    superscriptshift?: SignalOrValue<string | RemoveAttribute>;
 }
 interface MathMLMnElementAttributes<T> extends MathMLAttributes<T> { }
 interface MathMLMoElementAttributes<T> extends MathMLAttributes<T> {
-    fence?: FunctionMaybe<BooleanAttribute | RemoveAttribute>;
-    form?: FunctionMaybe<"prefix" | "infix" | "postfix" | RemoveAttribute>;
-    largeop?: FunctionMaybe<BooleanAttribute | RemoveAttribute>;
-    lspace?: FunctionMaybe<string | RemoveAttribute>;
-    maxsize?: FunctionMaybe<string | RemoveAttribute>;
-    minsize?: FunctionMaybe<string | RemoveAttribute>;
-    movablelimits?: FunctionMaybe<BooleanAttribute | RemoveAttribute>;
-    rspace?: FunctionMaybe<string | RemoveAttribute>;
-    separator?: FunctionMaybe<BooleanAttribute | RemoveAttribute>;
-    stretchy?: FunctionMaybe<BooleanAttribute | RemoveAttribute>;
-    symmetric?: FunctionMaybe<BooleanAttribute | RemoveAttribute>;
+    fence?: SignalOrValue<BooleanAttribute | RemoveAttribute>;
+    form?: SignalOrValue<"prefix" | "infix" | "postfix" | RemoveAttribute>;
+    largeop?: SignalOrValue<BooleanAttribute | RemoveAttribute>;
+    lspace?: SignalOrValue<string | RemoveAttribute>;
+    maxsize?: SignalOrValue<string | RemoveAttribute>;
+    minsize?: SignalOrValue<string | RemoveAttribute>;
+    movablelimits?: SignalOrValue<BooleanAttribute | RemoveAttribute>;
+    rspace?: SignalOrValue<string | RemoveAttribute>;
+    separator?: SignalOrValue<BooleanAttribute | RemoveAttribute>;
+    stretchy?: SignalOrValue<BooleanAttribute | RemoveAttribute>;
+    symmetric?: SignalOrValue<BooleanAttribute | RemoveAttribute>;
 
     /** @non-standard */
-    accent?: FunctionMaybe<BooleanAttribute | RemoveAttribute>;
+    accent?: SignalOrValue<BooleanAttribute | RemoveAttribute>;
 }
 interface MathMLMoverElementAttributes<T> extends MathMLAttributes<T> {
-    accent?: FunctionMaybe<BooleanAttribute | RemoveAttribute>;
+    accent?: SignalOrValue<BooleanAttribute | RemoveAttribute>;
 }
 interface MathMLMpaddedElementAttributes<T> extends MathMLAttributes<T> {
-    depth?: FunctionMaybe<string | RemoveAttribute>;
-    height?: FunctionMaybe<string | RemoveAttribute>;
-    lspace?: FunctionMaybe<string | RemoveAttribute>;
-    voffset?: FunctionMaybe<string | RemoveAttribute>;
-    width?: FunctionMaybe<string | RemoveAttribute>;
+    depth?: SignalOrValue<string | RemoveAttribute>;
+    height?: SignalOrValue<string | RemoveAttribute>;
+    lspace?: SignalOrValue<string | RemoveAttribute>;
+    voffset?: SignalOrValue<string | RemoveAttribute>;
+    width?: SignalOrValue<string | RemoveAttribute>;
 }
 interface MathMLMphantomElementAttributes<T> extends MathMLAttributes<T> { }
 interface MathMLMprescriptsElementAttributes<T> extends MathMLAttributes<T> { }
@@ -2752,128 +2081,101 @@ interface MathMLMrootElementAttributes<T> extends MathMLAttributes<T> { }
 interface MathMLMrowElementAttributes<T> extends MathMLAttributes<T> { }
 interface MathMLMsElementAttributes<T> extends MathMLAttributes<T> {
     /** @deprecated */
-    lquote?: FunctionMaybe<string | RemoveAttribute>;
+    lquote?: SignalOrValue<string | RemoveAttribute>;
     /** @deprecated */
-    rquote?: FunctionMaybe<string | RemoveAttribute>;
+    rquote?: SignalOrValue<string | RemoveAttribute>;
 }
 interface MathMLMspaceElementAttributes<T> extends MathMLAttributes<T> {
-    depth?: FunctionMaybe<string | RemoveAttribute>;
-    height?: FunctionMaybe<string | RemoveAttribute>;
-    width?: FunctionMaybe<string | RemoveAttribute>;
+    depth?: SignalOrValue<string | RemoveAttribute>;
+    height?: SignalOrValue<string | RemoveAttribute>;
+    width?: SignalOrValue<string | RemoveAttribute>;
 }
 interface MathMLMsqrtElementAttributes<T> extends MathMLAttributes<T> { }
 interface MathMLMstyleElementAttributes<T> extends MathMLAttributes<T> {
-    /**
-     * @deprecated
-     * @non-standard
-     */
-    background?: FunctionMaybe<string | RemoveAttribute>;
-    /**
-     * @deprecated
-     * @non-standard
-     */
-    color?: FunctionMaybe<string | RemoveAttribute>;
-    /**
-     * @deprecated
-     * @non-standard
-     */
-    fontsize?: FunctionMaybe<string | RemoveAttribute>;
-    /**
-     * @deprecated
-     * @non-standard
-     */
-    fontstyle?: FunctionMaybe<string | RemoveAttribute>;
-    /**
-     * @deprecated
-     * @non-standard
-     */
-    fontweight?: FunctionMaybe<string | RemoveAttribute>;
+    /**@deprecated @non-standard*/
+    background?: SignalOrValue<string | RemoveAttribute>;
+    /**@deprecated @non-standard*/
+    color?: SignalOrValue<string | RemoveAttribute>;
+    /**@deprecated @non-standard*/
+    fontsize?: SignalOrValue<string | RemoveAttribute>;
+    /**@deprecated @non-standard*/
+    fontstyle?: SignalOrValue<string | RemoveAttribute>;
+    /**@deprecated @non-standard*/
+    fontweight?: SignalOrValue<string | RemoveAttribute>;
 
     /** @deprecated */
-    scriptminsize?: FunctionMaybe<string | RemoveAttribute>;
+    scriptminsize?: SignalOrValue<string | RemoveAttribute>;
     /** @deprecated */
-    scriptsizemultiplier?: FunctionMaybe<string | RemoveAttribute>;
+    scriptsizemultiplier?: SignalOrValue<string | RemoveAttribute>;
 }
 interface MathMLMsubElementAttributes<T> extends MathMLAttributes<T> {
-    /**
-     * @deprecated
-     * @non-standard
-     */
-    subscriptshift?: FunctionMaybe<string | RemoveAttribute>;
+    /**@deprecated @non-standard*/
+    subscriptshift?: SignalOrValue<string | RemoveAttribute>;
 }
 interface MathMLMsubsupElementAttributes<T> extends MathMLAttributes<T> {
-    /**
-     * @deprecated
-     * @non-standard
-     */
-    subscriptshift?: FunctionMaybe<string | RemoveAttribute>;
-    /**
-     * @deprecated
-     * @non-standard
-     */
-    superscriptshift?: FunctionMaybe<string | RemoveAttribute>;
+    /**@deprecated @non-standard*/
+    subscriptshift?: SignalOrValue<string | RemoveAttribute>;
+    /**@deprecated @non-standard*/
+    superscriptshift?: SignalOrValue<string | RemoveAttribute>;
 }
 interface MathMLMsupElementAttributes<T> extends MathMLAttributes<T> {
-    /**
-     * @deprecated
-     * @non-standard
-     */
-    superscriptshift?: FunctionMaybe<string | RemoveAttribute>;
+    /**@deprecated @non-standard*/
+    superscriptshift?: SignalOrValue<string | RemoveAttribute>;
 }
 interface MathMLMtableElementAttributes<T> extends MathMLAttributes<T> {
     /** @non-standard */
-    align?: FunctionMaybe<"axis" | "baseline" | "bottom" | "center" | "top" | RemoveAttribute>;
+    align?: SignalOrValue<"axis" | "baseline" | "bottom" | "center" | "top" | RemoveAttribute>;
     /** @non-standard */
-    columnalign?: FunctionMaybe<"center" | "left" | "right" | RemoveAttribute>;
+    columnalign?: SignalOrValue<"center" | "left" | "right" | RemoveAttribute>;
     /** @non-standard */
-    columnlines?: FunctionMaybe<"dashed" | "none" | "solid" | RemoveAttribute>;
+    columnlines?: SignalOrValue<"dashed" | "none" | "solid" | RemoveAttribute>;
     /** @non-standard */
-    columnspacing?: FunctionMaybe<string | RemoveAttribute>;
+    columnspacing?: SignalOrValue<string | RemoveAttribute>;
     /** @non-standard */
-    frame?: FunctionMaybe<"dashed" | "none" | "solid" | RemoveAttribute>;
+    frame?: SignalOrValue<"dashed" | "none" | "solid" | RemoveAttribute>;
     /** @non-standard */
-    framespacing?: FunctionMaybe<string | RemoveAttribute>;
+    framespacing?: SignalOrValue<string | RemoveAttribute>;
     /** @non-standard */
-    rowalign?: FunctionMaybe<"axis" | "baseline" | "bottom" | "center" | "top" | RemoveAttribute>;
+    rowalign?: SignalOrValue<"axis" | "baseline" | "bottom" | "center" | "top" | RemoveAttribute>;
     /** @non-standard */
-    rowlines?: FunctionMaybe<"dashed" | "none" | "solid" | RemoveAttribute>;
+    rowlines?: SignalOrValue<"dashed" | "none" | "solid" | RemoveAttribute>;
     /** @non-standard */
-    rowspacing?: FunctionMaybe<string | RemoveAttribute>;
+    rowspacing?: SignalOrValue<string | RemoveAttribute>;
     /** @non-standard */
-    width?: FunctionMaybe<string | RemoveAttribute>;
+    width?: SignalOrValue<string | RemoveAttribute>;
 }
 interface MathMLMtdElementAttributes<T> extends MathMLAttributes<T> {
-    columnspan?: FunctionMaybe<number | string | RemoveAttribute>;
-    rowspan?: FunctionMaybe<number | string | RemoveAttribute>;
+    columnspan?: SignalOrValue<number | string | RemoveAttribute>;
+    rowspan?: SignalOrValue<number | string | RemoveAttribute>;
     /** @non-standard */
-    columnalign?: FunctionMaybe<"center" | "left" | "right" | RemoveAttribute>;
+    columnalign?: SignalOrValue<"center" | "left" | "right" | RemoveAttribute>;
     /** @non-standard */
-    rowalign?: FunctionMaybe<"axis" | "baseline" | "bottom" | "center" | "top" | RemoveAttribute>;
+    rowalign?: SignalOrValue<"axis" | "baseline" | "bottom" | "center" | "top" | RemoveAttribute>;
 }
 interface MathMLMtextElementAttributes<T> extends MathMLAttributes<T> { }
 interface MathMLMtrElementAttributes<T> extends MathMLAttributes<T> {
     /** @non-standard */
-    columnalign?: FunctionMaybe<"center" | "left" | "right" | RemoveAttribute>;
+    columnalign?: SignalOrValue<"center" | "left" | "right" | RemoveAttribute>;
     /** @non-standard */
-    rowalign?: FunctionMaybe<"axis" | "baseline" | "bottom" | "center" | "top" | RemoveAttribute>;
+    rowalign?: SignalOrValue<"axis" | "baseline" | "bottom" | "center" | "top" | RemoveAttribute>;
 }
 interface MathMLMunderElementAttributes<T> extends MathMLAttributes<T> {
-    accentunder?: FunctionMaybe<BooleanAttribute | RemoveAttribute>;
+    accentunder?: SignalOrValue<BooleanAttribute | RemoveAttribute>;
 }
 interface MathMLMunderoverElementAttributes<T> extends MathMLAttributes<T> {
-    accent?: FunctionMaybe<BooleanAttribute | RemoveAttribute>;
-    accentunder?: FunctionMaybe<BooleanAttribute | RemoveAttribute>;
+    accent?: SignalOrValue<BooleanAttribute | RemoveAttribute>;
+    accentunder?: SignalOrValue<BooleanAttribute | RemoveAttribute>;
 }
 interface MathMLSemanticsElementAttributes<T> extends MathMLAttributes<T> { }
 
 interface MathMLMencloseElementAttributes<T> extends MathMLAttributes<T> {
     /** @non-standard */
-    notation?: FunctionMaybe<string | RemoveAttribute>;
+    notation?: SignalOrValue<string | RemoveAttribute>;
 }
 interface MathMLMfencedElementAttributes<T> extends MathMLAttributes<T> {
-    close?: FunctionMaybe<string | RemoveAttribute>;
-    open?: FunctionMaybe<string | RemoveAttribute>;
-    separators?: FunctionMaybe<string | RemoveAttribute>;
+    close?: SignalOrValue<string | RemoveAttribute>;
+    open?: SignalOrValue<string | RemoveAttribute>;
+    separators?: SignalOrValue<string | RemoveAttribute>;
 }
 
 // TAGS
@@ -2997,21 +2299,13 @@ interface HTMLElementTags {
 }
 /** @type {HTMLElementDeprecatedTagNameMap} */
 interface HTMLElementDeprecatedTags {
-    /**
-     * @deprecated
-     */
+    /** * @deprecated */
     big: HTMLAttributes<HTMLElement>;
-    /**
-     * @deprecated
-     */
+    /** * @deprecated */
     keygen: KeygenHTMLAttributes<HTMLUnknownElement>;
-    /**
-     * @deprecated
-     */
+    /** * @deprecated */
     menuitem: HTMLAttributes<HTMLUnknownElement>;
-    /**
-     * @deprecated
-     */
+    /** * @deprecated */
     param: ParamHTMLAttributes<HTMLParamElement>;
 }
 /** @type {SVGElementTagNameMap} */
@@ -3107,17 +2401,10 @@ interface MathMLElementTags {
     munder: MathMLMunderElementAttributes<MathMLElement>;
     munderover: MathMLMunderoverElementAttributes<MathMLElement>;
     semantics: MathMLSemanticsElementAttributes<MathMLElement>;
-    /**
-     * @non-standard
-     */
+    /** @non-standard */
     menclose: MathMLMencloseElementAttributes<MathMLElement>;
-    /**
-     * @deprecated
-     */
+    /** * @deprecated */
     maction: MathMLMactionElementAttributes<MathMLElement>;
-    /**
-     * @deprecated
-     * @non-standard
-     */
+    /**@deprecated @non-standard*/
     mfenced: MathMLMfencedElementAttributes<MathMLElement>;
 }

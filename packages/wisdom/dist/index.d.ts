@@ -132,114 +132,8 @@ export type StylePropertiesBase = Partial<Pick<CSSStyleDeclaration, {
 export type StyleProperties = {
 	[K in keyof StylePropertiesBase]: SignalOrValue<StylePropertiesBase[K]>;
 };
-/**
- * Originally based on JSX types for Surplus and Inferno and adapted for `dom-expressions`.
- *
- * - https://github.com/adamhaile/surplus/blob/master/index.d.ts
- * - https://github.com/infernojs/inferno/blob/master/packages/inferno/src/core/types.ts
- *
- * MathML typings coming mostly from Preact
- *
- * - https://github.com/preactjs/preact/blob/07dc9f324e58569ce66634aa03fe8949b4190358/src/jsx.d.ts#L2575
- *
- * Checked against other frameworks via the following table:
- *
- * - https://potahtml.github.io/namespace-jsx-project/index.html
- *
- * # Typings on elements
- *
- * ## Attributes
- *
- * - Typings include attributes and not properties (unless the property Is special-cased, such
- *   textContent, event handlers, etc).
- * - Attributes are lowercase to avoid confusion with properties.
- * - Attributes are used "as is" and won't be transformed in any way (such to `lowercase` or from
- *   `dashed-case` to `camelCase`).
- *
- * ## Event Handlers
- *
- * - Event handlers use `camelCase` such `onClick` and will be delegated when possible, bubbling
- *   through the component tree, not the dom tree.
- * - Native event handlers use the namespace `on:` such `on:click`, and wont be delegated. bubbling
- *   the dom tree.
- * - A global case-insensitive event handler can be added by extending `EventHandlersElement<T>`
- * - A native `on:` event handler can be added by extending `CustomEvents<T>` interface
- *
- * ## Boolean Attributes (property setter that accepts `true | false`):
- *
- * - `(bool)true` adds the attribute `<video autoplay={true}/>` or in JSX as `<video autoplay/>`
- * - `(bool)false` removes the attribute from the DOM `<video autoplay={false}/>`
- * - `=""` may be accepted for the sake of parity with html `<video autoplay=""/>`
- * - `"true" | "false"` are NOT allowed, these are strings that evaluate to `(bool)true`
- *
- * ## Enumerated Attributes (attribute accepts 1 string value out of many)
- *
- * - Accepts any of the enumerated values, such: `"perhaps" | "maybe"`
- * - When one of the possible values is empty(in html that's for the attribute to be present), then it
- *   will also accept `(bool)true` to make it consistent with boolean attributes.
- *
- * Such `popover` attribute provides `"" | "manual" | "auto" | "hint"`.
- *
- * By NOT allowing `(bool)true` we will have to write `<div popover="" />`. Therefore, To make it
- * consistent with Boolean Attributes we accept `true | "" | "manual" | "auto" | "hint"`, such as:
- * `<div popover={true} />` or in JSX `<div popover />` is allowed and equivalent to `<div
- * popover="" />`
- *
- * ## Pseudo-Boolean Attributes (enumerated attributes that happen to accept the strings `"true" | "false"`)
- *
- * - Such `<div draggable="true"/>` or `<div draggable="false"/>`. The value of the attribute is a
- *   string not a boolean.
- * - `<div draggable={true}/>` is not valid because `(bool)true` is NOT transformed to the string
- *   `"true"`. Likewise `<div draggable={false}/>` removes the attribute from the element.
- * - MDN documentation https://developer.mozilla.org/en-US/docs/Web/HTML/Global_attributes/draggable
- *
- * ## All Of The Above In a nutshell
- *
- * - `(bool)true` adds an empty attribute
- * - `(bool)false` removes the attribute
- * - Attributes are lowercase
- * - Event handlers are camelCase
- * - Anything else is a `string` and used "as is"
- * - Additionally, an attribute may be removed by `undefined`
- *
- * ## Using Properties
- *
- * - The namespace `prop:` could be used to directly set properties in native elements and
- *   custom-elements. `<custom-element prop:myProp={true}/>` equivalent to `el.myProp = true`
- *
- * ## Interfaces
- *
- * Events
- *
- * 1. An event handler goes in `EventHandlersElement` when:
- *
- *    - `event` is global, that's to be defined in `HTMLElement` AND `SVGElement` AND `MathMLElement`
- *    - `event` is defined in `Element` (as `HTMLElement/MathMLElement/SVGElement` -> `Element`)
- * 2. `<body>`, `<svg>`, `<framesete>` are special as these include `window` events
- * 3. Any other event is special for its own tag.
- *
- * Browser Hierarchy
- *
- * - $Element (ex HTMLDivElement <div>) -> ... -> HTMLElement -> Element -> Node
- * - $Element (all math elements are MathMLElement) MathMLElement -> Element -> Node
- * - $Element`(ex SVGMaskElement <mask>) -> ... -> SVGElement -> Element -> Node
- *
- * Attributes
- *
- *      <div> -> ... -> HTMLAttributes -> ElementAttributes
- *      <svg> -> ... -> SVGAttributes -> ElementAttributes
- *      <math> -> ... -> MathMLAttributes -> ElementAttributes
- *
- *      ElementAttributes = `Element` + `Node` attributes (aka global attributes)
- *
- *      HTMLAttributes = `HTMLElement` attributes (aka HTML global attributes)
- *      SVGAttributes = `SVGElement` attributes (aka SVG global attributes)
- *      MathMLAttributes = `MathMLElement` attributes (aka MATH global attributes)
- *
- *      CustomAttributes = Framework attributes
- */
 export type DOMElement = Element;
-// Event handlers
+// event handlers
 export interface EventHandler<T, E extends Event> {
 	(e: E & {
 		currentTarget: T;
@@ -926,10 +820,7 @@ export interface ButtonHTMLAttributes<T> extends HTMLAttributes<T> {
 export interface CanvasHTMLAttributes<T> extends HTMLAttributes<T> {
 	height?: SignalOrValue<number | string | RemoveAttribute>;
 	width?: SignalOrValue<number | string | RemoveAttribute>;
-	/**
-	 * @deprecated
-	 * @non-standard
-	 */
+	/**@deprecated @non-standard*/
 	"moz-opaque"?: SignalOrValue<BooleanAttribute | RemoveAttribute>;
 }
 export interface CaptionHTMLAttributes<T> extends HTMLAttributes<T> {
@@ -1043,10 +934,7 @@ export interface IframeHTMLAttributes<T> extends HTMLAttributes<T> {
 	sharedstoragewritable?: SignalOrValue<BooleanAttribute | RemoveAttribute>;
 	/** @deprecated */
 	align?: SignalOrValue<string | RemoveAttribute>;
-	/**
-	 * @deprecated
-	 * @non-standard
-	 */
+	/**@deprecated @non-standard*/
 	allowpaymentrequest?: SignalOrValue<BooleanAttribute | RemoveAttribute>;
 	/** @deprecated */
 	allowtransparency?: SignalOrValue<BooleanAttribute | RemoveAttribute>;
@@ -1268,10 +1156,7 @@ export interface OlHTMLAttributes<T> extends HTMLAttributes<T> {
 	reversed?: SignalOrValue<BooleanAttribute | RemoveAttribute>;
 	start?: SignalOrValue<number | string | RemoveAttribute>;
 	type?: SignalOrValue<"1" | "a" | "A" | "i" | "I" | RemoveAttribute>;
-	/**
-	 * @deprecated
-	 * @non-standard
-	 */
+	/**@deprecated @non-standard*/
 	compact?: SignalOrValue<BooleanAttribute | RemoveAttribute>;
 }
 export interface OptgroupHTMLAttributes<T> extends HTMLAttributes<T> {
@@ -1624,10 +1509,7 @@ export interface ShapeElementSVGAttributes<T> extends SVGAttributes<T>, Pick<Pre
 export interface TextContentElementSVGAttributes<T> extends SVGAttributes<T>, Pick<PresentationSVGAttributes, "font-family" | "font-style" | "font-variant" | "font-weight" | "font-stretch" | "font-size" | "font-size-adjust" | "kerning" | "letter-spacing" | "word-spacing" | "text-decoration" | "glyph-orientation-horizontal" | "glyph-orientation-vertical" | "direction" | "unicode-bidi" | "text-anchor" | "dominant-baseline" | "color" | "fill" | "fill-rule" | "fill-opacity" | "stroke" | "stroke-width" | "stroke-linecap" | "stroke-linejoin" | "stroke-miterlimit" | "stroke-dasharray" | "stroke-dashoffset" | "stroke-opacity"> {
 }
 export interface ZoomAndPanSVGAttributes {
-	/**
-	 * @deprecated
-	 * @non-standard
-	 */
+	/**@deprecated @non-standard*/
 	zoomAndPan?: SignalOrValue<"disable" | "magnify" | RemoveAttribute>;
 }
 export interface AnimateSVGAttributes<T> extends AnimationElementSVGAttributes<T>, AnimationAttributeTargetSVGAttributes, AnimationTimingSVGAttributes, AnimationValueSVGAttributes, AnimationAdditionSVGAttributes, Pick<PresentationSVGAttributes, "color-interpolation" | "color-rendering"> {
@@ -1934,15 +1816,9 @@ export interface MathMLAnnotationXmlElementAttributes<T> extends MathMLAttribute
 	src?: SignalOrValue<string | RemoveAttribute>;
 }
 export interface MathMLMactionElementAttributes<T> extends MathMLAttributes<T> {
-	/**
-	 * @deprecated
-	 * @non-standard
-	 */
+	/**@deprecated @non-standard*/
 	actiontype?: SignalOrValue<"statusline" | "toggle" | RemoveAttribute>;
-	/**
-	 * @deprecated
-	 * @non-standard
-	 */
+	/**@deprecated @non-standard*/
 	selection?: SignalOrValue<string | RemoveAttribute>;
 }
 export interface MathMLMathElementAttributes<T> extends MathMLAttributes<T> {
@@ -1952,30 +1828,18 @@ export interface MathMLMerrorElementAttributes<T> extends MathMLAttributes<T> {
 }
 export interface MathMLMfracElementAttributes<T> extends MathMLAttributes<T> {
 	linethickness?: SignalOrValue<string | RemoveAttribute>;
-	/**
-	 * @deprecated
-	 * @non-standard
-	 */
+	/**@deprecated @non-standard*/
 	denomalign?: SignalOrValue<"center" | "left" | "right" | RemoveAttribute>;
-	/**
-	 * @deprecated
-	 * @non-standard
-	 */
+	/**@deprecated @non-standard*/
 	numalign?: SignalOrValue<"center" | "left" | "right" | RemoveAttribute>;
 }
 export interface MathMLMiElementAttributes<T> extends MathMLAttributes<T> {
 	mathvariant?: SignalOrValue<"normal" | RemoveAttribute>;
 }
 export interface MathMLMmultiscriptsElementAttributes<T> extends MathMLAttributes<T> {
-	/**
-	 * @deprecated
-	 * @non-standard
-	 */
+	/**@deprecated @non-standard*/
 	subscriptshift?: SignalOrValue<string | RemoveAttribute>;
-	/**
-	 * @deprecated
-	 * @non-standard
-	 */
+	/**@deprecated @non-standard*/
 	superscriptshift?: SignalOrValue<string | RemoveAttribute>;
 }
 export interface MathMLMnElementAttributes<T> extends MathMLAttributes<T> {
@@ -2027,30 +1891,15 @@ export interface MathMLMspaceElementAttributes<T> extends MathMLAttributes<T> {
 export interface MathMLMsqrtElementAttributes<T> extends MathMLAttributes<T> {
 }
 export interface MathMLMstyleElementAttributes<T> extends MathMLAttributes<T> {
-	/**
-	 * @deprecated
-	 * @non-standard
-	 */
+	/**@deprecated @non-standard*/
 	background?: SignalOrValue<string | RemoveAttribute>;
-	/**
-	 * @deprecated
-	 * @non-standard
-	 */
+	/**@deprecated @non-standard*/
 	color?: SignalOrValue<string | RemoveAttribute>;
-	/**
-	 * @deprecated
-	 * @non-standard
-	 */
+	/**@deprecated @non-standard*/
 	fontsize?: SignalOrValue<string | RemoveAttribute>;
-	/**
-	 * @deprecated
-	 * @non-standard
-	 */
+	/**@deprecated @non-standard*/
 	fontstyle?: SignalOrValue<string | RemoveAttribute>;
-	/**
-	 * @deprecated
-	 * @non-standard
-	 */
+	/**@deprecated @non-standard*/
 	fontweight?: SignalOrValue<string | RemoveAttribute>;
 	/** @deprecated */
 	scriptminsize?: SignalOrValue<string | RemoveAttribute>;
@@ -2058,29 +1907,17 @@ export interface MathMLMstyleElementAttributes<T> extends MathMLAttributes<T> {
 	scriptsizemultiplier?: SignalOrValue<string | RemoveAttribute>;
 }
 export interface MathMLMsubElementAttributes<T> extends MathMLAttributes<T> {
-	/**
-	 * @deprecated
-	 * @non-standard
-	 */
+	/**@deprecated @non-standard*/
 	subscriptshift?: SignalOrValue<string | RemoveAttribute>;
 }
 export interface MathMLMsubsupElementAttributes<T> extends MathMLAttributes<T> {
-	/**
-	 * @deprecated
-	 * @non-standard
-	 */
+	/**@deprecated @non-standard*/
 	subscriptshift?: SignalOrValue<string | RemoveAttribute>;
-	/**
-	 * @deprecated
-	 * @non-standard
-	 */
+	/**@deprecated @non-standard*/
 	superscriptshift?: SignalOrValue<string | RemoveAttribute>;
 }
 export interface MathMLMsupElementAttributes<T> extends MathMLAttributes<T> {
-	/**
-	 * @deprecated
-	 * @non-standard
-	 */
+	/**@deprecated @non-standard*/
 	superscriptshift?: SignalOrValue<string | RemoveAttribute>;
 }
 export interface MathMLMtableElementAttributes<T> extends MathMLAttributes<T> {
@@ -2349,18 +2186,11 @@ export interface MathMLElementTags {
 	munder: MathMLMunderElementAttributes<MathMLElement>;
 	munderover: MathMLMunderoverElementAttributes<MathMLElement>;
 	semantics: MathMLSemanticsElementAttributes<MathMLElement>;
-	/**
-	 * @non-standard
-	 */
+	/** @non-standard */
 	menclose: MathMLMencloseElementAttributes<MathMLElement>;
-	/**
-	 * @deprecated
-	 */
+	/** * @deprecated */
 	maction: MathMLMactionElementAttributes<MathMLElement>;
-	/**
-	 * @deprecated
-	 * @non-standard
-	 */
+	/**@deprecated @non-standard*/
 	mfenced: MathMLMfencedElementAttributes<MathMLElement>;
 }
 export type IntrinsicElementsCombined = HTMLElementTags & (ConfigureJSXElement["svg"] extends false ? void : SVGElementTags) & (ConfigureJSXElement["mathml"] extends false ? void : MathMLElementTags);
