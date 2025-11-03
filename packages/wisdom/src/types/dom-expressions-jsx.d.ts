@@ -7,8 +7,6 @@ import { CustomDomAttributes as CustomAttributes } from "./custom-attributes";
 import { SignalOrValue as FunctionMaybe } from "./signal-like";
 import { StyleProperties } from "./style-attributes";
 
-//import * as csstype from "csstype";
-
 /**
  * Originally based on JSX types for Surplus and Inferno and adapted for `dom-expressions`.
  *
@@ -129,31 +127,11 @@ interface EventHandler<T, E extends Event> {
     ): void;
 }
 
-//interface BoundEventHandler<
-//    T,
-//    E extends Event,
-//    EHandler extends EventHandler<T, any> = EventHandler<T, E>
-//> {
-//    0: (data: any, ...e: Parameters<EHandler>) => void;
-//    1: any;
-//}
 type EventHandlerUnion<
     T,
     E extends Event,
     EHandler extends EventHandler<T, any> = EventHandler<T, E>
-> = EHandler; // | BoundEventHandler<T, E, EHandler>;
-
-//interface EventHandlerWithOptions<T, E extends Event, EHandler = EventHandler<T, E>>
-//    extends AddEventListenerOptions,
-//    EventListenerOptions {
-//    handleEvent: EHandler;
-//}
-
-//type EventHandlerWithOptionsUnion<
-//    T,
-//    E extends Event,
-//    EHandler extends EventHandler<T, any> = EventHandler<T, E>
-//> = EHandler | EventHandlerWithOptions<T, E, EHandler>;
+> = EHandler;
 
 interface InputEventHandler<T, E extends InputEvent> {
     (
@@ -204,24 +182,14 @@ type FocusEventHandlerUnion<T, E extends FocusEvent> = EventHandlerUnion<
 >;
 // end event handlers
 
-//type ClassList =
-//    | Record<string, boolean>
-//    | Array<string | number | boolean | null | undefined | Record<string, boolean>>;
 
-//const SERIALIZABLE: unique symbol;
 interface SerializableAttributeValue {
     toString(): string;
-    //    [SERIALIZABLE]: never;
 }
 
 interface IntrinsicAttributes {
     ref?: unknown | ((e: unknown) => void) | undefined;
 }
-//interface CustomAttributes<T> {
-//    ref?: T | ((el: T) => void) | undefined;
-//    children?: FunctionMaybe<Element | undefined>;
-//    $ServerOnly?: boolean | undefined;
-//}
 type Accessor<T> = () => T;
 interface Directives { }
 interface DirectiveFunctions {
@@ -257,20 +225,7 @@ type OnAttributes<T> = {
 
 // CSS
 
-//interface CSSProperties extends csstype.PropertiesHyphen {
-//    // Override
-//    [key: `-${string}`]: string | number | undefined;
-//}
-
 type CSSProperties = StyleProperties;
-
-// TODO: Should we allow this?
-// type ClassKeys = `class:${string}`;
-// type CSSKeys = Exclude<keyof csstype.PropertiesHyphen, `-${string}`>;
-
-// type CSSAttributes = {
-//   [key in CSSKeys as `style:${key}`]: csstype.PropertiesHyphen[key];
-// };
 
 // BOOLEAN
 
@@ -701,29 +656,6 @@ interface EventHandlersWindow<T> {
     onStorage?: EventHandlerUnion<T, StorageEvent> | undefined;
     onUnhandledRejection?: EventHandlerUnion<T, PromiseRejectionEvent> | undefined;
     onUnload?: EventHandlerUnion<T, Event> | undefined;
-
-    // "on:afterprint"?: EventHandlerWithOptionsUnion<T, Event> | undefined;
-    // "on:beforeprint"?: EventHandlerWithOptionsUnion<T, Event> | undefined;
-    // "on:beforeunload"?: EventHandlerWithOptionsUnion<T, BeforeUnloadEvent> | undefined;
-    // "on:gamepadconnected"?: EventHandlerWithOptionsUnion<T, GamepadEvent> | undefined;
-    // "on:gamepaddisconnected"?: EventHandlerWithOptionsUnion<T, GamepadEvent> | undefined;
-    // "on:hashchange"?: EventHandlerWithOptionsUnion<T, HashChangeEvent> | undefined;
-    // "on:languagechange"?: EventHandlerWithOptionsUnion<T, Event> | undefined;
-    // "on:message"?: EventHandlerWithOptionsUnion<T, MessageEvent> | undefined;
-    // "on:messageerror"?: EventHandlerWithOptionsUnion<T, MessageEvent> | undefined;
-    // "on:offline"?: EventHandlerWithOptionsUnion<T, Event> | undefined;
-    // "on:online"?: EventHandlerWithOptionsUnion<T, Event> | undefined;
-    // "on:pagehide"?: EventHandlerWithOptionsUnion<T, PageTransitionEvent> | undefined;
-    // TODO `PageRevealEvent` is currently undefined in TS
-    // "on:pagereveal"?: EventHandlerWithOptionsUnion<T, Event> | undefined;
-    // "on:pageshow"?: EventHandlerWithOptionsUnion<T, PageTransitionEvent> | undefined;
-    // TODO `PageSwapEvent` is currently undefined in TS
-    // "on:pageswap"?: EventHandlerWithOptionsUnion<T, Event> | undefined;
-    // "on:popstate"?: EventHandlerWithOptionsUnion<T, PopStateEvent> | undefined;
-    // "on:rejectionhandled"?: EventHandlerWithOptionsUnion<T, PromiseRejectionEvent> | undefined;
-    // "on:storage"?: EventHandlerWithOptionsUnion<T, StorageEvent> | undefined;
-    // "on:unhandledrejection"?: EventHandlerWithOptionsUnion<T, PromiseRejectionEvent> | undefined;
-    // "on:unload"?: EventHandlerWithOptionsUnion<T, Event> | undefined;
 }
 
 /**
@@ -825,9 +757,7 @@ interface EventHandlersElement<T> {
     onResize?: EventHandlerUnion<T, UIEvent> | undefined;
     onScroll?: EventHandlerUnion<T, Event> | undefined;
     onScrollEnd?: EventHandlerUnion<T, Event> | undefined;
-    // todo `SnapEvent` is currently undefined in TS
     onScrollSnapChange?: EventHandlerUnion<T, Event> | undefined;
-    // todo `SnapEvent` is currently undefined in TS
     onScrollSnapChanging?: EventHandlerUnion<T, Event> | undefined;
     onSecurityPolicyViolation?: EventHandlerUnion<T, SecurityPolicyViolationEvent> | undefined;
     onSeeked?: EventHandlerUnion<T, Event> | undefined;
@@ -852,122 +782,6 @@ interface EventHandlersElement<T> {
     onVolumeChange?: EventHandlerUnion<T, Event> | undefined;
     onWaiting?: EventHandlerUnion<T, Event> | undefined;
     onWheel?: EventHandlerUnion<T, WheelEvent> | undefined;
-
-    // "on:abort"?: EventHandlerWithOptionsUnion<T, UIEvent> | undefined;
-    // "on:animationcancel"?: EventHandlerWithOptionsUnion<T, AnimationEvent> | undefined;
-    // "on:animationend"?: EventHandlerWithOptionsUnion<T, AnimationEvent> | undefined;
-    // "on:animationiteration"?: EventHandlerWithOptionsUnion<T, AnimationEvent> | undefined;
-    // "on:animationstart"?: EventHandlerWithOptionsUnion<T, AnimationEvent> | undefined;
-    // "on:auxclick"?: EventHandlerWithOptionsUnion<T, PointerEvent> | undefined;
-    // "on:beforecopy"?: EventHandlerWithOptionsUnion<T, ClipboardEvent> | undefined;
-    // "on:beforecut"?: EventHandlerWithOptionsUnion<T, ClipboardEvent> | undefined;
-    // "on:beforeinput"?:EventHandlerWithOptionsUnion<T, InputEvent, InputEventHandler<T, InputEvent>> | undefined;
-    // "on:beforematch"?: EventHandlerWithOptionsUnion<T, Event> | undefined;
-    // "on:beforepaste"?: EventHandlerWithOptionsUnion<T, ClipboardEvent> | undefined;
-    // "on:beforetoggle"?: EventHandlerWithOptionsUnion<T, ToggleEvent> | undefined;
-    // "on:beforexrselect"?: EventHandlerWithOptionsUnion<T, Event> | undefined;
-    // "on:blur"?: EventHandlerWithOptionsUnion<T, FocusEvent, FocusEventHandler<T, FocusEvent>> | undefined;
-    // "on:cancel"?: EventHandlerWithOptionsUnion<T, Event> | undefined;
-    // "on:canplay"?: EventHandlerWithOptionsUnion<T, Event> | undefined;
-    // "on:canplaythrough"?: EventHandlerWithOptionsUnion<T, Event> | undefined;
-    // "on:change"?: EventHandlerWithOptionsUnion<T, Event, ChangeEventHandler<T, Event>> | undefined;
-    // "on:click"?: EventHandlerWithOptionsUnion<T, MouseEvent> | undefined;
-    // "on:close"?: EventHandlerWithOptionsUnion<T, Event> | undefined;
-    // TODO `CommandEvent` is currently undefined in TS
-    // "on:command"?: EventHandlerWithOptionsUnion<T, Event> | undefined;
-    // "on:compositionend"?: EventHandlerWithOptionsUnion<T, CompositionEvent> | undefined;
-    // "on:compositionstart"?: EventHandlerWithOptionsUnion<T, CompositionEvent> | undefined;
-    // "on:compositionupdate"?: EventHandlerWithOptionsUnion<T, CompositionEvent> | undefined;
-    // "on:contentvisibilityautostatechange"?: | EventHandlerWithOptionsUnion<T, ContentVisibilityAutoStateChangeEvent> | undefined;
-    // "on:contextlost"?: EventHandlerWithOptionsUnion<T, Event> | undefined;
-    // "on:contextmenu"?: EventHandlerWithOptionsUnion<T, PointerEvent> | undefined;
-    // "on:contextrestored"?: EventHandlerWithOptionsUnion<T, Event> | undefined;
-    // "on:copy"?: EventHandlerWithOptionsUnion<T, ClipboardEvent> | undefined;
-    // "on:cuechange"?: EventHandlerWithOptionsUnion<T, Event> | undefined;
-    // "on:cut"?: EventHandlerWithOptionsUnion<T, ClipboardEvent> | undefined;
-    // "on:dblclick"?: EventHandlerWithOptionsUnion<T, MouseEvent> | undefined;
-    // "on:drag"?: EventHandlerWithOptionsUnion<T, DragEvent> | undefined;
-    // "on:dragend"?: EventHandlerWithOptionsUnion<T, DragEvent> | undefined;
-    // "on:dragenter"?: EventHandlerWithOptionsUnion<T, DragEvent> | undefined;
-    // "on:dragexit"?: EventHandlerWithOptionsUnion<T, DragEvent> | undefined;
-    // "on:dragleave"?: EventHandlerWithOptionsUnion<T, DragEvent> | undefined;
-    // "on:dragover"?: EventHandlerWithOptionsUnion<T, DragEvent> | undefined;
-    // "on:dragstart"?: EventHandlerWithOptionsUnion<T, DragEvent> | undefined;
-    // "on:drop"?: EventHandlerWithOptionsUnion<T, DragEvent> | undefined;
-    // "on:durationchange"?: EventHandlerWithOptionsUnion<T, Event> | undefined;
-    // "on:emptied"?: EventHandlerWithOptionsUnion<T, Event> | undefined;
-    // "on:ended"?: EventHandlerWithOptionsUnion<T, Event> | undefined;
-    // "on:error"?: EventHandlerWithOptionsUnion<T, ErrorEvent> | undefined;
-    // "on:focus"?: | EventHandlerWithOptionsUnion<T, FocusEvent, FocusEventHandler<T, FocusEvent>> | undefined;
-    // "on:focusin"?: | EventHandlerWithOptionsUnion<T, FocusEvent, FocusEventHandler<T, FocusEvent>> | undefined;
-    // "on:focusout"?: | EventHandlerWithOptionsUnion<T, FocusEvent, FocusEventHandler<T, FocusEvent>> | undefined;
-    // "on:formdata"?: EventHandlerWithOptionsUnion<T, FormDataEvent> | undefined;
-    // "on:fullscreenchange"?: EventHandlerWithOptionsUnion<T, Event> | undefined;
-    // "on:fullscreenerror"?: EventHandlerWithOptionsUnion<T, Event> | undefined;
-    // "on:gotpointercapture"?: EventHandlerWithOptionsUnion<T, PointerEvent> | undefined;
-    // "on:input"?: | EventHandlerWithOptionsUnion<T, InputEvent, InputEventHandler<T, InputEvent>> | undefined;
-    // "on:invalid"?: EventHandlerWithOptionsUnion<T, Event> | undefined;
-    // "on:keydown"?: EventHandlerWithOptionsUnion<T, KeyboardEvent> | undefined;
-    // "on:keypress"?: EventHandlerWithOptionsUnion<T, KeyboardEvent> | undefined;
-    // "on:keyup"?: EventHandlerWithOptionsUnion<T, KeyboardEvent> | undefined;
-    // "on:load"?: EventHandlerWithOptionsUnion<T, Event> | undefined;
-    // "on:loadeddata"?: EventHandlerWithOptionsUnion<T, Event> | undefined;
-    // "on:loadedmetadata"?: EventHandlerWithOptionsUnion<T, Event> | undefined;
-    // "on:loadstart"?: EventHandlerWithOptionsUnion<T, Event> | undefined;
-    // "on:lostpointercapture"?: EventHandlerWithOptionsUnion<T, PointerEvent> | undefined;
-    // "on:mousedown"?: EventHandlerWithOptionsUnion<T, MouseEvent> | undefined;
-    // "on:mouseenter"?: EventHandlerWithOptionsUnion<T, MouseEvent> | undefined;
-    // "on:mouseleave"?: EventHandlerWithOptionsUnion<T, MouseEvent> | undefined;
-    // "on:mousemove"?: EventHandlerWithOptionsUnion<T, MouseEvent> | undefined;
-    // "on:mouseout"?: EventHandlerWithOptionsUnion<T, MouseEvent> | undefined;
-    // "on:mouseover"?: EventHandlerWithOptionsUnion<T, MouseEvent> | undefined;
-    // "on:mouseup"?: EventHandlerWithOptionsUnion<T, MouseEvent> | undefined;
-    // "on:paste"?: EventHandlerWithOptionsUnion<T, ClipboardEvent> | undefined;
-    // "on:pause"?: EventHandlerWithOptionsUnion<T, Event> | undefined;
-    // "on:play"?: EventHandlerWithOptionsUnion<T, Event> | undefined;
-    // "on:playing"?: EventHandlerWithOptionsUnion<T, Event> | undefined;
-    // "on:pointercancel"?: EventHandlerWithOptionsUnion<T, PointerEvent> | undefined;
-    // "on:pointerdown"?: EventHandlerWithOptionsUnion<T, PointerEvent> | undefined;
-    // "on:pointerenter"?: EventHandlerWithOptionsUnion<T, PointerEvent> | undefined;
-    // "on:pointerleave"?: EventHandlerWithOptionsUnion<T, PointerEvent> | undefined;
-    // "on:pointermove"?: EventHandlerWithOptionsUnion<T, PointerEvent> | undefined;
-    // "on:pointerout"?: EventHandlerWithOptionsUnion<T, PointerEvent> | undefined;
-    // "on:pointerover"?: EventHandlerWithOptionsUnion<T, PointerEvent> | undefined;
-    // "on:pointerrawupdate"?: EventHandlerWithOptionsUnion<T, PointerEvent> | undefined;
-    // "on:pointerup"?: EventHandlerWithOptionsUnion<T, PointerEvent> | undefined;
-    // "on:progress"?: EventHandlerWithOptionsUnion<T, ProgressEvent> | undefined;
-    // "on:ratechange"?: EventHandlerWithOptionsUnion<T, Event> | undefined;
-    // "on:reset"?: EventHandlerWithOptionsUnion<T, Event> | undefined;
-    // "on:resize"?: EventHandlerWithOptionsUnion<T, UIEvent> | undefined;
-    // "on:scroll"?: EventHandlerWithOptionsUnion<T, Event> | undefined;
-    // "on:scrollend"?: EventHandlerWithOptionsUnion<T, Event> | undefined;
-    // todo `SnapEvent` is currently undefined in TS
-    // "on:scrollsnapchange"?: EventHandlerWithOptionsUnion<T, Event> | undefined;
-    // todo `SnapEvent` is currently undefined in TS
-    // "on:scrollsnapchanging"?: EventHandlerWithOptionsUnion<T, Event> | undefined;
-    // "on:securitypolicyviolation"?: | EventHandlerWithOptionsUnion<T, SecurityPolicyViolationEvent> | undefined;
-    // "on:seeked"?: EventHandlerWithOptionsUnion<T, Event> | undefined;
-    // "on:seeking"?: EventHandlerWithOptionsUnion<T, Event> | undefined;
-    // "on:select"?: EventHandlerWithOptionsUnion<T, Event> | undefined;
-    // "on:selectionchange"?: EventHandlerWithOptionsUnion<T, Event> | undefined;
-    // "on:selectstart"?: EventHandlerWithOptionsUnion<T, Event> | undefined;
-    // "on:slotchange"?: EventHandlerWithOptionsUnion<T, Event> | undefined;
-    // "on:stalled"?: EventHandlerWithOptionsUnion<T, Event> | undefined;
-    // "on:submit"?: EventHandlerWithOptionsUnion<T, SubmitEvent> | undefined;
-    // "on:suspend"?: EventHandlerWithOptionsUnion<T, Event> | undefined;
-    // "on:timeupdate"?: EventHandlerWithOptionsUnion<T, Event> | undefined;
-    // "on:toggle"?: EventHandlerWithOptionsUnion<T, ToggleEvent> | undefined;
-    // "on:touchcancel"?: EventHandlerWithOptionsUnion<T, TouchEvent> | undefined;
-    // "on:touchend"?: EventHandlerWithOptionsUnion<T, TouchEvent> | undefined;
-    // "on:touchmove"?: EventHandlerWithOptionsUnion<T, TouchEvent> | undefined;
-    // "on:touchstart"?: EventHandlerWithOptionsUnion<T, TouchEvent> | undefined;
-    // "on:transitioncancel"?: EventHandlerWithOptionsUnion<T, TransitionEvent> | undefined;
-    // "on:transitionend"?: EventHandlerWithOptionsUnion<T, TransitionEvent> | undefined;
-    // "on:transitionrun"?: EventHandlerWithOptionsUnion<T, TransitionEvent> | undefined;
-    // "on:transitionstart"?: EventHandlerWithOptionsUnion<T, TransitionEvent> | undefined;
-    // "on:volumechange"?: EventHandlerWithOptionsUnion<T, Event> | undefined;
-    // "on:waiting"?: EventHandlerWithOptionsUnion<T, Event> | undefined;
-    // "on:wheel"?: EventHandlerWithOptionsUnion<T, WheelEvent> | undefined;
 }
 
 type EventType =
