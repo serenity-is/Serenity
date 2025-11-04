@@ -2121,7 +2121,7 @@ export interface SVGElementTags {
 	use: UseSVGAttributes<SVGUseElement>;
 	view: ViewSVGAttributes<SVGViewElement>;
 }
-interface MathMLElementTags {
+export interface MathMLElementTags {
 	annotation: MathMLAnnotationElementAttributes<MathMLElement>;
 	"annotation-xml": MathMLAnnotationXmlElementAttributes<MathMLElement>;
 	math: MathMLMathElementAttributes<MathMLElement>;

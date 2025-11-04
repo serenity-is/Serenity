@@ -1,10 +1,10 @@
-export * from "./classname";
-export * from "./components";
-export * from "./custom-attributes";
-export { ElementAttributes, HTMLElementTags, SVGElementTags } from "./dom-expressions-jsx";
-export * from "./jsx-element";
-export * from "./jsx-namespace";
-export * from "./ref-types";
-export * from "./signal-like";
-export * from "./style-attributes";
+export type * from "./classname";
+export type * from "./components";
+export type * from "./custom-attributes";
+export type { ElementAttributes, HTMLElementTags, SVGElementTags, MathMLElementTags } from "./dom-expressions-jsx";
+export type * from "./jsx-element";
+export type * from "./jsx-namespace";
+export type * from "./ref-types";
+export type * from "./signal-like";
+export type * from "./style-attributes";
 
