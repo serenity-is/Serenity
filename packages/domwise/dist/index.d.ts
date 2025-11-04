@@ -52,7 +52,7 @@ export interface CustomDomAttributes<T> {
 	on?: Record<string, Function>;
 	onCapture?: Record<string, Function>;
 }
-interface ElementAttributes<T> {
+export interface ElementAttributes<T> {
 	className?: ElementAttributes<T>["class"];
 	tabIndex?: SignalOrValue<number | string | RemoveAttribute>;
 	namespaceURI?: string | undefined;
@@ -116,10 +116,19 @@ export type ShadowRootContainer = {
 	};
 	children: ComponentChildren;
 };
-type StylePropertiesBase = Partial<Pick<CSSStyleDeclaration, {
+export type RemoveIndex<T> = {
+	[K in keyof T as string extends K ? never : number extends K ? never : K]: T[K];
+};
+// eslint-disable-next-line @typescript-eslint/no-unsafe-function-type
+export type ExcludeMethods<T> = Pick<T, {
+	[K in keyof T]: T[K] extends Function ? never : K;
+}[keyof T]>;
+export type StyleAttributes = Partial<ExcludeMethods<RemoveIndex<Omit<CSSStyleDeclaration, "length" | "parentRules">>>>;
+/** CSSStyleDeclaration contains methods, readonly properties and an index signature, which we all need to filter out. */
+export type StylePropertiesBase = Partial<Pick<CSSStyleDeclaration, {
 	[K in keyof CSSStyleDeclaration]: K extends string ? CSSStyleDeclaration[K] extends string ? K : never : never;
 }[keyof CSSStyleDeclaration]>>;
-type StyleProperties = {
+export type StyleProperties = {
 	[K in keyof StylePropertiesBase]: SignalOrValue<StylePropertiesBase[K]>;
 };
 type DOMElement = Element;
@@ -610,7 +619,14 @@ interface EventHandlersElement<T> {
 	onWaiting?: EventHandlerUnion<T, Event> | undefined;
 	onWheel?: EventHandlerUnion<T, WheelEvent> | undefined;
 }
-interface ElementAttributes<T> extends CustomDomAttributes<T>, DirectiveAttributes, DirectiveFunctionAttributes<T>, PropAttributes, OnAttributes<T>, EventHandlersElement<T>, AriaAttributes {
+// GLOBAL ATTRIBUTES
+/**
+ * Global `Element` + `Node` interface keys, shared by all tags regardless of their namespace:
+ *
+ * 1. That's `keys` that are defined BY ALL `HTMLElement/SVGElement/MathMLElement` interfaces.
+ * 2. Includes `keys` defined by `Element` and `Node` interfaces.
+ */
+export interface ElementAttributes<T> extends CustomDomAttributes<T>, DirectiveAttributes, DirectiveFunctionAttributes<T>, PropAttributes, OnAttributes<T>, EventHandlersElement<T>, AriaAttributes {
 	// [key: ClassKeys]: boolean;
 	// properties
 	innerHTML?: SignalOrValue<string>;
@@ -1925,7 +1941,9 @@ interface MathMLMfencedElementAttributes<T> extends MathMLAttributes<T> {
 	open?: SignalOrValue<string | RemoveAttribute>;
 	separators?: SignalOrValue<string | RemoveAttribute>;
 }
-interface HTMLElementTags {
+// TAGS
+/** @type {HTMLElementTagNameMap} */
+export interface HTMLElementTags {
 	a: AnchorHTMLAttributes<HTMLAnchorElement>;
 	abbr: HTMLAttributes<HTMLElement>;
 	address: HTMLAttributes<HTMLElement>;
@@ -2041,7 +2059,8 @@ interface HTMLElementTags {
 	/** @url https://www.electronjs.org/docs/latest/api/webview-tag */
 	webview: WebViewHTMLAttributes<HTMLElement>;
 }
-interface SVGElementTags {
+/** @type {SVGElementTagNameMap} */
+export interface SVGElementTags {
 	animate: AnimateSVGAttributes<SVGAnimateElement>;
 	animateMotion: AnimateMotionSVGAttributes<SVGAnimateMotionElement>;
 	animateTransform: AnimateTransformSVGAttributes<SVGAnimateTransformElement>;

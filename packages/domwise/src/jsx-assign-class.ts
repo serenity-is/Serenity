@@ -1,6 +1,6 @@
+import type { JSXElement } from "../types";
 import { className } from "./classname";
 import { isSignalLike, observeSignal } from "./signal-util";
-import type { JSXElement } from "../types/jsx-element";
 import { isArrayLike, isObject } from "./util";
 
 function unsignalizePrevClass(prev: any): any {

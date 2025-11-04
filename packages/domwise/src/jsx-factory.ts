@@ -1,13 +1,12 @@
+import type { ComponentChildren, JSXElement } from "../types"
+import type { ElementAttributes, HTMLElementTags, SVGElementTags } from "../types"
 import { initComponentClass } from "./component"
+import { currentNamespaceURI } from "./in-namespace-uri"
 import { appendChildren } from "./jsx-append-children"
 import { assignProps } from "./jsx-assign-props"
-import { MathMLNamespace, mathMLOnlyTags as mathMLOnlyTags } from "./mathml-consts"
-import { currentNamespaceURI } from "./in-namespace-uri"
+import { MathMLNamespace, mathMLOnlyTags } from "./mathml-consts"
 import { attachRef } from "./ref"
-import { SVGNamespace, svgOnlyTags as svgOnlyTags } from "./svg-consts"
-import type { JSXElement } from "../types"
-import type { ComponentChildren } from "../types/custom-attributes"
-import type { ElementAttributes, HTMLElementTags, SVGElementTags } from "../types/dom-expressions-jsx"
+import { SVGNamespace, svgOnlyTags } from "./svg-consts"
 import { isComponentClass, isObject, isString } from "./util"
 
 

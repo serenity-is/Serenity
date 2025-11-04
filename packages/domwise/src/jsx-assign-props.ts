@@ -1,9 +1,9 @@
+import type { JSXElement } from "../types";
 import { addDisposingListener } from "./disposing-listener";
 import { assignClass } from "./jsx-assign-class";
 import { assignStyle } from "./jsx-assign-style";
 import { isSignalLike, observeSignal } from "./signal-util";
 import { nonPresentationSVGAttributes } from "./svg-consts";
-import type { JSXElement } from "../types/jsx-element";
 import { forEach, isObject, isVisibleChild, keys } from "./util";
 
 const XLinkNamespace = "http://www.w3.org/1999/xlink";
