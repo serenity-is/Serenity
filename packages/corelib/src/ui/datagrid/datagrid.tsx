@@ -787,10 +787,10 @@ export class DataGrid<TItem, P = {}> extends Widget<P> implements IDataGrid, IRe
     }
 
     /**
-     * Gets SlickGrid columns
+     * Gets .sleekGrid.columns()
      * @param all True to get all columns, false to get only visible columns
      */
-    public getSlickColumns(all?: boolean) {
+    public getGridColumns(all?: boolean) {
         return this._grid?.getColumns(all);
     }
 

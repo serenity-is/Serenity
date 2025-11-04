@@ -5459,10 +5459,10 @@ export declare class DataGrid<TItem, P = {}> extends Widget<P> implements IDataG
 	/** @deprecated override createColumns */
 	protected getColumns(): Column<TItem>[];
 	/**
-	 * Gets SlickGrid columns
+	 * Gets .sleekGrid.columns()
 	 * @param all True to get all columns, false to get only visible columns
 	 */
-	getSlickColumns(all?: boolean): Column<TItem>[];
+	getGridColumns(all?: boolean): Column<TItem>[];
 	protected wrapFormatterWithEditLink(column: Column, item: PropertyItem): void;
 	protected propertyItemsToSlickColumns(propertyItems: PropertyItem[]): Column[];
 	protected getSlickOptions(): GridOptions;
