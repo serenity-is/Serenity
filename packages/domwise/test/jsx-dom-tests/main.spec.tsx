@@ -364,338 +364,339 @@ describe("jsx-dom main", () => {
         })
 
         it("supports useImperativeHandle", () => {
-            const Button = function ({ ref, ...props }: { ref: Ref<{ focus: () => string }>, [key: string]: any }) {
+            const buttonRef = createRef<{ focus: () => string }>();
+
+            const Button = function ({ ref, ...props }: { ref: typeof buttonRef, [key: string]: any }) {
                 useImperativeHandle(ref, () => ({
                     focus: () => "ping",
                 }))
                 return <button {...props} />
             }
 
-        const ref = createRef<{ focus: () => string }>()
-        const node = (
-            <Button className="container" title="test" ref={ref}>
-                Click me!
-            </Button>
-        )
-        expect(node.className).toBe("container")
-        expect(ref.current).toHaveProperty("focus")
-        expect(ref.current.focus()).toBe("ping")
-    })
+            const node = (
+                <Button className="container" title="test" ref={buttonRef}>
+                    Click me!
+                </Button>
+            )
+            expect(node.className).toBe("container")
+            expect(buttonRef.current).toHaveProperty("focus")
+            expect(buttonRef.current.focus()).toBe("ping")
+        })
 
-    it("supports defaultProps in functional components", () => {
-        const Button = (props: any) => <div className={props.className} />
-        Button.defaultProps = { className: "defaultClass" }
-        const button = <Button />
-        expect(button.className).toBe("defaultClass")
-    })
+        it("supports defaultProps in functional components", () => {
+            const Button = (props: any) => <div className={props.className} />
+            Button.defaultProps = { className: "defaultClass" }
+            const button = <Button />
+            expect(button.className).toBe("defaultClass")
+        })
 
-    it("supports defaultProps in class components", () => {
-        class Button extends Component<{ className: string }> {
-            static defaultProps = { className: "defaultClass" }
-            render() {
-                return <div className={this.props.className} />
+        it("supports defaultProps in class components", () => {
+            class Button extends Component<{ className: string }> {
+                static defaultProps = { className: "defaultClass" }
+                render() {
+                    return <div className={this.props.className} />
+                }
             }
-        }
-        // @ts-ignore
-        const button = <Button />
-        expect(button.className).toBe("defaultClass")
-    })
+            // @ts-ignore
+            const button = <Button />
+            expect(button.className).toBe("defaultClass")
+        })
 
-    it("supports spellCheck attribute", () => {
-        <label for=""></label>
-        expect((<input spellCheck={true} /> as HTMLInputElement).spellcheck).toBe(true)
-        expect((<input spellCheck={false} /> as HTMLInputElement).spellcheck).toBe(false)
-        expect((<textarea spellCheck={true} /> as HTMLTextAreaElement).spellcheck).toBe(true)
-        expect((<textarea spellCheck={false} /> as HTMLTextAreaElement).spellcheck).toBe(false)
-    })
+        it("supports spellCheck attribute", () => {
+            <label for=""></label>
+            expect((<input spellCheck={true} /> as HTMLInputElement).spellcheck).toBe(true)
+            expect((<input spellCheck={false} /> as HTMLInputElement).spellcheck).toBe(false)
+            expect((<textarea spellCheck={true} /> as HTMLTextAreaElement).spellcheck).toBe(true)
+            expect((<textarea spellCheck={false} /> as HTMLTextAreaElement).spellcheck).toBe(false)
+        })
 
-    it("supports value attribute on textarea", () => {
-        expect((<textarea value="Test" /> as HTMLTextAreaElement).value).toBe("Test")
-        expect((<textarea value={undefined} /> as HTMLTextAreaElement).value).toBe("")
-    })
+        it("supports value attribute on textarea", () => {
+            expect((<textarea value="Test" /> as HTMLTextAreaElement).value).toBe("Test")
+            expect((<textarea value={undefined} /> as HTMLTextAreaElement).value).toBe("")
+        })
 
-    it("supports value attribute on select", () => {
-        const select = (
-            <select value="B">
-                <option value="A"></option>
-                <option value="B"></option>
-                <option value="C"></option>
-            </select>
-        ) as HTMLSelectElement
-
-        expect(select.querySelector<HTMLOptionElement>("[value=B]").selected).toBe(true)
-
-        const selectDeep = (
-            <select value={["C"]}>
-                <optgroup label="Group 1">
+        it("supports value attribute on select", () => {
+            const select = (
+                <select value="B">
                     <option value="A"></option>
-                </optgroup>
-                <optgroup label="Group 2">
+                    <option value="B"></option>
+                    <option value="C"></option>
+                </select>
+            ) as HTMLSelectElement
+
+            expect(select.querySelector<HTMLOptionElement>("[value=B]").selected).toBe(true)
+
+            const selectDeep = (
+                <select value={["C"]}>
+                    <optgroup label="Group 1">
+                        <option value="A"></option>
+                    </optgroup>
+                    <optgroup label="Group 2">
+                        <option value="B" selected></option>
+                        <option value="C"></option>
+                    </optgroup>
+                </select>
+            ) as HTMLSelectElement
+
+            expect(selectDeep.querySelector<HTMLOptionElement>("[value=C]").selected).toBe(true)
+        })
+
+        it("supports value attribute on select with multiple", () => {
+            const select = (
+                <select multiple value={["B", "C"]}>
+                    <option value="A" selected></option>
                     <option value="B" selected></option>
                     <option value="C"></option>
-                </optgroup>
-            </select>
-        ) as HTMLSelectElement
+                </select>
+            ) as HTMLSelectElement
 
-        expect(selectDeep.querySelector<HTMLOptionElement>("[value=C]").selected).toBe(true)
-    })
+            expect(select.querySelector<HTMLOptionElement>("[value=A]").selected).toBe(false)
+            expect(select.querySelector<HTMLOptionElement>("[value=B]").selected).toBe(true)
+            expect(select.querySelector<HTMLOptionElement>("[value=C]").selected).toBe(true)
 
-    it("supports value attribute on select with multiple", () => {
-        const select = (
-            <select multiple value={["B", "C"]}>
-                <option value="A" selected></option>
-                <option value="B" selected></option>
-                <option value="C"></option>
-            </select>
-        ) as HTMLSelectElement
-
-        expect(select.querySelector<HTMLOptionElement>("[value=A]").selected).toBe(false)
-        expect(select.querySelector<HTMLOptionElement>("[value=B]").selected).toBe(true)
-        expect(select.querySelector<HTMLOptionElement>("[value=C]").selected).toBe(true)
-
-        const selectSingle = (
-            <select multiple value={"C"}>
-                <option value="A"></option>
-                <option value="B" selected></option>
-                <option value="C" selected></option>
-            </select>
-        ) as HTMLSelectElement
-
-        expect(selectSingle.querySelector<HTMLOptionElement>("[value=A]").selected).toBe(false)
-        expect(selectSingle.querySelector<HTMLOptionElement>("[value=B]").selected).toBe(false)
-        expect(selectSingle.querySelector<HTMLOptionElement>("[value=C]").selected).toBe(true)
-
-        const selectDeep = (
-            <select multiple value={["A", "B"]}>
-                <optgroup label="Group 1">
+            const selectSingle = (
+                <select multiple value={"C"}>
                     <option value="A"></option>
-                </optgroup>
-                <optgroup label="Group 2">
                     <option value="B" selected></option>
-                    <option value="C"></option>
-                </optgroup>
-            </select>
-        ) as HTMLSelectElement
+                    <option value="C" selected></option>
+                </select>
+            ) as HTMLSelectElement
 
-        expect(selectDeep.querySelector<HTMLOptionElement>("[value=A]").selected).toBe(true)
-        expect(selectDeep.querySelector<HTMLOptionElement>("[value=B]").selected).toBe(true)
-        expect(selectDeep.querySelector<HTMLOptionElement>("[value=C]").selected).toBe(false)
-    })
-})
+            expect(selectSingle.querySelector<HTMLOptionElement>("[value=A]").selected).toBe(false)
+            expect(selectSingle.querySelector<HTMLOptionElement>("[value=B]").selected).toBe(false)
+            expect(selectSingle.querySelector<HTMLOptionElement>("[value=C]").selected).toBe(true)
 
-describe("styles", () => {
-    it("supports style object", () => {
-        expect((<div style={{ display: "none" }} />).style.display).toBe("none")
-    })
+            const selectDeep = (
+                <select multiple value={["A", "B"]}>
+                    <optgroup label="Group 1">
+                        <option value="A"></option>
+                    </optgroup>
+                    <optgroup label="Group 2">
+                        <option value="B" selected></option>
+                        <option value="C"></option>
+                    </optgroup>
+                </select>
+            ) as HTMLSelectElement
 
-    it("supports style string", () => {
-        const el = <div style="display: none; margin: 1px;" />
-        expect(el.style.display).toBe("none")
-        expect(el.style.margin).toBe("1px")
-    })
-})
-
-const _it =
-    (name: string, fn: (resolve: () => void, reject: (reason?: any) => void) => void) => () =>
-        it(name, () => new Promise<void>(fn))
-
-describe("events", () => {
-    _it("supports event listeners", done => {
-        const button = (<button onClick={() => done()} />) as HTMLButtonElement
-        button.click()
+            expect(selectDeep.querySelector<HTMLOptionElement>("[value=A]").selected).toBe(true)
+            expect(selectDeep.querySelector<HTMLOptionElement>("[value=B]").selected).toBe(true)
+            expect(selectDeep.querySelector<HTMLOptionElement>("[value=C]").selected).toBe(false)
+        })
     })
 
-    _it("supports capture event listeners", (done, reject) => {
-        const button = (
-            <button
-                onClickCapture={event => {
-                    event.stopImmediatePropagation()
-                    done()
-                }}
-                onClick={() => reject("`onClickCapture` was not called")}
-            />
-        ) as HTMLButtonElement
-        button.click()
+    describe("styles", () => {
+        it("supports style object", () => {
+            expect((<div style={{ display: "none" }} />).style.display).toBe("none")
+        })
+
+        it("supports style string", () => {
+            const el = <div style="display: none; margin: 1px;" />
+            expect(el.style.display).toBe("none")
+            expect(el.style.margin).toBe("1px")
+        })
     })
 
-    it("uses `element.on...` properties", () => {
-        const button = (<button onClick={() => void 0} />) as HTMLButtonElement
-        expect(button.onclick).to.be.a("function")
-    })
+    const _it =
+        (name: string, fn: (resolve: () => void, reject: (reason?: any) => void) => void) => () =>
+            it(name, () => new Promise<void>(fn))
 
-    it("uses addEventListener", () => {
-        const button = (<button {...{ onCustomEvent: () => void 0 } as any} />) as HTMLButtonElement
-        // @ts-expect-error checking not existing property
-        expect(button.oncustomevent).to.not.be.a("function")
-        // @ts-expect-error checking not existing property
-        expect(button.customEvent).to.not.be.a("function")
-    })
+    describe("events", () => {
+        _it("supports event listeners", done => {
+            const button = (<button onClick={() => done()} />) as HTMLButtonElement
+            button.click()
+        })
 
-    _it("supports custom events", done => {
-        const button = (<button {...{ onCustomEvent: () => done() } as any} />) as HTMLButtonElement
-        button.dispatchEvent(new window.Event("customEvent"))
-    })
-
-    _it("supports event listeners using `on` attribute", done => {
-        const button = (<button on={{ click: () => done() }} />) as HTMLButtonElement
-        button.click()
-    })
-
-    _it("supports capture event listeners using `onCapture` attribute", (done, reject) => {
-        const button = (
-            <button
-                onCapture={{
-                    click: event => {
+        _it("supports capture event listeners", (done, reject) => {
+            const button = (
+                <button
+                    onClickCapture={event => {
                         event.stopImmediatePropagation()
                         done()
-                    },
-                }}
-                onClick={() => reject("`onCapture` was not called")}
-            />
-        ) as HTMLButtonElement
-        button.click()
+                    }}
+                    onClick={() => reject("`onClickCapture` was not called")}
+                />
+            ) as HTMLButtonElement
+            button.click()
+        })
+
+        it("uses `element.on...` properties", () => {
+            const button = (<button onClick={() => void 0} />) as HTMLButtonElement
+            expect(button.onclick).to.be.a("function")
+        })
+
+        it("uses addEventListener", () => {
+            const button = (<button {...{ onCustomEvent: () => void 0 } as any} />) as HTMLButtonElement
+            // @ts-expect-error checking not existing property
+            expect(button.oncustomevent).to.not.be.a("function")
+            // @ts-expect-error checking not existing property
+            expect(button.customEvent).to.not.be.a("function")
+        })
+
+        _it("supports custom events", done => {
+            const button = (<button {...{ onCustomEvent: () => done() } as any} />) as HTMLButtonElement
+            button.dispatchEvent(new window.Event("customEvent"))
+        })
+
+        _it("supports event listeners using `on` attribute", done => {
+            const button = (<button on={{ click: () => done() }} />) as HTMLButtonElement
+            button.click()
+        })
+
+        _it("supports capture event listeners using `onCapture` attribute", (done, reject) => {
+            const button = (
+                <button
+                    onCapture={{
+                        click: event => {
+                            event.stopImmediatePropagation()
+                            done()
+                        },
+                    }}
+                    onClick={() => reject("`onCapture` was not called")}
+                />
+            ) as HTMLButtonElement
+            button.click()
+        })
+
+        _it("supports custom events using `on` attribute", done => {
+            const button = (<button on={{ CustomEvent: () => done() }} />) as HTMLButtonElement
+            button.dispatchEvent(new window.Event("CustomEvent"))
+        })
+        _it("maps onDoubleClick to dblclick event", done => {
+            const button = (<button onDoubleClick={() => done()} />) as HTMLButtonElement
+            button.dispatchEvent(new window.Event("dblclick"))
+        })
+        _it("maps onDblClick to dblclick event", done => {
+            const button = (<button onDblClick={() => done()} />) as HTMLButtonElement
+            button.dispatchEvent(new window.Event("dblclick"))
+        })
+        _it("maps onDoubleClickCapture to dblclick event", done => {
+            const button = (<button onDoubleClickCapture={() => done()} />) as HTMLButtonElement
+            button.dispatchEvent(new window.Event("dblclick"))
+        })
+        _it("maps onDblClickCapture to dblclick event", done => {
+            const button = (<button onDblClickCapture={() => done()} />) as HTMLButtonElement
+            button.dispatchEvent(new window.Event("dblclick"))
+        })
     })
 
-    _it("supports custom events using `on` attribute", done => {
-        const button = (<button on={{ CustomEvent: () => done() }} />) as HTMLButtonElement
-        button.dispatchEvent(new window.Event("CustomEvent"))
-    })
-    _it("maps onDoubleClick to dblclick event", done => {
-        const button = (<button onDoubleClick={() => done()} />) as HTMLButtonElement
-        button.dispatchEvent(new window.Event("dblclick"))
-    })
-    _it("maps onDblClick to dblclick event", done => {
-        const button = (<button onDblClick={() => done()} />) as HTMLButtonElement
-        button.dispatchEvent(new window.Event("dblclick"))
-    })
-    _it("maps onDoubleClickCapture to dblclick event", done => {
-        const button = (<button onDoubleClickCapture={() => done()} />) as HTMLButtonElement
-        button.dispatchEvent(new window.Event("dblclick"))
-    })
-    _it("maps onDblClickCapture to dblclick event", done => {
-        const button = (<button onDblClickCapture={() => done()} />) as HTMLButtonElement
-        button.dispatchEvent(new window.Event("dblclick"))
-    })
-})
+    describe("forwardRef", () => {
+        it("supports forwardRef", () => {
+            // const FancyButton = forwardRef((props, ref) => (
+            const FancyButton = props => (
+                <button ref={props.ref} className="FancyButton">
+                    {props.children}
+                </button>
+            )
 
-describe("forwardRef", () => {
-    it("supports forwardRef", () => {
-        // const FancyButton = forwardRef((props, ref) => (
-        const FancyButton = props => (
-            <button ref={props.ref} className="FancyButton">
-                {props.children}
-            </button>
-        )
-
-        // You can now get a ref directly to the DOM button:
-        const ref = createRef();
-        (<FancyButton ref={ref}>Click me!</FancyButton>).toString();
-        expect(ref.current).toBeInstanceOf(HTMLButtonElement)
-    })
-})
-
-describe("fragment", () => {
-    it("supports fragments", () => {
-        const frag = (
-            <>
-                {[2]}
-                <span>Bonjour</span>
-            </>
-        )
-        const nodes = frag.childNodes
-        expect(nodes[0].nodeType).toBe(Node.TEXT_NODE)
-        expect(nodes[0].textContent).toBe("2")
-        expect(nodes[1].nodeName).toBe("SPAN")
-        expect(nodes[1].textContent).toBe("Bonjour")
+            // You can now get a ref directly to the DOM button:
+            const ref = createRef();
+            (<FancyButton ref={ref}>Click me!</FancyButton>).toString();
+            expect(ref.current).toBeInstanceOf(HTMLButtonElement)
+        })
     })
 
-    it("supports fragments with explicit tag", () => {
-        const frag = (
-            <Fragment>
-                {[2]}
-                <span>Bonjour</span>
-            </Fragment>
-        )
-        const nodes = frag.childNodes
-        expect(nodes[0].nodeType).toBe(Node.TEXT_NODE)
-        expect(nodes[0].textContent).toBe("2")
-        expect(nodes[1].nodeName).toBe("SPAN")
-        expect(nodes[1].textContent).toBe("Bonjour")
-    })
+    describe("fragment", () => {
+        it("supports fragments", () => {
+            const frag = (
+                <>
+                    {[2]}
+                    <span>Bonjour</span>
+                </>
+            )
+            const nodes = frag.childNodes
+            expect(nodes[0].nodeType).toBe(Node.TEXT_NODE)
+            expect(nodes[0].textContent).toBe("2")
+            expect(nodes[1].nodeName).toBe("SPAN")
+            expect(nodes[1].textContent).toBe("Bonjour")
+        })
 
-    it("supports fragments with one child", () => {
-        const frag = (
-            <>
-                <span>Text</span>
-            </>
-        )
-        const nodes = frag.childNodes
-        expect(nodes).to.have.lengthOf(1)
-        expect(nodes[0].nodeName).toBe("SPAN")
-        expect(nodes[0].textContent).toBe("Text")
-    })
+        it("supports fragments with explicit tag", () => {
+            const frag = (
+                <Fragment>
+                    {[2]}
+                    <span>Bonjour</span>
+                </Fragment>
+            )
+            const nodes = frag.childNodes
+            expect(nodes[0].nodeType).toBe(Node.TEXT_NODE)
+            expect(nodes[0].textContent).toBe("2")
+            expect(nodes[1].nodeName).toBe("SPAN")
+            expect(nodes[1].textContent).toBe("Bonjour")
+        })
 
-    it("supports fragments as child", () => {
-        const frag = (
-            <div>
+        it("supports fragments with one child", () => {
+            const frag = (
                 <>
                     <span>Text</span>
                 </>
-            </div>
-        )
-        const nodes = frag.childNodes
-        expect(nodes).to.have.lengthOf(1)
-        expect(nodes[0].nodeName).toBe("SPAN")
-        expect(nodes[0].textContent).toBe("Text")
+            )
+            const nodes = frag.childNodes
+            expect(nodes).to.have.lengthOf(1)
+            expect(nodes[0].nodeName).toBe("SPAN")
+            expect(nodes[0].textContent).toBe("Text")
+        })
+
+        it("supports fragments as child", () => {
+            const frag = (
+                <div>
+                    <>
+                        <span>Text</span>
+                    </>
+                </div>
+            )
+            const nodes = frag.childNodes
+            expect(nodes).to.have.lengthOf(1)
+            expect(nodes[0].nodeName).toBe("SPAN")
+            expect(nodes[0].textContent).toBe("Text")
+        })
     })
-})
 
-describe("web component events", () => {
-    it("can be defined as a web component", () => {
-        customElements.define("web-component", class WebComponent extends HTMLElement { })
+    describe("web component events", () => {
+        it("can be defined as a web component", () => {
+            customElements.define("web-component", class WebComponent extends HTMLElement { })
+        })
     })
-})
 
-describe("templates", () => {
-    it("supports templates", () => {
-        const template = (
-            <template>
-                {[2]}
-                <span>Bonjour</span>
-            </template>
-        ) as HTMLTemplateElement
+    describe("templates", () => {
+        it("supports templates", () => {
+            const template = (
+                <template>
+                    {[2]}
+                    <span>Bonjour</span>
+                </template>
+            ) as HTMLTemplateElement
 
-        const nodes = template.content.childNodes
-        expect(nodes[0].nodeType).toBe(Node.TEXT_NODE)
-        expect(nodes[0].textContent).toBe("2")
-        expect(nodes[1].nodeName).toBe("SPAN")
-        expect(nodes[1].textContent).toBe("Bonjour")
+            const nodes = template.content.childNodes
+            expect(nodes[0].nodeType).toBe(Node.TEXT_NODE)
+            expect(nodes[0].textContent).toBe("2")
+            expect(nodes[1].nodeName).toBe("SPAN")
+            expect(nodes[1].textContent).toBe("Bonjour")
+        })
     })
-})
 
-it('attach event listeners but drop the dash after on', function () {
-    const addEventListener = vi.spyOn(EventTarget.prototype, 'addEventListener');
+    it('attach event listeners but drop the dash after on', function () {
+        const addEventListener = vi.spyOn(EventTarget.prototype, 'addEventListener');
 
-    const handler = function () { };
-    const assignProps = { onremoteinput: handler, onRemoteinput: handler };
-    const element = (
-        <a href="#" {...assignProps}>
-            Download
-        </a>
-    ) as HTMLElement;
+        const handler = function () { };
+        const assignProps = { onremoteinput: handler, onRemoteinput: handler };
+        const element = (
+            <a href="#" {...assignProps}>
+                Download
+            </a>
+        ) as HTMLElement;
 
-    expect(element.outerHTML).toBe('<a href="#">Download</a>');
+        expect(element.outerHTML).toBe('<a href="#">Download</a>');
 
-    expect(addEventListener.mock.calls.length).toBe(2);
-    expect(addEventListener.mock.calls[0]).toEqual([
-        'remoteinput',
-        handler,
-    ]);
-    expect(addEventListener.mock.calls[1]).toEqual([
-        'remoteinput',
-        handler,
-    ]);
+        expect(addEventListener.mock.calls.length).toBe(2);
+        expect(addEventListener.mock.calls[0]).toEqual([
+            'remoteinput',
+            handler,
+        ]);
+        expect(addEventListener.mock.calls[1]).toEqual([
+            'remoteinput',
+            handler,
+        ]);
 
-    addEventListener.mockClear();
-});
+        addEventListener.mockClear();
+    });
 })
