@@ -2247,12 +2247,12 @@ export type SNoInfer<T> = [
 export declare class EditorAttribute {
 }
 /**
- * Marker interface for SlickGrid formatters.
+ * Marker interface for SleekGrid formatters.
  */
 export declare class ISlickFormatter {
 }
 /**
- * Register a SlickGrid formatter.
+ * Register a SleekGrid formatter.
  * @param type Formatter type
  * @param name Formatter name
  * @param intfAndAttr Optional interface(s) to implement
@@ -4053,7 +4053,7 @@ export interface ArgsRowsOrCountChanged extends ArgsDataView {
 }
 /**
  * A data view that supports remote data loading, sorting, filtering, grouping, and paging.
- * Extends the functionality of SlickGrid's DataView with server-side data operations.
+ * Extends the functionality of SleekGrid's DataView with server-side data operations.
  *
  * @typeparam TItem The type of entities in the view
  */
@@ -5391,7 +5391,7 @@ export declare class DataGrid<TItem, P = {}> extends Widget<P> implements IDataG
 	 * @returns The SleekGrid columns.
 	 */
 	protected createSleekColumns(): Column<TItem>[];
-	/** @deprecated Override initSleekGrid to add plugins to the sleekgrid */
+	/** Override initSleekGrid to add plugins to the sleekgrid */
 	protected createSlickGrid(): ISleekGrid<TItem> | null;
 	protected initSleekGrid(): void;
 	protected setInitialSortOrder(): void;
@@ -7131,9 +7131,9 @@ export declare namespace LazyLoadHelper {
 	const executeOnceWhenShown: typeof executeOnceWhenVisible;
 	const executeEverytimeWhenShown: typeof executeEverytimeWhenVisible;
 }
-export declare namespace PropertyItemSlickConverter {
-	function toSlickColumns(items: PropertyItem[]): Column[];
-	function toSlickColumn(item: PropertyItem): Column;
+export declare namespace PropertyItemColumnConverter {
+	function toColumns(items: PropertyItem[]): Column[];
+	function toColumn(item: PropertyItem): Column;
 }
 export declare namespace SlickFormatting {
 	function itemLink<TItem = any>(itemType: string, idField: string, getText: Format<TItem>, cssClass?: (ctx: FormatterContext<TItem>) => string, encode?: boolean): Format<TItem>;
