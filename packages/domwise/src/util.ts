@@ -9,10 +9,6 @@ export function forEach<V = any>(value: { [key: string]: V }, fn: (value: V, key
     }
 }
 
-export function identity<T>(value: T) {
-    return value;
-}
-
 export function isElement(val: any): val is Element {
     return val && typeof val.nodeType === "number";
 }

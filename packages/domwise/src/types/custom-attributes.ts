@@ -29,19 +29,12 @@ export interface CustomDomAttributes<T> {
     dangerouslySetInnerHTML?: { __html: string };
     ref?: Ref<T>;
 
-    /** @deprecated This is simply ignored as it only applies to v-dom  */
+    /** @deprecated This is simply ignored as it only applies to v-dom */
     key?: string | number;
 
     /** compat from jsx-dom/react */
     on?: Record<string, Function>;
     onCapture?: Record<string, Function>;
-
-    /**
-     * This is essentially a reverse "is" attribute.
-     * If you specify it, the generated tag will be tsxTag and it will receive an "is" attribute with the tag you specified in your JSX.
-     * This is needed because we can't make the is-property associate with the correct component props.
-     */
-    tsxTag?: keyof HTMLElementTagNameMap | keyof SVGElementTagNameMap;
 }
 
 declare module "./dom-expressions-jsx" {
@@ -85,7 +78,7 @@ declare module "./dom-expressions-jsx" {
         htmlFor?: SignalOrValue<string | RemoveAttribute>;
     }
 
-    interface TdHTMLAttributes<T>{
+    interface TdHTMLAttributes<T> {
         colSpan?: SignalOrValue<number | string | RemoveAttribute>;
         rowSpan?: SignalOrValue<number | string | RemoveAttribute>;
     }

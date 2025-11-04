@@ -54,17 +54,11 @@ export interface CustomDomAttributes<T> {
 		__html: string;
 	};
 	ref?: Ref<T>;
-	/** @deprecated This is simply ignored as it only applies to v-dom  */
+	/** @deprecated This is simply ignored as it only applies to v-dom */
 	key?: string | number;
 	/** compat from jsx-dom/react */
 	on?: Record<string, Function>;
 	onCapture?: Record<string, Function>;
-	/**
-	 * This is essentially a reverse "is" attribute.
-	 * If you specify it, the generated tag will be tsxTag and it will receive an "is" attribute with the tag you specified in your JSX.
-	 * This is needed because we can't make the is-property associate with the correct component props.
-	 */
-	tsxTag?: keyof HTMLElementTagNameMap | keyof SVGElementTagNameMap;
 }
 interface ElementAttributes<T> {
 	className?: ElementAttributes<T>["class"];
@@ -2172,19 +2166,10 @@ export declare namespace JSX {
 	interface IntrinsicElements extends IntrinsicElementsCombined, CustomElementsHTML {
 	}
 }
-export declare function Fragment(attr: {
-	children?: ComponentChildren | undefined;
-}): any;
 export declare function createRef<T = any>(): RefObject<T>;
-declare function identity<T>(value: T): T;
-export declare function useMemo<T>(factory: () => T): T;
-export declare function forwardRef<T = Node, P = {}>(render: (props: P, ref: Ref<T>) => JSXElement): FunctionComponent<P & {
-	ref?: Ref<T>;
-}>;
-export declare function useImperativeHandle<T>(ref: Ref<T>, init: () => T, _deps?: unknown): void;
+export declare function useImperativeHandle<T>(ref: Ref<T>, init: () => T): void;
 export declare function createElement(tag: any, attr: any, ...children: any[]): any;
 export declare const h: typeof createElement;
-export declare function createFactory(tag: string | FunctionComponent<any>): any;
 export declare class Component<T = any> {
 	static isComponent: boolean;
 	constructor(props: T & {
@@ -2243,6 +2228,9 @@ export declare function removeDisposingListener<T extends EventTarget>(target: T
  * @returns The current lifecycle root element or null if none is set.
  */
 export declare function currentLifecycleRoot(...args: Element[]): Element | null;
+export declare function Fragment(attr: {
+	children?: ComponentChildren | undefined;
+}): any;
 export declare function useClassList(initialValue?: ClassNames): BasicClassList;
 export declare function useText(initialValue?: string): readonly [
 	Text,
@@ -2333,10 +2321,7 @@ export declare const untracked: (<T>(fn: () => T) => T);
 export declare const SVGNamespace = "http://www.w3.org/2000/svg";
 
 export {
-	Fragment as StrictMode,
 	createRef as useRef,
-	identity as memo,
-	identity as useCallback,
 	jsx as jsxs,
 };
 
