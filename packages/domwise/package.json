@@ -1,6 +1,6 @@
 {
   "name": "@serenity-is/domwise",
-  "version": "1.0.0",
+  "version": "0.0.4",
   "description": "Use JSX syntax to create DOM elements with full TypeScript support",
   "type": "module",
   "types": "dist/index.d.ts",
@@ -45,8 +45,8 @@
     "ui"
   ],
   "author": "Volkan Ceylan, Furkan Evran, Victor Tomaili (https://serenity.is)",
-  "repository": "serenity-is/sleekgrid",
+  "repository": "serenity-is/serenity",
   "license": "MIT",
-  "bugs": "https://github.com/serenity-is/sleekGrid/issues",
-  "homepage": "https://github.com/serenity-is/sleekGrid#readme"
+  "bugs": "https://github.com/serenity-is/serenity/issues",
+  "homepage": "https://github.com/serenity-is/serenity#readme"
 }
