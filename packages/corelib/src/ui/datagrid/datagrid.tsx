@@ -13,7 +13,7 @@ import { FilterStore } from "../filtering/filterstore";
 import { EditLink } from "../helpers/editlink";
 import { GridUtils } from "../helpers/gridutils";
 import { LazyLoadHelper } from "../helpers/lazyloadhelper";
-import { PropertyItemSlickConverter } from "../helpers/propertyitemslickconverter";
+import { PropertyItemColumnConverter } from "../helpers/propertyitemcolumnconverter";
 import { SlickFormatting } from "../helpers/slickformatting";
 import { SlickHelper } from "../helpers/slickhelper";
 import { ToolButton, Toolbar } from "../widgets/toolbar";
@@ -373,21 +373,21 @@ export class DataGrid<TItem, P = {}> extends Widget<P> implements IDataGrid, IRe
      */
     protected createColumns(): Column<TItem>[] {
         const items = this.getPropertyItems();
-        return this.propertyItemsToSlickColumns(items);
+        return this.propertyItemsToColumns(items);
     }
 
     /**
-     * Creates the SlickGrid columns. This method calls createColumns (via getColumns for compatibility) and then post processes them.
-     * @returns The SlickGrid columns.
+     * Creates the SleekGrid columns. This method calls createColumns (via getColumns for compatibility) and then post processes them.
+     * @returns The SleekGrid columns.
      */
-    protected createSlickColumns(): Column<TItem>[] {
+    protected createSleekColumns(): Column<TItem>[] {
         const columns = (this as any).getColumns();
         return this.postProcessColumns(columns || []) || [];
     }
 
-    /** @deprecated Override initSleekGrid to add plugins to the sleekgrid */
+    /** Override initSleekGrid to add plugins to the sleekgrid */
     protected createSlickGrid(): ISleekGrid<TItem> | null {
-        const columns = this.createSlickColumns();
+        const columns = this.createSleekColumns();
         const slickOptions = this.getSlickOptions();
         this._grid = new SleekGrid(this.slickContainer.getNode(), this.view as any, columns, slickOptions);
         this._grid.registerPlugin(new AutoTooltips({ enableForHeaderCells: true }));
@@ -786,14 +786,6 @@ export class DataGrid<TItem, P = {}> extends Widget<P> implements IDataGrid, IRe
         return this.createColumns();
     }
 
-    /**
-     * Gets .sleekGrid.columns()
-     * @param all True to get all columns, false to get only visible columns
-     */
-    public getGridColumns(all?: boolean) {
-        return this._grid?.getColumns(all);
-    }
-
     protected wrapFormatterWithEditLink(column: Column, item: PropertyItem) {
         const orgFormat = column.format;
         const itemType = item.editLinkItemType || null;
@@ -809,8 +801,8 @@ export class DataGrid<TItem, P = {}> extends Widget<P> implements IDataGrid, IRe
         }
     }
 
-    protected propertyItemsToSlickColumns(propertyItems: PropertyItem[]): Column[] {
-        var columns = PropertyItemSlickConverter.toSlickColumns(propertyItems);
+    protected propertyItemsToColumns(propertyItems: PropertyItem[]): Column[] {
+        var columns = PropertyItemColumnConverter.toColumns(propertyItems);
         for (var i = 0; i < propertyItems.length; i++) {
             var item = propertyItems[i];
             if (item.editLink) {
@@ -1215,9 +1207,6 @@ export class DataGrid<TItem, P = {}> extends Widget<P> implements IDataGrid, IRe
     public get sleekGrid() { return this._grid; }
     protected set sleekGrid(value: ISleekGrid<TItem>) { this._grid = value; }
 
-    /** @deprecated use sleekGrid.getColumns(true) */
-    protected get allColumns(): Column[] { return this._grid?.getColumns(true) }
-
     /** @deprecated Use sleekGrid or getGrid() */
     public get slickGrid() { return this._grid; }
 
@@ -1228,6 +1217,9 @@ export class DataGrid<TItem, P = {}> extends Widget<P> implements IDataGrid, IRe
     getFilterStore(): FilterStore {
         return (this.filterBar == null) ? null : this.filterBar.get_store();
     }
+
+    public get allColumns(): Column[] { return this._grid?.getColumns(true) }
+    public get columns() { return this._grid?.getColumns(false); }
 
     /** @obsolete use defaultPersistenceStorage, this one has a typo */
     public static get defaultPersistanceStorage(): SettingStorage { return DataGrid.defaultPersistenceStorage; }

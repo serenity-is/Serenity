@@ -114,7 +114,7 @@ export * from "./ui/helpers/gridrowselectionmixin";
 export * from "./ui/helpers/gridselectallbuttonhelper";
 export * from "./ui/helpers/gridutils";
 export * from "./ui/helpers/lazyloadhelper";
-export * from "./ui/helpers/propertyitemslickconverter";
+export * from "./ui/helpers/propertyitemcolumnconverter";
 export * from "./ui/helpers/slickformatting";
 export * from "./ui/helpers/slickhelper";
 export * from "./ui/helpers/slicktreehelper";

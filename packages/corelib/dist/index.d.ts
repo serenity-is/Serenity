@@ -5387,10 +5387,10 @@ export declare class DataGrid<TItem, P = {}> extends Widget<P> implements IDataG
 	 */
 	protected createColumns(): Column<TItem>[];
 	/**
-	 * Creates the SlickGrid columns. This method calls createColumns (via getColumns for compatibility) and then post processes them.
-	 * @returns The SlickGrid columns.
+	 * Creates the SleekGrid columns. This method calls createColumns (via getColumns for compatibility) and then post processes them.
+	 * @returns The SleekGrid columns.
 	 */
-	protected createSlickColumns(): Column<TItem>[];
+	protected createSleekColumns(): Column<TItem>[];
 	/** @deprecated Override initSleekGrid to add plugins to the sleekgrid */
 	protected createSlickGrid(): ISleekGrid<TItem> | null;
 	protected initSleekGrid(): void;
@@ -5458,13 +5458,8 @@ export declare class DataGrid<TItem, P = {}> extends Widget<P> implements IDataG
 	protected getPropertyItemsDataAsync(): Promise<PropertyItemsData>;
 	/** @deprecated override createColumns */
 	protected getColumns(): Column<TItem>[];
-	/**
-	 * Gets .sleekGrid.columns()
-	 * @param all True to get all columns, false to get only visible columns
-	 */
-	getGridColumns(all?: boolean): Column<TItem>[];
 	protected wrapFormatterWithEditLink(column: Column, item: PropertyItem): void;
-	protected propertyItemsToSlickColumns(propertyItems: PropertyItem[]): Column[];
+	protected propertyItemsToColumns(propertyItems: PropertyItem[]): Column[];
 	protected getSlickOptions(): GridOptions;
 	protected populateLock(): void;
 	protected populateUnlock(): void;
@@ -5518,12 +5513,12 @@ export declare class DataGrid<TItem, P = {}> extends Widget<P> implements IDataG
 	getGrid(): ISleekGrid<TItem>;
 	get sleekGrid(): ISleekGrid<TItem>;
 	protected set sleekGrid(value: ISleekGrid<TItem>);
-	/** @deprecated use sleekGrid.getColumns(true) */
-	protected get allColumns(): Column[];
 	/** @deprecated Use sleekGrid or getGrid() */
 	get slickGrid(): ISleekGrid<TItem>;
 	getView(): IRemoteView<TItem>;
 	getFilterStore(): FilterStore;
+	get allColumns(): Column[];
+	get columns(): Column<TItem>[];
 	/** @obsolete use defaultPersistenceStorage, this one has a typo */
 	static get defaultPersistanceStorage(): SettingStorage;
 	/** @obsolete use defaultPersistenceStorage, this one has a typo */

@@ -5,7 +5,7 @@ namespace Serenity.ComponentModel;
 /// Centers text horizontally (usually in a grid column).
 /// </summary>
 /// <remarks>
-/// Used for text alignment in grids by adding `align-center` CSS class to corresponding SlickGrid column.
+/// Used for text alignment in grids by adding `align-center` CSS class to corresponding SleekGrid column.
 /// Note that it has no effect on editors or forms.
 /// </remarks>
 public class AlignCenterAttribute : AlignmentAttribute

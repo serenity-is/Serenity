@@ -1,11 +1,11 @@
 import { Culture, addLocalText } from "../../base";
 import { DateFormatter } from "../formatters/dateformatter";
 import { DateTimeFormatter } from "../formatters/datetimeformatter";
-import { PropertyItemSlickConverter } from "./propertyitemslickconverter";
+import { PropertyItemColumnConverter } from "./propertyitemcolumnconverter";
 
-describe('PropertyItemSlickConverter.toSlickColumn', () => {
+describe('PropertyItemColumnConverter.toSlickColumn', () => {
     it('tries to load a localText with the items name as key', () => {
-        var converted = PropertyItemSlickConverter.toSlickColumn({
+        var converted = PropertyItemColumnConverter.toColumn({
             name: null,
             title: 'Test.Local.Text.Key'
         });
@@ -14,7 +14,7 @@ describe('PropertyItemSlickConverter.toSlickColumn', () => {
 
         addLocalText('Test.Local.Text.Key', 'translated');
 
-        var converted2 = PropertyItemSlickConverter.toSlickColumn({
+        var converted2 = PropertyItemColumnConverter.toColumn({
             name: null,
             title: 'Test.Local.Text.Key'
         });
@@ -23,7 +23,7 @@ describe('PropertyItemSlickConverter.toSlickColumn', () => {
     });
 
     it('should pass date formatter to slick formatter', () => {
-        var converted = PropertyItemSlickConverter.toSlickColumn({
+        var converted = PropertyItemColumnConverter.toColumn({
             name: null,
             title: 'Test.Local.Text.Key',
             formatterType: DateFormatter,
@@ -41,7 +41,7 @@ describe('PropertyItemSlickConverter.toSlickColumn', () => {
 
 
     it('should pass date time formatter parameters to slick formatter', () => {
-        var converted = PropertyItemSlickConverter.toSlickColumn({
+        var converted = PropertyItemColumnConverter.toColumn({
             name: null,
             title: 'Test.Local.Text.Key',
             formatterType: DateTimeFormatter,

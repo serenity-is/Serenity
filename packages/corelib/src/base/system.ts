@@ -356,13 +356,13 @@ export class EditorAttribute { }
 registerClass(EditorAttribute, 'Serenity.EditorAttribute');
 
 /**
- * Marker interface for SlickGrid formatters.
+ * Marker interface for SleekGrid formatters.
  */
 export class ISlickFormatter { }
 registerInterface(ISlickFormatter, 'Serenity.ISlickFormatter');
 
 /**
- * Register a SlickGrid formatter.
+ * Register a SleekGrid formatter.
  * @param type Formatter type
  * @param name Formatter name
  * @param intfAndAttr Optional interface(s) to implement

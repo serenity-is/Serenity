@@ -1,24 +1,24 @@
-import { Column, SleekGrid } from "@serenity-is/sleekgrid";
+import { Column } from "@serenity-is/sleekgrid";
 import { Authorization, isPromiseLike, tryGetText, type PropertyItem } from "../../base";
 import { FormatterType } from "../../types/formattertype";
 import { FormatterTypeRegistry } from "../../types/formattertyperegistry";
 import { IInitializeColumn } from "../formatters/iinitializecolumn";
 import { ReflectionOptionsSetter } from "../widgets/reflectionoptionssetter";
 
-export namespace PropertyItemSlickConverter {
+export namespace PropertyItemColumnConverter {
 
-    export function toSlickColumns(items: PropertyItem[]): Column[] {
+    export function toColumns(items: PropertyItem[]): Column[] {
         var result: Column[] = [];
         if (items == null) {
             return result;
         }
         for (var i = 0; i < items.length; i++) {
-            result.push(PropertyItemSlickConverter.toSlickColumn(items[i]));
+            result.push(PropertyItemColumnConverter.toColumn(items[i]));
         }
         return result;
     }
 
-    export function toSlickColumn(item: PropertyItem): Column {
+    export function toColumn(item: PropertyItem): Column {
         var result: Column = {
             field: item.unbound ? null : item.name,
             id: item.unbound ? item.name : null,

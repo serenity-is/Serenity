@@ -37,7 +37,7 @@ export interface ArgsRowsOrCountChanged extends ArgsDataView {
 
 /**
  * A data view that supports remote data loading, sorting, filtering, grouping, and paging.
- * Extends the functionality of SlickGrid's DataView with server-side data operations.
+ * Extends the functionality of SleekGrid's DataView with server-side data operations.
  * 
  * @typeparam TItem The type of entities in the view
  */
