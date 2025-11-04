@@ -1,4 +1,4 @@
-import { bindThis } from "../src/bind-this";
+import { bindThis } from "#src/bind-this";
 
 describe("bindThis", () => {
     class TestClass {

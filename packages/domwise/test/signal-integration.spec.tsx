@@ -1,5 +1,5 @@
+import { invokeDisposingListeners } from "#src/disposing-listener";
 import { describe, expect, it } from "vitest";
-import { invokeDisposingListeners } from "../src/disposing-listener";
 import { mockSignal } from "./mocks/mock-signal";
 
 describe("signal integration", () => {

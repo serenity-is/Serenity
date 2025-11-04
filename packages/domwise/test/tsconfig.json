@@ -6,7 +6,9 @@
         "noImplicitAny": false,
         "declaration": false,
         "sourceMap": true,
-        "rootDir": "../",
+        "outDir": "../dist",
+        "rootDir": "..",
+        "rootDirs": ["./src", "./test"],
         "types": [
             "vitest/globals"
         ]

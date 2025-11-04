@@ -1,5 +1,5 @@
-import { derivedSignal } from "../src/signal-util";
-import { computed, signal } from "../src/signals";
+import { derivedSignal } from "#src/signal-util";
+import { computed, signal } from "#src/signals";
 
 describe("createDerivedSignal", () => {
     it("should create a derived signal from an existing read-write signal", () => {

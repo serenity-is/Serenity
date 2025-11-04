@@ -1,5 +1,9 @@
-import { Component, createElement, createRef, Fragment, jsx, useImperativeHandle, useRef, useText, type Ref } from "../../src"
-import type { ButtonHTMLAttributes, HTMLAttributes } from "../../src/types/dom-expressions-jsx"
+import { createElement, useImperativeHandle, useRef } from "#src/compat-api"
+import { Component } from "#src/component"
+import { useText } from "#src/hooks"
+import { Fragment, jsx } from "#src/jsx-runtime"
+import { createRef } from "#src/ref"
+import type { HTMLElementTags, Ref } from "#types"
 
 describe("jsx-dom main", () => {
     it("creates a <div> element", () => {
@@ -301,7 +305,7 @@ describe("jsx-dom main", () => {
 
         describe("supports ref forwarding without forwardRef", () => {
             it("element", () => {
-                const Container = ({ ref, ...props }: HTMLAttributes<HTMLDivElement> & { ref: Ref<HTMLButtonElement> }) => (
+                const Container = ({ ref, ...props }: HTMLElementTags["div"] & { ref: Ref<HTMLButtonElement> }) => (
                     <div {...props}>
                         <button ref={ref}>Button</button>
                     </div>
@@ -318,8 +322,8 @@ describe("jsx-dom main", () => {
             });
 
             it("component", () => {
-                const Button = (props: ButtonHTMLAttributes<HTMLButtonElement>) => <button {...props} />
-                const Container = ({ ref, ...props }: HTMLAttributes<HTMLDivElement> & { ref: Ref<HTMLButtonElement> }) => (
+                const Button = (props: HTMLElementTags["button"]) => <button {...props} />
+                const Container = ({ ref, ...props }: HTMLElementTags["div"] & { ref: Ref<HTMLButtonElement> }) => (
                     <div {...props}>
                         <Button ref={ref}>Button</Button>
                     </div>

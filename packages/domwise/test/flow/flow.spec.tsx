@@ -1,9 +1,9 @@
 import { describe, expect, it } from "vitest";
-import { invokeDisposingListeners } from "../../src/disposing-listener";
-import { Show } from "../../src/flow/show";
-import { isSignalLike } from "../../src/signal-util";
-import type { SignalLike } from "../../types";
 import { mockSignal } from "../mocks/mock-signal";
+import { isSignalLike } from "#src/signal-util";
+import { Show } from "#src/flow/show";
+import type { SignalLike } from "#types";
+import { invokeDisposingListeners } from "#src/disposing-listener";
 
 describe("Show", () => {
     it("shows else content if when is false", () => {

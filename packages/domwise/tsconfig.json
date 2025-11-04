@@ -15,9 +15,9 @@
       "noEmitHelpers": false,
       "noImplicitAny": true,
       "isolatedModules": true,
-      "rootDir": ".",
+      "rootDir": "./src",
       "sourceMap": false,
-      "skipLibCheck": false,
+      "skipLibCheck": true,
       "outDir": "./dist",
       "target": "ESNext",
       "useDefineForClassFields": false

@@ -1,4 +1,5 @@
-import { createRef, ShadowRootNode } from "../../src"
+import { createRef } from "#src/ref"
+import { ShadowRootNode } from "#src/shadow"
 
 describe("shadow", () => {
 

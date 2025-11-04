@@ -17,8 +17,11 @@
     "./jsx-dev-runtime": "./dist/jsx-dev-runtime.js"
   },
   "imports": {
+    "#src": "./src/index.ts",
     "#src/jsx-runtime": "./src/jsx-runtime.ts",
-    "#src/jsx-dev-runtime": "./src/jsx-dev-runtime.ts"
+    "#src/jsx-dev-runtime": "./src/jsx-dev-runtime.ts",
+    "#src/*": "./src/*.ts",
+    "#types": "./types/index.d.ts"
   },
   "files": [
     "dist/**/*.ts",
