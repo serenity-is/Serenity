@@ -146,6 +146,7 @@ export interface EditorHost {
 	navigateNext(): boolean;
 	navigatePrev(): boolean;
 	onCompositeEditorChange: EventEmitter<any>;
+	getEditorFactory(): EditorFactory;
 }
 export interface CompositeEditorOptions {
 	formValues: any;
@@ -246,95 +247,208 @@ export declare class EditorLock {
  * A global singleton editor lock.
  */
 export declare const GlobalEditorLock: EditorLock;
-/**
- * Context object for column formatters. It provides access to the
- * current cell value, row index, column index, etc.
- * Use grid.getFormatterContext() or the @see formatterContext helper to create a new instance.
- */
-export interface FormatterContext<TItem = any> {
+export type CellNavigationDirection = "up" | "down" | "left" | "right" | "next" | "prev" | "home" | "end";
+export interface CellNavigation {
+	navigateBottom(): void;
+	navigateDown(): boolean;
+	navigateLeft(): boolean;
+	navigateNext(): boolean;
+	navigatePageDown(): void;
+	navigatePageUp(): void;
+	navigatePrev(): boolean;
+	navigateRight(): boolean;
+	navigateRowEnd(): boolean;
+	navigateRowStart(): boolean;
+	navigateTop(): void;
+	navigateToRow(row: number): boolean;
+	navigateUp(): boolean;
 	/**
-	 * Additional attributes to be added to the cell node.
+	 * Navigate the active cell in the specified direction.
+	 * @param dir Navigation direction.
+	 * @return Whether navigation resulted in a change of active cell.
 	 */
-	addAttrs?: {
-		[key: string]: string;
+	navigate(dir: CellNavigationDirection): boolean;
+}
+export interface DragPosition {
+	startX: number;
+	startY: number;
+	range: DragRange;
+}
+export interface DragItem extends DragPosition {
+	dragSource: HTMLElement | Document | null;
+	dragHandle: HTMLElement | null;
+	deltaX: number;
+	deltaY: number;
+	target: HTMLElement;
+}
+export interface DragRange {
+	start: {
+		row?: number;
+		cell?: number;
 	};
-	/**
-	 * Additional classes to be added to the cell node.
-	 */
-	addClass?: string;
-	/**
-	 * True if the formatter is allowed to return raw HTML that will be set using innerHTML.
-	 * This is set from grid options and defaults to true for backward compatibility.
-	 * When set to false, the formatter should return plain text and the result will be set using textContent
-	 * and the escape() method is a noop in that case.
-	 */
-	readonly enableHtmlRendering: boolean;
-	/**
-	 * Returns html escaped ctx.value if called without arguments. Prefer this over
-	 * ctx.value when returning as HTML string to avoid html injection attacks!
-	 * Note that when enableHtmlRendering is false, this is simply a noop and returns the value as string.
-	 */
-	escape(value?: any): string;
-	/**
-	 * The row index of the cell.
-	 */
-	row?: number;
-	/**
-	 * The column index of the cell.
-	 */
-	cell?: number;
-	/**
-	 * The column definition of the cell.
-	 */
-	column?: Column<TItem>;
-	/**
-	 * The grid instance.
-	 */
-	grid?: any;
-	/**
-	 * The item of the row.
-	 */
-	item?: TItem;
-	/**
-	 * Purpose of the call, e.g. "auto-width", "excel-export", "group-header", "header-filter", "pdf-export", "print".
-	 */
-	purpose?: "auto-width" | "excel-export" | "group-header" | "grand-totals" | "group-totals" | "header-filter" | "pdf-export" | "print";
-	/**
-	 * Sanitizer function to clean up dirty HTML.
-	 */
-	sanitizer: (dirtyHtml: string) => string;
-	/**
-	 * Tooltip text to be added to the cell node as title attribute.
-	 */
-	tooltip?: string;
-	/** when returning a formatter result as HTML string, prefer ctx.escape() to avoid script injection attacks! */
-	value?: any;
-}
-export type FormatterResult = (string | HTMLElement | SVGElement | MathMLElement | DocumentFragment);
-export type ColumnFormat<TItem = any> = (ctx: FormatterContext<TItem>) => FormatterResult;
-export interface CompatFormatterResult {
-	addClasses?: string;
-	text?: FormatterResult;
-	toolTip?: string;
-}
-export type CompatFormatter<TItem = any> = (row: number, cell: number, value: any, column: Column<TItem>, item: TItem, grid?: any) => string | CompatFormatterResult;
-export interface FormatterFactory<TItem = any> {
-	getFormat?(column: Column<TItem>): ColumnFormat<TItem>;
-	getFormatter?(column: Column<TItem>): CompatFormatter<TItem>;
-}
-export type AsyncPostRender<TItem = any> = (cellNode: HTMLElement, row: number, item: TItem, column: Column<TItem>, reRender: boolean) => void;
-export type AsyncPostCleanup<TItem = any> = (cellNode: HTMLElement, row?: number, column?: Column<TItem>) => void;
-export type CellStylesHash = {
-	[row: number]: {
-		[columnId: string]: string;
+	end: {
+		row?: number;
+		cell?: number;
 	};
+}
+export interface ArgsGrid {
+	grid: ISleekGrid;
+}
+export interface ArgsColumn extends ArgsGrid {
+	column: Column;
+}
+export interface DragData extends DragItem {
+	mode: string;
+	row: number;
+	cell: number;
+	item: any;
+	helper: HTMLElement;
+}
+export interface ArgsColumnNode extends ArgsColumn {
+	node: HTMLElement;
+}
+export type ArgsSortCol = {
+	sortCol: Column;
+	sortAsc: boolean;
 };
-export declare function defaultColumnFormat(ctx: FormatterContext): any;
-export declare function convertCompatFormatter(compatFormatter: CompatFormatter): ColumnFormat;
-export declare function applyFormatterResultToCellNode(ctx: FormatterContext, fmtResult: FormatterResult, node: HTMLElement, opt?: {
-	contentOnly?: boolean;
-}): void;
-export declare function formatterContext<TItem = any>(opt?: Partial<Exclude<FormatterContext<TItem>, "addAttrs" | "addClass" | "tooltip">>): FormatterContext<TItem>;
+export interface ArgsSort extends ArgsGrid {
+	multiColumnSort: boolean;
+	sortAsc: boolean;
+	sortCol: Column;
+	sortCols: ArgsSortCol[];
+}
+export interface ArgsSelectedRowsChange extends ArgsGrid {
+	rows: number[];
+	changedSelectedRows: number[];
+	changedUnselectedRows: number[];
+	previousSelectedRows: number[];
+	caller: any;
+}
+export interface ArgsScroll extends ArgsGrid {
+	scrollLeft: number;
+	scrollTop: number;
+}
+export interface ArgsCssStyle extends ArgsGrid {
+	key: string;
+	hash: CellStylesHash;
+}
+export interface ArgsCell extends ArgsGrid {
+	row: number;
+	cell: number;
+}
+export interface ArgsCellChange extends ArgsCell {
+	item: any;
+}
+export interface ArgsCellEdit extends ArgsCellChange {
+	column: Column;
+}
+export interface ArgsAddNewRow extends ArgsColumn {
+	item: any;
+}
+export interface ArgsEditorDestroy extends ArgsGrid {
+	editor: Editor;
+}
+export interface ArgsValidationError extends ArgsCell {
+	editor: Editor;
+	column: Column;
+	cellNode: HTMLElement;
+	validationResults: ValidationResult;
+}
+export type CellEvent = IEventData & ArgsCell;
+export type CellKeyboardEvent = KeyboardEvent & ArgsCell;
+export type CellMouseEvent = MouseEvent & ArgsCell;
+export type HeaderColumnEvent = IEventData & ArgsColumn;
+export type HeaderMouseEvent = MouseEvent & ArgsColumn;
+export type HeaderRenderEvent = IEventData & ArgsColumnNode;
+export type FooterColumnEvent = HeaderColumnEvent;
+export type FooterMouseEvent = HeaderMouseEvent;
+export type FooterRenderEvent = HeaderRenderEvent;
+export type GridEvent = IEventData & ArgsGrid;
+export type GridDragEvent = UIEvent & {
+	dragData: DragData;
+};
+export type GridMouseEvent = MouseEvent & ArgsGrid;
+export interface GridPlugin {
+	init(grid: ISleekGrid): void;
+	pluginName?: string;
+	destroy?: () => void;
+}
+/** @deprecated Use GridPlugin instead */
+export interface IPlugin extends GridPlugin {
+}
+export interface GridPluginHost {
+	getPluginByName(name: string): GridPlugin;
+	registerPlugin(plugin: GridPlugin): void;
+	unregisterPlugin(plugin: GridPlugin): void;
+}
+export interface GridSignals {
+	readonly showColumnHeader: Signal<boolean>;
+	readonly hideColumnHeader: Computed<boolean>;
+	readonly showTopPanel: Signal<boolean>;
+	readonly hideTopPanel: Computed<boolean>;
+	readonly showHeaderRow: Signal<boolean>;
+	readonly hideHeaderRow: Computed<boolean>;
+	readonly showFooterRow: Signal<boolean>;
+	readonly hideFooterRow: Computed<boolean>;
+	readonly pinnedStartLast: Signal<number>;
+	readonly pinnedEndFirst: Signal<number>;
+	readonly frozenTopLast: Signal<number>;
+	readonly frozenBottomFirst: Signal<number>;
+}
+export interface ViewportInfo {
+	height: number;
+	width: number;
+	hasVScroll: boolean;
+	hasHScroll: boolean;
+	headerHeight: number;
+	groupingPanelHeight: number;
+	virtualHeight: number;
+	realScrollHeight: number;
+	topPanelHeight: number;
+	headerRowHeight: number;
+	footerRowHeight: number;
+	numVisibleRows: number;
+}
+export type BandKey = "start" | "main" | "end";
+export type PaneKey = "top" | "body" | "bottom";
+export interface GridBandRefs {
+	key: BandKey;
+	headerCols?: HTMLElement;
+	headerRowCols?: HTMLElement;
+	canvas: {
+		top?: HTMLElement;
+		body: HTMLElement;
+		bottom?: HTMLElement;
+	};
+	footerRowCols?: HTMLElement;
+	readonly firstCol: number;
+	canvasWidth: number;
+}
+export type GridLayoutRefs = {
+	readonly start: GridBandRefs;
+	readonly main: GridBandRefs;
+	readonly end: GridBandRefs;
+	topPanel?: HTMLElement;
+	pinnedStartLast: number;
+	pinnedEndFirst: number;
+	frozenTopLast: number;
+	frozenBottomFirst: number;
+};
+export interface LayoutHost extends Pick<ISleekGrid, "getColumns" | "getOptions" | "getContainerNode" | "getDataLength" | "onAfterInit">, GridPluginHost {
+	getSignals(): GridSignals;
+	getViewportInfo(): ViewportInfo;
+	removeNode(node: HTMLElement): void;
+	readonly refs: GridLayoutRefs;
+}
+export interface LayoutEngine {
+	layoutName: string;
+	init(host: LayoutHost): void;
+	destroy(): void;
+	adjustFrozenRowsOption?(): void;
+	afterSetOptions(args: GridOptions): void;
+	/** this might be called before init, chicken egg situation */
+	reorderViewColumns?(viewCols: Column[], refs: GridLayoutRefs): Column[];
+}
 /***
  * Information about a group of rows.
  */
@@ -447,191 +561,6 @@ export declare class GroupTotals<TEntity = any> extends NonDataRow implements IG
 	 * Contains max
 	 */
 	max?: Record<string, any>;
-}
-export interface Column<TItem = any> {
-	asyncPostRender?: AsyncPostRender<TItem>;
-	asyncPostRenderCleanup?: AsyncPostCleanup<TItem>;
-	behavior?: any;
-	cannotTriggerInsert?: boolean;
-	cssClass?: string;
-	defaultSortAsc?: boolean;
-	editor?: EditorClass;
-	editorFixedDecimalPlaces?: number;
-	field?: string;
-	frozen?: boolean | "start" | "end";
-	focusable?: boolean;
-	footerCssClass?: string;
-	format?: ColumnFormat<TItem>;
-	/** @deprecated, use @see format */
-	formatter?: CompatFormatter<TItem>;
-	groupTotalsFormat?: (ctx: FormatterContext<IGroupTotals<TItem>>) => FormatterResult;
-	/** @deprecated, use @see groupTotalsFormat */
-	groupTotalsFormatter?: (totals?: IGroupTotals<TItem>, column?: Column<TItem>, grid?: unknown) => string;
-	headerCssClass?: string;
-	id?: string;
-	maxWidth?: any;
-	minWidth?: number;
-	name?: string;
-	nameFormat?: (ctx: FormatterContext<TItem>) => FormatterResult;
-	previousWidth?: number;
-	referencedFields?: string[];
-	rerenderOnResize?: boolean;
-	resizable?: boolean;
-	selectable?: boolean;
-	sortable?: boolean;
-	sortOrder?: number;
-	toolTip?: string;
-	validator?: (value: any, editorArgs?: any) => ValidationResult;
-	visible?: boolean;
-	width?: number;
-}
-export declare const columnDefaults: Partial<Column>;
-export interface ColumnMetadata<TItem = any> {
-	colspan: number | "*";
-	cssClasses?: string;
-	focusable?: boolean;
-	editor?: EditorClass;
-	format?: ColumnFormat<TItem>;
-	/** @deprecated */
-	formatter?: CompatFormatter<TItem>;
-	selectable?: boolean;
-}
-export interface ColumnSort {
-	columnId: string;
-	sortAsc?: boolean;
-}
-export interface ItemMetadata<TItem = any> {
-	cssClasses?: string;
-	columns?: {
-		[key: string]: ColumnMetadata<TItem>;
-	};
-	focusable?: boolean;
-	format?: ColumnFormat<TItem>;
-	/** @deprecated */
-	formatter?: CompatFormatter<TItem>;
-	selectable?: boolean;
-}
-export declare function initializeColumns(columns: Column[], defaults: Partial<Column<any>>): void;
-export declare function titleize(str: string): string;
-export interface DragPosition {
-	startX: number;
-	startY: number;
-	range: DragRange;
-}
-export interface DragItem extends DragPosition {
-	dragSource: HTMLElement | Document | null;
-	dragHandle: HTMLElement | null;
-	deltaX: number;
-	deltaY: number;
-	target: HTMLElement;
-}
-export interface DragRange {
-	start: {
-		row?: number;
-		cell?: number;
-	};
-	end: {
-		row?: number;
-		cell?: number;
-	};
-}
-export type CellNavigationDirection = "up" | "down" | "left" | "right" | "next" | "prev" | "home" | "end";
-export interface CellNavigation {
-	navigateBottom(): void;
-	navigateDown(): boolean;
-	navigateLeft(): boolean;
-	navigateNext(): boolean;
-	navigatePageDown(): void;
-	navigatePageUp(): void;
-	navigatePrev(): boolean;
-	navigateRight(): boolean;
-	navigateRowEnd(): boolean;
-	navigateRowStart(): boolean;
-	navigateTop(): void;
-	navigateToRow(row: number): boolean;
-	navigateUp(): boolean;
-	navigate(dir: CellNavigationDirection): boolean;
-}
-export interface GridPlugin {
-	init(grid: IGrid): void;
-	pluginName?: string;
-	destroy?: () => void;
-}
-/** @deprecated Use GridPlugin instead */
-export interface IPlugin extends GridPlugin {
-}
-export interface GridPluginHost {
-	getPluginByName(name: string): GridPlugin;
-	registerPlugin(plugin: GridPlugin): void;
-	unregisterPlugin(plugin: GridPlugin): void;
-}
-export interface GridSignals {
-	readonly showColumnHeader: Signal<boolean>;
-	readonly hideColumnHeader: Computed<boolean>;
-	readonly showTopPanel: Signal<boolean>;
-	readonly hideTopPanel: Computed<boolean>;
-	readonly showHeaderRow: Signal<boolean>;
-	readonly hideHeaderRow: Computed<boolean>;
-	readonly showFooterRow: Signal<boolean>;
-	readonly hideFooterRow: Computed<boolean>;
-	readonly pinnedStartLast: Signal<number>;
-	readonly pinnedEndFirst: Signal<number>;
-	readonly frozenTopLast: Signal<number>;
-	readonly frozenBottomFirst: Signal<number>;
-}
-export interface ViewportInfo {
-	height: number;
-	width: number;
-	hasVScroll: boolean;
-	hasHScroll: boolean;
-	headerHeight: number;
-	groupingPanelHeight: number;
-	virtualHeight: number;
-	realScrollHeight: number;
-	topPanelHeight: number;
-	headerRowHeight: number;
-	footerRowHeight: number;
-	numVisibleRows: number;
-}
-export type BandKey = "start" | "main" | "end";
-export type PaneKey = "top" | "body" | "bottom";
-export interface GridBandRefs {
-	key: BandKey;
-	headerCols?: HTMLElement;
-	headerRowCols?: HTMLElement;
-	canvas: {
-		top?: HTMLElement;
-		body: HTMLElement;
-		bottom?: HTMLElement;
-	};
-	footerRowCols?: HTMLElement;
-	readonly firstCol: number;
-	canvasWidth: number;
-}
-export type GridLayoutRefs = {
-	readonly start: GridBandRefs;
-	readonly main: GridBandRefs;
-	readonly end: GridBandRefs;
-	topPanel?: HTMLElement;
-	pinnedStartLast: number;
-	pinnedEndFirst: number;
-	frozenTopLast: number;
-	frozenBottomFirst: number;
-};
-export interface LayoutHost extends Pick<IGrid, "getColumns" | "getInitialColumns" | "getOptions" | "getContainerNode" | "getDataLength" | "onAfterInit">, GridPluginHost {
-	getSignals(): GridSignals;
-	getViewportInfo(): ViewportInfo;
-	removeNode(node: HTMLElement): void;
-	readonly refs: GridLayoutRefs;
-}
-export interface LayoutEngine {
-	layoutName: string;
-	init(host: LayoutHost): void;
-	destroy(): void;
-	adjustFrozenRowsOption?(): void;
-	afterSetOptions(args: GridOptions): void;
-	/** this might be called before init, chicken egg situation */
-	reorderViewColumns?(viewCols: Column[], refs: GridLayoutRefs): Column[];
 }
 /**
  * Configuration options for the SleekGrid component.
@@ -826,7 +755,7 @@ export interface GridOptions<TItem = any> {
 	 * Function to format group totals for display in the grouping panel.
 	 * @deprecated Use `groupTotalsFormat` with `FormatterContext<IGroupTotals>` signature instead.
 	 */
-	groupTotalsFormatter?: (totals?: IGroupTotals<TItem>, column?: Column<TItem>, grid?: any) => string;
+	groupTotalsFormatter?: (totals?: IGroupTotals<TItem>, column?: Column<TItem>, grid?: ISleekGrid) => string;
 	/**
 	 * Defaults to null, e.g. calculated based on CSS. Height of the header row in pixels.
 	 */
@@ -962,7 +891,7 @@ export interface ViewRange {
 	leftPx?: number;
 	rightPx?: number;
 }
-export interface IGrid<TItem = any> extends CellNavigation, EditorHost, GridPluginHost {
+export interface ISleekGrid<TItem = any> extends CellNavigation, EditorHost, GridPluginHost {
 	readonly onActiveCellChanged: EventEmitter<ArgsCell, IEventData>;
 	readonly onActiveCellPositionChanged: EventEmitter<ArgsGrid, IEventData>;
 	readonly onAddNewRow: EventEmitter<ArgsAddNewRow, IEventData>;
@@ -994,8 +923,8 @@ export interface IGrid<TItem = any> extends CellNavigation, EditorHost, GridPlug
 	}>;
 	readonly onFooterRowCellRendered: EventEmitter<ArgsColumnNode, IEventData>;
 	readonly onHeaderCellRendered: EventEmitter<ArgsColumnNode, IEventData>;
-	readonly onHeaderClick: EventEmitter<ArgsColumn, IEventData>;
-	readonly onHeaderContextMenu: EventEmitter<ArgsColumn, IEventData>;
+	readonly onHeaderClick: EventEmitter<ArgsColumn, MouseEvent>;
+	readonly onHeaderContextMenu: EventEmitter<ArgsColumn, MouseEvent>;
 	readonly onHeaderMouseEnter: EventEmitter<ArgsColumn, MouseEvent>;
 	readonly onHeaderMouseLeave: EventEmitter<ArgsColumn, MouseEvent>;
 	readonly onHeaderRowCellRendered: EventEmitter<ArgsColumnNode, IEventData>;
@@ -1044,10 +973,13 @@ export interface IGrid<TItem = any> extends CellNavigation, EditorHost, GridPlug
 		left: number;
 	};
 	getColspan(row: number, cell: number): number;
+	/** Gets a column by its ID. May also return hidden columns */
 	getColumnById(id: string): Column<TItem>;
 	getColumnFromNode(cellNode: Element): Column<TItem>;
-	getColumnIndex(id: string): number;
-	getColumns(): Column<TItem>[];
+	/** Returns a column's index in the visible columns list by its column ID. It returns -1 for hidden columns unless all argument is true */
+	getColumnIndex(id: string, all?: boolean): number;
+	/** Returns only the visible columns in order unless all argument is true */
+	getColumns(all?: boolean): Column<TItem>[];
 	getContainerNode(): HTMLElement;
 	getData(): any;
 	getDataItem(row: number): TItem;
@@ -1069,7 +1001,9 @@ export interface IGrid<TItem = any> extends CellNavigation, EditorHost, GridPlug
 	getHeaderColumn(columnIdOrIdx: string | number): HTMLElement;
 	getHeaderRow(): HTMLElement;
 	getHeaderRowColumn(columnIdOrIdx: string | number): HTMLElement;
+	/** @deprecated Use getColumnIndex(id, true) */
 	getInitialColumnIndex(id: string): number;
+	/** @deprecated Use getColumns(true) */
 	getInitialColumns(): Column<TItem>[];
 	getLayoutInfo(): {
 		frozenTopRows: number;
@@ -1091,17 +1025,32 @@ export interface IGrid<TItem = any> extends CellNavigation, EditorHost, GridPlug
 	getTopPanel(): HTMLElement;
 	getTotalsFormatter(column: Column<TItem>): ColumnFormat<TItem>;
 	getUID(): string;
+	/** Gets the viewport range */
 	getViewport(viewportTop?: number, viewportLeft?: number): ViewRange;
 	getViewportNode(row?: number, cell?: number): HTMLElement;
+	/** Gets a view (e.g. visible) column by its column ID */
 	getVisibleColumnById(id: string): Column<TItem>;
 	getVisibleRange(viewportTop?: number, viewportLeft?: number): ViewRange;
 	gotoCell(row: number, cell: number, forceEdit?: boolean): void;
 	invalidate(): void;
 	invalidateAllRows(): void;
+	/**
+	 * Invalidates various elements after properties of columns have changed.
+	 * Call this if you change columns properties that don't require a full setColumns call (e.g. width, name, visible etc.)
+	 */
+	invalidateColumns(): void;
 	invalidateRow(row: number): void;
 	invalidateRows(rows: number[]): void;
 	removeCellCssStyles(key: string): void;
 	render: () => void;
+	/**
+	 * Reorders columns based on their IDs and notifies onColumnsReordered by default.
+	 * @param columnIds
+	 * @param opt Whether to notify onColumnsReordered (default true).
+	 */
+	reorderColumns(columnIds: string[], opt?: {
+		notify?: boolean;
+	}): void;
 	resetActiveCell(): void;
 	resizeCanvas: () => void;
 	scrollActiveCellIntoView(): void;
@@ -1114,6 +1063,17 @@ export interface IGrid<TItem = any> extends CellNavigation, EditorHost, GridPlug
 	setCellCssStyles(key: string, hash: CellStylesHash): void;
 	setColumnHeaderVisibility(visible: boolean): void;
 	setColumns(columns: Column<TItem>[]): void;
+	/**
+	 * Sets the visible columns based on their IDs and reorders them to provided order
+	 * unless specified otherwise.
+	 * @param columnIds The IDs of the columns to be made visible.
+	 * @param opt Whether to reorder the visible columns based on the provided IDs (default true),
+	 * and notify onColumnsReordered (default true).
+	 */
+	setVisibleColumns(columnIds: string[], opt?: {
+		reorder?: boolean;
+		notify?: boolean;
+	}): void;
 	setData(newData: any, scrollToTop?: boolean): void;
 	setFooterRowVisibility(visible: boolean): void;
 	setGroupingPanelVisibility(visible: boolean): void;
@@ -1135,83 +1095,160 @@ export interface IGrid<TItem = any> extends CellNavigation, EditorHost, GridPlug
 	updateRow(row: number): void;
 	updateRowCount(): void;
 }
-export interface ArgsGrid {
-	grid: IGrid;
+/**
+ * Context object for column formatters. It provides access to the
+ * current cell value, row index, column index, etc.
+ * Use grid.getFormatterContext() or the @see formatterContext helper to create a new instance.
+ */
+export interface FormatterContext<TItem = any> {
+	/**
+	 * Additional attributes to be added to the cell node.
+	 */
+	addAttrs?: {
+		[key: string]: string;
+	};
+	/**
+	 * Additional classes to be added to the cell node.
+	 */
+	addClass?: string;
+	/**
+	 * True if the formatter is allowed to return raw HTML that will be set using innerHTML.
+	 * This is set from grid options and defaults to true for backward compatibility.
+	 * When set to false, the formatter should return plain text and the result will be set using textContent
+	 * and the escape() method is a noop in that case.
+	 */
+	readonly enableHtmlRendering: boolean;
+	/**
+	 * Returns html escaped ctx.value if called without arguments. Prefer this over
+	 * ctx.value when returning as HTML string to avoid html injection attacks!
+	 * Note that when enableHtmlRendering is false, this is simply a noop and returns the value as string.
+	 */
+	escape(value?: any): string;
+	/**
+	 * The row index of the cell.
+	 */
+	row?: number;
+	/**
+	 * The column index of the cell.
+	 */
+	cell?: number;
+	/**
+	 * The column definition of the cell.
+	 */
+	column?: Column<TItem>;
+	/**
+	 * The grid instance.
+	 */
+	grid?: ISleekGrid;
+	/**
+	 * The item of the row.
+	 */
+	item?: TItem;
+	/**
+	 * Purpose of the call, e.g. "auto-width", "excel-export", "group-header", "header-filter", "pdf-export", "print".
+	 */
+	purpose?: "auto-width" | "excel-export" | "group-header" | "grand-totals" | "group-totals" | "header-filter" | "pdf-export" | "print";
+	/**
+	 * Sanitizer function to clean up dirty HTML.
+	 */
+	sanitizer: (dirtyHtml: string) => string;
+	/**
+	 * Tooltip text to be added to the cell node as title attribute.
+	 */
+	tooltip?: string;
+	/** when returning a formatter result as HTML string, prefer ctx.escape() to avoid script injection attacks! */
+	value?: any;
 }
-export interface ArgsColumn extends ArgsGrid {
-	column: Column;
+export type FormatterResult = (string | HTMLElement | SVGElement | MathMLElement | DocumentFragment);
+export type ColumnFormat<TItem = any> = (ctx: FormatterContext<TItem>) => FormatterResult;
+export interface CompatFormatterResult {
+	addClasses?: string;
+	text?: FormatterResult;
+	toolTip?: string;
 }
-export interface DragData extends DragItem {
-	mode: string;
-	row: number;
-	cell: number;
-	item: any;
-	helper: HTMLElement;
+export type CompatFormatter<TItem = any> = (row: number, cell: number, value: any, column: Column<TItem>, item: TItem, grid?: ISleekGrid) => string | CompatFormatterResult;
+export interface FormatterFactory<TItem = any> {
+	getFormat?(column: Column<TItem>): ColumnFormat<TItem>;
+	getFormatter?(column: Column<TItem>): CompatFormatter<TItem>;
 }
-export interface ArgsColumnNode extends ArgsColumn {
-	node: HTMLElement;
-}
-export type ArgsSortCol = {
-	sortCol: Column;
-	sortAsc: boolean;
+export type AsyncPostRender<TItem = any> = (cellNode: HTMLElement, row: number, item: TItem, column: Column<TItem>, reRender: boolean) => void;
+export type AsyncPostCleanup<TItem = any> = (cellNode: HTMLElement, row?: number, column?: Column<TItem>) => void;
+export type CellStylesHash = {
+	[row: number]: {
+		[columnId: string]: string;
+	};
 };
-export interface ArgsSort extends ArgsGrid {
-	multiColumnSort: boolean;
-	sortAsc: boolean;
-	sortCol: Column;
-	sortCols: ArgsSortCol[];
+export declare function defaultColumnFormat(ctx: FormatterContext): any;
+export declare function convertCompatFormatter(compatFormatter: CompatFormatter): ColumnFormat;
+export declare function applyFormatterResultToCellNode(ctx: FormatterContext, fmtResult: FormatterResult, node: HTMLElement, opt?: {
+	contentOnly?: boolean;
+}): void;
+export declare function formatterContext<TItem = any>(opt?: Partial<Exclude<FormatterContext<TItem>, "addAttrs" | "addClass" | "tooltip">>): FormatterContext<TItem>;
+export interface Column<TItem = any> {
+	asyncPostRender?: AsyncPostRender<TItem>;
+	asyncPostRenderCleanup?: AsyncPostCleanup<TItem>;
+	behavior?: any;
+	cannotTriggerInsert?: boolean;
+	cssClass?: string;
+	defaultSortAsc?: boolean;
+	editor?: EditorClass;
+	editorFixedDecimalPlaces?: number;
+	field?: string;
+	frozen?: boolean | "start" | "end";
+	focusable?: boolean;
+	footerCssClass?: string;
+	format?: ColumnFormat<TItem>;
+	/** @deprecated, use @see format */
+	formatter?: CompatFormatter<TItem>;
+	groupTotalsFormat?: (ctx: FormatterContext<IGroupTotals<TItem>>) => FormatterResult;
+	/** @deprecated, use @see groupTotalsFormat */
+	groupTotalsFormatter?: (totals?: IGroupTotals<TItem>, column?: Column<TItem>, grid?: unknown) => string;
+	headerCssClass?: string;
+	id?: string;
+	maxWidth?: any;
+	minWidth?: number;
+	name?: string;
+	nameFormat?: (ctx: FormatterContext<TItem>) => FormatterResult;
+	previousWidth?: number;
+	referencedFields?: string[];
+	rerenderOnResize?: boolean;
+	resizable?: boolean;
+	selectable?: boolean;
+	sortable?: boolean;
+	sortOrder?: number;
+	toolTip?: string;
+	validator?: (value: any, editorArgs?: any) => ValidationResult;
+	visible?: boolean;
+	width?: number;
 }
-export interface ArgsSelectedRowsChange extends ArgsGrid {
-	rows: number[];
-	changedSelectedRows: number[];
-	changedUnselectedRows: number[];
-	previousSelectedRows: number[];
-	caller: any;
+export declare const columnDefaults: Partial<Column>;
+export interface ColumnMetadata<TItem = any> {
+	colspan: number | "*";
+	cssClasses?: string;
+	focusable?: boolean;
+	editor?: EditorClass;
+	format?: ColumnFormat<TItem>;
+	/** @deprecated */
+	formatter?: CompatFormatter<TItem>;
+	selectable?: boolean;
 }
-export interface ArgsScroll extends ArgsGrid {
-	scrollLeft: number;
-	scrollTop: number;
+export interface ColumnSort {
+	columnId: string;
+	sortAsc?: boolean;
 }
-export interface ArgsCssStyle extends ArgsGrid {
-	key: string;
-	hash: CellStylesHash;
+export interface ItemMetadata<TItem = any> {
+	cssClasses?: string;
+	columns?: {
+		[key: string]: ColumnMetadata<TItem>;
+	};
+	focusable?: boolean;
+	format?: ColumnFormat<TItem>;
+	/** @deprecated */
+	formatter?: CompatFormatter<TItem>;
+	selectable?: boolean;
 }
-export interface ArgsCell extends ArgsGrid {
-	row: number;
-	cell: number;
-}
-export interface ArgsCellChange extends ArgsCell {
-	item: any;
-}
-export interface ArgsCellEdit extends ArgsCellChange {
-	column: Column;
-}
-export interface ArgsAddNewRow extends ArgsColumn {
-	item: any;
-}
-export interface ArgsEditorDestroy extends ArgsGrid {
-	editor: Editor;
-}
-export interface ArgsValidationError extends ArgsCell {
-	editor: Editor;
-	column: Column;
-	cellNode: HTMLElement;
-	validationResults: ValidationResult;
-}
-export type CellEvent = IEventData & ArgsCell;
-export type CellKeyboardEvent = KeyboardEvent & ArgsCell;
-export type CellMouseEvent = MouseEvent & ArgsCell;
-export type HeaderColumnEvent = IEventData & ArgsColumn;
-export type HeaderMouseEvent = MouseEvent & ArgsColumn;
-export type HeaderRenderEvent = IEventData & ArgsColumnNode;
-export type FooterColumnEvent = HeaderColumnEvent;
-export type FooterMouseEvent = HeaderMouseEvent;
-export type FooterRenderEvent = HeaderRenderEvent;
-export type GridEvent = IEventData & ArgsGrid;
-export type GridDragEvent = UIEvent & {
-	dragData: DragData;
-};
-export type GridMouseEvent = MouseEvent & ArgsGrid;
+export declare function initColumnProps(columns: Column[], defaults: Partial<Column<any>>): void;
+export declare function titleize(str: string): string;
 export interface IDataView<TItem = any> {
 	/** Gets the grand totals for all aggregated data. */
 	getGrandTotals(): IGroupTotals;
@@ -1278,7 +1315,7 @@ export declare const FooterRow: ({ band, refs, signals }: {
 	refs: GridLayoutRefs;
 	signals: Pick<GridSignals, "hideFooterRow" | "pinnedStartLast" | "pinnedEndFirst">;
 }) => import("@serenity-is/domwise").JSXElement;
-export declare class Grid<TItem = any> implements IGrid<TItem> {
+export declare class SleekGrid<TItem = any> implements ISleekGrid<TItem> {
 	private _absoluteColMinWidth;
 	private _activeCanvasNode;
 	private _activeCell;
@@ -1478,15 +1515,12 @@ export declare class Grid<TItem = any> implements IGrid<TItem> {
 	private removeCssRules;
 	private createCssRules;
 	destroy(): void;
+	getEditorFactory(): EditorFactory;
 	getEditorLock(): EditorLock;
 	getEditController(): EditController;
-	/** Gets a column by its ID. May also return non visible columns */
 	getColumnById(id: string): Column<TItem>;
-	/** Returns a column's index in the visible columns list by its column ID */
-	getColumnIndex(id: string): number;
-	/** Gets index of a column in the initial column list passed to the grid, or setColumns method. May include invisible cols and index does not have to match visible column order. */
+	getColumnIndex(id: string, all?: boolean): number;
 	getInitialColumnIndex(id: string): number;
-	/** Gets a view (e.g. visible) column by its column ID */
 	getVisibleColumnById(id: string): Column<TItem>;
 	autosizeColumns(): void;
 	private applyColumnHeaderWidths;
@@ -1494,14 +1528,22 @@ export declare class Grid<TItem = any> implements IGrid<TItem> {
 	setSortColumns(cols: ColumnSort[]): void;
 	getSortColumns(): ColumnSort[];
 	private handleSelectedRangesChanged;
-	/** Returns only the visible columns in order */
-	getColumns(): Column<TItem>[];
-	/** Returns list of columns passed to the grid constructor, or setColumns method. May include invisible columns and order does not match visible column order. */
+	getColumns(all?: boolean): Column<TItem>[];
+	/** @deprecated Use getColumns(true) */
 	getInitialColumns(): Column<TItem>[];
 	private updateViewColLeftRight;
-	private setInitialCols;
+	private updateViewCols;
+	private setInitCols;
 	private handleFrozenColsOption;
 	setColumns(columns: Column<TItem>[]): void;
+	reorderColumns(columnIds: string[], opt?: {
+		notify?: boolean;
+	}): void;
+	setVisibleColumns(columnIds: string[], opt?: {
+		reorder?: boolean;
+		notify?: boolean;
+	}): void;
+	invalidateColumns(): void;
 	getOptions(): GridOptions<TItem>;
 	setOptions(args: GridOptions<TItem>, suppressRender?: boolean, suppressColumnSet?: boolean, suppressSetOverflow?: boolean): void;
 	private validateAndEnforceOptions;
@@ -1556,11 +1598,6 @@ export declare class Grid<TItem = any> implements IGrid<TItem> {
 	updateRowCount(): void;
 	private setPaneHeights;
 	private setVirtualHeight;
-	/**
-	 * @param viewportTop optional viewport top
-	 * @param viewportLeft optional viewport left
-	 * @returns viewport range
-	 */
 	getViewport(viewportTop?: number, viewportLeft?: number): ViewRange;
 	getVisibleRange(viewportTop?: number, viewportLeft?: number): ViewRange;
 	getRenderedRange(viewportTop?: number, viewportLeft?: number): ViewRange;
@@ -1663,10 +1700,6 @@ export declare class Grid<TItem = any> implements IGrid<TItem> {
 	private getColumnCount;
 	private isRTL;
 	private setTabbingDirection;
-	/**
-	 * @param {string} dir Navigation direction.
-	 * @return {boolean} Whether navigation resulted in a change of active cell.
-	 */
 	navigate(dir: string): boolean;
 	getCellNode(row: number, cell: number): HTMLElement;
 	setActiveCell(row: number, cell: number): void;
@@ -1680,6 +1713,8 @@ export declare class Grid<TItem = any> implements IGrid<TItem> {
 	getSelectedRows(): number[];
 	setSelectedRows(rows: number[]): void;
 }
+/** @deprecated Use SleekGrid */
+export declare const Grid: typeof SleekGrid;
 export declare function PercentCompleteFormatter(ctx: FormatterContext): HTMLSpanElement | "-";
 export declare function PercentCompleteBarFormatter(ctx: FormatterContext): FormatterResult;
 export declare function YesNoFormatter(ctx: FormatterContext): FormatterResult;
@@ -1807,13 +1842,13 @@ export interface GroupItemMetadataProviderOptions {
 	totalsFormatter?: CompatFormatter<IGroupTotals>;
 }
 export declare class GroupItemMetadataProvider implements GridPlugin {
-	protected grid: IGrid;
+	protected grid: ISleekGrid;
 	private options;
 	constructor(opt?: GroupItemMetadataProviderOptions);
 	static readonly defaults: GroupItemMetadataProviderOptions;
 	static defaultGroupFormat(ctx: FormatterContext, opt?: GroupItemMetadataProviderOptions): FormatterResult;
-	static defaultTotalsFormat(ctx: FormatterContext, grid?: IGrid): FormatterResult;
-	init(grid: IGrid): void;
+	static defaultTotalsFormat(ctx: FormatterContext, grid?: ISleekGrid): FormatterResult;
+	init(grid: ISleekGrid): void;
 	readonly pluginName = "GroupItemMetadataProvider";
 	destroy(): void;
 	getOptions(): GroupItemMetadataProviderOptions;
@@ -1838,7 +1873,7 @@ export declare class AutoTooltips implements GridPlugin {
 	private options;
 	constructor(options?: AutoTooltipsOptions);
 	static readonly defaults: AutoTooltipsOptions;
-	init(grid: IGrid): void;
+	init(grid: ISleekGrid): void;
 	destroy(): void;
 	private handleMouseEnter;
 	private handleHeaderMouseEnter;
@@ -1860,7 +1895,7 @@ export declare class RowMoveManager implements GridPlugin {
 	onMoveRows: EventEmitter<ArgsMoveRows, IEventData>;
 	constructor(options?: RowMoveManagerOptions);
 	static readonly defaults: RowMoveManagerOptions;
-	init(grid: IGrid): void;
+	init(grid: ISleekGrid): void;
 	destroy(): void;
 	private handleDragInit;
 	private handleDragStart;
@@ -1878,7 +1913,7 @@ export declare class RowSelectionModel implements GridPlugin, SelectionModel {
 	onSelectedRangesChanged: EventEmitter<CellRange[], IEventData>;
 	constructor(options?: RowSelectionModelOptions);
 	static readonly defaults: RowSelectionModelOptions;
-	init(grid: IGrid): void;
+	init(grid: ISleekGrid): void;
 	destroy(): void;
 	private wrapHandler;
 	private rowsToRanges;

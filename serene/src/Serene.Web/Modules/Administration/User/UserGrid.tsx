@@ -32,7 +32,7 @@ export class UserGrid extends EntityGrid<UserRow, any> {
             var rolesLookup: Lookup<RoleRow>;
             RoleRow.getLookupAsync().then(lookup => {
                 rolesLookup = lookup;
-                this.slickGrid.invalidate();
+                this.sleekGrid.invalidate();
             });
 
             roles.format = ctx => {

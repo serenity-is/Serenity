@@ -1,5 +1,5 @@
 
-import { ArgsSort, Grid } from "@serenity-is/sleekgrid";
+import { ArgsSort, ISleekGrid } from "@serenity-is/sleekgrid";
 import { isInstanceOfType, localText, PropertyItem } from "../../base";
 import { deepClone } from "../../compat";
 import { IRemoteView } from "../../slick";
@@ -14,7 +14,7 @@ import { ReflectionOptionsSetter } from "../widgets/reflectionoptionssetter";
 import { QuickFilter } from "./quickfilter";
 import { QuickFilterBar } from "./quickfilterbar";
 
-export function getDefaultSortBy(this: void, sleekGrid: Grid): string[] {
+export function getDefaultSortBy(this: void, sleekGrid: ISleekGrid): string[] {
     if (!sleekGrid)
         return [];
 
@@ -109,7 +109,7 @@ export function propertyItemToQuickFilter(item: PropertyItem): QuickFilter<any, 
     return result;
 }
 
-export function slickGridOnSort(this: void, view: IRemoteView<any>, p: ArgsSort) {
+export function sleekGridOnSort(this: void, view: IRemoteView<any>, p: ArgsSort) {
     view.populateLock();
     try {
         var sortBy = [];

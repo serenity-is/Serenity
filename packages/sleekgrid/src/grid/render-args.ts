@@ -1,4 +1,4 @@
-import type { IGrid } from "../core";
+import type { ISleekGrid } from "../core";
 import type { CellStylesHash } from "../core/formatting";
 import type { ViewRange } from "../core/viewrange";
 import type { CachedRow } from "./internal";
@@ -16,9 +16,7 @@ export interface RowCellCommonRenderArgs<TItem> {
         pinnedStartLast: number;
         pinnedEndFirst: number;
     };
-    grid: Pick<IGrid<TItem>, "getColumns" | "getData" | "getDataItemValueForColumn" | "getDataLength" | "getFormatter"> & {
-        getOptions: () => { addNewRowCssClass?: string }
-    };
+    grid: ISleekGrid;
     item: TItem;
     row: number;
 }

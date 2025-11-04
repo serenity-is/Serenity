@@ -26,6 +26,7 @@ export interface EditorHost {
     navigateNext(): boolean;
     navigatePrev(): boolean;
     onCompositeEditorChange: EventEmitter<any>;
+    getEditorFactory(): EditorFactory;
 }
 
 interface CompositeEditorOptions {

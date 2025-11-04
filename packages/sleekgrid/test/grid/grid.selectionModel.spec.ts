@@ -1,12 +1,12 @@
-import { CellRange, EventEmitter, type IGrid, type SelectionModel } from "../../src/core";
-import { Grid } from "../../src/grid/grid";
+import { CellRange, EventEmitter, type ISleekGrid, type SelectionModel } from "../../src/core";
+import { SleekGrid } from "../../src/grid/sleekgrid";
 
 it('should selectionModel init with grid', () => {
-    const grid = new Grid(document.createElement('div'), [], [], {});
+    const grid = new SleekGrid(document.createElement('div'), [], [], {});
 
-    let selectionModelInitGrid: IGrid | null = null;
+    let selectionModelInitGrid: ISleekGrid | null = null;
     const selectionModel: SelectionModel = {
-        init: (grid: IGrid) => {
+        init: (grid: ISleekGrid) => {
             selectionModelInitGrid = grid;
         },
         setSelectedRanges: (_ranges: CellRange[]) => {
@@ -22,7 +22,7 @@ it('should selectionModel init with grid', () => {
 });
 
 it('should subscribe to selectionModel.onSelectedRangesChanged', () => {
-    const grid = new Grid(document.createElement('div'), [], [], {});
+    const grid = new SleekGrid(document.createElement('div'), [], [], {});
 
     let selectionModelOnSelectedRangesSubscribed = false;
 
@@ -32,7 +32,7 @@ it('should subscribe to selectionModel.onSelectedRangesChanged', () => {
     };
 
     const selectionModel: SelectionModel = {
-        init: (_grid: IGrid) => {},
+        init: (_grid: ISleekGrid) => {},
         setSelectedRanges: (_ranges: CellRange[]) => {
         },
         refreshSelections: () => {
@@ -45,7 +45,7 @@ it('should subscribe to selectionModel.onSelectedRangesChanged', () => {
 });
 
 it('should unsubscribe from selectionModel.onSelectedRangesChanged on destroy', () => {
-    const grid = new Grid(document.createElement('div'), [], [], {});
+    const grid = new SleekGrid(document.createElement('div'), [], [], {});
 
     let selectionModelOnSelectedRangesUnsubscribed = false;
 
@@ -55,7 +55,7 @@ it('should unsubscribe from selectionModel.onSelectedRangesChanged on destroy', 
     };
 
     const selectionModel: SelectionModel = {
-        init: (_grid: IGrid) => {},
+        init: (_grid: ISleekGrid) => {},
         setSelectedRanges: (_ranges: CellRange[]) => {
         },
         refreshSelections: () => {
@@ -69,7 +69,7 @@ it('should unsubscribe from selectionModel.onSelectedRangesChanged on destroy', 
 });
 
 it('should unsubscribe from selectionModel.onSelectedRangesChanged when setting a new selectionModel', () => {
-    const grid = new Grid(document.createElement('div'), [], [], {});
+    const grid = new SleekGrid(document.createElement('div'), [], [], {});
 
     let selectionModelOnSelectedRangesUnsubscribed = false;
 
@@ -79,7 +79,7 @@ it('should unsubscribe from selectionModel.onSelectedRangesChanged when setting 
     };
 
     const selectionModel: SelectionModel = {
-        init: (_grid: IGrid) => {},
+        init: (_grid: ISleekGrid) => {},
         setSelectedRanges: (_ranges: CellRange[]) => {
         },
         refreshSelections: () => {
@@ -89,7 +89,7 @@ it('should unsubscribe from selectionModel.onSelectedRangesChanged when setting 
 
     grid.setSelectionModel(selectionModel);
     grid.setSelectionModel({
-        init: (_grid: IGrid) => {},
+        init: (_grid: ISleekGrid) => {},
         setSelectedRanges: (_ranges: CellRange[]) => {
         },
         refreshSelections: () => {
@@ -100,10 +100,10 @@ it('should unsubscribe from selectionModel.onSelectedRangesChanged when setting 
 });
 
 it('should return current selectionModel on getSelectionModel', () => {
-    const grid = new Grid(document.createElement('div'), [], [], {});
+    const grid = new SleekGrid(document.createElement('div'), [], [], {});
 
     const selectionModel: SelectionModel = {
-        init: (_grid: IGrid) => {},
+        init: (_grid: ISleekGrid) => {},
         setSelectedRanges: (_ranges: CellRange[]) => {
         },
         refreshSelections: () => {

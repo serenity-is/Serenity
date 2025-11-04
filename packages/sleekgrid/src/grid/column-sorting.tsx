@@ -1,8 +1,8 @@
 import type { Column } from "../core/column";
-import type { IGrid } from "../core/igrid";
+import type { ISleekGrid } from "../core/igrid";
 import { triggerGridEvent } from "./event-utils";
 
-export function columnSortHandler(this: Pick<IGrid, "getColumnFromNode" | "getEditorLock" | "getColumns" | "getInitialColumns" |
+export function columnSortHandler(this: Pick<ISleekGrid, "getColumnFromNode" | "getEditorLock" | "getColumns" | "getInitialColumns" |
     "getInitialColumnIndex" | "getSortColumns" | "setSortColumns" | "onSort"> & {
         getOptions: () => { multiColumnSort: boolean }
     }, e: MouseEvent): void {
@@ -63,14 +63,14 @@ export function columnSortHandler(this: Pick<IGrid, "getColumnFromNode" | "getEd
         this.setSortColumns(sortColumns);
 
         if (!multiColumnSort) {
-            triggerGridEvent.call(this as IGrid, this.onSort, {
+            triggerGridEvent.call(this as ISleekGrid, this.onSort, {
                 multiColumnSort: false,
                 sortCol: column,
                 sortAsc: sortOpts.sortAsc
             }, e);
         } else {
-            var cols = this.getInitialColumns();
-            triggerGridEvent.call(this as IGrid, this.onSort, {
+            var cols = this.getColumns(true);
+            triggerGridEvent.call(this as ISleekGrid, this.onSort, {
                 multiColumnSort: true,
                 sortCols: this.getSortColumns().map(col => ({
                     sortCol: cols[this.getInitialColumnIndex(col.columnId)],

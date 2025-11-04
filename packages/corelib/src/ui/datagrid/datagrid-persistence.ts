@@ -1,4 +1,4 @@
-import { Column, Grid } from "@serenity-is/sleekgrid";
+import { Column, ISleekGrid } from "@serenity-is/sleekgrid";
 import { cssEscape, FilterPanelTexts, Fluent } from "../../base";
 import { IRemoteView } from "../../slick";
 import { EditorUtils } from "../editors/editorutils";
@@ -64,7 +64,7 @@ export function getCurrentSettings(this: void, opt: {
     flags: GridPersistenceFlags,
     includeDeletedToggle: HTMLElement,
     quickFiltersDiv: Fluent,
-    sleekGrid: Grid,
+    sleekGrid: ISleekGrid,
     toolbar: Toolbar,
     uniqueName: string
 }): PersistedGridSettings {
@@ -173,62 +173,30 @@ export function getCurrentSettings(this: void, opt: {
 }
 
 export function restoreSettingsFrom(this: void, opt: {
-    allColumns: (value?: Column[]) => Column[],
     canShowColumn: (column: Column) => boolean,
     filterBar: FilterDisplayBar,
     flags: GridPersistenceFlags,
     includeDeletedToggle: HTMLElement,
     quickFiltersDiv: Fluent,
-    sleekGrid: Grid,
+    sleekGrid: ISleekGrid,
     settings: PersistedGridSettings,
     toolbar: Toolbar,
     uniqueName: string,
     view: IRemoteView<any>
 }) {
-    let columns = opt.sleekGrid.getColumns();
-    let colById: { [key: string]: Column } = null;
-    const initColById = function (cl: Column[]) {
-        colById = {};
-        for (let c of cl) {
-            colById[c.id] = c;
-        }
-    };
+    let allColumns = opt.sleekGrid.getColumns(true);
+    let colById: { [key: string]: Column } = Object.create(null);
+    for (let c of allColumns) {
+        colById[c.id] = c;
+    }
 
     const flags = opt.flags || {};
     const settings = opt.settings || {};
 
     if (settings.columns != null) {
-        if (flags.columnVisibility !== false) {
-            let allColumns = opt.allColumns();
-            initColById(allColumns);
-            const newColumns = [];
-            for (let x of settings.columns) {
-                if (x.id != null && x.visible === true) {
-                    const column = colById[x.id];
-                    if (opt.canShowColumn(column)) {
-                        column.visible = true;
-                        newColumns.push(column);
-                        delete colById[x.id];
-                    }
-                }
-            }
-
-            for (let c2 of allColumns) {
-                if (colById[c2.id] != null) {
-                    c2.visible = false;
-                    newColumns.push(c2);
-                }
-            }
-
-            allColumns = opt.allColumns(newColumns);
-            columns = allColumns.filter(function (x1) {
-                return x1.visible === true;
-            });
-        }
 
         if (flags.columnPinning !== false &&
             settings.columns.some(x => "pin" in x)) {
-            initColById(columns);
             for (let x1 of settings.columns) {
                 if (x1.id != null) {
                     const column = colById[x1.id];
@@ -241,7 +209,6 @@ export function restoreSettingsFrom(this: void, opt: {
         }
 
         if (flags.columnWidths !== false) {
-            initColById(columns);
             for (let x2 of settings.columns) {
                 if (x2.id != null && x2.width != null && x2.width !== 0) {
                     const column1 = colById[x2.id];
@@ -253,7 +220,6 @@ export function restoreSettingsFrom(this: void, opt: {
         }
 
         if (flags.sortColumns !== false) {
-            initColById(columns);
             const list = [];
             const sortColumns = settings.columns.filter(function (x3) {
                 return x3.id != null && (x3.sort ?? 0) !== 0;
@@ -281,7 +247,20 @@ export function restoreSettingsFrom(this: void, opt: {
             });
             opt.sleekGrid.setSortColumns(list);
         }
-        opt.sleekGrid.setColumns(columns);
+
+        if (flags.columnVisibility !== false) {
+            const visibleColumns = settings.columns.filter(x => x.id != null &&
+                x.visible === true &&
+                colById[x.id] &&
+                opt.canShowColumn(colById[x.id])
+            ).map(x => x.id);
+
+            opt.sleekGrid.setVisibleColumns(visibleColumns, { notify: false });
+        }
+        else {
+            opt.sleekGrid.invalidateColumns();
+        }
+        
         opt.sleekGrid.invalidate();
     }
 

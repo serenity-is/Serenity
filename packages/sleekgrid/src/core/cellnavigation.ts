@@ -14,5 +14,10 @@ export interface CellNavigation {
     navigateTop(): void;
     navigateToRow(row: number): boolean;
     navigateUp(): boolean;
+    /**
+     * Navigate the active cell in the specified direction.
+     * @param dir Navigation direction.
+     * @return Whether navigation resulted in a change of active cell.
+     */
     navigate(dir: CellNavigationDirection): boolean;
 }

@@ -1,5 +1,5 @@
 ﻿import { Column } from "../../src/core/column";
-import { Grid } from "../../src/grid/grid";
+import { SleekGrid } from "../../src/grid/sleekgrid";
 import { FrozenLayout } from "../../src/layouts/frozen-layout";
 
 const slickPaneMain = "slick-pane-main";
@@ -27,60 +27,60 @@ function container() {
 describe('options.frozenColumns', () => {
 
     it('is ignored when undefined', () => {
-        const grid = new Grid(container(), [], threeCols(), {
+        const grid = new SleekGrid(container(), [], threeCols(), {
             enableColumnReorder: false,
             layoutEngine: new FrozenLayout()
         });
 
-        expect(grid.getInitialColumns().length).toBe(3);
+        expect(grid.getColumns(true).length).toBe(3);
         expect(grid.getColumns().length).toBe(3);
         expect(grid.getColumns()[0].frozen).toBeUndefined();
     });
 
     it('is ignored when null', () => {
-        const grid = new Grid(container(), [], threeCols(), {
+        const grid = new SleekGrid(container(), [], threeCols(), {
             enableColumnReorder: false,
             frozenColumns: null,
             layoutEngine: new FrozenLayout()
         });
 
-        expect(grid.getInitialColumns().length).toBe(3);
+        expect(grid.getColumns(true).length).toBe(3);
         expect(grid.getColumns().length).toBe(3);
         expect(grid.getColumns()[0].frozen).toBeUndefined();
     });
 
     it('is ignored when less than zero', () => {
-        const grid = new Grid(container(), [], threeCols(), {
+        const grid = new SleekGrid(container(), [], threeCols(), {
             enableColumnReorder: false,
             frozenColumns: -1,
             layoutEngine: new FrozenLayout()
         });
 
-        expect(grid.getInitialColumns().length).toBe(3);
+        expect(grid.getColumns(true).length).toBe(3);
         expect(grid.getColumns().length).toBe(3);
         expect(grid.getColumns()[0].frozen).toBeUndefined();
     });
 
     it('is ignored when than zero', () => {
-        const grid = new Grid(container(), [], threeCols(), {
+        const grid = new SleekGrid(container(), [], threeCols(), {
             enableColumnReorder: false,
             frozenColumns: 0,
             layoutEngine: new FrozenLayout()
         });
 
-        expect(grid.getInitialColumns().length).toBe(3);
+        expect(grid.getColumns(true).length).toBe(3);
         expect(grid.getColumns().length).toBe(3);
         expect(grid.getColumns()[0].frozen).toBeUndefined();
     });
 
     it('sets first column to frozen when 1 and all cols are visible', () => {
-        const grid = new Grid(container(), [], threeCols(), {
+        const grid = new SleekGrid(container(), [], threeCols(), {
             enableColumnReorder: false,
             frozenColumns: 1,
             layoutEngine: new FrozenLayout()
         });
 
-        expect(grid.getInitialColumns().length).toBe(3);
+        expect(grid.getColumns(true).length).toBe(3);
         expect(grid.getColumns().length).toBe(3);
         expect(grid.getColumns()[0].frozen).toBe(true);
     });
@@ -88,13 +88,13 @@ describe('options.frozenColumns', () => {
     it('sets the first visible column to frozen when 1', () => {
         var cols = threeCols();
         cols[0].visible = false;
-        const grid = new Grid(container(), [], cols, {
+        const grid = new SleekGrid(container(), [], cols, {
             enableColumnReorder: false,
             frozenColumns: 1,
             layoutEngine: new FrozenLayout()
         });
 
-        expect(grid.getInitialColumns().length).toBe(3);
+        expect(grid.getColumns(true).length).toBe(3);
         expect(grid.getColumns().length).toBe(2);
         expect(grid.getColumns()[0].frozen).toBe(true);
         expect(grid.getColumns()[0].id).toBe('c2');
@@ -102,13 +102,13 @@ describe('options.frozenColumns', () => {
     });
 
     it('sets first two columns to frozen when 2 and all cols are visible', () => {
-        const grid = new Grid(container(), [], threeCols(), {
+        const grid = new SleekGrid(container(), [], threeCols(), {
             enableColumnReorder: false,
             frozenColumns: 2,
             layoutEngine: new FrozenLayout()
         });
 
-        expect(grid.getInitialColumns().length).toBe(3);
+        expect(grid.getColumns(true).length).toBe(3);
         expect(grid.getColumns().length).toBe(3);
         expect(grid.getColumns()[0].frozen).toBe(true);
         expect(grid.getColumns()[1].frozen).toBe(true);
@@ -117,13 +117,13 @@ describe('options.frozenColumns', () => {
     it('sets the first two visible column to frozen when 2', () => {
         var cols = threeCols();
         cols[0].visible = false;
-        const grid = new Grid(container(), [], cols, {
+        const grid = new SleekGrid(container(), [], cols, {
             enableColumnReorder: false,
             frozenColumns: 2,
             layoutEngine: new FrozenLayout()
         });
 
-        expect(grid.getInitialColumns().length).toBe(3);
+        expect(grid.getColumns(true).length).toBe(3);
         expect(grid.getColumns().length).toBe(2);
         expect(grid.getColumns()[0].frozen).toBe(true);
         expect(grid.getColumns()[0].id).toBe('c2');
@@ -132,7 +132,7 @@ describe('options.frozenColumns', () => {
     });
 
     it('null gets deleted from options after processing', () => {
-        const grid = new Grid(container(), [], threeCols(), {
+        const grid = new SleekGrid(container(), [], threeCols(), {
             enableColumnReorder: false,
             frozenColumns: null,
             layoutEngine: new FrozenLayout()
@@ -143,7 +143,7 @@ describe('options.frozenColumns', () => {
 
     it('sets pane visibilities properly', () => {
         const div = container();
-        const grid = new Grid(div, [], threeCols(), {
+        const grid = new SleekGrid(div, [], threeCols(), {
             enableColumnReorder: false,
             frozenColumns: 2,
             layoutEngine: new FrozenLayout()
@@ -169,7 +169,7 @@ describe('options.frozenColumns', () => {
     it("switches scroll containers when setting frozen columns back to 0 at runtime", () => {
         const div = container();
         const layout = new FrozenLayout();
-        const grid = new Grid(div, [], threeCols(), {
+        const grid = new SleekGrid(div, [], threeCols(), {
             frozenColumns: 2,
             layoutEngine: layout
         });
@@ -198,7 +198,7 @@ describe('options.frozenColumns', () => {
     it("switches scroll containers when setting frozen columns > 0 at runtime", () => {
         const div = container();
         const layout = new FrozenLayout();
-        const grid = new Grid(div, [], threeCols(), {
+        const grid = new SleekGrid(div, [], threeCols(), {
             frozenColumns: 0,
             layoutEngine: layout
         });
@@ -230,7 +230,7 @@ describe('options.frozenColumns', () => {
         cols[2].frozen = true;
         const div = container();
         const layout = new FrozenLayout();
-        const grid = new Grid(div, [], cols, {
+        const grid = new SleekGrid(div, [], cols, {
             enableColumnReorder: false,
             layoutEngine: layout
         });

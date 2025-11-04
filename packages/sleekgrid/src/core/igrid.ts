@@ -9,7 +9,7 @@ import type { GridOptions } from "./gridoptions";
 import type { SelectionModel } from "./selection-model";
 import type { ViewRange } from "./viewrange";
 
-export interface IGrid<TItem = any> extends CellNavigation, EditorHost, GridPluginHost {
+export interface ISleekGrid<TItem = any> extends CellNavigation, EditorHost, GridPluginHost {
     readonly onActiveCellChanged: EventEmitter<ArgsCell, IEventData>;
     readonly onActiveCellPositionChanged: EventEmitter<ArgsGrid, IEventData>;
     readonly onAddNewRow: EventEmitter<ArgsAddNewRow, IEventData>;
@@ -33,8 +33,8 @@ export interface IGrid<TItem = any> extends CellNavigation, EditorHost, GridPlug
     readonly onDragStart: EventEmitter<ArgsGrid, UIEvent & { dragData: DragData }>;
     readonly onFooterRowCellRendered: EventEmitter<ArgsColumnNode, IEventData>;
     readonly onHeaderCellRendered: EventEmitter<ArgsColumnNode, IEventData>;
-    readonly onHeaderClick: EventEmitter<ArgsColumn, IEventData>;
-    readonly onHeaderContextMenu: EventEmitter<ArgsColumn, IEventData>;
+    readonly onHeaderClick: EventEmitter<ArgsColumn, MouseEvent>;
+    readonly onHeaderContextMenu: EventEmitter<ArgsColumn, MouseEvent>;
     readonly onHeaderMouseEnter: EventEmitter<ArgsColumn, MouseEvent>;
     readonly onHeaderMouseLeave: EventEmitter<ArgsColumn, MouseEvent>;
     readonly onHeaderRowCellRendered: EventEmitter<ArgsColumnNode, IEventData>;
@@ -72,10 +72,13 @@ export interface IGrid<TItem = any> extends CellNavigation, EditorHost, GridPlug
     getCellNode(row: number, cell: number): HTMLElement;
     getCellNodeBox(row: number, cell: number): { top: number; right: number; bottom: number; left: number; };
     getColspan(row: number, cell: number): number;
+    /** Gets a column by its ID. May also return hidden columns */
     getColumnById(id: string): Column<TItem>;
     getColumnFromNode(cellNode: Element): Column<TItem>;
-    getColumnIndex(id: string): number;
-    getColumns(): Column<TItem>[];
+    /** Returns a column's index in the visible columns list by its column ID. It returns -1 for hidden columns unless all argument is true */
+    getColumnIndex(id: string, all?: boolean): number;
+    /** Returns only the visible columns in order unless all argument is true */
+    getColumns(all?: boolean): Column<TItem>[];
     getContainerNode(): HTMLElement;
     getData(): any;
     getDataItem(row: number): TItem;
@@ -94,7 +97,9 @@ export interface IGrid<TItem = any> extends CellNavigation, EditorHost, GridPlug
     getHeaderColumn(columnIdOrIdx: string | number): HTMLElement;
     getHeaderRow(): HTMLElement;
     getHeaderRowColumn(columnIdOrIdx: string | number): HTMLElement;
+    /** @deprecated Use getColumnIndex(id, true) */
     getInitialColumnIndex(id: string): number;
+    /** @deprecated Use getColumns(true) */
     getInitialColumns(): Column<TItem>[];
     getLayoutInfo(): { frozenTopRows: number, frozenBottomRows: number, pinnedStartCols: number, pinnedEndCols: number };
     getOptions(): GridOptions<TItem>;
@@ -108,17 +113,30 @@ export interface IGrid<TItem = any> extends CellNavigation, EditorHost, GridPlug
     getTopPanel(): HTMLElement;
     getTotalsFormatter(column: Column<TItem>): ColumnFormat<TItem>;
     getUID(): string;
+    /** Gets the viewport range */
     getViewport(viewportTop?: number, viewportLeft?: number): ViewRange;
     getViewportNode(row?: number, cell?: number): HTMLElement;
+    /** Gets a view (e.g. visible) column by its column ID */
     getVisibleColumnById(id: string): Column<TItem>;
     getVisibleRange(viewportTop?: number, viewportLeft?: number): ViewRange;
     gotoCell(row: number, cell: number, forceEdit?: boolean): void;
     invalidate(): void;
     invalidateAllRows(): void;
+    /**
+     * Invalidates various elements after properties of columns have changed.
+     * Call this if you change columns properties that don't require a full setColumns call (e.g. width, name, visible etc.)
+     */
+    invalidateColumns(): void;
     invalidateRow(row: number): void;
     invalidateRows(rows: number[]): void;
     removeCellCssStyles(key: string): void;
     render: () => void;
+    /**
+     * Reorders columns based on their IDs and notifies onColumnsReordered by default.
+     * @param columnIds
+     * @param opt Whether to notify onColumnsReordered (default true).
+     */
+    reorderColumns(columnIds: string[], opt?: { notify?: boolean }): void;
     resetActiveCell(): void;
     resizeCanvas: () => void;
     scrollActiveCellIntoView(): void;
@@ -131,6 +149,14 @@ export interface IGrid<TItem = any> extends CellNavigation, EditorHost, GridPlug
     setCellCssStyles(key: string, hash: CellStylesHash): void;
     setColumnHeaderVisibility(visible: boolean): void;
     setColumns(columns: Column<TItem>[]): void;
+    /**
+     * Sets the visible columns based on their IDs and reorders them to provided order
+     * unless specified otherwise.
+     * @param columnIds The IDs of the columns to be made visible.
+     * @param opt Whether to reorder the visible columns based on the provided IDs (default true),
+     * and notify onColumnsReordered (default true).
+     */
+    setVisibleColumns(columnIds: string[], opt?: { reorder?: boolean, notify?: boolean }): void;
     setData(newData: any, scrollToTop?: boolean): void;
     setFooterRowVisibility(visible: boolean): void;
     setGroupingPanelVisibility(visible: boolean): void;

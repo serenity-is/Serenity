@@ -1,13 +1,13 @@
+import type { ISleekGrid } from "../../src/core";
 import type { GridPlugin } from "../../src/core/grid-plugin";
-import type { IGrid } from "../../src/core/igrid";
-import { Grid } from "../../src/grid/grid";
+import { SleekGrid } from "../../src/grid/sleekgrid";
 
 it('should call plugin init with grid instance', () => {
-    const grid = new Grid(document.createElement('div'), [], [], {});
+    const grid = new SleekGrid(document.createElement('div'), [], [], {});
 
-    let pluginInitGrid: IGrid | null = null;
+    let pluginInitGrid: ISleekGrid | null = null;
     const plugin: GridPlugin = {
-        init: (grid: IGrid) => {
+        init: (grid: ISleekGrid) => {
             pluginInitGrid = grid;
         }
     }
@@ -18,10 +18,10 @@ it('should call plugin init with grid instance', () => {
 });
 
 it('should be able to get plugin by name if it exists', () => {
-    const grid = new Grid(document.createElement('div'), [], [], {});
+    const grid = new SleekGrid(document.createElement('div'), [], [], {});
 
     const plugin: GridPlugin = {
-        init: (_grid: IGrid) => {},
+        init: (_grid: ISleekGrid) => {},
         pluginName: 'test'
     }
 
@@ -31,11 +31,11 @@ it('should be able to get plugin by name if it exists', () => {
 });
 
 it('should be able to unregister a plugin', () => {
-    const grid = new Grid(document.createElement('div'), [], [], {});
+    const grid = new SleekGrid(document.createElement('div'), [], [], {});
 
     let pluginDestroyCalled = false;
     const plugin: GridPlugin = {
-        init: (_grid: IGrid) => {},
+        init: (_grid: ISleekGrid) => {},
         destroy: () => {
             pluginDestroyCalled = true;
         },
@@ -52,11 +52,11 @@ it('should be able to unregister a plugin', () => {
 });
 
 it('should call plugin.destroy if it exists', () => {
-    const grid = new Grid(document.createElement('div'), [], [], {});
+    const grid = new SleekGrid(document.createElement('div'), [], [], {});
 
     let pluginDestroyCalled = false;
     const plugin: GridPlugin = {
-        init: (_grid: IGrid) => {},
+        init: (_grid: ISleekGrid) => {},
         destroy: () => {
             pluginDestroyCalled = true;
         }
@@ -69,10 +69,10 @@ it('should call plugin.destroy if it exists', () => {
 });
 
 it('should be able to get plugins without names', () => {
-    const grid = new Grid(document.createElement('div'), [], [], {});
+    const grid = new SleekGrid(document.createElement('div'), [], [], {});
 
     const newPlugin = (): GridPlugin => ({
-        init: (_grid: IGrid) => {
+        init: (_grid: ISleekGrid) => {
         }
     });
 

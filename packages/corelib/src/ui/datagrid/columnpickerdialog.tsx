@@ -5,8 +5,14 @@ import { ResizableAttribute } from "../../types";
 import { BaseDialog } from "../dialogs/basedialog";
 import { ToolButton } from "../widgets/toolbar";
 import { IDataGrid } from "./idatagrid";
+import type { PersistedGridSettings } from "./datagrid-persistence";
 
-export class ColumnPickerDialog<P = {}> extends BaseDialog<P> {
+export interface ColumnPickerDialogOptions {
+    columns: Column[];
+    defaultColumns: string[];
+}
+
+export class ColumnPickerDialog<P extends ColumnPickerDialogOptions = ColumnPickerDialogOptions> extends BaseDialog<P> {
 
     static [Symbol.typeInfo] = this.registerClass(nsSerenity, [new ResizableAttribute()]);
 
@@ -14,10 +20,16 @@ export class ColumnPickerDialog<P = {}> extends BaseDialog<P> {
     declare private ulHidden: HTMLUListElement;
     declare private colById: { [key: string]: Column };
 
-    declare public allColumns: Column[];
-    declare public visibleColumns: string[];
-    declare public defaultColumns: string[];
-    declare public done: () => void;
+    declare private visibleColumns: string[];
+    declare public done: (newColumns: string[]) => void;
+
+    constructor(opt: P) {
+        super(opt);
+
+        this.options.columns ??= [];
+        this.visibleColumns = this.options.columns.filter(x => x.visible !== false).map(x => x.id);
+        this.options.defaultColumns ??= this.visibleColumns.slice(0);
+    }
 
     protected renderContents(): any {
         this.dialogTitle = ColumnPickerDialogTexts.Title;
@@ -77,7 +89,7 @@ export class ColumnPickerDialog<P = {}> extends BaseDialog<P> {
                         });
 
                     let last: HTMLElement = null;
-                    for (let id of this.defaultColumns) {
+                    for (let id of (this.options.defaultColumns || this.visibleColumns)) {
                         let li = liByKey[id];
                         if (!li)
                             continue;
@@ -100,26 +112,8 @@ export class ColumnPickerDialog<P = {}> extends BaseDialog<P> {
             },
             okDialogButton({
                 click: () => {
-                    let newColumns: Column[] = [];
-
-                    for (var col of this.allColumns)
-                        col.visible = false;
-
-                    this.visibleColumns = Array.from(this.ulVisible.childNodes).map((x: HTMLElement) => {
-                        let id = x.dataset.key;
-                        var col = this.colById[id];
-                        col.visible = true;
-                        newColumns.push(col);
-                        return id;
-                    });
-
-                    for (var col of this.allColumns) {
-                        if (!col.visible)
-                            newColumns.push(col);
-                    }
-
-                    this.allColumns = newColumns;
-                    this.done && this.done();
+                    this.visibleColumns = Array.from(this.ulVisible.childNodes).map((x: HTMLElement) => x.dataset.key);
+                    this.done && this.done(this.visibleColumns);
                 }
             }),
             cancelDialogButton()
@@ -160,7 +154,7 @@ export class ColumnPickerDialog<P = {}> extends BaseDialog<P> {
     }
 
     protected setupColumns(): void {
-        this.allColumns = this.allColumns || [];
+        this.options.columns = this.options.columns || [];
         this.visibleColumns = this.visibleColumns || [];
 
         let visible: { [key: string]: boolean } = {};
@@ -169,16 +163,15 @@ export class ColumnPickerDialog<P = {}> extends BaseDialog<P> {
         }
 
         this.colById = {};
-        for (let c of this.allColumns) {
+        for (let c of this.options.columns) {
             this.colById[c.id] = c;
         }
 
-        if (this.defaultColumns == null)
-            this.defaultColumns = this.visibleColumns.slice(0);
+        this.options.defaultColumns ??= this.visibleColumns.slice(0);
 
         let hidden: Column[] = [];
 
-        for (let c of this.allColumns) {
+        for (let c of this.options.columns) {
             if (!visible[c.id] && (!c.sourceItem ||
                 (c.sourceItem.filterOnly !== true &&
                     (c.sourceItem.readPermission == null || Authorization.hasPermission(c.sourceItem.readPermission))))) {
@@ -249,18 +242,18 @@ export class ColumnPickerDialog<P = {}> extends BaseDialog<P> {
     }
 
     static openDialog({ grid }: { grid: IDataGrid }) {
-        var picker = new ColumnPickerDialog({});
-        picker.allColumns = (grid as any).getAllColumns?.() || grid.getGrid().getInitialColumns();
+        let defaultColumns: string[];
         if ((grid as any).initialSettings) {
-            var initialSettings = (grid as any).initialSettings;
+            const initialSettings = (grid as any).initialSettings as PersistedGridSettings;
             if (initialSettings.columns && initialSettings.columns.length)
-                picker.defaultColumns = initialSettings.columns.map((x: any) => x.id);
+                defaultColumns = initialSettings.columns.map(x => x.id);
         }
-        picker.visibleColumns = grid.getGrid().getColumns().map(x => x.id);
-        picker.done = () => {
-            (grid as any).setAllColumns?.(picker.allColumns);
-            var visible = picker.allColumns.filter(x => x.visible === true);
-            grid.getGrid().setColumns(visible);
+        var picker = new ColumnPickerDialog({
+            columns: grid.getGrid().getColumns(true),
+            defaultColumns
+        });
+        picker.done = (newColumns) => {
+            grid.getGrid().setVisibleColumns(newColumns);
             Promise.resolve((grid as any).persistSettings()).then(() => grid.getView().populate());
         };
 

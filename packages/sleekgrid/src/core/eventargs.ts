@@ -1,9 +1,9 @@
 import type { CellStylesHash, Column, Editor, IEventData, ValidationResult } from ".";
 import type { DragItem, DragPosition } from "./draggable";
-import type { IGrid } from "./igrid";
+import type { ISleekGrid } from "./igrid";
 
 export interface ArgsGrid {
-    grid: IGrid;
+    grid: ISleekGrid;
 }
 
 export interface ArgsColumn extends ArgsGrid {

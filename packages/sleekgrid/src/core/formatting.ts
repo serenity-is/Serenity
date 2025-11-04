@@ -1,5 +1,6 @@
 import type { Column } from "./column";
 import { gridDefaults, GridOptions } from "./gridoptions";
+import type { ISleekGrid } from "./igrid";
 import { addClass, basicDOMSanitizer, escapeHtml, removeClass } from "./util";
 
 /**
@@ -52,7 +53,7 @@ export interface FormatterContext<TItem = any> {
     /**
      * The grid instance.
      */
-    grid?: any;
+    grid?: ISleekGrid;
 
     /**
      * The item of the row.
@@ -87,7 +88,7 @@ export interface CompatFormatterResult {
     toolTip?: string;
 }
 
-export type CompatFormatter<TItem = any> = (row: number, cell: number, value: any, column: Column<TItem>, item: TItem, grid?: any) => string | CompatFormatterResult;
+export type CompatFormatter<TItem = any> = (row: number, cell: number, value: any, column: Column<TItem>, item: TItem, grid?: ISleekGrid) => string | CompatFormatterResult;
 
 export interface FormatterFactory<TItem = any> {
     getFormat?(column: Column<TItem>): ColumnFormat<TItem>;

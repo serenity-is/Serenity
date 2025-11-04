@@ -1,4 +1,4 @@
-import { applyFormatterResultToCellNode, Column, ColumnFormat, CompatFormatter, convertCompatFormatter, FormatterContext, FormatterResult, Group, IGroupTotals, ItemMetadata, type CellKeyboardEvent, type CellMouseEvent, type GridPlugin, type IGrid } from "../core";
+import { applyFormatterResultToCellNode, Column, ColumnFormat, CompatFormatter, convertCompatFormatter, FormatterContext, FormatterResult, Group, IGroupTotals, ItemMetadata, type CellKeyboardEvent, type CellMouseEvent, type GridPlugin, type ISleekGrid } from "../core";
 
 export interface GroupItemMetadataProviderOptions {
     enableExpandCollapse?: boolean;
@@ -24,7 +24,7 @@ export interface GroupItemMetadataProviderOptions {
 }
 
 export class GroupItemMetadataProvider implements GridPlugin {
-    declare protected grid: IGrid;
+    declare protected grid: ISleekGrid;
     declare private options: GroupItemMetadataProviderOptions;
 
     constructor(opt?: GroupItemMetadataProviderOptions) {
@@ -82,7 +82,7 @@ export class GroupItemMetadataProvider implements GridPlugin {
         </>
     }
 
-    public static defaultTotalsFormat(ctx: FormatterContext, grid?: IGrid): FormatterResult {
+    public static defaultTotalsFormat(ctx: FormatterContext, grid?: ISleekGrid): FormatterResult {
         let item = ctx.item as IGroupTotals;
         if (!item.__groupTotals && (item as any).totals)
             ctx.item = item = (item as any).totals;
@@ -98,7 +98,7 @@ export class GroupItemMetadataProvider implements GridPlugin {
         return "";
     }
 
-    init(grid: IGrid) {
+    init(grid: ISleekGrid) {
         this.grid = grid;
         grid.onClick.subscribe(this.handleGridClick);
         grid.onKeyDown.subscribe(this.handleGridKeyDown);

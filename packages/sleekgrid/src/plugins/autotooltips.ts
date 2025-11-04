@@ -1,4 +1,4 @@
-import type { GridPlugin, HeaderColumnEvent, IGrid } from "../core";
+import type { GridPlugin, HeaderColumnEvent, ISleekGrid } from "../core";
 
 export interface AutoTooltipsOptions {
     enableForCells?: boolean;
@@ -9,7 +9,7 @@ export interface AutoTooltipsOptions {
 
 export class AutoTooltips implements GridPlugin {
 
-    declare private grid: IGrid;
+    declare private grid: ISleekGrid;
     declare private options: AutoTooltipsOptions;
 
     constructor(options?: AutoTooltipsOptions) {
@@ -23,7 +23,7 @@ export class AutoTooltips implements GridPlugin {
         replaceExisting: true
     }
 
-    init(grid: IGrid) {
+    init(grid: ISleekGrid) {
         this.grid = grid;
 
         if (this.options.enableForCells)

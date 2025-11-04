@@ -1,8 +1,8 @@
 import { type EventEmitter, type IEventData } from "../core/event";
 import type { ArgsGrid } from "../core/eventargs";
-import type { IGrid } from "../core/igrid";
+import type { ISleekGrid } from "../core/igrid";
 
-export function triggerGridEvent<TArgs extends ArgsGrid, TEventData extends IEventData = IEventData>(this: IGrid,
+export function triggerGridEvent<TArgs extends ArgsGrid, TEventData extends IEventData = IEventData>(this: ISleekGrid,
     evt: EventEmitter<TArgs, TEventData>, args?: Omit<TArgs, "grid">, e?: TEventData, mergeArgs = true): any {
     args ??= {} as any;
     (args as TArgs).grid = this;

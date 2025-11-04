@@ -141,7 +141,7 @@ export class ProductGrid<P = {}> extends EntityGrid<ProductRow, P> {
     }
 
     private inputsChange(e: Event) {
-        const cell = this.slickGrid.getCellFromEvent(e);
+        const cell = this.sleekGrid.getCellFromEvent(e);
         const item = this.itemAt(cell.row);
         const input = e.target as (HTMLInputElement | HTMLSelectElement);
         const field = input.getAttribute('data-field');

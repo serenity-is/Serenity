@@ -1,5 +1,5 @@
 import { DataGrid, deepClone, Fluent, formatDate, ListRequest, ListResponse, serviceCall, stringFormat, ToolButton } from "@serenity-is/corelib";
-import { applyFormatterResultToCellNode, Column, FormatterResult, Grid } from "@serenity-is/sleekgrid";
+import { applyFormatterResultToCellNode, Column, FormatterResult, ISleekGrid } from "@serenity-is/sleekgrid";
 
 export interface PdfExportOptions {
     grid: DataGrid<any, any>;
@@ -48,7 +48,7 @@ export namespace PdfExportHelper {
         });
     }
 
-    function toAutoTableData(sleekGrid: Grid, entities: any[], keys: string[], srcColumns: Column[]) {
+    function toAutoTableData(sleekGrid: ISleekGrid, entities: any[], keys: string[], srcColumns: Column[]) {
         let el = document.createElement('span');
         let row = 0;
         return entities.map(item => {
@@ -92,20 +92,20 @@ export namespace PdfExportHelper {
 
     export function exportToPdf(options: PdfExportOptions): void {
 
-        var g = options.grid;
+        const dataGrid = options.grid;
 
         if (!options.onViewSubmit())
             return;
 
-        var request = deepClone(g.view.params) as ListRequest;
+        var request = deepClone(dataGrid.view.params) as ListRequest;
         request.Take = 0;
         request.Skip = 0;
 
-        var sortBy = g.view.sortBy;
+        var sortBy = dataGrid.view.sortBy;
         if (sortBy != null)
             request.Sort = sortBy;
 
-        var gridColumns = g.slickGrid.getColumns();
+        var gridColumns = dataGrid.sleekGrid.getColumns();
         gridColumns = gridColumns.filter(x => x.id !== "__select__");
 
         request.IncludeColumns = [];
@@ -113,7 +113,7 @@ export namespace PdfExportHelper {
             request.IncludeColumns.push(column.id || column.field);
 
         serviceCall({
-            url: g.view.url,
+            url: dataGrid.view.url,
             request: request,
             onSuccess: response => includeAutoTable(() => {
                 // @ts-ignore
@@ -123,11 +123,11 @@ export namespace PdfExportHelper {
                 let columns = toAutoTableColumns(srcColumns, columnStyles, options.columnTitles);
                 var keys = columns.map(x => x.dataKey);
                 let entities = (<ListResponse<any>>response).Entities || [];
-                let data = toAutoTableData(g.slickGrid, entities, keys, srcColumns);
+                let data = toAutoTableData(dataGrid.sleekGrid, entities, keys, srcColumns);
 
                 doc.setFontSize(options.titleFontSize || 10);
                 doc.setFont('helvetica', 'bold');
-                let reportTitle = options.reportTitle || g.getTitle() || "Report";
+                let reportTitle = options.reportTitle || dataGrid.getTitle() || "Report";
 
                 doc.autoTableText(reportTitle, doc.internal.pageSize.width / 2,
                     options.titleTop || 25, { halign: 'center' });
@@ -195,7 +195,7 @@ export namespace PdfExportHelper {
 
                 if (!options.output || options.output == "file") {
                     var fileName = options.fileName || options.reportTitle || "{0}_{1}.pdf";
-                    fileName = stringFormat(fileName, g.getTitle() || "report",
+                    fileName = stringFormat(fileName, dataGrid.getTitle() || "report",
                         formatDate(new Date(), "yyyyMMdd_HHmm"));
                     doc.save(fileName);
                     return;

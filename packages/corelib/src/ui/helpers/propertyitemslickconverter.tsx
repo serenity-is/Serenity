@@ -1,4 +1,4 @@
-import { Column, Grid } from "@serenity-is/sleekgrid";
+import { Column, SleekGrid } from "@serenity-is/sleekgrid";
 import { Authorization, isPromiseLike, tryGetText, type PropertyItem } from "../../base";
 import { FormatterType } from "../../types/formattertype";
 import { FormatterTypeRegistry } from "../../types/formattertyperegistry";
@@ -73,7 +73,7 @@ export namespace PropertyItemSlickConverter {
         }
         if (isPromiseLike(formatterType)) {
             result.format = (ctx) => {
-                if (ctx.row != null && ctx.cell != null && ctx.grid instanceof Grid) {
+                if (ctx.row != null && ctx.cell != null && ctx.grid) {
                     const grid = ctx.grid;
                     const row = ctx.row;
                     const cell = ctx.cell;

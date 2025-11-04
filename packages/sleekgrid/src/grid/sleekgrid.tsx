@@ -1,9 +1,9 @@
 import { bindThis, currentLifecycleRoot } from "@serenity-is/domwise";
 import { preClickClassName } from "../core/base";
 import { CellRange } from "../core/cellrange";
-import { columnDefaults, initializeColumns, type Column, type ColumnMetadata, type ColumnSort, type ItemMetadata } from "../core/column";
+import { columnDefaults, initColumnProps, type Column, type ColumnMetadata, type ColumnSort, type ItemMetadata } from "../core/column";
 import { Draggable, type DragPosition } from "../core/draggable";
-import type { EditCommand, EditController, Editor, EditorClass, EditorLock, Position, RowCell } from "../core/editing";
+import type { EditCommand, EditController, Editor, EditorClass, EditorFactory, EditorLock, Position, RowCell } from "../core/editing";
 import { EventData, EventEmitter, type IEventData } from "../core/event";
 import type { ArgsAddNewRow, ArgsCell, ArgsCellChange, ArgsCellEdit, ArgsColumn, ArgsColumnNode, ArgsCssStyle, ArgsEditorDestroy, ArgsGrid, ArgsScroll, ArgsSelectedRowsChange, ArgsSort, ArgsValidationError, DragData } from "../core/eventargs";
 import { applyFormatterResultToCellNode, convertCompatFormatter, defaultColumnFormat, formatterContext, type CellStylesHash, type ColumnFormat, type FormatterContext, type FormatterResult } from "../core/formatting";
@@ -12,7 +12,7 @@ import type { GridSignals } from "../core/grid-signals";
 import { gridDefaults, type GridOptions } from "../core/gridoptions";
 import type { IGroupTotals } from "../core/group";
 import { type IDataView } from "../core/idataview";
-import type { IGrid } from "../core/igrid";
+import type { ISleekGrid } from "../core/igrid";
 import type { SelectionModel } from "../core/selection-model";
 import { addClass, escapeHtml, parsePx, removeClass } from "../core/util";
 import type { ViewportInfo } from "../core/viewportinfo";
@@ -30,7 +30,7 @@ import { renderCell } from "./render-cell";
 import { renderRow } from "./render-row";
 import { absBox, applyColumnWidths, applyLegacyHeightOptions, createCssRules, findStylesheetByUID, getInnerWidth, getMaxSupportedCssHeight, getScrollBarDimensions, setStyleProp } from "./style-utils";
 
-export class Grid<TItem = any> implements IGrid<TItem> {
+export class SleekGrid<TItem = any> implements ISleekGrid<TItem> {
     declare private _absoluteColMinWidth: number;
     declare private _activeCanvasNode: HTMLElement;
     declare private _activeCell: number;
@@ -109,7 +109,7 @@ export class Grid<TItem = any> implements IGrid<TItem> {
     private _tabbingDirection: number = 1;
     declare private _trigger: typeof triggerGridEvent;
     declare private static _nextUid: number;
-    private _uid: string = "_sleekgrid_" + (Grid._nextUid = (Grid._nextUid || 0) + 1) + "_";
+    private _uid: string = "_sleekgrid_" + (SleekGrid._nextUid = (SleekGrid._nextUid || 0) + 1) + "_";
     private _viewportInfo: ViewportInfo = {} as any;
     private _vScrollDir: number = 1;
 
@@ -244,7 +244,8 @@ export class Grid<TItem = any> implements IGrid<TItem> {
 
         this._layout = typeof options.layoutEngine === "function" ? options.layoutEngine() : (options.layoutEngine ?? new BasicLayout());
 
-        this.setInitialCols(columns);
+        this.setInitCols(columns);
+        this.updateViewCols();
         this._scrollDims = getScrollBarDimensions();
 
         if (options.groupingPanel) {
@@ -258,7 +259,6 @@ export class Grid<TItem = any> implements IGrid<TItem> {
                 getColumns: boundThis.getColumns,
                 getContainerNode: boundThis.getContainerNode,
                 getDataLength: boundThis.getDataLength,
-                getInitialColumns: boundThis.getInitialColumns,
                 getOptions: boundThis.getOptions,
                 getSignals: boundThis.getSignals,
                 getViewportInfo: boundThis.getViewportInfo,
@@ -414,7 +414,7 @@ export class Grid<TItem = any> implements IGrid<TItem> {
             });
         }
 
-        Grid.onAfterInit.notify({ grid: this });
+        SleekGrid.onAfterInit.notify({ grid: this });
         this.onAfterInit.notify({ grid: this });
     }
 
@@ -916,13 +916,13 @@ export class Grid<TItem = any> implements IGrid<TItem> {
             scroll: !hasPinnedCols,
             onStart: (e: { item: any; originalEvent: MouseEvent; }) => {
                 canDragScroll = !hasPinnedCols ||
-                    Grid.offset(e.item)!.left > Grid.offset(this.getScrollContainerX())!.left;
+                    SleekGrid.offset(e.item)!.left > SleekGrid.offset(this.getScrollContainerX())!.left;
 
                 if (canDragScroll && e.originalEvent && e.originalEvent.pageX > this._container.clientWidth) {
                     if (!(columnScrollTimer)) {
                         columnScrollTimer = setInterval(bindThis(this).scrollColumnsLeft, 100);
                     }
-                } else if (canDragScroll && e.originalEvent && e.originalEvent.pageX < Grid.offset(this.getScrollContainerX())!.left) {
+                } else if (canDragScroll && e.originalEvent && e.originalEvent.pageX < SleekGrid.offset(this.getScrollContainerX())!.left) {
                     if (!(columnScrollTimer)) {
                         columnScrollTimer = setInterval(bindThis(this).scrollColumnsRight, 100);
                     }
@@ -945,13 +945,9 @@ export class Grid<TItem = any> implements IGrid<TItem> {
                 this._mapBands(band => band.headerCols).forEach((headerCols, i) => {
                     if (!headerCols.contains(e.item))
                         return;
-                    reorderedCols = sortToDesiredOrderAndKeepRest(
-                        this._initCols,
-                        (this.sortableColInstances[i]?.toArray?.() ?? []));
+                    this.reorderColumns((this.sortableColInstances[i]?.toArray?.() ?? []));
                 });
 
-                reorderedCols && this.setColumns(reorderedCols);
-                this._trigger(this.onColumnsReordered, {});
                 e.stopPropagation();
                 this.setupColumnResize();
                 if (this._activeCellNode) {
@@ -1123,9 +1119,9 @@ export class Grid<TItem = any> implements IGrid<TItem> {
         }
     }
 
-
-    //////////////////////////////////////////////////////////////////////////////////////////////
-    // General
+    getEditorFactory(): EditorFactory {
+        return this._options.editorFactory;
+    }
 
     getEditorLock(): EditorLock {
         return this._options.editorLock;
@@ -1135,22 +1131,18 @@ export class Grid<TItem = any> implements IGrid<TItem> {
         return this._editController;
     }
 
-    /** Gets a column by its ID. May also return non visible columns */
     getColumnById(id: string): Column<TItem> {
         return id ? this._cols[this._colById[id]] : null;
     }
 
-    /** Returns a column's index in the visible columns list by its column ID */
-    getColumnIndex(id: string): number {
-        return id ? this._colById[id] : null;
+    getColumnIndex(id: string, all?: boolean): number {
+        return id ? (all ? this._initColById : this._colById)[id] : null;
     }
 
-    /** Gets index of a column in the initial column list passed to the grid, or setColumns method. May include invisible cols and index does not have to match visible column order. */
     getInitialColumnIndex(id: string): number {
         return id ? this._initColById[id] : null;
     }
 
-    /** Gets a view (e.g. visible) column by its column ID */
     getVisibleColumnById(id: string): Column<TItem> {
         return id ? this._cols[this._colById[id]] : null;
     }
@@ -1280,12 +1272,11 @@ export class Grid<TItem = any> implements IGrid<TItem> {
         }
     }
 
-    /** Returns only the visible columns in order */
-    getColumns(): Column<TItem>[] {
-        return this._cols;
+    getColumns(all?: boolean): Column<TItem>[] {
+        return all ? this._initCols : this._cols;
     }
 
-    /** Returns list of columns passed to the grid constructor, or setColumns method. May include invisible columns and order does not match visible column order. */
+    /** @deprecated Use getColumns(true) */
     getInitialColumns(): Column<TItem>[] {
         return this._initCols;
     }
@@ -1305,39 +1296,43 @@ export class Grid<TItem = any> implements IGrid<TItem> {
         }
     }
 
-    private setInitialCols(initCols: Column[]) {
-
-        initializeColumns(initCols, this._colDefaults);
-
-        var initColById: any = {};
-        var viewCols: Column[] = [];
-        var viewColById: { [key: string]: number } = {};
-        var i: number, m: Column;
-        for (i = 0; i < initCols.length; i++) {
-            m = initCols[i];
-            initColById[m.id] = i;
-            if (m.visible !== false)
-                viewCols.push(m);
+    private updateViewCols() {
+        const initCols = this._initCols;
+        let col: Column;
+        let cols: Column[] = [];
+        var colById: { [key: string]: number } = {};
+        for (col of initCols) {
+            if (col.visible !== false)
+                cols.push(col);
         }
 
-        this.handleFrozenColsOption(viewCols, this._options);
-        viewCols = this._layout.reorderViewColumns?.(viewCols, this._refs) ?? viewCols;
+        this.handleFrozenColsOption(cols, this._options);
+        cols = this._layout.reorderViewColumns?.(cols, this._refs) ?? cols;
 
         this._postRenderActive = this._options.enableAsyncPostRender ?? false;
         this._postCleanupActive = this._options.enableAsyncPostRenderCleanup ?? false;
-        for (i = 0; i < viewCols.length; i++) {
-            m = viewCols[i];
-            viewColById[m.id] = i;
-            if (m.asyncPostRenderCleanup != null)
+        for (let i = 0; i < cols.length; i++) {
+            col = cols[i];
+            colById[col.id] = i;
+            if (col.asyncPostRenderCleanup != null)
                 this._postCleanupActive = true;
-            if (m.asyncPostRender != null)
+            if (col.asyncPostRender != null)
                 this._postRenderActive = true;
         }
 
+        this._cols = cols;
+        this._colById = colById;
+    }
+
+    private setInitCols(initCols: Column[]) {
+        initColumnProps(initCols, this._colDefaults);
+        const initColById: any = {};
+        for (let i = 0; i < initCols.length; i++) {
+            const col = initCols[i];
+            initColById[col.id] = i;
+        }
         this._initCols = initCols;
         this._initColById = initColById;
-        this._cols = viewCols;
-        this._colById = viewColById;
     }
 
     private handleFrozenColsOption(viewCols: Column[], options?: GridOptions) {
@@ -1377,9 +1372,40 @@ export class Grid<TItem = any> implements IGrid<TItem> {
             columns = this._initCols;
         }
 
-        this.setInitialCols(columns);
-        this.updateViewColLeftRight();
+        this.setInitCols(columns);
+        this.invalidateColumns();
+    }
 
+    public reorderColumns(columnIds: string[], opt?: { notify?: boolean }): void {
+        sortToDesiredOrderAndKeepRest(this._initCols, columnIds);
+        this.invalidateColumns();
+        if (opt?.notify ?? true) {
+            this._trigger(this.onColumnsReordered, {});
+        }
+    }
+
+    public setVisibleColumns(columnIds: string[], opt?: { reorder?: boolean, notify?: boolean }): void {
+        const idSet = new Set(columnIds);
+        let anyChange = false;
+        for (const col of this._initCols) {
+            const visible = idSet.has(col.id);
+            if ((col.visible !== false) != visible) {
+                col.visible = visible;
+                anyChange = true;
+            }
+        }
+        if (opt?.reorder ?? true) {
+            this.reorderColumns(columnIds, { notify: opt?.notify });
+        }
+        else if (anyChange) {
+            this.invalidateColumns();
+            this._trigger(this.onColumnsReordered, {});
+        }
+    }
+
+    public invalidateColumns() {
+        this.updateViewCols();
+        this.updateViewColLeftRight();
         if (this._initialized) {
             this.setOverflow();
             this.invalidateAllRows();
@@ -2059,11 +2085,6 @@ export class Grid<TItem = any> implements IGrid<TItem> {
         setStyleProp(style, '--sg-virtual-height', this._viewportInfo.realScrollHeight + "px");
     }
 
-    /**
-     * @param viewportTop optional viewport top
-     * @param viewportLeft optional viewport left
-     * @returns viewport range
-     */
     getViewport(viewportTop?: number, viewportLeft?: number): ViewRange {
         return this.getVisibleRange(viewportTop, viewportLeft);
     }
@@ -3647,10 +3668,6 @@ export class Grid<TItem = any> implements IGrid<TItem> {
         this._tabbingDirection = dir;
     }
 
-    /**
-     * @param {string} dir Navigation direction.
-     * @return {boolean} Whether navigation resulted in a change of active cell.
-     */
     navigate(dir: string): boolean {
         if (!this._options.enableCellNavigation) {
             return false;
@@ -3918,3 +3935,7 @@ function isPollutingKey(key: string | null | undefined): boolean {
 const contentOnly = {
     contentOnly: true
 }
+
+/** @deprecated Use SleekGrid */
+export const Grid: typeof SleekGrid = SleekGrid;
+

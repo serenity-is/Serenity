@@ -1,3 +1,4 @@
+import { EventEmitter } from "../../src/core";
 import type { Column } from "../../src/core/column";
 import type { RowCell } from "../../src/core/editing";
 import type { GridSignals } from "../../src/core/grid-signals";
@@ -31,7 +32,6 @@ export function mockLayoutHost(): LayoutHost & {
         getAvailableWidth: vi.fn(() => 1000),
         getCellFromPoint: vi.fn(() => ({ row: 0, cell: 0 } as RowCell)),
         getColumns: vi.fn(() => [] as Column[]),
-        getInitialColumns: vi.fn(() => [] as Column[]),
         getContainerNode: vi.fn(() => host.container),
         getDataLength: vi.fn(() => 0),
         getOptions: vi.fn(() => host.opt),
@@ -43,7 +43,8 @@ export function mockLayoutHost(): LayoutHost & {
         renderRows: vi.fn(),
         registerPlugin: vi.fn(),
         unregisterPlugin: vi.fn(),
-        getPluginByName: vi.fn(() => null)
+        getPluginByName: vi.fn(() => null),
+        onAfterInit: new EventEmitter<any, any>()
     };
     return host;
 }

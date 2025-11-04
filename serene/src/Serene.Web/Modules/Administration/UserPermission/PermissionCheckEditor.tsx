@@ -183,7 +183,7 @@ export class PermissionCheckEditor<P extends PermissionCheckEditorOptions = Perm
             else
                 item.GrantRevoke = grant;
 
-            this.slickGrid.invalidate();
+            this.sleekGrid.invalidate();
         }
     }
 

@@ -1,5 +1,5 @@
-import { convertCompatFormatter, EventData, EventEmitter, Grid, Group, GroupItemMetadataProvider, GroupTotals, IGroupTotals, ItemMetadata, type FormatterContext } from "@serenity-is/sleekgrid";
-import { ListRequest, ListResponse, PagerTexts, ServiceOptions, ServiceResponse, htmlEncode, serviceCall } from "../base";
+import { convertCompatFormatter, EventData, EventEmitter, ISleekGrid, Group, GroupItemMetadataProvider, GroupTotals, IGroupTotals, ItemMetadata, type FormatterContext } from "@serenity-is/sleekgrid";
+import { ListRequest, ListResponse, PagerTexts, serviceCall, ServiceOptions, ServiceResponse } from "../base";
 import { AggregateFormatting } from "./aggregateformatting";
 import { IAggregator } from "./aggregators";
 import { CancellableViewCallback, IRemoteView, PagingInfo, RemoteViewAjaxCallback, RemoteViewFilter, RemoteViewProcessCallback } from "./iremoteview";
@@ -1174,7 +1174,7 @@ export class RemoteView<TItem = any> implements IRemoteView<TItem> {
      *
      * NOTE:  This doesn't work with cell selection model.
      *
-     * @param grid The grid to sync selection with.
+     * @param sleekGrid The grid to sync selection with.
      * @param preserveHidden Whether to keep selected items that go out of the
      *     view due to them getting filtered out.
      * @param preserveHiddenOnSelectionChange Whether to keep selected items
@@ -1184,9 +1184,9 @@ export class RemoteView<TItem = any> implements IRemoteView<TItem> {
      *     changes.  This is useful since, in combination with the above two options, it allows
      *     access to the full list selected row ids, and not just the ones visible to the grid.
      */
-    public syncGridSelection(grid: Grid, preserveHidden?: boolean, preserveHiddenOnSelectionChange?: boolean) {
+    public syncGridSelection(sleekGrid: ISleekGrid, preserveHidden?: boolean, preserveHiddenOnSelectionChange?: boolean) {
         let inHandler: boolean;;
-        let selectedRowIds = this.mapRowsToIds(grid.getSelectedRows());
+        let selectedRowIds = this.mapRowsToIds(sleekGrid.getSelectedRows());
         const onSelectedRowIdsChanged = new EventEmitter();
 
         const self = this;
@@ -1198,7 +1198,7 @@ export class RemoteView<TItem = any> implements IRemoteView<TItem> {
             selectedRowIds = rowIds;
 
             onSelectedRowIdsChanged.notify({
-                "grid": grid,
+                "grid": sleekGrid,
                 "ids": selectedRowIds,
                 "dataView": this
             }, new EventData(), self);
@@ -1211,15 +1211,15 @@ export class RemoteView<TItem = any> implements IRemoteView<TItem> {
                 if (!preserveHidden) {
                     setSelectedRowIds(self.mapRowsToIds(selectedRows));
                 }
-                grid.setSelectedRows(selectedRows);
+                sleekGrid.setSelectedRows(selectedRows);
                 inHandler = false;
             }
         }
 
-        grid.onSelectedRowsChanged.subscribe(function (this: void) {
+        sleekGrid.onSelectedRowsChanged.subscribe(function (this: void) {
             if (inHandler) { return; }
-            const newSelectedRowIds = self.mapRowsToIds(grid.getSelectedRows());
-            if (!preserveHiddenOnSelectionChange || !grid.getOptions().multiSelect) {
+            const newSelectedRowIds = self.mapRowsToIds(sleekGrid.getSelectedRows());
+            if (!preserveHiddenOnSelectionChange || !sleekGrid.getOptions().multiSelect) {
                 setSelectedRowIds(newSelectedRowIds);
             } else {
                 // keep the ones that are hidden
@@ -1240,7 +1240,7 @@ export class RemoteView<TItem = any> implements IRemoteView<TItem> {
      * @param grid The grid to sync styles with
      * @param key The style key to sync
      */
-    public syncGridCellCssStyles(grid: Grid, key: string) {
+    public syncGridCellCssStyles(grid: ISleekGrid, key: string) {
         let hashById: any;
         let inHandler: boolean;
 

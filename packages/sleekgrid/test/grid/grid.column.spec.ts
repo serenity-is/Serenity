@@ -1,5 +1,5 @@
 import { Column } from "../../src/core";
-import { BasicLayout, Grid } from "../../src/grid";
+import { BasicLayout, SleekGrid } from "../../src/grid";
 
 const getTestColumns = (): Column[] => ([{
     id: 'test_id',
@@ -14,7 +14,7 @@ const getTestColumns = (): Column[] => ([{
 describe('updateColumnHeader', () => {
     it('should be able to update column header', () => {
         const columns = getTestColumns();
-        const grid = new Grid(document.createElement('div'), [], columns, {});
+        const grid = new SleekGrid(document.createElement('div'), [], columns, {});
 
         grid.updateColumnHeader(columns[0].id, 'abc', 'def');
 
@@ -27,7 +27,7 @@ describe('updateColumnHeader', () => {
         const columns = getTestColumns();
         columns[0].toolTip = 'test';
 
-        const grid = new Grid(document.createElement('div'), [], columns, {});
+        const grid = new SleekGrid(document.createElement('div'), [], columns, {});
 
         let onBeforeHeaderCellDestroyCalled = false;
         grid.onBeforeHeaderCellDestroy.subscribe((eventData, args) => {
@@ -46,7 +46,7 @@ describe('updateColumnHeader', () => {
 
     it('should trigger onHeaderCellRendered event after update', () => {
         const columns = getTestColumns();
-        const grid = new Grid(document.createElement('div'), [], columns, {});
+        const grid = new SleekGrid(document.createElement('div'), [], columns, {});
 
         let onHeaderCellRenderedCalled = false;
         grid.onHeaderCellRendered.subscribe((eventData, args) => {
@@ -65,7 +65,7 @@ describe('updateColumnHeader', () => {
 
     it('should update innerHTML when passed a function', () => {
         const columns = getTestColumns();
-        const grid = new Grid(document.createElement('div'), [], columns, {});
+        const grid = new SleekGrid(document.createElement('div'), [], columns, {});
 
         grid.updateColumnHeader(columns[0].id, () => {
             const i = document.createElement('i');
@@ -81,7 +81,7 @@ describe('updateColumnHeader', () => {
 
     it('should update textContent when passed a string', () => {
         const columns = getTestColumns();
-        const grid = new Grid(document.createElement('div'), [], columns, {});
+        const grid = new SleekGrid(document.createElement('div'), [], columns, {});
 
         grid.updateColumnHeader(columns[0].id, `<i><span id="test">abc</span></i>`, 'def');
 
@@ -91,7 +91,7 @@ describe('updateColumnHeader', () => {
 
     it('should not update column header if grid is not initialized', () => {
         const columns = getTestColumns();
-        const grid = new Grid(document.createElement('div'), [], columns, {
+        const grid = new SleekGrid(document.createElement('div'), [], columns, {
             explicitInitialization: true
         });
 
@@ -106,7 +106,7 @@ describe('updateColumnHeader', () => {
 describe('getColumnIndex', () => {
     it('should return the column index', () => {
         const columns = getTestColumns();
-        const grid = new Grid(document.createElement('div'), [], columns, {});
+        const grid = new SleekGrid(document.createElement('div'), [], columns, {});
 
         expect(grid.getColumnIndex(columns[0].id)).toBe(0);
         expect(grid.getColumnIndex(columns[1].id)).toBe(1);
@@ -114,7 +114,7 @@ describe('getColumnIndex', () => {
 
     it('should return the column index after the index change', () => {
         const columns = getTestColumns();
-        const grid = new Grid(document.createElement('div'), [], columns, {});
+        const grid = new SleekGrid(document.createElement('div'), [], columns, {});
 
         grid.setColumns([columns[1], columns[0]]);
 
@@ -125,7 +125,7 @@ describe('getColumnIndex', () => {
     it('should not be aware of the indexes of the not visible columns', () => {
         const columns = getTestColumns();
         columns[0].visible = false;
-        const grid = new Grid(document.createElement('div'), [], columns, {});
+        const grid = new SleekGrid(document.createElement('div'), [], columns, {});
 
         expect(grid.getColumnIndex(columns[0].id)).toBeFalsy();
         expect(grid.getColumnIndex(columns[1].id)).toBe(0);
@@ -137,7 +137,7 @@ describe('getInitialColumnIndex', () => {
         const layoutEngine = new BasicLayout();
 
         const columns = getTestColumns();
-        const grid = new Grid(document.createElement('div'), [], columns, { layoutEngine });
+        const grid = new SleekGrid(document.createElement('div'), [], columns, { layoutEngine });
 
         expect(grid.getInitialColumnIndex(columns[0].id)).toBe(0);
         expect(grid.getInitialColumnIndex(columns[1].id)).toBe(1);
@@ -151,7 +151,7 @@ describe('getInitialColumnIndex', () => {
 
         const columns = getTestColumns();
         columns[0].visible = false;
-        const grid = new Grid(document.createElement('div'), [], columns, { layoutEngine });
+        const grid = new SleekGrid(document.createElement('div'), [], columns, { layoutEngine });
 
         expect(grid.getInitialColumnIndex(columns[0].id)).toBe(0);
         expect(grid.getInitialColumnIndex(columns[1].id)).toBe(1);
@@ -164,24 +164,24 @@ describe('getInitialColumnIndex', () => {
 describe('getInitialColumns', () => {
     it('should return initial columns', () => {
         const columns = getTestColumns();
-        const grid = new Grid(document.createElement('div'), [], columns, {});
+        const grid = new SleekGrid(document.createElement('div'), [], columns, {});
 
-        expect(grid.getInitialColumns()).toBe(columns);
+        expect((grid as any).getInitialColumns()).toBe(columns);
     });
 
     it('should return initial columns even though column was not visible', () => {
         const columns = getTestColumns();
         columns[0].visible = false;
-        const grid = new Grid(document.createElement('div'), [], columns, {});
+        const grid = new SleekGrid(document.createElement('div'), [], columns, {});
 
-        expect(grid.getInitialColumns()).toBe(columns);
+        expect((grid as any).getInitialColumns()).toBe(columns);
     })
 });
 
 describe('getColumns', () => {
     it('should return the columns', () => {
         const columns = getTestColumns();
-        const grid = new Grid(document.createElement('div'), [], columns, {});
+        const grid = new SleekGrid(document.createElement('div'), [], columns, {});
 
         expect(grid.getColumns()).toStrictEqual(columns);
     });
@@ -189,7 +189,7 @@ describe('getColumns', () => {
     it('should not return not visible columns', () => {
         const columns = getTestColumns();
         columns[0].visible = false;
-        const grid = new Grid(document.createElement('div'), [], columns, {});
+        const grid = new SleekGrid(document.createElement('div'), [], columns, {});
 
         expect(grid.getColumns()).toEqual([columns[1]]);
     });
@@ -198,18 +198,18 @@ describe('getColumns', () => {
 describe('setColumns', () => {
     it('should set initial columns', () => {
         const columns = getTestColumns();
-        const grid = new Grid(document.createElement('div'), [], columns, {});
+        const grid = new SleekGrid(document.createElement('div'), [], columns, {});
 
         const newColumns = getTestColumns();
         newColumns[0].name = 'foo';
         grid.setColumns(newColumns);
 
-        expect(grid.getInitialColumns()).toBe(newColumns);
+        expect(grid.getColumns(true)).toBe(newColumns);
     });
 
     it('should set columns', () => {
         const columns = getTestColumns();
-        const grid = new Grid(document.createElement('div'), [], columns, {});
+        const grid = new SleekGrid(document.createElement('div'), [], columns, {});
 
         const newColumns = getTestColumns();
         newColumns[0].name = 'foo';

@@ -1,4 +1,4 @@
-import { Column, EventEmitter, FormatterContext, FormatterResult, Grid, GridOptions, Group, GroupItemMetadataProvider, GroupTotals, IDataView, IEventData, IGroupTotals, ItemMetadata } from '@serenity-is/sleekgrid';
+import { Column, EventEmitter, FormatterContext, FormatterResult, GridOptions, Group, GroupItemMetadataProvider, GroupTotals, IDataView, IEventData, IGroupTotals, ISleekGrid, ItemMetadata } from '@serenity-is/sleekgrid';
 
 export interface UserDefinition {
 	/**
@@ -3969,11 +3969,11 @@ export interface IRemoteView<TItem = any> extends IDataView<TItem> {
 	/**
 	 * Syncs cell CSS styles between the grid and the data view.
 	 */
-	syncGridCellCssStyles?(grid: Grid, key: string): void;
+	syncGridCellCssStyles?(grid: ISleekGrid, key: string): void;
 	/***
 	 * Wires the grid and the DataView together to keep row selection tied to item ids.
 	 */
-	syncGridSelection?(grid: Grid, preserveHidden?: boolean, preserveHiddenOnSelectionChange?: boolean): EventEmitter<any, IEventData>;
+	syncGridSelection?(grid: ISleekGrid, preserveHidden?: boolean, preserveHiddenOnSelectionChange?: boolean): EventEmitter<any, IEventData>;
 	/**
 	 * Updates an existing item in the view.
 	 * @param id The ID of the item to update
@@ -4388,7 +4388,7 @@ export declare class RemoteView<TItem = any> implements IRemoteView<TItem> {
 	 *
 	 * NOTE:  This doesn't work with cell selection model.
 	 *
-	 * @param grid The grid to sync selection with.
+	 * @param sleekGrid The grid to sync selection with.
 	 * @param preserveHidden Whether to keep selected items that go out of the
 	 *     view due to them getting filtered out.
 	 * @param preserveHiddenOnSelectionChange Whether to keep selected items
@@ -4398,13 +4398,13 @@ export declare class RemoteView<TItem = any> implements IRemoteView<TItem> {
 	 *     changes.  This is useful since, in combination with the above two options, it allows
 	 *     access to the full list selected row ids, and not just the ones visible to the grid.
 	 */
-	syncGridSelection(grid: Grid, preserveHidden?: boolean, preserveHiddenOnSelectionChange?: boolean): EventEmitter<any, import("@serenity-is/sleekgrid").IEventData>;
+	syncGridSelection(sleekGrid: ISleekGrid, preserveHidden?: boolean, preserveHiddenOnSelectionChange?: boolean): EventEmitter<any, import("@serenity-is/sleekgrid").IEventData>;
 	/**
 	 * Syncs cell CSS styles between the grid and the data view.
 	 * @param grid The grid to sync styles with
 	 * @param key The style key to sync
 	 */
-	syncGridCellCssStyles(grid: Grid, key: string): void;
+	syncGridCellCssStyles(grid: ISleekGrid, key: string): void;
 	/**
 	 * Adds data received from the server to the view.
 	 * @param data The response data from the server
@@ -4828,19 +4828,22 @@ export declare function delegateRemove(delegate1: any, delegate2: any): any;
 export declare function delegateContains(targets: any[], object: any, method: any): boolean;
 export interface IDataGrid {
 	getElement(): HTMLElement;
-	getGrid(): Grid;
+	getGrid(): ISleekGrid;
 	getView(): IRemoteView<any>;
 	getFilterStore(): FilterStore;
 }
-export declare class ColumnPickerDialog<P = {}> extends BaseDialog<P> {
+export interface ColumnPickerDialogOptions {
+	columns: Column[];
+	defaultColumns: string[];
+}
+export declare class ColumnPickerDialog<P extends ColumnPickerDialogOptions = ColumnPickerDialogOptions> extends BaseDialog<P> {
 	static [Symbol.typeInfo]: ClassTypeInfo<"Serenity.">;
 	private ulVisible;
 	private ulHidden;
 	private colById;
-	allColumns: Column[];
-	visibleColumns: string[];
-	defaultColumns: string[];
-	done: () => void;
+	private visibleColumns;
+	done: (newColumns: string[]) => void;
+	constructor(opt: P);
 	protected renderContents(): any;
 	static createToolButton(grid: IDataGrid): ToolButton;
 	protected getDialogButtons(): DialogButton[];
@@ -5324,6 +5327,7 @@ export declare class QuickFilterBar<P extends QuickFilterBarOptions = QuickFilte
 }
 export declare class DataGrid<TItem, P = {}> extends Widget<P> implements IDataGrid, IReadOnly {
 	static [Symbol.typeInfo]: ClassTypeInfo<"Serenity.">;
+	private _grid;
 	private _isDisabled;
 	private _layoutTimer;
 	protected titleDiv: Fluent;
@@ -5332,12 +5336,10 @@ export declare class DataGrid<TItem, P = {}> extends Widget<P> implements IDataG
 	protected quickFiltersDiv: Fluent;
 	protected quickFiltersBar: QuickFilterBar;
 	protected slickContainer: Fluent;
-	protected allColumns: Column[];
 	protected propertyItemsData: PropertyItemsData;
 	protected initialSettings: PersistedGridSettings;
 	protected restoringSettings: number;
 	view: IRemoteView<TItem>;
-	slickGrid: Grid;
 	openDialogsAsPanel: boolean;
 	static defaultRowHeight: number;
 	static defaultPersistenceStorage: SettingStorage;
@@ -5378,8 +5380,20 @@ export declare class DataGrid<TItem, P = {}> extends Widget<P> implements IDataG
 	protected initialPopulate(): void;
 	protected canFilterColumn(column: Column): boolean;
 	protected initializeFilterBar(): void;
-	protected createSlickGrid(): Grid;
-	protected initSlickGrid(): void;
+	/**
+	 * Creates initial column set for this grid. This column set is then passed
+	 * to postProcessColumns to adjust widths etc, and then used as the initial
+	 * columns for the slickgrid.
+	 */
+	protected createColumns(): Column<TItem>[];
+	/**
+	 * Creates the SlickGrid columns. This method calls createColumns (via getColumns for compatibility) and then post processes them.
+	 * @returns The SlickGrid columns.
+	 */
+	protected createSlickColumns(): Column<TItem>[];
+	/** @deprecated Override initSleekGrid to add plugins to the sleekgrid */
+	protected createSlickGrid(): ISleekGrid<TItem> | null;
+	protected initSleekGrid(): void;
 	protected setInitialSortOrder(): void;
 	itemAt(row: number): TItem;
 	itemId(item: TItem): any;
@@ -5442,30 +5456,13 @@ export declare class DataGrid<TItem, P = {}> extends Widget<P> implements IDataG
 	protected getPropertyItems(): PropertyItem[];
 	protected getPropertyItemsData(): PropertyItemsData;
 	protected getPropertyItemsDataAsync(): Promise<PropertyItemsData>;
-	/**
-	 * This gets the inital column set for this grid usually by converting property items
-	 * generated for a Columns.cs file to slick columns that will be passed to the Grid
-	 * constructor. Note that this does not return the current columns of the sleekgrid itself.
-	 * It is only called once during initialization, and should never be called after that.
-	 */
+	/** @deprecated override createColumns */
 	protected getColumns(): Column<TItem>[];
 	/**
-	 * Reads the initial column set for this grid, generated by getColumns, before
-	 * filtering out the invisible columns. Only the visible columns are passed to the
-	 * sleekgrid constructor. The column picker uses this to get the full list of columns
-	 * including the invisible ones. To access the current columns of the sleekgrid itself,
-	 * use slickGrid.getColumns().
-	 * @returns
+	 * Gets SlickGrid columns
+	 * @param all True to get all columns, false to get only visible columns
 	 */
-	getAllColumns(): Column<TItem>[];
-	/**
-	 * Sets the initial column set for this grid. This should not normally be called
-	 * directly, and is only set by the column picker to store the new columns
-	 * order after a column order change.
-	 * To update the columns of the sleekgrid itself, use slickGrid.setColumns().
-	 * @param columns The initial columns to set.
-	 */
-	setAllColumns(columns: Column<TItem>[]): void;
+	getSlickColumns(all?: boolean): Column<TItem>[];
 	protected wrapFormatterWithEditLink(column: Column, item: PropertyItem): void;
 	protected propertyItemsToSlickColumns(propertyItems: PropertyItem[]): Column[];
 	protected getSlickOptions(): GridOptions;
@@ -5518,7 +5515,13 @@ export declare class DataGrid<TItem, P = {}> extends Widget<P> implements IDataG
 	persistSettings(flags?: GridPersistenceFlags): void | Promise<void>;
 	getCurrentSettings(flags?: GridPersistenceFlags): PersistedGridSettings;
 	getElement(): HTMLElement;
-	getGrid(): Grid;
+	getGrid(): ISleekGrid<TItem>;
+	get sleekGrid(): ISleekGrid<TItem>;
+	protected set sleekGrid(value: ISleekGrid<TItem>);
+	/** @deprecated use sleekGrid.getColumns(true) */
+	protected get allColumns(): Column[];
+	/** @deprecated Use sleekGrid or getGrid() */
+	get slickGrid(): ISleekGrid<TItem>;
 	getView(): IRemoteView<TItem>;
 	getFilterStore(): FilterStore;
 	/** @obsolete use defaultPersistenceStorage, this one has a typo */
@@ -5995,7 +5998,7 @@ export declare class CheckTreeEditor<TItem extends CheckTreeItem<TItem>, P = {}>
 	protected itemSelectedChanged(item: TItem): void;
 	protected getSelectAllText(): string;
 	protected isThreeStateHierarchy(): boolean;
-	protected createSlickGrid(): Grid;
+	protected initSleekGrid(): void;
 	protected onViewFilter(item: TItem): boolean;
 	protected getInitialCollapse(): boolean;
 	protected onViewProcessData(response: ListResponse<TItem>): ListResponse<TItem>;
@@ -7126,8 +7129,8 @@ export declare namespace GridUtils {
 	function addIncludeDeletedToggle(toolDiv: HTMLElement | ArrayLike<HTMLElement>, view: IRemoteView<any>, hint?: string, initial?: boolean): void;
 	function addQuickSearchInput(toolDiv: HTMLElement | ArrayLike<HTMLElement>, view: IRemoteView<any>, fields?: QuickSearchField[], onChange?: () => void): QuickSearchInput;
 	function addQuickSearchInputCustom(container: HTMLElement | ArrayLike<HTMLElement>, onSearch: (p1: string, p2: string, done: (p3: boolean) => void) => void, fields?: QuickSearchField[]): QuickSearchInput;
-	function makeOrderable(grid: Grid, handleMove: (rows: number[], insertBefore: number) => void): void;
-	function makeOrderableWithUpdateRequest<TItem = any, TId = any>(grid: IDataGrid, getId: (item: TItem) => TId, getDisplayOrder: (item: TItem) => any, service: string, getUpdateRequest: (id: TId, order: number) => SaveRequest<TItem>): void;
+	function makeOrderable(grid: ISleekGrid, handleMove: (rows: number[], insertBefore: number) => void): void;
+	function makeOrderableWithUpdateRequest<TItem = any, TId = any>(dataGrid: IDataGrid, getId: (item: TItem) => TId, getDisplayOrder: (item: TItem) => any, service: string, getUpdateRequest: (id: TId, order: number) => SaveRequest<TItem>): void;
 }
 export declare namespace LazyLoadHelper {
 	const executeOnceWhenShown: typeof executeOnceWhenVisible;

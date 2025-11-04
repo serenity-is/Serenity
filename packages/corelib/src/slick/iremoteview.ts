@@ -1,4 +1,4 @@
-import { EventEmitter, Grid, Group, GroupItemMetadataProvider, GroupTotals, IDataView, IEventData } from "@serenity-is/sleekgrid";
+import { EventEmitter, ISleekGrid, Group, GroupItemMetadataProvider, GroupTotals, IDataView, IEventData } from "@serenity-is/sleekgrid";
 import { ListResponse, ServiceOptions } from "../base";
 import { GroupInfo, PagingOptions, SummaryOptions } from "./slicktypes";
 
@@ -240,11 +240,11 @@ export interface IRemoteView<TItem = any> extends IDataView<TItem> {
     /**
      * Syncs cell CSS styles between the grid and the data view.
      */
-    syncGridCellCssStyles?(grid: Grid, key: string): void;
+    syncGridCellCssStyles?(grid: ISleekGrid, key: string): void;
     /***
      * Wires the grid and the DataView together to keep row selection tied to item ids.
      */
-    syncGridSelection?(grid: Grid, preserveHidden?: boolean, preserveHiddenOnSelectionChange?: boolean): EventEmitter<any, IEventData>;
+    syncGridSelection?(grid: ISleekGrid, preserveHidden?: boolean, preserveHiddenOnSelectionChange?: boolean): EventEmitter<any, IEventData>;
     /**
      * Updates an existing item in the view.
      * @param id The ID of the item to update

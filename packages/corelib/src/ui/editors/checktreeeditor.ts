@@ -1,8 +1,7 @@
-﻿import { Column, FormatterContext, Grid, GridOptions } from "@serenity-is/sleekgrid";
+﻿import { Column, FormatterContext, ISleekGrid, GridOptions } from "@serenity-is/sleekgrid";
 import { CheckTreeEditorTexts, Culture, Fluent, ListResponse, nsSerenity, type Lookup, type PropertyItem } from "../../base";
 import { ScriptData, getLookup } from "../../compat";
 import { IGetEditValue, IReadOnly, ISetEditValue } from "../../interfaces";
-import { ReflectionOptionsSetter } from "../widgets/reflectionoptionssetter";
 import { DataGrid } from "../datagrid/datagrid";
 import { GridSelectAllButtonHelper } from "../helpers/gridselectallbuttonhelper";
 import { GridUtils } from "../helpers/gridutils";
@@ -120,11 +119,12 @@ export class CheckTreeEditor<TItem extends CheckTreeItem<TItem>, P = {}> extends
         return false;
     }
 
-    protected createSlickGrid(): Grid {
+    protected override initSleekGrid() {
         this.domNode.classList.add("slick-no-cell-border", "slick-no-odd-even", "slick-hide-header");
-        var result = super.createSlickGrid();
-        result.resizeCanvas();
-        return result;
+
+        super.initSleekGrid();
+        
+        this.sleekGrid.resizeCanvas();
     }
 
     protected onViewFilter(item: TItem): boolean {

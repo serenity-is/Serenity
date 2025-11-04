@@ -1,5 +1,5 @@
 import { EntityGrid } from "@serenity-is/corelib";
-import { Grid, GridOptions, RowSelectionModel } from "@serenity-is/sleekgrid";
+import { GridOptions, RowSelectionModel } from "@serenity-is/sleekgrid";
 import { nsExtensions } from "../ServerTypes/Namespaces";
 
 export class SelectableEntityGrid<TItem, TOptions> extends EntityGrid<TItem, TOptions> {
@@ -13,9 +13,9 @@ export class SelectableEntityGrid<TItem, TOptions> extends EntityGrid<TItem, TOp
         return opt;
     }
 
-    protected createSlickGrid(): Grid {
-        var grid = super.createSlickGrid();
-        grid.setSelectionModel(new RowSelectionModel());
-        return grid;
+    protected override initSleekGrid() {
+        super.initSleekGrid();
+        
+        this.sleekGrid.setSelectionModel(new RowSelectionModel());
     }
 }

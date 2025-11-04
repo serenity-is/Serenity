@@ -1,7 +1,6 @@
 import { ViewportInfo } from "../../src/core";
 import { GridOptions } from "../../src/core/gridoptions";
-import { BasicLayout } from "../../src/grid/";
-import { Grid } from "../../src/grid/grid";
+import { BasicLayout, SleekGrid } from "../../src/grid/";
 
 describe('canvas', () => {
 
@@ -38,7 +37,7 @@ describe('canvas', () => {
         };
 
         const container = new (MockJQueryStatic as any)(document.createElement("div"));
-        const grid = new Grid(container as any, [], [], gridOptions);
+        const grid = new SleekGrid(container as any, [], [], gridOptions);
 
         const canvases = grid.getCanvases();
         expect(canvases).toBeInstanceOf(MockJQueryStatic);
@@ -46,7 +45,7 @@ describe('canvas', () => {
     });
 
     it('should return activeCanvasNode as null if its not set', () => {
-        const grid = new Grid(document.createElement('div'), [], [], {});
+        const grid = new SleekGrid(document.createElement('div'), [], [], {});
 
         expect(grid.getActiveCanvasNode()).toBeFalsy();
     });
@@ -57,7 +56,7 @@ describe('canvas', () => {
             return { height: '1000px', width: '1000px', getPropertyValue: (_prop: string) => 1000 } as any;
         };
 
-        const grid = new Grid(document.createElement('div'), [{ c1: 1, c2: 8 }], [{ field: "c1" }, { field: "c2" }], {
+        const grid = new SleekGrid(document.createElement('div'), [{ c1: 1, c2: 8 }], [{ field: "c1" }, { field: "c2" }], {
             rowHeight: 20
         });
 
@@ -79,7 +78,7 @@ describe('canvas', () => {
 
         canvasNode.appendChild(container); // Canvas -> Container -> Grid
 
-        const grid = new Grid(container, [], [], {});
+        const grid = new SleekGrid(container, [], [], {});
 
         grid.getActiveCanvasNode({
             target: container
@@ -89,7 +88,7 @@ describe('canvas', () => {
     });
 
     it('should not set active canvas if event is null', () => {
-        const grid = new Grid(document.createElement('div'), [], [], {});
+        const grid = new SleekGrid(document.createElement('div'), [], [], {});
 
         grid.getActiveCanvasNode(null);
 
@@ -135,11 +134,11 @@ describe('viewport', () => {
             return oldGetComputedStyles(el);
         }
 
-        new Grid(document.createElement('div'), data, columns, gridOptions);
+        new SleekGrid(document.createElement('div'), data, columns, gridOptions);
         const viewportWithVScroll = getViewportInfo();
 
         viewportHeight = dataHeight + 1;
-        new Grid(document.createElement('div'), data, columns, gridOptions);
+        new SleekGrid(document.createElement('div'), data, columns, gridOptions);
         const viewportWithoutVScroll = getViewportInfo(); /* reference of this function has changed */
 
         window.getComputedStyle = oldGetComputedStyles;
@@ -149,7 +148,7 @@ describe('viewport', () => {
     });
 
     it('should return activeViewportNode as null if its not set', () => {
-        const grid = new Grid(document.createElement('div'), [], [], {});
+        const grid = new SleekGrid(document.createElement('div'), [], [], {});
 
         expect(grid.getActiveViewportNode()).toBeFalsy();
     });
@@ -160,7 +159,7 @@ describe('viewport', () => {
             return { height: '1000px', width: '1000px', getPropertyValue: (_prop: string) => 1000 } as any;
         };
 
-        const grid = new Grid(document.createElement('div'), [{ c1: 1, c2: 8 }], [{ field: "c1" }, { field: "c2" }], {
+        const grid = new SleekGrid(document.createElement('div'), [{ c1: 1, c2: 8 }], [{ field: "c1" }, { field: "c2" }], {
             rowHeight: 20
         });
 
@@ -182,7 +181,7 @@ describe('viewport', () => {
 
         viewportNode.appendChild(container); // Viewport -> Container -> Grid
 
-        const grid = new Grid(container, [], [], {});
+        const grid = new SleekGrid(container, [], [], {});
 
         grid.getActiveViewportNode({
             target: container
@@ -192,7 +191,7 @@ describe('viewport', () => {
     });
 
     it('should not set active viewport if event is null', () => {
-        const grid = new Grid(document.createElement('div'), [], [], {});
+        const grid = new SleekGrid(document.createElement('div'), [], [], {});
 
         grid.getActiveCanvasNode(null);
 
@@ -211,7 +210,7 @@ describe('viewport', () => {
             oldLayoutEngineInit.call(layoutEngine, layoutHost);
         };
 
-        new Grid(document.createElement('div'), [], [], { layoutEngine });
+        new SleekGrid(document.createElement('div'), [], [], { layoutEngine });
 
         if (!asserted)
             throw "assertion not made";

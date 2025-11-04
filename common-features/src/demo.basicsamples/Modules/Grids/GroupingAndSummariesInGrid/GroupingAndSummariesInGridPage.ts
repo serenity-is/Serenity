@@ -13,11 +13,11 @@ export class GroupingAndSummariesInGrid<P = {}> extends EntityGrid<ProductRow, P
     protected getRowDefinition() { return ProductRow; }
     protected getService() { return ProductService.baseUrl; }
 
-    protected createSlickGrid() {
-        var grid = super.createSlickGrid();
+    protected override initSleekGrid() {
+        super.initSleekGrid();
 
         // need to register this plugin for grouping or you'll have errors
-        grid.registerPlugin(new GroupItemMetadataProvider());
+        this.sleekGrid.registerPlugin(new GroupItemMetadataProvider());
 
         this.view.setSummaryOptions({
             aggregators: [
@@ -27,8 +27,6 @@ export class GroupingAndSummariesInGrid<P = {}> extends EntityGrid<ProductRow, P
                 new Aggregators.Avg('ReorderLevel')
             ]
         });
-
-        return grid;
     }
 
     protected getColumns() {

@@ -19,7 +19,7 @@ export class TreeGridMixin<TItem> {
 
         Fluent.on(dg.domNode.querySelector('.grid-container'), "click", (e) => {
             if ((e.target as HTMLElement).classList.contains('s-TreeToggle')) {
-                var src = dg.slickGrid.getCellFromEvent(e);
+                var src = dg.sleekGrid.getCellFromEvent(e);
                 if (src.cell >= 0 &&
                     src.row >= 0) {
                     SlickTreeHelper.toggleClick<TItem>(e as any, src.row, src.row, dg.view, getId);
@@ -46,7 +46,7 @@ export class TreeGridMixin<TItem> {
         };
 
         if (options.toggleField) {
-            var col = (dg['allColumns'] || dg.slickGrid.getColumns())?.find(x => x.field == options.toggleField || x.id == options.toggleField) as Column<TItem>;
+            var col = (dg.sleekGrid.getColumns(true))?.find(x => x.field == options.toggleField || x.id == options.toggleField) as Column<TItem>;
             if (col) {
                 col.format = SlickFormatting.treeToggle(() => dg.view, getId,
                     col.format || ((ctx: FormatterContext<TItem>) => ctx.escape()));

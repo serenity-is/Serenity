@@ -1,7 +1,7 @@
-import type { IGrid } from "./igrid";
+import type { ISleekGrid } from "./igrid";
 
 export interface GridPlugin {
-    init(grid: IGrid): void;
+    init(grid: ISleekGrid): void;
     pluginName?: string;
     destroy?: () => void;
 }

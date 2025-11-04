@@ -1,7 +1,6 @@
 ﻿import { Column, columnDefaults } from "../../src/core/column";
 import { gridDefaults, GridOptions } from "../../src/core/gridoptions";
-import { BasicLayout, LayoutHost } from "../../src/grid/";
-import { Grid } from "../../src/grid/grid";
+import { BasicLayout, LayoutHost, SleekGrid } from "../../src/grid/";
 
 function threeCols(): Column[] {
     return [{
@@ -25,7 +24,7 @@ describe('Grid columns', () => {
             return;
 
         const gridColumns = threeCols();
-        new Grid(document.createElement("div"), [], gridColumns, {});
+        new SleekGrid(document.createElement("div"), [], gridColumns, {});
 
         expect(gridColumns).not.toStrictEqual(threeCols());
 
@@ -38,7 +37,7 @@ describe('Grid columns', () => {
             return;
 
         const gridColumns = threeCols();
-        new Grid(document.createElement("div"), [], gridColumns, {});
+        new SleekGrid(document.createElement("div"), [], gridColumns, {});
 
         expect(gridColumns).not.toStrictEqual(threeCols());
 
@@ -48,7 +47,7 @@ describe('Grid columns', () => {
 
     it('should set default width of the columns using gridOptions.defaultColumnWidth', () => {
         const gridColumns = threeCols();
-        new Grid(document.createElement("div"), [], gridColumns, { defaultColumnWidth: 123 });
+        new SleekGrid(document.createElement("div"), [], gridColumns, { defaultColumnWidth: 123 });
 
         for (const col of gridColumns)
             expect(col.width).toBe(123);
@@ -56,7 +55,7 @@ describe('Grid columns', () => {
 
     it('should set default width of the columns using columnDefaults.width', () => {
         const gridColumns = threeCols();
-        new Grid(document.createElement("div"), [], gridColumns, { defaultColumnWidth: undefined });
+        new SleekGrid(document.createElement("div"), [], gridColumns, { defaultColumnWidth: undefined });
 
         for (const col of gridColumns)
             expect(col.width).toBe(columnDefaults.width);
@@ -71,7 +70,7 @@ describe('Grid columns', () => {
         if (colDefaultFirstProperty)
             (gridColumns[0] as any)[colDefaultFirstProperty] = "123";
 
-        new Grid(document.createElement("div"), [], gridColumns, { defaultColumnWidth: 456 });
+        new SleekGrid(document.createElement("div"), [], gridColumns, { defaultColumnWidth: 456 });
 
         expect(gridColumns[0].width).toBe(123);
         if (colDefaultFirstProperty)
@@ -118,26 +117,26 @@ describe('options', () => {
         };
 
         const container = MockJQueryStatic(document.createElement("div"));
-        const grid = new Grid(container as any, [], [], gridOptions);
+        const grid = new SleekGrid(container as any, [], [], gridOptions);
 
         expect(grid.getContainerNode()).toBe(container[0]);
         expect(gridOptions.jQuery).toStrictEqual(MockJQueryStatic);
     });
 
     it('should throw an error if container is null', () => {
-        expect(() => new Grid(null, [], [], {})).toThrow();
+        expect(() => new SleekGrid(null, [], [], {})).toThrow();
     });
 
     it('should add slick-container class to the container', () => {
         const container = document.createElement("div");
-        new Grid(container, [], [], {});
+        new SleekGrid(container, [], [], {});
 
         expect(container.classList.contains("slick-container")).toBe(true);
     });
 
     it('should set default options', () => {
         const gridOptions: GridOptions = {}
-        const grid = new Grid(document.createElement("div"), [], [], gridOptions);
+        const grid = new SleekGrid(document.createElement("div"), [], [], gridOptions);
 
         expect(grid.getOptions()).toMatchObject(gridDefaults);
     });
@@ -147,14 +146,14 @@ describe('options', () => {
             rowHeight: (gridDefaults.rowHeight ?? 0) + 1
         };
 
-        const grid = new Grid(document.createElement("div"), [], [], gridOptions);
+        const grid = new SleekGrid(document.createElement("div"), [], [], gridOptions);
 
         expect(grid.getOptions().rowHeight).toBe(gridOptions.rowHeight);
     });
 
     it('should set rtl to true if body has rtl class', () => {
         document.body.classList.add("rtl");
-        const grid = new Grid(document.createElement("div"), [], [], {});
+        const grid = new SleekGrid(document.createElement("div"), [], [], {});
 
         expect(grid.getOptions().rtl).toBe(true);
         document.body.classList.remove("rtl");
@@ -169,7 +168,7 @@ describe('options', () => {
             } as any;
         };
 
-        const grid = new Grid(document.createElement("div"), [], [], {});
+        const grid = new SleekGrid(document.createElement("div"), [], [], {});
         window.getComputedStyle = oldGetComputedStyle;
 
         expect(grid.getOptions().rtl).toBe(true);
@@ -181,7 +180,7 @@ describe('options', () => {
             leaveSpaceForNewRows: true
         };
 
-        const grid = new Grid(document.createElement("div"), [], [], gridOptions);
+        const grid = new SleekGrid(document.createElement("div"), [], [], gridOptions);
 
         expect(grid.getOptions().leaveSpaceForNewRows).toBe(false);
     });
@@ -191,13 +190,13 @@ describe('options', () => {
             explicitInitialization: true
         };
 
-        const oldInit = Grid.prototype.init;
-        Grid.prototype.init = () => {
+        const oldInit = SleekGrid.prototype.init;
+        SleekGrid.prototype.init = () => {
             throw new Error("Grid was initialized");
         };
 
-        new Grid(document.createElement("div"), [{ "c1": 1 }], [{ field: "c1" }], gridOptions);
-        Grid.prototype.init = oldInit;
+        new SleekGrid(document.createElement("div"), [{ "c1": 1 }], [{ field: "c1" }], gridOptions);
+        SleekGrid.prototype.init = oldInit;
     });
 });
 
@@ -206,28 +205,28 @@ describe('layout', () => {
         const container = document.createElement("div");
         container.innerHTML = "foo 123";
 
-        new Grid(container, [], [], {});
+        new SleekGrid(container, [], [], {});
 
         expect(container.innerHTML).not.toContain("foo 123");
     });
 
     it('should set overflow to hidden', () => {
         const container = document.createElement("div");
-        new Grid(container, [], [], {});
+        new SleekGrid(container, [], [], {});
 
         expect(container.style.overflow).toBe("hidden");
     });
 
     it('should set outline to 0', () => {
         const container = document.createElement("div");
-        new Grid(container, [], [], {});
+        new SleekGrid(container, [], [], {});
 
         expect(container.style.outline).toBe(globalThis.jsdom ? "0" : "0px");
     });
 
     it('should add uid as a class to the container', () => {
         const container = document.createElement("div");
-        const grid = new Grid(container, [], [], {});
+        const grid = new SleekGrid(container, [], [], {});
 
         const uid = (grid as any).uid as string;
 
@@ -247,7 +246,7 @@ describe('layout', () => {
         }
 
         const container = document.createElement("div");
-        new Grid(container, [], [], {});
+        new SleekGrid(container, [], [], {});
 
         window.getComputedStyle = oldGetComputedStyle;
 
@@ -256,21 +255,21 @@ describe('layout', () => {
 
     it('should append two elements with slick-focus-sink classes to the container', () => {
         const container = document.createElement("div");
-        new Grid(container, [], [], {});
+        new SleekGrid(container, [], [], {});
 
         expect(container.querySelectorAll(".slick-focus-sink")).toHaveLength(2);
     });
 
     it('should append slick-grouping-panel to the container if groupingPanel is true', () => {
         const container = document.createElement("div");
-        new Grid(container, [], [], { groupingPanel: true });
+        new SleekGrid(container, [], [], { groupingPanel: true });
 
         expect(container.querySelector(".slick-grouping-panel")).not.toBeNull();
     });
 
     it('should append slick-preheader-panel if groupingPanel and preHeaderPanel are true', () => {
         const container = document.createElement("div");
-        new Grid(container, [], [], { groupingPanel: true, createPreHeaderPanel: true });
+        new SleekGrid(container, [], [], { groupingPanel: true, createPreHeaderPanel: true });
 
         expect(container.querySelector(".slick-grouping-panel")).not.toBeNull();
         expect(container.querySelector(".slick-preheader-panel")).not.toBeNull();
@@ -278,7 +277,7 @@ describe('layout', () => {
 
     it('should not append slick-preheader-panel if groupingPanel is false', () => {
         const container = document.createElement("div");
-        new Grid(container, [], [], { groupingPanel: false, createPreHeaderPanel: true });
+        new SleekGrid(container, [], [], { groupingPanel: false, createPreHeaderPanel: true });
 
         expect(container.querySelector(".slick-grouping-panel")).toBeNull();
         expect(container.querySelector(".slick-preheader-panel")).toBeNull();
@@ -286,7 +285,7 @@ describe('layout', () => {
 
     it('should hide slick-grouping-panel if showGroupingPanel is false', () => {
         const container = document.createElement("div");
-        new Grid(container, [], [], { groupingPanel: true, showGroupingPanel: false });
+        new SleekGrid(container, [], [], { groupingPanel: true, showGroupingPanel: false });
 
         expect(container.querySelector<HTMLElement>(".slick-grouping-panel")?.hidden).toBe(true);
     });
@@ -304,7 +303,7 @@ describe('layout', () => {
         };
 
         const container = document.createElement("div");
-        const grid = new Grid(container, [{ c1: 1 }], [{ field: "c1" }], { layoutEngine: layoutEngine });
+        const grid = new SleekGrid(container, [{ c1: 1 }], [{ field: "c1" }], { layoutEngine: layoutEngine });
 
         expect(layoutHostGrid.getColumns()).toEqual(grid.getColumns());
         expect(layoutHostGrid.getContainerNode()).toEqual(grid.getContainerNode());
@@ -317,7 +316,7 @@ describe('layout', () => {
         const layoutEngine = new BasicLayout();
 
         const container = document.createElement("div");
-        new Grid(container, [], [], {
+        new SleekGrid(container, [], [], {
             layoutEngine: layoutEngine,
             viewportClass: "test-viewport-class"
         });
@@ -335,7 +334,7 @@ describe('data event bindings', () => {
             }
         };
 
-        new Grid(document.createElement("div"), data, [], {});
+        new SleekGrid(document.createElement("div"), data, [], {});
 
         expect(onRowCountChangedSubscribeCalls).toBe(1);
     });
@@ -348,7 +347,7 @@ describe('data event bindings', () => {
             }
         };
 
-        new Grid(document.createElement("div"), data, [], {});
+        new SleekGrid(document.createElement("div"), data, [], {});
 
         expect(onRowsChangedSubscribeCalls).toBe(1);
     });
@@ -361,7 +360,7 @@ describe('data event bindings', () => {
             }
         };
 
-        new Grid(document.createElement("div"), data, [], {});
+        new SleekGrid(document.createElement("div"), data, [], {});
 
         expect(onDataChangedSubscribeCalls).toBe(1);
     });
@@ -375,7 +374,7 @@ describe('data event bindings', () => {
             }
         };
 
-        const grid = new Grid(document.createElement("div"), data, [], {});
+        const grid = new SleekGrid(document.createElement("div"), data, [], {});
         grid.destroy();
 
         expect(onRowCountChangedUnsubscribeCalls).toBe(1);
@@ -390,7 +389,7 @@ describe('data event bindings', () => {
             }
         };
 
-        const grid = new Grid(document.createElement("div"), data, [], {});
+        const grid = new SleekGrid(document.createElement("div"), data, [], {});
         grid.destroy();
 
         expect(onRowsChangedUnsubscribeCalls).toBe(1);
@@ -405,7 +404,7 @@ describe('data event bindings', () => {
             }
         };
 
-        const grid = new Grid(document.createElement("div"), data, [], {});
+        const grid = new SleekGrid(document.createElement("div"), data, [], {});
         grid.destroy();
 
         expect(onDataChangedUnsubscribeCalls).toBe(1);

@@ -1,10 +1,10 @@
-﻿import { Column, initializeColumns, titleize } from "../../src/core/column";
+﻿import { Column, initColumnProps, titleize } from "../../src/core/column";
 
 describe("initializeColumns", () => {
     it('should set defaults of the columns', () => {
         const column: Column = {};
 
-        initializeColumns([column], {
+        initColumnProps([column], {
             width: 200,
             cssClass: 'test'
         });
@@ -20,7 +20,7 @@ describe("initializeColumns", () => {
             { id: 'test', name: 'test' },
         ];
 
-        initializeColumns(columns, {});
+        initColumnProps(columns, {});
 
         expect(columns[0].id).toBe('test');
         expect(columns[1].id).toBe('test_1');
@@ -30,7 +30,7 @@ describe("initializeColumns", () => {
     it('should generate id from field if id is null', () => {
         const column: Column = { id: null, field: 'test' };
 
-        initializeColumns([column], {});
+        initColumnProps([column], {});
 
         expect(column.id).toBe('test');
     });
@@ -38,7 +38,7 @@ describe("initializeColumns", () => {
     it('should generate id as col if id and field are null', () => {
         const column: Column = { id: null, field: null };
 
-        initializeColumns([column], {});
+        initColumnProps([column], {});
 
         expect(column.id).toBe('col');
     });
@@ -50,7 +50,7 @@ describe("initializeColumns", () => {
             { id: null, field: 'test', name: 'test' },
         ];
 
-        initializeColumns(columns, {});
+        initColumnProps(columns, {});
 
         expect(columns[0].id).toBe('test');
         expect(columns[1].id).toBe('test_1');
@@ -64,7 +64,7 @@ describe("initializeColumns", () => {
             { id: null, field: null, name: 'test' },
         ];
 
-        initializeColumns(columns, {});
+        initColumnProps(columns, {});
 
         expect(columns[0].id).toBe('col');
         expect(columns[1].id).toBe('col_1');
@@ -74,14 +74,14 @@ describe("initializeColumns", () => {
     it('should be able to constrain the minWidth of the column', () => {
         const column: Column = { minWidth: 100, width: 50 };
 
-        initializeColumns([column], {});
+        initColumnProps([column], {});
         expect(column.width).toBe(100);
     });
 
     it('should be able to constrain the maxWidth of the column', () => {
         const column: Column = { maxWidth: 100, width: 200 };
 
-        initializeColumns([column], {});
+        initColumnProps([column], {});
         expect(column.width).toBe(100);
     });
 
@@ -92,7 +92,7 @@ describe("initializeColumns", () => {
             { id: 'c3', name: 'c3', maxWidth: 200 },
         ];
 
-        initializeColumns(columns, {
+        initColumnProps(columns, {
             width: 200,
             minWidth: 100,
             maxWidth: 300
@@ -119,7 +119,7 @@ describe("initializeColumns", () => {
             { id: null, name: undefined, field: null }
         ];
 
-        initializeColumns(columns, {});
+        initColumnProps(columns, {});
 
         expect(columns[0].name).toBe('test abc');
         expect(columns[1].name).toBe('Test Abc');

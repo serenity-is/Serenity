@@ -1,5 +1,5 @@
 import { addDisposingListener } from "@serenity-is/domwise";
-import { Grid, RowMoveManager } from "@serenity-is/sleekgrid";
+import { RowMoveManager, type ISleekGrid } from "@serenity-is/sleekgrid";
 import { EntityGridTexts, SaveRequest, isArrayLike, serviceRequest } from "../../base";
 import { IRemoteView } from "../../slick";
 import { IDataGrid } from "../datagrid/idatagrid";
@@ -112,7 +112,7 @@ export namespace GridUtils {
         });
     }
 
-    export function makeOrderable(grid: Grid,
+    export function makeOrderable(grid: ISleekGrid,
         handleMove: (rows: number[], insertBefore: number) => void): void {
 
         var moveRowsPlugin = new RowMoveManager({ cancelEditOnDrag: true });
@@ -139,11 +139,11 @@ export namespace GridUtils {
         grid.registerPlugin(moveRowsPlugin);
     }
 
-    export function makeOrderableWithUpdateRequest<TItem = any, TId = any>(grid: IDataGrid,
+    export function makeOrderableWithUpdateRequest<TItem = any, TId = any>(dataGrid: IDataGrid,
         getId: (item: TItem) => TId, getDisplayOrder: (item: TItem) => any, service: string,
         getUpdateRequest: (id: TId, order: number) => SaveRequest<TItem>): void {
 
-        makeOrderable(grid.getGrid(), function (rows, insertBefore) {
+        makeOrderable(dataGrid.getGrid(), function (rows, insertBefore) {
             if (rows.length === 0) {
                 return;
             }
@@ -153,8 +153,8 @@ export namespace GridUtils {
             if (index < 0) {
                 order = 1;
             }
-            else if (insertBefore >= grid.getGrid().getDataLength()) {
-                order = (getDisplayOrder(grid.getGrid().getDataItem(grid.getGrid().getDataLength() - 1)) ?? 0);
+            else if (insertBefore >= dataGrid.getGrid().getDataLength()) {
+                order = (getDisplayOrder(dataGrid.getGrid().getDataItem(dataGrid.getGrid().getDataLength() - 1)) ?? 0);
                 if (order === 0) {
                     order = insertBefore + 1;
                 }
@@ -163,7 +163,7 @@ export namespace GridUtils {
                 }
             }
             else {
-                order = (getDisplayOrder(grid.getGrid().getDataItem(insertBefore)) ?? 0);
+                order = (getDisplayOrder(dataGrid.getGrid().getDataItem(insertBefore)) ?? 0);
                 if (order === 0) {
                     order = insertBefore + 1;
                 }
@@ -172,14 +172,14 @@ export namespace GridUtils {
             var i = 0;
             var next: any = null;
             next = function () {
-                serviceRequest(service, getUpdateRequest(getId(grid.getGrid().getDataItem(rows[i])), order++),
+                serviceRequest(service, getUpdateRequest(getId(dataGrid.getGrid().getDataItem(rows[i])), order++),
                     () => {
                         i++;
                         if (i < rows.length) {
                             next();
                         }
                         else {
-                            grid.getView().populate();
+                            dataGrid.getView().populate();
                         }
                     });
             };

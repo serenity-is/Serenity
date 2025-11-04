@@ -1,5 +1,5 @@
 import { bindThis } from "@serenity-is/domwise";
-import { EventEmitter, EventSubscriber, type IGrid, type GridPlugin } from "../core";
+import { EventEmitter, EventSubscriber, type ISleekGrid, type GridPlugin } from "../core";
 
 export interface RowMoveManagerOptions {
     cancelEditOnDrag?: boolean;
@@ -19,7 +19,7 @@ interface ArgsMoveRows {
 }
 
 export class RowMoveManager implements GridPlugin {
-    declare private grid: IGrid;
+    declare private grid: ISleekGrid;
     declare private options: RowMoveManagerOptions;
     declare private dragging: boolean;
     private handler = new EventSubscriber();
@@ -34,7 +34,7 @@ export class RowMoveManager implements GridPlugin {
         cancelEditOnDrag: false
     }
 
-    init(grid: IGrid) {
+    init(grid: ISleekGrid) {
         this.grid = grid;
         const boundThis = bindThis(this);
         this.handler.subscribe(grid.onDragInit, boundThis.handleDragInit)

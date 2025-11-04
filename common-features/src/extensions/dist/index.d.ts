@@ -1,5 +1,5 @@
 import { BaseDialog, DataGrid, DeleteResponse, DialogType, Dictionary, EditorProps, EmailAddressEditor, EntityDialog, EntityGrid, Formatter, IGetEditValue, ISetEditValue, IconClassName, ListRequest, ListResponse, PasswordEditor, PrefixedContext, PropertyDialog, PropertyItem, RenderableContent, SaveInitiator, SaveResponse, ServiceError, ServiceOptions, ServiceRequest, ServiceResponse, SettingStorage, ToolButton, Widget, WidgetProps } from '@serenity-is/corelib';
-import { FormatterContext, FormatterResult, Grid, GridOptions } from '@serenity-is/sleekgrid';
+import { FormatterContext, FormatterResult, GridOptions } from '@serenity-is/sleekgrid';
 
 export interface ChangePasswordForm {
 	OldPassword: PasswordEditor;
@@ -722,7 +722,7 @@ export declare class PromptDialog<P extends PromptDialogOptions = PromptDialogOp
 export declare class SelectableEntityGrid<TItem, TOptions> extends EntityGrid<TItem, TOptions> {
 	static [Symbol.typeInfo]: import("@serenity-is/corelib").ClassTypeInfo<"Serenity.Extensions.">;
 	protected getSlickOptions(): GridOptions;
-	protected createSlickGrid(): Grid;
+	protected initSleekGrid(): void;
 }
 /**
 * This is an editor widget but it only displays a text, not edits it.

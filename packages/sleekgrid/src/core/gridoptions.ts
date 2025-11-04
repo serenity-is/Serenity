@@ -3,6 +3,7 @@ import { type Column } from "./column";
 import { GlobalEditorLock, type EditCommand, type EditorFactory, type EditorLock } from "./editing";
 import { defaultColumnFormat, type ColumnFormat, type CompatFormatter, type FormatterContext, type FormatterFactory, type FormatterResult } from "./formatting";
 import { type IGroupTotals } from "./group";
+import type { ISleekGrid } from "./igrid";
 
 /**
  * Configuration options for the SleekGrid component.
@@ -242,7 +243,7 @@ export interface GridOptions<TItem = any> {
      * Function to format group totals for display in the grouping panel.
      * @deprecated Use `groupTotalsFormat` with `FormatterContext<IGroupTotals>` signature instead.
      */
-    groupTotalsFormatter?: (totals?: IGroupTotals<TItem>, column?: Column<TItem>, grid?: any) => string;
+    groupTotalsFormatter?: (totals?: IGroupTotals<TItem>, column?: Column<TItem>, grid?: ISleekGrid) => string;
 
     /**
      * Defaults to null, e.g. calculated based on CSS. Height of the header row in pixels.

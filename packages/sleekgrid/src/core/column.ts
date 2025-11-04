@@ -1,6 +1,7 @@
 import { EditorClass, ValidationResult } from "./editing";
 import type { AsyncPostCleanup, AsyncPostRender, ColumnFormat, CompatFormatter, FormatterContext, FormatterResult } from "./formatting";
 import { IGroupTotals } from "./group";
+import type { ISleekGrid } from "./igrid";
 
 export interface Column<TItem = any> {
     asyncPostRender?: AsyncPostRender<TItem>;
@@ -77,7 +78,7 @@ export interface ItemMetadata<TItem = any> {
     selectable?: boolean;
 }
 
-export function initializeColumns(columns: Column[], defaults: Partial<Column<any>>) {
+export function initColumnProps(columns: Column[], defaults: Partial<Column<any>>) {
     var usedIds: { [key: string]: boolean } = {};
 
     for (var i = 0; i < columns.length; i++) {

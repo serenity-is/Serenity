@@ -1,5 +1,5 @@
 import { bindThis } from "@serenity-is/domwise";
-import { AutoTooltips, Column, ColumnSort, FormatterContext, Grid, GridOptions, type CellMouseEvent } from "@serenity-is/sleekgrid";
+import { AutoTooltips, Column, ColumnSort, FormatterContext, GridOptions, SleekGrid, type CellMouseEvent, type ISleekGrid } from "@serenity-is/sleekgrid";
 import { Authorization, Criteria, DataGridTexts, Fluent, ListResponse, cssEscape, debounce, getInstanceType, getTypeFullName, getjQuery, nsSerenity, tryGetText, type PropertyItem, type PropertyItemsData } from "../../base";
 import { PubSub } from "../../base/pubsub";
 import { LayoutTimer, ScriptData, getColumnsData, getColumnsDataAsync, setEquality } from "../../compat";
@@ -19,7 +19,7 @@ import { SlickHelper } from "../helpers/slickhelper";
 import { ToolButton, Toolbar } from "../widgets/toolbar";
 import { Widget, WidgetProps } from "../widgets/widget";
 import { getWidgetFrom, tryGetWidget } from "../widgets/widgetutils";
-import { getDefaultSortBy, getItemCssClass, propertyItemToQuickFilter, slickGridOnSort } from "./datagrid-internal";
+import { getDefaultSortBy, getItemCssClass, propertyItemToQuickFilter, sleekGridOnSort } from "./datagrid-internal";
 import { GridPersistenceFlags, PersistedGridSettings, SettingStorage, getCurrentSettings, restoreSettingsFrom } from "./datagrid-persistence";
 import { IDataGrid } from "./idatagrid";
 import { IRowDefinition } from "./irowdefinition";
@@ -35,20 +35,20 @@ export class DataGrid<TItem, P = {}> extends Widget<P> implements IDataGrid, IRe
 
     static [Symbol.typeInfo] = this.registerClass(nsSerenity, [IReadOnly]);
 
+    declare private _grid: ISleekGrid<TItem>;
     declare private _isDisabled: boolean;
     declare private _layoutTimer: number;
+
     declare protected titleDiv: Fluent;
     declare protected toolbar: Toolbar;
     declare protected filterBar: FilterDisplayBar;
     declare protected quickFiltersDiv: Fluent;
     declare protected quickFiltersBar: QuickFilterBar;
     declare protected slickContainer: Fluent;
-    declare protected allColumns: Column[];
     declare protected propertyItemsData: PropertyItemsData;
     declare protected initialSettings: PersistedGridSettings;
     declare protected restoringSettings: number;
     declare public view: IRemoteView<TItem>;
-    declare public slickGrid: Grid;
     declare public openDialogsAsPanel: boolean;
 
     declare public static defaultRowHeight: number;
@@ -97,9 +97,9 @@ export class DataGrid<TItem, P = {}> extends Widget<P> implements IDataGrid, IRe
 
     protected propertyItemsReady(itemsData: PropertyItemsData) {
         this.propertyItemsData = itemsData;
-        this.allColumns = this.allColumns ?? this.getColumns();
-        this.slickGrid = this.createSlickGrid();
-        this.initSlickGrid();
+        const sleekGrid = (this as any).createSlickGrid();
+        this._grid ??= sleekGrid;
+        this.initSleekGrid();
 
         if (this.enableFiltering()) {
             this.createFilterBar();
@@ -146,25 +146,25 @@ export class DataGrid<TItem, P = {}> extends Widget<P> implements IDataGrid, IRe
     }
 
     protected layout(): void {
-        if (!this.domNode || !Fluent.isVisibleLike(this.domNode) || !this.slickContainer || !this.slickGrid)
+        if (!this.domNode || !Fluent.isVisibleLike(this.domNode) || !this.slickContainer || !this._grid)
             return;
 
         var responsiveHeight = this.domNode.classList.contains('responsive-height');
-        var madeAutoHeight = this.slickGrid != null && this.slickGrid.getOptions().autoHeight;
+        var madeAutoHeight = this._grid != null && this._grid.getOptions().autoHeight;
         var shouldAutoHeight = responsiveHeight && window.innerWidth < 768;
 
         if (shouldAutoHeight) {
             if (!madeAutoHeight) {
-                this.slickGrid.setOptions({ autoHeight: true });
+                this._grid.setOptions({ autoHeight: true });
             }
         }
         else if (madeAutoHeight) {
             this.slickContainer.getNode().style.height = "";
             this.slickContainer.findAll('.slick-viewport').forEach(x => x.style.height = "");
-            this.slickGrid.setOptions({ autoHeight: false });
+            this._grid.setOptions({ autoHeight: false });
         }
 
-        this.slickGrid.resizeCanvas();
+        this._grid.resizeCanvas();
     }
 
     protected getInitialTitle(): string {
@@ -205,7 +205,7 @@ export class DataGrid<TItem, P = {}> extends Widget<P> implements IDataGrid, IRe
     }
 
     protected getQuickFilters(): QuickFilter<Widget<any>, any>[] {
-        return this.allColumns.filter(function (x) {
+        return this._grid.getColumns(true).filter(function (x) {
             return x.sourceItem &&
                 x.sourceItem.quickFilter === true &&
                 (x.sourceItem.readPermission == null ||
@@ -267,13 +267,13 @@ export class DataGrid<TItem, P = {}> extends Widget<P> implements IDataGrid, IRe
             this.toolbar = null;
         }
 
-        if (this.slickGrid) {
-            this.slickGrid.onClick.clear();
-            this.slickGrid.onSort.clear();
-            this.slickGrid.onColumnsResized.clear();
-            this.slickGrid.onColumnsReordered.clear();
-            this.slickGrid.destroy();
-            this.slickGrid = null;
+        if (this._grid) {
+            this._grid.onClick.clear();
+            this._grid.onSort.clear();
+            this._grid.onColumnsResized.clear();
+            this._grid.onColumnsReordered.clear();
+            this._grid.destroy();
+            this._grid = null;
         }
 
         if (this.view) {
@@ -353,7 +353,7 @@ export class DataGrid<TItem, P = {}> extends Widget<P> implements IDataGrid, IRe
     protected initializeFilterBar() {
 
         this.filterBar.set_store(new FilterStore(
-            this.allColumns
+            this._grid.getColumns(true)
                 .filter(c => this.canFilterColumn(c))
                 .map(x => x.sourceItem)));
 
@@ -366,26 +366,36 @@ export class DataGrid<TItem, P = {}> extends Widget<P> implements IDataGrid, IRe
         });
     }
 
-    protected createSlickGrid(): Grid {
-
-        var visibleColumns = this.postProcessColumns(this.allColumns).filter(function (x) {
-            return x.visible !== false;
-        });
-
-        var slickOptions = this.getSlickOptions();
-        var grid = new Grid(this.slickContainer.getNode(), this.view as any, visibleColumns, slickOptions) as Grid;
-        grid.registerPlugin(new AutoTooltips({
-            enableForHeaderCells: true
-        }));
-
-        this.slickGrid = grid;
-
-        this.setInitialSortOrder();
-
-        return grid;
+    /**
+     * Creates initial column set for this grid. This column set is then passed
+     * to postProcessColumns to adjust widths etc, and then used as the initial
+     * columns for the slickgrid.
+     */
+    protected createColumns(): Column<TItem>[] {
+        const items = this.getPropertyItems();
+        return this.propertyItemsToSlickColumns(items);
     }
 
-    protected initSlickGrid(): void {
+    /**
+     * Creates the SlickGrid columns. This method calls createColumns (via getColumns for compatibility) and then post processes them.
+     * @returns The SlickGrid columns.
+     */
+    protected createSlickColumns(): Column<TItem>[] {
+        const columns = (this as any).getColumns();
+        return this.postProcessColumns(columns || []) || [];
+    }
+
+    /** @deprecated Override initSleekGrid to add plugins to the sleekgrid */
+    protected createSlickGrid(): ISleekGrid<TItem> | null {
+        const columns = this.createSlickColumns();
+        const slickOptions = this.getSlickOptions();
+        this._grid = new SleekGrid(this.slickContainer.getNode(), this.view as any, columns, slickOptions);
+        this._grid.registerPlugin(new AutoTooltips({ enableForHeaderCells: true }));
+        this.setInitialSortOrder();
+        return this._grid;
+    }
+
+    protected initSleekGrid(): void {
     }
 
     protected setInitialSortOrder(): void {
@@ -410,11 +420,11 @@ export class DataGrid<TItem, P = {}> extends Widget<P> implements IDataGrid, IRe
             return x;
         });
 
-        this.slickGrid.setSortColumns(mapped);
+        this._grid.setSortColumns(mapped);
     }
 
     itemAt(row: number): TItem {
-        return this.slickGrid.getDataItem(row);
+        return this._grid.getDataItem(row);
     }
 
     itemId(item: TItem): any {
@@ -422,7 +432,7 @@ export class DataGrid<TItem, P = {}> extends Widget<P> implements IDataGrid, IRe
     }
 
     rowCount() {
-        return this.slickGrid.getDataLength();
+        return this._grid.getDataLength();
     }
 
     getItems(): TItem[] {
@@ -434,20 +444,20 @@ export class DataGrid<TItem, P = {}> extends Widget<P> implements IDataGrid, IRe
     }
 
     protected bindToSlickEvents() {
-        this.slickGrid.onSort.subscribe((_, p) => {
-            slickGridOnSort(this.view, p);
+        this._grid.onSort.subscribe((_, p) => {
+            sleekGridOnSort(this.view, p);
             this.persistSettings();
         });
 
-        this.slickGrid.onClick.subscribe((e: CellMouseEvent) => {
+        this._grid.onClick.subscribe((e: CellMouseEvent) => {
             this.onClick(e, e.row, e.cell);
         });
 
-        this.slickGrid.onColumnsReordered.subscribe(() => {
+        this._grid.onColumnsReordered.subscribe(() => {
             return this.persistSettings();
         });
 
-        this.slickGrid.onColumnsResized.subscribe(() => {
+        this._grid.onColumnsResized.subscribe(() => {
             return this.persistSettings();
         });
     }
@@ -524,7 +534,7 @@ export class DataGrid<TItem, P = {}> extends Widget<P> implements IDataGrid, IRe
     }
 
     protected getIncludeColumns(include: { [key: string]: boolean }): void {
-        var columns = this.slickGrid.getColumns();
+        var columns = this._grid.getColumns();
         for (var column of columns) {
             if (column.field) {
                 include[column.field] = true;
@@ -588,7 +598,7 @@ export class DataGrid<TItem, P = {}> extends Widget<P> implements IDataGrid, IRe
     }
 
     protected getDefaultSortBy(): any[] {
-        return getDefaultSortBy(this.slickGrid);
+        return getDefaultSortBy(this._grid);
     }
 
     protected usePager(): boolean {
@@ -771,37 +781,17 @@ export class DataGrid<TItem, P = {}> extends Widget<P> implements IDataGrid, IRe
         return { items: [], additionalItems: [] };
     }
 
-    /**
-     * This gets the inital column set for this grid usually by converting property items
-     * generated for a Columns.cs file to slick columns that will be passed to the Grid
-     * constructor. Note that this does not return the current columns of the sleekgrid itself. 
-     * It is only called once during initialization, and should never be called after that.
-     */
+    /** @deprecated override createColumns */
     protected getColumns(): Column<TItem>[] {
-        return this.propertyItemsToSlickColumns(this.getPropertyItems());
+        return this.createColumns();
     }
 
     /**
-     * Reads the initial column set for this grid, generated by getColumns, before
-     * filtering out the invisible columns. Only the visible columns are passed to the
-     * sleekgrid constructor. The column picker uses this to get the full list of columns
-     * including the invisible ones. To access the current columns of the sleekgrid itself,
-     * use slickGrid.getColumns(). 
-     * @returns 
+     * Gets SlickGrid columns
+     * @param all True to get all columns, false to get only visible columns
      */
-    public getAllColumns(): Column<TItem>[] {
-        return this.allColumns;
-    }
-
-    /**
-     * Sets the initial column set for this grid. This should not normally be called
-     * directly, and is only set by the column picker to store the new columns 
-     * order after a column order change.
-     * To update the columns of the sleekgrid itself, use slickGrid.setColumns().
-     * @param columns The initial columns to set.
-     */
-    public setAllColumns(columns: Column<TItem>[]): void {
-        this.allColumns = columns;
+    public getSlickColumns(all?: boolean) {
+        return this._grid?.getColumns(all);
     }
 
     protected wrapFormatterWithEditLink(column: Column, item: PropertyItem) {
@@ -977,7 +967,7 @@ export class DataGrid<TItem, P = {}> extends Widget<P> implements IDataGrid, IRe
     }
 
     protected resizeCanvas(): void {
-        this.slickGrid?.resizeCanvas();
+        this._grid?.resizeCanvas();
     }
 
     protected subDialogDataChange(): void {
@@ -1042,7 +1032,7 @@ export class DataGrid<TItem, P = {}> extends Widget<P> implements IDataGrid, IRe
 
     protected getPersistenceStorage(): SettingStorage {
         if ((this as any).getPersistanceStorage) return (this as any).getPersistanceStorage(); // compat
-        
+
         return DataGrid.defaultPersistenceStorage;
     }
 
@@ -1117,7 +1107,7 @@ export class DataGrid<TItem, P = {}> extends Widget<P> implements IDataGrid, IRe
     }
 
     protected restoreSettingsFrom(settings: PersistedGridSettings, flags?: GridPersistenceFlags): void {
-        if (!this.slickGrid || !settings)
+        if (!this._grid || !settings)
             return;
 
         this.view.beginUpdate();
@@ -1140,18 +1130,12 @@ export class DataGrid<TItem, P = {}> extends Widget<P> implements IDataGrid, IRe
             event.flagsToUse ??= event.flagsDefault;
 
             restoreSettingsFrom({
-                allColumns: (value: Column[]) => {
-                    if (value == null)
-                        return this.allColumns;
-
-                    return this.allColumns = value;
-                },
                 canShowColumn: bindThis(this).canShowColumn,
                 filterBar: this.filterBar,
                 flags: event.flagsToUse,
                 includeDeletedToggle: this.domNode.querySelector('.s-IncludeDeletedToggle'),
                 quickFiltersDiv: this.quickFiltersDiv,
-                sleekGrid: this.slickGrid,
+                sleekGrid: this._grid,
                 settings: event.settings,
                 toolbar: this.toolbar,
                 uniqueName: this.uniqueName,
@@ -1211,7 +1195,7 @@ export class DataGrid<TItem, P = {}> extends Widget<P> implements IDataGrid, IRe
             flags,
             includeDeletedToggle: this.domNode.querySelector('.s-IncludeDeletedToggle'),
             quickFiltersDiv: this.quickFiltersDiv,
-            sleekGrid: this.slickGrid,
+            sleekGrid: this._grid,
             toolbar: this.toolbar,
             uniqueName: this.uniqueName
         });
@@ -1224,9 +1208,18 @@ export class DataGrid<TItem, P = {}> extends Widget<P> implements IDataGrid, IRe
         return this.domNode;
     }
 
-    getGrid(): Grid {
-        return this.slickGrid;
+    getGrid(): ISleekGrid<TItem> {
+        return this._grid;
     }
+
+    public get sleekGrid() { return this._grid; }
+    protected set sleekGrid(value: ISleekGrid<TItem>) { this._grid = value; }
+
+    /** @deprecated use sleekGrid.getColumns(true) */
+    protected get allColumns(): Column[] { return this._grid?.getColumns(true) }
+
+    /** @deprecated Use sleekGrid or getGrid() */
+    public get slickGrid() { return this._grid; }
 
     getView(): IRemoteView<TItem> {
         return this.view;
