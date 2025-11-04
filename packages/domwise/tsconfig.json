@@ -15,12 +15,12 @@
       "noEmitHelpers": false,
       "noImplicitAny": true,
       "isolatedModules": true,
-      "rootDir": "./src",
+      "rootDir": ".",
       "sourceMap": false,
       "skipLibCheck": false,
       "outDir": "./dist",
       "target": "ESNext",
       "useDefineForClassFields": false
     },
-    "include": ["src"]
+    "include": ["src", "types"]
   }

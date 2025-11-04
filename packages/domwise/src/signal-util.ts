@@ -1,5 +1,5 @@
 import { addDisposingListener, currentLifecycleRoot, removeDisposingListener } from "./disposing-listener";
-import { type EffectDisposer, type SignalLike } from "./types";
+import { type EffectDisposer, type SignalLike } from "../types";
 
 export function isSignalLike(val: any): val is SignalLike<any> {
     return val != null && typeof val === "object" && typeof val.subscribe === "function" && typeof val.peek === "function" && 'value' in val;

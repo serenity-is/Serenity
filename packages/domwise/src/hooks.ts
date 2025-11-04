@@ -1,5 +1,5 @@
 import { className } from "./classname"
-import type { BasicClassList, ClassNames } from "./types"
+import type { BasicClassList, ClassNames } from "../types"
 
 export function useClassList(initialValue?: ClassNames) {
   const div = document.createElement("div")

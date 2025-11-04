@@ -1,3 +1,4 @@
+export * from "../types";
 export { bindThis } from "./bind-this";
 export { className } from "./classname";
 export * from "./compat-api";
@@ -13,5 +14,3 @@ export { ShadowRootNode } from "./shadow";
 export { isSignalLike, observeSignal } from "./signal-util";
 export * from "./signals";
 export { SVGNamespace } from "./svg-consts";
-export * from "./types";
-

@@ -1,5 +1,5 @@
 import { appendChildren } from "./jsx-append-children"
-import type { ComponentChildren } from "./types"
+import type { ComponentChildren } from "../types"
 
 export function Fragment(attr: { children?: ComponentChildren | undefined }): any {
     const fragment = document.createDocumentFragment()

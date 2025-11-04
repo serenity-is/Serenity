@@ -1,9 +1,3 @@
-export declare function bindThis<T>(obj: T): T;
-/**
- * Convert a `value` to a className string.
- * `value` can be a string, an array or a `Dictionary<boolean>`.
- */
-export declare function className(value: any): string;
 export interface BasicClassList {
 	(value: Element): void;
 	readonly size: number;
@@ -13,7 +7,7 @@ export interface BasicClassList {
 	toggle(token: string, force?: boolean): void;
 	contains(token: string): boolean;
 }
-type ClassName = string | {
+export type ClassName = string | {
 	[key: string]: boolean;
 } | false | null | undefined | ClassName[];
 export type ClassNames = ClassName | BasicClassList | Iterable<string> | DOMTokenList;
@@ -42,7 +36,7 @@ export interface Signal<T> extends SignalLike<T> {
 export interface Computed<T> extends SignalLike<T> {
 }
 export type SignalOrValue<T> = T | SignalLike<T>;
-type ComponentChild = string | number | Iterable<ComponentChild> | Array<ComponentChild> | {
+export type ComponentChild = string | number | Iterable<ComponentChild> | Array<ComponentChild> | {
 	value: ComponentChild;
 	peek: () => ComponentChild;
 	subscribe: (cb: (newValue: ComponentChild) => void) => void;
@@ -54,8 +48,6 @@ export interface CustomDomAttributes<T> {
 		__html: string;
 	};
 	ref?: Ref<T>;
-	/** @deprecated This is simply ignored as it only applies to v-dom */
-	key?: string | number;
 	/** compat from jsx-dom/react */
 	on?: Record<string, Function>;
 	onCapture?: Record<string, Function>;
@@ -2158,14 +2150,18 @@ export declare namespace JSX {
 	interface ElementChildrenAttribute {
 		children: {};
 	}
-	interface IntrinsicAttributes {
-	}
 	interface IntrinsicClassAttributes<T> {
 		ref?: Ref<T>;
 	}
 	interface IntrinsicElements extends IntrinsicElementsCombined, CustomElementsHTML {
 	}
 }
+export declare function bindThis<T>(obj: T): T;
+/**
+ * Convert a `value` to a className string.
+ * `value` can be a string, an array or a `Dictionary<boolean>`.
+ */
+export declare function className(value: any): string;
 export declare function createRef<T = any>(): RefObject<T>;
 export declare function useImperativeHandle<T>(ref: Ref<T>, init: () => T): void;
 export declare function createElement(tag: any, attr: any, ...children: any[]): any;
@@ -2242,9 +2238,9 @@ export declare function inSVGNamespace(fn: () => ComponentChildren): ComponentCh
 export declare function inMathMLNamespace(fn: () => ComponentChildren): ComponentChildren;
 export declare function inHTMLNamespace(fn: () => ComponentChildren): ComponentChildren;
 type DataKeys = `data-${string}`;
-export declare function jsx<THtmlTag extends keyof HTMLElementTagNameMap, TElement extends HTMLElementTagNameMap[THtmlTag]>(type: THtmlTag, props?: (HTMLElementTags[THtmlTag] & Record<DataKeys, string | number>) | null, key?: string): TElement;
-export declare function jsx<TSVGTag extends (keyof SVGElementTagNameMap & keyof SVGElementTags), TElement extends SVGElementTagNameMap[TSVGTag]>(type: TSVGTag, props?: (SVGElementTags[TSVGTag] & Record<DataKeys, string | number>) | null, key?: string): TElement;
-export declare function jsx(type: string, props?: (ElementAttributes<JSXElement> & Record<DataKeys, string | number>) | null, key?: string): JSXElement;
+export declare function jsx<THtmlTag extends keyof HTMLElementTagNameMap, TElement extends HTMLElementTagNameMap[THtmlTag]>(type: THtmlTag, props?: (HTMLElementTags[THtmlTag] & Record<DataKeys, string | number>) | null): TElement;
+export declare function jsx<TSVGTag extends (keyof SVGElementTagNameMap & keyof SVGElementTags), TElement extends SVGElementTagNameMap[TSVGTag]>(type: TSVGTag, props?: (SVGElementTags[TSVGTag] & Record<DataKeys, string | number>) | null): TElement;
+export declare function jsx(type: string, props?: (ElementAttributes<JSXElement> & Record<DataKeys, string | number>) | null): JSXElement;
 export declare const MathMLNamespace = "http://www.w3.org/1998/Math/MathML";
 export declare function ShadowRootNode({ children, ref, ...attr }: ShadowRootInit & {
 	ref?: Ref<ShadowRoot>;

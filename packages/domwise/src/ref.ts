@@ -1,4 +1,4 @@
-import type { RefObject } from "./types";
+import type { RefObject } from "../types";
 
 export function createRef<T = any>(): RefObject<T> {
     return Object.seal({ current: null });

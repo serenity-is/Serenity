@@ -1,6 +1,6 @@
 import { MathMLNamespace } from "./mathml-consts";
 import { SVGNamespace } from "./svg-consts";
-import type { ComponentChildren } from "./types";
+import type { ComponentChildren } from "../types";
 
 let namespaceURI: string | null = null;
 

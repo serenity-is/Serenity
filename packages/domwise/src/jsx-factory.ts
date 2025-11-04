@@ -5,9 +5,9 @@ import { MathMLNamespace, mathMLOnlyTags as mathMLOnlyTags } from "./mathml-cons
 import { currentNamespaceURI } from "./in-namespace-uri"
 import { attachRef } from "./ref"
 import { SVGNamespace, svgOnlyTags as svgOnlyTags } from "./svg-consts"
-import type { JSXElement } from "./types"
-import type { ComponentChildren } from "./types/custom-attributes"
-import type { ElementAttributes, HTMLElementTags, SVGElementTags } from "./types/dom-expressions-jsx"
+import type { JSXElement } from "../types"
+import type { ComponentChildren } from "../types/custom-attributes"
+import type { ElementAttributes, HTMLElementTags, SVGElementTags } from "../types/dom-expressions-jsx"
 import { isComponentClass, isObject, isString } from "./util"
 
 

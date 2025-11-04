@@ -1,6 +1,6 @@
+import type { Ref } from "../types"
 import { jsx } from "./jsx-factory"
-import { attachRef, createRef } from "./ref"
-import type { FunctionComponent, JSXElement, Ref } from "./types"
+import { attachRef } from "./ref"
 import { isString } from "./util"
 
 export { createRef as useRef } from "./ref"

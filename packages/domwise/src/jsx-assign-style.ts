@@ -1,5 +1,5 @@
 import { isSignalLike, observeSignal } from "./signal-util";
-import type { JSXElement } from "./types";
+import type { JSXElement } from "../types";
 import { isNumber, isObject, isString, keys } from "./util";
 
 /**

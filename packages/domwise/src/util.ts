@@ -1,4 +1,4 @@
-import { type ComponentClass } from "./types";
+import { type ComponentClass } from "../types";
 
 export const keys: <T>(obj: T) => Array<keyof T> = Object.keys as any;
 
