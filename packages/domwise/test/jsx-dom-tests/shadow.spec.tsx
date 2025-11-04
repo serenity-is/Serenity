@@ -1,4 +1,3 @@
-/** @jsxImportSource ../../src */
 import { createRef, ShadowRootNode } from "../../src"
 
 describe("shadow", () => {

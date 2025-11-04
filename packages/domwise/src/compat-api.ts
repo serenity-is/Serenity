@@ -5,12 +5,6 @@ import { isString } from "./util"
 
 export { createRef as useRef } from "./ref"
 
-export function forwardRef<T = Node, P = {}>(
-  render: (props: P, ref: Ref<T>) => JSXElement
-): FunctionComponent<P & { ref?: Ref<T> }> {
-  return ({ ref, ...props }) => render(props as P, ref || createRef<T>())
-}
-
 export function useImperativeHandle<T>(ref: Ref<T>, init: () => T) {
     attachRef(ref, init());
 }
@@ -27,7 +21,7 @@ export function createElement(tag: any, attr: any, ...children: any[]) {
         ({ children, ...attr } = attr);
     }
 
-    return jsx(tag, { ...attr, children }, attr.key);
+    return jsx(tag, { ...attr, children });
 }
 
 export const h = createElement;

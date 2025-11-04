@@ -29,9 +29,6 @@ export interface CustomDomAttributes<T> {
     dangerouslySetInnerHTML?: { __html: string };
     ref?: Ref<T>;
 
-    /** @deprecated This is simply ignored as it only applies to v-dom */
-    key?: string | number;
-
     /** compat from jsx-dom/react */
     on?: Record<string, Function>;
     onCapture?: Record<string, Function>;

@@ -1,4 +1,3 @@
-/** @jsxImportSource ../../src */
 import { SVGNamespace } from "../../src/"
 
 describe("SVG", () => {

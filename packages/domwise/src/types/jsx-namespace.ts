@@ -13,14 +13,9 @@ export declare namespace JSX {
         children: {};
     }
 
-    interface IntrinsicAttributes {
-
-    }
-
     interface IntrinsicClassAttributes<T> {
         ref?: Ref<T>;
     }
-
 
     interface IntrinsicElements extends IntrinsicElementsCombined, CustomElementsHTML { }
 }

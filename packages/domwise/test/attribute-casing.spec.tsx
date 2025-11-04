@@ -1,5 +1,3 @@
-/** @jsxImportSource ../src */
-
 describe("supports lowercase attribute variants by default but also allows some uppercase", () => {
 
     it("supports for and htmlFor", () => {

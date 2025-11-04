@@ -1,4 +1,3 @@
-/** @jsxImportSource ../../src */
 import type { StyleProperties } from "../../src/types/style-attributes"
 
 describe("CSS", () => {

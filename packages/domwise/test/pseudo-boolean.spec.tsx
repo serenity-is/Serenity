@@ -1,5 +1,3 @@
-/** @jsxImportSource ../src */
-
 describe("supports pseudo-boolean ('true', 'false') attribute values for some attributes", () => {
 
     it("supports contenteditable with pseudo-boolean values", () => {

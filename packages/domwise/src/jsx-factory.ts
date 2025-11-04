@@ -16,27 +16,23 @@ type DataKeys = `data-${string}`
 // DOM Elements
 export function jsx<THtmlTag extends keyof HTMLElementTagNameMap, TElement extends HTMLElementTagNameMap[THtmlTag]>(
     type: THtmlTag,
-    props?: (HTMLElementTags[THtmlTag] & Record<DataKeys, string | number>) | null,
-    key?: string
+    props?: (HTMLElementTags[THtmlTag] & Record<DataKeys, string | number>) | null
 ): TElement
 export function jsx<TSVGTag extends (keyof SVGElementTagNameMap & keyof SVGElementTags), TElement extends SVGElementTagNameMap[TSVGTag]>(
     type: TSVGTag,
-    props?: (SVGElementTags[TSVGTag] & Record<DataKeys, string | number>) | null,
-    key?: string
+    props?: (SVGElementTags[TSVGTag] & Record<DataKeys, string | number>) | null
 ): TElement
 export function jsx(
     type: string,
-    props?: (ElementAttributes<JSXElement> & Record<DataKeys, string | number>) | null,
-    key?: string
+    props?: (ElementAttributes<JSXElement> & Record<DataKeys, string | number>) | null
 ): JSXElement
 // Custom components
 //export function jsx<P extends {}, TElement extends JSXElement = JSXElement>(
 //    type: ComponentType<P, TElement>,
 //    props?: P & { children?: ComponentChildren; ref?: Ref<TElement> } | null,
-//    key?: string
 //): TElement
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
-export function jsx(tag: any, props?: { children?: ComponentChildren, [key: string]: any }, _key?: string) {
+export function jsx(tag: any, props?: { children?: ComponentChildren, [key: string]: any }) {
 
     let { children, ...attr } = props || {};
     let ns = attr.namespaceURI;

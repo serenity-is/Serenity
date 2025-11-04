@@ -1,6 +1,5 @@
-/** @jsxImportSource ../../src */
-import { Component, createElement, createRef, forwardRef, Fragment, jsx, useImperativeHandle, useRef, useText, type JSX, type Ref } from "../../src"
-import type { HTMLAttributes } from "../../src/types/dom-expressions-jsx"
+import { Component, createElement, createRef, Fragment, jsx, useImperativeHandle, useRef, useText, type Ref } from "../../src"
+import type { ButtonHTMLAttributes, HTMLAttributes } from "../../src/types/dom-expressions-jsx"
 
 describe("jsx-dom main", () => {
     it("creates a <div> element", () => {
@@ -9,20 +8,12 @@ describe("jsx-dom main", () => {
 
     describe("supports publicly declared APIs", () => {
         it("supports createFactory", () => {
-            expect(createElement).to.be.a("function")
-            //expect(createFactory).to.be.a("function")
-            expect(createRef).to.be.a("function")
-            expect(jsx).to.be.a("function")
-            //expect(useCallback).to.be.a("function")
-            //expect(useMemo).to.be.a("function")
-            expect(useRef).to.be.a("function")
-            expect(useText).to.be.a("function")
-
-            //const Div = createFactory("div")
-            //expect((<Div>div tag</Div>).tagName).toBe("DIV")
-
-            const element = jsx("div", { children: "test" })
-
+            expect(createElement).to.be.a("function");
+            expect(createRef).to.be.a("function");
+            expect(jsx).to.be.a("function");
+            expect(useRef).to.be.a("function");
+            expect(useText).to.be.a("function");
+            const element = jsx("div", { children: "test" });
             function CustomComponent(props: any): any {
                 if (!new.target) return new (CustomComponent as any)(props)
             }
@@ -308,13 +299,13 @@ describe("jsx-dom main", () => {
             expect(button).toBeInstanceOf(HTMLButtonElement)
         })
 
-        describe("supports forwardRef", () => {
+        describe("supports ref forwarding without forwardRef", () => {
             it("element", () => {
-                const Container = forwardRef<HTMLButtonElement, any>((props, ref) => (
+                const Container = ({ ref, ...props }: HTMLAttributes<HTMLDivElement> & { ref: Ref<HTMLButtonElement> }) => (
                     <div {...props}>
                         <button ref={ref}>Button</button>
                     </div>
-                ))
+                );
 
                 const ref = createRef()
                 const node = (
@@ -324,15 +315,15 @@ describe("jsx-dom main", () => {
                 )
                 expect(node.className).toBe("container")
                 expect(ref.current).toBeInstanceOf(HTMLButtonElement)
-            })
+            });
 
             it("component", () => {
-                const Button = props => <button {...props} />
-                const Container = forwardRef<HTMLButtonElement, any>((props, ref) => (
+                const Button = (props: ButtonHTMLAttributes<HTMLButtonElement>) => <button {...props} />
+                const Container = ({ ref, ...props }: HTMLAttributes<HTMLDivElement> & { ref: Ref<HTMLButtonElement> }) => (
                     <div {...props}>
                         <Button ref={ref}>Button</Button>
                     </div>
-                ))
+                );
 
                 const ref = createRef()
                 const node = (
@@ -581,7 +572,6 @@ describe("jsx-dom main", () => {
 
     describe("forwardRef", () => {
         it("supports forwardRef", () => {
-            // const FancyButton = forwardRef((props, ref) => (
             const FancyButton = props => (
                 <button ref={props.ref} className="FancyButton">
                     {props.children}

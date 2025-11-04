@@ -1,4 +1,3 @@
-/** @jsxImportSource ../../src */
 import { describe, expect, it } from "vitest"
 import { useClassList, useRef, useText } from "../../src"
 
