@@ -99,7 +99,7 @@ it('skip boolean children', function () {
 it('skip null children', function () {
     const element = <span>{null}</span> as HTMLElement;
 
-    expect(element.outerHTML).toBe('<span><!----></span>');
+    expect(element.outerHTML).toBe('<span></span>');
 });
 
 it('skip undefined children', function () {
