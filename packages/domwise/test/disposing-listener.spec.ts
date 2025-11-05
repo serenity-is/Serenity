@@ -1,4 +1,4 @@
-import { addDisposingListener, getDisposingListeners, invokeDisposingListeners, removeDisposingListener, dispatchDisposingEvent, currentLifecycleRoot } from "../src/disposing-listener";
+import { addDisposingListener, currentLifecycleRoot, dispatchDisposingEvent, getDisposingListeners, invokeDisposingListeners, removeDisposingListener } from "../src/disposing-listener";
 
 let el: HTMLElement;
 

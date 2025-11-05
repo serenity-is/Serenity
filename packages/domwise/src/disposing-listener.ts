@@ -46,7 +46,7 @@ export function invokeDisposingListeners(node: EventTarget, opt?: {
 
     const disposingListeners = getDisposingListeners();
 
-    function invokeFor(el: EventTarget) {   
+    function invokeFor(el: EventTarget) {
         const listeners = disposingListeners.get(el);
         if (!listeners)
             return;

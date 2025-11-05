@@ -1,4 +1,4 @@
-import { type PropHook, type ComponentClass } from "../types";
+import { type ComponentClass, type PropHook } from "../types";
 import { initPropHookSymbol } from "./prop-hook";
 
 export function isElement(val: any): val is Element {

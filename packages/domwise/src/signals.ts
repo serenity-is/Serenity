@@ -1,6 +1,5 @@
 import * as signals from "@preact/signals-core";
 import { type Computed, type Signal, type SignalLike } from "../types";
-import { isSignalLike } from "./signal-util";
 
 export interface SignalOptions<T> {
     watched?: (this: SignalLike<T>) => void;

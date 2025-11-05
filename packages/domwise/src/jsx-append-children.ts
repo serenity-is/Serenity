@@ -1,7 +1,7 @@
+import type { ComponentChildren, SignalLike } from "../types";
 import { setRef } from "./ref";
 import { isShadowRoot } from "./shadow";
 import { isSignalLike, observeSignal } from "./signal-util";
-import type { ComponentChildren, SignalLike } from "../types";
 import { isArrayLike, isElement, isNumber, isString, isVisibleChild } from "./util";
 
 function appendChild(parent: Node, child: Node) {

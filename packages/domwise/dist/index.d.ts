@@ -2266,10 +2266,6 @@ export declare function useText(initialValue?: string): readonly [
 	Text,
 	(value: string) => void
 ];
-export declare const initPropHookSymbol: unique symbol;
-export interface PropHook<TNode extends Element = Element> {
-	[initPropHookSymbol](node: TNode, propName: string): void;
-}
 export declare function currentNamespaceURI(value?: string): string;
 export declare function inNamespaceURI(namespaceURI: string | null, children: () => ComponentChildren): ComponentChildren;
 export declare function inSVGNamespace(fn: () => ComponentChildren): ComponentChildren;
@@ -2280,6 +2276,10 @@ export declare function jsx<THtmlTag extends keyof HTMLElementTagNameMap, TEleme
 export declare function jsx<TSVGTag extends (keyof SVGElementTagNameMap & keyof SVGElementTags), TElement extends SVGElementTagNameMap[TSVGTag]>(type: TSVGTag, props?: (SVGElementTags[TSVGTag] & Record<DataKeys, string | number>) | null): TElement;
 export declare function jsx(type: string, props?: (ElementAttributes<JSXElement> & Record<DataKeys, string | number>) | null): JSXElement;
 export declare const MathMLNamespace = "http://www.w3.org/1998/Math/MathML";
+export declare const initPropHookSymbol: unique symbol;
+export interface PropHook<TNode extends Element = Element> {
+	[initPropHookSymbol](node: TNode, propName: string): void;
+}
 export declare function ShadowRootNode({ children, ref, ...attr }: ShadowRootInit & {
 	ref?: Ref<ShadowRoot>;
 	children?: ComponentChildren;

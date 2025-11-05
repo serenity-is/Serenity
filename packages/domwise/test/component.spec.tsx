@@ -1,4 +1,4 @@
-import { Component, initComponentClass } from "../src/component"
+import { Component, initComponentClass } from "../src/component";
 
 describe("Component", () => {
     it("can be instantiated with props", () => {

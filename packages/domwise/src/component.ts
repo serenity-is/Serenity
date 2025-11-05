@@ -1,5 +1,5 @@
-import { setRef } from "./ref";
 import type { ComponentChildren, ComponentClass, JSXElement, Ref } from "../types";
+import { setRef } from "./ref";
 
 export class Component<T = any> {
     static isComponent = true;

@@ -1,4 +1,4 @@
-import { createElement, useImperativeHandle } from "../src/compat-api"
+import { createElement, useImperativeHandle } from "../src/compat-api";
 import { useRef } from "../src/hooks";
 
 describe("createElement", () => {

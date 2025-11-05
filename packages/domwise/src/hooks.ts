@@ -25,7 +25,7 @@ export function useClassList(initialValue?: ClassNames): BasicClassList {
         ClassList,
         Object.getOwnPropertyDescriptors({
             [initPropHookSymbol](node: Element, prop: string) {
-                if (prop !== "class") 
+                if (prop !== "class")
                     throw new Error("useClassList can only be used for 'class' attribute.");
                 removeDisposingListener(temp, dispose);
                 node?.setAttribute("class", list?.value);

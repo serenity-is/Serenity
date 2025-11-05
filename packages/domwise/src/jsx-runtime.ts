@@ -1,1 +1,1 @@
-export { jsx, jsxs, jsx as jsxDEV, Fragment, type JSX } from "./index.js";
+export { Fragment, jsx, jsx as jsxDEV, jsxs, type JSX } from "./index.js";

@@ -1,4 +1,4 @@
-import type { ComponentChildren, Ref, ShadowRootContainer } from "../types"
+import type { ComponentChildren, Ref, ShadowRootContainer } from "../types";
 
 const jsxTypeKeySymbol = Symbol.for("Serenity.jsxTypeKey")
 const shadowRootKey = "ShadowRoot";

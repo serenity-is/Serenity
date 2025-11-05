@@ -1,6 +1,6 @@
+import type { ComponentChildren } from "../types";
 import { MathMLNamespace } from "./mathml-consts";
 import { SVGNamespace } from "./svg-consts";
-import type { ComponentChildren } from "../types";
 
 const jsxNamespaceURISymbol = Symbol.for("Serenity.jsxNamespaceURI");
 

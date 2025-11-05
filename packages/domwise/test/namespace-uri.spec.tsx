@@ -72,7 +72,7 @@ describe("namespace URI context helpers", () => {
             <svg>
                 {inMathMLNamespace(() => <math />)}
             </svg>
-        ); 
+        );
         expect(svg.namespaceURI).to.equal(SVGNamespace);
         expect(svg.children[0].namespaceURI).to.equal(MathMLNamespace);
     });
@@ -91,7 +91,7 @@ describe("namespace URI context helpers", () => {
     it("context is properly restored after function calls", () => {
         // First call sets SVG context
         inSVGNamespace(() => <circle />);
-        
+
         // Second call should not be affected by first
         const div = inHTMLNamespace(() => <div />);
         expect((div as Element).namespaceURI).to.equal("http://www.w3.org/1999/xhtml");
@@ -108,7 +108,7 @@ describe("namespace URI context helpers", () => {
             <rect />
             <a />
         </>);
-        
+
         const elements = Array.from((result as any).childNodes) as Element[];
         expect(elements[0].namespaceURI).to.equal(SVGNamespace); // circle
         expect(elements[1].namespaceURI).to.equal(SVGNamespace); // rect  

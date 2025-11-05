@@ -1,4 +1,4 @@
-import { derivedSignal, isSignalLike, isWritableSignal, isReadonlySignal, observeSignal, PrimitiveComputed } from "../src/signal-util";
+import { derivedSignal, isReadonlySignal, isSignalLike, isWritableSignal, observeSignal, PrimitiveComputed } from "../src/signal-util";
 import { computed, signal } from "../src/signals";
 import { mockSignal } from "./mocks/mock-signal";
 

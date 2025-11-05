@@ -1,5 +1,5 @@
 
-import { appendChildren } from "../src/jsx-append-children";    
+import { appendChildren } from "../src/jsx-append-children";
 import { mockSignal } from "./mocks/mock-signal";
 
 let container: HTMLElement;

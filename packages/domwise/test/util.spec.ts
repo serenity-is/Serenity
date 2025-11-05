@@ -1,5 +1,5 @@
-import { isArrayLike, isElement, isString, isNumber, isObject, isComponentClass, isPropHook, isVisibleChild } from "../src/util";
 import { initPropHookSymbol } from "../src/prop-hook";
+import { isArrayLike, isComponentClass, isElement, isNumber, isObject, isPropHook, isString, isVisibleChild } from "../src/util";
 
 describe("isArrayLike", () => {
     it("returns true for arrays", () => {

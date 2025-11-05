@@ -1,5 +1,5 @@
-import { addDisposingListener, currentLifecycleRoot, removeDisposingListener } from "./disposing-listener";
 import { type Computed, type EffectDisposer, type Signal, type SignalLike } from "../types";
+import { addDisposingListener, currentLifecycleRoot, removeDisposingListener } from "./disposing-listener";
 
 /** A type guard that checks if an object is signal-like, meaning it has subscribe and peek methods, and a value property. */
 export function isSignalLike<T = any>(obj: any): obj is SignalLike<T> {

@@ -253,7 +253,7 @@ export function assignProp(node: JSXElement, key: string, value: any, prev?: any
 
 export function assignProps(node: JSXElement, props: Record<string, any>) {
     for (let [key, value] of Object.entries(props)) {
-        
+
         if (key in mappedKeys)
             key = mappedKeys[key];
 

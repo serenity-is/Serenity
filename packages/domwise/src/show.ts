@@ -1,5 +1,5 @@
-import { derivedSignal, isSignalLike, observeSignal } from "./signal-util";
 import type { ComponentChildren, JSXElement, SignalOrValue } from "../types";
+import { derivedSignal, isSignalLike, observeSignal } from "./signal-util";
 
 export function Show<TWhen>(props: {
     when: SignalOrValue<TWhen | undefined | null>;

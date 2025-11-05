@@ -1,20 +1,23 @@
 ﻿{
-    "extends": "../tsconfig.json",
-    "compilerOptions": {
-        "jsx": "react-jsx",
-        "jsxImportSource": "#src",
-        "noImplicitAny": false,
-        "declaration": false,
-        "sourceMap": true,
-        "outDir": "../dist",
-        "rootDir": "..",
-        "rootDirs": ["./src", "./test"],
-        "skipLibCheck": true,
-        "types": [
-            "vitest/globals"
-        ]
-    },
-    "include": [
-        "."
+  "extends": "../tsconfig.json",
+  "compilerOptions": {
+    "jsx": "react-jsx",
+    "jsxImportSource": "#src",
+    "noImplicitAny": false,
+    "declaration": false,
+    "sourceMap": true,
+    "outDir": "../dist",
+    "rootDir": "..",
+    "rootDirs": [
+      "./src",
+      "./test"
+    ],
+    "skipLibCheck": true,
+    "types": [
+      "vitest/globals"
     ]
+  },
+  "include": [
+    "."
+  ]
 }

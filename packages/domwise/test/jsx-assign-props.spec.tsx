@@ -312,7 +312,7 @@ describe("assignProps", () => {
         expect(addEventListenerSpy).toHaveBeenNthCalledWith(3, "mycustom", handler2);
     });
 
-        it("handles update of single custom onCapture event", () => {
+    it("handles update of single custom onCapture event", () => {
         const handler1 = vi.fn();
         const handler2 = vi.fn();
 

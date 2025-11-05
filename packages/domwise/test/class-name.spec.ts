@@ -1,4 +1,4 @@
-import { className } from "../src/class-name"
+import { className } from "../src/class-name";
 
 describe("className", () => {
     it("returns empty string for falsy values", () => {
