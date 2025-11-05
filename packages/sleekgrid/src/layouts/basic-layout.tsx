@@ -26,10 +26,6 @@ export class BasicLayout implements LayoutEngine {
         this.host = this.refs = null;
     }
 
-    public getTopPanel(): HTMLElement {
-        return this.refs.topPanel;
-    }
-
     public afterSetOptions(): void { }
 
     readonly layoutName = "BasicLayout";

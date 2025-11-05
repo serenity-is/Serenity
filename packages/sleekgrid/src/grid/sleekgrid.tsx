@@ -83,7 +83,7 @@ export class SleekGrid<TItem = any> implements ISleekGrid<TItem> {
     private _plugins: GridPlugin[] = [];
     declare private _postCleanupActive: boolean;
     private _postProcessCleanupQueue: PostProcessCleanupEntry[] = [];
-    private _postProcessedRows: { [row: number]: { [cell: number]: string } } = {};
+    private _postProcessedRows: { [row: number]: { [cell: number]: string } } = Object.create(null);
     declare private _postProcessFromRow: number;
     private _postProcessGroupId: number = 0;
     declare private _postProcessToRow: number;
@@ -92,7 +92,7 @@ export class SleekGrid<TItem = any> implements ISleekGrid<TItem> {
     private _mapBands: <T>(fn: (band: GridBandRefs) => T) => T[];
     private _forEachBand: (fn: (band: GridBandRefs) => void) => void;
     declare private _removeNode: (node: Element) => void;
-    private _rowsCache: { [key: number]: CachedRow } = {};
+    private _rowsCache: { [key: number]: CachedRow } = Object.create(null);
     declare private _scrollDims: { width: number, height: number };
     private _scrollLeft: number = 0;
     private _scrollLeftPrev: number = 0;
