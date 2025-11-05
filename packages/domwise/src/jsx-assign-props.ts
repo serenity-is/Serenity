@@ -5,7 +5,7 @@ import { assignStyle } from "./jsx-assign-style";
 import { initPropHookSymbol } from "./prop-hook";
 import { isSignalLike, observeSignal } from "./signal-util";
 import { nonPresentationSVGAttributes } from "./svg-consts";
-import { forEach, isObject, isPropHook, isVisibleChild, keys } from "./util";
+import { isObject, isPropHook, isVisibleChild } from "./util";
 
 const XLinkNamespace = "http://www.w3.org/1999/xlink";
 const XMLNamespace = "http://www.w3.org/XML/1998/namespace";
@@ -30,15 +30,15 @@ export function assignProp(node: JSXElement, key: string, value: any, prev?: any
     switch (key) {
         case "dataset":
             if (prev != null) {
-                forEach(prev, (v, k) => {
+                Object.entries(prev).forEach(([k, v]) => {
                     if (v != null) {
                         delete node.dataset[k];
                     }
                 });
             }
-            forEach(value, (dataValue, dataKey) => {
+            Object.entries(value).forEach(([dataKey, dataValue]) => {
                 if (dataValue != null) {
-                    node.dataset[dataKey] = dataValue
+                    node.dataset[dataKey] = dataValue as string;
                 }
             })
             return;
@@ -117,15 +117,15 @@ export function assignProp(node: JSXElement, key: string, value: any, prev?: any
         case "onCapture":
             const useCapture = key === "onCapture";
             if (prev != null) {
-                forEach(prev, (eventHandler, eventName) => {
+                Object.entries(prev).forEach(([eventName, eventHandler]) => {
                     if (value == null || value[eventName] !== eventHandler) {
-                        node.removeEventListener(eventName, eventHandler, useCapture);
+                        node.removeEventListener(eventName, eventHandler as any, useCapture);
                     }
                 });
             }
-            forEach(value, (eventHandler, eventName) => {
+            Object.entries(value).forEach(([eventName, eventHandler]) => {
                 if (prev == null || prev[eventName] !== eventHandler) {
-                    node.addEventListener(eventName, eventHandler, useCapture);
+                    node.addEventListener(eventName, eventHandler as any, useCapture);
                 }
             });
             return;
@@ -174,7 +174,7 @@ export function assignProp(node: JSXElement, key: string, value: any, prev?: any
             } else if (useCapture) {
                 eventName = attribute.substring(2, attribute.length - 7);
                 if (prev != null) {
-                    node.removeEventListener(eventName, prev);
+                    node.removeEventListener(eventName, prev, true);
                 }
                 node.addEventListener(eventName, value, true);
             } else {
@@ -252,8 +252,7 @@ export function assignProp(node: JSXElement, key: string, value: any, prev?: any
 }
 
 export function assignProps(node: JSXElement, props: Record<string, any>) {
-    for (let key of keys(props)) {
-        let value = props[key];
+    for (let [key, value] of Object.entries(props)) {
         
         if (key in mappedKeys)
             key = mappedKeys[key];

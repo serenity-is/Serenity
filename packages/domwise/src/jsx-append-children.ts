@@ -31,12 +31,6 @@ function replaceNode(oldNode: Node, newNode: Node) {
 }
 
 function wrapAsNode(value: any): Node {
-    if (typeof value === "string") {
-        return document.createTextNode(value);
-    }
-    if (typeof value === "number") {
-        return document.createTextNode(value.toString());
-    }
     if (value instanceof DocumentFragment) {
         ++fragmentPlaceholderIdx;
         value.prepend(document.createComment(placeholderPrefix + fragmentPlaceholderIdx));
@@ -46,10 +40,10 @@ function wrapAsNode(value: any): Node {
     if (value instanceof Node) {
         return value;
     }
-    if (value == null || value === false) {
+    if (!isVisibleChild(value)) {
         return document.createComment("");
     }
-    return value;
+    return document.createTextNode(value);
 }
 
 function appendChildrenWithSignal(parent: Node, signal: SignalLike<any>) {

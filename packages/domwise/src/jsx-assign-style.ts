@@ -1,6 +1,6 @@
-import { isSignalLike, observeSignal } from "./signal-util";
 import type { JSXElement } from "../types";
-import { isNumber, isObject, isString, keys } from "./util";
+import { isSignalLike, observeSignal } from "./signal-util";
+import { isNumber, isObject, isString } from "./util";
 
 /**
  * Copyright (c) Facebook, Inc. and its affiliates.
@@ -76,13 +76,11 @@ let isUnitlessNumber = /*#__PURE__*/ (() => {
      */
     const prefixes = ["Webkit", "ms", "Moz", "O"]
 
-    // Using Object.keys here, or else the vanilla for-in loop makes IE8 go into an
-    // infinite loop, because it iterates over the newly added props too.
-    keys(rec).forEach((prop) => {
+    Object.keys(rec).forEach((prop) => {
         prefixes.forEach((prefix) => {
-            rec[prefixKey(prefix, prop)] = 0 // isUnitlessNumber[prop]
-        })
-    })
+            rec[prefixKey(prefix, prop)] = 0;
+        });
+    });
 
     return rec;
 })();
@@ -139,8 +137,8 @@ export function assignStyle(node: JSXElement, value?: any, prev?: boolean | any)
 
         Object.entries(value).forEach(([key, val]) => {
             if (isSignalLike(val)) {
-                observeSignal(val, args => setStylePropValue(node, key, args.newValue), { 
-                    lifecycleNode: node 
+                observeSignal(val, args => setStylePropValue(node, key, args.newValue), {
+                    lifecycleNode: node
                 });
             }
             else {

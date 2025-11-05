@@ -66,7 +66,7 @@ type PropBindingThis<T> = {
 
 function propBinding<T>(this: PropBindingThis<T>, value?: T | null | undefined | false) {
     if (arguments.length && value !== this.value) {
-        this.node && assignProp(this.node as JSXElement, this.prop, value);
+        this.node && assignProp(this.node as JSXElement, this.prop, value, this.value);
         this.value = value;
     }
     return this.value;

@@ -1,4 +1,4 @@
-import { derivedSignal, isSignalLike, isWritableSignal, isReadonlySignal, observeSignal } from "../src/signal-util";
+import { derivedSignal, isSignalLike, isWritableSignal, isReadonlySignal, observeSignal, PrimitiveComputed } from "../src/signal-util";
 import { computed, signal } from "../src/signals";
 import { mockSignal } from "./mocks/mock-signal";
 
@@ -35,6 +35,50 @@ describe("isWritableSignal", () => {
     it("returns false for non-signal objects", () => {
         expect(isWritableSignal({})).toBe(false);
         expect(isWritableSignal(null)).toBe(false);
+    });
+
+    it("returns true for signals with value setter in prototype chain", () => {
+        // Create a signal-like object with value setter in prototype
+        const proto = {};
+        Object.defineProperty(proto, 'value', {
+            set() { },
+            enumerable: true,
+            configurable: true
+        });
+
+        const obj = Object.create(proto);
+        obj.subscribe = () => {};
+        obj.peek = () => {};
+        obj.value = 42;
+
+        expect(isWritableSignal(obj)).toBe(true);
+    });
+
+    it("returns false for signals with non-writable value in prototype chain", () => {
+        // Create a signal-like object with non-writable value in prototype
+        const proto = {};
+        Object.defineProperty(proto, 'value', {
+            writable: false,
+            value: 42,
+            enumerable: true,
+            configurable: true
+        });
+
+        const obj = Object.create(proto);
+        obj.subscribe = () => {};
+        obj.peek = () => {};
+
+        expect(isWritableSignal(obj)).toBe(false);
+    });
+
+    it("returns false for signal-like objects without value property in prototype chain", () => {
+        // Create a signal-like object without any value property in prototype chain
+        const obj: any = {};
+        obj.subscribe = () => {};
+        obj.peek = () => {};
+        // Don't add value property anywhere
+
+        expect(isWritableSignal(obj)).toBe(false);
     });
 });
 
@@ -107,6 +151,27 @@ describe("observeSignal", () => {
         sig.value = 2;
         expect(callback).not.toHaveBeenCalled();
     });
+
+    it("handles lifecycle node changes", () => {
+        const sig = signal(1);
+        const lifecycleNode = document.createElement('div');
+        const callback = vi.fn();
+
+        const disposer = observeSignal(sig, callback, { lifecycleNode });
+        expect(disposer).toBeDefined();
+
+        disposer();
+    });
+
+    it("handles useLifecycleRoot option", () => {
+        const sig = signal(1);
+        const callback = vi.fn();
+
+        const disposer = observeSignal(sig, callback, { useLifecycleRoot: true });
+        expect(disposer).toBeDefined();
+
+        disposer();
+    });
 });
 
 describe("createDerivedSignal", () => {
@@ -136,5 +201,121 @@ describe("createDerivedSignal", () => {
         expect(typeof derived.derivedDisposer).toBe('function');
         signalMock.value = 50;
         expect(derived.value).toBe(100);
+    });
+
+    it("should throw error for non-signal input", () => {
+        expect(() => derivedSignal({} as any, value => value)).toThrow("Input must be a SignalLike");
+        expect(() => derivedSignal(null as any, value => value)).toThrow("Input must be a SignalLike");
+        expect(() => derivedSignal(42 as any, value => value)).toThrow("Input must be a SignalLike");
+    });
+
+    it("should create derived signal using constructor when available", () => {
+        // Create a mock signal with a working constructor
+        class MockSignal {
+            constructor(fn: () => any) {
+                this.value = fn();
+            }
+            value: any;
+            subscribe(callback: (value: any) => void) {
+                callback(this.value);
+                return () => {};
+            }
+            peek() {
+                return this.value;
+            }
+        }
+
+        const original = new MockSignal(() => 10);
+        const derived = derivedSignal(original, value => value * 2);
+        
+        // Should be an instance of MockSignal
+        expect(derived).toBeInstanceOf(MockSignal);
+        expect(derived.value).toBe(20);
+    });
+});
+
+describe("PrimitiveComputed", () => {
+    it("should initialize with computed value", () => {
+        let callCount = 0;
+        const comp = new PrimitiveComputed(() => {
+            callCount++;
+            return callCount * 2;
+        });
+        expect(comp.value).toBe(2);
+        expect(callCount).toBe(1);
+    });
+
+    it("should update value when update is called", () => {
+        let base = 1;
+        const comp = new PrimitiveComputed(() => base * 2);
+        expect(comp.value).toBe(2);
+
+        base = 3;
+        comp.update();
+        expect(comp.value).toBe(6);
+    });
+
+    it("should not update subscribers if value unchanged", () => {
+        let base = 1;
+        const comp = new PrimitiveComputed(() => base);
+        const callback = vi.fn();
+        comp.subscribe(callback);
+        callback.mockClear();
+
+        comp.update(); // value still 1
+        expect(callback).not.toHaveBeenCalled();
+    });
+
+    it("should update subscribers if value changed", () => {
+        let base = 1;
+        const comp = new PrimitiveComputed(() => base);
+        const callback = vi.fn();
+        comp.subscribe(callback);
+        callback.mockClear();
+
+        base = 2;
+        comp.update();
+        expect(callback).toHaveBeenCalledWith(2);
+    });
+
+    it("should force update even if value unchanged when force=true", () => {
+        const comp = new PrimitiveComputed(() => 42);
+        const callback = vi.fn();
+        comp.subscribe(callback);
+        callback.mockClear();
+
+        comp.update(true); // force update
+        expect(callback).toHaveBeenCalledWith(42);
+    });
+
+    it("should return current value from peek", () => {
+        const comp = new PrimitiveComputed(() => 123);
+        expect(comp.peek()).toBe(123);
+    });
+
+    it("should handle multiple subscribers", () => {
+        let value = 1;
+        const comp = new PrimitiveComputed(() => value);
+        const callback1 = vi.fn();
+        const callback2 = vi.fn();
+
+        const disposer1 = comp.subscribe(callback1);
+        const disposer2 = comp.subscribe(callback2);
+
+        value = 2;
+        comp.update();
+
+        expect(callback1).toHaveBeenCalledWith(2);
+        expect(callback2).toHaveBeenCalledWith(2);
+
+        disposer1();
+        callback1.mockClear();
+        callback2.mockClear();
+
+        value = 3;
+        comp.update();
+
+        expect(callback1).not.toHaveBeenCalled();
+        expect(callback2).toHaveBeenCalledWith(3);
     });
 });

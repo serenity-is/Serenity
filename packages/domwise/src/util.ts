@@ -1,17 +1,8 @@
 import { type PropHook, type ComponentClass } from "../types";
 import { initPropHookSymbol } from "./prop-hook";
 
-export const keys: <T>(obj: T) => Array<keyof T> = Object.keys as any;
-
-export function forEach<V = any>(value: { [key: string]: V }, fn: (value: V, key: string) => void) {
-    if (!value) return;
-    for (const key of keys(value)) {
-        fn(value[key], key as any);
-    }
-}
-
 export function isElement(val: any): val is Element {
-    return val && typeof val.nodeType === "number";
+    return !!(val && typeof val.nodeType === "number");
 }
 
 export function isString(val: any): val is string {

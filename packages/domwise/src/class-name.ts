@@ -1,4 +1,4 @@
-import { isObject, isVisibleChild, keys } from "./util"
+import { isObject, isVisibleChild } from "./util"
 
 /**
  * Convert a `value` to a className string.
@@ -11,7 +11,7 @@ export function className(value: any): string {
         if (Symbol.iterator in value) {
             return className(Array.from(value))
         }
-        return keys(value)
+        return Object.keys(value)
             .filter(k => value[k])
             .join(" ")
     } else if (isVisibleChild(value)) {

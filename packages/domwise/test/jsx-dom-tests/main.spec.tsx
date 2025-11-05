@@ -490,28 +490,22 @@ describe("jsx-dom main", () => {
         })
     })
 
-    const _it =
-        (name: string, fn: (resolve: () => void, reject: (reason?: any) => void) => void) => () =>
-            it(name, () => new Promise<void>(fn))
-
     describe("events", () => {
-        _it("supports event listeners", done => {
+        it("supports event listeners", () => new Promise<void>(done => {
             const button = (<button onClick={() => done()} />) as HTMLButtonElement
             button.click()
-        })
+        }));
 
-        _it("supports capture event listeners", (done, reject) => {
-            const button = (
-                <button
-                    onClickCapture={event => {
-                        event.stopImmediatePropagation()
-                        done()
-                    }}
-                    onClick={() => reject("`onClickCapture` was not called")}
-                />
-            ) as HTMLButtonElement
+        it("supports capture event listeners", () => new Promise<void>((done, reject) => {
+            const button = <button
+                onClickCapture={event => {
+                    event.stopImmediatePropagation()
+                    done()
+                }}
+                onClick={() => reject("`onClickCapture` was not called")}
+            /> as HTMLButtonElement;
             button.click()
-        })
+        }));
 
         it("uses `element.on...` properties", () => {
             const button = (<button onClick={() => void 0} />) as HTMLButtonElement
@@ -526,51 +520,55 @@ describe("jsx-dom main", () => {
             expect(button.customEvent).to.not.be.a("function")
         })
 
-        _it("supports custom events", done => {
+        it("supports custom events", () => new Promise<void>((done) => {
             const button = (<button {...{ onCustomEvent: () => done() } as any} />) as HTMLButtonElement
             button.dispatchEvent(new window.Event("customEvent"))
-        })
+        }));
 
-        _it("supports event listeners using `on` attribute", done => {
+        it("supports event listeners using `on` attribute", () => new Promise<void>((done) => {
             const button = (<button on={{ click: () => done() }} />) as HTMLButtonElement
             button.click()
-        })
+        }));
 
-        _it("supports capture event listeners using `onCapture` attribute", (done, reject) => {
+        it("supports capture event listeners using `onCapture` attribute", () => new Promise<void>((done, reject) => {
             const button = (
                 <button
                     onCapture={{
-                        click: event => {
+                        click: (event: Event) => {
                             event.stopImmediatePropagation()
                             done()
-                        },
+                        }
                     }}
                     onClick={() => reject("`onCapture` was not called")}
                 />
             ) as HTMLButtonElement
-            button.click()
-        })
+            button.click();
+        }));
 
-        _it("supports custom events using `on` attribute", done => {
+        it("supports custom events using `on` attribute", () => new Promise<void>(done => {
             const button = (<button on={{ CustomEvent: () => done() }} />) as HTMLButtonElement
             button.dispatchEvent(new window.Event("CustomEvent"))
-        })
-        _it("maps onDoubleClick to dblclick event", done => {
+        }));
+
+        it("maps onDoubleClick to dblclick event", () => new Promise<void>(done => {
             const button = (<button onDoubleClick={() => done()} />) as HTMLButtonElement
             button.dispatchEvent(new window.Event("dblclick"))
-        })
-        _it("maps onDblClick to dblclick event", done => {
+        }));
+
+        it("maps onDblClick to dblclick event", () => new Promise<void>(done => {
             const button = (<button onDblClick={() => done()} />) as HTMLButtonElement
             button.dispatchEvent(new window.Event("dblclick"))
-        })
-        _it("maps onDoubleClickCapture to dblclick event", done => {
+        }));
+
+        it("maps onDoubleClickCapture to dblclick event", () => new Promise<void>(done => {
             const button = (<button onDoubleClickCapture={() => done()} />) as HTMLButtonElement
             button.dispatchEvent(new window.Event("dblclick"))
-        })
-        _it("maps onDblClickCapture to dblclick event", done => {
+        }));
+
+        it("maps onDblClickCapture to dblclick event", () => new Promise<void>(done => {
             const button = (<button onDblClickCapture={() => done()} />) as HTMLButtonElement
             button.dispatchEvent(new window.Event("dblclick"))
-        })
+        }));
     })
 
     describe("forwardRef", () => {
