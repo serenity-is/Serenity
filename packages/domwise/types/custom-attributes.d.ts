@@ -1,28 +1,5 @@
-import type { ClassNames } from "./classname";
-import type { ShadowRootContainer } from "./components";
-import type { JSXElement } from "./jsx-element";
-import type { Ref } from "./ref-types";
-import type { SignalOrValue } from "./signal-like";
-
-type ComponentChild =
-    | string
-    | number
-    | Iterable<ComponentChild>
-    | Array<ComponentChild>
-    | { value: ComponentChild, peek: () => ComponentChild, subscribe: (cb: (newValue: ComponentChild) => void) => void }
-    | JSXElement
-    | NodeList
-    | ChildNode
-    | HTMLCollection
-    | ShadowRootContainer
-    | DocumentFragment
-    | Text
-    | Comment
-    | boolean
-    | null
-    | undefined
-
-export type ComponentChildren = ComponentChild[] | ComponentChild;
+import type { Ref, SignalOrValue } from "./basic-types";
+import type { ComponentChildren } from "./jsx-namespace";
 
 export interface CustomDomAttributes<T> {
     children?: ComponentChildren;
@@ -34,7 +11,7 @@ export interface CustomDomAttributes<T> {
     onCapture?: Record<string, Function>;
 }
 
-declare module "./dom-expressions-jsx" {
+declare module "./jsx-elements" {
     interface ElementAttributes<T> {
         className?: ElementAttributes<T>["class"];
         tabIndex?: SignalOrValue<number | string | RemoveAttribute>;

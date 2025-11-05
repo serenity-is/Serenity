@@ -1,4 +1,4 @@
-import type { SignalLike } from "#types";
+import type { SignalLike } from "../../types";
 
 export function mockSignal<T>(initialValue: T): SignalLike<T> & {
     set value(value: T),

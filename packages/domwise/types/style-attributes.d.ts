@@ -1,4 +1,4 @@
-import type { SignalOrValue } from "./signal-like";
+import type { SignalOrValue } from "./basic-types";
 
 type RemoveIndex<T> = { [K in keyof T as string extends K ? never : number extends K ? never : K]: T[K] };
 // eslint-disable-next-line @typescript-eslint/no-unsafe-function-type

@@ -1,4 +1,4 @@
-import type { StyleProperties } from "#types"
+import type { StyleProperties } from "../../types"
 
 describe("CSS", () => {
     it("supports numeric CSS properties", () => {

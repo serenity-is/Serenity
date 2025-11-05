@@ -1,4 +1,5 @@
-import { type ComponentClass } from "../types";
+import { type PropHook, type ComponentClass } from "../types";
+import { initPropHookSymbol } from "./prop-hook";
 
 export const keys: <T>(obj: T) => Array<keyof T> = Object.keys as any;
 
@@ -31,6 +32,10 @@ export function isComponentClass(val: Function & { isComponent?: boolean }): val
 
 export function isArrayLike(val: any): val is ArrayLike<any> {
     return isObject(val) && typeof val.length === "number" && typeof val.nodeType !== "number";
+}
+
+export function isPropHook(value: any): value is PropHook {
+    return typeof value === "function" && typeof value[initPropHookSymbol] === "function";
 }
 
 // https://facebook.github.io/react/docs/jsx-in-depth.html#booleans-null-and-undefined-are-ignored

@@ -1,8 +1,8 @@
-import { attachRef } from "./ref";
+import { setRef } from "./ref";
 import { isShadowRoot } from "./shadow";
 import { isSignalLike, observeSignal } from "./signal-util";
 import type { ComponentChildren, SignalLike } from "../types";
-import { isArrayLike, isElement, isNumber, isString } from "./util";
+import { isArrayLike, isElement, isNumber, isString, isVisibleChild } from "./util";
 
 function appendChild(parent: Node, child: Node) {
     if (parent instanceof window.HTMLTemplateElement) {
@@ -88,20 +88,19 @@ export function appendChildren(
     parent: Node,
     children: ComponentChildren,
 ) {
+    if (!isVisibleChild(children)) return;
     if (isArrayLike(children)) {
         for (const child of [...(children as any[])]) {
             appendChildren(parent, child);
         }
     } else if (isString(children) || isNumber(children)) {
         appendChild(parent, document.createTextNode(children as any));
-    } else if (children === null) {
-        appendChild(parent, document.createComment(""));
     } else if (isElement(children)) {
         appendChild(parent, children);
     } else if (isShadowRoot(children)) {
         const shadowRoot = (parent as HTMLElement).attachShadow(children.attr);
         appendChildren(shadowRoot, children.children);
-        attachRef(children.ref, shadowRoot);
+        setRef(children.ref, shadowRoot);
     } else if (isSignalLike(children)) {
         appendChildrenWithSignal(parent, children);
     }

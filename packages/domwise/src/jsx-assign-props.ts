@@ -2,9 +2,10 @@ import type { JSXElement } from "../types";
 import { addDisposingListener } from "./disposing-listener";
 import { assignClass } from "./jsx-assign-class";
 import { assignStyle } from "./jsx-assign-style";
+import { initPropHookSymbol } from "./prop-hook";
 import { isSignalLike, observeSignal } from "./signal-util";
 import { nonPresentationSVGAttributes } from "./svg-consts";
-import { forEach, isObject, isVisibleChild, keys } from "./util";
+import { forEach, isObject, isPropHook, isVisibleChild, keys } from "./util";
 
 const XLinkNamespace = "http://www.w3.org/1999/xlink";
 const XMLNamespace = "http://www.w3.org/XML/1998/namespace";
@@ -13,22 +14,18 @@ function normalizeAttribute(s: string, separator: string) {
     return s.replace(/[A-Z]/g, match => separator + match.toLowerCase());
 }
 
-const propToAttr: Record<string, string> = {
+const mappedKeys: Record<string, string> = {
     className: "class",
     contentEditable: "contenteditable",
     htmlFor: "for",
-    tabIndex: "tabindex",
-    spellCheck: "spellcheck",
+    innerText: "textContent",
+    maxLength: "maxlength",
     readOnly: "readonly",
-    maxLength: "maxlength"
+    spellCheck: "spellcheck",
+    tabIndex: "tabindex",
 }
 
-function assignProp(node: JSXElement, key: string, value: any, prev?: any) {
-
-    const propAttr = propToAttr[key];
-    if (propAttr) {
-        key = propAttr;
-    }
+export function assignProp(node: JSXElement, key: string, value: any, prev?: any) {
 
     switch (key) {
         case "dataset":
@@ -46,8 +43,6 @@ function assignProp(node: JSXElement, key: string, value: any, prev?: any) {
             })
             return;
 
-        case "innerHTML":
-        case "innerText":
         case "textContent":
             if (isVisibleChild(value)) {
                 (node as any)[key] = value
@@ -257,12 +252,19 @@ function assignProp(node: JSXElement, key: string, value: any, prev?: any) {
 }
 
 export function assignProps(node: JSXElement, props: Record<string, any>) {
-    for (const key of keys(props)) {
+    for (let key of keys(props)) {
         let value = props[key];
+        
+        if (key in mappedKeys)
+            key = mappedKeys[key];
+
         if (isSignalLike(value)) {
             observeSignal(value, (args) => assignProp(node, key, args.newValue, args.prevValue), {
                 lifecycleNode: node
             });
+        }
+        else if (isPropHook(value)) {
+            (value as any)[initPropHookSymbol](node, key);
         }
         else {
             assignProp(node, key, value);

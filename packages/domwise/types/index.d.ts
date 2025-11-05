@@ -1,10 +1,7 @@
-export type * from "./classname";
+export type * from "./basic-types";
 export type * from "./components";
 export type * from "./custom-attributes";
-export type { ElementAttributes, HTMLElementTags, SVGElementTags, MathMLElementTags } from "./dom-expressions-jsx";
-export type * from "./jsx-element";
+export type { ElementAttributes, HTMLElementTags, MathMLElementTags, SVGElementTags } from "./jsx-elements";
 export type * from "./jsx-namespace";
-export type * from "./ref-types";
-export type * from "./signal-like";
 export type * from "./style-attributes";
 

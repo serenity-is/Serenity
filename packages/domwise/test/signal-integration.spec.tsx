@@ -1,4 +1,4 @@
-import { invokeDisposingListeners } from "#src/disposing-listener";
+import { invokeDisposingListeners } from "../src/disposing-listener";
 import { describe, expect, it } from "vitest";
 import { mockSignal } from "./mocks/mock-signal";
 

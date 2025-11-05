@@ -1,4 +1,4 @@
-import { SVGNamespace } from "#src/svg-consts"
+import { SVGNamespace } from "../../src/svg-consts"
 
 describe("SVG", () => {
     const namespace = SVGNamespace

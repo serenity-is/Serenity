@@ -1,14 +1,12 @@
-import type { ComponentChildren, JSXElement } from "../types"
-import type { ElementAttributes, HTMLElementTags, SVGElementTags } from "../types"
+import type { ComponentChildren, ElementAttributes, HTMLElementTags, JSXElement, SVGElementTags } from "../types"
 import { initComponentClass } from "./component"
 import { currentNamespaceURI } from "./in-namespace-uri"
 import { appendChildren } from "./jsx-append-children"
 import { assignProps } from "./jsx-assign-props"
 import { MathMLNamespace, mathMLOnlyTags } from "./mathml-consts"
-import { attachRef } from "./ref"
+import { setRef } from "./ref"
 import { SVGNamespace, svgOnlyTags } from "./svg-consts"
 import { isComponentClass, isObject, isString } from "./util"
-
 
 type DataKeys = `data-${string}`
 
@@ -62,7 +60,7 @@ export function jsx(tag: any, props?: { children?: ComponentChildren, [key: stri
             }
         }
 
-        attachRef(attr.ref, node)
+        setRef(attr.ref, node)
     } else if (typeof tag === "function") {
         // Custom elements.
         if (isObject(tag.defaultProps)) {

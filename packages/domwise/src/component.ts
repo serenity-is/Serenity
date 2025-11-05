@@ -1,4 +1,4 @@
-import { attachRef } from "./ref";
+import { setRef } from "./ref";
 import type { ComponentChildren, ComponentClass, JSXElement, Ref } from "../types";
 
 export class Component<T = any> {
@@ -20,7 +20,7 @@ export function initComponentClass(Class: ComponentClass, attr: any, children: a
     const instance = new Class(attr)
     const node = instance.render()
     if ("ref" in attr) {
-        attachRef(attr.ref, instance)
+        setRef(attr.ref, instance)
     }
     return node
 }

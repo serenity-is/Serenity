@@ -1,5 +1,4 @@
-import { useRef } from "#src/compat-api"
-import { useClassList, useText } from "#src/hooks"
+import { useClassList, useRef, useText } from "../../src/hooks"
 import { describe, expect, it } from "vitest"
 
 describe("hooks", () => {

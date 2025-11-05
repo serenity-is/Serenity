@@ -1,5 +1,6 @@
 import * as signals from "@preact/signals-core";
 import { type Computed, type Signal, type SignalLike } from "../types";
+import { isSignalLike } from "./signal-util";
 
 export interface SignalOptions<T> {
     watched?: (this: SignalLike<T>) => void;
@@ -24,3 +25,7 @@ export const computed: (<T>(fn: () => T, options?: SignalOptions<T>) => Computed
 export const effect: ((fn: EffectFn, options?: EffectOptions) => () => void) = signals.effect;
 export const batch: (<T>(fn: () => T) => T) = signals.batch;
 export const untracked: (<T>(fn: () => T) => T) = signals.untracked;
+
+export function useSignal<T>(initialValue: T): Signal<T> {
+    return signal(initialValue);
+}

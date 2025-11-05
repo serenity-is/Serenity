@@ -1,5 +1,7 @@
-import { MathMLNamespace, SVGNamespace, inHTMLNamespace, inMathMLNamespace, inNamespaceURI, inSVGNamespace } from "#src";
-import { JSXElement } from "#types";
+import { inHTMLNamespace, inMathMLNamespace, inNamespaceURI, inSVGNamespace } from "../src/in-namespace-uri";
+import { MathMLNamespace } from "../src/mathml-consts";
+import { SVGNamespace } from "../src/svg-consts";
+import { JSXElement } from "../types";
 
 describe("supports namespaceURI attribute", () => {
     it("allows setting namespaceURI on elements", () => {

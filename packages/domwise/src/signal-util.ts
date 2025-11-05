@@ -1,10 +1,38 @@
 import { addDisposingListener, currentLifecycleRoot, removeDisposingListener } from "./disposing-listener";
-import { type EffectDisposer, type SignalLike } from "../types";
+import { type Computed, type EffectDisposer, type Signal, type SignalLike } from "../types";
 
-export function isSignalLike(val: any): val is SignalLike<any> {
-    return val != null && typeof val === "object" && typeof val.subscribe === "function" && typeof val.peek === "function" && 'value' in val;
+/** A type guard that checks if an object is signal-like, meaning it has subscribe and peek methods, and a value property. */
+export function isSignalLike<T = any>(obj: any): obj is SignalLike<T> {
+    return obj != null && typeof obj === "object" && typeof obj.subscribe === "function" && typeof obj.peek === "function" && 'value' in obj;
 }
 
+/** A type guard that checks if an object is a writable signal-like, meaning it passes the isSignalLike check and has a value setter. */
+export function isWritableSignal<T>(obj: any): obj is Signal<T> {
+    if (!isSignalLike(obj))
+        return false;
+
+    // Walk the prototype chain to find the 'value' descriptor
+    let descriptor: PropertyDescriptor | undefined;
+    let current = obj;
+    while (current && !descriptor) {
+        if (descriptor = Object.getOwnPropertyDescriptor(current, "value")) {
+            if ("writable" in descriptor) {
+                return Boolean(descriptor.writable);
+            }
+            return typeof descriptor.set === "function";
+        }
+        current = Object.getPrototypeOf(current);
+    }
+
+    return false;
+}
+
+/** A type guard that checks if an object is a readonly signal-like, meaning it passes the isSignalLike check and has no value setter. */
+export function isReadonlySignal<T = any>(obj: any): obj is Computed<T> {
+    return isSignalLike(obj) && !isWritableSignal(obj);
+}
+
+/** Arguments for the observeSignal function */
 export type SignalObserveArgs<T> = {
     /** True if this is the initial call upon subscription. */
     isInitial: boolean
@@ -88,12 +116,9 @@ class SignalObserveArgsImpl<T> implements SignalObserveArgs<T> {
 export type ObserveSignalCallback<T> = (args: SignalObserveArgs<T>) => void;
 
 /**
- * This calls the callback whenever the signal value changes. It is 
- * called immediately upon subscription with the current value. The callback
- * is called with an argument object that provides information about the signal
- * and the change.
+ * Observes a signal and calls the callback immediately upon subscription and when the signal changes.
  * @param signal Signal to observe
- * @param callback Callback to execute when the signal value changes.
+ * @param callback Callback to execute immediately upon subscription and when the signal value changes.
  */
 export function observeSignal<T>(signal: SignalLike<T>, callback: ObserveSignalCallback<T>, opt?: {
     /** 
@@ -133,6 +158,7 @@ export interface DerivedSignalLike<T> extends SignalLike<T> {
     derivedDisposer?: () => void;
 }
 
+/** Creates a derived signal from a computation function */
 export function derivedSignal<TDerived, TInput = any>(input: SignalLike<TInput>, fn: (value: TInput) => TDerived): DerivedSignalLike<TDerived> {
 
     if (!isSignalLike(input)) {
@@ -141,7 +167,7 @@ export function derivedSignal<TDerived, TInput = any>(input: SignalLike<TInput>,
 
     const callback = () => fn(input.value);
 
-    if (typeof input.constructor === "function") {
+    if (typeof input.constructor === "function" && input.constructor !== {}.constructor) {
         try {
             let derived = new (input.constructor as any)(callback);
             let disposer: EffectDisposer;
@@ -152,7 +178,7 @@ export function derivedSignal<TDerived, TInput = any>(input: SignalLike<TInput>,
                     });
                 }
                 if (disposer) {
-                    (derived as DerivedSignalLike<TDerived>).derivedDisposer = function() {
+                    (derived as DerivedSignalLike<TDerived>).derivedDisposer = function () {
                         disposer();
                         delete (derived as DerivedSignalLike<TDerived>).derivedDisposer;
                     }
@@ -170,9 +196,9 @@ export function derivedSignal<TDerived, TInput = any>(input: SignalLike<TInput>,
             return;
         }
         primitive.update();
-    }); 
+    });
     if (disposer) {
-        (primitive as DerivedSignalLike<TDerived>).derivedDisposer = function() {
+        (primitive as DerivedSignalLike<TDerived>).derivedDisposer = function () {
             disposer();
             delete (primitive as any).derivedDisposer;
         }

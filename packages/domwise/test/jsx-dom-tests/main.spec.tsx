@@ -1,9 +1,9 @@
-import { createElement, useImperativeHandle, useRef } from "#src/compat-api"
-import { Component } from "#src/component"
-import { useText } from "#src/hooks"
-import { Fragment, jsx } from "#src/jsx-runtime"
-import { createRef } from "#src/ref"
-import type { HTMLElementTags, Ref } from "#types"
+import { createElement, useImperativeHandle } from "../../src/compat-api"
+import { Component } from "../../src/component"
+import { useRef, useText } from "../../src/hooks"
+import { Fragment, jsx } from "../../src/jsx-runtime"
+import { createRef } from "../../src/ref"
+import type { HTMLElementTags, Ref } from "../../types"
 
 describe("jsx-dom main", () => {
     it("creates a <div> element", () => {
@@ -235,11 +235,10 @@ describe("jsx-dom main", () => {
             })
         })
 
-        it("supports innerHTML, innerText and textContent", () => {
+        it("supports textContent and innerText", () => {
             //don't support
-            //expect((<div innerHTML="<div></div><div></div>" />).querySelectorAll("div").length).toBe(2)
-            //expect((<div innerText="<img>" />).querySelectorAll("img")).to.be.empty
-            //expect((<div innerText="<img>" />).textContent).toBe("<img>")
+            expect((<div innerText="<img>" />).querySelectorAll("img")).to.be.empty
+            expect((<div innerText="<img>" />).textContent).toBe("<img>")
             expect((<div textContent="<img>" />).querySelectorAll("img")).to.be.empty
         })
 
@@ -364,7 +363,7 @@ describe("jsx-dom main", () => {
             const Button = function ({ ref, ...props }: { ref: typeof buttonRef, [key: string]: any }) {
                 useImperativeHandle(ref, () => ({
                     focus: () => "ping",
-                }))
+                }));
                 return <button {...props} />
             }
 

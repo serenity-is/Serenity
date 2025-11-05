@@ -1,6 +1,5 @@
-import type { ComponentChildren } from "./custom-attributes";
-import type { JSXElement } from "./jsx-element";
-import type { Ref } from "./ref-types";
+import type { Ref } from "./basic-types";
+import type { ComponentChildren, JSXElement } from "./jsx-namespace";
 
 export interface ComponentClass<P = {}, T extends Node = JSXElement> {
     new(props: P): ComponentClass<P, T>
@@ -25,3 +24,4 @@ export type ShadowRootContainer = {
     };
     children: ComponentChildren;
 }
+

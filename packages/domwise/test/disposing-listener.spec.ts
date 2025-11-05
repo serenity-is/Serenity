@@ -1,4 +1,4 @@
-import { addDisposingListener, getDisposingListeners, invokeDisposingListeners, removeDisposingListener } from "#src/disposing-listener";
+import { addDisposingListener, getDisposingListeners, invokeDisposingListeners, removeDisposingListener, dispatchDisposingEvent, currentLifecycleRoot } from "../src/disposing-listener";
 
 let el: HTMLElement;
 
@@ -142,6 +142,10 @@ describe("removeDisposingListener", () => {
 });
 
 describe("invokeDisposingListeners", () => {
+    it("ignores null target", () => {
+        expect(() => invokeDisposingListeners(null as any)).not.toThrow();
+    });
+
     it("should call the callback when the disposing event is dispatched", () => {
         const callback = vi.fn();
         addDisposingListener(el, () => callback());
@@ -201,5 +205,108 @@ describe("invokeDisposingListeners", () => {
         expect(el.addEventListener).toHaveBeenCalledOnce();
         invokeDisposingListeners(el);
         expect(el.removeEventListener).toHaveBeenCalledWith("disposing", (el.addEventListener as any).mock.calls[0][1]);
+    });
+
+    it("invokes listeners on descendants when opt.descendants is true", () => {
+        const parent = document.createElement("div");
+        const child = document.createElement("span");
+        parent.appendChild(child);
+
+        const parentListener = vi.fn();
+        const childListener = vi.fn();
+
+        addDisposingListener(parent, parentListener);
+        addDisposingListener(child, childListener);
+
+        invokeDisposingListeners(parent, { descendants: true });
+
+        expect(childListener).toHaveBeenCalledOnce();
+        expect(parentListener).toHaveBeenCalledOnce();
+    });
+
+    it("excludes self when opt.excludeSelf is true", () => {
+        const listener = vi.fn();
+        addDisposingListener(el, listener);
+        invokeDisposingListeners(el, { excludeSelf: true });
+        expect(listener).not.toHaveBeenCalled();
+    });
+
+    it("does not invoke descendants if node has no children", () => {
+        const noChildEl = document.createElement("div");
+        const listener = vi.fn();
+        addDisposingListener(noChildEl, listener);
+        invokeDisposingListeners(noChildEl, { descendants: true });
+        expect(listener).toHaveBeenCalledOnce();
+        // No descendants, so only self
+    });
+
+    it("does not invoke descendants if node is not an Element", () => {
+        const nonElementTarget = new EventTarget();
+        const listener = vi.fn();
+        addDisposingListener(nonElementTarget, listener);
+        invokeDisposingListeners(nonElementTarget, { descendants: true });
+        expect(listener).toHaveBeenCalledOnce();
+        // Not an Element, so no descendants logic
+    });
+});
+
+describe("dispatchDisposingEvent", () => {
+    it("dispatches a disposing event on the target", () => {
+        const dispatchSpy = vi.spyOn(el, "dispatchEvent");
+        dispatchDisposingEvent(el);
+        expect(dispatchSpy).toHaveBeenCalledWith(expect.any(CustomEvent));
+        const event = dispatchSpy.mock.calls[0][0] as CustomEvent;
+        expect(event.type).toBe("disposing");
+        expect(event.bubbles).toBe(false);
+        expect(event.cancelable).toBe(false);
+    });
+
+    it("dispatches with custom options", () => {
+        const dispatchSpy = vi.spyOn(el, "dispatchEvent");
+        dispatchDisposingEvent(el, { bubbles: true, cancelable: true });
+        expect(dispatchSpy).toHaveBeenCalledWith(expect.any(CustomEvent));
+        const event = dispatchSpy.mock.calls[0][0] as CustomEvent;
+        expect(event.bubbles).toBe(true);
+        expect(event.cancelable).toBe(true);
+    });
+
+    it("does nothing if target is null", () => {
+        expect(() => dispatchDisposingEvent(null as any)).not.toThrow();
+    });
+
+    it("does nothing if CustomEvent is not available", () => {
+        const originalCustomEvent = globalThis.CustomEvent;
+        delete (globalThis as any).CustomEvent;
+        expect(() => dispatchDisposingEvent(el)).not.toThrow();
+        globalThis.CustomEvent = originalCustomEvent;
+    });
+});
+
+describe("currentLifecycleRoot", () => {
+    it("returns null when no root is set", () => {
+        expect(currentLifecycleRoot()).toBeNull();
+    });
+
+    it("sets and returns the lifecycle root", () => {
+        const root = document.createElement("div");
+        const result = currentLifecycleRoot(root);
+        expect(result).toBeNull(); // previous was null
+        expect(currentLifecycleRoot()).toBe(root);
+    });
+
+    it("returns the previous root when setting a new one", () => {
+        const root1 = document.createElement("div");
+        const root2 = document.createElement("div");
+        currentLifecycleRoot(root1);
+        const result = currentLifecycleRoot(root2);
+        expect(result).toBe(root1);
+        expect(currentLifecycleRoot()).toBe(root2);
+    });
+
+    it("sets to null when passed null", () => {
+        const root = document.createElement("div");
+        currentLifecycleRoot(root);
+        currentLifecycleRoot(null as any);
+        expect(currentLifecycleRoot()).toBeNull();
     });
 });

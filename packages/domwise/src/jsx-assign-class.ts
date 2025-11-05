@@ -1,5 +1,5 @@
 import type { JSXElement } from "../types";
-import { className } from "./classname";
+import { className } from "./class-name";
 import { isSignalLike, observeSignal } from "./signal-util";
 import { isArrayLike, isObject } from "./util";
 
@@ -29,11 +29,6 @@ function clearPrevClass(node: JSXElement, prev?: any): void {
     if (prev == null || prev === false || prev === true)
         return;
 
-    if (typeof prev === "function") {
-        node.setAttribute("class", "");
-        return;
-    }
-
     prev = unsignalizePrevClass(prev);
 
     const prevClassNames = (className(prev) ?? "").split(" ");
@@ -47,14 +42,6 @@ function clearPrevClass(node: JSXElement, prev?: any): void {
 export function assignClass(node: JSXElement, value?: any, prev?: any): void {
     if (value == null || value === false) {
         clearPrevClass(node, prev);
-        return;
-    }
-
-    if (typeof value === "function") {
-        if (prev !== value) {
-            clearPrevClass(node, prev);
-            value(node);
-        }
         return;
     }
 

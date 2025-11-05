@@ -9,6 +9,7 @@
         "outDir": "../dist",
         "rootDir": "..",
         "rootDirs": ["./src", "./test"],
+        "skipLibCheck": true,
         "types": [
             "vitest/globals"
         ]
