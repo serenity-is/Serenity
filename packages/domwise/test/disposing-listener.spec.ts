@@ -31,7 +31,7 @@ describe("addDisposingListener", () => {
         addDisposingListener(el, listener);
         addDisposingListener(el, listener);
         el.dispatchEvent(new Event("disposing"));
-        expect(listener).toHaveBeenCalledOnce();
+        expect(listener).toHaveBeenCalledExactlyOnceWith(el);
     });
 
     it("only adds the disposing event listener once", () => {

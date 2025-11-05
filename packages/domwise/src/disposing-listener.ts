@@ -2,7 +2,7 @@ const disposingListenersSymbol = Symbol.for("Serenity.disposingListeners");
 const lifecycleRootSymbol = Symbol.for("Serenity.lifecycleRoot");
 
 export function getDisposingListeners(): WeakMap<EventTarget, ({
-    callback: () => void,
+    callback: (node: EventTarget) => void,
     regKey?: string
 })[]> {
     return (globalThis as any)[disposingListenersSymbol] ||= new WeakMap();
@@ -54,7 +54,7 @@ export function invokeDisposingListeners(node: EventTarget, opt?: {
         el.removeEventListener("disposing", disposingEventListener);
         for (const disposer of listeners) {
             try {
-                disposer.callback();
+                disposer.callback(el);
             } catch {
                 // ignore
             }
@@ -90,7 +90,7 @@ export function invokeDisposingListeners(node: EventTarget, opt?: {
  * @param regKey An optional registration key to identify the listener.
  * @returns The element that the listener was added to.
  */
-export function addDisposingListener<T extends EventTarget>(target: T, handler: () => void, regKey?: string): T {
+export function addDisposingListener<T extends EventTarget>(target: T, handler: (el: Element) => void, regKey?: string): T {
     if (!target || !handler)
         return target;
     const disposingListeners = getDisposingListeners();
