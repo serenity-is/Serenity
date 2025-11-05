@@ -1,6 +1,7 @@
 export interface PropHook<TNode extends Element = Element> {
 }
 export interface BasicClassList extends PropHook<Element> {
+	(): DOMTokenList;
 	readonly size: number;
 	readonly value: string;
 	add(...tokens: string[]): void;
@@ -2234,7 +2235,7 @@ export declare function invokeDisposingListeners(node: EventTarget, opt?: {
  * @param regKey An optional registration key to identify the listener.
  * @returns The element that the listener was added to.
  */
-export declare function addDisposingListener<T extends EventTarget>(target: T, handler: () => void, regKey?: string): T;
+export declare function addDisposingListener<T extends EventTarget>(target: T, handler: (el: Element) => void, regKey?: string): T;
 /**
  * Removes a disposing listener from an element. Note that this does not remove an event listener from the element,
  * but removes the listener from the list of disposing listeners that will be called when the `disposing` event

@@ -2,7 +2,7 @@ const disposingListenersSymbol = Symbol.for("Serenity.disposingListeners");
 const lifecycleRootSymbol = Symbol.for("Serenity.lifecycleRoot");
 
 export function getDisposingListeners(): WeakMap<EventTarget, ({
-    callback: (node: EventTarget) => void,
+    callback: (el: EventTarget) => void,
     regKey?: string
 })[]> {
     return (globalThis as any)[disposingListenersSymbol] ||= new WeakMap();
