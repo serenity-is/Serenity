@@ -28,7 +28,7 @@ describe("Component", () => {
 
     it("can be used as JSX element", () => {
         class MyComponent extends Component<{ text: string }> {
-            render() {
+            override render() {
                 return <div>{this.props.text}</div>;
             }
         }
@@ -41,7 +41,7 @@ describe("Component", () => {
 
 describe("initComponentClass", () => {
     class TestComponent extends Component {
-        render() {
+        override render() {
             return document.createElement('div');
         }
     }
@@ -64,7 +64,7 @@ describe("initComponentClass", () => {
                 super(props);
                 this.storedProps = props;
             }
-            render() {
+            override render() {
                 return document.createElement('p');
             }
         }

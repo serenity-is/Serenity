@@ -17,7 +17,7 @@ describe("jsx-dom main", () => {
             expect(jsx).to.be.a("function");
             expect(useRef).to.be.a("function");
             expect(useText).to.be.a("function");
-            const element = jsx("div", { children: "test" });
+            jsx("div", { children: "test" }).valueOf();
             function CustomComponent(props: any): any {
                 if (!new.target) return new (CustomComponent as any)(props)
             }
@@ -43,7 +43,7 @@ describe("jsx-dom main", () => {
                 super(props)
             }
 
-            render() {
+            override render() {
                 expect(this.props.a).toBe(1)
                 expect(this.props.b).toBe(2)
                 expect(this.props.c).toBe(3)
@@ -341,7 +341,7 @@ describe("jsx-dom main", () => {
             // #104
             it("class component with ref", () => {
                 class Button extends Component<{ className: string }> {
-                    render() {
+                    override render() {
                         return <button className={this.props.className} />
                     }
                 }
@@ -387,7 +387,7 @@ describe("jsx-dom main", () => {
         it("supports defaultProps in class components", () => {
             class Button extends Component<{ className: string }> {
                 static defaultProps = { className: "defaultClass" }
-                render() {
+                override render() {
                     return <div className={this.props.className} />
                 }
             }

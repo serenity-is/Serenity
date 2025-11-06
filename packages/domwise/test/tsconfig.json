@@ -13,6 +13,8 @@
       "./test"
     ],
     "skipLibCheck": true,
+    "exactOptionalPropertyTypes": false,
+    "strict": false,
     "types": [
       "vitest/globals"
     ]

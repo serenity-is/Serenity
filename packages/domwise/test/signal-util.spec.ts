@@ -300,7 +300,7 @@ describe("PrimitiveComputed", () => {
         const callback2 = vi.fn();
 
         const disposer1 = comp.subscribe(callback1);
-        const disposer2 = comp.subscribe(callback2);
+        comp.subscribe(callback2);
 
         value = 2;
         comp.update();
