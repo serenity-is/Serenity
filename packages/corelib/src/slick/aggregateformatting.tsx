@@ -38,7 +38,7 @@ export namespace AggregateFormatting {
         if (!aggKey)
             return "";
 
-        const value = totals[aggKey][field];
+        const value = totals[aggKey]?.[field];
         let displayName = aggType?.displayName;
         if (!displayName) {
             const textKey = (aggKey.substring(0, 1).toUpperCase() + aggKey.substring(1));
