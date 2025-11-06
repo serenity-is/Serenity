@@ -559,10 +559,23 @@ export namespace Fluent {
      */
     export function toggle(element: Element, flag?: boolean): void {
         if (element) {
-            if ("hidden" in element)
-                element.hidden = flag != null ? !flag : !element.hidden;
-            else
-                toggleClass(element, "hidden", flag);
+            let hidden = !(flag != null ? flag : (
+                ("hidden" in element && !!element.hidden) ||
+                element.classList.contains("hidden") ||
+                (element as any).style?.display === "none"));
+
+            if ("hidden" in element)    
+                element.hidden = hidden;
+
+            if (!hidden) {
+                if ("style" in element &&
+                    (element as any).style?.display === "none") {
+                    (element as any).style.display = "";
+                }
+
+                if (element.classList.contains("hidden"))
+                    element.classList.remove("hidden");
+            }
         }
     }
 
