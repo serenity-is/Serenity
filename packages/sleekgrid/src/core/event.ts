@@ -194,12 +194,11 @@ export function patchEvent(e: IEventData) {
     if (e == null)
         return e;
 
-    if (!("defaultPrevented" in e) && e.isDefaultPrevented) {
+    if (!("defaultPrevented" in e) && typeof e.isDefaultPrevented === "function") {
         Object.defineProperty(e, "defaultPrevented", {
             get: function () {
                 return e.isDefaultPrevented();
             },
-            writable: true,
             enumerable: true,
             configurable: true
         });
