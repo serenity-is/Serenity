@@ -68,9 +68,9 @@ export interface ToolbarOptions {
 }
 
 export class Toolbar<P extends ToolbarOptions = ToolbarOptions> extends Widget<P> {
-    static [Symbol.typeInfo] = this.registerClass(nsSerenity);
+    static override [Symbol.typeInfo] = this.registerClass(nsSerenity);
 
-    protected renderContents(): any {
+    protected override renderContents(): any {
 
         let group = <div class="tool-group" />;
 
@@ -93,7 +93,7 @@ export class Toolbar<P extends ToolbarOptions = ToolbarOptions> extends Widget<P
         return group;
     }
 
-    destroy() {
+    override destroy() {
         this.domNode.querySelectorAll('div.tool-button').forEach(el => Fluent.off(el, 'click'));
         if (this.mouseTrap) {
             if (this.mouseTrap.__listeners) {

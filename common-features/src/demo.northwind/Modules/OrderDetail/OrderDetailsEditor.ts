@@ -5,7 +5,7 @@ import { nsDemoNorthwind } from "../ServerTypes/Namespaces";
 import { OrderDetailDialog } from "./OrderDetailDialog";
 
 export class OrderDetailsEditor<P = {}> extends GridEditorBase<OrderDetailRow, P> {
-    static [Symbol.typeInfo] = this.registerEditor(nsDemoNorthwind);
+    static override [Symbol.typeInfo] = this.registerEditor(nsDemoNorthwind);
     
     protected getColumnsKey() { return OrderDetailColumns.columnsKey; }
     protected getDialogType() { return OrderDetailDialog; }

@@ -4,7 +4,7 @@ import { BaseEditorFiltering } from "./baseeditorfiltering";
 import { FilterOperator } from "./filteroperator";
 
 export class DateFiltering extends BaseEditorFiltering<DateEditor> {
-    static [Symbol.typeInfo] = this.registerClass(nsSerenity);
+    static override [Symbol.typeInfo] = this.registerClass(nsSerenity);
 
     constructor() {
         super(DateEditor)

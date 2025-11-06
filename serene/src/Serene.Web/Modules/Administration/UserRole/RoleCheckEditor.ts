@@ -3,7 +3,7 @@ import { RoleRow } from "../../ServerTypes/Administration/RoleRow";
 import { nsAdministration } from "../../ServerTypes/Namespaces";
 
 export class RoleCheckEditor extends CheckTreeEditor<CheckTreeItem<any>, any> {
-    static [Symbol.typeInfo] = this.registerEditor(nsAdministration);
+    static override [Symbol.typeInfo] = this.registerEditor(nsAdministration);
 
     private searchText: string;
 

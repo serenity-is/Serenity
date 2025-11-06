@@ -5,7 +5,7 @@ import { MembershipValidationTexts, UserDialogTexts } from "../../ServerTypes/Te
 import { UserPermissionDialog } from "../UserPermission/UserPermissionDialog";
 
 export class UserDialog extends EntityDialog<UserRow, any> {
-    static [Symbol.typeInfo] = this.registerClass(nsAdministration);
+    static override [Symbol.typeInfo] = this.registerClass(nsAdministration);
 
     protected getFormKey() { return UserForm.formKey; }
     protected getIdProperty() { return UserRow.idProperty; }

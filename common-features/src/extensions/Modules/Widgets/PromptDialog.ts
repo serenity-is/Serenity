@@ -15,7 +15,7 @@ export interface PromptDialogOptions {
 }
 
 export class PromptDialog<P extends PromptDialogOptions = PromptDialogOptions> extends PropertyDialog<any, P> {
-    static [Symbol.typeInfo] = this.registerClass(nsExtensions);
+    static override [Symbol.typeInfo] = this.registerClass(nsExtensions);
 
     constructor(props: WidgetProps<P>) {
         super(props);

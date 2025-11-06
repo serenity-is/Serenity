@@ -3,7 +3,7 @@ import { TerritoryForm, TerritoryRow, TerritoryService } from "../ServerTypes/De
 import { nsDemoNorthwind } from "../ServerTypes/Namespaces";
 
 export class TerritoryDialog<P = {}> extends EntityDialog<TerritoryRow, P> {
-    static [Symbol.typeInfo] = this.registerClass(nsDemoNorthwind);
+    static override [Symbol.typeInfo] = this.registerClass(nsDemoNorthwind);
 
     protected getFormKey() { return TerritoryForm.formKey; }
     protected getRowDefinition() { return TerritoryRow; }

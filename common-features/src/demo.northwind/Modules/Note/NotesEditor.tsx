@@ -7,7 +7,7 @@ import { bindThis } from "@serenity-is/domwise";
 
 export class NotesEditor<P = {}> extends EditorWidget<P>
     implements IGetEditValue, ISetEditValue {
-    static [Symbol.typeInfo] = this.registerEditor(nsDemoNorthwind, [IGetEditValue, ISetEditValue]);
+    static override [Symbol.typeInfo] = this.registerEditor(nsDemoNorthwind, [IGetEditValue, ISetEditValue]);
     static override createDefaultElement() { return <div /> as HTMLElement }
 
     declare private isDirty: boolean;

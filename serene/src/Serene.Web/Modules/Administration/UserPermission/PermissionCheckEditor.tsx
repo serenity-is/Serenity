@@ -25,7 +25,7 @@ export interface PermissionCheckItem {
 }
 
 export class PermissionCheckEditor<P extends PermissionCheckEditorOptions = PermissionCheckEditorOptions> extends DataGrid<PermissionCheckItem, P> {
-    static [Symbol.typeInfo] = this.registerEditor(nsAdministration, [IGetEditValue, ISetEditValue]);
+    static override [Symbol.typeInfo] = this.registerEditor(nsAdministration, [IGetEditValue, ISetEditValue]);
 
     protected getIdProperty() { return "Key"; }
 

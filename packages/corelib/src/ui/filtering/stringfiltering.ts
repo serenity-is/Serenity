@@ -3,7 +3,7 @@ import { BaseFiltering } from "./basefiltering";
 import { FilterOperator, FilterOperators } from "./filteroperator";
 
 export class StringFiltering extends BaseFiltering {
-    static [Symbol.typeInfo] = this.registerClass(nsSerenity);
+    static override [Symbol.typeInfo] = this.registerClass(nsSerenity);
 
     getOperators(): FilterOperator[] {
         var ops = [
@@ -15,7 +15,7 @@ export class StringFiltering extends BaseFiltering {
         return this.appendNullableOperators(ops);
     }
 
-    validateEditorValue(value: string) {
+    override validateEditorValue(value: string) {
         if (value.length === 0) {
             return value;
         }

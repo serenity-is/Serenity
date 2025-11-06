@@ -3,7 +3,7 @@ import { Widget, WidgetProps } from "../widgets/widget";
 import { FilterStore } from "./filterstore";
 
 export class FilterWidgetBase<P = {}> extends Widget<P> {
-    static [Symbol.typeInfo] = this.registerClass(nsSerenity);
+    static override [Symbol.typeInfo] = this.registerClass(nsSerenity);
 
     declare private store: FilterStore;
 
@@ -17,7 +17,7 @@ export class FilterWidgetBase<P = {}> extends Widget<P> {
         this.store.add_changed(this.onFilterStoreChanged);
     }
 
-    destroy() {
+    override destroy() {
 
         if (this.store) {
             this.store.remove_changed(this.onFilterStoreChanged);

@@ -3,9 +3,9 @@ import { FilterDialog } from "./filterdialog";
 import { FilterWidgetBase } from "./filterwidgetbase";
 
 export class FilterDisplayBar<P = {}> extends FilterWidgetBase<P> {
-    static [Symbol.typeInfo] = this.registerClass(nsSerenity);
+    static override [Symbol.typeInfo] = this.registerClass(nsSerenity);
 
-    protected renderContents(): any {
+    protected override renderContents(): any {
         var openFilterDialog = (e: Event) => {
             e.preventDefault();
             var dialog = new FilterDialog({});
@@ -29,7 +29,7 @@ export class FilterDisplayBar<P = {}> extends FilterWidgetBase<P> {
         );
     }
 
-    protected filterStoreChanged() {
+    protected override filterStoreChanged() {
         super.filterStoreChanged();
 
         var displayText = this.get_store().get_displayText()?.trim() || null;

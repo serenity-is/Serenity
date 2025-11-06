@@ -5,7 +5,7 @@ import { Toolbar, ToolButton } from "./toolbar";
 import { Widget, WidgetProps } from "./widget";
 
 export class BasePanel<P = {}> extends Widget<P> {
-    static [Symbol.typeInfo] = this.registerClass(nsSerenity);
+    static override [Symbol.typeInfo] = this.registerClass(nsSerenity);
     
     constructor(props: WidgetProps<P>) {
         super(props);
@@ -15,7 +15,7 @@ export class BasePanel<P = {}> extends Widget<P> {
         this.initToolbar();
     }
 
-    destroy() {
+    override destroy() {
         TabsExtensions.destroy(this.tabs);
         this.tabs = null;
 

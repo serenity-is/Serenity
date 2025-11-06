@@ -5,7 +5,7 @@ import { PropertyGrid, PropertyGridMode, PropertyGridOptions } from "./propertyg
 import { WidgetProps } from "./widget";
 
 export class PropertyPanel<TItem, P> extends BasePanel<P> {
-    static [Symbol.typeInfo] = this.registerClass(nsSerenity);
+    static override [Symbol.typeInfo] = this.registerClass(nsSerenity);
 
     declare private _entity: TItem;
     declare private _entityId: any;
@@ -17,7 +17,7 @@ export class PropertyPanel<TItem, P> extends BasePanel<P> {
         this.loadInitialEntity();
     }
 
-    destroy() {
+    override destroy() {
         if (this.propertyGrid) {
             this.propertyGrid.destroy();
             this.propertyGrid = null;

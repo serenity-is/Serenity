@@ -15,7 +15,7 @@ export interface FilterFieldSelectOptions {
 }
 
 class FilterFieldSelect<P extends FilterFieldSelectOptions = FilterFieldSelectOptions> extends ComboboxEditor<P, PropertyItem> {
-    static [Symbol.typeInfo] = this.registerClass(nsSerenity);
+    static override [Symbol.typeInfo] = this.registerClass(nsSerenity);
 
     constructor(props: WidgetProps<P>) {
         super(props);
@@ -25,7 +25,7 @@ class FilterFieldSelect<P extends FilterFieldSelectOptions = FilterFieldSelectOp
         }
     }
 
-    emptyItemText() {
+    override emptyItemText() {
         if (!this.value) {
             return FilterPanelTexts.SelectField;
         }
@@ -33,7 +33,7 @@ class FilterFieldSelect<P extends FilterFieldSelectOptions = FilterFieldSelectOp
         return null;
     }
 
-    getComboboxOptions() {
+    override getComboboxOptions() {
         var opt = super.getComboboxOptions();
         opt.allowClear = false;
         return opt;
@@ -41,7 +41,7 @@ class FilterFieldSelect<P extends FilterFieldSelectOptions = FilterFieldSelectOp
 }
 
 class FilterOperatorSelect extends ComboboxEditor<any, FilterOperator> {
-    static [Symbol.typeInfo] = this.registerClass(nsSerenity);
+    static override [Symbol.typeInfo] = this.registerClass(nsSerenity);
 
     constructor(props: WidgetProps<{ source: FilterOperator[] }>) {
         super(props);
@@ -55,11 +55,11 @@ class FilterOperatorSelect extends ComboboxEditor<any, FilterOperator> {
             this.value = this.options.source[0].key;
     }
 
-    emptyItemText(): string {
+    override emptyItemText(): string {
         return null;
     }
 
-    getComboboxOptions() {
+    override getComboboxOptions() {
         var opt = super.getComboboxOptions();
         opt.allowClear = false;
         return opt;
@@ -67,7 +67,7 @@ class FilterOperatorSelect extends ComboboxEditor<any, FilterOperator> {
 }
 
 export class FilterPanel<P = {}> extends FilterWidgetBase<P> {
-    static [Symbol.typeInfo] = this.registerClass(nsSerenity);
+    static override [Symbol.typeInfo] = this.registerClass(nsSerenity);
 
     declare private rowsDiv: HTMLElement;
     declare private resetButton: HTMLButtonElement;
@@ -96,7 +96,7 @@ export class FilterPanel<P = {}> extends FilterWidgetBase<P> {
         }
     }
 
-    protected filterStoreChanged() {
+    protected override filterStoreChanged() {
         super.filterStoreChanged();
         this.updateRowsFromStore();
     }

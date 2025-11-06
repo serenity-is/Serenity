@@ -7,7 +7,7 @@ import { CustomerOrdersGrid } from "./CustomerOrdersGrid";
 import { NorthwindDbTexts } from "../ServerTypes/Texts";
 
 export class CustomerDialog<P = {}> extends EntityDialog<CustomerRow, P> {
-    static [Symbol.typeInfo] = this.registerClass(nsDemoNorthwind);
+    static override [Symbol.typeInfo] = this.registerClass(nsDemoNorthwind);
 
     protected getFormKey() { return CustomerForm.formKey; }
     protected getRowDefinition() { return CustomerRow; }

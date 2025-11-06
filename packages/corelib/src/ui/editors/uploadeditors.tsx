@@ -274,7 +274,7 @@ export interface MultipleFileUploadEditorOptions extends FileUploadEditorOptions
 
 export class MultipleFileUploadEditor<P extends MultipleFileUploadEditorOptions = MultipleFileUploadEditorOptions> extends EditorWidget<P>
     implements IReadOnly, IGetEditValue, ISetEditValue, IValidateRequired {
-    static [Symbol.typeInfo] = this.registerEditor(nsSerenity, [IReadOnly, IGetEditValue, ISetEditValue, IValidateRequired]);
+    static override [Symbol.typeInfo] = this.registerEditor(nsSerenity, [IReadOnly, IGetEditValue, ISetEditValue, IValidateRequired]);
 
     declare private entities: UploadedFile[];
     declare private toolbar: Toolbar;
@@ -461,7 +461,7 @@ export class MultipleFileUploadEditor<P extends MultipleFileUploadEditorOptions 
 }
 
 export class MultipleImageUploadEditor<P extends ImageUploadEditorOptions = ImageUploadEditorOptions> extends MultipleFileUploadEditor<P> {
-    static [Symbol.typeInfo] = this.registerClass(nsSerenity);
+    static override [Symbol.typeInfo] = this.registerClass(nsSerenity);
 
     constructor(props: EditorProps<P>) {
         super(props);

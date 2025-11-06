@@ -3,7 +3,7 @@ import { nsExtensions } from "../ServerTypes/Namespaces";
 import { BasicProgressDialogTexts } from "../ServerTypes/Texts";
 
 export class BasicProgressDialog<P = {}> extends BaseDialog<P> {
-    static [Symbol.typeInfo] = this.registerClass(nsExtensions);
+    static override [Symbol.typeInfo] = this.registerClass(nsExtensions);
 
     declare private progressBar: HTMLElement;
 

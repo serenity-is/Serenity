@@ -3,7 +3,7 @@ import { RegionForm, RegionRow, RegionService } from "../ServerTypes/Demo";
 import { nsDemoNorthwind } from "../ServerTypes/Namespaces";
 
 export class RegionDialog<P = {}> extends EntityDialog<RegionRow, P> {
-    static [Symbol.typeInfo] = this.registerClass(nsDemoNorthwind);
+    static override [Symbol.typeInfo] = this.registerClass(nsDemoNorthwind);
     
     protected getFormKey() { return RegionForm.formKey; }
     protected getRowDefinition() { return RegionRow; }

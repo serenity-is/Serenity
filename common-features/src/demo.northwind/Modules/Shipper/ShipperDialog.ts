@@ -3,7 +3,7 @@ import { ShipperForm, ShipperRow, ShipperService } from "../ServerTypes/Demo";
 import { nsDemoNorthwind } from "../ServerTypes/Namespaces";
 
 export class ShipperDialog<P = {}> extends EntityDialog<ShipperRow, P> {
-    static [Symbol.typeInfo] = this.registerClass(nsDemoNorthwind);
+    static override [Symbol.typeInfo] = this.registerClass(nsDemoNorthwind);
 
     protected getFormKey() { return ShipperForm.formKey; }
     protected getRowDefinition() { return ShipperRow; }

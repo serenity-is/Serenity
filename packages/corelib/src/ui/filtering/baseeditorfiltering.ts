@@ -6,7 +6,7 @@ import { Widget } from "../widgets/widget";
 import { BaseFiltering } from "./basefiltering";
 
 export abstract class BaseEditorFiltering<TEditor extends Widget<any>> extends BaseFiltering {
-    static [Symbol.typeInfo] = this.registerClass(nsSerenity);
+    static override [Symbol.typeInfo] = this.registerClass(nsSerenity);
     constructor(public editorTypeRef: any) {
         super();
     }
@@ -26,7 +26,7 @@ export abstract class BaseEditorFiltering<TEditor extends Widget<any>> extends B
 
     declare protected editor: TEditor;
 
-    createEditor() {
+    override createEditor() {
         if (this.useEditor()) {
             this.editor = new (this.editorTypeRef as typeof Widget<{}>)({
                 element: el => {
@@ -44,7 +44,7 @@ export abstract class BaseEditorFiltering<TEditor extends Widget<any>> extends B
         return false;
     }
 
-    getCriteriaField() {
+    override getCriteriaField() {
         if (this.useEditor() &&
             this.useIdField() &&
             this.get_field().filteringIdField) {
@@ -61,7 +61,7 @@ export abstract class BaseEditorFiltering<TEditor extends Widget<any>> extends B
         return Object.assign(opt, this.get_field().filteringParams);
     }
 
-    loadState(state: any) {
+    override loadState(state: any) {
         if (this.useEditor()) {
             if (state == null) {
                 return;
@@ -74,7 +74,7 @@ export abstract class BaseEditorFiltering<TEditor extends Widget<any>> extends B
         super.loadState(state);
     }
 
-    saveState() {
+    override saveState() {
         if (this.useEditor()) {
             return EditorUtils.getValue(this.editor);
         }
@@ -82,7 +82,7 @@ export abstract class BaseEditorFiltering<TEditor extends Widget<any>> extends B
         return super.saveState();
     }
 
-    getEditorValue() {
+    override getEditorValue() {
         if (this.useEditor()) {
             var value = EditorUtils.getValue(this.editor);
 
@@ -95,7 +95,7 @@ export abstract class BaseEditorFiltering<TEditor extends Widget<any>> extends B
         return super.getEditorValue();
     }
 
-    initQuickFilter(filter: QuickFilter<Widget<any>, any>) {
+    override initQuickFilter(filter: QuickFilter<Widget<any>, any>) {
         super.initQuickFilter(filter);
 
         filter.type = this.editorTypeRef;
