@@ -30,6 +30,7 @@ try
                 company = "serenity-is";
             pkgId = "@" + company + "/" + pkgId.Substring(idx + 1);
         }
+        var domwise = pkgId == "@serenity-is/domwise";
         var pkgJson = Path.Combine(pkgPath, "package.json");
         var expectedContent = @"{
   ""name"": """ + pkgId.Replace("\"", "\\\"") + @""",
@@ -37,7 +38,15 @@ try
     ""."": {
       ""types"": ""./dist/index.d.ts"",
       ""import"": ""./dist/index.js""
+    }," + (domwise ? @"
+    ""./jsx-runtime"": {
+      ""types"": ""./dist/jsx-runtime/index.d.ts"",
+      ""import"": ""./dist/jsx-runtime/index.js""
     },
+    ""./jsx-dev-runtime"": {
+      ""types"": ""./dist/jsx-dev-runtime/index.d.ts"",
+      ""import"": ""./dist/jsx-dev-runtime/index.js""
+    }," : "") + @"
     ""./dist/*.css"": ""./dist/*.css""
   },
   ""main"": ""dist/index.js"",
