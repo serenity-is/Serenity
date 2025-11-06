@@ -3,7 +3,7 @@ const lifecycleRootSymbol = Symbol.for("Serenity.lifecycleRoot");
 
 export function getDisposingListeners(): WeakMap<EventTarget, ({
     callback: (el: EventTarget) => void,
-    regKey?: string
+    regKey: string | undefined
 })[]> {
     return (globalThis as any)[disposingListenersSymbol] ||= new WeakMap();
 }
@@ -62,7 +62,7 @@ export function invokeDisposingListeners(node: EventTarget, opt?: {
     }
 
     if (opt?.descendants && node instanceof Element && node.hasChildNodes()) {
-        const descendants = [];
+        const descendants: Node[] = [];
         const iterator = document.createNodeIterator(
             node as Node,
             NodeFilter.SHOW_ELEMENT | NodeFilter.SHOW_TEXT | NodeFilter.SHOW_COMMENT);
@@ -73,7 +73,7 @@ export function invokeDisposingListeners(node: EventTarget, opt?: {
             }
         }
         for (let i = 0; i < descendants.length; i++) {
-            invokeFor(descendants[i]);
+            invokeFor(descendants[i] as EventTarget);
         }
     }
 
@@ -90,7 +90,7 @@ export function invokeDisposingListeners(node: EventTarget, opt?: {
  * @param regKey An optional registration key to identify the listener.
  * @returns The element that the listener was added to.
  */
-export function addDisposingListener<T extends EventTarget>(target: T, handler: (el: Element) => void, regKey?: string): T {
+export function addDisposingListener<T extends EventTarget>(target: T | null | undefined, handler: ((el: T) => void) | undefined | null, regKey?: string): T | null | undefined {
     if (!target || !handler)
         return target;
     const disposingListeners = getDisposingListeners();
@@ -99,7 +99,7 @@ export function addDisposingListener<T extends EventTarget>(target: T, handler: 
         if (typeof target.addEventListener !== "function")
             return target;
         disposingListeners.set(target, listeners = [{
-            callback: handler,
+            callback: handler!,
             regKey
         }]);
         target.addEventListener("disposing", disposingEventListener, { once: true });
@@ -130,7 +130,7 @@ export function addDisposingListener<T extends EventTarget>(target: T, handler: 
  * @param regKey An optional registration key to identify the listener.
  * @returns The element that the listener was removed from.
  */
-export function removeDisposingListener<T extends EventTarget>(target: T, handler: () => void, regKey?: string): T {
+export function removeDisposingListener<T extends EventTarget>(target: T | null | undefined, handler: (() => void) | undefined | null, regKey?: string | undefined | null): T | null | undefined {
     if (!target || (!handler && !regKey))
         return target;
     const disposingListeners = getDisposingListeners();

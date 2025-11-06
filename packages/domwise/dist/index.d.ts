@@ -2235,7 +2235,7 @@ export declare function invokeDisposingListeners(node: EventTarget, opt?: {
  * @param regKey An optional registration key to identify the listener.
  * @returns The element that the listener was added to.
  */
-export declare function addDisposingListener<T extends EventTarget>(target: T, handler: (el: Element) => void, regKey?: string): T;
+export declare function addDisposingListener<T extends EventTarget>(target: T | null | undefined, handler: ((el: T) => void) | undefined | null, regKey?: string): T | null | undefined;
 /**
  * Removes a disposing listener from an element. Note that this does not remove an event listener from the element,
  * but removes the listener from the list of disposing listeners that will be called when the `disposing` event
@@ -2246,7 +2246,7 @@ export declare function addDisposingListener<T extends EventTarget>(target: T, h
  * @param regKey An optional registration key to identify the listener.
  * @returns The element that the listener was removed from.
  */
-export declare function removeDisposingListener<T extends EventTarget>(target: T, handler: () => void, regKey?: string): T;
+export declare function removeDisposingListener<T extends EventTarget>(target: T | null | undefined, handler: (() => void) | undefined | null, regKey?: string | undefined | null): T | null | undefined;
 /**
  * Sets or gets the current lifecycle root element.
  * @param args If provided, sets the lifecycle root to the first argument and returns the previous root.
@@ -2266,7 +2266,7 @@ export declare function useText(initialValue?: string): readonly [
 	Text,
 	(value: string) => void
 ];
-export declare function currentNamespaceURI(value?: string): string;
+export declare function currentNamespaceURI(value?: string | null | undefined): string | null | undefined;
 export declare function inNamespaceURI(namespaceURI: string | null, children: () => ComponentChildren): ComponentChildren;
 export declare function inSVGNamespace(fn: () => ComponentChildren): ComponentChildren;
 export declare function inMathMLNamespace(fn: () => ComponentChildren): ComponentChildren;
@@ -2300,19 +2300,19 @@ type SignalObserveArgs<T> = {
 	/**
 	 * Disposes the signal subscription. Only available if the signal library supports unsubscription.
 	 */
-	effectDisposer: EffectDisposer | undefined;
+	effectDisposer: EffectDisposer | null | undefined;
 	/**
 	 * Gets the lifecycle root at the time of subscription if useLifecycleRoot option was true.
 	 */
-	readonly lifecycleRoot: EventTarget | undefined;
+	readonly lifecycleRoot: EventTarget | null | undefined;
 	/**
 	 * Gets the lifecycle node to tie the signal's lifecycle to.
 	 */
-	get lifecycleNode(): EventTarget | undefined;
+	get lifecycleNode(): EventTarget | null | undefined;
 	/**
 	 * Sets the lifecycle node to tie the signal's lifecycle to.
 	 */
-	set lifecycleNode(value: EventTarget | undefined);
+	set lifecycleNode(value: EventTarget | null | undefined);
 };
 type ObserveSignalCallback<T> = (args: SignalObserveArgs<T>) => void;
 /**
@@ -2330,7 +2330,7 @@ export declare function observeSignal<T>(signal: SignalLike<T>, callback: Observ
 	 * Optional node to tie the signal's lifecycle to.
 	 */
 	lifecycleNode?: EventTarget;
-}): EffectDisposer;
+}): EffectDisposer | null | undefined;
 interface DerivedSignalLike<T> extends SignalLike<T> {
 	derivedDisposer?: () => void;
 }

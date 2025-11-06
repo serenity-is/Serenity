@@ -4,8 +4,8 @@ import { SVGNamespace } from "./svg-consts";
 
 const jsxNamespaceURISymbol = Symbol.for("Serenity.jsxNamespaceURI");
 
-export function currentNamespaceURI(value?: string): string {
-    const current = (globalThis as any)[jsxNamespaceURISymbol] as string | undefined;
+export function currentNamespaceURI(value?: string | null | undefined): string | null | undefined {
+    const current = (globalThis as any)[jsxNamespaceURISymbol];
     if (!arguments.length) {
         return current;
     }

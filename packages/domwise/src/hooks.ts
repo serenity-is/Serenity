@@ -5,20 +5,20 @@ import { assignProp } from "./jsx-assign-props";
 import { initPropHookSymbol } from "./prop-hook";
 
 export function useClassList(initialValue?: ClassNames): BasicClassList {
-    let temp = document.createElement("div") as Element;
+    let temp: Element | null = document.createElement("div") as Element;
     if (initialValue != null) {
         temp.className = className(initialValue)
     }
 
-    let list = temp.classList;
+    let list: DOMTokenList = temp.classList;
 
     function ClassList() {
         return list;
     }
 
     function dispose() {
-        list = null;
-        temp = null;
+        list = null as any;
+        temp = null as any;
     }
 
     Object.defineProperties(
@@ -27,8 +27,8 @@ export function useClassList(initialValue?: ClassNames): BasicClassList {
             [initPropHookSymbol](node: Element, prop: string) {
                 if (prop !== "class")
                     throw new Error("useClassList can only be used for 'class' attribute.");
-                removeDisposingListener(temp, dispose);
-                node?.setAttribute("class", list?.value);
+                temp && removeDisposingListener(temp, dispose);
+                list && node?.setAttribute("class", list.value);
                 addDisposingListener(temp = node, dispose);
                 list = node?.classList ?? list;
             },
@@ -61,12 +61,12 @@ type PropBindingThis<T> = {
     dispose?: (() => void);
     node?: JSXElement | undefined;
     prop?: string | undefined;
-    value: T | null | undefined | false;
+    value?: T | null | undefined | false;
 }
 
 function propBinding<T>(this: PropBindingThis<T>, value?: T | null | undefined | false) {
     if (arguments.length && value !== this.value) {
-        this.node && assignProp(this.node as JSXElement, this.prop, value, this.value);
+        this.node && this.prop && assignProp(this.node as JSXElement, this.prop, value, this.value);
         this.value = value;
     }
     return this.value;
@@ -98,7 +98,7 @@ export function usePropBinding<T>(initialValue?: T | null | undefined | false): 
         value: initialValue
     }
     accessorThis.dispose = propBindingDispose.bind(accessorThis);
-    const hook = propBinding.bind(accessorThis);
+    const hook = propBinding.bind(accessorThis) as PropBinding<T>;
     hook[initPropHookSymbol] = propBindingInit.bind(accessorThis);
     return hook;
 }

@@ -127,7 +127,7 @@ export function assignStyle(node: JSXElement, value?: any, prev?: boolean | any)
     if (isObject(value)) {
         if (isObject(prev)) {
             value = { ...value };
-            Object.entries(prev).forEach(([key, val]) => {
+            Object.keys(prev).forEach(key => {
                 if (!(key in value))
                     value[key] = "";
             });

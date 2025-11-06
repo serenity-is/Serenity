@@ -1276,7 +1276,6 @@ export declare class BasicLayout implements LayoutEngine {
 	protected refs: GridLayoutRefs;
 	init(host: LayoutHost): void;
 	destroy(): void;
-	getTopPanel(): HTMLElement;
 	afterSetOptions(): void;
 	readonly layoutName = "BasicLayout";
 }

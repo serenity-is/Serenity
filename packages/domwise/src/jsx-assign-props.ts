@@ -272,6 +272,6 @@ export function assignProps(node: JSXElement, props: Record<string, any>) {
     return node;
 }
 
-function nodeEventPropDisposer(key: string) {
-    (this as any)[key] = null;
+function nodeEventPropDisposer(this: { [key: string]: any }, key: string) {
+    this[key] = null;
 }

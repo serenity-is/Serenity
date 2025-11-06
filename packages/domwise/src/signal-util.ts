@@ -47,19 +47,19 @@ export type SignalObserveArgs<T> = {
     /**
      * Disposes the signal subscription. Only available if the signal library supports unsubscription.
      */
-    effectDisposer: EffectDisposer | undefined;
+    effectDisposer: EffectDisposer | null | undefined;
     /**
      * Gets the lifecycle root at the time of subscription if useLifecycleRoot option was true.
      */
-    readonly lifecycleRoot: EventTarget | undefined;
+    readonly lifecycleRoot: EventTarget | null | undefined;
     /**
      * Gets the lifecycle node to tie the signal's lifecycle to.
      */
-    get lifecycleNode(): EventTarget | undefined,
+    get lifecycleNode(): EventTarget | null | undefined,
     /**
      * Sets the lifecycle node to tie the signal's lifecycle to.
      */
-    set lifecycleNode(value: EventTarget | undefined),
+    set lifecycleNode(value: EventTarget | null | undefined);
 }
 
 class SignalObserveArgsImpl<T> implements SignalObserveArgs<T> {
@@ -69,10 +69,10 @@ class SignalObserveArgsImpl<T> implements SignalObserveArgs<T> {
     declare isInitial: boolean;
     declare hasChanged: boolean;
     declare private _dispose: EffectDisposer | undefined;
-    declare private _node: EventTarget | undefined;
-    declare lifecycleRoot: EventTarget | undefined;
+    declare private _node: EventTarget | null | undefined;
+    declare lifecycleRoot: EventTarget | null | undefined;
 
-    constructor(signal: SignalLike<T>, lifecycleRoot: EventTarget | undefined, lifecycleNode: EventTarget | undefined) {
+    constructor(signal: SignalLike<T>, lifecycleRoot: EventTarget | null | undefined, lifecycleNode: EventTarget | null | undefined) {
         this.signal = signal;
         this.isInitial = true;
         this.hasChanged = false;
@@ -80,7 +80,7 @@ class SignalObserveArgsImpl<T> implements SignalObserveArgs<T> {
         this._node = lifecycleNode;
     }
 
-    get lifecycleNode(): EventTarget | undefined {
+    get lifecycleNode(): EventTarget | null | undefined {
         return this._node;
     }
 
@@ -130,7 +130,7 @@ export function observeSignal<T>(signal: SignalLike<T>, callback: ObserveSignalC
      * Optional node to tie the signal's lifecycle to.
      */
     lifecycleNode?: EventTarget
-}): EffectDisposer {
+}): EffectDisposer | null | undefined {
 
     const lifecycleRoot = opt?.useLifecycleRoot ? currentLifecycleRoot() : void 0;
     const args = new SignalObserveArgsImpl(signal, lifecycleRoot, opt?.lifecycleNode);
@@ -170,7 +170,7 @@ export function derivedSignal<TDerived, TInput = any>(input: SignalLike<TInput>,
     if (typeof input.constructor === "function" && input.constructor !== {}.constructor) {
         try {
             let derived = new (input.constructor as any)(callback);
-            let disposer: EffectDisposer;
+            let disposer: EffectDisposer | null | undefined;
             if (isSignalLike(derived)) {
                 if (derived.peek() === callback) {
                     disposer = input.subscribe(() => {
@@ -179,7 +179,7 @@ export function derivedSignal<TDerived, TInput = any>(input: SignalLike<TInput>,
                 }
                 if (disposer) {
                     (derived as DerivedSignalLike<TDerived>).derivedDisposer = function () {
-                        disposer();
+                        disposer!();
                         delete (derived as DerivedSignalLike<TDerived>).derivedDisposer;
                     }
                 }
@@ -189,7 +189,7 @@ export function derivedSignal<TDerived, TInput = any>(input: SignalLike<TInput>,
         }
     }
 
-    let primitive: PrimitiveComputed<TDerived>;
+    let primitive: PrimitiveComputed<TDerived> | undefined;
     const disposer = input.subscribe(() => {
         if (!primitive) {
             primitive = new PrimitiveComputed<TDerived>(callback);
@@ -203,7 +203,7 @@ export function derivedSignal<TDerived, TInput = any>(input: SignalLike<TInput>,
             delete (primitive as any).derivedDisposer;
         }
     }
-    return primitive;
+    return primitive!;
 }
 
 export class PrimitiveComputed<T> {

@@ -15,7 +15,7 @@ function appendChild(parent: Node, child: Node) {
 let fragmentPlaceholderIdx = 0;
 const placeholderPrefix = "__domwisefrag_";
 
-function isPlaceholder(node: Node): node is Comment {
+function isPlaceholder(node: Node | null): node is Comment {
     return node instanceof Comment && node.data.startsWith(placeholderPrefix);
 }
 
@@ -51,7 +51,7 @@ function appendChildrenWithSignal(parent: Node, signal: SignalLike<any>) {
     observeSignal(signal, (args) => {
         if (args.isInitial) {
             prevNode = wrapAsNode(args.newValue);
-            let prevNodeNew = isFragmentWithPlaceholder(prevNode) ? prevNode.firstChild : prevNode;
+            let prevNodeNew = isFragmentWithPlaceholder(prevNode) ? prevNode.firstChild! : prevNode;
             appendChildren(parent, prevNode as any);
             args.lifecycleNode = (prevNode = prevNodeNew) ?? parent;
             return;
@@ -63,7 +63,7 @@ function appendChildrenWithSignal(parent: Node, signal: SignalLike<any>) {
 
         const newNode = wrapAsNode(args.newValue);
         if (isPlaceholder(prevNode)) {
-            let n: Node;
+            let n: Node | null;
             while (n = prevNode.nextSibling) {
                 n.parentNode?.removeChild(n);
                 if (n instanceof Comment && n.data === prevNode.data) {
@@ -71,7 +71,7 @@ function appendChildrenWithSignal(parent: Node, signal: SignalLike<any>) {
                 }
             }
         }
-        let prevNodeNew = isFragmentWithPlaceholder(newNode) ? newNode.firstChild : newNode;
+        let prevNodeNew = isFragmentWithPlaceholder(newNode) ? newNode.firstChild! : newNode;
         replaceNode(prevNode, newNode);
         args.lifecycleNode = (prevNode = prevNodeNew) ?? parent;
     });

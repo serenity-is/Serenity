@@ -1,26 +1,38 @@
 {
-    "compileOnSave": false,
-    "compilerOptions": {
-      "allowJs": false,
-      "declaration": true,
-      "emitBOM": true,
-      "lib": [
-        "ES2017",
-        "DOM"
-      ],
-      "module": "ESNext",
-      "moduleResolution": "Bundler",
-      "newLine": "lf",
-      "noEmit": true,
-      "noEmitHelpers": false,
-      "noImplicitAny": true,
-      "isolatedModules": true,
-      "rootDir": "./src",
-      "sourceMap": false,
-      "skipDefaultLibCheck": true,
-      "outDir": "./dist",
-      "target": "ESNext",
-      "useDefineForClassFields": false
-    },
-    "include": ["src", "types"]
-  }
+  "compileOnSave": false,
+  "compilerOptions": {
+    "allowJs": false,
+    "allowUnreachableCode": false,
+    "allowUnusedLabels": false,
+    "exactOptionalPropertyTypes": true,
+    "declaration": true,
+    "emitBOM": true,
+    "lib": [
+      "ES2017",
+      "DOM"
+    ],
+    "isolatedModules": true,
+    "module": "ESNext",
+    "moduleResolution": "Bundler",
+    "newLine": "lf",
+    "noEmit": true,
+    "noEmitHelpers": false,
+    "noFallthroughCasesInSwitch": true,
+    "noImplicitOverride": true, 
+    "noImplicitReturns": true,
+    "noUnusedLocals": true,
+    "noUnusedParameters": true,
+    "outDir": "./dist",
+    "rootDir": "./src",
+    "skipDefaultLibCheck": true,
+    "sourceMap": false,
+    "strict": true,
+    "strictFunctionTypes": false,
+    "target": "ESNext",
+    "useDefineForClassFields": false
+  },
+  "include": [
+    "src",
+    "types"
+  ]
+}
