@@ -119,20 +119,21 @@ export function createCssRules(this: void, { opt, cellHeightDiff, colCount, cont
 
     const styleNode = document.createElement('style');
     styleNode.dataset.uid = uid;
-    var rules = ["." + uid + "{ " +
+    const rules = [
+        "." + uid + " { " +
         "--sg-cell-height: " + opt.rowHeight + "px;" +
-        "--sg-scrollbar-w: " + scrollDims.width + "px;",
-        "--sg-scrollbar-h: " + scrollDims.height + "px;",
-        " .slick-cell { height:" + cellHeight + "px;",
-        " .slick-row { height:" + opt.rowHeight + "px;" +
+        "--sg-scrollbar-w: " + scrollDims.width + "px;" +
+        "--sg-scrollbar-h: " + scrollDims.height + "px;" +
         " }",
+        "." + uid + ".slick-cell { height: " + cellHeight + "px; }",
+        "." + uid + ".slick-row { height: " + opt.rowHeight + "px; }"
     ];
 
-    for (var i = 0; i < colCount; i++) {
+    for (let i = 0; i < colCount; i++) {
         rules.push("." + uid + " .l" + i + " { }");
         rules.push("." + uid + " .r" + i + " { }");
     }
-    styleNode.appendChild(document.createTextNode(rules.join(" ")));
+    styleNode.appendChild(document.createTextNode(rules.join("\n")));
     document.head.appendChild(styleNode);
     return {
         styleNode
