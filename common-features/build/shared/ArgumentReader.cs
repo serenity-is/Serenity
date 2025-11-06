@@ -107,8 +107,7 @@ public partial class ArgumentReader(IEnumerable<string> arguments)
     public void ThrowIfRemaining()
     {
         if (arguments.Count != 0)
-            throw new ArgumentException($"Unknown argument: " +
-                $"${arguments[0]}", nameof(arguments));
+            throw new ArgumentException($"Unknown argument: {arguments[0]}", nameof(arguments));
     }
 
     public bool HasHelpSwitch()
