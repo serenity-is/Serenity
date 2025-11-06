@@ -3936,6 +3936,5 @@ const contentOnly = {
     contentOnly: true
 }
 
-/** @deprecated Use SleekGrid */
-export const Grid: typeof SleekGrid = SleekGrid;
+export { SleekGrid as Grid }
 

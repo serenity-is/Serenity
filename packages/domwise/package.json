@@ -14,11 +14,11 @@
       "import": "./dist/index.js"
     },
     "./jsx-runtime": "./dist/jsx-runtime.js",
-    "./jsx-dev-runtime": "./dist/jsx-dev-runtime.js"
+    "./jsx-dev-runtime": "./dist/jsx-runtime.js"
   },
   "imports": {
     "#src/jsx-runtime": "./src/jsx-runtime.ts",
-    "#src/jsx-dev-runtime": "./src/jsx-dev-runtime.ts",
+    "#src/jsx-dev-runtime": "./src/jsx-runtime.ts",
     "#types": "./types/index.d.ts"
   },
   "files": [

@@ -55,16 +55,11 @@ const esmJsxRuntime = {
     outfile: './dist/jsx-runtime.js'
 }
 
-const esmJsxDevRuntime = {
-    ...esmJsxRuntime,
-    outfile: './dist/jsx-dev-runtime.js'
-}
 const buildList = [];
 
 buildList.push(
     esmIndex,
-    esmJsxRuntime,
-    esmJsxDevRuntime
+    esmJsxRuntime
 )
 
 for (const buildItem of buildList) {
