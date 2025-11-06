@@ -8,13 +8,13 @@ export default () => gridPageInit(SerialAutoNumberGrid);
  * Subclass of CustomerGrid to override dialog type to SerialAutoNumberDialog
  */
 export class SerialAutoNumberGrid extends CustomerGrid {
-    static [Symbol.typeInfo] = this.registerClass(nsDemoBasicSamples);
+    static override[Symbol.typeInfo] = this.registerClass(nsDemoBasicSamples);
 
-    protected getDialogType() { return SerialAutoNumberDialog; }
+    protected override getDialogType() { return SerialAutoNumberDialog; }
 }
 
 export class SerialAutoNumberDialog extends CustomerDialog {
-    static [Symbol.typeInfo] = this.registerClass(nsDemoBasicSamples);
+    static override[Symbol.typeInfo] = this.registerClass(nsDemoBasicSamples);
 
     constructor(props: {}) {
         super(props);
@@ -27,7 +27,7 @@ export class SerialAutoNumberDialog extends CustomerDialog {
         });
     }
 
-    protected afterLoadEntity() {
+    protected override afterLoadEntity() {
         super.afterLoadEntity();
 
         // fill next number in new record mode

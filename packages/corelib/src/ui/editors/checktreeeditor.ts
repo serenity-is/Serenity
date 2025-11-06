@@ -28,7 +28,7 @@ export interface CheckTreeItem<TSource> {
 
 export class CheckTreeEditor<TItem extends CheckTreeItem<TItem>, P = {}> extends DataGrid<TItem, P>
     implements IGetEditValue, ISetEditValue, IReadOnly {
-    static override [Symbol.typeInfo] = this.registerEditor(nsSerenity, [IGetEditValue, ISetEditValue, IReadOnly]);
+    static override[Symbol.typeInfo] = this.registerEditor(nsSerenity, [IGetEditValue, ISetEditValue, IReadOnly]);
 
     static override createDefaultElement() { return document.createElement("div"); }
 
@@ -321,7 +321,7 @@ export class CheckTreeEditor<TItem extends CheckTreeItem<TItem>, P = {}> extends
         return false;
     }
 
-    protected override getColumns(): Column[] {
+    protected override createColumns(): Column[] {
         var self = this;
         var columns: Column[] = [];
         columns.push({
@@ -476,7 +476,7 @@ export interface CheckLookupEditorOptions {
 }
 
 export class CheckLookupEditor<TItem extends CheckTreeItem<TItem> = any, P extends CheckLookupEditorOptions = CheckLookupEditorOptions> extends CheckTreeEditor<CheckTreeItem<TItem>, P> {
-    static override [Symbol.typeInfo] = this.registerEditor(nsSerenity);
+    static override[Symbol.typeInfo] = this.registerEditor(nsSerenity);
 
     declare private searchText: string;
     declare private enableUpdateItems: boolean;

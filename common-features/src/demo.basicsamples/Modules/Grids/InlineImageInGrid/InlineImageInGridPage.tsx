@@ -36,14 +36,14 @@ export class InlineImageFormatter implements Formatter, IInitializeColumn {
 }
 
 export class InlineImageInGrid<P = {}> extends EntityGrid<ProductRow, P> {
-    static [Symbol.typeInfo] = this.registerClass(nsDemoBasicSamples);
+    static override[Symbol.typeInfo] = this.registerClass(nsDemoBasicSamples);
 
-    protected getColumnsKey() { return InlineImageInGridColumns.columnsKey; }
-    protected getDialogType() { return ProductDialog; }
-    protected getRowDefinition() { return ProductRow; }
-    protected getService() { return ProductService.baseUrl; }
+    protected override getColumnsKey() { return InlineImageInGridColumns.columnsKey; }
+    protected override getDialogType() { return ProductDialog; }
+    protected override getRowDefinition() { return ProductRow; }
+    protected override getService() { return ProductService.baseUrl; }
 
-    protected getSlickOptions(): GridOptions {
+    protected override getSlickOptions(): GridOptions {
         let opt = super.getSlickOptions();
         opt.rowHeight = 150;
         return opt;

@@ -4,7 +4,7 @@ import { ReportRetrieveResult } from "../ServerTypes/Reporting";
 import { ReportHelper } from "./ReportHelper";
 
 export class ReportDialog<P extends ReportDialogOptions = ReportDialogOptions> extends BaseDialog<P> {
-    static override [Symbol.typeInfo] = this.registerClass(nsExtensions);
+    static override[Symbol.typeInfo] = this.registerClass(nsExtensions);
 
     declare private report: ReportRetrieveResult;
     declare private propertyGrid: PropertyGrid;
@@ -16,7 +16,7 @@ export class ReportDialog<P extends ReportDialogOptions = ReportDialogOptions> e
         this.loadReport(this.options.reportKey);
     }
 
-    protected getDialogButtons() {
+    protected override getDialogButtons() {
         return null;
     }
 
@@ -76,7 +76,7 @@ export class ReportDialog<P extends ReportDialogOptions = ReportDialogOptions> e
         });
     }
 
-    getToolbarButtons() {
+    protected override getToolbarButtons() {
         return [
             {
                 title: 'Preview',
@@ -102,7 +102,7 @@ export class ReportDialog<P extends ReportDialogOptions = ReportDialogOptions> e
         ];
     }
 
-    renderContents(): any {
+    protected override renderContents(): any {
         const id = this.useIdPrefix();
         return (
             <div class="s-DialogContent">

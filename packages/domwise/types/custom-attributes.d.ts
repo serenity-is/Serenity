@@ -1,4 +1,4 @@
-import type { Ref, SignalOrValue } from "./basic-types";
+import type { Ref, PropValue } from "./basic-types";
 import type { ComponentChildren } from "./jsx-namespace";
 
 export interface CustomDomAttributes<T> {
@@ -14,7 +14,7 @@ export interface CustomDomAttributes<T> {
 declare module "./jsx-elements" {
     interface ElementAttributes<T> {
         className?: ElementAttributes<T>["class"];
-        tabIndex?: SignalOrValue<number | string | RemoveAttribute>;
+        tabIndex?: PropValue<number | string | RemoveAttribute>;
         namespaceURI?: string | undefined;
         onClickCapture?: EventHandlerUnion<T, MouseEvent> | undefined;
         onDblClickCapture?: EventHandlerUnion<T, MouseEvent> | undefined;
@@ -23,37 +23,42 @@ declare module "./jsx-elements" {
     }
 
     interface HTMLAttributes<T> {
-        contentEditable?: SignalOrValue<EnumeratedPseudoBoolean | EnumeratedAcceptsEmpty | "plaintext-only" | "inherit" | RemoveAttribute>;
+        contentEditable?: PropValue<EnumeratedPseudoBoolean | EnumeratedAcceptsEmpty | "plaintext-only" | "inherit" | RemoveAttribute>;
         dataset?: { [key: string]: string } | undefined
-        spellCheck?: SignalOrValue<EnumeratedPseudoBoolean | EnumeratedAcceptsEmpty | RemoveAttribute>;
+        spellCheck?: PropValue<EnumeratedPseudoBoolean | EnumeratedAcceptsEmpty | RemoveAttribute>;
     }
 
     interface SVGAttributes<T> {
-        tabIndex?: SignalOrValue<number | string | RemoveAttribute>;
+        tabIndex?: PropValue<number | string | RemoveAttribute>;
     }
 
     interface AnchorHTMLAttributes<T> {
         /** @deprecated use referrerpolicy */
-        referrerPolicy?: SignalOrValue<HTMLReferrerPolicy | RemoveAttribute>;
+        referrerPolicy?: PropValue<HTMLReferrerPolicy | RemoveAttribute>;
     }
 
     interface ButtonHTMLAttributes<T> {
-        autoFocus?: SignalOrValue<boolean | RemoveAttribute>;
-        formNoValidate?: SignalOrValue<boolean | RemoveAttribute>;
+        autoFocus?: PropValue<boolean | RemoveAttribute>;
+        formNoValidate?: PropValue<boolean | RemoveAttribute>;
+    }
+
+    interface FormHTMLAttributes<T> extends HTMLAttributes<T> {
+        autoComplete?: PropValue<"on" | "off" | RemoveAttribute>;
     }
 
     interface InputHTMLAttributes<T> {
-        maxLength?: SignalOrValue<string | number | RemoveAttribute>;
-        minLength?: SignalOrValue<string | number | RemoveAttribute>;
-        readOnly?: SignalOrValue<boolean | RemoveAttribute>;
+        autoComplete?: PropValue<HTMLAutocomplete | RemoveAttribute>;
+        maxLength?: PropValue<string | number | RemoveAttribute>;
+        minLength?: PropValue<string | number | RemoveAttribute>;
+        readOnly?: PropValue<boolean | RemoveAttribute>;
     }
 
     interface LabelHTMLAttributes<T> {
-        htmlFor?: SignalOrValue<string | RemoveAttribute>;
+        htmlFor?: PropValue<string | RemoveAttribute>;
     }
 
     interface TdHTMLAttributes<T> {
-        colSpan?: SignalOrValue<number | string | RemoveAttribute>;
-        rowSpan?: SignalOrValue<number | string | RemoveAttribute>;
+        colSpan?: PropValue<number | string | RemoveAttribute>;
+        rowSpan?: PropValue<number | string | RemoveAttribute>;
     }
 }

@@ -2,8 +2,8 @@
 export class {{GridClassName}} extends {{SERENITYIMPORT "EntityGrid"}}<{{RowClassName}}> {
     static override [Symbol.typeInfo] = this.registerClass("{{ModuleNamespace}}.");
 
-    protected getColumnsKey() { return {{SERVERTYPEIMPORT ColumnsClassName}}.columnsKey; }
-    protected getDialogType() { return {{IMPORTFROM "./" + DialogClassName DialogClassName}}; }
-    protected getRowDefinition() { return {{SERVERTYPEIMPORT RowClassName}}; }
-    protected getService() { return {{SERVERTYPEIMPORT ServiceClassName}}.baseUrl; }
+    protected override getColumnsKey() { return {{SERVERTYPEIMPORT ColumnsClassName}}.columnsKey; }
+    protected override getDialogType() { return {{IMPORTFROM "./" + DialogClassName DialogClassName}}; }
+    protected override getRowDefinition() { return {{SERVERTYPEIMPORT RowClassName}}; }
+    protected override getService() { return {{SERVERTYPEIMPORT ServiceClassName}}.baseUrl; }
 }

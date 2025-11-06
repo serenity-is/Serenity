@@ -3,7 +3,7 @@ import { EditorProps } from "./editorwidget";
 import { SelectEditor, SelectEditorOptions } from "./selecteditor";
 
 export class DateYearEditor<P extends DateYearEditorOptions = DateYearEditorOptions> extends SelectEditor<P> {
-    static override [Symbol.typeInfo] = this.registerEditor(nsSerenity);
+    static override[Symbol.typeInfo] = this.registerEditor(nsSerenity);
 
     constructor(props: EditorProps<P>) {
         super(props);

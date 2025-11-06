@@ -4,7 +4,7 @@ import { BaseEditorFiltering } from "./baseeditorfiltering";
 import { FilterOperator, FilterOperators } from "./filteroperator";
 
 export class ServiceLookupFiltering extends BaseEditorFiltering<ServiceLookupEditor> {
-    static override [Symbol.typeInfo] = this.registerClass(nsSerenity);
+    static override[Symbol.typeInfo] = this.registerClass(nsSerenity);
 
     constructor() {
         super(ServiceLookupEditor);

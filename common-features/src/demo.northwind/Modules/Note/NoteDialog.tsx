@@ -2,11 +2,11 @@ import { BaseDialog, DialogButton, HtmlContentEditor, HtmlNoteContentEditor, can
 import { nsDemoNorthwind } from "../ServerTypes/Namespaces";
 
 export class NoteDialog<P = {}> extends BaseDialog<P> {
-    static override [Symbol.typeInfo] = this.registerClass(nsDemoNorthwind);
+    static override[Symbol.typeInfo] = this.registerClass(nsDemoNorthwind);
 
     declare private textEditor: HtmlContentEditor;
 
-    protected renderContents(): any {
+    protected override renderContents(): any {
         const id = this.useIdPrefix();
         return (
             <form id={id.Form} class="s-Form">
@@ -15,7 +15,7 @@ export class NoteDialog<P = {}> extends BaseDialog<P> {
         );
     }
 
-    protected getDialogButtons(): DialogButton[] {
+    protected override getDialogButtons(): DialogButton[] {
         return [
             okDialogButton({
                 click: (e: Event) => {

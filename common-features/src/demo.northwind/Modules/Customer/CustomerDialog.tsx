@@ -7,11 +7,11 @@ import { CustomerOrdersGrid } from "./CustomerOrdersGrid";
 import { NorthwindDbTexts } from "../ServerTypes/Texts";
 
 export class CustomerDialog<P = {}> extends EntityDialog<CustomerRow, P> {
-    static override [Symbol.typeInfo] = this.registerClass(nsDemoNorthwind);
+    static override[Symbol.typeInfo] = this.registerClass(nsDemoNorthwind);
 
-    protected getFormKey() { return CustomerForm.formKey; }
-    protected getRowDefinition() { return CustomerRow; }
-    protected getService() { return CustomerService.baseUrl; }
+    protected override getFormKey() { return CustomerForm.formKey; }
+    protected override getRowDefinition() { return CustomerRow; }
+    protected override getService() { return CustomerService.baseUrl; }
 
     protected form = new CustomerForm(this.idPrefix);
 
@@ -39,12 +39,12 @@ export class CustomerDialog<P = {}> extends EntityDialog<CustomerRow, P> {
         }
     }
 
-    loadResponse(data: any) {
+    protected override loadResponse(data: any) {
         super.loadResponse(data);
         this.loadedState = this.getSaveState();
     }
 
-    loadEntity(entity: CustomerRow) {
+    protected override loadEntity(entity: CustomerRow) {
         super.loadEntity(entity);
 
         TabsExtensions.setDisabled(this.tabs, 'Orders', this.isNewOrDeleted());
@@ -58,7 +58,7 @@ export class CustomerDialog<P = {}> extends EntityDialog<CustomerRow, P> {
         reloadLookup('Northwind.Customer');
     }
 
-    renderContents(): any {
+    protected override renderContents(): any {
         const id = this.useIdPrefix();
         return (
             <div id={id.Tabs} class="s-DialogContent">

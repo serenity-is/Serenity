@@ -39,16 +39,16 @@ export default (model: number | OrderRow) => {
  * A version of order dialog converted to a panel by adding PanelAttribute.
  */
 export class EntityDialogAsPanel extends OrderDialog {
-    static [Symbol.typeInfo] = this.registerClass(nsDemoBasicSamples, [new PanelAttribute()]);
+    static override[Symbol.typeInfo] = this.registerClass(nsDemoBasicSamples, [new PanelAttribute()]);
 
-    protected updateInterface() {
+    protected override updateInterface() {
         super.updateInterface();
 
         this.deleteButton.hide();
         this.applyChangesButton.hide();
     }
 
-    protected onSaveSuccess(response: SaveResponse, initiator: SaveInitiator) {
+    protected override onSaveSuccess(response: SaveResponse, initiator: SaveInitiator) {
         this.showSaveSuccessMessage(response, initiator);
     }
 }

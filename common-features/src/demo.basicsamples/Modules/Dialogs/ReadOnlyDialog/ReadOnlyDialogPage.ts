@@ -8,14 +8,14 @@ export default () => gridPageInit(ReadOnlyGrid);
  * A readonly grid that launches ReadOnlyDialog
  */
 export class ReadOnlyGrid extends SupplierGrid {
-    static [Symbol.typeInfo] = this.registerClass(nsDemoBasicSamples);
+    static override[Symbol.typeInfo] = this.registerClass(nsDemoBasicSamples);
 
-    protected getDialogType() { return ReadOnlyDialog; }
+    protected override getDialogType() { return ReadOnlyDialog; }
 
     /**
      * Removing add button from grid using its css class
      */
-    protected getButtons(): ToolButton[] {
+    protected override getButtons(): ToolButton[] {
         var buttons = super.getButtons();
         buttons.splice(indexOf(buttons, x => x.action == "add"), 1);
         return buttons;
@@ -23,7 +23,7 @@ export class ReadOnlyGrid extends SupplierGrid {
 }
 
 export class ReadOnlyDialog extends SupplierDialog {
-    static [Symbol.typeInfo] = this.registerClass(nsDemoBasicSamples);
+    static override[Symbol.typeInfo] = this.registerClass(nsDemoBasicSamples);
 
     /**
      * This is the method that gets list of tool 
@@ -32,7 +32,7 @@ export class ReadOnlyDialog extends SupplierDialog {
      * Here we'll remove save and close button, and
      * apply changes buttons. 
      */
-    protected getToolbarButtons(): ToolButton[] {
+    protected override getToolbarButtons(): ToolButton[] {
         let buttons = super.getToolbarButtons();
 
         buttons.splice(indexOf(buttons, x => x.action == "save-and-close"), 1);
@@ -51,7 +51,7 @@ export class ReadOnlyDialog extends SupplierDialog {
      * is initialized and an entity is loaded into dialog.
      * This is also called in new item mode.
      */
-    protected updateInterface(): void {
+    protected override updateInterface(): void {
 
         super.updateInterface();
 
@@ -91,7 +91,7 @@ export class ReadOnlyDialog extends SupplierDialog {
      * 
      * But our dialog is readonly, so we should change it to 'View xyz'
      */
-    protected getEntityTitle(): string {
+    protected override getEntityTitle(): string {
 
         if (!this.isEditMode()) {
             // we shouldn't hit here, but anyway for demo...
@@ -114,7 +114,7 @@ export class ReadOnlyDialog extends SupplierDialog {
      * This method is actually the one that calls getEntityTitle()
      * and updates the dialog title. We could do it here too...
      */
-    protected updateTitle(): void {
+    protected override updateTitle(): void {
         super.updateTitle();
 
         // remove super.updateTitle() call above and uncomment 

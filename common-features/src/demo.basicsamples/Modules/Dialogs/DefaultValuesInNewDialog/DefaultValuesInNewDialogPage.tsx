@@ -16,14 +16,14 @@ export default () => {
 }
 
 export class DefaultValuesInNewGrid extends OrderGrid {
-    static [Symbol.typeInfo] = this.registerClass(nsDemoBasicSamples);
+    static override[Symbol.typeInfo] = this.registerClass(nsDemoBasicSamples);
 
     /**
      * This method is called when New Item button is clicked.
      * By default, it calls EditItem with an empty entity.
      * This is a good place to fill in default values for New Item button.
      */
-    protected async addButtonClick() {
+    protected override async addButtonClick() {
         this.editItem({
             CustomerID: 'ANTON',
             RequiredDate: formatDate(new Date(), 'yyyy-MM-dd'),
@@ -34,7 +34,7 @@ export class DefaultValuesInNewGrid extends OrderGrid {
         } satisfies OrderRow);
     }
 
-    protected getButtons() {
+    protected override getButtons() {
         // preserving default New Item button
         var buttons = super.getButtons();
 

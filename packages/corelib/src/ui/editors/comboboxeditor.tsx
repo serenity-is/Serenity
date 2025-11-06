@@ -38,7 +38,7 @@ export interface ComboboxEditorOptions extends ComboboxFilterOptions, ComboboxIn
 
 export class ComboboxEditor<P, TItem> extends EditorWidget<P> implements
     ISetEditValue, IGetEditValue, IStringValue, IReadOnly {
-    static override [Symbol.typeInfo] = this.registerClass(nsSerenity, [ISetEditValue, IGetEditValue, IStringValue, IReadOnly]);
+    static override[Symbol.typeInfo] = this.registerClass(nsSerenity, [ISetEditValue, IGetEditValue, IStringValue, IReadOnly]);
 
     static override createDefaultElement() { return <input type="hidden" /> as HTMLInputElement; }
     declare readonly domNode: HTMLInputElement;

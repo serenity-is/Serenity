@@ -7,9 +7,9 @@ export default function pageInit() {
 }
 
 export class StaticTextBlockDialog<P = {}> extends PropertyDialog<any, P> {
-    static [Symbol.typeInfo] = this.registerClass(nsDemoBasicSamples);
+    static override[Symbol.typeInfo] = this.registerClass(nsDemoBasicSamples);
 
-    protected getFormKey() { return StaticTextBlockForm.formKey; }
+    protected override getFormKey() { return StaticTextBlockForm.formKey; }
 
     protected form = new StaticTextBlockForm(this.idPrefix);
 
@@ -23,13 +23,13 @@ export class StaticTextBlockDialog<P = {}> extends PropertyDialog<any, P> {
      * Here we override loadInitialEntity method to set value for "DisplayFieldValue" field.
      * If this was an EntityDialog, your field value would be originating from server side entity.
      */
-    protected loadInitialEntity() {
+    protected override loadInitialEntity() {
         this.propertyGrid.load({
             DisplayFieldValue: 'This content comes from <b>the value</b> of <em>DisplayFieldValue</em> field.'
         });
     }
 
-    protected getDialogOptions() {
+    protected override getDialogOptions() {
         var opt = super.getDialogOptions();
         opt.width = 650;
         opt.modal = false;

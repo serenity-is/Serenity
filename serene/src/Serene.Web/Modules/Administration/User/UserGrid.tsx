@@ -4,14 +4,14 @@ import { nsAdministration } from "../../ServerTypes/Namespaces";
 import { UserDialog } from "./UserDialog";
 
 export class UserGrid extends EntityGrid<UserRow, any> {
-    static [Symbol.typeInfo] = this.registerClass(nsAdministration);
+    static override[Symbol.typeInfo] = this.registerClass(nsAdministration);
 
-    protected getColumnsKey() { return UserColumns.columnsKey; }
-    protected getDialogType() { return UserDialog; }
-    protected getIdProperty() { return UserRow.idProperty; }
+    protected override getColumnsKey() { return UserColumns.columnsKey; }
+    protected override getDialogType() { return UserDialog; }
+    protected override getIdProperty() { return UserRow.idProperty; }
     protected getIsActiveProperty() { return UserRow.isActiveProperty; }
-    protected getLocalTextPrefix() { return UserRow.localTextPrefix; }
-    protected getService() { return UserService.baseUrl; }
+    protected override getLocalTextPrefix() { return UserRow.localTextPrefix; }
+    protected override getService() { return UserService.baseUrl; }
 
     constructor(props: any) {
         super(props);
@@ -24,8 +24,8 @@ export class UserGrid extends EntityGrid<UserRow, any> {
     protected override createIncludeDeletedButton() {
     }
 
-    protected override getColumns() {
-        var columns = super.getColumns();
+    protected override createColumns() {
+        var columns = super.createColumns();
 
         var roles = tryFirst(columns, x => x.field == UserRow.Fields.Roles);
         if (roles) {

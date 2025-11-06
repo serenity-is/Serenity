@@ -5,7 +5,7 @@ import { Toolbar, ToolButton } from "./toolbar";
 import { Widget, WidgetProps } from "./widget";
 
 export class BasePanel<P = {}> extends Widget<P> {
-    static override [Symbol.typeInfo] = this.registerClass(nsSerenity);
+    static override[Symbol.typeInfo] = this.registerClass(nsSerenity);
     
     constructor(props: WidgetProps<P>) {
         super(props);

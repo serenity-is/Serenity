@@ -18,16 +18,16 @@ export default () => {
 /** Subclass of ProductGrid to override dialog type to CloneableEntityDialog */
 export class CloneableEntityGrid<P = {}> extends EntityGrid<ProductRow, P> {
 
-    protected getColumnsKey() { return ProductColumns.columnsKey; }
-    protected getDialogType() { return CloneableEntityDialog; }
-    protected getRowDefinition() { return ProductRow; }
-    protected getService() { return ProductService.baseUrl; }
+    protected override getColumnsKey() { return ProductColumns.columnsKey; }
+    protected override getDialogType() { return CloneableEntityDialog; }
+    protected override getRowDefinition() { return ProductRow; }
+    protected override getService() { return ProductService.baseUrl; }
 }
 
 export class CloneableEntityDialog extends ProductDialog {
-    static [Symbol.typeInfo] = this.registerClass(nsDemoBasicSamples);
+    static override[Symbol.typeInfo] = this.registerClass(nsDemoBasicSamples);
 
-    protected updateInterface() {
+    protected override updateInterface() {
 
         // by default cloneButton is hidden in base UpdateInterface method
         super.updateInterface();
@@ -36,10 +36,8 @@ export class CloneableEntityDialog extends ProductDialog {
         this.cloneButton.toggle(this.isEditMode());
     }
 
-    /**
-        * Overriding this method is optional to customize cloned entity
-        */
-    protected getCloningEntity() {
+    /** Overriding this method is optional to customize cloned entity */
+    protected override getCloningEntity() {
         var clone = super.getCloningEntity();
 
         // add (Clone) suffix if it's not already added

@@ -4,10 +4,10 @@ import { nsDemoNorthwind } from "../ServerTypes/Namespaces";
 import { CategoryDialog } from "./CategoryDialog";
 
 export class CategoryGrid<P = {}> extends EntityGrid<CategoryRow, P> {
-    static [Symbol.typeInfo] = this.registerClass(nsDemoNorthwind);
+    static override[Symbol.typeInfo] = this.registerClass(nsDemoNorthwind);
 
-    protected getColumnsKey() { return CategoryColumns.columnsKey; }
-    protected getDialogType() { return <any>CategoryDialog; }
-    protected getRowDefinition() { return CategoryRow; }
-    protected getService() { return CategoryService.baseUrl; }
+    protected override getColumnsKey() { return CategoryColumns.columnsKey; }
+    protected override getDialogType() { return <any>CategoryDialog; }
+    protected override getRowDefinition() { return CategoryRow; }
+    protected override getService() { return CategoryService.baseUrl; }
 }

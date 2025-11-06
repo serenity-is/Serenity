@@ -4,13 +4,13 @@ import { nsAdministration } from "../../ServerTypes/Namespaces";
 import { RoleDialog } from "./RoleDialog";
 
 export class RoleGrid extends EntityGrid<RoleRow, any> {
-    static [Symbol.typeInfo] = this.registerClass(nsAdministration);
+    static override[Symbol.typeInfo] = this.registerClass(nsAdministration);
 
-    protected getColumnsKey() { return RoleColumns.columnsKey; }
-    protected getDialogType() { return RoleDialog; }
-    protected getIdProperty() { return RoleRow.idProperty; }
-    protected getLocalTextPrefix() { return RoleRow.localTextPrefix; }
-    protected getService() { return RoleService.baseUrl; }
+    protected override getColumnsKey() { return RoleColumns.columnsKey; }
+    protected override getDialogType() { return RoleDialog; }
+    protected override getIdProperty() { return RoleRow.idProperty; }
+    protected override getLocalTextPrefix() { return RoleRow.localTextPrefix; }
+    protected override getService() { return RoleService.baseUrl; }
 
     constructor(props: any) {
         super(props);

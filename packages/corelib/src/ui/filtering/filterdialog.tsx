@@ -4,7 +4,7 @@ import { WidgetProps } from "../widgets/widget";
 import { FilterPanel } from "./filterpanel";
 
 export class FilterDialog<P = {}> extends BaseDialog<P> {
-    static override [Symbol.typeInfo] = this.registerClass(nsSerenity);
+    static override[Symbol.typeInfo] = this.registerClass(nsSerenity);
 
     declare private filterPanel: FilterPanel;
 

@@ -10,19 +10,19 @@ export default () => gridPageInit(LookupFilterByMultipleGrid);
  * Subclass of ProductGrid to override dialog type to CloneableEntityDialog
  */
 export class LookupFilterByMultipleGrid<P = {}> extends EntityGrid<ProductRow, P> {
-    static [Symbol.typeInfo] = this.registerClass(nsDemoBasicSamples);
+    static override[Symbol.typeInfo] = this.registerClass(nsDemoBasicSamples);
 
-    protected getColumnsKey() { return ProductColumns.columnsKey; }
-    protected getDialogType() { return LookupFilterByMultipleDialog; }
-    protected getRowDefinition() { return ProductRow; }
-    protected getService() { return ProductService.baseUrl; }
+    protected override getColumnsKey() { return ProductColumns.columnsKey; }
+    protected override getDialogType() { return LookupFilterByMultipleDialog; }
+    protected override getRowDefinition() { return ProductRow; }
+    protected override getService() { return ProductService.baseUrl; }
 
     /**
      * This method is called just before List request is sent to service.
      * You have an opportunity here to cancel request or modify it.
      * Here we'll add a custom criteria to list request.
      */
-    protected onViewSubmit() {
+    protected override onViewSubmit() {
         if (!super.onViewSubmit()) {
             return false;
         }
@@ -43,9 +43,9 @@ export class LookupFilterByMultipleGrid<P = {}> extends EntityGrid<ProductRow, P
  * (LookupFilterByMultipleForm) with our special category editor.
  */
 export class LookupFilterByMultipleDialog extends ProductDialog {
-    static [Symbol.typeInfo] = this.registerClass(nsDemoBasicSamples);
+    static override[Symbol.typeInfo] = this.registerClass(nsDemoBasicSamples);
 
-    protected getFormKey() { return LookupFilterByMultipleForm.formKey; }
+    protected override getFormKey() { return LookupFilterByMultipleForm.formKey; }
 }
 
 /**
@@ -59,14 +59,14 @@ export class LookupFilterByMultipleDialog extends ProductDialog {
  */
 export class ProduceSeafoodCategoryEditor extends
     LookupEditorBase<LookupEditorOptions, CategoryRow> {
-    static [Symbol.typeInfo] = this.registerEditor(nsDemoBasicSamples);
+    static override[Symbol.typeInfo] = this.registerEditor(nsDemoBasicSamples);
 
     /**
      * Normally LookupEditor requires a lookup key to determine which set of
      * lookup data to show in editor. As our editor will only show category
      * data, we lock it to category lookup key.
      */
-    protected getLookupKey() {
+    protected override getLookupKey() {
         return CategoryRow.lookupKey;
     }
 
@@ -76,7 +76,7 @@ export class ProduceSeafoodCategoryEditor extends
      * otherwise their value will be null in client side as they are not sent back
      * from server in lookup script.
      */
-    protected getItems(lookup: Lookup<CategoryRow>) {
+    protected override getItems(lookup: Lookup<CategoryRow>) {
         return super.getItems(lookup).filter(x =>
             x.CategoryName === 'Produce' || x.CategoryName === 'Seafood');
     }

@@ -4,7 +4,7 @@ import { nsExtensions } from "../ServerTypes/Namespaces";
 import { ReportDialog } from "./ReportDialog";
 
 export class ReportPage<P = {}> extends Widget<P> {
-    static [Symbol.typeInfo] = this.registerClass(nsExtensions);
+    static override[Symbol.typeInfo] = this.registerClass(nsExtensions);
 
     constructor(props: WidgetProps<P>) {
         super(props);

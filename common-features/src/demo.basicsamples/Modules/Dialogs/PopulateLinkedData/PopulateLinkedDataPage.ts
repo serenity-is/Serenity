@@ -9,17 +9,17 @@ export default () => gridPageInit(PopulateLinkedDataGrid);
  * A subclass of OrderGrid that launches PopulateLinkedDataDialog
  */
 export class PopulateLinkedDataGrid extends OrderGrid {
-    static [Symbol.typeInfo] = this.registerClass(nsDemoBasicSamples);
+    static override[Symbol.typeInfo] = this.registerClass(nsDemoBasicSamples);
 
-    protected getDialogType() { return PopulateLinkedDataDialog; }
+    protected override getDialogType() { return PopulateLinkedDataDialog; }
 }
 
 export class PopulateLinkedDataDialog<P = {}> extends EntityDialog<OrderRow, P> {
-    static [Symbol.typeInfo] = this.registerClass(nsDemoBasicSamples);
+    static override[Symbol.typeInfo] = this.registerClass(nsDemoBasicSamples);
 
-    protected getFormKey() { return PopulateLinkedDataForm.formKey; }
-    protected getRowDefinition() { return OrderRow; }
-    protected getService() { return OrderService.baseUrl; }
+    protected override getFormKey() { return PopulateLinkedDataForm.formKey; }
+    protected override getRowDefinition() { return OrderRow; }
+    protected override getService() { return OrderService.baseUrl; }
 
     protected form = new PopulateLinkedDataForm(this.idPrefix);
 
@@ -60,7 +60,7 @@ export class PopulateLinkedDataDialog<P = {}> extends EntityDialog<OrderRow, P> 
      * We are changing it here to "s-OrderDialog", to make it use default OrderDialog styles
      * This has no effect other than looks on populate linked data demonstration
      */
-    protected getCssClass() {
+    protected override getCssClass() {
         return super.getCssClass() + " s-OrderDialog s-Demo-Northwind-OrderDialog";
     }
 }

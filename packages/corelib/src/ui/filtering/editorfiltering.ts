@@ -6,7 +6,7 @@ import { BaseEditorFiltering } from "./baseeditorfiltering";
 import { FilterOperator, FilterOperators } from "./filteroperator";
 
 export class EditorFiltering extends BaseEditorFiltering<Widget<any>> {
-    static override [Symbol.typeInfo] = this.registerClass(nsSerenity);
+    static override[Symbol.typeInfo] = this.registerClass(nsSerenity);
 
     constructor(public readonly props: { editorType?: string, useRelative?: boolean, useLike?: boolean } = {}) {
         super(Widget);

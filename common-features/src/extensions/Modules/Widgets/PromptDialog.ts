@@ -15,7 +15,7 @@ export interface PromptDialogOptions {
 }
 
 export class PromptDialog<P extends PromptDialogOptions = PromptDialogOptions> extends PropertyDialog<any, P> {
-    static override [Symbol.typeInfo] = this.registerClass(nsExtensions);
+    static override[Symbol.typeInfo] = this.registerClass(nsExtensions);
 
     constructor(props: WidgetProps<P>) {
         super(props);
@@ -38,7 +38,7 @@ export class PromptDialog<P extends PromptDialogOptions = PromptDialogOptions> e
 
     }
 
-    protected getDialogButtons() {
+    protected override getDialogButtons() {
         return [
             okDialogButton({
                 click: (e: Event) => {
@@ -56,11 +56,11 @@ export class PromptDialog<P extends PromptDialogOptions = PromptDialogOptions> e
         ];
     }
 
-    protected loadInitialEntity() {
+    protected override loadInitialEntity() {
         this.value = this.options.value;
     }
 
-    protected getPropertyItems() {
+    protected override getPropertyItems() {
         return [
             {
                 name: "Value",

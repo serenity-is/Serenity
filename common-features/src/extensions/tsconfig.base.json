@@ -17,6 +17,7 @@
     "module": "ESNext",
     "moduleResolution": "Bundler",
     "newLine": "lf",
+    "noImplicitOverride": true,
     "preserveConstEnums": true,
     "skipLibCheck": true,
     "sourceMap": true,

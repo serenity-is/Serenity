@@ -6,12 +6,12 @@ import { nsDemoBasicSamples } from "../../ServerTypes/Namespaces";
 export default () => gridPageInit(GroupingAndSummariesInGrid);
 
 export class GroupingAndSummariesInGrid<P = {}> extends EntityGrid<ProductRow, P> {
-    static [Symbol.typeInfo] = this.registerClass(nsDemoBasicSamples);
+    static override[Symbol.typeInfo] = this.registerClass(nsDemoBasicSamples);
 
-    protected getColumnsKey() { return ProductColumns.columnsKey; }
-    protected getDialogType() { return ProductDialog; }
-    protected getRowDefinition() { return ProductRow; }
-    protected getService() { return ProductService.baseUrl; }
+    protected override getColumnsKey() { return ProductColumns.columnsKey; }
+    protected override getDialogType() { return ProductDialog; }
+    protected override getRowDefinition() { return ProductRow; }
+    protected override getService() { return ProductService.baseUrl; }
 
     protected override initSleekGrid() {
         super.initSleekGrid();
@@ -29,8 +29,8 @@ export class GroupingAndSummariesInGrid<P = {}> extends EntityGrid<ProductRow, P
         });
     }
 
-    protected getColumns() {
-        var columns = new ProductColumns(super.getColumns());
+    protected override createColumns() {
+        var columns = new ProductColumns(super.createColumns());
 
         columns.UnitsOnOrder && (columns.UnitsOnOrder.groupTotalsFormat = (ctx) =>
             (ctx.item.max ? ('max: ' + ctx.escape(ctx.item.max[columns.UnitsOnOrder.field] ?? '')) : ''));
@@ -41,17 +41,17 @@ export class GroupingAndSummariesInGrid<P = {}> extends EntityGrid<ProductRow, P
         return columns.valueOf();
     }
 
-    protected getSlickOptions() {
+    protected override getSlickOptions() {
         var opt = super.getSlickOptions();
         opt.showFooterRow = true;
         return opt;
     }
 
-    protected usePager() {
+    protected override usePager() {
         return false;
     }
 
-    protected getButtons() {
+    protected override getButtons() {
         return [{
             title: 'Group By Category',
             separator: true,

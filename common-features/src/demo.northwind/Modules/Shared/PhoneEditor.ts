@@ -7,7 +7,7 @@ export interface PhoneEditorOptions {
 }
 
 export class PhoneEditor<P extends PhoneEditorOptions = PhoneEditorOptions> extends StringEditor<P> {
-    static override [Symbol.typeInfo] = this.registerEditor(nsDemoNorthwind);
+    static override[Symbol.typeInfo] = this.registerEditor(nsDemoNorthwind);
 
     constructor(props: WidgetProps<P>) {
         super(props);
@@ -43,11 +43,11 @@ export class PhoneEditor<P extends PhoneEditorOptions = PhoneEditorOptions> exte
         return PhoneEditor.formatPhone(value);
     }
 
-    get_value() {
+    override get_value() {
         return this.getFormattedValue();
     }
 
-    set_value(value: string) {
+    override set_value(value: string) {
         (this.domNode as HTMLInputElement).value = value;
     }
 

@@ -642,7 +642,7 @@ export declare class ReportDialog<P extends ReportDialogOptions = ReportDialogOp
 	protected loadReport(reportKey: string): void;
 	protected updateInterface(): void;
 	executeReport(target: string, ext: string, download: boolean): void;
-	getToolbarButtons(): ({
+	protected getToolbarButtons(): ({
 		title: string;
 		cssClass: string;
 		onClick: () => void;
@@ -653,7 +653,7 @@ export declare class ReportDialog<P extends ReportDialogOptions = ReportDialogOp
 		icon: string;
 		onClick: () => void;
 	})[];
-	renderContents(): any;
+	protected renderContents(): any;
 }
 export interface ReportDialogOptions {
 	reportKey: string;

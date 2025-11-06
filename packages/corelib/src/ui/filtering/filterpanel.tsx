@@ -15,7 +15,7 @@ export interface FilterFieldSelectOptions {
 }
 
 class FilterFieldSelect<P extends FilterFieldSelectOptions = FilterFieldSelectOptions> extends ComboboxEditor<P, PropertyItem> {
-    static override [Symbol.typeInfo] = this.registerClass(nsSerenity);
+    static override[Symbol.typeInfo] = this.registerClass(nsSerenity);
 
     constructor(props: WidgetProps<P>) {
         super(props);
@@ -41,7 +41,7 @@ class FilterFieldSelect<P extends FilterFieldSelectOptions = FilterFieldSelectOp
 }
 
 class FilterOperatorSelect extends ComboboxEditor<any, FilterOperator> {
-    static override [Symbol.typeInfo] = this.registerClass(nsSerenity);
+    static override[Symbol.typeInfo] = this.registerClass(nsSerenity);
 
     constructor(props: WidgetProps<{ source: FilterOperator[] }>) {
         super(props);
@@ -67,7 +67,7 @@ class FilterOperatorSelect extends ComboboxEditor<any, FilterOperator> {
 }
 
 export class FilterPanel<P = {}> extends FilterWidgetBase<P> {
-    static override [Symbol.typeInfo] = this.registerClass(nsSerenity);
+    static override[Symbol.typeInfo] = this.registerClass(nsSerenity);
 
     declare private rowsDiv: HTMLElement;
     declare private resetButton: HTMLButtonElement;

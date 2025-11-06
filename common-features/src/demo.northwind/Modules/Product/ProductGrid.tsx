@@ -7,11 +7,11 @@ import { ProductDialog } from "./ProductDialog";
 import "./ProductGrid.css";
 
 export class ProductGrid<P = {}> extends EntityGrid<ProductRow, P> {
-    static [Symbol.typeInfo] = this.registerClass(nsDemoNorthwind, [new FilterableAttribute()]);
-    protected getColumnsKey() { return ProductColumns.columnsKey; }
-    protected getDialogType() { return ProductDialog as any; }
-    protected getRowDefinition() { return ProductRow; }
-    protected getService() { return ProductService.baseUrl; }
+    static override[Symbol.typeInfo] = this.registerClass(nsDemoNorthwind, [new FilterableAttribute()]);
+    protected override getColumnsKey() { return ProductColumns.columnsKey; }
+    protected override getDialogType() { return ProductDialog as any; }
+    protected override getRowDefinition() { return ProductRow; }
+    protected override getService() { return ProductService.baseUrl; }
 
     declare private pendingChanges: Dictionary<any>;
 
@@ -21,7 +21,7 @@ export class ProductGrid<P = {}> extends EntityGrid<ProductRow, P> {
         this.slickContainer.on('change', 'input.edit, textarea.edit, select.edit', (e) => this.inputsChange(e as any));
     }
 
-    protected getButtons() {
+    protected override getButtons() {
         var buttons = super.getButtons();
 
         buttons.push(ExcelExportHelper.createToolButton({
@@ -61,7 +61,7 @@ export class ProductGrid<P = {}> extends EntityGrid<ProductRow, P> {
         return buttons;
     }
 
-    protected onViewProcessData(response) {
+    protected override onViewProcessData(response) {
         this.pendingChanges = {};
         this.setSaveButtonState();
         return super.onViewProcessData(response);
@@ -119,8 +119,8 @@ export class ProductGrid<P = {}> extends EntityGrid<ProductRow, P> {
         return item[field];
     }
 
-    protected getColumns(): Column[] {
-        const columns = new ProductColumns(super.getColumns());
+    protected override createColumns(): Column[] {
+        const columns = new ProductColumns(super.createColumns());
         const num = (ctx: FormatterContext<ProductRow>) => this.numericInputFormatter(ctx);
         const str = (ctx: FormatterContext<ProductRow>) => this.stringInputFormatter(ctx);
 
@@ -232,7 +232,7 @@ export class ProductGrid<P = {}> extends EntityGrid<ProductRow, P> {
         })();
     }
 
-    protected getQuickFilters() {
+    protected override getQuickFilters() {
         const flt = super.getQuickFilters();
 
         const q = parseQueryString();

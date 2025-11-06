@@ -5,12 +5,12 @@ import { nsDemoNorthwind } from "../ServerTypes/Namespaces";
 import { OrderDetailDialog } from "./OrderDetailDialog";
 
 export class OrderDetailsEditor<P = {}> extends GridEditorBase<OrderDetailRow, P> {
-    static override [Symbol.typeInfo] = this.registerEditor(nsDemoNorthwind);
+    static override[Symbol.typeInfo] = this.registerEditor(nsDemoNorthwind);
     
-    protected getColumnsKey() { return OrderDetailColumns.columnsKey; }
-    protected getDialogType() { return OrderDetailDialog; }
-    protected getRowDefinition() { return OrderDetailRow; }
-    protected getService() { return OrderDetailService.baseUrl; }
+    protected override getColumnsKey() { return OrderDetailColumns.columnsKey; }
+    protected override getDialogType() { return OrderDetailDialog; }
+    protected override getRowDefinition() { return OrderDetailRow; }
+    protected override getService() { return OrderDetailService.baseUrl; }
 
     protected override async validateEntity(row: OrderDetailRow, id: any) {
         row.ProductID = toId(row.ProductID);

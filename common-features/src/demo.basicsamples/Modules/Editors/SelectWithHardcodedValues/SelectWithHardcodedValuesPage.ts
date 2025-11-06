@@ -24,7 +24,7 @@ export default function pageInit() {
  * in server side forms, e.g. [HardCodedValuesEditor]
  */
 export class HardcodedValuesEditor<P = {}> extends ComboboxEditor<P, any> {
-    static [Symbol.typeInfo] = this.registerEditor(nsDemoBasicSamples);
+    static override[Symbol.typeInfo] = this.registerEditor(nsDemoBasicSamples);
 
     constructor(props: EditorProps<P>) {
         super(props);
@@ -49,9 +49,9 @@ export class HardcodedValuesEditor<P = {}> extends ComboboxEditor<P, any> {
 }
 
 export class HardcodedValuesDialog<P = {}> extends PropertyDialog<any, P> {
-    static [Symbol.typeInfo] = this.registerClass(nsDemoBasicSamples);
+    static override[Symbol.typeInfo] = this.registerClass(nsDemoBasicSamples);
 
-    protected getFormKey() { return HardcodedValuesForm.formKey; }
+    protected override getFormKey() { return HardcodedValuesForm.formKey; }
 
     protected form = new HardcodedValuesForm(this.idPrefix);
 
@@ -65,7 +65,7 @@ export class HardcodedValuesDialog<P = {}> extends PropertyDialog<any, P> {
         });
     }
 
-    protected getDialogOptions() {
+    protected override getDialogOptions() {
         var opt = super.getDialogOptions();
         opt.modal = false;
         return opt;

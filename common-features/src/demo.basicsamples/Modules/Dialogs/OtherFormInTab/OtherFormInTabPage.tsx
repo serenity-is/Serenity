@@ -8,7 +8,7 @@ export default () => gridPageInit(OtherFormInTabGrid);
  * Subclass of OrderGrid to override dialog type to OtherFormInTabDialog
  */
 export class OtherFormInTabGrid<P = {}> extends OrderGrid<P> {
-    static [Symbol.typeInfo] = this.registerClass(nsDemoBasicSamples);
+    static override[Symbol.typeInfo] = this.registerClass(nsDemoBasicSamples);
 
     protected override getDialogType() { return OtherFormInTabDialog; }
 }
@@ -17,7 +17,7 @@ export class OtherFormInTabGrid<P = {}> extends OrderGrid<P> {
  * Our custom order dialog subclass that will have a tab to display and edit selected customer details.
  */
 export class OtherFormInTabDialog<P = {}> extends OrderDialog<P> {
-    static [Symbol.typeInfo] = this.registerClass(nsDemoBasicSamples);
+    static override[Symbol.typeInfo] = this.registerClass(nsDemoBasicSamples);
 
     declare private customerValidator: any;
     declare private customerPropertyGrid: PropertyGrid;
@@ -54,7 +54,7 @@ export class OtherFormInTabDialog<P = {}> extends OrderDialog<P> {
         return toId(this.form.CustomerID.value);
     }
 
-    loadEntity(entity: OrderRow) {
+    protected override loadEntity(entity: OrderRow) {
         super.loadEntity(entity);
         TabsExtensions.setDisabled(this.tabs, 'Customer', !this.customerId);
     }
@@ -94,7 +94,7 @@ export class OtherFormInTabDialog<P = {}> extends OrderDialog<P> {
         });
     }
 
-    renderContents(): any {
+    protected override renderContents(): any {
         const id = this.useIdPrefix();
         return (
             <div id={id.Tabs} class="s-DialogContent">

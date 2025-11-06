@@ -329,7 +329,7 @@ export function PropertyTabs(props: {
 
 export class PropertyGrid<P extends PropertyGridOptions = PropertyGridOptions> extends Widget<P> {
 
-    static override [Symbol.typeInfo] = this.registerClass(nsSerenity);
+    static override[Symbol.typeInfo] = this.registerClass(nsSerenity);
 
     declare private fieldElements: PropertyFieldElement[];
 

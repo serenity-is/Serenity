@@ -20,7 +20,7 @@ export interface ServiceLookupEditorOptions extends ComboboxEditorOptions {
 }
 
 export abstract class ServiceLookupEditorBase<P extends ServiceLookupEditorOptions, TItem> extends ComboboxEditor<P, TItem> {
-    static override [Symbol.typeInfo] = this.registerEditor(nsSerenity);
+    static override[Symbol.typeInfo] = this.registerEditor(nsSerenity);
 
     protected override getDialogTypeKey() {
         var dialogTypeKey = super.getDialogTypeKey();
@@ -185,7 +185,7 @@ export abstract class ServiceLookupEditorBase<P extends ServiceLookupEditorOptio
 }
 
 export class ServiceLookupEditor<P extends ServiceLookupEditorOptions = ServiceLookupEditorOptions, TItem = any> extends ServiceLookupEditorBase<ServiceLookupEditorOptions, TItem> {
-    static override [Symbol.typeInfo] = this.registerEditor(nsSerenity);
+    static override[Symbol.typeInfo] = this.registerEditor(nsSerenity);
 
     constructor(props: EditorProps<P>) {
         super(props);

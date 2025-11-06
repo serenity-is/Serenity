@@ -3,7 +3,7 @@ import { FilterDialog } from "./filterdialog";
 import { FilterWidgetBase } from "./filterwidgetbase";
 
 export class FilterDisplayBar<P = {}> extends FilterWidgetBase<P> {
-    static override [Symbol.typeInfo] = this.registerClass(nsSerenity);
+    static override[Symbol.typeInfo] = this.registerClass(nsSerenity);
 
     protected override renderContents(): any {
         var openFilterDialog = (e: Event) => {

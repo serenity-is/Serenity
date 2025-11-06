@@ -1,5 +1,5 @@
 
-import { SubDialogHelper } from "@serenity-is/corelib";
+import { SubDialogHelper, type Widget } from "@serenity-is/corelib";
 import { Column } from "@serenity-is/sleekgrid";
 import { OrderGrid } from "../Order/OrderGrid";
 import { OrderRow } from "../ServerTypes/Demo";
@@ -9,15 +9,15 @@ import { CustomerOrderDialog } from "./CustomerOrderDialog";
 const fld = OrderRow.Fields;
 
 export class CustomerOrdersGrid<P = {}> extends OrderGrid<P> {
-    static [Symbol.typeInfo] = this.registerClass(nsDemoNorthwind);
-    
-    protected getDialogType() { return CustomerOrderDialog; }
+    static override[Symbol.typeInfo] = this.registerClass(nsDemoNorthwind);
 
-    protected getColumns(): Column[] {
-        return super.getColumns().filter(x => x.field !== fld.CustomerCompanyName);
+    protected override getDialogType() { return CustomerOrderDialog; }
+
+    protected override createColumns(): Column[] {
+        return super.createColumns().filter(x => x.field !== fld.CustomerCompanyName);
     }
 
-    protected initEntityDialog(itemType, dialog) {
+    protected override initEntityDialog(itemType: string, dialog: Widget<any>) {
         super.initEntityDialog(itemType, dialog);
         SubDialogHelper.cascade(dialog, this.domNode.closest('.ui-dialog') as HTMLElement);
     }
@@ -30,17 +30,17 @@ export class CustomerOrdersGrid<P = {}> extends OrderGrid<P> {
         return buttons;
     }
 
-    protected addButtonClick() {
+    protected override addButtonClick() {
         if (!this.customerID)
             return;
         this.editItem({ CustomerID: this.customerID });
     }
 
-    protected getInitialTitle() {
+    protected override getInitialTitle() {
         return null;
     }
 
-    protected getGridCanLoad() {
+    protected override getGridCanLoad() {
         return super.getGridCanLoad() && !!this.customerID;
     }
 

@@ -2,9 +2,9 @@
 export class {{DialogClassName}} extends {{SERENITYIMPORT "EntityDialog"}}<{{RowClassName}}, any> {
     static override [Symbol.typeInfo] = this.registerClass("{{ModuleNamespace}}.");
 
-    protected getFormKey() { return {{SERVERTYPEIMPORT FormClassName}}.formKey; }
-    protected getRowDefinition() { return {{SERVERTYPEIMPORT RowClassName}}; }
-    protected getService() { return {{SERVERTYPEIMPORT ServiceClassName}}.baseUrl; }
+    protected override getFormKey() { return {{SERVERTYPEIMPORT FormClassName}}.formKey; }
+    protected override getRowDefinition() { return {{SERVERTYPEIMPORT RowClassName}}; }
+    protected override getService() { return {{SERVERTYPEIMPORT ServiceClassName}}.baseUrl; }
 
     protected form = new {{FormClassName}}(this.idPrefix);
 }

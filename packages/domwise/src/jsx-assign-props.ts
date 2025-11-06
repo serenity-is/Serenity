@@ -14,16 +14,25 @@ function normalizeAttribute(s: string, separator: string) {
     return s.replace(/[A-Z]/g, match => separator + match.toLowerCase());
 }
 
-const mappedKeys: Record<string, string> = {
-    className: "class",
-    contentEditable: "contenteditable",
-    htmlFor: "for",
-    innerText: "textContent",
-    maxLength: "maxlength",
-    readOnly: "readonly",
-    spellCheck: "spellcheck",
-    tabIndex: "tabindex",
-}
+const mappedKeys: Map<string, string> = new Map<string, string>([
+    ["autoComplete", "autocomplete"],
+    ["autoFocus", "autofocus"],
+    ["className", "class"],
+    ["colSpan", "colspan"],
+    ["contentEditable", "contenteditable"],
+    ["formNoValidate", "formnovalidate"],
+    ["htmlFor", "for"],
+    ["innerText", "textContent"],
+    ["minLength", "minlength"],
+    ["maxLength", "maxlength"],
+    ["readOnly", "readonly"],
+    ["reffererPolicy", "referrerpolicy"],
+    ["rowSpan", "rowspan"],
+    ["spellCheck", "spellcheck"],
+    ["tabIndex", "tabindex"],
+    ["onDoubleClick", "onDblClick"],
+    ["onDoubleClickCapture", "onDblClickCapture"]
+]);
 
 export function assignProp(node: JSXElement, key: string, value: any, prev?: any) {
 
@@ -160,12 +169,6 @@ export function assignProp(node: JSXElement, key: string, value: any, prev?: any
 
             let attribute = key.toLowerCase();
             const useCapture = attribute.endsWith("capture");
-            if (attribute === "ondoubleclick") {
-                attribute = "ondblclick";
-            } else if (useCapture && attribute === "ondoubleclickcapture") {
-                attribute = "ondblclickcapture";
-            }
-
             let eventName;
             if (!useCapture && ((node as any)[attribute] === null || (prev != null && (node as any)[attribute] === prev))) {
                 // use property when possible jsx-dom PR #17
@@ -254,8 +257,7 @@ export function assignProp(node: JSXElement, key: string, value: any, prev?: any
 export function assignProps(node: JSXElement, props: Record<string, any>) {
     for (let [key, value] of Object.entries(props)) {
 
-        if (key in mappedKeys)
-            key = mappedKeys[key];
+        key = mappedKeys.get(key) ?? key;
 
         if (isSignalLike(value)) {
             observeSignal(value, (args) => assignProp(node, key, args.newValue, args.prevValue), {

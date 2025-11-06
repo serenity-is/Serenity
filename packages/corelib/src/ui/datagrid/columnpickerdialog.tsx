@@ -14,7 +14,7 @@ export interface ColumnPickerDialogOptions {
 
 export class ColumnPickerDialog<P extends ColumnPickerDialogOptions = ColumnPickerDialogOptions> extends BaseDialog<P> {
 
-    static override [Symbol.typeInfo] = this.registerClass(nsSerenity, [new ResizableAttribute()]);
+    static override[Symbol.typeInfo] = this.registerClass(nsSerenity, [new ResizableAttribute()]);
 
     declare private ulVisible: HTMLUListElement;
     declare private ulHidden: HTMLUListElement;

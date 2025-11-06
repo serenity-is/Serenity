@@ -10,9 +10,9 @@ export default () => gridPageInit(FilteredLookupInDetailGrid);
  * Subclass of OrderGrid to override dialog type to FilteredLookupInDetailDialog
  */
 export class FilteredLookupInDetailGrid extends OrderGrid {
-    static [Symbol.typeInfo] = this.registerClass(nsDemoBasicSamples);
+    static override[Symbol.typeInfo] = this.registerClass(nsDemoBasicSamples);
 
-    protected getDialogType() { return FilteredLookupInDetailDialog; }
+    protected override getDialogType() { return FilteredLookupInDetailDialog; }
 }
 
 /**
@@ -20,7 +20,7 @@ export class FilteredLookupInDetailGrid extends OrderGrid {
  * that will be used to set CascadeValue of product editor
  */
 export class FilteredLookupOrderDetailDialog extends OrderDetailDialog {
-    static [Symbol.typeInfo] = this.registerClass(nsDemoBasicSamples);
+    static override[Symbol.typeInfo] = this.registerClass(nsDemoBasicSamples);
 
     constructor(props: any) {
         super(props);
@@ -40,7 +40,7 @@ export class FilteredLookupOrderDetailDialog extends OrderDetailDialog {
      * This method is called just before an entity is loaded to dialog
      * This is also called for new record mode with an empty entity
      */
-    protected beforeLoadEntity(entity) {
+    protected override beforeLoadEntity(entity) {
         super.beforeLoadEntity(entity);
 
         // setting cascade value here
@@ -57,9 +57,9 @@ export class FilteredLookupOrderDetailDialog extends OrderDetailDialog {
  * Our subclass of Order Details editor with a CategoryID property
  */
 export class FilteredLookupDetailEditor<P = {}> extends OrderDetailsEditor<P> {
-    static [Symbol.typeInfo] = this.registerEditor(nsDemoBasicSamples);
+    static override[Symbol.typeInfo] = this.registerEditor(nsDemoBasicSamples);
 
-    protected getDialogType() { return FilteredLookupOrderDetailDialog; }
+    protected override getDialogType() { return FilteredLookupOrderDetailDialog; }
 
     declare public categoryID: number;
 
@@ -68,7 +68,7 @@ export class FilteredLookupDetailEditor<P = {}> extends OrderDetailsEditor<P> {
      * grid editor when Add button or an edit link is clicked
      * We have an opportunity here to pass CategoryID to edit dialog
      */
-    protected initEntityDialog(itemType: string, dialog: Widget<any>) {
+    protected override initEntityDialog(itemType: string, dialog: Widget<any>) {
         super.initEntityDialog(itemType, dialog);
 
         // passing category ID from grid editor to detail dialog
@@ -80,11 +80,11 @@ export class FilteredLookupDetailEditor<P = {}> extends OrderDetailsEditor<P> {
  * Basic order dialog with a category selection
  */
 export class FilteredLookupInDetailDialog<P = {}> extends EntityDialog<OrderRow, P> {
-    static [Symbol.typeInfo] = this.registerClass(nsDemoBasicSamples);
+    static override[Symbol.typeInfo] = this.registerClass(nsDemoBasicSamples);
 
-    protected getFormKey() { return FilteredLookupInDetailForm.formKey; }
-    protected getRowDefinition() { return OrderRow; }
-    protected getService() { return OrderService.baseUrl; }
+    protected override getFormKey() { return FilteredLookupInDetailForm.formKey; }
+    protected override getRowDefinition() { return OrderRow; }
+    protected override getService() { return OrderService.baseUrl; }
 
     declare private form: FilteredLookupInDetailForm;
 

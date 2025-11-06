@@ -16,7 +16,7 @@ class LoginPanel extends PropertyPanel<LoginRequest, any> {
 
     public readonly form = new LoginForm(this.idPrefix);
 
-    protected getFormKey() { return LoginForm.formKey; }
+    protected override getFormKey() { return LoginForm.formKey; }
 
     constructor(props?: WidgetProps<any>) {
         super(props);
@@ -58,7 +58,7 @@ class LoginPanel extends PropertyPanel<LoginRequest, any> {
         window.location.href = getReturnUrl({ purpose: "login" });
     }
 
-    protected renderContents() {
+    protected override renderContents() {
         const id = this.useIdPrefix();
         this.element.empty().append(<>
             <AccountPanelTitle />

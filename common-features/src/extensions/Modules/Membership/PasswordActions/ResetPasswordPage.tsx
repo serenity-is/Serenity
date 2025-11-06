@@ -17,7 +17,7 @@ export interface ResetPasswordOptions extends TransformInclude {
 
 export class ResetPasswordPanel extends PropertyPanel<ResetPasswordRequest, ResetPasswordOptions> {
 
-    protected getFormKey() { return ResetPasswordForm.formKey; }
+    protected override getFormKey() { return ResetPasswordForm.formKey; }
 
     private form = new ResetPasswordForm(this.idPrefix);
     declare private tokenInput: HTMLInputElement;
@@ -53,7 +53,7 @@ export class ResetPasswordPanel extends PropertyPanel<ResetPasswordRequest, Rese
         });
     }
 
-    renderContents(): any {
+    protected override renderContents(): any {
         const id = this.useIdPrefix();
         return (
             <div class="s-container-tight">

@@ -1,4 +1,4 @@
-import { BaseDialog, BooleanEditor, CaptureOperationType, ColumnsBase, DateEditor, DecimalEditor, DeleteRequest, DeleteResponse, DialogButton, EditorProps, EditorWidget, EmailAddressEditor, EntityDialog, EntityGrid, EnumEditor, Formatter, IGetEditValue, ISetEditValue, ImageUploadEditor, IntegerEditor, ListRequest, ListResponse, LookupEditor, LookupEditorBase, LookupEditorOptions, PrefixedContext, PropertyItem, RetrieveRequest, RetrieveResponse, SaveInitiator, SaveRequest, SaveResponse, ServiceLookupEditor, ServiceOptions, StringEditor, ToolButton, WidgetProps } from '@serenity-is/corelib';
+import { BaseDialog, BooleanEditor, CaptureOperationType, ColumnsBase, DateEditor, DecimalEditor, DeleteRequest, DeleteResponse, DialogButton, EditorProps, EditorWidget, EmailAddressEditor, EntityDialog, EntityGrid, EnumEditor, Formatter, IGetEditValue, ISetEditValue, ImageUploadEditor, IntegerEditor, ListRequest, ListResponse, LookupEditor, LookupEditorBase, LookupEditorOptions, PrefixedContext, PropertyItem, RetrieveRequest, RetrieveResponse, SaveInitiator, SaveRequest, SaveResponse, ServiceLookupEditor, ServiceOptions, StringEditor, ToolButton, Widget, WidgetProps } from '@serenity-is/corelib';
 import { GetNextNumberRequest, GetNextNumberResponse, GridEditorBase, GridEditorDialog } from '@serenity-is/extensions';
 import { Column, FormatterContext, FormatterResult } from '@serenity-is/sleekgrid';
 
@@ -988,10 +988,10 @@ export declare class CustomerDialog<P = {}> extends EntityDialog<CustomerRow, P>
 	constructor(props: WidgetProps<P>);
 	initDialog(): void;
 	getSaveState(): string;
-	loadResponse(data: any): void;
-	loadEntity(entity: CustomerRow): void;
+	protected loadResponse(data: any): void;
+	protected loadEntity(entity: CustomerRow): void;
 	protected onSaveSuccess(response: SaveResponse, initiator: SaveInitiator): void;
-	renderContents(): any;
+	protected renderContents(): any;
 }
 export declare class CustomerGrid<P = {}> extends EntityGrid<CustomerRow, P> {
 	static [Symbol.typeInfo]: import("@serenity-is/corelib").ClassTypeInfo<"Serenity.Demo.Northwind.">;
@@ -1006,13 +1006,13 @@ export declare class OrderDialog<P = {}> extends EntityDialog<OrderRow, P> {
 	protected getRowDefinition(): typeof OrderRow;
 	protected getService(): string;
 	protected form: OrderForm;
-	getToolbarButtons(): import("@serenity-is/corelib").ToolButton[];
+	protected getToolbarButtons(): import("@serenity-is/corelib").ToolButton[];
 	protected updateInterface(): void;
 	protected afterLoadEntity(): void;
 }
 export declare class CustomerOrderDialog extends OrderDialog {
 	static [Symbol.typeInfo]: import("@serenity-is/corelib").ClassTypeInfo<"Serenity.Demo.Northwind.">;
-	updateInterface(): void;
+	protected updateInterface(): void;
 }
 export declare class OrderGrid<P = {}> extends EntityGrid<OrderRow, P> {
 	static [Symbol.typeInfo]: import("@serenity-is/corelib").ClassTypeInfo<"Serenity.Demo.Northwind.">;
@@ -1024,7 +1024,7 @@ export declare class OrderGrid<P = {}> extends EntityGrid<OrderRow, P> {
 	protected getQuickFilters(): import("@serenity-is/corelib").QuickFilter<import("@serenity-is/corelib").Widget<any>, any>[];
 	protected createQuickFilters(): void;
 	protected getButtons(): ToolButton[];
-	protected getColumns(): import("@serenity-is/sleekgrid").Column<OrderRow>[];
+	protected createColumns(): import("@serenity-is/sleekgrid").Column<OrderRow>[];
 	protected onClick(e: Event, row: number, cell: number): void;
 	set_shippingState(value: number): void;
 	protected addButtonClick(): void;
@@ -1032,8 +1032,8 @@ export declare class OrderGrid<P = {}> extends EntityGrid<OrderRow, P> {
 export declare class CustomerOrdersGrid<P = {}> extends OrderGrid<P> {
 	static [Symbol.typeInfo]: import("@serenity-is/corelib").ClassTypeInfo<"Serenity.Demo.Northwind.">;
 	protected getDialogType(): typeof CustomerOrderDialog;
-	protected getColumns(): Column[];
-	protected initEntityDialog(itemType: any, dialog: any): void;
+	protected createColumns(): Column[];
+	protected initEntityDialog(itemType: string, dialog: Widget<any>): void;
 	protected getButtons(): import("@serenity-is/corelib").ToolButton[];
 	protected addButtonClick(): void;
 	protected getInitialTitle(): any;
@@ -1091,7 +1091,7 @@ export declare class ProductGrid<P = {}> extends EntityGrid<ProductRow, P> {
 	private stringInputFormatter;
 	private selectFormatter;
 	private getEffectiveValue;
-	protected getColumns(): Column[];
+	protected createColumns(): Column[];
 	private inputsChange;
 	private setSaveButtonState;
 	private saveClick;

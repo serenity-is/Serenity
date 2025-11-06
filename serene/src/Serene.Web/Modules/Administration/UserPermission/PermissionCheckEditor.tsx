@@ -25,7 +25,7 @@ export interface PermissionCheckItem {
 }
 
 export class PermissionCheckEditor<P extends PermissionCheckEditorOptions = PermissionCheckEditorOptions> extends DataGrid<PermissionCheckItem, P> {
-    static override [Symbol.typeInfo] = this.registerEditor(nsAdministration, [IGetEditValue, ISetEditValue]);
+    static override[Symbol.typeInfo] = this.registerEditor(nsAdministration, [IGetEditValue, ISetEditValue]);
 
     protected getIdProperty() { return "Key"; }
 
@@ -88,7 +88,7 @@ export class PermissionCheckEditor<P extends PermissionCheckEditorOptions = Perm
         return (item.GrantRevoke === true || (item.GrantRevoke == null && this.hasByRoleOrImplicitly(item.Key))) ? 'allow' : 'deny';
     }
 
-    protected getColumns(): Column[] {
+    protected override createColumns(): Column[] {
         let columns: Column[] = [{
             name: UserPermissionDialogTexts.Permission,
             field: 'Title',

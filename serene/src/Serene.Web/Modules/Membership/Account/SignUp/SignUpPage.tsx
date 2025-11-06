@@ -9,7 +9,7 @@ export default function pageInit(opt: any) {
 
 class SignUpPanel extends PropertyPanel<SignUpRequest, any> {
 
-    protected getFormKey() { return SignUpForm.formKey; }
+    protected override getFormKey() { return SignUpForm.formKey; }
 
     private form: SignUpForm;
 
@@ -54,7 +54,7 @@ class SignUpPanel extends PropertyPanel<SignUpRequest, any> {
         });
     }
 
-    renderContents() {
+    protected override renderContents() {
         const id = this.useIdPrefix();
         this.element.empty().append(<>
             <AccountPanelTitle />
@@ -63,8 +63,8 @@ class SignUpPanel extends PropertyPanel<SignUpRequest, any> {
                 <h5 class="text-center my-4">{SignUpFormTexts.FormTitle}</h5>
                 <p id={id.FormInfo} class="text-center">{SignUpFormTexts.FormInfo}</p>
 
-                <form id={id.Form} action="" autoComplete="off">
-                    <input autoComplete="false" name="hidden" type="text" style="display:none;" />
+                <form id={id.Form} action="" autocomplete="off">
+                    <input autocomplete="false" name="hidden" type="text" style="display:none;" />
                     <div id={id.PropertyGrid}></div>
                     <div class="px-field">
                         <button id={id.SubmitButton} type="submit" class="btn btn-primary my-4 w-100"

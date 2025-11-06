@@ -5,11 +5,11 @@ import { nsDemoNorthwind } from "../ServerTypes/Namespaces";
 import "./OrderDetailDialog.css";
 
 export class OrderDetailDialog extends GridEditorDialog<OrderDetailRow> {
-    static override [Symbol.typeInfo] = this.registerClass(nsDemoNorthwind);
+    static override[Symbol.typeInfo] = this.registerClass(nsDemoNorthwind);
     
-    protected getFormKey() { return OrderDetailForm.formKey; }
-    protected getRowDefinition() { return OrderDetailRow; }
-    protected getService() { return OrderDetailService.baseUrl; }
+    protected override getFormKey() { return OrderDetailForm.formKey; }
+    protected override getRowDefinition() { return OrderDetailRow; }
+    protected override getService() { return OrderDetailService.baseUrl; }
 
     declare protected form: OrderDetailForm;
 

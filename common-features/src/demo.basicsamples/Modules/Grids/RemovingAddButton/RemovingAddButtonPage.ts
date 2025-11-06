@@ -5,12 +5,12 @@ import { nsDemoBasicSamples } from "../../ServerTypes/Namespaces";
 export default () => gridPageInit(RemovingAddButton)
 
 export class RemovingAddButton extends SupplierGrid {
-    static [Symbol.typeInfo] = this.registerClass(nsDemoBasicSamples);
+    static override[Symbol.typeInfo] = this.registerClass(nsDemoBasicSamples);
 
     /**
      * This method is called to get list of buttons to be created.
      */
-    protected getButtons(): ToolButton[] {
+    protected override getButtons(): ToolButton[] {
 
         // call base method to get list of buttons
         // by default, base entity grid adds a few buttons, 

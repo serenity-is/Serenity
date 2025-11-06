@@ -11,7 +11,7 @@ export interface EnumEditorOptions extends ComboboxCommonOptions {
 }
 
 export class EnumEditor<P extends EnumEditorOptions = EnumEditorOptions> extends ComboboxEditor<P, ComboboxItem> {
-    static override [Symbol.typeInfo] = this.registerEditor(nsSerenity);
+    static override[Symbol.typeInfo] = this.registerEditor(nsSerenity);
 
     constructor(props: EditorProps<P>) {
         super(props);

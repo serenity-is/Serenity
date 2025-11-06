@@ -5,7 +5,7 @@ import { nsExtensions } from "../ServerTypes/Namespaces";
 * This is an editor widget but it only displays a text, not edits it.
 */
 export class StaticTextBlock<P extends StaticTextBlockOptions = StaticTextBlockOptions> extends Widget<P> implements ISetEditValue {
-    static [Symbol.typeInfo] = this.registerEditor(nsExtensions, [ISetEditValue]);
+    static override[Symbol.typeInfo] = this.registerEditor(nsExtensions, [ISetEditValue]);
     static override createDefaultElement() { return document.createElement("div"); }
 
     declare private value: string;

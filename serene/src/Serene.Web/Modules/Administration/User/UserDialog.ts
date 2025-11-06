@@ -5,14 +5,14 @@ import { MembershipValidationTexts, UserDialogTexts } from "../../ServerTypes/Te
 import { UserPermissionDialog } from "../UserPermission/UserPermissionDialog";
 
 export class UserDialog extends EntityDialog<UserRow, any> {
-    static override [Symbol.typeInfo] = this.registerClass(nsAdministration);
+    static override[Symbol.typeInfo] = this.registerClass(nsAdministration);
 
-    protected getFormKey() { return UserForm.formKey; }
-    protected getIdProperty() { return UserRow.idProperty; }
+    protected override getFormKey() { return UserForm.formKey; }
+    protected override getIdProperty() { return UserRow.idProperty; }
     protected getIsActiveProperty() { return UserRow.isActiveProperty; }
-    protected getLocalTextPrefix() { return UserRow.localTextPrefix; }
-    protected getNameProperty() { return UserRow.nameProperty; }
-    protected getService() { return UserService.baseUrl; }
+    protected override getLocalTextPrefix() { return UserRow.localTextPrefix; }
+    protected override getNameProperty() { return UserRow.nameProperty; }
+    protected override getService() { return UserService.baseUrl; }
 
     protected form = new UserForm(this.idPrefix);
 
@@ -34,7 +34,7 @@ export class UserDialog extends EntityDialog<UserRow, any> {
         });
     }
 
-    protected getToolbarButtons() {
+    protected override getToolbarButtons() {
         let buttons = super.getToolbarButtons();
 
         buttons.push({
@@ -52,13 +52,13 @@ export class UserDialog extends EntityDialog<UserRow, any> {
         return buttons;
     }
 
-    protected updateInterface() {
+    protected override updateInterface() {
         super.updateInterface();
 
         this.toolbar.findButton("edit-permissions-button").toggleClass("disabled", this.isNewOrDeleted());
     }
 
-    protected afterLoadEntity() {
+    protected override afterLoadEntity() {
         super.afterLoadEntity();
 
         // these fields are only required in new record mode

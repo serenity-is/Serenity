@@ -9,7 +9,7 @@ export interface EmailEditorOptions {
 }
 
 export class EmailEditor<P extends EmailEditorOptions = EmailEditorOptions> extends EditorWidget<P> {
-    static override [Symbol.typeInfo] = this.registerEditor(nsSerenity, [IStringValue, IReadOnly]);
+    static override[Symbol.typeInfo] = this.registerEditor(nsSerenity, [IStringValue, IReadOnly]);
 
     static override createDefaultElement() { return <input type="text" /> as HTMLInputElement; }
     declare readonly domNode: HTMLInputElement;

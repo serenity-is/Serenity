@@ -5,20 +5,20 @@ import { bindThis } from "@serenity-is/domwise";
 
 export abstract class GridEditorBase<TEntity, P = {}> extends EntityGrid<TEntity, P>
     implements IGetEditValue, ISetEditValue {
-    static [Symbol.typeInfo] = this.registerEditor(nsExtensions, [IGetEditValue, ISetEditValue]);
+    static override[Symbol.typeInfo] = this.registerEditor(nsExtensions, [IGetEditValue, ISetEditValue]);
     static override createDefaultElement() { return document.createElement("div"); }
 
     /** Gets the id property name. Returns it from getRowDefinition() if available, or the default __id.
      * For connected mode, this should be the actual id property name of the entity, or getRowDefinition
      * should be implemented.
      */
-    protected getIdProperty() { return this.getRowDefinition()?.idProperty ?? "__id"; }
+    protected override getIdProperty() { return this.getRowDefinition()?.idProperty ?? "__id"; }
 
     /**
      * Gets the dialog type to be used for editing entities. This method must be overridden in the grid editor class to return
      * the dialog type that extends GridEditorDialog<TEntity> and has the same TEntity type with the grid editor.
      */
-    protected getDialogType(): DialogType | PromiseLike<DialogType> {
+    protected override getDialogType(): DialogType | PromiseLike<DialogType> {
         throw new Error(`Please override getDialogType method in the grid editor class (${getTypeFullName(getInstanceType(this))}),` + 
             ` and return the correct dialog type which extends GridEditorDialog!`);
     }
@@ -157,7 +157,7 @@ export abstract class GridEditorBase<TEntity, P = {}> extends EntityGrid<TEntity
         return {} as TEntity;
     }
 
-    protected getButtons(): ToolButton[] {
+    protected override getButtons(): ToolButton[] {
         const buttons = super.getButtons();
         const addButton = buttons.find(x => x.action === 'add');
         if (addButton) {
@@ -178,7 +178,7 @@ export abstract class GridEditorBase<TEntity, P = {}> extends EntityGrid<TEntity
      * This method is overridden to intercept the dialog creation and pass the handlers for save/delete operations.
      * @param entityOrId Entity or id of the entity to be edited
      */
-    protected editItem(entityOrId: any): void {
+    protected override editItem(entityOrId: any): void {
 
         const scriptType = typeof (entityOrId);
         let id: any;
@@ -260,21 +260,21 @@ export abstract class GridEditorBase<TEntity, P = {}> extends EntityGrid<TEntity
     /**
      * Returns true only in connected mode, otherwise false.
      */
-    protected getGridCanLoad() {
+    protected override getGridCanLoad() {
         return super.getGridCanLoad() && !!this._connectedMode;
     }
 
     /**
      * As grid editor works in memory editing mode by default, it does not use pager.
      */
-    protected usePager() {
+    protected override usePager() {
         return false;
     }
 
     /**
      * No title by default for grid editors
      */
-    protected getInitialTitle() {
+    protected override getInitialTitle() {
         return null;
     }
 

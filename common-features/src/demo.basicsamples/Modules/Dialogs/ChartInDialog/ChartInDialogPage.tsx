@@ -23,11 +23,11 @@ export default () => {
 }
 
 export class ChartInDialog<P = {}> extends BaseDialog<P> {
-    static [Symbol.typeInfo] = this.registerClass(nsDemoBasicSamples, [new ResizableAttribute(), new MaximizableAttribute()]);
+    static override[Symbol.typeInfo] = this.registerClass(nsDemoBasicSamples, [new ResizableAttribute(), new MaximizableAttribute()]);
 
     declare private canvas: HTMLCanvasElement;
 
-    protected onDialogOpen() {
+    protected override onDialogOpen() {
         super.onDialogOpen();
 
         BasicSamplesService.OrdersByShipper({}, response => {
@@ -45,11 +45,11 @@ export class ChartInDialog<P = {}> extends BaseDialog<P> {
         });
     }
 
-    protected renderContents(): any {
+    protected override renderContents(): any {
         return (<canvas id={`${this.idPrefix}Chart`} ref={el => this.canvas = el}></canvas>);
     }
 
-    protected getDialogOptions() {
+    protected override getDialogOptions() {
         var opt = super.getDialogOptions();
         opt.title = 'Orders by Shipper';
         opt.modal = false;

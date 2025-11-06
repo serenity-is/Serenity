@@ -6,10 +6,10 @@ import { nsDemoBasicSamples } from "../../ServerTypes/Namespaces";
 export default () => gridPageInit(RowSelectionGrid);
 
 export class RowSelectionGrid<P = {}> extends SelectableEntityGrid<SupplierRow, P> {
-    static [Symbol.typeInfo] = this.registerClass(nsDemoBasicSamples);
+    static override[Symbol.typeInfo] = this.registerClass(nsDemoBasicSamples);
 
-    protected getColumnsKey() { return SupplierColumns.columnsKey; }
-    protected getDialogType() { return <any>SupplierDialog; }
-    protected getRowDefinition() { return SupplierRow; }
-    protected getService() { return SupplierService.baseUrl; }
+    protected override getColumnsKey() { return SupplierColumns.columnsKey; }
+    protected override getDialogType() { return <any>SupplierDialog; }
+    protected override getRowDefinition() { return SupplierRow; }
+    protected override getService() { return SupplierService.baseUrl; }
 }

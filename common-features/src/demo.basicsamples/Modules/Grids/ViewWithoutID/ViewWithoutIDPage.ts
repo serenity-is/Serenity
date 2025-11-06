@@ -6,13 +6,13 @@ import { nsDemoBasicSamples } from "../../ServerTypes/Namespaces";
 export default () => gridPageInit(ViewWithoutIDGrid)
 
 export class ViewWithoutIDGrid<P = {}> extends EntityGrid<SalesByCategoryRow, P> {
-    static [Symbol.typeInfo] = this.registerClass(nsDemoBasicSamples);
+    static override[Symbol.typeInfo] = this.registerClass(nsDemoBasicSamples);
 
-    protected getColumnsKey() { return SalesByCategoryColumns.columnsKey; }
-    protected getIdProperty() { return "__id"; }
+    protected override getColumnsKey() { return SalesByCategoryColumns.columnsKey; }
+    protected override getIdProperty() { return "__id"; }
     protected getNameProperty() { return SalesByCategoryRow.nameProperty; }
-    protected getLocalTextPrefix() { return SalesByCategoryRow.localTextPrefix; }
-    protected getService() { return SalesByCategoryService.baseUrl; }
+    protected override getLocalTextPrefix() { return SalesByCategoryRow.localTextPrefix; }
+    protected override getService() { return SalesByCategoryService.baseUrl; }
 
     // this is our autoincrementing counter
     private nextId = 1;
@@ -20,7 +20,7 @@ export class ViewWithoutIDGrid<P = {}> extends EntityGrid<SalesByCategoryRow, P>
     /**
      * This method is called to preprocess data returned from the list service
      */
-    protected onViewProcessData(response: ListResponse<SalesByCategoryRow>) {
+    protected override onViewProcessData(response: ListResponse<SalesByCategoryRow>) {
         response = super.onViewProcessData(response);
 
         // there is no __id property in SalesByCategoryRow but 
@@ -31,7 +31,7 @@ export class ViewWithoutIDGrid<P = {}> extends EntityGrid<SalesByCategoryRow, P>
         return response;
     }
 
-    protected getButtons() {
+    protected override getButtons() {
         return [];
     }
 }

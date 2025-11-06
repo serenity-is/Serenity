@@ -6,7 +6,7 @@ import { Widget } from "../widgets/widget";
 import { BaseFiltering } from "./basefiltering";
 
 export abstract class BaseEditorFiltering<TEditor extends Widget<any>> extends BaseFiltering {
-    static override [Symbol.typeInfo] = this.registerClass(nsSerenity);
+    static override[Symbol.typeInfo] = this.registerClass(nsSerenity);
     constructor(public editorTypeRef: any) {
         super();
     }

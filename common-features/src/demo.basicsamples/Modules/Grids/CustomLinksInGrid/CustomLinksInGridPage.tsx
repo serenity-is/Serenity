@@ -6,14 +6,14 @@ import { nsDemoBasicSamples } from "../../ServerTypes/Namespaces";
 export default () => gridPageInit(CustomLinksInGrid);
 
 export class CustomLinksInGrid extends OrderGrid {
-    static [Symbol.typeInfo] = this.registerClass(nsDemoBasicSamples);
+    static override[Symbol.typeInfo] = this.registerClass(nsDemoBasicSamples);
 
     /**
-     * We override getColumns() to change format functions for some columns.
+     * We override createColumns() to change format functions for some columns.
      * You could also write them as formatter classes, and use them at server side
      */
-    protected getColumns(): Column[] {
-        var columns = new OrderColumns(super.getColumns());
+    protected override createColumns(): Column[] {
+        var columns = new OrderColumns(super.createColumns());
 
         columns.CustomerCompanyName && (columns.CustomerCompanyName.format =
             ctx => <a href="#" class="customer-link">{ctx.value}</a>);
@@ -30,7 +30,7 @@ export class CustomLinksInGrid extends OrderGrid {
         return columns.valueOf();
     }
 
-    protected onClick(e: Event, row: number, cell: number): void {
+    protected override onClick(e: Event, row: number, cell: number): void {
 
         // let base grid handle clicks for its edit links
         super.onClick(e, row, cell);
@@ -101,7 +101,7 @@ export class CustomLinksInGrid extends OrderGrid {
      * As we changed format for other columns, this will only be called
      * for links in remaining OrderID column
      */
-    protected editItem(entityOrId) {
+    protected override editItem(entityOrId) {
         // check that this is an edit link click, not add button, ID is always a string
         if (typeof entityOrId == "string") {
             // convert ID to an integer, and find order with that ID

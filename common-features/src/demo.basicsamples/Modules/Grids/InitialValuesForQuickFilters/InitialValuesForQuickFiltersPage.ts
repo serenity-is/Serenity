@@ -8,14 +8,14 @@ export default () => gridPageInit(InitialValuesForQuickFilters);
 const fld = OrderRow.Fields;
 
 export class InitialValuesForQuickFilters extends OrderGrid {
-    static [Symbol.typeInfo] = this.registerClass(nsDemoBasicSamples);
+    static override[Symbol.typeInfo] = this.registerClass(nsDemoBasicSamples);
 
     /**
      * This method is called to get list of quick filters to be created for this grid.
      * By default, it returns quick filter objects corresponding to properties that
      * have a [QuickFilter] attribute at server side OrderColumns.cs
      */
-    protected getQuickFilters(): QuickFilter<Widget<any>, any>[] {
+    protected override getQuickFilters(): QuickFilter<Widget<any>, any>[] {
 
         // get quick filter list from base class
         let filters = super.getQuickFilters();
@@ -57,7 +57,7 @@ export class InitialValuesForQuickFilters extends OrderGrid {
      * We could use getQuickFilters() method for ShipVia too,
      * but this is for demonstration purposes
      */
-    protected createQuickFilters(): void {
+    protected override createQuickFilters(): void {
 
         // let base class to create quick filters first
         super.createQuickFilters();

@@ -5,12 +5,12 @@ import { nsDemoNorthwind } from "../ServerTypes/Namespaces";
 import { TerritoryDialog } from "./TerritoryDialog";
 
 export class TerritoryGrid<P = {}> extends EntityGrid<TerritoryRow, P> {
-    static [Symbol.typeInfo] = this.registerClass(nsDemoNorthwind);
+    static override[Symbol.typeInfo] = this.registerClass(nsDemoNorthwind);
 
-    protected getColumnsKey() { return TerritoryColumns.columnsKey; }
-    protected getDialogType() { return <any>TerritoryDialog; }
-    protected getRowDefinition() { return TerritoryRow; }
-    protected getService() { return TerritoryService.baseUrl; }
+    protected override getColumnsKey() { return TerritoryColumns.columnsKey; }
+    protected override getDialogType() { return <any>TerritoryDialog; }
+    protected override getRowDefinition() { return TerritoryRow; }
+    protected override getService() { return TerritoryService.baseUrl; }
 }
 
 [RegionDialog]

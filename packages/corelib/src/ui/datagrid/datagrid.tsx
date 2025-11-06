@@ -33,7 +33,7 @@ export type { GridPersistenceFlags, PersistedGridColumn, PersistedGridSettings, 
 
 export class DataGrid<TItem, P = {}> extends Widget<P> implements IDataGrid, IReadOnly {
 
-    static override [Symbol.typeInfo] = this.registerClass(nsSerenity, [IReadOnly]);
+    static override[Symbol.typeInfo] = this.registerClass(nsSerenity, [IReadOnly]);
 
     declare private _grid: ISleekGrid<TItem>;
     declare private _isDisabled: boolean;

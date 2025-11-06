@@ -5,11 +5,11 @@ import { TranslationService } from "../../ServerTypes/Administration";
 import { nsAdministration } from "../../ServerTypes/Namespaces";
 
 export class TranslationGrid extends EntityGrid<TranslationItem, any> {
-    static [Symbol.typeInfo] = this.registerClass(nsAdministration);
+    static override[Symbol.typeInfo] = this.registerClass(nsAdministration);
 
-    protected getIdProperty() { return "Key"; }
-    protected getLocalTextPrefix() { return "Administration.Translation"; }
-    protected getService() { return TranslationService.baseUrl; }
+    protected override getIdProperty() { return "Key"; }
+    protected override getLocalTextPrefix() { return "Administration.Translation"; }
+    protected override getService() { return TranslationService.baseUrl; }
 
     private hasChanges: boolean;
     private searchText: string;
@@ -31,7 +31,7 @@ export class TranslationGrid extends EntityGrid<TranslationItem, any> {
         });
     }
 
-    protected onClick(e: MouseEvent, row: number, cell: number): any {
+    protected override onClick(e: MouseEvent, row: number, cell: number): any {
         super.onClick(e, row, cell);
 
         if (e.defaultPrevented || (e as any)?.isDefaultPrevented?.()) {
@@ -80,7 +80,7 @@ export class TranslationGrid extends EntityGrid<TranslationItem, any> {
         }
     }
 
-    protected getColumns(): Column[] {
+    protected override createColumns(): Column[] {
 
         var columns: Column[] = [];
         columns.push({
@@ -118,7 +118,7 @@ export class TranslationGrid extends EntityGrid<TranslationItem, any> {
         return columns;
     }
 
-    protected createToolbarExtensions(): void {
+    protected override createToolbarExtensions(): void {
         super.createToolbarExtensions();
 
         let opt: LookupEditorOptions = {
@@ -176,7 +176,7 @@ export class TranslationGrid extends EntityGrid<TranslationItem, any> {
         });
     }
 
-    protected onViewSubmit(): boolean {
+    protected override onViewSubmit(): boolean {
         var request = this.view.params;
         request.SourceLanguageID = this.sourceLanguage.value;
         this.targetLanguageKey = this.targetLanguage.value || '';
@@ -185,7 +185,7 @@ export class TranslationGrid extends EntityGrid<TranslationItem, any> {
         return super.onViewSubmit();
     }
 
-    protected getButtons(): ToolButton[] {
+    protected override getButtons(): ToolButton[] {
         return [{
             title: TranslationTexts.SaveChangesButton,
             onClick: e => this.saveChanges(this.targetLanguageKey).then(() => this.refresh()),
@@ -224,7 +224,7 @@ export class TranslationGrid extends EntityGrid<TranslationItem, any> {
             match(item.TargetText) || match(item.CustomText);
     }
 
-    protected usePager() {
+    protected override usePager() {
         return false;
     }
 }

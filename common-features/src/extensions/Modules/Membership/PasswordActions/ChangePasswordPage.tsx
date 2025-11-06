@@ -10,7 +10,7 @@ export default function pageInit() {
 
 class ChangePasswordPanel<P = {}> extends PropertyPanel<ChangePasswordRequest, P> {
 
-    protected getFormKey() { return ChangePasswordForm.formKey; }
+    protected override getFormKey() { return ChangePasswordForm.formKey; }
 
     private form = new ChangePasswordForm(this.idPrefix);
 
@@ -42,7 +42,7 @@ class ChangePasswordPanel<P = {}> extends PropertyPanel<ChangePasswordRequest, P
         })
     }
 
-    renderContents(): any {
+    protected override renderContents(): any {
         const id = this.useIdPrefix();
         return (
             <div class="s-Panel">

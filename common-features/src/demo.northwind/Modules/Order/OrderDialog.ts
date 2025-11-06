@@ -5,15 +5,15 @@ import { nsDemoNorthwind } from "../ServerTypes/Namespaces";
 import "./OrderDialog.css";
 
 export class OrderDialog<P = {}> extends EntityDialog<OrderRow, P> {
-    static override [Symbol.typeInfo] = this.registerClass(nsDemoNorthwind);
+    static override[Symbol.typeInfo] = this.registerClass(nsDemoNorthwind);
 
-    protected getFormKey() { return OrderForm.formKey; }
-    protected getRowDefinition() { return OrderRow; }
-    protected getService() { return OrderService.baseUrl; }
+    protected override getFormKey() { return OrderForm.formKey; }
+    protected override getRowDefinition() { return OrderRow; }
+    protected override getService() { return OrderService.baseUrl; }
 
     protected form = new OrderForm(this.idPrefix);
 
-    getToolbarButtons() {
+    protected override getToolbarButtons() {
         var buttons = super.getToolbarButtons();
 
         buttons.push(ReportHelper.createToolButton({
@@ -28,13 +28,13 @@ export class OrderDialog<P = {}> extends EntityDialog<OrderRow, P> {
         return buttons;
     }
 
-    protected updateInterface() {
+    protected override updateInterface() {
         super.updateInterface();
 
         this.toolbar.findButton('export-pdf-button').toggle(this.isEditMode());
     }
 
-    protected afterLoadEntity() {
+    protected override afterLoadEntity() {
         super.afterLoadEntity();
         this.form.DetailList.orderId = this.entityId;
     }

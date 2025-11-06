@@ -7,14 +7,14 @@ import { bindThis } from "@serenity-is/domwise";
 
 export class NotesEditor<P = {}> extends EditorWidget<P>
     implements IGetEditValue, ISetEditValue {
-    static override [Symbol.typeInfo] = this.registerEditor(nsDemoNorthwind, [IGetEditValue, ISetEditValue]);
+    static override[Symbol.typeInfo] = this.registerEditor(nsDemoNorthwind, [IGetEditValue, ISetEditValue]);
     static override createDefaultElement() { return <div /> as HTMLElement }
 
     declare private isDirty: boolean;
     declare private items: NoteRow[];
     declare private noteList: HTMLUListElement;
 
-    protected renderContents(): any {
+    protected override renderContents(): any {
         let id = this.useIdPrefix();
         return (<div>
             <Toolbar id={id.Toolbar} buttons={[{

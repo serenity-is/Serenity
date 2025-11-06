@@ -8,7 +8,7 @@ export default () => gridPageInit(OtherFormInTabOneBarGrid);
  * Subclass of OrderGrid to override dialog type to OtherFormInTabOneBarDialog
  */
 export class OtherFormInTabOneBarGrid extends OrderGrid {
-    static [Symbol.typeInfo] = this.registerClass(nsDemoBasicSamples);
+    static override[Symbol.typeInfo] = this.registerClass(nsDemoBasicSamples);
 
     protected override getDialogType() { return OtherFormOneBarDialog; }
 }
@@ -18,7 +18,7 @@ export class OtherFormInTabOneBarGrid extends OrderGrid {
  * With single toolbar for all forms
  */
 export class OtherFormOneBarDialog<P = {}> extends OrderDialog<P> {
-    static [Symbol.typeInfo] = this.registerClass(nsDemoBasicSamples);
+    static override[Symbol.typeInfo] = this.registerClass(nsDemoBasicSamples);
 
     declare private customerPropertyGrid: PropertyGrid;
     declare private customerValidator: any;
@@ -56,7 +56,7 @@ export class OtherFormOneBarDialog<P = {}> extends OrderDialog<P> {
         return toId(this.form.CustomerID.value);
     }
 
-    loadEntity(entity: OrderRow) {
+    protected override loadEntity(entity: OrderRow) {
         super.loadEntity(entity);
 
         TabsExtensions.setDisabled(this.tabs, 'Customer', !this.customerId);
@@ -123,11 +123,11 @@ export class OtherFormOneBarDialog<P = {}> extends OrderDialog<P> {
     }
 
     // This is called when save/update button is pressed
-    protected save(callback: (response: SaveResponse) => void) {
+    protected override save(callback: (response: SaveResponse) => void) {
         this.saveAll(callback);
     }
 
-    renderContents(): any {
+    protected override renderContents(): any {
         const id = this.useIdPrefix();
         return (<>
             <div id={id.Toolbar} class="s-DialogToolbar">

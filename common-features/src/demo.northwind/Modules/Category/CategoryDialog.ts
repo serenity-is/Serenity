@@ -3,11 +3,11 @@ import { CategoryForm, CategoryRow, CategoryService } from "../ServerTypes/Demo"
 import { nsDemoNorthwind } from "../ServerTypes/Namespaces";
 
 export class CategoryDialog<P = {}> extends EntityDialog<CategoryRow, P> {
-    static override [Symbol.typeInfo] = this.registerClass(nsDemoNorthwind);
+    static override[Symbol.typeInfo] = this.registerClass(nsDemoNorthwind);
 
-    protected getFormKey() { return CategoryForm.formKey; }
-    protected getRowDefinition() { return CategoryRow; }
-    protected getService() { return CategoryService.baseUrl; }
+    protected override getFormKey() { return CategoryForm.formKey; }
+    protected override getRowDefinition() { return CategoryRow; }
+    protected override getService() { return CategoryService.baseUrl; }
 
     protected form = new CategoryForm(this.idPrefix);
 }

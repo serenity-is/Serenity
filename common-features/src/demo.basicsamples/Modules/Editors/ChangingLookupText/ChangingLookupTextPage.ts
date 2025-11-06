@@ -14,13 +14,13 @@ export default function pageInit() {
  * Our custom product editor type
  */
 export class ChangingLookupTextEditor extends LookupEditorBase<LookupEditorOptions, ProductRow> {
-    static [Symbol.typeInfo] = this.registerEditor(nsDemoBasicSamples);
+    static override[Symbol.typeInfo] = this.registerEditor(nsDemoBasicSamples);
 
-    protected getLookupKey() {
+    protected override getLookupKey() {
         return ProductRow.lookupKey;
     }
 
-    protected getItemText(item: ProductRow, lookup: Lookup<ProductRow>) {
+    protected override getItemText(item: ProductRow, lookup: Lookup<ProductRow>) {
         return super.getItemText(item, lookup) +
             ' (' +
             '$' + formatNumber(item.UnitPrice, '#,##0.00') +
@@ -31,10 +31,10 @@ export class ChangingLookupTextEditor extends LookupEditorBase<LookupEditorOptio
 }
 
 export class ChangingLookupTextDialog<P = {}> extends GridEditorDialog<OrderDetailRow, P> {
-    static [Symbol.typeInfo] = this.registerClass(nsDemoBasicSamples);
+    static override[Symbol.typeInfo] = this.registerClass(nsDemoBasicSamples);
 
-    protected getFormKey() { return ChangingLookupTextForm.formKey; }
-    protected getLocalTextPrefix() { return OrderDetailRow.localTextPrefix; }
+    protected override getFormKey() { return ChangingLookupTextForm.formKey; }
+    protected override getLocalTextPrefix() { return OrderDetailRow.localTextPrefix; }
 
     declare protected form: ChangingLookupTextForm;
 
@@ -61,13 +61,13 @@ export class ChangingLookupTextDialog<P = {}> extends GridEditorDialog<OrderDeta
         });
     }
 
-    protected getDialogOptions() {
+    protected override getDialogOptions() {
         var opt = super.getDialogOptions();
         opt.modal = false;
         return opt;
     }
 
-    protected updateInterface() {
+    protected override updateInterface() {
         super.updateInterface();
         this.toolbar.findButton('apply-changes-button').hide();
         this.toolbar.findButton('save-and-close-button').hide();

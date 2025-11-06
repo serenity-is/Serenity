@@ -6185,7 +6185,7 @@ export declare class HtmlContentEditor<P extends HtmlContentEditorOptions = Html
 	protected getLanguage(): string;
 	protected getConfig(): CKEditorConfig;
 	protected getEditorInstance(): any;
-	destroy(): void;
+	overridedestroy(): void;
 	get_value(): string;
 	get value(): string;
 	set_value(value: string): void;

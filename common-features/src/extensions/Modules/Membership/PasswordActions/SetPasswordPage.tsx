@@ -30,7 +30,7 @@ class SetPasswordPage extends BasePanel {
         })
     }
 
-    renderContents(): any {
+    protected override renderContents(): any {
         return (
             <div class="s-Panel">
                 <h3 class="page-title mb-4 text-center">{SetPasswordFormTexts.PageTitle}</h3>

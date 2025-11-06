@@ -16,8 +16,8 @@ describe("GridEditorBase", () => {
     }
 
     class ConnectedEditor extends EmptyEditor {
-        getIdProperty() { return "theId" };
-        getService() { return "/Service" };
+        override getIdProperty() { return "theId" };
+        override getService() { return "/Service" };
     }
 
     it("has id property as __id by default", () => {
@@ -27,7 +27,7 @@ describe("GridEditorBase", () => {
 
     it("returns id property from getRowDefinition() if available", () => {
         class Editor extends EmptyEditor {
-            getRowDefinition() { return { idProperty: "theRowDefinitionId" } };
+            override getRowDefinition() { return { idProperty: "theRowDefinitionId" } };
         }
 
         const editor = new Editor({});
@@ -36,7 +36,7 @@ describe("GridEditorBase", () => {
 
     it("does not fail if getRowDefinition() returns null", () => {
         class Editor extends EmptyEditor {
-            getRowDefinition() { return null; };
+            override getRowDefinition() { return null; };
         }
 
         const editor = new Editor({});

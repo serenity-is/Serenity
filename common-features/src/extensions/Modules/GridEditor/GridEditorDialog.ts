@@ -2,9 +2,9 @@ import { DeleteResponse, EntityDialog, PanelAttribute, SaveInitiator, SaveRespon
 import { nsExtensions } from "../ServerTypes/Namespaces";
 
 export abstract class GridEditorDialog<TEntity, P = {}> extends EntityDialog<TEntity, P> {
-    static override [Symbol.typeInfo] = this.registerClass(nsExtensions, [new PanelAttribute(false)]);
+    static override[Symbol.typeInfo] = this.registerClass(nsExtensions, [new PanelAttribute(false)]);
 
-    protected getIdProperty() { return this.getRowDefinition()?.idProperty ?? "__id"; }
+    protected override getIdProperty() { return this.getRowDefinition()?.idProperty ?? "__id"; }
 
     public onSave: (options: ServiceOptions<SaveResponse>,
         callback: (response: SaveResponse) => void, initiator: SaveInitiator) => void;
@@ -12,13 +12,13 @@ export abstract class GridEditorDialog<TEntity, P = {}> extends EntityDialog<TEn
     public onDelete: (options: ServiceOptions<DeleteResponse>,
         callback: (response: DeleteResponse) => void) => void;
 
-    public destroy() {
+    override destroy() {
         this.onSave = null;
         this.onDelete = null;
         super.destroy();
     }
 
-    protected updateInterface() {
+    protected override updateInterface() {
         super.updateInterface();
 
         // apply changes button doesn't work properly with in-memory grids yet

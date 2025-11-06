@@ -6,16 +6,16 @@ import { OrderDialog } from "./OrderDialog";
 import "./OrderGrid.css";
 
 export class OrderGrid<P = {}> extends EntityGrid<OrderRow, P> {
-    static [Symbol.typeInfo] = this.registerClass(nsDemoNorthwind, [new FilterableAttribute()]);
+    static override[Symbol.typeInfo] = this.registerClass(nsDemoNorthwind, [new FilterableAttribute()]);
 
-    protected getColumnsKey() { return OrderColumns.columnsKey; }
-    protected getDialogType() { return OrderDialog as any; }
-    protected getRowDefinition() { return OrderRow; }
-    protected getService() { return OrderService.baseUrl; }
+    protected override getColumnsKey() { return OrderColumns.columnsKey; }
+    protected override getDialogType() { return OrderDialog as any; }
+    protected override getRowDefinition() { return OrderRow; }
+    protected override getService() { return OrderService.baseUrl; }
 
     declare protected shippingStateFilter: EnumEditor;
 
-    protected getQuickFilters() {
+    protected override getQuickFilters() {
         var filters = super.getQuickFilters();
 
         filters.push({
@@ -35,13 +35,13 @@ export class OrderGrid<P = {}> extends EntityGrid<OrderRow, P> {
         return filters;
     }
 
-    protected createQuickFilters() {
+    protected override createQuickFilters() {
         super.createQuickFilters();
 
         this.shippingStateFilter = this.findQuickFilter(EnumEditor, OrderRow.Fields.ShippingState);
     }
 
-    protected getButtons(): ToolButton[] {
+    protected override getButtons(): ToolButton[] {
         var buttons = super.getButtons();
 
         buttons.push(ExcelExportHelper.createToolButton({
@@ -59,8 +59,8 @@ export class OrderGrid<P = {}> extends EntityGrid<OrderRow, P> {
         return buttons;
     }
 
-    protected getColumns() {
-        var columns = new OrderColumns(super.getColumns());
+    protected override createColumns() {
+        var columns = new OrderColumns(super.createColumns());
 
         columns.PrintInvoice.format = () => <a class="inline-action" data-action="print-invoice" title="invoice">
             <i class={faIcon("file-pdf", "red")}></i></a>;
@@ -68,7 +68,7 @@ export class OrderGrid<P = {}> extends EntityGrid<OrderRow, P> {
         return columns.valueOf();
     }
 
-    protected onClick(e: Event, row: number, cell: number) {
+    protected override onClick(e: Event, row: number, cell: number) {
         super.onClick(e, row, cell);
 
         if (Fluent.isDefaultPrevented(e))
@@ -93,7 +93,7 @@ export class OrderGrid<P = {}> extends EntityGrid<OrderRow, P> {
         this.shippingStateFilter.value = value == null ? '' : value.toString();
     }
 
-    protected addButtonClick() {
+    protected override addButtonClick() {
         var eq = this.view.params.EqualityFilter;
         this.editItem({
             CustomerID: eq ? eq.CustomerID : null

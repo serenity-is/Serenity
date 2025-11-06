@@ -11,7 +11,7 @@ export default function pageInit() {
 
 export class ForgotPasswordPanel<P = {}> extends PropertyPanel<ForgotPasswordRequest, P> {
 
-    protected getFormKey() { return ForgotPasswordForm.formKey; }
+    protected override getFormKey() { return ForgotPasswordForm.formKey; }
 
     protected submitClick() {
         if (!this.validateForm())
@@ -29,7 +29,7 @@ export class ForgotPasswordPanel<P = {}> extends PropertyPanel<ForgotPasswordReq
         });
     }
 
-    renderContents(): any {
+    protected override renderContents(): any {
         const id = this.useIdPrefix();
         return (
             <div class="s-container-tight">

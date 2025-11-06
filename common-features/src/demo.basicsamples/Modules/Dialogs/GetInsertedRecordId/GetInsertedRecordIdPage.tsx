@@ -18,13 +18,13 @@ export default () => {
  * Subclass of CategoryGrid to override dialog type to GetInsertedRecordIdDialog
  */
 export class GetInsertedRecordIdGrid extends CategoryGrid {
-    static [Symbol.typeInfo] = this.registerClass(nsDemoBasicSamples);
+    static override[Symbol.typeInfo] = this.registerClass(nsDemoBasicSamples);
 
     protected override getDialogType() { return GetInsertedRecordIdDialog; }
 }
 
 export class GetInsertedRecordIdDialog extends CategoryDialog {
-    static [Symbol.typeInfo] = this.registerClass(nsDemoBasicSamples);
+    static override[Symbol.typeInfo] = this.registerClass(nsDemoBasicSamples);
 
     /**
      * This method is called after the save request to service

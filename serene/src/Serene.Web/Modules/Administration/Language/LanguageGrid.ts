@@ -4,14 +4,14 @@ import { nsAdministration } from "../../ServerTypes/Namespaces";
 import { LanguageDialog } from "./LanguageDialog";
 
 export class LanguageGrid extends EntityGrid<LanguageRow, any> {
-    static [Symbol.typeInfo] = this.registerClass(nsAdministration);
+    static override[Symbol.typeInfo] = this.registerClass(nsAdministration);
 
     protected useAsync() { return true; }
-    protected getColumnsKey() { return LanguageColumns.columnsKey; }
-    protected getDialogType() { return LanguageDialog; }
-    protected getIdProperty() { return LanguageRow.idProperty; }
-    protected getLocalTextPrefix() { return LanguageRow.localTextPrefix; }
-    protected getService() { return LanguageService.baseUrl; }
+    protected override getColumnsKey() { return LanguageColumns.columnsKey; }
+    protected override getDialogType() { return LanguageDialog; }
+    protected override getIdProperty() { return LanguageRow.idProperty; }
+    protected override getLocalTextPrefix() { return LanguageRow.localTextPrefix; }
+    protected override getService() { return LanguageService.baseUrl; }
 
     protected afterInit() {
         super.afterInit();

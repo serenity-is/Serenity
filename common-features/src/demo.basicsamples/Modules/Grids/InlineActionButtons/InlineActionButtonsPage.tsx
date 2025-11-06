@@ -10,10 +10,10 @@ const viewDetailsAction = "view-details";
 const newOrderAction = "new-order";
 
 export class InlineActionGrid extends CustomerGrid {
-    static [Symbol.typeInfo] = this.registerClass(nsDemoBasicSamples);
+    static override[Symbol.typeInfo] = this.registerClass(nsDemoBasicSamples);
 
-    protected getColumns() {
-        var columns = super.getColumns();
+    protected override createColumns() {
+        var columns = super.createColumns();
 
         let inlineAction = (actionKey: string, hint, iconClass: string): Column => ({
             id: "inline_action_" + actionKey,
@@ -31,7 +31,7 @@ export class InlineActionGrid extends CustomerGrid {
         return columns;
     }
 
-    protected onClick(e: Event, row: number, cell: number) {
+    protected override onClick(e: Event, row: number, cell: number) {
         super.onClick(e, row, cell);
 
         if (Fluent.isDefaultPrevented(e))

@@ -16,7 +16,7 @@ import { SaveInitiator, applyChangesToolButton, cloneToolButton, deleteToolButto
 
 export class EntityDialog<TItem, P = {}> extends BaseDialog<P> implements IEditDialog, IReadOnly {
 
-    static override [Symbol.typeInfo] = this.registerClass(nsSerenity, [IEditDialog, IReadOnly, new PanelAttribute(true)]);
+    static override[Symbol.typeInfo] = this.registerClass(nsSerenity, [IEditDialog, IReadOnly, new PanelAttribute(true)]);
 
     declare private _entity: TItem;
     declare private _entityId: any;
