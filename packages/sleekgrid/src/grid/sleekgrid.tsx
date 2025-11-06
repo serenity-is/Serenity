@@ -1083,7 +1083,7 @@ export class SleekGrid<TItem = any> implements ISleekGrid<TItem> {
         if (this._jQuery) {
             this._jQuery(this._container).off("." + this._uid);
             this._jQuery(document).off("." + this._uid);
-            this._jQuery(this._container).find(".slick-header-column,. slick-headerrow-column, .slick-footerrow-column, .slick-focus-sink").off("." + this._uid);
+            this._jQuery(this._container).find(".slick-header-column, .slick-headerrow-column, .slick-footerrow-column, .slick-focus-sink").off("." + this._uid);
             this._jQuery(this._mapBands(band => band.headerCols)).off("." + this._uid);
             this._jQuery(this._mapBands(band => band.headerRowCols)).off("." + this._uid);
             this._jQuery(this._mapBands(band => band.footerRowCols)).off("." + this._uid);
