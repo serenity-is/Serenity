@@ -10,7 +10,7 @@ export * from "./grid-signals";
 export * from "./gridoptions";
 export * from "./group";
 export * from "./idataview";
-export * from "./igrid";
+export * from "./isleekgrid";
 export * from "./selection-model";
 export * from "./util";
 export * from "./viewportinfo";

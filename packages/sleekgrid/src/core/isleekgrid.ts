@@ -62,6 +62,8 @@ export interface ISleekGrid<TItem = any> extends CellNavigation, EditorHost, Gri
     getActiveCanvasNode(e?: IEventData): HTMLElement;
     getActiveCellNode(): HTMLElement;
     getActiveViewportNode(e?: IEventData): HTMLElement;
+    /** Returns all columns in the grid, including hidden ones, the order might not match visible columns due to pinning, ordering etc. */
+    getAllColumns(): Column<TItem>[];
     getCanvases(): any | HTMLElement[];
     getCanvasNode(row?: number, cell?: number): HTMLElement;
     getCellCssStyles(key: string): CellStylesHash;
@@ -72,13 +74,13 @@ export interface ISleekGrid<TItem = any> extends CellNavigation, EditorHost, Gri
     getCellNode(row: number, cell: number): HTMLElement;
     getCellNodeBox(row: number, cell: number): { top: number; right: number; bottom: number; left: number; };
     getColspan(row: number, cell: number): number;
-    /** Gets a column by its ID. May also return hidden columns */
+    /** Gets a column by its ID. May also return hidden columns. */
     getColumnById(id: string): Column<TItem>;
     getColumnFromNode(cellNode: Element): Column<TItem>;
-    /** Returns a column's index in the visible columns list by its column ID. It returns -1 for hidden columns unless all argument is true */
-    getColumnIndex(id: string, all?: boolean): number;
-    /** Returns only the visible columns in order unless all argument is true */
-    getColumns(all?: boolean): Column<TItem>[];
+    /** Returns a column's index in the visible columns list by its column ID. If opt.inAll is true, it will return index in all columns. */
+    getColumnIndex(id: string, opt?: { inAll?: boolean }): number;
+    /** Returns only the visible columns in order */
+    getColumns(): Column<TItem>[];
     getContainerNode(): HTMLElement;
     getData(): any;
     getDataItem(row: number): TItem;
@@ -97,10 +99,6 @@ export interface ISleekGrid<TItem = any> extends CellNavigation, EditorHost, Gri
     getHeaderColumn(columnIdOrIdx: string | number): HTMLElement;
     getHeaderRow(): HTMLElement;
     getHeaderRowColumn(columnIdOrIdx: string | number): HTMLElement;
-    /** @deprecated Use getColumnIndex(id, true) */
-    getInitialColumnIndex(id: string): number;
-    /** @deprecated Use getColumns(true) */
-    getInitialColumns(): Column<TItem>[];
     getLayoutInfo(): { frozenTopRows: number, frozenBottomRows: number, pinnedStartCols: number, pinnedEndCols: number };
     getOptions(): GridOptions<TItem>;
     getPreHeaderPanel(): HTMLElement;
@@ -116,8 +114,6 @@ export interface ISleekGrid<TItem = any> extends CellNavigation, EditorHost, Gri
     /** Gets the viewport range */
     getViewport(viewportTop?: number, viewportLeft?: number): ViewRange;
     getViewportNode(row?: number, cell?: number): HTMLElement;
-    /** Gets a view (e.g. visible) column by its column ID */
-    getVisibleColumnById(id: string): Column<TItem>;
     getVisibleRange(viewportTop?: number, viewportLeft?: number): ViewRange;
     gotoCell(row: number, cell: number, forceEdit?: boolean): void;
     invalidate(): void;

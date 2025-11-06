@@ -1,4 +1,4 @@
-import { ColumnFormat, CompatFormatter, formatterContext as ctx, Group, type IGrid } from "../../src/core";
+import { ColumnFormat, CompatFormatter, formatterContext as ctx, Group, type ISleekGrid } from "../../src/core";
 import { GroupItemMetadataProvider } from "../../src/data/groupitemmetadataprovider";
 
 describe("GroupItemMetadataProvider.defaults", () => {

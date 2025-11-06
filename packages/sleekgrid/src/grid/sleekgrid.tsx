@@ -12,7 +12,7 @@ import type { GridSignals } from "../core/grid-signals";
 import { gridDefaults, type GridOptions } from "../core/gridoptions";
 import type { IGroupTotals } from "../core/group";
 import { type IDataView } from "../core/idataview";
-import type { ISleekGrid } from "../core/igrid";
+import type { ISleekGrid } from "../core/isleekgrid";
 import type { SelectionModel } from "../core/selection-model";
 import { addClass, escapeHtml, parsePx, removeClass } from "../core/util";
 import type { ViewportInfo } from "../core/viewportinfo";
@@ -63,8 +63,8 @@ export class SleekGrid<TItem = any> implements ISleekGrid<TItem> {
     declare private _hPostRenderCleanup: number;
     declare private _hRender: number;
     private _ignoreScrollUntil: number = 0;
-    declare private _initColById: { [key: string]: number };
-    declare private _initCols: Column<TItem>[];
+    declare private _allCols: Column<TItem>[];
+    declare private _allColsById: { [key: string]: number };
     declare private _initialized: any;
     declare private _jQuery: any;
     declare private _jumpinessCoefficient: number;
@@ -256,6 +256,7 @@ export class SleekGrid<TItem = any> implements ISleekGrid<TItem> {
         try {
             this._layout.init({
                 onAfterInit: this.onAfterInit,
+                getAllColumns: boundThis.getAllColumns,
                 getColumns: boundThis.getColumns,
                 getContainerNode: boundThis.getContainerNode,
                 getDataLength: boundThis.getDataLength,
@@ -1132,19 +1133,11 @@ export class SleekGrid<TItem = any> implements ISleekGrid<TItem> {
     }
 
     getColumnById(id: string): Column<TItem> {
-        return id ? this._cols[this._colById[id]] : null;
+        return id ? this._allCols[this._allColsById[id]] : null;
     }
 
-    getColumnIndex(id: string, all?: boolean): number {
-        return id ? (all ? this._initColById : this._colById)[id] : null;
-    }
-
-    getInitialColumnIndex(id: string): number {
-        return id ? this._initColById[id] : null;
-    }
-
-    getVisibleColumnById(id: string): Column<TItem> {
-        return id ? this._cols[this._colById[id]] : null;
+    getColumnIndex(id: string, opt?: { inAll?: boolean }): number {
+        return id ? (opt?.inAll ? this._allColsById[id] : this._colById[id]) : null;
     }
 
     autosizeColumns(): void {
@@ -1272,13 +1265,12 @@ export class SleekGrid<TItem = any> implements ISleekGrid<TItem> {
         }
     }
 
-    getColumns(all?: boolean): Column<TItem>[] {
-        return all ? this._initCols : this._cols;
+    getAllColumns(): Column<TItem>[] {
+        return this._allCols;
     }
 
-    /** @deprecated Use getColumns(true) */
-    getInitialColumns(): Column<TItem>[] {
-        return this._initCols;
+    getColumns(): Column<TItem>[] {
+        return this._cols;
     }
 
     private updateViewColLeftRight(): void {
@@ -1297,7 +1289,7 @@ export class SleekGrid<TItem = any> implements ISleekGrid<TItem> {
     }
 
     private updateViewCols() {
-        const initCols = this._initCols;
+        const initCols = this._allCols;
         let col: Column;
         let cols: Column[] = [];
         var colById: { [key: string]: number } = {};
@@ -1331,8 +1323,8 @@ export class SleekGrid<TItem = any> implements ISleekGrid<TItem> {
             const col = initCols[i];
             initColById[col.id] = i;
         }
-        this._initCols = initCols;
-        this._initColById = initColById;
+        this._allCols = initCols;
+        this._allColsById = initColById;
     }
 
     private handleFrozenColsOption(viewCols: Column[], options?: GridOptions) {
@@ -1358,18 +1350,18 @@ export class SleekGrid<TItem = any> implements ISleekGrid<TItem> {
     setColumns(columns: Column<TItem>[]): void {
 
         if (columns &&
-            this._initCols &&
+            this._allCols &&
             this._cols &&
             columns.length === this._cols.length &&
-            this._initCols.length > this._cols.length &&
+            this._allCols.length > this._cols.length &&
             !columns.some(x => this._cols.indexOf(x) < 0) &&
             !this._cols.some(x => columns.indexOf(x) < 0)) {
             // probably called with grid.setColumns(grid.getColumns()) potentially changing orders / widths etc
             // try to preserve initial columns
             sortToDesiredOrderAndKeepRest(
-                this._initCols,
+                this._allCols,
                 columns.map(x => x.id));
-            columns = this._initCols;
+            columns = this._allCols;
         }
 
         this.setInitCols(columns);
@@ -1377,7 +1369,7 @@ export class SleekGrid<TItem = any> implements ISleekGrid<TItem> {
     }
 
     public reorderColumns(columnIds: string[], opt?: { notify?: boolean }): void {
-        sortToDesiredOrderAndKeepRest(this._initCols, columnIds);
+        sortToDesiredOrderAndKeepRest(this._allCols, columnIds);
         this.invalidateColumns();
         if (opt?.notify ?? true) {
             this._trigger(this.onColumnsReordered, {});
@@ -1387,7 +1379,7 @@ export class SleekGrid<TItem = any> implements ISleekGrid<TItem> {
     public setVisibleColumns(columnIds: string[], opt?: { reorder?: boolean, notify?: boolean }): void {
         const idSet = new Set(columnIds);
         let anyChange = false;
-        for (const col of this._initCols) {
+        for (const col of this._allCols) {
             const visible = idSet.has(col.id);
             if ((col.visible !== false) != visible) {
                 col.visible = visible;
@@ -1452,7 +1444,7 @@ export class SleekGrid<TItem = any> implements ISleekGrid<TItem> {
         this._layout.afterSetOptions(args);
 
         if (args.columns && !suppressColumnSet) {
-            this.setColumns(args.columns ?? this._initCols);
+            this.setColumns(args.columns ?? this._allCols);
         }
 
         if (!suppressSetOverflow) {

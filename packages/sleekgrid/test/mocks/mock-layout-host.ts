@@ -31,6 +31,7 @@ export function mockLayoutHost(): LayoutHost & {
         cleanUpAndRenderCells: vi.fn(),
         getAvailableWidth: vi.fn(() => 1000),
         getCellFromPoint: vi.fn(() => ({ row: 0, cell: 0 } as RowCell)),
+        getAllColumns: vi.fn(() => [] as Column[]),
         getColumns: vi.fn(() => [] as Column[]),
         getContainerNode: vi.fn(() => host.container),
         getDataLength: vi.fn(() => 0),

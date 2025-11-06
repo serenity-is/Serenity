@@ -1,6 +1,6 @@
 import type { CellStylesHash, Column, Editor, IEventData, ValidationResult } from ".";
 import type { DragItem, DragPosition } from "./draggable";
-import type { ISleekGrid } from "./igrid";
+import type { ISleekGrid } from "./isleekgrid";
 
 export interface ArgsGrid {
     grid: ISleekGrid;

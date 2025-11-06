@@ -1,6 +1,6 @@
 import type { Column } from "./column";
 import { gridDefaults, GridOptions } from "./gridoptions";
-import type { ISleekGrid } from "./igrid";
+import type { ISleekGrid } from "./isleekgrid";
 import { addClass, basicDOMSanitizer, escapeHtml, removeClass } from "./util";
 
 /**

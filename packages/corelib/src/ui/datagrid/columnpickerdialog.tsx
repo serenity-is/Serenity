@@ -249,7 +249,7 @@ export class ColumnPickerDialog<P extends ColumnPickerDialogOptions = ColumnPick
                 defaultColumns = initialSettings.columns.map(x => x.id);
         }
         var picker = new ColumnPickerDialog({
-            columns: grid.getGrid().getColumns(true),
+            columns: grid.getGrid().getAllColumns(),
             defaultColumns
         });
         picker.done = (newColumns) => {

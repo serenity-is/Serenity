@@ -205,7 +205,7 @@ export class DataGrid<TItem, P = {}> extends Widget<P> implements IDataGrid, IRe
     }
 
     protected getQuickFilters(): QuickFilter<Widget<any>, any>[] {
-        return this._grid.getColumns(true).filter(function (x) {
+        return this.allColumns.filter(function (x) {
             return x.sourceItem &&
                 x.sourceItem.quickFilter === true &&
                 (x.sourceItem.readPermission == null ||
@@ -353,7 +353,7 @@ export class DataGrid<TItem, P = {}> extends Widget<P> implements IDataGrid, IRe
     protected initializeFilterBar() {
 
         this.filterBar.set_store(new FilterStore(
-            this._grid.getColumns(true)
+            this.allColumns
                 .filter(c => this.canFilterColumn(c))
                 .map(x => x.sourceItem)));
 
@@ -1218,8 +1218,8 @@ export class DataGrid<TItem, P = {}> extends Widget<P> implements IDataGrid, IRe
         return (this.filterBar == null) ? null : this.filterBar.get_store();
     }
 
-    public get allColumns(): Column[] { return this._grid?.getColumns(true) }
-    public get columns() { return this._grid?.getColumns(false); }
+    public get allColumns(): Column[] { return this._grid?.getAllColumns() }
+    public get columns() { return this._grid?.getColumns(); }
 
     /** @obsolete use defaultPersistenceStorage, this one has a typo */
     public static get defaultPersistanceStorage(): SettingStorage { return DataGrid.defaultPersistenceStorage; }

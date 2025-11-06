@@ -1,9 +1,9 @@
 import type { Column } from "../core/column";
-import type { ISleekGrid } from "../core/igrid";
+import type { ISleekGrid } from "../core/isleekgrid";
 import { triggerGridEvent } from "./event-utils";
 
-export function columnSortHandler(this: Pick<ISleekGrid, "getColumnFromNode" | "getEditorLock" | "getColumns" | "getInitialColumns" |
-    "getInitialColumnIndex" | "getSortColumns" | "setSortColumns" | "onSort"> & {
+export function columnSortHandler(this: Pick<ISleekGrid, "getColumnFromNode" | "getEditorLock" |
+    "getColumnById" | "getSortColumns" | "setSortColumns" | "onSort"> & {
         getOptions: () => { multiColumnSort: boolean }
     }, e: MouseEvent): void {
     var tgt = e.target as Element;
@@ -69,11 +69,10 @@ export function columnSortHandler(this: Pick<ISleekGrid, "getColumnFromNode" | "
                 sortAsc: sortOpts.sortAsc
             }, e);
         } else {
-            var cols = this.getColumns(true);
             triggerGridEvent.call(this as ISleekGrid, this.onSort, {
                 multiColumnSort: true,
                 sortCols: this.getSortColumns().map(col => ({
-                    sortCol: cols[this.getInitialColumnIndex(col.columnId)],
+                    sortCol: this.getColumnById(col.columnId),
                     sortAsc: col.sortAsc
                 }))
             }, e);

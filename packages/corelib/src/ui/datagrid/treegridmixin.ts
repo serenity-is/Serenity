@@ -46,7 +46,7 @@ export class TreeGridMixin<TItem> {
         };
 
         if (options.toggleField) {
-            var col = (dg.sleekGrid.getColumns(true))?.find(x => x.field == options.toggleField || x.id == options.toggleField) as Column<TItem>;
+            var col = dg.allColumns?.find(x => x.field == options.toggleField || x.id == options.toggleField) as Column<TItem>;
             if (col) {
                 col.format = SlickFormatting.treeToggle(() => dg.view, getId,
                     col.format || ((ctx: FormatterContext<TItem>) => ctx.escape()));

@@ -32,7 +32,7 @@ describe('options.frozenColumns', () => {
             layoutEngine: new FrozenLayout()
         });
 
-        expect(grid.getColumns(true).length).toBe(3);
+        expect(grid.getAllColumns().length).toBe(3);
         expect(grid.getColumns().length).toBe(3);
         expect(grid.getColumns()[0].frozen).toBeUndefined();
     });
@@ -44,7 +44,7 @@ describe('options.frozenColumns', () => {
             layoutEngine: new FrozenLayout()
         });
 
-        expect(grid.getColumns(true).length).toBe(3);
+        expect(grid.getAllColumns().length).toBe(3);
         expect(grid.getColumns().length).toBe(3);
         expect(grid.getColumns()[0].frozen).toBeUndefined();
     });
@@ -56,7 +56,7 @@ describe('options.frozenColumns', () => {
             layoutEngine: new FrozenLayout()
         });
 
-        expect(grid.getColumns(true).length).toBe(3);
+        expect(grid.getAllColumns().length).toBe(3);
         expect(grid.getColumns().length).toBe(3);
         expect(grid.getColumns()[0].frozen).toBeUndefined();
     });
@@ -68,7 +68,7 @@ describe('options.frozenColumns', () => {
             layoutEngine: new FrozenLayout()
         });
 
-        expect(grid.getColumns(true).length).toBe(3);
+        expect(grid.getAllColumns().length).toBe(3);
         expect(grid.getColumns().length).toBe(3);
         expect(grid.getColumns()[0].frozen).toBeUndefined();
     });
@@ -80,7 +80,7 @@ describe('options.frozenColumns', () => {
             layoutEngine: new FrozenLayout()
         });
 
-        expect(grid.getColumns(true).length).toBe(3);
+        expect(grid.getAllColumns().length).toBe(3);
         expect(grid.getColumns().length).toBe(3);
         expect(grid.getColumns()[0].frozen).toBe(true);
     });
@@ -94,7 +94,7 @@ describe('options.frozenColumns', () => {
             layoutEngine: new FrozenLayout()
         });
 
-        expect(grid.getColumns(true).length).toBe(3);
+        expect(grid.getAllColumns().length).toBe(3);
         expect(grid.getColumns().length).toBe(2);
         expect(grid.getColumns()[0].frozen).toBe(true);
         expect(grid.getColumns()[0].id).toBe('c2');
@@ -108,7 +108,7 @@ describe('options.frozenColumns', () => {
             layoutEngine: new FrozenLayout()
         });
 
-        expect(grid.getColumns(true).length).toBe(3);
+        expect(grid.getAllColumns().length).toBe(3);
         expect(grid.getColumns().length).toBe(3);
         expect(grid.getColumns()[0].frozen).toBe(true);
         expect(grid.getColumns()[1].frozen).toBe(true);
@@ -123,7 +123,7 @@ describe('options.frozenColumns', () => {
             layoutEngine: new FrozenLayout()
         });
 
-        expect(grid.getColumns(true).length).toBe(3);
+        expect(grid.getAllColumns().length).toBe(3);
         expect(grid.getColumns().length).toBe(2);
         expect(grid.getColumns()[0].frozen).toBe(true);
         expect(grid.getColumns()[0].id).toBe('c2');

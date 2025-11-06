@@ -184,7 +184,7 @@ export function restoreSettingsFrom(this: void, opt: {
     uniqueName: string,
     view: IRemoteView<any>
 }) {
-    let allColumns = opt.sleekGrid.getColumns(true);
+    let allColumns = opt.sleekGrid.getAllColumns();
     let colById: { [key: string]: Column } = Object.create(null);
     for (let c of allColumns) {
         colById[c.id] = c;

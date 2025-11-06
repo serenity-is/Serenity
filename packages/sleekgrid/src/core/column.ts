@@ -1,7 +1,7 @@
 import { EditorClass, ValidationResult } from "./editing";
 import type { AsyncPostCleanup, AsyncPostRender, ColumnFormat, CompatFormatter, FormatterContext, FormatterResult } from "./formatting";
 import { IGroupTotals } from "./group";
-import type { ISleekGrid } from "./igrid";
+import type { ISleekGrid } from "./isleekgrid";
 
 export interface Column<TItem = any> {
     asyncPostRender?: AsyncPostRender<TItem>;

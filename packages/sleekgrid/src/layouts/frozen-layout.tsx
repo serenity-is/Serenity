@@ -43,7 +43,7 @@ export class FrozenLayout implements LayoutEngine {
         if (arg.frozenRows != null || arg.frozenBottom != null)
             this.adjustFrozenRowsOption();
         if (arg.frozenColumns != null && arg.columns == null) {
-            const columns = this.reorderViewColumns(this.host.getColumns(true), this.refs);
+            const columns = this.reorderViewColumns(this.host.getAllColumns(), this.refs);
             if (columns != null)
                 arg.columns = columns;
         }

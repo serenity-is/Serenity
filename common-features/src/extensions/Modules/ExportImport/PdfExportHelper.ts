@@ -105,7 +105,7 @@ export namespace PdfExportHelper {
         if (sortBy != null)
             request.Sort = sortBy;
 
-        var gridColumns = dataGrid.sleekGrid.getColumns();
+        var gridColumns = dataGrid.columns;
         gridColumns = gridColumns.filter(x => x.id !== "__select__");
 
         request.IncludeColumns = [];

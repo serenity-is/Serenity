@@ -2162,6 +2162,14 @@ export declare function getBaseType(type: any): any;
  */
 export declare function registerClass(type: any, name: string, intf?: any[]): void;
 /**
+ * Indicates the enum key of an enum type (by default the name of the enum type is used as key)
+ */
+export declare class EnumKeyAttribute {
+	value: string;
+	static [Symbol.typeInfo]: ClassTypeInfo<"Serenity.">;
+	constructor(value: string);
+}
+/**
  * Register an enum with the type system.
  * @param enumType Enum type to register
  * @param name Name to register the enum under
@@ -4478,14 +4486,6 @@ export interface RemoteViewOptions<TItem = any> {
 	sortBy?: string | string[];
 	/** URL of the service endpoint for data requests */
 	url?: string;
-}
-/**
- * Indicates the enum key of an enum type (by default the name of the enum type is used as key)
- */
-export declare class EnumKeyAttribute {
-	value: string;
-	static [Symbol.typeInfo]: ClassTypeInfo<"Serenity.">;
-	constructor(value: string);
 }
 /**
  * Indicates if a dialog should have a close button in its title bar (default true)

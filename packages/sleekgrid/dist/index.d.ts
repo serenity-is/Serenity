@@ -434,7 +434,7 @@ export type GridLayoutRefs = {
 	frozenTopLast: number;
 	frozenBottomFirst: number;
 };
-export interface LayoutHost extends Pick<ISleekGrid, "getColumns" | "getOptions" | "getContainerNode" | "getDataLength" | "onAfterInit">, GridPluginHost {
+export interface LayoutHost extends Pick<ISleekGrid, "getAllColumns" | "getColumns" | "getOptions" | "getContainerNode" | "getDataLength" | "onAfterInit">, GridPluginHost {
 	getSignals(): GridSignals;
 	getViewportInfo(): ViewportInfo;
 	removeNode(node: HTMLElement): void;
@@ -952,6 +952,8 @@ export interface ISleekGrid<TItem = any> extends CellNavigation, EditorHost, Gri
 	getActiveCanvasNode(e?: IEventData): HTMLElement;
 	getActiveCellNode(): HTMLElement;
 	getActiveViewportNode(e?: IEventData): HTMLElement;
+	/** Returns all columns in the grid, including hidden ones, the order might not match visible columns due to pinning, ordering etc. */
+	getAllColumns(): Column<TItem>[];
 	getCanvases(): any | HTMLElement[];
 	getCanvasNode(row?: number, cell?: number): HTMLElement;
 	getCellCssStyles(key: string): CellStylesHash;
@@ -973,13 +975,15 @@ export interface ISleekGrid<TItem = any> extends CellNavigation, EditorHost, Gri
 		left: number;
 	};
 	getColspan(row: number, cell: number): number;
-	/** Gets a column by its ID. May also return hidden columns */
+	/** Gets a column by its ID. May also return hidden columns. */
 	getColumnById(id: string): Column<TItem>;
 	getColumnFromNode(cellNode: Element): Column<TItem>;
-	/** Returns a column's index in the visible columns list by its column ID. It returns -1 for hidden columns unless all argument is true */
-	getColumnIndex(id: string, all?: boolean): number;
-	/** Returns only the visible columns in order unless all argument is true */
-	getColumns(all?: boolean): Column<TItem>[];
+	/** Returns a column's index in the visible columns list by its column ID. If opt.inAll is true, it will return index in all columns. */
+	getColumnIndex(id: string, opt?: {
+		inAll?: boolean;
+	}): number;
+	/** Returns only the visible columns in order */
+	getColumns(): Column<TItem>[];
 	getContainerNode(): HTMLElement;
 	getData(): any;
 	getDataItem(row: number): TItem;
@@ -1001,10 +1005,6 @@ export interface ISleekGrid<TItem = any> extends CellNavigation, EditorHost, Gri
 	getHeaderColumn(columnIdOrIdx: string | number): HTMLElement;
 	getHeaderRow(): HTMLElement;
 	getHeaderRowColumn(columnIdOrIdx: string | number): HTMLElement;
-	/** @deprecated Use getColumnIndex(id, true) */
-	getInitialColumnIndex(id: string): number;
-	/** @deprecated Use getColumns(true) */
-	getInitialColumns(): Column<TItem>[];
 	getLayoutInfo(): {
 		frozenTopRows: number;
 		frozenBottomRows: number;
@@ -1028,8 +1028,6 @@ export interface ISleekGrid<TItem = any> extends CellNavigation, EditorHost, Gri
 	/** Gets the viewport range */
 	getViewport(viewportTop?: number, viewportLeft?: number): ViewRange;
 	getViewportNode(row?: number, cell?: number): HTMLElement;
-	/** Gets a view (e.g. visible) column by its column ID */
-	getVisibleColumnById(id: string): Column<TItem>;
 	getVisibleRange(viewportTop?: number, viewportLeft?: number): ViewRange;
 	gotoCell(row: number, cell: number, forceEdit?: boolean): void;
 	invalidate(): void;
@@ -1346,8 +1344,8 @@ export declare class SleekGrid<TItem = any> implements ISleekGrid<TItem> {
 	private _hPostRenderCleanup;
 	private _hRender;
 	private _ignoreScrollUntil;
-	private _initColById;
-	private _initCols;
+	private _allCols;
+	private _allColsById;
 	private _initialized;
 	private _jQuery;
 	private _jumpinessCoefficient;
@@ -1518,18 +1516,17 @@ export declare class SleekGrid<TItem = any> implements ISleekGrid<TItem> {
 	getEditorLock(): EditorLock;
 	getEditController(): EditController;
 	getColumnById(id: string): Column<TItem>;
-	getColumnIndex(id: string, all?: boolean): number;
-	getInitialColumnIndex(id: string): number;
-	getVisibleColumnById(id: string): Column<TItem>;
+	getColumnIndex(id: string, opt?: {
+		inAll?: boolean;
+	}): number;
 	autosizeColumns(): void;
 	private applyColumnHeaderWidths;
 	setSortColumn(columnId: string, ascending: boolean): void;
 	setSortColumns(cols: ColumnSort[]): void;
 	getSortColumns(): ColumnSort[];
 	private handleSelectedRangesChanged;
-	getColumns(all?: boolean): Column<TItem>[];
-	/** @deprecated Use getColumns(true) */
-	getInitialColumns(): Column<TItem>[];
+	getAllColumns(): Column<TItem>[];
+	getColumns(): Column<TItem>[];
 	private updateViewColLeftRight;
 	private updateViewCols;
 	private setInitCols;
