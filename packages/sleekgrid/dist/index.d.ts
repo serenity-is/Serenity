@@ -1712,8 +1712,6 @@ export declare class SleekGrid<TItem = any> implements ISleekGrid<TItem> {
 	getSelectedRows(): number[];
 	setSelectedRows(rows: number[]): void;
 }
-/** @deprecated Use SleekGrid */
-export declare const Grid: typeof SleekGrid;
 export declare function PercentCompleteFormatter(ctx: FormatterContext): HTMLSpanElement | "-";
 export declare function PercentCompleteBarFormatter(ctx: FormatterContext): FormatterResult;
 export declare function YesNoFormatter(ctx: FormatterContext): FormatterResult;
@@ -1924,5 +1922,9 @@ export declare class RowSelectionModel implements GridPlugin, SelectionModel {
 	private handleKeyDown;
 	private handleClick;
 }
+
+export {
+	SleekGrid as Grid,
+};
 
 export {};
