@@ -121,12 +121,12 @@ export function createCssRules(this: void, { opt, cellHeightDiff, colCount, cont
     styleNode.dataset.uid = uid;
     const rules = [
         "." + uid + " { " +
-        "--sg-cell-height: " + opt.rowHeight + "px;" +
-        "--sg-scrollbar-w: " + scrollDims.width + "px;" +
-        "--sg-scrollbar-h: " + scrollDims.height + "px;" +
-        " }",
-        "." + uid + ".slick-cell { height: " + cellHeight + "px; }",
-        "." + uid + ".slick-row { height: " + opt.rowHeight + "px; }"
+        "--sg-cell-height: " + opt.rowHeight + "px; " +
+        "--sg-scrollbar-w: " + scrollDims.width + "px; " +
+        "--sg-scrollbar-h: " + scrollDims.height + "px; " +
+        "}",
+        "." + uid + " .slick-cell { height: " + cellHeight + "px; }",
+        "." + uid + " .slick-row { height: " + opt.rowHeight + "px; }"
     ];
 
     for (let i = 0; i < colCount; i++) {
