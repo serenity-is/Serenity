@@ -9,7 +9,8 @@
     "types": [
       "vitest/globals"
     ],
-    "noImplicitAny": false
+    "noImplicitAny": false,
+    "noImplicitOverride": false
   },
   "include": [
     "./src/base/globals.d.ts",

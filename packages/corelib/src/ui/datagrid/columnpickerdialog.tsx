@@ -14,7 +14,7 @@ export interface ColumnPickerDialogOptions {
 
 export class ColumnPickerDialog<P extends ColumnPickerDialogOptions = ColumnPickerDialogOptions> extends BaseDialog<P> {
 
-    static [Symbol.typeInfo] = this.registerClass(nsSerenity, [new ResizableAttribute()]);
+    static override [Symbol.typeInfo] = this.registerClass(nsSerenity, [new ResizableAttribute()]);
 
     declare private ulVisible: HTMLUListElement;
     declare private ulHidden: HTMLUListElement;
@@ -31,7 +31,7 @@ export class ColumnPickerDialog<P extends ColumnPickerDialogOptions = ColumnPick
         this.options.defaultColumns ??= this.visibleColumns.slice(0);
     }
 
-    protected renderContents(): any {
+    protected override renderContents(): any {
         this.dialogTitle = ColumnPickerDialogTexts.Title;
 
         return (
@@ -76,7 +76,7 @@ export class ColumnPickerDialog<P extends ColumnPickerDialogOptions = ColumnPick
         }
     }
 
-    protected getDialogButtons(): DialogButton[] {
+    protected override getDialogButtons(): DialogButton[] {
         return [
             {
                 text: ColumnPickerDialogTexts.RestoreDefaults,
@@ -120,7 +120,7 @@ export class ColumnPickerDialog<P extends ColumnPickerDialogOptions = ColumnPick
         ];
     }
 
-    protected getDialogOptions() {
+    protected override getDialogOptions() {
         var opt = super.getDialogOptions();
         opt.width = 600;
         return opt;
@@ -230,7 +230,7 @@ export class ColumnPickerDialog<P extends ColumnPickerDialogOptions = ColumnPick
         }
     }
 
-    protected onDialogOpen(): void {
+    protected override onDialogOpen(): void {
         this.setupColumns();
 
         super.onDialogOpen();

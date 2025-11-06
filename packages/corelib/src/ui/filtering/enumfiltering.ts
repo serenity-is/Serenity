@@ -4,7 +4,7 @@ import { BaseEditorFiltering } from "./baseeditorfiltering";
 import { FilterOperators } from "./filteroperator";
 
 export class EnumFiltering extends BaseEditorFiltering<EnumEditor> {
-    static [Symbol.typeInfo] = this.registerClass(nsSerenity);
+    static override [Symbol.typeInfo] = this.registerClass(nsSerenity);
 
     constructor() {
         super(EnumEditor);
@@ -15,7 +15,7 @@ export class EnumFiltering extends BaseEditorFiltering<EnumEditor> {
         return this.appendNullableOperators(op);
     }
 
-    getEditorText(): string {
+    override getEditorText(): string {
         if (this.useEditor()) {
             return this.editor.text;
         }

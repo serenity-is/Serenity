@@ -4,7 +4,7 @@ import { WidgetProps } from "../widgets/widget";
 import { FilterPanel } from "./filterpanel";
 
 export class FilterDialog<P = {}> extends BaseDialog<P> {
-    static [Symbol.typeInfo] = this.registerClass(nsSerenity);
+    static override [Symbol.typeInfo] = this.registerClass(nsSerenity);
 
     declare private filterPanel: FilterPanel;
 
@@ -23,17 +23,17 @@ export class FilterDialog<P = {}> extends BaseDialog<P> {
         return this.filterPanel;
     }
 
-    protected renderContents(): any {
+    protected override renderContents(): any {
         return <div id={this.useIdPrefix().FilterPanel} />
     }
 
-    protected getDialogOptions() {
+    protected override getDialogOptions() {
         var opt = super.getDialogOptions();
         opt.fullScreen = "lg-down";
         return opt;
     }
 
-    protected getDialogButtons() {
+    protected override getDialogButtons() {
         return [
             okDialogButton({
                 click: (e) => {

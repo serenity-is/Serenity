@@ -4,7 +4,7 @@ import { ComboboxCommonOptions, ComboboxEditor } from "./comboboxeditor";
 import { EditorProps } from "./editorwidget";
 
 export class SelectEditor<P extends SelectEditorOptions = SelectEditorOptions> extends ComboboxEditor<P, ComboboxItem> {
-    static [Symbol.typeInfo] = this.registerEditor(nsSerenity);
+    static override [Symbol.typeInfo] = this.registerEditor(nsSerenity);
 
     constructor(props: EditorProps<P>) {
         super(props);
@@ -16,14 +16,14 @@ export class SelectEditor<P extends SelectEditorOptions = SelectEditorOptions> e
         return this.options.items || [];
     }
 
-    protected emptyItemText() {
+    protected override emptyItemText() {
         if (this.options.emptyOptionText) {
             return this.options.emptyOptionText;
         }
         return super.emptyItemText();
     }
 
-    updateItems() {
+    override updateItems() {
         var items = this.getItems();
         this.clearItems();
 

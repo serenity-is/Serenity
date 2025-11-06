@@ -28,7 +28,7 @@ export interface CheckTreeItem<TSource> {
 
 export class CheckTreeEditor<TItem extends CheckTreeItem<TItem>, P = {}> extends DataGrid<TItem, P>
     implements IGetEditValue, ISetEditValue, IReadOnly {
-    static [Symbol.typeInfo] = this.registerEditor(nsSerenity, [IGetEditValue, ISetEditValue, IReadOnly]);
+    static override [Symbol.typeInfo] = this.registerEditor(nsSerenity, [IGetEditValue, ISetEditValue, IReadOnly]);
 
     static override createDefaultElement() { return document.createElement("div"); }
 
@@ -41,7 +41,7 @@ export class CheckTreeEditor<TItem extends CheckTreeItem<TItem>, P = {}> extends
         this.updateItems();
     }
 
-    protected getIdProperty() {
+    protected override getIdProperty() {
         return "id";
     }
 
@@ -82,7 +82,7 @@ export class CheckTreeEditor<TItem extends CheckTreeItem<TItem>, P = {}> extends
         this.set_value(value);
     }
 
-    protected getButtons(): ToolButton[] {
+    protected override getButtons(): ToolButton[] {
         var selectAllText = this.getSelectAllText();
         if (!selectAllText) {
             return null;
@@ -127,7 +127,7 @@ export class CheckTreeEditor<TItem extends CheckTreeItem<TItem>, P = {}> extends
         this.sleekGrid.resizeCanvas();
     }
 
-    protected onViewFilter(item: TItem): boolean {
+    protected override onViewFilter(item: TItem): boolean {
         if (!super.onViewFilter(item)) {
             return false;
         }
@@ -157,7 +157,7 @@ export class CheckTreeEditor<TItem extends CheckTreeItem<TItem>, P = {}> extends
         return false;
     }
 
-    protected onViewProcessData(response: ListResponse<TItem>): ListResponse<TItem> {
+    protected override onViewProcessData(response: ListResponse<TItem>): ListResponse<TItem> {
         response = super.onViewProcessData(response);
         this.itemById = null;
         SlickTreeHelper.setIndents(response.Entities, function (x) {
@@ -168,7 +168,7 @@ export class CheckTreeEditor<TItem extends CheckTreeItem<TItem>, P = {}> extends
         return response;
     }
 
-    protected onClick(e: Event, row: number, cell: number): void {
+    protected override onClick(e: Event, row: number, cell: number): void {
         super.onClick(e, row, cell);
 
         if (!Fluent.isDefaultPrevented(e)) {
@@ -321,7 +321,7 @@ export class CheckTreeEditor<TItem extends CheckTreeItem<TItem>, P = {}> extends
         return false;
     }
 
-    protected getColumns(): Column[] {
+    protected override getColumns(): Column[] {
         var self = this;
         var columns: Column[] = [];
         columns.push({
@@ -356,7 +356,7 @@ export class CheckTreeEditor<TItem extends CheckTreeItem<TItem>, P = {}> extends
         return ctx.escape();
     }
 
-    protected getSlickOptions(): GridOptions {
+    protected override getSlickOptions(): GridOptions {
         var opt = super.getSlickOptions();
         opt.forceFitColumns = true;
         return opt;
@@ -396,11 +396,11 @@ export class CheckTreeEditor<TItem extends CheckTreeItem<TItem>, P = {}> extends
 
     declare private _readOnly: boolean;
 
-    public get_readOnly() {
+    public override get_readOnly() {
         return this._readOnly;
     }
 
-    public set_readOnly(value: boolean) {
+    public override set_readOnly(value: boolean) {
         if (!!this._readOnly != !!value) {
             this._readOnly = !!value;
             this.view.refresh();
@@ -476,7 +476,7 @@ export interface CheckLookupEditorOptions {
 }
 
 export class CheckLookupEditor<TItem extends CheckTreeItem<TItem> = any, P extends CheckLookupEditorOptions = CheckLookupEditorOptions> extends CheckTreeEditor<CheckTreeItem<TItem>, P> {
-    static [Symbol.typeInfo] = this.registerEditor(nsSerenity);
+    static override [Symbol.typeInfo] = this.registerEditor(nsSerenity);
 
     declare private searchText: string;
     declare private enableUpdateItems: boolean;
@@ -491,7 +491,7 @@ export class CheckLookupEditor<TItem extends CheckTreeItem<TItem> = any, P exten
         this.lookupChangeOff = ScriptData.bindToChange('Lookup.' + this.getLookupKey(), bindThis(this).updateItems);
     }
 
-    public destroy(): void {
+    public override destroy(): void {
         if (this.lookupChangeOff) {
             this.lookupChangeOff();
             this.lookupChangeOff = null;
@@ -500,7 +500,7 @@ export class CheckLookupEditor<TItem extends CheckTreeItem<TItem> = any, P exten
         super.destroy();
     }
 
-    protected updateItems() {
+    protected override updateItems() {
         if (this.enableUpdateItems)
             super.updateItems();
     }
@@ -509,11 +509,11 @@ export class CheckLookupEditor<TItem extends CheckTreeItem<TItem> = any, P exten
         return this.options.lookupKey;
     }
 
-    protected getButtons(): ToolButton[] {
+    protected override getButtons(): ToolButton[] {
         return super.getButtons() ?? (this.options.hideSearch ? null : []);
     }
 
-    protected createToolbarExtensions() {
+    protected override createToolbarExtensions() {
         super.createToolbarExtensions();
 
         GridUtils.addQuickSearchInputCustom(this.toolbar.domNode, (field, text) => {
@@ -522,7 +522,7 @@ export class CheckLookupEditor<TItem extends CheckTreeItem<TItem> = any, P exten
         });
     }
 
-    protected getSelectAllText(): string {
+    protected override getSelectAllText(): string {
         if (!this.options.showSelectAll)
             return null;
 
@@ -571,7 +571,7 @@ export class CheckLookupEditor<TItem extends CheckTreeItem<TItem> = any, P exten
         return this.filterItems(this.cascadeItems(lookup.items));
     }
 
-    protected getTreeItems() {
+    protected override getTreeItems() {
         var lookup = getLookup<TItem>(this.options.lookupKey);
         var items = this.getLookupItems(lookup);
         return items.map(item => <CheckTreeItem<TItem>>{
@@ -581,13 +581,13 @@ export class CheckLookupEditor<TItem extends CheckTreeItem<TItem> = any, P exten
         });
     }
 
-    protected onViewFilter(item: CheckTreeItem<TItem>) {
+    protected override onViewFilter(item: CheckTreeItem<TItem>) {
         return super.onViewFilter(item) &&
             (!this.searchText || stripDiacritics(item.text || '')
                 .toUpperCase().indexOf(this.searchText) >= 0);
     }
 
-    protected moveSelectedUp(): boolean {
+    protected override moveSelectedUp(): boolean {
         return this.options.checkedOnTop;
     }
 

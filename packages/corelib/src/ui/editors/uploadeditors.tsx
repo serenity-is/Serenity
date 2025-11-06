@@ -17,7 +17,7 @@ export interface ImageUploadEditorOptions extends FileUploadEditorOptions {
 
 export class FileUploadEditor<P extends FileUploadEditorOptions = FileUploadEditorOptions> extends EditorWidget<P>
     implements IReadOnly, IGetEditValue, ISetEditValue, IValidateRequired {
-    static [Symbol.typeInfo] = this.registerEditor(nsSerenity, [IReadOnly, IGetEditValue, ISetEditValue, IValidateRequired]);
+    static override [Symbol.typeInfo] = this.registerEditor(nsSerenity, [IReadOnly, IGetEditValue, ISetEditValue, IValidateRequired]);
 
     constructor(props: EditorProps<P>) {
         super(props);
@@ -256,7 +256,7 @@ export class FileUploadEditor<P extends FileUploadEditorOptions = FileUploadEdit
 }
 
 export class ImageUploadEditor<P extends ImageUploadEditorOptions = ImageUploadEditorOptions> extends FileUploadEditor<P> {
-    static [Symbol.typeInfo] = this.registerEditor(nsSerenity);
+    static override [Symbol.typeInfo] = this.registerEditor(nsSerenity);
 
     constructor(props: EditorProps<P>) {
         super(props);

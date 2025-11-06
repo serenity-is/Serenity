@@ -14,7 +14,7 @@ import { ColumnPickerDialog } from "./columnpickerdialog";
 import { DataGrid } from "./datagrid";
 
 export class EntityGrid<TItem, P = {}> extends DataGrid<TItem, P> {
-    static [Symbol.typeInfo] = this.registerClass(nsSerenity);
+    static override [Symbol.typeInfo] = this.registerClass(nsSerenity);
 
     constructor(props: WidgetProps<P>) {
         super(props);
@@ -22,7 +22,7 @@ export class EntityGrid<TItem, P = {}> extends DataGrid<TItem, P> {
         Fluent.on(this.domNode, "handleroute." + this.uniqueName, bindThis(this).handleRoute);
     }
 
-    destroy() {
+    override destroy() {
         Fluent.off(document, "." + this.uniqueName + "_routerfix");
         super.destroy();
     }
@@ -75,20 +75,20 @@ export class EntityGrid<TItem, P = {}> extends DataGrid<TItem, P> {
         }
     }
 
-    protected usePager(): boolean {
+    protected override usePager(): boolean {
         return true;
     }
 
-    protected createToolbarExtensions(): void {
+    protected override createToolbarExtensions(): void {
         this.createIncludeDeletedButton();
         this.createQuickSearchInput();
     }
 
-    protected getInitialTitle(): string {
+    protected override getInitialTitle(): string {
         return this.getDisplayName();
     }
 
-    protected getLocalTextPrefix(): string {
+    protected override getLocalTextPrefix(): string {
         var result = super.getLocalTextPrefix();
 
         if (result != null ||
@@ -141,11 +141,11 @@ export class EntityGrid<TItem, P = {}> extends DataGrid<TItem, P> {
         return this._itemName = localText(this.getLocalTextDbPrefix() + "EntitySingular", this.getEntityType());
     }
 
-    protected getAddButtonCaption(): string {
+    protected override getAddButtonCaption(): string {
         return stringFormat(EntityGridTexts.NewButton, this.getItemName());
     }
 
-    protected getButtons(): ToolButton[] {
+    protected override getButtons(): ToolButton[] {
 
         var buttons: ToolButton[] = [];
         buttons.push({
@@ -183,7 +183,7 @@ export class EntityGrid<TItem, P = {}> extends DataGrid<TItem, P> {
         this.editItem(new Object());
     }
 
-    protected editItem(entityOrId: any): void {
+    protected override editItem(entityOrId: any): void {
         this.createEntityDialog(this.getItemType(), dlg => {
             var dialog = safeCast(dlg, IEditDialog);
             if (dialog != null) {
@@ -200,7 +200,7 @@ export class EntityGrid<TItem, P = {}> extends DataGrid<TItem, P> {
         });
     }
 
-    protected editItemOfType(itemType: string, entityOrId: any): void {
+    protected override editItemOfType(itemType: string, entityOrId: any): void {
 
         if (itemType === this.getItemType()) {
             this.editItem(entityOrId);
@@ -239,13 +239,13 @@ export class EntityGrid<TItem, P = {}> extends DataGrid<TItem, P> {
         return resolveUrl('~/Services/' + this.getServiceMethod());
     }
 
-    protected getViewOptions(): RemoteViewOptions {
+    protected override getViewOptions(): RemoteViewOptions {
         var opt = super.getViewOptions();
         opt.url = this.getServiceUrl();
         return opt;
     }
 
-    protected getItemType() {
+    protected override getItemType() {
         return this.getEntityType();
     }
 

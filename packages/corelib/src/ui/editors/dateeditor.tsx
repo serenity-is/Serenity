@@ -12,7 +12,7 @@ export interface DateEditorOptions {
 }
 
 export class DateEditor<P extends DateEditorOptions = DateEditorOptions> extends EditorWidget<P> implements IStringValue, IReadOnly {
-    static [Symbol.typeInfo] = this.registerEditor(nsSerenity, [IStringValue, IReadOnly]);
+    static override [Symbol.typeInfo] = this.registerEditor(nsSerenity, [IStringValue, IReadOnly]);
 
     static override createDefaultElement() { return <input type="text" /> as HTMLInputElement; }
     declare readonly domNode: HTMLInputElement;
@@ -90,7 +90,7 @@ export class DateEditor<P extends DateEditorOptions = DateEditorOptions> extends
         triggerChange && Fluent.trigger(this.domNode, 'change');
     }    
 
-    destroy() {
+    override destroy() {
         if (this.domNode && (this.domNode as any)._flatpickr) {
             (this.domNode as any)._flatpickr.destroy?.();
             delete (this.domNode as any)._flatpickr;

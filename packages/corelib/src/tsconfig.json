@@ -19,6 +19,7 @@
     "moduleResolution": "Bundler",
     "newLine": "lf",
     "noImplicitAny": true,
+    "noImplicitOverride": true,
     "outDir": "../out",
     "skipLibCheck": true,
     "sourceMap": true,

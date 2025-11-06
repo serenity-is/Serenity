@@ -7,7 +7,7 @@ import { EditorProps, EditorWidget } from "./editorwidget";
 
 export class DateTimeEditor<P extends DateTimeEditorOptions = DateTimeEditorOptions> extends EditorWidget<P> implements IStringValue, IReadOnly {
 
-    static [Symbol.typeInfo] = this.registerEditor(nsSerenity, [IStringValue, IReadOnly]);
+    static override [Symbol.typeInfo] = this.registerEditor(nsSerenity, [IStringValue, IReadOnly]);
 
     static override createDefaultElement() { return <input type="text" /> as HTMLInputElement; }
     declare readonly domNode: HTMLInputElement;
@@ -147,7 +147,7 @@ export class DateTimeEditor<P extends DateTimeEditorOptions = DateTimeEditorOpti
         triggerChange && Fluent.trigger(this.domNode, 'change');
     }
 
-    destroy() {
+    override destroy() {
         if (this.domNode && (this.domNode as any)._flatpickr && (this.domNode as any)._flatpickr.destroy) {
             (this.domNode as any)._flatpickr.destroy();
         }

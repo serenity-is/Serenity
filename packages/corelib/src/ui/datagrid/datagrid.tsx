@@ -33,7 +33,7 @@ export type { GridPersistenceFlags, PersistedGridColumn, PersistedGridSettings, 
 
 export class DataGrid<TItem, P = {}> extends Widget<P> implements IDataGrid, IReadOnly {
 
-    static [Symbol.typeInfo] = this.registerClass(nsSerenity, [IReadOnly]);
+    static override [Symbol.typeInfo] = this.registerClass(nsSerenity, [IReadOnly]);
 
     declare private _grid: ISleekGrid<TItem>;
     declare private _isDisabled: boolean;
@@ -248,7 +248,7 @@ export class DataGrid<TItem, P = {}> extends Widget<P> implements IDataGrid, IRe
         input?.domNode?.setAttribute('id', this.idPrefix + 'QuickSearchInput');
     }
 
-    public destroy() {
+    public override destroy() {
 
         this.onAfterInit?.clear();
         this.onDataChanged?.clear();

@@ -6,7 +6,7 @@ import { BaseEditorFiltering } from "./baseeditorfiltering";
 import { FilterOperator, FilterOperators } from "./filteroperator";
 
 export class EditorFiltering extends BaseEditorFiltering<Widget<any>> {
-    static [Symbol.typeInfo] = this.registerClass(nsSerenity);
+    static override [Symbol.typeInfo] = this.registerClass(nsSerenity);
 
     constructor(public readonly props: { editorType?: string, useRelative?: boolean, useLike?: boolean } = {}) {
         super(Widget);
@@ -45,7 +45,7 @@ export class EditorFiltering extends BaseEditorFiltering<Widget<any>> {
         return list;
     }
 
-    protected useEditor() {
+    protected override useEditor() {
         var op = this.get_operator().key;
 
         return op === FilterOperators.EQ ||
@@ -57,7 +57,7 @@ export class EditorFiltering extends BaseEditorFiltering<Widget<any>> {
                 op === FilterOperators.GE));
     }
 
-    getEditorOptions() {
+    override getEditorOptions() {
         var opt = super.getEditorOptions();
         if (this.useEditor() && this.editorType === (this.get_field().editorType ?? 'String')) {
             opt = Object.assign(opt, this.get_field().editorParams);
@@ -66,7 +66,7 @@ export class EditorFiltering extends BaseEditorFiltering<Widget<any>> {
         return opt;
     }
 
-    createEditor() {
+    override createEditor() {
         if (this.useEditor()) {
             var editorType = EditorTypeRegistry.get(this.editorType) as typeof Widget<{}>;
 
@@ -81,11 +81,11 @@ export class EditorFiltering extends BaseEditorFiltering<Widget<any>> {
         super.createEditor();
     }
 
-    protected useIdField(): boolean {
+    protected override useIdField(): boolean {
         return this.useEditor();
     }
 
-    initQuickFilter(filter: QuickFilter<Widget<any>, any>) {
+    override initQuickFilter(filter: QuickFilter<Widget<any>, any>) {
         super.initQuickFilter(filter);
 
         filter.type = EditorTypeRegistry.get(this.editorType);

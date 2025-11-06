@@ -11,7 +11,7 @@ export interface EnumEditorOptions extends ComboboxCommonOptions {
 }
 
 export class EnumEditor<P extends EnumEditorOptions = EnumEditorOptions> extends ComboboxEditor<P, ComboboxItem> {
-    static [Symbol.typeInfo] = this.registerEditor(nsSerenity);
+    static override [Symbol.typeInfo] = this.registerEditor(nsSerenity);
 
     constructor(props: EditorProps<P>) {
         super(props);
@@ -19,7 +19,7 @@ export class EnumEditor<P extends EnumEditorOptions = EnumEditorOptions> extends
         this.updateItems();
     }
 
-    protected updateItems(): void | PromiseLike<void> {
+    protected override updateItems(): void | PromiseLike<void> {
         this.clearItems();
 
         var enumType = this.options.enumType || EnumTypeRegistry.getOrLoad(this.options.enumKey);
@@ -48,7 +48,7 @@ export class EnumEditor<P extends EnumEditorOptions = EnumEditorOptions> extends
             then(enumType);
     }
 
-    protected allowClear() {
+    protected override allowClear() {
         return (this.options.allowClear ?? true);
     }
 }

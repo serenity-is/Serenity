@@ -10,7 +10,7 @@ import { applyCssSizes, handleUIDialogResponsive } from "./basedialog-internal";
 import { DialogExtensions } from "./dialogextensions";
 
 export class BaseDialog<P> extends Widget<P> {
-    static [Symbol.typeInfo] = this.registerClass(nsSerenity, [IDialog]);
+    static override [Symbol.typeInfo] = this.registerClass(nsSerenity, [IDialog]);
 
     static override createDefaultElement() { return document.body.appendChild(<div hidden />) as HTMLDivElement; }
 
@@ -28,7 +28,7 @@ export class BaseDialog<P> extends Widget<P> {
         this.initToolbar();
     }
 
-    public destroy(): void {
+    public override destroy(): void {
         TabsExtensions.destroy(this.tabs);
         this.tabs = null;
 
@@ -55,7 +55,7 @@ export class BaseDialog<P> extends Widget<P> {
         super.destroy();
     }
 
-    protected addCssClass(): void {
+    protected override addCssClass(): void {
         // class goes to dialog / modal / panel element
     }
 

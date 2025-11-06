@@ -6,7 +6,7 @@ import { WidgetProps } from "../widgets/widget";
 import { BaseDialog } from "./basedialog";
 
 export class PropertyDialog<TItem, P> extends BaseDialog<P> {
-    static [Symbol.typeInfo] = this.registerClass(nsSerenity, [new PanelAttribute(false)]);
+    static override [Symbol.typeInfo] = this.registerClass(nsSerenity, [new PanelAttribute(false)]);
 
     declare private _entity: TItem;
     declare private _entityId: any;
@@ -36,7 +36,7 @@ export class PropertyDialog<TItem, P> extends BaseDialog<P> {
         return false;
     }
 
-    destroy() {
+    override destroy() {
         if (this.propertyGrid) {
             this.propertyGrid.destroy();
             this.propertyGrid = null;
@@ -45,13 +45,13 @@ export class PropertyDialog<TItem, P> extends BaseDialog<P> {
         super.destroy();
     }
 
-    protected getDialogOptions() {
+    protected override getDialogOptions() {
         var opt = super.getDialogOptions();
         opt.width = 400;
         return opt;
     }
 
-    protected getDialogButtons() {
+    protected override getDialogButtons() {
 
         if (this.getCustomAttribute(StaticPanelAttribute)?.value === true)
             return [];
@@ -185,7 +185,7 @@ export class PropertyDialog<TItem, P> extends BaseDialog<P> {
 
     declare protected propertyGrid: PropertyGrid;
 
-    protected renderContents(): any {
+    protected override renderContents(): any {
         if (this.legacyTemplateRender())
             return void 0;
 

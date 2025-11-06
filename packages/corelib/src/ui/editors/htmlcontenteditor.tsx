@@ -14,7 +14,7 @@ export interface CKEditorConfig {
 
 export class HtmlContentEditor<P extends HtmlContentEditorOptions = HtmlContentEditorOptions> extends EditorWidget<P>
     implements IStringValue, IReadOnly {
-    static [Symbol.typeInfo] = this.registerEditor(nsSerenity, [IStringValue, IReadOnly]);
+    static override [Symbol.typeInfo] = this.registerEditor(nsSerenity, [IStringValue, IReadOnly]);
 
     declare private _instanceReady: boolean;
     declare readonly domNode: HTMLTextAreaElement;
@@ -142,7 +142,7 @@ export class HtmlContentEditor<P extends HtmlContentEditorOptions = HtmlContentE
         return (window as any)['CKEDITOR']?.instances?.[id];
     }
 
-    destroy(): void {
+    overridedestroy(): void {
         var instance = this.getEditorInstance();
         instance && instance.destroy(true);
         super.destroy();
@@ -227,9 +227,9 @@ export class HtmlContentEditor<P extends HtmlContentEditorOptions = HtmlContentE
 }
 
 export class HtmlNoteContentEditor<P extends HtmlContentEditorOptions = HtmlContentEditorOptions> extends HtmlContentEditor<P> {
-    static [Symbol.typeInfo] = this.registerEditor(nsSerenity);
+    static override [Symbol.typeInfo] = this.registerEditor(nsSerenity);
 
-    protected getConfig(): CKEditorConfig {
+    protected override getConfig(): CKEditorConfig {
         var config = super.getConfig();
         (config as any).removeButtons += ',Cut,Copy,Paste,BulletedList,NumberedList,' +
             'Indent,Outdent,SpecialChar,Subscript,Superscript,Styles,PasteText,' +
@@ -244,9 +244,9 @@ export class HtmlNoteContentEditor<P extends HtmlContentEditorOptions = HtmlCont
 }
 
 export class HtmlReportContentEditor<P extends HtmlContentEditorOptions = HtmlContentEditorOptions> extends HtmlContentEditor<P> {
-    static [Symbol.typeInfo] = this.registerEditor(nsSerenity);
+    static override [Symbol.typeInfo] = this.registerEditor(nsSerenity);
 
-    protected getConfig(): CKEditorConfig {
+    protected override getConfig(): CKEditorConfig {
         var config = super.getConfig();
         (config as any).removeButtons += ',Cut,Copy,Paste,BulletedList,NumberedList,' +
             'Indent,Outdent,SpecialChar,Subscript,Superscript,Styles,' +

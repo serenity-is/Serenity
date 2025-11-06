@@ -16,7 +16,7 @@ import { SaveInitiator, applyChangesToolButton, cloneToolButton, deleteToolButto
 
 export class EntityDialog<TItem, P = {}> extends BaseDialog<P> implements IEditDialog, IReadOnly {
 
-    static [Symbol.typeInfo] = this.registerClass(nsSerenity, [IEditDialog, IReadOnly, new PanelAttribute(true)]);
+    static override [Symbol.typeInfo] = this.registerClass(nsSerenity, [IEditDialog, IReadOnly, new PanelAttribute(true)]);
 
     declare private _entity: TItem;
     declare private _entityId: any;
@@ -56,7 +56,7 @@ export class EntityDialog<TItem, P = {}> extends BaseDialog<P> implements IEditD
         return false;
     }
 
-    destroy(): void {
+    override destroy(): void {
         this.propertyGrid?.destroy();
         delete this.propertyGrid;
         this.localizer?.destroy();
@@ -570,7 +570,7 @@ export class EntityDialog<TItem, P = {}> extends BaseDialog<P> implements IEditD
         notifySuccess(EntityDialogTexts.SaveSuccessMessage, '', null);
     }
 
-    protected getToolbarButtons(): ToolButton[] {
+    protected override getToolbarButtons(): ToolButton[] {
         return [
             saveAndCloseToolButton({
                 onClick: () => this.save(() => this.dialogClose("save-and-close"), "save-and-close"),
@@ -752,7 +752,7 @@ export class EntityDialog<TItem, P = {}> extends BaseDialog<P> implements IEditD
         return false;
     }
 
-    protected renderContents(): any {
+    protected override renderContents(): any {
         if (this.legacyTemplateRender())
             return void 0;
 

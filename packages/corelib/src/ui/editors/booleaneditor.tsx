@@ -3,7 +3,7 @@ import { IBooleanValue } from "../../interfaces";
 import { EditorWidget } from "./editorwidget";
 
 export class BooleanEditor<P = {}> extends EditorWidget<P> {
-    static [Symbol.typeInfo] = this.registerEditor(nsSerenity, [IBooleanValue]);
+    static override [Symbol.typeInfo] = this.registerEditor(nsSerenity, [IBooleanValue]);
 
     static override createDefaultElement() { return <input type="checkbox" /> as HTMLInputElement; }
 

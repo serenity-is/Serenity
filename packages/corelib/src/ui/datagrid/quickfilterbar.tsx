@@ -16,7 +16,7 @@ export interface QuickFilterBarOptions {
 
 export class QuickFilterBar<P extends QuickFilterBarOptions = QuickFilterBarOptions> extends Widget<P> {
 
-    static [Symbol.typeInfo] = this.registerClass(nsSerenity);
+    static override [Symbol.typeInfo] = this.registerClass(nsSerenity);
 
     constructor(props: WidgetProps<P>) {
         super(props);
@@ -337,7 +337,7 @@ export class QuickFilterBar<P extends QuickFilterBarOptions = QuickFilterBarOpti
 
     declare private submitHandlers: any;
 
-    destroy() {
+    override destroy() {
         this.submitHandlers = null;
         super.destroy();
     }

@@ -12,7 +12,7 @@ export interface DecimalEditorOptions {
 }
 
 export class DecimalEditor<P extends DecimalEditorOptions = DecimalEditorOptions> extends EditorWidget<P> implements IDoubleValue {
-    static [Symbol.typeInfo] = this.registerEditor(nsSerenity, [IDoubleValue]);
+    static override [Symbol.typeInfo] = this.registerEditor(nsSerenity, [IDoubleValue]);
 
     static override createDefaultElement() { return <input type="text" /> as HTMLInputElement; }
     declare readonly domNode: HTMLInputElement;
@@ -24,7 +24,7 @@ export class DecimalEditor<P extends DecimalEditorOptions = DecimalEditorOptions
         this.initAutoNumeric();
     }
 
-    destroy() {
+    override destroy() {
         AutoNumeric.destroy(this.domNode);
         super.destroy();
     }

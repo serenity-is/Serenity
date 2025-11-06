@@ -4,7 +4,7 @@ import { EditorProps, EditorWidget } from "./editorwidget";
 
 // http://digitalbush.com/projects/masked-input-plugin/
 export class MaskedEditor<P extends MaskedEditorOptions = MaskedEditorOptions> extends EditorWidget<P> {
-    static [Symbol.typeInfo] = this.registerEditor(nsSerenity, [IStringValue]);
+    static override [Symbol.typeInfo] = this.registerEditor(nsSerenity, [IStringValue]);
 
     static override createDefaultElement() { return <input type="text" /> as HTMLInputElement; }
     declare readonly domNode: HTMLInputElement;

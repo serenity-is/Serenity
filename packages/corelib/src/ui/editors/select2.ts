@@ -2295,7 +2295,7 @@ class SingleSelect2 extends AbstractSelect2 {
         return container;
     }
 
-    protected enableInterface() {
+    protected override enableInterface() {
         var result = super.enableInterface();
         if (result) {
             this.focusser.disabled = !this.isInterfaceEnabled();
@@ -2303,7 +2303,7 @@ class SingleSelect2 extends AbstractSelect2 {
         return result;
     }
 
-    protected opening() {
+    protected override opening() {
         var el, range, len;
 
         if (this.opts.minimumResultsForSearch >= 0) {
@@ -2374,7 +2374,7 @@ class SingleSelect2 extends AbstractSelect2 {
         return this.container.classList.contains("select2-container-active");
     }
 
-    protected cancel(e?: Event) {
+    protected override cancel(e?: Event) {
         super.cancel(e);
         this.focusser.disabled = false;
 
@@ -2635,7 +2635,7 @@ class SingleSelect2 extends AbstractSelect2 {
             || (this.opts.element.value === null);
     }
 
-    protected prepareOpts(opts: Select2Options) {
+    protected override prepareOpts(opts: Select2Options) {
         opts = super.prepareOpts(opts);
         var self = this;
 
@@ -2670,7 +2670,7 @@ class SingleSelect2 extends AbstractSelect2 {
         return opts;
     }
 
-    protected getPlaceholder() {
+    protected override getPlaceholder() {
         // if a placeholder is specified on a single select without a valid placeholder option ignore it
         if (this.select) {
             if (this.getPlaceholderOption() === undefined) {
@@ -2840,7 +2840,7 @@ class SingleSelect2 extends AbstractSelect2 {
         }
     }
 
-    protected clearSearch() {
+    protected override clearSearch() {
         this.search.value = "";
         this.focusser.value = "";
     }
@@ -2889,7 +2889,7 @@ class MultiSelect2 extends AbstractSelect2 {
         return container;
     }
 
-    protected prepareOpts(opts: Select2Options) {
+    protected override prepareOpts(opts: Select2Options) {
         opts = super.prepareOpts(opts);
         var self = this;
 
@@ -3183,7 +3183,7 @@ class MultiSelect2 extends AbstractSelect2 {
         }
     }
 
-    protected clearSearch() {
+    protected override clearSearch() {
         var placeholder = this.getPlaceholder(),
             maxWidth = this.getMaxSearchWidth();
 
@@ -3206,7 +3206,7 @@ class MultiSelect2 extends AbstractSelect2 {
         }
     }
 
-    protected opening() {
+    protected override opening() {
         this.clearPlaceholder(); // should be done before super so placeholder is not used to search
         this.resizeSearch();
 
@@ -3263,7 +3263,7 @@ class MultiSelect2 extends AbstractSelect2 {
         self.postprocessResults();
     }
 
-    protected tokenize(): string {
+    protected override tokenize(): string {
         var input = this.search.value;
         input = this.opts.tokenizer.call(this, input, this.data(), bindThis(this).onSelect, this.opts);
         if (input != null && input != undefined) {
@@ -3326,7 +3326,7 @@ class MultiSelect2 extends AbstractSelect2 {
             this.focusSearch();
     }
 
-    protected cancel(e?: Event) {
+    protected override cancel(e?: Event) {
         this.close();
         this.focusSearch();
     }

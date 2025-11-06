@@ -18,15 +18,15 @@ vi.mock("../base", async (importActual) => {
 
 // Mock editor classes
 class TestEditor1 extends Widget {
-    static [Symbol.typeInfo] = { typeName: "TestEditor1", typeKind: "class" as const };
+    static override [Symbol.typeInfo] = { typeName: "TestEditor1", typeKind: "class" as const };
 }
 
 class TestEditor2 extends Widget {
-    static [Symbol.typeInfo] = { typeName: "TestEditor2", typeKind: "class" as const };
+    static override [Symbol.typeInfo] = { typeName: "TestEditor2", typeKind: "class" as const };
 }
 
 class TestEditorWithSuffix extends Widget {
-    static [Symbol.typeInfo] = { typeName: "TestEditorWithSuffix", typeKind: "class" as const };
+    static override [Symbol.typeInfo] = { typeName: "TestEditorWithSuffix", typeKind: "class" as const };
 }
 
 class NonEditorClass {

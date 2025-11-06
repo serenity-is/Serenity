@@ -12,7 +12,7 @@ export interface LookupEditorOptions extends ComboboxEditorOptions {
 
 export abstract class LookupEditorBase<P extends LookupEditorOptions, TItem> extends ComboboxEditor<P, TItem> {
 
-    static [Symbol.typeInfo] = this.registerEditor(nsSerenity);
+    static override [Symbol.typeInfo] = this.registerEditor(nsSerenity);
 
     declare private lookupChangeOff: any;
 
@@ -25,11 +25,11 @@ export abstract class LookupEditorBase<P extends LookupEditorOptions, TItem> ext
         }
     }
 
-    hasAsyncSource(): boolean {
+    override hasAsyncSource(): boolean {
         return !!this.options.async;
     }
 
-    destroy(): void {
+    override destroy(): void {
         if (this.lookupChangeOff) {
             this.lookupChangeOff();
             this.lookupChangeOff = null;
@@ -71,7 +71,7 @@ export abstract class LookupEditorBase<P extends LookupEditorOptions, TItem> ext
         return this.filterItems(this.cascadeItems(lookup.items));
     }
 
-    protected getIdField() {
+    protected override getIdField() {
         return this.lookup != null ? this.lookup.idField : super.getIdField();
     }
 
@@ -83,7 +83,7 @@ export abstract class LookupEditorBase<P extends LookupEditorOptions, TItem> ext
         return textValue == null ? '' : textValue.toString();
     }
 
-    protected mapItem(item: TItem): ComboboxItem<TItem> {
+    protected override mapItem(item: TItem): ComboboxItem<TItem> {
         return {
             id: this.itemId(item),
             text: this.getItemText(item, this.lookup),
@@ -96,7 +96,7 @@ export abstract class LookupEditorBase<P extends LookupEditorOptions, TItem> ext
         return super.itemDisabled(item);
     }
 
-    public updateItems() {
+    public override updateItems() {
         if (this.hasAsyncSource())
             return;
 
@@ -125,7 +125,7 @@ export abstract class LookupEditorBase<P extends LookupEditorOptions, TItem> ext
         };
     }
 
-    protected getDialogTypeKey() {
+    protected override getDialogTypeKey() {
         var dialogTypeKey = super.getDialogTypeKey();
         if (dialogTypeKey)
             return dialogTypeKey;
@@ -137,14 +137,14 @@ export abstract class LookupEditorBase<P extends LookupEditorOptions, TItem> ext
         (entity as any)[this.getLookup().textField] = term;
     }
 
-    protected editDialogDataChange() {
+    protected override editDialogDataChange() {
         reloadLookup(this.getLookupKey());
     }
 }
 
 export class LookupEditor<P extends LookupEditorOptions = LookupEditorOptions> extends LookupEditorBase<P, {}> {
 
-    static [Symbol.typeInfo] = this.registerEditor(nsSerenity);
+    static override [Symbol.typeInfo] = this.registerEditor(nsSerenity);
 
     constructor(props: EditorProps<P>) {
         super(props);
