@@ -11,7 +11,7 @@ export class RoleCheckEditor extends CheckTreeEditor<CheckTreeItem<any>, any> {
         super(props);
     }
 
-    protected createToolbarExtensions() {
+    protected override createToolbarExtensions() {
         super.createToolbarExtensions();
 
         GridUtils.addQuickSearchInputCustom(this.toolbar.element, (field, text) => {
@@ -20,18 +20,18 @@ export class RoleCheckEditor extends CheckTreeEditor<CheckTreeItem<any>, any> {
         });
     }
 
-    protected getButtons() {
+    protected override getButtons() {
         return [];
     }
 
-    protected getTreeItems() {
+    protected override getTreeItems() {
         return (RoleRow as any).getLookup().items.map(role => <CheckTreeItem<any>>{
             id: role.RoleId.toString(),
             text: role.RoleName
         });
     }
 
-    protected onViewFilter(item) {
+    protected override onViewFilter(item) {
         return super.onViewFilter(item) &&
             (isEmptyOrNull(this.searchText) ||
                 stripDiacritics(item.text || '')

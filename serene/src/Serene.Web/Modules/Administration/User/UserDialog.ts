@@ -9,7 +9,7 @@ export class UserDialog extends EntityDialog<UserRow, any> {
 
     protected override getFormKey() { return UserForm.formKey; }
     protected override getIdProperty() { return UserRow.idProperty; }
-    protected getIsActiveProperty() { return UserRow.isActiveProperty; }
+    protected override getIsActiveProperty() { return UserRow.isActiveProperty; }
     protected override getLocalTextPrefix() { return UserRow.localTextPrefix; }
     protected override getNameProperty() { return UserRow.nameProperty; }
     protected override getService() { return UserService.baseUrl; }

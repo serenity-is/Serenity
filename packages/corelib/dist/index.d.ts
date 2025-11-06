@@ -6006,7 +6006,7 @@ export declare class CheckTreeEditor<TItem extends CheckTreeItem<TItem>, P = {}>
 	protected allDescendantsSelected(item: TItem): boolean;
 	protected getDelimited(): boolean;
 	protected anyDescendantsSelected(item: TItem): boolean;
-	protected getColumns(): Column[];
+	protected createColumns(): Column[];
 	protected getItemText(ctx: FormatterContext): string;
 	protected getSlickOptions(): GridOptions;
 	protected sortItems(): void;

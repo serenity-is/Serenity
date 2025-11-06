@@ -16,6 +16,7 @@
     "newLine": "lf",
     "noEmit": true,
     "noEmitOnError": false,
+    "noImplicitOverride": true,
     "outDir": "./wwwroot/esm",
     "paths": {
       "@serenity-is/*": [ "./node_modules/@serenity-is/*/dist/index", "./node_modules/.dotnet/serenity.*/dist/index" ],

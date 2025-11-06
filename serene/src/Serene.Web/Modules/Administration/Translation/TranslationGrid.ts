@@ -193,7 +193,7 @@ export class TranslationGrid extends EntityGrid<TranslationItem, any> {
         }];
     }
 
-    protected createQuickSearchInput() {
+    protected override createQuickSearchInput() {
         GridUtils.addQuickSearchInputCustom(this.toolbar.element,
             (field, searchText) => {
                 this.searchText = searchText;
@@ -201,7 +201,7 @@ export class TranslationGrid extends EntityGrid<TranslationItem, any> {
             });
     }
 
-    protected onViewFilter(item: TranslationItem) {
+    protected override onViewFilter(item: TranslationItem) {
         if (!super.onViewFilter(item)) {
             return false;
         }

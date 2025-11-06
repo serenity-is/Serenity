@@ -3,6 +3,7 @@
     "compilerOptions": {
         "noImplicitAny": false,
         "declaration": false,
+        "skipLibCheck": true,
         "sourceMap": true,
         "types": [
             "vitest/globals"

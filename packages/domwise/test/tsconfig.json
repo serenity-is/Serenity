@@ -5,6 +5,7 @@
     "jsxImportSource": "#src",
     "noImplicitAny": false,
     "declaration": false,
+    "skipLibCheck": true,
     "sourceMap": true,
     "outDir": "../dist",
     "rootDir": "..",
@@ -12,7 +13,6 @@
       "./src",
       "./test"
     ],
-    "skipLibCheck": true,
     "exactOptionalPropertyTypes": false,
     "strict": false,
     "types": [

@@ -27,7 +27,7 @@ export interface PermissionCheckItem {
 export class PermissionCheckEditor<P extends PermissionCheckEditorOptions = PermissionCheckEditorOptions> extends DataGrid<PermissionCheckItem, P> {
     static override[Symbol.typeInfo] = this.registerEditor(nsAdministration, [IGetEditValue, ISetEditValue]);
 
-    protected getIdProperty() { return "Key"; }
+    protected override getIdProperty() { return "Key"; }
 
     declare private searchText: string;
     declare private byParentKey: Grouping<PermissionCheckItem>;
@@ -120,16 +120,16 @@ export class PermissionCheckEditor<P extends PermissionCheckEditorOptions = Perm
         return columns;
     }
 
-    public setItems(items: PermissionCheckItem[]): void {
+    public override setItems(items: PermissionCheckItem[]): void {
         SlickTreeHelper.setIndents(items, x => x.Key, x => x.ParentKey, false);
         this.view.setItems(items, true);
     }
 
-    protected onViewSubmit() {
+    protected override onViewSubmit() {
         return false;
     }
 
-    protected onViewFilter(item: PermissionCheckItem): boolean {
+    protected overrideonViewFilter(item: PermissionCheckItem): boolean {
         return super.onViewFilter(item) && SlickTreeHelper.filterById(item, this.view, x => x.ParentKey) &&
             (!this.searchText || (this.matchContains(item) || item.IsGroup && this.getDescendants(item, false).some(x => this.matchContains(x))));
     }
@@ -159,7 +159,7 @@ export class PermissionCheckEditor<P extends PermissionCheckEditorOptions = Perm
         return result;
     }
 
-    protected onClick(e: Event, row: number, cell: number): void {
+    protected override onClick(e: Event, row: number, cell: number): void {
         super.onClick(e, row, cell);
 
         if (!Fluent.isDefaultPrevented(e))
@@ -195,11 +195,11 @@ export class PermissionCheckEditor<P extends PermissionCheckEditorOptions = Perm
         return idx >= 0 ? key.substring(0, idx + 1) : null;
     }
 
-    protected getButtons(): ToolButton[] {
+    protected override getButtons(): ToolButton[] {
         return [];
     }
 
-    protected createToolbarExtensions(): void {
+    protected override createToolbarExtensions(): void {
         super.createToolbarExtensions();
         GridUtils.addQuickSearchInputCustom(this.toolbar.domNode, (_, text) => {
             this.searchText = stripDiacritics(text?.trim() ?? '').toLowerCase();

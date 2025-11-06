@@ -9,7 +9,7 @@ export class UserGrid extends EntityGrid<UserRow, any> {
     protected override getColumnsKey() { return UserColumns.columnsKey; }
     protected override getDialogType() { return UserDialog; }
     protected override getIdProperty() { return UserRow.idProperty; }
-    protected getIsActiveProperty() { return UserRow.isActiveProperty; }
+    protected override getIsActiveProperty() { return UserRow.isActiveProperty; }
     protected override getLocalTextPrefix() { return UserRow.localTextPrefix; }
     protected override getService() { return UserService.baseUrl; }
 

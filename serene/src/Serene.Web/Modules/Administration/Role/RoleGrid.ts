@@ -16,7 +16,7 @@ export class RoleGrid extends EntityGrid<RoleRow, any> {
         super(props);
     }
 
-    protected getDefaultSortBy() {
+    protected override getDefaultSortBy() {
         return [RoleRow.Fields.RoleName];
     }
 }

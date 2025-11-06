@@ -19,7 +19,6 @@
     "newLine": "lf",
     "noImplicitOverride": true,
     "preserveConstEnums": true,
-    "skipLibCheck": true,
     "sourceMap": true,
     "target": "ES2017",
     "types": [

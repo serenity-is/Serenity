@@ -3,6 +3,7 @@
   "compilerOptions": {
     "noEmit": true,
     "outDir": "../out/test",
+    "skipLibCheck": true,
     "typeRoots": [
       "../node_modules/@types",
       "../../../../node_modules/@types",

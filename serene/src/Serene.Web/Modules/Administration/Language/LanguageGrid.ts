@@ -6,17 +6,17 @@ import { LanguageDialog } from "./LanguageDialog";
 export class LanguageGrid extends EntityGrid<LanguageRow, any> {
     static override[Symbol.typeInfo] = this.registerClass(nsAdministration);
 
-    protected useAsync() { return true; }
+    protected override useAsync() { return true; }
     protected override getColumnsKey() { return LanguageColumns.columnsKey; }
     protected override getDialogType() { return LanguageDialog; }
     protected override getIdProperty() { return LanguageRow.idProperty; }
     protected override getLocalTextPrefix() { return LanguageRow.localTextPrefix; }
     protected override getService() { return LanguageService.baseUrl; }
 
-    protected afterInit() {
+    protected override afterInit() {
         super.afterInit();
     }
-    protected getDefaultSortBy() {
+    protected override getDefaultSortBy() {
         return [LanguageRow.Fields.LanguageName];
     }
 }
