@@ -1,7 +1,6 @@
-﻿import { Enum, getCustomAttribute, isPromiseLike, localText, nsSerenity } from "../../base";
+﻿import { Enum, EnumKeyAttribute, getCustomAttribute, getType, getTypeFullName, isPromiseLike, localText, nsSerenity } from "../../base";
 import { getLookup } from "../../compat";
 import { IReadOnly, IStringValue } from "../../interfaces";
-import { EnumKeyAttribute } from "../../types/attributes";
 import { EnumTypeRegistry } from "../../types/enumtyperegistry";
 import { EditorProps, EditorWidget } from "./editorwidget";
 
@@ -38,10 +37,8 @@ export class RadioButtonEditor<P extends RadioButtonEditorOptions = RadioButtonE
             const then = (enumType: any) => {
                 var enumKey = this.options.enumKey;
                 if (enumKey == null && enumType != null) {
-                    var enumKeyAttr = getCustomAttribute(enumType, EnumKeyAttribute, false);
-                    if (enumKeyAttr) {
-                        enumKey = enumKeyAttr.value;
-                    }
+                    enumKey = getCustomAttribute(enumType, EnumKeyAttribute, false)?.value ??
+                        getTypeFullName(enumType);
                 }
 
                 var values = Enum.getValues(enumType);

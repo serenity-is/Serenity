@@ -1,7 +1,6 @@
 import { FormatterContext, FormatterResult } from "@serenity-is/sleekgrid";
-import { Enum, formatterTypeInfo, getCustomAttribute, getTypeFullName, htmlEncode, isPromiseLike, localText, nsSerenity, registerType } from "../../base";
+import { Enum, EnumKeyAttribute, formatterTypeInfo, getCustomAttribute, getTypeFullName, htmlEncode, isPromiseLike, localText, nsSerenity, registerType } from "../../base";
 import { Formatter } from "../../slick";
-import { EnumKeyAttribute } from "../../types/attributes";
 import { EnumTypeRegistry } from "../../types/enumtyperegistry";
 
 export class EnumFormatter implements Formatter {
@@ -34,8 +33,8 @@ export class EnumFormatter implements Formatter {
         }
 
         var name = Enum.toString(enumType, value);
-        var enumKeyAttr = getCustomAttribute(enumType, EnumKeyAttribute, false);
-        var enumKey = enumKeyAttr ? enumKeyAttr.value : getTypeFullName(enumType);
+        var enumKey = getCustomAttribute(enumType, EnumKeyAttribute, false)?.value ??
+            getTypeFullName(enumType);
         return EnumFormatter.getText(enumKey, name);
     }
 

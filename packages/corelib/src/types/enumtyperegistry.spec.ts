@@ -1,5 +1,4 @@
-import { addCustomAttribute, getGlobalTypeRegistry, registerEnum } from "../base";
-import { EnumKeyAttribute } from "./attributes";
+import { addCustomAttribute, EnumKeyAttribute, getGlobalTypeRegistry, registerEnum } from "../base";
 import { EnumTypeRegistry } from "./enumtyperegistry";
 
 beforeEach(() => {
@@ -64,10 +63,10 @@ describe("EnumTypeRegistry", () => {
             User = 1
         }
 
+        registerEnum(UserRole, 'MyApp.UserRole', 'User.Role');
+
         // Add EnumKeyAttribute
         addCustomAttribute(UserRole, new EnumKeyAttribute("Role.User"));
-
-        registerEnum(UserRole, 'MyApp.UserRole', 'User.Role');
 
         // Should find by EnumKeyAttribute, not by registered enumKey
         const type1 = EnumTypeRegistry.tryGet("Role.User");

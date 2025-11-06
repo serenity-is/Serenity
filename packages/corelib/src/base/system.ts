@@ -183,6 +183,16 @@ export function registerClass(type: any, name: string, intf?: any[]): void {
 }
 
 /**
+ * Indicates the enum key of an enum type (by default the name of the enum type is used as key)
+ */
+export class EnumKeyAttribute {
+    static [Symbol.typeInfo] = classTypeInfo(nsSerenity); static { registerType(this); }
+
+    constructor(public value: string) {
+    }
+}
+
+/**
  * Register an enum with the type system.
  * @param enumType Enum type to register
  * @param name Name to register the enum under
@@ -195,8 +205,9 @@ export function registerEnum(enumType: any, name: string, enumKey?: string) {
     if (name && name.endsWith("."))
         throw "Enum name cannot end with a dot in registerEnum!";
 
-    internalRegisterType(enumType, name, undefined, "enum");    
+    internalRegisterType(enumType, name, undefined, "enum");
     if (enumKey && enumKey != name) {
+        addCustomAttribute(enumType, new EnumKeyAttribute(enumKey));
         const typeStore = getGlobalTypeRegistry();
         if (!typeStore[enumKey])
             typeStore[enumKey] = enumType;

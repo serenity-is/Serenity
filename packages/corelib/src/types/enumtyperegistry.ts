@@ -1,5 +1,4 @@
-﻿import { getCustomAttribute, htmlEncode, isEnum, notifyError } from "../base";
-import { EnumKeyAttribute } from "./attributes";
+﻿import { EnumKeyAttribute, getCustomAttribute, htmlEncode, isEnum, notifyError } from "../base";
 import { BaseTypeRegistry } from "./basetyperegistry";
 
 class EnumTypeRegistryImpl extends BaseTypeRegistry<object> {

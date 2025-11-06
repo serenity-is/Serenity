@@ -1,6 +1,6 @@
 import { Decorators } from "./decorators";
-import { EnumKeyAttribute, CloseButtonAttribute, ElementAttribute, FilterableAttribute, MaximizableAttribute, OptionAttribute, PanelAttribute, ResizableAttribute, StaticPanelAttribute } from "./attributes";
-import { EditorAttribute, addCustomAttribute, registerClass, registerEditor, registerEnum, registerFormatter, registerInterface, registerType } from "../base";
+import { CloseButtonAttribute, ElementAttribute, FilterableAttribute, MaximizableAttribute, OptionAttribute, PanelAttribute, ResizableAttribute, StaticPanelAttribute } from "./attributes";
+import { EditorAttribute, EnumKeyAttribute, addCustomAttribute, registerClass, registerEditor, registerEnum, registerFormatter, registerInterface, registerType } from "../base";
 import { addTypeMember } from "../compat";
 
 vi.mock("../base", async (importOriginal) => {

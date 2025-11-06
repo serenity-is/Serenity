@@ -1,16 +1,6 @@
 import { classTypeInfo, nsSerenity, registerType } from "../base";
 
 /**
- * Indicates the enum key of an enum type (by default the name of the enum type is used as key)
- */
-export class EnumKeyAttribute {
-    static [Symbol.typeInfo] = classTypeInfo(nsSerenity); static { registerType(this); }
-
-    constructor(public value: string) {
-    }
-}
-
-/**
  * Indicates if a dialog should have a close button in its title bar (default true)
  */
 export class CloseButtonAttribute {

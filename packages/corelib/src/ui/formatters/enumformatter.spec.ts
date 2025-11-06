@@ -1,6 +1,5 @@
 import { formatterContext as ctx } from "@serenity-is/sleekgrid";
-import { addCustomAttribute, registerEnum } from "../../base";
-import { EnumKeyAttribute } from "../../types/attributes";
+import { addCustomAttribute, EnumKeyAttribute, registerEnum } from "../../base";
 import { EnumTypeRegistry } from "../../types/enumtyperegistry";
 import { EnumFormatter } from "./enumformatter";
 
