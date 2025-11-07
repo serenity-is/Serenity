@@ -5146,6 +5146,7 @@ export declare class FilterDisplayBar<P = {}> extends FilterWidgetBase<P> {
 	static [Symbol.typeInfo]: ClassTypeInfo<"Serenity.">;
 	protected renderContents(): any;
 	protected filterStoreChanged(): void;
+	static createToolButton(opt: Partial<ToolButtonProps>): ToolButton;
 }
 export interface QuickSearchField {
 	name: string;
@@ -5199,14 +5200,23 @@ export interface PersistedGridSettings {
 	includeDeleted?: boolean;
 }
 export interface GridPersistenceFlags {
+	/** Column pinning state. Defaults to persist unless explicitly set to false. */
 	columnPinning?: boolean;
+	/** Column widths. Defaults to persist unless explicitly set to false. */
 	columnWidths?: boolean;
+	/** Column visibility. Defaults to persist unless explicitly set to false. */
 	columnVisibility?: boolean;
+	/** Sort columns. Defaults to persist unless explicitly set to false. */
 	sortColumns?: boolean;
+	/** Filter items. Defaults to persist unless explicitly set to false. */
 	filterItems?: boolean;
+	/** Quick filter values. Defaults to persist unless explicitly set to false. */
 	quickFilters?: boolean;
+	/** Quick filter display text. Only persists when explicitly set to true. */
 	quickFilterText?: boolean;
+	/** Quick search input text. Only persists when explicitly set to true. */
 	quickSearch?: boolean;
+	/** Include deleted toggle state. Defaults to persist unless explicitly set to false. */
 	includeDeleted?: boolean;
 }
 export declare const omitAllGridPersistenceFlags: GridPersistenceFlags;
@@ -5300,9 +5310,16 @@ export interface QuickFilterBarOptions {
 	getTitle?: (filter: QuickFilter<Widget<any>, any>) => string;
 	idPrefix?: string;
 }
+export interface QuickFilterItemData<TWidget> {
+	displayText?: (w: TWidget, l: string) => string;
+	saveState?: (w: TWidget) => any;
+	loadState?: (w: TWidget, state: any) => void;
+}
 export declare class QuickFilterBar<P extends QuickFilterBarOptions = QuickFilterBarOptions> extends Widget<P> {
 	static [Symbol.typeInfo]: ClassTypeInfo<"Serenity.">;
 	constructor(props: WidgetProps<P>);
+	private static readonly itemDataMap;
+	static getItemData<TWidget>(filterItem: Node): QuickFilterItemData<TWidget> | undefined;
 	addSeparator(): void;
 	add<TWidget extends Widget<any>, TOptions>(opt: QuickFilter<TWidget, TOptions>): TWidget;
 	addDateRange(field: string, title?: string): DateEditor;
@@ -5342,6 +5359,7 @@ export declare class DataGrid<TItem, P = {}> extends Widget<P> implements IDataG
 	view: IRemoteView<TItem>;
 	openDialogsAsPanel: boolean;
 	static defaultRowHeight: number;
+	static readonly defaultPersistenceFlags: GridPersistenceFlags;
 	static defaultPersistenceStorage: SettingStorage;
 	static defaultColumnWidthScale: number;
 	static defaultColumnWidthDelta: number;
@@ -5380,6 +5398,7 @@ export declare class DataGrid<TItem, P = {}> extends Widget<P> implements IDataG
 	protected initialPopulate(): void;
 	protected canFilterColumn(column: Column): boolean;
 	protected initializeFilterBar(): void;
+	protected filterStoreChanged(): void;
 	/**
 	 * Creates initial column set for this grid. This column set is then passed
 	 * to postProcessColumns to adjust widths etc, and then used as the initial
@@ -5555,6 +5574,9 @@ export declare class EntityGrid<TItem, P = {}> extends DataGrid<TItem, P> {
 	protected getItemName(): string;
 	protected getAddButtonCaption(): string;
 	protected getButtons(): ToolButton[];
+	protected setFilterBarVisibility(): void;
+	protected createFilterBar(): void;
+	protected filterStoreChanged(): void;
 	protected newRefreshButton(noText?: boolean): ToolButton;
 	protected addButtonClick(): void;
 	protected editItem(entityOrId: any): void;
@@ -7113,7 +7135,7 @@ export declare class GridRowSelectionMixin {
 	getSelectedAsInt64(): number[];
 	setSelectedKeys(keys: string[]): void;
 	private isSelectable;
-	static createSelectColumn(getMixin: () => GridRowSelectionMixin): Column;
+	static createSelectColumn(getMixin: () => GridRowSelectionMixin, columnOptions?: Partial<Column>): Column;
 }
 export declare namespace GridSelectAllButtonHelper {
 	function update(grid: IDataGrid, getSelected: (p1: any) => boolean): void;
