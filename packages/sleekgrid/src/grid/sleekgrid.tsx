@@ -1,4 +1,4 @@
-import { bindThis, currentLifecycleRoot } from "@serenity-is/domwise";
+import { bindThis, currentLifecycleRoot, observeSignal } from "@serenity-is/domwise";
 import { preClickClassName } from "../core/base";
 import { CellRange } from "../core/cellrange";
 import { columnDefaults, initColumnProps, type Column, type ColumnMetadata, type ColumnSort, type ItemMetadata } from "../core/column";
@@ -75,6 +75,7 @@ export class SleekGrid<TItem = any> implements ISleekGrid<TItem> {
     declare private _off: OmitThisParameter<typeof removeListener>;
     declare private _options: GridOptions<TItem>;
     declare private _signals: GridSignals;
+    private _signalsDisposers: (() => void)[] = [];
     private _page: number = 0;
     declare private _pageHeight: number;
     private _pageOffset: number = 0;
@@ -220,6 +221,17 @@ export class SleekGrid<TItem = any> implements ISleekGrid<TItem> {
         this._forEachBand = forEachBand.bind(null, refs);
         this._signals = signals;
 
+        const frozenTopBottomChanged = () => {
+            this._initialized && this.invalidateAllRows?.();
+        };
+        const pinnedStartEndChanged = () => {
+            this._initialized && this.invalidateColumns();
+        };
+        this._signalsDisposers.push(observeSignal(signals.frozenTopRows, frozenTopBottomChanged));
+        this._signalsDisposers.push(observeSignal(signals.frozenBottomRows, frozenTopBottomChanged));
+        this._signalsDisposers.push(observeSignal(signals.pinnedStartCols, pinnedStartEndChanged));
+        this._signalsDisposers.push(observeSignal(signals.pinnedEndCols, pinnedStartEndChanged));
+
         this.validateAndEnforceOptions();
         this.setOptionDependentSignals();
 
@@ -321,6 +333,7 @@ export class SleekGrid<TItem = any> implements ISleekGrid<TItem> {
         this.measureCellPaddingAndBorder();
         this.setOverflow();
         this.updateViewColLeftRight();
+        this.adjustPinnedColsLimit();
         this.createCssRules();
         this.createColumnHeaders();
         this.createColumnFooters();
@@ -492,14 +505,12 @@ export class SleekGrid<TItem = any> implements ISleekGrid<TItem> {
     }
 
     public getLayoutInfo(): { frozenTopRows: number, frozenBottomRows: number, pinnedStartCols: number, pinnedEndCols: number } {
-        const { frozenTopLast, frozenBottomFirst, pinnedStartLast, pinnedEndFirst } = this._refs;
-        const dataLength = this.getDataLength();
-        const colCount = this.getColumns().length;
+        const { frozenTopRows, frozenBottomRows, pinnedStartCols, pinnedEndCols } = this._refs;
         return {
-            frozenTopRows: frozenTopLast >= 0 ? frozenTopLast + 1 : 0,
-            frozenBottomRows: frozenBottomFirst >= 0 && frozenBottomFirst < dataLength ? dataLength - frozenBottomFirst : 0,
-            pinnedStartCols: pinnedStartLast >= 0 ? pinnedStartLast + 1 : 0,
-            pinnedEndCols: pinnedEndFirst >= 0 && pinnedEndFirst < colCount ? colCount - pinnedEndFirst : 0
+            frozenTopRows,
+            frozenBottomRows,
+            pinnedStartCols,
+            pinnedEndCols,
         };
     }
 
@@ -564,45 +575,79 @@ export class SleekGrid<TItem = any> implements ISleekGrid<TItem> {
         });
     }
 
-    private updateBandCanvasWidths(): boolean {
-        const oldCanvasWidths = this._mapBands(x => { const w = x.canvasWidth; x.canvasWidth = 0; return w; });
+    private adjustPinnedColsLimit() {
+        let colCount = this._cols.length;
+        let pinnedAvail = colCount;
+        const config = this._refs.config;
+        let pinnedStartCols = config.pinnedStartCols > 0 ? Math.min(config.pinnedStartCols, pinnedAvail) : 0;
+        pinnedAvail -= pinnedStartCols;
+        let pinnedEndCols = config.pinnedEndCols > 0 ? Math.min(config.pinnedEndCols, pinnedAvail) : 0;
+        do {
+            const calc = this.calcCanvasBandWidths({ pinnedStartLast: pinnedStartCols - 1, pinnedEndFirst: pinnedEndCols > 0 ? colCount - pinnedEndCols : Infinity });
+            if (calc.mainBand >= 100)
+                break;
+
+            if (pinnedEndCols > 0)
+                pinnedEndCols--;
+            else if (pinnedStartCols > 0)
+                pinnedStartCols--;
+            else
+                break;
+        } while (true);
+
+        this._refs.config.pinnedLimit = pinnedStartCols + pinnedEndCols;
+    }
+
+    private calcCanvasBandWidths(opt?: { pinnedStartLast: number, pinnedEndFirst: number }) {
+        const result = { start: 0, main: 0, end: 0, startBand: 0, endBand: 0, mainBand: 0, hasHScroll: false };
         const cols = this._cols;
-        const { pinnedStartLast, pinnedEndFirst, start, main, end } = this._refs;
+        const pinnedStartLast = opt?.pinnedStartLast ?? this._refs.pinnedStartLast;
+        const pinnedEndFirst = opt?.pinnedEndFirst ?? this._refs.pinnedEndFirst;
+        const start = this._refs.start;
+        const end = this._refs.end;
         let c = cols.length;
         while (c--) {
             if (c <= pinnedStartLast) {
-                start.canvasWidth += cols[c].width;
+                result.start += cols[c].width;
             }
             else if (c >= pinnedEndFirst) {
-                end.canvasWidth += cols[c].width;
+                result.end += cols[c].width;
             }
             else {
-                main.canvasWidth += cols[c].width;
+                result.main += cols[c].width;
             }
         }
+        result.hasHScroll = this.getAvailableWidth() < result.main + result.start + result.end;
+
+        const startViewport = start.canvas.body?.parentElement;
+        const endViewport = end.canvas.body?.parentElement;
+        result.startBand = result.start + ((startViewport?.offsetWidth || 0) - (startViewport?.clientWidth || 0)); // include pinned start border
+        result.endBand = result.end + ((endViewport?.offsetWidth || 0) - (endViewport?.clientWidth || 0)); // include pinned end border
+        result.mainBand = this._viewportInfo.width - result.startBand - result.endBand;
+        if (result.mainBand < 0) {
+            result.mainBand = 0;
+        }
+        return result;
+    }
+
+    private updateBandCanvasWidths(): boolean {
+        const oldCanvasWidths = this._mapBands(x => x.canvasWidth );;
+        const newCanvasWidths = this.calcCanvasBandWidths();
+        const { start, main, end } = this._refs;
+        start.canvasWidth = newCanvasWidths.start;
+        main.canvasWidth = newCanvasWidths.main;
+        end.canvasWidth = newCanvasWidths.end;
         const widthChanged = start.canvasWidth !== oldCanvasWidths[0] ||
             main.canvasWidth !== oldCanvasWidths[1] ||
             end.canvasWidth !== oldCanvasWidths[2];
 
-        if (widthChanged) {
-            this._viewportInfo.hasHScroll = (main.canvasWidth > this._viewportInfo.width - this._scrollDims.width);
-        }
+        this._viewportInfo.hasHScroll = newCanvasWidths.hasHScroll;
 
         const style = this._cssVarRules?.style ?? this._container.style;
-        const refs = this._refs;
-        const startViewport = refs.start.canvas.body?.parentElement;
-        const endViewport = refs.end.canvas.body?.parentElement;
-        let startWidth = refs.start.canvasWidth + ((startViewport?.offsetWidth || 0) - (startViewport?.clientWidth || 0)); // include pinned start border
-        let endWidth = refs.end.canvasWidth + ((endViewport?.offsetWidth || 0) - (endViewport?.clientWidth || 0)); // include pinned end border
-        let mainWidth = this._viewportInfo.width - startWidth - endWidth;
-        if (mainWidth < 0) {
-            mainWidth = 0;
-        }
-
-        setStyleProp(style, "--sg-start-width", startWidth + "px");
-        setStyleProp(style, "--sg-virtual-width", refs.main.canvasWidth + "px");
-        setStyleProp(style, "--sg-end-width", endWidth + "px");
-        setStyleProp(style, "--sg-main-width", mainWidth + "px");
+        setStyleProp(style, "--sg-start-width", newCanvasWidths.startBand + "px");
+        setStyleProp(style, "--sg-end-width", newCanvasWidths.endBand + "px");
+        setStyleProp(style, "--sg-main-width", newCanvasWidths.mainBand + "px");
+        setStyleProp(style, "--sg-virtual-width", newCanvasWidths.main + "px");
         return widthChanged;
     }
 
@@ -699,7 +744,7 @@ export class SleekGrid<TItem = any> implements ISleekGrid<TItem> {
             return null;
 
         const band = this.getBandRefsForCell(cell);
-        return band.headerCols?.children.item(cell - band.firstCol) as HTMLDivElement;
+        return band.headerCols?.children.item(cell - band.cellOffset) as HTMLDivElement;
     }
 
     getGroupingPanel(): HTMLElement {
@@ -722,7 +767,7 @@ export class SleekGrid<TItem = any> implements ISleekGrid<TItem> {
             return;
 
         const band = this.getBandRefsForCell(cell);
-        return band.headerRowCols?.children.item(cell - band.firstCol) as HTMLDivElement;
+        return band.headerRowCols?.children.item(cell - band.cellOffset) as HTMLDivElement;
     }
 
     getFooterRow(): HTMLElement {
@@ -737,7 +782,7 @@ export class SleekGrid<TItem = any> implements ISleekGrid<TItem> {
             return null;
 
         const band = this.getBandRefsForCell(cell);
-        return band.footerRowCols?.children.item(cell - band.firstCol) as HTMLDivElement;
+        return band.footerRowCols?.children.item(cell - band.cellOffset) as HTMLDivElement;
     }
 
     private createColumnFooters(): void {
@@ -987,6 +1032,7 @@ export class SleekGrid<TItem = any> implements ISleekGrid<TItem> {
     }
 
     public columnsResized(invalidate = true) {
+        this.adjustPinnedColsLimit();
         this.applyColumnHeaderWidths();
         this.applyColumnWidths();
         invalidate && this.invalidateAllRows();
@@ -1093,6 +1139,8 @@ export class SleekGrid<TItem = any> implements ISleekGrid<TItem> {
         this.sortableColInstances?.forEach(instance => { try { instance.destroy() } catch (e) { console.warn(e); } });
 
         const refs = this._refs;
+        this._signalsDisposers?.forEach(d => d?.());
+        this._signalsDisposers = [];
         const canvasNodes = getAllCanvasNodes(refs);
         if (this._jQuery)
             this._jQuery(canvasNodes).off("draginit dragstart dragend drag");
@@ -1314,6 +1362,7 @@ export class SleekGrid<TItem = any> implements ISleekGrid<TItem> {
 
         this._cols = cols;
         this._colById = colById;
+        this._refs.config.colCount = cols.length;
     }
 
     private setInitCols(initCols: Column[]) {
@@ -1400,6 +1449,7 @@ export class SleekGrid<TItem = any> implements ISleekGrid<TItem> {
         this.updateViewColLeftRight();
         if (this._initialized) {
             this.setOverflow();
+            this.adjustPinnedColsLimit();
             this.invalidateAllRows();
             this.createColumnHeaders();
             this.createColumnFooters();
@@ -1906,9 +1956,9 @@ export class SleekGrid<TItem = any> implements ISleekGrid<TItem> {
     }
 
     private calcViewportSize(): void {
-        const layout = this._layout;
         const refs = this._refs;
         const vs = this._viewportInfo;
+        this.adjustPinnedColsLimit();
         this.updateBandCanvasWidths();
         vs.width = getInnerWidth(this._container);
         vs.groupingPanelHeight = (this._options.groupingPanel && this._options.showGroupingPanel) ? this._groupingPanel?.offsetHeight || 0 : 0;
@@ -1936,6 +1986,7 @@ export class SleekGrid<TItem = any> implements ISleekGrid<TItem> {
         }
 
         vs.numVisibleRows = Math.ceil(vs.height / this._options.rowHeight);
+        this._refs.config.frozenLimit = this._options.autoHeight ? 0 : Math.floor(vs.height / this._options.rowHeight) - 1;
     }
 
     resizeCanvas = (): void => {
@@ -1984,15 +2035,13 @@ export class SleekGrid<TItem = any> implements ISleekGrid<TItem> {
         var oldH = Math.round(parsePx(getComputedStyle(scrollCanvas).height));
 
         let numberOfRows = dataLengthIncludingAddNew + (this._options.leaveSpaceForNewRows ? this._viewportInfo.numVisibleRows - 1 : 0);
-        const dataLength = this.getDataLength();
-        this._layout.adjustFrozenRowsOption?.();
-        const { frozenTopLast, frozenBottomFirst } = this._refs;
-        if (frozenTopLast >= 0) {
-            numberOfRows -= frozenTopLast + 1;
+        const { frozenTopRows: prevFrozenTopRows, frozenBottomRows: prevFrozenBottomRows } = this._refs;
+        this._refs.config.dataLength = this.getDataLength();
+        const { frozenTopRows, frozenBottomRows } = this._refs;
+        if (prevFrozenTopRows !== frozenTopRows || prevFrozenBottomRows !== frozenBottomRows) {
+            this.invalidateAllRows();
         }
-        if (frozenBottomFirst < dataLength) {
-            numberOfRows -= (dataLength - frozenBottomFirst - 1);
-        }
+        numberOfRows -= frozenTopRows + frozenBottomRows;
 
         var tempViewportH = Math.round(parsePx(getComputedStyle(this.getScrollContainerY()).height));
         const vpi = this._viewportInfo;
@@ -2062,10 +2111,9 @@ export class SleekGrid<TItem = any> implements ISleekGrid<TItem> {
 
     private setPaneHeights() {
         const style = this._cssVarRules?.style ?? this._container.style;
-        const { frozenTopLast, frozenBottomFirst } = this._refs;
-        const topHeight = (frozenTopLast >= 0 ? (frozenTopLast + 1) * this._options.rowHeight : 0);
-        const dataLength = this.getDataLength();
-        const bottomHeight = (frozenBottomFirst < dataLength ? (this.getDataLength() - frozenBottomFirst) * this._options.rowHeight : 0);
+        const { frozenTopRows, frozenBottomRows } = this._refs;
+        const topHeight = frozenTopRows * this._options.rowHeight;
+        const bottomHeight = frozenBottomRows * this._options.rowHeight;
         setStyleProp(style, '--sg-top-height', topHeight + "px");
         setStyleProp(style, '--sg-bottom-height', bottomHeight + "px");
         setStyleProp(style, '--sg-body-height', (this._viewportInfo.height - topHeight - bottomHeight) + "px");
@@ -3485,7 +3533,7 @@ export class SleekGrid<TItem = any> implements ISleekGrid<TItem> {
 
     scrollRowIntoView(row: number, doPaging?: boolean): void {
 
-        const { frozenTopLast, frozenBottomFirst } = this._refs;
+        const { frozenTopLast } = this._refs;
         if (!this.isFrozenRow(row)) {
 
             var viewportScrollH = Math.round(parsePx(getComputedStyle(this.getScrollContainerY()).height));
@@ -3928,5 +3976,5 @@ const contentOnly = {
     contentOnly: true
 }
 
-export { SleekGrid as Grid }
+export { SleekGrid as Grid };
 

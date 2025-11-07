@@ -1,6 +1,6 @@
 .slick-container {
   display: grid;
-  grid-template-columns: max-content minmax(30px, 1fr) max-content;
+  grid-template-columns: max-content minmax(100px, 1fr) max-content;
   grid-template-rows: max-content max-content max-content max-content max-content minmax(0, 1fr) max-content max-content;
   grid-template-areas:
     "grouping-panel grouping-panel grouping-panel"

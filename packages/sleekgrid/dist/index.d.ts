@@ -390,10 +390,10 @@ export interface GridSignals {
 	readonly hideHeaderRow: Computed<boolean>;
 	readonly showFooterRow: Signal<boolean>;
 	readonly hideFooterRow: Computed<boolean>;
-	readonly pinnedStartLast: Signal<number>;
-	readonly pinnedEndFirst: Signal<number>;
-	readonly frozenTopLast: Signal<number>;
-	readonly frozenBottomFirst: Signal<number>;
+	readonly pinnedStartCols: Signal<number>;
+	readonly pinnedEndCols: Signal<number>;
+	readonly frozenTopRows: Signal<number>;
+	readonly frozenBottomRows: Signal<number>;
 }
 export interface ViewportInfo {
 	height: number;
@@ -421,7 +421,7 @@ export interface GridBandRefs {
 		bottom?: HTMLElement;
 	};
 	footerRowCols?: HTMLElement;
-	readonly firstCol: number;
+	readonly cellOffset: number;
 	canvasWidth: number;
 }
 export type GridLayoutRefs = {
@@ -429,10 +429,24 @@ export type GridLayoutRefs = {
 	readonly main: GridBandRefs;
 	readonly end: GridBandRefs;
 	topPanel?: HTMLElement;
-	pinnedStartLast: number;
-	pinnedEndFirst: number;
-	frozenTopLast: number;
-	frozenBottomFirst: number;
+	readonly pinnedStartCols: number;
+	readonly pinnedStartLast: number;
+	readonly pinnedEndCols: number;
+	readonly pinnedEndFirst: number;
+	readonly frozenTopRows: number;
+	readonly frozenTopLast: number;
+	readonly frozenBottomRows: number;
+	readonly frozenBottomFirst: number;
+	config: {
+		pinnedStartCols?: number;
+		pinnedEndCols?: number;
+		pinnedLimit?: number;
+		colCount?: number;
+		frozenTopRows?: number;
+		frozenBottomRows?: number;
+		frozenLimit?: number;
+		dataLength?: number;
+	};
 };
 export interface LayoutHost extends Pick<ISleekGrid, "getAllColumns" | "getColumns" | "getOptions" | "getContainerNode" | "getDataLength" | "onAfterInit">, GridPluginHost {
 	getSignals(): GridSignals;
@@ -1290,12 +1304,12 @@ export declare class FrozenLayout implements LayoutEngine {
 export declare const Header: ({ band, refs, signals }: {
 	band: BandKey;
 	refs: GridLayoutRefs;
-	signals: Pick<GridSignals, "hideColumnHeader" | "pinnedStartLast" | "pinnedEndFirst">;
+	signals: Pick<GridSignals, "hideColumnHeader" | "pinnedStartCols" | "pinnedEndCols">;
 }) => import("@serenity-is/domwise").JSXElement;
 export declare const HeaderRow: ({ band, refs, signals }: {
 	band: BandKey;
 	refs: GridLayoutRefs;
-	signals: Pick<GridSignals, "hideHeaderRow" | "pinnedStartLast" | "pinnedEndFirst">;
+	signals: Pick<GridSignals, "hideHeaderRow" | "pinnedStartCols" | "pinnedEndCols">;
 }) => import("@serenity-is/domwise").JSXElement;
 export declare const TopPanel: ({ refs, signals }: {
 	refs: GridLayoutRefs;
@@ -1305,12 +1319,12 @@ export declare const Viewport: ({ band, pane, refs, signals }: {
 	band: BandKey;
 	pane: PaneKey;
 	refs: GridLayoutRefs;
-	signals: Pick<GridSignals, "frozenTopLast" | "frozenBottomFirst" | "pinnedStartLast" | "pinnedEndFirst">;
+	signals: Pick<GridSignals, "frozenTopRows" | "frozenBottomRows" | "pinnedStartCols" | "pinnedEndCols">;
 }) => import("@serenity-is/domwise").JSXElement;
 export declare const FooterRow: ({ band, refs, signals }: {
 	band: BandKey;
 	refs: GridLayoutRefs;
-	signals: Pick<GridSignals, "hideFooterRow" | "pinnedStartLast" | "pinnedEndFirst">;
+	signals: Pick<GridSignals, "hideFooterRow" | "pinnedStartCols" | "pinnedEndCols">;
 }) => import("@serenity-is/domwise").JSXElement;
 export declare class SleekGrid<TItem = any> implements ISleekGrid<TItem> {
 	private _absoluteColMinWidth;
@@ -1482,6 +1496,7 @@ export declare class SleekGrid<TItem = any> implements ISleekGrid<TItem> {
 	getActiveViewportNode(e?: IEventData): HTMLElement;
 	private getAvailableWidth;
 	private applyColumnWidths;
+	private calcCanvasBandWidths;
 	private updateBandCanvasWidths;
 	private updateCanvasWidth;
 	private bindAncestorScrollEvents;

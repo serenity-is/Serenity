@@ -2,30 +2,30 @@ import { type SignalLike, computed } from "@serenity-is/domwise";
 import type { GridSignals } from "../core";
 import type { BandKey, GridLayoutRefs, PaneKey } from "./layout-refs";
 
-function bandHidden(band: BandKey, hide: SignalLike<boolean>, signals: Pick<GridSignals, "pinnedStartLast" | "pinnedEndFirst">): SignalLike<boolean> {
+function bandHidden(band: BandKey, hide: SignalLike<boolean>, signals: Pick<GridSignals, "pinnedStartCols" | "pinnedEndCols">): SignalLike<boolean> {
     if (band === "main")
         return hide;
     return computed(() => hide.value ||
-        (band === "start" && signals.pinnedStartLast.value < 0) ||
-        (band === "end" && signals.pinnedEndFirst.value == Infinity)
+        (band === "start" && signals.pinnedStartCols.value < 0) ||
+        (band === "end" && signals.pinnedEndCols.value == Infinity)
     );
 }
 
-function paneBandHidden(pane: PaneKey, band: BandKey, signals: Pick<GridSignals, "pinnedStartLast" | "pinnedEndFirst" | "frozenTopLast" | "frozenBottomFirst">): boolean | SignalLike<boolean> {
+function paneBandHidden(pane: PaneKey, band: BandKey, signals: Pick<GridSignals, "pinnedStartCols" | "pinnedEndCols" | "frozenTopRows" | "frozenBottomRows">): boolean | SignalLike<boolean> {
     if (pane === "body" && band === "main")
         return false;
 
     return computed(() =>
-        (pane === "top" && signals.frozenTopLast.value < 0) ||
-        (pane === "bottom" && signals.frozenBottomFirst.value === Infinity) ||
-        (band === "start" && signals.pinnedStartLast.value < 0) ||
-        (band === "end" && signals.pinnedEndFirst.value == Infinity));
+        (pane === "top" && signals.frozenTopRows.value <= 0) ||
+        (pane === "bottom" && signals.frozenBottomRows.value <= 0) ||
+        (band === "start" && signals.pinnedStartCols.value <= 0) ||
+        (band === "end" && signals.pinnedEndCols.value <= 0));
 }
 
 export const Header = ({ band, refs, signals }: {
     band: BandKey,
     refs: GridLayoutRefs,
-    signals: Pick<GridSignals, "hideColumnHeader" | "pinnedStartLast" | "pinnedEndFirst">
+    signals: Pick<GridSignals, "hideColumnHeader" | "pinnedStartCols" | "pinnedEndCols">
 }) => {
     const bandRefs = refs[band];
     return <div hidden={bandHidden(band, signals.hideColumnHeader, signals)} class={`sg-${band} slick-header`}>
@@ -36,7 +36,7 @@ export const Header = ({ band, refs, signals }: {
 export const HeaderRow = ({ band, refs, signals }: {
     band: BandKey,
     refs: GridLayoutRefs,
-    signals: Pick<GridSignals, "hideHeaderRow" | "pinnedStartLast" | "pinnedEndFirst">
+    signals: Pick<GridSignals, "hideHeaderRow" | "pinnedStartCols" | "pinnedEndCols">
 }) => {
     const bandRefs = refs[band];
     return <div hidden={bandHidden(band, signals.hideHeaderRow, signals)} class={`sg-${band} slick-headerrow`}>
@@ -58,7 +58,7 @@ export const Viewport = ({ band, pane, refs, signals }: {
     band: BandKey,
     pane: PaneKey,
     refs: GridLayoutRefs,
-    signals: Pick<GridSignals, "frozenTopLast" | "frozenBottomFirst" | "pinnedStartLast" | "pinnedEndFirst">
+    signals: Pick<GridSignals, "frozenTopRows" | "frozenBottomRows" | "pinnedStartCols" | "pinnedEndCols">
 }) => {
     const bandRefs = refs[band];
     return <div hidden={paneBandHidden(pane, band, signals)} class={`sg-${pane} sg-${band} slick-viewport`} tabindex="0">
@@ -68,7 +68,7 @@ export const Viewport = ({ band, pane, refs, signals }: {
 
 export const FooterRow = ({ band, refs, signals }: {
     band: BandKey, refs: GridLayoutRefs,
-    signals: Pick<GridSignals, "hideFooterRow" | "pinnedStartLast" | "pinnedEndFirst">
+    signals: Pick<GridSignals, "hideFooterRow" | "pinnedStartCols" | "pinnedEndCols">
 }) => {
     const bandRefs = refs[band];
     return <div hidden={bandHidden(band, signals.hideFooterRow, signals)} class={`sg-${band} slick-footerrow`}>

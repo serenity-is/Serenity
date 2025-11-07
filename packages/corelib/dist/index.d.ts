@@ -3305,7 +3305,7 @@ export declare function centerDialog(el: HTMLElement | ArrayLike<HTMLElement>): 
 export declare namespace LayoutTimer {
 	function store(key: number): void;
 	function trigger(key: number): void;
-	function onSizeChange(element: () => HTMLElement, handler: () => void, opt?: {
+	function onSizeChange(element: () => (HTMLElement | Window), handler: () => void, opt?: {
 		width?: boolean;
 		height?: boolean;
 		debounceTimes?: number;

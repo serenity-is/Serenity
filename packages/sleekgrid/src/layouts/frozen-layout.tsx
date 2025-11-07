@@ -33,7 +33,7 @@ export class FrozenLayout implements LayoutEngine {
 
     public reorderViewColumns(viewCols: Column[], refs: GridLayoutRefs): Column[] {
         const pinnedStartCols = viewCols.filter(x => x.frozen && x.frozen !== 'end');
-        refs.pinnedStartLast = pinnedStartCols.length > 0 ? pinnedStartCols.length - 1 : -Infinity;
+        refs.config.pinnedStartCols = pinnedStartCols.length;
         if (pinnedStartCols.length > 0)
             return pinnedStartCols.concat(viewCols.filter(x => !x.frozen));
         return null;
@@ -51,14 +51,12 @@ export class FrozenLayout implements LayoutEngine {
 
     public adjustFrozenRowsOption(): void {
         const { autoHeight, frozenRows, frozenBottom } = this.host.getOptions();
-        let frozenTopLast = -Infinity;
+        let frozenTopRows = 0;
         if (!autoHeight) {
             let availRows = this.host.getViewportInfo().numVisibleRows;
-            let frozenTopRows = frozenBottom === true ? 0 : (frozenRows ?? 0);
-            frozenTopRows = (frozenTopRows > 0 && frozenRows <= availRows) ? frozenTopRows : 0;
-            frozenTopLast = frozenTopRows > 0 ? frozenTopRows - 1 : -Infinity;
+            frozenTopRows = frozenBottom === true ? 0 : (frozenRows ?? 0);
         }
-        this.refs.frozenTopLast = frozenTopLast;
+        this.refs.config.frozenTopRows = frozenTopRows;
     }
 
     public destroy(): void {

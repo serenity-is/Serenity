@@ -14,7 +14,7 @@ export interface GridBandRefs {
         bottom?: HTMLElement;
     },
     footerRowCols?: HTMLElement;
-    readonly firstCol: number;
+    readonly cellOffset: number;
     canvasWidth: number;
 }
 
@@ -23,10 +23,24 @@ export type GridLayoutRefs = {
     readonly main: GridBandRefs;
     readonly end: GridBandRefs;
     topPanel?: HTMLElement;
-    pinnedStartLast: number;
-    pinnedEndFirst: number;
-    frozenTopLast: number;
-    frozenBottomFirst: number;
+    readonly pinnedStartCols: number;
+    readonly pinnedStartLast: number;
+    readonly pinnedEndCols: number;
+    readonly pinnedEndFirst: number;
+    readonly frozenTopRows: number;
+    readonly frozenTopLast: number;
+    readonly frozenBottomRows: number;
+    readonly frozenBottomFirst: number;
+    config: {
+        pinnedStartCols?: number;
+        pinnedEndCols?: number;
+        pinnedLimit?: number;
+        colCount?: number;
+        frozenTopRows?: number;
+        frozenBottomRows?: number;
+        frozenLimit?: number;
+        dataLength?: number;
+    }
 }
 
 export function forEachBand(refs: GridLayoutRefs, callback: (band: GridBandRefs) => void): void {
@@ -120,10 +134,52 @@ export function createGridSignalsAndRefs(): { signals: GridSignals; refs: GridLa
     const hideFooterRow = computed(() => !showFooterRow.value);
     const showTopPanel = signal();
     const hideTopPanel = computed(() => !showTopPanel.value);
-    let pinnedStartLast = -Infinity;
-    let pinnedEndFirst = Infinity;
-    let frozenTopLast = -Infinity;
-    let frozenBottomFirst = Infinity;
+    const config = {
+        pinnedStartCols: 0,
+        pinnedEndCols: 0,
+        pinnedLimit: 0,
+        frozenTopRows: 0,
+        frozenBottomRows: 0,
+        frozenLimit: 0,
+        colCount: 0,
+        dataLength: 0
+    };
+    const calculated = {
+        pinnedStartLast: -Infinity,
+        startFirstCol: -Infinity,
+        pinnedStartCols: 0,
+        pinnedEndFirst: Infinity,
+        pinnedEndCols: 0,
+        frozenTopLast: -Infinity,
+        frozenTopRows: 0,
+        frozenBottomFirst: Infinity,
+        frozenBottomRows: 0
+    };
+
+    function recalc() {
+        const colCount = Math.max(config.colCount ?? 0, 0);
+        const rowCount = Math.max(config.dataLength ?? 0, 0);
+        let pinnedAvail = Math.min(Math.max(config.pinnedLimit, 0), colCount);
+        calculated.pinnedStartCols = config.pinnedStartCols > 0 ? Math.min(config.pinnedStartCols, pinnedAvail) : 0;
+        pinnedAvail -= calculated.pinnedStartCols;
+        calculated.pinnedEndCols = config.pinnedEndCols > 0 ? Math.min(config.pinnedEndCols, pinnedAvail) : 0;
+
+        let frozenAvail = Math.min(Math.max(config.frozenLimit, 0), rowCount);
+        calculated.frozenTopRows = config.frozenTopRows > 0 ? Math.min(config.frozenTopRows, frozenAvail) : 0;
+        frozenAvail -= calculated.frozenTopRows;
+        calculated.frozenBottomRows = config.frozenBottomRows > 0 ? Math.min(config.frozenBottomRows, frozenAvail) : 0;
+
+        calculated.pinnedStartLast = calculated.pinnedStartCols > 0 ? calculated.pinnedStartCols - 1 : -Infinity;
+        calculated.pinnedEndFirst = calculated.pinnedEndCols > 0 ? rowCount - calculated.pinnedEndCols : Infinity;
+        calculated.frozenTopLast = calculated.frozenTopRows > 0 ? calculated.frozenTopRows - 1 : -Infinity;
+        calculated.frozenBottomFirst = calculated.frozenBottomRows > 0 ? config.dataLength - calculated.frozenBottomRows : Infinity;
+
+        signals.pinnedStartCols.value = calculated.pinnedStartCols;
+        signals.pinnedEndCols.value = calculated.pinnedEndCols;
+        signals.frozenTopRows.value = calculated.frozenTopRows;
+        signals.frozenBottomRows.value = calculated.frozenBottomRows;
+    }
+
     const signals: GridSignals = {
         showColumnHeader,
         hideColumnHeader,
@@ -133,10 +189,10 @@ export function createGridSignalsAndRefs(): { signals: GridSignals; refs: GridLa
         hideHeaderRow,
         showFooterRow,
         hideFooterRow,
-        pinnedStartLast: signal(pinnedStartLast),
-        pinnedEndFirst: signal(pinnedEndFirst),
-        frozenTopLast: signal(frozenTopLast),
-        frozenBottomFirst: signal(frozenBottomFirst),
+        pinnedStartCols: signal(0),
+        pinnedEndCols: signal(0),
+        frozenTopRows: signal(0),
+        frozenBottomRows: signal(0),
     };
     const refs: GridLayoutRefs = {
         start: {
@@ -144,13 +200,13 @@ export function createGridSignalsAndRefs(): { signals: GridSignals; refs: GridLa
             canvas: {
                 body: null
             },
-            firstCol: -Infinity,
+            cellOffset: 0,
             canvasWidth: 0
         },
         main: {
             key: "main",
             canvas: { body: null },
-            firstCol: 0,
+            get cellOffset() { return calculated.pinnedStartCols; },
             canvasWidth: 0
         },
         end: {
@@ -158,43 +214,90 @@ export function createGridSignalsAndRefs(): { signals: GridSignals; refs: GridLa
             canvas: {
                 body: null
             },
-            firstCol: Infinity,
+            get cellOffset() { return calculated.pinnedEndFirst >= 0 ? calculated.pinnedEndFirst : 0; },
             canvasWidth: 0
         },
-        get pinnedStartLast() {
-            return pinnedStartLast;
+        get pinnedStartCols() {
+            return calculated.pinnedStartCols;
         },
-        set pinnedStartLast(value) {
-            if (pinnedStartLast !== value) {
-                pinnedStartLast = value;
-                (refs.start as any).firstCol = value >= 0 ? 0 : -Infinity;
-                (refs.main as any).firstCol = value >= 0 ? value + 1 : 0;
-                signals.pinnedStartLast.value = value;
-            }
+        get pinnedStartLast() {
+            return calculated.pinnedStartLast;
         },
         get pinnedEndFirst() {
-            return pinnedEndFirst;
+            return calculated.pinnedEndFirst
         },
-        set pinnedEndFirst(value) {
-            if (pinnedEndFirst !== value) {
-                pinnedEndFirst = value;
-                (refs.end as any).firstCol = value;
-            }
-            signals.pinnedEndFirst.value = value;
+        get pinnedEndCols() {
+            return calculated.pinnedEndCols;
+        },
+        get frozenTopRows() {
+            return calculated.frozenTopRows;
         },
         get frozenTopLast() {
-            return frozenTopLast;
+            return calculated.frozenTopLast;
         },
-        set frozenTopLast(value) {
-            frozenTopLast = value;
-            signals.frozenTopLast.value = value;
+        get frozenBottomRows() {
+            return calculated.frozenBottomRows;
         },
         get frozenBottomFirst() {
-            return frozenBottomFirst;
+            return calculated.frozenBottomFirst;
         },
-        set frozenBottomFirst(value) {
-            frozenBottomFirst = value;
-            signals.frozenBottomFirst.value = value;
+        config: {
+            get dataLength() { return config.dataLength; },
+            get colCount() { return config.colCount; },
+            get pinnedStartCols() { return config.pinnedStartCols; },
+            get pinnedEndCols() { return config.pinnedEndCols; },
+            get pinnedLimit() { return config.pinnedLimit; },
+            get frozenTopRows() { return config.frozenTopRows; },
+            get frozenBottomRows() { return config.frozenBottomRows; },
+            get frozenLimit() { return config.frozenLimit; },
+            set dataLength(v: number) {
+                if (config.dataLength !== v) {
+                    config.dataLength = v;
+                    recalc();
+                }
+            },
+            set colCount(v: number) {
+                if (config.colCount !== v) {
+                    config.colCount = v;
+                    recalc();
+                }
+            },
+            set pinnedStartCols(v: number) {
+                if (config.pinnedStartCols !== v) {
+                    config.pinnedStartCols = v;
+                    recalc();
+                }
+            },
+            set pinnedEndCols(v: number) {
+                if (config.pinnedEndCols !== v) {
+                    config.pinnedEndCols = v;
+                    recalc();
+                }
+            },
+            set pinnedLimit(v: number) {
+                if (config.pinnedLimit !== v) {
+                    config.pinnedLimit = v;
+                    recalc();
+                }
+            },
+            set frozenTopRows(v: number) {
+                if (config.frozenTopRows !== v) {
+                    config.frozenTopRows = v;
+                    recalc();
+                }
+            },
+            set frozenBottomRows(v: number) {
+                if (config.frozenBottomRows !== v) {
+                    config.frozenBottomRows = v;
+                    recalc();
+                }
+            },
+            set frozenLimit(v: number) {
+                if (config.frozenLimit !== v) {
+                    config.frozenLimit = v;
+                    recalc();
+                }
+            }
         }
     };
     return { signals, refs };
