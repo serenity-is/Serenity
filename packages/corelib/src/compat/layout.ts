@@ -1,7 +1,7 @@
 ﻿import { addDisposingListener } from "@serenity-is/domwise";
 import { Fluent, getjQuery, isArrayLike } from "../base";
 import { type CreateWidgetParams, type Widget, type WidgetProps } from "../ui/widgets/widget";
-import { executeEverytimeWhenVisible } from "./layouttimer";
+import { executeEverytimeWhenVisible, LayoutTimer } from "./layouttimer";
 import { Router } from "./router";
 
 function initWidgetPage<TWidget extends Widget<P>, P>(widgetOrType: (CreateWidgetParams<TWidget, P>["type"]) | TWidget,
@@ -67,6 +67,7 @@ export function initFullHeightGridPage(gridDiv: HTMLElement | ArrayLike<HTMLElem
         setHeight && layoutFillHeight(el);
         Fluent.trigger(el, 'layout');
     };
+    let layoutTimerKey: number;
 
     if (document.body.classList.contains('has-layout-event')) {
         Fluent.on(document.body, 'layout', layout);
@@ -75,13 +76,13 @@ export function initFullHeightGridPage(gridDiv: HTMLElement | ArrayLike<HTMLElem
         (window as any).Metronic.addResizeHandler(layout);
     }
     else {
-        Fluent.on(window, 'resize', layout);
+        layoutTimerKey = LayoutTimer.onSizeChange(() => window, layout, { debounceTimes: 1 });
     }
 
     layout();
 
     addDisposingListener(el, () => {
-        Fluent.off(window, 'resize', layout);
+        LayoutTimer.off(layoutTimerKey);
         Fluent.off(document.body, 'layout', layout);
     });
 

@@ -4,7 +4,7 @@ export { };
 
 interface LayoutTimerReg {
     handler: () => void;
-    element: () => HTMLElement;
+    element: () => (HTMLElement | Window);
     width: boolean;
     height: boolean;
     storedWidth?: number;
@@ -33,6 +33,21 @@ export namespace LayoutTimer {
         }
     }
 
+    function getSize(el: HTMLElement | Window): { width: number, height: number } {
+        if (el === window) {
+            return {
+                width: window.innerWidth,
+                height: window.innerHeight
+            };
+        }
+        else {
+            return {
+                width: (el as HTMLElement).offsetWidth,
+                height: (el as HTMLElement).offsetHeight
+            };
+        }
+    }
+
     function onTimeout() {
         for (const key in regs) {
             const reg = regs[key];
@@ -41,8 +56,7 @@ export namespace LayoutTimer {
                 if (!el)
                     continue;
 
-                let w = el.offsetWidth;
-                let h = el.offsetHeight;
+                let { width: w, height: h } = getSize(el);
                 if (w <= 0 || h <= 0) {
                     reg.storedWidth = w;
                     reg.storedHeight = h;
@@ -67,8 +81,7 @@ export namespace LayoutTimer {
                             reg.handler();
                         }
                         finally {
-                            w = el.offsetWidth;
-                            h = el.offsetHeight;
+                            ({ width: w, height: h } = getSize(el));
                         }
                     }
                 }
@@ -97,8 +110,9 @@ export namespace LayoutTimer {
         if (!el)
             return;
 
-        reg.storedWidth = el.offsetWidth;
-        reg.storedHeight = el.offsetHeight;
+        const { width: w, height: h } = getSize(el);
+        reg.storedWidth = w;
+        reg.storedHeight = h;
         reg.debouncedTimes = 0;
     }
 
@@ -115,7 +129,7 @@ export namespace LayoutTimer {
         store(key);
     }
 
-    export function onSizeChange(element: () => HTMLElement, handler: () => void, opt?: { width?: boolean, height?: boolean, debounceTimes?: number }): number {
+    export function onSizeChange(element: () => (HTMLElement | Window), handler: () => void, opt?: { width?: boolean, height?: boolean, debounceTimes?: number }): number {
         if (handler == null)
             throw "Layout handler can't be null!";
 
