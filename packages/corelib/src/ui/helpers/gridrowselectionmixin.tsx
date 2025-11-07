@@ -150,14 +150,16 @@ export class GridRowSelectionMixin {
             this.options.selectable(item));
     }
 
-    static createSelectColumn(getMixin: () => GridRowSelectionMixin): Column {
+    static createSelectColumn(getMixin: () => GridRowSelectionMixin, columnOptions?: Partial<Column>): Column {
         return {
             name: "[×]",
             nameFormat: () => <span class="select-all-items check-box no-float"></span>,
             toolTip: ' ',
             id: '__select__',
+            resizable: false,
             width: 27,
             minWidth: 27,
+            maxWidth: 27,
             headerCssClass: 'select-all-header',
             sortable: false,
             format: function (ctx) {
@@ -168,7 +170,8 @@ export class GridRowSelectionMixin {
                 }
                 var isChecked = mixin.include[ctx.item[mixin.idField]];
                 return <span class={'select-item check-box no-float' + (isChecked ? ' checked' : '')}></span>;
-            }
+            },
+            ...columnOptions
         };
     }
 }
