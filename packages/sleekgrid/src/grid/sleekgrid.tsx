@@ -263,8 +263,7 @@ export class SleekGrid<TItem = any> implements ISleekGrid<TItem> {
 
         this._layout = typeof options.layoutEngine === "function" ? options.layoutEngine() : (options.layoutEngine ?? new BasicLayout());
 
-        this.setInitCols(columns);
-        this.updateViewCols();
+        this.setAllCols(columns, { initProps: true });
         this._scrollDims = getScrollBarDimensions();
 
         if (options.groupingPanel) {
@@ -438,6 +437,7 @@ export class SleekGrid<TItem = any> implements ISleekGrid<TItem> {
             this._initialized = true;
         }
         SleekGrid.onAfterInit.notify({ grid: this });
+        this.onAfterInit.notify({ grid: this });
     }
 
     registerPlugin(plugin: GridPlugin): void {
@@ -1345,11 +1345,11 @@ export class SleekGrid<TItem = any> implements ISleekGrid<TItem> {
     }
 
     private updateViewCols() {
-        const initCols = this._allCols;
+        const allCols = this._allCols;
         let col: Column;
         let cols: Column[] = [];
         var colById: { [key: string]: number } = {};
-        for (col of initCols) {
+        for (col of allCols) {
             if (col.visible !== false)
                 cols.push(col);
         }
@@ -1373,15 +1373,18 @@ export class SleekGrid<TItem = any> implements ISleekGrid<TItem> {
         this._refs.config.colCount = cols.length;
     }
 
-    private setInitCols(initCols: Column[]) {
-        initColumnProps(initCols, this._colDefaults);
-        const initColById: any = {};
+    /** Set the initial columns, also calls initColumnProps unless opt.initProps is false */
+    private setAllCols(initCols: Column[], opt?: { initProps?: boolean }): void {
+        initCols ||= [];
+        (opt?.initProps ?? true) && initColumnProps(initCols, this._colDefaults);
+        const allColsById: any = {};
         for (let i = 0; i < initCols.length; i++) {
             const col = initCols[i];
-            initColById[col.id] = i;
+            allColsById[col.id] = i;
         }
         this._allCols = initCols;
-        this._allColsById = initColById;
+        this._allColsById = allColsById;
+        this.updateViewCols();
     }
 
     private handleFrozenColsOption(viewCols: Column[], options?: GridOptions) {
@@ -1406,6 +1409,7 @@ export class SleekGrid<TItem = any> implements ISleekGrid<TItem> {
 
     setColumns(columns: Column<TItem>[]): void {
 
+        let initProps = true;
         if (columns &&
             this._allCols &&
             this._cols &&
@@ -1413,20 +1417,18 @@ export class SleekGrid<TItem = any> implements ISleekGrid<TItem> {
             this._allCols.length > this._cols.length &&
             !columns.some(x => this._cols.indexOf(x) < 0) &&
             !this._cols.some(x => columns.indexOf(x) < 0)) {
-            // probably called with grid.setColumns(grid.getColumns()) potentially changing orders / widths etc
-            // try to preserve initial columns
-            sortToDesiredOrderAndKeepRest(
-                this._allCols,
-                columns.map(x => x.id));
-            columns = this._allCols;
+            // probably called with grid.setColumns(grid.getColumns()) potentially
+            // changing orders / widths etc, try to preserve initial columns
+            columns = sortToDesiredOrderAndKeepRest(this._allCols, columns.map(x => x.id));
+            initProps = false;
         }
 
-        this.setInitCols(columns);
+        this.setAllCols(columns, { initProps });
         this.invalidateColumns();
     }
 
     public reorderColumns(columnIds: string[], opt?: { notify?: boolean }): void {
-        sortToDesiredOrderAndKeepRest(this._allCols, columnIds);
+        this.setAllCols(sortToDesiredOrderAndKeepRest(this._allCols, columnIds), { initProps: false });
         this.invalidateColumns();
         if (opt?.notify ?? true) {
             this._trigger(this.onColumnsReordered, {});
@@ -1447,18 +1449,20 @@ export class SleekGrid<TItem = any> implements ISleekGrid<TItem> {
             this.reorderColumns(columnIds, { notify: opt?.notify });
         }
         else if (anyChange) {
+            this.setAllCols(this._allCols, { initProps: false });
             this.invalidateColumns();
             this._trigger(this.onColumnsReordered, {});
         }
     }
 
     public invalidateColumns() {
-        this._ignorePinChangeUntil = new Date().getTime() + 100;
         this.updateViewCols();
         this.updateViewColLeftRight();
         if (this._initialized) {
-            this.setOverflow();
+            this._ignorePinChangeUntil = new Date().getTime() + 100;
             this.adjustPinnedColsLimit();
+            this.updateViewColLeftRight();
+            this.setOverflow();
             this.invalidateAllRows();
             this.createColumnHeaders();
             this.createColumnFooters();

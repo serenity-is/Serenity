@@ -34,11 +34,11 @@ export type GridLayoutRefs = {
     config: {
         pinnedStartCols?: number;
         pinnedEndCols?: number;
-        pinnedLimit?: number;
+        pinnedLimit?: number | null;
         colCount?: number;
         frozenTopRows?: number;
         frozenBottomRows?: number;
-        frozenLimit?: number;
+        frozenLimit?: number | null;
         dataLength?: number;
     }
 }
@@ -137,7 +137,7 @@ export function createGridSignalsAndRefs(): { signals: GridSignals; refs: GridLa
     const config = {
         pinnedStartCols: 0,
         pinnedEndCols: 0,
-        pinnedLimit: 0,
+        pinnedLimit: null as number | null,
         frozenTopRows: 0,
         frozenBottomRows: 0,
         frozenLimit: 0,
@@ -159,20 +159,20 @@ export function createGridSignalsAndRefs(): { signals: GridSignals; refs: GridLa
     function recalc() {
         const colCount = Math.max(config.colCount ?? 0, 0);
         const rowCount = Math.max(config.dataLength ?? 0, 0);
-        let pinnedAvail = Math.min(Math.max(config.pinnedLimit, 0), colCount);
+        let pinnedAvail = Math.min(Math.max(config.pinnedLimit ?? colCount, 0), colCount);
         calculated.pinnedStartCols = config.pinnedStartCols > 0 ? Math.min(config.pinnedStartCols, pinnedAvail) : 0;
         pinnedAvail -= calculated.pinnedStartCols;
         calculated.pinnedEndCols = config.pinnedEndCols > 0 ? Math.min(config.pinnedEndCols, pinnedAvail) : 0;
 
-        let frozenAvail = Math.min(Math.max(config.frozenLimit, 0), rowCount);
+        let frozenAvail = Math.min(Math.max(config.frozenLimit ?? rowCount, 0), rowCount);
         calculated.frozenTopRows = config.frozenTopRows > 0 ? Math.min(config.frozenTopRows, frozenAvail) : 0;
         frozenAvail -= calculated.frozenTopRows;
         calculated.frozenBottomRows = config.frozenBottomRows > 0 ? Math.min(config.frozenBottomRows, frozenAvail) : 0;
 
         calculated.pinnedStartLast = calculated.pinnedStartCols > 0 ? calculated.pinnedStartCols - 1 : -Infinity;
-        calculated.pinnedEndFirst = calculated.pinnedEndCols > 0 ? rowCount - calculated.pinnedEndCols : Infinity;
+        calculated.pinnedEndFirst = calculated.pinnedEndCols > 0 ? colCount - calculated.pinnedEndCols : Infinity;
         calculated.frozenTopLast = calculated.frozenTopRows > 0 ? calculated.frozenTopRows - 1 : -Infinity;
-        calculated.frozenBottomFirst = calculated.frozenBottomRows > 0 ? config.dataLength - calculated.frozenBottomRows : Infinity;
+        calculated.frozenBottomFirst = calculated.frozenBottomRows > 0 ? rowCount - calculated.frozenBottomRows : Infinity;
 
         signals.pinnedStartCols.value = calculated.pinnedStartCols;
         signals.pinnedEndCols.value = calculated.pinnedEndCols;
@@ -274,7 +274,7 @@ export function createGridSignalsAndRefs(): { signals: GridSignals; refs: GridLa
                     recalc();
                 }
             },
-            set pinnedLimit(v: number) {
+            set pinnedLimit(v: number | null) {
                 if (config.pinnedLimit !== v) {
                     config.pinnedLimit = v;
                     recalc();
