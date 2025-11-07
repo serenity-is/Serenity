@@ -50,13 +50,8 @@ export class FrozenLayout implements LayoutEngine {
     }
 
     public adjustFrozenRowsOption(): void {
-        const { autoHeight, frozenRows, frozenBottom } = this.host.getOptions();
-        let frozenTopRows = 0;
-        if (!autoHeight) {
-            let availRows = this.host.getViewportInfo().numVisibleRows;
-            frozenTopRows = frozenBottom === true ? 0 : (frozenRows ?? 0);
-        }
-        this.refs.config.frozenTopRows = frozenTopRows;
+        const { frozenRows, frozenBottom } = this.host.getOptions();
+        this.refs.config.frozenTopRows = frozenBottom === true ? 0 : (frozenRows ?? 0);
     }
 
     public destroy(): void {

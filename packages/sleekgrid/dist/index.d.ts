@@ -1370,6 +1370,7 @@ export declare class SleekGrid<TItem = any> implements ISleekGrid<TItem> {
 	private _off;
 	private _options;
 	private _signals;
+	private _signalsDisposers;
 	private _page;
 	private _pageHeight;
 	private _pageOffset;
@@ -1496,6 +1497,7 @@ export declare class SleekGrid<TItem = any> implements ISleekGrid<TItem> {
 	getActiveViewportNode(e?: IEventData): HTMLElement;
 	private getAvailableWidth;
 	private applyColumnWidths;
+	private adjustPinnedColsLimit;
 	private calcCanvasBandWidths;
 	private updateBandCanvasWidths;
 	private updateCanvasWidth;
