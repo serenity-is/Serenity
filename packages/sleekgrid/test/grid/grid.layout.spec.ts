@@ -60,9 +60,9 @@ describe('canvas', () => {
             rowHeight: 20
         });
 
-        window.getComputedStyle = oldGetComputedStyle;
 
         const cellNode = grid.getCellNode(0, 0)
+        window.getComputedStyle = oldGetComputedStyle;
 
         grid.getActiveCanvasNode({
             target: cellNode

@@ -65,7 +65,7 @@ export class SleekGrid<TItem = any> implements ISleekGrid<TItem> {
     private _ignoreScrollUntil: number = 0;
     declare private _allCols: Column<TItem>[];
     declare private _allColsById: { [key: string]: number };
-    declare private _initialized: any;
+    declare private _initialized: boolean;
     declare private _jQuery: any;
     declare private _jumpinessCoefficient: number;
     declare private _lastRenderTime: number;
@@ -226,6 +226,7 @@ export class SleekGrid<TItem = any> implements ISleekGrid<TItem> {
             if (this._initialized) {
                 //console.debug('invalidate rows on frozen top/bottom change');
                 this.invalidateAllRows?.();
+                this.render?.();
             }
         };
         const pinnedStartEndChanged = () => {
@@ -344,98 +345,98 @@ export class SleekGrid<TItem = any> implements ISleekGrid<TItem> {
             this.createColumnFooters();
             this.applyColumnWidths()
             this.setupColumnSort();
-            this.resizeCanvas();
-            this.bindAncestorScrollEvents();
-
-            const boundThis = bindThis(this);
-            this._on(this._container, "resize", boundThis.resizeCanvas);
-
-            this.getViewports().forEach(vp => {
-                var scrollTicking = false;
-                this._on(vp, "scroll", (e) => {
-                    if (!scrollTicking) {
-                        scrollTicking = true;
-
-                        window.requestAnimationFrame(() => {
-                            this.handleScroll();
-                            scrollTicking = false;
-                        });
-                    }
-                });
-                this._on(vp, "wheel", boundThis.handleMouseWheel as any);
-                this._on(vp, "mousewheel" as any, boundThis.handleMouseWheel);
-            });
-
-            this._forEachBand(band => {
-                const hs = band.headerCols;
-                if (hs) {
-                    hs.onselectstart = () => false;
-                    this._on(hs, "contextmenu", boundThis.handleHeaderContextMenu);
-                    this._on(hs, "click", boundThis.handleHeaderClick);
-                    if (this._jQuery) {
-                        this._jQuery(hs)
-                            .on('mouseenter.' + this._uid, '.slick-header-column', boundThis.handleHeaderMouseEnter)
-                            .on('mouseleave.' + this._uid, '.slick-header-column', boundThis.handleHeaderMouseLeave);
-                    }
-                    else {
-                        // need to reimplement this similar to jquery events
-                        this._on(hs, "mouseenter", e => (e.target as HTMLElement).closest(".slick-header-column") &&
-                            boundThis.handleHeaderMouseEnter(e));
-                        this._on(hs, "mouseleave", e => (e.target as HTMLElement).closest(".slick-header-column") &&
-                            boundThis.handleHeaderMouseLeave(e));
-                    }
-                }
-
-                band.headerRowCols && this._on(band.headerRowCols.parentElement, 'scroll', boundThis.handleHeaderFooterRowScroll);
-                band.footerRowCols && this._on(band.footerRowCols.parentElement, 'scroll', boundThis.handleHeaderFooterRowScroll);
-            });
-
-            [this._focusSink1, this._focusSink2].forEach(fs => this._on(fs, "keydown", boundThis.handleKeyDown));
-
-            var canvases = Array.from<HTMLElement>(this.getCanvases());
-            canvases.forEach(canvas => {
-                this._on(canvas, "keydown", boundThis.handleKeyDown)
-                this._on(canvas, "click", boundThis.handleClick)
-                this._on(canvas, "dblclick", boundThis.handleDblClick)
-                this._on(canvas, "contextmenu", boundThis.handleContextMenu);
-            });
-
-            this._draggableInstance = Draggable({
-                containerElement: this._container,
-                //allowDragFrom: 'div.slick-cell',
-                // the slick cell parent must always contain `.dnd` and/or `.cell-reorder` class to be identified as draggable
-                //allowDragFromClosest: 'div.slick-cell.dnd, div.slick-cell.cell-reorder',
-                preventDragFromKeys: ['ctrlKey', 'metaKey'],
-                onDragInit: boundThis.handleDragInit,
-                onDragStart: boundThis.handleDragStart,
-                onDrag: boundThis.handleDrag,
-                onDragEnd: boundThis.handleDragEnd
-            });
-
-            canvases.forEach(canvas => {
-                if (this._jQuery) {
-                    this._jQuery(canvas)
-                        .on('mouseenter' + this._uid, '.slick-cell', boundThis.handleMouseEnter)
-                        .on('mouseleave' + this._uid, '.slick-cell', boundThis.handleMouseLeave);
-                }
-                else {
-                    this._on(canvas, "mouseenter", e => (e.target as HTMLElement)?.classList?.contains("slick-cell") && boundThis.handleMouseEnter(e), { capture: true });
-                    this._on(canvas, "mouseleave", e => (e.target as HTMLElement)?.classList?.contains("slick-cell") && boundThis.handleMouseLeave(e), { capture: true });
-                }
-            });
-
-            // Work around http://crbug.com/312427.
-            if (navigator.userAgent.toLowerCase().match(/webkit/) &&
-                navigator.userAgent.toLowerCase().match(/macintosh/)) {
-                canvases.forEach(c => {
-                    this._on(c, "wheel" as any, boundThis.handleMouseWheel as any);
-                    this._on(c, "mousewheel" as any, boundThis.handleMouseWheel as any);
-                });
-            }
-        }
-        finally {
+        } finally {
             this._initialized = true;
         }
+        this.resizeCanvas();
+        this.bindAncestorScrollEvents();
+
+        const boundThis = bindThis(this);
+        this._on(this._container, "resize", boundThis.resizeCanvas);
+
+        this.getViewports().forEach(vp => {
+            var scrollTicking = false;
+            this._on(vp, "scroll", (e) => {
+                if (!scrollTicking) {
+                    scrollTicking = true;
+
+                    window.requestAnimationFrame(() => {
+                        this.handleScroll();
+                        scrollTicking = false;
+                    });
+                }
+            });
+            this._on(vp, "wheel", boundThis.handleMouseWheel as any);
+            this._on(vp, "mousewheel" as any, boundThis.handleMouseWheel);
+        });
+
+        this._forEachBand(band => {
+            const hs = band.headerCols;
+            if (hs) {
+                hs.onselectstart = () => false;
+                this._on(hs, "contextmenu", boundThis.handleHeaderContextMenu);
+                this._on(hs, "click", boundThis.handleHeaderClick);
+                if (this._jQuery) {
+                    this._jQuery(hs)
+                        .on('mouseenter.' + this._uid, '.slick-header-column', boundThis.handleHeaderMouseEnter)
+                        .on('mouseleave.' + this._uid, '.slick-header-column', boundThis.handleHeaderMouseLeave);
+                }
+                else {
+                    // need to reimplement this similar to jquery events
+                    this._on(hs, "mouseenter", e => (e.target as HTMLElement).closest(".slick-header-column") &&
+                        boundThis.handleHeaderMouseEnter(e));
+                    this._on(hs, "mouseleave", e => (e.target as HTMLElement).closest(".slick-header-column") &&
+                        boundThis.handleHeaderMouseLeave(e));
+                }
+            }
+
+            band.headerRowCols && this._on(band.headerRowCols.parentElement, 'scroll', boundThis.handleHeaderFooterRowScroll);
+            band.footerRowCols && this._on(band.footerRowCols.parentElement, 'scroll', boundThis.handleHeaderFooterRowScroll);
+        });
+
+        [this._focusSink1, this._focusSink2].forEach(fs => this._on(fs, "keydown", boundThis.handleKeyDown));
+
+        var canvases = Array.from<HTMLElement>(this.getCanvases());
+        canvases.forEach(canvas => {
+            this._on(canvas, "keydown", boundThis.handleKeyDown)
+            this._on(canvas, "click", boundThis.handleClick)
+            this._on(canvas, "dblclick", boundThis.handleDblClick)
+            this._on(canvas, "contextmenu", boundThis.handleContextMenu);
+        });
+
+        this._draggableInstance = Draggable({
+            containerElement: this._container,
+            //allowDragFrom: 'div.slick-cell',
+            // the slick cell parent must always contain `.dnd` and/or `.cell-reorder` class to be identified as draggable
+            //allowDragFromClosest: 'div.slick-cell.dnd, div.slick-cell.cell-reorder',
+            preventDragFromKeys: ['ctrlKey', 'metaKey'],
+            onDragInit: boundThis.handleDragInit,
+            onDragStart: boundThis.handleDragStart,
+            onDrag: boundThis.handleDrag,
+            onDragEnd: boundThis.handleDragEnd
+        });
+
+        canvases.forEach(canvas => {
+            if (this._jQuery) {
+                this._jQuery(canvas)
+                    .on('mouseenter' + this._uid, '.slick-cell', boundThis.handleMouseEnter)
+                    .on('mouseleave' + this._uid, '.slick-cell', boundThis.handleMouseLeave);
+            }
+            else {
+                this._on(canvas, "mouseenter", e => (e.target as HTMLElement)?.classList?.contains("slick-cell") && boundThis.handleMouseEnter(e), { capture: true });
+                this._on(canvas, "mouseleave", e => (e.target as HTMLElement)?.classList?.contains("slick-cell") && boundThis.handleMouseLeave(e), { capture: true });
+            }
+        });
+
+        // Work around http://crbug.com/312427.
+        if (navigator.userAgent.toLowerCase().match(/webkit/) &&
+            navigator.userAgent.toLowerCase().match(/macintosh/)) {
+            canvases.forEach(c => {
+                this._on(c, "wheel" as any, boundThis.handleMouseWheel as any);
+                this._on(c, "mousewheel" as any, boundThis.handleMouseWheel as any);
+            });
+        }
+
         SleekGrid.onAfterInit.notify({ grid: this });
         this.onAfterInit.notify({ grid: this });
     }
@@ -2048,12 +2049,8 @@ export class SleekGrid<TItem = any> implements ISleekGrid<TItem> {
         var oldH = Math.round(parsePx(getComputedStyle(scrollCanvas).height));
 
         let numberOfRows = dataLengthIncludingAddNew + (this._options.leaveSpaceForNewRows ? this._viewportInfo.numVisibleRows - 1 : 0);
-        const { frozenTopRows: prevFrozenTopRows, frozenBottomRows: prevFrozenBottomRows } = this._refs;
         this._refs.config.dataLength = this.getDataLength();
         const { frozenTopRows, frozenBottomRows } = this._refs;
-        if (prevFrozenTopRows !== frozenTopRows || prevFrozenBottomRows !== frozenBottomRows) {
-            this.invalidateAllRows();
-        }
         numberOfRows -= frozenTopRows + frozenBottomRows;
 
         var tempViewportH = Math.round(parsePx(getComputedStyle(this.getScrollContainerY()).height));

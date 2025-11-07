@@ -249,6 +249,7 @@ describe("DataGrid.getCurrentSettings", () => {
         })).toEqual({
             columns: [
                 { id: "A", visible: true },
+                { id: "B" },
                 { id: "C", visible: true }
             ]
         });

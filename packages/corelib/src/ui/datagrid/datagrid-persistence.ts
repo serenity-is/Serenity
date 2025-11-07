@@ -87,9 +87,10 @@ export function getCurrentSettings(this: void, opt: {
                 p.pin = column.frozen !== "end" ? "start" : "end";
             }
 
-            if (flags.columnVisibility !== false && p.visible !== false) {
+            if (flags.columnVisibility !== false && column.visible !== false) {
                 p.visible = true;
             }
+
             if (flags.columnWidths !== false) {
                 p.width = column.width;
             }
@@ -106,6 +107,11 @@ export function getCurrentSettings(this: void, opt: {
         if (flags.columnPinning && !settings.columns.some(x => "pin" in x && settings.columns.length)) {
             // ensure at least one column has pinned info so that while restoring we know pinning flag was used
             settings.columns[0].pin = false;
+        }
+
+        if (flags.columnVisibility && !settings.columns.some(x => "visible" in x && settings.columns.length)) {
+            // ensure at least one column has visibility info so that while restoring we know visibility flag was used
+            settings.columns[0].visible = false;
         }
     }
 
@@ -248,7 +254,8 @@ export function restoreSettingsFrom(this: void, opt: {
             opt.sleekGrid.setSortColumns(list);
         }
 
-        if (flags.columnVisibility !== false) {
+        if (flags.columnVisibility !== false &&
+            settings.columns.some(x => "visible" in x)) {
             const visibleColumns = settings.columns.filter(x => x.id != null &&
                 x.visible === true &&
                 colById[x.id] &&
