@@ -440,11 +440,11 @@ export type GridLayoutRefs = {
 	config: {
 		pinnedStartCols?: number;
 		pinnedEndCols?: number;
-		pinnedLimit?: number;
+		pinnedLimit?: number | null;
 		colCount?: number;
 		frozenTopRows?: number;
 		frozenBottomRows?: number;
-		frozenLimit?: number;
+		frozenLimit?: number | null;
 		dataLength?: number;
 	};
 };
@@ -1547,7 +1547,8 @@ export declare class SleekGrid<TItem = any> implements ISleekGrid<TItem> {
 	getColumns(): Column<TItem>[];
 	private updateViewColLeftRight;
 	private updateViewCols;
-	private setInitCols;
+	/** Set the initial columns, also calls initColumnProps unless opt.initProps is false */
+	private setAllCols;
 	private handleFrozenColsOption;
 	setColumns(columns: Column<TItem>[]): void;
 	reorderColumns(columnIds: string[], opt?: {

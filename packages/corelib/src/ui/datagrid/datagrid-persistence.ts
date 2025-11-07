@@ -77,7 +77,7 @@ export function getCurrentSettings(this: void, opt: {
         flags.sortColumns !== false) {
         settings.columns = [];
         const sortColumns = opt.sleekGrid.getSortColumns() as any[];
-        const columns = opt.sleekGrid.getColumns();
+        const columns = opt.sleekGrid.getAllColumns();
         for (const column of columns) {
             const p: PersistedGridColumn = {
                 id: column.id
@@ -87,7 +87,7 @@ export function getCurrentSettings(this: void, opt: {
                 p.pin = column.frozen !== "end" ? "start" : "end";
             }
 
-            if (flags.columnVisibility !== false) {
+            if (flags.columnVisibility !== false && p.visible !== false) {
                 p.visible = true;
             }
             if (flags.columnWidths !== false) {
