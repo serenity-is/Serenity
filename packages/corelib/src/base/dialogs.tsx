@@ -930,7 +930,7 @@ function createMessageDialog(opt: {
 }): Partial<Dialog> {
 
     if (!hasBSModal() && !hasUIDialog()) {
-        const msg: string = opt.message == null ? "": typeof opt.message === "string" ? opt.message : opt.message.textContent;
+        const msg: string = opt.message == null ? "" : typeof opt.message === "string" ? opt.message : opt.message.textContent;
         const result = opt.native(msg);
         opt.options?.onClose?.(result);
         return {
@@ -1192,13 +1192,10 @@ const modalHide = (e: Event) => {
 
 const modalHidden = (e: Event) => {
     const instance = Dialog.getInstance(e.target as HTMLElement);
-    if (document.activeElement && instance && instance.getDialogNode()?.contains(document.activeElement)) {
-        try {
+    try {
+        if (document.activeElement && instance && instance.getDialogNode()?.contains(document.activeElement))
             (document.activeElement as HTMLElement).blur?.();
-        }
-        catch { 
-        }
-    }
+    } catch { }
     const body = Dialog.getInstance(e.target as HTMLElement)?.getContentNode();
     if (body) {
         Fluent.trigger(body, "modalclose");
