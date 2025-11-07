@@ -1989,7 +1989,8 @@ export class SleekGrid<TItem = any> implements ISleekGrid<TItem> {
         } else {
 
             var style = getComputedStyle(this._container);
-            vs.height = parsePx(style.height)
+            vs.height =
+                parsePx(style.height)
                 - parsePx(style.paddingTop)
                 - parsePx(style.paddingBottom)
                 - vs.headerHeight
@@ -2053,7 +2054,7 @@ export class SleekGrid<TItem = any> implements ISleekGrid<TItem> {
         const { frozenTopRows, frozenBottomRows } = this._refs;
         numberOfRows -= frozenTopRows + frozenBottomRows;
 
-        var tempViewportH = Math.round(parsePx(getComputedStyle(this.getScrollContainerY()).height));
+        var tempViewportH = Math.floor(parsePx(getComputedStyle(this.getScrollContainerY()).height));
         const vpi = this._viewportInfo;
         var oldViewportHasVScroll = vpi.hasVScroll;
         // with autoHeight, we do not need to accommodate the vertical scroll bar
@@ -2073,7 +2074,7 @@ export class SleekGrid<TItem = any> implements ISleekGrid<TItem> {
 
         this.startPostProcessingCleanup();
 
-        vpi.virtualHeight = Math.max(this._options.rowHeight * numberOfRows, tempViewportH - this._scrollDims.height);
+        vpi.virtualHeight = Math.max(this._options.rowHeight * numberOfRows, Math.floor(tempViewportH - this._scrollDims.height));
 
         if (this._activeCellNode && this._activeRow > l) {
             this.resetActiveCell();
