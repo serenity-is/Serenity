@@ -20,7 +20,6 @@ export interface QuickFilterItemData<TWidget> {
     loadState?: (w: TWidget, state: any) => void;
 }
 
-
 export class QuickFilterBar<P extends QuickFilterBarOptions = QuickFilterBarOptions> extends Widget<P> {
 
     static override[Symbol.typeInfo] = this.registerClass(nsSerenity);

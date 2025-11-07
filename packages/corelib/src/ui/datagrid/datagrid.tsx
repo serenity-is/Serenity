@@ -358,13 +358,15 @@ export class DataGrid<TItem, P = {}> extends Widget<P> implements IDataGrid, IRe
                 .filter(c => this.canFilterColumn(c))
                 .map(x => x.sourceItem)));
 
-        this.filterBar.get_store().add_changed(() => {
-            if (this.restoringSettings <= 0) {
-                this.persistSettings();
-                this.view && (this.view.seekToPage = 1);
-                this.refresh();
-            }
-        });
+        this.filterBar.get_store().add_changed(bindThis(this).filterStoreChanged);
+    }
+
+    protected filterStoreChanged() {
+        if (this.restoringSettings <= 0) {
+            this.persistSettings();
+            this.view && (this.view.seekToPage = 1);
+            this.refresh();
+        }
     }
 
     /**
@@ -616,7 +618,10 @@ export class DataGrid<TItem, P = {}> extends Widget<P> implements IDataGrid, IRe
 
     protected createFilterBar(): void {
         this.filterBar = new FilterDisplayBar({
-            element: el => this.domNode.append(el)
+            element: el => {
+                const after = this.quickFiltersBar?.domNode ?? this.toolbar?.domNode;
+                after ? Fluent(el).insertAfter(after) : this.domNode.prepend(el);
+            }
         });
         this.initializeFilterBar();
     }

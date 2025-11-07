@@ -12,6 +12,8 @@ import { ToolButton } from "../widgets/toolbar";
 import { Widget, WidgetProps } from "../widgets/widget";
 import { ColumnPickerDialog } from "./columnpickerdialog";
 import { DataGrid } from "./datagrid";
+import { FilterDisplayBar } from "../filtering/filterdisplaybar";
+import { FilterDialog } from "../filtering/filterdialog";
 
 export class EntityGrid<TItem, P = {}> extends DataGrid<TItem, P> {
     static override[Symbol.typeInfo] = this.registerClass(nsSerenity);
@@ -162,8 +164,38 @@ export class EntityGrid<TItem, P = {}> extends DataGrid<TItem, P> {
 
         buttons.push(this.newRefreshButton(true));
         buttons.push(ColumnPickerDialog.createToolButton(this as any));
+        buttons.push(FilterDisplayBar.createToolButton({
+            onClick: () => {
+                if (!this.filterBar)
+                    return;
+                const dialog = new FilterDialog({});
+                dialog.get_filterPanel().set_store(this.filterBar.get_store());
+                dialog.dialogOpen(null);
+            },
+            visible: () => this.filterBar != null
+        }));
 
         return buttons;
+    }
+
+    protected setFilterBarVisibility(): void {
+        if (!this.filterBar.domNode)
+            return;
+
+        if (this.filterBar.domNode.hidden != !this.filterBar?.get_store()?.get_items()?.length) {
+            Fluent.toggle(this.filterBar.domNode);
+            this.layout();
+        }
+    }
+
+    protected override createFilterBar(): void {
+        super.createFilterBar();
+        this.setFilterBarVisibility();
+    }
+
+    protected override filterStoreChanged() {
+        super.filterStoreChanged();
+        this.setFilterBarVisibility();
     }
 
     protected newRefreshButton(noText?: boolean): ToolButton {

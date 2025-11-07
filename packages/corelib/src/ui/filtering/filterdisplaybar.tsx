@@ -1,4 +1,5 @@
-﻿import { FilterPanelTexts, nsSerenity } from "../../base";
+﻿import { faIcon, FilterPanelTexts, nsSerenity } from "../../base";
+import { type ToolButton, type ToolButtonProps } from "../widgets/toolbar";
 import { FilterDialog } from "./filterdialog";
 import { FilterWidgetBase } from "./filterwidgetbase";
 
@@ -41,5 +42,15 @@ export class FilterDisplayBar<P = {}> extends FilterWidgetBase<P> {
             displayText = FilterPanelTexts.EffectiveEmpty;
 
         this.element.findFirst('.txt').text('[' + displayText + ']');
+    }
+
+    public static createToolButton(opt: Partial<ToolButtonProps>): ToolButton {
+        return {
+            hint: FilterPanelTexts.EditFilter,
+            action: 'edit-filter',
+            cssClass: "edit-filter-button",
+            icon: faIcon("filter"),
+            ...opt
+        };
     }
 }
