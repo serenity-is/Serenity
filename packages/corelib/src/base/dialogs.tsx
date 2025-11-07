@@ -1191,6 +1191,14 @@ const modalHide = (e: Event) => {
 }
 
 const modalHidden = (e: Event) => {
+    const instance = Dialog.getInstance(e.target as HTMLElement);
+    if (document.activeElement && instance && instance.getDialogNode()?.contains(document.activeElement)) {
+        try {
+            (document.activeElement as HTMLElement).blur?.();
+        }
+        catch { 
+        }
+    }
     const body = Dialog.getInstance(e.target as HTMLElement)?.getContentNode();
     if (body) {
         Fluent.trigger(body, "modalclose");
