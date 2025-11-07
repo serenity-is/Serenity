@@ -70,6 +70,7 @@ export class SleekGrid<TItem = any> implements ISleekGrid<TItem> {
     declare private _jumpinessCoefficient: number;
     declare private _lastRenderTime: number;
     declare private _layout: LayoutEngine;
+    private _ignorePinChangeUntil: number = 0;
     declare private _numberOfPages: number;
     declare private _on: OmitThisParameter<typeof addListener>;
     declare private _off: OmitThisParameter<typeof removeListener>;
@@ -222,10 +223,16 @@ export class SleekGrid<TItem = any> implements ISleekGrid<TItem> {
         this._signals = signals;
 
         const frozenTopBottomChanged = () => {
-            this._initialized && this.invalidateAllRows?.();
+            if (this._initialized) {
+                //console.debug('invalidate rows on frozen top/bottom change');
+                this.invalidateAllRows?.();
+            }
         };
         const pinnedStartEndChanged = () => {
-            this._initialized && this.invalidateColumns();
+            if (this._initialized && this._ignorePinChangeUntil <= new Date().getTime()) {
+                //console.debug('invalidate cols on pin start/end change');
+                this.invalidateColumns();
+            }
         };
         this._signalsDisposers.push(observeSignal(signals.frozenTopRows, frozenTopBottomChanged));
         this._signalsDisposers.push(observeSignal(signals.frozenBottomRows, frozenTopBottomChanged));
@@ -323,113 +330,114 @@ export class SleekGrid<TItem = any> implements ISleekGrid<TItem> {
         if (this._initialized)
             return;
 
-        this._initialized = true;
+        try {
+            this.calcViewportSize();
+            this._layout.adjustFrozenRowsOption?.();
 
-        this.calcViewportSize();
-        this._layout.adjustFrozenRowsOption?.();
+            // header columns and cells may have different padding/border skewing width calculations (box-sizing, hello?)
+            // calculate the diff so we can set consistent sizes
+            this.measureCellPaddingAndBorder();
+            this.setOverflow();
+            this.updateViewColLeftRight();
+            this.adjustPinnedColsLimit();
+            this.createCssRules();
+            this.createColumnHeaders();
+            this.createColumnFooters();
+            this.applyColumnWidths()
+            this.setupColumnSort();
+            this.resizeCanvas();
+            this.bindAncestorScrollEvents();
 
-        // header columns and cells may have different padding/border skewing width calculations (box-sizing, hello?)
-        // calculate the diff so we can set consistent sizes
-        this.measureCellPaddingAndBorder();
-        this.setOverflow();
-        this.updateViewColLeftRight();
-        this.adjustPinnedColsLimit();
-        this.createCssRules();
-        this.createColumnHeaders();
-        this.createColumnFooters();
-        this.applyColumnWidths()
-        this.setupColumnSort();
-        this.resizeCanvas();
-        this.bindAncestorScrollEvents();
+            const boundThis = bindThis(this);
+            this._on(this._container, "resize", boundThis.resizeCanvas);
 
-        const boundThis = bindThis(this);
-        this._on(this._container, "resize", boundThis.resizeCanvas);
+            this.getViewports().forEach(vp => {
+                var scrollTicking = false;
+                this._on(vp, "scroll", (e) => {
+                    if (!scrollTicking) {
+                        scrollTicking = true;
 
-        this.getViewports().forEach(vp => {
-            var scrollTicking = false;
-            this._on(vp, "scroll", (e) => {
-                if (!scrollTicking) {
-                    scrollTicking = true;
-
-                    window.requestAnimationFrame(() => {
-                        this.handleScroll();
-                        scrollTicking = false;
-                    });
-                }
+                        window.requestAnimationFrame(() => {
+                            this.handleScroll();
+                            scrollTicking = false;
+                        });
+                    }
+                });
+                this._on(vp, "wheel", boundThis.handleMouseWheel as any);
+                this._on(vp, "mousewheel" as any, boundThis.handleMouseWheel);
             });
-            this._on(vp, "wheel", boundThis.handleMouseWheel as any);
-            this._on(vp, "mousewheel" as any, boundThis.handleMouseWheel);
-        });
 
-        this._forEachBand(band => {
-            const hs = band.headerCols;
-            if (hs) {
-                hs.onselectstart = () => false;
-                this._on(hs, "contextmenu", boundThis.handleHeaderContextMenu);
-                this._on(hs, "click", boundThis.handleHeaderClick);
+            this._forEachBand(band => {
+                const hs = band.headerCols;
+                if (hs) {
+                    hs.onselectstart = () => false;
+                    this._on(hs, "contextmenu", boundThis.handleHeaderContextMenu);
+                    this._on(hs, "click", boundThis.handleHeaderClick);
+                    if (this._jQuery) {
+                        this._jQuery(hs)
+                            .on('mouseenter.' + this._uid, '.slick-header-column', boundThis.handleHeaderMouseEnter)
+                            .on('mouseleave.' + this._uid, '.slick-header-column', boundThis.handleHeaderMouseLeave);
+                    }
+                    else {
+                        // need to reimplement this similar to jquery events
+                        this._on(hs, "mouseenter", e => (e.target as HTMLElement).closest(".slick-header-column") &&
+                            boundThis.handleHeaderMouseEnter(e));
+                        this._on(hs, "mouseleave", e => (e.target as HTMLElement).closest(".slick-header-column") &&
+                            boundThis.handleHeaderMouseLeave(e));
+                    }
+                }
+
+                band.headerRowCols && this._on(band.headerRowCols.parentElement, 'scroll', boundThis.handleHeaderFooterRowScroll);
+                band.footerRowCols && this._on(band.footerRowCols.parentElement, 'scroll', boundThis.handleHeaderFooterRowScroll);
+            });
+
+            [this._focusSink1, this._focusSink2].forEach(fs => this._on(fs, "keydown", boundThis.handleKeyDown));
+
+            var canvases = Array.from<HTMLElement>(this.getCanvases());
+            canvases.forEach(canvas => {
+                this._on(canvas, "keydown", boundThis.handleKeyDown)
+                this._on(canvas, "click", boundThis.handleClick)
+                this._on(canvas, "dblclick", boundThis.handleDblClick)
+                this._on(canvas, "contextmenu", boundThis.handleContextMenu);
+            });
+
+            this._draggableInstance = Draggable({
+                containerElement: this._container,
+                //allowDragFrom: 'div.slick-cell',
+                // the slick cell parent must always contain `.dnd` and/or `.cell-reorder` class to be identified as draggable
+                //allowDragFromClosest: 'div.slick-cell.dnd, div.slick-cell.cell-reorder',
+                preventDragFromKeys: ['ctrlKey', 'metaKey'],
+                onDragInit: boundThis.handleDragInit,
+                onDragStart: boundThis.handleDragStart,
+                onDrag: boundThis.handleDrag,
+                onDragEnd: boundThis.handleDragEnd
+            });
+
+            canvases.forEach(canvas => {
                 if (this._jQuery) {
-                    this._jQuery(hs)
-                        .on('mouseenter.' + this._uid, '.slick-header-column', boundThis.handleHeaderMouseEnter)
-                        .on('mouseleave.' + this._uid, '.slick-header-column', boundThis.handleHeaderMouseLeave);
+                    this._jQuery(canvas)
+                        .on('mouseenter' + this._uid, '.slick-cell', boundThis.handleMouseEnter)
+                        .on('mouseleave' + this._uid, '.slick-cell', boundThis.handleMouseLeave);
                 }
                 else {
-                    // need to reimplement this similar to jquery events
-                    this._on(hs, "mouseenter", e => (e.target as HTMLElement).closest(".slick-header-column") &&
-                        boundThis.handleHeaderMouseEnter(e));
-                    this._on(hs, "mouseleave", e => (e.target as HTMLElement).closest(".slick-header-column") &&
-                        boundThis.handleHeaderMouseLeave(e));
+                    this._on(canvas, "mouseenter", e => (e.target as HTMLElement)?.classList?.contains("slick-cell") && boundThis.handleMouseEnter(e), { capture: true });
+                    this._on(canvas, "mouseleave", e => (e.target as HTMLElement)?.classList?.contains("slick-cell") && boundThis.handleMouseLeave(e), { capture: true });
                 }
-            }
-
-            band.headerRowCols && this._on(band.headerRowCols.parentElement, 'scroll', boundThis.handleHeaderFooterRowScroll);
-            band.footerRowCols && this._on(band.footerRowCols.parentElement, 'scroll', boundThis.handleHeaderFooterRowScroll);
-        });
-
-        [this._focusSink1, this._focusSink2].forEach(fs => this._on(fs, "keydown", boundThis.handleKeyDown));
-
-        var canvases = Array.from<HTMLElement>(this.getCanvases());
-        canvases.forEach(canvas => {
-            this._on(canvas, "keydown", boundThis.handleKeyDown)
-            this._on(canvas, "click", boundThis.handleClick)
-            this._on(canvas, "dblclick", boundThis.handleDblClick)
-            this._on(canvas, "contextmenu", boundThis.handleContextMenu);
-        });
-
-        this._draggableInstance = Draggable({
-            containerElement: this._container,
-            //allowDragFrom: 'div.slick-cell',
-            // the slick cell parent must always contain `.dnd` and/or `.cell-reorder` class to be identified as draggable
-            //allowDragFromClosest: 'div.slick-cell.dnd, div.slick-cell.cell-reorder',
-            preventDragFromKeys: ['ctrlKey', 'metaKey'],
-            onDragInit: boundThis.handleDragInit,
-            onDragStart: boundThis.handleDragStart,
-            onDrag: boundThis.handleDrag,
-            onDragEnd: boundThis.handleDragEnd
-        });
-
-        canvases.forEach(canvas => {
-            if (this._jQuery) {
-                this._jQuery(canvas)
-                    .on('mouseenter' + this._uid, '.slick-cell', boundThis.handleMouseEnter)
-                    .on('mouseleave' + this._uid, '.slick-cell', boundThis.handleMouseLeave);
-            }
-            else {
-                this._on(canvas, "mouseenter", e => (e.target as HTMLElement)?.classList?.contains("slick-cell") && boundThis.handleMouseEnter(e), { capture: true });
-                this._on(canvas, "mouseleave", e => (e.target as HTMLElement)?.classList?.contains("slick-cell") && boundThis.handleMouseLeave(e), { capture: true });
-            }
-        });
-
-        // Work around http://crbug.com/312427.
-        if (navigator.userAgent.toLowerCase().match(/webkit/) &&
-            navigator.userAgent.toLowerCase().match(/macintosh/)) {
-            canvases.forEach(c => {
-                this._on(c, "wheel" as any, boundThis.handleMouseWheel as any);
-                this._on(c, "mousewheel" as any, boundThis.handleMouseWheel as any);
             });
-        }
 
+            // Work around http://crbug.com/312427.
+            if (navigator.userAgent.toLowerCase().match(/webkit/) &&
+                navigator.userAgent.toLowerCase().match(/macintosh/)) {
+                canvases.forEach(c => {
+                    this._on(c, "wheel" as any, boundThis.handleMouseWheel as any);
+                    this._on(c, "mousewheel" as any, boundThis.handleMouseWheel as any);
+                });
+            }
+        }
+        finally {
+            this._initialized = true;
+        }
         SleekGrid.onAfterInit.notify({ grid: this });
-        this.onAfterInit.notify({ grid: this });
     }
 
     registerPlugin(plugin: GridPlugin): void {
@@ -631,7 +639,7 @@ export class SleekGrid<TItem = any> implements ISleekGrid<TItem> {
     }
 
     private updateBandCanvasWidths(): boolean {
-        const oldCanvasWidths = this._mapBands(x => x.canvasWidth );;
+        const oldCanvasWidths = this._mapBands(x => x.canvasWidth);;
         const newCanvasWidths = this.calcCanvasBandWidths();
         const { start, main, end } = this._refs;
         start.canvasWidth = newCanvasWidths.start;
@@ -1445,6 +1453,7 @@ export class SleekGrid<TItem = any> implements ISleekGrid<TItem> {
     }
 
     public invalidateColumns() {
+        this._ignorePinChangeUntil = new Date().getTime() + 100;
         this.updateViewCols();
         this.updateViewColLeftRight();
         if (this._initialized) {

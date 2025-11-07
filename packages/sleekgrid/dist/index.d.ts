@@ -1365,6 +1365,7 @@ export declare class SleekGrid<TItem = any> implements ISleekGrid<TItem> {
 	private _jumpinessCoefficient;
 	private _lastRenderTime;
 	private _layout;
+	private _ignorePinChangeUntil;
 	private _numberOfPages;
 	private _on;
 	private _off;
