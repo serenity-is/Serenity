@@ -14,6 +14,13 @@ export interface QuickFilterBarOptions {
     idPrefix?: string;
 }
 
+export interface QuickFilterItemData<TWidget> {
+    displayText?: (w: TWidget, l: string) => string;
+    saveState?: (w: TWidget) => any;
+    loadState?: (w: TWidget, state: any) => void;
+}
+
+
 export class QuickFilterBar<P extends QuickFilterBarOptions = QuickFilterBarOptions> extends Widget<P> {
 
     static override[Symbol.typeInfo] = this.registerClass(nsSerenity);
@@ -32,6 +39,12 @@ export class QuickFilterBar<P extends QuickFilterBarOptions = QuickFilterBarOpti
         this.options.idPrefix = (this.options.idPrefix ?? this.uniqueName + '_');
     }
 
+    private static readonly itemDataMap = new WeakMap<Node, QuickFilterItemData<any>>();
+
+    static getItemData<TWidget>(filterItem: Node): QuickFilterItemData<TWidget> | undefined {
+        return this.itemDataMap.get(filterItem);
+    }
+
     public addSeparator(): void {
         this.domNode.append(<hr />)
     }
@@ -45,11 +58,7 @@ export class QuickFilterBar<P extends QuickFilterBarOptions = QuickFilterBarOpti
             this.addSeparator();
         }
 
-        const qfElement = this.domNode.appendChild(<div class="quick-filter-item" data-qffield={opt.field}></div>) as HTMLDivElement & {
-            qfdisplaytext?: (w: TWidget, l: string) => string;
-            qfsavestate?: (w: TWidget) => any;
-            qfloadstate?: (w: TWidget, state: any) => void;
-        }
+        const qfElement = this.domNode.appendChild(<div class="quick-filter-item" data-qffield={opt.field}></div>) as HTMLDivElement;
 
         var title = localText(opt.title, opt.title);
         if (title == null) {
@@ -61,16 +70,22 @@ export class QuickFilterBar<P extends QuickFilterBarOptions = QuickFilterBarOpti
 
         qfElement.appendChild(<span class="quick-filter-label">{title}</span>);
 
+        const qfData = {} as QuickFilterItemData<TWidget>;
+
         if (opt.displayText != null) {
-            qfElement.qfdisplaytext = opt.displayText;
+            qfData.displayText = opt.displayText;
         }
 
         if (opt.saveState != null) {
-            qfElement.qfsavestate = opt.saveState;
+            qfData.saveState = opt.saveState;
         }
 
         if (opt.loadState != null) {
-            qfElement.qfloadstate = opt.loadState;
+            qfData.loadState = opt.loadState;
+        }
+
+        if (qfData.displayText || qfData.saveState || qfData.loadState) {
+            QuickFilterBar.itemDataMap.set(qfElement, qfData);
         }
 
         if (opt.cssClass) {

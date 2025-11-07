@@ -20,7 +20,7 @@ import { ToolButton, Toolbar } from "../widgets/toolbar";
 import { Widget, WidgetProps } from "../widgets/widget";
 import { getWidgetFrom, tryGetWidget } from "../widgets/widgetutils";
 import { getDefaultSortBy, getItemCssClass, propertyItemToQuickFilter, sleekGridOnSort } from "./datagrid-internal";
-import { GridPersistenceFlags, PersistedGridSettings, SettingStorage, getCurrentSettings, restoreSettingsFrom } from "./datagrid-persistence";
+import { GridPersistenceFlags, PersistedGridSettings, SettingStorage, getCurrentSettings, restoreSettingsFrom, defaultGridPersistenceFlags } from "./datagrid-persistence";
 import { IDataGrid } from "./idatagrid";
 import { IRowDefinition } from "./irowdefinition";
 import { QuickFilter } from "./quickfilter";
@@ -52,6 +52,7 @@ export class DataGrid<TItem, P = {}> extends Widget<P> implements IDataGrid, IRe
     declare public openDialogsAsPanel: boolean;
 
     declare public static defaultRowHeight: number;
+    public static readonly defaultPersistenceFlags = defaultGridPersistenceFlags;
     declare public static defaultPersistenceStorage: SettingStorage;
 
     declare public static defaultColumnWidthScale: number;
@@ -1123,13 +1124,13 @@ export class DataGrid<TItem, P = {}> extends Widget<P> implements IDataGrid, IRe
 
             restoreSettingsFrom({
                 canShowColumn: bindThis(this).canShowColumn,
-                filterBar: this.filterBar,
+                filterStore: this.filterBar?.get_store(),
                 flags: event.flagsToUse,
                 includeDeletedToggle: this.domNode.querySelector('.s-IncludeDeletedToggle'),
                 quickFiltersDiv: this.quickFiltersDiv,
                 sleekGrid: this._grid,
                 settings: event.settings,
-                toolbar: this.toolbar,
+                toolbarNode: this.toolbar?.domNode,
                 uniqueName: this.uniqueName,
                 view: this.view
             });
@@ -1183,12 +1184,12 @@ export class DataGrid<TItem, P = {}> extends Widget<P> implements IDataGrid, IRe
         event.flagsToUse ||= event.flagsDefault;
 
         event.settings = getCurrentSettings({
-            filterBar: this.filterBar,
+            filterStore: this.filterBar?.get_store(),
             flags,
             includeDeletedToggle: this.domNode.querySelector('.s-IncludeDeletedToggle'),
             quickFiltersDiv: this.quickFiltersDiv,
             sleekGrid: this._grid,
-            toolbar: this.toolbar,
+            toolbarNode: this.toolbar?.domNode,
             uniqueName: this.uniqueName
         });
         event.after = true;

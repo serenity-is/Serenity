@@ -1,12 +1,12 @@
-import { Column, ISleekGrid } from "@serenity-is/sleekgrid";
+import { type Column, type ISleekGrid } from "@serenity-is/sleekgrid";
 import { cssEscape, FilterPanelTexts, Fluent } from "../../base";
-import { IRemoteView } from "../../slick";
+import { type IRemoteView } from "../../slick";
 import { EditorUtils } from "../editors/editorutils";
-import { FilterDisplayBar } from "../filtering/filterdisplaybar";
-import { FilterLine } from "../filtering/filterline";
-import { Toolbar } from "../widgets/toolbar";
-import { Widget } from "../widgets/widget";
+import { type FilterLine } from "../filtering/filterline";
+import type { FilterStore } from "../filtering/filterstore";
+import { type Widget } from "../widgets/widget";
 import { tryGetWidget } from "../widgets/widgetutils";
+import { QuickFilterBar } from "./quickfilterbar";
 import { QuickSearchField, QuickSearchInput } from "./quicksearchinput";
 
 export interface SettingStorage {
@@ -33,19 +33,40 @@ export interface PersistedGridSettings {
 }
 
 export interface GridPersistenceFlags {
+    /** Column pinning state. Defaults to persist unless explicitly set to false. */
     columnPinning?: boolean;
+    /** Column widths. Defaults to persist unless explicitly set to false. */
     columnWidths?: boolean;
+    /** Column visibility. Defaults to persist unless explicitly set to false. */
     columnVisibility?: boolean;
+    /** Sort columns. Defaults to persist unless explicitly set to false. */
     sortColumns?: boolean;
+    /** Filter items. Defaults to persist unless explicitly set to false. */
     filterItems?: boolean;
+    /** Quick filter values. Defaults to persist unless explicitly set to false. */
     quickFilters?: boolean;
+    /** Quick filter display text. Only persists when explicitly set to true. */
     quickFilterText?: boolean;
+    /** Quick search input text. Only persists when explicitly set to true. */
     quickSearch?: boolean;
+    /** Include deleted toggle state. Defaults to persist unless explicitly set to false. */
     includeDeleted?: boolean;
 }
 
 /** @deprecated Use GridPersistenceFlags, this one has a typo in the name */
 export type GridPersistanceFlags = GridPersistenceFlags;
+
+export const defaultGridPersistenceFlags: GridPersistenceFlags = {
+    columnPinning: true,
+    columnWidths: true,
+    columnVisibility: true,
+    sortColumns: true,
+    filterItems: true,
+    quickFilters: true,
+    quickFilterText: false,
+    quickSearch: false,
+    includeDeleted: true
+};
 
 export const omitAllGridPersistenceFlags: GridPersistenceFlags = {
     columnPinning: false,
@@ -58,44 +79,43 @@ export const omitAllGridPersistenceFlags: GridPersistenceFlags = {
     quickSearch: false,
     includeDeleted: false
 };
-
 export function getCurrentSettings(this: void, opt: {
-    filterBar: FilterDisplayBar,
+    filterStore: FilterStore,
     flags: GridPersistenceFlags,
     includeDeletedToggle: HTMLElement,
     quickFiltersDiv: Fluent,
     sleekGrid: ISleekGrid,
-    toolbar: Toolbar,
+    toolbarNode: HTMLElement,
     uniqueName: string
 }): PersistedGridSettings {
 
-    const flags = opt.flags || {};
+    const flags = Object.assign({}, defaultGridPersistenceFlags, opt.flags || {});
     const settings: PersistedGridSettings = {};
-    if (flags.columnVisibility !== false ||
-        flags.columnWidths !== false ||
-        flags.columnPinning !== false ||
-        flags.sortColumns !== false) {
+    if (flags.columnVisibility ||
+        flags.columnWidths ||
+        flags.columnPinning ||
+        flags.sortColumns) {
         settings.columns = [];
-        const sortColumns = opt.sleekGrid.getSortColumns() as any[];
+        const sortColumns = opt.sleekGrid.getSortColumns();
         const columns = opt.sleekGrid.getAllColumns();
         for (const column of columns) {
             const p: PersistedGridColumn = {
                 id: column.id
             };
 
-            if (flags.columnPinning !== false && column.frozen) {
+            if (flags.columnPinning && column.frozen) {
                 p.pin = column.frozen !== "end" ? "start" : "end";
             }
 
-            if (flags.columnVisibility !== false && column.visible !== false) {
+            if (flags.columnVisibility && column.visible !== false) {
                 p.visible = true;
             }
 
-            if (flags.columnWidths !== false) {
+            if (flags.columnWidths) {
                 p.width = column.width;
             }
 
-            if (flags.sortColumns !== false) {
+            if (flags.sortColumns) {
                 const sort = sortColumns.findIndex(x => x.columnId == column.id);
                 if (sort >= 0) {
                     p.sort = sortColumns[sort].sortAsc !== false ? (sort + 1) : (-sort - 1);
@@ -104,27 +124,27 @@ export function getCurrentSettings(this: void, opt: {
             settings.columns.push(p);
         }
 
-        if (flags.columnPinning && !settings.columns.some(x => "pin" in x && settings.columns.length)) {
+        if (flags.columnPinning && settings.columns.length > 0 && !settings.columns.some(x => "pin" in x)) {
             // ensure at least one column has pinned info so that while restoring we know pinning flag was used
             settings.columns[0].pin = false;
         }
 
-        if (flags.columnVisibility && !settings.columns.some(x => "visible" in x && settings.columns.length)) {
+        if (flags.columnVisibility && settings.columns.length > 0 && !settings.columns.some(x => "visible" in x)) {
             // ensure at least one column has visibility info so that while restoring we know visibility flag was used
             settings.columns[0].visible = false;
         }
     }
 
-    if (flags.includeDeleted !== false && opt.includeDeletedToggle) {
+    if (flags.includeDeleted && opt.includeDeletedToggle) {
         settings.includeDeleted = opt.includeDeletedToggle.matches(".pressed");
     }
 
-    if (flags.filterItems !== false && (opt.filterBar != null) && (opt.filterBar.get_store() != null)) {
-        settings.filterItems = opt.filterBar.get_store().get_items().slice();
+    if (flags.filterItems && opt.filterStore) {
+        settings.filterItems = opt.filterStore.get_items().slice();
     }
 
-    if (flags.quickSearch === true) {
-        const qsInput = opt.toolbar?.domNode?.querySelector('.s-QuickSearchInput');
+    if (flags.quickSearch) {
+        const qsInput = opt.toolbarNode?.querySelector('.s-QuickSearchInput');
         if (qsInput) {
             const qsWidget = tryGetWidget(qsInput, QuickSearchInput);
             if (qsWidget) {
@@ -134,30 +154,28 @@ export function getCurrentSettings(this: void, opt: {
         }
     }
 
-    if (flags.quickFilters !== false && (opt.quickFiltersDiv != null) && opt.quickFiltersDiv.length > 0) {
+    if (flags.quickFilters && (opt.quickFiltersDiv != null) && opt.quickFiltersDiv.length > 0) {
         settings.quickFilters = {};
-        opt.quickFiltersDiv.findAll('.quick-filter-item').forEach(e => {
-            const field = e.dataset.qffield;
+        opt.quickFiltersDiv.findAll('.quick-filter-item').forEach(filterItem => {
+            const field = filterItem.dataset.qffield;
             if (!field?.length) {
                 return;
             }
 
-            const widget = tryGetWidget('#' + opt.uniqueName + '_QuickFilter_' + field, Widget);
+            const widget = tryGetWidget<Widget>('#' + opt.uniqueName + '_QuickFilter_' + field);
             if (!widget)
                 return;
 
-            const qfElement = e as any;
-            const saveState = qfElement.qfsavestate;
-            const state = typeof saveState === "function" ? saveState(widget) : EditorUtils.getValue(widget);
+            const qfData = QuickFilterBar.getItemData(filterItem);
+            const state = typeof qfData?.saveState === "function" ? qfData.saveState(widget) : EditorUtils.getValue(widget);
             settings.quickFilters[field] = state;
-            if (flags.quickFilterText === true && e.classList.contains('quick-filter-active')) {
+            if (flags.quickFilterText && filterItem.classList.contains('quick-filter-active')) {
 
-                const getDisplayText = qfElement.qfdisplaytext;
-                const filterLabel = e.querySelector('.quick-filter-label')?.textContent ?? '';
+                const filterLabel = filterItem.querySelector('.quick-filter-label')?.textContent ?? '';
 
                 let displayText;
-                if (typeof getDisplayText === "function") {
-                    displayText = getDisplayText(widget, filterLabel);
+                if (typeof qfData?.displayText === "function") {
+                    displayText = qfData.displayText(widget, filterLabel);
                 }
                 else {
                     displayText = filterLabel + ' = ' + EditorUtils.getDisplayText(widget);
@@ -180,13 +198,13 @@ export function getCurrentSettings(this: void, opt: {
 
 export function restoreSettingsFrom(this: void, opt: {
     canShowColumn: (column: Column) => boolean,
-    filterBar: FilterDisplayBar,
+    filterStore: FilterStore,
     flags: GridPersistenceFlags,
     includeDeletedToggle: HTMLElement,
     quickFiltersDiv: Fluent,
     sleekGrid: ISleekGrid,
     settings: PersistedGridSettings,
-    toolbar: Toolbar,
+    toolbarNode: HTMLElement,
     uniqueName: string,
     view: IRemoteView<any>
 }) {
@@ -196,12 +214,12 @@ export function restoreSettingsFrom(this: void, opt: {
         colById[c.id] = c;
     }
 
-    const flags = opt.flags || {};
+    const flags = Object.assign({}, defaultGridPersistenceFlags, opt.flags || {});
     const settings = opt.settings || {};
 
     if (settings.columns != null) {
 
-        if (flags.columnPinning !== false &&
+        if (flags.columnPinning &&
             settings.columns.some(x => "pin" in x)) {
             for (let x1 of settings.columns) {
                 if (x1.id != null) {
@@ -214,7 +232,7 @@ export function restoreSettingsFrom(this: void, opt: {
             }
         }
 
-        if (flags.columnWidths !== false) {
+        if (flags.columnWidths) {
             for (let x2 of settings.columns) {
                 if (x2.id != null && x2.width != null && x2.width !== 0) {
                     const column1 = colById[x2.id];
@@ -225,7 +243,7 @@ export function restoreSettingsFrom(this: void, opt: {
             }
         }
 
-        if (flags.sortColumns !== false) {
+        if (flags.sortColumns) {
             const list = [];
             const sortColumns = settings.columns.filter(function (x3) {
                 return x3.id != null && (x3.sort ?? 0) !== 0;
@@ -254,7 +272,7 @@ export function restoreSettingsFrom(this: void, opt: {
             opt.sleekGrid.setSortColumns(list);
         }
 
-        if (flags.columnVisibility !== false &&
+        if (flags.columnVisibility &&
             settings.columns.some(x => "visible" in x)) {
             const visibleColumns = settings.columns.filter(x => x.id != null &&
                 x.visible === true &&
@@ -267,29 +285,28 @@ export function restoreSettingsFrom(this: void, opt: {
         else {
             opt.sleekGrid.invalidateColumns();
         }
-        
+
         opt.sleekGrid.invalidate();
     }
 
     if (settings.filterItems != null &&
-        flags.filterItems !== false &&
-        opt.filterBar != null &&
-        opt.filterBar.get_store() != null) {
-        const items = opt.filterBar.get_store().get_items();
+        flags.filterItems &&
+        opt.filterStore) {
+        const items = opt.filterStore.get_items();
         items.length = 0;
         items.push.apply(items, settings.filterItems);
-        opt.filterBar.get_store().raiseChanged();
+        opt.filterStore.raiseChanged();
     }
 
     if (settings.includeDeleted != null &&
-        flags.includeDeleted !== false) {
+        flags.includeDeleted) {
         if (opt.includeDeletedToggle && !!settings.includeDeleted !== opt.includeDeletedToggle.classList.contains('pressed')) {
             Fluent.trigger(opt.includeDeletedToggle.querySelector('a'), "click");
         }
     }
 
     if (settings.quickFilters != null &&
-        flags.quickFilters !== false &&
+        flags.quickFilters &&
         opt.quickFiltersDiv != null &&
         opt.quickFiltersDiv.length > 0) {
         opt.quickFiltersDiv.findAll('.quick-filter-item').forEach(e => {
@@ -299,13 +316,13 @@ export function restoreSettingsFrom(this: void, opt: {
                 return;
             }
 
-            const widget = tryGetWidget('#' + cssEscape(opt.uniqueName + '_QuickFilter_' + field), Widget);
+            const widget = tryGetWidget<Widget>('#' + cssEscape(opt.uniqueName + '_QuickFilter_' + field));
             if (widget == null) {
                 return;
             }
 
             const state = settings.quickFilters[field];
-            const loadState = (e as any).qfloadstate;
+            const loadState = QuickFilterBar.getItemData(e)?.loadState;
             if (typeof loadState === "function") {
                 loadState(widget, state);
             }
@@ -315,8 +332,8 @@ export function restoreSettingsFrom(this: void, opt: {
         });
     }
 
-    if (flags.quickSearch === true && (settings.quickSearchField !== undefined || settings.quickSearchText !== undefined)) {
-        const qsInput = opt.toolbar?.domNode?.querySelector('.s-QuickSearchInput');
+    if (flags.quickSearch && (settings.quickSearchField !== undefined || settings.quickSearchText !== undefined)) {
+        const qsInput = opt.toolbarNode.querySelector('.s-QuickSearchInput');
         if (qsInput) {
             const qsWidget = tryGetWidget(qsInput, QuickSearchInput);
             qsWidget && qsWidget.restoreState(settings.quickSearchText, settings.quickSearchField);
