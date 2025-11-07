@@ -385,6 +385,8 @@ public class ProjectFileInfo(IFileSystem fileSystem, string projectFile,
         return assemblyFiles;
     }
 
+    private static readonly char[] semicolonSplitter = [';'];
+    private static readonly char[] equalsSplitter = ['='];
 
     public IDictionary<string, string> GetGlobalUsings()
     {
@@ -393,9 +395,9 @@ public class ProjectFileInfo(IFileSystem fileSystem, string projectFile,
             globalUsings = new Dictionary<string, string>(StringComparer.Ordinal);
             if (getPropertyArgument?.Invoke("GlobalUsings") is string gs)
             {
-                foreach (var g in gs.Split([';'], StringSplitOptions.RemoveEmptyEntries))
+                foreach (var g in gs.Split(semicolonSplitter, StringSplitOptions.RemoveEmptyEntries))
                 {
-                    var parts = g.Split(['='], 2);
+                    var parts = g.Split(equalsSplitter, 2);
                     if (parts.Length == 1)
                         globalUsings[parts[0].Trim()] = null;
                     else
