@@ -1,4 +1,4 @@
-import { Dictionary, EditorUtils, EntityGrid, FilterableAttribute, FormValidationTexts, Lookup, WidgetProps, deepClone, formatNumber, notifyError, parseDecimal, parseInteger, parseQueryString, serviceRequest, toId } from "@serenity-is/corelib";
+import { Attributes, Dictionary, EditorUtils, EntityGrid, FormValidationTexts, Lookup, WidgetProps, deepClone, formatNumber, notifyError, parseDecimal, parseInteger, parseQueryString, serviceRequest, toId } from "@serenity-is/corelib";
 import { ExcelExportHelper, PdfExportHelper } from "@serenity-is/extensions";
 import { Column, FormatterContext, FormatterResult, NonDataRow } from "@serenity-is/sleekgrid";
 import { CategoryRow, ProductColumns, ProductRow, ProductService, SupplierRow } from "../ServerTypes/Demo";
@@ -7,7 +7,7 @@ import { ProductDialog } from "./ProductDialog";
 import "./ProductGrid.css";
 
 export class ProductGrid<P = {}> extends EntityGrid<ProductRow, P> {
-    static override[Symbol.typeInfo] = this.registerClass(nsDemoNorthwind, [new FilterableAttribute()]);
+    static override[Symbol.typeInfo] = this.registerClass(nsDemoNorthwind, [Attributes.advancedFiltering()]);
     protected override getColumnsKey() { return ProductColumns.columnsKey; }
     protected override getDialogType() { return ProductDialog as any; }
     protected override getRowDefinition() { return ProductRow; }

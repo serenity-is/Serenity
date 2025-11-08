@@ -1,6 +1,6 @@
 import { addCustomAttribute, EditorAttribute, EnumKeyAttribute, ISlickFormatter, registerClass as regClass, registerEditor as regEditor, registerEnum as regEnum, registerFormatter as regFormatter, registerInterface as regIntf, registerType as regType } from "../base";
 import { addTypeMember, TypeMemberKind } from "../compat";
-import { CloseButtonAttribute, ElementAttribute, FilterableAttribute, MaximizableAttribute, OptionAttribute, PanelAttribute, ResizableAttribute, StaticPanelAttribute } from "./attributes";
+import { AdvancedFilteringAttribute, CloseButtonAttribute, ElementAttribute, FilterableAttribute, MaximizableAttribute, OptionAttribute, PanelAttribute, ResizableAttribute, StaticPanelAttribute } from "./attributes";
 
 export namespace Decorators {
 
@@ -101,11 +101,14 @@ export namespace Decorators {
         }
     }
 
-    export function filterable(value = true) {
+    export function advancedFiltering(value = true) {
         return function (target: Function, _context?: any) {
-            addCustomAttribute(target, new FilterableAttribute(value));
+            addCustomAttribute(target, new AdvancedFilteringAttribute(value));
         }
     }
+
+    /** @deprecated Use `advancedFiltering` instead */
+    export const filterable = advancedFiltering;
 
     export function maximizable(value = true) {
         return function (target: Function, _context?: any) {

@@ -1,4 +1,4 @@
-import { classTypeInfo, nsSerenity, registerType } from "../base";
+import { classTypeInfo, EnumKeyAttribute, nsSerenity, registerType } from "../base";
 
 /**
  * Indicates if a dialog should have a close button in its title bar (default true)
@@ -23,12 +23,13 @@ export class ElementAttribute {
 /**
  * Indicates if a grid should have an advanced filter editor
  */
-export class FilterableAttribute {
+export class AdvancedFilteringAttribute {
     static [Symbol.typeInfo] = classTypeInfo(nsSerenity); static { registerType(this); }
 
     constructor(public value = true) {
     }
 }
+
 
 /**
  * Indicates that a dialog or panel should be maximizable.
@@ -82,3 +83,22 @@ export class StaticPanelAttribute {
     constructor(public value = true) {
     }
 }
+
+export namespace Attributes {
+    /** Indicates if a grid should have an advanced filter editor */
+    export function advancedFiltering(value = true) { return new AdvancedFilteringAttribute(value); }
+    /** Indicates if a dialog should have a close button in its title bar (default true) */
+    export function closeButton(value = true) { return new CloseButtonAttribute(value); }
+    /** Indicates if a dialog should be resizable, only for jquery ui dialogs. */
+    export function resizable(value = true) { return new ResizableAttribute(value); }
+    /** Indicates if a dialog should be maximizable, only for jquery ui dialogs. */
+    export function maximizable(value = true) { return new MaximizableAttribute(value); }
+    /** Indicates if a dialog should be opened as a panel by default (default null) */
+    export function panel(value = true) { return new PanelAttribute(value); }
+    /** Indicates if a dialog should be a static panel, which is not a dialog at all. */
+    export function staticPanel(value = true) { return new StaticPanelAttribute(value); }
+}
+
+
+/** @deprecated Use Attributes.advancedFiltering() instead */
+export const FilterableAttribute = AdvancedFilteringAttribute;

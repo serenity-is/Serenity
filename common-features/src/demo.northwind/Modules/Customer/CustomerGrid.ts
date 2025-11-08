@@ -1,10 +1,10 @@
-import { EntityGrid, FilterableAttribute } from "@serenity-is/corelib";
+import { Attributes, EntityGrid } from "@serenity-is/corelib";
 import { CustomerColumns, CustomerRow, CustomerService } from "../ServerTypes/Demo";
 import { nsDemoNorthwind } from "../ServerTypes/Namespaces";
 import { CustomerDialog } from "./CustomerDialog";
 
 export class CustomerGrid<P = {}> extends EntityGrid<CustomerRow, P> {
-    static override[Symbol.typeInfo] = this.registerClass(nsDemoNorthwind, [new FilterableAttribute()]);
+    static override[Symbol.typeInfo] = this.registerClass(nsDemoNorthwind, [Attributes.advancedFiltering()]);
 
     protected override getColumnsKey() { return CustomerColumns.columnsKey; }
     protected override getDialogType() { return <any>CustomerDialog; }

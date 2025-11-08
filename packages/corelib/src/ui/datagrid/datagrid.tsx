@@ -19,8 +19,9 @@ import { SlickHelper } from "../helpers/slickhelper";
 import { ToolButton, Toolbar } from "../widgets/toolbar";
 import { Widget, WidgetProps } from "../widgets/widget";
 import { getWidgetFrom, tryGetWidget } from "../widgets/widgetutils";
+import { dataGridDefaults } from "./datagrid-defaults";
 import { getDefaultSortBy, getItemCssClass, propertyItemToQuickFilter, sleekGridOnSort } from "./datagrid-internal";
-import { GridPersistenceFlags, PersistedGridSettings, SettingStorage, getCurrentSettings, restoreSettingsFrom, defaultGridPersistenceFlags } from "./datagrid-persistence";
+import { GridPersistenceFlags, PersistedGridSettings, SettingStorage, getCurrentSettings, restoreSettingsFrom, type GridPersistenceEvent } from "./datagrid-persistence";
 import { IDataGrid } from "./idatagrid";
 import { IRowDefinition } from "./irowdefinition";
 import { QuickFilter } from "./quickfilter";
@@ -29,7 +30,7 @@ import { QuickSearchField } from "./quicksearchinput";
 import { SlickPager } from "./slickpager";
 
 export { omitAllGridPersistenceFlags } from "./datagrid-persistence";
-export type { GridPersistenceFlags, PersistedGridColumn, PersistedGridSettings, SettingStorage } from "./datagrid-persistence";
+export type { GridPersistenceEvent, GridPersistenceFlags, PersistedGridColumn, PersistedGridSettings, SettingStorage } from "./datagrid-persistence";
 
 export class DataGrid<TItem, P = {}> extends Widget<P> implements IDataGrid, IReadOnly {
 
@@ -49,14 +50,18 @@ export class DataGrid<TItem, P = {}> extends Widget<P> implements IDataGrid, IRe
     declare protected initialSettings: PersistedGridSettings;
     declare protected restoringSettings: number;
     declare public view: IRemoteView<TItem>;
+
     declare public openDialogsAsPanel: boolean;
 
-    declare public static defaultRowHeight: number;
-    public static readonly defaultPersistenceFlags = defaultGridPersistenceFlags;
-    declare public static defaultPersistenceStorage: SettingStorage;
-
-    declare public static defaultColumnWidthScale: number;
-    declare public static defaultColumnWidthDelta: number;
+    public static readonly defaultOptions = dataGridDefaults;
+    
+    static get defaultRowHeight() { return dataGridDefaults.rowHeight; }
+    static get defaultPersistenceStorage() { return dataGridDefaults.persistenceStorage; }
+    static set defaultPersistenceStorage(value: SettingStorage) { dataGridDefaults.persistenceStorage = value; }
+    static get defaultColumnWidthScale() { return dataGridDefaults.columnWidthScale; }
+    static set defaultColumnWidthScale(value: number) { dataGridDefaults.columnWidthScale = value; }
+    static get defaultColumnWidthDelta() { return dataGridDefaults.columnWidthDelta; }
+    static set defaultColumnWidthDelta(value: number) { dataGridDefaults.columnWidthDelta = value; }
 
     public static readonly onAfterInit = new PubSub<DataGridInitEvent>();
     public readonly onAfterInit = new PubSub<DataGridInitEvent>();
@@ -102,7 +107,7 @@ export class DataGrid<TItem, P = {}> extends Widget<P> implements IDataGrid, IRe
         this._grid ??= sleekGrid;
         this.initSleekGrid();
 
-        if (this.enableFiltering()) {
+        if (this.enableAdvancedFiltering()) {
             this.createFilterBar();
         }
 
@@ -608,8 +613,11 @@ export class DataGrid<TItem, P = {}> extends Widget<P> implements IDataGrid, IRe
         return false;
     }
 
-    protected enableFiltering(): boolean {
-        return this.getCustomAttribute(FilterableAttribute)?.value;
+    protected enableAdvancedFiltering(): boolean {
+        return this.getCustomAttribute(FilterableAttribute)?.value ??
+            (typeof dataGridDefaults.enableAdvancedFiltering === "function" ?
+                dataGridDefaults.enableAdvancedFiltering(this) 
+                    : dataGridDefaults.enableAdvancedFiltering) ?? false;
     }
 
     protected populateWhenVisible(): boolean {
@@ -1228,9 +1236,9 @@ export class DataGrid<TItem, P = {}> extends Widget<P> implements IDataGrid, IRe
     public get columns() { return this._grid?.getColumns(); }
 
     /** @obsolete use defaultPersistenceStorage, this one has a typo */
-    public static get defaultPersistanceStorage(): SettingStorage { return DataGrid.defaultPersistenceStorage; }
+    public static get defaultPersistanceStorage(): SettingStorage { return DataGrid.defaultOptions.persistenceStorage; }
     /** @obsolete use defaultPersistenceStorage, this one has a typo */
-    public static set defaultPersistanceStorage(value: SettingStorage) { DataGrid.defaultPersistenceStorage = value; }
+    public static set defaultPersistanceStorage(value: SettingStorage) { DataGrid.defaultOptions.persistenceStorage = value; }
 }
 
 export interface DataGridEvent {
@@ -1238,14 +1246,5 @@ export interface DataGridEvent {
 }
 
 export type DataGridChangeEvent = DataGridEvent;
-export type DataGridInitEvent = DataGridEvent;
 
-export interface GridPersistenceEvent extends DataGridEvent {
-    after: boolean;
-    flagsArgument: GridPersistenceFlags;
-    flagsDefault: GridPersistenceFlags;
-    flagsToUse: GridPersistenceFlags;
-    settings: PersistedGridSettings;
-    readonly restoring: boolean;
-    readonly persisting: boolean;
-}
+export type DataGridInitEvent = DataGridEvent;

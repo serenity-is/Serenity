@@ -1,5 +1,5 @@
 import { Decorators } from "./decorators";
-import { CloseButtonAttribute, ElementAttribute, FilterableAttribute, MaximizableAttribute, OptionAttribute, PanelAttribute, ResizableAttribute, StaticPanelAttribute } from "./attributes";
+import { AdvancedFilteringAttribute, CloseButtonAttribute, ElementAttribute, FilterableAttribute, MaximizableAttribute, OptionAttribute, PanelAttribute, ResizableAttribute, StaticPanelAttribute } from "./attributes";
 import { EditorAttribute, EnumKeyAttribute, addCustomAttribute, registerClass, registerEditor, registerEnum, registerFormatter, registerInterface, registerType } from "../base";
 import { addTypeMember } from "../compat";
 
@@ -254,21 +254,21 @@ describe("Decorators", () => {
         });
     });
 
-    describe("filterable", () => {
-        it("should add FilterableAttribute with default value", () => {
+    describe("advancedFiltering", () => {
+        it("should add AdvancedFilteringAttribute with default value", () => {
             class TestClass {}
 
-            const decorator = Decorators.filterable();
+            const decorator = Decorators.advancedFiltering();
             decorator(TestClass);
 
-            expect(addCustomAttribute).toHaveBeenCalledWith(TestClass, expect.any(FilterableAttribute));
+            expect(addCustomAttribute).toHaveBeenCalledWith(TestClass, expect.any(AdvancedFilteringAttribute));
             expect((addCustomAttribute as any).mock.calls[0][1].value).toBe(true);
         });
 
         it("should add FilterableAttribute with specified value", () => {
             class TestClass {}
 
-            const decorator = Decorators.filterable(false);
+            const decorator = Decorators.advancedFiltering(false);
             decorator(TestClass);
 
             expect(addCustomAttribute).toHaveBeenCalledWith(TestClass, expect.any(FilterableAttribute));

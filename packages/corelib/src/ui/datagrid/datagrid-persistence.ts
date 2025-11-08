@@ -8,6 +8,7 @@ import { type Widget } from "../widgets/widget";
 import { tryGetWidget } from "../widgets/widgetutils";
 import { QuickFilterBar } from "./quickfilterbar";
 import { QuickSearchField, QuickSearchInput } from "./quicksearchinput";
+import type { DataGridEvent } from "./datagrid";
 
 export interface SettingStorage {
     getItem(key: string): string | Promise<string>;
@@ -339,4 +340,14 @@ export function restoreSettingsFrom(this: void, opt: {
             qsWidget && qsWidget.restoreState(settings.quickSearchText, settings.quickSearchField);
         }
     }
+}
+
+export interface GridPersistenceEvent extends DataGridEvent {
+    after: boolean;
+    flagsArgument: GridPersistenceFlags;
+    flagsDefault: GridPersistenceFlags;
+    flagsToUse: GridPersistenceFlags;
+    settings: PersistedGridSettings;
+    readonly restoring: boolean;
+    readonly persisting: boolean;
 }

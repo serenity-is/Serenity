@@ -1,12 +1,12 @@
 ﻿import { PropertyItem, PropertyItemsData, cancelDialogButton, getInstanceType, getTypeFullName, nsSerenity, okDialogButton } from "../../base";
 import { ScriptData, getFormData, getFormDataAsync } from "../../compat";
-import { PanelAttribute, StaticPanelAttribute } from "../../types/attributes";
+import { Attributes, PanelAttribute, StaticPanelAttribute } from "../../types/attributes";
 import { PropertyGrid, PropertyGridOptions } from "../widgets/propertygrid";
 import { WidgetProps } from "../widgets/widget";
 import { BaseDialog } from "./basedialog";
 
 export class PropertyDialog<TItem, P> extends BaseDialog<P> {
-    static override[Symbol.typeInfo] = this.registerClass(nsSerenity, [new PanelAttribute(false)]);
+    static override[Symbol.typeInfo] = this.registerClass(nsSerenity, [Attributes.panel(false)]);
 
     declare private _entity: TItem;
     declare private _entityId: any;

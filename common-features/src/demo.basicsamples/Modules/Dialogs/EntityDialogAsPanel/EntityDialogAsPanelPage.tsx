@@ -1,4 +1,4 @@
-import { notifySuccess, PanelAttribute, resolveUrl, SaveInitiator, SaveResponse } from "@serenity-is/corelib";
+import { Attributes, notifySuccess, PanelAttribute, resolveUrl, SaveInitiator, SaveResponse } from "@serenity-is/corelib";
 import { OrderDialog, type OrderRow } from "@serenity-is/demo.northwind";
 import { SampleInfo } from "../../sample-info";
 import { nsDemoBasicSamples } from "../../ServerTypes/Namespaces";
@@ -39,7 +39,7 @@ export default (model: number | OrderRow) => {
  * A version of order dialog converted to a panel by adding PanelAttribute.
  */
 export class EntityDialogAsPanel extends OrderDialog {
-    static override[Symbol.typeInfo] = this.registerClass(nsDemoBasicSamples, [new PanelAttribute()]);
+    static override[Symbol.typeInfo] = this.registerClass(nsDemoBasicSamples, [Attributes.panel()]);
 
     protected override updateInterface() {
         super.updateInterface();

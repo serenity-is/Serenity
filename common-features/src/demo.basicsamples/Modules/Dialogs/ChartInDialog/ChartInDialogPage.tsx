@@ -1,9 +1,9 @@
-import { BaseDialog, MaximizableAttribute, ResizableAttribute } from "@serenity-is/corelib";
+import { Attributes, BaseDialog } from "@serenity-is/corelib";
 import { BarController, BarElement, CategoryScale, Chart, Legend, LinearScale } from "chart.js";
+import { SampleInfo } from "../../sample-info";
 import { BasicSamplesService } from "../../ServerTypes/Demo";
 import { nsDemoBasicSamples } from "../../ServerTypes/Namespaces";
 import "./ChartInDialogPage.css";
-import { SampleInfo } from "../../sample-info";
 
 Chart.register(BarController, BarElement, CategoryScale, Legend, LinearScale);
 
@@ -23,7 +23,7 @@ export default () => {
 }
 
 export class ChartInDialog<P = {}> extends BaseDialog<P> {
-    static override[Symbol.typeInfo] = this.registerClass(nsDemoBasicSamples, [new ResizableAttribute(), new MaximizableAttribute()]);
+    static override[Symbol.typeInfo] = this.registerClass(nsDemoBasicSamples, [Attributes.resizable(), Attributes.maximizable()]);
 
     declare private canvas: HTMLCanvasElement;
 

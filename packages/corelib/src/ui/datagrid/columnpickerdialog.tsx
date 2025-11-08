@@ -1,11 +1,11 @@
 ﻿import { Column } from "@serenity-is/sleekgrid";
 import { Authorization, ColumnPickerDialogTexts, Culture, Dialog, DialogButton, Fluent, cancelDialogButton, faIcon, nsSerenity, okDialogButton } from "../../base";
 import { Router } from "../../compat";
-import { ResizableAttribute } from "../../types";
+import { Attributes } from "../../types";
 import { BaseDialog } from "../dialogs/basedialog";
 import { ToolButton } from "../widgets/toolbar";
-import { IDataGrid } from "./idatagrid";
 import type { PersistedGridSettings } from "./datagrid-persistence";
+import { IDataGrid } from "./idatagrid";
 
 export interface ColumnPickerDialogOptions {
     columns: Column[];
@@ -14,7 +14,7 @@ export interface ColumnPickerDialogOptions {
 
 export class ColumnPickerDialog<P extends ColumnPickerDialogOptions = ColumnPickerDialogOptions> extends BaseDialog<P> {
 
-    static override[Symbol.typeInfo] = this.registerClass(nsSerenity, [new ResizableAttribute()]);
+    static override[Symbol.typeInfo] = this.registerClass(nsSerenity, [Attributes.resizable()]);
 
     declare private ulVisible: HTMLUListElement;
     declare private ulHidden: HTMLUListElement;

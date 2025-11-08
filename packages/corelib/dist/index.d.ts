@@ -4506,7 +4506,7 @@ export declare class ElementAttribute {
 /**
  * Indicates if a grid should have an advanced filter editor
  */
-export declare class FilterableAttribute {
+export declare class AdvancedFilteringAttribute {
 	value: boolean;
 	static [Symbol.typeInfo]: ClassTypeInfo<"Serenity.">;
 	constructor(value?: boolean);
@@ -4555,6 +4555,22 @@ export declare class StaticPanelAttribute {
 	static [Symbol.typeInfo]: ClassTypeInfo<"Serenity.">;
 	constructor(value?: boolean);
 }
+export declare namespace Attributes {
+	/** Indicates if a grid should have an advanced filter editor */
+	function advancedFiltering(value?: boolean): AdvancedFilteringAttribute;
+	/** Indicates if a dialog should have a close button in its title bar (default true) */
+	function closeButton(value?: boolean): CloseButtonAttribute;
+	/** Indicates if a dialog should be resizable, only for jquery ui dialogs. */
+	function resizable(value?: boolean): ResizableAttribute;
+	/** Indicates if a dialog should be maximizable, only for jquery ui dialogs. */
+	function maximizable(value?: boolean): MaximizableAttribute;
+	/** Indicates if a dialog should be opened as a panel by default (default null) */
+	function panel(value?: boolean): PanelAttribute;
+	/** Indicates if a dialog should be a static panel, which is not a dialog at all. */
+	function staticPanel(value?: boolean): StaticPanelAttribute;
+}
+/** @deprecated Use Attributes.advancedFiltering() instead */
+export declare const FilterableAttribute: typeof AdvancedFilteringAttribute;
 export declare enum CaptureOperationType {
 	Before = 0,
 	Delete = 1,
@@ -4581,7 +4597,9 @@ export declare namespace Decorators {
 	function closeButton(value?: boolean): (target: Function, _context?: any) => void;
 	function editor(): (target: Function, _context?: any) => void;
 	function element(value: string): (target: Function, _context?: any) => void;
-	function filterable(value?: boolean): (target: Function, _context?: any) => void;
+	function advancedFiltering(value?: boolean): (target: Function, _context?: any) => void;
+	/** @deprecated Use `advancedFiltering` instead */
+	const filterable: typeof advancedFiltering;
 	function maximizable(value?: boolean): (target: Function, _context?: any) => void;
 	function panel(value?: boolean): (target: Function, _context?: any) => void;
 	function resizable(value?: boolean): (target: Function, _context?: any) => void;
@@ -5220,6 +5238,15 @@ export interface GridPersistenceFlags {
 	includeDeleted?: boolean;
 }
 export declare const omitAllGridPersistenceFlags: GridPersistenceFlags;
+export interface GridPersistenceEvent extends DataGridEvent {
+	after: boolean;
+	flagsArgument: GridPersistenceFlags;
+	flagsDefault: GridPersistenceFlags;
+	flagsToUse: GridPersistenceFlags;
+	settings: PersistedGridSettings;
+	readonly restoring: boolean;
+	readonly persisting: boolean;
+}
 export interface IRowDefinition {
 	readonly deletePermission?: string;
 	readonly idProperty?: string;
@@ -5358,11 +5385,22 @@ export declare class DataGrid<TItem, P = {}> extends Widget<P> implements IDataG
 	protected restoringSettings: number;
 	view: IRemoteView<TItem>;
 	openDialogsAsPanel: boolean;
-	static defaultRowHeight: number;
-	static readonly defaultPersistenceFlags: GridPersistenceFlags;
-	static defaultPersistenceStorage: SettingStorage;
-	static defaultColumnWidthScale: number;
-	static defaultColumnWidthDelta: number;
+	static readonly defaultOptions: {
+		columnWidthDelta: number;
+		columnWidthScale: number;
+		enableAdvancedFiltering: (boolean | ((grid: DataGrid<any>) => boolean));
+		openDialogsAsPanel: boolean;
+		rowHeight: number;
+		persistenceFlags: GridPersistenceFlags;
+		persistenceStorage: SettingStorage;
+	};
+	static get defaultRowHeight(): number;
+	static get defaultPersistenceStorage(): SettingStorage;
+	static set defaultPersistenceStorage(value: SettingStorage);
+	static get defaultColumnWidthScale(): number;
+	static set defaultColumnWidthScale(value: number);
+	static get defaultColumnWidthDelta(): number;
+	static set defaultColumnWidthDelta(value: number);
 	static readonly onAfterInit: PubSub<DataGridEvent>;
 	readonly onAfterInit: PubSub<DataGridEvent>;
 	readonly onDataChanged: PubSub<DataGridEvent>;
@@ -5441,7 +5479,7 @@ export declare class DataGrid<TItem, P = {}> extends Widget<P> implements IDataG
 	protected createView(): IRemoteView<TItem>;
 	protected getDefaultSortBy(): any[];
 	protected usePager(): boolean;
-	protected enableFiltering(): boolean;
+	protected enableAdvancedFiltering(): boolean;
 	protected populateWhenVisible(): boolean;
 	protected createFilterBar(): void;
 	protected getPagerOptions(): PagerOptions;
@@ -5548,15 +5586,6 @@ export interface DataGridEvent {
 }
 export type DataGridChangeEvent = DataGridEvent;
 export type DataGridInitEvent = DataGridEvent;
-export interface GridPersistenceEvent extends DataGridEvent {
-	after: boolean;
-	flagsArgument: GridPersistenceFlags;
-	flagsDefault: GridPersistenceFlags;
-	flagsToUse: GridPersistenceFlags;
-	settings: PersistedGridSettings;
-	readonly restoring: boolean;
-	readonly persisting: boolean;
-}
 export declare class EntityGrid<TItem, P = {}> extends DataGrid<TItem, P> {
 	static [Symbol.typeInfo]: ClassTypeInfo<"Serenity.">;
 	constructor(props: WidgetProps<P>);

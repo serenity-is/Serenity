@@ -207,7 +207,8 @@ export function registerEnum(enumType: any, name: string, enumKey?: string) {
 
     internalRegisterType(enumType, name, undefined, "enum");
     if (enumKey && enumKey != name) {
-        addCustomAttribute(enumType, new EnumKeyAttribute(enumKey));
+        if (!hasCustomAttribute(enumType, EnumKeyAttribute, false))
+            addCustomAttribute(enumType, new EnumKeyAttribute(enumKey));
         const typeStore = getGlobalTypeRegistry();
         if (!typeStore[enumKey])
             typeStore[enumKey] = enumType;

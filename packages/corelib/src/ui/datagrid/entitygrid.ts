@@ -220,7 +220,7 @@ export class EntityGrid<TItem, P = {}> extends DataGrid<TItem, P> {
             var dialog = safeCast(dlg, IEditDialog);
             if (dialog != null) {
                 dialog.load(entityOrId, () => {
-                    dialog.dialogOpen(this.openDialogsAsPanel);
+                    dialog.dialogOpen(this.openDialogsAsPanel ?? DataGrid.defaultOptions.openDialogsAsPanel);
                 });
 
                 return;
@@ -243,7 +243,7 @@ export class EntityGrid<TItem, P = {}> extends DataGrid<TItem, P> {
             var dialog = safeCast(dlg, IEditDialog);
             if (dialog != null) {
                 dialog.load(entityOrId, () => {
-                    dialog.dialogOpen(this.openDialogsAsPanel)
+                    dialog.dialogOpen(this.openDialogsAsPanel ?? DataGrid.defaultOptions.openDialogsAsPanel);
                 });
                 return;
             }
