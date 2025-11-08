@@ -18,8 +18,16 @@ export namespace AggregateFormatting {
         const totals = ctx.item as any;
         const column = ctx.column;
         const field = column?.field;
-        if (!totals || !field)
+        if (!totals)
             return "";
+    
+        const summaryType = column.summaryType ?? column?.sourceItem?.summaryType;
+        if (!column?.field || summaryType === SummaryType.Disabled || summaryType == null) {
+            return <span class="aggregate-disabled"></span>;
+        }
+        if (summaryType === SummaryType.None) {
+            return <span class="aggregate-none"></span>;
+        }
 
         let aggType: IAggregatorConstructor;
         let aggKey: string;
