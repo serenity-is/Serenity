@@ -145,4 +145,4 @@ export function sleekGridOnSort(this: void, view: IRemoteView<any>, p: ArgsSort)
     else {
         view.populate();
     }
-}    
+}

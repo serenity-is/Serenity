@@ -357,7 +357,7 @@ export declare class BulkServiceAction {
 export interface ExcelExportOptions {
 	grid: DataGrid<any, any>;
 	service: string;
-	onViewSubmit: () => boolean;
+	onViewSubmit?: () => boolean;
 	editRequest?: (request: ListRequest) => ListRequest;
 	title?: string;
 	hint?: string;
@@ -447,7 +447,7 @@ declare global {
 }
 export interface PdfExportOptions {
 	grid: DataGrid<any, any>;
-	onViewSubmit: () => boolean;
+	onViewSubmit?: () => boolean;
 	title?: string;
 	hint?: string;
 	separator?: boolean;

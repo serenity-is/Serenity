@@ -1,11 +1,11 @@
 import { bindThis } from "@serenity-is/domwise";
-import { AutoTooltips, Column, ColumnSort, FormatterContext, GridOptions, SleekGrid, type CellMouseEvent, type ISleekGrid } from "@serenity-is/sleekgrid";
+import { AutoTooltips, Column, ColumnSort, FormatterContext, GridOptions, SleekGrid, type ArgsSort, type CellMouseEvent, type ISleekGrid } from "@serenity-is/sleekgrid";
 import { Authorization, Criteria, DataGridTexts, Fluent, ListResponse, cssEscape, debounce, getInstanceType, getTypeFullName, getjQuery, nsSerenity, tryGetText, type PropertyItem, type PropertyItemsData } from "../../base";
 import { PubSub } from "../../base/pubsub";
 import { LayoutTimer, ScriptData, getColumnsData, getColumnsDataAsync, setEquality } from "../../compat";
 import { IReadOnly } from "../../interfaces";
 import { Format, IRemoteView, PagerOptions, RemoteView, RemoteViewOptions } from "../../slick";
-import { FilterableAttribute } from "../../types/attributes";
+import { AdvancedFilteringAttribute } from "../../types/attributes";
 import { DateEditor } from "../editors/dateeditor";
 import { SelectEditor } from "../editors/selecteditor";
 import { FilterDisplayBar } from "../filtering/filterdisplaybar";
@@ -21,7 +21,7 @@ import { Widget, WidgetProps } from "../widgets/widget";
 import { getWidgetFrom, tryGetWidget } from "../widgets/widgetutils";
 import { dataGridDefaults } from "./datagrid-defaults";
 import { getDefaultSortBy, getItemCssClass, propertyItemToQuickFilter, sleekGridOnSort } from "./datagrid-internal";
-import { GridPersistenceFlags, PersistedGridSettings, SettingStorage, getCurrentSettings, restoreSettingsFrom, type GridPersistenceEvent } from "./datagrid-persistence";
+import { GridPersistenceFlags, PersistedGridSettings, SettingStorage, getCurrentSettings, restoreSettingsFrom, type DataGridPersistenceEvent } from "./datagrid-persistence";
 import { IDataGrid } from "./idatagrid";
 import { IRowDefinition } from "./irowdefinition";
 import { QuickFilter } from "./quickfilter";
@@ -30,14 +30,13 @@ import { QuickSearchField } from "./quicksearchinput";
 import { SlickPager } from "./slickpager";
 
 export { omitAllGridPersistenceFlags } from "./datagrid-persistence";
-export type { GridPersistenceEvent, GridPersistenceFlags, PersistedGridColumn, PersistedGridSettings, SettingStorage } from "./datagrid-persistence";
+export type { DataGridPersistenceEvent, GridPersistenceFlags, PersistedGridColumn, PersistedGridSettings, SettingStorage } from "./datagrid-persistence";
 
 export class DataGrid<TItem, P = {}> extends Widget<P> implements IDataGrid, IReadOnly {
 
     static override[Symbol.typeInfo] = this.registerClass(nsSerenity, [IReadOnly]);
 
     declare private _grid: ISleekGrid<TItem>;
-    declare private _isDisabled: boolean;
     declare private _layoutTimer: number;
 
     declare protected titleDiv: Fluent;
@@ -54,7 +53,7 @@ export class DataGrid<TItem, P = {}> extends Widget<P> implements IDataGrid, IRe
     declare public openDialogsAsPanel: boolean;
 
     public static readonly defaultOptions = dataGridDefaults;
-    
+
     static get defaultRowHeight() { return dataGridDefaults.rowHeight; }
     static get defaultPersistenceStorage() { return dataGridDefaults.persistenceStorage; }
     static set defaultPersistenceStorage(value: SettingStorage) { dataGridDefaults.persistenceStorage = value; }
@@ -65,8 +64,12 @@ export class DataGrid<TItem, P = {}> extends Widget<P> implements IDataGrid, IRe
 
     public static readonly onAfterInit = new PubSub<DataGridInitEvent>();
     public readonly onAfterInit = new PubSub<DataGridInitEvent>();
+    public readonly onCanSubmit = new PubSub<DataGridSubmitEvent>();
     public readonly onDataChanged = new PubSub<DataGridChangeEvent>();
-    public readonly onPersistence = new PubSub<GridPersistenceEvent>();
+    public readonly onFiltering = new PubSub<DataGridFilteringEvent<TItem>>();
+    public readonly onPersistence = new PubSub<DataGridPersistenceEvent>();
+    public readonly onProcessData = new PubSub<DataGridProcessEvent<TItem>>();
+    public readonly onSubmitting = new PubSub<DataGridSubmitEvent>();
 
     constructor(props: WidgetProps<P>) {
         super(props);
@@ -123,7 +126,6 @@ export class DataGrid<TItem, P = {}> extends Widget<P> implements IDataGrid, IRe
 
         this.createQuickFilters();
 
-        this.updateDisabledState();
         this.updateInterface();
 
         // call before restoring settings so global handlers can add mixins/plugins before that
@@ -274,16 +276,16 @@ export class DataGrid<TItem, P = {}> extends Widget<P> implements IDataGrid, IRe
         }
 
         if (this._grid) {
-            this._grid.onClick.clear();
-            this._grid.onSort.clear();
-            this._grid.onColumnsResized.clear();
-            this._grid.onColumnsReordered.clear();
+            this._grid.onClick.unsubscribe(this.handleGridClick);
+            this._grid.onSort.unsubscribe(this.handleGridSort);
+            this._grid.onColumnsResized.unsubscribe(this.handleGridColumnsResized);
+            this._grid.onColumnsReordered.unsubscribe(this.handleGridColumnsReordered);
             this._grid.destroy();
             this._grid = null;
         }
 
         if (this.view) {
-            this.view.onDataChanged.clear();
+            this.view.onDataChanged.unsubscribe(this.viewDataChanged);
             this.view.onSubmit = null;
             this.view.setFilter(null);
             this.view = null;
@@ -451,23 +453,29 @@ export class DataGrid<TItem, P = {}> extends Widget<P> implements IDataGrid, IRe
         this.view.setItems(value, true);
     }
 
+    protected handleGridSort(e: Event & ArgsSort) {
+        sleekGridOnSort(this.view, e);
+        this.persistSettings();
+    }
+
+    protected handleGridClick(e: CellMouseEvent) {
+        this.onClick(e, e.row, e.cell);
+    }
+
+    protected handleGridColumnsReordered() {
+        this.persistSettings();
+    }
+
+    protected handleGridColumnsResized() {
+        this.persistSettings();
+    }
+
     protected bindToSlickEvents() {
-        this._grid.onSort.subscribe((_, p) => {
-            sleekGridOnSort(this.view, p);
-            this.persistSettings();
-        });
-
-        this._grid.onClick.subscribe((e: CellMouseEvent) => {
-            this.onClick(e, e.row, e.cell);
-        });
-
-        this._grid.onColumnsReordered.subscribe(() => {
-            return this.persistSettings();
-        });
-
-        this._grid.onColumnsResized.subscribe(() => {
-            return this.persistSettings();
-        });
+        const boundThis = bindThis(this);
+        this._grid.onSort.subscribe(boundThis.handleGridSort);
+        this._grid.onClick.subscribe(boundThis.handleGridClick);
+        this._grid.onColumnsReordered.subscribe(boundThis.handleGridColumnsReordered);
+        this._grid.onColumnsResized.subscribe(boundThis.handleGridColumnsResized);
     }
 
     protected getAddButtonCaption(): string {
@@ -514,23 +522,36 @@ export class DataGrid<TItem, P = {}> extends Widget<P> implements IDataGrid, IRe
     }
 
     protected bindToViewEvents(): void {
-        var self = this;
+        const boundThis = bindThis(this);
+        this.view.onDataChanged.subscribe(boundThis.viewDataChanged);
+        this.view.setFilter(boundThis.handleViewFilter);
+        this.view.onSubmit = boundThis.handleViewSubmit;
+        this.view.onProcessData = boundThis.handleViewProcessData;
+    }
 
-        this.view.onDataChanged.subscribe(function (e, d) {
-            return self.viewDataChanged(e, d);
-        });
+    protected handleViewFilter(item: TItem): boolean { 
+        if (!this.onViewFilter(item))
+            return false;
 
-        this.view.onSubmit = function () {
-            return self.onViewSubmit();
-        };
+        const e: DataGridFilteringEvent<TItem> = { dataGrid: this, item: item, isMatch: true };
+        this.onFiltering.notify(e, { isCancelled: x => !x.isMatch });
+        return e.isMatch;
+    }
 
-        this.view.setFilter(function (item) {
-            return self.onViewFilter(item);
-        });
+    protected handleViewProcessData(response: ListResponse<TItem>): ListResponse<TItem> {
+        response = this.onViewProcessData(response);
+        const e: DataGridProcessEvent<TItem> = { dataGrid: this, response: response };
+        this.onProcessData.notify(e);
+        return e.response;
+    }
 
-        this.view.onProcessData = function (response) {
-            return self.onViewProcessData(response);
-        }
+    protected handleViewSubmit(): boolean {
+        if (!this.onViewSubmit())
+            return false;
+
+        const e: DataGridSubmitEvent = { dataGrid: this, cancel: false };
+        this.onSubmitting.notify(e, { isCancelled: x => x.cancel });
+        return !e.cancel;
     }
 
     protected onViewProcessData(response: ListResponse<TItem>): ListResponse<TItem> {
@@ -581,14 +602,11 @@ export class DataGrid<TItem, P = {}> extends Widget<P> implements IDataGrid, IRe
     }
 
     protected onViewSubmit(): boolean {
-        if (this._isDisabled || !this.getGridCanLoad()) {
+        if (!this.getGridCanLoad())
             return false;
-        }
-
         this.setCriteriaParameter();
         this.setIncludeColumnsParameter();
         this.invokeSubmitHandlers();
-
         return true;
     }
 
@@ -614,10 +632,10 @@ export class DataGrid<TItem, P = {}> extends Widget<P> implements IDataGrid, IRe
     }
 
     protected enableAdvancedFiltering(): boolean {
-        return this.getCustomAttribute(FilterableAttribute)?.value ??
+        return this.getCustomAttribute(AdvancedFilteringAttribute)?.value ??
             (typeof dataGridDefaults.enableAdvancedFiltering === "function" ?
-                dataGridDefaults.enableAdvancedFiltering(this) 
-                    : dataGridDefaults.enableAdvancedFiltering) ?? false;
+                dataGridDefaults.enableAdvancedFiltering(this)
+                : dataGridDefaults.enableAdvancedFiltering) ?? false;
     }
 
     protected populateWhenVisible(): boolean {
@@ -849,7 +867,24 @@ export class DataGrid<TItem, P = {}> extends Widget<P> implements IDataGrid, IRe
     }
 
     protected getGridCanLoad(): boolean {
+        const e: DataGridSubmitEvent = { dataGrid: this, cancel: false };
+        this.onCanSubmit.notify(e);
+        if (e.cancel)
+            return false;
+
         return true;
+    }
+
+    /** 
+     * Prepares submit arguments in this.view.params by calling this.view.onSubmit if available, or this.handleViewSubmit if not. 
+     * Note that if getGridCanLoad returns false, the prepared arguments might be in a incomplete state. */
+    public prepareSubmit(): boolean {
+        if (this.view?.onSubmit) {
+            const result = this.view.onSubmit(this.view);
+            return result == null || !!result;
+        }
+
+        return this.handleViewSubmit();
     }
 
     public refresh() {
@@ -874,17 +909,6 @@ export class DataGrid<TItem, P = {}> extends Widget<P> implements IDataGrid, IRe
 
     protected internalRefresh(): void {
         this.view.populate();
-    }
-
-    public setIsDisabled(value: boolean): void {
-        if (this._isDisabled !== value) {
-            this._isDisabled = value;
-            if (this._isDisabled) {
-                this.view.setItems([], true);
-            }
-
-            this.updateDisabledState();
-        }
     }
 
     declare private _readonly: boolean;
@@ -966,10 +990,6 @@ export class DataGrid<TItem, P = {}> extends Widget<P> implements IDataGrid, IRe
             return this._isActiveProperty = rowDefinition.isActiveProperty ?? '';
 
         return this._isActiveProperty = '';
-    }
-
-    protected updateDisabledState(): void {
-        this.slickContainer.toggleClass('ui-state-disabled', !!this._isDisabled);
     }
 
     protected resizeCanvas(): void {
@@ -1121,7 +1141,7 @@ export class DataGrid<TItem, P = {}> extends Widget<P> implements IDataGrid, IRe
         try {
 
             const flagsDefault = this.gridPersistenceFlags();
-            const event: GridPersistenceEvent = {
+            const event: DataGridPersistenceEvent = {
                 after: false,
                 dataGrid: this,
                 flagsArgument: flags,
@@ -1183,7 +1203,7 @@ export class DataGrid<TItem, P = {}> extends Widget<P> implements IDataGrid, IRe
     public getCurrentSettings(flags?: GridPersistenceFlags) {
 
         const flagsDefault = this.gridPersistenceFlags();
-        const event: GridPersistenceEvent = {
+        const event: DataGridPersistenceEvent = {
             after: false,
             dataGrid: this,
             flagsArgument: flags,
@@ -1246,5 +1266,18 @@ export interface DataGridEvent {
 }
 
 export type DataGridChangeEvent = DataGridEvent;
-
 export type DataGridInitEvent = DataGridEvent;
+
+
+export interface DataGridSubmitEvent extends DataGridEvent {
+    cancel?: boolean;
+}
+
+export interface DataGridFilteringEvent<TItem = any> extends DataGridEvent {
+    item: TItem;
+    isMatch: boolean;
+}
+
+export interface DataGridProcessEvent<TItem> extends DataGridEvent {
+    response: ListResponse<TItem>;
+}

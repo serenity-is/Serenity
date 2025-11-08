@@ -27,13 +27,11 @@ export class ProductGrid<P = {}> extends EntityGrid<ProductRow, P> {
         buttons.push(ExcelExportHelper.createToolButton({
             grid: this,
             service: ProductService.baseUrl + '/ListExcel',
-            onViewSubmit: () => this.onViewSubmit(),
             separator: true
         }));
 
         buttons.push(PdfExportHelper.createToolButton({
             grid: this,
-            onViewSubmit: () => this.onViewSubmit(),
             reportTitle: 'Product List',
             columnTitles: {
                 'Discontinued': 'Dis.',

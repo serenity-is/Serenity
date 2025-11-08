@@ -1,5 +1,5 @@
 import { Column } from "@serenity-is/sleekgrid";
-import { Authorization, isPromiseLike, tryGetText, type PropertyItem } from "../../base";
+import { Authorization, isPromiseLike, SummaryType, tryGetText, type PropertyItem } from "../../base";
 import { FormatterType } from "../../types/formattertype";
 import { FormatterTypeRegistry } from "../../types/formattertyperegistry";
 import { IInitializeColumn } from "../formatters/iinitializecolumn";
@@ -28,6 +28,7 @@ export namespace PropertyItemColumnConverter {
             sortable: item.sortable !== false,
             sortOrder: item.sortOrder ?? 0,
             width: item.width != null ? item.width : 80,
+            summaryType: item.summaryType,
             minWidth: item.minWidth ?? 30,
             maxWidth: (item.maxWidth == null || item.maxWidth === 0) ? null : item.maxWidth,
             resizable: item.resizable == null || !!item.resizable

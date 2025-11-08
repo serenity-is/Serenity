@@ -13,8 +13,10 @@ public partial class BasicPropertyProcessor : PropertyProcessor
             if (source.GetAttribute<PrimaryKeyAttribute>() != null ||
                 source.GetAttribute<IdentityAttribute>() != null ||
                 source.GetAttribute<ForeignKeyAttribute>() != null ||
-                source.GetAttribute<LeftJoinAttribute>() != null)
+                source.GetAttribute<LeftJoinAttribute>() != null ||
+                source.GetAttribute<UnboundAttribute>() != null)
             {
+                item.SummaryType = SummaryType.Disabled;
                 return;
             }
 
@@ -40,8 +42,10 @@ public partial class BasicPropertyProcessor : PropertyProcessor
                 item.SummaryType = SummaryType.None;
                 return;
             }
+
+            item.SummaryType = SummaryType.Disabled;
         }
-        else if (summaryTypeAttr.Value != SummaryType.Disabled)
+        else
             item.SummaryType = summaryTypeAttr.Value;
     }
 }

@@ -1,9 +1,9 @@
-import { DataGrid, ListRequest, ToolButton, deepClone, faIcon, postToService } from "@serenity-is/corelib";
+import { DataGrid, ListRequest, ToolButton, deepClone, faIcon, postToService, type IRemoteView } from "@serenity-is/corelib";
 
 export interface ExcelExportOptions {
     grid: DataGrid<any, any>;
     service: string;
-    onViewSubmit: () => boolean;
+    onViewSubmit?: () => boolean;
     editRequest?: (request: ListRequest) => ListRequest;
     title?: string;
     hint?: string;
@@ -20,11 +20,12 @@ export namespace ExcelExportHelper {
             cssClass: 'export-xlsx-button',
             icon: faIcon("file-excel"),
             onClick: function () {
-                if (!options.onViewSubmit()) {
-                    return;
-                }
 
                 let grid = options.grid;
+                if ((options.onViewSubmit && !options.onViewSubmit()) ||
+                    (!options.onViewSubmit && !grid.prepareSubmit())) {
+                    return;
+                }
 
                 var request = deepClone(grid.getView().params) as ListRequest;
                 request.Take = 0;

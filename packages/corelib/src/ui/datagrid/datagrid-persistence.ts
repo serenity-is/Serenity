@@ -342,7 +342,7 @@ export function restoreSettingsFrom(this: void, opt: {
     }
 }
 
-export interface GridPersistenceEvent extends DataGridEvent {
+export interface DataGridPersistenceEvent extends DataGridEvent {
     after: boolean;
     flagsArgument: GridPersistenceFlags;
     flagsDefault: GridPersistenceFlags;

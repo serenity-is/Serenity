@@ -27,23 +27,15 @@ export class TreeGridMixin<TItem> {
             }
         });
 
-        var oldViewFilter = (dg as any).onViewFilter;
-        (dg as any).onViewFilter = function (item: TItem) {
-            if (!oldViewFilter.apply(this, [item]))
-                return false;
+        dg.onFiltering.subscribe((e) => {
+            e.isMatch = SlickTreeHelper.filterById(e.item, dg.view, options.getParentId);
+        });
 
-            return SlickTreeHelper.filterById(item, dg.view, options.getParentId);
-        };
-
-        var oldProcessData = (dg as any).onViewProcessData;
-        (dg as any).onViewProcessData = function (response: ListResponse<TItem>) {
-
-            response = oldProcessData.apply(this, [response]);
-            response.Entities = TreeGridMixin.applyTreeOrdering(response.Entities, getId, options.getParentId);
-            SlickTreeHelper.setIndents(response.Entities, getId, options.getParentId,
+        dg.onProcessData.subscribe((e) => {
+            e.response.Entities = TreeGridMixin.applyTreeOrdering(e.response.Entities, getId, options.getParentId);
+            SlickTreeHelper.setIndents(e.response.Entities, getId, options.getParentId,
                 (options.initialCollapse && options.initialCollapse()) || false);
-            return response;
-        };
+        });
 
         if (options.toggleField) {
             var col = dg.allColumns?.find(x => x.field == options.toggleField || x.id == options.toggleField) as Column<TItem>;

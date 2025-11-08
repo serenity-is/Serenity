@@ -1,4 +1,4 @@
-import { Column, EventEmitter, FormatterContext, FormatterResult, GridOptions, Group, GroupItemMetadataProvider, GroupTotals, IDataView, IEventData, IGroupTotals, ISleekGrid, ItemMetadata } from '@serenity-is/sleekgrid';
+import { ArgsSort, CellMouseEvent, Column, EventEmitter, FormatterContext, FormatterResult, GridOptions, Group, GroupItemMetadataProvider, GroupTotals, IDataView, IEventData, IGroupTotals, ISleekGrid, ItemMetadata } from '@serenity-is/sleekgrid';
 
 export interface UserDefinition {
 	/**
@@ -4880,7 +4880,9 @@ declare class PubSub<TEvent = {}> {
 	private handlers;
 	subscribe(fn: (e: TEvent) => void): void;
 	unsubscribe(fn: (e: TEvent) => void): void;
-	notify(e: TEvent): void;
+	notify(e: TEvent, opt?: {
+		isCancelled: (e: TEvent) => boolean;
+	}): void;
 	clear(): void;
 }
 export type EditorProps<T> = WidgetProps<T> & {
@@ -5238,7 +5240,7 @@ export interface GridPersistenceFlags {
 	includeDeleted?: boolean;
 }
 export declare const omitAllGridPersistenceFlags: GridPersistenceFlags;
-export interface GridPersistenceEvent extends DataGridEvent {
+export interface DataGridPersistenceEvent extends DataGridEvent {
 	after: boolean;
 	flagsArgument: GridPersistenceFlags;
 	flagsDefault: GridPersistenceFlags;
@@ -5372,7 +5374,6 @@ export declare class QuickFilterBar<P extends QuickFilterBarOptions = QuickFilte
 export declare class DataGrid<TItem, P = {}> extends Widget<P> implements IDataGrid, IReadOnly {
 	static [Symbol.typeInfo]: ClassTypeInfo<"Serenity.">;
 	private _grid;
-	private _isDisabled;
 	private _layoutTimer;
 	protected titleDiv: Fluent;
 	protected toolbar: Toolbar;
@@ -5403,8 +5404,12 @@ export declare class DataGrid<TItem, P = {}> extends Widget<P> implements IDataG
 	static set defaultColumnWidthDelta(value: number);
 	static readonly onAfterInit: PubSub<DataGridEvent>;
 	readonly onAfterInit: PubSub<DataGridEvent>;
+	readonly onCanSubmit: PubSub<DataGridSubmitEvent>;
 	readonly onDataChanged: PubSub<DataGridEvent>;
-	readonly onPersistence: PubSub<GridPersistenceEvent>;
+	readonly onFiltering: PubSub<DataGridFilteringEvent<TItem>>;
+	readonly onPersistence: PubSub<DataGridPersistenceEvent>;
+	readonly onProcessData: PubSub<DataGridProcessEvent<TItem>>;
+	readonly onSubmitting: PubSub<DataGridSubmitEvent>;
 	constructor(props: WidgetProps<P>);
 	private layoutTimerCallback;
 	protected propertyItemsReady(itemsData: PropertyItemsData): void;
@@ -5457,6 +5462,10 @@ export declare class DataGrid<TItem, P = {}> extends Widget<P> implements IDataG
 	rowCount(): number;
 	getItems(): TItem[];
 	setItems(value: TItem[]): void;
+	protected handleGridSort(e: Event & ArgsSort): void;
+	protected handleGridClick(e: CellMouseEvent): void;
+	protected handleGridColumnsReordered(): void;
+	protected handleGridColumnsResized(): void;
 	protected bindToSlickEvents(): void;
 	protected getAddButtonCaption(): string;
 	protected getButtons(): ToolButton[];
@@ -5465,6 +5474,9 @@ export declare class DataGrid<TItem, P = {}> extends Widget<P> implements IDataG
 	protected onClick(e: Event, row: number, cell: number): void;
 	protected viewDataChanged(e: any, rows: TItem[]): void;
 	protected bindToViewEvents(): void;
+	protected handleViewFilter(item: TItem): boolean;
+	protected handleViewProcessData(response: ListResponse<TItem>): ListResponse<TItem>;
+	protected handleViewSubmit(): boolean;
 	protected onViewProcessData(response: ListResponse<TItem>): ListResponse<TItem>;
 	protected onViewFilter(item: TItem): boolean;
 	protected getIncludeColumns(include: {
@@ -5521,10 +5533,13 @@ export declare class DataGrid<TItem, P = {}> extends Widget<P> implements IDataG
 	protected populateLock(): void;
 	protected populateUnlock(): void;
 	protected getGridCanLoad(): boolean;
+	/**
+	 * Prepares submit arguments in this.view.params by calling this.view.onSubmit if available, or this.handleViewSubmit if not.
+	 * Note that if getGridCanLoad returns false, the prepared arguments might be in a incomplete state. */
+	prepareSubmit(): boolean;
 	refresh(): void;
 	protected refreshIfNeeded(): void;
 	protected internalRefresh(): void;
-	setIsDisabled(value: boolean): void;
 	private _readonly;
 	get readOnly(): boolean;
 	set readOnly(value: boolean);
@@ -5540,7 +5555,6 @@ export declare class DataGrid<TItem, P = {}> extends Widget<P> implements IDataG
 	protected getIsDeletedProperty(): string;
 	private _isActiveProperty;
 	protected getIsActiveProperty(): string;
-	protected updateDisabledState(): void;
 	protected resizeCanvas(): void;
 	protected subDialogDataChange(): void;
 	protected addFilterSeparator(): void;
@@ -5586,6 +5600,16 @@ export interface DataGridEvent {
 }
 export type DataGridChangeEvent = DataGridEvent;
 export type DataGridInitEvent = DataGridEvent;
+export interface DataGridSubmitEvent extends DataGridEvent {
+	cancel?: boolean;
+}
+export interface DataGridFilteringEvent<TItem = any> extends DataGridEvent {
+	item: TItem;
+	isMatch: boolean;
+}
+export interface DataGridProcessEvent<TItem> extends DataGridEvent {
+	response: ListResponse<TItem>;
+}
 export declare class EntityGrid<TItem, P = {}> extends DataGrid<TItem, P> {
 	static [Symbol.typeInfo]: ClassTypeInfo<"Serenity.">;
 	constructor(props: WidgetProps<P>);

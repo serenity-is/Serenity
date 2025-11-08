@@ -1,9 +1,9 @@
-import { DataGrid, deepClone, Fluent, formatDate, ListRequest, ListResponse, serviceCall, stringFormat, ToolButton } from "@serenity-is/corelib";
+import { DataGrid, deepClone, Fluent, formatDate, ListRequest, ListResponse, serviceCall, stringFormat, ToolButton, type IRemoteView } from "@serenity-is/corelib";
 import { applyFormatterResultToCellNode, Column, FormatterResult, ISleekGrid } from "@serenity-is/sleekgrid";
 
 export interface PdfExportOptions {
     grid: DataGrid<any, any>;
-    onViewSubmit: () => boolean;
+    onViewSubmit?: () => boolean;
     title?: string;
     hint?: string;
     separator?: boolean;
@@ -94,8 +94,10 @@ export namespace PdfExportHelper {
 
         const dataGrid = options.grid;
 
-        if (!options.onViewSubmit())
+        if ((options.onViewSubmit && !options.onViewSubmit()) ||
+            (!options.onViewSubmit && !dataGrid.prepareSubmit())) {
             return;
+        }
 
         var request = deepClone(dataGrid.view.params) as ListRequest;
         request.Take = 0;

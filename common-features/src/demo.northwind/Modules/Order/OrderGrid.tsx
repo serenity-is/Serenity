@@ -47,13 +47,11 @@ export class OrderGrid<P = {}> extends EntityGrid<OrderRow, P> {
         buttons.push(ExcelExportHelper.createToolButton({
             grid: this,
             service: OrderService.baseUrl + '/ListExcel',
-            onViewSubmit: () => this.onViewSubmit(),
             separator: true
         }));
 
         buttons.push(PdfExportHelper.createToolButton({
-            grid: this,
-            onViewSubmit: () => this.onViewSubmit()
+            grid: this
         }));
 
         return buttons;

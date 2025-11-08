@@ -125,7 +125,7 @@ export class PermissionCheckEditor<P extends PermissionCheckEditorOptions = Perm
         this.view.setItems(items, true);
     }
 
-    protected override onViewSubmit() {
+    protected override getGridCanLoad() {
         return false;
     }
 
