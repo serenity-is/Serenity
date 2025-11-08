@@ -22,7 +22,7 @@ export namespace AggregateFormatting {
             return "";
     
         const summaryType = column.summaryType ?? column?.sourceItem?.summaryType;
-        if (!column?.field || summaryType === SummaryType.Disabled || summaryType == null) {
+        if (!column?.field || summaryType === SummaryType.Disabled) {
             return <span class="aggregate-disabled"></span>;
         }
         if (summaryType === SummaryType.None) {

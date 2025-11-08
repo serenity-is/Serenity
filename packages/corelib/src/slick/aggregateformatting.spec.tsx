@@ -219,7 +219,7 @@ describe("AggregateFormatting.groupTotalsFormat", () => {
             }
         }));
 
-        expect(result).toBe("");
+        expect(result).toStrictEqual(<span class="aggregate-disabled" />);
     });
 
     it("should return empty string when no aggregator key found", () => {
