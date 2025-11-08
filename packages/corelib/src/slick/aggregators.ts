@@ -41,7 +41,7 @@ export namespace Aggregators {
         static readonly summaryType = SummaryType.Avg;
         static readonly aggregateKey = "avg";
         static get displayName() {
-            return localText("Enums.Serenity.SummaryType.Avg")
+            return localText("Enums.Serenity.SummaryType.Avg", "Avg")
         }
     }
 
