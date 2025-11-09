@@ -29,6 +29,10 @@ public partial class ServerTypingsGenerator : TypingsGeneratorBase
             {
                 AddFile(files.Key + ".ts");
             }
+            else
+            {
+                ResetCodeWriter();
+            }
         }
 
     }

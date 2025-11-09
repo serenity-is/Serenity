@@ -29,13 +29,18 @@ public abstract class CodeGeneratorBase
         generatedCode = [];
     }
 
+    protected void ResetCodeWriter()
+    {
+        sb.Clear();
+        cw.LocalUsings?.Clear();
+        cw.CurrentNamespace = null;
+    }
+
     protected virtual void AddFile(string filename)
     {
         var text = cw.ToString();
         generatedCode.Add(new GeneratedSource(filename, text));
-        sb.Clear();
-        cw.LocalUsings?.Clear();
-        cw.CurrentNamespace = null;
+        ResetCodeWriter();
     }
 
     protected abstract void GenerateAll();

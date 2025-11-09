@@ -20,6 +20,9 @@ public partial class ServerTypingsGenerator : TypingsGeneratorBase
             sb.AppendLine($"export const ns{item.Key}: {quotedDot} = {quotedDot};");
         }
 
-        AddFile("Namespaces.ts");
+        if (!string.IsNullOrWhiteSpace(sb.ToString()))
+            AddFile("Namespaces.ts");
+        else
+            ResetCodeWriter();
     }
 }
