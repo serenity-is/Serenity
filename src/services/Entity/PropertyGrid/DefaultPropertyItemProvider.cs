@@ -52,7 +52,7 @@ public partial class DefaultPropertyItemProvider(IServiceProvider provider, ITyp
         foreach (var property in type.GetProperties(BindingFlags.Public | BindingFlags.Instance)
             .OrderBy(x => x.MetadataToken))
         {
-            if (property.GetCustomAttribute<IgnoreAttribute>(false) != null ||
+            if (property.GetCustomAttribute<IgnoreUIFieldAttribute>(false) != null ||
                 property.GetCustomAttribute<TransformIgnoreAttribute>(false) != null ||
                 (predicate != null && predicate(property) == false))
                 continue;

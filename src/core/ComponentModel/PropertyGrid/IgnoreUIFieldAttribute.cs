@@ -1,4 +1,4 @@
-namespace Serenity.ComponentModel;
+﻿namespace Serenity.ComponentModel;
 
 /// <summary>
 /// Skips a property while generating grid column, form field, or report form parameter list.
@@ -9,7 +9,6 @@ namespace Serenity.ComponentModel;
 /// the property in request types, but skip it in UI generation.
 /// </summary>
 [AttributeUsage(AttributeTargets.Property, AllowMultiple = false)]
-[Obsolete("Use IgnoreUIFieldAttribute instead")]
-public class IgnoreAttribute : IgnoreUIFieldAttribute
+public class IgnoreUIFieldAttribute : Attribute
 {
 }

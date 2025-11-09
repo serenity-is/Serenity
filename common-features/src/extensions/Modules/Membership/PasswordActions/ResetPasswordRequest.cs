@@ -3,7 +3,7 @@ namespace Serenity.Extensions;
 [FormScript(LocalTextPrefix = "Forms.Membership.ResetPassword.")]
 public class ResetPasswordRequest : ServiceRequest
 {
-    [Ignore]
+    [IgnoreUIField]
     public string Token { get; set; }
     [PasswordEditor, Required(true), DisplayName("New Password"), Placeholder("password")]
     public string NewPassword { get; set; }

@@ -13,6 +13,6 @@ public class ServiceRequest
     /// Another option could be to add a [JsonExtensionData] but that could open
     /// way to the side effect ignoring typos.
     /// </summary>
-    [Ignore]
+    [IgnoreUIField]
     public Dictionary<string, object> CustomData { get; set; }
 }

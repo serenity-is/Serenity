@@ -28,7 +28,7 @@ public partial class ServerTypingsGenerator : TypingsGeneratorBase
             var fields = enumType.FieldsOf().Where(x => x.IsStatic &&
                 !x.IsSpecialName() && x.Constant() != null &&
                 (!x.HasCustomAttributes() ||
-                    (TypingsUtils.FindAttr(x.GetAttributes(), "Serenity.ComponentModel", "IgnoreAttribute") == null &&
+                    (TypingsUtils.FindAttr(x.GetAttributes(), "Serenity.ComponentModel", "IgnoreUIFieldAttribute") == null &&
                      TypingsUtils.FindAttr(x.GetAttributes(), "Serenity.ComponentModel", "TransformIgnoreAttribute") == null)));
             fields = fields.OrderBy(x => Convert.ToInt64(x.Constant(), CultureInfo.InvariantCulture));
 

@@ -98,8 +98,8 @@ public partial class ServerTypingsGenerator : TypingsGeneratorBase
                     if (property != null)
                     {
                         var attrs = property.GetAttributes();
-                        if (TypingsUtils.FindAttr(attrs, "Serenity.ComponentModel", "TransformIgnoreAttribute") is null &&
-                            TypingsUtils.FindAttr(attrs, "Serenity.ComponentModel", "IgnoreAttribute") is null)
+                        if (TypingsUtils.FindAttr(attrs, "Serenity.ComponentModel", "IgnoreUIFieldAttribute") is null &&
+                            TypingsUtils.FindAttr(attrs, "Serenity.ComponentModel", "TransformIgnoreAttribute") is null)
                             yield return property;
                     }
                 }

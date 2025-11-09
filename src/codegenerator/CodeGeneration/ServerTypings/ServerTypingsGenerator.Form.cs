@@ -270,7 +270,7 @@ public partial class ServerTypingsGenerator : TypingsGeneratorBase
                 if (basedOnByName != null)
                     basedOnField = basedOnByName[item.Name].FirstOrDefault();
 
-                if (GetAttribute(item, basedOnField, rowAnnotations, "Serenity.ComponentModel", "IgnoreAttribute") != null ||
+                if (GetAttribute(item, basedOnField, rowAnnotations, "Serenity.ComponentModel", "IgnoreUIFieldAttribute") != null ||
                     GetAttribute(item, basedOnField, rowAnnotations, "Serenity.ComponentModel", "TransformIgnoreAttribute") != null)
                     continue;
 
