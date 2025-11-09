@@ -53,6 +53,7 @@ public partial class DefaultPropertyItemProvider(IServiceProvider provider, ITyp
             .OrderBy(x => x.MetadataToken))
         {
             if (property.GetCustomAttribute<IgnoreAttribute>(false) != null ||
+                property.GetCustomAttribute<TransformIgnoreAttribute>(false) != null ||
                 (predicate != null && predicate(property) == false))
                 continue;
 

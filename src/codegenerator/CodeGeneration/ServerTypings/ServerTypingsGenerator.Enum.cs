@@ -29,7 +29,7 @@ public partial class ServerTypingsGenerator : TypingsGeneratorBase
                 !x.IsSpecialName() && x.Constant() != null &&
                 (!x.HasCustomAttributes() ||
                     (TypingsUtils.FindAttr(x.GetAttributes(), "Serenity.ComponentModel", "IgnoreAttribute") == null &&
-                     TypingsUtils.FindAttr(x.GetAttributes(), "Serenity.ComponentModel", "ScriptSkipAttribute") == null)));
+                     TypingsUtils.FindAttr(x.GetAttributes(), "Serenity.ComponentModel", "TransformIgnoreAttribute") == null)));
             fields = fields.OrderBy(x => Convert.ToInt64(x.Constant(), CultureInfo.InvariantCulture));
 
             var inserted = 0;

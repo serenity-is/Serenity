@@ -271,7 +271,7 @@ public partial class ServerTypingsGenerator : TypingsGeneratorBase
                     basedOnField = basedOnByName[item.Name].FirstOrDefault();
 
                 if (GetAttribute(item, basedOnField, rowAnnotations, "Serenity.ComponentModel", "IgnoreAttribute") != null ||
-                    GetAttribute(item, basedOnField, rowAnnotations, "Serenity.ComponentModel", "ScriptSkipAttribute") != null)
+                    GetAttribute(item, basedOnField, rowAnnotations, "Serenity.ComponentModel", "TransformIgnoreAttribute") != null)
                     continue;
 
                 var editorTypeAttr = GetAttribute(item, basedOnField, rowAnnotations, "Serenity.ComponentModel", "EditorTypeAttribute");

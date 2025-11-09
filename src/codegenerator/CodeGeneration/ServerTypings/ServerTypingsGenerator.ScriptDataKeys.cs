@@ -5,7 +5,7 @@ public partial class ServerTypingsGenerator : TypingsGeneratorBase
     protected void PreVisitTypeForScriptData(TypeDefinition type)
     {
         var attrs = type.GetAttributes();
-        if (TypingsUtils.FindAttr(attrs, "Serenity.ComponentModel", "ScriptSkipAttribute") != null)
+        if (TypingsUtils.FindAttr(attrs, "Serenity.ComponentModel", "TransformIgnoreAttribute") != null)
             return;
 
         var dataScriptAttr = TypingsUtils.FindAttr(attrs, "Serenity.ComponentModel", "DataScriptAttribute");

@@ -102,7 +102,8 @@ public static class ReportColumnConverter
                 propertyInfo == null)
                 continue;
 
-            if (member.GetCustomAttribute<IgnoreAttribute>() != null)
+            if (member.GetCustomAttribute<IgnoreAttribute>() != null ||
+                member.GetCustomAttribute<TransformIgnoreAttribute>() != null)
                 continue;
 
             Field baseField;

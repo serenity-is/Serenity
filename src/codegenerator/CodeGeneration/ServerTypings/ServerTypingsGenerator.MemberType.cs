@@ -145,7 +145,7 @@ public partial class ServerTypingsGenerator : TypingsGeneratorBase
 
         var resolvedType = memberType.Resolve();
 
-        if (resolvedType != null && TypingsUtils.GetAttr(resolvedType, "Serenity.ComponentModel", "ScriptSkipAttribute") != null)
+        if (resolvedType != null && TypingsUtils.GetAttr(resolvedType, "Serenity.ComponentModel", "TransformIgnoreAttribute") != null)
         {
             sb.Append("any");
             return;

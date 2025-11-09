@@ -28,14 +28,14 @@ public partial class ServerTypingsGenerator : TypingsGeneratorBase
 
     protected void AddNestedLocalTexts(TypeDefinition type, string prefix)
     {
-        if (TypingsUtils.FindAttr(type.GetAttributes(), "Serenity.ComponentModel", "ScriptSkipAttribute") != null)
+        if (TypingsUtils.FindAttr(type.GetAttributes(), "Serenity.ComponentModel", "TransformIgnoreAttribute") != null)
             return;
 
         foreach (var fi in type.FieldsOf().Where(x =>
             x.IsPublic() && x.IsStatic &&
             x.DeclaringType().FullNameOf() == type.FullNameOf() &&
             x.FieldType().FullNameOf() == "Serenity.LocalText" &&
-            TypingsUtils.FindAttr(x.GetAttributes(), "Serenity.ComponentModel", "ScriptSkipAttribute") == null))
+            TypingsUtils.FindAttr(x.GetAttributes(), "Serenity.ComponentModel", "TransformIgnoreAttribute") == null))
         {
             localTextKeys.Add(prefix + fi.Name);
         }

@@ -6,7 +6,6 @@ namespace Serenity.ComponentModel;
 /// </summary>
 /// <seealso cref="Attribute" />
 [AttributeUsage(AttributeTargets.Class | AttributeTargets.Enum | AttributeTargets.Field | AttributeTargets.Property, AllowMultiple = false)]
-[Obsolete("Use TransformIgnoreAttribute instead")]
-public class ScriptSkipAttribute : TransformIgnoreAttribute
+public class TransformIgnoreAttribute : Attribute
 {
 }

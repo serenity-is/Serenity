@@ -7,6 +7,7 @@
 /// This might be useful when a type is used as a Service Request and Form
 /// Declaration at the same time.
 /// </summary>
+[AttributeUsage(AttributeTargets.Property, AllowMultiple = false)]
 public class IgnoreAttribute : Attribute
 {
 }

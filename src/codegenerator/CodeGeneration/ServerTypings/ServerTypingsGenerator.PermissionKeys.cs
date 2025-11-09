@@ -30,7 +30,7 @@ public partial class ServerTypingsGenerator : TypingsGeneratorBase
 
             foreach (var nested in type.NestedTypes())
             {
-                if (TypingsUtils.GetAttr(type, "Serenity.ComponentModel", "ScriptSkipAttribute") != null)
+                if (TypingsUtils.GetAttr(type, "Serenity.ComponentModel", "TransformIgnoreAttribute") != null)
                     continue;
 
                 sb.AppendLine();

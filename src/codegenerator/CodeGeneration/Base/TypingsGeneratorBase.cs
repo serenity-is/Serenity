@@ -426,7 +426,7 @@ public abstract class TypingsGeneratorBase : ImportGeneratorBase
 #if ISSOURCEGENERATOR
                         (fromType.ContainingType != null && fromType.DeclaredAccessibility != Accessibility.Public) ||
 #endif
-                        TypingsUtils.GetAttr(fromType, "Serenity.ComponentModel", "ScriptSkipAttribute") != null)
+                        TypingsUtils.GetAttr(fromType, "Serenity.ComponentModel", "TransformIgnoreAttribute") != null)
                         continue;
 
                     var baseClasses = TypingsUtils.EnumerateBaseClasses(fromType).ToArray();
@@ -886,7 +886,7 @@ public abstract class TypingsGeneratorBase : ImportGeneratorBase
 
         if ((TypingsUtils.FindAttr(method.GetAttributes(), "System.Web.Mvc", "NonActionAttribute") ??
              TypingsUtils.FindAttr(method.GetAttributes(), "Microsoft.AspNetCore.Mvc", "NonActionAttribute") ??
-             TypingsUtils.FindAttr(method.GetAttributes(), "Serenity.ComponentModel", "ScriptSkipAttribute")) != null)
+             TypingsUtils.FindAttr(method.GetAttributes(), "Serenity.ComponentModel", "TransformIgnoreAttribute")) != null)
             return false;
 
         if (!TypingsUtils.IsSubclassOf(
