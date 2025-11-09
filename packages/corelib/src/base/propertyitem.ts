@@ -78,7 +78,13 @@ export interface PropertyItem {
     quickFilterCssClass?: string;
 }
 
+/** Alias for PropertyItem. It may replace PropertyItem in the future */
+export type UIFieldItem = PropertyItem;
+
 export interface PropertyItemsData {
     items: PropertyItem[];
     additionalItems: PropertyItem[];
 }
+
+/** Alias for PropertyItemsData. It may replace PropertyItemsData in the future */
+export type UIFieldSet = PropertyItemsData;

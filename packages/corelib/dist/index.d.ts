@@ -1941,10 +1941,14 @@ export interface PropertyItem {
 	quickFilterSeparator?: boolean;
 	quickFilterCssClass?: string;
 }
+/** Alias for PropertyItem. It may replace PropertyItem in the future */
+export type UIFieldItem = PropertyItem;
 export interface PropertyItemsData {
 	items: PropertyItem[];
 	additionalItems: PropertyItem[];
 }
+/** Alias for PropertyItemsData. It may replace PropertyItemsData in the future */
+export type UIFieldSet = PropertyItemsData;
 /**
  * Gets the known hash value for a given dynamic script name. They are usually
  * registered server-side via dynamic script manager and their latest known
