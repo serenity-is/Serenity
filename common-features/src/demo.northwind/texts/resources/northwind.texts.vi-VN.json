@@ -42,7 +42,7 @@
   "Db.Northwind.CustomerDemographic.EntityPlural": "Khách hàng địa phương học",
   "Db.Northwind.CustomerDemographic.EntitySingular": "Khách hàng địa phương hóa",
   "Db.Northwind.CustomerDemographic.ID": "ID",
-  "Db.Northwind.CustomerDetails.CustomerID": null,
+  "Db.Northwind.CustomerDetails.CustomerID": "Khách hàng",
   "Db.Northwind.CustomerDetails.Email": "Email",
   "Db.Northwind.CustomerDetails.EntityPlural": "Chi tiết khách hàng",
   "Db.Northwind.CustomerDetails.EntitySingular": "Chi tiết khách hàng",

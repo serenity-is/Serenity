@@ -42,7 +42,7 @@
   "Db.Northwind.CustomerDemographic.EntityPlural": "Zákaznické demografie",
   "Db.Northwind.CustomerDemographic.EntitySingular": "Zákaznická demografie",
   "Db.Northwind.CustomerDemographic.ID": "ID",
-  "Db.Northwind.CustomerDetails.CustomerID": null,
+  "Db.Northwind.CustomerDetails.CustomerID": "Zákazník",
   "Db.Northwind.CustomerDetails.Email": "Email",
   "Db.Northwind.CustomerDetails.EntityPlural": "Detaily zákazníka",
   "Db.Northwind.CustomerDetails.EntitySingular": "Detaily zákazníka",

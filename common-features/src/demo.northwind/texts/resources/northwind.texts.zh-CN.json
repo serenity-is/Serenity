@@ -42,7 +42,7 @@
   "Db.Northwind.CustomerDemographic.EntityPlural": "客户人口统计学",
   "Db.Northwind.CustomerDemographic.EntitySingular": "客户人口统计学",
   "Db.Northwind.CustomerDemographic.ID": "ID",
-  "Db.Northwind.CustomerDetails.CustomerID": null,
+  "Db.Northwind.CustomerDetails.CustomerID": "客户",
   "Db.Northwind.CustomerDetails.Email": "电子邮件",
   "Db.Northwind.CustomerDetails.EntityPlural": "客户详情",
   "Db.Northwind.CustomerDetails.EntitySingular": "客户详细信息",

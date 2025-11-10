@@ -42,7 +42,7 @@
   "Db.Northwind.CustomerDemographic.EntityPlural": "المؤهلات العملاء",
   "Db.Northwind.CustomerDemographic.EntitySingular": "الإحصائيات العملاء",
   "Db.Northwind.CustomerDemographic.ID": "معرف",
-  "Db.Northwind.CustomerDetails.CustomerID": null,
+  "Db.Northwind.CustomerDetails.CustomerID": "العميل",
   "Db.Northwind.CustomerDetails.Email": "البريد الإلكتروني",
   "Db.Northwind.CustomerDetails.EntityPlural": "تفاصيل العملاء",
   "Db.Northwind.CustomerDetails.EntitySingular": "تفاصيل العميل",

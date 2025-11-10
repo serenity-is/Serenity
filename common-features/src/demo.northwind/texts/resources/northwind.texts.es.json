@@ -42,7 +42,7 @@
   "Db.Northwind.CustomerDemographic.EntityPlural": "Demografías de clientes",
   "Db.Northwind.CustomerDemographic.EntitySingular": "Demografía de clientes",
   "Db.Northwind.CustomerDemographic.ID": "Id",
-  "Db.Northwind.CustomerDetails.CustomerID": null,
+  "Db.Northwind.CustomerDetails.CustomerID": "Cliente",
   "Db.Northwind.CustomerDetails.Email": "Correo electrónico",
   "Db.Northwind.CustomerDetails.EntityPlural": "Detalles de clientes",
   "Db.Northwind.CustomerDetails.EntitySingular": "Detalles del cliente",

@@ -42,7 +42,7 @@
   "Db.Northwind.CustomerDemographic.EntityPlural": "গ্রাহক ডেমোগ্রাফিক্স",
   "Db.Northwind.CustomerDemographic.EntitySingular": "গ্রাহক ডেমোগ্রাফিক্স",
   "Db.Northwind.CustomerDemographic.ID": "আইডি",
-  "Db.Northwind.CustomerDetails.CustomerID": null,
+  "Db.Northwind.CustomerDetails.CustomerID": "গ্রাহক",
   "Db.Northwind.CustomerDetails.Email": "ইমেইল",
   "Db.Northwind.CustomerDetails.EntityPlural": "গ্রাহক বিবরণ",
   "Db.Northwind.CustomerDetails.EntitySingular": "গ্রাহকের বিশদ তথ্য",

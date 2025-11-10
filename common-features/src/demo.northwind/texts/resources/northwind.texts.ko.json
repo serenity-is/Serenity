@@ -42,7 +42,7 @@
   "Db.Northwind.CustomerDemographic.EntityPlural": "고객 데모그래피",
   "Db.Northwind.CustomerDemographic.EntitySingular": "고객 데모그래피",
   "Db.Northwind.CustomerDemographic.ID": "ID",
-  "Db.Northwind.CustomerDetails.CustomerID": null,
+  "Db.Northwind.CustomerDetails.CustomerID": "고객",
   "Db.Northwind.CustomerDetails.Email": "이메일",
   "Db.Northwind.CustomerDetails.EntityPlural": "고객 상세 정보",
   "Db.Northwind.CustomerDetails.EntitySingular": "고객 상세 정보",

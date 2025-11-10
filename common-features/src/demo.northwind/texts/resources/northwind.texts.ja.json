@@ -42,7 +42,7 @@
   "Db.Northwind.CustomerDemographic.EntityPlural": "顧客の人口統計学",
   "Db.Northwind.CustomerDemographic.EntitySingular": "顧客デモグラフィー",
   "Db.Northwind.CustomerDemographic.ID": "ID",
-  "Db.Northwind.CustomerDetails.CustomerID": null,
+  "Db.Northwind.CustomerDetails.CustomerID": "顧客",
   "Db.Northwind.CustomerDetails.Email": "メール",
   "Db.Northwind.CustomerDetails.EntityPlural": "顧客詳細",
   "Db.Northwind.CustomerDetails.EntitySingular": "顧客詳細",

@@ -42,7 +42,7 @@
   "Db.Northwind.CustomerDemographic.EntityPlural": "ग्राहक जनसांख्यिकी",
   "Db.Northwind.CustomerDemographic.EntitySingular": "ग्राहक जनसांख्यिकी",
   "Db.Northwind.CustomerDemographic.ID": "आईडी",
-  "Db.Northwind.CustomerDetails.CustomerID": null,
+  "Db.Northwind.CustomerDetails.CustomerID": "ग्राहक",
   "Db.Northwind.CustomerDetails.Email": "ईमेल",
   "Db.Northwind.CustomerDetails.EntityPlural": "ग्राहक विवरण",
   "Db.Northwind.CustomerDetails.EntitySingular": "ग्राहक विवरण",

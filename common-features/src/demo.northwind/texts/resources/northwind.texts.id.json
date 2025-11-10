@@ -42,7 +42,7 @@
   "Db.Northwind.CustomerDemographic.EntityPlural": "Demografi Pelanggan",
   "Db.Northwind.CustomerDemographic.EntitySingular": "Demografi Pelanggan",
   "Db.Northwind.CustomerDemographic.ID": "ID",
-  "Db.Northwind.CustomerDetails.CustomerID": null,
+  "Db.Northwind.CustomerDetails.CustomerID": "Pelanggan",
   "Db.Northwind.CustomerDetails.Email": "Surel",
   "Db.Northwind.CustomerDetails.EntityPlural": "Rincian Pelanggan",
   "Db.Northwind.CustomerDetails.EntitySingular": "Rincian Pelanggan",

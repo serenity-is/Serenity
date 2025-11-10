@@ -42,7 +42,7 @@
   "Db.Northwind.CustomerDemographic.EntityPlural": "جمعیت‌شناسی مشتریان",
   "Db.Northwind.CustomerDemographic.EntitySingular": "جمع‌شناسی مشتریان",
   "Db.Northwind.CustomerDemographic.ID": "شناسه",
-  "Db.Northwind.CustomerDetails.CustomerID": null,
+  "Db.Northwind.CustomerDetails.CustomerID": "مشتری",
   "Db.Northwind.CustomerDetails.Email": "ایمیل",
   "Db.Northwind.CustomerDetails.EntityPlural": "جزئیات مشتری",
   "Db.Northwind.CustomerDetails.EntitySingular": "جزئیات مشتری",
