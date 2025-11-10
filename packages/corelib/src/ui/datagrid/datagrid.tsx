@@ -1,5 +1,5 @@
 import { bindThis } from "@serenity-is/domwise";
-import { AutoTooltips, Column, ColumnSort, FormatterContext, GridOptions, SleekGrid, type ArgsSort, type CellMouseEvent, type ISleekGrid } from "@serenity-is/sleekgrid";
+import { AutoTooltips, Column, ColumnSort, FormatterContext, type GridOptions, SleekGrid, type ArgsSort, type CellMouseEvent, type ISleekGrid } from "@serenity-is/sleekgrid";
 import { Authorization, Criteria, DataGridTexts, Fluent, ListResponse, cssEscape, debounce, getInstanceType, getTypeFullName, getjQuery, nsSerenity, tryGetText, type PropertyItem, type PropertyItemsData } from "../../base";
 import { PubSub } from "../../base/pubsub";
 import { LayoutTimer, ScriptData, getColumnsData, getColumnsDataAsync, setEquality } from "../../compat";
@@ -19,6 +19,7 @@ import { SlickHelper } from "../helpers/slickhelper";
 import { ToolButton, Toolbar } from "../widgets/toolbar";
 import { Widget, WidgetProps } from "../widgets/widget";
 import { getWidgetFrom, tryGetWidget } from "../widgets/widgetutils";
+import type { AutoRegisterArgs } from "./datagrid-autoregister";
 import { dataGridDefaults } from "./datagrid-defaults";
 import { getDefaultSortBy, getItemCssClass, propertyItemToQuickFilter, sleekGridOnSort } from "./datagrid-internal";
 import { GridPersistenceFlags, PersistedGridSettings, SettingStorage, getCurrentSettings, restoreSettingsFrom, type DataGridPersistenceEvent } from "./datagrid-persistence";
@@ -29,6 +30,7 @@ import { QuickFilterBar } from "./quickfilterbar";
 import { QuickSearchField } from "./quicksearchinput";
 import { SlickPager } from "./slickpager";
 
+export type { AutoRegisterArgs } from "./datagrid-autoregister";
 export { omitAllGridPersistenceFlags } from "./datagrid-persistence";
 export type { DataGridPersistenceEvent, GridPersistenceFlags, PersistedGridColumn, PersistedGridSettings, SettingStorage } from "./datagrid-persistence";
 
@@ -96,6 +98,9 @@ export class DataGrid<TItem, P = {}> extends Widget<P> implements IDataGrid, IRe
         this.syncOrAsyncThen(this.getPropertyItemsData, this.getPropertyItemsDataAsync, itemsData => {
             this.propertyItemsReady(itemsData);
         });
+    }
+
+    protected autoRegisteringPlugin(args: AutoRegisterArgs): void {
     }
 
     private layoutTimerCallback() {
@@ -1281,3 +1286,4 @@ export interface DataGridFilteringEvent<TItem = any> extends DataGridEvent {
 export interface DataGridProcessEvent<TItem> extends DataGridEvent {
     response: ListResponse<TItem>;
 }
+

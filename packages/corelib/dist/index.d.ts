@@ -5172,6 +5172,26 @@ export declare class FilterDisplayBar<P = {}> extends FilterWidgetBase<P> {
 	protected filterStoreChanged(): void;
 	static createToolButton(opt: Partial<ToolButtonProps>): ToolButton;
 }
+/**
+ * Arguments for auto register callback
+ */
+export interface AutoRegisterArgs<P = any, T = any> {
+	pluginType: {
+		new (props: P): T;
+	};
+	/** Set to true to cancel the auto register process for this grid / dataGrid */
+	cancel: boolean;
+	/** The data grid instance if available */
+	dataGrid?: DataGrid<any> | null;
+	/** The ISleekGrid instance */
+	sleekGrid?: ISleekGrid;
+	/**
+	 * Options that can be modified by the callback, which are passed to the plugin/mixin constructor.
+	 * Note that the options set here only applies to the auto registered instance and
+	 * not to any manually created instance.
+	 */
+	options: Partial<P>;
+}
 export interface QuickSearchField {
 	name: string;
 	title: string;
@@ -5415,6 +5435,7 @@ export declare class DataGrid<TItem, P = {}> extends Widget<P> implements IDataG
 	readonly onProcessData: PubSub<DataGridProcessEvent<TItem>>;
 	readonly onSubmitting: PubSub<DataGridSubmitEvent>;
 	constructor(props: WidgetProps<P>);
+	protected autoRegisteringPlugin(args: AutoRegisterArgs): void;
 	private layoutTimerCallback;
 	protected propertyItemsReady(itemsData: PropertyItemsData): void;
 	protected afterInit(): void;
