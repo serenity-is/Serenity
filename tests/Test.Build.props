@@ -41,8 +41,8 @@
       <CopyToPublishDirectory>PreserveNewest</CopyToPublishDirectory>
     </Content>
     <PackageReference Include="Microsoft.NET.Test.Sdk" Version="17.14.1" />
-    <PackageReference Include="System.IO.Abstractions.TestingHelpers" Version="22.0.15" />
-    <PackageReference Include="xunit.runner.visualstudio" Version="3.1.4">
+    <PackageReference Include="System.IO.Abstractions.TestingHelpers" Version="22.0.16" />
+    <PackageReference Include="xunit.runner.visualstudio" Version="3.1.5">
       <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
       <PrivateAssets>all</PrivateAssets>
     </PackageReference>
@@ -52,7 +52,7 @@
     </PackageReference>
   </ItemGroup>
   <ItemGroup Condition="'$(ReferenceSelenium)' != 'false'">
-    <PackageReference Include="Selenium.WebDriver" Version="4.35.0" />
+    <PackageReference Include="Selenium.WebDriver" Version="4.38.0" />
     <Using Include="OpenQA.Selenium" />
   </ItemGroup>
 </Project>
