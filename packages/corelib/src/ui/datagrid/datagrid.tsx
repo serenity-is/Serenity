@@ -19,7 +19,7 @@ import { SlickHelper } from "../helpers/slickhelper";
 import { ToolButton, Toolbar } from "../widgets/toolbar";
 import { Widget, WidgetProps } from "../widgets/widget";
 import { getWidgetFrom, tryGetWidget } from "../widgets/widgetutils";
-import type { AutoRegisterArgs } from "./datagrid-autoregister";
+import type { AutoRegisterArgs } from "./datagrid-autoregisterargs";
 import { dataGridDefaults } from "./datagrid-defaults";
 import { getDefaultSortBy, getItemCssClass, propertyItemToQuickFilter, sleekGridOnSort } from "./datagrid-internal";
 import { GridPersistenceFlags, PersistedGridSettings, SettingStorage, getCurrentSettings, restoreSettingsFrom, type DataGridPersistenceEvent } from "./datagrid-persistence";
@@ -30,7 +30,7 @@ import { QuickFilterBar } from "./quickfilterbar";
 import { QuickSearchField } from "./quicksearchinput";
 import { SlickPager } from "./slickpager";
 
-export type { AutoRegisterArgs } from "./datagrid-autoregister";
+export type { AutoRegisterArgs } from "./datagrid-autoregisterargs";
 export { omitAllGridPersistenceFlags } from "./datagrid-persistence";
 export type { DataGridPersistenceEvent, GridPersistenceFlags, PersistedGridColumn, PersistedGridSettings, SettingStorage } from "./datagrid-persistence";
 
