@@ -22,7 +22,7 @@ public static partial class Shared
 
                 CleanDirectory(PackageOutDir, true);
 
-                if (StartProcess("pnpm", "all", Src) != 0)
+                if (StartProcess("cmd", "/c pnpm all", Src) != 0)
                     ExitWithError("Error while pnpm all " + Src);
 
                 if (StartProcess("dotnet", $"restore \"{SolutionFile}\"", Src) != 0)
