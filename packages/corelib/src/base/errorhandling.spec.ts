@@ -3,7 +3,6 @@ import { type Mock } from "vitest";
 import { alertDialog, iframeDialog } from "./dialogs";
 import { ErrorHandling } from "./errorhandling";
 import { notifyError } from "./notify";
-import { H } from "vitest/dist/chunks/environment.d.cL3nLXbE.js";
 
 vi.mock(import("./dialogs"), async () => {
     return {
