@@ -11,6 +11,7 @@ vi.mock(import("@serenity-is/domwise"), async () => {
 
 beforeEach(() => {
     vi.restoreAllMocks();
+    vi.clearAllMocks();
 });
 
 describe("notifyDisposingNode", () => {

@@ -6,10 +6,10 @@ vi.mock("../base", () => ({
     Fluent: {
         trigger: vi.fn()
     },
-    Tooltip: vi.fn().mockImplementation(() => ({
-        show: vi.fn().mockReturnThis(),
-        delayedDispose: vi.fn().mockReturnThis()
-    })),
+    Tooltip: vi.fn().mockImplementation(function() {
+        this.show = vi.fn().mockReturnThis();
+        this.delayedDispose = vi.fn().mockReturnThis();
+    }),
     Validator: {
         getInstance: vi.fn(),
         getHighlightTarget: vi.fn()

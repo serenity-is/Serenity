@@ -3,14 +3,12 @@ import * as notify from "./notify";
 import { Uploader, UploaderBatch } from "./uploader";
 
 vi.mock("./dialogs", () => ({
-    __esModule: true,
     alertDialog: vi.fn(),
     iframeDialog: vi.fn()
 }));
 
 
 vi.mock("./notify", () => ({
-    __esModule: true,
     notifyError: vi.fn()
 }));
 
@@ -143,7 +141,7 @@ describe("Uploader.uploadBatch", () => {
             onerror: vi.fn(),
             onprogress: vi.fn()
         } as any;
-        window.XMLHttpRequest = vi.fn(() => xhrMock as any) as any;
+        window.XMLHttpRequest = vi.fn(function() { return xhrMock as any; }) as any;
     });
 
     afterEach(() => {
@@ -163,7 +161,7 @@ describe("Uploader.uploadBatch", () => {
     });
 
     it("should call batchSuccess on successful upload", async () => {
-        window.XMLHttpRequest = vi.fn(() => xhrMock as any) as any;
+        window.XMLHttpRequest = vi.fn().mockImplementation(function() { return xhrMock }) as any;
         const batchSuccess = vi.fn();
         const uploader = new Uploader({
             batchSuccess
@@ -249,7 +247,7 @@ describe("Uploader.uploadBatch exception handling", () => {
             onerror: vi.fn(),
             onprogress: vi.fn()
         } as any;
-        window.XMLHttpRequest = vi.fn(() => xhrMock as any) as any;
+        window.XMLHttpRequest = vi.fn(function() { return xhrMock }) as any;
     });
 
     afterEach(() => {
@@ -715,7 +713,7 @@ describe("Uploader allStart and allStop callbacks", () => {
             onerror: vi.fn(),
             onprogress: vi.fn()
         } as any;
-        window.XMLHttpRequest = vi.fn(() => xhrMock as any) as any;
+        window.XMLHttpRequest = vi.fn(function() { return xhrMock as any; }) as any;
     });
 
     afterEach(() => {

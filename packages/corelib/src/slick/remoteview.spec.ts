@@ -10,35 +10,35 @@ vi.mock("../base", async (importActual) => ({
 }));
 
 vi.mock("@serenity-is/sleekgrid", () => ({
-    EventEmitter: vi.fn().mockImplementation(() => ({
-        subscribe: vi.fn(),
-        unsubscribe: vi.fn(),
-        notify: vi.fn()
-    })),
+    EventEmitter: vi.fn().mockImplementation(function() {
+        this.subscribe = vi.fn();
+        this.unsubscribe = vi.fn();
+        this.notify = vi.fn();
+    }),
     EventData: vi.fn(),
-    GroupItemMetadataProvider: vi.fn().mockImplementation(() => ({
-        getGroupRowMetadata: vi.fn(),
-        getTotalsRowMetadata: vi.fn()
-    })),
-    Group: vi.fn().mockImplementation(() => ({
-        value: null,
-        level: 0,
-        count: 0,
-        rows: [],
-        groups: [],
-        collapsed: false,
-        totals: null
-    })),
-    GroupTotals: vi.fn().mockImplementation(() => ({
-        __groupTotals: true,
-        initialized: false,
-        group: null,
-        sum: {},
-        avg: {},
-        min: {},
-        max: {},
-        count: 0
-    })),
+    GroupItemMetadataProvider: vi.fn().mockImplementation(function() {
+        this.getGroupRowMetadata = vi.fn(),
+        this.getTotalsRowMetadata = vi.fn()
+    }),
+    Group: vi.fn().mockImplementation(function() {
+        this.value = null;
+        this.level = 0;
+        this.count = 0;
+        this.rows = [];
+        this.groups = [];
+        this.collapsed = false;
+        this.totals = null;
+    }),
+    GroupTotals: vi.fn().mockImplementation(function() {
+        this.__groupTotals = true;
+        this.initialized = false;
+        this.group = null;
+        this.sum = {};
+        this.avg = {};
+        this.min = {};
+        this.max = {};
+        this.count = 0;
+    }),
     gridDefaults: {}
 }));
 

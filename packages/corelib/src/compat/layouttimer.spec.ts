@@ -2,14 +2,16 @@
 
 let mockElement: HTMLElement;
 
+beforeAll(() => {
+    vi.useFakeTimers();
+});
+
 beforeEach(() => {
     // Mock DOM element
     mockElement = {
         offsetWidth: 100,
         offsetHeight: 100
     } as HTMLElement;
-
-    vi.useFakeTimers();
 });
 
 afterEach(() => {

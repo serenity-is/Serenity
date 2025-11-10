@@ -47,6 +47,7 @@ beforeEach(() => {
 
 afterEach(() => {
     vi.restoreAllMocks();
+    vi.clearAllMocks();
     (base.isSameOrigin as any).mockReturnValue(true);
     (base.getCookie as any).mockReturnValue(undefined);
 });
