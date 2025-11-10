@@ -1,6 +1,6 @@
 ﻿import { Column, initColumnProps, titleize } from "../../src/core/column";
 
-describe("initializeColumns", () => {
+describe("initColumnProps", () => {
     it('should set defaults of the columns', () => {
         const column: Column = {};
 
