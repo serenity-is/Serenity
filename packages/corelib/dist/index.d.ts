@@ -2638,14 +2638,16 @@ export declare class Tooltip {
 	hide(): Tooltip;
 	show(): Tooltip;
 }
-/** A procedure that takes no arguments and returns void */
-export type Action = () => void;
-/** A function that takes no arguments and returns a value of type T */
-export type Func<T> = () => T;
-/** A predicate that takes an argument of type T and returns a boolean */
-export type Predicate<T> = (arg: T) => boolean;
-/** A procedure that takes an argument of type T and returns void */
-export type Proc<T> = (arg: T) => void;
+declare global {
+	/** A procedure that takes no arguments and returns void */
+	type Action = () => void;
+	/** A function that takes no arguments and returns a value of type T */
+	type Func<T> = () => T;
+	/** A predicate that takes an argument of type T and returns a boolean */
+	type Predicate<T> = (arg: T) => boolean;
+	/** A procedure that takes an argument of type T and returns void */
+	type Proc<T> = (arg: T) => void;
+}
 /** Inspired from https://github.com/silverwind/uppie and https://github.com/GoogleChromeLabs/file-drop/blob/master/lib/filedrop.ts */
 export interface UploaderOptions {
 	/** Accept. If not specified, read from the passed input  */
@@ -5200,6 +5202,7 @@ export interface AutoRegisterArgs<P = any, T = any> {
 	 */
 	options: Partial<P>;
 }
+export type AutoRegisterHandler<P = any, T = any> = (args: AutoRegisterArgs<P, T>) => void;
 export interface QuickSearchField {
 	name: string;
 	title: string;

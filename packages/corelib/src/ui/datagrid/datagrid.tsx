@@ -30,7 +30,7 @@ import { QuickFilterBar } from "./quickfilterbar";
 import { QuickSearchField } from "./quicksearchinput";
 import { SlickPager } from "./slickpager";
 
-export type { AutoRegisterArgs } from "./datagrid-autoregisterargs";
+export type { AutoRegisterArgs, AutoRegisterHandler } from "./datagrid-autoregisterargs";
 export { omitAllGridPersistenceFlags } from "./datagrid-persistence";
 export type { DataGridPersistenceEvent, GridPersistenceFlags, PersistedGridColumn, PersistedGridSettings, SettingStorage } from "./datagrid-persistence";
 

@@ -20,3 +20,4 @@ export interface AutoRegisterArgs<P = any, T = any> {
     options: Partial<P>;
 }
 
+export type AutoRegisterHandler<P = any, T = any> = (args: AutoRegisterArgs<P, T>) => void;
