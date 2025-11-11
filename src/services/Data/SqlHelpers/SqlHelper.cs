@@ -71,7 +71,7 @@ public static class SqlHelper
         }
         catch (Exception ex)
         {
-            logger.LogDebug(ex, "Error logging command: {");
+            logger.LogDebug(ex, "Error logging command");
         }
     }
 
