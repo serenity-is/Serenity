@@ -1,4 +1,4 @@
-import { ScriptData, scriptDataHooks } from "@serenity-is/corelib";
+import { Lookup, ScriptData, scriptDataHooks, setScriptData, type LookupOptions } from "@serenity-is/corelib";
 import { inject, Mock, vi } from "vitest";
 
 let orgFetchScriptData: any;
@@ -27,6 +27,17 @@ export function unmockDynamicData() {
         return;
 
     scriptDataHooks.fetchScriptData = orgFetchScriptData == null ? void 0 : orgFetchScriptData;
+}
+
+export function mockRowLookup<TRow = any>(rowType: { lookupKey: string, idProperty: string, nameProperty?: string }, data?: TRow[]) {
+    setScriptData("Lookup." + rowType.lookupKey, new Lookup<TRow>({
+        idField: rowType.idProperty,
+        textField: rowType.nameProperty
+    }, data || []));
+}
+
+export function mockLookup<TItem = any>(lookupKey: string, data?: TItem[], options: LookupOptions<TItem> = {}) {
+    setScriptData("Lookup." + lookupKey, new Lookup(options || {}, data || []));
 }
 
 import { resolveServiceUrl } from "@serenity-is/corelib";
