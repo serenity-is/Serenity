@@ -5,7 +5,7 @@
     <OutputPath>$(ArtifactsPath)\bin\$(MSBuildProjectName)</OutputPath>
     <GenerateDocumentationFile>false</GenerateDocumentationFile>    
     <RootNamespace>Serenity.CodeGenerator</RootNamespace>
-    <TargetFramework>net8.0</TargetFramework>
+    <TargetFramework>net10.0</TargetFramework>
     <TreatWarningsAsErrors>true</TreatWarningsAsErrors>
     <PackAsTool>true</PackAsTool>
     <PackageId>sergen</PackageId>
@@ -22,8 +22,8 @@
   <ItemGroup>
     <PackageReference Include="Scriban" Version="6.5.0" />
     <PackageReference Include="Mono.Cecil" Version="0.11.6" />
-    <PackageReference Include="Microsoft.Extensions.DependencyModel" Version="9.0.10" />
-    <PackageReference Include="Microsoft.Extensions.FileSystemGlobbing" Version="9.0.10" />
+    <PackageReference Include="Microsoft.Extensions.DependencyModel" Version="10.0.0" />
+    <PackageReference Include="Microsoft.Extensions.FileSystemGlobbing" Version="10.0.0" />
     <PackageReference Include="Spectre.Console" Version="0.53.0" />
   </ItemGroup>
   <Target Name="CopySergenToArtifacts" AfterTargets="Pack">

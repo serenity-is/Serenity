@@ -14,14 +14,14 @@ internal static class TarFileReader
         long size;
         while (tarStream.Position < tarStream.Length)
         {
-            tarStream.Read(buffer, 0, 100);
+            tarStream.ReadExactly(buffer, 0, 100);
             name = Encoding.ASCII.GetString(buffer, 0, 100).TrimEnd('\0').Trim();
 
             if (string.IsNullOrEmpty(name))
                 break;
 
             tarStream.Seek(24, SeekOrigin.Current);
-            tarStream.Read(buffer, 0, 12);
+            tarStream.ReadExactly(buffer, 0, 12);
             size = Convert.ToInt64(Encoding.ASCII.GetString(buffer, 0, 12).TrimEnd('\0').Trim(), 8);
             tarStream.Seek(376, SeekOrigin.Current);
 

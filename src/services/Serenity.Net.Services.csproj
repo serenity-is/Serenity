@@ -1,14 +1,14 @@
 <Project Sdk="Microsoft.NET.Sdk">
   <PropertyGroup>
     <AssemblyName>Serenity.Net.Services</AssemblyName>
-    <TargetFramework>net8.0</TargetFramework>
+    <TargetFramework>net10.0</TargetFramework>
     <Title>Serenity Platform - Services Library</Title>
     <Description>Contains classes for CRUD service / repository implementations...</Description>
   </PropertyGroup>
   <ItemGroup>
     <ProjectReference Include="..\core\Serenity.Net.Core.csproj" />
     <PackageReference Include="Dapper" Version="2.1.66" />
-    <PackageReference Include="Microsoft.Extensions.FileProviders.Abstractions" Version="9.0.10" />
+    <PackageReference Include="Microsoft.Extensions.FileProviders.Abstractions" Version="10.0.0" />
     <PackageReference Include="SixLabors.ImageSharp" Version="2.1.12" />
   </ItemGroup>
 </Project>

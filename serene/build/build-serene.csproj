@@ -4,7 +4,7 @@
     <OutputType>Exe</OutputType>
     <AppendTargetFrameworkToOutputPath>false</AppendTargetFrameworkToOutputPath>
     <OutputPath>bin</OutputPath>
-    <TargetFramework>net8.0</TargetFramework>
+    <TargetFramework>net10.0</TargetFramework>
     <SharedSrc>..\..\common-features\build\shared</SharedSrc>
     <DefaultItemExcludes>$(DefaultItemExcludes);artifacts\**</DefaultItemExcludes>
     <DefineConstants>$(DefineConstants);IsTemplateBuild</DefineConstants>
@@ -12,7 +12,7 @@
 
   <ItemGroup>
     <PackageReference Include="Newtonsoft.Json" Version="13.0.4" />
-    <PackageReference Include="NuGet.Protocol" Version="6.7.0" />
+    <PackageReference Include="NuGet.Protocol" Version="6.14.0" />
     <PackageReference Include="YamlDotNet" Version="16.3.0" />
   </ItemGroup>
 

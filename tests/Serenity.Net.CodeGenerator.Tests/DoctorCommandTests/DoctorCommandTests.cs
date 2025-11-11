@@ -64,9 +64,9 @@ public partial class DoctorCommandTests
 
         public ProjectFileInfo.ProjectProperties MsBuildProperties { get; set; } = new()
         {
-            TargetFramework = "net8.0",
+            TargetFramework = "net10.0",
             EsmAssetBasePath = null,
-            OutDir = @"bin\Debug\net8.0\"
+            OutDir = @"bin\Debug\net10.0\"
         };
 
         public Dictionary<string, string> NpmDependencies { get; set; } = new()
