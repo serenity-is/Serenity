@@ -740,6 +740,11 @@ export namespace DialogTexts {
     export declare const OkButton: string;
 
     /**
+     * Title for the prompt dialog.
+     */
+    export declare const PromptTitle: string;
+
+    /**
      * Hint for restoring dialogs.
      */
     export declare const RestoreHint: string;
@@ -768,6 +773,7 @@ export namespace DialogTexts {
         MaximizeHint: 'Maximize',
         NoButton: 'No',
         OkButton: 'OK',
+        PromptTitle: 'Prompt',
         RestoreHint: 'Restore',
         SuccessTitle: 'Success',
         WarningTitle: 'Warning',

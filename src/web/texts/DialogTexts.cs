@@ -12,6 +12,7 @@ public static class DialogTexts
     public static readonly LocalText AlertTitle = "Alert";
     public static readonly LocalText ConfirmationTitle = "Confirm";
     public static readonly LocalText InformationTitle = "Information";
+    public static readonly LocalText Prompt = "Prompt";
     public static readonly LocalText SuccessTitle = "Success";
     public static readonly LocalText WarningTitle = "Warning";
 }

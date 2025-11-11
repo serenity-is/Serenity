@@ -1,7 +1,7 @@
 import { formatNumber, nsSerenity, parseInteger } from "../../base";
 import { isTrimmedEmpty } from "../../compat";
 import { IDoubleValue } from "../../interfaces";
-import { AutoNumeric } from "./autonumeric";
+import { AutoNumeric, type AutoNumericOptions } from "./autonumeric";
 import { DecimalEditor } from "./decimaleditor";
 import { EditorProps, EditorWidget } from "./editorwidget";
 
@@ -33,12 +33,18 @@ export class IntegerEditor<P extends IntegerEditorOptions = IntegerEditorOptions
         AutoNumeric.init(this.domNode, this.getAutoNumericOptions());
     }
 
-    protected getAutoNumericOptions(): any {
-        var numericOptions = Object.assign({}, DecimalEditor.defaultAutoNumericOptions(), {
+    protected getAutoNumericOptions(): AutoNumericOptions {
+        var numericOptions: AutoNumericOptions = Object.assign({}, DecimalEditor.defaultAutoNumericOptions(), {
             vMin: this.options.minValue ?? (this.options.allowNegatives ? (this.options.maxValue != null ? ("-" + this.options.maxValue) : '-2147483647') : '0'),
             vMax: this.options.maxValue ?? 2147483647,
             aSep: null
         });
+
+        for (const key of Object.keys(this.options)) {
+            if (AutoNumeric.allowedSettingKeys.has(key)) {
+                (numericOptions as any)[key] = (this.options as any)[key];
+            }
+        }
 
         return numericOptions;
     }

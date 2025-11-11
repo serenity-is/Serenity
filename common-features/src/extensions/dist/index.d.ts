@@ -1,4 +1,4 @@
-import { BaseDialog, DataGrid, DeleteResponse, DialogType, Dictionary, EditorProps, EmailAddressEditor, EntityDialog, EntityGrid, Formatter, IGetEditValue, ISetEditValue, IconClassName, ListRequest, ListResponse, PasswordEditor, PrefixedContext, PropertyDialog, PropertyItem, RenderableContent, SaveInitiator, SaveResponse, ServiceError, ServiceOptions, ServiceRequest, ServiceResponse, SettingStorage, ToolButton, Widget, WidgetProps } from '@serenity-is/corelib';
+import { BaseDialog, DataGrid, DeleteResponse, DialogOptions, DialogType, Dictionary, EditorProps, EmailAddressEditor, EntityDialog, EntityGrid, Formatter, IGetEditValue, ISetEditValue, IconClassName, ListRequest, ListResponse, PasswordEditor, PrefixedContext, PropertyDialog, PropertyItem, RenderableContent, SaveInitiator, SaveResponse, ServiceError, ServiceOptions, ServiceRequest, ServiceResponse, SettingStorage, ToolButton, Widget, WidgetProps } from '@serenity-is/corelib';
 import { FormatterContext, FormatterResult, GridOptions } from '@serenity-is/sleekgrid';
 
 export interface ChangePasswordForm {
@@ -698,15 +698,19 @@ export interface PromptDialogOptions {
 	editorOptions?: any;
 	title?: string;
 	message?: RenderableContent;
+	closeOnEscape?: boolean;
 	/** @deprecated, set message as HTML element */
 	isHtml?: boolean;
 	value?: any;
 	required?: boolean;
+	submitOnEnter?: boolean;
 	validateValue: (v: any) => boolean;
 }
 export declare class PromptDialog<P extends PromptDialogOptions = PromptDialogOptions> extends PropertyDialog<any, P> {
 	static [Symbol.typeInfo]: import("@serenity-is/corelib").ClassTypeInfo<"Serenity.Extensions.">;
+	static readonly defaultOptions: Partial<PromptDialogOptions>;
 	constructor(props: WidgetProps<P>);
+	protected getDialogOptions(): DialogOptions;
 	protected getDialogButtons(): import("@serenity-is/corelib").DialogButton[];
 	protected loadInitialEntity(): void;
 	protected getPropertyItems(): {
@@ -715,6 +719,9 @@ export declare class PromptDialog<P extends PromptDialogOptions = PromptDialogOp
 		required: boolean;
 		editorParams: any;
 	}[];
+	getEditor<T extends Widget>(widgetType: {
+		new (props?: any): T;
+	}): T;
 	get value(): any;
 	set value(v: any);
 	static prompt(title: string, message: string, value: string, validateValue: (string: any) => boolean): void;

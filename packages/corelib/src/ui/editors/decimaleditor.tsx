@@ -33,8 +33,8 @@ export class DecimalEditor<P extends DecimalEditorOptions = DecimalEditorOptions
         AutoNumeric.init(this.domNode, this.getAutoNumericOptions());
     }
 
-    protected getAutoNumericOptions(): any {
-        var numericOptions = Object.assign({}, DecimalEditor.defaultAutoNumericOptions(), {
+    protected getAutoNumericOptions(): AutoNumericOptions {
+        var numericOptions: AutoNumericOptions = Object.assign({}, DecimalEditor.defaultAutoNumericOptions(), {
             vMin: this.options.minValue ?? (this.options.allowNegatives ? (this.options.maxValue != null ? ("-" + this.options.maxValue) : '-999999999999.99') : '0.00'),
             vMax: this.options.maxValue ?? '999999999999.99'
         });
@@ -45,6 +45,12 @@ export class DecimalEditor<P extends DecimalEditorOptions = DecimalEditorOptions
 
         if (this.options.padDecimals != null) {
             numericOptions.aPad = this.options.padDecimals;
+        }
+
+        for (const key of Object.keys(this.options)) {
+            if (AutoNumeric.allowedSettingKeys.has(key)) {
+                (numericOptions as any)[key] = (this.options as any)[key];
+            }
         }
 
         return numericOptions;
@@ -95,5 +101,5 @@ export class DecimalEditor<P extends DecimalEditorOptions = DecimalEditorOptions
             aSep: ((Culture.decimalSeparator === '.') ? ',' : '.'),
             aPad: true
         };
-    }
+    }   
 }

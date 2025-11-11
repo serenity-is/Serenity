@@ -1,4 +1,4 @@
-import { PropertyDialog, Widget, WidgetProps, cancelDialogButton, getTypeFullName, okDialogButton, sanitizeHtml, toggleClass, type RenderableContent } from "@serenity-is/corelib";
+import { Dialog, DialogTexts, PropertyDialog, Widget, WidgetProps, cancelDialogButton, getTypeFullName, getWidgetFrom, okDialogButton, sanitizeHtml, toggleClass, type DialogOptions, type RenderableContent } from "@serenity-is/corelib";
 import { nsExtensions } from "../ServerTypes/Namespaces";
 
 export interface PromptDialogOptions {
@@ -7,18 +7,29 @@ export interface PromptDialogOptions {
     editorOptions?: any;
     title?: string;
     message?: RenderableContent;
+    closeOnEscape?: boolean;
     /** @deprecated, set message as HTML element */
     isHtml?: boolean;
     value?: any;
     required?: boolean;
+    submitOnEnter?: boolean;
     validateValue: (v: any) => boolean;
 }
 
 export class PromptDialog<P extends PromptDialogOptions = PromptDialogOptions> extends PropertyDialog<any, P> {
     static override[Symbol.typeInfo] = this.registerClass(nsExtensions);
 
+    static readonly defaultOptions: Partial<PromptDialogOptions> = {
+        required: true,
+        submitOnEnter: true,
+        closeOnEscape: true,
+    };    
+
     constructor(props: WidgetProps<P>) {
-        super(props);
+        super({ 
+            ...PromptDialog.defaultOptions, 
+            ...(props || {} as any) 
+        });
 
         if (this.options.cssClass)
             toggleClass(this.domNode, this.options.cssClass);
@@ -34,8 +45,22 @@ export class PromptDialog<P extends PromptDialogOptions = PromptDialogOptions> e
                 msg.append(this.options.message ?? "");
         }
 
-        this.dialogTitle = this.options.title || "Prompt";
+        this.dialogTitle = this.options.title ?? DialogTexts.PromptTitle;
+        if (this.options.submitOnEnter ?? true) {
+            this.byId("Value").on("keydown", (e) => {
+                if (e.key === "Enter") {
+                    e.preventDefault();
+                    this.dialog?.getFooterNode()?.querySelector('button')?.click();
+                }
+            });
+        }
+    }
 
+    protected override getDialogOptions(): DialogOptions {
+        return {
+            ...super.getDialogOptions(),
+            closeOnEscape: this.options.closeOnEscape,
+        };
     }
 
     protected override getDialogButtons() {
@@ -65,10 +90,14 @@ export class PromptDialog<P extends PromptDialogOptions = PromptDialogOptions> e
             {
                 name: "Value",
                 editorType: typeof this.options.editorType === "function" ? getTypeFullName(this.options.editorType) : this.options.editorType || "String",
-                required: this.options.required ?? true,
+                required: !!this.options.required,
                 editorParams: this.options.editorOptions
             }
         ]
+    }
+
+    public getEditor<T extends Widget>(widgetType: { new(props?: any): T }): T {
+        return getWidgetFrom(this.byId("Value"), widgetType);
     }
 
     public get value() {

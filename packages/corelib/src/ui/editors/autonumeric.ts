@@ -1277,5 +1277,10 @@ export class AutoNumeric {
     static hasInstance(input: HTMLInputElement) {
         return typeof (input as any)?.autoNumeric === "object";
     }
+
+    static readonly allowedSettingKeys = new Set<string>([
+        'aNum', 'aSep', 'dGroup', 'aDec', 'altDec', 'aSign', 'pSign', 'vMax', 'vMin',
+        'mDec', 'mRound', 'aPad', 'nBracket', 'wEmpty', 'lZero', 'aForm', 'tagList'
+    ]);
 }
 

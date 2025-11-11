@@ -747,6 +747,10 @@ export declare namespace DialogTexts {
 	 */
 	const OkButton: string;
 	/**
+	 * Title for the prompt dialog.
+	 */
+	const PromptTitle: string;
+	/**
 	 * Hint for restoring dialogs.
 	 */
 	const RestoreHint: string;
@@ -6070,6 +6074,7 @@ export declare class AutoNumeric {
 	/** returns the settings object for those who need to look under the hood */
 	static getSettings(input: HTMLInputElement): AutoNumericOptions;
 	static hasInstance(input: HTMLInputElement): boolean;
+	static readonly allowedSettingKeys: Set<string>;
 }
 export declare class BooleanEditor<P = {}> extends EditorWidget<P> {
 	static [Symbol.typeInfo]: EditorTypeInfo<"Serenity.">;
@@ -6208,7 +6213,7 @@ export declare class DecimalEditor<P extends DecimalEditorOptions = DecimalEdito
 	constructor(props: EditorProps<P>);
 	destroy(): void;
 	protected initAutoNumeric(): void;
-	protected getAutoNumericOptions(): any;
+	protected getAutoNumericOptions(): AutoNumericOptions;
 	get_value(): number;
 	get value(): number;
 	set_value(value: number): void;
@@ -6328,7 +6333,7 @@ export declare class IntegerEditor<P extends IntegerEditorOptions = IntegerEdito
 	constructor(props: EditorProps<P>);
 	destroy(): void;
 	protected initAutoNumeric(): void;
-	protected getAutoNumericOptions(): any;
+	protected getAutoNumericOptions(): AutoNumericOptions;
 	get_value(): number;
 	get value(): number;
 	set_value(value: number): void;
