@@ -1,3 +1,14 @@
+## 9.1.1 (2025-11-11)
+
+### Features
+- Add submitOnEnter and closeOnEscape options to PromptDialog (defaults to true, can be modified by setting PromptDialog.defaultOptions). 
+- Add PromptDialog.getEditor method to access the editor. 
+- Pass known options from editor options to the autonumeric instance from integer/decimal editors.
+- Improve login page 2FA code entering UI experience (StartSharp).
+
+## Bugfixes
+- Add `[hidden] *` to validation ignore default list, just like `.hidden *`.
+
 ## 9.1.0 (2025-11-10)
 
 ### Features
