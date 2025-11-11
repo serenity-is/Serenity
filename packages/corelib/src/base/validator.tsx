@@ -275,7 +275,7 @@ export class Validator {
         errorElement: "label",
         focusInvalid: true,
         onsubmit: true,
-        ignore: '[hidden], [style*="display:none"], [style*="display: none"] *, .hidden *, input[type=hidden], .no-validate',
+        ignore: '[hidden], [hidden] *, [style*="display:none"], [style*="display: none"] *, .hidden *, input[type=hidden], .no-validate',
         normalizer: function (value: string) {
             return typeof value === "string" ? value.trim() : value;
         },
