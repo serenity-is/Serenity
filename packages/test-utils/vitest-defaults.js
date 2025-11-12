@@ -49,7 +49,7 @@ export default (opt) => {
 }
 
 function tryProject(root, name) {
-    const target = "net8.0";
+    const target = "net10.0";
     const folder = `${root}/src/${name}.Web`;
     const csproj = `${folder}/${name}.Web.csproj`;
     if (!existsSync(csproj))

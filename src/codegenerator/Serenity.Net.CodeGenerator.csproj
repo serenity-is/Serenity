@@ -5,7 +5,7 @@
     <OutputPath>$(ArtifactsPath)\bin\$(MSBuildProjectName)</OutputPath>
     <GenerateDocumentationFile>false</GenerateDocumentationFile>    
     <RootNamespace>Serenity.CodeGenerator</RootNamespace>
-    <TargetFramework>net8.0</TargetFramework>
+    <TargetFramework>net10.0</TargetFramework>
     <TreatWarningsAsErrors>true</TreatWarningsAsErrors>
     <PackAsTool>true</PackAsTool>
     <PackageId>sergen</PackageId>

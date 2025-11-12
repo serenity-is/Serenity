@@ -1,4 +1,4 @@
-﻿using Microsoft.AspNetCore.Http;
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Abstractions;
 using Microsoft.AspNetCore.Mvc.Infrastructure;
@@ -32,12 +32,19 @@ public static class TemplateHelper
         ArgumentNullException.ThrowIfNull(serviceProvider);
 
         var viewEngine = serviceProvider.GetRequiredService<IRazorViewEngine>();
-        var actionContextAccessor = serviceProvider.GetService<IActionContextAccessor>();
+        var httpContextAccessor = serviceProvider.GetService<IHttpContextAccessor>();
         var tempDataProvider = serviceProvider.GetRequiredService<ITempDataProvider>();
 
         ViewEngineResult viewEngineResult;
-        if (actionContextAccessor?.ActionContext is ActionContext actionContext)
+        ActionContext actionContext;
+        if (httpContextAccessor?.HttpContext?.GetEndpoint() is Endpoint endpoint &&
+            endpoint.Metadata.GetMetadata<ActionDescriptor>() is ActionDescriptor actionDescriptor)
+        {
+            actionContext = new ActionContext(httpContextAccessor.HttpContext,
+                httpContextAccessor.HttpContext.GetRouteData() ?? new RouteData(),
+                actionDescriptor);
             viewEngineResult = viewEngine.FindView(actionContext, viewName, false);
+        }
         else
         {
             viewEngineResult = viewEngine.GetView(executingFilePath: viewName, viewPath: viewName, isMainPage: false);

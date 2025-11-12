@@ -10,7 +10,7 @@
     <RestoreNodeTypes>false</RestoreNodeTypes>
     <SerenitySrc Condition="'$(SerenitySrc)' == ''">$(MSBuildThisFileDirectory)..\..\src\</SerenitySrc>
     <StaticWebAssetBasePath>/$(MSBuildProjectName)</StaticWebAssetBasePath>
-    <TargetFramework>net8.0</TargetFramework>
+    <TargetFramework>net10.0</TargetFramework>
     <TypeScriptCompileBlocked>true</TypeScriptCompileBlocked>
     <UseArtifactsOutput>true</UseArtifactsOutput>
   </PropertyGroup>

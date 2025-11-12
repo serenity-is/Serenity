@@ -5,7 +5,7 @@
     <ArtifactsPath>$(MSBuildThisFileDirectory)..\..\artifacts</ArtifactsPath>
     <SerenityVersion Condition="'$(SerenityVersion)' == ''">9.1.1</SerenityVersion>
     <SergenTransform>all</SergenTransform>
-    <TargetFramework>net8.0</TargetFramework>
+    <TargetFramework>net10.0</TargetFramework>
     <DotnetToolManifestFile>$(MSBuildProjectDirectory)\..\.config\dotnet-tools.json</DotnetToolManifestFile>
     <DotnetToolRestoreStamp>$(MSBuildProjectDirectory)\..\.config\.restore-stamp</DotnetToolRestoreStamp>
   </PropertyGroup>
