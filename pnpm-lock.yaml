@@ -130,7 +130,11 @@ importers:
 
   packages/domwise: {}
 
-  packages/sleekgrid: {}
+  packages/sleekgrid:
+    devDependencies:
+      '@serenity-is/domwise':
+        specifier: workspace:*
+        version: link:../domwise
 
   packages/test-utils:
     devDependencies:
