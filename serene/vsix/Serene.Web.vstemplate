@@ -123,7 +123,7 @@
             <ProjectItem ReplaceParameters="true" TargetFileName="UserDialogTexts.cs">UserDialogTexts.cs</ProjectItem>
             <ProjectItem ReplaceParameters="true" TargetFileName="UserEndpoint.cs">UserEndpoint.cs</ProjectItem>
             <ProjectItem ReplaceParameters="true" TargetFileName="UserForm.cs">UserForm.cs</ProjectItem>
-            <ProjectItem ReplaceParameters="true" TargetFileName="UserGrid.ts">UserGrid.ts</ProjectItem>
+            <ProjectItem ReplaceParameters="true" TargetFileName="UserGrid.tsx">UserGrid.tsx</ProjectItem>
             <ProjectItem ReplaceParameters="true" TargetFileName="UserHelper.cs">UserHelper.cs</ProjectItem>
             <ProjectItem ReplaceParameters="true" TargetFileName="UserListRequest.cs">UserListRequest.cs</ProjectItem>
             <ProjectItem ReplaceParameters="true" TargetFileName="UserPage.cs">UserPage.cs</ProjectItem>
@@ -195,7 +195,6 @@
           <ProjectItem ReplaceParameters="true" TargetFileName="ScriptInit.ts">ScriptInit.ts</ProjectItem>
         </Folder>
         <Folder Name="Membership" TargetFolderName="Membership">
-          <ProjectItem ReplaceParameters="true" TargetFileName="_ViewStart.cshtml">_ViewStart.cshtml</ProjectItem>
           <Folder Name="Account" TargetFolderName="Account">
             <ProjectItem ReplaceParameters="true" TargetFileName="AccountPage.cs">AccountPage.cs</ProjectItem>
             <ProjectItem ReplaceParameters="true" TargetFileName="AccountPanelTitle.tsx">AccountPanelTitle.tsx</ProjectItem>
@@ -320,12 +319,12 @@
         </Folder>
         <Folder Name="esm" TargetFolderName="esm">
           <Folder Name="_chunks" TargetFolderName="_chunks">
+            <ProjectItem ReplaceParameters="true" TargetFileName="chunk-4FLWFU44.js">chunk-4FLWFU44.js</ProjectItem>
             <ProjectItem ReplaceParameters="true" TargetFileName="chunk-FZ27HJ7K.js">chunk-FZ27HJ7K.js</ProjectItem>
-            <ProjectItem ReplaceParameters="true" TargetFileName="chunk-HGWGC2OS.js">chunk-HGWGC2OS.js</ProjectItem>
-            <ProjectItem ReplaceParameters="true" TargetFileName="chunk-RJS7ONNS.js">chunk-RJS7ONNS.js</ProjectItem>
+            <ProjectItem ReplaceParameters="true" TargetFileName="chunk-IWJESYK3.js">chunk-IWJESYK3.js</ProjectItem>
+            <ProjectItem ReplaceParameters="true" TargetFileName="chunk-LVKVMUC3.js">chunk-LVKVMUC3.js</ProjectItem>
             <ProjectItem ReplaceParameters="true" TargetFileName="chunk-RKUHNEJF.js">chunk-RKUHNEJF.js</ProjectItem>
             <ProjectItem ReplaceParameters="true" TargetFileName="chunk-TA7MABRS.js">chunk-TA7MABRS.js</ProjectItem>
-            <ProjectItem ReplaceParameters="true" TargetFileName="chunk-UWZX6RIR.js">chunk-UWZX6RIR.js</ProjectItem>
           </Folder>
           <Folder Name="Modules" TargetFolderName="Modules">
             <Folder Name="Administration" TargetFolderName="Administration">
