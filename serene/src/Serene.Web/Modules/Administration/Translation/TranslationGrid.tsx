@@ -1,4 +1,4 @@
-import { confirmDialog, EntityGrid, Fluent, GridUtils, isEmptyOrNull, isTrimmedEmpty, LookupEditor, LookupEditorOptions, notifySuccess, outerHtml, stripDiacritics, ToolButton, trimToEmpty, trimToNull, Widget } from "@serenity-is/corelib";
+import { confirmDialog, EntityGrid, Fluent, GridUtils, isEmptyOrNull, isTrimmedEmpty, LookupEditor, LookupEditorOptions, notifySuccess, stripDiacritics, ToolButton, trimToEmpty, trimToNull, Widget } from "@serenity-is/corelib";
 import { TranslationItem, TranslationTexts } from "@serenity-is/extensions";
 import { Column } from "@serenity-is/sleekgrid";
 import { TranslationService } from "../../ServerTypes/Administration";
@@ -22,13 +22,13 @@ export class TranslationGrid extends EntityGrid<TranslationItem, any> {
 
         this.element.on('keyup.' + this.uniqueName + ' change.' + this.uniqueName,
             'input.custom-text', e => {
-            var value = trimToNull(Fluent(e.target).val());
-            if (value === '') {
-                value = null;
-            }
-            this.view.getItemById(Fluent(e.target).data('key')).CustomText = value;
-            this.hasChanges = true;
-        });
+                var value = trimToNull(Fluent(e.target).val());
+                if (value === '') {
+                    value = null;
+                }
+                this.view.getItemById(Fluent(e.target).data('key')).CustomText = value;
+                this.hasChanges = true;
+            });
     }
 
     protected override onClick(e: MouseEvent, row: number, cell: number): any {
@@ -95,11 +95,7 @@ export class TranslationGrid extends EntityGrid<TranslationItem, any> {
             name: TranslationTexts.SourceText,
             width: 300,
             sortable: false,
-            format: ctx => {
-                return outerHtml(Fluent('a')
-                    .addClass('source-text')
-                    .text(ctx.value || ''));
-            }
+            format: ctx => <a class="source-text">{ctx.value ?? ''}</a>
         });
 
         columns.push({
@@ -107,12 +103,7 @@ export class TranslationGrid extends EntityGrid<TranslationItem, any> {
             name: TranslationTexts.CustomText,
             width: 300,
             sortable: false,
-            format: ctx => outerHtml(Fluent('input')
-                .addClass('custom-text')
-                .attr('value', ctx.value)
-                .attr('type', 'text')
-                .attr('placeholder', ctx.item.TargetText)
-                .attr('data-key', ctx.item.Key))
+            format: ctx => <input class="custom-text" value={ctx.value ?? ''} type="text" placeholder={ctx.item.TargetText} data-key={ctx.item.Key} />
         });
 
         return columns;
