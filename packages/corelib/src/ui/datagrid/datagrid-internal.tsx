@@ -94,7 +94,7 @@ export function propertyItemToQuickFilter(item: PropertyItem): QuickFilter<any, 
             filtering.set_field(item);
             filtering.set_operator({ key: FilterOperators.EQ });
             (filtering as any).initQuickFilter(result);
-            result.options = Object.assign(deepClone(result.options), item.quickFilterParams);
+            result.options = Object.assign(deepClone(result.options ?? {}), item.quickFilterParams ?? {});
         }
         else {
             return null;
