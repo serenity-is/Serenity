@@ -1,13 +1,13 @@
 namespace Serenity.CodeGeneration;
 
-public partial class ServerTypingsGenerator : TypingsGeneratorBase
+public partial class ServerTypingsGenerator
 {
     protected void GenerateBasicType(TypeDefinition type)
     {
         cw.Indented("export interface ");
 
         var identifier = MakeFriendlyName(type, codeNamespace: null);
-        var baseClass = GetBaseClass(type);
+        var baseClass = GetBasicTypeBaseClass(type);
 
         RegisterGeneratedType(ns: null, identifier, typeOnly: true);
 
@@ -83,5 +83,44 @@ public partial class ServerTypingsGenerator : TypingsGeneratorBase
         }
         while ((current = current.BaseType?.Resolve()) != null &&
             (baseClass == null || !TypingsUtils.IsAssignableFrom(current, baseClass)));
+    }
+
+    protected static TypeReference GetBasicTypeBaseClass(TypeDefinition type)
+    {
+        foreach (var t in TypingsUtils.SelfAndBaseClasses(type))
+        {
+            if (t.BaseType != null &&
+                t.BaseType.IsGenericInstance() &&
+#if ISSOURCEGENERATOR
+                t.BaseType.OriginalDefinition.NamespaceOf() == "Serenity.Services")
+#else
+                (t.BaseType as GenericInstanceType).ElementType.Namespace == "Serenity.Services")
+#endif
+            {
+#if ISSOURCEGENERATOR
+                var n = t.BaseType.OriginalDefinition.MetadataName();
+#else
+                var n = (t.BaseType as GenericInstanceType).ElementType.Name;
+#endif
+                if (n == "ListResponse`1" || n == "RetrieveResponse`1" || n == "SaveRequest`1")
+                    return t.BaseType;
+            }
+
+            if (t.NamespaceOf() != "Serenity.Services")
+                continue;
+
+            if (t.Name == "ListRequest" ||
+                t.Name == "RetrieveRequest" ||
+                t.Name == "DeleteRequest" ||
+                t.Name == "DeleteResponse" ||
+                t.Name == "UndeleteRequest" ||
+                t.Name == "UndeleteResponse" ||
+                t.Name == "SaveResponse" ||
+                t.Name == "ServiceRequest" ||
+                t.Name == "ServiceResponse")
+                return t;
+        }
+
+        return null;
     }
 }

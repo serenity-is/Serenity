@@ -1,7 +1,12 @@
 namespace Serenity.CodeGeneration;
 
-public partial class ServerTypingsGenerator : TypingsGeneratorBase
+public partial class ServerTypingsGenerator
 {
+    public bool LocalTexts { get; set; }
+
+    protected HashSet<string> localTextKeys = [];
+    protected Dictionary<string, string> localTextNestedClasses = [];
+
     protected void PreVisitTypeForTexts(TypeDefinition fromType)
     {
         var nestedLocalTexts = TypingsUtils.GetAttr(fromType, "Serenity.Extensibility",
@@ -63,6 +68,32 @@ public partial class ServerTypingsGenerator : TypingsGeneratorBase
             localTextKeys.Add(prefix + prop.Name);
         localTextKeys.Add(prefix + "EntityPlural");
         localTextKeys.Add(prefix + "EntitySingular");
+    }
+
+
+    public void SetLocalTextFiltersFrom(IFileSystem fileSystem, string appSettingsFile)
+    {
+        ArgumentExceptionHelper.ThrowIfNull(fileSystem, nameof(fileSystem));
+        ArgumentExceptionHelper.ThrowIfNull(appSettingsFile, nameof(appSettingsFile));
+
+        if (!LocalTexts || !fileSystem.FileExists(appSettingsFile))
+            return;
+
+        try
+        {
+            var obj = Newtonsoft.Json.Linq.JObject.Parse(fileSystem.ReadAllText(appSettingsFile));
+            if ((obj["LocalTextPackages"] ?? ((obj["AppSettings"]
+                as Newtonsoft.Json.Linq.JObject)?["LocalTextPackages"])) is
+                Newtonsoft.Json.Linq.JObject packages)
+            {
+                foreach (var p in packages.PropertyValues())
+                    foreach (var x in p.Values<string>())
+                        LocalTextFilters.Add(x);
+            }
+        }
+        catch
+        {
+        }
     }
 
     protected void GenerateTexts()

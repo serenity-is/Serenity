@@ -4,7 +4,7 @@ namespace Serenity.CodeGenerator;
 
 public class ApplicationMetadata : IApplicationMetadata
 {
-    private class Scanner(IFileSystem fileSystem, params string[] assemblyLocations) : TypingsGeneratorBase(fileSystem, assemblyLocations)
+    private class Scanner(IFileSystem fileSystem, params string[] assemblyLocations) : ServerTypingsGenerator(fileSystem, assemblyLocations)
     {
         public List<TypeDefinition> RowTypes { get; } = [];
         public Dictionary<string, string> RowTypeToListRoute = [];
@@ -13,12 +13,17 @@ public class ApplicationMetadata : IApplicationMetadata
         {
         }
 
+        protected override void GenerateCommonCode()
+        {
+        }
+
         protected override void ScanAnnotationTypeAttributes(TypeDefinition type)
         {
             base.ScanAnnotationTypeAttributes(type);
 
-            if (TypingsUtils.IsSubclassOf(type, "Serenity.Data", "Row") ||
-                TypingsUtils.IsSubclassOf(type, "Serenity.Data", "Row`1"))
+            var baseTypes = TypingsUtils.EnumerateBaseClasses(type).ToArray();
+
+            if (IsRowType(baseTypes, type))
             {
                 RowTypes.Add(type);
             }

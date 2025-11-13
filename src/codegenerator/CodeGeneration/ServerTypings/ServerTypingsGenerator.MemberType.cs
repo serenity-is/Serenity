@@ -1,8 +1,28 @@
 namespace Serenity.CodeGeneration;
 
-public partial class ServerTypingsGenerator : TypingsGeneratorBase
+public partial class ServerTypingsGenerator
 {
-    protected override void HandleMemberType(TypeReference memberType, string codeNamespace)
+    public static bool CanHandleType(TypeDefinition memberType)
+    {
+        if (memberType is null)
+            return false;
+#if ISSOURCEGENERATOR
+        if (memberType.TypeKind == TypeKind.Interface)
+#else
+        if (memberType.IsInterface)
+#endif
+            return false;
+
+        if (memberType.IsAbstract)
+            return false;
+
+        if (TypingsUtils.IsOrSubClassOf(memberType, "System", "Delegate"))
+            return false;
+
+        return true;
+    }
+
+    protected virtual void HandleMemberType(TypeReference memberType, string codeNamespace)
     {
         var ns = memberType.NamespaceOf();
         bool isSystem = ns == "System";

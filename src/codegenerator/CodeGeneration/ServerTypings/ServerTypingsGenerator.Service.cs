@@ -1,6 +1,6 @@
 namespace Serenity.CodeGeneration;
 
-public partial class ServerTypingsGenerator : TypingsGeneratorBase
+public partial class ServerTypingsGenerator
 {
     private void GenerateService(TypeDefinition type, string identifier)
     {
@@ -113,5 +113,181 @@ public partial class ServerTypingsGenerator : TypingsGeneratorBase
                 cw.IndentedLine("});");
             }
         });
+    }
+
+    protected virtual string GetControllerIdentifier(TypeReference controller)
+    {
+        string className = controller.Name;
+
+        if (className.EndsWith("Controller", StringComparison.Ordinal))
+            className = className[0..^10];
+        else if (className.EndsWith("Endpoint", StringComparison.Ordinal))
+            className = className[0..^8];
+        else if (className.EndsWith("Service", StringComparison.Ordinal))
+            className = className[0..^7];
+
+        return className + "Service";
+    }
+
+    protected static bool IsPublicServiceMethod(MethodDefinition method, out TypeReference requestType, out TypeReference responseType,
+        out string requestParam)
+    {
+        ArgumentExceptionHelper.ThrowIfNull(method);
+
+        responseType = null;
+        requestType = null;
+        requestParam = null;
+
+        if ((TypingsUtils.FindAttr(method.GetAttributes(), "System.Web.Mvc", "NonActionAttribute") ??
+             TypingsUtils.FindAttr(method.GetAttributes(), "Microsoft.AspNetCore.Mvc", "NonActionAttribute") ??
+             TypingsUtils.FindAttr(method.GetAttributes(), "Serenity.ComponentModel", "TransformIgnoreAttribute")) != null)
+            return false;
+
+        if (!TypingsUtils.IsSubclassOf(
+#if ISSOURCEGENERATOR
+                method.ContainingType,
+#else
+                method.DeclaringType,
+#endif
+                "System.Web.Mvc", "Controller") &&
+            !TypingsUtils.IsSubclassOf(
+#if ISSOURCEGENERATOR
+                method.ContainingType,
+#else
+                method.DeclaringType,
+#endif
+                "Microsoft.AspNetCore.Mvc", "ControllerBase"))
+            return false;
+
+#if ISSOURCEGENERATOR
+        if ((method.MethodKind == MethodKind.PropertySet ||
+             method.MethodKind == MethodKind.PropertyGet) &&
+#else
+        if (method.IsSpecialName &&
+#endif
+            (method.Name.StartsWith("set_", StringComparison.Ordinal) || method.Name.StartsWith("get_", StringComparison.Ordinal)))
+            return false;
+
+        var parameters = method.Parameters.Where(x =>
+#if ISSOURCEGENERATOR
+            x.Type.TypeKind != TypeKind.Interface &&
+#else
+            !x.ParameterType.Resolve().IsInterface &&
+#endif
+            TypingsUtils.FindAttr(x.GetAttributes(), "Microsoft.AspNetCore.Mvc", "FromServicesAttribute") == null).ToArray();
+
+        if (parameters.Length > 1)
+            return false;
+
+        if (parameters.Length == 1)
+        {
+#if ISSOURCEGENERATOR
+            requestType = parameters[0].Type;
+            if (!CanHandleType(requestType))
+#else
+            requestType = parameters[0].ParameterType;
+            if (requestType.IsPrimitive || !CanHandleType(requestType.Resolve()))
+#endif
+                return false;
+        }
+        else
+            requestType = null;
+
+        requestParam = parameters.Length == 0 ? "request" : parameters[0].Name;
+
+        responseType = method.ReturnType;
+        if (responseType != null &&
+            responseType.IsGenericInstance() &&
+#if ISSOURCEGENERATOR
+            (responseType as INamedTypeSymbol).OriginalDefinition
+#else
+            (responseType as GenericInstanceType).ElementType
+#endif
+                .FullNameOf().StartsWith("Serenity.Services.Result`1", StringComparison.Ordinal))
+        {
+#if ISSOURCEGENERATOR
+            responseType = (responseType as INamedTypeSymbol).TypeArguments[0];
+#else
+            responseType = (responseType as GenericInstanceType).GenericArguments[0];
+#endif
+            return true;
+        }
+#if ISSOURCEGENERATOR
+        else if (responseType.IsGenericInstance() &&
+            (responseType as INamedTypeSymbol).OriginalDefinition
+#else
+        else if (responseType != null &&
+            responseType.IsGenericInstance &&
+            (responseType as GenericInstanceType).ElementType
+#endif
+                .FullNameOf().StartsWith("System.Threading.Tasks.Task`1", StringComparison.Ordinal))
+        {
+#if ISSOURCEGENERATOR
+            responseType = (responseType as INamedTypeSymbol).TypeArguments[0];
+#else
+            responseType = (responseType as GenericInstanceType).GenericArguments[0];
+#endif
+            return true;
+        }
+        else if (TypingsUtils.IsOrSubClassOf(responseType, "System.Web.Mvc", "ActionResult") ||
+            TypingsUtils.IsAssignableFrom("Microsoft.AspNetCore.Mvc.IActionResult",
+#if ISSOURCEGENERATOR
+            responseType))
+#else
+            responseType.Resolve()))
+#endif
+            return false;
+        else if (responseType == null || TypingsUtils.IsVoid(responseType))
+            return false;
+
+        return true;
+    }
+
+    protected static string GetServiceUrlFromRoute(TypeDefinition controller)
+    {
+        ArgumentExceptionHelper.ThrowIfNull(controller);
+
+        var route = TypingsUtils.GetAttr(controller, "System.Web.Mvc", "RouteAttribute") ??
+            TypingsUtils.GetAttr(controller, "Microsoft.AspNetCore.Mvc", "RouteAttribute");
+        string url = route == null ||
+            route.ConstructorArguments()?.Count == 0 || route.ConstructorArguments()[0].Value is not string ?
+            ("Services/HasNoRoute/" + controller.Name) : (route.ConstructorArguments()[0].Value as string ?? "");
+
+        url = url.Replace("[controller]", controller.Name[..^"Controller".Length]
+#if ISSOURCEGENERATOR
+            );
+#else
+            , StringComparison.Ordinal);
+#endif
+        url = url.Replace("/[action]", ""
+#if ISSOURCEGENERATOR
+            );
+#else
+            , StringComparison.Ordinal);
+#endif
+
+        if (!url.StartsWith("~/", StringComparison.Ordinal) && !url.StartsWith('/'))
+            url = "~/" + url;
+
+        while (true)
+        {
+            var idx1 = url.IndexOf('{', StringComparison.Ordinal);
+            if (idx1 <= 0)
+                break;
+
+            var idx2 = url.IndexOf('}', idx1 + 1);
+            if (idx2 <= 0)
+                break;
+
+            url = url[..idx1] + url[(idx2 + 1)..];
+        }
+
+        if (url.StartsWith("~/Services/", StringComparison.OrdinalIgnoreCase))
+            url = url["~/Services/".Length..];
+
+        if (url.Length > 1 && url.EndsWith('/'))
+            url = url[0..^1];
+
+        return url;
     }
 }

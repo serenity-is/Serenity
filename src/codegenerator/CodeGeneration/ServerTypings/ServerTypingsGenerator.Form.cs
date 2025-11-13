@@ -5,7 +5,7 @@ using Microsoft.CodeAnalysis;
 
 namespace Serenity.CodeGeneration;
 
-public partial class ServerTypingsGenerator : TypingsGeneratorBase
+public partial class ServerTypingsGenerator
 {
     const string requestSuffix = "Request";
 
