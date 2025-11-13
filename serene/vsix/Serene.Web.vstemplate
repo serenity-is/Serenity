@@ -98,7 +98,7 @@
           </Folder>
           <Folder Name="Translation" TargetFolderName="Translation">
             <ProjectItem ReplaceParameters="true" TargetFileName="TranslationEndpoint.cs">TranslationEndpoint.cs</ProjectItem>
-            <ProjectItem ReplaceParameters="true" TargetFileName="TranslationGrid.ts">TranslationGrid.ts</ProjectItem>
+            <ProjectItem ReplaceParameters="true" TargetFileName="TranslationGrid.tsx">TranslationGrid.tsx</ProjectItem>
             <ProjectItem ReplaceParameters="true" TargetFileName="TranslationItem.cs">TranslationItem.cs</ProjectItem>
             <ProjectItem ReplaceParameters="true" TargetFileName="TranslationListRequest.cs">TranslationListRequest.cs</ProjectItem>
             <ProjectItem ReplaceParameters="true" TargetFileName="TranslationPage.cs">TranslationPage.cs</ProjectItem>
@@ -319,12 +319,13 @@
         </Folder>
         <Folder Name="esm" TargetFolderName="esm">
           <Folder Name="_chunks" TargetFolderName="_chunks">
-            <ProjectItem ReplaceParameters="true" TargetFileName="chunk-4FLWFU44.js">chunk-4FLWFU44.js</ProjectItem>
             <ProjectItem ReplaceParameters="true" TargetFileName="chunk-FZ27HJ7K.js">chunk-FZ27HJ7K.js</ProjectItem>
-            <ProjectItem ReplaceParameters="true" TargetFileName="chunk-IWJESYK3.js">chunk-IWJESYK3.js</ProjectItem>
-            <ProjectItem ReplaceParameters="true" TargetFileName="chunk-LVKVMUC3.js">chunk-LVKVMUC3.js</ProjectItem>
+            <ProjectItem ReplaceParameters="true" TargetFileName="chunk-HYDVAOP7.js">chunk-HYDVAOP7.js</ProjectItem>
             <ProjectItem ReplaceParameters="true" TargetFileName="chunk-RKUHNEJF.js">chunk-RKUHNEJF.js</ProjectItem>
+            <ProjectItem ReplaceParameters="true" TargetFileName="chunk-RSMKVBGB.js">chunk-RSMKVBGB.js</ProjectItem>
             <ProjectItem ReplaceParameters="true" TargetFileName="chunk-TA7MABRS.js">chunk-TA7MABRS.js</ProjectItem>
+            <ProjectItem ReplaceParameters="true" TargetFileName="chunk-TICQHP5J.js">chunk-TICQHP5J.js</ProjectItem>
+            <ProjectItem ReplaceParameters="true" TargetFileName="chunk-VISSMS63.js">chunk-VISSMS63.js</ProjectItem>
           </Folder>
           <Folder Name="Modules" TargetFolderName="Modules">
             <Folder Name="Administration" TargetFolderName="Administration">
