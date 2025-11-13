@@ -7,6 +7,7 @@
     <GenerateComputedBuildStaticWebAssetsDependsOn>RunTSBuild;$(GenerateComputedBuildStaticWebAssetsDependsOn)</GenerateComputedBuildStaticWebAssetsDependsOn>
     <!--#if (IsNotTemplate)-->
     <CommonSrc>..\..\..\common-features\src\</CommonSrc>
+    <EnableDefaultCompressedItems>false</EnableDefaultCompressedItems>
     <SerenitySrc>..\..\..\src\</SerenitySrc>
     <DefineConstants>$(DefineConstants);Northwind;BasicSamples</DefineConstants>
     <UseProjectRefs Condition="!Exists('$(SerenitySrc)..\Serenity.sln')">false</UseProjectRefs>
