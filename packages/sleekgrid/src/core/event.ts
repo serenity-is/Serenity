@@ -13,7 +13,7 @@ export interface IEventData<TArgs = {}, TEvent = {}> {
     nativeEvent: TEvent | null | undefined;
 }
 
-type MergeArgKeys = "grid" | "column" | "node" | "row" | "rows" | "cell" | "item";
+type MergeArgKeys = "grid" | "column" | "node" | "row" | "cell" | "item";
 
 export type EventData<TArgs = {}, TEvent = {}> = IEventData<TArgs, TEvent> & TEvent & { [key in keyof TArgs & (MergeArgKeys)]: TArgs[key] };
 export type EventCallback<TArgs = {}, TEvent = {}> = (e: EventData<TArgs, TEvent>, args?: TArgs) => void;
@@ -67,7 +67,7 @@ function initializeEventDataProps() {
         addEventDataProp(key, false);
     }
 
-    for (const key of ['grid', 'column', 'node', 'row', 'rows', 'cell', 'item']) {
+    for (const key of ['grid', 'column', 'node', 'row', 'cell', 'item']) {
         addEventDataProp(key, true);
     }
 }

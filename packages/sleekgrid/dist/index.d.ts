@@ -43,7 +43,7 @@ export interface IEventData<TArgs = {}, TEvent = {}> {
 	getReturnValues(): any[];
 	nativeEvent: TEvent | null | undefined;
 }
-export type MergeArgKeys = "grid" | "column" | "node" | "row" | "rows" | "cell" | "item";
+export type MergeArgKeys = "grid" | "column" | "node" | "row" | "cell" | "item";
 export type EventData<TArgs = {}, TEvent = {}> = IEventData<TArgs, TEvent> & TEvent & {
 	[key in keyof TArgs & (MergeArgKeys)]: TArgs[key];
 };

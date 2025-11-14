@@ -1539,8 +1539,8 @@ export class SleekGrid<TItem = any> implements ISleekGrid<TItem> {
         this.render();
     }
 
-    private viewOnRowsChanged(e: { rows: number[] }) {
-        this.invalidateRows(e.rows);
+    private viewOnRowsChanged({ args }: { args: { rows: number[] } }) {
+        this.invalidateRows(args.rows);
         this.render();
         this.updateGrandTotals();
     }
