@@ -1,5 +1,4 @@
 import type { CellStylesHash, Column, Editor, EventData, ValidationResult } from ".";
-import type { DragItem } from "./draggable";
 import type { ISleekGrid } from "./isleekgrid";
 
 export interface ArgsGrid {
@@ -10,13 +9,16 @@ export interface ArgsColumn extends ArgsGrid {
     column: Column;
 }
 
-export interface DragData extends DragItem {
+export interface ArgsDrag extends ArgsGrid {
     mode: string;
     row: number;
     cell: number;
     item: any;
     helper: HTMLElement;
 }
+
+let a: EventData<ArgsGrid>;
+
 
 export interface ArgsColumnNode extends ArgsColumn {
     node: HTMLElement;
@@ -90,7 +92,7 @@ export type FooterColumnEvent = HeaderColumnEvent;
 export type FooterMouseEvent = HeaderMouseEvent;
 export type FooterRenderEvent = HeaderRenderEvent;
 export type GridEvent = EventData<ArgsGrid>;
-export type GridDragEvent = EventData<ArgsGrid, UIEvent> & { dragData: DragData };
+export type GridDragEvent = EventData<ArgsDrag, UIEvent>;
 export type GridMouseEvent = EventData<ArgsGrid, MouseEvent>;
 export type GridSortEvent = EventData<ArgsSort>;
 

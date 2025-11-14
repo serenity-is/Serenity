@@ -5,29 +5,29 @@ import { IAggregator } from "./aggregators";
 import { CancellableViewCallback, IRemoteView, PagingInfo, RemoteViewAjaxCallback, RemoteViewFilter, RemoteViewProcessCallback } from "./iremoteview";
 import { GroupInfo, PagingOptions, SummaryOptions } from "./slicktypes";
 
-export interface ArgsDataView {
+export interface ArgsRemoteView {
     dataView: RemoteView;
 }
 
-export interface ArgsGroupToggle extends ArgsDataView {
+export interface ArgsGroupToggle extends ArgsRemoteView {
     groupingKey: string;
     level: number;
 }
 
-export interface ArgsPagingInfo extends ArgsDataView {
+export interface ArgsPagingInfo extends ArgsRemoteView {
     pagingInfo: PagingInfo;
 }
 
-export interface ArgsRowCountChanged extends ArgsDataView {
+export interface ArgsRowCountChanged extends ArgsRemoteView {
     previous: number;
     current: number;
 }
 
-export interface ArgsRowsChanged extends ArgsDataView {
+export interface ArgsRowsChanged extends ArgsRemoteView {
     rows: number[];
 }
 
-export interface ArgsRowsOrCountChanged extends ArgsDataView {
+export interface ArgsRowsOrCountChanged extends ArgsRemoteView {
     rowsDiff: number[];
     previousRowCount: number;
     currentRowCount: number;
@@ -99,13 +99,13 @@ export class RemoteView<TItem = any> implements IRemoteView<TItem> {
     public onSubmit: CancellableViewCallback<TItem>;
 
     /** Event fired when the underlying data changes */
-    public readonly onDataChanged = new EventEmitter<ArgsDataView>();
+    public readonly onDataChanged = new EventEmitter<ArgsRemoteView>();
 
     /** Event fired when data loading completes */
-    public readonly onDataLoaded = new EventEmitter<ArgsDataView>();
+    public readonly onDataLoaded = new EventEmitter<ArgsRemoteView>();
 
     /** Event fired when data loading begins */
-    public readonly onDataLoading = new EventEmitter<ArgsDataView>();
+    public readonly onDataLoading = new EventEmitter<ArgsRemoteView>();
 
     /** Event fired when a group is collapsed */
     public readonly onGroupCollapsed = new EventEmitter<ArgsGroupToggle>();

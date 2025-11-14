@@ -3757,24 +3757,24 @@ export interface PagingOptions {
 	rowsPerPage?: number;
 	page?: number;
 }
-export interface ArgsDataView {
+export interface ArgsRemoteView {
 	dataView: RemoteView;
 }
-export interface ArgsGroupToggle extends ArgsDataView {
+export interface ArgsGroupToggle extends ArgsRemoteView {
 	groupingKey: string;
 	level: number;
 }
-export interface ArgsPagingInfo extends ArgsDataView {
+export interface ArgsPagingInfo extends ArgsRemoteView {
 	pagingInfo: PagingInfo;
 }
-export interface ArgsRowCountChanged extends ArgsDataView {
+export interface ArgsRowCountChanged extends ArgsRemoteView {
 	previous: number;
 	current: number;
 }
-export interface ArgsRowsChanged extends ArgsDataView {
+export interface ArgsRowsChanged extends ArgsRemoteView {
 	rows: number[];
 }
-export interface ArgsRowsOrCountChanged extends ArgsDataView {
+export interface ArgsRowsOrCountChanged extends ArgsRemoteView {
 	rowsDiff: number[];
 	previousRowCount: number;
 	currentRowCount: number;
@@ -3837,11 +3837,11 @@ export declare class RemoteView<TItem = any> implements IRemoteView<TItem> {
 	/** Callback invoked before submitting a request, can cancel the operation */
 	onSubmit: CancellableViewCallback<TItem>;
 	/** Event fired when the underlying data changes */
-	readonly onDataChanged: EventEmitter<ArgsDataView, {}>;
+	readonly onDataChanged: EventEmitter<ArgsRemoteView, {}>;
 	/** Event fired when data loading completes */
-	readonly onDataLoaded: EventEmitter<ArgsDataView, {}>;
+	readonly onDataLoaded: EventEmitter<ArgsRemoteView, {}>;
 	/** Event fired when data loading begins */
-	readonly onDataLoading: EventEmitter<ArgsDataView, {}>;
+	readonly onDataLoading: EventEmitter<ArgsRemoteView, {}>;
 	/** Event fired when a group is collapsed */
 	readonly onGroupCollapsed: EventEmitter<ArgsGroupToggle, {}>;
 	/** Event fired when a group is expanded */
@@ -4346,11 +4346,11 @@ export interface IRemoteView<TItem = any> extends IDataView<TItem> {
 	/** Callback invoked before making AJAX calls */
 	onAjaxCall: RemoteViewAjaxCallback<TItem>;
 	/** Event fired when the underlying data changes */
-	readonly onDataChanged: EventEmitter<ArgsDataView>;
+	readonly onDataChanged: EventEmitter<ArgsRemoteView>;
 	/** Event fired when data loading completes */
-	readonly onDataLoaded: EventEmitter<ArgsDataView>;
+	readonly onDataLoaded: EventEmitter<ArgsRemoteView>;
 	/** Event fired when data loading begins */
-	readonly onDataLoading: EventEmitter<ArgsDataView>;
+	readonly onDataLoading: EventEmitter<ArgsRemoteView>;
 	/** Event fired when a group is collapsed */
 	readonly onGroupCollapsed?: EventEmitter<ArgsGroupToggle>;
 	/** Event fired when a group is expanded */
