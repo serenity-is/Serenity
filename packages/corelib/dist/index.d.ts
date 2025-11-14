@@ -3758,7 +3758,7 @@ export interface PagingOptions {
 	page?: number;
 }
 export interface ArgsRemoteView {
-	dataView: RemoteView;
+	dataView: IRemoteView;
 }
 export interface ArgsGroupToggle extends ArgsRemoteView {
 	groupingKey: string;
