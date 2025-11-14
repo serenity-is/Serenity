@@ -6,7 +6,7 @@ import { CancellableViewCallback, IRemoteView, PagingInfo, RemoteViewAjaxCallbac
 import { GroupInfo, PagingOptions, SummaryOptions } from "./slicktypes";
 
 export interface ArgsRemoteView {
-    dataView: RemoteView;
+    dataView: IRemoteView;
 }
 
 export interface ArgsGroupToggle extends ArgsRemoteView {
