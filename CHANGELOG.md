@@ -1,3 +1,13 @@
+## 9.1.2 (2025-11-14)
+
+### Features
+- Redesigned SleekGrid event system as the previous one caused some issues when it is used in a site that has jQuery loaded. Only a subset of Args properties (grid, column, row, cell etc) are passed through the event argument, while the rest can be accessed via second args parameter, or e.args.
+- Changed view namespace for .cshtml files to `MyProject.Views` (for /Modules) and `MyProject.Views.Shared` (for /Views) by default to avoid potential namespace problems
+
+### Bugfixes
+- Converted formatters in Serene Translation page to JSX syntax as HTML strings no longer supported by default
+- Add coalesce to quickFilterParams as Object.assign fails when it is null
+
 ## 9.1.1 (2025-11-11)
 
 ### Features
