@@ -1,31 +1,133 @@
-export interface IEventData {
-    readonly type?: string;
-    currentTarget?: EventTarget | null;
-    target?: EventTarget | null;
-    originalEvent?: any;
-    defaultPrevented?: boolean;
-    preventDefault?(): void;
-    stopPropagation?(): void;
-    stopImmediatePropagation?(): void;
-    isDefaultPrevented?(): boolean;
-    isImmediatePropagationStopped?(): boolean;
-    isPropagationStopped?(): boolean;
+export interface IEventData<TArgs = {}, TEvent = {}> {
+    args: TArgs;
+    defaultPrevented: boolean;
+    preventDefault(): void;
+    stopPropagation(): void;
+    stopImmediatePropagation(): void;
+    isDefaultPrevented(): boolean;
+    isImmediatePropagationStopped(): boolean;
+    isPropagationStopped(): boolean;
+    getReturnValue(): any;
+    getReturnValues(): any[];
+    nativeEvent: TEvent | null | undefined;
+}
+
+export type EventData<TArgs = {}, TEvent = {}> = IEventData<TArgs, TEvent> & TEvent & TArgs;
+export type EventCallback<TArgs = {}, TEvent = {}> = (e: EventData<TArgs, TEvent>, args?: TArgs) => void;
+
+let eventDataInitialized = false;
+
+function addEventDataProp(name: string) {
+    Object.defineProperty(EventDataWrapper.prototype, name, {
+        enumerable: true,
+        configurable: true,
+        get: function () {
+            if (this.nativeEvent) {
+                return this.nativeEvent[name];
+            }
+        },
+        set: function (value) {
+            if (this.nativeEvent) {
+                this.nativeEvent[name] = value;
+                return;
+            }
+
+            Object.defineProperty(this, name, {
+                enumerable: true,
+                configurable: true,
+                writable: true,
+                value: value
+            });
+        }
+    });
+}
+
+function initializeEventDataProps() {
+    for (const key of [
+        'altKey', 'char', 'bubbles', 'button', 'buttons', 'cancelable', 'changedTouches',
+        'charCode', 'clientX', 'clientY', 'code', 'ctrlKey', 'currentTarget', 'detail', 'eventPhase',
+        'key', 'keyCode', 'metaKey', 'offsetX', 'offsetY', 'originalEvent', 'pageX', 'pageY', 'pointerId',
+        'pointerType', 'screenX', 'screenY', 'shiftKey', 'relatedTarget', 'target', 'targetTouches',
+        'toElement', 'touches', 'type', 'view', 'which']) {
+        addEventDataProp(key);
+    }
 }
 
 /***
  * An event object for passing data to event handlers and letting them control propagation.
  * <p>This is pretty much identical to how W3C and jQuery implement events.</p>
  */
-export class EventData implements IEventData {
+export class EventDataWrapper<TArgs, TEvent = {}> implements IEventData<TArgs, TEvent> {
+    private _args: TArgs;
     private _isPropagationStopped = false;
     private _isImmediatePropagationStopped = false;
-    declare defaultPrevented?: boolean;
+    private _isDefaultPrevented = false;
+    private _nativeEvent: Event;
+    private _returnValue: any;
+    private _returnValues: any[] = [];
+
+    constructor(event?: TEvent | null, args?: TArgs, mergeArgs = true) {
+        this._nativeEvent = event as Event;
+        this._args = args || {} as TArgs;
+
+        if (!eventDataInitialized) {
+            eventDataInitialized = true;
+            initializeEventDataProps();
+        }
+
+        if (event) {
+            for (let key of Object.keys(event)) {
+                if (!(key in this)) {
+                    Object.defineProperty(this, key, {
+                        get: () => (event as any)[key],
+                        set: (value) => { (event as any)[key] = value; },
+                        enumerable: true,
+                        configurable: true
+                    });
+                }
+            }
+        }
+
+        if (args && mergeArgs) {
+            for (let key in args) {
+                if (args.hasOwnProperty(key) && !(key in this)) {
+                    Object.defineProperty(this, key, {
+                        get: () => args[key],
+                        set: (value) => { args[key] = value; },
+                        enumerable: true,
+                        configurable: true
+                    });
+                }
+            }
+        }
+    }
+
+    get defaultPrevented(): boolean { return this._isDefaultPrevented; }
+
+    preventDefault() {
+        this._isDefaultPrevented = true;
+        this._nativeEvent?.preventDefault?.();
+    }
+
+    isDefaultPrevented() {
+        if (this._isDefaultPrevented)
+            return true;
+
+        if (this._nativeEvent && ("defaultPrevented" in this._nativeEvent))
+            return !!this._nativeEvent.defaultPrevented;
+
+        if (this._nativeEvent && typeof (this._nativeEvent as any).isDefaultPrevented === "function")
+            return (this._nativeEvent as any).isDefaultPrevented();
+
+        return false;
+    }
 
     /***
      * Stops event from propagating up the DOM tree.
      */
     stopPropagation() {
         this._isPropagationStopped = true;
+        this._nativeEvent?.stopPropagation();
     }
 
     /***
@@ -40,6 +142,7 @@ export class EventData implements IEventData {
      */
     stopImmediatePropagation() {
         this._isImmediatePropagationStopped = true;
+        this._nativeEvent?.stopImmediatePropagation();
     }
 
     /***
@@ -48,14 +151,36 @@ export class EventData implements IEventData {
     isImmediatePropagationStopped(): boolean {
         return this._isImmediatePropagationStopped;
     }
+
+    get args(): TArgs {
+        return this._args;
+    }
+
+    addReturnValue(value: any): void {
+        this._returnValues.push(value);
+        if (value !== undefined)
+            this._returnValue = value;
+    }
+
+    getReturnValues(): any[] {
+        return this._returnValues;
+    }
+
+    getReturnValue(): any {
+        return this._returnValue;
+    }
+
+    get nativeEvent(): TEvent | null | undefined {
+        return this._nativeEvent as TEvent;
+    }
 }
 
 /***
  * A simple publisher-subscriber implementation.
  */
-export class EventEmitter<TArgs = any, TEventData extends IEventData = IEventData> {
+export class EventEmitter<TArgs = any, TEvent = {}> {
 
-    private _handlers: ((e: TEventData & TArgs, args?: TArgs) => void)[] = [];
+    private _handlers: EventCallback<TArgs, TEvent>[] = [];
 
     /***
      * Adds an event handler to be called when the event is fired.
@@ -63,7 +188,7 @@ export class EventEmitter<TArgs = any, TEventData extends IEventData = IEventDat
      * object the event was fired with.<p>
      * @param fn {Function} Event handler.
      */
-    subscribe(fn: ((e: TEventData & TArgs, args?: TArgs) => void)) {
+    subscribe(fn: EventCallback<TArgs, TEvent>) {
         this._handlers.push(fn);
     }
 
@@ -71,7 +196,7 @@ export class EventEmitter<TArgs = any, TEventData extends IEventData = IEventDat
      * Removes an event handler added with <code>subscribe(fn)</code>.
      * @param fn {Function} Event handler to be removed.
      */
-    unsubscribe(fn: ((e: TEventData & TArgs, args?: TArgs) => void)) {
+    unsubscribe(fn: EventCallback<TArgs, TEvent>) {
         for (var i = this._handlers.length - 1; i >= 0; i--) {
             if (this._handlers[i] === fn) {
                 this._handlers.splice(i, 1);
@@ -82,7 +207,7 @@ export class EventEmitter<TArgs = any, TEventData extends IEventData = IEventDat
     /***
      * Fires an event notifying all subscribers.
      * @param args {Object} Additional data object to be passed to all handlers.
-     * @param e {EventData}
+     * @param e {EventDataWrapper}
      *      Optional.
      *      An <code>EventData</code> object to be passed to all handlers.
      *      For DOM events, an existing W3C/jQuery event object can be passed in.
@@ -91,28 +216,14 @@ export class EventEmitter<TArgs = any, TEventData extends IEventData = IEventDat
      *      The scope ("this") within which the handler will be executed.
      *      If not specified, the scope will be set to the <code>Event</code> instance.
      */
-    notify(args?: TArgs, e?: TEventData, scope?: object, mergeArgs = true): any {
-        const event = (patchEvent(e) || new EventData()) as TEventData & TArgs;
-
-        if (args != null && mergeArgs) {
-            for (let key in args) {
-                if (args.hasOwnProperty(key) && !(key in event)) {
-                    Object.defineProperty(event, key, {
-                        get: () => args[key],
-                        set: (value) => { args[key] = value; },
-                        enumerable: true,
-                        configurable: true
-                    });
-                }
-            }
-        }
+    notify(args?: TArgs, e?: TEvent, scope?: object, mergeArgs = true): EventData<TArgs, TEvent> {
+        const sed = new EventDataWrapper<TArgs, TEvent>(e, args, mergeArgs);
         scope = scope || this;
-
-        var lastReturnValue; // for compatibility, not used
-        for (var i = 0; i < this._handlers.length && !(event.isPropagationStopped() || event.isImmediatePropagationStopped()); i++) {
-            lastReturnValue = this._handlers[i].call(scope, event, args);
+        for (var i = 0; i < this._handlers.length && !(sed.isPropagationStopped() || sed.isImmediatePropagationStopped()); i++) {
+            const returnValue = this._handlers[i].call(scope, sed, args);
+            sed.addReturnValue(returnValue);
         }
-        return lastReturnValue;
+        return sed as unknown as EventData<TArgs, TEvent>;
     }
 
     clear() {
@@ -120,15 +231,15 @@ export class EventEmitter<TArgs = any, TEventData extends IEventData = IEventDat
     }
 }
 
-interface EventSubscriberEntry<TArgs = any, TEventData extends IEventData = IEventData> {
-    event: EventEmitter<TArgs, TEventData>;
-    handler: ((e: TEventData, args: TArgs) => void);
+interface EventSubscriberEntry {
+    event: EventEmitter<any, any>;
+    handler: EventCallback<any, any>;
 }
 
-export class EventSubscriber<TArgs = any, TEventData extends IEventData = IEventData> {
-    private _handlers: EventSubscriberEntry<TArgs, TEventData>[] = [];
+export class EventSubscriber {
+    private _handlers: EventSubscriberEntry[] = [];
 
-    subscribe(event: EventEmitter<TArgs, TEventData>, handler: ((e: TEventData & TArgs, args?: TArgs) => void)): this {
+    subscribe<TArgs, TEvent>(event: EventEmitter<TArgs, TEvent>, handler: EventCallback<TArgs, TEvent>): this {
         this._handlers.push({
             event: event,
             handler: handler
@@ -138,7 +249,7 @@ export class EventSubscriber<TArgs = any, TEventData extends IEventData = IEvent
         return this;
     }
 
-    unsubscribe(event: EventEmitter<TArgs, TEventData>, handler: ((e: TEventData & TArgs, args?: TArgs) => void)): this {
+    unsubscribe<TArgs, TEvent>(event: EventEmitter<TArgs, TEvent>, handler: EventCallback<TArgs, TEvent>): this {
         var i = this._handlers.length;
         while (i--) {
             if (this._handlers[i].event === event &&
@@ -152,7 +263,7 @@ export class EventSubscriber<TArgs = any, TEventData extends IEventData = IEvent
         return this;
     }
 
-    unsubscribeAll(): EventSubscriber<TArgs, TEventData> {
+    unsubscribeAll(): EventSubscriber {
         var i = this._handlers.length;
         while (i--) {
             this._handlers[i].event.unsubscribe(this._handlers[i].handler);
@@ -179,43 +290,4 @@ export const keyCode = {
     RIGHT: 39,
     TAB: 9,
     UP: 38
-}
-
-function returnTrue() {
-    return true;
-}
-
-function returnFalse() {
-    return false;
-}
-
-// patches event so that it has methods jQuery event objects provides, for backward compatibility when jQuery is not loaded
-export function patchEvent(e: IEventData) {
-    if (e == null)
-        return e;
-
-    if (!("defaultPrevented" in e) && typeof e.isDefaultPrevented === "function") {
-        Object.defineProperty(e, "defaultPrevented", {
-            get: function () {
-                return e.isDefaultPrevented();
-            },
-            enumerable: true,
-            configurable: true
-        });
-    }
-    else if (!e.isDefaultPrevented && e.preventDefault)
-        e.isDefaultPrevented = function () { return this.defaultPrevented; }
-
-    var org1: () => void, org2: () => void;
-    if (!e.isImmediatePropagationStopped && (org1 = e.stopImmediatePropagation)) {
-        e.isImmediatePropagationStopped = returnFalse;
-        e.stopImmediatePropagation = function () { this.isImmediatePropagationStopped = returnTrue; org1.call(this); }
-    }
-
-    if (!e.isPropagationStopped && (org2 = e.stopPropagation)) {
-        e.isPropagationStopped = returnFalse;
-        e.stopPropagation = function () { this.isPropagationStopped = returnTrue; org2.call(this); }
-    }
-
-    return e;
 }

@@ -1,5 +1,5 @@
-import type { CellStylesHash, Column, Editor, IEventData, ValidationResult } from ".";
-import type { DragItem, DragPosition } from "./draggable";
+import type { CellStylesHash, Column, Editor, EventData, ValidationResult } from ".";
+import type { DragItem } from "./draggable";
 import type { ISleekGrid } from "./isleekgrid";
 
 export interface ArgsGrid {
@@ -80,17 +80,18 @@ export interface ArgsValidationError extends ArgsCell {
     validationResults: ValidationResult;
 }
 
-export type CellEvent = IEventData & ArgsCell;
-export type CellKeyboardEvent = KeyboardEvent & ArgsCell;
-export type CellMouseEvent = MouseEvent & ArgsCell;
-export type HeaderColumnEvent = IEventData & ArgsColumn;
-export type HeaderMouseEvent = MouseEvent & ArgsColumn;
-export type HeaderRenderEvent = IEventData & ArgsColumnNode;
+export type CellEvent = EventData<ArgsCell>;
+export type CellKeyboardEvent = EventData<ArgsCell, KeyboardEvent>;
+export type CellMouseEvent = EventData<ArgsCell, MouseEvent>;
+export type HeaderColumnEvent = EventData<ArgsColumn, Event>;
+export type HeaderMouseEvent = EventData<ArgsColumn, MouseEvent>;
+export type HeaderRenderEvent = EventData<ArgsColumnNode, Event>;
 export type FooterColumnEvent = HeaderColumnEvent;
 export type FooterMouseEvent = HeaderMouseEvent;
 export type FooterRenderEvent = HeaderRenderEvent;
-export type GridEvent = IEventData & ArgsGrid;
-export type GridDragEvent = UIEvent & { dragData: DragData };
-export type GridMouseEvent = MouseEvent & ArgsGrid;
+export type GridEvent = EventData<ArgsGrid>;
+export type GridDragEvent = EventData<ArgsGrid, UIEvent> & { dragData: DragData };
+export type GridMouseEvent = EventData<ArgsGrid, MouseEvent>;
+export type GridSortEvent = EventData<ArgsSort>;
 
 

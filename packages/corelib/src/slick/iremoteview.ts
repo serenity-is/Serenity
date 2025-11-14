@@ -1,5 +1,6 @@
-import { EventEmitter, ISleekGrid, Group, GroupItemMetadataProvider, GroupTotals, IDataView, IEventData } from "@serenity-is/sleekgrid";
+import { EventEmitter, Group, GroupItemMetadataProvider, GroupTotals, IDataView, ISleekGrid } from "@serenity-is/sleekgrid";
 import { ListResponse, ServiceOptions } from "../base";
+import type { ArgsDataView, ArgsGroupToggle, ArgsPagingInfo, ArgsRowCountChanged, ArgsRowsOrCountChanged } from "./remoteview";
 import { GroupInfo, PagingOptions, SummaryOptions } from "./slicktypes";
 
 /**
@@ -138,20 +139,24 @@ export interface IRemoteView<TItem = any> extends IDataView<TItem> {
     insertItem?(insertBefore: number, item: any): void;
     /** Callback invoked before making AJAX calls */
     onAjaxCall: RemoteViewAjaxCallback<TItem>;
+    /** Event fired when the underlying data changes */
+    readonly onDataChanged: EventEmitter<ArgsDataView>;
     /** Event fired when data loading completes */
-    readonly onDataLoaded: EventEmitter<any, IEventData>;
+    readonly onDataLoaded: EventEmitter<ArgsDataView>;
     /** Event fired when data loading begins */
-    readonly onDataLoading: EventEmitter<any, IEventData>;
+    readonly onDataLoading: EventEmitter<ArgsDataView>;
     /** Event fired when a group is collapsed */
-    readonly onGroupCollapsed?: EventEmitter<any, IEventData>;
+    readonly onGroupCollapsed?: EventEmitter<ArgsGroupToggle>;
     /** Event fired when a group is expanded */
-    readonly onGroupExpanded?: EventEmitter<any, IEventData>;
+    readonly onGroupExpanded?: EventEmitter<ArgsGroupToggle>;
     /** Event fired when paging information changes */
-    readonly onPagingInfoChanged: EventEmitter<any, IEventData>;
+    readonly onPagingInfoChanged: EventEmitter<ArgsPagingInfo>;
     /** Callback invoked to process data received from the server */
     onProcessData: RemoteViewProcessCallback<TItem>;
+    /** Event fired when the row count changes */
+    readonly onRowCountChanged: EventEmitter<ArgsRowCountChanged>;
     /** Event fired when rows or count change */
-    readonly onRowsOrCountChanged?: EventEmitter<any, IEventData>;
+    readonly onRowsOrCountChanged?: EventEmitter<ArgsRowsOrCountChanged>;
     /** Callback invoked before submitting a request, can cancel the operation */
     onSubmit: CancellableViewCallback<TItem>;
     /** Additional parameters to send with service requests */
@@ -244,7 +249,7 @@ export interface IRemoteView<TItem = any> extends IDataView<TItem> {
     /***
      * Wires the grid and the DataView together to keep row selection tied to item ids.
      */
-    syncGridSelection?(grid: ISleekGrid, preserveHidden?: boolean, preserveHiddenOnSelectionChange?: boolean): EventEmitter<any, IEventData>;
+    syncGridSelection?(grid: ISleekGrid, preserveHidden?: boolean, preserveHiddenOnSelectionChange?: boolean): EventEmitter<any, {}>;
     /**
      * Updates an existing item in the view.
      * @param id The ID of the item to update

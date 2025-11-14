@@ -1,9 +1,9 @@
 import * as deprecatedWorkaround from "../../src/core/event";
-import { EventData, EventEmitter, EventSubscriber, IEventData, patchEvent } from "../../src/core/event";
+import { EventDataWrapper, EventEmitter, EventSubscriber, type EventData } from "../../src/core/event";
 
-describe('EventData', () => {
+describe('EventDataWrapper', () => {
     it('stopPropagation stops event propagation', () => {
-        const eventData = new EventData();
+        const eventData = new EventDataWrapper();
 
         expect(eventData.isPropagationStopped()).toBeFalsy();
 
@@ -12,7 +12,7 @@ describe('EventData', () => {
     });
 
     it('stopImmediatePropagation stops event propagation', () => {
-        const eventData = new EventData();
+        const eventData = new EventDataWrapper();
 
         expect(eventData.isImmediatePropagationStopped()).toBeFalsy();
 
@@ -30,7 +30,7 @@ describe('EventEmitter', () => {
             isEventCalled = true;
         });
 
-        event.notify(null, new EventData(), null);
+        event.notify(null, new EventDataWrapper(), null);
 
         expect(isEventCalled).toBeTruthy();
     });
@@ -47,7 +47,7 @@ describe('EventEmitter', () => {
             isEventCalled[1] = true;
         });
 
-        event.notify(null, new EventData(), null)
+        event.notify(null, new EventDataWrapper(), null)
 
         expect(isEventCalled[0]).toBeTruthy();
         expect(isEventCalled[1]).toBeTruthy();
@@ -63,7 +63,7 @@ describe('EventEmitter', () => {
 
         event.notify({
             foo: 'bar',
-        }, new EventData(), null)
+        }, new EventDataWrapper(), null)
 
         expect(eventArgs).toBeDefined();
         expect(eventArgs.foo).toBe('bar');
@@ -80,7 +80,7 @@ describe('EventEmitter', () => {
         event.subscribe(handler);
         event.unsubscribe(handler);
 
-        event.notify(null, new EventData(), null)
+        event.notify(null, new EventDataWrapper(), null)
 
         expect(callCount).toBe(0);
     });
@@ -101,7 +101,7 @@ describe('EventEmitter', () => {
         event.subscribe(otherHandler);
         event.unsubscribe(handler);
 
-        event.notify(null, new EventData(), null)
+        event.notify(null, new EventDataWrapper(), null)
 
         expect(callCount).toBe(1);
     });
@@ -121,43 +121,51 @@ describe('EventEmitter', () => {
         };
 
         event.subscribe(handler);
-        event.notify(null, new EventData(), scope)
+        event.notify(null, new EventDataWrapper(), scope)
 
         expect(callCount).toBe(1);
     });
 
     it('doesnt notify subscribers when event propagation is stopped', () => {
         const event = new EventEmitter();
-        const eventData = new EventData();
         let callCount = 0;
 
-        const handler = () => {
+        const handler1 = (e) => {
             callCount++;
+            e.stopPropagation();
         };
 
-        event.subscribe(handler);
+        const handler2 = () => {
+            callCount++;
+        }
 
-        eventData.stopPropagation();
-        event.notify(null, eventData, null)
+        event.subscribe(handler1);
+        event.subscribe(handler2);
 
-        expect(callCount).toBe(0);
+        event.notify(null, null, null)
+
+        expect(callCount).toBe(1);
     });
 
-    it('doesnt notify subscribers when event immediate propagation is stopped', () => {
+    it('doesnt notify remaining subscribers when event immediate propagation is stopped', () => {
         const event = new EventEmitter();
-        const eventData = new EventData();
         let callCount = 0;
 
-        const handler = () => {
+        const handler1 = (e) => {
             callCount++;
+            e.stopImmediatePropagation();
         };
 
-        event.subscribe(handler);
+        const handler2 = () => {
+            callCount++;
+        }
 
-        eventData.stopImmediatePropagation();
-        event.notify(null, eventData, null)
+        event.subscribe(handler1);
+        event.subscribe(handler2);
 
-        expect(callCount).toBe(0);
+        event.notify(null, null, null)
+
+        expect(callCount).toBe(1);
     });
 
     it('sends EventDate as an new instance if it is not passed', () => {
@@ -207,10 +215,10 @@ describe('EventEmitter', () => {
 
         event.subscribe(normalReturnHandler); // callCount will be 1
         event.subscribe(doubleReturnHandler); // callCount will be 2
-        const firstValue = event.notify(null, null, null); // double return handler will return 4
+        const firstValue = event.notify(null, null, null).getReturnValue(); // double return handler will return 4
 
         event.unsubscribe(doubleReturnHandler);
-        const secondValue = event.notify(null, null, null); // callCount will be 3 - normal return handler will return 3
+        const secondValue = event.notify(null, null, null).getReturnValue(); // callCount will be 3 - normal return handler will return 3
 
         expect(firstValue).toBe(4);
         expect(secondValue).toBe(3);
@@ -258,7 +266,7 @@ describe('EventSubscriber', () => {
     it('unsubcribe method can be chained', function () {
         const event = new EventEmitter();
         const subscriber = new EventSubscriber();
-        const handler = () => {};
+        const handler = () => { };
         subscriber.subscribe(event, handler);
         const actual = subscriber.unsubscribe(event, handler);
         expect(actual).toBe(subscriber);
@@ -418,82 +426,82 @@ describe('EventSubscriber', () => {
     });
 });
 
-describe('patchEvent', () => {
+describe('EventDataWrapper', () => {
     it('returns undefined when e is undefined', () => {
-        const result = patchEvent(undefined);
-        expect(result).toBeUndefined();
+        const result = new EventDataWrapper(undefined);
+        expect(result.nativeEvent).toBeUndefined();
     });
 
     it('returns null when e is null', () => {
-        const result = patchEvent(null);
-        expect(result).toBeNull();
+        const result = new EventDataWrapper(null);
+        expect(result.nativeEvent).toBeNull();
     });
 
     it('returns original object when it is empty', () => {
         const e = {};
-        var result = patchEvent(e);
-        expect(result).toBe(e);
+        var result = new EventDataWrapper(e);
+        expect(result.nativeEvent).toBe(e);
     });
 
 
     it('adds isDefaultPrevented when it has preventDefault', () => {
         let calls = 0;
-        const e: IEventData = {
+        const e: EventData = {
             defaultPrevented: false,
-            preventDefault: function() { this.defaultPrevented = true; calls++; }
-        };
+            preventDefault: function () { this.defaultPrevented = true; calls++; }
+        } as any;
 
-        const result = patchEvent(e);
-        expect(result).toBe(e);
+        const result = new EventDataWrapper(e);
+        expect(result.nativeEvent).toBe(e);
         expect(e.stopPropagation).toBeUndefined();
         expect(e.stopImmediatePropagation).toBeUndefined();
 
-        expect(e.isDefaultPrevented != null).toBe(true);
-        expect(e.isDefaultPrevented()).toBe(false);
-        expect(e.defaultPrevented).toBe(false);
+        expect(result.isDefaultPrevented != null).toBe(true);
+        expect(result.isDefaultPrevented()).toBe(false);
+        expect(result.defaultPrevented).toBe(false);
         expect(calls).toBe(0);
 
         e.preventDefault();
-        expect(e.isDefaultPrevented()).toBe(true);
+        expect(result.isDefaultPrevented()).toBe(true);
         expect(e.defaultPrevented).toBe(true);
 
         e.preventDefault();
-        expect(e.isDefaultPrevented()).toBe(true);
+        expect(result.isDefaultPrevented()).toBe(true);
         expect(e.defaultPrevented).toBe(true);
         expect(calls).toBe(2);
     });
 
     it('adds isPropagationStopped when it has stopPropagation', () => {
         let calls = 0;
-        const e: IEventData = {
-            stopPropagation: function() { calls++; }
-        };
+        const e: EventData = {
+            stopPropagation: function () { calls++; }
+        } as any;
 
-        const result = patchEvent(e);
-        expect(result).toBe(e);
+        const result = new EventDataWrapper(e);
+        expect(result.nativeEvent).toBe(e);
         expect(e.preventDefault).toBeUndefined();
         expect(e.stopImmediatePropagation).toBeUndefined();
         expect(e.defaultPrevented).toBeUndefined();
-        expect(e.isPropagationStopped != null).toBe(true);
-        expect(e.isPropagationStopped()).toBe(false);
+        expect(result.isPropagationStopped != null).toBe(true);
+        expect(result.isPropagationStopped()).toBe(false);
         expect(calls).toBe(0);
 
         result.stopPropagation();
-        expect(e.isPropagationStopped()).toBe(true);
+        expect(result.isPropagationStopped()).toBe(true);
 
         result.stopPropagation();
-        expect(e.isPropagationStopped()).toBe(true);
+        expect(result.isPropagationStopped()).toBe(true);
         expect(calls).toBe(2);
     });
 
     it('adds isImmediatePropagationStopped when it has stopImmediatePropagation', () => {
         let calls = 0;
-        const e: IEventData = {
-            stopImmediatePropagation: function() { calls++; }
-        };
+        const e: EventData = {
+            stopImmediatePropagation: function () { calls++; }
+        } as any;
 
-        const result = patchEvent(e);
-        expect(result).toBe(e);
+        const result = new EventDataWrapper(e);
+        expect(result.nativeEvent).toBe(e);
         expect(e.preventDefault).toBeUndefined();
         expect(e.stopPropagation).toBeUndefined();
         expect(e.defaultPrevented).toBe(undefined);
