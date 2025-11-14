@@ -44,12 +44,12 @@ export interface IEventData<TArgs = {}, TEvent = {}> {
 	nativeEvent: TEvent | null | undefined;
 }
 export type EventData<TArgs = {}, TEvent = {}> = IEventData<TArgs, TEvent> & TEvent & TArgs;
-export type SleekListener<TArgs = {}, TEvent = {}> = (e: EventData<TArgs, TEvent>, args?: TArgs) => void;
+export type EventCallback<TArgs = {}, TEvent = {}> = (e: EventData<TArgs, TEvent>, args?: TArgs) => void;
 /***
  * An event object for passing data to event handlers and letting them control propagation.
  * <p>This is pretty much identical to how W3C and jQuery implement events.</p>
  */
-export declare class EventWrapper<TArgs, TEvent = {}> implements IEventData<TArgs, TEvent> {
+export declare class EventDataWrapper<TArgs, TEvent = {}> implements IEventData<TArgs, TEvent> {
 	private _args;
 	private _isPropagationStopped;
 	private _isImmediatePropagationStopped;
@@ -94,16 +94,16 @@ export declare class EventEmitter<TArgs = any, TEvent = {}> {
 	 * object the event was fired with.<p>
 	 * @param fn {Function} Event handler.
 	 */
-	subscribe(fn: SleekListener<TArgs, TEvent>): void;
+	subscribe(fn: EventCallback<TArgs, TEvent>): void;
 	/***
 	 * Removes an event handler added with <code>subscribe(fn)</code>.
 	 * @param fn {Function} Event handler to be removed.
 	 */
-	unsubscribe(fn: SleekListener<TArgs, TEvent>): void;
+	unsubscribe(fn: EventCallback<TArgs, TEvent>): void;
 	/***
 	 * Fires an event notifying all subscribers.
 	 * @param args {Object} Additional data object to be passed to all handlers.
-	 * @param e {EventWrapper}
+	 * @param e {EventDataWrapper}
 	 *      Optional.
 	 *      An <code>EventData</code> object to be passed to all handlers.
 	 *      For DOM events, an existing W3C/jQuery event object can be passed in.
@@ -117,8 +117,8 @@ export declare class EventEmitter<TArgs = any, TEvent = {}> {
 }
 export declare class EventSubscriber {
 	private _handlers;
-	subscribe<TArgs, TEvent>(event: EventEmitter<TArgs, TEvent>, handler: SleekListener<TArgs, TEvent>): this;
-	unsubscribe<TArgs, TEvent>(event: EventEmitter<TArgs, TEvent>, handler: SleekListener<TArgs, TEvent>): this;
+	subscribe<TArgs, TEvent>(event: EventEmitter<TArgs, TEvent>, handler: EventCallback<TArgs, TEvent>): this;
+	unsubscribe<TArgs, TEvent>(event: EventEmitter<TArgs, TEvent>, handler: EventCallback<TArgs, TEvent>): this;
 	unsubscribeAll(): EventSubscriber;
 }
 /** @deprecated */

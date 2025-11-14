@@ -13,12 +13,12 @@ export interface IEventData<TArgs = {}, TEvent = {}> {
 }
 
 export type EventData<TArgs = {}, TEvent = {}> = IEventData<TArgs, TEvent> & TEvent & TArgs;
-export type SleekListener<TArgs = {}, TEvent = {}> = (e: EventData<TArgs, TEvent>, args?: TArgs) => void;
+export type EventCallback<TArgs = {}, TEvent = {}> = (e: EventData<TArgs, TEvent>, args?: TArgs) => void;
 
 let eventDataInitialized = false;
 
 function addEventDataProp(name: string) {
-    Object.defineProperty(EventWrapper.prototype, name, {
+    Object.defineProperty(EventDataWrapper.prototype, name, {
         enumerable: true,
         configurable: true,
         get: function () {
@@ -57,7 +57,7 @@ function initializeEventDataProps() {
  * An event object for passing data to event handlers and letting them control propagation.
  * <p>This is pretty much identical to how W3C and jQuery implement events.</p>
  */
-export class EventWrapper<TArgs, TEvent = {}> implements IEventData<TArgs, TEvent> {
+export class EventDataWrapper<TArgs, TEvent = {}> implements IEventData<TArgs, TEvent> {
     private _args: TArgs;
     private _isPropagationStopped = false;
     private _isImmediatePropagationStopped = false;
@@ -180,7 +180,7 @@ export class EventWrapper<TArgs, TEvent = {}> implements IEventData<TArgs, TEven
  */
 export class EventEmitter<TArgs = any, TEvent = {}> {
 
-    private _handlers: SleekListener<TArgs, TEvent>[] = [];
+    private _handlers: EventCallback<TArgs, TEvent>[] = [];
 
     /***
      * Adds an event handler to be called when the event is fired.
@@ -188,7 +188,7 @@ export class EventEmitter<TArgs = any, TEvent = {}> {
      * object the event was fired with.<p>
      * @param fn {Function} Event handler.
      */
-    subscribe(fn: SleekListener<TArgs, TEvent>) {
+    subscribe(fn: EventCallback<TArgs, TEvent>) {
         this._handlers.push(fn);
     }
 
@@ -196,7 +196,7 @@ export class EventEmitter<TArgs = any, TEvent = {}> {
      * Removes an event handler added with <code>subscribe(fn)</code>.
      * @param fn {Function} Event handler to be removed.
      */
-    unsubscribe(fn: SleekListener<TArgs, TEvent>) {
+    unsubscribe(fn: EventCallback<TArgs, TEvent>) {
         for (var i = this._handlers.length - 1; i >= 0; i--) {
             if (this._handlers[i] === fn) {
                 this._handlers.splice(i, 1);
@@ -207,7 +207,7 @@ export class EventEmitter<TArgs = any, TEvent = {}> {
     /***
      * Fires an event notifying all subscribers.
      * @param args {Object} Additional data object to be passed to all handlers.
-     * @param e {EventWrapper}
+     * @param e {EventDataWrapper}
      *      Optional.
      *      An <code>EventData</code> object to be passed to all handlers.
      *      For DOM events, an existing W3C/jQuery event object can be passed in.
@@ -217,7 +217,7 @@ export class EventEmitter<TArgs = any, TEvent = {}> {
      *      If not specified, the scope will be set to the <code>Event</code> instance.
      */
     notify(args?: TArgs, e?: TEvent, scope?: object, mergeArgs = true): EventData<TArgs, TEvent> {
-        const sed = new EventWrapper<TArgs, TEvent>(e, args, mergeArgs);
+        const sed = new EventDataWrapper<TArgs, TEvent>(e, args, mergeArgs);
         scope = scope || this;
         for (var i = 0; i < this._handlers.length && !(sed.isPropagationStopped() || sed.isImmediatePropagationStopped()); i++) {
             const returnValue = this._handlers[i].call(scope, sed, args);
@@ -233,13 +233,13 @@ export class EventEmitter<TArgs = any, TEvent = {}> {
 
 interface EventSubscriberEntry {
     event: EventEmitter<any, any>;
-    handler: SleekListener<any, any>;
+    handler: EventCallback<any, any>;
 }
 
 export class EventSubscriber {
     private _handlers: EventSubscriberEntry[] = [];
 
-    subscribe<TArgs, TEvent>(event: EventEmitter<TArgs, TEvent>, handler: SleekListener<TArgs, TEvent>): this {
+    subscribe<TArgs, TEvent>(event: EventEmitter<TArgs, TEvent>, handler: EventCallback<TArgs, TEvent>): this {
         this._handlers.push({
             event: event,
             handler: handler
@@ -249,7 +249,7 @@ export class EventSubscriber {
         return this;
     }
 
-    unsubscribe<TArgs, TEvent>(event: EventEmitter<TArgs, TEvent>, handler: SleekListener<TArgs, TEvent>): this {
+    unsubscribe<TArgs, TEvent>(event: EventEmitter<TArgs, TEvent>, handler: EventCallback<TArgs, TEvent>): this {
         var i = this._handlers.length;
         while (i--) {
             if (this._handlers[i].event === event &&
