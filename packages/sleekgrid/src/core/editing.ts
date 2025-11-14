@@ -1,5 +1,5 @@
 import { Column, ColumnMetadata } from "./column";
-import { EventEmitter, IEventData } from "./event";
+import { EventEmitter, SleekEvent } from "./event";
 
 export interface Position {
     bottom?: number;
@@ -43,7 +43,7 @@ export interface EditorOptions {
     compositeEditorOptions?: CompositeEditorOptions;
     container?: HTMLElement;
     item?: any;
-    event?: IEventData;
+    event?: SleekEvent;
     commitChanges?: () => void,
     cancelChanges?: () => void
 }

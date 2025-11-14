@@ -649,13 +649,19 @@ export namespace Fluent {
         if (!event)
             return void 0;
 
-        if (typeof event[prop] !== "undefined")
+        if (prop in event) {
             return event[prop];
+        }
 
-        if (typeof event.originalEvent === "object" && typeof event.originalEvent[prop] !== "undefined")
-            return event.originalEvent[prop];
+        if (typeof event.nativeEvent === "object" && prop in event.nativeEvent)
+            return event.nativeEvent[prop];
 
-        if (typeof event.detail === "object")
+        const originalEvent = event.originalEvent ?? event.nativeEvent?.originalEvent;
+
+        if (typeof originalEvent === "object" && prop in originalEvent)
+            return originalEvent[prop];
+
+        if (typeof event.detail === "object" && prop in event.detail)
             return event.detail[prop];
     }
 }

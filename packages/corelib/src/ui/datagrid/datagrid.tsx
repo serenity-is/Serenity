@@ -1,5 +1,5 @@
 import { bindThis } from "@serenity-is/domwise";
-import { AutoTooltips, Column, ColumnSort, FormatterContext, type GridOptions, SleekGrid, type ArgsSort, type CellMouseEvent, type ISleekGrid } from "@serenity-is/sleekgrid";
+import { AutoTooltips, Column, ColumnSort, FormatterContext, type GridOptions, SleekGrid, type ArgsSort, type CellMouseEvent, type ISleekGrid, type SleekEvent } from "@serenity-is/sleekgrid";
 import { Authorization, Criteria, DataGridTexts, Fluent, ListResponse, cssEscape, debounce, getInstanceType, getTypeFullName, getjQuery, nsSerenity, tryGetText, type PropertyItem, type PropertyItemsData } from "../../base";
 import { PubSub } from "../../base/pubsub";
 import { LayoutTimer, ScriptData, getColumnsData, getColumnsDataAsync, setEquality } from "../../compat";
@@ -458,7 +458,7 @@ export class DataGrid<TItem, P = {}> extends Widget<P> implements IDataGrid, IRe
         this.view.setItems(value, true);
     }
 
-    protected handleGridSort(e: Event & ArgsSort) {
+    protected handleGridSort(e: SleekEvent<ArgsSort>) {
         sleekGridOnSort(this.view, e);
         this.persistSettings();
     }
@@ -520,7 +520,7 @@ export class DataGrid<TItem, P = {}> extends Widget<P> implements IDataGrid, IRe
         }
     }
 
-    protected viewDataChanged(e: any, rows: TItem[]): void {
+    protected viewDataChanged(): void {
         this.onDataChanged.notify({ dataGrid: this });
         this.markupReady();
         this.layout();

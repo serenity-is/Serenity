@@ -30,27 +30,37 @@ export declare class CellRange {
 	 */
 	toString(): string;
 }
-export interface IEventData {
-	readonly type?: string;
-	currentTarget?: EventTarget | null;
-	target?: EventTarget | null;
-	originalEvent?: any;
-	defaultPrevented?: boolean;
-	preventDefault?(): void;
-	stopPropagation?(): void;
-	stopImmediatePropagation?(): void;
-	isDefaultPrevented?(): boolean;
-	isImmediatePropagationStopped?(): boolean;
-	isPropagationStopped?(): boolean;
+export interface IEventData<TArgs = {}, TEvent = {}> {
+	args: TArgs;
+	defaultPrevented: boolean;
+	preventDefault(): void;
+	stopPropagation(): void;
+	stopImmediatePropagation(): void;
+	isDefaultPrevented(): boolean;
+	isImmediatePropagationStopped(): boolean;
+	isPropagationStopped(): boolean;
+	getReturnValue(): any;
+	getReturnValues(): any[];
+	nativeEvent: TEvent | null | undefined;
 }
+export type SleekEvent<TArgs = {}, TEvent = {}> = IEventData<TArgs, TEvent> & TEvent & TArgs;
+export type SleekListener<TArgs = {}, TEvent = {}> = (e: SleekEvent<TArgs, TEvent>, args?: TArgs) => void;
 /***
  * An event object for passing data to event handlers and letting them control propagation.
  * <p>This is pretty much identical to how W3C and jQuery implement events.</p>
  */
-export declare class EventData implements IEventData {
+export declare class EventData<TArgs, TEvent = {}> implements IEventData<TArgs, TEvent> {
+	private _args;
 	private _isPropagationStopped;
 	private _isImmediatePropagationStopped;
-	defaultPrevented?: boolean;
+	private _isDefaultPrevented;
+	private _nativeEvent;
+	private _returnValue;
+	private _returnValues;
+	constructor(event?: TEvent | null, args?: TArgs, mergeArgs?: boolean);
+	get defaultPrevented(): boolean;
+	preventDefault(): void;
+	isDefaultPrevented(): any;
 	/***
 	 * Stops event from propagating up the DOM tree.
 	 */
@@ -67,11 +77,16 @@ export declare class EventData implements IEventData {
 	 * Returns whether stopImmediatePropagation was called on this event object.\
 	 */
 	isImmediatePropagationStopped(): boolean;
+	get args(): TArgs;
+	addReturnValue(value: any): void;
+	getReturnValues(): any[];
+	getReturnValue(): any;
+	get nativeEvent(): TEvent | null | undefined;
 }
 /***
  * A simple publisher-subscriber implementation.
  */
-export declare class EventEmitter<TArgs = any, TEventData extends IEventData = IEventData> {
+export declare class EventEmitter<TArgs = any, TEvent = {}> {
 	private _handlers;
 	/***
 	 * Adds an event handler to be called when the event is fired.
@@ -79,12 +94,12 @@ export declare class EventEmitter<TArgs = any, TEventData extends IEventData = I
 	 * object the event was fired with.<p>
 	 * @param fn {Function} Event handler.
 	 */
-	subscribe(fn: ((e: TEventData & TArgs, args?: TArgs) => void)): void;
+	subscribe(fn: SleekListener<TArgs, TEvent>): void;
 	/***
 	 * Removes an event handler added with <code>subscribe(fn)</code>.
 	 * @param fn {Function} Event handler to be removed.
 	 */
-	unsubscribe(fn: ((e: TEventData & TArgs, args?: TArgs) => void)): void;
+	unsubscribe(fn: SleekListener<TArgs, TEvent>): void;
 	/***
 	 * Fires an event notifying all subscribers.
 	 * @param args {Object} Additional data object to be passed to all handlers.
@@ -97,14 +112,14 @@ export declare class EventEmitter<TArgs = any, TEventData extends IEventData = I
 	 *      The scope ("this") within which the handler will be executed.
 	 *      If not specified, the scope will be set to the <code>Event</code> instance.
 	 */
-	notify(args?: TArgs, e?: TEventData, scope?: object, mergeArgs?: boolean): any;
+	notify(args?: TArgs, e?: TEvent, scope?: object, mergeArgs?: boolean): SleekEvent<TArgs, TEvent>;
 	clear(): void;
 }
-export declare class EventSubscriber<TArgs = any, TEventData extends IEventData = IEventData> {
+export declare class EventSubscriber {
 	private _handlers;
-	subscribe(event: EventEmitter<TArgs, TEventData>, handler: ((e: TEventData & TArgs, args?: TArgs) => void)): this;
-	unsubscribe(event: EventEmitter<TArgs, TEventData>, handler: ((e: TEventData & TArgs, args?: TArgs) => void)): this;
-	unsubscribeAll(): EventSubscriber<TArgs, TEventData>;
+	subscribe<TArgs, TEvent>(event: EventEmitter<TArgs, TEvent>, handler: SleekListener<TArgs, TEvent>): this;
+	unsubscribe<TArgs, TEvent>(event: EventEmitter<TArgs, TEvent>, handler: SleekListener<TArgs, TEvent>): this;
+	unsubscribeAll(): EventSubscriber;
 }
 /** @deprecated */
 export declare const keyCode: {
@@ -123,7 +138,6 @@ export declare const keyCode: {
 	TAB: number;
 	UP: number;
 };
-export declare function patchEvent(e: IEventData): IEventData;
 export interface Position {
 	bottom?: number;
 	height?: number;
@@ -161,7 +175,7 @@ export interface EditorOptions {
 	compositeEditorOptions?: CompositeEditorOptions;
 	container?: HTMLElement;
 	item?: any;
-	event?: IEventData;
+	event?: SleekEvent;
 	commitChanges?: () => void;
 	cancelChanges?: () => void;
 }
@@ -354,20 +368,20 @@ export interface ArgsValidationError extends ArgsCell {
 	cellNode: HTMLElement;
 	validationResults: ValidationResult;
 }
-export type CellEvent = IEventData & ArgsCell;
-export type CellKeyboardEvent = KeyboardEvent & ArgsCell;
-export type CellMouseEvent = MouseEvent & ArgsCell;
-export type HeaderColumnEvent = IEventData & ArgsColumn;
-export type HeaderMouseEvent = MouseEvent & ArgsColumn;
-export type HeaderRenderEvent = IEventData & ArgsColumnNode;
+export type CellEvent = SleekEvent<ArgsCell>;
+export type CellKeyboardEvent = SleekEvent<ArgsCell, KeyboardEvent>;
+export type CellMouseEvent = SleekEvent<ArgsCell, MouseEvent>;
+export type HeaderColumnEvent = SleekEvent<ArgsColumn, Event>;
+export type HeaderMouseEvent = SleekEvent<ArgsColumn, MouseEvent>;
+export type HeaderRenderEvent = SleekEvent<ArgsColumnNode, Event>;
 export type FooterColumnEvent = HeaderColumnEvent;
 export type FooterMouseEvent = HeaderMouseEvent;
 export type FooterRenderEvent = HeaderRenderEvent;
-export type GridEvent = IEventData & ArgsGrid;
-export type GridDragEvent = UIEvent & {
+export type GridEvent = SleekEvent<ArgsGrid>;
+export type GridDragEvent = SleekEvent<ArgsGrid, UIEvent> & {
 	dragData: DragData;
 };
-export type GridMouseEvent = MouseEvent & ArgsGrid;
+export type GridMouseEvent = SleekEvent<ArgsGrid, MouseEvent>;
 export interface GridPlugin {
 	init(grid: ISleekGrid): void;
 	pluginName?: string;
@@ -906,21 +920,21 @@ export interface ViewRange {
 	rightPx?: number;
 }
 export interface ISleekGrid<TItem = any> extends CellNavigation, EditorHost, GridPluginHost {
-	readonly onActiveCellChanged: EventEmitter<ArgsCell, IEventData>;
-	readonly onActiveCellPositionChanged: EventEmitter<ArgsGrid, IEventData>;
-	readonly onAddNewRow: EventEmitter<ArgsAddNewRow, IEventData>;
-	readonly onAfterInit: EventEmitter<ArgsGrid, IEventData>;
-	readonly onBeforeCellEditorDestroy: EventEmitter<ArgsEditorDestroy, IEventData>;
-	readonly onBeforeDestroy: EventEmitter<ArgsGrid, IEventData>;
-	readonly onBeforeEditCell: EventEmitter<ArgsCellEdit, IEventData>;
-	readonly onBeforeFooterRowCellDestroy: EventEmitter<ArgsColumnNode, IEventData>;
-	readonly onBeforeHeaderCellDestroy: EventEmitter<ArgsColumnNode, IEventData>;
-	readonly onBeforeHeaderRowCellDestroy: EventEmitter<ArgsColumnNode, IEventData>;
-	readonly onCellChange: EventEmitter<ArgsCellChange, IEventData>;
-	readonly onCellCssStylesChanged: EventEmitter<ArgsCssStyle, IEventData>;
+	readonly onActiveCellChanged: EventEmitter<ArgsCell>;
+	readonly onActiveCellPositionChanged: EventEmitter<ArgsGrid>;
+	readonly onAddNewRow: EventEmitter<ArgsAddNewRow>;
+	readonly onAfterInit: EventEmitter<ArgsGrid>;
+	readonly onBeforeCellEditorDestroy: EventEmitter<ArgsEditorDestroy>;
+	readonly onBeforeDestroy: EventEmitter<ArgsGrid>;
+	readonly onBeforeEditCell: EventEmitter<ArgsCellEdit>;
+	readonly onBeforeFooterRowCellDestroy: EventEmitter<ArgsColumnNode>;
+	readonly onBeforeHeaderCellDestroy: EventEmitter<ArgsColumnNode>;
+	readonly onBeforeHeaderRowCellDestroy: EventEmitter<ArgsColumnNode>;
+	readonly onCellChange: EventEmitter<ArgsCellChange>;
+	readonly onCellCssStylesChanged: EventEmitter<ArgsCssStyle>;
 	readonly onClick: EventEmitter<ArgsCell, MouseEvent>;
-	readonly onColumnsReordered: EventEmitter<ArgsGrid, IEventData>;
-	readonly onColumnsResized: EventEmitter<ArgsGrid, IEventData>;
+	readonly onColumnsReordered: EventEmitter<ArgsGrid>;
+	readonly onColumnsResized: EventEmitter<ArgsGrid>;
 	readonly onContextMenu: EventEmitter<ArgsGrid, UIEvent>;
 	readonly onDblClick: EventEmitter<ArgsCell, MouseEvent>;
 	readonly onDrag: EventEmitter<ArgsGrid, UIEvent & {
@@ -935,21 +949,21 @@ export interface ISleekGrid<TItem = any> extends CellNavigation, EditorHost, Gri
 	readonly onDragStart: EventEmitter<ArgsGrid, UIEvent & {
 		dragData: DragData;
 	}>;
-	readonly onFooterRowCellRendered: EventEmitter<ArgsColumnNode, IEventData>;
-	readonly onHeaderCellRendered: EventEmitter<ArgsColumnNode, IEventData>;
+	readonly onFooterRowCellRendered: EventEmitter<ArgsColumnNode>;
+	readonly onHeaderCellRendered: EventEmitter<ArgsColumnNode>;
 	readonly onHeaderClick: EventEmitter<ArgsColumn, MouseEvent>;
 	readonly onHeaderContextMenu: EventEmitter<ArgsColumn, MouseEvent>;
 	readonly onHeaderMouseEnter: EventEmitter<ArgsColumn, MouseEvent>;
 	readonly onHeaderMouseLeave: EventEmitter<ArgsColumn, MouseEvent>;
-	readonly onHeaderRowCellRendered: EventEmitter<ArgsColumnNode, IEventData>;
+	readonly onHeaderRowCellRendered: EventEmitter<ArgsColumnNode>;
 	readonly onKeyDown: EventEmitter<ArgsCell, KeyboardEvent>;
 	readonly onMouseEnter: EventEmitter<ArgsGrid, MouseEvent>;
 	readonly onMouseLeave: EventEmitter<ArgsGrid, MouseEvent>;
-	readonly onScroll: EventEmitter<ArgsScroll, IEventData>;
-	readonly onSelectedRowsChanged: EventEmitter<ArgsSelectedRowsChange, IEventData>;
-	readonly onSort: EventEmitter<ArgsSort, IEventData>;
-	readonly onValidationError: EventEmitter<ArgsValidationError, IEventData>;
-	readonly onViewportChanged: EventEmitter<ArgsGrid, IEventData>;
+	readonly onScroll: EventEmitter<ArgsScroll>;
+	readonly onSelectedRowsChanged: EventEmitter<ArgsSelectedRowsChange>;
+	readonly onSort: EventEmitter<ArgsSort>;
+	readonly onValidationError: EventEmitter<ArgsValidationError>;
+	readonly onViewportChanged: EventEmitter<ArgsGrid>;
 	init(): void;
 	addCellCssStyles(key: string, hash: CellStylesHash): void;
 	autosizeColumns(): void;
@@ -963,9 +977,13 @@ export interface ISleekGrid<TItem = any> extends CellNavigation, EditorHost, Gri
 	flashCell(row: number, cell: number, speed?: number): void;
 	focus(): void;
 	getAbsoluteColumnMinWidth(): number;
-	getActiveCanvasNode(e?: IEventData): HTMLElement;
+	getActiveCanvasNode(e?: {
+		target: EventTarget;
+	}): HTMLElement;
 	getActiveCellNode(): HTMLElement;
-	getActiveViewportNode(e?: IEventData): HTMLElement;
+	getActiveViewportNode(e?: {
+		target: EventTarget;
+	}): HTMLElement;
 	/** Returns all columns in the grid, including hidden ones, the order might not match visible columns due to pinning, ordering etc. */
 	getAllColumns(): Column<TItem>[];
 	getCanvases(): any | HTMLElement[];
@@ -1271,11 +1289,11 @@ export interface IDataView<TItem = any> {
 	/** Gets metadata for the item at the specified row index. */
 	getItemMetadata?(row: number): ItemMetadata<TItem>;
 	/** Event fired when the underlying data changes */
-	readonly onDataChanged?: EventEmitter<any, IEventData>;
+	readonly onDataChanged?: EventEmitter<any>;
 	/** Event fired when the row count changes */
-	readonly onRowCountChanged?: EventEmitter<any, IEventData>;
+	readonly onRowCountChanged?: EventEmitter<any>;
 	/** Event fired when specific rows change */
-	readonly onRowsChanged?: EventEmitter<any, IEventData>;
+	readonly onRowsChanged?: EventEmitter<any>;
 }
 export declare function addClass(el: Element, cls: string): void;
 export declare function escapeHtml(s: any): any;
@@ -1416,23 +1434,23 @@ export declare class SleekGrid<TItem = any> implements ISleekGrid<TItem> {
 	private _focusSink2;
 	private _groupingPanel;
 	private _eventDisposer;
-	readonly onActiveCellChanged: EventEmitter<ArgsCell, IEventData>;
-	readonly onActiveCellPositionChanged: EventEmitter<ArgsGrid, IEventData>;
-	readonly onAddNewRow: EventEmitter<ArgsAddNewRow, IEventData>;
-	static readonly onAfterInit: EventEmitter<ArgsGrid, IEventData>;
-	readonly onAfterInit: EventEmitter<ArgsGrid, IEventData>;
-	readonly onBeforeCellEditorDestroy: EventEmitter<ArgsEditorDestroy, IEventData>;
-	readonly onBeforeDestroy: EventEmitter<ArgsGrid, IEventData>;
-	readonly onBeforeEditCell: EventEmitter<ArgsCellEdit, IEventData>;
-	readonly onBeforeFooterRowCellDestroy: EventEmitter<ArgsColumnNode, IEventData>;
-	readonly onBeforeHeaderCellDestroy: EventEmitter<ArgsColumnNode, IEventData>;
-	readonly onBeforeHeaderRowCellDestroy: EventEmitter<ArgsColumnNode, IEventData>;
-	readonly onCellChange: EventEmitter<ArgsCellChange, IEventData>;
-	readonly onCellCssStylesChanged: EventEmitter<ArgsCssStyle, IEventData>;
+	readonly onActiveCellChanged: EventEmitter<ArgsCell, {}>;
+	readonly onActiveCellPositionChanged: EventEmitter<ArgsGrid, {}>;
+	readonly onAddNewRow: EventEmitter<ArgsAddNewRow, {}>;
+	static readonly onAfterInit: EventEmitter<ArgsGrid, {}>;
+	readonly onAfterInit: EventEmitter<ArgsGrid, {}>;
+	readonly onBeforeCellEditorDestroy: EventEmitter<ArgsEditorDestroy, {}>;
+	readonly onBeforeDestroy: EventEmitter<ArgsGrid, {}>;
+	readonly onBeforeEditCell: EventEmitter<ArgsCellEdit, {}>;
+	readonly onBeforeFooterRowCellDestroy: EventEmitter<ArgsColumnNode, {}>;
+	readonly onBeforeHeaderCellDestroy: EventEmitter<ArgsColumnNode, {}>;
+	readonly onBeforeHeaderRowCellDestroy: EventEmitter<ArgsColumnNode, {}>;
+	readonly onCellChange: EventEmitter<ArgsCellChange, {}>;
+	readonly onCellCssStylesChanged: EventEmitter<ArgsCssStyle, {}>;
 	readonly onClick: EventEmitter<ArgsCell, MouseEvent>;
-	readonly onColumnsReordered: EventEmitter<ArgsGrid, IEventData>;
-	readonly onColumnsResized: EventEmitter<ArgsGrid, IEventData>;
-	readonly onCompositeEditorChange: EventEmitter<ArgsGrid, IEventData>;
+	readonly onColumnsReordered: EventEmitter<ArgsGrid, {}>;
+	readonly onColumnsResized: EventEmitter<ArgsGrid, {}>;
+	readonly onCompositeEditorChange: EventEmitter<ArgsGrid, {}>;
 	readonly onContextMenu: EventEmitter<ArgsGrid, UIEvent>;
 	readonly onDblClick: EventEmitter<ArgsCell, MouseEvent>;
 	readonly onDrag: EventEmitter<ArgsGrid, UIEvent & {
@@ -1447,21 +1465,21 @@ export declare class SleekGrid<TItem = any> implements ISleekGrid<TItem> {
 	readonly onDragStart: EventEmitter<ArgsGrid, UIEvent & {
 		dragData: DragData;
 	}>;
-	readonly onFooterRowCellRendered: EventEmitter<ArgsColumnNode, IEventData>;
-	readonly onHeaderCellRendered: EventEmitter<ArgsColumnNode, IEventData>;
+	readonly onFooterRowCellRendered: EventEmitter<ArgsColumnNode, {}>;
+	readonly onHeaderCellRendered: EventEmitter<ArgsColumnNode, {}>;
 	readonly onHeaderClick: EventEmitter<ArgsColumn, MouseEvent>;
 	readonly onHeaderContextMenu: EventEmitter<ArgsColumn, MouseEvent>;
 	readonly onHeaderMouseEnter: EventEmitter<ArgsColumn, MouseEvent>;
 	readonly onHeaderMouseLeave: EventEmitter<ArgsColumn, MouseEvent>;
-	readonly onHeaderRowCellRendered: EventEmitter<ArgsColumnNode, IEventData>;
+	readonly onHeaderRowCellRendered: EventEmitter<ArgsColumnNode, {}>;
 	readonly onKeyDown: EventEmitter<ArgsCell, KeyboardEvent>;
 	readonly onMouseEnter: EventEmitter<ArgsGrid, MouseEvent>;
 	readonly onMouseLeave: EventEmitter<ArgsGrid, MouseEvent>;
-	readonly onScroll: EventEmitter<ArgsScroll, IEventData>;
-	readonly onSelectedRowsChanged: EventEmitter<ArgsSelectedRowsChange, IEventData>;
-	readonly onSort: EventEmitter<ArgsSort, IEventData>;
-	readonly onValidationError: EventEmitter<ArgsValidationError, IEventData>;
-	readonly onViewportChanged: EventEmitter<ArgsGrid, IEventData>;
+	readonly onScroll: EventEmitter<ArgsScroll, {}>;
+	readonly onSelectedRowsChanged: EventEmitter<ArgsSelectedRowsChange, {}>;
+	readonly onSort: EventEmitter<ArgsSort, {}>;
+	readonly onValidationError: EventEmitter<ArgsValidationError, {}>;
+	readonly onViewportChanged: EventEmitter<ArgsGrid, {}>;
 	constructor(container: string | HTMLElement | ArrayLike<HTMLElement>, data: any, columns: Column<TItem>[], options: GridOptions<TItem>);
 	private applyLegacyHeightOptions;
 	private createGroupingPanel;
@@ -1491,11 +1509,15 @@ export declare class SleekGrid<TItem = any> implements ISleekGrid<TItem> {
 	};
 	getCanvasNode(row?: number, cell?: number): HTMLElement;
 	getCanvases(): any | HTMLElement[];
-	getActiveCanvasNode(e?: IEventData): HTMLElement;
+	getActiveCanvasNode(e?: {
+		target: EventTarget;
+	}): HTMLElement;
 	getViewportNode(row?: number, cell?: number): HTMLElement;
 	private getViewportInfo;
 	private getViewports;
-	getActiveViewportNode(e?: IEventData): HTMLElement;
+	getActiveViewportNode(e?: {
+		target: EventTarget;
+	}): HTMLElement;
 	private getAvailableWidth;
 	private applyColumnWidths;
 	private adjustPinnedColsLimit;
@@ -1904,8 +1926,8 @@ export declare class RowMoveManager implements GridPlugin {
 	private options;
 	private dragging;
 	private handler;
-	onBeforeMoveRows: EventEmitter<ArgsMoveRows, IEventData>;
-	onMoveRows: EventEmitter<ArgsMoveRows, IEventData>;
+	onBeforeMoveRows: EventEmitter<ArgsMoveRows, {}>;
+	onMoveRows: EventEmitter<ArgsMoveRows, {}>;
 	constructor(options?: RowMoveManagerOptions);
 	static readonly defaults: RowMoveManagerOptions;
 	init(grid: ISleekGrid): void;
@@ -1923,7 +1945,7 @@ export declare class RowSelectionModel implements GridPlugin, SelectionModel {
 	private handler;
 	private options;
 	private ranges;
-	onSelectedRangesChanged: EventEmitter<CellRange[], IEventData>;
+	onSelectedRangesChanged: EventEmitter<CellRange[], {}>;
 	constructor(options?: RowSelectionModelOptions);
 	static readonly defaults: RowSelectionModelOptions;
 	init(grid: ISleekGrid): void;

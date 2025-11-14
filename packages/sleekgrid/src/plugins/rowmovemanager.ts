@@ -1,5 +1,5 @@
 import { bindThis } from "@serenity-is/domwise";
-import { EventEmitter, EventSubscriber, type ISleekGrid, type GridPlugin } from "../core";
+import { EventEmitter, EventSubscriber, type ISleekGrid, type GridPlugin, type SleekEvent } from "../core";
 
 export interface RowMoveManagerOptions {
     cancelEditOnDrag?: boolean;
@@ -47,12 +47,12 @@ export class RowMoveManager implements GridPlugin {
         this.handler?.unsubscribeAll();
     }
 
-    private handleDragInit(e: UIEvent) {
+    private handleDragInit(e: SleekEvent<{}, UIEvent>) {
         // prevent the grid from cancelling drag'n'drop by default
         e.stopImmediatePropagation();
     }
 
-    private handleDragStart(e: UIEvent, dd: RowMoveManagerDragData) {
+    private handleDragStart(e: SleekEvent<{}, UIEvent>, dd: RowMoveManagerDragData) {
         let cell = this.grid.getCellFromEvent(e);
 
         if (this.options.cancelEditOnDrag && this.grid.getEditorLock().isActive()) {
@@ -88,7 +88,7 @@ export class RowMoveManager implements GridPlugin {
         dd.insertBefore = -1;
     }
 
-    private handleDrag(e: UIEvent, dd: RowMoveManagerDragData) {
+    private handleDrag(e: SleekEvent<{}, UIEvent>, dd: RowMoveManagerDragData) {
         if (!this.dragging)
             return;
 
@@ -104,12 +104,12 @@ export class RowMoveManager implements GridPlugin {
 
         let insertBefore = Math.max(0, Math.min(Math.round(top / this.grid.getOptions().rowHeight), this.grid.getDataLength()));
         if (insertBefore !== dd.insertBefore) {
-            let eventData = {
+            let sgEvent = {
                 rows: dd.selectedRows,
                 insertBefore: insertBefore
             };
 
-            if (this.onBeforeMoveRows.notify(eventData) === false) {
+            if (this.onBeforeMoveRows.notify(sgEvent).getReturnValue() === false) {
                 dd.guide.style.top = "-1000";
                 dd.canMove = false;
             } else {
@@ -121,7 +121,7 @@ export class RowMoveManager implements GridPlugin {
         }
     }
 
-    private handleDragEnd(e: UIEvent, dd: RowMoveManagerDragData) {
+    private handleDragEnd(e: SleekEvent<{}, UIEvent>, dd: RowMoveManagerDragData) {
         if (!this.dragging)
             return;
 

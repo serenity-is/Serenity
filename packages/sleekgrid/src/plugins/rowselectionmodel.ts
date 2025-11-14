@@ -1,4 +1,4 @@
-import { CellRange, EventEmitter, EventSubscriber, IEventData, type ArgsCell, type ISleekGrid, type GridPlugin, type SelectionModel, type CellEvent } from "../core";
+import { CellRange, EventEmitter, EventSubscriber, SleekEvent, type ArgsCell, type ISleekGrid, type GridPlugin, type SelectionModel, type CellEvent } from "../core";
 
 export interface RowSelectionModelOptions {
     selectActiveRow?: boolean;

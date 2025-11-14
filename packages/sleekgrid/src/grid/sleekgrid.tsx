@@ -4,7 +4,7 @@ import { CellRange } from "../core/cellrange";
 import { columnDefaults, initColumnProps, type Column, type ColumnMetadata, type ColumnSort, type ItemMetadata } from "../core/column";
 import { Draggable, type DragPosition } from "../core/draggable";
 import type { EditCommand, EditController, Editor, EditorClass, EditorFactory, EditorLock, Position, RowCell } from "../core/editing";
-import { EventData, EventEmitter, type IEventData } from "../core/event";
+import { EventEmitter, type SleekEvent } from "../core/event";
 import type { ArgsAddNewRow, ArgsCell, ArgsCellChange, ArgsCellEdit, ArgsColumn, ArgsColumnNode, ArgsCssStyle, ArgsEditorDestroy, ArgsGrid, ArgsScroll, ArgsSelectedRowsChange, ArgsSort, ArgsValidationError, DragData } from "../core/eventargs";
 import { applyFormatterResultToCellNode, convertCompatFormatter, defaultColumnFormat, formatterContext, type CellStylesHash, type ColumnFormat, type FormatterContext, type FormatterResult } from "../core/formatting";
 import type { GridPlugin } from "../core/grid-plugin";
@@ -541,7 +541,7 @@ export class SleekGrid<TItem = any> implements ISleekGrid<TItem> {
         return this._jQuery ? this._jQuery(canvases) : canvases;
     }
 
-    getActiveCanvasNode(e?: IEventData): HTMLElement {
+    getActiveCanvasNode(e?: { target: EventTarget }): HTMLElement {
         if (e) { // compatibility with celldecorator plugin
             this._activeCanvasNode = (e.target as HTMLElement)?.closest?.('.grid-canvas');
         }
@@ -560,7 +560,7 @@ export class SleekGrid<TItem = any> implements ISleekGrid<TItem> {
         return getAllViewportNodes(this._refs);
     }
 
-    getActiveViewportNode(e?: IEventData): HTMLElement {
+    getActiveViewportNode(e?: { target: EventTarget }): HTMLElement {
         if (e) { // compatibility with celldecorator plugin
             this._activeViewportNode = (e.target as HTMLElement)?.closest?.('.slick-viewport');
         }
@@ -1265,7 +1265,7 @@ export class SleekGrid<TItem = any> implements ISleekGrid<TItem> {
         return this._sortColumns;
     }
 
-    private handleSelectedRangesChanged = (e: IEventData, ranges: CellRange[]): void => {
+    private handleSelectedRangesChanged = (e: SleekEvent, ranges: CellRange[]): void => {
         var previousSelectedRows = this._selectedRows.slice(0); // shallow copy previously selected rows for later comparison
         this._selectedRows = [];
         var hash: any = Object.create(null), cols = this._cols;
@@ -2584,7 +2584,7 @@ export class SleekGrid<TItem = any> implements ISleekGrid<TItem> {
         this._hRender = null;
     }
 
-    private handleHeaderFooterRowScroll = (e: IEventData): void => {
+    private handleHeaderFooterRowScroll = (e: Event): void => {
         if (this._ignoreScrollUntil >= new Date().getTime())
             return;
 
@@ -2868,10 +2868,10 @@ export class SleekGrid<TItem = any> implements ISleekGrid<TItem> {
         }
 
         (e as any).dragData = dd;
-        const retval = this._trigger(this.onDragInit as any, dd, e, false);
-        if ((e as IEventData).isImmediatePropagationStopped && (e as IEventData).isImmediatePropagationStopped()) {
+        const sge = this._trigger(this.onDragInit as any, dd, e, false);
+        if (sge.isImmediatePropagationStopped) {
             e.preventDefault();
-            return retval;
+            return sge.getReturnValue();
         }
 
         // if nobody claims to be handling drag'n'drop by stopping immediate propagation,
@@ -2886,8 +2886,8 @@ export class SleekGrid<TItem = any> implements ISleekGrid<TItem> {
         }
 
         (e as any).dragData = dd;
-        this._trigger(this.onDragStart as any, dd, e, false);
-        if ((e as IEventData).isImmediatePropagationStopped && (e as IEventData).isImmediatePropagationStopped()) {
+        const sge = this._trigger(this.onDragStart as any, dd, e, false);
+        if (sge.isImmediatePropagationStopped()) {
             return true
         }
 
@@ -2896,7 +2896,8 @@ export class SleekGrid<TItem = any> implements ISleekGrid<TItem> {
 
     private handleDrag(e: DragEvent, dd: DragPosition): any {
         (e as any).dragData = dd;
-        return this._trigger(this.onDrag as any, dd, e, false);
+        const sge = this._trigger(this.onDrag as any, dd, e, false);
+        return sge.getReturnValue();
     }
 
     private handleDragEnd(e: DragEvent, dd: DragPosition): void {
@@ -2905,8 +2906,8 @@ export class SleekGrid<TItem = any> implements ISleekGrid<TItem> {
     }
 
     private handleKeyDown(e: KeyboardEvent): void {
-        this._trigger(this.onKeyDown, { row: this._activeRow, cell: this._activeCell }, e);
-        var handled = (e as IEventData).isImmediatePropagationStopped && (e as IEventData).isImmediatePropagationStopped();
+        const sge = this._trigger(this.onKeyDown, { row: this._activeRow, cell: this._activeCell }, e);
+        var handled = sge.isImmediatePropagationStopped();
 
         if (!handled) {
             if (!e.shiftKey && !e.altKey) {
@@ -2993,7 +2994,7 @@ export class SleekGrid<TItem = any> implements ISleekGrid<TItem> {
             e.stopPropagation();
             e.preventDefault();
             try {
-                ((e as IEventData).originalEvent as any).keyCode = 0; // prevent default behaviour for special keys in IE browsers (F3, F5, etc.)
+                (e as any).originalEvent && ((e as any).originalEvent.keyCode = 0); // prevent default behaviour for special keys in IE browsers (F3, F5, etc.)
             }
             // ignore exceptions - setting the original event's keycode throws access denied exception for "Ctrl"
             // (hitting control key only, nothing else), "Shift" (maybe others)
@@ -3039,8 +3040,8 @@ export class SleekGrid<TItem = any> implements ISleekGrid<TItem> {
             return;
         }
 
-        this._trigger(this.onClick, { row: cell.row, cell: cell.cell }, e);
-        if ((e as IEventData).isImmediatePropagationStopped && (e as IEventData).isImmediatePropagationStopped()) {
+        const sge = this._trigger(this.onClick, { row: cell.row, cell: cell.cell }, e);
+        if (sge.isImmediatePropagationStopped && sge.isImmediatePropagationStopped()) {
             return;
         }
 
@@ -3075,8 +3076,8 @@ export class SleekGrid<TItem = any> implements ISleekGrid<TItem> {
             return;
         }
 
-        this._trigger(this.onDblClick, { row: cell.row, cell: cell.cell }, e);
-        if ((e as IEventData).isImmediatePropagationStopped && (e as IEventData).isImmediatePropagationStopped()) {
+        const sge = this._trigger(this.onDblClick, { row: cell.row, cell: cell.cell }, e);
+        if (sge.isImmediatePropagationStopped()) {
             return;
         }
 
@@ -3423,8 +3424,9 @@ export class SleekGrid<TItem = any> implements ISleekGrid<TItem> {
         var columnDef = this._cols[this._activeCell];
         var item = this.getDataItem(this._activeRow);
 
-        const ev = new EventData();
-        if (this._trigger(this.onBeforeEditCell, { row: this._activeRow, cell: this._activeCell, item: item, column: columnDef }, ev) === false || ev.defaultPrevented) {
+        const sge = this._trigger(this.onBeforeEditCell, { row: this._activeRow, cell: this._activeCell, item: item, column: columnDef });
+        if (sge.isDefaultPrevented() ||
+            sge.getReturnValue() === false) {
             this.setFocus();
             return;
         }

@@ -1184,7 +1184,7 @@ export class RemoteView<TItem = any> implements IRemoteView<TItem> {
      *     changes.  This is useful since, in combination with the above two options, it allows
      *     access to the full list selected row ids, and not just the ones visible to the grid.
      */
-    public syncGridSelection(sleekGrid: ISleekGrid, preserveHidden?: boolean, preserveHiddenOnSelectionChange?: boolean) {
+    public syncGridSelection(sleekGrid: ISleekGrid, preserveHidden?: boolean, preserveHiddenOnSelectionChange?: boolean): EventEmitter<any> {
         let inHandler: boolean;;
         let selectedRowIds = this.mapRowsToIds(sleekGrid.getSelectedRows());
         const onSelectedRowIdsChanged = new EventEmitter();
