@@ -43,13 +43,13 @@ export interface IEventData<TArgs = {}, TEvent = {}> {
 	getReturnValues(): any[];
 	nativeEvent: TEvent | null | undefined;
 }
-export type SleekEvent<TArgs = {}, TEvent = {}> = IEventData<TArgs, TEvent> & TEvent & TArgs;
-export type SleekListener<TArgs = {}, TEvent = {}> = (e: SleekEvent<TArgs, TEvent>, args?: TArgs) => void;
+export type EventData<TArgs = {}, TEvent = {}> = IEventData<TArgs, TEvent> & TEvent & TArgs;
+export type SleekListener<TArgs = {}, TEvent = {}> = (e: EventData<TArgs, TEvent>, args?: TArgs) => void;
 /***
  * An event object for passing data to event handlers and letting them control propagation.
  * <p>This is pretty much identical to how W3C and jQuery implement events.</p>
  */
-export declare class EventData<TArgs, TEvent = {}> implements IEventData<TArgs, TEvent> {
+export declare class EventWrapper<TArgs, TEvent = {}> implements IEventData<TArgs, TEvent> {
 	private _args;
 	private _isPropagationStopped;
 	private _isImmediatePropagationStopped;
@@ -103,7 +103,7 @@ export declare class EventEmitter<TArgs = any, TEvent = {}> {
 	/***
 	 * Fires an event notifying all subscribers.
 	 * @param args {Object} Additional data object to be passed to all handlers.
-	 * @param e {EventData}
+	 * @param e {EventWrapper}
 	 *      Optional.
 	 *      An <code>EventData</code> object to be passed to all handlers.
 	 *      For DOM events, an existing W3C/jQuery event object can be passed in.
@@ -112,7 +112,7 @@ export declare class EventEmitter<TArgs = any, TEvent = {}> {
 	 *      The scope ("this") within which the handler will be executed.
 	 *      If not specified, the scope will be set to the <code>Event</code> instance.
 	 */
-	notify(args?: TArgs, e?: TEvent, scope?: object, mergeArgs?: boolean): SleekEvent<TArgs, TEvent>;
+	notify(args?: TArgs, e?: TEvent, scope?: object, mergeArgs?: boolean): EventData<TArgs, TEvent>;
 	clear(): void;
 }
 export declare class EventSubscriber {
@@ -175,7 +175,7 @@ export interface EditorOptions {
 	compositeEditorOptions?: CompositeEditorOptions;
 	container?: HTMLElement;
 	item?: any;
-	event?: SleekEvent;
+	event?: EventData;
 	commitChanges?: () => void;
 	cancelChanges?: () => void;
 }
@@ -368,20 +368,21 @@ export interface ArgsValidationError extends ArgsCell {
 	cellNode: HTMLElement;
 	validationResults: ValidationResult;
 }
-export type CellEvent = SleekEvent<ArgsCell>;
-export type CellKeyboardEvent = SleekEvent<ArgsCell, KeyboardEvent>;
-export type CellMouseEvent = SleekEvent<ArgsCell, MouseEvent>;
-export type HeaderColumnEvent = SleekEvent<ArgsColumn, Event>;
-export type HeaderMouseEvent = SleekEvent<ArgsColumn, MouseEvent>;
-export type HeaderRenderEvent = SleekEvent<ArgsColumnNode, Event>;
+export type CellEvent = EventData<ArgsCell>;
+export type CellKeyboardEvent = EventData<ArgsCell, KeyboardEvent>;
+export type CellMouseEvent = EventData<ArgsCell, MouseEvent>;
+export type HeaderColumnEvent = EventData<ArgsColumn, Event>;
+export type HeaderMouseEvent = EventData<ArgsColumn, MouseEvent>;
+export type HeaderRenderEvent = EventData<ArgsColumnNode, Event>;
 export type FooterColumnEvent = HeaderColumnEvent;
 export type FooterMouseEvent = HeaderMouseEvent;
 export type FooterRenderEvent = HeaderRenderEvent;
-export type GridEvent = SleekEvent<ArgsGrid>;
-export type GridDragEvent = SleekEvent<ArgsGrid, UIEvent> & {
+export type GridEvent = EventData<ArgsGrid>;
+export type GridDragEvent = EventData<ArgsGrid, UIEvent> & {
 	dragData: DragData;
 };
-export type GridMouseEvent = SleekEvent<ArgsGrid, MouseEvent>;
+export type GridMouseEvent = EventData<ArgsGrid, MouseEvent>;
+export type GridSortEvent = EventData<ArgsSort>;
 export interface GridPlugin {
 	init(grid: ISleekGrid): void;
 	pluginName?: string;

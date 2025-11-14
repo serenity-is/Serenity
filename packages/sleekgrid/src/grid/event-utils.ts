@@ -1,9 +1,9 @@
-import { type EventEmitter, type SleekEvent } from "../core/event";
+import { type EventEmitter, type EventData } from "../core/event";
 import type { ArgsGrid } from "../core/eventargs";
 import type { ISleekGrid } from "../core/isleekgrid";
 
 export function triggerGridEvent<TArgs extends ArgsGrid, TEventData = {}>(this: ISleekGrid,
-    evt: EventEmitter<TArgs, TEventData>, args?: Omit<TArgs, "grid">, e?: TEventData, mergeArgs = true): SleekEvent & { getReturnValue(): any; getReturnValues(): any[]; args: TArgs } {
+    evt: EventEmitter<TArgs, TEventData>, args?: Omit<TArgs, "grid">, e?: TEventData, mergeArgs = true): EventData & { getReturnValue(): any; getReturnValues(): any[]; args: TArgs } {
     args ??= {} as any;
     (args as TArgs).grid = this;
     if (!mergeArgs && e) {

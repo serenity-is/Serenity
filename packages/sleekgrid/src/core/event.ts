@@ -12,13 +12,13 @@ export interface IEventData<TArgs = {}, TEvent = {}> {
     nativeEvent: TEvent | null | undefined;
 }
 
-export type SleekEvent<TArgs = {}, TEvent = {}> = IEventData<TArgs, TEvent> & TEvent & TArgs;
-export type SleekListener<TArgs = {}, TEvent = {}> = (e: SleekEvent<TArgs, TEvent>, args?: TArgs) => void;
+export type EventData<TArgs = {}, TEvent = {}> = IEventData<TArgs, TEvent> & TEvent & TArgs;
+export type SleekListener<TArgs = {}, TEvent = {}> = (e: EventData<TArgs, TEvent>, args?: TArgs) => void;
 
 let eventDataInitialized = false;
 
 function addEventDataProp(name: string) {
-    Object.defineProperty(EventData.prototype, name, {
+    Object.defineProperty(EventWrapper.prototype, name, {
         enumerable: true,
         configurable: true,
         get: function () {
@@ -57,7 +57,7 @@ function initializeEventDataProps() {
  * An event object for passing data to event handlers and letting them control propagation.
  * <p>This is pretty much identical to how W3C and jQuery implement events.</p>
  */
-export class EventData<TArgs, TEvent = {}> implements IEventData<TArgs, TEvent> {
+export class EventWrapper<TArgs, TEvent = {}> implements IEventData<TArgs, TEvent> {
     private _args: TArgs;
     private _isPropagationStopped = false;
     private _isImmediatePropagationStopped = false;
@@ -207,7 +207,7 @@ export class EventEmitter<TArgs = any, TEvent = {}> {
     /***
      * Fires an event notifying all subscribers.
      * @param args {Object} Additional data object to be passed to all handlers.
-     * @param e {EventData}
+     * @param e {EventWrapper}
      *      Optional.
      *      An <code>EventData</code> object to be passed to all handlers.
      *      For DOM events, an existing W3C/jQuery event object can be passed in.
@@ -216,28 +216,14 @@ export class EventEmitter<TArgs = any, TEvent = {}> {
      *      The scope ("this") within which the handler will be executed.
      *      If not specified, the scope will be set to the <code>Event</code> instance.
      */
-    notify(args?: TArgs, e?: TEvent, scope?: object, mergeArgs = true): SleekEvent<TArgs, TEvent> {
-        const sge = new EventData<TArgs, TEvent>(e, args, mergeArgs);
-
-        if (args != null && mergeArgs) {
-            for (let key in args) {
-                if (args.hasOwnProperty(key) && !(key in sge)) {
-                    Object.defineProperty(sge, key, {
-                        get: () => args[key],
-                        set: (value) => { args[key] = value; },
-                        enumerable: true,
-                        configurable: true
-                    });
-                }
-            }
-        }
+    notify(args?: TArgs, e?: TEvent, scope?: object, mergeArgs = true): EventData<TArgs, TEvent> {
+        const sed = new EventWrapper<TArgs, TEvent>(e, args, mergeArgs);
         scope = scope || this;
-
-        for (var i = 0; i < this._handlers.length && !(sge.isPropagationStopped() || sge.isImmediatePropagationStopped()); i++) {
-            const returnValue = this._handlers[i].call(scope, sge, args);
-            sge.addReturnValue(returnValue);
+        for (var i = 0; i < this._handlers.length && !(sed.isPropagationStopped() || sed.isImmediatePropagationStopped()); i++) {
+            const returnValue = this._handlers[i].call(scope, sed, args);
+            sed.addReturnValue(returnValue);
         }
-        return sge as unknown as SleekEvent<TArgs, TEvent>;
+        return sed as unknown as EventData<TArgs, TEvent>;
     }
 
     clear() {
@@ -245,13 +231,13 @@ export class EventEmitter<TArgs = any, TEvent = {}> {
     }
 }
 
-interface EventSubscriberEntry<TArgs = {}, TEvent = {}> {
-    event: EventEmitter<TArgs, TEvent>;
-    handler: ((e: TEvent, args: TArgs) => void);
+interface EventSubscriberEntry {
+    event: EventEmitter<any, any>;
+    handler: SleekListener<any, any>;
 }
 
 export class EventSubscriber {
-    private _handlers: EventSubscriberEntry<any, any>[] = [];
+    private _handlers: EventSubscriberEntry[] = [];
 
     subscribe<TArgs, TEvent>(event: EventEmitter<TArgs, TEvent>, handler: SleekListener<TArgs, TEvent>): this {
         this._handlers.push({

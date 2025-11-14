@@ -1,5 +1,5 @@
 import { bindThis } from "@serenity-is/domwise";
-import { EventEmitter, EventSubscriber, type ISleekGrid, type GridPlugin, type SleekEvent } from "../core";
+import { EventEmitter, EventSubscriber, type ISleekGrid, type GridPlugin, type EventData } from "../core";
 
 export interface RowMoveManagerOptions {
     cancelEditOnDrag?: boolean;
@@ -47,12 +47,12 @@ export class RowMoveManager implements GridPlugin {
         this.handler?.unsubscribeAll();
     }
 
-    private handleDragInit(e: SleekEvent<{}, UIEvent>) {
+    private handleDragInit(e: EventData<{}, UIEvent>) {
         // prevent the grid from cancelling drag'n'drop by default
         e.stopImmediatePropagation();
     }
 
-    private handleDragStart(e: SleekEvent<{}, UIEvent>, dd: RowMoveManagerDragData) {
+    private handleDragStart(e: EventData<{}, UIEvent>, dd: RowMoveManagerDragData) {
         let cell = this.grid.getCellFromEvent(e);
 
         if (this.options.cancelEditOnDrag && this.grid.getEditorLock().isActive()) {
@@ -88,7 +88,7 @@ export class RowMoveManager implements GridPlugin {
         dd.insertBefore = -1;
     }
 
-    private handleDrag(e: SleekEvent<{}, UIEvent>, dd: RowMoveManagerDragData) {
+    private handleDrag(e: EventData<{}, UIEvent>, dd: RowMoveManagerDragData) {
         if (!this.dragging)
             return;
 
@@ -121,7 +121,7 @@ export class RowMoveManager implements GridPlugin {
         }
     }
 
-    private handleDragEnd(e: SleekEvent<{}, UIEvent>, dd: RowMoveManagerDragData) {
+    private handleDragEnd(e: EventData<{}, UIEvent>, dd: RowMoveManagerDragData) {
         if (!this.dragging)
             return;
 

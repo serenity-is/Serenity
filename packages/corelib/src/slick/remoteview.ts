@@ -1,4 +1,4 @@
-import { convertCompatFormatter, EventData, EventEmitter, ISleekGrid, Group, GroupItemMetadataProvider, GroupTotals, IGroupTotals, ItemMetadata, type FormatterContext } from "@serenity-is/sleekgrid";
+import { convertCompatFormatter, EventEmitter, Group, GroupItemMetadataProvider, GroupTotals, IGroupTotals, ISleekGrid, ItemMetadata, type FormatterContext } from "@serenity-is/sleekgrid";
 import { ListRequest, ListResponse, PagerTexts, serviceCall, ServiceOptions, ServiceResponse } from "../base";
 import { AggregateFormatting } from "./aggregateformatting";
 import { IAggregator } from "./aggregators";
@@ -1201,7 +1201,7 @@ export class RemoteView<TItem = any> implements IRemoteView<TItem> {
                 "grid": sleekGrid,
                 "ids": selectedRowIds,
                 "dataView": this
-            }, new EventData(), self);
+            }, null, self);
         }
 
         function update(this: void) {

@@ -1,7 +1,7 @@
 import type { CellNavigation } from "./cellnavigation";
 import type { Column, ColumnSort } from "./column";
 import type { EditController, Editor, EditorClass, EditorHost, EditorLock, Position } from "./editing";
-import type { EventEmitter, SleekEvent } from "./event";
+import type { EventEmitter } from "./event";
 import type { ArgsAddNewRow, ArgsCell, ArgsCellChange, ArgsCellEdit, ArgsColumn, ArgsColumnNode, ArgsCssStyle, ArgsEditorDestroy, ArgsGrid, ArgsScroll, ArgsSelectedRowsChange, ArgsSort, ArgsValidationError, DragData } from "./eventargs";
 import type { CellStylesHash, ColumnFormat, FormatterContext } from "./formatting";
 import type { GridPluginHost } from "./grid-plugin";

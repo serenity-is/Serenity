@@ -1,9 +1,9 @@
 import * as deprecatedWorkaround from "../../src/core/event";
-import { EventData, EventEmitter, EventSubscriber, SleekEvent } from "../../src/core/event";
+import { EventDataWrapper, EventEmitter, EventSubscriber, type EventData } from "../../src/core/event";
 
-describe('EventData', () => {
+describe('EventDataWrapper', () => {
     it('stopPropagation stops event propagation', () => {
-        const eventData = new EventData();
+        const eventData = new EventDataWrapper();
 
         expect(eventData.isPropagationStopped()).toBeFalsy();
 
@@ -12,7 +12,7 @@ describe('EventData', () => {
     });
 
     it('stopImmediatePropagation stops event propagation', () => {
-        const eventData = new EventData();
+        const eventData = new EventDataWrapper();
 
         expect(eventData.isImmediatePropagationStopped()).toBeFalsy();
 
@@ -30,7 +30,7 @@ describe('EventEmitter', () => {
             isEventCalled = true;
         });
 
-        event.notify(null, new EventData(), null);
+        event.notify(null, new EventDataWrapper(), null);
 
         expect(isEventCalled).toBeTruthy();
     });
@@ -47,7 +47,7 @@ describe('EventEmitter', () => {
             isEventCalled[1] = true;
         });
 
-        event.notify(null, new EventData(), null)
+        event.notify(null, new EventDataWrapper(), null)
 
         expect(isEventCalled[0]).toBeTruthy();
         expect(isEventCalled[1]).toBeTruthy();
@@ -63,7 +63,7 @@ describe('EventEmitter', () => {
 
         event.notify({
             foo: 'bar',
-        }, new EventData(), null)
+        }, new EventDataWrapper(), null)
 
         expect(eventArgs).toBeDefined();
         expect(eventArgs.foo).toBe('bar');
@@ -80,7 +80,7 @@ describe('EventEmitter', () => {
         event.subscribe(handler);
         event.unsubscribe(handler);
 
-        event.notify(null, new EventData(), null)
+        event.notify(null, new EventDataWrapper(), null)
 
         expect(callCount).toBe(0);
     });
@@ -101,7 +101,7 @@ describe('EventEmitter', () => {
         event.subscribe(otherHandler);
         event.unsubscribe(handler);
 
-        event.notify(null, new EventData(), null)
+        event.notify(null, new EventDataWrapper(), null)
 
         expect(callCount).toBe(1);
     });
@@ -121,7 +121,7 @@ describe('EventEmitter', () => {
         };
 
         event.subscribe(handler);
-        event.notify(null, new EventData(), scope)
+        event.notify(null, new EventDataWrapper(), scope)
 
         expect(callCount).toBe(1);
     });
@@ -426,32 +426,32 @@ describe('EventSubscriber', () => {
     });
 });
 
-describe('EventData', () => {
+describe('EventDataWrapper', () => {
     it('returns undefined when e is undefined', () => {
-        const result = new EventData(undefined);
+        const result = new EventDataWrapper(undefined);
         expect(result.nativeEvent).toBeUndefined();
     });
 
     it('returns null when e is null', () => {
-        const result = new EventData(null);
+        const result = new EventDataWrapper(null);
         expect(result.nativeEvent).toBeNull();
     });
 
     it('returns original object when it is empty', () => {
         const e = {};
-        var result = new EventData(e);
+        var result = new EventDataWrapper(e);
         expect(result.nativeEvent).toBe(e);
     });
 
 
     it('adds isDefaultPrevented when it has preventDefault', () => {
         let calls = 0;
-        const e: SleekEvent = {
+        const e: EventData = {
             defaultPrevented: false,
             preventDefault: function () { this.defaultPrevented = true; calls++; }
         } as any;
 
-        const result = new EventData(e);
+        const result = new EventDataWrapper(e);
         expect(result.nativeEvent).toBe(e);
         expect(e.stopPropagation).toBeUndefined();
         expect(e.stopImmediatePropagation).toBeUndefined();
@@ -473,11 +473,11 @@ describe('EventData', () => {
 
     it('adds isPropagationStopped when it has stopPropagation', () => {
         let calls = 0;
-        const e: SleekEvent = {
+        const e: EventData = {
             stopPropagation: function () { calls++; }
         } as any;
 
-        const result = new EventData(e);
+        const result = new EventDataWrapper(e);
         expect(result.nativeEvent).toBe(e);
         expect(e.preventDefault).toBeUndefined();
         expect(e.stopImmediatePropagation).toBeUndefined();
@@ -496,11 +496,11 @@ describe('EventData', () => {
 
     it('adds isImmediatePropagationStopped when it has stopImmediatePropagation', () => {
         let calls = 0;
-        const e: SleekEvent = {
+        const e: EventData = {
             stopImmediatePropagation: function () { calls++; }
         } as any;
 
-        const result = new EventData(e);
+        const result = new EventDataWrapper(e);
         expect(result.nativeEvent).toBe(e);
         expect(e.preventDefault).toBeUndefined();
         expect(e.stopPropagation).toBeUndefined();

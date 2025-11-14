@@ -4,7 +4,7 @@ import { CellRange } from "../core/cellrange";
 import { columnDefaults, initColumnProps, type Column, type ColumnMetadata, type ColumnSort, type ItemMetadata } from "../core/column";
 import { Draggable, type DragPosition } from "../core/draggable";
 import type { EditCommand, EditController, Editor, EditorClass, EditorFactory, EditorLock, Position, RowCell } from "../core/editing";
-import { EventEmitter, type SleekEvent } from "../core/event";
+import { EventEmitter, type EventData } from "../core/event";
 import type { ArgsAddNewRow, ArgsCell, ArgsCellChange, ArgsCellEdit, ArgsColumn, ArgsColumnNode, ArgsCssStyle, ArgsEditorDestroy, ArgsGrid, ArgsScroll, ArgsSelectedRowsChange, ArgsSort, ArgsValidationError, DragData } from "../core/eventargs";
 import { applyFormatterResultToCellNode, convertCompatFormatter, defaultColumnFormat, formatterContext, type CellStylesHash, type ColumnFormat, type FormatterContext, type FormatterResult } from "../core/formatting";
 import type { GridPlugin } from "../core/grid-plugin";
@@ -1265,7 +1265,7 @@ export class SleekGrid<TItem = any> implements ISleekGrid<TItem> {
         return this._sortColumns;
     }
 
-    private handleSelectedRangesChanged = (e: SleekEvent, ranges: CellRange[]): void => {
+    private handleSelectedRangesChanged = (e: EventData, ranges: CellRange[]): void => {
         var previousSelectedRows = this._selectedRows.slice(0); // shallow copy previously selected rows for later comparison
         this._selectedRows = [];
         var hash: any = Object.create(null), cols = this._cols;

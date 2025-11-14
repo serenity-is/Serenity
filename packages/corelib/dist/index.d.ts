@@ -1,4 +1,4 @@
-import { ArgsSort, CellMouseEvent, Column, EventEmitter, FormatterContext, FormatterResult, GridOptions, Group, GroupItemMetadataProvider, GroupTotals, IDataView, IGroupTotals, ISleekGrid, ItemMetadata, SleekEvent } from '@serenity-is/sleekgrid';
+import { CellMouseEvent, Column, EventEmitter, FormatterContext, FormatterResult, GridOptions, GridSortEvent, Group, GroupItemMetadataProvider, GroupTotals, IDataView, IGroupTotals, ISleekGrid, ItemMetadata } from '@serenity-is/sleekgrid';
 
 export interface UserDefinition {
 	/**
@@ -5506,7 +5506,7 @@ export declare class DataGrid<TItem, P = {}> extends Widget<P> implements IDataG
 	rowCount(): number;
 	getItems(): TItem[];
 	setItems(value: TItem[]): void;
-	protected handleGridSort(e: SleekEvent<ArgsSort>): void;
+	protected handleGridSort(e: GridSortEvent): void;
 	protected handleGridClick(e: CellMouseEvent): void;
 	protected handleGridColumnsReordered(): void;
 	protected handleGridColumnsResized(): void;

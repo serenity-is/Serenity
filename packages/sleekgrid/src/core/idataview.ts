@@ -1,5 +1,5 @@
 import { ItemMetadata } from "./column";
-import { EventEmitter, SleekEvent } from "./event";
+import { EventEmitter, EventData } from "./event";
 import { Group, IGroupTotals } from "./group";
 
 export interface IDataView<TItem = any> {

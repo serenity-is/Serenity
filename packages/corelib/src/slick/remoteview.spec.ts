@@ -15,7 +15,7 @@ vi.mock("@serenity-is/sleekgrid", () => ({
         this.unsubscribe = vi.fn();
         this.notify = vi.fn();
     }),
-    EventData: vi.fn(),
+    EventDataWrapper: vi.fn(),
     GroupItemMetadataProvider: vi.fn().mockImplementation(function() {
         this.getGroupRowMetadata = vi.fn(),
         this.getTotalsRowMetadata = vi.fn()
