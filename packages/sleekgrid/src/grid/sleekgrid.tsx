@@ -5,7 +5,7 @@ import { columnDefaults, initColumnProps, type Column, type ColumnMetadata, type
 import { Draggable, type DragPosition } from "../core/draggable";
 import type { EditCommand, EditController, Editor, EditorClass, EditorFactory, EditorLock, Position, RowCell } from "../core/editing";
 import { EventEmitter, type EventData } from "../core/event";
-import type { ArgsAddNewRow, ArgsCell, ArgsCellChange, ArgsCellEdit, ArgsColumn, ArgsColumnNode, ArgsCssStyle, ArgsEditorDestroy, ArgsGrid, ArgsScroll, ArgsSelectedRowsChange, ArgsSort, ArgsValidationError, DragData } from "../core/eventargs";
+import type { ArgsAddNewRow, ArgsCell, ArgsCellChange, ArgsCellEdit, ArgsColumn, ArgsColumnNode, ArgsCssStyle, ArgsDrag, ArgsEditorDestroy, ArgsGrid, ArgsScroll, ArgsSelectedRowsChange, ArgsSort, ArgsValidationError } from "../core/eventargs";
 import { applyFormatterResultToCellNode, convertCompatFormatter, defaultColumnFormat, formatterContext, type CellStylesHash, type ColumnFormat, type FormatterContext, type FormatterResult } from "../core/formatting";
 import type { GridPlugin } from "../core/grid-plugin";
 import type { GridSignals } from "../core/grid-signals";
@@ -142,10 +142,10 @@ export class SleekGrid<TItem = any> implements ISleekGrid<TItem> {
     readonly onCompositeEditorChange = new EventEmitter<ArgsGrid>();
     readonly onContextMenu = new EventEmitter<ArgsGrid, UIEvent>();
     readonly onDblClick = new EventEmitter<ArgsCell, MouseEvent>();
-    readonly onDrag = new EventEmitter<ArgsGrid, UIEvent & { dragData: DragData }>();
-    readonly onDragEnd = new EventEmitter<ArgsGrid, UIEvent & { dragData: DragData }>();
-    readonly onDragInit = new EventEmitter<ArgsGrid, UIEvent & { dragData: DragData }>();
-    readonly onDragStart = new EventEmitter<ArgsGrid, UIEvent & { dragData: DragData }>();
+    readonly onDrag = new EventEmitter<ArgsDrag, UIEvent>();
+    readonly onDragEnd = new EventEmitter<ArgsDrag, UIEvent>();
+    readonly onDragInit = new EventEmitter<ArgsDrag, UIEvent>();
+    readonly onDragStart = new EventEmitter<ArgsDrag, UIEvent>();
     readonly onFooterRowCellRendered = new EventEmitter<ArgsColumnNode>();
     readonly onHeaderCellRendered = new EventEmitter<ArgsColumnNode>();
     readonly onHeaderClick = new EventEmitter<ArgsColumn, MouseEvent>();
@@ -1539,8 +1539,8 @@ export class SleekGrid<TItem = any> implements ISleekGrid<TItem> {
         this.render();
     }
 
-    private viewOnRowsChanged(e: { rows: number[] }) {
-        this.invalidateRows(e.rows);
+    private viewOnRowsChanged({ args }: { args: { rows: number[] } }) {
+        this.invalidateRows(args.rows);
         this.render();
         this.updateGrandTotals();
     }
@@ -2868,7 +2868,7 @@ export class SleekGrid<TItem = any> implements ISleekGrid<TItem> {
         }
 
         (e as any).dragData = dd;
-        const sge = this._trigger(this.onDragInit as any, dd, e, false);
+        const sge = this._trigger(this.onDragInit as any, dd, e);
         if (sge.isImmediatePropagationStopped) {
             e.preventDefault();
             return sge.getReturnValue();
@@ -2885,8 +2885,7 @@ export class SleekGrid<TItem = any> implements ISleekGrid<TItem> {
             return false;
         }
 
-        (e as any).dragData = dd;
-        const sge = this._trigger(this.onDragStart as any, dd, e, false);
+        const sge = this._trigger(this.onDragStart as any, dd, e);
         if (sge.isImmediatePropagationStopped()) {
             return true
         }
@@ -2895,14 +2894,12 @@ export class SleekGrid<TItem = any> implements ISleekGrid<TItem> {
     }
 
     private handleDrag(e: DragEvent, dd: DragPosition): any {
-        (e as any).dragData = dd;
-        const sge = this._trigger(this.onDrag as any, dd, e, false);
+        const sge = this._trigger(this.onDrag as any, dd, e);
         return sge.getReturnValue();
     }
 
     private handleDragEnd(e: DragEvent, dd: DragPosition): void {
-        (e as any).dragData = dd;
-        this._trigger(this.onDragEnd as any, dd, e, false);
+        this._trigger(this.onDragEnd as any, dd, e);
     }
 
     private handleKeyDown(e: KeyboardEvent): void {

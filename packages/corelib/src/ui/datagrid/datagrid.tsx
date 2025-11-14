@@ -459,7 +459,7 @@ export class DataGrid<TItem, P = {}> extends Widget<P> implements IDataGrid, IRe
     }
 
     protected handleGridSort(e: GridSortEvent) {
-        sleekGridOnSort(this.view, e);
+        sleekGridOnSort(this.view, e.args);
         this.persistSettings();
     }
 

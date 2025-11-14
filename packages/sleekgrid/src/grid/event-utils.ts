@@ -3,15 +3,10 @@ import type { ArgsGrid } from "../core/eventargs";
 import type { ISleekGrid } from "../core/isleekgrid";
 
 export function triggerGridEvent<TArgs extends ArgsGrid, TEventData = {}>(this: ISleekGrid,
-    evt: EventEmitter<TArgs, TEventData>, args?: Omit<TArgs, "grid">, e?: TEventData, mergeArgs = true): EventData & { getReturnValue(): any; getReturnValues(): any[]; args: TArgs } {
+    evt: EventEmitter<TArgs, TEventData>, args?: Omit<TArgs, "grid">, e?: TEventData): EventData & { getReturnValue(): any; getReturnValues(): any[]; args: TArgs } {
     args ??= {} as any;
     (args as TArgs).grid = this;
-    if (!mergeArgs && e) {
-        e ??= {} as TEventData;
-        (e as any).grid = this;
-    }
-
-    return evt.notify(args as TArgs, e, this, mergeArgs);
+    return evt.notify(args as TArgs, e, this);
 }
 
 export function addListener<K extends keyof HTMLElementEventMap>(this: {

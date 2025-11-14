@@ -1,3 +1,4 @@
+
 export interface IEventData<TArgs = {}, TEvent = {}> {
     args: TArgs;
     defaultPrevented: boolean;
@@ -12,22 +13,35 @@ export interface IEventData<TArgs = {}, TEvent = {}> {
     nativeEvent: TEvent | null | undefined;
 }
 
-export type EventData<TArgs = {}, TEvent = {}> = IEventData<TArgs, TEvent> & TEvent & TArgs;
+type MergeArgKeys = "grid" | "column" | "node" | "row" | "cell" | "item";
+
+export type EventData<TArgs = {}, TEvent = {}> = IEventData<TArgs, TEvent> & TEvent & { [key in keyof TArgs & (MergeArgKeys)]: TArgs[key] };
 export type EventCallback<TArgs = {}, TEvent = {}> = (e: EventData<TArgs, TEvent>, args?: TArgs) => void;
 
 let eventDataInitialized = false;
 
-function addEventDataProp(name: string) {
+function addEventDataProp(name: string, isArgs: boolean) {
     Object.defineProperty(EventDataWrapper.prototype, name, {
         enumerable: true,
         configurable: true,
-        get: function () {
-            if (this.nativeEvent) {
+        get: function (this: EventDataWrapper<any, any>) {
+            if (isArgs) {
+                if (typeof this.args === "object" && this.args !== null)
+                    return this.args[name];
+            }
+            else if (this.nativeEvent) {
                 return this.nativeEvent[name];
             }
         },
         set: function (value) {
-            if (this.nativeEvent) {
+
+            if (isArgs) {
+                if (typeof this.args === "object" && this.args !== null) {
+                    this.args[name] = value;
+                    return;
+                }
+            }
+            else if (this.nativeEvent) {
                 this.nativeEvent[name] = value;
                 return;
             }
@@ -42,6 +56,7 @@ function addEventDataProp(name: string) {
     });
 }
 
+
 function initializeEventDataProps() {
     for (const key of [
         'altKey', 'char', 'bubbles', 'button', 'buttons', 'cancelable', 'changedTouches',
@@ -49,7 +64,11 @@ function initializeEventDataProps() {
         'key', 'keyCode', 'metaKey', 'offsetX', 'offsetY', 'originalEvent', 'pageX', 'pageY', 'pointerId',
         'pointerType', 'screenX', 'screenY', 'shiftKey', 'relatedTarget', 'target', 'targetTouches',
         'toElement', 'touches', 'type', 'view', 'which']) {
-        addEventDataProp(key);
+        addEventDataProp(key, false);
+    }
+
+    for (const key of ['grid', 'column', 'node', 'row', 'cell', 'item']) {
+        addEventDataProp(key, true);
     }
 }
 
@@ -66,39 +85,13 @@ export class EventDataWrapper<TArgs, TEvent = {}> implements IEventData<TArgs, T
     private _returnValue: any;
     private _returnValues: any[] = [];
 
-    constructor(event?: TEvent | null, args?: TArgs, mergeArgs = true) {
+    constructor(event?: TEvent | null, args?: TArgs) {
         this._nativeEvent = event as Event;
         this._args = args || {} as TArgs;
 
         if (!eventDataInitialized) {
             eventDataInitialized = true;
             initializeEventDataProps();
-        }
-
-        if (event) {
-            for (let key of Object.keys(event)) {
-                if (!(key in this)) {
-                    Object.defineProperty(this, key, {
-                        get: () => (event as any)[key],
-                        set: (value) => { (event as any)[key] = value; },
-                        enumerable: true,
-                        configurable: true
-                    });
-                }
-            }
-        }
-
-        if (args && mergeArgs) {
-            for (let key in args) {
-                if (args.hasOwnProperty(key) && !(key in this)) {
-                    Object.defineProperty(this, key, {
-                        get: () => args[key],
-                        set: (value) => { args[key] = value; },
-                        enumerable: true,
-                        configurable: true
-                    });
-                }
-            }
         }
     }
 
@@ -216,8 +209,8 @@ export class EventEmitter<TArgs = any, TEvent = {}> {
      *      The scope ("this") within which the handler will be executed.
      *      If not specified, the scope will be set to the <code>Event</code> instance.
      */
-    notify(args?: TArgs, e?: TEvent, scope?: object, mergeArgs = true): EventData<TArgs, TEvent> {
-        const sed = new EventDataWrapper<TArgs, TEvent>(e, args, mergeArgs);
+    notify(args?: TArgs, e?: TEvent, scope?: object): EventData<TArgs, TEvent> {
+        const sed = new EventDataWrapper<TArgs, TEvent>(e, args);
         scope = scope || this;
         for (var i = 0; i < this._handlers.length && !(sed.isPropagationStopped() || sed.isImmediatePropagationStopped()); i++) {
             const returnValue = this._handlers[i].call(scope, sed, args);

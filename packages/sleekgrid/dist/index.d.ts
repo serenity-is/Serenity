@@ -43,7 +43,10 @@ export interface IEventData<TArgs = {}, TEvent = {}> {
 	getReturnValues(): any[];
 	nativeEvent: TEvent | null | undefined;
 }
-export type EventData<TArgs = {}, TEvent = {}> = IEventData<TArgs, TEvent> & TEvent & TArgs;
+export type MergeArgKeys = "grid" | "column" | "node" | "row" | "cell" | "item";
+export type EventData<TArgs = {}, TEvent = {}> = IEventData<TArgs, TEvent> & TEvent & {
+	[key in keyof TArgs & (MergeArgKeys)]: TArgs[key];
+};
 export type EventCallback<TArgs = {}, TEvent = {}> = (e: EventData<TArgs, TEvent>, args?: TArgs) => void;
 /***
  * An event object for passing data to event handlers and letting them control propagation.
@@ -57,7 +60,7 @@ export declare class EventDataWrapper<TArgs, TEvent = {}> implements IEventData<
 	private _nativeEvent;
 	private _returnValue;
 	private _returnValues;
-	constructor(event?: TEvent | null, args?: TArgs, mergeArgs?: boolean);
+	constructor(event?: TEvent | null, args?: TArgs);
 	get defaultPrevented(): boolean;
 	preventDefault(): void;
 	isDefaultPrevented(): any;
@@ -112,7 +115,7 @@ export declare class EventEmitter<TArgs = any, TEvent = {}> {
 	 *      The scope ("this") within which the handler will be executed.
 	 *      If not specified, the scope will be set to the <code>Event</code> instance.
 	 */
-	notify(args?: TArgs, e?: TEvent, scope?: object, mergeArgs?: boolean): EventData<TArgs, TEvent>;
+	notify(args?: TArgs, e?: TEvent, scope?: object): EventData<TArgs, TEvent>;
 	clear(): void;
 }
 export declare class EventSubscriber {
@@ -283,35 +286,13 @@ export interface CellNavigation {
 	 */
 	navigate(dir: CellNavigationDirection): boolean;
 }
-export interface DragPosition {
-	startX: number;
-	startY: number;
-	range: DragRange;
-}
-export interface DragItem extends DragPosition {
-	dragSource: HTMLElement | Document | null;
-	dragHandle: HTMLElement | null;
-	deltaX: number;
-	deltaY: number;
-	target: HTMLElement;
-}
-export interface DragRange {
-	start: {
-		row?: number;
-		cell?: number;
-	};
-	end: {
-		row?: number;
-		cell?: number;
-	};
-}
 export interface ArgsGrid {
 	grid: ISleekGrid;
 }
 export interface ArgsColumn extends ArgsGrid {
 	column: Column;
 }
-export interface DragData extends DragItem {
+export interface ArgsDrag extends ArgsGrid {
 	mode: string;
 	row: number;
 	cell: number;
@@ -378,9 +359,7 @@ export type FooterColumnEvent = HeaderColumnEvent;
 export type FooterMouseEvent = HeaderMouseEvent;
 export type FooterRenderEvent = HeaderRenderEvent;
 export type GridEvent = EventData<ArgsGrid>;
-export type GridDragEvent = EventData<ArgsGrid, UIEvent> & {
-	dragData: DragData;
-};
+export type GridDragEvent = EventData<ArgsDrag, UIEvent>;
 export type GridMouseEvent = EventData<ArgsGrid, MouseEvent>;
 export type GridSortEvent = EventData<ArgsSort>;
 export interface GridPlugin {
@@ -938,18 +917,10 @@ export interface ISleekGrid<TItem = any> extends CellNavigation, EditorHost, Gri
 	readonly onColumnsResized: EventEmitter<ArgsGrid>;
 	readonly onContextMenu: EventEmitter<ArgsGrid, UIEvent>;
 	readonly onDblClick: EventEmitter<ArgsCell, MouseEvent>;
-	readonly onDrag: EventEmitter<ArgsGrid, UIEvent & {
-		dragData: DragData;
-	}>;
-	readonly onDragEnd: EventEmitter<ArgsGrid, UIEvent & {
-		dragData: DragData;
-	}>;
-	readonly onDragInit: EventEmitter<ArgsGrid, UIEvent & {
-		dragData: DragData;
-	}>;
-	readonly onDragStart: EventEmitter<ArgsGrid, UIEvent & {
-		dragData: DragData;
-	}>;
+	readonly onDrag: EventEmitter<ArgsDrag, UIEvent>;
+	readonly onDragEnd: EventEmitter<ArgsDrag, UIEvent>;
+	readonly onDragInit: EventEmitter<ArgsDrag, UIEvent>;
+	readonly onDragStart: EventEmitter<ArgsDrag, UIEvent>;
 	readonly onFooterRowCellRendered: EventEmitter<ArgsColumnNode>;
 	readonly onHeaderCellRendered: EventEmitter<ArgsColumnNode>;
 	readonly onHeaderClick: EventEmitter<ArgsColumn, MouseEvent>;
@@ -1290,11 +1261,16 @@ export interface IDataView<TItem = any> {
 	/** Gets metadata for the item at the specified row index. */
 	getItemMetadata?(row: number): ItemMetadata<TItem>;
 	/** Event fired when the underlying data changes */
-	readonly onDataChanged?: EventEmitter<any>;
+	readonly onDataChanged?: EventEmitter<{}>;
 	/** Event fired when the row count changes */
-	readonly onRowCountChanged?: EventEmitter<any>;
+	readonly onRowCountChanged?: EventEmitter<{
+		previous: number;
+		current: number;
+	}>;
 	/** Event fired when specific rows change */
-	readonly onRowsChanged?: EventEmitter<any>;
+	readonly onRowsChanged?: EventEmitter<{
+		rows: number[];
+	}>;
 }
 export declare function addClass(el: Element, cls: string): void;
 export declare function escapeHtml(s: any): any;
@@ -1454,18 +1430,10 @@ export declare class SleekGrid<TItem = any> implements ISleekGrid<TItem> {
 	readonly onCompositeEditorChange: EventEmitter<ArgsGrid, {}>;
 	readonly onContextMenu: EventEmitter<ArgsGrid, UIEvent>;
 	readonly onDblClick: EventEmitter<ArgsCell, MouseEvent>;
-	readonly onDrag: EventEmitter<ArgsGrid, UIEvent & {
-		dragData: DragData;
-	}>;
-	readonly onDragEnd: EventEmitter<ArgsGrid, UIEvent & {
-		dragData: DragData;
-	}>;
-	readonly onDragInit: EventEmitter<ArgsGrid, UIEvent & {
-		dragData: DragData;
-	}>;
-	readonly onDragStart: EventEmitter<ArgsGrid, UIEvent & {
-		dragData: DragData;
-	}>;
+	readonly onDrag: EventEmitter<ArgsDrag, UIEvent>;
+	readonly onDragEnd: EventEmitter<ArgsDrag, UIEvent>;
+	readonly onDragInit: EventEmitter<ArgsDrag, UIEvent>;
+	readonly onDragStart: EventEmitter<ArgsDrag, UIEvent>;
 	readonly onFooterRowCellRendered: EventEmitter<ArgsColumnNode, {}>;
 	readonly onHeaderCellRendered: EventEmitter<ArgsColumnNode, {}>;
 	readonly onHeaderClick: EventEmitter<ArgsColumn, MouseEvent>;

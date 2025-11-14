@@ -1,6 +1,6 @@
 import { EventEmitter, Group, GroupItemMetadataProvider, GroupTotals, IDataView, ISleekGrid } from "@serenity-is/sleekgrid";
 import { ListResponse, ServiceOptions } from "../base";
-import type { ArgsDataView, ArgsGroupToggle, ArgsPagingInfo, ArgsRowCountChanged, ArgsRowsOrCountChanged } from "./remoteview";
+import type { ArgsRemoteView, ArgsGroupToggle, ArgsPagingInfo, ArgsRowCountChanged, ArgsRowsOrCountChanged } from "./remoteview";
 import { GroupInfo, PagingOptions, SummaryOptions } from "./slicktypes";
 
 /**
@@ -140,11 +140,11 @@ export interface IRemoteView<TItem = any> extends IDataView<TItem> {
     /** Callback invoked before making AJAX calls */
     onAjaxCall: RemoteViewAjaxCallback<TItem>;
     /** Event fired when the underlying data changes */
-    readonly onDataChanged: EventEmitter<ArgsDataView>;
+    readonly onDataChanged: EventEmitter<ArgsRemoteView>;
     /** Event fired when data loading completes */
-    readonly onDataLoaded: EventEmitter<ArgsDataView>;
+    readonly onDataLoaded: EventEmitter<ArgsRemoteView>;
     /** Event fired when data loading begins */
-    readonly onDataLoading: EventEmitter<ArgsDataView>;
+    readonly onDataLoading: EventEmitter<ArgsRemoteView>;
     /** Event fired when a group is collapsed */
     readonly onGroupCollapsed?: EventEmitter<ArgsGroupToggle>;
     /** Event fired when a group is expanded */

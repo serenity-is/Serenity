@@ -3,7 +3,7 @@
   "isRoot": true,
   "tools": {
     "sergen": {
-      "version": "9.1.1",
+      "version": "9.1.3",
       "commands": [
         "sergen"
       ],

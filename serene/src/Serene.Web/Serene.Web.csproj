@@ -25,19 +25,19 @@
   <ItemGroup>
     <PackageReference Include="FluentMigrator.Runner" Version="7.1.0" />
     <PackageReference Include="Microsoft.Data.Sqlite" Version="10.0.0" />
-    <PackageReference Include="Microsoft.Data.SqlClient" Version="6.1.2" />
+    <PackageReference Include="Microsoft.Data.SqlClient" Version="6.1.3" />
     <PackageReference Include="Microsoft.TypeScript.MSBuild" Version="5.9.3" PrivateAssets="all" IncludeAssets="runtime; build; native; contentfiles; analyzers" />
   </ItemGroup>
   <ItemGroup Condition="'$(UseProjectRefs)' == 'false'">
-    <PackageReference Include="Serenity.Assets" Version="9.0.0" />
-    <PackageReference Include="Serenity.Corelib" Version="9.0.0" />
-    <PackageReference Include="Serenity.Net.Web" Version="9.0.0" />
-    <PackageReference Include="Serenity.Extensions" Version="9.0.0" />
+    <PackageReference Include="Serenity.Assets" Version="9.1.1" />
+    <PackageReference Include="Serenity.Corelib" Version="9.1.1" />
+    <PackageReference Include="Serenity.Net.Web" Version="9.1.1" />
+    <PackageReference Include="Serenity.Extensions" Version="9.1.1" />
     <!--#if (Northwind)-->
-    <PackageReference Include="Serenity.Demo.Northwind" Version="9.0.0" />
+    <PackageReference Include="Serenity.Demo.Northwind" Version="9.1.1" />
     <!--#endif-->
     <!--#if (BasicSamples)-->
-    <PackageReference Include="Serenity.Demo.BasicSamples" Version="9.0.0" />
+    <PackageReference Include="Serenity.Demo.BasicSamples" Version="9.1.1" />
     <!--#endif-->
   </ItemGroup>
   <ItemGroup Condition="'$(UseProjectRefs)' != 'false'">
