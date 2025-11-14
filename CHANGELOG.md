@@ -1,3 +1,8 @@
+## 9.1.3 (2025-11-14)
+
+### Bugfixes
+- Fix an issue with System.Data.Common reference in sergen g
+
 ## 9.1.2 (2025-11-14)
 
 ### Features
