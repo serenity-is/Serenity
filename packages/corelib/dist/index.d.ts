@@ -4878,15 +4878,18 @@ export interface IDataGrid {
 	getView(): IRemoteView<any>;
 	getFilterStore(): FilterStore;
 }
-export interface ColumnPickerResult {
-	order: string[];
-	visible: string[];
-}
+export type ColumnPickerChangeArgs = {
+	toggledColumn: Column;
+	reorderedColumns: boolean;
+	restoredDefaults: boolean;
+};
 export interface ColumnPickerDialogOptions {
 	columns?: Column[] | (() => Column[]);
-	defaults?: ColumnPickerResult | (() => ColumnPickerResult);
+	defaultOrder?: string[] | (() => string[]);
+	defaultVisible?: string[] | (() => string[]);
 	dataGrid?: IDataGrid;
 	sleekGrid?: ISleekGrid;
+	onChange?: (args: ColumnPickerChangeArgs) => Promise<any>;
 	toggleColumn?: (columnId: string, show?: boolean) => void;
 	reorderColumns?: (columnIds: string[], setVisible?: string[]) => void;
 }
@@ -4894,15 +4897,15 @@ export declare class ColumnPickerDialog<P extends ColumnPickerDialogOptions = Co
 	static [Symbol.typeInfo]: ClassTypeInfo<"Serenity.">;
 	private list;
 	private colById;
-	private defaults;
+	private defaultOrder;
+	private defaultVisible;
 	private columns;
 	private reorderColumns;
 	private toggleColumn;
 	private toggleAllCheckbox;
 	private searchInput;
+	private onChange;
 	constructor(opt: P);
-	private populateGrid;
-	private persistSettings;
 	destroy(): void;
 	protected handleToggleClick(e: MouseEvent): void;
 	protected renderContents(): any;
@@ -4917,6 +4920,7 @@ export declare class ColumnPickerDialog<P extends ColumnPickerDialogOptions = Co
 	private getTitle;
 	private isTogglable;
 	private isMovable;
+	private getPinInfo;
 	private createColumnItem;
 	private handleSortableEnd;
 	protected createColumnItems(): void;
