@@ -157,13 +157,15 @@ export class ColumnPickerDialog<P extends ColumnPickerDialogOptions = ColumnPick
 
         return (
             <div class="columns-container">
-                <div class="search-bar d-flex align-items-center mb-2">
+                <div class="search-bar d-flex align-items-center">
                     <div class="form-check">
                         <input type="checkbox" id={this.uniqueName + "_ToggleAll"} class="form-check-input toggle-all" ref={ref => this.toggleAllCheckbox = ref} onClick={bindThis(this).handleToggleAllClick} />
                     </div>
+                    <div class="search-sep" />
                     <div class="s-QuickSearchBar flex-grow-1" ref={bindThis(this).createSearch}>
                     </div>
-                    <button id={this.uniqueName + "_RestoreDefaults"} class="btn btn-sm btn-outline-danger float-end ms-2"
+                    <div class="search-sep" />
+                    <button id={this.uniqueName + "_RestoreDefaults"} class="btn btn-sm btn-outline-danger float-end"
                         type="button" title={ColumnPickerDialogTexts.RestoreDefaults} onClick={bindThis(this).handleRestoreDefaults}>
                         <i class={faIcon("redo")} />
                     </button>
