@@ -3239,7 +3239,6 @@ button.panel-titlebar-close::after {
 }
 
 .slick-cell.editable {
-  z-index: 11;
   overflow: visible;
   background: white;
   border-color: black;
