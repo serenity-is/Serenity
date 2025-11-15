@@ -39,6 +39,7 @@ export class DataGrid<TItem, P = {}> extends Widget<P> implements IDataGrid, IRe
     static override[Symbol.typeInfo] = this.registerClass(nsSerenity, [IReadOnly]);
 
     declare private _grid: ISleekGrid<TItem>;
+    declare private _initialSettings: PersistedGridSettings;
     declare private _layoutTimer: number;
 
     declare protected titleDiv: Fluent;
@@ -48,7 +49,6 @@ export class DataGrid<TItem, P = {}> extends Widget<P> implements IDataGrid, IRe
     declare protected quickFiltersBar: QuickFilterBar;
     declare protected slickContainer: Fluent;
     declare protected propertyItemsData: PropertyItemsData;
-    declare protected initialSettings: PersistedGridSettings;
     declare protected restoringSettings: number;
     declare public view: IRemoteView<TItem>;
 
@@ -1259,6 +1259,8 @@ export class DataGrid<TItem, P = {}> extends Widget<P> implements IDataGrid, IRe
 
     public get allColumns(): Column[] { return this._grid?.getAllColumns() }
     public get columns() { return this._grid?.getColumns(); }
+    public get initialSettings() { return this._initialSettings; }
+    protected set initialSettings(value: PersistedGridSettings) { this._initialSettings = value; }
 
     /** @obsolete use defaultPersistenceStorage, this one has a typo */
     public static get defaultPersistanceStorage(): SettingStorage { return DataGrid.defaultOptions.persistenceStorage; }

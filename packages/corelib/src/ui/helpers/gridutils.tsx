@@ -98,16 +98,16 @@ export namespace GridUtils {
     }
 
     export function addQuickSearchInputCustom(container: HTMLElement | ArrayLike<HTMLElement>,
-        onSearch: (p1: string, p2: string, done: (p3: boolean) => void) => void,
+        onSearch: (field: string, query: string, done: (found: boolean) => void) => void,
         fields?: QuickSearchField[]): QuickSearchInput {
 
         const input = <input type="text" /> as HTMLInputElement;
-        (isArrayLike(container) ? container[0] : container).prepend(<div class={["s-QuickSearchBar", fields?.length && "has-quick-search-files"]}>{input}</div>)
+        (isArrayLike(container) ? container[0] : container).prepend(<div class={["s-QuickSearchBar", fields?.length && "has-quick-search-fields"]}>{input}</div>)
 
         return new QuickSearchInput({
             element: input,
             fields: fields,
-            onSearch: onSearch as any
+            onSearch
         });
     }
 

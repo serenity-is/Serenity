@@ -3714,8 +3714,14 @@ export declare namespace AggregateFormatting {
 export type Format<TItem = any> = (ctx: FormatterContext<TItem>) => FormatterResult;
 declare module "@serenity-is/sleekgrid" {
 	interface Column<TItem = any> {
+		/** Fields that this column depends on for its formatting or values */
 		referencedFields?: string[];
+		/** Source PropertyItem from which this column was created */
 		sourceItem?: PropertyItem;
+		/** If false, the hide column action will be hidden for this column (column picker / via menu) */
+		togglable?: boolean;
+		/** If false, the move column actions will be hidden for this column (column picker / via menu) */
+		movable?: boolean;
 	}
 }
 export interface Formatter {
@@ -4872,31 +4878,50 @@ export interface IDataGrid {
 	getView(): IRemoteView<any>;
 	getFilterStore(): FilterStore;
 }
+export interface ColumnPickerResult {
+	order: string[];
+	visible: string[];
+}
 export interface ColumnPickerDialogOptions {
-	columns: Column[];
-	defaultColumns: string[];
+	columns?: Column[] | (() => Column[]);
+	defaults?: ColumnPickerResult | (() => ColumnPickerResult);
+	dataGrid?: IDataGrid;
+	sleekGrid?: ISleekGrid;
+	toggleColumn?: (columnId: string, show?: boolean) => void;
+	reorderColumns?: (columnIds: string[], setVisible?: string[]) => void;
 }
 export declare class ColumnPickerDialog<P extends ColumnPickerDialogOptions = ColumnPickerDialogOptions> extends BaseDialog<P> {
 	static [Symbol.typeInfo]: ClassTypeInfo<"Serenity.">;
-	private ulVisible;
-	private ulHidden;
+	private list;
 	private colById;
-	private visibleColumns;
-	done: (newColumns: string[]) => void;
+	private defaults;
+	private columns;
+	private reorderColumns;
+	private toggleColumn;
+	private toggleAllCheckbox;
+	private searchInput;
 	constructor(opt: P);
+	private populateGrid;
+	private persistSettings;
+	destroy(): void;
+	protected handleToggleClick(e: MouseEvent): void;
 	protected renderContents(): any;
-	static createToolButton(grid: IDataGrid): ToolButton;
-	protected getDialogButtons(): DialogButton[];
+	protected createSearch(div: HTMLElement): void;
+	protected handleRestoreDefaults(): void;
+	protected handleToggleAllClick(): void;
+	protected updateToggleAllValue(): boolean;
+	protected handleSearch(_field: string, query: string, done: (found: boolean) => void): void;
+	static createToolButton(optOrDataGrid: IDataGrid | ColumnPickerDialogOptions): ToolButton;
 	protected getDialogOptions(): DialogOptions;
+	protected getDialogButtons(): DialogButton[];
 	private getTitle;
-	private allowHide;
-	private createLI;
-	private updateListStates;
-	protected setupColumns(): void;
+	private isTogglable;
+	private isMovable;
+	private createColumnItem;
+	private handleSortableEnd;
+	protected createColumnItems(): void;
 	protected onDialogOpen(): void;
-	static openDialog({ grid }: {
-		grid: IDataGrid;
-	}): void;
+	static openDialog(opt: ColumnPickerDialogOptions): void;
 }
 declare class PubSub<TEvent = {}> {
 	private handlers;
@@ -5219,7 +5244,7 @@ export interface QuickSearchInputOptions {
 	typeDelay?: number;
 	loadingParentClass?: string;
 	filteredParentClass?: string;
-	onSearch?: (p1: string, p2: string, p3: (p1: boolean) => void) => void;
+	onSearch?: (field: string, query: string, done: (found: boolean) => void) => void;
 	fields?: QuickSearchField[];
 }
 export declare class QuickSearchInput<P extends QuickSearchInputOptions = QuickSearchInputOptions> extends Widget<P> {
@@ -5417,6 +5442,7 @@ export declare class QuickFilterBar<P extends QuickFilterBarOptions = QuickFilte
 export declare class DataGrid<TItem, P = {}> extends Widget<P> implements IDataGrid, IReadOnly {
 	static [Symbol.typeInfo]: ClassTypeInfo<"Serenity.">;
 	private _grid;
+	private _initialSettings;
 	private _layoutTimer;
 	protected titleDiv: Fluent;
 	protected toolbar: Toolbar;
@@ -5425,7 +5451,6 @@ export declare class DataGrid<TItem, P = {}> extends Widget<P> implements IDataG
 	protected quickFiltersBar: QuickFilterBar;
 	protected slickContainer: Fluent;
 	protected propertyItemsData: PropertyItemsData;
-	protected initialSettings: PersistedGridSettings;
 	protected restoringSettings: number;
 	view: IRemoteView<TItem>;
 	openDialogsAsPanel: boolean;
@@ -5634,6 +5659,8 @@ export declare class DataGrid<TItem, P = {}> extends Widget<P> implements IDataG
 	getFilterStore(): FilterStore;
 	get allColumns(): Column[];
 	get columns(): Column<TItem>[];
+	get initialSettings(): PersistedGridSettings;
+	protected set initialSettings(value: PersistedGridSettings);
 	/** @obsolete use defaultPersistenceStorage, this one has a typo */
 	static get defaultPersistanceStorage(): SettingStorage;
 	/** @obsolete use defaultPersistenceStorage, this one has a typo */
@@ -7243,7 +7270,7 @@ export declare namespace GridUtils {
 	function addToggleButton(toolDiv: HTMLElement | ArrayLike<HTMLElement>, cssClass: string, callback: (p1: boolean) => void, hint: string, initial?: boolean): void;
 	function addIncludeDeletedToggle(toolDiv: HTMLElement | ArrayLike<HTMLElement>, view: IRemoteView<any>, hint?: string, initial?: boolean): void;
 	function addQuickSearchInput(toolDiv: HTMLElement | ArrayLike<HTMLElement>, view: IRemoteView<any>, fields?: QuickSearchField[], onChange?: () => void): QuickSearchInput;
-	function addQuickSearchInputCustom(container: HTMLElement | ArrayLike<HTMLElement>, onSearch: (p1: string, p2: string, done: (p3: boolean) => void) => void, fields?: QuickSearchField[]): QuickSearchInput;
+	function addQuickSearchInputCustom(container: HTMLElement | ArrayLike<HTMLElement>, onSearch: (field: string, query: string, done: (found: boolean) => void) => void, fields?: QuickSearchField[]): QuickSearchInput;
 	function makeOrderable(grid: ISleekGrid, handleMove: (rows: number[], insertBefore: number) => void): void;
 	function makeOrderableWithUpdateRequest<TItem = any, TId = any>(dataGrid: IDataGrid, getId: (item: TItem) => TId, getDisplayOrder: (item: TItem) => any, service: string, getUpdateRequest: (id: TId, order: number) => SaveRequest<TItem>): void;
 }
