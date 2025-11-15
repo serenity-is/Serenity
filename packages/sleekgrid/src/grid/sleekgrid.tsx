@@ -12,7 +12,7 @@ import type { GridSignals } from "../core/grid-signals";
 import { gridDefaults, type GridOptions } from "../core/gridoptions";
 import type { IGroupTotals } from "../core/group";
 import { type IDataView } from "../core/idataview";
-import type { ISleekGrid } from "../core/isleekgrid";
+import type { GridLayoutInfo, ISleekGrid } from "../core/isleekgrid";
 import type { SelectionModel } from "../core/selection-model";
 import { addClass, escapeHtml, parsePx, removeClass } from "../core/util";
 import type { ViewportInfo } from "../core/viewportinfo";
@@ -224,14 +224,12 @@ export class SleekGrid<TItem = any> implements ISleekGrid<TItem> {
 
         const frozenTopBottomChanged = () => {
             if (this._initialized) {
-                //console.debug('invalidate rows on frozen top/bottom change');
                 this.invalidateAllRows?.();
                 this.render?.();
             }
         };
         const pinnedStartEndChanged = () => {
             if (this._initialized && this._ignorePinChangeUntil <= new Date().getTime()) {
-                //console.debug('invalidate cols on pin start/end change');
                 this.invalidateColumns();
             }
         };
@@ -513,13 +511,18 @@ export class SleekGrid<TItem = any> implements ISleekGrid<TItem> {
         return refs.main;
     }
 
-    public getLayoutInfo(): { frozenTopRows: number, frozenBottomRows: number, pinnedStartCols: number, pinnedEndCols: number } {
+    public getLayoutInfo(): GridLayoutInfo {
         const { frozenTopRows, frozenBottomRows, pinnedStartCols, pinnedEndCols } = this._refs;
+        const { supportFrozenRows, supportFrozenBottom, supportPinnedCols, supportPinnedEnd } = this._layout;
         return {
             frozenTopRows,
             frozenBottomRows,
             pinnedStartCols,
             pinnedEndCols,
+            supportFrozenRows,
+            supportFrozenBottom,
+            supportPinnedCols,
+            supportPinnedEnd
         };
     }
 
@@ -1428,15 +1431,7 @@ export class SleekGrid<TItem = any> implements ISleekGrid<TItem> {
         this.invalidateColumns();
     }
 
-    public reorderColumns(columnIds: string[], opt?: { notify?: boolean }): void {
-        this.setAllCols(sortToDesiredOrderAndKeepRest(this._allCols, columnIds), { initProps: false });
-        this.invalidateColumns();
-        if (opt?.notify ?? true) {
-            this._trigger(this.onColumnsReordered, {});
-        }
-    }
-
-    public setVisibleColumns(columnIds: string[], opt?: { reorder?: boolean, notify?: boolean }): void {
+    private internalSetVisibleColumns(columnIds: string[]): boolean {
         const idSet = new Set(columnIds);
         let anyChange = false;
         for (const col of this._allCols) {
@@ -1446,13 +1441,29 @@ export class SleekGrid<TItem = any> implements ISleekGrid<TItem> {
                 anyChange = true;
             }
         }
+        return anyChange;
+    }
+
+    public reorderColumns(columnIds: string[], opt?: { notify?: boolean, setVisible?: string[] }): void {
+        opt?.setVisible && this.internalSetVisibleColumns(opt.setVisible);
+        const newColumns = sortToDesiredOrderAndKeepRest(this._allCols, columnIds);
+        this.setAllCols(newColumns, { initProps: false });
+        this.invalidateColumns();
+        if (opt?.notify ?? true) {
+            this._trigger(this.onColumnsReordered, {});
+        }
+    }
+
+    public setVisibleColumns(columnIds: string[], opt?: { reorder?: boolean, notify?: boolean }): void {
+        const visibilityChange = this.internalSetVisibleColumns(columnIds);
         if (opt?.reorder ?? true) {
             this.reorderColumns(columnIds, { notify: opt?.notify });
         }
-        else if (anyChange) {
+        else if (visibilityChange) {
             this.setAllCols(this._allCols, { initProps: false });
             this.invalidateColumns();
-            this._trigger(this.onColumnsReordered, {});
+            if (opt?.notify ?? true)
+                this._trigger(this.onColumnsReordered, {});
         }
     }
 
