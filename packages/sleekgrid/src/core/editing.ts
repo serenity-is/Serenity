@@ -29,7 +29,7 @@ export interface EditorHost {
     getEditorFactory(): EditorFactory;
 }
 
-interface CompositeEditorOptions {
+export interface CompositeEditorOptions {
     formValues: any;
 }
 

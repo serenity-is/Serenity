@@ -13,7 +13,7 @@ interface RowMoveManagerDragData {
     canMove: boolean
 }
 
-interface ArgsMoveRows {
+export interface ArgsMoveRows {
     rows: number[];
     insertBefore: number;
 }
