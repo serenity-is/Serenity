@@ -1,5 +1,5 @@
 import { implementedInterfacesSymbol, isAssignableFromSymbol, isInstanceOfTypeSymbol } from "./symbols";
-import { EditorAttribute, Enum, ISlickFormatter, addCustomAttribute, classTypeInfo, editorTypeInfo, fieldsProxy, formatterTypeInfo, getBaseType, getCustomAttribute, getCustomAttributes, getInstanceType, getType, getTypeFullName, getTypeNameProp, getTypeShortName, hasCustomAttribute, initFormType, interfaceTypeInfo, isAssignableFrom, isEnum, isInstanceOfType, registerClass, registerEnum, registerInterface, registerType } from "./system";
+import { CustomAttribute, EditorAttribute, Enum, ISlickFormatter, addCustomAttribute, classTypeInfo, editorTypeInfo, fieldsProxy, formatterTypeInfo, getBaseType, getCustomAttribute, getCustomAttributes, getInstanceType, getType, getTypeFullName, getTypeNameProp, getTypeShortName, hasCustomAttribute, initFormType, interfaceTypeInfo, isAssignableFrom, isEnum, isInstanceOfType, registerClass, registerEditor, registerEnum, registerFormatter, registerInterface, registerType, type AttributeSpecifier, type InterfaceType } from "./system";
 import { ensureTypeInfo, getGlobalTypeRegistry, peekTypeInfo } from "./system-internal";
 
 afterEach(() => {
@@ -144,7 +144,7 @@ describe("isAssignableFrom", () => {
 
 
 describe("registerClass", () => {
-    function expectClassDetails(klass: any, name: string, intf?: any[]) {
+    function expectClassDetails(klass: any, name: string, intf?: InterfaceType[], attrs?: CustomAttribute[]) {
         expect(isEnum(klass)).toBe(false);
 
         if (intf != null) {
@@ -153,7 +153,11 @@ describe("registerClass", () => {
         else
             expect(klass[implementedInterfacesSymbol]).toBeUndefined();
 
-        expect(peekTypeInfo(klass)?.customAttributes).toBeUndefined();
+        if (attrs != null) {
+            expect(peekTypeInfo(klass)?.customAttributes).toStrictEqual(attrs);
+        }
+        else
+            expect(peekTypeInfo(klass)?.customAttributes).toBeUndefined();
         expect(peekTypeInfo(klass)?.enumFlags).toBeUndefined();
 
         if (name != null) {
@@ -194,11 +198,13 @@ describe("registerClass", () => {
     it('works with no name with interfaces', function () {
 
         class Intf1 {
+            static [Symbol.typeInfo] = interfaceTypeInfo("Intf1");
         }
 
         class Intf2 {
+            static [Symbol.typeInfo] = interfaceTypeInfo("Intf2");
         }
-
+        
         class Test {
         }
 
@@ -209,9 +215,11 @@ describe("registerClass", () => {
     it('works with name and interfaces', function () {
 
         class Intf1 {
+            static [Symbol.typeInfo] = interfaceTypeInfo("Intf1");
         }
 
         class Intf2 {
+            static [Symbol.typeInfo] = interfaceTypeInfo("Intf2");
         }
 
         class Test {
@@ -225,9 +233,11 @@ describe("registerClass", () => {
     it('works with derived class with null interface list null derives interfaces as is', function () {
 
         class Intf1 {
+            static [Symbol.typeInfo] = interfaceTypeInfo("Intf1");
         }
 
         class Intf2 {
+            static [Symbol.typeInfo] = interfaceTypeInfo("Intf2");
         }
 
         class Test {
@@ -250,9 +260,11 @@ describe("registerClass", () => {
     it('works with derived class with empty interface list derives interfaces as a copy', function () {
 
         class Intf1 {
+            static [Symbol.typeInfo] = interfaceTypeInfo("Intf1");
         }
 
         class Intf2 {
+            static [Symbol.typeInfo] = interfaceTypeInfo("Intf2");
         }
 
         class Test {
@@ -275,15 +287,18 @@ describe("registerClass", () => {
     it('works with derived class with extra interface list derives interfaces as a copy', function () {
 
         class Intf1 {
+            static [Symbol.typeInfo] = interfaceTypeInfo("Intf1");
         }
 
         class Intf2 {
+            static [Symbol.typeInfo] = interfaceTypeInfo("Intf2");
         }
 
         class Test {
         }
 
         class Intf3 {
+            static [Symbol.typeInfo] = interfaceTypeInfo("Intf3");
         }
 
         class Derived extends Test {
@@ -311,6 +326,65 @@ describe("registerClass", () => {
 
         registerClass(MyClass, null);
         expect(getType("MyClassName")).toBe(MyClass);
+    });
+
+    it('works with attribute instances', function () {
+        class MyAttr extends CustomAttribute {
+        }
+
+        class Test {
+        }
+
+        const attr = new MyAttr();
+        const name = 'Test_Class_With_Attr_Instance';
+        registerClass(Test, name, [attr]);
+        expectClassDetails(Test, name, undefined, [attr]);
+    });
+
+    it('works with attribute classes', function () {
+        class MyAttr extends CustomAttribute {
+        }
+
+        class Test {
+        }
+
+        const name = 'Test_Class_With_Attr_Class';
+        registerClass(Test, name, [MyAttr]);
+        expectClassDetails(Test, name, undefined, [new MyAttr()]);
+    });
+
+    it('works with attribute factories', function () {
+        class MyAttr extends CustomAttribute {
+        }
+
+        function myAttrFactory() {
+            return new MyAttr();
+        }
+        myAttrFactory.isAttributeFactory = true;
+
+        class Test {
+        }
+
+        const name = 'Test_Class_With_Attr_Factory';
+        registerClass(Test, name, [myAttrFactory]);
+        expectClassDetails(Test, name, undefined, [new MyAttr()]);
+    });
+
+    it('works with mixed interfaces and attributes', function () {
+        class Intf {
+            static [Symbol.typeInfo] = interfaceTypeInfo("Intf");
+        }
+
+        class MyAttr extends CustomAttribute {
+        }
+
+        class Test {
+        }
+
+        const attr = new MyAttr();
+        const name = 'Test_Class_With_Intf_And_Attr';
+        registerClass(Test, name, [Intf, attr]);
+        expectClassDetails(Test, name, [Intf], [attr]);
     });
 });
 
@@ -373,10 +447,52 @@ describe("registerEnum", () => {
         expect(getType(name)).toBe(Test);
         expect(getType(key)).toBe(Test);
     });
+
+    it('throws if enumType is not object or null', function () {
+        expect(() => registerEnum("not object", "name")).toThrow("Enum type is required in registerEnum!");
+        expect(() => registerEnum(null, "name")).toThrow("Enum type is required in registerEnum!");
+    });
+
+    it('throws if name ends with dot', function () {
+        enum Test {
+            A = 1
+        }
+        expect(() => registerEnum(Test, "name.")).toThrow("Enum name cannot end with a dot in registerEnum!");
+    });
+});
+
+describe("registerEditor", () => {
+    it('works with attributes', function () {
+        class MyAttr extends CustomAttribute {
+        }
+
+        class TestEditor {
+        }
+
+        const name = 'Test_Editor_With_Attr';
+        registerEditor(TestEditor, name, [MyAttr]);
+        expect(hasCustomAttribute(TestEditor, EditorAttribute)).toBe(true);
+        expect(hasCustomAttribute(TestEditor, MyAttr)).toBe(true);
+    });
+});
+
+describe("registerFormatter", () => {
+    it('works with attributes', function () {
+        class MyAttr extends CustomAttribute {
+        }
+
+        class TestFormatter {
+        }
+
+        const name = 'Test_Formatter_With_Attr';
+        registerFormatter(TestFormatter, name, [MyAttr]);
+        expect(hasCustomAttribute(TestFormatter, MyAttr)).toBe(true);
+        expect(isAssignableFrom(ISlickFormatter, TestFormatter)).toBe(true);
+    });
 });
 
 describe("registerInterface", () => {
-    function expectTypeDetails(klass: any, name: string, intf?: any[]) {
+    function expectTypeDetails(klass: any, name: string, intf?: InterfaceType[]) {
         expect(isEnum(klass)).toBe(false);
 
         if (intf != null) {
@@ -427,9 +543,11 @@ describe("registerInterface", () => {
     it('works with no name with interfaces', function () {
 
         class Intf1 {
+            static [Symbol.typeInfo] = interfaceTypeInfo("Intf1");
         }
 
         class Intf2 {
+            static [Symbol.typeInfo] = interfaceTypeInfo("Intf2");
         }
 
         class ITest {
@@ -442,9 +560,11 @@ describe("registerInterface", () => {
     it('works with name and interfaces', function () {
 
         class Intf1 {
+            static [Symbol.typeInfo] = interfaceTypeInfo("Intf1");
         }
 
         class Intf2 {
+            static [Symbol.typeInfo] = interfaceTypeInfo("Intf2");
         }
 
         class ITest {
@@ -460,9 +580,11 @@ describe("registerInterface", () => {
         // NOTE: interfaces are not supposed to be derived
 
         class Intf1 {
+            static [Symbol.typeInfo] = interfaceTypeInfo("Intf1");
         }
 
         class Intf2 {
+            static [Symbol.typeInfo] = interfaceTypeInfo("Intf2");
         }
 
         class ITest {
@@ -488,9 +610,12 @@ describe("registerInterface", () => {
         // just testing copy of [implementedInterfacesSymbol] here
 
         class Intf1 {
+            static [Symbol.typeInfo] = interfaceTypeInfo("Intf1");
         }
 
         class Intf2 {
+            static [Symbol.typeInfo] = interfaceTypeInfo("Intf2");
+
         }
 
         class ITest {
@@ -516,15 +641,18 @@ describe("registerInterface", () => {
         // just testing copy of [implementedInterfacesSymbol] here
 
         class Intf1 {
+            static [Symbol.typeInfo] = interfaceTypeInfo("Intf1");
         }
 
         class Intf2 {
+            static [Symbol.typeInfo] = interfaceTypeInfo("Intf2");
         }
 
         class ITest {
         }
 
         class Intf3 {
+            static [Symbol.typeInfo] = interfaceTypeInfo("Intf3");
         }
 
         class IDerived extends ITest {
@@ -738,7 +866,7 @@ describe("getTypeShortName", () => {
 
 describe("addCustomAttribute", () => {
     it("can add custom attribute", () => {
-        class MyAttribute {
+        class MyAttribute extends CustomAttribute {
         }
         registerClass(MyAttribute, "MyAttribute");
         class MyClass {
@@ -764,8 +892,9 @@ describe("addCustomAttribute", () => {
     });
 
     it("can add multiple attribute of same type", () => {
-        class MyAttribute {
+        class MyAttribute extends CustomAttribute {
             constructor(public value: boolean) {
+                super();
             }
         }
         class MyClass {
@@ -783,7 +912,7 @@ describe("addCustomAttribute", () => {
 });
 
 describe("getCustomAttribute", () => {
-    class MyAttribute {
+    class MyAttribute extends CustomAttribute {
     }
     it("returns null if type is null or undefined", () => {
         expect(getCustomAttribute(null, MyAttribute)).toBeNull();
@@ -815,7 +944,7 @@ describe("getCustomAttribute", () => {
     it("does not return another attribute type", () => {
         class MyClass {
         }
-        class OtherAttribute {
+        class OtherAttribute extends CustomAttribute {
         }
         const attr = new MyAttribute();
         addCustomAttribute(MyClass, attr);
@@ -878,7 +1007,7 @@ describe("getCustomAttribute", () => {
 });
 
 describe("getCustomAttributes", () => {
-    class MyAttribute {
+    class MyAttribute extends CustomAttribute {
     }
 
     it("returns empty array if type is null or undefined", () => {
@@ -986,7 +1115,7 @@ describe("getCustomAttributes", () => {
 
 describe("hasCustomAttribute", () => {
     it("returns false if no custom attribute", () => {
-        class MyAttribute {
+        class MyAttribute extends CustomAttribute {
         }
         class MyClass {
         }
@@ -994,7 +1123,7 @@ describe("hasCustomAttribute", () => {
     });
 
     it("returns true if custom attribute", () => {
-        class MyAttribute {
+        class MyAttribute extends CustomAttribute {
         }
         class MyClass {
         }

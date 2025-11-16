@@ -2066,7 +2066,7 @@ export type TypeInfo<TypeName> = {
 	/** Implemented interfaces */
 	interfaces?: any[];
 	/** Custom attributes */
-	customAttributes?: any[];
+	customAttributes?: CustomAttribute[];
 	/** Enum flags */
 	enumFlags?: boolean;
 	/** Registered flag */
@@ -2166,13 +2166,16 @@ export declare function getBaseType(type: any): any;
  * Register a class with the type system.
  * @param type Class type to register
  * @param name Name to register the class under
- * @param intf Optional interfaces the class implements
+ * @param intfAndAttr Optional interfaces and attributes the class implements
  */
-export declare function registerClass(type: any, name: string, intf?: any[]): void;
+export declare function registerClass(type: any, name: string, intfAndAttr?: (InterfaceType | AttributeSpecifier)[]): void;
+export declare abstract class CustomAttribute {
+	static [Symbol.typeInfo]: ClassTypeInfo<"Serenity.">;
+}
 /**
  * Indicates the enum key of an enum type (by default the name of the enum type is used as key)
  */
-export declare class EnumKeyAttribute {
+export declare class EnumKeyAttribute extends CustomAttribute {
 	value: string;
 	static [Symbol.typeInfo]: ClassTypeInfo<"Serenity.">;
 	constructor(value: string);
@@ -2193,7 +2196,7 @@ export declare function registerEnum(enumType: any, name: string, enumKey?: stri
  * @param name Name to register the interface under
  * @param intf Optional interfaces the interface class implements
  */
-export declare function registerInterface(type: any, name: string, intf?: any[]): void;
+export declare function registerInterface(type: any, name: string, intf?: InterfaceType[]): void;
 /**
  * Enum utilities
  */
@@ -2260,7 +2263,8 @@ export type SNoInfer<T> = [
  * Attribute class for editors. This is used by the editorTypeInfo function
  * and registerEditor function to add EditorAttribute to editors.
  */
-export declare class EditorAttribute {
+export declare class EditorAttribute extends CustomAttribute {
+	static [Symbol.typeInfo]: ClassTypeInfo<"Serenity.">;
 }
 /**
  * Marker interface for SleekGrid formatters.
@@ -2272,16 +2276,16 @@ export declare abstract class ISlickFormatter {
  * Register a SleekGrid formatter.
  * @param type Formatter type
  * @param name Formatter name
- * @param intfAndAttr Optional interface(s) to implement
+ * @param intfAndAttr Optional attributes and interface(s) to implement
  */
-export declare function registerFormatter(type: any, name: string, intfAndAttr?: any[]): void;
+export declare function registerFormatter(type: any, name: string, intfAndAttr?: (InterfaceType | AttributeSpecifier)[]): void;
 /**
  * Register an editor type. Adds EditorAttribute if not already present.
  * @param type Editor type
  * @param name Editor name
- * @param intf Optional interface(s) to implement
+ * @param intfAndAttr Optional attributes and interface(s) to implement
  */
-export declare function registerEditor(type: any, name: string, intfAndAttr?: any[]): void;
+export declare function registerEditor(type: any, name: string, intfAndAttr?: (InterfaceType | AttributeSpecifier)[]): void;
 /**
  * Adds a custom attribute to a type. JavaScript does not have built-in support for attributes,
  * so Serenity uses a customAttributes array on typeInfo to store them. This is used by
@@ -2289,7 +2293,7 @@ export declare function registerEditor(type: any, name: string, intfAndAttr?: an
  * @param type
  * @param attr
  */
-export declare function addCustomAttribute(type: any, attr: any): void;
+export declare function addCustomAttribute(type: any, attr: CustomAttribute): void;
 /**
  * Get a custom attribute of a type.
  * @param type Type to get the attribute from
@@ -2297,7 +2301,7 @@ export declare function addCustomAttribute(type: any, attr: any): void;
  * @param inherit Indicates whether to search in base types
  * @returns The custom attribute or null if not found
  */
-export declare function getCustomAttribute<TAttr>(type: any, attrType: {
+export declare function getCustomAttribute<TAttr extends CustomAttribute>(type: any, attrType: {
 	new (...args: any[]): TAttr;
 }, inherit?: boolean): TAttr;
 /**
@@ -2328,10 +2332,18 @@ export type EditorTypeInfo<TypeName> = TypeInfo<TypeName>;
 export type FormatterTypeInfo<TypeName> = TypeInfo<TypeName>;
 /** Interface type information. This is used to make type name available in declaration files unlike decorators that does not show in .d.ts files. */
 export type InterfaceTypeInfo<TypeName> = TypeInfo<TypeName>;
-export declare function classTypeInfo<TypeName>(typeName: StringLiteral<TypeName>, intfAndAttr?: any[]): ClassTypeInfo<TypeName>;
-export declare function editorTypeInfo<TypeName>(typeName: StringLiteral<TypeName>, intfAndAttr?: any[]): EditorTypeInfo<TypeName>;
+/** Type for attribute class, attribute instance or attribute factory */
+export type AttributeSpecifier = CustomAttribute | {
+	new (): CustomAttribute;
+} | (() => CustomAttribute);
+/** Type for interface class */
+export type InterfaceType = Function & {
+	[Symbol.typeInfo]: InterfaceTypeInfo<string>;
+};
+export declare function classTypeInfo<TypeName>(typeName: StringLiteral<TypeName>, intfAndAttr?: (InterfaceType | AttributeSpecifier)[]): ClassTypeInfo<TypeName>;
+export declare function editorTypeInfo<TypeName>(typeName: StringLiteral<TypeName>, intfAndAttr?: (InterfaceType | AttributeSpecifier)[]): EditorTypeInfo<TypeName>;
 export declare function formatterTypeInfo<TypeName>(typeName: StringLiteral<TypeName>, intfAndAttr?: any[]): FormatterTypeInfo<TypeName>;
-export declare function interfaceTypeInfo<TypeName>(typeName: StringLiteral<TypeName>, intfAndAttr?: any[]): InterfaceTypeInfo<TypeName>;
+export declare function interfaceTypeInfo<TypeName>(typeName: StringLiteral<TypeName>, intf?: InterfaceType[]): InterfaceTypeInfo<TypeName>;
 export declare function registerType(type: {
 	[Symbol.typeInfo]: TypeInfo<any>;
 	name: string;
@@ -4519,7 +4531,7 @@ export type RemoteViewProcessCallback<TItem> = (data: ListResponse<TItem>, view:
 /**
  * Indicates if a dialog should have a close button in its title bar (default true)
  */
-export declare class CloseButtonAttribute {
+export declare class CloseButtonAttribute extends CustomAttribute {
 	value: boolean;
 	static [Symbol.typeInfo]: ClassTypeInfo<"Serenity.">;
 	constructor(value?: boolean);
@@ -4527,7 +4539,7 @@ export declare class CloseButtonAttribute {
 /**
  * Indicates the element type of a widget like "div", "span" etc.
  */
-export declare class ElementAttribute {
+export declare class ElementAttribute extends CustomAttribute {
 	value: string;
 	static [Symbol.typeInfo]: ClassTypeInfo<"Serenity.">;
 	constructor(value: string);
@@ -4535,7 +4547,7 @@ export declare class ElementAttribute {
 /**
  * Indicates if a grid should have an advanced filter editor
  */
-export declare class AdvancedFilteringAttribute {
+export declare class AdvancedFilteringAttribute extends CustomAttribute {
 	value: boolean;
 	static [Symbol.typeInfo]: ClassTypeInfo<"Serenity.">;
 	constructor(value?: boolean);
@@ -4545,7 +4557,7 @@ export declare class AdvancedFilteringAttribute {
  * Requires jquery ui dialogs and jquery.dialogextend.js.
  * It does not work with current bootstrap modals.
  */
-export declare class MaximizableAttribute {
+export declare class MaximizableAttribute extends CustomAttribute {
 	value: boolean;
 	static [Symbol.typeInfo]: ClassTypeInfo<"Serenity.">;
 	constructor(value?: boolean);
@@ -4554,13 +4566,13 @@ export declare class MaximizableAttribute {
  * Indicates that the property is an option. This is no longer used as JSX
  * does not support it, but it is kept for backward compatibility.
  */
-export declare class OptionAttribute {
+export declare class OptionAttribute extends CustomAttribute {
 	static [Symbol.typeInfo]: ClassTypeInfo<"Serenity.">;
 }
 /**
  * Indicates if a dialog should be opened as a panel
  */
-export declare class PanelAttribute {
+export declare class PanelAttribute extends CustomAttribute {
 	value: boolean;
 	static [Symbol.typeInfo]: ClassTypeInfo<"Serenity.">;
 	constructor(value?: boolean);
@@ -4568,7 +4580,7 @@ export declare class PanelAttribute {
 /**
  * Indicates if a dialog should be resizable, only for jquery ui dialogs.
  */
-export declare class ResizableAttribute {
+export declare class ResizableAttribute extends CustomAttribute {
 	value: boolean;
 	static [Symbol.typeInfo]: ClassTypeInfo<"Serenity.">;
 	constructor(value?: boolean);
@@ -4579,7 +4591,7 @@ export declare class ResizableAttribute {
  * It does not have a title bar, close button or modal behavior.
  * It is just a way to show a form inside a page, without any dialog stuff.
  */
-export declare class StaticPanelAttribute {
+export declare class StaticPanelAttribute extends CustomAttribute {
 	value: boolean;
 	static [Symbol.typeInfo]: ClassTypeInfo<"Serenity.">;
 	constructor(value?: boolean);
@@ -4587,16 +4599,34 @@ export declare class StaticPanelAttribute {
 export declare namespace Attributes {
 	/** Indicates if a grid should have an advanced filter editor */
 	function advancedFiltering(value?: boolean): AdvancedFilteringAttribute;
+	namespace advancedFiltering {
+		var isAttributeFactory: boolean;
+	}
 	/** Indicates if a dialog should have a close button in its title bar (default true) */
 	function closeButton(value?: boolean): CloseButtonAttribute;
+	namespace closeButton {
+		var isAttributeFactory: boolean;
+	}
 	/** Indicates if a dialog should be resizable, only for jquery ui dialogs. */
 	function resizable(value?: boolean): ResizableAttribute;
+	namespace resizable {
+		var isAttributeFactory: boolean;
+	}
 	/** Indicates if a dialog should be maximizable, only for jquery ui dialogs. */
 	function maximizable(value?: boolean): MaximizableAttribute;
+	namespace maximizable {
+		var isAttributeFactory: boolean;
+	}
 	/** Indicates if a dialog should be opened as a panel by default (default null) */
 	function panel(value?: boolean): PanelAttribute;
+	namespace panel {
+		var isAttributeFactory: boolean;
+	}
 	/** Indicates if a dialog should be a static panel, which is not a dialog at all. */
 	function staticPanel(value?: boolean): StaticPanelAttribute;
+	namespace staticPanel {
+		var isAttributeFactory: boolean;
+	}
 }
 /** @deprecated Use Attributes.advancedFiltering() instead */
 export declare const FilterableAttribute: typeof AdvancedFilteringAttribute;
@@ -4615,12 +4645,12 @@ export declare namespace Decorators {
 	function registerType(): (target: Function & {
 		[Symbol.typeInfo]: any;
 	}, _context?: any) => void;
-	function registerClass(nameOrIntf?: string | any[], intf2?: any[]): (target: Function, _context?: any) => void;
-	function registerInterface(nameOrIntf?: string | any[], intf2?: any[]): (target: Function, _context?: any) => void;
-	function registerEditor(nameOrIntf?: string | any[], intf2?: any[]): (target: Function, _context?: any) => void;
+	function registerClass(nameOrIntf?: string | InterfaceType[], intf2?: InterfaceType[]): (target: Function, _context?: any) => void;
+	function registerInterface(nameOrIntf?: string | InterfaceType[], intf2?: InterfaceType[]): (target: Function, _context?: any) => void;
+	function registerEditor(nameOrIntf?: string | InterfaceType[], intf2?: InterfaceType[]): (target: Function, _context?: any) => void;
 	function registerEnum(target: any, enumKey?: string, name?: string): void;
 	function registerEnumType(target: any, name?: string, enumKey?: string): void;
-	function registerFormatter(nameOrIntf?: string | any[], intf2?: any[]): (target: Function, _context?: any) => void;
+	function registerFormatter(nameOrIntf?: string | InterfaceType[], intf2?: InterfaceType[]): (target: Function, _context?: any) => void;
 	function enumKey(value: string): (target: Function, _context?: any) => void;
 	function option(): (target: Object, propertyKey: string) => void;
 	function closeButton(value?: boolean): (target: Function, _context?: any) => void;

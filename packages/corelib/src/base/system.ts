@@ -172,24 +172,78 @@ export function getBaseType(type: any) {
     return Object.getPrototypeOf(type.prototype).constructor;
 }
 
+function isInterfaceType(type: any): type is InterfaceType {
+    return typeof type === "function" && peekTypeInfo(type)?.typeKind === "interface";
+}
+
+function isAttributeClass(item: any): item is { new(): CustomAttribute } {
+    return typeof item === "function" && isAssignableFrom(CustomAttribute, item);
+}
+
+function isAttributeFactory(item: any): item is (() => CustomAttribute) {
+    return typeof item === "function" && item.isAttributeFactory === true;
+}
+
+function extractInterfaces(intfAndAttr: (InterfaceType | AttributeSpecifier)[]): InterfaceType[] {
+    const result = intfAndAttr?.filter(isInterfaceType) as InterfaceType[];
+    if (result && result.length === intfAndAttr.length)
+        return intfAndAttr as InterfaceType[];
+    return result;
+}
+
+function extractAttributes(intfAndAttr: (InterfaceType | AttributeSpecifier)[]): CustomAttribute[] {
+    const result: CustomAttribute[] = [];
+    if (!intfAndAttr)
+        return result;
+
+    for (const item of intfAndAttr) {
+        if (isInterfaceType(item))
+            continue;
+
+        if (isInstanceOfType(item, CustomAttribute)) {
+            result.push(item as CustomAttribute);
+            continue;
+        }
+
+        if (isAttributeClass(item)) {
+            result.push(new (item as { new(): CustomAttribute })());
+            continue;
+        }
+
+        if (isAttributeFactory(item)) {
+            result.push(item());
+            continue;
+        }
+    }
+
+    return result
+}
+
 /**
  * Register a class with the type system.
  * @param type Class type to register
  * @param name Name to register the class under
- * @param intf Optional interfaces the class implements
+ * @param intfAndAttr Optional interfaces and attributes the class implements
  */
-export function registerClass(type: any, name: string, intf?: any[]): void {
-    internalRegisterType(type, name, intf, "class");
+export function registerClass(type: any, name: string, intfAndAttr?: (InterfaceType | AttributeSpecifier)[]): void {
+    internalRegisterType(type, name, extractInterfaces(intfAndAttr), "class");
+    for (const attr of extractAttributes(intfAndAttr)) {
+        addCustomAttribute(type, attr);
+    }
 }
 
+export abstract class CustomAttribute {
+    static [Symbol.typeInfo] = classTypeInfo(nsSerenity); static { registerType(this); }
+}
 
 /**
  * Indicates the enum key of an enum type (by default the name of the enum type is used as key)
  */
-export class EnumKeyAttribute {
-    static [Symbol.typeInfo] = classTypeInfo(nsSerenity); static { registerType(this); }
+export class EnumKeyAttribute extends CustomAttribute {
+    static override [Symbol.typeInfo] = classTypeInfo(nsSerenity); static { registerType(this); }
 
     constructor(public value: string) {
+        super();
     }
 }
 
@@ -225,8 +279,8 @@ export function registerEnum(enumType: any, name: string, enumKey?: string) {
  * @param name Name to register the interface under
  * @param intf Optional interfaces the interface class implements
  */
-export function registerInterface(type: any, name: string, intf?: any[]) {
-    internalRegisterType(type, name, intf, "interface");
+export function registerInterface(type: any, name: string, intf?: InterfaceType[]) {
+    internalRegisterType(type, name, extractInterfaces(intf), "interface");
     Object.defineProperty(type, isAssignableFromSymbol, { value: interfaceIsAssignableFrom, configurable: true });
 }
 
@@ -365,8 +419,9 @@ export type SNoInfer<T> = [T][T extends any ? 0 : never];
  * Attribute class for editors. This is used by the editorTypeInfo function
  * and registerEditor function to add EditorAttribute to editors.
  */
-export class EditorAttribute { }
-registerClass(EditorAttribute, 'Serenity.EditorAttribute');
+export class EditorAttribute extends CustomAttribute { 
+    static override [Symbol.typeInfo] = classTypeInfo(nsSerenity); static { registerType(this); }
+}
 
 /**
  * Marker interface for SleekGrid formatters.
@@ -379,9 +434,9 @@ export abstract class ISlickFormatter {
  * Register a SleekGrid formatter.
  * @param type Formatter type
  * @param name Formatter name
- * @param intfAndAttr Optional interface(s) to implement
+ * @param intfAndAttr Optional attributes and interface(s) to implement
  */
-export function registerFormatter(type: any, name: string, intfAndAttr?: any[]): void {
+export function registerFormatter(type: any, name: string, intfAndAttr?: (InterfaceType | AttributeSpecifier)[]): void {
     registerClass(type, name, merge([ISlickFormatter], intfAndAttr));
 }
 
@@ -389,10 +444,16 @@ export function registerFormatter(type: any, name: string, intfAndAttr?: any[]):
  * Register an editor type. Adds EditorAttribute if not already present.
  * @param type Editor type
  * @param name Editor name
- * @param intf Optional interface(s) to implement
+ * @param intfAndAttr Optional attributes and interface(s) to implement
  */
-export function registerEditor(type: any, name: string, intfAndAttr?: any[]) {
-    registerClass(type, name, merge([new EditorAttribute()], intfAndAttr?.filter(x => typeof (x) !== "function" && x.prototype !== EditorAttribute.prototype)));
+export function registerEditor(type: any, name: string, intfAndAttr?: (InterfaceType | AttributeSpecifier)[]) {
+    registerClass(type, name, extractInterfaces(intfAndAttr));
+    let attributes = extractAttributes(intfAndAttr);
+    addCustomAttribute(type, new EditorAttribute());
+    for (const attr of attributes) {
+        if (getInstanceType(attr) !== EditorAttribute)
+            addCustomAttribute(type, attr);
+    }
 }
 
 /**
@@ -402,7 +463,7 @@ export function registerEditor(type: any, name: string, intfAndAttr?: any[]) {
  * @param type 
  * @param attr 
  */
-export function addCustomAttribute(type: any, attr: any) {
+export function addCustomAttribute(type: any, attr: CustomAttribute) {
     let typeInfo = ensureTypeInfo(type);
     if (!typeInfo.customAttributes)
         typeInfo.customAttributes = [attr];
@@ -417,7 +478,7 @@ export function addCustomAttribute(type: any, attr: any) {
  * @param inherit Indicates whether to search in base types
  * @returns The custom attribute or null if not found
  */
-export function getCustomAttribute<TAttr>(type: any, attrType: { new(...args: any[]): TAttr }, inherit: boolean = true): TAttr {
+export function getCustomAttribute<TAttr extends CustomAttribute>(type: any, attrType: { new(...args: any[]): TAttr }, inherit: boolean = true): TAttr {
     if (!type || attrType == null)
         return null;
 
@@ -427,7 +488,7 @@ export function getCustomAttribute<TAttr>(type: any, attrType: { new(...args: an
             for (let i = attrs.length - 1; i >= 0; i--) {
                 let attr = attrs[i];
                 if (attr != null && isInstanceOfType(attr, attrType))
-                    return attr;
+                    return attr as any;
             }
         }
     }
@@ -484,34 +545,39 @@ export type FormatterTypeInfo<TypeName> = TypeInfo<TypeName>;
 /** Interface type information. This is used to make type name available in declaration files unlike decorators that does not show in .d.ts files. */
 export type InterfaceTypeInfo<TypeName> = TypeInfo<TypeName>;
 
-export function classTypeInfo<TypeName>(typeName: StringLiteral<TypeName>, intfAndAttr?: any[]): ClassTypeInfo<TypeName> {
+/** Type for attribute class, attribute instance or attribute factory */
+export type AttributeSpecifier = CustomAttribute | { new(): CustomAttribute } | (() => CustomAttribute);
+/** Type for interface class */
+export type InterfaceType = Function & { [Symbol.typeInfo]: InterfaceTypeInfo<string> };
+
+export function classTypeInfo<TypeName>(typeName: StringLiteral<TypeName>, intfAndAttr?: (InterfaceType | AttributeSpecifier)[]): ClassTypeInfo<TypeName> {
     const typeInfo: TypeInfo<TypeName> = {
         typeKind: "class",
         typeName
     }
 
-    const interfaces = intfAndAttr?.filter(x => typeof (x) === "function");
+    const interfaces = extractInterfaces(intfAndAttr);
     if (interfaces?.length)
         typeInfo.interfaces = interfaces;
 
-    const attrs = intfAndAttr?.filter(x => typeof (x) !== "function")
+    const attrs = extractAttributes(intfAndAttr);
     if (attrs?.length)
         typeInfo.customAttributes = attrs;
 
     return typeInfo;
 }
 
-export function editorTypeInfo<TypeName>(typeName: StringLiteral<TypeName>, intfAndAttr?: any[]): EditorTypeInfo<TypeName> {
+export function editorTypeInfo<TypeName>(typeName: StringLiteral<TypeName>, intfAndAttr?: (InterfaceType | AttributeSpecifier)[]): EditorTypeInfo<TypeName> {
     const typeInfo: TypeInfo<TypeName> = {
         typeKind: "class",
         typeName
     };
 
-    const interfaces = intfAndAttr?.filter(x => typeof (x) === "function");
+    const interfaces = extractInterfaces(intfAndAttr);
     if (interfaces?.length)
         typeInfo.interfaces = interfaces;
 
-    typeInfo.customAttributes = merge([new EditorAttribute()], intfAndAttr?.filter(x => typeof (x) !== "function" && x.prototype !== EditorAttribute.prototype))
+    typeInfo.customAttributes = merge([new EditorAttribute()], extractAttributes(intfAndAttr).filter(x => getInstanceType(x) !== EditorAttribute));
     return typeInfo;
 }
 
@@ -519,29 +585,25 @@ export function formatterTypeInfo<TypeName>(typeName: StringLiteral<TypeName>, i
     const typeInfo: TypeInfo<TypeName> = {
         typeKind: "class",
         typeName,
-        interfaces: merge([ISlickFormatter], intfAndAttr?.filter(x => typeof (x) === "function"))
+        interfaces: merge([ISlickFormatter], extractInterfaces(intfAndAttr))
     };
 
-    const attrs = intfAndAttr?.filter(x => typeof (x) !== "function");
+    const attrs = extractAttributes(intfAndAttr);
     if (attrs?.length)
         typeInfo.customAttributes = attrs;
 
     return typeInfo;
 }
 
-export function interfaceTypeInfo<TypeName>(typeName: StringLiteral<TypeName>, intfAndAttr?: any[]): InterfaceTypeInfo<TypeName> {
+export function interfaceTypeInfo<TypeName>(typeName: StringLiteral<TypeName>, intf?: InterfaceType[]): InterfaceTypeInfo<TypeName> {
     const typeInfo: TypeInfo<TypeName> = {
         typeKind: "interface",
         typeName
     }
 
-    const interfaces = intfAndAttr?.filter(x => typeof (x) === "function");
+    const interfaces = extractInterfaces(intf);
     if (interfaces?.length)
         typeInfo.interfaces = interfaces;
-
-    const attrs = intfAndAttr?.filter(x => typeof (x) !== "function")
-    if (attrs?.length)
-        typeInfo.customAttributes = attrs;
 
     return typeInfo;
 }

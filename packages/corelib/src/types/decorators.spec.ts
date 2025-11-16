@@ -1,6 +1,6 @@
 import { Decorators } from "./decorators";
 import { AdvancedFilteringAttribute, CloseButtonAttribute, ElementAttribute, FilterableAttribute, MaximizableAttribute, OptionAttribute, PanelAttribute, ResizableAttribute, StaticPanelAttribute } from "./attributes";
-import { EditorAttribute, EnumKeyAttribute, addCustomAttribute, registerClass, registerEditor, registerEnum, registerFormatter, registerInterface, registerType } from "../base";
+import { EditorAttribute, EnumKeyAttribute, addCustomAttribute, interfaceTypeInfo, registerClass, registerEditor, registerEnum, registerFormatter, registerInterface, registerType } from "../base";
 import { addTypeMember } from "../compat";
 
 vi.mock("../base", async (importOriginal) => {
@@ -45,9 +45,14 @@ describe("Decorators", () => {
 
     describe("registerClass", () => {
         it("should call registerClass with string name and interfaces", () => {
-            class TestClass {}
-            class Interface1 {}
-            class Interface2 {}
+            class TestClass {
+            }
+            class Interface1 {
+                static [Symbol.typeInfo] = interfaceTypeInfo("Interface2");
+            }
+            class Interface2 {
+                static [Symbol.typeInfo] = interfaceTypeInfo("Interface2");
+            }
 
             const decorator = Decorators.registerClass("TestName", [Interface1, Interface2]);
             decorator(TestClass);
@@ -57,8 +62,12 @@ describe("Decorators", () => {
 
         it("should call registerClass with interfaces array when first param is array", () => {
             class TestClass {}
-            class Interface1 {}
-            class Interface2 {}
+            class Interface1 {
+                static [Symbol.typeInfo] = interfaceTypeInfo("Interface1");
+            }
+            class Interface2 {
+                static [Symbol.typeInfo] = interfaceTypeInfo("Interface2");
+            }
 
             const decorator = Decorators.registerClass([Interface1, Interface2]);
             decorator(TestClass);
@@ -70,8 +79,12 @@ describe("Decorators", () => {
     describe("registerInterface", () => {
         it("should call registerInterface with string name and interfaces", () => {
             class TestInterface {}
-            class Interface1 {}
-            class Interface2 {}
+            class Interface1 {
+                static [Symbol.typeInfo] = interfaceTypeInfo("Interface1");
+            }
+            class Interface2 {
+                static [Symbol.typeInfo] = interfaceTypeInfo("Interface2");
+            }
 
             const decorator = Decorators.registerInterface("TestName", [Interface1, Interface2]);
             decorator(TestInterface);
@@ -81,8 +94,12 @@ describe("Decorators", () => {
 
         it("should call registerInterface with interfaces array when first param is array", () => {
             class TestInterface {}
-            class Interface1 {}
-            class Interface2 {}
+            class Interface1 {
+                static [Symbol.typeInfo] = interfaceTypeInfo("Interface1");
+            }
+            class Interface2 {
+                static [Symbol.typeInfo] = interfaceTypeInfo("Interface2");
+            }
 
             const decorator = Decorators.registerInterface([Interface1, Interface2]);
             decorator(TestInterface);
@@ -94,8 +111,12 @@ describe("Decorators", () => {
     describe("registerEditor", () => {
         it("should call registerEditor with string name and interfaces", () => {
             class TestEditor {}
-            class Interface1 {}
-            class Interface2 {}
+            class Interface1 {
+                static [Symbol.typeInfo] = interfaceTypeInfo("Interface1");
+            }
+            class Interface2 {
+                static [Symbol.typeInfo] = interfaceTypeInfo("Interface2");
+            }
 
             const decorator = Decorators.registerEditor("TestName", [Interface1, Interface2]);
             decorator(TestEditor);
@@ -105,8 +126,12 @@ describe("Decorators", () => {
 
         it("should call registerEditor with interfaces array when first param is array", () => {
             class TestEditor {}
-            class Interface1 {}
-            class Interface2 {}
+            class Interface1 {
+                static [Symbol.typeInfo] = interfaceTypeInfo("Interface1");
+            }
+            class Interface2 {
+                static [Symbol.typeInfo] = interfaceTypeInfo("Interface2");
+            }
 
             const decorator = Decorators.registerEditor([Interface1, Interface2]);
             decorator(TestEditor);
@@ -146,8 +171,12 @@ describe("Decorators", () => {
     describe("registerFormatter", () => {
         it("should call registerFormatter with string name and interfaces", () => {
             class TestFormatter {}
-            class Interface1 {}
-            class Interface2 {}
+            class Interface1 {
+                static [Symbol.typeInfo] = interfaceTypeInfo("Interface1");
+            }
+            class Interface2 {
+                static [Symbol.typeInfo] = interfaceTypeInfo("Interface2");
+            }
 
             const decorator = Decorators.registerFormatter("TestName", [Interface1, Interface2]);
             decorator(TestFormatter);
