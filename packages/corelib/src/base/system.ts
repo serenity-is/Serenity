@@ -214,6 +214,8 @@ function extractAttributes(intfAndAttr: (InterfaceType | AttributeSpecifier)[]):
             result.push(item());
             continue;
         }
+
+        throw new Error("Invalid attribute or interface specifier: " + item);
     }
 
     return result
@@ -234,6 +236,7 @@ export function registerClass(type: any, name: string, intfAndAttr?: (InterfaceT
 
 export abstract class CustomAttribute {
     static [Symbol.typeInfo] = classTypeInfo(nsSerenity); static { registerType(this); }
+    declare private readonly isCustomAttribute: true;
 }
 
 /**
@@ -502,7 +505,7 @@ export function getCustomAttribute<TAttr extends CustomAttribute>(type: any, att
  * @param inherit Indicates whether to search in base types
  * @returns True if the type has the attribute
  */
-export function hasCustomAttribute<TAttr>(type: any, attrType: { new(...args: any[]): TAttr }, inherit: boolean = true): boolean {
+export function hasCustomAttribute<TAttr extends CustomAttribute>(type: any, attrType: { new(...args: any[]): TAttr }, inherit: boolean = true): boolean {
     return getCustomAttribute(type, attrType, inherit) != null;
 }
 
@@ -546,7 +549,7 @@ export type FormatterTypeInfo<TypeName> = TypeInfo<TypeName>;
 export type InterfaceTypeInfo<TypeName> = TypeInfo<TypeName>;
 
 /** Type for attribute class, attribute instance or attribute factory */
-export type AttributeSpecifier = CustomAttribute | { new(): CustomAttribute } | (() => CustomAttribute);
+export type AttributeSpecifier = CustomAttribute | ({ new(): CustomAttribute }) | (() => CustomAttribute);
 /** Type for interface class */
 export type InterfaceType = Function & { [Symbol.typeInfo]: InterfaceTypeInfo<string> };
 
@@ -581,7 +584,7 @@ export function editorTypeInfo<TypeName>(typeName: StringLiteral<TypeName>, intf
     return typeInfo;
 }
 
-export function formatterTypeInfo<TypeName>(typeName: StringLiteral<TypeName>, intfAndAttr?: any[]): FormatterTypeInfo<TypeName> {
+export function formatterTypeInfo<TypeName>(typeName: StringLiteral<TypeName>, intfAndAttr?: (InterfaceType | AttributeSpecifier)[]): FormatterTypeInfo<TypeName> {
     const typeInfo: TypeInfo<TypeName> = {
         typeKind: "class",
         typeName,

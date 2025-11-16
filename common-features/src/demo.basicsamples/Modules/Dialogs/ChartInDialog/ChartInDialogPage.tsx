@@ -23,7 +23,7 @@ export default () => {
 }
 
 export class ChartInDialog<P = {}> extends BaseDialog<P> {
-    static override[Symbol.typeInfo] = this.registerClass(nsDemoBasicSamples, [Attributes.resizable(), Attributes.maximizable()]);
+    static override[Symbol.typeInfo] = this.registerClass(nsDemoBasicSamples, [Attributes.resizable, Attributes.maximizable]);
 
     declare private canvas: HTMLCanvasElement;
 

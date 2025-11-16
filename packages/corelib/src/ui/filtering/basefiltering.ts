@@ -1,4 +1,4 @@
-import { ClassTypeInfo, classTypeInfo, Criteria, FilterPanelTexts, Fluent, getInstanceType, getTypeFullName, localText, nsSerenity, registerType, stringFormat, StringLiteral, type PropertyItem } from "../../base";
+import { ClassTypeInfo, classTypeInfo, Criteria, FilterPanelTexts, Fluent, getInstanceType, getTypeFullName, localText, nsSerenity, registerType, stringFormat, StringLiteral, type AttributeSpecifier, type InterfaceType, type PropertyItem } from "../../base";
 import { deepClone } from "../../compat";
 import { QuickFilter } from "../datagrid/quickfilter";
 import { Combobox } from "../editors/combobox";
@@ -257,7 +257,7 @@ export abstract class BaseFiltering implements IFiltering, IQuickFiltering {
         filter.options = deepClone(this.get_field().quickFilterParams);
     }
 
-    protected static registerClass<TypeName>(typeName: StringLiteral<TypeName>, intfAndAttr?: any[]): ClassTypeInfo<TypeName> {
+    protected static registerClass<TypeName>(typeName: StringLiteral<TypeName>, intfAndAttr?: (InterfaceType | AttributeSpecifier)[]): ClassTypeInfo<TypeName> {
         if (Object.prototype.hasOwnProperty.call(this, Symbol.typeInfo) && this[Symbol.typeInfo])
             throw new Error(`Type ${this.name} already has a typeInfo property!`);
 

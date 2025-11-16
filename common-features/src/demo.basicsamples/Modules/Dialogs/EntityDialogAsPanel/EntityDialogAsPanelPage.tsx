@@ -39,7 +39,7 @@ export default (model: number | OrderRow) => {
  * A version of order dialog converted to a panel by adding PanelAttribute.
  */
 export class EntityDialogAsPanel extends OrderDialog {
-    static override[Symbol.typeInfo] = this.registerClass(nsDemoBasicSamples, [Attributes.panel()]);
+    static override[Symbol.typeInfo] = this.registerClass(nsDemoBasicSamples, [Attributes.panel]);
 
     protected override updateInterface() {
         super.updateInterface();

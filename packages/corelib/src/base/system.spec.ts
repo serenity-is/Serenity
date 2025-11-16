@@ -1,5 +1,5 @@
 import { implementedInterfacesSymbol, isAssignableFromSymbol, isInstanceOfTypeSymbol } from "./symbols";
-import { CustomAttribute, EditorAttribute, Enum, ISlickFormatter, addCustomAttribute, classTypeInfo, editorTypeInfo, fieldsProxy, formatterTypeInfo, getBaseType, getCustomAttribute, getCustomAttributes, getInstanceType, getType, getTypeFullName, getTypeNameProp, getTypeShortName, hasCustomAttribute, initFormType, interfaceTypeInfo, isAssignableFrom, isEnum, isInstanceOfType, registerClass, registerEditor, registerEnum, registerFormatter, registerInterface, registerType, type AttributeSpecifier, type InterfaceType } from "./system";
+import { CustomAttribute, EditorAttribute, Enum, ISlickFormatter, addCustomAttribute, classTypeInfo, editorTypeInfo, fieldsProxy, formatterTypeInfo, getBaseType, getCustomAttribute, getCustomAttributes, getInstanceType, getType, getTypeFullName, getTypeNameProp, getTypeShortName, hasCustomAttribute, initFormType, interfaceTypeInfo, isAssignableFrom, isEnum, isInstanceOfType, registerClass, registerEditor, registerEnum, registerFormatter, registerInterface, registerType, type InterfaceType, type InterfaceTypeInfo } from "./system";
 import { ensureTypeInfo, getGlobalTypeRegistry, peekTypeInfo } from "./system-internal";
 
 afterEach(() => {
@@ -74,12 +74,17 @@ describe("Enum.toString", () => {
 });
 
 namespace Module1 {
-    export class ISome { }
+    export class ISome { 
+        declare static [Symbol.typeInfo]: InterfaceTypeInfo<"ISome">;
+    }
+
     registerInterface(ISome, "ISome");
 }
 
 namespace CopyModule1 {
-    export class ISome { }
+    export class ISome { 
+        declare static [Symbol.typeInfo]: InterfaceTypeInfo<"ISome">;
+    }
     registerInterface(ISome, "ISome");
 }
 
@@ -113,7 +118,9 @@ describe("isAssignableFrom", () => {
     });
 
     it("interfaces with same class names but different registration names won't match", function () {
-        class ISome { }
+        class ISome { 
+            declare static [Symbol.typeInfo]: InterfaceTypeInfo<"ISomeDiff">;
+        }
         registerInterface(ISome, "ISomeDiff")
         class X { }
         registerClass(X, "X", [ISome])
@@ -121,8 +128,8 @@ describe("isAssignableFrom", () => {
     });
 
     it("classes that are not registered as interfaces won't match", function () {
-        class ISome { }
-        registerClass(ISome, "ISome")
+        class ISome extends CustomAttribute { 
+        }
         class X { }
         registerClass(X, "X", [ISome])
         expect(isAssignableFrom(Module1.ISome, X)).toBe(false);
@@ -877,9 +884,9 @@ describe("addCustomAttribute", () => {
     });
 
     it("can add multiple attribute", () => {
-        class MyAttribute1 {
+        class MyAttribute1 extends CustomAttribute {
         }
-        class MyAttribute2 {
+        class MyAttribute2 extends CustomAttribute {
         }
         class MyClass {
         }

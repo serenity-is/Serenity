@@ -2171,6 +2171,7 @@ export declare function getBaseType(type: any): any;
 export declare function registerClass(type: any, name: string, intfAndAttr?: (InterfaceType | AttributeSpecifier)[]): void;
 export declare abstract class CustomAttribute {
 	static [Symbol.typeInfo]: ClassTypeInfo<"Serenity.">;
+	private readonly isCustomAttribute;
 }
 /**
  * Indicates the enum key of an enum type (by default the name of the enum type is used as key)
@@ -2311,7 +2312,7 @@ export declare function getCustomAttribute<TAttr extends CustomAttribute>(type: 
  * @param inherit Indicates whether to search in base types
  * @returns True if the type has the attribute
  */
-export declare function hasCustomAttribute<TAttr>(type: any, attrType: {
+export declare function hasCustomAttribute<TAttr extends CustomAttribute>(type: any, attrType: {
 	new (...args: any[]): TAttr;
 }, inherit?: boolean): boolean;
 /**
@@ -2333,16 +2334,16 @@ export type FormatterTypeInfo<TypeName> = TypeInfo<TypeName>;
 /** Interface type information. This is used to make type name available in declaration files unlike decorators that does not show in .d.ts files. */
 export type InterfaceTypeInfo<TypeName> = TypeInfo<TypeName>;
 /** Type for attribute class, attribute instance or attribute factory */
-export type AttributeSpecifier = CustomAttribute | {
+export type AttributeSpecifier = CustomAttribute | ({
 	new (): CustomAttribute;
-} | (() => CustomAttribute);
+}) | (() => CustomAttribute);
 /** Type for interface class */
 export type InterfaceType = Function & {
 	[Symbol.typeInfo]: InterfaceTypeInfo<string>;
 };
 export declare function classTypeInfo<TypeName>(typeName: StringLiteral<TypeName>, intfAndAttr?: (InterfaceType | AttributeSpecifier)[]): ClassTypeInfo<TypeName>;
 export declare function editorTypeInfo<TypeName>(typeName: StringLiteral<TypeName>, intfAndAttr?: (InterfaceType | AttributeSpecifier)[]): EditorTypeInfo<TypeName>;
-export declare function formatterTypeInfo<TypeName>(typeName: StringLiteral<TypeName>, intfAndAttr?: any[]): FormatterTypeInfo<TypeName>;
+export declare function formatterTypeInfo<TypeName>(typeName: StringLiteral<TypeName>, intfAndAttr?: (InterfaceType | AttributeSpecifier)[]): FormatterTypeInfo<TypeName>;
 export declare function interfaceTypeInfo<TypeName>(typeName: StringLiteral<TypeName>, intf?: InterfaceType[]): InterfaceTypeInfo<TypeName>;
 export declare function registerType(type: {
 	[Symbol.typeInfo]: TypeInfo<any>;
@@ -3272,7 +3273,7 @@ export declare class Widget<P = {}> {
 	change(handler: (e: Event) => void): void;
 	changeSelect2(handler: (e: Event) => void): void;
 	static create<TWidget extends Widget<P>, P>(params: CreateWidgetParams<TWidget, P>): TWidget;
-	protected getCustomAttribute<TAttr>(attrType: {
+	protected getCustomAttribute<TAttr extends CustomAttribute>(attrType: {
 		new (...args: any[]): TAttr;
 	}, inherit?: boolean): TAttr;
 	protected afterRender(callback: () => void): void;
@@ -3290,8 +3291,8 @@ export declare class Widget<P = {}> {
 	protected syncOrAsyncThen<T>(syncMethod: (() => T), asyncMethod: (() => PromiseLike<T>), then: (v: T) => void): void;
 	protected useIdPrefix(): IdPrefixType;
 	static readonly isComponent = true;
-	protected static registerClass<TypeName>(typeName: StringLiteral<TypeName>, intfAndAttr?: any[]): ClassTypeInfo<TypeName>;
-	protected static registerEditor<TypeName>(typeName: StringLiteral<TypeName>, intfAndAttr?: any[]): EditorTypeInfo<TypeName>;
+	protected static registerClass<TypeName>(typeName: StringLiteral<TypeName>, intfAndAttr?: (InterfaceType | AttributeSpecifier)[]): ClassTypeInfo<TypeName>;
+	protected static registerEditor<TypeName>(typeName: StringLiteral<TypeName>, intfAndAttr?: (InterfaceType | AttributeSpecifier)[]): EditorTypeInfo<TypeName>;
 	static [Symbol.typeInfo]: ClassTypeInfo<"Serenity.">;
 }
 /** @deprecated Use Widget */
@@ -4599,34 +4600,16 @@ export declare class StaticPanelAttribute extends CustomAttribute {
 export declare namespace Attributes {
 	/** Indicates if a grid should have an advanced filter editor */
 	function advancedFiltering(value?: boolean): AdvancedFilteringAttribute;
-	namespace advancedFiltering {
-		var isAttributeFactory: boolean;
-	}
 	/** Indicates if a dialog should have a close button in its title bar (default true) */
 	function closeButton(value?: boolean): CloseButtonAttribute;
-	namespace closeButton {
-		var isAttributeFactory: boolean;
-	}
 	/** Indicates if a dialog should be resizable, only for jquery ui dialogs. */
 	function resizable(value?: boolean): ResizableAttribute;
-	namespace resizable {
-		var isAttributeFactory: boolean;
-	}
 	/** Indicates if a dialog should be maximizable, only for jquery ui dialogs. */
 	function maximizable(value?: boolean): MaximizableAttribute;
-	namespace maximizable {
-		var isAttributeFactory: boolean;
-	}
 	/** Indicates if a dialog should be opened as a panel by default (default null) */
 	function panel(value?: boolean): PanelAttribute;
-	namespace panel {
-		var isAttributeFactory: boolean;
-	}
 	/** Indicates if a dialog should be a static panel, which is not a dialog at all. */
 	function staticPanel(value?: boolean): StaticPanelAttribute;
-	namespace staticPanel {
-		var isAttributeFactory: boolean;
-	}
 }
 /** @deprecated Use Attributes.advancedFiltering() instead */
 export declare const FilterableAttribute: typeof AdvancedFilteringAttribute;
@@ -6899,7 +6882,7 @@ export declare abstract class BaseFiltering implements IFiltering, IQuickFilteri
 	getEditorValue(): string;
 	getEditorText(): string;
 	initQuickFilter(filter: QuickFilter<Widget<any>, any>): void;
-	protected static registerClass<TypeName>(typeName: StringLiteral<TypeName>, intfAndAttr?: any[]): ClassTypeInfo<TypeName>;
+	protected static registerClass<TypeName>(typeName: StringLiteral<TypeName>, intfAndAttr?: (InterfaceType | AttributeSpecifier)[]): ClassTypeInfo<TypeName>;
 	static [Symbol.typeInfo]: ClassTypeInfo<"Serenity.">;
 }
 export declare abstract class BaseEditorFiltering<TEditor extends Widget<any>> extends BaseFiltering {
@@ -7165,7 +7148,7 @@ export declare class FileDownloadFormatter implements Formatter, IInitializeColu
 }
 export declare abstract class FormatterBase implements Formatter {
 	abstract format(ctx: FormatterContext): FormatterResult;
-	protected static registerFormatter<TypeName>(typeName: StringLiteral<TypeName>, intfAndAttr?: any[]): FormatterTypeInfo<TypeName>;
+	protected static registerFormatter<TypeName>(typeName: StringLiteral<TypeName>, intfAndAttr?: (InterfaceType | AttributeSpecifier)[]): FormatterTypeInfo<TypeName>;
 	static [Symbol.typeInfo]: FormatterTypeInfo<"Serenity.">;
 }
 export declare class MinuteFormatter implements Formatter {
