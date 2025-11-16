@@ -1133,6 +1133,59 @@ describe("hasCustomAttribute", () => {
     });
 });
 
+describe("typeInfo functions", () => {
+    it("classTypeInfo creates correct type info", () => {
+        class MyAttr extends CustomAttribute {
+        }
+
+        class Intf {
+            static [Symbol.typeInfo] = interfaceTypeInfo("Intf");
+        }
+
+        const typeInfo = classTypeInfo("MyClass", [Intf, MyAttr]);
+        expect(typeInfo.typeKind).toBe("class");
+        expect(typeInfo.typeName).toBe("MyClass");
+        expect(typeInfo.interfaces).toStrictEqual([Intf]);
+        expect(typeInfo.customAttributes).toHaveLength(1);
+        expect(typeInfo.customAttributes[0]).toBeInstanceOf(MyAttr);
+    });
+
+    it("editorTypeInfo creates correct type info with EditorAttribute", () => {
+        class MyAttr extends CustomAttribute {
+        }
+
+        const typeInfo = editorTypeInfo("MyEditor", [MyAttr]);
+        expect(typeInfo.typeKind).toBe("class");
+        expect(typeInfo.typeName).toBe("MyEditor");
+        expect(typeInfo.customAttributes).toHaveLength(2);
+        expect(typeInfo.customAttributes.some(attr => attr instanceof EditorAttribute)).toBe(true);
+        expect(typeInfo.customAttributes.some(attr => attr instanceof MyAttr)).toBe(true);
+    });
+
+    it("formatterTypeInfo creates correct type info with ISlickFormatter", () => {
+        class MyAttr extends CustomAttribute {
+        }
+
+        const typeInfo = formatterTypeInfo("MyFormatter", [MyAttr]);
+        expect(typeInfo.typeKind).toBe("class");
+        expect(typeInfo.typeName).toBe("MyFormatter");
+        expect(typeInfo.interfaces).toContain(ISlickFormatter);
+        expect(typeInfo.customAttributes).toHaveLength(1);
+        expect(typeInfo.customAttributes[0]).toBeInstanceOf(MyAttr);
+    });
+
+    it("interfaceTypeInfo creates correct type info", () => {
+        class Intf1 {
+            static [Symbol.typeInfo] = interfaceTypeInfo("Intf1");
+        }
+
+        const typeInfo = interfaceTypeInfo("MyInterface", [Intf1]);
+        expect(typeInfo.typeKind).toBe("interface");
+        expect(typeInfo.typeName).toBe("MyInterface");
+        expect(typeInfo.interfaces).toStrictEqual([Intf1]);
+    });
+});
+
 describe("isEnum", () => {
     it("correctly identifies enum types", function () {
         enum TestEnum {
@@ -1155,3 +1208,4 @@ describe("isEnum", () => {
         }
     });
 });
+
