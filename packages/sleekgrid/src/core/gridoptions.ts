@@ -72,7 +72,7 @@ export interface GridOptions<TItem = any> {
     columns?: Column<TItem>[];
 
     /**
-     * @obsolete Use showGroupingPanel option instead.
+     * @deprecated Use showGroupingPanel option instead.
      */
     createPreHeaderPanel?: boolean;
 
@@ -281,7 +281,7 @@ export interface GridOptions<TItem = any> {
     multiSelect?: boolean;
 
     /**
-     * @obsolete Use groupingPanelHeight option instead.
+     * @deprecated Use groupingPanelHeight option instead.
      */
     preHeaderPanelHeight?: number;
 
@@ -350,7 +350,7 @@ export interface GridOptions<TItem = any> {
     showHeaderRow?: boolean;
 
     /**
-     * @obsolete Use showGroupingPanel option instead.
+     * @deprecated Use showGroupingPanel option instead.
      */
     showPreHeaderPanel?: boolean;
 

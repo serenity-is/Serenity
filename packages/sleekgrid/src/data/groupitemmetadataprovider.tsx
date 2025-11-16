@@ -7,7 +7,7 @@ export interface GroupItemMetadataProviderOptions {
     groupIndentation?: number;
     groupFocusable?: boolean;
     groupFormat?: ColumnFormat<Group>;
-    /** @deprecated see @use groupFormat */
+    /** @deprecated see groupFormat */
     groupFormatter?: CompatFormatter<Group>;
     groupLevelPrefix?: string;
     groupRowTotals?: boolean;
@@ -19,7 +19,7 @@ export interface GroupItemMetadataProviderOptions {
     totalsCssClass?: string;
     totalsFocusable?: boolean;
     totalsFormat?: ColumnFormat<IGroupTotals>;
-    /** @deprecated see @use totalsFormat */
+    /** @deprecated use totalsFormat */
     totalsFormatter?: CompatFormatter<IGroupTotals>;
 }
 

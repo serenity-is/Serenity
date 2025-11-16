@@ -1,4 +1,5 @@
 export * from "./base";
+export * from "./cellnavigation";
 export * from "./cellrange";
 export * from "./column";
 export * from "./editing";
