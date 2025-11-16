@@ -31,7 +31,8 @@ export namespace PropertyItemColumnConverter {
             summaryType: item.summaryType,
             minWidth: item.minWidth ?? 30,
             maxWidth: (item.maxWidth == null || item.maxWidth === 0) ? null : item.maxWidth,
-            resizable: item.resizable == null || !!item.resizable
+            resizable: item.resizable == null || !!item.resizable,
+            togglable: item.allowHide === false ? false : void 0
         };
 
         result.visible = item.visible !== false && item.filterOnly !== true &&

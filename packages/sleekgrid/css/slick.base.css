@@ -254,7 +254,6 @@
   text-overflow: ellipsis;
   vertical-align: middle;
   white-space: nowrap;
-  z-index: 1;
 }
 
 .slick-row {
@@ -289,7 +288,6 @@
 }
 
 .slick-cell.editable {
-  z-index: 11;
   overflow: visible;
 }
 

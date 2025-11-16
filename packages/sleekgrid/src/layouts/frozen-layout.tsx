@@ -59,4 +59,7 @@ export class FrozenLayout implements LayoutEngine {
     }
 
     readonly layoutName = "FrozenLayout";
+
+    supportPinnedCols: true = true;
+    supportFrozenRows: true = true;
 }

@@ -99,7 +99,7 @@ export interface ISleekGrid<TItem = any> extends CellNavigation, EditorHost, Gri
     getHeaderColumn(columnIdOrIdx: string | number): HTMLElement;
     getHeaderRow(): HTMLElement;
     getHeaderRowColumn(columnIdOrIdx: string | number): HTMLElement;
-    getLayoutInfo(): { frozenTopRows: number, frozenBottomRows: number, pinnedStartCols: number, pinnedEndCols: number };
+    getLayoutInfo(): GridLayoutInfo;
     getOptions(): GridOptions<TItem>;
     getPreHeaderPanel(): HTMLElement;
     getRenderedRange(viewportTop?: number, viewportLeft?: number): ViewRange;
@@ -130,9 +130,10 @@ export interface ISleekGrid<TItem = any> extends CellNavigation, EditorHost, Gri
     /**
      * Reorders columns based on their IDs and notifies onColumnsReordered by default.
      * @param columnIds
-     * @param opt Whether to notify onColumnsReordered (default true).
+     * @param opt Whether to notify onColumnsReordered (default true). If setVisible is provided, it will also set visibility based on that.
+     * This function is used by column picker and other plugins to reorder columns and set visibility in one shot.
      */
-    reorderColumns(columnIds: string[], opt?: { notify?: boolean }): void;
+    reorderColumns(columnIds: string[], opt?: { notify?: boolean, setVisible?: string[] }): void;
     resetActiveCell(): void;
     resizeCanvas: () => void;
     scrollActiveCellIntoView(): void;
@@ -170,3 +171,14 @@ export interface ISleekGrid<TItem = any> extends CellNavigation, EditorHost, Gri
     updateRow(row: number): void;
     updateRowCount(): void;
 }
+
+export type GridLayoutInfo = {
+    frozenTopRows: number;
+    frozenBottomRows: number;
+    pinnedStartCols: number;
+    pinnedEndCols: number;
+    supportFrozenRows: boolean
+    supportFrozenBottom: boolean;
+    supportPinnedCols: boolean;
+    supportPinnedEnd: boolean;
+};

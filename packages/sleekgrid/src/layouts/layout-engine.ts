@@ -10,5 +10,9 @@ export interface LayoutEngine {
     adjustFrozenRowsOption?(): void;
     afterSetOptions(args: GridOptions): void;
     /** this might be called before init, chicken egg situation */
-    reorderViewColumns?(viewCols: Column[], refs: GridLayoutRefs): Column[]
+    reorderViewColumns?(viewCols: Column[], refs: GridLayoutRefs): Column[];
+    supportPinnedCols?: boolean;
+    supportPinnedEnd?: boolean;
+    supportFrozenRows?: boolean;
+    supportFrozenBottom?: boolean;
 }

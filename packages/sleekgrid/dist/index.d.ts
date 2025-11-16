@@ -456,6 +456,10 @@ export interface LayoutEngine {
 	afterSetOptions(args: GridOptions): void;
 	/** this might be called before init, chicken egg situation */
 	reorderViewColumns?(viewCols: Column[], refs: GridLayoutRefs): Column[];
+	supportPinnedCols?: boolean;
+	supportPinnedEnd?: boolean;
+	supportFrozenRows?: boolean;
+	supportFrozenBottom?: boolean;
 }
 /***
  * Information about a group of rows.
@@ -1009,12 +1013,7 @@ export interface ISleekGrid<TItem = any> extends CellNavigation, EditorHost, Gri
 	getHeaderColumn(columnIdOrIdx: string | number): HTMLElement;
 	getHeaderRow(): HTMLElement;
 	getHeaderRowColumn(columnIdOrIdx: string | number): HTMLElement;
-	getLayoutInfo(): {
-		frozenTopRows: number;
-		frozenBottomRows: number;
-		pinnedStartCols: number;
-		pinnedEndCols: number;
-	};
+	getLayoutInfo(): GridLayoutInfo;
 	getOptions(): GridOptions<TItem>;
 	getPreHeaderPanel(): HTMLElement;
 	getRenderedRange(viewportTop?: number, viewportLeft?: number): ViewRange;
@@ -1048,10 +1047,12 @@ export interface ISleekGrid<TItem = any> extends CellNavigation, EditorHost, Gri
 	/**
 	 * Reorders columns based on their IDs and notifies onColumnsReordered by default.
 	 * @param columnIds
-	 * @param opt Whether to notify onColumnsReordered (default true).
+	 * @param opt Whether to notify onColumnsReordered (default true). If setVisible is provided, it will also set visibility based on that.
+	 * This function is used by column picker and other plugins to reorder columns and set visibility in one shot.
 	 */
 	reorderColumns(columnIds: string[], opt?: {
 		notify?: boolean;
+		setVisible?: string[];
 	}): void;
 	resetActiveCell(): void;
 	resizeCanvas: () => void;
@@ -1097,6 +1098,16 @@ export interface ISleekGrid<TItem = any> extends CellNavigation, EditorHost, Gri
 	updateRow(row: number): void;
 	updateRowCount(): void;
 }
+export type GridLayoutInfo = {
+	frozenTopRows: number;
+	frozenBottomRows: number;
+	pinnedStartCols: number;
+	pinnedEndCols: number;
+	supportFrozenRows: boolean;
+	supportFrozenBottom: boolean;
+	supportPinnedCols: boolean;
+	supportPinnedEnd: boolean;
+};
 /**
  * Context object for column formatters. It provides access to the
  * current cell value, row index, column index, etc.
@@ -1295,6 +1306,8 @@ export declare class FrozenLayout implements LayoutEngine {
 	adjustFrozenRowsOption(): void;
 	destroy(): void;
 	readonly layoutName = "FrozenLayout";
+	supportPinnedCols: true;
+	supportFrozenRows: true;
 }
 export declare const Header: ({ band, refs, signals }: {
 	band: BandKey;
@@ -1470,12 +1483,7 @@ export declare class SleekGrid<TItem = any> implements ISleekGrid<TItem> {
 	getAbsoluteColumnMinWidth(): number;
 	getSelectionModel(): SelectionModel;
 	private getBandRefsForCell;
-	getLayoutInfo(): {
-		frozenTopRows: number;
-		frozenBottomRows: number;
-		pinnedStartCols: number;
-		pinnedEndCols: number;
-	};
+	getLayoutInfo(): GridLayoutInfo;
 	getCanvasNode(row?: number, cell?: number): HTMLElement;
 	getCanvases(): any | HTMLElement[];
 	getActiveCanvasNode(e?: {
@@ -1542,8 +1550,10 @@ export declare class SleekGrid<TItem = any> implements ISleekGrid<TItem> {
 	private setAllCols;
 	private handleFrozenColsOption;
 	setColumns(columns: Column<TItem>[]): void;
+	private internalSetVisibleColumns;
 	reorderColumns(columnIds: string[], opt?: {
 		notify?: boolean;
+		setVisible?: string[];
 	}): void;
 	setVisibleColumns(columnIds: string[], opt?: {
 		reorder?: boolean;

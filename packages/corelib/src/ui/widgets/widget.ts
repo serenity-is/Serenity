@@ -1,5 +1,5 @@
 import { addDisposingListener, bindThis, removeDisposingListener } from "@serenity-is/domwise";
-import { ClassTypeInfo, Config, EditorTypeInfo, Fluent, StringLiteral, addClass, addValidationRule, appendToNode, classTypeInfo, editorTypeInfo, getCustomAttribute, getInstanceType, getTypeFullName, getTypeShortName, htmlEncode, isArrayLike, nsSerenity, registerType, toggleClass } from "../../base";
+import { ClassTypeInfo, Config, EditorTypeInfo, Fluent, StringLiteral, addClass, addValidationRule, appendToNode, classTypeInfo, editorTypeInfo, getCustomAttribute, getInstanceType, getTypeFullName, getTypeShortName, htmlEncode, isArrayLike, nsSerenity, registerType, toggleClass, type AttributeSpecifier, type CustomAttribute, type InterfaceType } from "../../base";
 import { ensureParentOrFragment, handleElementProp, isFragmentWorkaround, setElementProps } from "./widgetinternal";
 import { IdPrefixType, associateWidget, deassociateWidget, getWidgetName, useIdPrefix, type WidgetProps } from "./widgetutils";
 export { getWidgetFrom, tryGetWidget, useIdPrefix, type IdPrefixType, type WidgetProps } from "./widgetutils";
@@ -135,7 +135,7 @@ export class Widget<P = {}> {
         return widget;
     }
 
-    protected getCustomAttribute<TAttr>(attrType: { new(...args: any[]): TAttr }, inherit: boolean = true): TAttr {
+    protected getCustomAttribute<TAttr extends CustomAttribute>(attrType: { new(...args: any[]): TAttr }, inherit: boolean = true): TAttr {
         return getCustomAttribute(getInstanceType(this), attrType, inherit);
     }
 
@@ -218,7 +218,7 @@ export class Widget<P = {}> {
     // jsx-dom >= 8.1.5 requires isComponent as a static property
     static readonly isComponent = true;
 
-    protected static registerClass<TypeName>(typeName: StringLiteral<TypeName>, intfAndAttr?: any[]): ClassTypeInfo<TypeName> {
+    protected static registerClass<TypeName>(typeName: StringLiteral<TypeName>, intfAndAttr?: (InterfaceType | AttributeSpecifier)[]): ClassTypeInfo<TypeName> {
         if (Object.prototype.hasOwnProperty.call(this, Symbol.typeInfo) && this[Symbol.typeInfo])
             throw new Error(`Type ${this.name} already has a typeInfo property!`);
 
@@ -227,7 +227,7 @@ export class Widget<P = {}> {
         return typeInfo;
     }
 
-    protected static registerEditor<TypeName>(typeName: StringLiteral<TypeName>, intfAndAttr?: any[]): EditorTypeInfo<TypeName> {
+    protected static registerEditor<TypeName>(typeName: StringLiteral<TypeName>, intfAndAttr?: (InterfaceType | AttributeSpecifier)[]): EditorTypeInfo<TypeName> {
         if (Object.prototype.hasOwnProperty.call(this, Symbol.typeInfo) && this[Symbol.typeInfo])
             throw new Error(`Type ${this.name} already has a typeInfo property!`);
 

@@ -1,4 +1,4 @@
-import { addCustomAttribute, EditorAttribute, EnumKeyAttribute, ISlickFormatter, registerClass as regClass, registerEditor as regEditor, registerEnum as regEnum, registerFormatter as regFormatter, registerInterface as regIntf, registerType as regType } from "../base";
+import { addCustomAttribute, EditorAttribute, EnumKeyAttribute, ISlickFormatter, registerClass as regClass, registerEditor as regEditor, registerEnum as regEnum, registerFormatter as regFormatter, registerInterface as regIntf, registerType as regType, type InterfaceType } from "../base";
 import { addTypeMember, TypeMemberKind } from "../compat";
 import { AdvancedFilteringAttribute, CloseButtonAttribute, ElementAttribute, FilterableAttribute, MaximizableAttribute, OptionAttribute, PanelAttribute, ResizableAttribute, StaticPanelAttribute } from "./attributes";
 
@@ -14,7 +14,7 @@ export namespace Decorators {
         }
     }
 
-    export function registerClass(nameOrIntf?: string | any[], intf2?: any[]) {
+    export function registerClass(nameOrIntf?: string | InterfaceType[], intf2?: InterfaceType[]) {
         return function (target: Function, _context?: any) {
             if (typeof nameOrIntf == "string")
                 regClass(target, nameOrIntf, intf2);
@@ -23,7 +23,7 @@ export namespace Decorators {
         }
     }
 
-    export function registerInterface(nameOrIntf?: string | any[], intf2?: any[]) {
+    export function registerInterface(nameOrIntf?: string | InterfaceType[], intf2?: InterfaceType[]) {
         return function (target: Function, _context?: any) {
 
             if (typeof nameOrIntf == "string")
@@ -33,7 +33,7 @@ export namespace Decorators {
         }
     }
 
-    export function registerEditor(nameOrIntf?: string | any[], intf2?: any[]) {
+    export function registerEditor(nameOrIntf?: string | InterfaceType[], intf2?: InterfaceType[]) {
         return function (target: Function, _context?: any) {
             if (typeof nameOrIntf == "string")
                 regEditor(target, nameOrIntf, intf2);
@@ -52,7 +52,7 @@ export namespace Decorators {
         registerEnum(target, enumKey ?? name, name);
     }
 
-    export function registerFormatter(nameOrIntf: string | any[] = [ISlickFormatter], intf2: any[] = [ISlickFormatter]) {
+    export function registerFormatter(nameOrIntf: string | InterfaceType[] = [ISlickFormatter], intf2: InterfaceType[] = [ISlickFormatter]) {
         return function (target: Function, _context?: any) {
             if (typeof nameOrIntf == "string")
                 regFormatter(target, nameOrIntf, intf2);

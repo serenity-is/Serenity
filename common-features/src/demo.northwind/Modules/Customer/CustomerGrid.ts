@@ -4,7 +4,7 @@ import { nsDemoNorthwind } from "../ServerTypes/Namespaces";
 import { CustomerDialog } from "./CustomerDialog";
 
 export class CustomerGrid<P = {}> extends EntityGrid<CustomerRow, P> {
-    static override[Symbol.typeInfo] = this.registerClass(nsDemoNorthwind, [Attributes.advancedFiltering()]);
+    static override[Symbol.typeInfo] = this.registerClass(nsDemoNorthwind, [Attributes.advancedFiltering]);
 
     protected override getColumnsKey() { return CustomerColumns.columnsKey; }
     protected override getDialogType() { return <any>CustomerDialog; }

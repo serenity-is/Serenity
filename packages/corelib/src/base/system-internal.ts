@@ -1,4 +1,5 @@
 import { implementedInterfacesSymbol, isAssignableFromSymbol, typeRegistrySymbol } from "./symbols";
+import type { CustomAttribute, InterfaceType } from "./system";
 
 (Symbol as any).typeInfo ??= Symbol.for("Serenity.typeInfo");
 
@@ -33,7 +34,7 @@ export type TypeInfo<TypeName> = {
     /** Implemented interfaces */
     interfaces?: any[];
     /** Custom attributes */
-    customAttributes?: any[];
+    customAttributes?: CustomAttribute[];
     /** Enum flags */
     enumFlags?: boolean;
     /** Registered flag */
@@ -88,7 +89,7 @@ function autoRegisterViaTypeInfo(type: any): void {
     return;
 }
 
-export function internalRegisterType(type: any, typeName?: string, interfaces?: any[], kind?: "class" | "enum" | "interface"): TypeInfo<string> {
+export function internalRegisterType(type: any, typeName?: string, interfaces?: InterfaceType[], kind?: "class" | "enum" | "interface"): TypeInfo<string> {
     const typeInfo = ensureTypeInfo(type);
     if (kind)
         typeInfo.typeKind = kind;

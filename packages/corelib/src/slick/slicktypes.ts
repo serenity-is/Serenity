@@ -6,8 +6,14 @@ export type Format<TItem = any> = (ctx: FormatterContext<TItem>) => FormatterRes
 
 declare module "@serenity-is/sleekgrid" {
     export interface Column<TItem = any> {
+        /** Fields that this column depends on for its formatting or values */
         referencedFields?: string[];
+        /** Source PropertyItem from which this column was created */
         sourceItem?: PropertyItem;
+        /** If false, the hide column action will be hidden for this column (column picker / via menu) */
+        togglable?: boolean;
+        /** If false, the move column actions will be hidden for this column (column picker / via menu) */
+        movable?: boolean;
     }
 }
 

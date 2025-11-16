@@ -1,6 +1,6 @@
 ﻿import { interfaceTypeInfo, nsSerenity, registerType } from "../base";
 
-export class IValidateRequired {
+export abstract class IValidateRequired {
     static [Symbol.typeInfo] = interfaceTypeInfo(nsSerenity); static { registerType(this); }
 }
 

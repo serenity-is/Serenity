@@ -1,32 +1,35 @@
-import { classTypeInfo, EnumKeyAttribute, nsSerenity, registerType } from "../base";
+import { CustomAttribute, classTypeInfo, nsSerenity, registerType } from "../base";
 
 /**
  * Indicates if a dialog should have a close button in its title bar (default true)
  */
-export class CloseButtonAttribute {
-    static [Symbol.typeInfo] = classTypeInfo(nsSerenity); static { registerType(this); }
+export class CloseButtonAttribute extends CustomAttribute {
+    static override[Symbol.typeInfo] = classTypeInfo(nsSerenity); static { registerType(this); }
 
     constructor(public value = true) {
+        super();
     }
 }
 
 /**
  * Indicates the element type of a widget like "div", "span" etc.
  */
-export class ElementAttribute {
-    static [Symbol.typeInfo] = classTypeInfo(nsSerenity); static { registerType(this); }
+export class ElementAttribute extends CustomAttribute {
+    static override[Symbol.typeInfo] = classTypeInfo(nsSerenity); static { registerType(this); }
 
     constructor(public value: string) {
+        super();
     }
 }
 
 /**
  * Indicates if a grid should have an advanced filter editor
  */
-export class AdvancedFilteringAttribute {
-    static [Symbol.typeInfo] = classTypeInfo(nsSerenity); static { registerType(this); }
+export class AdvancedFilteringAttribute extends CustomAttribute {
+    static override[Symbol.typeInfo] = classTypeInfo(nsSerenity); static { registerType(this); }
 
     constructor(public value = true) {
+        super();
     }
 }
 
@@ -36,10 +39,11 @@ export class AdvancedFilteringAttribute {
  * Requires jquery ui dialogs and jquery.dialogextend.js.
  * It does not work with current bootstrap modals.
  */
-export class MaximizableAttribute {
-    static [Symbol.typeInfo] = classTypeInfo(nsSerenity); static { registerType(this); }
+export class MaximizableAttribute extends CustomAttribute {
+    static override[Symbol.typeInfo] = classTypeInfo(nsSerenity); static { registerType(this); }
 
     constructor(public value = true) {
+        super();
     }
 }
 
@@ -47,27 +51,29 @@ export class MaximizableAttribute {
  * Indicates that the property is an option. This is no longer used as JSX
  * does not support it, but it is kept for backward compatibility.
  */
-export class OptionAttribute {
-    static [Symbol.typeInfo] = classTypeInfo(nsSerenity); static { registerType(this); }
+export class OptionAttribute extends CustomAttribute {
+    static override[Symbol.typeInfo] = classTypeInfo(nsSerenity); static { registerType(this); }
 }
 
 /**
  * Indicates if a dialog should be opened as a panel
  */
-export class PanelAttribute {
-    static [Symbol.typeInfo] = classTypeInfo(nsSerenity); static { registerType(this); }
+export class PanelAttribute extends CustomAttribute {
+    static override[Symbol.typeInfo] = classTypeInfo(nsSerenity); static { registerType(this); }
 
     constructor(public value = true) {
+        super();
     }
 }
 
 /**
  * Indicates if a dialog should be resizable, only for jquery ui dialogs.
  */
-export class ResizableAttribute {
-    static [Symbol.typeInfo] = classTypeInfo(nsSerenity); static { registerType(this); }
+export class ResizableAttribute extends CustomAttribute {
+    static override[Symbol.typeInfo] = classTypeInfo(nsSerenity); static { registerType(this); }
 
     constructor(public value = true) {
+        super();
     }
 }
 
@@ -77,10 +83,11 @@ export class ResizableAttribute {
  * It does not have a title bar, close button or modal behavior.
  * It is just a way to show a form inside a page, without any dialog stuff.
  */
-export class StaticPanelAttribute {
-    static [Symbol.typeInfo] = classTypeInfo(nsSerenity); static { registerType(this); }
+export class StaticPanelAttribute extends CustomAttribute {
+    static override[Symbol.typeInfo] = classTypeInfo(nsSerenity); static { registerType(this); }
 
     constructor(public value = true) {
+        super();
     }
 }
 
@@ -97,8 +104,9 @@ export namespace Attributes {
     export function panel(value = true) { return new PanelAttribute(value); }
     /** Indicates if a dialog should be a static panel, which is not a dialog at all. */
     export function staticPanel(value = true) { return new StaticPanelAttribute(value); }
+    
+    Object.keys(Attributes).forEach(key => (Attributes as any)[key].isAttributeFactory = true);
 }
-
 
 /** @deprecated Use Attributes.advancedFiltering() instead */
 export const FilterableAttribute = AdvancedFilteringAttribute;

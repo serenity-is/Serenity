@@ -2066,7 +2066,7 @@ export type TypeInfo<TypeName> = {
 	/** Implemented interfaces */
 	interfaces?: any[];
 	/** Custom attributes */
-	customAttributes?: any[];
+	customAttributes?: CustomAttribute[];
 	/** Enum flags */
 	enumFlags?: boolean;
 	/** Registered flag */
@@ -2166,13 +2166,17 @@ export declare function getBaseType(type: any): any;
  * Register a class with the type system.
  * @param type Class type to register
  * @param name Name to register the class under
- * @param intf Optional interfaces the class implements
+ * @param intfAndAttr Optional interfaces and attributes the class implements
  */
-export declare function registerClass(type: any, name: string, intf?: any[]): void;
+export declare function registerClass(type: any, name: string, intfAndAttr?: (InterfaceType | AttributeSpecifier)[]): void;
+export declare abstract class CustomAttribute {
+	static [Symbol.typeInfo]: ClassTypeInfo<"Serenity.">;
+	private readonly isCustomAttribute;
+}
 /**
  * Indicates the enum key of an enum type (by default the name of the enum type is used as key)
  */
-export declare class EnumKeyAttribute {
+export declare class EnumKeyAttribute extends CustomAttribute {
 	value: string;
 	static [Symbol.typeInfo]: ClassTypeInfo<"Serenity.">;
 	constructor(value: string);
@@ -2193,7 +2197,7 @@ export declare function registerEnum(enumType: any, name: string, enumKey?: stri
  * @param name Name to register the interface under
  * @param intf Optional interfaces the interface class implements
  */
-export declare function registerInterface(type: any, name: string, intf?: any[]): void;
+export declare function registerInterface(type: any, name: string, intf?: InterfaceType[]): void;
 /**
  * Enum utilities
  */
@@ -2260,27 +2264,29 @@ export type SNoInfer<T> = [
  * Attribute class for editors. This is used by the editorTypeInfo function
  * and registerEditor function to add EditorAttribute to editors.
  */
-export declare class EditorAttribute {
+export declare class EditorAttribute extends CustomAttribute {
+	static [Symbol.typeInfo]: ClassTypeInfo<"Serenity.">;
 }
 /**
  * Marker interface for SleekGrid formatters.
  */
-export declare class ISlickFormatter {
+export declare abstract class ISlickFormatter {
+	static [Symbol.typeInfo]: InterfaceTypeInfo<"Serenity.">;
 }
 /**
  * Register a SleekGrid formatter.
  * @param type Formatter type
  * @param name Formatter name
- * @param intfAndAttr Optional interface(s) to implement
+ * @param intfAndAttr Optional attributes and interface(s) to implement
  */
-export declare function registerFormatter(type: any, name: string, intfAndAttr?: any[]): void;
+export declare function registerFormatter(type: any, name: string, intfAndAttr?: (InterfaceType | AttributeSpecifier)[]): void;
 /**
  * Register an editor type. Adds EditorAttribute if not already present.
  * @param type Editor type
  * @param name Editor name
- * @param intf Optional interface(s) to implement
+ * @param intfAndAttr Optional attributes and interface(s) to implement
  */
-export declare function registerEditor(type: any, name: string, intfAndAttr?: any[]): void;
+export declare function registerEditor(type: any, name: string, intfAndAttr?: (InterfaceType | AttributeSpecifier)[]): void;
 /**
  * Adds a custom attribute to a type. JavaScript does not have built-in support for attributes,
  * so Serenity uses a customAttributes array on typeInfo to store them. This is used by
@@ -2288,7 +2294,7 @@ export declare function registerEditor(type: any, name: string, intfAndAttr?: an
  * @param type
  * @param attr
  */
-export declare function addCustomAttribute(type: any, attr: any): void;
+export declare function addCustomAttribute(type: any, attr: CustomAttribute): void;
 /**
  * Get a custom attribute of a type.
  * @param type Type to get the attribute from
@@ -2296,7 +2302,7 @@ export declare function addCustomAttribute(type: any, attr: any): void;
  * @param inherit Indicates whether to search in base types
  * @returns The custom attribute or null if not found
  */
-export declare function getCustomAttribute<TAttr>(type: any, attrType: {
+export declare function getCustomAttribute<TAttr extends CustomAttribute>(type: any, attrType: {
 	new (...args: any[]): TAttr;
 }, inherit?: boolean): TAttr;
 /**
@@ -2306,7 +2312,7 @@ export declare function getCustomAttribute<TAttr>(type: any, attrType: {
  * @param inherit Indicates whether to search in base types
  * @returns True if the type has the attribute
  */
-export declare function hasCustomAttribute<TAttr>(type: any, attrType: {
+export declare function hasCustomAttribute<TAttr extends CustomAttribute>(type: any, attrType: {
 	new (...args: any[]): TAttr;
 }, inherit?: boolean): boolean;
 /**
@@ -2327,10 +2333,18 @@ export type EditorTypeInfo<TypeName> = TypeInfo<TypeName>;
 export type FormatterTypeInfo<TypeName> = TypeInfo<TypeName>;
 /** Interface type information. This is used to make type name available in declaration files unlike decorators that does not show in .d.ts files. */
 export type InterfaceTypeInfo<TypeName> = TypeInfo<TypeName>;
-export declare function classTypeInfo<TypeName>(typeName: StringLiteral<TypeName>, intfAndAttr?: any[]): ClassTypeInfo<TypeName>;
-export declare function editorTypeInfo<TypeName>(typeName: StringLiteral<TypeName>, intfAndAttr?: any[]): EditorTypeInfo<TypeName>;
-export declare function formatterTypeInfo<TypeName>(typeName: StringLiteral<TypeName>, intfAndAttr?: any[]): FormatterTypeInfo<TypeName>;
-export declare function interfaceTypeInfo<TypeName>(typeName: StringLiteral<TypeName>, intfAndAttr?: any[]): InterfaceTypeInfo<TypeName>;
+/** Type for attribute class, attribute instance or attribute factory */
+export type AttributeSpecifier = CustomAttribute | ({
+	new (): CustomAttribute;
+}) | (() => CustomAttribute);
+/** Type for interface class */
+export type InterfaceType = Function & {
+	[Symbol.typeInfo]: InterfaceTypeInfo<string>;
+};
+export declare function classTypeInfo<TypeName>(typeName: StringLiteral<TypeName>, intfAndAttr?: (InterfaceType | AttributeSpecifier)[]): ClassTypeInfo<TypeName>;
+export declare function editorTypeInfo<TypeName>(typeName: StringLiteral<TypeName>, intfAndAttr?: (InterfaceType | AttributeSpecifier)[]): EditorTypeInfo<TypeName>;
+export declare function formatterTypeInfo<TypeName>(typeName: StringLiteral<TypeName>, intfAndAttr?: (InterfaceType | AttributeSpecifier)[]): FormatterTypeInfo<TypeName>;
+export declare function interfaceTypeInfo<TypeName>(typeName: StringLiteral<TypeName>, intf?: InterfaceType[]): InterfaceTypeInfo<TypeName>;
 export declare function registerType(type: {
 	[Symbol.typeInfo]: TypeInfo<any>;
 	name: string;
@@ -3259,7 +3273,7 @@ export declare class Widget<P = {}> {
 	change(handler: (e: Event) => void): void;
 	changeSelect2(handler: (e: Event) => void): void;
 	static create<TWidget extends Widget<P>, P>(params: CreateWidgetParams<TWidget, P>): TWidget;
-	protected getCustomAttribute<TAttr>(attrType: {
+	protected getCustomAttribute<TAttr extends CustomAttribute>(attrType: {
 		new (...args: any[]): TAttr;
 	}, inherit?: boolean): TAttr;
 	protected afterRender(callback: () => void): void;
@@ -3277,8 +3291,8 @@ export declare class Widget<P = {}> {
 	protected syncOrAsyncThen<T>(syncMethod: (() => T), asyncMethod: (() => PromiseLike<T>), then: (v: T) => void): void;
 	protected useIdPrefix(): IdPrefixType;
 	static readonly isComponent = true;
-	protected static registerClass<TypeName>(typeName: StringLiteral<TypeName>, intfAndAttr?: any[]): ClassTypeInfo<TypeName>;
-	protected static registerEditor<TypeName>(typeName: StringLiteral<TypeName>, intfAndAttr?: any[]): EditorTypeInfo<TypeName>;
+	protected static registerClass<TypeName>(typeName: StringLiteral<TypeName>, intfAndAttr?: (InterfaceType | AttributeSpecifier)[]): ClassTypeInfo<TypeName>;
+	protected static registerEditor<TypeName>(typeName: StringLiteral<TypeName>, intfAndAttr?: (InterfaceType | AttributeSpecifier)[]): EditorTypeInfo<TypeName>;
 	static [Symbol.typeInfo]: ClassTypeInfo<"Serenity.">;
 }
 /** @deprecated Use Widget */
@@ -3539,59 +3553,59 @@ export declare namespace ValidationHelper {
 	function validateElement(elem: ArrayLike<HTMLElement> | HTMLElement): void;
 }
 export declare function jQueryPatch(): boolean;
-export declare class IBooleanValue {
+export declare abstract class IBooleanValue {
 	static [Symbol.typeInfo]: InterfaceTypeInfo<"Serenity.">;
 }
 export interface IBooleanValue {
 	get_value(): boolean;
 	set_value(value: boolean): void;
 }
-export declare class IDialog {
+export declare abstract class IDialog {
 	static [Symbol.typeInfo]: InterfaceTypeInfo<"Serenity.">;
 }
 export interface IDialog {
 	dialogOpen(asPanel?: boolean): void;
 }
-export declare class IDoubleValue {
+export declare abstract class IDoubleValue {
 	static [Symbol.typeInfo]: InterfaceTypeInfo<"Serenity.">;
 }
 export interface IDoubleValue {
 	get_value(): any;
 	set_value(value: any): void;
 }
-export declare class IEditDialog {
+export declare abstract class IEditDialog {
 	static [Symbol.typeInfo]: InterfaceTypeInfo<"Serenity.">;
 }
 export interface IEditDialog {
 	load(entityOrId: any, done: () => void, fail?: (p1: any) => void): void;
 }
-export declare class IGetEditValue {
+export declare abstract class IGetEditValue {
 	static [Symbol.typeInfo]: InterfaceTypeInfo<"Serenity.">;
 }
 export interface IGetEditValue {
 	getEditValue(property: PropertyItem, target: any): void;
 }
-export declare class IReadOnly {
+export declare abstract class IReadOnly {
 	static [Symbol.typeInfo]: InterfaceTypeInfo<"Serenity.">;
 }
 export interface IReadOnly {
 	get_readOnly(): boolean;
 	set_readOnly(value: boolean): void;
 }
-export declare class ISetEditValue {
+export declare abstract class ISetEditValue {
 	static [Symbol.typeInfo]: InterfaceTypeInfo<"Serenity.">;
 }
 export interface ISetEditValue {
 	setEditValue(source: any, property: PropertyItem): void;
 }
-export declare class IStringValue {
+export declare abstract class IStringValue {
 	static [Symbol.typeInfo]: InterfaceTypeInfo<"Serenity.">;
 }
 export interface IStringValue {
 	get_value(): string;
 	set_value(value: string): void;
 }
-export declare class IValidateRequired {
+export declare abstract class IValidateRequired {
 	static [Symbol.typeInfo]: InterfaceTypeInfo<"Serenity.">;
 }
 export interface IValidateRequired {
@@ -3714,8 +3728,14 @@ export declare namespace AggregateFormatting {
 export type Format<TItem = any> = (ctx: FormatterContext<TItem>) => FormatterResult;
 declare module "@serenity-is/sleekgrid" {
 	interface Column<TItem = any> {
+		/** Fields that this column depends on for its formatting or values */
 		referencedFields?: string[];
+		/** Source PropertyItem from which this column was created */
 		sourceItem?: PropertyItem;
+		/** If false, the hide column action will be hidden for this column (column picker / via menu) */
+		togglable?: boolean;
+		/** If false, the move column actions will be hidden for this column (column picker / via menu) */
+		movable?: boolean;
 	}
 }
 export interface Formatter {
@@ -4512,7 +4532,7 @@ export type RemoteViewProcessCallback<TItem> = (data: ListResponse<TItem>, view:
 /**
  * Indicates if a dialog should have a close button in its title bar (default true)
  */
-export declare class CloseButtonAttribute {
+export declare class CloseButtonAttribute extends CustomAttribute {
 	value: boolean;
 	static [Symbol.typeInfo]: ClassTypeInfo<"Serenity.">;
 	constructor(value?: boolean);
@@ -4520,7 +4540,7 @@ export declare class CloseButtonAttribute {
 /**
  * Indicates the element type of a widget like "div", "span" etc.
  */
-export declare class ElementAttribute {
+export declare class ElementAttribute extends CustomAttribute {
 	value: string;
 	static [Symbol.typeInfo]: ClassTypeInfo<"Serenity.">;
 	constructor(value: string);
@@ -4528,7 +4548,7 @@ export declare class ElementAttribute {
 /**
  * Indicates if a grid should have an advanced filter editor
  */
-export declare class AdvancedFilteringAttribute {
+export declare class AdvancedFilteringAttribute extends CustomAttribute {
 	value: boolean;
 	static [Symbol.typeInfo]: ClassTypeInfo<"Serenity.">;
 	constructor(value?: boolean);
@@ -4538,7 +4558,7 @@ export declare class AdvancedFilteringAttribute {
  * Requires jquery ui dialogs and jquery.dialogextend.js.
  * It does not work with current bootstrap modals.
  */
-export declare class MaximizableAttribute {
+export declare class MaximizableAttribute extends CustomAttribute {
 	value: boolean;
 	static [Symbol.typeInfo]: ClassTypeInfo<"Serenity.">;
 	constructor(value?: boolean);
@@ -4547,13 +4567,13 @@ export declare class MaximizableAttribute {
  * Indicates that the property is an option. This is no longer used as JSX
  * does not support it, but it is kept for backward compatibility.
  */
-export declare class OptionAttribute {
+export declare class OptionAttribute extends CustomAttribute {
 	static [Symbol.typeInfo]: ClassTypeInfo<"Serenity.">;
 }
 /**
  * Indicates if a dialog should be opened as a panel
  */
-export declare class PanelAttribute {
+export declare class PanelAttribute extends CustomAttribute {
 	value: boolean;
 	static [Symbol.typeInfo]: ClassTypeInfo<"Serenity.">;
 	constructor(value?: boolean);
@@ -4561,7 +4581,7 @@ export declare class PanelAttribute {
 /**
  * Indicates if a dialog should be resizable, only for jquery ui dialogs.
  */
-export declare class ResizableAttribute {
+export declare class ResizableAttribute extends CustomAttribute {
 	value: boolean;
 	static [Symbol.typeInfo]: ClassTypeInfo<"Serenity.">;
 	constructor(value?: boolean);
@@ -4572,7 +4592,7 @@ export declare class ResizableAttribute {
  * It does not have a title bar, close button or modal behavior.
  * It is just a way to show a form inside a page, without any dialog stuff.
  */
-export declare class StaticPanelAttribute {
+export declare class StaticPanelAttribute extends CustomAttribute {
 	value: boolean;
 	static [Symbol.typeInfo]: ClassTypeInfo<"Serenity.">;
 	constructor(value?: boolean);
@@ -4608,12 +4628,12 @@ export declare namespace Decorators {
 	function registerType(): (target: Function & {
 		[Symbol.typeInfo]: any;
 	}, _context?: any) => void;
-	function registerClass(nameOrIntf?: string | any[], intf2?: any[]): (target: Function, _context?: any) => void;
-	function registerInterface(nameOrIntf?: string | any[], intf2?: any[]): (target: Function, _context?: any) => void;
-	function registerEditor(nameOrIntf?: string | any[], intf2?: any[]): (target: Function, _context?: any) => void;
+	function registerClass(nameOrIntf?: string | InterfaceType[], intf2?: InterfaceType[]): (target: Function, _context?: any) => void;
+	function registerInterface(nameOrIntf?: string | InterfaceType[], intf2?: InterfaceType[]): (target: Function, _context?: any) => void;
+	function registerEditor(nameOrIntf?: string | InterfaceType[], intf2?: InterfaceType[]): (target: Function, _context?: any) => void;
 	function registerEnum(target: any, enumKey?: string, name?: string): void;
 	function registerEnumType(target: any, name?: string, enumKey?: string): void;
-	function registerFormatter(nameOrIntf?: string | any[], intf2?: any[]): (target: Function, _context?: any) => void;
+	function registerFormatter(nameOrIntf?: string | InterfaceType[], intf2?: InterfaceType[]): (target: Function, _context?: any) => void;
 	function enumKey(value: string): (target: Function, _context?: any) => void;
 	function option(): (target: Object, propertyKey: string) => void;
 	function closeButton(value?: boolean): (target: Function, _context?: any) => void;
@@ -4872,31 +4892,54 @@ export interface IDataGrid {
 	getView(): IRemoteView<any>;
 	getFilterStore(): FilterStore;
 }
+export type ColumnPickerChangeArgs = {
+	toggledColumn: Column;
+	reorderedColumns: boolean;
+	restoredDefaults: boolean;
+};
 export interface ColumnPickerDialogOptions {
-	columns: Column[];
-	defaultColumns: string[];
+	columns?: Column[] | (() => Column[]);
+	defaultOrder?: string[] | (() => string[]);
+	defaultVisible?: string[] | (() => string[]);
+	dataGrid?: IDataGrid;
+	sleekGrid?: ISleekGrid;
+	onChange?: (args: ColumnPickerChangeArgs) => Promise<any>;
+	toggleColumn?: (columnId: string, show?: boolean) => void;
+	reorderColumns?: (columnIds: string[], setVisible?: string[]) => void;
 }
 export declare class ColumnPickerDialog<P extends ColumnPickerDialogOptions = ColumnPickerDialogOptions> extends BaseDialog<P> {
 	static [Symbol.typeInfo]: ClassTypeInfo<"Serenity.">;
-	private ulVisible;
-	private ulHidden;
+	private list;
 	private colById;
-	private visibleColumns;
-	done: (newColumns: string[]) => void;
+	private defaultOrder;
+	private defaultVisible;
+	private columns;
+	private reorderColumns;
+	private toggleColumn;
+	private toggleAllCheckbox;
+	private searchInput;
+	private onChange;
 	constructor(opt: P);
+	destroy(): void;
+	protected handleToggleClick(e: MouseEvent): void;
 	protected renderContents(): any;
-	static createToolButton(grid: IDataGrid): ToolButton;
-	protected getDialogButtons(): DialogButton[];
+	protected createSearch(div: HTMLElement): void;
+	protected handleRestoreDefaults(): void;
+	protected handleToggleAllClick(): void;
+	protected updateToggleAllValue(): boolean;
+	protected handleSearch(_field: string, query: string, done: (found: boolean) => void): void;
+	static createToolButton(optOrDataGrid: IDataGrid | ColumnPickerDialogOptions): ToolButton;
 	protected getDialogOptions(): DialogOptions;
+	protected getDialogButtons(): DialogButton[];
 	private getTitle;
-	private allowHide;
-	private createLI;
-	private updateListStates;
-	protected setupColumns(): void;
+	private isTogglable;
+	private isMovable;
+	private getPinInfo;
+	private createColumnItem;
+	private handleSortableEnd;
+	protected createColumnItems(): void;
 	protected onDialogOpen(): void;
-	static openDialog({ grid }: {
-		grid: IDataGrid;
-	}): void;
+	static openDialog(opt: ColumnPickerDialogOptions): void;
 }
 declare class PubSub<TEvent = {}> {
 	private handlers;
@@ -5219,7 +5262,7 @@ export interface QuickSearchInputOptions {
 	typeDelay?: number;
 	loadingParentClass?: string;
 	filteredParentClass?: string;
-	onSearch?: (p1: string, p2: string, p3: (p1: boolean) => void) => void;
+	onSearch?: (field: string, query: string, done: (found: boolean) => void) => void;
 	fields?: QuickSearchField[];
 }
 export declare class QuickSearchInput<P extends QuickSearchInputOptions = QuickSearchInputOptions> extends Widget<P> {
@@ -5417,6 +5460,7 @@ export declare class QuickFilterBar<P extends QuickFilterBarOptions = QuickFilte
 export declare class DataGrid<TItem, P = {}> extends Widget<P> implements IDataGrid, IReadOnly {
 	static [Symbol.typeInfo]: ClassTypeInfo<"Serenity.">;
 	private _grid;
+	private _initialSettings;
 	private _layoutTimer;
 	protected titleDiv: Fluent;
 	protected toolbar: Toolbar;
@@ -5425,7 +5469,6 @@ export declare class DataGrid<TItem, P = {}> extends Widget<P> implements IDataG
 	protected quickFiltersBar: QuickFilterBar;
 	protected slickContainer: Fluent;
 	protected propertyItemsData: PropertyItemsData;
-	protected initialSettings: PersistedGridSettings;
 	protected restoringSettings: number;
 	view: IRemoteView<TItem>;
 	openDialogsAsPanel: boolean;
@@ -5634,6 +5677,8 @@ export declare class DataGrid<TItem, P = {}> extends Widget<P> implements IDataG
 	getFilterStore(): FilterStore;
 	get allColumns(): Column[];
 	get columns(): Column<TItem>[];
+	get initialSettings(): PersistedGridSettings;
+	protected set initialSettings(value: PersistedGridSettings);
 	/** @obsolete use defaultPersistenceStorage, this one has a typo */
 	static get defaultPersistanceStorage(): SettingStorage;
 	/** @obsolete use defaultPersistenceStorage, this one has a typo */
@@ -6788,6 +6833,9 @@ export declare namespace FilterOperators {
 		[key: string]: string;
 	};
 }
+export declare abstract class IFiltering {
+	static [Symbol.typeInfo]: InterfaceTypeInfo<"Serenity.">;
+}
 export interface IFiltering {
 	createEditor(): void;
 	getCriteria(): CriteriaWithText;
@@ -6801,14 +6849,11 @@ export interface IFiltering {
 	get_operator(): FilterOperator;
 	set_operator(value: FilterOperator): void;
 }
-export declare class IFiltering {
+export declare abstract class IQuickFiltering {
 	static [Symbol.typeInfo]: InterfaceTypeInfo<"Serenity.">;
 }
 export interface IQuickFiltering {
 	initQuickFilter(filter: QuickFilter<Widget<any>, any>): void;
-}
-export declare class IQuickFiltering {
-	static [Symbol.typeInfo]: InterfaceTypeInfo<"Serenity.">;
 }
 export declare abstract class BaseFiltering implements IFiltering, IQuickFiltering {
 	private field;
@@ -6837,7 +6882,7 @@ export declare abstract class BaseFiltering implements IFiltering, IQuickFilteri
 	getEditorValue(): string;
 	getEditorText(): string;
 	initQuickFilter(filter: QuickFilter<Widget<any>, any>): void;
-	protected static registerClass<TypeName>(typeName: StringLiteral<TypeName>, intfAndAttr?: any[]): ClassTypeInfo<TypeName>;
+	protected static registerClass<TypeName>(typeName: StringLiteral<TypeName>, intfAndAttr?: (InterfaceType | AttributeSpecifier)[]): ClassTypeInfo<TypeName>;
 	static [Symbol.typeInfo]: ClassTypeInfo<"Serenity.">;
 }
 export declare abstract class BaseEditorFiltering<TEditor extends Widget<any>> extends BaseFiltering {
@@ -7073,11 +7118,11 @@ export declare class EnumFormatter implements Formatter {
 	static getText(enumKey: string, name: string): string;
 	static getName(enumType: any, value: any): string;
 }
+export declare abstract class IInitializeColumn {
+	static [Symbol.typeInfo]: InterfaceTypeInfo<"Serenity.">;
+}
 export interface IInitializeColumn {
 	initializeColumn(column: Column): void;
-}
-export declare class IInitializeColumn {
-	static [Symbol.typeInfo]: InterfaceTypeInfo<"Serenity.">;
 }
 export declare class FileDownloadFormatter implements Formatter, IInitializeColumn {
 	readonly props: {
@@ -7103,7 +7148,7 @@ export declare class FileDownloadFormatter implements Formatter, IInitializeColu
 }
 export declare abstract class FormatterBase implements Formatter {
 	abstract format(ctx: FormatterContext): FormatterResult;
-	protected static registerFormatter<TypeName>(typeName: StringLiteral<TypeName>, intfAndAttr?: any[]): FormatterTypeInfo<TypeName>;
+	protected static registerFormatter<TypeName>(typeName: StringLiteral<TypeName>, intfAndAttr?: (InterfaceType | AttributeSpecifier)[]): FormatterTypeInfo<TypeName>;
 	static [Symbol.typeInfo]: FormatterTypeInfo<"Serenity.">;
 }
 export declare class MinuteFormatter implements Formatter {
@@ -7243,7 +7288,7 @@ export declare namespace GridUtils {
 	function addToggleButton(toolDiv: HTMLElement | ArrayLike<HTMLElement>, cssClass: string, callback: (p1: boolean) => void, hint: string, initial?: boolean): void;
 	function addIncludeDeletedToggle(toolDiv: HTMLElement | ArrayLike<HTMLElement>, view: IRemoteView<any>, hint?: string, initial?: boolean): void;
 	function addQuickSearchInput(toolDiv: HTMLElement | ArrayLike<HTMLElement>, view: IRemoteView<any>, fields?: QuickSearchField[], onChange?: () => void): QuickSearchInput;
-	function addQuickSearchInputCustom(container: HTMLElement | ArrayLike<HTMLElement>, onSearch: (p1: string, p2: string, done: (p3: boolean) => void) => void, fields?: QuickSearchField[]): QuickSearchInput;
+	function addQuickSearchInputCustom(container: HTMLElement | ArrayLike<HTMLElement>, onSearch: (field: string, query: string, done: (found: boolean) => void) => void, fields?: QuickSearchField[]): QuickSearchInput;
 	function makeOrderable(grid: ISleekGrid, handleMove: (rows: number[], insertBefore: number) => void): void;
 	function makeOrderableWithUpdateRequest<TItem = any, TId = any>(dataGrid: IDataGrid, getId: (item: TItem) => TId, getDisplayOrder: (item: TItem) => any, service: string, getUpdateRequest: (id: TId, order: number) => SaveRequest<TItem>): void;
 }

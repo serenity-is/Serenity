@@ -11,7 +11,7 @@ export interface QuickSearchInputOptions {
     typeDelay?: number;
     loadingParentClass?: string;
     filteredParentClass?: string;
-    onSearch?: (p1: string, p2: string, p3: (p1: boolean) => void) => void;
+    onSearch?: (field: string, query: string, done: (found: boolean) => void) => void;
     fields?: QuickSearchField[];
 }
 

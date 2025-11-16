@@ -1,3 +1,14 @@
+## 9.1.4 (2025-11-16)
+
+### Features
+- New Column Picker Dialog which only has one set of columns (e.g. not split by visible / hidden) and has checkboxes to toggle visibility. It also applies changes as soon as a checkbox is clicked or columns dragged. The new one can also work with raw SleekGrid, or any other component with columns as long as necessary callbacks are provided.
+- Use the IRemoteView interface in RemoteView events
+- Provide more info from sleekgrid.getLayoutInfo method about column pinning / frozen rows ability
+
+### Bugfixes
+- Fix actions dropdown visibility issue due to slick-cell having a z-index value in base.css
+- Fix some actions in header menu failing due to losing this context when calling preventDefault
+
 ## 9.1.3 (2025-11-14)
 
 ### Bugfixes

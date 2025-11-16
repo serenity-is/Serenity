@@ -2,7 +2,7 @@ import { Authorization, DeleteRequest, DeleteResponse, EntityDialogTexts, Fluent
 import { ScriptData, ValidationHelper, getFormData, getFormDataAsync, replaceAll, validatorAbortHandler } from "../../compat";
 import { IEditDialog, IReadOnly } from "../../interfaces";
 import { DataChangeInfo } from "../../types";
-import { Attributes, PanelAttribute } from "../../types/attributes";
+import { Attributes } from "../../types/attributes";
 import { IRowDefinition } from "../datagrid/irowdefinition";
 import { EditorUtils } from "../editors/editorutils";
 import { SubDialogHelper } from "../helpers/subdialoghelper";
@@ -16,7 +16,7 @@ import { SaveInitiator, applyChangesToolButton, cloneToolButton, deleteToolButto
 
 export class EntityDialog<TItem, P = {}> extends BaseDialog<P> implements IEditDialog, IReadOnly {
 
-    static override[Symbol.typeInfo] = this.registerClass(nsSerenity, [IEditDialog, IReadOnly, Attributes.panel(true)]);
+    static override[Symbol.typeInfo] = this.registerClass(nsSerenity, [IEditDialog, IReadOnly, Attributes.panel]);
 
     declare private _entity: TItem;
     declare private _entityId: any;
