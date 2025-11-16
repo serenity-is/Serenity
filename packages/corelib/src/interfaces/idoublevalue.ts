@@ -1,6 +1,6 @@
 ﻿import { interfaceTypeInfo, nsSerenity, registerType } from "../base";
 
-export class IDoubleValue {
+export abstract class IDoubleValue {
     static [Symbol.typeInfo] = interfaceTypeInfo(nsSerenity); static { registerType(this); }
 }
 

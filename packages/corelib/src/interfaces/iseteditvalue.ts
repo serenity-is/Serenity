@@ -1,6 +1,6 @@
 ﻿import { interfaceTypeInfo, nsSerenity, PropertyItem, registerType } from "../base";
 
-export class ISetEditValue {
+export abstract class ISetEditValue {
     static [Symbol.typeInfo] = interfaceTypeInfo(nsSerenity); static { registerType(this); }
 }
 

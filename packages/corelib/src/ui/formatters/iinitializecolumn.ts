@@ -1,10 +1,10 @@
 import { Column } from "@serenity-is/sleekgrid";
 import { interfaceTypeInfo, nsSerenity, registerType } from "../../base";
 
-export interface IInitializeColumn {
-    initializeColumn(column: Column): void;
+export abstract class IInitializeColumn {
+    static [Symbol.typeInfo] = interfaceTypeInfo(nsSerenity); static { registerType(this); }
 }
 
-export class IInitializeColumn {
-    static [Symbol.typeInfo] = interfaceTypeInfo(nsSerenity); static { registerType(this); }
+export interface IInitializeColumn {
+    initializeColumn(column: Column): void;
 }

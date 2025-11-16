@@ -2,6 +2,10 @@ import { interfaceTypeInfo, nsSerenity, registerType, type PropertyItem } from "
 import { CriteriaWithText } from "./criteriawithtext";
 import { FilterOperator } from "./filteroperator";
 
+export abstract class IFiltering {
+    static [Symbol.typeInfo] = interfaceTypeInfo(nsSerenity); static { registerType(this); }
+}
+
 export interface IFiltering {
     createEditor(): void;
     getCriteria(): CriteriaWithText;
@@ -14,8 +18,4 @@ export interface IFiltering {
     set_container(value: HTMLElement): void;
     get_operator(): FilterOperator;
     set_operator(value: FilterOperator): void;
-}
-
-export class IFiltering {
-    static [Symbol.typeInfo] = interfaceTypeInfo(nsSerenity); static { registerType(this); }
 }

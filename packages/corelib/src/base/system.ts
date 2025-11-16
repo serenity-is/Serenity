@@ -182,6 +182,7 @@ export function registerClass(type: any, name: string, intf?: any[]): void {
     internalRegisterType(type, name, intf, "class");
 }
 
+
 /**
  * Indicates the enum key of an enum type (by default the name of the enum type is used as key)
  */
@@ -370,8 +371,9 @@ registerClass(EditorAttribute, 'Serenity.EditorAttribute');
 /**
  * Marker interface for SleekGrid formatters.
  */
-export class ISlickFormatter { }
-registerInterface(ISlickFormatter, 'Serenity.ISlickFormatter');
+export abstract class ISlickFormatter { 
+    static [Symbol.typeInfo] = interfaceTypeInfo(nsSerenity); static { registerType(this); }
+}
 
 /**
  * Register a SleekGrid formatter.

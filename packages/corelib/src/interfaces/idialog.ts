@@ -1,6 +1,6 @@
 ﻿import { interfaceTypeInfo, nsSerenity, registerType } from "../base";
 
-export class IDialog {
+export abstract class IDialog {
     static [Symbol.typeInfo] = interfaceTypeInfo(nsSerenity); static { registerType(this); }
 }
 

@@ -2265,7 +2265,8 @@ export declare class EditorAttribute {
 /**
  * Marker interface for SleekGrid formatters.
  */
-export declare class ISlickFormatter {
+export declare abstract class ISlickFormatter {
+	static [Symbol.typeInfo]: InterfaceTypeInfo<"Serenity.">;
 }
 /**
  * Register a SleekGrid formatter.
@@ -3539,59 +3540,59 @@ export declare namespace ValidationHelper {
 	function validateElement(elem: ArrayLike<HTMLElement> | HTMLElement): void;
 }
 export declare function jQueryPatch(): boolean;
-export declare class IBooleanValue {
+export declare abstract class IBooleanValue {
 	static [Symbol.typeInfo]: InterfaceTypeInfo<"Serenity.">;
 }
 export interface IBooleanValue {
 	get_value(): boolean;
 	set_value(value: boolean): void;
 }
-export declare class IDialog {
+export declare abstract class IDialog {
 	static [Symbol.typeInfo]: InterfaceTypeInfo<"Serenity.">;
 }
 export interface IDialog {
 	dialogOpen(asPanel?: boolean): void;
 }
-export declare class IDoubleValue {
+export declare abstract class IDoubleValue {
 	static [Symbol.typeInfo]: InterfaceTypeInfo<"Serenity.">;
 }
 export interface IDoubleValue {
 	get_value(): any;
 	set_value(value: any): void;
 }
-export declare class IEditDialog {
+export declare abstract class IEditDialog {
 	static [Symbol.typeInfo]: InterfaceTypeInfo<"Serenity.">;
 }
 export interface IEditDialog {
 	load(entityOrId: any, done: () => void, fail?: (p1: any) => void): void;
 }
-export declare class IGetEditValue {
+export declare abstract class IGetEditValue {
 	static [Symbol.typeInfo]: InterfaceTypeInfo<"Serenity.">;
 }
 export interface IGetEditValue {
 	getEditValue(property: PropertyItem, target: any): void;
 }
-export declare class IReadOnly {
+export declare abstract class IReadOnly {
 	static [Symbol.typeInfo]: InterfaceTypeInfo<"Serenity.">;
 }
 export interface IReadOnly {
 	get_readOnly(): boolean;
 	set_readOnly(value: boolean): void;
 }
-export declare class ISetEditValue {
+export declare abstract class ISetEditValue {
 	static [Symbol.typeInfo]: InterfaceTypeInfo<"Serenity.">;
 }
 export interface ISetEditValue {
 	setEditValue(source: any, property: PropertyItem): void;
 }
-export declare class IStringValue {
+export declare abstract class IStringValue {
 	static [Symbol.typeInfo]: InterfaceTypeInfo<"Serenity.">;
 }
 export interface IStringValue {
 	get_value(): string;
 	set_value(value: string): void;
 }
-export declare class IValidateRequired {
+export declare abstract class IValidateRequired {
 	static [Symbol.typeInfo]: InterfaceTypeInfo<"Serenity.">;
 }
 export interface IValidateRequired {
@@ -6819,6 +6820,9 @@ export declare namespace FilterOperators {
 		[key: string]: string;
 	};
 }
+export declare abstract class IFiltering {
+	static [Symbol.typeInfo]: InterfaceTypeInfo<"Serenity.">;
+}
 export interface IFiltering {
 	createEditor(): void;
 	getCriteria(): CriteriaWithText;
@@ -6832,14 +6836,11 @@ export interface IFiltering {
 	get_operator(): FilterOperator;
 	set_operator(value: FilterOperator): void;
 }
-export declare class IFiltering {
+export declare abstract class IQuickFiltering {
 	static [Symbol.typeInfo]: InterfaceTypeInfo<"Serenity.">;
 }
 export interface IQuickFiltering {
 	initQuickFilter(filter: QuickFilter<Widget<any>, any>): void;
-}
-export declare class IQuickFiltering {
-	static [Symbol.typeInfo]: InterfaceTypeInfo<"Serenity.">;
 }
 export declare abstract class BaseFiltering implements IFiltering, IQuickFiltering {
 	private field;
@@ -7104,11 +7105,11 @@ export declare class EnumFormatter implements Formatter {
 	static getText(enumKey: string, name: string): string;
 	static getName(enumType: any, value: any): string;
 }
+export declare abstract class IInitializeColumn {
+	static [Symbol.typeInfo]: InterfaceTypeInfo<"Serenity.">;
+}
 export interface IInitializeColumn {
 	initializeColumn(column: Column): void;
-}
-export declare class IInitializeColumn {
-	static [Symbol.typeInfo]: InterfaceTypeInfo<"Serenity.">;
 }
 export declare class FileDownloadFormatter implements Formatter, IInitializeColumn {
 	readonly props: {
