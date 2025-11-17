@@ -102,23 +102,26 @@ export class GridRadioSelectionMixin {
         this.include[key] = true;
     }
 
-    static createSelectColumn(getMixin: () => GridRadioSelectionMixin): Column {
+    static createSelectColumn(getMixin: () => GridRadioSelectionMixin, columnOptions?: Partial<Column>): Column {
         return {
-            name: '',
+            name: '[×]',
+            nameFormat: () => "",
             toolTip: ' ',
             id: '__select__',
+            resizable: false,
             width: 27,
             minWidth: 27,
+            maxWidth: 27,
             headerCssClass: '',
             sortable: false,
-            formatter: function (row, cell, value, column, item) {
-                var mixin = getMixin();
-                if (!mixin || !mixin.isSelectable(item)) {
+            format: function (ctx) {
+                const mixin = getMixin();
+                if (!mixin || !mixin.isSelectable(ctx.item)) {
                     return '';
                 }
 
-                var isChecked = mixin.include[item[mixin.idField]];
-                return '<input type="radio" name="radio-selection-group" class="rad-select-item no-float" style="cursor: pointer;width: 13px; height:13px;" ' + (isChecked ? ' checked' : '') + ' /> ';
+                const isChecked = mixin.include[ctx.item[mixin.idField]];
+                return <input type="radio" name="radio-selection-group" class="rad-select-item no-float" style="cursor: pointer" checked={isChecked} />;
             }
         };
     }
