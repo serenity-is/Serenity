@@ -405,7 +405,7 @@ export declare function getElementReadOnly(el: Element): boolean | null;
 /**
  * Sets readonly class and disabled (for select, radio, checkbox) or readonly attribute (for other inputs) on given element.
  * It does not check for attached widgets.
- * @param el Element
+ * @param elements Element or array-like of elements
  * @param value Readonly state
  */
 export declare function setElementReadOnly(elements: Element | ArrayLike<Element>, value: boolean): void;
@@ -3103,7 +3103,6 @@ export declare function indexOf<TItem>(array: TItem[], predicate: (x: TItem) => 
 export declare function insert(obj: any, index: number, item: any): void;
 /**
  * Determines if the object is an array. Prefer Array.isArray over this function (e.g. `Array.isArray(obj)`).
- * @param obj Object to test.
  * @returns True if the object is an array.
  * @example
  * isArray([1, 2, 3]); // true
@@ -3503,8 +3502,6 @@ export declare let today: () => Date;
 /**
  * Deep clones an object or value.
  * @param a The value to clone.
- * @param a2 An optional second value to merge into the clone.
- * @param a3 An optional third value to merge into the clone.
  * @returns A deep clone of the input value.
  */
 export declare function deepClone<T = any>(a: T): T;

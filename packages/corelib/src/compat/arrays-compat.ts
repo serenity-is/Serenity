@@ -130,7 +130,6 @@ export function insert(obj: any, index: number, item: any): void {
 
 /**
  * Determines if the object is an array. Prefer Array.isArray over this function (e.g. `Array.isArray(obj)`).
- * @param obj Object to test.
  * @returns True if the object is an array.
  * @example
  * isArray([1, 2, 3]); // true

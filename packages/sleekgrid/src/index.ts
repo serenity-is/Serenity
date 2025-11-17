@@ -1,3 +1,11 @@
+/**
+ * ## SleekGrid
+ *
+ * A modern, lightweight, and highly customizable data grid component for web applications.
+ *
+ * @packageDocumentation
+ */
+
 export * from "./core";
 export * from "./grid";
 export * from "./layouts/frozen-layout";
