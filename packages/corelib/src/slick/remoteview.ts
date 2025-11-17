@@ -76,53 +76,23 @@ export class RemoteView<TItem = any> implements IRemoteView<TItem> {
     private totalCount: number = null;
     private totalRows = 0;
     private updated: Record<string, boolean> = null;
-
-    /** Additional parameters to send with service requests */
+    
     public params: Record<string, any>;
-
-    /** The page number to seek to when loading data */
     public seekToPage: number;
-
-    /** Sort expressions for the data */
     public sortBy: string[];
-
-    /** The URL to fetch data from */
     public url: string;
 
-    /** Callback invoked before making AJAX calls */
     public onAjaxCall: RemoteViewAjaxCallback<TItem>;
-
-    /** Callback invoked to process data received from the server */
     public onProcessData: RemoteViewProcessCallback<TItem>;
-
-    /** Callback invoked before submitting a request, can cancel the operation */
     public onSubmit: CancellableViewCallback<TItem>;
-
-    /** Event fired when the underlying data changes */
     public readonly onDataChanged = new EventEmitter<ArgsRemoteView>();
-
-    /** Event fired when data loading completes */
     public readonly onDataLoaded = new EventEmitter<ArgsRemoteView>();
-
-    /** Event fired when data loading begins */
     public readonly onDataLoading = new EventEmitter<ArgsRemoteView>();
-
-    /** Event fired when a group is collapsed */
     public readonly onGroupCollapsed = new EventEmitter<ArgsGroupToggle>();
-
-    /** Event fired when a group is expanded */
     public readonly onGroupExpanded = new EventEmitter<ArgsGroupToggle>();
-
-    /** Event fired when paging information changes */
     public readonly onPagingInfoChanged = new EventEmitter<ArgsPagingInfo>();
-
-    /** Event fired when the row count changes */
     public readonly onRowCountChanged = new EventEmitter<ArgsRowCountChanged>();
-
-    /** Event fired when specific rows change */
     public readonly onRowsChanged = new EventEmitter<ArgsRowsChanged>();
-
-    /** Event fired when rows or count change */
     public readonly onRowsOrCountChanged = new EventEmitter<ArgsRowsOrCountChanged>();
 
     constructor(options: RemoteViewOptions<TItem>) {
@@ -166,18 +136,10 @@ export class RemoteView<TItem = any> implements IRemoteView<TItem> {
         predefinedValues: []
     }
 
-    /**
-     * Begins a batch update operation. Multiple changes can be made without triggering refreshes.
-     * Call endUpdate() to complete the batch and refresh the view.
-     */
     public beginUpdate() {
         this.suspend++;
     }
 
-    /**
-     * Ends a batch update operation. If this is the outermost endUpdate call,
-     * refreshes the view to reflect all changes made during the batch.
-     */
     public endUpdate() {
         this.suspend--;
         if (this.suspend <= 0)
@@ -217,27 +179,14 @@ export class RemoteView<TItem = any> implements IRemoteView<TItem> {
         }
     }
 
-    /**
-     * Gets all items in the view.
-     * @returns Array of all items
-     */
     public getItems(): TItem[] {
         return this.items;
     }
 
-    /**
-     * Gets the name of the property used as the unique identifier for items.
-     * @returns The ID property name
-     */
     public getIdPropertyName(): string {
         return this.idProperty;
     }
 
-    /**
-     * Sets the items in the view and optionally changes the ID property.
-     * @param data Array of items to set
-     * @param newIdProperty Optional new ID property name, or boolean to reset
-     */
     public setItems(data: any[], newIdProperty?: string | boolean): void {
         if (newIdProperty != null && typeof newIdProperty == "string")
             this.idProperty = newIdProperty;
@@ -263,10 +212,6 @@ export class RemoteView<TItem = any> implements IRemoteView<TItem> {
         this.onDataChanged.notify({ dataView: this }, null, this);
     }
 
-    /**
-     * Sets paging options and triggers a data reload if options changed.
-     * @param args The paging options to set
-     */
     public setPagingOptions(args: PagingOptions): void {
         let anyChange = false;
 
@@ -298,10 +243,6 @@ export class RemoteView<TItem = any> implements IRemoteView<TItem> {
             this.populate();
     }
 
-    /**
-     * Gets the current paging information.
-     * @returns Object containing paging state information
-     */
     public getPagingInfo(): PagingInfo {
         return {
             rowsPerPage: this.rowsPerPage,
@@ -347,11 +288,6 @@ export class RemoteView<TItem = any> implements IRemoteView<TItem> {
         }
     }
 
-    /**
-     * Sorts the items using the specified comparer function.
-     * @param comparer Optional custom comparer function
-     * @param ascending Whether to sort in ascending order (default true)
-     */
     public sort(comparer?: (a: any, b: any) => number, ascending?: boolean): void {
         this.sortAsc = ascending;
         if (ascending === false) {
@@ -369,18 +305,10 @@ export class RemoteView<TItem = any> implements IRemoteView<TItem> {
         this.refresh();
     }
 
-    /**
-     * Gets whether local sorting is enabled.
-     * @returns true if local sorting is enabled
-     */
     public getLocalSort(): boolean {
         return this.localSort;
     }
 
-    /**
-     * Sets whether to use local sorting. When enabled, sorting is done client-side.
-     * @param value Whether to enable local sorting
-     */
     public setLocalSort(value: boolean): void {
         if (this.localSort != value) {
             this.localSort = value;
@@ -388,60 +316,33 @@ export class RemoteView<TItem = any> implements IRemoteView<TItem> {
         }
     }
 
-    /**
-     * Re-sorts the items using the current sort settings.
-     */
     public reSort() {
         this.sort(this.sortComparer, this.sortAsc);
     }
 
-    /**
-     * Gets the filtered items (after applying the current filter).
-     * @returns Array of filtered items
-     */
     public getFilteredItems(): any[] {
         return this.filteredItems;
     }
 
-    /**
-     * Gets the current filter function.
-     * @returns The current filter function
-     */
     public getFilter() {
         return this.filter;
     }
 
-    /**
-     * Sets the filter function to apply to items.
-     * @param filterFn The filter function to apply
-     */
     public setFilter(filterFn: RemoteViewFilter<TItem>): void {
         this.filter = filterFn;
         this.refresh();
     }
 
-    /**
-     * Gets the current grouping configuration.
-     * @returns Array of grouping information
-     */
     public getGrouping() {
         return this.groupingInfos;
     }
 
-    /**
-     * Sets summary/aggregation options for the view.
-     * @param summary Object containing aggregators and other summary options
-     */
     public setSummaryOptions(summary: SummaryOptions): void {
         this.grandAggregators = summary?.aggregators || [];
         this.grandTotals = {};
         this.setGrouping(this.groupingInfos || []);
     }
 
-    /**
-     * Gets the grand totals for all aggregated data.
-     * @returns Object containing grand totals
-     */
     public getGrandTotals(): IGroupTotals {
         this.grandTotals ??= {};
 
@@ -462,10 +363,6 @@ export class RemoteView<TItem = any> implements IRemoteView<TItem> {
         return this.grandTotals;
     }
 
-    /**
-     * Sets the grouping configuration for the view.
-     * @param groupingInfo Grouping information or array of grouping information
-     */
     public setGrouping(groupingInfo: GroupInfo<TItem> | GroupInfo<TItem>[]): void {
         if (!this.groupItemMetadataProvider) {
             this.groupItemMetadataProvider = new GroupItemMetadataProvider();
@@ -485,20 +382,10 @@ export class RemoteView<TItem = any> implements IRemoteView<TItem> {
         this.refresh();
     }
 
-    /**
-     * Gets an item by its index in the items array.
-     * @param i The index of the item
-     * @returns The item at the specified index
-     */
     public getItemByIdx(i: number): any {
         return this.items[i];
     }
 
-    /**
-     * Gets the index of an item by its ID.
-     * @param id The ID of the item
-     * @returns The index of the item, or undefined if not found
-     */
     public getIdxById(id: any): number {
         return this.idxById[id];
     }
@@ -512,31 +399,16 @@ export class RemoteView<TItem = any> implements IRemoteView<TItem> {
         }
     }
 
-    /**
-     * Gets the row index for an item.
-     * @param item The item to find
-     * @returns The row index of the item
-     */
     public getRowByItem(item: any): number {
         this.ensureRowsByIdCache();
         return this.rowsById[item[this.idProperty]];
     }
 
-    /**
-     * Gets the row index for an item by its ID.
-     * @param id The ID of the item
-     * @returns The row index of the item
-     */
     public getRowById(id: any): number {
         this.ensureRowsByIdCache();
         return this.rowsById[id];
     }
 
-    /**
-     * Gets an item by its ID.
-     * @param id The ID of the item
-     * @returns The item with the specified ID
-     */
     public getItemById(id: any): TItem {
         return this.items[this.idxById[id]];
     }
@@ -590,11 +462,6 @@ export class RemoteView<TItem = any> implements IRemoteView<TItem> {
         return ids;
     }
 
-    /**
-     * Updates an existing item in the view.
-     * @param id The ID of the item to update
-     * @param item The new item data
-     */
     public updateItem(id: any, item: any) {
         if (this.idxById[id] === undefined) {
             throw new Error("Invalid id");
@@ -627,31 +494,18 @@ export class RemoteView<TItem = any> implements IRemoteView<TItem> {
         this.refresh();
     }
 
-    /**
-     * Inserts an item at the specified position.
-     * @param insertBefore The index to insert before
-     * @param item The item to insert
-     */
     public insertItem(insertBefore: number, item: any) {
         this.items.splice(insertBefore, 0, item);
         this.updateIdxById(insertBefore);
         this.refresh();
     }
 
-    /**
-     * Adds an item to the end of the items array.
-     * @param item The item to add
-     */
     public addItem(item: any) {
         this.items.push(item);
         this.updateIdxById(this.items.length - 1);
         this.refresh();
     }
 
-    /**
-     * Deletes an item by its ID.
-     * @param id The ID of the item to delete
-     */
     public deleteItem(id: any) {
         const idx = this.idxById[id];
         if (idx === undefined) {
@@ -663,19 +517,10 @@ export class RemoteView<TItem = any> implements IRemoteView<TItem> {
         this.refresh();
     }
 
-    /**
-     * Adds an item in sorted order.
-     * @param item The item to add
-     */
     public sortedAddItem(item: any) {
         this.insertItem(this.sortedIndex(item), item);
     }
 
-    /**
-     * Updates an item while maintaining sorted order.
-     * @param id The ID of the item to update
-     * @param item The new item data
-     */
     public sortedUpdateItem(id: any, item: any) {
         if (this.idxById[id] === undefined || id !== item[this.idProperty]) {
             throw new Error("Invalid or non-matching id " + this.idxById[id]);
@@ -707,27 +552,14 @@ export class RemoteView<TItem = any> implements IRemoteView<TItem> {
         return low;
     }
 
-    /**
-     * Gets all rows in the view (including group rows and totals rows).
-     * @returns Array of all rows
-     */
     public getRows(): (TItem | Group<any> | GroupTotals<any>)[] {
         return this.rows;
     }
 
-    /**
-     * Gets the total number of rows in the view.
-     * @returns The number of rows
-     */
     public getLength() {
         return this.rows.length;
     }
 
-    /**
-     * Gets the item at the specified row index.
-     * @param i The row index
-     * @returns The item at the row index
-     */
     public getItem(i: number): any {
         const item = this.rows[i];
 
@@ -749,11 +581,6 @@ export class RemoteView<TItem = any> implements IRemoteView<TItem> {
         return item;
     }
 
-    /**
-     * Gets metadata for the item at the specified row index.
-     * @param row The row index
-     * @returns Metadata object or null
-     */
     public getItemMetadata(row: number) {
         const item = this.rows[row];
         if (item === undefined) {
@@ -798,18 +625,10 @@ export class RemoteView<TItem = any> implements IRemoteView<TItem> {
         this.refresh();
     }
 
-    /**
-     * Collapses all groups at the specified level, or all levels if not specified.
-     * @param level Optional level to collapse. If not specified, applies to all levels.
-     */
     public collapseAllGroups(level?: number) {
         this.expandCollapseAllGroups(level, true);
     }
 
-    /**
-     * Expands all groups at the specified level, or all levels if not specified.
-     * @param level Optional level to expand. If not specified, applies to all levels.
-     */
     public expandAllGroups(level?: number) {
         this.expandCollapseAllGroups(level, false);
     }
@@ -834,32 +653,16 @@ export class RemoteView<TItem = any> implements IRemoteView<TItem> {
         this.refresh();
     }
 
-    /**
-     * Collapses a specific group.
-     * @param constArgs Either a Slick.Group's "groupingKey" property, or a
-     * constiable argument list of grouping values denoting a unique path to the row.
-     * For example, calling collapseGroup('high', '10%') will collapse the '10%' subgroup of the 'high' group.
-     */
     public collapseGroup(constArgs: any[]) {
         const args = Array.prototype.slice.call(arguments);
         this.expandCollapseGroup(args, true);
     }
 
-    /**
-     * Expands a specific group.
-     * @param constArgs Either a Slick.Group's "groupingKey" property, or a
-     * constiable argument list of grouping values denoting a unique path to the row.
-     * For example, calling expandGroup('high', '10%') will expand the '10%' subgroup of the 'high' group.
-     */
     public expandGroup(constArgs: any[]) {
         const args = Array.prototype.slice.call(arguments);
         this.expandCollapseGroup(args, false);
     }
 
-    /**
-     * Gets the current groups.
-     * @returns Array of groups
-     */
     public getGroups() {
         return this.groups;
     }
@@ -1126,11 +929,6 @@ export class RemoteView<TItem = any> implements IRemoteView<TItem> {
         return diff;
     }
 
-    /**
-     * Refresh the view by recalculating the rows and notifying changes.
-     * Note that this does not re-fetch the data from the server, use populate
-     * method for that purpose.
-     */
     public refresh() {
         if (this.suspend) {
             return;
@@ -1235,11 +1033,6 @@ export class RemoteView<TItem = any> implements IRemoteView<TItem> {
         return onSelectedRowIdsChanged;
     }
 
-    /**
-     * Syncs cell CSS styles between the grid and the data view.
-     * @param grid The grid to sync styles with
-     * @param key The style key to sync
-     */
     public syncGridCellCssStyles(grid: ISleekGrid, key: string) {
         let hashById: any;
         let inHandler: boolean;
@@ -1290,10 +1083,6 @@ export class RemoteView<TItem = any> implements IRemoteView<TItem> {
         this.onRowsOrCountChanged.subscribe(update);
     }
 
-    /**
-     * Adds data received from the server to the view.
-     * @param data The response data from the server
-     */
     public addData(data: any) {
 
         if (this.onProcessData && data)
@@ -1328,10 +1117,6 @@ export class RemoteView<TItem = any> implements IRemoteView<TItem> {
         this.onPagingInfoChanged.notify({ pagingInfo: this.getPagingInfo(), dataView: this });
     }
 
-    /**
-     * Loads data from the server using the configured URL and parameters.
-     * @returns false if the operation was cancelled or no URL is configured
-     */
     public populate() {
         if (this.populateLocks > 0) {
             this.populateCalls++;
@@ -1417,19 +1202,12 @@ export class RemoteView<TItem = any> implements IRemoteView<TItem> {
         this.loading = controller;
     }
 
-    /**
-     * Locks population to prevent automatic data loading.
-     * Use this when you want to make multiple changes without triggering loads.
-     */
     public populateLock() {
         if (this.populateLocks == 0)
             this.populateCalls = 0;
         this.populateLocks++;
     }
 
-    /**
-     * Unlocks population. If there were pending populate calls while locked, executes them.
-     */
     public populateUnlock() {
         if (this.populateLocks > 0) {
             this.populateLocks--;
@@ -1438,18 +1216,10 @@ export class RemoteView<TItem = any> implements IRemoteView<TItem> {
         }
     }
 
-    /**
-     * Gets the group item metadata provider.
-     * @returns The metadata provider
-     */
     public getGroupItemMetadataProvider() {
         return this.groupItemMetadataProvider;
     }
 
-    /**
-     * Sets the group item metadata provider.
-     * @param value The metadata provider to set
-     */
     public setGroupItemMetadataProvider(value: GroupItemMetadataProvider) {
         this.groupItemMetadataProvider = value;
     }

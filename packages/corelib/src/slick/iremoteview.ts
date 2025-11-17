@@ -61,6 +61,13 @@ export interface IRemoteView<TItem = any> extends IDataView<TItem> {
      * @returns The current filter function
      */
     getFilter?(): RemoteViewFilter<TItem>;
+
+    /**
+     * Gets the filtered items (after applying the current filter).
+     * @returns Array of filtered items
+     */
+    getFilteredItems(): any[];
+
     /**
      * Gets the current grouping configuration.
      * @returns Array of grouping information
