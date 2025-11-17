@@ -2878,9 +2878,8 @@ export class SleekGrid<TItem = any> implements ISleekGrid<TItem> {
             return false;
         }
 
-        (e as any).dragData = dd;
         const sge = this._trigger(this.onDragInit as any, dd, e);
-        if (sge.isImmediatePropagationStopped) {
+        if (sge.isImmediatePropagationStopped()) {
             e.preventDefault();
             return sge.getReturnValue();
         }
@@ -3049,7 +3048,7 @@ export class SleekGrid<TItem = any> implements ISleekGrid<TItem> {
         }
 
         const sge = this._trigger(this.onClick, { row: cell.row, cell: cell.cell }, e);
-        if (sge.isImmediatePropagationStopped && sge.isImmediatePropagationStopped()) {
+        if (sge.isImmediatePropagationStopped()) {
             return;
         }
 
