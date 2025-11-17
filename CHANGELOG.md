@@ -1,3 +1,12 @@
+## 9.1.5 (2025-11-17)
+
+### Features
+- Enhance type system for attributes and interfaces. Add CustomAttribute base class for extensible attribute support and attribute typing. Introduce AttributeSpecifier union type for flexible attribute specification (classes, instances, factories). Update registerClass, registerEditor, registerFormatter to handle AttributeSpecifier. No need to call Attributes.factoryFunction() as it will be called by registration helper automatically (e.g. `[Attributes.someAttr]` is enough). Similarly, new `SomeAttributeClass()` is not necessary when passing attributes.
+
+### Bugfixes
+- Potential this issue in setTimeout for asyncPostProcess
+- Fix wrong isImmediatePropagationStopped check in onDragInit causing inputs to not get focus in the grid
+
 ## 9.1.4 (2025-11-16)
 
 ### Features
