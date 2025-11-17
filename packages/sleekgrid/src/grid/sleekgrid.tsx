@@ -2485,7 +2485,7 @@ export class SleekGrid<TItem = any> implements ISleekGrid<TItem> {
             this.asyncPostProcessCleanupRows();
         }
         else {
-            this._hPostRenderCleanup = setTimeout(this.asyncPostProcessCleanupRows, this._options.asyncPostCleanupDelay);
+            this._hPostRenderCleanup = setTimeout(bindThis(this).asyncPostProcessCleanupRows, this._options.asyncPostCleanupDelay);
         }
     }
 
@@ -2546,7 +2546,7 @@ export class SleekGrid<TItem = any> implements ISleekGrid<TItem> {
         }
     }
 
-    public render = (): void => {
+    public render(): void {
         if (!this._initialized) { return; }
         if (this._hRender) {
             clearTimeout(this._hRender);
@@ -2702,7 +2702,7 @@ export class SleekGrid<TItem = any> implements ISleekGrid<TItem> {
                         (this._lastRenderTime < new Date().getTime() - this._options.forceSyncScrollInterval))) {
                     this.render();
                 } else {
-                    this._hRender = setTimeout(this.render, 50);
+                    this._hRender = setTimeout(bindThis(this).render, 50);
                 }
 
                 this._trigger(this.onViewportChanged);
@@ -2774,7 +2774,7 @@ export class SleekGrid<TItem = any> implements ISleekGrid<TItem> {
 
             // call this function again after the specified delay
             if (this._options.asyncPostRenderDelay >= 0) {
-                this._hPostRenderCleanup = setTimeout(this.asyncPostProcessCleanupRows, this._options.asyncPostCleanupDelay);
+                this._hPostRenderCleanup = setTimeout(bindThis(this).asyncPostProcessCleanupRows, this._options.asyncPostCleanupDelay);
                 return;
             }
         }
