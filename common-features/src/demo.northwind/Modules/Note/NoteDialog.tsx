@@ -10,7 +10,10 @@ export class NoteDialog<P = {}> extends BaseDialog<P> {
         const id = this.useIdPrefix();
         return (
             <form id={id.Form} class="s-Form">
-                <textarea id={id.Text} class="required" ref={el => this.textEditor = new HtmlNoteContentEditor({ element: el })} />
+                <div class="field">
+                    <textarea id={id.Text} class="editor required" ref={el => this.textEditor = new HtmlNoteContentEditor({ element: el })} />
+                    <div class="vx"></div>
+                </div>
             </form>
         );
     }

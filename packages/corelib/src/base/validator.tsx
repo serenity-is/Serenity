@@ -291,6 +291,12 @@ export class Validator {
                 if (optional === "dependency-mismatch" &&
                     !Validator.rules(validator.validationTargetFor(element) || element)?.required)
                     return;
+
+                if (element.tagName.toLowerCase() === "textarea" &&
+                    element.style.visibility === "hidden") {
+                    // Skip hidden textareas (like CKEditor)
+                    return;
+                }
             }
 
             validator.element(element);
@@ -298,10 +304,8 @@ export class Validator {
         onkeyup: function (element: ValidatableElement, event: KeyboardEvent, validator: Validator) {
 
             // Avoid revalidate the field when pressing one of the following keys
-            const excludedKeys = ["Shift", "Control", "Alt", "CapsLock", "End", "Home",
-                "ArrowLeft", "ArrowUp", "ArrowRight", "ArrowDown", "Insert", "NumLock", "AltGr"];
-
-            if (event.key === "Tab" && Validator.elementValue(element) === "" || excludedKeys.includes(event.key)) {
+            if ((event.key === "Tab" && Validator.elementValue(element) === "") || 
+                Validator.excludedModifierKeys.has(event.key)) {
                 return;
             } else if (element.name in validator.submitted || element.name in validator.invalid) {
                 validator.element(element);
@@ -1684,6 +1688,8 @@ export class Validator {
         const hl = el.dataset.vxHighlight;
         if (hl)
             return document.getElementById(hl);
+        else if (el.tagName.toLowerCase() === 'textarea' && el.style.visibility == 'hidden' && el.id)
+            return document.getElementById('cke_' + el.id);
         else if (el.classList.contains("select2-offscreen") && el.id)
             return document.getElementById('s2id_' + el.id);
     }
@@ -1718,6 +1724,8 @@ export class Validator {
             element.classList.remove('customValidate');
     }
 
+    static readonly excludedModifierKeys: Set<string> = new Set([
+        "Shift", "Control", "Alt", "CapsLock", "End", "Home", "ArrowLeft", "ArrowUp", "ArrowRight", "ArrowDown", "Insert", "NumLock", "AltGr"]);
 }
 
 function isPollutingKey(key: string | null | undefined): boolean {

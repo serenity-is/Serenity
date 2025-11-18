@@ -1,4 +1,4 @@
-import { Fluent, FormValidationTexts, nsSerenity, resolveUrl } from "../../base";
+import { Fluent, FormValidationTexts, nsSerenity, resolveUrl, Validator } from "../../base";
 import { isTrimmedEmpty } from "../../compat";
 import { IReadOnly, IStringValue } from "../../interfaces";
 import { LazyLoadHelper } from "../helpers/lazyloadhelper";
@@ -87,6 +87,8 @@ export class HtmlContentEditor<P extends HtmlContentEditorOptions = HtmlContentE
         return 'en';
     }
 
+    private triggerKeyupEvent: KeyboardEvent;
+
     protected getConfig(): CKEditorConfig {
         return {
             customConfig: '',
@@ -98,6 +100,18 @@ export class HtmlContentEditor<P extends HtmlContentEditorOptions = HtmlContentE
                 change: (x1: any) => {
                     x1.editor.updateElement();
                     Fluent.trigger(this.domNode, "change");
+
+                    if (this.triggerKeyupEvent) {
+                        const validator = Validator.getInstance(this.domNode.form);
+                        if (validator && validator?.settings?.onkeyup) {
+                            // trigger validation on keyup
+                            validator.settings.onkeyup(this.domNode, this.triggerKeyupEvent, validator)
+                        }
+                        this.triggerKeyupEvent = null;
+                    }
+                },
+                key: (e: any) => {
+                    this.triggerKeyupEvent = e?.data?.domEvent?.$;
                 }
             },
             toolbarGroups: [
@@ -142,7 +156,7 @@ export class HtmlContentEditor<P extends HtmlContentEditorOptions = HtmlContentE
         return (window as any)['CKEDITOR']?.instances?.[id];
     }
 
-    overridedestroy(): void {
+    override destroy(): void {
         var instance = this.getEditorInstance();
         instance && instance.destroy(true);
         super.destroy();
