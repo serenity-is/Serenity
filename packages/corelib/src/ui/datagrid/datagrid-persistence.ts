@@ -239,7 +239,7 @@ export function restoreSettingsFrom(this: void, opt: {
             }
         }
 
-        if (flags.sortColumns && (settings.flags.sortColumns ??
+        if (flags.sortColumns && (settings.flags?.sortColumns ??
                 settings.columns.some(c => "sort" in c))) {
             const list = [];
             const sortColumns = settings.columns.filter(function (x3) {
