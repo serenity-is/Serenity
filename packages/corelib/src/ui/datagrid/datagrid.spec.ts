@@ -213,7 +213,8 @@ describe("DataGrid.getCurrentSettings", () => {
 
         const grid = new MyGrid({});
         expect(grid.getCurrentSettings()).toEqual({
-            columns: []
+            columns: [],
+            flags: DataGrid.defaultOptions.persistenceFlags
         });
     });
 
@@ -222,12 +223,14 @@ describe("DataGrid.getCurrentSettings", () => {
         }
 
         const grid = new MyGrid({});
-        expect(grid.getCurrentSettings({
+        const flags = {
             ...omitAllGridPersistenceFlags,
             columnVisibility: false,
             columnWidths: false,
             sortColumns: false
-        })).toEqual({
+        };
+        expect(grid.getCurrentSettings(flags)).toEqual({
+            flags: flags
         });
     });
 
@@ -243,15 +246,17 @@ describe("DataGrid.getCurrentSettings", () => {
         }
 
         const grid = new MyGrid({});
-        expect(grid.getCurrentSettings({
+        const flags = {
             ...omitAllGridPersistenceFlags,
             columnVisibility: true
-        })).toEqual({
+        };
+        expect(grid.getCurrentSettings(flags)).toEqual({
             columns: [
                 { id: "A", visible: true },
-                { id: "B" },
+                { id: "B", visible: false },
                 { id: "C", visible: true }
-            ]
+            ],
+            flags: flags
         });
     });
 
@@ -266,14 +271,16 @@ describe("DataGrid.getCurrentSettings", () => {
         }
 
         const grid = new MyGrid({});
-        expect(grid.getCurrentSettings({ 
+        const flags = { 
             ...omitAllGridPersistenceFlags,
             columnWidths: true 
-        })).toEqual({
+        };
+        expect(grid.getCurrentSettings(flags)).toEqual({
             columns: [
                 { id: "A", width: 100 },
                 { id: "B", width: 200 }
-            ]
+            ],
+            flags: flags
         });
     });
 });

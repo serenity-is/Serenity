@@ -24,6 +24,7 @@ export interface PersistedGridColumn {
 }
 
 export interface PersistedGridSettings {
+    flags?: GridPersistenceFlags;
     columns?: PersistedGridColumn[];
     filterItems?: FilterLine[];
     quickFilters?: { [key: string]: any };
@@ -91,7 +92,9 @@ export function getCurrentSettings(this: void, opt: {
 }): PersistedGridSettings {
 
     const flags = Object.assign({}, defaultGridPersistenceFlags, opt.flags || {});
-    const settings: PersistedGridSettings = {};
+    const settings: PersistedGridSettings = {
+        flags: flags
+    };
     if (flags.columnVisibility ||
         flags.columnWidths ||
         flags.columnPinning ||
@@ -104,12 +107,12 @@ export function getCurrentSettings(this: void, opt: {
                 id: column.id
             };
 
-            if (flags.columnPinning && column.frozen) {
-                p.pin = column.frozen !== "end" ? "start" : "end";
+            if (flags.columnPinning) {
+                p.pin = column.frozen ? (column.frozen !== "end" ? "start" : "end") : false;
             }
 
-            if (flags.columnVisibility && column.visible !== false) {
-                p.visible = true;
+            if (flags.columnVisibility) {
+                p.visible = column.visible !== false;
             }
 
             if (flags.columnWidths) {
@@ -123,16 +126,6 @@ export function getCurrentSettings(this: void, opt: {
                 }
             }
             settings.columns.push(p);
-        }
-
-        if (flags.columnPinning && settings.columns.length > 0 && !settings.columns.some(x => "pin" in x)) {
-            // ensure at least one column has pinned info so that while restoring we know pinning flag was used
-            settings.columns[0].pin = false;
-        }
-
-        if (flags.columnVisibility && settings.columns.length > 0 && !settings.columns.some(x => "visible" in x)) {
-            // ensure at least one column has visibility info so that while restoring we know visibility flag was used
-            settings.columns[0].visible = false;
         }
     }
 
@@ -221,7 +214,8 @@ export function restoreSettingsFrom(this: void, opt: {
     if (settings.columns != null) {
 
         if (flags.columnPinning &&
-            settings.columns.some(x => "pin" in x)) {
+            (settings.flags?.columnPinning 
+                ?? settings.columns.some(x => "pin" in x))) {
             for (let x1 of settings.columns) {
                 if (x1.id != null) {
                     const column = colById[x1.id];
@@ -233,7 +227,8 @@ export function restoreSettingsFrom(this: void, opt: {
             }
         }
 
-        if (flags.columnWidths) {
+        if (flags.columnWidths && (settings.flags?.columnWidths 
+                ?? settings.columns.some(c => "width" in c))) {
             for (let x2 of settings.columns) {
                 if (x2.id != null && x2.width != null && x2.width !== 0) {
                     const column1 = colById[x2.id];
@@ -244,7 +239,8 @@ export function restoreSettingsFrom(this: void, opt: {
             }
         }
 
-        if (flags.sortColumns) {
+        if (flags.sortColumns && (settings.flags.sortColumns ??
+                settings.columns.some(c => "sort" in c))) {
             const list = [];
             const sortColumns = settings.columns.filter(function (x3) {
                 return x3.id != null && (x3.sort ?? 0) !== 0;
@@ -273,8 +269,8 @@ export function restoreSettingsFrom(this: void, opt: {
             opt.sleekGrid.setSortColumns(list);
         }
 
-        if (flags.columnVisibility &&
-            settings.columns.some(x => "visible" in x)) {
+        if (flags.columnVisibility && (settings.flags?.columnVisibility
+                ?? settings.columns.some(x => "visible" in x))) {
             const visibleColumns = settings.columns.filter(x => x.id != null &&
                 x.visible === true &&
                 colById[x.id] &&
@@ -333,7 +329,8 @@ export function restoreSettingsFrom(this: void, opt: {
         });
     }
 
-    if (flags.quickSearch && (settings.quickSearchField !== undefined || settings.quickSearchText !== undefined)) {
+    if (flags.quickSearch && (settings.flags?.quickSearch ??
+         ((settings.quickSearchField !== undefined || settings.quickSearchText !== undefined)))) {
         const qsInput = opt.toolbarNode.querySelector('.s-QuickSearchInput');
         if (qsInput) {
             const qsWidget = tryGetWidget(qsInput, QuickSearchInput);
