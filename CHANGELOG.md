@@ -1,3 +1,16 @@
+## 9.1.6 (2025-11-18)
+
+### Features
+- Improve column picker dialog toggle all handling so that only one populate necessary when multiple columns are shown
+- Stored the used persistence flags in persisted grid settings.
+- Improve HTML content editor validation handling
+- Add getFilteredItems method to IRemoteView interface, remove comments from RemoteView methods that already has comments in IRemoteView
+- Bump glob to 12.0.0, vitest to 4.0.10, jsdom to 27.2.0
+- @serenity-is/tsbuild 9.1.6 with updated glob dependency
+
+### Bugfixes
+- Fix gridradioselectionmixin using html string
+
 ## 9.1.5 (2025-11-17)
 
 ### Features
