@@ -29,8 +29,6 @@ export let today = (): Date => {
 /**
  * Deep clones an object or value.
  * @param a The value to clone.
- * @param a2 An optional second value to merge into the clone.
- * @param a3 An optional third value to merge into the clone.
  * @returns A deep clone of the input value.
  */
 export function deepClone<T = any>(a: T): T {

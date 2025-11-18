@@ -405,7 +405,7 @@ export declare function getElementReadOnly(el: Element): boolean | null;
 /**
  * Sets readonly class and disabled (for select, radio, checkbox) or readonly attribute (for other inputs) on given element.
  * It does not check for attached widgets.
- * @param el Element
+ * @param elements Element or array-like of elements
  * @param value Readonly state
  */
 export declare function setElementReadOnly(elements: Element | ArrayLike<Element>, value: boolean): void;
@@ -3028,6 +3028,7 @@ export declare class Validator {
 	static getHighlightTarget(el: HTMLElement): HTMLElement;
 	static addCustomRule(element: HTMLElement | ArrayLike<HTMLElement>, rule: (input: ValidatableElement) => string, uniqueName?: string): void;
 	static removeCustomRule(element: HTMLElement | ArrayLike<HTMLElement>, uniqueName: string): void;
+	static readonly excludedModifierKeys: Set<string>;
 }
 export declare const addValidationRule: typeof Validator.addCustomRule;
 export declare const removeValidationRule: typeof Validator.removeCustomRule;
@@ -3103,7 +3104,6 @@ export declare function indexOf<TItem>(array: TItem[], predicate: (x: TItem) => 
 export declare function insert(obj: any, index: number, item: any): void;
 /**
  * Determines if the object is an array. Prefer Array.isArray over this function (e.g. `Array.isArray(obj)`).
- * @param obj Object to test.
  * @returns True if the object is an array.
  * @example
  * isArray([1, 2, 3]); // true
@@ -3503,8 +3503,6 @@ export declare let today: () => Date;
 /**
  * Deep clones an object or value.
  * @param a The value to clone.
- * @param a2 An optional second value to merge into the clone.
- * @param a3 An optional third value to merge into the clone.
  * @returns A deep clone of the input value.
  */
 export declare function deepClone<T = any>(a: T): T;
@@ -3750,7 +3748,7 @@ export interface GroupInfo<TItem> {
 	 * so never use or rely on ctx.value here!
 	 */
 	format?: (ctx: FormatterContext<Group<TItem>>) => FormatterResult;
-	/** @obsolete use format */
+	/** @deprecated use format */
 	formatter?: (group: Group<TItem>) => string;
 	comparer?: (a: Group<TItem>, b: Group<TItem>) => number;
 	aggregators?: IAggregator[];
@@ -3804,8 +3802,6 @@ export interface ArgsRowsOrCountChanged extends ArgsRemoteView {
 /**
  * A data view that supports remote data loading, sorting, filtering, grouping, and paging.
  * Extends the functionality of SleekGrid's DataView with server-side data operations.
- *
- * @typeparam TItem The type of entities in the view
  */
 export declare class RemoteView<TItem = any> implements IRemoteView<TItem> {
 	private contentType;
@@ -3842,50 +3838,26 @@ export declare class RemoteView<TItem = any> implements IRemoteView<TItem> {
 	private totalCount;
 	private totalRows;
 	private updated;
-	/** Additional parameters to send with service requests */
 	params: Record<string, any>;
-	/** The page number to seek to when loading data */
 	seekToPage: number;
-	/** Sort expressions for the data */
 	sortBy: string[];
-	/** The URL to fetch data from */
 	url: string;
-	/** Callback invoked before making AJAX calls */
 	onAjaxCall: RemoteViewAjaxCallback<TItem>;
-	/** Callback invoked to process data received from the server */
 	onProcessData: RemoteViewProcessCallback<TItem>;
-	/** Callback invoked before submitting a request, can cancel the operation */
 	onSubmit: CancellableViewCallback<TItem>;
-	/** Event fired when the underlying data changes */
 	readonly onDataChanged: EventEmitter<ArgsRemoteView, {}>;
-	/** Event fired when data loading completes */
 	readonly onDataLoaded: EventEmitter<ArgsRemoteView, {}>;
-	/** Event fired when data loading begins */
 	readonly onDataLoading: EventEmitter<ArgsRemoteView, {}>;
-	/** Event fired when a group is collapsed */
 	readonly onGroupCollapsed: EventEmitter<ArgsGroupToggle, {}>;
-	/** Event fired when a group is expanded */
 	readonly onGroupExpanded: EventEmitter<ArgsGroupToggle, {}>;
-	/** Event fired when paging information changes */
 	readonly onPagingInfoChanged: EventEmitter<ArgsPagingInfo, {}>;
-	/** Event fired when the row count changes */
 	readonly onRowCountChanged: EventEmitter<ArgsRowCountChanged, {}>;
-	/** Event fired when specific rows change */
 	readonly onRowsChanged: EventEmitter<ArgsRowsChanged, {}>;
-	/** Event fired when rows or count change */
 	readonly onRowsOrCountChanged: EventEmitter<ArgsRowsOrCountChanged, {}>;
 	constructor(options: RemoteViewOptions<TItem>);
 	/** Default configuration for grouping information */
 	static readonly groupingInfoDefaults: GroupInfo<any>;
-	/**
-	 * Begins a batch update operation. Multiple changes can be made without triggering refreshes.
-	 * Call endUpdate() to complete the batch and refresh the view.
-	 */
 	beginUpdate(): void;
-	/**
-	 * Ends a batch update operation. If this is the outermost endUpdate call,
-	 * refreshes the view to reflect all changes made during the batch.
-	 */
 	endUpdate(): void;
 	/**
 	 * Sets hints for the next refresh operation to optimize performance.
@@ -3894,118 +3866,28 @@ export declare class RemoteView<TItem = any> implements IRemoteView<TItem> {
 	setRefreshHints(hints: any): void;
 	private updateIdxById;
 	private ensureIdUniqueness;
-	/**
-	 * Gets all items in the view.
-	 * @returns Array of all items
-	 */
 	getItems(): TItem[];
-	/**
-	 * Gets the name of the property used as the unique identifier for items.
-	 * @returns The ID property name
-	 */
 	getIdPropertyName(): string;
-	/**
-	 * Sets the items in the view and optionally changes the ID property.
-	 * @param data Array of items to set
-	 * @param newIdProperty Optional new ID property name, or boolean to reset
-	 */
 	setItems(data: any[], newIdProperty?: string | boolean): void;
-	/**
-	 * Sets paging options and triggers a data reload if options changed.
-	 * @param args The paging options to set
-	 */
 	setPagingOptions(args: PagingOptions): void;
-	/**
-	 * Gets the current paging information.
-	 * @returns Object containing paging state information
-	 */
 	getPagingInfo(): PagingInfo;
 	private getSortComparer;
-	/**
-	 * Sorts the items using the specified comparer function.
-	 * @param comparer Optional custom comparer function
-	 * @param ascending Whether to sort in ascending order (default true)
-	 */
 	sort(comparer?: (a: any, b: any) => number, ascending?: boolean): void;
-	/**
-	 * Gets whether local sorting is enabled.
-	 * @returns true if local sorting is enabled
-	 */
 	getLocalSort(): boolean;
-	/**
-	 * Sets whether to use local sorting. When enabled, sorting is done client-side.
-	 * @param value Whether to enable local sorting
-	 */
 	setLocalSort(value: boolean): void;
-	/**
-	 * Re-sorts the items using the current sort settings.
-	 */
 	reSort(): void;
-	/**
-	 * Gets the filtered items (after applying the current filter).
-	 * @returns Array of filtered items
-	 */
 	getFilteredItems(): any[];
-	/**
-	 * Gets the current filter function.
-	 * @returns The current filter function
-	 */
 	getFilter(): RemoteViewFilter<TItem>;
-	/**
-	 * Sets the filter function to apply to items.
-	 * @param filterFn The filter function to apply
-	 */
 	setFilter(filterFn: RemoteViewFilter<TItem>): void;
-	/**
-	 * Gets the current grouping configuration.
-	 * @returns Array of grouping information
-	 */
 	getGrouping(): GroupInfo<TItem>[];
-	/**
-	 * Sets summary/aggregation options for the view.
-	 * @param summary Object containing aggregators and other summary options
-	 */
 	setSummaryOptions(summary: SummaryOptions): void;
-	/**
-	 * Gets the grand totals for all aggregated data.
-	 * @returns Object containing grand totals
-	 */
 	getGrandTotals(): IGroupTotals;
-	/**
-	 * Sets the grouping configuration for the view.
-	 * @param groupingInfo Grouping information or array of grouping information
-	 */
 	setGrouping(groupingInfo: GroupInfo<TItem> | GroupInfo<TItem>[]): void;
-	/**
-	 * Gets an item by its index in the items array.
-	 * @param i The index of the item
-	 * @returns The item at the specified index
-	 */
 	getItemByIdx(i: number): any;
-	/**
-	 * Gets the index of an item by its ID.
-	 * @param id The ID of the item
-	 * @returns The index of the item, or undefined if not found
-	 */
 	getIdxById(id: any): number;
 	private ensureRowsByIdCache;
-	/**
-	 * Gets the row index for an item.
-	 * @param item The item to find
-	 * @returns The row index of the item
-	 */
 	getRowByItem(item: any): number;
-	/**
-	 * Gets the row index for an item by its ID.
-	 * @param id The ID of the item
-	 * @returns The row index of the item
-	 */
 	getRowById(id: any): number;
-	/**
-	 * Gets an item by its ID.
-	 * @param id The ID of the item
-	 * @returns The item with the specified ID
-	 */
 	getItemById(id: any): TItem;
 	/**
 	 * Maps an array of items to their corresponding row indices.
@@ -4025,93 +3907,24 @@ export declare class RemoteView<TItem = any> implements IRemoteView<TItem> {
 	 * @returns Array of item IDs
 	 */
 	mapRowsToIds(rowArray: any[]): any[];
-	/**
-	 * Updates an existing item in the view.
-	 * @param id The ID of the item to update
-	 * @param item The new item data
-	 */
 	updateItem(id: any, item: any): void;
-	/**
-	 * Inserts an item at the specified position.
-	 * @param insertBefore The index to insert before
-	 * @param item The item to insert
-	 */
 	insertItem(insertBefore: number, item: any): void;
-	/**
-	 * Adds an item to the end of the items array.
-	 * @param item The item to add
-	 */
 	addItem(item: any): void;
-	/**
-	 * Deletes an item by its ID.
-	 * @param id The ID of the item to delete
-	 */
 	deleteItem(id: any): void;
-	/**
-	 * Adds an item in sorted order.
-	 * @param item The item to add
-	 */
 	sortedAddItem(item: any): void;
-	/**
-	 * Updates an item while maintaining sorted order.
-	 * @param id The ID of the item to update
-	 * @param item The new item data
-	 */
 	sortedUpdateItem(id: any, item: any): void;
 	private sortedIndex;
-	/**
-	 * Gets all rows in the view (including group rows and totals rows).
-	 * @returns Array of all rows
-	 */
 	getRows(): (TItem | Group<any> | GroupTotals<any>)[];
-	/**
-	 * Gets the total number of rows in the view.
-	 * @returns The number of rows
-	 */
 	getLength(): number;
-	/**
-	 * Gets the item at the specified row index.
-	 * @param i The row index
-	 * @returns The item at the row index
-	 */
 	getItem(i: number): any;
-	/**
-	 * Gets metadata for the item at the specified row index.
-	 * @param row The row index
-	 * @returns Metadata object or null
-	 */
 	getItemMetadata(row: number): any;
 	private expandCollapseAllGroups;
-	/**
-	 * Collapses all groups at the specified level, or all levels if not specified.
-	 * @param level Optional level to collapse. If not specified, applies to all levels.
-	 */
 	collapseAllGroups(level?: number): void;
-	/**
-	 * Expands all groups at the specified level, or all levels if not specified.
-	 * @param level Optional level to expand. If not specified, applies to all levels.
-	 */
 	expandAllGroups(level?: number): void;
 	private resolveLevelAndGroupingKey;
 	private expandCollapseGroup;
-	/**
-	 * Collapses a specific group.
-	 * @param constArgs Either a Slick.Group's "groupingKey" property, or a
-	 * constiable argument list of grouping values denoting a unique path to the row.
-	 * For example, calling collapseGroup('high', '10%') will collapse the '10%' subgroup of the 'high' group.
-	 */
 	collapseGroup(constArgs: any[]): void;
-	/**
-	 * Expands a specific group.
-	 * @param constArgs Either a Slick.Group's "groupingKey" property, or a
-	 * constiable argument list of grouping values denoting a unique path to the row.
-	 * For example, calling expandGroup('high', '10%') will expand the '10%' subgroup of the 'high' group.
-	 */
 	expandGroup(constArgs: any[]): void;
-	/**
-	 * Gets the current groups.
-	 * @returns Array of groups
-	 */
 	getGroups(): Group<TItem>[];
 	private getOrCreateGroup;
 	private extractGroups;
@@ -4124,11 +3937,6 @@ export declare class RemoteView<TItem = any> implements IRemoteView<TItem> {
 	private getFilteredAndPagedItems;
 	private getRowDiffs;
 	private recalc;
-	/**
-	 * Refresh the view by recalculating the rows and notifying changes.
-	 * Note that this does not re-fetch the data from the server, use populate
-	 * method for that purpose.
-	 */
 	refresh(): void;
 	/***
 	 * Wires the grid and the DataView together to keep row selection tied to item ids.
@@ -4149,40 +3957,12 @@ export declare class RemoteView<TItem = any> implements IRemoteView<TItem> {
 	 *     access to the full list selected row ids, and not just the ones visible to the grid.
 	 */
 	syncGridSelection(sleekGrid: ISleekGrid, preserveHidden?: boolean, preserveHiddenOnSelectionChange?: boolean): EventEmitter<any>;
-	/**
-	 * Syncs cell CSS styles between the grid and the data view.
-	 * @param grid The grid to sync styles with
-	 * @param key The style key to sync
-	 */
 	syncGridCellCssStyles(grid: ISleekGrid, key: string): void;
-	/**
-	 * Adds data received from the server to the view.
-	 * @param data The response data from the server
-	 */
 	addData(data: any): boolean;
-	/**
-	 * Loads data from the server using the configured URL and parameters.
-	 * @returns false if the operation was cancelled or no URL is configured
-	 */
 	populate(): boolean;
-	/**
-	 * Locks population to prevent automatic data loading.
-	 * Use this when you want to make multiple changes without triggering loads.
-	 */
 	populateLock(): void;
-	/**
-	 * Unlocks population. If there were pending populate calls while locked, executes them.
-	 */
 	populateUnlock(): void;
-	/**
-	 * Gets the group item metadata provider.
-	 * @returns The metadata provider
-	 */
 	getGroupItemMetadataProvider(): GroupItemMetadataProvider;
-	/**
-	 * Sets the group item metadata provider.
-	 * @param value The metadata provider to set
-	 */
 	setGroupItemMetadataProvider(value: GroupItemMetadataProvider): void;
 	/** @deprecated Gets the ID property name, for compatibility */
 	get idField(): string;
@@ -4287,6 +4067,11 @@ export interface IRemoteView<TItem = any> extends IDataView<TItem> {
 	 * @returns The current filter function
 	 */
 	getFilter?(): RemoteViewFilter<TItem>;
+	/**
+	 * Gets the filtered items (after applying the current filter).
+	 * @returns Array of filtered items
+	 */
+	getFilteredItems(): any[];
 	/**
 	 * Gets the current grouping configuration.
 	 * @returns Array of grouping information
@@ -4893,7 +4678,7 @@ export interface IDataGrid {
 	getFilterStore(): FilterStore;
 }
 export type ColumnPickerChangeArgs = {
-	toggledColumn: Column;
+	toggledColumns: Column[];
 	reorderedColumns: boolean;
 	restoredDefaults: boolean;
 };
@@ -4904,8 +4689,8 @@ export interface ColumnPickerDialogOptions {
 	dataGrid?: IDataGrid;
 	sleekGrid?: ISleekGrid;
 	onChange?: (args: ColumnPickerChangeArgs) => Promise<any>;
-	toggleColumn?: (columnId: string, show?: boolean) => void;
-	reorderColumns?: (columnIds: string[], setVisible?: string[]) => void;
+	toggleColumns?: (columnIds: string[], show?: boolean) => Column[];
+	reorderColumns?: (columnIds: string[], setVisible?: string[]) => boolean;
 }
 export declare class ColumnPickerDialog<P extends ColumnPickerDialogOptions = ColumnPickerDialogOptions> extends BaseDialog<P> {
 	static [Symbol.typeInfo]: ClassTypeInfo<"Serenity.">;
@@ -4914,16 +4699,19 @@ export declare class ColumnPickerDialog<P extends ColumnPickerDialogOptions = Co
 	private defaultOrder;
 	private defaultVisible;
 	private columns;
-	private reorderColumns;
-	private toggleColumn;
+	private reorderColumnsHandler;
+	private toggleColumnsHandler;
 	private toggleAllCheckbox;
 	private searchInput;
-	private onChange;
+	private onChangeHandler;
 	constructor(opt: P);
 	destroy(): void;
+	protected toggleColumns(columnIds: string[], show?: boolean): Column[];
+	protected onChange(args: ColumnPickerChangeArgs): PromiseLike<any>;
 	protected handleToggleClick(e: MouseEvent): void;
 	protected renderContents(): any;
 	protected createSearch(div: HTMLElement): void;
+	protected reorderColumns(columnIds: string[], setVisible?: string[], restoredDefaults?: boolean): void;
 	protected handleRestoreDefaults(): void;
 	protected handleToggleAllClick(): void;
 	protected updateToggleAllValue(): boolean;
@@ -5295,6 +5083,7 @@ export interface PersistedGridColumn {
 	pin?: "start" | "end" | false;
 }
 export interface PersistedGridSettings {
+	flags?: GridPersistenceFlags;
 	columns?: PersistedGridColumn[];
 	filterItems?: FilterLine[];
 	quickFilters?: {
@@ -5679,9 +5468,9 @@ export declare class DataGrid<TItem, P = {}> extends Widget<P> implements IDataG
 	get columns(): Column<TItem>[];
 	get initialSettings(): PersistedGridSettings;
 	protected set initialSettings(value: PersistedGridSettings);
-	/** @obsolete use defaultPersistenceStorage, this one has a typo */
+	/** @deprecated use defaultPersistenceStorage, this one has a typo */
 	static get defaultPersistanceStorage(): SettingStorage;
-	/** @obsolete use defaultPersistenceStorage, this one has a typo */
+	/** @deprecated use defaultPersistenceStorage, this one has a typo */
 	static set defaultPersistanceStorage(value: SettingStorage);
 }
 export interface DataGridEvent {
@@ -6348,9 +6137,10 @@ export declare class HtmlContentEditor<P extends HtmlContentEditorOptions = Html
 	constructor(props: EditorProps<P>);
 	protected instanceReady(x: any): void;
 	protected getLanguage(): string;
+	private triggerKeyupEvent;
 	protected getConfig(): CKEditorConfig;
 	protected getEditorInstance(): any;
-	overridedestroy(): void;
+	destroy(): void;
 	get_value(): string;
 	get value(): string;
 	set_value(value: string): void;
@@ -7254,7 +7044,7 @@ export declare class GridRadioSelectionMixin {
 	getSelectedAsInt32(): number;
 	getSelectedAsInt64(): number;
 	setSelectedKey(key: string): void;
-	static createSelectColumn(getMixin: () => GridRadioSelectionMixin): Column;
+	static createSelectColumn(getMixin: () => GridRadioSelectionMixin, columnOptions?: Partial<Column>): Column;
 }
 export interface GridRowSelectionMixinOptions {
 	selectable?: (item: any) => boolean;

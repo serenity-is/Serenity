@@ -1,4 +1,5 @@
-﻿import { ColumnPickerDialogTexts, Fluent } from "../../base";
+﻿import type { Column } from "@serenity-is/sleekgrid";
+import { ColumnPickerDialogTexts, Fluent } from "../../base";
 import { ColumnPickerDialog } from "./columnpickerdialog";
 
 afterEach(() => {
@@ -242,7 +243,7 @@ describe("ColumnPickerDialog", () => {
     });
 
     it("should toggle individual column visibility when checkbox is clicked", () => {
-        let toggledColumnId: string | undefined;
+        let toggledColumnIds: string[] | undefined;
 
         const dialog = new ColumnPickerDialog({
             columns: [
@@ -250,13 +251,18 @@ describe("ColumnPickerDialog", () => {
                 { id: "B", name: "Column B", visible: false },
                 { id: "C", name: "Column C", visible: true }
             ],
-            toggleColumn: (columnId: string, show?: boolean) => {
-                toggledColumnId = columnId;
+            toggleColumns: (columnIds: string[], show?: boolean) => {
+                toggledColumnIds = columnIds;
+                const toggledColumns: Column[] = [];
                 // Update the column's visible state (simulate the default behavior)
-                const column = dialog['colById'][columnId];
-                if (column) {
-                    column.visible = show ?? (column.visible === false);
+                for (const columnId of columnIds) {
+                    const column = dialog['colById'][columnId];
+                    if (column) {
+                        column.visible = show ?? (column.visible === false);
+                        toggledColumns.push(column);
+                    }
                 }
+                return toggledColumns;
             }
         });
 
@@ -271,12 +277,12 @@ describe("ColumnPickerDialog", () => {
 
         // Click on column A's checkbox to hide it
         inputs[0].click();
-        expect(toggledColumnId).toBe("A");
+        expect(toggledColumnIds).toEqual(["A"]);
         expect(dialog['colById']['A'].visible).toBe(false);
 
         // Click on column B's checkbox to show it
         inputs[1].click();
-        expect(toggledColumnId).toBe("B");
+        expect(toggledColumnIds).toEqual(["B"]);
         expect(dialog['colById']['B'].visible).toBe(true);
     });
 

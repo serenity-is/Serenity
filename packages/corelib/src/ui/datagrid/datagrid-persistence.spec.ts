@@ -45,7 +45,7 @@ describe("getCurrentSettings", () => {
             uniqueName: "TestGrid"
         });
 
-        expect(settings).toEqual({});
+        expect(settings).toEqual({ flags: omitAllGridPersistenceFlags});
     });
 
     it("captures column visibility when flag is true", () => {
@@ -55,9 +55,10 @@ describe("getCurrentSettings", () => {
             { id: "col3", visible: true }
         ];
         const grid = mockSleekGrid(columns);
+        const flags = { ...omitAllGridPersistenceFlags, columnVisibility: true };
         const settings = getCurrentSettings({
             filterStore: null,
-            flags: { ...omitAllGridPersistenceFlags, columnVisibility: true },
+            flags: flags,
             includeDeletedToggle: document.createElement("div"),
             quickFiltersDiv: Fluent(document.createElement("div")),
             sleekGrid: grid,
@@ -67,7 +68,7 @@ describe("getCurrentSettings", () => {
 
         expect(settings.columns).toEqual([
             { id: "col1", visible: true },
-            { id: "col2" },
+            { id: "col2", visible: false },
             { id: "col3", visible: true }
         ]);
     });
@@ -114,7 +115,7 @@ describe("getCurrentSettings", () => {
         });
 
         expect(settings.columns).toEqual([
-            { id: "col1" },
+            { id: "col1", pin: false },
             { id: "col2", pin: "start" },
             { id: "col3", pin: "end" }
         ]);
@@ -266,8 +267,8 @@ describe("getCurrentSettings", () => {
         // Should use defaults: persist columns, filters, etc. but not quickSearch/quickFilterText
         expect(settings.columns).toBeDefined();
         expect(settings.columns!.length).toBe(2);
-        expect(settings.columns![0]).toEqual({ id: "col1", visible: true, width: 100, pin: false }); // dummy pin added since columnPinning defaults to true
-        expect(settings.columns![1]).toEqual({ id: "col2", width: 200 }); // visible false is omitted since it's the default
+        expect(settings.columns![0]).toEqual({ id: "col1", visible: true, width: 100, pin: false });
+        expect(settings.columns![1]).toEqual({ id: "col2", visible: false, width: 200, pin: false });
         expect(settings.quickSearchField).toBeUndefined();
         expect(settings.quickSearchText).toBeUndefined();
     });

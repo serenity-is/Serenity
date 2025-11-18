@@ -629,7 +629,7 @@ export interface GridOptions<TItem = any> {
 	 */
 	columns?: Column<TItem>[];
 	/**
-	 * @obsolete Use showGroupingPanel option instead.
+	 * @deprecated Use showGroupingPanel option instead.
 	 */
 	createPreHeaderPanel?: boolean;
 	/**
@@ -800,7 +800,7 @@ export interface GridOptions<TItem = any> {
 	 */
 	multiSelect?: boolean;
 	/**
-	 * @obsolete Use groupingPanelHeight option instead.
+	 * @deprecated Use groupingPanelHeight option instead.
 	 */
 	preHeaderPanelHeight?: number;
 	/**
@@ -856,7 +856,7 @@ export interface GridOptions<TItem = any> {
 	 */
 	showHeaderRow?: boolean;
 	/**
-	 * @obsolete Use showGroupingPanel option instead.
+	 * @deprecated Use showGroupingPanel option instead.
 	 */
 	showPreHeaderPanel?: boolean;
 	/**
@@ -1628,7 +1628,7 @@ export declare class SleekGrid<TItem = any> implements ISleekGrid<TItem> {
 	private invalidatePostProcessingResults;
 	private updateRowPositions;
 	private updateGrandTotals;
-	render: () => void;
+	render(): void;
 	private handleHeaderFooterRowScroll;
 	private handleMouseWheel;
 	private handleScroll;
@@ -1840,7 +1840,7 @@ export interface GroupItemMetadataProviderOptions {
 	groupIndentation?: number;
 	groupFocusable?: boolean;
 	groupFormat?: ColumnFormat<Group>;
-	/** @deprecated see @use groupFormat */
+	/** @deprecated see groupFormat */
 	groupFormatter?: CompatFormatter<Group>;
 	groupLevelPrefix?: string;
 	groupRowTotals?: boolean;
@@ -1852,7 +1852,7 @@ export interface GroupItemMetadataProviderOptions {
 	totalsCssClass?: string;
 	totalsFocusable?: boolean;
 	totalsFormat?: ColumnFormat<IGroupTotals>;
-	/** @deprecated see @use totalsFormat */
+	/** @deprecated use totalsFormat */
 	totalsFormatter?: CompatFormatter<IGroupTotals>;
 }
 export declare class GroupItemMetadataProvider implements GridPlugin {

@@ -1,3 +1,25 @@
+## 9.1.6 (2025-11-18)
+
+### Features
+- Improve column picker dialog toggle all handling so that only one populate necessary when multiple columns are shown
+- Stored the used persistence flags in persisted grid settings.
+- Improve HTML content editor validation handling
+- Add getFilteredItems method to IRemoteView interface, remove comments from RemoteView methods that already has comments in IRemoteView
+- Bump glob to 12.0.0, vitest to 4.0.10, jsdom to 27.2.0
+- @serenity-is/tsbuild 9.1.6 with updated glob dependency
+
+### Bugfixes
+- Fix gridradioselectionmixin using html string
+
+## 9.1.5 (2025-11-17)
+
+### Features
+- Enhance type system for attributes and interfaces. Add CustomAttribute base class for extensible attribute support and attribute typing. Introduce AttributeSpecifier union type for flexible attribute specification (classes, instances, factories). Update registerClass, registerEditor, registerFormatter to handle AttributeSpecifier. No need to call Attributes.factoryFunction() as it will be called by registration helper automatically (e.g. `[Attributes.someAttr]` is enough). Similarly, new `SomeAttributeClass()` is not necessary when passing attributes.
+
+### Bugfixes
+- Potential this issue in setTimeout for asyncPostProcess
+- Fix wrong isImmediatePropagationStopped check in onDragInit causing inputs to not get focus in the grid
+
 ## 9.1.4 (2025-11-16)
 
 ### Features

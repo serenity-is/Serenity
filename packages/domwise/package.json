@@ -31,6 +31,7 @@
   ],
   "scripts": {
     "build": "node build/build",
+    "doc": "typedoc --plugin typedoc-plugin-markdown --exclude **/lib/**/* --excludePrivate --readme none --githubPages false --hidePageHeader --name @serenity-is/domwise --sourceLinkTemplate https://github.com/serenity-is/serenity/blob/master/{path}#L{line} --out /serenity-is/SerenityIs/SerenityIs.Web/Docs/api/js/domwise --json ./out/typedoc.json src",
     "dts": "dts-bundle-generator -o dist/index.d.ts src/index.ts --project=./tsconfig.json --no-banner --disable-symlinks-following --export-referenced-types=false --external-inlines=@preact/signals-core",
     "prepublishOnly": "pnpm build && pnpm run test --coverage && pnpm dts",
     "test": "pnpm build && vitest run",

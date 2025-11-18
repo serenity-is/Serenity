@@ -8,25 +8,22 @@ public partial class DoctorCommand(IProjectFileInfo project, IGeneratorConsole c
     IProcessExecutor processExecutor) 
     : BaseGeneratorCommand(project, console)
 {
-    static readonly Version RecommendedNodeVersion = new(20, 11, 0);
-    static readonly Version RecommendedNpmVersion = new(10, 8, 2);
+    static readonly Version RecommendedNodeVersion = new(24, 10, 0);
+    static readonly Version RecommendedNpmVersion = new(11, 6, 2);
 
     static readonly (Version, Version)[] RecommendedTSBuildVersion = [
         (new(0, 0, 0), new(8, 6, 0)),
         (new(8, 7, 1), new(8, 7, 4)),
         (new(8, 8, 4), new(8, 8, 4)),
         (new(8, 8, 6), new(8, 8, 6)),
-        (new(8, 8, 8), new(8, 8, 8))
+        (new(8, 8, 8), new(8, 8, 8)),
+        (new(9, 1, 6), new(9, 1, 6))
     ];
 
     static readonly (Version, Version)[] RecommendedJsxDomVersion = [
         (new(0, 0, 0), new(8, 1, 4)),
         (new(8, 6, 4), new(8, 1, 5)),
         (new(8, 8, 4), new(8, 1, 6))
-    ];
-
-    static readonly (Version, Version)[] RecommendedDomWiseVersion = [
-        (new (0, 0, 0), new(1, 0, 0))
     ];
 
     public IArgumentReader Arguments { get; set; }
@@ -377,7 +374,6 @@ public partial class DoctorCommand(IProjectFileInfo project, IGeneratorConsole c
         }
 
         CheckTSBuildVersion(packageJson, serenityVersion);
-        CheckJsxDomVersion(packageJson, serenityVersion);
     }
 
     void CheckTSBuildVersion(PackageJson packageJson, Version serenityVersion)
@@ -418,89 +414,6 @@ public partial class DoctorCommand(IProjectFileInfo project, IGeneratorConsole c
         else
         {
             Info("@serenity-is/tsbuild Version", version.ToString());
-        }
-    }
-
-    void CheckJsxDomVersion(PackageJson packageJson, Version serenityVersion)
-    {
-        if (packageJson.dependencies?.TryGetValue("jsx-dom", out var versionStr) != true &&
-            packageJson.devDependencies?.TryGetValue("jsx-dom", out versionStr) != true)
-        {
-            Warning($"jsx-dom package not found in package.json dependencies!");
-            return;
-        }
-
-        if (versionStr.StartsWith("./node_modules/.dotnet/", StringComparison.Ordinal))
-        {
-            Info("@serenity-is/domwise Version", versionStr);
-            return;
-        }
-
-        if (versionStr.StartsWith("workspace:", StringComparison.Ordinal))
-        {
-            Info("@serenity-is/domwise Version", versionStr);
-            return;
-        }
-
-        if (!Version.TryParse(versionStr, out Version version))
-        {
-            Warning($"Can't parse jsx-dom dependency version from package.json!");
-            return;
-        }
-
-        var recommendedVersion = RecommendedJsxDomVersion.LastOrDefault(x =>
-            serenityVersion >= x.Item1).Item2;
-
-        if (version != null && version < recommendedVersion)
-        {
-            Error($"jsx-dom version in package.json is {version}, " +
-                $"please update to {RecommendedJsxDomVersion} for better support.");
-        }
-        else if (version != null && version > recommendedVersion)
-        {
-            Warning($"The jsx-dom version in package.json is {version}, " +
-                $"which is newer than the recommended version {recommendedVersion} " +
-                $"for Serenity {serenityVersion}. Please check docs as it may include breaking changes.");
-        }
-        else
-        {
-            Info("jsx-dom Version", version.ToString());
-        }
-    }
-
-    
-    void CheckDomWiseVersion(PackageJson packageJson, Version serenityVersion)
-    {
-        if (packageJson.dependencies?.TryGetValue("@serenity-is/domwise", out var versionStr) != true &&
-            packageJson.devDependencies?.TryGetValue("@serenity-is/domwise", out versionStr) != true)
-        {
-            Warning($"@serenity-is/domwise package not found in package.json dependencies!");
-            return;
-        }
-
-        if (!Version.TryParse(versionStr, out Version version))
-        {
-            Warning($"Can't parse @serenity-is/domwise dependency version from package.json!");
-            return;
-        }
-
-        var recommendedVersion = RecommendedDomWiseVersion.LastOrDefault(x =>
-            serenityVersion >= x.Item1).Item2;
-
-        if (version != null && version < recommendedVersion)
-        {
-            Error($"@serenity-is/domwise version in package.json is {version}, " +
-                $"please update to {RecommendedDomWiseVersion} for better support.");
-        }
-        else if (version != null && version > recommendedVersion)
-        {
-            Warning($"The @serenity-is/domwise version in package.json is {version}, " +
-                $"which is newer than the recommended version {recommendedVersion} " +
-                $"for Serenity {serenityVersion}. Please check docs as it may include breaking changes.");
-        }
-        else
-        {
-            Info("@serenity-is/domwise Version", version.ToString());
         }
     }
 

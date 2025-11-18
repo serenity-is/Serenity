@@ -146,7 +146,7 @@ export function getElementReadOnly(el: Element): boolean | null {
 /**
  * Sets readonly class and disabled (for select, radio, checkbox) or readonly attribute (for other inputs) on given element.
  * It does not check for attached widgets.
- * @param el Element
+ * @param elements Element or array-like of elements
  * @param value Readonly state
  */
 export function setElementReadOnly(elements: Element | ArrayLike<Element>, value: boolean) {

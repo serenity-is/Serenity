@@ -12,7 +12,7 @@ import type { DataGrid } from "./datagrid";
 import { IDataGrid } from "./idatagrid";
 
 export type ColumnPickerChangeArgs = {
-    toggledColumn: Column;
+    toggledColumns: Column[];
     reorderedColumns: boolean;
     restoredDefaults: boolean;
 };
@@ -24,8 +24,8 @@ export interface ColumnPickerDialogOptions {
     dataGrid?: IDataGrid;
     sleekGrid?: ISleekGrid;
     onChange?: (args: ColumnPickerChangeArgs) => Promise<any>;
-    toggleColumn?: (columnId: string, show?: boolean) => void;
-    reorderColumns?: (columnIds: string[], setVisible?: string[]) => void;
+    toggleColumns?: (columnIds: string[], show?: boolean) => Column[];
+    reorderColumns?: (columnIds: string[], setVisible?: string[]) => boolean;
 }
 
 export class ColumnPickerDialog<P extends ColumnPickerDialogOptions = ColumnPickerDialogOptions> extends BaseDialog<P> {
@@ -37,11 +37,11 @@ export class ColumnPickerDialog<P extends ColumnPickerDialogOptions = ColumnPick
     declare private defaultOrder: string[];
     declare private defaultVisible: string[];
     declare private columns: Column[];
-    declare private reorderColumns: (columnIds: string[], setVisible?: string[]) => void;
-    declare private toggleColumn: (columnId: string, show?: boolean) => void;
+    declare private reorderColumnsHandler: (columnIds: string[], setVisible?: string[]) => boolean;
+    declare private toggleColumnsHandler: (columnIds: string[], show?: boolean) => Column[];
     declare private toggleAllCheckbox: HTMLInputElement;
     declare private searchInput: HTMLInputElement;
-    declare private onChange: (args: ColumnPickerChangeArgs) => PromiseLike<any>;
+    declare private onChangeHandler: (args: ColumnPickerChangeArgs) => PromiseLike<any>;
 
     constructor(opt: P) {
         super(opt);
@@ -76,32 +76,37 @@ export class ColumnPickerDialog<P extends ColumnPickerDialogOptions = ColumnPick
 
         const sleekGrid = opt.sleekGrid ?? opt.dataGrid?.getGrid();
 
-        this.toggleColumn = opt.toggleColumn ?? ((columnId: string, show?: boolean) => {
-            const column = this.colById[columnId];
-            if (!column)
-                return;
-            show ??= (column?.visible === false);
-            let shown = false;
-            if (column.visible === false && show) {
-                column.visible = true;
-                shown = true;
+        this.toggleColumnsHandler = opt.toggleColumns ?? ((columnIds: string[], show?: boolean) => {
+            const toggledColumns: Column[] = [];
+            for (let columnId of columnIds) {
+                const column = this.colById[columnId];
+                if (!column)
+                    continue;
+                show ??= (column?.visible === false);
+                if (column.visible === false && show) {
+                    column.visible = true;
+                }
+                else if (column.visible !== false && !show) {
+                    column.visible = false;
+                }
+                else
+                    continue;
+                toggledColumns.push(column);
             }
-            else if (column.visible !== false && !show) {
-                column.visible = false;
+            if (toggledColumns.length) {
+                sleekGrid?.invalidateColumns();
+                return toggledColumns;
             }
-            else
-                return;
-            sleekGrid?.invalidateColumns();
-            this.onChange({ toggledColumn: column, reorderedColumns: false, restoredDefaults: false });
         });
 
-        this.reorderColumns = opt.reorderColumns ?? ((columnIds: string[], setVisible?: string[]) => {
+        this.reorderColumnsHandler = opt.reorderColumns ?? ((columnIds: string[], setVisible?: string[]) => {
             sleekGrid?.reorderColumns(columnIds, { notify: true, setVisible });
+            return true;
         });
 
-        this.onChange = opt.onChange ?? (args => {
+        this.onChangeHandler = opt.onChange ?? (args => {
             const persistPromise = Promise.resolve((this.options.dataGrid as any)?.persistSettings?.());
-            if (args.toggledColumn?.visible !== false ||
+            if (args.toggledColumns?.some(c => c.visible !== false) ||
                 args.reorderedColumns ||
                 args.restoredDefaults) {
                 return persistPromise.then(() => {
@@ -119,24 +124,37 @@ export class ColumnPickerDialog<P extends ColumnPickerDialogOptions = ColumnPick
     }
 
     public override destroy() {
-        delete this.toggleColumn;
+        delete this.toggleColumnsHandler;
         delete this.colById;
         delete this.columns;
         delete this.defaultOrder;
         delete this.defaultVisible;
-        delete this.onChange;
-        delete this.reorderColumns;
+        delete this.onChangeHandler;
+        delete this.reorderColumnsHandler;
         delete this.searchInput;
         delete this.toggleAllCheckbox;
         this.element.off("click", this.handleToggleClick);
         super.destroy();
     }
 
+    protected toggleColumns(columnIds: string[], show?: boolean): Column[] {
+        const result = this.toggleColumnsHandler(columnIds, show);
+        if (result && result.length) {
+            this.onChange({ toggledColumns: result, reorderedColumns: false, restoredDefaults: false });
+        }
+        return result;
+    }
+
+    protected onChange(args: ColumnPickerChangeArgs): PromiseLike<any> {
+        return this.onChangeHandler(args);
+    }
+
     protected handleToggleClick(e: MouseEvent) {
         const columnId = (e.target as HTMLElement)?.closest("li")?.dataset.key;
         if (!columnId)
             return;
-        this.toggleColumn(columnId);
+
+        this.toggleColumns([columnId]);
 
         queueMicrotask(() => { // sortablejs somehow saves checked inputs on touch start, 
             // and restores them on destroy of any sortable instance, so we need to reapply checked states
@@ -183,9 +201,14 @@ export class ColumnPickerDialog<P extends ColumnPickerDialogOptions = ColumnPick
         this.searchInput = input.domNode;
     }
 
+    protected reorderColumns(columnIds: string[], setVisible?: string[], restoredDefaults?: boolean) {
+        if (this.reorderColumnsHandler(columnIds, setVisible)) {
+            this.onChange({ toggledColumns: null, reorderedColumns: true, restoredDefaults });
+        }
+    }
+
     protected handleRestoreDefaults() {
-        this.reorderColumns(this.defaultOrder, this.defaultVisible);
-        this.onChange({ toggledColumn: null, reorderedColumns: true, restoredDefaults: true });
+        this.reorderColumns(this.defaultOrder, this.defaultVisible, true);
 
         let liByKey: { [key: string]: HTMLElement } = {};
         Array.from(this.list.childNodes)
@@ -230,16 +253,18 @@ export class ColumnPickerDialog<P extends ColumnPickerDialogOptions = ColumnPick
 
     protected handleToggleAllClick() {
         const show = this.toggleAllCheckbox.checked;
+        const columnIds: string[] = [];
         this.list.querySelectorAll<HTMLInputElement>("li:not([hidden]) input.toggle-visibility:not([disabled])").forEach(input => {
             if (!!input.checked !== !!show) {
                 input.checked = show;
                 const li = input.closest("li");
                 const colId = li?.dataset.key;
                 if (colId) {
-                    this.toggleColumn(colId, show);
+                    columnIds.push(colId);
                 }
             }
         });
+        this.toggleColumns(columnIds, show);
         this.updateToggleAllValue();
     }
 
@@ -357,8 +382,7 @@ export class ColumnPickerDialog<P extends ColumnPickerDialogOptions = ColumnPick
             .map(li => (li as HTMLElement).dataset?.key)
             .filter(id => id != null);
 
-        this.reorderColumns(newOrder);
-        this.onChange({ toggledColumn: null, reorderedColumns: true, restoredDefaults: false });
+        this.reorderColumns(newOrder, null, false);
     }
 
     protected createColumnItems(): void {

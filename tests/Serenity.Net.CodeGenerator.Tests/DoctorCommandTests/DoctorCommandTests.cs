@@ -72,15 +72,15 @@ public partial class DoctorCommandTests
         public Dictionary<string, string> NpmDependencies { get; set; } = new()
         {
             ["@serenity-is/corelib"] = "./node_modules/.dotnet/serenity.corelib",
+            ["@serenity-is/domwise"] = "./node_modules/.dotnet/serenity.domwise",
             ["@serenity-is/extensions"] = "./node_modules/.dotnet/serenity.extensions",
             ["@serenity-is/pro.extensions"] = "./node_modules/.dotnet/serenity.pro.extensions",
-            ["@serenity-is/sleekgrid"] = "./node_modules/.dotnet/serenity.sleekgrid",
-            ["jsx-dom"] = "8.1.6"
+            ["@serenity-is/sleekgrid"] = "./node_modules/.dotnet/serenity.sleekgrid"
         };
 
         public Dictionary<string, string> NpmDevDependencies { get; set; } = new()
         {
-            ["@serenity-is/tsbuild"] = "8.8.8"
+            ["@serenity-is/tsbuild"] = "9.1.6"
         };
 
         public string SergenExtends { get; set; } = "defaults@9.0.0";
@@ -136,8 +136,8 @@ public partial class DoctorCommandTests
                 }));
         }
 
-        public string NodeVersion = "22.12.0";
-        public string NpmVersion = "10.9.1";
+        public string NodeVersion = "24.10.0";
+        public string NpmVersion = "11.6.2";
         
         internal static readonly string[] modulesIncludeArray = ["Modules"];
     }

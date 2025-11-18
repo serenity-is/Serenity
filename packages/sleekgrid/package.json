@@ -1,6 +1,6 @@
 {
   "name": "@serenity-is/sleekgrid",
-  "version": "2.0.2",
+  "version": "2.0.3",
   "description": "A modern Data Grid / Spreadsheet component",
   "type": "module",
   "types": "dist/index.d.ts",
@@ -30,7 +30,7 @@
   "scripts": {
     "build": "node build/build",
     "build:full": "node build/build --full",
-    "doc": "typedoc --plugin typedoc-plugin-markdown --exclude **/lib/**/* --excludePrivate --readme none --githubPages false --hidePageHeader --sourceLinkTemplate https://github.com/serenity-is/sleekgrid/blob/master/{path}#L{line} --readme none --out /serenity-is/SerenityIs/SerenityIs.Web/Docs/api/js/sleekgrid --json ./out/typedoc.json src",
+    "doc": "typedoc --plugin typedoc-plugin-markdown --exclude **/lib/**/* --excludePrivate --readme none --githubPages false --hidePageHeader --sourceLinkTemplate https://github.com/serenity-is/Serenity/blob/master/{path}#L{line} --readme none --out /serenity-is/SerenityIs/SerenityIs.Web/Docs/api/js/sleekgrid --json ./out/typedoc.json src",
     "dts": "dts-bundle-generator -o dist/index.d.ts src/index.ts --project=./tsconfig.json --no-banner --disable-symlinks-following",
     "prepublishOnly": "pnpm build:full && pnpm run test --coverage && pnpm dts",
     "test": "pnpm build && vitest run",
