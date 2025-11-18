@@ -1165,7 +1165,7 @@ export class DataGrid<TItem, P = {}> extends Widget<P> implements IDataGrid, IRe
                 filterStore: this.filterBar?.get_store(),
                 flags: event.flagsToUse,
                 includeDeletedToggle: this.domNode.querySelector('.s-IncludeDeletedToggle'),
-                quickFiltersDiv: this.quickFiltersDiv,
+                quickFiltersDiv: this.quickFiltersDiv?.getNode(),
                 sleekGrid: this._grid,
                 settings: event.settings,
                 toolbarNode: this.toolbar?.domNode,
@@ -1225,7 +1225,7 @@ export class DataGrid<TItem, P = {}> extends Widget<P> implements IDataGrid, IRe
             filterStore: this.filterBar?.get_store(),
             flags,
             includeDeletedToggle: this.domNode.querySelector('.s-IncludeDeletedToggle'),
-            quickFiltersDiv: this.quickFiltersDiv,
+            quickFiltersDiv: this.quickFiltersDiv?.getNode(),
             sleekGrid: this._grid,
             toolbarNode: this.toolbar?.domNode,
             uniqueName: this.uniqueName
