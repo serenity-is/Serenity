@@ -1,3 +1,8 @@
+## 9.1.7 (2025-11-1)
+
+### Bugfixes
+- Null flags issue when restoring persisted settings
+
 ## 9.1.6 (2025-11-18)
 
 ### Features
