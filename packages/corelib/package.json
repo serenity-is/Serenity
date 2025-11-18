@@ -39,7 +39,7 @@
   "repository": "https://github.com/serenity-is/serenity/packages/corelib",
   "scripts": {
     "build": "node build/build",
-    "doc": "typedoc --plugin typedoc-plugin-markdown --exclude **/lib/**/* --excludePrivate --readme none --githubPages false --hidePageHeader --tsconfig ./src/tsconfig.json --name corelib --sourceLinkTemplate https://github.com/serenity-is/serenity/blob/master/{path}#L{line} --out /serenity-is/SerenityIs/SerenityIs.Web/Docs/api/js/corelib --json ./out/typedoc.json src",
+    "doc": "typedoc --plugin typedoc-plugin-markdown --exclude **/lib/**/* --excludePrivate --readme none --githubPages false --hidePageHeader --tsconfig ./src/tsconfig.json --sourceLinkTemplate https://github.com/serenity-is/serenity/blob/master/{path}#L{line} --out /serenity-is/SerenityIs/SerenityIs.Web/Docs/api/js/corelib --json ./out/typedoc.json src",
     "dts": "tsc --build && dts-bundle-generator --project ./src/tsconfig.dts.json --disable-symlinks-following --export-referenced-types=false --inline-declare-externals --inline-declare-global --no-banner out/index.d.ts -o dist/index.d.ts",
     "prepublishOnly": "node build/build && pnpm run test --coverage && pnpm dts",
     "test": "pnpm build && vitest run",

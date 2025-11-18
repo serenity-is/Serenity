@@ -1262,9 +1262,9 @@ export class DataGrid<TItem, P = {}> extends Widget<P> implements IDataGrid, IRe
     public get initialSettings() { return this._initialSettings; }
     protected set initialSettings(value: PersistedGridSettings) { this._initialSettings = value; }
 
-    /** @obsolete use defaultPersistenceStorage, this one has a typo */
+    /** @deprecated use defaultPersistenceStorage, this one has a typo */
     public static get defaultPersistanceStorage(): SettingStorage { return DataGrid.defaultOptions.persistenceStorage; }
-    /** @obsolete use defaultPersistenceStorage, this one has a typo */
+    /** @deprecated use defaultPersistenceStorage, this one has a typo */
     public static set defaultPersistanceStorage(value: SettingStorage) { DataGrid.defaultOptions.persistenceStorage = value; }
 }
 

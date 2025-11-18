@@ -30,7 +30,7 @@ export interface GroupInfo<TItem> {
      * so never use or rely on ctx.value here!
      */
     format?: (ctx: FormatterContext<Group<TItem>>) => FormatterResult;
-    /** @obsolete use format */
+    /** @deprecated use format */
     formatter?: (group: Group<TItem>) => string;
     comparer?: (a: Group<TItem>, b: Group<TItem>) => number;
     aggregators?: IAggregator[];

@@ -38,8 +38,6 @@ export interface ArgsRowsOrCountChanged extends ArgsRemoteView {
 /**
  * A data view that supports remote data loading, sorting, filtering, grouping, and paging.
  * Extends the functionality of SleekGrid's DataView with server-side data operations.
- * 
- * @typeparam TItem The type of entities in the view
  */
 export class RemoteView<TItem = any> implements IRemoteView<TItem> {
     private contentType: string;
