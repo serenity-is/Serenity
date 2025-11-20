@@ -7027,6 +7027,7 @@ export declare function EditLink(props: {
 	 */
 	children?: any;
 }): HTMLAnchorElement;
+export declare const skipEditLinkFormatPurposes: Set<string>;
 export interface GridRadioSelectionMixinOptions {
 	selectable?: (item: any) => boolean;
 }
