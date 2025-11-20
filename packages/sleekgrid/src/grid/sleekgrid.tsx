@@ -2387,6 +2387,7 @@ export class SleekGrid<TItem = any> implements ISleekGrid<TItem> {
             row: row,
             colLeft: this._colLeft,
             colRight: this._colRight,
+            rtl: this._options.rtl,
             // row only args
             range: null,
             sbCenter: rowRendering ? [] : null,
@@ -2397,7 +2398,7 @@ export class SleekGrid<TItem = any> implements ISleekGrid<TItem> {
             cell: cell,
             colMetadata: null,
             colspan: null,
-            sb: rowRendering ? null : []
+            sb: rowRendering ? null : [],
         };
     }
 

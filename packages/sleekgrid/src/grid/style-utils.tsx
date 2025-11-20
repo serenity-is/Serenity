@@ -104,7 +104,7 @@ export function createCssRules(this: void, { opt, cellHeightDiff, colCount, cont
 } {
     const cellHeight = (opt.rowHeight - cellHeightDiff);
     const useCssVars = typeof opt.useCssVars === 'number' ? (colCount <= opt.useCssVars) :
-        opt.useCssVars ? colCount <= 50 : false;
+        opt.useCssVars ? colCount <= 100 : false;
 
     container.classList.toggle('sleek-vars', useCssVars);
 
@@ -199,6 +199,7 @@ export function applyColumnWidths(this: void, { cols, cssColRulesL, cssColRulesR
     refs: GridLayoutRefs,
 }): void {
     let x = 0, w, start = opts.rtl ? 'right' : 'left', end = opts.rtl ? 'left' : 'right',
+        startVar = opts.rtl ? '--r' : '--l', endVar = opts.rtl ? '--l' : '--r',
         styles = container.style;
 
     for (let c = 0; c < cols.length; c++) {
@@ -209,8 +210,8 @@ export function applyColumnWidths(this: void, { cols, cssColRulesL, cssColRulesR
         let startVal = x + "px";
         let endVal = (c <= refs.pinnedStartLast ? refs.start.canvasWidth : c >= refs.pinnedEndFirst ? refs.end.canvasWidth : refs.main.canvasWidth) - x - w + "px";
         if (!cssColRulesL) {
-            setStyleProp(styles, "--l" + c, startVal);
-            setStyleProp(styles, "--r" + c, endVal);
+            setStyleProp(styles, startVar + c, startVal);
+            setStyleProp(styles, endVar + c, endVal);
         }
         else {
             const ruleL = cssColRulesL[c];

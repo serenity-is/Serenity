@@ -2,10 +2,11 @@ import { formatterContext, type FormatterResult } from "../core/formatting";
 import { escapeHtml } from "../core/util";
 import type { CellRenderArgs } from "./render-args";
 
-export function renderCell<TItem>(this: void, { activeCell, activeRow, cell, cellCssClasses, colMetadata, colspan, grid, item, sb, row, frozenPinned, cachedRow }: CellRenderArgs<TItem>): void {
+export function renderCell<TItem>(this: void, { activeCell, activeRow, cell, cellCssClasses, colMetadata,
+    colspan, grid, item, sb, row, rtl, frozenPinned, cachedRow }: CellRenderArgs<TItem>): void {
     const cols = grid.getColumns();
     const column = cols[cell];
-    let klass = "slick-cell l" + cell + " r" + Math.min(cols.length - 1, cell + colspan - 1) +
+    let klass = "slick-cell" + (rtl ? " r" : " l") + cell + (rtl ? " l" : " r") + Math.min(cols.length - 1, cell + colspan - 1) +
         (column.cssClass ? " " + column.cssClass : "");
 
     if (cell <= frozenPinned.pinnedStartLast)

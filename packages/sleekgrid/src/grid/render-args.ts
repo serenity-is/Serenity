@@ -19,6 +19,7 @@ export interface RowCellCommonRenderArgs<TItem> {
     grid: ISleekGrid;
     item: TItem;
     row: number;
+    rtl: boolean;
 }
 
 export interface RowRenderArgs<TItem> extends RowCellCommonRenderArgs<TItem> {
