@@ -987,7 +987,7 @@ abstract class AbstractSelect2 {
 
         syncCssClasses(this.container, this.opts.element, this.opts.adaptContainerCssClass);
 
-        this.container.setAttribute("style", opts.element.getAttribute("style"));
+        Object.assign(this.container.style, opts.element.style);
         Object.assign(this.container.style, evaluate(opts.containerCss, this.opts.element));
         Fluent.addClass(this.container, evaluate(opts.containerCssClass, this.opts.element));
 

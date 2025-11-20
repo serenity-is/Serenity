@@ -3,25 +3,34 @@
 @inject ITextLocalizer Localizer
 @{
     ViewData["Title"] = AccessDeniedViewTexts.PageTitle.ToString(Localizer);
-ViewData["PageId"] = "AccessDenied";
-Layout = User.IsLoggedIn() ?
-    "~/Views/Shared/_Layout.cshtml" :
-    "~/Views/Shared/_LayoutNoNavigation.cshtml";
+    ViewData["PageId"] = "AccessDenied";
+    Layout = User.IsLoggedIn() ?
+        "~/Views/Shared/_Layout.cshtml" :
+        "~/Views/Shared/_LayoutNoNavigation.cshtml";
 }
+<style nonce="@Html.CspNonce()">
+.icon-cell {
+    width: 200px;
+}
+
+.icon-cell i {
+    font-size: 180px;
+}
+</style>
 
 <div class="page-content">
     <div class="message">
         <table>
             <tr>
-                <td style="width: 200px;">
-                    <i class="fa fa-times-circle text-red" style="font-size: 180px;"></i>
+                <td class="icon-cell">
+                    <i class="fa fa-times-circle text-red"></i>
                 </td>
                 <td>
                     <h1>@AccessDeniedViewTexts.PageTitle.ToString(Localizer)</h1>
                     <h3>@(User.IsLoggedIn() ? AccessDeniedViewTexts.LackPermissions.ToString(Localizer) : AccessDeniedViewTexts.NotLoggedIn.ToString(Localizer))</h3>
                     @if (Model != null)
                 {
-                    <a class="redirect" href="/Account/Login?returnURL=@Model">@(User.IsLoggedIn() ? 
+                    <a class="redirect" href="/Account/Login?returnURL=@Model">@(User.IsLoggedIn() ?
                         AccessDeniedViewTexts.ClickToChangeUser.ToString(Localizer) : AccessDeniedViewTexts.ClickToLogin.ToString(Localizer))</a>
                 }
                 else
@@ -35,6 +44,6 @@ Layout = User.IsLoggedIn() ?
                 </td>
             </tr>
         </table>
-        
+
     </div>
 </div>

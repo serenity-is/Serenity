@@ -1137,7 +1137,8 @@ export function iframeDialog(options: IFrameDialogOptions): Partial<Dialog> {
     function onOpen(div: HTMLElement) {
         if (div) {
             let iframe = div.appendChild(document.createElement('iframe'));
-            iframe.setAttribute("style", "border: none; width: 100%");
+            iframe.style.border = "none";
+            iframe.style.width = "100%";
             let content = sanitizeHtml(options.html);
             if (content.indexOf('<body') < 0)
                 content = "<body>" + content + "</body>";

@@ -27,7 +27,7 @@ export default function pageInit() {
     const warningClick = () => warningDialog("Hey, be careful!");
 
     const alertWithHtmlClick = () => alertDialog(
-        <div style="white-space: initial">
+        <div style={{ whiteSpace: "initial" }}>
             <h4>Here is some HTML content!</h4>
             <ul>
                 <li>Item 1</li>

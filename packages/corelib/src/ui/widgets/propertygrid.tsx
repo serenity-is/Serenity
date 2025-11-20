@@ -593,7 +593,7 @@ function setMaxLength(widget: Widget<any>, maxLength: number) {
 }
 
 function createLineBreak(klass: string): HTMLElement {
-    return <div class={klass} style="width: 100%" /> as HTMLElement;
+    return <div class={klass} style={{ width: "100%" }} /> as HTMLElement;
 }
 
 export enum PropertyGridMode {

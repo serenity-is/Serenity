@@ -33,11 +33,11 @@ export class EntityLocalizer {
             !pgOptions.items.some(x => x.localizable === true))
             return;
 
-        const localGridDiv = <div id={idPrefix + 'LocalizationGrid'} style="display: none" /> as HTMLDivElement;
+        const localGridDiv = <div id={idPrefix + 'LocalizationGrid'} hidden /> as HTMLDivElement;
         pgDiv.after(localGridDiv);
         const langs = this.options.getLanguages() || [];
 
-        this.targetLanguage = <select class="target-language ms-2" style="display: none">
+        this.targetLanguage = <select class="target-language ms-2" hidden>
             <option value="">--{localText("Site.Translation.TargetLanguage")}--</option>
             {langs.map(x => <option value={x.id}>{x.text}</option>)}
         </select> as HTMLSelectElement;

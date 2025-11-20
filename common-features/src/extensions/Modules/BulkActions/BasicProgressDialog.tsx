@@ -76,7 +76,7 @@ export class BasicProgressDialog<P = {}> extends BaseDialog<P> {
         return (
             <div class="s-DialogContent s-BasicProgressDialogContent">
                 <div id={id.StatusText} class="status-text" ></div>
-                <div id={id.Progress} class="progress" style="height: 1.5rem">
+                <div id={id.Progress} class="progress" style={{ height: "1.5rem" }}>
                     <div id={id.ProgressBar} class="progress-bar" aria-valuenow={0} aria-valuemin={0} aria-valuemax={100} ref={el => this.progressBar = el}></div>
                 </div>
             </div>

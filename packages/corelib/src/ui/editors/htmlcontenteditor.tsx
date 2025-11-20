@@ -232,9 +232,13 @@ export class HtmlContentEditor<P extends HtmlContentEditorOptions = HtmlContentE
         if (script) {
             return script.addEventListener("load", then);
         }
-
+        const nonce = 
+            document.head?.querySelector('meta[name="csp-nonce"]')?.getAttribute('content') ??
+            document.head?.querySelector('script[nonce]')?.getAttribute('nonce') ??
+            document.head?.querySelector('style[nonce]')?.getAttribute('nonce');
+            
         document.head.appendChild(
-            <script type="text/javascript" id="CKEditorScript" async={false} onLoad={then}
+            <script type="text/javascript" id="CKEditorScript" async={false} onLoad={then} nonce={nonce}
                 src={resolveUrl(HtmlContentEditor.getCKEditorBasePath() + 'ckeditor.js?v=' + HtmlContentEditor.CKEditorVer)}>
             </script>);
     };
