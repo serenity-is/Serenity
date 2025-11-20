@@ -880,9 +880,9 @@ export interface GridOptions<TItem = any> {
 	 */
 	useLegacyUI?: boolean;
 	/**
-	 * Defaults to `true` which is equivalent to 50. If `true`, uses CSS variables for styling (for up to 50 cols).
+	 * Defaults to `true` which is equivalent to 100. If `true`, uses CSS variables for styling (for up to 100 cols).
 	 * If set to a number, enables CSS variables only if column count is less than or equal to that number.
-	 * This is dependent on the stylesheet which only supports up to 50 columns by default.
+	 * This is dependent on the stylesheet which only supports up to 100 columns by default.
 	 * But if you defined your own stylesheet with more columns, you can set this to a higher number.
 	 */
 	useCssVars?: boolean | number;
