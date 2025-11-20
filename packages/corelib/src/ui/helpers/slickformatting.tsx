@@ -2,6 +2,7 @@ import { applyFormatterResultToCellNode, FormatterContext, FormatterResult } fro
 import { htmlEncode, sanitizeHtml } from "../../base";
 import { replaceAll } from "../../compat";
 import { Format, IRemoteView } from "../../slick";
+import { skipEditLinkFormatPurposes } from "./editlink";
 
 export namespace SlickFormatting {
     
@@ -20,9 +21,7 @@ export namespace SlickFormatting {
             fmtResult = fmtResult instanceof Node ? fmtResult : encode ? ctx.escape(fmtResult) : (fmtResult ?? '');
 
             if ((ctx.item as any)?.__nonDataRow ||
-                ctx.purpose === "group-header" ||
-                ctx.purpose === "group-totals" ||
-                ctx.purpose === "grand-totals") {
+                (ctx.purpose && skipEditLinkFormatPurposes.has(ctx.purpose))) {
                 return fmtResult;
             }
 

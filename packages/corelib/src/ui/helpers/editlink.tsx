@@ -50,3 +50,13 @@ export function EditLink(props: {
         {props.children}
     </a> as HTMLAnchorElement;
 }
+
+export const skipEditLinkFormatPurposes = new Set<string>([
+    "excel-export",
+    "group-header",
+    "group-totals",
+    "grand-totals",
+    "header-filter",
+    "pdf-export",
+    "print"
+]);
