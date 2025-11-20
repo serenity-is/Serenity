@@ -63,20 +63,12 @@ export namespace SlickFormatting {
                 }
             }
 
-            if (text instanceof Element) {
-                var fragment = document.createDocumentFragment();
-                fragment.appendChild(spacer);
-                fragment.appendChild(toggle);
-                fragment.appendChild(text);
-                return fragment;
+            if (ctx.enableHtmlRendering && typeof text === "string" && text.length) {
+                return (spacer.outerHTML + toggle.outerHTML + text);
             }
-            else if (text instanceof DocumentFragment) {
-                text.prepend(toggle);
-                text.prepend(spacer);
-                return text;
+            else {
+                return <>{spacer}{toggle}{text}</>
             }
-            else
-                return (spacer.outerHTML + toggle.outerHTML + (text ?? ""));
         };
     }
 }
