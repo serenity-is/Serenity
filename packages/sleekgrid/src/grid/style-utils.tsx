@@ -71,7 +71,7 @@ export function getMaxSupportedCssHeight(recalc?: boolean): number {
 
 export function getScrollBarDimensions(recalc?: boolean): { width: number; height: number; } {
     if (!scrollbarDimensions || recalc) {
-        const c = document.body.appendChild(<div style="position:absolute;top:-10000px;left:-10000px;width:100px;height:100px;overflow: scroll;border:0" /> as HTMLElement);
+        const c = document.body.appendChild(<div style={{ position: "absolute", top: "-10000px", left: "-10000px", width: "100px", height: "100px", overflow: "scroll", border: "0" }} /> as HTMLElement);
         scrollbarDimensions = {
             width: Math.round(c.offsetWidth - c.clientWidth),
             height: Math.round(c.offsetWidth - c.clientHeight)
@@ -96,7 +96,7 @@ export function createCssRules(this: void, { opt, cellHeightDiff, colCount, cont
     cellHeightDiff: number,
     colCount: number,
     container: HTMLElement,
-    opt: { useCssVars?: boolean | number, rowHeight?: number },
+    opt: { styleNonce?: string, useCssVars?: boolean | number, rowHeight?: number },
     scrollDims: { width: number, height: number },
     uid: string
 }): {
@@ -118,10 +118,19 @@ export function createCssRules(this: void, { opt, cellHeightDiff, colCount, cont
     }
 
     const styleNode = document.createElement('style');
+    const nonce = opt.styleNonce ??
+        document.head?.querySelector('meta[name="csp-nonce"]')?.getAttribute('content') ??
+        document.head?.querySelector('style[nonce]')?.getAttribute('nonce') ??
+        document.head?.querySelector('script[nonce]')?.getAttribute('nonce');
+
     styleNode.dataset.uid = uid;
+    if (nonce)
+        styleNode.nonce = nonce;
+
     const rules = [
         "." + uid + " { " +
-        "--sg-cell-height: " + opt.rowHeight + "px; " +
+        "--sg-row-height: " + opt.rowHeight + "px; " +
+        "--sg-cell-height: " + cellHeight + "px; " +
         "--sg-scrollbar-w: " + scrollDims.width + "px; " +
         "--sg-scrollbar-h: " + scrollDims.height + "px; " +
         "}",

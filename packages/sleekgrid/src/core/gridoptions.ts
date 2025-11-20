@@ -365,6 +365,13 @@ export interface GridOptions<TItem = any> {
     suppressActiveCellChangeOnEdit?: boolean;
 
     /**
+     * Nonce value for CSP (Content Security Policy) when `useCssVars` is `false`. Applied to the dynamically
+     * created `<style>` element to allow inline CSS injection without violating CSP rules.
+     * If not provided, the grid will attempt to detect a nonce from a meta element with `csp-nonce` name or from existing `<style>` or `<script>` elements on the page.
+     */
+    styleNonce?: string;
+
+    /**
      * Defaults to `false`. If `true`, synchronizes column resizing with cell resizing.
      */
     syncColumnCellResize?: boolean;
@@ -384,6 +391,10 @@ export interface GridOptions<TItem = any> {
      * If set to a number, enables CSS variables only if column count is less than or equal to that number.
      * This is dependent on the stylesheet which only supports up to 100 columns by default.
      * But if you defined your own stylesheet with more columns, you can set this to a higher number.
+     *
+     * If set to `false`, uses a dynamic `<style>` element (with optional `styleNonce` for CSP) to inject CSS rules
+     * for positioning, avoiding inline styles entirely.
+     *
      */
     useCssVars?: boolean | number;
 

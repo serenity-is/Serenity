@@ -8,6 +8,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no" />
 <meta name="username" content="@User?.Identity?.Name" />
 @*<meta http-equiv="Content-Security-Policy" content="base-uri 'self'; default-src 'self'; img-src data: https: 'self'; object-src 'none'; script-src 'nonce-@nonce' 'self'; style-src 'unsafe-inline' 'self'; connect-src 'self' http: ws: wss:; upgrade-insecure-requests;" />*@
+<meta name="csp-nonce" content="@nonce" />
 <link rel="home" id="ApplicationPath" href="~/" />
 <link rel="icon" type="image/x-icon" href="~/favicon.ico" />
 @Html.StyleBundle("Base")
