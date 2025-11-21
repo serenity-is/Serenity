@@ -147,6 +147,11 @@ export declare const Config: {
 	 */
 	applicationPath: string;
 	/**
+	 * Gets the content Security Policy nonce value to be used in script/style tags. This is usually set from server side
+	 * via a meta tag with name "csp-nonce".
+	 */
+	cspNonce: string;
+	/**
 	 * Gets a default return URL for the application. This is used when a return URL is not specified
 	 * @param purpose Optional purpose for the return URL, for example "login" or "logout"
 	 */
@@ -181,6 +186,7 @@ export declare const Config: {
 	notLoggedInHandler: Function;
 };
 export declare function resetApplicationPath(): void;
+export declare function resetCspNonce(): void;
 /**
  * CriteriaBuilder is a class that allows to build unary or binary criteria with completion support.
  */
