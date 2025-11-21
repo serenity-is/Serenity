@@ -71,6 +71,7 @@ export * from "./ui/editors/servicelookupeditor";
 export * from "./ui/editors/stringeditor";
 export * from "./ui/editors/textareaeditor";
 export * from "./ui/editors/timeeditor";
+export * from "./ui/editors/tiptapeditor";
 export * from "./ui/editors/uploadeditors";
 export * from "./ui/editors/urleditor";
 export * from "./ui/filtering/baseeditorfiltering";

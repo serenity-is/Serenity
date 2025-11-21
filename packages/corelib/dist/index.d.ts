@@ -6471,6 +6471,44 @@ export declare class TimeSpanEditor<P extends TimeSpanEditorOptions = TimeSpanEd
 	get value(): string;
 	set value(value: string);
 }
+export interface HtmlTipTapEditorOptions {
+	cols?: number;
+	rows?: number;
+}
+export interface TipTapArgs {
+	element: HTMLElement;
+	extensions: any[];
+	content?: string;
+	editable?: boolean;
+	textDirection?: "ltr" | "rtl" | "auto";
+	injectCss?: boolean;
+	injectNonce?: string;
+	editorProps?: any;
+	parseOptions?: any;
+}
+export interface TipTapExtension {
+}
+export interface TipTapModule {
+	Editor: {
+		new (args: TipTapArgs): any;
+	};
+	StarterKit?: TipTapExtension;
+}
+export declare class TipTapEditor<P extends HtmlTipTapEditorOptions = HtmlTipTapEditorOptions> extends EditorWidget<P> implements IStringValue, IReadOnly {
+	static [Symbol.typeInfo]: EditorTypeInfo<"Serenity.">;
+	readonly domNode: HTMLTextAreaElement;
+	static createDefaultElement(): HTMLDivElement;
+	static tipTapModule: TipTapModule | (() => (TipTapModule | Promise<TipTapModule>));
+	private tipTapElement;
+	constructor(props: EditorProps<P>);
+	destroy(): void;
+	get_value(): string;
+	get value(): string;
+	set_value(value: string): void;
+	set value(v: string);
+	get_readOnly(): boolean;
+	set_readOnly(value: boolean): void;
+}
 export declare namespace UploadHelper {
 	function addUploadInput(options: UploadInputOptions): Fluent;
 	function checkImageConstraints(file: UploadResponse, opt: FileUploadConstraints): boolean;
