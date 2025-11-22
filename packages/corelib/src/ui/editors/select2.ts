@@ -987,7 +987,21 @@ abstract class AbstractSelect2 {
 
         syncCssClasses(this.container, this.opts.element, this.opts.adaptContainerCssClass);
 
-        this.container.setAttribute("style", opts.element.getAttribute("style"));
+// Copy safe computed styles to avoid CSP issues with inline styles
+const computedStyle = getComputedStyle(opts.element);
+const safeProperties = [
+    'width', 'height', 'min-width', 'min-height', 'max-width', 'max-height',
+    'margin', 'margin-top', 'margin-right', 'margin-bottom', 'margin-left',
+    'padding', 'padding-top', 'padding-right', 'padding-bottom', 'padding-left',
+    'border', 'border-width', 'border-style', 'border-color',
+    'border-top', 'border-right', 'border-bottom', 'border-left',
+    'border-top-width', 'border-right-width', 'border-bottom-width', 'border-left-width',
+    'border-top-style', 'border-right-style', 'border-bottom-style', 'border-left-style',
+    'border-top-color', 'border-right-color', 'border-bottom-color', 'border-left-color',
+    'box-sizing', 'display', 'position', 'float', 'clear'
+];
+
+        copyStyle(this.container.style, this.opts.element.style);
         Object.assign(this.container.style, evaluate(opts.containerCss, this.opts.element));
         Fluent.addClass(this.container, evaluate(opts.containerCssClass, this.opts.element));
 
@@ -3657,3 +3671,24 @@ class MultiSelect2 extends AbstractSelect2 {
 function handleDropdownTrap(e: Event) {
     e.stopPropagation();
 }
+
+const safeStyleProperties = [
+    'width', 'height', 'min-width', 'min-height', 'max-width', 'max-height',
+    'margin', 'margin-top', 'margin-right', 'margin-bottom', 'margin-left',
+    'padding', 'padding-top', 'padding-right', 'padding-bottom', 'padding-left',
+    'border', 'border-width', 'border-style', 'border-color',
+    'border-top', 'border-right', 'border-bottom', 'border-left',
+    'border-top-width', 'border-right-width', 'border-bottom-width', 'border-left-width',
+    'border-top-style', 'border-right-style', 'border-bottom-style', 'border-left-style',
+    'border-top-color', 'border-right-color', 'border-bottom-color', 'border-left-color',
+    'box-sizing', 'display', 'position', 'float', 'clear'
+];
+
+function copyStyle(from: CSSStyleDeclaration, to: CSSStyleDeclaration) {
+    for (var prop of safeStyleProperties) {
+        if (from.getPropertyValue(prop)) {
+            to.setProperty(prop, from.getPropertyValue(prop));
+        }
+    }
+}
+    

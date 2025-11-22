@@ -5,7 +5,7 @@ import { renderCell } from "./render-cell";
 
 export function renderRow<TItem>(this: void, args: RowRenderArgs<TItem>): void {
 
-    const { activeRow, colLeft, colRight, grid, item, getRowTop, frozenPinned, range, row, sbStart, sbCenter, sbEnd } = args;
+    const { activeRow, colLeft, colRight, grid, item, frozenPinned, range, row, sbStart, sbCenter, sbEnd } = args;
     const { pinnedStartLast, pinnedEndFirst, frozenTopLast, frozenBottomFirst } = frozenPinned;
     const dataLoading = row < grid.getDataLength() && !item;
     const cols = grid.getColumns();
@@ -24,7 +24,7 @@ export function renderRow<TItem>(this: void, args: RowRenderArgs<TItem>): void {
         rowCss += " " + itemMetadata.cssClasses;
     }
 
-    const rowTag = `<div class="${escapeHtml(rowCss)}" style="top: ${getRowTop(row)}px" data-row="${row}">`;
+    const rowTag = `<div class="${escapeHtml(rowCss)}" data-row="${row}">`;
 
     sbCenter.push(rowTag);
 

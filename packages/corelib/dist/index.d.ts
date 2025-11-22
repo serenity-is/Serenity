@@ -147,6 +147,11 @@ export declare const Config: {
 	 */
 	applicationPath: string;
 	/**
+	 * Gets the content Security Policy nonce value to be used in script/style tags. This is usually set from server side
+	 * via a meta tag with name "csp-nonce".
+	 */
+	cspNonce: string;
+	/**
 	 * Gets a default return URL for the application. This is used when a return URL is not specified
 	 * @param purpose Optional purpose for the return URL, for example "login" or "logout"
 	 */
@@ -181,6 +186,7 @@ export declare const Config: {
 	notLoggedInHandler: Function;
 };
 export declare function resetApplicationPath(): void;
+export declare function resetCspNonce(): void;
 /**
  * CriteriaBuilder is a class that allows to build unary or binary criteria with completion support.
  */
@@ -2541,6 +2547,50 @@ declare namespace webTexts {
 			const ThenBy: string;
 			const ValueRequired: string;
 		}
+		namespace HtmlContentEditor {
+			function asKey(): typeof HtmlContentEditor;
+			function asTry(): typeof HtmlContentEditor;
+			const AlignCenter: string;
+			const AlignJustify: string;
+			const AlignLeft: string;
+			const AlignRight: string;
+			const BackgroundColor: string;
+			const Bold: string;
+			const Copy: string;
+			const Cut: string;
+			const FindAndReplace: string;
+			const Font: string;
+			const FontSize: string;
+			const Format: string;
+			const HeadingLevel: string;
+			const HorizontalRule: string;
+			const Hyperlink: string;
+			const Indent: string;
+			const InlineCode: string;
+			const InsertImage: string;
+			const InsertTable: string;
+			const Italic: string;
+			const Maximize: string;
+			const NormalText: string;
+			const OrderedList: string;
+			const Outdent: string;
+			const Paste: string;
+			const PasteAsPlainText: string;
+			const PasteFromWord: string;
+			const Redo: string;
+			const RemoveFormat: string;
+			const RemoveHeading: string;
+			const RemoveHyperlink: string;
+			const StrikeThrough: string;
+			const Subscript: string;
+			const Superscript: string;
+			const TextColor: string;
+			const ToggleHeading: string;
+			const Underline: string;
+			const Undo: string;
+			const UnorderedList: string;
+			const ViewSource: string;
+		}
 		namespace Pager {
 			function asKey(): typeof Pager;
 			function asTry(): typeof Pager;
@@ -2591,6 +2641,7 @@ declare namespace webTexts {
 		const MaximizeHint: string;
 		const NoButton: string;
 		const OkButton: string;
+		const Prompt: string;
 		const RestoreHint: string;
 		const SuccessTitle: string;
 		const WarningTitle: string;
@@ -2633,6 +2684,7 @@ export declare const EntityDialogTexts: typeof webTexts.Controls.EntityDialog;
 export declare const EntityGridTexts: typeof webTexts.Controls.EntityGrid;
 export declare const FilterPanelTexts: typeof webTexts.Controls.FilterPanel;
 export declare const FormValidationTexts: typeof webTexts.Validation;
+export declare const HtmlContentEditorTexts: typeof webTexts.Controls.HtmlContentEditor;
 export declare const PagerTexts: typeof webTexts.Controls.Pager;
 export declare const PropertyGridTexts: typeof webTexts.Controls.PropertyGrid;
 export declare const QuickSearchTexts: typeof webTexts.Controls.QuickSearch;
@@ -6123,23 +6175,69 @@ export declare class EnumEditor<P extends EnumEditorOptions = EnumEditorOptions>
 	protected updateItems(): void | PromiseLike<void>;
 	protected allowClear(): boolean;
 }
+export interface TiptapModule {
+	Editor: any;
+	StarterKit?: any;
+	TextAlign?: any;
+}
+export interface TiptapToolbarHiddenOption {
+	alignment?: boolean;
+	alignmentJustify?: boolean;
+	blockquote?: boolean;
+	boldItalicUnderline?: boolean;
+	inlineCode?: boolean;
+	headings?: boolean;
+	image?: boolean;
+	link?: boolean;
+	listOptions?: boolean;
+	strike?: boolean;
+	superSubScript?: boolean;
+	undoRedo?: boolean;
+}
+export interface TiptapToolbarHiddenOption {
+	alignment?: boolean;
+	alignmentJustify?: boolean;
+	blockquote?: boolean;
+	boldItalicUnderline?: boolean;
+	inlineCode?: boolean;
+	headings?: boolean;
+	image?: boolean;
+	link?: boolean;
+	listOptions?: boolean;
+	strike?: boolean;
+	superSubScript?: boolean;
+	undoRedo?: boolean;
+}
+export type HtmlContentEditorProvider = "ckeditor" | "tiptap";
 export interface HtmlContentEditorOptions {
 	cols?: number;
 	rows?: number;
+	editorProvider?: HtmlContentEditorProvider;
 }
 export interface CKEditorConfig {
 }
 export declare class HtmlContentEditor<P extends HtmlContentEditorOptions = HtmlContentEditorOptions> extends EditorWidget<P> implements IStringValue, IReadOnly {
 	static [Symbol.typeInfo]: EditorTypeInfo<"Serenity.">;
-	private _instanceReady;
+	private _ckInstanceReady;
 	readonly domNode: HTMLTextAreaElement;
+	static tiptapModule: TiptapModule | (() => (TiptapModule | Promise<TiptapModule>));
+	private tiptapEditor;
+	private tiptapElement;
 	static createDefaultElement(): HTMLTextAreaElement;
+	static defaultEditorProvider: HtmlContentEditorProvider;
+	static readonly defaultOptions: Partial<HtmlContentEditorOptions>;
 	constructor(props: EditorProps<P>);
-	protected instanceReady(x: any): void;
-	protected getLanguage(): string;
+	protected handleCKInstanceReady(x: any): void;
+	protected handleCKEditorChange(e: any): void;
+	protected handleCKKey(e: any): void;
+	protected getCKEditorLanguage(): string;
 	private triggerKeyupEvent;
-	protected getConfig(): CKEditorConfig;
-	protected getEditorInstance(): any;
+	protected getCKEditorConfig(): CKEditorConfig;
+	protected getCKEditorInstance(): any;
+	protected getTiptapStarterKit(tiptap: TiptapModule): any;
+	protected getTiptapExtensions(tiptap: TiptapModule): any[];
+	/** Can be overridden to hide some buttons even though they are registered in extensions */
+	protected getTiptapToolbarHidden(editor: any): TiptapToolbarHiddenOption;
 	destroy(): void;
 	get_value(): string;
 	get value(): string;
@@ -6151,14 +6249,28 @@ export declare class HtmlContentEditor<P extends HtmlContentEditorOptions = Html
 	static CKEditorBasePath: string;
 	static getCKEditorBasePath(): string;
 	static includeCKEditor(then: () => void): void;
+	get editorProvider(): HtmlContentEditorProvider;
 }
+/** Html content editor variant for notes with limited toolbar options, e.g. undo redo and bold / italic / underline for now */
 export declare class HtmlNoteContentEditor<P extends HtmlContentEditorOptions = HtmlContentEditorOptions> extends HtmlContentEditor<P> {
 	static [Symbol.typeInfo]: EditorTypeInfo<"Serenity.">;
-	protected getConfig(): CKEditorConfig;
+	constructor(props: EditorProps<P>);
+	protected getCKEditorConfig(): CKEditorConfig;
+	protected getTiptapExtensions(tiptap: TiptapModule): any[];
+	protected getTiptapStarterKit(tiptap: TiptapModule): any;
 }
+/**
+ * This is originally was intended to be a subset more compatible with reports,
+ * which was necessary as most report rendering engines had limited HTML/CSS support.
+ * We will revisit this if needed in future.
+ */
 export declare class HtmlReportContentEditor<P extends HtmlContentEditorOptions = HtmlContentEditorOptions> extends HtmlContentEditor<P> {
 	static [Symbol.typeInfo]: EditorTypeInfo<"Serenity.">;
-	protected getConfig(): CKEditorConfig;
+	constructor(props: EditorProps<P>);
+	protected getCKEditorConfig(): CKEditorConfig;
+	protected getTiptapToolbarHidden(editor: any): TiptapToolbarHiddenOption;
+	protected getTiptapExtensions(tiptap: TiptapModule): any[];
+	protected getTiptapStarterKit(tiptap: TiptapModule): any;
 }
 export interface IntegerEditorOptions {
 	minValue?: number;
@@ -7027,6 +7139,7 @@ export declare function EditLink(props: {
 	 */
 	children?: any;
 }): HTMLAnchorElement;
+export declare const skipEditLinkFormatPurposes: Set<string>;
 export interface GridRadioSelectionMixinOptions {
 	selectable?: (item: any) => boolean;
 }

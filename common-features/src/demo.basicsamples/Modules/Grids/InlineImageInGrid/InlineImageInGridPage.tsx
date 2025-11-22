@@ -24,7 +24,7 @@ export class InlineImageFormatter implements Formatter, IInitializeColumn {
         }
 
         return <a class="inline-image" target="_blank" href={resolveUrl("~/upload/" + file)}>
-            <img src={resolveUrl('~/upload/' + file)} style="max-height: 145px; max-width: 100%" /></a>;
+            <img src={resolveUrl('~/upload/' + file)} style={{ maxHeight: "145px", maxWidth: "100%" }} /></a>;
     }
 
     initializeColumn(column: Column): void {

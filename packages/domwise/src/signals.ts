@@ -28,3 +28,21 @@ export const untracked: (<T>(fn: () => T) => T) = signals.untracked;
 export function useSignal<T>(initialValue: T): Signal<T> {
     return signal(initialValue);
 }
+
+/** Creates a factory for computed signals that can be manually updated as a batch */
+export function useUpdatableComputed() {
+    const updater = signal(0);
+    
+    const factory = <T, >(fn: () => T): Computed<T> => {
+        return computed(() => {
+            updater.value;
+            return fn();
+        });
+    };
+    
+    const update = () => {
+        updater.value++;
+    };
+    
+    return { computed: factory, update };
+}

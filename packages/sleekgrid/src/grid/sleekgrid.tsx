@@ -215,7 +215,6 @@ export class SleekGrid<TItem = any> implements ISleekGrid<TItem> {
         else
             this._container.classList.add('ltr');
 
-
         const { signals, refs } = createGridSignalsAndRefs();
         this._refs = refs;
         this._mapBands = mapBands.bind(null, refs);
@@ -1069,7 +1068,7 @@ export class SleekGrid<TItem = any> implements ISleekGrid<TItem> {
         const h = ["border-left-width", "border-right-width", "padding-left", "padding-right"];
         const v = ["border-top-width", "border-bottom-width", "padding-top", "padding-bottom"];
 
-        let el = this._refs.main.headerCols.appendChild(<div class="slick-header-column" style="visibility: hidden" /> as HTMLElement);
+        let el = this._refs.main.headerCols.appendChild(<div class="slick-header-column" style={{ visibility: "hidden" }} /> as HTMLElement);
         this._headerColumnWidthDiff = 0;
         let cs = getComputedStyle(el);
         if (cs.boxSizing != "border-box")
@@ -1077,7 +1076,7 @@ export class SleekGrid<TItem = any> implements ISleekGrid<TItem> {
         el.remove();
 
         const r = this.getCanvasNode().appendChild(<div class="slick-row">
-            {el = <div class="slick-cell" id="" style="visibility: hidden" /> as HTMLElement};
+            {el = <div class="slick-cell" id="" style={{ visibility: "hidden" }} /> as HTMLElement};
         </div>);
         el.innerHTML = "-";
         this._cellWidthDiff = this._cellHeightDiff = 0;
@@ -2387,6 +2386,7 @@ export class SleekGrid<TItem = any> implements ISleekGrid<TItem> {
             row: row,
             colLeft: this._colLeft,
             colRight: this._colRight,
+            rtl: this._options.rtl,
             // row only args
             range: null,
             sbCenter: rowRendering ? [] : null,
@@ -2397,7 +2397,7 @@ export class SleekGrid<TItem = any> implements ISleekGrid<TItem> {
             cell: cell,
             colMetadata: null,
             colspan: null,
-            sb: rowRendering ? null : []
+            sb: rowRendering ? null : [],
         };
     }
 
@@ -2448,9 +2448,14 @@ export class SleekGrid<TItem = any> implements ISleekGrid<TItem> {
             function append(canvas: GridBandRefs["canvas"], rowNode: HTMLElement) {
                 canvas[row <= frozenTopLast ? "top" : row >= frozenBottomFirst ? "bottom" : "body"]?.appendChild(rowNode);
             }
+
             (cache.rowNodeS = s.firstElementChild as HTMLElement) && pinnedStart && append(start.canvas, cache.rowNodeS);
             (cache.rowNodeC = c.firstElementChild as HTMLElement) && append(main.canvas, cache.rowNodeC);
             (cache.rowNodeE = e.firstElementChild as HTMLElement) && pinnedEnd && append(end.canvas, cache.rowNodeE);
+            const rowTop = args.getRowTop(row) + "px";
+            cache.rowNodeS && (cache.rowNodeS.style.top = rowTop);
+            cache.rowNodeC && (cache.rowNodeC.style.top = rowTop);
+            cache.rowNodeE && (cache.rowNodeE.style.top = rowTop);
             if (cache.cellRenderContent.some(x => x instanceof Node))
                 this.ensureCellNodesInRowsCache(row);
         }

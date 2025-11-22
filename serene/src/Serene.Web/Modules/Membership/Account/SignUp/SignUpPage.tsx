@@ -64,7 +64,7 @@ class SignUpPanel extends PropertyPanel<SignUpRequest, any> {
                 <p id={id.FormInfo} class="text-center">{SignUpFormTexts.FormInfo}</p>
 
                 <form id={id.Form} action="" autocomplete="off">
-                    <input autocomplete="false" name="hidden" type="text" style="display:none;" />
+                    <input autocomplete="false" name="hidden" type="text" style={{display: "none"}} />
                     <div id={id.PropertyGrid}></div>
                     <div class="px-field">
                         <button id={id.SubmitButton} type="submit" class="btn btn-primary my-4 w-100"

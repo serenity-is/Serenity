@@ -85,7 +85,7 @@ export function getCurrentSettings(this: void, opt: {
     filterStore: FilterStore,
     flags: GridPersistenceFlags,
     includeDeletedToggle: HTMLElement,
-    quickFiltersDiv: Fluent,
+    quickFiltersDiv: HTMLElement,
     sleekGrid: ISleekGrid,
     toolbarNode: HTMLElement,
     uniqueName: string
@@ -148,9 +148,9 @@ export function getCurrentSettings(this: void, opt: {
         }
     }
 
-    if (flags.quickFilters && (opt.quickFiltersDiv != null) && opt.quickFiltersDiv.length > 0) {
+    if (flags.quickFilters && (opt.quickFiltersDiv != null)) {
         settings.quickFilters = {};
-        opt.quickFiltersDiv.findAll('.quick-filter-item').forEach(filterItem => {
+        opt.quickFiltersDiv.querySelectorAll<HTMLElement>('.quick-filter-item').forEach(filterItem => {
             const field = filterItem.dataset.qffield;
             if (!field?.length) {
                 return;
@@ -195,7 +195,7 @@ export function restoreSettingsFrom(this: void, opt: {
     filterStore: FilterStore,
     flags: GridPersistenceFlags,
     includeDeletedToggle: HTMLElement,
-    quickFiltersDiv: Fluent,
+    quickFiltersDiv: HTMLElement,
     sleekGrid: ISleekGrid,
     settings: PersistedGridSettings,
     toolbarNode: HTMLElement,
@@ -239,7 +239,7 @@ export function restoreSettingsFrom(this: void, opt: {
             }
         }
 
-        if (flags.sortColumns && (settings.flags.sortColumns ??
+        if (flags.sortColumns && (settings.flags?.sortColumns ??
                 settings.columns.some(c => "sort" in c))) {
             const list = [];
             const sortColumns = settings.columns.filter(function (x3) {
@@ -304,9 +304,8 @@ export function restoreSettingsFrom(this: void, opt: {
 
     if (settings.quickFilters != null &&
         flags.quickFilters &&
-        opt.quickFiltersDiv != null &&
-        opt.quickFiltersDiv.length > 0) {
-        opt.quickFiltersDiv.findAll('.quick-filter-item').forEach(e => {
+        opt.quickFiltersDiv != null) {
+        opt.quickFiltersDiv.querySelectorAll<HTMLElement>('.quick-filter-item').forEach(e => {
             const field = e.dataset.qffield;
 
             if (!field?.length) {

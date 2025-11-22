@@ -11,7 +11,7 @@ public class StaticTextBlockForm
     public String SomeInput { get; set; }
 
     [DisplayName("Static Html")]
-    [StaticTextBlock(Text = "<h4 style='margin-top: 0px;'>Here is an HTML list:</h2><ul><li>Item 1</li><li>Item 2</li><li>Item 3</li></ul>", IsHtml = true)]
+    [StaticTextBlock(Text = "<h4 class='mt-0'>Here is an HTML list:</h2><ul><li>Item 1</li><li>Item 2</li><li>Item 3</li></ul>", IsHtml = true)]
     public String HtmlList { get; set; }
 
     [DisplayName("From a Local Text")]

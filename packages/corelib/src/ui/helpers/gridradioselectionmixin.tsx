@@ -121,7 +121,8 @@ export class GridRadioSelectionMixin {
                 }
 
                 const isChecked = mixin.include[ctx.item[mixin.idField]];
-                return <input type="radio" name="radio-selection-group" class="rad-select-item no-float" style="cursor: pointer" checked={isChecked} />;
+                return <input type="radio" name="radio-selection-group" class="rad-select-item no-float"
+                    style={{ cursor: "pointer" }} checked={isChecked} />;
             }
         };
     }

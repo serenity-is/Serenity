@@ -45,4 +45,15 @@ public partial class HtmlContentEditorAttribute : CustomEditorAttribute
         get { return GetOption<int>("rows"); }
         set { SetOption("rows", value); }
     }
+
+    /// <summary>
+    /// Gets or sets the editor provider.
+    /// Allowed values are "ckeditor" and "tiptap".
+    /// Default is "ckeditor".
+    /// </summary>
+    public string EditorProvider
+    {
+        get { return GetOption<string>("editorProvider"); }
+        set { SetOption("editorProvider", value); }
+    }
 }

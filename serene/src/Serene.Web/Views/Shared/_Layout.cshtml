@@ -12,7 +12,7 @@ var sidebarPaneCollapsed = Context?.Request?.Cookies?["SidebarPaneCollapsed"] ==
     <title>@(ViewData["Title"]) - Serene</title>
 </head>
 <body id="s-@(ViewData["PageId"])Page" class="@(ViewData["BodyClass"]) @(sidebarPaneCollapsed)">
-<div id="PageBackground" style="display: none"></div>
+<div id="PageBackground"></div>
 @if (hideNav)
 {
     <div id="page-outer-nonav">

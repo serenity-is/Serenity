@@ -22,16 +22,19 @@ export interface FormatterContext<TItem = any> {
 
     /**
      * True if the formatter is allowed to return raw HTML that will be set using innerHTML.
-     * This is set from grid options and defaults to true for backward compatibility.
-     * When set to false, the formatter should return plain text and the result will be set using textContent
-     * and the escape() method is a noop in that case.
+     * This is set from grid options and defaults to false which means the formatter
+     * should return plain text and the result will be set using textContent and
+     * the escape() method is a noop. If true, the formatter can return HTML strings but should
+     * take care to avoid script injection attacks by using ctx.escape() method.
      */
     readonly enableHtmlRendering: boolean;
 
 	/**
-	 * Returns html escaped ctx.value if called without arguments. Prefer this over
-	 * ctx.value when returning as HTML string to avoid html injection attacks!
-     * Note that when enableHtmlRendering is false, this is simply a noop and returns the value as string.
+     * When enableHtmlRendering is false (default), this simply returns the value as string.
+	 * When enableHtmlRendering is true, returns html escaped value / ctx.value if called without
+     * arguments. Prefer this over ctx.value when returning HTML strings to avoid html injection
+     * attacks when enableHtmlRendering is true. You don't have to use this inside JSX
+     * style formatters as JSX automatically escapes values.
 	 */
     escape(value?: any): string;
 

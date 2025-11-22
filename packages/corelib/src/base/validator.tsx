@@ -1689,7 +1689,7 @@ export class Validator {
         if (hl)
             return document.getElementById(hl);
         else if (el.tagName.toLowerCase() === 'textarea' && el.style.visibility == 'hidden' && el.id)
-            return document.getElementById('cke_' + el.id);
+            return document.getElementById('cke_' + el.id) ?? document.getElementById('tiptap_' + el.id);
         else if (el.classList.contains("select2-offscreen") && el.id)
             return document.getElementById('s2id_' + el.id);
     }

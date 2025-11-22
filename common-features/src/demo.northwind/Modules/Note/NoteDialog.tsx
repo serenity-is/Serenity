@@ -1,4 +1,4 @@
-import { BaseDialog, DialogButton, HtmlContentEditor, HtmlNoteContentEditor, cancelDialogButton, okDialogButton } from "@serenity-is/corelib";
+import { BaseDialog, DialogButton, cancelDialogButton, okDialogButton, HtmlContentEditor, HtmlNoteContentEditor } from "@serenity-is/corelib";
 import { nsDemoNorthwind } from "../ServerTypes/Namespaces";
 
 export class NoteDialog<P = {}> extends BaseDialog<P> {

@@ -7,6 +7,12 @@ const Config = {
     applicationPath: '/',
 
     /**
+     * Gets the content Security Policy nonce value to be used in script/style tags. This is usually set from server side
+     * via a meta tag with name "csp-nonce".
+     */
+    cspNonce: null as string,
+
+    /**
      * Gets a default return URL for the application. This is used when a return URL is not specified
      * @param purpose Optional purpose for the return URL, for example "login" or "logout"
      */
@@ -55,7 +61,17 @@ export function resetApplicationPath() {
     }
 }
 
+export function resetCspNonce() {
+    Config.cspNonce = null;
+    if (typeof document !== 'undefined') {
+        Config.cspNonce = document.querySelector<HTMLMetaElement>('meta[name="csp-nonce"]')?.content ??
+            document.querySelector<HTMLScriptElement>('script[nonce]')?.nonce ??
+            document.querySelector<HTMLStyleElement>('style[nonce]')?.nonce;
+    }
+}
+
 resetApplicationPath();
+resetCspNonce();
 
 export { Config };
 

@@ -52,7 +52,6 @@ namespace webTexts {
         namespace EntityGrid {
             export function asKey(): typeof EntityGrid;
             export function asTry(): typeof EntityGrid;
-
             export const IncludeDeletedToggle: string;
             export const NewButton: string;
             export const RefreshButton: string;
@@ -85,30 +84,35 @@ namespace webTexts {
                 export const bw: string;
                 export const contains: string;
                 export const eq: string;
+                // js keyword!: export const false: string;
                 export const ge: string;
                 export const gt: string;
+                // js keyword!: export const in: string;
                 export const isnotnull: string;
                 export const isnull: string;
                 export const le: string;
                 export const lt: string;
                 export const ne: string;
                 export const startswith: string;
+                // js keyword!: export const true: string;
             }
             namespace OperatorNames {
                 export function asKey(): typeof OperatorNames;
                 export function asTry(): typeof OperatorNames;
-
                 export const bw: string;
                 export const contains: string;
                 export const eq: string;
+                // js keyword!: export const false: string;
                 export const ge: string;
                 export const gt: string;
+                // js keyword!: export const in: string;
                 export const isnotnull: string;
                 export const isnull: string;
                 export const le: string;
                 export const lt: string;
                 export const ne: string;
                 export const startswith: string;
+                // js keyword!: export const true: string;
             }
             export const Or: string;
             export const OrInParens: string;
@@ -119,6 +123,50 @@ namespace webTexts {
             export const SelectField: string;
             export const ThenBy: string;
             export const ValueRequired: string;
+        }
+        namespace HtmlContentEditor {
+            export function asKey(): typeof HtmlContentEditor;
+            export function asTry(): typeof HtmlContentEditor;
+            export const AlignCenter: string;
+            export const AlignJustify: string;
+            export const AlignLeft: string;
+            export const AlignRight: string;
+            export const BackgroundColor: string;
+            export const Bold: string;
+            export const Copy: string;
+            export const Cut: string;
+            export const FindAndReplace: string;
+            export const Font: string;
+            export const FontSize: string;
+            export const Format: string;
+            export const HeadingLevel: string;
+            export const HorizontalRule: string;
+            export const Hyperlink: string;
+            export const Indent: string;
+            export const InlineCode: string;
+            export const InsertImage: string;
+            export const InsertTable: string;
+            export const Italic: string;
+            export const Maximize: string;
+            export const NormalText: string;
+            export const OrderedList: string;
+            export const Outdent: string;
+            export const Paste: string;
+            export const PasteAsPlainText: string;
+            export const PasteFromWord: string;
+            export const Redo: string;
+            export const RemoveFormat: string;
+            export const RemoveHeading: string;
+            export const RemoveHyperlink: string;
+            export const StrikeThrough: string;
+            export const Subscript: string;
+            export const Superscript: string;
+            export const TextColor: string;
+            export const ToggleHeading: string;
+            export const Underline: string;
+            export const Undo: string;
+            export const UnorderedList: string;
+            export const ViewSource: string;
         }
         namespace Pager {
             export function asKey(): typeof Pager;
@@ -170,6 +218,7 @@ namespace webTexts {
         export const MaximizeHint: string;
         export const NoButton: string;
         export const OkButton: string;
+        export const Prompt: string;
         export const RestoreHint: string;
         export const SuccessTitle: string;
         export const WarningTitle: string;
@@ -203,6 +252,7 @@ namespace webTexts {
         export const UsernameExists: string;
         export const Xss: string;
     }
+
 }
 
 const textsProxy: typeof webTexts = proxyTexts({}, '', {
@@ -217,6 +267,7 @@ const textsProxy: typeof webTexts = proxyTexts({}, '', {
             OperatorFormats: {},
             OperatorNames: {}
         },
+        HtmlContentEditor: {},
         Pager: {},
         PropertyGrid: {},
         QuickSearch: {},
@@ -234,6 +285,7 @@ export const EntityDialogTexts = textsProxy.Controls.EntityDialog;
 export const EntityGridTexts = textsProxy.Controls.EntityGrid;
 export const FilterPanelTexts = textsProxy.Controls.FilterPanel;
 export const FormValidationTexts = textsProxy.Validation;
+export const HtmlContentEditorTexts = textsProxy.Controls.HtmlContentEditor;
 export const PagerTexts = textsProxy.Controls.Pager;
 export const PropertyGridTexts = textsProxy.Controls.PropertyGrid;
 export const QuickSearchTexts = textsProxy.Controls.QuickSearch;

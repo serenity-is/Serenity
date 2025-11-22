@@ -10,7 +10,7 @@ import { DateEditor } from "../editors/dateeditor";
 import { SelectEditor } from "../editors/selecteditor";
 import { FilterDisplayBar } from "../filtering/filterdisplaybar";
 import { FilterStore } from "../filtering/filterstore";
-import { EditLink } from "../helpers/editlink";
+import { EditLink, skipEditLinkFormatPurposes } from "../helpers/editlink";
 import { GridUtils } from "../helpers/gridutils";
 import { LazyLoadHelper } from "../helpers/lazyloadhelper";
 import { PropertyItemColumnConverter } from "../helpers/propertyitemcolumnconverter";
@@ -761,9 +761,7 @@ export class DataGrid<TItem, P = {}> extends Widget<P> implements IDataGrid, IRe
         }
 
         if ((props?.context?.item as any)?.__nonDataRow ||
-            props.context?.purpose === "group-header" ||
-            props.context?.purpose === "group-totals" ||
-            props.context?.purpose === "grand-totals") {
+            (props.context?.purpose && skipEditLinkFormatPurposes.has(props.context.purpose))) {
             return <>{children}</>;
         }
 
@@ -1165,7 +1163,7 @@ export class DataGrid<TItem, P = {}> extends Widget<P> implements IDataGrid, IRe
                 filterStore: this.filterBar?.get_store(),
                 flags: event.flagsToUse,
                 includeDeletedToggle: this.domNode.querySelector('.s-IncludeDeletedToggle'),
-                quickFiltersDiv: this.quickFiltersDiv,
+                quickFiltersDiv: this.quickFiltersDiv?.getNode(),
                 sleekGrid: this._grid,
                 settings: event.settings,
                 toolbarNode: this.toolbar?.domNode,
@@ -1225,7 +1223,7 @@ export class DataGrid<TItem, P = {}> extends Widget<P> implements IDataGrid, IRe
             filterStore: this.filterBar?.get_store(),
             flags,
             includeDeletedToggle: this.domNode.querySelector('.s-IncludeDeletedToggle'),
-            quickFiltersDiv: this.quickFiltersDiv,
+            quickFiltersDiv: this.quickFiltersDiv?.getNode(),
             sleekGrid: this._grid,
             toolbarNode: this.toolbar?.domNode,
             uniqueName: this.uniqueName

@@ -170,7 +170,7 @@ export class FilterPanel<P = {}> extends FilterWidgetBase<P> {
                     {FilterPanelTexts.ResetButton}
                 </button>
             </div>
-            <div style="clear: both" />
+            <div style={{ clear: "both" }} />
         </>);
     }
 
@@ -294,7 +294,7 @@ export class FilterPanel<P = {}> extends FilterWidgetBase<P> {
             <div class="filter-line">
                 <a class="delete" title={FilterPanelTexts.RemoveField}
                     onClick={boundThis.deleteRowClick}><span></span></a>
-                <div class="l" style="display: none">
+                <div class="l" hidden>
                     <a class="rightparen" href="#" onClick={boundThis.leftRightParenClick}>)</a>
                     <a class={["andor", isLastRowOr && "or"]} href="#"
                         title={FilterPanelTexts.ChangeAndOr} onClick={boundThis.andOrClick}>

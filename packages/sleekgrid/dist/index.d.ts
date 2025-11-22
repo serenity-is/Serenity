@@ -868,6 +868,12 @@ export interface GridOptions<TItem = any> {
 	 */
 	suppressActiveCellChangeOnEdit?: boolean;
 	/**
+	 * Nonce value for CSP (Content Security Policy) when `useCssVars` is `false`. Applied to the dynamically
+	 * created `<style>` element to allow inline CSS injection without violating CSP rules.
+	 * If not provided, the grid will attempt to detect a nonce from a meta element with `csp-nonce` name or from existing `<style>` or `<script>` elements on the page.
+	 */
+	styleNonce?: string;
+	/**
 	 * Defaults to `false`. If `true`, synchronizes column resizing with cell resizing.
 	 */
 	syncColumnCellResize?: boolean;
@@ -880,10 +886,14 @@ export interface GridOptions<TItem = any> {
 	 */
 	useLegacyUI?: boolean;
 	/**
-	 * Defaults to `true` which is equivalent to 50. If `true`, uses CSS variables for styling (for up to 50 cols).
+	 * Defaults to `true` which is equivalent to 100. If `true`, uses CSS variables for styling (for up to 100 cols).
 	 * If set to a number, enables CSS variables only if column count is less than or equal to that number.
-	 * This is dependent on the stylesheet which only supports up to 50 columns by default.
+	 * This is dependent on the stylesheet which only supports up to 100 columns by default.
 	 * But if you defined your own stylesheet with more columns, you can set this to a higher number.
+	 *
+	 * If set to `false`, uses a dynamic `<style>` element (with optional `styleNonce` for CSP) to inject CSS rules
+	 * for positioning, avoiding inline styles entirely.
+	 *
 	 */
 	useCssVars?: boolean | number;
 	/**
@@ -1126,15 +1136,18 @@ export interface FormatterContext<TItem = any> {
 	addClass?: string;
 	/**
 	 * True if the formatter is allowed to return raw HTML that will be set using innerHTML.
-	 * This is set from grid options and defaults to true for backward compatibility.
-	 * When set to false, the formatter should return plain text and the result will be set using textContent
-	 * and the escape() method is a noop in that case.
+	 * This is set from grid options and defaults to false which means the formatter
+	 * should return plain text and the result will be set using textContent and
+	 * the escape() method is a noop. If true, the formatter can return HTML strings but should
+	 * take care to avoid script injection attacks by using ctx.escape() method.
 	 */
 	readonly enableHtmlRendering: boolean;
 	/**
-	 * Returns html escaped ctx.value if called without arguments. Prefer this over
-	 * ctx.value when returning as HTML string to avoid html injection attacks!
-	 * Note that when enableHtmlRendering is false, this is simply a noop and returns the value as string.
+	 * When enableHtmlRendering is false (default), this simply returns the value as string.
+	 * When enableHtmlRendering is true, returns html escaped value / ctx.value if called without
+	 * arguments. Prefer this over ctx.value when returning HTML strings to avoid html injection
+	 * attacks when enableHtmlRendering is true. You don't have to use this inside JSX
+	 * style formatters as JSX automatically escapes values.
 	 */
 	escape(value?: any): string;
 	/**
