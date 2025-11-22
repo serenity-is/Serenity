@@ -1,12 +1,19 @@
-import { Fluent, FormValidationTexts, nsSerenity, resolveUrl, Validator } from "../../base";
+import { bindThis } from "@serenity-is/domwise";
+import { Fluent, FormValidationTexts, nsSerenity, resolveUrl, sanitizeHtml, Validator } from "../../base";
 import { isTrimmedEmpty } from "../../compat";
 import { IReadOnly, IStringValue } from "../../interfaces";
 import { LazyLoadHelper } from "../helpers/lazyloadhelper";
 import { EditorProps, EditorWidget } from "./editorwidget";
+import { getTiptapContent, TiptapToolbar, type TiptapModule, type TiptapModuleInternal, type TiptapToolbarHiddenOption } from "./htmlcontenteditor-tiptap";
+
+export type HtmlContentEditorProvider = "ckeditor" | "tiptap";
+
+export type { TiptapModule, TiptapToolbarHiddenOption } from "./htmlcontenteditor-tiptap";
 
 export interface HtmlContentEditorOptions {
     cols?: number;
     rows?: number;
+    editorProvider?: HtmlContentEditorProvider;
 }
 
 export interface CKEditorConfig {
@@ -16,15 +23,28 @@ export class HtmlContentEditor<P extends HtmlContentEditorOptions = HtmlContentE
     implements IStringValue, IReadOnly {
     static override[Symbol.typeInfo] = this.registerEditor(nsSerenity, [IStringValue, IReadOnly]);
 
-    declare private _instanceReady: boolean;
+    declare private _ckInstanceReady: boolean;
     declare readonly domNode: HTMLTextAreaElement;
+    static tiptapModule: TiptapModule | (() => (TiptapModule | Promise<TiptapModule>));
+    declare private tiptapEditor: any;
+    declare private tiptapElement: HTMLElement;
 
     static override createDefaultElement() { return document.createElement("textarea"); }
 
-    constructor(props: EditorProps<P>) {
-        super(props);
+    static defaultEditorProvider: HtmlContentEditorProvider;
 
-        this._instanceReady = false;
+    static readonly defaultOptions: Partial<HtmlContentEditorOptions> = {
+    };
+
+    constructor(props: EditorProps<P>) {
+        super({
+            editorProvider: HtmlContentEditor.defaultEditorProvider,
+            ...HtmlContentEditor.defaultOptions,
+            ...props
+        });
+
+        this.element.addClass("s-HtmlContentEditor");
+        this._ckInstanceReady = false;
 
         let textArea = this.domNode;
         var id = textArea.getAttribute('id');
@@ -48,17 +68,59 @@ export class HtmlContentEditor<P extends HtmlContentEditorOptions = HtmlContentE
             return null;
         });
 
-        HtmlContentEditor.includeCKEditor(() => {
-            LazyLoadHelper.executeOnceWhenShown(this.domNode, () => {
-                var config = this.getConfig();
-                (window as any)['CKEDITOR'] && (window as any)['CKEDITOR'].replace(id, config);
+        if (HtmlContentEditor.tiptapModule && this.options.editorProvider === "tiptap") {
+            Promise.resolve(typeof HtmlContentEditor.tiptapModule === "function" ?
+                HtmlContentEditor.tiptapModule() : HtmlContentEditor.tiptapModule).then((tiptap: TiptapModuleInternal) => {
+                    if (!tiptap?.Editor)
+                        return;
+
+                    this.tiptapElement = document.createElement('div');
+                    this.tiptapElement.id = "tiptap_" + (this.domNode?.id ?? this.uniqueName);
+                    this.tiptapElement.dataset.editorProvider = "tiptap";
+                    textArea.parentElement!.insertBefore(this.tiptapElement, textArea);
+                    textArea.style.visibility = 'hidden';
+                    for (const k of textArea.className.split(' ')) {
+                        k && this.tiptapElement.classList.add(k);
+                    }
+                    textArea.classList.add("s-offscreen");
+
+                    this.tiptapEditor = new tiptap.Editor({
+                        element: this.tiptapElement,
+                        content: sanitizeHtml(textArea.value),
+                        extensions: this.getTiptapExtensions(tiptap),
+                    });
+
+                    this.tiptapElement.prepend(TiptapToolbar({
+                        editor: this.tiptapEditor,
+                        hidden: this.getTiptapToolbarHidden(this.tiptapEditor)
+                    }));
+
+                    this.tiptapEditor.on('update', () => {
+                        const html = getTiptapContent(this.tiptapEditor);
+                        textArea.value = sanitizeHtml(html);
+                        Fluent.trigger(textArea, "change");
+                    });
+
+                    this.domNode.dataset.editorProvider = "tiptap";
+                });
+        }
+        else if (this.options.editorProvider !== "tiptap") {
+            HtmlContentEditor.includeCKEditor(() => {
+                LazyLoadHelper.executeOnceWhenShown(this.domNode, () => {
+                    if ((window as any)['CKEDITOR']) {
+                        const config = this.getCKEditorConfig();
+                        (window as any)['CKEDITOR'].replace(id, config);
+                        this.domNode.dataset.editorProvider = "ckeditor";
+                    }
+                });
             });
-        });
+        }
     }
 
-    protected instanceReady(x: any): void {
-        this._instanceReady = true;
+    protected handleCKInstanceReady(x: any): void {
+        this._ckInstanceReady = true;
 
+        x.editor?.container?.$ && (x.editor.container.$.dataset.editorProvider = "ckeditor");
         this.domNode.classList.forEach((clss) => { x.editor.container.$?.classList.add(clss); });
         this.domNode.classList.add('select2-offscreen');
         this.domNode.style.display = 'block';
@@ -68,7 +130,25 @@ export class HtmlContentEditor<P extends HtmlContentEditorOptions = HtmlContentE
         x.editor.setReadOnly(this.get_readOnly());
     }
 
-    protected getLanguage(): string {
+    protected handleCKEditorChange(e: any): void {
+        e.editor.updateElement();
+        Fluent.trigger(this.domNode, "change");
+
+        if (this.triggerKeyupEvent) {
+            const validator = Validator.getInstance(this.domNode.form);
+            if (validator && validator?.settings?.onkeyup) {
+                // trigger validation on keyup
+                validator.settings.onkeyup(this.domNode, this.triggerKeyupEvent, validator)
+            }
+            this.triggerKeyupEvent = null;
+        }
+    }
+
+    protected handleCKKey(e: any): void {
+        this.triggerKeyupEvent = e?.data?.domEvent?.$;
+    }
+
+    protected getCKEditorLanguage(): string {
         if (!(window as any)['CKEDITOR'])
             return 'en';
 
@@ -89,30 +169,18 @@ export class HtmlContentEditor<P extends HtmlContentEditorOptions = HtmlContentE
 
     private triggerKeyupEvent: KeyboardEvent;
 
-    protected getConfig(): CKEditorConfig {
+    protected getCKEditorConfig(): CKEditorConfig {
+        const boundThis = bindThis(this);
+
         return {
             customConfig: '',
-            language: this.getLanguage(),
+            language: this.getCKEditorLanguage(),
             bodyClass: 's-HtmlContentBody',
             versionCheck: false,
             on: {
-                instanceReady: (x: any) => this.instanceReady(x),
-                change: (x1: any) => {
-                    x1.editor.updateElement();
-                    Fluent.trigger(this.domNode, "change");
-
-                    if (this.triggerKeyupEvent) {
-                        const validator = Validator.getInstance(this.domNode.form);
-                        if (validator && validator?.settings?.onkeyup) {
-                            // trigger validation on keyup
-                            validator.settings.onkeyup(this.domNode, this.triggerKeyupEvent, validator)
-                        }
-                        this.triggerKeyupEvent = null;
-                    }
-                },
-                key: (e: any) => {
-                    this.triggerKeyupEvent = e?.data?.domEvent?.$;
-                }
+                instanceReady: boundThis.handleCKInstanceReady,
+                change: boundThis.handleCKEditorChange,
+                key: boundThis.handleCKKey
             },
             toolbarGroups: [
                 {
@@ -151,25 +219,54 @@ export class HtmlContentEditor<P extends HtmlContentEditorOptions = HtmlContentE
         };
     }
 
-    protected getEditorInstance() {
-        var id = this.domNode.getAttribute("id");
+    protected getCKEditorInstance() {
+        const id = this.domNode.getAttribute("id");
         return (window as any)['CKEDITOR']?.instances?.[id];
     }
 
+    protected getTiptapStarterKit(tiptap: TiptapModule): any {
+        return tiptap.StarterKit;
+    }
+
+    protected getTiptapExtensions(tiptap: TiptapModule): any[] {
+        return [
+            this.getTiptapStarterKit(tiptap),
+            tiptap.TextAlign.configure({
+                types: ["paragraph", "heading"],
+                alignments: ["left", "center", "right", "justify"]
+            })
+        ].filter(x => x != null);
+    }
+
+    /** Can be overridden to hide some buttons even though they are registered in extensions */
+    protected getTiptapToolbarHidden(editor: any): TiptapToolbarHiddenOption {
+        return {
+        };
+    }
+
     override destroy(): void {
-        var instance = this.getEditorInstance();
-        instance && instance.destroy(true);
+        if (this.editorProvider === "ckeditor") {
+            const ckInstance = this.getCKEditorInstance();
+            ckInstance && ckInstance.destroy(true);
+        }
+        else if (this.tiptapEditor) {
+            this.tiptapEditor.destroy();
+            delete this.tiptapEditor;
+        }
         super.destroy();
     }
 
     get_value(): string {
-        var instance = this.getEditorInstance();
-        if (this._instanceReady && instance) {
-            return instance.getData();
+        if (this.tiptapEditor) {
+            return sanitizeHtml(getTiptapContent(this.tiptapEditor));
         }
-        else {
-            return this.domNode.value;
+        else if (this.editorProvider === "ckeditor") {
+            const ckInstance = this.getCKEditorInstance();
+            if (this._ckInstanceReady && ckInstance) {
+                return sanitizeHtml(ckInstance.getData());
+            }
         }
+        return sanitizeHtml(this.domNode.value);
     }
 
     get value(): string {
@@ -177,10 +274,20 @@ export class HtmlContentEditor<P extends HtmlContentEditorOptions = HtmlContentE
     }
 
     set_value(value: string): void {
-        var instance = this.getEditorInstance();
-        this.domNode.value = value ?? '';
-        if (this._instanceReady && instance)
-            instance.setData(value ?? '');
+        value = sanitizeHtml(value ?? '');
+
+        this.domNode.value = value;
+
+        if (this.tiptapEditor) {
+            this.tiptapEditor?.commands.setContent(value);
+            return;
+        }
+
+        if (this.editorProvider === "ckeditor") {
+            const ckInstance = this.getCKEditorInstance();
+            if (this._ckInstanceReady && ckInstance)
+                ckInstance.setData(value);
+        }
     }
 
     set value(v: string) {
@@ -201,9 +308,16 @@ export class HtmlContentEditor<P extends HtmlContentEditorOptions = HtmlContentE
                 this.domNode.removeAttribute('disabled');
             }
 
-            var instance = this.getEditorInstance();
-            if (this._instanceReady && instance)
-                instance.setReadOnly(value);
+            if (this.tiptapEditor) {
+                this.tiptapEditor.setEditable(!value);
+                return;
+            }
+
+            if (this.editorProvider !== "ckeditor") {
+                const ckInstance = this.getCKEditorInstance();
+                if (this._ckInstanceReady && ckInstance)
+                    ckInstance.setReadOnly(value);
+            }
         }
     }
 
@@ -232,40 +346,35 @@ export class HtmlContentEditor<P extends HtmlContentEditorOptions = HtmlContentE
         if (script) {
             return script.addEventListener("load", then);
         }
-        const nonce = 
+        const nonce =
             document.head?.querySelector('meta[name="csp-nonce"]')?.getAttribute('content') ??
             document.head?.querySelector('script[nonce]')?.getAttribute('nonce') ??
             document.head?.querySelector('style[nonce]')?.getAttribute('nonce');
-            
+
         document.head.appendChild(
             <script type="text/javascript" id="CKEditorScript" async={false} onLoad={then} nonce={nonce}
                 src={resolveUrl(HtmlContentEditor.getCKEditorBasePath() + 'ckeditor.js?v=' + HtmlContentEditor.CKEditorVer)}>
             </script>);
     };
-}
 
-export class HtmlNoteContentEditor<P extends HtmlContentEditorOptions = HtmlContentEditorOptions> extends HtmlContentEditor<P> {
-    static override[Symbol.typeInfo] = this.registerEditor(nsSerenity);
-
-    protected override getConfig(): CKEditorConfig {
-        var config = super.getConfig();
-        (config as any).removeButtons += ',Cut,Copy,Paste,BulletedList,NumberedList,' +
-            'Indent,Outdent,SpecialChar,Subscript,Superscript,Styles,PasteText,' +
-            'PasteFromWord,Strike,Link,Unlink,CreatePlaceholder,Image,Table,' +
-            'HorizontalRule,Source,Maximize,Format,Font,FontSize,Anchor,Blockquote,' +
-            'CreatePlaceholder,BGColor,JustifyLeft,JustifyCenter,' +
-            'JustifyRight,JustifyBlock,Superscript,RemoveFormat';
-
-        (config as any).removePlugins = 'elementspath,uploadimage,image2';
-        return config;
+    get editorProvider(): HtmlContentEditorProvider {
+        return this.domNode?.dataset?.editorProvider as HtmlContentEditorProvider ?? null;
     }
 }
 
-export class HtmlReportContentEditor<P extends HtmlContentEditorOptions = HtmlContentEditorOptions> extends HtmlContentEditor<P> {
+/** Html content editor variant for notes with limited toolbar options, e.g. undo redo and bold / italic / underline for now */
+export class HtmlNoteContentEditor<P extends HtmlContentEditorOptions = HtmlContentEditorOptions> extends HtmlContentEditor<P> {
     static override[Symbol.typeInfo] = this.registerEditor(nsSerenity);
 
-    protected override getConfig(): CKEditorConfig {
-        var config = super.getConfig();
+    constructor(props: EditorProps<P>) {
+        super({
+            editorProvider: HtmlNoteContentEditor.defaultEditorProvider,
+            ...props,
+        });
+    }
+
+    protected override getCKEditorConfig(): CKEditorConfig {
+        var config = super.getCKEditorConfig();
         (config as any).removeButtons += ',Cut,Copy,Paste,BulletedList,NumberedList,' +
             'Indent,Outdent,SpecialChar,Subscript,Superscript,Styles,' +
             'PasteText,PasteFromWord,Strike,Link,Unlink,CreatePlaceholder,' +
@@ -276,4 +385,86 @@ export class HtmlReportContentEditor<P extends HtmlContentEditorOptions = HtmlCo
         (config as any).removePlugins = 'elementspath,uploadimage,image2';
         return config;
     }
+
+    protected override getTiptapExtensions(tiptap: TiptapModule): any[] {
+        return [this.getTiptapStarterKit(tiptap)].filter(x => x != null);
+    }
+
+    protected override getTiptapStarterKit(tiptap: TiptapModule): any {
+        return (tiptap as TiptapModuleInternal).StarterKit?.configure({
+            blockquote: false,
+            bulletList: false,
+            code: false,
+            codeBlock: false,
+            heading: false,
+            horizontalRule: false,
+            listItem: false,
+            listKeymap: false,
+            link: false,
+            orderedList: false,
+            strike: false
+        });
+    }
 }
+
+/** 
+ * This is originally was intended to be a subset more compatible with reports,
+ * which was necessary as most report rendering engines had limited HTML/CSS support. 
+ * We will revisit this if needed in future.
+ */
+export class HtmlReportContentEditor<P extends HtmlContentEditorOptions = HtmlContentEditorOptions> extends HtmlContentEditor<P> {
+    static override[Symbol.typeInfo] = this.registerEditor(nsSerenity);
+
+    constructor(props: EditorProps<P>) {
+        super({
+            editorProvider: HtmlReportContentEditor.defaultEditorProvider,
+            ...props,
+        });
+    }
+
+    protected override getCKEditorConfig(): CKEditorConfig {
+        var config = super.getCKEditorConfig();
+        (config as any).removeButtons += ',Cut,Copy,Paste,BulletedList,NumberedList,' +
+            'Indent,Outdent,SpecialChar,Subscript,Superscript,Styles,' +
+            'PasteText,PasteFromWord,Strike,Link,Unlink,CreatePlaceholder,' +
+            'Image,Table,HorizontalRule,Source,Maximize,Format,Font,FontSize,' +
+            'Anchor,Blockquote,CreatePlaceholder,BGColor,' +
+            'JustifyBlock,Superscript,RemoveFormat';
+
+        (config as any).removePlugins = 'elementspath,uploadimage,image2';
+        return config;
+    }
+
+    protected override getTiptapToolbarHidden(editor: any): TiptapToolbarHiddenOption {
+        return {
+            alignmentJustify: true
+        };
+    }
+
+    protected override getTiptapExtensions(tiptap: TiptapModule): any[] {
+        return [
+            this.getTiptapStarterKit(tiptap),
+            tiptap.TextAlign.configure({
+                types: ["paragraph", "heading"],
+                alignments: ["left", "center", "right"]
+            })
+        ].filter(x => x != null);
+    }
+
+    protected override getTiptapStarterKit(tiptap: TiptapModule): any {
+        return (tiptap as TiptapModuleInternal).StarterKit?.configure({
+            blockquote: false,
+            bulletList: false,
+            code: false,
+            codeBlock: false,
+            heading: false,
+            horizontalRule: false,
+            listItem: false,
+            listKeymap: false,
+            link: false,
+            orderedList: false,
+            strike: false
+        });
+    }
+}
+

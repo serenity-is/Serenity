@@ -2360,6 +2360,11 @@ export declare const effect: ((fn: EffectFn, options?: EffectOptions) => () => v
 export declare const batch: (<T>(fn: () => T) => T);
 export declare const untracked: (<T>(fn: () => T) => T);
 export declare function useSignal<T>(initialValue: T): Signal<T>;
+/** Creates a factory for computed signals that can be manually updated as a batch */
+export declare function useUpdatableComputed(): {
+	computed: <T>(fn: () => T) => Computed<T>;
+	update: () => void;
+};
 export declare const SVGNamespace = "http://www.w3.org/2000/svg";
 
 export {
