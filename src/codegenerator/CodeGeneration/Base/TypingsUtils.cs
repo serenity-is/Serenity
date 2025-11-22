@@ -7,6 +7,11 @@ global using PropertyDefinition = Microsoft.CodeAnalysis.IPropertySymbol;
 global using TypeDefinition = Microsoft.CodeAnalysis.ITypeSymbol;
 global using TypeReference = Microsoft.CodeAnalysis.ITypeSymbol;
 global using GenericInstanceType = Microsoft.CodeAnalysis.INamedTypeSymbol;
+global using MethodKind = Microsoft.CodeAnalysis.MethodKind;
+global using TypeKind = Microsoft.CodeAnalysis.TypeKind;
+global using INamedTypeSymbol = Microsoft.CodeAnalysis.INamedTypeSymbol;
+global using SymbolEqualityComparer = Microsoft.CodeAnalysis.SymbolEqualityComparer;
+global using SymbolFilter = Microsoft.CodeAnalysis.SymbolFilter;
 using Microsoft.CodeAnalysis;
 #else
 global using CustomAttribute = Mono.Cecil.CustomAttribute;

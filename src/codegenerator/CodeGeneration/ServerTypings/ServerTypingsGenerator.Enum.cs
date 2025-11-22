@@ -1,6 +1,6 @@
 namespace Serenity.CodeGeneration;
 
-public partial class ServerTypingsGenerator : TypingsGeneratorBase
+public partial class ServerTypingsGenerator
 {
     private static string GetEnumKeyFor(TypeDefinition enumType)
     {

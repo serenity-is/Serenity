@@ -1,6 +1,6 @@
 namespace Serenity.CodeGeneration;
 
-public partial class ClientTypesGenerator : ImportGeneratorBase
+public partial class ClientTypesGenerator
 {
     private void GenerateFormatter(ExternalType type, string name, string key)
     {

@@ -1,38 +1,110 @@
 namespace Serenity.CodeGeneration;
 
 #if ISSOURCEGENERATOR
-public partial class ServerTypingsGenerator(Microsoft.CodeAnalysis.Compilation compilation,
-    System.Threading.CancellationToken cancellationToken)
-    : TypingsGeneratorBase(compilation, cancellationToken)
+using Microsoft.CodeAnalysis;
+using System.Collections.Immutable;
+using System.Threading;
+#endif
+
+public partial class ServerTypingsGenerator : CodeGeneratorBase
 {
+#if ISSOURCEGENERATOR
+    private readonly CancellationToken cancellationToken;
+
+    public ServerTypingsGenerator(Compilation compilation, CancellationToken cancellationToken)
+    {
+        Compilation = compilation ?? throw new ArgumentNullException(nameof(compilation));
+        this.cancellationToken = cancellationToken;
+    }
+
+    public Compilation Compilation { get; }
 #else
-public partial class ServerTypingsGenerator : TypingsGeneratorBase
-{
     public ServerTypingsGenerator(IFileSystem fileSystem, params Assembly[] assemblies)
-        : base(fileSystem, assemblies)
+        : this(TypingsUtils.ToDefinitions(fileSystem, assemblies?.Select(x => x.Location)))
     {
     }
 
     public ServerTypingsGenerator(IFileSystem fileSystem, params string[] assemblyLocations)
-        : base(fileSystem, assemblyLocations)
+        : this(TypingsUtils.ToDefinitions(fileSystem, assemblyLocations))
     {
     }
+
+    protected ServerTypingsGenerator(params Mono.Cecil.AssemblyDefinition[] assemblies)
+        : base()
+    {
+        if (assemblies == null || assemblies.Length == 0)
+            throw new ArgumentNullException(nameof(assemblies));
+
+        foreach (var assembly in assemblies)
+        {
+            var assemblyName = assembly.Name?.Name;
+            if (!string.IsNullOrEmpty(assemblyName))
+                assemblyNames.Add(assemblyName);
+        }
+
+        Assemblies = assemblies;
+    }
+
+    public Mono.Cecil.AssemblyDefinition[] Assemblies { get; private set; }
+
+    /// <summary>Optional predicate for test purposes</summary>
+    public Func<TypeDefinition, bool> TypeFilter { get; set; }
 #endif
 
-    public bool LocalTexts { get; set; }
+    private readonly HashSet<string> visited = [];
+    private Queue<TypeDefinition> generateQueue;
+    protected List<TypeDefinition> lookupScripts = [];
+    protected List<GeneratedTypeInfo> generatedTypes = [];
+    protected List<AnnotationTypeInfo> annotationTypes = [];
+    protected TypeDefinition[] emptyTypes = [];
+
+    protected readonly HashSet<string> assemblyNames = new(StringComparer.Ordinal);
+
     public bool ModuleReExports { get; set; } = true;
 
     public readonly HashSet<string> LocalTextFilters = [];
 
-    protected HashSet<string> localTextKeys = [];
-    protected Dictionary<string, string> localTextNestedClasses = [];
     protected Dictionary<string, TypeDefinition> scriptDataKeys = [];
     protected Dictionary<string, List<string>> namespaceConstants = [];
 
+    protected static string GetAssemblyNameFor(TypeReference type)
+    {
+        var assemblyName =
+#if ISSOURCEGENERATOR
+        type.ContainingAssembly?.Name;
+#else
+        type.Scope?.Name;
+        if (assemblyName != null && assemblyName.EndsWith(".dll", StringComparison.OrdinalIgnoreCase))
+            assemblyName = assemblyName[0..^4];
+#endif
+        return assemblyName;
+    }
+
     protected override void GenerateAll()
     {
-        base.GenerateAll();
+        InitModularTypeByKey();
+        EnqueueInitialTypes();
 
+        while (generateQueue.Count > 0)
+        {
+            var typeDef = generateQueue.Dequeue();
+
+#if ISSOURCEGENERATOR
+            if (typeDef.ContainingAssembly?.Name != Compilation.AssemblyName)
+                continue;
+#else
+            if (!Assemblies.Any(x => x.FullName == typeDef.Module.Assembly.FullName))
+                continue;
+#endif
+
+            GenerateCodeFor(typeDef);
+        }
+
+        GenerateCommonCode();
+    }
+
+    protected virtual void GenerateCommonCode()
+    {
         if (LocalTexts)
             GenerateTexts();
 
@@ -46,7 +118,43 @@ public partial class ServerTypingsGenerator : TypingsGeneratorBase
         GenerateNamespaceConstants();
     }
 
-    protected override void GenerateCodeFor(TypeDefinition type)
+    protected virtual bool IsUsingNamespace(string ns)
+    {
+        return false;
+    }
+
+
+    protected virtual void PreVisitType(TypeDefinition type)
+    {
+        PreVisitTypeForTexts(type);
+        PreVisitTypeForScriptData(type);
+    }
+
+    protected class GeneratedTypeInfo
+    {
+        public string Namespace { get; set; }
+        public string Name { get; set; }
+        public bool Module { get; set; }
+        public bool TypeOnly { get; set; }
+    }
+
+    protected override void AddFile(string filename)
+    {
+        HandleModuleImportsOnAddFile(filename);
+        base.AddFile(filename);
+    }
+
+    protected void RegisterGeneratedType(string ns, string name, bool typeOnly)
+    {
+        generatedTypes.Add(new GeneratedTypeInfo
+        {
+            Namespace = ns,
+            Name = name,
+            TypeOnly = typeOnly
+        });
+    }
+
+    protected virtual void GenerateCodeFor(TypeDefinition type)
     {
         void add(Action<TypeDefinition> action, string fileIdentifier = null)
         {
@@ -92,19 +200,20 @@ public partial class ServerTypingsGenerator : TypingsGeneratorBase
             return;
         }
 
-        if (TypingsUtils.IsSubclassOf(type, "Microsoft.AspNetCore.Mvc", "ControllerBase") ||
-            TypingsUtils.IsSubclassOf(type, "System.Web.Mvc", "Controller"))
+        var baseTypes = TypingsUtils.EnumerateBaseClasses(type).ToArray();
+
+        if (IsServiceEndpoint(baseTypes, type))
         {
             var controllerIdentifier = GetControllerIdentifier(type);
             add((t) => GenerateService(t, controllerIdentifier), controllerIdentifier);
             return;
         }
 
-        var formScriptAttr = TypingsUtils.GetAttr(type, "Serenity.ComponentModel", "FormScriptAttribute");
+        var formScriptAttr = GetFormScriptAttribute(type);
         if (formScriptAttr != null)
         {
             var formIdentifier = type.Name;
-            var isServiceRequest = TypingsUtils.IsSubclassOf(type, "Serenity.Services", "ServiceRequest");
+            var isServiceRequest = IsServiceRequest(baseTypes, type);
             if (formIdentifier.EndsWith(requestSuffix, StringComparison.Ordinal) && isServiceRequest)
                 formIdentifier = formIdentifier[..^requestSuffix.Length] + "Form";
 
@@ -118,7 +227,7 @@ public partial class ServerTypingsGenerator : TypingsGeneratorBase
             return;
         }
 
-        var columnsScriptAttr = TypingsUtils.GetAttr(type, "Serenity.ComponentModel", "ColumnsScriptAttribute");
+        var columnsScriptAttr = GetColumnsScriptAttribute(type);
         if (columnsScriptAttr != null)
         {
             add((t) => GenerateColumns(t, columnsScriptAttr));
@@ -126,103 +235,42 @@ public partial class ServerTypingsGenerator : TypingsGeneratorBase
             return;
         }
 
-        if (TypingsUtils.GetAttr(type, "Serenity.Extensibility", "NestedPermissionKeysAttribute") != null ||
-            TypingsUtils.GetAttr(type, "Serenity.ComponentModel", "NestedPermissionKeysAttribute") != null)
+        if (GetNestedPermissionKeysAttribute(type) != null)
         {
             add(GeneratePermissionKeys);
             return;
         }
 
-        if (TypingsUtils.IsSubclassOf(type, "Serenity.Data", "Row") ||
-            TypingsUtils.IsSubclassOf(type, "Serenity.Data", "Row`1"))
+        if (IsRowType(baseTypes, type))
         {
             var metadata = ExtractRowMetadata(type);
-            
+
             add((t) =>
             {
                 GenerateRowType(t);
                 GenerateRowMetadata(t, metadata);
             });
-            
+
             return;
         }
 
         add(GenerateBasicType);
     }
 
-    public void SetLocalTextFiltersFrom(IFileSystem fileSystem, string appSettingsFile)
-    {
-        ArgumentExceptionHelper.ThrowIfNull(fileSystem, nameof(fileSystem));
-        ArgumentExceptionHelper.ThrowIfNull(appSettingsFile, nameof(appSettingsFile));
-
-        if (!LocalTexts || !fileSystem.FileExists(appSettingsFile))
-            return;
-
-        try
-        {
-            var obj = Newtonsoft.Json.Linq.JObject.Parse(fileSystem.ReadAllText(appSettingsFile));
-            if ((obj["LocalTextPackages"] ?? ((obj["AppSettings"] 
-                as Newtonsoft.Json.Linq.JObject)?["LocalTextPackages"])) is 
-                Newtonsoft.Json.Linq.JObject packages)
-            {
-                foreach (var p in packages.PropertyValues())
-                    foreach (var x in p.Values<string>())
-                        LocalTextFilters.Add(x);
-            }
-        }
-        catch
-        {
-        }
-    }
-
-    protected override void PreVisitType(TypeDefinition type)
-    {
-        base.PreVisitType(type);
-        PreVisitTypeForTexts(type);
-        PreVisitTypeForScriptData(type);
-    }
-
     protected override void Reset()
     {
         base.Reset();
 
+        cw.BraceOnSameLine = true;
+        generateQueue = new Queue<TypeDefinition>();
+        visited.Clear();
+        lookupScripts.Clear();
+        generatedTypes.Clear();
+        annotationTypes.Clear();
         localTextKeys.Clear();
         localTextNestedClasses.Clear();
         namespaceConstants.Clear();
         scriptDataKeys.Clear();
-
     }
 
-    public string DetermineModulesRoot(IFileSystem fileSystem, string projectFile,
-        string rootNamespace)
-    {
-        ArgumentExceptionHelper.ThrowIfNull(fileSystem, nameof(fileSystem));
-        ArgumentExceptionHelper.ThrowIfNull(projectFile, nameof(projectFile));
-
-        var projectDir = fileSystem.GetDirectoryName(projectFile);
-        var modulesDir = fileSystem.Combine(projectDir, "Modules");
-
-        if (!fileSystem.DirectoryExists(modulesDir) ||
-            fileSystem.GetFiles(modulesDir, "*.*").Length == 0)
-        {
-            var rootNsDir = fileSystem.Combine(projectDir, 
-                fileSystem.GetFileName(projectFile));
-            if (fileSystem.DirectoryExists(rootNsDir))
-            {
-                modulesDir = rootNsDir;
-                ModulesPathFolder = fileSystem.GetFileName(projectFile);
-            }
-            else
-            {
-                rootNsDir = fileSystem.Combine(projectDir, rootNamespace);
-                if (fileSystem.DirectoryExists(rootNsDir))
-                {
-                    modulesDir = rootNsDir;
-                    ModulesPathFolder = rootNamespace;
-                }
-            }
-        }
-
-        return modulesDir;
-    }
 }

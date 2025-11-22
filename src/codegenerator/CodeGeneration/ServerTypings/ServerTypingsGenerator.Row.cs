@@ -5,7 +5,7 @@ using Mono.Cecil.Cil;
 
 namespace Serenity.CodeGeneration;
 
-public partial class ServerTypingsGenerator : TypingsGeneratorBase
+public partial class ServerTypingsGenerator
 {
     protected void GenerateRowType(TypeDefinition type)
     {
