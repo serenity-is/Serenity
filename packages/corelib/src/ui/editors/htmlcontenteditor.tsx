@@ -4,7 +4,7 @@ import { isTrimmedEmpty } from "../../compat";
 import { IReadOnly, IStringValue } from "../../interfaces";
 import { LazyLoadHelper } from "../helpers/lazyloadhelper";
 import { EditorProps, EditorWidget } from "./editorwidget";
-import { getRestExtensions, getTiptapContent, TiptapToolbar, type TiptapModule, type TiptapModuleInternal, type TiptapToolbarHiddenOption } from "./htmlcontenteditor-tiptap";
+import { defaultTiptapFileHandlerConfig, getAllTiptapExtensions, getTiptapContent, TiptapToolbar, type TiptapModule, type TiptapToolbarHiddenOption } from "./htmlcontenteditor-tiptap";
 
 export type HtmlContentEditorProvider = "ckeditor" | "tiptap";
 
@@ -70,7 +70,7 @@ export class HtmlContentEditor<P extends HtmlContentEditorOptions = HtmlContentE
 
         if (HtmlContentEditor.tiptapModule && this.options.editorProvider === "tiptap") {
             Promise.resolve(typeof HtmlContentEditor.tiptapModule === "function" ?
-                HtmlContentEditor.tiptapModule() : HtmlContentEditor.tiptapModule).then((tiptap: TiptapModuleInternal) => {
+                HtmlContentEditor.tiptapModule() : HtmlContentEditor.tiptapModule).then((tiptap: TiptapModule) => {
                     if (!tiptap?.Editor)
                         return;
 
@@ -84,10 +84,15 @@ export class HtmlContentEditor<P extends HtmlContentEditorOptions = HtmlContentE
                     }
                     textArea.classList.add("s-offscreen");
 
+                    const extensions = this.getTiptapExtensions(tiptap)
+                        .filter(ext => ext != null)
+                        .map(ext => this.configureTiptapExtension(ext))
+                        .filter(ext => ext != null);
+
                     this.tiptapEditor = new tiptap.Editor({
                         element: this.tiptapElement,
                         content: sanitizeHtml(textArea.value),
-                        extensions: this.getTiptapExtensions(tiptap),
+                        extensions: extensions,
                         injectNonce: Config.cspNonce
                     });
 
@@ -228,19 +233,25 @@ export class HtmlContentEditor<P extends HtmlContentEditorOptions = HtmlContentE
         return (window as any)['CKEDITOR']?.instances?.[id];
     }
 
-    protected getTiptapStarterKit(tiptap: TiptapModule): any {
-        return tiptap.StarterKit;
+    protected configureTiptapExtension(extension: any): any {
+        if (!extension || !extension.name)
+            return extension;
+
+        switch (extension.name) {
+            case "fileHandler":
+                return extension.configure(defaultTiptapFileHandlerConfig());
+
+            case "textAlign":
+                return extension.configure({
+                    types: ["paragraph", "heading"],
+                    alignments: ["left", "center", "right", "justify"]
+                });
+        }
+        return extension;
     }
 
     protected getTiptapExtensions(tiptap: TiptapModule): any[] {
-        return [
-            this.getTiptapStarterKit(tiptap),
-            tiptap.TextAlign.configure({
-                types: ["paragraph", "heading"],
-                alignments: ["left", "center", "right", "justify"]
-            }),
-            ...getRestExtensions(tiptap)
-        ].filter(x => x != null);
+        return getAllTiptapExtensions(tiptap);
     }
 
     protected createTiptapToolbar(editor: any, hidden: TiptapToolbarHiddenOption): HTMLElement {
@@ -395,24 +406,32 @@ export class HtmlNoteContentEditor<P extends HtmlContentEditorOptions = HtmlCont
         return config;
     }
 
-    protected override getTiptapExtensions(tiptap: TiptapModule): any[] {
-        return [this.getTiptapStarterKit(tiptap)].filter(x => x != null);
+    protected override configureTiptapExtension(extension: any): any {
+        extension = super.configureTiptapExtension(extension);
+
+        switch (extension?.name) {
+            case "starterKit":
+                extension = extension.configure({
+                    blockquote: false,
+                    bulletList: false,
+                    code: false,
+                    codeBlock: false,
+                    heading: false,
+                    horizontalRule: false,
+                    listItem: false,
+                    listKeymap: false,
+                    link: false,
+                    orderedList: false,
+                    strike: false
+                });
+                break;
+        }
+
+        return extension;
     }
 
-    protected override getTiptapStarterKit(tiptap: TiptapModule): any {
-        return (tiptap as TiptapModuleInternal).StarterKit?.configure({
-            blockquote: false,
-            bulletList: false,
-            code: false,
-            codeBlock: false,
-            heading: false,
-            horizontalRule: false,
-            listItem: false,
-            listKeymap: false,
-            link: false,
-            orderedList: false,
-            strike: false
-        });
+    protected override getTiptapExtensions(tiptap: TiptapModule): any[] {
+        return [tiptap.StarterKit];
     }
 }
 
@@ -450,30 +469,33 @@ export class HtmlReportContentEditor<P extends HtmlContentEditorOptions = HtmlCo
         };
     }
 
-    protected override getTiptapExtensions(tiptap: TiptapModule): any[] {
-        return [
-            this.getTiptapStarterKit(tiptap),
-            tiptap.TextAlign.configure({
-                types: ["paragraph", "heading"],
-                alignments: ["left", "center", "right"]
-            })
-        ].filter(x => x != null);
-    }
+    protected override configureTiptapExtension(extension: any): any {
+        extension = super.configureTiptapExtension(extension);
 
-    protected override getTiptapStarterKit(tiptap: TiptapModule): any {
-        return (tiptap as TiptapModuleInternal).StarterKit?.configure({
-            blockquote: false,
-            bulletList: false,
-            code: false,
-            codeBlock: false,
-            heading: false,
-            horizontalRule: false,
-            listItem: false,
-            listKeymap: false,
-            link: false,
-            orderedList: false,
-            strike: false
-        });
+        switch (extension?.name) {
+            case "starterKit":
+                extension = extension.configure({
+                    blockquote: false,
+                    bulletList: false,
+                    code: false,
+                    codeBlock: false,
+                    heading: false,
+                    horizontalRule: false,
+                    listItem: false,
+                    listKeymap: false,
+                    link: false,
+                    orderedList: false,
+                    strike: false
+                });
+
+            case "textAlign":
+                extension = extension.configure({
+                    alignments: ["left", "center", "right"]
+                });
+                break;
+        }
+
+        return extension;
     }
 }
 

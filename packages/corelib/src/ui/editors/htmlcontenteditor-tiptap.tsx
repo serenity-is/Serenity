@@ -1,18 +1,10 @@
 import { type Computed, type PropValue, useUpdatableComputed } from "@serenity-is/domwise";
 import { faIcon, HtmlContentEditorTexts } from "../../base";
 
-/* To avoid importing tiptap dependencies in corelib, we define minimal interfaces here */
+/* To avoid importing tiptap dependencies in corelib, we define minimal interfaces here. */
 export interface TiptapModule {
     Editor: any;
-    StarterKit?: any;
-    TextAlign?: any;
-}
-
-/* Internal TiptapModule typing */
-export interface TiptapModuleInternal {
-    Editor: { new(args: TiptapEditorArgs): TiptapEditor; };
-    StarterKit?: { configure: (options: StarterKitOptions) => any; };
-    TextAlign?: any;
+    [key: string]: any;
 }
 
 export interface TiptapToolbarHiddenOption {
@@ -63,6 +55,7 @@ interface TiptapEditorArgs {
 
 interface TiptapEditorChain {
     focus: () => TiptapEditorChain,
+    insertContentAt: (pos: number, content: any) => TiptapEditorChain,
     setTextAlign: (align: TextAlign) => TiptapEditorChain,
     toggleTextAlign: (align: TextAlign) => TiptapEditorChain,
     toggleMark: (mark: string) => TiptapEditorChain,
@@ -158,7 +151,7 @@ export function TiptapToolbar(props: {
     const alignment = (["left", "center", "right", "justify"] as TextAlign[]);
 
     const hiddenUndoRedo = computed(() => hidden.undoRedo || !isEditable(editor));
-    
+
     const hiddenMark: Record<Mark, Computed<boolean>> = {
         bold: computed(() => hidden.boldItalicUnderline || !showMark(editor, "bold")),
         italic: computed(() => hidden.boldItalicUnderline || !showMark(editor, "italic")),
@@ -396,11 +389,59 @@ export function getTiptapContent(editor: TiptapEditor): string {
     return editor.getHTML();
 }
 
-export function getRestExtensions(tiptap: TiptapModule) {
-    return Object.entries(tiptap).filter(([k, e]) => e && 
-        e !== tiptap.StarterKit && 
-        e !== tiptap.TextAlign && 
-        /[A-Z]/.test(k[0]) && e && 
+export function getAllTiptapExtensions(tiptap: TiptapModule) {
+    return Object.entries(tiptap).filter(([k, e]) => e &&
+        /[A-Z]/.test(k[0]) && e &&
         (e.type === "extension" || e.type === "mark" || e.type === "node"))
         .map(([_, e]) => e)
+}
+
+export function defaultTiptapFileHandlerConfig() {
+    return {
+        allowedMimeTypes: ['image/jpeg', 'image/gif', 'image/png', 'image/webp'],
+        onDrop: (currentEditor: TiptapEditor, files: Blob[], pos: any) => {
+            files.forEach((file: Blob) => {
+                const fileReader = new FileReader()
+
+                fileReader.readAsDataURL(file)
+                fileReader.onload = () => {
+                    currentEditor
+                        .chain()
+                        .insertContentAt(pos, {
+                            type: 'image',
+                            attrs: {
+                                src: fileReader.result,
+                            },
+                        })
+                        .focus()
+                        .run()
+                }
+            })
+        },
+        onPaste: (currentEditor: any, files: Blob[], htmlContent: any) => {
+            files.forEach(file => {
+                if (htmlContent) {
+                    // if there is htmlContent, stop manual insertion & let other extensions handle insertion via inputRule
+                    // you could extract the pasted file from this url string and upload it to a server for example
+                    return false
+                }
+
+                const fileReader = new FileReader()
+
+                fileReader.readAsDataURL(file)
+                fileReader.onload = () => {
+                    currentEditor
+                        .chain()
+                        .insertContentAt(currentEditor.state.selection.anchor, {
+                            type: 'image',
+                            attrs: {
+                                src: fileReader.result,
+                            }
+                        })
+                        .focus()
+                        .run()
+                }
+            })
+        },
+    }
 }
