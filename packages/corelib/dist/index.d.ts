@@ -6177,8 +6177,7 @@ export declare class EnumEditor<P extends EnumEditorOptions = EnumEditorOptions>
 }
 export interface TiptapModule {
 	Editor: any;
-	StarterKit?: any;
-	TextAlign?: any;
+	[key: string]: any;
 }
 export interface TiptapToolbarHiddenOption {
 	alignment?: boolean;
@@ -6236,7 +6235,7 @@ export declare class HtmlContentEditor<P extends HtmlContentEditorOptions = Html
 	protected getConfig(): CKEditorConfig;
 	protected getCKEditorConfig(): CKEditorConfig;
 	protected getCKEditorInstance(): any;
-	protected getTiptapStarterKit(tiptap: TiptapModule): any;
+	protected configureTiptapExtension(extension: any): any;
 	protected getTiptapExtensions(tiptap: TiptapModule): any[];
 	protected createTiptapToolbar(editor: any, hidden: TiptapToolbarHiddenOption): HTMLElement;
 	/** Can be overridden to hide some buttons even though they are registered in extensions */
@@ -6259,8 +6258,8 @@ export declare class HtmlNoteContentEditor<P extends HtmlContentEditorOptions = 
 	static [Symbol.typeInfo]: EditorTypeInfo<"Serenity.">;
 	constructor(props: EditorProps<P>);
 	protected getCKEditorConfig(): CKEditorConfig;
+	protected configureTiptapExtension(extension: any): any;
 	protected getTiptapExtensions(tiptap: TiptapModule): any[];
-	protected getTiptapStarterKit(tiptap: TiptapModule): any;
 }
 /**
  * This is originally was intended to be a subset more compatible with reports,
@@ -6272,8 +6271,7 @@ export declare class HtmlReportContentEditor<P extends HtmlContentEditorOptions 
 	constructor(props: EditorProps<P>);
 	protected getCKEditorConfig(): CKEditorConfig;
 	protected getTiptapToolbarHidden(editor: any): TiptapToolbarHiddenOption;
-	protected getTiptapExtensions(tiptap: TiptapModule): any[];
-	protected getTiptapStarterKit(tiptap: TiptapModule): any;
+	protected configureTiptapExtension(extension: any): any;
 }
 export interface IntegerEditorOptions {
 	minValue?: number;

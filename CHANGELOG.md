@@ -1,4 +1,18 @@
-## 9.1.7 (2025-11-1)
+## 9.2.0 (2025-11-24)
+
+### Features
+- This will be the last version using .NET 8, only minor 9.2.x versions from `net8` branch may be released to fix any critical issues.
+- Instead of using sleek-vars.rtl sleek-vars.ltr etc. change the values of --l, --r variables based on rtl. Increase number of supported columns to 100 from 50 which should be enough for most cases.
+- Add styleNonce option to SleekGrid constructor support more strict CSP directives. If not passed, it will be looked up from a meta element with csp-nonce name, or style/script with nonce value in document head.
+- Replace inline style attributes to potentially support stricter CSP directives. Currently only CKEditor 4 is an issue as it requires unsafe-inline.
+- Configured `HtmlNoteContentEditor` and `HtmlReportContentEditor` to use `Tiptap` instead of `CKEditor` (StartSharp). See tiptap-init.ts file in latest template. Tiptap usage is currently opt-in. CKEditor support will be removed in a future version as it is out-of-date and is not compatible with strict CSP.
+- Add helpers to add / get CSP directives, both from the layout and per specific pages (like emailclient page which uses CKEditor 4 that requires unsafe-inline)
+- New `useUpdatableComputed` helper in `domwise` to create a factory for computed signals that can be manually updated as a batch (by internally incrementing a counter signal). This may be useful for computed signals that depend not only on other signals, but externally changing state.
+
+### Bugfixes
+- Fix potential issue with SlickFormatting.treeToggle when formatter returns a string, and enableHtmlRendering is false. Update the default comment in FormatterContext.enableHtmlRendering
+
+## 9.1.7 (2025-11-19)
 
 ### Bugfixes
 - Null flags issue when restoring persisted settings
