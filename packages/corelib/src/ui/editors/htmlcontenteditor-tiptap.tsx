@@ -8,7 +8,7 @@ export interface TiptapModule {
     TextAlign?: any;
 }
 
-/** Internal TiptapModule typing */
+/* Internal TiptapModule typing */
 export interface TiptapModuleInternal {
     Editor: { new(args: TiptapEditorArgs): TiptapEditor; };
     StarterKit?: { configure: (options: StarterKitOptions) => any; };
@@ -127,59 +127,6 @@ interface StarterKitOptions {
     trailingNode?: object | false;
 }
 
-/**
- * Checks if a mark exists in the editor schema
- * @param markName - The name of the mark to check
- * @param editor - The editor instance
- * @returns boolean indicating if the mark exists in the schema
- */
-const isMarkInSchema = (
-    markName: string,
-    editor: TiptapEditor
-): boolean => {
-    if (!editor?.schema) return false
-    return editor.schema.spec.marks.get(markName) !== undefined
-}
-
-/**
- * Checks if a node exists in the editor schema
- * @param nodeName - The name of the node to check
- * @param editor - The editor instance
- * @returns boolean indicating if the node exists in the schema
- */
-const isNodeInSchema = (
-    nodeName: string,
-    editor: TiptapEditor
-): boolean => {
-    if (!editor?.schema) return false
-    return editor.schema.spec.nodes.get(nodeName) !== undefined
-}
-
-
-/**
- * Checks if one or more extensions are registered in the Tiptap editor.
- * @param editor - The Tiptap editor instance
- * @param extensionNames - A single extension name or an array of names to check
- * @returns True if at least one of the extensions is available, false otherwise
- */
-function isExtensionAvailable(
-    editor: TiptapEditor,
-    extensionNames: string | string[]
-): boolean {
-    if (!editor) return false
-
-    const names = Array.isArray(extensionNames)
-        ? extensionNames
-        : [extensionNames]
-
-    const found = names.some((name) =>
-        editor.extensionManager.extensions.some((ext) => ext.name === name)
-    )
-
-    return found
-}
-
-
 export interface TiptapToolbarHiddenOption {
     alignment?: boolean;
     alignmentJustify?: boolean;
@@ -212,7 +159,7 @@ export function TiptapToolbar(props: {
                 {(["undo", "redo"] as UndoRedoAction[]).map(key =>
                     <TiptapButton title={undoRedoTexts[key]} icon={undoRedoIcons[key]}
                         disabled={computed(() => !canUndoRedo(editor, key))}
-                        hidden={computed(() => hidden.undoRedo || !showUndoRedo(editor, key))}
+                        hidden={computed(() => hidden.undoRedo || !isEditable(editor))}
                         onClick={() => execUndoRedo(editor, key)} />
                 )}
             </div>
@@ -228,7 +175,7 @@ export function TiptapToolbar(props: {
             </div>
 
             <div class="btn-group me-2" hidden={hidden.alignment}>
-                {textAlignKeys.map(key =>
+                {(["left", "center", "right", "justify"] as TextAlign[]).map(key =>
                     <TiptapButton title={textAlignTexts[key]} icon={textAlignIcons[key]}
                         active={computed(() => isTextAlignActive(editor, key))}
                         disabled={computed(() => !canSetTextAlign(editor, key))}
@@ -271,10 +218,23 @@ export function TiptapToolbar(props: {
 
 // most of the following functions are adapted from https://github.com/ueberdosis/tiptap-ui-components
 
-function isNodeTypeSelected(
-    editor: TiptapEditor,
-    types: string[] = []
-): boolean {
+function isExtensionAvailable(editor: TiptapEditor, extensionNames: string | string[]): boolean {
+    if (!editor) return false;
+    const names = Array.isArray(extensionNames) ? extensionNames : [extensionNames];
+    return names.some((name) => editor.extensionManager.extensions.some((ext) => ext.name === name));
+}
+
+const isMarkInSchema = (markName: string, editor: TiptapEditor): boolean => {
+    if (!editor?.schema) return false;
+    return editor.schema.spec.marks.get(markName) !== undefined;
+}
+
+const isNodeInSchema = (nodeName: string, editor: TiptapEditor): boolean => {
+    if (!editor?.schema) return false;
+    return editor.schema.spec.nodes.get(nodeName) !== undefined;
+}
+
+function isNodeTypeSelected(editor: TiptapEditor, types: string[] = []): boolean {
     if (!editor || !editor.state.selection) return false
 
     const { state } = editor
@@ -302,46 +262,22 @@ const undoRedoIcons: Record<UndoRedoAction, string> = {
     redo: faIcon("redo")
 };
 
-function canUndoRedo(
-    editor: Editor,
-    action: UndoRedoAction
-): boolean {
-    if (!editor || !editor.isEditable) return false
-    if (isNodeTypeSelected(editor, ["image"])) return false
+function isEditable(editor: Editor): boolean {
+    return !!(editor && editor.isEditable);
+}
+
+function canUndoRedo(editor: Editor, action: UndoRedoAction): boolean {
+    if (!isEditable(editor) || isNodeTypeSelected(editor, ["image"])) return false;
     return action === "undo" ? editor.can().undo() : editor.can().redo();
 }
 
-function execUndoRedo(
-    editor: Editor,
-    action: UndoRedoAction
-): boolean {
-    if (!editor || !editor.isEditable) return false
-    if (!canUndoRedo(editor, action)) return false
-
-    const chain = editor.chain().focus()
-    return action === "undo" ? chain.undo().run() : chain.redo().run()
+function execUndoRedo(editor: Editor, action: UndoRedoAction): boolean {
+    if (!isEditable(editor) || !canUndoRedo(editor, action)) return false;
+    const chain = editor.chain().focus();
+    return action === "undo" ? chain.undo().run() : chain.redo().run();
 }
 
-function showUndoRedo(editor: Editor, action: UndoRedoAction, opt?: {
-    hideWhenUnavailable?: boolean
-}): boolean {
-    if (!editor || !editor.isEditable) return false
-
-    if (opt?.hideWhenUnavailable && !editor.isActive("code")) {
-        return canUndoRedo(editor, action)
-    }
-
-    return true
-}
-
-type Mark =
-    | "bold"
-    | "italic"
-    | "strike"
-    | "code"
-    | "underline"
-    | "superscript"
-    | "subscript"
+type Mark = "bold" | "italic" | "strike" | "code" | "underline" | "superscript" | "subscript"
 
 const markTexts: Record<Mark, string> = {
     bold: HtmlContentEditorTexts.Bold,
@@ -364,36 +300,22 @@ const markIcons: Record<Mark, string> = {
 };
 
 function canToggleMark(editor: Editor, type: Mark): boolean {
-    if (!editor || !editor.isEditable) return false
-    if (!isMarkInSchema(type, editor) || isNodeTypeSelected(editor, ["image"]))
-        return false
-
-    return editor.can().toggleMark(type)
+    if (!isEditable(editor) || !isMarkInSchema(type, editor) || isNodeTypeSelected(editor, ["image"])) return false;
+    return editor.can().toggleMark(type);
 }
 
 function isMarkActive(editor: Editor, type: Mark): boolean {
-    if (!editor || !editor.isEditable) return false
-    return editor.isActive(type)
+    if (!isEditable(editor)) return false;
+    return editor.isActive(type);
 }
 
 function toggleMark(editor: Editor, type: Mark): boolean {
-    if (!editor || !editor.isEditable) return false
-    if (!canToggleMark(editor, type)) return false
-
-    return editor.chain().focus().toggleMark(type).run()
+    if (!isEditable(editor) || !canToggleMark(editor, type)) return false;
+    return editor.chain().focus().toggleMark(type).run();
 }
 
-function showMark(editor: Editor, type: Mark, opt?: {
-    hideWhenUnavailable: boolean
-}): boolean {
-    if (!editor || !editor.isEditable) return false
-    if (!isMarkInSchema(type, editor)) return false
-
-    if (opt?.hideWhenUnavailable && !editor.isActive("code")) {
-        return canToggleMark(editor, type)
-    }
-
-    return true
+function showMark(editor: Editor, type: Mark): boolean {
+    return isEditable(editor) && isMarkInSchema(type, editor);
 }
 
 type TextAlign = "left" | "center" | "right" | "justify"
@@ -412,86 +334,41 @@ const textAlignIcons: Record<TextAlign, string> = {
     justify: faIcon("align-justify")
 };
 
-const textAlignKeys = ["left", "center", "right", "justify"] as TextAlign[];
-
-function canSetTextAlign(
-    editor: TiptapEditor,
-    align: TextAlign
-): boolean {
-    if (!editor || !editor.isEditable) return false
-    if (
-        !isExtensionAvailable(editor, "textAlign") ||
-        isNodeTypeSelected(editor, ["image", "horizontalRule"])
-    )
-        return false
-
-    return editor.can().setTextAlign(align)
+function canSetTextAlign(editor: TiptapEditor, align: TextAlign): boolean {
+    if (!isEditable(editor)) return false;
+    if (!isExtensionAvailable(editor, "textAlign") || isNodeTypeSelected(editor, ["image", "horizontalRule"])) return false;
+    return editor.can().setTextAlign(align);
 }
 
-function hasSetTextAlign(
-    commands: any
-): boolean {
-    return "setTextAlign" in commands
+function hasSetTextAlign(commands: any): boolean {
+    return "setTextAlign" in commands;
 }
 
-function isTextAlignActive(
-    editor: TiptapEditor,
-    align: TextAlign
-): boolean {
-    if (!editor || !editor.isEditable) return false
-    return editor.isActive({ textAlign: align })
+function isTextAlignActive(editor: TiptapEditor, align: TextAlign): boolean {
+    if (!isEditable(editor)) return false;
+    return editor.isActive({ textAlign: align });
 }
 
 function setTextAlign(editor: TiptapEditor, align: TextAlign): boolean {
-    if (!editor || !editor.isEditable) return false
-    if (!canSetTextAlign(editor, align)) return false
-
+    if (!isEditable(editor) || !canSetTextAlign(editor, align)) return false;
     const chain = editor.chain().focus();
-    if (hasSetTextAlign(chain)) {
-        return chain.setTextAlign(align).run()
-    }
-
-    return false
+    if (hasSetTextAlign(chain)) return chain.setTextAlign(align).run();
+    return false;
 }
 
-function showTextAlign(editor: TiptapEditor, align: TextAlign, opt?: {
-    hideWhenUnavailable: boolean
-}): boolean {
-
-    if (!editor || !editor.isEditable) return false;
-    if (!isExtensionAvailable(editor, "textAlign")) return false;
-
-    if (opt?.hideWhenUnavailable && !editor.isActive("code")) {
-        return canSetTextAlign(editor, align)
-    }
-
-    return true
+function showTextAlign(editor: TiptapEditor): boolean {
+    return isEditable(editor) && isExtensionAvailable(editor, "textAlign");
 }
 
 export function isTiptapContentEmpty(content: any): boolean {
-    if (content === null) {
-        return true
-    }
-
-    if (typeof content === 'string') {
-        return content === ''
-    }
-
-    if (Array.isArray(content)) {
-        return content.every(item => isTiptapContentEmpty(item))
-    }
-
-    if (!content.content) {
-        return true
-    }
-
-    return content.content.every((item: any) => !item.content)
+    if (content === null) return true;
+    if (typeof content === 'string') return content === '';
+    if (Array.isArray(content)) return content.every(item => isTiptapContentEmpty(item));
+    if (!content.content) return true;
+    return content.content.every((item: any) => !item.content);
 }
 
 export function getTiptapContent(editor: TiptapEditor): string {
-    if (isTiptapContentEmpty(editor.getJSON())) {
-        return '';
-    }
-
+    if (isTiptapContentEmpty(editor.getJSON())) return '';
     return editor.getHTML();
 }
