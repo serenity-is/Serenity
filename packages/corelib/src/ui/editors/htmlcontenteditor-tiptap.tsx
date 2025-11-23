@@ -231,8 +231,6 @@ export function TiptapToolbar(props: {
             <div class="btn-group">
                 <button class="btn btn-outline-secondary" title="Link" type="button" tabindex="-1">
                     <i class={faIcon("link")}></i>
-                </button></div><div class="tiptap-separator" data-orientation="vertical" role="none"></div>
-                <TiptapButton title={HtmlContentEditorTexts.InlineCode} disabled={inlineCodeDisabled} icon={faIcon("code")} hidden={hidden.inlineCode || !isMarkInSchema("code", editor)} onClick={() => editor?.commands?.toggleCode?.()} />
             </div>
             <button class="btn btn-outline-secondary" title="Add image" type="button" tabindex="-1">
                 <i class={faIcon("image")}></i>
@@ -403,6 +401,6 @@ export function getRestExtensions(tiptap: TiptapModule) {
         e !== tiptap.StarterKit && 
         e !== tiptap.TextAlign && 
         /[A-Z]/.test(k[0]) && e && 
-        (e.type === "extension" || e.type === "mark"))
+        (e.type === "extension" || e.type === "mark" || e.type === "node"))
         .map(([_, e]) => e)
 }
