@@ -4,7 +4,7 @@ import { nsDemoNorthwind } from "../ServerTypes/Namespaces";
 export class NoteDialog<P = {}> extends BaseDialog<P> {
     static override[Symbol.typeInfo] = this.registerClass(nsDemoNorthwind);
 
-    declare private textEditor: HtmlContentEditor;
+    declare private textEditor: HtmlNoteContentEditor;
 
     protected override renderContents(): any {
         const id = this.useIdPrefix();

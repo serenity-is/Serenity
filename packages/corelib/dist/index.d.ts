@@ -6232,10 +6232,13 @@ export declare class HtmlContentEditor<P extends HtmlContentEditorOptions = Html
 	protected handleCKKey(e: any): void;
 	protected getCKEditorLanguage(): string;
 	private triggerKeyupEvent;
+	/** @deprecated Override and use getCKEditorConfig() */
+	protected getConfig(): CKEditorConfig;
 	protected getCKEditorConfig(): CKEditorConfig;
 	protected getCKEditorInstance(): any;
 	protected getTiptapStarterKit(tiptap: TiptapModule): any;
 	protected getTiptapExtensions(tiptap: TiptapModule): any[];
+	protected createTiptapToolbar(editor: any, hidden: TiptapToolbarHiddenOption): HTMLElement;
 	/** Can be overridden to hide some buttons even though they are registered in extensions */
 	protected getTiptapToolbarHidden(editor: any): TiptapToolbarHiddenOption;
 	destroy(): void;

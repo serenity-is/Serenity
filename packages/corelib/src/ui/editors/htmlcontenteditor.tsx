@@ -106,7 +106,7 @@ export class HtmlContentEditor<P extends HtmlContentEditorOptions = HtmlContentE
             HtmlContentEditor.includeCKEditor(() => {
                 LazyLoadHelper.executeOnceWhenShown(this.domNode, () => {
                     if ((window as any)['CKEDITOR']) {
-                        const config = this.getCKEditorConfig();
+                        const config = (this as any).getConfig();
                         (window as any)['CKEDITOR'].replace(id, config);
                         this.domNode.dataset.editorProvider = "ckeditor";
                     }
@@ -166,6 +166,11 @@ export class HtmlContentEditor<P extends HtmlContentEditorOptions = HtmlContentE
     }
 
     private triggerKeyupEvent: KeyboardEvent;
+
+    /** @deprecated Override and use getCKEditorConfig() */
+    protected getConfig(): CKEditorConfig {
+        return this.getCKEditorConfig();
+    }
 
     protected getCKEditorConfig(): CKEditorConfig {
         const boundThis = bindThis(this);
