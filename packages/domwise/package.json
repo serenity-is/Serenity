@@ -1,6 +1,6 @@
 {
   "name": "@serenity-is/domwise",
-  "version": "1.0.2",
+  "version": "1.1.0",
   "description": "Use JSX syntax to create DOM elements with full TypeScript support",
   "type": "module",
   "types": "dist/index.d.ts",
