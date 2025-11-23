@@ -1,5 +1,5 @@
 import { bindThis } from "@serenity-is/domwise";
-import { Fluent, FormValidationTexts, nsSerenity, resolveUrl, sanitizeHtml, Validator } from "../../base";
+import { Config, Fluent, FormValidationTexts, nsSerenity, resolveUrl, sanitizeHtml, Validator } from "../../base";
 import { isTrimmedEmpty } from "../../compat";
 import { IReadOnly, IStringValue } from "../../interfaces";
 import { LazyLoadHelper } from "../helpers/lazyloadhelper";
@@ -88,6 +88,7 @@ export class HtmlContentEditor<P extends HtmlContentEditorOptions = HtmlContentE
                         element: this.tiptapElement,
                         content: sanitizeHtml(textArea.value),
                         extensions: this.getTiptapExtensions(tiptap),
+                        injectNonce: Config.cspNonce
                     });
 
                     const toolbar = this.createTiptapToolbar(this.tiptapEditor, this.getTiptapToolbarHidden(this.tiptapEditor));
