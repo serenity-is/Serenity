@@ -6,7 +6,7 @@ if not exist "%ProgramFiles%\dotnet\dotnet.exe" (
     goto end
 )
 if "%VSINSTALLDIR%"=="" (
-	set VSINSTALLDIR=%ProgramFiles%\Microsoft Visual Studio\2022\Community
+	set VSINSTALLDIR=%ProgramFiles%\Microsoft Visual Studio\2026\Community
 )
 
 if not exist "%VSINSTALLDIR%\MSBuild\Current\Bin\msbuild.exe" (
@@ -15,8 +15,8 @@ if not exist "%VSINSTALLDIR%\MSBuild\Current\Bin\msbuild.exe" (
 )
 
 for /F "tokens=4 delims=\\" %%G in ("%VSINSTALLDIR%") do set "vsversion=%%G"
-if %vsversion% LSS 2022 (
-    echo ERROR: This script requires Visual Studio 2022 or newer. You are using version %vsversion%.
+if %vsversion% LSS 2026 (
+    echo ERROR: This script requires Visual Studio 2026 or newer. You are using version %vsversion%.
     goto end
 )
 
