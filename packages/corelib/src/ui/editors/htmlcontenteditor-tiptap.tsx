@@ -169,16 +169,11 @@ export function TiptapToolbar(props: {
         subscript: computed(() => hidden.superSubScript || !showMark(editor, "subscript"))
     };
 
-    const hiddenAlignment: Record<TextAlign, Computed<boolean>> = {
-        left: computed(() => hidden.alignment || !showTextAlign(editor)),
-        center: computed(() => hidden.alignment || !showTextAlign(editor)),
-        right: computed(() => hidden.alignment || !showTextAlign(editor)),
-        justify: computed(() => hidden.alignment || hidden.alignmentJustify || !showTextAlign(editor))
-    };
-
+    const hiddenLeftCenterRight = computed(() => hidden.alignment || !showTextAlign(editor));
+    const hiddenJustify = computed(() => hiddenLeftCenterRight.value || hidden.alignmentJustify);
     const hiddenBoldItalicUnderlineStrike = computed(() => boldItalicUnderlineStrike.every(key => hiddenMark[key].value));
     const hiddenSuperSubScriptCode = computed(() => superSubScriptCode.every(key => hiddenMark[key].value));
-    const hiddenAlignmentAll = computed(() => alignment.every(key => hiddenAlignment[key].value));
+    const hiddenAlignmentAll = computed(() => hiddenLeftCenterRight.value && hiddenJustify.value);
 
     return (
         <div role="toolbar" title="toolbar" data-variant="fixed" class="btn-toolbar">
@@ -216,7 +211,7 @@ export function TiptapToolbar(props: {
                     <TiptapButton title={textAlignTexts[key]} icon={textAlignIcons[key]}
                         active={computed(() => isTextAlignActive(editor, key))}
                         disabled={computed(() => !canSetTextAlign(editor, key))}
-                        hidden={hiddenAlignment[key]}
+                        hidden={key === "justify" ? hiddenJustify : hiddenLeftCenterRight}
                         onClick={() => {
                             if (isTextAlignActive(editor, key) && editor.chain().toggleTextAlign) {
                                 editor.chain().focus().toggleTextAlign(key).run();
