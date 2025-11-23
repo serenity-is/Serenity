@@ -4,7 +4,7 @@ import { isTrimmedEmpty } from "../../compat";
 import { IReadOnly, IStringValue } from "../../interfaces";
 import { LazyLoadHelper } from "../helpers/lazyloadhelper";
 import { EditorProps, EditorWidget } from "./editorwidget";
-import { getTiptapContent, TiptapToolbar, type TiptapModule, type TiptapModuleInternal, type TiptapToolbarHiddenOption } from "./htmlcontenteditor-tiptap";
+import { getRestExtensions, getTiptapContent, TiptapToolbar, type TiptapModule, type TiptapModuleInternal, type TiptapToolbarHiddenOption } from "./htmlcontenteditor-tiptap";
 
 export type HtmlContentEditorProvider = "ckeditor" | "tiptap";
 
@@ -90,10 +90,8 @@ export class HtmlContentEditor<P extends HtmlContentEditorOptions = HtmlContentE
                         extensions: this.getTiptapExtensions(tiptap),
                     });
 
-                    this.tiptapElement.prepend(TiptapToolbar({
-                        editor: this.tiptapEditor,
-                        hidden: this.getTiptapToolbarHidden(this.tiptapEditor)
-                    }));
+                    const toolbar = this.createTiptapToolbar(this.tiptapEditor, this.getTiptapToolbarHidden(this.tiptapEditor));
+                    this.tiptapElement.prepend(toolbar);
 
                     this.tiptapEditor.on('update', () => {
                         const html = getTiptapContent(this.tiptapEditor);
@@ -234,8 +232,13 @@ export class HtmlContentEditor<P extends HtmlContentEditorOptions = HtmlContentE
             tiptap.TextAlign.configure({
                 types: ["paragraph", "heading"],
                 alignments: ["left", "center", "right", "justify"]
-            })
+            }),
+            ...getRestExtensions(tiptap)
         ].filter(x => x != null);
+    }
+
+    protected createTiptapToolbar(editor: any, hidden: TiptapToolbarHiddenOption): HTMLElement {
+        return <TiptapToolbar editor={editor} hidden={hidden} /> as HTMLElement;
     }
 
     /** Can be overridden to hide some buttons even though they are registered in extensions */

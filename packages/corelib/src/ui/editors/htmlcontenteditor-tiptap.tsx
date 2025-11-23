@@ -1,4 +1,4 @@
-import { type PropValue, useUpdatableComputed } from "@serenity-is/domwise";
+import { type Computed, type PropValue, useUpdatableComputed } from "@serenity-is/domwise";
 import { faIcon, HtmlContentEditorTexts } from "../../base";
 
 /* To avoid importing tiptap dependencies in corelib, we define minimal interfaces here */
@@ -153,33 +153,70 @@ export function TiptapToolbar(props: {
 
     editor.on('transaction', update);
 
+    const boldItalicUnderlineStrike = (["bold", "italic", "underline", "strike"] as Mark[]);
+    const superSubScriptCode = (["superscript", "subscript", "code"] as Mark[]);
+    const alignment = (["left", "center", "right", "justify"] as TextAlign[]);
+
+    const hiddenUndoRedo = computed(() => hidden.undoRedo || !isEditable(editor));
+    
+    const hiddenMark: Record<Mark, Computed<boolean>> = {
+        bold: computed(() => hidden.boldItalicUnderline || !showMark(editor, "bold")),
+        italic: computed(() => hidden.boldItalicUnderline || !showMark(editor, "italic")),
+        underline: computed(() => hidden.boldItalicUnderline || !showMark(editor, "underline")),
+        strike: computed(() => hidden.strike || !showMark(editor, "strike")),
+        code: computed(() => hidden.inlineCode || !showMark(editor, "code")),
+        superscript: computed(() => hidden.superSubScript || !showMark(editor, "superscript")),
+        subscript: computed(() => hidden.superSubScript || !showMark(editor, "subscript"))
+    };
+
+    const hiddenAlignment: Record<TextAlign, Computed<boolean>> = {
+        left: computed(() => hidden.alignment || !showTextAlign(editor)),
+        center: computed(() => hidden.alignment || !showTextAlign(editor)),
+        right: computed(() => hidden.alignment || !showTextAlign(editor)),
+        justify: computed(() => hidden.alignment || hidden.alignmentJustify || !showTextAlign(editor))
+    };
+
+    const hiddenBoldItalicUnderlineStrike = computed(() => boldItalicUnderlineStrike.every(key => hiddenMark[key].value));
+    const hiddenSuperSubScriptCode = computed(() => superSubScriptCode.every(key => hiddenMark[key].value));
+    const hiddenAlignmentAll = computed(() => alignment.every(key => hiddenAlignment[key].value));
+
     return (
         <div role="toolbar" title="toolbar" data-variant="fixed" class="btn-toolbar">
-            <div class="btn-group me-2" hidden={hidden.undoRedo}>
+            <div class="btn-group" hidden={hiddenUndoRedo}>
                 {(["undo", "redo"] as UndoRedoAction[]).map(key =>
                     <TiptapButton title={undoRedoTexts[key]} icon={undoRedoIcons[key]}
                         disabled={computed(() => !canUndoRedo(editor, key))}
-                        hidden={computed(() => hidden.undoRedo || !isEditable(editor))}
+                        hidden={hiddenUndoRedo}
                         onClick={() => execUndoRedo(editor, key)} />
                 )}
             </div>
 
-            <div class="btn-group me-2" hidden={hidden.boldItalicUnderline && hidden.strike}>
-                {(["bold", "italic", "underline", "strike"] as Mark[]).map(key =>
+            <div class="btn-group" hidden={hiddenBoldItalicUnderlineStrike}>
+                {boldItalicUnderlineStrike.map(key =>
                     <TiptapButton title={markTexts[key]} icon={markIcons[key]}
                         active={computed(() => isMarkActive(editor, key))}
                         disabled={computed(() => !canToggleMark(editor, key))}
-                        hidden={computed(() => hidden.boldItalicUnderline || (key === "strike" ? hidden.strike : hidden.boldItalicUnderline) || !showMark(editor, key))}
+                        hidden={hiddenMark[key]}
                         onClick={() => toggleMark(editor, key)} />
                 )}
             </div>
 
-            <div class="btn-group me-2" hidden={hidden.alignment}>
-                {(["left", "center", "right", "justify"] as TextAlign[]).map(key =>
+            <div class="btn-group" hidden={hiddenSuperSubScriptCode}>
+                {superSubScriptCode.map(key =>
+                    <TiptapButton title={markTexts[key]} icon={markIcons[key]}
+                        active={computed(() => isMarkActive(editor, key))}
+                        disabled={computed(() => !canToggleMark(editor, key))}
+                        hidden={hiddenMark[key]}
+                        onClick={() => toggleMark(editor, key)} />
+                )}
+            </div>
+
+            <div class="btn-group" hidden={hiddenAlignmentAll}>
+                {alignment.map(key =>
                     <TiptapButton title={textAlignTexts[key]} icon={textAlignIcons[key]}
                         active={computed(() => isTextAlignActive(editor, key))}
                         disabled={computed(() => !canSetTextAlign(editor, key))}
-                        hidden={computed(() => hidden.alignment || (key === "justify" && hidden.alignmentJustify) || !showTextAlign(editor, key))}
+                        hidden={hiddenAlignment[key]}
                         onClick={() => {
                             if (isTextAlignActive(editor, key) && editor.chain().toggleTextAlign) {
                                 editor.chain().focus().toggleTextAlign(key).run();
@@ -191,22 +228,15 @@ export function TiptapToolbar(props: {
             </div>
 
             {/* todo add more buttons like below
-            <div class="btn-group me-2" hidden={hidden.headings && hidden.blockquote && hidden.listOptions}>
+            <div class="btn-group" hidden={hidden.headings && hidden.blockquote && hidden.listOptions}>
                 <TiptapButton title={HtmlContentEditorTexts.FormatTextAsHeading} icon={faIcon("heading")} hidden={hidden.headings || !isNodeInSchema("heading", editor)} />
                 <TiptapButton title={HtmlContentEditorTexts.ListOptions} icon={faIcon("list-ul")} hidden={hidden.listOptions || !isNodeInSchema("list", editor)} />
                 <TiptapButton title={HtmlContentEditorTexts.Blockquote} icon={faIcon("quote-right")} hidden={hidden.blockquote || !isNodeInSchema("blockquote", editor)} />
             </div>
-            <div class="btn-group me-2">
+            <div class="btn-group">
                 <button class="btn btn-outline-secondary" title="Link" type="button" tabindex="-1">
                     <i class={faIcon("link")}></i>
                 </button></div><div class="tiptap-separator" data-orientation="vertical" role="none"></div>
-                <div class="btn-group me-2">
-                <button class="btn btn-outline-secondary" title="Superscript" type="button" tabindex="-1">
-                    <i class={faIcon("superscript")}></i>
-                </button>
-                <button class="btn btn-outline-secondary" title="Subscript" type="button" tabindex="-1">
-                    <i class={faIcon("subscript")}></i>
-                </button>
                 <TiptapButton title={HtmlContentEditorTexts.InlineCode} disabled={inlineCodeDisabled} icon={faIcon("code")} hidden={hidden.inlineCode || !isMarkInSchema("code", editor)} onClick={() => editor?.commands?.toggleCode?.()} />
             </div>
             <button class="btn btn-outline-secondary" title="Add image" type="button" tabindex="-1">
@@ -371,4 +401,13 @@ export function isTiptapContentEmpty(content: any): boolean {
 export function getTiptapContent(editor: TiptapEditor): string {
     if (isTiptapContentEmpty(editor.getJSON())) return '';
     return editor.getHTML();
+}
+
+export function getRestExtensions(tiptap: TiptapModule) {
+    return Object.entries(tiptap).filter(([k, e]) => e && 
+        e !== tiptap.StarterKit && 
+        e !== tiptap.TextAlign && 
+        /[A-Z]/.test(k[0]) && e && 
+        (e.type === "extension" || e.type === "mark"))
+        .map(([_, e]) => e)
 }
