@@ -1,4 +1,4 @@
-﻿namespace Serenity.ComponentModel;
+namespace Serenity.ComponentModel;
 
 /// <summary>
 /// Indicates that the target property should use a "HtmlContent" editor.
@@ -51,7 +51,7 @@ public partial class HtmlContentEditorAttribute : CustomEditorAttribute
     /// Allowed values are "ckeditor" and "tiptap".
     /// Default is "ckeditor".
     /// </summary>
-    public string EditorProvider
+    public string? EditorProvider
     {
         get { return GetOption<string>("editorProvider"); }
         set { SetOption("editorProvider", value); }

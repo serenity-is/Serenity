@@ -1,18 +1,10 @@
-import { type PropValue, useUpdatableComputed } from "@serenity-is/domwise";
+import { type Computed, type PropValue, useUpdatableComputed } from "@serenity-is/domwise";
 import { faIcon, HtmlContentEditorTexts } from "../../base";
 
-/* To avoid importing tiptap dependencies in corelib, we define minimal interfaces here */
+/* To avoid importing tiptap dependencies in corelib, we define minimal interfaces here. */
 export interface TiptapModule {
     Editor: any;
-    StarterKit?: any;
-    TextAlign?: any;
-}
-
-/** Internal TiptapModule typing */
-export interface TiptapModuleInternal {
-    Editor: { new(args: TiptapEditorArgs): TiptapEditor; };
-    StarterKit?: { configure: (options: StarterKitOptions) => any; };
-    TextAlign?: any;
+    [key: string]: any;
 }
 
 export interface TiptapToolbarHiddenOption {
@@ -63,6 +55,7 @@ interface TiptapEditorArgs {
 
 interface TiptapEditorChain {
     focus: () => TiptapEditorChain,
+    insertContentAt: (pos: number, content: any) => TiptapEditorChain,
     setTextAlign: (align: TextAlign) => TiptapEditorChain,
     toggleTextAlign: (align: TextAlign) => TiptapEditorChain,
     toggleMark: (mark: string) => TiptapEditorChain,
@@ -127,59 +120,6 @@ interface StarterKitOptions {
     trailingNode?: object | false;
 }
 
-/**
- * Checks if a mark exists in the editor schema
- * @param markName - The name of the mark to check
- * @param editor - The editor instance
- * @returns boolean indicating if the mark exists in the schema
- */
-const isMarkInSchema = (
-    markName: string,
-    editor: TiptapEditor
-): boolean => {
-    if (!editor?.schema) return false
-    return editor.schema.spec.marks.get(markName) !== undefined
-}
-
-/**
- * Checks if a node exists in the editor schema
- * @param nodeName - The name of the node to check
- * @param editor - The editor instance
- * @returns boolean indicating if the node exists in the schema
- */
-const isNodeInSchema = (
-    nodeName: string,
-    editor: TiptapEditor
-): boolean => {
-    if (!editor?.schema) return false
-    return editor.schema.spec.nodes.get(nodeName) !== undefined
-}
-
-
-/**
- * Checks if one or more extensions are registered in the Tiptap editor.
- * @param editor - The Tiptap editor instance
- * @param extensionNames - A single extension name or an array of names to check
- * @returns True if at least one of the extensions is available, false otherwise
- */
-function isExtensionAvailable(
-    editor: TiptapEditor,
-    extensionNames: string | string[]
-): boolean {
-    if (!editor) return false
-
-    const names = Array.isArray(extensionNames)
-        ? extensionNames
-        : [extensionNames]
-
-    const found = names.some((name) =>
-        editor.extensionManager.extensions.some((ext) => ext.name === name)
-    )
-
-    return found
-}
-
-
 export interface TiptapToolbarHiddenOption {
     alignment?: boolean;
     alignmentJustify?: boolean;
@@ -206,33 +146,65 @@ export function TiptapToolbar(props: {
 
     editor.on('transaction', update);
 
+    const boldItalicUnderlineStrike = (["bold", "italic", "underline", "strike"] as Mark[]);
+    const superSubScriptCode = (["superscript", "subscript", "code"] as Mark[]);
+    const alignment = (["left", "center", "right", "justify"] as TextAlign[]);
+
+    const hiddenUndoRedo = computed(() => hidden.undoRedo || !isEditable(editor));
+
+    const hiddenMark: Record<Mark, Computed<boolean>> = {
+        bold: computed(() => hidden.boldItalicUnderline || !showMark(editor, "bold")),
+        italic: computed(() => hidden.boldItalicUnderline || !showMark(editor, "italic")),
+        underline: computed(() => hidden.boldItalicUnderline || !showMark(editor, "underline")),
+        strike: computed(() => hidden.strike || !showMark(editor, "strike")),
+        code: computed(() => hidden.inlineCode || !showMark(editor, "code")),
+        superscript: computed(() => hidden.superSubScript || !showMark(editor, "superscript")),
+        subscript: computed(() => hidden.superSubScript || !showMark(editor, "subscript"))
+    };
+
+    const hiddenLeftCenterRight = computed(() => hidden.alignment || !showTextAlign(editor));
+    const hiddenJustify = computed(() => hiddenLeftCenterRight.value || hidden.alignmentJustify);
+    const hiddenBoldItalicUnderlineStrike = computed(() => boldItalicUnderlineStrike.every(key => hiddenMark[key].value));
+    const hiddenSuperSubScriptCode = computed(() => superSubScriptCode.every(key => hiddenMark[key].value));
+    const hiddenAlignmentAll = computed(() => hiddenLeftCenterRight.value && hiddenJustify.value);
+
     return (
         <div role="toolbar" title="toolbar" data-variant="fixed" class="btn-toolbar">
-            <div class="btn-group me-2" hidden={hidden.undoRedo}>
+            <div class="btn-group" hidden={hiddenUndoRedo}>
                 {(["undo", "redo"] as UndoRedoAction[]).map(key =>
                     <TiptapButton title={undoRedoTexts[key]} icon={undoRedoIcons[key]}
                         disabled={computed(() => !canUndoRedo(editor, key))}
-                        hidden={computed(() => hidden.undoRedo || !showUndoRedo(editor, key))}
+                        hidden={hiddenUndoRedo}
                         onClick={() => execUndoRedo(editor, key)} />
                 )}
             </div>
 
-            <div class="btn-group me-2" hidden={hidden.boldItalicUnderline && hidden.strike}>
-                {(["bold", "italic", "underline", "strike"] as Mark[]).map(key =>
+            <div class="btn-group" hidden={hiddenBoldItalicUnderlineStrike}>
+                {boldItalicUnderlineStrike.map(key =>
                     <TiptapButton title={markTexts[key]} icon={markIcons[key]}
                         active={computed(() => isMarkActive(editor, key))}
                         disabled={computed(() => !canToggleMark(editor, key))}
-                        hidden={computed(() => hidden.boldItalicUnderline || (key === "strike" ? hidden.strike : hidden.boldItalicUnderline) || !showMark(editor, key))}
+                        hidden={hiddenMark[key]}
                         onClick={() => toggleMark(editor, key)} />
                 )}
             </div>
 
-            <div class="btn-group me-2" hidden={hidden.alignment}>
-                {textAlignKeys.map(key =>
+            <div class="btn-group" hidden={hiddenSuperSubScriptCode}>
+                {superSubScriptCode.map(key =>
+                    <TiptapButton title={markTexts[key]} icon={markIcons[key]}
+                        active={computed(() => isMarkActive(editor, key))}
+                        disabled={computed(() => !canToggleMark(editor, key))}
+                        hidden={hiddenMark[key]}
+                        onClick={() => toggleMark(editor, key)} />
+                )}
+            </div>
+
+            <div class="btn-group" hidden={hiddenAlignmentAll}>
+                {alignment.map(key =>
                     <TiptapButton title={textAlignTexts[key]} icon={textAlignIcons[key]}
                         active={computed(() => isTextAlignActive(editor, key))}
                         disabled={computed(() => !canSetTextAlign(editor, key))}
-                        hidden={computed(() => hidden.alignment || (key === "justify" && hidden.alignmentJustify) || !showTextAlign(editor, key))}
+                        hidden={key === "justify" ? hiddenJustify : hiddenLeftCenterRight}
                         onClick={() => {
                             if (isTextAlignActive(editor, key) && editor.chain().toggleTextAlign) {
                                 editor.chain().focus().toggleTextAlign(key).run();
@@ -244,23 +216,14 @@ export function TiptapToolbar(props: {
             </div>
 
             {/* todo add more buttons like below
-            <div class="btn-group me-2" hidden={hidden.headings && hidden.blockquote && hidden.listOptions}>
+            <div class="btn-group" hidden={hidden.headings && hidden.blockquote && hidden.listOptions}>
                 <TiptapButton title={HtmlContentEditorTexts.FormatTextAsHeading} icon={faIcon("heading")} hidden={hidden.headings || !isNodeInSchema("heading", editor)} />
                 <TiptapButton title={HtmlContentEditorTexts.ListOptions} icon={faIcon("list-ul")} hidden={hidden.listOptions || !isNodeInSchema("list", editor)} />
                 <TiptapButton title={HtmlContentEditorTexts.Blockquote} icon={faIcon("quote-right")} hidden={hidden.blockquote || !isNodeInSchema("blockquote", editor)} />
             </div>
-            <div class="btn-group me-2">
+            <div class="btn-group">
                 <button class="btn btn-outline-secondary" title="Link" type="button" tabindex="-1">
                     <i class={faIcon("link")}></i>
-                </button></div><div class="tiptap-separator" data-orientation="vertical" role="none"></div>
-                <div class="btn-group me-2">
-                <button class="btn btn-outline-secondary" title="Superscript" type="button" tabindex="-1">
-                    <i class={faIcon("superscript")}></i>
-                </button>
-                <button class="btn btn-outline-secondary" title="Subscript" type="button" tabindex="-1">
-                    <i class={faIcon("subscript")}></i>
-                </button>
-                <TiptapButton title={HtmlContentEditorTexts.InlineCode} disabled={inlineCodeDisabled} icon={faIcon("code")} hidden={hidden.inlineCode || !isMarkInSchema("code", editor)} onClick={() => editor?.commands?.toggleCode?.()} />
             </div>
             <button class="btn btn-outline-secondary" title="Add image" type="button" tabindex="-1">
                 <i class={faIcon("image")}></i>
@@ -271,10 +234,23 @@ export function TiptapToolbar(props: {
 
 // most of the following functions are adapted from https://github.com/ueberdosis/tiptap-ui-components
 
-function isNodeTypeSelected(
-    editor: TiptapEditor,
-    types: string[] = []
-): boolean {
+function isExtensionAvailable(editor: TiptapEditor, extensionNames: string | string[]): boolean {
+    if (!editor) return false;
+    const names = Array.isArray(extensionNames) ? extensionNames : [extensionNames];
+    return names.some((name) => editor.extensionManager.extensions.some((ext) => ext.name === name));
+}
+
+const isMarkInSchema = (markName: string, editor: TiptapEditor): boolean => {
+    if (!editor?.schema) return false;
+    return editor.schema.spec.marks.get(markName) !== undefined;
+}
+
+const isNodeInSchema = (nodeName: string, editor: TiptapEditor): boolean => {
+    if (!editor?.schema) return false;
+    return editor.schema.spec.nodes.get(nodeName) !== undefined;
+}
+
+function isNodeTypeSelected(editor: TiptapEditor, types: string[] = []): boolean {
     if (!editor || !editor.state.selection) return false
 
     const { state } = editor
@@ -302,46 +278,22 @@ const undoRedoIcons: Record<UndoRedoAction, string> = {
     redo: faIcon("redo")
 };
 
-function canUndoRedo(
-    editor: Editor,
-    action: UndoRedoAction
-): boolean {
-    if (!editor || !editor.isEditable) return false
-    if (isNodeTypeSelected(editor, ["image"])) return false
+function isEditable(editor: Editor): boolean {
+    return !!(editor && editor.isEditable);
+}
+
+function canUndoRedo(editor: Editor, action: UndoRedoAction): boolean {
+    if (!isEditable(editor) || isNodeTypeSelected(editor, ["image"])) return false;
     return action === "undo" ? editor.can().undo() : editor.can().redo();
 }
 
-function execUndoRedo(
-    editor: Editor,
-    action: UndoRedoAction
-): boolean {
-    if (!editor || !editor.isEditable) return false
-    if (!canUndoRedo(editor, action)) return false
-
-    const chain = editor.chain().focus()
-    return action === "undo" ? chain.undo().run() : chain.redo().run()
+function execUndoRedo(editor: Editor, action: UndoRedoAction): boolean {
+    if (!isEditable(editor) || !canUndoRedo(editor, action)) return false;
+    const chain = editor.chain().focus();
+    return action === "undo" ? chain.undo().run() : chain.redo().run();
 }
 
-function showUndoRedo(editor: Editor, action: UndoRedoAction, opt?: {
-    hideWhenUnavailable?: boolean
-}): boolean {
-    if (!editor || !editor.isEditable) return false
-
-    if (opt?.hideWhenUnavailable && !editor.isActive("code")) {
-        return canUndoRedo(editor, action)
-    }
-
-    return true
-}
-
-type Mark =
-    | "bold"
-    | "italic"
-    | "strike"
-    | "code"
-    | "underline"
-    | "superscript"
-    | "subscript"
+type Mark = "bold" | "italic" | "strike" | "code" | "underline" | "superscript" | "subscript"
 
 const markTexts: Record<Mark, string> = {
     bold: HtmlContentEditorTexts.Bold,
@@ -364,36 +316,22 @@ const markIcons: Record<Mark, string> = {
 };
 
 function canToggleMark(editor: Editor, type: Mark): boolean {
-    if (!editor || !editor.isEditable) return false
-    if (!isMarkInSchema(type, editor) || isNodeTypeSelected(editor, ["image"]))
-        return false
-
-    return editor.can().toggleMark(type)
+    if (!isEditable(editor) || !isMarkInSchema(type, editor) || isNodeTypeSelected(editor, ["image"])) return false;
+    return editor.can().toggleMark(type);
 }
 
 function isMarkActive(editor: Editor, type: Mark): boolean {
-    if (!editor || !editor.isEditable) return false
-    return editor.isActive(type)
+    if (!isEditable(editor)) return false;
+    return editor.isActive(type);
 }
 
 function toggleMark(editor: Editor, type: Mark): boolean {
-    if (!editor || !editor.isEditable) return false
-    if (!canToggleMark(editor, type)) return false
-
-    return editor.chain().focus().toggleMark(type).run()
+    if (!isEditable(editor) || !canToggleMark(editor, type)) return false;
+    return editor.chain().focus().toggleMark(type).run();
 }
 
-function showMark(editor: Editor, type: Mark, opt?: {
-    hideWhenUnavailable: boolean
-}): boolean {
-    if (!editor || !editor.isEditable) return false
-    if (!isMarkInSchema(type, editor)) return false
-
-    if (opt?.hideWhenUnavailable && !editor.isActive("code")) {
-        return canToggleMark(editor, type)
-    }
-
-    return true
+function showMark(editor: Editor, type: Mark): boolean {
+    return isEditable(editor) && isMarkInSchema(type, editor);
 }
 
 type TextAlign = "left" | "center" | "right" | "justify"
@@ -412,86 +350,98 @@ const textAlignIcons: Record<TextAlign, string> = {
     justify: faIcon("align-justify")
 };
 
-const textAlignKeys = ["left", "center", "right", "justify"] as TextAlign[];
-
-function canSetTextAlign(
-    editor: TiptapEditor,
-    align: TextAlign
-): boolean {
-    if (!editor || !editor.isEditable) return false
-    if (
-        !isExtensionAvailable(editor, "textAlign") ||
-        isNodeTypeSelected(editor, ["image", "horizontalRule"])
-    )
-        return false
-
-    return editor.can().setTextAlign(align)
+function canSetTextAlign(editor: TiptapEditor, align: TextAlign): boolean {
+    if (!isEditable(editor)) return false;
+    if (!isExtensionAvailable(editor, "textAlign") || isNodeTypeSelected(editor, ["image", "horizontalRule"])) return false;
+    return editor.can().setTextAlign(align);
 }
 
-function hasSetTextAlign(
-    commands: any
-): boolean {
-    return "setTextAlign" in commands
+function hasSetTextAlign(commands: any): boolean {
+    return "setTextAlign" in commands;
 }
 
-function isTextAlignActive(
-    editor: TiptapEditor,
-    align: TextAlign
-): boolean {
-    if (!editor || !editor.isEditable) return false
-    return editor.isActive({ textAlign: align })
+function isTextAlignActive(editor: TiptapEditor, align: TextAlign): boolean {
+    if (!isEditable(editor)) return false;
+    return editor.isActive({ textAlign: align });
 }
 
 function setTextAlign(editor: TiptapEditor, align: TextAlign): boolean {
-    if (!editor || !editor.isEditable) return false
-    if (!canSetTextAlign(editor, align)) return false
-
+    if (!isEditable(editor) || !canSetTextAlign(editor, align)) return false;
     const chain = editor.chain().focus();
-    if (hasSetTextAlign(chain)) {
-        return chain.setTextAlign(align).run()
-    }
-
-    return false
+    if (hasSetTextAlign(chain)) return chain.setTextAlign(align).run();
+    return false;
 }
 
-function showTextAlign(editor: TiptapEditor, align: TextAlign, opt?: {
-    hideWhenUnavailable: boolean
-}): boolean {
-
-    if (!editor || !editor.isEditable) return false;
-    if (!isExtensionAvailable(editor, "textAlign")) return false;
-
-    if (opt?.hideWhenUnavailable && !editor.isActive("code")) {
-        return canSetTextAlign(editor, align)
-    }
-
-    return true
+function showTextAlign(editor: TiptapEditor): boolean {
+    return isEditable(editor) && isExtensionAvailable(editor, "textAlign");
 }
 
 export function isTiptapContentEmpty(content: any): boolean {
-    if (content === null) {
-        return true
-    }
-
-    if (typeof content === 'string') {
-        return content === ''
-    }
-
-    if (Array.isArray(content)) {
-        return content.every(item => isTiptapContentEmpty(item))
-    }
-
-    if (!content.content) {
-        return true
-    }
-
-    return content.content.every((item: any) => !item.content)
+    if (content === null) return true;
+    if (typeof content === 'string') return content === '';
+    if (Array.isArray(content)) return content.every(item => isTiptapContentEmpty(item));
+    if (!content.content) return true;
+    return content.content.every((item: any) => !item.content);
 }
 
 export function getTiptapContent(editor: TiptapEditor): string {
-    if (isTiptapContentEmpty(editor.getJSON())) {
-        return '';
-    }
-
+    if (isTiptapContentEmpty(editor.getJSON())) return '';
     return editor.getHTML();
+}
+
+export function getAllTiptapExtensions(tiptap: TiptapModule) {
+    return Object.entries(tiptap).filter(([k, e]) => e &&
+        /[A-Z]/.test(k[0]) && e &&
+        (e.type === "extension" || e.type === "mark" || e.type === "node"))
+        .map(([_, e]) => e)
+}
+
+export function defaultTiptapFileHandlerConfig() {
+    return {
+        allowedMimeTypes: ['image/jpeg', 'image/gif', 'image/png', 'image/webp'],
+        onDrop: (currentEditor: TiptapEditor, files: Blob[], pos: any) => {
+            files.forEach((file: Blob) => {
+                const fileReader = new FileReader()
+
+                fileReader.readAsDataURL(file)
+                fileReader.onload = () => {
+                    currentEditor
+                        .chain()
+                        .insertContentAt(pos, {
+                            type: 'image',
+                            attrs: {
+                                src: fileReader.result,
+                            },
+                        })
+                        .focus()
+                        .run()
+                }
+            })
+        },
+        onPaste: (currentEditor: any, files: Blob[], htmlContent: any) => {
+            files.forEach(file => {
+                if (htmlContent) {
+                    // if there is htmlContent, stop manual insertion & let other extensions handle insertion via inputRule
+                    // you could extract the pasted file from this url string and upload it to a server for example
+                    return false
+                }
+
+                const fileReader = new FileReader()
+
+                fileReader.readAsDataURL(file)
+                fileReader.onload = () => {
+                    currentEditor
+                        .chain()
+                        .insertContentAt(currentEditor.state.selection.anchor, {
+                            type: 'image',
+                            attrs: {
+                                src: fileReader.result,
+                            }
+                        })
+                        .focus()
+                        .run()
+                }
+            })
+        },
+    }
 }
