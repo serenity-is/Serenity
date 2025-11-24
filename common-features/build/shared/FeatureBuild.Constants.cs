@@ -25,6 +25,7 @@ public static partial class Shared
         Shared.PackageVersion = arguments.GetString(["version", "v"]);
         Shared.LocalPush = arguments.GetBoolean(["local-push", "localpush", "lp"]) ?? false;
         Shared.IsPatch = arguments.GetBoolean(["patch"]) ?? false;
+        System.Console.WriteLine($"Parsed Args: serenity-version: {Shared.SerenityVersion}, version: {Shared.PackageVersion}, local-push: {Shared.LocalPush}, patch: {Shared.IsPatch}");
         return arguments.GetCommand() ?? "pack";
     }
 }

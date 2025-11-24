@@ -30,7 +30,7 @@ public static partial class Shared
     public static string TemplateZipWebFolder => Path.Combine(TemporaryFilesRoot, ProjectId, ProjectName);
     public static string SerenityFolder => IsStartSharp ? Path.Combine(Root, "Serenity") : Path.Combine(Root, "..");
     public static string SerenityPackageVersionProps => Path.Combine(SerenityFolder, "build", "Package.Version.props");
-    
+
     public static bool IsPatch { get; set; } = false;
     public static bool LocalPush { get; set; } = false;
 
@@ -39,6 +39,8 @@ public static partial class Shared
         Shared.TemplateVersion = arguments.GetString(["version", "v"]);
         Shared.LocalPush = arguments.GetBoolean(["local-push", "localpush", "lp"]) ?? true;
         Shared.IsPatch = arguments.GetBoolean(["patch"]) ?? false;
+        System.Console.WriteLine($"Parsed Args: version: {Shared.TemplateVersion}, local-push: {Shared.LocalPush}, patch: {Shared.IsPatch}");
+
         return arguments.GetCommand() ?? "vsix";
     }
 }
