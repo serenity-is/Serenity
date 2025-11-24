@@ -19,6 +19,12 @@ public static partial class Shared
         while (skipFolders.Contains(Path.GetFileName(Root)))
             Root = Path.GetDirectoryName(Root);
 
+        Console.WriteLine($"Using root directory: {System.IO.Path.GetFullPath(Root)}");
+        Console.WriteLine($"Using Serenity directory: {System.IO.Path.GetFullPath(SerenityDir)}");
+        Console.WriteLine($"Solution file: {System.IO.Path.GetFullPath(SolutionFile)}");
+        Console.WriteLine($"Is Patch: {IsPatch}");
+        Console.WriteLine($"Is StartSharp: {IsStartSharp}");
+
 #if IsTemplateBuild
         IsStartSharp = IsStartSharp ||
             Directory.Exists(Path.Combine(Root, "StartSharp")) ||

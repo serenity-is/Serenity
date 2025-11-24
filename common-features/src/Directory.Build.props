@@ -3,7 +3,7 @@
   <Import Project="$(MSBuildThisFileDirectory)..\build\Feature.Build.props" />
   <PropertyGroup>
     <ArtifactsPath>$(MSBuildThisFileDirectory)..\..\artifacts</ArtifactsPath>
-    <SerenityVersion Condition="'$(SerenityVersion)' == ''">9.2.0</SerenityVersion>
+    <SerenityVersion Condition="'$(SerenityVersion)' == ''">9.2.1</SerenityVersion>
     <SergenTransform>all</SergenTransform>
     <TargetFramework>net8.0</TargetFramework>
     <DotnetToolManifestFile>$(MSBuildProjectDirectory)\..\.config\dotnet-tools.json</DotnetToolManifestFile>

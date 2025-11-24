@@ -60,7 +60,7 @@ public static partial class Shared
                 string.Equals(SerenityVersion, "ws", StringComparison.OrdinalIgnoreCase) ||
                 string.Equals(SerenityVersion, "workspace", StringComparison.OrdinalIgnoreCase))
             {
-                var xes = XElement.Parse(File.ReadAllText(SerenityPackageBuildProps));
+                var xes = XElement.Parse(File.ReadAllText(SerenityPackageVersionProps));
                 SerenityVersion = xes.Descendants("Version").FirstOrDefault()?.Value?.ToString();
             }
 

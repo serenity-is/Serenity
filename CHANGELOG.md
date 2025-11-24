@@ -5,6 +5,14 @@
 - First .NET 10 version. You'll need to install Visual Studio 2026 and .NET 10 SDK.
 - Please stay at 9.2.x versions if you still need to use Visual Studio 2022 and .NET 8.
 
+## 9.2.1 (2025-11-24)
+
+## Features
+- AddCspDirective overloads for ControllerBase and HttpContext
+
+## Bugfixes
+- Fix remaining discovered CSP related issues in sample pages
+
 ## 9.2.0 (2025-11-24)
 
 ### Features

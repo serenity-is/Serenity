@@ -51,7 +51,7 @@ public static partial class Shared
         string serenityVersion;
         if (IsPatch)
         {
-            var xes = XElement.Parse(File.ReadAllText(SerenityPackageBuildProps));
+            var xes = XElement.Parse(File.ReadAllText(SerenityPackageVersionProps));
             serenityVersion = xes.Descendants("Version").FirstOrDefault()?.Value?.ToString();
         }
         else
