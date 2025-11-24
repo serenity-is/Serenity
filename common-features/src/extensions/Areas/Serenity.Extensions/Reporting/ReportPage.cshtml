@@ -51,7 +51,7 @@ if (!category.SubCategories.IsEmptyOrNull() ||
 }
 }
 
-<style>
+<style nonce="@Html.CspNonce()">
 .report-list [data-bs-toggle][aria-expanded=true]>i {
         transform: rotate(90deg);
 }
