@@ -77,7 +77,7 @@ export class GroupItemMetadataProvider implements GridPlugin {
         applyFormatterResultToCellNode(ctx, fmtResultTitle, titleSpan, contentOnly);
         return <>
             <span class={opt.toggleCssClass + " " + (group.collapsed ? opt.toggleCollapsedCssClass : opt.toggleExpandedCssClass)}
-                style={"margin-left:" + indentation + "px"}></span>
+                style={{ marginLeft: indentation + "px" }}></span>
             {titleSpan}
         </>
     }
