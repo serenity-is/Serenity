@@ -19,15 +19,19 @@ public static partial class Shared
         while (skipFolders.Contains(Path.GetFileName(Root)))
             Root = Path.GetDirectoryName(Root);
 
+
 #if IsTemplateBuild
         IsStartSharp = IsStartSharp ||
             Directory.Exists(Path.Combine(Root, "StartSharp")) ||
-            Directory.Exists(Path.Combine(Root, "src", "StartSharp")) ||
+            Directory.Exists(Path.Combine(Root, "src", "StartSharp.Web")) ||
             Directory.Exists(Path.Combine(Root, "pro-features")) ||
             File.Exists(Path.Combine(Root, "StartSharp.sln")) ||
-            Path.GetFileName(Root)?.ToLowerInvariant() == "startsharp";
+            Path.GetFileName(Root)?.StartsWith("start", StringComparison.OrdinalIgnoreCase) == true;
+
+        Console.WriteLine($"Using Root: {System.IO.Path.GetFullPath(Root)}, SerenityDir: {System.IO.Path.GetFullPath(SerenityFolder)}, Solution: {System.IO.Path.GetFullPath(SolutionFile)}, IsStartSharp: {IsStartSharp}");
+#else
+        Console.WriteLine($"Using Root: {System.IO.Path.GetFullPath(Root)}, SerenityDir: {System.IO.Path.GetFullPath(SerenityDir)}, Solution: {System.IO.Path.GetFullPath(SolutionFile)}, IsStartSharp: {IsStartSharp}");
 #endif
     }
-
 }
 #endif

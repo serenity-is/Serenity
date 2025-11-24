@@ -51,7 +51,7 @@ public static partial class Shared
         string serenityVersion;
         if (IsPatch)
         {
-            var xes = XElement.Parse(File.ReadAllText(SerenityPackageBuildProps));
+            var xes = XElement.Parse(File.ReadAllText(SerenityPackageVersionProps));
             serenityVersion = xes.Descendants("Version").FirstOrDefault()?.Value?.ToString();
         }
         else
@@ -89,7 +89,7 @@ public static partial class Shared
 
         if (IsPatch)
         {
-            var propsFile = Path.Combine(Root, "common-features", "build", "Package.Build.props");
+            var propsFile = Path.Combine(Root, "Serenity", "common-features", "build", "Package.Build.props");
             var propsRoot = XElement.Parse(File.ReadAllText(propsFile));
             cfPackageVersion = propsRoot.Descendants("Version").FirstOrDefault()?.Value;
 

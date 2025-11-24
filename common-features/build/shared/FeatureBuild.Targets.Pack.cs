@@ -55,13 +55,15 @@ public static partial class Shared
                 (string.IsNullOrEmpty(SerenityVersion) && !IsPatch))
             {
                 SerenityVersion = GetLatestVersionOf(SerenityNetWebPackage)?.ToString();
+                System.Console.WriteLine("Determined latest Serenity version: " + SerenityVersion);
             }
             else if ((IsPatch && string.IsNullOrEmpty(SerenityVersion)) ||
                 string.Equals(SerenityVersion, "ws", StringComparison.OrdinalIgnoreCase) ||
                 string.Equals(SerenityVersion, "workspace", StringComparison.OrdinalIgnoreCase))
             {
-                var xes = XElement.Parse(File.ReadAllText(SerenityPackageBuildProps));
+                var xes = XElement.Parse(File.ReadAllText(SerenityPackageVersionProps));
                 SerenityVersion = xes.Descendants("Version").FirstOrDefault()?.Value?.ToString();
+                System.Console.WriteLine("Determined workspace Serenity version: " + SerenityVersion);
             }
 
             if (string.IsNullOrEmpty(SerenityVersion))
