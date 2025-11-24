@@ -20,20 +20,22 @@ public static partial class Shared
             Root = Path.GetDirectoryName(Root);
 
         Console.WriteLine($"Using root directory: {System.IO.Path.GetFullPath(Root)}");
-        Console.WriteLine($"Using Serenity directory: {System.IO.Path.GetFullPath(SerenityDir)}");
-        Console.WriteLine($"Solution file: {System.IO.Path.GetFullPath(SolutionFile)}");
-        Console.WriteLine($"Is Patch: {IsPatch}");
-        Console.WriteLine($"Is StartSharp: {IsStartSharp}");
 
 #if IsTemplateBuild
         IsStartSharp = IsStartSharp ||
             Directory.Exists(Path.Combine(Root, "StartSharp")) ||
-            Directory.Exists(Path.Combine(Root, "src", "StartSharp")) ||
+            Directory.Exists(Path.Combine(Root, "src", "StartSharp.Web")) ||
             Directory.Exists(Path.Combine(Root, "pro-features")) ||
             File.Exists(Path.Combine(Root, "StartSharp.sln")) ||
-            Path.GetFileName(Root)?.ToLowerInvariant() == "startsharp";
+            Path.GetFileName(Root)?.StartsWith("start", StringComparison.OrdinalIgnoreCase) == true;
+            
+        Console.WriteLine($"Using Serenity directory: {System.IO.Path.GetFullPath(SerenityFolder)}");
+#else
+        Console.WriteLine($"Using Serenity directory: {System.IO.Path.GetFullPath(SerenityDir)}");
 #endif
+        Console.WriteLine($"Solution file: {System.IO.Path.GetFullPath(SolutionFile)}");
+        Console.WriteLine($"Is Patch: {IsPatch}");
+        Console.WriteLine($"Is StartSharp: {IsStartSharp}");
     }
-
 }
 #endif
