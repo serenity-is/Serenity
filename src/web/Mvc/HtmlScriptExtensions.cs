@@ -1,5 +1,7 @@
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Html;
+using Microsoft.AspNetCore.Http;
+using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.AspNetCore.WebUtilities;
 using Microsoft.Extensions.DependencyInjection;
@@ -334,6 +336,30 @@ public static partial class HtmlScriptExtensions
     public static void AddCspDirective(this IHtmlHelper html, string directiveName, params string[] values)
     {
         AddCspDirective(html.ViewContext?.HttpContext?.Items, directiveName, values);
+    }
+
+    /// <summary>
+    /// Adds a Content Security Policy directive to the current HTTP context items.
+    /// </summary>
+    /// <param name="context">Http context</param>
+    /// <param name="directiveName">CSP directive name</param>
+    /// <param name="values">CSP directive values. Note that these values will be automatically quoted if they look like keywords ([A-Za-z0-9_-] only)
+    /// and are not already quoted.</param>
+    public static void AddCspDirective(this HttpContext context, string directiveName, params string[] values)
+    {
+        AddCspDirective(context.Items, directiveName, values);
+    }
+
+    /// <summary>
+    /// Adds a Content Security Policy directive to the current HTTP context items.
+    /// </summary>
+    /// <param name="controller">Controller</param>
+    /// <param name="directiveName">CSP directive name</param>
+    /// <param name="values">CSP directive values. Note that these values will be automatically quoted if they look like keywords ([A-Za-z0-9_-] only)
+    /// and are not already quoted.</param>
+    public static void AddCspDirective(this ControllerBase controller, string directiveName, params string[] values)
+    {
+        AddCspDirective(controller.HttpContext.Items, directiveName, values);
     }
 
     private static readonly HashSet<string> allowedCspDirectiveNames = new(StringComparer.OrdinalIgnoreCase)

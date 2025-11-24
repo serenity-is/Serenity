@@ -362,7 +362,7 @@ export class LongTextCellEdit extends BaseCellEdit {
 
         const boundThis = bindThis(this);
         this._wrapper = this._container.appendChild(<div class="large-editor-text slick-large-editor-text"
-            style={`z-index:10000; background:white; padding:5px; border:3px solid gray; border-radius:10px;${isComposite ? "position: relative; padding: 0; border: 0" : "position: absolute"}`}>
+            style={{ zIndex: "10000", background: "white", padding: "5px", border: "3px solid gray", "borderRadius": "10px", position: isComposite ? "relative" : "absolute", padding: isComposite ? "0" : null, border: isComposite ? "0" : null }}>
             <textarea rows={5} style={{ background: "white", width: "250px", height: "80px", border: "0", outline: "0" }}
                 onKeyDown={boundThis.handleKeyDown} ref={el => this._input = el} />
         </div> as HTMLDivElement);

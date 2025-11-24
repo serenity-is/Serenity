@@ -17,7 +17,7 @@ public static class BasicSamplesHelper
             return null;
         var path = file.StartsWith('/') ? file[1..] : ("common-features/src/demo.basicsamples" + GetRelativePathFor(helper, file));
         var href = GetRepositoryBlobUrl(helper) + path;
-        return new HtmlString($"<a class=\"s-sample-source-link\" target=\"_blank\" style=\"font-weight: bold;\" href=\"{helper.Encode(href)}\">{helper.Encode(Path.GetFileName(file))}</a>");
+        return new HtmlString($"<a class=\"s-sample-source-link\" target=\"_blank\" href=\"{helper.Encode(href)}\">{helper.Encode(Path.GetFileName(file))}</a>");
     }
 
     const string RepositoryUrl = "https://github.com/serenity-is/Serenity";

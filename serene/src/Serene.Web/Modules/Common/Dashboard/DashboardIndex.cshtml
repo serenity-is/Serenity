@@ -14,7 +14,7 @@ ViewData["PageId"] = "Dashboard";
     <h1>@Localizer.Get("Navigation.Dashboard")</h1>
 }
 
-<style>
+<style nonce="@Html.CspNonce()">
 .s-dashboard-card, .s-dashboard-card-sm {
     margin-bottom: var(--bs-gutter-x);
 }
