@@ -9,25 +9,57 @@ namespace Serenity.JsonConverters;
 public class ObjectJsonConverter : JsonConverter<object>
 {
     /// <summary>
+    /// ISO 8601 date time separator position.
+    /// </summary>
+    private const byte IsoDateTimeSeparatorPosition = 10;
+    /// <summary>
+    /// Minimum ISO 8601 date time length.
+    /// </summary>
+    private const byte MinIsoDateTimeLength = 19;
+    /// <summary>
+    /// Maximum ISO 8601 date time length.
+    /// </summary>
+    private const byte MaxIsoDateTimeLength = 40;
+
+    /// <summary>
     /// Default instance of the ObjectJsonConverter
     /// </summary>
     public static readonly ObjectJsonConverter Instance = new();
 
     /// <inheritdoc/>
-    public override object Read(ref Utf8JsonReader reader, Type type, JsonSerializerOptions options) => 
+    public override object Read(ref Utf8JsonReader reader, Type type, JsonSerializerOptions options) =>
         reader.TokenType switch
         {
             JsonTokenType.True => true,
             JsonTokenType.False => false,
             JsonTokenType.Number when reader.TryGetInt64(out long l) => l,
             JsonTokenType.Number => reader.GetDouble(),
-            JsonTokenType.String when reader.TryGetDateTimeOffset(out DateTimeOffset dto) => dto,
-            JsonTokenType.String when reader.TryGetDateTime(out DateTime datetime) => datetime,
+            JsonTokenType.String when TryParseDateTimeOffset(reader.GetString(), out DateTimeOffset dto) => dto,
             JsonTokenType.String => reader.GetString()!,
             JsonTokenType.StartArray => JsonSerializer.Deserialize<object[]>(ref reader, options)!,
             JsonTokenType.StartObject => JsonSerializer.Deserialize<Dictionary<string, object>>(ref reader, options)!,
             _ => JsonDocument.ParseValue(ref reader).RootElement.Clone()
         };
+
+    /// <summary>
+    /// Tries to parse a DateTimeOffset from a string.
+    /// </summary>
+    /// <param name="s">The string to parse.</param>
+    /// <param name="dateTimeOffset">The parsed DateTimeOffset.</param>
+    /// <returns>>True if parsing was successful; otherwise, false.</returns>
+    private static bool TryParseDateTimeOffset(string? s, out DateTimeOffset dateTimeOffset)
+    {
+        dateTimeOffset = default;
+        if (s is null)
+            return false;
+
+        if (s.Length is < MinIsoDateTimeLength or > MaxIsoDateTimeLength ||
+            !char.IsDigit(s[0]) ||
+            s[IsoDateTimeSeparatorPosition] != 'T')
+            return false;
+
+        return DateTimeOffset.TryParse(s, out dateTimeOffset);
+    }
 
     /// <inheritdoc/>
     public override void Write(Utf8JsonWriter writer, object objectToWrite, JsonSerializerOptions options) =>
