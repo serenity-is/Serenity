@@ -17,6 +17,20 @@ public class RestoreNodeTypesTask : Microsoft.Build.Utilities.Task
     {
         try
         {
+            HashSet<string> skipPackageJsonKeys = new HashSet<string>
+            {
+                "bundledDependencies",
+                "dependencies",
+                "devDependencies",
+                "engines",
+                "optionalDependencies",
+                "overrides",
+                "peerDependencies",
+                "peerDependenciesMeta",
+                "scripts",
+                "version"
+            };
+
             var newDeps = new SortedDictionary<string, string>();
             foreach (var pkgFolder in (FolderNames ?? "")
                 .Split(new char[] { ';' }, StringSplitOptions.RemoveEmptyEntries))
@@ -64,8 +78,8 @@ public class RestoreNodeTypesTask : Microsoft.Build.Utilities.Task
                         ["name"] = pkgId
                     };
 
-                    foreach (var key in new string[] { "type", "main", "import", "types", "exports" })
-                        if (orgJson.Contains(key))
+                    foreach (string key in orgJson.Keys)
+                        if (!skipPackageJsonKeys.Contains(key))
                             pkgJson[key] = orgJson[key];
                 }
                 else
