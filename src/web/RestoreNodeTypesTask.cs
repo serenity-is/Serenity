@@ -237,14 +237,12 @@ public class RestoreNodeTypesTask : Microsoft.Build.Utilities.Task
             while (true)
             {
                 if (EndReached()) return null;
-                c = ReadChar();
-                switch (c)
+                switch (c = ReadChar())
                 {
                     case '"': return sb.ToString();
                     case '\\':
                         if (EndReached()) return null;
-                        c = ReadChar();
-                        switch (c)
+                        switch (c = ReadChar())
                         {
                             case '"': case '\\': case '/': sb.Append(c); break;
                             case 'b': sb.Append('\b'); break;

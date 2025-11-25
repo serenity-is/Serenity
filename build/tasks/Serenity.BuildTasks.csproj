@@ -15,16 +15,15 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <PackageReference Include="Microsoft.Build.Utilities.Core" Version="18.0.2" PrivateAssets="all"  ExcludeAssets="Runtime" />
-  </ItemGroup>
-
-  <ItemGroup>
-    <!--<Content Include="build\Serenity.BuildTasks.props" PackagePath="build\" />-->
-    <!--<Content Include="build\Serenity.BuildTasks.targets" PackagePath="build\" />-->
+    <PackageReference Include="Microsoft.Build.Utilities.Core" Version="18.0.2" PrivateAssets="all" ExcludeAssets="Runtime" />
   </ItemGroup>
 
   <ItemGroup>
     <Using Remove="*" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Compile Include="..\..\src\web\RestoreNodeTypesTask.cs" Link="RestoreNodeTypesTask.cs" />
   </ItemGroup>
 
   <Target Name="CopyProjectReferencesToPackage" DependsOnTargets="ResolveReferences">
