@@ -120,6 +120,7 @@ export const esbuildOptions = (opt) => {
         outdir: 'wwwroot/esm',
         plugins,
         sourcemap: true,
+        sourceRoot: "Modules",
         splitting: splitting,
         target: 'es2017',
         watch: process.argv.slice(2).some(x => x == "--watch"),

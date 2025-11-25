@@ -18,6 +18,7 @@ const coreLibBase = {
     minify: false,
     outbase: 'src',
     sourcemap: true,
+    sourceRoot: "src",
     splitting: false,
     target: 'es2015'
 }

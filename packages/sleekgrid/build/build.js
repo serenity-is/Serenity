@@ -66,6 +66,7 @@ const compatDefaults = {
     color: true,
     logLevel: 'info',
     sourcemap: true,
+    sourceRoot: "src",
     footer: {
         js: '["Data", "Editors", "Formatters", "Plugins"].forEach(ns => Slick._[ns] && (Slick[ns] = Object.assign(Slick[ns] || {}, Slick._[ns])) && delete Slick._[ns]); Object.assign(Slick, Slick._); delete Slick._;'
     }
@@ -152,7 +153,8 @@ const sleekDefaults = {
     color: true,
     logLevel: 'info',
     target: 'es6',
-    sourcemap: true
+    sourcemap: true,
+    sourceRoot: "src"
 }
 
 const sleekIndex = {
