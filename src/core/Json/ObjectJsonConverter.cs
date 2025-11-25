@@ -46,7 +46,7 @@ public class ObjectJsonConverter : JsonConverter<object>
     /// </summary>
     /// <param name="s">The string to parse.</param>
     /// <param name="dateTimeOffset">The parsed DateTimeOffset.</param>
-    /// <returns>>True if parsing was successful; otherwise, false.</returns>
+    /// <returns>True if parsing was successful; otherwise, false.</returns>
     private static bool TryParseDateTimeOffset(string? s, out DateTimeOffset dateTimeOffset)
     {
         dateTimeOffset = default;
