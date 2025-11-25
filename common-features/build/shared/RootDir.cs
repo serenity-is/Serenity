@@ -25,6 +25,7 @@ public static partial class Shared
             Directory.Exists(Path.Combine(Root, "StartSharp")) ||
             Directory.Exists(Path.Combine(Root, "src", "StartSharp.Web")) ||
             Directory.Exists(Path.Combine(Root, "pro-features")) ||
+            File.Exists(Path.Combine(Root, "StartSharp.slnx")) ||
             File.Exists(Path.Combine(Root, "StartSharp.sln")) ||
             Path.GetFileName(Root)?.StartsWith("start", StringComparison.OrdinalIgnoreCase) == true;
 
