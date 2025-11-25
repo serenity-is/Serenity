@@ -1,18 +1,3 @@
-<Project>
-  <PropertyGroup>
-    <DotNetSergen Condition="'$(DotNetSergen)' == '' And Exists('$(MSBuildThisFileDirectory)..\..\artifacts\sergen\sergen')">$(MSBuildThisFileDirectory)..\..\artifacts\sergen\sergen</DotNetSergen>
-    <DotNetSergen Condition="'$(DotNetSergen)' == '' And Exists('$(MSBuildThisFileDirectory)..\..\artifacts\sergen\sergen.exe')">$(MSBuildThisFileDirectory)..\..\artifacts\sergen\sergen.exe</DotNetSergen>
-    <DotNetSergen Condition="'$(DotNetSergen)' == '' And Exists('$(MSBuildThisFileDirectory)..\codegenerator\Serenity.Net.CodeGenerator.csproj')">dotnet run --project $(MSBuildThisFileDirectory)..\codegenerator\Serenity.Net.CodeGenerator.csproj -- </DotNetSergen>
-    <DotNetSergen Condition="'$(DotNetSergen)' == ''">dotnet sergen</DotNetSergen>
-  </PropertyGroup>
-  <UsingTask TaskName="RestoreNodeTypesTask" TaskFactory="RoslynCodeTaskFactory" AssemblyFile="$(MSBuildToolsPath)\Microsoft.Build.Tasks.Core.dll" >
-    <ParameterGroup>
-      <FolderNames ParameterType="System.String" />
-      <PatchDependencies ParameterType="System.String" />
-    </ParameterGroup>
-    <Task>
-      <Code Type="Class" Language="cs">
-        <![CDATA[
 using System;
 using System.Collections;
 using System.Collections.Generic;
@@ -421,75 +406,21 @@ public class RestoreNodeTypesTask : Microsoft.Build.Utilities.Task
         public override string ToString() { return sb.ToString(); }
     }
 }
-]]>
-      </Code>
-    </Task>
-  </UsingTask>
 
-  <PropertyGroup>
-    <RestoreNodeTypes Condition="'$(RestoreNodeTypes)' == '' And Exists('$(MSBuildProjectDirectory)\tsconfig.json')">true</RestoreNodeTypes>
-    <CompileTypeScriptDependsOn Condition="'$(RestoreNodeTypes)' != 'false'">RestoreNodeTypes;$(CompileTypeScriptDependsOn)</CompileTypeScriptDependsOn>
-  </PropertyGroup>
-  <ItemGroup>
-    <Content Remove="texts\resources\**\*.json" />
-    <EmbeddedResource Include="texts\resources\**\*.json" WithCulture="false" Culture="" />
-    <AssemblyAttribute Include="Serenity.ComponentModel.TypeSourceAssemblyAttribute" />
-  </ItemGroup>
-  <Target Name="RestoreNodeTypes" DependsOnTargets="ResolvePackageAssets;IncludeTransitiveProjectReferences" BeforeTargets="BeforeBuild" Condition="'$(RestoreNodeTypes)' != 'false'">
-    <ItemGroup>
-      <_NodeTypePackageOrig Include="%(ProjectReference.RootDir)%(Directory)package.json*" Condition="'$(RestoreNodeTypes)' != 'false' And Exists('%(ProjectReference.RootDir)%(Directory)package.json') And Exists('%(ProjectReference.RootDir)%(Directory)dist\index.js')">
-        <FolderName>$([System.String]::Copy('%(ProjectReference.Filename)').ToLowerInvariant())</FolderName>
-      </_NodeTypePackageOrig>
-      <_NodeTypePackageOrig Include="%(RuntimeCopyLocalItems.RootDir)%(Directory)..\..\package.json*" Condition="'$(RestoreNodeTypes)' != 'false' And Exists('%(RuntimeCopyLocalItems.RootDir)%(Directory)..\..\package.json') And Exists('%(RuntimeCopyLocalItems.RootDir)%(Directory)..\..\dist\index.js')">
-        <FolderName>$([System.String]::Copy('%(RuntimeCopyLocalItems.NuGetPackageId)').ToLowerInvariant())</FolderName>
-      </_NodeTypePackageOrig>
-      <_NodeTypeToRestore Include="%(ProjectReference.RootDir)%(Directory)dist\**\*.*" Condition="'$(RestoreNodeTypes)' != 'false'">
-        <FolderName>$([System.String]::Copy('%(ProjectReference.Filename)').ToLowerInvariant())</FolderName>
-      </_NodeTypeToRestore>
-      <_NodeTypeToRestore Include="%(RuntimeCopyLocalItems.RootDir)%(Directory)..\..\dist\**\*.*" Condition="'$(RestoreNodeTypes)' != 'false'">
-        <FolderName>$([System.String]::Copy('%(RuntimeCopyLocalItems.NuGetPackageId)').ToLowerInvariant())</FolderName>
-      </_NodeTypeToRestore>
-      <_NodeTypeDeleteFiles Include="node_modules\.dotnet\**\*.*" Exclude="@(_NodeTypeToRestore->'node_modules\.dotnet\%(FolderName)\dist\%(RecursiveDir)%(Filename)%(Extension)');@(_NodeTypeToRestore->'node_modules\.dotnet\%(FolderName)\package.json'->Distinct());@(_NodeTypePackageOrig->'node_modules\.dotnet\%(FolderName)\package.orig.json'->Distinct())" />
-    </ItemGroup>
-    <Delete Files="@(_NodeTypeDeleteFiles)" />
-    <Copy SourceFiles="@(_NodeTypeToRestore)" DestinationFiles="@(_NodeTypeToRestore->'node_modules\.dotnet\%(FolderName)\dist\%(RecursiveDir)%(Filename)%(Extension)')" SkipUnchangedFiles="true"  UseHardlinksIfPossible="true" />
-    <Copy SourceFiles="@(_NodeTypePackageOrig)" DestinationFiles="@(_NodeTypePackageOrig->'node_modules\.dotnet\%(FolderName)\package.orig.json')" SkipUnchangedFiles="true"  UseHardlinksIfPossible="true" />
-    <RestoreNodeTypesTask FolderNames="@(_NodeTypeToRestore->'%(FolderName)'->Distinct())" PatchDependencies="$(RestoreNodeTypesPatchDependencies)" ContinueOnError="true" />
-  </Target>
-  <Target Name="SetSergenTransformArgs">
-    <ItemGroup>
-      <SergenGlobalUsing Include="@(Using)" Condition="'%(Using.Alias)' == '' And '%(Using.Static)' != 'true'" />
-    </ItemGroup>
-    <PropertyGroup>
-      <SergenTransformArgs>-p &quot;$(ProjectFileName)&quot; -prop:Configuration=$(Configuration) -prop:AssemblyName=&quot;$(AssemblyName)&quot; -prop:ESMAssetBasePath=&quot;$(ESMAssetBasePath)&quot; -globalusings &quot;@(SergenGlobalUsing->'%(Identity)')&quot; -prop:OutDir=&quot;$(OutDir.Trim('\').Replace("\", "/"))&quot; -prop:RootNamespace=$(RootNamespace) -prop:TargetFramework=$(TargetFramework)</SergenTransformArgs>
-    </PropertyGroup>
-    <Message Importance="normal" Text="Transform Arguments: $(SergenTransformArgs)"/>
-  </Target>
-  <ItemGroup Condition="'$(SerenityUsings)' != 'false'">
-    <Using Include="Microsoft.AspNetCore.Mvc" />
-    <Using Include="Microsoft.Extensions.Logging" />
-    <Using Include="Microsoft.Extensions.Options" />
-    <Using Include="Serenity" />
-    <Using Include="Serenity.Abstractions" />
-    <Using Include="Serenity.ComponentModel" />
-    <Using Include="Serenity.Data" />
-    <Using Include="Serenity.Data.Mapping" />
-    <Using Include="Serenity.Extensions" />
-    <Using Include="Serenity.Navigation" />
-    <Using Include="Serenity.Services" />
-    <Using Include="Serenity.Web" />
-    <Using Include="System" />
-    <Using Include="System.Collections.Generic" />
-    <Using Include="System.ComponentModel" />
-    <Using Include="System.Data.IDbConnection" Alias="IDbConnection" />
-    <Using Include="System.Data.Common.DbProviderFactories" Alias="DbProviderFactories" />
-    <Using Include="System.Globalization.CultureInfo" Alias="CultureInfo" />
-    <Using Include="System.Globalization.DateTimeStyles" Alias="DateTimeStyles" />
-    <Using Include="System.Globalization.NumberStyles" Alias="NumberStyles" />
-    <Using Include="System.Linq" />
-    <Using Include="System.Text" />
-    <Using Include="System.Text.RegularExpressions" />
-    <Using Include="System.Threading" />
-    <Using Include="System.Threading.Tasks" />
-  </ItemGroup>
-</Project>
+#if IsExternalTestProject
+namespace Microsoft.Build.Utilities
+{
+    public class Task()
+    {
+        public virtual bool Execute()
+        {
+            return true;
+        }
+
+        public static class Log
+        {
+            public static void LogWarning(string text) {}
+        }
+    }
+}
+#endif

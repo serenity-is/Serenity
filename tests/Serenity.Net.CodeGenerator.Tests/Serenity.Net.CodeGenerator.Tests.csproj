@@ -1,8 +1,12 @@
-<Project Sdk="Microsoft.NET.Sdk">
+﻿<Project Sdk="Microsoft.NET.Sdk">
+  <PropertyGroup>
+    <DefineConstants>$(DefineConstants);IsExternalTestProject</DefineConstants>
+  </PropertyGroup>
   <ItemGroup>
     <ProjectReference Include="..\..\src\codegenerator\Serenity.Net.CodeGenerator.csproj" />
     <ProjectReference Include="..\..\src\web\Serenity.Net.Web.csproj" />
     <PackageReference Include="CSharpMinifier" Version="1.2.1" />
+    <Compile Include="..\..\build\tasks\RestoreNodeTypesTask.cs" Link="RestoreNodeTypesTests\RestoreNodeTypesTask.cs" />
     <Compile Include="..\Serenity.Net.Tests\testutils\mocks\MockFileSystem.cs" Link="testutils/mocks/%(RecursiveDir)%(Filename)%(Extension)" />
     <Using Include="Serenity.TestUtils" />
   </ItemGroup>
