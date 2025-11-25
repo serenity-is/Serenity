@@ -11,7 +11,7 @@
       <PatchDependencies ParameterType="System.String" />
     </ParameterGroup>
     <Task>
-      <Code Type="Class" Language="cs" Source="$(MSBuildThisFileDirectory)\RestoreNodeTypesTask.cs" />
+      <Code Type="Class" Language="cs" Source="$(MSBuildThisFileDirectory)RestoreNodeTypesTask.cs" />
     </Task>
   </UsingTask>
   <PropertyGroup>
