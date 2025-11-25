@@ -9,7 +9,7 @@ public static partial class Shared
     public static string PackageOutDir => Path.Combine(Root, "build", ".nupkg");
     public static string SerenityDir => Path.GetFileName(Root).ToLowerInvariant() == "common-features" ? Path.Combine(Root, "..") : Path.Combine(Root, "..", "Serenity");
     private static string SolutionFileBase => Path.Combine(Src, Path.GetFileName(Root));
-    public static string SolutionFile => File.Exists(SolutionFileBase + ".slnf") ? SolutionFileBase + ".slnf" : SolutionFileBase + ".sln";
+    public static string SolutionFile => File.Exists(SolutionFileBase + ".slnf") ? SolutionFileBase + ".slnf" : SolutionFileBase + ".slnx";
     public static string PackageBuildProps => Path.Combine(Root, "build", "Package.Build.props");
     public static string SerenityPackageVersionProps => Path.Combine(SerenityDir, "build", "Package.Version.props");
     public static string DirectoryBuildProps => Path.Combine(Src, "Directory.Build.props");

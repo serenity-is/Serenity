@@ -2,12 +2,12 @@
 # Copilot instructions — Serenity (repo root)
 
 Key points (quick):
-- Root build is driven by MSBuild/Visual Studio (`Serenity.sln`) for .NET projects and `pnpm`/`node` for TypeScript packages under `packages/` and `src/typescript`.
+- Root build is driven by MSBuild/Visual Studio (`Serenity.slnx`) for .NET projects and `pnpm`/`node` for TypeScript packages under `packages/` and `src/typescript`.
 - Many packages (e.g., `packages/corelib`, `packages/sleekgrid`) contain their own `README.md` and a `.github/copilot-instructions.md` with package-specific details — check those for specialized rules.
-- Use project scripts (`pnpm -r build`, `pnpm -r tsc`, `pnpm -r test`) from the repository root where appropriate; .NET builds are via `build\build.csproj` or opening `Serenity.sln` in Visual Studio.
+- Use project scripts (`pnpm -r build`, `pnpm -r tsc`, `pnpm -r test`) from the repository root where appropriate; .NET builds are via `build\build.csproj` or opening `Serenity.slnx` in Visual Studio.
 
 Repository architecture (concise):
-- .NET backend: projects live under `src/` (e.g., `src/core/Serenity.Net.Core.csproj`, `src/web/Serenity.Net.Web.csproj`) and are composed into `Serenity.sln`. These projects provide services, code-generation hooks, and MSBuild targets that integrate TypeScript builds.
+- .NET backend: projects live under `src/` (e.g., `src/core/Serenity.Net.Core.csproj`, `src/web/Serenity.Net.Web.csproj`) and are composed into `Serenity.slnx`. These projects provide services, code-generation hooks, and MSBuild targets that integrate TypeScript builds.
 - TypeScript frontend and libraries: under `packages/` and `serene/` (app template). Notable package: `packages/corelib` — core TypeScript utilities, event system, UI widgets, and runtime registration conventions.
 - Common-features: reusable .NET features and demo projects in `common-features/`.
 - Build/release orchestration: top-level `build/` contains MSBuild helpers; `build.cmd` invokes `dotnet run --project build\build.csproj`.
@@ -57,7 +57,7 @@ Examples to copy patterns from
 - Event handling: see fluent-events in `packages/corelib/src/base/fluent-events.ts` for the custom event system.
 
 Where to look first (high-signal files)
-- `Serenity.sln` — overall project composition and which projects are built together.
+- `Serenity.slnx` — overall project composition and which projects are built together.
 - `build/build.csproj` and `build.cmd` — orchestrates higher-level build steps for the repo.
 - `packages/corelib/.github/copilot-instructions.md` and `packages/corelib/README.md` — package-specific agent guidance and examples.
 - `package.json` (repo root) and `pnpm-workspace.yaml` — workspace and scripts for TypeScript tooling.
@@ -83,7 +83,7 @@ Troubleshooting
 - **Runtime registration not working**: Ensure enums/classes are registered with `registerEnum()`/`registerClass()` and check symbol exports.
 
 Repository architecture (concise):
-- .NET backend: projects live under `src/` (e.g., `src/core/Serenity.Net.Core.csproj`, `src/web/Serenity.Net.Web.csproj`) and are composed into `Serenity.sln`. These projects provide services, code-generation hooks, and MSBuild targets that integrate TypeScript builds.
+- .NET backend: projects live under `src/` (e.g., `src/core/Serenity.Net.Core.csproj`, `src/web/Serenity.Net.Web.csproj`) and are composed into `Serenity.slnx`. These projects provide services, code-generation hooks, and MSBuild targets that integrate TypeScript builds.
 - TypeScript frontend and libraries: under `packages/` and `serene/` (app template). Notable package: `packages/corelib` — core TypeScript utilities, event system, UI widgets, and runtime registration conventions.
 - Common-features: reusable .NET features and demo projects in `common-features/`.
 - Build orchestration: top-level `build/` contains MSBuild helpers; `build.cmd` invokes `dotnet run --project build\build.csproj`.
@@ -151,7 +151,7 @@ Examples to copy patterns from
 - MSBuild integration: examine `src/Directory.Build.targets` and `build/Package.Build.props` for targets that run TS build and package artifacts.
 
 Where to look first (high-signal files)
-- `Serenity.sln` — overall project composition and which projects are built together.
+- `Serenity.slnx` — overall project composition and which projects are built together.
 - `build/build.csproj` and `build.cmd` — orchestrates higher-level build steps for the repo.
 - `packages/corelib/.github/copilot-instructions.md` and `packages/corelib/README.md` — package-specific agent guidance and examples.
 - `package.json` (repo root) and `pnpm-workspace.yaml` — workspace and scripts for TypeScript tooling.

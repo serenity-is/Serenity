@@ -51,7 +51,7 @@ jobs:
     - name: script tests
       run: pnpm -r test -- --coverage
 
-    - name: dotnet build Serenity.sln
+    - name: dotnet build Serenity.slnx
       run: dotnet build /p:SkipNodeScripts=true
 
     - name: dotnet test

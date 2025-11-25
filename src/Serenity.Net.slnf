@@ -1,6 +1,6 @@
 {
   "solution": {
-    "path": "..\\Serenity.sln",
+    "path": "..\\Serenity.slnx",
     "projects": [
       "packages\\corelib\\Serenity.Corelib.csproj",
       "packages\\domwise\\Serenity.DomWise.csproj",
