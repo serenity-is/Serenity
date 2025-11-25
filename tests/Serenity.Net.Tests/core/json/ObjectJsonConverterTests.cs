@@ -105,9 +105,10 @@ public class ObjectJsonConverterTests
     [Theory]
     [InlineData("2020-01-02T03:04:05Z")]
     [InlineData("2020-01-02T03:04:05+02:00")]
-    [InlineData("2020-01-02T03:04:05.1234567Z")]
     [InlineData("2020-01-02T03:04:05.123Z")]
     [InlineData("1999-12-31T23:59:59Z")]
+    [InlineData("2020-01-02T03:04:05.1234567891011121314Z")]
+    [InlineData("2020-01-02T03:04:05")]
     public void IsoDateTimeStrings_AreParsed_AsDateTimeOffset(string iso)
     {
         var json = JsonSerializer.Serialize(iso);
@@ -124,6 +125,12 @@ public class ObjectJsonConverterTests
     [InlineData("")] // empty
     [InlineData("not-a-date")]
     [InlineData("2020-01-02T03:04")] // too short
+    [InlineData("2020-01-02T03:04:1")] // too short
+    [InlineData("2020-01-02T03:04:05.12345678910111213141Z")] // too long
+    [InlineData("2020-01-02X03:04:05")] // invalid separator
+    [InlineData("1234567890123456789")] // all digits, no T separator
+    [InlineData("1234567890T23456789")] // all digits, with T separator
+
     public void NonIsoOrInvalidDateStrings_AreLeftAsString(string s)
     {
         var json = JsonSerializer.Serialize(s);

@@ -11,15 +11,15 @@ public class ObjectJsonConverter : JsonConverter<object>
     /// <summary>
     /// ISO 8601 date time separator position.
     /// </summary>
-    private const byte IsoDateTimeSeparatorPosition = 10;
+    private const int IsoDateTimeSeparatorPosition = 10;
     /// <summary>
     /// Minimum ISO 8601 date time length.
     /// </summary>
-    private const byte MinIsoDateTimeLength = 19;
+    private const int MinIsoDateTimeLength = 19;
     /// <summary>
     /// Maximum ISO 8601 date time length.
     /// </summary>
-    private const byte MaxIsoDateTimeLength = 40;
+    private const int MaxIsoDateTimeLength = 40;
 
     /// <summary>
     /// Default instance of the ObjectJsonConverter
@@ -27,19 +27,22 @@ public class ObjectJsonConverter : JsonConverter<object>
     public static readonly ObjectJsonConverter Instance = new();
 
     /// <inheritdoc/>
-    public override object Read(ref Utf8JsonReader reader, Type type, JsonSerializerOptions options) =>
-        reader.TokenType switch
+    public override object Read(ref Utf8JsonReader reader, Type type, JsonSerializerOptions options)
+    {
+        var str = reader.TokenType == JsonTokenType.String ? reader.GetString() : null;
+        return reader.TokenType switch
         {
             JsonTokenType.True => true,
             JsonTokenType.False => false,
             JsonTokenType.Number when reader.TryGetInt64(out long l) => l,
             JsonTokenType.Number => reader.GetDouble(),
-            JsonTokenType.String when TryParseDateTimeOffset(reader.GetString(), out DateTimeOffset dto) => dto,
-            JsonTokenType.String => reader.GetString()!,
+            JsonTokenType.String when TryParseDateTimeOffset(str, out DateTimeOffset dto) => dto,
+            JsonTokenType.String => str!,
             JsonTokenType.StartArray => JsonSerializer.Deserialize<object[]>(ref reader, options)!,
             JsonTokenType.StartObject => JsonSerializer.Deserialize<Dictionary<string, object>>(ref reader, options)!,
             _ => JsonDocument.ParseValue(ref reader).RootElement.Clone()
         };
+    }
 
     /// <summary>
     /// Tries to parse a DateTimeOffset from a string.
@@ -58,7 +61,7 @@ public class ObjectJsonConverter : JsonConverter<object>
             s[IsoDateTimeSeparatorPosition] != 'T')
             return false;
 
-        return DateTimeOffset.TryParse(s, out dateTimeOffset);
+        return DateTimeOffset.TryParse(s, CultureInfo.InvariantCulture, DateTimeStyles.None, out dateTimeOffset);
     }
 
     /// <inheritdoc/>
