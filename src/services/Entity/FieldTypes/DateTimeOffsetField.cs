@@ -103,31 +103,6 @@ public sealed class DateTimeOffsetField(ICollection<Field> collection, string na
     }
 
     /// <summary>
-    /// Gets or sets the value of this field with the specified row.
-    /// </summary>
-    /// <value>
-    /// The <see cref="Nullable{DateTimeOffset}"/>.
-    /// </value>
-    /// <param name="row">The row.</param>
-    /// <returns></returns>
-    public new DateTimeOffset? this[IRow row]
-    {
-        get
-        {
-            CheckUnassignedRead(row);
-            return _getValue(row);
-        }
-        set
-        {
-            if (value != null)
-                _setValue(row, value.Value);
-            else
-                _setValue(row, value);
-            row.FieldAssignedValue(this);
-        }
-    }
-
-    /// <summary>
     /// Serializes this fields value to JSON
     /// </summary>
     /// <param name="writer">The writer.</param>

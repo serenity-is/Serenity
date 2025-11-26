@@ -68,31 +68,6 @@ public sealed class TimeSpanField(ICollection<Field> collection, string name, Lo
     }
 
     /// <summary>
-    /// Gets or sets the <see cref="Nullable{TimeSpan}"/> with the specified row.
-    /// </summary>
-    /// <value>
-    /// The <see cref="Nullable{TimeSpan}"/>.
-    /// </value>
-    /// <param name="row">The row.</param>
-    /// <returns></returns>
-    public new TimeSpan? this[IRow row]
-    {
-        get
-        {
-            CheckUnassignedRead(row);
-            return _getValue(row);
-        }
-        set
-        {
-            if (value != null)
-                _setValue(row, value.Value);
-            else
-                _setValue(row, null);
-            row.FieldAssignedValue(this);
-        }
-    }
-
-    /// <summary>
     /// Serializes this fields value to JSON
     /// </summary>
     /// <param name="writer">The writer.</param>

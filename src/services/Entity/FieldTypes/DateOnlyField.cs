@@ -91,27 +91,6 @@ public sealed class DateOnlyField(ICollection<Field> collection, string name, Lo
     }
 
     /// <summary>
-    /// Gets or sets the value of this field with the specified row.
-    /// </summary>
-    /// <param name="row">The row.</param>
-    public new DateOnly? this[IRow row]
-    {
-        get
-        {
-            CheckUnassignedRead(row);
-            return _getValue(row);
-        }
-        set
-        {
-            if (value != null)
-                _setValue(row, value.Value);
-            else
-                _setValue(row, value);
-            row.FieldAssignedValue(this);
-        }
-    }
-
-    /// <summary>
     /// Sets the value of this field in specified row as object.
     /// </summary>
     /// <param name="row">The row.</param>
