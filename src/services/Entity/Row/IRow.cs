@@ -65,15 +65,21 @@ public interface IRow : IEntityWithJoins
     /// <param name="value">The value.</param>
     void SetIndexedData(int index, object value);
     /// <summary>
-    /// Gets or sets a value indicating whether to track assignments to field values.
+    /// Gets or sets a flag indicating whether to track assignments to field values.
     /// </summary>
     /// <value>
     ///   <c>true</c> if assignments are tracked; otherwise, <c>false</c>.
     /// </value>
     bool TrackAssignments { get; set; }
     /// <summary>
-    /// Gets or sets a value indicating whether track assignments to field values,
-    /// and raise an exception if an unassigned field is tried to read.
+    /// Gets or sets a flag indicating whether to track assignments to field values in addition
+    /// to throwing an exception on read if an unassigned field with null value is accessed.
+    /// Setting this to true implicitly sets TrackAssignments to true, 
+    /// and setting it to false does not change TrackAssignments value.
+    /// This flag is useful when loading a partial row from a database query
+    /// and you want to ensure that only assigned fields are read.
+    /// Connection extensions like List, ById, etc. automatically set this flag
+    /// to true for rows they load.
     /// </summary>
     /// <value>
     ///   <c>true</c> if track with checks; otherwise, <c>false</c>.
