@@ -28,6 +28,7 @@ public static partial class CSharpSyntaxRules
         "explicit",
         "extern",
         "false",
+        "field",
         "finally",
         "fixed",
         "float",
