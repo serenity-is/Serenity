@@ -155,12 +155,20 @@ public sealed class DateTimeField(ICollection<Field> collection, string name, Lo
             return value.LocalDateTime;
     }
 
-    private DateTime ToDateTimeKind(DateTimeOffset value)
+    /// <summary>
+    /// Converts the value to this field's DateTimeKind
+    /// </summary>
+    /// <param name="value">The value.</param>
+    public DateTime ToDateTimeKind(DateTimeOffset value)
     {
         return ToDateTimeKind(value, dateTimeKind);
     }
 
-    private DateTime ToDateTimeKind(DateTime value)
+    /// <summary>
+    /// Converts the value to this field's DateTimeKind
+    /// </summary>
+    /// <param name="value">The value.</param>
+    public DateTime ToDateTimeKind(DateTime value)
     {
         return ToDateTimeKind(value, dateTimeKind);
     }
