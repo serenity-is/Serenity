@@ -23,7 +23,7 @@ public abstract partial class Row<TFields> : IRow, IRow<TFields>
     internal int[] assignedFieldsArray;
     internal Hashtable dictionaryData;
     internal object[] indexedData;
-    internal bool tracking;
+    internal bool trackAssignments;
     internal bool trackWithChecks;
 
     /// <summary>
@@ -84,8 +84,8 @@ public abstract partial class Row<TFields> : IRow, IRow<TFields>
         foreach (var field in fields)
             field.Copy(this, clone);
 
-        clone.tracking = tracking;
-        if (tracking)
+        clone.trackAssignments = trackAssignments;
+        if (trackAssignments)
         {
             clone.assignedFieldsMask = assignedFieldsMask;
             if (assignedFieldsArray != null)
@@ -187,7 +187,7 @@ public abstract partial class Row<TFields> : IRow, IRow<TFields>
     /// <inheritdoc />
     public void OnFieldGet(Field field)
     {
-        if (!trackWithChecks || !tracking)
+        if (!trackWithChecks)
             return;
 
         if (IsAssigned(field))
@@ -204,7 +204,7 @@ public abstract partial class Row<TFields> : IRow, IRow<TFields>
     /// <inheritdoc />
     public void OnFieldSet(Field field)
     {
-        if (!tracking)
+        if (!trackAssignments)
             return;
 
         var index = field.index;
@@ -255,7 +255,7 @@ public abstract partial class Row<TFields> : IRow, IRow<TFields>
     /// <value>
     ///   <c>true</c> if this instance has any field assigned; otherwise, <c>false</c>.
     /// </value>
-    bool IRow.IsAnyFieldAssigned => tracking && (assignedFieldsMask != 0 || assignedFieldsArray != null);
+    bool IRow.IsAnyFieldAssigned => trackAssignments && (assignedFieldsMask != 0 || assignedFieldsArray != null);
 
     bool IRow.IgnoreConstraints { get; set; }
 
@@ -274,22 +274,22 @@ public abstract partial class Row<TFields> : IRow, IRow<TFields>
     {
         get
         {
-            return tracking;
+            return trackAssignments;
         }
         set
         {
-            if (tracking != value)
+            if (trackAssignments != value)
             {
                 if (value)
                 {
                     if (propertyChanged != null)
                         previousValues = CloneRow();
 
-                    tracking = value;
+                    trackAssignments = value;
                 }
                 else
                 {
-                    tracking = false;
+                    trackAssignments = false;
                     trackWithChecks = false;
                     assignedFieldsMask = 0;
                     assignedFieldsArray = null;
@@ -308,13 +308,13 @@ public abstract partial class Row<TFields> : IRow, IRow<TFields>
     {
         get
         {
-            return tracking && trackWithChecks;
+            return trackWithChecks;
         }
         set
         {
-            if (value != (tracking && trackWithChecks))
+            if (value != trackWithChecks)
             {
-                if (value && !tracking)
+                if (value && !trackAssignments)
                     ((IRow)this).TrackAssignments = true;
 
                 trackWithChecks = value;
