@@ -56,7 +56,7 @@ public class JsonField<TValue>(ICollection<Field> collection, string name, Local
             _setValue(row, JsonSerializer.Deserialize<TValue>(reader.GetString(index), 
                 SerializerOptions ?? JSON.Defaults.Strict));
 
-        row.FieldAssignedValue(this);
+        row.OnFieldSet(this);
     }
 
     /// <summary>
@@ -146,7 +146,7 @@ public class JsonField<TValue>(ICollection<Field> collection, string name, Local
                 break;
         }
 
-        row.FieldAssignedValue(this);
+        row.OnFieldSet(this);
     }
 
     /// <inheritdoc/>
@@ -168,7 +168,7 @@ public class JsonField<TValue>(ICollection<Field> collection, string name, Local
                 break;
         }
 
-        row.FieldAssignedValue(this);
+        row.OnFieldSet(this);
     }
 
     /// <inheritdoc/>

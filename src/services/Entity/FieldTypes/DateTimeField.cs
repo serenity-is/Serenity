@@ -84,7 +84,7 @@ public sealed class DateTimeField(ICollection<Field> collection, string name, Lo
             _setValue(row, datetime);
         }
 
-        row.FieldAssignedValue(this);
+        row.OnFieldSet(this);
     }
 
     private DateTimeKind? dateTimeKind;
@@ -173,7 +173,7 @@ public sealed class DateTimeField(ICollection<Field> collection, string name, Lo
     {
         get
         {
-            row.CheckUnassignedRead(this);
+            row.OnFieldGet(this);
             return _getValue(row);
         }
         set
@@ -182,7 +182,7 @@ public sealed class DateTimeField(ICollection<Field> collection, string name, Lo
                 _setValue(row, ToDateTimeKind(value.Value));
             else
                 _setValue(row, value);
-            row.FieldAssignedValue(this);
+            row.OnFieldSet(this);
         }
     }
 
@@ -198,7 +198,7 @@ public sealed class DateTimeField(ICollection<Field> collection, string name, Lo
         else
             _setValue(row, ToDateTimeKind((DateTime)value));
 
-        row.FieldAssignedValue(this);
+        row.OnFieldSet(this);
     }
 
     /// <summary>
@@ -267,7 +267,7 @@ public sealed class DateTimeField(ICollection<Field> collection, string name, Lo
                 throw JsonUnexpectedToken(reader);
         }
 
-        row.FieldAssignedValue(this);
+        row.OnFieldSet(this);
     }
 
     /// <inheritdoc/>
@@ -293,7 +293,7 @@ public sealed class DateTimeField(ICollection<Field> collection, string name, Lo
                 throw UnexpectedJsonToken(ref reader);
         }
 
-        row.FieldAssignedValue(this);
+        row.OnFieldSet(this);
     }
 
     /// <inheritdoc/>

@@ -87,7 +87,7 @@ public sealed class DateOnlyField(ICollection<Field> collection, string name, Lo
             _setValue(row, datetime);
         }
 
-        row.FieldAssignedValue(this);
+        row.OnFieldSet(this);
     }
 
     /// <summary>
@@ -102,7 +102,7 @@ public sealed class DateOnlyField(ICollection<Field> collection, string name, Lo
         else
             _setValue(row, (DateOnly)value);
 
-        row.FieldAssignedValue(this);
+        row.OnFieldSet(this);
     }
 
     /// <summary>
@@ -171,7 +171,7 @@ public sealed class DateOnlyField(ICollection<Field> collection, string name, Lo
                 throw JsonUnexpectedToken(reader);
         }
 
-        row.FieldAssignedValue(this);
+        row.OnFieldSet(this);
     }
 
     /// <inheritdoc/>
@@ -197,7 +197,7 @@ public sealed class DateOnlyField(ICollection<Field> collection, string name, Lo
                 throw UnexpectedJsonToken(ref reader);
         }
 
-        row.FieldAssignedValue(this);
+        row.OnFieldSet(this);
     }
 
     /// <inheritdoc/>

@@ -54,7 +54,7 @@ public class Int32Field(ICollection<Field> collection, string name, LocalText ca
         else
             _setValue(row, Convert.ToInt32(value, CultureInfo.InvariantCulture));
 
-        row.FieldAssignedValue(this);
+        row.OnFieldSet(this);
     }
 
     /// <summary>
@@ -147,7 +147,7 @@ public class Int32Field(ICollection<Field> collection, string name, LocalText ca
                 throw JsonUnexpectedToken(reader);
         }
 
-        row.FieldAssignedValue(this);
+        row.OnFieldSet(this);
     }
 
     /// <inheritdoc/>
@@ -185,7 +185,7 @@ public class Int32Field(ICollection<Field> collection, string name, LocalText ca
                 throw UnexpectedJsonToken(ref reader);
         }
 
-        row.FieldAssignedValue(this);
+        row.OnFieldSet(this);
     }
 
     /// <inheritdoc/>

@@ -53,7 +53,7 @@ public class StringField(ICollection<Field> collection, string name, LocalText c
         else
             _setValue(row, reader.GetString(index));
 
-        row.FieldAssignedValue(this);
+        row.OnFieldSet(this);
     }
 
     /// <summary>
@@ -137,7 +137,7 @@ public class StringField(ICollection<Field> collection, string name, LocalText c
                 throw JsonUnexpectedToken(reader);
         }
 
-        row.FieldAssignedValue(this);
+        row.OnFieldSet(this);
     }
 
     /// <inheritdoc/>
@@ -167,7 +167,7 @@ public class StringField(ICollection<Field> collection, string name, LocalText c
                 throw UnexpectedJsonToken(ref reader);
         }
 
-        row.FieldAssignedValue(this);
+        row.OnFieldSet(this);
     }
 
     /// <inheritdoc/>

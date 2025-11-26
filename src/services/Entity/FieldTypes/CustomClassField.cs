@@ -51,7 +51,7 @@ public class CustomClassField<TValue>(ICollection<Field> collection, string name
         else
             _setValue(row, GetFromReader(reader, index));
 
-        row.FieldAssignedValue(this);
+        row.OnFieldSet(this);
     }
 
     /// <summary>
@@ -152,7 +152,7 @@ public class CustomClassField<TValue>(ICollection<Field> collection, string name
                 break;
         }
 
-        row.FieldAssignedValue(this);
+        row.OnFieldSet(this);
     }
 
     /// <summary>
@@ -179,7 +179,7 @@ public class CustomClassField<TValue>(ICollection<Field> collection, string name
                 break;
         }
 
-        row.FieldAssignedValue(this);
+        row.OnFieldSet(this);
     }
 
     /// <inheritdoc/>
@@ -225,6 +225,6 @@ public class CustomClassField<TValue>(ICollection<Field> collection, string name
             value = Clone(value);
 
         _setValue(target, value);
-        target.FieldAssignedValue(this);
+        target.OnFieldSet(this);
     }
 }

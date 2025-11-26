@@ -26,15 +26,15 @@ public interface IRow : IEntityWithJoins
     /// </value>
     RowFieldsBase Fields { get; }
     /// <summary>
-    /// Called when field is assigned a value.
+    /// Called when a field is assigned a value.
     /// </summary>
     /// <param name="field">The field.</param>
-    void FieldAssignedValue(Field field);
+    void OnFieldSet(Field field);
     /// <summary>
-    /// Called to check if field is read without being assigned a value when tracking with checks.
+    /// Called to check if a field is read without being assigned a value when tracking with checks.
     /// </summary>
     /// <param name="field">The field.</param>
-    void CheckUnassignedRead(Field field);
+    void OnFieldGet(Field field);
     /// <summary>
     /// Gets the dictionary data.
     /// </summary>

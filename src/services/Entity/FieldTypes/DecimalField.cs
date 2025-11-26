@@ -56,7 +56,7 @@ public sealed class DecimalField(ICollection<Field> collection, string name, Loc
         else
             _setValue(row, Convert.ToDecimal(value, CultureInfo.InvariantCulture));
 
-        row.FieldAssignedValue(this);
+        row.OnFieldSet(this);
     }
 
     /// <summary>
@@ -104,7 +104,7 @@ public sealed class DecimalField(ICollection<Field> collection, string name, Loc
                 throw JsonUnexpectedToken(reader);
         }
 
-        row.FieldAssignedValue(this);
+        row.OnFieldSet(this);
     }
 
     /// <inheritdoc/>
@@ -137,7 +137,7 @@ public sealed class DecimalField(ICollection<Field> collection, string name, Loc
                 throw UnexpectedJsonToken(ref reader);
         }
 
-        row.FieldAssignedValue(this);
+        row.OnFieldSet(this);
     }
 
     /// <inheritdoc/>

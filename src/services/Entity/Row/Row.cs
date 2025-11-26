@@ -184,12 +184,16 @@ public abstract partial class Row<TFields> : IRow, IRow<TFields>
         return CreateNew();
     }
 
-    void IRow.CheckUnassignedRead(Field field)
+    /// <inheritdoc />
+    public void OnFieldGet(Field field)
     {
-        if (!tracking || 
-            !trackWithChecks ||
-            IsAssigned(field) ||
-            !field.IsNullNoCheck(this))
+        if (!trackWithChecks || !tracking)
+            return;
+
+        if (IsAssigned(field))
+            return;
+
+        if (!field.IsNullNoCheck(this))
             return;
 
         throw new InvalidOperationException(string.Format(
@@ -197,7 +201,8 @@ public abstract partial class Row<TFields> : IRow, IRow<TFields>
                 field.Name, GetType().Name));
     }
 
-    void IRow.FieldAssignedValue(Field field)
+    /// <inheritdoc />
+    public void OnFieldSet(Field field)
     {
         if (!tracking)
             return;
@@ -217,7 +222,8 @@ public abstract partial class Row<TFields> : IRow, IRow<TFields>
 
         if (propertyChanged != null &&
             previousValues != null &&
-            field.IndexCompare(previousValues, this) != 0) { 
+            field.IndexCompare(previousValues, this) != 0)
+        {
             RaisePropertyChanged(field);
             field.Copy(this, previousValues);
         }

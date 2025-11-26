@@ -70,7 +70,7 @@ public abstract class GenericValueField<TValue> : Field, IEnumTypeField where TV
     {
         _setValue(target, _getValue(source));
         if (target.TrackAssignments)
-            target.FieldAssignedValue(this);
+            target.OnFieldSet(this);
     }
 
     /// <summary>
@@ -81,13 +81,13 @@ public abstract class GenericValueField<TValue> : Field, IEnumTypeField where TV
     {
         get
         {
-            row.CheckUnassignedRead(this);
+            row.OnFieldGet(this);
             return _getValue(row);
         }
         set
         {
             _setValue(row, value);
-            row.FieldAssignedValue(this);
+            row.OnFieldSet(this);
         }
     }
 
@@ -119,7 +119,7 @@ public abstract class GenericValueField<TValue> : Field, IEnumTypeField where TV
             }
         }
 
-        row.FieldAssignedValue(this);
+        row.OnFieldSet(this);
     }
 
     /// <inheritdoc/>

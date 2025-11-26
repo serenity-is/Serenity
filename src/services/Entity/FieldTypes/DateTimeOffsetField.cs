@@ -99,7 +99,7 @@ public sealed class DateTimeOffsetField(ICollection<Field> collection, string na
             _setValue(row, dto);
         }
 
-        row.FieldAssignedValue(this);
+        row.OnFieldSet(this);
     }
 
     /// <summary>
@@ -157,7 +157,7 @@ public sealed class DateTimeOffsetField(ICollection<Field> collection, string na
                 throw JsonUnexpectedToken(reader);
         }
 
-        row.FieldAssignedValue(this);
+        row.OnFieldSet(this);
     }
 
     /// <inheritdoc/>
@@ -183,7 +183,7 @@ public sealed class DateTimeOffsetField(ICollection<Field> collection, string na
                 throw UnexpectedJsonToken(ref reader);
         }
 
-        row.FieldAssignedValue(this);
+        row.OnFieldSet(this);
     }
 
     /// <inheritdoc/>

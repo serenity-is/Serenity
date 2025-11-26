@@ -53,7 +53,7 @@ public sealed class GuidField(ICollection<Field> collection, string name, LocalT
         else
             _setValue(row, reader.GetGuid(index));
 
-        row.FieldAssignedValue(this);
+        row.OnFieldSet(this);
     }
 
     /// <summary>
@@ -96,7 +96,7 @@ public sealed class GuidField(ICollection<Field> collection, string name, LocalT
                 throw JsonUnexpectedToken(reader);
         }
 
-        row.FieldAssignedValue(this);
+        row.OnFieldSet(this);
     }
 
     /// <summary>
@@ -149,7 +149,7 @@ public sealed class GuidField(ICollection<Field> collection, string name, LocalT
                 throw UnexpectedJsonToken(ref reader);
         }
 
-        row.FieldAssignedValue(this);
+        row.OnFieldSet(this);
     }
 
     /// <inheritdoc/>

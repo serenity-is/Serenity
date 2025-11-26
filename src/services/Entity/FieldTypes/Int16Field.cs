@@ -53,7 +53,7 @@ public sealed class Int16Field(ICollection<Field> collection, string name, Local
         else
             _setValue(row, Convert.ToInt16(reader.GetValue(index)));
 
-        row.FieldAssignedValue(this);
+        row.OnFieldSet(this);
     }
 
     /// <summary>
@@ -112,7 +112,7 @@ public sealed class Int16Field(ICollection<Field> collection, string name, Local
                 throw JsonUnexpectedToken(reader);
         }
 
-        row.FieldAssignedValue(this);
+        row.OnFieldSet(this);
     }
 
     /// <inheritdoc/>
@@ -150,7 +150,7 @@ public sealed class Int16Field(ICollection<Field> collection, string name, Local
                 throw UnexpectedJsonToken(ref reader);
         }
 
-        row.FieldAssignedValue(this);
+        row.OnFieldSet(this);
     }
 
     /// <inheritdoc/>

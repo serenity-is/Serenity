@@ -53,7 +53,7 @@ public sealed class BooleanField(ICollection<Field> collection, string name, Loc
         else
             _setValue(row, Convert.ToBoolean(reader.GetValue(index)));
 
-        row.FieldAssignedValue(this);
+        row.OnFieldSet(this);
     }
 
     /// <summary>
@@ -103,7 +103,7 @@ public sealed class BooleanField(ICollection<Field> collection, string name, Loc
                 throw JsonUnexpectedToken(reader);
         }
 
-        row.FieldAssignedValue(this);
+        row.OnFieldSet(this);
     }
 
     /// <inheritdoc/>
@@ -134,7 +134,7 @@ public sealed class BooleanField(ICollection<Field> collection, string name, Loc
                 throw UnexpectedJsonToken(ref reader);
         }
 
-        row.FieldAssignedValue(this);
+        row.OnFieldSet(this);
     }
 
     /// <inheritdoc/>

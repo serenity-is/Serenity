@@ -36,7 +36,7 @@ public abstract class GenericField<TValue>(ICollection<Field> collection, FieldT
     public override void Copy(IRow source, IRow target)
     {
         _setValue(target, _getValue(source));
-        target.FieldAssignedValue(this);
+        target.OnFieldSet(this);
     }
 
     /// <summary>
@@ -47,13 +47,13 @@ public abstract class GenericField<TValue>(ICollection<Field> collection, FieldT
     {
         get
         {
-            row.CheckUnassignedRead(this);
+            row.OnFieldGet(this);
             return _getValue(row);
         }
         set
         {
             _setValue(row, value);
-            row.FieldAssignedValue(this);
+            row.OnFieldSet(this);
         }
     }
 }

@@ -41,7 +41,7 @@ public class EnumField<TEnum> : Int32Field
     {
         get
         {
-            row.CheckUnassignedRead(this);
+            row.OnFieldGet(this);
             var value = _getValue(row);
             if (value == null)
                 return null;
@@ -52,7 +52,7 @@ public class EnumField<TEnum> : Int32Field
         {
             int? v = value == null ? null : Convert.ToInt32(value);
             _setValue(row, v);
-            row.FieldAssignedValue(this);
+            row.OnFieldSet(this);
         }
     }
 }

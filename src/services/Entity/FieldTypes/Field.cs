@@ -591,7 +591,7 @@ public abstract partial class Field : IFieldWithJoinInfo
     /// <returns></returns>
     public object AsObject(IRow row)
     {
-        row.CheckUnassignedRead(this);
+        row.OnFieldGet(this);
         return AsObjectNoCheck(row);
     }
 
@@ -637,7 +637,7 @@ public abstract partial class Field : IFieldWithJoinInfo
     /// </returns>
     public bool IsNull(IRow row)
     {
-        row.CheckUnassignedRead(this);
+        row.OnFieldGet(this);
         return IsNullNoCheck(row);
     }
 

@@ -53,7 +53,7 @@ public sealed class Int64Field(ICollection<Field> collection, string name, Local
         else
             _setValue(row, Convert.ToInt64(reader.GetValue(index), CultureInfo.InvariantCulture));
 
-        row.FieldAssignedValue(this);
+        row.OnFieldSet(this);
     }
 
     /// <summary>
@@ -118,7 +118,7 @@ public sealed class Int64Field(ICollection<Field> collection, string name, Local
                 throw JsonUnexpectedToken(reader);
         }
 
-        row.FieldAssignedValue(this);
+        row.OnFieldSet(this);
     }
 
     /// <inheritdoc/>
@@ -156,7 +156,7 @@ public sealed class Int64Field(ICollection<Field> collection, string name, Local
                 throw UnexpectedJsonToken(ref reader);
         }
 
-        row.FieldAssignedValue(this);
+        row.OnFieldSet(this);
     }
 
     /// <inheritdoc/>

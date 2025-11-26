@@ -56,7 +56,7 @@ public sealed class DoubleField(ICollection<Field> collection, string name, Loca
         else
             _setValue(row, Convert.ToDouble(value, CultureInfo.InvariantCulture));
 
-        row.FieldAssignedValue(this);
+        row.OnFieldSet(this);
     }
 
     /// <summary>
@@ -104,7 +104,7 @@ public sealed class DoubleField(ICollection<Field> collection, string name, Loca
                 throw JsonUnexpectedToken(reader);
         }
 
-        row.FieldAssignedValue(this);
+        row.OnFieldSet(this);
     }
 
     /// <inheritdoc/>
@@ -137,7 +137,7 @@ public sealed class DoubleField(ICollection<Field> collection, string name, Loca
                 throw UnexpectedJsonToken(ref reader);
         }
 
-        row.FieldAssignedValue(this);
+        row.OnFieldSet(this);
     }
 
     /// <inheritdoc/>

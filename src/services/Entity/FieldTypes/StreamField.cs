@@ -70,7 +70,7 @@ public class StreamField(ICollection<Field> collection, string name, LocalText c
             _setValue(row, new MemoryStream(a));
         }
 
-        row.FieldAssignedValue(this);
+        row.OnFieldSet(this);
     }
 
     /// <summary>
@@ -160,7 +160,7 @@ public class StreamField(ICollection<Field> collection, string name, LocalText c
                 throw JsonUnexpectedToken(reader);
         }
 
-        row.FieldAssignedValue(this);
+        row.OnFieldSet(this);
     }
 
     /// <inheritdoc/>
@@ -181,7 +181,7 @@ public class StreamField(ICollection<Field> collection, string name, LocalText c
                 throw UnexpectedJsonToken(ref reader);
         }
 
-        row.FieldAssignedValue(this);
+        row.OnFieldSet(this);
     }
 
     /// <inheritdoc/>

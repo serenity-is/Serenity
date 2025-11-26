@@ -64,7 +64,7 @@ public sealed class TimeSpanField(ICollection<Field> collection, string name, Lo
             _setValue(row, timeSpan);
         }
 
-        row.FieldAssignedValue(this);
+        row.OnFieldSet(this);
     }
 
     /// <summary>
@@ -125,7 +125,7 @@ public sealed class TimeSpanField(ICollection<Field> collection, string name, Lo
                 throw JsonUnexpectedToken(reader);
         }
 
-        row.FieldAssignedValue(this);
+        row.OnFieldSet(this);
     }
 
     /// <inheritdoc/>
@@ -151,7 +151,7 @@ public sealed class TimeSpanField(ICollection<Field> collection, string name, Lo
                 throw UnexpectedJsonToken(ref reader);
         }
 
-        row.FieldAssignedValue(this);
+        row.OnFieldSet(this);
     }
 
     /// <inheritdoc/>

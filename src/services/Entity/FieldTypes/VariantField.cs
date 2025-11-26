@@ -53,7 +53,7 @@ public class VariantField(ICollection<Field> collection, string name, LocalText 
         else
             _setValue(row, reader.GetValue(index));
 
-        row.FieldAssignedValue(this);
+        row.OnFieldSet(this);
     }
 
     /// <summary>
@@ -121,7 +121,7 @@ public class VariantField(ICollection<Field> collection, string name, LocalText 
                 throw JsonUnexpectedToken(reader);
         }
 
-        row.FieldAssignedValue(this);
+        row.OnFieldSet(this);
     }
 
     /// <inheritdoc/>
@@ -152,7 +152,7 @@ public class VariantField(ICollection<Field> collection, string name, LocalText 
                 throw UnexpectedJsonToken(ref reader);
         }
 
-        row.FieldAssignedValue(this);
+        row.OnFieldSet(this);
     }
 
     /// <inheritdoc/>

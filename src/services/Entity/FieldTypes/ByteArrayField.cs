@@ -69,7 +69,7 @@ public class ByteArrayField(ICollection<Field> collection, string name, LocalTex
             _setValue(row, a);
         }
 
-        row.FieldAssignedValue(this);
+        row.OnFieldSet(this);
     }
 
     /// <summary>
@@ -146,7 +146,7 @@ public class ByteArrayField(ICollection<Field> collection, string name, LocalTex
                 throw JsonUnexpectedToken(reader);
         }
 
-        row.FieldAssignedValue(this);
+        row.OnFieldSet(this);
     }
 
     /// <inheritdoc/>
@@ -167,7 +167,7 @@ public class ByteArrayField(ICollection<Field> collection, string name, LocalTex
                 throw UnexpectedJsonToken(ref reader);
         }
 
-        row.FieldAssignedValue(this);
+        row.OnFieldSet(this);
     }
 
     /// <inheritdoc/>

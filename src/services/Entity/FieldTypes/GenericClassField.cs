@@ -32,7 +32,7 @@ public abstract class GenericClassField<TValue> : Field where TValue : class
     public override void Copy(IRow source, IRow target)
     {
         _setValue(target, _getValue(source));
-        target.FieldAssignedValue(this);
+        target.OnFieldSet(this);
     }
 
     /// <summary>
@@ -44,13 +44,13 @@ public abstract class GenericClassField<TValue> : Field where TValue : class
     {
         get
         {
-            row.CheckUnassignedRead(this);
+            row.OnFieldGet(this);
             return _getValue(row);
         }
         set
         {
             _setValue(row, value);
-            row.FieldAssignedValue(this);
+            row.OnFieldSet(this);
         }
     }
 
@@ -90,7 +90,7 @@ public abstract class GenericClassField<TValue> : Field where TValue : class
     public override void AsObject(IRow row, object value)
     {
         _setValue(row, (TValue)value);
-        row.FieldAssignedValue(this);
+        row.OnFieldSet(this);
     }
 
     /// <inheritdoc />
