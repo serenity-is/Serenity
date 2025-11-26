@@ -1,4 +1,4 @@
-﻿namespace Serenity.Data;
+namespace Serenity.Data;
 
 /// <summary>
 /// Field with an Enum value
@@ -41,7 +41,7 @@ public class EnumField<TEnum> : Int32Field
     {
         get
         {
-            CheckUnassignedRead(row);
+            row.CheckUnassignedRead(this);
             var value = _getValue(row);
             if (value == null)
                 return null;

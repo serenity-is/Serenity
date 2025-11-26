@@ -44,7 +44,7 @@ public abstract class GenericClassField<TValue> : Field where TValue : class
     {
         get
         {
-            CheckUnassignedRead(row);
+            row.CheckUnassignedRead(this);
             return _getValue(row);
         }
         set
@@ -98,7 +98,7 @@ public abstract class GenericClassField<TValue> : Field where TValue : class
     /// </summary>
     /// <param name="row">The row.</param>
     /// <returns></returns>
-    protected override bool GetIsNull(IRow row)
+    protected internal override bool GetIsNull(IRow row)
     {
         return _getValue(row) == null;
     }

@@ -505,31 +505,6 @@ public abstract partial class Field : IFieldWithJoinInfo
     }
 
     /// <summary>
-    /// Checks the unassigned read.
-    /// </summary>
-    /// <param name="row">The row.</param>
-    /// <exception cref="ArgumentNullException">row</exception>
-    /// <exception cref="InvalidOperationException"></exception>
-    protected void CheckUnassignedRead(IRow row)
-    {
-        if (row == null)
-            throw new ArgumentNullException("row");
-
-        if (!row.TrackWithChecks)
-            return;
-
-        if (row.IsAssigned(this))
-            return;
-
-        if (!GetIsNull(row))
-            return;
-
-        throw new InvalidOperationException(string.Format(
-            "{0} field on {1} is read before assigned a value! Make sure this field is selected in your SqlQuery. Extensions like connection.List only loads table fields by default, view / expression fields are not loaded unless explicitly selected.",
-                Name, row.GetType().Name));
-    }
-
-    /// <summary>
     /// Serializes this fields value to JSON
     /// </summary>
     /// <param name="writer">The writer.</param>
@@ -616,7 +591,7 @@ public abstract partial class Field : IFieldWithJoinInfo
     /// <returns></returns>
     public object AsObject(IRow row)
     {
-        CheckUnassignedRead(row);
+        row.CheckUnassignedRead(this);
         return AsObjectNoCheck(row);
     }
 
@@ -639,7 +614,7 @@ public abstract partial class Field : IFieldWithJoinInfo
     /// </summary>
     /// <param name="row">The row.</param>
     /// <returns></returns>
-    protected abstract bool GetIsNull(IRow row);
+    protected internal abstract bool GetIsNull(IRow row);
 
     /// <summary>
     /// Gets the value of this row as an SQL value.
@@ -660,7 +635,7 @@ public abstract partial class Field : IFieldWithJoinInfo
     /// </returns>
     public bool IsNull(IRow row)
     {
-        CheckUnassignedRead(row);
+        row.CheckUnassignedRead(this);
         return GetIsNull(row);
     }
 

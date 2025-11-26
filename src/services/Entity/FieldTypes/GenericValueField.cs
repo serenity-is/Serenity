@@ -81,7 +81,7 @@ public abstract class GenericValueField<TValue> : Field, IEnumTypeField where TV
     {
         get
         {
-            CheckUnassignedRead(row);
+            row.CheckUnassignedRead(this);
             return _getValue(row);
         }
         set
@@ -127,7 +127,7 @@ public abstract class GenericValueField<TValue> : Field, IEnumTypeField where TV
     /// </summary>
     /// <param name="row">The row.</param>
     /// <returns></returns>
-    protected override bool GetIsNull(IRow row)
+    protected internal override bool GetIsNull(IRow row)
     {
         return _getValue(row) == null;
     }

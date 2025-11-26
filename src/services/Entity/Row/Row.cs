@@ -42,11 +42,10 @@ public abstract partial class Row<TFields> : IRow, IRow<TFields>
     /// <exception cref="ArgumentOutOfRangeException">fields</exception>
     protected Row(TFields fields)
     {
-        if (fields == null)
-            throw new ArgumentNullException(nameof(fields));
+        ArgumentNullException.ThrowIfNull(fields, nameof(fields));
 
         if (!fields.isInitialized)
-            throw new ArgumentOutOfRangeException("fields", $"{GetType().FullName} constructor is called " +
+            throw new ArgumentOutOfRangeException(nameof(fields), $"{GetType().FullName} constructor is called " +
                 $"with a fields object that is not initialized. Please call .Init() method on it before using!");
 
         this.fields = fields;
@@ -185,6 +184,19 @@ public abstract partial class Row<TFields> : IRow, IRow<TFields>
         return CreateNew();
     }
 
+    void IRow.CheckUnassignedRead(Field field)
+    {
+        if (!tracking || 
+            !trackWithChecks ||
+            IsAssigned(field) ||
+            !field.GetIsNull(this))
+            return;
+
+        throw new InvalidOperationException(string.Format(
+            "{0} field on {1} is read before assigned a value! Make sure this field is selected in your SqlQuery. Extensions like connection.List only loads table fields by default, view / expression fields are not loaded unless explicitly selected.",
+                field.Name, GetType().Name));
+    }
+
     void IRow.FieldAssignedValue(Field field)
     {
         if (!tracking)
@@ -308,7 +320,7 @@ public abstract partial class Row<TFields> : IRow, IRow<TFields>
     {
         var field = FindField(fieldName);
         return field is null
-            ? throw new ArgumentOutOfRangeException("fieldName", string.Format(
+            ? throw new ArgumentOutOfRangeException(nameof(fieldName), string.Format(
                 "{0} has no field with name '{1}'.", GetType().Name, fieldName))
             : field;
     }
@@ -424,6 +436,8 @@ public abstract partial class Row<TFields> : IRow, IRow<TFields>
     /// </returns>
     public bool IsAssigned(Field field)
     {
+        ArgumentNullException.ThrowIfNull(field);
+
         if (assignedFieldsMask == 0 && assignedFieldsArray == null)
             return false;
 

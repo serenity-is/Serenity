@@ -1,4 +1,4 @@
-﻿using System.Collections;
+using System.Collections;
 
 namespace Serenity.Data;
 
@@ -30,6 +30,11 @@ public interface IRow : IEntityWithJoins
     /// </summary>
     /// <param name="field">The field.</param>
     void FieldAssignedValue(Field field);
+    /// <summary>
+    /// Called to check if field is read without being assigned a value when tracking with checks.
+    /// </summary>
+    /// <param name="field">The field.</param>
+    void CheckUnassignedRead(Field field);
     /// <summary>
     /// Gets the dictionary data.
     /// </summary>

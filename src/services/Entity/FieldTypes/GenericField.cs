@@ -1,4 +1,4 @@
-﻿namespace Serenity.Data;
+namespace Serenity.Data;
 
 /// <summary>
 /// Base generic class for fields with a value
@@ -47,7 +47,7 @@ public abstract class GenericField<TValue>(ICollection<Field> collection, FieldT
     {
         get
         {
-            CheckUnassignedRead(row);
+            row.CheckUnassignedRead(this);
             return _getValue(row);
         }
         set
