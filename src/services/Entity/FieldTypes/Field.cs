@@ -610,11 +610,10 @@ public abstract partial class Field : IFieldWithJoinInfo
     public abstract object AsObjectNoCheck(IRow row);
 
     /// <summary>
-    /// Gets if the field value is null.
+    /// Gets if the field value is null without checking for assignment.
     /// </summary>
     /// <param name="row">The row.</param>
-    /// <returns></returns>
-    protected internal abstract bool GetIsNull(IRow row);
+    public abstract bool IsNullNoCheck(IRow row);
 
     /// <summary>
     /// Gets the value of this row as an SQL value.
@@ -628,6 +627,9 @@ public abstract partial class Field : IFieldWithJoinInfo
 
     /// <summary>
     /// Determines whether the specified row is null.
+    /// This method checks for assignment if TrackWithChecks is true and
+    /// may throw an exception if the field is unassigned. 
+    /// Use IsNullNoCheck to skip that check.
     /// </summary>
     /// <param name="row">The row.</param>
     /// <returns>
@@ -636,7 +638,7 @@ public abstract partial class Field : IFieldWithJoinInfo
     public bool IsNull(IRow row)
     {
         row.CheckUnassignedRead(this);
-        return GetIsNull(row);
+        return IsNullNoCheck(row);
     }
 
     /// <summary>

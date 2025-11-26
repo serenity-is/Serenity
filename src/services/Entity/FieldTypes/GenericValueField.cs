@@ -122,12 +122,8 @@ public abstract class GenericValueField<TValue> : Field, IEnumTypeField where TV
         row.FieldAssignedValue(this);
     }
 
-    /// <summary>
-    /// Gets if the field value is null.
-    /// </summary>
-    /// <param name="row">The row.</param>
-    /// <returns></returns>
-    protected internal override bool GetIsNull(IRow row)
+    /// <inheritdoc/>
+    public override bool IsNullNoCheck(IRow row)
     {
         return _getValue(row) == null;
     }

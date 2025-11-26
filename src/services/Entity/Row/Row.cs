@@ -189,7 +189,7 @@ public abstract partial class Row<TFields> : IRow, IRow<TFields>
         if (!tracking || 
             !trackWithChecks ||
             IsAssigned(field) ||
-            !field.GetIsNull(this))
+            !field.IsNullNoCheck(this))
             return;
 
         throw new InvalidOperationException(string.Format(
