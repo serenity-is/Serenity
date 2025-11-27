@@ -42,13 +42,14 @@ const esmIndex = {
     ...defaults,
     format: 'esm',
     minify: false,
-    outfile: './dist/index.js'
+    outfile: './dist/index.js',
+    sourcemap: true,
+    sourceRoot: "src"
 }
 
 const esmJsxRuntime = {
     ...defaults,
     format: 'esm',
-    sourcemap: false,
     bundle: false,
     minify: false,
     entryPoints: ['./src/jsx-runtime.ts'],

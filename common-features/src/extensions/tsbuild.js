@@ -24,6 +24,9 @@ await build(Object.assign({}, buildOpt, {
 
 // wwwroot/index.js: Global script (e.g. ~/Serenity.Extensions/index.js include in appsettings.bundles.json)
 await build(Object.assign({}, buildOpt, {
+    external: [
+        '@serenity-is/*'
+    ],
     format: 'iife',
     footer: {
         js: 'Serenity.Extensions = Serenity.Extensions || {}; Object.assign(Serenity.Extensions, Serenity._); delete Serenity._;'

@@ -6,13 +6,12 @@ import { globSync } from "glob";
 export const defaultEntryPointGlobs = ['Modules/**/*Page.ts', 'Modules/**/*Page.tsx', 'Modules/**/ScriptInit.ts', 'Modules/**/*.mts'];
 
 export const importAsGlobalsMapping = {
-    "@serenity-is/base": "Serenity",
     "@serenity-is/corelib": "Serenity",
-    "@serenity-is/corelib/q": "Q",
-    "@serenity-is/corelib/slick": "Slick",
-    "@serenity-is/sleekgrid": "Slick",
+    "@serenity-is/domwise": "Serenity.DomWise",
+    "@serenity-is/domwise/jsx-runtime": "Serenity.DomWise",
     "@serenity-is/extensions": "Serenity.Extensions",
-    "@serenity-is/pro.extensions": "Serenity"
+    "@serenity-is/pro.extensions": "Serenity",
+    "@serenity-is/sleekgrid": "Slick"
 }
 
 export const esbuildOptions = (opt) => {

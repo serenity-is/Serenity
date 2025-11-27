@@ -22,6 +22,7 @@
     "noImplicitOverride": true,
     "outDir": "../out",
     "skipLibCheck": true,
+    "stripInternal": true,
     "sourceMap": true,
     "target": "ES2017",
     "types": [],
