@@ -1,5 +1,5 @@
 @echo off
-dotnet run --project %~dp0\build\build.csproj -- %*%
+dotnet run --project %~dp0\build.csproj -- %*%
 if "%~1"=="push" goto :cfpush
 pause
 goto :eof
@@ -8,6 +8,6 @@ goto :eof
 echo.
 CHOICE /M "Run common-features\build-cf.cmd %*%"
 If %ERRORLEVEL% EQU 1 (
-    cd %~dp0\common-features
+    cd %~dp0\..\common-features
     call build-cf.cmd %*%
 )
