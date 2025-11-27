@@ -132,4 +132,4 @@ export * from "./ui/widgets/widgetutils";
 export type Constructor<T> = new (...args: any[]) => T;
 
 /** @internal */
-export * as DomWise from "@serenity-is/domwise";
+export * from "@serenity-is/domwise";

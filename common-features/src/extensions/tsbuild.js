@@ -29,7 +29,7 @@ await build(Object.assign({}, buildOpt, {
     ],
     format: 'iife',
     footer: {
-        js: 'Serenity.Extensions = Serenity.Extensions || {}; Object.assign(Serenity.Extensions, Serenity._); delete Serenity._;'
+        js: 'Serenity = Serenity || {}; Object.assign(Serenity, Serenity._); Serenity.Extensions = Serenity.Extensions || Serenity._; delete Serenity._;'
     },
     globalName: 'Serenity._',
     outdir: 'wwwroot/'

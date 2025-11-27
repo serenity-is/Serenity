@@ -7,11 +7,11 @@ export const defaultEntryPointGlobs = ['Modules/**/*Page.ts', 'Modules/**/*Page.
 
 export const importAsGlobalsMapping = {
     "@serenity-is/corelib": "Serenity",
-    "@serenity-is/domwise": "Serenity.DomWise",
-    "@serenity-is/domwise/jsx-runtime": "Serenity.DomWise",
-    "@serenity-is/extensions": "Serenity.Extensions",
+    "@serenity-is/domwise": "Serenity",
+    "@serenity-is/domwise/jsx-runtime": "Serenity",
+    "@serenity-is/extensions": "Serenity",
     "@serenity-is/pro.extensions": "Serenity",
-    "@serenity-is/sleekgrid": "Slick"
+    "@serenity-is/sleekgrid": "Serenity"
 }
 
 export const esbuildOptions = (opt) => {

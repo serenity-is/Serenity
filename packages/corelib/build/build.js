@@ -105,6 +105,11 @@ const corelibGlobalBase = {
     ['RemoteView'].forEach(function(x) {
         me.Slick[x] = Serenity[x];
     });
+    Object.keys(me.Slick).forEach(function(key) {
+        if (me.Slick[key] != null && Serenity[key] == null) {
+            Serenity[key] = me.Slick[key];
+        }
+    });
 })(this);`
     },
     format: 'iife',
