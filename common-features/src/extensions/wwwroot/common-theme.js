@@ -41,7 +41,7 @@
     document.addEventListener('DOMContentLoaded', function () {
 
         var languageMenus = document.querySelectorAll('.s-language-selection-menu')
-        if (languageMenus.length && typeof Q != "undefined" && Q.getLookupAsync) {
+        if (languageMenus.length && typeof Serenity != "undefined" && Serenity.getLookupAsync) {
 
             function languageClick(e) {
                 var a = e.target.closest('[data-language]');
@@ -56,7 +56,7 @@
                 menu.addEventListener('click', languageClick);
             });
 
-            Q.getLookupAsync("Administration.Language").then(function (lookup) {
+            Serenity.getLookupAsync("Administration.Language").then(function (lookup) {
                 for (var l of lookup.items) {
                     languageMenus.forEach(function (menu) {
                         var li = document.createElement('li');

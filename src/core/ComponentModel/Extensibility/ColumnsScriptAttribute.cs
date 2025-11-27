@@ -4,7 +4,7 @@ namespace Serenity.ComponentModel;
 /// Indicates that this type should generate a columns script, 
 /// which contains information about properties in this type and 
 /// is an array of PropertyItem objects. Column scripts can be
-/// accessed from client side using Q.getColumns("Key")
+/// accessed from client side using Serenity.getColumns("Key")
 /// </summary>
 /// <seealso cref="Attribute" />
 [AttributeUsage(AttributeTargets.Class, AllowMultiple = false)]

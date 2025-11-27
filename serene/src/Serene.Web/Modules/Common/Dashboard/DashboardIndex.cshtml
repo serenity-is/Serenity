@@ -413,7 +413,7 @@ ViewData["PageId"] = "Dashboard";
         var trafficChart = new Chart(document.getElementById('traffic-chart'), {
             type: 'bar',
             data: {
-                labels: Array(37).fill().map(function(x, n) { var d = new Date(); d.setDate(d.getDate() - n); return Q.formatDate(d, 'MMM dd'); }).reverse(),
+                labels: Array(37).fill().map(function(x, n) { var d = new Date(); d.setDate(d.getDate() - n); return Serenity.formatDate(d, 'MMM dd'); }).reverse(),
                 datasets: [
                     {
                         label: 'Search',

@@ -3,7 +3,7 @@
 /// <summary>
 /// Indicates that this method / type should generate a remote data
 /// script. Data contained by remote data scripts can be accessed
-/// client side using Q.getRemoteData("Key") function.
+/// client side using Serenity.getRemoteData("Key") function.
 /// </summary>
 /// <seealso cref="DynamicScriptAttribute" />
 [AttributeUsage(AttributeTargets.Class, AllowMultiple = false)]
