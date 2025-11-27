@@ -1296,11 +1296,11 @@ export interface IDataView<TItem = any> {
 		rows: number[];
 	}>;
 }
-export declare function addClass(el: Element, cls: string): void;
+export declare function addCssClass(el: Element, cls: string): void;
 export declare function escapeHtml(s: any): any;
 export declare function basicDOMSanitizer(dirtyHtml: string): string;
 export declare function disableSelection(target: HTMLElement): void;
-export declare function removeClass(el: Element, cls: string): void;
+export declare function removeCssClass(el: Element, cls: string): void;
 export declare function parsePx(str: string): number;
 export declare class BasicLayout implements LayoutEngine {
 	protected host: LayoutHost;
@@ -1745,7 +1745,7 @@ export declare class SleekGrid<TItem = any> implements ISleekGrid<TItem> {
 export declare function PercentCompleteFormatter(ctx: FormatterContext): HTMLSpanElement | "-";
 export declare function PercentCompleteBarFormatter(ctx: FormatterContext): FormatterResult;
 export declare function YesNoFormatter(ctx: FormatterContext): FormatterResult;
-export declare function CheckboxFormatter(ctx: FormatterContext): FormatterResult;
+export declare function CheckBoxFormatter(ctx: FormatterContext): FormatterResult;
 export declare function CheckmarkFormatter(ctx: FormatterContext): FormatterResult;
 export declare namespace Formatters {
 	function PercentComplete(_row: number, _cell: number, value: any): HTMLSpanElement | "-";

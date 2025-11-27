@@ -1,7 +1,7 @@
 import type { Column } from "./column";
 import { gridDefaults, GridOptions } from "./gridoptions";
 import type { ISleekGrid } from "./isleekgrid";
-import { addClass, basicDOMSanitizer, escapeHtml, removeClass } from "./util";
+import { addCssClass, basicDOMSanitizer, escapeHtml, removeCssClass } from "./util";
 
 /**
  * Context object for column formatters. It provides access to the
@@ -144,7 +144,7 @@ export function applyFormatterResultToCellNode(ctx: FormatterContext, fmtResult:
 
         var oldFmtCls = node.dataset.fmtcls;
         if (oldFmtCls?.length && (ctx.addClass != oldFmtCls)) {
-            removeClass(node, oldFmtCls);
+            removeCssClass(node, oldFmtCls);
             if (!ctx.addClass?.length)
                 delete node.dataset.fmtcls;
         }
@@ -179,7 +179,7 @@ export function applyFormatterResultToCellNode(ctx: FormatterContext, fmtResult:
         }
 
         if (ctx.addClass?.length) {
-            addClass(node, ctx.addClass);
+            addCssClass(node, ctx.addClass);
             node.dataset.fmtcls = ctx.addClass;
         }
     }

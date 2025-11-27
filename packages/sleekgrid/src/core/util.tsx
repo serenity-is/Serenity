@@ -1,6 +1,6 @@
 import type { SignalOrValue } from "@serenity-is/domwise";
 
-export function addClass(el: Element, cls: string) {
+export function addCssClass(el: Element, cls: string) {
     if (cls == null || !cls.length)
         return;
 
@@ -136,7 +136,7 @@ export function disableSelection(target: HTMLElement) {
     }
 }
 
-export function removeClass(el: Element, cls: string) {
+export function removeCssClass(el: Element, cls: string) {
     if (cls == null || !cls.length)
         return;
 

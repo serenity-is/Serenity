@@ -14,7 +14,7 @@ import type { IGroupTotals } from "../core/group";
 import { type IDataView } from "../core/idataview";
 import type { GridLayoutInfo, ISleekGrid } from "../core/isleekgrid";
 import type { SelectionModel } from "../core/selection-model";
-import { addClass, escapeHtml, parsePx, removeClass } from "../core/util";
+import { addCssClass, escapeHtml, parsePx, removeCssClass } from "../core/util";
 import type { ViewportInfo } from "../core/viewportinfo";
 import type { ViewRange } from "../core/viewrange";
 import { BasicLayout } from "../layouts/basic-layout";
@@ -295,7 +295,7 @@ export class SleekGrid<TItem = any> implements ISleekGrid<TItem> {
         this._container.append(this._focusSink2 = this._focusSink1.cloneNode() as HTMLElement);
 
         if (options.viewportClass)
-            this.getViewports().forEach(vp => addClass(vp, options.viewportClass));
+            this.getViewports().forEach(vp => addCssClass(vp, options.viewportClass));
 
         if (!options.explicitInitialization) {
             this.init();
@@ -824,9 +824,9 @@ export class SleekGrid<TItem = any> implements ISleekGrid<TItem> {
             this._jQuery && this._jQuery(footerRowCell).data("column", m);
 
             if (m.footerCssClass)
-                addClass(footerRowCell, m.footerCssClass);
+                addCssClass(footerRowCell, m.footerCssClass);
             else if (m.cssClass)
-                addClass(footerRowCell, m.cssClass);
+                addCssClass(footerRowCell, m.cssClass);
 
             footerRowColsNode.appendChild(footerRowCell);
 
@@ -1061,7 +1061,7 @@ export class SleekGrid<TItem = any> implements ISleekGrid<TItem> {
         this._refs.main.canvas.body.parentElement.style.overflowY = alwaysVS ? "scroll" : autoHeight ? "hidden" : "auto";
 
         if (this._options.viewportClass)
-            this.getViewports().forEach(vp => addClass(vp, this._options.viewportClass));
+            this.getViewports().forEach(vp => addCssClass(vp, this._options.viewportClass));
     }
 
     private measureCellPaddingAndBorder(): void {
@@ -2797,7 +2797,7 @@ export class SleekGrid<TItem = any> implements ISleekGrid<TItem> {
                         node = this.getCellNode(parseInt(row, 10), this.getColumnIndex(columnId));
                         if (node) {
                             const r = removedRowHash[columnId];
-                            removeClass(node, r);
+                            removeCssClass(node, r);
                         }
                     }
                 }
@@ -2809,7 +2809,7 @@ export class SleekGrid<TItem = any> implements ISleekGrid<TItem> {
                         node = this.getCellNode(parseInt(row, 10), this.getColumnIndex(columnId));
                         if (node) {
                             const a = addedRowHash[columnId];
-                            addClass(node, a);
+                            addCssClass(node, a);
                         }
                     }
                 }
