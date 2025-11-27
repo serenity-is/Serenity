@@ -1,6 +1,7 @@
 {
   "name": "serene.web",
   "dependencies": {
+    "@serenity-is/assets": "workspace:*",
     "@serenity-is/corelib": "workspace:*",
     "@serenity-is/demo.northwind": "workspace:*",
     "@serenity-is/domwise": "workspace:*",

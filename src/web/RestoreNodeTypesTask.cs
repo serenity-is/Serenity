@@ -43,7 +43,7 @@ public class RestoreNodeTypesTask : Microsoft.Build.Utilities.Task
                 Directory.CreateDirectory(pkgPath);
 
                 var pkgFile = Path.Combine(pkgPath, "package.json");
-                var orgFile = Path.Combine(pkgPath, "package.orig.json");
+                var dotFile = Path.Combine(pkgPath, "package.dotnet.json");
                 OrderedDictionary pkgJson;
 
                 var pkgId = pkgFolder.ToLowerInvariant();
@@ -56,34 +56,34 @@ public class RestoreNodeTypesTask : Microsoft.Build.Utilities.Task
                     pkgId = "@" + company + "/" + pkgId.Substring(idx + 1);
                 }
 
-                OrderedDictionary orgJson = null;
-                if (File.Exists(orgFile))
+                OrderedDictionary dotJson = null;
+                if (File.Exists(dotFile))
                 {
                     try
                     {
-                        orgJson = new JsonParser(File.ReadAllText(orgFile).Trim()).ParseObject();
-                        if (orgJson.Contains("name") && orgJson["name"] != null)
-                            pkgId = orgJson["name"].ToString();
+                        dotJson = new JsonParser(File.ReadAllText(dotFile).Trim()).ParseObject();
+                        if (dotJson.Contains("name") && dotJson["name"] != null)
+                            pkgId = dotJson["name"].ToString();
                     }
                     catch (Exception ex1)
                     {
                         Log.LogWarning("Error during parsing RestoreNodeTypesTask: " +
-                            orgFile + " " +
+                            dotFile + " " +
                             ex1.ToString());
-                        orgJson = null;
+                        dotJson = null;
                     }
                 }
 
-                if (orgJson != null)
+                if (dotJson != null)
                 {
                     pkgJson = new OrderedDictionary()
                     {
                         ["name"] = pkgId
                     };
 
-                    foreach (string key in orgJson.Keys)
+                    foreach (string key in dotJson.Keys)
                         if (!skipPackageJsonKeys.Contains(key))
-                            pkgJson[key] = orgJson[key];
+                            pkgJson[key] = dotJson[key];
                 }
                 else
                 {

@@ -153,6 +153,9 @@ importers:
 
   serene/src/Serene.Web:
     dependencies:
+      '@serenity-is/assets':
+        specifier: workspace:*
+        version: link:../../../src/assets
       '@serenity-is/corelib':
         specifier: workspace:*
         version: link:../../../packages/corelib
@@ -208,6 +211,8 @@ importers:
       test-utils:
         specifier: workspace:*
         version: link:../../../packages/test-utils
+
+  src/assets: {}
 
 packages:
 

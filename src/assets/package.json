@@ -1,0 +1,6 @@
+{
+  "name": "@serenity-is/assets",
+  "exports": {
+    "./*": "./wwwroot/*"
+  }
+}

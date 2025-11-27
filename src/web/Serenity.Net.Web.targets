@@ -25,24 +25,53 @@
   </ItemGroup>
   <Target Name="RestoreNodeTypes" DependsOnTargets="ResolvePackageAssets;IncludeTransitiveProjectReferences" BeforeTargets="BeforeBuild" Condition="'$(RestoreNodeTypes)' != 'false'">
     <ItemGroup>
-      <_NodeTypePackageOrig Include="%(ProjectReference.RootDir)%(Directory)package.json*" Condition="'$(RestoreNodeTypes)' != 'false' And Exists('%(ProjectReference.RootDir)%(Directory)package.json') And Exists('%(ProjectReference.RootDir)%(Directory)dist\index.js')">
-        <FolderName>$([System.String]::Copy('%(ProjectReference.Filename)').ToLowerInvariant())</FolderName>
-      </_NodeTypePackageOrig>
-      <_NodeTypePackageOrig Include="%(RuntimeCopyLocalItems.RootDir)%(Directory)..\..\package.json*" Condition="'$(RestoreNodeTypes)' != 'false' And Exists('%(RuntimeCopyLocalItems.RootDir)%(Directory)..\..\package.json') And Exists('%(RuntimeCopyLocalItems.RootDir)%(Directory)..\..\dist\index.js')">
+      <!--from package references-->
+      <_NodeTypePackageDotnet Include="%(RuntimeCopyLocalItems.RootDir)%(Directory)..\..\package.json"
+        Condition="'%(RuntimeCopyLocalItems.NuGetPackageId)' != '' And Exists('%(RuntimeCopyLocalItems.RootDir)%(Directory)..\..\package.json')
+          And (Exists('%(RuntimeCopyLocalItems.RootDir)%(Directory)..\..\dist\index.js') 
+            Or '$([System.IO.File]::ReadAllText(`%(RuntimeCopyLocalItems.RootDir)%(Directory)..\..\package.json`).Contains(`./wwwroot/`))' == 'True')">
         <FolderName>$([System.String]::Copy('%(RuntimeCopyLocalItems.NuGetPackageId)').ToLowerInvariant())</FolderName>
-      </_NodeTypePackageOrig>
-      <_NodeTypeToRestore Include="%(ProjectReference.RootDir)%(Directory)dist\**\*.*" Condition="'$(RestoreNodeTypes)' != 'false'">
-        <FolderName>$([System.String]::Copy('%(ProjectReference.Filename)').ToLowerInvariant())</FolderName>
-      </_NodeTypeToRestore>
-      <_NodeTypeToRestore Include="%(RuntimeCopyLocalItems.RootDir)%(Directory)..\..\dist\**\*.*" Condition="'$(RestoreNodeTypes)' != 'false'">
+      </_NodeTypePackageDotnet>
+      <_NodeTypeCopyFiles Include="%(RuntimeCopyLocalItems.RootDir)%(Directory)..\..\dist\**\*.*"
+        Condition="'%(RuntimeCopyLocalItems.NuGetPackageId)' != ''">
         <FolderName>$([System.String]::Copy('%(RuntimeCopyLocalItems.NuGetPackageId)').ToLowerInvariant())</FolderName>
-      </_NodeTypeToRestore>
-      <_NodeTypeDeleteFiles Include="node_modules\.dotnet\**\*.*" Exclude="@(_NodeTypeToRestore->'node_modules\.dotnet\%(FolderName)\dist\%(RecursiveDir)%(Filename)%(Extension)');@(_NodeTypeToRestore->'node_modules\.dotnet\%(FolderName)\package.json'->Distinct());@(_NodeTypePackageOrig->'node_modules\.dotnet\%(FolderName)\package.orig.json'->Distinct())" />
+        <SubDir>dist\</SubDir>
+      </_NodeTypeCopyFiles>
+      <_NodeTypeCopyFiles Include="%(RuntimeCopyLocalItems.RootDir)%(Directory)..\..\staticwebassets\**\*.*"
+        Exclude="%(RuntimeCopyLocalItems.RootDir)%(Directory)..\..\staticwebassets\**\*.d.ts;%(RuntimeCopyLocalItems.RootDir)%(Directory)..\..\staticwebassets\esm\**"
+        Condition="'%(RuntimeCopyLocalItems.NuGetPackageId)' != '' 
+          And Exists('%(RuntimeCopyLocalItems.RootDir)%(Directory)..\..\package.json')
+          And '$([System.IO.File]::ReadAllText(`%(RuntimeCopyLocalItems.RootDir)%(Directory)..\..\package.json`).Contains(`./wwwroot/`))' == 'True'">
+        <FolderName>$([System.String]::Copy('%(RuntimeCopyLocalItems.NuGetPackageId)').ToLowerInvariant())</FolderName>
+        <SubDir>wwwroot\</SubDir>
+      </_NodeTypeCopyFiles>
+
+      <!--from project references-->
+      <_NodeTypePackageDotnet Include="%(ProjectReference.RootDir)%(Directory)package.json"
+        Condition="Exists('%(ProjectReference.RootDir)%(Directory)package.json')
+          And (Exists('%(ProjectReference.RootDir)%(Directory)dist\index.js') 
+            Or '$([System.IO.File]::ReadAllText(`%(ProjectReference.RootDir)%(Directory)package.json`).Contains(`./wwwroot/`))' == 'True')">
+        <FolderName>$([System.String]::Copy('%(ProjectReference.Filename)').ToLowerInvariant())</FolderName>
+      </_NodeTypePackageDotnet>
+      <_NodeTypeCopyFiles Include="%(ProjectReference.RootDir)%(Directory)dist\**\*.*">
+        <FolderName>$([System.String]::Copy('%(ProjectReference.Filename)').ToLowerInvariant())</FolderName>
+        <SubDir>dist\</SubDir>
+      </_NodeTypeCopyFiles>
+      <_NodeTypeCopyFiles Include="%(ProjectReference.RootDir)%(Directory)wwwroot\**\*.*"
+        Exclude="%(ProjectReference.RootDir)%(Directory)wwwroot\**\*.d.ts;%(ProjectReference.RootDir)%(Directory)wwwroot\esm\**"
+        Condition="Exists('%(ProjectReference.RootDir)%(Directory)package.json')  
+          And '$([System.IO.File]::ReadAllText(`%(ProjectReference.RootDir)%(Directory)package.json`).Contains(`./wwwroot/`))' == 'True'">
+        <FolderName>$([System.String]::Copy('%(ProjectReference.Filename)').ToLowerInvariant())</FolderName>
+        <SubDir>wwwroot\</SubDir>
+      </_NodeTypeCopyFiles>
+    </ItemGroup>
+    <Copy SourceFiles="@(_NodeTypePackageDotnet)" DestinationFiles="@(_NodeTypePackageDotnet->'node_modules\.dotnet\%(FolderName)\package.dotnet.json')" SkipUnchangedFiles="true"  UseHardlinksIfPossible="true" />
+    <RestoreNodeTypesTask FolderNames="@(_NodeTypeCopyFiles->'%(FolderName)'->Distinct())" PatchDependencies="$(RestoreNodeTypesPatchDependencies)" ContinueOnError="true" />
+    <ItemGroup>
+      <_NodeTypeDeleteFiles Include="node_modules\.dotnet\**\*.*" Exclude="@(_NodeTypeCopyFiles->'node_modules\.dotnet\%(FolderName)%(SubDir)(RecursiveDir)%(Filename)%(Extension)');@(_NodeTypeCopyFiles->'node_modules\.dotnet\%(FolderName)\package.json'->Distinct());@(_NodeTypePackageDotnet->'node_modules\.dotnet\%(FolderName)\package.dotnet.json'->Distinct())" />
     </ItemGroup>
     <Delete Files="@(_NodeTypeDeleteFiles)" />
-    <Copy SourceFiles="@(_NodeTypeToRestore)" DestinationFiles="@(_NodeTypeToRestore->'node_modules\.dotnet\%(FolderName)\dist\%(RecursiveDir)%(Filename)%(Extension)')" SkipUnchangedFiles="true"  UseHardlinksIfPossible="true" />
-    <Copy SourceFiles="@(_NodeTypePackageOrig)" DestinationFiles="@(_NodeTypePackageOrig->'node_modules\.dotnet\%(FolderName)\package.orig.json')" SkipUnchangedFiles="true"  UseHardlinksIfPossible="true" />
-    <RestoreNodeTypesTask FolderNames="@(_NodeTypeToRestore->'%(FolderName)'->Distinct())" PatchDependencies="$(RestoreNodeTypesPatchDependencies)" ContinueOnError="true" />
+    <Copy SourceFiles="@(_NodeTypeCopyFiles)" DestinationFiles="@(_NodeTypeCopyFiles->'node_modules\.dotnet\%(FolderName)\%(SubDir)%(RecursiveDir)%(Filename)%(Extension)')" SkipUnchangedFiles="true" UseHardlinksIfPossible="true" />
   </Target>
   <Target Name="SetSergenTransformArgs">
     <ItemGroup>
@@ -61,6 +90,7 @@
     <Using Include="Serenity.Abstractions" />
     <Using Include="Serenity.ComponentModel" />
     <Using Include="Serenity.Data" />
+
     <Using Include="Serenity.Data.Mapping" />
     <Using Include="Serenity.Extensions" />
     <Using Include="Serenity.Navigation" />
