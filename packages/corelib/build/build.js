@@ -85,32 +85,7 @@ const corelibGlobalBase = {
         js: 'var Slick = Slick || {};'
     },
     footer: {
-        js: `(function (me) {
-    if (!me.Q)
-        me.Q = me.Serenity;
-    else if (me.Q !== me.Serenity) {
-        Object.keys(me.Q).forEach(function(key) {
-            if (me.Q[key] != null &&
-                me.Serenity[key] == null) {
-                me.Serenity[key] = me.Q[key];
-            }
-        });
-        me.Q = me.Serenity;
-    }
-    me.Slick = me.Slick || {};
-    ['Aggregators', 'AggregateFormatting'].forEach(function(x) {
-        me.Slick[x] = me.Slick[x] || {};
-        Object.assign(me.Slick[x], Serenity[x]);
-    });
-    ['RemoteView'].forEach(function(x) {
-        me.Slick[x] = Serenity[x];
-    });
-    Object.keys(me.Slick).forEach(function(key) {
-        if (me.Slick[key] != null && Serenity[key] == null) {
-            Serenity[key] = me.Slick[key];
-        }
-    });
-})(this);`
+        js: `(function (me) { Serenity.initGlobalMappings({ corelib: Serenity, globals: me }) })(this);`
     },
     format: 'iife',
     globalName: 'Serenity',

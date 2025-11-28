@@ -3274,6 +3274,25 @@ export declare function newBodyDiv(): HTMLDivElement;
  * Returns the outer HTML of the element.
  */
 export declare function outerHtml(element: Element | ArrayLike<HTMLElement>): string;
+/**
+ * Setups global namespace mappings like Serenity, Slick etc. for compatibility with feature
+ * packages that use global references via tsbuild's importAsGlobals option.
+ * @param param0
+ */
+export declare function initGlobalMappings({ corelib, globals, domwise, sleekgrid, extensions, proExtensions, bootstrap, flatpickr, glightbox, mousetrap, nprogress, sortable }: {
+	globals?: any;
+	corelib?: any;
+	domwise?: any;
+	sleekgrid?: any;
+	extensions?: any;
+	proExtensions?: any;
+	bootstrap?: any;
+	flatpickr?: any;
+	glightbox?: any;
+	mousetrap?: any;
+	nprogress?: any;
+	sortable?: any;
+}): void;
 export declare function getWidgetName(type: Function): string;
 export declare function associateWidget(widget: {
 	domNode: HTMLElement;

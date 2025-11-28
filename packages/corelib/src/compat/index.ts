@@ -2,6 +2,7 @@ export * from "./arrays-compat";
 export * from "./dialogs-compat";
 export * from "./formatting-compat";
 export * from "./html-compat";
+export * from "./init-global-mappings";
 export * from "./layout";
 export * from "./layouttimer";
 export * from "./router";

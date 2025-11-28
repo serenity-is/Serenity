@@ -191,6 +191,11 @@ export namespace LT {
 
 const global = getGlobalObject();
 const serenity = global.Serenity || (global.Serenity = {});
-serenity.LT = serenity.LT || {};
-serenity.LT.add = serenity.addLocalText = addLocalText;
+if (!serenity.addLocalText) {
+    serenity.addLocalText = addLocalText;
+}
+const lt = (serenity.LT || (serenity.LT = {}));
+if (!lt.add) {
+    lt.add = serenity.addLocalText;
+}
 

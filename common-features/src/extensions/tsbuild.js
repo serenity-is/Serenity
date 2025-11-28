@@ -29,7 +29,16 @@ await build(Object.assign({}, buildOpt, {
     ],
     format: 'iife',
     footer: {
-        js: 'Serenity = Serenity || {}; Object.assign(Serenity, Serenity._); Serenity.Extensions = Serenity.Extensions || Serenity._; delete Serenity._;'
+        js: `
+Serenity = Serenity || {}; 
+if (Serenity.initGlobalMappings) { 
+    Serenity.initGlobalMappings({ extensions: Serenity._ }); 
+} else { 
+    Object.assign(Serenity, Serenity._);
+    Serenity.Extensions = Serenity.Extensions || Serenity._; 
+    delete Serenity._;
+}
+`
     },
     globalName: 'Serenity._',
     outdir: 'wwwroot/'
@@ -42,8 +51,8 @@ await esbuild({
         { in: "wwwroot/style/bundle.css", out: "common-theme" }
     ],
     legalComments: "inline",
-    loader: { 
-        ".jpg": "file" 
+    loader: {
+        ".jpg": "file"
     },
     outdir: "wwwroot/",
     write: false,
