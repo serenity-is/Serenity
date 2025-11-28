@@ -13,6 +13,7 @@ const coreLibBase = {
     entryPoints: [
         'src/index.ts'
     ],
+    jsxSideEffects: true,
     keepNames: true,
     logLevel: 'info',
     minify: false,

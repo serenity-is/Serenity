@@ -33,6 +33,7 @@ const defaults = {
     bundle: true,
     entryPoints: ['./src/index.ts'],
     color: true,
+    jsxSideEffects: true,
     logLevel: 'info',
     target: 'es2020',
     plugins: [writeIfChanged()]
