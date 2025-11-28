@@ -1,12 +1,12 @@
-import { addClass, basicDOMSanitizer, disableSelection, escapeHtml, removeClass } from "../../src/core/util";
+import { addCssClass, basicDOMSanitizer, disableSelection, escapeHtml, removeCssClass } from "../../src/core/util";
 import { jsx as H } from "@serenity-is/domwise";
 
-describe('addClass', () => {
+describe('addCssClass', () => {
     it('should not do anything if classes to add is null or undefined', () => {
         const element: HTMLDivElement = document.createElement('div');
 
-        addClass(element, null);
-        addClass(element, undefined);
+        addCssClass(element, null);
+        addCssClass(element, undefined);
 
         expect(element.classList.length).toBe(0);
     });
@@ -14,7 +14,7 @@ describe('addClass', () => {
     it('should add class to the element', () => {
         const element: HTMLDivElement = document.createElement('div');
 
-        addClass(element, 'test');
+        addCssClass(element, 'test');
 
         expect(element.classList.length).toBe(1);
         expect(element.classList.contains('test')).toBe(true);
@@ -23,7 +23,7 @@ describe('addClass', () => {
     it('should add multiple classes to the element', () => {
         const element: HTMLDivElement = document.createElement('div');
 
-        addClass(element, 'test1 test2');
+        addCssClass(element, 'test1 test2');
 
         expect(element.classList.length).toBe(2);
         expect(element.classList.contains('test1')).toBe(true);
@@ -33,8 +33,8 @@ describe('addClass', () => {
     it('should not add duplicate classes to the element', () => {
         const element: HTMLDivElement = document.createElement('div');
 
-        addClass(element, 'test');
-        addClass(element, 'test');
+        addCssClass(element, 'test');
+        addCssClass(element, 'test');
 
         expect(element.classList.length).toBe(1);
         expect(element.classList.contains('test')).toBe(true);
@@ -43,7 +43,7 @@ describe('addClass', () => {
     it('should not add empty space if parameter contains more than one space', () => {
         const element: HTMLDivElement = document.createElement('div');
 
-        addClass(element, 'test1  test2');
+        addCssClass(element, 'test1  test2');
 
         expect(element.classList.length).toBe(2);
         expect(element.classList.contains('test1')).toBe(true);
@@ -51,13 +51,13 @@ describe('addClass', () => {
     });
 });
 
-describe('removeClass', () => {
+describe('removeCssClass', () => {
     it('should not do anything if classes to remove is null or undefined', () => {
         const element: HTMLDivElement = document.createElement('div');
         element.classList.add('test');
 
-        removeClass(element, null);
-        removeClass(element, undefined);
+        removeCssClass(element, null);
+        removeCssClass(element, undefined);
 
         expect(element.classList.length).toBe(1);
         expect(element.classList.contains('test')).toBe(true);
@@ -69,7 +69,7 @@ describe('removeClass', () => {
 
         expect(element.classList.length).toBe(1);
 
-        removeClass(element, 'test');
+        removeCssClass(element, 'test');
 
         expect(element.classList.length).toBe(0);
         expect(element.classList.contains('test')).toBe(false);
@@ -82,7 +82,7 @@ describe('removeClass', () => {
 
         expect(element.classList.length).toBe(2);
 
-        removeClass(element, 'test1 test2');
+        removeCssClass(element, 'test1 test2');
 
         expect(element.classList.length).toBe(0);
         expect(element.classList.contains('test1')).toBe(false);
