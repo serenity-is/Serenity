@@ -1,7 +1,7 @@
 import esbuild from "esbuild";
-import { existsSync, readdirSync, statSync, mkdirSync, writeFileSync, rmSync, readFileSync } from "fs";
-import { dirname, join, relative, resolve } from "path";
+import { existsSync, mkdirSync, readFileSync, rmSync, writeFileSync } from "fs";
 import { globSync } from "glob";
+import { dirname, join, resolve } from "path";
 
 export const defaultEntryPointGlobs = ['Modules/**/*Page.ts', 'Modules/**/*Page.tsx', 'Modules/**/ScriptInit.ts', 'Modules/**/*.mts'];
 
@@ -12,6 +12,37 @@ export const importAsGlobalsMapping = {
     "@serenity-is/extensions": "Serenity",
     "@serenity-is/pro.extensions": "Serenity",
     "@serenity-is/sleekgrid": "Serenity"
+}
+
+export const esbuildDefaults = {
+    assetNames: 'assets/[name]-[hash]',
+    bundle: true,
+    chunkNames: '_chunks/[name]-[hash]',
+    color: true,
+    format: 'esm',
+    jsxSideEffects: true,
+    keepNames: true,
+    loader: {
+        '.woff2': 'file',
+        '.woff': 'file',
+        '.ttf': 'file',
+        '.eot': 'file',
+        '.svg': 'file',
+        '.png': 'file',
+        '.jpg': 'file',
+        '.jpeg': 'file',
+        '.gif': 'file',
+        '.webp': 'file',
+    },
+    logLevel: 'info',
+    metafile: true,
+    minify: true,
+    outbase: "./",
+    outdir: 'wwwroot/esm',
+    sourcemap: true,
+    splitting: true,
+    sourceRoot: "Modules",
+    target: 'es2017'
 }
 
 export const esbuildOptions = (opt) => {
@@ -58,6 +89,7 @@ export const esbuildOptions = (opt) => {
         }
 
         if (globs != null) {
+            globs = globs.filter(x => x.indexOf("..") < 0);
             var include = globs.filter(x => !x.startsWith('!'));
             var exclude = globs.filter(x => x.startsWith('!')).map(x => x.substring(1));
             exclude.push(".git/**");
@@ -75,13 +107,23 @@ export const esbuildOptions = (opt) => {
         }
         else {
             entryPoints = [];
+
+            function scanDir(dir, org) {
+                return readdirSync(dir).reduce((files, file) => {
+                    const absolute = join(dir, file);
+                    return [...files, ...(statSync(absolute).isDirectory()
+                        ? scanDir(absolute, org || dir)
+                        : [relative(org || dir, absolute)])]
+                }, []);
+            }
+
             entryPointRoots.forEach(root =>
                 scanDir(root)
                     .filter(p => p.match(entryPointsRegEx))
                     .forEach(p => entryPoints.push(root + '/' + p)));
         }
     }
-   
+
     var splitting = opt.splitting;
     if (splitting === undefined)
         splitting = !process.argv.slice(2).some(x => x == "--nosplit");
@@ -90,7 +132,7 @@ export const esbuildOptions = (opt) => {
     if (plugins === undefined) {
         plugins = [];
         if ((opt.clean === undefined && splitting) || opt.clean)
-            plugins.push(cleanPlugin());
+            plugins.push(cleanPlugin(opt.clean === true ? {} : opt.clean));
         if (opt.importAsGlobals === undefined || opt.importAsGlobals)
             plugins.push(importAsGlobalsPlugin(opt.importAsGlobals ?? importAsGlobalsMapping));
     }
@@ -104,26 +146,15 @@ export const esbuildOptions = (opt) => {
     delete opt.importAsGlobals;
     delete opt.writeIfChanged;
 
-    return Object.assign({
+    return {
+        ...esbuildDefaults,
         absWorkingDir: resolve('./'),
-        bundle: true,
-        chunkNames: '_chunks/[name]-[hash]',
-        color: true,
-        entryPoints: entryPoints,
-        format: 'esm',
-        keepNames: true,
-        logLevel: 'info',
-        metafile: true,
-        minify: true,
-        outbase: "./",
-        outdir: 'wwwroot/esm',
+        entryPoints,
         plugins,
-        sourcemap: true,
-        sourceRoot: "Modules",
-        splitting: splitting,
-        target: 'es2017',
+        splitting,
         watch: process.argv.slice(2).some(x => x == "--watch"),
-    }, opt);
+        ...opt
+    };
 }
 
 export const build = async (opt) => {
@@ -139,7 +170,7 @@ export const build = async (opt) => {
         paths = paths.filter((v, i, a) => a.indexOf(v) === i); // unique
         if (paths.length) {
             npmCopy(paths);
-        }   
+        }
     }
 
     delete opt?.npmCopy;
@@ -162,15 +193,6 @@ export const build = async (opt) => {
         await esbuild.build(opt);
     }
 };
-
-function scanDir(dir, org) {
-    return readdirSync(dir).reduce((files, file) => {
-        const absolute = join(dir, file);
-        return [...files, ...(statSync(absolute).isDirectory()
-            ? scanDir(absolute, org || dir)
-            : [relative(org || dir, absolute)])]
-    }, []);
-}
 
 // https://github.com/evanw/esbuild/issues/337
 export function importAsGlobalsPlugin(mapping) {
@@ -195,23 +217,51 @@ export function importAsGlobalsPlugin(mapping) {
     };
 }
 
-export function cleanPlugin() {
+export const cleanPluginDefaults = {
+    globs: [
+        '*.css',
+        '*.css.map',
+        '*.js',
+        '*.js.map',
+        '*.jpg',
+        '*.png',
+        '*.gif',
+        '*.svg',
+        '*.woff',
+        '*.woff2',
+        '*.ttf',
+        '*.eot'
+    ],
+    logDeletedFiles: true
+}
+
+export function cleanPlugin(opt) {
+    opt = Object.assign({}, cleanPluginDefaults, opt ?? {});
     return {
         name: 'clean',
         setup(build) {
             build.onEnd(result => {
                 try {
+                    const outdir = build.initialOptions.outdir;
                     const { outputs } = result.metafile ?? {};
-                    if (!outputs || !existsSync(build.initialOptions.outdir))
+                    if (!outputs || !existsSync(outdir))
                         return;
 
-                    const outputFiles = new Set(Object.keys(outputs));
-                    scanDir(build.initialOptions.outdir).forEach(file => {
-                        if (!file.endsWith('.js') && !file.endsWith('.js.map') && !file.endsWith('.css') && !file.endsWith('.css.map'))
-                            return;
-                        if (!outputFiles.has(join(build.initialOptions.outdir, file).replace(/\\/g, '/'))) {
-                            console.log('esbuild clean: deleting extra file ' + file);
-                            rmSync(join(build.initialOptions.outdir, file));
+                    const outputFiles = new Set(Object.keys(outputs).map(x => x.replace(/\\/g, '/')));
+                    const globs = opt.globs.filter(x => x.indexOf("..") < 0);
+
+                    const existingFiles = globSync(globs.filter(x => !x.startsWith('!')), {
+                        cwd: build.initialOptions.outdir,
+                        ignore: globs.filter(x => x.startsWith('!')).map(x => x.substring(1)),
+                        nodir: true,
+                        matchBase: true
+                    }).map(x => join(outdir, x).replace(/\\/g, '/'));
+
+                    existingFiles.forEach(file => {
+                        if (!outputFiles.has(file)) {
+                            if (opt.logDeletedFiles ?? true)
+                                console.log('esbuild clean: deleting extra file ' + file);
+                            rmSync(file);
                         }
                     });
                 } catch (e) {
@@ -240,7 +290,7 @@ export function writeIfChanged() {
                     else {
                         mkdirSync(dirname(file.path), { recursive: true });
                     }
-                    writeFileSync(file.path, file.text);
+                    writeFileSync(file.path, file.contents);
                 });
             });
         }
@@ -256,7 +306,7 @@ export function npmCopy(paths) {
             return;
         }
 
-        (function() {
+        (function () {
             const srcContent = readFileSync(srcFile);
             if (existsSync(dstfile)) {
                 if (readFileSync(dstfile).equals(srcContent))
