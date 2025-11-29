@@ -3293,6 +3293,7 @@ export declare function initGlobalMappings({ corelib, globals, domwise, sleekgri
 	nprogress?: any;
 	sortable?: any;
 }): void;
+export declare function initFlatpickrLocale(flatpickr: any): void;
 export declare function getWidgetName(type: Function): string;
 export declare function associateWidget(widget: {
 	domNode: HTMLElement;
