@@ -1,0 +1,22 @@
+﻿{
+  "extends": "../tsconfig.json",
+  "compilerOptions": {
+    "noImplicitAny": false,
+    "skipLibCheck": true,
+    "sourceMap": true,
+    "outDir": "../dist",
+    "rootDir": "..",
+    "rootDirs": [
+      "./src",
+      "./test"
+    ],
+    "exactOptionalPropertyTypes": false,
+    "strict": false,
+    "types": [
+      "vitest/globals"
+    ]
+  },
+  "include": [
+    "."
+  ]
+}

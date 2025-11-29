@@ -1,11 +1,14 @@
 import esbuild from "esbuild";
 import { existsSync, mkdirSync, readFileSync, rmSync, writeFileSync } from "fs";
-import { globSync } from "glob";
-import { dirname, join, resolve } from "path";
+import { globSync, type GlobOptions } from "glob";
+import { dirname, isAbsolute, join, resolve, sep } from "path";
 
 export const defaultEntryPointGlobs = ['Modules/**/*Page.ts', 'Modules/**/*Page.tsx', 'Modules/**/ScriptInit.ts', 'Modules/**/*.mts'];
 
-export const importAsGlobalsMapping = {
+/**
+ * Default mapping for importing modules as globals. corelib, domwise, extensions, pro.extensions, sleekgrid 
+ * are all mapped to Serenity global namespace */
+export const importAsGlobalsMapping: Record<string, string> = {
     "@serenity-is/corelib": "Serenity",
     "@serenity-is/domwise": "Serenity",
     "@serenity-is/domwise/jsx-runtime": "Serenity",
@@ -14,7 +17,50 @@ export const importAsGlobalsMapping = {
     "@serenity-is/sleekgrid": "Serenity"
 }
 
-export const esbuildDefaults = {
+export function safeGlobSync(globs: string[], options: Omit<GlobOptions, "ignore"> = {}): string[] {
+    const root = options.root || process.cwd();
+
+    const normalizePattern = (pattern: string) => {
+        let normalized = pattern.replace(/\\/g, '/');
+
+        if (normalized.startsWith('/')) {
+            // anchored to root
+            normalized = '.' + normalized;
+        } else if (!normalized.includes('/')) {
+            // no slashes, match anywhere
+            normalized = '**/' + normalized;
+        }
+
+        // check for invalid patterns
+        if (isAbsolute(normalized) || normalized.includes('..') || /^[a-zA-Z]:/.test(normalized)) {
+            throw new Error(`Invalid pattern: ${pattern}`);
+        }
+
+        return normalized;
+    };
+
+    globs = globs.map(x => x?.trim()).filter(x => x.length > 0);
+    const includes = globs.filter(x => !x.startsWith('!')).map(normalizePattern);
+    const excludes = globs.filter(x => x.startsWith('!')).map(x => normalizePattern(x.substring(1)));
+
+    const results = globSync(includes, {
+        nodir: true,
+        ignore: excludes,
+        matchBase: true,
+        cwd: root,
+        ...options
+    });
+
+    // filter results to ensure under root
+    const resolvedRoot = resolve(root);
+    return (results as string[]).filter((file: string) => {
+        const fullPath = resolve(root, file);
+        return fullPath.startsWith(resolvedRoot + sep) || fullPath === resolvedRoot;
+    });
+}
+
+/** Default esbuild options used by TSBuild */
+export const esbuildDefaults: Partial<import("esbuild").BuildOptions> = {
     assetNames: 'assets/[name]-[hash]',
     bundle: true,
     chunkNames: '_chunks/[name]-[hash]',
@@ -45,30 +91,80 @@ export const esbuildDefaults = {
     target: 'es2017'
 }
 
-export const esbuildOptions = (opt) => {
+
+export interface TSBuildOptions extends Partial<import("esbuild").BuildOptions> {
+    /** Enable bundling of dependencies, default is true */
+    bundle?: boolean;
+
+    /** Chunk names to generate when code splitting is enabled. Default is '_chunks/[name]-[hash]' */
+    chunkNames?: string;
+
+    /** True to enable the clean plugin. Default is true if splitting is true. */
+    clean?: boolean | CleanPluginOptions;
+
+    /**
+     * Determines the set of entry points that should be passed to the esbuild. 
+     * Only use to specify full paths of entry points manually if you calculated them yourself.
+     * Prefer specifying entry point globs in sergen.json under TSBuild:EntryPoints which supports
+     * globs and defaults to ['Modules/** /*Page.ts', 'Modules/** /*Page.tsx', 'Modules/** /ScriptInit.ts'] */
+    entryPoints?: string[];
+
+    /**
+     * A set of mappings to pass to the importAsGlobalsPlugin. If this is undefined or any object and the plugins 
+     * is not specified, importAsGlobals plugin is enabled */
+    importAsGlobals?: Record<string, string>;
+
+    /**
+     * True to enable metafile generation by esbuild. Default is true.
+     * If this is false, clean plugin won't work properly.
+     */
+    metafile?: boolean;
+
+    /** True to enable minification. Default is true. */
+    minify?: boolean;
+
+    /** False to not call npmCopy automatically for entries in appsettings.bundles.json that start with `~/npm/`. Default is true.*/
+    npmCopy?: boolean;
+
+    /** Base directory for calculating output file locations in output directory. Default is "./" */
+    outbase?: string;
+
+    /** Base output directory. Default is wwwroot/esm */
+    outdir?: string;
+
+    /** True to enable code splitting. Default is true unless --nosplit is passed in process arguments. */
+    splitting?: boolean;
+
+    /** Should source maps be generated. Default is true. */
+    sourcemap?: boolean;
+
+    /* Javascript target for output files. Default is es2017. */
+    target?: string;
+
+    /** True to watch, default is calculated from process args and true if it contains --watch */
+    watch?: boolean;
+
+    /** Write output files only if contents have changed. Default is true. */
+    writeIfChanged?: boolean;
+}
+
+/** Processes passed TSBuildOptions options and converts it to options suitable for esbuild */
+export const esbuildOptions = (opt: TSBuildOptions): import("esbuild").BuildOptions => {
 
     opt = Object.assign({}, opt);
 
-    var entryPointsRegEx;
-    if (opt.entryPointsRegEx !== undefined) {
-        entryPointsRegEx = opt.entryPointsRegEx;
-        delete opt.entryPointsRegEx;
+    if ((opt as any).entryPointsRegex !== undefined ||
+        (opt as any).entryPointRoots !== undefined) {
+        throw new Error("TSBuildOptions.entryPointsRegex and entryPointRoots are deprecated, use TSBuild:EntryPoints in sergen.json.");
     }
 
-    var entryPointRoots = ['Modules'];
-    if (opt.entryPointRoots !== undefined) {
-        entryPointRoots = opt.entryPointRoots;
-        delete opt.entryPointRoots;
-    }
-
-
-    var entryPoints = opt.entryPoints;
+    let entryPoints = opt.entryPoints as string[];
     if (entryPoints === void 0) {
         let globs;
         if (existsSync('sergen.json')) {
             var json = readFileSync('sergen.json', 'utf8').trim();
-            var cfg = JSON.parse(json || {});
-            globs = cfg?.TSBuild?.EntryPoints;
+            var cfg = JSON.parse(json || "{}");
+            globs = cfg?.TSBuild?.EntryPoints as string[];
             if (globs != null && globs[0] === '+') {
                 globs = [...defaultEntryPointGlobs, ...globs.slice(1)];
             }
@@ -76,51 +172,26 @@ export const esbuildOptions = (opt) => {
                 typeof cfg.Extends == "string" &&
                 existsSync(cfg.Extends)) {
                 json = readFileSync(cfg.Extends, 'utf8').trim();
-                cfg = JSON.parse(json || {});
-                globs = cfg?.TSBuild?.EntryPoints;
+                cfg = JSON.parse(json || "{}");
+                globs = cfg?.TSBuild?.EntryPoints as string[];
                 if (globs != null && globs[0] === '+') {
                     globs = [...defaultEntryPointGlobs, ...globs.slice(1)];
                 }
             }
         }
 
-        if (globs == null && !entryPointsRegEx) {
+        if (globs == null) {
             globs = defaultEntryPointGlobs;
         }
 
         if (globs != null) {
-            globs = globs.filter(x => x.indexOf("..") < 0);
-            var include = globs.filter(x => !x.startsWith('!'));
-            var exclude = globs.filter(x => x.startsWith('!')).map(x => x.substring(1));
-            exclude.push(".git/**");
-            exclude.push("App_Data/**");
-            exclude.push("bin/**");
-            exclude.push("obj/**");
-            exclude.push("node_modules/**");
-            exclude.push("**/node_modules/**");
+            globs.push("!.git/**");
+            globs.push("!App_Data/**");
+            globs.push("!bin/**");
+            globs.push("!obj/**");
+            globs.push("!node_modules/**");
 
-            entryPoints = globSync(include, {
-                ignore: exclude,
-                nodir: true,
-                matchBase: true
-            });
-        }
-        else {
-            entryPoints = [];
-
-            function scanDir(dir, org) {
-                return readdirSync(dir).reduce((files, file) => {
-                    const absolute = join(dir, file);
-                    return [...files, ...(statSync(absolute).isDirectory()
-                        ? scanDir(absolute, org || dir)
-                        : [relative(org || dir, absolute)])]
-                }, []);
-            }
-
-            entryPointRoots.forEach(root =>
-                scanDir(root)
-                    .filter(p => p.match(entryPointsRegEx))
-                    .forEach(p => entryPoints.push(root + '/' + p)));
+            entryPoints = safeGlobSync(globs);
         }
     }
 
@@ -132,7 +203,7 @@ export const esbuildOptions = (opt) => {
     if (plugins === undefined) {
         plugins = [];
         if ((opt.clean === undefined && splitting) || opt.clean)
-            plugins.push(cleanPlugin(opt.clean === true ? {} : opt.clean));
+            plugins.push(cleanPlugin(opt.clean === true ? {} : (opt.clean ?? {})));
         if (opt.importAsGlobals === undefined || opt.importAsGlobals)
             plugins.push(importAsGlobalsPlugin(opt.importAsGlobals ?? importAsGlobalsMapping));
     }
@@ -157,13 +228,16 @@ export const esbuildOptions = (opt) => {
     };
 }
 
-export const build = async (opt) => {
+/** Calls esbuild with passed options. By default, this is used to generate files under wwwroot/esm/ from entry points under Modules/
+ * but this can be changed by passing outdir and outbase, and other options. */
+export const build = async (opt: TSBuildOptions) => {
     if (opt?.npmCopy !== false &&
         existsSync('appsettings.bundles.json')) {
         const bundlesJson = readFileSync('appsettings.bundles.json', 'utf8').trim();
-        const bundlesCfg = JSON.parse(bundlesJson || {});
-        const bundles = Object.values(bundlesCfg?.CssBundling?.Bundles || {}).concat(Object.values(bundlesCfg?.ScriptBundling?.Bundles || {}));
-        let paths = [];
+        const bundlesCfg = JSON.parse(bundlesJson || "{}");
+        const bundles: string[][] = (Object.values(bundlesCfg?.CssBundling?.Bundles || {}) as string[][])
+            .concat(Object.values(bundlesCfg?.ScriptBundling?.Bundles || {}) as string[][]);
+        let paths: string[] = [];
         Object.values(bundles).filter(x => x?.length).forEach(bundle => {
             paths.push(...bundle.filter(f => f?.startsWith('~/npm/')).map(f => f.substring(5)));
         });
@@ -175,34 +249,35 @@ export const build = async (opt) => {
 
     delete opt?.npmCopy;
 
-    opt = esbuildOptions(opt);
+    const esopt: import("esbuild").BuildOptions = esbuildOptions(opt);
 
-    if (opt.watch) {
+    if ((esopt as any).watch) {
         // this somehow resolves the issue that when debugging is stopped
         // in Visual Studio, the node process stays alive
         setInterval(() => {
             process.stdout.write("");
         }, 5000);
 
-        delete opt.watch;
-        const context = await esbuild.context(opt);
+        delete (esopt as any).watch;
+        const context = await esbuild.context(esopt);
         await context.watch();
     }
     else {
-        delete opt.watch;
-        await esbuild.build(opt);
+        delete (esopt as any).watch;
+        await esbuild.build(esopt);
     }
 };
 
 // https://github.com/evanw/esbuild/issues/337
-export function importAsGlobalsPlugin(mapping) {
-    const escRe = (s) => s.replace(/[-\/\\^$*+?.()|[\]{}]/g, "\\$&");
+/** Plugin for importing modules as globals */
+export function importAsGlobalsPlugin(mapping: Record<string, string>) {
+    const escRe = (s: string) => s.replace(/[-\/\\^$*+?.()|[\]{}]/g, "\\$&");
     const filter = new RegExp(Object.keys(mapping).map((mod) =>
         `^${escRe(mod)}$`).join("|"));
 
     return {
         name: "global-imports",
-        setup(build) {
+        setup(build: esbuild.PluginBuild) {
             build.onResolve({ filter }, (args) => {
                 if (!mapping[args.path])
                     throw new Error("Unknown global: " + args.path);
@@ -210,13 +285,14 @@ export function importAsGlobalsPlugin(mapping) {
             });
 
             build.onLoad({ filter: /.*/, namespace: "external-global" },
-                async (args) => {
+                async (args: esbuild.OnLoadArgs) => {
                     return { contents: `module.exports = ${args.path};`, loader: "js" };
                 });
         }
     };
 }
 
+/** Default options for cleanPlugin */
 export const cleanPluginDefaults = {
     globs: [
         '*.css',
@@ -235,26 +311,32 @@ export const cleanPluginDefaults = {
     logDeletedFiles: true
 }
 
-export function cleanPlugin(opt) {
+/** Options for cleanPlugin */
+export interface CleanPluginOptions {
+    /** Glob patterns to include for cleaning. Default is ['** /*.js', '** /*.js.map', '** /*.css', '** /*.css.map'] */
+    globs?: string[];
+
+    /** Whether to log deleted files to console. Default is true */
+    logDeletedFiles?: boolean;
+}
+
+/** Plugin for cleaning output directory based on passed globs */
+export function cleanPlugin(opt: CleanPluginOptions) {
     opt = Object.assign({}, cleanPluginDefaults, opt ?? {});
     return {
         name: 'clean',
-        setup(build) {
+        setup(build: esbuild.PluginBuild) {
             build.onEnd(result => {
                 try {
-                    const outdir = build.initialOptions.outdir;
+                    const outdir = build.initialOptions.outdir as string;
                     const { outputs } = result.metafile ?? {};
                     if (!outputs || !existsSync(outdir))
                         return;
 
                     const outputFiles = new Set(Object.keys(outputs).map(x => x.replace(/\\/g, '/')));
-                    const globs = opt.globs.filter(x => x.indexOf("..") < 0);
 
-                    const existingFiles = globSync(globs.filter(x => !x.startsWith('!')), {
-                        cwd: build.initialOptions.outdir,
-                        ignore: globs.filter(x => x.startsWith('!')).map(x => x.substring(1)),
-                        nodir: true,
-                        matchBase: true
+                    const existingFiles = safeGlobSync(opt.globs || [], {
+                        cwd: outdir,
                     }).map(x => join(outdir, x).replace(/\\/g, '/'));
 
                     existingFiles.forEach(file => {
@@ -272,14 +354,11 @@ export function cleanPlugin(opt) {
     }
 }
 
-export function checkIfTrigger() {
-    // nop
-}
-
+/** Plugin for writing files only if changed */
 export function writeIfChanged() {
     return {
         name: "write-if-changed",
-        setup(build) {
+        setup(build: esbuild.PluginBuild) {
             build.onEnd(result => {
                 result.outputFiles?.forEach(file => {
                     if (existsSync(file.path)) {
@@ -297,7 +376,8 @@ export function writeIfChanged() {
     };
 }
 
-export function npmCopy(paths) {
+/** Copies files from node_modules to outdir (wwwroot/npm by default). Paths are relative to node_modules. */
+export function npmCopy(paths: string[]) {
     paths.forEach(path => {
         const srcFile = join("node_modules", path);
         const dstfile = join("wwwroot/npm", path);

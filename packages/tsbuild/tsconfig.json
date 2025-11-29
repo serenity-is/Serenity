@@ -1,0 +1,37 @@
+{
+  "compileOnSave": false,
+  "compilerOptions": {
+    "allowJs": true,
+    "allowUnreachableCode": false,
+    "allowUnusedLabels": false,
+    "exactOptionalPropertyTypes": true,
+    "declaration": true,
+    "emitDeclarationOnly": true,
+    "emitBOM": true,
+    "lib": [
+      "ES2017",
+      "DOM"
+    ],
+    "isolatedModules": true,
+    "module": "ESNext",
+    "moduleResolution": "Bundler",
+    "newLine": "lf",
+    "noEmitHelpers": false,
+    "noFallthroughCasesInSwitch": true,
+    "noImplicitOverride": true, 
+    "noImplicitReturns": true,
+    "noUnusedLocals": true,
+    "noUnusedParameters": true,
+    "outDir": "./dist",
+    "rootDir": "./src",
+    "skipDefaultLibCheck": true,
+    "sourceMap": false,
+    "strict": true,
+    "strictFunctionTypes": false,
+    "target": "ESNext",
+    "useDefineForClassFields": false
+  },
+  "include": [
+    "src"
+  ]
+}
