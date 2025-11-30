@@ -3,6 +3,7 @@
     <AccelerateBuildsInVisualStudio>true</AccelerateBuildsInVisualStudio>
     <AddAutoRefs Condition="'$(AddAutoRefs)' == ''">true</AddAutoRefs>
     <AddRazorSupportForMvc>true</AddRazorSupportForMvc>
+    <CompressionExcludePatterns>$(CompressionExcludePatterns);**\*.map;**\*.txt;</CompressionExcludePatterns>
     <DefaultItemExcludes>node_modules\**;coverage\**;$(DefaultItemExcludes)</DefaultItemExcludes>
     <DefineConstants Condition="'$(IsPublicDemo)'=='true'">$(DefineConstants);IsPublicDemo</DefineConstants>
     <ESMAssetBasePath>/$(MSBuildProjectName)/esm</ESMAssetBasePath>
