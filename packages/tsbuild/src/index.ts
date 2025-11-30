@@ -379,7 +379,7 @@ export interface CompressOptions {
 
 /** Plugin for writing files only if changed */
 export function writeIfChanged(opt?: CompressOptions) {
-    const compressExtensions = opt?.extensions ?? ['.js', '.css', '.html', '.svg', '.json'];
+    const compressExtensions = opt?.extensions ?? ['.css', '.js', '.svg', '.json'];
 
     return {
         name: "write-if-changed",
