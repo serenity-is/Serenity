@@ -15,6 +15,8 @@ export interface TSBuildOptions extends Partial<import("esbuild").BuildOptions> 
     chunkNames?: string;
     /** True to enable the clean plugin. Default is true if splitting is true. */
     clean?: boolean | CleanPluginOptions;
+    /** Options for compressing output files. If specified, enables compression. Currently only available when writeIfChanged plugin is enabled */
+    compress?: CompressOptions;
     /**
      * Determines the set of entry points that should be passed to the esbuild.
      * Only use to specify full paths of entry points manually if you calculated them yourself.
@@ -75,8 +77,17 @@ export declare function cleanPlugin(opt: CleanPluginOptions): {
     name: string;
     setup(build: esbuild.PluginBuild): void;
 };
+export interface CompressOptions {
+    brotli?: boolean | {
+        quality?: number;
+    };
+    gzip?: boolean | {
+        level?: number;
+    };
+    extensions?: string[];
+}
 /** Plugin for writing files only if changed */
-export declare function writeIfChanged(): {
+export declare function writeIfChanged(opt?: CompressOptions): {
     name: string;
     setup(build: esbuild.PluginBuild): void;
 };

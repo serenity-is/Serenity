@@ -1,7 +1,10 @@
 import esbuild from "esbuild";
 import { existsSync, mkdirSync, readFileSync, rmSync, writeFileSync } from "fs";
 import { globSync, type GlobOptions } from "glob";
+import { constants, createBrotliCompress, createGzip } from "node:zlib";
 import { dirname, isAbsolute, join, resolve, sep } from "path";
+import pipe from "node:stream/promises"
+import fs from "fs";
 
 export const defaultEntryPointGlobs = ['Modules/**/*Page.ts', 'Modules/**/*Page.tsx', 'Modules/**/ScriptInit.ts', 'Modules/**/*.mts'];
 
@@ -101,6 +104,9 @@ export interface TSBuildOptions extends Partial<import("esbuild").BuildOptions> 
 
     /** True to enable the clean plugin. Default is true if splitting is true. */
     clean?: boolean | CleanPluginOptions;
+
+    /** Options for compressing output files. If specified, enables compression. Currently only available when writeIfChanged plugin is enabled */
+    compress?: CompressOptions;
 
     /**
      * Determines the set of entry points that should be passed to the esbuild. 
@@ -208,11 +214,12 @@ export const esbuildOptions = (opt: TSBuildOptions): import("esbuild").BuildOpti
             plugins.push(importAsGlobalsPlugin(opt.importAsGlobals ?? importAsGlobalsMapping));
     }
 
-    if (opt.write === undefined && opt.writeIfChanged === undefined || opt.writeIfChanged) {
-        plugins.push(writeIfChanged());
+    if ((opt.write === undefined && opt.writeIfChanged === undefined) || opt.writeIfChanged) {
+        plugins.push(writeIfChanged(opt.compress));
         opt.write = false;
     }
 
+    delete opt.compress;
     delete opt.clean;
     delete opt.importAsGlobals;
     delete opt.writeIfChanged;
@@ -344,6 +351,12 @@ export function cleanPlugin(opt: CleanPluginOptions) {
                             if (opt.logDeletedFiles ?? true)
                                 console.log('esbuild clean: deleting extra file ' + file);
                             rmSync(file);
+                            if (existsSync(file + ".gz")) {
+                                rmSync(file + ".gz");
+                            }
+                            if (existsSync(file + ".br")) {
+                                rmSync(file + ".br");
+                            }
                         }
                     });
                 } catch (e) {
@@ -354,23 +367,79 @@ export function cleanPlugin(opt: CleanPluginOptions) {
     }
 }
 
+export interface CompressOptions {
+    brotli?: boolean | {
+        quality?: number;
+    },
+    gzip?: boolean | {
+        level?: number;
+    },
+    extensions?: string[];
+}
+
 /** Plugin for writing files only if changed */
-export function writeIfChanged() {
+export function writeIfChanged(opt?: CompressOptions) {
+    const compressExtensions = opt?.extensions ?? ['.js', '.css', '.html', '.svg', '.json'];
+
     return {
         name: "write-if-changed",
         setup(build: esbuild.PluginBuild) {
-            build.onEnd(result => {
-                result.outputFiles?.forEach(file => {
+            build.onEnd(async result => {
+                const start = new Date().getTime();
+                let compressed: number = 0;
+                let written: number = 0;
+                let checkedFiles: number = 0;
+                let outputFiles = result.outputFiles || [];
+                for (const file of outputFiles) {
+
+                    checkedFiles++;
+                    const compressFile = async () => {
+                        if ((opt?.brotli || opt?.gzip) &&
+                            compressExtensions.some(ext => file.path?.endsWith(ext))) {
+                            if (opt.brotli) {
+                                await pipe.pipeline(
+                                    fs.createReadStream(file.path),
+                                    createBrotliCompress({
+                                        [constants.BROTLI_PARAM_QUALITY]: (typeof opt.brotli === "object" && opt.brotli.quality) || 4
+                                    }),
+                                    fs.createWriteStream(`${file.path}.br`));
+                                compressed++;
+                            }
+                            if (opt.gzip) {
+                                await pipe.pipeline(
+                                    fs.createReadStream(file.path),
+                                    createGzip({ level: (typeof opt.gzip === "object" && opt.gzip.level) || 7 }),
+                                    fs.createWriteStream(`${file.path}.gz`));
+                                compressed++;
+                            }
+                        }
+                    };
+
                     if (existsSync(file.path)) {
                         const old = readFileSync(file.path);
-                        if (old.equals(file.contents))
-                            return;
+                        if (old.equals(file.contents)) {
+                            if ((opt?.brotli && !existsSync(file.path + '.br')) ||
+                                (opt?.gzip && !existsSync(file.path + '.gz'))) {
+                                await compressFile();
+                            }
+                            continue;
+                        }
                     }
                     else {
                         mkdirSync(dirname(file.path), { recursive: true });
                     }
                     writeFileSync(file.path, file.contents);
-                });
+                    written++;
+                    await compressFile();
+                }
+
+                const end = new Date().getTime();
+                if (written > 0 || compressed > 0)
+                    console.log(`Checked ${checkedFiles} output files in ${end - start} ms: changed ${written}, compressed ${compressed}`);
+                else
+                    console.log(`Checked ${checkedFiles} output files in ${end - start} ms: none changed`);
+
+                await Promise.resolve();
             });
         }
     };
