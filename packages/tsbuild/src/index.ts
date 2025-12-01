@@ -230,18 +230,17 @@ export const esbuildOptions = (opt: TSBuildOptions): import("esbuild").BuildOpti
     delete opt.importAsGlobals;
     delete opt.writeIfChanged;
 
+    
     if (opt.sourceRoot === undefined) {
-        opt.sourceRoot = "Modules";
         if (existsSync('package.json')) {
             let pkgId = JSON.parse(readFileSync('package.json', 'utf8').trim() || "{}").name;
             if (pkgId.startsWith("@serenity-is/")) {
-                opt.sourceRoot = "https://packages.serenity.is/" + pkgId.substring(12) + "/Modules/";
-                pkgId = pkgId.substring(12);
+                opt.sourceRoot = "https://packages.serenity.is/" + pkgId.substring(13) + "/Modules/";
             }
         }
         opt.sourceRoot ??= "Modules";
     }
-
+    
     return {
         ...esbuildDefaults,
         absWorkingDir: resolve('./'),
