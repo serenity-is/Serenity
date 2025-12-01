@@ -1,9 +1,14 @@
 import esbuild from "esbuild";
+// @ts-ignore
 import { existsSync, mkdirSync, readFileSync, rmSync, writeFileSync } from "fs";
 import { globSync, type GlobOptions } from "glob";
+// @ts-ignore
 import { constants, createBrotliCompress, createGzip } from "node:zlib";
+// @ts-ignore
 import { dirname, isAbsolute, join, resolve, sep } from "path";
+// @ts-ignore
 import pipe from "node:stream/promises"
+// @ts-ignore
 import fs from "fs";
 
 export const defaultEntryPointGlobs = ['Modules/**/*Page.ts', 'Modules/**/*Page.tsx', 'Modules/**/ScriptInit.ts', 'Modules/**/*.mts'];
@@ -21,6 +26,7 @@ export const importAsGlobalsMapping: Record<string, string> = {
 }
 
 export function safeGlobSync(globs: string[], options: Omit<GlobOptions, "ignore"> = {}): string[] {
+    // @ts-ignore
     const root = options.root || process.cwd();
 
     const normalizePattern = (pattern: string) => {
@@ -90,7 +96,6 @@ export const esbuildDefaults: Partial<import("esbuild").BuildOptions> = {
     outdir: 'wwwroot/esm',
     sourcemap: true,
     splitting: true,
-    sourceRoot: "Modules",
     target: 'es2017'
 }
 
@@ -203,6 +208,7 @@ export const esbuildOptions = (opt: TSBuildOptions): import("esbuild").BuildOpti
 
     var splitting = opt.splitting;
     if (splitting === undefined)
+        // @ts-ignore
         splitting = !process.argv.slice(2).some(x => x == "--nosplit");
 
     var plugins = opt.plugins;
@@ -224,12 +230,25 @@ export const esbuildOptions = (opt: TSBuildOptions): import("esbuild").BuildOpti
     delete opt.importAsGlobals;
     delete opt.writeIfChanged;
 
+    if (opt.sourceRoot === undefined) {
+        opt.sourceRoot = "Modules";
+        if (existsSync('package.json')) {
+            let pkgId = JSON.parse(readFileSync('package.json', 'utf8').trim() || "{}").name;
+            if (pkgId.startsWith("@serenity-is/")) {
+                opt.sourceRoot = "https://packages.serenity.is/" + pkgId.substring(12) + "/Modules/";
+                pkgId = pkgId.substring(12);
+            }
+        }
+        opt.sourceRoot ??= "Modules";
+    }
+
     return {
         ...esbuildDefaults,
         absWorkingDir: resolve('./'),
         entryPoints,
         plugins,
         splitting,
+        // @ts-ignore
         watch: process.argv.slice(2).some(x => x == "--watch"),
         ...opt
     };
@@ -262,6 +281,7 @@ export const build = async (opt: TSBuildOptions) => {
         // this somehow resolves the issue that when debugging is stopped
         // in Visual Studio, the node process stays alive
         setInterval(() => {
+            // @ts-ignore
             process.stdout.write("");
         }, 5000);
 

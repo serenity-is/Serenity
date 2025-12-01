@@ -31,30 +31,31 @@ function writeIfChanged() {
 
 const defaults = {
     bundle: true,
-    entryPoints: ['./src/index.ts'],
     color: true,
+    format: 'esm',
     jsxSideEffects: true,
     logLevel: 'info',
+    minify: false,
     target: 'es2020',
-    plugins: [writeIfChanged()]
+    outdir: 'dist',
+    plugins: [writeIfChanged()],
+    sourcemap: true,
+    sourceRoot: "https://packages.serenity.is/domwise/src/"
 }
 
 const esmIndex = {
     ...defaults,
-    format: 'esm',
-    minify: false,
-    outfile: './dist/index.js',
-    sourcemap: true,
-    sourceRoot: "src"
+    entryPoints: [{
+        in: './src/index.ts', out: 'index'
+    }],
 }
 
 const esmJsxRuntime = {
     ...defaults,
-    format: 'esm',
     bundle: false,
-    minify: false,
-    entryPoints: ['./src/jsx-runtime.ts'],
-    outfile: './dist/jsx-runtime.js'
+    entryPoints: [{
+        in: './src/jsx-runtime.ts', out: 'jsx-runtime'
+    }]
 }
 
 const buildList = [];

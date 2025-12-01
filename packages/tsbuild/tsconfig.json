@@ -9,7 +9,7 @@
     "emitDeclarationOnly": true,
     "emitBOM": true,
     "lib": [
-      "ES2017",
+      "ES2019",
       "DOM"
     ],
     "isolatedModules": true,
@@ -24,6 +24,7 @@
     "noUnusedParameters": true,
     "outDir": "./dist",
     "rootDir": "./src",
+    "skipLibCheck": true,
     "skipDefaultLibCheck": true,
     "sourceMap": false,
     "strict": true,

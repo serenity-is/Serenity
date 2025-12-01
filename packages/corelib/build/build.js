@@ -19,7 +19,7 @@ const coreLibBase = {
     minify: false,
     outbase: 'src',
     sourcemap: true,
-    sourceRoot: "src",
+    sourceRoot: "https://packages.serenity.is/corelib/src/",
     splitting: false,
     target: 'es2015'
 }
