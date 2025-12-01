@@ -1,6 +1,8 @@
 ﻿import { getGlobalObject } from "../base"
 
 function copyProps(source: any, target: any) {
+    if (!source || !target)
+        return;
     Object.keys(source).forEach(function (key) {
         if (source[key] != null &&
             target[key] == null &&
