@@ -3279,13 +3279,13 @@ export declare function outerHtml(element: Element | ArrayLike<HTMLElement>): st
  * packages that use global references via tsbuild's importAsGlobals option.
  * @param param0
  */
-export declare function initGlobalMappings({ corelib, globals, domwise, sleekgrid, extensions, proExtensions, bootstrap, flatpickr, glightbox, mousetrap, nprogress, sortable }: {
+export declare function initGlobalMappings({ corelib, globals, domwise, sleekgrid, extensions, proextensions, bootstrap, flatpickr, glightbox, mousetrap, nprogress, sortable }: {
 	globals?: any;
 	corelib?: any;
 	domwise?: any;
 	sleekgrid?: any;
 	extensions?: any;
-	proExtensions?: any;
+	proextensions?: any;
 	bootstrap?: any;
 	flatpickr?: any;
 	glightbox?: any;

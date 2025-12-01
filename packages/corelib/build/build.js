@@ -76,8 +76,7 @@ await esbuild.build({
     ...coreLibBase,
     external: ['@serenity-is/sleekgrid'],
     format: 'esm',
-    outdir: 'dist',
-    sourcemap: false
+    outdir: 'dist'
 });
 
 const corelibGlobalBase = {

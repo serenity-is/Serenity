@@ -23,13 +23,13 @@ function copyProps(source: any, target: any) {
  * @param param0 
  */
 export function initGlobalMappings({ corelib, globals, domwise, sleekgrid,
-    extensions, proExtensions, bootstrap, flatpickr, glightbox, mousetrap, nprogress, sortable }: {
+    extensions, proextensions, bootstrap, flatpickr, glightbox, mousetrap, nprogress, sortable }: {
         globals?: any,
         corelib?: any,
         domwise?: any,
         sleekgrid?: any,
         extensions?: any,
-        proExtensions?: any,
+        proextensions?: any,
         bootstrap?: any,
         flatpickr?: any,
         glightbox?: any,
@@ -48,7 +48,7 @@ export function initGlobalMappings({ corelib, globals, domwise, sleekgrid,
         }
     }
 
-    if (corelib || sleekgrid || domwise || extensions || proExtensions) {
+    if (corelib || sleekgrid || domwise || extensions || proextensions) {
         if (!globals.Serenity) {
             globals.Serenity = Object.create(null);
         }
@@ -102,9 +102,9 @@ export function initGlobalMappings({ corelib, globals, domwise, sleekgrid,
             }
         }
 
-        if (proExtensions) {
-            if (globals.Serenity !== proExtensions) {
-                copyProps(proExtensions, globals.Serenity);
+        if (proextensions) {
+            if (globals.Serenity !== proextensions) {
+                copyProps(proextensions, globals.Serenity);
             }
         }
     }

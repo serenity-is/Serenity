@@ -95,7 +95,6 @@ export const esbuildDefaults: Partial<import("esbuild").BuildOptions> = {
     outbase: "./",
     outdir: 'wwwroot/esm',
     sourcemap: true,
-    splitting: true,
     target: 'es2017'
 }
 
@@ -207,9 +206,11 @@ export const esbuildOptions = (opt: TSBuildOptions): import("esbuild").BuildOpti
     }
 
     var splitting = opt.splitting;
-    if (splitting === undefined)
+    if (splitting === undefined) {
         // @ts-ignore
-        splitting = !process.argv.slice(2).some(x => x == "--nosplit");
+        splitting = !process.argv.slice(2).some(x => x == "--nosplit") &&
+            (!opt.format || opt.format === 'esm');
+    }
 
     var plugins = opt.plugins;
     if (plugins === undefined) {
