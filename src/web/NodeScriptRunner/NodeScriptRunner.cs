@@ -1,4 +1,4 @@
-﻿// Licensed to the .NET Foundation under one or more agreements.
+// Licensed to the .NET Foundation under one or more agreements.
 // The .NET Foundation licenses this file to you under the MIT license.
 
 using Microsoft.Extensions.Logging;
@@ -128,10 +128,13 @@ public sealed class NodeScriptRunner : IDisposable
             if (!string.IsNullOrWhiteSpace(line))
             {
                 // workaround for esbuild as it logs to stderr
-                if (line.StartsWith("[watch]"))
-                    logger.LogInformation(StripAnsiColors(line));
-                else
+                if (line.StartsWith("Error:", StringComparison.OrdinalIgnoreCase))
                     logger.LogError(StripAnsiColors(line));
+                else if (line.StartsWith("Warning:", StringComparison.OrdinalIgnoreCase) ||
+                    line.StartsWith("Warn:", StringComparison.OrdinalIgnoreCase))
+                    logger.LogWarning(StripAnsiColors(line));
+                else
+                    logger.LogInformation(StripAnsiColors(line));
             }
         };
 #pragma warning restore CA2254 // Template should be a static expression

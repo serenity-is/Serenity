@@ -7,8 +7,11 @@ export declare const defaultEntryPointGlobs: string[];
 export declare const importAsGlobalsMapping: Record<string, string>;
 export declare function safeGlobSync(globs: string[], options?: Omit<GlobOptions, "ignore">): string[];
 /** Default esbuild options used by TSBuild */
-export declare const esbuildDefaults: Partial<import("esbuild").BuildOptions>;
+export declare const tsbuildDefaults: Partial<import("esbuild").BuildOptions>;
 export interface TSBuildOptions extends Partial<import("esbuild").BuildOptions> {
+    /** Enable building of global iife bundles from Modules/Common/bundles/*-bundle(.css|.ts) files to wwwroot/bundles/. Default is false.
+      * If set to an object, uses the passed options for building global bundles. */
+    buildGlobalBundles?: boolean | TSBuildOptions;
     /** Enable bundling of dependencies, default is true */
     bundle?: boolean;
     /** Chunk names to generate when code splitting is enabled. Default is '_chunks/[name]-[hash]' */
@@ -26,7 +29,7 @@ export interface TSBuildOptions extends Partial<import("esbuild").BuildOptions> 
     /**
      * A set of mappings to pass to the importAsGlobalsPlugin. If this is undefined or any object and the plugins
      * is not specified, importAsGlobals plugin is enabled */
-    importAsGlobals?: Record<string, string>;
+    importAsGlobals?: Record<string, string> | null;
     /**
      * True to enable metafile generation by esbuild. Default is true.
      * If this is false, clean plugin won't work properly.
@@ -52,6 +55,8 @@ export interface TSBuildOptions extends Partial<import("esbuild").BuildOptions> 
 }
 /** Processes passed TSBuildOptions options and converts it to options suitable for esbuild */
 export declare const esbuildOptions: (opt: TSBuildOptions) => import("esbuild").BuildOptions;
+/** Default options for global iife bundle builds which is used when buildGlobalBundles is true or is an object */
+export declare const tsbuildGlobalBundleDefaults: Partial<TSBuildOptions>;
 /** Calls esbuild with passed options. By default, this is used to generate files under wwwroot/esm/ from entry points under Modules/
  * but this can be changed by passing outdir and outbase, and other options. */
 export declare const build: (opt: TSBuildOptions) => Promise<void>;

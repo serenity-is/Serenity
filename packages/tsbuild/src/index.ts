@@ -69,7 +69,7 @@ export function safeGlobSync(globs: string[], options: Omit<GlobOptions, "ignore
 }
 
 /** Default esbuild options used by TSBuild */
-export const esbuildDefaults: Partial<import("esbuild").BuildOptions> = {
+export const tsbuildDefaults: Partial<import("esbuild").BuildOptions> = {
     assetNames: 'assets/[name]-[hash]',
     bundle: true,
     chunkNames: '_chunks/[name]-[hash]',
@@ -98,8 +98,11 @@ export const esbuildDefaults: Partial<import("esbuild").BuildOptions> = {
     target: 'es2017'
 }
 
-
 export interface TSBuildOptions extends Partial<import("esbuild").BuildOptions> {
+    /** Enable building of global iife bundles from Modules/Common/bundles/*-bundle(.css|.ts) files to wwwroot/bundles/. Default is false.
+      * If set to an object, uses the passed options for building global bundles. */
+    buildGlobalBundles?: boolean | TSBuildOptions;
+
     /** Enable bundling of dependencies, default is true */
     bundle?: boolean;
 
@@ -122,7 +125,7 @@ export interface TSBuildOptions extends Partial<import("esbuild").BuildOptions> 
     /**
      * A set of mappings to pass to the importAsGlobalsPlugin. If this is undefined or any object and the plugins 
      * is not specified, importAsGlobals plugin is enabled */
-    importAsGlobals?: Record<string, string>;
+    importAsGlobals?: Record<string, string> | null;
 
     /**
      * True to enable metafile generation by esbuild. Default is true.
@@ -231,7 +234,7 @@ export const esbuildOptions = (opt: TSBuildOptions): import("esbuild").BuildOpti
     delete opt.importAsGlobals;
     delete opt.writeIfChanged;
 
-    
+
     if (opt.sourceRoot === undefined) {
         if (existsSync('package.json')) {
             let pkgId = JSON.parse(readFileSync('package.json', 'utf8').trim() || "{}").name;
@@ -241,9 +244,9 @@ export const esbuildOptions = (opt: TSBuildOptions): import("esbuild").BuildOpti
         }
         opt.sourceRoot ??= "Modules";
     }
-    
+
     return {
-        ...esbuildDefaults,
+        ...tsbuildDefaults,
         absWorkingDir: resolve('./'),
         entryPoints,
         plugins,
@@ -254,9 +257,33 @@ export const esbuildOptions = (opt: TSBuildOptions): import("esbuild").BuildOpti
     };
 }
 
+/** Default options for global iife bundle builds which is used when buildGlobalBundles is true or is an object */
+export const tsbuildGlobalBundleDefaults: Partial<TSBuildOptions> = {
+    entryPoints: [
+        "Modules/Common/bundles/*-bundle.ts",
+        "Modules/Common/bundles/*-bundle.css",
+        "Modules/Common/bundles/*-bundle.rtl.css",
+    ],
+    format: "iife",
+    importAsGlobals: null,
+    outdir: "wwwroot/bundles/",
+    outbase: "Modules/Common/bundles",
+    watch: false,
+}
+
 /** Calls esbuild with passed options. By default, this is used to generate files under wwwroot/esm/ from entry points under Modules/
  * but this can be changed by passing outdir and outbase, and other options. */
 export const build = async (opt: TSBuildOptions) => {
+    if (opt.buildGlobalBundles) {
+        const buildGlobalBundles: TSBuildOptions = {
+            ...tsbuildGlobalBundleDefaults,
+            ...(opt.buildGlobalBundles === true ? {} : opt.buildGlobalBundles)
+        };
+        delete opt.buildGlobalBundles;
+        console.log("\x1b[32mBuilding global bundles...\x1b[0m");
+        await build(buildGlobalBundles);
+    }
+
     if (opt?.npmCopy !== false &&
         existsSync('appsettings.bundles.json')) {
         const bundlesJson = readFileSync('appsettings.bundles.json', 'utf8').trim();
@@ -369,7 +396,7 @@ export function cleanPlugin(opt: CleanPluginOptions) {
                     existingFiles.forEach(file => {
                         if (!outputFiles.has(file)) {
                             if (opt.logDeletedFiles ?? true)
-                                console.log('esbuild clean: deleting extra file ' + file);
+                                console.log(`esbuild clean: \x1b[33mdeleting extra file ${file}\x1b[0m`);
                             rmSync(file);
                             if (existsSync(file + ".gz")) {
                                 rmSync(file + ".gz");
@@ -455,9 +482,9 @@ export function writeIfChanged(opt?: CompressOptions) {
 
                 const end = new Date().getTime();
                 if (written > 0 || compressed > 0)
-                    console.log(`Checked ${checkedFiles} output files in ${end - start} ms: changed ${written}, compressed ${compressed}`);
+                    console.log(`esbuild write: \x1b[32mChecked ${checkedFiles} output files in ${end - start} ms, changed ${written}, compressed ${compressed}\x1b[0m`);
                 else
-                    console.log(`Checked ${checkedFiles} output files in ${end - start} ms: none changed`);
+                    console.log(`esbuild write: \x1b[32mChecked ${checkedFiles} output files in ${end - start} ms, none changed\x1b[0m`);
 
                 await Promise.resolve();
             });
