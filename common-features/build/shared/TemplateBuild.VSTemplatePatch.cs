@@ -45,9 +45,8 @@ public static partial class Shared
         "jest.config.js",
         "vitest.config.ts",
         "StyleCop.Cache",
-        "Serene.Web.js.map",
-        "StartSharp.Web.js.map",
         "launchSettings.json",
+        "**/wwwroot/bundles/**/*.js.map",
         "**/wwwroot/esm/**/*.js.map",
         "*.tsbuildinfo"
     });
