@@ -246,7 +246,6 @@ export const esbuildOptions = (opt: TSBuildOptions): import("esbuild").BuildOpti
     delete opt.compress;
     delete opt.clean;
     delete opt.importAsGlobals;
-    delete opt.splitting;
     delete opt.writeIfChanged;
 
     if (opt.sourceRoot === undefined) {
