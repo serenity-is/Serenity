@@ -3,6 +3,7 @@ using Microsoft.AspNetCore.Mvc.Controllers;
 using Microsoft.AspNetCore.Mvc.Filters;
 using System.IO;
 using System.Text.Json;
+using System.Threading.Tasks;
 
 namespace Serenity.Services;
 
@@ -21,18 +22,22 @@ public class JsonRequestAttribute : ActionFilterAttribute
     }
 
     /// <inheritdoc/>
-    public override void OnActionExecuting(ActionExecutingContext filterContext)
+    public override async Task OnActionExecutionAsync(ActionExecutingContext context, ActionExecutionDelegate next)
     {
-        ArgumentNullException.ThrowIfNull(filterContext);
+        ArgumentNullException.ThrowIfNull(context);
+        ArgumentNullException.ThrowIfNull(next);
 
-        var request = filterContext.HttpContext.Request;
+        var request = context.HttpContext.Request;
         string method = request.Method ?? "";
-        var prms = filterContext.ActionDescriptor
+        var prms = context.ActionDescriptor
             .Parameters
             .Where(x => !x.ParameterType.IsInterface);
 
         if (!prms.Any() || string.IsNullOrEmpty(ParamName))
+        {
+            await next();
             return;
+        }
 
         if (prms.Count() != 1)
         {
@@ -42,8 +47,8 @@ public class JsonRequestAttribute : ActionFilterAttribute
                 throw new ArgumentOutOfRangeException(string.Format(CultureInfo.CurrentCulture,
                     "Method {0} has {1} parameters. [JsonRequest] requires an action method with only one parameter," + 
                     "or a parameter with name '{2}'!",
-                        ((ControllerActionDescriptor)filterContext.ActionDescriptor).ActionName, 
-                        filterContext.ActionDescriptor.Parameters.Count,
+                        ((ControllerActionDescriptor)context.ActionDescriptor).ActionName, 
+                        context.ActionDescriptor.Parameters.Count,
                         ParamName));
         }
 
@@ -55,24 +60,24 @@ public class JsonRequestAttribute : ActionFilterAttribute
             if ((request.ContentType ?? string.Empty)
                 .Contains("application/json", StringComparison.OrdinalIgnoreCase))
             {
-                if (filterContext.HttpContext.Request.Body.CanSeek)
-                    filterContext.HttpContext.Request.Body.Seek(0, SeekOrigin.Begin);
+                if (context.HttpContext.Request.Body.CanSeek)
+                    context.HttpContext.Request.Body.Seek(0, SeekOrigin.Begin);
 
-                var encoding = (string)filterContext.HttpContext.Request.Headers.ContentEncoding ?? "utf-8";
+                var encoding = (string)context.HttpContext.Request.Headers.ContentEncoding ?? "utf-8";
                 object obj;
                 if (string.Equals(encoding, "utf-8", StringComparison.OrdinalIgnoreCase))
                 {
-                    obj = JsonSerializer.Deserialize(filterContext.HttpContext.Request.Body, prm.ParameterType,
+                    obj = await JsonSerializer.DeserializeAsync(context.HttpContext.Request.Body, prm.ParameterType,
                         JSON.Defaults.Strict);
                 }
                 else
                 {
-                    using var sr = new StreamReader(filterContext.HttpContext.Request.Body,
+                    using var sr = new StreamReader(context.HttpContext.Request.Body,
                         Encoding.GetEncoding(encoding)); 
-                    obj = JsonSerializer.Deserialize(sr.ReadToEnd(), prm.ParameterType, JSON.Defaults.Strict);
+                    obj = JsonSerializer.Deserialize(await sr.ReadToEndAsync(), prm.ParameterType, JSON.Defaults.Strict);
                 }
 
-                filterContext.ActionArguments[prm.Name] = obj;
+                context.ActionArguments[prm.Name] = obj;
             }
             else 
             {
@@ -80,7 +85,7 @@ public class JsonRequestAttribute : ActionFilterAttribute
                 if (req != null)
                 {
                     var obj = JsonSerializer.Deserialize(req, prm.ParameterType, JSON.Defaults.Strict);
-                    filterContext.ActionArguments[prm.Name] = obj;
+                    context.ActionArguments[prm.Name] = obj;
                 }
             }
         }
@@ -91,9 +96,11 @@ public class JsonRequestAttribute : ActionFilterAttribute
             if (req != null)
             {
                 var obj = JsonSerializer.Deserialize(req, prm.ParameterType, JSON.Defaults.Strict);
-                filterContext.ActionArguments[prm.Name] = obj;
+                context.ActionArguments[prm.Name] = obj;
             }
         }
+
+        await next();
     }
 
     private string FromFormOrQuery(HttpRequest request, string name)
