@@ -46,7 +46,6 @@ public static partial class Shared
         "vitest.config.ts",
         "StyleCop.Cache",
         "launchSettings.json",
-        "**/wwwroot/bundles/**/*.js.map",
         "**/wwwroot/esm/**/*.js.map",
         "*.tsbuildinfo"
     });

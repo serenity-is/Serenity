@@ -9,7 +9,7 @@ export declare function safeGlobSync(globs: string[], options?: Omit<GlobOptions
 /** Default esbuild options used by TSBuild */
 export declare const tsbuildDefaults: Partial<import("esbuild").BuildOptions>;
 export interface TSBuildOptions extends Partial<import("esbuild").BuildOptions> {
-    /** Enable building of global iife bundles from Modules/Common/bundles/*-bundle(.css|.ts) files to wwwroot/bundles/. Default is false.
+    /** Enable building of global iife bundles from Modules/Common/esm/bundles/*-bundle(.css|.ts) files to wwwroot/esm/bundles/. Default is false.
       * If set to an object, uses the passed options for building global bundles. */
     buildGlobalBundles?: boolean | TSBuildOptions;
     /** Enable bundling of dependencies, default is true */

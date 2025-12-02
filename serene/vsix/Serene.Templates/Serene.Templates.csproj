@@ -26,7 +26,7 @@
     <Content Include="templates\.template.config\**\*">
       <PackagePath>content\templates\.template.config\%(RecursiveDir)%(Filename)%(Extension)</PackagePath>
     </Content>
-    <Content Include="..\..\src\Serene.Web\**\*;" Exclude="**\App_Data\**;**\bin\**;**\dynamic-data\**;**\obj\**;**\node_modules\**;**\PublishProfiles\**;**\TestResults\**;**\*.bak;**\*.log;**\*.orig;**\*.sqlite;**\*.user;**\*.vstemplate;**\*machine.json;**\*.orig;**\*.vstemplate;**\.csslintrc;**\Thumbs.db;**\ErrorLog.db;**\StyleCop.Cache;**\.vs\**;**\.vscode\**;**\bundles\**\*.map;**\esm\**\*.map;**\*.Web\coverage\**;**\*.Web\out\**;**\*.Web\package.json;**\*.Web\package-lock.json;**\*.Web\test\**;**\*.Web\jest.config.js;**\*.Web\vitest*.*">
+    <Content Include="..\..\src\Serene.Web\**\*;" Exclude="**\App_Data\**;**\bin\**;**\dynamic-data\**;**\obj\**;**\node_modules\**;**\PublishProfiles\**;**\TestResults\**;**\*.bak;**\*.log;**\*.orig;**\*.sqlite;**\*.user;**\*.vstemplate;**\*machine.json;**\*.orig;**\*.vstemplate;**\.csslintrc;**\Thumbs.db;**\ErrorLog.db;**\StyleCop.Cache;**\.vs\**;**\.vscode\**;**\esm\**\*.map;**\*.Web\coverage\**;**\*.Web\out\**;**\*.Web\package.json;**\*.Web\package-lock.json;**\*.Web\test\**;**\*.Web\jest.config.js;**\*.Web\vitest*.*">
       <Link>templates\Serene.Web\%(RecursiveDir)%(Filename)%(Extension)</Link>
       <PackagePath>content\templates\Serene.Web\%(RecursiveDir)%(Filename)%(Extension)</PackagePath>
     </Content>

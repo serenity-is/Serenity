@@ -99,7 +99,7 @@ export const tsbuildDefaults: Partial<import("esbuild").BuildOptions> = {
 }
 
 export interface TSBuildOptions extends Partial<import("esbuild").BuildOptions> {
-    /** Enable building of global iife bundles from Modules/Common/bundles/*-bundle(.css|.ts) files to wwwroot/bundles/. Default is false.
+    /** Enable building of global iife bundles from Modules/Common/esm/bundles/*-bundle(.css|.ts) files to wwwroot/esm/bundles/. Default is false.
       * If set to an object, uses the passed options for building global bundles. */
     buildGlobalBundles?: boolean | TSBuildOptions;
 
@@ -161,6 +161,24 @@ export interface TSBuildOptions extends Partial<import("esbuild").BuildOptions> 
     writeIfChanged?: boolean;
 }
 
+function isSplittingEnabled(opt: TSBuildOptions): boolean {
+    if (opt.splitting !== undefined) {
+        return !!opt.splitting;
+    }
+    return (opt.format == null || opt.format === 'esm') && 
+        !process.argv.slice(2).some(x => x == "--nosplit");
+}
+
+function cleanPluginOptions(opt: TSBuildOptions): CleanPluginOptions | null {
+    if (opt.plugins === undefined)
+        return null;
+
+    if ((opt.clean === undefined && isSplittingEnabled(opt)) || opt.clean)
+        return opt.clean === true ? {} : (opt.clean ?? {})
+
+    return null;
+}
+
 /** Processes passed TSBuildOptions options and converts it to options suitable for esbuild */
 export const esbuildOptions = (opt: TSBuildOptions): import("esbuild").BuildOptions => {
 
@@ -208,18 +226,14 @@ export const esbuildOptions = (opt: TSBuildOptions): import("esbuild").BuildOpti
         }
     }
 
-    var splitting = opt.splitting;
-    if (splitting === undefined) {
-        // @ts-ignore
-        splitting = !process.argv.slice(2).some(x => x == "--nosplit") &&
-            (!opt.format || opt.format === 'esm');
-    }
+    const splitting = isSplittingEnabled(opt);
 
-    var plugins = opt.plugins;
+    let plugins = opt.plugins;
     if (plugins === undefined) {
         plugins = [];
-        if ((opt.clean === undefined && splitting) || opt.clean)
-            plugins.push(cleanPlugin(opt.clean === true ? {} : (opt.clean ?? {})));
+        const cleanOpt = cleanPluginOptions(opt);
+        if (cleanOpt != null)
+            plugins.push(cleanPlugin(cleanOpt));
         if (opt.importAsGlobals === undefined || opt.importAsGlobals)
             plugins.push(importAsGlobalsPlugin(opt.importAsGlobals ?? importAsGlobalsMapping));
     }
@@ -232,8 +246,8 @@ export const esbuildOptions = (opt: TSBuildOptions): import("esbuild").BuildOpti
     delete opt.compress;
     delete opt.clean;
     delete opt.importAsGlobals;
+    delete opt.splitting;
     delete opt.writeIfChanged;
-
 
     if (opt.sourceRoot === undefined) {
         if (existsSync('package.json')) {
@@ -266,7 +280,7 @@ export const tsbuildGlobalBundleDefaults: Partial<TSBuildOptions> = {
     ],
     format: "iife",
     importAsGlobals: null,
-    outdir: "wwwroot/bundles/",
+    outdir: "wwwroot/esm/bundles/",
     outbase: "Modules/Common/bundles",
     watch: false,
 }
@@ -282,6 +296,17 @@ export const build = async (opt: TSBuildOptions) => {
         delete opt.buildGlobalBundles;
         console.log("\x1b[32mBuilding global bundles...\x1b[0m");
         await build(buildGlobalBundles);
+
+        let cleanOpt = cleanPluginOptions(opt);
+        if (cleanOpt != null) {
+            opt.clean = {
+                ...cleanOpt,
+                globs: [
+                    "!./bundles/**",
+                    ...cleanOpt.globs ?? cleanPluginDefaults.globs
+                ]
+            }
+        }
     }
 
     if (opt?.npmCopy !== false &&
