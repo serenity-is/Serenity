@@ -7,10 +7,10 @@ namespace Serenity.Services;
 /// </summary>
 public class ServiceEndpointApplicationModelProvider : IApplicationModelProvider
 {
-    private readonly List<IActionModelConvention> actionModelConventions = new()
-    {
+    private readonly List<IActionModelConvention> actionModelConventions =
+    [
         new ServiceEndpointActionModelConvention()
-    };
+    ];
 
     /// <summary>
     /// [ApiController] attribute model provider uses <c>-1000 + 100</c> -

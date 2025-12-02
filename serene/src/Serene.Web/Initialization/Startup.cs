@@ -4,7 +4,6 @@ using Microsoft.AspNetCore.DataProtection;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.HttpOverrides;
-using Microsoft.AspNetCore.Server.Kestrel.Core;
 using Microsoft.Data.SqlClient;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
@@ -55,13 +54,12 @@ public partial class Startup
 
         services.AddAntiforgery(options => options.HeaderName = "X-CSRF-TOKEN");
 
-        var builder = services.AddControllersWithViews(options =>
+        services.AddControllersWithViews(options =>
         {
-            options.Filters.Add(typeof(AutoValidateAntiforgeryIgnoreBearerAttribute));
-            options.Filters.Add(typeof(AntiforgeryCookieResultFilterAttribute));
-            options.Conventions.Add(new ServiceEndpointActionModelConvention());
-            options.ModelMetadataDetailsProviders.Add(new ServiceEndpointBindingMetadataProvider());
+            options.Filters.Add<AutoValidateAntiforgeryIgnoreBearerAttribute>();
+            options.Filters.Add<AntiforgeryCookieResultFilterAttribute>();
         });
+        services.AddServiceEndpointConventions();
 
         services.Configure<JsonOptions>(options => JSON.Defaults.Populate(options.JsonSerializerOptions));
 
