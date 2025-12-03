@@ -35,6 +35,8 @@ public static partial class Shared
             yield return "Serenity.Net.Web";
             yield return "Serenity.Corelib";
             yield return "Serenity.Assets";
+            yield return "Serenity.DomWise";
+            yield return "Serenity.SleekGrid";
         }
     }
 

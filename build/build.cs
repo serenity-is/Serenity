@@ -210,12 +210,14 @@ public sealed class Pack : FrostingTask<BuildContext>
     public override void Run(BuildContext context)
     {
         var packer = new DotNetPacker(context, context.SerenitySrc, context.SerenityNupkg);
+        packer.Pack("../packages/assets/Serenity.Assets.csproj");
+        packer.Pack("../packages/domwise/Serenity.DomWise.csproj");
+        packer.Pack("../packages/sleekgrid/Serenity.SleekGrid.csproj");
+        packer.Pack("../packages/corelib/Serenity.Corelib.csproj");
         packer.Pack("core/Serenity.Net.Core.csproj");
         packer.Pack("services/Serenity.Net.Services.csproj");
         packer.Pack("web/Serenity.Net.Web.csproj");
         packer.Pack("codegenerator/Serenity.Net.CodeGenerator.csproj");
-        packer.Pack("assets/Serenity.Assets.csproj");
-        packer.Pack("../packages/corelib/Serenity.Corelib.csproj");
     }
 }
 
