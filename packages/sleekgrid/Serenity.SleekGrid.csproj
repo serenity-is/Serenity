@@ -3,13 +3,9 @@
     <Description>NuGet version of @serenity-is/sleekgrid NPM package</Description>
   </PropertyGroup>
   <ItemGroup>
-      <Content Update="$(MSBuildProjectDirectory)\docs\**\*" CopyToOutputDirectory="Never" CopyToPublishDirectory="Never" Pack="false" />
+    <Content Update="$(MSBuildProjectDirectory)\docs\**\*" CopyToOutputDirectory="Never" CopyToPublishDirectory="Never" Pack="false" />
+    <ProjectReference Include="..\domwise\Serenity.DomWise.csproj">
+      <ReferenceOutputAssembly>false</ReferenceOutputAssembly>
+    </ProjectReference>
   </ItemGroup>
-  <Target Name="CreateNodeModules" AfterTargets="NpmInstall">
-    <MakeDir Directories="$(MSBuildProjectDirectory)\node_modules" Condition="!Exists('$(MSBuildProjectDirectory)\node_modules')" />
-    <Touch AlwaysCreate="true" Files="$(MSBuildProjectDirectory)\node_modules\.keep" Condition="!Exists('$(MSBuildProjectDirectory)\node_modules\.keep')" />
-  </Target>
-  <Target Name="RunTSBuild" Condition="'$(SkipNodeScripts)' != 'true'" BeforeTargets="ResolveProjectStaticWebAssets" DependsOnTargets="NpmInstall">
-    <Exec Command="pnpm build" />
-  </Target>
 </Project>

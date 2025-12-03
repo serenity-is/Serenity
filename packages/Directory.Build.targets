@@ -11,4 +11,11 @@
     <None Update="$(MSBuildProjectDirectory)\coverage\**\*;$(MSBuildProjectDirectory)\out\**\*;$(MSBuildProjectDirectory)\jest*.js;$(MSBuildProjectDirectory)\vitest*.*;$(MSBuildProjectDirectory)\tsbuild*.js;$(MSBuildProjectDirectory)\test\**\*" CopyToOutputDirectory="Never" CopyToPublishDirectory="Never" Pack="false" />
     <None Include="$(MSBuildProjectDirectory)\dist\**" CopyToOutputDirectory="Never" CopyToPublishDirectory="Never" Pack="true" PackagePath="dist\" />
   </ItemGroup>
+  <Target Name="CreateNodeModules" AfterTargets="NpmInstall" Condition="'$(CreateNodeModulesDirectory)' == 'true'">
+    <MakeDir Directories="$(MSBuildProjectDirectory)\node_modules" Condition="!Exists('$(MSBuildProjectDirectory)\node_modules')" />
+    <Touch AlwaysCreate="true" Files="$(MSBuildProjectDirectory)\node_modules\.keep" Condition="!Exists('$(MSBuildProjectDirectory)\node_modules\.keep')" />
+  </Target>
+  <Target Name="RunTSBuild" BeforeTargets="ResolveProjectStaticWebAssets" DependsOnTargets="NpmInstall" Condition="'$(RunTSBuild)' == 'true'">
+    <Exec Command="pnpm build" />
+  </Target>  
 </Project>

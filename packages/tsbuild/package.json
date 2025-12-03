@@ -30,13 +30,6 @@
   ],
   "license": "MIT",
   "repository": "https://github.com/serenity-is/serenity/packages/tsbuild",
-  "scripts": {
-    "build": "esbuild src/index.ts --bundle --format=esm --platform=node --outdir=dist --external:glob --external:esbuild",
-    "dts": "tsc",
-    "prepublishOnly": "pnpm build && pnpm run test --coverage && pnpm dts",
-    "test": "pnpm build && vitest run",
-    "tsc": "tsc"
-  },  
   "type": "module",
   "types": "dist/index.d.ts"
 }

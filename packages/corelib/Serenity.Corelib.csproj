@@ -6,7 +6,4 @@
     <ProjectReference Include="..\domwise\Serenity.DomWise.csproj" />
     <ProjectReference Include="..\sleekgrid\Serenity.SleekGrid.csproj" />
   </ItemGroup>
-  <Target Name="RunTSBuild" Condition="'$(SkipNodeScripts)' != 'true'" BeforeTargets="ResolveProjectStaticWebAssets" DependsOnTargets="NpmInstall">
-    <Exec Command="pnpm build" />
-  </Target>
 </Project>

@@ -15,14 +15,6 @@
       ]
     },
     {
-      "library": "jquery@3.7.1",
-      "destination": "wwwroot/jquery",
-      "files": [
-        "jquery.js",
-        "jquery.min.js"
-      ]
-    },
-    {
       "library": "mousetrap@1.6.5",
       "destination": "wwwroot/mousetrap",
       "files": [

@@ -9,8 +9,7 @@
     "mousetrap": "1.6.5"
   },
   "scripts": {
-    "build": "node build/build",
-    "prepublishOnly": "pnpm build"
-  },
-  "type": "module"
+    "build": "node build/build.mjs",
+    "prepublishOnly": "node build/build.mjs"
+  }
 }
