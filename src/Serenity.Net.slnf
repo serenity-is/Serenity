@@ -2,12 +2,12 @@
   "solution": {
     "path": "..\\Serenity.slnx",
     "projects": [
+      "packages\\assets\\Serenity.Assets.csproj",
       "packages\\corelib\\Serenity.Corelib.csproj",
       "packages\\domwise\\Serenity.DomWise.csproj",
       "packages\\sleekgrid\\Serenity.SleekGrid.csproj",
       "packages\\test-utils\\test-utils.esproj",
       "packages\\tsbuild\\tsbuild.esproj",
-      "src\\assets\\Serenity.Assets.csproj",
       "src\\codegenerator\\Serenity.Net.CodeGenerator.csproj",
       "src\\core\\Serenity.Net.Core.csproj",
       "src\\services\\Serenity.Net.Services.csproj",

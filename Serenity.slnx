@@ -21,8 +21,6 @@
     <File Path="src/RestoreNpmPackages.targets" />
     <File Path="src/web/Serenity.Net.Web.targets" />
     <File Path="tests/Test.Build.props" />
-    <Project Path="packages/domwise/Serenity.DomWise.csproj" />
-    <Project Path="src/assets/Serenity.Assets.csproj" />
     <Project Path="src/codegenerator/Serenity.Net.CodeGenerator.csproj" />
     <Project Path="src/core/Serenity.Net.Core.csproj" />
     <Project Path="src/services/Serenity.Net.Services.csproj" />
@@ -33,7 +31,9 @@
   <Folder Name="/serenity/npm-packages/">
     <File Path="packages/Directory.Build.props" />
     <File Path="packages/Directory.Build.targets" />
+    <Project Path="packages/assets/Serenity.Assets.csproj" />
     <Project Path="packages/corelib/Serenity.Corelib.csproj" />
+    <Project Path="packages/domwise/Serenity.DomWise.csproj" />
     <Project Path="packages/sleekgrid/Serenity.SleekGrid.csproj" />
     <Project Path="packages/test-utils/test-utils.esproj" />
     <Project Path="packages/tsbuild/tsbuild.esproj" />

@@ -5,10 +5,5 @@
   </PropertyGroup>
   <ItemGroup>
     <Using Remove="*" />
-    <None Include="Content\**\*.*" Exclude="*.back;*.orig;*.log">
-      <Pack>true</Pack>
-      <PackagePath>content\Content\</PackagePath>
-      <IncludeInPackage>true</IncludeInPackage>
-    </None>
   </ItemGroup>
 </Project>

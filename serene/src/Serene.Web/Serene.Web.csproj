@@ -42,9 +42,9 @@
     <!--#endif-->
   </ItemGroup>
   <ItemGroup Condition="'$(UseProjectRefs)' != 'false'">
-    <ProjectReference Include="$(SerenitySrc)assets\Serenity.Assets.csproj" />
-    <ProjectReference Include="$(SerenitySrc)web\Serenity.Net.Web.csproj" />
+    <ProjectReference Include="$(SerenitySrc)..\packages\Serenity.Assets.csproj" />
     <ProjectReference Include="$(SerenitySrc)..\packages\corelib\Serenity.Corelib.csproj" />
+    <ProjectReference Include="$(SerenitySrc)web\Serenity.Net.Web.csproj" />
     <ProjectReference Include="$(CommonSrc)extensions\Serenity.Extensions.csproj" />
     <ProjectReference Include="$(CommonSrc)demo.northwind\Serenity.Demo.Northwind.csproj" />
     <ProjectReference Include="$(CommonSrc)demo.basicsamples\Serenity.Demo.BasicSamples.csproj" />
