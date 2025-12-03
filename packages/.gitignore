@@ -4,5 +4,6 @@ coverage/
 out/
 /*/dist/**/*.js
 /*/dist/**/*.map
+/assets/wwwroot/bootstrap/**/*.css
 /*/wwwroot/**/*.js
 /*/wwwroot/**/*.map
