@@ -2,5 +2,10 @@
   "name": "@serenity-is/assets",
   "exports": {
     "./*": "./wwwroot/*"
-  }
+  },
+  "scripts": {
+    "build": "node build/build",
+    "prepublishOnly": "pnpm build"
+  },
+  "type": "module"
 }

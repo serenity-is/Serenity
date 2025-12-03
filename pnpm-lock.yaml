@@ -122,6 +122,8 @@ importers:
         specifier: workspace:*
         version: link:../../../packages/corelib
 
+  packages/assets: {}
+
   packages/corelib:
     dependencies:
       '@serenity-is/sleekgrid':
@@ -155,7 +157,7 @@ importers:
     dependencies:
       '@serenity-is/assets':
         specifier: workspace:*
-        version: link:../../../src/assets
+        version: link:../../../packages/assets
       '@serenity-is/corelib':
         specifier: workspace:*
         version: link:../../../packages/corelib
@@ -211,8 +213,6 @@ importers:
       test-utils:
         specifier: workspace:*
         version: link:../../../packages/test-utils
-
-  src/assets: {}
 
 packages:
 

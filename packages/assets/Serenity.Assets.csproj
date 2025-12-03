@@ -6,4 +6,11 @@
   <ItemGroup>
     <Using Remove="*" />
   </ItemGroup>
+  <Target Name="CreateNodeModules" AfterTargets="NpmInstall">
+    <MakeDir Directories="$(MSBuildProjectDirectory)\node_modules" Condition="!Exists('$(MSBuildProjectDirectory)\node_modules')" />
+    <Touch AlwaysCreate="true" Files="$(MSBuildProjectDirectory)\node_modules\.keep" Condition="!Exists('$(MSBuildProjectDirectory)\node_modules\.keep')" />
+  </Target>
+  <Target Name="RunTSBuild" Condition="'$(SkipNodeScripts)' != 'true'" BeforeTargets="ResolveProjectStaticWebAssets" DependsOnTargets="NpmInstall">
+    <Exec Command="pnpm build" />
+  </Target>  
 </Project>
