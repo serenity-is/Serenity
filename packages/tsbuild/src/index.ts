@@ -166,7 +166,7 @@ function isSplittingEnabled(opt: TSBuildOptions): boolean {
         return !!opt.splitting;
     }
     return (opt.format == null || opt.format === 'esm') && 
-        !process.argv.slice(2).some(x => x == "--nosplit");
+        !((globalThis as any).process.argv as string[]).slice(2).some(x => x == "--nosplit");
 }
 
 function cleanPluginOptions(opt: TSBuildOptions): CleanPluginOptions | null {

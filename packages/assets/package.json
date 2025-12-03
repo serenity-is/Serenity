@@ -3,6 +3,11 @@
   "exports": {
     "./*": "./wwwroot/*"
   },
+  "devDependencies": {
+    "bootstrap": "5.3.8",
+    "jquery": "3.7.1",
+    "mousetrap": "1.6.5"
+  },
   "scripts": {
     "build": "node build/build",
     "prepublishOnly": "pnpm build"
