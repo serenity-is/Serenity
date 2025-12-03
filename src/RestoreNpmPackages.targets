@@ -1,15 +1,19 @@
 <Project>
+  <PropertyGroup>
+    <NpmInstallArgs Condition="'$(NpmInstallArgs)' == ''">--filter !*.web</NpmInstallArgs>
+  </PropertyGroup>
   <Target Name="ComputeNpmPackageMetadata">
     <ItemGroup>
       <NpmPackageFile>
         <StampFile>$([System.IO.Path]::Combine('%(RootDir)%(Directory)', 'node_modules', '.install-stamp'))</StampFile>
         <WorkingDir>%(RootDir)%(Directory)</WorkingDir>
         <NodeModulesDir>%(RootDir)%(Directory)\node_modules\</NodeModulesDir>
-        <InstallCommand>pnpm install</InstallCommand>
+        <InstallCommand>pnpm install $(NpmInstallArgs)</InstallCommand>
       </NpmPackageFile>
     </ItemGroup>
   </Target>
-  <Target Name="NpmInstall" Condition="'$(SkipNodeScripts)' != 'true'" DependsOnTargets="ComputeNpmPackageMetadata" Inputs="@(NpmPackageFile)" Outputs="%(NpmPackageFile.StampFile)">
+  <Target Name="NpmInstall" Condition="'$(SkipNodeScripts)' != 'true'" DependsOnTargets="ComputeNpmPackageMetadata" AfterTargets="ResolveProjectReferences"
+    Inputs="@(NpmPackageFile)" Outputs="%(NpmPackageFile.StampFile)">
     <Message Text="Installing NPM packages for $(ProjectName)..." Importance="high" />  
     <Exec Command="%(NpmPackageFile.InstallCommand)" WorkingDirectory="%(WorkingDir)" />
     <Touch Files="%(NpmPackageFile.StampFile)" AlwaysCreate="true" Condition="Exists('%(NodeModulesDir)')" ContinueOnError="true" />
