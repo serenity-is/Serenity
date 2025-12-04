@@ -1,4 +1,5 @@
 using System.Text.Json;
+using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
 
 namespace Serenity.Services;
@@ -35,9 +36,9 @@ public class ResultWithStatus<TResponse>(int statusCode, TResponse data) : Statu
     public TResponse Data { get; set; } = data;
 
     /// <inheritdoc/>
-    public override void ExecuteResult(ActionContext context)
+    public override async Task ExecuteResultAsync(ActionContext context)
     {
-        base.ExecuteResult(context);
+        await base.ExecuteResultAsync(context);
 
         ArgumentNullException.ThrowIfNull(context);
 
@@ -46,12 +47,8 @@ public class ResultWithStatus<TResponse>(int statusCode, TResponse data) : Statu
 
         if (ContentEncoding != null)
             response.Headers.ContentEncoding = ContentEncoding.WebName;
- 
+
         if (Data != null)
-        {
-            using var writer = new Utf8JsonWriter(response.Body);
-            JsonSerializer.Serialize(writer, Data, SerializerOptions);
-            writer.Flush();
-        }
+            await JsonSerializer.SerializeAsync(response.Body, Data, SerializerOptions);
     }
 }
