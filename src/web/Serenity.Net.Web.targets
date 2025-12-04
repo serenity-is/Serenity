@@ -1,8 +1,6 @@
 <Project>
   <PropertyGroup>
-    <DotNetSergen Condition="'$(DotNetSergen)' == '' And Exists('$(MSBuildThisFileDirectory)..\..\artifacts\sergen\sergen')">$(MSBuildThisFileDirectory)..\..\artifacts\sergen\sergen</DotNetSergen>
-    <DotNetSergen Condition="'$(DotNetSergen)' == '' And Exists('$(MSBuildThisFileDirectory)..\..\artifacts\sergen\sergen.exe')">$(MSBuildThisFileDirectory)..\..\artifacts\sergen\sergen.exe</DotNetSergen>
-    <DotNetSergen Condition="'$(DotNetSergen)' == '' And Exists('$(MSBuildThisFileDirectory)..\codegenerator\Serenity.Net.CodeGenerator.csproj')">dotnet run --project $(MSBuildThisFileDirectory)..\codegenerator\Serenity.Net.CodeGenerator.csproj -- </DotNetSergen>
+    <DotNetSergen Condition="'$(DotNetSergen)' == '' And Exists('$(MSBuildThisFileDirectory)..\codegenerator\Serenity.Net.CodeGenerator.csproj')">dotnet run --project $(MSBuildThisFileDirectory)..\codegenerator\Serenity.Net.CodeGenerator.csproj --artifacts-path $(MSBuildThisFileDirectory)..\..\artifacts\sergen\$(MSBuildProjectName) -- </DotNetSergen>
     <DotNetSergen Condition="'$(DotNetSergen)' == ''">dotnet sergen</DotNetSergen>
   </PropertyGroup>
   <UsingTask TaskName="RestoreNodeTypesTask" TaskFactory="RoslynCodeTaskFactory" AssemblyFile="$(MSBuildToolsPath)\Microsoft.Build.Tasks.Core.dll" >
@@ -90,7 +88,6 @@
     <Using Include="Serenity.Abstractions" />
     <Using Include="Serenity.ComponentModel" />
     <Using Include="Serenity.Data" />
-
     <Using Include="Serenity.Data.Mapping" />
     <Using Include="Serenity.Extensions" />
     <Using Include="Serenity.Navigation" />

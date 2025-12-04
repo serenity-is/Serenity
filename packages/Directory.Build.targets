@@ -15,15 +15,15 @@
     <MakeDir Directories="$(MSBuildProjectDirectory)\node_modules" Condition="!Exists('$(MSBuildProjectDirectory)\node_modules')" />
     <Touch AlwaysCreate="true" Files="$(MSBuildProjectDirectory)\node_modules\.keep" Condition="!Exists('$(MSBuildProjectDirectory)\node_modules\.keep')" />
   </Target>
-  <Target Name="RunTSBuild" BeforeTargets="ResolveProjectStaticWebAssets" DependsOnTargets="NpmInstall" Condition="'$(RunTSBuild)' == 'true'">
+  <Target Name="CompileProjectTSConfig" BeforeTargets="ResolveProjectStaticWebAssets" DependsOnTargets="NpmInstall" Condition="'$(RunTSBuild)' == 'true'">
     <ItemGroup>
       <_ContentBeforeTSBuild Include="wwwroot\**\*" />
     </ItemGroup>
     <Exec Command="pnpm build" />
     <ItemGroup>
       <_ContentAfterTSBuild Include="wwwroot\**\*" Exclude="@(_ContentBeforeTSBuild)" />
-      <Content Include="@(_ContentAfterTSBuild)" Exclude="@(Content)" CopyToOutputDirectory="PreserveNewest" CopyToPublishDirectory="PreserveNewest" ExcludeFromSingleFile="true" />
-      <_ContentBeforeTSBuild Remove="@(_ContentAfterTSBuild)" />
+      <Content Include="@(_ContentAfterTSBuild)" Exclude="@(Content)" CopyToOutputDirectory="Never" CopyToPublishDirectory="PreserveNewest" ExcludeFromSingleFile="true" />
+      <_ContentBeforeTSBuild Remove="wwwroot\**\*" />
       <Content Remove="@(_ContentBeforeTSBuild)" />
     </ItemGroup>
   </Target>  

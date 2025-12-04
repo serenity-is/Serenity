@@ -2,7 +2,4 @@
   <PropertyGroup>
     <DefaultItemExcludes>$(DefaultItemExcludes);out\**</DefaultItemExcludes>
   </PropertyGroup>
-  <ItemGroup>
-    <ProjectReference Include="..\tsbuild\tsbuild.csproj" ReferenceOutputAssembly="false" PrivateAssets="All" IncludeAssets="none" ExcludeAssets="all" />
-  </ItemGroup>
 </Project>

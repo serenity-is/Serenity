@@ -2,6 +2,5 @@
   <ItemGroup>
     <PackageReference Include="Serenity.Demo.Northwind" Version="$(Version)" Condition="!Exists('..\demo.northwind\Serenity.Demo.Northwind.csproj')" />
     <ProjectReference Include="..\demo.northwind\Serenity.Demo.Northwind.csproj" Condition="Exists('..\demo.northwind\Serenity.Demo.Northwind.csproj')" />
-    <ProjectReference Include="$(SerenitySrc)codegenerator\Serenity.Net.CodeGenerator.csproj" ReferenceOutputAssembly="false" PrivateAssets="All" IncludeAssets="none" ExcludeAssets="all" />
   </ItemGroup>
 </Project>

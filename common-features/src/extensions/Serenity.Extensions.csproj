@@ -7,7 +7,5 @@
     <PackageReference Include="FluentMigrator.Extensions.SqlServer" Version="7.1.0" />
     <PackageReference Include="MailKit" Version="4.14.1" />
     <PackageReference Include="nClam" Version="9.0.0" />
-    <ProjectReference Include="$(SerenitySrc)..\packages\corelib\Serenity.Corelib.csproj" ReferenceOutputAssembly="false" PrivateAssets="All" IncludeAssets="none" ExcludeAssets="all" />
-    <ProjectReference Include="$(SerenitySrc)codegenerator\Serenity.Net.CodeGenerator.csproj" ReferenceOutputAssembly="false" PrivateAssets="All" IncludeAssets="none" ExcludeAssets="all" />
   </ItemGroup>
 </Project>

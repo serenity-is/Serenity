@@ -26,10 +26,4 @@
     <PackageReference Include="Microsoft.Extensions.FileSystemGlobbing" Version="10.0.0" />
     <PackageReference Include="Spectre.Console" Version="0.53.0" />
   </ItemGroup>
-  <Target Name="CopySergenToArtifacts" AfterTargets="Pack">
-    <ItemGroup>
-      <_OutputFilesToCopy Include="$(OutDir)\**\*" />
-    </ItemGroup>
-    <Copy SourceFiles="@(_OutputFilesToCopy)" DestinationFolder="$(ArtifactsPath)\sergen\%(RecursiveDir)" UseHardlinksIfPossible="true" SkipUnchangedFiles="true" OverwriteReadOnlyFiles="true" />
-  </Target>
 </Project>

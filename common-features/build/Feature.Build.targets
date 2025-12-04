@@ -12,15 +12,16 @@
   <Target Name="CompileProjectTSConfig" DependsOnTargets="NpmInstall;RestoreNodeTypes" BeforeTargets="ResolveProjectStaticWebAssets" AfterTargets="ResolveProjectReferences"
           Condition="Exists('tsconfig.json') And '$(RunTSBuild)' == 'true'">
     <ItemGroup>
-      <CleanedEsmFiles Include="wwwroot\esm\**" />
+      <_ContentBeforeTSBuild Include="wwwroot\**\*" />
     </ItemGroup>
     <Message Text="Executing TypeScript compiler for $(ProjectName)..." Importance="high"></Message>
     <Exec Command="node &quot;$(TSJavaScriptFile.Replace('build\\..\tools\', 'tools\'))&quot; -p ./tsconfig.json" Condition="!Exists('tsbuild.js')" ContinueOnError="true" />
     <Exec Command="pnpm build" Condition="Exists('tsbuild.js')" ContinueOnError="true" />
     <ItemGroup>
-      <CleanedEsmFiles Remove="wwwroot\esm\**" />
-      <Content Remove="@(CleanedEsmFiles)" />
-      <Content Include="wwwroot\esm\**\*.js;wwwroot\esm\**\*.css;wwwroot\esm\**\*.map" Exclude="@(Content)" CopyToOutputDirectory="Never" CopyToPublishDirectory="PreserveNewest" ExcludeFromSingleFile="true" />
+      <_ContentAfterTSBuild Include="wwwroot\**\*" Exclude="@(_ContentBeforeTSBuild)" />
+      <Content Include="@(_ContentAfterTSBuild)" Exclude="@(Content)" CopyToOutputDirectory="Never" CopyToPublishDirectory="PreserveNewest" ExcludeFromSingleFile="true" />
+      <_ContentBeforeTSBuild Remove="wwwroot\**\*" />
+      <Content Remove="@(_ContentBeforeTSBuild)" />
     </ItemGroup>
   </Target>
 </Project>
