@@ -9,11 +9,11 @@
     <Exec Command="dotnet tool restore" ContinueOnError="true" />
     <Touch Files="$(DotnetToolRestoreStamp)" AlwaysCreate="true" />
   </Target>
-  <Target Name="TransformMvc" BeforeTargets="BeforeBuild" DependsOnTargets="$(TransformDependsOn)"
+  <Target Name="TransformMvc" AfterTargets="ResolveProjectReferences" DependsOnTargets="$(TransformDependsOn)"
           Condition="'$(SergenTransform)' == 'mvc'">
     <Exec Command="$(DotNetSergen) mvc $(SergenTransformArgs)" ContinueOnError="true" />
   </Target>
-  <Target Name="TransformMvct" BeforeTargets="BeforeBuild" DependsOnTargets="$(TransformDependsOn)"
+  <Target Name="TransformMvct" AfterTargets="ResolveProjectReferences" DependsOnTargets="$(TransformDependsOn)"
           Condition="'$(SergenTransform)' == 'mvct' OR '$(SergenTransform)' == 'all'">
     <Exec Command="$(DotNetSergen) mvct $(SergenTransformArgs)" ContinueOnError="true" />
   </Target>

@@ -6,5 +6,6 @@
   <ItemGroup>
     <PackageReference Include="Serenity.Extensions" Version="$(Version)" Condition="!Exists('..\extensions\Serenity.Extensions.csproj')" />
     <ProjectReference Include="..\extensions\Serenity.Extensions.csproj" Condition="Exists('..\extensions\Serenity.Extensions.csproj')" />
+    <ProjectReference Include="$(SerenitySrc)codegenerator\Serenity.Net.CodeGenerator.csproj" ReferenceOutputAssembly="false"  PrivateAssets="All" IncludeAssets="none" ExcludeAssets="all" />
   </ItemGroup>
 </Project>

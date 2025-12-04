@@ -4,8 +4,6 @@
   </PropertyGroup>
   <ItemGroup>
     <Content Update="$(MSBuildProjectDirectory)\docs\**\*" CopyToOutputDirectory="Never" CopyToPublishDirectory="Never" Pack="false" />
-    <ProjectReference Include="..\assets\Serenity.Assets.csproj">
-      <ReferenceOutputAssembly>false</ReferenceOutputAssembly>
-    </ProjectReference>
+    <ProjectReference Include="..\tsbuild\tsbuild.csproj" ReferenceOutputAssembly="false" PrivateAssets="All" IncludeAssets="none" ExcludeAssets="all" />
   </ItemGroup>
 </Project>

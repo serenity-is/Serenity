@@ -1,10 +1,8 @@
-<Project Sdk="Microsoft.NET.Sdk.Razor">
+﻿<Project Sdk="Microsoft.NET.Sdk">
   <PropertyGroup>
-    <TargetFramework>net10.0</TargetFramework>
-    <StaticWebAssetBasePath>/Serenity.Assets</StaticWebAssetBasePath>
+    <DefaultItemExcludes>$(DefaultItemExcludes);out\**</DefaultItemExcludes>
   </PropertyGroup>
   <ItemGroup>
-    <Using Remove="*" />
     <ProjectReference Include="..\tsbuild\tsbuild.csproj" ReferenceOutputAssembly="false" PrivateAssets="All" IncludeAssets="none" ExcludeAssets="all" />
   </ItemGroup>
 </Project>
