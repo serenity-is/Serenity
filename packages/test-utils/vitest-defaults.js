@@ -62,7 +62,7 @@ function tryProject(root, name) {
     let releaseExists = !debugExists && existsSync(releaseDll);
     if (!debugExists && !releaseExists) {
         console.info("Building " + csproj + "...");
-        execSync(`dotnet build ${csproj}`, { timeout: 120000 });
+        execSync(`dotnet build ${csproj} --p:SkipTSBuild=true`, { timeout: 120000 });
     }
 
     debugExists = existsSync(debugDll);
