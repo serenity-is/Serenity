@@ -7,7 +7,7 @@
     <DefaultItemExcludes>$(DefaultItemExcludes);package*.json;sergen.json;tsconfig.json;tsconfig.base.json;libman.json</DefaultItemExcludes>
     <EmbedUntrackedSources>true</EmbedUntrackedSources>
     <ESBuild>$(MSBuildProjectDirectory)\node_modules\.bin\esbuild</ESBuild>
-    <GenerateDocumentationFile>true</GenerateDocumentationFile>
+    <GenerateDocumentationFile Condition="'$(GenerateDocumentationFile)' == ''">true</GenerateDocumentationFile>
     <LangVersion>latest</LangVersion>
     <PlatformTarget>AnyCPU</PlatformTarget>
     <ProduceReferenceAssembly>true</ProduceReferenceAssembly>

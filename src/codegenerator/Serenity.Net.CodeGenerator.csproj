@@ -9,6 +9,7 @@
     <TreatWarningsAsErrors>true</TreatWarningsAsErrors>
     <PackAsTool>true</PackAsTool>
     <PackageId>sergen</PackageId>
+    <DefineConstants Condition="'$(NoDbProviders)' == 'true'">$(DefineConstants);NoDbProviders</DefineConstants>
   </PropertyGroup>
   <ItemGroup>
     <EmbeddedResource Include="Templates\*.scriban" />
@@ -18,7 +19,7 @@
     <InternalsVisibleTo Include="Serenity.Net.CodeGenerator.Tests" />
     <Compile Include="..\typescript\**\*.cs" Link="TypeScript\%(RecursiveDir)%(Filename)%(Extension)" />
   </ItemGroup>
-  <Import Project="$(MSBuildThisFileDirectory)..\CommonDbProviders.props" />
+  <Import Project="$(MSBuildThisFileDirectory)..\CommonDbProviders.props" Condition="'$(NoDbProviders)' != 'true'" />
   <ItemGroup>
     <PackageReference Include="Scriban" Version="6.5.0" />
     <PackageReference Include="Mono.Cecil" Version="0.11.6" />

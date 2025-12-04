@@ -43,6 +43,7 @@ public partial class GenerateCommand
 
     private static void RegisterSqlProviders()
     {
+#if !NoDbProviders
         DbProviderFactories.RegisterFactory("Microsoft.Data.SqlClient",
             Microsoft.Data.SqlClient.SqlClientFactory.Instance);
         DbProviderFactories.RegisterFactory("System.Data.SqlClient",
@@ -57,6 +58,7 @@ public partial class GenerateCommand
             MySqlConnector.MySqlConnectorFactory.Instance);
         DbProviderFactories.RegisterFactory("Oracle.ManagedDataAccess.Client", 
             Oracle.ManagedDataAccess.Client.OracleClientFactory.Instance);
+#endif
     }
 
     private static ConnectionStringOptions ParseConnectionStrings(IFileSystem fileSystem,
