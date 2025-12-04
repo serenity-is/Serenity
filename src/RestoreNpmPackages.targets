@@ -1,7 +1,21 @@
 <Project>
   <PropertyGroup>
     <NpmInstallArgs Condition="'$(NpmInstallArgs)' == ''">--filter !*.web</NpmInstallArgs>
+    <NpmInstallMutex Condition="'$(NpmInstallMutex)' == ''">Global\SerenityNpmInstallMutex</NpmInstallMutex>
   </PropertyGroup>
+  <UsingTask TaskName="MutexExec" TaskFactory="RoslynCodeTaskFactory" AssemblyFile="$(MSBuildToolsPath)\Microsoft.Build.Tasks.Core.dll" >
+    <ParameterGroup>
+      <MutexName ParameterType="System.String" />
+      <MutexTimeout ParameterType="System.Int32" />
+      <Command ParameterType="System.String" />
+      <WorkingDirectory ParameterType="System.String" />
+      <Timeout ParameterType="System.Int32" />
+    </ParameterGroup>
+    <Task>
+      <Reference Include="$(MSBuildToolsPath)\Microsoft.Build.Tasks.Core.dll" />
+      <Code Type="Class" Language="cs" Source="$(MSBuildThisFileDirectory)MutexExecTask.cs" />
+    </Task>
+  </UsingTask>  
   <Target Name="ComputeNpmPackageMetadata">
     <ItemGroup>
       <NpmPackageFile>
@@ -14,8 +28,8 @@
   </Target>
   <Target Name="NpmInstall" Condition="'$(SkipNodeScripts)' != 'true'" DependsOnTargets="ComputeNpmPackageMetadata" AfterTargets="ResolveProjectReferences"
     Inputs="@(NpmPackageFile)" Outputs="%(NpmPackageFile.StampFile)">
-    <Message Text="Installing NPM packages for $(ProjectName)..." Importance="high" />    
-    <Exec Command="%(NpmPackageFile.InstallCommand)" WorkingDirectory="%(WorkingDir)" />
+    <Message Text="Installing NPM packages for $(ProjectName)..." Importance="high" />
+    <MutexExec MutexName="$(NpmInstallMutex)" MutexTimeout="60000" Command="%(NpmPackageFile.InstallCommand)" WorkingDirectory="%(WorkingDir)" />
     <Touch Files="%(NpmPackageFile.StampFile)" AlwaysCreate="true" Condition="Exists('%(NodeModulesDir)')" ContinueOnError="true" />
   </Target>
 </Project>

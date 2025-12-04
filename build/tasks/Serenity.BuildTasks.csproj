@@ -16,6 +16,7 @@
 
   <ItemGroup>
     <PackageReference Include="Microsoft.Build.Utilities.Core" Version="18.0.2" PrivateAssets="all" ExcludeAssets="Runtime" />
+    <PackageReference Include="Microsoft.Build.Tasks.Core" Version="18.0.2" PrivateAssets="all" ExcludeAssets="Runtime" />
   </ItemGroup>
 
   <ItemGroup>
@@ -23,6 +24,7 @@
   </ItemGroup>
 
   <ItemGroup>
+    <Compile Include="..\..\src\MutexExecTask.cs" Link="MutexExecTask.cs" />
     <Compile Include="..\..\src\web\RestoreNodeTypesTask.cs" Link="RestoreNodeTypesTask.cs" />
   </ItemGroup>
 
