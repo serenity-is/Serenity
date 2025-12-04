@@ -29,7 +29,7 @@
   </Target>
   <Target Name="NpmInstall" Condition="'$(SkipTSBuild)' != 'true'" DependsOnTargets="ComputeNpmPackageMetadata" AfterTargets="ResolveProjectReferences"
     Inputs="@(NpmPackageFile)" Outputs="%(NpmPackageFile.StampFile)">
-    <Message Text="Installing NPM packages for $(ProjectName) with args $(NpmInstallArgs)..." Importance="high" />
+    <Message Text="Installing NPM packages for $(ProjectName)... (args: $(NpmInstallArgs))" Importance="high" />
     <MutexExec MutexName="$(NpmInstallMutex)" MutexTimeout="60000" Command="%(NpmPackageFile.InstallCommand)" WorkingDirectory="%(WorkingDir)" />
     <Touch Files="%(NpmPackageFile.StampFile)" AlwaysCreate="true" Condition="Exists('%(NodeModulesDir)')" ContinueOnError="true" />
   </Target>
