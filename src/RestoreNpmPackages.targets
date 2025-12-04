@@ -26,7 +26,7 @@
       </NpmPackageFile>
     </ItemGroup>
   </Target>
-  <Target Name="NpmInstall" Condition="'$(SkipNodeScripts)' != 'true'" DependsOnTargets="ComputeNpmPackageMetadata" AfterTargets="ResolveProjectReferences"
+  <Target Name="NpmInstall" Condition="'$(SkipTSBuild)' != 'true'" DependsOnTargets="ComputeNpmPackageMetadata" AfterTargets="ResolveProjectReferences"
     Inputs="@(NpmPackageFile)" Outputs="%(NpmPackageFile.StampFile)">
     <Message Text="Installing NPM packages for $(ProjectName)..." Importance="high" />
     <MutexExec MutexName="$(NpmInstallMutex)" MutexTimeout="60000" Command="%(NpmPackageFile.InstallCommand)" WorkingDirectory="%(WorkingDir)" />

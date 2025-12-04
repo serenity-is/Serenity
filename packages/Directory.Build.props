@@ -9,8 +9,8 @@
     <ArtifactsPath>$(MSBuildThisFileDirectory)..\artifacts</ArtifactsPath>    
     <UseArtifactsOutput>true</UseArtifactsOutput>
     <CreateNodeModulesDirectory Condition="'$(CreateNodeModulesDirectory)' == ''">true</CreateNodeModulesDirectory>
-    <SkipNodeScripts Condition="'$(SkipNodeScripts)' == '' And '$(DesignTimeBuild)' == 'true'">true</SkipNodeScripts>
-    <RunTSBuild Condition="'$(RunTSBuild)' == '' And '$(SkipNodeScripts)' != 'true'">true</RunTSBuild>
+    <SkipTSBuild Condition="'$(SkipTSBuild)' == '' And '$(DesignTimeBuild)' == 'true'">true</SkipTSBuild>
+    <RunTSBuild Condition="'$(RunTSBuild)' == '' And '$(SkipTSBuild)' != 'true'">true</RunTSBuild>
   </PropertyGroup>
   <ItemGroup>
     <NpmPackageFile Include="$(MSBuildProjectDirectory)\package.json" />

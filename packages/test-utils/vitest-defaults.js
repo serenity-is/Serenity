@@ -60,16 +60,20 @@ function tryProject(root, name) {
 
     let debugExists = existsSync(debugDll);
     let releaseExists = !debugExists && existsSync(releaseDll);
-    if (!debugExists && !releaseExists)
+    if (!debugExists && !releaseExists) {
+        console.info("Building " + csproj + "...");
         execSync(`dotnet build ${csproj}`, { timeout: 120000 });
+    }
 
     debugExists = existsSync(debugDll);
     releaseExists = !debugExists && existsSync(releaseDll);
-    if (debugExists || releaseExists)
+    if (debugExists || releaseExists) {
+        console.info("Preparing dynamic data for " + name + " via dotnet " + (debugExists ? debugDll : releaseDll) + " dynamic-data ...");
         execSync(`dotnet ${debugExists ? debugDll : releaseDll} dynamic-data`, {
             timeout: 120000,
             cwd: resolve(".").indexOf(name + ".Web") >= 0 ? resolve("./") : testUtils
         });
+    }
 
     return true;
 }

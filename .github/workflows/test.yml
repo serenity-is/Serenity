@@ -48,7 +48,7 @@ jobs:
       run: pnpm -r test -- --coverage
 
     - name: dotnet build Serenity.slnx
-      run: dotnet build /p:SkipNodeScripts=true
+      run: dotnet build /p:SkipTSBuild=true
 
     - name: dotnet test
       run: dotnet test --no-build --verbosity normal
