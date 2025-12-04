@@ -61,13 +61,13 @@ function tryProject(root, name) {
     let debugExists = existsSync(debugDll);
     let releaseExists = !debugExists && existsSync(releaseDll);
     if (!debugExists && !releaseExists)
-        execSync(`dotnet build ${csproj}`, { timeout: 60000 });
+        execSync(`dotnet build ${csproj}`, { timeout: 120000 });
 
     debugExists = existsSync(debugDll);
     releaseExists = !debugExists && existsSync(releaseDll);
     if (debugExists || releaseExists)
         execSync(`dotnet ${debugExists ? debugDll : releaseDll} dynamic-data`, {
-            timeout: 60000,
+            timeout: 120000,
             cwd: resolve(".").indexOf(name + ".Web") >= 0 ? resolve("./") : testUtils
         });
 
