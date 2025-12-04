@@ -12,7 +12,7 @@
       <Timeout ParameterType="System.Int32" />
     </ParameterGroup>
     <Task>
-      <Reference Include="$(MSBuildToolsPath)\Microsoft.Build.Tasks.Core.dll" />
+      <Reference Include="Microsoft.Build.Tasks.Core.dll" />
       <Code Type="Class" Language="cs" Source="$(MSBuildThisFileDirectory)MutexExecTask.cs" />
     </Task>
   </UsingTask>  
