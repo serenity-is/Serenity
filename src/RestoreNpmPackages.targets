@@ -1,6 +1,7 @@
 <Project>
   <PropertyGroup>
-    <NpmInstallArgs Condition="'$(NpmInstallArgs)' == ''">--filter !*.web</NpmInstallArgs>
+    <NpmInstallPkgId Condition="'$(NpmInstallPackageName)' == ''">$(MSBuildProjectName.ToLowerInvariant().Replace("serenity.", "@serenity-is/"))</NpmInstallPkgId>
+    <NpmInstallArgs Condition="'$(NpmInstallArgs)' == ''">--filter ./ --filter $(NpmInstallPkgId) --filter ../../</NpmInstallArgs>
     <NpmInstallMutex Condition="'$(NpmInstallMutex)' == ''">Global\SerenityNpmInstallMutex</NpmInstallMutex>
   </PropertyGroup>
   <UsingTask TaskName="MutexExec" TaskFactory="RoslynCodeTaskFactory" AssemblyFile="$(MSBuildToolsPath)\Microsoft.Build.Tasks.Core.dll" >
@@ -28,7 +29,7 @@
   </Target>
   <Target Name="NpmInstall" Condition="'$(SkipTSBuild)' != 'true'" DependsOnTargets="ComputeNpmPackageMetadata" AfterTargets="ResolveProjectReferences"
     Inputs="@(NpmPackageFile)" Outputs="%(NpmPackageFile.StampFile)">
-    <Message Text="Installing NPM packages for $(ProjectName)..." Importance="high" />
+    <Message Text="Installing NPM packages for $(ProjectName) with args $(NpmInstallArgs)..." Importance="high" />
     <MutexExec MutexName="$(NpmInstallMutex)" MutexTimeout="60000" Command="%(NpmPackageFile.InstallCommand)" WorkingDirectory="%(WorkingDir)" />
     <Touch Files="%(NpmPackageFile.StampFile)" AlwaysCreate="true" Condition="Exists('%(NodeModulesDir)')" ContinueOnError="true" />
   </Target>
