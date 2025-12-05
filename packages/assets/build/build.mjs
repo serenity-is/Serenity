@@ -83,4 +83,11 @@ copyFileIfChanged(`node_modules/glightbox/dist/js/glightbox.js`, `wwwroot/glight
         return content;
     }
 });
+
 copyFileIfChanged(`node_modules/glightbox/dist/css/glightbox.css`, `wwwroot/glightbox/css/glightbox.css`);
+for (const file of [
+    "nprogress.js",
+    "nprogress.css"
+]) {
+    copyFileIfChanged(`node_modules/nprogress/${file}`, `wwwroot/nprogress/${file}`);
+};
