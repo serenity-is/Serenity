@@ -24,7 +24,7 @@
   </ItemGroup>
 
   <ItemGroup>
-    <Compile Include="..\..\src\MutexExecTask.cs" Link="MutexExecTask.cs" />
+    <Compile Include="..\..\src\web\MutexExecTask.cs" Link="MutexExecTask.cs" />
     <Compile Include="..\..\src\web\RestoreNodeTypesTask.cs" Link="RestoreNodeTypesTask.cs" />
   </ItemGroup>
 
