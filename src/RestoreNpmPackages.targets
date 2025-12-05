@@ -1,6 +1,5 @@
 <Project>
   <PropertyGroup>
-    <NpmInstallPkgId Condition="'$(NpmInstallPackageName)' == ''">$(MSBuildProjectName.ToLowerInvariant().Replace("serenity.", "@serenity-is/"))</NpmInstallPkgId>
     <NpmInstallMutex Condition="'$(NpmInstallMutex)' == ''">Global\SerenityNpmInstallMutex</NpmInstallMutex>
   </PropertyGroup>
   <UsingTask TaskName="MutexExec" TaskFactory="RoslynCodeTaskFactory" AssemblyFile="$(MSBuildToolsPath)\Microsoft.Build.Tasks.Core.dll" >

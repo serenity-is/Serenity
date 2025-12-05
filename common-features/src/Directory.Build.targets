@@ -11,14 +11,17 @@
   </Target>
   <Target Name="TransformMvc" AfterTargets="ResolveProjectReferences" DependsOnTargets="$(TransformDependsOn)"
           Condition="'$(SergenTransform)' == 'mvc'">
-    <Exec Command="$(DotNetSergen) mvc $(SergenTransformArgs)" ContinueOnError="true" />
+    <MutexExec Command="$(DotNetSergen) mvc $(SergenTransformArgs)" MutexName="Global\SergenTransformWithDotnetRun" ContinueOnError="true" Condition="'$(DotNetSergen)' != 'dotnet sergen'"  WorkingDirectory="$(MSBuildProjectDirectory)" />
+    <Exec Command="$(DotNetSergen) mvc $(SergenTransformArgs)" ContinueOnError="true" Condition="'$(DotNetSergen)' == 'dotnet sergen'" />
   </Target>
   <Target Name="TransformMvct" AfterTargets="ResolveProjectReferences" DependsOnTargets="$(TransformDependsOn)"
           Condition="'$(SergenTransform)' == 'mvct' OR '$(SergenTransform)' == 'all'">
-    <Exec Command="$(DotNetSergen) mvct $(SergenTransformArgs)" ContinueOnError="true" />
+    <MutexExec Command="$(DotNetSergen) mvct $(SergenTransformArgs)" MutexName="Global\SergenTransformWithDotnetRun" ContinueOnError="true" Condition="'$(DotNetSergen)' != 'dotnet sergen'" WorkingDirectory="$(MSBuildProjectDirectory)" />
+    <Exec Command="$(DotNetSergen) mvct $(SergenTransformArgs)" ContinueOnError="true" Condition="'$(DotNetSergen)' == 'dotnet sergen'" />
   </Target>
   <Target Name="TransformServerTypings" AfterTargets="AfterBuild" DependsOnTargets="$(TransformDependsOn)"
           Condition="'$(SergenTransform)' == 'servertypings' OR '$(SergenTransform)' == 'all'">
-    <Exec Command="$(DotNetSergen) servertypings $(SergenTransformArgs)" ContinueOnError="true" />
+    <MutexExec Command="$(DotNetSergen) servertypings $(SergenTransformArgs)" MutexName="Global\SergenTransformWithDotnetRun" ContinueOnError="true" Condition="'$(DotNetSergen)' != 'dotnet sergen'" WorkingDirectory="$(MSBuildProjectDirectory)" />
+    <Exec Command="$(DotNetSergen) servertypings $(SergenTransformArgs)" ContinueOnError="true" Condition="'$(DotNetSergen)' == 'dotnet sergen'" />
   </Target>
 </Project>
