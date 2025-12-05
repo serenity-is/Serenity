@@ -15,7 +15,7 @@
     </ParameterGroup>
     <Task>
       <Reference Include="Microsoft.Build.Tasks.Core.dll" />
-      <Code Type="Class" Language="cs" Source="$(MSBuildThisFileDirectory)web\MutexExecTask.cs" />
+      <Code Type="Class" Language="cs" Source="$(MSBuildThisFileDirectory)web/MutexExecTask.cs" />
     </Task>
   </UsingTask>  
   <Target Name="ComputeNpmPackageMetadata">
