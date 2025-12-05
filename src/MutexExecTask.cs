@@ -17,6 +17,9 @@ public class MutexExec : Exec
     public string MutexName { get; set; }
     public int MutexTimeout { get; set; } = 60000;
     public bool MutexWarningOnly { get; set; } = false;
+    public string TouchInputFile { get; set; }
+    public bool TouchInputCreateIfNotExist { get; set; } = false;
+    public string TouchOutputFile { get; set; }
 
     public bool Success = true;
 
@@ -31,7 +34,7 @@ public class MutexExec : Exec
             {
                 while (true)
                 {
-                    Log.LogMessage(MessageImportance.High, $"Waiting to acquire Exec mutex {MutexName}...");
+                    Log.LogMessage(MessageImportance.Normal, $"Waiting to acquire Exec mutex {MutexName}...");
                     if (!mutex.WaitOne(MutexTimeout / tryTimes))
                     {
                         tryCount++;
@@ -61,9 +64,47 @@ public class MutexExec : Exec
                 // We got the mutex even though it was abandoned.
             }
 
+            FileInfo touchOutputInfo = null;
             try
             {
-                return base.Execute();
+                if (!string.IsNullOrEmpty(TouchInputFile) && 
+                    !string.IsNullOrEmpty(TouchOutputFile))
+                {
+                    var touchInputInfo = new FileInfo(TouchInputFile);
+                    touchOutputInfo = new FileInfo(TouchOutputFile);
+
+                    if (!touchInputInfo.Exists)
+                    {
+                        if (TouchInputCreateIfNotExist)
+                        {
+                            Directory.CreateDirectory(Path.GetDirectoryName(TouchInputFile));
+                            using (File.Create(TouchInputFile)) { }
+                            touchInputInfo.Refresh();
+                        }
+                        Log.LogMessage(MessageImportance.High, $"Touch input file {TouchInputFile} does not exist, will not skip execution.");
+                    }
+                    else if (touchOutputInfo.Exists &&
+                        touchOutputInfo.LastWriteTimeUtc >= touchInputInfo.LastWriteTimeUtc)
+                    {
+                        Log.LogMessage(MessageImportance.Normal, $"Skipping execution of command because {TouchOutputFile} is newer than {TouchInputFile}");
+                        return true;
+                    }
+                }
+                Log.LogMessage(MessageImportance.High, $"MutexExec {WorkingDirectory}> {Command}...");
+                var result = base.Execute();
+                if (result && 
+                    touchOutputInfo != null)
+                {
+                    touchOutputInfo.Refresh();
+                    if (!touchOutputInfo.Exists)
+                    {
+                        Directory.CreateDirectory(Path.GetDirectoryName(TouchOutputFile));
+                        using (File.Create(TouchOutputFile)) { }
+                    }
+                    touchOutputInfo.LastWriteTimeUtc = DateTime.UtcNow;
+                }
+
+                return result;
             }
             finally
             {

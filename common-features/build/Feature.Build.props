@@ -21,6 +21,5 @@
     <PackageReference Include="Microsoft.TypeScript.MSBuild" Version="5.9.3" Condition="Exists('$(MSBuildProjectDirectory)\tsconfig.json')" PrivateAssets="all" IncludeAssets="runtime; build; native; contentfiles; analyzers; buildtransitive" />
     <PackageReference Include="Serenity.Net.Web" Version="$(SerenityVersion)" Condition="!Exists('$(SerenitySrc)web\Serenity.Net.Web.csproj') and '$(AddAutoRefs)' == 'true'" />
     <ProjectReference Include="$(SerenitySrc)web\Serenity.Net.Web.csproj" Condition="Exists('$(SerenitySrc)web\Serenity.Net.Web.csproj') and '$(AddAutoRefs)' == 'true'" />
-    <NpmPackageFile Include="$(MSBuildProjectDirectory)\package.json" Condition="Exists('$(MSBuildProjectDirectory)\package.json')" />
   </ItemGroup>
 </Project>

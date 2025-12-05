@@ -11,5 +11,6 @@
   </PropertyGroup>
   <ItemGroup>
     <Using Include="$(MSBuildProjectName).MVC.ESM" Alias="ESM" />
+    <NpmPackageFile Include="$(MSBuildThisFileDirectory)..\..\package.json" Condition="Exists('$(MSBuildProjectDirectory)\package.json')" />
   </ItemGroup>
 </Project>

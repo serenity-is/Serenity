@@ -1,7 +1,6 @@
 <Project>
   <PropertyGroup>
     <NpmInstallPkgId Condition="'$(NpmInstallPackageName)' == ''">$(MSBuildProjectName.ToLowerInvariant().Replace("serenity.", "@serenity-is/"))</NpmInstallPkgId>
-    <NpmInstallArgs Condition="'$(NpmInstallArgs)' == ''">--filter ./ --filter $(NpmInstallPkgId) --filter ../../</NpmInstallArgs>
     <NpmInstallMutex Condition="'$(NpmInstallMutex)' == ''">Global\SerenityNpmInstallMutex</NpmInstallMutex>
   </PropertyGroup>
   <UsingTask TaskName="MutexExec" TaskFactory="RoslynCodeTaskFactory" AssemblyFile="$(MSBuildToolsPath)\Microsoft.Build.Tasks.Core.dll" >
@@ -11,6 +10,9 @@
       <Command ParameterType="System.String" />
       <WorkingDirectory ParameterType="System.String" />
       <Timeout ParameterType="System.Int32" />
+      <TouchInputFile ParameterType="System.String" />
+      <TouchOutputFile ParameterType="System.String" />
+      <TouchInputCreateIfNotExist ParameterType="System.Boolean" />
     </ParameterGroup>
     <Task>
       <Reference Include="Microsoft.Build.Tasks.Core.dll" />
@@ -23,14 +25,13 @@
         <StampFile>$([System.IO.Path]::Combine('%(RootDir)%(Directory)', 'node_modules', '.install-stamp'))</StampFile>
         <WorkingDir>%(RootDir)%(Directory)</WorkingDir>
         <NodeModulesDir>%(RootDir)%(Directory)\node_modules\</NodeModulesDir>
-        <InstallCommand>pnpm install $(NpmInstallArgs)</InstallCommand>
+        <InstallCommand>pnpm install</InstallCommand>
       </NpmPackageFile>
     </ItemGroup>
   </Target>
   <Target Name="NpmInstall" Condition="'$(SkipTSBuild)' != 'true'" DependsOnTargets="ComputeNpmPackageMetadata" AfterTargets="ResolveProjectReferences"
     Inputs="@(NpmPackageFile)" Outputs="%(NpmPackageFile.StampFile)">
-    <Message Text="Installing NPM packages for $(ProjectName)... (args: $(NpmInstallArgs))" Importance="high" />
-    <MutexExec MutexName="$(NpmInstallMutex)" MutexTimeout="60000" Command="%(NpmPackageFile.InstallCommand)" WorkingDirectory="%(WorkingDir)" />
-    <Touch Files="%(NpmPackageFile.StampFile)" AlwaysCreate="true" Condition="Exists('%(NodeModulesDir)')" ContinueOnError="true" />
+    <MutexExec MutexName="$(NpmInstallMutex)" MutexTimeout="60000" Command="%(NpmPackageFile.InstallCommand)" WorkingDirectory="%(WorkingDir)"
+      TouchInputFile="%(NpmPackageFile.FullPath)" TouchOutputFile="%(NpmPackageFile.StampFile)" />
   </Target>
 </Project>

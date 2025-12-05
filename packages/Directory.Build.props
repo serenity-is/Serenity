@@ -8,11 +8,10 @@
     <AccelerateBuildsInVisualStudio>true</AccelerateBuildsInVisualStudio>
     <ArtifactsPath>$(MSBuildThisFileDirectory)..\artifacts</ArtifactsPath>    
     <UseArtifactsOutput>true</UseArtifactsOutput>
-    <CreateNodeModulesDirectory Condition="'$(CreateNodeModulesDirectory)' == ''">true</CreateNodeModulesDirectory>
     <SkipTSBuild Condition="'$(SkipTSBuild)' == '' And '$(DesignTimeBuild)' == 'true'">true</SkipTSBuild>
     <RunTSBuild Condition="'$(RunTSBuild)' == '' And '$(SkipTSBuild)' != 'true'">true</RunTSBuild>
   </PropertyGroup>
   <ItemGroup>
-    <NpmPackageFile Include="$(MSBuildProjectDirectory)\package.json" />
+    <NpmPackageFile Include="$(MSBuildThisFileDirectory)..\package.json" Condition="Exists('$(MSBuildProjectDirectory)\package.json')" />
   </ItemGroup>
 </Project>
