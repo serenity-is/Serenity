@@ -89,7 +89,6 @@ export function initGlobalMappings({ corelib, globals, domwise, sleekgrid,
             copyProps(domwise, globals.Serenity);
         }
 
-
         if (extensions) {
             if (globals.Serenity !== extensions) {
                 copyProps(extensions, globals.Serenity);
@@ -118,19 +117,19 @@ export function initGlobalMappings({ corelib, globals, domwise, sleekgrid,
     if (mousetrap) {
         if (typeof mousetrap.default === "function")
             mousetrap = mousetrap.default;
-        globals.mousetrap = mousetrap;
+        globals.Mousetrap = mousetrap;
     }
 
     if (sortable) {
         if (typeof sortable.default === "function")
             sortable = sortable.default;
-        globals.sortable = sortable;
+        globals.Sortable = sortable;
     }
 
     if (nprogress) {
         if (typeof nprogress.default === "object")
             nprogress = nprogress.default;
-        globals.nprogress = nprogress;
+        globals.NProgress = nprogress;
     }
 
     if (glightbox) {
