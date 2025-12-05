@@ -85,9 +85,13 @@ copyFileIfChanged(`node_modules/glightbox/dist/js/glightbox.js`, `wwwroot/glight
 });
 
 copyFileIfChanged(`node_modules/glightbox/dist/css/glightbox.css`, `wwwroot/glightbox/css/glightbox.css`);
+
 for (const file of [
     "nprogress.js",
     "nprogress.css"
 ]) {
     copyFileIfChanged(`node_modules/nprogress/${file}`, `wwwroot/nprogress/${file}`);
 };
+
+copyFileIfChanged(`node_modules/sortablejs/Sortable.js`, `wwwroot/Scripts/sortable.js`);
+copyFileIfChanged(`node_modules/sortablejs/Sortable.min.js`, `wwwroot/Scripts/sortable.min.js`);
