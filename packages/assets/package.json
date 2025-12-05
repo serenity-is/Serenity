@@ -5,6 +5,7 @@
   },
   "devDependencies": {
     "bootstrap": "5.3.8",
+    "glightbox": "3.3.1",
     "jquery": "3.7.1",
     "mousetrap": "1.6.5"
   },

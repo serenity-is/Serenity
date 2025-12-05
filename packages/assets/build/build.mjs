@@ -71,3 +71,16 @@ for (const file of [
         patchContents: removeSourceMappingURL
     });
 }
+
+copyFileIfChanged(`node_modules/glightbox/dist/js/glightbox.js`, `wwwroot/glightbox/js/glightbox.js`, {
+    encoding: 'utf-8',
+    patchContents: content => {
+        // fix for csp issues
+        content = content.replace(/setAttribute\s*\(\s*['"]style['"]\s*,\s*/g, 'style = (');
+        if (/setAttribute\(['"]style['"]/.test(content)) {
+            console.warn(`Warning: Some setAttribute('style', ...) calls may remain in glightbox.js!`);
+        }
+        return content;
+    }
+});
+copyFileIfChanged(`node_modules/glightbox/dist/css/glightbox.css`, `wwwroot/glightbox/css/glightbox.css`);
