@@ -1,3 +1,30 @@
+## 10.0.2 (2025-12-06)
+
+## Features
+- Make it possible to optionally provide files under wwwroot via npm / nuget package to node_modules/.dotnet. Also include feature project's package.json in the NuGet package and use it while restoring packages.  Adapt TinyJSON code to for a stable JSON parser / writer in RoslynCodeTaskFactory without having to reference System.Text.Json or Newtonsoft.Json within RestoreNodeTypesTask.
+- Added a patched local copy of glightbox to Serenity.Assets as it has issues with CSP
+- Migrated from .sln to .slnx format which is simpler and readable.
+- Export domwise from corelib so that it's code is not duplicated by every feature project requiring it
+- importAsGlobalsMapping now maps all (sleekgrid, corelib, extensions etc) to Serenity namespace by default.
+- Define initGlobalMappings helper which setups global variables for Serenity libs like corelib, sleekgrid, extensions, pro.extensions in addition to optionally third party libs like bootstrap. This can be used to potentially remove appsettings.bundles.json and pass globals to feature packages that requires it.
+- Add custom DateTimeOffset parsing to ObjectJsonConverter for Newtonsoft.Json compatibility (#7391)
+- Move CheckUnassignedRead to IRow interface for consistency with FieldAssignedValue
+- Rename Field.GetIsNull to Field.IsNullNoCheck similar to AsObjectNoCheck
+- Rename IRow.FieldAssignedValue to OnFieldSet, IRow.CheckUnassignedRead to OnFieldGet to better emphasize they need to be called before getting / after setting a field value for checks / tracking to work. These methods are used internally so should not be a breaking change.
+- Implement faster property get / set methods for partial row properties generated via `[GenerateFields]` attribute.
+- Add ability to set include / exclude glob patterns for tsbuild cleanPlugin.
+- Add compression option to writeIfChanged plugin and tsbuild options via compress property. Brotli is too slow (15x slower than gzip) even with quality: 4, so only gzip is recommended for now. This is not recommended to be used for now as static web assets SDK also does its own compression.
+- Add a PreCompressedFileProvider that may server .gz, .br compressed files if available. These are produced by static web assets SDK during build and publish.
+- Added buildGlobalBundles option to tsbuild to automatically bundle files under Modules/Common/bundles/*-bundle(.css|.ts). StartSharp now uses this to generate its bundles instead of appsettings.bundles.json.
+- Use l10n bundle and initGlobalMappings function in flatpickr-init
+- Remove Pages/Dashboard css bundle as can directly import @serenity-is/pro.extensions/pages/dashboard.css from DashboardPage.tsx
+- Merge pro-theme.js into Pro.Extensions/index.js. The one in appsettings.bundles.json should be removed.
+- Converted JsonRequest attribute to async, disabled AllowSynchronousIO in Startup.cs. This was crashing in .NET 10 under Ubuntu.
+- New AddServiceEndpointConventions extension for usage in Startup instead of adding services / conventions manually.
+- Serenity.DomWise and Serenity.SleekGrid will be released along with other Serenity libs and use the same version with other libs
+- Most of the static files inside Serenity.Assets package is generated from npm packages instead of libman.json.
+- Sync pnpm install tasks via a mutex.
+
 ## 10.0.1 (2025-11-24)
 
 ## Features
