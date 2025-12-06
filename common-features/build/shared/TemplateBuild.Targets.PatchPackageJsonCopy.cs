@@ -49,6 +49,7 @@ public static partial class Shared
             devDependencies.Remove("test-utils");
 
             PnpmWorkspaceYaml workspaceYaml = null;
+            string workspaceFile = Path.Combine(Root, "pnpm-workspace.yaml");
 
             foreach (var deps in new JObject[] { dependencies, devDependencies })
             {
@@ -67,14 +68,13 @@ public static partial class Shared
                     {
                         if (workspaceYaml == null)
                         {
-                            string workspaceFile = Path.Combine(SerenityFolder, "pnpm-workspace.yaml");
                             if (!File.Exists(workspaceFile))
                             {
                                 ExitWithError($"File does not exist: {workspaceFile} !");
                                 return;
                             }
 
-                            var yaml = File.ReadAllText(Path.Combine(SerenityFolder, "pnpm-workspace.yaml"));
+                            var yaml = File.ReadAllText(workspaceFile);
                             var deserializer = new DeserializerBuilder()
                                 .WithNamingConvention(YamlDotNet.Serialization.NamingConventions.NullNamingConvention.Instance)
                                 .IgnoreUnmatchedProperties()
@@ -88,7 +88,8 @@ public static partial class Shared
                              catalog?.TryGetValue(property.Name, out var catalogVersion) != true) &&
                              workspaceYaml.catalog?.TryGetValue(property.Name, out catalogVersion) != true)
                         {
-                            ExitWithError($"Catalog package version not found: {property.Name} in {version} !");
+                            Console.WriteLine(Newtonsoft.Json.JsonConvert.SerializeObject(workspaceYaml.catalogs, Newtonsoft.Json.Formatting.Indented));
+                            ExitWithError($"Catalog package version not found: {property.Name} for catalog {catalogName} in {workspaceFile}!");
                             return;
                         }
 
@@ -152,8 +153,8 @@ public static partial class Shared
 
         private class PnpmWorkspaceYaml
         {
-            public Dictionary<string, string> catalog { get; set; } = [];
-            public Dictionary<string, Dictionary<string, string>> catalogs { get; set; } = [];
+            public Dictionary<string, string> catalog { get; set; } = new(StringComparer.Ordinal);
+            public Dictionary<string, Dictionary<string, string>> catalogs { get; set; } = new(StringComparer.Ordinal);
         }
     }
 }

@@ -1,3 +1,8 @@
+## 10.0.3 (2025-12-06)
+
+## Bugfixes
+- Missing targets file in Serenity.Net.Web
+
 ## 10.0.2 (2025-12-06)
 
 ## Features
