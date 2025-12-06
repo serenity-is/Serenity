@@ -1,3 +1,8 @@
+## 10.0.4 (2025-12-06)
+
+## Bugfixes
+- Missing package.json in NuGet packages for assets, corelib etc.
+
 ## 10.0.3 (2025-12-06)
 
 ## Bugfixes

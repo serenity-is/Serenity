@@ -9,6 +9,7 @@
     <ProjectCapability Include="TypeScriptNuGet" />
     <Content Update="$(MSBuildProjectDirectory)\coverage\**\*;$(MSBuildProjectDirectory)\out\**\*;$(MSBuildProjectDirectory)\package*.json;$(MSBuildProjectDirectory)\sergen*.json;$(MSBuildProjectDirectory)\ts*.json;$(MSBuildProjectDirectory)\src\**\*;$(MSBuildProjectDirectory)\test\**\*" CopyToOutputDirectory="Never" CopyToPublishDirectory="Never" Pack="false" />
     <None Update="$(MSBuildProjectDirectory)\coverage\**\*;$(MSBuildProjectDirectory)\out\**\*;$(MSBuildProjectDirectory)\jest*.js;$(MSBuildProjectDirectory)\vitest*.*;$(MSBuildProjectDirectory)\tsbuild*.js;$(MSBuildProjectDirectory)\test\**\*" CopyToOutputDirectory="Never" CopyToPublishDirectory="Never" Pack="false" />
+    <Content Update="$(MSBuildProjectDirectory)\package.json" CopyToOutputDirectory="Never" CopyToPublishDirectory="Never" Pack="true" PackagePath="" />
     <None Include="$(MSBuildProjectDirectory)\dist\**" CopyToOutputDirectory="Never" CopyToPublishDirectory="Never" Pack="true" PackagePath="dist\" />
   </ItemGroup>
   <Target Name="CompileProjectTSConfig" BeforeTargets="ResolveProjectStaticWebAssets" DependsOnTargets="NpmInstall" Condition="'$(RunTSBuild)' == 'true'">
