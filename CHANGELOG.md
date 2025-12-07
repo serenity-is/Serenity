@@ -1,3 +1,9 @@
+## 10.0.5 (2025-12-07)
+
+## Features
+- Allow TransformIgnore attribute on methods. 
+- Improve handling for complex / unresolvable types during server types generation by using "unknown" as a type, and printing the problematic type as an inline comment. Note that this may now also include members of non-standard types like interfaces, abstract types etc which was skipped before.
+
 ## 10.0.4 (2025-12-06)
 
 ## Bugfixes
