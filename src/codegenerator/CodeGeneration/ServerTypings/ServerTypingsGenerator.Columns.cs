@@ -35,7 +35,7 @@ public partial class ServerTypingsGenerator
                     if (basedOnRow != null)
                     {
                         sb.Append('<');
-                        HandleMemberType(basedOnRow, codeNamespace);
+                        AppendMappedType(basedOnRow, codeNamespace);
                         sb.Append('>');
                     }
                     sb.AppendLine(";");
@@ -53,7 +53,7 @@ public partial class ServerTypingsGenerator
         if (basedOnRow != null)
         {
             sb.Append('<');
-            HandleMemberType(basedOnRow, codeNamespace);
+            AppendMappedType(basedOnRow, codeNamespace);
             sb.Append('>');
         }
 

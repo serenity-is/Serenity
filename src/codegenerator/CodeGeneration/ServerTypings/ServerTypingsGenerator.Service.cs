@@ -46,14 +46,14 @@ public partial class ServerTypingsGenerator
                     sb.Append(serviceRequest);
                 }
                 else
-                    HandleMemberType(requestType, codeNamespace);
+                    AppendMappedType(requestType, codeNamespace);
 
                 sb.Append(", onSuccess?: (response: ");
-                HandleMemberType(responseType, codeNamespace);
+                AppendMappedType(responseType, codeNamespace);
                 var serviceOptions = ImportFromQ("ServiceOptions");
 
                 sb.Append($") => void, opt?: {serviceOptions}<any>): PromiseLike<");
-                HandleMemberType(responseType, codeNamespace);
+                AppendMappedType(responseType, codeNamespace);
                 sb.AppendLine(">;");
             }
 
@@ -183,12 +183,9 @@ public partial class ServerTypingsGenerator
         {
 #if ISSOURCEGENERATOR
             requestType = parameters[0].Type;
-            if (!CanHandleType(requestType))
 #else
             requestType = parameters[0].ParameterType;
-            if (requestType.IsPrimitive || !CanHandleType(requestType.Resolve()))
 #endif
-                return false;
         }
         else
             requestType = null;
@@ -197,39 +194,29 @@ public partial class ServerTypingsGenerator
 
         responseType = method.ReturnType;
         if (responseType != null &&
-            responseType.IsGenericInstance() &&
+            responseType.IsGenericInstanceType(out var originalDefinition) &&
+            originalDefinition.FullNameOf().StartsWith("System.Threading.Tasks.Task`1", StringComparison.Ordinal))
+        { 
 #if ISSOURCEGENERATOR
-            (responseType as INamedTypeSymbol).OriginalDefinition
+                responseType = (responseType as INamedTypeSymbol).TypeArguments[0];
 #else
-            (responseType as GenericInstanceType).ElementType
+                responseType = (responseType as GenericInstanceType).GenericArguments[0];
 #endif
-                .FullNameOf().StartsWith("Serenity.Services.Result`1", StringComparison.Ordinal))
+        }
+
+        if (responseType != null &&
+            responseType.IsGenericInstanceType(out originalDefinition) &&
+            (originalDefinition.FullNameOf().StartsWith("Serenity.Services.Result`1", StringComparison.Ordinal) ||
+             originalDefinition.FullNameOf().StartsWith("Serenity.Services.ResultWithStatus`1", StringComparison.Ordinal)))
         {
 #if ISSOURCEGENERATOR
             responseType = (responseType as INamedTypeSymbol).TypeArguments[0];
 #else
             responseType = (responseType as GenericInstanceType).GenericArguments[0];
 #endif
-            return true;
         }
-#if ISSOURCEGENERATOR
-        else if (responseType.IsGenericInstance() &&
-            (responseType as INamedTypeSymbol).OriginalDefinition
-#else
-        else if (responseType != null &&
-            responseType.IsGenericInstance &&
-            (responseType as GenericInstanceType).ElementType
-#endif
-                .FullNameOf().StartsWith("System.Threading.Tasks.Task`1", StringComparison.Ordinal))
-        {
-#if ISSOURCEGENERATOR
-            responseType = (responseType as INamedTypeSymbol).TypeArguments[0];
-#else
-            responseType = (responseType as GenericInstanceType).GenericArguments[0];
-#endif
-            return true;
-        }
-        else if (TypingsUtils.IsOrSubClassOf(responseType, "System.Web.Mvc", "ActionResult") ||
+
+        if (TypingsUtils.IsOrSubClassOf(responseType, "System.Web.Mvc", "ActionResult") ||
             TypingsUtils.IsAssignableFrom("Microsoft.AspNetCore.Mvc.IActionResult",
 #if ISSOURCEGENERATOR
             responseType))

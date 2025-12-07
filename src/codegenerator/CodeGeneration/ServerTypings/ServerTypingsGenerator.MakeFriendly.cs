@@ -4,7 +4,7 @@ public partial class ServerTypingsGenerator
 {
     protected virtual string MakeFriendlyName(TypeReference type, string codeNamespace)
     {
-        if (type.IsGenericInstance())
+        if (type.IsGenericInstanceType(out _))
         {
             var name = type.Name;
             var idx = name.IndexOf('`', StringComparison.Ordinal);
@@ -25,7 +25,7 @@ public partial class ServerTypingsGenerator
                 if (i++ > 0)
                     sb.Append(", ");
 
-                HandleMemberType(argument, codeNamespace);
+                AppendMappedType(argument, codeNamespace);
             }
 
             sb.Append('>');
@@ -93,18 +93,31 @@ public partial class ServerTypingsGenerator
         {
             ExternalType moduleType = TryFindModuleType(ns?.Length > 0 ? (ns + "." + name) : name, containingAssembly);
             if (moduleType != null)
+            {
                 return AddExternalImport(moduleType.Module, nonGeneric);
+            }
+            return "unknown";
         }
 
         var filename = GetTypingFileNameFor(ns, nonGeneric);
         return AddModuleImport(filename, nonGeneric, external: false);
     }
 
+    protected static readonly HashSet<string> UnknownAnyObject = new(StringComparer.Ordinal)
+    {
+        "unknown",
+        "any",
+        "object"
+    };
+
     protected virtual void MakeFriendlyReference(TypeReference type, string codeNamespace)
     {
-        var fullName = ShortenFullName(ScriptNamespaceFor(type), type.Name, codeNamespace, GetAssemblyNameFor(type));
+        var ns = ScriptNamespaceFor(type);
+        var name = type.Name;
+        var fullName = ShortenFullName(ns, name, codeNamespace, GetAssemblyNameFor(type));
 
-        if (type.IsGenericInstance())
+        if (!UnknownAnyObject.Contains(fullName) &&
+            type.IsGenericInstanceType(out _))
         {
             var idx = fullName.IndexOf('`', StringComparison.Ordinal);
             if (idx >= 0)
@@ -123,7 +136,7 @@ public partial class ServerTypingsGenerator
                 if (i++ > 0)
                     sb.Append(", ");
 
-                HandleMemberType(argument, codeNamespace);
+                AppendMappedType(argument, codeNamespace);
             }
 
             sb.Append('>');
@@ -131,6 +144,10 @@ public partial class ServerTypingsGenerator
         }
 
         sb.Append(fullName);
+        if (UnknownAnyObject.Contains(fullName))
+        {
+            sb.Append($" /* {(!string.IsNullOrEmpty(ns) ? ns + "." : "")}{type.Name} */");
+        }
     }
 
     protected virtual string ScriptNamespaceFor(TypeReference type)

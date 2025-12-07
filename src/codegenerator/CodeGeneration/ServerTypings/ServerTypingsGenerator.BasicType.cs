@@ -28,9 +28,6 @@ public partial class ServerTypingsGenerator
     {
         void handleMember(TypeReference memberType, string memberName, IEnumerable<CustomAttribute> a)
         {
-            if (!CanHandleType(memberType.Resolve()))
-                return;
-
             var jsonProperty = a != null ? (
                 TypingsUtils.FindAttr(a, "Newtonsoft.Json", "JsonPropertyAttribute") ??
                 TypingsUtils.FindAttr(a, "System.Text.Json.Serialization", "JsonPropertyNameAttribute")) : null;
@@ -47,7 +44,7 @@ public partial class ServerTypingsGenerator
 
             cw.Indented(memberName);
             sb.Append("?: ");
-            HandleMemberType(memberType, codeNamespace);
+            AppendMappedType(memberType, codeNamespace);
             sb.Append(';');
             sb.AppendLine();
         }
@@ -90,18 +87,10 @@ public partial class ServerTypingsGenerator
         foreach (var t in TypingsUtils.SelfAndBaseClasses(type))
         {
             if (t.BaseType != null &&
-                t.BaseType.IsGenericInstance() &&
-#if ISSOURCEGENERATOR
-                t.BaseType.OriginalDefinition.NamespaceOf() == "Serenity.Services")
-#else
-                (t.BaseType as GenericInstanceType).ElementType.Namespace == "Serenity.Services")
-#endif
+                t.BaseType.IsGenericInstanceType(out var originalDefinition) &&
+                originalDefinition.NamespaceOf() == "Serenity.Services")
             {
-#if ISSOURCEGENERATOR
-                var n = t.BaseType.OriginalDefinition.MetadataName();
-#else
-                var n = (t.BaseType as GenericInstanceType).ElementType.Name;
-#endif
+                var n = originalDefinition.MetadataName();
                 if (n == "ListResponse`1" || n == "RetrieveResponse`1" || n == "SaveRequest`1")
                     return t.BaseType;
             }

@@ -59,7 +59,7 @@ public class ApplicationMetadata : IApplicationMetadata
             }
         }
 
-        protected override void HandleMemberType(TypeReference memberType, string codeNamespace)
+        protected override void AppendMappedType(TypeReference memberType, string codeNamespace)
         {
         }
     }

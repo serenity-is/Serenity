@@ -68,10 +68,19 @@ public static class TypingsUtils
         return type.GetMembers().OfType<IMethodSymbol>();
     }
 
-    public static bool IsGenericInstance(this TypeDefinition typeSymbol)
+    public static bool IsGenericInstanceType(this TypeDefinition typeSymbol, out GenericInstanceType originalDefinition)
     {
-        return typeSymbol is GenericInstanceType nt &&
-            nt.IsGenericType && !nt.TypeArguments.Any(x => x.TypeKind == TypeKind.TypeParameter);
+        if (typeSymbol is GenericInstanceType nt &&
+            nt.IsGenericType && !nt.TypeArguments.Any(x => x.TypeKind == TypeKind.TypeParameter))
+        {
+            originalDefinition = nt.OriginalDefinition;
+            return true;
+        }
+        else
+        {
+            originalDefinition = null;
+            return false;
+        }
     }
 
     public static TypeDefinition Resolve(this TypeDefinition typeSymbol)
@@ -268,9 +277,16 @@ public static class TypingsUtils
         return type.Properties;
     }
 
-    public static bool IsGenericInstance(this TypeReference type)
+    public static bool IsGenericInstanceType(this TypeReference type, out TypeReference elementType)
     {
-        return type.IsGenericInstance;
+        if (type.IsGenericInstance)
+        {
+            elementType = (type as GenericInstanceType).ElementType;
+            return true;
+        }
+
+        elementType = null;
+        return false;
     }
 
     public static IEnumerable<CustomAttribute> GetAttributes(this PropertyDefinition prop, string ns, string name, bool subAttributes = false)

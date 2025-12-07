@@ -21,6 +21,7 @@ public partial class ServerTypingsGeneratorTests
     {
         var generator = new ServerTypingsGenerator(new MockFileSystem(),
             typeof(ServerTypingsGeneratorTests).Assembly.Location);
+        generator.AddBuiltinTSTypes();
         generator.RootNamespaces.Add("ServerTypingsTest");
         generator.ModuleReExports = false;
         generator.TypeFilter = type =>

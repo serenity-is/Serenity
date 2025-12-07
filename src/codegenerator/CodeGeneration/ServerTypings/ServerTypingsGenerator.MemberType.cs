@@ -2,55 +2,41 @@ namespace Serenity.CodeGeneration;
 
 public partial class ServerTypingsGenerator
 {
-    public static bool CanHandleType(TypeDefinition memberType)
+    protected virtual void AppendMappedType(TypeReference type, string codeNamespace)
     {
-        if (memberType is null)
-            return false;
-#if ISSOURCEGENERATOR
-        if (memberType.TypeKind == TypeKind.Interface)
-#else
-        if (memberType.IsInterface)
-#endif
-            return false;
+        if (type == null)
+        {
+            sb.Append("unknown /* null type */");
+            return;
+        }
 
-        if (memberType.IsAbstract)
-            return false;
-
-        if (TypingsUtils.IsOrSubClassOf(memberType, "System", "Delegate"))
-            return false;
-
-        return true;
-    }
-
-    protected virtual void HandleMemberType(TypeReference memberType, string codeNamespace)
-    {
-        var ns = memberType.NamespaceOf();
+        var ns = type.NamespaceOf();
         bool isSystem = ns == "System";
 
-        if (isSystem && memberType.Name == "String")
+        if (isSystem && type.Name == "String")
         {
             sb.Append("string");
             return;
         }
 
-        if (memberType.Name == "dynamic")
+        if (type.Name == "dynamic")
         {
             sb.Append("any");
             return;
         }
 
         if (isSystem &&
-            memberType is GenericInstanceType &&
-            memberType.MetadataName() == "Nullable`1")
+            type is GenericInstanceType &&
+            type.MetadataName() == "Nullable`1")
         {
-            memberType = (memberType as GenericInstanceType).GenericArguments()[0];
-            isSystem = memberType.NamespaceOf() == "System";
+            type = (type as GenericInstanceType).GenericArguments()[0];
+            isSystem = type.NamespaceOf() == "System";
         }
 
-        var name = memberType.Name;
+        var name = type.Name;
 
         if (isSystem &&
-            memberType.IsPrimitive())
+            type.IsPrimitive())
         {
             if (name == "Int16" ||
                 name == "Int32" ||
@@ -92,9 +78,9 @@ public partial class ServerTypingsGenerator
             return;
         }
 
-        if (memberType.IsArray())
+        if (type.IsArray())
         {
-            var elementType = memberType.ElementType();
+            var elementType = type.ElementType();
             if (elementType.NamespaceOf() == "Serenity.Services" &&
                 elementType.Name == "SortBy")
             {
@@ -104,7 +90,7 @@ public partial class ServerTypingsGenerator
         }
 
         if (name == "Stream" &&
-            memberType.NamespaceOf() == "System.IO")
+            type.NamespaceOf() == "System.IO")
         {
             sb.Append("number[]");
             return;
@@ -117,16 +103,16 @@ public partial class ServerTypingsGenerator
             return;
         }
 
-        if (memberType.IsArray())
+        if (type.IsArray())
         {
-            HandleMemberType(memberType.ElementType(), codeNamespace);
+            AppendMappedType(type.ElementType(), codeNamespace);
             sb.Append("[]");
             return;
         }
 
-        if (memberType.IsGenericInstance())
+        if (type.IsGenericInstanceType(out _))
         {
-            var gi = memberType as GenericInstanceType;
+            var gi = type as GenericInstanceType;
             if (gi.ElementType().NamespaceOf() == "System.Collections.Generic")
             {
                 if (gi.ElementType().MetadataName() == "List`1" ||
@@ -135,7 +121,7 @@ public partial class ServerTypingsGenerator
                     gi.ElementType().MetadataName() == "IEnumerable`1" ||
                     gi.ElementType().MetadataName() == "ISet`1")
                 {
-                    HandleMemberType(gi.GenericArguments()[0], codeNamespace);
+                    AppendMappedType(gi.GenericArguments()[0], codeNamespace);
                     sb.Append("[]");
                     return;
                 }
@@ -144,9 +130,9 @@ public partial class ServerTypingsGenerator
                     gi.ElementType().MetadataName() == "IDictionary`2")
                 {
                     sb.Append("{ [key: ");
-                    HandleMemberType(gi.GenericArguments()[0], codeNamespace);
+                    AppendMappedType(gi.GenericArguments()[0], codeNamespace);
                     sb.Append("]: ");
-                    HandleMemberType(gi.GenericArguments()[1], codeNamespace);
+                    AppendMappedType(gi.GenericArguments()[1], codeNamespace);
                     sb.Append(" }");
                     return;
                 }
@@ -154,16 +140,16 @@ public partial class ServerTypingsGenerator
         }
 
 #if ISSOURCEGENERATOR
-        if (memberType is Microsoft.CodeAnalysis.ITypeParameterSymbol)
+        if (type is Microsoft.CodeAnalysis.ITypeParameterSymbol)
 #else
-        if (memberType.IsGenericParameter)
+        if (type.IsGenericParameter)
 #endif
         {
-            sb.Append(memberType.Name);
+            sb.Append(type.Name);
             return;
         }
 
-        var resolvedType = memberType.Resolve();
+        var resolvedType = type.Resolve();
 
         if (resolvedType != null && TypingsUtils.GetAttr(resolvedType, "Serenity.ComponentModel", "TransformIgnoreAttribute") != null)
         {
@@ -172,8 +158,8 @@ public partial class ServerTypingsGenerator
         }
         else
         {
-            EnqueueType(memberType.Resolve());
-            MakeFriendlyReference(memberType, codeNamespace);
+            EnqueueType(type.Resolve());
+            MakeFriendlyReference(type, codeNamespace);
         }
     }
 

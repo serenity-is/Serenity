@@ -38,11 +38,11 @@ public partial class ServerTypingsGenerator
             var enumType = TypingsUtils.GetEnumTypeFrom(property.PropertyType());
             if (enumType != null)
             {
-                HandleMemberType(enumType, codeNamespace);
+                AppendMappedType(enumType, codeNamespace);
             }
             else
             {
-                HandleMemberType(TypingsUtils.GetNullableUnderlyingType(property.PropertyType()) ?? property.PropertyType(), codeNamespace);
+                AppendMappedType(TypingsUtils.GetNullableUnderlyingType(property.PropertyType()) ?? property.PropertyType(), codeNamespace);
             }
 
             sb.AppendLine(";");
