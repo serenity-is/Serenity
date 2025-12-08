@@ -1,4 +1,4 @@
-import { execSync } from "child_process";
+import { execFileSync } from "child_process";
 import { existsSync, readdirSync, readFileSync } from "fs";
 import { basename, join, resolve } from "path";
 import { fileURLToPath } from 'url';
@@ -62,14 +62,14 @@ function tryProject(root, name) {
     let releaseExists = !debugExists && existsSync(releaseDll);
     if (!debugExists && !releaseExists) {
         console.info("Building " + csproj + "...");
-        execSync(`dotnet build ${csproj} --p:SkipTSBuild=true`, { timeout: 120000 });
+        execFileSync("dotnet", ["build", csproj, "--p:SkipTSBuild=true"], { timeout: 120000 });
     }
 
     debugExists = existsSync(debugDll);
     releaseExists = !debugExists && existsSync(releaseDll);
     if (debugExists || releaseExists) {
         console.info("Preparing dynamic data for " + name + " via dotnet " + (debugExists ? debugDll : releaseDll) + " dynamic-data ...");
-        execSync(`dotnet ${debugExists ? debugDll : releaseDll} dynamic-data`, {
+        execFileSync("dotnet", [debugExists ? debugDll : releaseDll, "dynamic-data"], {
             timeout: 120000,
             cwd: resolve(".").indexOf(name + ".Web") >= 0 ? resolve("./") : testUtils
         });
