@@ -8,7 +8,6 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Options;
 using System.Net;
 using System.Security.Cryptography;
-using System.Text.Encodings.Web;
 using System.Web;
 
 namespace Serenity.Web;
@@ -402,6 +401,19 @@ public static partial class HtmlScriptExtensions
     }
 
     /// <summary>
+    /// Adds a Content Security Policy script-src directive for the given URL
+    /// and returns the URL. This can be used in script include helpers for external URLs.
+    /// </summary>
+    /// <param name="html">Html helper</param>
+    /// <param name="url">Url</param>
+    /// <returns></returns>
+    public static string AddCspScriptUrl(this IHtmlHelper html, string url)
+    {
+        AddCspDirective(html, "script-src", url);
+        return url;
+    }
+
+    /// <summary>
     /// Gets a Content Security Policy directive added via AddCspDirective
     /// merged with any manual values provided. The string includes the final semicolon.
     /// This can be used to render parts of the CSP header or meta tag content.
@@ -465,6 +477,96 @@ public static partial class HtmlScriptExtensions
         });
 
         return scriptManager.GetScriptText(scriptName);
+    }
+
+    const string importMapKey = "HtmlScriptExtensions:ImportMap";
+
+    class ImportMap
+    {
+        public Dictionary<string, string> Imports { get; set; }
+        public Dictionary<string, Dictionary<string, string>> Scopes { get; set; }
+        public Dictionary<string, string> Integrity { get; set; }
+    }
+
+    /// <summary>
+    /// Adds an entry to the import map for the current HTML view, associating a module specifier with its address and
+    /// optional integrity value.
+    /// </summary>
+    /// <remarks>If the import map does not exist in the current HTTP context, a new one is created. This
+    /// method is typically used in server-side rendering scenarios to manage JavaScript module imports and CSP
+    /// headers.</remarks>
+    /// <param name="html">The HTML helper instance used to access the current view context.</param>
+    /// <param name="specifier">The module specifier to map, such as a package name or relative path. Cannot be null.</param>
+    /// <param name="address">The address or URL where the module can be loaded from. Cannot be null.</param>
+    /// <param name="integrity">An optional integrity hash for the module, used to verify its contents. If null, no integrity value is set.</param>
+    /// <param name="csp">Indicates whether to add a Content Security Policy directive for the module address. Set to <see
+    /// langword="true"/> to add the directive; otherwise, <see langword="false"/>.</param>
+    public static void AddImportMapEntry(this IHtmlHelper html, string specifier, string address, string integrity = null,
+        bool csp = true)
+    {
+        AddImportMapEntry(html?.ViewContext?.HttpContext, specifier, address, integrity, csp);
+    }
+
+    /// <summary>
+    /// Adds an entry to the import map for the current HTML view, associating a module specifier with its address and
+    /// optional integrity value.
+    /// </summary>
+    /// <remarks>If the import map does not exist in the current HTTP context, a new one is created. This
+    /// method is typically used in server-side rendering scenarios to manage JavaScript module imports and CSP
+    /// headers.</remarks>
+    /// <param name="context">Http context.</param>
+    /// <param name="specifier">The module specifier to map, such as a package name or relative path. Cannot be null.</param>
+    /// <param name="address">The address or URL where the module can be loaded from. Cannot be null.</param>
+    /// <param name="integrity">An optional integrity hash for the module, used to verify its contents. If null, no integrity value is set.</param>
+    /// <param name="csp">Indicates whether to add a Content Security Policy directive for the module address. Set to <see
+    /// langword="true"/> to add the directive; otherwise, <see langword="false"/>.</param>
+    public static void AddImportMapEntry(this HttpContext context, string specifier, string address, string integrity = null,
+        bool csp = true)
+    {
+        ArgumentNullException.ThrowIfNull(context);
+        ArgumentNullException.ThrowIfNull(specifier);
+        ArgumentNullException.ThrowIfNull(address);
+        var contextItems = context.Items;
+        if (contextItems == null)
+            return;
+        if (contextItems[importMapKey] is not ImportMap importMap)
+            contextItems[importMapKey] = importMap = new ImportMap();
+        importMap.Imports ??= new Dictionary<string, string>(StringComparer.Ordinal);
+        importMap.Imports[specifier] = address;
+        if (integrity != null)
+        {
+            importMap.Integrity ??= new Dictionary<string, string>(StringComparer.Ordinal);
+            importMap.Integrity[address] = integrity;
+        }
+        if (csp)
+            context.AddCspDirective("script-src", address);
+    }
+
+    /// <summary>
+    /// Renders an HTML import map script element based on the current view's import map configuration.
+    /// </summary>
+    /// <remarks>Use this method in a Razor view to emit an import map for JavaScript module loading. The
+    /// import map is retrieved from the current HTTP context and serialized to JSON. If no import map is configured,
+    /// the method returns an empty result.</remarks>
+    /// <param name="html">The HTML helper instance used to access the current view context and import map data. Cannot be null.</param>
+    /// <returns>An HtmlString containing a <script type="importmap" /> element with the serialized import map, or an empty
+    /// HtmlString if no import map is available.</returns>
+    public static HtmlString RenderImportMap(this IHtmlHelper html)
+    {
+        ArgumentNullException.ThrowIfNull(html);
+        var contextItems = html.ViewContext?.HttpContext?.Items;
+        if (contextItems == null ||
+            contextItems[importMapKey] is not ImportMap importMap)
+            return HtmlString.Empty;
+
+        var json = JSON.StringifyIndented(new
+        {
+            imports = importMap.Imports,
+            scopes = importMap.Scopes,
+            integrity = importMap.Integrity
+        });
+
+        return new HtmlString($"<script type=\"importmap\" nonce=\"{html.CspNonce()}\">\n{json}\n</script>\n");
     }
 
     /// <summary>
