@@ -1,3 +1,9 @@
+## 10.0.6 (2025-12-09)
+
+## Bugfixes
+- Fix report cshtml file could not be located due to IActionContextAccessor being made obsolete in .NET 10.
+- Add https://cdnjs.cloudflare.com/ajax/libs/ to CSP script-src directive for jspdf dynamic loading
+
 ## 10.0.5 (2025-12-07)
 
 ## Features
