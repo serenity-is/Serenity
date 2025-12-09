@@ -1,5 +1,6 @@
-import { DataGrid, deepClone, Fluent, formatDate, ListRequest, ListResponse, serviceCall, stringFormat, ToolButton, type IRemoteView } from "@serenity-is/corelib";
+import { DataGrid, deepClone, Fluent, formatDate, getGlobalObject, ListRequest, ListResponse, serviceCall, stringFormat, ToolButton } from "@serenity-is/corelib";
 import { applyFormatterResultToCellNode, Column, FormatterResult, ISleekGrid } from "@serenity-is/sleekgrid";
+import { type jsPDF } from "./JsPdfAutoTable";
 
 export interface PdfExportOptions {
     grid: DataGrid<any, any>;
@@ -117,8 +118,7 @@ export namespace PdfExportHelper {
         serviceCall({
             url: dataGrid.view.url,
             request: request,
-            onSuccess: response => includeAutoTable(() => {
-                // @ts-ignore
+            onSuccess: response => autoTableImport(({ jsPDF }) => {
                 let doc = new jsPDF('l', 'pt');
                 let srcColumns = gridColumns;
                 let columnStyles: { [dataKey: string]: jsPDF.AutoTableStyles; } = {};
@@ -153,7 +153,7 @@ export namespace PdfExportHelper {
                 var header: (data: any) => void;
                 if (pageNumbers) {
                     footer = function (data) {
-                        var str = data.pageCount;
+                        var str = (data.pageNumber ?? data.pageCount)?.toString() ?? "?";
                         // Total page number plugin only available in jspdf v1.0+
                         if (typeof doc.putTotalPages === 'function') {
                             str = str + " / " + totalPagesExp;
@@ -185,7 +185,7 @@ export namespace PdfExportHelper {
                     if (!!footer) footer(data);
                 };
 
-                autoOptions.head = [columns];
+                autoOptions.head = [columns.map(x => x.title)];
                 autoOptions.body = data;
 
                 doc.autoTable(autoOptions);
@@ -228,50 +228,81 @@ export namespace PdfExportHelper {
         };
     }
 
-    function includeJsPDF(then: () => void) {
-        // @ts-ignore
-        if (typeof jsPDF !== "undefined")
-            return then();
+    function jsPdfImport(then: ({ jsPDF }: { jsPDF: jsPDF }) => void) {
 
-        var script = document.getElementById("jsPDFScript") as HTMLScriptElement;
-        if (script)
-            return then();
+        const globalObj = getGlobalObject();
 
-        script = document.createElement("script");
-        script.type = "text/javascript";
-        script.async = false;
-        script.id = "jsPDFScript";
-        script.addEventListener("load", () => {
-            if (typeof jsPDF === "undefined" && typeof jspdf !== "undefined") {
-                window.jsPDF = jspdf.jsPDF;
+        let jsPDF = globalObj.jsPDF ?? globalObj.jspdf?.jsPDF as jsPDF;
+        if (jsPDF)
+            return then({ jsPDF });
+
+        import("jspdf" as any).then(jsPDFModule => {
+            jsPDF = jsPDFModule?.jsPDF ?? globalObj.jsPDF ?? globalObj.jspdf?.jsPDF as jsPDF;
+            if (jsPDF) {
+                globalObj.jsPDF = jsPDF;
+                then({ jsPDF });
             }
-            then();
-        });
-        script.src = "https://cdnjs.cloudflare.com/ajax/libs/jspdf/3.0.1/jspdf.umd.min.js";
-        document.head.append(script);
-    }
-
-    function includeAutoTable(then: () => void) {
-        includeJsPDF(() => {
-            // @ts-ignore
-            if (typeof jsPDF === "undefined" ||
-                typeof (jsPDF as any).API == "undefined" ||
-                typeof (jsPDF as any).API.autoTable !== "undefined")
-                return then();
-
-            var script = document.querySelector("#jsPDFAutoTableScript") as HTMLScriptElement;
+            else {
+                throw new Error("Cannot import jsPDF module!");
+            }
+        }).catch((e) => {
+            console.warn("Falling back to CDN import for jsPDF.", e);
+            var script = document.getElementById("jsPDFScript") as HTMLScriptElement;
             if (script)
-                return then();
+                return then({ jsPDF: globalObj.jsPDF });
 
             script = document.createElement("script");
-            script.async = false;
             script.type = "text/javascript";
-            script.id = "jsPDFAutoTableScript";
+            script.async = false;
+            script.id = "jsPDFScript";
             script.addEventListener("load", () => {
-                then();
+                jsPDF = globalObj.jsPDF ?? globalObj.jspdf?.jsPDF as jsPDF;
+                if (jsPDF) {
+                    then({ jsPDF });
+                }
+                else {
+                    throw new Error("jsPDF is not available after UMD script load from CDN!");
+                }
             });
-            script.src = "https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.8.4/jspdf.plugin.autotable.min.js";
+            script.src = "https://cdnjs.cloudflare.com/ajax/libs/jspdf/3.0.3/jspdf.umd.min.js";
             document.head.append(script);
+        });
+    }
+
+    function autoTableImport(then: ({ jsPDF }: { jsPDF: jsPDF }) => void) {
+        jsPdfImport(({ jsPDF }) => {
+            if (jsPDF?.API?.autoTable)
+                return then({ jsPDF });
+
+            import("jspdf-autotable" as any).then(({ applyPlugin }) => {
+                if (typeof applyPlugin === "function") {
+                    applyPlugin(jsPDF);
+                    then({ jsPDF });
+                }
+                else if (jsPDF?.API?.autoTable) {
+                    then({ jsPDF });
+                }
+                else {
+                    throw new Error("Cannot import jsPDF AutoTable module!");
+                }
+            }).catch(() => {
+                console.warn("Falling back to CDN import for jsPDF AutoTable.");
+                const globalObj = getGlobalObject();
+                let jsPDF = globalObj.jsPDF ?? globalObj.jspdf?.jsPDF as jsPDF;                
+                var script = document.querySelector("#jsPDFAutoTableScript") as HTMLScriptElement;
+                if (script)
+                    return then({ jsPDF });
+
+                script = document.createElement("script");
+                script.async = false;
+                script.type = "text/javascript";
+                script.id = "jsPDFAutoTableScript";
+                script.addEventListener("load", () => {
+                    then({ jsPDF });
+                });
+                script.src = "https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/5.0.2/jspdf.plugin.autotable.min.js";
+                document.head.append(script);
+            });
         });
     }
 }
