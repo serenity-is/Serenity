@@ -26,6 +26,8 @@ export interface TSBuildOptions extends Partial<import("esbuild").BuildOptions> 
      * Prefer specifying entry point globs in sergen.json under TSBuild:EntryPoints which supports
      * globs and defaults to ['Modules/** /*Page.ts', 'Modules/** /*Page.tsx', 'Modules/** /ScriptInit.ts'] */
     entryPoints?: string[];
+    /** Fetch cache plugin options or boolean to enable/disable */
+    fetchCache?: boolean | FetchCachePluginOptions;
     /**
      * A set of mappings to pass to the importAsGlobalsPlugin. If this is undefined or any object and the plugins
      * is not specified, importAsGlobals plugin is enabled */
@@ -98,3 +100,11 @@ export declare function writeIfChanged(opt?: CompressOptions): {
 };
 /** Copies files from node_modules to outdir (wwwroot/npm by default). Paths are relative to node_modules. */
 export declare function npmCopy(paths: string[]): void;
+
+/** fetchCachePlugin options */
+export interface FetchCachePluginOptions {
+    importMap?: Record<string, string>;
+}
+
+/** Fetch cache plugin for esbuild https modules, e.g. CDNs, optionally with an import map */
+export declare function fetchCachePlugin({ importMap }: FetchCachePluginOptions): esbuild.Plugin;

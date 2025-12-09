@@ -73,6 +73,9 @@ export const tsbuildDefaults = {
         ".webp": "file"
     },
     logLevel: "info",
+    logOverride: {
+        'duplicate-case': 'silent'
+    },    
     metafile: true,
     minify: true,
     outbase: "./",
@@ -141,6 +144,9 @@ export const esbuildOptions = (opt) => {
             plugins.push(cleanPlugin(cleanOpt));
         if (opt.importAsGlobals === void 0 || opt.importAsGlobals)
             plugins.push(importAsGlobalsPlugin(opt.importAsGlobals ?? importAsGlobalsMapping));
+        if (opt.fetchCache === true || typeof opt.fetchCache === "object") {
+            plugins.push(fetchCachePlugin(typeof opt.fetchCache === "object" ? opt.fetchCache : {}));
+        }
     }
     if (opt.write === void 0 && opt.writeIfChanged === void 0 || opt.writeIfChanged) {
         plugins.push(writeIfChanged(opt.compress));
@@ -148,6 +154,7 @@ export const esbuildOptions = (opt) => {
     }
     delete opt.compress;
     delete opt.clean;
+    delete opt.fetchCache;
     delete opt.importAsGlobals;
     delete opt.writeIfChanged;
     if (opt.sourceRoot === void 0) {
@@ -400,4 +407,91 @@ export function npmCopy(paths) {
             }
         }
     });
+}
+
+export function fetchCachePlugin({ importMap }) {
+    // adapted from https://github.com/jed/esbuild-plugin-http-fetch
+
+    importMap = importMap || {};
+    const escRe = (s) => s.replace(/[-\/\\^$*+?.()|[\]{}]/g, "\\$&");
+    const filter = new RegExp("^https?:\\/\\/|" + Object.keys(importMap).map((mod) => `^${escRe(mod)}$`).join("|"));
+
+    return {
+        name: 'fetch-cache',
+        setup(build) {
+            build.onResolve({ filter }, ({ path }) => {
+                const mapped = importMap[path];
+                return {
+                    path: mapped || path,
+                    namespace: 'fetch-cache'
+                };
+            });
+
+            build.onResolve({ filter: /.*/, namespace: 'fetch-cache' }, async ({ path, importer }) => {
+                if (importMap[path]) {
+                    return {
+                        path: importMap[path],
+                        namespace: 'fetch-cache'
+                    };
+                }
+
+                return {
+                    path: new URL(path, importer).href,
+                    namespace: 'fetch-cache'
+                }
+            });
+
+            build.onLoad({ filter: /.*/, namespace: 'fetch-cache' }, async ({ path }) => {
+                const url = new URL(path);
+                const safePath = (url.hostname + "_" + url.pathname).replace(/[^a-zA-Z0-9._-]/g, '_');
+                const cacheDir = resolve('./node_modules', '.esbuild-fetch-cache');
+                const cachePath = join(cacheDir, safePath);
+                let contents;
+                if (existsSync(cachePath)) {
+                    contents = readFileSync(cachePath, 'utf8');
+                }
+                else {
+                    console.info(`Fetching ${path}...`);
+                    let source = await fetch(path);
+                    if (!source.ok) {
+                        let message = `GET ${path} failed: status ${source.status}`
+                        throw new Error(message)
+                    }
+                    contents = await source.text();
+                    let pattern = /\/\/# sourceMappingURL=(\S+)/;
+                    let match = contents.match(pattern);
+                    if (match) {
+                        let srcMapUrl = new URL(match[1], source.url);
+                        console.info(`Fetching ${srcMapUrl.href}...`);
+                        let srcMapResp = await fetch(srcMapUrl);
+                        if (!srcMapResp.ok) {
+                            let message = `GET ${srcMapUrl.href} failed: status ${srcMapResp.status}`;
+                            throw new Error(message);
+                        }
+                        let srcMapBlob = await srcMapResp.blob();
+                        let srcMapBuffer = Buffer.from(await srcMapBlob.arrayBuffer());
+                        let srcMapDataUrl = `data:` + srcMapBlob.type + `;base64,${srcMapBuffer.toString('base64')}`;
+                        let comment = `//# sourceMappingURL=${srcMapDataUrl}`;
+                        contents = contents.replace(pattern, comment);
+                    }
+                }
+
+                let { pathname } = new URL(path);
+                let loader = pathname.match(/[^.]+$/)[0];
+                switch (loader) {
+                    case "mjs":
+                    case "cjs":
+                    case "ts":
+                    case "tsx":
+                    case "jsx":
+                        loader = "js";
+                        break;
+                    default:
+                        loader = void 0;
+                }
+                return { contents, loader };
+
+            });
+        }
+    }
 }
