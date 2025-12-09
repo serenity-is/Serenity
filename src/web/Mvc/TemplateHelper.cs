@@ -35,7 +35,8 @@ public static class TemplateHelper
         var httpContextAccessor = serviceProvider.GetService<IHttpContextAccessor>();
         var tempDataProvider = serviceProvider.GetRequiredService<ITempDataProvider>();
 
-        ViewEngineResult viewEngineResult;
+        var viewEngineResult = viewEngine.GetView(executingFilePath: null, viewPath: viewName, isMainPage: false);
+
         ActionContext actionContext;
         if (httpContextAccessor?.HttpContext?.GetEndpoint() is Endpoint endpoint &&
             endpoint.Metadata.GetMetadata<ActionDescriptor>() is ActionDescriptor actionDescriptor)
@@ -43,11 +44,9 @@ public static class TemplateHelper
             actionContext = new ActionContext(httpContextAccessor.HttpContext,
                 httpContextAccessor.HttpContext.GetRouteData() ?? new RouteData(),
                 actionDescriptor);
-            viewEngineResult = viewEngine.FindView(actionContext, viewName, false);
         }
         else
         {
-            viewEngineResult = viewEngine.GetView(executingFilePath: viewName, viewPath: viewName, isMainPage: false);
 
             var httpContext = serviceProvider?.GetService<IHttpContextAccessor>()?.HttpContext ??
                 new DefaultHttpContext
