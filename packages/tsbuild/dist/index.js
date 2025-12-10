@@ -93,9 +93,9 @@ function isSplittingEnabled(opt) {
 }
 
 function cleanPluginOptions(opt) {
-    if (opt.plugins === void 0)
+    if (opt.plugins !== void 0)
         return null;
-    if (opt.clean === void 0 && isSplittingEnabled(opt) || opt.clean)
+    if ((opt.clean === void 0 && isSplittingEnabled(opt)) || opt.clean)
         return opt.clean === true ? {} : opt.clean ?? {};
     return null;
 }
@@ -138,18 +138,30 @@ export const esbuildOptions = (opt) => {
     }
     const splitting = isSplittingEnabled(opt);
     let plugins = opt.plugins;
+    
     if (plugins === void 0) {
         plugins = [];
+    
+        // clean and import plugins are only added if user didn't provide custom plugins
         const cleanOpt = cleanPluginOptions(opt);
         if (cleanOpt != null)
             plugins.push(cleanPlugin(cleanOpt));
+                
         if (opt.importAsGlobals === void 0 || opt.importAsGlobals)
             plugins.push(importAsGlobalsPlugin(opt.importAsGlobals ?? importAsGlobalsMapping));
     }
-    if (opt.write === void 0 && opt.writeIfChanged === void 0 || opt.writeIfChanged) {
+    else {
+        if (opt.clean)
+            console.warn("TSBuildOptions.clean is ignored when custom plugins are provided.");
+        if (opt.importAsGlobals)
+            console.warn("TSBuildOptions.importAsGlobals is ignored when custom plugins are provided.");
+    }
+
+    if ((opt.write === void 0 && opt.writeIfChanged === void 0) || opt.writeIfChanged) {
         plugins.push(writeIfChanged(opt.compress));
         opt.write = false;
     }
+
     delete opt.compress;
     delete opt.clean;
     delete opt.importAsGlobals;
