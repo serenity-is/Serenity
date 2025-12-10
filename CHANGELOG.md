@@ -1,3 +1,13 @@
+## 10.0.7 (2025-12-10)
+
+## Features
+- New AddImportMapEntry, and RenderImportMap extensions in HtmlScriptExtensions that can be used in layout pages to prepare import maps, and optionally add external URLs to csp (on by default).
+- Export jspdf and jspdf-autotable from ~/Serenity.Assets/jspdf/jspdf-autotable.bundle.js and use it from PdfExportHelper instead of CDN which may be problematic for strict CSP and some disconnected scenarios. They can also be overridden via an import map entries for `jspdf` and `jspdf-autotable`.
+- Also build a ~/Serenity.Assets/tiptap/tiptap.bundle.js to make it easier to update tiptap packages for apps. This can be overridden/mapped via an import map entry for `@serenity-is/tiptap`, see `_ImportMap.cshtml` in latest templates. Local npm installations for tiptap modules in templates are removed.
+
+## Bugfixes
+- tsbuild clean plugin was not functional by default, update `@serenity-is/tsbuild` in package.json to 10.0.7 to resolve the issue.
+
 ## 10.0.6 (2025-12-09)
 
 ## Bugfixes
