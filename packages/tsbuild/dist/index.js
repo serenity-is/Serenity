@@ -60,6 +60,7 @@ export const tsbuildDefaults = {
     format: "esm",
     jsxSideEffects: true,
     keepNames: true,
+    lineLimit: 1000,
     loader: {
         ".woff2": "file",
         ".woff": "file",
@@ -73,6 +74,9 @@ export const tsbuildDefaults = {
         ".webp": "file"
     },
     logLevel: "info",
+    logOverride: {
+        "empty-glob": "silent"
+    },
     metafile: true,
     minify: true,
     outbase: "./",
@@ -173,8 +177,11 @@ export const esbuildOptions = (opt) => {
 
 export const tsbuildGlobalBundleDefaults = {
     entryPoints: [
+        "Modules/Common/bundles/*.bundle.ts",
         "Modules/Common/bundles/*-bundle.ts",
+        "Modules/Common/bundles/*.bundle.css",
         "Modules/Common/bundles/*-bundle.css",
+        "Modules/Common/bundles/*.bundle.rtl.css",
         "Modules/Common/bundles/*-bundle.rtl.css"
     ],
     format: "iife",

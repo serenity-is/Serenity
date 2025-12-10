@@ -1,4 +1,4 @@
-import { DataGrid, deepClone, Fluent, formatDate, getGlobalObject, ListRequest, ListResponse, serviceCall, stringFormat, ToolButton } from "@serenity-is/corelib";
+import { DataGrid, deepClone, Fluent, formatDate, getGlobalObject, ListRequest, ListResponse, notifyError, resolveUrl, serviceCall, stringFormat, ToolButton } from "@serenity-is/corelib";
 import { applyFormatterResultToCellNode, Column, FormatterResult, ISleekGrid } from "@serenity-is/sleekgrid";
 import { type jsPDF } from "./JsPdfAutoTable";
 
@@ -237,35 +237,25 @@ export namespace PdfExportHelper {
             return then({ jsPDF });
 
         import("jspdf" as any).then(jsPDFModule => {
-            jsPDF = jsPDFModule?.jsPDF ?? globalObj.jsPDF ?? globalObj.jspdf?.jsPDF as jsPDF;
+            jsPDF = jsPDFModule?.jsPDF;
             if (jsPDF) {
                 globalObj.jsPDF = jsPDF;
                 then({ jsPDF });
             }
-            else {
-                throw new Error("Cannot import jsPDF module!");
-            }
-        }).catch((e) => {
-            console.warn("Falling back to CDN import for jsPDF.", e);
-            var script = document.getElementById("jsPDFScript") as HTMLScriptElement;
-            if (script)
-                return then({ jsPDF: globalObj.jsPDF });
-
-            script = document.createElement("script");
-            script.type = "text/javascript";
-            script.async = false;
-            script.id = "jsPDFScript";
-            script.addEventListener("load", () => {
-                jsPDF = globalObj.jsPDF ?? globalObj.jspdf?.jsPDF as jsPDF;
+            else 
+                notifyError("Failed to load jsPDF module from import map!");
+        }).catch(() => {
+            import(resolveUrl("~/Serenity.Assets/jspdf/jspdf-autotable.bundle.js")).then(jsPDFModule => {
+                jsPDF = jsPDFModule?.jsPDF;
                 if (jsPDF) {
+                    globalObj.jsPDF = jsPDF;
                     then({ jsPDF });
                 }
-                else {
-                    throw new Error("jsPDF is not available after UMD script load from CDN!");
-                }
+                else
+                    notifyError("Failed to load jsPDF module from assets!");
+            }).catch(() => {
+                notifyError("Failed to load jsPDF module!");
             });
-            script.src = "https://cdnjs.cloudflare.com/ajax/libs/jspdf/3.0.3/jspdf.umd.min.js";
-            document.head.append(script);
         });
     }
 
@@ -282,26 +272,23 @@ export namespace PdfExportHelper {
                 else if (jsPDF?.API?.autoTable) {
                     then({ jsPDF });
                 }
-                else {
-                    throw new Error("Cannot import jsPDF AutoTable module!");
-                }
+                else 
+                    notifyError("Failed to load jsPDF AutoTable module from import map!");
             }).catch(() => {
-                console.warn("Falling back to CDN import for jsPDF AutoTable.");
-                const globalObj = getGlobalObject();
-                let jsPDF = globalObj.jsPDF ?? globalObj.jspdf?.jsPDF as jsPDF;                
-                var script = document.querySelector("#jsPDFAutoTableScript") as HTMLScriptElement;
-                if (script)
-                    return then({ jsPDF });
-
-                script = document.createElement("script");
-                script.async = false;
-                script.type = "text/javascript";
-                script.id = "jsPDFAutoTableScript";
-                script.addEventListener("load", () => {
-                    then({ jsPDF });
+                import(resolveUrl("~/Serenity.Assets/jspdf/jspdf-autotable.bundle.js")).then(({ applyPlugin }) => {
+                    if (typeof applyPlugin === "function") {
+                        applyPlugin(jsPDF);
+                        then({ jsPDF });
+                    }
+                    else if (jsPDF?.API?.autoTable) {
+                        then({ jsPDF });
+                    }
+                    else
+                        notifyError("Failed to load jsPDF AutoTable module from assets!");
+                })
+                .catch(() => {
+                    notifyError("Failed to load jsPDF AutoTable module!");
                 });
-                script.src = "https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/5.0.2/jspdf.plugin.autotable.min.js";
-                document.head.append(script);
             });
         });
     }

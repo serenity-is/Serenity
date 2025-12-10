@@ -1,5 +1,6 @@
 import { copyFileSync, constants, existsSync, mkdirSync, readFileSync, writeFileSync } from 'node:fs';
 import { dirname } from 'node:path';
+import esbuild from 'esbuild';
 
 function copyFileIfChanged(srcFile, dstfile, opt) {
 
@@ -95,3 +96,49 @@ for (const file of [
 
 copyFileIfChanged(`node_modules/sortablejs/Sortable.js`, `wwwroot/Scripts/sortable.js`);
 copyFileIfChanged(`node_modules/sortablejs/Sortable.min.js`, `wwwroot/Scripts/sortable.min.js`);
+
+function writeIfChanged() {
+    return {
+        name: "write-if-changed",
+        setup(build) {
+            const write = build.initialOptions.write;
+            build.initialOptions.write = false;
+            build.onEnd(result => {
+                if (!(write === undefined || write))
+                    return;
+                result.outputFiles?.forEach(file => {
+                    if (existsSync(file.path)) {
+                        const old = readFileSync(file.path);
+                        if (old.equals(file.contents))
+                            return;
+                    }
+                    else {
+                        mkdirSync(dirname(file.path), { recursive: true });
+                    }
+                    writeFileSync(file.path, file.text);
+                });
+            });
+        }
+    };
+}
+
+await esbuild.build({
+    entryPoints: ['./src/**/*.mjs'],
+    bundle: true,
+    color: true,
+    external: [
+        "canvg", // jspdf optional dependency
+        "core-js", // jspdf optional dependency
+        "dompurify", // jspdf optional dependency
+        "html2canvas" // jspdf optional dependency
+    ],
+    outdir: 'wwwroot',
+    outbase: './src',
+    format: 'esm',
+    minify: true,
+    lineLimit: 1000,
+    logLevel: "info",
+    sourcemap: false,
+    sourceRoot: "https://packages.serenity.is/assets/src/",
+    plugins: [writeIfChanged()],
+});
