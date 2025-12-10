@@ -314,8 +314,8 @@ public static partial class HtmlScriptExtensions
         ArgumentException.ThrowIfNullOrEmpty(value);
 
         // Auto-quote if it looks like a keyword (alphanumeric, no existing quotes)
-        if (!string.IsNullOrEmpty(value) && 
-            !value.StartsWith('\'') && !value.StartsWith('\"') && 
+        if (!string.IsNullOrEmpty(value) &&
+            !value.StartsWith('\'') && !value.StartsWith('\"') &&
             value.All(c => char.IsLetterOrDigit(c) || c == '-' || c == '_'))
         {
             return $"'{value}'";
@@ -521,7 +521,7 @@ public static partial class HtmlScriptExtensions
     /// <param name="csp">Indicates whether to add a Content Security Policy directive for the module address. Set to <see
     /// langword="true"/> to add the directive; otherwise, <see langword="false"/>.</param>
     public static void AddImportMapEntry(this HttpContext context, string specifier, string address, string integrity = null,
-        bool csp = true)
+        bool? csp = null)
     {
         ArgumentNullException.ThrowIfNull(context);
         ArgumentNullException.ThrowIfNull(specifier);
@@ -532,13 +532,27 @@ public static partial class HtmlScriptExtensions
         if (contextItems[importMapKey] is not ImportMap importMap)
             contextItems[importMapKey] = importMap = new ImportMap();
         importMap.Imports ??= new Dictionary<string, string>(StringComparer.Ordinal);
+
+        if (address.StartsWith("~/", StringComparison.Ordinal) ||
+            address.StartsWith('/'))
+        {
+            address = context.RequestServices.GetService<IContentHashCache>()?
+                .ResolveWithHash(context.Request.PathBase, address) ?? address;
+            csp ??= false;
+        }
+        else csp ??= address.StartsWith("http://", StringComparison.Ordinal) ||
+            address.StartsWith("https://", StringComparison.Ordinal) ||
+            address.StartsWith("data:", StringComparison.Ordinal) ||
+            address.StartsWith("blob:", StringComparison.Ordinal);
+
         importMap.Imports[specifier] = address;
         if (integrity != null)
         {
             importMap.Integrity ??= new Dictionary<string, string>(StringComparer.Ordinal);
             importMap.Integrity[address] = integrity;
         }
-        if (csp)
+
+        if (csp == true)
             context.AddCspDirective("script-src", address);
     }
 
