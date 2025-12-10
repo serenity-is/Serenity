@@ -228,7 +228,8 @@ export namespace PdfExportHelper {
         };
     }
 
-    const jspdfModule = "jspdf";
+    const jsPdfModuleName = "jspdf";
+    const jsPdfAutoTableModuleName = "jspdf-autotable";
 
     function jsPdfImport(then: ({ jsPDF }: { jsPDF: jsPDF }) => void) {
 
@@ -238,7 +239,7 @@ export namespace PdfExportHelper {
         if (jsPDF)
             return then({ jsPDF });
 
-        import(`${jspdfModule}`).then(jsPDFModule => {
+        import(`${jsPdfModuleName}`).then(jsPDFModule => {
             jsPDF = jsPDFModule?.jsPDF;
             if (jsPDF) {
                 globalObj.jsPDF = jsPDF;
@@ -266,7 +267,7 @@ export namespace PdfExportHelper {
             if (jsPDF?.API?.autoTable)
                 return then({ jsPDF });
 
-            import("jspdf-autotable" as any).then(({ applyPlugin }) => {
+            import(`${jsPdfAutoTableModuleName}`).then(({ applyPlugin }) => {
                 if (typeof applyPlugin === "function") {
                     applyPlugin(jsPDF);
                     then({ jsPDF });
