@@ -184,6 +184,9 @@ export const tsbuildGlobalBundleDefaults = {
         "Modules/Common/bundles/*.bundle.rtl.css",
         "Modules/Common/bundles/*-bundle.rtl.css"
     ],
+    external: [
+        "@serenity-is/tiptap"
+    ],
     format: "iife",
     importAsGlobals: null,
     outdir: "wwwroot/esm/bundles/",

@@ -19,13 +19,25 @@ export interface HtmlContentEditorOptions {
 export interface CKEditorConfig {
 }
 
+// we don't have such a package right now, but this will let the user override it
+// via an import map or if in future if we do, this will load that
+const tiptapModuleName = "@serenity-is/tiptap";
+
 export class HtmlContentEditor<P extends HtmlContentEditorOptions = HtmlContentEditorOptions> extends EditorWidget<P>
     implements IStringValue, IReadOnly {
     static override[Symbol.typeInfo] = this.registerEditor(nsSerenity, [IStringValue, IReadOnly]);
 
     declare private _ckInstanceReady: boolean;
     declare readonly domNode: HTMLTextAreaElement;
-    static tiptapModule: TiptapModule | (() => (TiptapModule | Promise<TiptapModule>));
+
+    static tiptapModule: TiptapModule | (() => (TiptapModule | Promise<TiptapModule>)) = async () => {
+        try {
+            return await import(`${tiptapModuleName}`);
+        } catch { 
+            return await import(resolveUrl("~/Serenity.Assets/tiptap/tiptap.bundle.js"));
+        }
+    }
+
     declare private tiptapEditor: any;
     declare private tiptapElement: HTMLElement;
 

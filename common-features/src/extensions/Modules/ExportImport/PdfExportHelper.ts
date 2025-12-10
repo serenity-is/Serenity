@@ -228,6 +228,8 @@ export namespace PdfExportHelper {
         };
     }
 
+    const jspdfModule = "jspdf";
+
     function jsPdfImport(then: ({ jsPDF }: { jsPDF: jsPDF }) => void) {
 
         const globalObj = getGlobalObject();
@@ -236,7 +238,7 @@ export namespace PdfExportHelper {
         if (jsPDF)
             return then({ jsPDF });
 
-        import("jspdf" as any).then(jsPDFModule => {
+        import(`${jspdfModule}`).then(jsPDFModule => {
             jsPDF = jsPDFModule?.jsPDF;
             if (jsPDF) {
                 globalObj.jsPDF = jsPDF;
