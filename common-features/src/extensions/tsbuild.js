@@ -59,5 +59,5 @@ await esbuild({
     plugins: [
         writeIfChanged()
     ],
-    target: "es6",
+    target: "es2022",
 });

@@ -60,7 +60,7 @@ function writeIfChanged() {
 
 const compatDefaults = {
     bundle: true,
-    target: 'es6',
+    target: 'es2022',
     format: 'iife',
     globalName: 'Slick._',
     color: true,
@@ -154,7 +154,7 @@ const sleekDefaults = {
     color: true,
     jsxSideEffects: true,
     logLevel: 'info',
-    target: 'es6',
+    target: 'es2022',
     sourcemap: true,
     sourceRoot: "https://packages.serenity.is/sleekgrid/src/"
 }

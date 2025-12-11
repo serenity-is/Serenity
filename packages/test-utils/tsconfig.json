@@ -5,7 +5,7 @@
     "module": "ESNext",
     "moduleResolution": "bundler",
     "lib": [
-      "es2015",
+      "ES2022",
       "dom"
     ],
     "outDir": "./out"

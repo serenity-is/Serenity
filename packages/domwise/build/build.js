@@ -36,7 +36,7 @@ const defaults = {
     jsxSideEffects: true,
     logLevel: 'info',
     minify: false,
-    target: 'es2020',
+    target: 'es2022',
     outdir: 'dist',
     plugins: [writeIfChanged()],
     sourcemap: true,

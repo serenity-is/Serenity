@@ -21,7 +21,7 @@ const coreLibBase = {
     sourcemap: true,
     sourceRoot: "https://packages.serenity.is/corelib/src/",
     splitting: false,
-    target: 'es2015'
+    target: 'es2022'
 }
 
 // https://github.com/evanw/esbuild/issues/337
