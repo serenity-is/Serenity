@@ -82,7 +82,7 @@ export const tsbuildDefaults = {
     outbase: "./",
     outdir: "wwwroot/esm",
     sourcemap: true,
-    target: "es2017"
+    target: "es2022"
 };
 
 function isSplittingEnabled(opt) {
