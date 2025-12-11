@@ -68,8 +68,8 @@ class SignalObserveArgsImpl<T> implements SignalObserveArgs<T> {
     declare prevValue: T | undefined;
     declare isInitial: boolean;
     declare hasChanged: boolean;
-    declare private _dispose: EffectDisposer | undefined;
-    declare private _node: EventTarget | null | undefined;
+    #dispose: EffectDisposer | undefined;
+    #node: EventTarget | null | undefined;
     declare lifecycleRoot: EventTarget | null | undefined;
 
     constructor(signal: SignalLike<T>, lifecycleRoot: EventTarget | null | undefined, lifecycleNode: EventTarget | null | undefined) {
@@ -77,38 +77,38 @@ class SignalObserveArgsImpl<T> implements SignalObserveArgs<T> {
         this.isInitial = true;
         this.hasChanged = false;
         this.lifecycleRoot = lifecycleRoot;
-        this._node = lifecycleNode;
+        this.#node = lifecycleNode;
     }
 
     get lifecycleNode(): EventTarget | null | undefined {
-        return this._node;
+        return this.#node;
     }
 
-    private delDispose() {
-        removeDisposingListener(this._node, this.effectDisposer);
-        removeDisposingListener(this._node, (this.signal as DerivedSignalLike<T>)?.derivedDisposer);
+    #delDispose() {
+        removeDisposingListener(this.#node, this.effectDisposer);
+        removeDisposingListener(this.#node, (this.signal as DerivedSignalLike<T>)?.derivedDisposer);
     }
 
-    private addDispose() {
-        addDisposingListener(this._node, this.effectDisposer);
-        addDisposingListener(this._node, (this.signal as DerivedSignalLike<T>)?.derivedDisposer);
+    #addDispose() {
+        addDisposingListener(this.#node, this.effectDisposer);
+        addDisposingListener(this.#node, (this.signal as DerivedSignalLike<T>)?.derivedDisposer);
     }
 
     get effectDisposer(): EffectDisposer | undefined {
-        return this._dispose;
+        return this.#dispose;
     }
 
     set effectDisposer(value: EffectDisposer | undefined) {
-        this.delDispose();
-        this._dispose = value;
-        this.addDispose();
+        this.#delDispose();
+        this.#dispose = value;
+        this.#addDispose();
     }
 
     set lifecycleNode(value: EventTarget | undefined) {
-        if (value !== this._node) {
-            this.delDispose();
-            this._node = value;
-            this.addDispose();
+        if (value !== this.#node) {
+            this.#delDispose();
+            this.#node = value;
+            this.#addDispose();
         }
     }
 }
@@ -207,34 +207,34 @@ export function derivedSignal<TDerived, TInput = any>(input: SignalLike<TInput>,
 }
 
 export class PrimitiveComputed<T> {
-    private _subs: Set<(value: T) => void> = new Set();
-    declare private _value: T;
-    declare private _fn: () => T;
+    #subs: Set<(value: T) => void> = new Set();
+    #value: T;
+    #fn: () => T;
 
     constructor(fn: () => T) {
-        this._fn = fn;
+        this.#fn = fn;
         this.update(true);
     }
 
     update(force?: boolean): void {
-        const newValue = this._fn();
-        if (newValue !== this._value || force) {
-            this._value = newValue;
-            this._subs.forEach(sub => sub(newValue));
+        const newValue = this.#fn();
+        if (newValue !== this.#value || force) {
+            this.#value = newValue;
+            this.#subs.forEach(sub => sub(newValue));
         }
     }
 
     subscribe(callback: (value: T) => void): EffectDisposer {
-        callback(this._value);
-        this._subs.add(callback);
-        return () => this._subs.delete(callback);
+        callback(this.#value);
+        this.#subs.add(callback);
+        return () => this.#subs.delete(callback);
     }
 
     peek(): T {
-        return this._value;
+        return this.#value;
     }
 
     get value(): T {
-        return this._value;
+        return this.#value;
     }
 }

@@ -28,6 +28,7 @@
     "sourceMap": false,
     "strict": true,
     "strictFunctionTypes": false,
+    "strictPropertyInitialization": false,
     "target": "ESNext",
     "useDefineForClassFields": false
   },
