@@ -4802,7 +4802,7 @@ export declare class ColumnPickerDialog<P extends ColumnPickerDialogOptions = Co
 	static openDialog(opt: ColumnPickerDialogOptions): void;
 }
 declare class PubSub<TEvent = {}> {
-	private handlers;
+	#private;
 	subscribe(fn: (e: TEvent) => void): void;
 	unsubscribe(fn: (e: TEvent) => void): void;
 	notify(e: TEvent, opt?: {

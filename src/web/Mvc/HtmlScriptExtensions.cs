@@ -557,6 +557,14 @@ public static partial class HtmlScriptExtensions
     }
 
     /// <summary>
+    /// Adds import map entries for modules provided via Serenity.Assets like tiptap, jspdf, etc.
+    /// </summary>
+    public static void AddSerenityAssetsImportMapEntries(this HttpContext context)
+    {
+        
+    }
+
+    /// <summary>
     /// Renders an HTML import map script element based on the current view's import map configuration.
     /// </summary>
     /// <remarks>Use this method in a Razor view to emit an import map for JavaScript module loading. The
