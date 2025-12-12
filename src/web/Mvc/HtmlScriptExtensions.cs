@@ -501,10 +501,11 @@ public static partial class HtmlScriptExtensions
     /// <param name="integrity">An optional integrity hash for the module, used to verify its contents. If null, no integrity value is set.</param>
     /// <param name="csp">Indicates whether to add a Content Security Policy directive for the module address. Set to <see
     /// langword="true"/> to add the directive; otherwise, <see langword="false"/>.</param>
+    /// <param name="overwrite">True (default) to overwrite existing entries if any</param>
     public static void AddImportMapEntry(this IHtmlHelper html, string specifier, string address, string integrity = null,
-        bool csp = true)
+        bool csp = true, bool overwrite = true)
     {
-        AddImportMapEntry(html?.ViewContext?.HttpContext, specifier, address, integrity, csp);
+        AddImportMapEntry(html?.ViewContext?.HttpContext, specifier, address, integrity, csp, overwrite);
     }
 
     /// <summary>
@@ -520,8 +521,9 @@ public static partial class HtmlScriptExtensions
     /// <param name="integrity">An optional integrity hash for the module, used to verify its contents. If null, no integrity value is set.</param>
     /// <param name="csp">Indicates whether to add a Content Security Policy directive for the module address. Set to <see
     /// langword="true"/> to add the directive; otherwise, <see langword="false"/>.</param>
+    /// <param name="overwrite">True (default) to overwrite existing entries if any</param>
     public static void AddImportMapEntry(this HttpContext context, string specifier, string address, string integrity = null,
-        bool? csp = null)
+        bool? csp = null, bool overwrite = true)
     {
         ArgumentNullException.ThrowIfNull(context);
         ArgumentNullException.ThrowIfNull(specifier);
@@ -532,6 +534,9 @@ public static partial class HtmlScriptExtensions
         if (contextItems[importMapKey] is not ImportMap importMap)
             contextItems[importMapKey] = importMap = new ImportMap();
         importMap.Imports ??= new Dictionary<string, string>(StringComparer.Ordinal);
+
+        if (!overwrite && importMap.Imports.ContainsKey(specifier))
+            return;
 
         if (address.StartsWith("~/", StringComparison.Ordinal) ||
             address.StartsWith('/'))
@@ -559,9 +564,13 @@ public static partial class HtmlScriptExtensions
     /// <summary>
     /// Adds import map entries for modules provided via Serenity.Assets like tiptap, jspdf, etc.
     /// </summary>
-    public static void AddSerenityAssetsImportMapEntries(this HttpContext context)
+    /// <param name="context">Http context</param>
+    /// <param name="overwrite">True (default) to overwrite existing entries if any</param>
+    public static void AddSerenityAssetsImportMapEntries(this HttpContext context, bool overwrite = true)
     {
-        
+        context.AddImportMapEntry("jspdf", "~/Serenity.Assets/jspdf/jspdf-autotable.bundle.js", overwrite: overwrite);
+        context.AddImportMapEntry("jspdf-autotable", "~/Serenity.Assets/jspdf/jspdf-autotable.bundle.js", overwrite: overwrite);
+        context.AddImportMapEntry("@serenity-is/tiptap", "~/Serenity.Assets/tiptap/tiptap.bundle.js", overwrite: overwrite);
     }
 
     /// <summary>
