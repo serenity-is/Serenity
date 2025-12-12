@@ -162,11 +162,10 @@ export class PermissionCheckEditor<P extends PermissionCheckEditorOptions = Perm
     protected override onClick(e: Event, row: number, cell: number): void {
         super.onClick(e, row, cell);
 
-        if (!Fluent.isDefaultPrevented(e))
-            SlickTreeHelper.toggleClick(e, row, cell, this.view, (x: any) => x.Key);
-
         if (Fluent.isDefaultPrevented(e))
             return;
+
+        SlickTreeHelper.toggleClick(e, row, cell, this.view, (x: any) => x.Key);
 
         const target = Fluent(e.target);
         let grant = target.hasClass('grant');
