@@ -495,26 +495,6 @@ public static partial class HtmlScriptExtensions
     /// <remarks>If the import map does not exist in the current HTTP context, a new one is created. This
     /// method is typically used in server-side rendering scenarios to manage JavaScript module imports and CSP
     /// headers.</remarks>
-    /// <param name="html">The HTML helper instance used to access the current view context.</param>
-    /// <param name="specifier">The module specifier to map, such as a package name or relative path. Cannot be null.</param>
-    /// <param name="address">The address or URL where the module can be loaded from. Cannot be null.</param>
-    /// <param name="integrity">An optional integrity hash for the module, used to verify its contents. If null, no integrity value is set.</param>
-    /// <param name="csp">Indicates whether to add a Content Security Policy directive for the module address. Set to <see
-    /// langword="true"/> to add the directive; otherwise, <see langword="false"/>.</param>
-    /// <param name="overwrite">True (default) to overwrite existing entries if any</param>
-    public static void AddImportMapEntry(this IHtmlHelper html, string specifier, string address, string integrity = null,
-        bool csp = true, bool overwrite = true)
-    {
-        AddImportMapEntry(html?.ViewContext?.HttpContext, specifier, address, integrity, csp, overwrite);
-    }
-
-    /// <summary>
-    /// Adds an entry to the import map for the current HTML view, associating a module specifier with its address and
-    /// optional integrity value.
-    /// </summary>
-    /// <remarks>If the import map does not exist in the current HTTP context, a new one is created. This
-    /// method is typically used in server-side rendering scenarios to manage JavaScript module imports and CSP
-    /// headers.</remarks>
     /// <param name="context">Http context.</param>
     /// <param name="specifier">The module specifier to map, such as a package name or relative path. Cannot be null.</param>
     /// <param name="address">The address or URL where the module can be loaded from. Cannot be null.</param>
