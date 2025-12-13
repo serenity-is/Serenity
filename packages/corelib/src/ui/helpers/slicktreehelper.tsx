@@ -77,6 +77,9 @@ export namespace SlickTreeHelper {
         if (!target.classList.contains('s-TreeToggle')) {
             return;
         }
+        
+        e.preventDefault();
+
         if (target.classList.contains('s-TreeCollapse') || target.classList.contains('s-TreeExpand')) {
             var item = view.getItem(row) as any;
             if (item != null) {

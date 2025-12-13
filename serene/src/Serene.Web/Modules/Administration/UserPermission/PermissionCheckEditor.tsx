@@ -129,7 +129,7 @@ export class PermissionCheckEditor<P extends PermissionCheckEditorOptions = Perm
         return false;
     }
 
-    protected overrideonViewFilter(item: PermissionCheckItem): boolean {
+    protected override onViewFilter(item: PermissionCheckItem): boolean {
         return super.onViewFilter(item) && SlickTreeHelper.filterById(item, this.view, x => x.ParentKey) &&
             (!this.searchText || (this.matchContains(item) || item.IsGroup && this.getDescendants(item, false).some(x => this.matchContains(x))));
     }
@@ -162,8 +162,10 @@ export class PermissionCheckEditor<P extends PermissionCheckEditorOptions = Perm
     protected override onClick(e: Event, row: number, cell: number): void {
         super.onClick(e, row, cell);
 
-        if (!Fluent.isDefaultPrevented(e))
-            SlickTreeHelper.toggleClick(e, row, cell, this.view, (x: any) => x.Key);
+        if (Fluent.isDefaultPrevented(e))
+            return;
+
+        SlickTreeHelper.toggleClick(e, row, cell, this.view, (x: any) => x.Key);
 
         if (Fluent.isDefaultPrevented(e))
             return;
