@@ -1,3 +1,4 @@
+import { Fluent } from "../../base";
 import { IRemoteView } from "../../slick";
 
 export namespace SlickTreeHelper {
@@ -73,6 +74,9 @@ export namespace SlickTreeHelper {
 
     export function toggleClick<TItem>(e: Event, row: number, cell: number,
         view: IRemoteView<TItem>, getId: (x: TItem) => any): void {
+        if (!e || !e.target || Fluent.isDefaultPrevented(e)) 
+            return;
+
         var target = e.target as HTMLElement;
         if (!target.classList.contains('s-TreeToggle')) {
             return;
