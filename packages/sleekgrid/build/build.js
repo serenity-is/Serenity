@@ -162,7 +162,7 @@ const sleekDefaults = {
 const sleekIndex = {
     ...sleekDefaults,
     format: 'esm',
-    minify: true,
+    minify: false,
     outfile: './dist/index.js'
 }
 

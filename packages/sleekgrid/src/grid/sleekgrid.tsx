@@ -1482,7 +1482,7 @@ export class SleekGrid<TItem = any> implements ISleekGrid<TItem> {
             this.createCssRules();
             this.resizeCanvas();
             this.updateCanvasWidth(true);
-            this.handleScroll();
+            this.handleScroll({ forceSync: true });
             this.getSelectionModel()?.refreshSelections?.();
         }
     }
@@ -2639,18 +2639,19 @@ export class SleekGrid<TItem = any> implements ISleekGrid<TItem> {
 
         this._scrollTop = Math.max(0, this.getScrollContainerY().scrollTop - (deltaY * this._options.rowHeight));
         this._scrollLeft = this.getScrollContainerX().scrollLeft + (deltaX * 10);
-        if (this._handleScroll(true)) {
+        if (this.handleScroll({ isMouseWheel: true })) {
             e.preventDefault();
         }
     }
 
-    private handleScroll() {
-        this._scrollTop = this.getScrollContainerY().scrollTop;
-        this._scrollLeft = this.getScrollContainerX().scrollLeft;
-        this._handleScroll();
-    }
-
-    private _handleScroll(isMouseWheel?: boolean) {
+    private handleScroll(opt?: {
+        isMouseWheel?: boolean,
+        forceSync?: boolean,
+    }) {
+        if (!opt?.isMouseWheel) {
+            this._scrollTop = this.getScrollContainerY().scrollTop;
+            this._scrollLeft = this.getScrollContainerX().scrollLeft;
+        }
 
         var vScrollDist = Math.abs(this._scrollTop - this._scrollTopPrev);
         var hScrollDist = Math.abs(this._scrollLeft - this._scrollLeftPrev);
@@ -2658,37 +2659,42 @@ export class SleekGrid<TItem = any> implements ISleekGrid<TItem> {
         if (hScrollDist || vScrollDist)
             this._ignoreScrollUntil = new Date().getTime() + 100;
 
-        if (hScrollDist) {
+        if (hScrollDist || opt?.forceSync) {
             const scrollLeft = this._scrollLeftPrev = this._scrollLeft;
             getAllHScrollContainers(this._refs).forEach(sc => sc.scrollLeft = scrollLeft);
         }
 
         const vpi = this._viewportInfo;
 
-        if (vScrollDist) {
-            this._vScrollDir = this._scrollTopPrev < this._scrollTop ? 1 : -1;
-            const scrollTop = this._scrollTopPrev = this._scrollTop;
-
+        if (vScrollDist || opt?.forceSync) {
             const scrollContainerY = this.getScrollContainerY();
-            if (isMouseWheel === true) {
-                scrollContainerY.scrollTop = scrollTop;
+
+            if (vScrollDist) {
+                this._vScrollDir = this._scrollTopPrev < this._scrollTop ? 1 : -1;
+                this._scrollTopPrev = this._scrollTop;
+
+                if (opt?.isMouseWheel) {
+                    scrollContainerY.scrollTop = this._scrollTop;
+                }
             }
 
-            getAllVScrollContainers(this._refs).forEach(sc => sc !== scrollContainerY && (sc.scrollTop = scrollTop));
+            getAllVScrollContainers(this._refs).forEach(sc => sc !== scrollContainerY && (sc.scrollTop = this._scrollTop));
 
-            // switch virtual pages if needed
-            if (vScrollDist < this._viewportInfo.height) {
-                this.scrollTo(scrollTop + this._pageOffset);
-            } else {
-                var oldOffset = this._pageOffset;
-                if (vpi.realScrollHeight == vpi.height) {
-                    this._page = 0;
+            if (vScrollDist) {
+                // switch virtual pages if needed
+                if (vScrollDist < this._viewportInfo.height) {
+                    this.scrollTo(this._scrollTop + this._pageOffset);
                 } else {
-                    this._page = Math.min(this._numberOfPages - 1, Math.floor(scrollTop * ((vpi.virtualHeight - this._viewportInfo.height) / (vpi.realScrollHeight - this._viewportInfo.height)) * (1 / this._pageHeight)));
-                }
-                this._pageOffset = Math.round(this._page * this._jumpinessCoefficient);
-                if (oldOffset != this._pageOffset) {
-                    this.invalidateAllRows();
+                    var oldOffset = this._pageOffset;
+                    if (vpi.realScrollHeight == vpi.height) {
+                        this._page = 0;
+                    } else {
+                        this._page = Math.min(this._numberOfPages - 1, Math.floor(this._scrollTop * ((vpi.virtualHeight - this._viewportInfo.height) / (vpi.realScrollHeight - this._viewportInfo.height)) * (1 / this._pageHeight)));
+                    }
+                    this._pageOffset = Math.round(this._page * this._jumpinessCoefficient);
+                    if (oldOffset != this._pageOffset) {
+                        this.invalidateAllRows();
+                    }
                 }
             }
         }
