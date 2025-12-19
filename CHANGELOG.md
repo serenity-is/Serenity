@@ -1,38 +1,50 @@
+## 10.0.8 (2025-12-18)
+
+### Features
+- All scripts now target ES2022, which is supported by all current major browsers
+- AddSerenityAssetsImportMapEntries extension for adding jspdf and tiptap import map entries from ~/Serenity.Assets in _ImportMap.cshtml instead of manually specifiying individual entries
+- Use .bundle.js and .bundle.css instead of -bundle.js and -bundle.css suffixes for consistency.
+
+### Bugfixes
+
+- Fix temporary column scroll synchronization issue when hiding / showing a column via column picker
+- Fix PermissionCheckEditor onClick event name
+
 ## 10.0.7 (2025-12-10)
 
-## Features
+### Features
 - New AddImportMapEntry, and RenderImportMap extensions in HtmlScriptExtensions that can be used in layout pages to prepare import maps, and optionally add external URLs to csp (on by default).
 - Export jspdf and jspdf-autotable from ~/Serenity.Assets/jspdf/jspdf-autotable.bundle.js and use it from PdfExportHelper instead of CDN which may be problematic for strict CSP and some disconnected scenarios. They can also be overridden via an import map entries for `jspdf` and `jspdf-autotable`.
 - Also build a ~/Serenity.Assets/tiptap/tiptap.bundle.js to make it easier to update tiptap packages for apps. This can be overridden/mapped via an import map entry for `@serenity-is/tiptap`, see `_ImportMap.cshtml` in latest templates. Local npm installations for tiptap modules in templates are removed.
 
-## Bugfixes
+### Bugfixes
 - tsbuild clean plugin was not functional by default, update `@serenity-is/tsbuild` in package.json to 10.0.7 to resolve the issue.
 
 ## 10.0.6 (2025-12-09)
 
-## Bugfixes
+### Bugfixes
 - Fix report cshtml file could not be located due to IActionContextAccessor being made obsolete in .NET 10.
 - Add https://cdnjs.cloudflare.com/ajax/libs/ to CSP script-src directive for jspdf dynamic loading
 
 ## 10.0.5 (2025-12-07)
 
-## Features
+### Features
 - Allow TransformIgnore attribute on methods. 
 - Improve handling for complex / unresolvable types during server types generation by using "unknown" as a type, and printing the problematic type as an inline comment. Note that this may now also include members of non-standard types like interfaces, abstract types etc which was skipped before.
 
 ## 10.0.4 (2025-12-06)
 
-## Bugfixes
+### Bugfixes
 - Missing package.json in NuGet packages for assets, corelib etc.
 
 ## 10.0.3 (2025-12-06)
 
-## Bugfixes
+### Bugfixes
 - Missing targets file in Serenity.Net.Web
 
-## 10.0.2 (2025-12-06)
+### 10.0.2 (2025-12-06)
 
-## Features
+### Features
 - Make it possible to optionally provide files under wwwroot via npm / nuget package to node_modules/.dotnet. Also include feature project's package.json in the NuGet package and use it while restoring packages.  Adapt TinyJSON code to for a stable JSON parser / writer in RoslynCodeTaskFactory without having to reference System.Text.Json or Newtonsoft.Json within RestoreNodeTypesTask.
 - Added a patched local copy of glightbox to Serenity.Assets as it has issues with CSP
 - Migrated from .sln to .slnx format which is simpler and readable.
