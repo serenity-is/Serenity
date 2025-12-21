@@ -1,3 +1,4 @@
+import { init as esmlInit, parse as esmlParse } from "es-module-lexer";
 import esbuild from "esbuild";
 import { createReadStream, createWriteStream, existsSync, mkdirSync, readFileSync, rmSync, writeFileSync } from "fs";
 import { globSync } from "glob";
@@ -138,15 +139,15 @@ export const esbuildOptions = (opt) => {
     }
     const splitting = isSplittingEnabled(opt);
     let plugins = opt.plugins;
-    
+
     if (plugins === void 0) {
         plugins = [];
-    
+
         // clean and import plugins are only added if user didn't provide custom plugins
         const cleanOpt = cleanPluginOptions(opt);
         if (cleanOpt != null)
             plugins.push(cleanPlugin(cleanOpt));
-                
+
         if (opt.importAsGlobals === void 0 || opt.importAsGlobals)
             plugins.push(importAsGlobalsPlugin(opt.importAsGlobals ?? importAsGlobalsMapping));
     }
@@ -257,17 +258,71 @@ export const build = async (opt) => {
 export function importAsGlobalsPlugin(mapping) {
     const escRe = (s) => s.replace(/[-\/\\^$*+?.()|[\]{}]/g, "\\$&");
     const filter = new RegExp(Object.keys(mapping).map((mod) => `^${escRe(mod)}$`).join("|"));
+    const referenced = new Set();
+    let serenityModuleContents;
     return {
         name: "global-imports",
-        setup(build2) {
-            build2.onResolve({ filter }, (args) => {
+        setup(build) {
+            build.onResolve({ filter }, (args) => {
+                if (args.namespace === "skip-external-global") {
+                    return;
+                }
                 if (!mapping[args.path])
                     throw new Error("Unknown global: " + args.path);
+                referenced.add(args.path);
                 return { path: mapping[args.path], namespace: "external-global" };
             });
-            build2.onLoad(
+            build.onLoad(
                 { filter: /.*/, namespace: "external-global" },
                 async (args) => {
+                    if (args.path === "Serenity") {
+                        if (serenityModuleContents === void 0) {
+                            const names = new Set();
+                            try {
+                                await esmlInit;
+                                for (const [mod, ns] of Object.entries(mapping)) {
+                                    if (ns === "Serenity" && referenced.has(mod)) {
+                                        const resResult = await build.resolve(mod, {
+                                            resolveDir: build.initialOptions.absWorkingDir || process.cwd(),
+                                            kind: "import-statement",
+                                            namespace: "skip-external-global"
+                                        });
+                                        if (resResult.errors.length)
+                                            throw new Error(`Failed to resolve module ${mod}: ${resResult.errors.map(e => e.text).join(", ")}`);
+                                        if (!resResult.path)
+                                            throw new Error(`Failed to resolve module ${mod}: no path returned from build.resolve!`);
+                                        const source = readFileSync(resResult.path, "utf8");
+                                        const [_, exports] = esmlParse(source);
+                                        for (const exp of exports) {
+                                            if (exp.n !== "default" && exp.n && exp.n.length > 0)
+                                                names.add(exp.n);
+                                        }
+                                    }
+                                }
+
+                                if (names.size > 0) {
+                                    const exportNames = Array.from(names).join(", ");
+                                    const sb = [];
+                                    sb.push(`const { ${exportNames} } = Serenity;`);
+                                    sb.push(`export { ${exportNames} };`);
+                                    serenityModuleContents = sb.join("\n");
+                                }
+                            }
+                            catch (e) {
+                                console.warn(`esbuild external-globals plugin: failed to parse exports for global import`, e);
+                                serenityModuleContents = null;
+                                // continue with commonjs export
+                            }
+                        }
+
+                        if (serenityModuleContents) {
+                            return {
+                                contents: serenityModuleContents,
+                                loader: "js"
+                            };
+                        }
+                    }
+
                     return { contents: `module.exports = ${args.path};`, loader: "js" };
                 }
             );

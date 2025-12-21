@@ -6,6 +6,7 @@
   "description": "Serenity ESBuild functions",
   "dependencies": {
     "esbuild": "catalog:serenity",
+    "es-module-lexer": "catalog:serenity",
     "glob": "catalog:serenity"
   },
   "exports": {

@@ -21,6 +21,9 @@ catalogs:
     dts-bundle-generator:
       specifier: 9.5.1
       version: 9.5.1
+    es-module-lexer:
+      specifier: 2.0.0
+      version: 2.0.0
     esbuild:
       specifier: 0.27.2
       version: 0.27.2
@@ -195,6 +198,9 @@ importers:
 
   packages/tsbuild:
     dependencies:
+      es-module-lexer:
+        specifier: catalog:serenity
+        version: 2.0.0
       esbuild:
         specifier: catalog:serenity
         version: 0.27.2
@@ -1134,6 +1140,9 @@ packages:
 
   es-module-lexer@1.7.0:
     resolution: {integrity: sha512-jEQoCwk8hyb2AZziIOLhDqpm5+2ww5uIE6lkO/6jcOCusfk6LhMHpXXfBLXTZ7Ydyt0j4VoUQv6uGNYbdW+kBA==}
+
+  es-module-lexer@2.0.0:
+    resolution: {integrity: sha512-5POEcUuZybH7IdmGsD8wlf0AI55wMecM9rVBTI/qEAy2c1kTOm3DjFYjrBdI2K3BaJjJYfYFeRtM0t9ssnRuxw==}
 
   esbuild@0.25.12:
     resolution: {integrity: sha512-bbPBYYrtZbkt6Os6FiTLCTFxvq4tt3JKall1vRwshA3fdVztsLAatFaZobhkBC8/BrPetoa0oksYoKXoG4ryJg==}
@@ -2384,6 +2393,8 @@ snapshots:
   entities@6.0.1: {}
 
   es-module-lexer@1.7.0: {}
+
+  es-module-lexer@2.0.0: {}
 
   esbuild@0.25.12:
     optionalDependencies:
