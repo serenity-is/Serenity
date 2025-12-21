@@ -255,7 +255,7 @@ export const build = async (opt) => {
     }
 };
 
-const globalModTest = {
+const serenityModuleTest = {
     "@serenity-is/corelib": "PropertyGrid",
     "@serenity-is/domwise": "observeSignal",
     "@serenity-is/domwise/jsx-runtime": "jsx",
@@ -267,7 +267,7 @@ const globalModTest = {
 export function importAsGlobalsPlugin(mapping) {
     const escRe = (s) => s.replace(/[-\/\\^$*+?.()|[\]{}]/g, "\\$&");
     const filter = new RegExp(Object.keys(mapping).map((mod) => `^${escRe(mod)}$`).join("|"));
-    const modContents = {};
+    let serenityModuleContents;
     return {
         name: "global-imports",
         setup(build) {
@@ -277,81 +277,105 @@ export function importAsGlobalsPlugin(mapping) {
                 }
                 if (!mapping[args.path])
                     throw new Error("Unknown global: " + args.path);
-                return { path: args.path, namespace: "external-global" };
+                return { path: mapping[args.path], namespace: "external-global" };
             });
             build.onLoad(
                 { filter: /.*/, namespace: "external-global" },
                 async (args) => {
-                    const mod = args.path;
-                    const ns = mapping[mod];
-                    if (mod.startsWith("@serenity-is/") && mapping[mod]) {
-                        if (!(mod in modContents)) {
+                    if (args.path === "Serenity") {
+                        if (serenityModuleContents === void 0) {
                             const initOpt = build?.initialOptions || {};
                             const absWorkingDir = initOpt.absWorkingDir || process.cwd();
                             const allNames = new Set();
+                            const nameByModule = {};
+                            const moduleTest = {};
                             try {
                                 await esmlInit;
-                                const resResult = await build.resolve(mod, {
-                                    resolveDir: absWorkingDir,
-                                    kind: "import-statement",
-                                    namespace: "skip-external-global"
-                                });
-                                if (resResult.errors.length)
-                                    throw new Error(`Failed to resolve module ${mod}: ${resResult.errors.map(e => e.text).join(", ")}`);
-                                if (!resResult.path)
-                                    throw new Error(`Failed to resolve module ${mod}: no path returned from build.resolve!`);
-                                let path = resResult.path;
-                                if (resResult.external) {
-                                    let currentPath = absWorkingDir;
-                                    const actualMod = mod == "@serenity-is/domwise/jsx-runtime" ? "@serenity-is/domwise" : mod;
-                                    const actualFile = mod == "@serenity-is/domwise/jsx-runtime" ? "dist/jsx-runtime.js" : "dist/index.js";
-                                    while (true) {
-                                        const nmPath = join(currentPath, "node_modules", actualMod, actualFile);
-                                        if (existsSync(nmPath)) {
-                                            path = nmPath;
-                                            break;
+                                for (const [mod, ns] of Object.entries(mapping)) {
+                                    if (ns === "Serenity") {
+                                        const resResult = await build.resolve(mod, {
+                                            resolveDir: absWorkingDir,
+                                            kind: "import-statement",
+                                            namespace: "skip-external-global"
+                                        });
+                                        if (resResult?.errors?.length || !resResult?.path)
+                                            continue;
+
+                                        let path = resResult.path;
+                                        if (resResult.external) {
+                                            path = null;
+                                            let currentPath = absWorkingDir;
+                                            const actualMod = mod == "@serenity-is/domwise/jsx-runtime" ? "@serenity-is/domwise" : mod;
+                                            const actualFile = mod == "@serenity-is/domwise/jsx-runtime" ? "dist/jsx-runtime.js" : "dist/index.js";
+                                            let tries = 0;
+                                            while (tries++ < 100) {
+                                                const nmPath = join(currentPath, "node_modules", actualMod, actualFile);
+                                                if (existsSync(nmPath)) {
+                                                    path = nmPath;
+                                                    break;
+                                                }
+                                                currentPath = dirname(currentPath);
+                                                if (!currentPath.length)
+                                                    break;
+                                            }
                                         }
-                                        currentPath = dirname(currentPath);
-                                        if (!currentPath.length)
-                                            break;
-                                    }
-                                }
-                                const source = readFileSync(path, "utf8");
-                                const [_, exports] = esmlParse(source);
-                                for (const exp of exports) {
-                                    if (exp.n !== "default" && exp.n && exp.n.length > 0) {
-                                        allNames.add(exp.n);
+                                        if (!path)
+                                            continue;
+                                        const source = readFileSync(path, "utf8");
+                                        const [_, exports] = esmlParse(source);
+                                        nameByModule[mod] ??= new Set();
+                                        if (!moduleTest[mod] && serenityModuleTest[mod]) {
+                                            moduleTest[mod] = serenityModuleTest[mod];
+                                        }
+                                        for (const exp of exports) {
+                                            if (exp.n !== "default" && exp.n && exp.n.length > 0) {
+                                                allNames.add(exp.n);
+                                                nameByModule[mod].add(exp.n);
+                                            }
+                                        }
                                     }
                                 }
 
                                 if (allNames.size > 0) {
                                     const exportNames = Array.from(allNames).sort().join(", ");
                                     const sb = [];
-                                    sb.push(`if (typeof ${ns} === "undefined") globalThis.${ns} = Object.create(null);`);
-                                    if (initOpt.format === "esm" && mod in globalModTest) {
-                                        sb.push(`if (!(${JSON.stringify(globalModTest[mod])} in ${ns})) try { const k = ${JSON.stringify(mod)}; const m = await import(k); for (const n of Object.keys(m)) if (!(n in ${ns})) ${ns}[n] = m[n]; } catch (e) { console.warn(e); }`);
+                                    sb.push(`if (typeof Serenity === "undefined") globalThis.Serenity = Object.create(null);`);
+                                    if (initOpt.format === "esm" && Object.keys(moduleTest).length > 0) {
+                                        sb.push(`
+const t = ${JSON.stringify(moduleTest)};
+for (const [k, v] of Object.entries(t)) {
+    if (v in Serenity) continue;
+    try {
+        const m = await import(k);
+        for (const n of Object.keys(m)) {
+            if (!(n in Serenity)) Serenity[n] = m[n];
+        }
+    } catch (e) { console.warn(e); }
+}`);
                                     }
-                                    sb.push(`const { ${exportNames} } = ${ns};`);
+
+                                    sb.push(`const { ${exportNames} } = Serenity;`);
                                     sb.push(`export { ${exportNames} };`);
-                                    modContents[mod] = sb.join("\n");
+                                    serenityModuleContents = sb.join("\n");
+                                    writeFileSync("P:/internal/debug-" + absWorkingDir.replace(/[:.\/\\]/g, "-") + "-" + new Date().getTime + ".txt", serenityModuleContents, { encoding: "utf8", flag: "w" });
                                 }
                             }
                             catch (e) {
                                 console.warn(`esbuild external-globals plugin: failed to parse exports for global import`, e);
-                                modContents[mod] = null;
+                                serenityModuleContents = null;
                                 // continue with commonjs export
                             }
                         }
 
-                        if (modContents[mod]) {
+                        if (serenityModuleContents) {
                             return {
-                                contents: modContents[mod],
+                                contents: serenityModuleContents,
                                 loader: "js"
                             };
                         }
                     }
 
-                    return { contents: `module.exports = ${ns};`, loader: "js" };
+                    return { contents: `module.exports = ${args.path};`, loader: "js" };
                 }
             );
         }
