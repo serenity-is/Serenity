@@ -11,7 +11,7 @@
     "jsx": "react-jsx",
     "jsxImportSource": "@serenity-is/domwise",
     "lib": [
-      "ES2017",
+      "ES2022",
       "DOM"
     ],
     "module": "ESNext",
@@ -20,7 +20,7 @@
     "noImplicitOverride": true,
     "preserveConstEnums": true,
     "sourceMap": true,
-    "target": "ES2017",
+    "target": "ES2022",
     "types": [
     ],
     "useDefineForClassFields": false

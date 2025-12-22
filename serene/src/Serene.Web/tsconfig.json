@@ -28,7 +28,7 @@
     "skipDefaultLibCheck": true,
     "skipLibCheck": true,
     "sourceMap": false,
-    "target": "ES2017",
+    "target": "ES2022",
     "typeRoots": [
       "./node_modules/@types"
     ],

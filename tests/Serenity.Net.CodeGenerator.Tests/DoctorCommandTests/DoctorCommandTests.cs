@@ -122,7 +122,7 @@ public partial class DoctorCommandTests
             ["forceConsistentCasingInFileNames"] = true,
             ["module"] = "esnext",
             ["moduleResolution"] = "bundler",
-            ["target"] = "ES2017",
+            ["target"] = "ES2022",
             ["useDefineForClassFields"] = false
         };
 
