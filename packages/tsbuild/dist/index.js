@@ -357,7 +357,6 @@ for (const [k, v] of Object.entries(t)) {
                                     sb.push(`const { ${exportNames} } = Serenity;`);
                                     sb.push(`export { ${exportNames} };`);
                                     serenityModuleContents = sb.join("\n");
-                                    writeFileSync("P:/internal/debug-" + absWorkingDir.replace(/[:.\/\\]/g, "-") + "-" + new Date().getTime + ".txt", serenityModuleContents, { encoding: "utf8", flag: "w" });
                                 }
                             }
                             catch (e) {
