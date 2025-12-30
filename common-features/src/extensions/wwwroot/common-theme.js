@@ -24,7 +24,7 @@
         var date = new Date();
         date.setFullYear(date.getFullYear() + 1);
         document.cookie = name + "=" + encodeURIComponent(value) +
-            ";expires=" + date.toGMTString() + ";path=/";
+            ";expires=" + date.toUTCString() + ";path=/";
     }
 
     function setupDataGridDefaults() {
