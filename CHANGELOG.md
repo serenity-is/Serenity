@@ -1,3 +1,13 @@
+## 10.0.9 (2025-12-31)
+
+### Features
+- Generate an ESM style script from tsbuild externalGlobals plugin for Serenity modules instead of CommonJS by parsing .js files via es-module-lexer. This should result in a more optimized output.
+- Set target to ES2022 in tsconfig.json files.
+- Shorten Dutch header menu texts, use auto for label column in header menu split actions, set overflow hidden, ellipsis for dropdown-items under split actions
+
+### Bugfixes
+- Use toUTCString instead of toGMTString (deprecated) or toISOString (not supported for cookies) while setting cookie expiration time for Language / ThemeSelection.
+
 ## 10.0.8 (2025-12-18)
 
 ### Features
