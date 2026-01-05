@@ -161,11 +161,11 @@ importers:
         specifier: 3.7.1
         version: 3.7.1
       jspdf:
-        specifier: 3.0.4
-        version: 3.0.4
+        specifier: 4.0.0
+        version: 4.0.0
       jspdf-autotable:
         specifier: 5.0.2
-        version: 5.0.2(jspdf@3.0.4)
+        version: 5.0.2(jspdf@4.0.0)
       mousetrap:
         specifier: 1.6.5
         version: 1.6.5
@@ -1116,9 +1116,6 @@ packages:
   decimal.js@10.6.0:
     resolution: {integrity: sha512-YpgQiITW3JXGntzdUmyUR1V812Hn8T1YVXhCu+wO3OpS4eU9l4YdD3qjyiKdV6mvV29zapkMeD390UVEf2lkUg==}
 
-  dompurify@3.3.0:
-    resolution: {integrity: sha512-r+f6MYR1gGN1eJv0TVQbhA7if/U7P87cdPl3HN5rikqaBSBxLiCb/b9O+2eG0cxz0ghyU+mU1QkbsOwERMYlWQ==}
-
   dompurify@3.3.1:
     resolution: {integrity: sha512-qkdCKzLNtrgPFP1Vo+98FRzJnBRGe4ffyCea9IwHB1fyxPOeNTHpLKYGd4Uk9xvNoH0ZoOjwZxNptyMwqrId1Q==}
 
@@ -1282,8 +1279,8 @@ packages:
     peerDependencies:
       jspdf: ^2 || ^3
 
-  jspdf@3.0.4:
-    resolution: {integrity: sha512-dc6oQ8y37rRcHn316s4ngz/nOjayLF/FFxBF4V9zamQKRqXxyiH1zagkCdktdWhtoQId5K20xt1lB90XzkB+hQ==}
+  jspdf@4.0.0:
+    resolution: {integrity: sha512-w12U97Z6edKd2tXDn3LzTLg7C7QLJlx0BPfM3ecjK2BckUl9/81vZ+r5gK4/3KQdhAcEZhENUxRhtgYBj75MqQ==}
 
   jvectormap-content@0.1.1:
     resolution: {integrity: sha512-8yYRhbQ6Zrm38Abv64tfAuKNlTKPJh2HsdRIHYAy2XyNZhBcAVZQXWVinTXWcRuWngd1UVmUmzA8ncOlQEv08A==}
@@ -1659,6 +1656,7 @@ packages:
   whatwg-encoding@3.1.1:
     resolution: {integrity: sha512-6qN4hJdMwfYBtE3YBTTHhoeuUrDBPZmbQaxWAqSALV/MeEnR5z1xd8UKud2RAkFoPkmB+hli1TZSnyi84xz1vQ==}
     engines: {node: '>=18'}
+    deprecated: Use @exodus/bytes instead for a more spec-conformant and faster implementation
 
   whatwg-mimetype@4.0.0:
     resolution: {integrity: sha512-QaKxh0eNIi2mE9p2vEdzfagOKHCcj1pJ56EEHGQOVxp8r9/iszLUUV7v89x9O1p/T+NlTM5W7jW6+cz4Fq1YVg==}
@@ -2372,11 +2370,6 @@ snapshots:
 
   decimal.js@10.6.0: {}
 
-  dompurify@3.3.0:
-    optionalDependencies:
-      '@types/trusted-types': 2.0.7
-    optional: true
-
   dompurify@3.3.1:
     optionalDependencies:
       '@types/trusted-types': 2.0.7
@@ -2585,11 +2578,11 @@ snapshots:
       - supports-color
       - utf-8-validate
 
-  jspdf-autotable@5.0.2(jspdf@3.0.4):
+  jspdf-autotable@5.0.2(jspdf@4.0.0):
     dependencies:
-      jspdf: 3.0.4
+      jspdf: 4.0.0
 
-  jspdf@3.0.4:
+  jspdf@4.0.0:
     dependencies:
       '@babel/runtime': 7.28.4
       fast-png: 6.4.0
@@ -2597,7 +2590,7 @@ snapshots:
     optionalDependencies:
       canvg: 3.0.11
       core-js: 3.47.0
-      dompurify: 3.3.0
+      dompurify: 3.3.1
       html2canvas: 1.4.1
 
   jvectormap-content@0.1.1: {}
