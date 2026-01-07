@@ -40,8 +40,8 @@ catalogs:
       specifier: 2.30.1
       version: 2.30.1
     preact:
-      specifier: 10.28.0
-      version: 10.28.0
+      specifier: 10.28.2
+      version: 10.28.2
     typescript:
       specifier: 5.9.3
       version: 5.9.3
@@ -260,7 +260,7 @@ importers:
         version: 2.30.1
       preact:
         specifier: catalog:serenity
-        version: 10.28.0
+        version: 10.28.2
     devDependencies:
       '@serenity-is/tsbuild':
         specifier: workspace:*
@@ -1383,8 +1383,8 @@ packages:
     resolution: {integrity: sha512-3Ybi1tAuwAP9s0r1UQ2J4n5Y0G05bJkpUIO0/bI9MhwmD70S5aTWbXGBwxHrelT+XM1k6dM0pk+SwNkpTRN7Pg==}
     engines: {node: ^10 || ^12 || >=14}
 
-  preact@10.28.0:
-    resolution: {integrity: sha512-rytDAoiXr3+t6OIP3WGlDd0ouCUG1iCWzkcY3++Nreuoi17y6T5i/zRhe6uYfoVcxq6YU+sBtJouuRDsq8vvqA==}
+  preact@10.28.2:
+    resolution: {integrity: sha512-lbteaWGzGHdlIuiJ0l2Jq454m6kcpI1zNje6d8MlGAFlYvP2GO4ibnat7P74Esfz4sPTdM6UxtTwh/d3pwM9JA==}
 
   prosemirror-changeset@2.3.1:
     resolution: {integrity: sha512-j0kORIBm8ayJNl3zQvD1TTPHJX3g042et6y/KQhZhnPrruO8exkTgG8X+NRpj7kIyMMEx74Xb3DyMIBtO0IKkQ==}
@@ -2678,7 +2678,7 @@ snapshots:
       picocolors: 1.1.1
       source-map-js: 1.2.1
 
-  preact@10.28.0: {}
+  preact@10.28.2: {}
 
   prosemirror-changeset@2.3.1:
     dependencies:

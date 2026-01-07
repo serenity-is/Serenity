@@ -22,6 +22,6 @@ catalogs:
     "glob": "13.0.0"
     "jsdom": "27.4.0"
     "moment": "2.30.1"
-    "preact": "10.28.0"
+    "preact": "10.28.2"
     "typescript": "5.9.3"
     "vitest": "4.0.16"
