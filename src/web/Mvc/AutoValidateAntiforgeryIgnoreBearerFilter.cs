@@ -4,6 +4,7 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Filters;
 using Microsoft.AspNetCore.Mvc.ViewFeatures;
 using Microsoft.Extensions.Logging;
+using Microsoft.Extensions.Options;
 using Microsoft.Net.Http.Headers;
 using System.Threading.Tasks;
 
@@ -15,14 +16,19 @@ internal class AutoValidateAntiforgeryIgnoreBearerFilter : IAsyncAuthorizationFi
     private const string NotMostEffectiveFilter = "Skipping the execution of current filter as its not the most effective filter implementing the policy {FilterPolicy}.";
 
     private readonly IAntiforgery antiforgery;
+    private readonly IOptions<AntiforgeryFilterOptions> options;
     private readonly ILogger logger;
 
-    public AutoValidateAntiforgeryIgnoreBearerFilter(IAntiforgery antiforgery, ILoggerFactory loggerFactory)
+    public AutoValidateAntiforgeryIgnoreBearerFilter(
+        IAntiforgery antiforgery, 
+        ILoggerFactory loggerFactory,
+        IOptions<AntiforgeryFilterOptions> options)
     {
         ArgumentNullException.ThrowIfNull(antiforgery);
 
         this.antiforgery = antiforgery ?? throw new ArgumentNullException(nameof(antiforgery));
-        logger = loggerFactory.CreateLogger(GetType());
+        this.options = options;
+        logger = loggerFactory?.CreateLogger(GetType());
     }
 
     public async Task OnAuthorizationAsync(AuthorizationFilterContext context)
@@ -31,7 +37,8 @@ internal class AutoValidateAntiforgeryIgnoreBearerFilter : IAsyncAuthorizationFi
 
         if (!context.IsEffectivePolicy<IAntiforgeryPolicy>(this))
         {
-            logger?.LogTrace(NotMostEffectiveFilter, typeof(IAntiforgeryPolicy));
+            if (logger?.IsEnabled(LogLevel.Trace) == true)
+                logger.LogTrace(NotMostEffectiveFilter, typeof(IAntiforgeryPolicy));
             return;
         }
 
@@ -43,7 +50,8 @@ internal class AutoValidateAntiforgeryIgnoreBearerFilter : IAsyncAuthorizationFi
             }
             catch (AntiforgeryValidationException exception)
             {
-                logger?.LogWarning(exception, AntiforgeryTokenInvalid, exception.Message);
+                if (logger?.IsEnabled(LogLevel.Warning) == true)
+                    logger.LogWarning(exception, AntiforgeryTokenInvalid, exception.Message);
                 context.Result = new AntiforgeryValidationFailedResult();
             }
         }
@@ -70,6 +78,19 @@ internal class AutoValidateAntiforgeryIgnoreBearerFilter : IAsyncAuthorizationFi
             string.IsNullOrEmpty(cookie))
         {
             return false;
+        }
+
+        if (!string.IsNullOrEmpty(options?.Value?.SkipValidationHeaderName))
+        {
+            var headerValue = context.HttpContext.Request.Headers[options.Value.SkipValidationHeaderName];
+            if (!string.IsNullOrEmpty(headerValue))
+            {
+                if (string.IsNullOrEmpty(options.Value.SkipValidationHeaderValue) ||
+                    string.Equals(headerValue, options.Value.SkipValidationHeaderValue, StringComparison.InvariantCultureIgnoreCase))
+                {
+                    return false;
+                }
+            }
         }
 
         return true;
