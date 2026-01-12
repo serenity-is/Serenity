@@ -1,3 +1,11 @@
+## 10.1.0 (2026-01-12)
+
+### Features
+- Add AntiforgeryFilter options SkipValidationHeaderName (default "X-CSRF-SKIP") and SkipValidationHeaderValue (default "true") that when present in header will skip CSRF validation when using AutoValidateAntiforgeryIgnoreBearerFilter. This will make it easier to work with clients that use cookie auth (not bearer) call into services by adding the header.
+
+### Bugfixes
+- Serenity.Pro.Extensions global init script passes invalid case `proExtensions` instead of `proextensions` to initGlobalMappings
+
 ## 10.0.9 (2025-12-31)
 
 ### Features
