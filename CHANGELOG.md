@@ -1,3 +1,8 @@
+## 10.1.1 (2026-01-15)
+
+### Features
+- Override Equals and GetHashCode for PageAuthorizeAttribute as Equals throws stack overflow for default implementation of Attribute.Equals when the permission keys passed are same for the action and controller causing Swagger to fail when enumerating attributes for the action
+
 ## 10.1.0 (2026-01-12)
 
 ### Features
