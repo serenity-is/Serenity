@@ -1,4 +1,4 @@
-﻿using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Filters;
 using Microsoft.Extensions.DependencyInjection;
 
@@ -131,4 +131,17 @@ public class PageAuthorizeAttribute : TypeFilterAttribute
     /// The permission key
     /// </summary>
     public string Permission { get; private set; }
+
+    /// <inheritdoc/>
+    public override bool Equals(object obj)
+    {
+        return obj is PageAuthorizeAttribute other &&
+            string.Equals(Permission, other.Permission, StringComparison.Ordinal);
+    }
+
+    /// <inheritdoc/>
+    public override int GetHashCode()
+    {
+        return base.GetHashCode();
+    }
 }
