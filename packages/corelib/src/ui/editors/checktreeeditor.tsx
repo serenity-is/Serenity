@@ -1,4 +1,5 @@
-﻿import { Column, FormatterContext, ISleekGrid, GridOptions } from "@serenity-is/sleekgrid";
+﻿import { bindThis } from "@serenity-is/domwise";
+import { Column, FormatterContext, GridOptions, type FormatterResult } from "@serenity-is/sleekgrid";
 import { CheckTreeEditorTexts, Culture, Fluent, ListResponse, nsSerenity, type Lookup, type PropertyItem } from "../../base";
 import { ScriptData, getLookup } from "../../compat";
 import { IGetEditValue, IReadOnly, ISetEditValue } from "../../interfaces";
@@ -13,7 +14,6 @@ import { CascadedWidgetLink } from "./cascadedwidgetlink";
 import { stripDiacritics } from "./combobox";
 import { EditorUtils } from "./editorutils";
 import { EditorProps } from "./editorwidget";
-import { bindThis } from "@serenity-is/domwise";
 
 export interface CheckTreeItem<TSource> {
     isSelected?: boolean;
@@ -330,29 +330,21 @@ export class CheckTreeEditor<TItem extends CheckTreeItem<TItem>, P = {}> extends
             }, function (x) {
                 return x.id;
             }, ctx => {
-                var cls = 'check-box';
-                var item = ctx.item;
+                const item = ctx.item;
                 if (item.hideCheckBox) {
                     return this.getItemText(ctx);
                 }
-                var threeState = this.isThreeStateHierarchy();
-                if (item.isSelected) {
-                    if (threeState && !item.isAllDescendantsSelected) {
-                        cls += ' partial';
-                    }
-                    else {
-                        cls += ' checked';
-                    }
-                }
-                if (this._readOnly)
-                    cls += ' readonly';
-                return '<span class="' + cls + '"></span>' + this.getItemText(ctx);
+                const threeState = this.isThreeStateHierarchy();
+                return <>
+                    <span class={["check-box", item.isSelected && (threeState && !item.isAllDescendantsSelected ? "partial" : "checked"), this._readOnly && "readonly"]}></span>
+                    {this.getItemText(ctx)}
+                    </>;
             })
         });
         return columns;
     }
 
-    protected getItemText(ctx: FormatterContext): string {
+    protected getItemText(ctx: FormatterContext): FormatterResult {
         return ctx.escape();
     }
 
@@ -516,9 +508,10 @@ export class CheckLookupEditor<TItem extends CheckTreeItem<TItem> = any, P exten
     protected override createToolbarExtensions() {
         super.createToolbarExtensions();
 
-        GridUtils.addQuickSearchInputCustom(this.toolbar.domNode, (field, text) => {
+        GridUtils.addQuickSearchInputCustom(this.toolbar.domNode, (_, text, done) => {
             this.searchText = stripDiacritics(text || '').toUpperCase();
             this.view.setItems(this.view.getItems(), true);
+            done(this.sleekGrid.getDataLength() > 0);
         });
     }
 
@@ -574,11 +567,11 @@ export class CheckLookupEditor<TItem extends CheckTreeItem<TItem> = any, P exten
     protected override getTreeItems() {
         var lookup = getLookup<TItem>(this.options.lookupKey);
         var items = this.getLookupItems(lookup);
-        return items.map(item => <CheckTreeItem<TItem>>{
+        return items.map(item => ({
             id: ((item as any)[lookup.idField] ?? "").toString(),
             text: ((item as any)[lookup.textField] ?? "").toString(),
             source: item
-        });
+        } satisfies CheckTreeItem<TItem>));
     }
 
     protected override onViewFilter(item: CheckTreeItem<TItem>) {
