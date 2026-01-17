@@ -4749,6 +4749,44 @@ export interface IDataGrid {
 	getView(): IRemoteView<any>;
 	getFilterStore(): FilterStore;
 }
+export interface QuickSearchField {
+	name: string;
+	title: string;
+}
+export interface QuickSearchArgs {
+	field?: string;
+	query: string;
+	done: (found?: boolean) => void;
+	handled?: boolean;
+}
+export interface QuickSearchInputOptions {
+	typeDelay?: number;
+	loadingParentClass?: string;
+	fields?: QuickSearchField[];
+	filteredParentClass?: string;
+	/** @deprecated Prefer search */
+	onSearch?: (field: QuickSearchArgs["field"], query: QuickSearchArgs["query"], done: QuickSearchArgs["done"]) => void;
+	beforeSearch?: (args: QuickSearchArgs) => void;
+	search?: (args: QuickSearchArgs) => void;
+}
+export declare class QuickSearchInput<P extends QuickSearchInputOptions = QuickSearchInputOptions> extends Widget<P> {
+	static [Symbol.typeInfo]: ClassTypeInfo<"Serenity.">;
+	static createDefaultElement(): HTMLInputElement;
+	readonly domNode: HTMLInputElement;
+	private lastValue;
+	private field;
+	private fieldLink;
+	private fieldChanged;
+	private timer;
+	constructor(props: WidgetProps<P>);
+	protected checkIfValueChanged(): void;
+	get_value(): string;
+	get_field(): QuickSearchField;
+	set_field(value: QuickSearchField): void;
+	protected updateInputPlaceHolder(): void;
+	restoreState(value: string, field: QuickSearchField): void;
+	protected searchNow(value: string): void;
+}
 export type ColumnPickerChangeArgs = {
 	toggledColumns: Column[];
 	reorderedColumns: boolean;
@@ -4787,7 +4825,7 @@ export declare class ColumnPickerDialog<P extends ColumnPickerDialogOptions = Co
 	protected handleRestoreDefaults(): void;
 	protected handleToggleAllClick(): void;
 	protected updateToggleAllValue(): boolean;
-	protected handleSearch(_field: string, query: string, done: (found: boolean) => void): void;
+	protected handleSearch({ query, done }: QuickSearchArgs): void;
 	static createToolButton(optOrDataGrid: IDataGrid | ColumnPickerDialogOptions): ToolButton;
 	protected getDialogOptions(): DialogOptions;
 	protected getDialogButtons(): DialogButton[];
@@ -5114,35 +5152,6 @@ export interface AutoRegisterArgs<P = any, T = any> {
 	options: Partial<P>;
 }
 export type AutoRegisterHandler<P = any, T = any> = (args: AutoRegisterArgs<P, T>) => void;
-export interface QuickSearchField {
-	name: string;
-	title: string;
-}
-export interface QuickSearchInputOptions {
-	typeDelay?: number;
-	loadingParentClass?: string;
-	filteredParentClass?: string;
-	onSearch?: (field: string, query: string, done: (found: boolean) => void) => void;
-	fields?: QuickSearchField[];
-}
-export declare class QuickSearchInput<P extends QuickSearchInputOptions = QuickSearchInputOptions> extends Widget<P> {
-	static [Symbol.typeInfo]: ClassTypeInfo<"Serenity.">;
-	static createDefaultElement(): HTMLInputElement;
-	readonly domNode: HTMLInputElement;
-	private lastValue;
-	private field;
-	private fieldLink;
-	private fieldChanged;
-	private timer;
-	constructor(props: WidgetProps<P>);
-	protected checkIfValueChanged(): void;
-	get_value(): string;
-	get_field(): QuickSearchField;
-	set_field(value: QuickSearchField): void;
-	protected updateInputPlaceHolder(): void;
-	restoreState(value: string, field: QuickSearchField): void;
-	protected searchNow(value: string): void;
-}
 export interface SettingStorage {
 	getItem(key: string): string | Promise<string>;
 	setItem(key: string, value: string): void | Promise<void>;
@@ -6033,7 +6042,7 @@ export declare class CheckTreeEditor<TItem extends CheckTreeItem<TItem>, P = {}>
 	protected getDelimited(): boolean;
 	protected anyDescendantsSelected(item: TItem): boolean;
 	protected createColumns(): Column[];
-	protected getItemText(ctx: FormatterContext): string;
+	protected getItemText(ctx: FormatterContext): FormatterResult;
 	protected getSlickOptions(): GridOptions;
 	protected sortItems(): void;
 	protected moveSelectedUp(): boolean;
@@ -6072,7 +6081,11 @@ export declare class CheckLookupEditor<TItem extends CheckTreeItem<TItem> = any,
 	protected cascadeItems(items: TItem[]): TItem[];
 	protected filterItems(items: TItem[]): TItem[];
 	protected getLookupItems(lookup: Lookup<TItem>): TItem[];
-	protected getTreeItems(): CheckTreeItem<TItem>[];
+	protected getTreeItems(): {
+		id: any;
+		text: any;
+		source: TItem;
+	}[];
 	protected onViewFilter(item: CheckTreeItem<TItem>): boolean;
 	protected moveSelectedUp(): boolean;
 	protected get_cascadeFrom(): string;
@@ -7211,8 +7224,17 @@ export declare namespace GridSelectAllButtonHelper {
 export declare namespace GridUtils {
 	function addToggleButton(toolDiv: HTMLElement | ArrayLike<HTMLElement>, cssClass: string, callback: (p1: boolean) => void, hint: string, initial?: boolean): void;
 	function addIncludeDeletedToggle(toolDiv: HTMLElement | ArrayLike<HTMLElement>, view: IRemoteView<any>, hint?: string, initial?: boolean): void;
+	function addQuickSearch({ container, fields, beforeSearch, search, view }: {
+		container: HTMLElement | ArrayLike<HTMLElement>;
+		fields?: QuickSearchField[];
+		beforeSearch?: (args: QuickSearchArgs) => void;
+		search?: (args: QuickSearchArgs) => void;
+		view?: IRemoteView<any>;
+	}): QuickSearchInput;
+	/** @deprecated use addQuickSearch with named args */
 	function addQuickSearchInput(toolDiv: HTMLElement | ArrayLike<HTMLElement>, view: IRemoteView<any>, fields?: QuickSearchField[], onChange?: () => void): QuickSearchInput;
-	function addQuickSearchInputCustom(container: HTMLElement | ArrayLike<HTMLElement>, onSearch: (field: string, query: string, done: (found: boolean) => void) => void, fields?: QuickSearchField[]): QuickSearchInput;
+	/** @deprecated use addQuickSearch with named args */
+	function addQuickSearchInputCustom(container: HTMLElement | ArrayLike<HTMLElement>, search: (field: QuickSearchArgs["field"], query: QuickSearchArgs["query"], done: QuickSearchArgs["done"]) => void, fields?: QuickSearchField[]): QuickSearchInput;
 	function makeOrderable(grid: ISleekGrid, handleMove: (rows: number[], insertBefore: number) => void): void;
 	function makeOrderableWithUpdateRequest<TItem = any, TId = any>(dataGrid: IDataGrid, getId: (item: TItem) => TId, getDisplayOrder: (item: TItem) => any, service: string, getUpdateRequest: (id: TId, order: number) => SaveRequest<TItem>): void;
 }

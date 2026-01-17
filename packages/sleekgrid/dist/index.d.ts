@@ -1645,7 +1645,6 @@ export declare class SleekGrid<TItem = any> implements ISleekGrid<TItem> {
 	private handleHeaderFooterRowScroll;
 	private handleMouseWheel;
 	private handleScroll;
-	private _handleScroll;
 	private asyncPostProcessRows;
 	private asyncPostProcessCleanupRows;
 	private updateCellCssStylesOnRenderedRows;

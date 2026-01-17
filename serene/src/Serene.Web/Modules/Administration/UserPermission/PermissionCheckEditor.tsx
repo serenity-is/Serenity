@@ -200,9 +200,13 @@ export class PermissionCheckEditor<P extends PermissionCheckEditorOptions = Perm
 
     protected override createToolbarExtensions(): void {
         super.createToolbarExtensions();
-        GridUtils.addQuickSearchInputCustom(this.toolbar.domNode, (_, text) => {
-            this.searchText = stripDiacritics(text?.trim() ?? '').toLowerCase();
-            this.view.setItems(this.view.getItems(), true);
+        GridUtils.addQuickSearch({
+            container: this.toolbar.domNode,
+            search: ({ query, done }) => {
+                this.searchText = stripDiacritics(query?.trim() ?? '').toLowerCase();
+                this.view.setItems(this.view.getItems(), true);
+                done(this.rowCount() > 0);
+            }
         });
     }
 

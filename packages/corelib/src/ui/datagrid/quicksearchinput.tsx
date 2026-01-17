@@ -7,12 +7,22 @@ export interface QuickSearchField {
     title: string;
 }
 
+export interface QuickSearchArgs {
+    field?: string;
+    query: string;
+    done: (found?: boolean) => void;
+    handled?: boolean;
+}
+
 export interface QuickSearchInputOptions {
     typeDelay?: number;
     loadingParentClass?: string;
-    filteredParentClass?: string;
-    onSearch?: (field: string, query: string, done: (found: boolean) => void) => void;
     fields?: QuickSearchField[];
+    filteredParentClass?: string;
+    /** @deprecated Prefer search */
+    onSearch?: (field: QuickSearchArgs["field"], query: QuickSearchArgs["query"], done: QuickSearchArgs["done"]) => void;
+    beforeSearch?: (args: QuickSearchArgs) => void;
+    search?: (args: QuickSearchArgs) => void;
 }
 
 export class QuickSearchInput<P extends QuickSearchInputOptions = QuickSearchInputOptions> extends Widget<P> {
@@ -133,7 +143,7 @@ export class QuickSearchInput<P extends QuickSearchInputOptions = QuickSearchInp
         this.domNode.classList.add(klass);
         this.domNode.parentElement?.classList.add(klass);
 
-        var done = (results: any) => {
+        var done = (results: boolean) => {
             this.domNode.classList.remove(klass);
             this.domNode.parentElement?.classList.remove(klass);
 
@@ -146,8 +156,13 @@ export class QuickSearchInput<P extends QuickSearchInputOptions = QuickSearchInp
             }
         };
 
-        if (this.options.onSearch != null) {
-            this.options.onSearch(this.field?.name, value, done);
+        const args = { field: this.field?.name, query: value, done };
+        this.options.beforeSearch?.(args);
+        if ((this.options as any).onSearch != null) {
+            (this.options as any).onSearch(args.field, args.query, args.done);
+        }
+        else if (this.options.search != null) {
+            this.options.search(args);
         }
         else {
             done(true);

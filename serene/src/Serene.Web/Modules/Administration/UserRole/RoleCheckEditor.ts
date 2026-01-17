@@ -14,9 +14,13 @@ export class RoleCheckEditor extends CheckTreeEditor<CheckTreeItem<any>, any> {
     protected override createToolbarExtensions() {
         super.createToolbarExtensions();
 
-        GridUtils.addQuickSearchInputCustom(this.toolbar.element, (field, text) => {
-            this.searchText = stripDiacritics(text || '').toUpperCase();
-            this.view.setItems(this.view.getItems(), true);
+        GridUtils.addQuickSearch({
+            container: this.toolbar.element,
+            search: ({ query, done }) => {
+                this.searchText = stripDiacritics(query || '').toUpperCase();
+                this.view.setItems(this.view.getItems(), true);
+                done(this.rowCount() > 0);
+            }
         });
     }
 

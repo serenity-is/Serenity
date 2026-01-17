@@ -10,6 +10,7 @@ import { GridUtils } from "../helpers/gridutils";
 import { ToolButton } from "../widgets/toolbar";
 import type { DataGrid } from "./datagrid";
 import { IDataGrid } from "./idatagrid";
+import type { QuickSearchArgs } from "./quicksearchinput";
 
 export type ColumnPickerChangeArgs = {
     toggledColumns: Column[];
@@ -196,7 +197,10 @@ export class ColumnPickerDialog<P extends ColumnPickerDialogOptions = ColumnPick
     }
 
     protected createSearch(div: HTMLElement) {
-        const input = GridUtils.addQuickSearchInputCustom(div, bindThis(this).handleSearch);
+        const input = GridUtils.addQuickSearch({ 
+            container: div, 
+            search: bindThis(this).handleSearch
+        });
         input.element.attr("id", this.uniqueName + "_Search");
         this.searchInput = input.domNode;
     }
@@ -273,7 +277,7 @@ export class ColumnPickerDialog<P extends ColumnPickerDialogOptions = ColumnPick
         return this.toggleAllCheckbox.checked = Array.from(inputs).every(x => x.checked);
     }
 
-    protected handleSearch(_field: string, query: string, done: (found: boolean) => void): void {
+    protected handleSearch({ query, done }: QuickSearchArgs): void {
         query = stripDiacritics(query?.trim().toLowerCase() ?? "");
         if (query.length && !this.list.style.height) {
             this.list.style.height = this.list.offsetHeight + "px";

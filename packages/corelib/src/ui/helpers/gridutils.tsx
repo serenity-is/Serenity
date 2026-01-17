@@ -3,7 +3,7 @@ import { RowMoveManager, type ISleekGrid } from "@serenity-is/sleekgrid";
 import { EntityGridTexts, SaveRequest, isArrayLike, serviceRequest } from "../../base";
 import { IRemoteView } from "../../slick";
 import { IDataGrid } from "../datagrid/idatagrid";
-import { QuickSearchField, QuickSearchInput } from "../datagrid/quicksearchinput";
+import { QuickSearchField, QuickSearchInput, type QuickSearchArgs } from "../datagrid/quicksearchinput";
 
 export namespace GridUtils {
     export function addToggleButton(toolDiv: HTMLElement | ArrayLike<HTMLElement>, cssClass: string,
@@ -50,64 +50,104 @@ export namespace GridUtils {
         });
     }
 
-    export function addQuickSearchInput(toolDiv: HTMLElement | ArrayLike<HTMLElement>,
-        view: IRemoteView<any>, fields?: QuickSearchField[], onChange?: () => void): QuickSearchInput {
+    export function addQuickSearch({ container, fields, beforeSearch, search, view }: {
+        container: HTMLElement | ArrayLike<HTMLElement>,
+        fields?: QuickSearchField[],
+        beforeSearch?: (args: QuickSearchArgs) => void,
+        search?: (args: QuickSearchArgs) => void,
+        view?: IRemoteView<any>,
+    }): QuickSearchInput {
 
-        var oldSubmit = view.onSubmit;
-        var input: QuickSearchInput;
-        view.onSubmit = function (v) {
-            if (input) {
-                var searchText = input.get_value();
-                if (searchText && searchText.length > 0) {
-                    v.params.ContainsText = searchText;
+        const el = <input type="text" /> as HTMLInputElement;
+        container = isArrayLike(container) ? container[0] : container;
+        container.prepend(<div class={["s-QuickSearchBar", fields?.length && "has-quick-search-fields"]}>{el}</div>)
+
+        let lastDoneEvent: ((found: boolean) => void) = null;
+        const input = new QuickSearchInput({
+            element: el,
+            fields,
+            beforeSearch,
+            search: search ?? ((args) => {
+                lastDoneEvent = args.done;
+                if (view) {
+                    view.seekToPage = 1;
+                    view.populate();
                 }
-                else {
-                    delete v.params['ContainsText'];
-                }
-                var searchField = input.get_field()?.name;
-                if (searchField != null && searchField.length > 0) {
-                    v.params.ContainsField = searchField;
-                }
-                else {
-                    delete v.params['ContainsField'];
-                }
-            }
-
-            if (oldSubmit != null)
-                return oldSubmit(v);
-
-            return true;
-        };
-
-        var lastDoneEvent: any = null;
-        input = addQuickSearchInputCustom(toolDiv, (field, query, done) => {
-            onChange && onChange();
-            view.seekToPage = 1;
-            lastDoneEvent = done;
-            view.populate();
-        }, fields);
-
-        view.onDataLoaded.subscribe(function (e, ui) {
-            if (lastDoneEvent != null) {
-                lastDoneEvent(view.getLength() > 0);
-                lastDoneEvent = null;
-            }
+            })
         });
+
+        if (view) {
+            let oldSubmit = view.onSubmit;
+            view.onSubmit = function (v) {
+                if (input) {
+                    var searchText = input.get_value();
+                    if (searchText && searchText.length > 0) {
+                        v.params.ContainsText = searchText;
+                    }
+                    else {
+                        delete v.params['ContainsText'];
+                    }
+                    var searchField = input.get_field()?.name;
+                    if (searchField != null && searchField.length > 0) {
+                        v.params.ContainsField = searchField;
+                    }
+                    else {
+                        delete v.params['ContainsField'];
+                    }
+                }
+
+                if (oldSubmit != null)
+                    return oldSubmit(v);
+
+                return true;
+            };
+
+            const onDataLoaded = function () {
+                if (lastDoneEvent != null) {
+                    lastDoneEvent(view.getLength() > 0);
+                    lastDoneEvent = null;
+                }
+            }
+
+            view.onDataLoaded.subscribe(onDataLoaded);
+
+
+            addDisposingListener(el, function () {
+                view?.onDataLoaded?.unsubscribe(onDataLoaded);
+                if (view && oldSubmit) {
+                    view.onSubmit = oldSubmit;
+                    view = null;
+                    oldSubmit = null;
+                }
+            });
+        }
 
         return input;
     }
 
+
+    /** @deprecated use addQuickSearch with named args */
+    export function addQuickSearchInput(toolDiv: HTMLElement | ArrayLike<HTMLElement>,
+        view: IRemoteView<any>, fields?: QuickSearchField[], onChange?: () => void): QuickSearchInput {
+        return addQuickSearch({
+            container: toolDiv,
+            fields: fields,
+            view,
+            beforeSearch: onChange,
+            search: () => {
+            }
+        });
+    }
+
+    /** @deprecated use addQuickSearch with named args */
     export function addQuickSearchInputCustom(container: HTMLElement | ArrayLike<HTMLElement>,
-        onSearch: (field: string, query: string, done: (found: boolean) => void) => void,
+        search: (field: QuickSearchArgs["field"], query: QuickSearchArgs["query"], done: QuickSearchArgs["done"]) => void,
         fields?: QuickSearchField[]): QuickSearchInput {
 
-        const input = <input type="text" /> as HTMLInputElement;
-        (isArrayLike(container) ? container[0] : container).prepend(<div class={["s-QuickSearchBar", fields?.length && "has-quick-search-fields"]}>{input}</div>)
-
-        return new QuickSearchInput({
-            element: input,
+        return addQuickSearch({
+            container: container,
             fields: fields,
-            onSearch
+            search: (args) => search(args.field, args.query, args.done)
         });
     }
 

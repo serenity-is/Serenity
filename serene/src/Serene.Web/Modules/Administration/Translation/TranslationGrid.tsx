@@ -185,11 +185,14 @@ export class TranslationGrid extends EntityGrid<TranslationItem, any> {
     }
 
     protected override createQuickSearchInput() {
-        GridUtils.addQuickSearchInputCustom(this.toolbar.element,
-            (field, searchText) => {
-                this.searchText = searchText;
+        GridUtils.addQuickSearch({
+            container: this.toolbar.element,
+            search: ({ query, done }) => {
+                this.searchText = query;
                 this.view.setItems(this.view.getItems(), true);
-            });
+                done(this.rowCount() > 0);
+            }
+        });
     }
 
     protected override onViewFilter(item: TranslationItem) {

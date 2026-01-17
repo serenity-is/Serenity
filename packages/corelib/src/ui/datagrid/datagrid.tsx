@@ -257,7 +257,12 @@ export class DataGrid<TItem, P = {}> extends Widget<P> implements IDataGrid, IRe
     }
 
     protected createQuickSearchInput(): void {
-        var input = GridUtils.addQuickSearchInput(this.toolbar.domNode, this.view, this.getQuickSearchFields(), () => this.persistSettings(null));
+        const input = GridUtils.addQuickSearch({
+            container: this.toolbar.domNode, 
+            view: this.view, 
+            fields: this.getQuickSearchFields(), 
+            beforeSearch: () => this.persistSettings(null)
+        });
         input?.domNode?.setAttribute('id', this.idPrefix + 'QuickSearchInput');
     }
 

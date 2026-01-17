@@ -123,7 +123,7 @@ export class CheckTreeEditor<TItem extends CheckTreeItem<TItem>, P = {}> extends
         this.domNode.classList.add("slick-no-cell-border", "slick-no-odd-even", "slick-hide-header");
 
         super.initSleekGrid();
-        
+
         this.sleekGrid.resizeCanvas();
     }
 
@@ -338,7 +338,7 @@ export class CheckTreeEditor<TItem extends CheckTreeItem<TItem>, P = {}> extends
                 return <>
                     <span class={["check-box", item.isSelected && (threeState && !item.isAllDescendantsSelected ? "partial" : "checked"), this._readOnly && "readonly"]}></span>
                     {this.getItemText(ctx)}
-                    </>;
+                </>;
             })
         });
         return columns;
@@ -508,10 +508,13 @@ export class CheckLookupEditor<TItem extends CheckTreeItem<TItem> = any, P exten
     protected override createToolbarExtensions() {
         super.createToolbarExtensions();
 
-        GridUtils.addQuickSearchInputCustom(this.toolbar.domNode, (_, text, done) => {
-            this.searchText = stripDiacritics(text || '').toUpperCase();
-            this.view.setItems(this.view.getItems(), true);
-            done(this.sleekGrid.getDataLength() > 0);
+        GridUtils.addQuickSearch({
+            container: this.toolbar.domNode,
+            search: ({ query, done }) => {
+                this.searchText = stripDiacritics(query || '').toUpperCase();
+                this.view.setItems(this.view.getItems(), true);
+                done(this.rowCount() > 0);
+            }
         });
     }
 
