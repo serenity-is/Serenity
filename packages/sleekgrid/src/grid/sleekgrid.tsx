@@ -351,6 +351,7 @@ export class SleekGrid<TItem = any> implements ISleekGrid<TItem> {
         const boundThis = bindThis(this);
         this._on(this._container, "resize", boundThis.resizeCanvas);
 
+        const scrollContainerX = this.getScrollContainerX();
         this.getViewports().forEach(vp => {
             var scrollTicking = false;
             this._on(vp, "scroll", (e) => {
@@ -363,8 +364,10 @@ export class SleekGrid<TItem = any> implements ISleekGrid<TItem> {
                     });
                 }
             });
-            this._on(vp, "wheel", boundThis.handleMouseWheel as any);
-            this._on(vp, "mousewheel" as any, boundThis.handleMouseWheel);
+            if (vp !== scrollContainerX) {
+                this._on(vp, "wheel", boundThis.handleMouseWheel as any);
+                this._on(vp, "mousewheel" as any, boundThis.handleMouseWheel);
+            }
         });
 
         this._forEachBand(band => {
@@ -2631,14 +2634,21 @@ export class SleekGrid<TItem = any> implements ISleekGrid<TItem> {
         }
 
         if (e.wheelDeltaY !== undefined) {
-            deltaY = e.wheelDeltaY / 120;
+            if (!e.wheelDeltaX && e.wheelDeltaY && e.shiftKey) {
+                // some browsers (Chrome) only provide vertical wheel delta if shift is pressed
+                deltaX = -1 * e.wheelDeltaY / 120;
+                deltaY = 0;
+            }
+            else {
+                deltaY = e.wheelDeltaY / 120;
+            }
         }
-        if (e.wheelDeltaX !== undefined) {
+        if (e.wheelDeltaX) {
             deltaX = -1 * e.wheelDeltaX / 120;
         }
 
         this._scrollTop = Math.max(0, this.getScrollContainerY().scrollTop - (deltaY * this._options.rowHeight));
-        this._scrollLeft = this.getScrollContainerX().scrollLeft + (deltaX * 10);
+        this._scrollLeft = this.getScrollContainerX().scrollLeft + (deltaX * 100);
         if (this.handleScroll({ isMouseWheel: true })) {
             e.preventDefault();
         }
