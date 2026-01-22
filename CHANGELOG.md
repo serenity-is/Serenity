@@ -1,3 +1,12 @@
+## 10.1.2 (2026-01-22)
+
+### Features
+- New GridUtils.addQuickSearch method with named arguments instead of addQuickSearchInput and addQuickSearchInputCustom methods which are deprecated
+- Handle Shift+Wheel for horizontal scroll in Sleekgrid
+
+### Bugfixes
+- Fix CheckTreeEditor / CheckLookupEditor formatting issue / quick search indicator
+
 ## 10.1.1 (2026-01-15)
 
 ### Features
