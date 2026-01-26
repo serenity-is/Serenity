@@ -1,3 +1,8 @@
+## 10.1.3 (2026-01-26)
+
+### Bugfixes
+- Handle issue when a `Sortable(false)` column is in the server side generated sorted column list
+
 ## 10.1.2 (2026-01-22)
 
 ### Features
