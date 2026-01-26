@@ -1,4 +1,4 @@
-﻿namespace Serenity.ComponentModel;
+namespace Serenity.ComponentModel;
 
 /// <summary>
 /// Indicates that the target property should use a "DateTime" editor.
@@ -25,9 +25,9 @@ public partial class DateTimeEditorAttribute : CustomEditorAttribute
     /// <value>
     /// The minimum value.
     /// </value>
-    public DateTime MinValue
+    public string? MinValue
     {
-        get { return GetOption<DateTime>("minValue"); }
+        get { return GetOption<string>("minValue"); }
         set { SetOption("minValue", value); }
     }
 
@@ -37,9 +37,9 @@ public partial class DateTimeEditorAttribute : CustomEditorAttribute
     /// <value>
     /// The maximum value.
     /// </value>
-    public DateTime MaxValue
+    public string? MaxValue
     {
-        get { return GetOption<DateTime>("maxValue"); }
+        get { return GetOption<string>("maxValue"); }
         set { SetOption("maxValue", value); }
     }
 
