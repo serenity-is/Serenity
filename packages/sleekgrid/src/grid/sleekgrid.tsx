@@ -1257,10 +1257,12 @@ export class SleekGrid<TItem = any> implements ISleekGrid<TItem> {
                 var header = headerColumnEls[columnIndex];
                 if (header) {
                     header.classList.add("slick-header-column-sorted");
-                    var si = header.querySelector(".slick-sort-indicator");
-                    si && si.classList.add(col.sortAsc ? "slick-sort-indicator-asc" : "slick-sort-indicator-desc");
-                    const sub = si.querySelector("sub");
-                    sub && (sub.textContent = this._sortColumns.length > 1 ? (i + 1).toString() : "");
+                    const si = header.querySelector(".slick-sort-indicator");
+                    if (si) {
+                        si.classList.add(col.sortAsc ? "slick-sort-indicator-asc" : "slick-sort-indicator-desc");
+                        const sub = si.querySelector("sub");
+                        sub && (sub.textContent = this._sortColumns.length > 1 ? (i + 1).toString() : "");
+                    }
                 }
             }
         });
