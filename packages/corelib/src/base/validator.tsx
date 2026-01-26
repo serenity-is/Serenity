@@ -709,14 +709,14 @@ export class Validator {
         if (element instanceof HTMLInputElement && Validator.isCheckOrRadio(element)) {
             if (!element.name)
                 return element.checked ? 1 : 0;
-            return Array.from(element.form?.querySelectorAll(`[name=${element.name}]`)).filter(x => (x as any).checked).length || 0;
+            return Array.from(element.form?.querySelectorAll(`[name=${cssEscape(element.name)}]`)).filter(x => (x as any).checked).length || 0;
         }
 
         return typeof value === "number" ? ("" + value).length : (value as any).length;
     }
 
     static isContentEditable(element: HTMLElement) {
-        let val = element.getAttribute("contenteditable");
+        let val = element?.getAttribute("contenteditable");
         return val != null && val !== "false"
     }
 
