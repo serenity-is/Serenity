@@ -16,9 +16,9 @@ public class DateTimeEditorAttributeTests
 
         var attribute = new DateTimeEditorAttribute()
         {
-            MinValue = new DateTime(2023, 01, 01)
+            MinValue = "2023-01-02"
         };
-        Assert.Equal(new DateTime(2023, 01, 01), attribute.MinValue);
+        Assert.Equal("2023-01-02", attribute.MinValue);
     }
 
     [Fact]
@@ -26,9 +26,9 @@ public class DateTimeEditorAttributeTests
     {
         var attribute = new DateTimeEditorAttribute()
         {
-            MaxValue = new DateTime(2023, 01, 01)
-        };
-        Assert.Equal(new DateTime(2023, 01, 01), attribute.MaxValue);
+            MaxValue = "2023-01-02"
+        };  
+        Assert.Equal("2023-01-02", attribute.MaxValue);
     }
 
     [Fact]

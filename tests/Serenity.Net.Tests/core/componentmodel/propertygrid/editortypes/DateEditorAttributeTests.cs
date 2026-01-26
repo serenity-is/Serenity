@@ -12,10 +12,10 @@ public class DateEditorAttributeTests
     [Fact]
     public void MinValue_CanBeSetAndGet()
     {
-        var expectedDateTime = new DateTime(2023, 01, 01);
+        var expectedDateTime = "2023-01-02";
         var attribute = new DateEditorAttribute()
         {
-            MinValue = expectedDateTime,
+            MinValue = expectedDateTime
         };
         Assert.Equal(expectedDateTime, attribute.MinValue);
     }
@@ -23,7 +23,7 @@ public class DateEditorAttributeTests
     [Fact]
     public void MaxValue_CanBeSetAndGet()
     {
-        var expectedDateTime = new DateTime(2024, 01, 01);
+        var expectedDateTime = "2024-01-02";
         var attribute = new DateEditorAttribute()
         {
             MaxValue = expectedDateTime,
