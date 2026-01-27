@@ -1,10 +1,15 @@
+using Microsoft.Extensions.Options;
+
 namespace Serenity.PropertyGrid;
 
 /// <summary>
 /// Basic property processor
 /// </summary>
-public partial class BasicPropertyProcessor : PropertyProcessor
+/// <param name="options">The options.</param>
+public partial class BasicPropertyProcessor(IOptions<PropertyProcessorOptions> options = null) : PropertyProcessor
 {
+    private readonly PropertyProcessorOptions options = options?.Value ?? new();
+
     /// <summary>
     /// Sets properties of a PropertyItem by analysing a property source
     /// </summary>
