@@ -1,3 +1,8 @@
+## 9.2.2 (2026-01-27)
+
+## Bugfixes
+- Backport DateOnlyField fixes
+
 ## 10.0.0 (2025-11-24)
 
 ### Features
