@@ -28,7 +28,7 @@ public class SchemaHelper
             { "character varying", "String" },
             { "character", "String" },
             { "clob", "String" },
-            { "date", "DateOnly" },
+            { "date", "DateTime" },
             { "datetime", "DateTime" },
             { "datetime2", "DateTime" },
             { "datetimeoffset", "DateTimeOffset" },
