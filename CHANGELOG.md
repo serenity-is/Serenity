@@ -1,3 +1,9 @@
+## 10.1.5 (2026-01-27)
+
+### Bugfixes
+- Fix issue with DateOnly field due to the format string extra quote
+- Revert Sergen to generate DateTime fields as before for SQL date columns as DateOnlyField is not yet stable
+
 ## 10.1.4 (2026-01-27)
 
 ### Features
