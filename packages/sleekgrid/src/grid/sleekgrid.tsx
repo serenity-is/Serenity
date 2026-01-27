@@ -1641,6 +1641,7 @@ export class SleekGrid<TItem = any> implements ISleekGrid<TItem> {
     setFooterRowVisibility(visible: boolean): void {
         if (!this._options.showFooterRow != !visible) {
             this._signals.showFooterRow.value = this._options.showFooterRow = !!visible;
+            visible && this.updateGrandTotals();
             this.resizeCanvas();
         }
     }
