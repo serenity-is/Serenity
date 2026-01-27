@@ -1,6 +1,6 @@
 <Project>
   <PropertyGroup>
-    <Version>10.1.3</Version>
+    <Version>10.1.4</Version>
     <Company>Serenity Software</Company>
     <Copyright>Copyright © Serenity Software, Volkan Ceylan</Copyright>
     <Product>Serenity Platform - Common Features</Product>

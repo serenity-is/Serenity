@@ -1,3 +1,12 @@
+## 10.1.4 (2026-01-27)
+
+### Features
+- Add PropertyProcessor:DefaultSummaryType setting which can be set to None, Disabled etc. to override default Sum aggregate type for numeric columns, e.g. `services.Configure<PropertyProcessorOptions>(options => options.DefaultSummaryType = SummaryType.None)` to set default to none but still allow user to choose via header menu etc.;
+
+### Bugfixes
+- Summary footer value not shown first time when no columns had summary and one set via the column header menu, e.g. footer row is toggled
+- Change min max value for date/time editor attributes to string as DateTime can't be used as attribute prop value
+
 ## 10.1.3 (2026-01-26)
 
 ### Bugfixes
