@@ -1,92 +1,91 @@
 ## 10.1.4 (2026-01-27)
 
 ### Features
-- Add PropertyProcessor:DefaultSummaryType setting which can be set to None, Disabled etc. to override default Sum aggregate type for numeric columns, e.g. `services.Configure<PropertyProcessorOptions>(options => options.DefaultSummaryType = SummaryType.None)` to set default to none but still allow user to choose via header menu etc.;
+- Add a PropertyProcessor:DefaultSummaryType setting that can be set to None, Disabled, etc., to override the default Sum aggregate type for numeric columns. For example: `services.Configure<PropertyProcessorOptions>(options => options.DefaultSummaryType = SummaryType.None)` sets the default to None but still allows users to choose via the header menu, etc.
 
 ### Bugfixes
-- Summary footer value not shown first time when no columns had summary and one set via the column header menu, e.g. footer row is toggled
-- Change min max value for date/time editor attributes to string as DateTime can't be used as attribute prop value
+- The summary footer value is not shown the first time when no columns have summaries and one is set via the column header menu (e.g., when the footer row is toggled).
+- Change the min/max values for date/time editor attributes to strings, as DateTime cannot be used as an attribute property value.
 
 ## 10.1.3 (2026-01-26)
 
 ### Bugfixes
-- Handle issue when a `Sortable(false)` column is in the server side generated sorted column list
+- Handle the issue when a `Sortable(false)` column is included in the server-side generated sorted column list.
 
 ## 10.1.2 (2026-01-22)
 
 ### Features
-- New GridUtils.addQuickSearch method with named arguments instead of addQuickSearchInput and addQuickSearchInputCustom methods which are deprecated
-- Handle Shift+Wheel for horizontal scroll in Sleekgrid
+- Introduce a new GridUtils.addQuickSearch method with named arguments, replacing the deprecated addQuickSearchInput and addQuickSearchInputCustom methods.
+- Handle Shift+Wheel for horizontal scrolling in SleekGrid.
 
 ### Bugfixes
-- Fix CheckTreeEditor / CheckLookupEditor formatting issue / quick search indicator
+- Fix formatting issues with CheckTreeEditor/CheckLookupEditor and the quick search indicator.
 
 ## 10.1.1 (2026-01-15)
 
 ### Features
-- Override Equals and GetHashCode for PageAuthorizeAttribute as Equals throws stack overflow for default implementation of Attribute.Equals when the permission keys passed are same for the action and controller causing Swagger to fail when enumerating attributes for the action
+- Override Equals and GetHashCode for PageAuthorizeAttribute, as the default implementation of Attribute.Equals throws a stack overflow when the permission keys are the same for the action and controller, causing Swagger to fail when enumerating attributes for the action.
 
 ## 10.1.0 (2026-01-12)
 
 ### Features
-- Add AntiforgeryFilter options SkipValidationHeaderName (default "X-CSRF-SKIP") and SkipValidationHeaderValue (default "true") that when present in header will skip CSRF validation when using AutoValidateAntiforgeryIgnoreBearerFilter. This will make it easier to work with clients that use cookie auth (not bearer) call into services by adding the header.
+- Add AntiforgeryFilter options: SkipValidationHeaderName (default "X-CSRF-SKIP") and SkipValidationHeaderValue (default "true"). When present in the header, these will skip CSRF validation when using AutoValidateAntiforgeryIgnoreBearerFilter. This makes it easier to work with clients that use cookie authentication (not bearer tokens) by adding the header.
 
 ### Bugfixes
-- Serenity.Pro.Extensions global init script passes invalid case `proExtensions` instead of `proextensions` to initGlobalMappings
+- The Serenity.Pro.Extensions global init script passes an invalid case `proExtensions` instead of `proextensions` to initGlobalMappings.
 
 ## 10.0.9 (2025-12-31)
 
 ### Features
-- Generate an ESM style script from tsbuild externalGlobals plugin for Serenity modules instead of CommonJS by parsing .js files via es-module-lexer. This should result in a more optimized output.
-- Set target to ES2022 in tsconfig.json files.
-- Shorten Dutch header menu texts, use auto for label column in header menu split actions, set overflow hidden, ellipsis for dropdown-items under split actions
+- Generate an ESM-style script from the tsbuild externalGlobals plugin for Serenity modules instead of CommonJS, by parsing .js files via es-module-lexer. This should result in more optimized output.
+- Set the target to ES2022 in tsconfig.json files.
+- Shorten Dutch header menu texts, use "auto" for the label column in header menu split actions, and set overflow to hidden with ellipsis for dropdown items under split actions.
 
 ### Bugfixes
-- Use toUTCString instead of toGMTString (deprecated) or toISOString (not supported for cookies) while setting cookie expiration time for Language / ThemeSelection.
+- Use toUTCString instead of the deprecated toGMTString or toISOString (not supported for cookies) when setting cookie expiration time for Language/ThemeSelection.
 
 ## 10.0.8 (2025-12-18)
 
 ### Features
-- All scripts now target ES2022, which is supported by all current major browsers
-- AddSerenityAssetsImportMapEntries extension for adding jspdf and tiptap import map entries from ~/Serenity.Assets in _ImportMap.cshtml instead of manually specifiying individual entries
-- Use .bundle.js and .bundle.css instead of -bundle.js and -bundle.css suffixes for consistency.
+- All scripts now target ES2022, which is supported by all current major browsers.
+- Add the AddSerenityAssetsImportMapEntries extension for adding jspdf and tiptap import map entries from ~/Serenity.Assets in _ImportMap.cshtml, instead of manually specifying individual entries.
+- Use .bundle.js and .bundle.css suffixes instead of -bundle.js and -bundle.css for consistency.
 
 ### Bugfixes
-
-- Fix temporary column scroll synchronization issue when hiding / showing a column via column picker
-- Fix PermissionCheckEditor onClick event name
+- Fix the temporary column scroll synchronization issue when hiding or showing a column via the column picker.
+- Fix the PermissionCheckEditor onClick event name.
 
 ## 10.0.7 (2025-12-10)
 
 ### Features
-- New AddImportMapEntry, and RenderImportMap extensions in HtmlScriptExtensions that can be used in layout pages to prepare import maps, and optionally add external URLs to csp (on by default).
-- Export jspdf and jspdf-autotable from ~/Serenity.Assets/jspdf/jspdf-autotable.bundle.js and use it from PdfExportHelper instead of CDN which may be problematic for strict CSP and some disconnected scenarios. They can also be overridden via an import map entries for `jspdf` and `jspdf-autotable`.
-- Also build a ~/Serenity.Assets/tiptap/tiptap.bundle.js to make it easier to update tiptap packages for apps. This can be overridden/mapped via an import map entry for `@serenity-is/tiptap`, see `_ImportMap.cshtml` in latest templates. Local npm installations for tiptap modules in templates are removed.
+- Introduce new AddImportMapEntry and RenderImportMap extensions in HtmlScriptExtensions, which can be used in layout pages to prepare import maps and optionally add external URLs to CSP (enabled by default).
+- Export jspdf and jspdf-autotable from ~/Serenity.Assets/jspdf/jspdf-autotable.bundle.js and use them from PdfExportHelper instead of CDN, which may be problematic for strict CSP and disconnected scenarios. They can also be overridden via import map entries for `jspdf` and `jspdf-autotable`.
+- Also build ~/Serenity.Assets/tiptap/tiptap.bundle.js to make it easier to update tiptap packages for apps. This can be overridden or mapped via an import map entry for `@serenity-is/tiptap`; see `_ImportMap.cshtml` in the latest templates. Local npm installations for tiptap modules in templates are removed.
 
 ### Bugfixes
-- tsbuild clean plugin was not functional by default, update `@serenity-is/tsbuild` in package.json to 10.0.7 to resolve the issue.
+- The tsbuild clean plugin was not functional by default; update `@serenity-is/tsbuild` in package.json to 10.0.7 to resolve the issue.
 
 ## 10.0.6 (2025-12-09)
 
 ### Bugfixes
-- Fix report cshtml file could not be located due to IActionContextAccessor being made obsolete in .NET 10.
-- Add https://cdnjs.cloudflare.com/ajax/libs/ to CSP script-src directive for jspdf dynamic loading
+- Fix the issue where the report .cshtml file could not be located due to IActionContextAccessor being made obsolete in .NET 10.
+- Add https://cdnjs.cloudflare.com/ajax/libs/ to the CSP script-src directive for jspdf dynamic loading.
 
 ## 10.0.5 (2025-12-07)
 
 ### Features
-- Allow TransformIgnore attribute on methods. 
-- Improve handling for complex / unresolvable types during server types generation by using "unknown" as a type, and printing the problematic type as an inline comment. Note that this may now also include members of non-standard types like interfaces, abstract types etc which was skipped before.
+- Allow the TransformIgnore attribute on methods.
+- Improve handling for complex or unresolvable types during server types generation by using "unknown" as the type and printing the problematic type as an inline comment. Note that this may now include members of non-standard types like interfaces and abstract types, which were previously skipped.
 
 ## 10.0.4 (2025-12-06)
 
 ### Bugfixes
-- Missing package.json in NuGet packages for assets, corelib etc.
+- Missing package.json in NuGet packages for assets, corelib, etc.
 
 ## 10.0.3 (2025-12-06)
 
 ### Bugfixes
-- Missing targets file in Serenity.Net.Web
+- Missing targets file in Serenity.Net.Web.
 
 ### 10.0.2 (2025-12-06)
 
@@ -104,7 +103,7 @@
 - Implement faster property get / set methods for partial row properties generated via `[GenerateFields]` attribute.
 - Add ability to set include / exclude glob patterns for tsbuild cleanPlugin.
 - Add compression option to writeIfChanged plugin and tsbuild options via compress property. Brotli is too slow (15x slower than gzip) even with quality: 4, so only gzip is recommended for now. This is not recommended to be used for now as static web assets SDK also does its own compression.
-- Add a PreCompressedFileProvider that may server .gz, .br compressed files if available. These are produced by static web assets SDK during build and publish.
+- Add a PreCompressedFileProvider that may serve .gz, .br compressed files if available. These are produced by static web assets SDK during build and publish.
 - Added buildGlobalBundles option to tsbuild to automatically bundle files under Modules/Common/bundles/*-bundle(.css|.ts). StartSharp now uses this to generate its bundles instead of appsettings.bundles.json.
 - Use l10n bundle and initGlobalMappings function in flatpickr-init
 - Remove Pages/Dashboard css bundle as can directly import @serenity-is/pro.extensions/pages/dashboard.css from DashboardPage.tsx
