@@ -1,3 +1,8 @@
+## 10.1.6 (2026-01-27)
+
+### Bugfixes
+- Empty header filter dropdown contents before appending the search results
+
 ## 10.1.5 (2026-01-27)
 
 ### Bugfixes
