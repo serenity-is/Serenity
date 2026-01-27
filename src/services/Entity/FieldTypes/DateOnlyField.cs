@@ -117,7 +117,7 @@ public sealed class DateOnlyField(ICollection<Field> collection, string name, Lo
         if (value.HasValue)
         {
             var dt = value.Value;
-            writer.WriteValue(dt.ToString("yyyy'-'MM'-'dd'", CultureInfo.InvariantCulture));
+            writer.WriteValue(dt.ToString("yyyy'-'MM'-'dd", CultureInfo.InvariantCulture));
         }
         else
             writer.WriteNull();
@@ -209,7 +209,7 @@ public sealed class DateOnlyField(ICollection<Field> collection, string name, Lo
         else
         {
             var dt = value.Value;
-            writer.WriteStringValue(dt.ToString("yyyy'-'MM'-'dd'", CultureInfo.InvariantCulture));
+            writer.WriteStringValue(dt.ToString("yyyy'-'MM'-'dd", CultureInfo.InvariantCulture));
         }
     }
 }

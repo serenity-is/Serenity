@@ -122,7 +122,8 @@ public static class SqlHelper
                 var mappedType = Dapper.SqlMapper.LookupDbType(value.GetType(), "n/a", false, out var _); ;
 #pragma warning restore CS0618
 
-                if (mappedType != param.DbType && mappedType != null)
+                if (!(param.DbType == DbType.Date && value is DateOnly) &&
+                      mappedType != param.DbType && mappedType != null)
                     param.DbType = mappedType.Value;
 
                 if (param.DbType == DbType.DateTime &&
