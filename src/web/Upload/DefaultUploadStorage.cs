@@ -45,9 +45,9 @@ public class DefaultUploadStorage : IUploadStorage
             new TempUploadStorage(new DiskUploadStorageOptions
             {
                 RootPath = Path.Combine(path, "temporary"),
-                RootUrl = UriHelper.Combine(opt.Url, "temporary/")
+                RootUrl = UriHelper.Combine(opt.Url, UploadPathHelper.TemporaryFilePrefix)
             }, fileSystem),
-            "temporary/");
+            UploadPathHelper.TemporaryFilePrefix);
     }
 
     /// <inheritdoc/>

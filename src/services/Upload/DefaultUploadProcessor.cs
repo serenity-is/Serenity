@@ -57,7 +57,7 @@ public class DefaultUploadProcessor(IImageProcessor imageProcessor, IUploadStora
 
         UploadPathHelper.CheckFileNameSecurity(filename);
 
-        bool isExistingTemporary = filename.StartsWith("temporary/", StringComparison.Ordinal) &&
+        bool isExistingTemporary = UploadPathHelper.IsTemporaryFile(filename) &&
             uploadStorage.FileExists(filename);
 
         if (!isExistingTemporary)
@@ -86,7 +86,7 @@ public class DefaultUploadProcessor(IImageProcessor imageProcessor, IUploadStora
 
                     if (!isExistingTemporary)
                     {
-                        var basePath = "temporary/" + Guid.NewGuid().ToString("N");
+                        var basePath = UploadPathHelper.TemporaryFilePrefix + Guid.NewGuid().ToString("N");
                         stream.Seek(0, System.IO.SeekOrigin.Begin);
                         result.TemporaryFile = uploadStorage.WriteFile(basePath + System.IO.Path.GetExtension(filename),
                             stream, OverwriteOption.Disallowed);

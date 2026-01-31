@@ -113,4 +113,22 @@ public static class UploadPathHelper
 
         return path;
     }
+
+    /// <summary>
+    /// Represents the prefix used to identify temporary upload files.
+    /// </summary>
+    /// <remarks>Use this constant to distinguish files that are stored temporarily during the upload process.
+    /// Files with this prefix are typically subject to cleanup or special handling.</remarks>
+    public const string TemporaryFilePrefix = "temporary/";
+
+    /// <summary>
+    /// Determines whether the specified file name represents a temporary upload file.
+    /// </summary>
+    /// <param name="fileName">The name of the file to evaluate. Can be null or empty.</param>
+    /// <returns>true if the file name is not null or empty and indicates a temporary upload file; otherwise, false.</returns>
+    public static bool IsTemporaryFile(string fileName)
+    {
+        return !string.IsNullOrEmpty(fileName) &&
+            fileName.StartsWith(TemporaryFilePrefix, StringComparison.Ordinal);
+    }
 }

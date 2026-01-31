@@ -360,7 +360,7 @@ public class FileUploadBehavior(IUploadStorage storage, IUploadProcessor uploadP
         if (string.IsNullOrEmpty(temporaryFile))
             throw new ArgumentNullException(nameof(temporaryFile));
 
-        if (!temporaryFile.StartsWith("temporary/", StringComparison.OrdinalIgnoreCase))
+        if (!UploadPathHelper.IsTemporaryFile(temporaryFile))
             throw new InvalidOperationException("For security reasons, only temporary files can be used in uploads!");
 
         UploadPathHelper.CheckFileNameSecurity(temporaryFile);
