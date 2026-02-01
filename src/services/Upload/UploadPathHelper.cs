@@ -11,14 +11,20 @@ public static class UploadPathHelper
     /// Gets thumb file name
     /// </summary>
     /// <param name="path">File path</param>
-    /// <param name="thumbSuffix">Thumb suffix, default is "_t.jpg"</param>
+    /// <param name="width">Thumb width</param>
+    /// <param name="height">Thumb height</param>
     /// <returns></returns>
-    public static string GetThumbnailName(string path, string thumbSuffix = "_t.jpg")
+    public static string GetThumbnailName(string path, int? width = null, int? height = null)
     {
         if (string.IsNullOrEmpty(path))
             return path;
 
-        return Path.ChangeExtension(path, null) + thumbSuffix;
+        path = Path.ChangeExtension(path, null);
+
+        if (width != null && height != null)
+            return path + string.Format(CultureInfo.InvariantCulture, SizedThumbFormat, width, height) + ThumbExtension;
+
+        return path + ThumbBaseSuffix + ThumbExtension;
     }
 
     /// <summary>
@@ -38,6 +44,10 @@ public static class UploadPathHelper
         baseName = null;
         suffix = null;
 
+        if (string.IsNullOrEmpty(filename))
+            return false;
+
+        filename = Path.GetFileName(filename);
         if (string.IsNullOrEmpty(filename))
             return false;
 
@@ -131,4 +141,28 @@ public static class UploadPathHelper
         return !string.IsNullOrEmpty(fileName) &&
             fileName.StartsWith(TemporaryFilePrefix, StringComparison.Ordinal);
     }
+
+    /// <summary>
+    /// The thumbnail suffix used for thumbnail images. Does not include file extension.
+    /// </summary>
+    public const string ThumbBaseSuffix = "_t";
+    
+    /// <summary>
+    /// Represents the format string used to generate a thumbnail size suffix with width and height placeholders.
+    /// It does not include the file extension.
+    /// </summary>
+    /// <remarks>This format string can be used with string formatting methods to create a suffix indicating
+    /// the dimensions of a thumbnail image. For example, using string.Format(SizedThumbFormat, 100, 200) produces the
+    /// string "_t100x200".</remarks>
+    public const string SizedThumbFormat = "_t{0}x{1}";
+
+    /// <summary>
+    /// Represents the file extension used for thumbnail images in JPEG format.
+    /// </summary>
+    public const string ThumbExtension = ".jpg";
+
+    /// <summary>
+    /// Represents the file extension used for metadata files.
+    /// </summary>
+    public const string MetaFileExtension = ".meta";
 }
