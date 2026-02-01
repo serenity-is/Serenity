@@ -64,9 +64,12 @@ public static class UploadStorageExtensions
     /// <param name="path">Full source file path</param>
     public static IEnumerable<string> GetThumbnailFiles(this IUploadStorage uploadStorage, string path)
     {
+        var sourceDir = PathHelper.ToUrl(Path.GetDirectoryName(path));
         var sourceBase = Path.ChangeExtension(path, null);
 
-        foreach (var thumbPath in uploadStorage.GetThumbnailFiles(path))
+        foreach (var thumbPath in uploadStorage.GetFiles(sourceDir, 
+            Path.GetFileName(sourceBase) + UploadPathHelper.ThumbBaseSuffix + 
+            "*" + UploadPathHelper.ThumbExtension))
         {
             if (!UploadPathHelper.TryParseThumbSuffix(thumbPath,
                 out var baseName, out _, out _, out _) ||
