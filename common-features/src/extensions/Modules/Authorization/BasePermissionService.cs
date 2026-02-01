@@ -51,6 +51,15 @@ public abstract class BasePermissionService(
     }
 
     /// <summary>
+    /// Gets whether the specified permission is "NEVER", which denies access to all users
+    /// including super administrators.
+    /// </summary>
+    protected virtual bool IsNever(string permission)
+    {
+        return permission == "NEVER";
+    }
+
+    /// <summary>
     /// Checks if the transient grantor has the specified permission.
     /// </summary>
     /// <param name="permission">Permission</param>
@@ -116,7 +125,7 @@ public abstract class BasePermissionService(
     /// <inheritdoc/>
     public virtual bool HasPermission(string permission)
     {
-        if (!IsValidKey(permission))
+        if (!IsValidKey(permission) || IsNever(permission))
             return false;
 
         if (IsAsterisk(permission) || IsTransientlyGranted(permission))

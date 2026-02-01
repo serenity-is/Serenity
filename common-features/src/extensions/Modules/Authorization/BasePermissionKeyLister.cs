@@ -130,11 +130,11 @@ public abstract class BasePermissionKeyLister(ITwoLevelCache cache, ITypeSource 
 
     /// <summary>
     /// Gets a list of permissions that are used as markers and should not be listed.
-    /// Default implementation returns ["*", "?"]
+    /// Default implementation returns ["*", "?", "NEVER"]
     /// </summary>
     protected virtual IEnumerable<string> GetMarkerPermissions()
     {
-        return ["*", "?"];
+        return ["*", "?", "NEVER"];
     }
 
     /// <summary>
