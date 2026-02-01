@@ -31,12 +31,12 @@ public static class UploadPathHelper
     /// Tries to parse a thumbnail filename suffix, e.g. it ends with "_t.jpg",
     /// or "_tNxN.jpg" where N is a number
     /// </summary>
-    /// <param name="filename">Filename</param>
-    /// <param name="baseName">Base name of the file</param>
+    /// <param name="path">File path, e.g. some/file_t.jpg</param>
+    /// <param name="baseName">Base name of the file, e.g. some/file. May include folder</param>
     /// <param name="suffix">Thumb suffix</param>
     /// <param name="width">Thumb width</param>
     /// <param name="height">Thumb height</param>
-    public static bool TryParseThumbSuffix(string filename,
+    public static bool TryParseThumbSuffix(string path,
         out string baseName, out string suffix, out int width, out int height)
     {
         width = -1;
@@ -44,10 +44,10 @@ public static class UploadPathHelper
         baseName = null;
         suffix = null;
 
-        if (string.IsNullOrEmpty(filename))
+        if (string.IsNullOrEmpty(path))
             return false;
 
-        filename = Path.GetFileName(filename);
+        var filename = Path.GetFileName(path);
         if (string.IsNullOrEmpty(filename))
             return false;
 
@@ -58,7 +58,8 @@ public static class UploadPathHelper
         if (tIndex < 0)
             return false;
 
-        baseName = filename[..tIndex];
+        var folder = Path.GetDirectoryName(path);
+        baseName = (string.IsNullOrEmpty(folder) ? "" : (PathHelper.ToUrl(folder) + "/")) + filename[..tIndex];
         suffix = filename[tIndex..];
         
         if (string.Equals(suffix, "_t.jpg", StringComparison.OrdinalIgnoreCase))

@@ -41,6 +41,11 @@ public static class FileMetadataKeys
     public const string ImageSize = "ImageSize";
 
     /// <summary>
+    /// Represents the key used to indicate whether an item is a thumbnail image.
+    /// </summary>
+    public const string IsThumbnail = "IsThumbnail";
+
+    /// <summary>
     /// Original name of the file
     /// </summary>
     public const string OriginalName = "OriginalName";
@@ -49,4 +54,10 @@ public static class FileMetadataKeys
     /// Generated default thumbnail size like 96x96.
     /// </summary>
     public const string ThumbSize = "ThumbSize";
+
+    /// <summary>
+    /// Represents the primary file's extension when the file is a derivative version,
+    /// like a thumbnail or a converted format.
+    /// </summary>
+    public const string PrimaryFileExtension = "PrimaryFileExtension";
 }

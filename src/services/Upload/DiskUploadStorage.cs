@@ -1,4 +1,6 @@
+using Microsoft.Extensions.Options;
 using Serenity.IO;
+using System.Net.NetworkInformation;
 
 namespace Serenity.Web;
 
@@ -33,11 +35,8 @@ public class DiskUploadStorage : IUploadStorage
         this.fileSystem = fileSystem ?? new PhysicalDiskUploadFileSystem();
         var opt = options ?? throw new ArgumentNullException(nameof(options));
 
-        if (string.IsNullOrWhiteSpace(opt.RootPath))
-            throw new ArgumentNullException(nameof(opt.RootPath));
-
-        if (string.IsNullOrWhiteSpace(opt.RootUrl))
-            throw new ArgumentNullException(nameof(opt.RootUrl));
+        ArgumentException.ThrowIfNullOrWhiteSpace(opt.RootPath);
+        ArgumentException.ThrowIfNullOrWhiteSpace(opt.RootUrl);
 
         RootUrl = opt.RootUrl;
         RootPath = opt.RootPath;
@@ -106,11 +105,8 @@ public class DiskUploadStorage : IUploadStorage
     /// <inheritdoc/>
     public virtual void SetFileMetadata(string path, IDictionary<string, string> metadata, bool overwriteAll)
     {
-        if (string.IsNullOrEmpty(path))
-            throw new ArgumentNullException(nameof(path));
-
-        if (metadata == null)
-            throw new ArgumentNullException(nameof(metadata));
+        ArgumentException.ThrowIfNullOrEmpty(path);
+        ArgumentNullException.ThrowIfNull(metadata);
 
         if (IsInternalFile(path))
             throw new ArgumentOutOfRangeException(nameof(path));
@@ -160,24 +156,24 @@ public class DiskUploadStorage : IUploadStorage
         try
         {
             var sourceBasePath = fileSystem.ChangeExtension(sourcePath, null);
-            var sourceBaseName = fileSystem.GetFileNameWithoutExtension(sourceBasePath);
             var targetBasePath = fileSystem.ChangeExtension(targetPath, null);
 
-            var sourceDir = fileSystem.GetDirectoryName(sourcePath);
-            foreach (var f in store.GetFiles(sourceDir,
-                 sourceBaseName + "_t*.jpg"))
+            foreach (var thumbPath in store.GetThumbnailFiles(sourcePath))
             {
-                if (!UploadPathHelper.TryParseThumbSuffix(fileSystem.GetFileName(f), 
-                    out var baseName, out var suffix, out _, out _) ||
-                    !string.Equals(sourceBaseName, baseName, StringComparison.OrdinalIgnoreCase))
+                if (!UploadPathHelper.TryParseThumbSuffix(thumbPath, out _, out var suffix, out _, out _))
                     continue;
 
-                using var src = store.OpenFile(f);
-                newFiles.Add(WriteFile(targetBasePath + suffix, src, OverwriteOption.Overwrite));
+                using var src = store.OpenFile(thumbPath);
+                var targetThumb = targetBasePath + suffix;
+                targetThumb = WriteFile(targetThumb, src, OverwriteOption.Overwrite);
+                newFiles.Add(targetThumb);
+                var thumbMetadata = store.GetFileMetadata(thumbPath);
+                if (thumbMetadata?.Count > 0)
+                    SetFileMetadata(targetThumb, thumbMetadata, true);
             }
 
             var metadata = store.GetFileMetadata(sourcePath);
-            if (metadata.Count > 0)
+            if (metadata?.Count > 0)
                 SetFileMetadata(targetPath, metadata, true);
 
             return targetPath;
@@ -221,21 +217,14 @@ public class DiskUploadStorage : IUploadStorage
 
         fileSystem.Delete(fileName, DeleteType.TryDeleteOrMark);
 
-        string sourcePath = fileSystem.GetDirectoryName(fileName);
-        string sourceBase = fileSystem.GetFileNameWithoutExtension(fileName);
-
-        foreach (var f in fileSystem.GetFiles(sourcePath,
-            sourceBase + "_t*.jpg", recursive: false))
+        foreach (var thumbFile in this.GetThumbnailFiles(path))
         {
-            if (!UploadPathHelper.TryParseThumbSuffix(fileSystem.GetFileName(f),
-                out var baseName, out _, out _, out _) ||
-                !string.Equals(sourceBase, baseName, StringComparison.OrdinalIgnoreCase))
-                continue;
-
-            fileSystem.Delete(f, DeleteType.TryDeleteOrMark);
+            var thumbPath = fileSystem.Combine(folder, fileSystem.GetFileName(thumbFile));
+            fileSystem.Delete(thumbPath, DeleteType.TryDeleteOrMark);
+            fileSystem.Delete(thumbPath + UploadPathHelper.MetaFileExtension, DeleteType.TryDeleteOrMark);
         }
 
-        fileSystem.Delete(fileName + ".meta", DeleteType.TryDeleteOrMark);
+        fileSystem.Delete(fileName + UploadPathHelper.MetaFileExtension, DeleteType.TryDeleteOrMark);
     }
 
     /// <inheritdoc/>
@@ -253,10 +242,9 @@ public class DiskUploadStorage : IUploadStorage
     /// <inheritdoc/>
     public string[] GetFiles(string path, string searchPattern)
     {
-        return fileSystem.GetFiles(FilePath(path), searchPattern, recursive: true)
+        return [.. fileSystem.GetFiles(FilePath(path), searchPattern, recursive: true)
             .Where(x => !IsInternalFile(x))
-            .Select(x => fileSystem.GetRelativePath(RootPath, x))
-            .ToArray();
+            .Select(x => fileSystem.GetRelativePath(RootPath, x))];
     }
 
     /// <inheritdoc/>

@@ -46,15 +46,10 @@ public class DefaultUploadProcessor(IImageProcessor imageProcessor, IUploadStora
     /// <inheritdoc/>
     public virtual ProcessedUploadInfo Process(System.IO.Stream stream, string filename, IUploadOptions options)
     {
-        if (stream is null)
-            throw new ArgumentNullException(nameof(stream));
-
-        if (filename is null)
-            throw new ArgumentNullException(nameof(filename));
-
-        if (options is null)
-            throw new ArgumentNullException(nameof(options));
-
+        ArgumentNullException.ThrowIfNull(stream);
+        ArgumentNullException.ThrowIfNull(filename);
+        ArgumentNullException.ThrowIfNull(options);
+        
         UploadPathHelper.CheckFileNameSecurity(filename);
 
         bool isExistingTemporary = UploadPathHelper.IsTemporaryFile(filename) &&
@@ -155,14 +150,9 @@ public class DefaultUploadProcessor(IImageProcessor imageProcessor, IUploadStora
     /// <exception cref="ArgumentNullException">image or options is null</exception>
     protected virtual ScaleImageAsResult ScaleMainImage(object image, IUploadImageOptions options, string imageFile)
     {
-        if (image is null)
-            throw new ArgumentNullException(nameof(image));
-
-        if (options is null)
-            throw new ArgumentNullException(nameof(options));
-
-        if (string.IsNullOrEmpty(imageFile))
-            throw new ArgumentNullException(nameof(imageFile));
+        ArgumentNullException.ThrowIfNull(image);
+        ArgumentNullException.ThrowIfNull(options);
+        ArgumentException.ThrowIfNullOrEmpty(imageFile);
 
         var (imageWidth, imageHeight) = imageProcessor.GetImageSize(image);
         var scaleSmaller = options.ScaleSmaller == true;
@@ -175,9 +165,9 @@ public class DefaultUploadProcessor(IImageProcessor imageProcessor, IUploadStora
         {
             var baseFile = System.IO.Path.ChangeExtension(imageFile, null);
             var originalName = uploadStorage.GetOriginalName(imageFile);
-            result = ScaleImageAs(image, options.ScaleWidth, options.ScaleHeight, options.ScaleMode, 
+            result = ScaleImageAs(image, options.ScaleWidth, options.ScaleHeight, options.ScaleMode,
                 options.ScaleBackColor, new ImageEncoderParams { Quality = options.ScaleQuality },
-                baseFile + ".jpg");
+                baseFile + ".jpg", primaryFile: null); // main image itself, not a thumbnail
 
             imageWidth = result.Width;
             imageHeight = result.Height;
@@ -204,19 +194,17 @@ public class DefaultUploadProcessor(IImageProcessor imageProcessor, IUploadStora
     /// <exception cref="ArgumentNullException">image, options or temporaryFile is null</exception>
     public virtual ScaleImageAsResult CreateDefaultThumb(object image, IUploadImageOptions options, string imageFile)
     {
-        if (image is null)
-            throw new ArgumentNullException(nameof(image));
-
-        if (options is null)
-            throw new ArgumentNullException(nameof(options));
+        ArgumentNullException.ThrowIfNull(image);
+        ArgumentNullException.ThrowIfNull(options);
 
         if ((options.ThumbWidth > 0 || options.ThumbHeight > 0) &&
             (options.ThumbWidth >= 0 && options.ThumbHeight >= 0))
         {
-            var result = ScaleImageAs(image, options.ThumbWidth, options.ThumbHeight, 
-                options.ThumbMode, options.ThumbBackColor, 
+            var thumbFile = UploadPathHelper.GetThumbnailName(imageFile);
+            var result = ScaleImageAs(image, options.ThumbWidth, options.ThumbHeight,
+                options.ThumbMode, options.ThumbBackColor,
                 new ImageEncoderParams { Quality = options.ThumbQuality },
-                System.IO.Path.ChangeExtension(imageFile, null) + "_t.jpg");
+                thumbFile, primaryFile: imageFile);
 
             uploadStorage.SetFileMetadata(imageFile, new Dictionary<string, string>()
             {
@@ -238,7 +226,7 @@ public class DefaultUploadProcessor(IImageProcessor imageProcessor, IUploadStora
     /// <param name="imageFile">Main image file</param>
     /// <exception cref="ArgumentNullException">image, options or temporaryFile is null</exception>
     /// <exception cref="ArgumentOutOfRangeException">options.ThumbSizes contains invalid values</exception>
-    protected virtual IEnumerable<ScaleImageAsResult> CreateAdditionalThumbs(object image, 
+    protected virtual IEnumerable<ScaleImageAsResult> CreateAdditionalThumbs(object image,
         IUploadImageOptions options, string imageFile)
     {
         if (image is null)
@@ -255,8 +243,6 @@ public class DefaultUploadProcessor(IImageProcessor imageProcessor, IUploadStora
         if (thumbSizes is null)
             return result;
 
-        var baseFile = System.IO.Path.ChangeExtension(imageFile, null);
-
         foreach (var sizeStr in thumbSizes.Replace(";", ",", StringComparison.Ordinal).Split([',']))
         {
             var dims = sizeStr.ToUpperInvariant().Split(['X']);
@@ -268,11 +254,11 @@ public class DefaultUploadProcessor(IImageProcessor imageProcessor, IUploadStora
                 (w == 0 && h == 0))
                 throw new ArgumentOutOfRangeException(nameof(thumbSizes));
 
-            var thumbFile = baseFile + "_t" + w.ToInvariant() + "x" + h.ToInvariant() + ".jpg";
+            var thumbFile = UploadPathHelper.GetThumbnailName(imageFile, w, h);
 
             result.Add(ScaleImageAs(image, w, h, options.ThumbMode, options.ThumbBackColor,
                 new ImageEncoderParams { Quality = options.ThumbQuality },
-                thumbFile));
+                thumbFile, primaryFile: imageFile));
         }
 
         return result;
@@ -288,9 +274,11 @@ public class DefaultUploadProcessor(IImageProcessor imageProcessor, IUploadStora
     /// <param name="backgroundColor">Pad color</param>
     /// <param name="encoderParams">Encoder parameters for target image</param>
     /// <param name="targetFile">Path</param>
+    /// <param name="primaryFile">Primary file which this is a derivative of. Pass null if this is the main image itself, not a thumbnail.
+    /// and not a thumbnail.</param>
     /// <exception cref="ArgumentNullException">One of inputs is null</exception>
-    protected virtual ScaleImageAsResult ScaleImageAs(object image, int width, int height, 
-        ImageScaleMode mode, string backgroundColor, ImageEncoderParams encoderParams, string targetFile)
+    protected virtual ScaleImageAsResult ScaleImageAs(object image, int width, int height,
+        ImageScaleMode mode, string backgroundColor, ImageEncoderParams encoderParams, string targetFile, string primaryFile)
     {
         var scaledImage = imageProcessor.Scale(image, width, height, mode, backgroundColor, inplace: false);
         try
@@ -300,9 +288,18 @@ public class DefaultUploadProcessor(IImageProcessor imageProcessor, IUploadStora
             using var ms = new System.IO.MemoryStream();
             imageProcessor.Save(scaledImage, ms, "image/jpeg", encoderParams);
             ms.Seek(0, System.IO.SeekOrigin.Begin);
+            var filename = uploadStorage.WriteFile(targetFile, ms, OverwriteOption.Overwrite);
+            if (primaryFile != null)
+            {
+                uploadStorage.SetFileMetadata(filename, new Dictionary<string, string>()
+                {
+                    [FileMetadataKeys.IsThumbnail] = "true",
+                    [FileMetadataKeys.PrimaryFileExtension] = System.IO.Path.GetExtension(primaryFile)
+                }, overwriteAll: true);
+            }
             return new ScaleImageAsResult
             {
-                Filename = uploadStorage.WriteFile(targetFile, ms, OverwriteOption.Overwrite),
+                Filename = filename,
                 Width = size.width,
                 Height = size.height
             };
