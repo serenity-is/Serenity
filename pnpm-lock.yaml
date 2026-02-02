@@ -161,11 +161,11 @@ importers:
         specifier: 3.7.1
         version: 3.7.1
       jspdf:
-        specifier: 4.0.0
-        version: 4.0.0
+        specifier: 4.1.0
+        version: 4.1.0
       jspdf-autotable:
         specifier: 5.0.7
-        version: 5.0.7(jspdf@4.0.0)
+        version: 5.0.7(jspdf@4.1.0)
       mousetrap:
         specifier: 1.6.5
         version: 1.6.5
@@ -296,8 +296,8 @@ packages:
     engines: {node: '>=6.0.0'}
     hasBin: true
 
-  '@babel/runtime@7.28.4':
-    resolution: {integrity: sha512-Q/N6JNWvIvPnLDvjlE1OUBLPQHH6l3CltCEsHIujp45zQUSSh8K+gHnaEX45yAT1nyngnINhvWtzN+Nb9D8RAQ==}
+  '@babel/runtime@7.28.6':
+    resolution: {integrity: sha512-05WQkdpL9COIMz4LjTxGpPNCdlpyimKppYNoJ5Di5EUObifl8t4tuLuUBBZEpoLYOmfvIWrsp9fCl0HoPRVTdA==}
     engines: {node: '>=6.9.0'}
 
   '@babel/types@7.28.5':
@@ -1089,8 +1089,8 @@ packages:
   color-name@1.1.4:
     resolution: {integrity: sha512-dOy+3AuW3a2wNbZHIuMZpTcgjGuLU/uBL/ubcZF9OXbDo8ff4O8yVp5Bf0efS8uEoYo5q4Fx7dY9OgQGXgAsQA==}
 
-  core-js@3.47.0:
-    resolution: {integrity: sha512-c3Q2VVkGAUyupsjRnaNX6u8Dq2vAdzm9iuPj5FW0fRxzlxgq9Q39MDq10IvmQSpLgHQNyQzQmOo6bgGHmH3NNg==}
+  core-js@3.48.0:
+    resolution: {integrity: sha512-zpEHTy1fjTMZCKLHUZoVeylt9XrzaIN2rbPXEt0k+q7JE5CkCZdo6bNq55bn24a69CH7ErAVLKijxJja4fw+UQ==}
 
   crelt@1.0.6:
     resolution: {integrity: sha512-VQ2MBenTq1fWZUH9DJNGti7kKv6EeAuYr3cLwxUWhIu1baTaXh4Ib5W2CqHVqib4/MqbYGJqiL3Zb8GJZr3l4g==}
@@ -1284,8 +1284,8 @@ packages:
     peerDependencies:
       jspdf: ^2 || ^3 || ^4
 
-  jspdf@4.0.0:
-    resolution: {integrity: sha512-w12U97Z6edKd2tXDn3LzTLg7C7QLJlx0BPfM3ecjK2BckUl9/81vZ+r5gK4/3KQdhAcEZhENUxRhtgYBj75MqQ==}
+  jspdf@4.1.0:
+    resolution: {integrity: sha512-xd1d/XRkwqnsq6FP3zH1Q+Ejqn2ULIJeDZ+FTKpaabVpZREjsJKRJwuokTNgdqOU+fl55KgbvgZ1pRTSWCP2kQ==}
 
   jvectormap-content@0.1.1:
     resolution: {integrity: sha512-8yYRhbQ6Zrm38Abv64tfAuKNlTKPJh2HsdRIHYAy2XyNZhBcAVZQXWVinTXWcRuWngd1UVmUmzA8ncOlQEv08A==}
@@ -1733,7 +1733,7 @@ snapshots:
     dependencies:
       '@babel/types': 7.28.5
 
-  '@babel/runtime@7.28.4': {}
+  '@babel/runtime@7.28.6': {}
 
   '@babel/types@7.28.5':
     dependencies:
@@ -2304,9 +2304,9 @@ snapshots:
 
   canvg@3.0.11:
     dependencies:
-      '@babel/runtime': 7.28.4
+      '@babel/runtime': 7.28.6
       '@types/raf': 3.4.3
-      core-js: 3.47.0
+      core-js: 3.48.0
       raf: 3.4.1
       regenerator-runtime: 0.13.11
       rgbcolor: 1.0.1
@@ -2332,7 +2332,7 @@ snapshots:
 
   color-name@1.1.4: {}
 
-  core-js@3.47.0:
+  core-js@3.48.0:
     optional: true
 
   crelt@1.0.6: {}
@@ -2576,18 +2576,18 @@ snapshots:
       - supports-color
       - utf-8-validate
 
-  jspdf-autotable@5.0.7(jspdf@4.0.0):
+  jspdf-autotable@5.0.7(jspdf@4.1.0):
     dependencies:
-      jspdf: 4.0.0
+      jspdf: 4.1.0
 
-  jspdf@4.0.0:
+  jspdf@4.1.0:
     dependencies:
-      '@babel/runtime': 7.28.4
+      '@babel/runtime': 7.28.6
       fast-png: 6.4.0
       fflate: 0.8.2
     optionalDependencies:
       canvg: 3.0.11
-      core-js: 3.47.0
+      core-js: 3.48.0
       dompurify: 3.3.1
       html2canvas: 1.4.1
 
