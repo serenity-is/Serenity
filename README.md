@@ -58,7 +58,7 @@ See [Serenity Developer Guide - https://serenity.is/docs](https://serenity.is/do
 - Property Viewer: View widget properties, options, and state
 - DOM Highlighting: Highlight DOM elements associated with widgets
 - Scroll Into View: Quickly navigate to widget elements in the page
-- View Source: Instantly inspect the source code for widget constructors and methods.
+- View Source: Instantly inspect the source code for widget constructors and methods
 
 [Download from Chrome Web Store](https://chromewebstore.google.com/detail/serenity-developer-tools/andpiimofmnbnphjdcknpgdhkgamlggh)
 
