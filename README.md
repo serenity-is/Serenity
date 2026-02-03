@@ -50,6 +50,18 @@ See [Serenity Developer Guide - https://serenity.is/docs](https://serenity.is/do
 **Check out the Visual Studio Toolbox Presentation:**
 - [Building Web Apps with the Serenity Platform](https://docs.microsoft.com/en-us/shows/visual-studio-toolbox/building-web-apps-with-the-serenity-platform)
 
+## Serenity Developer Tools
+[Serenity Developer Tools](https://github.com/serenity-is/devtools) is a Chrome extension designed to help developers inspect and debug widgets, properties, source code, and DOM elements directly within the browser's DevTools.
+
+- Widget Inspector: Browse and inspect Serenity widgets in your application
+- Element Picker: Click on elements to find their corresponding widget
+- Property Viewer: View widget properties, options, and state
+- DOM Highlighting: Highlight DOM elements associated with widgets
+- Scroll Into View: Quickly navigate to widget elements in the page
+- View Source: Instantly inspect the source code for widget constructors and methods
+
+[Download from Chrome Web Store](https://chromewebstore.google.com/detail/serenity-developer-tools/andpiimofmnbnphjdcknpgdhkgamlggh)
+
 ## Contribute / Spread the Word
 
 You may contribute to the project by opening a pull request, adding documentation, sample source code, asking a question or suggesting an improvement, etc. Just open a discussion here with relevant links.
