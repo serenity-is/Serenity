@@ -9,7 +9,7 @@ packages:
 
 catalogs:
   serenity:
-    "@floating-ui/dom": "1.7.4"
+    "@floating-ui/dom": "1.7.5"
     "@preact/signals-core": "1.12.2"
     "@vitest/coverage-v8": "4.0.18"
     "chart.js": "4.5.1"
