@@ -10,8 +10,8 @@ packages:
 catalogs:
   serenity:
     "@floating-ui/dom": "1.7.4"
-    "@preact/signals-core": "1.12.1"
-    "@vitest/coverage-v8": "4.0.16"
+    "@preact/signals-core": "1.12.2"
+    "@vitest/coverage-v8": "4.0.18"
     "chart.js": "4.5.1"
     "dompurify": "3.3.1"
     "dts-bundle-generator": "9.5.1"
@@ -20,8 +20,8 @@ catalogs:
     "flatpickr": "4.6.13"
     "glightbox": "3.3.1"
     "glob": "13.0.0"
-    "jsdom": "27.4.0"
+    "jsdom": "28.0.0"
     "moment": "2.30.1"
-    "preact": "10.28.2"
+    "preact": "10.28.3"
     "typescript": "5.9.3"
-    "vitest": "4.0.16"
+    "vitest": "4.0.18"
