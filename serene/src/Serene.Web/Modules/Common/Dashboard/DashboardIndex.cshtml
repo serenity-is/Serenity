@@ -276,8 +276,6 @@ ViewData["PageId"] = "Dashboard";
 <script nonce="@Html.CspNonce()">
 
     $(function () {
-
-
         $('.daterange').daterangepicker({
             ranges: {
                 'Today': [moment(), moment()],
@@ -309,6 +307,8 @@ ViewData["PageId"] = "Dashboard";
             "RU": 3000 //Russia
         };
 
+        // jQuery v4 does not have $.isArray, so we need to set it for jvectormap
+        $.isArray ??= Array.isArray;
         $('#world-map').vectorMap({
             map: 'world_mill',
             backgroundColor: "transparent",

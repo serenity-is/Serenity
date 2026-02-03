@@ -158,8 +158,8 @@ importers:
         specifier: 3.3.1
         version: 3.3.1
       jquery:
-        specifier: 3.7.1
-        version: 3.7.1
+        specifier: 4.0.0
+        version: 4.0.0
       jspdf:
         specifier: 4.1.0
         version: 4.1.0
@@ -254,7 +254,7 @@ importers:
         version: 0.1.1
       jvectormap-next:
         specifier: 3.1.2
-        version: 3.1.2(jquery@3.7.1)
+        version: 3.1.2(jquery@4.0.0)
       moment:
         specifier: catalog:serenity
         version: 2.30.1
@@ -1273,6 +1273,9 @@ packages:
 
   jquery@3.7.1:
     resolution: {integrity: sha512-m4avr8yL8kmFN8psrbFFFmB/If14iN5o9nw/NgnnM+kybDJpRsAynV2BsfpTYrTRysYUdADVD7CkUUizgkpLfg==}
+
+  jquery@4.0.0:
+    resolution: {integrity: sha512-TXCHVR3Lb6TZdtw1l3RTLf8RBWVGexdxL6AC8/e0xZKEpBflBsjh9/8LXw+dkNFuOyW9B7iB3O1sP7hS0Kiacg==}
 
   js-tokens@10.0.0:
     resolution: {integrity: sha512-lM/UBzQmfJRo9ABXbPWemivdCW8V2G8FHaHdypQaIy523snUjog0W71ayWXTjiR+ixeMyVHN2XcpnTd/liPg/Q==}
@@ -2359,7 +2362,7 @@ snapshots:
 
   daterangepicker@3.1.0:
     dependencies:
-      jquery: 3.7.1
+      jquery: 4.0.0
       moment: 2.30.1
 
   debug@4.4.3:
@@ -2537,6 +2540,8 @@ snapshots:
 
   jquery@3.7.1: {}
 
+  jquery@4.0.0: {}
+
   js-tokens@10.0.0: {}
 
   jsdom@28.0.0:
@@ -2582,9 +2587,9 @@ snapshots:
 
   jvectormap-content@0.1.1: {}
 
-  jvectormap-next@3.1.2(jquery@3.7.1):
+  jvectormap-next@3.1.2(jquery@4.0.0):
     dependencies:
-      jquery: 3.7.1
+      jquery: 4.0.0
 
   linkify-it@5.0.0:
     dependencies:
