@@ -62,5 +62,5 @@ public class FileReadAccessSettings : IOptions<FileReadAccessSettings>
     public bool? ReturnForbidResult { get; set; }
 
     /// <inheritdoc />
-    public FileReadAccessSettings Value => throw new NotImplementedException();
+    public FileReadAccessSettings Value => this;
 }
