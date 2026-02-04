@@ -99,7 +99,7 @@ export class DateEditor<P extends DateEditorOptions = DateEditorOptions> extends
     }
 
     get_value(): string {
-        var value = this.domNode.value?.trim();
+        var value = this.domNode?.value?.trim();
         if (!value) {
             return null;
         }

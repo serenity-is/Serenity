@@ -36,7 +36,9 @@ export class PhoneEditor<P extends PhoneEditorOptions = PhoneEditorOptions> exte
     }
 
     protected getFormattedValue(): string {
-        var value = (this.domNode as HTMLInputElement).value;
+        var value = (this.domNode as HTMLInputElement)?.value;
+        if (!value)
+            return null;
         if (this.props?.multiple) {
             return PhoneEditor.formatMulti(value, PhoneEditor.formatPhone);
         }

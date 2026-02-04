@@ -5,6 +5,7 @@
  * https://raw.githubusercontent.com/haacked/aspnet-client-validation
  */
 
+import { addDisposingListener } from "@serenity-is/domwise";
 import { Config } from "./config";
 import { Fluent } from "./fluent";
 import { parseDate, parseDecimal, parseInteger, stringFormat } from "./formatting";
@@ -1701,11 +1702,17 @@ export class Validator {
             return;
         element.classList.add('customValidate');
         let rules = customValidateRules.get(element);
-        if (!rules)
+        if (!rules) {
             customValidateRules.set(element, rules = {});
+            addDisposingListener(element, Validator.customRuleDisposingHandler);
+        }
         uniqueName ??= '';
         rules[uniqueName] ??= [];
         rules[uniqueName].push(rule);
+    }
+
+    private static customRuleDisposingHandler(el: ValidatableElement) {
+        customValidateRules.delete(el);
     }
 
     static removeCustomRule(element: HTMLElement | ArrayLike<HTMLElement>, uniqueName: string): void {

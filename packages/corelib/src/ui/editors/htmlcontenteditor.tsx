@@ -298,7 +298,7 @@ export class HtmlContentEditor<P extends HtmlContentEditorOptions = HtmlContentE
                 return sanitizeHtml(ckInstance.getData());
             }
         }
-        return sanitizeHtml(this.domNode.value);
+        return sanitizeHtml(this.domNode?.value);
     }
 
     get value(): string {

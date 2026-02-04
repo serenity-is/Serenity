@@ -196,7 +196,7 @@ export class DateTimeEditor<P extends DateTimeEditorOptions = DateTimeEditorOpti
     }
 
     get_value(): string {
-        var value = this.domNode.value?.trim();
+        var value = this.domNode?.value?.trim();
         if (value != null && value.length === 0) {
             return null;
         }
