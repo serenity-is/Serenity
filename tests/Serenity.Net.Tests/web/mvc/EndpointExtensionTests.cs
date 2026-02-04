@@ -5,7 +5,7 @@ public class EndpointExtensionTests
     [Fact]
     public void ConvertToResponse_ShowsDetails_WhenShowDetailsIsTrue()
     {
-        var mockExceptionLogger = new MockExceptionLogger();
+        var mockExceptionLogger = new MockLogger();
         var exception = new ValidationError("Not Sensitive Error");
 
         var response = exception.ConvertToResponse<ServiceResponse>(mockExceptionLogger, NullTextLocalizer.Instance, showDetails: true);
@@ -16,7 +16,7 @@ public class EndpointExtensionTests
     [Fact]
     public void ConvertToResponse_HidesDetails_WhenShowDetailsIsFalse_AndErrorIsSensitive()
     {
-        var mockExceptionLogger = new MockExceptionLogger();
+        var mockExceptionLogger = new MockLogger();
         var exception = new ValidationError("Sensitive Error")
         {
             IsSensitiveMessage = true
@@ -29,7 +29,7 @@ public class EndpointExtensionTests
     [Fact]
     public void ConvertToResponse_ShowsDetails_WhenShowDetailsIsFalse_AndErrorIsNotSensitive()
     {
-        var mockExceptionLogger = new MockExceptionLogger();
+        var mockExceptionLogger = new MockLogger();
         var exception = new ValidationError("Not Sensitive Error")
         {
             IsSensitiveMessage = false
@@ -42,7 +42,7 @@ public class EndpointExtensionTests
     [Fact]
     public void ConvertToResponse_HidesDetails_AndUsesConstantErrorMessage_WhenShowDetailsIsFalse_AndErrorIsSensitive_AndLocalizerIsNull()
     {
-        var mockExceptionLogger = new MockExceptionLogger();
+        var mockExceptionLogger = new MockLogger();
         var exception = new ValidationError("Sensitive Error")
         {
             IsSensitiveMessage = true

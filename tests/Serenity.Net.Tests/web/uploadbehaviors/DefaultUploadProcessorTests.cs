@@ -32,7 +32,7 @@ public partial class DefaultUploadProcessorTests
         ILogger<DefaultUploadProcessor> logger = null,
         IUploadAVScanner avScanner = null)
     {
-        storage = uploadStorage ??= MockUploadStorage.Create();
+        storage = uploadStorage ??= new MockUploadStorage();
         mockFileSystem = (uploadStorage as MockUploadStorage)?.MockFileSystem;
         imageProcessor ??= new DefaultImageProcessor();
         logger ??= new NullLogger<DefaultUploadProcessor>();
@@ -155,7 +155,7 @@ public partial class DefaultUploadProcessorTests
 
         var ex = Assert.Throws<ValidationError>(() => uploadProcessor.Process(storage.OpenFile(fileName), fileName, attr));
 
-        Assert.Equal($"Enums.{nameof(ImageCheckResult)}.{Enum.GetName(typeof(ImageCheckResult), ImageCheckResult.InvalidImage)}", ex.Message);
+        Assert.Equal($"Enums.{nameof(ImageCheckResult)}.{Enum.GetName(ImageCheckResult.InvalidImage)}", ex.Message);
     }
 
     [Fact]
@@ -211,7 +211,7 @@ public partial class DefaultUploadProcessorTests
 
         var ex = Assert.Throws<ValidationError>(() => uploadProcessor.Process(storage.OpenFile(fileName), fileName, attr));
 
-        Assert.Equal($"Enums.{nameof(ImageCheckResult)}.{Enum.GetName(typeof(ImageCheckResult), result)}", ex.Message);
+        Assert.Equal($"Enums.{nameof(ImageCheckResult)}.{Enum.GetName(result)}", ex.Message);
     }
 
     [Fact]

@@ -1,8 +1,8 @@
 namespace Serenity.TestUtils;
 
-public class MockHandlerFactory(Func<Type, Type, object> createHandler) : IDefaultHandlerFactory
+public class MockHandlerFactory(Func<Type, Type, object> createHandler = null) : IDefaultHandlerFactory
 {
-    private readonly Func<Type, Type, object> createHandler = createHandler ?? throw new ArgumentNullException(nameof(createHandler));
+    public Func<Type, Type, object> CreateHandlerCallback = createHandler ?? ((_, _) => throw new NotImplementedException());
 
     public object CreateHandler(Type rowType, Type handlerInterface)
     {

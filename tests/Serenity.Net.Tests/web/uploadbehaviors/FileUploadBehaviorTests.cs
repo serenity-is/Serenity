@@ -11,7 +11,7 @@ public partial class FileUploadBehaviorTests
     [Fact]
     public void ActivateFor_ReturnsFalse_WhenRowIsNull()
     {
-        var sut = new FileUploadBehavior(MockUploadStorage.Create(), new MockUploadProcessor());
+        var sut = new FileUploadBehavior(new MockUploadStorage(), new MockUploadProcessor());
         var result = sut.ActivateFor(null);
 
         Assert.False(result);
@@ -20,7 +20,7 @@ public partial class FileUploadBehaviorTests
     [Fact]
     public void ActivateFor_ReturnsFalse_WhenTargetDoesntHave_ImageUploadEditorAttribute()
     {
-        var sut = new FileUploadBehavior(MockUploadStorage.Create(), new MockUploadProcessor())
+        var sut = new FileUploadBehavior(new MockUploadStorage(), new MockUploadProcessor())
         {
             Target = TestRow.Fields.Id
         };
@@ -32,7 +32,7 @@ public partial class FileUploadBehaviorTests
     [Fact]
     public void ActivateFor_ReturnsFalse_WhenTargetImageUploadEditorAttribute_DisableDefaultBehaviour_IsTrue()
     {
-        var sut = new FileUploadBehavior(MockUploadStorage.Create(), new MockUploadProcessor())
+        var sut = new FileUploadBehavior(new MockUploadStorage(), new MockUploadProcessor())
         {
             Target = TestRow.Fields.ImageUploadEditorDisableDefaultBehavior
         };
@@ -44,7 +44,7 @@ public partial class FileUploadBehaviorTests
     [Fact]
     public void ActivateFor_ThrowsArgumentException_WhenTargetType_IsNotStringField()
     {
-        var sut = new FileUploadBehavior(MockUploadStorage.Create(), new MockUploadProcessor())
+        var sut = new FileUploadBehavior(new MockUploadStorage(), new MockUploadProcessor())
         {
             Target = TestIIdRow.Fields.IntegerFieldImageUploadEditor
         };
@@ -56,7 +56,7 @@ public partial class FileUploadBehaviorTests
     [Fact]
     public void ActivateFor_ThrowsArgumentException_WhenRow_DoesNotInherits_IIdRow()
     {
-        var sut = new FileUploadBehavior(MockUploadStorage.Create(), new MockUploadProcessor())
+        var sut = new FileUploadBehavior(new MockUploadStorage(), new MockUploadProcessor())
         {
             Target = TestRow.Fields.StringFieldImageUploadEditor
         };
@@ -68,7 +68,7 @@ public partial class FileUploadBehaviorTests
     [Fact]
     public void ActivateFor_Throws_WhenTargetImageUploadEditorAttribute_OriginalName_IsNotStringField()
     {
-        var sut = new FileUploadBehavior(MockUploadStorage.Create(), new MockUploadProcessor())
+        var sut = new FileUploadBehavior(new MockUploadStorage(), new MockUploadProcessor())
         {
             Target = TestIIdRow.Fields.ImageUploadEditorOriginalNameIntegerField
         };
@@ -79,7 +79,7 @@ public partial class FileUploadBehaviorTests
     [Fact]
     public void ActivateFor_Throws_WhenTargetImageUploadEditorAttribute_OriginalName_IsNull()
     {
-        var sut = new FileUploadBehavior(MockUploadStorage.Create(), new MockUploadProcessor())
+        var sut = new FileUploadBehavior(new MockUploadStorage(), new MockUploadProcessor())
         {
             Target = TestIIdRow.Fields.ImageUploadEditorOriginalNameNoField
         };
@@ -90,7 +90,7 @@ public partial class FileUploadBehaviorTests
     [Fact]
     public void ActivateFor_ReturnsTrue_WhenTargetImageUploadEditorAttribute_OriginalName_IsStringField()
     {
-        var sut = new FileUploadBehavior(MockUploadStorage.Create(), new MockUploadProcessor())
+        var sut = new FileUploadBehavior(new MockUploadStorage(), new MockUploadProcessor())
         {
             Target = TestIIdRow.Fields.ImageUploadEditorOriginalName
         };
@@ -102,7 +102,7 @@ public partial class FileUploadBehaviorTests
     [Fact]
     public void OnPrepareQuery_ShouldAdd_NonTableReplaceFields_ToSelectSqlQuery()
     {
-        var sut = new FileUploadBehavior(MockUploadStorage.Create(), new MockUploadProcessor())
+        var sut = new FileUploadBehavior(new MockUploadStorage(), new MockUploadProcessor())
         {
             Target = TestIIdRow.Fields.ImageUploadEditorReplaceField
         };
@@ -127,7 +127,7 @@ public partial class FileUploadBehaviorTests
     [Theory]
     public void OnPrepareQuery_ShouldNotAdd_NonTableReplaceFields_ToSqlQuery_IfFieldIsAlreadySelected(int selectIndex)
     {
-        var sut = new FileUploadBehavior(MockUploadStorage.Create(), new MockUploadProcessor())
+        var sut = new FileUploadBehavior(new MockUploadStorage(), new MockUploadProcessor())
         {
             Target = TestIIdRow.Fields.ImageUploadEditorReplaceField
         };
@@ -164,7 +164,7 @@ public partial class FileUploadBehaviorTests
     [Fact]
     public void ParseReplaceFields_ThrowsArgumentException_WhenPipeOperators_AreNextToEachOther()
     {
-        var sut = new FileUploadBehavior(MockUploadStorage.Create(), new MockUploadProcessor())
+        var sut = new FileUploadBehavior(new MockUploadStorage(), new MockUploadProcessor())
         {
             Target = TestIIdRow.Fields.ImageUploadEditorInvalidReplaceField
         };
@@ -176,7 +176,7 @@ public partial class FileUploadBehaviorTests
     [Fact]
     public void ParseReplaceFields_ThrowsArgumentException_WhenReplaceField_DoesntExist()
     {
-        var sut = new FileUploadBehavior(MockUploadStorage.Create(), new MockUploadProcessor())
+        var sut = new FileUploadBehavior(new MockUploadStorage(), new MockUploadProcessor())
         {
             Target = TestIIdRow.Fields.ImageUploadEditorReplaceFieldNoField
         };
@@ -188,7 +188,7 @@ public partial class FileUploadBehaviorTests
     [Fact]
     public void OnBeforeSave_DeletesOldFiles_OnCommit()
     {
-        var mockUploadStorage = (MockUploadStorage)MockUploadStorage.Create();
+        var mockUploadStorage = new MockUploadStorage();
         var mockFileSystem = (MockFileSystem)mockUploadStorage.MockFileSystem;
 
         var sut = new FileUploadBehavior(mockUploadStorage, new MockUploadProcessor(mockUploadStorage))
@@ -236,7 +236,7 @@ public partial class FileUploadBehaviorTests
     [Fact]
     public void OnBeforeSave_DoesntDeleteOldFiles_OnCommit_WhenFileNamesAreTrimmedEqual()
     {
-        var mockUploadStorage = (MockUploadStorage)MockUploadStorage.Create();
+        var mockUploadStorage = new MockUploadStorage();
         var mockFileSystem = (MockFileSystem)mockUploadStorage.MockFileSystem;
 
         var sut = new FileUploadBehavior(mockUploadStorage, new MockUploadProcessor(mockUploadStorage))
@@ -277,7 +277,7 @@ public partial class FileUploadBehaviorTests
     [Fact]
     public void OnBeforeSave_SetsRowsEditorField_ToNull_OnCommit_WhenNewFileName_IsNull()
     {
-        var mockUploadStorage = (MockUploadStorage)MockUploadStorage.Create();
+        var mockUploadStorage = new MockUploadStorage();
         var mockFileSystem = (MockFileSystem)mockUploadStorage.MockFileSystem;
 
         var sut = new FileUploadBehavior(mockUploadStorage, new MockUploadProcessor(mockUploadStorage))
@@ -321,7 +321,7 @@ public partial class FileUploadBehaviorTests
     [InlineData(" ")]
     public void OnBeforeSave_DoesntDoAnything_OnCommit_WhenNewFileName_IsNullAnd_OldFileName_IsTrimmedEmpty(string oldFileName)
     {
-        var mockUploadStorage = (MockUploadStorage)MockUploadStorage.Create();
+        var mockUploadStorage = new MockUploadStorage();
         var mockFileSystem = (MockFileSystem)mockUploadStorage.MockFileSystem;
 
         var sut = new FileUploadBehavior(mockUploadStorage, new MockUploadProcessor(mockUploadStorage))
@@ -360,7 +360,7 @@ public partial class FileUploadBehaviorTests
     [Fact]
     public void OnBeforeSave_ThrowsIf_NewFileNameDoesntStartWith_TemporaryFolder()
     {
-        var mockUploadStorage = (MockUploadStorage)MockUploadStorage.Create();
+        var mockUploadStorage = new MockUploadStorage();
 
         var sut = new FileUploadBehavior(mockUploadStorage, new MockUploadProcessor(mockUploadStorage))
         {
@@ -393,7 +393,7 @@ public partial class FileUploadBehaviorTests
     [Fact]
     public void OnBeforeSave_SetsOriginalFileNameField_ToNull_WhenEditorField_IsNull()
     {
-        var mockUploadStorage = (MockUploadStorage)MockUploadStorage.Create();
+        var mockUploadStorage = new MockUploadStorage();
 
         var sut = new FileUploadBehavior(mockUploadStorage, new MockUploadProcessor(mockUploadStorage))
         {
@@ -430,7 +430,7 @@ public partial class FileUploadBehaviorTests
     [Fact]
     public void OnBeforeSave_SetsOriginalName_ToNull_OnCommit_WhenFileDoesntHaveMeta()
     {
-        var mockUploadStorage = (MockUploadStorage)MockUploadStorage.Create();
+        var mockUploadStorage = new MockUploadStorage();
         var mockFileSystem = (MockFileSystem)mockUploadStorage.MockFileSystem;
 
         var sut = new FileUploadBehavior(mockUploadStorage, new MockUploadProcessor(mockUploadStorage))
@@ -467,7 +467,7 @@ public partial class FileUploadBehaviorTests
     [Fact]
     public void OnBeforeSave_SetsOriginalName_ToOriginalName_OnCommit_WhenFileDoesHaveMeta()
     {
-        var mockUploadStorage = (MockUploadStorage)MockUploadStorage.Create();
+        var mockUploadStorage = new MockUploadStorage();
         var mockFileSystem = (MockFileSystem)mockUploadStorage.MockFileSystem;
 
         var sut = new FileUploadBehavior(mockUploadStorage, new MockUploadProcessor(mockUploadStorage))
@@ -509,7 +509,7 @@ public partial class FileUploadBehaviorTests
     [Fact]
     public void OnBeforeSave_SavesFileToHistory_IfAttributeHasCopyToHistoryTrue()
     {
-        var mockUploadStorage = (MockUploadStorage)MockUploadStorage.Create();
+        var mockUploadStorage = new MockUploadStorage();
         var mockFileSystem = (MockFileSystem)mockUploadStorage.MockFileSystem;
 
         var sut = new FileUploadBehavior(mockUploadStorage, new MockUploadProcessor(mockUploadStorage))
@@ -554,7 +554,7 @@ public partial class FileUploadBehaviorTests
     [InlineData(false)]
     public void OnBeforeSave_SetsNewFileNameToField_WhenItsUpdate(bool isUpdate)
     {
-        var mockUploadStorage = (MockUploadStorage)MockUploadStorage.Create();
+        var mockUploadStorage = new MockUploadStorage();
         var mockFileSystem = (MockFileSystem)mockUploadStorage.MockFileSystem;
 
         var sut = new FileUploadBehavior(mockUploadStorage, new MockUploadProcessor(mockUploadStorage))
@@ -603,7 +603,7 @@ public partial class FileUploadBehaviorTests
     [Fact]
     public void OnAfterDelete_DeletesFiles_OnCommit()
     {
-        var mockUploadStorage = (MockUploadStorage)MockUploadStorage.Create();
+        var mockUploadStorage = new MockUploadStorage();
         var mockFileSystem = (MockFileSystem)mockUploadStorage.MockFileSystem;
 
         var sut = new FileUploadBehavior(mockUploadStorage, new MockUploadProcessor(mockUploadStorage))
@@ -638,7 +638,7 @@ public partial class FileUploadBehaviorTests
     [Fact]
     public void OnAfterDelete_DoesntDeletesFilesOnCommit_WhenRowImplementsIIsActiveDeletedRow()
     {
-        var mockUploadStorage = (MockUploadStorage)MockUploadStorage.Create();
+        var mockUploadStorage = new MockUploadStorage();
         var mockFileSystem = (MockFileSystem)mockUploadStorage.MockFileSystem;
 
         var sut = new FileUploadBehavior(mockUploadStorage, new MockUploadProcessor(mockUploadStorage))
@@ -673,7 +673,7 @@ public partial class FileUploadBehaviorTests
     [Fact]
     public void OnAfterDelete_DoesntDeletesFilesOnCommit_WhenRowImplementsIIsDeletedRow()
     {
-        var mockUploadStorage = (MockUploadStorage)MockUploadStorage.Create();
+        var mockUploadStorage = new MockUploadStorage();
         var mockFileSystem = (MockFileSystem)mockUploadStorage.MockFileSystem;
 
         var sut = new FileUploadBehavior(mockUploadStorage, new MockUploadProcessor(mockUploadStorage))
@@ -708,7 +708,7 @@ public partial class FileUploadBehaviorTests
     [Fact]
     public void OnAfterDelete_DoesntDeletesFilesOnCommit_WhenRowImplementsIDeleteLogRow()
     {
-        var mockUploadStorage = (MockUploadStorage)MockUploadStorage.Create();
+        var mockUploadStorage = new MockUploadStorage();
         var mockFileSystem = (MockFileSystem)mockUploadStorage.MockFileSystem;
 
         var sut = new FileUploadBehavior(mockUploadStorage, new MockUploadProcessor(mockUploadStorage))
@@ -745,7 +745,7 @@ public partial class FileUploadBehaviorTests
     [InlineData(false)]
     public void OnAfterSave_CopiesTemporaryFiles_AndDeletesOldFiles_WhenHandlerIsCreate(bool isUpdate)
     {
-        var mockUploadStorage = (MockUploadStorage)MockUploadStorage.Create();
+        var mockUploadStorage = new MockUploadStorage();
         var mockFileSystem = (MockFileSystem)mockUploadStorage.MockFileSystem;
 
         var sut = new FileUploadBehavior(mockUploadStorage, new MockUploadProcessor(mockUploadStorage))
@@ -796,7 +796,7 @@ public partial class FileUploadBehaviorTests
     [Fact]
     public void OnAfterSave_UpdatesRowFileNameFromDatabase_WhenHandlerIsCreate()
     {
-        var mockUploadStorage = (MockUploadStorage)MockUploadStorage.Create();
+        var mockUploadStorage = new MockUploadStorage();
         var mockFileSystem = (MockFileSystem)mockUploadStorage.MockFileSystem;
 
         var sut = new FileUploadBehavior(mockUploadStorage, new MockUploadProcessor(mockUploadStorage))
@@ -855,7 +855,7 @@ public partial class FileUploadBehaviorTests
      [Fact]
     public void OnAfterSave_DoesntDoAnything_WhenHandlerIsCreate_AndFileNameIsNull()
     {
-        var mockUploadStorage = (MockUploadStorage)MockUploadStorage.Create();
+        var mockUploadStorage = new MockUploadStorage();
 
         var sut = new FileUploadBehavior(mockUploadStorage, new MockUploadProcessor(mockUploadStorage))
         {
@@ -888,7 +888,7 @@ public partial class FileUploadBehaviorTests
     [Fact]
     public void ProcessReplaceFields_DirectlyReturns_WhenReplaceFieldsAreNull()
     {
-        var mockUploadStorage = (MockUploadStorage)MockUploadStorage.Create();
+        var mockUploadStorage = new MockUploadStorage();
         var mockFileSystem = (MockFileSystem)mockUploadStorage.MockFileSystem;
 
         var sut = new FileUploadBehavior(mockUploadStorage, new MockUploadProcessor(mockUploadStorage))
@@ -1136,7 +1136,7 @@ public partial class FileUploadBehaviorTests
         {
             attr.FilenameFormat = fileNameFormat;
 
-            var mockUploadStorage = (MockUploadStorage)MockUploadStorage.Create();
+            var mockUploadStorage = new MockUploadStorage();
             var mockFileSystem = (MockFileSystem)mockUploadStorage.MockFileSystem;
 
             var sut = new FileUploadBehavior(mockUploadStorage, new MockUploadProcessor(mockUploadStorage),

@@ -1,16 +1,13 @@
 namespace Serenity.TestUtils;
 
-public class MockUploadStorage(DiskUploadStorageOptions options,
-    MockDiskUploadFileSystem fileSystem) : DiskUploadStorage(options, fileSystem ?? throw new ArgumentNullException(nameof(fileSystem)))
-{
-    public MockDiskUploadFileSystem MockFileSystem { get; } = fileSystem;
-
-    public static IUploadStorage Create()
+public class MockUploadStorage(
+    DiskUploadStorageOptions options = null,
+    MockDiskUploadFileSystem fs = null)
+    : DiskUploadStorage(options ?? new DiskUploadStorageOptions
     {
-        return new MockUploadStorage(new DiskUploadStorageOptions
-        {
-            RootPath = "/",
-            RootUrl = "/upload/"
-        }, new MockDiskUploadFileSystem());
-    }
+        RootPath = "/",
+        RootUrl = "/upload/"
+    }, fs ?? new MockDiskUploadFileSystem())
+{
+    public MockDiskUploadFileSystem MockFileSystem => (MockDiskUploadFileSystem)fileSystem;
 }

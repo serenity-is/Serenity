@@ -2,7 +2,7 @@ using Microsoft.Extensions.Logging;
 
 namespace Serenity.TestUtils;
 
-public class MockExceptionLogger : ILogger
+public class MockLogger : ILogger
 {
     public Exception LastException { get; private set; }
 
@@ -20,4 +20,8 @@ public class MockExceptionLogger : ILogger
     {
         LastException ??= exception;
     }
+}
+
+public class MockLogger<T> : MockLogger, ILogger<T>
+{
 }
