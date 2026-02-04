@@ -1,8 +1,8 @@
-﻿namespace Serenity.TestUtils;
+namespace Serenity.TestUtils;
 
 public class MockPermissions : IPermissionService
 {
-    private readonly Func<string, bool> hasPermission;
+    public Func<string, bool> HasPermission { get; set; }
 
     public MockPermissions()
     {
@@ -10,11 +10,11 @@ public class MockPermissions : IPermissionService
 
     public MockPermissions(Func<string, bool> hasPermission)
     {
-        this.hasPermission = hasPermission ?? throw new ArgumentNullException(nameof(hasPermission));
+        HasPermission = hasPermission ?? throw new ArgumentNullException(nameof(hasPermission));
     }
 
-    public bool HasPermission(string permission)
+    bool IPermissionService.HasPermission(string permission)
     {
-        return hasPermission == null || hasPermission(permission);
+        return HasPermission == null || HasPermission(permission);
     }
 }
