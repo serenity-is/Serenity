@@ -9,8 +9,8 @@ public partial class BasicPropertyProcessor : PropertyProcessor
             var attr = source.Property.GetAttribute<ReadPermissionAttribute>(false);
             if (attr != null)
             {
-                if (attr.Permission != "*")
-                    item.ReadPermission = attr.Permission ?? "?";
+                if (attr.Permission != SpecialPermissionKeys.Public)
+                    item.ReadPermission = attr.Permission ?? SpecialPermissionKeys.LoggedIn;
 
                 return;
             }
@@ -19,7 +19,7 @@ public partial class BasicPropertyProcessor : PropertyProcessor
         if (source.BasedOnField is not null)
         {
             if (source.BasedOnField.ReadPermission != null &&
-                source.BasedOnField.ReadPermission != "*")
+                source.BasedOnField.ReadPermission != SpecialPermissionKeys.Public)
                 item.ReadPermission = source.BasedOnField.ReadPermission;
         }
     }

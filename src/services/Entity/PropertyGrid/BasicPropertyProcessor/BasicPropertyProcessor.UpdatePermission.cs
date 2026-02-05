@@ -9,8 +9,8 @@ public partial class BasicPropertyProcessor : PropertyProcessor
             var attr = source.Property.GetAttribute<UpdatePermissionAttribute>(false);
             if (attr != null)
             {
-                if (attr.Permission != "*")
-                    item.UpdatePermission = attr.Permission ?? "?";
+                if (attr.Permission != SpecialPermissionKeys.Public)
+                    item.UpdatePermission = attr.Permission ?? SpecialPermissionKeys.LoggedIn;
 
                 return;
             }
@@ -19,7 +19,7 @@ public partial class BasicPropertyProcessor : PropertyProcessor
         if (source.BasedOnField is not null)
         {
             if (source.BasedOnField.UpdatePermission != null &&
-                source.BasedOnField.UpdatePermission != "*")
+                source.BasedOnField.UpdatePermission != SpecialPermissionKeys.LoggedIn)
                 item.UpdatePermission = source.BasedOnField.UpdatePermission;
         }
     }

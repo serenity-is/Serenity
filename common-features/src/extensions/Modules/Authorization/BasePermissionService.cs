@@ -37,7 +37,7 @@ public abstract class BasePermissionService(
     /// <param name="permission">Permission</param>
     protected virtual bool IsAsterisk(string permission)
     {
-        return permission == "*";
+        return permission == SpecialPermissionKeys.Public;
     }
 
     /// <summary>
@@ -47,16 +47,16 @@ public abstract class BasePermissionService(
     /// <param name="permission">Permission</param>
     protected virtual bool IsQuestionMark(string permission)
     {
-        return permission == "?";
+        return permission == SpecialPermissionKeys.LoggedIn;
     }
 
     /// <summary>
-    /// Gets whether the specified permission is "NEVER", which denies access to all users
+    /// Gets whether the specified permission is "DENY", which denies access to all users
     /// including super administrators.
     /// </summary>
-    protected virtual bool IsNever(string permission)
+    protected virtual bool IsDeny(string permission)
     {
-        return permission == "NEVER";
+        return permission == SpecialPermissionKeys.Deny;
     }
 
     /// <summary>
@@ -125,7 +125,7 @@ public abstract class BasePermissionService(
     /// <inheritdoc/>
     public virtual bool HasPermission(string permission)
     {
-        if (!IsValidKey(permission) || IsNever(permission))
+        if (!IsValidKey(permission) || IsDeny(permission))
             return false;
 
         if (IsAsterisk(permission) || IsTransientlyGranted(permission))
