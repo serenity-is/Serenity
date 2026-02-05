@@ -2,10 +2,13 @@ namespace Serenity.TestUtils;
 
 public class MockHandlerFactory(Func<Type, Type, object> createHandler = null) : IDefaultHandlerFactory
 {
-    public Func<Type, Type, object> CreateHandlerCallback = createHandler ?? ((_, _) => throw new NotImplementedException());
+    public Func<Type, Type, object> CreateHandler { get; set; } = createHandler;
 
-    public object CreateHandler(Type rowType, Type handlerInterface)
+    object IDefaultHandlerFactory.CreateHandler(Type rowType, Type handlerInterface)
     {
-        return createHandler(rowType, handlerInterface);
+        if (CreateHandler is null)
+            throw new NotImplementedException("CreateHandler delegate is not set in MockHandlerFactory.");
+        
+        return CreateHandler(rowType, handlerInterface);
     }
 }

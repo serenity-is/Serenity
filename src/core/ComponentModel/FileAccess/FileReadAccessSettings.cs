@@ -14,13 +14,6 @@ public class FileReadAccessSettings : IOptions<FileReadAccessSettings>
     public const string SectionKey = "FileReadAccess";
 
     /// <summary>
-    /// Default file read access when no FileReadAccess attribute is present.
-    /// Use "*" for public, "?" for logged-in users, or a specific permission.
-    /// Default is "*" (public) for backward compatibility.
-    /// </summary>
-    public string? DefaultPermission { get; set; } = "*";
-
-    /// <summary>
     /// Permission that bypasses all file read access checks.
     /// You may set this to a special permission like "Administration:General"
     /// to allow administrators to read all files.
@@ -28,16 +21,17 @@ public class FileReadAccessSettings : IOptions<FileReadAccessSettings>
     public string? BypassPermission { get; set; }
 
     /// <summary>
-    /// What to do when .meta file is missing or corrupted.
-    /// Options: "Allow" (default), "Deny", "DefaultPermission"
+    /// Permission to check when no FileReadAccess attribute is present,
+    /// or its PermissionOnly is true but no permission is specified.
+    /// Default is "*" for compat, e.g. allow access to anyone that have access to the entity.
     /// </summary>
-    public FileReadAccessMissingBehavior? MissingMetaBehavior { get; set; } = FileReadAccessMissingBehavior.DefaultPermission;
+    public string? DefaultPermission { get; set; } = "*";
 
     /// <summary>
-    /// What to do when related entity cannot be found or accessed.
-    /// Options: "Allow", "Deny" (default), "DefaultPermission"
+    /// Permission to check when file metadata is missing or cannot be read. Default is null,
+    /// e.g. DefaultPermission is used.
     /// </summary>
-    public FileReadAccessMissingBehavior? MissingEntityBehavior { get; set; } = FileReadAccessMissingBehavior.Deny;
+    public string? MissingMetadataPermission { get; set; }
 
     /// <summary>
     /// Regular expression patterns for paths and corresponding permissions that are handled before 

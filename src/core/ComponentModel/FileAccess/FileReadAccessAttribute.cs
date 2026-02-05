@@ -20,12 +20,12 @@ public class FileReadAccessAttribute : Attribute
     /// The Bypass permission is usually given to administrators and set in FileReadAccessSettings.
     /// Default is true, meaning that users with the bypass permission are allowed to read the file.
     /// </summary>
-    public bool? AllowBypass { get; set; }
+    public bool AllowBypass { get; set; } = true;
 
     /// <summary>
     /// Gets or sets a value indicating whether to skip entity-level access control
     /// and use only permission-based access. If this attribute specifies a permission,
     /// that permission is used. Otherwise, the default permission is used.
     /// </summary>
-    public bool? PermissionOnly { get; set; }
+    public bool PermissionOnly { get; set; }
 }
