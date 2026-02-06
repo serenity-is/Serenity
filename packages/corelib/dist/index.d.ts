@@ -3079,6 +3079,7 @@ export declare class Validator {
 	static addMethod(name: string, method: ValidationProvider, message?: string): void;
 	static getHighlightTarget(el: HTMLElement): HTMLElement;
 	static addCustomRule(element: HTMLElement | ArrayLike<HTMLElement>, rule: (input: ValidatableElement) => string, uniqueName?: string): void;
+	private static customRuleDisposingHandler;
 	static removeCustomRule(element: HTMLElement | ArrayLike<HTMLElement>, uniqueName: string): void;
 	static readonly excludedModifierKeys: Set<string>;
 }
@@ -3294,6 +3295,7 @@ export declare function initGlobalMappings({ corelib, globals, domwise, sleekgri
 	sortable?: any;
 }): void;
 export declare function initFlatpickrLocale(flatpickr: any): void;
+export declare function initNProgress(nprogress?: any): boolean;
 export declare function getWidgetName(type: Function): string;
 export declare function associateWidget(widget: {
 	domNode: HTMLElement;

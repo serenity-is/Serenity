@@ -1,4 +1,4 @@
-﻿import { getGlobalObject } from "../base"
+import { Fluent, getGlobalObject } from "../base"
 
 function copyProps(source: any, target: any) {
     if (!source || !target)
@@ -130,6 +130,7 @@ export function initGlobalMappings({ corelib, globals, domwise, sleekgrid,
         if (typeof nprogress.default === "object")
             nprogress = nprogress.default;
         globals.NProgress = nprogress;
+        initNProgress(nprogress);
     }
 
     if (glightbox) {
@@ -156,4 +157,27 @@ export function initFlatpickrLocale(flatpickr: any) {
         culture = culture.split('-')[0];
         flatpickr.l10ns[culture] && flatpickr.localize(flatpickr.l10ns[culture]);
     }
+}
+
+export function initNProgress(nprogress?: any): boolean {
+    nprogress = nprogress || getGlobalObject()?.NProgress;
+    if (!nprogress ||
+        !nprogress.start ||
+        !nprogress.done ||
+        nprogress.serenityInit ||
+        typeof document === 'undefined')
+        return;
+
+    let npt: number;
+    Fluent.on(document, "ajaxStart", function () {
+        clearTimeout(npt);
+        npt = setTimeout(nprogress.start, 200);
+    });
+
+    Fluent.on(document, "ajaxStop", function () {
+        clearTimeout(npt);
+        nprogress.done();
+    });
+
+    return nprogress.serenityInit = true;
 }
