@@ -109,6 +109,14 @@ public static partial class CSharpSyntaxRules
         return Keywords.Contains(identifier);
     }
 
+    public static string EscapeIfKeyword(string identifier)
+    {
+        if (IsKeyword(identifier))
+            return "@" + identifier;
+
+        return identifier;
+    }
+
     public static bool IsValidIdentifier(string identifier, bool ignoreKeywords)
     {
         if (string.IsNullOrEmpty(identifier))

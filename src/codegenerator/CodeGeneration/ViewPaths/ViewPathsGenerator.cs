@@ -26,6 +26,9 @@ public class ViewPathsGenerator(IFileSystem fileSystem,
         if (!char.IsLetter(s[0]) && s[0] != '_')
             s = $"_{s}";
 
+        if (char.IsLetter(s[0]) && !char.IsUpper(s[0]))
+            s = char.ToUpper(s[0]) + s[1..];
+
         return s;
     }
 
@@ -38,7 +41,7 @@ public class ViewPathsGenerator(IFileSystem fileSystem,
         cw.InBrace(() =>
         {
             var last = Array.Empty<string>();
-            var processed = new HashSet<string>();
+            var processed = new HashSet<string>(StringComparer.InvariantCultureIgnoreCase);
 
             foreach (var file in files)
             {
@@ -112,7 +115,7 @@ public class ViewPathsGenerator(IFileSystem fileSystem,
                 }
 
                 cw.Indented(parts.Length > 1 ? new string(' ', (parts.Length - 1) * 4) : "");
-                cw.AppendLine("public const string " + n + " = \"~/" +
+                cw.AppendLine("public const string " + CSharpSyntaxRules.EscapeIfKeyword(n) + " = \"~/" +
                     file.Replace('\\', '/') + "\";");
 
                 last = parts;

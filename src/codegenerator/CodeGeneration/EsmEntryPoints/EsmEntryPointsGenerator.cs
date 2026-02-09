@@ -67,6 +67,9 @@ public class EsmEntryPointsGenerator()
             if (!char.IsLetter(s[0]) && s[0] != '_')
                 s = $"_{s}";
 
+            if (char.IsLetter(s[0]) && !char.IsUpper(s[0]))
+                s = char.ToUpper(s[0]) + s[1..];
+
             return s;
         }
 
@@ -89,7 +92,7 @@ public class EsmEntryPointsGenerator()
                         x.Count() == 1);
 
                 foreach (var shortName in byShortName)
-                    cw.IndentedLine("public const string " + shortName.Key + " = \"~" + EsmAssetBasePath + "/" +
+                    cw.IndentedLine("public const string " + CSharpSyntaxRules.EscapeIfKeyword(shortName.Key) + " = \"~" + EsmAssetBasePath + "/" +
                         System.IO.Path.ChangeExtension(shortName.First(), ".js").Replace('\\', '/') + "\";");
 
                 if (byShortName.Any())
@@ -171,7 +174,7 @@ public class EsmEntryPointsGenerator()
                         endOfBrace = false;
                     }
 
-                    cw.IndentedLine("public const string " + n + " = \"~" + EsmAssetBasePath + "/" +
+                    cw.IndentedLine("public const string " + CSharpSyntaxRules.EscapeIfKeyword(n) + " = \"~" + EsmAssetBasePath + "/" +
                         System.IO.Path.ChangeExtension(file, ".js").Replace('\\', '/') + "\";");
                     constLine = true;
                     last = parts;

@@ -34,9 +34,7 @@ public partial class ClientTypesGenerator
             cw.Indented("public ");
             sb.Append(typeName);
             sb.Append(' ');
-            if (CSharpSyntaxRules.IsKeyword(option.Name))
-                sb.Append('@');
-            sb.Append(option.Name);
+            sb.Append(CSharpSyntaxRules.EscapeIfKeyword(option.Name));
             sb.Append(" { get; set; }");
             sb.AppendLine();
         }
