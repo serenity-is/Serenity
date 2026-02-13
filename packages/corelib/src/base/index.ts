@@ -22,7 +22,6 @@ export * from "./texts/servicestexts";
 export * from "./texts/webtexts";
 export * from "./toastr2";
 export * from "./tooltip";
-export * from "./type-helpers";
 export * from "./uploader";
 export * from "./userdefinition";
 export * from "./validator";
