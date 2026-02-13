@@ -420,4 +420,15 @@ public class RestoreNodeTypesTask : Microsoft.Build.Utilities.Task
         internal static bool IsEnum(object value) { return value != null && value.GetType().IsEnum; }
         public override string ToString() { return sb.ToString(); }
     }
+#if IsExternalTestProject
+    private Serenity.IFileSystem fileSystem;
+    public RestoreNodeTypesTask(Serenity.IFileSystem fileSystem) { this.fileSystem = fileSystem; }
+    private IFileSystem Path => fileSystem;
+    private IFileSystem File => fileSystem;
+}
+
+public static class FileSystemExtensions
+{
+    public static bool Exists(this IFileSystem fileSystem, string path) => fileSystem.FileExists(path);
+#endif
 }
