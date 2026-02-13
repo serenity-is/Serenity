@@ -2708,16 +2708,6 @@ export declare class Tooltip {
 	hide(): Tooltip;
 	show(): Tooltip;
 }
-declare global {
-	/** A procedure that takes no arguments and returns void */
-	type Action = () => void;
-	/** A function that takes no arguments and returns a value of type T */
-	type Func<T> = () => T;
-	/** A predicate that takes an argument of type T and returns a boolean */
-	type Predicate<T> = (arg: T) => boolean;
-	/** A procedure that takes an argument of type T and returns void */
-	type Proc<T> = (arg: T) => void;
-}
 /** Inspired from https://github.com/silverwind/uppie and https://github.com/GoogleChromeLabs/file-drop/blob/master/lib/filedrop.ts */
 export interface UploaderOptions {
 	/** Accept. If not specified, read from the passed input  */
