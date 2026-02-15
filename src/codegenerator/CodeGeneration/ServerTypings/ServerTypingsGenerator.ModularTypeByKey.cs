@@ -168,13 +168,14 @@ public partial class ServerTypingsGenerator
                 if ((scriptType = GetScriptType("@serenity-is/corelib:" + nonGeneric)) != null)
                     return scriptType;
             }
-            else if (containingAssembly.StartsWith("Serenity.", StringComparison.OrdinalIgnoreCase))
+            else
             {
-                if ((scriptType = GetScriptType("@serenity-is/" + containingAssembly[9..].ToLowerInvariant() + ":" + nonGeneric)) != null)
-                    return scriptType;
+                foreach (var pkgName in GetPossiblePackageNames(containingAssembly))
+                {
+                    if ((scriptType = GetScriptType(pkgName + ":" + nonGeneric)) != null)
+                        return scriptType;
+                }
             }
-            else if ((scriptType = GetScriptType(containingAssembly.ToLowerInvariant() + ":" + nonGeneric)) != null)
-                return scriptType;
         }
 
         if (ns == null)
@@ -197,6 +198,32 @@ public partial class ServerTypingsGenerator
             return scriptType;
 
         return null;
+    }
+
+    private IEnumerable<string> GetPossiblePackageNames(string asmName)
+    {
+        if (string.IsNullOrEmpty(asmName))
+            yield break;
+
+        asmName = asmName.ToLowerInvariant();
+
+        if (AssemblyToPackageName.TryGetValue(asmName, out var pkgName) && 
+            !string.IsNullOrEmpty(pkgName))
+        {
+            yield return pkgName;
+        }
+
+        if (asmName.StartsWith("serenity.", StringComparison.Ordinal))
+            yield return "@serenity-is/" + asmName[9..];
+
+        if (asmName.StartsWith("serenity.net.", StringComparison.Ordinal))
+            yield return "@serenity-is/" + asmName[12..];
+
+        var dotIdx = asmName.IndexOf('.');
+        if (dotIdx > 0)
+            yield return "@" + asmName[0..dotIdx] + "/" + asmName[(dotIdx + 1)..];
+
+        yield return asmName;
     }
 
     private static readonly string[] CommonSerenityModulesColon = [

@@ -63,6 +63,7 @@ public partial class ServerTypingsGenerator : CodeGeneratorBase
     public bool ModuleReExports { get; set; } = true;
 
     public readonly HashSet<string> LocalTextFilters = [];
+    public readonly IDictionary<string, string> AssemblyToPackageName = new Dictionary<string, string>(StringComparer.OrdinalIgnoreCase);
 
     protected Dictionary<string, TypeDefinition> scriptDataKeys = [];
     protected Dictionary<string, List<string>> namespaceConstants = [];
