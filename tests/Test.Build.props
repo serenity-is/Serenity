@@ -46,13 +46,13 @@
       <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
       <PrivateAssets>all</PrivateAssets>
     </PackageReference>
-    <PackageReference Include="coverlet.collector" Version="6.0.4">
+    <PackageReference Include="coverlet.collector" Version="8.0.0">
       <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
       <PrivateAssets>all</PrivateAssets>
     </PackageReference>
   </ItemGroup>
   <ItemGroup Condition="'$(ReferenceSelenium)' != 'false'">
-    <PackageReference Include="Selenium.WebDriver" Version="4.39.0" />
+    <PackageReference Include="Selenium.WebDriver" Version="4.40.0" />
     <Using Include="OpenQA.Selenium" />
   </ItemGroup>
 </Project>
