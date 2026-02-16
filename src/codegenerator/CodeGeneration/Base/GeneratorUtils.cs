@@ -1,4 +1,4 @@
-﻿namespace Serenity.Reflection;
+namespace Serenity.Reflection;
 
 public static class GeneratorUtils
 {
@@ -59,5 +59,65 @@ public static class GeneratorUtils
 
         derivedType = null;
         return false;
+    }
+
+    private class PackageJson
+    {
+#pragma warning disable IDE1006 // Naming Styles
+        public Dictionary<string, string> dependencies { get; set; }
+        public Dictionary<string, string> devDependencies { get; set; }
+#pragma warning restore IDE1006 // Naming Styles
+    }
+
+    public static IDictionary<string, string> GetAssemblyToPackageMappings(
+        IFileSystem fileSystem, string csproj)
+    {
+        var result = new Dictionary<string, string>(StringComparer.InvariantCultureIgnoreCase);
+
+        var projectDir = fileSystem.GetDirectoryName(csproj);
+        var packageJson = fileSystem.Combine(projectDir, "package.json");
+        if (!fileSystem.FileExists(packageJson))
+            return result;
+
+        var packageData = CodeGenerator.TSConfigHelper.TryParseJsonFile<PackageJson>(fileSystem, packageJson);
+
+        foreach (var pair in (packageData.dependencies ?? [])
+            .Concat(packageData.devDependencies ?? []))
+        {
+            if (pair.Value == null)
+                continue;
+
+            var dotnetIdx = pair.Value.IndexOf("/node_modules/.dotnet/", StringComparison.Ordinal);
+            if (dotnetIdx >= 0)
+            {
+                var projectPath = pair.Value[(dotnetIdx + "/node_modules/.dotnet/".Length)..];
+                if (projectPath.IndexOf('/') < 0)
+                    result[projectPath] = pair.Key;
+                continue;
+            }
+
+            string value = pair.Value;
+            if (value.StartsWith("file://", StringComparison.Ordinal))
+                value = value["file://".Length..];
+
+            string path;
+            if (value.StartsWith("./", StringComparison.Ordinal) ||
+                value.StartsWith("../", StringComparison.Ordinal))
+            {
+                path = fileSystem.Combine(projectDir, value);
+            }
+            else if (value.StartsWith("workspace:", StringComparison.Ordinal))
+            {
+                path = fileSystem.Combine(projectDir, "node_modules", pair.Key);
+            }
+            else
+                continue;
+
+            var csprojFiles = fileSystem.GetFiles(path, "*.csproj", recursive: false);
+            if (csprojFiles.Length == 1)
+                result[fileSystem.GetFileNameWithoutExtension(csprojFiles[0])] = pair.Key;
+        }
+
+        return result;
     }
 }

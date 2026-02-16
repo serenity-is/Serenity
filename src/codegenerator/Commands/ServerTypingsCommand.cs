@@ -31,11 +31,15 @@ public class ServerTypingsCommand(IProjectFileInfo project, IGeneratorConsole co
             LocalTexts = config.ServerTypings != null && config.ServerTypings.LocalTexts,
             ModuleReExports = config?.ServerTypings?.ModuleReExports != false
         };
+
         if (config?.ServerTypings?.PreferRelativePaths ?? true)
         {
             generator.ModulesPathAlias = null;
             generator.RootPathAlias = null;
         }
+
+        foreach (var pair in GeneratorUtils.GetAssemblyToPackageMappings(FileSystem, ProjectFile))
+            generator.AssemblyToPackageName[pair.Key] = pair.Value;
 
         string outDir = FileSystem.Combine(generator.DetermineModulesRoot(
             FileSystem, ProjectFile, config.RootNamespace), "ServerTypes");
