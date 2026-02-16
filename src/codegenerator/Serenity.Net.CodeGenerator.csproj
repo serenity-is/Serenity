@@ -23,8 +23,8 @@
   <ItemGroup>
     <PackageReference Include="Scriban" Version="6.5.2" />
     <PackageReference Include="Mono.Cecil" Version="0.11.6" />
-    <PackageReference Include="Microsoft.Extensions.DependencyModel" Version="10.0.1" />
-    <PackageReference Include="Microsoft.Extensions.FileSystemGlobbing" Version="10.0.1" />
+    <PackageReference Include="Microsoft.Extensions.DependencyModel" Version="10.0.3" />
+    <PackageReference Include="Microsoft.Extensions.FileSystemGlobbing" Version="10.0.3" />
     <PackageReference Include="Spectre.Console" Version="0.54.0" />
   </ItemGroup>
 </Project>
