@@ -17,13 +17,8 @@ public partial class DoctorCommand(IProjectFileInfo project, IGeneratorConsole c
         (new(8, 8, 4), new(8, 8, 4)),
         (new(8, 8, 6), new(8, 8, 6)),
         (new(8, 8, 8), new(8, 8, 8)),
-        (new(9, 1, 6), new(9, 1, 6))
-    ];
-
-    static readonly (Version, Version)[] RecommendedJsxDomVersion = [
-        (new(0, 0, 0), new(8, 1, 4)),
-        (new(8, 6, 4), new(8, 1, 5)),
-        (new(8, 8, 4), new(8, 1, 6))
+        (new(9, 1, 6), new(9, 1, 6)),
+        (new(10, 1, 6), new(10, 1, 6))
     ];
 
     public IArgumentReader Arguments { get; set; }
