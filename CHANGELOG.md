@@ -1,4 +1,4 @@
-## 10.2.0 (2026-02-13)
+## 10.2.0 (2026-02-16)
 
 ### Features
 - New Serenity Developer Tools extension for Chrome
