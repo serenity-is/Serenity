@@ -1,3 +1,20 @@
+## 10.2.0 (2026-02-13)
+
+### Features
+- New Serenity Developer Tools extension for Chrome
+- New `DENY` special permission that denies access to everyone including super admins.
+- Define UploadPathHelper.TemporaryFilePrefix and UploadPathHelper.IsTemporaryFile and use them instead of hardcoding temporary/
+- Add thumbnail metadata and helpers to find a primary file from the thumbnail file
+- Add FileReadAccessAttribute and FileReadAccessSettings that will be used by SecureUploadFileResponder (currently experimental in pro.extensions)
+- New SecureUploadFileResponder (in pro.extensions) that checks for related entity access, and optionally permissions while returning files from FilePage/Read.
+- Update jQuery to 4.0.0 (served via Serenity.Assets for compat). Note that it has some breaking changes like removing $.isArray, so stay at 3.7.0 via npm if you have problems
+- Remove unused global type helpers (Action, Predicate etc.) that sometimes clash with other globals. Include ESNext.Disposable as signals-core requires it
+- Try more package names like `@company/package`, `company.package` for an assembly name like `Company.Package` in ServerTypingsGenerator. Also try to parse assembly to package name mappings from package.json.
+
+### Bugfixes
+- Issue with generated MVC file when C# keywords like `decimal` are used as `.cshtml` file names.
+- Add disposing listener to the target element during addValidationRule to resolve issue when the editor with custom validation rule itself is disposed in inline grid editors and validation callbacks are executed. Also add null coalescing to DateEditor, DateTimeEditor get_value methods for this.domNode? to avoid issues for similar cases.
+
 ## 10.1.6 (2026-01-27)
 
 ### Bugfixes

@@ -1,5 +1,4 @@
 using System.IO;
-using System.Security.Cryptography;
 
 namespace Serenity.CodeGenerator;
 
@@ -80,7 +79,7 @@ public partial class DoctorCommandTests
 
         public Dictionary<string, string> NpmDevDependencies { get; set; } = new()
         {
-            ["@serenity-is/tsbuild"] = "9.1.6"
+            ["@serenity-is/tsbuild"] = "10.1.6"
         };
 
         public string SergenExtends { get; set; } = "defaults@9.0.0";
