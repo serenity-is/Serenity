@@ -1,3 +1,8 @@
+## 10.2.1 (2026-02-17)
+
+### Features
+- Skip types from non-local modules in node_modules in addition to types from declaration files in client types generator to avoid generating duplicate editor, formatter attributes etc. for types in project package references.
+
 ## 10.2.0 (2026-02-16)
 
 ### Features
