@@ -166,7 +166,7 @@ public partial class ServerTypingsGenerator
             if (SerenityNetAssemblies.Contains(containingAssembly))
             {
                 if ((scriptType = GetScriptType("@serenity-is/corelib:" + nonGeneric)) != null)
-                    return scriptType;
+                    return scriptType; 
             }
             else
             {

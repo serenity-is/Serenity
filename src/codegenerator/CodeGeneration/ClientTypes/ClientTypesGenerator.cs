@@ -78,11 +78,26 @@ public partial class ClientTypesGenerator : CodeGeneratorBase
             if (generatedTypes.Contains(tsType.Key))
                 continue;
 
-            if (tsType.Value.IsDeclaration == true)
+            var type = tsType.Value;
+
+            // Skip declaration types and types from non-local modules in node_modules
+            if (type.IsDeclaration == true ||
+                (!string.IsNullOrEmpty(type.Module) &&
+                 type.SourceFile != null &&
+                 !IsLocalModule(type.Module) &&
+                 type.SourceFile.Replace('\\', '/').Contains("/node_modules/")))
                 continue;
 
-            GenerateType(tsType.Value);
+            GenerateType(type);
         }
+    }
+
+    private static bool IsLocalModule(string module)
+    {
+        return !string.IsNullOrEmpty(module) &&
+            (module.StartsWith("./", StringComparison.Ordinal) ||
+             module.StartsWith("../", StringComparison.Ordinal) ||
+             module.StartsWith('/'));
     }
 
     private static string GetNamespace(string ns)
