@@ -3,7 +3,7 @@
     "northwind-transform": {
       "commandName": "Project",
       "commandLineArgs": "t",
-      "workingDirectory": "P:\\xandapay\\XPHR_v1\\company"
+      "workingDirectory": "../../common-features/src/demo.northwind"
     },
     "serene-generate": {
       "commandName": "Project",
