@@ -1089,27 +1089,6 @@ export class DataGrid<TItem, P = {}> extends Widget<P> implements IDataGrid, IRe
         return {};
     }
 
-    protected canShowColumn(column: Column) {
-        if (column == null) {
-            return false;
-        }
-
-        var item = column.sourceItem;
-        if (item == null) {
-            return true;
-        }
-
-        if (item.filterOnly === true) {
-            return false;
-        }
-
-        if (item.readPermission == null) {
-            return true;
-        }
-
-        return Authorization.hasPermission(item.readPermission);
-    }
-
     protected getPersistedSettings(): PersistedGridSettings | Promise<PersistedGridSettings> {
         var storage = this.getPersistenceStorage();
         if (storage == null)
@@ -1164,7 +1143,6 @@ export class DataGrid<TItem, P = {}> extends Widget<P> implements IDataGrid, IRe
             event.flagsToUse ??= event.flagsDefault;
 
             restoreSettingsFrom({
-                canShowColumn: bindThis(this).canShowColumn,
                 filterStore: this.filterBar?.get_store(),
                 flags: event.flagsToUse,
                 includeDeletedToggle: this.domNode.querySelector('.s-IncludeDeletedToggle'),

@@ -191,7 +191,7 @@ export function getCurrentSettings(this: void, opt: {
 }
 
 export function restoreSettingsFrom(this: void, opt: {
-    canShowColumn: (column: Column) => boolean,
+    canShowColumn?: (column: Column) => boolean,
     filterStore: FilterStore,
     flags: GridPersistenceFlags,
     includeDeletedToggle: HTMLElement,
@@ -271,11 +271,15 @@ export function restoreSettingsFrom(this: void, opt: {
 
         if (flags.columnVisibility && (settings.flags?.columnVisibility
                 ?? settings.columns.some(x => "visible" in x))) {
-            const visibleColumns = settings.columns.filter(x => x.id != null &&
+            let visibleColumns = settings.columns.filter(x => x.id != null &&
                 x.visible === true &&
                 colById[x.id] &&
-                opt.canShowColumn(colById[x.id])
+                (opt.canShowColumn ?? isVisibleOrTogglable)(colById[x.id])
             ).map(x => x.id);
+
+            const alwaysVisibleColumns = allColumns.filter(c => c.visible !== false && 
+                c.togglable === false).map(c => c.id).filter(id => !visibleColumns.includes(id));
+            visibleColumns = alwaysVisibleColumns.concat(visibleColumns);
 
             opt.sleekGrid.setVisibleColumns(visibleColumns, { notify: false });
         }
@@ -346,4 +350,8 @@ export interface DataGridPersistenceEvent extends DataGridEvent {
     settings: PersistedGridSettings;
     readonly restoring: boolean;
     readonly persisting: boolean;
+}
+
+function isVisibleOrTogglable(column: Column): boolean {
+    return !!column && (column.visible !== false || column.togglable !== false);
 }

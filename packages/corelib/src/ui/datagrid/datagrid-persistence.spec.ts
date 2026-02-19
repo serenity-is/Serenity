@@ -375,7 +375,6 @@ function restoreSettingsArgs(opt: Partial<Parameters<typeof restoreSettingsFrom>
         toolbarNode: null,
         uniqueName: "TestGrid",
         view: { sortBy: [] } as any,
-        canShowColumn: vi.fn(() => true),
         ...opt
     } as Parameters<typeof restoreSettingsFrom>[0];
 };
