@@ -342,6 +342,11 @@ export class ColumnPickerDialog<P extends ColumnPickerDialogOptions = ColumnPick
         return col.name || col.toolTip || col.id;
     }
 
+    private isAlwaysHidden(col: Column): boolean {
+        return col.visible === false &&
+            col.togglable === false;
+    }
+
     private isTogglable(col: Column): boolean {
         return col.togglable !== false;
     }
@@ -369,7 +374,7 @@ export class ColumnPickerDialog<P extends ColumnPickerDialogOptions = ColumnPick
         const pinText = tryGetText("Controls.ColumnHeaderMenu.Pin");
         const pinHint = (pinned && pinText) ? `${pinText}: ${pinnedRight ? localText("Controls.ColumnHeaderMenu.PinRight", "") : localText("Controls.ColumnHeaderMenu.PinLeft", "")}` : null;
         return (
-            <li class={[!togglable && "cant-hide", !movable && "not-movable"]} data-key={col.id}>
+            <li class={[!togglable && "cant-hide", !movable && "not-movable"]} data-key={col.id} hidden={this.isAlwaysHidden(col)}>
                 <div class="form-check">
                     <input type="checkbox" id={this.uniqueName + "_col_" + col.id} class="form-check-input toggle-visibility" disabled={!togglable} checked={col.visible !== false} />
                     <span class="drag-handle" style={{ visibility: !movable && "hidden" }}><i class={faIcon("braille")} /></span>

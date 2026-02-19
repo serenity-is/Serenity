@@ -19,6 +19,9 @@ export namespace PropertyItemColumnConverter {
     }
 
     export function toColumn(item: PropertyItem): Column {
+        const isAlwaysHidden = item.filterOnly === true ||
+            (item.readPermission != null && !Authorization.hasPermission(item.readPermission));
+
         var result: Column = {
             field: item.unbound ? null : item.name,
             id: item.unbound ? item.name : null,
@@ -32,11 +35,9 @@ export namespace PropertyItemColumnConverter {
             minWidth: item.minWidth ?? 30,
             maxWidth: (item.maxWidth == null || item.maxWidth === 0) ? null : item.maxWidth,
             resizable: item.resizable == null || !!item.resizable,
-            togglable: item.allowHide === false ? false : void 0
+            togglable: (isAlwaysHidden || item.allowHide === false) ? false : void 0,
+            visible: !isAlwaysHidden && item.visible !== false
         };
-
-        result.visible = item.visible !== false && item.filterOnly !== true &&
-            (item.readPermission == null || Authorization.hasPermission(item.readPermission));
 
         var name = tryGetText(item.title);
         if (name == null)
