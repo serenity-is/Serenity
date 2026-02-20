@@ -4,14 +4,14 @@
     "./*": "./wwwroot/*"
   },
   "devDependencies": {
-    "@tiptap/core": "3.19.0",
-    "@tiptap/extension-file-handler": "3.19.0",
-    "@tiptap/extension-image": "3.19.0",
-    "@tiptap/extension-subscript": "3.19.0",
-    "@tiptap/extension-superscript": "3.19.0",
-    "@tiptap/extension-text-align": "3.19.0",
-    "@tiptap/extension-text-style": "3.19.0",
-    "@tiptap/starter-kit": "3.19.0",
+    "@tiptap/core": "3.20.0",
+    "@tiptap/extension-file-handler": "3.20.0",
+    "@tiptap/extension-image": "3.20.0",
+    "@tiptap/extension-subscript": "3.20.0",
+    "@tiptap/extension-superscript": "3.20.0",
+    "@tiptap/extension-text-align": "3.20.0",
+    "@tiptap/extension-text-style": "3.20.0",
+    "@tiptap/starter-kit": "3.20.0",
     "bootstrap": "5.3.8",
     "glightbox": "3.3.1",
     "jquery": "4.0.0",
@@ -19,7 +19,7 @@
     "jspdf-autotable": "5.0.7",
     "mousetrap": "1.6.5",
     "nprogress": "0.2.0",
-    "sortablejs": "1.15.6"
+    "sortablejs": "1.15.7"
   },
   "scripts": {
     "build": "node build/build.mjs",
