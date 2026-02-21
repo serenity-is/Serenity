@@ -13,3 +13,52 @@
   min-height: 400px;
   height: 400px;
 }
+
+.modal-header .btn-window-maximize {
+  margin-left: auto;
+}
+
+.modal-header.has-maximize-button .btn-close {
+  margin-left: 0;
+}
+
+.modal-dialog.modal-fullscreen .modal-header .btn-window-maximize .maximize-image {
+  display: none !important;
+}
+
+.modal-dialog:not(.modal-fullscreen) .modal-header .btn-window-maximize .restore-image {
+  display: none !important;
+}
+
+@media (max-width: 767.98px) {
+  .modal-fullscreen-md-down .btn-window-maximize {
+    display: none !important;
+  }
+  .modal-fullscreen-md-down .has-maximize-button .btn-close {
+    margin-left: auto !important;
+  }
+}
+@media (max-width: 991.98px) {
+  .modal-fullscreen-lg-down .btn-window-maximize {
+    display: none !important;
+  }
+  .modal-fullscreen-lg-down .has-maximize-button .btn-close {
+    margin-left: auto !important;
+  }
+}
+@media (max-width: 1199.98px) {
+  .modal-fullscreen-xl-down .btn-window-maximize {
+    display: none !important;
+  }
+  .modal-fullscreen-xl-down .has-maximize-button .btn-close {
+    margin-left: auto !important;
+  }
+}
+@media (max-width: 1399.98px) {
+  .modal-fullscreen-xxl-down .btn-window-maximize {
+    display: none !important;
+  }
+  .modal-fullscreen-xxl-down .has-maximize-button .btn-close {
+    margin-left: auto !important;
+  }
+}
