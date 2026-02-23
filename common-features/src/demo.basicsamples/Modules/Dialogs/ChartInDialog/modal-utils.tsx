@@ -149,7 +149,6 @@ function Draggable(options: DraggableOption) {
     return { destroy };
 }
 
-
 export function makeModalMaximizable(dialog: Dialog) {
     if (!dialog || dialog.type !== "bsmodal")
         return;
@@ -184,6 +183,11 @@ export function makeModalMaximizable(dialog: Dialog) {
         header.appendChild(maximizeButton);
 }
 
+/**
+ * Makes a modal dialog draggable by its header. Note that Bootstrap's modal implementation
+ * is not normally designed for dragging, so this is a best effort approach and may
+ * not work perfectly in all scenarios.
+ */
 export function makeModalDraggable(dialog: Dialog) {
     if (!dialog || dialog.type !== "bsmodal")
         return;
