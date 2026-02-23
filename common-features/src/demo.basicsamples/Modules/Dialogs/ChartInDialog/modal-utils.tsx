@@ -1,4 +1,4 @@
-import type { Dialog } from "@serenity-is/corelib";
+import { debounce, type Dialog } from "@serenity-is/corelib";
 import "./modal-utils.css";
 
 interface DragPosition {
@@ -174,7 +174,7 @@ export function makeModalMaximizable(dialog: Dialog) {
         <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-window-stack restore-image" viewBox="0 0 16 16" style={{ transform: "scale(-1,1)" }}>
             <path d="M4.5 6a.5.5 0 1 0 0-1 .5.5 0 0 0 0 1M6 6a.5.5 0 1 0 0-1 .5.5 0 0 0 0 1m2-.5a.5.5 0 1 1-1 0 .5.5 0 0 1 1 0" />
             <path d="M12 1a2 2 0 0 1 2 2 2 2 0 0 1 2 2v8a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2 2 2 0 0 1-2-2V3a2 2 0 0 1 2-2zM2 12V5a2 2 0 0 1 2-2h9a1 1 0 0 0-1-1H2a1 1 0 0 0-1 1v8a1 1 0 0 0 1 1m1-4v5a1 1 0 0 0 1 1h10a1 1 0 0 0 1-1V8zm12-1V5a1 1 0 0 0-1-1H4a1 1 0 0 0-1 1v2z" />
-        </svg>        
+        </svg>
     </button>
 
     if (closeButton)
@@ -203,7 +203,7 @@ export function makeModalDraggable(dialog: Dialog) {
         const r = el.getBoundingClientRect();
         // allow a 1px tolerance for rounding differences
         return Math.abs(r.width - window.innerWidth) < 1 &&
-               Math.abs(r.height - window.innerHeight) < 1;
+            Math.abs(r.height - window.innerHeight) < 1;
     }
 
     const dlg = header.closest<HTMLElement>(".modal-dialog");
@@ -221,41 +221,58 @@ export function makeModalDraggable(dialog: Dialog) {
             const content = dlg.querySelector<HTMLElement>(".modal-content") ?? dlg;
             const bounds = content.getBoundingClientRect();
             const match = /translate\(([-0-9]+)px,\s*([-0-9]+)px\)/.exec(content.style.transform || "");
-            const baseX = (match ? parseInt(match[1]) : 0);
-            const baseY = (match ? parseInt(match[2]) : 0);
+            const baseX = (data as any).baseX = (match ? parseInt(match[1]) : 0);
+            const baseY = (data as any).baseY = (match ? parseInt(match[2]) : 0);
             (data as any).minX = -bounds.left + baseX;
             (data as any).minY = -bounds.top + baseY;
             (data as any).maxX = window.innerWidth - bounds.width - bounds.left + baseX;
             (data as any).maxY = window.innerHeight - bounds.height - bounds.top + baseY;
-            (data as any).origX = baseX;
-            (data as any).origY = baseY;
             header.style.userSelect = "none";
         },
         onDrag: (_, data: DragItem) => {
             if (!dlg || isFullScreen(dlg))
                 return;
             const content = dlg.querySelector<HTMLElement>(".modal-content") ?? dlg;
-            const origX = (data as any).origX ?? 0;
-            const origY = (data as any).origY ?? 0;
-            let tx = origX + data.deltaX;
-            let ty = origY + data.deltaY;
-            tx = Math.min(tx, (data as any).maxX);
-            ty = Math.min(ty, (data as any).maxY);
-            tx = Math.max(tx, (data as any).minX);
-            ty = Math.max(ty, (data as any).minY);
+            const baseX = (data as any).baseX ?? 0;
+            const baseY = (data as any).baseY ?? 0;
+            const tx = Math.max(Math.min(baseX + data.deltaX, (data as any).maxX), (data as any).minX);
+            const ty = Math.max(Math.min(baseY + data.deltaY, (data as any).maxY), (data as any).minY);
             content.style.transform = `translate(${tx}px, ${ty}px)`;
         },
         onDragEnd: () => {
             if (!dlg || isFullScreen(dlg))
-                return;            
+                return;
             header.style.userSelect = "";
         }
     });
 
+    const resizeHandler = () => {
+        if (!dlg || isFullScreen(dlg))
+            return;
+        const content = dlg.querySelector<HTMLElement>(".modal-content") ?? dlg;
+        const b = content.getBoundingClientRect();
+        if (b.left < 0 || b.top < 0 || b.right > window.innerWidth || b.bottom > window.innerHeight) {
+            const match = /translate\(([-0-9]+)px,\s*([-0-9]+)px\)/.exec(content.style.transform || "");
+            if (!match)
+                return;
+            const baseX = parseInt(match[1]);
+            const baseY = parseInt(match[2]);
+            const maxX = window.innerWidth - b.width - b.left + baseX;  
+            const maxY = window.innerHeight - b.height - b.top + baseY;
+            const tx = Math.max(Math.min(baseX, maxX), -b.left + baseX);
+            const ty = Math.max(Math.min(baseY, maxY), -b.top + baseY);
+            content.style.transform = `translate(${tx}px, ${ty}px)`;
+        }
+    };
+
+    window.addEventListener("resize", resizeHandler);
+
     dialog.onClose(() => {
-        dlg.classList.remove("draggable");
+        dlg?.classList.remove("draggable");
         draggable?.destroy();
+        window.removeEventListener("resize", resizeHandler);
         draggable = null;
+        dialog = null;
     });
 
 }
