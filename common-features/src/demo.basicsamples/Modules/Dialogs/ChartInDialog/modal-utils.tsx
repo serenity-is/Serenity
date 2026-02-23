@@ -196,12 +196,8 @@ export function makeModalDraggable(dialog: Dialog) {
     if (!header)
         return;
 
-    // returns true if the dialog currently fills (or almost fills) the viewport.
-    // this covers modal-fullscreen and any responsive variant, without needing
-    // to know the class name. we compare the bounding rect to window size.
     function isFullScreen(el: HTMLElement) {
         const r = el.getBoundingClientRect();
-        // allow a 1px tolerance for rounding differences
         return Math.abs(r.width - window.innerWidth) < 1 &&
             Math.abs(r.height - window.innerHeight) < 1;
     }
@@ -212,32 +208,32 @@ export function makeModalDraggable(dialog: Dialog) {
 
     dlg.classList.add("draggable");
 
+    function setPosition(left: number, top: number) {
+        const content = dlg.querySelector<HTMLElement>(".modal-content") ?? dlg;
+        const bounds = content.getBoundingClientRect();
+        dlg.style.left = Math.max(Math.min(left, window.innerWidth - bounds.width), 0) + "px";
+        dlg.style.top = Math.max(Math.min(top, window.innerHeight - bounds.height), 0) + "px";
+    }
+
     let draggable = Draggable({
         containerElement: header,
-        onDragStart: (_, data) => {
+        onDragStart: (e, data) => {
             if (!dlg || isFullScreen(dlg))
                 return;
-
+            e.preventDefault();
             const content = dlg.querySelector<HTMLElement>(".modal-content") ?? dlg;
             const bounds = content.getBoundingClientRect();
-            const match = /translate\(([-0-9]+)px,\s*([-0-9]+)px\)/.exec(content.style.transform || "");
-            const baseX = (data as any).baseX = (match ? parseInt(match[1]) : 0);
-            const baseY = (data as any).baseY = (match ? parseInt(match[2]) : 0);
-            (data as any).minX = -bounds.left + baseX;
-            (data as any).minY = -bounds.top + baseY;
-            (data as any).maxX = window.innerWidth - bounds.width - bounds.left + baseX;
-            (data as any).maxY = window.innerHeight - bounds.height - bounds.top + baseY;
+            (data as any).origX = dlg.style.left ? parseFloat(dlg.style.left) : bounds.left;
+            (data as any).origY = dlg.style.top ? parseFloat(dlg.style.top) : bounds.top;
             header.style.userSelect = "none";
         },
-        onDrag: (_, data: DragItem) => {
+        onDrag: (e, data: DragItem) => {
             if (!dlg || isFullScreen(dlg))
                 return;
-            const content = dlg.querySelector<HTMLElement>(".modal-content") ?? dlg;
-            const baseX = (data as any).baseX ?? 0;
-            const baseY = (data as any).baseY ?? 0;
-            const tx = Math.max(Math.min(baseX + data.deltaX, (data as any).maxX), (data as any).minX);
-            const ty = Math.max(Math.min(baseY + data.deltaY, (data as any).maxY), (data as any).minY);
-            content.style.transform = `translate(${tx}px, ${ty}px)`;
+            e.preventDefault();
+            setPosition((data as any).origX + data.deltaX, (data as any).origY + data.deltaY);
+            dlg.classList.add("dragged");
+            
         },
         onDragEnd: () => {
             if (!dlg || isFullScreen(dlg))
@@ -247,22 +243,9 @@ export function makeModalDraggable(dialog: Dialog) {
     });
 
     const resizeHandler = () => {
-        if (!dlg || isFullScreen(dlg))
+        if (!dlg || isFullScreen(dlg) || !dlg.classList.contains("dragged"))
             return;
-        const content = dlg.querySelector<HTMLElement>(".modal-content") ?? dlg;
-        const b = content.getBoundingClientRect();
-        if (b.left < 0 || b.top < 0 || b.right > window.innerWidth || b.bottom > window.innerHeight) {
-            const match = /translate\(([-0-9]+)px,\s*([-0-9]+)px\)/.exec(content.style.transform || "");
-            if (!match)
-                return;
-            const baseX = parseInt(match[1]);
-            const baseY = parseInt(match[2]);
-            const maxX = window.innerWidth - b.width - b.left + baseX;  
-            const maxY = window.innerHeight - b.height - b.top + baseY;
-            const tx = Math.max(Math.min(baseX, maxX), -b.left + baseX);
-            const ty = Math.max(Math.min(baseY, maxY), -b.top + baseY);
-            content.style.transform = `translate(${tx}px, ${ty}px)`;
-        }
+        setPosition(parseFloat(dlg.style.left), parseFloat(dlg.style.top));
     };
 
     window.addEventListener("resize", resizeHandler);
@@ -274,5 +257,4 @@ export function makeModalDraggable(dialog: Dialog) {
         draggable = null;
         dialog = null;
     });
-
 }
