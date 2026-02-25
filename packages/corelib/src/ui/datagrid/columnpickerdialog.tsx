@@ -31,7 +31,7 @@ export interface ColumnPickerDialogOptions {
 
 export class ColumnPickerDialog<P extends ColumnPickerDialogOptions = ColumnPickerDialogOptions> extends BaseDialog<P> {
 
-    static override[Symbol.typeInfo] = this.registerClass(nsSerenity, [Attributes.resizable]);
+    static override[Symbol.typeInfo] = this.registerClass(nsSerenity);
 
     declare private list: HTMLUListElement;
     declare private colById: { [key: string]: Column };
