@@ -167,13 +167,18 @@ export class TranslationGrid extends EntityGrid<TranslationItem, any> {
         });
     }
 
-    protected override onViewSubmit(): boolean {
+    protected override setViewParams() {
+        super.setViewParams();
         var request = this.view.params;
         request.SourceLanguageID = this.sourceLanguage.value;
         this.targetLanguageKey = this.targetLanguage.value || '';
         request.TargetLanguageID = this.targetLanguageKey;
+    }
+
+    protected override onViewSubmit() {
+        if (!super.onViewSubmit())
+            return false;
         this.hasChanges = false;
-        return super.onViewSubmit();
     }
 
     protected override getButtons(): ToolButton[] {

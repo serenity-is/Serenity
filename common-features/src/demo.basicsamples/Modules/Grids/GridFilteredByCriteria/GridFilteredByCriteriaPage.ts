@@ -12,11 +12,8 @@ export class GridFilteredByCriteria<P = {}> extends EntityGrid<ProductRow, P> {
     protected override getRowDefinition() { return ProductRow; }
     protected override getService() { return ProductService.baseUrl; }
 
-    protected override onViewSubmit() {
-        // only continue if base class returns true (didn't cancel request)
-        if (!super.onViewSubmit()) {
-            return false;
-        }
+    protected override setViewParams() {
+        super.setViewParams();
 
         // view object is the data source for grid (SlickRemoteView)
         // this is an EntityGrid so its Params object is a ListRequest
@@ -32,7 +29,5 @@ export class GridFilteredByCriteria<P = {}> extends EntityGrid<ProductRow, P> {
             Criteria(fld.UnitsInStock).gt(10),
             Criteria(fld.CategoryName).ne('Condiments'),
             Criteria(fld.Discontinued).eq(0));
-
-        return true;
     }
 }

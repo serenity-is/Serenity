@@ -22,19 +22,15 @@ export class LookupFilterByMultipleGrid<P = {}> extends EntityGrid<ProductRow, P
      * You have an opportunity here to cancel request or modify it.
      * Here we'll add a custom criteria to list request.
      */
-    protected override onViewSubmit() {
-        if (!super.onViewSubmit()) {
-            return false;
-        }
-
+    protected override setViewParams() {
+        super.setViewParams();
+        
         // this has no relation to our lookup editor but as we'll allow picking only 
         // categories of Produce and Seafood in product dialog, it's better to show
         // only products from these categories in grid too
         let request = this.view.params as ListRequest;
         request.Criteria = Criteria.and(request.Criteria,
             Criteria(ProductRow.Fields.CategoryName).in(['Produce', 'Seafood']));
-
-        return true;
     }
 }
 
