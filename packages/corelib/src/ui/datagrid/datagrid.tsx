@@ -72,6 +72,7 @@ export class DataGrid<TItem, P = {}> extends Widget<P> implements IDataGrid, IRe
     public readonly onPersistence = new PubSub<DataGridPersistenceEvent>();
     public readonly onProcessData = new PubSub<DataGridProcessEvent<TItem>>();
     public readonly onSubmitting = new PubSub<DataGridSubmitEvent>();
+    public readonly onSetViewParams = new PubSub<DataGridEvent>();
 
     constructor(props: WidgetProps<P>) {
         super(props);
@@ -611,12 +612,19 @@ export class DataGrid<TItem, P = {}> extends Widget<P> implements IDataGrid, IRe
         this.view.params.IncludeColumns = array;
     }
 
-    protected onViewSubmit(): boolean {
-        if (!this.getGridCanLoad())
-            return false;
+    protected setViewParams(): void {
         this.setCriteriaParameter();
         this.setIncludeColumnsParameter();
         this.invokeSubmitHandlers();
+        this.onSetViewParams.notify({ dataGrid: this });
+    }
+
+    protected onViewSubmit(): boolean {
+        this.setViewParams();
+
+        if (!this.getGridCanLoad())
+            return false;
+
         return true;
     }
 

@@ -4822,6 +4822,7 @@ export declare class ColumnPickerDialog<P extends ColumnPickerDialogOptions = Co
 	protected getDialogOptions(): DialogOptions;
 	protected getDialogButtons(): DialogButton[];
 	private getTitle;
+	private isAlwaysHidden;
 	private isTogglable;
 	private isMovable;
 	private getPinInfo;
@@ -5358,6 +5359,7 @@ export declare class DataGrid<TItem, P = {}> extends Widget<P> implements IDataG
 	readonly onPersistence: PubSub<DataGridPersistenceEvent>;
 	readonly onProcessData: PubSub<DataGridProcessEvent<TItem>>;
 	readonly onSubmitting: PubSub<DataGridSubmitEvent>;
+	readonly onSetViewParams: PubSub<DataGridEvent>;
 	constructor(props: WidgetProps<P>);
 	protected autoRegisteringPlugin(args: AutoRegisterArgs): void;
 	private layoutTimerCallback;
@@ -5434,6 +5436,7 @@ export declare class DataGrid<TItem, P = {}> extends Widget<P> implements IDataG
 	protected setCriteriaParameter(): void;
 	protected setEquality(field: string, value: any): void;
 	protected setIncludeColumnsParameter(): void;
+	protected setViewParams(): void;
 	protected onViewSubmit(): boolean;
 	protected markupReady(): void;
 	protected createSlickContainer(): Fluent;
@@ -5520,7 +5523,6 @@ export declare class DataGrid<TItem, P = {}> extends Widget<P> implements IDataG
 	protected getPersistenceStorage(): SettingStorage;
 	protected getPersistenceKey(): string;
 	protected gridPersistenceFlags(): GridPersistenceFlags;
-	protected canShowColumn(column: Column): boolean;
 	protected getPersistedSettings(): PersistedGridSettings | Promise<PersistedGridSettings>;
 	protected restoreSettings(settings?: PersistedGridSettings, flags?: GridPersistenceFlags): void | Promise<void>;
 	protected restoreSettingsFrom(settings: PersistedGridSettings, flags?: GridPersistenceFlags): void;
