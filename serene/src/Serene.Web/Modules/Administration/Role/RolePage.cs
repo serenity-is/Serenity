@@ -1,4 +1,4 @@
-﻿namespace Serene.Administration.Pages;
+namespace Serene.Administration.Pages;
 
 [PageAuthorize(typeof(RoleRow))]
 public class RolePage : Controller
@@ -6,7 +6,6 @@ public class RolePage : Controller
     [Route("Administration/Role")]
     public ActionResult Index()
     {
-        return this.GridPage("@/Administration/Role/RolePage",
-            RoleRow.Fields.PageTitle());
+        return this.GridPage<RoleRow>(ESM.RolePage, RoleRow.Fields.PageTitle());
     }
 }
