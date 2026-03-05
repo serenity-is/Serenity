@@ -13,7 +13,7 @@ catalogs:
     "@preact/signals-core": "1.13.0"
     "@vitest/coverage-v8": "4.0.18"
     "chart.js": "4.5.1"
-    "dompurify": "3.3.1"
+    "dompurify": "3.3.2"
     "dts-bundle-generator": "9.5.1"
     "esbuild": "0.27.3"
     "es-module-lexer": "2.0.0"
