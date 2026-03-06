@@ -4,7 +4,7 @@
     <PackageReference Include="FastMember" Version="1.5.0" />
     <PackageReference Include="FluentMigrator" Version="8.0.1" />
     <PackageReference Include="FluentMigrator.Extensions.SqlServer" Version="8.0.1" />
-    <PackageReference Include="MailKit" Version="4.15.0" />
+    <PackageReference Include="MailKit" Version="4.15.1" />
     <PackageReference Include="nClam" Version="9.0.0" />
   </ItemGroup>
 </Project>
