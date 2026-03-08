@@ -9,8 +9,8 @@ packages:
 
 catalogs:
   serenity:
-    "@floating-ui/dom": "1.7.5"
-    "@preact/signals-core": "1.13.0"
+    "@floating-ui/dom": "1.7.6"
+    "@preact/signals-core": "1.14.0"
     "@vitest/coverage-v8": "4.0.18"
     "chart.js": "4.5.1"
     "dompurify": "3.3.2"
