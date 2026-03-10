@@ -1,3 +1,16 @@
+## 10.2.2 (2026-03-10)
+
+### Features
+- Use logic for always visible / hidden columns also for data grid persistence
+- Add sample for adding maximize button to modal in ChartInDialog sample
+- Also add dragging ability to the modal in ChartInDialog sample. Split modal utility code.
+- Add onSetViewParams event to DataGrid and attach to it instead of onSubmitting event in HeaderFiltersMixin, as if onViewSubmit is manually called instead of prepareSubmit, ExcelExportHelper won't be able to set its filters as onSubmitting won't be triggered.
+- Add Criteria and Distinct support to DataExplorer
+
+### Bugfixes
+- Fix Columns with FilterOnly attribute or the ones that does not have the ReadPermission should not be shown in the column picker
+- Revert unintentional UserPage and AccountPage changes in StartSharp which was made to reproduce a bug
+
 ## 10.2.1 (2026-02-17)
 
 ### Features
