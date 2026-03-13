@@ -1,5 +1,5 @@
 import { isWritableSignal } from "../src/signal-util";
-import { useSignal } from "../src/signals";
+import { useSignal, useUpdatableComputed } from "../src/signals";
 
 describe("useSignal", () => {
     it("creates a signal with the initial value", () => {
@@ -26,3 +26,34 @@ describe("useSignal", () => {
         expect(isWritableSignal(sig)).toBe(true);
     });
 });
+
+describe("useUpdatableComputed", () => {
+    it("recomputes value only when update() is called", () => {
+        const { computed, update } = useUpdatableComputed();
+        let calls = 0;
+        const c = computed(() => ++calls);
+
+        expect(c.value).toBe(1);
+        expect(c.value).toBe(1); // cached value
+
+        update();
+        expect(c.value).toBe(2);
+        expect(c.value).toBe(2); // cached again
+    });
+
+    it("updates derived values based on external state when update() is called", () => {
+        const { computed, update } = useUpdatableComputed();
+        let base = 0;
+        const derived = computed(() => base * 10);
+
+        expect(derived.value).toBe(0);
+        base = 3;
+
+        // Without calling update, the computed value should not reflect the changed base state
+        expect(derived.value).toBe(0);
+
+        update();
+        expect(derived.value).toBe(30);
+    });
+});
+
