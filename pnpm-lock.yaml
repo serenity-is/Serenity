@@ -34,8 +34,8 @@ catalogs:
       specifier: 13.0.6
       version: 13.0.6
     jsdom:
-      specifier: 29.0.0
-      version: 29.0.0
+      specifier: 29.0.1
+      version: 29.0.1
     moment:
       specifier: 2.30.1
       version: 2.30.1
@@ -61,7 +61,7 @@ importers:
         version: link:packages/domwise
       '@vitest/coverage-v8':
         specifier: catalog:serenity
-        version: 4.1.0(vitest@4.1.0(jsdom@29.0.0)(vite@7.2.6))
+        version: 4.1.0(vitest@4.1.0(jsdom@29.0.1)(vite@7.2.6))
       dts-bundle-generator:
         specifier: catalog:serenity
         version: 9.5.1
@@ -70,13 +70,13 @@ importers:
         version: 0.27.4
       jsdom:
         specifier: catalog:serenity
-        version: 29.0.0
+        version: 29.0.1
       typescript:
         specifier: catalog:serenity
         version: 5.9.3
       vitest:
         specifier: catalog:serenity
-        version: 4.1.0(jsdom@29.0.0)(vite@7.2.6)
+        version: 4.1.0(jsdom@29.0.1)(vite@7.2.6)
 
   common-features:
     dependencies:
@@ -1262,8 +1262,8 @@ packages:
   js-tokens@10.0.0:
     resolution: {integrity: sha512-lM/UBzQmfJRo9ABXbPWemivdCW8V2G8FHaHdypQaIy523snUjog0W71ayWXTjiR+ixeMyVHN2XcpnTd/liPg/Q==}
 
-  jsdom@29.0.0:
-    resolution: {integrity: sha512-9FshNB6OepopZ08unmmGpsF7/qCjxGPbo3NbgfJAnPeHXnsODE9WWffXZtRFRFe0ntzaAOcSKNJFz8wiyvF1jQ==}
+  jsdom@29.0.1:
+    resolution: {integrity: sha512-z6JOK5gRO7aMybVq/y/MlIpKh8JIi68FBKMUtKkK2KH/wMSRlCxQ682d08LB9fYXplyY/UXG8P4XXTScmdjApg==}
     engines: {node: ^20.19.0 || ^22.13.0 || >=24.0.0}
     peerDependencies:
       canvas: ^3.0.0
@@ -1560,8 +1560,8 @@ packages:
   uc.micro@2.1.0:
     resolution: {integrity: sha512-ARDJmphmdvUk6Glw7y9DQ2bFkKBHwQHLi2lsaH6PPmz/Ka9sFOBsBluozhDltWmnv9u/cF6Rt87znRTPV+yp/A==}
 
-  undici@7.24.4:
-    resolution: {integrity: sha512-BM/JzwwaRXxrLdElV2Uo6cTLEjhSb3WXboncJamZ15NgUURmvlXvxa6xkwIOILIjPNo9i8ku136ZvWV0Uly8+w==}
+  undici@7.24.5:
+    resolution: {integrity: sha512-3IWdCpjgxp15CbJnsi/Y9TCDE7HWVN19j1hmzVhoAkY/+CJx449tVxT5wZc1Gwg8J+P0LWvzlBzxYRnHJ+1i7Q==}
     engines: {node: '>=20.18.1'}
 
   utrie@1.0.2:
@@ -2206,7 +2206,7 @@ snapshots:
   '@types/trusted-types@2.0.7':
     optional: true
 
-  '@vitest/coverage-v8@4.1.0(vitest@4.1.0(jsdom@29.0.0)(vite@7.2.6))':
+  '@vitest/coverage-v8@4.1.0(vitest@4.1.0(jsdom@29.0.1)(vite@7.2.6))':
     dependencies:
       '@bcoe/v8-coverage': 1.0.2
       '@vitest/utils': 4.1.0
@@ -2218,7 +2218,7 @@ snapshots:
       obug: 2.1.1
       std-env: 4.0.0
       tinyrainbow: 3.0.3
-      vitest: 4.1.0(jsdom@29.0.0)(vite@7.2.6)
+      vitest: 4.1.0(jsdom@29.0.1)(vite@7.2.6)
 
   '@vitest/expect@4.1.0':
     dependencies:
@@ -2516,7 +2516,7 @@ snapshots:
 
   js-tokens@10.0.0: {}
 
-  jsdom@29.0.0:
+  jsdom@29.0.1:
     dependencies:
       '@asamuzakjp/css-color': 5.0.1
       '@asamuzakjp/dom-selector': 7.0.3
@@ -2533,7 +2533,7 @@ snapshots:
       saxes: 6.0.0
       symbol-tree: 3.2.4
       tough-cookie: 6.0.1
-      undici: 7.24.4
+      undici: 7.24.5
       w3c-xmlserializer: 5.0.0
       webidl-conversions: 8.0.1
       whatwg-mimetype: 5.0.0
@@ -2873,7 +2873,7 @@ snapshots:
 
   uc.micro@2.1.0: {}
 
-  undici@7.24.4: {}
+  undici@7.24.5: {}
 
   utrie@1.0.2:
     dependencies:
@@ -2891,7 +2891,7 @@ snapshots:
     optionalDependencies:
       fsevents: 2.3.3
 
-  vitest@4.1.0(jsdom@29.0.0)(vite@7.2.6):
+  vitest@4.1.0(jsdom@29.0.1)(vite@7.2.6):
     dependencies:
       '@vitest/expect': 4.1.0
       '@vitest/mocker': 4.1.0(vite@7.2.6)
@@ -2914,7 +2914,7 @@ snapshots:
       vite: 7.2.6
       why-is-node-running: 2.3.0
     optionalDependencies:
-      jsdom: 29.0.0
+      jsdom: 29.0.1
     transitivePeerDependencies:
       - msw
 
