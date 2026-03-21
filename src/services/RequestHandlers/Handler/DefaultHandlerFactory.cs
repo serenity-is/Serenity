@@ -45,11 +45,9 @@ public class DefaultHandlerFactory(IDefaultHandlerRegistry registry, IHandlerAct
     /// <inheritdoc/>
     public object CreateHandler(Type rowType, Type handlerInterface)
     {
-        if (rowType == null)
-            throw new ArgumentNullException(nameof(rowType));
+        ArgumentNullException.ThrowIfNull(rowType);
 
-        if (handlerInterface == null)
-            throw new ArgumentNullException(nameof(handlerInterface));
+        ArgumentNullException.ThrowIfNull(handlerInterface);
 
         var handlerType = cache.GetOrAdd((rowType, handlerInterface), GetHandlerType);
         return activator.CreateInstance(handlerType);

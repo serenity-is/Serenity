@@ -1,4 +1,4 @@
-﻿namespace Serenity.Services;
+namespace Serenity.Services;
 
 internal class UndeleteHandlerProxy<TRow, TUndeleteRequest, TUndeleteResponse>
     : IUndeleteHandler<TRow, TUndeleteRequest, TUndeleteResponse>
@@ -10,8 +10,7 @@ internal class UndeleteHandlerProxy<TRow, TUndeleteRequest, TUndeleteResponse>
 
     public UndeleteHandlerProxy(IDefaultHandlerFactory factory)
     {
-        if (factory is null)
-            throw new ArgumentNullException(nameof(factory));
+        ArgumentNullException.ThrowIfNull(factory);
 
         handler = (IUndeleteHandler<TRow, TUndeleteRequest, TUndeleteResponse>) factory.CreateHandler<IUndeleteRequestProcessor>(typeof(TRow));
     }

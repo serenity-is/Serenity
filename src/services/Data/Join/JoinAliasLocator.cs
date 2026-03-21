@@ -1,4 +1,4 @@
-﻿namespace Serenity.Data;
+namespace Serenity.Data;
 
 /// <summary>
 /// Locates alias references in an SQL expression
@@ -13,8 +13,7 @@ public class JoinAliasLocator
     /// <exception cref="ArgumentNullException">expression is null</exception>
     public static HashSet<string> Locate(string expression)
     {
-        if (expression == null)
-            throw new ArgumentNullException("expression");
+        ArgumentNullException.ThrowIfNull(expression);
 
         HashSet<string> aliases = null;
         EnumerateAliases(expression, s =>
@@ -35,8 +34,7 @@ public class JoinAliasLocator
     /// <exception cref="ArgumentNullException">expression is null</exception>
     public static HashSet<string> LocateOptimized(string expression, out string singleAlias)
     {
-        if (expression == null)
-            throw new ArgumentNullException("expression");
+        ArgumentNullException.ThrowIfNull(expression);
 
         HashSet<string> aliases = null;
         string alias = null;

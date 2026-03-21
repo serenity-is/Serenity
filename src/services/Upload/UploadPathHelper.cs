@@ -106,11 +106,9 @@ public static class UploadPathHelper
     /// <exception cref="ArgumentNullException">Path or exists is null</exception>
     public static string FindAvailableName(string path, Func<string, bool> exists)
     {
-        if (path == null)
-            throw new ArgumentNullException(nameof(path));
+        ArgumentNullException.ThrowIfNull(path);
 
-        if (exists == null)
-            throw new ArgumentNullException(nameof(exists));
+        ArgumentNullException.ThrowIfNull(exists);
 
         var extension = Path.GetExtension(path);
         string baseFileName = null;

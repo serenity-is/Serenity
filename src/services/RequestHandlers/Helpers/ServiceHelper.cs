@@ -1,4 +1,4 @@
-﻿namespace Serenity.Services;
+namespace Serenity.Services;
 
 /// <summary>
 /// Contains some helper methods for service handlers
@@ -49,11 +49,9 @@ public static class ServiceHelper
         Exception exception, string indexName,
         IRow oldRow, IRow newRow, params Field[] indexFields)
     {
-        if (connection == null)
-            throw new ArgumentNullException("connection");
+        ArgumentNullException.ThrowIfNull(connection);
 
-        if (exception == null)
-            throw new ArgumentNullException("exception");
+        ArgumentNullException.ThrowIfNull(exception);
 
         if (indexFields == null ||
             indexFields.Length == 0)

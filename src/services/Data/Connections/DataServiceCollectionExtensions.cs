@@ -15,8 +15,7 @@ public static class DataServiceCollectionExtensions
     /// <param name="services">The service collection.</param>
     public static void AddSqlConnections(this IServiceCollection services)
     {
-        if (services == null)
-            throw new ArgumentNullException(nameof(services));
+        ArgumentNullException.ThrowIfNull(services);
 
         services.AddOptions();
         services.TryAddSingleton<ISqlDialectMapper, DefaultSqlDialectMapper>();
@@ -32,11 +31,9 @@ public static class DataServiceCollectionExtensions
     public static void AddSqlConnections(this IServiceCollection services, 
         Action<ConnectionStringOptions> setupAction)
     {
-        if (services == null)
-            throw new ArgumentNullException(nameof(services));
+        ArgumentNullException.ThrowIfNull(services);
 
-        if (setupAction == null)
-            throw new ArgumentNullException(nameof(setupAction));
+        ArgumentNullException.ThrowIfNull(setupAction);
 
         services.AddSqlConnections();
         services.Configure(setupAction);

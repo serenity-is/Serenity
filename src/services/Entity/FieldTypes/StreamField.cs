@@ -46,8 +46,7 @@ public class StreamField(ICollection<Field> collection, string name, LocalText c
     /// <exception cref="ArgumentNullException">reader</exception>
     public override void GetFromReader(IDataReader reader, int index, IRow row)
     {
-        if (reader == null)
-            throw new ArgumentNullException("reader");
+        ArgumentNullException.ThrowIfNull(reader);
 
         if (reader.IsDBNull(index))
             _setValue(row, null);
@@ -97,10 +96,8 @@ public class StreamField(ICollection<Field> collection, string name, LocalText c
     /// </exception>
     public static void CopyStream(Stream source, Stream dest)
     {
-        if (source == null)
-            throw new ArgumentNullException("source");
-        if (dest == null)
-            throw new ArgumentNullException("dest");
+        ArgumentNullException.ThrowIfNull(source);
+        ArgumentNullException.ThrowIfNull(dest);
 
         byte[] buffer = new byte[4096];
         int read;
@@ -141,8 +138,7 @@ public class StreamField(ICollection<Field> collection, string name, LocalText c
     /// <exception cref="ArgumentNullException">reader</exception>
     public override void ValueFromJson(Newtonsoft.Json.JsonReader reader, IRow row, Newtonsoft.Json.JsonSerializer serializer)
     {
-        if (reader == null)
-            throw new ArgumentNullException("reader");
+        ArgumentNullException.ThrowIfNull(reader);
 
         switch (reader.TokenType)
         {

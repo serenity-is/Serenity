@@ -1,4 +1,4 @@
-﻿using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.DependencyInjection;
 using Serenity.PropertyGrid;
 using System.Collections;
 
@@ -128,11 +128,9 @@ public class TabularDataReport : IDataOnlyReport
     public static List<ReportColumn> GetColumnListFor(Type columnsType,
         IEnumerable<string> exportColumns, IServiceProvider serviceProvider)
     {
-        if (columnsType == null)
-            throw new ArgumentNullException(nameof(columnsType));
+        ArgumentNullException.ThrowIfNull(columnsType);
 
-        if (serviceProvider == null)
-            throw new ArgumentNullException(nameof(serviceProvider));
+        ArgumentNullException.ThrowIfNull(serviceProvider);
 
         var list = new List<ReportColumn>();
         if (exportColumns != null && !exportColumns.Any())
@@ -207,11 +205,9 @@ public class TabularDataReport : IDataOnlyReport
     public static ReportColumn FromPropertyItem(PropertyItem item, Field field, 
         PropertyInfo property, IServiceProvider provider, ITextLocalizer localizer)
     {
-        if (item is null)
-            throw new ArgumentNullException(nameof(item));
+        ArgumentNullException.ThrowIfNull(item);
 
-        if (localizer is null)
-            throw new ArgumentNullException(nameof(localizer));
+        ArgumentNullException.ThrowIfNull(localizer);
 
         var result = new ReportColumn
         {

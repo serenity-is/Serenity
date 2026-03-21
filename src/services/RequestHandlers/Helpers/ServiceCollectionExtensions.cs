@@ -80,12 +80,10 @@ public static class ServiceCollectionExtensions
     public static IServiceCollection AddCustomRequestHandlers(this IServiceCollection collection, 
         ITypeSource typeSource = null, Func<Type, Type, bool> predicate = null)
     {
-        if (collection == null)
-            throw new ArgumentNullException(nameof(collection));
+        ArgumentNullException.ThrowIfNull(collection);
 
         typeSource ??= collection.FirstOrDefault(x => x.ServiceType == typeof(ITypeSource))?.ImplementationInstance as ITypeSource;
-        if (typeSource == null)
-            throw new ArgumentNullException(nameof(typeSource));
+        ArgumentNullException.ThrowIfNull(typeSource);
 
         var interfacesToAdd = new Dictionary<Type, List<Type>>();
 
@@ -191,8 +189,7 @@ public static class ServiceCollectionExtensions
     public static IServiceCollection AddServiceHandlers(this IServiceCollection collection, 
         ITypeSource customHandlerTypeSource = null, Func<Type, Type, bool> customHandlerPredicate = null)
     {
-        if (collection == null)
-            throw new ArgumentNullException(nameof(collection));
+        ArgumentNullException.ThrowIfNull(collection);
 
         collection.AddCaching();
         collection.AddEntities();
@@ -219,8 +216,7 @@ public static class ServiceCollectionExtensions
     /// <exception cref="ArgumentNullException">Provider is null</exception>
     public static ILocalTextRegistry AddBaseTexts(this IServiceProvider provider, IFileProvider webFileProvider = null)
     {
-        if (provider == null)
-            throw new ArgumentNullException(nameof(provider));
+        ArgumentNullException.ThrowIfNull(provider);
 
         var typeSource = provider.GetRequiredService<ITypeSource>();
         var textRegistry = provider.GetRequiredService<ILocalTextRegistry>();
@@ -250,8 +246,7 @@ public static class ServiceCollectionExtensions
     public static ILocalTextRegistry AddBaseTexts(this ILocalTextRegistry textRegistry, ITypeSource typeSource,
         IRowTypeRegistry rowTypeRegistry = null, bool includeResources = true)
     {
-        if (textRegistry is null)
-            throw new ArgumentNullException(nameof(textRegistry));
+        ArgumentNullException.ThrowIfNull(textRegistry);
 
         textRegistry.AddNavigationTexts(typeSource);
         textRegistry.AddPropertyItemsTexts(typeSource);
@@ -293,14 +288,11 @@ public static class ServiceCollectionExtensions
     /// <exception cref="ArgumentNullException">registry, provider or sub path is null</exception>
     public static ILocalTextRegistry AddJsonTexts(this ILocalTextRegistry registry, IFileProvider provider, string subpath, bool recursive = true)
     {
-        if (registry is null)
-            throw new ArgumentNullException(nameof(registry));
+        ArgumentNullException.ThrowIfNull(registry);
 
-        if (provider is null)
-            throw new ArgumentNullException(nameof(provider));
-        
-        if (subpath is null)
-            throw new ArgumentNullException(nameof(subpath));
+        ArgumentNullException.ThrowIfNull(provider);
+
+        ArgumentNullException.ThrowIfNull(subpath);
 
         var contents = provider.GetDirectoryContents(subpath);
         if (contents is null || !contents.Exists)

@@ -101,8 +101,7 @@ public partial class SqlQuery : QueryWithParams, ISqlQuery, IFilterableQuery, IG
     /// <returns>The query itself.</returns>
     public SqlQuery From(string table, IAlias alias)
     {
-        if (alias == null)
-            throw new ArgumentNullException("alias");
+        ArgumentNullException.ThrowIfNull(alias);
 
         if (aliasExpressions != null &&
             aliasExpressions.ContainsKey(alias.Name))
@@ -129,8 +128,7 @@ public partial class SqlQuery : QueryWithParams, ISqlQuery, IFilterableQuery, IG
     /// <remarks>This overload requires that alias has a table name.</remarks>
     public SqlQuery From(IAlias alias)
     {
-        if (alias == null)
-            throw new ArgumentNullException("alias");
+        ArgumentNullException.ThrowIfNull(alias);
 
         if (string.IsNullOrEmpty(alias.Table))
             throw new ArgumentOutOfRangeException("alias.table");
@@ -147,11 +145,9 @@ public partial class SqlQuery : QueryWithParams, ISqlQuery, IFilterableQuery, IG
     /// <remarks>This overload requires that alias has a table name.</remarks>
     public SqlQuery From(ISqlQuery subQuery, IAlias alias)
     {
-        if (subQuery == null)
-            throw new ArgumentNullException("subQuery");
+        ArgumentNullException.ThrowIfNull(subQuery);
 
-        if (alias == null)
-            throw new ArgumentNullException("alias");
+        ArgumentNullException.ThrowIfNull(alias);
 
         return From(subQuery.ToString(), alias);
     }
@@ -164,8 +160,7 @@ public partial class SqlQuery : QueryWithParams, ISqlQuery, IFilterableQuery, IG
     /// <remarks>This function uses a linear search in column list, so use with caution.</remarks>
     string IGetExpressionByName.GetExpression(string columnName)
     {
-        if (columnName == null)
-            throw new ArgumentNullException("columnName");
+        ArgumentNullException.ThrowIfNull(columnName);
 
         Column fieldInfo = columns.Find(
             column => (column.ColumnName != null && column.ColumnName == columnName) ||
@@ -204,8 +199,7 @@ public partial class SqlQuery : QueryWithParams, ISqlQuery, IFilterableQuery, IG
     /// <returns>The query itself.</returns>
     public SqlQuery GroupBy(IAlias alias, string fieldName)
     {
-        if (alias == null)
-            throw new ArgumentNullException("alias");
+        ArgumentNullException.ThrowIfNull(alias);
 
         if (string.IsNullOrEmpty(fieldName))
             throw new ArgumentNullException("field");
@@ -263,8 +257,7 @@ public partial class SqlQuery : QueryWithParams, ISqlQuery, IFilterableQuery, IG
     /// <returns>The query itself.</returns>
     public SqlQuery OrderBy(IAlias alias, string fieldName, bool desc = false)
     {
-        if (alias == null)
-            throw new ArgumentNullException("alias");
+        ArgumentNullException.ThrowIfNull(alias);
 
         if (string.IsNullOrEmpty(fieldName))
             throw new ArgumentNullException("field");
@@ -342,8 +335,7 @@ public partial class SqlQuery : QueryWithParams, ISqlQuery, IFilterableQuery, IG
     /// <remarks>No column name is used for the field or expression.</remarks>
     public SqlQuery Select(IAlias alias, string fieldName)
     {
-        if (alias == null)
-            throw new ArgumentNullException("alias");
+        ArgumentNullException.ThrowIfNull(alias);
 
         if (string.IsNullOrEmpty(fieldName))
             throw new ArgumentNullException("fieldName");
@@ -387,8 +379,7 @@ public partial class SqlQuery : QueryWithParams, ISqlQuery, IFilterableQuery, IG
     /// <returns>The query itself.</returns>
     public SqlQuery Select(IAlias alias, string fieldName, string columnName)
     {
-        if (alias == null)
-            throw new ArgumentNullException("alias");
+        ArgumentNullException.ThrowIfNull(alias);
 
         if (string.IsNullOrEmpty(fieldName))
             throw new ArgumentNullException("fieldName");
@@ -413,8 +404,7 @@ public partial class SqlQuery : QueryWithParams, ISqlQuery, IFilterableQuery, IG
     /// <returns>The query itself.</returns>
     public SqlQuery Select(ISqlQuery expression, string columnName)
     {
-        if (expression == null)
-            throw new ArgumentNullException("expression");
+        ArgumentNullException.ThrowIfNull(expression);
 
         if (string.IsNullOrEmpty(columnName))
             throw new ArgumentNullException("columnName");
@@ -431,8 +421,7 @@ public partial class SqlQuery : QueryWithParams, ISqlQuery, IFilterableQuery, IG
     /// <returns>The query itself.</returns>
     public SqlQuery Select(ISqlQuery expression)
     {
-        if (expression == null)
-            throw new ArgumentNullException("expression");
+        ArgumentNullException.ThrowIfNull(expression);
 
         Select(expression.ToString());
 

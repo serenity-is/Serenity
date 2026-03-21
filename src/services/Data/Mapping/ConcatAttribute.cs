@@ -14,8 +14,7 @@ public class ConcatAttribute : BaseExpressionAttribute
     /// <exception cref="ArgumentNullException">One of expressions is null</exception>
     public ConcatAttribute(object expression1, object expression2, params object[] rest)
     {
-        if (rest == null)
-            throw new ArgumentNullException(nameof(rest));
+        ArgumentNullException.ThrowIfNull(rest);
 
         if (rest.Length > 0)
         {

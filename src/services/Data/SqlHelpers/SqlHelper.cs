@@ -62,8 +62,7 @@ public static class SqlHelper
     /// <param name="logger">Logger</param>
     public static void LogCommand(string method, IDbCommand command, ILogger logger)
     {
-        if (logger == null)
-            throw new ArgumentNullException(nameof(logger));
+        ArgumentNullException.ThrowIfNull(logger);
 
         try
         {
@@ -178,8 +177,7 @@ public static class SqlHelper
     /// <exception cref="ArgumentNullException">connection</exception>
     public static IDbCommand NewCommand(IDbConnection connection, string commandText)
     {
-        if (connection == null)
-            throw new ArgumentNullException("connection");
+        ArgumentNullException.ThrowIfNull(connection);
 
         IDbCommand command = connection.CreateCommand();
 
@@ -228,8 +226,7 @@ public static class SqlHelper
     /// </exception>
     private static int InternalExecuteNonQuery(IDbCommand command, ILogger logger)
     {
-        if (command == null)
-            throw new ArgumentNullException("command");
+        ArgumentNullException.ThrowIfNull(command);
 
         if (command.Connection == null)
             throw new ArgumentNullException("command.Connection");
@@ -406,8 +403,7 @@ public static class SqlHelper
     /// </returns>
     public static int Execute(this SqlDelete query, IDbConnection connection, ExpectedRows expectedRows = ExpectedRows.One, ILogger logger = null)
     {
-        if (query == null)
-            throw new ArgumentNullException(nameof(query));
+        ArgumentNullException.ThrowIfNull(query);
 
         var commandText = query.ToString();
 
@@ -421,8 +417,7 @@ public static class SqlHelper
 
     private static IDataReader InternalExecuteReader(IDbConnection connection, string commandText, IDictionary<string, object> param, ILogger logger)
     {
-        if (connection == null)
-            throw new ArgumentNullException("connection");
+        ArgumentNullException.ThrowIfNull(connection);
 
         connection.EnsureOpen();
 
@@ -488,8 +483,7 @@ public static class SqlHelper
     /// <returns>A data reader with results.</returns>
     public static IDataReader ExecuteReader(this SqlQuery query, IDbConnection connection, ILogger logger = null)
     {
-        if (query == null) 
-            throw new ArgumentNullException("query");
+        ArgumentNullException.ThrowIfNull(query);
 
         var commandText = query.ToString();
         if (connection is ISqlOperationInterceptor interceptor &&
@@ -501,8 +495,7 @@ public static class SqlHelper
 
     private static object InternalExecuteScalar(IDbConnection connection, string commandText, IDictionary<string, object> param, ILogger logger)
     {
-        if (connection == null)
-            throw new ArgumentNullException("connection");
+        ArgumentNullException.ThrowIfNull(connection);
 
         connection.EnsureOpen();
 
@@ -568,8 +561,7 @@ public static class SqlHelper
     /// <exception cref="ArgumentNullException">selectQuery is null</exception>
     public static object ExecuteScalar(IDbConnection connection, SqlQuery query, ILogger logger = null)
     {
-        if (query == null)
-            throw new ArgumentNullException(nameof(query));
+        ArgumentNullException.ThrowIfNull(query);
 
         string commandText = query.ToString();
         if (connection is ISqlOperationInterceptor interceptor &&

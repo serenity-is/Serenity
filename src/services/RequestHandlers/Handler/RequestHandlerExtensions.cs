@@ -1,4 +1,4 @@
-﻿namespace Serenity.Services;
+namespace Serenity.Services;
 
 /// <summary>
 /// Contains extension methods to create request / response types
@@ -66,8 +66,7 @@ public static class RequestHandlerExtensions
     /// <param name="handler">Handler instance</param>
     public static Type GetRequestType(this IRequestHandler handler)
     {
-        if (handler == null)
-            throw new ArgumentNullException(nameof(handler));
+        ArgumentNullException.ThrowIfNull(handler);
 
         return handler.GetType().GetInterfaces()
             .FirstOrDefault(x => x.IsGenericType &&
@@ -80,8 +79,7 @@ public static class RequestHandlerExtensions
     /// <param name="handler">Handler instance</param>
     public static Type GetResponseType(this IRequestHandler handler)
     {
-        if (handler == null)
-            throw new ArgumentNullException(nameof(handler));
+        ArgumentNullException.ThrowIfNull(handler);
 
         return handler.GetType().GetInterfaces()
             .FirstOrDefault(x => x.IsGenericType &&

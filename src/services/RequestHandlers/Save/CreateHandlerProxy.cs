@@ -1,4 +1,4 @@
-﻿namespace Serenity.Services;
+namespace Serenity.Services;
 
 internal class CreateHandlerProxy<TRow, TSaveRequest, TSaveResponse>
     : ICreateHandler<TRow, TSaveRequest, TSaveResponse>
@@ -10,8 +10,7 @@ internal class CreateHandlerProxy<TRow, TSaveRequest, TSaveResponse>
 
     public CreateHandlerProxy(IDefaultHandlerFactory factory)
     {
-        if (factory is null)
-            throw new ArgumentNullException(nameof(factory));
+        ArgumentNullException.ThrowIfNull(factory);
 
         handler = (ICreateHandler<TRow, TSaveRequest, TSaveResponse>) factory.CreateHandler<ISaveRequestProcessor>(typeof(TRow));
     }

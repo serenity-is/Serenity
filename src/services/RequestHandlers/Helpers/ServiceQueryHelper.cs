@@ -1,4 +1,4 @@
-﻿namespace Serenity.Services;
+namespace Serenity.Services;
 
 /// <summary>
 /// Contains static helper methods for service handler queries.
@@ -16,8 +16,7 @@ public static class ServiceQueryHelper
     /// <exception cref="ArgumentNullException">query is null</exception>
     public static SqlQuery ApplySort(this SqlQuery query, string sort, bool descending)
     {
-        if (query == null)
-            throw new ArgumentNullException("query");
+        ArgumentNullException.ThrowIfNull(query);
 
         var ext = (ISqlQueryExtensible)query;
 

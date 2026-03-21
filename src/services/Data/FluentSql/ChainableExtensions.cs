@@ -1,4 +1,4 @@
-﻿namespace Serenity;
+namespace Serenity;
 
 /// <summary>
 /// Contains method chaining extensions for objects like SQL queries that implement
@@ -16,8 +16,7 @@ public static class ChainableExtensions
     public static TChain With<TChain>(this TChain chain, Action<TChain> action)
         where TChain : IChainable
     {
-        if (action == null)
-            throw new ArgumentNullException("action");
+        ArgumentNullException.ThrowIfNull(action);
 
         action(chain);
 

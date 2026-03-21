@@ -229,11 +229,9 @@ public class DefaultUploadProcessor(IImageProcessor imageProcessor, IUploadStora
     protected virtual IEnumerable<ScaleImageAsResult> CreateAdditionalThumbs(object image,
         IUploadImageOptions options, string imageFile)
     {
-        if (image is null)
-            throw new ArgumentNullException(nameof(image));
+        ArgumentNullException.ThrowIfNull(image);
 
-        if (options is null)
-            throw new ArgumentNullException(nameof(options));
+        ArgumentNullException.ThrowIfNull(options);
 
         if (string.IsNullOrEmpty(imageFile))
             throw new ArgumentNullException(nameof(imageFile));

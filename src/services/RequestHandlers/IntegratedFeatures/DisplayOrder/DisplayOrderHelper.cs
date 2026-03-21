@@ -21,12 +21,10 @@ public static class DisplayOrderHelper
     public static int GetNextValue(IDbConnection connection, string tableName,
         Field orderField, ICriteria filter)
     {
-        if (connection == null)
-            throw new ArgumentNullException("connection");
+        ArgumentNullException.ThrowIfNull(connection);
         if (tableName == null || tableName.Length == 0)
             throw new ArgumentNullException("tableName");
-        if (orderField is null)
-            throw new ArgumentNullException("orderField");
+        ArgumentNullException.ThrowIfNull(orderField);
 
         using IDataReader reader = new SqlQuery()
             .Select(
@@ -89,14 +87,11 @@ public static class DisplayOrderHelper
         ICriteria filter = null, object recordID = null, int newDisplayOrder = 1,
         bool descendingKeyOrder = false, bool hasUniqueConstraint = false)
     {
-        if (connection == null)
-            throw new ArgumentNullException("connection");
+        ArgumentNullException.ThrowIfNull(connection);
         if (tableName == null || tableName.Length == 0)
             throw new ArgumentNullException("tableName");
-        if (keyField is null)
-            throw new ArgumentNullException("keyField");
-        if (orderField is null)
-            throw new ArgumentNullException("orderField");
+        ArgumentNullException.ThrowIfNull(keyField);
+        ArgumentNullException.ThrowIfNull(orderField);
 
         // last assigned display order value
         int order = 0;
@@ -215,17 +210,14 @@ public static class DisplayOrderHelper
     public static bool UpdateOrders(IDbConnection connection, List<OrderRecord> orderRecords,
         string tableName, Field keyField, Field orderField, bool hasUniqueConstraint = false)
     {
-        if (connection == null)
-            throw new ArgumentNullException("connection");
+        ArgumentNullException.ThrowIfNull(connection);
 
         if (string.IsNullOrEmpty(tableName))
             throw new ArgumentNullException("tableName");
 
-        if (keyField is null)
-            throw new ArgumentNullException("keyField");
+        ArgumentNullException.ThrowIfNull(keyField);
 
-        if (orderField is null)
-            throw new ArgumentNullException("orderField");
+        ArgumentNullException.ThrowIfNull(orderField);
 
         // StringBuilder that will contain query(s)
         StringBuilder queries = new();

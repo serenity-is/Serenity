@@ -1,4 +1,4 @@
-﻿namespace Serenity.Services;
+namespace Serenity.Services;
 
 internal class ListHandlerProxy<TRow, TListRequest, TListResponse>
     : IListHandler<TRow, TListRequest, TListResponse>
@@ -10,8 +10,7 @@ internal class ListHandlerProxy<TRow, TListRequest, TListResponse>
 
     public ListHandlerProxy(IDefaultHandlerFactory factory)
     {
-        if (factory is null)
-            throw new ArgumentNullException(nameof(factory));
+        ArgumentNullException.ThrowIfNull(factory);
 
         handler = (IListHandler<TRow, TListRequest, TListResponse>) factory.CreateHandler<IListRequestProcessor>(typeof(TRow));
     }

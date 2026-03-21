@@ -1,4 +1,4 @@
-﻿using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.DependencyInjection;
 
 namespace Serenity.Reporting;
 
@@ -10,8 +10,7 @@ public static class ReportColumnConverter
     private static ReportColumn FromMember(MemberInfo member, Type dataType,
         Field baseField, ITextLocalizer localizer)
     {
-        if (member == null)
-            throw new ArgumentNullException("member");
+        ArgumentNullException.ThrowIfNull(member);
 
         var result = new ReportColumn
         {

@@ -24,7 +24,7 @@ public abstract partial class PropertyItemsScript
     /// <exception cref="ArgumentNullException"></exception>
     public static string Compact(IEnumerable<(string scriptName, PropertyItemsData data)> inputs)
     {
-        if (inputs is null) throw new ArgumentNullException(nameof(inputs));
+        ArgumentNullException.ThrowIfNull(inputs);
         Dictionary<string, string> strMap = [];
         int strMapCount = 0;
 

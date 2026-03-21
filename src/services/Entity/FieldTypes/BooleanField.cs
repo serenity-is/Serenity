@@ -45,8 +45,7 @@ public sealed class BooleanField(ICollection<Field> collection, string name, Loc
     /// <exception cref="ArgumentNullException">reader</exception>
     public override void GetFromReader(IDataReader reader, int index, IRow row)
     {
-        if (reader == null)
-            throw new ArgumentNullException("reader");
+        ArgumentNullException.ThrowIfNull(reader);
 
         if (reader.IsDBNull(index))
             _setValue(row, null);
@@ -76,8 +75,7 @@ public sealed class BooleanField(ICollection<Field> collection, string name, Loc
     /// <exception cref="ArgumentNullException">reader is null</exception>
     public override void ValueFromJson(Newtonsoft.Json.JsonReader reader, IRow row, Newtonsoft.Json.JsonSerializer serializer)
     {
-        if (reader == null)
-            throw new ArgumentNullException("reader");
+        ArgumentNullException.ThrowIfNull(reader);
 
         switch (reader.TokenType)
         {

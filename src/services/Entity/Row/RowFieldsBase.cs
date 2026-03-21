@@ -954,8 +954,7 @@ public partial class RowFieldsBase : Collection<Field>, IAlias, IHaveJoins
         if (isInitialized)
             throw new InvalidOperationException("field collection can't be modified!");
 
-        if (item is null)
-            throw new ArgumentNullException("item");
+        ArgumentNullException.ThrowIfNull(item);
 
         if (byName.ContainsKey(item.Name))
             throw new ArgumentOutOfRangeException("item",
@@ -1003,8 +1002,7 @@ public partial class RowFieldsBase : Collection<Field>, IAlias, IHaveJoins
         if (isInitialized)
             throw new InvalidOperationException("field collection can't be modified!");
 
-        if (item is null)
-            throw new ArgumentNullException("item");
+        ArgumentNullException.ThrowIfNull(item);
 
         if (byName.ContainsKey(item.Name))
             throw new ArgumentOutOfRangeException("item",

@@ -1,4 +1,4 @@
-﻿using Microsoft.Extensions.Logging;
+using Microsoft.Extensions.Logging;
 
 namespace Serenity.Data;
 
@@ -36,8 +36,7 @@ public static class ConnectionExtensions
     /// <exception cref="InvalidOperationException">Can't auto open a closed connection that was previously open!</exception>
     public static IDbConnection EnsureOpen(this IDbConnection connection)
     {
-        if (connection == null)
-            throw new ArgumentNullException("connection");
+        ArgumentNullException.ThrowIfNull(connection);
 
         if (connection.State != ConnectionState.Open)
         {

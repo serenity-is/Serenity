@@ -84,8 +84,7 @@ public abstract class BaseCriteria : ICriteria
     /// <exception cref="ArgumentNullException">mask is null</exception>
     public BaseCriteria StartsWith(string mask, bool upper = false)
     {
-        if (mask == null)
-            throw new ArgumentNullException("mask");
+        ArgumentNullException.ThrowIfNull(mask);
 
         return Like(mask + "%", upper);
     }
@@ -99,8 +98,7 @@ public abstract class BaseCriteria : ICriteria
     /// <exception cref="ArgumentNullException">mask is null</exception>
     public BaseCriteria EndsWith(string mask, bool upper = false)
     {
-        if (mask == null)
-            throw new ArgumentNullException("mask");
+        ArgumentNullException.ThrowIfNull(mask);
 
         return Like("%" + mask, upper);
     }
@@ -193,8 +191,7 @@ public abstract class BaseCriteria : ICriteria
     /// <exception cref="ArgumentNullException">statement is null</exception>
     public BaseCriteria In(ISqlQuery statement)
     {
-        if (statement is null)
-            throw new ArgumentNullException("statement");
+        ArgumentNullException.ThrowIfNull(statement);
 
         return new BinaryCriteria(this, CriteriaOperator.In, new Criteria(statement));
     }
@@ -255,8 +252,7 @@ public abstract class BaseCriteria : ICriteria
     /// <exception cref="ArgumentNullException">statement is null</exception>
     public BaseCriteria NotIn(ISqlQuery statement)
     {
-        if (statement is null)
-            throw new ArgumentNullException("statement");
+        ArgumentNullException.ThrowIfNull(statement);
 
         return new BinaryCriteria(this, CriteriaOperator.NotIn, new Criteria(statement));
     }

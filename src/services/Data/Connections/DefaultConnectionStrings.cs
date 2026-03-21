@@ -1,4 +1,4 @@
-﻿using Microsoft.Extensions.Options;
+using Microsoft.Extensions.Options;
 
 namespace Serenity.Data;
 
@@ -26,8 +26,7 @@ public class DefaultConnectionStrings(IOptions<ConnectionStringOptions> options,
     /// <param name="entry">Connection entry</param>
     protected virtual ISqlDialect DetermineDialect(string connectionKey, ConnectionStringEntry entry)
     {
-        if (entry == null)
-            throw new ArgumentNullException(nameof(entry));
+        ArgumentNullException.ThrowIfNull(entry);
 
         if (entry.DialectInstance != null)
             return entry.DialectInstance;

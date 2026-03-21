@@ -1,4 +1,4 @@
-﻿using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.DependencyInjection;
 using System.Threading;
 
 namespace Serenity.Data;
@@ -95,8 +95,7 @@ public static class RowFieldsProvider
     public static TFields Resolve<TFields>(string alias)
         where TFields : RowFieldsBase
     {
-        if (alias == null)
-            throw new ArgumentNullException(nameof(alias));
+        ArgumentNullException.ThrowIfNull(alias);
 
         return (TFields)Current.ResolveWithAlias(typeof(TFields), alias);
     }

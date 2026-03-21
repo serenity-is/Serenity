@@ -15,8 +15,7 @@ public class CaseAttribute : BaseExpressionAttribute
     /// <exception cref="ArgumentNullException">One of expressions is null</exception>
     public CaseAttribute(object when1, object then1, params object[] restOrElse)
     {
-        if (restOrElse == null)
-            throw new ArgumentNullException(nameof(restOrElse));
+        ArgumentNullException.ThrowIfNull(restOrElse);
 
         When = [when1 ?? throw new ArgumentNullException(nameof(when1))];
         Then = [then1 ?? throw new ArgumentNullException(nameof(then1))];

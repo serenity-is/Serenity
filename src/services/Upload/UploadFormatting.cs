@@ -15,8 +15,7 @@ public static class UploadFormatting
     /// <exception cref="ArgumentNullException">options or options.OriginalName is null</exception>
     public static string FormatFilename(FormatFilenameOptions options)
     {
-        if (options is null)
-            throw new ArgumentNullException(nameof(options));
+        ArgumentNullException.ThrowIfNull(options);
 
         object groupKey;
         string s;

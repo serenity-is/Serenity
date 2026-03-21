@@ -1,4 +1,4 @@
-﻿namespace Serenity.Data;
+namespace Serenity.Data;
 
 /// <summary>
 ///   Used to define aliases like (T0).</summary>
@@ -154,8 +154,7 @@ public class Alias : IAlias
     {
         get
         {
-            if (field == null)
-                throw new ArgumentNullException("field");
+            ArgumentNullException.ThrowIfNull(field);
 
             return aliasDot + field.Name;
         }
@@ -209,8 +208,7 @@ public class Alias : IAlias
     /// <exception cref="ArgumentNullException">field</exception>
     public static string operator +(Alias alias, IField field)
     {
-        if (field == null)
-            throw new ArgumentNullException("field");
+        ArgumentNullException.ThrowIfNull(field);
 
         return alias.aliasDot + field.Name;
     }

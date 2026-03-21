@@ -45,8 +45,7 @@ public sealed class SingleField(ICollection<Field> collection, string name, Loca
     /// <exception cref="ArgumentNullException">reader</exception>
     public override void GetFromReader(IDataReader reader, int index, IRow row)
     {
-        if (reader == null)
-            throw new ArgumentNullException("reader");
+        ArgumentNullException.ThrowIfNull(reader);
 
         var value = reader.GetValue(index);
         if (value is DBNull)
@@ -79,8 +78,7 @@ public sealed class SingleField(ICollection<Field> collection, string name, Loca
     /// <exception cref="ArgumentNullException">reader</exception>
     public override void ValueFromJson(Newtonsoft.Json.JsonReader reader, IRow row, Newtonsoft.Json.JsonSerializer serializer)
     {
-        if (reader == null)
-            throw new ArgumentNullException("reader");
+        ArgumentNullException.ThrowIfNull(reader);
 
         switch (reader.TokenType)
         {

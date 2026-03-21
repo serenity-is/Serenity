@@ -15,8 +15,7 @@ public static class EntitySqlQueryExtensions
     /// <exception cref="ArgumentNullException">row</exception>
     public static SqlQuery From(this SqlQuery query, IEntity entity)
     {
-        if (entity == null)
-            throw new ArgumentNullException("row");
+        ArgumentNullException.ThrowIfNull(entity);
 
         if (entity as IRow != null)
         {
@@ -62,8 +61,7 @@ public static class EntitySqlQueryExtensions
     /// <returns>The query itself.</returns>
     public static SqlQuery Select(this SqlQuery query, IField field)
     {
-        if (field == null)
-            throw new ArgumentNullException("field");
+        ArgumentNullException.ThrowIfNull(field);
 
         query.EnsureJoinsInExpression(field.Expression);
         new SqlQuery.Column(query, field.Expression, field.ColumnAlias, field);
@@ -89,11 +87,9 @@ public static class EntitySqlQueryExtensions
     /// </exception>
     public static SqlQuery Select(this SqlQuery query, IField field, string columnName)
     {
-        if (field == null)
-            throw new ArgumentNullException("field");
+        ArgumentNullException.ThrowIfNull(field);
 
-        if (columnName == null)
-            throw new ArgumentNullException("columnName");
+        ArgumentNullException.ThrowIfNull(columnName);
 
         query.EnsureJoinsInExpression(field.Expression);
         new SqlQuery.Column(query, field.Expression, columnName, field);
@@ -120,11 +116,9 @@ public static class EntitySqlQueryExtensions
     /// </remarks>
     public static SqlQuery Select(this SqlQuery query, IAlias alias, IField field)
     {
-        if (alias == null)
-            throw new ArgumentNullException("alias");
+        ArgumentNullException.ThrowIfNull(alias);
 
-        if (field == null)
-            throw new ArgumentNullException("field");
+        ArgumentNullException.ThrowIfNull(field);
 
         return query.Select(alias.NameDot + field);
     }
@@ -152,14 +146,11 @@ public static class EntitySqlQueryExtensions
     /// </remarks>
     public static SqlQuery Select(this SqlQuery query, IAlias alias, IField field, string columnName)
     {
-        if (alias == null)
-            throw new ArgumentNullException("alias");
+        ArgumentNullException.ThrowIfNull(alias);
 
-        if (field == null)
-            throw new ArgumentNullException("field");
+        ArgumentNullException.ThrowIfNull(field);
 
-        if (columnName == null)
-            throw new ArgumentNullException("columnName");
+        ArgumentNullException.ThrowIfNull(columnName);
 
         return query.Select(alias.NameDot + SqlSyntax.AutoBracket(field.Name, query.Dialect()), columnName);
     }
@@ -179,8 +170,7 @@ public static class EntitySqlQueryExtensions
     /// <exception cref="ArgumentNullException">fields</exception>
     public static SqlQuery Select(this SqlQuery query, params IField[] fields)
     {
-        if (fields == null)
-            throw new ArgumentNullException("fields");
+        ArgumentNullException.ThrowIfNull(fields);
 
         foreach (IField field in fields)
             Select(query, field);
@@ -209,8 +199,7 @@ public static class EntitySqlQueryExtensions
         if (string.IsNullOrEmpty(expression))
             throw new ArgumentNullException("field");
 
-        if (intoField == null)
-            throw new ArgumentNullException("alias");
+        ArgumentNullException.ThrowIfNull(intoField);
 
         new SqlQuery.Column(query, expression, intoField.ColumnAlias, intoField);
         return query;
@@ -226,8 +215,7 @@ public static class EntitySqlQueryExtensions
     /// <exception cref="ArgumentNullException">field</exception>
     public static SqlQuery OrderBy(this SqlQuery query, IField field, bool desc = false)
     {
-        if (field == null)
-            throw new ArgumentNullException("field");
+        ArgumentNullException.ThrowIfNull(field);
 
         return query.OrderBy(field.Expression, desc);
     }
@@ -241,8 +229,7 @@ public static class EntitySqlQueryExtensions
     /// <exception cref="ArgumentNullException">fields</exception>
     public static SqlQuery OrderBy(this SqlQuery query, params IField[] fields)
     {
-        if (fields == null)
-            throw new ArgumentNullException("fields");
+        ArgumentNullException.ThrowIfNull(fields);
 
         foreach (IField field in fields)
             OrderBy(query, field);
@@ -259,8 +246,7 @@ public static class EntitySqlQueryExtensions
     /// <exception cref="ArgumentNullException">field</exception>
     public static SqlQuery GroupBy(this SqlQuery query, IField field)
     {
-        if (field == null)
-            throw new ArgumentNullException("field");
+        ArgumentNullException.ThrowIfNull(field);
 
         return query.GroupBy(field.Expression);
     }
@@ -274,8 +260,7 @@ public static class EntitySqlQueryExtensions
     /// <exception cref="ArgumentNullException">fields</exception>
     public static SqlQuery GroupBy(this SqlQuery query, params IField[] fields)
     {
-        if (fields == null)
-            throw new ArgumentNullException("fields");
+        ArgumentNullException.ThrowIfNull(fields);
 
         foreach (IField f in fields)
             GroupBy(query, f);

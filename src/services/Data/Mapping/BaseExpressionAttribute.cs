@@ -1,4 +1,4 @@
-﻿
+
 namespace Serenity.Data.Mapping;
 
 /// <summary>
@@ -54,8 +54,7 @@ public abstract class BaseExpressionAttribute : Attribute
     /// <exception cref="ArgumentNullException">Dialect is null</exception>
     public static string ToString(object expression, ISqlDialect dialect)
     {
-        if (dialect is null)
-            throw new ArgumentNullException(nameof(dialect));
+        ArgumentNullException.ThrowIfNull(dialect);
 
         if (expression is null)
             return SqlConversions.Null;

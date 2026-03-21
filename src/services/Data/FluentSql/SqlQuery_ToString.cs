@@ -35,8 +35,7 @@ public partial class SqlQuery
     ///   Formatted SELECT statement</returns>
     public static string ToString(ISqlQuery query, ISqlDialect dialect)
     {
-        if (query is null)
-            throw new ArgumentNullException(nameof(query));
+        ArgumentNullException.ThrowIfNull(query);
 
         if (dialect is ISqlQueryToString sqlQueryToString)
             return sqlQueryToString.ToString(query);

@@ -6,8 +6,7 @@ public static class ServiceAuthorizationExtensions
 {
     private static string GetPermissionFor(Type sourceType, params Type[] attributeTypes)
     {
-        if (sourceType == null)
-            throw new ArgumentNullException(nameof(sourceType));
+        ArgumentNullException.ThrowIfNull(sourceType);
 
         if (attributeTypes.IsEmptyOrNull())
             throw new ArgumentNullException(nameof(attributeTypes));

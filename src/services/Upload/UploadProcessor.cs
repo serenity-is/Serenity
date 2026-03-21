@@ -55,8 +55,7 @@ public class UploadProcessor(IUploadStorage storage, IExceptionLogger _ = null) 
     public bool ProcessStream(Stream fileContent, string extension, 
         ITextLocalizer localizer, IUploadOptions options = null)
     {
-        if (fileContent is null)
-            throw new ArgumentNullException(nameof(fileContent));
+        ArgumentNullException.ThrowIfNull(fileContent);
 
         options ??= new UploadOptions
         {

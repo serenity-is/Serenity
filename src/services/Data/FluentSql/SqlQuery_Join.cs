@@ -41,8 +41,7 @@ public partial class SqlQuery : QueryWithParams, IFilterableQuery, IGetExpressio
     /// <exception cref="InvalidOperationException">Another join with different expression is already in the query.</exception>
     public SqlQuery Join(Join join)
     {
-        if (join == null)
-            throw new ArgumentNullException("join");
+        ArgumentNullException.ThrowIfNull(join);
 
         var sb = new StringBuilder();
         JoinToString(join, sb, modifySelf: false);
@@ -86,8 +85,7 @@ public partial class SqlQuery : QueryWithParams, IFilterableQuery, IGetExpressio
     /// </exception>
     public SqlQuery LeftJoin(string toTable, IAlias alias, ICriteria onCriteria)
     {
-        if (alias == null)
-            throw new ArgumentNullException("alias");
+        ArgumentNullException.ThrowIfNull(alias);
 
         if (string.IsNullOrEmpty(toTable))
             throw new ArgumentNullException("alias.table");
@@ -113,8 +111,7 @@ public partial class SqlQuery : QueryWithParams, IFilterableQuery, IGetExpressio
     /// </exception>
     public SqlQuery LeftJoin(IAlias alias, ICriteria onCriteria)
     {
-        if (alias == null)
-            throw new ArgumentNullException("alias");
+        ArgumentNullException.ThrowIfNull(alias);
 
         if (string.IsNullOrEmpty(alias.Table))
             throw new ArgumentNullException("alias.table");
@@ -143,8 +140,7 @@ public partial class SqlQuery : QueryWithParams, IFilterableQuery, IGetExpressio
     /// </exception>
     public SqlQuery RightJoin(string toTable, IAlias alias, ICriteria onCriteria)
     {
-        if (alias == null)
-            throw new ArgumentNullException("alias");
+        ArgumentNullException.ThrowIfNull(alias);
 
         if (string.IsNullOrEmpty(toTable))
             throw new ArgumentNullException("alias.table");
@@ -172,8 +168,7 @@ public partial class SqlQuery : QueryWithParams, IFilterableQuery, IGetExpressio
     /// </exception>
     public SqlQuery RightJoin(IAlias alias, ICriteria onCriteria)
     {
-        if (alias == null)
-            throw new ArgumentNullException("alias");
+        ArgumentNullException.ThrowIfNull(alias);
 
         if (string.IsNullOrEmpty(alias.Table))
             throw new ArgumentNullException("alias.table");
@@ -201,8 +196,7 @@ public partial class SqlQuery : QueryWithParams, IFilterableQuery, IGetExpressio
     /// </exception>
     public SqlQuery InnerJoin(IAlias alias, ICriteria onCriteria)
     {
-        if (alias == null)
-            throw new ArgumentNullException("alias");
+        ArgumentNullException.ThrowIfNull(alias);
 
         if (string.IsNullOrEmpty(alias.Table))
             throw new ArgumentNullException("alias.table");
@@ -266,8 +260,7 @@ public partial class SqlQuery : QueryWithParams, IFilterableQuery, IGetExpressio
     /// <exception cref="ArgumentNullException">join is null</exception>
     public SqlQuery EnsureJoin(Join join)
     {
-        if (join == null)
-            throw new ArgumentNullException("join");
+        ArgumentNullException.ThrowIfNull(join);
 
         var joinAlias = join.Name;
         if (aliasExpressions != null && aliasExpressions.ContainsKey(joinAlias))

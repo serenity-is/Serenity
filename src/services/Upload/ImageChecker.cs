@@ -24,11 +24,9 @@ public class ImageChecker
     public ImageCheckResult CheckStream(Stream inputStream, IImageProcessor imageProcessor, bool returnImage,
         out object image, out ImageFormatInfo formatInfo, ILogger logger = null)
     {
-        if (inputStream is null)
-            throw new ArgumentNullException(nameof(inputStream));
+        ArgumentNullException.ThrowIfNull(inputStream);
 
-        if (imageProcessor is null)
-            throw new ArgumentNullException(nameof(imageProcessor));
+        ArgumentNullException.ThrowIfNull(imageProcessor);
 
         // store the start time of validation
         DateTime startTime = DateTime.Now;

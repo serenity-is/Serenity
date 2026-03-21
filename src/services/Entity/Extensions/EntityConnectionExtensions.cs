@@ -505,8 +505,7 @@ public static class EntityConnectionExtensions
     /// <exception cref="ArgumentNullException">row is null</exception>
     public static SqlInsert ToSqlInsert(this IRow row)
     {
-        if (row == null)
-            throw new ArgumentNullException("row");
+        ArgumentNullException.ThrowIfNull(row);
 
         var insert = new SqlInsert(row.Table);
 
@@ -527,8 +526,7 @@ public static class EntityConnectionExtensions
     /// <exception cref="ArgumentNullException">row is null</exception>
     public static SqlUpdate ToSqlUpdateById(this IIdRow row)
     {
-        if (row == null)
-            throw new ArgumentNullException("row");
+        ArgumentNullException.ThrowIfNull(row);
 
         var update = new SqlUpdate(row.Table);
 

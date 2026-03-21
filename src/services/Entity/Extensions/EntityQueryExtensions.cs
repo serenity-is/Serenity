@@ -1,4 +1,4 @@
-﻿namespace Serenity.Data;
+namespace Serenity.Data;
 
 /// <summary>
 ///   Extensions for objects implementing IDbWhere interface.</summary>
@@ -14,8 +14,7 @@ public static class EntityQueryExtensions
     ///   Object itself.</returns>
     public static T WhereEqual<T>(this T self, IRow row) where T : IFilterableQuery
     {
-        if (row == null)
-            throw new ArgumentNullException("row");
+        ArgumentNullException.ThrowIfNull(row);
         if (!row.TrackAssignments)
             throw new ArgumentException("row must be in TrackAssignments mode to determine modified fields.");
         foreach (var field in row.Fields)
@@ -33,8 +32,7 @@ public static class EntityQueryExtensions
     ///   Object itself.</returns>
     public static T Set<T>(this T self, IRow row, IField exclude = null) where T : ISetFieldByStatement
     {
-        if (row == null)
-            throw new ArgumentNullException("row");
+        ArgumentNullException.ThrowIfNull(row);
 
         if (!row.TrackAssignments)
             throw new ArgumentException("row must be in TrackAssignments mode to determine modified fields.");
@@ -56,11 +54,9 @@ public static class EntityQueryExtensions
     ///   Fields to be excluded (optional).</param>
     public static SqlQuery SelectTableFields(this SqlQuery query, IRow row, params Field[] exclude)
     {
-        if (query == null)
-            throw new ArgumentNullException("query");
+        ArgumentNullException.ThrowIfNull(query);
 
-        if (row == null)
-            throw new ArgumentNullException("row");
+        ArgumentNullException.ThrowIfNull(row);
 
         HashSet<Field> excludeFields =
             (exclude != null && exclude.Length > 0) ? new HashSet<Field>(exclude) : null;
@@ -91,11 +87,9 @@ public static class EntityQueryExtensions
     ///   Fields to be excluded (optional).</param>
     public static SqlQuery SelectForeignFields(this SqlQuery query, IRow row, params Field[] exclude)
     {
-        if (query == null)
-            throw new ArgumentNullException("query");
+        ArgumentNullException.ThrowIfNull(query);
 
-        if (row == null)
-            throw new ArgumentNullException("row");
+        ArgumentNullException.ThrowIfNull(row);
 
         HashSet<Field> excludeFields =
             (exclude != null && exclude.Length > 0) ? new HashSet<Field>(exclude) : null;
@@ -123,8 +117,7 @@ public static class EntityQueryExtensions
     ///   Query to select fields into (required).</param>
     public static SqlQuery SelectNonTableFields(this SqlQuery query)
     {
-        if (query == null)
-            throw new ArgumentNullException("query");
+        ArgumentNullException.ThrowIfNull(query);
 
         var ext = (ISqlQueryExtensible)query;
 
@@ -148,8 +141,7 @@ public static class EntityQueryExtensions
     ///   Fields to be excluded (optional).</param>
     public static SqlQuery SelectTableFields(this SqlQuery query, params Field[] exclude)
     {
-        if (query == null)
-            throw new ArgumentNullException("query");
+        ArgumentNullException.ThrowIfNull(query);
 
         var ext = (ISqlQueryExtensible)query;
 

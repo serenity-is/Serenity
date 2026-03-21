@@ -18,9 +18,9 @@ public class ColumnsScriptRegistration
     public static IEnumerable<ColumnsScript> RegisterColumnsScripts(IDynamicScriptManager scriptManager,
         ITypeSource typeSource, IPropertyItemProvider propertyProvider, IServiceProvider serviceProvider)
     {
-        if (scriptManager == null) throw new ArgumentNullException(nameof(scriptManager));
-        if (typeSource == null) throw new ArgumentNullException(nameof(typeSource));
-        if (serviceProvider == null) throw new ArgumentNullException(nameof(serviceProvider));
+        ArgumentNullException.ThrowIfNull(scriptManager);
+        ArgumentNullException.ThrowIfNull(typeSource);
+        ArgumentNullException.ThrowIfNull(serviceProvider);
 
         var scripts = new List<ColumnsScript>();
         foreach (var type in typeSource.GetTypesWithAttribute(typeof(ColumnsScriptAttribute)))

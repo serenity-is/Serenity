@@ -28,14 +28,11 @@ public class DefaultUploadValidator(IImageProcessor imageProcessor, ITextLocaliz
     public void ValidateFile(IUploadFileConstraints constraints, 
         Stream stream, string filename, out bool isImageExtension)
     {
-        if (constraints is null)
-            throw new ArgumentNullException(nameof(constraints));
+        ArgumentNullException.ThrowIfNull(constraints);
 
-        if (stream is null)
-            throw new ArgumentNullException(nameof(stream));
+        ArgumentNullException.ThrowIfNull(stream);
 
-        if (filename is null)
-            throw new ArgumentNullException(nameof(filename));
+        ArgumentNullException.ThrowIfNull(filename);
 
         isImageExtension = false;
         var fileExtension = Path.GetExtension(filename);
@@ -128,14 +125,11 @@ public class DefaultUploadValidator(IImageProcessor imageProcessor, ITextLocaliz
     public void ValidateImage(IUploadImageContrains constraints, Stream stream, 
         string filename, out object image)
     {
-        if (constraints is null)
-            throw new ArgumentNullException(nameof(constraints));
+        ArgumentNullException.ThrowIfNull(constraints);
 
-        if (stream is null)
-            throw new ArgumentNullException(nameof(stream));
+        ArgumentNullException.ThrowIfNull(stream);
 
-        if (filename is null)
-            throw new ArgumentNullException(nameof(filename));
+        ArgumentNullException.ThrowIfNull(filename);
 
         var fileExtension = Path.GetExtension(filename);
 

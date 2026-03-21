@@ -1,4 +1,4 @@
-﻿namespace Serenity.Data;
+namespace Serenity.Data;
 
 /// <summary>
 /// Unary criteria with one operand and operator
@@ -18,8 +18,7 @@ public class UnaryCriteria : BaseCriteria
     /// <exception cref="ArgumentOutOfRangeException">operator</exception>
     public UnaryCriteria(CriteriaOperator op, BaseCriteria operand)
     {
-        if (operand is null)
-            throw new ArgumentNullException("operand");
+        ArgumentNullException.ThrowIfNull(operand);
 
         if (op < CriteriaOperator.Paren || op > CriteriaOperator.Exists)
             throw new ArgumentOutOfRangeException("op");

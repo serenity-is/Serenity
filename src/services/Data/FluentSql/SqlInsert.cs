@@ -100,8 +100,7 @@ public class SqlInsert : QueryWithParams, ISetFieldByStatement
     ///   SqlInsert object itself.</returns>
     public SqlInsert SetTo(IField field, string value)
     {
-        if (field == null)
-            throw new ArgumentNullException("meta");
+        ArgumentNullException.ThrowIfNull(field);
 
         cachedQuery = null;
         return SetTo(field.Name, value);
@@ -175,8 +174,7 @@ public class SqlInsert : QueryWithParams, ISetFieldByStatement
         if (tableName == null || tableName.Length == 0)
             throw new ArgumentNullException(tableName);
 
-        if (nameValuePairs == null)
-            throw new ArgumentNullException("nameValuePairs");
+        ArgumentNullException.ThrowIfNull(nameValuePairs);
 
         if (nameValuePairs.Count % 2 != 0)
             throw new ArgumentOutOfRangeException("nameValuePairs");

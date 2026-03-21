@@ -1,4 +1,4 @@
-﻿namespace Serenity.Data;
+namespace Serenity.Data;
 
 /// <summary>
 ///   Contains static extension methods for Field objects.</summary>
@@ -93,8 +93,7 @@ public static class EntityFieldExtensions
     public static TField OfJoin<TField>(this TField field, Join join, string origin, FieldFlags extraFlags = FieldFlags.Internal)
         where TField : Field
     {
-        if (join == null)
-            throw new ArgumentNullException("join");
+        ArgumentNullException.ThrowIfNull(join);
 
         field.Expression = join.Name + "." + origin;
 

@@ -1,4 +1,4 @@
-﻿namespace Serenity.Services;
+namespace Serenity.Services;
 
 /// <summary>
 /// Contains helper methods for two level cache invalidation
@@ -26,8 +26,7 @@ public static class TwoLevelCacheInvalidationExtensions
     /// <exception cref="ArgumentNullException">cache is null</exception>
     public static void InvalidateOnCommit(this ITwoLevelCache cache, IUnitOfWork uow, string groupKey)
     {
-        if (cache is null)
-            throw new ArgumentNullException(nameof(cache));
+        ArgumentNullException.ThrowIfNull(cache);
 
         if (string.IsNullOrEmpty(groupKey))
             throw new ArgumentNullException(nameof(groupKey));
@@ -77,8 +76,7 @@ public static class TwoLevelCacheInvalidationExtensions
     /// <exception cref="ArgumentNullException">Cache is null</exception>
     public static void InvalidateOnCommit(this ITwoLevelCache cache, IUnitOfWork uow, RowFieldsBase fields)
     {
-        if (fields is null)
-            throw new ArgumentNullException(nameof(fields));
+        ArgumentNullException.ThrowIfNull(fields);
 
         InvalidateOnCommit(cache, uow, fields.GenerationKey);
 
@@ -98,8 +96,7 @@ public static class TwoLevelCacheInvalidationExtensions
     /// <exception cref="ArgumentNullException">Cache is null</exception>
     public static void InvalidateOnCommit(this ITwoLevelCache cache, IUnitOfWork uow, IRow row)
     {
-        if (row is null)
-            throw new ArgumentNullException(nameof(row));
+        ArgumentNullException.ThrowIfNull(row);
 
         InvalidateOnCommit(cache, uow, row.GetFields().GenerationKey);
         ProcessTwoLevelCachedAttribute(cache, uow, row.GetType());

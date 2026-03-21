@@ -1,4 +1,4 @@
-﻿namespace Serenity.Data;
+namespace Serenity.Data;
 
 /// <summary>
 /// Contains connection string extensions
@@ -13,8 +13,7 @@ public static class ConnectionStringsExtensions
     /// <returns>Connection string with key, or throws an ArgumentOutOfRangeException</returns>
     public static IConnectionString Get(this IConnectionStrings connectionStrings, string connectionKey)
     {
-        if (connectionStrings == null)
-            throw new ArgumentNullException(nameof(connectionStrings));
+        ArgumentNullException.ThrowIfNull(connectionStrings);
 
         var connectionString = connectionStrings.TryGetConnectionString(connectionKey) ?? throw new ArgumentOutOfRangeException(nameof(connectionKey));
         return connectionString;

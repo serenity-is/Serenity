@@ -84,8 +84,7 @@ public class SqlUpdate : QueryWithParams, ISetFieldByStatement, IFilterableQuery
     ///   SqlUpdate object itself.</returns>
     public SqlUpdate SetTo(IField field, string value)
     {
-        if (field == null)
-            throw new ArgumentNullException("field");
+        ArgumentNullException.ThrowIfNull(field);
         return SetTo(field.Name, value);
     }
 
@@ -128,8 +127,7 @@ public class SqlUpdate : QueryWithParams, ISetFieldByStatement, IFilterableQuery
     ///   SqlUpdate object itself.</returns>
     public SqlUpdate Inc(IField field, int value)
     {
-        if (field == null)
-            throw new ArgumentNullException("field");
+        ArgumentNullException.ThrowIfNull(field);
 
         return Inc(field.Name, value);
     }
@@ -282,8 +280,7 @@ public class SqlUpdate : QueryWithParams, ISetFieldByStatement, IFilterableQuery
         if (tableName == null || tableName.Length == 0)
             throw new ArgumentNullException(tableName);
 
-        if (nameValuePairs == null)
-            throw new ArgumentNullException("nameValuePairs");
+        ArgumentNullException.ThrowIfNull(nameValuePairs);
 
         if (nameValuePairs.Count % 2 != 0)
             throw new ArgumentOutOfRangeException("nameValuePairs");

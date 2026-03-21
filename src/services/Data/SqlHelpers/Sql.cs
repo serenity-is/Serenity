@@ -1,4 +1,4 @@
-﻿namespace Serenity.Data;
+namespace Serenity.Data;
 
 /// <summary>
 /// Contains SQL expression generation helpers
@@ -27,8 +27,7 @@ public static partial class Sql
     /// <exception cref="ArgumentNullException">field is null or empty</exception>
     public static string Sum(IField field)
     {
-        if (field == null)
-            throw new ArgumentNullException("field");
+        ArgumentNullException.ThrowIfNull(field);
 
         return "SUM(" + field.Expression + ")";
     }
@@ -54,8 +53,7 @@ public static partial class Sql
     /// <exception cref="ArgumentNullException">field is null or empty</exception>
     public static string Count(IField field)
     {
-        if (field == null)
-            throw new ArgumentNullException("field");
+        ArgumentNullException.ThrowIfNull(field);
         return "COUNT(" + field.Expression + ")";
     }
 
@@ -166,8 +164,7 @@ public static partial class Sql
     /// <exception cref="ArgumentNullException">field is null or empty</exception>
     public static string Min(IField field)
     {
-        if (field == null)
-            throw new ArgumentNullException("field");
+        ArgumentNullException.ThrowIfNull(field);
 
         return "MIN(" + field.Expression + ")";
     }
@@ -210,8 +207,7 @@ public static partial class Sql
     /// <exception cref="ArgumentNullException">field is null or empty</exception>
     public static string Max(IField field)
     {
-        if (field == null)
-            throw new ArgumentNullException("field");
+        ArgumentNullException.ThrowIfNull(field);
 
         return "MAX(" + field.Expression + ")";
     }
@@ -268,8 +264,7 @@ public static partial class Sql
     /// <exception cref="ArgumentNullException">field is null or empty</exception>
     public static string Avg(IField field)
     {
-        if (field == null)
-            throw new ArgumentNullException("field");
+        ArgumentNullException.ThrowIfNull(field);
 
         return "AVG(" + field.Expression + ")";
     }

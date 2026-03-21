@@ -32,8 +32,7 @@ public partial class DefaultPropertyItemProvider(IServiceProvider provider, ITyp
     /// <exception cref="InvalidProgramException">CheckNames is true and there is name mismatch</exception>
     public IEnumerable<PropertyItem> GetPropertyItemsFor(Type type, Func<PropertyInfo, bool> predicate)
     {
-        if (type == null)
-            throw new ArgumentNullException("type");
+        ArgumentNullException.ThrowIfNull(type);
 
         var list = new List<PropertyItem>();
 

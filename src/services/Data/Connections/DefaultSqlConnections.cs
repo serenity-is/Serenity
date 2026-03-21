@@ -1,4 +1,4 @@
-﻿using Microsoft.Extensions.Logging;
+using Microsoft.Extensions.Logging;
 using System.Data.Common;
 
 namespace Serenity.Data;
@@ -39,11 +39,9 @@ public class DefaultSqlConnections(IConnectionStrings connectionStrings, IConnec
     /// <returns>A new <see cref="IDbConnection"/> object.</returns>
     protected virtual IDbConnection CreateConnection(string connectionString, string providerName, ISqlDialect dialect)
     {
-        if (providerName == null)
-            throw new ArgumentNullException(nameof(providerName));
+        ArgumentNullException.ThrowIfNull(providerName);
 
-        if (connectionString == null)
-            throw new ArgumentNullException(nameof(connectionString));
+        ArgumentNullException.ThrowIfNull(connectionString);
 
         var factory = DbProviderFactories.GetFactory(providerName);
         var connection = factory.CreateConnection();

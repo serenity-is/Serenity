@@ -22,11 +22,9 @@ public class BinaryCriteria : BaseCriteria
     /// <exception cref="ArgumentOutOfRangeException">Operator is not a binary one.</exception>
     public BinaryCriteria(BaseCriteria left, CriteriaOperator op, BaseCriteria right)
     {
-        if (left is null)
-            throw new ArgumentNullException("left");
+        ArgumentNullException.ThrowIfNull(left);
 
-        if (right is null)
-            throw new ArgumentNullException("right");
+        ArgumentNullException.ThrowIfNull(right);
 
         if (op < CriteriaOperator.AND || op > CriteriaOperator.NotLike)
             throw new ArgumentOutOfRangeException("op");

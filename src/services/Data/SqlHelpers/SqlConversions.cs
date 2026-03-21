@@ -196,8 +196,7 @@ public static class SqlConversions
     /// <returns>Translated query.</returns>
     public static string Translate(string commandText, ISqlDialect dialect)
     {
-        if (dialect is null)
-            throw new ArgumentNullException(nameof(dialect));
+        ArgumentNullException.ThrowIfNull(dialect);
 
         commandText = DatabaseCaretReferences.Replace(commandText);
 
@@ -222,8 +221,7 @@ public static class SqlConversions
     /// <returns>Translated query.</returns>
     public static string Translate(IQueryWithParams query, IDbConnection connection)
     {
-        if (query == null)
-            throw new ArgumentNullException(nameof(query));
+        ArgumentNullException.ThrowIfNull(query);
 
         return Translate(query.ToString(), connection.GetDialect());
     }

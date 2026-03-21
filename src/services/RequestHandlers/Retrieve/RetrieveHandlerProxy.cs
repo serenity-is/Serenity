@@ -1,4 +1,4 @@
-﻿namespace Serenity.Services;
+namespace Serenity.Services;
 
 internal class RetrieveHandlerProxy<TRow, TRetrieveRequest, TRetrieveResponse>
     : IRetrieveHandler<TRow, TRetrieveRequest, TRetrieveResponse>
@@ -10,8 +10,7 @@ internal class RetrieveHandlerProxy<TRow, TRetrieveRequest, TRetrieveResponse>
 
     public RetrieveHandlerProxy(IDefaultHandlerFactory factory)
     {
-        if (factory is null)
-            throw new ArgumentNullException(nameof(factory));
+        ArgumentNullException.ThrowIfNull(factory);
 
         handler = (IRetrieveHandler<TRow, TRetrieveRequest, TRetrieveResponse>) factory.CreateHandler<IRetrieveRequestProcessor>(typeof(TRow));
     }

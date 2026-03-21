@@ -21,8 +21,7 @@ public static class EntityLocalTexts
     {
         var provider = registry ?? throw new ArgumentNullException(nameof(registry));
 
-        if (rowInstances == null)
-            throw new ArgumentNullException(nameof(rowInstances));
+        ArgumentNullException.ThrowIfNull(rowInstances);
 
         void addText(string text, string key)
         {

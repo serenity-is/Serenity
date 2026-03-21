@@ -1,4 +1,4 @@
-﻿namespace Serenity.Data;
+namespace Serenity.Data;
 
 /// <summary>
 /// Determines the connection key used for a class
@@ -24,8 +24,7 @@ public class ConnectionKeyAttribute : Attribute
     /// <exception cref="ArgumentOutOfRangeException">sourceType has no ConnectionKey attribute.</exception>
     public ConnectionKeyAttribute(Type sourceType)
     {
-        if (sourceType == null)
-            throw new ArgumentNullException("sourceType");
+        ArgumentNullException.ThrowIfNull(sourceType);
 
         var attr = sourceType.GetCustomAttribute<ConnectionKeyAttribute>(true) ?? throw new ArgumentOutOfRangeException("sourceType",
                 "ConnectionKeyAttribute is created with source type " + sourceType.Name +

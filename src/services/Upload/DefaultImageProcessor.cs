@@ -18,8 +18,7 @@ public class DefaultImageProcessor : IImageProcessor
     /// <inheritdoc/>
     public (int width, int height) GetImageSize(object imageObj)
     {
-        if (imageObj == null)
-            throw new ArgumentNullException(nameof(imageObj));
+        ArgumentNullException.ThrowIfNull(imageObj);
 
         if (imageObj is not Image image)
             throw new ArgumentOutOfRangeException(nameof(imageObj));
@@ -51,17 +50,14 @@ public class DefaultImageProcessor : IImageProcessor
     /// <inheritdoc/>
     public void Save(object imageObj, Stream target, string mimeType, ImageEncoderParams encoderParams)
     {
-        if (imageObj == null)
-            throw new ArgumentNullException(nameof(imageObj));
+        ArgumentNullException.ThrowIfNull(imageObj);
 
         if (imageObj is not Image image)
             throw new ArgumentOutOfRangeException(nameof(imageObj));
 
-        if (target is null)
-            throw new ArgumentNullException(nameof(target));
+        ArgumentNullException.ThrowIfNull(target);
 
-        if (mimeType is null)
-            throw new ArgumentNullException(nameof(mimeType));
+        ArgumentNullException.ThrowIfNull(mimeType);
 
         IImageEncoder encoder = mimeType switch
         {
@@ -78,8 +74,7 @@ public class DefaultImageProcessor : IImageProcessor
     /// <inheritdoc/>
     public object Scale(object imageObj, int scaleWidth, int scaleHeight, ImageScaleMode mode, string backgroundColor, bool inplace)
     {
-        if (imageObj == null)
-            throw new ArgumentNullException(nameof(imageObj));
+        ArgumentNullException.ThrowIfNull(imageObj);
 
         if (imageObj is not Image image)
             throw new ArgumentOutOfRangeException(nameof(imageObj));
