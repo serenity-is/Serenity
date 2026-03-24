@@ -18,6 +18,7 @@
     "moduleResolution": "Bundler",
     "newLine": "lf",
     "noImplicitOverride": true,
+    "noUncheckedSideEffectImports": false,
     "preserveConstEnums": true,
     "sourceMap": true,
     "strict": false,

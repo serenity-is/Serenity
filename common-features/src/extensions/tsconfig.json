@@ -2,7 +2,8 @@
   "extends": "./tsconfig.base.json",
   "compilerOptions": {
     "emitDeclarationOnly": true,
-    "outDir": "./out"
+    "outDir": "./out",
+    "rootDir": "."
   },
   "exclude": [
     "Modules/index.ts"

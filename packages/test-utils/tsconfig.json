@@ -8,7 +8,8 @@
       "ES2022",
       "dom"
     ],
-    "outDir": "./out"
+    "outDir": "./out",
+    "rootDir": "."
   },
   "include": [
     "."
