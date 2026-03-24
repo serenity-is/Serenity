@@ -22,6 +22,7 @@
     "noImplicitOverride": true,
     "outDir": "../out",
     "skipLibCheck": true,
+    "strict": false,
     "stripInternal": true,
     "sourceMap": true,
     "target": "ES2022",

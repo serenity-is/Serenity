@@ -19,6 +19,7 @@
       "isolatedModules": true,
       "sourceMap": false,
       "skipLibCheck": false,
+      "strict": false,
       "outDir": "./dist",
       "target": "ESNext",
       "useDefineForClassFields": false

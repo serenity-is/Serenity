@@ -4,13 +4,13 @@
     "composite": false,
     "emitDeclarationOnly": false,
     "noEmit": true,
+    "noImplicitAny": false,
+    "noImplicitOverride": false,
     "rootDir": "./src",
     "tsBuildInfoFile": "./out/tsconfig.test.tsbuildinfo",
     "types": [
       "vitest/globals"
-    ],
-    "noImplicitAny": false,
-    "noImplicitOverride": false
+    ]
   },
   "include": [
     "./src/base/globals.d.ts",

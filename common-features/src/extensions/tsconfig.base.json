@@ -20,6 +20,7 @@
     "noImplicitOverride": true,
     "preserveConstEnums": true,
     "sourceMap": true,
+    "strict": false,
     "target": "ES2022",
     "types": [
     ],
