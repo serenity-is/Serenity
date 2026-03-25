@@ -4,6 +4,7 @@
     "composite": false,
     "noEmit": false,
     "emitDeclarationOnly": true,
+    "rootDir": ".",
     "skipLibCheck": false
   }
 }
