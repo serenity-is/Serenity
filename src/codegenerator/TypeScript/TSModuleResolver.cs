@@ -39,11 +39,7 @@ public partial class TSModuleResolver
     {
         this.fileSystem = fileSystem ?? throw new ArgumentNullException(nameof(fileSystem));
 
-        tsBasePath = tsConfig is null || tsConfig.CompilerOptions?.BaseUrl is null ||
-            tsConfig.CompilerOptions?.BaseUrl == "." || tsConfig.CompilerOptions?.BaseUrl == "./" ? tsConfigDir :
-            fileSystem.Combine(tsConfigDir, PathHelper.ToPath(tsConfig.CompilerOptions?.BaseUrl));
-
-        tsBasePath = PathHelper.ToPath(tsBasePath);
+        tsBasePath = PathHelper.ToPath(tsConfigDir);
 
         paths = tsConfig?.CompilerOptions?.Paths ?? [];
     }

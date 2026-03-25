@@ -74,7 +74,6 @@ export class B1 {
         {
             CompilerOptions = new()
             {
-                BaseUrl = ".",
                 Paths = new()
                 {
                     ["my/*"] = [ "./zzz/*" ]
@@ -110,7 +109,6 @@ export class B1 {
         {
             CompilerOptions = new()
             {
-                BaseUrl = ".",
                 Paths = new()
                 {
                     ["my/*"] = [ "./nnn", "./zzz/*" ]

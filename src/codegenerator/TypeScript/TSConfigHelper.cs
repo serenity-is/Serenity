@@ -95,23 +95,40 @@ public static class TSConfigHelper
             config.Exclude ??= baseConfig.Exclude;
             config.Files ??= baseConfig.Files;
             config.Include ??= baseConfig.Include;
-            config.RootDir ??= baseConfig.RootDir;
 
             if (baseConfig.CompilerOptions != null)
             {
                 config.CompilerOptions ??= new();
-                config.CompilerOptions.BaseUrl ??= baseConfig.CompilerOptions.BaseUrl;
                 config.CompilerOptions.Module ??= baseConfig.CompilerOptions.Module;
                 config.CompilerOptions.Paths ??= baseConfig.CompilerOptions.Paths;
+                config.CompilerOptions.RootDir ??= baseConfig.CompilerOptions.RootDir;
                 config.CompilerOptions.Types ??= baseConfig.CompilerOptions.Types;
 
+                var relativePath = fileSystem.GetRelativePath(fileSystem.GetDirectoryName(path), baseDir);
+                relativePath = PathHelper.ToUrl(relativePath) + "/";
+
+                string getRelative(string path)
+                {
+                    if (string.IsNullOrEmpty(path))
+                        return path;
+
+                    if (path.StartsWith("${configDir}", StringComparison.Ordinal))
+                        return "." + path[("${configDir}".Length)..];
+
+                    return relativePath + path;
+                }
+
+                // typeroots and rootdir are relative to the base config files
                 if (config.CompilerOptions.TypeRoots is null &&
                     baseConfig.CompilerOptions.TypeRoots is not null)
                 {
-                    // typeroots are relative to the base config files
-                    var relativePath = fileSystem.GetRelativePath(fileSystem.GetDirectoryName(path), baseDir);
-                    relativePath = PathHelper.ToUrl(relativePath);
-                    config.CompilerOptions.TypeRoots = baseConfig.CompilerOptions.TypeRoots.Select(x => relativePath + "/" + x).ToArray();
+                    config.CompilerOptions.TypeRoots = [.. baseConfig.CompilerOptions.TypeRoots.Select(getRelative)];
+                }
+
+                if (config.CompilerOptions.RootDir is null &&
+                    baseConfig.CompilerOptions.RootDir is not null)
+                {
+                    config.CompilerOptions.RootDir = getRelative(baseConfig.CompilerOptions.RootDir);
                 }
             }
 
