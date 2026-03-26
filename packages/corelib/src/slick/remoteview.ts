@@ -1,4 +1,4 @@
-import { convertCompatFormatter, EventEmitter, Group, GroupItemMetadataProvider, GroupTotals, IGroupTotals, ISleekGrid, ItemMetadata, type FormatterContext } from "@serenity-is/sleekgrid";
+import { convertCompatFormatter, EventEmitter, Group, GroupItemMetadataProvider, GroupTotals, IGroupTotals, ISleekGrid, ItemMetadata, type FormatterContext, type NonDataRow } from "@serenity-is/sleekgrid";
 import { ListRequest, ListResponse, PagerTexts, serviceCall, ServiceOptions, ServiceResponse } from "../base";
 import { AggregateFormatting } from "./aggregateformatting";
 import { IAggregator } from "./aggregators";
@@ -35,6 +35,11 @@ export interface ArgsRowsOrCountChanged extends ArgsRemoteView {
     rowsChanged: boolean;
 }
 
+export interface ArgsRecalcRows extends ArgsRemoteView {
+    oldRows: any[];
+    newRows: any[];
+}
+
 /**
  * A data view that supports remote data loading, sorting, filtering, grouping, and paging.
  * Extends the functionality of SleekGrid's DataView with server-side data operations.
@@ -46,7 +51,7 @@ export class RemoteView<TItem = any> implements IRemoteView<TItem> {
     private errorMessage: string = null;
     private filter: RemoteViewFilter<TItem>;
     private filterCache: any[] = [];
-    private filteredItems: any[] = [];
+    private filteredItems: TItem[] = [];
     private grandAggregators: IAggregator[];
     private grandTotals: IGroupTotals;
     private groupingInfos: GroupInfo<TItem>[] = [];
@@ -54,7 +59,7 @@ export class RemoteView<TItem = any> implements IRemoteView<TItem> {
     private groups: Group<TItem>[] = [];
     private idProperty: string;
     private idxById: Record<any, number> = {};
-    private itemMetadataCallback?: (p1?: TItem, p2?: number) => any;
+    private itemMetadataCallback?: (item?: TItem, row?: number) => ItemMetadata<TItem>;
     private items: TItem[] = [];
     private loading: AbortController | boolean = false;
     private localSort: boolean;
@@ -89,6 +94,7 @@ export class RemoteView<TItem = any> implements IRemoteView<TItem> {
     public readonly onGroupCollapsed = new EventEmitter<ArgsGroupToggle>();
     public readonly onGroupExpanded = new EventEmitter<ArgsGroupToggle>();
     public readonly onPagingInfoChanged = new EventEmitter<ArgsPagingInfo>();
+    public readonly onRecalcRows = new EventEmitter<ArgsRecalcRows>();
     public readonly onRowCountChanged = new EventEmitter<ArgsRowCountChanged>();
     public readonly onRowsChanged = new EventEmitter<ArgsRowsChanged>();
     public readonly onRowsOrCountChanged = new EventEmitter<ArgsRowsOrCountChanged>();
@@ -318,7 +324,7 @@ export class RemoteView<TItem = any> implements IRemoteView<TItem> {
         this.sort(this.sortComparer, this.sortAsc);
     }
 
-    public getFilteredItems(): any[] {
+    public getFilteredItems(): TItem[] {
         return this.filteredItems;
     }
 
@@ -809,8 +815,8 @@ export class RemoteView<TItem = any> implements IRemoteView<TItem> {
         return groupedRows;
     }
 
-    private batchFilter(items: any[]) {
-        const retval: any[] = [];
+    private batchFilter(items: TItem[]) {
+        const retval: TItem[] = [];
         let idx = 0;
 
         for (let i = 0, ii = items.length; i < ii; i++) {
@@ -822,9 +828,9 @@ export class RemoteView<TItem = any> implements IRemoteView<TItem> {
         return retval;
     }
 
-    private batchFilterWithCaching(items: any[], cache: any) {
-        const retval: any[] = [];
-        let idx = 0, item: any;
+    private batchFilterWithCaching(items: TItem[], cache: any) {
+        const retval: TItem[] = [];
+        let idx = 0, item: TItem;
 
         for (let i = 0, ii = items.length; i < ii; i++) {
             item = items[i];
@@ -839,7 +845,7 @@ export class RemoteView<TItem = any> implements IRemoteView<TItem> {
         return retval;
     }
 
-    private getFilteredAndPagedItems(items: any[]) {
+    private getFilteredAndPagedItems(items: TItem[]) {
         if (this.filter) {
             if (this.refreshHints?.isFilterNarrowing) {
                 this.filteredItems = this.batchFilter(this.filteredItems);
@@ -859,8 +865,8 @@ export class RemoteView<TItem = any> implements IRemoteView<TItem> {
         return { totalRows: this.filteredItems.length, rows: this.filteredItems };
     }
 
-    private getRowDiffs(rows: any[], newRows: any[]): number[] {
-        let item: any, r: any, eitherIsNonData: boolean, diff: number[] = [];
+    private getRowDiffs(rows: (TItem | Group | GroupTotals)[], newRows: (TItem | Group | GroupTotals)[]): number[] {
+        let item: TItem | Group | GroupTotals, r: TItem | Group | GroupTotals, eitherIsNonData: boolean, diff: number[] = [];
         let from = 0, to = newRows.length;
 
         if (this.refreshHints?.ignoreDiffsBefore) {
@@ -880,16 +886,16 @@ export class RemoteView<TItem = any> implements IRemoteView<TItem> {
                 item = newRows[i];
                 r = rows[i];
 
-                if ((this.groupingInfos.length && (eitherIsNonData = (item.__nonDataRow) || (r.__nonDataRow)) &&
-                    item.__group !== r.__group ||
-                    item.__group && !item.equals(r))
+                if ((this.groupingInfos.length && (eitherIsNonData = (item as NonDataRow).__nonDataRow || (r as NonDataRow).__nonDataRow) &&
+                    (item as Group).__group !== (r as Group).__group ||
+                    (item as Group).__group && !(item as Group).equals(r as Group))
                     || (eitherIsNonData &&
                         // no good way to compare totals since they are arbitrary DTOs
                         // deep object comparison is pretty expensive
                         // always considering them 'dirty' seems easier for the time being
-                        (item.__groupTotals || r.__groupTotals))
-                    || item[this.idProperty] != r[this.idProperty]
-                    || (this.updated && this.updated[item[this.idProperty]])
+                        ((item as GroupTotals).__groupTotals || (r as GroupTotals).__groupTotals))
+                    || (item as any)[this.idProperty] != (r as any)[this.idProperty]
+                    || (this.updated && this.updated[(item as any)[this.idProperty]])
                 ) {
                     diff[diff.length] = i;
                 }
@@ -898,7 +904,7 @@ export class RemoteView<TItem = any> implements IRemoteView<TItem> {
         return diff;
     }
 
-    private recalc(_items: any[]): number[] {
+    private recalc(items: TItem[]): number[] {
         this.rowsById = null;
 
         if (this.refreshHints?.isFilterNarrowing != this.prevRefreshHints?.isFilterNarrowing ||
@@ -906,7 +912,7 @@ export class RemoteView<TItem = any> implements IRemoteView<TItem> {
             this.filterCache = [];
         }
 
-        const filteredItems = this.getFilteredAndPagedItems(_items);
+        const filteredItems = this.getFilteredAndPagedItems(items);
         this.totalRows = filteredItems.totalRows;
         let newRows = filteredItems.rows;
 
@@ -920,7 +926,13 @@ export class RemoteView<TItem = any> implements IRemoteView<TItem> {
             }
         }
 
-        const diff = this.getRowDiffs(this.rows, newRows);
+        let oldRows = this.rows || [];
+        const e = { dataView: this, oldRows: oldRows, newRows: newRows };
+        this.onRecalcRows.notify(e, null, this);
+        oldRows = e.oldRows || oldRows;
+        newRows = e.newRows || newRows;
+
+        const diff = this.getRowDiffs(oldRows, newRows);
 
         this.rows = newRows;
 
@@ -1220,6 +1232,14 @@ export class RemoteView<TItem = any> implements IRemoteView<TItem> {
 
     public setGroupItemMetadataProvider(value: GroupItemMetadataProvider) {
         this.groupItemMetadataProvider = value;
+    }
+
+    public getItemMetadataCallback(): (item: TItem, row: number) => ItemMetadata<TItem> | undefined {
+        return this.itemMetadataCallback;
+    }
+
+    public setItemMetadataCallback(value: (item: TItem, row: number) => ItemMetadata<TItem>) {
+        this.itemMetadataCallback = value;
     }
 
     /** @deprecated Gets the ID property name, for compatibility */
