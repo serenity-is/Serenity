@@ -53,7 +53,7 @@ export interface ISleekGrid<TItem = any> extends CellNavigation, EditorHost, Gri
     canCellBeSelected(row: number, cell: number): boolean;
     clearTextSelection(): void;
     columnsResized(invalidate?: boolean): void;
-    commitCurrentEdit(): boolean;
+    commitCurrentEdit(opt?: { forceValueChange?: boolean }): boolean;
     destroy(): void;
     editActiveCell(editor?: EditorClass): void;
     flashCell(row: number, cell: number, speed?: number): void;

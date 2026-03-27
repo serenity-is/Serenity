@@ -3904,13 +3904,13 @@ export class SleekGrid<TItem = any> implements ISleekGrid<TItem> {
     //////////////////////////////////////////////////////////////////////////////////////////////
     // IEditor implementation for the editor lock
 
-    commitCurrentEdit(): boolean {
+    commitCurrentEdit(opt?: { forceValueChange?: boolean }): boolean {
         var item = this.getDataItem(this._activeRow);
         var column = this._cols[this._activeCell];
         var self = this;
 
         if (this._currentEditor) {
-            if (this._currentEditor.isValueChanged()) {
+            if (this._currentEditor.isValueChanged() || opt?.forceValueChange) {
                 var validationResults = this._currentEditor.validate();
 
                 if (validationResults.valid) {
