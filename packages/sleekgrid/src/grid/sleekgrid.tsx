@@ -3326,20 +3326,7 @@ export class SleekGrid<TItem = any> implements ISleekGrid<TItem> {
         this._activeCellNode = newCell;
 
         if (this._activeCellNode) {
-            var bcl = this._activeCellNode.getBoundingClientRect();
-
-            var rowOffset = Math.floor(this._activeCellNode.closest('.grid-canvas')?.getBoundingClientRect().top ?? 0 + document.body.scrollTop);
-            var isBottom = this._activeCellNode.closest('.grid-canvas.sg-bottom') != null;
-            const { frozenBottomFirst } = this._refs;
-            if (frozenBottomFirst != Infinity && isBottom) {
-                rowOffset -= (this._options.frozenBottom)
-                    ? Math.round(parsePx(getComputedStyle(this.getCanvasNode(0, 0)).height))
-                    : (this.getDataLength() - frozenBottomFirst) * this._options.rowHeight;
-            }
-
-            var cell = this.getCellFromPoint(bcl[this._options.rtl ? 'right' : 'left'] + document.body.scrollLeft, Math.ceil(bcl.top + document.body.scrollTop) - rowOffset);
-
-            this._activeRow = cell.row;
+            this._activeRow = this.getRowFromNode(this._activeCellNode.parentElement);
             this._activeCell = this._activePosX = this.getCellFromNode(this._activeCellNode);
 
             if (this._options.showCellSelection) {
