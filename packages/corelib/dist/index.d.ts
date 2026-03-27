@@ -3863,6 +3863,10 @@ export interface ArgsRowsOrCountChanged extends ArgsRemoteView {
 	rowCountChanged: boolean;
 	rowsChanged: boolean;
 }
+export interface ArgsRecalcRows extends ArgsRemoteView {
+	oldRows: any[];
+	newRows: any[];
+}
 /**
  * A data view that supports remote data loading, sorting, filtering, grouping, and paging.
  * Extends the functionality of SleekGrid's DataView with server-side data operations.
@@ -3915,6 +3919,7 @@ export declare class RemoteView<TItem = any> implements IRemoteView<TItem> {
 	readonly onGroupCollapsed: EventEmitter<ArgsGroupToggle, {}>;
 	readonly onGroupExpanded: EventEmitter<ArgsGroupToggle, {}>;
 	readonly onPagingInfoChanged: EventEmitter<ArgsPagingInfo, {}>;
+	readonly onRecalcRows: EventEmitter<ArgsRecalcRows, {}>;
 	readonly onRowCountChanged: EventEmitter<ArgsRowCountChanged, {}>;
 	readonly onRowsChanged: EventEmitter<ArgsRowsChanged, {}>;
 	readonly onRowsOrCountChanged: EventEmitter<ArgsRowsOrCountChanged, {}>;
@@ -3940,7 +3945,7 @@ export declare class RemoteView<TItem = any> implements IRemoteView<TItem> {
 	getLocalSort(): boolean;
 	setLocalSort(value: boolean): void;
 	reSort(): void;
-	getFilteredItems(): any[];
+	getFilteredItems(): TItem[];
 	getFilter(): RemoteViewFilter<TItem>;
 	setFilter(filterFn: RemoteViewFilter<TItem>): void;
 	getGrouping(): GroupInfo<TItem>[];
@@ -3981,7 +3986,7 @@ export declare class RemoteView<TItem = any> implements IRemoteView<TItem> {
 	getRows(): (TItem | Group<any> | GroupTotals<any>)[];
 	getLength(): number;
 	getItem(i: number): any;
-	getItemMetadata(row: number): any;
+	getItemMetadata(row: number): ItemMetadata<any>;
 	private expandCollapseAllGroups;
 	collapseAllGroups(level?: number): void;
 	expandAllGroups(level?: number): void;
@@ -4028,6 +4033,8 @@ export declare class RemoteView<TItem = any> implements IRemoteView<TItem> {
 	populateUnlock(): void;
 	getGroupItemMetadataProvider(): GroupItemMetadataProvider;
 	setGroupItemMetadataProvider(value: GroupItemMetadataProvider): void;
+	getItemMetadataCallback(): (item: TItem, row: number) => ItemMetadata<TItem> | undefined;
+	setItemMetadataCallback(value: (item: TItem, row: number) => ItemMetadata<TItem>): void;
 	/** @deprecated Gets the ID property name, for compatibility */
 	get idField(): string;
 	private formatGroupValue;
