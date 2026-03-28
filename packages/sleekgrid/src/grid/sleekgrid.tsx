@@ -3897,7 +3897,7 @@ export class SleekGrid<TItem = any> implements ISleekGrid<TItem> {
         var self = this;
 
         if (this._currentEditor) {
-            if (this._currentEditor.isValueChanged() || opt?.forceValueChange) {
+            if (this._currentEditor.isValueChanged({ commitEdit: true }) || opt?.forceValueChange) {
                 var validationResults = this._currentEditor.validate();
 
                 if (validationResults.valid) {

@@ -71,7 +71,7 @@ export interface Editor {
     destroy(): void;
     applyValue(item: any, value: any): void;
     focus(): void;
-    isValueChanged(): boolean;
+    isValueChanged(args: { commitEdit?: boolean }): boolean;
     keyCaptureList?: number[];
     loadValue(value: any): void;
     serializeValue(): any;
