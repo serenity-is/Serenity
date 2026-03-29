@@ -436,6 +436,7 @@ export declare class OrderColumns extends ColumnsBase<OrderRow> {
 	static readonly Fields: Readonly<Record<keyof OrderColumns, string>>;
 }
 export interface OrderDetailColumns {
+	DeleteRow: Column<OrderDetailRow>;
 	ProductName: Column<OrderDetailRow>;
 	UnitPrice: Column<OrderDetailRow>;
 	Quantity: Column<OrderDetailRow>;
@@ -501,6 +502,7 @@ export declare class OrderDetailsEditor<P = {}> extends GridEditorBase<OrderDeta
 	private _orderId;
 	get orderId(): number;
 	set orderId(value: number);
+	protected onClick(e: Event, row: number, cell: number): void;
 }
 export interface OrderForm {
 	CustomerID: CustomerEditor;

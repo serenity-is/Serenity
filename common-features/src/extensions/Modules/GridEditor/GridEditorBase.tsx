@@ -1,4 +1,4 @@
-import { DataChangeInfo, DialogType, EditorProps, EntityGrid, IGetEditValue, ISetEditValue, PropertyItem, SaveRequest, ServiceOptions, ServiceResponse, ToolButton, deepClone, getInstanceType, getTypeFullName, indexOf, serviceCall } from "@serenity-is/corelib";
+import { DataChangeInfo, DialogType, EditorProps, EntityGrid, Fluent, IGetEditValue, ISetEditValue, PropertyItem, SaveRequest, ServiceOptions, ServiceResponse, ToolButton, deepClone, getInstanceType, getTypeFullName, indexOf, serviceCall, type SaveResponse } from "@serenity-is/corelib";
 import { nsExtensions } from "../ServerTypes/Namespaces";
 import { GridEditorDialog } from "./GridEditorDialog";
 import { bindThis } from "@serenity-is/domwise";
@@ -59,16 +59,20 @@ export abstract class GridEditorBase<TEntity, P = {}> extends EntityGrid<TEntity
      * This is called from the editor dialog's save handler to save the entity.
      * @param opt Save options
      * @param callback An optional callback to call after the entity is saved, usually same with the opt.onSuccess
+     * Note that this is not called in connected mode to avoid double execution.
      */
-    protected async save(opt: ServiceOptions<any>, callback: (r: ServiceResponse) => void): Promise<void> {
+    protected async save(opt: ServiceOptions<any>, callback?: (r: ServiceResponse) => void): Promise<SaveResponse> {
         const request = opt.request as SaveRequest<TEntity>;
         let row = request.Entity;
-        let id = this.itemId(row);
+        let id = request.EntityId ?? this.itemId(row);
 
         if (this.connectedMode) {
             if (!(await this.validateEntity(row, request?.EntityId)))
                 return;
     
+            if (opt.service === void 0 && opt.url === void 0)
+                opt.service = id == null ? this.getCreateServiceMethod() : this.getUpdateServiceMethod();
+
             const response = await serviceCall(opt);
             id = response?.EntityId ?? id;
         }
@@ -101,15 +105,31 @@ export abstract class GridEditorBase<TEntity, P = {}> extends EntityGrid<TEntity
             entityId: id,
             entity: row
         } satisfies Partial<DataChangeInfo>);
+
+        return {
+            EntityId: id,
+        } satisfies SaveResponse;
+    }
+
+    protected getCreateServiceMethod() {
+        return this.getService() + '/Create';
+    }
+
+    protected getDeleteServiceMethod() {
+        return this.getService() + '/Delete';
+    }
+
+    protected getUpdateServiceMethod() {
+        return this.getService() + '/Update';
     }
 
     /**
      * This is called from the editor dialog's delete handler to delete the entity.
      * @param opt Delete service call options
      * @param callback An optional callback to call after the entity is deleted, usually same with the opt.onSuccess
-     * @returns 
+     * Note that this is not called in connected mode to avoid double execution.
      */
-    protected async delete(opt: ServiceOptions<any>, callback: (r: ServiceResponse) => void): Promise<void> {
+    protected async delete(opt: ServiceOptions<any>, callback?: (r: ServiceResponse) => void): Promise<void> {
         const id = opt?.request?.EntityId;
         const row = this.view.getItemById(id);
 
@@ -117,12 +137,10 @@ export abstract class GridEditorBase<TEntity, P = {}> extends EntityGrid<TEntity
             return;
 
         if (this.connectedMode) {
+            if (opt.service === void 0 && opt.url === void 0)
+                opt.service = this.getDeleteServiceMethod();
+
             await serviceCall(opt);
-            this.element.trigger("change", { 
-                operationType: "delete", 
-                entityId: id,
-                entity: row
-            } satisfies Partial<DataChangeInfo>);
         }
         else {
             callback?.({});
@@ -135,6 +153,9 @@ export abstract class GridEditorBase<TEntity, P = {}> extends EntityGrid<TEntity
         } satisfies Partial<DataChangeInfo>);
     }
 
+    /**
+     * Deletes the entity locally with the given id. If connected mode is on, this does nothing and returns true.
+     */
     protected deleteEntity(id: any): (boolean | Promise<boolean>) {
         if (!this.connectedMode)
             this.view.deleteItem(id);
@@ -373,5 +394,5 @@ export abstract class GridEditorBase<TEntity, P = {}> extends EntityGrid<TEntity
         }
 
         return dlg as GridEditorDialog<TEntity>;
-    }    
+    }
 }

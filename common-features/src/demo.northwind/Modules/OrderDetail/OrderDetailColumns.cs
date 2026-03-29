@@ -4,6 +4,8 @@ namespace Serenity.Demo.Northwind.Forms;
 [BasedOnRow(typeof(OrderDetailRow), CheckNames = true)]
 public class OrderDetailColumns
 {
+    [DeleteRowActionFormatter, DisplayName(""), FixedWidth(24), ReadOnly(true), Unbound]
+    public object DeleteRow { get; set; }
     [EditLink, Width(200)]
     public string ProductName { get; set; }
     [Width(100)]

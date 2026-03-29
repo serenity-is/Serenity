@@ -6,6 +6,7 @@ export * from "./BulkActions/BulkServiceAction";
 export * from "./ExportImport/ExcelExportHelper";
 export * from "./ExportImport/JsPdfAutoTable";
 export * from "./ExportImport/PdfExportHelper";
+export * from "./Formatters/DeleteRowActionFormatter";
 export * from "./Formatters/EnumSelectFormatter";
 export * from "./Formatters/SingleLineTextFormatter";
 export * from "./GridEditor/GridEditorBase";

@@ -1,4 +1,4 @@
-import { alertDialog, toId } from "@serenity-is/corelib";
+import { alertDialog, confirmDialog, EntityDialogTexts, Fluent, toId } from "@serenity-is/corelib";
 import { GridEditorBase } from "@serenity-is/extensions";
 import { OrderDetailColumns, OrderDetailRow, OrderDetailService, ProductRow } from "../ServerTypes/Demo";
 import { nsDemoNorthwind } from "../ServerTypes/Namespaces";
@@ -52,5 +52,26 @@ export class OrderDetailsEditor<P = {}> extends GridEditorBase<OrderDetailRow, P
             this.connectedMode = this._orderId != null;
             this.refresh();
         }
+    }
+
+    protected override onClick(e: Event, row: number, cell: number) {
+        super.onClick(e, row, cell);
+
+        if (Fluent.isDefaultPrevented(e))
+            return;
+
+        const action = (e.target as HTMLElement).closest(".inline-action")?.getAttribute("data-action");
+        if (!action)
+            return;
+
+        e.preventDefault();
+        confirmDialog(EntityDialogTexts.DeleteConfirmation, async () => {
+            this.delete({
+                request: {
+                    EntityId: this.itemId(this.itemAt(row))
+                },
+                onSuccess: () => this.connectedMode && this.view.populate()
+            });
+        });
     }
 }

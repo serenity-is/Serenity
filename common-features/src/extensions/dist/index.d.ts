@@ -483,6 +483,10 @@ export declare namespace PdfExportHelper {
 	function exportToPdf(options: PdfExportOptions): void;
 	function createToolButton(options: PdfExportOptions): ToolButton;
 }
+export declare class DeleteRowActionFormatter implements Formatter {
+	static [Symbol.typeInfo]: import("@serenity-is/corelib").FormatterTypeInfo<"Serenity.Extensions.">;
+	format(ctx: FormatterContext): FormatterResult;
+}
 export declare class EnumSelectFormatter implements Formatter {
 	readonly props: {
 		enumKey?: string;
@@ -553,15 +557,22 @@ export declare abstract class GridEditorBase<TEntity, P = {}> extends EntityGrid
 	 * This is called from the editor dialog's save handler to save the entity.
 	 * @param opt Save options
 	 * @param callback An optional callback to call after the entity is saved, usually same with the opt.onSuccess
+	 * Note that this is not called in connected mode to avoid double execution.
 	 */
-	protected save(opt: ServiceOptions<any>, callback: (r: ServiceResponse) => void): Promise<void>;
+	protected save(opt: ServiceOptions<any>, callback?: (r: ServiceResponse) => void): Promise<SaveResponse>;
+	protected getCreateServiceMethod(): string;
+	protected getDeleteServiceMethod(): string;
+	protected getUpdateServiceMethod(): string;
 	/**
 	 * This is called from the editor dialog's delete handler to delete the entity.
 	 * @param opt Delete service call options
 	 * @param callback An optional callback to call after the entity is deleted, usually same with the opt.onSuccess
-	 * @returns
+	 * Note that this is not called in connected mode to avoid double execution.
 	 */
-	protected delete(opt: ServiceOptions<any>, callback: (r: ServiceResponse) => void): Promise<void>;
+	protected delete(opt: ServiceOptions<any>, callback?: (r: ServiceResponse) => void): Promise<void>;
+	/**
+	 * Deletes the entity locally with the given id. If connected mode is on, this does nothing and returns true.
+	 */
 	protected deleteEntity(id: any): (boolean | Promise<boolean>);
 	/**
 	 * Called before saving an entity from the dialog. If the function returns false,
