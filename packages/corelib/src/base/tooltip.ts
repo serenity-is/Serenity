@@ -43,6 +43,9 @@ export class Tooltip {
         if (!instance)
             return;
         instance[isBS3() ? "destroy" : "dispose"]?.();
+        // workaround for https://github.com/twbs/bootstrap/issues/37474
+        instance._activeTrigger = {};
+        instance._element = document.createElement('noscript'); // placeholder with no behavior
     }
 
     delayedDispose(delay: number = 5000) {
