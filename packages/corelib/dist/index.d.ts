@@ -5735,6 +5735,7 @@ export declare class PropertyGrid<P extends PropertyGridOptions = PropertyGridOp
 	load(source: any): void;
 	static saveFieldValue(target: any, fieldElement: PropertyFieldElement, canModify?: boolean): void;
 	save(target?: any): any;
+	commitEdits(): Promise<boolean>;
 	get value(): any;
 	set value(val: any);
 	static canModifyItem(item: PropertyItem, mode?: PropertyGridMode): boolean;
@@ -5878,6 +5879,7 @@ export declare class EntityDialog<TItem, P = {}> extends BaseDialog<P> implement
 	protected getPropertyItemsData(): PropertyItemsData;
 	protected getPropertyItemsDataAsync(): Promise<PropertyItemsData>;
 	protected getPropertyGridOptions(): PropertyGridOptions;
+	protected commitEdits(): Promise<boolean>;
 	protected validateBeforeSave(): boolean;
 	protected getCreateServiceMethod(): string;
 	protected getUpdateServiceMethod(): string;

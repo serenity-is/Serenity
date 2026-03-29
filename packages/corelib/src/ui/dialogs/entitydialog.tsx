@@ -494,6 +494,14 @@ export class EntityDialog<TItem, P = {}> extends BaseDialog<P> implements IEditD
         };
     }
 
+    protected async commitEdits(): Promise<boolean> {
+        if (this.propertyGrid && (await this.propertyGrid.commitEdits()) === false) {
+            return false;
+        }
+
+        return true;
+    }
+
     protected validateBeforeSave(): boolean {
         return true;
     }
@@ -573,13 +581,21 @@ export class EntityDialog<TItem, P = {}> extends BaseDialog<P> implements IEditD
     protected override getToolbarButtons(): ToolButton[] {
         return [
             saveAndCloseToolButton({
-                onClick: () => this.save(() => this.dialogClose("save-and-close"), "save-and-close"),
+                onClick: async () => {
+                    if (!(await this.commitEdits()))
+                        return;
+                    this.save(() => this.dialogClose("save-and-close"), "save-and-close")
+                },
                 visible: () => !this.isDeleted() && !this.isViewMode(),
                 disabled: () => !this.hasSavePermission() || this.readOnly,
                 ref: el => this.saveAndCloseButton = Fluent(el)
             }),
             applyChangesToolButton({
-                onClick: () => this.save(response => this.loadById(this.isEditMode() ? (response?.EntityId ?? this.entityId) : response?.EntityId), "apply-changes"),
+                onClick: async () => {
+                    if (!(await this.commitEdits()))
+                        return;
+                    this.save(response => this.loadById(this.isEditMode() ? (response?.EntityId ?? this.entityId) : response?.EntityId), "apply-changes")
+                },
                 visible: () => !this.isDeleted() && !this.isViewMode(),
                 disabled: () => !this.hasSavePermission() || this.readOnly,
                 ref: el => this.applyChangesButton = Fluent(el)

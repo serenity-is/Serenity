@@ -463,6 +463,18 @@ export class PropertyGrid<P extends PropertyGridOptions = PropertyGridOptions> e
         return target;
     }
 
+    async commitEdits(): Promise<boolean> {
+        for (let fieldElement of this.fieldElements) {
+            if (fieldElement.editorWidget &&
+                typeof (fieldElement.editorWidget as any).commitEdits === "function") {
+                const result = await (fieldElement.editorWidget as any).commitEdits();
+                if (result === false)
+                    return false;
+            }
+        }
+        return true;
+    }
+
     public get value(): any {
         return this.save();
     }
