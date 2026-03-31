@@ -24,7 +24,7 @@ export namespace GridUtils {
     export function addIncludeDeletedToggle(toolDiv: HTMLElement | ArrayLike<HTMLElement>,
         view: IRemoteView<any>, hint?: string, initial?: boolean): void {
 
-        var includeDeleted = false;
+        var includeDeleted = initial ?? false;
         var oldSubmit = view.onSubmit;
         view.onSubmit = function (v) {
             v.params.IncludeDeleted = includeDeleted;
