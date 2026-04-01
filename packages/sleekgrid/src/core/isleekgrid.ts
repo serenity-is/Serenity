@@ -49,6 +49,7 @@ export interface ISleekGrid<TItem = any> extends CellNavigation, EditorHost, Gri
     init(): void;
     addCellCssStyles(key: string, hash: CellStylesHash): void;
     autosizeColumns(): void;
+    cancelCurrentEdit(): boolean;
     canCellBeActive(row: number, cell: number): boolean;
     canCellBeSelected(row: number, cell: number): boolean;
     clearTextSelection(): void;

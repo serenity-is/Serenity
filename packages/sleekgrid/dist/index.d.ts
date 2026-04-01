@@ -955,6 +955,7 @@ export interface ISleekGrid<TItem = any> extends CellNavigation, EditorHost, Gri
 	init(): void;
 	addCellCssStyles(key: string, hash: CellStylesHash): void;
 	autosizeColumns(): void;
+	cancelCurrentEdit(): boolean;
 	canCellBeActive(row: number, cell: number): boolean;
 	canCellBeSelected(row: number, cell: number): boolean;
 	clearTextSelection(): void;
@@ -1253,7 +1254,7 @@ export interface Column<TItem = any> {
 }
 export declare const columnDefaults: Partial<Column>;
 export interface ColumnMetadata<TItem = any> {
-	colspan: number | "*";
+	colspan?: number | "*";
 	cssClasses?: string;
 	focusable?: boolean;
 	editor?: EditorClass;
@@ -1742,7 +1743,7 @@ export declare class SleekGrid<TItem = any> implements ISleekGrid<TItem> {
 	commitCurrentEdit(opt?: {
 		forceValueChange?: boolean;
 	}): boolean;
-	private cancelCurrentEdit;
+	cancelCurrentEdit(): boolean;
 	private rowsToRanges;
 	getSelectedRows(): number[];
 	setSelectedRows(rows: number[]): void;

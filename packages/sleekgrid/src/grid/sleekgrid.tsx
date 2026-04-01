@@ -3970,7 +3970,7 @@ export class SleekGrid<TItem = any> implements ISleekGrid<TItem> {
         return true;
     }
 
-    private cancelCurrentEdit() {
+    cancelCurrentEdit() {
         this.makeActiveCellNormal();
         return true;
     }

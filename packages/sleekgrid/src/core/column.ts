@@ -53,7 +53,7 @@ export const columnDefaults: Partial<Column> = {
 };
 
 export interface ColumnMetadata<TItem = any> {
-    colspan: number | '*';
+    colspan?: number | '*';
     cssClasses?: string;
     focusable?: boolean;
     editor?: EditorClass;
