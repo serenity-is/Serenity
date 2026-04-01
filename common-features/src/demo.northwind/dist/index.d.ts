@@ -436,7 +436,7 @@ export declare class OrderColumns extends ColumnsBase<OrderRow> {
 	static readonly Fields: Readonly<Record<keyof OrderColumns, string>>;
 }
 export interface OrderDetailColumns {
-	DeleteRow: Column<OrderDetailRow>;
+	RowActions: Column<OrderDetailRow>;
 	ProductName: Column<OrderDetailRow>;
 	UnitPrice: Column<OrderDetailRow>;
 	Quantity: Column<OrderDetailRow>;

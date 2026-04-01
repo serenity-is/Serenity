@@ -3986,7 +3986,7 @@ export declare class RemoteView<TItem = any> implements IRemoteView<TItem> {
 	getRows(): (TItem | Group<any> | GroupTotals<any>)[];
 	getLength(): number;
 	getItem(i: number): any;
-	getItemMetadata(row: number): ItemMetadata<any>;
+	getItemMetadata(row: number): ItemMetadata<TItem>;
 	private expandCollapseAllGroups;
 	collapseAllGroups(level?: number): void;
 	expandAllGroups(level?: number): void;
@@ -4182,6 +4182,10 @@ export interface IRemoteView<TItem = any> extends IDataView<TItem> {
 	 */
 	getItemByIdx(i: number): any;
 	/**
+	 * Gets a callback function to retrieve item metadata. This can be used to dynamically assign CSS classes or other properties to items.
+	 */
+	getItemMetadataCallback(): (item: TItem, row: number) => ItemMetadata<TItem> | undefined;
+	/**
 	 * Gets all items in the view.
 	 * @returns Array of all items
 	 */
@@ -4235,6 +4239,8 @@ export interface IRemoteView<TItem = any> extends IDataView<TItem> {
 	readonly onPagingInfoChanged: EventEmitter<ArgsPagingInfo>;
 	/** Callback invoked to process data received from the server */
 	onProcessData: RemoteViewProcessCallback<TItem>;
+	/** Event fired when rows need to be recalculated */
+	readonly onRecalcRows: EventEmitter<ArgsRecalcRows>;
 	/** Event fired when the row count changes */
 	readonly onRowCountChanged: EventEmitter<ArgsRowCountChanged>;
 	/** Event fired when rows or count change */
@@ -4290,6 +4296,10 @@ export interface IRemoteView<TItem = any> extends IDataView<TItem> {
 	 * @param newIdProperty Optional new ID property name, or boolean to reset
 	 */
 	setItems(data: any[], newIdProperty?: string | boolean): void;
+	/**
+	 * Sets a callback function to retrieve item metadata. This can be used to dynamically assign CSS classes or other properties to items.
+	 */
+	setItemMetadataCallback(value: (item: TItem, row: number) => ItemMetadata<TItem>): void;
 	/**
 	 * Sets whether to use local sorting. When enabled, sorting is done client-side.
 	 * @param value Whether to enable local sorting
