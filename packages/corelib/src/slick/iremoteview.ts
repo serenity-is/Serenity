@@ -1,6 +1,6 @@
-import { EventEmitter, Group, GroupItemMetadataProvider, GroupTotals, IDataView, ISleekGrid } from "@serenity-is/sleekgrid";
+import { EventEmitter, Group, GroupItemMetadataProvider, GroupTotals, IDataView, ISleekGrid, type ItemMetadata } from "@serenity-is/sleekgrid";
 import { ListResponse, ServiceOptions } from "../base";
-import type { ArgsRemoteView, ArgsGroupToggle, ArgsPagingInfo, ArgsRowCountChanged, ArgsRowsOrCountChanged } from "./remoteview";
+import type { ArgsRecalcRows, ArgsRemoteView, ArgsGroupToggle, ArgsPagingInfo, ArgsRowCountChanged, ArgsRowsOrCountChanged } from "./remoteview";
 import { GroupInfo, PagingOptions, SummaryOptions } from "./slicktypes";
 
 /**
@@ -107,6 +107,10 @@ export interface IRemoteView<TItem = any> extends IDataView<TItem> {
      */
     getItemByIdx(i: number): any;
     /**
+     * Gets a callback function to retrieve item metadata. This can be used to dynamically assign CSS classes or other properties to items.
+     */
+    getItemMetadataCallback(): (item: TItem, row: number) => ItemMetadata<TItem> | undefined;
+    /**
      * Gets all items in the view.
      * @returns Array of all items
      */
@@ -160,6 +164,8 @@ export interface IRemoteView<TItem = any> extends IDataView<TItem> {
     readonly onPagingInfoChanged: EventEmitter<ArgsPagingInfo>;
     /** Callback invoked to process data received from the server */
     onProcessData: RemoteViewProcessCallback<TItem>;
+    /** Event fired when rows need to be recalculated */
+    readonly onRecalcRows: EventEmitter<ArgsRecalcRows>;
     /** Event fired when the row count changes */
     readonly onRowCountChanged: EventEmitter<ArgsRowCountChanged>;
     /** Event fired when rows or count change */
@@ -215,6 +221,10 @@ export interface IRemoteView<TItem = any> extends IDataView<TItem> {
      * @param newIdProperty Optional new ID property name, or boolean to reset
      */
     setItems(data: any[], newIdProperty?: string | boolean): void;
+    /**
+     * Sets a callback function to retrieve item metadata. This can be used to dynamically assign CSS classes or other properties to items.
+     */
+    setItemMetadataCallback(value: (item: TItem, row: number) => ItemMetadata<TItem>): void;
     /**
      * Sets whether to use local sorting. When enabled, sorting is done client-side.
      * @param value Whether to enable local sorting
@@ -315,3 +325,4 @@ export type RemoteViewFilter<TItem> = (item: TItem, view: IRemoteView<TItem>) =>
  * @returns The processed data
  */
 export type RemoteViewProcessCallback<TItem> = (data: ListResponse<TItem>, view: IRemoteView<TItem>) => ListResponse<TItem>;
+
