@@ -1,4 +1,6 @@
+using System.Threading.Tasks;
 using Xunit.Sdk;
+using Xunit.v3;
 using CallType = Serenity.TestUtils.MockGeneratorConsole.CallType;
 
 namespace Serenity.CodeGenerator;
@@ -13,17 +15,23 @@ public partial class CliTests
 
     private class ForAllCommandsAttribute : DataAttribute
     {
-        public override IEnumerable<object[]> GetData(MethodInfo testMethod)
+        public override ValueTask<IReadOnlyCollection<ITheoryDataRow>> GetData(MethodInfo testMethod, DisposalTracker disposalTracker)
         {
-            return [
-                [Cli.CommandKeys.Generate],
-                [Cli.CommandKeys.Mvc],
-                [Cli.CommandKeys.ServerTypings],
-                [Cli.CommandKeys.ClientTypes],
-                [Cli.CommandKeys.MvcAndClientTypes],
-                [Cli.CommandKeys.Restore],
-                [Cli.CommandKeys.Transform]
-            ];
+            return new(new TheoryData<string>
+            {
+                Cli.CommandKeys.Generate,
+                Cli.CommandKeys.Mvc,
+                Cli.CommandKeys.ServerTypings,
+                Cli.CommandKeys.ClientTypes,
+                Cli.CommandKeys.MvcAndClientTypes,
+                Cli.CommandKeys.Restore,
+                Cli.CommandKeys.Transform
+            });
+        }
+
+        public override bool SupportsDiscoveryEnumeration()
+        {
+            return true;
         }
     }
 

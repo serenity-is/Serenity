@@ -2,7 +2,9 @@ using Serenity.JsonConverters;
 using System.IO;
 using System.Text.Json;
 using System.Text.Json.Serialization;
+using System.Threading.Tasks;
 using Xunit.Sdk;
+using Xunit.v3;
 
 namespace Serenity.TypeScript;
 
@@ -82,19 +84,36 @@ public partial class TypeScriptTests
     // above to the full folder of cases
     private class TestCaseDataAttribute : DataAttribute
     {
-        public override IEnumerable<object[]> GetData(MethodInfo testMethod)
+        public override ValueTask<IReadOnlyCollection<ITheoryDataRow>> GetData(MethodInfo testMethod, DisposalTracker disposalTracker)
         {
+            var data = new TheoryData<string>();
             if (!Directory.Exists(TypeScriptCasesFolder))
-                return [[DummyCaseFile]];
+            {
+                data.Add(DummyCaseFile);
+                return new(data);
+            }
 
             var fullPath = Path.GetFullPath(TypeScriptCasesFolder);
             var cases = new DirectoryInfo(TypeScriptCasesFolder).GetFiles("*" + TestCaseExtension, SearchOption.AllDirectories)
                 .OrderBy(x => x.Length)
-                .Select(x => new object[] { Path.ChangeExtension(Path.GetRelativePath(fullPath, x.FullName), null) })
-                .Where(x => !TypeScriptCasesToSkip.Contains(x[0] as string))
+                .Select(x => Path.ChangeExtension(Path.GetRelativePath(fullPath, x.FullName), null))
+                .Where(x => !TypeScriptCasesToSkip.Contains(x))
                 .ToArray();
 
-            return cases.Length == 0 ? [[DummyCaseFile]] : cases;
+            if (cases.Length == 0)
+                data.Add(DummyCaseFile);
+            else
+            {
+                foreach (var testCase in cases)
+                    data.Add(testCase);
+            }
+
+            return new(data);
+        }
+
+        public override bool SupportsDiscoveryEnumeration()
+        {
+            return true;
         }
     }
 
