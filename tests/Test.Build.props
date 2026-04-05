@@ -5,7 +5,7 @@
     <DefaultItemExcludes>$(DefaultItemExcludes);TestResults\**</DefaultItemExcludes>
     <AccelerateBuildsInVisualStudio>true</AccelerateBuildsInVisualStudio>
     <UseArtifactsOutput>true</UseArtifactsOutput>
-    <ReferenceSelenium>false</ReferenceSelenium>
+    <ReferencePlaywright>false</ReferencePlaywright>
     <ReferenceTestSdk>true</ReferenceTestSdk>
     <UsingSerenity>true</UsingSerenity>
   </PropertyGroup>
@@ -20,6 +20,7 @@
     <Using Include="System.Security.Claims" />
     <Using Include="System.Text" />
     <Using Include="System.Text.RegularExpressions" />
+    <Using Include="System.Threading.Tasks" />
     <Using Include="Xunit" />
   </ItemGroup>
   <ItemGroup Condition="'$(UsingSerenity)' != 'false'">
@@ -51,8 +52,8 @@
       <PrivateAssets>all</PrivateAssets>
     </PackageReference>
   </ItemGroup>
-  <ItemGroup Condition="'$(ReferenceSelenium)' != 'false'">
-    <PackageReference Include="Selenium.WebDriver" Version="4.41.0" />
-    <Using Include="OpenQA.Selenium" />
+  <ItemGroup Condition="'$(ReferencePlaywright)' != 'false'">
+    <PackageReference Include="Microsoft.Playwright" Version="1.58.0" />
+    <Using Include="Microsoft.Playwright" />
   </ItemGroup>
 </Project>
