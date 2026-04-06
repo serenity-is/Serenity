@@ -48,7 +48,7 @@ public partial class TSConfigHelperTests
             .OrderBy(x => x, StringComparer.Ordinal)
             .ToArray();
 
-        var files = TSConfigHelper.ListFiles(fileSystem, tsconfig, out _)
+        var files = TSConfigHelper.ListFiles(fileSystem, tsconfig, out _, TestContext.Current.CancellationToken)
             .OrderBy(x => x, StringComparer.Ordinal);
 
         Assert.Equal(expectedFiles, files);
@@ -94,7 +94,8 @@ public partial class TSConfigHelperTests
             .OrderBy(x => x, StringComparer.Ordinal)
             .ToArray();
 
-        var files = TSConfigHelper.ListFiles(fileSystem, fileSystem.Combine(currentDirectory, "tsconfig.json"), out _)
+        var files = TSConfigHelper.ListFiles(fileSystem, fileSystem.Combine(currentDirectory, "tsconfig.json"), out _,
+            TestContext.Current.CancellationToken)
             .OrderBy(x => x, StringComparer.Ordinal);
 
         Assert.Equal(expectedFiles, files);
