@@ -8,6 +8,7 @@
     "esbuild": "catalog:serenity",
     "jsdom": "catalog:serenity",
     "typescript": "catalog:serenity",
+    "vite": "catalog:serenity",
     "vitest": "catalog:serenity"
   },
   "pnpm": {
