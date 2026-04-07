@@ -1,3 +1,21 @@
+## 10.2.3 (2026-04-07)
+
+### Features
+- GridEditController now support inline row adding. The add row can be placed at the top, bottom and optinally be a fixed/sticky row.
+- Switched to TypeScript 6, which has several breaking changes. Most notably, you should set `"strict": false` in your tsconfig.json as `strict` is `true` by default now.
+- Support `${configDir}` variable in `tsconfig.json` files which is useful for `extends` and config file relative paths.
+- Add `RemoteView.onRecalcRows` event to intercept recalc method before getting the row diffs, e.g. to inject some special rows like special / fixed location ones which are ignored in filtering / grouping calculations. 
+- Make it possible to get/set RemoteView.itemMetadataCallback.
+- Add a DeleteRowActionFormatter (Serenity.Extensions) and use it in OrderDetailsEditor to add a delete row action column, add getCreateServiceMethod, getDeleteServiceMethod, getUpdateServiceMethod methods to the GridEditorBase.
+- Add an async commitEdits method to property grid so that any pending edits can be asynchrously committed before the dialog itself is saved, useful for inline grid editors etc.
+- Bootstrap tooltip workaround for https://github.com/twbs/bootstrap/issues/37474
+- Switched to xUnit v3 for unit testing
+- Switched to Playwright from Selenium for browser functional tests
+- Added Recaptcha urls to CSP directives (StartSharp)
+
+### Bugfixes
+- Use initial value passed to the addIncludeDeletedToggle callback
+
 ## 10.2.2 (2026-03-10)
 
 ### Features
