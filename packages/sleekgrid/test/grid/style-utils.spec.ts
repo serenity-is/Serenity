@@ -164,6 +164,7 @@ describe('absBox', () => {
 
         const parentElement = document.createElement('div');
         parentElement.appendChild(element);
+        parentElement.style.overflowY = 'hidden';
         parentElement["_scrollTop"] = 21;
         parentElement["_scrollHeight"] = 20;
 
@@ -194,6 +195,7 @@ describe('absBox', () => {
 
         const parentElement = document.createElement('div');
         parentElement.appendChild(element);
+        parentElement.style.overflowY = 'hidden';
         parentElement["_scrollTop"] = 21;
         parentElement["_scrollHeight"] = 20;
 
@@ -224,6 +226,7 @@ describe('absBox', () => {
 
         const parentElement = document.createElement('div');
         parentElement.appendChild(element);
+        parentElement.style.overflowX = 'hidden';
         parentElement["_scrollLeft"] = 21;
         parentElement["_scrollWidth"] = 20;
 
@@ -253,6 +256,7 @@ describe('absBox', () => {
         element["_offsetWidth"] = 10;
 
         const parentElement = document.createElement('div');
+        parentElement.style.overflowX = 'hidden';
         parentElement.appendChild(element);
         parentElement["_scrollLeft"] = 21;
         parentElement["_scrollWidth"] = 20;
@@ -268,6 +272,7 @@ describe('absBox', () => {
         element["_offsetWidth"] = 10;
 
         const parentElement = document.createElement('div');
+        parentElement.style.overflowX = 'hidden';
         parentElement.appendChild(element);
         parentElement["_scrollLeft"] = 21;
         parentElement["_clientWidth"] = 100;
