@@ -63,10 +63,18 @@ export abstract class GridEditorBase<TEntity, P = {}> extends EntityGrid<TEntity
      */
     protected async save(opt: ServiceOptions<any>, callback?: (r: ServiceResponse) => void): Promise<SaveResponse> {
         const request = opt.request as SaveRequest<TEntity>;
+        let id = request.EntityId ?? this.itemId(request.Entity);
         let row = request.Entity;
-        let id = request.EntityId ?? this.itemId(row);
 
         if (this.connectedMode) {
+            if (id != null) {
+                const existing = this.view.getItemById(id);
+                if (existing) {
+                    row = Object.assign({} as TEntity, existing, row);
+                }
+            }
+
+            // ignore any changes made to the entity in connected mode
             if (!(await this.validateEntity(row, request?.EntityId)))
                 return;
     
@@ -83,6 +91,12 @@ export abstract class GridEditorBase<TEntity, P = {}> extends EntityGrid<TEntity
             if (id == null) {
                 (row as any)[this.getIdProperty()] = this.getNextId();
             }
+            else {
+                const existing = this.view.getItemById(id);
+                if (existing) {
+                    row = Object.assign({} as TEntity, existing, row);
+                }
+            }                
 
             if (!(await this.validateEntity(row, request?.EntityId)))
                 return;
@@ -93,7 +107,7 @@ export abstract class GridEditorBase<TEntity, P = {}> extends EntityGrid<TEntity
             }
             else {
                 const index = indexOf(items, x => this.itemId(x) === id);
-                items[index] = row = Object.assign({} as TEntity, deepClone(items[index]), row);
+                items[index] = row;
             }
 
             callback?.({});
