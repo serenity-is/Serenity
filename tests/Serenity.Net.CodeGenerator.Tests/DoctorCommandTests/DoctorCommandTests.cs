@@ -79,7 +79,7 @@ public partial class DoctorCommandTests
 
         public Dictionary<string, string> NpmDevDependencies { get; set; } = new()
         {
-            ["@serenity-is/tsbuild"] = "10.2.1"
+            ["@serenity-is/tsbuild"] = "10.2.4"
         };
 
         public string SergenExtends { get; set; } = "defaults@9.0.0";
