@@ -1,3 +1,13 @@
+## 10.2.4 (2026-04-07)
+
+### Features
+
+- Pass the full entity, e.g. merged with existing item to the validateEntity method, instead of only the request.Entity fields which might only include changed fields in inline editing mode.
+- Update modified css classes after cancelling row adding (StartSharp)
+
+### Bugfixes
+- GridEditController.deleteHandler receives a wrong defaultHandler argument
+
 ## 10.2.3 (2026-04-07)
 
 ### Features
