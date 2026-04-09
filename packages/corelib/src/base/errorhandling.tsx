@@ -45,32 +45,53 @@ export namespace ErrorHandling {
      * ScriptInit.ts for Serenity applications so that developers
      * can notice an error without having to check the browser console.
      */
-    export function runtimeErrorHandler(message: string, filename?: string,
+    export function runtimeErrorHandler(messageOrEvent: string | ErrorEvent, filename?: string,
         lineno?: number, colno?: number, error?: Error) {
         try {
             if (!ErrorHandling.isDevelopmentMode())
                 return;
-            const errorInfo = error?.stack ?? error?.toString();
 
-            const msg = <div>
-                <p>Message: {message}</p>
-                <p>File: {filename}</p>
-                <p>Line: {lineno}, Column: {colno}</p>
-                {errorInfo && <p>{errorInfo}</p>}
-            </div>
+            const isEvent = messageOrEvent != null && "preventDefault" in (messageOrEvent as any);
+            error = isEvent ? (messageOrEvent as ErrorEvent).error : error;
 
-            window.setTimeout(function () {
-                try {
-                    notifyError(msg, "SCRIPT ERROR! See browser console (F12) for details.", {
-                        timeOut: 15000
-                    });
-                }
-                catch {
-                }
-            }, 0);
+            reportScriptError({
+                error,
+                filename: isEvent ? (messageOrEvent as ErrorEvent).filename : filename,
+                lineno: isEvent ? (messageOrEvent as ErrorEvent).lineno : lineno,
+                colno: isEvent ? (messageOrEvent as ErrorEvent).colno : colno,
+                message: isEvent ? (messageOrEvent as ErrorEvent).message : messageOrEvent as string
+            });
         }
         catch {
         }
+    }
+
+    function reportScriptError({ error, filename, lineno, colno, message, unhandledRejection }: {
+        error: any,
+        message?: string,
+        filename?: string,
+        lineno?: number,
+        colno?: number,
+        unhandledRejection?: boolean
+    }) {
+        const errorInfo = error?.stack ?? error?.toString();
+
+        const msg = <div>
+            <p>Message: {message ?? error?.message ?? error?.toString() ?? "Unknown error"}</p>
+            {filename != null && <p>File: {filename ?? error?.filename ?? "Unknown file"}</p>}
+            {(lineno ?? colno) != null && <p>Line: {lineno}, Column: {colno}</p>}
+            {errorInfo && <p style={{ maxHeight: "180px", overflowY: "auto", whiteSpace: "pre-wrap" }}>{errorInfo}</p>}
+        </div>
+
+        window.setTimeout(function () {
+            try {
+                notifyError(msg, (unhandledRejection ? "UNCAUGHT ERROR! (in promise)!" : "SCRIPT ERROR!") + " See browser console (F12) for details.", {
+                    timeOut: 15000
+                });
+            }
+            catch {
+            }
+        }, 0);
     }
 
     /** 
@@ -99,17 +120,28 @@ export namespace ErrorHandling {
      */
     export function unhandledRejectionHandler(err: PromiseRejectionEvent) {
         try {
-            if (!err || !err.reason)
+            if (!err || !err.reason) {
                 return;
+            }
 
             const reason = err.reason;
-            if (reason.origin == "serviceCall") {
+            if (reason?.origin == "serviceCall") {
                 err.preventDefault();
 
                 if (!reason.silent &&
                     (reason.kind ?? "exception") === "exception") {
                     console.error(err);
                 }
+
+                return;
+            }
+
+            if (isDevelopmentMode()) {
+                reportScriptError({
+                    error: reason instanceof Error ? reason : null,
+                    message: reason instanceof Error ? reason.message : (typeof reason === "string" ? reason : null),
+                    unhandledRejection: true
+                });
             }
         }
         catch {
