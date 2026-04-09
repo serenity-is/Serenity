@@ -51,7 +51,7 @@ export namespace ErrorHandling {
             if (!ErrorHandling.isDevelopmentMode())
                 return;
 
-            const isEvent = messageOrEvent != null && "preventDefault" in (messageOrEvent as any);
+            const isEvent = typeof messageOrEvent === "object" && "preventDefault" in (messageOrEvent as any);
             error = isEvent ? (messageOrEvent as ErrorEvent).error : error;
 
             reportScriptError({
