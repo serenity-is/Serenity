@@ -975,7 +975,7 @@ export declare namespace ErrorHandling {
 	 * ScriptInit.ts for Serenity applications so that developers
 	 * can notice an error without having to check the browser console.
 	 */
-	function runtimeErrorHandler(message: string, filename?: string, lineno?: number, colno?: number, error?: Error): void;
+	function runtimeErrorHandler(messageOrEvent: string | ErrorEvent, filename?: string, lineno?: number, colno?: number, error?: Error): void;
 	/**
 	 * Determines if the current environment is development mode.
 	 * The runtimeErrorHandler (window.onerror) shows error notifications only
