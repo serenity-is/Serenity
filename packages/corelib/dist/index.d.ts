@@ -2484,6 +2484,7 @@ declare namespace webTexts {
 			const IncludeDeletedToggle: string;
 			const NewButton: string;
 			const RefreshButton: string;
+			const RowEditActionsTitle: string;
 			const SaveChangesButton: string;
 			const UndoChangesButton: string;
 		}

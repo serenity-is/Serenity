@@ -6,7 +6,7 @@ public partial class BasicPropertyProcessor : PropertyProcessor
     {
         if (source.Property != null)
         {
-            var attr = source.Property.GetAttribute<InsertPermissionAttribute>(false);
+            var attr = source.GetAttribute<InsertPermissionAttribute>();
             if (attr != null)
             {
                 if (attr.Permission != SpecialPermissionKeys.Public)

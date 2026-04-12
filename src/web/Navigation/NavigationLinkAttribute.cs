@@ -89,7 +89,7 @@ public class NavigationLinkAttribute : NavigationItemAttribute
 
         var actionMethod = controller.GetMethods(BindingFlags.Public | BindingFlags.Instance)
             .Where(x => x.Name == action)
-            .FirstOrDefault(x => x.GetAttribute<NonActionAttribute>() == null) ?? throw new ArgumentOutOfRangeException(nameof(action),
+            .FirstOrDefault(x => x.GetCustomAttribute<NonActionAttribute>() == null) ?? throw new ArgumentOutOfRangeException(nameof(action),
                 string.Format(CultureInfo.CurrentCulture,
                     "Controller {1} doesn't have an action with name {0}!",
                     action, controller.FullName));

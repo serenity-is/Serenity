@@ -1,4 +1,4 @@
-﻿namespace Serenity;
+namespace Serenity;
 
 /// <summary>
 /// Contains Enum mapping and other helper functions
@@ -164,7 +164,7 @@ public static class EnumMapper
                 var memInfo = enumType.GetMember(enumName);
                 if (memInfo != null && memInfo.Length == 1)
                 {
-                    var attribute = memInfo[0].GetCustomAttribute<DescriptionAttribute>(false);
+                    var attribute = memInfo[0].GetCustomAttribute<DescriptionAttribute>(inherit: false);
                     if (attribute != null)
                     {
                         text = attribute.Description;

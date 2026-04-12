@@ -1,4 +1,4 @@
-﻿namespace Serenity.Reflection;
+namespace Serenity.Reflection;
 
 /// <summary>
 /// Extension methods for annotation types
@@ -48,8 +48,8 @@ public static class AnnotationTypeExtensions
 
     private class AnnotatedProperty(PropertyInfo property, IEnumerable<PropertyInfo> annotations) : IPropertyInfo
     {
-        private readonly PropertyInfo property = property;
-        private readonly IEnumerable<PropertyInfo> annotations = annotations;
+        private readonly WrappedProperty property = new(property);
+        private readonly IEnumerable<WrappedProperty> annotations = [.. annotations.Select(a => new WrappedProperty(a))];
 
         public string Name => property.Name;
 
@@ -57,13 +57,13 @@ public static class AnnotationTypeExtensions
 
         public TAttr? GetAttribute<TAttr>() where TAttr : Attribute
         {
-            var attr = property.GetCustomAttribute<TAttr>();
+            var attr = property.GetAttribute<TAttr>();
             if (attr != null)
                 return attr;
 
             foreach (var annotation in annotations)
             {
-                attr = annotation.GetCustomAttribute<TAttr>();
+                attr = annotation.GetAttribute<TAttr>();
                 if (attr != null)
                     return attr;
             }
@@ -73,12 +73,12 @@ public static class AnnotationTypeExtensions
 
         public IEnumerable<TAttr> GetAttributes<TAttr>() where TAttr : Attribute
         {
-            foreach (var attr in property.GetCustomAttributes<TAttr>())
+            foreach (var attr in property.GetAttributes<TAttr>())
                 yield return attr;
 
             foreach (var annotation in annotations)
             {
-                foreach (var attr in annotation.GetCustomAttributes<TAttr>())
+                foreach (var attr in annotation.GetAttributes<TAttr>())
                     yield return attr;
             }
 

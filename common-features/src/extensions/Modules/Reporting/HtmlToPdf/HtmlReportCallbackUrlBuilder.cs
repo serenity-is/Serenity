@@ -30,7 +30,7 @@ public class HtmlReportCallbackUrlBuilder(
     {
         ArgumentNullException.ThrowIfNull(report);
 
-        var attr = report.GetType().GetCustomAttribute<ReportAttribute>(false);
+        var attr = report.GetType().GetCustomAttribute<ReportAttribute>(inherit: false);
         if (attr == null || string.IsNullOrEmpty(attr.ReportKey))
             return report.GetType().FullName;
 

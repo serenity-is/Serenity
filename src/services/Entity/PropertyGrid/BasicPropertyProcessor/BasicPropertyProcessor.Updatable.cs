@@ -6,7 +6,7 @@ public partial class BasicPropertyProcessor : PropertyProcessor
     {
         if (source.Property != null)
         {
-            var attr = source.Property.GetAttribute<UpdatableAttribute>(false);
+            var attr = source.GetAttribute<UpdatableAttribute>();
             if (attr != null)
             {
                 if (!attr.Value)

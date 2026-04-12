@@ -142,12 +142,12 @@ public static class ServiceCollectionExtensions
 
             if (pair.Value.Count != 1)
             {
-                var defaults = pair.Value.Where(x => x.GetAttribute<DefaultHandlerAttribute>()?.Value == true).ToArray();
+                var defaults = pair.Value.Where(x => x.GetCustomAttribute<DefaultHandlerAttribute>()?.Value == true).ToArray();
                 if (defaults.Length != 1)
                 {
                     if (defaults.Length == 0)
                     {
-                        var withoutDefaultFalse = pair.Value.Where(x => x.GetAttribute<DefaultHandlerAttribute>()?.Value != false).ToArray();
+                        var withoutDefaultFalse = pair.Value.Where(x => x.GetCustomAttribute<DefaultHandlerAttribute>()?.Value != false).ToArray();
                         if (withoutDefaultFalse.Length == 1)
                             defaults = withoutDefaultFalse;
                     }

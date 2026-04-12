@@ -1,4 +1,4 @@
-﻿namespace Serenity.ComponentModel;
+namespace Serenity.ComponentModel;
 
 /// <summary>
 /// Indicates that the target property should use a "CheckLookup" editor.
@@ -32,7 +32,7 @@ public partial class CheckLookupEditorAttribute : CustomEditorAttribute
         if (lookupType == null)
             throw new ArgumentNullException("lookupType");
 
-        var attr = lookupType.GetCustomAttribute<LookupScriptAttribute>(false) ?? throw new ArgumentException(string.Format(
+        var attr = lookupType.GetCustomAttribute<LookupScriptAttribute>(inherit: false) ?? throw new ArgumentException(string.Format(
                 "'{0}' type doesn't have a [LookupScript] attribute, so it can't " +
                 "be used with a CheckLookupEditor!",
                 lookupType.FullName), "lookupType");

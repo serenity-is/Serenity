@@ -197,8 +197,8 @@ public class DefaultReportRenderer(IDataReportExcelRenderer excelRenderer,
         if (report is ICustomFileName customFileName)
             return customFileName.GetFileName();
 
-        var filePrefix = report.GetType().GetAttribute<DisplayNameAttribute>()?.DisplayName ??
-            report.GetType().GetAttribute<ReportAttribute>()?.ReportKey ??
+        var filePrefix = report.GetType().GetCustomAttribute<DisplayNameAttribute>()?.DisplayName ??
+            report.GetType().GetCustomAttribute<ReportAttribute>()?.ReportKey ??
             report.GetType().Name;
 
         return filePrefix + "_" +

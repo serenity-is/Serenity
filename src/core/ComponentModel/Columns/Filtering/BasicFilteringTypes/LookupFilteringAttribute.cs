@@ -32,7 +32,7 @@ public partial class LookupFilteringAttribute : CustomFilteringAttribute
     public LookupFilteringAttribute(Type lookupType)
         : base(Key)
     {
-        var attr = lookupType.GetCustomAttribute<LookupScriptAttribute>(false) ?? throw new ArgumentOutOfRangeException("lookupType");
+        var attr = lookupType.GetCustomAttribute<LookupScriptAttribute>(inherit: false) ?? throw new ArgumentOutOfRangeException("lookupType");
         SetOption("lookupKey", attr.Key ??
             LookupScriptAttribute.AutoLookupKeyFor(lookupType));
     }

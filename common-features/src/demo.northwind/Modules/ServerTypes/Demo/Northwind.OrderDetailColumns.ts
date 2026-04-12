@@ -4,7 +4,7 @@ import { Column } from "@serenity-is/sleekgrid";
 import { OrderDetailRow } from "./Northwind.OrderDetailRow";
 
 export interface OrderDetailColumns {
-    RowActions: Column<OrderDetailRow>;
+    RowEditActions: Column<OrderDetailRow>;
     ProductName: Column<OrderDetailRow>;
     UnitPrice: Column<OrderDetailRow>;
     Quantity: Column<OrderDetailRow>;

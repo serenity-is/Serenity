@@ -33,7 +33,7 @@ public class ReportRegistry : IReportRegistry
     /// <param name="type">The report type</param>
     public static string GetReportKey(Type type)
     {
-        var attr = type.GetCustomAttribute<ReportAttribute>(false);
+        var attr = type.GetCustomAttribute<ReportAttribute>(inherit: false);
         if (attr == null || string.IsNullOrEmpty(attr.ReportKey))
             return type.FullName;
 
@@ -79,7 +79,7 @@ public class ReportRegistry : IReportRegistry
 
         foreach (var type in types)
         {
-            var attr = type.GetCustomAttribute<ReportAttribute>(false);
+            var attr = type.GetCustomAttribute<ReportAttribute>(inherit: false);
             // reports without a ReportAttribute should not be executed for security reasons
             if (attr == null)
                 continue;

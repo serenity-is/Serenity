@@ -1,4 +1,5 @@
 using Serenity.Web.Providers;
+using System.Reflection;
 
 namespace Serenity.Extensions;
 
@@ -50,5 +51,5 @@ public abstract class MembershipPageBase<TUserRow> : Controller
              (user as IPasswordRow)?.PasswordSaltField[user]);
     }
 
-    protected virtual string GetConnectionKey() => typeof(TUserRow).GetAttribute<ConnectionKeyAttribute>()?.Value ?? "Default";
+    protected virtual string GetConnectionKey() => typeof(TUserRow).GetCustomAttribute<ConnectionKeyAttribute>()?.Value ?? "Default";
 }

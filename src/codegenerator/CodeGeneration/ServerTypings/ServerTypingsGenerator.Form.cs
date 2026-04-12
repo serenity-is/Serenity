@@ -65,7 +65,7 @@ public partial class ServerTypingsGenerator
             x.HasConstant() &&
             x.Constant() is string &&
             x.DeclaringType().FullNameOf() == editorTypeAttr.AttributeType().FullNameOf());
-        
+
         if (keyConstant != null && keyConstant.Constant() as string != null)
             return keyConstant.Constant() as string;
 
@@ -164,7 +164,7 @@ public partial class ServerTypingsGenerator
         return type;
     }
 
-    private TypeDefinition GetBasedOnRowAndAnnotations(TypeDefinition type, 
+    private TypeDefinition GetBasedOnRowAndAnnotations(TypeDefinition type,
         out ILookup<string, PropertyDefinition> basedOnByName,
         out List<AnnotationTypeInfo> rowAnnotations)
     {
@@ -188,7 +188,7 @@ public partial class ServerTypingsGenerator
     }
 
     private static CustomAttribute GetAttribute(PropertyDefinition item, PropertyDefinition basedOnField,
-                IEnumerable<AnnotationTypeInfo> rowAnnotations, string ns, string name)
+        IEnumerable<AnnotationTypeInfo> rowAnnotations, string ns, string name)
     {
         var attr = TypingsUtils.FindAttr(item.GetAttributes(), ns, name);
 
@@ -318,7 +318,7 @@ public partial class ServerTypingsGenerator
 
                 var editorFullName = ReferenceScriptType(editorScriptType, codeNamespace);
                 var editorShortName = editorFullName;
-                
+
                 propertyNames.Add(item.Name);
                 propertyTypes.Add(editorShortName);
 

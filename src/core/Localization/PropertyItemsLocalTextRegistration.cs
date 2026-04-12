@@ -87,11 +87,11 @@ public static class PropertyItemsLocalTextRegistration
     /// <param name="type">Type with form/column attribute</param>
     public static string? GetPropertyItemsTextPrefix(Type type)
     {
-        var formAttr = type.GetAttribute<FormScriptAttribute>();
+        var formAttr = type.GetCustomAttribute<FormScriptAttribute>();
         string? itemsKey;
         if (formAttr is null)
         {
-            var columnsAttr = type.GetAttribute<ColumnsScriptAttribute>();
+            var columnsAttr = type.GetCustomAttribute<ColumnsScriptAttribute>();
             if (columnsAttr is null)
                 return null;
 

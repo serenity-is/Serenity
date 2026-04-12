@@ -1,4 +1,4 @@
-﻿namespace Serenity.ComponentModel;
+namespace Serenity.ComponentModel;
 
 /// <summary>
 /// Indicates that the target property should use a "RadioButton" editor.
@@ -25,7 +25,7 @@ public partial class RadioButtonEditorAttribute : CustomEditorAttribute
 
         if (enumOrLookupType.IsEnum)
         {
-            var ek = enumOrLookupType.GetCustomAttribute<EnumKeyAttribute>(false);
+            var ek = enumOrLookupType.GetCustomAttribute<EnumKeyAttribute>(inherit: false);
             if (ek == null)
                 EnumKey = enumOrLookupType.FullName;
             else
@@ -34,7 +34,7 @@ public partial class RadioButtonEditorAttribute : CustomEditorAttribute
             return;
         }
 
-        var lk = enumOrLookupType.GetCustomAttribute<LookupScriptAttribute>(false) ?? throw new ArgumentException(string.Format(
+        var lk = enumOrLookupType.GetCustomAttribute<LookupScriptAttribute>(inherit: false) ?? throw new ArgumentException(string.Format(
                 "'{0}' type doesn't have a [LookupScript] attribute, so it can't " +
                 "be used with a RadioButtonEditor!",
                 enumOrLookupType.FullName), "lookupType");

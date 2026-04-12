@@ -34,7 +34,7 @@ public abstract partial class PropertyItemsScript
         {
             var propertyInfos = typeof(PropertyItem).GetProperties(BindingFlags.Public | BindingFlags.Instance)
                 .Where(x => x.Name != nameof(PropertyItem.ExtensionData)).ToArray();
-            propertyNames = propertyInfos.Select(x => x.GetAttribute<JsonPropertyNameAttribute>()?.Name ?? x.Name).ToArray();
+            propertyNames = propertyInfos.Select(x => x.GetCustomAttribute<JsonPropertyNameAttribute>()?.Name ?? x.Name).ToArray();
             propertyGetters = propertyInfos.Select(CreatePropertyGetter).ToArray();
             PropertyNames = propertyNames;
             PropertyGetters = propertyGetters;

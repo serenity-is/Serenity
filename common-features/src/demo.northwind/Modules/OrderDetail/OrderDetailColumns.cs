@@ -1,11 +1,11 @@
-namespace Serenity.Demo.Northwind.Forms;
+namespace Serenity.Demo.Northwind.Columns;
 
 [ColumnsScript("Northwind.OrderDetail")]
 [BasedOnRow(typeof(OrderDetailRow), CheckNames = true)]
 public class OrderDetailColumns
 {
-    [DeleteRowActionFormatter, DisplayName(""), FixedWidth(40), Unbound]
-    public object RowActions { get; set; }
+    [DeleteRowActionFormatter, RowEditActionsColumn]
+    public object RowEditActions { get; set; }
     [EditLink, Width(200)]
     public string ProductName { get; set; }
     [Width(100)]

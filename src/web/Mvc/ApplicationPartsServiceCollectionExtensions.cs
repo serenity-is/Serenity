@@ -54,7 +54,7 @@ public static class ApplicationPartsServiceCollectionExtensions
         }
 
         foreach (var assembly in assemblies)
-        foreach (var keySetType in assembly.GetTypes().Where(x => x.GetAttribute<FeatureKeySetAttribute>() is not null))
+        foreach (var keySetType in assembly.GetTypes().Where(x => x.GetCustomAttribute<FeatureKeySetAttribute>() is not null))
         {
             var commonDeps = keySetType.GetCustomAttribute<RequiresFeatureAttribute>();
 

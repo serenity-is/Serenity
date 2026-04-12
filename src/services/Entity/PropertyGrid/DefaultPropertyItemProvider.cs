@@ -1,4 +1,5 @@
 using Microsoft.Extensions.DependencyInjection;
+using Serenity.Reflection;
 
 namespace Serenity.PropertyGrid;
 
@@ -51,6 +52,7 @@ public partial class DefaultPropertyItemProvider(IServiceProvider provider, ITyp
         foreach (var property in type.GetProperties(BindingFlags.Public | BindingFlags.Instance)
             .OrderBy(x => x.MetadataToken))
         {
+
             if (property.GetCustomAttribute<IgnoreUIFieldAttribute>(false) != null ||
                 property.GetCustomAttribute<TransformIgnoreAttribute>(false) != null ||
                 (predicate != null && predicate(property) == false))
@@ -58,8 +60,8 @@ public partial class DefaultPropertyItemProvider(IServiceProvider provider, ITyp
 
             var source = new PropertyInfoSource(property, basedOnRow);
             if (checkNames &&
-                property.GetCustomAttribute<NotMappedAttribute>() == null &&
-                property.GetCustomAttribute<SkipNameCheckAttribute>() == null)
+                source.GetAttribute<NotMappedAttribute>() == null &&
+                source.GetAttribute<SkipNameCheckAttribute>() == null)
             {
                 if (source.BasedOnField is null)
                 {

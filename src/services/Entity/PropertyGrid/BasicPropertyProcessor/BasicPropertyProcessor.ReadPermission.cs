@@ -6,7 +6,7 @@ public partial class BasicPropertyProcessor : PropertyProcessor
     {
         if (source.Property != null)
         {
-            var attr = source.Property.GetAttribute<ReadPermissionAttribute>(false);
+            var attr = source.GetAttribute<ReadPermissionAttribute>();
             if (attr != null)
             {
                 if (attr.Permission != SpecialPermissionKeys.Public)

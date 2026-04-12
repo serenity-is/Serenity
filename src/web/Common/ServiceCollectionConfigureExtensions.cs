@@ -20,7 +20,7 @@ public static class ServiceCollectionConfigureExtensions
         IConfiguration config) where TOptions : class
     {
         return services.Configure<TOptions>((config ?? throw new ArgumentNullException(nameof(config)))
-            .GetSection(typeof(TOptions).GetAttribute<DefaultSectionKeyAttribute>()?.SectionKey ??
+            .GetSection(typeof(TOptions).GetCustomAttribute<DefaultSectionKeyAttribute>()?.SectionKey ??
                 throw new ArgumentOutOfRangeException(nameof(TOptions))));
     }
 

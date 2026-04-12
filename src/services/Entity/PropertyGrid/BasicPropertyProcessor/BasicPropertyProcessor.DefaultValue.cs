@@ -6,7 +6,7 @@ public partial class BasicPropertyProcessor : PropertyProcessor
     {
         if (source.Property != null)
         {
-            var attr = source.Property.GetAttribute<DefaultValueAttribute>(false);
+            var attr = source.GetAttribute<DefaultValueAttribute>();
             if (attr != null)
             {
                 item.DefaultValue = attr.Value;

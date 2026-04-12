@@ -1,4 +1,6 @@
-﻿namespace Serenity.PropertyGrid;
+using Serenity.Reflection;
+
+namespace Serenity.PropertyGrid;
 
 /// <summary>
 /// Property info source for a reflection PropertyInfo object
@@ -6,6 +8,8 @@
 /// <seealso cref="IPropertySource" />
 public class PropertyInfoSource : IPropertySource
 {
+    private readonly WrappedProperty wrappedProperty;
+
     /// <summary>
     /// Initializes a new instance of the <see cref="PropertyInfoSource"/> class.
     /// </summary>
@@ -14,7 +18,8 @@ public class PropertyInfoSource : IPropertySource
     /// <exception cref="ArgumentNullException">property</exception>
     public PropertyInfoSource(PropertyInfo property, IRow basedOnRow)
     {
-        Property = property ?? throw new ArgumentNullException("property");
+        Property = property ?? throw new ArgumentNullException(nameof(property));
+        wrappedProperty = new WrappedProperty(property);
         BasedOnRow = basedOnRow;
 
         if (basedOnRow != null)
@@ -54,8 +59,8 @@ public class PropertyInfoSource : IPropertySource
     public TAttribute GetAttribute<TAttribute>()
         where TAttribute : Attribute
     {
-        return Property.GetCustomAttribute<TAttribute>() ??
-            BasedOnField.GetAttribute<TAttribute>();
+        return wrappedProperty.GetAttribute<TAttribute>() ??
+            BasedOnField?.GetAttribute<TAttribute>();
     }
 
     /// <summary>
@@ -67,7 +72,7 @@ public class PropertyInfoSource : IPropertySource
         where TAttribute : Attribute
     {
         var attrList = new List<TAttribute>();
-        attrList.AddRange(Property.GetCustomAttributes<TAttribute>());
+        attrList.AddRange(wrappedProperty.GetAttributes<TAttribute>());
 
         if (BasedOnField is not null)
         {
@@ -86,6 +91,7 @@ public class PropertyInfoSource : IPropertySource
     /// The property.
     /// </value>
     public PropertyInfo Property { get; private set; }
+
     /// <summary>
     /// Gets the type of the value.
     /// </summary>

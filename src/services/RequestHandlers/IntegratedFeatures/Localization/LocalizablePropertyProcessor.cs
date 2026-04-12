@@ -1,4 +1,4 @@
-﻿namespace Serenity.PropertyGrid;
+namespace Serenity.PropertyGrid;
 
 /// <summary>
 /// Property processor for handling localizable properties
@@ -19,7 +19,7 @@ public partial class LocalizablePropertyProcessor : PropertyProcessor
         if (BasedOnRow == null)
             return;
 
-        localAttr = BasedOnRow.GetType().GetCustomAttribute<LocalizationRowAttribute>(false);
+        localAttr = BasedOnRow.GetType().GetCustomAttribute<LocalizationRowAttribute>(inherit: false);
         if (localAttr == null)
             return;
 

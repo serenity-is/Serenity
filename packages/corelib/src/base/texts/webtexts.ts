@@ -55,6 +55,7 @@ namespace webTexts {
             export const IncludeDeletedToggle: string;
             export const NewButton: string;
             export const RefreshButton: string;
+            export const RowEditActionsTitle: string;
             export const SaveChangesButton: string;
             export const UndoChangesButton: string;
         }

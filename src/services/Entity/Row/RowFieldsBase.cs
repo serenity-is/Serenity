@@ -51,9 +51,9 @@ public partial class RowFieldsBase : Collection<Field>, IAlias, IHaveJoins
         alias = "T0";
         aliasDot = "T0.";
         this.fieldPrefix = fieldPrefix;
-        byName = new Dictionary<string, Field>(StringComparer.OrdinalIgnoreCase);
-        byPropertyName = new Dictionary<string, Field>(StringComparer.OrdinalIgnoreCase);
-        joins = new Dictionary<string, Join>(StringComparer.OrdinalIgnoreCase);
+        byName = new(StringComparer.OrdinalIgnoreCase);
+        byPropertyName = new(StringComparer.OrdinalIgnoreCase);
+        joins = new(StringComparer.OrdinalIgnoreCase);
         initializeLock = new object();
 
         DetermineRowType();
@@ -83,7 +83,7 @@ public partial class RowFieldsBase : Collection<Field>, IAlias, IHaveJoins
         if (!typeof(IRow).IsAssignableFrom(rowType) ||
             rowType.IsInterface)
             throw new InvalidProgramException(string.Format(
-                "RowFields {0}'s declaring row type {0} must be a subclass of Row!", fieldsType.Name, rowType.Name));
+                "RowFields {0}'s declaring row type {1} must be a subclass of Row!", fieldsType.Name, rowType.Name));
 
         var constructor = rowType.GetConstructors().FirstOrDefault(x => x.GetParameters().Length == 1 &&
             x.GetParameters()[0].GetType().IsSubclassOf(typeof(RowFieldsBase)));
@@ -176,7 +176,7 @@ public partial class RowFieldsBase : Collection<Field>, IAlias, IHaveJoins
             if (ns.EndsWith(".Entities"))
                 ns = ns[0..^9];
 
-            var idx = ns.IndexOf(".");
+            var idx = ns.IndexOf('.');
             if (idx >= 0)
                 ns = ns[(idx + 1)..];
 
@@ -203,8 +203,8 @@ public partial class RowFieldsBase : Collection<Field>, IAlias, IHaveJoins
         out Dictionary<string, FieldInfo> rowFields,
         out Dictionary<string, IPropertyInfo> rowProperties)
     {
-        rowFields = new Dictionary<string, FieldInfo>(StringComparer.OrdinalIgnoreCase);
-        rowProperties = new Dictionary<string, IPropertyInfo>(StringComparer.Ordinal);
+        rowFields = new(StringComparer.OrdinalIgnoreCase);
+        rowProperties = new(StringComparer.Ordinal);
 
         var members = rowType.GetMembers(BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Instance);
         foreach (var member in members)
@@ -562,12 +562,12 @@ public partial class RowFieldsBase : Collection<Field>, IAlias, IHaveJoins
 
                             if (bestMatch is LeftJoinAttribute lja)
                             {
-                                new LeftJoin(joins, lja.ToTable, lja.Alias,
+                                _ = new LeftJoin(joins, lja.ToTable, lja.Alias,
                                     new Criteria(lja.Alias, lja.OnCriteria) == new Criteria(field));
                             }
                             else if (bestMatch is InnerJoinAttribute ija)
                             {
-                                new InnerJoin(joins, ija.ToTable, ija.Alias,
+                                _ = new InnerJoin(joins, ija.ToTable, ija.Alias,
                                     new Criteria(ija.Alias, ija.OnCriteria) == new Criteria(field));
                             }
                         }
@@ -575,7 +575,7 @@ public partial class RowFieldsBase : Collection<Field>, IAlias, IHaveJoins
                         field.PropertyName = property.Name;
                         byPropertyName[field.PropertyName] = field;
 
-                        field.customAttributes = property.GetAttributes<Attribute>().ToArray();
+                        field.customAttributes = [.. property.GetAttributes<Attribute>()];
                     }
 
                     var idFieldAttribute = field.GetAttribute<IdPropertyAttribute>();
@@ -616,15 +616,14 @@ public partial class RowFieldsBase : Collection<Field>, IAlias, IHaveJoins
                 }
 
                 if (bestMatch is LeftJoinAttribute lja)
-                    new LeftJoin(joins, lja.ToTable, lja.Alias, new Criteria(lja.OnCriteria));
+                    _ = new LeftJoin(joins, lja.ToTable, lja.Alias, new Criteria(lja.OnCriteria));
                 else if (bestMatch is InnerJoinAttribute ija)
-                    new InnerJoin(joins, ija.ToTable, ija.Alias, new Criteria(ija.OnCriteria));
+                    _ = new InnerJoin(joins, ija.ToTable, ija.Alias, new Criteria(ija.OnCriteria));
                 else if (bestMatch is OuterApplyAttribute oua)
-                    new OuterApply(joins, oua.InnerQuery, oua.Alias);
+                    _ = new OuterApply(joins, oua.InnerQuery, oua.Alias);
             }
 
-            primaryKeys = this.Where(x => x.flags.HasFlag(FieldFlags.PrimaryKey))
-                .ToArray();
+            primaryKeys = [.. this.Where(x => x.flags.HasFlag(FieldFlags.PrimaryKey))];
 
             if (idField is null)
             {
@@ -750,7 +749,7 @@ public partial class RowFieldsBase : Collection<Field>, IAlias, IHaveJoins
                     if (string.Compare(field.ForeignTable, join.Table) == 0 &&
                         (join is LeftJoin || join is InnerJoin) &&
                         join.OnCriteria is object &&
-                        join.OnCriteria.ToStringIgnoreParams().IndexOf(field.Expression, StringComparison.OrdinalIgnoreCase) >= 0)
+                        join.OnCriteria.ToStringIgnoreParams().Contains(field.Expression, StringComparison.OrdinalIgnoreCase))
                     {
                         foreach (var f in this)
                             if (string.Compare(f.JoinAlias, join.Name, StringComparison.OrdinalIgnoreCase) == 0 &&
@@ -932,9 +931,8 @@ public partial class RowFieldsBase : Collection<Field>, IAlias, IHaveJoins
                         list.Add(new Tuple<Field, int>(@field, sortAttr.SortOrder));
                 }
 
-                sortOrders = list.OrderBy(x => Math.Abs(x.Item2))
-                    .Select(x => new Tuple<Field, bool>(x.Item1, x.Item2 < 0))
-                    .ToArray();
+                sortOrders = [.. list.OrderBy(x => Math.Abs(x.Item2)).Select(x => 
+                    new Tuple<Field, bool>(x.Item1, x.Item2 < 0))];
             }
 
             return sortOrders;
@@ -957,7 +955,7 @@ public partial class RowFieldsBase : Collection<Field>, IAlias, IHaveJoins
         ArgumentNullException.ThrowIfNull(item);
 
         if (byName.ContainsKey(item.Name))
-            throw new ArgumentOutOfRangeException("item",
+            throw new ArgumentOutOfRangeException(nameof(item),
                 string.Format("field list already contains a field with name '{0}'", item.Name));
 
         item.Fields?.Remove(item);
@@ -1005,7 +1003,7 @@ public partial class RowFieldsBase : Collection<Field>, IAlias, IHaveJoins
         ArgumentNullException.ThrowIfNull(item);
 
         if (byName.ContainsKey(item.Name))
-            throw new ArgumentOutOfRangeException("item",
+            throw new ArgumentOutOfRangeException(nameof(item),
                 string.Format("field list already contains a field with name '{0}'", item.Name));
 
         var old = base[index];
@@ -1171,7 +1169,7 @@ public partial class RowFieldsBase : Collection<Field>, IAlias, IHaveJoins
                     onCriteria = new Criteria(mapExpression(join.Value.OnCriteria.ToString()));
             }
 
-            new ReplacedJoin(joins,
+            _ = new ReplacedJoin(joins,
                 mapExpression(join.Value.Table),
                 mapAlias(join.Value.Name),
                 onCriteria,

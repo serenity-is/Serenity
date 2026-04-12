@@ -34,7 +34,7 @@ public partial class LookupEditorAttribute : LookupEditorBaseAttribute
         if (lookupType == null)
             throw new ArgumentNullException("lookupType");
 
-        var attr = lookupType.GetCustomAttribute<LookupScriptAttribute>(false) ?? throw new ArgumentException(string.Format(
+        var attr = lookupType.GetCustomAttribute<LookupScriptAttribute>(inherit: false) ?? throw new ArgumentException(string.Format(
                 "'{0}' type doesn't have a [LookupScript] attribute, so it can't " +
                 "be used with a LookupEditor!",
                 lookupType.FullName), "lookupType");
