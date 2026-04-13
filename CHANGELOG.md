@@ -1,3 +1,10 @@
+## 10.2.7 (2027-04-13)
+
+### Features
+- Add SelectableAttribute and FocusableAttribute and use them in setting grid columns corresponding props.
+- Add GetAttributesWithIntrinsic helper and use it instead of GetAttributes to also check intrinsic attributes added via IIntrinsicPropertyAttributeProvider in sergen and Pro.Coder for code generation.
+- Ensure BasedOnRowPropertyNameAnalyzer takes intrinsic attributes provided via an IIntrinsicPropertyAttributeProvider into account
+
 ## 10.2.6 (2026-04-13)
 
 ### Bugfixes
