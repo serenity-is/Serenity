@@ -190,7 +190,7 @@ public partial class ServerTypingsGenerator
     private static CustomAttribute GetAttribute(PropertyDefinition item, PropertyDefinition basedOnField,
         IEnumerable<AnnotationTypeInfo> rowAnnotations, string ns, string name)
     {
-        var attr = TypingsUtils.FindAttr(item.GetAttributes(), ns, name);
+        var attr = TypingsUtils.FindAttr(item.GetAttributesWithIntrinsic(), ns, name);
 
         if (attr == null && rowAnnotations != null)
         {
@@ -199,14 +199,14 @@ public partial class ServerTypingsGenerator
                 if (!annotationType.PropertyByName.TryGetValue(item.Name, out PropertyDefinition annotation))
                     continue;
 
-                attr = TypingsUtils.FindAttr(annotation.GetAttributes(), ns, name);
+                attr = TypingsUtils.FindAttr(annotation.GetAttributesWithIntrinsic(), ns, name);
                 if (attr != null)
                     return attr;
             }
         }
 
         if (attr == null && basedOnField != null)
-            attr = TypingsUtils.FindAttr(basedOnField.GetAttributes(), ns, name);
+            attr = TypingsUtils.FindAttr(basedOnField.GetAttributesWithIntrinsic(), ns, name);
 
         return attr;
     }

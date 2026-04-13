@@ -190,17 +190,35 @@ public static class TypingsUtils
             constant.Values : constant.Value;
     }
 
-    public static bool HasCustomAttributes(this IFieldSymbol field)
+    public static IEnumerable<CustomAttribute> GetAttributesWithIntrinsic(this PropertyDefinition prop)
+    {
+        var attributes = prop.GetAttributes();
+        foreach (var attr in attributes)
+            yield return attr;
+
+        foreach (var attr in attributes)
+        {
+            if (attr.AttributeClass != null &&
+                attr.AttributeClass.Interfaces.Any(i => i.Name == "IIntrinsicPropertyAttributeProvider" && i.NamespaceOf() == "Serenity.Reflection") &&
+                attr.AttributeClass.GetMembers("PropertyAttributes").OfType<PropertyDefinition>().FirstOrDefault() is PropertyDefinition property)
+            {
+                foreach (var intrinsicAttr in property.GetAttributes())
+                    yield return intrinsicAttr;
+            }
+        }
+    }
+
+    public static bool HasCustomAttributes(this FieldDefinition field)
     {
         return field.GetAttributes().Any();
     }
 
-    public static bool HasCustomAttributes(this IPropertySymbol prop)
+    public static bool HasCustomAttributes(this PropertyDefinition prop)
     {
         return prop.GetAttributes().Any();
     }
 
-    public static bool IsSpecialName(this IFieldSymbol field)
+    public static bool IsSpecialName(this FieldDefinition field)
     {
         return field.IsImplicitlyDeclared;
     }
@@ -306,6 +324,26 @@ public static class TypingsUtils
         return prop.CustomAttributes;
     }
 
+    public static IEnumerable<CustomAttribute> GetAttributesWithIntrinsic(this PropertyDefinition prop)
+    {
+        var attributes = prop.CustomAttributes;
+        foreach (var attr in attributes)
+            yield return attr;
+
+        foreach (var attr in attributes)
+        {
+            if (attr.AttributeType != null &&
+                attr.AttributeType.Resolve() is TypeDefinition type &&
+                type.Interfaces.Any(i => i.InterfaceType?.Name == "IIntrinsicPropertyAttributeProvider" &&
+                    i.InterfaceType.Namespace == "Serenity.Reflection") &&
+                type.Properties.FirstOrDefault(x => x.Name == "PropertyAttributes") is PropertyDefinition property)
+            {
+                foreach (var intrinsicAttr in property.CustomAttributes)
+                    yield return intrinsicAttr;
+            }
+        }
+    }
+
     public static IEnumerable<CustomAttribute> GetAttributes(this MethodDefinition method)
     {
         return method.CustomAttributes;
@@ -314,11 +352,6 @@ public static class TypingsUtils
     public static IEnumerable<CustomAttribute> GetAttributes(this TypeDefinition type)
     {
         return type.CustomAttributes;
-    }
-
-    public static IEnumerable<CustomAttribute> GetAttributes(this ParameterDefinition pd)
-    {
-        return pd.CustomAttributes;
     }
 
     public static bool HasCustomAttributes(this FieldDefinition field)

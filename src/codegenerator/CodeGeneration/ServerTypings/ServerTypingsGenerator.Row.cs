@@ -97,7 +97,7 @@ public partial class ServerTypingsGenerator
                     var property = propertyByName[fieldName].FirstOrDefault();
                     if (property != null)
                     {
-                        var attrs = property.GetAttributes();
+                        var attrs = property.GetAttributesWithIntrinsic();
                         if (TypingsUtils.FindAttr(attrs, "Serenity.ComponentModel", "IgnoreUIFieldAttribute") is null &&
                             TypingsUtils.FindAttr(attrs, "Serenity.ComponentModel", "TransformIgnoreAttribute") is null)
                             yield return property;
@@ -438,13 +438,13 @@ public partial class ServerTypingsGenerator
         var properties = EnumerateProperties(rowType).ToList();
 
         metadata.IdProperty ??= properties.FirstOrDefault(x =>
-                x.HasCustomAttributes() && TypingsUtils.FindAttr(x.GetAttributes(),
+                x.HasCustomAttributes() && TypingsUtils.FindAttr(x.GetAttributesWithIntrinsic(),
                     "Serenity.Data", "IdPropertyAttribute") != null)?.Name;
 
         if (metadata.IdProperty == null)
         {
             var identities = properties.Where(x =>
-                x.HasCustomAttributes() && TypingsUtils.FindAttr(x.GetAttributes(),
+                x.HasCustomAttributes() && TypingsUtils.FindAttr(x.GetAttributesWithIntrinsic(),
                     "Serenity.Data.Mapping", "IdentityAttribute") != null);
 
             if (identities.Count() == 1)
@@ -452,7 +452,7 @@ public partial class ServerTypingsGenerator
             else if (!identities.Any())
             {
                 var primaryKeys = properties.Where(x =>
-                    x.HasCustomAttributes() && TypingsUtils.FindAttr(x.GetAttributes(),
+                    x.HasCustomAttributes() && TypingsUtils.FindAttr(x.GetAttributesWithIntrinsic(),
                         "Serenity.Data.Mapping", "PrimaryKeyAttribute") != null);
 
                 if (primaryKeys.Count() == 1)
@@ -465,7 +465,7 @@ public partial class ServerTypingsGenerator
                 "Serenity.Data.StringField Serenity.Data.INameRow::get_NameField()");
 
         metadata.NameProperty ??= properties.FirstOrDefault(x =>
-                x.HasCustomAttributes() && TypingsUtils.FindAttr(x.GetAttributes(),
+                x.HasCustomAttributes() && TypingsUtils.FindAttr(x.GetAttributesWithIntrinsic(),
                     "Serenity.Data", "NamePropertyAttribute") != null)?.Name;
 
         metadata.IsActiveProperty = ExtractInterfacePropertyFromRow(rowType,
