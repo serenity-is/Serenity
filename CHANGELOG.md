@@ -1,3 +1,8 @@
+## 10.2.6 (2026-04-13)
+
+### Bugfixes
+- Deprecated GetAttribute method had `inherit: false` as default, instead of GetCustomAttribute which has `inherit: true` by default, resulting in [DefaultHandler] issues when a base class with [DefaultHandler] attribute is used.
+
 ## 10.2.5 (2026-04-13)
 
 ### Features

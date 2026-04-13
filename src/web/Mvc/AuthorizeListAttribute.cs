@@ -14,6 +14,6 @@ public class AuthorizeListAttribute : ServiceAuthorizeAttribute
     public AuthorizeListAttribute(Type sourceType)
         : base(sourceType, typeof(ReadPermissionAttribute))
     {
-        OrPermission = sourceType.GetCustomAttribute<ServiceLookupPermissionAttribute>()?.Permission;
+        OrPermission = sourceType.GetCustomAttribute<ServiceLookupPermissionAttribute>(inherit: false)?.Permission;
     }
 }

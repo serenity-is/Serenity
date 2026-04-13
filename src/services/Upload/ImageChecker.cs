@@ -183,7 +183,7 @@ public class ImageChecker
     public string FormatErrorMessage(ImageCheckResult result, ITextLocalizer localizer)
     {
         var format = localizer.Get("Enums." + 
-            (typeof(ImageCheckResult).GetCustomAttribute<EnumKeyAttribute>()?.Value ??
+            (typeof(ImageCheckResult).GetCustomAttribute<EnumKeyAttribute>(inherit: false)?.Value ??
              typeof(ImageCheckResult).FullName) + "." +
             Enum.GetName(typeof(ImageCheckResult), result));
 

@@ -36,7 +36,7 @@ public abstract class BaseAssemblyTypeSource(IFeatureToggles? featureToggles = n
     protected virtual bool Include(Type type)
     {
         return featureToggles == null ||
-            type.GetCustomAttribute<RequiresFeatureAttribute>() is not { } attr ||
+            type.GetCustomAttribute<RequiresFeatureAttribute>(inherit: false) is not { } attr ||
             featureToggles.IsEnabled(attr.Features, attr.RequireAny);
     }
 

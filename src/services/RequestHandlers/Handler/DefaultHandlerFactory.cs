@@ -22,7 +22,7 @@ public class DefaultHandlerFactory(IDefaultHandlerRegistry registry, IHandlerAct
         var handlers = registry.GetTypes(args.handlerInterface)
             .Where(x => 
                 requestHandler.IsAssignableFrom(x) &&
-                x.GetCustomAttribute<DefaultHandlerAttribute>()?.Value != false)
+                x.GetCustomAttribute<DefaultHandlerAttribute>(inherit: false)?.Value != false)
             .ToArray();
 
         if (handlers.Length == 1)
@@ -34,7 +34,7 @@ public class DefaultHandlerFactory(IDefaultHandlerRegistry registry, IHandlerAct
             return attr.Value.MakeGenericType(args.rowType);
         }
 
-        var defaults = handlers.Where(x => x.GetCustomAttribute<DefaultHandlerAttribute>()?.Value == true);
+        var defaults = handlers.Where(x => x.GetCustomAttribute<DefaultHandlerAttribute>(inherit: false)?.Value == true);
         if (defaults.Count() == 1)
             return defaults.First();
 
