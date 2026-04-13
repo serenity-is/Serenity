@@ -89,7 +89,7 @@ public class TranslationRepository(IRequestContext context, IWebHostEnvironment 
 
         foreach (var type in TypeSource.GetTypesWithAttribute(typeof(FormScriptAttribute)))
         {
-            var attr = type.GetAttribute<FormScriptAttribute>();
+            var attr = type.GetCustomAttribute<FormScriptAttribute>(inherit: false);
             foreach (var member in type.GetMembers(BindingFlags.Instance | BindingFlags.Public))
             {
                 var category = member.GetCustomAttribute<CategoryAttribute>();
