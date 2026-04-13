@@ -354,6 +354,11 @@ public static class TypingsUtils
         return type.CustomAttributes;
     }
 
+    public static IEnumerable<CustomAttribute> GetAttributes(this ParameterDefinition pd)
+    {
+        return pd.CustomAttributes;
+    }
+
     public static bool HasCustomAttributes(this FieldDefinition field)
     {
         return field.HasCustomAttributes;
