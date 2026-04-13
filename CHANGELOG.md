@@ -1,3 +1,16 @@
+## 10.2.5 (2026-04-13)
+
+### Features
+- Improve error handling for unhandledRejection (e.g. async) errors
+- Add IIntrinsicPropertyAttributeProvider which allows creating combination attributes for usage in forms / columns. 
+- RowEditActionsColumnAttribute for grid editors which is a combination attribute implementing IIntrinsicPropertyAttributeProvider. 
+- ReflectionExtensions.GetAttribute is now obsolete and will be removed, use GetCustomAttribute.
+- Better async error handling for inline editing, also validate invisible columns and show a notification if a required column is invisible (StartSharp)
+- Add ability to change autoEdit option in GridEditController (StartSharp)
+- Commit current row changes via Ctrl+Enter key in GridEditController (StartSharp)
+- Changed default for GridEditControllerOptions.actionsColumn (previously actionColumn) to `RowEditActions` (StartSharp). 
+- Add a GridEditController.createActionsColumn function to manually create an `RowEditActions` column (StartSharp).
+
 ## 10.2.4 (2026-04-07)
 
 ### Features
