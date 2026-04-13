@@ -48,6 +48,7 @@ export interface PropertyItem {
     localizable?: boolean;
     visible?: boolean;
     allowHide?: boolean;
+    focusable?: boolean;
     formatterType?: string | { new(props?: any): { format(ctx: any): string } } | PromiseLike<{ new(props?: any): { format(ctx: any): string } }>;
     formatterParams?: any;
     displayFormat?: string;
@@ -59,6 +60,7 @@ export interface PropertyItem {
     maxWidth?: number;
     labelWidth?: string;
     resizable?: boolean;
+    selectable?: boolean;
     sortable?: boolean;
     sortOrder?: number;
     groupOrder?: number;

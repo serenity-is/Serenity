@@ -362,6 +362,16 @@ public class PropertyItem
     public bool? AllowHide { get; set; }
 
     /// <summary>
+    /// Gets or sets the focusable flag of a column.
+    /// </summary>
+    /// <value>
+    /// The focusable.
+    /// </value>
+    [Newtonsoft.Json.JsonProperty("focusable")]
+    [JsonPropertyName("focusable")]
+    public bool? Focusable { get; set; }
+
+    /// <summary>
     /// Gets or sets the type of the formatter for columns.
     /// </summary>
     /// <value>
@@ -479,6 +489,16 @@ public class PropertyItem
     [Newtonsoft.Json.JsonProperty("resizable")]
     [JsonPropertyName("resizable")]
     public bool? Resizable { get; set; }
+
+    /// <summary>
+    /// Gets or sets the selectable flag of a column.
+    /// </summary>
+    /// <value>
+    /// The selectable.
+    /// </value>
+    [Newtonsoft.Json.JsonProperty("selectable")]
+    [JsonPropertyName("selectable")]
+    public bool? Selectable { get; set; }
 
     /// <summary>
     /// Gets or sets the sortable flag of a column.

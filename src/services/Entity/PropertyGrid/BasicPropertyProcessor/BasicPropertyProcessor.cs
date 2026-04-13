@@ -29,12 +29,14 @@ public partial class BasicPropertyProcessor(IOptions<PropertyProcessorOptions> o
         SetEditorAddons(source, item);
         SetEditorCssClass(source, item);
         SetFiltering(source, item);
+        SetFocusable(source, item);
         SetFormatting(source, item);
         SetFormCssClass(source, item);
         SetGrouping(source, item);
         SetHideOnInsert(source, item);
         SetHideOnUpdate(source, item);
         SetHint(source, item);
+        SetSelectable(source, item);
         SetSkipOnLoad(source, item);
         SetSkipOnSave(source, item);
         SetInsertable(source, item);
