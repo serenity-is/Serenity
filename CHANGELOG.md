@@ -1,3 +1,10 @@
+## 10.3.0 (2027-04-14)
+
+- Set grid's options.editorLock to a new one if default options editorLock is set to null. This allows setting gridDefaults.editorLock to null to automatically create a new one when required. Using GlobalEditorLock may cause some issues between editable grids in different unrelated dialogs.
+- Add tabbable option (default true) to columns which controls navigation via tab key. If a column is focusable: false, this property has no effect.
+- New TabbableAttribute that sets tabbable option for columns.
+- Rename SelectableAttribute to ShowSelectionAttribute to better identify intent and usage in SleekGrid, as it only controls if "selected" css class should be applied to cells, not selectability of a cell.
+
 ## 10.2.9 (2027-04-14)
 
 ### Bugfixes
