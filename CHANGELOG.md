@@ -1,3 +1,9 @@
+## 10.2.8 (2027-04-14)
+- Add Focusable(false), Selectable(false) to RowEditActionsColumnAttribute
+- Derive IPropertySource from IPropertyInfo
+- Add origin argument to IPropertyInfo.GetAttribute and IPropertyInfo.GetAttributes method to selectively exclude inherited, intrinsic, based on field attributes.
+- Make ReflectedType available through IPropertySource so that IPropertySource.Property does not need to be used and might be removed in the future to allow dynamic/mock props.
+
 ## 10.2.7 (2027-04-13)
 
 ### Features
