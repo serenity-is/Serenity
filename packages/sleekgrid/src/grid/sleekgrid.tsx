@@ -3,7 +3,8 @@ import { preClickClassName } from "../core/base";
 import { CellRange } from "../core/cellrange";
 import { columnDefaults, initColumnProps, type Column, type ColumnMetadata, type ColumnSort, type ItemMetadata } from "../core/column";
 import { Draggable, type DragPosition } from "../core/draggable";
-import type { EditCommand, EditController, Editor, EditorClass, EditorFactory, EditorLock, Position, RowCell } from "../core/editing";
+import type { EditCommand, EditController, Editor, EditorClass, EditorFactory, Position, RowCell } from "../core/editing";
+import { EditorLock } from "../core/editing";
 import { EventEmitter, type EventData } from "../core/event";
 import type { ArgsAddNewRow, ArgsCell, ArgsCellChange, ArgsCellEdit, ArgsColumn, ArgsColumnNode, ArgsCssStyle, ArgsDrag, ArgsEditorDestroy, ArgsGrid, ArgsScroll, ArgsSelectedRowsChange, ArgsSort, ArgsValidationError } from "../core/eventargs";
 import { applyFormatterResultToCellNode, convertCompatFormatter, defaultColumnFormat, formatterContext, type CellStylesHash, type ColumnFormat, type FormatterContext, type FormatterResult } from "../core/formatting";
@@ -1545,6 +1546,8 @@ export class SleekGrid<TItem = any> implements ISleekGrid<TItem> {
         if (this._options.autoHeight) {
             this._options.leaveSpaceForNewRows = false;
         }
+        if (!this._options.editorLock)
+            this._options.editorLock = new EditorLock();
     }
 
     private setOptionDependentSignals() {
