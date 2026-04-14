@@ -36,7 +36,6 @@ public partial class BasicPropertyProcessor(IOptions<PropertyProcessorOptions> o
         SetHideOnInsert(source, item);
         SetHideOnUpdate(source, item);
         SetHint(source, item);
-        SetSelectable(source, item);
         SetSkipOnLoad(source, item);
         SetSkipOnSave(source, item);
         SetInsertable(source, item);
@@ -47,8 +46,10 @@ public partial class BasicPropertyProcessor(IOptions<PropertyProcessorOptions> o
         SetReadPermission(source, item);
         SetRequired(source, item);
         SetResizable(source, item);
+        SetShowSelection(source, item);
         SetSorting(source, item);
         SetSummaryType(source, item);
+        SetTabbable(source, item);
         SetTitle(source, item);
         SetUnbound(source, item);
         SetUpdatable(source, item);

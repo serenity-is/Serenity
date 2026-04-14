@@ -14,6 +14,6 @@ public class OrderDetailColumns
     public short Quantity { get; set; }
     [Width(100)]
     public double Discount { get; set; }
-    [Width(100), ReadOnly(true)]
+    [Width(100), ReadOnly(true), Tabbable(false)]
     public decimal LineTotal { get; set; }
 }

@@ -8,7 +8,8 @@ namespace Serenity.ComponentModel;
 /// <remarks>
 /// Initializes a new instance of the <see cref="FocusableAttribute"/> class.
 /// </remarks>
-/// <param name="value">if set to <c>true</c> (default) column is selectable.</param>
+/// <param name="value">if set to <c>true</c> (default) column is focusable.</param>
+[AttributeUsage(AttributeTargets.Property, AllowMultiple = false)]
 public class FocusableAttribute(bool value = true) : Attribute
 {
 

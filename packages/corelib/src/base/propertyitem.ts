@@ -60,9 +60,10 @@ export interface PropertyItem {
     maxWidth?: number;
     labelWidth?: string;
     resizable?: boolean;
-    selectable?: boolean;
+    showSelection?: boolean;
     sortable?: boolean;
     sortOrder?: number;
+    tabbable?: boolean;
     groupOrder?: number;
     summaryType?: SummaryType;
     editLink?: boolean;

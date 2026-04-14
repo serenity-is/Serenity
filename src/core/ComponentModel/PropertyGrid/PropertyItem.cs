@@ -491,14 +491,14 @@ public class PropertyItem
     public bool? Resizable { get; set; }
 
     /// <summary>
-    /// Gets or sets the selectable flag of a column.
+    /// Gets or sets the apply selected CSS flag of a column.
     /// </summary>
     /// <value>
-    /// The selectable.
+    /// The apply selected CSS flag.
     /// </value>
-    [Newtonsoft.Json.JsonProperty("selectable")]
-    [JsonPropertyName("selectable")]
-    public bool? Selectable { get; set; }
+    [Newtonsoft.Json.JsonProperty("showSelection")]
+    [JsonPropertyName("showSelection")]
+    public bool? ShowSelection { get; set; }
 
     /// <summary>
     /// Gets or sets the sortable flag of a column.
@@ -521,6 +521,17 @@ public class PropertyItem
     [Newtonsoft.Json.JsonProperty("sortOrder")]
     [JsonPropertyName("sortOrder")]
     public int? SortOrder { get; set; }
+
+    /// <summary>
+    /// Gets or sets the tabbable flag of a column.
+    /// </summary>
+    /// <value>
+    /// The tabbable flag.
+    /// </value>
+    [Newtonsoft.Json.JsonProperty("tabbable")]
+    [JsonPropertyName("tabbable")]
+    public bool? Tabbable { get; set; }
+
 
     /// <summary>
     /// Gets or sets the grouping order of a column, 
