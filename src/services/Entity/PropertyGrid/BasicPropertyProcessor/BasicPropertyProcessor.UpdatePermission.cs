@@ -4,16 +4,13 @@ public partial class BasicPropertyProcessor : PropertyProcessor
 {
     private static void SetUpdatePermission(IPropertySource source, PropertyItem item)
     {
-        if (source.Property != null)
+        var attr = source.GetAttribute<UpdatePermissionAttribute>(AttributeOrigin.ExcludeBasedOnField);
+        if (attr != null)
         {
-            var attr = source.GetAttribute<UpdatePermissionAttribute>();
-            if (attr != null)
-            {
-                if (attr.Permission != SpecialPermissionKeys.Public)
-                    item.UpdatePermission = attr.Permission ?? SpecialPermissionKeys.LoggedIn;
+            if (attr.Permission != SpecialPermissionKeys.Public)
+                item.UpdatePermission = attr.Permission ?? SpecialPermissionKeys.LoggedIn;
 
-                return;
-            }
+            return;
         }
 
         if (source.BasedOnField is not null)

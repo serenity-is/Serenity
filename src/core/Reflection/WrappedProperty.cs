@@ -12,7 +12,8 @@ public class WrappedProperty(PropertyInfo property) : IPropertyInfo
     private static readonly ConcurrentDictionary<Type, PropertyInfo?> providerAttributesPropertyByType = new();
 
     private readonly PropertyInfo property = property;
-    private Attribute[]? cachedAttributes;
+    private Attribute[]? cachedAttributesExplicit;
+    private Attribute[]? cachedAttributesInherit;
 
     /// <summary>
     /// Gets the name.
@@ -35,10 +36,10 @@ public class WrappedProperty(PropertyInfo property) : IPropertyInfo
     /// </summary>
     /// <typeparam name="TAttr">The type of the attribute.</typeparam>
     /// <returns></returns> 
-    public TAttr? GetAttribute<TAttr>() where TAttr : Attribute
+    public TAttr? GetAttribute<TAttr>(AttributeOrigin origin = AttributeOrigin.All) where TAttr : Attribute
     {
         TAttr? result = null;
-        foreach (var attr in GetCachedAttributes())
+        foreach (var attr in GetCachedAttributes(origin))
             if (attr is TAttr typed)
             {
                 if (result is not null)
@@ -55,20 +56,22 @@ public class WrappedProperty(PropertyInfo property) : IPropertyInfo
     /// </summary>
     /// <typeparam name="TAttr">The type of the attribute.</typeparam>
     /// <returns></returns>
-    public IEnumerable<TAttr> GetAttributes<TAttr>() where TAttr : Attribute
+    public IEnumerable<TAttr> GetAttributes<TAttr>(AttributeOrigin origin = AttributeOrigin.All) where TAttr : Attribute
     {
-        foreach (var attr in GetCachedAttributes())
+        foreach (var attr in GetCachedAttributes(origin))
             if (attr is TAttr typed)
                 yield return typed;
     }
 
-    private Attribute[] GetCachedAttributes()
+    private Attribute[] GetCachedAttributes(AttributeOrigin origin)
     {
-        var cachedAttributes = this.cachedAttributes;
+        bool inherit = origin.HasFlag(AttributeOrigin.Inherit);
+        var cachedAttributes = inherit ? 
+            cachedAttributesInherit : cachedAttributesExplicit;
         if (cachedAttributes is not null)
             return cachedAttributes;
          
-        var directAttributes = property.GetCustomAttributes<Attribute>();
+        var directAttributes = property.GetCustomAttributes<Attribute>(inherit);
         var allAttributes = new List<Attribute>(directAttributes);
 
         foreach (var customAttr in directAttributes)
@@ -83,11 +86,14 @@ public class WrappedProperty(PropertyInfo property) : IPropertyInfo
             if (providerAttributesProperty == null)
                 continue;
 
-            allAttributes.AddRange(providerAttributesProperty.GetCustomAttributes<Attribute>());
+            allAttributes.AddRange(providerAttributesProperty.GetCustomAttributes<Attribute>(inherit: false));
         }
 
         cachedAttributes = [.. allAttributes];
 
-        return this.cachedAttributes = cachedAttributes;
+        if (inherit)
+            cachedAttributesInherit = cachedAttributes;
+
+        return cachedAttributesExplicit = cachedAttributes;
     }
 }

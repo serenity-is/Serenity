@@ -53,12 +53,16 @@ public partial class DefaultPropertyItemProvider(IServiceProvider provider, ITyp
             .OrderBy(x => x.MetadataToken))
         {
 
-            if (property.GetCustomAttribute<IgnoreUIFieldAttribute>(false) != null ||
-                property.GetCustomAttribute<TransformIgnoreAttribute>(false) != null ||
+            if (property.GetCustomAttribute<IgnoreUIFieldAttribute>(inherit: false) != null ||
+                property.GetCustomAttribute<TransformIgnoreAttribute>(inherit: false) != null ||
                 (predicate != null && predicate(property) == false))
                 continue;
 
             var source = new PropertyInfoSource(property, basedOnRow);
+            if (source.GetAttribute<IgnoreUIFieldAttribute>(AttributeOrigin.ExcludeInherit) != null ||
+                source.GetAttribute<TransformIgnoreAttribute>(AttributeOrigin.ExcludeInherit) != null)
+                continue;
+
             if (checkNames &&
                 source.GetAttribute<NotMappedAttribute>() == null &&
                 source.GetAttribute<SkipNameCheckAttribute>() == null)

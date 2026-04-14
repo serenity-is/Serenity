@@ -17,10 +17,8 @@ public partial class BasicPropertyProcessor : PropertyProcessor
             return text;
 
         bool fromField = !ignoreField &&
-            source.BasedOnField is not null &&
-            source.GetAttribute<TAttribute>() is not null &&
-            source.BasedOnField.GetAttribute<TAttribute>() ==
-                source.GetAttribute<TAttribute>();
+            source.GetAttribute<TAttribute>(AttributeOrigin.ExcludeBasedOnField) is null &&
+            source.GetAttribute<TAttribute>() is not null;
 
         if (!fromField)
         {
@@ -46,11 +44,7 @@ public partial class BasicPropertyProcessor : PropertyProcessor
 
     private void SetTitle(IPropertySource source, PropertyItem item)
     {
-        var attr = source.GetAttribute<DisplayNameAttribute>();
-        if (attr != null &&
-            source.BasedOnField?.GetAttribute<DisplayNameAttribute>() == attr)
-            attr = null;
-
+        var attr = source.GetAttribute<DisplayNameAttribute>(AttributeOrigin.ExcludeBasedOnField);
         if (attr != null)
         {
             item.Title = GetLocalizableTextValue<DisplayNameAttribute>(source, attr.DisplayName,

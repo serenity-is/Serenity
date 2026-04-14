@@ -4,16 +4,13 @@ public partial class BasicPropertyProcessor : PropertyProcessor
 {
     private static void SetInsertable(IPropertySource source, PropertyItem item)
     {
-        if (source.Property != null)
+        var attr = source.GetAttribute<InsertableAttribute>(AttributeOrigin.ExcludeBasedOnField);
+        if (attr != null)
         {
-            var attr = source.GetAttribute<InsertableAttribute>();
-            if (attr != null)
-            {
-                if (!attr.Value)
-                    item.Insertable = false;
+            if (!attr.Value)
+                item.Insertable = false;
 
-                return;
-            }
+            return;
         }
 
         if (source.BasedOnField is not null)

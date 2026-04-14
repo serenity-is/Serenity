@@ -55,30 +55,36 @@ public static class AnnotationTypeExtensions
 
         public Type PropertyType => property.PropertyType;
 
-        public TAttr? GetAttribute<TAttr>() where TAttr : Attribute
+        public TAttr? GetAttribute<TAttr>(AttributeOrigin origin) where TAttr : Attribute
         {
-            var attr = property.GetAttribute<TAttr>();
+            var attr = property.GetAttribute<TAttr>(origin);
             if (attr != null)
                 return attr;
 
-            foreach (var annotation in annotations)
+            if (origin.HasFlag(AttributeOrigin.Annotation))
             {
-                attr = annotation.GetAttribute<TAttr>();
-                if (attr != null)
-                    return attr;
+                foreach (var annotation in annotations)
+                {
+                    attr = annotation.GetAttribute<TAttr>();
+                    if (attr != null)
+                        return attr;
+                }
             }
 
             return null;
         }
 
-        public IEnumerable<TAttr> GetAttributes<TAttr>() where TAttr : Attribute
+        public IEnumerable<TAttr> GetAttributes<TAttr>(AttributeOrigin origin) where TAttr : Attribute
         {
-            foreach (var attr in property.GetAttributes<TAttr>())
+            foreach (var attr in property.GetAttributes<TAttr>(origin))
                 yield return attr;
+
+            if (!origin.HasFlag(AttributeOrigin.Annotation))
+                yield break;
 
             foreach (var annotation in annotations)
             {
-                foreach (var attr in annotation.GetAttributes<TAttr>())
+                foreach (var attr in annotation.GetAttributes<TAttr>(origin))
                     yield return attr;
             }
 

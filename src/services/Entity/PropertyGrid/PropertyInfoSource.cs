@@ -51,30 +51,24 @@ public class PropertyInfoSource : IPropertySource
         }
     }
 
-    /// <summary>
-    /// Gets the attribute.
-    /// </summary>
-    /// <typeparam name="TAttribute">The type of the attribute.</typeparam>
-    /// <returns></returns>
-    public TAttribute GetAttribute<TAttribute>()
+    /// <inheritdoc/>
+    public TAttribute GetAttribute<TAttribute>(AttributeOrigin origin = AttributeOrigin.All)
         where TAttribute : Attribute
     {
-        return wrappedProperty.GetAttribute<TAttribute>() ??
-            BasedOnField?.GetAttribute<TAttribute>();
+        return wrappedProperty.GetAttribute<TAttribute>(origin) ??
+            (origin.HasFlag(AttributeOrigin.BasedOnField) ?
+             BasedOnField?.GetAttribute<TAttribute>() : null);
     }
 
-    /// <summary>
-    /// Gets the attributes.
-    /// </summary>
-    /// <typeparam name="TAttribute">The type of the attribute.</typeparam>
-    /// <returns></returns>
-    public IEnumerable<TAttribute> GetAttributes<TAttribute>()
+    /// <inheritdoc/>
+    public IEnumerable<TAttribute> GetAttributes<TAttribute>(AttributeOrigin origin = AttributeOrigin.All)
         where TAttribute : Attribute
     {
         var attrList = new List<TAttribute>();
-        attrList.AddRange(wrappedProperty.GetAttributes<TAttribute>());
+        attrList.AddRange(wrappedProperty.GetAttributes<TAttribute>(origin));
 
-        if (BasedOnField is not null)
+        if (origin.HasFlag(AttributeOrigin.BasedOnField) &&
+            BasedOnField is not null)
         {
             foreach (var a in BasedOnField.CustomAttributes)
                 if (typeof(TAttribute).IsAssignableFrom(a.GetType()))
@@ -92,21 +86,21 @@ public class PropertyInfoSource : IPropertySource
     /// </value>
     public PropertyInfo Property { get; private set; }
 
-    /// <inheritdoc />
+    /// <inheritdoc/>
     public Type ValueType { get; private set; }
 
-    /// <inheritdoc />
+    /// <inheritdoc/>
     public Type EnumType { get; private set; }
 
-    /// <inheritdoc />
+    /// <inheritdoc/>
     public IRow BasedOnRow { get; private set; }
 
-    /// <inheritdoc />
+    /// <inheritdoc/>
     public Field BasedOnField { get; private set; }
 
-    /// <inheritdoc />
+    /// <inheritdoc/>
     public string Name => wrappedProperty.Name;
 
-    /// <inheritdoc />
+    /// <inheritdoc/>
     public Type PropertyType => wrappedProperty.PropertyType;
 }

@@ -4,16 +4,13 @@ public partial class BasicPropertyProcessor : PropertyProcessor
 {
     private static void SetUpdatable(IPropertySource source, PropertyItem item)
     {
-        if (source.Property != null)
+        var attr = source.GetAttribute<UpdatableAttribute>(AttributeOrigin.ExcludeBasedOnField);
+        if (attr != null)
         {
-            var attr = source.GetAttribute<UpdatableAttribute>();
-            if (attr != null)
-            {
-                if (!attr.Value)
-                    item.Updatable = false;
+            if (!attr.Value)
+                item.Updatable = false;
 
-                return;
-            }
+            return;
         }
 
         if (source.BasedOnField is not null)

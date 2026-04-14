@@ -4,16 +4,13 @@ public partial class BasicPropertyProcessor : PropertyProcessor
 {
     private static void SetReadPermission(IPropertySource source, PropertyItem item)
     {
-        if (source.Property != null)
+        var attr = source.GetAttribute<ReadPermissionAttribute>(AttributeOrigin.ExcludeBasedOnField);
+        if (attr != null)
         {
-            var attr = source.GetAttribute<ReadPermissionAttribute>();
-            if (attr != null)
-            {
-                if (attr.Permission != SpecialPermissionKeys.Public)
-                    item.ReadPermission = attr.Permission ?? SpecialPermissionKeys.LoggedIn;
+            if (attr.Permission != SpecialPermissionKeys.Public)
+                item.ReadPermission = attr.Permission ?? SpecialPermissionKeys.LoggedIn;
 
-                return;
-            }
+            return;
         }
 
         if (source.BasedOnField is not null)

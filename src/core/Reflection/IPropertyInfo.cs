@@ -18,14 +18,14 @@ public interface IPropertyInfo
     /// </summary>
     /// <typeparam name="TAttr">The type of the attribute.</typeparam>
     /// <returns></returns>
-    TAttr? GetAttribute<TAttr>() where TAttr : Attribute;
+    TAttr? GetAttribute<TAttr>(AttributeOrigin origin = AttributeOrigin.All) where TAttr : Attribute;
 
     /// <summary>
     /// Gets the attributes.
     /// </summary>
     /// <typeparam name="TAttr">The type of the attribute.</typeparam>
     /// <returns></returns>
-    IEnumerable<TAttr> GetAttributes<TAttr>() where TAttr : Attribute;
+    IEnumerable<TAttr> GetAttributes<TAttr>(AttributeOrigin origin = AttributeOrigin.All) where TAttr : Attribute;
 
     /// <summary>
     /// Gets the type of the property.
