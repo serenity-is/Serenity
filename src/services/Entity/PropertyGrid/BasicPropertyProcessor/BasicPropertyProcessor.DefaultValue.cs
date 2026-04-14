@@ -4,7 +4,7 @@ public partial class BasicPropertyProcessor : PropertyProcessor
 {
     private static void SetDefaultValue(IPropertySource source, PropertyItem item)
     {
-        var attr = source.GetAttribute<DefaultValueAttribute>(AttributeOrigin.ExceptBasedOnField);
+        var attr = source.GetAttribute<DefaultValueAttribute>(AttributeOrigin.ExcludeBasedOnField);
         if (attr != null)
         {
             item.DefaultValue = attr.Value;

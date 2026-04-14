@@ -33,11 +33,10 @@ public partial class BasicPropertyProcessor : PropertyProcessor
                     }
                     else
                     {
-                        var isRow = source.Property != null &&
-                            source.Property.ReflectedType != null &&
-                            !source.Property.ReflectedType.IsAbstract &&
-                            !source.Property.ReflectedType.IsInterface &&
-                            typeof(IRow).IsAssignableFrom(source.Property.ReflectedType);
+                        var isRow = source.ReflectedType != null &&
+                            !source.ReflectedType.IsAbstract &&
+                            !source.ReflectedType.IsInterface &&
+                            typeof(IRow).IsAssignableFrom(source.ReflectedType);
 
                         if (!isRow)
                         {
@@ -45,7 +44,7 @@ public partial class BasicPropertyProcessor : PropertyProcessor
                                 prefix = source.BasedOnField.Fields.LocalTextPrefix;
                         }
                         else
-                            prefix = ((IRow)Activator.CreateInstance(source.Property.ReflectedType))
+                            prefix = ((IRow)Activator.CreateInstance(source.ReflectedType))
                                 .Fields.LocalTextPrefix;
                     }
 

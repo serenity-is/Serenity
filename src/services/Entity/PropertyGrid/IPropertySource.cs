@@ -1,4 +1,4 @@
-﻿using Serenity.Reflection;
+using Serenity.Reflection;
 
 namespace Serenity.PropertyGrid;
 
@@ -14,6 +14,7 @@ public interface IPropertySource : IPropertyInfo
     /// The property.
     /// </value>
     PropertyInfo Property { get; }
+
     /// <summary>
     /// Gets the based on field.
     /// </summary>
@@ -21,6 +22,7 @@ public interface IPropertySource : IPropertyInfo
     /// The based on field.
     /// </value>
     Field BasedOnField { get; }
+
     /// <summary>
     /// Gets the type of the value.
     /// </summary>
@@ -28,6 +30,7 @@ public interface IPropertySource : IPropertyInfo
     /// The type of the value.
     /// </value>
     Type ValueType { get; }
+
     /// <summary>
     /// Gets the type of the enum.
     /// </summary>
@@ -35,4 +38,10 @@ public interface IPropertySource : IPropertyInfo
     /// The type of the enum.
     /// </value>
     Type EnumType { get; }
+
+    /// <summary>
+    /// Gets the reflected type that this property belongs to. This is used for some attribute providers 
+    /// that need to know the reflected type, such as based on row field provider.
+    /// </summary>
+    Type ReflectedType { get; }
 }

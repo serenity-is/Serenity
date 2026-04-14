@@ -24,7 +24,7 @@ public partial class BasicPropertyProcessor : PropertyProcessor
         {
             if (propertyItemsTextPrefix is null)
             {
-                if (source.Property?.ReflectedType is not Type type)
+                if (source.ReflectedType is not Type type)
                     return null;
 
                 propertyItemsTextPrefix = PropertyItemsLocalTextRegistration
@@ -48,7 +48,7 @@ public partial class BasicPropertyProcessor : PropertyProcessor
         if (attr != null)
         {
             item.Title = GetLocalizableTextValue<DisplayNameAttribute>(source, attr.DisplayName,
-                () => source.Property?.Name, ignoreField: true);
+                () => source.Name, ignoreField: true);
             return;
         }
 
@@ -59,7 +59,7 @@ public partial class BasicPropertyProcessor : PropertyProcessor
             if (basedOnField is not null)
                 item.Title = basedOnField.Caption?.Key ?? basedOnField.AutoTextKey;
             else
-                item.Title = source.Property?.Name;
+                item.Title = source.Name;
         }
     }
 }

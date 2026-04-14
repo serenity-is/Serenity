@@ -8,7 +8,7 @@ public partial class BasicPropertyProcessor : PropertyProcessor
         if (attr != null)
         {
             item.Hint = GetLocalizableTextValue<HintAttribute>(source, attr.Hint, 
-                () => source.Property?.Name + "_Hint");
+                () => source.Name + "_Hint");
         }
     }
 }

@@ -99,8 +99,11 @@ public class PropertyInfoSource : IPropertySource
     public Field BasedOnField { get; private set; }
 
     /// <inheritdoc/>
-    public string Name => wrappedProperty.Name;
+    public string Name => Property.Name;
 
     /// <inheritdoc/>
-    public Type PropertyType => wrappedProperty.PropertyType;
+    public Type PropertyType => Property.PropertyType;
+
+    /// <inheritdoc/>
+    public Type ReflectedType => Property.ReflectedType;
 }
