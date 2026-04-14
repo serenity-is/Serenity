@@ -33,6 +33,7 @@ export interface Column<TItem = any> {
     rerenderOnResize?: boolean;
     resizable?: boolean;
     selectable?: boolean;
+    tabbable?: boolean;
     sortable?: boolean;
     sortOrder?: number;
     toolTip?: string;
@@ -49,7 +50,8 @@ export const columnDefaults: Partial<Column> = {
     rerenderOnResize: false,
     defaultSortAsc: true,
     focusable: true,
-    selectable: true
+    selectable: true,
+    tabbable: true
 };
 
 export interface ColumnMetadata<TItem = any> {
@@ -61,6 +63,7 @@ export interface ColumnMetadata<TItem = any> {
     /** @deprecated */
     formatter?: CompatFormatter<TItem>;
     selectable?: boolean;
+    tabbable?: boolean;
 }
 
 export interface ColumnSort {
@@ -76,6 +79,7 @@ export interface ItemMetadata<TItem = any> {
     /** @deprecated */
     formatter?: CompatFormatter<TItem>;
     selectable?: boolean;
+    tabbable?: boolean;
 }
 
 export function initColumnProps(columns: Column[], defaults: Partial<Column<any>>) {

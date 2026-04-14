@@ -956,7 +956,7 @@ export interface ISleekGrid<TItem = any> extends CellNavigation, EditorHost, Gri
 	addCellCssStyles(key: string, hash: CellStylesHash): void;
 	autosizeColumns(): void;
 	cancelCurrentEdit(): boolean;
-	canCellBeActive(row: number, cell: number): boolean;
+	canCellBeActive(row: number, cell: number, tab?: boolean): boolean;
 	canCellBeSelected(row: number, cell: number): boolean;
 	clearTextSelection(): void;
 	columnsResized(invalidate?: boolean): void;
@@ -1245,6 +1245,7 @@ export interface Column<TItem = any> {
 	rerenderOnResize?: boolean;
 	resizable?: boolean;
 	selectable?: boolean;
+	tabbable?: boolean;
 	sortable?: boolean;
 	sortOrder?: number;
 	toolTip?: string;
@@ -1262,6 +1263,7 @@ export interface ColumnMetadata<TItem = any> {
 	/** @deprecated */
 	formatter?: CompatFormatter<TItem>;
 	selectable?: boolean;
+	tabbable?: boolean;
 }
 export interface ColumnSort {
 	columnId: string;
@@ -1277,6 +1279,7 @@ export interface ItemMetadata<TItem = any> {
 	/** @deprecated */
 	formatter?: CompatFormatter<TItem>;
 	selectable?: boolean;
+	tabbable?: boolean;
 }
 export declare function initColumnProps(columns: Column[], defaults: Partial<Column<any>>): void;
 export declare function titleize(str: string): string;
@@ -1579,6 +1582,7 @@ export declare class SleekGrid<TItem = any> implements ISleekGrid<TItem> {
 	}): void;
 	invalidateColumns(): void;
 	getOptions(): GridOptions<TItem>;
+	protected prepareForOptionsChange(): void;
 	setOptions(args: GridOptions<TItem>, suppressRender?: boolean, suppressColumnSet?: boolean, suppressSetOverflow?: boolean): void;
 	private validateAndEnforceOptions;
 	private setOptionDependentSignals;
@@ -1737,7 +1741,7 @@ export declare class SleekGrid<TItem = any> implements ISleekGrid<TItem> {
 	getCellNode(row: number, cell: number): HTMLElement;
 	setActiveCell(row: number, cell: number): void;
 	setActiveRow(row: number, cell: number, suppressScrollIntoView?: boolean): void;
-	canCellBeActive(row: number, cell: number): boolean;
+	canCellBeActive(row: number, cell: number, tab?: boolean): boolean;
 	canCellBeSelected(row: number, cell: number): boolean;
 	gotoCell(row: number, cell: number, forceEdit?: boolean): void;
 	commitCurrentEdit(opt?: {

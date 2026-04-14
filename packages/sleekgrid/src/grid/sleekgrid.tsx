@@ -3833,7 +3833,7 @@ export class SleekGrid<TItem = any> implements ISleekGrid<TItem> {
             this.scrollCellIntoView(row, cell || 0, false);
     }
 
-    canCellBeActive(row: number, cell: number): boolean {
+    canCellBeActive(row: number, cell: number, tab?: boolean): boolean {
         var cols = this._cols;
         if (!this._options.enableCellNavigation || row >= this.getDataLengthIncludingAddNew() ||
             row < 0 || cell >= cols.length || cell < 0) {
@@ -3842,18 +3842,42 @@ export class SleekGrid<TItem = any> implements ISleekGrid<TItem> {
 
         var rowMetadata = (this._data as IDataView).getItemMetadata?.(row);
         if (rowMetadata && typeof rowMetadata.focusable === "boolean") {
-            return rowMetadata.focusable;
+            if (!rowMetadata.focusable)
+                return false;
+
+            if (tab && typeof rowMetadata.tabbable === "boolean")
+                return rowMetadata.tabbable;
+
+            return true;
         }
 
         var colsMetadata = rowMetadata && rowMetadata.columns;
         if (colsMetadata && cols[cell] && colsMetadata[cols[cell].id] && typeof colsMetadata[cols[cell].id].focusable === "boolean") {
-            return colsMetadata[cols[cell].id].focusable;
-        }
-        if (colsMetadata && colsMetadata[cell] && typeof colsMetadata[cell].focusable === "boolean") {
-            return colsMetadata[cell].focusable;
+            if (!(colsMetadata[cols[cell].id].focusable))
+                return false;
+            if (tab && typeof colsMetadata[cols[cell].id].tabbable === "boolean")
+                return colsMetadata[cols[cell].id].tabbable;
+
+            return true;
         }
 
-        return cols[cell].focusable;
+        if (colsMetadata && colsMetadata[cell] && typeof colsMetadata[cell].focusable === "boolean") {
+            if (!(colsMetadata[cell].focusable))
+                return false;
+
+            if (tab && typeof colsMetadata[cell].tabbable === "boolean")
+                return colsMetadata[cell].tabbable;
+
+            return true;
+        }
+
+        if (!(cols[cell].focusable))
+            return false;
+
+        if (tab && typeof cols[cell].tabbable === "boolean")
+            return cols[cell].tabbable;
+
+        return true;
     }
 
     canCellBeSelected(row: number, cell: number) {

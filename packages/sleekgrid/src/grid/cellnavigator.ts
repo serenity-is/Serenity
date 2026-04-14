@@ -5,7 +5,7 @@ export interface CellNavigatorHost {
     getColumnCount(): number;
     getRowCount(): number;
     getColspan(row: number, cell: number): number;
-    canCellBeActive(row: number, cell: number): boolean;
+    canCellBeActive(row: number, cell: number, tab?: boolean): boolean;
     setTabbingDirection(dir: number): void;
     isRTL(): boolean;
 }
@@ -18,11 +18,11 @@ export class CellNavigator {
         this.host = h;
     }
 
-    private findFirstFocusableCell(row: number): number {
+    private findFirstFocusableCell(row: number, tab?: boolean): number {
         var cell = 0;
         var cols = this.host.getColumnCount();
         while (cell < cols) {
-            if (this.host.canCellBeActive(row, cell)) {
+            if (this.host.canCellBeActive(row, cell, tab)) {
                 return cell;
             }
             cell += this.host.getColspan(row, cell);
@@ -30,12 +30,12 @@ export class CellNavigator {
         return null;
     }
 
-    private findLastFocusableCell(row: number): number {
+    private findLastFocusableCell(row: number, tab: boolean): number {
         var cell = 0;
         var lastFocusableCell = null;
         var cols = this.host.getColumnCount();
         while (cell < cols) {
-            if (this.host.canCellBeActive(row, cell)) {
+            if (this.host.canCellBeActive(row, cell, tab)) {
                 lastFocusableCell = cell;
             }
             cell += this.host.getColspan(row, cell);
@@ -44,7 +44,7 @@ export class CellNavigator {
     }
 
 
-    private gotoRight(row?: number, cell?: number): GoToResult {
+    private gotoRight(row?: number, cell?: number, tab?: boolean): GoToResult {
         var cols = this.host.getColumnCount();
         if (cell >= cols) {
             return null;
@@ -53,7 +53,7 @@ export class CellNavigator {
         do {
             cell += this.host.getColspan(row, cell);
         }
-        while (cell < cols && !this.host.canCellBeActive(row, cell));
+        while (cell < cols && !this.host.canCellBeActive(row, cell, tab));
 
         if (cell < cols) {
             return {
@@ -65,12 +65,12 @@ export class CellNavigator {
         return null;
     }
 
-    private gotoLeft(row?: number, cell?: number): GoToResult {
+    private gotoLeft(row?: number, cell?: number, tab?: boolean): GoToResult {
         if (cell <= 0) {
             return null;
         }
 
-        var firstFocusableCell = this.findFirstFocusableCell(row);
+        var firstFocusableCell = this.findFirstFocusableCell(row, tab);
         if (firstFocusableCell === null || firstFocusableCell >= cell) {
             return null;
         }
@@ -82,7 +82,7 @@ export class CellNavigator {
         };
         var pos;
         while (true) {
-            pos = this.gotoRight(prev.row, prev.cell);
+            pos = this.gotoRight(prev.row, prev.cell, tab);
             if (!pos) {
                 return null;
             }
@@ -107,7 +107,7 @@ export class CellNavigator {
                 cell += this.host.getColspan(row, cell);
             }
 
-            if (this.host.canCellBeActive(row, prevCell)) {
+            if (this.host.canCellBeActive(row, prevCell, false)) {
                 return {
                     row: row,
                     cell: prevCell,
@@ -130,7 +130,7 @@ export class CellNavigator {
                 cell += this.host.getColspan(row, cell);
             }
 
-            if (this.host.canCellBeActive(row, prevCell)) {
+            if (this.host.canCellBeActive(row, prevCell, false)) {
                 return {
                     row: row,
                     cell: prevCell,
@@ -143,7 +143,7 @@ export class CellNavigator {
     private gotoNext(row?: number, cell?: number, posX?: number): GoToResult {
         if (row == null && cell == null) {
             row = cell = posX = 0;
-            if (this.host.canCellBeActive(row, cell)) {
+            if (this.host.canCellBeActive(row, cell, true)) {
                 return {
                     row: row,
                     cell: cell,
@@ -152,7 +152,7 @@ export class CellNavigator {
             }
         }
 
-        var pos = this.gotoRight(row, cell);
+        var pos = this.gotoRight(row, cell, true);
         if (pos) {
             return pos;
         }
@@ -160,7 +160,7 @@ export class CellNavigator {
         var firstFocusableCell = null;
         var dataLengthIncludingAddNew = this.host.getRowCount();
         while (++row < dataLengthIncludingAddNew) {
-            firstFocusableCell = this.findFirstFocusableCell(row);
+            firstFocusableCell = this.findFirstFocusableCell(row, true);
             if (firstFocusableCell != null) {
                 return {
                     row: row,
@@ -177,7 +177,7 @@ export class CellNavigator {
         if (row == null && cell == null) {
             row = this.host.getRowCount() - 1;
             cell = posX = cols - 1;
-            if (this.host.canCellBeActive(row, cell)) {
+            if (this.host.canCellBeActive(row, cell, true)) {
                 return {
                     row: row,
                     cell: cell,
@@ -189,7 +189,7 @@ export class CellNavigator {
         var pos;
         var lastSelectableCell;
         while (!pos) {
-            pos = this.gotoLeft(row, cell);
+            pos = this.gotoLeft(row, cell, true);
             if (pos) {
                 break;
             }
@@ -198,7 +198,7 @@ export class CellNavigator {
             }
 
             cell = 0;
-            lastSelectableCell = this.findLastFocusableCell(row);
+            lastSelectableCell = this.findLastFocusableCell(row, true);
             if (lastSelectableCell != null) {
                 pos = {
                     row: row,
@@ -211,7 +211,7 @@ export class CellNavigator {
     }
 
     private gotoRowStart(row: number) {
-        var newCell = this.findFirstFocusableCell(row);
+        var newCell = this.findFirstFocusableCell(row, false);
         if (newCell === null)
             return null;
 
@@ -223,7 +223,7 @@ export class CellNavigator {
     }
 
     private gotoRowEnd(row: number) {
-        var newCell = this.findLastFocusableCell(row);
+        var newCell = this.findLastFocusableCell(row, false);
         if (newCell === null)
             return null;
 
