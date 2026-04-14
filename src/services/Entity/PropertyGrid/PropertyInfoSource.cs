@@ -92,32 +92,21 @@ public class PropertyInfoSource : IPropertySource
     /// </value>
     public PropertyInfo Property { get; private set; }
 
-    /// <summary>
-    /// Gets the type of the value.
-    /// </summary>
-    /// <value>
-    /// The type of the value.
-    /// </value>
+    /// <inheritdoc />
     public Type ValueType { get; private set; }
-    /// <summary>
-    /// Gets the type of the enum.
-    /// </summary>
-    /// <value>
-    /// The type of the enum.
-    /// </value>
+
+    /// <inheritdoc />
     public Type EnumType { get; private set; }
-    /// <summary>
-    /// Gets the based on row.
-    /// </summary>
-    /// <value>
-    /// The based on row.
-    /// </value>
+
+    /// <inheritdoc />
     public IRow BasedOnRow { get; private set; }
-    /// <summary>
-    /// Gets the based on field.
-    /// </summary>
-    /// <value>
-    /// The based on field.
-    /// </value>
+
+    /// <inheritdoc />
     public Field BasedOnField { get; private set; }
+
+    /// <inheritdoc />
+    public string Name => wrappedProperty.Name;
+
+    /// <inheritdoc />
+    public Type PropertyType => wrappedProperty.PropertyType;
 }

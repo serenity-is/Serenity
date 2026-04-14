@@ -1,9 +1,11 @@
-﻿namespace Serenity.PropertyGrid;
+﻿using Serenity.Reflection;
+
+namespace Serenity.PropertyGrid;
 
 /// <summary>
 /// Abstracts the property source that returns PropertyInfo and some other info
 /// </summary>
-public interface IPropertySource
+public interface IPropertySource : IPropertyInfo
 {
     /// <summary>
     /// Gets the property.
@@ -19,18 +21,6 @@ public interface IPropertySource
     /// The based on field.
     /// </value>
     Field BasedOnField { get; }
-    /// <summary>
-    /// Gets the attribute.
-    /// </summary>
-    /// <typeparam name="TAttr">The type of the attribute.</typeparam>
-    /// <returns></returns>
-    TAttr GetAttribute<TAttr>() where TAttr : Attribute;
-    /// <summary>
-    /// Gets the attributes.
-    /// </summary>
-    /// <typeparam name="TAttr">The type of the attribute.</typeparam>
-    /// <returns></returns>
-    IEnumerable<TAttr> GetAttributes<TAttr>() where TAttr : Attribute;
     /// <summary>
     /// Gets the type of the value.
     /// </summary>
