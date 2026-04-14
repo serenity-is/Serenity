@@ -1496,12 +1496,19 @@ export class SleekGrid<TItem = any> implements ISleekGrid<TItem> {
         return this._options;
     }
 
-    setOptions(args: GridOptions<TItem>, suppressRender?: boolean, suppressColumnSet?: boolean, suppressSetOverflow?: boolean): void {
-        if (!this.getEditorLock().commitCurrentEdit()) {
+    protected prepareForOptionsChange() {
+        const editorLock = this.getEditorLock();
+        if (this._editController && editorLock?.isActive(this._editController) && !editorLock?.commitCurrentEdit()) {
+            editorLock?.cancelCurrentEdit();
             return;
         }
 
         this.makeActiveCellNormal();
+    }
+
+    setOptions(args: GridOptions<TItem>, suppressRender?: boolean, suppressColumnSet?: boolean, suppressSetOverflow?: boolean): void {
+
+        this.prepareForOptionsChange();
 
         if (args.groupingPanel && !this._options.groupingPanel)
             this.createGroupingPanel();

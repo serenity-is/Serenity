@@ -1,4 +1,11 @@
+## 10.2.9 (2027-04-14)
+
+### Bugfixes
+- Null reference issue when grid inline editor's inplace add button is clicked and another inplace editor grid is opened
+
 ## 10.2.8 (2027-04-14)
+
+### Features
 - Add Focusable(false), Selectable(false) to RowEditActionsColumnAttribute
 - Derive IPropertySource from IPropertyInfo
 - Add origin argument to IPropertyInfo.GetAttribute and IPropertyInfo.GetAttributes method to selectively exclude inherited, intrinsic, based on field attributes.
