@@ -224,7 +224,7 @@ public partial class ServerTypingsGenerator
             responseType.Resolve()))
 #endif
             return false;
-        else if (responseType == null || TypingsUtils.IsVoid(responseType))
+        else if (responseType == null || responseType.IsVoid())
             return false;
 
         return true;

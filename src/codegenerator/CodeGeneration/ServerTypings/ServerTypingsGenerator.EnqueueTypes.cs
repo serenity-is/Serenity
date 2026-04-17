@@ -144,7 +144,7 @@ public partial class ServerTypingsGenerator
 
     protected virtual bool ShouldIncludeInitialType(TypeDefinition type)
     {
-        var baseTypes = TypingsUtils.EnumerateBaseClasses(type).ToArray();
+        var baseTypes = type.EnumerateBaseClasses().ToArray();
 
         return IsServiceRequest(baseTypes, type) ||
             IsServiceResponse(baseTypes, type) ||

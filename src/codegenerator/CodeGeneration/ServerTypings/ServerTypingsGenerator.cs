@@ -201,7 +201,7 @@ public partial class ServerTypingsGenerator : CodeGeneratorBase
             return;
         }
 
-        var baseTypes = TypingsUtils.EnumerateBaseClasses(type).ToArray();
+        var baseTypes = type.EnumerateBaseClasses().ToArray();
 
         if (IsServiceEndpoint(baseTypes, type))
         {

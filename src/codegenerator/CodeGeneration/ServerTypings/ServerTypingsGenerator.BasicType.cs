@@ -84,7 +84,7 @@ public partial class ServerTypingsGenerator
 
     protected static TypeReference GetBasicTypeBaseClass(TypeDefinition type)
     {
-        foreach (var t in TypingsUtils.SelfAndBaseClasses(type))
+        foreach (var t in type.SelfAndBaseClasses())
         {
             if (t.BaseType != null &&
                 t.BaseType.IsGenericInstanceType(out var originalDefinition) &&

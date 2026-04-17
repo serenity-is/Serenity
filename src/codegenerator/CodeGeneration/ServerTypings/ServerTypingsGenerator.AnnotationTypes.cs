@@ -38,7 +38,7 @@ public partial class ServerTypingsGenerator
 
             foreach (var attr in annotationType.Attributes)
             {
-                baseClasses ??= TypingsUtils.EnumerateBaseClasses(type).ToArray();
+                baseClasses ??= type.EnumerateBaseClasses().ToArray();
 
                 if (TypingsUtils.IsOrSubClassOf(attr.AnnotatedType, "System", "Attribute"))
                 {

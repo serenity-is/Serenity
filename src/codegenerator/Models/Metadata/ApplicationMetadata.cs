@@ -21,7 +21,7 @@ public class ApplicationMetadata : IApplicationMetadata
         {
             base.ScanAnnotationTypeAttributes(type);
 
-            var baseTypes = TypingsUtils.EnumerateBaseClasses(type).ToArray();
+            var baseTypes = type.EnumerateBaseClasses().ToArray();
 
             if (IsRowType(baseTypes, type))
             {
