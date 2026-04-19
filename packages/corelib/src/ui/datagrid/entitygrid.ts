@@ -296,14 +296,32 @@ export class EntityGrid<TItem, P = {}> extends DataGrid<TItem, P> {
             return hash;
         });
     }
-
+    
     protected getInsertPermission(): string {
         return this.getRowDefinition()?.insertPermission;
     }
 
-    protected hasInsertPermission(): boolean {
-        var insertPermission = this.getInsertPermission();
-        return insertPermission == null || Authorization.hasPermission(this.getInsertPermission());
+    protected getUpdatePermission(): string {
+        return this.getRowDefinition()?.updatePermission;
+    }
+
+    protected getDeletePermission(): string {
+        return this.getRowDefinition()?.deletePermission;
+    }
+
+    protected hasDeletePermission() {
+        const deletePermission = this.getDeletePermission();
+        return deletePermission == null || Authorization.hasPermission(deletePermission);
+    }
+
+    protected hasInsertPermission() {
+        const insertPermission = this.getInsertPermission();
+        return insertPermission == null || Authorization.hasPermission(insertPermission);
+    }
+
+    protected hasUpdatePermission() {
+        const updatePermission = this.getUpdatePermission();
+        return updatePermission == null || Authorization.hasPermission(updatePermission);
     }
 
     protected transferDialogReadOnly(dialog: Widget<any>) {
