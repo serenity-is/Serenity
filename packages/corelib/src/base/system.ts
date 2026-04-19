@@ -14,6 +14,7 @@ declare global {
   }
 }
 
+export { isAddRowSymbol,typeInfoSymbol } from "./symbols";
 
 /**
  * Get the global object  (window in browsers, global in node)

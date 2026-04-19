@@ -2088,6 +2088,8 @@ export declare function ensureTypeInfo(type: any): TypeInfo<string>;
 export declare function peekTypeInfo(type: any): TypeInfo<string>;
 export declare function getTypeNameProp(type: any): string;
 export declare function setTypeNameProp(type: any, value: string): void;
+export declare const isAddRowSymbol: unique symbol;
+export declare const typeInfoSymbol: unique symbol;
 /** @deprecated Use getGlobalTypeRegistry instead */
 export declare const getTypeRegistry: typeof getGlobalTypeRegistry;
 export declare const nsSerenity: "Serenity.";

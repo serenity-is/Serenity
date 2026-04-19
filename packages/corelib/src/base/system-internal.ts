@@ -1,7 +1,7 @@
-import { implementedInterfacesSymbol, isAssignableFromSymbol, typeRegistrySymbol } from "./symbols";
+import { implementedInterfacesSymbol, isAssignableFromSymbol, typeInfoSymbol, typeRegistrySymbol } from "./symbols";
 import type { CustomAttribute, InterfaceType } from "./system";
 
-(Symbol as any).typeInfo ??= Symbol.for("Serenity.typeInfo");
+(Symbol as any).typeInfo ??= typeInfoSymbol;
 
 export const globalObject: any =
     (typeof globalThis !== "undefined" && globalThis) ||
