@@ -3990,7 +3990,7 @@ export declare class RemoteView<TItem = any> implements IRemoteView<TItem> {
 	getRows(): (TItem | Group<any> | GroupTotals<any>)[];
 	getLength(): number;
 	getItem(i: number): any;
-	getItemMetadata(row: number): ItemMetadata<any>;
+	getItemMetadata(row: number): ItemMetadata<TItem>;
 	private expandCollapseAllGroups;
 	collapseAllGroups(level?: number): void;
 	expandAllGroups(level?: number): void;
@@ -5616,7 +5616,11 @@ export declare class EntityGrid<TItem, P = {}> extends DataGrid<TItem, P> {
 	protected getItemType(): string;
 	protected routeDialog(itemType: string, dialog: Widget<any>): void;
 	protected getInsertPermission(): string;
+	protected getUpdatePermission(): string;
+	protected getDeletePermission(): string;
+	protected hasDeletePermission(): boolean;
 	protected hasInsertPermission(): boolean;
+	protected hasUpdatePermission(): boolean;
 	protected transferDialogReadOnly(dialog: Widget<any>): void;
 	protected initDialog(dialog: Widget<any>): void;
 	protected initEntityDialog(itemType: string, dialog: Widget<any>): void;
