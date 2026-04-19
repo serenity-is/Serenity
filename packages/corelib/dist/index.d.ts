@@ -3992,7 +3992,7 @@ export declare class RemoteView<TItem = any> implements IRemoteView<TItem> {
 	getRows(): (TItem | Group<any> | GroupTotals<any>)[];
 	getLength(): number;
 	getItem(i: number): any;
-	getItemMetadata(row: number): ItemMetadata<TItem>;
+	getItemMetadata(row: number): ItemMetadata<any>;
 	private expandCollapseAllGroups;
 	collapseAllGroups(level?: number): void;
 	expandAllGroups(level?: number): void;
