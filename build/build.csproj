@@ -6,6 +6,8 @@
     <DefaultItemExcludes>$(DefaultItemExcludes);tasks\**;assets\**;*.props;*.targets</DefaultItemExcludes>
   </PropertyGroup>
   <ItemGroup>
-    <PackageReference Include="Cake.Frosting" Version="5.0.0" />
+    <PackageReference Include="Cake.Frosting" Version="6.1.0" />
+    <PackageReference Include="NuGet.Packaging" Version="7.3.1" />
+    <PackageReference Include="NuGet.Protocol" Version="7.3.1" />
   </ItemGroup>
 </Project>

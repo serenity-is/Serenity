@@ -1,3 +1,13 @@
+## 10.3.1 (2027-04-20)
+
+- Rename useGridEditorSave to useGridEditorServices to better match intent (e.g. save and delete)
+- Define hasDeletePermission, hasInsertPermission etc. also in EntityGrid
+- Export isAddRowSymbol from corelib
+- Auto register function for GridEditController (StartSharp)
+- Add hasInsertPermission, hasUpdatePermission and canEditItem options to GridEditController
+- Use hasDeletePermission method from the grid if available, or use hasDeletePermission option of GridEditController if specified (StartSharp)
+- Add isReadOnly option to GridEditController, if not specified check grid's get_readOnly method / readOnly property (StartSharp)
+
 ## 10.3.0 (2027-04-14)
 
 - Set grid's options.editorLock to a new one if default options editorLock is set to null. This allows setting gridDefaults.editorLock to null to automatically create a new one when required. Using GlobalEditorLock may cause some issues between editable grids in different unrelated dialogs.
