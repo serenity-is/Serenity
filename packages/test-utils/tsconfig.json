@@ -9,7 +9,8 @@
       "dom"
     ],
     "outDir": "./out",
-    "rootDir": "."
+    "rootDir": ".",
+    "strict": false
   },
   "include": [
     "."
