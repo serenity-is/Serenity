@@ -2276,7 +2276,7 @@ export declare function inSVGNamespace(fn: () => ComponentChildren): ComponentCh
 export declare function inMathMLNamespace(fn: () => ComponentChildren): ComponentChildren;
 export declare function inHTMLNamespace(fn: () => ComponentChildren): ComponentChildren;
 type DataKeys = `data-${string}`;
-export declare function jsx<THtmlTag extends keyof HTMLElementTagNameMap, TElement extends HTMLElementTagNameMap[THtmlTag]>(type: THtmlTag, props?: (HTMLElementTags[THtmlTag] & Record<DataKeys, string | number>) | null): TElement;
+export declare function jsx<THtmlTag extends (keyof HTMLElementTagNameMap & keyof HTMLElementTags), TElement extends HTMLElementTagNameMap[THtmlTag]>(type: THtmlTag, props?: (HTMLElementTags[THtmlTag] & Record<DataKeys, string | number>) | null): TElement;
 export declare function jsx<TSVGTag extends (keyof SVGElementTagNameMap & keyof SVGElementTags), TElement extends SVGElementTagNameMap[TSVGTag]>(type: TSVGTag, props?: (SVGElementTags[TSVGTag] & Record<DataKeys, string | number>) | null): TElement;
 export declare function jsx(type: string, props?: (ElementAttributes<JSXElement> & Record<DataKeys, string | number>) | null): JSXElement;
 export declare const MathMLNamespace = "http://www.w3.org/1998/Math/MathML";

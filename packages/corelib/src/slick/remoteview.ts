@@ -585,7 +585,7 @@ export class RemoteView<TItem = any> implements IRemoteView<TItem> {
         return item;
     }
 
-    public getItemMetadata(row: number) {
+    public getItemMetadata(row: number): ItemMetadata<TItem> {
         const item = this.rows[row];
         if (item === undefined) {
             return null;

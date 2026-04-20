@@ -11,7 +11,7 @@ import { isComponentClass, isObject, isString } from "./util"
 type DataKeys = `data-${string}`
 
 // DOM Elements
-export function jsx<THtmlTag extends keyof HTMLElementTagNameMap, TElement extends HTMLElementTagNameMap[THtmlTag]>(
+export function jsx<THtmlTag extends (keyof HTMLElementTagNameMap & keyof HTMLElementTags), TElement extends HTMLElementTagNameMap[THtmlTag]>(
     type: THtmlTag,
     props?: (HTMLElementTags[THtmlTag] & Record<DataKeys, string | number>) | null
 ): TElement
