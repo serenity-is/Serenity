@@ -1,3 +1,4 @@
+import { bindThis } from "@serenity-is/domwise";
 import { Dialog, Fluent, isArrayLike } from "../base";
 
 export interface HandleRouteEvent extends Event {
@@ -7,23 +8,35 @@ export interface HandleRouteEvent extends Event {
     isInitial: boolean
 }
 
-export namespace Router {
-    let oldURL: string;
-    let resolving: number = 0;
-    let autoinc: number = 0;
-    let ignoreHashLock: number = 0;
-    let ignoreHashUntil: number = 0;
-    let hashAnchorClickValue: string;
-    let hashAnchorClickTime: number;
+export interface IClassicRouter {
+	enabled: boolean;
+	navigate(newHash: string, tryBack?: boolean, silent?: boolean): void;
+	replace(newHash: string, tryBack?: boolean): void;
+	replaceLast(newHash: string, tryBack?: boolean): void;
+	dialog(owner: HTMLElement | ArrayLike<HTMLElement>, element: HTMLElement | ArrayLike<HTMLElement>, dialogHash: () => string): void;
+	mightBeRouteRegex: RegExp;
+	resolve(newHash?: string): "disabled" | "skipped" | "shebang" | "missinghandler" | "calledhandler";
+	ignoreHashChange(expiration?: number): void;
+}
 
-    export let enabled: boolean = true;
+const ignoredSelector = '.s-MessageDialog, .s-MessageModal, .s-PromptDialog, .route-ignore';
 
-    function isEquivalentUrl(url1: string, url2: string) {
+class RouterImplementation implements IClassicRouter {
+    private oldURL: string;
+    private resolving: number = 0;
+    private autoinc: number = 0;
+    private ignoreHashLock: number = 0;
+    private ignoreHashUntil: number = 0;
+    private hashAnchorClickValue: string;
+    private hashAnchorClickTime: number;
+    enabled: boolean = true;
+
+    private isEquivalentUrl(url1: string, url2: string) {
         return url1 == url2 || url1 == url2 + '#' || url2 == url1 + '#';
     }
 
-    export function navigate(newHash: string, tryBack?: boolean, silent?: boolean) {
-        if (!enabled || resolving > 0)
+    navigate(newHash: string, tryBack?: boolean, silent?: boolean) {
+        if (!this.enabled || this.resolving > 0)
             return;
 
         newHash = newHash || '';
@@ -32,29 +45,29 @@ export namespace Router {
         const newURL = window.location.href.replace(/#$/, '')
             .replace(/#.*$/, '') + newHash;
         if (newURL != window.location.href) {
-            if (tryBack && oldURL != null && isEquivalentUrl(oldURL, newURL)) {
+            if (tryBack && this.oldURL != null && this.isEquivalentUrl(this.oldURL, newURL)) {
                 if (silent)
-                    ignoreHashChange();
+                    this.ignoreHashChange();
 
-                oldURL = null;
+                this.oldURL = null;
                 window.history.back();
                 return;
             }
 
             if (silent)
-                ignoreHashChange();
+                this.ignoreHashChange();
 
-            oldURL = window.location.href;
+            this.oldURL = window.location.href;
             window.location.hash = newHash;
         }
     }
 
-    export function replace(newHash: string, tryBack?: boolean) {
-        navigate(newHash, tryBack, true);
+    replace(newHash: string, tryBack?: boolean) {
+        this.navigate(newHash, tryBack, true);
     }
 
-    export function replaceLast(newHash: string, tryBack?: boolean) {
-        if (!enabled)
+    replaceLast(newHash: string, tryBack?: boolean) {
+        if (!this.enabled)
             return;
 
         let current = window.location.hash || '';
@@ -73,49 +86,48 @@ export namespace Router {
                 newHash = parts.join("/+/");
             }
         }
-        Router.replace(newHash, tryBack);
+        this.replace(newHash, tryBack);
     }
 
-    const ignoredSelector = '.s-MessageDialog, .s-MessageModal, .s-PromptDialog, .route-ignore';
 
-    function isIgnoredDialog(el: HTMLElement) {
+    private isIgnoredDialog(el: HTMLElement) {
         return !!(el?.closest(ignoredSelector) || Dialog.getInstance(el)?.getContentNode()?.closest(ignoredSelector));
     }
 
-    function isVisibleOrHiddenBy(el: HTMLElement): boolean {
+    private isVisibleOrHiddenBy(el: HTMLElement): boolean {
         return (el.offsetWidth > 0 && el.offsetHeight > 0) ||  // if visible
             !!(!el.closest(".hidden, [hidden]") && el.closest("[data-hiddenby]")) // or temporarily hidden by another panel
     }
 
-    function getVisibleOrHiddenByDialogs(): HTMLElement[] {
+    private getVisibleOrHiddenByDialogs(): HTMLElement[] {
         const visibleDialogs = Array.from(document.querySelectorAll<HTMLElement>(".modal, .panel-body, .ui-dialog-content"))
-            .filter(isVisibleOrHiddenBy)
-            .filter(x => !isIgnoredDialog(x));
+            .filter(this.isVisibleOrHiddenBy)
+            .filter(x => !this.isIgnoredDialog(x));
         visibleDialogs.sort((a: any, b: any) => {
             return parseInt(a.dataset.qrouterorder || "0", 10) - parseInt(b.dataset.qrouterorder || "0", 10);
         });
         return visibleDialogs;
     }
 
-    let pendingDialogHash: () => string;
-    let pendingDialogElement: HTMLElement;
-    let pendingDialogOwner: HTMLElement;
-    let pendingDialogPreHash: string;
+    private pendingDialogHash: () => string;
+    private pendingDialogElement: HTMLElement;
+    private pendingDialogOwner: HTMLElement;
+    private pendingDialogPreHash: string;
 
-    function onDialogOpen(ownerEl: HTMLElement | ArrayLike<HTMLElement>, element: HTMLElement | ArrayLike<HTMLElement>, dialogHash: () => string) {
+    private onDialogOpen(ownerEl: HTMLElement | ArrayLike<HTMLElement>, element: HTMLElement | ArrayLike<HTMLElement>, dialogHash: () => string) {
         const route = [];
         element = isArrayLike(element) ? element[0] : element;
         if (element &&
-            pendingDialogElement &&
-            (element === pendingDialogElement) || (element.contains(pendingDialogElement))) {
-            dialogHash = pendingDialogHash ?? dialogHash;
-            ownerEl = pendingDialogOwner;
+            this.pendingDialogElement &&
+            (element === this.pendingDialogElement) || (element.contains(this.pendingDialogElement))) {
+            dialogHash = this.pendingDialogHash ?? dialogHash;
+            ownerEl = this.pendingDialogOwner;
         }
 
-        pendingDialogHash = null;
-        pendingDialogElement = null;
-        pendingDialogOwner = null;
-        pendingDialogPreHash = null;
+        this.pendingDialogHash = null;
+        this.pendingDialogElement = null;
+        this.pendingDialogOwner = null;
+        this.pendingDialogPreHash = null;
 
         ownerEl = isArrayLike(ownerEl) ? ownerEl[0] : ownerEl;
         const ownerIsDialog = ownerEl?.matches(".ui-dialog-content, .panel-body, .modal-content");
@@ -124,7 +136,7 @@ export namespace Router {
 
         let idPrefix: string;
         if (ownerDlgInst) {
-            const dialogs = getVisibleOrHiddenByDialogs();
+            const dialogs = this.getVisibleOrHiddenByDialogs();
             const index = dialogs.indexOf(ownerDlgInst.getEventsNode());
 
             for (let i = 0; i <= index; i++) {
@@ -155,26 +167,26 @@ export namespace Router {
         Router.replace(route.join("/+/"));
     }
 
-    export function dialog(owner: HTMLElement | ArrayLike<HTMLElement>, element: HTMLElement | ArrayLike<HTMLElement>, dialogHash: () => string) {
-        if (!enabled)
+    dialog(owner: HTMLElement | ArrayLike<HTMLElement>, element: HTMLElement | ArrayLike<HTMLElement>, dialogHash: () => string) {
+        if (!this.enabled)
             return;
 
         const el = isArrayLike(element) ? element[0] : element;
-        pendingDialogElement = el;
-        pendingDialogHash = dialogHash;
-        pendingDialogOwner = isArrayLike(owner) ? owner[0] : owner;
-        pendingDialogPreHash = resolvingPreRoute;
+        this.pendingDialogElement = el;
+        this.pendingDialogHash = dialogHash;
+        this.pendingDialogOwner = isArrayLike(owner) ? owner[0] : owner;
+        this.pendingDialogPreHash = this.resolvingPreRoute;
     }
 
-    let resolvingPreRoute: string;
-    let resolveIndex = 0;
+    private resolvingPreRoute: string
+    private resolveIndex = 0;
 
-    export let mightBeRouteRegex: RegExp = /^(new$|edit\/|![0-9]+$)/
+    mightBeRouteRegex: RegExp = /^(new$|edit\/|![0-9]+$)/
 
-    export function resolve(newHash?: string): "disabled" | "skipped" | "shebang" | "missinghandler" | "calledhandler" {
-        resolveIndex++;
+    resolve(newHash?: string): "disabled" | "skipped" | "shebang" | "missinghandler" | "calledhandler" {
+        this.resolveIndex++;
 
-        if (!enabled) {
+        if (!this.enabled) {
             return "disabled";
         }
 
@@ -185,17 +197,17 @@ export namespace Router {
         const newParts = newHash.split("/+/");
 
         if (resolvingCurrent &&
-            (hashAnchorClickTime && new Date().getTime() - hashAnchorClickTime < 100) &&
-            hashAnchorClickValue === newHash &&
+            (this.hashAnchorClickTime && new Date().getTime() - this.hashAnchorClickTime < 100) &&
+            this.hashAnchorClickValue === newHash &&
             (newHash != '' || window.location.href.indexOf('#') >= 0) &&
             newParts.length == 1 &&
-            !newParts.some(x => mightBeRouteRegex.test(x))) {
+            !newParts.some(x => this.mightBeRouteRegex.test(x))) {
             return "skipped";
         }
 
-        resolving++;
+        this.resolving++;
         try {
-            const dialogs = getVisibleOrHiddenByDialogs();
+            const dialogs = this.getVisibleOrHiddenByDialogs();
             const oldParts = dialogs.map((el: any) => el.dataset.qroute);
 
             let same = 0;
@@ -259,123 +271,147 @@ export namespace Router {
                 if (route.startsWith("!"))
                     return "shebang";
 
-                resolvingPreRoute = newParts.slice(0, i).join("/+/");
+                this.resolvingPreRoute = newParts.slice(0, i).join("/+/");
                 try {
                     closeMessages();
                     Fluent.trigger(handler, "handleroute", <HandleRouteEvent>{
                         route: route,
                         parts: newParts,
                         index: i,
-                        isInitial: resolveIndex <= 3
+                        isInitial: this.resolveIndex <= 3
                     });
                 }
                 finally {
-                    resolvingPreRoute = null;
+                    this.resolvingPreRoute = null;
                     return "calledhandler";
                 }
             }
         }
         finally {
-            resolving--;
+            this.resolving--;
         }
     }
 
-    function hashChange(_: Event) {
-        if (ignoreHashLock > 0) {
-            if (new Date().getTime() > ignoreHashUntil) {
-                ignoreHashLock = 0;
+    private hashChange(_: Event) {
+        if (this.ignoreHashLock > 0) {
+            if (new Date().getTime() > this.ignoreHashUntil) {
+                this.ignoreHashLock = 0;
             }
             else {
-                ignoreHashLock--;
+                this.ignoreHashLock--;
                 return;
             }
         }
-        resolve();
+        this.resolve();
     }
 
-    export function ignoreHashChange(expiration?: number) {
-        ignoreHashLock++;
-        ignoreHashUntil = Math.max(ignoreHashUntil, new Date().getTime() + (expiration ?? 1000));
+    ignoreHashChange(expiration?: number) {
+        this.ignoreHashLock++;
+        this.ignoreHashUntil = Math.max(this.ignoreHashUntil, new Date().getTime() + (expiration ?? 1000));
     }
 
-    window.addEventListener("hashchange", hashChange, false);
+    private routerOrder: number = 1;
 
-    let routerOrder = 1;
+    private onDocumentDialogOpen(event: any) {
+        if (!this.enabled)
+            return;
 
-    if (typeof document !== "undefined") {
-        function onDocumentDialogOpen(event: any) {
-            if (!enabled)
-                return;
+        const dlg = event.target as HTMLElement;
+        if (!dlg || this.isIgnoredDialog(dlg))
+            return;
 
-            const dlg = event.target as HTMLElement;
-            if (!dlg || isIgnoredDialog(dlg))
-                return;
+        dlg.dataset.qrouterorder = (this.routerOrder++).toString();
 
-            dlg.dataset.qrouterorder = (routerOrder++).toString();
+        if (dlg.dataset.qroute)
+            return;
 
-            if (dlg.dataset.qroute)
-                return;
+        dlg.dataset.qprhash = this.resolvingPreRoute ?? this.pendingDialogPreHash ?? window.location.hash;
+        let owner = this.getVisibleOrHiddenByDialogs().filter(x => x !== dlg).pop();
+        if (!owner)
+            owner = document.documentElement;
 
-            dlg.dataset.qprhash = resolvingPreRoute ?? pendingDialogPreHash ?? window.location.hash;
-            let owner = getVisibleOrHiddenByDialogs().filter(x => x !== dlg).pop();
-            if (!owner)
-                owner = document.documentElement;
+        this.onDialogOpen(owner, dlg, () => "!" + (++this.autoinc).toString(36));
+    }
 
-            onDialogOpen(owner, dlg, () => {
-                return "!" + (++autoinc).toString(36);
-            });
+    private onDocumentClick(e: Event) {
+        if (Fluent.isDefaultPrevented(e))
+            return;
+
+        const a = (e.target as HTMLElement).closest?.('a[href^="#"]') as HTMLAnchorElement;
+        if (a) {
+            this.hashAnchorClickTime = new Date().getTime();
+            this.hashAnchorClickValue = a.hash.substring(1);
         }
+    }
 
-        Fluent.on(document, "dialogopen", ".ui-dialog-content", onDocumentDialogOpen);
-        Fluent.on(document, "shown.bs.modal", ".modal", onDocumentDialogOpen);
-        Fluent.on(document, "panelopen", ".panel-body", onDocumentDialogOpen);
-
-        Fluent.on(document, "click", e => {
-            if (!Fluent.isDefaultPrevented(e)) {
-                const a = (e.target as HTMLElement).closest?.('a[href^="#"]') as HTMLAnchorElement;
-                if (a) {
-                    hashAnchorClickTime = new Date().getTime();
-                    hashAnchorClickValue = a.hash.substring(1);
-                }
-            }
-        });
-
-        function shouldTryBack(e: Event) {
-            if (isIgnoredDialog(e.target as HTMLElement))
-                return false;
-
-            if ((e.target as HTMLElement)?.closest?.(".s-MessageDialog, .s-MessageModal") ||
-                (e as any).key === "Escape")
-                return true;
-
-            let orgEvent = ((e as any).originalEvent ?? e) as KeyboardEvent;
-            if (!orgEvent)
-                return false;
-
-            if (orgEvent.key === "Escape" ||
-                (orgEvent.target as HTMLElement)?.matches?.(".close, .panel-titlebar-close, .ui-dialog-titlebar-close"))
-                return true;
-
+    private shouldTryBack(e: Event) {
+        if (this.isIgnoredDialog(e.target as HTMLElement))
             return false;
+
+        if ((e.target as HTMLElement)?.closest?.(".s-MessageDialog, .s-MessageModal") ||
+            (e as any).key === "Escape")
+            return true;
+
+        let orgEvent = ((e as any).originalEvent ?? e) as KeyboardEvent;
+        if (!orgEvent)
+            return false;
+
+        if (orgEvent.key === "Escape" ||
+            (orgEvent.target as HTMLElement)?.matches?.(".close, .panel-titlebar-close, .ui-dialog-titlebar-close"))
+            return true;
+
+        return false;
+    }
+
+    private closeHandler(e: Event) {
+        const dlg = e.target as HTMLElement;
+        if (!dlg || this.isIgnoredDialog(dlg))
+            return;
+        delete dlg.dataset.qroute;
+        const prhash = dlg.dataset.qprhash;
+
+        let tryBack = this.shouldTryBack(e);
+
+        if (prhash != null)
+            Router.replace(prhash, tryBack);
+        else
+            Router.replaceLast('', tryBack);
+    }
+
+    constructor() {
+        const boundThis = bindThis(this);
+        window.addEventListener("hashchange", boundThis.hashChange, false);
+
+        if (typeof document !== "undefined") {
+
+            Fluent.on(document, "dialogopen", ".ui-dialog-content", boundThis.onDocumentDialogOpen);
+            Fluent.on(document, "shown.bs.modal", ".modal", boundThis.onDocumentDialogOpen);
+            Fluent.on(document, "panelopen", ".panel-body", boundThis.onDocumentDialogOpen);
         }
 
-        function closeHandler(e: any) {
-            const dlg = e.target as HTMLElement;
-            if (!dlg || isIgnoredDialog(e.target))
-                return;
-            delete dlg.dataset.qroute;
-            const prhash = dlg.dataset.qprhash;
+        Fluent.on(document, "click", boundThis.onDocumentClick);
 
-            let tryBack = shouldTryBack(e);
+        Fluent.on(document, "dialogclose.qrouter", boundThis.closeHandler);
+        Fluent.on(document, "hidden.bs.modal", boundThis.closeHandler);
+        Fluent.on(document, "panelclose.qrouter", boundThis.closeHandler);
+    }
 
-            if (prhash != null)
-                Router.replace(prhash, tryBack);
-            else
-                Router.replaceLast('', tryBack);
+    destroy() {
+        const boundThis = bindThis(this);
+        window.removeEventListener("hashchange", boundThis.hashChange, false);
+
+        if (typeof document !== "undefined") {
+            Fluent.off(document, "dialogopen", ".ui-dialog-content", boundThis.onDocumentDialogOpen);
+            Fluent.off(document, "shown.bs.modal", ".modal", boundThis.onDocumentDialogOpen);
+            Fluent.off(document, "panelopen", ".panel-body", boundThis.onDocumentDialogOpen);
+
+            Fluent.off(document, "click", boundThis.onDocumentClick);
+
+            Fluent.off(document, "dialogclose.qrouter", boundThis.closeHandler);
+            Fluent.off(document, "hidden.bs.modal", boundThis.closeHandler);
+            Fluent.off(document, "panelclose.qrouter", boundThis.closeHandler);
         }
-
-        Fluent.on(document, "dialogclose.qrouter", closeHandler);
-        Fluent.on(document, "hidden.bs.modal", closeHandler);
-        Fluent.on(document, "panelclose.qrouter", closeHandler);
     }
 }
+
+export const Router = new RouterImplementation() as IClassicRouter;

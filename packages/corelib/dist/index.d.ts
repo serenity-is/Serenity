@@ -2211,20 +2211,20 @@ export declare function registerInterface(type: any, name: string, intf?: Interf
 /**
  * Enum utilities
  */
-export declare namespace Enum {
+export declare const Enum: {
 	/**
 	 * Convert an enum value to a string containing enum names.
 	 * @param enumType Enum type
 	 * @param value Enum value
 	 */
-	let toString: (enumType: any, value: number) => string;
+	toString: (enumType: any, value: number) => string;
 	/**
 	 * Get all numeric values of an enum as an array.
 	 * @param enumType
 	 * @returns
 	 */
-	let getValues: (enumType: any) => number[];
-}
+	getValues: (enumType: any) => number[];
+};
 /**
  * Check if a type is an enum. A type is considered an enum if it is not a function
  * and it's [Symbol.typeInfo].typeKind is "enum".
@@ -3430,16 +3430,17 @@ export interface HandleRouteEvent extends Event {
 	index: number;
 	isInitial: boolean;
 }
-export declare namespace Router {
-	let enabled: boolean;
-	function navigate(newHash: string, tryBack?: boolean, silent?: boolean): void;
-	function replace(newHash: string, tryBack?: boolean): void;
-	function replaceLast(newHash: string, tryBack?: boolean): void;
-	function dialog(owner: HTMLElement | ArrayLike<HTMLElement>, element: HTMLElement | ArrayLike<HTMLElement>, dialogHash: () => string): void;
-	let mightBeRouteRegex: RegExp;
-	function resolve(newHash?: string): "disabled" | "skipped" | "shebang" | "missinghandler" | "calledhandler";
-	function ignoreHashChange(expiration?: number): void;
+export interface IClassicRouter {
+	enabled: boolean;
+	navigate(newHash: string, tryBack?: boolean, silent?: boolean): void;
+	replace(newHash: string, tryBack?: boolean): void;
+	replaceLast(newHash: string, tryBack?: boolean): void;
+	dialog(owner: HTMLElement | ArrayLike<HTMLElement>, element: HTMLElement | ArrayLike<HTMLElement>, dialogHash: () => string): void;
+	mightBeRouteRegex: RegExp;
+	resolve(newHash?: string): "disabled" | "skipped" | "shebang" | "missinghandler" | "calledhandler";
+	ignoreHashChange(expiration?: number): void;
 }
+export declare const Router: IClassicRouter;
 export declare namespace ScriptData {
 	const canLoad: typeof canLoadScriptData;
 	const ensure: typeof ensureScriptDataSync;
