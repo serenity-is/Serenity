@@ -1,5 +1,5 @@
 ﻿import esbuild from "esbuild";
-import { type GlobOptions } from "glob";
+import { type GlobOptions } from "tinyglobby";
 export declare const defaultEntryPointGlobs: string[];
 /**
  * Default mapping for importing modules as globals. corelib, domwise, extensions, pro.extensions, sleekgrid
