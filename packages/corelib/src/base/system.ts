@@ -291,13 +291,13 @@ export function registerInterface(type: any, name: string, intf?: InterfaceType[
 /**
  * Enum utilities
  */
-export namespace Enum {
+export const Enum = {
     /**
      * Convert an enum value to a string containing enum names.
      * @param enumType Enum type
      * @param value Enum value
      */
-    export let toString = (enumType: any, value: number): string => {
+    toString: (enumType: any, value: number): string => {
         if (value == null)
             return "";
 
@@ -328,14 +328,14 @@ export namespace Enum {
                 parts.push(value.toString());
             return parts.join(' | ');
         }
-    };
+    },
 
     /**
      * Get all numeric values of an enum as an array.
      * @param enumType 
      * @returns 
      */
-    export let getValues = (enumType: any) => {
+    getValues: (enumType: any) => {
         const parts = [];
         const values = enumType;
         for (const i in values) {
@@ -344,7 +344,7 @@ export namespace Enum {
                 parts.push(values[i]);
         }
         return parts;
-    };
+    }
 }
 
 /**
