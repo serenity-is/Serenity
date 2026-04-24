@@ -3,59 +3,53 @@ import esbuild from "esbuild";
 import { existsSync, mkdirSync, readFileSync, writeFileSync } from "fs";
 import { dirname } from "path";
 import process from 'process';
+import { build, rolldown } from "rolldown";
 
-function writeIfChanged() {
+function writeIfChangedPlugin() {
     return {
-        name: "write-if-changed",
-        setup(build) {
-            const write = build.initialOptions.write;
-            build.initialOptions.write = false;
-            build.onEnd(result => {
-                if (!(write === undefined || write))
-                    return;
-                result.outputFiles?.forEach(file => {
-                    if (existsSync(file.path)) {
-                        const old = readFileSync(file.path);
-                        if (old.equals(file.contents))
-                            return;
+        name: "rolldown-plugin-write-if-changed",
+        generateBundle: function(outputOptions, bundle, isWrite) {
+            const filenames = Object.keys(bundle);
+            for (const filename in filenames) {
+                const outputItem = bundle[filename];
+                const filePath = outputOptions.dir ? `${outputOptions.dir}/${filename}` : filename;
+                if (existsSync(filePath)) {
+                    let newContent = outputItem.type === 'asset' ? outputItem.source : outputItem.code;
+                    if (newContent instanceof Uint8Array) {
+                        newContent = Buffer.from(newContent).toString('utf8');
                     }
-                    else {
-                        mkdirSync(dirname(file.path), { recursive: true });
+                    if (readFileSync(filePath, 'utf8') === newContent) {
+                        delete bundle[filename];
                     }
-                    writeFileSync(file.path, file.text);
-                });
-            });
+                }
+            }
         }
     };
 }
 
 const defaults = {
-    bundle: true,
-    color: true,
-    format: 'esm',
-    jsxSideEffects: true,
     logLevel: 'info',
-    minify: false,
-    target: 'es2022',
-    outdir: 'dist',
-    plugins: [writeIfChanged()],
-    sourcemap: true,
-    sourceRoot: "https://packages.serenity.is/domwise/src/"
+    output: {
+        minify: false,
+        dir: "dist",
+        sourcemap: true,
+        sourcemapBaseUrl: "https://packages.serenity.is/domwise/src/"
+    },
+    plugins: [writeIfChangedPlugin()]
 }
 
 const esmIndex = {
     ...defaults,
-    entryPoints: [{
-        in: './src/index.ts', out: 'index'
-    }],
+    input: {
+        'index': 'src/index.ts'
+    }
 }
 
 const esmJsxRuntime = {
     ...defaults,
-    bundle: false,
-    entryPoints: [{
-        in: './src/jsx-runtime.ts', out: 'jsx-runtime'
-    }]
+    input: {
+        'jsx-runtime': 'src/jsx-runtime.ts'
+    }
 }
 
 const buildList = [];
@@ -66,7 +60,10 @@ buildList.push(
 )
 
 for (const buildItem of buildList) {
-    await esbuild.build({
-        ...buildItem,
-    }).catch(() => process.exit());
+	try {
+		await build(buildItem);
+	} catch (error) {
+		console.error(error);
+        process.exit(1);
+	}
 }
