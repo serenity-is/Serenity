@@ -42,6 +42,9 @@ catalogs:
     tinyglobby:
       specifier: 0.2.17
       version: 0.2.17
+    rolldown:
+      specifier: 1.0.0-rc.17
+      version: 1.0.0-rc.17
     typescript:
       specifier: 6.0.3
       version: 6.0.3
@@ -78,6 +81,9 @@ importers:
       jsdom:
         specifier: catalog:serenity
         version: 29.1.1
+      rolldown:
+        specifier: catalog:serenity
+        version: 1.0.0-rc.17
       typescript:
         specifier: catalog:serenity
         version: 6.0.3
