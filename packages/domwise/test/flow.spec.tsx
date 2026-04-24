@@ -112,3 +112,5 @@ describe("Show", () => {
         expect(whenSignal.listeners).toHaveLength(0);
     });
 });
+
+export { };

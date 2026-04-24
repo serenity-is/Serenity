@@ -97,3 +97,5 @@ describe("supports pseudo-boolean ('true', 'false') attribute values for some at
         expect((<input spellcheck={false}>Test</input> as HTMLInputElement).spellcheck).toBe(false);
     });
 });
+
+export { };

@@ -31,3 +31,5 @@ describe("supports lowercase attribute variants by default but also allows some 
         expect((<input minLength="5">Test</input> as HTMLInputElement).minLength).toBe(5);
     });
 })
+
+export { };
