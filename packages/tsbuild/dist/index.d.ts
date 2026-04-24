@@ -1,11 +1,13 @@
 ﻿import esbuild from "esbuild";
-import { type GlobOptions } from "tinyglobby";
 export declare const defaultEntryPointGlobs: string[];
 /**
  * Default mapping for importing modules as globals. corelib, domwise, extensions, pro.extensions, sleekgrid
  * are all mapped to Serenity global namespace */
 export declare const importAsGlobalsMapping: Record<string, string>;
-export declare function safeGlobSync(globs: string[], options?: Omit<GlobOptions, "ignore">): string[];
+/** Safely performs a glob search, preventing path traversal and returns matching file paths.
+ * @param options The arguments passed to the glob engine (currently tinyglobby)
+ */
+export declare function safeGlobSync(globs: string[], options?: any): string[];
 /** Default esbuild options used by TSBuild */
 export declare const tsbuildDefaults: Partial<import("esbuild").BuildOptions>;
 export interface TSBuildOptions extends Partial<import("esbuild").BuildOptions> {
