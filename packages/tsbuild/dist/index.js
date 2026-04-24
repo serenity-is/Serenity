@@ -1,7 +1,7 @@
 import { init as esmlInit, parse as esmlParse } from "es-module-lexer";
 import esbuild from "esbuild";
 import { createReadStream, createWriteStream, existsSync, mkdirSync, readFileSync, rmSync, writeFileSync } from "fs";
-import { globSync } from "glob";
+import { globSync } from "tinyglobby";
 import pipe from "node:stream/promises";
 import { constants, createBrotliCompress, createGzip } from "node:zlib";
 import { dirname, isAbsolute, join, resolve, sep } from "path";
@@ -40,9 +40,7 @@ export function safeGlobSync(globs, options = {}) {
     const includes = globs.filter((x) => !x.startsWith("!")).map(normalizePattern);
     const excludes = globs.filter((x) => x.startsWith("!")).map((x) => normalizePattern(x.substring(1)));
     const results = globSync(includes, {
-        nodir: true,
         ignore: excludes,
-        matchBase: true,
         cwd: root,
         ...options
     });

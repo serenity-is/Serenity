@@ -7,7 +7,7 @@
   "dependencies": {
     "esbuild": "catalog:serenity",
     "es-module-lexer": "catalog:serenity",
-    "glob": "catalog:serenity"
+    "tinyglobby": "catalog:serenity"
   },
   "exports": {
     ".": {
