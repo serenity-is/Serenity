@@ -7,7 +7,7 @@ export class BasicLayout implements LayoutEngine {
     protected host: LayoutHost;
     protected refs: GridLayoutRefs;
 
-    init(host: LayoutHost) {
+    init(host: LayoutHost): void {
         this.host = host;
         const signals = host.getSignals();
         const refs = this.refs = host.refs;

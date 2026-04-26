@@ -23,8 +23,8 @@ export class RowMoveManager implements GridPlugin {
     declare private options: RowMoveManagerOptions;
     declare private dragging: boolean;
     private handler = new EventSubscriber();
-    onBeforeMoveRows = new EventEmitter<ArgsMoveRows>();
-    onMoveRows = new EventEmitter<ArgsMoveRows>();
+    onBeforeMoveRows: EventEmitter<ArgsMoveRows> = new EventEmitter<ArgsMoveRows>();
+    onMoveRows: EventEmitter<ArgsMoveRows> = new EventEmitter<ArgsMoveRows>();
 
     constructor(options?: RowMoveManagerOptions) {
         this.options = Object.assign({}, RowMoveManager.defaults, options);
@@ -34,7 +34,7 @@ export class RowMoveManager implements GridPlugin {
         cancelEditOnDrag: false
     }
 
-    init(grid: ISleekGrid) {
+    init(grid: ISleekGrid): void {
         this.grid = grid;
         const boundThis = bindThis(this);
         this.handler.subscribe(grid.onDragInit, boundThis.handleDragInit)
@@ -43,7 +43,7 @@ export class RowMoveManager implements GridPlugin {
             .subscribe(grid.onDragEnd, boundThis.handleDragEnd);
     }
 
-    destroy() {
+    destroy(): void {
         this.handler?.unsubscribeAll();
     }
 

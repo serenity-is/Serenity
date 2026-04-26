@@ -115,7 +115,7 @@ export class TreeColumns {
 
     columnsById: { [key: string]: TreeColumn } = {};
 
-    init() {
+    init(): void {
         this.mapToId(this.treeColumns);
     }
 
@@ -133,7 +133,7 @@ export class TreeColumns {
         return this.treeColumns.slice();
     }
 
-    hasDepth() {
+    hasDepth(): boolean {
 
         for (var i in this.treeColumns) {
             if (this.treeColumns[i].hasOwnProperty('columns')) {
@@ -144,43 +144,43 @@ export class TreeColumns {
         return false;
     };
 
-    getTreeColumns() {
+    getTreeColumns(): TreeColumn[] {
         return this.treeColumns;
     };
 
-    extractColumns() {
+    extractColumns(): TreeColumn[] {
         return this.hasDepth() ? extractColumns(this.treeColumns) : this.treeColumns;
     };
 
-    getDepth() {
+    getDepth(): number {
         return getDepth(this.treeColumns);
     };
 
-    getColumnsInDepth(depth: number) {
+    getColumnsInDepth(depth: number): TreeColumn[] {
         return getColumnsInDepth(this.treeColumns, depth);
     };
 
-    getColumnsInGroup = function (groups: any) {
+    getColumnsInGroup = function (groups: any): TreeColumn[] {
         return extractColumns(groups);
     };
 
-    visibleColumns() {
+    visibleColumns(): TreeColumn[] {
         return filter(this.cloneTreeColumns(), (column) => column.visible);
     };
 
-    filter(condition: (col: TreeColumn) => boolean) {
+    filter(condition: (col: TreeColumn) => boolean): TreeColumn[] {
         return filter(this.cloneTreeColumns(), condition);
     };
 
-    reOrder(grid: TreeColumnsGrid) {
-        return sort(this.treeColumns, grid);
+    reOrder(grid: TreeColumnsGrid): void {
+        sort(this.treeColumns, grid);
     };
 
-    getById(id: string) {
+    getById(id: string): TreeColumn {
         return this.columnsById[id];
     }
 
-    getInIds(ids: string[]) {
+    getInIds(ids: string[]): TreeColumn[] {
         return ids.map((id) => {
             return this.columnsById[id];
         });

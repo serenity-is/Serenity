@@ -124,44 +124,44 @@ export class SleekGrid<TItem = any> implements ISleekGrid<TItem> {
     declare private _groupingPanel: HTMLElement;
     declare private _eventDisposer: AbortController;
 
-    readonly onActiveCellChanged = new EventEmitter<ArgsCell>();
-    readonly onActiveCellPositionChanged = new EventEmitter<ArgsGrid>();
-    readonly onAddNewRow = new EventEmitter<ArgsAddNewRow>();
-    static readonly onAfterInit = new EventEmitter<ArgsGrid>();
-    readonly onAfterInit = new EventEmitter<ArgsGrid>();
-    readonly onBeforeCellEditorDestroy = new EventEmitter<ArgsEditorDestroy>();
-    readonly onBeforeDestroy = new EventEmitter<ArgsGrid>();
-    readonly onBeforeEditCell = new EventEmitter<ArgsCellEdit>();
-    readonly onBeforeFooterRowCellDestroy = new EventEmitter<ArgsColumnNode>();
-    readonly onBeforeHeaderCellDestroy = new EventEmitter<ArgsColumnNode>();
-    readonly onBeforeHeaderRowCellDestroy = new EventEmitter<ArgsColumnNode>();
-    readonly onCellChange = new EventEmitter<ArgsCellChange>();
-    readonly onCellCssStylesChanged = new EventEmitter<ArgsCssStyle>();
-    readonly onClick = new EventEmitter<ArgsCell, MouseEvent>();
-    readonly onColumnsReordered = new EventEmitter<ArgsGrid>();
-    readonly onColumnsResized = new EventEmitter<ArgsGrid>();
-    readonly onCompositeEditorChange = new EventEmitter<ArgsGrid>();
-    readonly onContextMenu = new EventEmitter<ArgsGrid, UIEvent>();
-    readonly onDblClick = new EventEmitter<ArgsCell, MouseEvent>();
-    readonly onDrag = new EventEmitter<ArgsDrag, UIEvent>();
-    readonly onDragEnd = new EventEmitter<ArgsDrag, UIEvent>();
-    readonly onDragInit = new EventEmitter<ArgsDrag, UIEvent>();
-    readonly onDragStart = new EventEmitter<ArgsDrag, UIEvent>();
-    readonly onFooterRowCellRendered = new EventEmitter<ArgsColumnNode>();
-    readonly onHeaderCellRendered = new EventEmitter<ArgsColumnNode>();
-    readonly onHeaderClick = new EventEmitter<ArgsColumn, MouseEvent>();
-    readonly onHeaderContextMenu = new EventEmitter<ArgsColumn, MouseEvent>();
-    readonly onHeaderMouseEnter = new EventEmitter<ArgsColumn, MouseEvent>();
-    readonly onHeaderMouseLeave = new EventEmitter<ArgsColumn, MouseEvent>();
-    readonly onHeaderRowCellRendered = new EventEmitter<ArgsColumnNode>();
-    readonly onKeyDown = new EventEmitter<ArgsCell, KeyboardEvent>();
-    readonly onMouseEnter = new EventEmitter<ArgsGrid, MouseEvent>();
-    readonly onMouseLeave = new EventEmitter<ArgsGrid, MouseEvent>();
-    readonly onScroll = new EventEmitter<ArgsScroll>();
-    readonly onSelectedRowsChanged = new EventEmitter<ArgsSelectedRowsChange>();
-    readonly onSort = new EventEmitter<ArgsSort>();
-    readonly onValidationError = new EventEmitter<ArgsValidationError>();
-    readonly onViewportChanged = new EventEmitter<ArgsGrid>();
+    readonly onActiveCellChanged: EventEmitter<ArgsCell> = new EventEmitter<ArgsCell>();
+    readonly onActiveCellPositionChanged: EventEmitter<ArgsGrid> = new EventEmitter<ArgsGrid>();
+    readonly onAddNewRow: EventEmitter<ArgsAddNewRow> = new EventEmitter<ArgsAddNewRow>();
+    static readonly onAfterInit: EventEmitter<ArgsGrid> = new EventEmitter<ArgsGrid>();
+    readonly onAfterInit: EventEmitter<ArgsGrid> = new EventEmitter<ArgsGrid>();
+    readonly onBeforeCellEditorDestroy: EventEmitter<ArgsEditorDestroy> = new EventEmitter<ArgsEditorDestroy>();
+    readonly onBeforeDestroy: EventEmitter<ArgsGrid> = new EventEmitter<ArgsGrid>();
+    readonly onBeforeEditCell: EventEmitter<ArgsCellEdit> = new EventEmitter<ArgsCellEdit>();
+    readonly onBeforeFooterRowCellDestroy: EventEmitter<ArgsColumnNode> = new EventEmitter<ArgsColumnNode>();
+    readonly onBeforeHeaderCellDestroy: EventEmitter<ArgsColumnNode> = new EventEmitter<ArgsColumnNode>();
+    readonly onBeforeHeaderRowCellDestroy: EventEmitter<ArgsColumnNode> = new EventEmitter<ArgsColumnNode>();
+    readonly onCellChange: EventEmitter<ArgsCellChange> = new EventEmitter<ArgsCellChange>();
+    readonly onCellCssStylesChanged: EventEmitter<ArgsCssStyle> = new EventEmitter<ArgsCssStyle>();
+    readonly onClick: EventEmitter<ArgsCell, MouseEvent> = new EventEmitter<ArgsCell, MouseEvent>();
+    readonly onColumnsReordered: EventEmitter<ArgsGrid> = new EventEmitter<ArgsGrid>();
+    readonly onColumnsResized: EventEmitter<ArgsGrid> = new EventEmitter<ArgsGrid>();
+    readonly onCompositeEditorChange: EventEmitter<ArgsGrid> = new EventEmitter<ArgsGrid>();
+    readonly onContextMenu: EventEmitter<ArgsGrid, UIEvent> = new EventEmitter<ArgsGrid, UIEvent>();
+    readonly onDblClick: EventEmitter<ArgsCell, MouseEvent> = new EventEmitter<ArgsCell, MouseEvent>();
+    readonly onDrag: EventEmitter<ArgsDrag, UIEvent> = new EventEmitter<ArgsDrag, UIEvent>();
+    readonly onDragEnd: EventEmitter<ArgsDrag, UIEvent> = new EventEmitter<ArgsDrag, UIEvent>();
+    readonly onDragInit: EventEmitter<ArgsDrag, UIEvent> = new EventEmitter<ArgsDrag, UIEvent>();
+    readonly onDragStart: EventEmitter<ArgsDrag, UIEvent> = new EventEmitter<ArgsDrag, UIEvent>();
+    readonly onFooterRowCellRendered: EventEmitter<ArgsColumnNode> = new EventEmitter<ArgsColumnNode>();
+    readonly onHeaderCellRendered: EventEmitter<ArgsColumnNode> = new EventEmitter<ArgsColumnNode>();
+    readonly onHeaderClick: EventEmitter<ArgsColumn, MouseEvent> = new EventEmitter<ArgsColumn, MouseEvent>();
+    readonly onHeaderContextMenu: EventEmitter<ArgsColumn, MouseEvent> = new EventEmitter<ArgsColumn, MouseEvent>();
+    readonly onHeaderMouseEnter: EventEmitter<ArgsColumn, MouseEvent> = new EventEmitter<ArgsColumn, MouseEvent>();
+    readonly onHeaderMouseLeave: EventEmitter<ArgsColumn, MouseEvent> = new EventEmitter<ArgsColumn, MouseEvent>();
+    readonly onHeaderRowCellRendered: EventEmitter<ArgsColumnNode> = new EventEmitter<ArgsColumnNode>();
+    readonly onKeyDown: EventEmitter<ArgsCell, KeyboardEvent> = new EventEmitter<ArgsCell, KeyboardEvent>();
+    readonly onMouseEnter: EventEmitter<ArgsGrid, MouseEvent> = new EventEmitter<ArgsGrid, MouseEvent>();
+    readonly onMouseLeave: EventEmitter<ArgsGrid, MouseEvent> = new EventEmitter<ArgsGrid, MouseEvent>();
+    readonly onScroll: EventEmitter<ArgsScroll> = new EventEmitter<ArgsScroll>();
+    readonly onSelectedRowsChanged: EventEmitter<ArgsSelectedRowsChange> = new EventEmitter<ArgsSelectedRowsChange>();
+    readonly onSort: EventEmitter<ArgsSort> = new EventEmitter<ArgsSort>();
+    readonly onValidationError: EventEmitter<ArgsValidationError> = new EventEmitter<ArgsValidationError>();
+    readonly onViewportChanged: EventEmitter<ArgsGrid> = new EventEmitter<ArgsGrid>();
 
     constructor(container: string | HTMLElement | ArrayLike<HTMLElement>, data: any, columns: Column<TItem>[], options: GridOptions<TItem>) {
 
@@ -495,7 +495,7 @@ export class SleekGrid<TItem = any> implements ISleekGrid<TItem> {
         };
     }
 
-    getAbsoluteColumnMinWidth() {
+    getAbsoluteColumnMinWidth(): number {
         return this._absoluteColMinWidth;
     }
 
@@ -1046,7 +1046,7 @@ export class SleekGrid<TItem = any> implements ISleekGrid<TItem> {
         });
     }
 
-    public columnsResized(invalidate = true) {
+    public columnsResized(invalidate = true): void {
         this.adjustPinnedColsLimit();
         this.applyColumnHeaderWidths();
         this.applyColumnWidths();
@@ -1120,7 +1120,7 @@ export class SleekGrid<TItem = any> implements ISleekGrid<TItem> {
         }
     }
 
-    destroy() {
+    destroy(): void {
         this.getEditorLock().cancelCurrentEdit();
 
         this._trigger(this.onBeforeDestroy);
@@ -1234,11 +1234,11 @@ export class SleekGrid<TItem = any> implements ISleekGrid<TItem> {
         this.updateViewColLeftRight();
     }
 
-    setSortColumn(columnId: string, ascending: boolean) {
+    setSortColumn(columnId: string, ascending: boolean): void {
         this.setSortColumns([{ columnId: columnId, sortAsc: ascending }]);
     }
 
-    setSortColumns(cols: ColumnSort[]) {
+    setSortColumns(cols: ColumnSort[]): void {
         this._sortColumns = cols || [];
 
         var headerColumnEls: Element[] = [];
@@ -1472,7 +1472,7 @@ export class SleekGrid<TItem = any> implements ISleekGrid<TItem> {
         }
     }
 
-    public invalidateColumns() {
+    public invalidateColumns(): void {
         this.updateViewCols();
         this.updateViewColLeftRight();
         if (this._initialized) {
@@ -1497,7 +1497,7 @@ export class SleekGrid<TItem = any> implements ISleekGrid<TItem> {
         return this._options;
     }
 
-    protected prepareForOptionsChange() {
+    protected prepareForOptionsChange(): void {
         const editorLock = this.getEditorLock();
         if (this._editController && editorLock?.isActive(this._editController) && !editorLock?.commitCurrentEdit()) {
             editorLock?.cancelCurrentEdit();
@@ -1594,7 +1594,7 @@ export class SleekGrid<TItem = any> implements ISleekGrid<TItem> {
         }
     }
 
-    setData(newData: any, scrollToTop?: boolean) {
+    setData(newData: any, scrollToTop?: boolean): void {
         this.unbindFromData();
         this._data = newData;
         this.bindToData();
@@ -1641,7 +1641,7 @@ export class SleekGrid<TItem = any> implements ISleekGrid<TItem> {
         }
     }
 
-    setColumnHeaderVisibility(visible: boolean) {
+    setColumnHeaderVisibility(visible: boolean): void {
         if (!this._options.showColumnHeader != !visible) {
             this._signals.showColumnHeader.value = this._options.showColumnHeader = !!visible;
             this.resizeCanvas();
@@ -2053,16 +2053,16 @@ export class SleekGrid<TItem = any> implements ISleekGrid<TItem> {
         this.render();
     }
 
-    updatePagingStatusFromView(pagingInfo: { pageSize: number, pageNum: number, totalPages: number }) {
+    updatePagingStatusFromView(pagingInfo: { pageSize: number, pageNum: number, totalPages: number }): void {
         this._pagingActive = (pagingInfo.pageSize !== 0);
         this._pagingIsLastPage = (pagingInfo.pageNum == pagingInfo.totalPages - 1);
     }
 
-    public getScrollContainerX() {
+    public getScrollContainerX(): HTMLElement {
         return this._refs.main.canvas.body.parentElement;
     }
 
-    public getScrollContainerY() {
+    public getScrollContainerY(): HTMLElement {
         return this._refs.main.canvas.body.parentElement;
     }
 
@@ -3654,7 +3654,7 @@ export class SleekGrid<TItem = any> implements ISleekGrid<TItem> {
         this.navigateToRow(this.getDataLength() - 1);
     }
 
-    navigateToRow(row: number) {
+    navigateToRow(row: number): boolean {
         var dataLength = this.getDataLength();
         if (!dataLength) {
             return true;
@@ -3806,7 +3806,7 @@ export class SleekGrid<TItem = any> implements ISleekGrid<TItem> {
         return null;
     }
 
-    setActiveCell(row: number, cell: number) {
+    setActiveCell(row: number, cell: number): void {
         if (!this._initialized) { return; }
         var cols = this._cols;
         if (row > this.getDataLength() || row < 0 || cell >= cols.length || cell < 0) {
@@ -3821,7 +3821,7 @@ export class SleekGrid<TItem = any> implements ISleekGrid<TItem> {
         this.setActiveCellInternal(this.getCellNode(row, cell), false);
     }
 
-    setActiveRow(row: number, cell: number, suppressScrollIntoView?: boolean) {
+    setActiveRow(row: number, cell: number, suppressScrollIntoView?: boolean): void {
         if (!this._initialized)
             return;
 
@@ -3880,7 +3880,7 @@ export class SleekGrid<TItem = any> implements ISleekGrid<TItem> {
         return true;
     }
 
-    canCellBeSelected(row: number, cell: number) {
+    canCellBeSelected(row: number, cell: number): boolean {
         var cols = this._cols;
         if (row >= this.getDataLength() || row < 0 || cell >= cols.length || cell < 0) {
             return false;
@@ -3899,7 +3899,7 @@ export class SleekGrid<TItem = any> implements ISleekGrid<TItem> {
         return cols[cell].selectable;
     }
 
-    gotoCell(row: number, cell: number, forceEdit?: boolean) {
+    gotoCell(row: number, cell: number, forceEdit?: boolean): void {
         if (!this._initialized) { return; }
         if (!this.canCellBeActive(row, cell)) {
             return;
@@ -4025,7 +4025,7 @@ export class SleekGrid<TItem = any> implements ISleekGrid<TItem> {
         return this._selectedRows;
     }
 
-    setSelectedRows(rows: number[]) {
+    setSelectedRows(rows: number[]): void {
         if (!this._selectionModel) {
             throw "Selection model is not set";
         }

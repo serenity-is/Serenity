@@ -1,6 +1,6 @@
 import { invokeDisposingListeners } from "@serenity-is/domwise";
 
-export function simpleArrayEquals(arr1: number[], arr2: number[]) {
+export function simpleArrayEquals(arr1: number[], arr2: number[]): boolean {
     if (!Array.isArray(arr1) || !Array.isArray(arr2) || arr1.length !== arr2.length)
         return false;
     arr1 = arr1.slice().sort();
@@ -48,21 +48,21 @@ export interface PostProcessCleanupEntry {
     rowIdx?: number;
 }
 
-export const defaultRemoveNode = (node: HTMLElement) => {
+export const defaultRemoveNode = (node: HTMLElement): void => {
     if (!node)
         return;
     invokeDisposingListeners(node, { descendants: true });
     node.remove();
 }
 
-export const defaultEmptyNode = (node: HTMLElement) => {
+export const defaultEmptyNode = (node: HTMLElement): void => {
     if (!node)
         return;
     invokeDisposingListeners(node, { descendants: true, excludeSelf: true });
     node.innerHTML = "";
 }
 
-export function defaultJQueryEmptyNode(this: { (node: HTMLElement): { empty: () => void }, fn: any }, node: HTMLElement) {
+export function defaultJQueryEmptyNode(this: { (node: HTMLElement): { empty: () => void }, fn: any }, node: HTMLElement): void {
     if (!node)
         return;
     if (!this || this.fn)
@@ -71,7 +71,7 @@ export function defaultJQueryEmptyNode(this: { (node: HTMLElement): { empty: () 
         this(node).empty();
 }
 
-export function defaultJQueryRemoveNode(this: { (node: HTMLElement): { remove: () => void }, fn: any }, node: HTMLElement) {
+export function defaultJQueryRemoveNode(this: { (node: HTMLElement): { remove: () => void }, fn: any }, node: HTMLElement): void {
     if (!node)
         return;
     if (!this || this.fn)

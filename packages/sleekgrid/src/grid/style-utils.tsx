@@ -238,7 +238,7 @@ export function applyLegacyHeightOptions(this: void, { groupingPanel, opt, refs 
     groupingPanel: HTMLElement,
     opt: { topPanelHeight?: number, groupingPanelHeight?: number, headerRowHeight?: number, footerRowHeight?: number },
     refs: GridLayoutRefs,
-}) {
+}): void {
     if (opt.topPanelHeight != null) {
         const topPanel = refs.topPanel
         topPanel && (topPanel.style.height = opt.topPanelHeight + "px");

@@ -96,12 +96,12 @@ export class EventDataWrapper<TArgs, TEvent = {}> implements IEventData<TArgs, T
 
     get defaultPrevented(): boolean { return this._isDefaultPrevented; }
 
-    preventDefault() {
+    preventDefault(): void {
         this._isDefaultPrevented = true;
         this._nativeEvent?.preventDefault?.();
     }
 
-    isDefaultPrevented() {
+    isDefaultPrevented(): boolean {
         if (this._isDefaultPrevented)
             return true;
 
@@ -117,7 +117,7 @@ export class EventDataWrapper<TArgs, TEvent = {}> implements IEventData<TArgs, T
     /***
      * Stops event from propagating up the DOM tree.
      */
-    stopPropagation() {
+    stopPropagation(): void {
         this._isPropagationStopped = true;
         this._nativeEvent?.stopPropagation();
     }
@@ -132,7 +132,7 @@ export class EventDataWrapper<TArgs, TEvent = {}> implements IEventData<TArgs, T
     /***
      * Prevents the rest of the handlers from being executed.
      */
-    stopImmediatePropagation() {
+    stopImmediatePropagation(): void {
         this._isImmediatePropagationStopped = true;
         this._nativeEvent?.stopImmediatePropagation();
     }
@@ -180,7 +180,7 @@ export class EventEmitter<TArgs = any, TEvent = {}> {
      * object the event was fired with.<p>
      * @param fn {Function} Event handler.
      */
-    subscribe(fn: EventCallback<TArgs, TEvent>) {
+    subscribe(fn: EventCallback<TArgs, TEvent>): void {
         this._handlers.push(fn);
     }
 
@@ -188,7 +188,7 @@ export class EventEmitter<TArgs = any, TEvent = {}> {
      * Removes an event handler added with <code>subscribe(fn)</code>.
      * @param fn {Function} Event handler to be removed.
      */
-    unsubscribe(fn: EventCallback<TArgs, TEvent>) {
+    unsubscribe(fn: EventCallback<TArgs, TEvent>): void {
         for (var i = this._handlers.length - 1; i >= 0; i--) {
             if (this._handlers[i] === fn) {
                 this._handlers.splice(i, 1);
@@ -218,7 +218,7 @@ export class EventEmitter<TArgs = any, TEvent = {}> {
         return sed as unknown as EventData<TArgs, TEvent>;
     }
 
-    clear() {
+    clear(): void {
         this._handlers = [];
     }
 }

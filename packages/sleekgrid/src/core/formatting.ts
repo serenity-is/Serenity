@@ -103,7 +103,7 @@ export type AsyncPostCleanup<TItem = any> = (cellNode: HTMLElement, row?: number
 
 export type CellStylesHash = { [row: number]: { [columnId: string]: string } }
 
-export function defaultColumnFormat(ctx: FormatterContext) {
+export function defaultColumnFormat(ctx: FormatterContext): FormatterResult {
     if (ctx?.escape)
         return ctx.escape();
 
@@ -133,7 +133,7 @@ export function convertCompatFormatter(compatFormatter: CompatFormatter): Column
     }
 }
 
-export function applyFormatterResultToCellNode(ctx: FormatterContext, fmtResult: FormatterResult, node: HTMLElement, opt?: { contentOnly?: boolean }) {
+export function applyFormatterResultToCellNode(ctx: FormatterContext, fmtResult: FormatterResult, node: HTMLElement, opt?: { contentOnly?: boolean }): void {
     if (!opt?.contentOnly) {
         var oldFmtAtt = node.dataset.fmtatt as string;
         if (oldFmtAtt?.length > 0) {

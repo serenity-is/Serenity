@@ -23,7 +23,7 @@ export class AutoTooltips implements GridPlugin {
         replaceExisting: true
     }
 
-    init(grid: ISleekGrid) {
+    init(grid: ISleekGrid): void {
         this.grid = grid;
 
         if (this.options.enableForCells)
@@ -33,7 +33,7 @@ export class AutoTooltips implements GridPlugin {
             this.grid.onHeaderMouseEnter.subscribe(this.handleHeaderMouseEnter);
     }
 
-    destroy() {
+    destroy(): void {
         if (this.options.enableForCells)
             this.grid.onMouseEnter.unsubscribe(this.handleMouseEnter);
 

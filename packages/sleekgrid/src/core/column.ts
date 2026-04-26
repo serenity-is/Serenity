@@ -82,7 +82,7 @@ export interface ItemMetadata<TItem = any> {
     tabbable?: boolean;
 }
 
-export function initColumnProps(columns: Column[], defaults: Partial<Column<any>>) {
+export function initColumnProps(columns: Column[], defaults: Partial<Column<any>>): void {
     var usedIds: { [key: string]: boolean } = {};
 
     for (var i = 0; i < columns.length; i++) {
@@ -117,7 +117,7 @@ export function initColumnProps(columns: Column[], defaults: Partial<Column<any>
     }
 }
 
-export function titleize(str: string) {
+export function titleize(str: string): string {
     if (!str)
         return str;
 

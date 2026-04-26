@@ -4,12 +4,13 @@
       "allowJs": false,
       "declaration": true,
       "emitBOM": true,
+      "isolatedDeclarations": true,
+      "jsx": "react-jsx",
+      "jsxImportSource": "@serenity-is/domwise",
       "lib": [
         "ES2022",
         "DOM"
       ],
-      "jsx": "react-jsx",
-      "jsxImportSource": "@serenity-is/domwise",
       "module": "ESNext",
       "moduleResolution": "Bundler",
       "newLine": "lf",

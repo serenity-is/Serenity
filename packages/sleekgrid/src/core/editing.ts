@@ -112,7 +112,7 @@ export class EditorLock {
      * If another edit controller is already active, and exception will be thrown.
      * @param editController {EditController} edit controller acquiring the lock
      */
-    activate(editController: EditController) {
+    activate(editController: EditController): void {
         if (editController === this.activeEditController) { // already activated?
             return;
         }
@@ -133,7 +133,7 @@ export class EditorLock {
      * If the specified edit controller is not the active one, an exception will be thrown.
      * @param editController {EditController} edit controller releasing the lock
      */
-    deactivate(editController: EditController) {
+    deactivate(editController: EditController): void {
         if (this.activeEditController !== editController) {
             throw "SleekGrid.EditorLock.deactivate: specified editController is not the currently active one";
         }
@@ -165,4 +165,4 @@ export class EditorLock {
 /***
  * A global singleton editor lock.
  */
-export const GlobalEditorLock = new EditorLock();
+export const GlobalEditorLock: EditorLock = new EditorLock();

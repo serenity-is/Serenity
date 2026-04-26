@@ -8,7 +8,7 @@ export class FrozenLayout implements LayoutEngine {
     private host: LayoutHost;
     private refs: GridLayoutRefs;
 
-    init(host: LayoutHost) {
+    init(host: LayoutHost): void {
         this.host = host;
         this.refs = host.refs;
         const signals = host.getSignals();
@@ -39,7 +39,7 @@ export class FrozenLayout implements LayoutEngine {
         return null;
     }
 
-    public afterSetOptions(arg: GridOptions) {
+    public afterSetOptions(arg: GridOptions): void {
         if (arg.frozenRows != null || arg.frozenBottom != null)
             this.adjustFrozenRowsOption();
         if (arg.frozenColumns != null && arg.columns == null) {

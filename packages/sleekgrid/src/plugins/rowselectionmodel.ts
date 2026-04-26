@@ -30,7 +30,7 @@ export class RowSelectionModel implements GridPlugin, SelectionModel {
     private handler = new EventSubscriber();
     declare private options: RowSelectionModelOptions;
     declare private ranges: CellRange[];
-    onSelectedRangesChanged = new EventEmitter<CellRange[]>();
+    onSelectedRangesChanged: EventEmitter<CellRange[]> = new EventEmitter<CellRange[]>();
 
     constructor(options?: RowSelectionModelOptions) {
         this.options = Object.assign({}, RowSelectionModel.defaults, options);

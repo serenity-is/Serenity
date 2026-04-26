@@ -1,6 +1,6 @@
 import type { SignalOrValue } from "@serenity-is/domwise";
 
-export function addCssClass(el: Element, cls: string) {
+export function addCssClass(el: Element, cls: string): void {
     if (cls == null || !cls.length)
         return;
 
@@ -25,7 +25,7 @@ function escFunc(a: string) {
     return esc[a];
 }
 
-export function escapeHtml(s: any) {
+export function escapeHtml(s: any): string {
     if (!arguments.length && this && this !== globalThis) {
         s = this.value;
     }
@@ -39,7 +39,7 @@ export function escapeHtml(s: any) {
     if (this && this !== globalThis && this.enableHtmlRendering === false)
         return s;
 
-    return s.replace(/[<>"'&]/g, escFunc)
+    return s.replace(/[<>"'&]/g, escFunc);
 }
 
 const maybeHtmlRegex = /<|>|&|"|'/;
@@ -129,14 +129,14 @@ export function basicDOMSanitizer(dirtyHtml: string): string {
     }
 }
 
-export function disableSelection(target: HTMLElement) {
+export function disableSelection(target: HTMLElement): void {
     if (target) {
         target.style.userSelect = "none";
         target.addEventListener('selectstart', () => false);
     }
 }
 
-export function removeCssClass(el: Element, cls: string) {
+export function removeCssClass(el: Element, cls: string): void {
     if (cls == null || !cls.length)
         return;
 
@@ -149,7 +149,7 @@ export function removeCssClass(el: Element, cls: string) {
         el.classList.remove(cls);
 }
 
-export function parsePx(str: string) {
+export function parsePx(str: string): number {
     var value = parseFloat(str);
     if (isNaN(value))
         return 0;

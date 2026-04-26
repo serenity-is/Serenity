@@ -15,7 +15,7 @@ export function setupColumnResize<TItem>(this: void, { absoluteColMinWidth, cont
     headerColsElements: HTMLElement[],
     options: Pick<GridOptions, "forceFitColumns">,
     removeNode: (node: Element) => void,
-}) {
+}): void {
     let resizingCell: number, pageX: number, minPageX: number, maxPageX: number;
 
     let headerColEls: Element[] = [];

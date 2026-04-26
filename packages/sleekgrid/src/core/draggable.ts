@@ -59,7 +59,9 @@ export interface DraggableOption {
     onDragEnd?: (e: DragEvent, dd: DragPosition) => boolean | void;
 }
 
-export function Draggable(options: DraggableOption) {
+export function Draggable(options: DraggableOption): {
+    destroy: () => void;
+} {
     let { containerElement } = options;
     const { onDragInit, onDragStart, onDrag, onDragEnd, preventDragFromKeys } = options;
     let element: HTMLElement | null;
@@ -91,7 +93,7 @@ export function Draggable(options: DraggableOption) {
         }
     }
 
-    function destroy() {
+    function destroy(): void {
         if (containerElement) {
             containerElement.removeEventListener('mousedown', userPressed);
             containerElement.removeEventListener('touchstart', userPressed);

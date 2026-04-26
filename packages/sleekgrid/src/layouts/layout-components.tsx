@@ -1,4 +1,4 @@
-import { type SignalLike, computed } from "@serenity-is/domwise";
+import { type JSXElement, type SignalLike, computed } from "@serenity-is/domwise";
 import type { GridSignals } from "../core";
 import type { BandKey, GridLayoutRefs, PaneKey } from "./layout-refs";
 
@@ -26,7 +26,7 @@ export const Header = ({ band, refs, signals }: {
     band: BandKey,
     refs: GridLayoutRefs,
     signals: Pick<GridSignals, "hideColumnHeader" | "pinnedStartCols" | "pinnedEndCols">
-}) => {
+}): JSXElement => {
     const bandRefs = refs[band];
     return <div hidden={bandHidden(band, signals.hideColumnHeader, signals)} class={`sg-${band} slick-header`}>
         <div class={`sg-${band} slick-header-columns`} ref={el => { bandRefs.headerCols = el }} />
@@ -37,7 +37,7 @@ export const HeaderRow = ({ band, refs, signals }: {
     band: BandKey,
     refs: GridLayoutRefs,
     signals: Pick<GridSignals, "hideHeaderRow" | "pinnedStartCols" | "pinnedEndCols">
-}) => {
+}): JSXElement => {
     const bandRefs = refs[band];
     return <div hidden={bandHidden(band, signals.hideHeaderRow, signals)} class={`sg-${band} slick-headerrow`}>
         <div class={`sg-${band} slick-headerrow-columns`} ref={el => bandRefs.headerRowCols = el} />
@@ -47,7 +47,7 @@ export const HeaderRow = ({ band, refs, signals }: {
 export const TopPanel = ({ refs, signals }: {
     refs: GridLayoutRefs,
     signals: Pick<GridSignals, "hideTopPanel">
-}) => {
+}): JSXElement => {
     const bandRefs = refs["main"];
     return <div hidden={signals.hideTopPanel} class={`slick-top-panel-container`}>
         <div class="slick-top-panel" ref={el => refs.topPanel = el} />
@@ -59,7 +59,7 @@ export const Viewport = ({ band, pane, refs, signals }: {
     pane: PaneKey,
     refs: GridLayoutRefs,
     signals: Pick<GridSignals, "frozenTopRows" | "frozenBottomRows" | "pinnedStartCols" | "pinnedEndCols">
-}) => {
+}): JSXElement => {
     const bandRefs = refs[band];
     return <div hidden={paneBandHidden(pane, band, signals)} class={`sg-${pane} sg-${band} slick-viewport`} tabindex="0">
         <div class={`sg-${pane} sg-${band} grid-canvas`} tabindex="0" ref={el => bandRefs.canvas[pane] = el} />
@@ -69,7 +69,7 @@ export const Viewport = ({ band, pane, refs, signals }: {
 export const FooterRow = ({ band, refs, signals }: {
     band: BandKey, refs: GridLayoutRefs,
     signals: Pick<GridSignals, "hideFooterRow" | "pinnedStartCols" | "pinnedEndCols">
-}) => {
+}): JSXElement => {
     const bandRefs = refs[band];
     return <div hidden={bandHidden(band, signals.hideFooterRow, signals)} class={`sg-${band} slick-footerrow`}>
         <div class={`sg-${band} slick-footerrow-columns`} ref={el => bandRefs.footerRowCols = el} />

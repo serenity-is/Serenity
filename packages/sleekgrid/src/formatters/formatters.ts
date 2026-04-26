@@ -1,6 +1,6 @@
 import { FormatterContext, FormatterResult } from "../core";
 
-export function PercentCompleteFormatter(ctx: FormatterContext) {
+export function PercentCompleteFormatter(ctx: FormatterContext): FormatterResult {
     if (ctx.value == null || ctx.value === "")
         return "-";
     const span = document.createElement('span');

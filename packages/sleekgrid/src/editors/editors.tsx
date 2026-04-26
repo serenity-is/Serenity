@@ -1,5 +1,5 @@
 import { bindThis } from "@serenity-is/domwise";
-import { Editor, EditorOptions, parsePx, Position } from "../core";
+import { Editor, EditorOptions, parsePx, Position, type ValidationResult } from "../core";
 
 abstract class BaseCellEdit {
     declare protected _input: HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement;
@@ -13,23 +13,23 @@ abstract class BaseCellEdit {
 
     abstract init(): void;
 
-    destroy() {
+    destroy(): void {
         this._input.remove();
     }
 
-    focus() {
+    focus(): void {
         this._input.focus();
     }
 
-    getValue() {
+    getValue(): string {
         return this._input.value;
     }
 
-    setValue(val: string) {
+    setValue(val: string): void {
         this._input.value = val ?? '';
     }
 
-    loadValue(item: any) {
+    loadValue(item: any): void {
         this._defaultValue = item[this._args.column.field] ?? "";
         this._input.value = this._defaultValue;
         if ((this._input as any).select) {
@@ -42,15 +42,15 @@ abstract class BaseCellEdit {
         return this._input.value;
     }
 
-    applyValue(item: any, state: any) {
+    applyValue(item: any, state: any): void {
         item[this._args.column.field] = state;
     }
 
-    isValueChanged() {
+    isValueChanged(): boolean {
         return (!(this._input.value === "" && this._defaultValue == null)) && (this._input.value != this._defaultValue);
     }
 
-    validate() {
+    validate(): ValidationResult {
         if (this._args.column.validator) {
             var validationResults = this._args.column.validator(this._input.value, this._args);
             if (!validationResults.valid) {
@@ -69,7 +69,7 @@ export class TextCellEdit extends BaseCellEdit {
 
     declare _input: HTMLInputElement;
 
-    init() {
+    init(): void {
         const input = this._input = this._args.container.appendChild(<input type="text" class='editor-text slick-editor-text' /> as HTMLInputElement);
         input.addEventListener('keydown', this._args.editorCellNavOnLRKeys ? handleKeydownLRNav : handleKeydownLRNoNav);
         input.focus();
@@ -81,11 +81,11 @@ export class TextCellEdit extends BaseCellEdit {
 
 export class IntegerCellEdit extends TextCellEdit {
 
-    serializeValue() {
+    serializeValue(): any {
         return parseInt(this._input.value, 10) || 0;
     }
 
-    validate() {
+    validate(): ValidationResult {
         if (isNaN(parseInt(this._input.value, 10))) {
             return {
                 valid: false,
@@ -111,7 +111,7 @@ export class FloatCellEdit extends TextCellEdit {
         return (!rtn && rtn !== 0 ? null : rtn);
     }
 
-    loadValue(item: any) {
+    loadValue(item: any): void {
         this._defaultValue = item[this._args.column.field];
 
         var decPlaces = this.getDecimalPlaces();
@@ -126,7 +126,7 @@ export class FloatCellEdit extends TextCellEdit {
         this._input.select();
     }
 
-    serializeValue() {
+    serializeValue(): any {
         var rtn = parseFloat(this._input.value) as any;
         if (FloatCellEdit.AllowEmptyValue) {
             if (!rtn && rtn !== 0)
@@ -145,7 +145,7 @@ export class FloatCellEdit extends TextCellEdit {
         return rtn;
     }
 
-    validate() {
+    validate(): ValidationResult {
         if (isNaN(parseFloat(this._input.value))) {
             return {
                 valid: false,
@@ -160,7 +160,7 @@ export class FloatCellEdit extends TextCellEdit {
 export class DateCellEdit extends TextCellEdit {
     private _calendarOpen = false;
 
-    init() {
+    init(): void {
         super.init();
 
         // @ts-ignore
@@ -182,7 +182,7 @@ export class DateCellEdit extends TextCellEdit {
         this._input.style.width = (parsePx(getComputedStyle(this._input).width) - (!this._args.compositeEditorOptions ? 18 : 28)) + 'px';
     }
 
-    destroy() {
+    destroy(): void {
         // @ts-ignore
         ($ as any).datepicker.dpDiv.stop(true, true);
         // @ts-ignore
@@ -190,21 +190,21 @@ export class DateCellEdit extends TextCellEdit {
         super.destroy();
     }
 
-    show() {
+    show(): void {
         if (this._calendarOpen) {
             // @ts-ignore
             ($ as any).datepicker.dpDiv.stop(true, true).show();
         }
     };
 
-    hide() {
+    hide(): void {
         if (this._calendarOpen) {
             // @ts-ignore
             ($ as any).datepicker.dpDiv.stop(true, true).hide();
         }
     }
 
-    position(position: Position) {
+    position(position: Position): void {
         if (!this._calendarOpen) {
             return;
         }
@@ -219,7 +219,7 @@ export class YesNoSelectCellEdit extends BaseCellEdit {
 
     declare _input: HTMLSelectElement;
 
-    init() {
+    init(): void {
         this._args.container.appendChild(this._input = <select tabIndex="0" class="editor-yesno slick-editor-yesno">
             <option value="yes">Yes</option>
             <option value="no">No</option>
@@ -230,23 +230,23 @@ export class YesNoSelectCellEdit extends BaseCellEdit {
         addCompositeChangeListener(this, this._args, this._input);
     }
 
-    loadValue(item: any) {
+    loadValue(item: any): void {
         this._input.value = (this._defaultValue = item[this._args.column.field]) ? "yes" : "no";
     }
 
-    serializeValue() {
+    serializeValue(): any {
         return this._input.value === "yes";
     }
 
-    isValueChanged() {
+    isValueChanged(): boolean {
         return this._input.value != this._defaultValue;
     }
 
-    validate() {
+    validate(): ValidationResult {
         return {
             valid: true,
-            msg: null as string
-        }
+            msg: null
+        };
     }
 }
 
@@ -254,31 +254,31 @@ export class CheckboxCellEdit extends BaseCellEdit {
 
     declare _input: HTMLInputElement;
 
-    init() {
+    init(): void {
         this._input = this._args.container.appendChild(<input type="checkbox" value="true" class="editor-checkbox slick-editor-checkbox" /> as HTMLInputElement);
         this._input.focus();
 
         addCompositeChangeListener(this, this._args, this._input);
     }
 
-    loadValue(item: any) {
+    loadValue(item: any): void {
         this._defaultValue = !!item[this._args.column.field];
         this._input.checked = !!this._defaultValue;
     }
 
-    preClick() {
+    preClick(): void {
         this._input.checked = !this._input.checked;
     }
 
-    serializeValue() {
+    serializeValue(): any {
         return this._input.checked;
     }
 
-    applyValue(item: any, state: any) {
+    applyValue(item: any, state: any): void {
         item[this._args.column.field] = state;
     }
 
-    isValueChanged() {
+    isValueChanged(): boolean {
         return this.serializeValue() !== this._defaultValue;
     }
 
@@ -293,7 +293,7 @@ export class CheckboxCellEdit extends BaseCellEdit {
 export class PercentCompleteCellEdit extends IntegerCellEdit {
     declare protected _picker: HTMLDivElement;
 
-    init() {
+    init(): void {
         super.init();
         this._input.classList.remove('editor-text', 'slick-editor-text');
         this._input.classList.add('editor-percentcomplete', 'slick-editor-percentcomplete');
@@ -339,7 +339,7 @@ export class PercentCompleteCellEdit extends IntegerCellEdit {
             });
     }
 
-    destroy() {
+    destroy(): void {
         super.destroy();
         this._picker.remove();
     }
@@ -356,7 +356,7 @@ export class LongTextCellEdit extends BaseCellEdit {
     declare protected _container: HTMLElement;
     declare protected _wrapper: HTMLDivElement;
 
-    init() {
+    init(): void {
         const isComposite = this._args.compositeEditorOptions;
         this._container = isComposite ? this._args.container : document.body;
 
@@ -382,7 +382,7 @@ export class LongTextCellEdit extends BaseCellEdit {
         this._input.select();
     }
 
-    handleKeyDown(e: KeyboardEvent) {
+    handleKeyDown(e: KeyboardEvent): void {
         if (e.key === "Enter" && e.ctrlKey) {
             this.save();
         } else if (e.key === "Esc" || e.key == "Escape") {
@@ -408,29 +408,29 @@ export class LongTextCellEdit extends BaseCellEdit {
         }
     }
 
-    save() {
+    save(): void {
         this._args.commitChanges();
     };
 
-    cancel() {
+    cancel(): void {
         this._input.value = this._defaultValue;
         this._args.cancelChanges();
     }
 
-    hide() {
+    hide(): void {
         this._wrapper.hidden = true;
     }
 
-    show() {
+    show(): void {
         this._wrapper.hidden = false;
     }
 
-    position(position: Position) {
+    position(position: Position): void {
         this._wrapper.style.top = (position.top - 5) + 'px';
         this._wrapper.style.left = (position.left - 5) + 'px';
     }
 
-    destroy() {
+    destroy(): void {
         this._wrapper.remove();
     }
 }
