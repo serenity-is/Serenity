@@ -10,7 +10,7 @@ export function isRefObject<T = Node>(maybeRef: any): maybeRef is RefObject<T> {
 }
 
 /** Sets ref.current for a RefObject or a by calling a ref callback */
-export function setRef<T = Node>(ref: Ref<T> | undefined, current: T) {
+export function setRef<T = Node>(ref: Ref<T> | undefined, current: T): void {
     if (isRefObject<T>(ref)) {
         ref.current = current;
     } else if (typeof ref === "function") {

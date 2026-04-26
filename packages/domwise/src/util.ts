@@ -13,7 +13,7 @@ export function isNumber(val: any): val is number {
     return typeof val === "number";
 }
 
-export function isObject(val: any) {
+export function isObject(val: any): boolean {
     return typeof val === "object" && val !== null;
 }
 

@@ -1,5 +1,5 @@
 
-export const svgOnlyTags = /*#__PURE__*/ new Set([
+export const svgOnlyTags: Set<string> = /*#__PURE__*/ new Set([
     // "a",
     "animate",
     "animateMotion",
@@ -66,7 +66,7 @@ export const svgOnlyTags = /*#__PURE__*/ new Set([
     "view"
 ]);
 
-export const nonPresentationSVGAttributes =
+export const nonPresentationSVGAttributes: RegExp =
     /^(a(ll|t|u)|base[FP]|c(al|lipPathU|on)|di|ed|ex|filter[RU]|g(lyphR|r)|ke|l(en|im)|ma(rker[HUW]|s)|n|pat|pr|point[^e]|re[^n]|s[puy]|st[^or]|ta|textL|vi|xC|y|z)/
 
 export const SVGNamespace = "http://www.w3.org/2000/svg"

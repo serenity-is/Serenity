@@ -1,4 +1,4 @@
-export const initPropHookSymbol = Symbol.for("Serenity.initPropHook");
+export const initPropHookSymbol: unique symbol = Symbol.for("Serenity.initPropHook");
 
 declare module "../types" {
     interface PropHook<TNode extends Element = Element> {

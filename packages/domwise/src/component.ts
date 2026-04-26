@@ -15,12 +15,12 @@ export class Component<T = any> {
     }
 }
 
-export function initComponentClass(Class: ComponentClass, attr: any, children: any) {
-    attr = { ...attr, children }
-    const instance = new Class(attr)
-    const node = instance.render()
+export function initComponentClass(Class: ComponentClass, attr: any, children: any): JSXElement | null {
+    attr = { ...attr, children };
+    const instance = new Class(attr);
+    const node = instance.render();
     if ("ref" in attr) {
-        setRef(attr.ref, instance)
+        setRef(attr.ref, instance);
     }
-    return node
+    return node;
 }

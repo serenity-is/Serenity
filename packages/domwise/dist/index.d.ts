@@ -2196,7 +2196,7 @@ export declare function bindThis<T>(obj: T): T;
  */
 export declare function className(value: any): string;
 /** Required for classic (non-automatic) jsx factory. Prefer jsx function */
-export declare function createElement(tag: any, attr: any, ...children: any[]): any;
+export declare function createElement(tag: any, attr: any, ...children: any[]): JSXElement;
 /** For compatibility with React's useImperativeHandle, use setRef instead */
 export declare function useImperativeHandle<T>(ref: Ref<T>, init: () => T): void;
 export declare class Component<T = any> {
@@ -2267,8 +2267,8 @@ export declare function setRef<T = Node>(ref: Ref<T> | undefined, current: T): v
 export declare function useClassList(initialValue?: ClassNames): BasicClassList;
 export declare function usePropBinding<T>(initialValue?: T | null | undefined | false): PropBinding<T>;
 export declare function useText(initialValue?: string): readonly [
-	Text,
-	(value: string) => void
+	text: Text,
+	setText: (value: string) => void
 ];
 export declare function currentNamespaceURI(value?: string | null | undefined): string | null | undefined;
 export declare function inNamespaceURI(namespaceURI: string | null, children: () => ComponentChildren): ComponentChildren;

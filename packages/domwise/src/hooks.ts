@@ -103,7 +103,7 @@ export function usePropBinding<T>(initialValue?: T | null | undefined | false): 
     return hook;
 }
 
-export function useText(initialValue?: string) {
+export function useText(initialValue?: string): readonly [text: Text, setText: (value: string) => void] {
     const text = new Text()
     Object.defineProperty(text, "toString", {
         value() {
@@ -116,7 +116,7 @@ export function useText(initialValue?: string) {
     if (initialValue != null) {
         setText(initialValue)
     }
-    return [text, setText] as const
+    return [text, setText] as const;
 }
 
 export { createRef as useRef } from "./ref";

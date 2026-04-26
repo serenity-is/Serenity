@@ -12,6 +12,7 @@
       "ESNext.Disposable",
       "DOM"
     ],
+    "isolatedDeclarations": true,
     "isolatedModules": true,
     "module": "ESNext",
     "moduleResolution": "Bundler",

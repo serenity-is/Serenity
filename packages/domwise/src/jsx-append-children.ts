@@ -81,7 +81,7 @@ function appendChildrenWithSignal(parent: Node, signal: SignalLike<any>) {
 export function appendChildren(
     parent: Node,
     children: ComponentChildren,
-) {
+): void {
     if (!isVisibleChild(children)) return;
     if (isArrayLike(children)) {
         for (const child of [...(children as any[])]) {

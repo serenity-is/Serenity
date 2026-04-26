@@ -30,7 +30,7 @@ export function useSignal<T>(initialValue: T): Signal<T> {
 }
 
 /** Creates a factory for computed signals that can be manually updated as a batch */
-export function useUpdatableComputed() {
+export function useUpdatableComputed(): { computed: <T>(fn: () => T) => Computed<T>; update: () => void; } {
     const updater = signal(0);
     
     const factory = <T, >(fn: () => T): Computed<T> => {
@@ -40,7 +40,7 @@ export function useUpdatableComputed() {
         });
     };
     
-    const update = () => {
+    const update = (): void => {
         updater.value++;
     };
     

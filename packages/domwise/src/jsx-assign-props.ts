@@ -34,7 +34,7 @@ const mappedKeys: Map<string, string> = new Map<string, string>([
     ["onDoubleClickCapture", "onDblClickCapture"]
 ]);
 
-export function assignProp(node: JSXElement, key: string, value: any, prev?: any) {
+export function assignProp(node: JSXElement, key: string, value: any, prev?: any): void {
 
     switch (key) {
         case "dataset":
@@ -254,7 +254,7 @@ export function assignProp(node: JSXElement, key: string, value: any, prev?: any
     }
 }
 
-export function assignProps(node: JSXElement, props: Record<string, any>) {
+export function assignProps(node: JSXElement, props: Record<string, any>): void {
     for (let [key, value] of Object.entries(props)) {
 
         key = mappedKeys.get(key) ?? key;
@@ -271,7 +271,6 @@ export function assignProps(node: JSXElement, props: Record<string, any>) {
             assignProp(node, key, value);
         }
     }
-    return node;
 }
 
 function nodeEventPropDisposer(this: { [key: string]: any }, key: string) {
