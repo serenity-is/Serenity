@@ -14,8 +14,8 @@
     "flatpickr": "catalog:serenity",
     "jquery-knob": "1.2.11",
     "jquery-sparkline": "2.4.0",
-    "jvectormap-content": "0.1.1",
-    "jvectormap-next": "3.1.2",
+    "jvectormap-content": "0.2.0",
+    "jvectormap-next": "3.2.0",
     "moment": "catalog:serenity",
     "preact": "catalog:serenity"
   },
