@@ -53,6 +53,12 @@
     <ProjectReference Include="$(CommonSrc)extensions\Serenity.Extensions.csproj" />
     <ProjectReference Include="$(CommonSrc)demo.northwind\Serenity.Demo.Northwind.csproj" />
     <ProjectReference Include="$(CommonSrc)demo.basicsamples\Serenity.Demo.BasicSamples.csproj" />
+    <!--#if (IsNotTemplate)-->
+    <ProjectReference Include="$(SerenitySrc)codegenerator\Serenity.Net.CodeGenerator.csproj"
+        Condition="Exists('$(SerenitySrc)codegenerator\Serenity.Net.CodeGenerator.csproj')"
+        Private="false" ReferenceOutputAssembly="false" SkipGetTargetFrameworkProperties="true" UndefineProperties="TargetFramework"
+        ExcludeAssets="all" PrivateAssets="all" DisableTransitiveProjectReferences="true" DisableTransitiveFrameworkReferences="true" />
+    <!--#endif-->
   </ItemGroup>
   <ItemGroup Condition="'$(UseProjectRefs)' == 'false'">
   </ItemGroup>
@@ -73,7 +79,7 @@
       <Content Include="wwwroot\esm\**\*.js;wwwroot\esm\**\*.css;wwwroot\esm\**\*.map" Exclude="@(Content)" CopyToOutputDirectory="Never" CopyToPublishDirectory="PreserveNewest" ExcludeFromSingleFile="true" />
     </ItemGroup>
   </Target>
-  <Target Name="TransformMvcClientTypes" BeforeTargets="BeforeBuild" DependsOnTargets="SetSergenTransformArgs">
+  <Target Name="TransformMvcClientTypes" AfterTargets="ResolveProjectReferences" DependsOnTargets="SetSergenTransformArgs" Condition="'$(BuildingProject)' != 'false' And '$(DesignTimeBuild)' != 'true'">
     <Exec Command="dotnet tool restore" ContinueOnError="true" Condition="'$(DotNetSergen)' == 'dotnet sergen'" />
     <Exec Command="$(DotNetSergen) mvct $(SergenTransformArgs)" ContinueOnError="true" />
   </Target>

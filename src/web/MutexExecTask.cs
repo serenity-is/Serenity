@@ -48,7 +48,7 @@ public class MutexExec : Exec
                             return false;
                         }
                         else {
-                            Log.LogWarning($"Waiting to acquire Exec mutex {MutexName} timed out {tryCount}nd time...");
+                            Log.LogMessage(MessageImportance.High, $"Waiting to acquire Exec mutex {MutexName} timed out {tryCount} time...");
                         }
                     }
                     else

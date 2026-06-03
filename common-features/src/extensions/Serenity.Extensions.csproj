@@ -6,5 +6,8 @@
     <PackageReference Include="FluentMigrator.Extensions.SqlServer" Version="8.0.1" />
     <PackageReference Include="MailKit" Version="4.16.0" />
     <PackageReference Include="nClam" Version="9.0.0" />
+    <ProjectReference Include="$(SerenitySrc)..\packages\corelib\Serenity.Corelib.csproj" Condition="Exists('$(SerenitySrc)..\packages\corelib\Serenity.Corelib.csproj') and '$(AddAutoRefs)' == 'true'"
+      Private="false" ReferenceOutputAssembly="false" SkipGetTargetFrameworkProperties="true" UndefineProperties="TargetFramework" 
+      ExcludeAssets="all" PrivateAssets="all" DisableTransitiveProjectReferences="true" DisableTransitiveFrameworkReferences="true" />
   </ItemGroup>
 </Project>
