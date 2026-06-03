@@ -12,5 +12,9 @@
   <ItemGroup>
     <Using Include="$(MSBuildProjectName).MVC.ESM" Alias="ESM" />
     <NpmPackageFile Include="$(MSBuildThisFileDirectory)..\..\package.json" Condition="Exists('$(MSBuildProjectDirectory)\package.json')" />
+    <ProjectReference Include="$(MSBuildThisFileDirectory)..\..\src\codegenerator\Serenity.Net.CodeGenerator.csproj" 
+      Condition="Exists('$(MSBuildThisFileDirectory)..\..\src\codegenerator\Serenity.Net.CodeGenerator.csproj')" 
+      Private="false" ReferenceOutputAssembly="false" SkipGetTargetFrameworkProperties="true" UndefineProperties="TargetFramework" 
+      ExcludeAssets="all" PrivateAssets="all" DisableTransitiveProjectReferences="true" DisableTransitiveFrameworkReferences="true" />
   </ItemGroup>
 </Project>
