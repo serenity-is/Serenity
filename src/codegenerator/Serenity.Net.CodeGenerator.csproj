@@ -10,6 +10,7 @@
     <PackAsTool>true</PackAsTool>
     <PackageId>sergen</PackageId>
     <DefineConstants Condition="'$(NoDbProviders)' == 'true'">$(DefineConstants);NoDbProviders</DefineConstants>
+    <RunAnalyzersDuringBuild>false</RunAnalyzersDuringBuild>
   </PropertyGroup>
   <ItemGroup>
     <EmbeddedResource Include="Templates\*.scriban" />
