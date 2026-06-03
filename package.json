@@ -11,16 +11,6 @@
     "vite": "catalog:serenity",
     "vitest": "catalog:serenity"
   },
-  "pnpm": {
-    "onlyBuiltDependencies": [
-      "core-js",
-      "esbuild",
-      "msw"
-    ],
-    "overrides": {
-      "dompurify@<=3.3.3": ">=3.4.1"
-    }
-  },
   "scripts": {
     "all": "pnpm i && pnpm -r build && pnpm -r tsc && pnpm -r test"
   },
