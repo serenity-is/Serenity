@@ -16,7 +16,7 @@
     </ItemGroup>
     <Message Text="Executing TypeScript compiler for $(ProjectName)..." Importance="high"></Message>
     <Exec Command="node &quot;$(TSJavaScriptFile.Replace('build\\..\tools\', 'tools\'))&quot; -p ./tsconfig.json" Condition="!Exists('tsbuild.js')" ContinueOnError="true" />
-    <Exec Command="pnpm build" Condition="Exists('tsbuild.js')" ContinueOnError="true" />
+    <Exec Command="node --run build" Condition="Exists('tsbuild.js')" ContinueOnError="true" />
     <ItemGroup>
       <_ContentAfterTSBuild Include="wwwroot\**\*" Exclude="@(_ContentBeforeTSBuild)" />
       <Content Include="@(_ContentAfterTSBuild)" Exclude="@(Content)" CopyToOutputDirectory="Never" CopyToPublishDirectory="PreserveNewest" ExcludeFromSingleFile="true" />

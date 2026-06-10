@@ -7,7 +7,7 @@
     "build": "node ./tsbuild.js",
     "build:watch": "node ./tsbuild.js --watch",
     "dts": "dts-bundle-generator Modules/index.ts -o dist/index.d.ts --no-banner --disable-symlinks-following --inline-declare-global",
-    "test": "pnpm build && vitest run",
+    "test": "node --run build && vitest run",
     "tsc": "tsc"
   },
   "main": "dist/index.js",

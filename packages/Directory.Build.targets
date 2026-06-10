@@ -16,7 +16,7 @@
     <ItemGroup>
       <_ContentBeforeTSBuild Include="wwwroot\**\*" />
     </ItemGroup>
-    <Exec Command="pnpm build" />
+    <Exec Command="node --run build" />
     <ItemGroup>
       <_ContentAfterTSBuild Include="wwwroot\**\*" Exclude="@(_ContentBeforeTSBuild)" />
       <Content Include="@(_ContentAfterTSBuild)" Exclude="@(Content)" CopyToOutputDirectory="Never" CopyToPublishDirectory="PreserveNewest" ExcludeFromSingleFile="true" />
