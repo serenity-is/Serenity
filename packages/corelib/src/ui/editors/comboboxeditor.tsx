@@ -29,7 +29,7 @@ export interface ComboboxFilterOptions {
 export interface ComboboxInplaceAddOptions {
     inplaceAdd?: boolean;
     inplaceAddPermission?: string;
-    dialogType?: string;
+    dialogType?: string | DialogType | PromiseLike<DialogType>;
     autoComplete?: boolean;
 }
 
@@ -724,17 +724,29 @@ export class ComboboxEditor<P, TItem> extends EditorWidget<P> implements
     protected updateItems() {
     }
 
-    protected getDialogTypeKey() {
-        if ((this.options as ComboboxEditorOptions).dialogType != null) {
-            return (this.options as ComboboxEditorOptions).dialogType;
+    protected getDialogType(): DialogType | PromiseLike<DialogType> {
+        const opt = (this.options as ComboboxEditorOptions);
+        if (opt?.dialogType && typeof opt.dialogType !== "string")
+            return opt.dialogType as DialogType;
+
+        const dialogTypeKey = (this as any).getDialogTypeKey();
+        if (dialogTypeKey)
+            return DialogTypeRegistry.getOrLoad(dialogTypeKey);
+
+        return null;
+    }
+
+    /** @deprecated Override getDialogType() instead */
+    protected getDialogTypeKey(): string {
+        if (typeof (this.options as ComboboxEditorOptions).dialogType === "string") {
+            return (this.options as ComboboxEditorOptions).dialogType as string;
         }
 
         return null;
     }
 
     protected createEditDialog(callback: (dlg: IEditDialog) => void): void {
-        var dialogTypeKey = this.getDialogTypeKey();
-        var dialogType = DialogTypeRegistry.getOrLoad(dialogTypeKey);
+        const dialogType = this.getDialogType();
         const then = (dialogType: DialogType) => {
             var dialog = new dialogType({}).init?.();
             callback?.(dialog as unknown as IEditDialog);
