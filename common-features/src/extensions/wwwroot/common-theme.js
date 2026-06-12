@@ -63,7 +63,6 @@
                         var a = li.appendChild(document.createElement('a'));
                         a.classList.add('dropdown-item');
                         a.setAttribute('data-language', l.LanguageId);
-                        a.setAttribute('href', 'javascript:;');
                         a.textContent = l.LanguageName;
                         menu.appendChild(li);
                     });

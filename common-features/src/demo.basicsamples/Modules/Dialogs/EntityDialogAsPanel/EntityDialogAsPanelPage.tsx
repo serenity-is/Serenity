@@ -24,10 +24,10 @@ export default (model: number | OrderRow) => {
         <ul>
             <li><a href={resolveUrl("~/BasicSamples/EntityDialogAsPanel/")}>Switch to new record mode by changing URL</a></li>
             <li><a href={resolveUrl("~/BasicSamples/EntityDialogAsPanel/11068")}>Load Order with ID 11068 by changing URL</a></li>
-            <li><a id="SwitchToNewRecordMode" href="javascript:;" onClick={() => {
+            <li><a id="SwitchToNewRecordMode" role="button" class="link" onClick={() => {
                 myDialogAsPanel.load({}, function () { notifySuccess('Switched to new record mode'); });
             }}>Switch to new record mode with Javascript</a></li>
-            <li><a id="LoadEntityWithId" href="javascript:;" onClick={() => {
+            <li><a id="LoadEntityWithId" role="button" class="link" onClick={() => {
                 myDialogAsPanel.load({ OrderID: 11048 }, function () { notifySuccess('Loaded order with ID 11048'); });
             }}>Load Order with ID 11048 with javascript</a></li>
             <li><a href={resolveUrl("~/BasicSamples/EntityDialogAsPanel/11077")}>Back to Order with ID 11077 by changing URL</a></li>

@@ -9,7 +9,7 @@
     var icon = item.IconClass ?? "";
     var title = Localizer.TryGet("Navigation." + item.FullPath) ?? item.Title;
     var ulId = parentId + "_" + index;
-    var url = item.Url ?? (hasChildren ? ("#" + ulId) : "javascript:;");
+    var url = item.Url ?? (hasChildren ? ("#" + ulId) : "#");
     var target = Html.Raw(item.Target != null ? (" target=" + item.Target) : "");
     var bsToggle = Html.Raw(hasChildren ? " data-bs-toggle=\"collapse\"" : "");
     var ariaExpanded = Html.Raw(hasChildren && isActive ? " aria-expanded=\"true\"" : "");
@@ -62,7 +62,7 @@
     <ul class="s-sidebar-header-actions">
         <li>
             <div class="dropdown">
-                <a href="javascript:;" class="s-sidebar-header-link s-language-selection-link" 
+                <a class="s-sidebar-header-link s-language-selection-link"
                     data-bs-toggle="dropdown" title="switch language">
                     <i class="fa fa-language"></i>
                 </a>
@@ -74,7 +74,7 @@
     {
     <li>
             <div class="dropdown">
-                <a href="javascript:;" class="s-sidebar-header-link s-user-profile-link" 
+                <a class="s-sidebar-header-link s-user-profile-link"
                     data-bs-toggle="dropdown" title="@User?.Identity?.Name">
                     <i class="fa fa-user"></i>
                 </a>

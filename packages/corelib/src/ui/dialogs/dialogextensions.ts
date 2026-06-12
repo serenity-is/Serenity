@@ -90,7 +90,7 @@ function registerDialogExtendPlugin() {
             var titlebar = $(this.domNode).closest('.ui-dialog').children('.ui-dialog-titlebar');
             var closeButton = titlebar.find('.ui-dialog-titlebar-close').first();
             var button = $('<button class="ui-button ui-corner-all ui-button-icon-only ui-dialog-titlebar-'
-                + name + '" href="javascript:;" tabindex="-1"><i class="' + icon + '"></i></a>')
+                + name + '" tabindex="-1"><i class="' + icon + '"></i></button>')
                 .attr('title', hint)
                 .toggle(show)
                 .click(function (e: any) {

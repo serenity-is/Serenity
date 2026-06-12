@@ -2291,7 +2291,7 @@ class SingleSelect2 extends AbstractSelect2 {
         var container = document.createElement("div");
         container.classList.add("select2-container");
         container.innerHTML =
-            "<a href='javascript:void(0)' class='select2-choice' tabindex='-1'>" +
+            "<a role='button' class='select2-choice' tabindex='-1'>" +
             "<span class='select2-chosen'>&#160;</span><abbr class='select2-search-choice-close'></abbr>" +
             "<span class='select2-arrow' role='presentation'><b role='presentation'></b></span>" +
             "</a>" +
