@@ -20,7 +20,7 @@ catalogs:
     "chart.js": "4.5.1"
     "dompurify": "3.4.8"
     "dts-bundle-generator": "9.5.1"
-    "esbuild": "0.28.0"
+    "esbuild": "0.28.1"
     "es-module-lexer": "2.1.0"
     "flatpickr": "4.6.13"
     "glightbox": "3.3.1"
