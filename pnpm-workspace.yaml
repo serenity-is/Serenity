@@ -18,7 +18,7 @@ catalogs:
     "@preact/signals-core": "1.14.2"
     "@vitest/coverage-v8": "4.1.8"
     "chart.js": "4.5.1"
-    "dompurify": "3.4.9"
+    "dompurify": "3.4.11"
     "dts-bundle-generator": "9.5.1"
     "esbuild": "0.28.1"
     "es-module-lexer": "2.1.0"

@@ -16,8 +16,8 @@ catalogs:
       specifier: 4.5.1
       version: 4.5.1
     dompurify:
-      specifier: 3.4.9
-      version: 3.4.9
+      specifier: 3.4.11
+      version: 3.4.11
     dts-bundle-generator:
       specifier: 9.5.1
       version: 9.5.1
@@ -241,7 +241,7 @@ importers:
         version: 3.1.0
       dompurify:
         specifier: catalog:serenity
-        version: 3.4.9
+        version: 3.4.11
       flatpickr:
         specifier: catalog:serenity
         version: 4.6.13
@@ -955,11 +955,11 @@ packages:
     resolution: {integrity: sha512-Btj2BOOO83o3WyH59e8MgXsxEQVcarkUOpEYrubB0urwnN10yQ364rsiByU11nZlqWYZm05i/of7io4mzihBtQ==}
     engines: {node: '>=8'}
 
+  dompurify@3.4.11:
+    resolution: {integrity: sha512-zhlUV12GsaRzMsf9q5M254YhA4+VuF0fG+QFqu6aYpoGlKtz+w8//jBcGVYBgQkR5GHjUomejY84AV+/uPbWdw==}
+
   dompurify@3.4.2:
     resolution: {integrity: sha512-lHeS9SA/IKeIFFyYciHBr2n0v1VMPlSj843HdLOwjb2OxNwdq9Xykxqhk+FE42MzAdHvInbAolSE4mhahPpjXA==}
-
-  dompurify@3.4.9:
-    resolution: {integrity: sha512-4dPSRMRDqHvs0V4YDFCsaIZo4if5u0xM+llyxiM2fwuZFdKArUBAF3VtI2+n8NKg9P870WMdYk0UhqQNoWXbfQ==}
 
   dts-bundle-generator@9.5.1:
     resolution: {integrity: sha512-DxpJOb2FNnEyOzMkG11sxO2dmxPjthoVWxfKqWYJ/bI/rT1rvTMktF5EKjAYrRZu6Z6t3NhOUZ0sZ5ZXevOfbA==}
@@ -2118,14 +2118,14 @@ snapshots:
 
   detect-libc@2.1.2: {}
 
+  dompurify@3.4.11:
+    optionalDependencies:
+      '@types/trusted-types': 2.0.7
+
   dompurify@3.4.2:
     optionalDependencies:
       '@types/trusted-types': 2.0.7
     optional: true
-
-  dompurify@3.4.9:
-    optionalDependencies:
-      '@types/trusted-types': 2.0.7
 
   dts-bundle-generator@9.5.1:
     dependencies:
