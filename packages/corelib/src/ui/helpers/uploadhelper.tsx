@@ -3,13 +3,21 @@ import { replaceAll } from "../../compat";
 
 export namespace UploadHelper {
 
+
     export function addUploadInput(options: UploadInputOptions): Fluent {
+        return Fluent(createUploadInput(options).input);
+    }
+
+    export function createUploadInput(options: UploadInputOptions): {
+        input: HTMLInputElement,
+        uploader: Uploader
+    } {
         let container = isArrayLike(options.container) ? options.container[0] : options.container;
         let progress = Fluent(isArrayLike(options.progress) ? options.progress[0] : options.progress);
-        var button = container.closest(".tool-button") ?? container.closest("button") ?? container;
+        const button = container.closest(".tool-button") ?? container.closest("button") ?? container;
         button.classList.add("fileinput-button");
 
-        var uploadUrl = options.uploadUrl || '~/File/TemporaryUpload';
+        let uploadUrl = options.uploadUrl || '~/File/TemporaryUpload';
         if (options.uploadIntent) {
             if (uploadUrl.indexOf('?') < 0)
                 uploadUrl += "?"
@@ -19,15 +27,14 @@ export namespace UploadHelper {
             uploadUrl += encodeURIComponent(options.uploadIntent);
         }
 
-        var uploadInput = Fluent(<input type="file" name={options.inputName + '[]'} data-url={resolveUrl(uploadUrl)} multiple={!!options.allowMultiple} />)
-            .appendTo(container);
+        const input = container.appendChild(<input type="file" name={options.inputName + '[]'} data-url={resolveUrl(uploadUrl)} multiple={!!options.allowMultiple} />) as HTMLInputElement;
 
         const setProgress = (percent: number) => {
             let bar = progress.children()[0];
             bar && (bar.style.width = (percent ?? 0).toString() + '%');
         }
 
-        var uploader = new Uploader({
+        const uploader = new Uploader({
             batchSize: 1,
             batchSuccess: data => {
                 const response: UploadResponse = data.response ?? {};
@@ -37,7 +44,7 @@ export namespace UploadHelper {
                 }
                 options.fileDone?.(response, data.batch?.filePaths?.[0], data);
             },
-            input: uploadInput.getNode() as HTMLInputElement,
+            input: input,
             dropZone: options.zone,
             batchStart: () => {
                 blockUI(null);
@@ -57,7 +64,7 @@ export namespace UploadHelper {
             }
         });
 
-        return uploadInput;
+        return { input, uploader };
     }
 
     export function checkImageConstraints(file: UploadResponse,
