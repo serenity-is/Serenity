@@ -16,7 +16,7 @@ public static partial class Shared
 {
     static readonly string[] LocalFeedNames = ["MyPackages"];
     const string NugetOrgReadSource = "https://api.nuget.org/v3/index.json";
-    public const string NugetOrgPushSource = "https://www.nuget.org/api/v2/package";
+    public const string NugetOrgPushSource = "https://nuget.org";
 
     const string SerenityIsSourceKey = "serenity.is";
     private static PackageSource serenityIsPackageSource;

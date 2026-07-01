@@ -3,7 +3,7 @@
   <Import Project="$(MSBuildThisFileDirectory)..\build\Feature.Build.props" />
   <PropertyGroup>
     <ArtifactsPath>$(MSBuildThisFileDirectory)..\..\artifacts</ArtifactsPath>
-    <SerenityVersion Condition="'$(SerenityVersion)' == ''">10.3.2</SerenityVersion>
+    <SerenityVersion Condition="'$(SerenityVersion)' == ''">10.3.3</SerenityVersion>
     <SergenTransform Condition="'$(SergenTransform)' == '' And '$(BuildingProject)' != 'false' And '$(DesignTimeBuild)' != 'true'">all</SergenTransform>
     <TargetFramework>net10.0</TargetFramework>
     <DotnetToolManifestFile>$(MSBuildProjectDirectory)\..\.config\dotnet-tools.json</DotnetToolManifestFile>
@@ -12,9 +12,6 @@
   <ItemGroup>
     <Using Include="$(MSBuildProjectName).MVC.ESM" Alias="ESM" />
     <NpmPackageFile Include="$(MSBuildThisFileDirectory)..\..\package.json" Condition="Exists('$(MSBuildProjectDirectory)\package.json')" />
-    <ProjectReference Include="$(MSBuildThisFileDirectory)..\..\src\codegenerator\Serenity.Net.CodeGenerator.csproj" 
-      Condition="Exists('$(MSBuildThisFileDirectory)..\..\src\codegenerator\Serenity.Net.CodeGenerator.csproj')" 
-      Private="false" ReferenceOutputAssembly="false" SkipGetTargetFrameworkProperties="true" UndefineProperties="TargetFramework" 
-      ExcludeAssets="all" PrivateAssets="all" DisableTransitiveProjectReferences="true" DisableTransitiveFrameworkReferences="true" />
+    <ProjectReference Include="$(MSBuildThisFileDirectory)..\..\src\codegenerator\Serenity.Net.CodeGenerator.csproj" Condition="Exists('$(MSBuildThisFileDirectory)..\..\src\codegenerator\Serenity.Net.CodeGenerator.csproj')" Private="false" ReferenceOutputAssembly="false" SkipGetTargetFrameworkProperties="true" UndefineProperties="TargetFramework" ExcludeAssets="all" PrivateAssets="all" DisableTransitiveProjectReferences="true" DisableTransitiveFrameworkReferences="true" />
   </ItemGroup>
 </Project>

@@ -1,3 +1,20 @@
+## 10.3.3 (2026-07-01)
+
+### Features
+- Add RegisterScoped, RegisterSingleton, RegisterTransient attributes that allow an implementation type to be auto registered for any interface (excluding ones deriving from IRequestHandler) in Startup.cs ConfigureServices method by calling  services.AddAutoRegisteredServices(); which should be the last line in that method.
+- Use `node --run scriptname` instead of `pnpm scriptname` or `npm run scriptname`
+- Allow passing dialogType option of combo/lookup editors as a type / promise instead of string
+- Remove all `javascript:` urls for links as they are incompatible with strict CSP, or replace them with a role="button".
+- Expose uploader object via new createUploadInput helper
+- Add Blog sample under `Application Samples` (StartSharp)
+- Add missing `commitEdits` function to EntityGridDialog. Add test to catch missing EntityDialog prototype functions in EntityGridDialog.
+
+### Bugfixes
+
+- Clear cssColRulesL/R and cssVarRules to avoid issue when switching back from useCssVars in SleekGrid
+- Remove `\n` and `\t` from `<span class="counter"/>` texts and make sure display text shown properly even if they have such characters.
+- Ensure `HeaderFiltersPlugin.getFilterValue` does not fail when value is null / undefined.
+
 ## 10.3.2 (2026-05-05)
 
 ### Bugfixes
