@@ -5010,7 +5010,7 @@ export interface ComboboxFilterOptions {
 export interface ComboboxInplaceAddOptions {
 	inplaceAdd?: boolean;
 	inplaceAddPermission?: string;
-	dialogType?: string;
+	dialogType?: string | DialogType | PromiseLike<DialogType>;
 	autoComplete?: boolean;
 }
 export interface ComboboxEditorOptions extends ComboboxFilterOptions, ComboboxInplaceAddOptions, ComboboxCommonOptions {
@@ -5109,6 +5109,8 @@ export declare class ComboboxEditor<P, TItem> extends EditorWidget<P> implements
 	protected cascadeItems(items: TItem[]): TItem[];
 	protected filterItems(items: TItem[]): TItem[];
 	protected updateItems(): void;
+	protected getDialogType(): DialogType | PromiseLike<DialogType>;
+	/** @deprecated Override getDialogType() instead */
 	protected getDialogTypeKey(): string;
 	protected createEditDialog(callback: (dlg: IEditDialog) => void): void;
 	onInitNewEntity: (entity: TItem) => void;
@@ -6642,6 +6644,10 @@ export declare class TimeSpanEditor<P extends TimeSpanEditorOptions = TimeSpanEd
 }
 export declare namespace UploadHelper {
 	function addUploadInput(options: UploadInputOptions): Fluent;
+	function createUploadInput(options: UploadInputOptions): {
+		input: HTMLInputElement;
+		uploader: Uploader;
+	};
 	function checkImageConstraints(file: UploadResponse, opt: FileUploadConstraints): boolean;
 	function fileNameSizeDisplay(name: string, bytes: number): string;
 	function fileSizeDisplay(bytes: number): string;
