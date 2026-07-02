@@ -162,7 +162,7 @@ export function applyFormatterResultToCellNode(ctx: FormatterContext, fmtResult:
     else if (fmtResult instanceof Node) {
         node.appendChild(fmtResult);
     }
-    else if (!ctx.enableHtmlRendering)
+    else if (ctx.enableHtmlRendering)
         node.innerHTML = (ctx.sanitizer ?? escapeHtml)(("" + fmtResult));
     else
         node.textContent = "" + fmtResult;

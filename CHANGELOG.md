@@ -1,3 +1,9 @@
+## 10.3.4 (2026-07-02)
+
+### Bugfixes
+
+- applyFormatterResultToCellNode sets innerHTML instead of innerText when enableHtmlRendering is false, causing wrong content to be rendered on cell updates
+
 ## 10.3.3 (2026-07-01)
 
 ### Features

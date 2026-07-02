@@ -178,7 +178,7 @@ describe('applyFormatterResultToCellNode', () => {
     it('should set html of the element to the html in the object', () => {
         const cellNode = document.createElement('div');
 
-        applyFormatterResultToCellNode(ctx(), 'test<span>test</span>', cellNode);
+        applyFormatterResultToCellNode(ctx({ enableHtmlRendering: true }), 'test<span>test</span>', cellNode);
 
         expect(cellNode.childElementCount).toBe(1);
         expect(cellNode.innerHTML).toBe('test<span>test</span>');
