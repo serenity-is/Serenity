@@ -320,14 +320,14 @@ export declare enum CriteriaOperator {
  */
 export declare function Criteria(field: string): CriteriaBuilder;
 export declare namespace Criteria {
-	var and: (c1: any[], c2: any[], ...rest: any[][]) => any[];
-	var Operator: typeof CriteriaOperator;
-	var isEmpty: (c: any[]) => boolean;
-	var join: (c1: any[], op: string, c2: any[]) => any[];
-	var not: (c: any[]) => (string | any[])[];
-	var or: (c1: any[], c2: any[], ...rest: any[][]) => any[];
-	var paren: (c: any[]) => any[];
-	var parse: typeof parseCriteria;
+	export { CriteriaOperator as CriteriaOperator };
+	export var isEmpty: (c: any[]) => boolean;
+	export var join: (c1: any[], op: string, c2: any[]) => any[];
+	export var not: (c: any[]) => (string | any[])[];
+	export var and: (c1: any[], c2: any[], ...rest: any[][]) => any[];
+	export var or: (c1: any[], c2: any[], ...rest: any[][]) => any[];
+	export var paren: (c: any[]) => any[];
+	export { parseCriteria as parseCriteria };
 }
 export interface DebouncedFunction<T extends (...args: any[]) => any> {
 	/**
@@ -1357,8 +1357,6 @@ export interface Fluent<TElement extends HTMLElement = HTMLElement> extends Arra
 	val(): string;
 }
 export declare function Fluent<K extends keyof HTMLElementTagNameMap>(tag: K): Fluent<HTMLElementTagNameMap[K]>;
-export declare function Fluent<TElement extends HTMLElement>(element: TElement): Fluent<TElement>;
-export declare function Fluent(element: EventTarget): Fluent<HTMLElement>;
 export declare namespace Fluent {
 	var ready: (callback: () => void) => void;
 	var byId: <TElement extends HTMLElement>(id: string) => Fluent<TElement>;
@@ -1366,6 +1364,8 @@ export declare namespace Fluent {
 	var findEach: <TElement extends HTMLElement>(selector: string, callback: (el: Fluent<TElement>) => void) => void;
 	var findFirst: <TElement extends HTMLElement>(selector: string) => Fluent<TElement>;
 }
+export declare function Fluent<TElement extends HTMLElement>(element: TElement): Fluent<TElement>;
+export declare function Fluent(element: EventTarget): Fluent<HTMLElement>;
 export declare namespace Fluent {
 	/**
 	 * Adds an event listener to the element. It is possible to use delegated events like jQuery.

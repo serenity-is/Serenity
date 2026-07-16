@@ -758,22 +758,6 @@ export function Criteria(field: string) {
     return builder as CriteriaBuilder
 }
 
-/**
- * Ands two or more criteria together.
- * @param c1 First criteria.
- * @param c2 Second criteria.
- * @param rest Other criteria.
- */
-Criteria.and = function and(c1: any[], c2: any[], ...rest: any[][]) {
-    let result = Criteria.join(c1, 'and', c2);
-    if (rest) {
-        for (const k of rest)
-            result = Criteria.join(result, 'and', k);
-    }
-
-    return result;
-};
-
 /** Provides access to the `CriteriaOperator` enum, e.g list of operator keys */
 Criteria.Operator = CriteriaOperator;
 
@@ -809,6 +793,23 @@ Criteria.join = function join(c1: any[], op: string, c2: any[]): any[] {
 Criteria.not = function not(c: any[]) {
     return ['not', c]
 }
+
+
+/**
+ * Ands two or more criteria together.
+ * @param c1 First criteria.
+ * @param c2 Second criteria.
+ * @param rest Other criteria.
+ */
+Criteria.and = function and(c1: any[], c2: any[], ...rest: any[][]) {
+    let result = Criteria.join(c1, 'and', c2);
+    if (rest) {
+        for (const k of rest)
+            result = Criteria.join(result, 'and', k);
+    }
+
+    return result;
+};
 
 /**
  * Ors two or more criteria together.
