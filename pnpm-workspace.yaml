@@ -14,7 +14,7 @@ allowBuilds:
 
 catalogs:
   serenity:
-    "@floating-ui/dom": "1.7.6"
+    "@floating-ui/dom": "1.8.0"
     "@preact/signals-core": "1.14.4"
     "@vitest/coverage-v8": "4.1.10"
     "chart.js": "4.5.1"
