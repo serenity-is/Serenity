@@ -732,7 +732,7 @@ export class Validator {
             if (element.type === "radio" || element.type === "checkbox") {
                 if (element.name && element.form) {
                     const values = Array.from(element.form.querySelectorAll<HTMLInputElement>(`input[name=${cssEscape(element.name)}]`))
-                        .map(el => el.checked ? null : el.value);
+                        .map(el => el.checked ? el.value : null);
 
                     if (values.length > 1)
                         return values.filter(x => x != null);
@@ -919,7 +919,7 @@ export class Validator {
             this.showErrors();
 
             // Add aria-invalid status for screen readers
-            if (rs)
+            if (!rs)
                 element.setAttribute("aria-invalid", "true");
             else
                 element.removeAttribute("aria-invalid");
@@ -1209,9 +1209,9 @@ export class Validator {
 
     // Return the first defined argument, allowing empty strings
     findDefined(...args: any[]) {
-        for (let i = 0; i < arguments.length; i++) {
-            if (arguments[i] !== undefined) {
-                return arguments[i];
+        for (let i = 0; i < args.length; i++) {
+            if (args[i] !== undefined) {
+                return args[i];
             }
         }
         return undefined;
@@ -1262,7 +1262,9 @@ export class Validator {
             this.showLabel(error.element, error.message);
         }
         if (this.errorList.length) {
-            this.toShow = this.toShow;
+            // Original jQuery Validation plugin also appended elements from
+            // settings.errorContainer and settings.errorLabelContainer here,
+            // but those options are not implemented in this TypeScript port.
         }
         if (this.settings.success) {
             for (i = 0; this.successList[i]; i++) {
@@ -1351,7 +1353,7 @@ export class Validator {
                     x.classList.add(this.settings.success as string);
                 });
             } else {
-                this.settings.success(error, element);
+                this.settings.success(error || errors[0], element);
             }
         }
         errors.forEach(x => { this.toShow.push(x); });
@@ -1372,8 +1374,9 @@ export class Validator {
 
         // 'aria-describedby' should directly reference the error element
         if (describer) {
-            selector = selector + ", #" + cssEscape(describer)
-                .replace(/\s+/g, ", #");
+            selector = selector + ", #" + describer.split(/\s+/)
+                .map(id => cssEscape(id))
+                .join(", #");
         }
 
         return this.errors()
