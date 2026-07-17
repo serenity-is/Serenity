@@ -2361,7 +2361,9 @@ describe("onclick with option element", () => {
             // Set submitted state on parent select's name
             (validator as any).submitted["test"] = "error";
 
-            validator.settings.onclick?.(opt as any, new MouseEvent("click"), validator);
+            if (typeof validator.settings.onclick === "function") {
+                validator.settings.onclick(opt as any, new MouseEvent("click"), validator);
+            }
             expect(spy).toHaveBeenCalled();
         } finally {
             document.body.removeChild(form);

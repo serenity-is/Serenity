@@ -3439,6 +3439,44 @@ export interface IClassicRouter {
 	mightBeRouteRegex: RegExp;
 	resolve(newHash?: string): "disabled" | "skipped" | "shebang" | "missinghandler" | "calledhandler";
 	ignoreHashChange(expiration?: number): void;
+	destroy(): void;
+}
+export declare class ClassicRouter implements IClassicRouter {
+	private oldURL;
+	private resolving;
+	private autoinc;
+	private ignoreHashLock;
+	private ignoreHashUntil;
+	private hashAnchorClickValue;
+	private hashAnchorClickTime;
+	enabled: boolean;
+	private isEquivalentUrl;
+	navigate(newHash: string, tryBack?: boolean, silent?: boolean): void;
+	replace(newHash: string, tryBack?: boolean): void;
+	replaceLast(newHash: string, tryBack?: boolean): void;
+	private isIgnoredDialog;
+	private isVisibleOrHiddenBy;
+	private getVisibleOrHiddenByDialogs;
+	private pendingDialogHash;
+	private pendingDialogElement;
+	private pendingDialogOwner;
+	private pendingDialogPreHash;
+	private onDialogOpen;
+	dialog(owner: HTMLElement | ArrayLike<HTMLElement>, element: HTMLElement | ArrayLike<HTMLElement>, dialogHash: () => string): void;
+	private resolvingPreRoute;
+	private resolveIndex;
+	mightBeRouteRegex: RegExp;
+	resolve(newHash?: string): "disabled" | "skipped" | "shebang" | "missinghandler" | "calledhandler";
+	private hashChange;
+	ignoreHashChange(expiration?: number): void;
+	private routerOrder;
+	private boundThis;
+	private onDocumentDialogOpen;
+	private onDocumentClick;
+	private shouldTryBack;
+	private closeHandler;
+	constructor();
+	destroy(): void;
 }
 export declare const Router: IClassicRouter;
 export declare namespace ScriptData {

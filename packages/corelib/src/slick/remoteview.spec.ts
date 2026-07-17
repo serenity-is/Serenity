@@ -11,9 +11,16 @@ vi.mock("../base", async (importActual) => ({
 
 vi.mock("@serenity-is/sleekgrid", () => ({
     EventEmitter: vi.fn().mockImplementation(function() {
-        this.subscribe = vi.fn();
+        const handlers: any[] = [];
+        this.subscribe = vi.fn((handler: any) => {
+            handlers.push(handler);
+        });
         this.unsubscribe = vi.fn();
-        this.notify = vi.fn();
+        this.notify = vi.fn(function(...args: any[]) {
+            for (const handler of handlers) {
+                handler(...args);
+            }
+        });
     }),
     EventDataWrapper: vi.fn(),
     GroupItemMetadataProvider: vi.fn().mockImplementation(function() {
@@ -21,6 +28,8 @@ vi.mock("@serenity-is/sleekgrid", () => ({
         this.getTotalsRowMetadata = vi.fn()
     }),
     Group: vi.fn().mockImplementation(function() {
+        this.__group = true;
+        this.__nonDataRow = true;
         this.value = null;
         this.level = 0;
         this.count = 0;
@@ -28,9 +37,13 @@ vi.mock("@serenity-is/sleekgrid", () => ({
         this.groups = [];
         this.collapsed = false;
         this.totals = null;
+        this.equals = vi.fn(function(other: any) {
+            return this.value === other.value && this.level === other.level;
+        });
     }),
     GroupTotals: vi.fn().mockImplementation(function() {
         this.__groupTotals = true;
+        this.__nonDataRow = true;
         this.initialized = false;
         this.group = null;
         this.sum = {};
@@ -39,7 +52,8 @@ vi.mock("@serenity-is/sleekgrid", () => ({
         this.max = {};
         this.count = 0;
     }),
-    gridDefaults: {}
+    gridDefaults: {},
+    convertCompatFormatter: vi.fn((compatFn) => (ctx) => compatFn(0, 0, null, null, ctx.item))
 }));
 
 describe("RemoteView", () => {
@@ -1082,6 +1096,19 @@ describe("RemoteView", () => {
             // Should have called setCellCssStyles with updated styles
             expect(mockGrid.setCellCssStyles).toHaveBeenCalledWith("test-key", expect.any(Object));
         });
+
+        it("triggers update when row count changes after syncGridSelection", () => {
+            mockGrid.getSelectedRows = vi.fn(() => [0, 1]);
+            mockGrid.setSelectedRows = vi.fn();
+
+            view.syncGridSelection(mockGrid, false, false);
+
+            // Add an item which triggers onRowCountChanged
+            view.addItem({ id: 3, name: "Item 3" });
+
+            // The update function should have called setSelectedRows on the grid
+            expect(mockGrid.setSelectedRows).toHaveBeenCalled();
+        });
     });
 
     describe("group item metadata provider", () => {
@@ -1209,6 +1236,801 @@ describe("RemoteView", () => {
 
             // Should not throw - hints are internal
             expect(() => view.setRefreshHints(hints)).not.toThrow();
+        });
+    });
+
+    describe("formatGroupValue", () => {
+        let view: RemoteView<any>;
+
+        beforeEach(() => {
+            view = new RemoteView({ idField: "id" });
+        });
+
+        it("returns escaped value when ctx.item is null", () => {
+            const result = (view as any)['formatGroupValue']({ item: null, escape: (v: any) => String(v) });
+            // ctx.item?.value -> undefined -> String(undefined) -> "undefined"
+            expect(result).toBe("undefined");
+        });
+
+        it("returns escaped value when ctx.item.level is null", () => {
+            const result = (view as any)['formatGroupValue']({ item: { value: "test-val", level: null }, escape: (v: any) => String(v) });
+            expect(result).toBe("test-val");
+        });
+
+        it("returns escaped value when groupingInfo is missing for level", () => {
+            const result = (view as any)['formatGroupValue']({
+                item: { value: "test-val", level: 0 },
+                escape: (v: any) => String(v)
+            });
+            expect(result).toBe("test-val");
+        });
+
+        it("converts formatter and uses it when format is not set", () => {
+            const viewWithGrouping = new RemoteView({ idField: "id" });
+            const formatter = vi.fn(() => "formatted-value");
+            viewWithGrouping.setGrouping([{
+                getter: (item: any) => item.category,
+                formatter: formatter,
+                collapsed: false
+            }]);
+
+            (viewWithGrouping as any)['formatGroupValue']({
+                item: { value: "test", level: 0 },
+                escape: (v: any) => String(v)
+            });
+
+            expect(formatter).toHaveBeenCalledWith(expect.any(Object));
+        });
+
+        it("uses format when already set on groupingInfo", () => {
+            const viewWithGrouping = new RemoteView({ idField: "id" });
+            const formatFn = vi.fn(() => "already-formatted");
+            viewWithGrouping.setGrouping([{
+                getter: (item: any) => item.category,
+                format: formatFn,
+                collapsed: false
+            }]);
+
+            const result = (viewWithGrouping as any)['formatGroupValue']({
+                item: { value: "test", level: 0 },
+                escape: (v: any) => String(v)
+            });
+
+            expect(formatFn).toHaveBeenCalled();
+            expect(result).toBe("already-formatted");
+        });
+
+        it("falls back to escaped value when no format or formatter", () => {
+            const viewWithGrouping = new RemoteView({ idField: "id" });
+            viewWithGrouping.setGrouping([{
+                getter: (item: any) => item.category,
+                collapsed: false
+            }]);
+
+            const result = (viewWithGrouping as any)['formatGroupValue']({
+                item: { value: "fallback-val", level: 0 },
+                escape: (v: any) => String(v)
+            });
+
+            expect(result).toBe("fallback-val");
+        });
+
+        it("handles item with value undefined", () => {
+            const result = (view as any)['formatGroupValue']({
+                item: { value: undefined, level: 0 },
+                escape: (v: any) => String(v)
+            });
+            expect(result).toBe("undefined");
+        });
+    });
+
+    describe("getItem with grouping", () => {
+        let view: RemoteView<any>;
+
+        beforeEach(() => {
+            view = new RemoteView({ idField: "id" });
+        });
+
+        it("calculates group totals when displayTotalsRow is false", () => {
+            view.addItem({ id: 1, name: "Apple", category: "fruit", price: 10 });
+            view.addItem({ id: 2, name: "Banana", category: "fruit", price: 20 });
+            view.addItem({ id: 3, name: "Carrot", category: "vegetable", price: 30 });
+
+            view.setGrouping([{
+                getter: (item: any) => item.category,
+                formatter: (g: any) => g.value,
+                collapsed: false,
+                displayTotalsRow: false,
+                lazyTotalsCalculation: true,
+                aggregators: [new Aggregators.Sum('price')]
+            }]);
+
+            const rows = view.getRows();
+            // Find a group row
+            const groupRow = rows.find(r => r.__group);
+            expect(groupRow).toBeDefined();
+            expect(groupRow.totals).toBeDefined();
+            expect(groupRow.totals.initialized).toBe(false);
+
+            // Access the group row to trigger totals calculation
+            const groupRowIdx = rows.indexOf(groupRow);
+            const accessed = view.getItem(groupRowIdx);
+            expect(accessed.totals.initialized).toBe(true);
+        });
+    });
+
+    describe("getItemMetadata with groups", () => {
+        let view: RemoteView<any>;
+
+        beforeEach(() => {
+            view = new RemoteView({
+                idField: "id",
+                groupItemMetadataProvider: {
+                    getGroupRowMetadata: vi.fn(() => ({ cssClasses: "group-row" })),
+                    getTotalsRowMetadata: vi.fn(() => ({ cssClasses: "totals-row" }))
+                } as any
+            });
+        });
+
+        it("returns metadata for group rows", () => {
+            view.addItem({ id: 1, name: "Apple", category: "fruit" });
+            view.addItem({ id: 2, name: "Banana", category: "fruit" });
+            view.addItem({ id: 3, name: "Carrot", category: "vegetable" });
+
+            view.setGrouping([{
+                getter: (item: any) => item.category,
+                formatter: (g: any) => g.value,
+                collapsed: false
+            }]);
+
+            const rows = view.getRows();
+            const groupRowIdx = rows.findIndex(r => r.__group);
+            expect(groupRowIdx).not.toBe(-1);
+
+            const metadata = view.getItemMetadata(groupRowIdx);
+            expect(metadata).toEqual({ cssClasses: "group-row" });
+        });
+
+        it("returns metadata for totals rows", () => {
+            view.addItem({ id: 1, name: "Apple", category: "fruit", price: 10 });
+            view.addItem({ id: 2, name: "Banana", category: "fruit", price: 20 });
+            view.addItem({ id: 3, name: "Carrot", category: "vegetable", price: 30 });
+
+            view.setGrouping([{
+                getter: (item: any) => item.category,
+                formatter: (g: any) => g.value,
+                collapsed: false,
+                aggregators: [new Aggregators.Sum('price')]
+            }]);
+
+            const rows = view.getRows();
+            const totalsRowIdx = rows.findIndex(r => r.__groupTotals);
+            expect(totalsRowIdx).not.toBe(-1);
+
+            const metadata = view.getItemMetadata(totalsRowIdx);
+            expect(metadata).toEqual({ cssClasses: "totals-row" });
+        });
+
+        it("returns itemMetadataCallback result for regular rows", () => {
+            const itemMetadataCallback = vi.fn((item: any, row: number) => ({
+                cssClasses: `row-${row}`,
+                selectable: true
+            }));
+            const viewWithCallback = new RemoteView({
+                idField: "id",
+                getItemMetadata: itemMetadataCallback
+            });
+
+            viewWithCallback.addItem({ id: 1, name: "Item 1" });
+            const metadata = viewWithCallback.getItemMetadata(0);
+
+            expect(itemMetadataCallback).toHaveBeenCalledWith({ id: 1, name: "Item 1" }, 0);
+            expect(metadata).toEqual({ cssClasses: "row-0", selectable: true });
+        });
+    });
+
+    describe("setItems coverage", () => {
+        let view: RemoteView<any>;
+
+        beforeEach(() => {
+            view = new RemoteView({ idField: "id" });
+        });
+
+        it("calls recalc when in suspend mode during setItems", () => {
+            const items = [
+                { id: 1, name: "A" },
+                { id: 2, name: "B" }
+            ];
+
+            view.beginUpdate();
+            expect(() => view.setItems(items)).not.toThrow();
+            expect(view.getItems()).toEqual(items);
+            view.endUpdate();
+        });
+
+        it("handles localSort during setItems", () => {
+            const sortView = new RemoteView<any>({
+                idField: "id",
+                localSort: true,
+                sortBy: "name"
+            });
+
+            const items = [
+                { id: 1, name: "Z" },
+                { id: 2, name: "A" },
+                { id: 3, name: "M" }
+            ];
+
+            sortView.setItems(items);
+            expect(sortView.getItems()[0].name).toBe("A");
+            expect(sortView.getItems()[1].name).toBe("M");
+            expect(sortView.getItems()[2].name).toBe("Z");
+        });
+    });
+
+    describe("getSortComparer edge cases", () => {
+        it("handles null entries in sortBy array", () => {
+            const view = new RemoteView<any>({
+                idField: "id",
+                localSort: true,
+                sortBy: ["name", null as any, "age"]
+            });
+
+            const items = [
+                { id: 1, name: "C", age: 30 },
+                { id: 2, name: "A", age: 20 },
+                { id: 3, name: "B", age: 10 }
+            ];
+
+            view.setItems(items);
+            expect(view.getItems()[0].name).toBe("A");
+            expect(view.getItems()[1].name).toBe("B");
+            expect(view.getItems()[2].name).toBe("C");
+        });
+    });
+
+    describe("updateItem edge cases", () => {
+        let view: RemoteView<any>;
+
+        beforeEach(() => {
+            view = new RemoteView({ idField: "id" });
+        });
+
+        it("clears updated cache when id changes and old id was updated", () => {
+            view.addItem({ id: 1, name: "A" });
+            view.addItem({ id: 2, name: "B" });
+
+            // First update to populate the updated cache
+            view.updateItem(1, { id: 1, name: "A-modified" });
+
+            // Now update with id change - should clear old id from updated cache
+            expect(() => view.updateItem(1, { id: 3, name: "A-new-id" })).not.toThrow();
+            expect(view.getItemById(1)).toBeUndefined();
+            expect(view.getItemById(3)).toBeDefined();
+            expect(view.getItemById(3).name).toBe("A-new-id");
+        });
+    });
+
+    describe("addData coverage", () => {
+        let view: RemoteView<any>;
+
+        beforeEach(() => {
+            view = new RemoteView({
+                idField: "id",
+                url: "/api/test"
+            });
+        });
+
+        it("calculates page from Skip and Take when both present", () => {
+            const data = {
+                Entities: [
+                    { id: 1, name: "Item 1" },
+                    { id: 2, name: "Item 2" }
+                ],
+                TotalCount: 50,
+                Skip: 10,
+                Take: 10
+            };
+
+            view.addData(data);
+            // Page = ceil(10 / 10) + 1 = 2
+            expect(view.getPagingInfo().page).toBe(2);
+        });
+
+        it("sets page to 1 when Skip is 0", () => {
+            const data = {
+                Entities: [
+                    { id: 1, name: "Item 1" }
+                ],
+                TotalCount: 10,
+                Skip: 0,
+                Take: 10
+            };
+
+            view.addData(data);
+            expect(view.getPagingInfo().page).toBe(1);
+        });
+
+        it("sets page to 1 when rowsPerPage is 0 and no Take", () => {
+            const viewNoPaging = new RemoteView<any>({
+                idField: "id",
+                rowsPerPage: 0,
+                url: "/api/test"
+            });
+
+            const data = {
+                Entities: [
+                    { id: 1, name: "Item 1" }
+                ],
+                TotalCount: 10,
+                Skip: 10,
+                Take: 0
+            };
+
+            viewNoPaging.addData(data);
+            expect(viewNoPaging.getPagingInfo().page).toBe(1);
+        });
+
+        it("aborts previous loading and sets loading state", () => {
+            const mockServiceCall = vi.fn();
+            vi.mocked(serviceCall).mockImplementation(mockServiceCall);
+
+            view.populate();
+            const controller = view['loading'] as AbortController;
+            expect(controller).toBeInstanceOf(AbortController);
+            expect(controller.signal.aborted).toBe(false);
+
+            // Populate again to abort the first
+            view.populate();
+            expect(controller.signal.aborted).toBe(true);
+        });
+
+        it("handles onProcessData returning falsy value", () => {
+            view.onProcessData = vi.fn(() => undefined);
+
+            const data = {
+                Entities: [{ id: 1, name: "Item 1" }],
+                TotalCount: 1
+            };
+
+            // When onProcessData returns undefined/null, the original data is used (undefined || data = data)
+            const result = view.addData(data);
+            expect(result).toBeUndefined(); // addData doesn't return anything in this path
+            expect(view.getItems().length).toBe(1);
+        });
+    });
+
+    describe("populate edge cases", () => {
+        let view: RemoteView<any>;
+
+        beforeEach(() => {
+            view = new RemoteView({
+                idField: "id",
+                url: "/api/test"
+            });
+        });
+
+        it("handles sortBy as string in populate", () => {
+            const viewWithStringSort = new RemoteView<any>({
+                idField: "id",
+                url: "/api/test",
+                sortBy: "name"
+            });
+
+            const mockServiceCall = vi.fn();
+            vi.mocked(serviceCall).mockImplementation(mockServiceCall);
+
+            viewWithStringSort.populate();
+            expect(mockServiceCall).toHaveBeenCalled();
+            const callOptions = mockServiceCall.mock.calls[0][0];
+            expect(callOptions.request.Sort).toEqual(["name"]);
+        });
+
+        it("handles seekToPage being 0", () => {
+            const viewNoSeek = new RemoteView<any>({
+                idField: "id",
+                url: "/api/test",
+                seekToPage: 0
+            });
+
+            const mockServiceCall = vi.fn();
+            vi.mocked(serviceCall).mockImplementation(mockServiceCall);
+
+            viewNoSeek.populate();
+            expect(mockServiceCall).toHaveBeenCalled();
+            // seekToPage should be set to 1
+            expect(viewNoSeek.seekToPage).toBe(1);
+        });
+
+        it("includes Skip in request when seekToPage > 1", () => {
+            const viewWithPage = new RemoteView<any>({
+                idField: "id",
+                url: "/api/test",
+                rowsPerPage: 10,
+                seekToPage: 3
+            });
+
+            const mockServiceCall = vi.fn();
+            vi.mocked(serviceCall).mockImplementation(mockServiceCall);
+
+            viewWithPage.populate();
+            expect(mockServiceCall).toHaveBeenCalled();
+            const callOptions = mockServiceCall.mock.calls[0][0];
+            expect(callOptions.request.Skip).toBe(20); // (3-1) * 10
+            expect(callOptions.request.Take).toBe(10);
+        });
+
+        it("includes params in request", () => {
+            view.params = { additionalFilter: "test" };
+
+            const mockServiceCall = vi.fn();
+            vi.mocked(serviceCall).mockImplementation(mockServiceCall);
+
+            view.populate();
+            expect(mockServiceCall).toHaveBeenCalled();
+            const callOptions = mockServiceCall.mock.calls[0][0];
+            expect(callOptions.request.additionalFilter).toBe("test");
+        });
+    });
+
+    describe("syncGridCellCssStyles coverage", () => {
+        let view: RemoteView<any>;
+        let mockGrid: any;
+
+        beforeEach(() => {
+            view = new RemoteView({ idField: "id" });
+            view.addItem({ id: 1, name: "Item 1" });
+            view.addItem({ id: 2, name: "Item 2" });
+
+            mockGrid = {
+                getCellCssStyles: vi.fn(() => ({
+                    0: "style-1",
+                    1: "style-2"
+                })),
+                setCellCssStyles: vi.fn(),
+                onCellCssStylesChanged: {
+                    subscribe: vi.fn(),
+                    unsubscribe: vi.fn()
+                }
+            };
+        });
+
+        it("handles cleanup when args.hash is null", () => {
+            let subscribedCallback: any;
+            // Return empty hash initially so storeCellCssStyles doesn't access self before init
+            mockGrid.getCellCssStyles = vi.fn(() => ({}));
+            mockGrid.onCellCssStylesChanged.subscribe = vi.fn((cb) => {
+                subscribedCallback = cb;
+            });
+
+            view.syncGridCellCssStyles(mockGrid, "test-key");
+
+            // Trigger with a different key first - should return early
+            subscribedCallback(null, { key: "other-key", hash: { 0: "style" } });
+            expect(mockGrid.setCellCssStyles).not.toHaveBeenCalled();
+
+            // Now trigger with no hash (cleanup)
+            subscribedCallback(null, { key: "test-key", hash: null });
+            expect(mockGrid.onCellCssStylesChanged.unsubscribe).toHaveBeenCalled();
+        });
+
+        it("preserves hidden selection when preserveHiddenOnSelectionChange is true and multiSelect is on", () => {
+            mockGrid = {
+                getSelectedRows: vi.fn(() => [0, 1]),
+                setSelectedRows: vi.fn(),
+                getOptions: vi.fn(() => ({ multiSelect: true })),
+                onSelectedRowsChanged: {
+                    subscribe: vi.fn(),
+                    unsubscribe: vi.fn()
+                }
+            };
+
+            view.syncGridSelection(mockGrid, true, true);
+
+            const gridCallback = mockGrid.onSelectedRowsChanged.subscribe.mock.calls[0][0];
+
+            // Simulate grid selection change
+            mockGrid.getSelectedRows = vi.fn(() => [0]);
+            expect(() => gridCallback(null, null)).not.toThrow();
+        });
+    });
+
+    describe("sort edge cases", () => {
+        let view: RemoteView<any>;
+
+        beforeEach(() => {
+            view = new RemoteView({ idField: "id" });
+            view.addItem({ id: 1, name: "Charlie" });
+            view.addItem({ id: 2, name: "Alice" });
+            view.addItem({ id: 3, name: "Bob" });
+        });
+
+        it("reverses items when ascending is false and then re-sorts", () => {
+            view.sort((a, b) => a.name.localeCompare(b.name), false);
+
+            const items = view.getItems();
+            expect(items[0].name).toBe("Charlie");
+            expect(items[1].name).toBe("Bob");
+            expect(items[2].name).toBe("Alice");
+        });
+
+        it("enables localSort when setting to different value", () => {
+            expect(view.getLocalSort()).toBe(false);
+            view.setLocalSort(true);
+            expect(view.getLocalSort()).toBe(true);
+
+            // Set to same value should not trigger sort
+            view.setLocalSort(true);
+            expect(view.getLocalSort()).toBe(true);
+        });
+    });
+
+    describe("extractGroups edge cases", () => {
+        it("handles predefined values and string getter", () => {
+            const view = new RemoteView<any>({ idField: "id" });
+            view.addItem({ id: 1, name: "Apple", category: "fruit" });
+            view.addItem({ id: 2, name: "Banana", category: "fruit" });
+            view.addItem({ id: 3, name: "Carrot", category: "vegetable" });
+
+            // Use string getter (not function) and predefined values
+            view.setGrouping([{
+                getter: "category",
+                formatter: (g: any) => g.value,
+                collapsed: false,
+                predefinedValues: ["fruit", "vegetable", "meat"]
+            }]);
+
+            const groups = view.getGroups();
+            expect(groups.length).toBe(3);
+            expect(groups[0].value).toBe("fruit");
+            expect(groups[0].count).toBe(2);
+            expect(groups[1].value).toBe("meat");
+            expect(groups[1].count).toBe(0);
+            expect(groups[2].value).toBe("vegetable");
+            expect(groups[2].count).toBe(1);
+        });
+    });
+
+    describe("expandCollapseGroup with grouping delimiter", () => {
+        let view: RemoteView<any>;
+
+        beforeEach(() => {
+            view = new RemoteView({ idField: "id" });
+            view.addItem({ id: 1, name: "Apple", category: "fruit", sub: "sweet" });
+            view.addItem({ id: 2, name: "Banana", category: "fruit", sub: "sweet" });
+            view.addItem({ id: 3, name: "Carrot", category: "vegetable", sub: "savory" });
+        });
+
+        it("handles expand with grouping key containing delimiter", () => {
+            view.setGrouping([{
+                getter: (item: any) => item.category,
+                formatter: (g: any) => g.value,
+                collapsed: false
+            }]);
+
+            // Collapse all first
+            view.collapseAllGroups(0);
+
+            // Try expanding with a key that includes the delimiter
+            // The delimiter is ':|:' so we need to simulate it
+            const groupingKey = "fruit";
+            view.expandGroup([groupingKey]);
+
+            // Should not throw and groups should still be accessible
+            expect(view.getGroups().length).toBe(2);
+        });
+    });
+
+    describe("getRowDiffs coverage", () => {
+        let view: RemoteView<any>;
+
+        beforeEach(() => {
+            view = new RemoteView({ idField: "id" });
+        });
+
+        it("handles refreshHints ignoreDiffsBefore and ignoreDiffsAfter", () => {
+            view.addItem({ id: 1, name: "A" });
+            view.addItem({ id: 2, name: "B" });
+            view.addItem({ id: 3, name: "C" });
+
+            view.setRefreshHints({ ignoreDiffsBefore: 1, ignoreDiffsAfter: 2 });
+
+            // Trigger refresh
+            view.addItem({ id: 4, name: "D" });
+
+            // Should not throw
+            expect(view.getLength()).toBe(4);
+        });
+    });
+
+    describe("setPagingOptions coverage", () => {
+        let view: RemoteView<any>;
+
+        beforeEach(() => {
+            view = new RemoteView({
+                idField: "id",
+                rowsPerPage: 10,
+                url: "/api/test"
+            });
+        });
+
+        it("triggers populate when page changes", () => {
+            const mockServiceCall = vi.fn();
+            vi.mocked(serviceCall).mockImplementation(mockServiceCall);
+
+            view.setPagingOptions({ page: 3 });
+            expect(mockServiceCall).toHaveBeenCalled();
+        });
+
+        it("does not trigger populate when nothing changes", () => {
+            const mockServiceCall = vi.fn();
+            vi.mocked(serviceCall).mockImplementation(mockServiceCall);
+
+            view.setPagingOptions({ rowsPerPage: 10 });
+            // rowsPerPage is already 10, so no change
+            expect(mockServiceCall).not.toHaveBeenCalled();
+        });
+    });
+
+    describe("getGrandTotals coverage", () => {
+        it("initializes grandTotals when not initialized", () => {
+            const view = new RemoteView<any>({ idField: "id" });
+            view.addItem({ id: 1, value: 10 });
+            view.addItem({ id: 2, value: 20 });
+
+            const aggregators = [new Aggregators.Sum("value")];
+            view.setSummaryOptions({ aggregators });
+
+            const totals = view.getGrandTotals();
+            expect(totals.initialized).toBe(true);
+            expect(totals.sum.value).toBe(30);
+        });
+    });
+
+    describe("populateLock and populateUnlock edge cases", () => {
+        let view: RemoteView<any>;
+
+        beforeEach(() => {
+            view = new RemoteView({
+                idField: "id",
+                url: "/api/test"
+            });
+        });
+
+        it("handles multiple populateLocks and unlocks", () => {
+            const mockServiceCall = vi.fn();
+            vi.mocked(serviceCall).mockImplementation(mockServiceCall);
+
+            view.populateLock();
+            view.populateLock();
+            expect(view['populateLocks']).toBe(2);
+
+            view.populate();
+            expect(mockServiceCall).not.toHaveBeenCalled();
+
+            view.populateUnlock();
+            expect(view['populateLocks']).toBe(1);
+            expect(mockServiceCall).not.toHaveBeenCalled(); // Still locked
+
+            view.populateUnlock();
+            expect(view['populateLocks']).toBe(0);
+            // Should auto-trigger populate
+            expect(mockServiceCall).toHaveBeenCalled();
+        });
+
+        it("handles populateUnlock when already unlocked", () => {
+            expect(view['populateLocks']).toBe(0);
+            view.populateUnlock(); // Should not throw
+            expect(view['populateLocks']).toBe(0);
+        });
+    });
+
+    describe("setGroupItemMetadataProvider coverage", () => {
+        it("sets group item metadata provider", () => {
+            const view = new RemoteView<any>({ idField: "id" });
+            const provider = {
+                getGroupRowMetadata: vi.fn(),
+                getTotalsRowMetadata: vi.fn()
+            } as any;
+
+            view.setGroupItemMetadataProvider(provider);
+            expect(view.getGroupItemMetadataProvider()).toBe(provider);
+        });
+    });
+
+    describe("getItemMetadataCallback coverage", () => {
+        it("gets and sets itemMetadataCallback", () => {
+            const view = new RemoteView<any>({ idField: "id" });
+            const callback = vi.fn();
+
+            view.setItemMetadataCallback(callback);
+            expect(view.getItemMetadataCallback()).toBe(callback);
+
+            // Should call callback when getting metadata
+            view.addItem({ id: 1, name: "Test" });
+            const result = view.getItemMetadata(0);
+            expect(callback).toHaveBeenCalledWith({ id: 1, name: "Test" }, 0);
+        });
+
+        it("returns null when no callback and no special row", () => {
+            const view = new RemoteView<any>({ idField: "id" });
+            view.addItem({ id: 1, name: "Test" });
+            const result = view.getItemMetadata(0);
+            expect(result).toBeNull();
+        });
+    });
+
+    describe("idField getter", () => {
+        it("returns the id property name", () => {
+            const view = new RemoteView<any>({ idField: "myId" });
+            expect(view.idField).toBe("myId");
+        });
+    });
+
+    describe("recalc events", () => {
+        it("has onRecalcRows event emitter", () => {
+            const view = new RemoteView<any>({ idField: "id" });
+            expect(view.onRecalcRows).toBeDefined();
+            expect(() => view.onRecalcRows.subscribe(vi.fn())).not.toThrow();
+        });
+    });
+
+    describe("refresh hints coverage", () => {
+        let view: RemoteView<any>;
+
+        beforeEach(() => {
+            view = new RemoteView({ idField: "id" });
+            view.addItem({ id: 1, name: "Apple", category: "fruit" });
+            view.addItem({ id: 2, name: "Banana", category: "fruit" });
+            view.addItem({ id: 3, name: "Carrot", category: "vegetable" });
+            view.addItem({ id: 4, name: "Date", category: "fruit" });
+        });
+
+        it("handles isFilterNarrowing hint", () => {
+            const filter = (item: any) => item.category === "fruit";
+            view.setFilter(filter);
+
+            // First filter to populate filterCache
+            expect(view.getFilteredItems().length).toBe(3);
+
+            // Now set isFilterNarrowing hint and change filter to be more narrow
+            const narrowFilter = (item: any) => item.category === "fruit" && item.name.startsWith("A");
+            view.setRefreshHints({ isFilterNarrowing: true });
+            view.setFilter(narrowFilter);
+
+            // Should use batchFilter on filteredItems
+            expect(view.getFilteredItems().length).toBe(1);
+            expect(view.getFilteredItems()[0].name).toBe("Apple");
+        });
+
+        it("handles isFilterExpanding hint", () => {
+            // First set a narrow filter
+            const narrowFilter = (item: any) => item.category === "fruit";
+            view.setFilter(narrowFilter);
+            expect(view.getFilteredItems().length).toBe(3);
+
+            // Now expand the filter
+            const broadFilter = (item: any) => true;
+            view.setRefreshHints({ isFilterExpanding: true });
+            view.setFilter(broadFilter);
+
+            // Should use batchFilterWithCaching
+            expect(view.getFilteredItems().length).toBe(4);
+        });
+
+        it("handles isFilterUnchanged hint", () => {
+            // Set a filter
+            const filter = (item: any) => item.category === "fruit";
+            view.setFilter(filter);
+            expect(view.getFilteredItems().length).toBe(3);
+
+            // Now set isFilterUnchanged hint
+            view.setRefreshHints({ isFilterUnchanged: true });
+            const filter2 = (item: any) => item.category === "fruit";
+            view.setFilter(filter2);
+
+            // Should skip filtering
+            expect(view.getFilteredItems().length).toBe(3);
         });
     });
 });

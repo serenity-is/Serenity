@@ -190,6 +190,71 @@ describe("trimToEmpty", () => {
     });
 });
 
+describe("trimToNull", () => {
+    it("returns null for null and undefined", async () => {
+        const { trimToNull } = await import('./strings-compat');
+        expect(trimToNull(null)).toBeNull();
+        expect(trimToNull(undefined)).toBeNull();
+    });
+
+    it("returns null for empty or whitespace strings", async () => {
+        const { trimToNull } = await import('./strings-compat');
+        expect(trimToNull("")).toBeNull();
+        expect(trimToNull("   ")).toBeNull();
+        expect(trimToNull("\t\n")).toBeNull();
+    });
+
+    it("returns trimmed string for non-empty strings", async () => {
+        const { trimToNull } = await import('./strings-compat');
+        expect(trimToNull(" abc ")).toBe("abc");
+        expect(trimToNull("hello")).toBe("hello");
+        expect(trimToNull("  world  ")).toBe("world");
+    });
+});
+
+describe("replaceAll with null/undefined string", () => {
+    it("handles null and undefined string argument", async () => {
+        const { replaceAll } = await import('./strings-compat');
+        expect(replaceAll(null as any, "a", "b")).toBe("");
+        expect(replaceAll(undefined as any, "a", "b")).toBe("");
+    });
+});
+
+describe("trimEnd fallback", () => {
+    it("uses fallback when String.prototype.trimEnd is not available", async () => {
+        const { trimEnd } = await import('./strings-compat');
+        const oldTrimEnd = (String.prototype as any).trimEnd;
+        (String.prototype as any).trimEnd = undefined;
+        try {
+            expect(trimEnd(" hello ")).toBe(" hello");
+            expect(trimEnd("test\n")).toBe("test");
+            expect(trimEnd("abc  ")).toBe("abc");
+        } finally {
+            (String.prototype as any).trimEnd = oldTrimEnd;
+        }
+    });
+});
+
+describe("trimStart with actual values", () => {
+    it("trims start of string properly", async () => {
+        const { trimStart } = await import('./strings-compat');
+        expect(trimStart(" hello ")).toBe("hello ");
+        expect(trimStart("\n\t test")).toBe("test");
+    });
+
+    it("uses fallback when String.prototype.trimStart is not available", async () => {
+        const { trimStart } = await import('./strings-compat');
+        const oldTrimStart = (String.prototype as any).trimStart;
+        (String.prototype as any).trimStart = undefined;
+        try {
+            expect(trimStart(" hello ")).toBe("hello ");
+            expect(trimStart("  abc")).toBe("abc");
+        } finally {
+            (String.prototype as any).trimStart = oldTrimStart;
+        }
+    });
+});
+
 describe("zeroPad", () => {
     it("returns empty string for null and undefined", () => {
         expect(zeroPad(null, 2)).toBe('');

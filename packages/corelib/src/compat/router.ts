@@ -17,11 +17,12 @@ export interface IClassicRouter {
 	mightBeRouteRegex: RegExp;
 	resolve(newHash?: string): "disabled" | "skipped" | "shebang" | "missinghandler" | "calledhandler";
 	ignoreHashChange(expiration?: number): void;
+    destroy(): void;
 }
 
 const ignoredSelector = '.s-MessageDialog, .s-MessageModal, .s-PromptDialog, .route-ignore';
 
-class RouterImplementation implements IClassicRouter {
+export class ClassicRouter implements IClassicRouter {
     private oldURL: string;
     private resolving: number = 0;
     private autoinc: number = 0;
@@ -311,6 +312,7 @@ class RouterImplementation implements IClassicRouter {
     }
 
     private routerOrder: number = 1;
+    private boundThis: any;
 
     private onDocumentDialogOpen(event: any) {
         if (!this.enabled)
@@ -373,13 +375,13 @@ class RouterImplementation implements IClassicRouter {
         let tryBack = this.shouldTryBack(e);
 
         if (prhash != null)
-            Router.replace(prhash, tryBack);
+            this.replace(prhash, tryBack);
         else
-            Router.replaceLast('', tryBack);
+            this.replaceLast('', tryBack);
     }
 
     constructor() {
-        const boundThis = bindThis(this);
+        const boundThis = this.boundThis = bindThis(this);
         window.addEventListener("hashchange", boundThis.hashChange, false);
 
         if (typeof document !== "undefined") {
@@ -397,7 +399,10 @@ class RouterImplementation implements IClassicRouter {
     }
 
     destroy() {
-        const boundThis = bindThis(this);
+        const boundThis = this.boundThis;
+        if (!boundThis)
+            return;
+        this.boundThis = undefined;
         window.removeEventListener("hashchange", boundThis.hashChange, false);
 
         if (typeof document !== "undefined") {
@@ -414,4 +419,4 @@ class RouterImplementation implements IClassicRouter {
     }
 }
 
-export const Router = new RouterImplementation() as IClassicRouter;
+export const Router = new ClassicRouter() as IClassicRouter;
