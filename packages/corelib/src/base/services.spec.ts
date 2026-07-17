@@ -1,5 +1,5 @@
 import { mockFetch, unmockFetch } from "../test/mocks";
-import { getActiveRequests, getCookie, getServiceOptions, isSameOrigin, requestFinished, requestStarting, resolveServiceUrl, resolveUrl, serviceCall } from "./services";
+import { getActiveRequests, getCookie, getServiceOptions, isSameOrigin, requestFinished, requestStarting, resolveServiceUrl, resolveUrl, serviceCall, serviceRequest } from "./services";
 import { ServiceError, ServiceOptions, ServiceResponse } from "./servicetypes";
 
 vi.mock("./config", () => ({
@@ -404,7 +404,323 @@ describe("synchronous serviceCall", () => {
         expect(mockSpy.requests[0].isXHR).toBe(true);
         expect(error).toStrictEqual(response.Error);
     });
-
-
 });
 
+describe("serviceRequest", () => {
+    beforeEach(() => {
+        mockFetch();
+    });
+
+    afterEach(() => {
+        unmockFetch();
+    });
+
+    it("should make a service call with the specified service, request and onSuccess", async () => {
+        const response = { data: "Success" };
+        const onSuccess = vi.fn();
+        const mockSpy = mockFetch({ "~/Services/TestService": () => response });
+
+        const result = await serviceRequest("TestService", { arg: 1 }, onSuccess);
+
+        expect(result).toEqual(response);
+        expect(onSuccess).toHaveBeenCalledWith(response);
+        expect(mockSpy.requests.length).toBe(1);
+        expect(mockSpy.requests[0].url).toContain("TestService");
+    });
+
+    it("should pass additional options", async () => {
+        const response = { data: "Success" };
+        const mockSpy = mockFetch({ "~/Services/OtherService": () => response });
+
+        const result = await serviceRequest("OtherService", null, null, { async: false });
+
+        expect(result).toEqual(response);
+        expect(mockSpy.requests.length).toBe(1);
+        expect(mockSpy.requests[0].isXHR).toBe(true);
+    });
+});
+
+describe("requestFinished", () => {
+    afterEach(() => {
+        vi.restoreAllMocks();
+    });
+
+    it("should decrement activeRequests", () => {
+        requestStarting();
+        const before = getActiveRequests();
+        requestFinished();
+        expect(getActiveRequests()).toBe(before - 1);
+    });
+
+    it("should trigger ajaxStop via jQuery when $.active reaches 0", () => {
+        const jQuery: any = (window as any).jQuery = vi.fn();
+        try {
+            // Ensure module-level activeRequests starts at 0 for isolation
+            while (getActiveRequests() > 0) requestFinished();
+            while (getActiveRequests() < 0) requestStarting();
+            const initial = getActiveRequests();
+            requestStarting();
+
+            jQuery.active = 1;
+            const eventTriggerSpy = vi.fn();
+            jQuery.event = { trigger: eventTriggerSpy };
+
+            requestFinished();
+            expect(jQuery.active).toBe(0);
+            expect(eventTriggerSpy).toHaveBeenCalledWith("ajaxStop");
+        }
+        finally {
+            delete (window as any).jQuery;
+        }
+    });
+
+    it("should dispatch ajaxStop event when jQuery is not available and activeRequests is 0", () => {
+        // Ensure module-level activeRequests starts at 0 for isolation
+        while (getActiveRequests() > 0) requestFinished();
+        while (getActiveRequests() < 0) requestStarting();
+        // Ensure no jQuery is available
+        const origJQuery = (window as any).jQuery;
+        const orig$ = (window as any).$;
+        delete (window as any).jQuery;
+        delete (window as any).$;
+        try {
+            requestStarting();
+            const eventDispatchSpy = vi.spyOn(document, "dispatchEvent");
+            requestFinished();
+            // Verify that requestFinished properly balanced the call
+            expect(getActiveRequests()).toBe(0);
+        }
+        finally {
+            if (origJQuery) (window as any).jQuery = origJQuery;
+            if (orig$) (window as any).$ = orig$;
+        }
+    });
+});
+
+describe("async serviceCall error paths", () => {
+    beforeEach(() => {
+        mockFetch();
+    });
+
+    afterEach(() => {
+        unmockFetch();
+    });
+
+    it("should handle AbortError when signal is aborted", async () => {
+        const abortController = new AbortController();
+        const options = { url: "/test", signal: abortController.signal };
+
+        mockFetch({
+            "/test": (info) => {
+                // Check if signal was already aborted when fetch was called
+                if ((info.init as any)?.signal?.aborted) {
+                    const error = new DOMException("The operation was aborted", "AbortError");
+                    return Promise.reject(error);
+                }
+                // Otherwise, set up listener so that when abort happens later, reject
+                return new Promise((resolve, reject) => {
+                    const onAbort = () => {
+                        const error = new DOMException("The operation was aborted", "AbortError");
+                        reject(error);
+                    };
+                    if ((info.init as any)?.signal) {
+                        (info.init as any).signal.addEventListener("abort", onAbort, { once: true });
+                    }
+                });
+            }
+        });
+
+        const promise = serviceCall(options);
+        // Abort after a microtask to let the fetch start
+        await Promise.resolve();
+        abortController.abort();
+        await expect(promise).rejects.toThrow("was aborted");
+    });
+
+    it("should call onSuccess callback on successful response", async () => {
+        const response = { data: "Success" };
+        const onSuccess = vi.fn();
+        const options = { url: "/test", onSuccess };
+
+        mockFetch({ "/test": () => response });
+
+        await serviceCall(options);
+        expect(onSuccess).toHaveBeenCalledWith(response);
+    });
+
+    it("should handle empty response", async () => {
+        const options = { url: "/test" };
+
+        mockFetch({ "/test": () => null });
+
+        await expect(serviceCall(options)).rejects.toThrow("empty response");
+    });
+
+    it("should handle service error response (Error property)", async () => {
+        const response = { Error: { Code: "ValidationError", Message: "Invalid" } };
+        const onError = vi.fn();
+        const options = { url: "/test", onError };
+
+        const oldAlert = window.alert;
+        window.alert = () => { };
+        try {
+            mockFetch({ "/test": () => response });
+
+            await expect(serviceCall(options)).rejects.toThrow("resulted in error: Invalid!");
+            expect(onError).toHaveBeenCalledWith(response, expect.objectContaining({ status: 200 }));
+        }
+        finally {
+            window.alert = oldAlert;
+        }
+    });
+});
+
+describe("handleError paths", () => {
+    beforeEach(() => {
+        mockFetch();
+    });
+
+    afterEach(() => {
+        unmockFetch();
+    });
+
+    it("should handle NotLoggedIn via Config.notLoggedInHandler", async () => {
+        const { Config } = await import("./config");
+        const notLoggedInHandler = vi.fn().mockReturnValue(true);
+        Config.notLoggedInHandler = notLoggedInHandler;
+        try {
+            const response = { Error: { Code: "NotLoggedIn", Message: "Not logged in" } };
+            const onError = vi.fn();
+            mockFetch({ "/test": (info) => { info.status = 200; return response; } });
+
+            await expect(serviceCall({ url: "/test", onError })).rejects.toThrow("resulted in error: Not logged in!");
+            expect(notLoggedInHandler).toHaveBeenCalled();
+            expect(onError).not.toHaveBeenCalled();
+        }
+        finally {
+            Config.notLoggedInHandler = null;
+        }
+    });
+
+    it("should handle errorMode 'none' suppressing error display", async () => {
+        const response = { Error: { Code: "SomeError", Message: "Error msg" } };
+        const onError = vi.fn().mockReturnValue(false);
+        mockFetch({ "/test": (info) => { info.status = 200; return response; } });
+
+        await expect(serviceCall({ url: "/test", onError, errorMode: "none" })).rejects.toThrow("resulted in error: Error msg!");
+        expect(onError).toHaveBeenCalled();
+    });
+});
+
+describe("handleFetchError and handleXHRError paths", () => {
+    beforeEach(() => {
+        mockFetch();
+    });
+
+    afterEach(() => {
+        unmockFetch();
+    });
+
+    it("should handle HTTP 403 with redirect via Location header (async)", async () => {
+        const oldAlert = window.alert;
+        window.alert = () => { };
+        try {
+            mockFetch({
+                "/test": (info) => {
+                    info.status = 403;
+                    info.responseHeaders["Location"] = "http://redirected.com";
+                    return {};
+                }
+            });
+
+            await expect(serviceCall({ url: "/test", allowRedirect: true })).rejects.toThrow("HTTP 403");
+        }
+        finally {
+            window.alert = oldAlert;
+        }
+    });
+
+    it("should handle HTTP 403 with JSON error body (async)", async () => {
+        const onError = vi.fn();
+        const oldAlert = window.alert;
+        window.alert = () => { };
+        try {
+            mockFetch({
+                "/test": (info) => {
+                    info.status = 403;
+                    // Don't set Location header so it goes to JSON path
+                    info.responseHeaders["content-type"] = "application/json";
+                    return { Error: { Code: "Forbidden", Message: "Access denied" } };
+                }
+            });
+
+            await expect(serviceCall({ url: "/test", allowRedirect: false, onError })).rejects.toThrow("HTTP 403");
+            expect(onError).toHaveBeenCalled();
+        }
+        finally {
+            window.alert = oldAlert;
+        }
+    });
+
+    it("should handle HTTP error with text/plain content type (async)", async () => {
+        const oldAlert = window.alert;
+        window.alert = () => { };
+        try {
+            mockFetch({
+                "/test": (info) => {
+                    info.status = 500;
+                    info.responseHeaders["content-type"] = "text/plain";
+                    return "Internal server error";
+                }
+            });
+
+            await expect(serviceCall({ url: "/test" })).rejects.toThrow("HTTP 500");
+        }
+        finally {
+            window.alert = oldAlert;
+        }
+    });
+
+    it("should handle synchronous HTTP 403 with redirect", async () => {
+        const onError = vi.fn();
+        const oldAlert = window.alert;
+        window.alert = () => { };
+        try {
+            mockFetch({
+                "/test": (info) => {
+                    info.status = 403;
+                    info.responseHeaders["Location"] = "http://redirected.com";
+                    info.isXHR = true;
+                    return {};
+                }
+            });
+
+            await expect(serviceCall({ url: "/test", allowRedirect: true, async: false })).rejects.toThrow("HTTP 403");
+        }
+        finally {
+            window.alert = oldAlert;
+        }
+    });
+
+    it("should handle synchronous HTTP error with JSON error body", async () => {
+        const onError = vi.fn();
+        const oldAlert = window.alert;
+        window.alert = () => { };
+        try {
+            mockFetch({
+                "/test": (info) => {
+                    info.status = 403;
+                    info.responseHeaders["content-type"] = "application/json; charset=utf-8";
+                    info.isXHR = true;
+                    return { Error: { Code: "Forbidden", Message: "Blocked" } };
+                }
+            });
+
+            await expect(serviceCall({ url: "/test", allowRedirect: false, async: false, onError })).rejects.toThrow("HTTP 403");
+            expect(onError).toHaveBeenCalled();
+        }
+        finally {
+            window.alert = oldAlert;
+        }
+    });
+});

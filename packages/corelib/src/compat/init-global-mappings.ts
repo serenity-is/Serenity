@@ -1,4 +1,4 @@
-import { Fluent, getGlobalObject } from "../base"
+import { Fluent, getGlobalObject } from "../base";
 
 function copyProps(source: any, target: any) {
     if (!source || !target)
@@ -107,7 +107,7 @@ export function initGlobalMappings({ corelib, globals, domwise, sleekgrid,
             }
         }
     }
-    
+
     if (bootstrap) {
         if (typeof bootstrap.default === "object")
             bootstrap = bootstrap.default;

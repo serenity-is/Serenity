@@ -1246,5 +1246,71 @@ describe('Fluent static methods', () => {
         });
 
     });
+
+    describe('Fluent.ready', () => {
+        it('should do nothing if callback is null', () => {
+            Fluent.ready(null);
+        });
+
+        it('should use jQuery if available', () => {
+            const jQueryReady = vi.fn();
+            const jQuery = vi.fn().mockImplementation((cb: any) => {
+                if (typeof cb === "function") jQueryReady.mockImplementation(cb);
+                return {};
+            });
+            (window as any).jQuery = jQuery;
+            try {
+                const callback = vi.fn();
+                Fluent.ready(callback);
+                expect(jQuery).toHaveBeenCalledWith(callback);
+            }
+            finally {
+                delete (window as any).jQuery;
+            }
+        });
+
+        it('should use setTimeout when document is already loaded', () => {
+            vi.useFakeTimers();
+            try {
+                const callback = vi.fn();
+                Fluent.ready(callback);
+                vi.advanceTimersByTime(0);
+                expect(callback).toHaveBeenCalled();
+            }
+            finally {
+                vi.useRealTimers();
+            }
+        });
+    });
+
+    describe('Fluent.toggle static', () => {
+        it('should hide the element if it is visible', () => {
+            Fluent.toggle(element);
+            expect(element.hidden).toBe(true);
+        });
+
+        it('should show the element if it is hidden', () => {
+            element.hidden = true;
+            Fluent.toggle(element);
+            expect(element.hidden).toBe(false);
+        });
+
+        it('should hide if flag is false', () => {
+            Fluent.toggle(element, false);
+            expect(element.hidden).toBe(true);
+        });
+
+        it('should show if flag is true', () => {
+            element.hidden = true;
+            Fluent.toggle(element, true);
+            expect(element.hidden).toBe(false);
+        });
+    });
+
+    describe('Fluent.findEach null callback', () => {
+        it('should do nothing if callback is null', () => {
+            Fluent.findEach('.item', null);
+        });
+    });
 });
 
