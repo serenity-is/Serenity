@@ -94,15 +94,16 @@ export namespace SlickTreeHelper {
                     item._collapsed = false;
                 }
                 view.updateItem(getId(item), item);
-            }
-            if ((e as any).shiftKey) {
-                view.beginUpdate();
-                try {
-                    setCollapsed(view.getItems(), !!item._collapsed);
-                    view.setItems(view.getItems(), true);
-                }
-                finally {
-                    view.endUpdate();
+
+                if ((e as any).shiftKey) {
+                    view.beginUpdate();
+                    try {
+                        setCollapsed(view.getItems(), !!item._collapsed);
+                        view.setItems(view.getItems(), true);
+                    }
+                    finally {
+                        view.endUpdate();
+                    }
                 }
             }
         }

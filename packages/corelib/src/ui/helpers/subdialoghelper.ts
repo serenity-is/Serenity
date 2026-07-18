@@ -21,7 +21,7 @@ export namespace SubDialogHelper {
                 dataChange(e);
             }
         });
-        addDisposingListener(dialog.node, () => function () {
+        addDisposingListener(dialog.node, function () {
             Fluent.off(dialog.domNode, 'ondatachange.' + uniqueName);
         }, dialog.uniqueName);
         return dialog;

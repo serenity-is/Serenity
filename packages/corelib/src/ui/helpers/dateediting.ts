@@ -12,7 +12,6 @@ export function dateInputChangeHandler(e: Event) {
     var val = input.value ?? '';
     if (val.length >= 6 && val.length <= 8 && /^[0-9]*$/g.test(val)) {
         input.value = val.substring(0, 2) + Culture.dateSeparator + val.substring(2, 4) + Culture.dateSeparator + val.substring(4);
-        input.value = val.substring(0, 2) + Culture.dateSeparator + val.substring(2, 4) + Culture.dateSeparator + val.substring(4);
     }
 
     val = input.value ?? '';

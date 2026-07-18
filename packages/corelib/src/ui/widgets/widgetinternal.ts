@@ -106,7 +106,7 @@ export function setElementProps(widget: { domNode: HTMLElement }, props: EditorP
 
     if (props.initialValue != null) {
         try {
-            EditorUtils.setValue(this, props.initialValue);
+            EditorUtils.setValue(widget, props.initialValue);
         }
         catch {
         }

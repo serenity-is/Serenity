@@ -142,7 +142,8 @@ describe("setElementProps", () => {
     it("sets className via addClass", () => {
         const div = document.createElement("div");
         const widget = { domNode: div } as any;
-        setElementProps(widget, { class: "my-other-class" });
+        // Note: 'className' in EditorProps is separate from 'class'
+        setElementProps(widget, { className: "my-other-class" } as any);
         expect(div.classList.contains("my-other-class")).toBe(true);
     });
 

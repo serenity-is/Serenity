@@ -6,22 +6,24 @@ export namespace TabsExtensions {
     var navLinkSelector = ":scope > ul > li > a.nav-link, :scope > li > a.nav-link, :scope > a.nav-link, :scope > ul > li > a.ui-tabs-anchor, :scope > li > a.ui-tabs-anchor";
     var navLinkSelectorActive = ":scope > ul > li > a.nav-link.active, :scope > li > a.nav-link.active, :scope > a.nav-link.active, :scope > ul > li.ui-tabs-active > a, :scope > li.ui-tabs-active > a";
 
-    export function setDisabled(tabs: ArrayLike<HTMLElement> | HTMLElement, tabKey: string, isDisabled: boolean) {
+    export function setDisabled(tabs: ArrayLike<HTMLElement> | HTMLElement, tabKey: string | number, isDisabled: boolean) {
         tabs = isArrayLike(tabs) ? tabs[0] : tabs;
-        if (!tabs)
+        if (!tabs || typeof tabs === "string")
             return;
 
-        var ibk = indexByKey(tabs);
-        if (!ibk)
-            return;
-
-        var index = ibk[tabKey];
-        if (index == null) {
-            return;
+        var index: number;
+        if (typeof tabKey === "number")
+            index = tabKey;
+        else {
+            var ibk = indexByKey(tabs);
+            if (!ibk)
+                return;
+            index = ibk[tabKey];
+            if (index == null) {
+                return;
+            }
         }
 
-        if (typeof tabs === "string")
-            return;
         let $ = getjQuery();
         if (!$ || !$(tabs)?.data?.().uiTabs) {
             var anchors = Array.from(tabs.querySelectorAll<HTMLElement>(navLinkSelector));
@@ -44,22 +46,24 @@ export namespace TabsExtensions {
         $(tabs).tabs?.(isDisabled ? 'disable' : 'enable', index);
     }
 
-    export function toggle(tabs: ArrayLike<HTMLElement> | HTMLElement, tabKey: string, visible: boolean) {
+    export function toggle(tabs: ArrayLike<HTMLElement> | HTMLElement, tabKey: string | number, visible: boolean) {
         tabs = isArrayLike(tabs) ? tabs[0] : tabs;
-        if (!tabs)
+        if (!tabs || typeof tabs === "string")
             return;
 
-        var ibk = indexByKey(tabs);
-        if (!ibk)
-            return;
-
-        var index = ibk[tabKey];
-        if (index == null) {
-            return;
+        var index: number;
+        if (typeof tabKey === "number")
+            index = tabKey;
+        else {
+            var ibk = indexByKey(tabs);
+            if (!ibk)
+                return;
+            index = ibk[tabKey];
+            if (index == null) {
+                return;
+            }
         }
 
-        if (typeof tabs === "string")
-            return;
         let $ = getjQuery();
         if (!$ || !$(tabs).data?.().uiTabs) {
             var anchors = Array.from(tabs.querySelectorAll<HTMLAnchorElement>(navLinkSelector));
@@ -137,7 +141,7 @@ export namespace TabsExtensions {
             var ibk = indexByKey(tabs);
             if (!ibk)
                 return;
-            var index = ibk[tabKey];
+            index = ibk[tabKey];
             if (index == null) {
                 return;
             }

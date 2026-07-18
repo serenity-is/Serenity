@@ -97,6 +97,20 @@ describe("TabsExtensions", () => {
             expect(link?.classList.contains("disabled")).toBe(true);
         });
 
+        it("disables tab by numeric index", () => {
+            const tabs = document.createElement("div");
+            tabs.innerHTML = `
+                <ul>
+                    <li><a class="nav-link" data-tabkey="tab1">Tab 1</a></li>
+                    <li><a class="nav-link" data-tabkey="tab2">Tab 2</a></li>
+                </ul>
+            `;
+
+            TabsExtensions.setDisabled(tabs, 0, true);
+            const link = tabs.querySelector('[data-tabkey="tab1"]');
+            expect(link?.classList.contains("disabled")).toBe(true);
+        });
+
         it("does nothing for non-existent tab key", () => {
             const tabs = document.createElement("div");
             expect(() => TabsExtensions.setDisabled(tabs, "nonexistent", true)).not.toThrow();
@@ -108,7 +122,7 @@ describe("TabsExtensions", () => {
             expect(() => TabsExtensions.toggle(null, "test", true)).not.toThrow();
         });
 
-        it("toggles tab visibility", () => {
+        it("toggles tab visibility by key", () => {
             const tabs = document.createElement("div");
             tabs.innerHTML = `
                 <ul>
@@ -117,6 +131,20 @@ describe("TabsExtensions", () => {
             `;
 
             TabsExtensions.toggle(tabs, "tab1", false);
+            const link = tabs.querySelector('[data-tabkey="tab1"]') as HTMLAnchorElement;
+            expect(link.hidden).toBe(true);
+        });
+
+        it("toggles tab visibility by numeric index", () => {
+            const tabs = document.createElement("div");
+            tabs.innerHTML = `
+                <ul>
+                    <li><a class="nav-link" data-tabkey="tab1">Tab 1</a></li>
+                    <li><a class="nav-link" data-tabkey="tab2">Tab 2</a></li>
+                </ul>
+            `;
+
+            TabsExtensions.toggle(tabs, 0, false);
             const link = tabs.querySelector('[data-tabkey="tab1"]') as HTMLAnchorElement;
             expect(link.hidden).toBe(true);
         });

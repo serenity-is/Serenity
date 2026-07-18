@@ -309,18 +309,22 @@ describe('Widget.create', () => {
 });
 
 describe('Widget.afterRender', () => {
-    it('calls callback immediately if afterRenderSymbol queue is missing', () => {
+    it('calls callback immediately when called after renderContents', () => {
         const callback = vi.fn();
-        const widget = new Widget({});
-        // Delete the afterRender queue to test the early-return path
-        delete (widget as any)[Symbol.for("afterRender")];
-        // We can't easily call afterRender without the symbol, but we can simulate
-        // by calling internalRenderContents which checks the queue
-        // This tests the path where queue is falsy
+        // Create a deferred render widget so internalRenderContents hasn't run yet
+        class DeferredWidget extends Widget {
+            protected override deferRender() { return true; }
+        }
+        const widget = new DeferredWidget({});
+        // afterRender queues the callback
+        widget["afterRender"](callback);
+        // After init, internalRenderContents processes the queue and calls the callback
+        widget.init();
+        expect(callback).toHaveBeenCalled();
         widget.destroy();
     });
 
-    it('queues callback and processes during internalRenderContents', () => {
+    it('calls callback immediately if already rendered', () => {
         const callback = vi.fn();
         class TestWidget extends Widget {
             protected override renderContents(): any {
@@ -328,8 +332,9 @@ describe('Widget.afterRender', () => {
             }
         }
         const widget = new TestWidget({});
+        // After constructor, internalRenderContents has already run and consumed the queue
+        // So afterRender should call the callback immediately
         widget["afterRender"](callback);
-        // callback should have been called during internalRenderContents
         expect(callback).toHaveBeenCalled();
         widget.destroy();
     });
