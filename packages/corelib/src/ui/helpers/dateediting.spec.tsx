@@ -255,6 +255,118 @@ describe("dateInputKeyupHandler", () => {
         expect(mockInput.value).toBe('01/03/');
     });
 
+    it("should handle NumpadDivide key", () => {
+        Culture.dateOrder = 'dmy';
+        Culture.dateSeparator = '/';
+        mockInput.value = '1/';
+        mockInput.selectionEnd = 2;
+        mockEvent.key = 'NumpadDivide';
+
+        dateInputKeyupHandler(mockEvent);
+
+        expect(mockInput.value).toBe('01/');
+    });
+
+    it("should handle '/' key directly", () => {
+        Culture.dateOrder = 'dmy';
+        Culture.dateSeparator = '/';
+        mockInput.value = '1/';
+        mockInput.selectionEnd = 2;
+        mockEvent.key = '/';
+
+        dateInputKeyupHandler(mockEvent);
+
+        expect(mockInput.value).toBe('01/');
+    });
+
+    it("should handle slash key when last char is not separator (case 2)", () => {
+        Culture.dateOrder = 'dmy';
+        Culture.dateSeparator = '/';
+        mockInput.value = '12';
+        mockInput.selectionEnd = 2;
+        mockEvent.key = 'slash';
+
+        dateInputKeyupHandler(mockEvent);
+
+        // Last char is not separator, so it returns early from the slash handler
+        expect(mockInput.value).toBe('12');
+    });
+
+    it("should handle slash key case 4 with mdy", () => {
+        Culture.dateOrder = 'mdy';
+        Culture.dateSeparator = '/';
+        mockInput.value = '1/3/';
+        mockInput.selectionEnd = 4;
+        mockEvent.key = 'slash';
+
+        dateInputKeyupHandler(mockEvent);
+
+        expect(mockInput.value).toBe('01/03/');
+    });
+
+    it("should handle slash key at length 5 with valid pattern 1 (d/mm/)", () => {
+        Culture.dateOrder = 'dmy';
+        Culture.dateSeparator = '/';
+        mockInput.value = '4/12/';
+        mockInput.selectionEnd = 5;
+        mockEvent.key = 'slash';
+
+        dateInputKeyupHandler(mockEvent);
+
+        expect(mockInput.value).toBe('04/12/');
+    });
+
+    it("should handle slash key at length 5 with valid pattern 2 (dd/m/)", () => {
+        Culture.dateOrder = 'dmy';
+        Culture.dateSeparator = '/';
+        mockInput.value = '12/4/';
+        mockInput.selectionEnd = 5;
+        mockEvent.key = 'slash';
+
+        dateInputKeyupHandler(mockEvent);
+
+        expect(mockInput.value).toBe('12/04/');
+    });
+
+    it("should handle slash key with non-digit first char at length 2", () => {
+        Culture.dateOrder = 'dmy';
+        Culture.dateSeparator = '/';
+        mockInput.value = 'a/';
+        mockInput.selectionEnd = 2;
+        mockEvent.key = 'slash';
+
+        dateInputKeyupHandler(mockEvent);
+
+        // Non-digit first char causes early return from slash handler
+        expect(mockInput.value).toBe('a/');
+    });
+
+    it("should hit default case in slash handler with length 3", () => {
+        Culture.dateOrder = 'dmy';
+        Culture.dateSeparator = '/';
+        mockInput.value = '12/';
+        mockInput.selectionEnd = 3;
+        mockEvent.key = 'slash';
+
+        dateInputKeyupHandler(mockEvent);
+
+        // Length is 3, not in switch (2,4,5), hits default -> return
+        expect(mockInput.value).toBe('12/');
+    });
+
+    it("should do nothing when slash handler has length 5 but no matching format", () => {
+        Culture.dateOrder = 'dmy';
+        Culture.dateSeparator = '/';
+        mockInput.value = '12/34';
+        mockInput.selectionEnd = 5;
+        mockEvent.key = 'slash';
+
+        dateInputKeyupHandler(mockEvent);
+
+        // Length is 5 but last char is not separator (it's '4')
+        expect(mockInput.value).toBe('12/34');
+    });
+
     it("should handle numeric input and add separator at position 2", () => {
         Culture.dateOrder = 'dmy';
         Culture.dateSeparator = '/';
@@ -289,6 +401,203 @@ describe("dateInputKeyupHandler", () => {
         dateInputKeyupHandler(mockEvent);
 
         expect(mockInput.value).toBe('04/');
+    });
+
+    it("should not prepend zero for day <= 3 (returns early)", () => {
+        Culture.dateOrder = 'dmy';
+        Culture.dateSeparator = '/';
+        mockInput.value = '3';
+        mockInput.selectionEnd = 1;
+        mockEvent.key = '3';
+
+        dateInputKeyupHandler(mockEvent);
+
+        // charCodeAt(0) = 51, which is <= 51, so it returns without changing value
+        // But the handler may already have added a separator via prior logic
+        expect(mockInput.value).toBe('3');
+    });
+
+    it("should handle case 2 in dmy autocomplete with non-digit", () => {
+        Culture.dateOrder = 'dmy';
+        Culture.dateSeparator = '/';
+        mockInput.value = 'a';
+        mockInput.selectionEnd = 2;
+        mockEvent.key = 'a';
+
+        dateInputKeyupHandler(mockEvent);
+
+        // Not a digit, so shouldn't enter the dmy autocomplete
+        expect(mockInput.value).toBe('a');
+    });
+
+    it("should handle case 3 in dmy autocomplete with separator and valid digits", () => {
+        Culture.dateOrder = 'dmy';
+        Culture.dateSeparator = '/';
+        mockInput.value = '1/2';
+        mockInput.selectionEnd = 3;
+        mockEvent.key = '3';
+
+        dateInputKeyupHandler(mockEvent);
+
+        // case 3: val[0] is digit, val[1] is separator, val.charCodeAt(2) = 50 > 49
+        // so it pads: 1/2 -> 01/02 + separator -> 01/02/
+        expect(mockInput.value).toBe('01/02/');
+    });
+
+    it("should handle case 3 with month <= 1 (no padding)", () => {
+        Culture.dateOrder = 'dmy';
+        Culture.dateSeparator = '/';
+        mockInput.value = '1/0';
+        mockInput.selectionEnd = 3;
+        mockEvent.key = '2';
+
+        dateInputKeyupHandler(mockEvent);
+
+        // val.charCodeAt(2) = 48 ('0') <= 49, so it returns without change
+        expect(mockInput.value).toBe('1/0');
+    });
+
+    it("should handle case 4 with separator at position 1 (d/m)", () => {
+        Culture.dateOrder = 'dmy';
+        Culture.dateSeparator = '/';
+        mockInput.value = '1/23';
+        mockInput.selectionEnd = 4;
+        mockEvent.key = '4';
+
+        dateInputKeyupHandler(mockEvent);
+
+        // val[1] == '/', so it pads to "01/23" then adds separator
+        expect(mockInput.value).toBe('01/23/');
+    });
+
+    it("should handle case 4 with separator at position 2 (dd/m)", () => {
+        Culture.dateOrder = 'dmy';
+        Culture.dateSeparator = '/';
+        mockInput.value = '12/3';
+        mockInput.selectionEnd = 4;
+        mockEvent.key = '4';
+
+        dateInputKeyupHandler(mockEvent);
+
+        // val[2] == '/', month char '3' > '1' (charCode 51 > 49), so padding happens
+        expect(mockInput.value).toBe('12/03/');
+    });
+
+    it("should handle case 4 with separator at position 2 and month <= 1", () => {
+        Culture.dateOrder = 'dmy';
+        Culture.dateSeparator = '/';
+        mockInput.value = '12/0';
+        mockInput.selectionEnd = 4;
+        mockEvent.key = '0';
+
+        dateInputKeyupHandler(mockEvent);
+
+        // val.charCodeAt(3) = 48 <= 49, so returns without change
+        expect(mockInput.value).toBe('12/0');
+    });
+
+    it("should handle case 4 with separator at position 2 and non-digit first char", () => {
+        Culture.dateOrder = 'dmy';
+        Culture.dateSeparator = '/';
+        mockInput.value = 'ab/3';
+        mockInput.selectionEnd = 4;
+        mockEvent.key = '3';
+
+        dateInputKeyupHandler(mockEvent);
+
+        // val[2] == '/' but val[0] is not digit so returns
+        expect(mockInput.value).toBe('ab/3');
+    });
+
+    it("should handle case 4 with invalid digits at separator position 1", () => {
+        Culture.dateOrder = 'dmy';
+        Culture.dateSeparator = '/';
+        mockInput.value = 'a/b5';
+        mockInput.selectionEnd = 4;
+        mockEvent.key = '5';
+
+        dateInputKeyupHandler(mockEvent);
+
+        // val[1] == '/' but val[0] ('a') is not a digit, so returns
+        expect(mockInput.value).toBe('a/b5');
+    });
+
+    it("should handle case 4 where neither position matches separator", () => {
+        Culture.dateOrder = 'dmy';
+        Culture.dateSeparator = '/';
+        mockInput.value = 'a123';
+        mockInput.selectionEnd = 4;
+        mockEvent.key = '4';
+
+        dateInputKeyupHandler(mockEvent);
+
+        // Neither val[1] nor val[2] is '/', so returns
+        expect(mockInput.value).toBe('a123');
+    });
+
+    it("should handle case 5 with valid separator and digits", () => {
+        Culture.dateOrder = 'dmy';
+        Culture.dateSeparator = '/';
+        mockInput.value = '12/05';
+        mockInput.selectionEnd = 5;
+        mockEvent.key = '6';
+
+        dateInputKeyupHandler(mockEvent);
+
+        // Valid: val[2] is '/', all digits, adds separator
+        expect(mockInput.value).toBe('12/05/');
+    });
+
+    it("should handle case 2 with non-digit first char", () => {
+        Culture.dateOrder = 'dmy';
+        Culture.dateSeparator = '/';
+        mockInput.value = 'a2';
+        mockInput.selectionEnd = 2;
+        mockEvent.key = '3';
+
+        dateInputKeyupHandler(mockEvent);
+
+        // val[0] is not digit, so returns
+        expect(mockInput.value).toBe('a2');
+    });
+
+    it("should handle case 5 with invalid separator position", () => {
+        Culture.dateOrder = 'dmy';
+        Culture.dateSeparator = '/';
+        mockInput.value = '1205a';
+        mockInput.selectionEnd = 5;
+        mockEvent.key = '6';
+
+        dateInputKeyupHandler(mockEvent);
+
+        // val[2] is '0' not '/', so returns
+        expect(mockInput.value).toBe('1205a');
+    });
+
+    it("should handle case 5 with non-digit characters", () => {
+        Culture.dateOrder = 'dmy';
+        Culture.dateSeparator = '/';
+        mockInput.value = '12/a5';
+        mockInput.selectionEnd = 5;
+        mockEvent.key = '6';
+
+        dateInputKeyupHandler(mockEvent);
+
+        // val[2] is '/' but val[3] is not digit, so returns
+        expect(mockInput.value).toBe('12/a5');
+    });
+
+    it("should not apply dmy autocomplete for mdy date order", () => {
+        Culture.dateOrder = 'mdy';
+        Culture.dateSeparator = '/';
+        mockInput.value = '12';
+        mockInput.selectionEnd = 2;
+        mockEvent.key = '3';
+
+        dateInputKeyupHandler(mockEvent);
+
+        // dmy autocomplete only applies when dateOrder is 'dmy'
+        expect(mockInput.value).toBe('12');
     });
 
     it("should handle null input value", () => {

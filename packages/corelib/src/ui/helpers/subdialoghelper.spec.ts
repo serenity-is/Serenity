@@ -1,5 +1,14 @@
+import { getjQuery } from "../../base";
 import { Widget } from "../widgets/widget";
 import { SubDialogHelper } from "./subdialoghelper";
+
+vi.mock("../../base", async (importOriginal) => {
+    const actual: any = await importOriginal();
+    return {
+        ...actual,
+        getjQuery: vi.fn()
+    };
+});
 
 describe("SubDialogHelper", () => {
     describe("bindToDataChange", () => {
@@ -25,12 +34,11 @@ describe("SubDialogHelper", () => {
 
             SubDialogHelper.bindToDataChange(dialog, owner, dataChange);
 
-            // Dispatch with originalEvent that has operationType
-            const originalEvent = new CustomEvent("test");
-            (originalEvent as any).operationType = "update";
-            dialog.domNode.dispatchEvent(new CustomEvent("ondatachange", {
-                detail: { originalEvent }
-            }));
+            // Dispatch with originalEvent that has operationType set directly on the event
+            const ev = new CustomEvent("ondatachange");
+            (ev as any).originalEvent = { operationType: "update" };
+            dialog.domNode.dispatchEvent(ev);
+            expect(dataChange).toHaveBeenCalled();
 
             dialog.destroy();
             owner.destroy();
@@ -108,7 +116,7 @@ describe("SubDialogHelper", () => {
     });
 
     describe("cascade", () => {
-        it("sets up dialogopen handler for cascading", () => {
+        it("sets up dialogopen handler for cascading (no jQuery)", () => {
             const dialog = new Widget({});
             const element = document.createElement("div");
 
@@ -118,6 +126,31 @@ describe("SubDialogHelper", () => {
             // Trigger dialogopen
             dialog.domNode.dispatchEvent(new Event("dialogopen"));
 
+            dialog.destroy();
+        });
+
+        it("sets up dialogopen handler for cascading (with jQuery)", () => {
+            const mockDialogFn = vi.fn();
+            const mock$ = vi.fn(() => ({
+                dialog: mockDialogFn
+            })) as any;
+            mock$.fn = { dialog: true };
+            (getjQuery as any).mockReturnValue(mock$);
+
+            const dialog = new Widget({});
+            const element = document.createElement("div");
+
+            SubDialogHelper.cascade(dialog, element);
+
+            // Trigger dialogopen
+            dialog.domNode.dispatchEvent(new Event("dialogopen"));
+            expect(mockDialogFn).toHaveBeenCalledWith('option', 'position', {
+                my: 'left top',
+                at: 'left+20 top+20',
+                of: element
+            });
+
+            (getjQuery as any).mockRestore();
             dialog.destroy();
         });
     });
