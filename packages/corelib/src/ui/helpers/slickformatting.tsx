@@ -1,5 +1,4 @@
 import { applyFormatterResultToCellNode, FormatterContext, FormatterResult } from "@serenity-is/sleekgrid";
-import { htmlEncode, sanitizeHtml } from "../../base";
 import { replaceAll } from "../../compat";
 import { Format, IRemoteView } from "../../slick";
 import { skipEditLinkFormatPurposes } from "./editlink";
