@@ -6012,38 +6012,123 @@ export declare class PropertyDialog<TItem, P> extends BaseDialog<P> {
 	protected renderContents(): any;
 }
 export interface AutoNumericOptions {
+	/** allowed decimal separator characters
+	 * period "full stop" = '.'
+	 * comma = ','
+	 * @default '.'
+	 */
 	aDec?: string;
-	allowedAutoStrip?: RegExp;
-	allowLeading?: boolean;
+	/** allow to declare alternative decimal separator which is automatically replaced by aDec
+	 * developed for countries the use a comma ',' as the decimal character
+	 * and have keyboards\numeric pads that have a period 'full stop' as the decimal characters (Spain is an example)
+	 * @default null
+	 */
 	altDec?: string;
+	/** determine if the default value will be formatted on page ready.
+	 * true = automatically formats the default value on page ready
+	 * false = will not format the default value
+	 * @default true
+	 */
 	aForm?: boolean;
+	/** allowed numeric values
+	 * please do not modify
+	 * @default '0123456789'
+	 */
 	aNum?: string;
-	aNeg?: string;
+	/** allowed thousand separator characters
+	 * comma = ','
+	 * period "full stop" = '.'
+	 * apostrophe is escaped = '\''
+	 * space = ' '
+	 * none = ''
+	 * NOTE: do not use numeric characters
+	 * @default ','
+	 */
 	aSep?: string;
+	/** allowed currency symbol
+	 * Must be in quotes aSign: '$', a space is allowed aSign: '$ '
+	 * @default ''
+	 */
 	aSign?: string;
-	aNegRegAutoStrip?: string;
+	/** controls decimal padding
+	 * aPad: true - always Pad decimals with zeros
+	 * aPad: false - does not pad with zeros.
+	 * aPad: `some number` - pad decimals with zero to number different from mDec
+	 * thanks to Jonas Johansson for the suggestion
+	 * @default true
+	 */
 	aPad?: boolean;
+	/** digital grouping for the thousand separator used in Format
+	 * dGroup: '2', results in 99,99,99,999 common in India for values less than 1 billion and greater than -1 billion
+	 * dGroup: '3', results in 999,999,999 default
+	 * dGroup: '4', results in 9999,9999,9999 used in some Asian countries
+	 * @default '3'
+	 */
 	dGroup?: string;
 	/** internal */
 	holder?: any;
+	/** controls leading zero behavior
+	 * lZero: 'allow', - allows leading zeros to be entered. Zeros will be truncated when entering additional digits. On focusout zeros will be deleted.
+	 * lZero: 'deny', - allows only one leading zero on values less than one
+	 * lZero: 'keep', - allows leading zeros to be entered. on fousout zeros will be retained.
+	 * @default 'allow'
+	 */
 	lZero?: string;
+	/** max number of decimal places = used to override decimal places set by the vMin & vMax values
+	 * value must be enclosed in quotes example mDec: '3',
+	 * This can also set the value via a call back function mDec: 'css:#
+	 * @default null
+	 */
 	mDec?: number;
-	mInt?: number;
+	/** method used for rounding
+	 * mRound: 'S', Round-Half-Up Symmetric (default)
+	 * mRound: 'A', Round-Half-Up Asymmetric
+	 * mRound: 's', Round-Half-Down Symmetric (lower case s)
+	 * mRound: 'a', Round-Half-Down Asymmetric (lower case a)
+	 * mRound: 'B', Round-Half-Even "Bankers Rounding"
+	 * mRound: 'U', Round Up "Round-Away-From-Zero"
+	 * mRound: 'D', Round Down "Round-Toward-Zero" - same as truncate
+	 * mRound: 'C', Round to Ceiling "Toward Positive Infinity"
+	 * mRound: 'F', Round to Floor "Toward Negative Infinity"
+	 * @default 'S'
+	 */
 	mRound?: string;
+	/** places brackets on negative value -$ 999.99 to (999.99)
+	 * visible only when the field does NOT have focus the left and right symbols should be enclosed in quotes and separated by a comma
+	 * nBracket: null, nBracket: '(,)', nBracket: '[,]', nBracket: '<,>' or nBracket: '{,}'
+	 * @default null
+	 */
 	nBracket?: string;
-	numRegAutoStrip?: RegExp;
-	oEvent?: any;
+	/** placement of currency sign
+	 * for prefix pSign: 'p',
+	 * for suffix pSign: 's',
+	 * @default 'p'
+	 */
 	pSign?: string;
 	/** internal */
 	runOnce?: boolean;
-	skipFirstAutoStrip?: RegExp;
-	skipLastAutoStrip?: RegExp;
-	tagList?: string[];
+	/** maximum possible value
+	 * value must be enclosed in quotes and use the period for the decimal point
+	 * value must be larger than vMin
+	 * @default '9999999999999.99'
+	 */
 	vMax?: any;
+	/** minimum possible value
+	 * value must be enclosed in quotes and use the period for the decimal point
+	 * value must be smaller than vMax
+	 * @default '0.00'
+	 */
 	vMin?: any;
+	/** Displayed on empty string
+	 * wEmpty: 'empty', - input can be blank
+	 * wEmpty: 'zero', - displays zero
+	 * wEmpty: 'sign', - displays the currency sign
+	 * @default 'empty'
+	 */
 	wEmpty?: string;
 }
 export declare class AutoNumeric {
+	static defaults: AutoNumericOptions;
 	static init(input: HTMLInputElement, options: AutoNumericOptions): void;
 	/** method to remove settings and stop autoNumeric() */
 	static destroy(input: HTMLInputElement): void;

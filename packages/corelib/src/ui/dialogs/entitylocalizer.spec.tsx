@@ -21,7 +21,7 @@ function createMockOptions(overrides?: Partial<EntityLocalizerOptions>): EntityL
         pgOptions: {
             idPrefix: "Test_",
             items: [],
-            mode: 0,
+            mode: 0 as any,
             localTextPrefix: "Forms.Test."
         },
         retrieveLocalizations: vi.fn(async () => ({})),
@@ -61,7 +61,7 @@ describe("EntityLocalizer", () => {
                 pgOptions: {
                     idPrefix: "Test_",
                     items,
-                    mode: 0,
+                    mode: 0 as any,
                     localTextPrefix: "Forms.Test."
                 }
             });
@@ -90,7 +90,7 @@ describe("EntityLocalizer", () => {
                 pgOptions: {
                     idPrefix: "Test_",
                     items,
-                    mode: 0,
+                    mode: 0 as any,
                     localTextPrefix: "Forms.Test."
                 }
             });
@@ -112,7 +112,7 @@ describe("EntityLocalizer", () => {
                 pgOptions: {
                     idPrefix: "Test_",
                     items,
-                    mode: 0,
+                    mode: 0 as any,
                     localTextPrefix: "Forms.Test."
                 }
             });
@@ -135,7 +135,7 @@ describe("EntityLocalizer", () => {
                 pgOptions: {
                     idPrefix: "Test_",
                     items,
-                    mode: 0,
+                    mode: 0 as any,
                     localTextPrefix: "Forms.Test."
                 }
             });
@@ -187,7 +187,7 @@ describe("EntityLocalizer", () => {
                 pgOptions: {
                     idPrefix: "Test_",
                     items,
-                    mode: 0,
+                    mode: 0 as any,
                     localTextPrefix: "Forms.Test."
                 }
             });
@@ -213,7 +213,7 @@ describe("EntityLocalizer", () => {
                 pgOptions: {
                     idPrefix: "Test_",
                     items,
-                    mode: 0,
+                    mode: 0 as any,
                     localTextPrefix: "Forms.Test."
                 },
                 validateForm: vi.fn(() => false)
@@ -299,7 +299,7 @@ describe("EntityLocalizer", () => {
                 getPropertyGrid: vi.fn(() => Fluent(pgDiv)),
                 getButton: vi.fn(() => Fluent(button)),
                 getLanguages: vi.fn(() => []),
-                pgOptions: { idPrefix: "Test_", items, mode: 0, localTextPrefix: "Forms.Test." }
+                pgOptions: { idPrefix: "Test_", items, mode: 0 as any, localTextPrefix: "Forms.Test." }
             });
             const localizer = new EntityLocalizer(opt);
             return { localizer, button };
@@ -337,7 +337,7 @@ describe("EntityLocalizer", () => {
             const opt = createMockOptions({
                 getPropertyGrid: vi.fn(() => Fluent(pgDiv)),
                 getLanguages: vi.fn(() => [{ id: "en", text: "English" }]),
-                pgOptions: { idPrefix: "Test_", items, mode: 0, localTextPrefix: "Forms.Test." }
+                pgOptions: { idPrefix: "Test_", items, mode: 0 as any, localTextPrefix: "Forms.Test." }
             });
             const localizer = new EntityLocalizer(opt);
             // Mock grid.save
@@ -365,7 +365,7 @@ describe("EntityLocalizer", () => {
                 getButton: vi.fn(() => Fluent(button)),
                 getLanguages: vi.fn(() => [{ id: "en", text: "English" }]),
                 isNew: vi.fn(() => true),
-                pgOptions: { idPrefix: "Test_", items, mode: 0, localTextPrefix: "Forms.Test." },
+                pgOptions: { idPrefix: "Test_", items, mode: 0 as any, localTextPrefix: "Forms.Test." },
                 retrieveLocalizations: retrieveLocs
             });
             const localizer = new EntityLocalizer(opt);
@@ -407,7 +407,7 @@ describe("EntityLocalizer", () => {
                 getLanguages: vi.fn(() => [{ id: "en", text: "English" }]),
                 isNew: vi.fn(() => false),
                 getEntity: vi.fn(() => ({ Name: "Original" })),
-                pgOptions: { idPrefix: "Test_", items, mode: 0, localTextPrefix: "Forms.Test." },
+                pgOptions: { idPrefix: "Test_", items, mode: 0 as any, localTextPrefix: "Forms.Test." },
                 retrieveLocalizations: retrieveLocs
             });
             const localizer = new EntityLocalizer(opt);

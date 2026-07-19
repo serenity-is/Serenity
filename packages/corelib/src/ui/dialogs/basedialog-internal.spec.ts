@@ -189,7 +189,7 @@ describe("handleUIDialogResponsive", () => {
             }
             return { length: 0 } as any;
         });
-        mock$.fn = {};
+        (mock$ as any).fn = {};
         (window as any).jQuery = mock$;
     });
 
@@ -414,7 +414,7 @@ describe("handleUIDialogResponsive", () => {
                 }
                 return { length: 0 } as any;
             });
-            mock$.fn = {};
+            (mock$ as any).fn = {};
             (window as any).jQuery = mock$;
 
             handleUIDialogResponsive(mockDomNode);

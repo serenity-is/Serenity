@@ -38,35 +38,139 @@ function setElementSelection(that: HTMLInputElement, start: number, end: number)
 }
 
 export interface AutoNumericOptions {
+    /** allowed decimal separator characters
+     * period "full stop" = '.'
+     * comma = ','
+     * @default '.'
+     */
     aDec?: string;
+    /** @internal regex matching characters not allowed in numeric input */
     allowedAutoStrip?: RegExp;
+    /** @internal when false, leading zeros are stripped during focusout */
     allowLeading?: boolean;
+    /** allow to declare alternative decimal separator which is automatically replaced by aDec
+     * developed for countries the use a comma ',' as the decimal character
+     * and have keyboards\numeric pads that have a period 'full stop' as the decimal characters (Spain is an example)
+     * @default null
+     */
     altDec?: string;
+    /** determine if the default value will be formatted on page ready.
+     * true = automatically formats the default value on page ready
+     * false = will not format the default value
+     * @default true
+     */
     aForm?: boolean;
+    /** allowed numeric values
+     * please do not modify
+     * @default '0123456789'
+     */
     aNum?: string;
+    /** @internal negative sign string ('-' or ''), derived from vMin */
     aNeg?: string;
-    aSep?: string;
-    aSign?: string;
+    /** @internal regex string matching optional negative sign prefix */
     aNegRegAutoStrip?: string;
+    /** allowed thousand separator characters
+     * comma = ','
+     * period "full stop" = '.'
+     * apostrophe is escaped = '\''
+     * space = ' '
+     * none = ''
+     * NOTE: do not use numeric characters
+     * @default ','
+     */
+    aSep?: string;
+    /** allowed currency symbol
+     * Must be in quotes aSign: '$', a space is allowed aSign: '$ '
+     * @default ''
+     */
+    aSign?: string;
+    /** controls decimal padding
+     * aPad: true - always Pad decimals with zeros
+     * aPad: false - does not pad with zeros.
+     * aPad: `some number` - pad decimals with zero to number different from mDec
+     * thanks to Jonas Johansson for the suggestion
+     * @default true
+     */
     aPad?: boolean;
+    /** digital grouping for the thousand separator used in Format
+     * dGroup: '2', results in 99,99,99,999 common in India for values less than 1 billion and greater than -1 billion
+     * dGroup: '3', results in 999,999,999 default
+     * dGroup: '4', results in 9999,9999,9999 used in some Asian countries
+     * @default '3'
+     */
     dGroup?: string;
     /** internal */
     holder?: any;
+    /** controls leading zero behavior
+     * lZero: 'allow', - allows leading zeros to be entered. Zeros will be truncated when entering additional digits. On focusout zeros will be deleted.
+     * lZero: 'deny', - allows only one leading zero on values less than one
+     * lZero: 'keep', - allows leading zeros to be entered. on fousout zeros will be retained.
+     * @default 'allow'
+     */
     lZero?: string;
+    /** max number of decimal places = used to override decimal places set by the vMin & vMax values
+     * value must be enclosed in quotes example mDec: '3',
+     * This can also set the value via a call back function mDec: 'css:#
+     * @default null
+     */
     mDec?: number;
+    /** @internal maximum number of integer digits, computed from vMax and vMin */
     mInt?: number;
+    /** method used for rounding
+     * mRound: 'S', Round-Half-Up Symmetric (default)
+     * mRound: 'A', Round-Half-Up Asymmetric
+     * mRound: 's', Round-Half-Down Symmetric (lower case s)
+     * mRound: 'a', Round-Half-Down Asymmetric (lower case a)
+     * mRound: 'B', Round-Half-Even "Bankers Rounding"
+     * mRound: 'U', Round Up "Round-Away-From-Zero"
+     * mRound: 'D', Round Down "Round-Toward-Zero" - same as truncate
+     * mRound: 'C', Round to Ceiling "Toward Positive Infinity"
+     * mRound: 'F', Round to Floor "Toward Negative Infinity"
+     * @default 'S'
+     */
     mRound?: string;
+    /** places brackets on negative value -$ 999.99 to (999.99)
+     * visible only when the field does NOT have focus the left and right symbols should be enclosed in quotes and separated by a comma
+     * nBracket: null, nBracket: '(,)', nBracket: '[,]', nBracket: '<,>' or nBracket: '{,}'
+     * @default null
+     */
     nBracket?: string;
+    /** @internal regex to extract the numeric portion (sign + digits + decimal) */
     numRegAutoStrip?: RegExp;
+    /** @internal tracks the current event type ('keydown', 'keypress', 'focusin', 'focusout', 'set', 'get') */
     oEvent?: any;
+    /** placement of currency sign
+     * for prefix pSign: 'p',
+     * for suffix pSign: 's',
+     * @default 'p'
+     */
     pSign?: string;
     /** internal */
     runOnce?: boolean;
+    /** @internal regex to strip characters before the first digit */
     skipFirstAutoStrip?: RegExp;
+    /** @internal regex to strip characters after the last digit */
     skipLastAutoStrip?: RegExp;
+    /** @internal HTML tag names that support autoNumeric on textContent */
     tagList?: string[];
+    /** maximum possible value
+     * value must be enclosed in quotes and use the period for the decimal point
+     * value must be larger than vMin
+     * @default '9999999999999.99'
+     */
     vMax?: any;
+    /** minimum possible value
+     * value must be enclosed in quotes and use the period for the decimal point
+     * value must be smaller than vMax
+     * @default '0.00'
+     */
     vMin?: any;
+    /** Displayed on empty string
+     * wEmpty: 'empty', - input can be blank
+     * wEmpty: 'zero', - displays zero
+     * wEmpty: 'sign', - displays the currency sign
+     * @default 'empty'
+     */
     wEmpty?: string;
 }
 
@@ -330,9 +434,9 @@ function autoGroup(iv: string, settings: AutoNumericOptions) {
         return empty;
     }
     var digitalGroup: any = '';
-    if (settings.dGroup == "2") {
+    if (settings.dGroup === "2") {
         digitalGroup = /(\d)((\d)(\d{2}?)+)$/;
-    } else if (settings.dGroup == "4") {
+    } else if (settings.dGroup === "4") {
         digitalGroup = /(\d)((\d{4}?)+)$/;
     } else {
         digitalGroup = /(\d)((\d{3}?)+)$/;
@@ -476,6 +580,12 @@ function autoRound(iv: string, settings: AutoNumericOptions) { /** value to stri
                 }
                 if (i > 0) {
                     ivArray[i] = '0';
+                } else {
+                    /** carry past most significant digit: prepend 1 */
+                    ivArray[i] = '0';
+                    ivArray.unshift('1');
+                    rLength++;
+                    break;
                 }
             }
         }
@@ -674,7 +784,7 @@ class AutoNumericHolder {
      * process pasting, cursor moving and skipping of not interesting keys
      * if returns true, futher processing is not performed
      */
-    skipAllways(e: Event) {
+    skipAlways(e: Event) {
         var kdCode = this.kdCode,
             which = this.which,
             ctrlKey = this.ctrlKey,
@@ -886,6 +996,25 @@ function getHolder(that: HTMLInputElement, settings?: AutoNumericOptions, update
 
 export class AutoNumeric {
 
+    static defaults: AutoNumericOptions = {
+        aNum: '0123456789',
+        aSep: ',',
+        dGroup: '3',
+        aDec: '.',
+        altDec: null,
+        aSign: '',
+        pSign: 'p',
+        vMax: '9999999999999.99',
+        vMin: '0.00',
+        mDec: null,
+        mRound: 'S',
+        aPad: true,
+        nBracket: null,
+        wEmpty: 'empty',
+        lZero: 'allow',
+        aForm: true
+    };
+
     static init(input: HTMLInputElement, options: AutoNumericOptions): void {
         if (!input) {
             throw new Error("autoNumeric called with null element!");
@@ -894,103 +1023,7 @@ export class AutoNumeric {
             tagData: Record<string, string> = {}; /** attempt to grab HTML5 data, if they don't exist we'll get "undefined".*/
         Object.keys(input.dataset).forEach(key => tagData[key] = input.dataset[key]);
         if (typeof settings !== 'object') { /** If we couldn't grab settings, create them from defaults and passed options. */
-            var defaults: AutoNumericOptions = {
-                /** allowed numeric values
-                 * please do not modify
-                 */
-                aNum: '0123456789',
-                /** allowed thousand separator characters
-                 * comma = ','
-                 * period "full stop" = '.'
-                 * apostrophe is escaped = '\''
-                 * space = ' '
-                 * none = ''
-                 * NOTE: do not use numeric characters
-                 */
-                aSep: ',',
-                /** digital grouping for the thousand separator used in Format
-                 * dGroup: '2', results in 99,99,99,999 common in India for values less than 1 billion and greater than -1 billion
-                 * dGroup: '3', results in 999,999,999 default
-                 * dGroup: '4', results in 9999,9999,9999 used in some Asian countries
-                 */
-                dGroup: '3',
-                /** allowed decimal separator characters
-                 * period "full stop" = '.'
-                 * comma = ','
-                 */
-                aDec: '.',
-                /** allow to declare alternative decimal separator which is automatically replaced by aDec
-                 * developed for countries the use a comma ',' as the decimal character
-                 * and have keyboards\numeric pads that have a period 'full stop' as the decimal characters (Spain is an example)
-                 */
-                altDec: null,
-                /** allowed currency symbol
-                 * Must be in quotes aSign: '$', a space is allowed aSign: '$ '
-                 */
-                aSign: '',
-                /** placement of currency sign
-                 * for prefix pSign: 'p',
-                 * for suffix pSign: 's',
-                 */
-                pSign: 'p',
-                /** maximum possible value
-                 * value must be enclosed in quotes and use the period for the decimal point
-                 * value must be larger than vMin
-                 */
-                vMax: '9999999999999.99',
-                /** minimum possible value
-                 * value must be enclosed in quotes and use the period for the decimal point
-                 * value must be smaller than vMax
-                 */
-                vMin: '0.00',
-                /** max number of decimal places = used to override decimal places set by the vMin & vMax values
-                 * value must be enclosed in quotes example mDec: '3',
-                 * This can also set the value via a call back function mDec: 'css:#
-                 */
-                mDec: null,
-                /** method used for rounding
-                 * mRound: 'S', Round-Half-Up Symmetric (default)
-                 * mRound: 'A', Round-Half-Up Asymmetric
-                 * mRound: 's', Round-Half-Down Symmetric (lower case s)
-                 * mRound: 'a', Round-Half-Down Asymmetric (lower case a)
-                 * mRound: 'B', Round-Half-Even "Bankers Rounding"
-                 * mRound: 'U', Round Up "Round-Away-From-Zero"
-                 * mRound: 'D', Round Down "Round-Toward-Zero" - same as truncate
-                 * mRound: 'C', Round to Ceiling "Toward Positive Infinity"
-                 * mRound: 'F', Round to Floor "Toward Negative Infinity"
-                 */
-                mRound: 'S',
-                /** controls decimal padding
-                 * aPad: true - always Pad decimals with zeros
-                 * aPad: false - does not pad with zeros.
-                 * aPad: `some number` - pad decimals with zero to number different from mDec
-                 * thanks to Jonas Johansson for the suggestion
-                 */
-                aPad: true,
-                /** places brackets on negative value -$ 999.99 to (999.99)
-                 * visible only when the field does NOT have focus the left and right symbols should be enclosed in quotes and seperated by a comma
-                 * nBracket: null, nBracket: '(,)', nBracket: '[,]', nBracket: '<,>' or nBracket: '{,}'
-                 */
-                nBracket: null,
-                /** Displayed on empty string
-                 * wEmpty: 'empty', - input can be blank
-                 * wEmpty: 'zero', - displays zero
-                 * wEmpty: 'sign', - displays the currency sign
-                 */
-                wEmpty: 'empty',
-                /** controls leading zero behavior
-                 * lZero: 'allow', - allows leading zeros to be entered. Zeros will be truncated when entering additional digits. On focusout zeros will be deleted.
-                 * lZero: 'deny', - allows only one leading zero on values less than one
-                 * lZero: 'keep', - allows leading zeros to be entered. on fousout zeros will be retained.
-                 */
-                lZero: 'allow',
-                /** determine if the default value will be formatted on page ready.
-                 * true = automatically formats the default value on page ready
-                 * false = will not format the default value
-                 */
-                aForm: true
-            };
-            settings = Object.assign({}, defaults, tagData, options); /** Merge defaults, tagData and options */
+            settings = Object.assign({}, AutoNumeric.defaults, tagData, options); /** Merge defaults, tagData and options */
             if (settings.aDec === settings.aSep) {
                 throw new Error("autoNumeric will not function properly when the decimal character aDec: '" + settings.aDec + "' and thousand separator aSep: '" + settings.aSep + "' are the same character");
             }
@@ -1042,7 +1075,7 @@ export class AutoNumeric {
                 }*/
                 holder.init(e);
                 holder.settings.oEvent = 'keydown';
-                if (holder.skipAllways(e)) {
+                if (holder.skipAlways(e)) {
                     holder.processed = true;
                     return true;
                 }
@@ -1061,7 +1094,7 @@ export class AutoNumeric {
                     processed = holder.processed;
                 holder.init(e);
                 holder.settings.oEvent = 'keypress';
-                if (holder.skipAllways(e)) {
+                if (holder.skipAlways(e)) {
                     return true;
                 }
                 if (processed) {
@@ -1080,7 +1113,7 @@ export class AutoNumeric {
                 var holder = getHolder(input);
                 holder.init(e);
                 holder.settings.oEvent = 'keyup';
-                var skip = holder.skipAllways(e);
+                var skip = holder.skipAlways(e);
                 holder.kdCode = 0;
                 delete holder.valuePartsBeforePaste;
                 if (input.value === holder.settings.aSign) { /** added to properly place the caret when only the currency is present */
@@ -1218,7 +1251,6 @@ export class AutoNumeric {
         }
         value = checkValue(value, settings);
         settings.oEvent = 'set';
-        value.toString();
         if (value !== '') {
             value = autoRound(value, settings);
         }
@@ -1226,8 +1258,9 @@ export class AutoNumeric {
         value = autoGroup(value, settings);
         if (input.matches('input[type=text], input[type=hidden], input[type=tel], input:not([type])')) { /**added hidden type */
             input.value = value;
+            return value;
         }
-        if (!settings.tagList?.includes(input.tagName)) {
+        if (settings.tagList?.includes(input.tagName)) {
             return input.textContent = value;
         }
         throw new Error("The <" + input.tagName + "> is not supported by autoNumeric()");
