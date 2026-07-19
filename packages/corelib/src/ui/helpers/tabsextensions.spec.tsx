@@ -79,7 +79,7 @@ describe("TabsExtensions", () => {
         });
 
         it("uses jQuery UI tabs when available", () => {
-            const mockTabsOption = vi.fn((_opt: string, _val?: number) => {
+            const mockTabsOption = vi.fn((_opt: string, _val: number, _arg: any) => {
                 if (_val !== undefined) return undefined;
                 return 0;
             });
@@ -188,12 +188,14 @@ describe("TabsExtensions", () => {
         });
 
         it("disables active tab via jQuery UI and switches to first tab", () => {
-            const mockTabsOption = vi.fn((_opt: string) => 0); // active = 0
+            const mockTabsOption = vi.fn((_opt: string, _arg: any) => 0); // active = 0
             const mockTabsDisable = vi.fn();
             const mock$ = vi.fn(() => ({
                 tabs: (method: string, ...args: any[]) => {
                     if (method === 'option') return mockTabsOption(method, args[0]);
                     if (method === 'disable') return mockTabsDisable(method, args[0]);
+                    if (method === 'option') return mockTabsOption(method, args[0]);
+                    if (method === 'disable') return mockTabsDisable(method);
                     return undefined;
                 },
                 data: vi.fn(() => ({ uiTabs: true }))
@@ -560,7 +562,7 @@ describe("TabsExtensions", () => {
 
     describe("toggle - jQuery UI path for hiding active tab", () => {
         it("hides active tab and switches to first via jQuery UI", () => {
-            const mockTabsOption = vi.fn((_opt: string) => 0); // active = 0
+            const mockTabsOption = vi.fn((_opt: string, _args: any) => 0); // active = 0
             const mockToggle = vi.fn();
             const mock$ = vi.fn(() => ({
                 tabs: (method: string, ...args: any[]) => {

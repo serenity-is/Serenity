@@ -248,7 +248,7 @@ describe('PropertyItemColumnConverter', () => {
 
             // The format function should return empty string initially
             const ctx = { row: 0, cell: 0, grid: { updateCell: vi.fn() }, value: '2021-01-01' };
-            const result = converted.format!(ctx);
+            const result = converted.format!(ctx as any);
             expect(result).toBe('');
 
             // Wait for the promise to resolve

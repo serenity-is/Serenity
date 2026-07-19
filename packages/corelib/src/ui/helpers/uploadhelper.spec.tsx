@@ -128,19 +128,19 @@ describe("UploadHelper", () => {
     });
 
     describe("checkImageConstraints", () => {
-        beforeEach(() => {
-            FileUploadTexts.NotAnImageFile = "Not an image file";
-            FileUploadTexts.UploadFileTooSmall = "File too small: {0}";
-            FileUploadTexts.UploadFileTooBig = "File too big: {0}";
-            FileUploadTexts.MinWidth = "Min width: {0}";
-            FileUploadTexts.MaxWidth = "Max width: {0}";
-            FileUploadTexts.MinHeight = "Min height: {0}";
-            FileUploadTexts.MaxHeight = "Max height: {0}";
-        });
+        //beforeEach(() => {
+        //    FileUploadTexts.NotAnImageFile = "Not an image file";
+        //    FileUploadTexts.UploadFileTooSmall = "File too small: {0}";
+        //    FileUploadTexts.UploadFileTooBig = "File too big: {0}";
+        //    FileUploadTexts.MinWidth = "Min width: {0}";
+        //    FileUploadTexts.MaxWidth = "Max width: {0}";
+        //    FileUploadTexts.MinHeight = "Min height: {0}";
+        //    FileUploadTexts.MaxHeight = "Max height: {0}";
+        //});
 
         it("returns false for non-image when allowNonImage is false", () => {
             const result = UploadHelper.checkImageConstraints(
-                { IsImage: false, Size: 100, Width: 0, Height: 0 },
+                { IsImage: false, Size: 100, Width: 0, Height: 0, TemporaryFile: undefined },
                 { allowNonImage: false }
             );
             expect(result).toBe(false);
@@ -148,7 +148,7 @@ describe("UploadHelper", () => {
 
         it("returns true for non-image when allowNonImage is true", () => {
             const result = UploadHelper.checkImageConstraints(
-                { IsImage: false, Size: 100, Width: 0, Height: 0 },
+                { IsImage: false, Size: 100, Width: 0, Height: 0, TemporaryFile: undefined },
                 { allowNonImage: true }
             );
             expect(result).toBe(true);
@@ -156,7 +156,7 @@ describe("UploadHelper", () => {
 
         it("returns false if file is too small", () => {
             const result = UploadHelper.checkImageConstraints(
-                { IsImage: true, Size: 50, Width: 100, Height: 100 },
+                { IsImage: true, Size: 50, Width: 100, Height: 100, TemporaryFile: undefined },
                 { minSize: 100, allowNonImage: true }
             );
             expect(result).toBe(false);
@@ -164,7 +164,7 @@ describe("UploadHelper", () => {
 
         it("returns false if file is too big", () => {
             const result = UploadHelper.checkImageConstraints(
-                { IsImage: true, Size: 200, Width: 100, Height: 100 },
+                { IsImage: true, Size: 200, Width: 100, Height: 100, TemporaryFile: undefined },
                 { maxSize: 100, allowNonImage: true }
             );
             expect(result).toBe(false);
@@ -172,7 +172,7 @@ describe("UploadHelper", () => {
 
         it("returns false if width is too small", () => {
             const result = UploadHelper.checkImageConstraints(
-                { IsImage: true, Size: 100, Width: 50, Height: 100 },
+                { IsImage: true, Size: 100, Width: 50, Height: 100, TemporaryFile: undefined },
                 { minWidth: 100, allowNonImage: true }
             );
             expect(result).toBe(false);
@@ -180,7 +180,7 @@ describe("UploadHelper", () => {
 
         it("returns false if width is too big", () => {
             const result = UploadHelper.checkImageConstraints(
-                { IsImage: true, Size: 100, Width: 200, Height: 100 },
+                { IsImage: true, Size: 100, Width: 200, Height: 100, TemporaryFile: undefined },
                 { maxWidth: 100, allowNonImage: true }
             );
             expect(result).toBe(false);
@@ -188,7 +188,7 @@ describe("UploadHelper", () => {
 
         it("returns false if height is too small", () => {
             const result = UploadHelper.checkImageConstraints(
-                { IsImage: true, Size: 100, Width: 100, Height: 50 },
+                { IsImage: true, Size: 100, Width: 100, Height: 50, TemporaryFile: undefined },
                 { minHeight: 100, allowNonImage: true }
             );
             expect(result).toBe(false);
@@ -196,7 +196,7 @@ describe("UploadHelper", () => {
 
         it("returns false if height is too big", () => {
             const result = UploadHelper.checkImageConstraints(
-                { IsImage: true, Size: 100, Width: 100, Height: 200 },
+                { IsImage: true, Size: 100, Width: 100, Height: 200, TemporaryFile: undefined },
                 { maxHeight: 100, allowNonImage: true }
             );
             expect(result).toBe(false);
@@ -204,7 +204,7 @@ describe("UploadHelper", () => {
 
         it("returns true when all constraints pass", () => {
             const result = UploadHelper.checkImageConstraints(
-                { IsImage: true, Size: 100, Width: 100, Height: 100 },
+                { IsImage: true, Size: 100, Width: 100, Height: 100, TemporaryFile: undefined },
                 { minSize: 50, maxSize: 200, minWidth: 80, maxWidth: 120, minHeight: 80, maxHeight: 120, allowNonImage: true }
             );
             expect(result).toBe(true);
@@ -212,7 +212,7 @@ describe("UploadHelper", () => {
 
         it("skips image-specific checks when file is not an image", () => {
             const result = UploadHelper.checkImageConstraints(
-                { IsImage: false, Size: 100, Width: 10, Height: 10 },
+                { IsImage: false, Size: 100, Width: 10, Height: 10, TemporaryFile: undefined },
                 { minWidth: 100, allowNonImage: true }
             );
             expect(result).toBe(true);
@@ -553,7 +553,7 @@ describe("UploadHelper", () => {
     describe("checkImageConstraints edge cases", () => {
         it("handles minSize of 0 (no constraint)", () => {
             const result = UploadHelper.checkImageConstraints(
-                { IsImage: true, Size: 1, Width: 100, Height: 100 },
+                { IsImage: true, Size: 1, Width: 100, Height: 100, TemporaryFile: undefined },
                 { minSize: 0, allowNonImage: true }
             );
             expect(result).toBe(true);
@@ -561,7 +561,7 @@ describe("UploadHelper", () => {
 
         it("handles maxSize of 0 (no constraint)", () => {
             const result = UploadHelper.checkImageConstraints(
-                { IsImage: true, Size: 99999, Width: 100, Height: 100 },
+                { IsImage: true, Size: 99999, Width: 100, Height: 100, TemporaryFile: undefined },
                 { maxSize: 0, allowNonImage: true }
             );
             expect(result).toBe(true);
@@ -569,7 +569,7 @@ describe("UploadHelper", () => {
 
         it("handles minWidth of 0 (no constraint)", () => {
             const result = UploadHelper.checkImageConstraints(
-                { IsImage: true, Size: 100, Width: 0, Height: 100 },
+                { IsImage: true, Size: 100, Width: 0, Height: 100, TemporaryFile: undefined },
                 { minWidth: 0, allowNonImage: true }
             );
             expect(result).toBe(true);
@@ -577,7 +577,7 @@ describe("UploadHelper", () => {
 
         it("handles empty constraints object", () => {
             const result = UploadHelper.checkImageConstraints(
-                { IsImage: true, Size: 100, Width: 100, Height: 100 },
+                { IsImage: true, Size: 100, Width: 100, Height: 100, TemporaryFile: undefined },
                 {} as any
             );
             expect(result).toBe(true);

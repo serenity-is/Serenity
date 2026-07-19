@@ -192,8 +192,8 @@ describe("GridRadioSelectionMixin", () => {
 
             expect(column.id).toBe("__select__");
             expect(column.sortable).toBe(false);
-            expect(column.nameFormat).toBeDefined();
-            expect(column.nameFormat()).toBe("");
+            expect(typeof column.nameFormat).toBe("function");
+            expect((column.nameFormat as any)()).toBe("");
         });
 
         it("format returns empty string when mixin is null", () => {

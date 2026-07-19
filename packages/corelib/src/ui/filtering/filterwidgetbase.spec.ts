@@ -19,7 +19,7 @@ describe("FilterWidgetBase", () => {
         const store2 = new FilterStore([{ name: "Field1", title: "Field1" }]);
 
         const changedSpy = vi.fn();
-        widget.add_changed?.(changedSpy);
+        widget["add_changed"]?.(changedSpy);
 
         widget.set_store(store2);
         expect(widget.get_store()).toBe(store2);

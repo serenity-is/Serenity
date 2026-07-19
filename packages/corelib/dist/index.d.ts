@@ -6957,6 +6957,20 @@ export declare class EnumFiltering extends BaseEditorFiltering<EnumEditor> {
 export interface FilterFieldSelectOptions {
 	fields: PropertyItem[];
 }
+export declare class FilterFieldSelect<P extends FilterFieldSelectOptions = FilterFieldSelectOptions> extends ComboboxEditor<P, PropertyItem> {
+	static [Symbol.typeInfo]: ClassTypeInfo<"Serenity.">;
+	constructor(props: WidgetProps<P>);
+	emptyItemText(): string;
+	getComboboxOptions(): ComboboxOptions<any>;
+}
+export declare class FilterOperatorSelect extends ComboboxEditor<any, FilterOperator> {
+	static [Symbol.typeInfo]: ClassTypeInfo<"Serenity.">;
+	constructor(props: WidgetProps<{
+		source: FilterOperator[];
+	}>);
+	emptyItemText(): string;
+	getComboboxOptions(): ComboboxOptions<any>;
+}
 export declare class FilterPanel<P = {}> extends FilterWidgetBase<P> {
 	static [Symbol.typeInfo]: ClassTypeInfo<"Serenity.">;
 	private rowsDiv;
@@ -6974,7 +6988,8 @@ export declare class FilterPanel<P = {}> extends FilterWidgetBase<P> {
 	updateStoreOnReset: boolean;
 	protected renderContents(): any;
 	protected searchButtonClick(e: Event): void;
-	get_hasErrors(): boolean;
+	get hasErrors(): boolean;
+	protected get_hasErrors(): boolean;
 	search(): void;
 	protected addButtonClick(e: Event): void;
 	protected resetButtonClick(e: Event): void;
@@ -7339,8 +7354,8 @@ export declare namespace SubDialogHelper {
 	function cascadedDialogOffset(element: HTMLElement | ArrayLike<HTMLElement>): any;
 }
 export declare namespace TabsExtensions {
-	function setDisabled(tabs: ArrayLike<HTMLElement> | HTMLElement, tabKey: string, isDisabled: boolean): void;
-	function toggle(tabs: ArrayLike<HTMLElement> | HTMLElement, tabKey: string, visible: boolean): void;
+	function setDisabled(tabs: ArrayLike<HTMLElement> | HTMLElement, tabKey: string | number, isDisabled: boolean): void;
+	function toggle(tabs: ArrayLike<HTMLElement> | HTMLElement, tabKey: string | number, visible: boolean): void;
 	function activeTabKey(tabs: ArrayLike<HTMLElement> | HTMLElement): string;
 	function indexByKey(tabs: ArrayLike<HTMLElement> | HTMLElement): Record<string, number>;
 	function selectTab(tabs: HTMLElement | ArrayLike<HTMLElement>, tabKey: string | number): void;
