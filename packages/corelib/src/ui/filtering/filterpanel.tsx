@@ -14,7 +14,7 @@ export interface FilterFieldSelectOptions {
     fields: PropertyItem[];
 }
 
-class FilterFieldSelect<P extends FilterFieldSelectOptions = FilterFieldSelectOptions> extends ComboboxEditor<P, PropertyItem> {
+export class FilterFieldSelect<P extends FilterFieldSelectOptions = FilterFieldSelectOptions> extends ComboboxEditor<P, PropertyItem> {
     static override[Symbol.typeInfo] = this.registerClass(nsSerenity);
 
     constructor(props: WidgetProps<P>) {
@@ -40,7 +40,7 @@ class FilterFieldSelect<P extends FilterFieldSelectOptions = FilterFieldSelectOp
     }
 }
 
-class FilterOperatorSelect extends ComboboxEditor<any, FilterOperator> {
+export class FilterOperatorSelect extends ComboboxEditor<any, FilterOperator> {
     static override[Symbol.typeInfo] = this.registerClass(nsSerenity);
 
     constructor(props: WidgetProps<{ source: FilterOperator[] }>) {
@@ -179,8 +179,13 @@ export class FilterPanel<P = {}> extends FilterWidgetBase<P> {
         this.search();
     }
 
-    get_hasErrors(): boolean {
+    get hasErrors(): boolean {
         return !!this.rowsDiv.querySelector(":scope > div.v > span.error");
+    }
+
+    // for compat
+    protected get_hasErrors(): boolean {
+        return this.hasErrors;
     }
 
     search() {

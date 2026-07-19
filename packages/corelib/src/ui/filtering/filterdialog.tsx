@@ -38,7 +38,7 @@ export class FilterDialog<P = {}> extends BaseDialog<P> {
             okDialogButton({
                 click: (e) => {
                     this.filterPanel.search();
-                    if (this.filterPanel.get_hasErrors()) {
+                    if (this.filterPanel.hasErrors) {
                         e.preventDefault();
                         notifyError(FilterPanelTexts.FixErrorsMessage, '', null);
                         return;

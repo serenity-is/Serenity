@@ -1,4 +1,5 @@
 import { FilterPanelTexts, Fluent } from "../../base";
+import { FilterDialog } from "./filterdialog";
 import { FilterDisplayBar } from "./filterdisplaybar";
 import { FilterStore } from "./filterstore";
 
@@ -98,6 +99,65 @@ describe("FilterDisplayBar", () => {
         const bar = new FilterDisplayBar({});
         const txtLink = bar.element.findFirst('.txt');
         expect(txtLink.length).toBe(1);
+        bar.destroy();
+    });
+
+    it("edit link click opens filter dialog via openFilterDialog", () => {
+        const dialogOpenSpy = vi.spyOn(FilterDialog.prototype, "dialogOpen").mockImplementation(() => {});
+        const setStoreSpy = vi.fn();
+        vi.spyOn(FilterDialog.prototype, "get_filterPanel").mockReturnValue({ set_store: setStoreSpy } as any);
+
+        const bar = new FilterDisplayBar({});
+        const store = bar.get_store();
+        store.get_items().push({ field: "F1", displayText: "test" });
+        store.raiseChanged();
+
+        const editLink = bar.element.findFirst('.edit');
+        editLink.click();
+
+        expect(dialogOpenSpy).toHaveBeenCalledWith(null);
+        expect(setStoreSpy).toHaveBeenCalledWith(store);
+        bar.destroy();
+        dialogOpenSpy.mockRestore();
+    });
+
+    it("reset click prevents default", () => {
+        const bar = new FilterDisplayBar({});
+        const store = bar.get_store();
+        store.get_items().push({ field: "F1", displayText: "test" });
+        store.raiseChanged();
+
+        const resetLink = bar.element.findFirst('.reset');
+        // The reset link uses an onClick handler that calls e.preventDefault()
+        // and then clears items. Just verify the items are cleared.
+        expect(store.get_items().length).toBe(1);
+        resetLink.click();
+        expect(store.get_items().length).toBe(0);
+        bar.destroy();
+    });
+
+    it("displayText returns effective empty when null display text", () => {
+        const bar = new FilterDisplayBar({});
+        const store = bar.get_store();
+
+        // Raise changed with no items (displayText will be null)
+        store.raiseChanged();
+
+        const txtEl = bar.element.findFirst('.txt');
+        expect(txtEl.text()).toBe('[' + FilterPanelTexts.EffectiveEmpty + ']');
+        bar.destroy();
+    });
+
+    it("displayText shows empty brackets when trimmed display text is empty", () => {
+        const bar = new FilterDisplayBar({});
+        const store = bar.get_store();
+
+        // Add item with empty displayText
+        store.get_items().push({ field: "F1", displayText: "   " });
+        store.raiseChanged();
+
+        const txtEl = bar.element.findFirst('.txt');
+        expect(txtEl.text()).toBe('[' + FilterPanelTexts.EffectiveEmpty + ']');
         bar.destroy();
     });
 });

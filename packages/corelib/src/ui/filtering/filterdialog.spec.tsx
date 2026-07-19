@@ -62,6 +62,21 @@ describe("FilterDialog", () => {
         dialog.destroy();
     });
 
+    it("ok button click handler prevents default when hasErrors", () => {
+        const dialog = new FilterDialog({});
+        const buttons = (dialog as any).getDialogButtons();
+        const okButton = buttons[0];
+        const panel = dialog.get_filterPanel();
+
+        // Mock hasErrors to return true
+        vi.spyOn(panel, "hasErrors", "get").mockReturnValue(true);
+
+        const e = { preventDefault: vi.fn() };
+        okButton.click(e);
+        expect(e.preventDefault).toHaveBeenCalled();
+        dialog.destroy();
+    });
+
     it("cancel button is defined", () => {
         const dialog = new FilterDialog({});
         const buttons = (dialog as any).getDialogButtons();
@@ -87,6 +102,45 @@ describe("FilterDialog", () => {
         const dialog = new FilterDialog({});
         const options = (dialog as any).getDialogOptions();
         expect(options.fullScreen).toBe("lg-down");
+        dialog.destroy();
+    });
+
+    it("hasErrors returns true when error span exists as direct child of rowsDiv with class v", () => {
+        const dialog = new FilterDialog({});
+        const panel = dialog.get_filterPanel();
+
+        // Initially no errors
+        expect(panel.hasErrors).toBe(false);
+
+        // Add a div.v with span.error as direct child of rowsDiv (matching :scope > div.v > span.error)
+        const divV = document.createElement("div");
+        divV.className = "v";
+        const err = document.createElement("span");
+        err.className = "error";
+        divV.appendChild(err);
+        (panel as any).rowsDiv.appendChild(divV);
+
+        expect(panel.hasErrors).toBe(true);
+        dialog.destroy();
+    });
+
+    it("hasErrors returns false when error is inside a non-v child", () => {
+        const dialog = new FilterDialog({});
+        const panel = dialog.get_filterPanel();
+
+        // Add error inside a filter-line structure (not matching :scope > div.v)
+        const row = document.createElement("div");
+        row.className = "filter-line";
+        const divV = document.createElement("div");
+        divV.className = "v";
+        const err = document.createElement("span");
+        err.className = "error";
+        divV.appendChild(err);
+        row.appendChild(divV);
+        (panel as any).rowsDiv.appendChild(row);
+
+        // This returns false because :scope > div.v doesn't match nested div.v
+        expect(panel.hasErrors).toBe(false);
         dialog.destroy();
     });
 });
