@@ -413,7 +413,7 @@ describe("EntityLocalizer", () => {
             const localizer = new EntityLocalizer(opt);
             localizer["lastValue"] = null;
             const gridLoadSpy = vi.fn();
-            localizer["grid"] = { load: gridLoadSpy, save: vi.fn(), destroy: vi.fn() } as any;
+            localizer["grid"] = { load: gridLoadSpy, save: vi.fn(), destroy: vi.fn(), enumerateItems: vi.fn() } as any;
             await (localizer as any).loadLocalization();
             expect(retrieveLocs).toHaveBeenCalled();
             expect(gridLoadSpy).toHaveBeenCalled();
