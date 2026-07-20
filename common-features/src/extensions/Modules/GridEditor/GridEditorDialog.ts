@@ -7,10 +7,10 @@ export abstract class GridEditorDialog<TEntity, P = {}> extends EntityDialog<TEn
     protected override getIdProperty() { return this.getRowDefinition()?.idProperty ?? "__id"; }
 
     public onSave: (options: ServiceOptions<SaveResponse>,
-        callback: (response: SaveResponse) => void, initiator: SaveInitiator) => void;
+        callback: (response: SaveResponse) => void, initiator: SaveInitiator) => PromiseLike<SaveResponse>;
 
     public onDelete: (options: ServiceOptions<DeleteResponse>,
-        callback: (response: DeleteResponse) => void) => void;
+        callback: (response: DeleteResponse) => void) => PromiseLike<DeleteResponse>;
 
     override destroy() {
         this.onSave = null;
@@ -26,12 +26,12 @@ export abstract class GridEditorDialog<TEntity, P = {}> extends EntityDialog<TEn
     }
 
     protected override saveHandler(options: ServiceOptions<SaveResponse>,
-        callback: (response: SaveResponse) => void, initiator: SaveInitiator): void {
-        this.onSave?.(options, callback, initiator);
+        callback: (response: SaveResponse) => void, initiator: SaveInitiator): PromiseLike<SaveResponse> {
+        return this.onSave?.(options, callback, initiator);
     }
 
     protected override deleteHandler(options: ServiceOptions<DeleteResponse>,
-        callback: (response: DeleteResponse) => void): void {
-        this.onDelete?.(options, callback);
+        callback: (response: DeleteResponse) => void): PromiseLike<DeleteResponse> {
+        return this.onDelete?.(options, callback);
     }
 }

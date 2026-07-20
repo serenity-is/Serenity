@@ -515,12 +515,12 @@ export declare class SingleLineTextFormatter implements Formatter {
 export declare abstract class GridEditorDialog<TEntity, P = {}> extends EntityDialog<TEntity, P> {
 	static [Symbol.typeInfo]: import("@serenity-is/corelib").ClassTypeInfo<"Serenity.Extensions.">;
 	protected getIdProperty(): string;
-	onSave: (options: ServiceOptions<SaveResponse>, callback: (response: SaveResponse) => void, initiator: SaveInitiator) => void;
-	onDelete: (options: ServiceOptions<DeleteResponse>, callback: (response: DeleteResponse) => void) => void;
+	onSave: (options: ServiceOptions<SaveResponse>, callback: (response: SaveResponse) => void, initiator: SaveInitiator) => PromiseLike<SaveResponse>;
+	onDelete: (options: ServiceOptions<DeleteResponse>, callback: (response: DeleteResponse) => void) => PromiseLike<DeleteResponse>;
 	destroy(): void;
 	protected updateInterface(): void;
-	protected saveHandler(options: ServiceOptions<SaveResponse>, callback: (response: SaveResponse) => void, initiator: SaveInitiator): void;
-	protected deleteHandler(options: ServiceOptions<DeleteResponse>, callback: (response: DeleteResponse) => void): void;
+	protected saveHandler(options: ServiceOptions<SaveResponse>, callback: (response: SaveResponse) => void, initiator: SaveInitiator): PromiseLike<SaveResponse>;
+	protected deleteHandler(options: ServiceOptions<DeleteResponse>, callback: (response: DeleteResponse) => void): PromiseLike<DeleteResponse>;
 }
 export declare abstract class GridEditorBase<TEntity, P = {}> extends EntityGrid<TEntity, P> implements IGetEditValue, ISetEditValue {
 	static [Symbol.typeInfo]: import("@serenity-is/corelib").EditorTypeInfo<"Serenity.Extensions.">;
@@ -559,7 +559,7 @@ export declare abstract class GridEditorBase<TEntity, P = {}> extends EntityGrid
 	 * @param callback An optional callback to call after the entity is saved, usually same with the opt.onSuccess
 	 * Note that this is not called in connected mode to avoid double execution.
 	 */
-	protected save(opt: ServiceOptions<any>, callback?: (r: ServiceResponse) => void): Promise<SaveResponse>;
+	protected save(opt: ServiceOptions<any>, callback?: (r: ServiceResponse) => void, initiator?: SaveInitiator): Promise<SaveResponse>;
 	protected getCreateServiceMethod(): string;
 	protected getDeleteServiceMethod(): string;
 	protected getUpdateServiceMethod(): string;
@@ -569,7 +569,7 @@ export declare abstract class GridEditorBase<TEntity, P = {}> extends EntityGrid
 	 * @param callback An optional callback to call after the entity is deleted, usually same with the opt.onSuccess
 	 * Note that this is not called in connected mode to avoid double execution.
 	 */
-	protected delete(opt: ServiceOptions<any>, callback?: (r: ServiceResponse) => void): Promise<void>;
+	protected delete(opt: ServiceOptions<any>, callback?: (r: ServiceResponse) => void): Promise<DeleteResponse>;
 	/**
 	 * Deletes the entity locally with the given id. If connected mode is on, this does nothing and returns true.
 	 */

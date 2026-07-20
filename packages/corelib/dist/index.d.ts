@@ -3683,7 +3683,7 @@ export declare abstract class IEditDialog {
 	static [Symbol.typeInfo]: InterfaceTypeInfo<"Serenity.">;
 }
 export interface IEditDialog {
-	load(entityOrId: any, done: () => void, fail?: (p1: any) => void): void;
+	load(entityOrId: any, done: () => void, fail?: (p1: any) => void): PromiseLike<RetrieveResponse<any>>;
 }
 export declare abstract class IGetEditValue {
 	static [Symbol.typeInfo]: InterfaceTypeInfo<"Serenity.">;
@@ -5891,10 +5891,11 @@ export declare class EntityDialog<TItem, P = {}> extends BaseDialog<P> implement
 	protected isDeleted(): boolean;
 	protected isNew(): boolean;
 	protected isNewOrDeleted(): boolean;
+	protected getDeleteRequest(): DeleteRequest;
 	protected getDeleteOptions(callback: (response: DeleteResponse) => void): ServiceOptions<DeleteResponse>;
-	protected deleteHandler(options: ServiceOptions<DeleteResponse>, callback: (response: DeleteResponse) => void): void;
+	protected deleteHandler(options: ServiceOptions<DeleteResponse>, callback: (response: DeleteResponse) => void): PromiseLike<DeleteResponse>;
 	protected getDeleteServiceMethod(): string;
-	protected doDelete(callback: (response: DeleteResponse) => void): void;
+	protected doDelete(callback: (response: DeleteResponse) => void): PromiseLike<DeleteResponse>;
 	protected onDeleteSuccess(response: DeleteResponse): void;
 	protected getRowDefinition(): IRowDefinition;
 	private _entityType;
@@ -5915,21 +5916,21 @@ export declare class EntityDialog<TItem, P = {}> extends BaseDialog<P> implement
 	protected getIsDeletedProperty(): string;
 	private _service;
 	protected getService(): string;
-	load(entityOrId: any, done: () => void, fail?: (ex: any) => void): void;
+	load(entityOrId: any, done: () => void, fail?: (ex: any) => void): PromiseLike<RetrieveResponse<TItem>>;
 	loadNewAndOpenDialog(asPanel?: boolean): void;
 	loadEntityAndOpenDialog(entity: TItem, asPanel?: boolean): void;
 	protected loadResponse(data: any): void;
 	protected loadEntity(entity: TItem): void;
 	protected beforeLoadEntity(entity: TItem): void;
 	protected afterLoadEntity(): void;
-	loadByIdAndOpenDialog(entityId: any, asPanel?: boolean, callback?: (response: RetrieveResponse<TItem>) => void, fail?: () => void): void;
+	loadByIdAndOpenDialog(entityId: any, asPanel?: boolean, callback?: (response: RetrieveResponse<TItem>) => void, fail?: () => void): PromiseLike<RetrieveResponse<TItem>>;
 	protected onLoadingData(data: RetrieveResponse<TItem>): void;
 	protected getLoadByIdOptions(id: any, callback: (response: RetrieveResponse<TItem>) => void): ServiceOptions<RetrieveResponse<TItem>>;
 	protected getLoadByIdRequest(id: any): RetrieveRequest;
 	protected reloadById(): void;
 	protected getRetrieveServiceMethod(): string;
-	loadById(id: any, callback?: (response: RetrieveResponse<TItem>) => void, fail?: () => void): void;
-	protected loadByIdHandler(options: ServiceOptions<RetrieveResponse<TItem>>, callback: (response: RetrieveResponse<TItem>) => void, fail: () => void): void;
+	loadById(id: any, callback?: (response: RetrieveResponse<TItem>) => void, fail?: () => void): PromiseLike<RetrieveResponse<TItem>>;
+	protected loadByIdHandler(options: ServiceOptions<RetrieveResponse<TItem>>, callback: (response: RetrieveResponse<TItem>) => void, fail: () => void): PromiseLike<RetrieveResponse<TItem>>;
 	protected retrieveLocalizations(): Promise<Record<string, Partial<TItem>>>;
 	protected getLocalizerOptions(): EntityLocalizerOptions;
 	protected initLocalizer(): void;
@@ -5947,17 +5948,18 @@ export declare class EntityDialog<TItem, P = {}> extends BaseDialog<P> implement
 	protected getSaveEntity(): TItem;
 	protected getSaveRequest(): SaveRequest<TItem>;
 	protected onSaveSuccess(response: SaveResponse, initiator?: SaveInitiator): void;
-	protected save_submitHandler(callback: (response: SaveResponse) => void, initiator: SaveInitiator): void;
-	protected save(callback?: (response: SaveResponse) => void, initiator?: SaveInitiator): void | boolean;
-	protected saveHandler(options: ServiceOptions<SaveResponse>, callback: (response: SaveResponse) => void, initiator: SaveInitiator): void;
+	protected save_submitHandler(callback: (response: SaveResponse) => void, initiator: SaveInitiator): PromiseLike<SaveResponse>;
+	protected save(callback?: (response: SaveResponse) => void, initiator?: SaveInitiator): PromiseLike<SaveResponse> | false;
+	protected saveHandler(options: ServiceOptions<SaveResponse>, callback: (response: SaveResponse) => void, initiator: SaveInitiator): PromiseLike<SaveResponse>;
 	protected showSaveSuccessMessage(response: SaveResponse, initiator?: SaveInitiator): void;
 	protected getToolbarButtons(): ToolButton[];
 	protected getCloningEntity(): TItem;
 	protected updateInterface(): void;
+	protected getUndeleteRequest(): UndeleteRequest;
 	protected getUndeleteOptions(callback?: (response: UndeleteResponse) => void): ServiceOptions<UndeleteResponse>;
-	protected undeleteHandler(options: ServiceOptions<UndeleteResponse>, callback: (response: UndeleteResponse) => void): void;
+	protected undeleteHandler(options: ServiceOptions<UndeleteResponse>, callback?: (response: UndeleteResponse) => void): PromiseLike<UndeleteResponse>;
 	protected getUndeleteServiceMethod(): string;
-	protected undelete(callback?: (response: UndeleteResponse) => void): void;
+	protected undelete(callback?: (response: UndeleteResponse) => void): void | PromiseLike<UndeleteResponse>;
 	private _readonly;
 	get readOnly(): boolean;
 	set readOnly(value: boolean);

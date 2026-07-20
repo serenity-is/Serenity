@@ -1,4 +1,4 @@
-import { DataChangeInfo, DialogType, EditorProps, EntityGrid, Fluent, IGetEditValue, ISetEditValue, PropertyItem, SaveRequest, ServiceOptions, ServiceResponse, ToolButton, deepClone, getInstanceType, getTypeFullName, indexOf, serviceCall, type SaveResponse } from "@serenity-is/corelib";
+import { DataChangeInfo, DeleteResponse, DialogType, EditorProps, EntityGrid, Fluent, IGetEditValue, ISetEditValue, PropertyItem, SaveInitiator, SaveRequest, ServiceOptions, ServiceResponse, ToolButton, deepClone, getInstanceType, getTypeFullName, indexOf, serviceCall, type SaveResponse } from "@serenity-is/corelib";
 import { nsExtensions } from "../ServerTypes/Namespaces";
 import { GridEditorDialog } from "./GridEditorDialog";
 import { bindThis } from "@serenity-is/domwise";
@@ -61,11 +61,12 @@ export abstract class GridEditorBase<TEntity, P = {}> extends EntityGrid<TEntity
      * @param callback An optional callback to call after the entity is saved, usually same with the opt.onSuccess
      * Note that this is not called in connected mode to avoid double execution.
      */
-    protected async save(opt: ServiceOptions<any>, callback?: (r: ServiceResponse) => void): Promise<SaveResponse> {
+    protected async save(opt: ServiceOptions<any>, callback?: (r: ServiceResponse) => void, initiator?: SaveInitiator): Promise<SaveResponse> {
         const request = opt.request as SaveRequest<TEntity>;
         let id = request.EntityId ?? this.itemId(request.Entity);
         let row = request.Entity;
 
+        let response: SaveResponse;
         if (this.connectedMode) {
             if (id != null) {
                 const existing = this.view.getItemById(id);
@@ -81,7 +82,7 @@ export abstract class GridEditorBase<TEntity, P = {}> extends EntityGrid<TEntity
             if (opt.service === void 0 && opt.url === void 0)
                 opt.service = id == null ? this.getCreateServiceMethod() : this.getUpdateServiceMethod();
 
-            const response = await serviceCall(opt);
+            response = await serviceCall<SaveResponse>(opt);
             id = response?.EntityId ?? id;
         }
         else {
@@ -110,6 +111,7 @@ export abstract class GridEditorBase<TEntity, P = {}> extends EntityGrid<TEntity
                 items[index] = row;
             }
 
+            response = { EntityId: id };
             callback?.({});
             this.view.setItems(items, true);
         }
@@ -120,9 +122,7 @@ export abstract class GridEditorBase<TEntity, P = {}> extends EntityGrid<TEntity
             entity: row
         } satisfies Partial<DataChangeInfo>);
 
-        return {
-            EntityId: id,
-        } satisfies SaveResponse;
+        return response;
     }
 
     protected getCreateServiceMethod() {
@@ -143,21 +143,23 @@ export abstract class GridEditorBase<TEntity, P = {}> extends EntityGrid<TEntity
      * @param callback An optional callback to call after the entity is deleted, usually same with the opt.onSuccess
      * Note that this is not called in connected mode to avoid double execution.
      */
-    protected async delete(opt: ServiceOptions<any>, callback?: (r: ServiceResponse) => void): Promise<void> {
+    protected async delete(opt: ServiceOptions<any>, callback?: (r: ServiceResponse) => void): Promise<DeleteResponse> {
         const id = opt?.request?.EntityId;
         const row = this.view.getItemById(id);
 
         if (!(await this.deleteEntity(id)))
             return;
 
+        let response: DeleteResponse;
         if (this.connectedMode) {
             if (opt.service === void 0 && opt.url === void 0)
                 opt.service = this.getDeleteServiceMethod();
 
-            await serviceCall(opt);
+            response = await serviceCall<DeleteResponse>(opt);
         }
         else {
             callback?.({});
+            response = { } as DeleteResponse;
         }
 
         this.element.trigger("change", { 
@@ -165,6 +167,8 @@ export abstract class GridEditorBase<TEntity, P = {}> extends EntityGrid<TEntity
             entityId: id,
             entity: row
         } satisfies Partial<DataChangeInfo>);
+
+        return response;
     }
 
     /**
@@ -200,7 +204,7 @@ export abstract class GridEditorBase<TEntity, P = {}> extends EntityGrid<TEntity
                 this.createEntityDialog(this.getItemType(), dlg => {
                     const dialog = this.checkDialogType(dlg);
                     this.transferDialogReadOnly(dialog);
-                    dialog.onSave = (opt, callback, initiator) => this.save(opt, callback);
+                    dialog.onSave = (opt, callback, initiator) => this.save(opt, callback, initiator);
                     dialog.loadEntityAndOpenDialog(this.getNewEntity());
                 });
             }

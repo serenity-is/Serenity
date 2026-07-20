@@ -135,24 +135,15 @@ export class EntityDialog<TItem, P = {}> extends BaseDialog<P> implements IEditD
         return this.isNew() || this.isDeleted();
     }
 
-    protected getDeleteOptions(callback: (response: DeleteResponse) => void): ServiceOptions<DeleteResponse> {
-        return {};
-    }
-
-    protected deleteHandler(options: ServiceOptions<DeleteResponse>, callback: (response: DeleteResponse) => void): void {
-        serviceCall(options);
-    }
-
-    protected getDeleteServiceMethod() {
-        return this.getService() + '/Delete';
-    }
-
-    protected doDelete(callback: (response: DeleteResponse) => void): void {
-        const request: DeleteRequest = {
+    protected getDeleteRequest(): DeleteRequest {
+        return {
             EntityId: this.entityId
         };
+    }
 
-        const options: ServiceOptions<DeleteResponse> = Object.assign({
+    protected getDeleteOptions(callback: (response: DeleteResponse) => void): ServiceOptions<DeleteResponse> {
+        const request = this.getDeleteRequest();
+        return {
             service: this.getDeleteServiceMethod(),
             request: request,
             onSuccess: response => {
@@ -164,9 +155,20 @@ export class EntityDialog<TItem, P = {}> extends BaseDialog<P> implements IEditD
                     operationType: 'delete'
                 } satisfies Partial<DataChangeInfo>);
             }
-        } satisfies ServiceOptions<DeleteResponse>, this.getDeleteOptions(callback));
+        }
+    }
 
-        this.deleteHandler(options, callback);
+    protected deleteHandler(options: ServiceOptions<DeleteResponse>, callback: (response: DeleteResponse) => void): PromiseLike<DeleteResponse> {
+        return serviceCall(options);
+    }
+
+    protected getDeleteServiceMethod() {
+        return this.getService() + '/Delete';
+    }
+
+    protected doDelete(callback: (response: DeleteResponse) => void): PromiseLike<DeleteResponse> {
+        const options = this.getDeleteOptions(callback);
+        return this.deleteHandler(options, callback);
     }
 
     protected onDeleteSuccess(response: DeleteResponse): void {
@@ -285,38 +287,38 @@ export class EntityDialog<TItem, P = {}> extends BaseDialog<P> implements IEditD
         return this._service = replaceAll(this.getEntityType(), '.', '/');
     }
 
-    load(entityOrId: any, done: () => void, fail?: (ex: any) => void): void {
+    load(entityOrId: any, done: () => void, fail?: (ex: any) => void): PromiseLike<RetrieveResponse<TItem>> {
 
         const action = () => {
 
             if (entityOrId == null) {
                 this.loadResponse({});
                 done?.();
-                return;
+                return Promise.resolve<RetrieveResponse<TItem>>(null);
             }
 
             const scriptType = typeof (entityOrId);
             if (scriptType === 'string' || scriptType === 'number') {
-                this.loadById(entityOrId, () => {
-                    done && window.setTimeout(done, 0);
+                return this.loadById(entityOrId, () => {
+                    done?.();
                 }, null);
-                return;
             }
 
             this.loadResponse({ Entity: entityOrId || new Object() });
-            done && done();
+            done?.();
+            return Promise.resolve<RetrieveResponse<TItem>>(null);
         };
 
         if (fail == null) {
-            action();
-            return;
+            return action();
         }
 
         try {
-            action();
+            return action();
         }
         catch (ex1) {
             fail(ex1);
+            return Promise.reject(ex1);
         }
     }
 
@@ -360,12 +362,12 @@ export class EntityDialog<TItem, P = {}> extends BaseDialog<P> implements IEditD
         this.updateTitle();
     }
 
-    public loadByIdAndOpenDialog(entityId: any, asPanel?: boolean, callback?: (response: RetrieveResponse<TItem>) => void, fail?: () => void): void {
-        this.loadById(entityId,
-            response => window.setTimeout(() => {
+    public loadByIdAndOpenDialog(entityId: any, asPanel?: boolean, callback?: (response: RetrieveResponse<TItem>) => void, fail?: () => void): PromiseLike<RetrieveResponse<TItem>> {
+        return this.loadById(entityId,
+            response => {
                 this.dialogOpen(asPanel);
                 callback?.(response);
-            }, 0),
+            },
             () => {
                 if (!Fluent.isVisibleLike(this.domNode)) {
                     this.domNode.remove();
@@ -404,13 +406,14 @@ export class EntityDialog<TItem, P = {}> extends BaseDialog<P> implements IEditD
         return this.getService() + '/Retrieve';
     }
 
-    loadById(id: any, callback?: (response: RetrieveResponse<TItem>) => void, fail?: () => void) {
-        this.loadByIdHandler(this.getLoadByIdOptions(id, callback), callback, fail);
+    loadById(id: any, callback?: (response: RetrieveResponse<TItem>) => void, fail?: () => void): PromiseLike<RetrieveResponse<TItem>> {
+        return this.loadByIdHandler(this.getLoadByIdOptions(id, callback), callback, fail);
     }
 
-    protected loadByIdHandler(options: ServiceOptions<RetrieveResponse<TItem>>, callback: (response: RetrieveResponse<TItem>) => void, fail: () => void): void {
-        const request = serviceCall(options);
-        fail && ((request as any)?.fail ? (request as any).fail(fail) : request.then(null, fail));
+    protected loadByIdHandler(options: ServiceOptions<RetrieveResponse<TItem>>, callback: (response: RetrieveResponse<TItem>) => void, fail: () => void): PromiseLike<RetrieveResponse<TItem>> {
+        const response = serviceCall<RetrieveResponse<TItem>>(options);
+        fail && ((response as any)?.fail ? (response as any).fail(fail) : response.then(null, fail));
+        return response;
     }
 
     protected async retrieveLocalizations(): Promise<Record<string, Partial<TItem>>> {
@@ -559,19 +562,19 @@ export class EntityDialog<TItem, P = {}> extends BaseDialog<P> implements IEditD
         initiator !== "save-and-close" && this.showSaveSuccessMessage(response, initiator);
     }
 
-    protected save_submitHandler(callback: (response: SaveResponse) => void, initiator: SaveInitiator): void {
+    protected save_submitHandler(callback: (response: SaveResponse) => void, initiator: SaveInitiator): PromiseLike<SaveResponse> {
         const options = this.getSaveOptions(callback, initiator);
-        this.saveHandler(options, callback, initiator);
+        return this.saveHandler(options, callback, initiator);
     }
 
-    protected save(callback?: (response: SaveResponse) => void, initiator?: SaveInitiator): void | boolean {
-        return ValidationHelper.submit(this.byId('Form'),
-            () => this.validateBeforeSave(),
-            () => this.save_submitHandler(callback, initiator));
+    protected save(callback?: (response: SaveResponse) => void, initiator?: SaveInitiator): PromiseLike<SaveResponse> | false {
+        if (!ValidationHelper.submit(this.byId('Form'), () => this.validateBeforeSave(), null))
+            return false;
+        return this.save_submitHandler(callback, initiator);
     }
 
-    protected saveHandler(options: ServiceOptions<SaveResponse>, callback: (response: SaveResponse) => void, initiator: SaveInitiator): void {
-        serviceCall(options);
+    protected saveHandler(options: ServiceOptions<SaveResponse>, callback: (response: SaveResponse) => void, initiator: SaveInitiator): PromiseLike<SaveResponse> {
+        return serviceCall(options);
     }
 
     protected showSaveSuccessMessage(response: SaveResponse, initiator?: SaveInitiator): void {
@@ -675,21 +678,14 @@ export class EntityDialog<TItem, P = {}> extends BaseDialog<P> implements IEditD
             EditorUtils.setContainerReadOnly(this.byId("Form"), true);
     }
 
+    protected getUndeleteRequest(): UndeleteRequest {
+        return { EntityId: this.entityId };
+    }
+
     protected getUndeleteOptions(callback?: (response: UndeleteResponse) => void): ServiceOptions<UndeleteResponse> {
-        return {}
-    }
+        const request = this.getUndeleteRequest();
 
-    protected undeleteHandler(options: ServiceOptions<UndeleteResponse>, callback: (response: UndeleteResponse) => void): void {
-        serviceCall(options);
-    }
-
-    protected getUndeleteServiceMethod() {
-        return this.getService() + '/Undelete';
-    }
-
-    protected undelete(callback?: (response: UndeleteResponse) => void): void {
-        const request: UndeleteRequest = { EntityId: this.entityId };
-        const options: ServiceOptions<UndeleteResponse> = Object.assign({
+        return {
             service: this.getUndeleteServiceMethod(),
             request,
             onSuccess: response => {
@@ -700,9 +696,20 @@ export class EntityDialog<TItem, P = {}> extends BaseDialog<P> implements IEditD
                     operationType: 'undelete'
                 });
             }
-        } satisfies ServiceOptions<UndeleteResponse>, this.getUndeleteOptions(callback));
+        }
+    }
 
-        this.undeleteHandler(options, callback);
+    protected undeleteHandler(options: ServiceOptions<UndeleteResponse>, callback?: (response: UndeleteResponse) => void): PromiseLike<UndeleteResponse> {
+        return serviceCall(options);
+    }
+
+    protected getUndeleteServiceMethod() {
+        return this.getService() + '/Undelete';
+    }
+
+    protected undelete(callback?: (response: UndeleteResponse) => void): void | PromiseLike<UndeleteResponse> {
+        const options = this.getUndeleteOptions(callback);
+        return this.undeleteHandler(options, callback);
     }
 
     declare private _readonly: boolean;
