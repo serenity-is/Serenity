@@ -80,9 +80,16 @@ export function assignProp(node: JSXElement, key: string, value: any, prev?: any
                 return;
             }
             else if (node instanceof window.HTMLSelectElement) {
+                if (node.multiple && Array.isArray(value)) {
+                    const values = value.map(v => String(v));
+                    node.querySelectorAll("option")
+                        .forEach(option => (option.selected = values.includes(option.value)));
+                    return;
+                }
+                node.value = value;
                 return;
             } else if (node instanceof window.HTMLTextAreaElement) {
-                node.value = value
+                node.value = value;
                 return;
             }
             // use attribute for other elements
@@ -93,7 +100,7 @@ export function assignProp(node: JSXElement, key: string, value: any, prev?: any
             return;
 
         case "spellcheck":
-            (node as HTMLInputElement).spellcheck = value === "" || value === true || value === "true" ? true : (value === false || value === "false") ? false : value;
+            (node as HTMLElement).spellcheck = value === "" || value === true || value === "true" ? true : (value === false || value === "false") ? false : value;
             return;
 
         case "draggable":
@@ -229,7 +236,7 @@ export function assignProp(node: JSXElement, key: string, value: any, prev?: any
         }
 
         if (node instanceof SVGElement && !nonPresentationSVGAttributes.test(key)) {
-            node.removeAttributeNS(normalizeAttribute(key, "-"), value);
+            node.removeAttribute(normalizeAttribute(key, "-"));
         } else {
             node.removeAttribute(key);
         }

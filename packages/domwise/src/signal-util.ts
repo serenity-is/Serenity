@@ -227,13 +227,16 @@ export function derivedSignal<TDerived, TInput = any>(input: SignalLike<TInput>,
         }
         primitive.update();
     });
+    if (!primitive) {
+        primitive = new PrimitiveComputed<TDerived>(callback);
+    }
     if (disposer) {
         (primitive as DerivedSignalLike<TDerived>).derivedDisposer = function () {
             disposer();
             delete (primitive as any).derivedDisposer;
         }
     }
-    return primitive!;
+    return primitive;
 }
 
 export class PrimitiveComputed<T> {

@@ -6,7 +6,7 @@ export function Show<TWhen>(props: {
     fallback?: ComponentChildren | ((when: SignalOrValue<TWhen | undefined | null>) => ComponentChildren);
     children: ComponentChildren | ((when: SignalOrValue<TWhen | undefined | null>) => ComponentChildren);
 }): JSXElement {
-    function getContent(flag: boolean): JSXElement {
+    function getContent(flag: any): JSXElement {
         let content = flag ? props.children : props.fallback;
         if (typeof content === "function")
             content = content(props.when);
@@ -17,7 +17,8 @@ export function Show<TWhen>(props: {
     if (isSignalLike(props.when)) {
         const sig = derivedSignal<JSXElement>(props.when, getContent);
         observeSignal(sig, function(args) {
-            args.lifecycleNode = args.newValue;
+            if (args.newValue instanceof EventTarget)
+                args.lifecycleNode = args.newValue;
         });
         return sig as unknown as JSXElement;
     }

@@ -232,6 +232,26 @@ describe("createDerivedSignal", () => {
         expect(derived).toBeInstanceOf(MockSignal);
         expect(derived.value).toBe(20);
     });
+
+    it("should handle subscribe that does not call back synchronously", () => {
+        // A signal-like without a special constructor (constructor === {}.constructor)
+        // that does NOT call subscribe callback synchronously
+        const original = {
+            _value: 42,
+            peek: () => original._value,
+            subscribe: vi.fn((callback: (v: number) => void) => {
+                // NOT calling callback synchronously
+                return () => {};
+            }),
+            get value() { return original._value; },
+        };
+        expect(original.constructor).toBe({}.constructor);
+
+        const derived = derivedSignal(original, v => v * 2);
+        // Should still produce a valid derived signal with the initial value
+        expect(derived).toBeDefined();
+        expect(derived.value).toBe(84);
+    });
 });
 
 describe("PrimitiveComputed", () => {

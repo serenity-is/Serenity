@@ -108,9 +108,19 @@ describe("assignProps", () => {
 
     it("handles value property on select elements", () => {
         const select = document.createElement("select");
-        // Select elements should not set value directly
-        assignProps(select, { value: "option1" });
-        expect(select.value).toBe(""); // Should remain unchanged
+        select.innerHTML = '<option value="opt1"></option><option value="opt2"></option>';
+        assignProps(select, { value: "opt2" });
+        expect(select.value).toBe("opt2");
+    });
+
+    it("updates select value reactively via signal", () => {
+        const select = document.createElement("select");
+        select.innerHTML = '<option value="a"></option><option value="b"></option><option value="c"></option>';
+        const sig = signal("a");
+        assignProps(select, { value: sig });
+        expect(select.value).toBe("a");
+        sig.value = "c";
+        expect(select.value).toBe("c");
     });
 
     it("handles spellcheck property", () => {
@@ -445,9 +455,9 @@ describe("assignProp", () => {
 
     it("handles value property on select elements", () => {
         const select = document.createElement("select");
-        // Select elements should not set value directly
-        assignProp(select, "value", "option1");
-        expect(select.value).toBe(""); // Should remain unchanged
+        select.innerHTML = '<option value="opt1"></option><option value="opt2"></option>';
+        assignProp(select, "value", "opt2");
+        expect(select.value).toBe("opt2");
     });
 
     it("handles spellcheck property", () => {

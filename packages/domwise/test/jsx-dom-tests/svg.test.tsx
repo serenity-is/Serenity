@@ -1,3 +1,4 @@
+import { assignProp } from "../../src/jsx-assign-props"
 import { SVGNamespace } from "../../src/svg-consts"
 
 describe("SVG", () => {
@@ -117,6 +118,24 @@ describe("SVG", () => {
             expect(el.hasAttribute(attr)).to.be.true
         }
     })
+
+    it("removes previous presentation attribute values on re-assignment", () => {
+        const svg = document.createElementNS("http://www.w3.org/2000/svg", "path");
+        assignProp(svg, "fill", "red");
+        expect(svg.getAttribute("fill")).to.equal("red");
+        // Re-assign with a previous value — the old value should be removed
+        assignProp(svg, "fill", "blue", "red");
+        expect(svg.getAttribute("fill")).to.equal("blue");
+        expect(svg.getAttribute("fill")).not.to.equal("red");
+    });
+
+    it("removes previous non-presentation SVG attributes on re-assignment", () => {
+        const svg = document.createElementNS("http://www.w3.org/2000/svg", "path");
+        assignProp(svg, "viewBox", "0 0 100 100");
+        expect(svg.getAttribute("viewBox")).to.equal("0 0 100 100");
+        assignProp(svg, "viewBox", "0 0 200 200", "0 0 100 100");
+        expect(svg.getAttribute("viewBox")).to.equal("0 0 200 200");
+    });
 
     it("supports presentation SVG attributes", () => {
         const Path = "path" as any;

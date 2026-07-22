@@ -98,4 +98,14 @@ describe("assignClass", () => {
         assignClass(element, true, false);
         expect(element.classList.contains("test")).toBe(true);
     });
+
+    it("handles deeply nested arrays with signals in prev", () => {
+        const innerSig = mockSignal("x");
+        // prev with nested array containing a signal
+        assignClass(element, ["b"], [["a", innerSig]]);
+        // Nested signal should be unsignalized — "a" and the peeked "x" should be removed
+        expect(element.classList.contains("a")).toBe(false);
+        expect(element.classList.contains("x")).toBe(false);
+        expect(element.classList.contains("b")).toBe(true);
+    });
 });

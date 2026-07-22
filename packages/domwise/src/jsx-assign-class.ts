@@ -11,6 +11,8 @@ function unsignalizePrevClass(prev: any): any {
         prev = Array.from(prev).map(item => {
             if (isSignalLike(item))
                 return item.peek();
+            if (isArrayLike(item))
+                return unsignalizePrevClass(item);
             return item;
         });
     }

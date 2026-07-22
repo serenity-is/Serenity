@@ -6,6 +6,7 @@ import { assignProps } from "./jsx-assign-props"
 import { MathMLNamespace, mathMLOnlyTags } from "./mathml-consts"
 import { setRef } from "./ref"
 import { SVGNamespace, svgOnlyTags } from "./svg-consts"
+import { isSignalLike } from "./signal-util"
 import { isComponentClass, isObject, isString } from "./util"
 
 type DataKeys = `data-${string}`
@@ -63,13 +64,14 @@ export function jsx(tag: any, props?: { children?: ComponentChildren, [key: stri
         appendChildren(node, children)
 
         if (node instanceof window.HTMLSelectElement && attr.value != null) {
-            if (attr.multiple === true && Array.isArray(attr.value)) {
-                const values = attr.value.map(value => String(value))
+            const value = isSignalLike(attr.value) ? attr.value.peek() : attr.value;
+            if (attr.multiple === true && Array.isArray(value)) {
+                const values = value.map((v) => String(v));
                 node
                     .querySelectorAll("option")
                     .forEach(option => (option.selected = values.includes(option.value)))
             } else {
-                node.value = attr.value
+                node.value = value;
             }
         }
 
