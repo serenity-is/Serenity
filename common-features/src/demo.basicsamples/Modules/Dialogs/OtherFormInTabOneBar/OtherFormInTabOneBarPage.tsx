@@ -86,7 +86,7 @@ export class OtherFormOneBarDialog<P = {}> extends OrderDialog<P> {
             var c: CustomerRow = {};
             this.customerPropertyGrid.save(c);
 
-            CustomerService.Update({
+            return CustomerService.Update({
                 EntityId: id,
                 Entity: c
             }, response => {
@@ -116,15 +116,15 @@ export class OtherFormOneBarDialog<P = {}> extends OrderDialog<P> {
     }
 
     protected saveAll(callback: (response: SaveResponse) => void) {
-        this.saveCustomer(callback,
+        return this.saveCustomer(callback,
             // If customer success, save Order entity
             () => this.saveOrder(callback)
         );
     }
 
     // This is called when save/update button is pressed
-    protected override save(callback: (response: SaveResponse) => void) {
-        this.saveAll(callback);
+    protected override save(callback: (response: SaveResponse) => void): PromiseLike<SaveResponse> {
+        return this.saveAll(callback);
     }
 
     protected override renderContents(): any {
