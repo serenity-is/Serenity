@@ -15,8 +15,10 @@ function disposingEventListener(ev: Event): void {
 
 /**
  * Dispatches a `disposing` event on the target element.
- * @param target The target element to dispatch the event on.
- * @param opt Optional parameters for the event.
+ * @param target - The target element to dispatch the event on.
+ * @param opt - Optional event configuration.
+ * @param opt.bubbles - Whether the event bubbles. Defaults to `false`.
+ * @param opt.cancelable - Whether the event is cancelable. Defaults to `false`.
  */
 export function dispatchDisposingEvent(target: EventTarget, opt?: { bubbles?: boolean, cancelable?: boolean }): void {
     if (!target || typeof CustomEvent !== "function")
@@ -31,11 +33,14 @@ export function dispatchDisposingEvent(target: EventTarget, opt?: { bubbles?: bo
 }
 
 /**
- * Invokes all registered disposing listeners for the element and remove the 
+ * Invokes all registered disposing listeners for the element and removes the
  * global `disposing` event listener from the element as it is no longer needed.
- * Note that this does not dispatch a `disposing` event; to do that, 
+ * Note that this does not dispatch a `disposing` event; to do that,
  * use `dispatchDisposingEvent` instead.
- * @param node The node that is being disposed.
+ * @param node - The node that is being disposed.
+ * @param opt - Optional configuration.
+ * @param opt.descendants - If true, also invokes listeners on descendant nodes.
+ * @param opt.excludeSelf - If true, skips invoking listeners on the node itself (only descendants).
  */
 export function invokeDisposingListeners(node: EventTarget, opt?: {
     descendants?: boolean,
@@ -154,9 +159,11 @@ export function removeDisposingListener<T extends EventTarget>(target: T | null 
 }
 
 /**
- * Sets or gets the current lifecycle root element.
- * @param args If provided, sets the lifecycle root to the first argument and returns the previous root.
- * @returns The current lifecycle root element or null if none is set.
+ * Gets or sets the current lifecycle root element.
+ * When called with an argument, sets the lifecycle root and returns the previous value.
+ * When called without arguments, returns the current lifecycle root.
+ * @param args - If provided, the first element is set as the new lifecycle root.
+ * @returns The current (or previous) lifecycle root element, or `null` if none is set.
  */
 export function currentLifecycleRoot(...args: Element[]): Element | null {
     if (args.length > 0) {

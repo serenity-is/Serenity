@@ -153,6 +153,18 @@ DomWise compiles JSX directly into real DOM nodes using the `jsx` factory functi
 </div>
 ```
 
+**Factory functions:**
+
+DomWise provides two JSX factory functions with different signatures:
+
+| Function | Children parameter |
+|----------|--------------------|
+| `jsx` / `jsxs` | Children are passed as `props.children` (a property of the second argument) |
+| `createElement` / `h` | Children are passed as additional arguments after the props (rest params) |
+
+- **`jsx`** — The primary factory used by the automatic JSX runtime (`jsxImportSource`). Children go inside the `props` object: `jsx("div", { class: "foo", children: "Hello" })`.
+- **`createElement`** (aliased as `h`) — A classic/familiar API similar to `React.createElement`. Children are extra arguments: `createElement("div", { class: "foo" }, "Hello")`. If the `attr` argument is a string or array, it is treated as the first child and `attr` defaults to `{}`. If `attr.children` is present and no additional children were given, `attr.children` is used.
+
 ### Class
 
 The `class` attribute (also `className`) accepts:
@@ -795,21 +807,44 @@ className(new Set(["x", "y"]));         // "x y"
 
 ### bindThis
 
-Creates a proxy that automatically binds methods to the target object — lazy and cached.
+Creates a proxy that automatically binds method calls to the given object — lazily, with caching.
+Primarily intended for use in classes when attaching event handlers.
+
+Instead of `someElement.addEventListener("click", this.onClick.bind(this))` or an arrow function
+`(e) => this.onClick(e)` — both of which hurt performance and complicate `removeEventListener`
+because the bound function must be stored — you can write:
 
 ```tsx
 import { bindThis } from "@serenity-is/domwise";
 
 class MyWidget {
-  value = 42;
-  getValue() { return this.value; }
+  boundThis = bindThis(this);
+
+  constructor() {
+    // subscribe with boundThis — no need to store the bound function
+    someElement.addEventListener("click", this.boundThis.onClick);
+  }
+
+  onClick(e: MouseEvent) {
+    // `this` is always the widget instance
+    console.log("clicked", this);
+  }
+
+  dispose() {
+    // unsubscribe with the original method — no need to call bindThis again
+    someElement.removeEventListener("click", this.onClick);
+  }
 }
+```
 
-const widget = new MyWidget();
+The returned proxy lazily binds methods on first access and caches the bound function in the
+target object. Subsequent accesses return the same cached function, making it safe to use with
+`removeEventListener` by passing the **original** method (e.g. `this.onClick`). Calling `bindThis`
+a second time on the same object returns the same proxy.
+
+```tsx
 const bound = bindThis(widget);
-
-const { getValue } = bound;
-getValue(); // 42 — `this` is always the widget instance
+bound === bindThis(widget); // true
 ```
 
 Arrow functions and own properties are returned directly without binding.
@@ -829,10 +864,17 @@ inMathMLNamespace(() => {
   // All JSX elements here are created in the MathML namespace
 });
 
-inHTMLNamespace(() => {
-  // Explicitly switch back to HTML namespace
-});
-```
+inHTMLNamespace(() => {h, useImperativeHandle } from "@serenity-is/domwise";
+
+// Classic createElement API (like React.createElement)
+// Children are passed as additional arguments (rest params).
+const el = createElement("div", { class: "foo" }, "child1", "child2");
+
+// h is an alias for createElement
+const el2 = h("span", { class: "bar" }, "text");
+
+// If attr is a string or array, it is treated as the first child:
+const el3 = createElement("div", "only child
 
 ---
 

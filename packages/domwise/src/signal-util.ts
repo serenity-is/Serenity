@@ -1,12 +1,22 @@
 import { type Computed, type EffectDisposer, type Signal, type SignalLike } from "../types";
 import { addDisposingListener, currentLifecycleRoot, removeDisposingListener } from "./disposing-listener";
 
-/** A type guard that checks if an object is signal-like, meaning it has subscribe and peek methods, and a value property. */
+/**
+ * A type guard that checks if an object is signal-like, meaning it has `subscribe` and `peek` methods,
+ * and a `value` property.
+ * @param obj - The object to check.
+ * @returns `true` if the object is signal-like.
+ */
 export function isSignalLike<T = any>(obj: any): obj is SignalLike<T> {
     return obj != null && typeof obj === "object" && typeof obj.subscribe === "function" && typeof obj.peek === "function" && 'value' in obj;
 }
 
-/** A type guard that checks if an object is a writable signal-like, meaning it passes the isSignalLike check and has a value setter. */
+/**
+ * A type guard that checks if an object is a writable signal, meaning it passes the `isSignalLike` check
+ * and the `value` property has a setter or is writable.
+ * @param obj - The object to check.
+ * @returns `true` if the object is a writable signal.
+ */
 export function isWritableSignal<T>(obj: any): obj is Signal<T> {
     if (!isSignalLike(obj))
         return false;
@@ -27,7 +37,12 @@ export function isWritableSignal<T>(obj: any): obj is Signal<T> {
     return false;
 }
 
-/** A type guard that checks if an object is a readonly signal-like, meaning it passes the isSignalLike check and has no value setter. */
+/**
+ * A type guard that checks if an object is a readonly (computed) signal, meaning it passes the `isSignalLike` check
+ * but the `value` property is not writable.
+ * @param obj - The object to check.
+ * @returns `true` if the object is a readonly signal.
+ */
 export function isReadonlySignal<T = any>(obj: any): obj is Computed<T> {
     return isSignalLike(obj) && !isWritableSignal(obj);
 }
@@ -117,8 +132,13 @@ export type ObserveSignalCallback<T> = (args: SignalObserveArgs<T>) => void;
 
 /**
  * Observes a signal and calls the callback immediately upon subscription and when the signal changes.
- * @param signal Signal to observe
- * @param callback Callback to execute immediately upon subscription and when the signal value changes.
+ * Returns an effect disposer that can be used to stop observing.
+ * @param signal - Signal to observe.
+ * @param callback - Callback to execute immediately upon subscription and when the signal value changes.
+ * @param opt - Optional configuration.
+ * @param opt.useLifecycleRoot - If true, `currentLifecycleRoot()` at subscription time is recorded as the lifecycle node.
+ * @param opt.lifecycleNode - Optional node to tie the signal's lifecycle to (auto-disposal on dispose).
+ * @returns An effect disposer function, or `null`/`undefined` if the signal does not support disposal.
  */
 export function observeSignal<T>(signal: SignalLike<T>, callback: ObserveSignalCallback<T>, opt?: {
     /** 
@@ -158,7 +178,17 @@ export interface DerivedSignalLike<T> extends SignalLike<T> {
     derivedDisposer?: () => void;
 }
 
-/** Creates a derived signal from a computation function */
+/**
+ * Creates a derived (computed) signal from an input signal and a transform function.
+ * The returned signal-like object re-computes its value whenever the input signal changes.
+ * If the input signal's constructor supports derived computation, it is used; otherwise
+ * a `PrimitiveComputed` fallback is created.
+ * @typeParam TDerived - The type of the derived value.
+ * @typeParam TInput - The type of the input signal's value.
+ * @param input - The source signal to observe.
+ * @param fn - A transform function that maps the input value to the derived value.
+ * @returns A `DerivedSignalLike` that updates when the input signal changes.
+ */
 export function derivedSignal<TDerived, TInput = any>(input: SignalLike<TInput>, fn: (value: TInput) => TDerived): DerivedSignalLike<TDerived> {
 
     if (!isSignalLike(input)) {

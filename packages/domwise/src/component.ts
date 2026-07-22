@@ -1,6 +1,11 @@
 import type { ComponentChildren, ComponentClass, JSXElement, Ref } from "../types";
 import { setRef } from "./ref";
 
+/**
+ * Base class for creating JSX components with optional props, children, and ref support.
+ * Extend this class and override the `render` method to return a `JSXElement`.
+ * @typeParam T - The type of the component's props.
+ */
 export class Component<T = any> {
     static isComponent = true;
 

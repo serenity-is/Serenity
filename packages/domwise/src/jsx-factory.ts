@@ -10,6 +10,19 @@ import { isComponentClass, isObject, isString } from "./util"
 
 type DataKeys = `data-${string}`
 
+/**
+ * Creates a JSX element. Acts as the JSX factory function (used as `jsx()` and `jsxs()`).
+ * Supports HTML elements, SVG elements, MathML elements, and custom components.
+ * When the tag is a string, it creates a DOM element; when it is a function/class,
+ * it instantiates a component.
+ *
+ * Unlike `createElement` (or `h`), which takes children as additional arguments,
+ * `jsx` expects children as part of the `props` object (`props.children`).
+ *
+ * @param tag - The HTML/SVG/MathML tag name or a component function/class.
+ * @param props - The attributes/props for the element. Children are passed via `props.children`.
+ * @returns The created JSX element (DOM node).
+ */
 // DOM Elements
 export function jsx<THtmlTag extends (keyof HTMLElementTagNameMap & keyof HTMLElementTags), TElement extends HTMLElementTagNameMap[THtmlTag]>(
     type: THtmlTag,

@@ -1,8 +1,11 @@
 import { isObject, isVisibleChild } from "./util"
 
 /**
- * Convert a `value` to a className string.
- * `value` can be a string, an array or a `Dictionary<boolean>`.
+ * Converts a value to a className string.
+ * Supports strings, arrays (flattened), iterables, and `Dictionary<boolean>` objects
+ * where truthy keys are included.
+ * @param value - The value to convert. Can be a string, array, iterable, or dictionary.
+ * @returns A space-separated className string.
  */
 export function className(value: any): string {
     if (Array.isArray(value)) {

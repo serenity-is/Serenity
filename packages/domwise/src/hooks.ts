@@ -4,6 +4,14 @@ import { addDisposingListener, removeDisposingListener } from "./disposing-liste
 import { assignProp } from "./jsx-assign-props";
 import { initPropHookSymbol } from "./prop-hook";
 
+/**
+ * Creates a hook-like class list manager that wraps a `DOMTokenList`.
+ * Returns a callable object that can be used as a JSX prop hook via `initPropHookSymbol`,
+ * allowing reactive `class` attribute binding. Provides `add`, `remove`, `toggle`, `contains`,
+ * and `value` / `size` accessors similar to the native `classList` API.
+ * @param initialValue - Optional initial class value (string, array, or dictionary).
+ * @returns A `BasicClassList` instance.
+ */
 export function useClassList(initialValue?: ClassNames): BasicClassList {
     let temp: Element | null = document.createElement("div") as Element;
     if (initialValue != null) {
@@ -93,6 +101,13 @@ function propBindingInit(this: PropBindingThis<any>, el: Element, key: string) {
     }
 }
 
+/**
+ * Creates a two-way prop binding hook that synchronizes a value to an element's attribute.
+ * The returned function can be used as a JSX prop hook and automatically assigns the value
+ * to the bound element's property/attribute when it changes.
+ * @param initialValue - Optional initial value for the binding.
+ * @returns A `PropBinding<T>` callable that gets/sets the bound value.
+ */
 export function usePropBinding<T>(initialValue?: T | null | undefined | false): PropBinding<T> {
     const accessorThis: PropBindingThis<T> = {
         value: initialValue
@@ -103,6 +118,13 @@ export function usePropBinding<T>(initialValue?: T | null | undefined | false): 
     return hook;
 }
 
+/**
+ * Creates a `Text` node and a setter function to update its content.
+ * The text node's `toString` is overridden to return its `textContent`,
+ * making it suitable for use as a child in JSX.
+ * @param initialValue - Optional initial text content.
+ * @returns A tuple of the `Text` node and a setter to update its content.
+ */
 export function useText(initialValue?: string): readonly [text: Text, setText: (value: string) => void] {
     const text = new Text()
     Object.defineProperty(text, "toString", {
