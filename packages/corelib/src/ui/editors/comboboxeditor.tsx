@@ -844,7 +844,7 @@ export class ComboboxEditor<P, TItem> extends EditorWidget<P> implements
             if (editItem != null) {
                 dialog.load(editItem, () => {
                     (dialog as any).dialogOpen(this.openDialogAsPanel);
-                }, null);
+                });
             }
             else if (this.isMultiple() || !this.get_value()) {
                 var entity: TItem = {} as any;
@@ -852,12 +852,12 @@ export class ComboboxEditor<P, TItem> extends EditorWidget<P> implements
                 this.initNewEntity(entity);
                 dialog.load(entity, () => {
                     (dialog as any).dialogOpen(this.openDialogAsPanel);
-                }, null);
+                });
             }
             else {
                 dialog.load(this.get_value(), () => {
                     (dialog as any).dialogOpen(this.openDialogAsPanel);
-                }, null);
+                });
             }
         });
     }

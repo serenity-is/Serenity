@@ -1,4 +1,4 @@
-import type { ComponentChildren, ElementAttributes, HTMLElementTags, JSXElement, SVGElementTags } from "../types"
+import type { ComponentChildren, ComponentType, ElementAttributes, HTMLElementTags, JSXElement, Ref, SVGElementTags } from "../types"
 import { initComponentClass } from "./component"
 import { currentNamespaceURI } from "./in-namespace-uri"
 import { appendChildren } from "./jsx-append-children"
@@ -24,10 +24,10 @@ export function jsx(
     props?: (ElementAttributes<JSXElement> & Record<DataKeys, string | number>) | null
 ): JSXElement
 // Custom components
-//export function jsx<P extends {}, TElement extends JSXElement = JSXElement>(
-//    type: ComponentType<P, TElement>,
-//    props?: P & { children?: ComponentChildren; ref?: Ref<TElement> } | null,
-//): TElement
+export function jsx<P extends {}, TElement extends JSXElement = JSXElement>(
+    type: ComponentType<P, TElement>,
+    props?: P & { children?: ComponentChildren; ref?: Ref<TElement> } | null,
+): TElement
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
 export function jsx(tag: any, props?: { children?: ComponentChildren, [key: string]: any }) {
 

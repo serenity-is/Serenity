@@ -2279,6 +2279,10 @@ type DataKeys = `data-${string}`;
 export declare function jsx<THtmlTag extends (keyof HTMLElementTagNameMap & keyof HTMLElementTags), TElement extends HTMLElementTagNameMap[THtmlTag]>(type: THtmlTag, props?: (HTMLElementTags[THtmlTag] & Record<DataKeys, string | number>) | null): TElement;
 export declare function jsx<TSVGTag extends (keyof SVGElementTagNameMap & keyof SVGElementTags), TElement extends SVGElementTagNameMap[TSVGTag]>(type: TSVGTag, props?: (SVGElementTags[TSVGTag] & Record<DataKeys, string | number>) | null): TElement;
 export declare function jsx(type: string, props?: (ElementAttributes<JSXElement> & Record<DataKeys, string | number>) | null): JSXElement;
+export declare function jsx<P extends {}, TElement extends JSXElement = JSXElement>(type: ComponentType<P, TElement>, props?: P & {
+	children?: ComponentChildren;
+	ref?: Ref<TElement>;
+} | null): TElement;
 export declare const MathMLNamespace = "http://www.w3.org/1998/Math/MathML";
 export declare const initPropHookSymbol: unique symbol;
 export interface PropHook<TNode extends Element = Element> {
