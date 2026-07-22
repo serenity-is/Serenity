@@ -2189,16 +2189,64 @@ export type ShadowRootContainer = {
 	};
 	children: ComponentChildren;
 };
+/**
+ * Creates a proxy that automatically binds method calls to the given object.
+ * Intended for use in classes, e.g. when attaching event handlers.
+ * Instead of `someElement.addEventListener("click", this.onClick.bind(this))`
+ * or an arrow function `(e) => this.onClick(e)` (both of which hurt performance
+ * and complicate `removeEventListener` because the bound function must be stored),
+ * you can write:
+ *
+ * ```ts
+ * const boundThis = bindThis(this);
+ * someElement.addEventListener("click", boundThis.onClick);
+ * // later, in dispose:
+ * someElement.removeEventListener("click", this.onClick);
+ * ```
+ *
+ * The returned proxy lazily binds methods on first access and caches the bound
+ * function in the target object. Subsequent accesses return the same cached
+ * function, making it safe to use with `removeEventListener` by passing the
+ * **original** method (e.g. `this.onClick`). There is no need to call `bindThis`
+ * again in dispose — calling it a second time returns the same proxy.
+ * Non-function properties are returned as-is.
+ *
+ * @param obj - The object whose methods should be auto-bound.
+ * @returns A proxy wrapping the object with auto-bound method access.
+ */
 export declare function bindThis<T>(obj: T): T;
 /**
- * Convert a `value` to a className string.
- * `value` can be a string, an array or a `Dictionary<boolean>`.
+ * Converts a value to a className string.
+ * Supports strings, arrays (flattened), iterables, and `Dictionary<boolean>` objects
+ * where truthy keys are included.
+ * @param value - The value to convert. Can be a string, array, iterable, or dictionary.
+ * @returns A space-separated className string.
  */
 export declare function className(value: any): string;
-/** Required for classic (non-automatic) jsx factory. Prefer jsx function */
+/**
+ * Creates a JSX element using the classic (non-automatic) JSX factory signature.
+ * Children are passed as additional arguments after `attr` (rest params).
+ * If `attr` is a string or array, it is treated as the first child and `attr` becomes `{}`.
+ * If `attr.children` exists and no additional children were given, `attr.children` is used.
+ * Prefer using the `jsx` function directly when using the automatic JSX runtime.
+ * @param tag - The HTML/SVG tag name or component function/class.
+ * @param attr - The attributes/props for the element, or the first child if it is a string/array.
+ * @param children - Child elements passed as rest arguments.
+ * @returns The created JSX element.
+ */
 export declare function createElement(tag: any, attr: any, ...children: any[]): JSXElement;
-/** For compatibility with React's useImperativeHandle, use setRef instead */
+/**
+ * Compatibility helper similar to React's `useImperativeHandle`.
+ * Calls `setRef` with the result of `init()`. Prefer using `setRef` directly.
+ * @param ref - A `RefObject` or ref callback.
+ * @param init - A factory function returning the value to assign to the ref.
+ */
 export declare function useImperativeHandle<T>(ref: Ref<T>, init: () => T): void;
+/**
+ * Base class for creating JSX components with optional props, children, and ref support.
+ * Extend this class and override the `render` method to return a `JSXElement`.
+ * @typeParam T - The type of the component's props.
+ */
 export declare class Component<T = any> {
 	static isComponent: boolean;
 	constructor(props: T & {
@@ -2213,19 +2261,24 @@ export declare class Component<T = any> {
 }
 /**
  * Dispatches a `disposing` event on the target element.
- * @param target The target element to dispatch the event on.
- * @param opt Optional parameters for the event.
+ * @param target - The target element to dispatch the event on.
+ * @param opt - Optional event configuration.
+ * @param opt.bubbles - Whether the event bubbles. Defaults to `false`.
+ * @param opt.cancelable - Whether the event is cancelable. Defaults to `false`.
  */
 export declare function dispatchDisposingEvent(target: EventTarget, opt?: {
 	bubbles?: boolean;
 	cancelable?: boolean;
 }): void;
 /**
- * Invokes all registered disposing listeners for the element and remove the
+ * Invokes all registered disposing listeners for the element and removes the
  * global `disposing` event listener from the element as it is no longer needed.
  * Note that this does not dispatch a `disposing` event; to do that,
  * use `dispatchDisposingEvent` instead.
- * @param node The node that is being disposed.
+ * @param node - The node that is being disposed.
+ * @param opt - Optional configuration.
+ * @param opt.descendants - If true, also invokes listeners on descendant nodes.
+ * @param opt.excludeSelf - If true, skips invoking listeners on the node itself (only descendants).
  */
 export declare function invokeDisposingListeners(node: EventTarget, opt?: {
 	descendants?: boolean;
@@ -2252,30 +2305,112 @@ export declare function addDisposingListener<T extends EventTarget>(target: T | 
  */
 export declare function removeDisposingListener<T extends EventTarget>(target: T | null | undefined, handler: (() => void) | undefined | null, regKey?: string | undefined | null): T | null | undefined;
 /**
- * Sets or gets the current lifecycle root element.
- * @param args If provided, sets the lifecycle root to the first argument and returns the previous root.
- * @returns The current lifecycle root element or null if none is set.
+ * Gets or sets the current lifecycle root element.
+ * When called with an argument, sets the lifecycle root and returns the previous value.
+ * When called without arguments, returns the current lifecycle root.
+ * @param args - If provided, the first element is set as the new lifecycle root.
+ * @returns The current (or previous) lifecycle root element, or `null` if none is set.
  */
 export declare function currentLifecycleRoot(...args: Element[]): Element | null;
+/**
+ * Creates a document fragment containing the given children.
+ * Useful as a JSX fragment factory (e.g. `<></>`).
+ * @param attr - Object with an optional `children` property.
+ * @returns A `DocumentFragment` with the appended children.
+ */
 export declare function Fragment(attr: {
 	children?: ComponentChildren | undefined;
 }): any;
-/** Creates a new RefObject with current property */
+/**
+ * Creates a new `RefObject` with `current` initially set to `null`.
+ * The returned object is sealed to prevent extension.
+ * @typeParam T - The type of the referenced value.
+ * @returns A new sealed `RefObject<T>`.
+ */
 export declare function createRef<T = any>(): RefObject<T>;
-/** Sets ref.current for a RefObject or a by calling a ref callback */
+/**
+ * Sets the `current` property of a `RefObject`, or calls a ref callback with the given value.
+ * @typeParam T - The type of the referenced node.
+ * @param ref - A `RefObject` or a ref callback, or `undefined`.
+ * @param current - The value to assign to the ref.
+ */
 export declare function setRef<T = Node>(ref: Ref<T> | undefined, current: T): void;
+/**
+ * Creates a hook-like class list manager that wraps a `DOMTokenList`.
+ * Returns a callable object that can be used as a JSX prop hook via `initPropHookSymbol`,
+ * allowing reactive `class` attribute binding. Provides `add`, `remove`, `toggle`, `contains`,
+ * and `value` / `size` accessors similar to the native `classList` API.
+ * @param initialValue - Optional initial class value (string, array, or dictionary).
+ * @returns A `BasicClassList` instance.
+ */
 export declare function useClassList(initialValue?: ClassNames): BasicClassList;
+/**
+ * Creates a two-way prop binding hook that synchronizes a value to an element's attribute.
+ * The returned function can be used as a JSX prop hook and automatically assigns the value
+ * to the bound element's property/attribute when it changes.
+ * @param initialValue - Optional initial value for the binding.
+ * @returns A `PropBinding<T>` callable that gets/sets the bound value.
+ */
 export declare function usePropBinding<T>(initialValue?: T | null | undefined | false): PropBinding<T>;
+/**
+ * Creates a `Text` node and a setter function to update its content.
+ * The text node's `toString` is overridden to return its `textContent`,
+ * making it suitable for use as a child in JSX.
+ * @param initialValue - Optional initial text content.
+ * @returns A tuple of the `Text` node and a setter to update its content.
+ */
 export declare function useText(initialValue?: string): readonly [
 	text: Text,
 	setText: (value: string) => void
 ];
+/**
+ * Gets or sets the current JSX namespace URI.
+ * When called without arguments, returns the current namespace URI.
+ * When called with a value, sets the namespace and returns the previous value.
+ * @param value - If provided, sets the namespace URI to this value.
+ * @returns The current (or previous) namespace URI, or `null` / `undefined`.
+ */
 export declare function currentNamespaceURI(value?: string | null | undefined): string | null | undefined;
+/**
+ * Executes a children factory within a specific namespace URI context.
+ * The namespace is temporarily set for the duration of the call and restored afterwards.
+ * @param namespaceURI - The namespace URI to use, or `null` for HTML namespace.
+ * @param children - A factory function that returns children to be created in the given namespace.
+ * @returns The children produced by the factory.
+ */
 export declare function inNamespaceURI(namespaceURI: string | null, children: () => ComponentChildren): ComponentChildren;
+/**
+ * Executes a children factory within the SVG namespace.
+ * @param fn - A factory function that returns children.
+ * @returns The children produced by the factory.
+ */
 export declare function inSVGNamespace(fn: () => ComponentChildren): ComponentChildren;
+/**
+ * Executes a children factory within the MathML namespace.
+ * @param fn - A factory function that returns children.
+ * @returns The children produced by the factory.
+ */
 export declare function inMathMLNamespace(fn: () => ComponentChildren): ComponentChildren;
+/**
+ * Executes a children factory within the HTML namespace (explicitly setting namespace to `null`).
+ * @param fn - A factory function that returns children.
+ * @returns The children produced by the factory.
+ */
 export declare function inHTMLNamespace(fn: () => ComponentChildren): ComponentChildren;
 type DataKeys = `data-${string}`;
+/**
+ * Creates a JSX element. Acts as the JSX factory function (used as `jsx()` and `jsxs()`).
+ * Supports HTML elements, SVG elements, MathML elements, and custom components.
+ * When the tag is a string, it creates a DOM element; when it is a function/class,
+ * it instantiates a component.
+ *
+ * Unlike `createElement` (or `h`), which takes children as additional arguments,
+ * `jsx` expects children as part of the `props` object (`props.children`).
+ *
+ * @param tag - The HTML/SVG/MathML tag name or a component function/class.
+ * @param props - The attributes/props for the element. Children are passed via `props.children`.
+ * @returns The created JSX element (DOM node).
+ */
 export declare function jsx<THtmlTag extends (keyof HTMLElementTagNameMap & keyof HTMLElementTags), TElement extends HTMLElementTagNameMap[THtmlTag]>(type: THtmlTag, props?: (HTMLElementTags[THtmlTag] & Record<DataKeys, string | number>) | null): TElement;
 export declare function jsx<TSVGTag extends (keyof SVGElementTagNameMap & keyof SVGElementTags), TElement extends SVGElementTagNameMap[TSVGTag]>(type: TSVGTag, props?: (SVGElementTags[TSVGTag] & Record<DataKeys, string | number>) | null): TElement;
 export declare function jsx(type: string, props?: (ElementAttributes<JSXElement> & Record<DataKeys, string | number>) | null): JSXElement;
@@ -2283,16 +2418,29 @@ export declare function jsx<P extends {}, TElement extends JSXElement = JSXEleme
 	children?: ComponentChildren;
 	ref?: Ref<TElement>;
 } | null): TElement;
+/** The MathML namespace URI (`http://www.w3.org/1998/Math/MathML`). */
 export declare const MathMLNamespace = "http://www.w3.org/1998/Math/MathML";
 export declare const initPropHookSymbol: unique symbol;
 export interface PropHook<TNode extends Element = Element> {
 	[initPropHookSymbol](node: TNode, propName: string): void;
 }
+/**
+ * Creates a virtual node descriptor for a `ShadowRoot` that can be used
+ * during JSX element creation. The returned object is recognized by the
+ * JSX factory to create a shadow root on the parent element.
+ * @param options - An object with `ShadowRootInit` properties plus optional `ref` and `children`.
+ * @returns A virtual node descriptor recognized by the JSX factory.
+ */
 export declare function ShadowRootNode({ children, ref, ...attr }: ShadowRootInit & {
 	ref?: Ref<ShadowRoot>;
 	children?: ComponentChildren;
 }): any;
-/** A type guard that checks if an object is signal-like, meaning it has subscribe and peek methods, and a value property. */
+/**
+ * A type guard that checks if an object is signal-like, meaning it has `subscribe` and `peek` methods,
+ * and a `value` property.
+ * @param obj - The object to check.
+ * @returns `true` if the object is signal-like.
+ */
 export declare function isSignalLike<T = any>(obj: any): obj is SignalLike<T>;
 type SignalObserveArgs<T> = {
 	/** True if this is the initial call upon subscription. */
@@ -2325,8 +2473,13 @@ type SignalObserveArgs<T> = {
 type ObserveSignalCallback<T> = (args: SignalObserveArgs<T>) => void;
 /**
  * Observes a signal and calls the callback immediately upon subscription and when the signal changes.
- * @param signal Signal to observe
- * @param callback Callback to execute immediately upon subscription and when the signal value changes.
+ * Returns an effect disposer that can be used to stop observing.
+ * @param signal - Signal to observe.
+ * @param callback - Callback to execute immediately upon subscription and when the signal value changes.
+ * @param opt - Optional configuration.
+ * @param opt.useLifecycleRoot - If true, `currentLifecycleRoot()` at subscription time is recorded as the lifecycle node.
+ * @param opt.lifecycleNode - Optional node to tie the signal's lifecycle to (auto-disposal on dispose).
+ * @returns An effect disposer function, or `null`/`undefined` if the signal does not support disposal.
  */
 export declare function observeSignal<T>(signal: SignalLike<T>, callback: ObserveSignalCallback<T>, opt?: {
 	/**
@@ -2342,7 +2495,17 @@ export declare function observeSignal<T>(signal: SignalLike<T>, callback: Observ
 interface DerivedSignalLike<T> extends SignalLike<T> {
 	derivedDisposer?: () => void;
 }
-/** Creates a derived signal from a computation function */
+/**
+ * Creates a derived (computed) signal from an input signal and a transform function.
+ * The returned signal-like object re-computes its value whenever the input signal changes.
+ * If the input signal's constructor supports derived computation, it is used; otherwise
+ * a `PrimitiveComputed` fallback is created.
+ * @typeParam TDerived - The type of the derived value.
+ * @typeParam TInput - The type of the input signal's value.
+ * @param input - The source signal to observe.
+ * @param fn - A transform function that maps the input value to the derived value.
+ * @returns A `DerivedSignalLike` that updates when the input signal changes.
+ */
 export declare function derivedSignal<TDerived, TInput = any>(input: SignalLike<TInput>, fn: (value: TInput) => TDerived): DerivedSignalLike<TDerived>;
 export interface SignalOptions<T> {
 	watched?: (this: SignalLike<T>) => void;
@@ -2355,20 +2518,71 @@ export interface EffectOptions {
 type EffectFn = ((this: {
 	dispose: () => void;
 }) => void | (() => void)) | (() => void | (() => void));
+/**
+ * Creates a new writable signal with an optional initial value.
+ * Re-exported from `@preact/signals-core` with typed overloads.
+ * @typeParam T - The type of the signal's value.
+ * @param value - Optional initial value.
+ * @param options - Optional signal options (`watched`, `unwatched`, `name`).
+ * @returns A writable `Signal<T>`.
+ */
 export declare const signal: {
 	<T>(value: T, options?: SignalOptions<T>): Signal<T>;
 	<T = undefined>(): Signal<T | undefined>;
 };
+/**
+ * Creates a computed (derived) signal that re-computes when its dependencies change.
+ * Re-exported from `@preact/signals-core`.
+ * @typeParam T - The type of the computed value.
+ * @param fn - A computation function that returns the derived value.
+ * @param options - Optional signal options.
+ * @returns A read-only `Computed<T>` signal.
+ */
 export declare const computed: (<T>(fn: () => T, options?: SignalOptions<T>) => Computed<T>);
+/**
+ * Creates an effect that runs whenever its signal dependencies change.
+ * Re-exported from `@preact/signals-core`.
+ * @param fn - The effect function. May optionally return a cleanup callback.
+ * @param options - Optional effect options (`name`).
+ * @returns A disposer function to stop the effect.
+ */
 export declare const effect: ((fn: EffectFn, options?: EffectOptions) => () => void);
+/**
+ * Batches multiple signal updates into a single notification.
+ * Re-exported from `@preact/signals-core`.
+ * @typeParam T - The return type of the batch function.
+ * @param fn - A function that performs batched signal updates.
+ * @returns The return value of `fn`.
+ */
 export declare const batch: (<T>(fn: () => T) => T);
+/**
+ * Reads signal values without creating a dependency tracking context.
+ * Re-exported from `@preact/signals-core`.
+ * @typeParam T - The return type of the function.
+ * @param fn - A function that reads signals without tracking them.
+ * @returns The return value of `fn`.
+ */
 export declare const untracked: (<T>(fn: () => T) => T);
+/**
+ * Creates a writable signal with the given initial value.
+ * Convenience wrapper around the `signal()` function.
+ * @typeParam T - The type of the signal's value.
+ * @param initialValue - The initial value.
+ * @returns A `Signal<T>` instance.
+ */
 export declare function useSignal<T>(initialValue: T): Signal<T>;
-/** Creates a factory for computed signals that can be manually updated as a batch */
+/**
+ * Creates a factory for computed signals that can be manually refreshed as a batch.
+ * Returns an object with a `computed` method that creates computed signals tied to an
+ * internal updater signal, and an `update` method that triggers a refresh of all created
+ * computed signals.
+ * @returns An object with `computed` factory and `update` trigger.
+ */
 export declare function useUpdatableComputed(): {
 	computed: <T>(fn: () => T) => Computed<T>;
 	update: () => void;
 };
+/** The SVG namespace URI (`http://www.w3.org/2000/svg`). */
 export declare const SVGNamespace = "http://www.w3.org/2000/svg";
 
 export {
