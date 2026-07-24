@@ -7,7 +7,9 @@
 
 > **Use JSX syntax to create and manage DOM elements** — with full TypeScript support, reactive signal bindings, and seamless integration with the Serenity widget system.
 
-DomWise is a lightweight, high-performance JSX library that compiles your JSX templates directly into real DOM nodes — no virtual DOM, no diffing, no overhead. Designed from the ground up for the [Serenity](https://serenity.is) application framework, it embraces direct DOM manipulation and works harmonically with widget lifecycles, avoiding the reconciliation conflicts that plague VDOM libraries when mixed with imperative DOM updates.
+DomWise is a lightweight, high-performance JSX library that compiles your JSX templates directly into real DOM nodes — no virtual DOM, no diffing, no reconciliation overhead. Designed from the ground up for the [Serenity](https://serenity.is) application framework, it embraces direct DOM manipulation and works harmoniously with widget lifecycles, avoiding the conflicts that plague VDOM libraries when mixed with imperative DOM updates.
+
+Serenity's widget model was originally built around jQuery UI widgets that attach to existing elements, manipulate the DOM directly, and manage their own lifecycle through `init()` / `destroy()` methods. As the framework transitions away from jQuery toward a modern JSX-based programming model, DomWise provides the ideal foundation — it creates real DOM nodes that widgets can interact with natively, without the abstraction layer of a virtual DOM that would fight against imperative DOM operations.
 
 Built on the foundations of [jsx-dom](https://github.com/alex-kinokon/jsx-dom), [dom-expressions](https://github.com/ryansolid/dom-expressions), and [tsx-dom](https://github.com/Lusito/tsx-dom), DomWise adds first-class reactive programming via [@preact/signals-core](https://github.com/preactjs/signals), a powerful conditional `Show` component, and a comprehensive lifecycle management system that integrates with Serenity's widget dispose patterns.
 
@@ -18,7 +20,9 @@ See [NOTICE.md](./NOTICE.md) for licensing information about used libraries.
 ## Table of Contents
 
 - [Installation](#installation)
+- [Usage in Serene/StartSharp Applications](#usage-in-serene-startsharp-applications)
 - [Quick Start](#quick-start)
+- [Why Not Virtual DOM?](#why-not-virtual-dom)
 - [JSX Syntax](#jsx-syntax)
   - [Creating Elements](#creating-elements)
   - [Class](#class)
@@ -53,6 +57,11 @@ See [NOTICE.md](./NOTICE.md) for licensing information about used libraries.
 - [Lifecycle & Disposal](#lifecycle--disposal)
   - [Disposing Listeners](#disposing-listeners)
   - [Lifecycle Root](#lifecycle-root)
+- [Serenity Widget Integration](#serenity-widget-integration)
+  - [Widget Rendering Model: renderContents vs render](#widget-rendering-model-rendercontents-vs-render)
+  - [Once-Only Rendering](#once-only-rendering)
+  - [Direct DOM Manipulation](#direct-dom-manipulation)
+  - [Widget Lifecycle Integration](#widget-lifecycle-integration)
 - [Utilities](#utilities)
   - [className](#classname)
   - [bindThis](#bindthis)
@@ -77,6 +86,28 @@ yarn add @serenity-is/domwise
 ```bash
 pnpm add @serenity-is/domwise
 ```
+
+---
+
+## Usage in Serene/StartSharp Applications
+
+In Serene and StartSharp template applications, you typically do not need to install `@serenity-is/domwise` via npm manually. The package is brought in automatically through the NuGet package dependency chain:
+
+1. Your `.csproj` file references `Serenity.Corelib` (and optionally other Serenity packages).
+2. `Serenity.Corelib` has a NuGet dependency on `Serenity.DomWise`, which ships the DomWise JavaScript and TypeScript files as embedded static web assets under its `dist/` directory.
+3. When you run `npm install` or `pnpm install`, the `preinstall` / `pnpm:devPreinstall` script defined in your `package.json` executes `dotnet build -target:RestoreNodeTypes`.
+4. The `RestoreNodeTypes` MSBuild target, defined in `Serenity.Net.Web.targets` (shipped via the `Serenity.Net.Web` NuGet package), scans all referenced NuGet and project packages for their `dist/` directories and copies the files to your project's `node_modules/.dotnet/` folder.
+5. The same target also automatically inserts or updates the corresponding entries in your `package.json` dependencies section, pointing them to the local `node_modules/.dotnet/` paths.
+
+After running `npm install`, your `package.json` will contain entries like:
+
+```json
+"@serenity-is/domwise": "./node_modules/.dotnet/serenity.domwise"
+```
+
+This system ensures that your npm dependencies are always kept in sync with the NuGet package versions you have referenced — without any manual version management. It also accommodates Serenity packages (such as `Serenity.Extensions`, `Serenity.Pro.Extensions`) that do not have published npm registry counterparts.
+
+> **Note:** The direct `npm install @serenity-is/domwise` shown in the previous section is only needed when using DomWise outside of a Serene/StartSharp project, or if you require a standalone installation.
 
 ---
 
@@ -122,6 +153,39 @@ document.body.appendChild(
   </div>
 );
 ```
+
+---
+
+## Why Not Virtual DOM?
+
+DomWise compiles JSX directly into real DOM nodes — no virtual DOM, no diffing, no reconciliation. This design is a deliberate choice driven by Serenity's widget architecture.
+
+Serenity's widget model was originally designed over 10 years ago around jQuery UI widgets. Widgets attach themselves to existing DOM elements, manipulate the DOM directly, and manage their own lifecycle through `init()` / `destroy()` methods. When the framework began transitioning away from jQuery toward a JSX-based programming model, VDOM libraries like React were evaluated but their virtual DOM reconciliation conflicted with widgets that modify the DOM imperatively.
+
+
+While VDOM has its own set of advantages, they do not outweigh the issues that may arise when dealing with code or external components that manipulate the DOM directly.
+
+A JSX library that creates real DOM elements like DomWise — avoids these issues entirely:
+
+- **No reconciliation conflicts** — Widgets can freely append, remove, or modify DOM nodes without worrying about a VDOM diffing algorithm reverting their changes.
+- **Seamless migration** — Existing widgets that call `appendChild`, modify `innerHTML`, attach event listeners, or integrate with third-party libraries (Select2, Flatpickr, SortableJS, etc.) continue to work without wrappers or workarounds.
+- **Predictable lifecycle** — Elements are created once and live until explicitly removed. There is no re-render cycle that might reconstruct or detach widget-bound elements.
+- **Framework flexibility** — While DomWise is the primary programming model, you can freely use React, Preact, Vue, or any other framework in parts of your application without cross-framework reconciliation issues. For example, the StartSharp dashboard page uses Preact for its Chat widget while other widgets on the same page use DomWise.
+
+### From jsx-dom to DomWise
+
+The Serenity ecosystem initially adopted [jsx-dom](https://github.com/alex-kinokon/jsx-dom) as its JSX runtime. While jsx-dom served well, it lacked features needed for deeper framework integration:
+
+- **Reactive signals** — jsx-dom had no built-in support for reactive programming patterns.
+- **Control over development** — We needed the ability to quickly add features and fix discovered issues without waiting for upstream releases.
+
+DomWise builds on the foundations of jsx-dom, [dom-expressions](https://github.com/ryansolid/dom-expressions), and [tsx-dom](https://github.com/Lusito/tsx-dom), adding:
+
+- First-class [@preact/signals-core](https://github.com/preactjs/signals) integration — signals work natively as attribute values, class/style bindings, and children, with automatic DOM updates.
+- A comprehensive lifecycle management system that integrates with Serenity's widget disposal patterns.
+- Lowercased HTML attributes (e.g., `tabindex`, `readonly`, `for`) to match actual HTML, making it easier to copy-paste Bootstrap and other HTML snippets.
+- A `Show` component for declarative conditional rendering.
+- Hooks like `useClassList`, `usePropBinding`, `useText`, and `useUpdatableComputed`.
 
 ---
 
@@ -786,6 +850,99 @@ import { currentLifecycleRoot } from "@serenity-is/domwise";
 // Get the current lifecycle root (set automatically during JSX creation)
 const root = currentLifecycleRoot();
 ```
+
+---
+
+## Serenity Widget Integration
+
+DomWise is the foundation of Serenity's JSX rendering pipeline. It works hand-in-hand with the `Widget` base class from `@serenity-is/corelib` to provide a predictable, imperative-friendly component model.
+
+### Widget Rendering Model: `renderContents` vs `render`
+
+Unlike React class components where `render()` is called on every state/prop change, Serenity widgets follow a simpler, once-only rendering model:
+
+- **`render()`** — Returns the widget's root DOM node. This method is called once by the JSX runtime when the widget is instantiated in JSX (e.g., `<MyWidget />`). It calls `init()`, which triggers `internalRenderContents()`.
+
+- **`renderContents()`** — Called exactly once during widget initialization to populate the widget's DOM node with its initial content. Override this method to provide the JSX content for your widget:
+
+```tsx
+class MyWidget extends Widget<any> {
+  protected override renderContents() {
+    return (
+      <div class="my-widget">
+        <button onClick={e => this.handleClick(e)}>Click me</button>
+      </div>
+    );
+  }
+}
+```
+
+The `afterRender` internal queue ensures `renderContents` is only invoked once — the queue is deleted after the first call, preventing subsequent executions. This is fundamentally different from React's `render()`, which is called on every state or prop change.
+
+### Once-Only Rendering
+
+Serenity widgets do not re-render automatically. `renderContents()` fires once during initialization, and that's it. This design choice aligns with Serenity's imperative heritage:
+
+- **Direct DOM updates** — After `renderContents`, widgets update their DOM by directly manipulating elements (changing text content, toggling classes, adding/removing children). No VDOM diffing is needed.
+- **Reactive signals** — For scenarios where automatic DOM updates are desired, use signals. DomWise's signal bindings update the DOM in-place without triggering a full re-render:
+
+```tsx
+import { signal, Widget } from "@serenity-is/corelib";
+
+class CounterWidget extends Widget<any> {
+  private count = signal(0);
+
+  protected override renderContents() {
+    return (
+      <div>
+        <p>Count: {this.count}</p>
+        <button onClick={() => this.count.value++}>Increment</button>
+      </div>
+    );
+  }
+}
+```
+
+- **Imperative refreshes** — Methods like `grid.refresh()` or manual property updates followed by direct DOM changes are the norm. Widgets that need to rebuild their content can clear `domNode.innerHTML` and re-append elements.
+
+### Direct DOM Manipulation
+
+Because there is no VDOM reconciliation, you can freely mix JSX-rendered content with imperative DOM operations:
+
+```tsx
+class HybridWidget extends Widget<any> {
+  protected override renderContents() {
+    // JSX for the initial structure
+    return (
+      <div class="hybrid">
+        <div class="jsx-part">Created via JSX</div>
+        <div class="imperative-part"></div>
+      </div>
+    );
+  }
+
+  protected override onInitialized() {
+    // Direct DOM manipulation — perfectly safe, no VDOM conflicts
+    const imperativeDiv = this.domNode.querySelector('.imperative-part');
+    const child = document.createElement('span');
+    child.textContent = 'Added imperatively';
+    imperativeDiv.appendChild(child);
+  }
+}
+```
+
+This pattern is essential when working with third-party libraries (Select2, Flatpickr, SortableJS, etc.) that directly manipulate the DOM. In a VDOM environment, these libraries would fight against the framework's reconciliation engine; with DomWise, they coexist naturally.
+
+### Widget Lifecycle Integration
+
+DomWise's lifecycle system automatically hooks into Serenity's widget disposal mechanism. When a widget's `destroy()` method is called, DomWise:
+
+1. Fires the `"disposing"` custom event on the widget's `domNode`.
+2. Cleans up all signal subscriptions associated with the element.
+3. Removes event listeners registered via Fluent or DomWise's event system.
+4. Recursively disposes child widgets through the widget association system.
+
+This ensures no memory leaks when widgets are dynamically created and destroyed, even when signals and event handlers are involved. The `addDisposingListener` and `removeDisposingListener` functions from DomWise are used internally by the `Widget` base class to register its `destroy()` method.
 
 ---
 
