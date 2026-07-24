@@ -1033,6 +1033,7 @@ const el2 = h("span", { class: "bar" }, "text");
 
 // If attr is a string or array, it is treated as the first child:
 const el3 = createElement("div", "only child
+```
 
 ---
 
