@@ -911,22 +911,23 @@ Because there is no VDOM reconciliation, you can freely mix JSX-rendered content
 
 ```tsx
 class HybridWidget extends Widget<any> {
+  private imperativePart: HTMLDivElement;
+
   protected override renderContents() {
     // JSX for the initial structure
     return (
       <div class="hybrid">
         <div class="jsx-part">Created via JSX</div>
-        <div class="imperative-part"></div>
+        <div ref={el => this.imperativePart = el} class="imperative-part"></div>
       </div>
     );
   }
 
-  protected override onInitialized() {
+  someMethod() {
     // Direct DOM manipulation — perfectly safe, no VDOM conflicts
-    const imperativeDiv = this.domNode.querySelector('.imperative-part');
     const child = document.createElement('span');
     child.textContent = 'Added imperatively';
-    imperativeDiv.appendChild(child);
+    this.imperativePart.appendChild(child);
   }
 }
 ```
