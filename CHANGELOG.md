@@ -1,3 +1,28 @@
+## 10.3.5 (2026-07-25)
+
+### Features
+
+- Make EntityDialog methods like `save`, `loadById`, `delete`, etc. return a promise. This might be a breaking change if you have any code that overrides these methods and does not return a promise.
+- Apply EntityDialog promise return changes to EntityGridDialog (StartSharp)
+- Bring back custom component overload for the `jsx` function.
+- Switching to TypeScript 7. `dts-bundle-generator` still needs to use TypeScript 6 as TS7 does not have an API yet.
+- Allow `editSettings` function in `AddExceptionLogger` extension (StartSharp)
+- Add tests for `autonumeric`, `ui/dialogs`, `ui/filtering`, `ui/helpers`, `ui/widgets`, `validator`, `layout`, `router`, `strings-compat`, `remoteview`, `fluent`, `fluent-events`, `services`, `pubsub`, and `init-global-mappings`.
+- Increase test coverage across corelib and UI modules.
+- Generate/update dts files for new test additions.
+
+### Bugfixes
+
+- Fix domwise SVG presentation attributes never removed on re-assignment (`removeAttributeNS` called with swapped arguments).
+- Fix `<select>` value broken with signals — `assignProp` now handles `HTMLSelectElement` (single & multi-select).
+- Fix Show component memory leak — `lifecycleNode` no longer set to non-EventTarget values (e.g. string children).
+- Fix `derivedSignal` fallback crash when `subscribe` doesn't fire synchronously.
+- Fix `unsignalizePrevClass` to recursively handle nested arrays.
+- Fix spellcheck cast from `HTMLInputElement` to `HTMLElement`.
+- Fix `getContent` parameter type in Show.
+- Fix some potential issues in `ui/helpers` and `ui/widgets`.
+- Fix some minor bugs in validator.
+
 ## 10.3.4 (2026-07-02)
 
 ### Bugfixes
