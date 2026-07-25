@@ -153,7 +153,8 @@ public static partial class Shared
         var xml = XElement.Parse(File.ReadAllText(path));
         var pkg = new List<Tuple<string, string>>();
         foreach (var x in xml.Descendants("PackageReference"))
-            pkg.Add(new Tuple<string, string>(x.Attribute("Include").Value, x.Attribute("Version").Value));
+            if (x.Attribute("Version")?.Value != null)
+                pkg.Add(new Tuple<string, string>(x.Attribute("Include").Value, x.Attribute("Version").Value));
         return pkg;
     }
 }

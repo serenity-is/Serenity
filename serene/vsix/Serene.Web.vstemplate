@@ -319,13 +319,12 @@
         </Folder>
         <Folder Name="esm" TargetFolderName="esm">
           <Folder Name="_chunks" TargetFolderName="_chunks">
-            <ProjectItem ReplaceParameters="true" TargetFileName="chunk-FZ27HJ7K.js">chunk-FZ27HJ7K.js</ProjectItem>
-            <ProjectItem ReplaceParameters="true" TargetFileName="chunk-HYDVAOP7.js">chunk-HYDVAOP7.js</ProjectItem>
-            <ProjectItem ReplaceParameters="true" TargetFileName="chunk-RKUHNEJF.js">chunk-RKUHNEJF.js</ProjectItem>
-            <ProjectItem ReplaceParameters="true" TargetFileName="chunk-RSMKVBGB.js">chunk-RSMKVBGB.js</ProjectItem>
-            <ProjectItem ReplaceParameters="true" TargetFileName="chunk-TA7MABRS.js">chunk-TA7MABRS.js</ProjectItem>
-            <ProjectItem ReplaceParameters="true" TargetFileName="chunk-TICQHP5J.js">chunk-TICQHP5J.js</ProjectItem>
-            <ProjectItem ReplaceParameters="true" TargetFileName="chunk-VISSMS63.js">chunk-VISSMS63.js</ProjectItem>
+            <ProjectItem ReplaceParameters="true" TargetFileName="chunk-2X5OAECF.js">chunk-2X5OAECF.js</ProjectItem>
+            <ProjectItem ReplaceParameters="true" TargetFileName="chunk-3CYRTJWA.js">chunk-3CYRTJWA.js</ProjectItem>
+            <ProjectItem ReplaceParameters="true" TargetFileName="chunk-HSD4P733.js">chunk-HSD4P733.js</ProjectItem>
+            <ProjectItem ReplaceParameters="true" TargetFileName="chunk-MKWQKDDO.js">chunk-MKWQKDDO.js</ProjectItem>
+            <ProjectItem ReplaceParameters="true" TargetFileName="chunk-OL7A6VBL.js">chunk-OL7A6VBL.js</ProjectItem>
+            <ProjectItem ReplaceParameters="true" TargetFileName="chunk-WAUFGBOH.js">chunk-WAUFGBOH.js</ProjectItem>
           </Folder>
           <Folder Name="Modules" TargetFolderName="Modules">
             <Folder Name="Administration" TargetFolderName="Administration">

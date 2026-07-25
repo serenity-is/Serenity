@@ -5,18 +5,12 @@ if not exist "%ProgramFiles%\dotnet\dotnet.exe" (
     echo ERROR: dotnet not found. Please install dotnet to continue.
     goto end
 )
-if "%VSINSTALLDIR%"=="" (
-	set VSINSTALLDIR=%ProgramFiles%\Microsoft Visual Studio\2026\Community
+if "%VS2026INSTALLDIR%"=="" (
+	set VS2026INSTALLDIR=%ProgramFiles%\Microsoft Visual Studio\2026\Community
 )
 
-if not exist "%VSINSTALLDIR%\MSBuild\Current\Bin\msbuild.exe" (
-    echo ERROR: "%VSINSTALLDIR%\MSBuild\Current\Bin\msbuild.exe" not found. Please install Visual Studio to continue.
-    goto end
-)
-
-for /F "tokens=4 delims=\\" %%G in ("%VSINSTALLDIR%") do set "vsversion=%%G"
-if %vsversion% LSS 2026 (
-    echo ERROR: This script requires Visual Studio 2026 or newer. You are using version %vsversion%.
+if not exist "%VS2026INSTALLDIR%\MSBuild\Current\Bin\msbuild.exe" (
+    echo ERROR: "%VS2026INSTALLDIR%\MSBuild\Current\Bin\msbuild.exe" not found. Please install Visual Studio to continue.
     goto end
 )
 
@@ -36,7 +30,7 @@ goto build_vsix_package
 
 :build_vsix_package
 echo *** BUILDING VSIX PACKAGE ***
-"%VSINSTALLDIR%\MSBuild\Current\Bin\MSBuild.exe" "vsix\Serene.VSIX.slnx" -verbosity:m
+"%VS2026INSTALLDIR%\MSBuild\Current\Bin\MSBuild.exe" "vsix\Serene.VSIX.slnx" -verbosity:m
 if %ERRORLEVEL% GEQ 1 GOTO :error
 rem start vsix\bin\Serene.Template.vsix
 goto install_template
@@ -81,7 +75,7 @@ if errorlevel 2 goto end
 if errorlevel 1 goto push
 
 :push
-nuget push -source https://www.nuget.org/api/v2/package .\vsix\.nupkg\Serene.Templates*.nupkg
+nuget push -source https://nuget.org .\vsix\.nupkg\Serene.Templates*.nupkg
 if %ERRORLEVEL% GEQ 1 GOTO :error
 start microsoft-edge:https://marketplace.visualstudio.com/manage/publishers/volkanceylan/extensions/sereneserenityapplicationtemplate/edit
 goto end

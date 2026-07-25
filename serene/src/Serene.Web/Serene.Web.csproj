@@ -36,15 +36,15 @@
     <PackageReference Include="Microsoft.TypeScript.MSBuild" Version="6.0.3" PrivateAssets="all" IncludeAssets="runtime; build; native; contentfiles; analyzers" />
   </ItemGroup>
   <ItemGroup Condition="'$(UseProjectRefs)' == 'false'">
-    <PackageReference Include="Serenity.Assets" Version="9.1.1" />
-    <PackageReference Include="Serenity.Corelib" Version="9.1.1" />
-    <PackageReference Include="Serenity.Net.Web" Version="9.1.1" />
-    <PackageReference Include="Serenity.Extensions" Version="9.1.1" />
+    <PackageReference Include="Serenity.Assets" Version="10.3.5" />
+    <PackageReference Include="Serenity.Corelib" Version="10.3.5" />
+    <PackageReference Include="Serenity.Net.Web" Version="10.3.5" />
+    <PackageReference Include="Serenity.Extensions" Version="10.3.5" />
     <!--#if (Northwind)-->
-    <PackageReference Include="Serenity.Demo.Northwind" Version="9.1.1" />
+    <PackageReference Include="Serenity.Demo.Northwind" Version="10.3.5" />
     <!--#endif-->
     <!--#if (BasicSamples)-->
-    <PackageReference Include="Serenity.Demo.BasicSamples" Version="9.1.1" />
+    <PackageReference Include="Serenity.Demo.BasicSamples" Version="10.3.5" />
     <!--#endif-->
   </ItemGroup>
   <ItemGroup Condition="'$(UseProjectRefs)' != 'false'">
@@ -68,7 +68,7 @@
     <Exec Command="npm install" Condition="!Exists('..\..\..\pnpm-workspace.yaml')" />
     <Exec Command="pnpm install" Condition="Exists('..\..\..\pnpm-workspace.yaml')" />
   </Target>
-  <Target Name="RunTSBuild" DependsOnTargets="RestoreNodeTypes;NpmInstall" Condition="'$(SkipTSBuild)' != 'true'">
+  <Target Name="RunTSBuild" DependsOnTargets="RestoreNodeTypes;NpmInstall" BeforeTargets="ResolveProjectStaticWebAssets" AfterTargets="ResolveProjectReferences" Condition="'$(SkipTSBuild)' != 'true'">
     <Message Text="Executing TypeScript compiler for $(ProjectName)..." Importance="high" />
     <ItemGroup>
       <CleanedEsmFiles Include="wwwroot\esm\**" />
@@ -80,7 +80,7 @@
       <Content Include="wwwroot\esm\**\*.js;wwwroot\esm\**\*.css;wwwroot\esm\**\*.map" Exclude="@(Content)" CopyToOutputDirectory="Never" CopyToPublishDirectory="PreserveNewest" ExcludeFromSingleFile="true" />
     </ItemGroup>
   </Target>
-  <Target Name="TransformMvcClientTypes" AfterTargets="ResolveProjectReferences" DependsOnTargets="SetSergenTransformArgs" Condition="'$(BuildingProject)' != 'false' And '$(DesignTimeBuild)' != 'true'">
+  <Target Name="TransformMvcClientTypes" AfterTargets="ResolveProjectReferences" Condition="'$(BuildingProject)' != 'false' And '$(DesignTimeBuild)' != 'true' ">
     <Exec Command="dotnet tool restore" ContinueOnError="true" Condition="'$(DotNetSergen)' == 'dotnet sergen'" />
     <Exec Command="$(DotNetSergen) mvct $(SergenTransformArgs)" ContinueOnError="true" />
   </Target>

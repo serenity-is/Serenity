@@ -49,7 +49,7 @@ public static partial class Shared
             devDependencies.Remove("test-utils");
 
             PnpmWorkspaceYaml workspaceYaml = null;
-            string workspaceFile = Path.Combine(Root, "pnpm-workspace.yaml");
+            string workspaceFile = IsStartSharp ? Path.Combine(Root, "pnpm-workspace.yaml") : Path.Combine(Root, "..", "pnpm-workspace.yaml");
 
             foreach (var deps in new JObject[] { dependencies, devDependencies })
             {
