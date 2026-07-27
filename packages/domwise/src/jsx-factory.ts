@@ -20,7 +20,7 @@ type DataKeys = `data-${string}`
  * Unlike `createElement` (or `h`), which takes children as additional arguments,
  * `jsx` expects children as part of the `props` object (`props.children`).
  *
- * @param tag - The HTML/SVG/MathML tag name or a component function/class.
+ * @param type - The HTML/SVG/MathML tag name or a component function/class.
  * @param props - The attributes/props for the element. Children are passed via `props.children`.
  * @returns The created JSX element (DOM node).
  */

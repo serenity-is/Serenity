@@ -135,9 +135,9 @@ export type ObserveSignalCallback<T> = (args: SignalObserveArgs<T>) => void;
  * Returns an effect disposer that can be used to stop observing.
  * @param signal - Signal to observe.
  * @param callback - Callback to execute immediately upon subscription and when the signal value changes.
- * @param opt - Optional configuration.
- * @param opt.useLifecycleRoot - If true, `currentLifecycleRoot()` at subscription time is recorded as the lifecycle node.
- * @param opt.lifecycleNode - Optional node to tie the signal's lifecycle to (auto-disposal on dispose).
+ * @param opt - Optional configuration. useLifecycleRoot - If true, `currentLifecycleRoot()` at 
+ * subscription time is recorded as the lifecycle node. lifecycleNode - Optional node to tie the signal's lifecycle 
+ * to (auto-disposal on dispose).
  * @returns An effect disposer function, or `null`/`undefined` if the signal does not support disposal.
  */
 export function observeSignal<T>(signal: SignalLike<T>, callback: ObserveSignalCallback<T>, opt?: {
