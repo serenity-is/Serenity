@@ -1,10 +1,9 @@
 /**
  * ## DomWise (@serenity-is/domwise)
  * 
- * TypeScript library for creating and managing DOM elements using JSX syntax with strong typing and IDE support.
- * 
- * - This is primarily based on  [alex-kinokon/jsx-dom](https://github.com/alex-kinokon/jsx-dom) with integrated signal support via [@preact/signals](https://github.com/preactjs/signals) and some extra types / ideas from [ryansolid/dom-expressions](https://github.com/ryansolid/dom-expressions) and [lusito/tsx-dom](https://github.com/Lusito/tsx-dom).
- * - Enables creating and manipulating DOM elements using JSX syntax with strong typing and IDE support.
+ * > **Use JSX syntax to create and manage DOM elements** — with full TypeScript support, reactive signal bindings, and seamless integration with the Serenity widget system.
+ *
+ * DomWise is a lightweight, high-performance JSX library that compiles your JSX templates directly into real DOM nodes — no virtual DOM, no diffing, no reconciliation overhead. Designed from the ground up for the [Serenity](https://serenity.is) application framework, it embraces direct DOM manipulation and works harmoniously with widget lifecycles, avoiding the conflicts that plague VDOM libraries when mixed with imperative DOM updates.
  * @packageDocumentation
  */
 export type * from "../types";

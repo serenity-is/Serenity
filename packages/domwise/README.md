@@ -9,8 +9,6 @@
 
 DomWise is a lightweight, high-performance JSX library that compiles your JSX templates directly into real DOM nodes — no virtual DOM, no diffing, no reconciliation overhead. Designed from the ground up for the [Serenity](https://serenity.is) application framework, it embraces direct DOM manipulation and works harmoniously with widget lifecycles, avoiding the conflicts that plague VDOM libraries when mixed with imperative DOM updates.
 
-Serenity's widget model was originally built around jQuery UI widgets that attach to existing elements, manipulate the DOM directly, and manage their own lifecycle through `init()` / `destroy()` methods. As the framework transitions away from jQuery toward a modern JSX-based programming model, DomWise provides the ideal foundation — it creates real DOM nodes that widgets can interact with natively, without the abstraction layer of a virtual DOM that would fight against imperative DOM operations.
-
 Built on the foundations of [jsx-dom](https://github.com/alex-kinokon/jsx-dom), [dom-expressions](https://github.com/ryansolid/dom-expressions), and [tsx-dom](https://github.com/Lusito/tsx-dom), DomWise adds first-class reactive programming via [@preact/signals-core](https://github.com/preactjs/signals), a powerful conditional `Show` component, and a comprehensive lifecycle management system that integrates with Serenity's widget dispose patterns.
 
 See [NOTICE.md](./NOTICE.md) for licensing information about used libraries.
@@ -87,27 +85,7 @@ yarn add @serenity-is/domwise
 pnpm add @serenity-is/domwise
 ```
 
----
-
-## Usage in Serene/StartSharp Applications
-
-In Serene and StartSharp template applications, you typically do not need to install `@serenity-is/domwise` via npm manually. The package is brought in automatically through the NuGet package dependency chain:
-
-1. Your `.csproj` file references `Serenity.Corelib` (and optionally other Serenity packages).
-2. `Serenity.Corelib` has a NuGet dependency on `Serenity.DomWise`, which ships the DomWise JavaScript and TypeScript files as embedded static web assets under its `dist/` directory.
-3. When you run `npm install` or `pnpm install`, the `preinstall` / `pnpm:devPreinstall` script defined in your `package.json` executes `dotnet build -target:RestoreNodeTypes`.
-4. The `RestoreNodeTypes` MSBuild target, defined in `Serenity.Net.Web.targets` (shipped via the `Serenity.Net.Web` NuGet package), scans all referenced NuGet and project packages for their `dist/` directories and copies the files to your project's `node_modules/.dotnet/` folder.
-5. The same target also automatically inserts or updates the corresponding entries in your `package.json` dependencies section, pointing them to the local `node_modules/.dotnet/` paths.
-
-After running `npm install`, your `package.json` will contain entries like:
-
-```json
-"@serenity-is/domwise": "./node_modules/.dotnet/serenity.domwise"
-```
-
-This system ensures that your npm dependencies are always kept in sync with the NuGet package versions you have referenced — without any manual version management. It also accommodates Serenity packages (such as `Serenity.Extensions`, `Serenity.Pro.Extensions`) that do not have published npm registry counterparts.
-
-> **Note:** The direct `npm install @serenity-is/domwise` shown in the previous section is only needed when using DomWise outside of a Serene/StartSharp project, or if you require a standalone installation.
+> **Note:** The direct `npm install @serenity-is/domwise` shown in the previous section is only needed when using DomWise outside of a Serene/StartSharp project, or if you require a standalone installation. See [Usage in Serene/StartSharp Application](#usage-in-serenestartsharp-application)
 
 ---
 
@@ -158,10 +136,7 @@ document.body.appendChild(
 
 ## Why Not Virtual DOM?
 
-DomWise compiles JSX directly into real DOM nodes — no virtual DOM, no diffing, no reconciliation. This design is a deliberate choice driven by Serenity's widget architecture.
-
-Serenity's widget model was originally designed over 10 years ago around jQuery UI widgets. Widgets attach themselves to existing DOM elements, manipulate the DOM directly, and manage their own lifecycle through `init()` / `destroy()` methods. When the framework began transitioning away from jQuery toward a JSX-based programming model, VDOM libraries like React were evaluated but their virtual DOM reconciliation conflicted with widgets that modify the DOM imperatively.
-
+DomWise compiles JSX directly into real DOM nodes — no virtual DOM, no diffing, no reconciliation. 
 
 While VDOM has its own set of advantages, they do not outweigh the issues that may arise when dealing with code or external components that manipulate the DOM directly.
 
@@ -171,6 +146,8 @@ A JSX library that creates real DOM elements like DomWise — avoids these issue
 - **Seamless migration** — Existing widgets that call `appendChild`, modify `innerHTML`, attach event listeners, or integrate with third-party libraries (Select2, Flatpickr, SortableJS, etc.) continue to work without wrappers or workarounds.
 - **Predictable lifecycle** — Elements are created once and live until explicitly removed. There is no re-render cycle that might reconstruct or detach widget-bound elements.
 - **Framework flexibility** — While DomWise is the primary programming model, you can freely use React, Preact, Vue, or any other framework in parts of your application without cross-framework reconciliation issues. For example, the StartSharp dashboard page uses Preact for its Chat widget while other widgets on the same page use DomWise.
+
+This design is a deliberate choice driven by Serenity's widget architecture which was designed over 10 years ago around jQuery UI widgets. Widgets attach themselves to existing DOM elements, manipulate the DOM directly, and manage their own lifecycle through `init()` / `destroy()` methods. When the framework began transitioning away from jQuery toward a JSX-based programming model, VDOM libraries like React were evaluated but their virtual DOM reconciliation conflicted with widgets that modify the DOM imperatively.
 
 ### From jsx-dom to DomWise
 
@@ -1084,6 +1061,26 @@ import { jsx } from "@serenity-is/domwise";
 ```
 
 The package also provides a `/jsx-runtime` entry point for automatic runtime resolution, and a `/jsx-dev-runtime` entry point for development mode.
+
+---
+
+## Usage in Serene/StartSharp Applications
+
+In Serene and StartSharp template applications, you typically do not need to install `@serenity-is/domwise` via npm manually. The package is brought in automatically through the NuGet package dependency chain:
+
+1. Your `.csproj` file references `Serenity.Corelib` (and optionally other Serenity packages).
+2. `Serenity.Corelib` has a NuGet dependency on `Serenity.DomWise`, which ships the DomWise JavaScript and TypeScript files as embedded static web assets under its `dist/` directory.
+3. When you run `npm install` or `pnpm install`, the `preinstall` / `pnpm:devPreinstall` script defined in your `package.json` executes `dotnet build -target:RestoreNodeTypes`.
+4. The `RestoreNodeTypes` MSBuild target, defined in `Serenity.Net.Web.targets` (shipped via the `Serenity.Net.Web` NuGet package), scans all referenced NuGet and project packages for their `dist/` directories and copies the files to your project's `node_modules/.dotnet/` folder.
+5. The same target also automatically inserts or updates the corresponding entries in your `package.json` dependencies section, pointing them to the local `node_modules/.dotnet/` paths.
+
+After running `npm install`, your `package.json` will contain entries like:
+
+```json
+"@serenity-is/domwise": "./node_modules/.dotnet/serenity.domwise"
+```
+
+This system ensures that your npm dependencies are always kept in sync with the NuGet package versions you have referenced — without any manual version management. It also accommodates Serenity packages (such as `Serenity.Extensions`, `Serenity.Pro.Extensions`) that do not have published npm registry counterparts.
 
 ---
 
