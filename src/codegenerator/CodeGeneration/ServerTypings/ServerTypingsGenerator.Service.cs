@@ -42,7 +42,7 @@ public partial class ServerTypingsGenerator
                 sb.Append("(request: ");
                 if (requestType == null)
                 {
-                    var serviceRequest = ImportFromQ("ServiceRequest");
+                    var serviceRequest = ImportFromCorelib("ServiceRequest");
                     sb.Append(serviceRequest);
                 }
                 else
@@ -50,7 +50,7 @@ public partial class ServerTypingsGenerator
 
                 sb.Append(", onSuccess?: (response: ");
                 AppendMappedType(responseType, codeNamespace);
-                var serviceOptions = ImportFromQ("ServiceOptions");
+                var serviceOptions = ImportFromCorelib("ServiceOptions");
 
                 sb.Append($") => void, opt?: {serviceOptions}<any>): PromiseLike<");
                 AppendMappedType(responseType, codeNamespace);
@@ -106,7 +106,7 @@ public partial class ServerTypingsGenerator
                     cw.Indented("(<any>");
                     sb.Append(identifier);
                     sb.AppendLine(")[x] = function (r, s, o) {");
-                    var serviceRequest = ImportFromQ("serviceRequest");
+                    var serviceRequest = ImportFromCorelib("serviceRequest");
                     cw.IndentedLine($"    return {serviceRequest}(baseUrl + '/' + x, r, s, o);");
                     cw.IndentedLine("};");
                 });

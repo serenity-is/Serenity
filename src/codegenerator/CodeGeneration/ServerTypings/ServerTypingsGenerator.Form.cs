@@ -364,7 +364,7 @@ public partial class ServerTypingsGenerator
                         cw.Indented(identifier);
                         sb.AppendLine(".init = true;");
                         sb.AppendLine();
-                        var initFormType = ImportFromQ("initFormType");
+                        var initFormType = ImportFromCorelib("initFormType");
                         cw.Indented($"{initFormType}(");
 
                         sb.Append(identifier);

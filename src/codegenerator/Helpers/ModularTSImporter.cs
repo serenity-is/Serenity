@@ -15,11 +15,6 @@ public class ModularTSImporter(string currentModule)
             "../ServerTypes/" : ("../../ServerTypes/" + currentModule), name);
     }
 
-    protected string ImportFromQ(string name)
-    {
-        return AddExternalImport("@serenity-is/corelib", name);
-    }
-
     protected string ImportFromCorelib(string name)
     {
         return AddExternalImport("@serenity-is/corelib", name);
@@ -102,12 +97,12 @@ public class ModularTSImporter(string currentModule)
             }
         }));
 
-        scriptObject.Import("SERENITYIMPORT", new ImportFromDelegate(modularTSImporter.ImportFromCorelib));
+        scriptObject.Import("IMPORTFROMCORELIB", new ImportFromDelegate(modularTSImporter.ImportFromCorelib));
 
-        scriptObject.Import("QIMPORT", new ImportFromDelegate(modularTSImporter.ImportFromQ));
-
+        // for compat        
         scriptObject.Import("SERVERTYPEIMPORT", new ImportFromDelegate(modularTSImporter.ImportFromTypes));
-
+        scriptObject.Import("SERENITYIMPORT", new ImportFromDelegate(modularTSImporter.ImportFromCorelib));
+        scriptObject.Import("QIMPORT", new ImportFromDelegate(modularTSImporter.ImportFromCorelib));
         scriptObject.Import("GETEDITORVARIABLEINDEX", new EditorVariableIndexDelegate((editor, editors) =>
         {
             return editors.FirstOrDefault(x => string.Equals(x.Editor, editor, StringComparison.Ordinal)).Index.ToString();

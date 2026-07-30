@@ -1,5 +1,5 @@
 
-export class {{DialogClassName}} extends {{SERENITYIMPORT "EntityDialog"}}<{{RowClassName}}, any> {
+export class {{DialogClassName}} extends {{IMPORTFROMCORELIB "EntityDialog"}}<{{RowClassName}}, any> {
     static override [Symbol.typeInfo] = this.registerClass("{{ModuleNamespace}}.");
 
     protected override getFormKey() { return {{SERVERTYPEIMPORT FormClassName}}.formKey; }

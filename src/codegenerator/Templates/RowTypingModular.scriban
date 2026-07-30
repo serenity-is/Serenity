@@ -14,5 +14,5 @@ export abstract class {{RowClassName}} {%{{}%}{{if Identity}}
     static readonly readPermission = '{{Permission}}';
     static readonly updatePermission = '{{Permission}}';
 
-    static readonly Fields = {{QIMPORT "fieldsProxy"}}<{{RowClassName}}>();
+    static readonly Fields = {{IMPORTFROMCORELIB "fieldsProxy"}}<{{RowClassName}}>();
 }

@@ -1,2 +1,2 @@
 
-export default () => {{QIMPORT "gridPageInit"}}({{IMPORTFROM "./" + GridClassName GridClassName}});
+export default () => {{IMPORTFROMCORELIB "gridPageInit"}}({{IMPORTFROM "./" + GridClassName GridClassName}});

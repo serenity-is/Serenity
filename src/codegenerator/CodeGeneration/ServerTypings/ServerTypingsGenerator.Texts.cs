@@ -227,7 +227,7 @@ public partial class ServerTypingsGenerator
             });
 
             sb.AppendLine();
-            var proxyTexts = ImportFromQ("proxyTexts");
+            var proxyTexts = ImportFromCorelib("proxyTexts");
 
             sb.Append($"{(exportTexts ? "export " : "")}const Texts: typeof texts = {proxyTexts}({{}}, '', ");
             jw.Flush();

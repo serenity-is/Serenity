@@ -64,12 +64,6 @@ public partial class ServerTypingsGenerator
             char.MaxValue + from : from;
     }
 
-
-    protected string ImportFromQ(string name)
-    {
-        return AddExternalImport("@serenity-is/corelib", name);
-    }
-
     protected string ImportFromCorelib(string name)
     {
         return AddExternalImport("@serenity-is/corelib", name);

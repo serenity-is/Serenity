@@ -1,5 +1,5 @@
 
-export class {{GridClassName}} extends {{SERENITYIMPORT "EntityGrid"}}<{{RowClassName}}> {
+export class {{GridClassName}} extends {{IMPORTFROMCORELIB "EntityGrid"}}<{{RowClassName}}> {
     static override [Symbol.typeInfo] = this.registerClass("{{ModuleNamespace}}.");
 
     protected override getColumnsKey() { return {{SERVERTYPEIMPORT ColumnsClassName}}.columnsKey; }

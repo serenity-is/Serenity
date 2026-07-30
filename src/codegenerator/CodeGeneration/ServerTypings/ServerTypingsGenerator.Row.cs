@@ -524,8 +524,8 @@ public partial class ServerTypingsGenerator
                 cw.IndentedLine($"{export}lookupKey = {sq(meta.LookupKey)};");
                 sb.AppendLine();
 
-                var getLookup = ImportFromQ("getLookup");
-                var getLookupAsync = ImportFromQ("getLookupAsync");
+                var getLookup = ImportFromCorelib("getLookup");
+                var getLookupAsync = ImportFromCorelib("getLookupAsync");
                 cw.IndentedLine("/** @deprecated use getLookupAsync instead */");
                 cw.IndentedLine($"static getLookup() {{ return {getLookup}<{rowType.Name}>({sq(meta.LookupKey)}) }}");
                 cw.IndentedLine($"static async getLookupAsync() {{ return {getLookupAsync}<{rowType.Name}>({sq(meta.LookupKey)}) }}");
@@ -538,7 +538,7 @@ public partial class ServerTypingsGenerator
             cw.IndentedLine($"{export}updatePermission = {sq(meta.UpdatePermission)};");
             sb.AppendLine();
 
-            var fieldsProxy = ImportFromQ("fieldsProxy");
+            var fieldsProxy = ImportFromCorelib("fieldsProxy");
             cw.IndentedLine($"static readonly Fields = {fieldsProxy}<{rowType.Name}>();");
         });
     }

@@ -2,11 +2,11 @@
 export namespace {{ServiceClassName}} {
     export const baseUrl = '{{ServiceBaseUrl}}';
 
-    export declare function Create(request: {{SERENITYIMPORT "SaveRequest"}}<{{RowClassName}}>, onSuccess?: (response: {{SERENITYIMPORT "SaveResponse"}}) => void, opt?: {{SERENITYIMPORT "ServiceOptions"}}<any>): PromiseLike<{{SERENITYIMPORT "SaveResponse"}}>;
-    export declare function Update(request: {{SERENITYIMPORT "SaveRequest"}}<{{RowClassName}}>, onSuccess?: (response: {{SERENITYIMPORT "SaveResponse"}}) => void, opt?: {{SERENITYIMPORT "ServiceOptions"}}<any>): PromiseLike<{{SERENITYIMPORT "SaveResponse"}}>;
-    export declare function Delete(request: {{SERENITYIMPORT "DeleteRequest"}}, onSuccess?: (response: {{SERENITYIMPORT "DeleteResponse"}}) => void, opt?: {{SERENITYIMPORT "ServiceOptions"}}<any>): PromiseLike<{{SERENITYIMPORT "DeleteResponse"}}>;
-    export declare function Retrieve(request: {{SERENITYIMPORT "RetrieveRequest"}}, onSuccess?: (response: {{SERENITYIMPORT "RetrieveResponse"}}<{{RowClassName}}>) => void, opt?: {{SERENITYIMPORT "ServiceOptions"}}<any>): PromiseLike<{{SERENITYIMPORT "RetrieveResponse"}}<{{IMPORTFROM "./" + RowClassName RowClassName}}>>;
-    export declare function List(request: {{SERENITYIMPORT "ListRequest"}}, onSuccess?: (response: {{SERENITYIMPORT "ListResponse"}}<{{IMPORTFROM "./" + RowClassName RowClassName}}>) => void, opt?: {{SERENITYIMPORT "ServiceOptions"}}<any>): PromiseLike<{{SERENITYIMPORT "ListResponse"}}<{{IMPORTFROM "./" + RowClassName RowClassName}}>>;
+    export declare function Create(request: {{IMPORTFROMCORELIB "SaveRequest"}}<{{RowClassName}}>, onSuccess?: (response: {{IMPORTFROMCORELIB "SaveResponse"}}) => void, opt?: {{IMPORTFROMCORELIB "ServiceOptions"}}<any>): PromiseLike<{{IMPORTFROMCORELIB "SaveResponse"}}>;
+    export declare function Update(request: {{IMPORTFROMCORELIB "SaveRequest"}}<{{RowClassName}}>, onSuccess?: (response: {{IMPORTFROMCORELIB "SaveResponse"}}) => void, opt?: {{IMPORTFROMCORELIB "ServiceOptions"}}<any>): PromiseLike<{{IMPORTFROMCORELIB "SaveResponse"}}>;
+    export declare function Delete(request: {{IMPORTFROMCORELIB "DeleteRequest"}}, onSuccess?: (response: {{IMPORTFROMCORELIB "DeleteResponse"}}) => void, opt?: {{IMPORTFROMCORELIB "ServiceOptions"}}<any>): PromiseLike<{{IMPORTFROMCORELIB "DeleteResponse"}}>;
+    export declare function Retrieve(request: {{IMPORTFROMCORELIB "RetrieveRequest"}}, onSuccess?: (response: {{IMPORTFROMCORELIB "RetrieveResponse"}}<{{RowClassName}}>) => void, opt?: {{IMPORTFROMCORELIB "ServiceOptions"}}<any>): PromiseLike<{{IMPORTFROMCORELIB "RetrieveResponse"}}<{{IMPORTFROM "./" + RowClassName RowClassName}}>>;
+    export declare function List(request: {{IMPORTFROMCORELIB "ListRequest"}}, onSuccess?: (response: {{IMPORTFROMCORELIB "ListResponse"}}<{{IMPORTFROM "./" + RowClassName RowClassName}}>) => void, opt?: {{IMPORTFROMCORELIB "ServiceOptions"}}<any>): PromiseLike<{{IMPORTFROMCORELIB "ListResponse"}}<{{IMPORTFROM "./" + RowClassName RowClassName}}>>;
 
     export const Methods = {
         Create: "{{ServiceBaseUrl}}/Create",
@@ -24,7 +24,7 @@ export namespace {{ServiceClassName}} {
         'List'
     ].forEach(x => {
         (<any>{{ServiceClassName}})[x] = function (r, s, o) { 
-            return {{QIMPORT "serviceRequest"}}(baseUrl + '/' + x, r, s, o); 
+            return {{IMPORTFROMCORELIB "serviceRequest"}}(baseUrl + '/' + x, r, s, o); 
         };
     });
 }

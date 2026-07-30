@@ -67,7 +67,7 @@ public partial class ServerTypingsGenerator
             sb.Append(key);
             sb.AppendLine("';");
 
-            var fieldsProxy = ImportFromQ("fieldsProxy");
+            var fieldsProxy = ImportFromCorelib("fieldsProxy");
             cw.IndentedLine($"static readonly Fields = {fieldsProxy}<{type.Name}>();");
 
             foreach (var item in publicProperties)

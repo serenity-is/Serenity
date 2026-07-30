@@ -5,7 +5,7 @@ export interface {{ColumnsClassName}} {
     {{~end~}}
 }
 
-export class {{ColumnsClassName}} extends {{SERENITYIMPORT "ColumnsBase"}}<{{IMPORTFROM "./" + RowClassName RowClassName}}> {
+export class {{ColumnsClassName}} extends {{IMPORTFROMCORELIB "ColumnsBase"}}<{{IMPORTFROM "./" + RowClassName RowClassName}}> {
     static readonly columnsKey = '{{ColumnsKey}}';
-    static readonly Fields = {{QIMPORT "fieldsProxy"}}<{{ColumnsClassName}}>();
+    static readonly Fields = {{IMPORTFROMCORELIB "fieldsProxy"}}<{{ColumnsClassName}}>();
 }

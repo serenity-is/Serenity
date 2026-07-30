@@ -4,7 +4,7 @@ export interface {{FormClassName}} {
     {{~end~}}
 }
 
-export class {{FormClassName}} extends {{SERENITYIMPORT "PrefixedContext"}} {
+export class {{FormClassName}} extends {{IMPORTFROMCORELIB "PrefixedContext"}} {
     static readonly formKey = '{{FormKey}}';
     private static init: boolean;
     
@@ -14,8 +14,8 @@ export class {{FormClassName}} extends {{SERENITYIMPORT "PrefixedContext"}} {
         if (!{{FormClassName}}.init)  {
             {{FormClassName}}.init = true;
 
-            {{QIMPORT "initFormType"}}({{FormClassName}}, [{{for x in FormFields}}
-                '{{x.PropertyName}}', {{SERENITYIMPORT x.TSEditorType}},{{end}}
+            {{IMPORTFROMCORELIB "initFormType"}}({{FormClassName}}, [{{for x in FormFields}}
+                '{{x.PropertyName}}', {{IMPORTFROMCORELIB x.TSEditorType}},{{end}}
             ]);
         }
     }
