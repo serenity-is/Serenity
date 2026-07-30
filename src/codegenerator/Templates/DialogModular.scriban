@@ -6,5 +6,5 @@ export class {{DialogClassName}} extends {{IMPORTFROMCORELIB "EntityDialog"}}<{{
     protected override getRowDefinition() { return {{SERVERTYPEIMPORT RowClassName}}; }
     protected override getService() { return {{SERVERTYPEIMPORT ServiceClassName}}.baseUrl; }
 
-    protected form = new {{FormClassName}}(this.idPrefix);
+    protected form = new {{FormClassName}}(this);
 }
