@@ -6,18 +6,16 @@ export interface RoleForm {
 
 export class RoleForm extends PrefixedContext {
     static readonly formKey = 'Administration.Role';
-    private static init: boolean;
+    declare private static init: boolean;
 
-    constructor(prefix: string) {
-        super(prefix);
+    constructor(...args: ConstructorParameters<typeof PrefixedContext>) {
+        super(...args);
 
         if (!RoleForm.init) {
             RoleForm.init = true;
 
-            var w0 = StringEditor;
-
             initFormType(RoleForm, [
-                'RoleName', w0
+                'RoleName', StringEditor
             ]);
         }
     }

@@ -7,20 +7,17 @@ export interface LoginForm {
 
 export class LoginForm extends PrefixedContext {
     static readonly formKey = 'Membership.Login';
-    private static init: boolean;
+    declare private static init: boolean;
 
-    constructor(prefix: string) {
-        super(prefix);
+    constructor(...args: ConstructorParameters<typeof PrefixedContext>) {
+        super(...args);
 
         if (!LoginForm.init) {
             LoginForm.init = true;
 
-            var w0 = StringEditor;
-            var w1 = PasswordEditor;
-
             initFormType(LoginForm, [
-                'Username', w0,
-                'Password', w1
+                'Username', StringEditor,
+                'Password', PasswordEditor
             ]);
         }
     }

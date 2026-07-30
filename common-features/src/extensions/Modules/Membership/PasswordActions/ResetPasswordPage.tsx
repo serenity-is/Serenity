@@ -19,7 +19,7 @@ export class ResetPasswordPanel extends PropertyPanel<ResetPasswordRequest, Rese
 
     protected override getFormKey() { return ResetPasswordForm.formKey; }
 
-    private form = new ResetPasswordForm(this.idPrefix);
+    private form = new ResetPasswordForm(this);
     declare private tokenInput: HTMLInputElement;
 
     constructor(props: WidgetProps<ResetPasswordOptions>) {

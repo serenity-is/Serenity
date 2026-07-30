@@ -14,7 +14,7 @@ export default function pageInit(opt?: { activated: string }) {
 
 class LoginPanel extends PropertyPanel<LoginRequest, any> {
 
-    public readonly form = new LoginForm(this.idPrefix);
+    public readonly form = new LoginForm(this);
 
     protected override getFormKey() { return LoginForm.formKey; }
 

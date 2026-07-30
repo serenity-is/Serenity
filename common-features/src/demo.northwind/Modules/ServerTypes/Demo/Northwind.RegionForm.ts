@@ -7,20 +7,17 @@ export interface RegionForm {
 
 export class RegionForm extends PrefixedContext {
     static readonly formKey = 'Northwind.Region';
-    private static init: boolean;
+    declare private static init: boolean;
 
-    constructor(prefix: string) {
-        super(prefix);
+    constructor(...args: ConstructorParameters<typeof PrefixedContext>) {
+        super(...args);
 
         if (!RegionForm.init) {
             RegionForm.init = true;
 
-            var w0 = IntegerEditor;
-            var w1 = StringEditor;
-
             initFormType(RegionForm, [
-                'RegionID', w0,
-                'RegionDescription', w1
+                'RegionID', IntegerEditor,
+                'RegionDescription', StringEditor
             ]);
         }
     }

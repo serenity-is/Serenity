@@ -8,20 +8,17 @@ export interface ShipperForm {
 
 export class ShipperForm extends PrefixedContext {
     static readonly formKey = 'Northwind.Shipper';
-    private static init: boolean;
+    declare private static init: boolean;
 
-    constructor(prefix: string) {
-        super(prefix);
+    constructor(...args: ConstructorParameters<typeof PrefixedContext>) {
+        super(...args);
 
         if (!ShipperForm.init) {
             ShipperForm.init = true;
 
-            var w0 = StringEditor;
-            var w1 = PhoneEditor;
-
             initFormType(ShipperForm, [
-                'CompanyName', w0,
-                'Phone', w1
+                'CompanyName', StringEditor,
+                'Phone', PhoneEditor
             ]);
         }
     }

@@ -348,12 +348,12 @@ public partial class ServerTypingsGenerator
 
             if (propertyNames.Count > 0)
             {
-                cw.IndentedLine("private static init: boolean;");
+                cw.IndentedLine("declare private static init: boolean;");
                 sb.AppendLine();
-                cw.Indented("constructor(prefix: string)");
+                cw.Indented("constructor(...args: ConstructorParameters<typeof PrefixedContext>)");
                 cw.InBrace(delegate
                 {
-                    cw.IndentedLine("super(prefix);");
+                    cw.IndentedLine("super(...args);");
                     sb.AppendLine();
                     cw.Indented("if (!");
                     sb.Append(identifier);
@@ -364,25 +364,6 @@ public partial class ServerTypingsGenerator
                         cw.Indented(identifier);
                         sb.AppendLine(".init = true;");
                         sb.AppendLine();
-
-                        var typeNumber = new Dictionary<string, int>();
-                        foreach (var s in propertyTypes)
-                        {
-                            var typeName = s;
-                            SplitGenericArguments(ref typeName);
-
-                            if (!typeNumber.ContainsKey(typeName))
-                            {
-                                cw.Indented("var w");
-                                sb.Append(typeNumber.Count);
-                                sb.Append(" = ");
-                                sb.Append(typeName);
-                                sb.AppendLine(";");
-                                typeNumber[typeName] = typeNumber.Count;
-                            }
-                        }
-                        sb.AppendLine();
-
                         var initFormType = ImportFromQ("initFormType");
                         cw.Indented($"{initFormType}(");
 
@@ -397,11 +378,10 @@ public partial class ServerTypingsGenerator
 
                                 cw.Indented("'");
                                 sb.Append(propertyNames[i]);
-                                sb.Append("', w");
+                                sb.Append("', ");
                                 var typeName = propertyTypes[i];
                                 SplitGenericArguments(ref typeName);
-                                sb.Append(typeNumber[typeName]);
-                                sb.Append("");
+                                sb.Append(typeName);
                             }
 
                             sb.AppendLine();

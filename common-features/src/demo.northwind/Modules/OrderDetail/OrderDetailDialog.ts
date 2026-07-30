@@ -16,7 +16,7 @@ export class OrderDetailDialog extends GridEditorDialog<OrderDetailRow> {
     constructor(props: WidgetProps<any>) {
         super(props);
 
-        this.form = new OrderDetailForm(this.idPrefix);
+        this.form = new OrderDetailForm(this);
 
         this.form.ProductID.changeSelect2(async e => {
             var productID = toId(this.form.ProductID.value);

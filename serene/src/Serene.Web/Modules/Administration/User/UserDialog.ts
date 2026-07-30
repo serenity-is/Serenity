@@ -14,7 +14,7 @@ export class UserDialog extends EntityDialog<UserRow, any> {
     protected override getNameProperty() { return UserRow.nameProperty; }
     protected override getService() { return UserService.baseUrl; }
 
-    protected form = new UserForm(this.idPrefix);
+    protected form = new UserForm(this);
 
     constructor(props?: any) {
         super(props);

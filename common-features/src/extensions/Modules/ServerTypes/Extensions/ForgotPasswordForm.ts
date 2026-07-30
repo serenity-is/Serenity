@@ -6,18 +6,16 @@ export interface ForgotPasswordForm {
 
 export class ForgotPasswordForm extends PrefixedContext {
     static readonly formKey = 'Serenity.Extensions.ForgotPasswordRequest';
-    private static init: boolean;
+    declare private static init: boolean;
 
-    constructor(prefix: string) {
-        super(prefix);
+    constructor(...args: ConstructorParameters<typeof PrefixedContext>) {
+        super(...args);
 
         if (!ForgotPasswordForm.init) {
             ForgotPasswordForm.init = true;
 
-            var w0 = EmailAddressEditor;
-
             initFormType(ForgotPasswordForm, [
-                'Email', w0
+                'Email', EmailAddressEditor
             ]);
         }
     }

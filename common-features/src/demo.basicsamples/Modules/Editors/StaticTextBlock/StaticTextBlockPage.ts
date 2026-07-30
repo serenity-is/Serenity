@@ -11,7 +11,7 @@ export class StaticTextBlockDialog<P = {}> extends PropertyDialog<any, P> {
 
     protected override getFormKey() { return StaticTextBlockForm.formKey; }
 
-    protected form = new StaticTextBlockForm(this.idPrefix);
+    protected form = new StaticTextBlockForm(this);
 
     constructor(props: WidgetProps<P>) {
         super(props);

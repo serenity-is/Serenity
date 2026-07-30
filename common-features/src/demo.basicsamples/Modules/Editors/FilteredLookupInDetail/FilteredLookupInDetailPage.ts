@@ -25,7 +25,7 @@ export class FilteredLookupOrderDetailDialog extends OrderDetailDialog {
     constructor(props: any) {
         super(props);
 
-        this.form = new OrderDetailForm(this.idPrefix);
+        this.form = new OrderDetailForm(this);
 
         // we can set cascade field in constructor
         // we could also use FilterField but in this case, when CategoryID is null
@@ -91,7 +91,7 @@ export class FilteredLookupInDetailDialog<P = {}> extends EntityDialog<OrderRow,
     constructor(props: WidgetProps<P>) {
         super(props);
 
-        this.form = new FilteredLookupInDetailForm(this.idPrefix);
+        this.form = new FilteredLookupInDetailForm(this);
         this.form.CategoryID.change(e => {
             this.form.DetailList.categoryID = toId(this.form.CategoryID.value);
         });

@@ -9,5 +9,5 @@ export class TerritoryDialog<P = {}> extends EntityDialog<TerritoryRow, P> {
     protected override getRowDefinition() { return TerritoryRow; }
     protected override getService() { return TerritoryService.baseUrl; }
 
-    protected form = new TerritoryForm(this.idPrefix);
+    protected form = new TerritoryForm(this);
 }

@@ -3303,7 +3303,7 @@ export declare function tryGetWidget<TWidget>(element: Element | ArrayLike<HTMLE
 }): TWidget;
 export declare function getWidgetFrom<TWidget>(element: ArrayLike<HTMLElement> | Element | string, type?: {
 	new (...args: any[]): TWidget;
-}): TWidget;
+}, context?: HTMLElement): TWidget;
 export type IdPrefixType = {
 	[key: string]: string;
 	Form: string;
@@ -7471,7 +7471,12 @@ export declare class BasePanel<P = {}> extends Widget<P> {
 export declare const TemplatedPanel: typeof BasePanel;
 export declare class PrefixedContext {
 	readonly idPrefix: string;
-	constructor(idPrefix: string);
+	readonly context: HTMLElement;
+	constructor(prefixOrWidget: string | {
+		idPrefix: string;
+		domNode: HTMLElement;
+	}, context?: HTMLElement);
+	protected initialize(): void;
 	byId(id: string): Fluent;
 	w<TWidget>(id: string, type: {
 		new (...args: any[]): TWidget;

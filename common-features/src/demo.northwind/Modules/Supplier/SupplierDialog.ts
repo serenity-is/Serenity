@@ -9,5 +9,5 @@ export class SupplierDialog<P = {}> extends EntityDialog<SupplierRow, P> {
     protected override getRowDefinition() { return SupplierRow; }
     protected override getService() { return SupplierService.baseUrl; }
 
-    protected form = new SupplierForm(this.idPrefix);
+    protected form = new SupplierForm(this);
 }

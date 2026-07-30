@@ -38,7 +38,7 @@ export interface CategoryForm {
 export declare class CategoryForm extends PrefixedContext {
 	static readonly formKey = "Northwind.Category";
 	private static init;
-	constructor(prefix: string);
+	constructor(...args: ConstructorParameters<typeof PrefixedContext>);
 }
 export interface CategoryLangRow {
 	Id?: number;
@@ -246,7 +246,7 @@ export interface CustomerForm {
 export declare class CustomerForm extends PrefixedContext {
 	static readonly formKey = "Northwind.Customer";
 	private static init;
-	constructor(prefix: string);
+	constructor(...args: ConstructorParameters<typeof PrefixedContext>);
 }
 export interface CustomerGrossSalesRow {
 	CustomerId?: string;
@@ -457,7 +457,7 @@ export interface OrderDetailForm {
 export declare class OrderDetailForm extends PrefixedContext {
 	static readonly formKey = "Northwind.OrderDetail";
 	private static init;
-	constructor(prefix: string);
+	constructor(...args: ConstructorParameters<typeof PrefixedContext>);
 }
 export declare namespace OrderDetailService {
 	const baseUrl = "Northwind/OrderDetail";
@@ -523,7 +523,7 @@ export interface OrderForm {
 export declare class OrderForm extends PrefixedContext {
 	static readonly formKey = "Northwind.Order";
 	private static init;
-	constructor(prefix: string);
+	constructor(...args: ConstructorParameters<typeof PrefixedContext>);
 }
 export interface OrderListRequest extends ListRequest {
 	ProductID?: number;
@@ -612,7 +612,7 @@ export interface ProductForm {
 export declare class ProductForm extends PrefixedContext {
 	static readonly formKey = "Northwind.Product";
 	private static init;
-	constructor(prefix: string);
+	constructor(...args: ConstructorParameters<typeof PrefixedContext>);
 }
 export interface ProductLangRow {
 	Id?: number;
@@ -720,7 +720,7 @@ export interface RegionForm {
 export declare class RegionForm extends PrefixedContext {
 	static readonly formKey = "Northwind.Region";
 	private static init;
-	constructor(prefix: string);
+	constructor(...args: ConstructorParameters<typeof PrefixedContext>);
 }
 export declare namespace RegionService {
 	const baseUrl = "Northwind/Region";
@@ -819,7 +819,7 @@ export interface ShipperForm {
 export declare class ShipperForm extends PrefixedContext {
 	static readonly formKey = "Northwind.Shipper";
 	private static init;
-	constructor(prefix: string);
+	constructor(...args: ConstructorParameters<typeof PrefixedContext>);
 }
 export declare namespace ShipperService {
 	const baseUrl = "Northwind/Shipper";
@@ -894,7 +894,7 @@ export interface SupplierForm {
 export declare class SupplierForm extends PrefixedContext {
 	static readonly formKey = "Northwind.Supplier";
 	private static init;
-	constructor(prefix: string);
+	constructor(...args: ConstructorParameters<typeof PrefixedContext>);
 }
 export declare namespace SupplierService {
 	const baseUrl = "Northwind/Supplier";
@@ -948,7 +948,7 @@ export interface TerritoryForm {
 export declare class TerritoryForm extends PrefixedContext {
 	static readonly formKey = "Northwind.Territory";
 	private static init;
-	constructor(prefix: string);
+	constructor(...args: ConstructorParameters<typeof PrefixedContext>);
 }
 export declare namespace TerritoryService {
 	const baseUrl = "Northwind/Territory";

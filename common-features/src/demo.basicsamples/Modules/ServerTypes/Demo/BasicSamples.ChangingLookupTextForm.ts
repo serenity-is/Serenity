@@ -10,23 +10,19 @@ export interface ChangingLookupTextForm {
 
 export class ChangingLookupTextForm extends PrefixedContext {
     static readonly formKey = 'BasicSamples.ChangingLookupText';
-    private static init: boolean;
+    declare private static init: boolean;
 
-    constructor(prefix: string) {
-        super(prefix);
+    constructor(...args: ConstructorParameters<typeof PrefixedContext>) {
+        super(...args);
 
         if (!ChangingLookupTextForm.init) {
             ChangingLookupTextForm.init = true;
 
-            var w0 = ChangingLookupTextEditor;
-            var w1 = DecimalEditor;
-            var w2 = IntegerEditor;
-
             initFormType(ChangingLookupTextForm, [
-                'ProductID', w0,
-                'UnitPrice', w1,
-                'Quantity', w2,
-                'Discount', w1
+                'ProductID', ChangingLookupTextEditor,
+                'UnitPrice', DecimalEditor,
+                'Quantity', IntegerEditor,
+                'Discount', DecimalEditor
             ]);
         }
     }

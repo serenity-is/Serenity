@@ -41,7 +41,7 @@ export class ChangingLookupTextDialog<P = {}> extends GridEditorDialog<OrderDeta
     constructor(props: WidgetProps<P>) {
         super(props);
 
-        this.form = new ChangingLookupTextForm(this.idPrefix);
+        this.form = new ChangingLookupTextForm(this);
 
         this.form.ProductID.changeSelect2(async e => {
             var productID = toId(this.form.ProductID.value);

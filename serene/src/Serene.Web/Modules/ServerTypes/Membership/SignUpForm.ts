@@ -10,24 +10,20 @@ export interface SignUpForm {
 
 export class SignUpForm extends PrefixedContext {
     static readonly formKey = 'Membership.SignUp';
-    private static init: boolean;
+    declare private static init: boolean;
 
-    constructor(prefix: string) {
-        super(prefix);
+    constructor(...args: ConstructorParameters<typeof PrefixedContext>) {
+        super(...args);
 
         if (!SignUpForm.init) {
             SignUpForm.init = true;
 
-            var w0 = StringEditor;
-            var w1 = EmailAddressEditor;
-            var w2 = PasswordEditor;
-
             initFormType(SignUpForm, [
-                'DisplayName', w0,
-                'Email', w1,
-                'ConfirmEmail', w1,
-                'Password', w2,
-                'ConfirmPassword', w2
+                'DisplayName', StringEditor,
+                'Email', EmailAddressEditor,
+                'ConfirmEmail', EmailAddressEditor,
+                'Password', PasswordEditor,
+                'ConfirmPassword', PasswordEditor
             ]);
         }
     }

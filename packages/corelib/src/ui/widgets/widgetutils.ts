@@ -74,11 +74,11 @@ export function tryGetWidget<TWidget>(element: Element | ArrayLike<HTMLElement> 
     return null;
 }
 
-export function getWidgetFrom<TWidget>(element: ArrayLike<HTMLElement> | Element | string, type?: { new(...args: any[]): TWidget }): TWidget {
+export function getWidgetFrom<TWidget>(element: ArrayLike<HTMLElement> | Element | string, type?: { new(...args: any[]): TWidget }, context?: HTMLElement): TWidget {
     let selector: string;
     if (typeof element === "string") {
         selector = element;
-        element = document.querySelector(selector);
+        element = (context ?? document).querySelector(selector);
     }
 
     if (!element)

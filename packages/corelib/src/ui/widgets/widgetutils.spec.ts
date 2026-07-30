@@ -151,6 +151,35 @@ describe("getWidgetFrom", () => {
         const found = getWidgetFrom(div, BaseWidget);
         expect(found).toBe(widget);
     });
+
+    it("uses context parameter to find element by string selector", () => {
+        const contextEl = document.createElement("div");
+        const inner = document.createElement("div");
+        inner.id = "my_element";
+        contextEl.appendChild(inner);
+        document.body.appendChild(contextEl);
+
+        const widget = { domNode: inner };
+        associateWidget(widget);
+
+        const result = getWidgetFrom("#my_element", undefined, contextEl);
+        expect(result).toBe(widget);
+
+        document.body.removeChild(contextEl);
+    });
+
+    it("throws when element not found within context but exists in document", () => {
+        const contextEl = document.createElement("div");
+        const outside = document.createElement("div");
+        outside.id = "my_element";
+        document.body.appendChild(outside);
+        document.body.appendChild(contextEl);
+
+        expect(() => getWidgetFrom("#my_element", undefined, contextEl)).toThrow();
+
+        document.body.removeChild(outside);
+        document.body.removeChild(contextEl);
+    });
 });
 
 describe("useIdPrefix", () => {

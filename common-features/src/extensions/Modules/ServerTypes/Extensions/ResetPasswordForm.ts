@@ -7,19 +7,17 @@ export interface ResetPasswordForm {
 
 export class ResetPasswordForm extends PrefixedContext {
     static readonly formKey = 'Serenity.Extensions.ResetPasswordRequest';
-    private static init: boolean;
+    declare private static init: boolean;
 
-    constructor(prefix: string) {
-        super(prefix);
+    constructor(...args: ConstructorParameters<typeof PrefixedContext>) {
+        super(...args);
 
         if (!ResetPasswordForm.init) {
             ResetPasswordForm.init = true;
 
-            var w0 = PasswordEditor;
-
             initFormType(ResetPasswordForm, [
-                'NewPassword', w0,
-                'ConfirmPassword', w0
+                'NewPassword', PasswordEditor,
+                'ConfirmPassword', PasswordEditor
             ]);
         }
     }

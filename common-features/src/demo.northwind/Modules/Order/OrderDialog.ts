@@ -11,7 +11,7 @@ export class OrderDialog<P = {}> extends EntityDialog<OrderRow, P> {
     protected override getRowDefinition() { return OrderRow; }
     protected override getService() { return OrderService.baseUrl; }
 
-    protected form = new OrderForm(this.idPrefix);
+    protected form = new OrderForm(this);
 
     protected override getToolbarButtons() {
         var buttons = super.getToolbarButtons();

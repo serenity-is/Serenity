@@ -10,5 +10,5 @@ export class ProductDialog<P = {}> extends EntityDialog<ProductRow, P> {
     protected override getRowDefinition() { return ProductRow; }
     protected override getService() { return ProductService.baseUrl; }
 
-    protected form = new ProductForm(this.idPrefix);
+    protected form = new ProductForm(this);
 }

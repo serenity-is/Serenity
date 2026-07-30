@@ -9,5 +9,5 @@ export class CategoryDialog<P = {}> extends EntityDialog<CategoryRow, P> {
     protected override getRowDefinition() { return CategoryRow; }
     protected override getService() { return CategoryService.baseUrl; }
 
-    protected form = new CategoryForm(this.idPrefix);
+    protected form = new CategoryForm(this);
 }

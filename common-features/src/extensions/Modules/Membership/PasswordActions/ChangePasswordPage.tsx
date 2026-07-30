@@ -12,7 +12,7 @@ class ChangePasswordPanel<P = {}> extends PropertyPanel<ChangePasswordRequest, P
 
     protected override getFormKey() { return ChangePasswordForm.formKey; }
 
-    private form = new ChangePasswordForm(this.idPrefix);
+    private form = new ChangePasswordForm(this);
 
     constructor(props: WidgetProps<P>) {
         super(props);

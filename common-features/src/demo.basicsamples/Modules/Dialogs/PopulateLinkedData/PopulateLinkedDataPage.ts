@@ -21,7 +21,7 @@ export class PopulateLinkedDataDialog<P = {}> extends EntityDialog<OrderRow, P> 
     protected override getRowDefinition() { return OrderRow; }
     protected override getService() { return OrderService.baseUrl; }
 
-    protected form = new PopulateLinkedDataForm(this.idPrefix);
+    protected form = new PopulateLinkedDataForm(this);
 
     constructor(props: WidgetProps<P>) {
         super(props);

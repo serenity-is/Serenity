@@ -13,7 +13,7 @@ export class CustomerDialog<P = {}> extends EntityDialog<CustomerRow, P> {
     protected override getRowDefinition() { return CustomerRow; }
     protected override getService() { return CustomerService.baseUrl; }
 
-    protected form = new CustomerForm(this.idPrefix);
+    protected form = new CustomerForm(this);
 
     declare private ordersGrid: CustomerOrdersGrid;
     declare private loadedState: string;

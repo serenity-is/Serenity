@@ -9,5 +9,5 @@ export class RegionDialog<P = {}> extends EntityDialog<RegionRow, P> {
     protected override getRowDefinition() { return RegionRow; }
     protected override getService() { return RegionService.baseUrl; }
 
-    protected form = new RegionForm(this.idPrefix);
+    protected form = new RegionForm(this);
 }

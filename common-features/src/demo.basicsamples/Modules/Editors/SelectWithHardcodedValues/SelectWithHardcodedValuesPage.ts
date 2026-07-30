@@ -53,7 +53,7 @@ export class HardcodedValuesDialog<P = {}> extends PropertyDialog<any, P> {
 
     protected override getFormKey() { return HardcodedValuesForm.formKey; }
 
-    protected form = new HardcodedValuesForm(this.idPrefix);
+    protected form = new HardcodedValuesForm(this);
 
     constructor(props: WidgetProps<P>) {
         super(props);

@@ -16,7 +16,7 @@ class SignUpPanel extends PropertyPanel<SignUpRequest, any> {
     constructor(props: { element?: any } & any) {
         super(props);
 
-        this.form = new SignUpForm(this.idPrefix);
+        this.form = new SignUpForm(this);
 
         this.form.Email.element.attr("autocomplete", "off");
         this.form.Password.element.attr("autocomplete", "new-password");

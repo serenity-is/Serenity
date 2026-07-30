@@ -9,5 +9,5 @@ export class ShipperDialog<P = {}> extends EntityDialog<ShipperRow, P> {
     protected override getRowDefinition() { return ShipperRow; }
     protected override getService() { return ShipperService.baseUrl; }
 
-    protected form = new ShipperForm(this.idPrefix);
+    protected form = new ShipperForm(this);
 }

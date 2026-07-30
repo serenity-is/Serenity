@@ -11,5 +11,5 @@ export class LanguageDialog extends EntityDialog<LanguageRow, any> {
     protected override getNameProperty() { return LanguageRow.nameProperty; }
     protected override getService() { return LanguageService.baseUrl; }
 
-    protected form = new LanguageForm(this.idPrefix);
+    protected form = new LanguageForm(this);
 }

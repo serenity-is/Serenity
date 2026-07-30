@@ -15,7 +15,7 @@ export class RoleDialog extends EntityDialog<RoleRow, any> {
     protected override getNameProperty() { return RoleRow.nameProperty; }
     protected override getService() { return RoleService.baseUrl; }
 
-    protected form = new RoleForm(this.idPrefix);
+    protected form = new RoleForm(this);
 
     protected override getToolbarButtons() {
         let buttons = super.getToolbarButtons();
