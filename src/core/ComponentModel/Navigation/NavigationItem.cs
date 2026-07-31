@@ -49,4 +49,14 @@ public class NavigationItem
     /// True if this is a navigation section
     /// </summary>
     public bool IsSection { get; set; }
+
+    /// <summary>
+    /// Effective order among siblings. Unlike the declared <c>Order</c> on
+    /// <see cref="NavigationItemAttribute"/> (which may be assigned from an <see cref="int"/> in
+    /// an assembly attribute), this is a
+    /// <see cref="decimal"/> so that duplicate declared orders can be resolved to unique
+    /// values (see <c>NavigationHelper.HealOrders</c>), and so consumers (e.g. a CMS
+    /// inserting dynamic pages into the menu) can compute a midpoint between two siblings.
+    /// </summary>
+    public decimal Order { get; set; }
 }

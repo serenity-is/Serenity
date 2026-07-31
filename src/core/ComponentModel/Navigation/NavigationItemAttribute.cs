@@ -43,7 +43,7 @@ public abstract class NavigationItemAttribute : Attribute
     /// <summary>
     /// Gets / sets the order (only) among its siblings.
     /// </summary>
-    public int Order { get; set; }
+    public decimal Order { get; set; }
 
     /// <summary>
     /// Url of this navigation item, should be null for menu

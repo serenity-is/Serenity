@@ -39,7 +39,7 @@ public class NavigationHelper
 
         var result = new List<NavigationItem>();
 
-        void processAttr(NavigationItem parent, NavigationItemAttribute attr)
+        void processAttr(NavigationItem parent, NavigationItemAttribute attr, decimal order, int depth)
         {
             var item = new NavigationItem();
 
@@ -49,10 +49,13 @@ public class NavigationHelper
             var path = string.IsNullOrEmpty(attr.Category) ? "" : (attr.Category + "/");
             path += attr.Title ?? "";
 
-            var children = attrByCategory[path];
+            // attrByCategory[path] is already sorted ascending by Order (ties in stable original order)
+            var children = attrByCategory[path].ToList();
+            var childOrders = HealOrders([.. children.Select(x => x.Order)],
+                parentOrder: order, step: GetOrderStep(depth + 1));
             var target = parent?.Children ?? result;
-            foreach (var child in children)
-                processAttr(item, child);
+            for (var i = 0; i < children.Count; i++)
+                processAttr(item, children[i], childOrders[i], depth + 1);
 
             if (item.Children.Count > 0 || isAuthorizedSection)
             {
@@ -64,12 +67,96 @@ public class NavigationHelper
                 item.Target = attr.Target.TrimToNull();
                 item.Parent = parent;
                 item.IsSection = attr is NavigationSectionAttribute;
+                item.Order = order;
                 target.Add(item);
             }
         }
 
-        foreach (var menu in attrByCategory[""])
-            processAttr(null, menu);
+        var topLevel = attrByCategory[""].ToList();
+        var topOrders = HealOrders([.. topLevel.Select(x => x.Order)], step: GetOrderStep(0));
+        for (var i = 0; i < topLevel.Count; i++)
+            processAttr(null, topLevel[i], topOrders[i], 0);
+
+        return result;
+    }
+
+    private static decimal GetOrderStep(int depth)
+    {
+        return depth switch
+        {
+            0 => 1000m,
+            1 => 100m,
+            2 => 10m,
+            _ => 1m
+        };
+    }
+
+    /// <summary>
+    /// Resolves duplicate order values among a set of siblings into unique decimal values, e.g. so
+    /// that statically declared navigation items (whose <see cref="int"/> order may collide, as it is
+    /// only guaranteed unique by developer convention, not enforced) get distinct sort keys that a
+    /// consumer (e.g. a CMS module) can also use to compute a midpoint when inserting new items between
+    /// them.
+    /// This only changes orders for items that actually collide with another sibling; non-colliding
+    /// orders (other than <paramref name="sentinel"/>, see below) are returned unchanged, and within a
+    /// group of colliding siblings, the first one (in the order it was given) also keeps its original
+    /// value, minimizing the number of altered orders.
+    /// Any order equal to <paramref name="sentinel"/> (the code generator's default, meaning "not
+    /// explicitly set") is never left as-is: it is always resolved to <paramref name="parentOrder"/>
+    /// (or the largest real sibling order, if there is one) plus a multiple of <paramref name="step"/>,
+    /// so a forgotten order ends up near its siblings instead of near <see cref="int.MaxValue"/>.
+    /// </summary>
+    /// <param name="orders">Sibling order values, already sorted ascending. Ties should be in a stable,
+    /// deterministic order (e.g. as produced by a stable sort), as that relative order is preserved.</param>
+    /// <param name="parentOrder">The parent item's own resolved order, used as the fallback baseline for
+    /// <paramref name="sentinel"/> orders when there is no real sibling order to anchor to. Null (the
+    /// default) for a top level item, or if the parent's order isn't known/relevant.</param>
+    /// <param name="sentinel">The order value that means "not explicitly set". Defaults to
+    /// <see cref="int.MaxValue"/>, matching the code generator's navigation link template and the
+    /// string-only <c>NavigationLinkAttribute</c>/<c>NavigationMenuAttribute</c> constructors.</param>
+    /// <param name="step">The spacing used both between resolved <paramref name="sentinel"/> orders, and
+    /// as the fallback gap for a trailing duplicate group that has no following distinct order.</param>
+    public static IReadOnlyList<decimal> HealOrders(IReadOnlyList<decimal> orders,
+        decimal? parentOrder = null, decimal sentinel = int.MaxValue, decimal step = 100m)
+    {
+        ArgumentNullException.ThrowIfNull(orders);
+
+        var result = new decimal[orders.Count];
+        var i = 0;
+        decimal? lastResolved = null;
+        while (i < orders.Count)
+        {
+            var j = i + 1;
+            while (j < orders.Count && orders[j] == orders[i])
+                j++;
+
+            var groupSize = j - i;
+            if (orders[i] == sentinel)
+            {
+                // never leave an unset order near int.MaxValue; anchor it to the last real
+                // sibling order seen so far, or the parent's, so it stays a "reasonable" value
+                var baseline = lastResolved ?? parentOrder ?? 0m;
+                for (var k = 0; k < groupSize; k++)
+                    result[i + k] = baseline + step * (k + 1);
+            }
+            else if (groupSize == 1)
+            {
+                result[i] = orders[i];
+            }
+            else
+            {
+                // spread the duplicates across the gap to the next distinct order, so none of them
+                // collides with each other or with that next value; the first keeps its declared order
+                var baseOrder = orders[i];
+                var gap = j < orders.Count ? orders[j] - baseOrder : step;
+                var groupStep = gap / groupSize;
+                for (var k = 0; k < groupSize; k++)
+                    result[i + k] = baseOrder + k * groupStep;
+            }
+
+            lastResolved = result[j - 1];
+            i = j;
+        }
 
         return result;
     }
@@ -150,7 +237,13 @@ public class NavigationHelper
                 }
 
                 if (!byCategory[parent].Any(x => x.Title == title))
-                    missing.Add(path, new NavigationMenuAttribute(group.Min(x => x.Order), path));
+                {
+                    var menu = new NavigationMenuAttribute(0, path)
+                    {
+                        Order = group.Min(x => x.Order)
+                    };
+                    missing.Add(path, menu);
+                }
 
                 path = parent;
             }
@@ -172,7 +265,7 @@ public class NavigationHelper
 
         foreach (var group in groups.Where(x => x.Include != null && !x.Default))
         {
-            var minOrder = int.MaxValue;
+            decimal? minOrder = null;
             foreach (var pattern in group.Include)
             {
                 if (string.IsNullOrEmpty(pattern))
@@ -184,7 +277,7 @@ public class NavigationHelper
                         .Where(x => x != group && x is not NavigationGroupAttribute && !newCategory.ContainsKey(x)))
                     {
                         newCategory[child] = group.FullPath;
-                        if (child.Order < minOrder)
+                        if (!minOrder.HasValue || child.Order < minOrder)
                             minOrder = child.Order;
                     }
                 }
@@ -199,20 +292,20 @@ public class NavigationHelper
                         x != group && x is not NavigationGroupAttribute && !newCategory.ContainsKey(x)))
                     {
                         newCategory[item] = group.FullPath;
-                        if (item.Order < minOrder)
+                        if (!minOrder.HasValue || item.Order < minOrder)
                             minOrder = item.Order;
                     }
                 }
             }
 
             if (group.Order == int.MaxValue &&
-                minOrder < int.MaxValue)
-                group.Order = minOrder;
+                minOrder.HasValue)
+                group.Order = minOrder.Value;
         }
 
         foreach (var group in groups.Where(x => x.Default))
         {
-            var minOrder = int.MaxValue;
+            decimal? minOrder = null;
             foreach (var item in byCategory[group.Category ?? ""])
             {
                 if (group == item ||
@@ -239,14 +332,14 @@ public class NavigationHelper
                 if (isMatch)
                 {
                     newCategory[item] = group.FullPath;
-                    if (item.Order < minOrder)
+                    if (!minOrder.HasValue || item.Order < minOrder)
                         minOrder = item.Order;
                 }
             }
 
             if (group.Order == int.MaxValue &&
-                minOrder < int.MaxValue)
-                group.Order = minOrder;
+                minOrder.HasValue)
+                group.Order = minOrder.Value;
         }
 
         if (newCategory.Count == 0)
