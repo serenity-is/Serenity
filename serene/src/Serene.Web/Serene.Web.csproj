@@ -80,9 +80,18 @@
       <Content Include="wwwroot\esm\**\*.js;wwwroot\esm\**\*.css;wwwroot\esm\**\*.map" Exclude="@(Content)" CopyToOutputDirectory="Never" CopyToPublishDirectory="PreserveNewest" ExcludeFromSingleFile="true" />
     </ItemGroup>
   </Target>
-  <Target Name="TransformMvcClientTypes" AfterTargets="ResolveProjectReferences" Condition="'$(BuildingProject)' != 'false' And '$(DesignTimeBuild)' != 'true' ">
+  <Target Name="TransformMvcClientTypes" DependsOnTargets="SetSergenTransformArgs" AfterTargets="ResolveProjectReferences" Condition="'$(BuildingProject)' != 'false' And '$(DesignTimeBuild)' != 'true' ">
+    <ItemGroup>
+      <ExcludedImportsFiles Include="Imports\**\*.cs" Exclude="@(Compile)" />
+      <CleanedImportsFiles Include="Imports\**\*.cs" />
+    </ItemGroup>
     <Exec Command="dotnet tool restore" ContinueOnError="true" Condition="'$(DotNetSergen)' == 'dotnet sergen'" />
     <Exec Command="$(DotNetSergen) mvct $(SergenTransformArgs)" ContinueOnError="true" />
+    <ItemGroup>
+      <CleanedImportsFiles Remove="Imports\**\*.cs" />
+      <Compile Remove="@(CleanedImportsFiles)" />
+      <Compile Include="Imports\**\*.cs" Exclude="@(Compile);@(ExcludedImportsFiles)" />
+    </ItemGroup>
   </Target>
   <Target Name="TransformServerTypings" AfterTargets="AfterBuild" DependsOnTargets="SetSergenTransformArgs">
     <Exec Command="$(DotNetSergen) servertypings $(SergenTransformArgs)" ContinueOnError="true" />
