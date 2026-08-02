@@ -17,6 +17,7 @@
     "noEmit": true,
     "noEmitOnError": false,
     "noImplicitOverride": true,
+    "noUncheckedSideEffectImports": false,
     "outDir": "./wwwroot/esm",
     "paths": {
       "@serenity-is/*": [ "./node_modules/@serenity-is/*/dist/index", "./node_modules/.dotnet/serenity.*/dist/index" ],
