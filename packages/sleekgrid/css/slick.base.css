@@ -240,6 +240,16 @@
   touch-action: none;
 }
 
+.ltr .slick-resizable-handle {
+  right: -5px;
+  left: auto;
+}
+
+.rtl .slick-resizable-handle {
+  right: auto;
+  left: -5px;
+}
+
 .slick-container.slick-column-resizing * {
   cursor: ew-resize !important;
 }

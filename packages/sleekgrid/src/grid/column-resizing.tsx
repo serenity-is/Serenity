@@ -13,7 +13,7 @@ export function setupColumnResize<TItem>(this: void, { absoluteColMinWidth, cont
     container: HTMLElement,
     getEditorLock: () => EditorLock,
     headerColsElements: HTMLElement[],
-    options: Pick<GridOptions, "forceFitColumns">,
+    options: Pick<GridOptions, "forceFitColumns" | "rtl">,
     removeNode: (node: Element) => void,
 }): void {
     let resizingCell: number, pageX: number, minPageX: number, maxPageX: number;
@@ -48,6 +48,11 @@ export function setupColumnResize<TItem>(this: void, { absoluteColMinWidth, cont
         var dist;
         var thisPageX = e.pageX;
         dist = Math.min(maxPageX, Math.max(minPageX, thisPageX)) - pageX;
+
+        if (options.rtl) {
+            dist = -dist;
+        }
+
         if (isNaN(dist)) {
             return;
         }
@@ -56,7 +61,8 @@ export function setupColumnResize<TItem>(this: void, { absoluteColMinWidth, cont
             cell: resizingCell,
             dist,
             forceFit: options.forceFitColumns,
-            absoluteColMinWidth: absoluteColMinWidth
+            absoluteColMinWidth: absoluteColMinWidth,
+            rtl: options.rtl
         });
         colResizing(resizingCell);
     };
@@ -101,7 +107,8 @@ export function setupColumnResize<TItem>(this: void, { absoluteColMinWidth, cont
             cell: resizingCell,
             pageX,
             absoluteColMinWidth,
-            forceFit: options.forceFitColumns
+            forceFit: options.forceFitColumns,
+            rtl: options.rtl
         }));
         document.addEventListener('mousemove', docMouseMove, { signal: disposer.signal });
         document.addEventListener('mouseup', docMouseUp, { signal: disposer.signal });
@@ -192,12 +199,13 @@ export function autosizeColumns(cols: Column[], availWidth: number, absoluteColM
     return reRender;
 }
 
-function shrinkOrStretchColumn({ absoluteColMinWidth, cols, dist, cell: cell, forceFit }: {
+function shrinkOrStretchColumn({ absoluteColMinWidth, cols, dist, cell: cell, forceFit, rtl }: {
     absoluteColMinWidth: number,
     cols: Column[],
     cell: number,
     dist: number,
-    forceFit: boolean
+    forceFit: boolean,
+    rtl?: boolean
 }): void {
     var c: Column, j: number, x: number, actualMinWidth: number;
 
@@ -220,7 +228,10 @@ function shrinkOrStretchColumn({ absoluteColMinWidth, cols, dist, cell: cell, fo
 
         if (forceFit) {
             x = -dist;
-            for (j = cell + 1; j < cols.length; j++) {
+            const step = rtl ? -1 : 1;
+            const start = rtl ? cell - 1 : cell + 1;
+            const end = rtl ? 0 : cols.length;
+            for (j = start; rtl ? j >= end : j < end; j += step) {
                 c = cols[j];
                 if (c.resizable) {
                     if (x && c.maxWidth && (c.maxWidth - c.previousWidth < x)) {
@@ -253,7 +264,10 @@ function shrinkOrStretchColumn({ absoluteColMinWidth, cols, dist, cell: cell, fo
 
         if (forceFit) {
             x = -dist;
-            for (j = cell + 1; j < cols.length; j++) {
+            const step = rtl ? -1 : 1;
+            const start = rtl ? cell - 1 : cell + 1;
+            const end = rtl ? 0 : cols.length;
+            for (j = start; rtl ? j >= end : j < end; j += step) {
                 c = cols[j];
                 if (c.resizable) {
                     actualMinWidth = Math.max(c.minWidth || 0, absoluteColMinWidth);
@@ -271,19 +285,23 @@ function shrinkOrStretchColumn({ absoluteColMinWidth, cols, dist, cell: cell, fo
     }
 }
 
-function calcMinMaxPageXOnDragStart({ absoluteColMinWidth, cols, cell, forceFit, pageX }: {
+function calcMinMaxPageXOnDragStart({ absoluteColMinWidth, cols, cell, forceFit, pageX, rtl }: {
     absoluteColMinWidth: number,
     cols: Column[],
     cell: number,
     forceFit: boolean,
-    pageX: number
+    pageX: number,
+    rtl?: boolean
 }): { maxPageX: number; minPageX: number; } {
     var shrinkLeewayOnRight = null, stretchLeewayOnRight = null, j: number, c: Column;
     if (forceFit) {
         shrinkLeewayOnRight = 0;
         stretchLeewayOnRight = 0;
         // colums on right affect maxPageX/minPageX
-        for (j = cell + 1; j < cols.length; j++) {
+        const start = rtl ? cell - 1 : cell + 1;
+        const end = rtl ? 0 : cols.length;
+        const step = rtl ? -1 : 1;
+        for (j = start; rtl ? j >= end : j < end; j += step) {
             c = cols[j];
             if (c.resizable) {
                 if (stretchLeewayOnRight != null) {
@@ -298,7 +316,9 @@ function calcMinMaxPageXOnDragStart({ absoluteColMinWidth, cols, cell, forceFit,
         }
     }
     var shrinkLeewayOnLeft = 0, stretchLeewayOnLeft = 0;
-    for (j = 0; j <= cell; j++) {
+    const start = rtl ? cols.length - 1 : 0;
+    const step = rtl ? -1 : 1;
+    for (j = start; rtl ? j >= cell : j <= cell; j += step) {
         // columns on left only affect minPageX
         c = cols[j];
         if (c.resizable) {

@@ -967,6 +967,7 @@ export class SleekGrid<TItem = any> implements ISleekGrid<TItem> {
         const sortableOptions: any = {
             animation: 50,
             direction: 'horizontal',
+            rtl: this._options.rtl,
             chosenClass: 'slick-header-column-dragging',
             ghostClass: 'slick-sortable-placeholder',
             draggable: '.slick-header-column',
