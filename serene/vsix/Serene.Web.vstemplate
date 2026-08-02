@@ -319,12 +319,12 @@
         </Folder>
         <Folder Name="esm" TargetFolderName="esm">
           <Folder Name="_chunks" TargetFolderName="_chunks">
-            <ProjectItem ReplaceParameters="true" TargetFileName="chunk-2X5OAECF.js">chunk-2X5OAECF.js</ProjectItem>
             <ProjectItem ReplaceParameters="true" TargetFileName="chunk-3CYRTJWA.js">chunk-3CYRTJWA.js</ProjectItem>
-            <ProjectItem ReplaceParameters="true" TargetFileName="chunk-HSD4P733.js">chunk-HSD4P733.js</ProjectItem>
             <ProjectItem ReplaceParameters="true" TargetFileName="chunk-MKWQKDDO.js">chunk-MKWQKDDO.js</ProjectItem>
             <ProjectItem ReplaceParameters="true" TargetFileName="chunk-OL7A6VBL.js">chunk-OL7A6VBL.js</ProjectItem>
-            <ProjectItem ReplaceParameters="true" TargetFileName="chunk-WAUFGBOH.js">chunk-WAUFGBOH.js</ProjectItem>
+            <ProjectItem ReplaceParameters="true" TargetFileName="chunk-PCZG6246.js">chunk-PCZG6246.js</ProjectItem>
+            <ProjectItem ReplaceParameters="true" TargetFileName="chunk-PQAXRLUX.js">chunk-PQAXRLUX.js</ProjectItem>
+            <ProjectItem ReplaceParameters="true" TargetFileName="chunk-WSEB3JZA.js">chunk-WSEB3JZA.js</ProjectItem>
           </Folder>
           <Folder Name="Modules" TargetFolderName="Modules">
             <Folder Name="Administration" TargetFolderName="Administration">
