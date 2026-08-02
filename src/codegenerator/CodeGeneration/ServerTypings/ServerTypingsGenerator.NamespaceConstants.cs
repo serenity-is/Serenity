@@ -4,6 +4,13 @@ public partial class ServerTypingsGenerator
 {
     protected void GenerateNamespaceConstants()
     {
+        if (RootNamespaces != null)
+        {
+            foreach (var ns in RootNamespaces)
+                if (ns != "Serenity")
+                    AddNamespaceConstant(ns);
+        }
+
         var keyToNamespace = namespaceConstants
             .Where(x => x.Value?.Count == 1)
             .ToLookup(x => x.Key.Replace(".", "", StringComparison.Ordinal));

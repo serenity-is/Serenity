@@ -165,34 +165,7 @@ public partial class ServerTypingsGenerator : CodeGeneratorBase
             action(type);
             var fileName = GetTypingFileNameFor(typeNamespace, name) + ".ts";
             AddFile(fileName);
-
-            if (!string.IsNullOrEmpty(typeNamespace))
-            {
-                var ns = typeNamespace;
-                foreach (var rn in RootNamespaces)
-                {
-                    if (rn == ns)
-                    {
-                        ns = null;
-                        break;
-                    }
-
-                    if (ns.StartsWith(rn + '.', StringComparison.Ordinal))
-                    {
-                        ns = ns[(rn.Length + 1)..];
-                        break;
-                    }
-                }
-
-                if (ns != null)
-                {
-                    if (!namespaceConstants.TryGetValue(ns, out var list))
-                        namespaceConstants[ns] = list = [];
-
-                    if (!list.Contains(typeNamespace, StringComparer.Ordinal))
-                        list.Add(typeNamespace);
-                }
-            }
+            AddNamespaceConstant(typeNamespace);
         }
 
         if (type.IsEnum())
@@ -256,6 +229,37 @@ public partial class ServerTypingsGenerator : CodeGeneratorBase
         }
 
         add(GenerateBasicType);
+    }
+
+    protected virtual void AddNamespaceConstant(string typeNamespace)
+    {
+        if (string.IsNullOrEmpty(typeNamespace))
+            return;
+
+        var ns = typeNamespace;
+        foreach (var rn in RootNamespaces)
+        {
+            if (rn == ns)
+            {
+                ns = null;
+                break;
+            }
+
+            if (ns.StartsWith(rn + '.', StringComparison.Ordinal))
+            {
+                ns = ns[(rn.Length + 1)..];
+                break;
+            }
+        }
+
+        if (ns != null)
+        {
+            if (!namespaceConstants.TryGetValue(ns, out var list))
+                namespaceConstants[ns] = list = [];
+
+            if (!list.Contains(typeNamespace, StringComparer.Ordinal))
+                list.Add(typeNamespace);
+        }
     }
 
     protected override void Reset()
