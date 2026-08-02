@@ -7,7 +7,7 @@
     <Authors>Volkan Ceylan</Authors>
     <PackageIcon>package-icon.png</PackageIcon>
     <PackageLicenseExpression>MIT</PackageLicenseExpression>
-    <PackageProjectUrl>http://github.com/serenity-is/common-features</PackageProjectUrl>
+    <PackageProjectUrl>http://github.com/serenity-is/Serenity</PackageProjectUrl>
     <PackageTags>Serenity</PackageTags>
     <PublishRepositoryUrl>true</PublishRepositoryUrl>
     <EmbedUntrackedSources>true</EmbedUntrackedSources>
