@@ -47,6 +47,7 @@ export class QuickSearchInput<P extends QuickSearchInputOptions = QuickSearchInp
         const boundThis = bindThis(this);
         Fluent.on(this.domNode, "keyup." + this.uniqueName, boundThis.checkIfValueChanged);
         Fluent.on(this.domNode, "change." + this.uniqueName, boundThis.checkIfValueChanged);
+        Fluent.on(this.domNode, "input." + this.uniqueName, boundThis.checkIfValueChanged);
 
         this.domNode.before(<span class="quick-search-icon"><i /></span>)
 
