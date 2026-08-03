@@ -1,6 +1,7 @@
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.Extensions.DependencyInjection;
 using Newtonsoft.Json.Linq;
+using Serenity.Extensions.DependencyInjection;
 using Serenity.Localization;
 using System.IO;
 using System.Reflection;
@@ -151,11 +152,17 @@ public partial class TranslationRepository(IRequestContext context, IWebHostEnvi
         File.WriteAllText(textsFilePath, json);
 
         (LocalTextRegistry as IRemoveAll)?.RemoveAll();
-        Startup.InitializeLocalTexts(services);
-
         Cache.ExpireGroupItems(UserRow.Fields.GenerationKey);
         services.GetService<IDynamicScriptManager>()?.Reset();
-
+        var initializer = services.GetService<ILocalTextInitializer>();
+        if (initializer != null)
+            initializer.Initialize(LocalTextRegistry);
+        else
+        {
+            services.AddBaseTexts();
+            if (HostEnvironment != null)
+                LocalTextRegistry.AddJsonTexts(hostEnvironment.ContentRootFileProvider, "App_Data/texts");
+        }
         return new SaveResponse();
     }
 }

@@ -74,7 +74,7 @@ public static class DynamicScriptServiceCollectionExtensions
     /// </summary>
     /// <param name="collection">Service collection</param>
     /// <exception cref="ArgumentNullException">Collection is null</exception>
-    public static void AddCssBundling(this IServiceCollection collection)
+    public static IServiceCollection AddCssBundling(this IServiceCollection collection)
     {
         ArgumentNullException.ThrowIfNull(collection);
 
@@ -82,6 +82,18 @@ public static class DynamicScriptServiceCollectionExtensions
         collection.AddContentHashCache();
         collection.AddEsBuildCssMinifier();
         collection.TryAddSingleton<ICssBundleManager, CssBundleManager>();
+        return collection;
+    }
+
+    /// <summary>
+    /// Registers the default service types related to CSS and Script bundling
+    /// </summary>
+    /// <param name="collection"></param>
+    /// <returns></returns>
+    public static IServiceCollection AddCssAndScriptBundling(this IServiceCollection collection)
+    {
+        collection.AddCssBundling();
+        return collection.AddScriptBundling();
     }
 
     /// <summary>
@@ -108,7 +120,7 @@ public static class DynamicScriptServiceCollectionExtensions
     /// </summary>
     /// <param name="collection">Service collection</param>
     /// <exception cref="ArgumentNullException">Collection is null</exception>
-    public static void AddScriptBundling(this IServiceCollection collection)
+    public static IServiceCollection AddScriptBundling(this IServiceCollection collection)
     {
         ArgumentNullException.ThrowIfNull(collection);
 
@@ -116,6 +128,7 @@ public static class DynamicScriptServiceCollectionExtensions
         collection.AddContentHashCache();
         collection.AddEsBuildScriptMinifier();
         collection.TryAddSingleton<IScriptBundleManager, ScriptBundleManager>();
+        return collection;
     }
 
     /// <summary>
@@ -310,10 +323,10 @@ public static class DynamicScriptServiceCollectionExtensions
     /// Registers the default local text initializer
     /// </summary>
     /// <param name="collection">Service collection</param>
-    public static void AddLocalTextInitializer(this IServiceCollection collection)
+    public static IServiceCollection AddLocalTextInitializer(this IServiceCollection collection)
     {
-        ArgumentNullException.ThrowIfNull(collection);
         collection.TryAddSingleton<ILocalTextInitializer, DefaultLocalTextInitializer>();
+        return collection;
     }
 
 

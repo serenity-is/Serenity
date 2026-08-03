@@ -17,10 +17,8 @@ public static class UploadServiceCollectionExtensions
     /// </summary>
     /// <param name="collection">Service collection</param>
     /// <exception cref="ArgumentNullException">Collection is null</exception>
-    public static void AddUploadStorage(this IServiceCollection collection)
+    public static IServiceCollection AddUploadStorage(this IServiceCollection collection)
     {
-        ArgumentNullException.ThrowIfNull(collection);
-
         collection.AddOptions();
         collection.TryAddSingleton<IFilenameFormatSanitizer, DefaultFilenameFormatSanitizer>();
         collection.TryAddSingleton<IUploadStorage, DefaultUploadStorage>();
@@ -28,6 +26,7 @@ public static class UploadServiceCollectionExtensions
         collection.TryAddSingleton<IImageProcessor, DefaultImageProcessor>();
         collection.TryAddSingleton<IUploadProcessor, DefaultUploadProcessor>();
         collection.TryAddSingleton<IUploadFileResponder, DefaultUploadFileResponder>();
+        return collection;
     }
 
     /// <summary>
@@ -38,7 +37,7 @@ public static class UploadServiceCollectionExtensions
     /// <param name="collection">Service collection</param>
     /// <param name="setupAction">Callback to edit options</param>
     /// <exception cref="ArgumentNullException">Collection is null</exception>
-    public static void AddUploadStorage(this IServiceCollection collection,
+    public static IServiceCollection AddUploadStorage(this IServiceCollection collection,
         Action<UploadSettings> setupAction)
     {
         ArgumentNullException.ThrowIfNull(collection);
@@ -46,6 +45,7 @@ public static class UploadServiceCollectionExtensions
         ArgumentNullException.ThrowIfNull(setupAction);
 
         collection.AddUploadStorage();
-        collection.Configure(setupAction);
+        return collection.Configure(setupAction);
     }
+
 }

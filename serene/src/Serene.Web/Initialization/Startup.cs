@@ -9,7 +9,6 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Serenity.Extensions.DependencyInjection;
-using Serenity.Localization;
 using System.IO;
 
 namespace Serene;
@@ -85,37 +84,32 @@ public partial class Startup
         });
 
         services.AddSingleton<IDataMigrations, AppServices.DataMigrations>();
-        services.AddSingleton<IElevationHandler, DefaultElevationHandler>();
-        services.AddSingleton<IEmailSender, EmailSender>();
-        services.AddSingleton<IHttpContextAccessor, HttpContextAccessor>();
-        services.AddSingleton<IHttpContextItemsAccessor, HttpContextItemsAccessor>();
         services.AddSingleton<INavigationModelFactory, AppServices.NavigationModelFactory>();
         services.AddSingleton<IPermissionService, AppServices.PermissionService>();
         services.AddSingleton<IPermissionKeyLister, AppServices.PermissionKeyLister>();
         services.AddSingleton<IRolePermissionService, AppServices.RolePermissionService>();
-        services.AddSingleton<IUploadAVScanner, ClamAVUploadScanner>();
         services.AddSingleton<IUserPasswordValidator, AppServices.UserPasswordValidator>();
         services.AddUserProvider<AppServices.UserAccessor, AppServices.UserRetrieveService>();
-        services.AddServiceHandlers();
-        services.AddDynamicScripts();
-        services.AddCssBundling();
-        services.AddScriptBundling();
-        services.AddUploadStorage();
-        services.AddReporting();
-    }
 
-    public static void InitializeLocalTexts(IServiceProvider services)
-    {
-        var env = services.GetRequiredService<IWebHostEnvironment>();
-        services.AddBaseTexts(env.WebRootFileProvider)
-            .AddJsonTexts(env.WebRootFileProvider, "Scripts/site/texts")
-            .AddJsonTexts(env.ContentRootFileProvider, "App_Data/texts");
+        services.AddClamAVUploadScanner()
+            .AddUploadStorage();
+        services.AddDynamicScripts()
+            .AddCssAndScriptBundling();
+        services.AddEmailSender();
+        services.AddElevationHandler();
+        services.AddHttpContextItemsAccessor();
+        services.AddLocalTextInitializer();
+        services.AddPasswordStrengthValidator();
+        services.AddReporting();
+        services.AddServiceHandlers();
+        services.AddUploadStorage();
     }
 
     // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
     public void Configure(IApplicationBuilder app, IWebHostEnvironment env)
     {
         RowFieldsProvider.SetDefaultFrom(app.ApplicationServices);
+        app.InitializeLocalTexts();
 
         var startNodeScripts = Configuration["StartNodeScripts"];
         if (!string.IsNullOrEmpty(startNodeScripts))
@@ -125,8 +119,6 @@ public partial class Startup
                 app.StartNodeScript(script);
             }
         }
-
-        InitializeLocalTexts(app.ApplicationServices);
 
         app.UseRequestLocalization();
 
