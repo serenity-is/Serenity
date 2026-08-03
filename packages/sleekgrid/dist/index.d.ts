@@ -1283,6 +1283,49 @@ export interface ItemMetadata<TItem = any> {
 }
 export declare function initColumnProps(columns: Column[], defaults: Partial<Column<any>>): void;
 export declare function titleize(str: string): string;
+export interface DragPosition {
+	startX: number;
+	startY: number;
+	range: DragRange;
+}
+export interface DragItem extends DragPosition {
+	dragSource: HTMLElement | Document | null;
+	dragHandle: HTMLElement | null;
+	deltaX: number;
+	deltaY: number;
+	dragTarget: HTMLElement;
+}
+export interface DragRange {
+	start: {
+		row?: number;
+		cell?: number;
+	};
+	end: {
+		row?: number;
+		cell?: number;
+	};
+}
+export interface DraggableOption {
+	/** container DOM element, defaults to "document" */
+	containerElement?: HTMLElement | Document;
+	/** when defined, will allow dragging from a specific element by using the .matches() query selector. */
+	allowDragFrom?: string;
+	/** when defined, will allow dragging from a specific element or its closest parent by using the .closest() query selector. */
+	allowDragFromClosest?: string;
+	/** Defaults to `['ctrlKey', 'metaKey']`, list of keys that when pressed will prevent Draggable events from triggering (e.g. prevent onDrag when Ctrl key is pressed while dragging) */
+	preventDragFromKeys?: Array<"altKey" | "ctrlKey" | "metaKey" | "shiftKey">;
+	/** drag initialized callback */
+	onDragInit?: (e: DragEvent, dd: DragPosition) => boolean | void;
+	/** drag started callback */
+	onDragStart?: (e: DragEvent, dd: DragPosition) => boolean | void;
+	/** drag callback */
+	onDrag?: (e: DragEvent, dd: DragPosition) => boolean | void;
+	/** drag ended callback */
+	onDragEnd?: (e: DragEvent, dd: DragPosition) => boolean | void;
+}
+export declare function Draggable(options: DraggableOption): {
+	destroy: () => void;
+};
 export interface IDataView<TItem = any> {
 	/** Gets the grand totals for all aggregated data. */
 	getGrandTotals(): IGroupTotals;
