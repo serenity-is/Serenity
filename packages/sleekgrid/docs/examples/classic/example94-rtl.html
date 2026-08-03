@@ -1,0 +1,39 @@
+---
+title: 'RTL grid'
+demonstrates:
+- Grid with RTL layout, column resizing and column reordering
+---
+<script src="https://cdn.jsdelivr.net/npm/sortablejs-rtl@1.15.7/Sortable.min.js"></script>
+
+<div id="myGrid"></div>
+
+<script>
+    document.documentElement.setAttribute("dir", "rtl");
+    const data = [];
+    for (var i = 0; i < 500; i++) {
+        data[i] = {
+            title: "Task " + i,
+            duration: "5 days",
+            percentComplete: Math.round(Math.random() * 100),
+            start: "01/01/2022",
+            finish: "01/05/2022",
+            effortDriven: (i % 5 == 0)
+        };
+    }
+
+    const columns = [
+        { field: "title" },
+        { field: "duration" },
+        { field: "percentComplete", name: "% Complete", width: 90 },
+        { field: "start", width: 100 },
+        { field: "finish", width: 100 },
+        { field: "effortDriven", width: 100 }
+    ];
+
+    new Slick.Grid("#myGrid", data, columns, {
+        enableCellNavigation: true,
+        enableColumnReorder: true,
+        enableColumnResize: true,
+        rtl: true
+    });
+</script>

@@ -233,7 +233,6 @@
   font-size: 0.1px;
   position: absolute;
   width: 9px;
-  right: -5px;
   top: 0;
   height: 100%;
   z-index: 1;
@@ -278,15 +277,6 @@
   display: none !important;
 }
 
-.slick-hscrollspacer,
-.slick-footerrow-columns.sg-main,
-.slick-headerrow-columns.sg-main,
-.slick-header-columns.sg-main,
-.grid-canvas.sg-top.sg-main,
-.grid-canvas.sg-bottom.sg-main {
-  margin-right: var(--sg-scrollbar-w);
-}
-
 .slick-cell.editable {
   overflow: visible;
 }
@@ -323,6 +313,33 @@
 
 
 /*!rtl:begin:ignore*/
+
+.slick-resizable-handle {
+  right: -5px;
+}
+.rtl .slick-resizable-handle {
+  right: auto;
+  left: -5px;
+}
+
+.slick-hscrollspacer,
+.slick-footerrow-columns.sg-main,
+.slick-headerrow-columns.sg-main,
+.slick-header-columns.sg-main,
+.grid-canvas.sg-top.sg-main,
+.grid-canvas.sg-bottom.sg-main {
+  margin-right: var(--sg-scrollbar-w);
+}
+
+.rtl .slick-hscrollspacer,
+.rtl .slick-footerrow-columns.sg-main,
+.rtl .slick-headerrow-columns.sg-main,
+.rtl .slick-header-columns.sg-main,
+.rtl .grid-canvas.sg-top.sg-main,
+.rtl .grid-canvas.sg-bottom.sg-main {
+  margin-right: 0;
+  margin-left: var(--sg-scrollbar-w);
+}
 
 .sleek-vars .l0 {
   left: var(--l0);

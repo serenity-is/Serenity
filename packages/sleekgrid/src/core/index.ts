@@ -2,6 +2,7 @@ export * from "./base";
 export * from "./cellnavigation";
 export * from "./cellrange";
 export * from "./column";
+export * from "./draggable";
 export * from "./editing";
 export * from "./event";
 export * from "./eventargs";
