@@ -1915,6 +1915,9 @@ describe("Validator.getLength edge cases", () => {
 describe("check method exception handling", () => {
     it("re-throws TypeError with augmented message in debug mode", () => {
         const form = document.createElement("form");
+        // Debug mode logs thrown exceptions via console.log, which pollutes the
+        // test output, so silence it for this test.
+        const logSpy = vi.spyOn(console, "log").mockImplementation(() => { });
         try {
             const input = document.createElement("input");
             input.name = "test";
@@ -1935,6 +1938,7 @@ describe("check method exception handling", () => {
             expect(() => validator.check(input)).toThrow(TypeError);
             expect(() => validator.check(input)).toThrow(/original error/);
         } finally {
+            logSpy.mockRestore();
             document.body.removeChild(form);
             delete Validator.methods.throwsError;
         }
