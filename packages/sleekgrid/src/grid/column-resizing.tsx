@@ -61,8 +61,7 @@ export function setupColumnResize<TItem>(this: void, { absoluteColMinWidth, cont
             cell: resizingCell,
             dist,
             forceFit: options.forceFitColumns,
-            absoluteColMinWidth: absoluteColMinWidth,
-            rtl: options.rtl
+            absoluteColMinWidth: absoluteColMinWidth
         });
         colResizing(resizingCell);
     };
@@ -199,13 +198,12 @@ export function autosizeColumns(cols: Column[], availWidth: number, absoluteColM
     return reRender;
 }
 
-function shrinkOrStretchColumn({ absoluteColMinWidth, cols, dist, cell: cell, forceFit, rtl }: {
+function shrinkOrStretchColumn({ absoluteColMinWidth, cols, dist, cell: cell, forceFit }: {
     absoluteColMinWidth: number,
     cols: Column[],
     cell: number,
     dist: number,
-    forceFit: boolean,
-    rtl?: boolean
+    forceFit: boolean
 }): void {
     var c: Column, j: number, x: number, actualMinWidth: number;
 

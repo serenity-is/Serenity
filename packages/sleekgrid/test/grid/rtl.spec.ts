@@ -118,7 +118,7 @@ describe('RTL Mode', () => {
 
       const header = grid.getHeaderColumn(columns[0].id);
       mockOffsetWidth(header, 150);
-
+      
       const resizeHandle = header?.querySelector('.slick-resizable-handle') as HTMLElement;
       expect(resizeHandle).toBeTruthy();
 
@@ -142,13 +142,22 @@ describe('RTL Mode', () => {
       target.dispatchEvent(event);
     };
 
+    // Mock offsetWidth for each header according to its current model width
+    const mockHeadersToCurrentWidths = () => {
+      columns.forEach(col => {
+        const hdr = grid.getHeaderColumn(col.id);
+        if (hdr) mockOffsetWidth(hdr, col.width);
+      });
+    };
+
     // Test each column (0, 1, 2)
     for (let i = 0; i < columns.length; i++) {
-      // Reset column widths to 150 for each test iteration
+      
+      // Reset all column widths to 150
       columns.forEach(c => c.width = 150);
+      mockHeadersToCurrentWidths();
 
       const header = grid.getHeaderColumn(columns[i].id);
-      mockOffsetWidth(header, 150);
       const resizeHandle = header?.querySelector('.slick-resizable-handle') as HTMLElement;
       expect(resizeHandle).toBeTruthy();
 
@@ -156,26 +165,49 @@ describe('RTL Mode', () => {
       let startX = rect.left + rect.width / 2;
       let startY = rect.top + rect.height / 2;
 
-      // Drag right by 200px should shrink to minWidth (30)
+      // Shrink all columns 0..i to minWidth. Total shrink capacity = (i+1) * (150 - 30)
+      const totalShrink = (i + 1) * 120;
       fireMouseEvent('mousedown', resizeHandle, startX, startY);
-      fireMouseEvent('mousemove', document, startX + 200, startY);
-      fireMouseEvent('mouseup', document, startX + 200, startY);
+      fireMouseEvent('mousemove', document, startX + totalShrink, startY);
+      fireMouseEvent('mouseup', document, startX + totalShrink, startY);
 
-      expect(columns[i].width).toBeGreaterThanOrEqual(25);
-      expect(columns[i].width).toBeLessThanOrEqual(45);
+      // All columns 0..i should be near minWidth (30)
+      for (let k = 0; k <= i; k++) {
+        expect(columns[k].width).toBeGreaterThanOrEqual(25);
+        expect(columns[k].width).toBeLessThanOrEqual(45);
+      }
+      // Columns > i remain unchanged (150)
+      for (let k = i + 1; k < columns.length; k++) {
+        expect(columns[k].width).toBeGreaterThanOrEqual(145);
+        expect(columns[k].width).toBeLessThanOrEqual(155);
+      }
 
-      // Drag left by 200px should expand to 230
-      mockOffsetWidth(header, 30);
+      // Update the offsetWidth mock to reflect the current widths
+      mockHeadersToCurrentWidths();
+
+      // Re‑fetch handle position (layout may have changed)
       rect = resizeHandle.getBoundingClientRect();
       startX = rect.left + rect.width / 2;
       startY = rect.top + rect.height / 2;
 
+      // Second drag: expand by dragging left by 200px
       fireMouseEvent('mousedown', resizeHandle, startX, startY);
       fireMouseEvent('mousemove', document, startX - 200, startY);
       fireMouseEvent('mouseup', document, startX - 200, startY);
 
+      // The dragged column (i) should expand to near 230 (220-250)
       expect(columns[i].width).toBeGreaterThanOrEqual(220);
       expect(columns[i].width).toBeLessThanOrEqual(250);
+      // Columns before i stay at minWidth 30 (25-45)
+      for (let k = 0; k < i; k++) {
+        expect(columns[k].width).toBeGreaterThanOrEqual(25);
+        expect(columns[k].width).toBeLessThanOrEqual(45);
+      }
+      // Columns after i stay at 150
+      for (let k = i + 1; k < columns.length; k++) {
+        expect(columns[k].width).toBeGreaterThanOrEqual(145);
+        expect(columns[k].width).toBeLessThanOrEqual(155);
+      }
     }
   });
 
