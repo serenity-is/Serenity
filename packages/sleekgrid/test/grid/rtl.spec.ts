@@ -134,6 +134,51 @@ describe('RTL Mode', () => {
     });
   });
 
+  it('should allow each column expand after column is at minWidth in RTL (raw mouse events)', () => {
+    createGrid({ rtl: true });
+
+    const fireMouseEvent = (type: string, target: EventTarget, clientX: number, clientY: number) => {
+      const event = new MouseEvent(type, { bubbles: true, cancelable: true, clientX, clientY });
+      target.dispatchEvent(event);
+    };
+
+    // Test each column (0, 1, 2)
+    for (let i = 0; i < columns.length; i++) {
+      // Reset column widths to 150 for each test iteration
+      columns.forEach(c => c.width = 150);
+
+      const header = grid.getHeaderColumn(columns[i].id);
+      mockOffsetWidth(header, 150);
+      const resizeHandle = header?.querySelector('.slick-resizable-handle') as HTMLElement;
+      expect(resizeHandle).toBeTruthy();
+
+      let rect = resizeHandle.getBoundingClientRect();
+      let startX = rect.left + rect.width / 2;
+      let startY = rect.top + rect.height / 2;
+
+      // Drag right by 200px should shrink to minWidth (30)
+      fireMouseEvent('mousedown', resizeHandle, startX, startY);
+      fireMouseEvent('mousemove', document, startX + 200, startY);
+      fireMouseEvent('mouseup', document, startX + 200, startY);
+
+      expect(columns[i].width).toBeGreaterThanOrEqual(25);
+      expect(columns[i].width).toBeLessThanOrEqual(45);
+
+      // Drag left by 200px should expand to 230
+      mockOffsetWidth(header, 30);
+      rect = resizeHandle.getBoundingClientRect();
+      startX = rect.left + rect.width / 2;
+      startY = rect.top + rect.height / 2;
+
+      fireMouseEvent('mousedown', resizeHandle, startX, startY);
+      fireMouseEvent('mousemove', document, startX - 200, startY);
+      fireMouseEvent('mouseup', document, startX - 200, startY);
+
+      expect(columns[i].width).toBeGreaterThanOrEqual(220);
+      expect(columns[i].width).toBeLessThanOrEqual(250);
+    }
+  });
+
   describe('LTR Regression', () => {
     it('should behave correctly in LTR mode (drag right increases, drag left decreases)', () => {
       createGrid({ rtl: false });
