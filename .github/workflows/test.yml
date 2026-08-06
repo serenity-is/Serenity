@@ -23,7 +23,7 @@ jobs:
         dotnet-version: 10.0.x
 
     - name: Nuget package cache
-      uses: actions/cache@v4
+      uses: actions/cache@v5
       id: nuget-package-cache
       env:
         cache-name: nuget-package-cache
