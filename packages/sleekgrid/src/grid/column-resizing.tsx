@@ -61,8 +61,7 @@ export function setupColumnResize<TItem>(this: void, { absoluteColMinWidth, cont
             cell: resizingCell,
             dist,
             forceFit: options.forceFitColumns,
-            absoluteColMinWidth: absoluteColMinWidth,
-            rtl: options.rtl
+            absoluteColMinWidth: absoluteColMinWidth
         });
         colResizing(resizingCell);
     };
@@ -199,13 +198,12 @@ export function autosizeColumns(cols: Column[], availWidth: number, absoluteColM
     return reRender;
 }
 
-function shrinkOrStretchColumn({ absoluteColMinWidth, cols, dist, cell: cell, forceFit, rtl }: {
+function shrinkOrStretchColumn({ absoluteColMinWidth, cols, dist, cell: cell, forceFit }: {
     absoluteColMinWidth: number,
     cols: Column[],
     cell: number,
     dist: number,
-    forceFit: boolean,
-    rtl?: boolean
+    forceFit: boolean
 }): void {
     var c: Column, j: number, x: number, actualMinWidth: number;
 
@@ -228,10 +226,7 @@ function shrinkOrStretchColumn({ absoluteColMinWidth, cols, dist, cell: cell, fo
 
         if (forceFit) {
             x = -dist;
-            const step = rtl ? -1 : 1;
-            const start = rtl ? cell - 1 : cell + 1;
-            const end = rtl ? 0 : cols.length;
-            for (j = start; rtl ? j >= end : j < end; j += step) {
+            for (j = cell + 1; j < cols.length; j++) {
                 c = cols[j];
                 if (c.resizable) {
                     if (x && c.maxWidth && (c.maxWidth - c.previousWidth < x)) {
@@ -264,10 +259,7 @@ function shrinkOrStretchColumn({ absoluteColMinWidth, cols, dist, cell: cell, fo
 
         if (forceFit) {
             x = -dist;
-            const step = rtl ? -1 : 1;
-            const start = rtl ? cell - 1 : cell + 1;
-            const end = rtl ? 0 : cols.length;
-            for (j = start; rtl ? j >= end : j < end; j += step) {
+            for (j = cell + 1; j < cols.length; j++) {
                 c = cols[j];
                 if (c.resizable) {
                     actualMinWidth = Math.max(c.minWidth || 0, absoluteColMinWidth);
@@ -298,10 +290,7 @@ function calcMinMaxPageXOnDragStart({ absoluteColMinWidth, cols, cell, forceFit,
         shrinkLeewayOnRight = 0;
         stretchLeewayOnRight = 0;
         // colums on right affect maxPageX/minPageX
-        const start = rtl ? cell - 1 : cell + 1;
-        const end = rtl ? 0 : cols.length;
-        const step = rtl ? -1 : 1;
-        for (j = start; rtl ? j >= end : j < end; j += step) {
+        for (j = cell + 1; j < cols.length; j++) {
             c = cols[j];
             if (c.resizable) {
                 if (stretchLeewayOnRight != null) {
@@ -316,9 +305,7 @@ function calcMinMaxPageXOnDragStart({ absoluteColMinWidth, cols, cell, forceFit,
         }
     }
     var shrinkLeewayOnLeft = 0, stretchLeewayOnLeft = 0;
-    const start = rtl ? cols.length - 1 : 0;
-    const step = rtl ? -1 : 1;
-    for (j = start; rtl ? j >= cell : j <= cell; j += step) {
+    for (j = 0; j <= cell; j++) {
         // columns on left only affect minPageX
         c = cols[j];
         if (c.resizable) {
@@ -345,8 +332,16 @@ function calcMinMaxPageXOnDragStart({ absoluteColMinWidth, cols, cell, forceFit,
         stretchLeewayOnLeft = 100000;
     }
 
-    return {
-        maxPageX: pageX + Math.min(shrinkLeewayOnRight, stretchLeewayOnLeft),
-        minPageX: pageX - Math.min(shrinkLeewayOnLeft, stretchLeewayOnRight)
+    // RTL swaps the directional roles
+    if (rtl) {
+        return {
+            maxPageX: pageX + Math.min(shrinkLeewayOnLeft, stretchLeewayOnRight),
+            minPageX: pageX - Math.min(shrinkLeewayOnRight, stretchLeewayOnLeft)
+        }
+    } else {
+        return {
+            maxPageX: pageX + Math.min(shrinkLeewayOnRight, stretchLeewayOnLeft),
+            minPageX: pageX - Math.min(shrinkLeewayOnLeft, stretchLeewayOnRight)
+        }
     }
 }
