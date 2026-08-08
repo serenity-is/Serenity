@@ -161,7 +161,7 @@ public partial class TranslationRepository(IRequestContext context, IWebHostEnvi
         {
             services.AddBaseTexts();
             if (HostEnvironment != null)
-                LocalTextRegistry.AddJsonTexts(hostEnvironment.ContentRootFileProvider, "App_Data/texts");
+                LocalTextRegistry.AddJsonTexts(HostEnvironment.ContentRootFileProvider, "App_Data/texts");
         }
         return new SaveResponse();
     }
