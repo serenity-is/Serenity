@@ -1,6 +1,6 @@
 ﻿import type { FormatterContext } from "@serenity-is/sleekgrid";
 import { Config } from "./config";
-import { addClass, appendToNode, cssEscape, getElementReadOnly, getReturnUrl, htmlEncode, parseQueryString, removeClass, sanitizeHtml, sanitizeUrl, setElementReadOnly, toggleClass } from "./html";
+import { addClass, appendToNode, cssEscape, getElementReadOnly, getReturnUrl, htmlEncode, isSafeReturnUrl, parseQueryString, removeClass, sanitizeHtml, sanitizeUrl, setElementReadOnly, toggleClass } from "./html";
 import * as sleekgrid from "@serenity-is/sleekgrid";
 
 vi.mock("@serenity-is/sleekgrid", async (importActual) => {
@@ -495,6 +495,40 @@ describe("parseQueryString", () => {
     });
 });
 
+describe("isSafeReturnUrl", () => {
+    it("returns true for relative URLs with a single leading slash", () => {
+        expect(isSafeReturnUrl("/")).toBe(true);
+        expect(isSafeReturnUrl("/safe/path")).toBe(true);
+        expect(isSafeReturnUrl("/safe/path?x=1&y=2")).toBe(true);
+    });
+
+    it("returns false for protocol-relative URLs", () => {
+        expect(isSafeReturnUrl("//evil.example")).toBe(false);
+        expect(isSafeReturnUrl("//evil.example/payload")).toBe(false);
+        expect(isSafeReturnUrl("//evil.example?x=1")).toBe(false);
+        expect(isSafeReturnUrl("///evil.example")).toBe(false);
+        expect(isSafeReturnUrl("//")).toBe(false);
+    });
+
+    it("returns false for absolute URLs", () => {
+        expect(isSafeReturnUrl("http://evil.example")).toBe(false);
+        expect(isSafeReturnUrl("https://evil.example")).toBe(false);
+        expect(isSafeReturnUrl("javascript:alert(1)")).toBe(false);
+    });
+
+    it("returns false for backslashes and control characters", () => {
+        expect(isSafeReturnUrl("/\\evil.example")).toBe(false);
+        expect(isSafeReturnUrl("/\\/evil.example")).toBe(false);
+        expect(isSafeReturnUrl("/\tsafe/path")).toBe(false);
+        expect(isSafeReturnUrl("/\nsafe/path")).toBe(false);
+    });
+
+    it("returns false for null or empty values", () => {
+        expect(isSafeReturnUrl(null)).toBe(false);
+        expect(isSafeReturnUrl("")).toBe(false);
+    });
+});
+
 describe("getReturnUrl", () => {
     it("returns returnUrl from query string if it is safe", () => {
         const oldLocation = window.location.href;
@@ -510,6 +544,17 @@ describe("getReturnUrl", () => {
     it("returns defaultReturnUrl if returnUrl from query string is unsafe", () => {
         const oldLocation = window.location.href;
         if (changeJSDOMURL("http://localhost?returnUrl=http://unsafe.com"))
+            try {
+                const result = getReturnUrl();
+                expect(result).toBe(Config.defaultReturnUrl());
+            } finally {
+                changeJSDOMURL(oldLocation);
+            }
+    });
+
+    it("returns defaultReturnUrl if returnUrl from query string is protocol-relative", () => {
+        const oldLocation = window.location.href;
+        if (changeJSDOMURL("http://localhost?returnUrl=//evil.example/"))
             try {
                 const result = getReturnUrl();
                 expect(result).toBe(Config.defaultReturnUrl());

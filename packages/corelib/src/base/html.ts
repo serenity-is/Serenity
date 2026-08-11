@@ -195,8 +195,8 @@ export function parseQueryString(s?: string): Record<string, string> {
 export function isSafeReturnUrl(url: string): boolean {
     if (!url || typeof url !== "string")
         return false;
-    // Must start with exactly one /
-    if (!/^\//.test(url))
+    // Must start with exactly one /, e.g. reject protocol-relative URLs like //host
+    if (!/^\/(?!\/)/.test(url))
         return false;
     // Reject any : to prevent protocol-relative and absolute URLs
     if (url.includes(':'))
