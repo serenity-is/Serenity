@@ -3,6 +3,12 @@
     parentIdField?: string;
     textField?: string;
     textFormatter?(item: TItem): string;
+    /**
+     * Lookup cache expiration time in minutes (default: 60)
+     * Set to 0 to disable expiration (cache indefinitely)
+     * Clients can use isExpired() to check if lookup needs refresh
+     */
+    expireMinutes?: number;
 }
 
 declare global {
@@ -14,6 +20,9 @@ declare global {
             parentIdField: string;
             textField: string;
             textFormatter: (item: TItem) => string;
+            expireMinutes: number;
+            isExpired(): boolean;
+            getExpirationMinutes(): number;
         }
     }
 }
@@ -25,6 +34,8 @@ export class Lookup<TItem> {
     public parentIdField: string;
     public textField: string;
     public textFormatter: (item: TItem) => string;
+    public expireMinutes: number;
+    private expireTime: number;
 
     constructor(options: LookupOptions<TItem>, items?: TItem[]) {
         options = options || {};
@@ -33,6 +44,7 @@ export class Lookup<TItem> {
         this.parentIdField = options.parentIdField;
         this.textField = options.textField;
         this.textFormatter = options.textFormatter;
+        this.expireMinutes = options.expireMinutes ?? 60;
 
         if (items != null)
             this.update(items);
@@ -54,6 +66,19 @@ export class Lookup<TItem> {
                 }
             }
         }
+        this.expireTime = Date.now() + (this.expireMinutes * 60000);
+    }
+
+    isExpired(): boolean {
+        if (!this.expireTime)
+            return false;
+        return Date.now() >= this.expireTime;
+    }
+
+    getExpirationMinutes(): number {
+        if (!this.expireTime)
+            return -1;
+        return Math.max(0, Math.ceil((this.expireTime - Date.now()) / 60000));
     }
 
     protected get_idField() {
