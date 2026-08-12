@@ -171,8 +171,10 @@ public partial class ServerTypingsGenerator
         var parameters = method.Parameters.Where(x =>
 #if ISSOURCEGENERATOR
             x.Type.TypeKind != TypeKind.Interface &&
+            x.Type.FullNameOf() != "System.Threading.CancellationToken" &&
 #else
             !x.ParameterType.Resolve().IsInterface &&
+            x.ParameterType.FullNameOf() != "System.Threading.CancellationToken" &&
 #endif
             TypingsUtils.FindAttr(x.GetAttributes(), "Microsoft.AspNetCore.Mvc", "FromServicesAttribute") == null).ToArray();
 
