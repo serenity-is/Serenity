@@ -1,4 +1,6 @@
 ﻿using System.Collections;
+using System.Text;
+using Serenity.Data;
 
 namespace Serenity.Services
 {
@@ -180,33 +182,28 @@ namespace Serenity.Services
             listRequest.ColumnSelection = attr.ColumnSelection;
             listRequest.IncludeColumns = includeColumns;
 
-            var enumerator = handler.Response.Entities.Cast<IRow>();
-            while (true)
+            var masterRows = handler.Response.Entities.Cast<IRow>().ToList();
+            var masterIds = masterRows.Select(x => masterKeyField.AsObject(x)).ToList();
+
+            if (!masterIds.Any())
+                return;
+
+            listRequest.Criteria = foreignKeyCriteria.In(masterIds) & filterCriteria;
+
+            IListResponse response = listHandler.Process(
+                handler.Connection, listRequest);
+
+            var lookup = response.Entities.Cast<IRow>()
+                .ToLookup(x => foreignKeyField.AsObject(x).ToString());
+
+            foreach (var row in masterRows)
             {
-                var part = enumerator.Take(1000);
-                if (!part.Any())
-                    break;
+                var list = rowListFactory();
+                var matching = lookup[masterKeyField.AsObject(row).ToString()];
+                foreach (var x in matching)
+                    list.Add(x);
 
-                enumerator = enumerator.Skip(1000);
-
-                listRequest.Criteria = foreignKeyCriteria.In(
-                    part.Select(x => masterKeyField.AsObject(x))) & filterCriteria;
-
-                IListResponse response = listHandler.Process(
-                    handler.Connection, listRequest);
-
-                var lookup = response.Entities.Cast<IRow>()
-                    .ToLookup(x => foreignKeyField.AsObject(x).ToString());
-
-                foreach (var row in part)
-                {
-                    var list = rowListFactory();
-                    var matching = lookup[masterKeyField.AsObject(row).ToString()];
-                    foreach (var x in matching)
-                        list.Add(x);
-
-                    Target.AsObject(row, list);
-                }
+                Target.AsObject(row, list);
             }
         }
 
@@ -232,6 +229,48 @@ namespace Serenity.Services
             var deleteRequest = deleteHandler.CreateRequest();
             deleteRequest.EntityId = detailId;
             deleteHandler.Process(uow, deleteRequest);
+        }
+
+        private void BatchDeleteDetails(IDbConnection connection, IEnumerable<object> detailIds, ISqlDialect dialect)
+        {
+            if (detailIds == null || !detailIds.Any())
+                return;
+
+            var row = rowFactory();
+            var idField = row.IdField;
+            var idList = detailIds.ToList();
+
+            if (idList.Count == 0)
+                return;
+
+            var sb = new StringBuilder();
+            var tableName = SqlSyntax.AutoBracketValid(row.Table);
+            var idFieldName = SqlSyntax.AutoBracketValid(idField.Name);
+            var paramNames = new List<string>();
+
+            sb.AppendFormat("DELETE FROM {0} WHERE {1} IN (", tableName, idFieldName);
+
+            for (int i = 0; i < idList.Count; i++)
+            {
+                if (i > 0)
+                    sb.Append(", ");
+
+                var paramName = string.Format("@p{0}", i);
+                paramNames.Add(paramName);
+                sb.Append(paramName);
+            }
+
+            sb.Append(")");
+
+            var cmdText = SqlHelper.FixCommandText(sb.ToString(), dialect);
+            var paramDict = new Dictionary<string, object>();
+
+            for (int i = 0; i < idList.Count; i++)
+            {
+                paramDict[string.Format("p{0}", i)] = SqlHelper.FixParamType(idList[i]);
+            }
+
+            SqlHelper.ExecuteNonQuery(connection, cmdText, paramDict);
         }
 
         private string AsString(object obj)
@@ -279,13 +318,17 @@ namespace Serenity.Services
                     newById[idStr] = item;
             }
 
+            var idsToDelete = new List<object>();
             foreach (IRow item in oldList)
             {
                 var id = rowIdField.AsObject(item);
                 var idStr = AsString(id);
                 if (!newById.ContainsKey(idStr))
-                    DeleteDetail(uow, id);
+                    idsToDelete.Add(id);
             }
+
+            if (idsToDelete.Count > 0)
+                BatchDeleteDetails(uow.Connection, idsToDelete, uow.Connection.GetDialect());
 
             foreach (IRow item in newList)
             {
