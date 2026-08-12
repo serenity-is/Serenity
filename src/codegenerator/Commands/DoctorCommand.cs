@@ -11,7 +11,7 @@ public partial class DoctorCommand(IProjectFileInfo project, IGeneratorConsole c
     static readonly Version RecommendedNodeVersion = new(24, 10, 0);
     static readonly Version RecommendedNpmVersion = new(11, 6, 2);
 
-    static readonly (Version, Version)[] RecommendedTSBuildVersion = [
+    public static readonly (Version, Version)[] RecommendedTSBuildVersion = [
         (new(0, 0, 0), new(8, 6, 0)),
         (new(8, 7, 1), new(8, 7, 4)),
         (new(8, 8, 4), new(8, 8, 4)),
@@ -20,6 +20,7 @@ public partial class DoctorCommand(IProjectFileInfo project, IGeneratorConsole c
         (new(9, 1, 6), new(9, 1, 6)),
         (new(10, 1, 6), new(10, 2, 1)),
         (new(10, 2, 3), new(10, 2, 4)),
+        (new(10, 3, 7), new(10, 3, 7))
     ];
 
     public IArgumentReader Arguments { get; set; }

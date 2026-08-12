@@ -1,3 +1,27 @@
+## 10.3.7 (2026-08-12)
+
+### Features
+- Add more service collection extensions to simplify service registration in Startup.cs: `AddClamAVUploadScanner`, `AddElevationHandler`, `AddEmailSender`, `AddPasswordStrengthValidator`, `AddHttpContextItemsAccessor`, `AddCssBundling`, `AddCssAndScriptBundling`, `AddScriptBundling`, `AddLocalTextInitializer` and an `AddUploadStorage` overload. Add `AddBackgroundJobs`, `AddPuppeteerHtmlToPdf` and `AddSecureUploadFileResponder` (StartSharp).
+- `TranslationRepository` now uses `ILocalTextInitializer` in Serene instead of the static `InitializeLocalTexts` method in Startup.
+- Apply RTL related changes for SleekGrid from sleekgrid PR #16, and adjust `slick.base.css` so that it works properly in RTL mode, including in the Pro theme which runs RTL CSS. Add a basic RTL SleekGrid sample, and manually apply the patch from unmerged SortableJS PR #2368 for RTL support.
+- Correct RTL drag constraints in SleekGrid by swapping shrink/stretch leeways (#7420).
+- Also generate a namespace constant for root namespaces even if there is no server type there.
+- Use a namespace for `Criteria` as TypeScript 6/7 produces an incorrect dts file.
+- Add `noUncheckedSideEffectImports: false` to Serene tsconfig.json.
+- Switch to FullCalendar 7.0.2 (unified package), which has breaking changes; the Calendar sample is updated accordingly (StartSharp).
+- Replace the X.PagedList NuGet package reference, which is not updated for some time, with a minimal internal version of X.PagedList (StartSharp).
+- Implement better indentation for markup generated from cshtml file for sidebar (StartSharp).
+- Bump dompurify to 3.14.13, jsdom to 30.0.1, vite to 8.2.1, tiptap to 3.30.0, esbuild to 0.28.2.
+- Bump preact to 10.29.8, vite to 8.2.1, esbuild to 0.28.2, @preact/signals to 2.11.0, @types/google.maps to 3.65.5, highlight.js to 11.11.2, datatables to 3.0.1 (StartSharp).
+- Bump SQLitePCLRaw.bundle_e_sqlite3 to 3.0.5, NUglify to 1.22.3, Scriban to 7.2.6, ClosedXML to 0.105.1, Microsoft.Data.Sqlite to 10.0.11, MySqlConnector to 2.6.2, System libs to 10.0.11, PuppeteerSharp to 25.5.0, and Microsoft.Playwright.Xunit.v3 to 1.62.0.
+- Remove Microsoft.TypeScript.MSBuild from Feature.Build.props and sample Directory.Build.props.
+- Recommended `@serenity-is/tsbuild` version is now `10.3.7` which uses `esbuild 0.28.2`.
+
+### Bugfixes
+- Reject protocol-relative URLs in `isSafeReturnUrl`, so inputs like `//evil.example` are no longer considered safe, fixing an open redirect issue (CWE-601, GHSA-9qr4-c5fv-3vwm).
+- Ignore `CancellationToken` parameters when generating service typings, so service endpoint methods taking a `CancellationToken` no longer fail silently and now get a client proxy (#7421).
+- Also listen for the `input` event in QuickSearchInput, as Playwright only triggers the input event.
+
 ## 10.3.6 (2026-08-02)
 
 ### Features

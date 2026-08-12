@@ -30,21 +30,21 @@
     <PackageReference Include="FluentMigrator.Runner.Postgres" Version="8.0.1" />
     <PackageReference Include="FluentMigrator.Runner.SQLite" Version="8.0.1" />
     <PackageReference Include="FluentMigrator.Runner.SqlServer" Version="8.0.1" />
-    <PackageReference Include="Microsoft.Data.Sqlite" Version="10.0.10" />
+    <PackageReference Include="Microsoft.Data.Sqlite" Version="10.0.11" />
     <PackageReference Include="SQLitePCLRaw.bundle_e_sqlite3" VersionOverride="3.0.5" />
     <PackageReference Include="Microsoft.Data.SqlClient" Version="7.0.2" />
     <PackageReference Include="Microsoft.TypeScript.MSBuild" Version="6.0.3" PrivateAssets="all" IncludeAssets="runtime; build; native; contentfiles; analyzers" />
   </ItemGroup>
   <ItemGroup Condition="'$(UseProjectRefs)' == 'false'">
-    <PackageReference Include="Serenity.Assets" Version="10.3.6" />
-    <PackageReference Include="Serenity.Corelib" Version="10.3.6" />
-    <PackageReference Include="Serenity.Net.Web" Version="10.3.6" />
-    <PackageReference Include="Serenity.Extensions" Version="10.3.6" />
+    <PackageReference Include="Serenity.Assets" Version="10.3.7" />
+    <PackageReference Include="Serenity.Corelib" Version="10.3.7" />
+    <PackageReference Include="Serenity.Net.Web" Version="10.3.7" />
+    <PackageReference Include="Serenity.Extensions" Version="10.3.7" />
     <!--#if (Northwind)-->
-    <PackageReference Include="Serenity.Demo.Northwind" Version="10.3.6" />
+    <PackageReference Include="Serenity.Demo.Northwind" Version="10.3.7" />
     <!--#endif-->
     <!--#if (BasicSamples)-->
-    <PackageReference Include="Serenity.Demo.BasicSamples" Version="10.3.6" />
+    <PackageReference Include="Serenity.Demo.BasicSamples" Version="10.3.7" />
     <!--#endif-->
   </ItemGroup>
   <ItemGroup Condition="'$(UseProjectRefs)' != 'false'">

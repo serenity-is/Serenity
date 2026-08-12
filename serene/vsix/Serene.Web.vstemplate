@@ -319,12 +319,12 @@
         </Folder>
         <Folder Name="esm" TargetFolderName="esm">
           <Folder Name="_chunks" TargetFolderName="_chunks">
-            <ProjectItem ReplaceParameters="true" TargetFileName="chunk-3CYRTJWA.js">chunk-3CYRTJWA.js</ProjectItem>
-            <ProjectItem ReplaceParameters="true" TargetFileName="chunk-MKWQKDDO.js">chunk-MKWQKDDO.js</ProjectItem>
-            <ProjectItem ReplaceParameters="true" TargetFileName="chunk-OL7A6VBL.js">chunk-OL7A6VBL.js</ProjectItem>
-            <ProjectItem ReplaceParameters="true" TargetFileName="chunk-PCZG6246.js">chunk-PCZG6246.js</ProjectItem>
-            <ProjectItem ReplaceParameters="true" TargetFileName="chunk-PQAXRLUX.js">chunk-PQAXRLUX.js</ProjectItem>
-            <ProjectItem ReplaceParameters="true" TargetFileName="chunk-WSEB3JZA.js">chunk-WSEB3JZA.js</ProjectItem>
+            <ProjectItem ReplaceParameters="true" TargetFileName="chunk-C4EQ5RWX.js">chunk-C4EQ5RWX.js</ProjectItem>
+            <ProjectItem ReplaceParameters="true" TargetFileName="chunk-KN7K7VD7.js">chunk-KN7K7VD7.js</ProjectItem>
+            <ProjectItem ReplaceParameters="true" TargetFileName="chunk-KU4NFXZT.js">chunk-KU4NFXZT.js</ProjectItem>
+            <ProjectItem ReplaceParameters="true" TargetFileName="chunk-RJ25QAL2.js">chunk-RJ25QAL2.js</ProjectItem>
+            <ProjectItem ReplaceParameters="true" TargetFileName="chunk-W6NFVW5R.js">chunk-W6NFVW5R.js</ProjectItem>
+            <ProjectItem ReplaceParameters="true" TargetFileName="chunk-XUALUWTN.js">chunk-XUALUWTN.js</ProjectItem>
           </Folder>
           <Folder Name="Modules" TargetFolderName="Modules">
             <Folder Name="Administration" TargetFolderName="Administration">
