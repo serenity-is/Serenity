@@ -1,12 +1,13 @@
 ﻿using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Options;
+using System.Threading;
 
 namespace Serenity.Web
 {
     public class ScriptBundleManager : IScriptBundleManager
     {
-        private static readonly object sync = new();
+        private static readonly ReaderWriterLockSlim syncLock = new(LockRecursionPolicy.SupportsRecursion);
 
         private bool isEnabled;
         private Dictionary<string, string> bundleKeyBySourceUrl;
@@ -37,13 +38,16 @@ namespace Serenity.Web
             scriptManager.ScriptChanged += name =>
             {
                 HashSet<string> bundleKeys;
-                lock (sync)
+                syncLock.EnterReadLock();
+                try
                 {
                     if (bundleKeysBySourceUrl == null ||
                         !bundleKeysBySourceUrl.TryGetValue("dynamic://" + name, out bundleKeys))
                         bundleKeys = null;
-                    {
-                    }
+                }
+                finally
+                {
+                    syncLock.ExitReadLock();
                 }
 
                 if (bundleKeys != null)
@@ -54,7 +58,8 @@ namespace Serenity.Web
 
         public void Reset()
         {
-            lock (sync)
+            syncLock.EnterWriteLock();
+            try
             {
                 isEnabled = false;
                 var settings = options.Value;
@@ -260,14 +265,25 @@ namespace Serenity.Web
 
                 isEnabled = true;
             }
+            finally
+            {
+                syncLock.ExitWriteLock();
+            }
         }
 
         public bool IsEnabled
         {
             get
             {
-                lock (sync)
+                syncLock.EnterReadLock();
+                try
+                {
                     return isEnabled;
+                }
+                finally
+                {
+                    syncLock.ExitReadLock();
+                }
             }
         }
 
@@ -275,7 +291,8 @@ namespace Serenity.Web
         {
             BundleUtils.ClearVersionCache();
 
-            lock (sync)
+            syncLock.EnterWriteLock();
+            try
             {
                 if (bundleKeys == null)
                     return;
@@ -285,11 +302,16 @@ namespace Serenity.Web
 
                 Reset();
             }
+            finally
+            {
+                syncLock.ExitWriteLock();
+            }
         }
 
         public IEnumerable<string> GetBundleIncludes(string bundleKey)
         {
-            lock (sync)
+            syncLock.EnterReadLock();
+            try
             {
                 var bi = bundleIncludes;
                 if (bi != null && bi.TryGetValue(bundleKey, out List<string> includes) && includes != null)
@@ -297,14 +319,23 @@ namespace Serenity.Web
 
                 return Array.Empty<string>();
             }
+            finally
+            {
+                syncLock.ExitReadLock();
+            }
         }
 
         public string GetScriptBundle(string scriptUrl)
         {
             Dictionary<string, string> bySrcUrl;
-            lock (sync)
+            syncLock.EnterReadLock();
+            try
             {
                 bySrcUrl = bundleKeyBySourceUrl;
+            }
+            finally
+            {
+                syncLock.ExitReadLock();
             }
 
             string bundleKey;
