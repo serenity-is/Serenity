@@ -1,4 +1,5 @@
-﻿using Dictionary = System.Collections.Generic.Dictionary<string, object>;
+﻿using System.Threading.Tasks;
+using Dictionary = System.Collections.Generic.Dictionary<string, object>;
 
 namespace Serenity.Data
 {
@@ -316,6 +317,31 @@ namespace Serenity.Data
                     row.SetDictionaryData(name, value);
                 }
             }
+        }
+
+        /// <summary>
+        /// Asynchronously executes the query and loads all matching rows.
+        /// </summary>
+        /// <param name="query">The query.</param>
+        /// <param name="connection">The connection (must be DbConnection for async support).</param>
+        /// <returns>A task that represents the asynchronous operation, containing a list of matching rows.</returns>
+        public static async Task<int> ForEachAsync<TRow>(this SqlQuery query, System.Data.Common.DbConnection connection,
+            Func<TRow, Task> callBackAsync)
+            where TRow : class, IRow, new()
+        {
+            var row = new TRow();
+            int count = 0;
+
+            using var reader = await SqlHelper.ExecuteReaderAsync(connection, query.ToString(), query.Params);
+
+            while (await reader.ReadAsync())
+            {
+                query.GetFromReader(reader);
+                await callBackAsync(row.Clone() as TRow);
+                count++;
+            }
+
+            return count;
         }
     }
 }

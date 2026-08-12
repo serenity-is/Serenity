@@ -2,6 +2,7 @@
 using Microsoft.Extensions.Logging;
 using System.Data.Common;
 using System.IO;
+using System.Threading.Tasks;
 using Dictionary = System.Collections.Generic.Dictionary<string, object>;
 
 namespace Serenity.Data
@@ -675,6 +676,76 @@ namespace Serenity.Data
         {
             using IDataReader reader = ExecuteReader(connection, query, logger);
             return reader.Read();
+        }
+
+        /// <summary>
+        /// Executes the query asynchronously and returns a data reader.
+        /// </summary>
+        /// <param name="connection">The connection (must be DbConnection).</param>
+        /// <param name="commandText">The command text.</param>
+        /// <param name="param">The parameters.</param>
+        /// <param name="logger">Logger</param>
+        /// <returns>A task that represents the asynchronous operation, containing the data reader.</returns>
+        public static async Task<DbDataReader> ExecuteReaderAsync(DbConnection connection, string commandText, IDictionary<string, object> param = null, ILogger logger = null)
+        {
+            if (connection == null)
+                throw new ArgumentNullException(nameof(connection));
+
+            using DbCommand command = connection.CreateCommand();
+            command.CommandText = commandText;
+
+            if (param != null && param.Count > 0)
+            {
+                foreach (var p in param)
+                {
+                    var parameter = command.CreateParameter();
+                    parameter.ParameterName = p.Key;
+                    parameter.Value = p.Value ?? DBNull.Value;
+                    command.Parameters.Add(parameter);
+                }
+            }
+
+            if (connection.State != System.Data.ConnectionState.Open)
+                await connection.OpenAsync();
+
+            logger?.LogDebug($"ExecuteReaderAsync: {commandText}");
+
+            return await command.ExecuteReaderAsync();
+        }
+
+        /// <summary>
+        /// Executes the query asynchronously and returns number of affected rows.
+        /// </summary>
+        /// <param name="connection">The connection (must be DbConnection).</param>
+        /// <param name="commandText">The command text.</param>
+        /// <param name="param">The parameters.</param>
+        /// <param name="logger">Logger</param>
+        /// <returns>A task that represents the asynchronous operation, containing the number of affected rows.</returns>
+        public static async Task<int> ExecuteNonQueryAsync(DbConnection connection, string commandText, IDictionary<string, object> param = null, ILogger logger = null)
+        {
+            if (connection == null)
+                throw new ArgumentNullException(nameof(connection));
+
+            using DbCommand command = connection.CreateCommand();
+            command.CommandText = commandText;
+
+            if (param != null && param.Count > 0)
+            {
+                foreach (var p in param)
+                {
+                    var parameter = command.CreateParameter();
+                    parameter.ParameterName = p.Key;
+                    parameter.Value = p.Value ?? DBNull.Value;
+                    command.Parameters.Add(parameter);
+                }
+            }
+
+            if (connection.State != System.Data.ConnectionState.Open)
+                await connection.OpenAsync();
+
+            logger?.LogDebug($"ExecuteNonQueryAsync: {commandText}");
+
+            return await command.ExecuteNonQueryAsync();
         }
     }
 }
