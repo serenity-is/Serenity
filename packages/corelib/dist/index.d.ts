@@ -320,14 +320,59 @@ export declare enum CriteriaOperator {
  */
 export declare function Criteria(field: string): CriteriaBuilder;
 export declare namespace Criteria {
-	export { CriteriaOperator as CriteriaOperator };
-	export var isEmpty: (c: any[]) => boolean;
-	export var join: (c1: any[], op: string, c2: any[]) => any[];
-	export var not: (c: any[]) => (string | any[])[];
-	export var and: (c1: any[], c2: any[], ...rest: any[][]) => any[];
-	export var or: (c1: any[], c2: any[], ...rest: any[][]) => any[];
-	export var paren: (c: any[]) => any[];
-	export { parseCriteria as parseCriteria };
+	/** Provides access to the `CriteriaOperator` enum, e.g list of operator keys */
+	const Operator: typeof CriteriaOperator;
+	/**
+	 * Determines if a criteria is empty.
+	 */
+	function isEmpty(c: any[]): boolean;
+	/**
+	 * Joins two criteria together.
+	 * @param c1 First criteria.
+	 * @param op Operator to insert between, e.g. 'or', 'and'.
+	 * @param c2 Second criteria
+	 */
+	function join(c1: any[], op: string, c2: any[]): any[];
+	/**
+	 * Negates a criteria.
+	 * @param c Criteria to negate.
+	 */
+	function not(c: any[]): (string | any[])[];
+	/**
+	 * Ands two or more criteria together.
+	 * @param c1 First criteria.
+	 * @param c2 Second criteria.
+	 * @param rest Other criteria.
+	 */
+	function and(c1: any[], c2: any[], ...rest: any[][]): any[];
+	/**
+	 * Ors two or more criteria together.
+	 * @param c1 First criteria.
+	 * @param c2 Second criteria.
+	 * @param rest Other criteria.
+	 */
+	function or(c1: any[], c2: any[], ...rest: any[][]): any[];
+	/**
+	 * Puts a criteria in parens. Exists only for compatibility reasons.
+	 */
+	function paren(c: any[]): any[];
+	/**
+	 * Parses a criteria expression to Serenity Criteria array format.
+	 * The expression string may be a string literal, optionally containining
+	 * parameters like `A >= @p1 and B < @p2`.
+	 *
+	 * Or, the expression might be a tagged string literal that
+	 * contain parameter placeholders like `A >= ${p1}`
+	 * where p1 is a variable in the scope.
+	 *
+	 * @example
+	 * `Criteria.parse("A >= @p1 and B < @p2", { p1: 5, p2: 4 }) // [[[a], '>=' 5], 'and', [[b], '<', 4]]`
+	 *
+	 * @example
+	 * `let a = 5; b = 4;
+	 * Criteria.parse`A >= ${a} and B < ${b}` // [[[a], '>=' 5], 'and', [[b], '<', 4]]`
+	*/
+	const parse: typeof parseCriteria;
 }
 export interface DebouncedFunction<T extends (...args: any[]) => any> {
 	/**

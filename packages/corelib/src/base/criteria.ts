@@ -756,99 +756,101 @@ export function Criteria(field: string) {
     // workaround for subclassing array until corelib switched to ES6
     !(builder as any).eq && ((builder as any).__proto__ = CriteriaBuilder.prototype);
     return builder as CriteriaBuilder
-}
-
-/** Provides access to the `CriteriaOperator` enum, e.g list of operator keys */
-Criteria.Operator = CriteriaOperator;
-
-/** 
- * Determines if a criteria is empty.
- */
-Criteria.isEmpty = function isEmpty(c: any[]): boolean {
-    return c == null ||
-        c.length === 0 ||
-        (c.length === 1 && typeof c[0] === "string" && c[0].length === 0);
 };
 
-/**
- * Joins two criteria together.
- * @param c1 First criteria.
- * @param op Operator to insert between, e.g. 'or', 'and'.
- * @param c2 Second criteria
- */
-Criteria.join = function join(c1: any[], op: string, c2: any[]): any[] {
-    if (Criteria.isEmpty(c1))
-        return c2;
+export namespace Criteria {
+    /** Provides access to the `CriteriaOperator` enum, e.g list of operator keys */
+    export const Operator = CriteriaOperator;
 
-    if (Criteria.isEmpty(c2))
-        return c1;
+    /** 
+     * Determines if a criteria is empty.
+     */
+    export function isEmpty(c: any[]): boolean {
+        return c == null ||
+            c.length === 0 ||
+            (c.length === 1 && typeof c[0] === "string" && c[0].length === 0);
+    };
 
-    return [c1, op, c2];
-};
+    /**
+     * Joins two criteria together.
+     * @param c1 First criteria.
+     * @param op Operator to insert between, e.g. 'or', 'and'.
+     * @param c2 Second criteria
+     */
+    export function join(c1: any[], op: string, c2: any[]): any[] {
+        if (Criteria.isEmpty(c1))
+            return c2;
 
-/**
- * Negates a criteria.
- * @param c Criteria to negate.
- */
-Criteria.not = function not(c: any[]) {
-    return ['not', c]
-}
+        if (Criteria.isEmpty(c2))
+            return c1;
 
+        return [c1, op, c2];
+    };
 
-/**
- * Ands two or more criteria together.
- * @param c1 First criteria.
- * @param c2 Second criteria.
- * @param rest Other criteria.
- */
-Criteria.and = function and(c1: any[], c2: any[], ...rest: any[][]) {
-    let result = Criteria.join(c1, 'and', c2);
-    if (rest) {
-        for (const k of rest)
-            result = Criteria.join(result, 'and', k);
+    /**
+     * Negates a criteria.
+     * @param c Criteria to negate.
+     */
+    export function not(c: any[]) {
+        return ['not', c]
     }
 
-    return result;
-};
 
-/**
- * Ors two or more criteria together.
- * @param c1 First criteria.
- * @param c2 Second criteria.
- * @param rest Other criteria.
- */
-Criteria.or = function or(c1: any[], c2: any[], ...rest: any[][]) {
-    let result = Criteria.join(c1, 'or', c2);
+    /**
+     * Ands two or more criteria together.
+     * @param c1 First criteria.
+     * @param c2 Second criteria.
+     * @param rest Other criteria.
+     */
+    export function and(c1: any[], c2: any[], ...rest: any[][]) {
+        let result = Criteria.join(c1, 'and', c2);
+        if (rest) {
+            for (const k of rest)
+                result = Criteria.join(result, 'and', k);
+        }
 
-    if (rest) {
-        for (const k of rest)
-            result = Criteria.join(result, 'or', k);
+        return result;
+    };
+
+    /**
+     * Ors two or more criteria together.
+     * @param c1 First criteria.
+     * @param c2 Second criteria.
+     * @param rest Other criteria.
+     */
+    export function or(c1: any[], c2: any[], ...rest: any[][]) {
+        let result = Criteria.join(c1, 'or', c2);
+
+        if (rest) {
+            for (const k of rest)
+                result = Criteria.join(result, 'or', k);
+        }
+
+        return result;
     }
 
-    return result;
-}
+    /**
+     * Puts a criteria in parens. Exists only for compatibility reasons.
+     */
+    export function paren(c: any[]): any[] {
+        return Criteria.isEmpty(c) ? c : ['()', c];
+    }
 
-/**
- * Puts a criteria in parens. Exists only for compatibility reasons.
- */
-Criteria.paren = function parent(c: any[]): any[] {
-    return Criteria.isEmpty(c) ? c : ['()', c];
+    /** 
+     * Parses a criteria expression to Serenity Criteria array format.
+     * The expression string may be a string literal, optionally containining 
+     * parameters like `A >= @p1 and B < @p2`.
+     * 
+     * Or, the expression might be a tagged string literal that 
+     * contain parameter placeholders like `A >= ${p1}`
+     * where p1 is a variable in the scope.
+     *
+     * @example
+     * `Criteria.parse("A >= @p1 and B < @p2", { p1: 5, p2: 4 }) // [[[a], '>=' 5], 'and', [[b], '<', 4]]`
+     * 
+     * @example
+     * `let a = 5; b = 4;
+     * Criteria.parse`A >= ${a} and B < ${b}` // [[[a], '>=' 5], 'and', [[b], '<', 4]]`
+    */
+    export const parse = parseCriteria;
 }
-
-/** 
- * Parses a criteria expression to Serenity Criteria array format.
- * The expression string may be a string literal, optionally containining 
- * parameters like `A >= @p1 and B < @p2`.
- * 
- * Or, the expression might be a tagged string literal that 
- * contain parameter placeholders like `A >= ${p1}`
- * where p1 is a variable in the scope.
- *
- * @example
- * `Criteria.parse("A >= @p1 and B < @p2", { p1: 5, p2: 4 }) // [[[a], '>=' 5], 'and', [[b], '<', 4]]`
- * 
- * @example
- * `let a = 5; b = 4;
- * Criteria.parse`A >= ${a} and B < ${b}` // [[[a], '>=' 5], 'and', [[b], '<', 4]]`
-*/
-Criteria.parse = parseCriteria;
