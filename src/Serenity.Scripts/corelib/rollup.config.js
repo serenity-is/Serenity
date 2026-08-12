@@ -181,7 +181,19 @@ var extendGlobals = function () {
 
 async function minifyScript(fileName) {
     var minified = await minify({ [basename(fileName)]: fs.readFileSync(fileName, 'utf8') }, {
-        mangle: true,
+        compress: {
+            dead_code: true,
+            drop_console: false,
+            passes: 2,
+            unused: true,
+            pure_funcs: null,
+            hoist_funs: true,
+            toplevel: true
+        },
+        mangle: {
+            toplevel: true,
+            safari10: false
+        },
         sourceMap: {
             content: fs.existsSync(fileName + '.map') ? fs.readFileSync(fileName + '.map', 'utf8') : undefined,
             filename: fileName.replace(/\.js$/, '.min.js'),
@@ -233,11 +245,21 @@ export default [
             typescript({
                 tsconfig: 'src/tsconfig.json',
                 outDir: './out',
-                sourceRoot: resolve('./corelib')
+                sourceRoot: resolve('./corelib'),
+                compilerOptions: {
+                    // Enable optimization hints for bundlers
+                    sideEffects: false
+                }
             }),
             extendGlobals()
         ],
-        external
+        external,
+        // Tree-shaking configuration: remove unused code
+        treeshake: {
+            moduleSideEffects: false,
+            propertyReadSideEffects: false,
+            tryCatchDeoptimization: false
+        }
     },
     {
         input: "./out/q/index.d.ts",
@@ -274,14 +296,19 @@ export default [
     },
     {
         input: "./out/serenity/index.d.ts",
-        output: [{ 
+        output: [{
             file: "./dist/serenity/index.d.ts",
             format: "es"
         }],
         plugins: [
             dts()
         ],
-        external: ['../q', '../slick', ...external]
+        external: ['../q', '../slick', ...external],
+        treeshake: {
+            moduleSideEffects: false,
+            propertyReadSideEffects: false,
+            tryCatchDeoptimization: false
+        }
     },
     {
         input: "./out/serenity/index.d.ts",

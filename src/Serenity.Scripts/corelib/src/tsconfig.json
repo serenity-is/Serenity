@@ -31,7 +31,10 @@
     ],
     "noEmitHelpers": false,
     "importHelpers": false,
-    "jsx": "react"
+    "jsx": "react",
+    "preserveConstEnums": false,
+    "downlevelIteration": false,
+    "strict": true
   },
   "exclude": ["**/*.spec.ts"]
 }
