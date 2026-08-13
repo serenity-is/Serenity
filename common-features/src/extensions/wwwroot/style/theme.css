@@ -1866,13 +1866,17 @@ input.ui-button::-moz-focus-inner {
   color: var(--bs-body-color);
   font-size: 1.4rem;
   height: auto;
-  width: auto;
   margin: 0;
   padding: 1px 6px;
   line-height: inherit;
   text-shadow: none;
   outline: none;
-  text-indent: 0;
+}
+
+.ui-icon-closethick::before {
+  font-family: var(--s-icon-font);
+  font-weight: var(--s-icon-solid);
+  content: "\f00d";
 }
 
 .ui-dialog-content {
@@ -2304,6 +2308,22 @@ button.ui-datepicker-trigger::before {
 
 .ui-button-text-only .ui-button-text {
   padding: 0.4em 1em;
+}
+
+.ui-button-icon-only {
+  text-indent: -9999px;
+  width: 1.5em;
+}
+
+.ui-button-icon-only .ui-icon,
+.ui-button-icon-only i {
+  text-indent: 0;
+  line-height: 1;
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  margin-left: -0.50em;
+  margin-top: -0.50em;   
 }
 
 input.ui-button {

@@ -1,4 +1,5 @@
-﻿import { DialogTexts, Fluent, faIcon, getjQuery } from "../../base";
+﻿import { DialogTexts, faIcon, getjQuery, nsSerenity } from "../../base";
+import { Widget, WidgetProps } from "../widgets/widget";
 
 export namespace DialogExtensions {
 
@@ -6,7 +7,7 @@ export namespace DialogExtensions {
         let $ = getjQuery();
         if (!$)
             return;
-        var dlg = $(dialog)?.dialog?.();
+        const dlg = $(dialog)?.dialog?.();
         if (!dlg)
             return;
         dlg.dialog('option', 'resizable', true);
@@ -25,189 +26,204 @@ export namespace DialogExtensions {
     }
 
     export function dialogMaximizable(dialog: HTMLElement | ArrayLike<HTMLElement>): void {
-        let $ = getjQuery();
-        if (!$)
+        if (!getjQuery())
             return;
-        $(dialog).dialogExtend?.({
-            closable: true,
-            maximizable: true,
-            dblclick: 'maximize',
-            icons: { maximize: 'ui-icon-maximize-window' }
+        new UIDialogMaximizer({
+            element: dialog,
+            dblclick: 'maximize'
         });
     }
 }
 
-function registerDialogExtendPlugin() {
-    let $ = getjQuery();
-    if (!$ || !$.widget)
-        return false;
+export interface UIDialogMaximizerProps {
+    dblclick?: boolean | string;
+    load?: (() => void) | null;
+    beforeRestore?: (() => void) | null;
+    restore?: (() => void) | null;
+    showButton?: boolean;
+    beforeMaximize?: (() => void) | null;
+    maximize?: (() => void) | null;
+}
 
-    if ($.fn?.dialogExtend)
-        return true;
+/**
+ * Adds maximize / restore functionality to a jQuery UI dialog.
+ * Ported from the jquery.dialogextend plugin, converted from a jQuery UI widget
+ * into a plain class. Requires jQuery UI dialogs; it throws an error without them.
+ */
+export class UIDialogMaximizer extends Widget<UIDialogMaximizerProps> {
+    static override [Symbol.typeInfo] = this.registerClass(nsSerenity);
 
-    $.widget("ui.dialogExtend", {
-        options: {
-            dblclick: true,
-            load: null,
-            beforeRestore: null,
-            restore: null,
-            maximizable: false,
-            beforeMaximize: null,
-            maximize: null
-        },
-        _create: function () {
-            this._state = "normal";
-            this._initButtons();
-            this._setState("normal");
-            return this._trigger("load");
-        },
-        _setState: function (state: any) {
-            $(this.domNode).removeClass("ui-dialog-" + this._state).addClass("ui-dialog-" + state);
-            return this._state = state;
-        },
-        _initButtons: function () {
-            var _this = this;
+    static readonly defaults: Required<UIDialogMaximizerProps> = {
+        dblclick: true,
+        load: null,
+        beforeRestore: null,
+        restore: null,
+        showButton: true,
+        beforeMaximize: null,
+        maximize: null
+    };
 
-            this._addButton("maximize", this.options.maximizable, DialogTexts.MaximizeHint, faIcon("window-maximize"));
-            this._addButton("restore", false, DialogTexts.RestoreHint, faIcon("window-restore"));
+    private currentState = "normal";
+    private snapshot: any;
+    private originalConfigResizable: boolean | undefined;
 
-            var titlebar = $(this.domNode).closest('.ui-dialog').children('.ui-dialog-titlebar');
-            titlebar.dblclick(function () {
-                if (_this.options.dblclick) {
-                    if (_this._state !== "normal") {
-                        return _this.restore();
-                    } else {
-                        return _this[_this.options.dblclick]();
-                    }
-                }
-            }).select(function () {
-                return false;
-            });
-        },
-        _addButton: function (name: string, show: boolean, hint: string, icon: string) {
-            var _this = this;
+    constructor(props: WidgetProps<UIDialogMaximizerProps>) {
+        super({ ...UIDialogMaximizer.defaults, ...props });
+        if (!getjQuery())
+            throw new Error("DialogMaximizer requires jQuery!");
+        this.initButtons();
+        this.setState("normal");
+        this.options.load?.();
+    }
 
-            var titlebar = $(this.domNode).closest('.ui-dialog').children('.ui-dialog-titlebar');
-            var closeButton = titlebar.find('.ui-dialog-titlebar-close').first();
-            var button = $('<button class="ui-button ui-corner-all ui-button-icon-only ui-dialog-titlebar-'
-                + name + '" tabindex="-1"><i class="' + icon + '"></i></button>')
-                .attr('title', hint)
-                .toggle(show)
-                .click(function (e: any) {
-                    e.preventDefault();
-                    return _this[name]();
-                });
+    /** Returns the current state, e.g. "normal" or "maximized" */
+    state(): string {
+        return this.currentState;
+    }
 
-            if (closeButton)
-                button.insertBefore(closeButton);
-            else
-                button.appendTo(titlebar);
-
-            return button;
-        },
-        maximize: function () {
-            var newHeight, newWidth;
-
-            newHeight = $(window).height() - 1;
-            newWidth = $(window).width() - 1;
-            this._trigger("beforeMaximize");
-            if (this._state !== "normal") {
-                this._restore();
-            }
-            this._saveSnapshot();
-            var el = $(this.domNode) as any;
-            if (el.dialog("option", "draggable")) {
-                el.dialog("widget").draggable("option", "handle", null).find(".ui-dialog-draggable-handle").css("cursor", "text").end();
-            }
-            el.dialog("widget").css("position", "fixed").find(".ui-dialog-content").show().dialog("widget")
-                .find(".ui-dialog-buttonpane").show().end().find(".ui-dialog-content").dialog("option", {
-                    resizable: false,
-                    draggable: false,
-                    height: newHeight,
-                    width: newWidth,
-                    position: {
-                        of: window,
-                        my: "left top",
-                        at: "left top"
-                    }
-                });
-            this._setState("maximized");
-            this._toggleButtons();
-
-            if (this.original_config_resizable)
-                $(this.domNode).closest('.ui-dialog').triggerHandler("resize");
-
-            return this._trigger("maximize");
-        },
-        _restore_maximized: function () {
-            var el = $(this.domNode) as any;
-            var original = this._snapshot || { config: {}, size: {}, position: {}, titlebar: {} };
-            el.dialog("widget").css("position", original.position.mode).find(".ui-dialog-titlebar").css("white-space", original.titlebar.wrap).end().find(".ui-dialog-content").dialog("option", {
-                resizable: original.config.resizable,
-                draggable: original.config.draggable,
-                height: original.size.height,
-                width: original.size.width,
-                maxHeight: original.size.maxHeight,
+    maximize(): void {
+        let $ = getjQuery();
+        let newHeight = $(window).height() - 1;
+        let newWidth = $(window).width() - 1;
+        this.options.beforeMaximize?.();
+        if (this.currentState !== "normal") {
+            this.restorePreviousState();
+        }
+        this.saveSnapshot();
+        let el = $(this.domNode);
+        if (el.dialog("option", "draggable")) {
+            el.dialog("widget").draggable("option", "handle", null).find(".ui-dialog-draggable-handle").css("cursor", "text").end();
+        }
+        el.dialog("widget").css("position", "fixed").find(".ui-dialog-content").show().dialog("widget")
+            .find(".ui-dialog-buttonpane").show().end().find(".ui-dialog-content").dialog("option", {
+                resizable: false,
+                draggable: false,
+                height: newHeight,
+                width: newWidth,
                 position: {
                     of: window,
                     my: "left top",
-                    at: "left+" + original.position.left + " top+" + original.position.top
+                    at: "left top"
                 }
             });
-            if (el.dialog("option", "draggable")) {
-                return el.dialog("widget").draggable("option", "handle", el.dialog("widget").find(".ui-dialog-draggable-handle").length ?
-                    el.dialog("widget").find(".ui-dialog-draggable-handle") : ".ui-dialog-titlebar").find(".ui-dialog-draggable-handle").css("cursor", "move");
-            }
-        },
-        state: function () {
-            return this._state;
-        },
-        restore: function () {
-            this._trigger("beforeRestore");
-            this._restore();
-            this._setState("normal");
-            this._toggleButtons();
+        this.setState("maximized");
+        this.toggleButtons();
 
-            if (this.original_config_resizable)
-                $(this.domNode).closest('.ui-dialog').triggerHandler("resize");
+        if (this.originalConfigResizable)
+            $(this.domNode).closest('.ui-dialog').triggerHandler("resize");
 
-            return this._trigger("restore");
-        },
-        _restore: function () {
-            if (this._state !== "normal") {
-                return this["_restore_" + this._state]();
-            }
-        },
-        _saveSnapshot: function () {
-            if (this._state === "normal") {
-                var el = $(this.domNode) as any;
-                this._snapshot = {
-                    config: {
-                        resizable: el.dialog("option", "resizable"),
-                        draggable: el.dialog("option", "draggable"),
-                    },
-                    size: {
-                        height: el.dialog("widget").outerHeight(),
-                        width: el.dialog("option", "width"),
-                        maxHeight: el.dialog("option", "maxHeight")
-                    },
-                    position: {
-                        mode: el.dialog("widget").css("position"),
-                        left: el.dialog("widget").offset().left - $('body').scrollLeft(),
-                        top: el.dialog("widget").offset().top - $('body').scrollTop()
-                    },
-                    titlebar: {
-                        wrap: el.dialog("widget").find(".ui-dialog-titlebar").css("white-space")
-                    }
+        this.options.maximize?.();
+    }
+
+    restore(): void {
+        this.options.beforeRestore?.();
+        this.restorePreviousState();
+        this.setState("normal");
+        this.toggleButtons();
+
+        if (this.originalConfigResizable)
+            getjQuery()(this.domNode).closest('.ui-dialog').triggerHandler("resize");
+
+        this.options.restore?.();
+    }
+
+    private setState(state: string): string {
+        getjQuery()(this.domNode).removeClass("ui-dialog-" + this.currentState).addClass("ui-dialog-" + state);
+        return this.currentState = state;
+    }
+
+    private initButtons(): void {
+        this.addButton("maximize", this.options.showButton, DialogTexts.MaximizeHint, faIcon("window-maximize"));
+        this.addButton("restore", false, DialogTexts.RestoreHint, faIcon("window-restore"));
+
+        const titlebar = getjQuery()(this.domNode).closest('.ui-dialog').children('.ui-dialog-titlebar');
+        titlebar.dblclick(() => {
+            if (this.options.dblclick) {
+                if (this.currentState !== "normal") {
+                    return this.restore();
+                } else {
+                    return (this as any)[this.options.dblclick as string]();
                 }
             }
-        },
-        _toggleButtons: function () {
-            var uiDialog = $(this.domNode).closest('.ui-dialog');
-            uiDialog.find(".ui-dialog-titlebar-restore").toggle(this._state !== "normal");
-            uiDialog.find(".ui-dialog-titlebar-maximize").toggle(this._state !== "maximized");
-        }
-    });
-}
+        }).select(() => {
+            return false;
+        });
+    }
 
-!registerDialogExtendPlugin() && Fluent.ready(registerDialogExtendPlugin);
+    private addButton(name: string, show: boolean, hint: string, icon: string): void {
+        const titlebar = getjQuery()(this.domNode).closest('.ui-dialog').children('.ui-dialog-titlebar');
+        const closeButton = titlebar.find('.ui-dialog-titlebar-close').first();
+        const button = getjQuery()('<button class="ui-button ui-corner-all ui-button-icon-only ui-dialog-titlebar-'
+            + name + '" tabindex="-1"><i class="' + icon + '"></i></button>')
+            .attr('title', hint)
+            .toggle(show)
+            .click((e: any) => {
+                e.preventDefault();
+                return (this as any)[name]();
+            });
+
+        if (closeButton)
+            button.insertBefore(closeButton);
+        else
+            button.appendTo(titlebar);
+    }
+
+    private restoreMaximized(): void {
+        const el = getjQuery()(this.domNode);
+        const original = this.snapshot || { config: {}, size: {}, position: {}, titlebar: {} };
+        el.dialog("widget").css("position", original.position.mode).find(".ui-dialog-titlebar").css("white-space", original.titlebar.wrap).end().find(".ui-dialog-content").dialog("option", {
+            resizable: original.config.resizable,
+            draggable: original.config.draggable,
+            height: original.size.height,
+            width: original.size.width,
+            maxHeight: original.size.maxHeight,
+            position: {
+                of: window,
+                my: "left top",
+                at: "left+" + original.position.left + " top+" + original.position.top
+            }
+        });
+        if (el.dialog("option", "draggable")) {
+            el.dialog("widget").draggable("option", "handle", el.dialog("widget").find(".ui-dialog-draggable-handle").length ?
+                el.dialog("widget").find(".ui-dialog-draggable-handle") : ".ui-dialog-titlebar").find(".ui-dialog-draggable-handle").css("cursor", "move");
+        }
+    }
+
+    private restorePreviousState(): void {
+        if (this.currentState === "maximized") {
+            this.restoreMaximized();
+        }
+    }
+
+    private saveSnapshot(): void {
+        if (this.currentState === "normal") {
+            const el = getjQuery()(this.domNode);
+            this.snapshot = {
+                config: {
+                    resizable: el.dialog("option", "resizable"),
+                    draggable: el.dialog("option", "draggable"),
+                },
+                size: {
+                    height: el.dialog("widget").outerHeight(),
+                    width: el.dialog("option", "width"),
+                    maxHeight: el.dialog("option", "maxHeight")
+                },
+                position: {
+                    mode: el.dialog("widget").css("position"),
+                    left: el.dialog("widget").offset().left - getjQuery()('body').scrollLeft(),
+                    top: el.dialog("widget").offset().top - getjQuery()('body').scrollTop()
+                },
+                titlebar: {
+                    wrap: el.dialog("widget").find(".ui-dialog-titlebar").css("white-space")
+                }
+            };
+            this.originalConfigResizable = this.snapshot.config.resizable;
+        }
+    }
+
+    private toggleButtons(): void {
+        const uiDialog = getjQuery()(this.domNode).closest('.ui-dialog');
+        uiDialog.find(".ui-dialog-titlebar-restore").toggle(this.currentState !== "normal" && this.options.showButton);
+        uiDialog.find(".ui-dialog-titlebar-maximize").toggle(this.currentState !== "maximized" && this.options.showButton);
+    }
+}

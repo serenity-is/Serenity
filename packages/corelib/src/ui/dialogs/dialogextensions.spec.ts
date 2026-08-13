@@ -1,5 +1,5 @@
 import { describe, it, expect, vi, beforeEach, afterEach } from "vitest";
-import { DialogExtensions } from "./dialogextensions";
+import { DialogExtensions, UIDialogMaximizer } from "./dialogextensions";
 
 describe("DialogExtensions.dialogResizable", () => {
     let mockDialogInstance: any;
@@ -90,6 +90,49 @@ describe("DialogExtensions.dialogResizable", () => {
     });
 });
 
+function createMockChain(element: HTMLElement): any {
+    const chain: any = {
+        [0]: element,
+        length: 1,
+        closest: vi.fn(() => chain),
+        children: vi.fn(() => chain),
+        find: vi.fn(() => chain),
+        first: vi.fn(() => chain),
+        removeClass: vi.fn(() => chain),
+        addClass: vi.fn(() => chain),
+        dblclick: vi.fn(() => chain),
+        select: vi.fn(() => chain),
+        attr: vi.fn(() => chain),
+        toggle: vi.fn(() => chain),
+        click: vi.fn(() => chain),
+        insertBefore: vi.fn(() => chain),
+        appendTo: vi.fn(() => chain),
+        dialog: vi.fn((method?: string, option?: any) => {
+            if (method === "option" && option === "width")
+                return 800;
+            if (method === "option" && option === "maxHeight")
+                return 700;
+            if (method === "option" && option === "resizable")
+                return true;
+            if (method === "option" && option === "draggable")
+                return true;
+            return chain;
+        }),
+        draggable: vi.fn(() => chain),
+        end: vi.fn(() => chain),
+        show: vi.fn(() => chain),
+        css: vi.fn(() => chain),
+        outerHeight: vi.fn(() => 500),
+        offset: vi.fn(() => ({ left: 100, top: 200 })),
+        scrollLeft: vi.fn(() => 0),
+        scrollTop: vi.fn(() => 0),
+        height: vi.fn(() => 600),
+        width: vi.fn(() => 800),
+        triggerHandler: vi.fn(() => chain),
+    };
+    return chain;
+}
+
 describe("DialogExtensions.dialogMaximizable", () => {
     let mockElement: HTMLElement;
 
@@ -103,68 +146,138 @@ describe("DialogExtensions.dialogMaximizable", () => {
 
     it("returns early if no jQuery is available", () => {
         delete (window as any).jQuery;
-        DialogExtensions.dialogMaximizable(mockElement);
-        expect(true).toBe(true);
+        expect(() => DialogExtensions.dialogMaximizable(mockElement)).not.toThrow();
     });
 
-    it("calls dialogExtend on the element", () => {
-        const dialogExtendFn = vi.fn();
-        const mock$ = vi.fn(() => ({
-            dialogExtend: dialogExtendFn
-        })) as any;
+    it("adds maximize and restore buttons to the dialog titlebar", () => {
+        const chain = createMockChain(mockElement);
+        const mock$ = vi.fn(() => chain) as any;
         mock$.fn = {};
         (window as any).jQuery = mock$;
 
         DialogExtensions.dialogMaximizable(mockElement);
-        expect(dialogExtendFn).toHaveBeenCalledWith({
-            closable: true,
-            maximizable: true,
-            dblclick: 'maximize',
-            icons: { maximize: 'ui-icon-maximize-window' }
-        });
+
+        // one dblclick handler on the titlebar, plus a click handler per button
+        expect(chain.dblclick).toHaveBeenCalledTimes(1);
+        expect(chain.click).toHaveBeenCalledTimes(2);
     });
 
     it("accepts ArrayLike<HTMLElement> as argument", () => {
-        const dialogExtendFn = vi.fn();
-        const mock$ = vi.fn(() => ({
-            dialogExtend: dialogExtendFn
-        })) as any;
+        const chain = createMockChain(mockElement);
+        const mock$ = vi.fn(() => chain) as any;
         mock$.fn = {};
         (window as any).jQuery = mock$;
 
         const arrLike = { 0: mockElement, length: 1 } as any;
-        DialogExtensions.dialogMaximizable(arrLike);
-        expect(dialogExtendFn).toHaveBeenCalled();
+        expect(() => DialogExtensions.dialogMaximizable(arrLike)).not.toThrow();
+    });
+
+    it("maximizes via the maximize button and restores via the restore button", () => {
+        const chain = createMockChain(mockElement);
+        const mock$ = vi.fn(() => chain) as any;
+        mock$.fn = {};
+        (window as any).jQuery = mock$;
+
+        DialogExtensions.dialogMaximizable(mockElement);
+
+        // First added button is "maximize", second is "restore"
+        const maximizeClick = chain.click.mock.calls[0][0];
+        const restoreClick = chain.click.mock.calls[1][0];
+
+        maximizeClick({ preventDefault: vi.fn() });
+        expect(chain.dialog).toHaveBeenCalledWith("option", expect.objectContaining({
+            resizable: false,
+            draggable: false,
+            height: 599,
+            width: 799
+        }));
+
+        restoreClick({ preventDefault: vi.fn() });
+        expect(chain.dialog).toHaveBeenCalledWith("option", expect.objectContaining({
+            resizable: true,
+            draggable: true,
+            height: 500,
+            width: 800
+        }));
+    });
+
+    it("maximizes on titlebar double click", () => {
+        const chain = createMockChain(mockElement);
+        const mock$ = vi.fn(() => chain) as any;
+        mock$.fn = {};
+        (window as any).jQuery = mock$;
+
+        DialogExtensions.dialogMaximizable(mockElement);
+
+        const dblClickHandler = chain.dblclick.mock.calls[0][0];
+        dblClickHandler();
+        expect(chain.dialog).toHaveBeenCalledWith("option", expect.objectContaining({
+            resizable: false,
+            draggable: false
+        }));
     });
 });
 
-describe("registerDialogExtendPlugin (internal)", () => {
-    // The registerDialogExtendPlugin is called as a module-level side effect.
-    // It registers a jQuery UI widget called "ui.dialogExtend".
-    // Since the module is already loaded, we test the DialogExtensions functions 
-    // that use dialogExtend, and verify the module loaded without error.
-    
-    it("module exports are available", () => {
-        expect(typeof DialogExtensions.dialogResizable).toBe("function");
-        expect(typeof DialogExtensions.dialogMaximizable).toBe("function");
+describe("UIDialogMaximizer", () => {
+    let mockElement: HTMLElement;
+    let chain: any;
+
+    beforeEach(() => {
+        mockElement = document.createElement("div");
+        chain = createMockChain(mockElement);
+        const mock$ = vi.fn(() => chain) as any;
+        mock$.fn = {};
+        (window as any).jQuery = mock$;
     });
 
-    it("dialogMaximizable calls dialogExtend when jQuery has the plugin", () => {
-        const dialogExtendFn = vi.fn();
-        const mock$ = vi.fn(() => ({
-            dialogExtend: dialogExtendFn
-        })) as any;
-        mock$.fn = { dialogExtend: true };
-        (window as any).jQuery = mock$;
+    afterEach(() => {
+        delete (window as any).jQuery;
+    });
 
-        const el = document.createElement("div");
-        DialogExtensions.dialogMaximizable(el);
-        expect(dialogExtendFn).toHaveBeenCalledWith({
-            closable: true,
-            maximizable: true,
-            dblclick: 'maximize',
-            icons: { maximize: 'ui-icon-maximize-window' }
+    it("starts in normal state and fires load", () => {
+        const load = vi.fn();
+        new UIDialogMaximizer({ element: mockElement, load });
+        expect(load).toHaveBeenCalledTimes(1);
+    });
+
+    it("throws when jQuery is not available", () => {
+        delete (window as any).jQuery;
+        expect(() => new UIDialogMaximizer({ element: mockElement })).toThrow();
+    });
+
+    it("maximizes and restores, tracking state", () => {
+        const dlg = new UIDialogMaximizer({ element: mockElement, showButton: true, dblclick: "maximize" });
+        expect(dlg.state()).toBe("normal");
+
+        dlg.maximize();
+        expect(dlg.state()).toBe("maximized");
+        expect(chain.dialog).toHaveBeenCalledWith("option", expect.objectContaining({
+            resizable: false,
+            draggable: false
+        }));
+
+        dlg.restore();
+        expect(dlg.state()).toBe("normal");
+    });
+
+    it("fires option callbacks on maximize and restore", () => {
+        const beforeMaximize = vi.fn();
+        const maximize = vi.fn();
+        const beforeRestore = vi.fn();
+        const restore = vi.fn();
+
+        const dlg = new UIDialogMaximizer({
+            element: mockElement,
+            beforeMaximize, maximize, beforeRestore, restore
         });
+
+        dlg.maximize();
+        expect(beforeMaximize).toHaveBeenCalledTimes(1);
+        expect(maximize).toHaveBeenCalledTimes(1);
+
+        dlg.restore();
+        expect(beforeRestore).toHaveBeenCalledTimes(1);
+        expect(restore).toHaveBeenCalledTimes(1);
     });
 });
 
