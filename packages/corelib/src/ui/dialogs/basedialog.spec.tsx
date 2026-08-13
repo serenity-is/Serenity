@@ -1,7 +1,23 @@
 import { describe, it, expect, vi, beforeEach, afterEach } from "vitest";
-import { Fluent, Dialog } from "../../base";
+import { addCustomAttribute, Fluent, Dialog } from "../../base";
+import { MaximizableAttribute } from "../../types/attributes";
 import { BaseDialog } from "./basedialog";
+import { DialogExtensions } from "./dialogextensions";
 import { TabsExtensions } from "../helpers/tabsextensions";
+
+// Returns the event handler registered through the jQuery mock for the given event prefix.
+function getCapturedHandler(jq: any, prefix: string): Function {
+    for (const r of jq.mock.results) {
+        const obj = r.value;
+        if (obj && obj.on && obj.on.mock) {
+            for (const call of obj.on.mock.calls) {
+                if (typeof call[0] === "string" && call[0].startsWith(prefix))
+                    return call[1];
+            }
+        }
+    }
+    return null;
+}
 
 // Helper to access protected members
 function getDialogOptions(dialog: BaseDialog<any>): any {
@@ -578,6 +594,78 @@ describe("BaseDialog additional branches", () => {
         dialog["arrange"] = arrangeSpy;
         (dialog as any).onDialogOpen();
         expect(arrangeSpy).toHaveBeenCalled();
+        dialog.destroy();
+    });
+
+    it("dialog options onClose callback invokes onDialogClose", () => {
+        const dialog = new BaseDialog({});
+        const options = (dialog as any).getDialogOptions();
+        const spy = vi.spyOn(dialog as any, "onDialogClose");
+        options.onClose("result");
+        expect(spy).toHaveBeenCalledWith("result");
+        dialog.destroy();
+    });
+
+    it("dialog options onOpen callback invokes onDialogOpen", () => {
+        const dialog = new BaseDialog({});
+        const options = (dialog as any).getDialogOptions();
+        const spy = vi.spyOn(dialog as any, "onDialogOpen");
+        options.onOpen();
+        expect(spy).toHaveBeenCalled();
+        dialog.destroy();
+    });
+
+    it("arrange triggers layout on visible require-layout elements", () => {
+        const el = document.createElement("div");
+        document.body.appendChild(el);
+        const inner = document.createElement("div");
+        inner.className = "require-layout";
+        el.appendChild(inner);
+        const dialog = new BaseDialog({ element: el });
+        const isVisibleSpy = vi.spyOn(Fluent, "isVisibleLike").mockReturnValue(true);
+        const triggerSpy = vi.spyOn(Fluent, "trigger");
+        (dialog as any).arrange();
+        expect(triggerSpy).toHaveBeenCalledWith(inner, "layout");
+        expect(isVisibleSpy).toHaveBeenCalled();
+        dialog.destroy();
+    });
+
+    it("initUIDialog wires resize and dialogopen handlers", () => {
+        const dialog = new BaseDialog({});
+        const dlgResizableSpy = vi.spyOn(DialogExtensions, "dialogResizable").mockImplementation(() => { });
+        const handleResponsiveSpy = vi.spyOn(dialog as any, "handleResponsive").mockImplementation(() => { });
+        (dialog as any).initUIDialog();
+        const resizeHandler = getCapturedHandler((window as any).jQuery, "resize.");
+        expect(resizeHandler).toBeTypeOf("function");
+        resizeHandler();
+        expect(handleResponsiveSpy).toHaveBeenCalled();
+        expect(dlgResizableSpy).toHaveBeenCalled();
+        dialog.destroy();
+    });
+
+    it("initUIDialog applies dialogMaximizable when Maximizable attribute is set", () => {
+        class MaximizableDialog extends BaseDialog<any> { }
+        addCustomAttribute(MaximizableDialog, new MaximizableAttribute(true));
+        const dialog = new MaximizableDialog({});
+        const dlgResizableSpy = vi.spyOn(DialogExtensions, "dialogResizable").mockImplementation(() => { });
+        const dlgMaximizableSpy = vi.spyOn(DialogExtensions, "dialogMaximizable").mockImplementation(() => { });
+        (dialog as any).initUIDialog();
+        expect(dlgMaximizableSpy).toHaveBeenCalled();
+        dialog.destroy();
+    });
+
+    it("dialogOpen creates a new dialog instance when none exists", () => {
+        const dialog = new BaseDialog({});
+        expect(dialog["dialog"]).toBeFalsy();
+        (dialog as any).dialogOpen(true);
+        expect(dialog["dialog"]).toBeTruthy();
+        dialog.destroy();
+    });
+
+    it("handleResponsive delegates to handleUIDialogResponsive", () => {
+        delete (window as any).jQuery;
+        const dialog = new BaseDialog({});
+        expect(() => (dialog as any).handleResponsive()).not.toThrow();
         dialog.destroy();
     });
 });

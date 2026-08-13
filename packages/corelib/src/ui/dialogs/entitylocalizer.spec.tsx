@@ -1,5 +1,5 @@
 import { describe, it, expect, vi, beforeEach, afterEach } from "vitest";
-import { Fluent, PropertyItem } from "../../base";
+import { Fluent, PropertyItem, TranslationConfig } from "../../base";
 import { EntityLocalizer, EntityLocalizerOptions } from "./entitylocalizer";
 // Import StringEditor to register it in the editor registry, needed by PropertyGrid
 import "../editors/stringeditor";
@@ -459,5 +459,182 @@ describe("EntityLocalizer", () => {
             localizer.buttonClick();
             expect((localizer as any).isLocalizationMode()).toBe(false);
         });
+    });
+});
+
+describe("EntityLocalizer target language", () => {
+    afterEach(() => {
+        localStorage.removeItem("EntityLocalizer.TargetLanguage");
+    });
+
+    it("sets targetLanguage value from localStorage when valid", () => {
+        localStorage.setItem("EntityLocalizer.TargetLanguage", "en");
+        const pgDiv = document.createElement("div");
+        const items: PropertyItem[] = [{ name: "Name", title: "Name", localizable: true }];
+        const opt = createMockOptions({
+            getPropertyGrid: () => Fluent(pgDiv),
+            getLanguages: () => [{ id: "en", text: "English" }, { id: "tr", text: "Turkish" }],
+            pgOptions: { idPrefix: "Test_", items, mode: 0 as any, localTextPrefix: "Forms.Test." }
+        });
+        const localizer = new EntityLocalizer(opt);
+        expect(localizer["targetLanguage"].value).toBe("en");
+        localizer.destroy();
+    });
+
+    it("change event on targetLanguage updates and stores selection", () => {
+        const pgDiv = document.createElement("div");
+        const items: PropertyItem[] = [{ name: "Name", title: "Name", localizable: true }];
+        const opt = createMockOptions({
+            getPropertyGrid: () => Fluent(pgDiv),
+            getLanguages: () => [{ id: "en", text: "English" }],
+            pgOptions: { idPrefix: "Test_", items, mode: 0 as any, localTextPrefix: "Forms.Test." }
+        });
+        const localizer = new EntityLocalizer(opt);
+        localizer["targetLanguage"].value = "en";
+        localizer["targetLanguage"].dispatchEvent(new Event("change"));
+        expect(localStorage.getItem("EntityLocalizer.TargetLanguage")).toBe("en");
+        localizer.destroy();
+    });
+});
+
+describe("EntityLocalizer.buttonClick", () => {
+    it("stores grid value when localization changed", () => {
+        const pgDiv = document.createElement("div");
+        const button = document.createElement("button");
+        button.classList.add("pressed");
+        const items: PropertyItem[] = [{ name: "Name", title: "Name", localizable: true }];
+        const opt = createMockOptions({
+            getPropertyGrid: () => Fluent(pgDiv),
+            getButton: () => Fluent(button),
+            getLanguages: () => [{ id: "en", text: "English" }],
+            pgOptions: { idPrefix: "Test_", items, mode: 0 as any, localTextPrefix: "Forms.Test." }
+        });
+        const localizer = new EntityLocalizer(opt);
+        localizer["lastValue"] = {};
+        localizer["grid"] = {
+            save: vi.fn((v: any) => { v["en$Name"] = "Changed"; }),
+            load: vi.fn(),
+            enumerateItems: vi.fn(),
+            destroy: vi.fn()
+        } as any;
+        const updateInterfaceSpy = vi.fn();
+        localizer["updateInterface"] = updateInterfaceSpy;
+        const loadLocSpy = vi.fn();
+        localizer["loadLocalization"] = loadLocSpy;
+        localizer.buttonClick();
+        expect(localizer["lastValue"]).toEqual({ "en$Name": "Changed" });
+        expect(localizer["pendingValue"]).toEqual({ "en$Name": "Changed" });
+        localizer.destroy();
+    });
+});
+
+describe("EntityLocalizer.setLocalizationGridCurrentValues", () => {
+    it("sets hint attributes", () => {
+        const pgDiv = document.createElement("div");
+        const items: PropertyItem[] = [{ name: "Name", title: "Name", localizable: true }];
+        const baseInput = document.createElement("input");
+        baseInput.value = "Hint";
+        const opt = createMockOptions({
+            getPropertyGrid: () => Fluent(pgDiv),
+            getLanguages: () => [{ id: "en", text: "English" }],
+            byId: () => Fluent(baseInput),
+            pgOptions: { idPrefix: "Test_", items, mode: 0 as any, localTextPrefix: "Forms.Test." }
+        });
+        const localizer = new EntityLocalizer(opt);
+        const attrSpy = vi.fn(() => transElement);
+        const transElement = { attr: attrSpy };
+        const baseWidget = { domNode: document.createElement("input"), element: { val: vi.fn(() => "Hint") } };
+        const transWidget = { domNode: document.createElement("input"), element: transElement };
+        let pass = 0;
+        localizer["grid"] = {
+            enumerateItems: vi.fn((cb: any) => {
+                if (pass === 0)
+                    cb({ name: "Name" }, baseWidget);
+                else
+                    cb({ name: "en$Name" }, transWidget);
+                pass++;
+            }),
+            save: vi.fn(),
+            destroy: vi.fn()
+        } as any;
+        const isInputSpy = vi.spyOn(Fluent, "isInputLike").mockReturnValue(true);
+        (localizer as any).setLocalizationGridCurrentValues();
+        expect(attrSpy).toHaveBeenCalled();
+        isInputSpy.mockRestore();
+        localizer.destroy();
+    });
+});
+
+describe("EntityLocalizer.updateInterface", () => {
+    it("hides tool buttons in localization mode", () => {
+        const pgDiv = document.createElement("div");
+        const button = document.createElement("button");
+        button.classList.add("pressed");
+        const otherBtn = document.createElement("button");
+        const items: PropertyItem[] = [{ name: "Name", title: "Name", localizable: true }];
+        const opt = createMockOptions({
+            getPropertyGrid: () => Fluent(pgDiv),
+            getButton: () => Fluent(button),
+            getToolButtons: () => [button, otherBtn],
+            getLanguages: () => [{ id: "en", text: "English" }],
+            pgOptions: { idPrefix: "Test_", items, mode: 0 as any, localTextPrefix: "Forms.Test." }
+        });
+        const localizer = new EntityLocalizer(opt);
+        localizer.updateInterface();
+        expect(otherBtn.hidden).toBe(true);
+        expect(otherBtn.classList.contains("localization-hidden")).toBe(true);
+        localizer.destroy();
+    });
+
+    it("updateInterface restores tool buttons outside localization mode", () => {
+        const pgDiv = document.createElement("div");
+        const button = document.createElement("button");
+        const otherBtn = document.createElement("button");
+        otherBtn.classList.add("localization-hidden");
+        otherBtn.hidden = true;
+        const items: PropertyItem[] = [{ name: "Name", title: "Name", localizable: true }];
+        const opt = createMockOptions({
+            getPropertyGrid: () => Fluent(pgDiv),
+            getButton: () => Fluent(button),
+            getToolButtons: () => [button, otherBtn],
+            getLanguages: () => [{ id: "en", text: "English" }],
+            pgOptions: { idPrefix: "Test_", items, mode: 0 as any, localTextPrefix: "Forms.Test." }
+        });
+        const localizer = new EntityLocalizer(opt);
+        localizer.updateInterface();
+        expect(otherBtn.hidden).toBe(false);
+        expect(otherBtn.classList.contains("localization-hidden")).toBe(false);
+        localizer.destroy();
+    });
+});
+
+describe("EntityLocalizer translateTexts", () => {
+    it("wraps translation editors and translates", async () => {
+        const pgDiv = document.createElement("div");
+        const button = document.createElement("button");
+        const items: PropertyItem[] = [{ name: "Name", title: "Name", localizable: true }];
+        const translateTexts = vi.fn(() => Promise.resolve({ Translations: [{ TranslatedText: "Translated" }] }));
+        const orig = (TranslationConfig as any).translateTexts;
+        (TranslationConfig as any).translateTexts = translateTexts;
+        let localizer: EntityLocalizer;
+        try {
+            const opt = createMockOptions({
+                getPropertyGrid: () => Fluent(pgDiv),
+                getButton: () => Fluent(button),
+                getLanguages: () => [{ id: "en", text: "English" }],
+                pgOptions: { idPrefix: "Test_", items, mode: 0 as any, localTextPrefix: "Forms.Test." }
+            });
+            localizer = new EntityLocalizer(opt);
+            expect(localizer.isEnabled()).toBe(true);
+            const translateButtons = localizer["grid"].element.findAll("button");
+            expect(translateButtons.length).toBeGreaterThan(0);
+            translateButtons[0].dispatchEvent(new Event("click"));
+            await Promise.resolve();
+            expect(translateTexts).toHaveBeenCalled();
+        }
+        finally {
+            (TranslationConfig as any).translateTexts = orig;
+            localizer?.destroy();
+        }
     });
 });

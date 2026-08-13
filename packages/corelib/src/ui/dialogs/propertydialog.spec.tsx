@@ -1,5 +1,7 @@
 import { describe, it, expect, vi, beforeEach, afterEach } from "vitest";
-import { PropertyItemsData, PropertyItem } from "../../base";
+import { addCustomAttribute, PropertyItemsData, PropertyItem } from "../../base";
+import { ScriptData } from "../../compat";
+import { StaticPanelAttribute } from "../../types/attributes";
 import { PropertyDialog } from "./propertydialog";
 import "../editors/stringeditor";
 
@@ -522,6 +524,81 @@ describe("PropertyDialog additional branches", () => {
         }
         const dialog = new TestDialog({});
         expect(dialog).toBeDefined();
+        dialog.destroy();
+    });
+
+    it("getDialogButtons returns empty for StaticPanel", () => {
+        class StaticDialog extends PropertyDialog<any, any> {
+            getPropertyItemsData() { return mockPropertyItemsData(); }
+        }
+        addCustomAttribute(StaticDialog, new StaticPanelAttribute(true));
+        const dialog = new StaticDialog({});
+        expect(getDialogButtons(dialog)).toEqual([]);
+        dialog.destroy();
+    });
+
+    it("initPropertyGrid does nothing when no PropertyGrid element", () => {
+        class TestDialog extends PropertyDialog<any, any> {
+            getPropertyItemsData() { return mockPropertyItemsData(); }
+        }
+        const dialog = new TestDialog({});
+        const pg = dialog.domNode.querySelector("#" + dialog.idPrefix + "PropertyGrid");
+        pg?.remove();
+        initPropertyGrid(dialog);
+        dialog.destroy();
+    });
+
+    it("getPropertyItemsData uses custom items when ScriptData cannot load", () => {
+        const canLoadSpy = vi.spyOn(ScriptData, "canLoad").mockReturnValue(false);
+        class CustomDialog extends PropertyDialog<any, any> {
+            getPropertyItems() { return [{ name: "X" }] as any; }
+            initPropertyGrid() { }
+            loadInitialEntity() { }
+        }
+        const dialog = new CustomDialog({});
+        expect(dialog["propertyItemsData"]).toBeDefined();
+        dialog.destroy();
+        canLoadSpy.mockRestore();
+    });
+
+    it("entity setter stores value", () => {
+        class TestDialog extends PropertyDialog<any, any> {
+            getPropertyItemsData() { return mockPropertyItemsData(); }
+        }
+        const dialog = new TestDialog({});
+        (dialog as any).entity = { ID: 1 };
+        expect(dialog.entity).toEqual({ ID: 1 });
+        dialog.destroy();
+    });
+
+    it("entityId setter stores value", () => {
+        class TestDialog extends PropertyDialog<any, any> {
+            getPropertyItemsData() { return mockPropertyItemsData(); }
+        }
+        const dialog = new TestDialog({});
+        (dialog as any).entityId = 42;
+        expect(dialog.entityId).toBe(42);
+        dialog.destroy();
+    });
+
+    it("renderContents returns undefined when legacyTemplateRender", () => {
+        class LegacyDialog extends PropertyDialog<any, any> {
+            getPropertyItemsData() { return mockPropertyItemsData(); }
+            legacyTemplateRender() { return true; }
+        }
+        const dialog = new LegacyDialog({});
+        expect((dialog as any).renderContents()).toBeUndefined();
+        dialog.destroy();
+    });
+
+    it("getPropertyItemsDataAsync returns empty when formKey empty", async () => {
+        class TestDialog extends PropertyDialog<any, any> {
+            getPropertyItemsData() { return mockPropertyItemsData(); }
+            getFormKey() { return ""; }
+        }
+        const dialog = new TestDialog({});
+        const result = await (dialog as any).getPropertyItemsDataAsync();
+        expect(result).toEqual({ items: [], additionalItems: [] });
         dialog.destroy();
     });
 });

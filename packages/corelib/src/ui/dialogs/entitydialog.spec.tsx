@@ -1,4 +1,7 @@
 import { Authorization, Fluent, PropertyItemsData, Validator } from "../../base";
+import { ScriptData } from "../../compat";
+import { SubDialogHelper } from "../helpers/subdialoghelper";
+import { Widget } from "../widgets/widget";
 import { EntityDialog } from "./entitydialog";
 
 function getIdProperty(dialog: EntityDialog<any, any>): string {
@@ -1988,6 +1991,323 @@ describe('EntityDialog.getLocalTextPrefix', () => {
 
         var dialog = new TestRowDialog({});
         expect(getLocalTextPrefix(dialog)).toBeUndefined();
+    });
+});
+
+describe("EntityDialog caching", () => {
+    it("getEntitySingular caches result", () => {
+        class TestDialog extends EntityDialog<any, any> {
+            getPropertyItemsData() { return mockPropertyItemsData(); }
+            static [Symbol.typeInfo] = this.registerClass("MyProject.Test.TestDialog");
+        }
+        const dialog = new TestDialog({});
+        const first = getEntitySingular(dialog);
+        const second = getEntitySingular(dialog);
+        expect(first).toBe(second);
+        dialog.destroy();
+    });
+
+    it("getLocalTextDbPrefix caches result", () => {
+        class TestDialog extends EntityDialog<any, any> {
+            getPropertyItemsData() { return mockPropertyItemsData(); }
+        }
+        const dialog = new TestDialog({});
+        const first = getLocalTextDbPrefix(dialog);
+        expect(getLocalTextDbPrefix(dialog)).toBe(first);
+        dialog.destroy();
+    });
+});
+
+describe("EntityDialog.load error handling", () => {
+    it("load invokes done when loadById fires its callback", async () => {
+        class DefaultDialog extends EntityDialog<any, any> {
+            getPropertyItemsData() { return mockPropertyItemsData(); }
+        }
+        const dialog = new DefaultDialog({});
+        const done = vi.fn();
+        dialog["loadById"] = vi.fn((id: any, cb: any) => { cb(); return Promise.resolve({}); });
+        const result = dialog.load("abc", done);
+        expect(done).toHaveBeenCalled();
+        await result;
+        dialog.destroy();
+    });
+
+    it("load calls fail when action throws", async () => {
+        class DefaultDialog extends EntityDialog<any, any> {
+            getPropertyItemsData() { return mockPropertyItemsData(); }
+        }
+        const dialog = new DefaultDialog({});
+        const fail = vi.fn();
+        dialog["loadById"] = vi.fn(() => { throw new Error("boom"); });
+        const result = dialog.load("abc", vi.fn(), fail);
+        expect(fail).toHaveBeenCalled();
+        await expect(result).rejects.toThrow("boom");
+        dialog.destroy();
+    });
+
+    it("loadByIdAndOpenDialog invokes fail callback", async () => {
+        class DefaultDialog extends EntityDialog<any, any> {
+            getPropertyItemsData() { return mockPropertyItemsData(); }
+        }
+        const dialog = new DefaultDialog({});
+        const fail = vi.fn();
+        dialog["loadById"] = vi.fn((id: any, onSuccess: any, onFail: any) => { onFail(); return Promise.resolve({}); });
+        await (dialog as any).loadByIdAndOpenDialog(42, false, undefined, fail);
+        expect(fail).toHaveBeenCalled();
+        dialog.destroy();
+    });
+});
+
+describe("EntityDialog service options", () => {
+    it("getLoadByIdOptions onSuccess and onCleanup are invocable", () => {
+        class DefaultDialog extends EntityDialog<any, any> {
+            getPropertyItemsData() { return mockPropertyItemsData(); }
+        }
+        const dialog = new DefaultDialog({});
+        const callback = vi.fn();
+        const opts = getLoadByIdOptions(dialog, 42, callback);
+        const loadRespSpy = vi.spyOn(dialog as any, "loadResponse").mockImplementation(() => { });
+        opts.onSuccess({ Entity: {} });
+        expect(loadRespSpy).toHaveBeenCalled();
+        expect(callback).toHaveBeenCalled();
+        dialog["validator"] = { settings: {} } as any;
+        expect(() => opts.onCleanup()).not.toThrow();
+        dialog.destroy();
+    });
+
+    it("getSaveOptions onSuccess triggers callback and ondatachange", () => {
+        class DefaultDialog extends EntityDialog<any, any> {
+            getPropertyItemsData() { return mockPropertyItemsData(); }
+        }
+        const dialog = new DefaultDialog({});
+        dialog["propertyGrid"] = { save: vi.fn(), destroy: vi.fn() } as any;
+        const callback = vi.fn();
+        const opts = getSaveOptions(dialog, callback, "apply-changes" as any);
+        const saveSuccessSpy = vi.spyOn(dialog as any, "onSaveSuccess").mockImplementation(() => { });
+        const dataChangeSpy = vi.fn();
+        Fluent.on(dialog.domNode, "ondatachange", dataChangeSpy);
+        opts.onSuccess({ EntityId: 5 });
+        expect(saveSuccessSpy).toHaveBeenCalled();
+        expect(callback).toHaveBeenCalledWith({ EntityId: 5 });
+        expect(dataChangeSpy).toHaveBeenCalled();
+        dialog.destroy();
+    });
+
+    it("retrieveLocalizations calls service and returns Localizations", async () => {
+        const scSpy = vi.spyOn(await import("../../base"), "serviceCall").mockResolvedValue({ Localizations: { en: {} } } as any);
+        class DefaultDialog extends EntityDialog<any, any> {
+            getPropertyItemsData() { return mockPropertyItemsData(); }
+        }
+        const dialog = new DefaultDialog({});
+        (dialog as any).entityId = 1;
+        const result = await (dialog as any).retrieveLocalizations();
+        expect(result).toEqual({ en: {} });
+        scSpy.mockRestore();
+        dialog.destroy();
+    });
+});
+
+describe("EntityDialog.getLocalizerOptions", () => {
+    it("returns option arrows that are invocable", () => {
+        class DefaultDialog extends EntityDialog<any, any> {
+            getPropertyItemsData() { return mockPropertyItemsData(); }
+        }
+        const dialog = new DefaultDialog({});
+        dialog["toolbar"] = { element: { findAll: vi.fn(() => []) } } as any;
+        const opts = getLocalizerOptions(dialog);
+        expect(() => opts.byId("whatever")).not.toThrow();
+        expect(opts.getButton()).toBe(dialog["localizerButton"]);
+        expect(() => opts.getEntity()).not.toThrow();
+        expect(opts.getLanguages()).toEqual([]);
+        expect(() => opts.getPropertyGrid()).not.toThrow();
+        expect(() => opts.getToolButtons()).not.toThrow();
+        expect(opts.isNew()).toBe(true);
+        expect(typeof opts.retrieveLocalizations).toBe("function");
+        expect(opts.validateForm()).toBe(true);
+        dialog.destroy();
+    });
+});
+
+describe("EntityDialog.initPropertyGrid", () => {
+    it("does nothing when no PropertyGrid element", () => {
+        class DefaultDialog extends EntityDialog<any, any> {
+            getPropertyItemsData() { return mockPropertyItemsData(); }
+        }
+        const dialog = new DefaultDialog({});
+        const pg = dialog.domNode.querySelector("#" + dialog.idPrefix + "PropertyGrid");
+        pg?.remove();
+        initPropertyGrid(dialog);
+        dialog.destroy();
+    });
+});
+
+describe("EntityDialog.getPropertyItemsData", () => {
+    it("uses custom getPropertyItems when ScriptData cannot load", () => {
+        const canLoadSpy = vi.spyOn(ScriptData, "canLoad").mockReturnValue(false);
+        class CustomDialog extends EntityDialog<any, any> {
+            getPropertyItems() { return [{ name: "X" }] as any; }
+            initPropertyGrid() { }
+            initLocalizer() { }
+        }
+        const dialog = new CustomDialog({});
+        expect((dialog as any).propertyItemsData).toBeDefined();
+        dialog.destroy();
+        canLoadSpy.mockRestore();
+    });
+
+    it("returns empty when formKey is empty", () => {
+        class EmptyFormDialog extends EntityDialog<any, any> {
+            getFormKey() { return ""; }
+        }
+        const dialog = new EmptyFormDialog({});
+        expect((dialog as any).propertyItemsData).toEqual({ items: [], additionalItems: [] });
+        dialog.destroy();
+    });
+});
+
+describe("EntityDialog.updateInterface", () => {
+    it("sets form readonly when readOnly is true", () => {
+        class DefaultDialog extends EntityDialog<any, any> {
+            getPropertyItemsData() { return mockPropertyItemsData(); }
+        }
+        const dialog = new DefaultDialog({});
+        dialog["toolbar"] = { updateInterface: vi.fn() } as any;
+        const form = document.createElement("div");
+        form.id = dialog.idPrefix + "Form";
+        dialog.domNode.appendChild(form);
+        dialog["_readonly"] = true;
+        expect(() => updateInterface(dialog)).not.toThrow();
+        dialog.destroy();
+    });
+});
+
+describe("EntityDialog.renderContents", () => {
+    it("returns undefined when legacyTemplateRender", () => {
+        class LegacyDialog extends EntityDialog<any, any> {
+            getPropertyItemsData() { return mockPropertyItemsData(); }
+            legacyTemplateRender() { return true; }
+        }
+        const dialog = new LegacyDialog({});
+        expect((dialog as any).renderContents()).toBeUndefined();
+        dialog.destroy();
+    });
+});
+
+describe("EntityDialog toolbar button onClick handlers", () => {
+    it("saveAndClose button onClick commits and saves", async () => {
+        class DefaultDialog extends EntityDialog<any, any> {
+            getPropertyItemsData() { return mockPropertyItemsData(); }
+        }
+        const dialog = new DefaultDialog({});
+        const buttons = getToolbarButtons(dialog);
+        const commitSpy = vi.spyOn(dialog as any, "commitEdits").mockResolvedValue(true);
+        const saveSpy = vi.spyOn(dialog as any, "save").mockResolvedValue({});
+        await buttons[0].onClick();
+        expect(commitSpy).toHaveBeenCalled();
+        expect(saveSpy).toHaveBeenCalled();
+        dialog.destroy();
+    });
+
+    it("applyChanges button onClick commits and reloads", async () => {
+        class DefaultDialog extends EntityDialog<any, any> {
+            getPropertyItemsData() { return mockPropertyItemsData(); }
+        }
+        const dialog = new DefaultDialog({});
+        const buttons = getToolbarButtons(dialog);
+        const commitSpy = vi.spyOn(dialog as any, "commitEdits").mockResolvedValue(true);
+        const loadByIdSpy = vi.spyOn(dialog as any, "loadById").mockResolvedValue({});
+        const saveSpy = vi.spyOn(dialog as any, "save").mockImplementation((cb: any) => { cb({ EntityId: 7 }); return Promise.resolve({}); });
+        await buttons[1].onClick();
+        expect(commitSpy).toHaveBeenCalled();
+        expect(loadByIdSpy).toHaveBeenCalled();
+        dialog.destroy();
+    });
+
+    it("delete button onClick confirms and deletes", async () => {
+        const confirmSpy = vi.spyOn(await import("../../base"), "confirmDialog").mockImplementation((msg: any, onOk: any) => onOk());
+        class DefaultDialog extends EntityDialog<any, any> {
+            getPropertyItemsData() { return mockPropertyItemsData(); }
+        }
+        const dialog = new DefaultDialog({});
+        (dialog as any).entityId = 1;
+        const buttons = getToolbarButtons(dialog);
+        const doDeleteSpy = vi.spyOn(dialog as any, "doDelete").mockResolvedValue({});
+        buttons[2].onClick();
+        expect(doDeleteSpy).toHaveBeenCalled();
+        dialog.destroy();
+        confirmSpy.mockRestore();
+    });
+
+    it("undelete button onClick undeletes when deleted", async () => {
+        const confirmSpy = vi.spyOn(await import("../../base"), "confirmDialog").mockImplementation((msg: any, onOk: any) => onOk());
+        class TestRow {
+            static readonly isActiveProperty = "IsActive";
+        }
+        class RowDialog extends EntityDialog<any, any> {
+            getPropertyItemsData() { return mockPropertyItemsData(); }
+            getRowDefinition() { return TestRow; }
+        }
+        const dialog = new RowDialog({});
+        (dialog as any).entityId = 1;
+        (dialog as any).entity = { IsActive: -1 };
+        const buttons = getToolbarButtons(dialog);
+        const undeleteSpy = vi.spyOn(dialog as any, "undeleteHandler").mockResolvedValue({});
+        const loadByIdSpy = vi.spyOn(dialog as any, "loadById").mockResolvedValue({});
+        buttons[3].onClick();
+        expect(undeleteSpy).toHaveBeenCalled();
+        dialog.destroy();
+        confirmSpy.mockRestore();
+    });
+
+    it("edit button onClick enters edit mode", () => {
+        class DefaultDialog extends EntityDialog<any, any> {
+            getPropertyItemsData() { return mockPropertyItemsData(); }
+        }
+        const dialog = new DefaultDialog({});
+        (dialog as any).entityId = 1;
+        const buttons = getToolbarButtons(dialog);
+        const uiSpy = vi.spyOn(dialog as any, "updateInterface").mockImplementation(() => { });
+        const titleSpy = vi.spyOn(dialog as any, "updateTitle").mockImplementation(() => { });
+        buttons[4].onClick();
+        expect(dialog["editClicked"]).toBe(true);
+        expect(uiSpy).toHaveBeenCalled();
+        expect(titleSpy).toHaveBeenCalled();
+        dialog.destroy();
+    });
+
+    it("localization button onClick calls localizer.buttonClick", () => {
+        class DefaultDialog extends EntityDialog<any, any> {
+            getPropertyItemsData() { return mockPropertyItemsData(); }
+        }
+        const dialog = new DefaultDialog({});
+        const buttonClick = vi.fn();
+        dialog["localizer"] = { buttonClick, destroy: vi.fn() } as any;
+        const buttons = getToolbarButtons(dialog);
+        buttons[5].onClick();
+        expect(buttonClick).toHaveBeenCalled();
+        dialog.destroy();
+    });
+
+    it("clone button onClick clones when editing", () => {
+        class DefaultDialog extends EntityDialog<any, any> {
+            getPropertyItemsData() { return mockPropertyItemsData(); }
+        }
+        const dialog = new DefaultDialog({});
+        (dialog as any).entityId = 1;
+        (dialog as any).entity = { ID: 1, Name: "X" };
+        const buttons = getToolbarButtons(dialog);
+        const cloneDialog = { loadEntityAndOpenDialog: vi.fn() };
+        const widgetCreateSpy = vi.spyOn(Widget, "create").mockReturnValue(cloneDialog as any);
+        const cascadeSpy = vi.spyOn(SubDialogHelper, "cascade").mockReturnValue(cloneDialog as any);
+        const bubbleSpy = vi.spyOn(SubDialogHelper, "bubbleDataChange").mockImplementation(() => { });
+        buttons[6].onClick();
+        expect(widgetCreateSpy).toHaveBeenCalled();
+        expect(bubbleSpy).toHaveBeenCalled();
+        expect(cloneDialog.loadEntityAndOpenDialog).toHaveBeenCalled();
+        dialog.destroy();
+        widgetCreateSpy.mockRestore();
+        cascadeSpy.mockRestore();
+        bubbleSpy.mockRestore();
     });
 });
 
