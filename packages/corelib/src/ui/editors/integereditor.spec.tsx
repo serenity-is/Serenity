@@ -1,44 +1,20 @@
-import { Culture } from "../../base";
+import { describe, it, expect, vi, beforeEach } from "vitest";
 import { AutoNumeric } from "./autonumeric";
-import { DecimalEditor, type DecimalEditorOptions } from "./decimaleditor";
+import { IntegerEditor, type IntegerEditorOptions } from "./integereditor";
 
-beforeEach(() => {
-    vi.clearAllMocks();
-});
+describe("IntegerEditor", () => {
+    beforeEach(() => { vi.restoreAllMocks(); });
 
-const newEditor = async (opt: DecimalEditorOptions) => new (await import("./decimaleditor")).DecimalEditor(opt);
-
-describe("DecimalEditor", () => {
-    it("adds default values to autonumeric", async () => {
-        Culture.decimalSeparator = ".";
-
-        vi.spyOn(AutoNumeric, "init").mockImplementation((_, options) => {
-            expect(options.vMin).toBe('0.00');
-            expect(options.vMax).toBe('999999999999.99');
-            expect(options.aPad).toBe(true);
-            expect(options.aDec).toBe('.');
-            expect(options.altDec).toBe(',');
-            expect(options.aSep).toBe(',');
-            return null;
-        });
-
-        await newEditor({});
-    });
-});
-
-describe("DecimalEditor value handling", () => {
-    beforeEach(() => { Culture.decimalSeparator = "."; vi.restoreAllMocks(); });
-
-    function createEditor(options?: DecimalEditorOptions) {
+    function createEditor(options?: IntegerEditorOptions) {
         vi.spyOn(AutoNumeric, "init").mockImplementation(() => null);
-        return new DecimalEditor(options ?? {});
+        return new IntegerEditor(options ?? {});
     }
 
-    it("get_value returns AutoNumeric value when instance exists", () => {
+    it("get_value returns int from AutoNumeric", () => {
         vi.spyOn(AutoNumeric, "hasInstance").mockReturnValue(true);
-        vi.spyOn(AutoNumeric, "getValue").mockReturnValue("1234.5");
+        vi.spyOn(AutoNumeric, "getValue").mockReturnValue("42");
         const editor = createEditor();
-        expect(editor.get_value()).toBe(1234.5);
+        expect(editor.get_value()).toBe(42);
         editor.destroy();
     });
 
@@ -50,15 +26,22 @@ describe("DecimalEditor value handling", () => {
         editor.destroy();
     });
 
-    it("get_value parses domNode value when no AutoNumeric instance", () => {
+    it("get_value parses domNode when no AutoNumeric instance", () => {
         vi.spyOn(AutoNumeric, "hasInstance").mockReturnValue(false);
         const editor = createEditor();
-        editor.domNode.value = "42.5";
-        expect(editor.get_value()).toBe(42.5);
+        editor.domNode.value = "7";
+        expect(editor.get_value()).toBe(7);
         editor.destroy();
     });
 
-    it("set_value clears domNode value when null", () => {
+    it("get_value returns null when domNode empty", () => {
+        vi.spyOn(AutoNumeric, "hasInstance").mockReturnValue(false);
+        const editor = createEditor();
+        expect(editor.get_value()).toBeNull();
+        editor.destroy();
+    });
+
+    it("set_value clears domNode when null", () => {
         const editor = createEditor();
         editor.set_value(null as any);
         expect(editor.domNode.value).toBe("");
@@ -69,16 +52,16 @@ describe("DecimalEditor value handling", () => {
         vi.spyOn(AutoNumeric, "hasInstance").mockReturnValue(true);
         const setValueSpy = vi.spyOn(AutoNumeric, "setValue").mockImplementation(() => { });
         const editor = createEditor();
-        editor.set_value(1234.5);
-        expect(setValueSpy).toHaveBeenCalledWith(editor.domNode, 1234.5);
+        editor.set_value(7);
+        expect(setValueSpy).toHaveBeenCalledWith(editor.domNode, 7);
         editor.destroy();
     });
 
     it("set_value formats when no AutoNumeric instance", () => {
         vi.spyOn(AutoNumeric, "hasInstance").mockReturnValue(false);
         const editor = createEditor();
-        editor.set_value(42.5);
-        expect(editor.domNode.value).toBe("42.5");
+        editor.set_value(42);
+        expect(editor.domNode.value).toBe("42");
         editor.destroy();
     });
 
@@ -86,26 +69,26 @@ describe("DecimalEditor value handling", () => {
         vi.spyOn(AutoNumeric, "hasInstance").mockReturnValue(true);
         const setValueSpy = vi.spyOn(AutoNumeric, "setValue").mockImplementation(() => { });
         const editor = createEditor();
-        editor.value = 9.5;
+        editor.value = 9;
         expect(setValueSpy).toHaveBeenCalled();
         editor.destroy();
     });
 
     it("get_isValid reflects value", () => {
         vi.spyOn(AutoNumeric, "hasInstance").mockReturnValue(true);
-        vi.spyOn(AutoNumeric, "getValue").mockReturnValue("12.3");
+        vi.spyOn(AutoNumeric, "getValue").mockReturnValue("5");
         const editor = createEditor();
         expect(editor.get_isValid()).toBe(true);
         editor.destroy();
     });
 
-    it("getAutoNumericOptions applies decimals, padDecimals and allowNegatives", () => {
+    it("getAutoNumericOptions applies allowNegatives and min/max", () => {
         const initSpy = vi.spyOn(AutoNumeric, "init").mockImplementation(() => null);
-        const editor = new DecimalEditor({ decimals: 3, padDecimals: false, allowNegatives: true } as any);
+        const editor = new IntegerEditor({ allowNegatives: true, maxValue: 100 } as any);
         const opts = initSpy.mock.calls[0][1];
-        expect(opts.mDec).toBe(3);
-        expect(opts.aPad).toBe(false);
-        expect(opts.vMin).toBe('-999999999999.99');
+        expect(opts.vMin).toBe("-100");
+        expect(opts.vMax).toBe(100);
+        expect(opts.aSep).toBeNull();
         editor.destroy();
     });
 
