@@ -1,9 +1,9 @@
-﻿import { Criteria, FilterPanelTexts, Fluent, FormValidationTexts, ListRequest, formatDate, localText, notifyWarning, nsSerenity, parseDate, toId } from "../../base";
+﻿import { addDisposingListener } from "@serenity-is/domwise";
+import { Criteria, FilterPanelTexts, Fluent, FormValidationTexts, ListRequest, formatDate, notifyWarning, nsSerenity, parseDate, toId, tryGetText } from "../../base";
 import { DateEditor } from "../editors/dateeditor";
 import { DateTimeEditor, DateTimeEditorOptions } from "../editors/datetimeeditor";
 import { EditorUtils } from "../editors/editorutils";
 import { SelectEditor, SelectEditorOptions } from "../editors/selecteditor";
-import { delegateCombine, delegateRemove } from "../filtering/filterstore";
 import { Widget, WidgetProps } from "../widgets/widget";
 import { getWidgetFrom, tryGetWidget } from "../widgets/widgetutils";
 import { QuickFilter } from "./quickfilter";
@@ -59,7 +59,7 @@ export class QuickFilterBar<P extends QuickFilterBarOptions = QuickFilterBarOpti
 
         const qfElement = this.domNode.appendChild(<div class="quick-filter-item" data-qffield={opt.field}></div>) as HTMLDivElement;
 
-        var title = localText(opt.title, opt.title);
+        var title = tryGetText(opt.title) ?? opt.title;
         if (title == null) {
             title = this.options.getTitle ? this.options.getTitle(opt) : null;
             if (title == null) {
@@ -144,10 +144,8 @@ export class QuickFilterBar<P extends QuickFilterBarOptions = QuickFilterBarOpti
             window.setTimeout(() => this.onChange && this.onChange(e1), 0);
         });
 
-        this.add_submitHandlers(submitHandler);
-        Fluent.on(widget.domNode, 'cleanup.' + this.uniqueName, x => {
-            this.remove_submitHandlers(submitHandler);
-        });
+        this.submitHandlers.push(submitHandler);
+        addDisposingListener(widget.domNode, () => this.submitHandlers = this.submitHandlers?.filter(h => h !== submitHandler));
 
         return widget;
     }
@@ -349,7 +347,7 @@ export class QuickFilterBar<P extends QuickFilterBarOptions = QuickFilterBarOpti
 
     declare public onChange: (e: Event) => void;
 
-    declare private submitHandlers: any;
+    private submitHandlers = [] as ((request: ListRequest) => void)[];
 
     override destroy() {
         this.submitHandlers = null;
@@ -357,18 +355,7 @@ export class QuickFilterBar<P extends QuickFilterBarOptions = QuickFilterBarOpti
     }
 
     public onSubmit(request: ListRequest) {
-        this.submitHandlers && this.submitHandlers(request);
-    }
-
-    protected add_submitHandlers(action: (request: ListRequest) => void): void {
-        this.submitHandlers = delegateCombine(this.submitHandlers, action);
-    }
-
-    protected remove_submitHandlers(action: (request: ListRequest) => void): void {
-        this.submitHandlers = delegateRemove(this.submitHandlers, action);
-    }
-
-    protected clear_submitHandlers() {
+        this.submitHandlers?.forEach(handler => handler(request));
     }
 
     public find<TWidget>(type: { new(...args: any[]): TWidget }, field: string): TWidget {

@@ -738,3 +738,190 @@ describe("restoreSettingsFrom", () => {
         expect(qsWidget.restoreState).not.toHaveBeenCalled();
     });
 });
+
+describe("getCurrentSettings edge cases", () => {
+    it("captures quick filter text for active filters with displayText", () => {
+        const quickFiltersDiv = document.createElement("div");
+        const filterItem = document.createElement("div");
+        filterItem.className = "quick-filter-item quick-filter-active";
+        filterItem.setAttribute("data-qffield", "field1");
+        const label = document.createElement("div");
+        label.className = "quick-filter-label";
+        label.textContent = "Field 1";
+        filterItem.appendChild(label);
+        quickFiltersDiv.appendChild(filterItem);
+
+        vi.mocked(tryGetWidget).mockReturnValue({} as any);
+        vi.mocked(QuickFilterBar.getItemData).mockReturnValue({
+            saveState: vi.fn(() => "v"),
+            displayText: vi.fn((_w: any, l: string) => l + " = v")
+        });
+
+        const grid = mockSleekGrid();
+        const settings = getCurrentSettings({
+            filterStore: null,
+            flags: { ...omitAllGridPersistenceFlags, quickFilters: true, quickFilterText: true },
+            includeDeletedToggle: document.createElement("div"),
+            quickFiltersDiv,
+            sleekGrid: grid,
+            toolbarNode: null,
+            uniqueName: "TestGrid"
+        });
+
+        expect(settings.quickFilterText).toContain("Field 1 = v");
+        expect(settings.quickFilters).toEqual({ field1: "v" });
+    });
+
+    it("skips quick filter items without a field", () => {
+        const quickFiltersDiv = document.createElement("div");
+        const filterItem = document.createElement("div");
+        filterItem.className = "quick-filter-item";
+        quickFiltersDiv.appendChild(filterItem);
+        vi.mocked(tryGetWidget).mockReturnValue({} as any);
+
+        const grid = mockSleekGrid();
+        const settings = getCurrentSettings({
+            filterStore: null,
+            flags: { ...omitAllGridPersistenceFlags, quickFilters: true },
+            includeDeletedToggle: document.createElement("div"),
+            quickFiltersDiv,
+            sleekGrid: grid,
+            toolbarNode: null,
+            uniqueName: "TestGrid"
+        });
+        expect(settings.quickFilters).toEqual({});
+    });
+
+    it("skips quick filter when widget not found", () => {
+        const quickFiltersDiv = document.createElement("div");
+        const filterItem = document.createElement("div");
+        filterItem.className = "quick-filter-item";
+        filterItem.setAttribute("data-qffield", "field1");
+        quickFiltersDiv.appendChild(filterItem);
+        vi.mocked(tryGetWidget).mockReturnValue(null);
+
+        const grid = mockSleekGrid();
+        const settings = getCurrentSettings({
+            filterStore: null,
+            flags: { ...omitAllGridPersistenceFlags, quickFilters: true },
+            includeDeletedToggle: document.createElement("div"),
+            quickFiltersDiv,
+            sleekGrid: grid,
+            toolbarNode: null,
+            uniqueName: "TestGrid"
+        });
+        expect(settings.quickFilters).toEqual({});
+    });
+
+    it("uses EditorUtils.getValue when no saveState", () => {
+        const quickFiltersDiv = document.createElement("div");
+        const filterItem = document.createElement("div");
+        filterItem.className = "quick-filter-item";
+        filterItem.setAttribute("data-qffield", "field1");
+        quickFiltersDiv.appendChild(filterItem);
+        vi.mocked(tryGetWidget).mockReturnValue({} as any);
+        vi.mocked(QuickFilterBar.getItemData).mockReturnValue({});
+
+        const grid = mockSleekGrid();
+        const settings = getCurrentSettings({
+            filterStore: null,
+            flags: { ...omitAllGridPersistenceFlags, quickFilters: true },
+            includeDeletedToggle: document.createElement("div"),
+            quickFiltersDiv,
+            sleekGrid: grid,
+            toolbarNode: null,
+            uniqueName: "TestGrid"
+        });
+        expect(settings.quickFilters).toHaveProperty("field1");
+    });
+
+    it("skips quick search when widget not found", () => {
+        const toolbarNode = document.createElement("div");
+        const qsInput = document.createElement("input");
+        qsInput.className = "s-QuickSearchInput";
+        toolbarNode.appendChild(qsInput);
+        vi.mocked(tryGetWidget).mockReturnValue(null);
+
+        const grid = mockSleekGrid();
+        const settings = getCurrentSettings({
+            filterStore: null,
+            flags: { ...omitAllGridPersistenceFlags, quickSearch: true },
+            includeDeletedToggle: document.createElement("div"),
+            quickFiltersDiv: document.createElement("div"),
+            sleekGrid: grid,
+            toolbarNode,
+            uniqueName: "TestGrid"
+        });
+        expect(settings.quickSearchField).toBeUndefined();
+    });
+});
+
+describe("restoreSettingsFrom edge cases", () => {
+    it("restores quick filters via EditorUtils when no loadState", () => {
+        const quickFiltersDiv = document.createElement("div");
+        const filterItem = document.createElement("div");
+        filterItem.className = "quick-filter-item";
+        filterItem.setAttribute("data-qffield", "field1");
+        quickFiltersDiv.appendChild(filterItem);
+        vi.mocked(tryGetWidget).mockReturnValue({} as any);
+        vi.mocked(QuickFilterBar.getItemData).mockReturnValue({});
+
+        restoreSettingsFrom(restoreSettingsArgs({
+            quickFiltersDiv,
+            flags: { ...omitAllGridPersistenceFlags, quickFilters: true },
+            settings: { quickFilters: { field1: "v" } }
+        }));
+        expect(tryGetWidget).toHaveBeenCalled();
+    });
+
+    it("restores quick filters skipping when widget not found", () => {
+        const quickFiltersDiv = document.createElement("div");
+        const filterItem = document.createElement("div");
+        filterItem.className = "quick-filter-item";
+        filterItem.setAttribute("data-qffield", "field1");
+        quickFiltersDiv.appendChild(filterItem);
+        vi.mocked(tryGetWidget).mockReturnValue(null);
+
+        restoreSettingsFrom(restoreSettingsArgs({
+            quickFiltersDiv,
+            flags: { ...omitAllGridPersistenceFlags, quickFilters: true },
+            settings: { quickFilters: { field1: "v" } }
+        }));
+        expect(tryGetWidget).toHaveBeenCalled();
+    });
+
+    it("restores quick filters skipping items without a field", () => {
+        const quickFiltersDiv = document.createElement("div");
+        const filterItem = document.createElement("div");
+        filterItem.className = "quick-filter-item";
+        quickFiltersDiv.appendChild(filterItem);
+        vi.mocked(tryGetWidget).mockReturnValue({} as any);
+
+        restoreSettingsFrom(restoreSettingsArgs({
+            quickFiltersDiv,
+            flags: { ...omitAllGridPersistenceFlags, quickFilters: true },
+            settings: { quickFilters: { field1: "v" } }
+        }));
+        expect(tryGetWidget).not.toHaveBeenCalled();
+    });
+
+    it("restores quick search when settings.flags.quickSearch is true", () => {
+        const toolbarNode = document.createElement("div");
+        const qsInput = document.createElement("input");
+        qsInput.className = "s-QuickSearchInput";
+        toolbarNode.appendChild(qsInput);
+        const qsWidget = { restoreState: vi.fn() };
+        vi.mocked(tryGetWidget).mockReturnValue(qsWidget as any);
+
+        restoreSettingsFrom(restoreSettingsArgs({
+            toolbarNode,
+            flags: { ...omitAllGridPersistenceFlags, quickSearch: true },
+            settings: {
+                flags: { quickSearch: true } as any,
+                quickSearchText: "text",
+                quickSearchField: { name: "field1", title: "Field 1" }
+            }
+        }));
+        expect(qsWidget.restoreState).toHaveBeenCalled();
+    });
+});

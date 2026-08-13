@@ -125,7 +125,7 @@ export class FilterStore {
         return displayText;
     }
 
-    declare private changed: any;
+    private changed: ((store: FilterStore) => void)[] = [];
     declare private displayText: string;
     declare private fields: PropertyItem[];
     declare private fieldByName: { [key: string]: PropertyItem }
@@ -145,15 +145,15 @@ export class FilterStore {
 
     raiseChanged(): void {
         this.displayText = null;
-        this.changed && this.changed(this, {});
+        this.changed?.forEach(h => h(this));
     }
 
-    add_changed(value: (e: Event, a: any) => void): void {
-        this.changed = delegateCombine(this.changed, value);
+    add_changed(listener: (store: FilterStore) => void): void {
+        listener && this.changed.push(listener);
     }
 
-    remove_changed(value: (e: Event, a: any) => void): void {
-        this.changed = delegateRemove(this.changed, value);
+    remove_changed(listener: (store: FilterStore) => void): void {
+        this.changed = this.changed?.filter(h => h !== listener);
     }
 
     get_activeCriteria(): any[] {
@@ -167,85 +167,3 @@ export class FilterStore {
         return this.displayText;
     }
 }
-
-let _mkdel = (targets: any[]): any => {
-    var delegate: any = function () {
-        if (targets.length === 2) {
-            return targets[1].apply(targets[0], arguments);
-        }
-        else {
-            var clone = targets.slice();
-            for (var i = 0; i < clone.length; i += 2) {
-                if (delegateContains(targets, clone[i], clone[i + 1])) {
-                    clone[i + 1].apply(clone[i], arguments);
-                }
-            }
-            return null;
-        }
-    };
-    delegate._targets = targets;
-
-    return delegate;
-};
-
-export function delegateCombine(delegate1: any, delegate2: any) {
-    if (!delegate1) {
-        if (!delegate2._targets) {
-            return delegate2;
-        }
-        return delegate2;
-    }
-    if (!delegate2) {
-        if (!delegate1._targets) {
-            return delegate1;
-        }
-        return delegate1;
-    }
-
-    var targets1 = delegate1._targets ? delegate1._targets : [null, delegate1];
-    var targets2 = delegate2._targets ? delegate2._targets : [null, delegate2];
-
-    return _mkdel(targets1.concat(targets2));
-};
-
-export function delegateRemove(delegate1: any, delegate2: any) {
-    if (!delegate1 || (delegate1 === delegate2)) {
-        return null;
-    }
-    if (!delegate2) {
-        return delegate1;
-    }
-
-    var targets = delegate1._targets;
-    var object = null;
-    var method;
-    if (delegate2._targets) {
-        object = delegate2._targets[0];
-        method = delegate2._targets[1];
-    }
-    else {
-        method = delegate2;
-    }
-
-    for (var i = 0; i < targets.length; i += 2) {
-        if ((targets[i] === object) && (targets[i + 1] === method)) {
-            if (targets.length === 2) {
-                return null;
-            }
-            var t = targets.slice();
-            t.splice(i, 2);
-            return _mkdel(t);
-        }
-    }
-
-    return delegate1;
-};
-
-export function delegateContains(targets: any[], object: any, method: any) {
-    for (var i = 0; i < targets.length; i += 2) {
-        if (targets[i] === object && targets[i + 1] === method) {
-            return true;
-        }
-    }
-    return false;
-};

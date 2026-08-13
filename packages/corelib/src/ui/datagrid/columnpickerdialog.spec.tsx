@@ -1,5 +1,6 @@
 ﻿import type { Column } from "@serenity-is/sleekgrid";
 import { ColumnPickerDialogTexts, Fluent } from "../../base";
+import { Router } from "../../compat/router";
 import { ColumnPickerDialog } from "./columnpickerdialog";
 
 afterEach(() => {
@@ -392,5 +393,61 @@ describe("ColumnPickerDialog", () => {
 
         // Restore original method
         ColumnPickerDialog.openDialog = originalOpenDialog;
+    });
+
+    it("uses default toggleColumns handler and invalidates grid", () => {
+        const invalidateColumns = vi.fn();
+        const dialog = new ColumnPickerDialog({
+            columns: [
+                { id: "A", name: "Column A", visible: true },
+                { id: "B", name: "Column B", visible: false }
+            ],
+            sleekGrid: { invalidateColumns, getAllColumns: () => [], reorderColumns: vi.fn(), getData: vi.fn() } as any
+        });
+        dialog.dialogOpen();
+        const inputs = dialog.element.findAll<HTMLInputElement>("li[data-key] input.toggle-visibility");
+        inputs[0].click(); // hide A
+        expect(dialog["colById"]["A"].visible).toBe(false);
+        expect(invalidateColumns).toHaveBeenCalled();
+    });
+
+    it("default reorderColumns handler calls sleekGrid.reorderColumns", () => {
+        const reorderColumns = vi.fn();
+        const dialog = new ColumnPickerDialog({
+            columns: [{ id: "A", name: "Column A", visible: true }],
+            sleekGrid: { reorderColumns, getAllColumns: () => [], invalidateColumns: vi.fn(), getData: vi.fn() } as any
+        });
+        dialog.dialogOpen();
+        (dialog as any).reorderColumns(["A"], ["A"], false);
+        expect(reorderColumns).toHaveBeenCalledWith(["A"], { notify: true, setVisible: ["A"] });
+    });
+
+    it("handleSortableEnd reorders columns", () => {
+        const reorderColumns = vi.fn(() => true);
+        const dialog = new ColumnPickerDialog({
+            columns: [
+                { id: "A", name: "A", visible: true },
+                { id: "B", name: "B", visible: true }
+            ],
+            reorderColumns
+        });
+        dialog.dialogOpen();
+        (dialog as any).handleSortableEnd();
+        expect(reorderColumns).toHaveBeenCalled();
+    });
+
+    it("openDialog creates dialog and routes", () => {
+        const dialogSpy = vi.spyOn(ColumnPickerDialog.prototype, "dialogOpen");
+        const routerSpy = vi.spyOn(Router, "dialog").mockImplementation(() => { });
+        const dataGrid = {
+            element: Fluent(document.createElement("div")),
+            uniqueName: "G",
+            getGrid: () => ({ getAllColumns: () => [] })
+        };
+        ColumnPickerDialog.openDialog({ dataGrid: dataGrid as any, columns: [] });
+        expect(dialogSpy).toHaveBeenCalled();
+        expect(routerSpy).toHaveBeenCalled();
+        dialogSpy.mockRestore();
+        routerSpy.mockRestore();
     });
 });

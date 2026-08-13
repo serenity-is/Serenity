@@ -4833,14 +4833,11 @@ export declare class FilterStore {
 	};
 	get_items(): FilterLine[];
 	raiseChanged(): void;
-	add_changed(value: (e: Event, a: any) => void): void;
-	remove_changed(value: (e: Event, a: any) => void): void;
+	add_changed(listener: (store: FilterStore) => void): void;
+	remove_changed(listener: (store: FilterStore) => void): void;
 	get_activeCriteria(): any[];
 	get_displayText(): string;
 }
-export declare function delegateCombine(delegate1: any, delegate2: any): any;
-export declare function delegateRemove(delegate1: any, delegate2: any): any;
-export declare function delegateContains(targets: any[], object: any, method: any): boolean;
 export interface IDataGrid {
 	getElement(): HTMLElement;
 	getGrid(): ISleekGrid;
@@ -5418,9 +5415,6 @@ export declare class QuickFilterBar<P extends QuickFilterBarOptions = QuickFilte
 	private submitHandlers;
 	destroy(): void;
 	onSubmit(request: ListRequest): void;
-	protected add_submitHandlers(action: (request: ListRequest) => void): void;
-	protected remove_submitHandlers(action: (request: ListRequest) => void): void;
-	protected clear_submitHandlers(): void;
 	find<TWidget>(type: {
 		new (...args: any[]): TWidget;
 	}, field: string): TWidget;
@@ -5759,6 +5753,30 @@ export interface TreeGridMixinOptions<TItem> {
 export declare namespace DialogExtensions {
 	function dialogResizable(dialog: HTMLElement | ArrayLike<HTMLElement>, w?: any, h?: any, mw?: any, mh?: any): void;
 	function dialogMaximizable(dialog: HTMLElement | ArrayLike<HTMLElement>): void;
+}
+export interface UIDialogMaximizerProps {
+	dblclick?: boolean;
+	showButton?: boolean;
+}
+/**
+ * Adds maximize / restore functionality to a jQuery UI dialog.
+ * Ported from the jquery.dialogextend plugin, converted from a jQuery UI widget
+ * into a plain class. Requires jQuery UI dialogs; it throws an error without them.
+ */
+export declare class UIDialogMaximizer extends Widget<UIDialogMaximizerProps> {
+	static [Symbol.typeInfo]: ClassTypeInfo<"Serenity.">;
+	static readonly defaults: UIDialogMaximizerProps;
+	private maximized;
+	private snapshot;
+	constructor(props: WidgetProps<UIDialogMaximizerProps>);
+	private addButton;
+	/** Returns the current state, e.g. "normal" or "maximized" */
+	get isMaximized(): boolean;
+	private setMaximized;
+	maximize(): void;
+	restore(): void;
+	private restoreSnapshot;
+	private saveSnapshot;
 }
 export type PropertyFieldElement = HTMLElement & {
 	editorWidget?: Widget<any>;

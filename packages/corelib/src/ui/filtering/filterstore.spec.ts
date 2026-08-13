@@ -1,5 +1,5 @@
 import { FilterLine } from "./filterline";
-import { FilterStore, delegateCombine, delegateContains, delegateRemove } from "./filterstore";
+import { FilterStore } from "./filterstore";
 
 describe("FilterStore", () => {
     describe("constructor", () => {
@@ -204,94 +204,7 @@ describe("FilterStore", () => {
             expect(handler).not.toHaveBeenCalled();
         });
     });
-
-    describe("delegate helper functions", () => {
-        it("delegateCombine combines two delegates", () => {
-            const fn1 = vi.fn();
-            const fn2 = vi.fn();
-            const combined = delegateCombine(fn1, fn2);
-            combined();
-            expect(fn1).toHaveBeenCalled();
-            expect(fn2).toHaveBeenCalled();
-        });
-
-        it("delegateCombine returns second if first is null", () => {
-            const fn = vi.fn();
-            const result = delegateCombine(null, fn);
-            expect(result).toBe(fn);
-        });
-
-        it("delegateCombine returns first if second is null", () => {
-            const fn = vi.fn();
-            const result = delegateCombine(fn, null);
-            expect(result).toBe(fn);
-        });
-
-        it("delegateCombine with delegate having _targets property", () => {
-            const fn1 = vi.fn();
-            const fn2 = vi.fn();
-            // Create delegates with _targets by using delegateCombine
-            const inner1 = delegateCombine(null, fn1);
-            const inner2 = delegateCombine(null, fn2);
-            // Now combine these two delegates (both have _targets)
-            const combined = delegateCombine(inner1, inner2);
-            expect(combined._targets).toBeDefined();
-            expect(combined._targets.length).toBe(4);
-            combined();
-            expect(fn1).toHaveBeenCalled();
-            expect(fn2).toHaveBeenCalled();
-        });
-
-        it("delegateRemove returns null if delegates are equal", () => {
-            const fn = vi.fn();
-            expect(delegateRemove(fn, fn)).toBeNull();
-        });
-
-        it("delegateRemove returns null if delegate1 is null", () => {
-            expect(delegateRemove(null, vi.fn())).toBeNull();
-        });
-
-        it("delegateRemove returns delegate1 if delegate2 is null", () => {
-            const fn = vi.fn();
-            expect(delegateRemove(fn, null)).toBe(fn);
-        });
-
-        it("delegateRemove removes plain function target from combined delegate", () => {
-            const fn1 = vi.fn();
-            const fn2 = vi.fn();
-            const combined = delegateCombine(fn1, fn2);
-            const result = delegateRemove(combined, fn1);
-            expect(result).not.toBeNull();
-            // Result should still call fn2
-            result();
-            expect(fn2).toHaveBeenCalled();
-        });
-
-        it("delegateRemove when target not found returns delegate1 unchanged", () => {
-            const fn1 = vi.fn();
-            const fn2 = vi.fn();
-            const combined = delegateCombine(fn1, fn2);
-            const unrelated = vi.fn();
-            const result = delegateRemove(combined, unrelated);
-            expect(result).toBe(combined);
-        });
-
-        it("delegateRemove removes the only target and returns null", () => {
-            const fn1 = vi.fn();
-            const combined = delegateCombine(null, fn1);
-            const result = delegateRemove(combined, fn1);
-            expect(result).toBeNull();
-        });
-
-        it("delegateContains checks if target is in list", () => {
-            const obj = {};
-            const fn = vi.fn();
-            const targets = [obj, fn];
-            expect(delegateContains(targets, obj, fn)).toBe(true);
-            expect(delegateContains(targets, {}, fn)).toBe(false);
-        });
-    });
-
+   
     describe("integration", () => {
         it("handles complex filter scenario", () => {
             const store = new FilterStore([
