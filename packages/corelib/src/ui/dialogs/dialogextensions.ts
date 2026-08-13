@@ -29,20 +29,14 @@ export namespace DialogExtensions {
         if (!getjQuery())
             return;
         new UIDialogMaximizer({
-            element: dialog,
-            dblclick: 'maximize'
+            element: dialog
         });
     }
 }
 
 export interface UIDialogMaximizerProps {
-    dblclick?: boolean | string;
-    load?: (() => void) | null;
-    beforeRestore?: (() => void) | null;
-    restore?: (() => void) | null;
+    dblclick?: boolean;
     showButton?: boolean;
-    beforeMaximize?: (() => void) | null;
-    maximize?: (() => void) | null;
 }
 
 /**
@@ -53,43 +47,67 @@ export interface UIDialogMaximizerProps {
 export class UIDialogMaximizer extends Widget<UIDialogMaximizerProps> {
     static override [Symbol.typeInfo] = this.registerClass(nsSerenity);
 
-    static readonly defaults: Required<UIDialogMaximizerProps> = {
+    static readonly defaults: UIDialogMaximizerProps = {
         dblclick: true,
-        load: null,
-        beforeRestore: null,
-        restore: null,
-        showButton: true,
-        beforeMaximize: null,
-        maximize: null
+        showButton: true
     };
 
-    private currentState = "normal";
+    private maximized: boolean;
     private snapshot: any;
-    private originalConfigResizable: boolean | undefined;
 
     constructor(props: WidgetProps<UIDialogMaximizerProps>) {
         super({ ...UIDialogMaximizer.defaults, ...props });
-        if (!getjQuery())
+        const $ = getjQuery();
+        if (!$)
             throw new Error("DialogMaximizer requires jQuery!");
-        this.initButtons();
-        this.setState("normal");
-        this.options.load?.();
+        this.addButton("maximize", this.options.showButton, DialogTexts.MaximizeHint, faIcon("window-maximize"), () => this.maximize());
+        this.addButton("restore", false, DialogTexts.RestoreHint, faIcon("window-restore"), () => this.restore());
+        const titlebar = $(this.domNode).closest('.ui-dialog').children('.ui-dialog-titlebar');
+        titlebar.dblclick(() => {
+            if (this.options.dblclick) {
+                return this.maximized ? this.restore() : this.maximize();
+            }
+        }).select(() => false);
+    }
+
+    private addButton(name: string, show: boolean, hint: string, icon: string, click: () => void): void {
+        const $ = getjQuery();
+        const titlebar = $(this.domNode).closest('.ui-dialog').children('.ui-dialog-titlebar');
+        const closeButton = titlebar.find('.ui-dialog-titlebar-close').first();
+        const button = $('<button class="ui-button ui-corner-all ui-button-icon-only ui-dialog-titlebar-'
+            + name + '" tabindex="-1"><i class="' + icon + '"></i></button>')
+            .attr('title', hint)
+            .toggle(show)
+            .click((e: any) => {
+                e.preventDefault();
+                return click();
+            });
+
+        if (closeButton)
+            button.insertBefore(closeButton);
+        else
+            button.appendTo(titlebar);
     }
 
     /** Returns the current state, e.g. "normal" or "maximized" */
-    state(): string {
-        return this.currentState;
+    get isMaximized(): boolean {
+        return !!this.maximized;
+    }
+
+    private setMaximized(value: boolean) {
+        this.maximized = !!value;
+        const uiDialog = getjQuery()(this.domNode).closest('.ui-dialog');
+        uiDialog.toggleClass("ui-dialog-maximized", this.maximized);
+        uiDialog.find(".ui-dialog-titlebar-restore").toggle(this.maximized && this.options.showButton);
+        uiDialog.find(".ui-dialog-titlebar-maximize").toggle(!this.maximized && this.options.showButton);
+        this.snapshot?.config?.resizable && uiDialog.triggerHandler("resize");
     }
 
     maximize(): void {
         let $ = getjQuery();
         let newHeight = $(window).height() - 1;
         let newWidth = $(window).width() - 1;
-        this.options.beforeMaximize?.();
-        if (this.currentState !== "normal") {
-            this.restorePreviousState();
-        }
-        this.saveSnapshot();
+        this.maximized ? this.restoreSnapshot() : this.saveSnapshot();
         let el = $(this.domNode);
         if (el.dialog("option", "draggable")) {
             el.dialog("widget").draggable("option", "handle", null).find(".ui-dialog-draggable-handle").css("cursor", "text").end();
@@ -106,72 +124,22 @@ export class UIDialogMaximizer extends Widget<UIDialogMaximizerProps> {
                     at: "left top"
                 }
             });
-        this.setState("maximized");
-        this.toggleButtons();
-
-        if (this.originalConfigResizable)
-            $(this.domNode).closest('.ui-dialog').triggerHandler("resize");
-
-        this.options.maximize?.();
+        this.setMaximized(true);
     }
 
     restore(): void {
-        this.options.beforeRestore?.();
-        this.restorePreviousState();
-        this.setState("normal");
-        this.toggleButtons();
-
-        if (this.originalConfigResizable)
-            getjQuery()(this.domNode).closest('.ui-dialog').triggerHandler("resize");
-
-        this.options.restore?.();
+        this.restoreSnapshot();
+        this.setMaximized(false);
     }
+    
+    private restoreSnapshot(): void {
+        if (!this.maximized)
+            return;
 
-    private setState(state: string): string {
-        getjQuery()(this.domNode).removeClass("ui-dialog-" + this.currentState).addClass("ui-dialog-" + state);
-        return this.currentState = state;
-    }
-
-    private initButtons(): void {
-        this.addButton("maximize", this.options.showButton, DialogTexts.MaximizeHint, faIcon("window-maximize"));
-        this.addButton("restore", false, DialogTexts.RestoreHint, faIcon("window-restore"));
-
-        const titlebar = getjQuery()(this.domNode).closest('.ui-dialog').children('.ui-dialog-titlebar');
-        titlebar.dblclick(() => {
-            if (this.options.dblclick) {
-                if (this.currentState !== "normal") {
-                    return this.restore();
-                } else {
-                    return (this as any)[this.options.dblclick as string]();
-                }
-            }
-        }).select(() => {
-            return false;
-        });
-    }
-
-    private addButton(name: string, show: boolean, hint: string, icon: string): void {
-        const titlebar = getjQuery()(this.domNode).closest('.ui-dialog').children('.ui-dialog-titlebar');
-        const closeButton = titlebar.find('.ui-dialog-titlebar-close').first();
-        const button = getjQuery()('<button class="ui-button ui-corner-all ui-button-icon-only ui-dialog-titlebar-'
-            + name + '" tabindex="-1"><i class="' + icon + '"></i></button>')
-            .attr('title', hint)
-            .toggle(show)
-            .click((e: any) => {
-                e.preventDefault();
-                return (this as any)[name]();
-            });
-
-        if (closeButton)
-            button.insertBefore(closeButton);
-        else
-            button.appendTo(titlebar);
-    }
-
-    private restoreMaximized(): void {
         const el = getjQuery()(this.domNode);
         const original = this.snapshot || { config: {}, size: {}, position: {}, titlebar: {} };
-        el.dialog("widget").css("position", original.position.mode).find(".ui-dialog-titlebar").css("white-space", original.titlebar.wrap).end().find(".ui-dialog-content").dialog("option", {
+        const widget = el.dialog("widget");
+        widget.css("position", original.position.mode).find(".ui-dialog-titlebar").css("white-space", original.titlebar.wrap).end().find(".ui-dialog-content").dialog("option", {
             resizable: original.config.resizable,
             draggable: original.config.draggable,
             height: original.size.height,
@@ -184,46 +152,33 @@ export class UIDialogMaximizer extends Widget<UIDialogMaximizerProps> {
             }
         });
         if (el.dialog("option", "draggable")) {
-            el.dialog("widget").draggable("option", "handle", el.dialog("widget").find(".ui-dialog-draggable-handle").length ?
-                el.dialog("widget").find(".ui-dialog-draggable-handle") : ".ui-dialog-titlebar").find(".ui-dialog-draggable-handle").css("cursor", "move");
-        }
-    }
-
-    private restorePreviousState(): void {
-        if (this.currentState === "maximized") {
-            this.restoreMaximized();
+            widget.draggable("option", "handle", widget.find(".ui-dialog-draggable-handle").length ?
+                widget.find(".ui-dialog-draggable-handle") : ".ui-dialog-titlebar").find(".ui-dialog-draggable-handle").css("cursor", "move");
         }
     }
 
     private saveSnapshot(): void {
-        if (this.currentState === "normal") {
-            const el = getjQuery()(this.domNode);
-            this.snapshot = {
-                config: {
-                    resizable: el.dialog("option", "resizable"),
-                    draggable: el.dialog("option", "draggable"),
-                },
-                size: {
-                    height: el.dialog("widget").outerHeight(),
-                    width: el.dialog("option", "width"),
-                    maxHeight: el.dialog("option", "maxHeight")
-                },
-                position: {
-                    mode: el.dialog("widget").css("position"),
-                    left: el.dialog("widget").offset().left - getjQuery()('body').scrollLeft(),
-                    top: el.dialog("widget").offset().top - getjQuery()('body').scrollTop()
-                },
-                titlebar: {
-                    wrap: el.dialog("widget").find(".ui-dialog-titlebar").css("white-space")
-                }
-            };
-            this.originalConfigResizable = this.snapshot.config.resizable;
-        }
-    }
-
-    private toggleButtons(): void {
-        const uiDialog = getjQuery()(this.domNode).closest('.ui-dialog');
-        uiDialog.find(".ui-dialog-titlebar-restore").toggle(this.currentState !== "normal" && this.options.showButton);
-        uiDialog.find(".ui-dialog-titlebar-maximize").toggle(this.currentState !== "maximized" && this.options.showButton);
+        const $ = getjQuery();
+        const el = $(this.domNode);
+        const widget = el.dialog("widget");
+        this.snapshot = {
+            config: {
+                resizable: el.dialog("option", "resizable"),
+                draggable: el.dialog("option", "draggable"),
+            },
+            size: {
+                height: widget.outerHeight(),
+                width: el.dialog("option", "width"),
+                maxHeight: el.dialog("option", "maxHeight")
+            },
+            position: {
+                mode: widget.css("position"),
+                left: widget.offset().left - $('body').scrollLeft(),
+                top: widget.offset().top - $('body').scrollTop()
+            },
+            titlebar: {
+                wrap: widget.find(".ui-dialog-titlebar").css("white-space")
+            }
+        };
     }
 }

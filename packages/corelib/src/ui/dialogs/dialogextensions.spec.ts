@@ -99,11 +99,11 @@ function createMockChain(element: HTMLElement): any {
         find: vi.fn(() => chain),
         first: vi.fn(() => chain),
         removeClass: vi.fn(() => chain),
-        addClass: vi.fn(() => chain),
-        dblclick: vi.fn(() => chain),
+        toggleClass: vi.fn(() => chain),
         select: vi.fn(() => chain),
         attr: vi.fn(() => chain),
         toggle: vi.fn(() => chain),
+        dblclick: vi.fn(() => chain),
         click: vi.fn(() => chain),
         insertBefore: vi.fn(() => chain),
         appendTo: vi.fn(() => chain),
@@ -234,10 +234,9 @@ describe("UIDialogMaximizer", () => {
         delete (window as any).jQuery;
     });
 
-    it("starts in normal state and fires load", () => {
-        const load = vi.fn();
-        new UIDialogMaximizer({ element: mockElement, load });
-        expect(load).toHaveBeenCalledTimes(1);
+    it("starts in normal state", () => {
+        const maximizer = new UIDialogMaximizer({ element: mockElement });
+        expect(maximizer.isMaximized).toBe(false);
     });
 
     it("throws when jQuery is not available", () => {
@@ -246,38 +245,18 @@ describe("UIDialogMaximizer", () => {
     });
 
     it("maximizes and restores, tracking state", () => {
-        const dlg = new UIDialogMaximizer({ element: mockElement, showButton: true, dblclick: "maximize" });
-        expect(dlg.state()).toBe("normal");
+        const dlg = new UIDialogMaximizer({ element: mockElement, showButton: true, dblclick: true });
+        expect(dlg.isMaximized).toBe(false);
 
         dlg.maximize();
-        expect(dlg.state()).toBe("maximized");
+        expect(dlg.isMaximized).toBe(true);
         expect(chain.dialog).toHaveBeenCalledWith("option", expect.objectContaining({
             resizable: false,
             draggable: false
         }));
 
         dlg.restore();
-        expect(dlg.state()).toBe("normal");
-    });
-
-    it("fires option callbacks on maximize and restore", () => {
-        const beforeMaximize = vi.fn();
-        const maximize = vi.fn();
-        const beforeRestore = vi.fn();
-        const restore = vi.fn();
-
-        const dlg = new UIDialogMaximizer({
-            element: mockElement,
-            beforeMaximize, maximize, beforeRestore, restore
-        });
-
-        dlg.maximize();
-        expect(beforeMaximize).toHaveBeenCalledTimes(1);
-        expect(maximize).toHaveBeenCalledTimes(1);
-
-        dlg.restore();
-        expect(beforeRestore).toHaveBeenCalledTimes(1);
-        expect(restore).toHaveBeenCalledTimes(1);
+        expect(dlg.isMaximized).toBe(false);
     });
 });
 
