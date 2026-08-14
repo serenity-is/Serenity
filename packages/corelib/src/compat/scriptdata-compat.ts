@@ -49,7 +49,7 @@ export function reloadLookup<TItem = any>(key: string): Lookup<TItem> {
 }
 
 export function getColumns(key: string): PropertyItem[] {
-    return getColumnsData(key).items;
+    return getColumnsData(key)?.items ?? [];
 }
 
 export async function getColumnsAsync(key: string): Promise<PropertyItem[]> {
@@ -63,7 +63,7 @@ export function getColumnsData(key: string): PropertyItemsData {
 export const getColumnsDataAsync = getColumnsScript;
 
 export function getForm(key: string): PropertyItem[] {
-    return getFormData(key).items;
+    return getFormData(key)?.items ?? [];
 }
 
 export async function getFormAsync(key: string): Promise<PropertyItem[]> {
