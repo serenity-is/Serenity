@@ -18,7 +18,7 @@ describe("FilterPanel", () => {
 
     it("domNode has s-FilterPanel class", () => {
         const panel = new FilterPanel({});
-        expect(panel.domNode.classList.contains("s-FilterPanel'")).toBe(true);
+        expect(panel.domNode.classList.contains("s-FilterPanel")).toBe(true);
         panel.destroy();
     });
 

@@ -76,7 +76,7 @@ export class FilterPanel<P = {}> extends FilterWidgetBase<P> {
     constructor(props: WidgetProps<P>) {
         super(props);
 
-        this.domNode.classList.add("s-FilterPanel'")
+        this.domNode.classList.add("s-FilterPanel")
         this.rowsDiv = this.findById('Rows');
         this.updateButtons();
     }
