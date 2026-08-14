@@ -120,7 +120,7 @@ export class ClassicRouter implements IClassicRouter {
         element = isArrayLike(element) ? element[0] : element;
         if (element &&
             this.pendingDialogElement &&
-            (element === this.pendingDialogElement) || (element.contains(this.pendingDialogElement))) {
+            ((element === this.pendingDialogElement) || (element.contains(this.pendingDialogElement)))) {
             dialogHash = this.pendingDialogHash ?? dialogHash;
             ownerEl = this.pendingDialogOwner;
         }
