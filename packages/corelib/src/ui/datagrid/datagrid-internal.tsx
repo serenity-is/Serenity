@@ -89,7 +89,7 @@ export function propertyItemToQuickFilter(item: PropertyItem): QuickFilter<any, 
     }
     else {
         const filtering = new (filteringType as any)(item.filteringParams ?? {}) as IFiltering;
-        if (filtering && isInstanceOfType(filtering, IQuickFiltering)) {
+        if (isInstanceOfType(filtering, IQuickFiltering)) {
             ReflectionOptionsSetter.set(filtering, item.filteringParams);
             filtering.set_field(item);
             filtering.set_operator({ key: FilterOperators.EQ });
@@ -115,7 +115,7 @@ export function sleekGridOnSort(this: void, view: IRemoteView<any>, p: ArgsSort)
         var sortBy = [];
         var col: any;
         if (!!p.multiColumnSort) {
-            for (var i = 0; !!(i < p.sortCols.length); i++) {
+            for (var i = 0; i < p.sortCols.length; i++) {
                 var x = p.sortCols[i];
                 col = x.sortCol;
                 if (col == null) {
