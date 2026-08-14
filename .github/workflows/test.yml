@@ -18,7 +18,7 @@ jobs:
         submodules: true
 
     - name: setup .net
-      uses: actions/setup-dotnet@v4
+      uses: actions/setup-dotnet@v6
       with:
         dotnet-version: 10.0.x
 
@@ -34,7 +34,7 @@ jobs:
           ${{ runner.os }}-nuget-
 
     - name: setup node
-      uses: actions/setup-node@v4
+      uses: actions/setup-node@v7
       with:
         node-version: '24'
 
