@@ -289,6 +289,7 @@ describe("HtmlContextEditor", () => {
         editor.domNode = textarea;
         editor.options = {};
         editor._ckInstanceReady = true;
+        editor.domNode.dataset.editorProvider = "ckeditor";
         expect(editor.get_readOnly()).toBe(false);
         editor.set_readOnly(true);
         expect(ckInstance.setReadOnly).toHaveBeenCalledWith(true);

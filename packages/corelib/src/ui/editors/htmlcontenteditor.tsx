@@ -345,7 +345,7 @@ export class HtmlContentEditor<P extends HtmlContentEditorOptions = HtmlContentE
                 return;
             }
 
-            if (this.editorProvider !== "ckeditor") {
+            if (this.editorProvider === "ckeditor") {
                 const ckInstance = this.getCKEditorInstance();
                 if (this._ckInstanceReady && ckInstance)
                     ckInstance.setReadOnly(value);
