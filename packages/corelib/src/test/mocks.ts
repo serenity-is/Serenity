@@ -133,7 +133,7 @@ export function mockFetch(map?: { [urlOrService: string]: ((info: MockFetchInfo)
                 throw `Fetch is not configured on the mock fetch implementation: (${url})!`;
             }
 
-            var requestData = typeof init.body == "string" ? JSON.parse(init.body) : null;
+            var requestData = init && typeof init.body == "string" ? JSON.parse(init.body) : null;
 
             var info: MockFetchInfo = {
                 url: url,
@@ -221,7 +221,7 @@ class MockXHR {
     get responseText() { return JSON.stringify(this._responseData) }
 
     getResponseHeader(name: string): string {
-        return this._info?.responseHeaders[name];
+        return this._info?.responseHeaders[name?.toLowerCase()];
     }
 
     open(_method: string, url: string, _async?: boolean): void {
