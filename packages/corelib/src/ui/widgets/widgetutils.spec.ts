@@ -205,6 +205,12 @@ describe("useIdPrefix", () => {
         expect(id["#PropertyGrid"]).toBe("#my_PropertyGrid");
         expect(id["#something"]).toBe("#my_something");
     });
+
+    it("does not throw for symbol property access", () => {
+        const id = useIdPrefix("my_");
+        expect(() => (id as any)[Symbol.iterator]).not.toThrow();
+        expect((id as any)[Symbol.iterator]).toBeUndefined();
+    });
 });
 
 describe("Fluent extensions", () => {

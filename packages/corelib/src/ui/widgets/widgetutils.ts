@@ -14,7 +14,7 @@ export function associateWidget(widget: { domNode: HTMLElement }) {
     var widgets = elementMap.get(widget.domNode);
     if (widgets) {
         if (widgets[name])
-            throw new Error(`The element already has widget '${name}!`);
+            throw new Error(`The element already has widget '${name}'!`);
 
         widgets[name] = widget;
     }
@@ -86,7 +86,7 @@ export function getWidgetFrom<TWidget>(element: ArrayLike<HTMLElement> | Element
 
     var widget = tryGetWidget(element, type);
     if (!widget) {
-        var message = `Element (${selector ?? 'unknown'}) has no widget of type '${getTypeFullName(type)}'! If you have recently changed ` +
+        var message = `Element (${selector ?? 'unknown'}) has no widget of type '${getTypeFullName(type) ?? "Widget"}'! If you have recently changed ` +
             "editor type of a property in a form class, or changed data type in row (which also changes " +
             "editor type) your script side Form definition might be out of date. Make sure your project " +
             "builds successfully and transformations are executed.";
@@ -112,7 +112,10 @@ export function useIdPrefix(prefix: string): IdPrefixType {
 }
 
 const idPrefixHandler = {
-    get(target: any, p: string) {
+    get(target: any, p: string | symbol) {
+        if (typeof p === 'symbol')
+            return undefined;
+
         if (p.startsWith('#'))
             return '#' + target._ + p.substring(1);
 
