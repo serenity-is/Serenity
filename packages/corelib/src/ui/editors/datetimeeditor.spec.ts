@@ -93,6 +93,34 @@ describe("DateTimeEditor_WithDefaultInput", () => {
         editor.destroy();
     });
 
+    it("respects minValue/maxValue options instead of SQL defaults", () => {
+        const editor = newEditor({ minValue: "2020-01-01T00:00:00", maxValue: "2020-12-31T23:59:00" });
+        expect(editor.get_minValue()).toBe("2020-01-01T00:00:00");
+        expect(editor.get_maxValue()).toBe("2020-12-31T23:59:00");
+        expect(editor.get_sqlMinMax()).toBe(false);
+        editor.destroy();
+    });
+
+    it("keeps SQL default for unspecified bound when only one is provided", () => {
+        const editor = newEditor({ minValue: "2020-01-01T00:00:00" });
+        expect(editor.get_minValue()).toBe("2020-01-01T00:00:00");
+        expect(editor.get_maxValue()).toBe("9999-12-31");
+        editor.destroy();
+
+        const editor2 = newEditor({ maxValue: "2020-12-31T23:59:00" });
+        expect(editor2.get_minValue()).toBe("1753-01-01");
+        expect(editor2.get_maxValue()).toBe("2020-12-31T23:59:00");
+        editor2.destroy();
+    });
+
+    it("does not apply SQL min/max when sqlMinMax is false", () => {
+        const editor = newEditor({ sqlMinMax: false });
+        expect(editor.get_minValue()).toBeUndefined();
+        expect(editor.get_maxValue()).toBeUndefined();
+        expect(editor.get_sqlMinMax()).toBe(false);
+        editor.destroy();
+    });
+
     it("toggles readonly state", () => {
         const editor = newEditor({});
         expect(editor.get_readOnly()).toBe(false);

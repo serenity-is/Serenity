@@ -102,4 +102,16 @@ public partial class DateTimeEditorAttribute : CustomEditorAttribute
         get { return GetOption<bool>("useUtc"); }
         set { SetOption("useUtc", value); }
     }
+
+    /// <summary>
+    /// Gets or sets a value indicating whether SQL server min max dates should be used.
+    /// </summary>
+    /// <value>
+    ///   <c>true</c> if SQL server min max dates should be used; otherwise, <c>false</c>.
+    /// </value>
+    public bool SqlMinMax
+    {
+        get { return GetOption<bool?>("sqlMinMax") ?? true; }
+        set { SetOption("sqlMinMax", value); }
+    }
 }

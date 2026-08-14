@@ -126,7 +126,15 @@ export class DateTimeEditor<P extends DateTimeEditorOptions = DateTimeEditorOpti
                 this.lastSetValue = null;
         });
 
-        this.set_sqlMinMax(true);
+        if (this.options.sqlMinMax !== false) {
+            const minValue = this.options.minValue;
+            const maxValue = this.options.maxValue;
+            this.set_sqlMinMax(true);
+            if (minValue != null)
+                this.set_minValue(minValue);
+            if (maxValue != null)
+                this.set_maxValue(maxValue);
+        }        
 
         if (!this.options.inputOnly) {
             (this.time ?? this.domNode).after(
@@ -403,4 +411,5 @@ export interface DateTimeEditorOptions {
     useUtc?: boolean;
     seconds?: boolean;
     inputOnly?: boolean;
+    sqlMinMax?: boolean;
 }
