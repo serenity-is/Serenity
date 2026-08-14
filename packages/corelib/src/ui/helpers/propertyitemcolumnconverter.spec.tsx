@@ -289,5 +289,25 @@ describe('PropertyItemColumnConverter', () => {
             });
             expect(converted.togglable).toBeUndefined();
         });
+
+        it('renders a warning icon when a lazy formatter fails to load', async () => {
+            const failing = Promise.reject(new Error("boom"));
+
+            const converted = PropertyItemColumnConverter.toColumn({
+                name: 'f1',
+                title: 'Failing Formatter',
+                formatterType: failing as any
+            });
+
+            // let the rejection reach the load-time catch
+            await Promise.resolve();
+            await Promise.resolve();
+
+            const node = converted.format!({} as any) as HTMLElement;
+            expect(node.classList.contains('s-FormatterLoadError')).toBe(true);
+            const icon = node.querySelector('i');
+            expect(icon?.classList.contains('fa-exclamation-triangle')).toBe(true);
+            expect(node.getAttribute('title')).toContain('Failed to load formatter type');
+        });
     });
 });

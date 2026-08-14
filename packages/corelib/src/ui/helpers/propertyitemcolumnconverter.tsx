@@ -1,5 +1,5 @@
 import { Column } from "@serenity-is/sleekgrid";
-import { Authorization, isPromiseLike, SummaryType, tryGetText, type PropertyItem } from "../../base";
+import { Authorization, faIcon, isPromiseLike, SummaryType, tryGetText, type PropertyItem } from "../../base";
 import { FormatterType } from "../../types/formattertype";
 import { FormatterTypeRegistry } from "../../types/formattertyperegistry";
 import { IInitializeColumn } from "../formatters/iinitializecolumn";
@@ -56,7 +56,7 @@ export namespace PropertyItemColumnConverter {
             }
         }
 
-        if (item.pin != null && item.pin as any !== false) {
+        if (item.pin != null && item.pin !== false) {
             result.frozen = item.pin === "end" ? "end" : "start";
         }
 
@@ -65,6 +65,8 @@ export namespace PropertyItemColumnConverter {
 
         const formatterType = (isPromiseLike(item.formatterType) || typeof item.formatterType === "function")
             ? item.formatterType : (FormatterTypeRegistry.getOrLoad(item.formatterType));
+
+        let loadError: string;
 
         const then = (formatterType: FormatterType) => {
             var formatter = new formatterType(item.formatterParams ?? {});
@@ -78,23 +80,40 @@ export namespace PropertyItemColumnConverter {
             result.format = (ctx) => formatter.format(ctx);
         }
         if (isPromiseLike(formatterType)) {
+
             result.format = (ctx) => {
+                if (loadError != null) {
+                    return formatLoadError(loadError);
+                }
+
                 if (ctx.row != null && ctx.cell != null && ctx.grid) {
                     const grid = ctx.grid;
                     const row = ctx.row;
                     const cell = ctx.cell;
                     formatterType.then(() => {
                         grid.updateCell?.(row, cell);
+                    }, () => {
+                        grid.updateCell?.(row, cell);
                     });
                 }
                 return "";
             }
-            formatterType.then(then);
+
+            formatterType.then(then, (err) => {
+                loadError = "Failed to load formatter type: " + String(item.formatterType);
+                result.format = formatLoadError.bind(null, loadError);
+                console.error(loadError, err);
+            });
         }
         else {
             then(formatterType);
         }
 
         return result;
+    }
+
+    function formatLoadError(error: string) {
+        return <span class="s-FormatterLoadError" title={error}>
+            <i class={faIcon("exclamation-triangle", "warning")} /></span>;            
     }
 }
