@@ -160,4 +160,41 @@ describe("DateTimeFiltering", () => {
         expect(Array.isArray(result.criteria[0])).toBe(true);
         expect(result.displayText).toBeTruthy();
     });
+
+    it("getCriteria for le operator is less than the next day (regression)", () => {
+        const filtering = new DateTimeFiltering();
+        filtering.set_field({ name: "DateField" });
+        const container = document.createElement("div");
+        filtering.set_container(container);
+        filtering.set_operator({ key: "le" });
+        filtering.createEditor();
+
+        const input = container.querySelector("input");
+        input.value = "2024-01-15";
+
+        const result = filtering.getCriteria();
+        expect(result.criteria).toEqual([["DateField"], "<", "2024-01-16"]);
+    });
+
+    it("getCriteria for ne operator excludes the whole selected day, including next-day midnight (regression)", () => {
+        const filtering = new DateTimeFiltering();
+        filtering.set_field({ name: "DateField" });
+        const container = document.createElement("div");
+        filtering.set_container(container);
+        filtering.set_operator({ key: "ne" });
+        filtering.createEditor();
+
+        const input = container.querySelector("input");
+        input.value = "2024-01-15";
+
+        const result = filtering.getCriteria();
+        expect(result.criteria).toEqual([
+            "()",
+            [
+                [["DateField"], "<", "2024-01-15"],
+                "or",
+                [["DateField"], ">=", "2024-01-16"]
+            ]
+        ]);
+    });
 });

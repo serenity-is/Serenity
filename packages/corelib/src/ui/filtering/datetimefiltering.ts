@@ -42,7 +42,7 @@ export class DateTimeFiltering extends BaseEditorFiltering<DateEditor> {
                             return result;
                         }
                         case 'ne': {
-                            result.criteria = Criteria.paren(Criteria.or(criteria.lt(dateValue), criteria.gt(nextValue)));
+                            result.criteria = Criteria.paren(Criteria.or(criteria.lt(dateValue), criteria.ge(nextValue)));
                             return result;
                         }
                         case 'lt': {
@@ -51,6 +51,7 @@ export class DateTimeFiltering extends BaseEditorFiltering<DateEditor> {
                         }
                         case 'le': {
                             result.criteria = criteria.lt(nextValue);
+                            return result;
                         }
                         case 'gt': {
                             result.criteria = criteria.ge(nextValue);
