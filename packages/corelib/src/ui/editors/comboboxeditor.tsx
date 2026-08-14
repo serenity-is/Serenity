@@ -54,7 +54,7 @@ export class ComboboxEditor<P, TItem> extends EditorWidget<P> implements
         let hidden = this.domNode;
 
         this._items = [];
-        this._itemById = {};
+        this._itemById = Object.create(null);
         var emptyItemText = this.emptyItemText();
         if (emptyItemText != null) {
             hidden.setAttribute('placeholder', emptyItemText);
@@ -172,7 +172,7 @@ export class ComboboxEditor<P, TItem> extends EditorWidget<P> implements
                 let items = this.mapItems(result.items || []);
 
                 if (query.initSelection) {
-                    const itemById: typeof this._itemById = {};
+                    const itemById: typeof this._itemById = Object.create(null);
                     for (var x of items) {
                         itemById[x.id] = x;
                     }
@@ -264,7 +264,7 @@ export class ComboboxEditor<P, TItem> extends EditorWidget<P> implements
             throw new Error("Can't set items of an async select editor!");
 
         this._items = value || [];
-        this._itemById = {};
+        this._itemById = Object.create(null);
         for (var item of this._items)
             this._itemById[item.id] = item;
     }
@@ -280,7 +280,7 @@ export class ComboboxEditor<P, TItem> extends EditorWidget<P> implements
         if (this.hasAsyncSource())
             throw new Error("Can't set itemById of an async select editor!");
 
-        this._itemById = value || {};
+        this._itemById = value || Object.create(null);
     }
 
     public clearItems() {
@@ -288,7 +288,7 @@ export class ComboboxEditor<P, TItem> extends EditorWidget<P> implements
             throw new Error("Can't clear items of an async select editor!");
 
         this._items.length = 0;
-        this._itemById = {};
+        this._itemById = Object.create(null);
     }
 
     public addItem(item: ComboboxItem<TItem>) {
