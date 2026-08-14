@@ -50,9 +50,10 @@ export class PropertyPanel<TItem, P> extends BasePanel<P> {
         if (px >= 0) {
             name = name.substring(px + 1);
         }
-        else if (name.endsWith('Panel')) {
+
+        if (name.endsWith('Panel'))
             name = name.substring(0, name.length - 5);
-        }
+
         return name;
     }
 

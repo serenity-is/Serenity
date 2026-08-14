@@ -52,13 +52,13 @@ describe("PropertyPanel", () => {
         panel.destroy();
     });
 
-    it("getFormKey returns type name with namespace stripped", () => {
+    it("getFormKey strips namespace and Panel suffix like EntityDialog", () => {
         class TestPanel extends PropertyPanel<any, {}> {
             static override[Symbol.typeInfo] = this.registerClass("SomeNamespace.TestPanel");
         }
         const panel = new TestPanel({});
         const formKey = (panel as any).getFormKey();
-        expect(formKey).toBe("TestPanel");
+        expect(formKey).toBe("Test");
         panel.destroy();
     });
 
