@@ -292,7 +292,7 @@ describe('PropertyItemColumnConverter', () => {
 
         it('renders a warning icon when a lazy formatter fails to load', async () => {
             const failing = Promise.reject(new Error("boom"));
-
+            const errorSpy = vi.spyOn(console, 'error').mockImplementation(() => { /* suppress error logging */ });
             const converted = PropertyItemColumnConverter.toColumn({
                 name: 'f1',
                 title: 'Failing Formatter',
@@ -308,6 +308,7 @@ describe('PropertyItemColumnConverter', () => {
             const icon = node.querySelector('i');
             expect(icon?.classList.contains('fa-exclamation-triangle')).toBe(true);
             expect(node.getAttribute('title')).toContain('Failed to load formatter type');
+            expect(errorSpy).toHaveBeenCalledOnce();
         });
     });
 });
