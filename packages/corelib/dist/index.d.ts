@@ -6897,6 +6897,7 @@ export declare class FileUploadEditor<P extends FileUploadEditorOptions = FileUp
 	protected getUploadInputOptions(): UploadInputOptions;
 	protected addFileButtonText(): string;
 	protected getToolButtons(): ToolButton[];
+	protected getDefaultAllowNonImage(): boolean;
 	protected populate(): void;
 	protected updateInterface(): void;
 	get_readOnly(): boolean;
@@ -6919,6 +6920,7 @@ export declare class FileUploadEditor<P extends FileUploadEditorOptions = FileUp
 export declare class ImageUploadEditor<P extends ImageUploadEditorOptions = ImageUploadEditorOptions> extends FileUploadEditor<P> {
 	static [Symbol.typeInfo]: EditorTypeInfo<"Serenity.">;
 	constructor(props: EditorProps<P>);
+	protected getDefaultAllowNonImage(): boolean;
 }
 export interface MultipleFileUploadEditorOptions extends FileUploadEditorOptions {
 	jsonEncodeValue?: boolean;
