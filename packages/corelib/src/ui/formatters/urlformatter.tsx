@@ -7,7 +7,6 @@ export class UrlFormatter implements Formatter, IInitializeColumn {
     static [Symbol.typeInfo] = formatterTypeInfo(nsSerenity, [IInitializeColumn]); static { registerType(this); }
 
     constructor(readonly props: { displayProperty?: string, displayFormat?: string, urlProperty?: string, urlFormat?: string, target?: string } = {}) {
-        this.props ??= {};
     }
 
     format(ctx: FormatterContext): FormatterResult {
@@ -41,7 +40,7 @@ export class UrlFormatter implements Formatter, IInitializeColumn {
             column.referencedFields.push(this.displayProperty);
         }
 
-        if (this.urlProperty) {
+        if (this.urlProperty && this.urlProperty !== this.displayProperty) {
             column.referencedFields.push(this.urlProperty);
         }
     }
