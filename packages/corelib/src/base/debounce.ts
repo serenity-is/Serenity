@@ -80,6 +80,8 @@ export function debounce<T extends (...args: any) => any>(func: T, wait?: number
             clearTimeout(timeout);
             timeout = null;
         }
+
+        return result;
     };
 
     return debounced as DebouncedFunction<T>;
