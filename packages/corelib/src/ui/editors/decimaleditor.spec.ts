@@ -109,6 +109,22 @@ describe("DecimalEditor value handling", () => {
         editor.destroy();
     });
 
+    it("getAutoNumericOptions builds symmetric vMin from maxValue with allowNegatives", () => {
+        const initSpy = vi.spyOn(AutoNumeric, "init").mockImplementation(() => null);
+        const editor = new DecimalEditor({ allowNegatives: true, maxValue: "100" } as any);
+        const opts = initSpy.mock.calls[0][1];
+        expect(opts.vMin).toBe("-100");
+        editor.destroy();
+    });
+
+    it("getAutoNumericOptions guards negative maxValue when building vMin", () => {
+        const initSpy = vi.spyOn(AutoNumeric, "init").mockImplementation(() => null);
+        const editor = new DecimalEditor({ allowNegatives: true, maxValue: "-100" } as any);
+        const opts = initSpy.mock.calls[0][1];
+        expect(opts.vMin).toBe("-100");
+        editor.destroy();
+    });
+
     it("destroy calls AutoNumeric.destroy", () => {
         const destroySpy = vi.spyOn(AutoNumeric, "destroy");
         const editor = createEditor();

@@ -35,7 +35,7 @@ export class DecimalEditor<P extends DecimalEditorOptions = DecimalEditorOptions
 
     protected getAutoNumericOptions(): AutoNumericOptions {
         var numericOptions: AutoNumericOptions = Object.assign({}, DecimalEditor.defaultAutoNumericOptions(), {
-            vMin: this.options.minValue ?? (this.options.allowNegatives ? (this.options.maxValue != null ? ("-" + this.options.maxValue) : '-999999999999.99') : '0.00'),
+            vMin: this.options.minValue ?? (this.options.allowNegatives ? (this.options.maxValue != null ? ("-" + Math.abs(this.options.maxValue)) : '-999999999999.99') : '0.00'),
             vMax: this.options.maxValue ?? '999999999999.99'
         });
 
