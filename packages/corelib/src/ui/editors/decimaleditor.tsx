@@ -1,7 +1,18 @@
-﻿import { Culture, formatNumber, nsSerenity, parseDecimal } from "../../base";
+import { Culture, formatNumber, nsSerenity, parseDecimal } from "../../base";
 import { IDoubleValue } from "../../interfaces";
 import { AutoNumeric, AutoNumericOptions } from "./autonumeric";
 import { EditorProps, EditorWidget } from "./editorwidget";
+
+/**
+ * Returns the negative form of an AutoNumeric min/max value, preserving the
+ * string format (e.g. leading zeros and decimal places) instead of coercing
+ * through Math.abs, which would turn "0000.00" into 0 and lose the format.
+ */
+function toNegativeValue(value: string | number): string {
+    if (typeof value === 'string')
+        return value.startsWith('-') ? value : '-' + value;
+    return '-' + Math.abs(value);
+}
 
 export interface DecimalEditorOptions {
     minValue?: string;
@@ -35,7 +46,7 @@ export class DecimalEditor<P extends DecimalEditorOptions = DecimalEditorOptions
 
     protected getAutoNumericOptions(): AutoNumericOptions {
         var numericOptions: AutoNumericOptions = Object.assign({}, DecimalEditor.defaultAutoNumericOptions(), {
-            vMin: this.options.minValue ?? (this.options.allowNegatives ? (this.options.maxValue != null ? ("-" + Math.abs(this.options.maxValue)) : '-999999999999.99') : '0.00'),
+            vMin: this.options.minValue ?? (this.options.allowNegatives ? (this.options.maxValue != null ? toNegativeValue(this.options.maxValue) : '-999999999999.99') : '0.00'),
             vMax: this.options.maxValue ?? '999999999999.99'
         });
 
