@@ -348,7 +348,7 @@ export class Uploader {
         if (!batch || !batch.formData)
             return;
 
-        request = Object.assign({}, Uploader.requestDefaults);
+        request = Object.assign({}, Uploader.requestDefaults, request);
         if (request.url === void 0)
             request.url = resolveUrl("~/File/TemporaryUpload");
 
