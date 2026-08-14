@@ -50,6 +50,8 @@ export type Type = Function | Object;
  * @returns Value of the property or null if not found
  */
 export function getNested(from: any, name: string) {
+    if (from == null || name == null)
+        return null;
     const a = name.split('.');
     for (let i = 0; i < a.length; i++) {
         from = from[a[i]];
@@ -112,7 +114,7 @@ export function getTypeShortName(type: Type): string {
  */
 export function getInstanceType(instance: any): any {
     if (instance == null)
-        throw "Can't get instance type of null or undefined!";
+        throw new Error("Can't get instance type of null or undefined!");
 
     // Have to catch as constructor cannot be looked up on native COM objects
     try {
@@ -259,10 +261,10 @@ export class EnumKeyAttribute extends CustomAttribute {
  */
 export function registerEnum(enumType: any, name: string, enumKey?: string) {
     if (typeof enumType !== "object" || enumType == null)
-        throw "Enum type is required in registerEnum!";
+        throw new Error("Enum type is required in registerEnum!");
 
     if (name && name.endsWith("."))
-        throw "Enum name cannot end with a dot in registerEnum!";
+        throw new Error("Enum name cannot end with a dot in registerEnum!");
 
     internalRegisterType(enumType, name, undefined, "enum");
     if (enumKey && enumKey != name) {
@@ -614,15 +616,15 @@ export function interfaceTypeInfo<TypeName>(typeName: StringLiteral<TypeName>, i
 
 export function registerType(type: { [Symbol.typeInfo]: TypeInfo<any>, name: string }) {
     if (!type)
-        throw "registerType is called with null target!";
+        throw new Error("registerType is called with null target!");
 
     // peekTypeInfo should auto handle registration
     let typeInfo: TypeInfo<any> = peekTypeInfo(type);
     if (!typeInfo)
-        throw `registerType is called on type "${type.name}" that does not have a static [Symbol.typeInfo] property!`;
+        throw new Error(`registerType is called on type "${type.name}" that does not have a static [Symbol.typeInfo] property!`);
 
     if (!typeInfo.typeName)
-        throw `registerType is called on type "${type.name}", but it's typeInfo property does not have a typeName!`;
+        throw new Error(`registerType is called on type "${type.name}", but it's typeInfo property does not have a typeName!`);
 }
 
 export interface TransformInclude { }
