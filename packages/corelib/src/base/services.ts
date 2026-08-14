@@ -122,7 +122,7 @@ function serviceFetch<TResponse extends ServiceResponse>(options: ServiceOptions
 
                 let fetchResponse: Response;
                 try {
-                    fetchResponse = fetchResponse = await fetch(url, fetchInit);
+                    fetchResponse = await fetch(url, fetchInit);
                 }
                 catch (ex) {
                     if (ex.name === "AbortError") {
@@ -145,7 +145,7 @@ function serviceFetch<TResponse extends ServiceResponse>(options: ServiceOptions
                         "empty-response", { fetchResponse, url }));
 
                 if (response.Error) {
-                    handleError(response ?? {}, { status: fetchResponse.status, statusText: fetchResponse.statusText }, options);
+                    handleError(response, { status: fetchResponse.status, statusText: fetchResponse.statusText }, options);
                     return Promise.reject(reason(`Service fetch to '${url}' resulted in error: ${response.Error.Message ?? response.Error.Code}!`,
                         "service-error", { response, fetchResponse, url }));
                 }
@@ -296,7 +296,7 @@ function handleRedirect(getHeader: (key: string) => string): boolean {
 
 async function handleFetchError(response: Response, options: ServiceOptions<any>): Promise<void> {
 
-    if (response.status === 403 && options.allowRedirect && handleRedirect(response.headers.get))
+    if (response.status === 403 && options.allowRedirect && handleRedirect(response.headers.get.bind(response.headers)))
         return;
 
     if ((response.headers.get('content-type') || '').toLowerCase().indexOf('json') >= 0) {
@@ -318,7 +318,7 @@ async function handleFetchError(response: Response, options: ServiceOptions<any>
 }
 
 function handleXHRError(xhr: XMLHttpRequest, options: ServiceOptions<any>) {
-    if (xhr.status === 403 && options.allowRedirect && handleRedirect(xhr.getResponseHeader))
+    if (xhr.status === 403 && options.allowRedirect && handleRedirect(xhr.getResponseHeader.bind(xhr)))
         return;
 
     if ((xhr.getResponseHeader('content-type') || '')
