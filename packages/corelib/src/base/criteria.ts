@@ -614,7 +614,7 @@ function shuntingYard(tokens: Token[]): Token[] {
 
         if (tok.t == TOKEN_OPERATOR &&
             (tok.v === '(' || tok.v === ')'))
-            throw "Mismatched parentheses in criteria expression!";
+            throw new Error("Mismatched parentheses in criteria expression!");
 
         result.push(tok);
     }
