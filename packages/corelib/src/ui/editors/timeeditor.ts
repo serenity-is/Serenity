@@ -115,7 +115,7 @@ export class TimeEditor<P extends TimeEditorOptions = TimeEditorOptions> extends
         if (hour == null || minute == null) {
             return null;
         }
-        return (hour * 60 + minute) * (this.options.multiplier || 1);;
+        return (hour * 60 + minute) * (this.options.multiplier || 1);
     }
 
     protected get_value(): number {
