@@ -10,7 +10,7 @@ export function dateInputChangeHandler(e: Event) {
         return;
 
     var val = input.value ?? '';
-    if (val.length >= 6 && val.length <= 8 && /^[0-9]*$/g.test(val)) {
+    if (val.length >= 6 && val.length <= 8 && /^[0-9]*$/.test(val)) {
         input.value = val.substring(0, 2) + Culture.dateSeparator + val.substring(2, 4) + Culture.dateSeparator + val.substring(4);
     }
 
@@ -198,7 +198,7 @@ export function jQueryDatepickerZIndexWorkaround(input: HTMLInputElement) {
     if (!dialog)
         return;
     var dialogIndex = parseInt(getComputedStyle(dialog).zIndex, 10);
-    if (dialogIndex == null || isNaN(dialogIndex))
+    if (isNaN(dialogIndex))
         return;
     setTimeout(() => {
         let widget = $(input).datepicker('widget');
