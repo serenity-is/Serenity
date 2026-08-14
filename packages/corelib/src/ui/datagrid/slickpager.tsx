@@ -16,12 +16,12 @@ export class SlickPager<P extends PagerOptions = PagerOptions> extends Widget<P>
         let opt = this.options;
         opt.showRowsPerPage ??= true;
         opt.rowsPerPageOptions ??= [20, 100, 500, 2000];
-        var v = opt.view; if (!v) throw "SlickPager requires view option to be set!";
+        var v = opt.view; if (!v) throw new Error("SlickPager requires view option to be set!");
 
         const p = "slick-pg-";
         const Group = ({ id, children }: { id: string, children: any }) => <div class={`${p}grp ${p}grp-${id}`}>{children}</div> as HTMLDivElement;
         const Button = ({ id, onClick }: { id: string, onClick?: (e: MouseEvent) => void }) => <div class={`${p}${id} ${p}btn`} onClick={onClick}><span class={`${p}btn-span`}></span></div> as HTMLDivElement;
-        const NavButton = ({ id, onClick }: { id: string, onClick?: (e: MouseEvent) => void }) => { const b = Button({ id, onClick }); Fluent.on(b, "click", () => this._changePage(id)); return b; }
+        const NavButton = ({ id }: { id: string }) => { const b = Button({ id }); Fluent.on(b, "click", () => this._changePage(id)); return b; }
 
         this.element.addClass("s-SlickPager slick-pg").append(
             <div class={p + "in"}>
@@ -99,7 +99,7 @@ export class SlickPager<P extends PagerOptions = PagerOptions> extends Widget<P>
                 break;
         }
 
-        if (newp == info.page)
+        if (newp == null || newp == info.page)
             return false;
 
         if (this.options.onChangePage)

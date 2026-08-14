@@ -171,6 +171,34 @@ describe("SlickPager", () => {
             pager.destroy();
         });
 
+        it("does nothing when navigating prev on the first page", () => {
+            const view = createMockView();
+            view.pagingInfo.page = 1;
+            const pager = createPager(view);
+            expect(pager._changePage("prev")).toBe(false);
+            expect(view.setPagingOptions).not.toHaveBeenCalled();
+            pager.destroy();
+        });
+
+        it("does nothing when navigating next on the last page", () => {
+            const view = createMockView();
+            view.pagingInfo.page = 5;
+            const pager = createPager(view);
+            expect(pager._changePage("next")).toBe(false);
+            expect(view.setPagingOptions).not.toHaveBeenCalled();
+            pager.destroy();
+        });
+
+        it("does not call onChangePage when navigating prev on the first page", () => {
+            const view = createMockView();
+            view.pagingInfo.page = 1;
+            const onChangePage = vi.fn();
+            const pager = createPager(view, { onChangePage });
+            pager._changePage("prev");
+            expect(onChangePage).not.toHaveBeenCalled();
+            pager.destroy();
+        });
+
         it("calls onChangePage option instead of setPagingOptions", () => {
             const view = createMockView();
             view.pagingInfo.page = 2;
