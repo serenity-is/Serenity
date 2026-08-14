@@ -106,6 +106,14 @@ describe("deepClone", () => {
         expect(cloned).not.toBe(original);
     });
 
+    it('clones regex preserving the dotAll flag', function () {
+        const original = /test/s;
+        const cloned = deepClone(original);
+        expect(cloned.source).toBe(original.source);
+        expect(cloned.flags).toBe("s");
+        expect(cloned.dotAll).toBe(true);
+    });
+
     it('clones sets', function () {
         const original = new Set([1, 2, 3]);
         const cloned = deepClone(original);

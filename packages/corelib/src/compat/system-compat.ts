@@ -60,8 +60,8 @@ export function deepClone<T = any>(a: T): T {
 }
 
 function getRegExpFlags(regExp: RegExp) {
-    if (typeof (regExp.source as any).flags == 'string') {
-        return (regExp.source as any).flags;
+    if (typeof (regExp as any).flags == 'string') {
+        return (regExp as any).flags;
     } else {
         const flags = [];
         regExp.global && flags.push('g');
@@ -69,6 +69,7 @@ function getRegExpFlags(regExp: RegExp) {
         regExp.multiline && flags.push('m');
         regExp.sticky && flags.push('y');
         regExp.unicode && flags.push('u');
+        regExp.dotAll && flags.push('s');
         return flags.join('');
     }
 }
