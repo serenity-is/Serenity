@@ -20,7 +20,7 @@ export class GridRowSelectionMixin {
 
     constructor(grid: IDataGrid, options?: GridRowSelectionMixinOptions) {
 
-        this.include = {};
+        this.include = Object.create(null);
         this.grid = grid;
         this.idField = grid.getView().getIdPropertyName();
         this.options = options || {};
@@ -31,7 +31,7 @@ export class GridRowSelectionMixin {
     }
 
     destroy(): void {
-        this.include = {};
+        this.include = Object.create(null);
         this.grid?.getGrid()?.onClick?.unsubscribe(this.handleGridClick);
         this.grid?.getGrid()?.onHeaderClick?.unsubscribe(this.handleHeaderClick);
         (this.grid?.getView() as IRemoteView).onRowsChanged?.unsubscribe(this.updateSelectAll);
@@ -106,7 +106,7 @@ export class GridRowSelectionMixin {
     }
 
     resetCheckedAndRefresh(): void {
-        this.include = {};
+        this.include = Object.create(null);
         this.updateSelectAll();
         this.grid.getView().populate();
     }

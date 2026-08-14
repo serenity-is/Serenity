@@ -107,6 +107,20 @@ describe("GridRowSelectionMixin", () => {
             expect(e.preventDefault).not.toHaveBeenCalled();
             expect(gridObj.updateRow).not.toHaveBeenCalled();
         });
+
+        it("treats prototype property names as ordinary keys", () => {
+            viewObj.getItem = vi.fn(() => ({ id: "constructor" }));
+            viewObj.getLength = vi.fn(() => 1);
+            const mixin = new GridRowSelectionMixin(mockGrid);
+
+            const e = {
+                target: { classList: { contains: (c: string) => c === 'select-item' } },
+                preventDefault: vi.fn()
+            } as any;
+            onClickHandler(e, { row: 0 });
+
+            expect((mixin as any).include["constructor"]).toBe(true);
+        });
     });
 
     describe("handleHeaderClick (onHeaderClick handler)", () => {
@@ -333,6 +347,15 @@ describe("GridRowSelectionMixin", () => {
             const getMixin = vi.fn(() => mixin);
             const column = GridRowSelectionMixin.createSelectColumn(getMixin);
             const result = column.format({ item: { id: 2 } } as any);
+            expect(result).toBeTruthy();
+            expect((result as any).classList.contains('checked')).toBe(false);
+        });
+
+        it("format does not treat prototype property names as checked", () => {
+            const mixin = new GridRowSelectionMixin(mockGrid);
+            const getMixin = vi.fn(() => mixin);
+            const column = GridRowSelectionMixin.createSelectColumn(getMixin);
+            const result = column.format({ item: { id: "constructor" } } as any);
             expect(result).toBeTruthy();
             expect((result as any).classList.contains('checked')).toBe(false);
         });
