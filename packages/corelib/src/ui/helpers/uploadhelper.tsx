@@ -13,6 +13,8 @@ export namespace UploadHelper {
         uploader: Uploader
     } {
         let container = isArrayLike(options.container) ? options.container[0] : options.container;
+        if (!container)
+            throw new Error("UploadHelper.createUploadInput: container is required!");
         let progress = Fluent(isArrayLike(options.progress) ? options.progress[0] : options.progress);
         const button = container.closest(".tool-button") ?? container.closest("button") ?? container;
         button.classList.add("fileinput-button");
