@@ -15,7 +15,7 @@ function applyJQueryUIFixes($: any): boolean {
 
     (function (orig) {
         $.ui.dialog.prototype._focusTabbable = function () {
-            if (isMobileView) {
+            if (isMobileView()) {
                 this.uiDialog && this.uiDialog.focus();
                 return;
             }

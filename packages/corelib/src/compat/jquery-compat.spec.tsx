@@ -1,4 +1,10 @@
-﻿import { jQueryPatch } from "./jquery-compat";
+﻿import { isMobileView } from "./layout";
+import { jQueryPatch } from "./jquery-compat";
+
+vi.mock("./layout", async (importOriginal) => {
+    const actual: any = await importOriginal();
+    return { ...actual, isMobileView: vi.fn(() => false) };
+});
 
 afterEach(() => {
     delete (window as any).jQuery;
@@ -67,12 +73,13 @@ describe("jQuery UI Fixes", () => {
         expect(allowInteraction({ target: (<div id="support-modal"><div></div></div>).firstChild })).toBe(true);
     });
 
-    it("should override _focusTabbable method in jQuery UI dialog prototype", () => {
+    it("should focus the dialog container on mobile and delegate to original on desktop in _focusTabbable", () => {
         const jQuery = (window as any).jQuery = vi.fn();
+        const origFocusTabbable = vi.fn();
         const ui = (jQuery as any).ui = {
             dialog: {
                 prototype: {
-                    _focusTabbable: vi.fn()
+                    _focusTabbable: origFocusTabbable
                 }
             }
         };
@@ -81,9 +88,21 @@ describe("jQuery UI Fixes", () => {
 
         expect(ui.dialog.prototype._focusTabbable).toBeDefined();
         const focusTabbable = ui.dialog.prototype._focusTabbable;
-        const origMock = vi.fn();
-        focusTabbable.call({ uiDialog: { focus: origMock } });
-        expect(origMock).toHaveBeenCalled();
+        const focusMock = vi.fn();
+        const ctx = { uiDialog: { focus: focusMock } };
+
+        // desktop: delegate to the original implementation
+        (isMobileView as any).mockReturnValue(false);
+        focusTabbable.call(ctx);
+        expect(origFocusTabbable).toHaveBeenCalledTimes(1);
+        expect(focusMock).not.toHaveBeenCalled();
+
+        // mobile: focus the dialog container instead
+        (isMobileView as any).mockReturnValue(true);
+        origFocusTabbable.mockClear();
+        focusTabbable.call(ctx);
+        expect(focusMock).toHaveBeenCalledTimes(1);
+        expect(origFocusTabbable).not.toHaveBeenCalled();
     });
 
     it("should override _createTitlebar method in jQuery UI dialog prototype", () => {
