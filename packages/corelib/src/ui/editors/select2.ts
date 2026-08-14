@@ -949,20 +949,6 @@ abstract class AbstractSelect2 {
 
         syncCssClasses(this.container, this.opts.element, this.opts.adaptContainerCssClass);
 
-// Copy safe computed styles to avoid CSP issues with inline styles
-const computedStyle = getComputedStyle(opts.element);
-const safeProperties = [
-    'width', 'height', 'min-width', 'min-height', 'max-width', 'max-height',
-    'margin', 'margin-top', 'margin-right', 'margin-bottom', 'margin-left',
-    'padding', 'padding-top', 'padding-right', 'padding-bottom', 'padding-left',
-    'border', 'border-width', 'border-style', 'border-color',
-    'border-top', 'border-right', 'border-bottom', 'border-left',
-    'border-top-width', 'border-right-width', 'border-bottom-width', 'border-left-width',
-    'border-top-style', 'border-right-style', 'border-bottom-style', 'border-left-style',
-    'border-top-color', 'border-right-color', 'border-bottom-color', 'border-left-color',
-    'box-sizing', 'display', 'position', 'float', 'clear'
-];
-
         copyStyle(this.container.style, this.opts.element.style);
         Object.assign(this.container.style, evaluate(opts.containerCss, this.opts.element));
         Fluent.addClass(this.container, evaluate(opts.containerCssClass, this.opts.element));
@@ -1190,7 +1176,7 @@ const safeProperties = [
             // these options are not allowed when attached to a select because they are picked up off the element itself
             ["id", "multiple", "ajax", "query", "createSearchChoice", "initSelection", "data", "tags"].forEach(function (opt) {
                 if (opt in opts && ((opts as any)[opt] != null)) {
-                    throw new Error("Option '" + this + "' is not allowed for Select2 when attached to a <select> element.");
+                    throw new Error("Option '" + opt + "' is not allowed for Select2 when attached to a <select> element.");
                 }
             });
         }
@@ -1268,7 +1254,7 @@ const safeProperties = [
 
         if (opts.element.dataset.select2Tags) {
             if ("tags" in opts) {
-                throw "tags specified as both an attribute 'data-select2-tags' and in options of Select2 " + opts.element.getAttribute("id");
+                throw new Error("tags specified as both an attribute 'data-select2-tags' and in options of Select2 " + opts.element.getAttribute("id"));
             }
             opts.tags = JSON.parse(opts.element.dataset.select2Tags);
         }
@@ -1344,7 +1330,7 @@ const safeProperties = [
             }
         }
         if (typeof (opts.query) !== "function") {
-            throw "query function not defined for Select2 " + opts.element.getAttribute("id");
+            throw new Error("query function not defined for Select2 " + opts.element.getAttribute("id"));
         }
 
         if (opts.createSearchChoicePosition === 'top') {
@@ -1354,7 +1340,7 @@ const safeProperties = [
             opts.createSearchChoicePosition = function (list, item) { list.push(item); };
         }
         else if (typeof (opts.createSearchChoicePosition) !== "function") {
-            throw "invalid createSearchChoicePosition option must be 'top', 'bottom' or a custom function";
+            throw new Error("invalid createSearchChoicePosition option must be 'top', 'bottom' or a custom function");
         }
 
         return opts;
@@ -2765,8 +2751,7 @@ class SingleSelect2 extends AbstractSelect2 {
     }
 
     override val(val?: string, triggerChange?: boolean): string {
-        var triggerChange = false,
-            data = null,
+        var data = null,
             self = this,
             oldData = this.data();
 
@@ -3364,10 +3349,10 @@ class MultiSelect2 extends AbstractSelect2 {
         var val = this.getVal(),
             data,
             index;
-        selected = selected.closest(".select2-search-choice");
+        selected = selected?.closest(".select2-search-choice") as HTMLElement;
 
         if (!selected) {
-            throw "Invalid argument: " + selected + ". Must be .select2-search-choice";
+            throw new Error("Invalid argument: must be .select2-search-choice");
         }
 
         data = (selected as any).select2data;
