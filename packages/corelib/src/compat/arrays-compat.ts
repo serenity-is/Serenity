@@ -34,7 +34,7 @@ export function first<TItem>(array: TItem[], predicate: (x: TItem) => boolean): 
         if (predicate(x))
             return x;
 
-    throw new Error("first:No element satisfies the condition.!");
+    throw new Error("first:No element satisfies the condition.");
 }
 
 /**
@@ -177,7 +177,7 @@ export type Grouping<TItem> = { [key: string]: TItem[] };
  * toGrouping([1, 2, 3], x => x % 2 == 0 ? "even" : "odd"); // { odd: [1, 3], even: [2] }
  */
 export function toGrouping<TItem>(items: TItem[], getKey: (x: TItem) => any): Grouping<TItem> {
-    let lookup: Grouping<TItem> = {};
+    let lookup: Grouping<TItem> = Object.create(null) as Grouping<TItem>;
     for (let x of items) {
         let key = getKey(x) ?? "";
         let d = lookup[key];
@@ -192,7 +192,7 @@ export function toGrouping<TItem>(items: TItem[], getKey: (x: TItem) => any): Gr
 
 /**
  * Gets first element in an array that matches given predicate (similar to LINQ's FirstOrDefault).
- * Returns null if no match is found.
+ * Returns undefined if no match is found.
  * @param array Array to test.
  * @param predicate Predicate to test elements.
  * @returns First element that matches.

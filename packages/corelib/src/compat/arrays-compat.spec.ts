@@ -241,24 +241,31 @@ describe("single", () => {
 
 describe("toGrouping", () => {
     it('returns empty object for empty array', () => {
-        expect(toGrouping([], x => x)).toStrictEqual({})
+        expect(toGrouping([], x => x)).toEqual({})
     });
 
     it('uses empty string if key selector returns null or undefined', () => {
-        expect(toGrouping([1], x => null)).toStrictEqual({
+        expect(toGrouping([1], x => null)).toEqual({
             "": [1]
         });
 
-        expect(toGrouping([1], x => undefined)).toStrictEqual({
+        expect(toGrouping([1], x => undefined)).toEqual({
             "": [1]
         });
     });
 
     it('returns object with keys returned by key selector, and values as an array of matching items', () => {
-        expect(toGrouping([1, 2, 3, 4, 5], x => x % 2)).toStrictEqual({
+        expect(toGrouping([1, 2, 3, 4, 5], x => x % 2)).toEqual({
             "0": [2, 4],
             "1": [1, 3, 5],
         })
+    });
+
+    it('handles keys that collide with Object.prototype names', () => {
+        expect(toGrouping([1, 2, 3], x => x === 1 ? "constructor" : "other")).toEqual({
+            "constructor": [1],
+            "other": [2, 3],
+        });
     });
 });
 
