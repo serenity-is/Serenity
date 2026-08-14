@@ -201,7 +201,7 @@ describe("ImageUploadEditor", () => {
     it("defaults allowNonImage to false and adds its class", () => {
         const editor = new ImageUploadEditor({ element: el => document.body.appendChild(el) } as any);
         expect(editor["options"]?.allowNonImage).toBe(false);
-        expect(editor.domNode.classList.contains("s-ImageUploadEditor'")).toBe(true);
+        expect(editor.domNode.classList.contains("s-ImageUploadEditor")).toBe(true);
         editor.destroy();
     });
 });
@@ -341,7 +341,7 @@ describe("MultipleImageUploadEditor", () => {
 
     it("adds the multiple-image class", () => {
         const editor = new MultipleImageUploadEditor({ element: el => document.body.appendChild(el) } as any);
-        expect(editor.domNode.classList.contains("s-MultipleImageUploadEditor'")).toBe(true);
+        expect(editor.domNode.classList.contains("s-MultipleImageUploadEditor")).toBe(true);
         editor.destroy();
     });
 });

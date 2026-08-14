@@ -204,12 +204,7 @@ export class FileUploadEditor<P extends FileUploadEditorOptions = FileUploadEdit
             value = null;
 
         if (value != null) {
-            if (value.Filename == null) {
-                this.entity = null;
-            }
-            else {
-                this.entity = Object.assign(Object.create(null), value);
-            }
+            this.entity = Object.assign(Object.create(null), value);
         }
         else {
             this.entity = null;
@@ -267,7 +262,7 @@ export class ImageUploadEditor<P extends ImageUploadEditorOptions = ImageUploadE
 
         this.options.allowNonImage = this.getDefaultAllowNonImage();
 
-        this.domNode.classList.add("s-ImageUploadEditor'")
+        this.domNode.classList.add("s-ImageUploadEditor")
     }
     protected override getDefaultAllowNonImage(): boolean {
         return false;
@@ -471,6 +466,6 @@ export class MultipleImageUploadEditor<P extends ImageUploadEditorOptions = Imag
 
     constructor(props: EditorProps<P>) {
         super(props);
-        this.domNode.classList.add("s-MultipleImageUploadEditor'")
+        this.domNode.classList.add("s-MultipleImageUploadEditor")
     }
 }
