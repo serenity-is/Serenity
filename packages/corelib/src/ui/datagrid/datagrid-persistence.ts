@@ -156,7 +156,7 @@ export function getCurrentSettings(this: void, opt: {
                 return;
             }
 
-            const widget = tryGetWidget<Widget>('#' + opt.uniqueName + '_QuickFilter_' + field);
+            const widget = tryGetWidget<Widget>('#' + cssEscape(opt.uniqueName + '_QuickFilter_' + field));
             if (!widget)
                 return;
 

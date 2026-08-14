@@ -1,5 +1,5 @@
 ﻿import type { Column, ISleekGrid } from "@serenity-is/sleekgrid";
-import { Fluent } from "../../base";
+import { cssEscape, Fluent } from "../../base";
 import type { FilterLine } from "../filtering/filterline";
 import type { FilterStore } from "../filtering/filterstore";
 import { tryGetWidget } from "../widgets/widgetutils";
@@ -245,6 +245,33 @@ describe("getCurrentSettings", () => {
         });
 
         expect(settings.quickFilters).toEqual({ field1: "filter value" });
+    });
+
+    it("escapes field name when looking up quick filter widget", () => {
+        const quickFiltersDiv = document.createElement("div");
+        const filterItem = document.createElement("div");
+        filterItem.className = "quick-filter-item";
+        filterItem.setAttribute("data-qffield", "field:1");
+        const label = document.createElement("div");
+        label.className = "quick-filter-label";
+        label.textContent = "Field";
+        filterItem.appendChild(label);
+        quickFiltersDiv.appendChild(filterItem);
+
+        vi.mocked(tryGetWidget).mockReturnValue({} as any);
+
+        const grid = mockSleekGrid();
+        getCurrentSettings({
+            filterStore: null,
+            flags: { ...omitAllGridPersistenceFlags, quickFilters: true },
+            includeDeletedToggle: document.createElement("div"),
+            quickFiltersDiv: quickFiltersDiv,
+            sleekGrid: grid,
+            toolbarNode: null,
+            uniqueName: "TestGrid"
+        });
+
+        expect(cssEscape).toHaveBeenCalledWith('TestGrid_QuickFilter_field:1');
     });
 
     it("captures include deleted when flag is true", () => {
