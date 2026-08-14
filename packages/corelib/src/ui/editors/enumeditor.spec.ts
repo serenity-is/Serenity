@@ -1,4 +1,5 @@
-import { describe, it, expect } from "vitest";
+import { describe, it, expect, vi } from "vitest";
+import { EnumTypeRegistry } from "../../types/enumtyperegistry";
 import { EnumEditor } from "./enumeditor";
 
 enum TestEnum {
@@ -26,5 +27,17 @@ describe("EnumEditor", () => {
         const editor = new EnumEditor({ enumType: TestEnum, allowClear: false } as any);
         expect((editor as any).allowClear()).toBe(false);
         editor.destroy();
+    });
+
+    it("does not throw when the enum type cannot be resolved", () => {
+        const getOrLoad = vi.spyOn(EnumTypeRegistry, "getOrLoad").mockReturnValue(undefined as any);
+        try {
+            const editor = new EnumEditor({} as any);
+            expect(editor["_items"]).toEqual([]);
+            editor.destroy();
+        }
+        finally {
+            getOrLoad.mockRestore();
+        }
     });
 });

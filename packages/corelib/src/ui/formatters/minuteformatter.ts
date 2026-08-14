@@ -10,12 +10,12 @@ export class MinuteFormatter implements Formatter {
     }
 
     static format(value: number): string {
+        if (value == null || (value as any) === '' || !isFinite(value))
+            return '';
+
         var hour = Math.floor(value / 60);
         var minute = value - hour * 60;
         var hourStr, minuteStr;
-
-        if (value == null || isNaN(value))
-            return '';
 
         if (hour < 10)
             hourStr = '0' + hour;

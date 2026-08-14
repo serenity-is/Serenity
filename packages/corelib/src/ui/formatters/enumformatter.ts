@@ -14,8 +14,8 @@ export class EnumFormatter implements Formatter {
         var enumType = EnumTypeRegistry.getOrLoad(this.enumKey);
         if (isPromiseLike(enumType)) {
             const node = document.createElement("span");
-            enumType.then(() => {
-                const text = new Text(EnumFormatter.format(enumType, ctx.value));
+            enumType.then(resolved => {
+                const text = new Text(EnumFormatter.format(resolved, ctx.value));
                 node.parentElement && node.replaceWith(text);
             });
             return node;

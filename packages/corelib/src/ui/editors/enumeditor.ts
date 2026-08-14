@@ -24,6 +24,9 @@ export class EnumEditor<P extends EnumEditorOptions = EnumEditorOptions> extends
         var enumType = this.options.enumType || EnumTypeRegistry.getOrLoad(this.options.enumKey);
 
         const then = (enumType: any) => {
+            if (enumType == null)
+                return;
+
             var enumKey = this.options.enumKey;
 
             if (enumKey == null && enumType != null) {
@@ -34,7 +37,7 @@ export class EnumEditor<P extends EnumEditorOptions = EnumEditorOptions> extends
             var values = Enum.getValues(enumType);
             for (var x of values) {
                 var name = Enum.toString(enumType, x);
-                this.addOption(parseInt(x as any, 10).toString(),
+                this.addOption(String(x),
                     localText("Enums." + enumKey + "." + name, name), null, false);
             }
         }

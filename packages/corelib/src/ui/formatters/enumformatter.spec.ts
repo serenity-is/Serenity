@@ -74,7 +74,7 @@ describe("EnumFormatter", () => {
         await Promise.resolve();
         expect(node.parentElement).toBeNull();
         expect(container.firstChild?.nodeType).toBe(Node.TEXT_NODE);
-        expect(container.textContent.length).toBeGreaterThan(0);
+        expect(container.textContent).toBe("Enums.AsyncEnum.Value1");
         getOrLoad.mockRestore();
     });
 

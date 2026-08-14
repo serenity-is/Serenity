@@ -17,4 +17,12 @@ describe("MinuteFormatter", () => {
         expect(formatter.format(ctx({ value: 680 }))).toBe("11:20");
         expect(formatter.format(ctx({ value: 1360 }))).toBe("22:40");
     })
+
+    it("returns empty for empty or non-finite values", () => {
+        var formatter = new MinuteFormatter();
+        expect(formatter.format(ctx({ value: "" as any }))).toBe("");
+        expect(formatter.format(ctx({ value: undefined as any }))).toBe("");
+        expect(formatter.format(ctx({ value: Infinity as any }))).toBe("");
+        expect(formatter.format(ctx({ value: -Infinity as any }))).toBe("");
+    })
 })

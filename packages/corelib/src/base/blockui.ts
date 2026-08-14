@@ -1,4 +1,5 @@
 ﻿let blockUICount: number = 0;
+let pendingBlockTimer: any = null;
 
 /**
  * Tries to block the page
@@ -6,6 +7,7 @@
 export function blockUI(options?: { zIndex?: number, useTimeout?: boolean }) {
 
     function block() {
+        pendingBlockTimer = null;
         if (blockUICount++ > 0 ||
             typeof document === "undefined")
             return;
@@ -28,13 +30,24 @@ export function blockUI(options?: { zIndex?: number, useTimeout?: boolean }) {
         document.body.appendChild(div);
     }
 
-    (options?.useTimeout && (window.setTimeout(block, 0))) || block();
+    if (options?.useTimeout) {
+        if (pendingBlockTimer != null)
+            clearTimeout(pendingBlockTimer);
+        pendingBlockTimer = window.setTimeout(block, 0);
+    }
+    else {
+        block();
+    }
 }
 
 /**
  * Unblocks the page. 
  */
 export function blockUndo() {
+    if (pendingBlockTimer != null) {
+        clearTimeout(pendingBlockTimer);
+        pendingBlockTimer = null;
+    }
     if (blockUICount < 1)
         return;
     if (--blockUICount === 0 && typeof document !== "undefined")

@@ -92,4 +92,21 @@ describe("blockUI", () => {
         expect(div).toBe(null);
     });
 
+    it("does not create an orphan overlay when undone before the timeout fires", () => {
+        const oldTimeout = window.setTimeout;
+        window.setTimeout = function () {
+            return 1;
+        } as any;
+        try {
+            blockUI({ useTimeout: true });
+            blockUndo();
+            expect(document.querySelector("div.blockUI.blockOverlay")).toBeNull();
+        }
+        finally {
+            window.setTimeout = oldTimeout;
+            blockUndo();
+        }
+        expect(document.querySelector("div.blockUI.blockOverlay")).toBeNull();
+    });
+
 });
