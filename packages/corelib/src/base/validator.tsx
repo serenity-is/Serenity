@@ -556,7 +556,7 @@ export class Validator {
 
     constructor(form: HTMLFormElement, options: ValidatorOptions) {
         if (validatorMap.get(form))
-            throw "Form already has a Validator instance!";
+            throw new Error("Form already has a Validator instance!");
 
         validatorMap.set(form, this);
         form.setAttribute("novalidate", "novalidate");
@@ -864,7 +864,7 @@ export class Validator {
         let param: any;
         // Make sure required is at front
         if (data.required) {
-            let param = data.required;
+            param = data.required;
             delete data.required;
             data = Object.assign({ required: param }, data);
         }
@@ -1579,7 +1579,7 @@ export class Validator {
     }
 
     static dataRules(element: ValidatableElement) {
-        const rules = {},
+        const rules = Object.create(null),
             type = element.getAttribute("type");
         let method, value;
 
