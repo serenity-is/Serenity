@@ -52,7 +52,7 @@ export namespace SlickFormatting {
             if (next != null) {
                 var nextIndent = next._indent ?? 0;
                 if (nextIndent > indent) {
-                    if (!!!!(ctx.item as any)._collapsed) {
+                    if (!!(ctx.item as any)._collapsed) {
                         toggle.classList.add("s-TreeExpand");
                     }
                     else {
