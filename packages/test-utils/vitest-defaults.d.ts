@@ -1,5 +1,7 @@
 declare global {
-    var __dirname: string;
+    interface ImportMeta {
+        dirname: string;
+    }
 }
 
 export default function vitestDefaults(opt?: {
