@@ -612,7 +612,7 @@ function dialogButtonToBS(x: DialogButton): HTMLButtonElement {
     let html = htmlEncode(x.text);
     let iconClass = iconClassName(x.icon);
     if (iconClass)
-        html = '<i class="' + htmlEncode(iconClass) + '"><i>' + (html ? (" " + html) : "");
+        html = '<i class="' + htmlEncode(iconClass) + '"></i>' + (html ? (" " + html) : "");
     let button = document.createElement("button");
     button.type = "button";
     button.classList.add("btn");
