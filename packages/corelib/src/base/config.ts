@@ -56,7 +56,7 @@ export function resetApplicationPath() {
     if (typeof document !== 'undefined') {
         const pathLink = document.querySelector('link#ApplicationPath') as HTMLLinkElement;
         if (pathLink != null) {
-            Config.applicationPath = pathLink.getAttribute('href');
+            Config.applicationPath = pathLink.getAttribute('href') ?? '/';
         }
     }
 }
