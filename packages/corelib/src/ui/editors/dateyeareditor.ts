@@ -22,26 +22,26 @@ export class DateYearEditor<P extends DateYearEditorOptions = DateYearEditorOpti
         var minYear = (new Date()).getFullYear();
         var maxYear = (new Date()).getFullYear();
 
-        opt.minYear = (opt.minYear ?? '-10').toString();
-        if (opt.minYear.startsWith('-')) {
-            minYear -= parseInt(opt.minYear.substring(1), 10);
+        var minYearText = (opt.minYear ?? '-10').toString();
+        if (minYearText.startsWith('-')) {
+            minYear -= parseInt(minYearText.substring(1), 10);
         }
-        else if (opt.minYear.startsWith('+')) {
-            minYear += parseInt(opt.minYear.substring(1), 10);
+        else if (minYearText.startsWith('+')) {
+            minYear += parseInt(minYearText.substring(1), 10);
         }
         else {
-            minYear = parseInt(opt.minYear, 10);
+            minYear = parseInt(minYearText, 10);
         }
 
-        opt.maxYear = (opt.maxYear ?? '+10').toString();
-        if (opt.maxYear.startsWith('-')) {
-            maxYear -= parseInt(opt.maxYear.substring(1), 10);
+        var maxYearText = (opt.maxYear ?? '+10').toString();
+        if (maxYearText.startsWith('-')) {
+            maxYear -= parseInt(maxYearText.substring(1), 10);
         }
-        else if (opt.maxYear.startsWith('+')) {
-            maxYear += parseInt(opt.maxYear.substring(1), 10);
+        else if (maxYearText.startsWith('+')) {
+            maxYear += parseInt(maxYearText.substring(1), 10);
         }
         else {
-            maxYear = parseInt(opt.maxYear, 10);
+            maxYear = parseInt(maxYearText, 10);
         }
 
         if (opt.descending) {
