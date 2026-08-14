@@ -182,8 +182,13 @@ export function parseQueryString(s?: string): Record<string, string> {
         if (!part.length)
             continue;
         let pair = parts[i].split('=');
-        let name = decodeURIComponent(pair[0]);
-        result[name] = (pair.length >= 2 ? decodeURIComponent(pair[1]) : name);
+        try {
+            let name = decodeURIComponent(pair[0]);
+            result[name] = pair.length >= 2 ? decodeURIComponent(pair[1]) : name;
+        }
+        catch {
+            // ignore malformed percent-encoding
+        }
     }
     return result;
 }

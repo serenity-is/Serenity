@@ -482,6 +482,13 @@ describe("parseQueryString", () => {
         expect(result).toEqual({ param1: "value1", param2: "value@2", param3: "value/3" });
     });
 
+    it("ignores malformed percent-encoding", () => {
+        expect(() => parseQueryString("bad=%zz&good=1")).not.toThrow();
+        const result = parseQueryString("bad=%zz&good=1");
+        expect(result.good).toBe("1");
+        expect(result.bad).toBeUndefined();
+    });
+
     it("parses query string from location.search if no argument is provided", () => {
         const oldLocation = window.location.href;
         if (changeJSDOMURL("http://localhost?param1=value1&param2=value2")) {
