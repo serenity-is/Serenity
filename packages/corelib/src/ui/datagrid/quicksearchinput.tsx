@@ -90,7 +90,7 @@ export class QuickSearchInput<P extends QuickSearchInputOptions = QuickSearchInp
 
         this.fieldChanged = false;
 
-        if (!!this.timer) {
+        if (this.timer) {
             clearTimeout(this.timer);
         }
 
@@ -126,10 +126,10 @@ export class QuickSearchInput<P extends QuickSearchInputOptions = QuickSearchInp
     public restoreState(value: string, field: QuickSearchField) {
         this.fieldChanged = false;
         this.field = field;
-        var value = (value ?? '').trim();
+        value = (value ?? '').trim();
         this.domNode.value = value;
         this.lastValue = value;
-        if (!!this.timer) {
+        if (this.timer) {
             clearTimeout(this.timer);
             this.timer = null;
         }
@@ -138,7 +138,7 @@ export class QuickSearchInput<P extends QuickSearchInputOptions = QuickSearchInp
 
     protected searchNow(value: string) {
         this.domNode.parentElement?.classList.toggle(
-            (this.options.filteredParentClass ?? 's-QuickSearchFiltered'), !!(value.length > 0));
+            (this.options.filteredParentClass ?? 's-QuickSearchFiltered'), value.length > 0);
 
         let klass = this.options.loadingParentClass ?? 's-QuickSearchLoading';
         this.domNode.classList.add(klass);
@@ -159,8 +159,8 @@ export class QuickSearchInput<P extends QuickSearchInputOptions = QuickSearchInp
 
         const args = { field: this.field?.name, query: value, done };
         this.options.beforeSearch?.(args);
-        if ((this.options as any).onSearch != null) {
-            (this.options as any).onSearch(args.field, args.query, args.done);
+        if (this.options.onSearch != null) {
+            this.options.onSearch(args.field, args.query, args.done);
         }
         else if (this.options.search != null) {
             this.options.search(args);
