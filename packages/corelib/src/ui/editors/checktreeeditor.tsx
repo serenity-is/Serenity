@@ -51,7 +51,7 @@ export class CheckTreeEditor<TItem extends CheckTreeItem<TItem>, P = {}> extends
 
     protected updateItems(): void {
         var items = this.getTreeItems();
-        var itemById: Record<any, TItem> = {};
+        var itemById: Record<any, TItem> = Object.create(null) as any;
         for (var i = 0; i < items.length; i++) {
             var item = items[i];
             item.children = [];
@@ -140,7 +140,7 @@ export class CheckTreeEditor<TItem extends CheckTreeItem<TItem>, P = {}> extends
             }
 
             if (self.itemById == null) {
-                self.itemById = {};
+                self.itemById = Object.create(null);
                 for (var i = 0; i < items.length; i++) {
                     var o = items[i];
                     if (o.id != null) {
@@ -303,7 +303,7 @@ export class CheckTreeEditor<TItem extends CheckTreeItem<TItem>, P = {}> extends
     }
 
     protected getDelimited() {
-        return !!!!(this.options as any)['delimited'];
+        return !!((this.options as any)['delimited']);
     }
 
     protected anyDescendantsSelected(item: TItem): boolean {
@@ -358,7 +358,7 @@ export class CheckTreeEditor<TItem extends CheckTreeItem<TItem>, P = {}> extends
         if (!this.moveSelectedUp()) {
             return;
         }
-        var oldIndexes: Record<string, number> = {};
+        var oldIndexes: Record<string, number> = Object.create(null);
         var list = this.view.getItems();
         var i = 0;
         for (var $t1 = 0; $t1 < list.length; $t1++) {
@@ -416,7 +416,7 @@ export class CheckTreeEditor<TItem extends CheckTreeItem<TItem>, P = {}> extends
 
     private set_value(value: string | string[]) {
 
-        var selected: Record<string, boolean> = {};
+        var selected: Record<string, boolean> = Object.create(null);
         if (value != null) {
             if (typeof value == "string") {
                 value = value.split(',')
