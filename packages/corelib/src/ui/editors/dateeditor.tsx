@@ -82,7 +82,15 @@ export class DateEditor<P extends DateEditorOptions = DateEditorOptions> extends
             return null;
         });
 
-        this.set_sqlMinMax(true)
+        if (this.options.sqlMinMax !== false) {
+            const minValue = this.options.minValue;
+            const maxValue = this.options.maxValue;
+            this.set_sqlMinMax(true);
+            if (minValue != null)
+                this.set_minValue(minValue);
+            if (maxValue != null)
+                this.set_maxValue(maxValue);
+        }
     }
 
     setToToday(triggerChange?: boolean) {
@@ -141,6 +149,7 @@ export class DateEditor<P extends DateEditorOptions = DateEditorOptions> extends
     private set_valueAsDate(value: Date): void {
         if (value == null) {
             this.set_value(null);
+            return;
         }
 
         this.set_value(formatDate(value, 'yyyy-MM-dd'));
