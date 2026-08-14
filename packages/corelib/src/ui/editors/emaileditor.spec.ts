@@ -1,5 +1,6 @@
 import { afterEach, describe, expect, it, vi } from "vitest";
 import { Validator } from "../../base";
+import { ValidationHelper } from "../../compat";
 import { EmailEditor } from "./emaileditor";
 
 afterEach(() => {
@@ -138,9 +139,30 @@ describe("EmailEditor", () => {
         editor.destroy();
     });
 
-    it("validates the domain on blur", () => {
+    it("reports read-only based on the user input when the domain is readonly", () => {
+        const editor = new EmailEditor({ element: el => document.body.appendChild(el), domain: "test.com", readOnlyDomain: true } as any);
+        expect(editor.get_readOnly()).toBe(false);
+        editor.set_readOnly(true);
+        expect(editor.get_readOnly()).toBe(true);
+        editor.set_readOnly(false);
+        expect(editor.get_readOnly()).toBe(false);
+        editor.destroy();
+    });
+
+    it("preserves the full domain when the value has multiple @ signs", () => {
         const editor = new EmailEditor({ element: el => document.body.appendChild(el) } as any);
+        editor.set_value("a@b@c");
+        expect(editor.domNode.value).toBe("a");
+        expect(domainOf(editor).value).toBe("b@c");
+        expect(editor.value).toBe("a@b@c");
+        editor.destroy();
+    });
+
+    it("validates the user input when the domain blurs", () => {
+        const editor = new EmailEditor({ element: el => document.body.appendChild(el) } as any);
+        const spy = vi.spyOn(ValidationHelper, "validateElement");
         domainOf(editor).dispatchEvent(new FocusEvent("blur"));
+        expect(spy).toHaveBeenCalledWith(editor.domNode);
         editor.destroy();
     });
 });

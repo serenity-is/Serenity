@@ -27,7 +27,7 @@ export class EmailEditor<P extends EmailEditorOptions = EmailEditorOptions> exte
             {this.domain}
         </>)
 
-        Fluent.on(this.domain, 'blur.' + this.uniqueName, function () {
+        Fluent.on(this.domain, 'blur.' + this.uniqueName, () => {
             ValidationHelper.validateElement(this.domNode);
         });
 
@@ -104,23 +104,25 @@ export class EmailEditor<P extends EmailEditorOptions = EmailEditorOptions> exte
             this.domNode.value = "";
         }
         else {
-            var parts = value.split('@');
-            if (parts.length > 1) {
+            var idx = value.indexOf('@');
+            if (idx >= 0) {
+                var user = value.substring(0, idx);
+                var domain = value.substring(idx + 1);
                 if (!this.options.readOnlyDomain) {
-                    this.domain.value = parts[1];
-                    this.domNode.value = parts[0];
+                    this.domain.value = domain;
+                    this.domNode.value = user;
                 }
                 else if (this.options.domain) {
-                    if (parts[1] !== this.options.domain)
+                    if (domain !== this.options.domain)
                         this.domNode.value = value;
                     else
-                        this.domNode.value = parts[0];
+                        this.domNode.value = user;
                 }
                 else
-                    this.domNode.value = parts[0];
+                    this.domNode.value = user;
             }
             else
-                this.domNode.value = parts[0];
+                this.domNode.value = value;
         }
     }
 
@@ -130,7 +132,7 @@ export class EmailEditor<P extends EmailEditorOptions = EmailEditorOptions> exte
 
     get_readOnly(): boolean {
         return !(this.domNode.getAttribute("readonly") == null &&
-            (!this.options.readOnlyDomain || this.domain.getAttribute('readonly') == null));
+            (this.options.readOnlyDomain || this.domain.getAttribute('readonly') == null));
     }
 
     set_readOnly(value: boolean): void {
