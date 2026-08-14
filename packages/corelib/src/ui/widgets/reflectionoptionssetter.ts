@@ -7,12 +7,12 @@ export namespace ReflectionOptionsSetter {
     export function getPropertyValue(o: any, property: string): any {
         var d = o;
         var getter = d['get_' + property];
-        if (!!!(typeof (getter) === 'undefined')) {
+        if (typeof getter !== 'undefined') {
             return getter.apply(o);
         }
         var camelCase = makeCamelCase(property);
         getter = d['get_' + camelCase];
-        if (!!!(typeof (getter) === 'undefined')) {
+        if (typeof getter !== 'undefined') {
             return getter.apply(o);
         }
         return d[camelCase];
@@ -21,13 +21,13 @@ export namespace ReflectionOptionsSetter {
     export function setPropertyValue(o: any, property: string, value: any): void {
         var d = o;
         var setter = d['set_' + property];
-        if (!!!(typeof (setter) === 'undefined')) {
+        if (typeof setter !== 'undefined') {
             setter.apply(o, [value]);
             return;
         }
         var camelCase = makeCamelCase(property);
         setter = d['set_' + camelCase];
-        if (!!!(typeof (setter) === 'undefined')) {
+        if (typeof setter !== 'undefined') {
             setter.apply(o, [value]);
             return;
         }

@@ -87,7 +87,7 @@ export namespace SlickTreeHelper {
         if (target.classList.contains('s-TreeCollapse') || target.classList.contains('s-TreeExpand')) {
             var item = view.getItem(row) as any;
             if (item != null) {
-                if (!!!item._collapsed) {
+                if (!item._collapsed) {
                     item._collapsed = true;
                 }
                 else {

@@ -86,7 +86,7 @@ export class Tooltip {
         if (!this.el)
             return this;
 
-        this.el.setAttribute("title", value);
+        this.el.setAttribute("title", value ?? '');
 
         let instance = Tooltip.existingInstance(this.el);
         if (!instance)

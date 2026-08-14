@@ -81,9 +81,9 @@ export function setElementProps(widget: { domNode: HTMLElement }, props: EditorP
         addClass(el, (props as any).className);
 
     if (typeof props.maxLength === "number")
-        el.setAttribute("maxLength", (props.maxLength || 0).toString());
+        el.setAttribute("maxLength", props.maxLength.toString());
     else if (typeof (props as any).maxlength === "number")
-        el.setAttribute("maxLength", ((props as any).maxlength || 0).toString());
+        el.setAttribute("maxLength", (props as any).maxlength.toString());
 
     // using try catch here as some editors might not be able
     // to set them in the constructor if forwarding these

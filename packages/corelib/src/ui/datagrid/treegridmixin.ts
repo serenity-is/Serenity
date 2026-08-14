@@ -17,15 +17,18 @@ export class TreeGridMixin<TItem> {
         var idProperty = (dg as any).getIdProperty();
         var getId = (item: TItem) => (item as any)[idProperty];
 
-        Fluent.on(dg.domNode.querySelector('.grid-container'), "click", (e) => {
-            if ((e.target as HTMLElement).classList.contains('s-TreeToggle')) {
-                var src = dg.sleekGrid.getCellFromEvent(e);
-                if (src.cell >= 0 &&
-                    src.row >= 0) {
-                    SlickTreeHelper.toggleClick<TItem>(e as any, src.row, src.row, dg.view, getId);
+        var gridContainer = dg.domNode.querySelector('.grid-container');
+        if (gridContainer) {
+            Fluent.on(gridContainer, "click", (e) => {
+                if ((e.target as HTMLElement).classList.contains('s-TreeToggle')) {
+                    var src = dg.sleekGrid.getCellFromEvent(e);
+                    if (src.cell >= 0 &&
+                        src.row >= 0) {
+                        SlickTreeHelper.toggleClick<TItem>(e as any, src.row, src.cell, dg.view, getId);
+                    }
                 }
-            }
-        });
+            });
+        }
 
         dg.onFiltering.subscribe((e) => {
             e.isMatch = SlickTreeHelper.filterById(e.item, dg.view, options.getParentId);
