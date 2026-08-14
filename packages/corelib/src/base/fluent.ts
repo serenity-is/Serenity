@@ -933,7 +933,8 @@ Fluent.prototype.show = function (this: FluentThis) {
 }
 
 Fluent.prototype.style = function (this: FluentThis, callback: (css: CSSStyleDeclaration) => void) {
-    if (this.el && this.el.style instanceof CSSStyleDeclaration)
+    if (this.el && ((typeof CSSStyleDeclaration !== "undefined" && this.el.style instanceof CSSStyleDeclaration) || 
+        (typeof CSSStyleDeclaration === "undefined" && typeof this.el.style === "object" && this.el.style != null)))
         callback(this.el.style);
     return this;
 }
