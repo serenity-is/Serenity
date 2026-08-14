@@ -131,7 +131,7 @@ export namespace LayoutTimer {
 
     export function onSizeChange(element: () => (HTMLElement | Window), handler: () => void, opt?: { width?: boolean, height?: boolean, debounceTimes?: number }): number {
         if (handler == null)
-            throw "Layout handler can't be null!";
+            throw new Error("Layout handler can't be null!");
 
         regs[++nextKey] = {
             element: element,
@@ -173,7 +173,7 @@ export namespace LayoutTimer {
     }
 }
 
-export function executeOnceWhenVisible(el: HTMLElement | ArrayLike<HTMLElement>, callback: Function): number {
+export function executeOnceWhenVisible(el: HTMLElement | ArrayLike<HTMLElement>, callback: Function): number | null {
     el = isArrayLike(el) ? el[0] : el;
     if (!el)
         return null;
@@ -189,7 +189,7 @@ export function executeOnceWhenVisible(el: HTMLElement | ArrayLike<HTMLElement>,
     return timer;
 }
 
-export function executeEverytimeWhenVisible(el: HTMLElement | ArrayLike<HTMLElement>, callback: Function, callNowIfVisible: boolean): number {
+export function executeEverytimeWhenVisible(el: HTMLElement | ArrayLike<HTMLElement>, callback: Function, callNowIfVisible: boolean): number | null {
     el = isArrayLike(el) ? el[0] : el;
     if (!el)
         return null;
