@@ -513,6 +513,17 @@ describe("TabsExtensions", () => {
             const result = TabsExtensions.indexByKey(tabs);
             expect(result).toEqual({ "#/plain/href": 0 });
         });
+
+        it("handles anchors without an href attribute", () => {
+            const tabs = document.createElement("div");
+            tabs.innerHTML = `
+                <ul>
+                    <li><a class="nav-link">Tab</a></li>
+                </ul>
+            `;
+            const result = TabsExtensions.indexByKey(tabs);
+            expect(result).toEqual({ "": 0 });
+        });
     });
 
     describe("setDisabled - active tab switching", () => {

@@ -107,7 +107,7 @@ export namespace TabsExtensions {
         var tabKey = el.dataset.tabkey;
         if (tabKey)
             return tabKey;
-        var href = el.getAttribute('href').toString();
+        var href = el.getAttribute('href') ?? '';
         var prefix = '_Tab';
         var lastIndex = href.lastIndexOf(prefix);
         if (lastIndex >= 0) {
@@ -238,7 +238,6 @@ export namespace TabsExtensions {
                 const inst = bootstrap.Tab.getInstance(anchor);
                 if (inst && typeof inst.dispose === "function") {
                     inst.dispose();
-                    break;
                 }
             }
         }
