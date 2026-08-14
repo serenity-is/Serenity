@@ -172,6 +172,20 @@ describe("DialogExtensions.dialogMaximizable", () => {
         expect(() => DialogExtensions.dialogMaximizable(arrLike)).not.toThrow();
     });
 
+    it("appends buttons to the titlebar when there is no close button", () => {
+        const chain = createMockChain(mockElement);
+        const empty = { ...chain, length: 0, first: vi.fn(() => empty) };
+        chain.find = vi.fn(() => empty);
+        const mock$ = vi.fn(() => chain) as any;
+        mock$.fn = {};
+        (window as any).jQuery = mock$;
+
+        DialogExtensions.dialogMaximizable(mockElement);
+
+        expect(chain.appendTo).toHaveBeenCalled();
+        expect(chain.insertBefore).not.toHaveBeenCalled();
+    });
+
     it("maximizes via the maximize button and restores via the restore button", () => {
         const chain = createMockChain(mockElement);
         const mock$ = vi.fn(() => chain) as any;

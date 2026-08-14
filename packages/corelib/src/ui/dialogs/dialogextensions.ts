@@ -83,7 +83,7 @@ export class UIDialogMaximizer extends Widget<UIDialogMaximizerProps> {
                 return click();
             });
 
-        if (closeButton)
+        if (closeButton.length)
             button.insertBefore(closeButton);
         else
             button.appendTo(titlebar);
