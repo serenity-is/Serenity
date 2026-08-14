@@ -9,6 +9,11 @@ describe("RadioButtonEditor", () => {
         Option3 = 3
     }
 
+    enum StringTestEnum {
+        A = "a",
+        B = "b"
+    }
+
     it('sets disabled of each radio button', () => {
         const editor = new RadioButtonEditor({
             element: Fluent("input").appendTo(document.body),
@@ -83,5 +88,42 @@ describe("RadioButtonEditor", () => {
         expect(editor.element.findAll("input").length).toBe(2);
         editor.element.remove();
         vi.restoreAllMocks();
+    });
+
+    it("renders radios for string enums", () => {
+        const editor = new RadioButtonEditor({
+            element: Fluent("input").appendTo(document.body),
+            enumType: StringTestEnum as any
+        });
+        try {
+            const inputs = editor.element.findAll<HTMLInputElement>("input[type=radio]");
+            expect(inputs.length).toBe(2);
+            expect(inputs[0].value).toBe("a");
+            expect(inputs[1].value).toBe("b");
+        }
+        finally {
+            editor.element.remove();
+        }
+    });
+
+    it("preserves value set while enum is loading and applies it after load", async () => {
+        const editor = new RadioButtonEditor({
+            element: Fluent("input").appendTo(document.body),
+            enumType: Promise.resolve(TestEnum) as any
+        });
+
+        try {
+            editor.set_value("2");
+            expect(editor.get_value()).toBe("2");
+
+            await Promise.resolve();
+            await Promise.resolve();
+
+            expect(editor.element.findAll("input").length).toBe(3);
+            expect(editor.get_value()).toBe("2");
+        }
+        finally {
+            editor.element.remove();
+        }
     });
 });

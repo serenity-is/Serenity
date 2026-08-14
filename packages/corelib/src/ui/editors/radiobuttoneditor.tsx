@@ -13,6 +13,8 @@ export interface RadioButtonEditorOptions {
 export class RadioButtonEditor<P extends RadioButtonEditorOptions = RadioButtonEditorOptions> extends EditorWidget<P> implements IReadOnly {
     static override[Symbol.typeInfo] = this.registerEditor(nsSerenity, [IStringValue, IReadOnly]);
 
+    declare private _pendingValue: string;
+
     constructor(props: EditorProps<P>) {
         super(props);
 
@@ -41,11 +43,17 @@ export class RadioButtonEditor<P extends RadioButtonEditorOptions = RadioButtonE
                         getTypeFullName(enumType);
                 }
 
-                var values = Enum.getValues(enumType);
+                var values = this.getEnumValues(enumType);
                 for (var x of values) {
                     var name = Enum.toString(enumType, x);
                     this.addRadio(x.toString(), localText("Enums." + enumKey + "." + name, name));
                 }
+
+                // radios are ready now; apply any value that was set while the enum was still loading
+                if (this._pendingValue != null)
+                    this.set_value(this._pendingValue);
+
+                this._pendingValue = void 0;
             }
             if (isPromiseLike(enumType))
                 enumType.then(then);
@@ -54,12 +62,27 @@ export class RadioButtonEditor<P extends RadioButtonEditorOptions = RadioButtonE
         }
     }
 
+    protected getEnumValues(enumType: any): any[] {
+        var values = Enum.getValues(enumType);
+        if (values.length || enumType == null)
+            return values;
+
+        // Enum.getValues only returns numeric values, so for string enums collect the string members directly.
+        return Object.keys(enumType)
+            .filter(k => typeof enumType[k] === "string")
+            .map(k => enumType[k]);
+    }
+
     protected addRadio(value: string, text: string): void {
         this.domNode.appendChild(<label><input type="radio" name={this.uniqueName} id={this.uniqueName + '_' + value} value={value} />{text}</label>);
     }
 
     get_value(): string {
-        return this.element.findFirst('input:checked').val();
+        if (this.domNode.querySelector('input'))
+            return this.element.findFirst('input:checked').val();
+
+        // radios are not ready yet (async enum load); return the preserved value
+        return this._pendingValue;
     }
 
     get value(): string {
@@ -67,17 +90,23 @@ export class RadioButtonEditor<P extends RadioButtonEditorOptions = RadioButtonE
     }
 
     set_value(value: string): void {
-        if (value !== this.get_value()) {
-            var inputs = this.element.findAll<HTMLInputElement>('input');
-            var checks = inputs.filter(x => x.checked);
+        this._pendingValue = value;
+
+        if (!this.domNode.querySelector('input'))
+            return; // not loaded yet; the preserved value is applied once radios are ready
+
+        if (value === this.get_value())
+            return;
+
+        var inputs = this.element.findAll<HTMLInputElement>('input');
+        var checks = inputs.filter(x => x.checked);
+        if (checks.length > 0) {
+            (checks[0] as HTMLInputElement).checked = false;
+        }
+        if (value) {
+            checks = inputs.filter(x => (x as HTMLInputElement).value === value);
             if (checks.length > 0) {
-                (checks[0] as HTMLInputElement).checked = false;
-            }
-            if (value) {
-                checks = inputs.filter(x => (x as HTMLInputElement).value === value);
-                if (checks.length > 0) {
-                    (checks[0] as HTMLInputElement).checked = true;
-                }
+                (checks[0] as HTMLInputElement).checked = true;
             }
         }
     }
