@@ -11,7 +11,6 @@ export class CascadedWidgetLink<TParent extends Widget<any>> {
     constructor(private parentType: { new(...args: any[]): TParent },
         private widget: Widget<any>,
         private parentChange: (p1: TParent) => void) {
-        this.bind();
         addDisposingListener(this.widget.domNode, () => {
             this.unbind();
             this.widget = null;
@@ -20,6 +19,7 @@ export class CascadedWidgetLink<TParent extends Widget<any>> {
     }
 
     declare private _parentID: string;
+    private _parentNode?: HTMLElement;
 
     bind() {
 
@@ -30,7 +30,8 @@ export class CascadedWidgetLink<TParent extends Widget<any>> {
         var parent = tryGetWidget(findElementWithRelativeId(this.widget.domNode, this._parentID), this.parentType);
 
         if (parent != null) {
-            Fluent.on(parent.domNode, 'change.' + (this.widget as any).uniqueName, () => {
+            this._parentNode = parent.domNode;
+            Fluent.on(this._parentNode, 'change.' + (this.widget as any).uniqueName, () => {
                 this.parentChange(parent);
             });
             return parent;
@@ -41,19 +42,22 @@ export class CascadedWidgetLink<TParent extends Widget<any>> {
         }
     }
 
-    unbind() {
+    unbind(): HTMLElement | null {
 
         if (!this._parentID) {
             return null;
         }
 
-        var parent = tryGetWidget(findElementWithRelativeId(this.widget.domNode, this._parentID), this.parentType);
+        const parentNode = this._parentNode ??
+            (this._parentID ? findElementWithRelativeId(this.widget.domNode, this._parentID) : null);
 
-        if (parent != null) {
-            Fluent.off(parent.domNode, '.' + (this.widget as any).uniqueName);
+        this._parentNode = null;
+
+        if (parentNode != null) {
+            Fluent.off(parentNode, '.' + (this.widget as any).uniqueName);
         }
 
-        return parent;
+        return parentNode;
     }
 
     get_parentID() {

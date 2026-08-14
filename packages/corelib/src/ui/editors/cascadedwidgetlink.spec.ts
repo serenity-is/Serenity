@@ -57,7 +57,7 @@ describe("CascadedWidgetLink", () => {
         expect(link.get_parentID()).toBe("Parent");
         parentElement.dispatchEvent(new Event("change"));
         expect(parentChange).toHaveBeenCalledWith(parent);
-        expect((link as any).unbind()).toBe(parent);
+        expect((link as any).unbind()).toBe(parent.domNode);
 
         child.destroy();
         parent.destroy();

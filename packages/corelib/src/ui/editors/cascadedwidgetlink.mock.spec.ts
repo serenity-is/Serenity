@@ -43,7 +43,7 @@ describe("CascadedWidgetLink resolved parent", () => {
         parent.domNode.dispatchEvent(new Event("change"));
         expect(parentChange).toHaveBeenCalledWith(parent);
         expect(link.get_parentID()).toBe("Parent");
-        expect((link as any).unbind()).toBe(parent);
+        expect((link as any).unbind()).toBe(parent.domNode);
 
         child.destroy();
         parent.destroy();
