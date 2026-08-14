@@ -89,6 +89,8 @@ export function newBodyDiv(): HTMLDivElement {
  */
 export function outerHtml(element: Element | ArrayLike<HTMLElement>) {
     const el = document.createElement('i');
-    el.append((isArrayLike(element) ? element[0] : element).cloneNode(true));
+    const target = isArrayLike(element) ? element[0] : element;
+    if (target != null)
+        el.append(target.cloneNode(true));
     return el.innerHTML;
 }
