@@ -57,23 +57,14 @@ export class EditorFiltering extends BaseEditorFiltering<Widget<any>> {
                 op === FilterOperators.GE));
     }
 
-    override getEditorOptions() {
-        var opt = super.getEditorOptions();
-        if (this.useEditor() && this.editorType === (this.get_field().editorType ?? 'String')) {
-            opt = Object.assign(opt, this.get_field().editorParams);
-        }
-
-        return opt;
-    }
-
     override createEditor() {
         if (this.useEditor()) {
-            var editorType = EditorTypeRegistry.get(this.editorType) as typeof Widget<{}>;
+            var editorType = EditorTypeRegistry.get(this.editorType ?? 'String') as typeof Widget<{}>;
 
             this.editor = new editorType({
                 element: el => this.get_container().append(el),
                 ...this.getEditorOptions()
-            });
+            }).init?.();
 
             return;
         }
@@ -88,6 +79,6 @@ export class EditorFiltering extends BaseEditorFiltering<Widget<any>> {
     override initQuickFilter(filter: QuickFilter<Widget<any>, any>) {
         super.initQuickFilter(filter);
 
-        filter.type = EditorTypeRegistry.get(this.editorType);
+        filter.type = EditorTypeRegistry.get(this.editorType ?? 'String');
     }
 }

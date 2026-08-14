@@ -197,6 +197,17 @@ describe("EditorFiltering", () => {
         expect(opts.cascadeFrom).toBeUndefined();
     });
 
+    it("getEditorOptions never re-introduces cascadeFrom even when editorType matches", () => {
+        const filtering = new EditorFiltering({ editorType: "String" } as any);
+        filtering.set_field({ name: "Test", editorType: "String", editorParams: { cascadeFrom: "Parent", maxLength: 50 }, filteringParams: { someParam: true } });
+        filtering.set_operator({ key: "eq" });
+
+        const opts = filtering.getEditorOptions();
+        expect(opts.cascadeFrom).toBeUndefined();
+        expect(opts.maxLength).toBe(50);
+        expect(opts.someParam).toBe(true);
+    });
+
     it("getEditorOptions returns empty options with default constructor", () => {
         const filtering = new EditorFiltering();
         filtering.set_field({ name: "Test" });
