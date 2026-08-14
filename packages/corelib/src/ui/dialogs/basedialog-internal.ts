@@ -51,9 +51,12 @@ export function handleUIDialogResponsive(domNode: HTMLElement) {
     if (!$)
         return;
 
-    var dlg = ($(domNode) as any)?.dialog();
     var uiDialog = $(domNode).closest('.ui-dialog');
     if (!uiDialog.length)
+        return;
+
+    var dlg = ($(domNode) as any)?.dialog();
+    if (!dlg)
         return;
 
     if (isMobileView()) {
