@@ -290,6 +290,7 @@ export class DateTimeEditor<P extends DateTimeEditorOptions = DateTimeEditorOpti
     private set_valueAsDate(value: Date) {
         if (value == null) {
             this.set_value(null);
+            return;
         }
 
         this.set_value(formatDate(value, 'yyyy-MM-ddTHH:mm' + (this.options.seconds ? ':ss' : '')));
