@@ -399,7 +399,7 @@ export class PropertyGrid<P extends PropertyGridOptions = PropertyGridOptions> e
             var item = fieldElement.propertyItem;
             var editor = fieldElement.editorWidget;
             if (!editor && fieldElement.editorPromise)
-                throw `Editor for "${item.name}" is not loaded yet.`;
+                throw new Error(`Editor for "${item.name}" is not loaded yet.`);
             callback(item, editor);
         }
     }
@@ -448,7 +448,7 @@ export class PropertyGrid<P extends PropertyGridOptions = PropertyGridOptions> e
         if ((item.unbound ?? item.skipOnSave ?? (item as any).oneWay) !== true && (canModify ?? PropertyGrid.canModifyItem(item))) {
             var editor = fieldElement.editorWidget;
             if (!editor && fieldElement.editorPromise)
-                throw `Editor for "${item.name}" is not loaded yet.`;
+                throw new Error(`Editor for "${item.name}" is not loaded yet.`);
 
             EditorUtils.saveValue(editor, item, target);
         }
