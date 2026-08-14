@@ -427,7 +427,6 @@ export class DataGrid<TItem, P = {}> extends Widget<P> implements IDataGrid, IRe
         }
 
         var mapped = sortBy.map(function (s): ColumnSort {
-            var x: ColumnSort;
             if (s && s.toLowerCase().endsWith(' desc')) {
                 return {
                     columnId: s.substr(0, s.length - 5).trimEnd(),
@@ -438,7 +437,6 @@ export class DataGrid<TItem, P = {}> extends Widget<P> implements IDataGrid, IRe
                 columnId: s,
                 sortAsc: true
             }
-            return x;
         });
 
         this._grid.setSortColumns(mapped);
@@ -913,7 +911,7 @@ export class DataGrid<TItem, P = {}> extends Widget<P> implements IDataGrid, IRe
             this.internalRefresh();
             return;
         }
-        this.slickContainer.getNode().dataset.needsRefresh = "true";
+        this.slickContainer.data("needsRefresh", "true");
     }
 
     protected refreshIfNeeded(): void {
