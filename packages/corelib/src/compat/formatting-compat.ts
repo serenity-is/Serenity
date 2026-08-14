@@ -6,7 +6,7 @@ import { Culture, parseInteger, stringFormat, stringFormatLocale } from "../base
 export function turkishLocaleToLower(a: string): string {
     if (!a)
         return a;
-    return a.replace(/i/g, 'İ').replace(/ı/g, 'I').toLowerCase();
+    return a.replace(/İ/g, 'i').replace(/I/g, 'ı').toLowerCase();
 }
 
 /**
@@ -101,7 +101,7 @@ export function parseDayHourAndMin(s: string): number {
     else if (p.length == 2) {
         days = parseInteger(p[0]);
         let hm = parseHourAndMin(p[1]);
-        if (isNaN(days) || !hm || isNaN(hm))
+        if (isNaN(days) || hm == null || isNaN(hm))
             return NaN;
         return days * 24 * 60 + hm;
     }

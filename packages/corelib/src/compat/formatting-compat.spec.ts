@@ -18,6 +18,12 @@ describe("parseDayHourAndMin", () => {
         expect(formatting.parseDayHourAndMin("5.10:00")).toBe(5 * 24 * 60 + 10 * 60);
     });
 
+    it("returns number of minutes for day with zero hour/min part", async function () {
+        const formatting = (await import("./formatting-compat"));
+        expect(formatting.parseDayHourAndMin("1.00:00")).toBe(24 * 60);
+        expect(formatting.parseDayHourAndMin("3.00:00")).toBe(3 * 24 * 60);
+    });
+
     it("returns number of minutes for hour:min", async function () {
         const formatting = (await import("./formatting-compat"));
         expect(formatting.parseDayHourAndMin("10:25")).toBe(10 * 60 + 25);
@@ -112,6 +118,22 @@ describe("turkishLocaleToUpper", () => {
     it("converts i to İ and ı to I", async () => {
         const formatting = (await import("./formatting-compat"));
         expect(formatting.turkishLocaleToUpper("xıIiİıİia")).toBe("XIIİİIİİA");
+    });
+});
+
+describe("turkishLocaleToLower", () => {
+    it("ignores empty values as is", async () => {
+        const formatting = (await import("./formatting-compat"));
+        expect(formatting.turkishLocaleToLower("")).toBe("");
+        expect(formatting.turkishLocaleToLower(null)).toBe(null);
+        expect(formatting.turkishLocaleToLower(undefined)).toBe(undefined);
+    });
+
+    it("converts I to dotless i and İ to dotted i", async () => {
+        const formatting = (await import("./formatting-compat"));
+        expect(formatting.turkishLocaleToLower("ISIL")).toBe("ısıl");
+        expect(formatting.turkishLocaleToLower("xıIiİıİia")).toBe("xııiiıiia");
+        expect(formatting.turkishLocaleToLower("İSTANBUL")).toBe("istanbul");
     });
 });
 
