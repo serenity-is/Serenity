@@ -99,8 +99,8 @@ export function layoutFillHeightValue(element: HTMLElement | ArrayLike<HTMLEleme
     let h = 0;
     let $ = getjQuery();
     element = isArrayLike(element) ? element[0] : element
-    if (!$ && element)
-        return parseInt(getComputedStyle(element).height, 10);
+    if (!$ || !element)
+        return element ? parseInt(getComputedStyle(element).height, 10) : 0;
 
     $(element).parent().children().not(element).each(function (i: number, e: HTMLElement) {
         let q = $(e);
@@ -117,8 +117,10 @@ export function layoutFillHeightValue(element: HTMLElement | ArrayLike<HTMLEleme
 
 export function layoutFillHeight(element: HTMLElement | ArrayLike<HTMLElement>) {
     let h = layoutFillHeightValue(element);
-    let n = Math.round(h) + 'px';
     element = isArrayLike(element) ? element[0] : element;
+    if (!element || !isFinite(h))
+        return;
+    let n = Math.round(h) + 'px';
     if (element.style.height != n)
         element.style.height = n;
 }
@@ -140,14 +142,19 @@ export function triggerLayoutOnShow(element: HTMLElement | ArrayLike<HTMLElement
 
 export function centerDialog(el: HTMLElement | ArrayLike<HTMLElement>) {
     el = isArrayLike(el) ? el[0] : el;
+    if (!el)
+        return;
     let dlg = el.closest(".ui-dialog") as any;
     if (!dlg)
         return;
-    dlg = getjQuery()(dlg) as any;
+    let $ = getjQuery();
+    if (!$)
+        return;
+    dlg = $(dlg) as any;
     dlg.position?.({ at: 'center center', of: window });
     let pos = dlg.position?.();
-    if (pos.left < 0)
+    if (pos?.left < 0)
         dlg.css("left", "0px");
-    if (pos.top < 0)
+    if (pos?.top < 0)
         dlg.css("top", "0px");
 }
