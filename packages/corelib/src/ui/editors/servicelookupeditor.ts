@@ -50,7 +50,7 @@ export abstract class ServiceLookupEditorBase<P extends ServiceLookupEditorOptio
     }
 
     protected getIncludeColumns() {
-        var include = this.options.includeColumns || [];
+        var include = this.options.includeColumns?.slice() || [];
         var idField = this.getIdField();
 
         if (idField && include.indexOf(idField) < 0)

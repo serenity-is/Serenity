@@ -64,6 +64,14 @@ describe("ServiceLookupEditor", () => {
         editor.destroy();
     });
 
+    it("does not mutate the options.includeColumns array", () => {
+        const includeColumns = ["Col"];
+        const editor = create({ includeColumns });
+        editor.getIncludeColumns();
+        expect(includeColumns).toEqual(["Col"]);
+        editor.destroy();
+    });
+
     it("does not duplicate id and text fields in include columns", () => {
         const editor = create({ includeColumns: ["ID", "Name"] });
         expect(editor.getIncludeColumns()).toEqual(["ID", "Name"]);
