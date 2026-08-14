@@ -52,7 +52,7 @@ export function localText(key: string, defaultText?: string): string {
  * @param key The key of the localized string.
  * @returns The localized string or undefined if not found.
  */
-export function tryGetText(key: string): string {
+export function tryGetText(key: string): string | undefined {
     return getTable()[key];
 }
 
