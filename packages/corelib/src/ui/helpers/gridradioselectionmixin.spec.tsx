@@ -90,6 +90,17 @@ describe("GridRadioSelectionMixin", () => {
             expect(e.preventDefault).toHaveBeenCalled();
             expect((mixin as any).include).toEqual({});
         });
+
+        it("treats prototype property names as ordinary keys", () => {
+            viewObj.getItem = vi.fn(() => ({ id: "constructor" }));
+            viewObj.getLength = vi.fn(() => 1);
+            const mixin = new GridRadioSelectionMixin(mockGrid);
+
+            const e = { target: { classList: { contains: (c: string) => c === 'rad-select-item' } }, preventDefault: vi.fn() } as any;
+            subscribeHandler(e, { row: 0 });
+
+            expect((mixin as any).include["constructor"]).toBe(true);
+        });
     });
 
     describe("clear", () => {
@@ -228,6 +239,15 @@ describe("GridRadioSelectionMixin", () => {
             const result = column.format({ item: { id: 2 } } as any);
             expect(result).toBeTruthy();
             expect((result as any).type).toBe("radio");
+            expect((result as any).checked).toBeFalsy();
+        });
+
+        it("format does not treat prototype property names as checked", () => {
+            const mixin = new GridRadioSelectionMixin(mockGrid);
+            const getMixin = vi.fn(() => mixin);
+            const column = GridRadioSelectionMixin.createSelectColumn(getMixin);
+            const result = column.format({ item: { id: "constructor" } } as any);
+            expect(result).toBeTruthy();
             expect((result as any).checked).toBeFalsy();
         });
     });

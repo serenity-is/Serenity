@@ -18,7 +18,7 @@ export class GridRadioSelectionMixin {
 
     constructor(grid: IDataGrid, options?: GridRadioSelectionMixinOptions) {
 
-        this.include = {};
+        this.include = Object.create(null);
         this.grid = grid;
         this.idField = grid.getView().getIdPropertyName();
         this.options = options || {};
@@ -34,13 +34,10 @@ export class GridRadioSelectionMixin {
 
                 var id = item[this.idField].toString();
 
-                if (this.include[id] == true) {
-                    clearKeys(this.include);
-                }
-                else {
-                    clearKeys(this.include);
+                var wasSelected = this.include[id] == true;
+                clearKeys(this.include);
+                if (!wasSelected)
                     this.include[id] = true;
-                }
 
                 for (var i = 0; i < (grid.getView() as any).getLength(); i++) {
                     grid.getGrid().updateRow(i);
@@ -60,7 +57,7 @@ export class GridRadioSelectionMixin {
     }
 
     resetCheckedAndRefresh(): void {
-        this.include = {};
+        this.include = Object.create(null);
         this.grid.getView().populate();
     }
 
@@ -73,7 +70,7 @@ export class GridRadioSelectionMixin {
         return null;
     }
 
-    getSelectedAsInt32(): number {
+    getSelectedAsInt32(): number | null {
         var items = Object.keys(this.include).map(function (x) {
             return parseInt(x, 10);
         });
@@ -85,7 +82,7 @@ export class GridRadioSelectionMixin {
         return null;
     }
 
-    getSelectedAsInt64(): number {
+    getSelectedAsInt64(): number | null {
         var items = Object.keys(this.include).map(function (x) {
             return parseInt(x, 10);
         });
