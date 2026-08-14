@@ -1,5 +1,6 @@
 import { BaseFiltering } from "./basefiltering";
 import { FilterOperator } from "./filteroperator";
+import { Combobox } from "../editors/combobox";
 
 describe("BaseFiltering", () => {
     describe("getters/setters", () => {
@@ -483,6 +484,21 @@ describe("BaseFiltering", () => {
             filtering.set_operator({ key: "isnull" });
 
             expect(filtering.getEditorText()).toBe("directText");
+        });
+
+        it("joins selected combobox item texts", () => {
+            const getInstanceSpy = vi.spyOn(Combobox, "getInstance");
+            const filtering = new (class extends BaseFiltering {
+                getOperators(): FilterOperator[] { return []; }
+            })();
+            filtering.set_field({ name: "Test" });
+            const container = document.createElement("div");
+            filtering.set_container(container);
+            filtering.set_operator({ key: "eq" });
+            filtering.createEditor();
+            getInstanceSpy.mockReturnValue({ getSelectedItems: () => [{ text: "One" }, { text: "Two" }] } as any);
+            expect(filtering.getEditorText()).toBe("One, Two");
+            getInstanceSpy.mockRestore();
         });
     });
 

@@ -242,7 +242,7 @@ export abstract class BaseFiltering implements IFiltering, IQuickFiltering {
         var value;
         let combobox = Combobox.getInstance(input);
         if (combobox) {
-            value = combobox.getSelectedItems()?.join(", ");
+            value = combobox.getSelectedItems()?.map(x => x.text).join(", ");
         }
         else {
             value = input.value;
