@@ -205,7 +205,7 @@ describe("Combobox", () => {
         const abortQuery = vi.fn();
         const abortSelection = vi.fn();
         (element as any).queryLoading = { abort: abortQuery };
-        (element as any).initSelection = { abort: abortSelection };
+        (element as any).initSelectionLoading = { abort: abortSelection };
         (element as any).typeTimeout = 1;
         (element as any).typeTimeoutFn = vi.fn();
         combobox.abortPendingQuery();

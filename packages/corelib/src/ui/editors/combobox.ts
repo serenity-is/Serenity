@@ -231,8 +231,8 @@ export class Combobox<TItem = any> {
         if (!this.el)
             return;
 
-        (this.el as any).initSelection && (this.el as any).initSelection?.abort?.();
-        delete (this.el as any).initSelection;
+        (this.el as any).initSelectionLoading && (this.el as any).initSelectionLoading?.abort?.();
+        delete (this.el as any).initSelectionLoading;
     }
 
     dispose() {
