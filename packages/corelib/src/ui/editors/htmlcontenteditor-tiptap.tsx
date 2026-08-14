@@ -7,21 +7,6 @@ export interface TiptapModule {
     [key: string]: any;
 }
 
-export interface TiptapToolbarHiddenOption {
-    alignment?: boolean;
-    alignmentJustify?: boolean;
-    blockquote?: boolean;
-    boldItalicUnderline?: boolean;
-    inlineCode?: boolean;
-    headings?: boolean;
-    image?: boolean;
-    link?: boolean;
-    listOptions?: boolean;
-    strike?: boolean;
-    superSubScript?: boolean;
-    undoRedo?: boolean;
-}
-
 function TiptapButton(props: {
     title: string,
     active?: PropValue<boolean>,
@@ -391,7 +376,7 @@ export function getTiptapContent(editor: TiptapEditor): string {
 
 export function getAllTiptapExtensions(tiptap: TiptapModule) {
     return Object.entries(tiptap).filter(([k, e]) => e &&
-        /[A-Z]/.test(k[0]) && e &&
+        /[A-Z]/.test(k[0]) &&
         (e.type === "extension" || e.type === "mark" || e.type === "node"))
         .map(([_, e]) => e)
 }
