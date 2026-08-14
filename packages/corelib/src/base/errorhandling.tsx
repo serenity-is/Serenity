@@ -78,7 +78,7 @@ export namespace ErrorHandling {
 
         const msg = <div>
             <p>Message: {message ?? error?.message ?? error?.toString() ?? "Unknown error"}</p>
-            {filename != null && <p>File: {filename ?? error?.filename ?? "Unknown file"}</p>}
+            {filename != null && <p>File: {filename}</p>}
             {(lineno ?? colno) != null && <p>Line: {lineno}, Column: {colno}</p>}
             {errorInfo && <p style={{ maxHeight: "180px", overflowY: "auto", whiteSpace: "pre-wrap" }}>{errorInfo}</p>}
         </div>
