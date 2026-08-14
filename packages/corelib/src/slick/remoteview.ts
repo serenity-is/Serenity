@@ -58,7 +58,7 @@ export class RemoteView<TItem = any> implements IRemoteView<TItem> {
     private groupItemMetadataProvider: GroupItemMetadataProvider;
     private groups: Group<TItem>[] = [];
     private idProperty: string;
-    private idxById: Record<any, number> = {};
+    private idxById: Record<any, number> = Object.create(null);
     private itemMetadataCallback?: (item?: TItem, row?: number) => ItemMetadata<TItem>;
     private items: TItem[] = [];
     private loading: AbortController | boolean = false;
@@ -200,7 +200,7 @@ export class RemoteView<TItem = any> implements IRemoteView<TItem> {
             this.items.sort(this.getSortComparer());
         }
 
-        this.idxById = {};
+        this.idxById = Object.create(null);
         this.rowsById = null;
         this.grandTotals = {};
         this.updateIdxById();
@@ -304,7 +304,7 @@ export class RemoteView<TItem = any> implements IRemoteView<TItem> {
         if (ascending === false) {
             this.items.reverse();
         }
-        this.idxById = {};
+        this.idxById = Object.create(null);
         this.updateIdxById();
         this.refresh();
     }
@@ -396,7 +396,7 @@ export class RemoteView<TItem = any> implements IRemoteView<TItem> {
 
     private ensureRowsByIdCache(): void {
         if (!this.rowsById) {
-            this.rowsById = {};
+            this.rowsById = Object.create(null);
             for (let i = 0, l = this.rows.length; i < l; i++) {
                 this.rowsById[(this.rows[i] as any)[this.idProperty]] = i;
             }
@@ -690,7 +690,7 @@ export class RemoteView<TItem = any> implements IRemoteView<TItem> {
         let group: Group<TItem>;
         let val: any;
         const groups: Group<TItem>[] = [];
-        const groupsByVal: Record<any, Group<TItem>> = {};
+        const groupsByVal: Record<any, Group<TItem>> = Object.create(null);
         let item: TItem;
         const level = parentGroup ? parentGroup.level + 1 : 0;
         const groupingInfo = this.groupingInfos[level];
