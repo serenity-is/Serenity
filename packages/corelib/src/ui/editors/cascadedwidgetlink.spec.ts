@@ -42,4 +42,24 @@ describe("CascadedWidgetLink", () => {
         expect((link as any).widget).toBeNull();
         expect((link as any).parentChange).toBeNull();
     });
+
+    it("binds and unbinds a resolved parent widget", () => {
+        const parentElement = document.createElement("div");
+        parentElement.id = "Parent";
+        const childElement = document.createElement("div");
+        document.body.append(parentElement, childElement);
+        const parent = new ParentWidget({ element: parentElement });
+        const child = new ChildWidget({ element: childElement });
+        const parentChange = vi.fn();
+        const link = new CascadedWidgetLink(ParentWidget, child, parentChange);
+
+        link.set_parentID("Parent");
+        expect(link.get_parentID()).toBe("Parent");
+        parentElement.dispatchEvent(new Event("change"));
+        expect(parentChange).toHaveBeenCalledWith(parent);
+        expect((link as any).unbind()).toBe(parent);
+
+        child.destroy();
+        parent.destroy();
+    });
 });

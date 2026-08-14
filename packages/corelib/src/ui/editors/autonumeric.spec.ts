@@ -127,6 +127,152 @@ describe("AutoNumeric.init", () => {
     });
 });
 
+describe("AutoNumeric input events", () => {
+    it("handles keyboard and focus events on an initialized input", () => {
+        const input = initInput({ aSep: ",", aDec: ".", vMin: "-9999", vMax: "9999" }, "12");
+
+        expect(() => input.dispatchEvent(new KeyboardEvent("keydown", { key: "1", keyCode: 49, which: 49, bubbles: true }))).not.toThrow();
+        expect(() => input.dispatchEvent(new KeyboardEvent("keypress", { key: "2", keyCode: 50, which: 50, bubbles: true }))).not.toThrow();
+        expect(() => input.dispatchEvent(new KeyboardEvent("keyup", { key: "2", keyCode: 50, which: 50, bubbles: true }))).not.toThrow();
+        expect(() => input.dispatchEvent(new Event("focusin", { bubbles: true }))).not.toThrow();
+        expect(() => input.dispatchEvent(new Event("focusout", { bubbles: true }))).not.toThrow();
+        AutoNumeric.destroy(input);
+    });
+
+    it("handles readonly and disabled focus paths", () => {
+        const input = initInput({}, "12");
+        input.readOnly = true;
+        input.disabled = true;
+        expect(() => input.dispatchEvent(new KeyboardEvent("keydown", { key: "1", keyCode: 49, which: 49 }))).not.toThrow();
+        expect(() => input.dispatchEvent(new Event("focusin"))).not.toThrow();
+        expect(() => input.dispatchEvent(new Event("focusout"))).not.toThrow();
+        AutoNumeric.destroy(input);
+    });
+
+    it("processes navigation, deletion, decimal, sign, and modifier keys", () => {
+        const input = initInput({ aSep: ",", aDec: ".", vMin: "-999999", vMax: "999999" }, "1234.5");
+        const dispatchKey = (type: string, keyCode: number, key: string, modifiers?: any) => {
+            const event = new KeyboardEvent(type, { key, bubbles: true, ...modifiers });
+            Object.defineProperty(event, "keyCode", { value: keyCode });
+            Object.defineProperty(event, "which", { value: keyCode });
+            input.dispatchEvent(event);
+        };
+        const events = [
+            { type: "keydown", key: "Backspace", keyCode: 8, which: 8 },
+            { type: "keydown", key: "Delete", keyCode: 46, which: 46 },
+            { type: "keydown", key: "ArrowLeft", keyCode: 37, which: 37 },
+            { type: "keydown", key: "ArrowRight", keyCode: 39, which: 39 },
+            { type: "keydown", key: "Home", keyCode: 36, which: 36 },
+            { type: "keydown", key: "End", keyCode: 35, which: 35 },
+            { type: "keydown", key: ".", keyCode: 190, which: 190 },
+            { type: "keydown", key: "-", keyCode: 189, which: 189 },
+            { type: "keydown", key: "1", keyCode: 49, which: 49, ctrlKey: true },
+            { type: "keypress", key: ",", keyCode: 188, which: 188 },
+            { type: "keyup", key: "1", keyCode: 49, which: 49 }
+        ];
+        for (const info of events) {
+            expect(() => input.dispatchEvent(new KeyboardEvent(info.type, { ...info, bubbles: true }))).not.toThrow();
+        }
+        dispatchKey("keydown", 8, "Backspace");
+        dispatchKey("keydown", 46, "Delete");
+        dispatchKey("keypress", 49, "1");
+        dispatchKey("keypress", 190, ".");
+        dispatchKey("keypress", 189, "-");
+        dispatchKey("keydown", 86, "v", { ctrlKey: true });
+        dispatchKey("keyup", 86, "v", { ctrlKey: true });
+        dispatchKey("keydown", 65, "a", { ctrlKey: true });
+        dispatchKey("keydown", 67, "c", { ctrlKey: true });
+        dispatchKey("keydown", 88, "x", { ctrlKey: true });
+        dispatchKey("keyup", 67, "c", { ctrlKey: true });
+        dispatchKey("keydown", 112, "F1");
+        dispatchKey("keydown", 9, "Tab");
+        dispatchKey("keydown", 91, "Meta");
+        dispatchKey("keydown", 37, "ArrowLeft");
+        dispatchKey("keydown", 39, "ArrowRight");
+        AutoNumeric.destroy(input);
+    });
+
+    it("processes paste, selection deletion, and sign/decimal insertion", () => {
+        const input = initInput({ aSep: "", aDec: ".", vMin: "-9999.99", vMax: "9999.99" }, "123");
+        input.setSelectionRange(1, 2);
+        input.dispatchEvent(new KeyboardEvent("keydown", { key: "Delete", keyCode: 46, which: 46 }));
+        input.dispatchEvent(new KeyboardEvent("keypress", { key: ".", keyCode: 190, which: 190 }));
+        input.dispatchEvent(new KeyboardEvent("keypress", { key: "-", keyCode: 189, which: 189 }));
+
+        input.setSelectionRange(0, 0);
+        input.dispatchEvent(new KeyboardEvent("keydown", { key: "v", keyCode: 86, which: 86, ctrlKey: true }));
+        input.dispatchEvent(new KeyboardEvent("keyup", { key: "v", keyCode: 86, which: 86, ctrlKey: true }));
+        input.dispatchEvent(new KeyboardEvent("keydown", { key: "Insert", keyCode: 45, which: 45, shiftKey: true }));
+        expect(() => input.dispatchEvent(new KeyboardEvent("keyup", { key: "Insert", keyCode: 45, which: 45, shiftKey: true }))).not.toThrow();
+        AutoNumeric.destroy(input);
+    });
+
+    it("formats alternate decimals, brackets, padding, and exponential values", () => {
+        const alternate = initInput({ aDec: ",", altDec: ".", aSep: ".", mDec: 3, aPad: false }, "1234.5678");
+        AutoNumeric.setValue(alternate, "1234.5678");
+        expect(AutoNumeric.getValue(alternate)).toContain("1234");
+        AutoNumeric.destroy(alternate);
+
+        const bracketed = initInput({ vMin: "-9999", vMax: "9999", nBracket: "[,]", aSep: "", aDec: "." });
+        AutoNumeric.setValue(bracketed, "-12.5");
+        expect(bracketed.value).toContain("[");
+        AutoNumeric.destroy(bracketed);
+
+        const tiny = initInput({ aSep: "", aDec: ".", mDec: 8, aPad: false });
+        AutoNumeric.setValue(tiny, "1e-7");
+        expect(AutoNumeric.getValue(tiny)).toContain("0.0000001");
+        AutoNumeric.destroy(tiny);
+    });
+
+    it("uses an empty negative character when vMin is positive", () => {
+        const input = initInput({
+            aSep: "",
+            aDec: ".",
+            vMin: "0",
+            vMax: "9999.99"
+        });
+
+        expect((AutoNumeric.getSettings(input) as any).aNeg).toBe("");
+        AutoNumeric.setValue(input, "12.5");
+        expect(AutoNumeric.getValue(input)).toBe("12.5");
+        AutoNumeric.destroy(input);
+    });
+
+    it("positions a prefix sign for negative and positive values", () => {
+        const dispatchCopy = (input: HTMLInputElement) => {
+            const event = new KeyboardEvent("keydown", { key: "c", ctrlKey: true, bubbles: true });
+            Object.defineProperty(event, "keyCode", { value: 67 });
+            Object.defineProperty(event, "which", { value: 67 });
+            input.dispatchEvent(event);
+        };
+
+        const negative = initInput({ aSign: "$", pSign: "p", vMin: "-9999", vMax: "9999", aSep: "" });
+        AutoNumeric.setValue(negative, "-12");
+        negative.setSelectionRange(0, 2);
+        dispatchCopy(negative);
+        expect(negative.selectionStart).toBe(0);
+        expect(negative.selectionEnd).toBe(2);
+        AutoNumeric.destroy(negative);
+
+        const positive = initInput({ aSign: "$", pSign: "p", vMin: "0", vMax: "9999", aSep: "" });
+        AutoNumeric.setValue(positive, "12");
+        positive.setSelectionRange(0, 1);
+        dispatchCopy(positive);
+        expect(positive.selectionStart).toBe(0);
+        expect(positive.selectionEnd).toBe(1);
+        AutoNumeric.destroy(positive);
+    });
+
+    it("evaluates function-valued settings during initialization", () => {
+        const input = createInput();
+        AutoNumeric.init(input, {
+            aSign: (_el: any, _settings: any, key: string) => key === "aSign" ? "$" : ""
+        } as any);
+        expect(AutoNumeric.getSettings(input).aSign).toBe("$");
+        AutoNumeric.destroy(input);
+    });
+});
+
 // ===================== AutoNumeric.destroy =====================
 
 describe("AutoNumeric.destroy", () => {

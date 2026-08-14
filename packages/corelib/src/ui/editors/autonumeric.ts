@@ -5,36 +5,16 @@ import { Fluent } from "../../base";
 */
 function getElementSelection(that: HTMLInputElement) {
     var position: { start?: number, end?: number, length?: number } = {};
-    if (that.selectionStart === undefined) {
-        that.focus();
-        var select = (document as any).selection.createRange();
-        position.length = select.text.length;
-        select.moveStart('character', -that.value.length);
-        position.end = select.text.length;
-        position.start = position.end - position.length;
-    } else {
-        position.start = that.selectionStart;
-        position.end = that.selectionEnd;
-        position.length = position.end - position.start;
-    }
+    position.start = that.selectionStart;
+    position.end = that.selectionEnd;
+    position.length = position.end - position.start;
     return position;
 }
 
-/**
- * Cross browser routine for setting selected range/cursor position
- */
+/** Sets the selected range or cursor position. */
 function setElementSelection(that: HTMLInputElement, start: number, end: number) {
-    if (that.selectionStart === undefined) {
-        that.focus();
-        var r = (that as any).createTextRange();
-        r.collapse(true);
-        r.moveEnd('character', end);
-        r.moveStart('character', start);
-        r.select();
-    } else {
-        that.selectionStart = start;
-        that.selectionEnd = end;
-    }
+    that.selectionStart = start;
+    that.selectionEnd = end;
 }
 
 export interface AutoNumericOptions {
@@ -177,8 +157,7 @@ export interface AutoNumericOptions {
 /**
  * run callbacks in parameters if any
  * any parameter could be a callback:
- * - a function, which invoked with jQuery element, parameters and this parameter name and returns parameter value
- * - a name of function, attached to $(selector).autoNumeric.functionName(){} - which was called previously
+ * - a function, which receives the input, settings, and option name and returns the option value
  */
 function runCallbacks(input: HTMLInputElement & { autoNumeric?: AutoNumericOptions }, settings: AutoNumericOptions) {
     /**
@@ -188,14 +167,8 @@ function runCallbacks(input: HTMLInputElement & { autoNumeric?: AutoNumericOptio
      */
     Object.keys(settings).forEach(function (k) {
         var val = (settings as any)[k];
-        if (typeof val === 'function') {
+        if (typeof val === 'function')
             (settings as any)[k] = val(input, settings, k);
-        } else if (typeof (AutoNumeric.getSettings(input) as any)?.[val] === 'function') {
-            /**
-             * calls the attached function from the html5 data example: data-a-sign="functionName"
-             */
-            (settings as any)[k] = (AutoNumeric.getSettings(input) as any)?.[val](input, settings, k);
-        }
     });
 }
 
@@ -314,12 +287,8 @@ function truncateDecimal(s: string, aDec: string, mDec: number) {
         /** truncate decimal part to satisfying length
          * cause we would round it anyway */
         if (parts[1] && parts[1].length > mDec) {
-            if (mDec > 0) {
-                parts[1] = parts[1].substring(0, mDec);
-                s = parts.join(aDec);
-            } else {
-                s = parts[0];
-            }
+            parts[1] = parts[1].substring(0, mDec);
+            s = parts.join(aDec);
         }
     }
     return s;
@@ -331,9 +300,6 @@ function truncateDecimal(s: string, aDec: string, mDec: number) {
 function fixNumber(s: string, aDec: string, aNeg: string) {
     if (aDec && aDec !== '.') {
         s = s.replace(aDec, '.');
-    }
-    if (aNeg && aNeg !== '-') {
-        s = s.replace(aNeg, '-');
     }
     if (!s.match(/\d/)) {
         s += '0';
@@ -385,9 +351,6 @@ function checkValue(value: any, settings: AutoNumericOptions) {
  * prepare real number to be converted to our format
  */
 function presentNumber(s: string, aDec: string, aNeg: string) {
-    if (aNeg && aNeg !== '-') {
-        s = s.replace('-', aNeg);
-    }
     if (aDec && aDec !== '.') {
         s = s.replace('.', aDec);
     }

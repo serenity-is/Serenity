@@ -35,12 +35,16 @@ export function mockJQuery(fn: any = {}) {
                 this._selector?.setAttribute?.(k, v);
                 return this;
             },
-            off: function (ev: string, handler: () => void) {
-                this._selector?.removeEventListener?.(ev, handler);
+            off: function (ev: string, a: any, b: any) {
+                const handler = typeof a === "function" ? a : (b ?? a);
+                if (typeof handler === "function")
+                    this._selector?.removeEventListener?.(ev, handler);
                 return this;
             },
-            on: function (ev: string, handler: () => void) {
-                this._selector?.addEventListener?.(ev, handler);
+            on: function (ev: string, a: any, b: any) {
+                const handler = typeof a === "function" ? a : (b ?? a);
+                if (typeof handler === "function")
+                    this._selector?.addEventListener?.(ev, handler);
                 return this;
             },
             trigger: function (ev: Event) {
@@ -54,8 +58,10 @@ export function mockJQuery(fn: any = {}) {
             hasClass: function (cls: string) {
                 return !!this._selector?.classList?.contains(cls);
             },
-            one: function (ev: string, handler: () => void) {
-                this._selector?.addEventListener?.(ev, handler);
+            one: function (ev: string, a: any, b: any) {
+                const handler = typeof a === "function" ? a : (b ?? a);
+                if (typeof handler === "function")
+                    this._selector?.addEventListener?.(ev, handler);
                 return this;
             },
             destroy: function () {
@@ -86,6 +92,10 @@ export function mockJQuery(fn: any = {}) {
         }
         ev.isDefaultPrevented = () => false;
         ev.preventDefault = () => { ev.isDefaultPrevented = () => true; }
+        ev.isPropagationStopped = () => false;
+        ev.stopPropagation = () => { ev.isPropagationStopped = () => true; }
+        ev.isImmediatePropagationStopped = () => false;
+        ev.stopImmediatePropagation = () => { ev.isImmediatePropagationStopped = () => true; }
         return ev;
     }
     (window as any)["jQuery"] = jQuery;

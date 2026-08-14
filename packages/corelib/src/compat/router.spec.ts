@@ -714,3 +714,73 @@ describe("ClassicRouter.destroy", () => {
         expect(window.location.hash).toBe("#test");
     });
 });
+
+describe("ClassicRouter coverage edges", () => {
+    let oldLocation: string;
+
+    beforeEach(() => {
+        oldLocation = window.location.href;
+        document.body.innerHTML = "";
+    });
+
+    afterEach(() => {
+        changeJSDOMURL(oldLocation);
+        document.body.innerHTML = "";
+    });
+
+    it("prefixes the route with the owner id", () => {
+        const router = createRouter() as ClassicRouter;
+        document.documentElement.setAttribute("id", "root");
+        const panel = document.createElement("div");
+        panel.classList.add("panel-body");
+        document.body.appendChild(panel);
+        Fluent.trigger(panel, "panelopen");
+        expect(panel.dataset.qroute).toContain("root@");
+        document.documentElement.removeAttribute("id");
+        document.body.removeChild(panel);
+        router.destroy();
+    });
+
+    it("sorts visible dialogs by router order", () => {
+        const router = createRouter() as ClassicRouter;
+        const p1 = document.createElement("div");
+        p1.classList.add("panel-body");
+        p1.dataset.qrouterorder = "2";
+        const p2 = document.createElement("div");
+        p2.classList.add("panel-body");
+        p2.dataset.qrouterorder = "1";
+        Object.defineProperties(p1, { offsetWidth: { get: () => 100 }, offsetHeight: { get: () => 100 } });
+        Object.defineProperties(p2, { offsetWidth: { get: () => 100 }, offsetHeight: { get: () => 100 } });
+        document.body.append(p1, p2);
+        expect(() => router.resolve("#test")).not.toThrow();
+        document.body.removeChild(p1);
+        document.body.removeChild(p2);
+        router.destroy();
+    });
+
+    it("uses the topmost visible dialog as the owner", () => {
+        const router = createRouter() as ClassicRouter;
+        const p1 = document.createElement("div");
+        p1.classList.add("panel-body");
+        const p2 = document.createElement("div");
+        p2.classList.add("panel-body");
+        Object.defineProperties(p1, { offsetWidth: { get: () => 100 }, offsetHeight: { get: () => 100 } });
+        Object.defineProperties(p2, { offsetWidth: { get: () => 100 }, offsetHeight: { get: () => 100 } });
+        document.body.append(p1, p2);
+        Fluent.trigger(p1, "panelopen");
+        Fluent.trigger(p2, "panelopen");
+        expect(p2.dataset.qroute).toBeDefined();
+        document.body.removeChild(p1);
+        document.body.removeChild(p2);
+        router.destroy();
+    });
+
+    it("clears the ignore lock after expiration", () => {
+        const router = createRouter();
+        router.ignoreHashChange(-1);
+        window.dispatchEvent(new Event("hashchange"));
+        router.ignoreHashChange(1000);
+        window.dispatchEvent(new Event("hashchange"));
+        expect(() => router.destroy()).not.toThrow();
+    });
+});

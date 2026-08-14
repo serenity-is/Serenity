@@ -50,7 +50,7 @@ describe("IntegerEditor", () => {
 
     it("set_value uses AutoNumeric when instance exists", () => {
         vi.spyOn(AutoNumeric, "hasInstance").mockReturnValue(true);
-        const setValueSpy = vi.spyOn(AutoNumeric, "setValue").mockImplementation(() => { });
+        const setValueSpy = vi.spyOn(AutoNumeric, "setValue").mockImplementation((() => { }) as any);
         const editor = createEditor();
         editor.set_value(7);
         expect(setValueSpy).toHaveBeenCalledWith(editor.domNode, 7);
@@ -67,7 +67,7 @@ describe("IntegerEditor", () => {
 
     it("value setter delegates to set_value", () => {
         vi.spyOn(AutoNumeric, "hasInstance").mockReturnValue(true);
-        const setValueSpy = vi.spyOn(AutoNumeric, "setValue").mockImplementation(() => { });
+        const setValueSpy = vi.spyOn(AutoNumeric, "setValue").mockImplementation((() => { }) as any);
         const editor = createEditor();
         editor.value = 9;
         expect(setValueSpy).toHaveBeenCalled();

@@ -456,3 +456,124 @@ describe("LookupEditor", () => {
     });
 
 });
+
+describe("LookupEditor additional behavior", () => {
+    it("asyncSearch filters by ids, text, and paging", async () => {
+        ScriptData.set("Lookup.AsyncTest", {
+            idField: "Id",
+            textField: "Name",
+            items: [
+                { Id: 1, Name: "Alpha" },
+                { Id: 2, Name: "Beta" },
+                { Id: 3, Name: "Alphabet" }
+            ]
+        });
+
+        const editor = new LookupEditor({ lookupKey: "AsyncTest", async: true } as any);
+        const result = await (editor as any).asyncSearch({
+            idList: ["1", "3"],
+            searchTerm: "alp",
+            skip: 0,
+            take: 1
+        });
+        expect(result.items).toHaveLength(1);
+        expect(result.items[0]).toEqual({ Id: 1, Name: "Alpha" });
+        expect(result.more).toBe(true);
+        editor.destroy();
+    });
+
+    it("maps lookup items and handles null text", () => {
+        ScriptData.set("Lookup.MapTest", {
+            idField: "Id",
+            textField: "Name",
+            items: [{ Id: 1, Name: null }]
+        });
+        const editor = new LookupEditor({ lookupKey: "MapTest" } as any);
+        expect(editor.items[0].id).toBe("1");
+        expect(editor.items[0].text).toBe("");
+        expect(editor.items[0].disabled).toBe(false);
+        editor.destroy();
+    });
+
+    it("sets create term on the lookup text field", () => {
+        ScriptData.set("Lookup.CreateTest", {
+            idField: "Id",
+            textField: "Name",
+            items: []
+        });
+        const editor = new LookupEditor({ lookupKey: "CreateTest" } as any);
+        const entity: any = {};
+        (editor as any).setCreateTermOnNewEntity(entity, "Created");
+        expect(entity.Name).toBe("Created");
+        editor.destroy();
+    });
+
+    it("derives lookup key from a registered editor type", () => {
+        ScriptData.set("Lookup.Explicit", { items: [] });
+        class CustomLookupEditor extends LookupEditor<any> {
+            static [Symbol.typeInfo] = this.registerEditor("Test.CustomLookupEditor");
+        }
+        const editor = new CustomLookupEditor({ lookupKey: "Explicit" } as any);
+        expect((editor as any).getLookupKey()).toBe("Explicit");
+        editor.destroy();
+    });
+
+    it("derives lookup key without an explicit option", () => {
+        ScriptData.set("Lookup.Products", { idField: "Id", textField: "Name", items: [] });
+        class ProductsEditor extends LookupEditor<any> {
+            static [Symbol.typeInfo] = this.registerEditor("Test.ProductsEditor");
+        }
+        const editor = new ProductsEditor({} as any);
+        expect((editor as any).getLookupKey()).toBe("Products");
+        editor.destroy();
+    });
+
+    it("returns early from updateItems for async sources", () => {
+        ScriptData.set("AsyncEarly", { items: [{ id: 1, text: "One" }] });
+        const editor = new LookupEditor({ lookupKey: "AsyncEarly", async: true } as any);
+        expect(() => editor.updateItems()).not.toThrow();
+        editor.destroy();
+    });
+
+    it("supports asyncSearch without ids or a search term", async () => {
+        class AsyncEditor extends LookupEditor<any> {
+            protected override getLookupAsync() {
+                return Promise.resolve({
+                    idField: "Id",
+                    textField: "Name",
+                    items: [{ Id: 1, Name: "One" }, { Id: 2, Name: "Two" }]
+                } as any);
+            }
+        }
+        const editor = new AsyncEditor({ async: true } as any);
+        const result = await (editor as any).asyncSearch({ skip: 0 });
+        expect(result.items).toHaveLength(2);
+        expect(result.more).toBeUndefined();
+        editor.destroy();
+    });
+
+    it("uses base item text when lookup is null", () => {
+        ScriptData.set("Lookup.BaseText", { items: [] });
+        const editor = new LookupEditor({ lookupKey: "BaseText" } as any);
+        expect((editor as any).getItemText({ Name: "Base" }, null)).toBe("");
+        expect((editor as any).getIdField()).toBeUndefined();
+        editor.destroy();
+    });
+
+    it("uses lookup key as dialog type fallback", () => {
+        ScriptData.set("Lookup.DialogKey", { items: [] });
+        const editor = new LookupEditor({ lookupKey: "DialogKey" } as any);
+        expect((editor as any).getDialogTypeKey()).toBe("DialogKey");
+        editor.destroy();
+    });
+
+    it("reloads lookup when edit dialog data changes", async () => {
+        ScriptData.set("Lookup.ReloadKey", { items: [] });
+        const reloadSpy = vi.spyOn(await import("../../compat"), "reloadLookup").mockImplementation((() => { }) as any);
+        const editor = new LookupEditor({ lookupKey: "ReloadKey" } as any);
+        (editor as any).editDialogDataChange();
+        expect(reloadSpy).toHaveBeenCalledWith("ReloadKey");
+        reloadSpy.mockRestore();
+        editor.destroy();
+    });
+});

@@ -23,7 +23,7 @@ export class FileUploadEditor<P extends FileUploadEditorOptions = FileUploadEdit
         super(props);
 
         if (!this.options || this.options.allowNonImage == null)
-            this.options.allowNonImage = true;
+            this.options.allowNonImage = this.getDefaultAllowNonImage();
 
         this.domNode.classList.add('s-FileUploadEditor');
 
@@ -108,6 +108,10 @@ export class FileUploadEditor<P extends FileUploadEditorOptions = FileUploadEdit
                 }
             }
         ];
+    }
+
+    protected getDefaultAllowNonImage(): boolean {
+        return true;
     }
 
     protected populate(): void {
@@ -261,10 +265,12 @@ export class ImageUploadEditor<P extends ImageUploadEditorOptions = ImageUploadE
     constructor(props: EditorProps<P>) {
         super(props);
 
-        if (this.options.allowNonImage == null)
-            this.options.allowNonImage = false;
+        this.options.allowNonImage = this.getDefaultAllowNonImage();
 
         this.domNode.classList.add("s-ImageUploadEditor'")
+    }
+    protected override getDefaultAllowNonImage(): boolean {
+        return false;
     }
 }
 

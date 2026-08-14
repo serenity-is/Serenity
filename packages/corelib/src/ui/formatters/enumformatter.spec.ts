@@ -58,4 +58,34 @@ describe("EnumFormatter", () => {
         var value = EnumFormatter.getName(EnumTypeRegistry.get("TestEnum"), 1);
         expect(value).toBe("Value1");
     })
+
+    it("handles async enum type loading", async () => {
+        enum TestEnum {
+            Value1 = 1
+        };
+        registerEnum(TestEnum, "AsyncEnum", "AsyncEnum");
+        const getOrLoad = vi.spyOn(EnumTypeRegistry, "getOrLoad").mockReturnValue(Promise.resolve(TestEnum));
+        const formatter = new EnumFormatter();
+        formatter.enumKey = "AsyncEnum";
+        const container = document.createElement("div");
+        const node = formatter.format(ctx({ value: 1 })) as HTMLElement;
+        container.appendChild(node);
+        expect(node.tagName).toBe("SPAN");
+        await Promise.resolve();
+        expect(node.parentElement).toBeNull();
+        expect(container.firstChild?.nodeType).toBe(Node.TEXT_NODE);
+        expect(container.textContent.length).toBeGreaterThan(0);
+        getOrLoad.mockRestore();
+    });
+
+    it("returns empty text for an empty enum name", () => {
+        expect(EnumFormatter.getText("Some.Key", "")).toBe("");
+    });
+
+    it("returns empty name for a null value", () => {
+        enum TestEnum {
+            Value1 = 1
+        };
+        expect(EnumFormatter.getName(TestEnum, null)).toBe("");
+    });
 });

@@ -3,7 +3,7 @@
  */
 
 import { bindThis } from "@serenity-is/domwise";
-import { Fluent, SelectEditorTexts, serviceCall, stringFormat } from "../../base";
+import { debounce, Fluent, SelectEditorTexts, serviceCall, stringFormat } from "../../base";
 
 export type Select2Element = HTMLInputElement | HTMLSelectElement;
 export type Select2FormatResult = string | Element | DocumentFragment;
@@ -292,29 +292,8 @@ function installFilteredMouseMove(element: HTMLElement) {
     });
 }
 
-/**
- * Debounces a function. Returns a function that calls the original fn function only if no invocations have been made
- * within the last quietMillis milliseconds.
- *
- * @param quietMillis number of milliseconds to wait before invoking fn
- * @param fn function to be debounced
- * @param ctx object to be used as this reference within fn
- * @return debounced version of fn
- */
-function debounce(quietMillis: number, fn: any, ctx?: any) {
-    ctx = ctx || undefined;
-    var timeout: number;
-    return function () {
-        var args = arguments;
-        clearTimeout(timeout);
-        timeout = window.setTimeout(function () {
-            fn.apply(ctx, args);
-        }, quietMillis);
-    } as any;
-}
-
 function installDebouncedScroll(threshold: number, element: Element) {
-    var notify = debounce(threshold, function (args?: any) { Fluent.trigger(element, "scroll-debounced", args); });
+    var notify = debounce(function (args?: any) { Fluent.trigger(element, "scroll-debounced", args); }, threshold);
     Fluent.on(element, "scroll", function (e) {
         if (e.target === element) notify();
     });
@@ -327,7 +306,7 @@ function focus($el: HTMLElement) {
         of the current event has finished - which seems like the only reliable way
         to set focus */
     window.setTimeout(function () {
-        var el = $el, pos = ($el as any).value?.length || 0, range;
+        var el = $el, pos = ($el as any).value?.length || 0;
 
         $el.focus();
 
@@ -336,34 +315,17 @@ function focus($el: HTMLElement) {
         var isVisible = (el.offsetWidth > 0 || el.offsetHeight > 0);
         if (isVisible && el === document.activeElement) {
 
-            /* after the focus is set move the caret to the end, necessary when we val()
-                just before setting focus */
-            if ((el as any).setSelectionRange) {
-                (el as any).setSelectionRange(pos, pos);
-            }
-            else if ((el as any).createTextRange) {
-                range = (el as any).createTextRange();
-                range.collapse(false);
-                range.select();
-            }
+            /* after the focus is set move the caret to the end */
+            (el as HTMLInputElement).setSelectionRange(pos, pos);
         }
     }, 0);
 }
 
 function getCursorInfo(el: HTMLElement) {
-    var offset = 0;
-    var length = 0;
-    if ('selectionStart' in el) {
-        offset = (el as any).selectionStart;
-        length = (el as any).selectionEnd - offset;
-    } else if ('selection' in document) {
-        el.focus();
-        var sel = (document.selection as any).createRange();
-        length = (document.selection as any).createRange().text.length;
-        sel.moveStart('character', -(el as any).value.length);
-        offset = sel.text.length - length;
-    }
-    return { offset: offset, length: length };
+    const input = el as HTMLInputElement;
+    const offset = input.selectionStart ?? 0;
+    const length = (input.selectionEnd ?? offset) - offset;
+    return { offset, length };
 }
 
 function killEvent(event: Event) {
@@ -2318,7 +2280,7 @@ class SingleSelect2 extends AbstractSelect2 {
     }
 
     protected override opening() {
-        var el, range, len;
+        var el, len;
 
         if (this.opts.minimumResultsForSearch >= 0) {
             this.showSearch(true);
@@ -2327,9 +2289,6 @@ class SingleSelect2 extends AbstractSelect2 {
         super.opening();
 
         if (this.showSearchInput !== false) {
-            // IE appends focusser.val() at the end of field :/ so we manually insert it at the beginning using a range
-            // all other browsers handle this just fine
-
             this.search.value = this.focusser.value;
         }
         if (this.opts.shouldFocusInput(this)) {
@@ -2337,11 +2296,7 @@ class SingleSelect2 extends AbstractSelect2 {
             // move the cursor to the end after focussing, otherwise it will be at the beginning and
             // new text will appear *before* focusser.val()
             el = this.search;
-            if ((el as any).createTextRange) {
-                range = (el as any).createTextRange();
-                range.collapse(false);
-                range.select();
-            } else if (el.setSelectionRange) {
+            if (el.setSelectionRange) {
                 len = this.search.value.length;
                 el.setSelectionRange(len, len);
             }

@@ -897,5 +897,87 @@ describe("cssEscape", () => {
         });
     });
 
+    describe("edge cases", () => {
+        it("falls back to manual escaping when CSS.escape is unavailable", () => {
+            const orig = (globalThis as any).CSS;
+            (globalThis as any).CSS = undefined;
+            try {
+                expect(cssEscape("-")).toBe("\\-");
+                expect(cssEscape("\u0000")).toBe("\uFFFD");
+                expect(cssEscape("a\u0000b")).toBe("a\uFFFDb");
+                expect(cssEscape("\u0001")).toBe("\\1 ");
+                expect(cssEscape("\u007F")).toBe("\\7f ");
+                expect(cssEscape("1abc")).toBe("\\31 abc");
+                expect(cssEscape("-2")).toBe("-\\32 ");
+                expect(cssEscape("abcABC123-_")).toBe("abcABC123-_");
+                expect(cssEscape("a b.c#d:e;f[g]")).toBe("a\\ b\\.c\\#d\\:e\\;f\\[g\\]");
+                expect(cssEscape("üñîçødë")).toBe("üñîçødë");
+                expect(cssEscape("")).toBe("");
+            } finally {
+                (globalThis as any).CSS = orig;
+            }
+        });
+
+        it("rejects return urls with disallowed characters", () => {
+            expect(isSafeReturnUrl("//evil.example")).toBe(false);
+            expect(isSafeReturnUrl("http://evil.example")).toBe(false);
+            expect(isSafeReturnUrl("/colon:path")).toBe(false);
+            expect(isSafeReturnUrl("/path with space")).toBe(false);
+            expect(isSafeReturnUrl("/path#fragment")).toBe(false);
+        });
+
+        it("escapes html when DOMParser is unavailable", () => {
+            const orig = (globalThis as any).DOMParser;
+            (globalThis as any).DOMParser = undefined;
+            try {
+                expect(sanitizeHtml("<script>x</script>")).toBe(htmlEncode("<script>x</script>"));
+            } finally {
+                (globalThis as any).DOMParser = orig;
+            }
+        });
+
+        it("escapes html when parsing throws", () => {
+            const orig = (globalThis as any).DOMParser;
+            (globalThis as any).DOMParser = class {
+                parseFromString() { throw new Error("boom"); }
+            };
+            try {
+                expect(sanitizeHtml("<b>x</b>")).toBe(htmlEncode("<b>x</b>"));
+            } finally {
+                (globalThis as any).DOMParser = orig;
+            }
+        });
+
+        it("moves document content into the body during sanitization", () => {
+            const orig = (globalThis as any).DOMParser;
+            const body = document.createElement("body");
+            const docEl = document.createElement("html");
+            docEl.innerHTML = "<div>content</div>";
+            (globalThis as any).DOMParser = class {
+                parseFromString() { return { body, documentElement: docEl }; }
+            };
+            try {
+                expect(sanitizeHtml("<p>x</p>")).toContain("content");
+            } finally {
+                (globalThis as any).DOMParser = orig;
+            }
+        });
+
+        it("uses the document element when the body remains empty", () => {
+            const orig = (globalThis as any).DOMParser;
+            const body = document.createElement("body");
+            const docEl = document.createElement("div");
+            docEl.innerHTML = "  ";
+            (globalThis as any).DOMParser = class {
+                parseFromString() { return { body, documentElement: docEl }; }
+            };
+            try {
+                expect(sanitizeHtml("<p>x</p>").trim()).toBe("");
+            } finally {
+                (globalThis as any).DOMParser = orig;
+            }
+        });
+    });
+
 });
 

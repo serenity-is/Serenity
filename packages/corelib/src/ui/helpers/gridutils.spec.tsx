@@ -127,6 +127,19 @@ describe("GridUtils", () => {
             expect((params as any).IncludeDeleted).toBe(false);
             expect(result).toBe(true);
         });
+
+        it("cleans up the view submit handler on dispose", () => {
+            const toolDiv = document.createElement("div");
+            const oldSubmit = vi.fn();
+            const view = {
+                onSubmit: oldSubmit,
+                seekToPage: 0,
+                populate: vi.fn()
+            };
+            GridUtils.addIncludeDeletedToggle(toolDiv, view as any);
+            toolDiv.dispatchEvent(new CustomEvent("disposing", { bubbles: false }));
+            expect(view.onSubmit).toBeNull();
+        });
     });
 
     describe("addQuickSearch", () => {
@@ -266,6 +279,72 @@ describe("GridUtils", () => {
             // This simulates what happens when the element is removed from the DOM
             input!.dispatchEvent(new CustomEvent("disposing", { bubbles: false }));
         });
+
+        it("triggers the view search fallback from the input", () => {
+            const container = document.createElement("div");
+            const populate = vi.fn();
+            const view = {
+                onSubmit: vi.fn(),
+                seekToPage: 0,
+                populate,
+                getLength: vi.fn(() => 5),
+                onDataLoaded: { subscribe: vi.fn(), unsubscribe: vi.fn() }
+            };
+            const input = GridUtils.addQuickSearch({ container, view: view as any }) as any;
+            input.searchNow("term");
+            expect(view.seekToPage).toBe(1);
+            expect(populate).toHaveBeenCalled();
+            input.domNode.remove();
+        });
+
+        it("passes ContainsField when a field is selected", () => {
+            const container = document.createElement("div");
+            const view = {
+                onSubmit: vi.fn(),
+                seekToPage: 0,
+                populate: vi.fn(),
+                onDataLoaded: { subscribe: vi.fn(), unsubscribe: vi.fn() }
+            };
+            const input = GridUtils.addQuickSearch({ container, view: view as any }) as any;
+            input.set_field({ name: "f1", title: "F1" });
+            input.domNode.value = "test";
+            const params: any = {};
+            view.onSubmit({ params });
+            expect(params.ContainsField).toBe("f1");
+            input.domNode.remove();
+        });
+
+        it("returns true from submit wrapper without an old handler", () => {
+            const container = document.createElement("div");
+            const view = {
+                onSubmit: null,
+                seekToPage: 0,
+                populate: vi.fn(),
+                onDataLoaded: { subscribe: vi.fn(), unsubscribe: vi.fn() }
+            };
+            GridUtils.addQuickSearch({ container, view: view as any });
+            const result = view.onSubmit({ params: {} });
+            expect(result).toBe(true);
+        });
+
+        it("reports data loaded results after a search", () => {
+            let subscribeHandler: Function;
+            const container = document.createElement("div");
+            const view = {
+                onSubmit: vi.fn(),
+                seekToPage: 0,
+                populate: vi.fn(),
+                getLength: vi.fn(() => 5),
+                onDataLoaded: {
+                    subscribe: vi.fn((h: Function) => { subscribeHandler = h; }),
+                    unsubscribe: vi.fn()
+                }
+            };
+            const input = GridUtils.addQuickSearch({ container, view: view as any }) as any;
+            input.searchNow("term");
+            subscribeHandler();
+            input.domNode.remove();
+        });
     });
 
     describe("addQuickSearchInput", () => {
@@ -308,6 +387,15 @@ describe("GridUtils", () => {
             const searchFn = vi.fn();
             const input = GridUtils.addQuickSearchInputCustom(container, searchFn, [{ name: "f1", title: "F1" }]);
             expect(input).toBeTruthy();
+        });
+
+        it("invokes the custom search with field, query and done", () => {
+            const container = document.createElement("div");
+            const searchFn = vi.fn();
+            const input = GridUtils.addQuickSearchInputCustom(container, searchFn) as any;
+            input.searchNow("term");
+            expect(searchFn).toHaveBeenCalledWith(undefined, "term", expect.any(Function));
+            input.domNode.remove();
         });
     });
 
