@@ -335,6 +335,24 @@ describe("registerClass", () => {
         expect(getType("MyClassName")).toBe(MyClass);
     });
 
+    it("does not redefine implementedInterfacesSymbol when type already has its own", () => {
+        class Intf1 {
+            static [Symbol.typeInfo] = interfaceTypeInfo("Intf1");
+        }
+
+        class Test {
+        }
+
+        const existing: any[] = [Intf1];
+        Object.defineProperty(Test, implementedInterfacesSymbol, { value: existing, configurable: true });
+        (Test as any)[Symbol.typeInfo] = { typeKind: "class", typeName: "Test_AlreadyHasOwnInterfaces", interfaces: [Intf1] };
+
+        ensureTypeInfo(Test);
+
+        // autoRegisterViaTypeInfo should not redefine the existing own property
+        expect(Test[implementedInterfacesSymbol]).toBe(existing);
+    });
+
     it('works with attribute instances', function () {
         class MyAttr extends CustomAttribute {
         }

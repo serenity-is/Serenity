@@ -73,7 +73,7 @@ function autoRegisterViaTypeInfo(type: any): void {
         getGlobalTypeRegistry()[typeInfo.typeName] = type;
 
     if (typeInfo.interfaces?.length &&
-        !Object.prototype.hasOwnProperty.call(implementedInterfacesSymbol)) {
+        !Object.prototype.hasOwnProperty.call(type, implementedInterfacesSymbol)) {
         Object.defineProperty(type, implementedInterfacesSymbol, {
             value: merge(type[implementedInterfacesSymbol], typeInfo.interfaces),
             configurable: true
