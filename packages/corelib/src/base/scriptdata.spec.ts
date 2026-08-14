@@ -312,6 +312,22 @@ describe("fetchScriptData", () => {
         expect(data.textField).toBe("txt");
         scriptDataHooks.fetchScriptData = originalHook;
     });
+
+    it("uses async scriptDataHooks.fetchScriptData hook and converts to Lookup from resolved data", async () => {
+        const testLookup = { Params: { idField: "id", textField: "txt" }, Items: [{ id: 3, txt: "C" }] };
+        const originalHook = scriptDataHooks.fetchScriptData;
+        scriptDataHooks.fetchScriptData = async (name: string) => {
+            expect(name).toBe("Lookup.Test3");
+            return testLookup as any;
+        };
+
+        let data: any = await fetchScriptData("Lookup.Test3");
+        expect(data).toBeInstanceOf(Lookup);
+        expect(data.items).toEqual([{ id: 3, txt: "C" }]);
+        expect(data.idField).toBe("id");
+        expect(data.textField).toBe("txt");
+        scriptDataHooks.fetchScriptData = originalHook;
+    });
 });
 
 describe("getScriptData", () => {

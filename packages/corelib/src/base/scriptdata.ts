@@ -72,7 +72,7 @@ export function fetchScriptData<TData>(name: string): Promise<TData> {
     if (hookResult != void 0) {
         return Promise.resolve(hookResult).then(data => {
             if (name?.startsWith("Lookup.") && (data as any)?.Items && !(data as any).items && !(data as any).itemById)
-                return new Lookup((hookResult as any).Params, (hookResult as any).Items) as any;
+                return new Lookup((data as any).Params, (data as any).Items) as any;
             return data;
         });
     }
