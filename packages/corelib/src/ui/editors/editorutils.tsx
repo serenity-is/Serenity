@@ -27,8 +27,8 @@ export namespace EditorUtils {
         if (typeof value === "string")
             return value;
 
-        if (value instanceof Boolean)
-            return (!!value ? ((FilterPanelTexts.asTry().OperatorNames as any)["true"] ?? 'True') :
+        if (typeof value === "boolean")
+            return (value ? ((FilterPanelTexts.asTry().OperatorNames as any)["true"] ?? 'True') :
                 ((FilterPanelTexts.asTry().OperatorNames as any)["false"] ?? 'False'));
 
         return value.toString();
@@ -197,9 +197,10 @@ export namespace EditorUtils {
         }
         var gridField = widget.domNode.closest('.field');
         var hasSupItem = gridField?.querySelector('sup');
-        if (isRequired && !hasSupItem && gridField) {
+        var caption = gridField?.querySelector('.caption');
+        if (isRequired && !hasSupItem && caption) {
             Fluent(<sup title={PropertyGridTexts.RequiredHint}>*</sup>)
-                .prependTo(gridField.querySelector('.caption'));
+                .prependTo(caption);
         }
         else if (!isRequired && hasSupItem) {
             Fluent(hasSupItem).remove();

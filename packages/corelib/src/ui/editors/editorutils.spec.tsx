@@ -183,8 +183,10 @@ describe("EditorUtils.setReadOnly", () => {
     });
 
     it("formats boolean and null display values", () => {
-        const editor: any = { domNode: document.createElement("input"), getEditValue: (item: any, target: any) => target[item.name] = new Boolean(true) };
-        expect(EditorUtils.getDisplayText(editor)).toBeTruthy();
+        const editor: any = { domNode: document.createElement("input"), getEditValue: (item: any, target: any) => target[item.name] = true };
+        expect(EditorUtils.getDisplayText(editor)).toBe("True");
+        const falseEditor: any = { domNode: document.createElement("input"), getEditValue: (item: any, target: any) => target[item.name] = false };
+        expect(EditorUtils.getDisplayText(falseEditor)).toBe("False");
         const nullEditor: any = { domNode: document.createElement("input"), getEditValue: (item: any, target: any) => target[item.name] = null };
         expect(EditorUtils.getDisplayText(nullEditor)).toBe("");
     });
