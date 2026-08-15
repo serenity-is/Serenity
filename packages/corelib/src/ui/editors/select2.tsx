@@ -2074,7 +2074,7 @@ abstract class AbstractSelect2 {
         }
 
         if (opts.formatSearching && this.findHighlightableChoices().length === 0) {
-            render("select2-searching", evaluate(opts.formatSearching, opts.element) + "</li>");
+            render("select2-searching", evaluate(opts.formatSearching, opts.element));
         }
 
         search.classList.add("select2-active");
