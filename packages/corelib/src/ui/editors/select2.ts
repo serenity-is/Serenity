@@ -103,8 +103,6 @@ export interface Select2Options {
 
 var lastMousePosition = { x: 0, y: 0 };
 
-//MEASURE_SCROLLBAR_TEMPLATE = "<div class='select2-measure-scrollbar'></div>",
-
 // Grouped by target: the value is the concatenation of every source character that
 // transliterates to that target (e.g. all glyphs that normalize to "A"). The reverse
 // lookup map is expanded lazily, only when a non-ASCII character actually needs it.
@@ -1058,20 +1056,6 @@ abstract class AbstractSelect2 {
         // do not propagate change event from the search field out of the component
         Fluent.on(this.container, "change", ".select2-input", function (e: Event) { e.stopPropagation(); });
         Fluent.on(this.dropdown, "change", ".select2-input", function (e: Event) { e.stopPropagation(); });
-
-        // if jquery.mousewheel plugin is installed we can prevent out-of-bounds scrolling of results via mousewheel
-        //if ($.fn.mousewheel) {
-        //    results.mousewheel(function (e, delta, deltaX, deltaY) {
-        //        var top = results.scrollTop();
-        //        if (deltaY > 0 && top - deltaY <= 0) {
-        //            results.scrollTop(0);
-        //            killEvent(e);
-        //        } else if (deltaY < 0 && results.get(0).scrollHeight - results.scrollTop() + deltaY <= results.height()) {
-        //            results.scrollTop(results.get(0).scrollHeight - results.height());
-        //            killEvent(e);
-        //        }
-        //    });
-        //}
 
         installKeyUpChangeEvent(search);
         ["keyup-change", "input", "paste"].forEach(ev => Fluent.on(search, ev, boundThis.handleSearchInput));
@@ -2186,7 +2170,6 @@ abstract class AbstractSelect2 {
 
         this.close();
         this.container.classList.remove("select2-container-active");
-        // synonymous to .is(':focus'), which is available in jquery >= 1.6
         if (this.search === document.activeElement) { this.search.blur(); }
         this.clearSearch();
         this.selection.querySelectorAll(".select2-search-choice-focus").forEach(x => x.classList.remove("select2-search-choice-focus"));
