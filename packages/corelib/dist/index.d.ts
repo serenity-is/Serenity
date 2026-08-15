@@ -1730,7 +1730,7 @@ export declare function localText(key: string, defaultText?: string): string;
  * @param key The key of the localized string.
  * @returns The localized string or undefined if not found.
  */
-export declare function tryGetText(key: string): string;
+export declare function tryGetText(key: string): string | undefined;
 /**
  * Creates a proxy object for localized text retrieval.
  * @param obj - The target object to proxy (usually an empty object {})
@@ -3113,7 +3113,7 @@ export declare class Validator {
 	static classRules(element: ValidatableElement): ValidationRules;
 	static normalizeAttributeRule(rules: ValidationRules, type: string, method: string, value: ValidationValue): void;
 	static attributeRules(element: ValidatableElement): ValidationRules;
-	static dataRules(element: ValidatableElement): {};
+	static dataRules(element: ValidatableElement): any;
 	static staticRules(element: ValidatableElement): ValidationRules;
 	static normalizeRules(rules: ValidationRules, element: ValidatableElement): ValidationRules;
 	static addMethod(name: string, method: ValidationProvider, message?: string): void;
@@ -3229,7 +3229,7 @@ export type Grouping<TItem> = {
 export declare function toGrouping<TItem>(items: TItem[], getKey: (x: TItem) => any): Grouping<TItem>;
 /**
  * Gets first element in an array that matches given predicate (similar to LINQ's FirstOrDefault).
- * Returns null if no match is found.
+ * Returns undefined if no match is found.
  * @param array Array to test.
  * @param predicate Predicate to test elements.
  * @returns First element that matches.
@@ -3467,8 +3467,8 @@ export declare namespace LayoutTimer {
 	}): number;
 	function off(key: number): number;
 }
-export declare function executeOnceWhenVisible(el: HTMLElement | ArrayLike<HTMLElement>, callback: Function): number;
-export declare function executeEverytimeWhenVisible(el: HTMLElement | ArrayLike<HTMLElement>, callback: Function, callNowIfVisible: boolean): number;
+export declare function executeOnceWhenVisible(el: HTMLElement | ArrayLike<HTMLElement>, callback: Function): number | null;
+export declare function executeEverytimeWhenVisible(el: HTMLElement | ArrayLike<HTMLElement>, callback: Function, callNowIfVisible: boolean): number | null;
 export interface HandleRouteEvent extends Event {
 	route: string;
 	parts: string[];
@@ -5069,8 +5069,9 @@ export declare class CascadedWidgetLink<TParent extends Widget<any>> {
 		new (...args: any[]): TParent;
 	}, widget: Widget<any>, parentChange: (p1: TParent) => void);
 	private _parentID;
+	private _parentNode?;
 	bind(): TParent;
-	unbind(): TParent;
+	unbind(): HTMLElement | null;
 	get_parentID(): string;
 	set_parentID(value: string): void;
 }
@@ -5387,6 +5388,7 @@ export interface DateTimeEditorOptions {
 	useUtc?: boolean;
 	seconds?: boolean;
 	inputOnly?: boolean;
+	sqlMinMax?: boolean;
 }
 export interface QuickFilterBarOptions {
 	filters: QuickFilter<Widget<any>, any>[];
@@ -6439,20 +6441,6 @@ export interface TiptapToolbarHiddenOption {
 	superSubScript?: boolean;
 	undoRedo?: boolean;
 }
-export interface TiptapToolbarHiddenOption {
-	alignment?: boolean;
-	alignmentJustify?: boolean;
-	blockquote?: boolean;
-	boldItalicUnderline?: boolean;
-	inlineCode?: boolean;
-	headings?: boolean;
-	image?: boolean;
-	link?: boolean;
-	listOptions?: boolean;
-	strike?: boolean;
-	superSubScript?: boolean;
-	undoRedo?: boolean;
-}
 export type HtmlContentEditorProvider = "ckeditor" | "tiptap";
 export interface HtmlContentEditorOptions {
 	cols?: number;
@@ -6592,7 +6580,9 @@ export interface RadioButtonEditorOptions {
 }
 export declare class RadioButtonEditor<P extends RadioButtonEditorOptions = RadioButtonEditorOptions> extends EditorWidget<P> implements IReadOnly {
 	static [Symbol.typeInfo]: EditorTypeInfo<"Serenity.">;
+	private _pendingValue;
 	constructor(props: EditorProps<P>);
+	protected getEnumValues(enumType: any): any[];
 	protected addRadio(value: string, text: string): void;
 	get_value(): string;
 	get value(): string;
@@ -6729,6 +6719,7 @@ export declare class Select2 {
 	static getInstance(el: Select2Element): Select2;
 	static readonly ajaxDefaults: Select2AjaxOptions;
 	static readonly defaults: Select2Options;
+	static highlightMatch(text: string, term: string): Select2FormatResult;
 	static stripDiacritics(str: string): string;
 }
 export interface ServiceLookupEditorOptions extends ComboboxEditorOptions {
@@ -7095,7 +7086,6 @@ export declare class EditorFiltering extends BaseEditorFiltering<Widget<any>> {
 	set useLike(value: boolean);
 	getOperators(): FilterOperator[];
 	protected useEditor(): boolean;
-	getEditorOptions(): any;
 	createEditor(): void;
 	protected useIdField(): boolean;
 	initQuickFilter(filter: QuickFilter<Widget<any>, any>): void;
@@ -7422,8 +7412,8 @@ export declare class GridRadioSelectionMixin {
 	clear(): void;
 	resetCheckedAndRefresh(): void;
 	getSelectedKey(): string;
-	getSelectedAsInt32(): number;
-	getSelectedAsInt64(): number;
+	getSelectedAsInt32(): number | null;
+	getSelectedAsInt64(): number | null;
 	setSelectedKey(key: string): void;
 	static createSelectColumn(getMixin: () => GridRadioSelectionMixin, columnOptions?: Partial<Column>): Column;
 }
