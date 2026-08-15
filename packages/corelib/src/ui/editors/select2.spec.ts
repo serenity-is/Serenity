@@ -521,20 +521,15 @@ describe("Select2 wrapper", () => {
 
         const focusser = internal.focusser as HTMLInputElement;
         focusser.dispatchEvent(new FocusEvent("focus", { bubbles: true }));
-        for (const which of [9, 38, 40, 13, 27, 46, 8]) {
-            const event = new KeyboardEvent("keydown", { bubbles: true, cancelable: true });
-            Object.defineProperty(event, "which", { value: which });
-            Object.defineProperty(event, "keyCode", { value: which });
-            focusser.dispatchEvent(event);
+        for (const key of ["Tab", "ArrowUp", "ArrowDown", "Enter", "Escape", "Delete", "Backspace"]) {
+            focusser.dispatchEvent(new KeyboardEvent("keydown", { bubbles: true, cancelable: true, key }));
         }
         focusser.dispatchEvent(new FocusEvent("blur", { bubbles: true }));
 
         internal.open();
-        for (const which of [229, 33, 34, 38, 40, 13, 9, 27]) {
-            const event = new KeyboardEvent("keydown", { bubbles: true, cancelable: true });
-            Object.defineProperty(event, "which", { value: which });
-            Object.defineProperty(event, "keyCode", { value: which });
-            internal.search.dispatchEvent(event);
+        internal.search.dispatchEvent(new KeyboardEvent("keydown", { bubbles: true, cancelable: true, isComposing: true }));
+        for (const key of ["PageUp", "PageDown", "ArrowUp", "ArrowDown", "Enter", "Tab", "Escape"]) {
+            internal.search.dispatchEvent(new KeyboardEvent("keydown", { bubbles: true, cancelable: true, key }));
         }
         internal.search.dispatchEvent(new FocusEvent("focus", { bubbles: true }));
         internal.search.dispatchEvent(new FocusEvent("blur", { bubbles: true }));
@@ -594,11 +589,8 @@ describe("Select2 wrapper", () => {
         search.dispatchEvent(new Event("input", { bubbles: true }));
         search.dispatchEvent(new Event("paste", { bubbles: true }));
         internal.open();
-        for (const which of [37, 39, 8, 46, 13, 38, 40, 9, 27, 33, 34]) {
-            const event = new KeyboardEvent("keydown", { bubbles: true, cancelable: true });
-            Object.defineProperty(event, "which", { value: which });
-            Object.defineProperty(event, "keyCode", { value: which });
-            search.dispatchEvent(event);
+        for (const key of ["ArrowLeft", "ArrowRight", "Backspace", "Delete", "Enter", "ArrowUp", "ArrowDown", "Tab", "Escape", "PageUp", "PageDown"]) {
+            search.dispatchEvent(new KeyboardEvent("keydown", { bubbles: true, cancelable: true, key }));
         }
         search.dispatchEvent(new KeyboardEvent("keyup", { bubbles: true }));
         search.dispatchEvent(new FocusEvent("blur", { bubbles: true }));
@@ -618,18 +610,12 @@ describe("Select2 wrapper", () => {
         const internal: any = (input as any).select2;
         internal.open();
         const search = internal.search;
-        for (const which of [38, 40, 13, 9, 27, 33, 34]) {
-            const event = new KeyboardEvent("keydown", { bubbles: true, cancelable: true });
-            Object.defineProperty(event, "which", { value: which });
-            Object.defineProperty(event, "keyCode", { value: which });
-            search.dispatchEvent(event);
+        for (const key of ["ArrowUp", "ArrowDown", "Enter", "Tab", "Escape", "PageUp", "PageDown"]) {
+            search.dispatchEvent(new KeyboardEvent("keydown", { bubbles: true, cancelable: true, key }));
         }
         const focusser = internal.focusser;
-        for (const which of [9, 40, 13, 46, 8, 27]) {
-            const event = new KeyboardEvent("keydown", { bubbles: true, cancelable: true });
-            Object.defineProperty(event, "which", { value: which });
-            Object.defineProperty(event, "keyCode", { value: which });
-            focusser.dispatchEvent(event);
+        for (const key of ["Tab", "ArrowDown", "Enter", "Delete", "Backspace", "Escape"]) {
+            focusser.dispatchEvent(new KeyboardEvent("keydown", { bubbles: true, cancelable: true, key }));
         }
         internal.destroy();
     });
@@ -1035,17 +1021,13 @@ describe("Select2 wrapper", () => {
         const internal: any = (input as any).select2;
         internal.addSelectedChoice({ id: "1", text: "One" });
         internal.addSelectedChoice({ id: "2", text: "Two" });
-        const keydown = (which: number, extra: any = {}) => {
-            const event = new KeyboardEvent("keydown", { bubbles: true, cancelable: true });
-            Object.defineProperty(event, "which", { value: which });
-            Object.defineProperty(event, "keyCode", { value: which });
-            Object.assign(event, extra);
-            internal.search.dispatchEvent(event);
+        const keydown = (key: string, extra: any = {}) => {
+            internal.search.dispatchEvent(new KeyboardEvent("keydown", { bubbles: true, cancelable: true, key, ...extra }));
         };
-        keydown(8);
-        keydown(37);
+        keydown("Backspace");
+        keydown("ArrowLeft");
         internal.open();
-        keydown(27);
+        keydown("Escape");
         internal.destroy();
     });
 
@@ -1061,19 +1043,12 @@ describe("Select2 wrapper", () => {
                 query: query => query.callback({ results: [], more: false })
             } as any);
             const internal: any = (input as any).select2;
-            const event = new KeyboardEvent("keydown", { bubbles: true, cancelable: true });
-            Object.defineProperty(event, "which", { value: 13 });
-            Object.defineProperty(event, "keyCode", { value: 13 });
-            internal.search.dispatchEvent(event);
+            internal.search.dispatchEvent(new KeyboardEvent("keydown", { bubbles: true, cancelable: true, key: "Enter" }));
             return internal;
         };
         make(false).destroy();
         const alt = make(true);
-        const event = new KeyboardEvent("keydown", { bubbles: true, cancelable: true });
-        Object.defineProperty(event, "which", { value: 13 });
-        Object.defineProperty(event, "keyCode", { value: 13 });
-        Object.defineProperty(event, "altKey", { value: true });
-        alt.search.dispatchEvent(event);
+        alt.search.dispatchEvent(new KeyboardEvent("keydown", { bubbles: true, cancelable: true, key: "Enter", altKey: true }));
         alt.destroy();
     });
 

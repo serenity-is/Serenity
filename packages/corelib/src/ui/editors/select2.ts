@@ -101,59 +101,7 @@ export interface Select2Options {
     shouldFocusInput?: (p1: any) => boolean;
 }
 
-interface Select2Data {
-    text?: string;
-}
-
 var lastMousePosition = { x: 0, y: 0 };
-
-const KEY = {
-    TAB: 9,
-    ENTER: 13,
-    ESC: 27,
-    SPACE: 32,
-    LEFT: 37,
-    UP: 38,
-    RIGHT: 39,
-    DOWN: 40,
-    SHIFT: 16,
-    CTRL: 17,
-    ALT: 18,
-    PAGE_UP: 33,
-    PAGE_DOWN: 34,
-    HOME: 36,
-    END: 35,
-    BACKSPACE: 8,
-    DELETE: 46,
-    isArrow: function (k: any) {
-        k = k.which ? k.which : k;
-        switch (k) {
-            case KEY.LEFT:
-            case KEY.RIGHT:
-            case KEY.UP:
-            case KEY.DOWN:
-                return true;
-        }
-        return false;
-    },
-    isControl: function (e: any) {
-        var k = e.which;
-        switch (k) {
-            case KEY.SHIFT:
-            case KEY.CTRL:
-            case KEY.ALT:
-                return true;
-        }
-
-        if (e.metaKey) return true;
-
-        return false;
-    },
-    isFunctionKey: function (k: any) {
-        k = k.which ? k.which : k;
-        return k >= 112 && k <= 123;
-    }
-}
 
 //MEASURE_SCROLLBAR_TEMPLATE = "<div class='select2-measure-scrollbar'></div>",
 
@@ -2396,29 +2344,29 @@ class SingleSelect2 extends AbstractSelect2 {
         Fluent.on(this.search, "keydown", (e) => {
             if (!this.isInterfaceEnabled()) return;
 
-            // filter 229 keyCodes (input method editor is processing key input)
-            if (229 == (e as any).keyCode) return;
+            // skip events while an input method editor is composing text
+            if (e.isComposing) return;
 
-            if ((e as any).which === KEY.PAGE_UP || (e as any).which === KEY.PAGE_DOWN) {
+            if (e.key === "PageUp" || e.key === "PageDown") {
                 // prevent the page from scrolling
                 killEvent(e);
                 return;
             }
 
-            switch ((e as any).which) {
-                case KEY.UP:
-                case KEY.DOWN:
-                    this.moveHighlight(((e as any).which === KEY.UP) ? -1 : 1);
+            switch (e.key) {
+                case "ArrowUp":
+                case "ArrowDown":
+                    this.moveHighlight((e.key === "ArrowUp") ? -1 : 1);
                     killEvent(e);
                     return;
-                case KEY.ENTER:
+                case "Enter":
                     this.selectHighlighted();
                     killEvent(e);
                     return;
-                case KEY.TAB:
+                case "Tab":
                     this.selectHighlighted({ noFocus: true });
                     return;
-                case KEY.ESC:
+                case "Escape":
                     this.cancel(e);
                     killEvent(e);
                     return;
@@ -2440,17 +2388,18 @@ class SingleSelect2 extends AbstractSelect2 {
         Fluent.on(this.focusser, "keydown", e => {
             if (!this.isInterfaceEnabled()) return;
 
-            if ((e as any).which === KEY.TAB || KEY.isControl(e) || KEY.isFunctionKey(e) || (e as any).which === KEY.ESC) {
+            if (e.key === "Tab" || e.key === "Shift" || e.key === "Control" || e.key === "Alt" || e.metaKey
+                || /^F(?:1[0-2]|[1-9])$/.test(e.key) || e.key === "Escape") {
                 return;
             }
 
-            if (this.opts.openOnEnter === false && (e as any).which === KEY.ENTER) {
+            if (this.opts.openOnEnter === false && e.key === "Enter") {
                 killEvent(e);
                 return;
             }
 
-            if ((e as any).which == KEY.DOWN || (e as any).which == KEY.UP
-                || ((e as any).which == KEY.ENTER && this.opts.openOnEnter)) {
+            if (e.key == "ArrowDown" || e.key == "ArrowUp"
+                || (e.key == "Enter" && this.opts.openOnEnter)) {
 
                 if (e.altKey || e.ctrlKey || e.shiftKey || e.metaKey) return;
 
@@ -2459,7 +2408,7 @@ class SingleSelect2 extends AbstractSelect2 {
                 return;
             }
 
-            if ((e as any).which == KEY.DELETE || (e as any).which == KEY.BACKSPACE) {
+            if (e.key == "Delete" || e.key == "Backspace") {
                 if (this.opts.allowClear) {
                     this.clear();
                 }
@@ -2973,25 +2922,25 @@ class MultiSelect2 extends AbstractSelect2 {
             var pos = getCursorInfo(this.search);
 
             if (selected &&
-                ((e as any).which == KEY.LEFT || (e as any).which == KEY.RIGHT || (e as any).which == KEY.BACKSPACE || (e as any).which == KEY.DELETE || (e as any).which == KEY.ENTER)) {
+                (e.key == "ArrowLeft" || e.key == "ArrowRight" || e.key == "Backspace" || e.key == "Delete" || e.key == "Enter")) {
                 var selectedChoice = selected;
-                if ((e as any).which == KEY.LEFT && prev) {
+                if (e.key == "ArrowLeft" && prev) {
                     selectedChoice = prev;
                 }
-                else if ((e as any).which == KEY.RIGHT) {
+                else if (e.key == "ArrowRight") {
                     selectedChoice = next ? next : null;
                 }
-                else if ((e as any).which === KEY.BACKSPACE) {
+                else if (e.key === "Backspace") {
                     if (this.unselect(selected)) {
                         this.search.style.width = "10px";
                         selectedChoice = prev ? prev : next;
                     }
-                } else if ((e as any).which == KEY.DELETE) {
+                } else if (e.key == "Delete") {
                     if (this.unselect(selected)) {
                         this.search.style.width = "10px";
                         selectedChoice = next ? next : null;
                     }
-                } else if ((e as any).which == KEY.ENTER) {
+                } else if (e.key == "Enter") {
                     selectedChoice = null;
                 }
 
@@ -3001,8 +2950,8 @@ class MultiSelect2 extends AbstractSelect2 {
                     this.open();
                 }
                 return;
-            } else if ((((e as any).which === KEY.BACKSPACE && this.keydowns == 1)
-                || (e as any).which == KEY.LEFT) && (pos.offset == 0 && !pos.length)) {
+            } else if ((e.key === "Backspace" && this.keydowns == 1
+                || e.key == "ArrowLeft") && (pos.offset == 0 && !pos.length)) {
 
                 this.selectChoice(Array.from(selection.querySelectorAll<HTMLElement>(".select2-search-choice:not(.select2-locked)")).pop());
                 killEvent(e);
@@ -3012,33 +2961,33 @@ class MultiSelect2 extends AbstractSelect2 {
             }
 
             if (this.opened()) {
-                switch ((e as any).which) {
-                    case KEY.UP:
-                    case KEY.DOWN:
-                        this.moveHighlight(((e as any).which === KEY.UP) ? -1 : 1);
+                switch (e.key) {
+                    case "ArrowUp":
+                    case "ArrowDown":
+                        this.moveHighlight((e.key === "ArrowUp") ? -1 : 1);
                         killEvent(e);
                         return;
-                    case KEY.ENTER:
+                    case "Enter":
                         this.selectHighlighted();
                         killEvent(e);
                         return;
-                    case KEY.TAB:
+                    case "Tab":
                         this.selectHighlighted({ noFocus: true });
                         this.close();
                         return;
-                    case KEY.ESC:
+                    case "Escape":
                         this.cancel(e);
                         killEvent(e);
                         return;
                 }
             }
 
-            if ((e as any).which === KEY.TAB || KEY.isControl(e) || KEY.isFunctionKey(e)
-                || (e as any).which === KEY.BACKSPACE || (e as any).which === KEY.ESC) {
+            if (e.key === "Tab" || e.key === "Shift" || e.key === "Control" || e.key === "Alt" || e.metaKey
+                || /^F(?:1[0-2]|[1-9])$/.test(e.key) || e.key === "Backspace" || e.key === "Escape") {
                 return;
             }
 
-            if ((e as any).which === KEY.ENTER) {
+            if (e.key === "Enter") {
                 if (this.opts.openOnEnter === false) {
                     return;
                 } else if (e.altKey || e.ctrlKey || e.shiftKey || e.metaKey) {
@@ -3048,12 +2997,12 @@ class MultiSelect2 extends AbstractSelect2 {
 
             this.open();
 
-            if ((e as any).which === KEY.PAGE_UP || (e as any).which === KEY.PAGE_DOWN) {
+            if (e.key === "PageUp" || e.key === "PageDown") {
                 // prevent the page from scrolling
                 killEvent(e);
             }
 
-            if ((e as any).which === KEY.ENTER) {
+            if (e.key === "Enter") {
                 // prevent form from being submitted
                 killEvent(e);
             }
@@ -3631,4 +3580,3 @@ function copyStyle(from: CSSStyleDeclaration, to: CSSStyleDeclaration) {
         }
     }
 }
-    
