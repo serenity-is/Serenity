@@ -784,7 +784,7 @@ function local(options: any) {
     }
 
     return function (query: Select2QueryOptions) {
-        var t = query.term, filtered = { results: <any[]>[] }, process: any;
+        var t = query.term, filtered = { results: [] as any[] }, process: any;
         if (t === "") {
             query.callback(data());
             return;
@@ -819,7 +819,7 @@ function local(options: any) {
 function tags(data: any) {
     var isFunc = typeof data === "function";
     return function (query: Select2QueryOptions) {
-        var t = query.term, filtered = { results: <any[]>[] };
+        var t = query.term, filtered = { results: [] as any[] };
         var result = isFunc ? data(query) : data;
         if (Array.isArray(result)) {
             result.forEach(function (item: Select2Item) {
@@ -1221,7 +1221,7 @@ abstract class AbstractSelect2 {
             });
         }
 
-        opts = Object.assign({}, <Select2Options>{
+        opts = Object.assign({}, {
             populateResults: function (this: AbstractSelect2, container, results, query) {
                 var id = this.opts.id;
 
@@ -1285,7 +1285,7 @@ abstract class AbstractSelect2 {
 
                 populate(results, container, 0);
             }
-        }, Select2.defaults, opts);
+        } satisfies Select2Options, Select2.defaults, opts);
 
         if (typeof (opts.id) !== "function") {
             idKey = opts.id;
