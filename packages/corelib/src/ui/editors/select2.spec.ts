@@ -68,6 +68,55 @@ describe("Select2 wrapper", () => {
         expect(Select2.ajaxDefaults.params.method).toBe("GET");
     });
 
+    it("marks the matched term in the default formatResult using a node fragment", () => {
+        const defaults = Select2.defaults;
+        const formatted = defaults.formatResult!({ id: "1", text: "Café au lait" } as any,
+            document.createElement("div"), { term: "au" } as any, (x: string) => x);
+        expect(formatted).toBeInstanceOf(DocumentFragment);
+        const match = (formatted as DocumentFragment).querySelector("span.select2-match");
+        expect(match?.textContent).toBe("au");
+        expect((formatted as DocumentFragment).textContent).toBe("Café au lait");
+    });
+
+    it("renders string formatter results as text, not raw HTML", () => {
+        const input = document.createElement("input");
+        document.body.appendChild(input);
+        new Select2({
+            element: input,
+            initSelection: (_e, callback) => callback(null),
+            query: query => query.callback({ results: [], more: false }),
+            formatNoMatches: () => "<b>Nothing</b>"
+        } as any);
+        const internal: any = (input as any).select2;
+        internal.open();
+        internal.search.value = "x";
+        internal.updateResults(false);
+        expect(internal.results.textContent).toContain("<b>Nothing</b>");
+        expect(internal.results.querySelector(".select2-no-results b")).toBeNull();
+        internal.destroy();
+    });
+
+    it("still appends node formatter results", () => {
+        const input = document.createElement("input");
+        document.body.appendChild(input);
+        new Select2({
+            element: input,
+            initSelection: (_e, callback) => callback(null),
+            query: query => query.callback({ results: [], more: false }),
+            formatNoMatches: () => {
+                const el = document.createElement("em");
+                el.textContent = "Nothing";
+                return el;
+            }
+        } as any);
+        const internal: any = (input as any).select2;
+        internal.open();
+        internal.search.value = "x";
+        internal.updateResults(false);
+        expect(internal.results.querySelector(".select2-no-results em")?.textContent).toBe("Nothing");
+        internal.destroy();
+    });
+
     it("initializes and operates a single select", () => {
         const element = document.createElement("input");
         document.body.appendChild(element);

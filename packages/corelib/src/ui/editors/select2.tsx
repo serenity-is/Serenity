@@ -448,23 +448,6 @@ function syncCssClasses(dest: Element, src: Element, adapter: (kls: string) => s
     dest.setAttribute("class", replacements.join(" "));
 }
 
-
-function markMatch(text: string, term: string, markup: string[], escapeMarkup: (s: string) => string) {
-    var match = Select2.stripDiacritics(text.toUpperCase()).indexOf(Select2.stripDiacritics(term.toUpperCase())),
-        tl = term.length;
-
-    if (match < 0) {
-        markup.push(escapeMarkup(text));
-        return;
-    }
-
-    markup.push(escapeMarkup(text.substring(0, match)));
-    markup.push("<span class='select2-match'>");
-    markup.push(escapeMarkup(text.substring(match, match + tl)));
-    markup.push("</span>");
-    markup.push(escapeMarkup(text.substring(match + tl, text.length)));
-}
-
 function defaultEscapeMarkup(markup: string) {
     var replace_map: Record<string, string> = {
         '\\': '&#92;',
@@ -615,14 +598,12 @@ export class Select2 {
         formatLoadMore: (pageNumber: number) => stringFormat(SelectEditorTexts.LoadMore, pageNumber),
         formatMatches: (matches: number) => matches === 1 ? SelectEditorTexts.SingleMatch : stringFormat(SelectEditorTexts.MultipleMatches, matches),
         formatNoMatches: () => SelectEditorTexts.NoMatches,
-        formatResult: function (result, _, query, escapeMarkup) {
-            var markup: string[] = [];
-            markMatch(result.text, query.term, markup, escapeMarkup);
-            return markup.join("");
+        formatResult: function (result, _, query) {
+            return Select2.highlightMatch(result?.text, query?.term);
         },
         formatResultCssClass: function (data) { return data.css; },
         formatSearching: () => SelectEditorTexts.Searching,
-        formatSelection: (data, _, escapeMarkup) => data ? escapeMarkup(data.text) : undefined,
+        formatSelection: (data) => data ? data.text : undefined,
         formatSelectionCssClass: function () { return undefined; },
         formatSelectionTooBig: (limit: number) => stringFormat(SelectEditorTexts.SelectionTooBig, limit),
         sortResults: results => results,
@@ -661,6 +642,19 @@ export class Select2 {
             return true;
         }
     };
+
+    static highlightMatch(text: string, term: string): Select2FormatResult {
+        if (!text || !term)
+            return text;
+
+        const match = Select2.stripDiacritics(text.toUpperCase()).indexOf(Select2.stripDiacritics(term.toUpperCase()));
+        if (match < 0)
+            return text;
+
+        const tl = term.length;
+
+        return <>{text.substring(0, match)}<span className="select2-match">{text.substring(match, match + tl)}</span>{text.substring(match + tl, text.length)}</>;
+    }
 
     static stripDiacritics(str: string) {
         // Curated overrides first (chars whose Unicode decomposition would differ from the
@@ -1263,7 +1257,7 @@ abstract class AbstractSelect2 {
                                 label.appendChild(formatted);
                             }
                             else
-                                label.innerHTML = formatted ?? "";
+                                label.textContent = formatted ?? "";
                             node.append(label);
                         }
 
@@ -2025,7 +2019,7 @@ abstract class AbstractSelect2 {
             if (html instanceof Node)
                 li.appendChild(html);
             else
-                li.innerHTML = html ?? "";
+                li.textContent = html ?? "";
             return li;
         }
 
@@ -2776,7 +2770,7 @@ class SingleSelect2 extends AbstractSelect2 {
             if (formatted instanceof Node)
                 container.appendChild(formatted);
             else
-                container.innerHTML = formatted;
+                container.textContent = formatted;
         }
         cssClass = this.opts.formatSelectionCssClass(data, container);
         if (cssClass !== undefined) {
@@ -3351,7 +3345,7 @@ class MultiSelect2 extends AbstractSelect2 {
             if (formatted instanceof Node)
                 div.appendChild(formatted);
             else
-                div.innerHTML = formatted ?? "";
+                div.textContent = formatted ?? "";
         }
         cssClass = this.opts.formatSelectionCssClass(data, div);
         if (cssClass != undefined) {
@@ -3460,7 +3454,7 @@ class MultiSelect2 extends AbstractSelect2 {
                     if (noResults instanceof Node)
                         li.appendChild(noResults);
                     else
-                        li.innerHTML = noResults ?? "";
+                        li.textContent = noResults ?? "";
                 }
             }
         }
