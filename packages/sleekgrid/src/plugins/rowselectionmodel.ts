@@ -6,11 +6,14 @@ export interface RowSelectionModelOptions {
 
 function getRowsRange(from: number, to: number): number[] {
     let i: number, rows: number[] = [];
-    for (i = from; i <= to; i++) {
-        rows.push(i);
-    }
-    for (i = to; i < from; i++) {
-        rows.push(i);
+    if (from <= to) {
+        for (i = from; i <= to; i++) {
+            rows.push(i);
+        }
+    } else {
+        for (i = to; i <= from; i++) {
+            rows.push(i);
+        }
     }
     return rows;
 }
