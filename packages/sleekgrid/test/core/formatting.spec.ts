@@ -301,3 +301,32 @@ describe('convertCompatFormatter', () => {
         expect(fmtCtx.tooltip).toBe(undefined);
     });
 });
+describe('defaultColumnFormat - fallback without an escape function', () => {
+    const bare = (value: any, enableHtmlRendering = false): FormatterContext =>
+        ({ enableHtmlRendering, value } as unknown as FormatterContext);
+
+    it('returns empty string for null/undefined value when html rendering is disabled', () => {
+        expect(defaultColumnFormat(bare(null))).toBe("");
+        expect(defaultColumnFormat(bare(undefined))).toBe("");
+    });
+
+    it('converts non-string values to string when html rendering is disabled', () => {
+        expect(defaultColumnFormat(bare(1))).toBe("1");
+        expect(defaultColumnFormat(bare(true))).toBe("true");
+        expect(defaultColumnFormat(bare({}))).toBe("[object Object]");
+    });
+
+    it('returns string values unchanged when html rendering is disabled', () => {
+        expect(defaultColumnFormat(bare("abc"))).toBe("abc");
+        expect(defaultColumnFormat(bare("&<>"))).toBe("&<>");
+    });
+
+    it('escapes html when html rendering is enabled', () => {
+        expect(defaultColumnFormat(bare("&", true))).toBe("&amp;");
+        expect(defaultColumnFormat(bare("<", true))).toBe("&lt;");
+    });
+
+    it('returns empty string for null when html rendering is enabled', () => {
+        expect(defaultColumnFormat(bare(null, true))).toBe("");
+    });
+});
