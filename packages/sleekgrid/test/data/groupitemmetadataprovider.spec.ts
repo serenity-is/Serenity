@@ -1,4 +1,4 @@
-import { ColumnFormat, CompatFormatter, formatterContext as ctx, Group, type ISleekGrid } from "../../src/core";
+import { ColumnFormat, CompatFormatter, formatterContext as ctx, Group, GroupTotals, type ISleekGrid } from "../../src/core";
 import { GroupItemMetadataProvider } from "../../src/data/groupitemmetadataprovider";
 
 describe("GroupItemMetadataProvider.defaults", () => {
@@ -364,6 +364,195 @@ describe("GroupItemMetadataProvider.handleGridClick", () => {
         expect(grid.__data.expandGroupCalls.length).toBe(0);
         expect(grid.__data.collapseGroupCalls.length).toBe(1);
         expect(grid.__data.collapseGroupCalls[0]).toBe("gk3");
+    });
+});
+
+describe("GroupItemMetadataProvider formatters and metadata", () => {
+    it("formats groups with escaped values and optional expansion markup", () => {
+        const group = new Group();
+        group.value = "<unsafe>";
+        group.level = 2;
+        group.collapsed = true;
+
+        const plain = GroupItemMetadataProvider.defaultGroupFormat(ctx({ item: group }), {
+            ...GroupItemMetadataProvider.defaults,
+            enableExpandCollapse: false
+        });
+        const expanded = GroupItemMetadataProvider.defaultGroupFormat(ctx({ item: group }), {
+            ...GroupItemMetadataProvider.defaults,
+            groupIndentation: 10
+        });
+
+        expect(plain).toBe("<unsafe>");
+        expect(expanded).toBeDefined();
+        expect(group.formatValue).toBeUndefined();
+    });
+
+    it("uses a group's formatValue when supplied", () => {
+        const group = new Group();
+        const formatValue = vi.fn(() => "formatted");
+        group.formatValue = formatValue;
+
+        expect(GroupItemMetadataProvider.defaultGroupFormat(ctx({ item: group }), {
+            ...GroupItemMetadataProvider.defaults,
+            enableExpandCollapse: false
+        })).toBe("formatted");
+        expect(formatValue).toHaveBeenCalledOnce();
+    });
+
+    it("selects totals formatters from the grid and column compatibility options", () => {
+        const column = {} as any;
+        const totals = new GroupTotals();
+        const gridFormatter = vi.fn(() => () => "grid");
+        const grid = { getTotalsFormatter: gridFormatter } as any;
+
+        expect(GroupItemMetadataProvider.defaultTotalsFormat(ctx({ item: totals, column }), grid)).toBe("grid");
+        expect(gridFormatter).toHaveBeenCalledWith(column);
+
+        const compatFormatter = vi.fn(() => "compat");
+        const compatColumn = { groupTotalsFormatter: compatFormatter } as any;
+        expect(GroupItemMetadataProvider.defaultTotalsFormat(ctx({ item: totals, column: compatColumn }))).toBe("compat");
+        expect(compatFormatter).toHaveBeenCalled();
+
+        const formatColumn = { groupTotalsFormat: () => "format" } as any;
+        expect(GroupItemMetadataProvider.defaultTotalsFormat(ctx({ item: totals, column: formatColumn }))).toBe("format");
+        expect(GroupItemMetadataProvider.defaultTotalsFormat(ctx({ item: totals, column: {} as any }))).toBe("");
+    });
+
+    it("unwraps a wrapper item's totals before formatting", () => {
+        const totals = new GroupTotals();
+        const formatter = vi.fn((value: any) => value.item === totals ? "ok" : "wrong");
+        const column = { groupTotalsFormat: formatter } as any;
+        const wrapper = { totals } as any;
+
+        expect(GroupItemMetadataProvider.defaultTotalsFormat(ctx({ item: wrapper, column }))).toBe("ok");
+        expect(formatter).toHaveBeenCalledOnce();
+    });
+
+    it("returns group and totals row metadata using configured options", () => {
+        const provider = new GroupItemMetadataProvider({ groupRowTotals: true, groupFocusable: false, totalsFocusable: true });
+        const group = new Group();
+        group.level = 3;
+        const totals = new GroupTotals();
+        totals.group = group;
+
+        const groupMetadata = provider.getGroupRowMetadata(group);
+        const totalsMetadata = provider.getTotalsRowMetadata(totals);
+
+        expect(groupMetadata.selectable).toBe(false);
+        expect(groupMetadata.focusable).toBe(false);
+        expect(groupMetadata.format).toBe(provider.getOptions().totalsFormat);
+        expect(groupMetadata.columns?.[0]?.editor).toBeNull();
+        expect(totalsMetadata.focusable).toBe(true);
+        expect(totalsMetadata.cssClasses).toContain("slick-group-level-3");
+    });
+});
+
+describe("GroupItemMetadataProvider keyboard and lifecycle edge cases", () => {
+    it("ignores keyboard expansion when disabled or already in the requested state", () => {
+        const grid = mockGrid();
+        grid.getActiveCell = () => ({ row: 1 });
+        const event = mockEvent({ grid, key: "+" });
+        const provider = new GroupItemMetadataProvider({ enableExpandCollapse: false });
+
+        provider.handleGridKeyDown(event);
+        expect(event.preventDefaultCalls).toBe(0);
+
+        const enabled = new GroupItemMetadataProvider();
+        const expandedEvent = mockEvent({ grid, key: "+" });
+        grid.getDataItem = () => {
+            const group = new Group();
+            group.collapsed = false;
+            return group;
+        };
+        enabled.handleGridKeyDown(expandedEvent);
+        expect(expandedEvent.preventDefaultCalls).toBe(1);
+        expect(grid.__data.expandGroupCalls).toHaveLength(0);
+        expect(grid.__data.collapseGroupCalls).toHaveLength(0);
+    });
+
+    it("can be destroyed before initialization and merges new options", () => {
+        const provider = new GroupItemMetadataProvider({ groupCssClass: "initial" });
+        provider.destroy();
+        provider.setOptions({ groupCssClass: "updated" });
+        expect(provider.getOptions().groupCssClass).toBe("updated");
+    });
+
+    it("handles keyboard expansion and collapse through the initialized grid", () => {
+        const grid = mockGrid();
+        grid.getActiveCell = () => ({ row: 1 });
+        const provider = new GroupItemMetadataProvider();
+        provider.init(grid);
+
+        const expandEvent = mockEvent({ key: "+" });
+        provider.handleGridKeyDown(expandEvent);
+        expect(expandEvent.preventDefaultCalls).toBe(1);
+        expect(grid.__data.expandGroupCalls).toEqual(["gk1"]);
+
+        grid.getActiveCell = () => ({ row: 3 });
+        const collapseEvent = mockEvent({ key: "-" });
+        provider.handleGridKeyDown(collapseEvent);
+        expect(collapseEvent.preventDefaultCalls).toBe(1);
+        expect(grid.__data.collapseGroupCalls).toEqual(["gk3"]);
+    });
+
+    it("ignores keyboard events without a grid, active cell, or group item", () => {
+        const noGrid = new GroupItemMetadataProvider();
+        expect(() => noGrid.handleGridKeyDown(mockEvent({ key: "+" }))).not.toThrow();
+
+        const grid = mockGrid();
+        const provider = new GroupItemMetadataProvider();
+        provider.init(grid);
+        grid.getActiveCell = () => null;
+        provider.handleGridKeyDown(mockEvent({ key: "+" }));
+        grid.getActiveCell = () => ({ row: 333 });
+        provider.handleGridKeyDown(mockEvent({ key: "+" }));
+        expect(grid.__data.expandGroupCalls).toHaveLength(0);
+    });
+
+    it("handles missing optional data methods during keyboard expansion", () => {
+        const grid = mockGrid();
+        grid.getActiveCell = () => ({ row: 1 });
+        grid.__data.setRefreshHints = undefined;
+        grid.__data.expandGroup = undefined;
+        const provider = new GroupItemMetadataProvider();
+        provider.init(grid);
+
+        expect(() => provider.handleGridKeyDown(mockEvent({ key: "+" }))).not.toThrow();
+    });
+});
+
+describe("GroupItemMetadataProvider.groupCellPosition", () => {
+    it("returns the default position until group row totals are enabled", () => {
+        const provider = new GroupItemMetadataProvider();
+        expect(provider.groupCellPosition()).toEqual({ cell: 0, colspan: "*" });
+    });
+
+    it("finds the first non-summary column and spans matching frozen columns", () => {
+        const provider = new GroupItemMetadataProvider({ groupRowTotals: true });
+        const grid = mockGrid();
+        grid.getColumns = () => [
+            { summaryType: 1, frozen: true },
+            { id: "first", frozen: true },
+            { id: "second", frozen: true },
+            { id: "summary", summaryType: 1, frozen: true },
+            { id: "main", frozen: false }
+        ];
+        provider.init(grid);
+
+        expect(provider.groupCellPosition()).toEqual({ cell: 1, colspan: 1 });
+    });
+
+    it("enforces a minimum colspan when the next column is a summary or boundary", () => {
+        const provider = new GroupItemMetadataProvider({ groupRowTotals: true });
+        const grid = mockGrid();
+        grid.getColumns = () => [
+            { id: "first", frozen: true },
+            { id: "summary", summaryType: 1, frozen: true }
+        ];
+        provider.init(grid);
+
+        expect(provider.groupCellPosition()).toEqual({ cell: 0, colspan: 1 });
     });
 });
 
