@@ -110,7 +110,7 @@ export class RowMoveManager implements GridPlugin {
             };
 
             if (this.onBeforeMoveRows.notify(sgEvent).getReturnValue() === false) {
-                dd.guide.style.top = "-1000";
+                dd.guide.style.top = "-1000px";
                 dd.canMove = false;
             } else {
                 dd.guide.style.top = (insertBefore * this.grid.getOptions().rowHeight) + 'px';
