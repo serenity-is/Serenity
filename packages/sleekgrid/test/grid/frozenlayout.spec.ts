@@ -106,7 +106,7 @@ describe("FrozenLayout", () => {
 });
 
 function isHidden(element: HTMLElement | null): boolean {
-    return !element || element.hidden || getComputedStyle(element).display === "none";
+    return !element || !!element.hidden || getComputedStyle(element).display === "none";
 }
 
 function isVisible(element: HTMLElement | null): boolean {
