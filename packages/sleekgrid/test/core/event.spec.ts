@@ -519,6 +519,139 @@ describe('EventDataWrapper', () => {
 
 });
 
+describe('EventDataWrapper - merged args fields', () => {
+    it('exposes args fields through the merged getter', () => {
+        const args = { row: 3, cell: 4, grid: { id: "g" } };
+        const sed = new EventDataWrapper(undefined, args);
+        expect((sed as any).row).toBe(3);
+        expect((sed as any).cell).toBe(4);
+        expect((sed as any).grid).toBe(args.grid);
+    });
+
+    it('setter on an args field updates the args object', () => {
+        const args = { row: 3 };
+        const sed = new EventDataWrapper(undefined, args);
+        (sed as any).row = 9;
+        expect(args.row).toBe(9);
+    });
+
+    it('does not expose args fields when args is not an object', () => {
+        const sed = new EventDataWrapper(undefined, "not-an-object" as any);
+        expect((sed as any).row).toBeUndefined();
+    });
+
+    it('defines an own property when args is not an object and there is no native event', () => {
+        const sed = new EventDataWrapper(undefined, "not-an-object" as any);
+        (sed as any).row = 7;
+        expect((sed as any).row).toBe(7);
+    });
+});
+
+describe('EventDataWrapper - merged native event fields', () => {
+    it('exposes native event fields through the merged getter', () => {
+        const native = { keyCode: 13, target: "el" };
+        const sed = new EventDataWrapper(native);
+        expect((sed as any).keyCode).toBe(13);
+        expect((sed as any).target).toBe("el");
+    });
+
+    it('setter on a native event field updates the native event object', () => {
+        const native = { keyCode: 13 };
+        const sed = new EventDataWrapper(native);
+        (sed as any).keyCode = 27;
+        expect(native.keyCode).toBe(27);
+    });
+
+    it('does not expose native event fields when there is no native event', () => {
+        const sed = new EventDataWrapper();
+        expect((sed as any).keyCode).toBeUndefined();
+    });
+});
+
+describe('EventDataWrapper - native event delegation', () => {
+    it('calls preventDefault on the native event', () => {
+        let calls = 0;
+        const native = { preventDefault: () => calls++ };
+        const sed = new EventDataWrapper(native);
+        sed.preventDefault();
+        expect(sed.defaultPrevented).toBe(true);
+        expect(sed.isDefaultPrevented()).toBe(true);
+        expect(calls).toBe(1);
+    });
+
+    it('calls stopPropagation on the native event', () => {
+        let calls = 0;
+        const native = { stopPropagation: () => calls++ };
+        const sed = new EventDataWrapper(native);
+        sed.stopPropagation();
+        expect(sed.isPropagationStopped()).toBe(true);
+        expect(calls).toBe(1);
+    });
+
+    it('calls stopImmediatePropagation on the native event', () => {
+        let calls = 0;
+        const native = { stopImmediatePropagation: () => calls++ };
+        const sed = new EventDataWrapper(native);
+        sed.stopImmediatePropagation();
+        expect(sed.isImmediatePropagationStopped()).toBe(true);
+        expect(calls).toBe(1);
+    });
+
+    it('reads the native defaultPrevented property', () => {
+        expect(new EventDataWrapper({ defaultPrevented: true } as any).isDefaultPrevented()).toBe(true);
+        expect(new EventDataWrapper({ defaultPrevented: false } as any).isDefaultPrevented()).toBe(false);
+    });
+
+    it('calls the native isDefaultPrevented function when present', () => {
+        expect(new EventDataWrapper({ isDefaultPrevented: () => true } as any).isDefaultPrevented()).toBe(true);
+        expect(new EventDataWrapper({ isDefaultPrevented: () => false } as any).isDefaultPrevented()).toBe(false);
+    });
+
+    it('returns false when there is no native event and preventDefault was not called', () => {
+        expect(new EventDataWrapper().isDefaultPrevented()).toBe(false);
+        expect(new EventDataWrapper(null).isDefaultPrevented()).toBe(false);
+    });
+});
+
+describe('EventDataWrapper - return values', () => {
+    it('returns the args object', () => {
+        const args = { foo: "bar" };
+        expect(new EventDataWrapper(undefined, args).args).toBe(args);
+    });
+
+    it('addReturnValue ignores undefined for the last return value', () => {
+        const sed = new EventDataWrapper();
+        sed.addReturnValue(undefined);
+        expect(sed.getReturnValue()).toBeUndefined();
+        expect(sed.getReturnValues()).toEqual([undefined]);
+        sed.addReturnValue("ok");
+        expect(sed.getReturnValue()).toBe("ok");
+        expect(sed.getReturnValues()).toEqual([undefined, "ok"]);
+    });
+});
+
+describe('EventSubscriber - chaining and cleanup', () => {
+    it('subscribe method can be chained', () => {
+        const event = new EventEmitter();
+        const subscriber = new EventSubscriber();
+        expect(subscriber.subscribe(event, () => { })).toBe(subscriber);
+    });
+
+    it('unsubscribeAll removes every handler and can be chained', () => {
+        const event = new EventEmitter();
+        let callCount = 0;
+        const handler = () => callCount++;
+        const subscriber = new EventSubscriber();
+        subscriber.subscribe(event, handler);
+        subscriber.subscribe(event, handler);
+
+        expect(subscriber.unsubscribeAll()).toBe(subscriber);
+
+        event.notify(null, null, null);
+        expect(callCount).toBe(0);
+    });
+});
+
 describe('keyCode', () => {
     it("has correct codes", () => {
         expect((deprecatedWorkaround as any).keyCode.BACKSPACE).toBe(8);
