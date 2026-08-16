@@ -51,7 +51,7 @@ export function renderCell<TItem>(this: void, { activeCell, activeRow, cell, cel
 
     klass = escapeHtml(klass);
 
-    if (ctx.addClass?.length || ctx.addAttrs?.length || ctx.tooltip?.length) {
+    if (ctx.addClass?.length || (ctx.addAttrs != null && Object.keys(ctx.addAttrs).length > 0) || ctx.tooltip?.length) {
         if (ctx.addClass?.length)
             klass += (" " + escapeHtml(ctx.addClass));
 
