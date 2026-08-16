@@ -112,7 +112,7 @@ export class FloatCellEdit extends TextCellEdit {
     }
 
     loadValue(item: any): void {
-        this._defaultValue = item[this._args.column.field];
+        this._defaultValue = item[this._args.column.field] ?? "";
 
         var decPlaces = this.getDecimalPlaces();
         if (decPlaces !== null
@@ -239,7 +239,7 @@ export class YesNoSelectCellEdit extends BaseCellEdit {
     }
 
     isValueChanged(): boolean {
-        return this._input.value != this._defaultValue;
+        return this._input.value !== (this._defaultValue ? "yes" : "no");
     }
 
     validate(): ValidationResult {
@@ -292,18 +292,18 @@ export class CheckboxCellEdit extends BaseCellEdit {
 
 export class PercentCompleteCellEdit extends IntegerCellEdit {
     declare protected _picker: HTMLDivElement;
+    declare protected _slider: HTMLDivElement;
 
     init(): void {
         super.init();
         this._input.classList.remove('editor-text', 'slick-editor-text');
         this._input.classList.add('editor-percentcomplete', 'slick-editor-percentcomplete');
 
-        var slider: HTMLDivElement;
         this._picker = this._args.container.appendChild(
             <div class="slick-editor-percentcomplete-picker">
                 <div class="slick-editor-percentcomplete-helper">
                     <div class="slick-editor-percentcomplete-wrapper">
-                        <div class="slick-editor-percentcomplete-slider" ref={el => slider = el} />
+                        <div class="slick-editor-percentcomplete-slider" ref={el => this._slider = el} />
                         <div class="slick-editor-percentcomplete-buttons">
                             <button data-val={0}>Not started</button>
                             <button data-val={50}>In Progress</button>
@@ -317,10 +317,10 @@ export class PercentCompleteCellEdit extends IntegerCellEdit {
         this._input.select();
 
         // @ts-ignore
-        (($ as any)(slider) as any).slider({
+        (($ as any)(this._slider) as any).slider({
             orientation: "vertical",
             range: "min",
-            value: this._defaultValue,
+            value: this._defaultValue || 0,
             slide: (_: any, ui: any) => {
                 this._input.value = ui.value;
             },
@@ -335,8 +335,15 @@ export class PercentCompleteCellEdit extends IntegerCellEdit {
             .on("click", (e: any) => {
                 this._input.value = (e.target as HTMLButtonElement).dataset.val;
                 // @ts-ignore
-                (($ as any)(slider) as any).slider("value", (e.target as HTMLButtonElement).dataset.val);
+                (($ as any)(this._slider) as any).slider("value", (e.target as HTMLButtonElement).dataset.val);
             });
+    }
+
+    loadValue(item: any): void {
+        super.loadValue(item);
+        // keep the slider in sync with the cell value
+        // @ts-ignore
+        (($ as any)(this._slider) as any).slider("value", this._defaultValue);
     }
 
     destroy(): void {
