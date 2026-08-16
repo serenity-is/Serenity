@@ -74,7 +74,7 @@ export function getScrollBarDimensions(recalc?: boolean): { width: number; heigh
         const c = document.body.appendChild(<div style={{ position: "absolute", top: "-10000px", left: "-10000px", width: "100px", height: "100px", overflow: "scroll", border: "0" }} /> as HTMLElement);
         scrollbarDimensions = {
             width: Math.round(c.offsetWidth - c.clientWidth),
-            height: Math.round(c.offsetWidth - c.clientHeight)
+            height: Math.round(c.offsetHeight - c.clientHeight)
         };
         c.remove();
     }
