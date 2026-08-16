@@ -26,7 +26,7 @@ export function setupColumnResize<TItem>(this: void, { absoluteColMinWidth, cont
 
     let firstResizable: number, lastResizable: number;
     headerColEls.forEach((el, i) => {
-        if (i > cols.length)
+        if (i >= cols.length)
             return;
         const handle = el.querySelector(".slick-resizable-handle");
         handle && removeNode(handle);
