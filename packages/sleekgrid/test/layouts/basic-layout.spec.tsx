@@ -2,6 +2,15 @@ import { mockLayoutHost } from "../mocks/mock-layout-host";
 import { BasicLayout } from "../../src/grid";
 
 describe("BasicLayout", () => {
+    it("can be destroyed after initialization", () => {
+        const host = mockLayoutHost();
+        const layout = new BasicLayout();
+
+        layout.init(host);
+        expect(() => layout.destroy()).not.toThrow();
+        expect(() => layout.afterSetOptions()).not.toThrow();
+    });
+
     describe("headerrow visibility", () => {
         it("should hide headerrow when showHeaderRow is false", () => {
             const host = mockLayoutHost();
