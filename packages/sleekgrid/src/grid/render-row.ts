@@ -55,8 +55,9 @@ export function renderRow<TItem>(this: void, args: RowRenderArgs<TItem>): void {
         // Do not render cells outside of the viewport.
         if (pinnedStart || pinnedEnd || colRight[Math.min(colCount - 1, cell + colspan - 1)] > range.leftPx) {
             if (!(pinnedStart || pinnedEnd) && colLeft[cell] > range.rightPx) {
-                // All columns to the right are outside the range.
-                if (pinnedEndFirst != Infinity)
+                // All remaining center columns are outside the range, but pinned-end
+                // columns must still be rendered, so skip to the pinned-end band.
+                if (pinnedEndFirst == Infinity)
                     break;
                 cell = pinnedEndFirst - 1;
                 continue;
