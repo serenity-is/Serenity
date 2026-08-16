@@ -35,7 +35,7 @@ export class FrozenLayout implements LayoutEngine {
         const pinnedStartCols = viewCols.filter(x => x.frozen && x.frozen !== 'end');
         refs.config.pinnedStartCols = pinnedStartCols.length;
         if (pinnedStartCols.length > 0)
-            return pinnedStartCols.concat(viewCols.filter(x => !x.frozen));
+            return pinnedStartCols.concat(viewCols.filter(x => !x.frozen || x.frozen === 'end'));
         return null;
     }
 
