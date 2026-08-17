@@ -85,6 +85,56 @@ describe('Grid columns', () => {
 });
 
 describe('options', () => {
+    it('does not initialize twice when init is called again', () => {
+        const layout = new BasicLayout();
+        const oldInit = layout.init;
+        let initCalls = 0;
+        layout.init = function (host: LayoutHost) {
+            initCalls++;
+            oldInit.call(layout, host);
+        };
+
+        const grid = new SleekGrid(document.createElement("div"), [], [], { layoutEngine: layout });
+        grid.init();
+
+        expect(initCalls).toBe(1);
+    });
+
+    it('supports lifecycle notifications and plugin registration during initialization', () => {
+        const plugin = {
+            pluginName: "initialization-plugin",
+            init: vi.fn(),
+            destroy: vi.fn()
+        };
+        const layout = new BasicLayout();
+        const oldInit = layout.init;
+        layout.init = function (host: LayoutHost) {
+            host.registerPlugin(plugin);
+            oldInit.call(layout, host);
+        };
+        const container = document.createElement("div");
+        const grid = new SleekGrid(container, [], [], { layoutEngine: layout });
+        const afterInit = vi.fn();
+        grid.onAfterInit.subscribe(afterInit);
+
+        grid.init();
+
+        expect(plugin.init).toHaveBeenCalledWith(grid);
+        expect(grid.getPluginByName("initialization-plugin")).toBe(plugin);
+        expect(afterInit).not.toHaveBeenCalled();
+    });
+
+    it('notifies an instance subscriber when initialization is automatic', () => {
+        const afterInit = vi.fn();
+        const grid = new SleekGrid(document.createElement("div"), [], [], { explicitInitialization: true });
+        grid.onAfterInit.subscribe(afterInit);
+
+        grid.init();
+
+        expect(afterInit).toHaveBeenCalledOnce();
+        expect(afterInit.mock.calls[0][0]).toMatchObject({ grid });
+    });
+
     it('should be able to set jQuery from options', () => {
         function MockJQueryStatic(el: HTMLElement) {
 
@@ -197,6 +247,18 @@ describe('options', () => {
 
         new SleekGrid(document.createElement("div"), [{ "c1": 1 }], [{ field: "c1" }], gridOptions);
         SleekGrid.prototype.init = oldInit;
+    });
+
+    it('maps pre-header compatibility options to grouping panel options', () => {
+        const options: GridOptions = {
+            createPreHeaderPanel: true,
+            preHeaderPanelHeight: 37,
+            groupingPanel: true
+        };
+        const grid = new SleekGrid(document.createElement("div"), [], [], options);
+
+        expect(grid.getOptions().groupingPanelHeight).toBe(37);
+        expect(grid.getPreHeaderPanel()).not.toBeNull();
     });
 });
 

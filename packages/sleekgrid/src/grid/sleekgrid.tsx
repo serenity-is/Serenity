@@ -2887,24 +2887,21 @@ export class SleekGrid<TItem = any> implements ISleekGrid<TItem> {
 
     flashCell(row: number, cell: number, speed?: number): void {
         speed = speed || 100;
-        if (this._rowsCache[row]) {
-            var cellEl = this._jQuery(this.getCellNode(row, cell));
-            toggleCellClass(4);
-        }
-
         var klass = this._options.cellFlashingCssClass;
+        var cellNode = this._rowsCache[row] && this.getCellNode(row, cell);
+        if (!cellNode)
+            return;
 
-        function toggleCellClass(times: number) {
+        const toggleCellClass = (times: number) => {
             if (!times) {
                 return;
             }
             setTimeout(function () {
-                cellEl.queue(function () {
-                    cellEl.toggleClass(klass).dequeue();
-                    toggleCellClass(times - 1);
-                });
+                cellNode.classList.toggle(klass);
+                toggleCellClass(times - 1);
             }, speed);
         }
+        toggleCellClass(4);
     }
 
     //////////////////////////////////////////////////////////////////////////////////////////////

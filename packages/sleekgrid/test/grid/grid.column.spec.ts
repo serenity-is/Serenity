@@ -130,6 +130,15 @@ describe('getColumnIndex', () => {
         expect(grid.getColumnIndex(columns[0].id)).toBeFalsy();
         expect(grid.getColumnIndex(columns[1].id)).toBe(0);
     });
+
+    it('should return null for an empty or unknown column id', () => {
+        const grid = new SleekGrid(document.createElement('div'), [], getTestColumns(), {});
+
+        expect(grid.getColumnIndex(null)).toBeNull();
+        expect(grid.getColumnIndex('missing')).toBeUndefined();
+        expect(grid.getColumnIndex('missing', { inAll: true })).toBeUndefined();
+        expect(grid.getColumnById('missing')).toBeUndefined();
+    });
 });
 
 describe('getColumnIndex(true)', () => {
@@ -214,5 +223,62 @@ describe('setColumns', () => {
         grid.setColumns(newColumns);
 
         expect(grid.getColumns()).toStrictEqual([newColumns[0]]);
+    });
+
+    it('preserves hidden columns when replacing only the visible columns', () => {
+        const columns = getTestColumns();
+        columns[0].visible = false;
+        const grid = new SleekGrid(document.createElement('div'), [], columns, {});
+
+        grid.setColumns([columns[1]]);
+
+        expect(grid.getAllColumns()).toEqual([columns[0], columns[1]]);
+        expect(grid.getColumns()).toEqual([columns[1]]);
+    });
+});
+
+describe('column visibility and ordering', () => {
+    it('changes visibility without reordering when requested', () => {
+        const columns = getTestColumns();
+        const grid = new SleekGrid(document.createElement('div'), [], columns, {});
+        const reordered = vi.fn();
+        grid.onColumnsReordered.subscribe(reordered);
+
+        grid.setVisibleColumns(['test2_id'], { reorder: false });
+
+        expect(grid.getAllColumns()).toEqual(columns);
+        expect(grid.getColumns()).toEqual([columns[1]]);
+        expect(reordered).toHaveBeenCalledOnce();
+
+        grid.setVisibleColumns(['test_id', 'test2_id'], { reorder: false, notify: false });
+        expect(grid.getColumns()).toEqual(columns);
+        expect(reordered).toHaveBeenCalledOnce();
+    });
+
+    it('reorders columns and can change visibility without notifying', () => {
+        const columns = getTestColumns();
+        const grid = new SleekGrid(document.createElement('div'), [], columns, {});
+        const reordered = vi.fn();
+        grid.onColumnsReordered.subscribe(reordered);
+
+        grid.reorderColumns(['test2_id'], { notify: false, setVisible: ['test2_id'] });
+
+        expect(grid.getAllColumns()).toEqual(columns);
+        expect(grid.getColumns()).toEqual([columns[1]]);
+        expect(reordered).not.toHaveBeenCalled();
+    });
+
+    it('normalizes frozen columns and preserves frozen-end columns', () => {
+        const columns = [
+            { id: 'first', field: 'first' },
+            { id: 'middle', field: 'middle' },
+            { id: 'last', field: 'last', frozen: 'end' as const }
+        ];
+        const grid = new SleekGrid(document.createElement('div'), [], columns, { frozenColumns: 1 });
+
+        expect(grid.getColumns().map(column => column.id)).toEqual(['first', 'middle', 'last']);
+        expect(grid.getColumns()[0].frozen).toBe(true);
+        expect(grid.getColumns()[2].frozen).toBe('end');
+        expect(grid.getAllColumns()).toBe(columns);
     });
 });
