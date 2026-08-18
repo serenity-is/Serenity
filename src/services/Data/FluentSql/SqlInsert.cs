@@ -199,4 +199,171 @@ public class SqlInsert : QueryWithParams, ISetFieldByStatement
 
         return sb.ToString();
     }
+
+    /// <summary>
+    ///   Formats an UPSERT query, i.e. a query that updates the row matching the key fields
+    ///   or inserts a new row if no such row exists.</summary>
+    /// <param name="tableName">
+    ///   Table name (required).</param>
+    /// <param name="nameValuePairs">
+    ///   Field names and values. Must be passed in the order of <c>[field1, value1, field2, 
+    ///   value2, ...., fieldN, valueN]</c>. It must have even number of elements.</param>
+    /// <param name="keyFields">
+    ///   List of key field names (e.g. primary key columns) that should be used to determine 
+    ///   whether an existing row is updated or a new row is inserted. Key fields must exist 
+    ///   among the fields in <paramref name="nameValuePairs"/>.</param>
+    /// <param name="dialect">Target dialect</param>
+    /// <returns>
+    ///   Formatted UPSERT query.</returns>
+    public static string FormatUpsert(string tableName, List<string> nameValuePairs,
+        IEnumerable<string> keyFields, ISqlDialect dialect = null)
+    {
+        if (tableName == null || tableName.Length == 0)
+            throw new ArgumentNullException(nameof(tableName));
+
+        ArgumentNullException.ThrowIfNull(nameValuePairs);
+        ArgumentNullException.ThrowIfNull(keyFields);
+
+        if (nameValuePairs.Count % 2 != 0)
+            throw new ArgumentOutOfRangeException(nameof(nameValuePairs));
+
+        dialect ??= SqlSettings.DefaultDialect;
+
+        var keyFieldList = keyFields.ToList();
+        if (keyFieldList.Count == 0)
+            throw new ArgumentOutOfRangeException(nameof(keyFields));
+
+        int fieldCount = nameValuePairs.Count / 2;
+        var fields = new List<string>(fieldCount);
+        var values = new List<string>(fieldCount);
+        var valueByField = new Dictionary<string, string>(StringComparer.OrdinalIgnoreCase);
+
+        for (int i = 0; i < nameValuePairs.Count; i += 2)
+        {
+            var field = nameValuePairs[i];
+            if (field == null || field.Length == 0)
+                throw new ArgumentException(string.Format(
+                    "Field name at index {0} is null or empty!", i), nameof(nameValuePairs));
+
+            fields.Add(SqlSyntax.AutoBracket(field, dialect));
+            values.Add(nameValuePairs[i + 1]);
+            valueByField[field] = nameValuePairs[i + 1];
+        }
+
+        var keyFieldsSet = new HashSet<string>(keyFieldList, StringComparer.OrdinalIgnoreCase);
+        var keyBracketed = new List<string>(keyFieldList.Count);
+        var keyValues = new List<string>(keyFieldList.Count);
+        foreach (var keyField in keyFieldList)
+        {
+            if (!valueByField.TryGetValue(keyField, out var keyValue))
+                throw new ArgumentException(string.Format(
+                    "Key field '{0}' is not among the fields to insert!", keyField), nameof(keyFields));
+
+            keyBracketed.Add(SqlSyntax.AutoBracket(keyField, dialect));
+            keyValues.Add(keyValue);
+        }
+
+        var nonKeyFields = new List<string>();
+        var nonKeyValues = new List<string>();
+        for (int i = 0; i < fieldCount; i++)
+        {
+            if (keyFieldsSet.Contains(nameValuePairs[i * 2]))
+                continue;
+
+            nonKeyFields.Add(fields[i]);
+            nonKeyValues.Add(values[i]);
+        }
+
+        var table = SqlSyntax.AutoBracketValid(tableName, dialect);
+        var insertColumns = string.Join(", ", fields);
+        var insertValues = string.Join(", ", values);
+        var keyCondition = string.Join(" AND ", keyBracketed.Select((f, i) => f + " = " + keyValues[i]));
+        var nonKeyAssignments = string.Join(", ", nonKeyFields.Select((f, i) => f + " = " + nonKeyValues[i]));
+
+        switch (dialect.ServerType)
+        {
+            case nameof(ServerType.SqlServer):
+            {
+                var updateBlock = nonKeyFields.Count > 0 ? $"""
+                    ;
+                    IF @@ROWCOUNT = 0
+                    BEGIN
+                       UPDATE {table} SET {nonKeyAssignments} WHERE {keyCondition};
+                    END
+                    """ : "";
+                return $"""
+                    INSERT INTO {table} ({insertColumns})
+                    SELECT {insertValues} WHERE NOT EXISTS (
+                        SELECT 1 FROM {table} WITH (UPDLOCK, SERIALIZABLE)
+                        WHERE {keyCondition}){updateBlock}
+                    """;
+            }
+
+            case nameof(ServerType.Sqlite):
+            case nameof(ServerType.Postgres):
+            {
+                var conflictAction = nonKeyFields.Count > 0
+                    ? $"DO UPDATE SET {string.Join(", ", nonKeyFields.Select(f => f + " = excluded." + f))}"
+                    : "DO NOTHING";
+                return $"""
+                    INSERT INTO {table} ({insertColumns})
+                    VALUES ({insertValues})
+                    ON CONFLICT ({string.Join(", ", keyBracketed)})
+                    {conflictAction}
+                    """;
+            }
+
+            case nameof(ServerType.MySql):
+            {
+                var updateAssignments = nonKeyFields.Count > 0 ? nonKeyAssignments :
+                    keyBracketed[0] + " = " + keyBracketed[0];
+                return $"""
+                    INSERT INTO {table} ({insertColumns})
+                    VALUES ({insertValues})
+                    ON DUPLICATE KEY UPDATE {updateAssignments}
+                    """;
+            }
+
+            case nameof(ServerType.Oracle):
+            {
+                var mergeUpdate = nonKeyFields.Count > 0 ? $"""
+                    WHEN MATCHED THEN
+                        UPDATE SET {string.Join(", ", nonKeyFields.Select(f => "t." + f + " = s." + f))}
+                    """ : "";
+                return $"""
+                    MERGE INTO {table} t
+                    USING (SELECT {string.Join(", ", fields.Select((f, i) => values[i] + " AS " + f))} FROM dual) s
+                    ON ({string.Join(" AND ", keyBracketed.Select(f => "t." + f + " = s." + f))})
+                    {mergeUpdate}
+                    WHEN NOT MATCHED THEN
+                        INSERT ({insertColumns}) VALUES ({string.Join(", ", fields.Select(f => "s." + f))})
+                    """;
+            }
+
+            case nameof(ServerType.Firebird):
+                return $"""
+                    UPDATE OR INSERT INTO {table} ({insertColumns})
+                    VALUES ({insertValues})
+                    MATCHING ({string.Join(", ", keyBracketed)})
+                    """;
+
+            default:
+                throw new NotSupportedException(string.Format(
+                    "UPSERT is not supported for dialect '{0}'!", dialect.ServerType));
+        }
+    }
+
+    /// <summary>
+    ///   Formats an UPSERT query, i.e. a query that updates the row matching the key fields
+    ///   or inserts a new row if no such row exists.</summary>
+    /// <param name="keyFields">
+    ///   List of key field names (e.g. primary key columns) that should be used to determine 
+    ///   whether an existing row is updated or a new row is inserted. Key fields must exist 
+    ///   among the fields set on this query.</param>
+    /// <returns>
+    ///   Formatted UPSERT query.</returns>
+    public string ToUpsertString(IEnumerable<string> keyFields)
+    {
+        return FormatUpsert(tableName, nameValuePairs, keyFields, dialect);
+    }
 }

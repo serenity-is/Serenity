@@ -373,6 +373,35 @@ public static class SqlHelper
     }
 
     /// <summary>
+    /// Executes an UPSERT (insert or update) query on the connection and returns number of affected rows.
+    /// The key fields are used to determine whether an existing record is updated or a new record is inserted.
+    /// </summary>
+    /// <param name="query">The insert query.</param>
+    /// <param name="connection">The connection.</param>
+    /// <param name="keyFields">List of key fields (e.g. primary key columns) used to match an existing record.</param>
+    /// <param name="expectedRows">The expected rows. Used to validate expected number of affected rows.</param>
+    /// <param name="logger">Logger</param>
+    /// <returns>Number of affected rows.</returns>
+    public static int ExecuteUpsert(this SqlInsert query, IDbConnection connection,
+        IEnumerable<string> keyFields, ExpectedRows expectedRows = ExpectedRows.Ignore, ILogger logger = null)
+    {
+        ArgumentNullException.ThrowIfNull(query);
+        ArgumentNullException.ThrowIfNull(connection);
+
+        if (!query.IsDialectOverridden)
+            query.Dialect(connection.GetDialect());
+
+        string commandText = query.ToUpsertString(keyFields);
+
+        if (connection is ISqlOperationInterceptor interceptor &&
+            interceptor.ExecuteNonQuery(commandText, query.Params, expectedRows, query, getNewId: false) is { HasValue: true } intres)
+            return (int)intres.Value;
+
+        using var command = NewCommand(connection, commandText, query.Params);
+        return CheckExpectedRows(expectedRows, InternalExecuteNonQuery(command, logger));
+    }
+
+    /// <summary>
     /// Executes the specified update query on connection and returns number of affected rows.
     /// </summary>
     /// <param name="query">The query.</param>
