@@ -1,12 +1,19 @@
 import * as signals from "@preact/signals-core";
 import { type Computed, type Signal, type SignalLike } from "../types";
 
+/**
+ * Options for creating a signal.
+ * @typeParam T - The type of the signal's value.
+ */
 export interface SignalOptions<T> {
     watched?: (this: SignalLike<T>) => void;
     unwatched?: (this: SignalLike<T>) => void;
     name?: string;
 }
 
+/**
+ * Options for creating an effect.
+ */
 export interface EffectOptions {
     name?: string;
 }

@@ -614,7 +614,7 @@ interface HTMLAttributes<T> extends ElementAttributes<T> {
     exportparts?: PropValue<string | RemoveAttribute>;
     hidden?: PropValue<EnumeratedAcceptsEmpty | "hidden" | "until-found" | RemoveAttribute>;
     inert?: PropValue<BooleanAttribute | RemoveAttribute>;
-    inputmode?: PropValue<"decimal" | "email" | "none" | "numeric" | "search" | "tel" | "text" | "url" | RemoveAttribute>;
+    inputmode?: PropValue<"decimal" | "email" | "none" | "numeric" | "search" | "tel" | "text" | "url" | "value" | RemoveAttribute>;
     is?: PropValue<string | RemoveAttribute>;
     lang?: PropValue<string | RemoveAttribute>;
     popover?: PropValue<EnumeratedAcceptsEmpty | "manual" | "auto" | RemoveAttribute>;
@@ -729,7 +729,7 @@ interface CanvasHTMLAttributes<T> extends HTMLAttributes<T> {
     height?: PropValue<number | string | RemoveAttribute>;
     width?: PropValue<number | string | RemoveAttribute>;
 
-    /**@deprecated @non-standard*/
+    /** @deprecated @non-standard */
     "moz-opaque"?: PropValue<BooleanAttribute | RemoveAttribute>;
 }
 interface CaptionHTMLAttributes<T> extends HTMLAttributes<T> {
@@ -850,7 +850,7 @@ interface IframeHTMLAttributes<T> extends HTMLAttributes<T> {
 
     /** @deprecated */
     align?: PropValue<string | RemoveAttribute>;
-    /**@deprecated @non-standard*/
+    /** @deprecated @non-standard */
     allowpaymentrequest?: PropValue<BooleanAttribute | RemoveAttribute>;
     /** @deprecated */
     allowtransparency?: PropValue<BooleanAttribute | RemoveAttribute>;
@@ -1098,7 +1098,7 @@ interface OlHTMLAttributes<T> extends HTMLAttributes<T> {
     start?: PropValue<number | string | RemoveAttribute>;
     type?: PropValue<"1" | "a" | "A" | "i" | "I" | RemoveAttribute>;
 
-    /**@deprecated @non-standard*/
+    /** @deprecated @non-standard */
     compact?: PropValue<BooleanAttribute | RemoveAttribute>;
 }
 interface OptgroupHTMLAttributes<T> extends HTMLAttributes<T> {
@@ -1499,7 +1499,7 @@ interface TextContentElementSVGAttributes<T>
     Pick<PresentationSVGAttributes, "font-family" | "font-style" | "font-variant" | "font-weight" | "font-stretch" | "font-size" | "font-size-adjust" | "kerning" | "letter-spacing" | "word-spacing" | "text-decoration" | "glyph-orientation-horizontal" | "glyph-orientation-vertical" | "direction" | "unicode-bidi" | "text-anchor" | "dominant-baseline" | "color" | "fill" | "fill-rule" | "fill-opacity" | "stroke" | "stroke-width" | "stroke-linecap" | "stroke-linejoin" | "stroke-miterlimit" | "stroke-dasharray" | "stroke-dashoffset" | "stroke-opacity"> {
 }
 interface ZoomAndPanSVGAttributes {
-    /**@deprecated @non-standard*/
+    /** @deprecated @non-standard */
     zoomAndPan?: PropValue<"disable" | "magnify" | RemoveAttribute>;
 }
 interface AnimateSVGAttributes<T>
@@ -2019,9 +2019,9 @@ interface MathMLAnnotationXmlElementAttributes<T> extends MathMLAttributes<T> {
     src?: PropValue<string | RemoveAttribute>;
 }
 interface MathMLMactionElementAttributes<T> extends MathMLAttributes<T> {
-    /**@deprecated @non-standard*/
+    /** @deprecated @non-standard */
     actiontype?: PropValue<"statusline" | "toggle" | RemoveAttribute>;
-    /**@deprecated @non-standard*/
+    /** @deprecated @non-standard */
     selection?: PropValue<string | RemoveAttribute>;
 }
 interface MathMLMathElementAttributes<T> extends MathMLAttributes<T> {
@@ -2031,9 +2031,9 @@ interface MathMLMerrorElementAttributes<T> extends MathMLAttributes<T> { }
 interface MathMLMfracElementAttributes<T> extends MathMLAttributes<T> {
     linethickness?: PropValue<string | RemoveAttribute>;
 
-    /**@deprecated @non-standard*/
+    /** @deprecated @non-standard */
     denomalign?: PropValue<"center" | "left" | "right" | RemoveAttribute>;
-    /**@deprecated @non-standard*/
+    /** @deprecated @non-standard */
     numalign?: PropValue<"center" | "left" | "right" | RemoveAttribute>;
 }
 interface MathMLMiElementAttributes<T> extends MathMLAttributes<T> {
@@ -2041,9 +2041,9 @@ interface MathMLMiElementAttributes<T> extends MathMLAttributes<T> {
 }
 
 interface MathMLMmultiscriptsElementAttributes<T> extends MathMLAttributes<T> {
-    /**@deprecated @non-standard*/
+    /** @deprecated @non-standard */
     subscriptshift?: PropValue<string | RemoveAttribute>;
-    /**@deprecated @non-standard*/
+    /** @deprecated @non-standard */
     superscriptshift?: PropValue<string | RemoveAttribute>;
 }
 interface MathMLMnElementAttributes<T> extends MathMLAttributes<T> { }
@@ -2090,15 +2090,15 @@ interface MathMLMspaceElementAttributes<T> extends MathMLAttributes<T> {
 }
 interface MathMLMsqrtElementAttributes<T> extends MathMLAttributes<T> { }
 interface MathMLMstyleElementAttributes<T> extends MathMLAttributes<T> {
-    /**@deprecated @non-standard*/
+    /** @deprecated @non-standard */
     background?: PropValue<string | RemoveAttribute>;
-    /**@deprecated @non-standard*/
+    /** @deprecated @non-standard */
     color?: PropValue<string | RemoveAttribute>;
-    /**@deprecated @non-standard*/
+    /** @deprecated @non-standard */
     fontsize?: PropValue<string | RemoveAttribute>;
-    /**@deprecated @non-standard*/
+    /** @deprecated @non-standard */
     fontstyle?: PropValue<string | RemoveAttribute>;
-    /**@deprecated @non-standard*/
+    /** @deprecated @non-standard */
     fontweight?: PropValue<string | RemoveAttribute>;
 
     /** @deprecated */
@@ -2107,17 +2107,17 @@ interface MathMLMstyleElementAttributes<T> extends MathMLAttributes<T> {
     scriptsizemultiplier?: PropValue<string | RemoveAttribute>;
 }
 interface MathMLMsubElementAttributes<T> extends MathMLAttributes<T> {
-    /**@deprecated @non-standard*/
+    /** @deprecated @non-standard */
     subscriptshift?: PropValue<string | RemoveAttribute>;
 }
 interface MathMLMsubsupElementAttributes<T> extends MathMLAttributes<T> {
-    /**@deprecated @non-standard*/
+    /** @deprecated @non-standard */
     subscriptshift?: PropValue<string | RemoveAttribute>;
-    /**@deprecated @non-standard*/
+    /** @deprecated @non-standard */
     superscriptshift?: PropValue<string | RemoveAttribute>;
 }
 interface MathMLMsupElementAttributes<T> extends MathMLAttributes<T> {
-    /**@deprecated @non-standard*/
+    /** @deprecated @non-standard */
     superscriptshift?: PropValue<string | RemoveAttribute>;
 }
 interface MathMLMtableElementAttributes<T> extends MathMLAttributes<T> {
@@ -2297,13 +2297,13 @@ interface HTMLElementTags {
 }
 /** @type {HTMLElementDeprecatedTagNameMap} */
 interface HTMLElementDeprecatedTags {
-    /** * @deprecated */
+    /** @deprecated */
     big: HTMLAttributes<HTMLElement>;
-    /** * @deprecated */
+    /** @deprecated */
     keygen: KeygenHTMLAttributes<HTMLUnknownElement>;
-    /** * @deprecated */
+    /** @deprecated */
     menuitem: HTMLAttributes<HTMLUnknownElement>;
-    /** * @deprecated */
+    /** @deprecated */
     param: ParamHTMLAttributes<HTMLParamElement>;
 }
 /** @type {SVGElementTagNameMap} */
@@ -2401,8 +2401,8 @@ interface MathMLElementTags {
     semantics: MathMLSemanticsElementAttributes<MathMLElement>;
     /** @non-standard */
     menclose: MathMLMencloseElementAttributes<MathMLElement>;
-    /** * @deprecated */
+    /** @deprecated */
     maction: MathMLMactionElementAttributes<MathMLElement>;
-    /**@deprecated @non-standard*/
+    /** @deprecated @non-standard */
     mfenced: MathMLMfencedElementAttributes<MathMLElement>;
 }

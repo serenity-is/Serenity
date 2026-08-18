@@ -9,6 +9,9 @@ export type JSXElement = HTMLElement |
     (JSX.ConfigureElement["svg"] extends false ? never : SVGElement) |
     (JSX.ConfigureElement["mathml"] extends false ? never : MathMLElement);
 
+/**
+ * A single child that can be rendered inside a JSX element.
+ */
 type ComponentChild =
     | string
     | number
@@ -27,6 +30,9 @@ type ComponentChild =
     | null
     | undefined
 
+/**
+ * The children of a JSX element: a single child or an array of children.
+ */
 export type ComponentChildren = ComponentChild[] | ComponentChild;
 
 export namespace JSX {
