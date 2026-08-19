@@ -391,7 +391,34 @@ public static class SqlHelper
         if (!query.IsDialectOverridden)
             query.Dialect(connection.GetDialect());
 
-        string commandText = query.ToUpsertString(keyFields);
+        string commandText;
+        try
+        {
+            commandText = query.ToUpsertString(keyFields);
+        }
+        catch (NotSupportedException)
+        {
+            // Unknown dialect: fall back to a non-atomic update-then-insert.
+            var tableName = query.TableName();
+            var keySet = new HashSet<string>(keyFields, StringComparer.OrdinalIgnoreCase);
+
+            var update = new SqlUpdate(tableName).Dialect(query.Dialect());
+            foreach (var pair in query.GetFieldExpressions())
+            {
+                if (keySet.Contains(pair.Field))
+                    update.Where((new Criteria(pair.Field) == new Criteria(pair.Expression)).ToString());
+                else
+                    update.SetTo(pair.Field, pair.Expression);
+            }
+            if (query.Params is { } prms)
+                foreach (var p in prms)
+                    update.AddParam(p.Key, p.Value);
+
+            if (update.Execute(connection, ExpectedRows.ZeroOrOne, logger) != 1)
+                query.Execute(connection, logger);
+
+            return CheckExpectedRows(expectedRows, 1);
+        }
 
         if (connection is ISqlOperationInterceptor interceptor &&
             interceptor.ExecuteNonQuery(commandText, query.Params, expectedRows, query, getNewId: false) is { HasValue: true } intres)
