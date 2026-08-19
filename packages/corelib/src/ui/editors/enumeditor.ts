@@ -4,20 +4,37 @@ import { ComboboxItem } from "./combobox";
 import { ComboboxCommonOptions, ComboboxEditor } from "./comboboxeditor";
 import { EditorProps } from "./editorwidget";
 
+/**
+ * Options for the {@link EnumEditor}.
+ */
 export interface EnumEditorOptions extends ComboboxCommonOptions {
+    /** Key of the enum to load items from. */
     enumKey?: string;
+    /** The enum type to load items from. */
     enumType?: any;
 }
 
+/**
+ * An editor that renders a select of enum values.
+ * @typeParam P - Widget props type.
+ */
 export class EnumEditor<P extends EnumEditorOptions = EnumEditorOptions> extends ComboboxEditor<P, ComboboxItem> {
     static override[Symbol.typeInfo] = this.registerEditor(nsSerenity);
 
+    /**
+     * Creates an enum editor.
+     * @param props - Widget props.
+     */
     constructor(props: EditorProps<P>) {
         super(props);
 
         this.updateItems();
     }
 
+    /**
+     * Loads the enum values into the editor.
+     * @returns Void or a promise that resolves when items are loaded.
+     */
     protected override updateItems(): void | PromiseLike<void> {
         this.clearItems();
 
@@ -48,6 +65,10 @@ export class EnumEditor<P extends EnumEditorOptions = EnumEditorOptions> extends
             then(enumType);
     }
 
+    /**
+     * Whether the editor allows clearing the selection.
+     * @returns True when clear is allowed.
+     */
     protected override allowClear() {
         return (this.options.allowClear ?? true);
     }

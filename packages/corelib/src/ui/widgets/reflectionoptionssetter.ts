@@ -2,8 +2,19 @@ import { getInstanceType, isInstanceOfType } from "../../base";
 import { getTypeMembers, TypeMember, TypeMemberKind } from "../../compat";
 import { OptionAttribute } from "../../types/attributes";
 
+/**
+ * Reflection-based helper that applies option objects to widgets using members
+ * decorated with {@link OptionAttribute}. Handles PascalCase → camelCase mapping
+ * and getter/setter (`get_*`/`set_*`) conventions.
+ */
 export namespace ReflectionOptionsSetter {
 
+    /**
+     * Gets a property value via `get_<property>` or direct field access.
+     * @param o - Target object.
+     * @param property - Property name (PascalCase or camelCase).
+     * @returns Property value, or undefined if not found.
+     */
     export function getPropertyValue(o: any, property: string): any {
         var d = o;
         var getter = d['get_' + property];
@@ -18,6 +29,12 @@ export namespace ReflectionOptionsSetter {
         return d[camelCase];
     }
 
+    /**
+     * Sets a property value via `set_<property>` or direct field assignment.
+     * @param o - Target object.
+     * @param property - Property name (PascalCase or camelCase).
+     * @param value - Value to assign.
+     */
     export function setPropertyValue(o: any, property: string, value: any): void {
         var d = o;
         var setter = d['set_' + property];
@@ -69,6 +86,12 @@ export namespace ReflectionOptionsSetter {
         }
     }
 
+    /**
+     * Applies an options bag to a widget instance by setting members
+     * decorated with {@link OptionAttribute}.
+     * @param target - Widget instance to configure.
+     * @param options - Options object (keys are matched case-insensitively via camelCase conversion).
+     */
     export function set(target: any, options: any): void {
         if (options == null) {
             return;

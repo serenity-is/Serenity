@@ -5,8 +5,16 @@ import { FormatterTypeRegistry } from "../../types/formattertyperegistry";
 import { IInitializeColumn } from "../formatters/iinitializecolumn";
 import { ReflectionOptionsSetter } from "../widgets/reflectionoptionssetter";
 
+/**
+ * Converts {@link PropertyItem} definitions into sleek grid column definitions.
+ */
 export namespace PropertyItemColumnConverter {
 
+    /**
+     * Converts an array of property items into column definitions.
+     * @param items - The property items to convert.
+     * @returns The resulting column definitions.
+     */
     export function toColumns(items: PropertyItem[]): Column[] {
         var result: Column[] = [];
         if (items == null) {
@@ -18,6 +26,11 @@ export namespace PropertyItemColumnConverter {
         return result;
     }
 
+    /**
+     * Converts a single property item into a column definition.
+     * @param item - The property item to convert.
+     * @returns The resulting column definition.
+     */
     export function toColumn(item: PropertyItem): Column {
         const isAlwaysHidden = item.filterOnly === true ||
             (item.readPermission != null && !Authorization.hasPermission(item.readPermission));

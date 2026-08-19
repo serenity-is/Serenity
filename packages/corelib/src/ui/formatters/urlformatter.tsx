@@ -3,12 +3,21 @@ import { formatterTypeInfo, nsSerenity, registerType, resolveUrl, sanitizeUrl, s
 import { Formatter } from "../../slick";
 import { IInitializeColumn } from "./iinitializecolumn";
 
+/** Renders a value as a hyperlink with configurable URL / display mapping. */
 export class UrlFormatter implements Formatter, IInitializeColumn {
     static [Symbol.typeInfo] = formatterTypeInfo(nsSerenity, [IInitializeColumn]); static { registerType(this); }
 
+    /**
+     * @param props.displayProperty - Item field used for link text (defaults to cell value).
+     * @param props.displayFormat - Format string applied to display value.
+     * @param props.urlProperty - Item field used for URL (defaults to cell value).
+     * @param props.urlFormat - Format string applied to URL value.
+     * @param props.target - Anchor target (e.g. `"_blank"`).
+     */
     constructor(readonly props: { displayProperty?: string, displayFormat?: string, urlProperty?: string, urlFormat?: string, target?: string } = {}) {
     }
 
+    /** @param ctx - Formatter context. @returns Anchor element or empty string. */
     format(ctx: FormatterContext): FormatterResult {
         var url = (this.urlProperty ?
             (ctx.item[this.urlProperty] ?? '').toString() :
@@ -33,6 +42,10 @@ export class UrlFormatter implements Formatter, IInitializeColumn {
         return <a href={url} target={this.target}>{display}</a>;
     }
 
+    /**
+     * Declares any referenced fields so they are fetched for formatting.
+     * @param column - Column being initialized.
+     */
     initializeColumn(column: Column): void {
         column.referencedFields = column.referencedFields || [];
 

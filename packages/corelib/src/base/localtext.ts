@@ -9,9 +9,16 @@ function getTable(): { [key: string]: string } {
 }
 
 /**
- * Adds local text entries to the localization table.
- * @param obj The object containing key/value pairs to add. If a string is provided, it will be added as a key with the prefix (second argument) as its value.
- * @param pre The prefix to add to each key. If obj is a string, this will be the value for that key.
+ * Adds one or more entries to the global localization table.
+ * @param obj - Either a single key (string) whose value is `pre`, or a nested object map where leaf string values are stored under dot-joined keys (recursively). Pass `null`/`undefined`/empty to no-op.
+ * @param pre - Prefix prepended to each key, or the value when `obj` is a string. Defaults to `""` for object mode.
+ * @remarks The table is stored on the global object under {@link localTextTableSymbol} and is shared across the application. Nested objects are flattened with `.` separators (e.g. `{ a: { b: "x" } }` with `pre="Ns."` registers `"Ns.a.b"`).
+ * @example
+ * ```ts
+ * addLocalText({ "Db.Northwind.CustomerName": "Customer Name" });
+ * addLocalText("Db.Northwind.CustomerName", "Customer Name");
+ * addLocalText({ Customer: { Name: "Name" } }, "Db.Northwind.");
+ * ```
  */
 export function addLocalText(obj: string | Record<string, string | Record<string, any>>, pre?: string) {
     if (!obj)
@@ -38,19 +45,24 @@ export function addLocalText(obj: string | Record<string, string | Record<string
 }
 
 /**
- * Retrieves a localized string from the localization table.
- * @param key The key of the localized string.
- * @param defaultText The default text to return if the key is not found.
- * @returns The localized string or the default text.
+ * Retrieves a localized string for a key, falling back gracefully.
+ * @param key - Localization key to look up (e.g. `"Dialogs.YesButton"`). If falsy, an empty string or `defaultText` is returned.
+ * @param defaultText - Optional fallback returned when the key is not found. When omitted, the key itself is returned.
+ * @returns The localized value, `defaultText` if provided, the key itself, or `""` for nullish keys.
+ * @example
+ * ```ts
+ * localText("Dialogs.YesButton"); // "Yes" if registered, otherwise "Dialogs.YesButton"
+ * localText("Missing.Key", "Fallback"); // "Fallback"
+ * ```
  */
 export function localText(key: string, defaultText?: string): string {
     return getTable()[key] ?? defaultText ?? key ?? '';
 }
 
 /**
- * Tries to retrieve a localized string from the localization table.
- * @param key The key of the localized string.
- * @returns The localized string or undefined if not found.
+ * Tries to retrieve a localized string without falling back to the key.
+ * @param key - Localization key to look up.
+ * @returns The localized value if found, otherwise `undefined` (unlike {@link localText} which returns the key).
  */
 export function tryGetText(key: string): string | undefined {
     return getTable()[key];
@@ -110,19 +122,20 @@ const localizationProxyHandler: ProxyHandler<Record<string, any>> = {
 };
 
 /**
- * Creates a proxy object for localized text retrieval.
- * @param obj - The target object to proxy (usually an empty object {})
- * @param pfx - The key prefix for all text lookups
- * @param tpl - Template object defining the structure (object properties become nested proxies)
- * @param mode - The lookup mode: by default it uses localText, e.g. returns the localized text or the text key if not found,
- * "asTry"=tryGetText, e.g. returns undefined if not found, "asKey"=return the text key ("Forms.Something.Abc") as is (no lookup)
- * @returns A proxy object that provides localized text access
- * 
+ * Creates a typed proxy that resolves nested property access to localized strings.
+ * The proxy lazily wraps each level of `tpl`; property access concatenates `pfx` with the property name and performs the lookup according to `mode`.
+ * @param obj - Target object to proxy (usually `{}`). Mutated in place with hidden symbols and returned as a `Proxy`.
+ * @param pfx - Prefix prepended to every key lookup (e.g. `"Db.Northwind."`). Pass `""` for no prefix.
+ * @param tpl - Template object whose shape defines the available text keys; leaf values determine nesting. `null`/`undefined` leaves resolve to string lookups, objects create nested sub-proxies.
+ * @param mode - Lookup strategy: `undefined` uses {@link localText} (returns key on miss), `"asTry"` uses {@link tryGetText} (returns `undefined` on miss), `"asKey"` returns the generated key without any lookup.
+ * @returns A proxy over `obj` augmented with `asTry()` and `asKey()` mode-switchers. Access a leaf string like `proxy.foo.bar` to get the localized text for `"<pfx>foo.bar"`.
  * @example
- * const texts = proxyTexts({}, '', { user: { name: {} } });
- * texts.user.name.first // looks up "user.name.first" key, returns "user.name.first" if not found
- * texts.user.asTry().name.first // returns undefined if not found
- * texts.user.asKey().name.first // returns "user.name.first"
+ * ```ts
+ * const texts = proxyTexts({}, "", { user: { name: {} } });
+ * texts.user.name.first // localText("user.name.first")
+ * texts.user.asTry().name.first // tryGetText("user.name.first")
+ * texts.user.asKey().name.first // "user.name.first"
+ * ```
  */
 export function proxyTexts<T extends Record<string, any> = Record<string, any>>(obj: T, pfx: string, tpl: Record<string, any>, mode?: "asTry" | "asKey"):
     Record<string, any> & { asTry(): T; asKey(): T } {
@@ -133,12 +146,13 @@ export function proxyTexts<T extends Record<string, any> = Record<string, any>>(
 }
 
 /**
- * A list of languages with their IDs and display texts.
+ * List of available languages for the translation UI.
+ * Each entry pairs a language identifier with its display name.
  */
-export type LanguageList = { id: string, text: string }[];
+export type LanguageList = { /** Language identifier (e.g. `"en"`, `"tr"`). */ id: string, /** Human-readable language name. */ text: string }[];
 
 /**
- * Options for translating texts.
+ * Options passed to {@link TranslationConfig.translateTexts} to request machine/human translations.
  */
 export type TranslateTextsOptions = {
     /** The source language ID */
@@ -155,7 +169,7 @@ export type TranslateTextsOptions = {
 };
 
 /**
- * The result of a translation operation.
+ * Result returned by {@link TranslationConfig.translateTexts} containing translated entries.
  */
 export type TranslateTextsResult = {
     /** An array of resulting translations */
@@ -170,7 +184,8 @@ export type TranslateTextsResult = {
 };
 
 /**
- * Configuration for translation services.
+ * Global configuration hooks for the optional translation service integration.
+ * Assign these before invoking translation features in the UI.
  */
 export const TranslationConfig = {
     /** Retrieves the list of available languages */
@@ -179,13 +194,26 @@ export const TranslationConfig = {
     translateTexts: null as (opt: TranslateTextsOptions) => PromiseLike<TranslateTextsResult>
 }
 
-/** @deprecated prefer localText for better discoverability */
+/**
+ * Alias for {@link localText}.
+ * @deprecated Prefer {@link localText} directly for better discoverability and consistency.
+ */
 export const text = localText;
 
+/**
+ * Legacy namespace for local-text helpers.
+ * @deprecated Use the top-level {@link addLocalText} and {@link localText} functions instead.
+ */
 export namespace LT {
-    /** @deprecated Use addLocalText */
+    /**
+     * Alias for {@link addLocalText}.
+     * @deprecated Use {@link addLocalText} directly.
+     */
     export const add = addLocalText;
-    /** @deprecated Use localText */
+    /**
+     * Alias for {@link localText}.
+     * @deprecated Use {@link localText} directly.
+     */
     export const getDefault = localText;
 }
 

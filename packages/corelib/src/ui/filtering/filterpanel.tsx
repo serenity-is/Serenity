@@ -10,13 +10,25 @@ import { FilterOperator } from "./filteroperator";
 import { FilterWidgetBase } from "./filterwidgetbase";
 import { IFiltering } from "./ifiltering";
 
+/**
+ * Options for the {@link FilterFieldSelect}.
+ */
 export interface FilterFieldSelectOptions {
+    /** The fields to display in the select. */
     fields: PropertyItem[];
 }
 
+/**
+ * A combobox that lets the user select a filter field.
+ * @typeParam P - Widget props type.
+ */
 export class FilterFieldSelect<P extends FilterFieldSelectOptions = FilterFieldSelectOptions> extends ComboboxEditor<P, PropertyItem> {
     static override[Symbol.typeInfo] = this.registerClass(nsSerenity);
 
+    /**
+     * Creates a filter field select.
+     * @param props - Widget props.
+     */
     constructor(props: WidgetProps<P>) {
         super(props);
 
@@ -25,6 +37,10 @@ export class FilterFieldSelect<P extends FilterFieldSelectOptions = FilterFieldS
         }
     }
 
+    /**
+     * Returns the empty item text.
+     * @returns The empty item text.
+     */
     override emptyItemText() {
         if (!this.value) {
             return FilterPanelTexts.SelectField;
@@ -33,6 +49,10 @@ export class FilterFieldSelect<P extends FilterFieldSelectOptions = FilterFieldS
         return null;
     }
 
+    /**
+     * Returns the combobox options.
+     * @returns Combobox options.
+     */
     override getComboboxOptions() {
         var opt = super.getComboboxOptions();
         opt.allowClear = false;
@@ -40,9 +60,16 @@ export class FilterFieldSelect<P extends FilterFieldSelectOptions = FilterFieldS
     }
 }
 
+/**
+ * A combobox that lets the user select a filter operator.
+ */
 export class FilterOperatorSelect extends ComboboxEditor<any, FilterOperator> {
     static override[Symbol.typeInfo] = this.registerClass(nsSerenity);
 
+    /**
+     * Creates a filter operator select.
+     * @param props - Widget props including the source operators.
+     */
     constructor(props: WidgetProps<{ source: FilterOperator[] }>) {
         super(props);
 
@@ -55,10 +82,18 @@ export class FilterOperatorSelect extends ComboboxEditor<any, FilterOperator> {
             this.value = this.options.source[0].key;
     }
 
+    /**
+     * Returns the empty item text.
+     * @returns Null.
+     */
     override emptyItemText(): string {
         return null;
     }
 
+    /**
+     * Returns the combobox options.
+     * @returns Combobox options.
+     */
     override getComboboxOptions() {
         var opt = super.getComboboxOptions();
         opt.allowClear = false;
@@ -66,6 +101,10 @@ export class FilterOperatorSelect extends ComboboxEditor<any, FilterOperator> {
     }
 }
 
+/**
+ * A panel for building filter criteria with multiple filter lines.
+ * @typeParam P - Widget props type.
+ */
 export class FilterPanel<P = {}> extends FilterWidgetBase<P> {
     static override[Symbol.typeInfo] = this.registerClass(nsSerenity);
 
@@ -73,6 +112,10 @@ export class FilterPanel<P = {}> extends FilterWidgetBase<P> {
     declare private resetButton: HTMLButtonElement;
     declare private searchButton: HTMLButtonElement;
 
+    /**
+     * Creates a filter panel.
+     * @param props - Widget props.
+     */
     constructor(props: WidgetProps<P>) {
         super(props);
 
@@ -83,10 +126,15 @@ export class FilterPanel<P = {}> extends FilterWidgetBase<P> {
 
     declare private _showInitialLine: boolean;
 
+    /**
+     * Whether an initial empty line is shown.
+     * @returns True when shown.
+     */
     get showInitialLine() {
         return this._showInitialLine;
     }
 
+    /** Sets whether an initial empty line is shown. */
     set showInitialLine(value: boolean) {
         if (this._showInitialLine !== value) {
             this._showInitialLine = value;
@@ -96,11 +144,17 @@ export class FilterPanel<P = {}> extends FilterWidgetBase<P> {
         }
     }
 
+    /**
+     * Updates the rows when the filter store changes.
+     */
     protected override filterStoreChanged() {
         super.filterStoreChanged();
         this.updateRowsFromStore();
     }
 
+    /**
+     * Rebuilds the filter rows from the store.
+     */
     updateRowsFromStore() {
         Fluent(this.rowsDiv).empty();
 
@@ -143,10 +197,15 @@ export class FilterPanel<P = {}> extends FilterWidgetBase<P> {
 
     declare private _showSearchButton: boolean;
 
+    /**
+     * Whether the search button is shown.
+     * @returns True when shown.
+     */
     get showSearchButton(): boolean {
         return this._showSearchButton;
     }
 
+    /** Sets whether the search button is shown. */
     set showSearchButton(value: boolean) {
         if (this._showSearchButton !== value) {
             this._showSearchButton = value;
@@ -154,8 +213,13 @@ export class FilterPanel<P = {}> extends FilterWidgetBase<P> {
         }
     }
 
+    /** Whether the store is updated when the panel is reset. */
     declare updateStoreOnReset: boolean;
 
+    /**
+     * Renders the filter panel contents.
+     * @returns The rendered content.
+     */
     protected override renderContents(): any {
         const id = this.useIdPrefix();
         return (<>
@@ -174,20 +238,35 @@ export class FilterPanel<P = {}> extends FilterWidgetBase<P> {
         </>);
     }
 
+    /**
+     * Handles the search button click.
+     * @param e - The click event.
+     */
     protected searchButtonClick(e: Event) {
         e.preventDefault();
         this.search();
     }
 
+    /**
+     * Whether the panel has validation errors.
+     * @returns True when errors exist.
+     */
     get hasErrors(): boolean {
         return !!this.rowsDiv.querySelector(":scope > div.v > span.error");
     }
 
     // for compat
+    /**
+     * Whether the panel has validation errors.
+     * @returns True when errors exist.
+     */
     protected get_hasErrors(): boolean {
         return this.hasErrors;
     }
 
+    /**
+     * Builds filter lines from the current rows and updates the store.
+     */
     search() {
         this.rowsDiv.querySelectorAll(":scope > div.v > span.error").forEach(x => x.remove());
 
@@ -243,11 +322,19 @@ export class FilterPanel<P = {}> extends FilterWidgetBase<P> {
         this.get_store().raiseChanged();
     }
 
+    /**
+     * Handles the add-button click.
+     * @param e - The click event.
+     */
     protected addButtonClick(e: Event) {
         this.addEmptyRow(true);
         e.preventDefault();
     }
 
+    /**
+     * Handles the reset-button click.
+     * @param e - The click event.
+     */
     protected resetButtonClick(e: Event) {
         e.preventDefault();
 
@@ -265,6 +352,10 @@ export class FilterPanel<P = {}> extends FilterWidgetBase<P> {
         }
     }
 
+    /**
+     * Finds an empty row, if any.
+     * @returns The empty row element, or null.
+     */
     protected findEmptyRow(): HTMLElement {
         var result: HTMLElement = null;
 
@@ -282,6 +373,11 @@ export class FilterPanel<P = {}> extends FilterWidgetBase<P> {
         return result;
     }
 
+    /**
+     * Adds an empty filter row.
+     * @param popupField - Whether to open the field dropdown.
+     * @returns The new row element.
+     */
     protected addEmptyRow(popupField: boolean): HTMLElement {
         const emptyRow = this.findEmptyRow();
 
@@ -320,12 +416,20 @@ export class FilterPanel<P = {}> extends FilterWidgetBase<P> {
         return row;
     }
 
+    /**
+     * Handles the field change event.
+     * @param e - The change event.
+     */
     protected onRowFieldChange(e: Event) {
         var row = (e.target as HTMLElement).closest('div.filter-line');
         this.rowFieldChange(row as any);
         row.querySelector<HTMLInputElement>('div.o input.op-select')?.focus();
     }
 
+    /**
+     * Handles a field change for a row.
+     * @param row - The row element.
+     */
     protected rowFieldChange(row: HTMLElement) {
         delete (row as any).__Filtering;
         this.removeFiltering(row);
@@ -335,11 +439,19 @@ export class FilterPanel<P = {}> extends FilterWidgetBase<P> {
         this.updateButtons();
     }
 
+    /**
+     * Removes the filtering handler from a row.
+     * @param row - The row element.
+     */
     protected removeFiltering(row: HTMLElement): void {
         delete (row as any).__Filtering;
         delete (row as any).__FilteringField;
     }
 
+    /**
+     * Populates the operator list for a row.
+     * @param row - The row element.
+     */
     protected populateOperatorList(row: HTMLElement): void {
         var opDiv = row.querySelector<HTMLElement>('div.o');
         Fluent(opDiv).empty();
@@ -355,6 +467,11 @@ export class FilterPanel<P = {}> extends FilterWidgetBase<P> {
         opSelect.changeSelect2(bindThis(this).onRowOperatorChange);
     }
 
+    /**
+     * Returns the field for a row.
+     * @param row - The row element.
+     * @returns The field, or null.
+     */
     protected getFieldFor(row: HTMLElement) {
         if (!row) {
             return null;
@@ -368,6 +485,11 @@ export class FilterPanel<P = {}> extends FilterWidgetBase<P> {
         return this.get_store().get_fieldByName()[select.get_value()];
     }
 
+    /**
+     * Returns the filtering handler for a row.
+     * @param row - The row element.
+     * @returns The filtering handler, or null.
+     */
     protected getFilteringFor(row: HTMLElement): IFiltering {
         var field = this.getFieldFor(row);
 
@@ -391,6 +513,10 @@ export class FilterPanel<P = {}> extends FilterWidgetBase<P> {
         return filtering;
     }
 
+    /**
+     * Handles the operator change event.
+     * @param e - The change event.
+     */
     protected onRowOperatorChange(e: Event) {
         var row = (e.target as HTMLElement).closest('div.filter-line');
         this.rowOperatorChange(row as any);
@@ -402,6 +528,10 @@ export class FilterPanel<P = {}> extends FilterWidgetBase<P> {
         });
     }
 
+    /**
+     * Handles an operator change for a row.
+     * @param row - The row element.
+     */
     protected rowOperatorChange(row: HTMLElement): void {
 
         if (!row) {
@@ -431,6 +561,10 @@ export class FilterPanel<P = {}> extends FilterWidgetBase<P> {
         filtering.createEditor();
     }
 
+    /**
+     * Handles the delete-row click.
+     * @param e - The click event.
+     */
     protected deleteRowClick(e: Event): void {
         e.preventDefault();
         var row = (e.target as HTMLElement).closest('div.filter-line');
@@ -444,11 +578,18 @@ export class FilterPanel<P = {}> extends FilterWidgetBase<P> {
         this.updateButtons();
     }
 
+    /**
+     * Updates the visibility of the search and reset buttons.
+     */
     protected updateButtons(): void {
         Fluent.toggle(this.searchButton, this.rowsDiv.childElementCount >= 1 && this.showSearchButton);
         Fluent.toggle(this.resetButton, this.rowsDiv.childElementCount >= 1);
     }
 
+    /**
+     * Handles the and/or toggle click.
+     * @param e - The click event.
+     */
     protected andOrClick(e: Event): void {
         e.preventDefault();
         var andor = e.target as HTMLElement;
@@ -456,12 +597,19 @@ export class FilterPanel<P = {}> extends FilterWidgetBase<P> {
         andor.textContent = FilterPanelTexts[(andor.classList.contains('or') ? 'Or' : 'And')];
     }
 
+    /**
+     * Handles the left/right parenthesis click.
+     * @param e - The click event.
+     */
     protected leftRightParenClick(e: Event): void {
         e.preventDefault();
         (e.target as HTMLElement).classList.toggle('active');
         this.updateParens();
     }
 
+    /**
+     * Updates the parenthesis indicators for all rows.
+     */
     protected updateParens() {
         var rows = Array.from(this.rowsDiv.children)
         var inParen = false;

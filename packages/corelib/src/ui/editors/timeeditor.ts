@@ -3,13 +3,24 @@ import { addOption, zeroPad } from "../../compat";
 import { IDoubleValue, IReadOnly, IStringValue } from "../../interfaces";
 import { EditorProps, EditorWidget } from "./editorwidget";
 
+/**
+ * Options for the {@link TimeEditorBase}.
+ */
 export interface TimeEditorBaseOptions {
+    /** Whether to omit the empty option. */
     noEmptyOption?: boolean;
+    /** Starting hour for the hour select. */
     startHour?: any;
+    /** Ending hour for the hour select. */
     endHour?: any;
+    /** Interval in minutes between minute options. */
     intervalMinutes?: any;
 }
 
+/**
+ * Base editor for time values, providing hour and minute selects.
+ * @typeParam P - Widget props type.
+ */
 export class TimeEditorBase<P extends TimeEditorBaseOptions> extends EditorWidget<P> {
     static override[Symbol.typeInfo] = this.registerEditor(nsSerenity);
 
@@ -18,6 +29,10 @@ export class TimeEditorBase<P extends TimeEditorBaseOptions> extends EditorWidge
 
     declare protected minutes: Fluent;
 
+    /**
+     * Creates a time editor base.
+     * @param props - Widget props.
+     */
     constructor(props: EditorProps<P>) {
         super(props);
 
@@ -42,18 +57,34 @@ export class TimeEditorBase<P extends TimeEditorBaseOptions> extends EditorWidge
         }
     }
 
+    /**
+     * Returns the selected hour.
+     * @returns The hour value.
+     */
     get hour(): number {
         return toId(this.domNode.value);
     }
 
+    /**
+     * Returns the selected minute.
+     * @returns The minute value.
+     */
     get minute(): number {
         return toId(this.minutes.val());
     }
 
+    /**
+     * Returns whether the editor is read-only.
+     * @returns True when read-only.
+     */
     get_readOnly(): boolean {
         return this.domNode.classList.contains('readonly');
     }
 
+    /**
+     * Sets whether the editor is read-only.
+     * @param value - True to enable read-only mode.
+     */
     set_readOnly(value: boolean): void {
         if (value !== this.get_readOnly()) {
             setElementReadOnly([this.domNode, this.minutes.getNode()], value);
@@ -96,19 +127,39 @@ export interface TimeEditorOptions extends TimeEditorBaseOptions {
     multiplier?: number;
 }
 
+/**
+ * Options for the {@link TimeEditor}.
+ */
+export interface TimeEditorOptions extends TimeEditorBaseOptions {
+    /** Default is 1. Set to 60 to store seconds, 60000 to store ms in an integer field */
+    multiplier?: number;
+}
+
 /** Note that this editor's value is number of minutes, e.g. for
  * 16:30, value will be 990. If you want to use a TimeSpan field
  * use TimeSpanEditor instead.
  */
+/**
+ * An editor for time values stored as a number of minutes.
+ * @typeParam P - Widget props type.
+ */
 export class TimeEditor<P extends TimeEditorOptions = TimeEditorOptions> extends TimeEditorBase<P> {
     static override[Symbol.typeInfo] = this.registerEditor(nsSerenity, [IDoubleValue, IReadOnly]);
 
+    /**
+     * Creates a time editor.
+     * @param props - Widget props.
+     */
     constructor(props: EditorProps<P>) {
         super(props);
         this.domNode.classList.add("s-TimeEditor");
         this.minutes.addClass("s-TimeEditor");
     }
 
+    /**
+     * Returns the current time value in minutes.
+     * @returns The value, or null when empty.
+     */
     public get value(): number {
         var hour = this.hour;
         var minute = this.minute;
@@ -118,10 +169,18 @@ export class TimeEditor<P extends TimeEditorOptions = TimeEditorOptions> extends
         return (hour * 60 + minute) * (this.options.multiplier || 1);
     }
 
+    /**
+     * Returns the current time value in minutes.
+     * @returns The value, or null when empty.
+     */
     protected get_value(): number {
         return this.value;
     }
 
+    /**
+     * Sets the time value in minutes.
+     * @param value - The value to set.
+     */
     public set value(value: number) {
         if (value == null || (value as any) === "" || isNaN(value)) {
             if (this.options.noEmptyOption) {
@@ -141,11 +200,15 @@ export class TimeEditor<P extends TimeEditorOptions = TimeEditorOptions> extends
         }
     }
 
+    /** Sets the time value in minutes. */
     protected set_value(value: number): void {
         this.value = value;
     }
 }
 
+/**
+ * Options for the {@link TimeSpanEditor}.
+ */
 export interface TimeSpanEditorOptions extends TimeEditorBaseOptions {
 }
 
@@ -162,18 +225,28 @@ export class TimeSpanEditor<P extends TimeSpanEditorOptions = TimeSpanEditorOpti
         this.minutes.addClass("s-TimeSpanEditor");
     }
 
+    /**
+     * Returns the current time span value.
+     * @returns The value in "HH:mm" format.
+     */
     protected get_value(): string {
         return this.value;
     }
 
+    /** Sets the time span value. */
     protected set_value(value: string): void {
         this.value = value;
     }
 
+    /**
+     * Returns the current time span value.
+     * @returns The value in "HH:mm" format.
+     */
     public get value(): string {
         return this.hourAndMin;
     }
 
+    /** Sets the time span value. */
     public set value(value: string) {
         this.hourAndMin = value;
     }

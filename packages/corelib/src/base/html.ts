@@ -2,6 +2,11 @@
 import { Config } from "./config";
 import { isArrayLike, isPromiseLike } from "./system";
 
+/**
+ * Content that can be rendered as a toast/notification message or appended to the DOM.
+ * Accepts plain strings, DOM elements (HTML/SVG/MathML) and document fragments, which are
+ * handled by {@link appendToNode} and the notification helpers.
+ */
 export type RenderableContent = string | HTMLElement | SVGElement | MathMLElement | DocumentFragment;
 
 const esc: Record<string, string> = {
@@ -17,8 +22,13 @@ function escFunc(a: string): string {
 }
 
 /**
- * Html encodes a string (encodes single and double quotes, & (ampersand), > and < characters)
- * @param s String (or number etc.) to be HTML encoded
+ * HTML-encodes a value by escaping `<`, `>`, `"`, `'`, and `&`.
+ * @param s - Value to encode. Non-string values are coerced to string; `null`/`undefined` yields an empty string.
+ * @returns The HTML-escaped string, safe for interpolation into HTML markup.
+ * @example
+ * ```ts
+ * htmlEncode('<a href="x">a & b</a>'); // "&lt;a href=&quot;x&quot;&gt;a &amp; b&lt;/a&gt;"
+ * ```
  */
 export function htmlEncode(s: any): string {
     if (s == null)
@@ -30,11 +40,13 @@ export function htmlEncode(s: any): string {
     return s.replace(/[<>"'&]/g, escFunc)
 }
 
-/** 
- * Toggles the class on the element handling spaces like addClass does.
- * @param el the element
- * @param cls the class to toggle
- * @param add if true, the class will be added, if false the class will be removed, otherwise it will be toggled.
+/**
+ * Toggles one or more CSS classes on an element, supporting space-separated lists.
+ * When `cls` contains spaces it is split and each token is toggled individually.
+ * @param el - Target element. No-op if falsy.
+ * @param cls - Single class or space-separated class list to toggle. No-op if `null`/empty.
+ * @param add - Force mode: `true` to add, `false` to remove, `undefined` to toggle.
+ * @remarks Delegates to `Element.classList.toggle` per token, preserving existing classes.
  */
 export function toggleClass(el: Element, cls: string, add?: boolean) {
     if (!el || cls == null || !cls.length)
@@ -51,32 +63,33 @@ export function toggleClass(el: Element, cls: string, add?: boolean) {
 }
 
 /**
- * Adds a CSS class to the specified element.
- * 
- * @param el - The element to add the class to.
- * @param cls - The CSS class to add.
- * @returns A boolean value indicating whether the class was successfully added.
+ * Adds one or more CSS classes to an element.
+ * @param el - Target element.
+ * @param cls - Class name or space-separated list of class names to add.
+ * @remarks Wraps {@link toggleClass} with `add=true`; no-ops for empty/null inputs.
  */
 export function addClass(el: Element, cls: string) {
     return toggleClass(el, cls, true);
 }
 
 /**
- * Removes a CSS class from an element.
- * 
- * @param el - The element from which to remove the class.
- * @param cls - The CSS class to remove.
- * @returns A boolean indicating whether the class was successfully removed.
+ * Removes one or more CSS classes from an element.
+ * @param el - Target element.
+ * @param cls - Class name or space-separated list of class names to remove.
+ * @remarks Wraps {@link toggleClass} with `add=false`; no-ops for empty/null inputs.
  */
 export function removeClass(el: Element, cls: string) {
     return toggleClass(el, cls, false);
 }
 
 /**
- * Appends content like DOM nodes, string, number or an array of these to the parent node.
- * Undefined, null, false values are ignored. Promises are awaited.
- * @param parent Target parent element
- * @param child The content
+ * Appends heterogeneous content to a parent node.
+ * Handles strings (as text nodes), `Node` instances, array-like collections (recursively),
+ * promise-like values (async placeholder replaced on resolve/reject), and primitive values via `Node.append`.
+ * Falsy values `null`, `undefined`, and `false` are ignored.
+ * @param parent - Target parent node to append into.
+ * @param child - Content to append: a single value, array-like collection, `Node`, string, or `PromiseLike`.
+ * @remarks Promise children insert a comment placeholder synchronously and replace it with the resolved fragment when settled.
  */
 export function appendToNode(parent: ParentNode, child: any) {
 
@@ -115,6 +128,18 @@ const SAFE_URL_PATTERN = /^(?:(?:https?|mailto|ftp|tel|file|sms):|[^&:/?#]*(?:[/
 /** A pattern that matches safe data URLs. It only matches image, video, and audio types. */
 const DATA_URL_PATTERN = /^data:(?:image\/(?:bmp|gif|jpeg|jpg|png|tiff|webp)|video\/(?:mpeg|mp4|ogg|webm)|audio\/(?:mp3|oga|ogg|opus));base64,[a-z0-9+\/]+=*$/i;
 
+/**
+ * Sanitizes a URL for safe use in `href`/`src` attributes.
+ * Allows `http`, `https`, `mailto`, `ftp`, `tel`, `file`, `sms`, safe relative URLs, and safe `data:` image/video/audio URLs.
+ * Preserves `about:blank` and `javascript:void(0)` idioms; otherwise prefixes unsafe values with `unsafe:`.
+ * @param url - URL string to sanitize; trimmed before validation.
+ * @returns A safe URL string, or `unsafe:<original>` if the input fails validation.
+ * @example
+ * ```ts
+ * sanitizeUrl("javascript:alert(1)"); // "unsafe:javascript:alert(1)"
+ * sanitizeUrl("/app/page?x=1"); // "/app/page?x=1"
+ * ```
+ */
 export function sanitizeUrl(url: string): string {
     url = String(url).trim();
     if (url === "null" || url.length === 0 || url === "about:blank") return "about:blank";
@@ -124,10 +149,11 @@ export function sanitizeUrl(url: string): string {
 }
 
 /**
- * Gets readonly state of an element. If the element is null, returns null.
- * It does not check for attached widgets. It returns true if the element has readonly class,
- * disabled attribute (select, radio, checkbox) or readonly attribute (other inputs).
- * @param el element
+ * Gets the read-only state of a DOM element without consulting attached widgets.
+ * Considers the `readonly` CSS class, the `disabled` attribute for `select`/`radio`/`checkbox`,
+ * and the `readonly` attribute for other inputs.
+ * @param el - Element to inspect. Returns `null` if `el` is `null`/`undefined`.
+ * @returns `true` if read-only/disabled, `false` otherwise, or `null` when `el` is absent.
  */
 export function getElementReadOnly(el: Element): boolean | null {
     if (el == null)
@@ -144,10 +170,10 @@ export function getElementReadOnly(el: Element): boolean | null {
 }
 
 /**
- * Sets readonly class and disabled (for select, radio, checkbox) or readonly attribute (for other inputs) on given element.
- * It does not check for attached widgets.
- * @param elements Element or array-like of elements
- * @param value Readonly state
+ * Sets the read-only appearance and attribute on one or more elements without touching attached widgets.
+ * Toggles the `readonly` CSS class and sets `disabled` (for `select`/`radio`/`checkbox`) or `readonly` (for other elements).
+ * @param elements - Single element or array-like collection of elements. No-op if falsy.
+ * @param value - `true` to make read-only/disabled, `false` to make editable.
  */
 export function setElementReadOnly(elements: Element | ArrayLike<Element>, value: boolean) {
     if (!elements)
@@ -165,9 +191,13 @@ export function setElementReadOnly(elements: Element | ArrayLike<Element>, value
 }
 
 /**
- * Parses a query string into an object.
- * @param s Query string to parse, if not specified, location.search will be used.
- * @return An object with key/value pairs from the query string.
+ * Parses a URL query string into a key/value map.
+ * @param s - Query string to parse (without leading `?` is also accepted). When `undefined`, `location.search` is used.
+ * @returns An object mapping decoded keys to decoded values. Keys without `=` map to their own name; malformed percent-encodings are skipped.
+ * @example
+ * ```ts
+ * parseQueryString("a=1&b=hello%20world"); // { a: "1", b: "hello world" }
+ * ```
  */
 export function parseQueryString(s?: string): Record<string, string> {
     let qs: string;
@@ -194,8 +224,10 @@ export function parseQueryString(s?: string): Record<string, string> {
 }
 
 /**
- * Checks whether a return URL is safe for redirects. Must be relative, start with a single slash,
- * and contain only allowed characters (no protocol, no backslashes, no control chars, etc).
+ * Checks whether a return URL is safe for redirects.
+ * A safe URL must be a relative path starting with exactly one `/`, contain no protocol (`:`), backslashes, control characters, or `//` after the leading slash, and use only `\w`, `-`, `.`, `/`, `?`, `&`, `=`, `%` characters.
+ * @param url - Candidate return URL to validate.
+ * @returns `true` if the URL is safe to use as a redirect target, `false` otherwise.
  */
 export function isSafeReturnUrl(url: string): boolean {
     if (!url || typeof url !== "string")
@@ -218,8 +250,12 @@ export function isSafeReturnUrl(url: string): boolean {
 }
 
 /**
- * Gets the return URL from the query string.
- * @param opt Options for getting the return URL.
+ * Retrieves the `returnUrl` from the current query string, falling back to application config.
+ * @param opt - Options controlling lookup behavior.
+ * @param opt.queryOnly - When `true`, only the query string is checked; skips {@link Config.defaultReturnUrl}.
+ * @param opt.ignoreUnsafe - When `true`, unsafe URLs are returned as-is; otherwise unsafe values are discarded (`null`).
+ * @param opt.purpose - Purpose key forwarded to `Config.defaultReturnUrl` when no query-string value is found.
+ * @returns The validated return URL, the configured default, or `null`/`undefined` if none is available or the query value is unsafe.
  */
 export function getReturnUrl(opt?: {
     /** Whether to only consider the query string. If true, the function will not check the default return URL. */
@@ -244,8 +280,10 @@ export function getReturnUrl(opt?: {
 }
 
 /**
- * Escapes a CSS selector.
- * @param selector The CSS selector to escape.
+ * Escapes a string for safe use as a CSS identifier/selector.
+ * Delegates to `CSS.escape` when available; otherwise implements the CSSOM spec polyfill.
+ * @param selector - Raw selector/identifier to escape.
+ * @returns The escaped selector string safe for `querySelector` and CSS rules.
  */
 export function cssEscape(selector: string) {
     if (typeof CSS !== 'undefined' && typeof CSS.escape === "function")
@@ -290,13 +328,13 @@ export function cssEscape(selector: string) {
 
 const maybeHtmlRegex = /<|>|&|"|'/;
 
-/** 
- * Sanitizes HTML by removing dangerous elements and attributes.
- * Need to duplicate basicDomSanitizer logic here as corelib does 
- * not bundle sleekgrid, and should work standalone with/without 
- * sleekgrid loaded.
- * @param dirtyHtml The HTML string to sanitize.
- * @returns The sanitized HTML string.
+/**
+ * Sanitizes an HTML string by stripping dangerous elements and attributes.
+ * Preference order: SleekGrid sanitizer (`sleekgrid.formatterContext()?.sanitizer` or `sleekgrid.gridDefaults.sanitizer`), `DOMPurify.sanitize` if present, otherwise a built-in `DOMParser` implementation that removes `script`/`iframe`/`object`/`embed`/`form`/`style`/`link` and event-handler / unsafe-URL attributes.
+ * Falls back to {@link htmlEncode} if `DOMParser` is unavailable or parsing throws.
+ * @param dirtyHtml - Untrusted HTML markup to sanitize. Falsy values return an empty string; strings without HTML tags/entities are returned as-is (fast path).
+ * @returns The sanitized HTML string safe for insertion via `innerHTML`.
+ * @remarks This duplicates the basic DOM sanitizer logic so corelib works standalone with or without SleekGrid loaded.
  */
 export function sanitizeHtml(dirtyHtml: string): string {
     if (!dirtyHtml) {

@@ -13,6 +13,13 @@ interface LayoutTimerReg {
     debouncedTimes?: number;
 }
 
+/**
+ * Legacy polling-based layout timer that detects size and visibility changes.
+ * Compat shim for the old `Q.LayoutTimer` / `Serenity.LayoutTimer` API. Polls registered elements every ~100 ms,
+ * supports optional debouncing, and fires handlers when width, height, or visibility transitions occur.
+ * Prefer `ResizeObserver` or `Fluent.on(..., 'layout')` with CSS-based layouts for new code.
+ * @deprecated Kept for backward compatibility with legacy `layoutFillHeight` and `triggerLayoutOnShow` callers. Use `ResizeObserver` instead.
+ */
 export namespace LayoutTimer {
 
     let timeout: number;
@@ -101,6 +108,11 @@ export namespace LayoutTimer {
         startTimer();
     }
 
+    /**
+     * Captures and stores the current size of a registered element without firing its handler.
+     * Used to reset the baseline so the next poll compares against the current dimensions.
+     * @param key - Registration key returned by {@link onSizeChange} / {@link onShown} / etc.
+     */
     export function store(key: number) {
         const reg = regs[key];
         if (!reg)
@@ -116,6 +128,11 @@ export namespace LayoutTimer {
         reg.debouncedTimes = 0;
     }
 
+    /**
+     * Manually triggers the handler for a registration if the element is currently visible (positive width and height).
+     * Re-stores the baseline before and after invoking the handler.
+     * @param key - Registration key returned by {@link onSizeChange}.
+     */
     export function trigger(key: number) {
         const reg = regs[key];
         if (!reg)
@@ -129,6 +146,17 @@ export namespace LayoutTimer {
         store(key);
     }
 
+    /**
+     * Registers a handler invoked when the size of the element returned by `element()` changes.
+     * Polls via an internal timer; supports filtering by width / height and optional debouncing.
+     * @param element - Factory returning the target `HTMLElement` or `Window` to watch.
+     * @param handler - Callback invoked when a matching size change is detected.
+     * @param opt - Watch options.
+     * @param opt.width - When `false`, width changes are ignored. Defaults to `true`.
+     * @param opt.height - When `false`, height changes are ignored. Defaults to `true`.
+     * @param opt.debounceTimes - Number of polls to debounce before firing. `0` fires immediately. Defaults to `0`.
+     * @returns A numeric registration key that can be passed to {@link store}, {@link trigger}, or {@link off}.
+     */
     export function onSizeChange(element: () => (HTMLElement | Window), handler: () => void, opt?: { width?: boolean, height?: boolean, debounceTimes?: number }): number {
         if (handler == null)
             throw new Error("Layout handler can't be null!");
@@ -147,18 +175,51 @@ export namespace LayoutTimer {
         return nextKey;
     }
 
+    /**
+     * Registers a handler invoked only when the width of the element changes.
+     * Convenience wrapper around {@link onSizeChange} with `height: false`.
+     * @param element - Factory returning the target `HTMLElement`.
+     * @param handler - Callback invoked on width change.
+     * @param opt - Optional debounce configuration.
+     * @param opt.debounceTimes - Number of polls to debounce before firing.
+     * @returns A numeric registration key.
+     */
     export function onWidthChange(element: () => HTMLElement, handler: () => void, opt?: { debounceTimes?: number }) {
         return onSizeChange(element, handler, { width: true, height: false, debounceTimes: opt?.debounceTimes });
     }
 
+    /**
+     * Registers a handler invoked only when the height of the element changes.
+     * Convenience wrapper around {@link onSizeChange} with `width: false`.
+     * @param element - Factory returning the target `HTMLElement`.
+     * @param handler - Callback invoked on height change.
+     * @param opt - Optional debounce configuration.
+     * @param opt.debounceTimes - Number of polls to debounce before firing.
+     * @returns A numeric registration key.
+     */
     export function onHeightChange(element: () => HTMLElement, handler: () => void, opt?: { debounceTimes?: number }) {
         return onSizeChange(element, handler, { width: false, height: true, debounceTimes: opt?.debounceTimes });
     }
 
+    /**
+     * Registers a handler invoked when the element becomes visible (transitions from zero to non-zero size).
+     * Wrapper around {@link onSizeChange} with both `width` and `height` set to `false` so only hidden-to-visible transitions fire.
+     * @param element - Factory returning the target `HTMLElement`.
+     * @param handler - Callback invoked when the element is shown.
+     * @param opt - Optional debounce configuration.
+     * @param opt.debounceTimes - Number of polls to debounce before firing.
+     * @returns A numeric registration key.
+     */
     export function onShown(element: () => HTMLElement, handler: () => void, opt?: { debounceTimes?: number }) {
         return onSizeChange(element, handler, { width: false, height: false, debounceTimes: opt?.debounceTimes });
     }
 
+    /**
+     * Unregisters a handler previously registered with {@link onSizeChange} / {@link onWidthChange} / {@link onHeightChange} / {@link onShown}.
+     * Stops the internal polling timer when no registrations remain.
+     * @param key - Registration key to remove.
+     * @returns `0` for compatibility with the legacy API.
+     */
     export function off(key: number): number {
         const reg = regs[key];
         if (!reg)
@@ -173,6 +234,15 @@ export namespace LayoutTimer {
     }
 }
 
+/**
+ * Executes a callback once when the element becomes visible.
+ * If the element is already visible (positive `offsetWidth` / `offsetHeight`), the callback is invoked immediately and `null` is returned.
+ * Otherwise registers via {@link LayoutTimer.onShown} and auto-unregisters after the first fire.
+ * @param el - Target element or array-like collection (first element is used).
+ * @param callback - Function to invoke when visible.
+ * @returns The {@link LayoutTimer} registration key, or `null` if already visible / element missing.
+ * @deprecated Prefer `IntersectionObserver` or `ResizeObserver`. Kept for legacy `triggerLayoutOnShow` compatibility.
+ */
 export function executeOnceWhenVisible(el: HTMLElement | ArrayLike<HTMLElement>, callback: Function): number | null {
     el = isArrayLike(el) ? el[0] : el;
     if (!el)
@@ -189,6 +259,15 @@ export function executeOnceWhenVisible(el: HTMLElement | ArrayLike<HTMLElement>,
     return timer;
 }
 
+/**
+ * Executes a callback every time the element becomes visible.
+ * Unlike {@link executeOnceWhenVisible}, the registration persists and fires on each hidden-to-visible transition.
+ * @param el - Target element or array-like collection (first element is used).
+ * @param callback - Function to invoke each time the element is shown.
+ * @param callNowIfVisible - When `true` and the element is already visible, invokes the callback immediately before registering.
+ * @returns The {@link LayoutTimer} registration key, or `null` if the element is missing.
+ * @deprecated Prefer `IntersectionObserver` / `ResizeObserver`. Kept for legacy `triggerLayoutOnShow` compatibility.
+ */
 export function executeEverytimeWhenVisible(el: HTMLElement | ArrayLike<HTMLElement>, callback: Function, callNowIfVisible: boolean): number | null {
     el = isArrayLike(el) ? el[0] : el;
     if (!el)

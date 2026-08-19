@@ -5,20 +5,38 @@ import { FileUploadConstraints, UploadHelper, UploadInputOptions, UploadedFile }
 import { ToolButton, Toolbar } from "../widgets/toolbar";
 import { EditorProps, EditorWidget } from "./editorwidget";
 
+/**
+ * Options for the {@link FileUploadEditor}.
+ */
 export interface FileUploadEditorOptions extends FileUploadConstraints {
+    /** Whether to display the original file name. */
     displayFileName?: boolean;
+    /** Upload intent for the upload service. */
     uploadIntent?: string;
+    /** Upload URL. */
     uploadUrl?: string;
+    /** URL prefix for file links. */
     urlPrefix?: string;
 }
 
+/**
+ * Options for the {@link ImageUploadEditor}.
+ */
 export interface ImageUploadEditorOptions extends FileUploadEditorOptions {
 }
 
+/**
+ * An editor that uploads and displays a single file.
+ * @typeParam P - Widget props type.
+ */
 export class FileUploadEditor<P extends FileUploadEditorOptions = FileUploadEditorOptions> extends EditorWidget<P>
     implements IReadOnly, IGetEditValue, ISetEditValue, IValidateRequired {
     static override[Symbol.typeInfo] = this.registerEditor(nsSerenity, [IReadOnly, IGetEditValue, ISetEditValue, IValidateRequired]);
 
+    /**
+     * Creates a file upload editor.
+     * @param props - Widget props.
+     */
     constructor(props: EditorProps<P>) {
         super(props);
 
@@ -54,6 +72,10 @@ export class FileUploadEditor<P extends FileUploadEditorOptions = FileUploadEdit
         this.updateInterface();
     }
 
+    /**
+     * Returns the upload input options.
+     * @returns Upload input options.
+     */
     protected getUploadInputOptions(): UploadInputOptions {
         return {
             container: this.toolbar.findButton('add-file-button'),
@@ -81,10 +103,18 @@ export class FileUploadEditor<P extends FileUploadEditorOptions = FileUploadEdit
         }
     }
 
+    /**
+     * Returns the text for the add-file button.
+     * @returns The button text.
+     */
     protected addFileButtonText(): string {
         return FileUploadTexts.AddFileButton;
     }
 
+    /**
+     * Returns the toolbar buttons for the editor.
+     * @returns Tool button definitions.
+     */
     protected getToolButtons(): ToolButton[] {
         return [
             {
@@ -110,10 +140,17 @@ export class FileUploadEditor<P extends FileUploadEditorOptions = FileUploadEdit
         ];
     }
 
+    /**
+     * Returns whether non-image files are allowed by default.
+     * @returns True when non-image files are allowed.
+     */
     protected getDefaultAllowNonImage(): boolean {
         return true;
     }
 
+    /**
+     * Populates the file symbols from the current entity.
+     */
     protected populate(): void {
         var displayOriginalName = this.options.displayFileName ||
             !isTrimmedEmpty(this.options.originalNameProperty);
@@ -131,6 +168,9 @@ export class FileUploadEditor<P extends FileUploadEditorOptions = FileUploadEdit
         this.hiddenInput.value = ((this.get_value() || {}).Filename)?.trim() || null;
     }
 
+    /**
+     * Updates the interface to reflect the current state.
+     */
     protected updateInterface(): void {
         var addButton = this.toolbar.findButton('add-file-button');
         var delButton = this.toolbar.findButton('delete-button');
@@ -139,10 +179,18 @@ export class FileUploadEditor<P extends FileUploadEditorOptions = FileUploadEdit
             this.entity == null);
     }
 
+    /**
+     * Returns whether the editor is read-only.
+     * @returns True when read-only.
+     */
     get_readOnly(): boolean {
         return this.uploadInput.attr('disabled') != null;
     }
 
+    /**
+     * Sets whether the editor is read-only.
+     * @param value - True to enable read-only mode.
+     */
     set_readOnly(value: boolean): void {
         if (this.get_readOnly() !== value) {
             let $ = getjQuery();
@@ -165,14 +213,26 @@ export class FileUploadEditor<P extends FileUploadEditorOptions = FileUploadEdit
         }
     }
 
+    /**
+     * Returns whether the field is required.
+     * @returns True when required.
+     */
     get_required(): boolean {
         return this.hiddenInput.classList.contains("required");
     }
 
+    /**
+     * Sets whether the field is required.
+     * @param value - True when required.
+     */
     set_required(value: boolean): void {
         this.hiddenInput.classList.toggle("required", !!value);
     }
 
+    /**
+     * Returns the current uploaded file.
+     * @returns The uploaded file, or null.
+     */
     get_value(): UploadedFile {
         if (this.entity == null) {
             return null;
@@ -181,10 +241,18 @@ export class FileUploadEditor<P extends FileUploadEditorOptions = FileUploadEdit
         return copy;
     }
 
+    /**
+     * Returns the current uploaded file.
+     * @returns The uploaded file.
+     */
     get value(): UploadedFile {
         return this.get_value();
     }
 
+    /**
+     * Sets the uploaded file.
+     * @param value - The uploaded file to set.
+     */
     set_value(value: UploadedFile): void {
         if (typeof value === "string") {
             var stringValue = (value as string).trim();
@@ -215,14 +283,25 @@ export class FileUploadEditor<P extends FileUploadEditorOptions = FileUploadEdit
         this.updateInterface();
     }
 
+    /** Sets the uploaded file. */
     set value(v: UploadedFile) {
         this.set_value(v);
     }
 
+    /**
+     * Gets the edit value into a target object.
+     * @param property - The property item.
+     * @param target - The target object.
+     */
     getEditValue(property: PropertyItem, target: any) {
         target[property.name] = this.entity?.Filename?.trim() || null;
     }
 
+    /**
+     * Sets the edit value from a source object.
+     * @param source - The source object.
+     * @param property - The property item.
+     */
     setEditValue(source: any, property: PropertyItem) {
         var value: UploadedFile = {};
         value.Filename = source[property.name];
@@ -254,9 +333,17 @@ export class FileUploadEditor<P extends FileUploadEditorOptions = FileUploadEdit
     declare protected hiddenInput: HTMLInputElement;
 }
 
+/**
+ * An editor that uploads and displays a single image.
+ * @typeParam P - Widget props type.
+ */
 export class ImageUploadEditor<P extends ImageUploadEditorOptions = ImageUploadEditorOptions> extends FileUploadEditor<P> {
     static override[Symbol.typeInfo] = this.registerEditor(nsSerenity);
 
+    /**
+     * Creates an image upload editor.
+     * @param props - Widget props.
+     */
     constructor(props: EditorProps<P>) {
         super(props);
 
@@ -264,15 +351,27 @@ export class ImageUploadEditor<P extends ImageUploadEditorOptions = ImageUploadE
 
         this.domNode.classList.add("s-ImageUploadEditor")
     }
+    /**
+     * Whether non-image files are allowed.
+     * @returns False for image editors.
+     */
     protected override getDefaultAllowNonImage(): boolean {
         return false;
     }
 }
 
+/**
+ * Options for the {@link MultipleFileUploadEditor}.
+ */
 export interface MultipleFileUploadEditorOptions extends FileUploadEditorOptions {
+    /** Whether to JSON-encode the value. */
     jsonEncodeValue?: boolean;
 }
 
+/**
+ * An editor that uploads and displays multiple files.
+ * @typeParam P - Widget props type.
+ */
 export class MultipleFileUploadEditor<P extends MultipleFileUploadEditorOptions = MultipleFileUploadEditorOptions> extends EditorWidget<P>
     implements IReadOnly, IGetEditValue, ISetEditValue, IValidateRequired {
     static override[Symbol.typeInfo] = this.registerEditor(nsSerenity, [IReadOnly, IGetEditValue, ISetEditValue, IValidateRequired]);
@@ -284,6 +383,10 @@ export class MultipleFileUploadEditor<P extends MultipleFileUploadEditorOptions 
     declare protected progress: HTMLElement;
     declare protected hiddenInput: HTMLInputElement;
 
+    /**
+     * Creates a multiple file upload editor.
+     * @param props - Widget props.
+     */
     constructor(props: EditorProps<P>) {
         super(props);
 
@@ -308,6 +411,10 @@ export class MultipleFileUploadEditor<P extends MultipleFileUploadEditorOptions 
         this.updateInterface();
     }
 
+    /**
+     * Returns the upload input options.
+     * @returns Upload input options.
+     */
     protected getUploadInputOptions(): UploadInputOptions {
         var addFileButton = this.toolbar.findButton('add-file-button');
 
@@ -334,10 +441,18 @@ export class MultipleFileUploadEditor<P extends MultipleFileUploadEditorOptions 
         }
     }
 
+    /**
+     * Returns the text for the add-file button.
+     * @returns The button text.
+     */
     protected addFileButtonText(): string {
         return FileUploadTexts.AddFileButton;
     }
 
+    /**
+     * Returns the toolbar buttons for the editor.
+     * @returns Tool button definitions.
+     */
     protected getToolButtons(): ToolButton[] {
         return [{
             title: this.addFileButtonText(),
@@ -348,6 +463,9 @@ export class MultipleFileUploadEditor<P extends MultipleFileUploadEditorOptions 
         }];
     }
 
+    /**
+     * Populates the file symbols from the current entities.
+     */
     protected populate(): void {
         UploadHelper.populateFileSymbols(this.fileSymbols, this.entities,
             true, this.options.urlPrefix);
@@ -367,16 +485,27 @@ export class MultipleFileUploadEditor<P extends MultipleFileUploadEditorOptions 
         this.hiddenInput.value = this.get_value()[0]?.Filename || null;
     }
 
+    /**
+     * Updates the interface to reflect the current state.
+     */
     protected updateInterface(): void {
         var addButton = this.toolbar.findButton('add-file-button');
         addButton.toggleClass('disabled', this.get_readOnly());
         this.fileSymbols.querySelectorAll('a.delete').forEach(x => Fluent(x).toggle(!this.get_readOnly()));
     }
 
+    /**
+     * Returns whether the editor is read-only.
+     * @returns True when read-only.
+     */
     get_readOnly(): boolean {
         return this.uploadInput.attr('disabled') != null;
     }
 
+    /**
+     * Sets whether the editor is read-only.
+     * @param value - True to enable read-only mode.
+     */
     set_readOnly(value: boolean): void {
         if (this.get_readOnly() !== value) {
             let $ = getjQuery();
@@ -399,24 +528,44 @@ export class MultipleFileUploadEditor<P extends MultipleFileUploadEditorOptions 
         }
     }
 
+    /**
+     * Returns whether the field is required.
+     * @returns True when required.
+     */
     get_required(): boolean {
         return this.hiddenInput.classList.contains('required');
     }
 
+    /**
+     * Sets whether the field is required.
+     * @param value - True when required.
+     */
     set_required(value: boolean): void {
         this.hiddenInput && this.hiddenInput.classList.toggle('required', !!value);
     }
 
+    /**
+     * Returns the current uploaded files.
+     * @returns The uploaded files.
+     */
     get_value(): UploadedFile[] {
         return this.entities.map(function (x) {
             return Object.assign(Object.create(null), x);
         });
     }
 
+    /**
+     * Returns the current uploaded files.
+     * @returns The uploaded files.
+     */
     get value(): UploadedFile[] {
         return this.get_value();
     }
 
+    /**
+     * Sets the uploaded files.
+     * @param value - The uploaded files to set.
+     */
     set_value(value: UploadedFile[]) {
         this.entities = (value || []).map(function (x) {
             return Object.assign(Object.create(null), x);
@@ -425,10 +574,16 @@ export class MultipleFileUploadEditor<P extends MultipleFileUploadEditorOptions 
         this.updateInterface();
     }
 
+    /** Sets the uploaded files. */
     set value(v: UploadedFile[]) {
         this.set_value(v);
     }
 
+    /**
+     * Gets the edit value into a target object.
+     * @param property - The property item.
+     * @param target - The target object.
+     */
     getEditValue(property: PropertyItem, target: any) {
         if (this.jsonEncodeValue) {
             target[property.name] = JSON.stringify(this.get_value());
@@ -438,6 +593,11 @@ export class MultipleFileUploadEditor<P extends MultipleFileUploadEditorOptions 
         }
     }
 
+    /**
+     * Sets the edit value from a source object.
+     * @param source - The source object.
+     * @param property - The property item.
+     */
     setEditValue(source: any, property: PropertyItem) {
         var val = source[property.name];
         if (typeof val == "string") {
@@ -457,13 +617,26 @@ export class MultipleFileUploadEditor<P extends MultipleFileUploadEditorOptions 
         }
     }
 
+    /**
+     * Whether the value is JSON-encoded.
+     * @returns True when JSON-encoded.
+     */
     public get jsonEncodeValue() { return this.options.jsonEncodeValue }
+    /** Sets whether the value is JSON-encoded. */
     public set jsonEncodeValue(value) { this.options.jsonEncodeValue = value }
 }
 
+/**
+ * An editor that uploads and displays multiple images.
+ * @typeParam P - Widget props type.
+ */
 export class MultipleImageUploadEditor<P extends ImageUploadEditorOptions = ImageUploadEditorOptions> extends MultipleFileUploadEditor<P> {
     static override[Symbol.typeInfo] = this.registerClass(nsSerenity);
 
+    /**
+     * Creates a multiple image upload editor.
+     * @param props - Widget props.
+     */
     constructor(props: EditorProps<P>) {
         super(props);
         this.domNode.classList.add("s-MultipleImageUploadEditor")

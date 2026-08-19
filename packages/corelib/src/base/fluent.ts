@@ -413,9 +413,29 @@ export interface Fluent<TElement extends HTMLElement = HTMLElement> extends Arra
 
 const validTagRegex = /^[a-zA-Z][a-zA-Z0-9\-]*$/;
 
+/**
+ * Creates a {@link Fluent} wrapper from a tag name or an existing element.
+ * @param tag - Tag name to create (e.g. `"div"`). Must match `^[a-zA-Z][a-zA-Z0-9\\-]*$`; otherwise an empty wrapper is returned.
+ * @returns A {@link Fluent} wrapping the newly created element.
+ */
 export function Fluent<K extends keyof HTMLElementTagNameMap>(tag: K): Fluent<HTMLElementTagNameMap[K]>;
+/**
+ * Wraps an existing element in a {@link Fluent} instance.
+ * @param element - Element to wrap; `null` / `undefined` yields an empty wrapper.
+ * @returns A {@link Fluent} wrapping `element`.
+ */
 export function Fluent<TElement extends HTMLElement>(element: TElement): Fluent<TElement>;
+/**
+ * Wraps an `EventTarget` (typically an `HTMLElement`) in a {@link Fluent} instance.
+ * @param element - Target to wrap.
+ * @returns A {@link Fluent} wrapping `element`.
+ */
 export function Fluent(element: EventTarget): Fluent<HTMLElement>;
+/**
+ * Factory / constructor for {@link Fluent} wrappers. Also usable with `new`.
+ * @param tagOrElement - Tag name to create, or an element / `EventTarget` to wrap.
+ * @returns A {@link Fluent} instance. When called without `new`, delegates to the constructor path.
+ */
 export function Fluent<K extends keyof HTMLElementTagNameMap>(tagOrElement: K | HTMLElementTagNameMap[K]): Fluent<HTMLElementTagNameMap[K]> {
     if (!(this instanceof Fluent)) {
         if (typeof tagOrElement === "string") {
@@ -431,13 +451,17 @@ export function Fluent<K extends keyof HTMLElementTagNameMap>(tagOrElement: K | 
     return this;
 }
 
+/**
+ * Static helpers that operate on raw DOM elements without requiring a {@link Fluent} wrapper.
+ * @remarks Supports jQuery-style namespaced and delegated events via the shared `fluent-events` module.
+ */
 export namespace Fluent {
     /**
-     * Adds an event listener to the element. It is possible to use delegated events like jQuery.
-     *
-     * @param element The target element
-     * @param type The type of the event. It can include a ".namespace" similar to jQuery.
-     * @param listener The event listener to add.
+     * Adds an event listener, with optional delegation and namespace support.
+     * @param element - Target element to listen on.
+     * @param type - Event type; may include a `.namespace` suffix (e.g. `"click.myNs"`).
+     * @param listener - Callback to invoke when the event fires.
+     * @returns `void`.
      */
     export function on<K extends keyof HTMLElementEventMap>(element: EventTarget, type: K, listener: (this: HTMLElement, ev: HTMLElementEventMap[K]) => any): void;
     export function on(element: EventTarget, type: string, listener: EventListener): void;
@@ -447,11 +471,11 @@ export namespace Fluent {
     }
 
     /**
-     * Adds a one-time event listener to the element. It is possible to use delegated events like jQuery.
-     *
-     * @param element The target element
-     * @param type The type of the event. It can include a ".namespace" similar to jQuery.
-     * @param listener The event listener to add.
+     * Adds a one-time event listener that is automatically removed after the first invocation.
+     * @param element - Target element to listen on.
+     * @param type - Event type; may include a `.namespace` suffix.
+     * @param listener - Callback to invoke once when the event fires.
+     * @returns `void`.
      */
     export function one<K extends keyof HTMLElementEventMap>(element: EventTarget, type: K, listener: (this: HTMLElement, ev: HTMLElementEventMap[K]) => any): void;
     export function one(element: EventTarget, type: string, listener: EventListener): void;
@@ -461,11 +485,11 @@ export namespace Fluent {
     }
 
     /**
-     * Removes an event listener from the element.
-     *
-     * @param element The target element
-     * @param type The type of the event. It can include a ".namespace" similar to jQuery.
-     * @param listener The event listener to remove.
+     * Removes an event listener (or all listeners for a namespaced type).
+     * @param element - Target element.
+     * @param type - Event type; may include a `.namespace`. When only a namespace is handled, all matching listeners are removed.
+     * @param listener - Specific callback to remove. When omitted, all listeners for `type` are removed.
+     * @returns `void`.
      */
     export function off<K extends keyof HTMLElementEventMap>(element: EventTarget, type: K, listener?: (this: HTMLElement, ev: HTMLElementEventMap[K]) => any): void;
     export function off(element: EventTarget, type: string, listener?: EventListener): void;
@@ -475,27 +499,31 @@ export namespace Fluent {
     }
 
     /**
-     * Triggers a specified event on the element.
-     *
-     * @param element The target element
-     * @param type The type of the event to trigger.
-     * @param args Optional. An object that specifies event-specific initialization properties.
-     * @returns The event object. Use Fluent.isDefaultPrevented the check if preventDefault is called.
+     * Dispatches a synthetic event on the element.
+     * @param element - Target element to dispatch on.
+     * @param type - Event type to trigger (e.g. `"click"`, `"change"`).
+     * @param args - Optional properties merged into the created `Event` / `CustomEvent` (`detail`, `bubbles`, etc.).
+     * @returns The dispatched event. Use {@link Fluent.isDefaultPrevented} to test whether `preventDefault()` was called.
      */
     export function trigger(element: EventTarget, type: string, args?: any): Event & { isDefaultPrevented?(): boolean } {
         return triggerEvent(element, type, args);
     }
 
     /**
-     * Adds one or more classes to the element. Any falsy value is ignored.
-     * 
-     * @param element The target element
-     * @param value The class or classes to add. It can be a string, boolean, or an array of strings or booleans.
+     * Adds one or more classes to the element.
+     * @param element - Target element.
+     * @param value - Class name(s) to add. Strings are split on whitespace; arrays are flattened; falsy entries are ignored.
+     * @returns `void`.
      */
     export function addClass(element: Element, value: string | boolean | (string | boolean)[]): void {
         toggleCls(element, toClassName(value), true);
     }
 
+    /**
+     * Removes all child nodes from the element, notifying `disposing` handlers and clearing Fluent event listeners.
+     * @param element - Element to empty. No-op when `null` / `undefined`.
+     * @returns `void`.
+     */
     export function empty(element: Element): void {
         if (!element)
             return;
@@ -513,19 +541,19 @@ export namespace Fluent {
             element.innerHTML = "";
     }
 
-    /** 
-     * Returns true if the element is visible like. This is for compatibility with jQuery's :visible selector.
-     * @param element The target element
-     * @returns true if the element has offsetWidth or offsetHeight or any getClientRects().length > 0
+    /**
+     * Tests whether the element is considered visible (jQuery `:visible` semantics).
+     * @param element - Element to test.
+     * @returns `true` when the element has non-zero `offsetWidth` / `offsetHeight` or any client rects.
      */
     export function isVisibleLike(element: Element): boolean {
         return !!(element && ((element as any).offsetWidth || (element as any).offsetHeight || element.getClientRects().length));
     }
 
     /**
-     * Removes the element from the DOM. It also removes event handlers and disposes widgets by calling "disposing" event handlers.
-     *
-     * @param element The element to remove
+     * Removes the element from the DOM, clearing Fluent event handlers and firing `disposing` notifications for the element and its descendants.
+     * @param element - Element to remove. No-op when `null` / `undefined`.
+     * @returns `void`.
      */
     export function remove(element: Element): void {
         if (!element)
@@ -541,21 +569,20 @@ export namespace Fluent {
     }
 
     /**
-     * Removes one or more classes from the element. Any falsy value is ignored.
-     *
-     * @param element The target element
-     * @param value The class or classes to remove. It can be a string, boolean, or an array of strings or booleans.
+     * Removes one or more classes from the element.
+     * @param element - Target element.
+     * @param value - Class name(s) to remove. Falsy entries are ignored.
+     * @returns `void`.
      */
     export function removeClass(element: Element, value: string | boolean | (string | boolean)[]): void {
         toggleCls(element, toClassName(value), false);
     }
 
     /**
-     * Toggles the visibility of the element.
-     * 
-     * @param element The target element
-     * @param flag Optional. A flag indicating whether to show or hide the element. If not provided, the visibility will be toggled.
-     * @returns The Fluent object itself.
+     * Shows or hides the element, handling `hidden`, `display:none`, and `.hidden` class.
+     * @param element - Target element.
+     * @param flag - When `true`, shows the element; when `false`, hides it; when omitted, toggles the current visibility.
+     * @returns `void`.
      */
     export function toggle(element: Element, flag?: boolean): void {
         if (element) {
@@ -580,19 +607,20 @@ export namespace Fluent {
     }
 
     /**
-     * Toggles one or more classes on the element. If the class exists, it is removed; otherwise, it is added. Falsy values are ignored.
-     *
-     * @param element The target element
-     * @param value The class or classes to toggle. It can be a string, boolean, or an array of strings or booleans.
+     * Toggles one or more classes on the element.
+     * @param element - Target element.
+     * @param value - Class name(s) to toggle. Falsy entries are ignored.
+     * @param add - When `true`, forces addition; when `false`, forces removal; when omitted, each class is toggled.
+     * @returns `void`.
      */
     export function toggleClass(element: Element, value: string | boolean | (string | boolean)[], add?: boolean): void {
         element && toggleCls(element, toClassName(value), add);
     }
 
     /**
-     * Converts the given class value or an array of class values to a CSS class name. Any falsy value is ignored.
-     * @param value The class or classes. It can be a string, boolean, or an array of strings or booleans.
-     * @returns Class name string
+     * Normalizes a class value (string, boolean flag, or nested array) to a space-separated class string.
+     * @param value - Value to normalize. Non-string primitives are stringified; booleans and `null` / `undefined` yield `""`; arrays are recursively flattened and falsy entries dropped.
+     * @returns The concatenated class string (may be empty).
      */
     export function toClassName(value: string | boolean | (string | boolean)[]): string {
         if (typeof value === "string")
@@ -604,32 +632,31 @@ export namespace Fluent {
         return "";
     }
 
-    /** 
-     * Returns true if the element is input like. E.g. one of input, textarea, select, button. This is for compatibility with jQuery's :input selector.
-     * @param element The target element
-     * @returns true if element is an input like node
+    /**
+     * Tests whether the element is an input-like control (`input`, `select`, `textarea`, or `button`).
+     * @param element - Element to test.
+     * @returns `true` when the element's tag name matches an input-like tag.
      */
     export function isInputLike(element: Element): element is (HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement | HTMLButtonElement) {
         return isInputTag(element?.nodeName);
     }
 
-    /** A CSS selector for input like tags */
+    /** CSS selector that matches input-like elements (`input,select,textarea,button`). */
     export const inputLikeSelector = "input,select,textarea,button";
 
-    /** 
-     * Returns true if the tag is one of input, textarea, select, button.
-     * @param tag The tag
-     * @returns true if the element has offsetWidth or offsetHeight or any getClientRects().length > 0
+    /**
+     * Tests whether a tag name is an input-like tag.
+     * @param tag - Tag name to test (case-insensitive).
+     * @returns `true` when `tag` is `input`, `select`, `textarea`, or `button`.
      */
     export function isInputTag(tag: string) {
         return /^(?:input|select|textarea|button)$/i.test(tag);
     }
 
     /**
-     * Checks if the event's preventDefault method is called. This is for compatibility with jQuery which
-     * has a non-standard isDefaultPrevented method.
-     * @param event The event object
-     * @returns True if preventDefault is called.
+     * Tests whether `preventDefault()` was called on the event, supporting both native and jQuery-wrapped events.
+     * @param event - Event object, possibly with a jQuery `isDefaultPrevented()` method.
+     * @returns `true` when `defaultPrevented` is `true` or `isDefaultPrevented()` returns `true`.
      */
     export function isDefaultPrevented(event: { defaultPrevented?: boolean, isDefaultPrevented?: () => boolean }) {
         return event != null && (!!event.defaultPrevented ||
@@ -637,13 +664,10 @@ export namespace Fluent {
     }
 
     /**
-     * Tries to read a property from the event, or event.originalEvent, or event.detail. It is designed
-     * for compatibility with the way jQuery wraps original event under originalEvent property, that
-     * causes custom properties to be not available in the event object.
-     * 
-     * @param event The event object
-     * @param prop The property name
-     * @returns The property value
+     * Reads a property from the event, falling back to wrapped/original event containers.
+     * @param event - Event object, potentially jQuery-wrapped (`originalEvent`, `nativeEvent`).
+     * @param prop - Property name to read.
+     * @returns The property value, or `undefined` when not found. Lookup order: `event[prop]` → `event.nativeEvent[prop]` → `event.originalEvent[prop]` / `event.nativeEvent.originalEvent[prop]` → `event.detail[prop]`.
      */
     export function eventProp(event: any, prop: string) {
         if (!event)
@@ -993,8 +1017,9 @@ Object.defineProperty(Fluent.prototype, Symbol.iterator, { get: function () { re
 
 
 /**
- * Executes a callback when the DOM is ready.
- * @param callback A callback to be executed when DOM is ready
+ * Executes a callback once the DOM is ready.
+ * @param callback - Function to invoke. When jQuery is available, delegated to `$(callback)`; otherwise uses `DOMContentLoaded` or an async tick when already loaded.
+ * @returns `void`.
  */
 Fluent.ready = function (callback: () => void) {
     if (!callback)
@@ -1019,29 +1044,28 @@ Fluent.ready = function (callback: () => void) {
 }
 
 /**
- * Finds the first element having the specified ID within the document.
- * @param id The ID
- * @returns A Fluent instance representing the first matching element, or null if no match is found.
+ * Finds the element with the given ID in the document.
+ * @param id - Element ID to search for.
+ * @returns A {@link Fluent} wrapping the found element, or an empty wrapper when not found.
  */
 Fluent.byId = function <TElement extends HTMLElement>(id: string): Fluent<TElement> {
     return Fluent<TElement>(document.getElementById(id) as TElement);
 }
 
 /**
- * Finds all elements matching the specified selector within the document.
- * 
- * @param selector The CSS selector to search for.
- * @returns An array of HTML elements matching the selector.
+ * Finds all elements matching a selector in the document.
+ * @param selector - CSS selector to query.
+ * @returns An array of matching elements (empty when none match).
  */
 Fluent.findAll = function <TElement extends HTMLElement>(selector: string): TElement[] {
     return Array.from(document.querySelectorAll<TElement>(selector));
 }
 
 /**
- * Iterates over all elements matching the specified selector within the document.
- * 
- * @param selector The CSS selector to search for.
- * @param callback A function to execute for each matching element. Receives a Fluent object.
+ * Iterates over all elements matching a selector, invoking a callback with a {@link Fluent} wrapper for each.
+ * @param selector - CSS selector to query.
+ * @param callback - Function invoked for each matching element.
+ * @returns `void`.
  */
 Fluent.findEach = function <TElement extends HTMLElement>(selector: string, callback: (el: Fluent<TElement>) => void): void {
     if (!callback)
@@ -1050,9 +1074,9 @@ Fluent.findEach = function <TElement extends HTMLElement>(selector: string, call
 }
 
 /**
- * Finds the first element matching the specified selector within the document.
- * @param selector The CSS selector to search for.
- * @returns A Fluent instance representing the first matching element, or null if no match is found.
+ * Finds the first element matching a selector in the document.
+ * @param selector - CSS selector to query.
+ * @returns A {@link Fluent} wrapping the first match, or an empty wrapper when not found.
  */
 Fluent.findFirst = function <TElement extends HTMLElement>(selector: string): Fluent<TElement> {
     return Fluent<TElement>(document.querySelector<TElement>(selector));

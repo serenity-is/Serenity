@@ -3,8 +3,21 @@ import { replaceAll } from "../../compat";
 import { Format, IRemoteView } from "../../slick";
 import { skipEditLinkFormatPurposes } from "./editlink";
 
+/**
+ * Formatting helpers for sleek grids.
+ */
 export namespace SlickFormatting {
     
+    /**
+     * Returns a formatter that renders an edit link for an item.
+     * @typeParam TItem - The type of the row item.
+     * @param itemType - The type of the item, e.g. "Northwind.Customer".
+     * @param idField - The name of the field holding the item id.
+     * @param getText - A formatter that produces the link text, or null to use the raw value.
+     * @param cssClass - Optional function returning an extra CSS class for the link.
+     * @param encode - Whether to HTML-encode the text. Defaults to true.
+     * @returns The item link formatter.
+     */
     export function itemLink<TItem = any>(itemType: string, idField: string, getText: Format<TItem>,
         cssClass?: (ctx: FormatterContext<TItem>) => string, encode: boolean = true): Format<TItem> {
         return function (ctx: FormatterContext<TItem>) {
@@ -38,6 +51,14 @@ export namespace SlickFormatting {
         }
     }
 
+    /**
+     * Returns a formatter that renders a tree toggle (expand/collapse) control
+     * with indentation based on the item's hierarchy.
+     * @param getView - A function that returns the remote view.
+     * @param getId - A function that returns the id of an item.
+     * @param formatter - The formatter used to render the item content.
+     * @returns The tree toggle formatter.
+     */
     export function treeToggle(getView: () => IRemoteView<any>, getId: (x: any) => any,
         formatter: Format): Format {
         return function (ctx: FormatterContext): FormatterResult {

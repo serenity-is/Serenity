@@ -33,4 +33,5 @@ After applying the fixes, build the project by running "npm run build" from the 
     }
 }
 
+/** Singleton registry for dialog types (keyed by full name and short name without `Dialog` suffix). */
 export const DialogTypeRegistry = new DialogTypeRegistryImpl();

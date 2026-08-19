@@ -14,51 +14,79 @@ import { localText } from "./localtext";
 import { isArrayLike } from "./system";
 
 /**
- * An `HTMLElement` that can be validated (`input`, `select`, `textarea`, or [contenteditable).
+ * An `HTMLElement` that can be validated (`input`, `select`, `textarea`, or `[contenteditable]`).
+ * Extends `HTMLElement` with form-associated properties used by the validation engine.
  */
 export interface ValidatableElement extends HTMLElement {
+    /** Owning form element, if associated. */
     form?: HTMLFormElement;
+    /** Field name used as the validation key. */
     name?: string;
+    /** Input type (e.g. `"text"`, `"checkbox"`, `"radio"`). */
     type?: string;
+    /** Current string value of the element. */
     value?: string;
 }
 
+/** Raw value extracted from a {@link ValidatableElement} for validation. */
 export type ValidationValue = string | string[] | number | boolean;
 
 /**
- * Validation plugin signature with multitype return.
- * Boolean return signifies the validation result, which uses the default validation error message read from the element attribute.
- * String return signifies failed validation, which then will be used as the validation error message.
- * Promise return signifies asynchronous plugin behavior, with same behavior as Boolean or String.
+ * Validation rule implementation.
+ * - `boolean` return: `true` passes, `false` fails using the default message.
+ * - `string` return: non-empty string fails and is used as the error message.
+ * - `Promise` return: async variant with the same semantics.
+ * @param value - Current field value.
+ * @param element - Element being validated.
+ * @param params - Optional rule parameter (e.g. min value, regex).
+ * @returns Validation result or promise thereof.
  */
 export type ValidationProvider = (value: ValidationValue, element: ValidatableElement, params?: any) => boolean | string | Promise<boolean | string>;
 
+/** Map of field name to error message / flag for fields currently failing validation. */
 export interface ValidationErrorMap {
     [name: string]: (string | boolean);
 }
 
+/** Single validation failure entry. */
 export interface ValidationErrorItem {
+    /** Localized error message to display. */
     message: string;
+    /** Element that failed validation. */
     element: ValidatableElement;
+    /** Name of the rule / method that failed (e.g. `"required"`, `"email"`). */
     method?: string;
 }
 
+/** Ordered list of validation failures for the current validation run. */
 export type ValidationErrorList = ValidationErrorItem[];
 
+/** Rule set for a single field: method name to parameter (e.g. `{ required: true, minlength: 3 }`). */
 export type ValidationRules = Record<string, any>;
 
+/** Map of field name to its {@link ValidationRules}. */
 export interface ValidationRulesMap {
     [name: string]: ValidationRules;
 }
 
+/**
+ * Event delegate for validation triggers (`onclick`, `onfocusout`, `onkeyup`, `onfocusin`).
+ * @param element - Source element that raised the event.
+ * @param event - DOM event.
+ * @param validator - Owning validator instance.
+ */
 export type ValidateEventDelegate = (element: ValidatableElement, event: Event, validator: Validator) => void;
 
 function messageKey(method: string) {
     return "msg" + method.charAt(0).toUpperCase() + method.substring(1).toLowerCase()
 }
 
+/**
+ * Configuration for a {@link Validator} instance. Mirrors jQuery Validation plugin options
+ * with Serenity-specific extensions.
+ */
 export interface ValidatorOptions {
-    /** True for logging debug info */
+    /** When `true` enables debug logging and prevents form submit. */
     debug?: boolean;
 
     /**
@@ -109,9 +137,14 @@ export interface ValidatorOptions {
      * Callback for custom code when an invalid form is submitted. Called with an event object as the first argument, and the validator
      * as in the second.
      */
+    /**
+     * Callback invoked when an invalid form is submitted.
+     * @param event - Submit / invalid-form event.
+     * @param validator - Owning validator instance.
+     */
     invalidHandler?(event: Event, validator: Validator): void;
     /**
-     * Key/value pairs defining custom messages. Key is the name of an element, value the message to display for that element. Instead
+     * Key/value pairs defining custom messages. Key is the name of an element, value is the message to display for that element. Instead
      * of a plain message, another map with specific messages for each rule can be used. Overrides the title attribute of an element or
      * the default message for the method (in that order). Each message can be a String or a Callback. The callback is called in the scope
      * of the validator, with the rule's parameters as the first argument and the element as the second, and must return a String to display
@@ -121,6 +154,12 @@ export interface ValidatorOptions {
      */
     messages?: Record<string, string | Record<string, string>> | undefined;
 
+    /**
+     * Optional normalizer that transforms the raw field value before validation.
+     * @param val - Raw field value.
+     * @param element - Element being validated.
+     * @returns Normalized string value.
+     */
     normalizer?: (val: ValidationValue, element: ValidatableElement) => string;
 
     /**
@@ -165,27 +204,29 @@ export interface ValidatorOptions {
     onsubmit?: boolean | undefined;
 
     /**
-     * Pending class
-     * default: "pending"
+     * CSS class applied to elements with a pending async validation.
+     * default: `"pending"`
      */
     pendingClass?: string | undefined;
 
     /**
-     * A custom message display handler. Gets the map of errors as the first argument and an array of errors as the second,
-     * called in the context of the validator object. The arguments contain only those elements currently validated,
-     * which can be a single element when doing validation onblur/keyup. You can trigger (in addition to your own messages)
-     * the default behaviour by calling this.defaultShowErrors().
+     * Static rule definitions keyed by field name.
      */
     rules?: ValidationRulesMap | undefined;
 
     /**
-     * A custom message display handler. Gets the map of errors as the first argument and an array of errors as the second,
-     * called in the context of the validator object. The arguments contain only those elements currently validated, which can
-     * be a single element when doing validation onblur/keyup. You can trigger (in addition to your own messages) the default
-     * behaviour by calling this.defaultShowErrors().
+     * Custom error display handler. Receives the current error map and list.
+     * Call `this.defaultShowErrors()` to run the built-in display logic in addition to custom handling.
+     * @param errorMap - Map of field name to error message.
+     * @param errorList - Ordered list of validation failures.
+     * @param validator - Owning validator instance.
      */
     showErrors?(errorMap: ValidationErrorMap, errorList: ValidationErrorList, validator: Validator): void;
 
+    /**
+     * Called when a pending async validation is aborted (e.g. due to form reset or re-validation).
+     * @param validator - Owning validator instance.
+     */
     abortHandler?(validator: Validator): void;
 
     /**
@@ -257,16 +298,28 @@ let customValidateRules: WeakMap<ValidatableElement, { [key: string]: ((input: V
  */
 const SIMPLE_EMAIL_REGEX = /^[a-zA-Z0-9.!#$%&'*+/=?^_`{|}~-]+@(?:[a-zA-Z0-9-]+\.)*[a-zA-Z0-9-]+$/;
 
+/**
+ * Form validation engine inspired by jQuery Validation and ASP.NET client validation.
+ * Manages rules, messages, error display, and async pending state for a single form.
+ */
 export class Validator {
 
+    /**
+     * Checks whether a field is optional (not required and empty).
+     * @param element - Element to test.
+     * @param value - Optional explicit value; when omitted the element's current value is used.
+     * @returns Truthy optional marker or falsy when required / non-empty; `"dependency-mismatch"` when the required rule is absent and value is empty.
+     */
     static optional(element: ValidatableElement, value?: ValidationValue) {
         if (value === void 0)
             value = Validator.elementValue(element);
         return !Validator.methods.required(value, element) && "dependency-mismatch";
     }
 
+    /** When `true` automatically combines `min`+`max` into `range` and `minlength`+`maxlength` into `rangelength` during rule normalization. */
     static autoCreateRanges: boolean = false;
 
+    /** Default options applied to every new validator instance. */
     static defaults: ValidatorOptions = {
         messages: {},
         rules: {},
@@ -359,6 +412,7 @@ export class Validator {
         }
     }
 
+    /** Default messages keyed by validation method name. Values may be translation keys or functions. */
     static readonly messages: Record<string, string | Function> = {
         required: "Validation.Required",
         remote: "Please fix this field.",
@@ -381,6 +435,7 @@ export class Validator {
         xss: "Validation.Xss"
     }
 
+    /** Built-in validation methods keyed by rule name. Extend via {@link Validator.addMethod}. */
     static readonly methods: Record<string, ValidationProvider> = {
 
         required: function (value, element) {
@@ -537,7 +592,9 @@ export class Validator {
         }
     }
 
+    /** Effective settings for this validator instance (merged defaults + constructor options). */
     readonly settings: ValidatorOptions;
+    /** Last element that received focus, used by {@link Validator.focusInvalid}. */
     declare public lastActive: ValidatableElement;
     declare private cancelSubmit: boolean;
     declare private currentElements: ValidatableElement[];
@@ -554,6 +611,11 @@ export class Validator {
     declare private toHide: HTMLElement[];
     declare private toShow: HTMLElement[];
 
+    /**
+     * Creates a validator for a form and wires up submit / focus / key handlers.
+     * @param form - Form element to validate.
+     * @param options - Validator options merged over {@link Validator.defaults}.
+     */
     constructor(form: HTMLFormElement, options: ValidatorOptions) {
         if (validatorMap.get(form))
             throw new Error("Form already has a Validator instance!");
@@ -651,6 +713,11 @@ export class Validator {
         this.init();
     }
 
+    /**
+     * Gets the validator instance associated with a form or an element inside a form.
+     * @param element - Form element, form-associated element, or array-like collection.
+     * @returns The validator instance, or `null` if not found.
+     */
     static getInstance(element: HTMLFormElement | Node | ArrayLike<HTMLElement>) {
         element = isArrayLike(element) ? element[0] : element;
         if (!element)
@@ -699,10 +766,22 @@ export class Validator {
         return element instanceof HTMLInputElement || element instanceof HTMLSelectElement || element instanceof HTMLTextAreaElement;
     }
 
+    /**
+     * Whether the element is a checkbox or radio input.
+     * @param element - Element to test.
+     * @returns `true` if checkbox or radio.
+     */
     static isCheckOrRadio(element: Node): element is HTMLInputElement {
         return element instanceof HTMLInputElement && (/radio|checkbox/i).test(element.type);
     }
 
+    /**
+     * Gets the logical length of a value for `minlength` / `maxlength` checks.
+     * Handles selects, checkbox groups, and plain strings.
+     * @param value - Raw field value.
+     * @param element - Source element (used for select / checkbox groups).
+     * @returns Length of the value.
+     */
     static getLength(value: ValidationValue, element: HTMLElement): number {
         if (element instanceof HTMLSelectElement)
             return element.querySelectorAll("option:checked").length;
@@ -716,11 +795,22 @@ export class Validator {
         return typeof value === "number" ? ("" + value).length : (value as any).length;
     }
 
+    /**
+     * Whether the element is content-editable.
+     * @param element - Element to test.
+     * @returns `true` if `contenteditable` is set and not `"false"`.
+     */
     static isContentEditable(element: HTMLElement) {
         let val = element?.getAttribute("contenteditable");
         return val != null && val !== "false"
     }
 
+    /**
+     * Extracts the current value from a form element, normalizing special cases
+     * (radio / checkbox groups, number inputs, file inputs, contenteditable).
+     * @param element - Source element.
+     * @returns The extracted value (`string`, `number`, `string[]`, or `null`).
+     */
     static elementValue(element: HTMLElement) {
         if (element instanceof Element && Validator.isContentEditable(element)) {
             return element.textContent;
@@ -788,6 +878,11 @@ export class Validator {
         return val;
     }
 
+    /**
+     * Validates a form or a single element using its associated validator.
+     * @param element - Form or field element (or array-like collection; first element is used).
+     * @returns `true` if valid, `false` otherwise (or `false` if no validator is found).
+     */
     static valid(element: HTMLFormElement | ValidatableElement | ArrayLike<ValidatableElement>): boolean {
         element = element instanceof HTMLFormElement ? element : isArrayLike(element) ? element[0] : element;
         if (!element)
@@ -803,6 +898,13 @@ export class Validator {
         return validator.element(element);
     }
 
+    /**
+     * Gets or mutates the validation rules for an element.
+     * @param element - Target element.
+     * @param command - `"add"` to add rules, `"remove"` to remove rules, or omitted to read.
+     * @param argument - Rules to add or space-separated method names to remove.
+     * @returns The aggregated rules (or removed rules when `command` is `"remove"`).
+     */
     static rules(element: ValidatableElement, command?: "add" | "remove", argument?: any): ValidationRules {
         let isContentEditable = Validator.isContentEditable(element);
         //settings, staticRules, existingRules, data, param, filtered;
@@ -879,6 +981,10 @@ export class Validator {
         return data;
     }
 
+    /**
+     * Validates the entire form, updates error state, and shows errors.
+     * @returns `true` if the form is valid.
+     */
     form() {
         this.checkForm();
         Object.assign(this.submitted, this.errorMap);
@@ -890,6 +996,10 @@ export class Validator {
         return this.valid();
     }
 
+    /**
+     * Validates all elements in the form without updating the display.
+     * @returns `true` if all elements are valid.
+     */
     checkForm() {
         this.prepareForm();
         for (let i = 0, elements = (this.currentElements = this.elements()); elements[i]; i++) {
@@ -898,6 +1008,11 @@ export class Validator {
         return this.valid();
     }
 
+    /**
+     * Validates a single element and updates error display.
+     * @param element - Element to validate.
+     * @returns `true` if the element is valid.
+     */
     element(element: ValidatableElement) {
         const checkElement = this.validationTargetFor(element);
         let result = true, rs: boolean;
@@ -928,6 +1043,10 @@ export class Validator {
         return result;
     }
 
+    /**
+     * Displays validation errors, merging optional additional errors into the current state.
+     * @param errors - Optional additional error map to merge before display.
+     */
     showErrors(errors?: ValidationErrorMap) {
         if (errors) {
             // Add items to error list and map
@@ -949,6 +1068,9 @@ export class Validator {
         }
     }
 
+    /**
+     * Resets form validation state, hides errors, and clears `aria-invalid` attributes.
+     */
     resetForm() {
         this.invalid = {};
         this.submitted = {};
@@ -963,6 +1085,10 @@ export class Validator {
         this.resetElements(elements);
     }
 
+    /**
+     * Resets visual validation state for a set of elements.
+     * @param elements - Elements to reset.
+     */
     resetElements(elements: ValidatableElement[]) {
         let i: number;
 
@@ -979,6 +1105,10 @@ export class Validator {
         }
     }
 
+    /**
+     * Gets the count of currently invalid fields.
+     * @returns Number of invalid entries.
+     */
     numberOfInvalids() {
         return Validator.objectLength(this.invalid);
     }
@@ -997,10 +1127,15 @@ export class Validator {
         return count;
     }
 
+    /** Hides currently tracked error labels. */
     hideErrors() {
         this.hideThese(this.toHide);
     }
 
+    /**
+     * Hides a set of error labels.
+     * @param errors - Error label elements to hide.
+     */
     hideThese(errors: HTMLElement[]) {
         errors.forEach(x => {
             x.textContent = "";
@@ -1008,14 +1143,26 @@ export class Validator {
         });
     }
 
+    /**
+     * Whether there are currently no validation errors.
+     * @returns `true` if valid.
+     */
     valid() {
         return this.size() === 0;
     }
 
+    /**
+     * Gets the number of current validation errors.
+     * @returns Error count.
+     */
     size() {
         return this.errorList.length;
     }
 
+    /**
+     * Focuses the last active invalid element or the first invalid element.
+     * Honors `abortHandler` and `focusInvalid` settings.
+     */
     focusInvalid() {
         if (this.settings.abortHandler)
             this.settings.abortHandler(this);
@@ -1034,11 +1181,19 @@ export class Validator {
         }
     }
 
+    /**
+     * Finds the last active element among current errors, if it is still invalid.
+     * @returns The last active invalid element, or falsy if none.
+     */
     findLastActive() {
         const lastActive = this.lastActive;
         return lastActive && this.errorList.filter(n => n.element.name === lastActive.name).length === 1 && lastActive;
     }
 
+    /**
+     * Gets all validatable elements in the form that have rules and are not ignored.
+     * @returns Array of elements to validate.
+     */
     elements(): ValidatableElement[] {
         const rulesCache: Record<string, boolean> = {};
 
@@ -1084,11 +1239,16 @@ export class Validator {
             });
     }
 
+    /**
+     * Gets existing error label elements in the form.
+     * @returns Array of error label elements.
+     */
     errors() {
         const errorClass = this.settings.errorClass.split(" ").join(".");
         return Array.from(this.currentForm.querySelectorAll<HTMLElement>(this.settings.errorElement + "." + errorClass));
     }
 
+    /** Resets internal error tracking without touching the DOM. */
     resetInternals() {
         this.successList = [];
         this.errorList = [];
@@ -1097,25 +1257,37 @@ export class Validator {
         this.toHide = [];
     }
 
+    /** Resets internal state and clears the current element list. */
     reset() {
         this.resetInternals();
         this.currentElements = [];
     }
 
+    /** Resets all validation state including displayed errors. */
     resetAll() {
         this.resetForm();
     };
 
+    /** Prepares state for a full form validation pass. */
     prepareForm() {
         this.reset();
         this.toHide = this.errors();
     }
 
+    /**
+     * Prepares state for validating a single element.
+     * @param element - Element to prepare for.
+     */
     prepareElement(element: ValidatableElement) {
         this.reset();
         this.toHide = this.errorsFor(element);
     }
 
+    /**
+     * Runs all applicable validation rules for an element.
+     * @param element - Element to check.
+     * @returns `true` if valid, `false` if invalid, or `undefined` for dependency mismatch.
+     */
     check(element: ValidatableElement) {
         element = this.validationTargetFor(element);
 
@@ -1197,17 +1369,34 @@ export class Validator {
     // Return the custom message for the given element and validation method
     // specified in the element's HTML5 data attribute
     // return the generic message if present and no method specific message is present
+    /**
+     * Gets a custom message from HTML5 `data-msg*` attributes for an element/method.
+     * @param element - Source element.
+     * @param method - Validation method name.
+     * @returns The data message, if present.
+     */
     customDataMessage(element: ValidatableElement, method: string) {
         return element.dataset[messageKey(method)] || element.dataset.msg;
     }
 
     // Return the custom message for the given element name and validation method
+    /**
+     * Gets a custom message from `settings.messages` for a field/method.
+     * @param name - Field name.
+     * @param method - Validation method name.
+     * @returns The configured message, if present.
+     */
     customMessage(name: string, method: string) {
         const m = this.settings.messages[name];
         return m && (typeof m == "string" ? m : (m as any)[method]);
     }
 
     // Return the first defined argument, allowing empty strings
+    /**
+     * Returns the first defined argument, allowing empty strings.
+     * @param args - Values to test in order.
+     * @returns The first non-`undefined` value.
+     */
     findDefined(...args: any[]) {
         for (let i = 0; i < args.length; i++) {
             if (args[i] !== undefined) {
@@ -1217,6 +1406,12 @@ export class Validator {
         return undefined;
     }
 
+    /**
+     * Resolves the default error message for a rule, checking custom messages, data attributes, and {@link Validator.messages}.
+     * @param element - Target element.
+     * @param rule - Rule descriptor with method and parameters.
+     * @returns The resolved message string.
+     */
     defaultMessage(element: ValidatableElement, rule: { method: string, parameters?: any }) {
 
         let message = this.findDefined(
@@ -1239,6 +1434,11 @@ export class Validator {
         return message;
     }
 
+    /**
+     * Formats the error message for a failed rule and records it in the error map/list.
+     * @param element - Element that failed.
+     * @param rule - Rule that failed.
+     */
     formatAndAdd(element: ValidatableElement, rule: { method: string, parameters: any }) {
         const message = this.defaultMessage(element, rule);
 
@@ -1252,6 +1452,7 @@ export class Validator {
         this.submitted[element.name] = message;
     }
 
+    /** Default error display: highlights invalid elements, shows labels, and hides stale errors. */
     defaultShowErrors() {
         let i, elements, error;
         for (i = 0; this.errorList[i]; i++) {
@@ -1281,15 +1482,28 @@ export class Validator {
         this.toShow.forEach(x => Fluent.toggle(x, true));
     }
 
+    /**
+     * Gets elements among {@link Validator.currentElements} that are currently valid.
+     * @returns Valid elements.
+     */
     validElements() {
         let invalids = this.invalidElements();
         return this.currentElements.filter(x => !invalids.includes(x));
     }
 
+    /**
+     * Gets elements that are currently invalid.
+     * @returns Invalid elements.
+     */
     invalidElements() {
         return this.errorList.map(x => x.element);
     }
 
+    /**
+     * Creates or updates the error label for an element.
+     * @param element - Target element.
+     * @param message - Error message; when omitted shows the success state if configured.
+     */
     showLabel(element: ValidatableElement, message?: string) {
         let errors = this.errorsFor(element),
             elementID = this.idOrName(element),
@@ -1367,6 +1581,11 @@ export class Validator {
         });
     }
 
+    /**
+     * Gets error labels associated with an element via `for` attribute or `aria-describedby`.
+     * @param element - Target element.
+     * @returns Matching error label elements.
+     */
     errorsFor(element: ValidatableElement) {
         const name = cssEscape(this.idOrName(element)),
             describer = element.getAttribute("aria-describedby");
@@ -1383,10 +1602,20 @@ export class Validator {
             .filter(x => x.matches(selector));
     }
 
+    /**
+     * Gets the identifier used for error label association (`name` for radio/checkbox, otherwise `id` or `name`).
+     * @param element - Target element.
+     * @returns The identifier string.
+     */
     idOrName(element: ValidatableElement) {
         return Validator.isCheckOrRadio(element) ? element.name : element.id || element.name;
     }
 
+    /**
+     * Resolves the actual element to validate (first member of a radio/checkbox group, filtered by `ignore`).
+     * @param element - Source element.
+     * @returns The validation target, or `undefined` if filtered out.
+     */
     validationTargetFor(element: ValidatableElement) {
 
         let elements = [element];
@@ -1399,10 +1628,16 @@ export class Validator {
         return elements.filter(x => !x.matches(this.settings.ignore))[0];
     }
 
+    /**
+     * Finds all elements in the form with the given name.
+     * @param name - Field name to search for.
+     * @returns Matching elements.
+     */
     findByName(name: string): ValidatableElement[] {
         return Array.from(this.currentForm.querySelectorAll<ValidatableElement>("[name='" + cssEscape(name) + "']"));
     }
 
+    /** Handlers for depend-type checks used by {@link Validator.depend}. */
     dependTypes = {
         "boolean": function (param: any) {
             return param;
@@ -1415,10 +1650,20 @@ export class Validator {
         }
     }
 
+    /**
+     * Evaluates whether a dependency condition is met.
+     * @param param - Boolean, selector string, or function.
+     * @param element - Context element.
+     * @returns `true` if the dependency is satisfied.
+     */
     depend(param: any, element: ValidatableElement) {
         return (this.dependTypes as any)[typeof param] ? (this.dependTypes as any)[typeof param](param, element) : true;
     }
 
+    /**
+     * Marks an async validation request as pending for an element.
+     * @param element - Element with a pending remote check.
+     */
     startRequest(element: ValidatableElement) {
         if (!this.pending[element.name]) {
             this.pendingRequest++;
@@ -1427,6 +1672,11 @@ export class Validator {
         }
     }
 
+    /**
+     * Clears a pending async request and triggers form submit / invalid-form handling as needed.
+     * @param element - Element whose request completed.
+     * @param valid - Whether the async result was valid.
+     */
     stopRequest(element: ValidatableElement, valid: boolean) {
         let formSubmitted = this.formSubmitted;
 
@@ -1451,6 +1701,10 @@ export class Validator {
         }
     }
 
+    /**
+     * Aborts a pending async request for an element, if any.
+     * @param element - Element whose pending request should be aborted.
+     */
     abortRequest(element: ValidatableElement) {
         if (this.pending[element.name]) {
             (this.pending[element.name] as AbortController).abort();
@@ -1466,6 +1720,12 @@ export class Validator {
         }
     }
 
+    /**
+     * Gets or creates the cached previous value for a remote validation method.
+     * @param element - Target element.
+     * @param method - Validation method name (defaults to `"remote"`).
+     * @returns The cached previous value object.
+     */
     previousValue(element: ValidatableElement, method: string) {
         method = typeof method === "string" && method || "remote";
 
@@ -1477,6 +1737,9 @@ export class Validator {
     }
 
     // Cleans up all forms and elements, removes validator-specific events
+    /**
+     * Cleans up event handlers and removes the validator instance from the form.
+     */
     destroy() {
         this.resetForm();
         Fluent.off(this.currentForm, ".validator");
@@ -1484,6 +1747,7 @@ export class Validator {
         delete this.currentForm;
     }
 
+    /** CSS-class to rule mapping (e.g. `"required"` → `{ required: true }`). */
     static classRuleSettings: Record<string, ValidationRules> = {
         required: { required: true },
         email: { email: true },
@@ -1496,6 +1760,11 @@ export class Validator {
         customValidate: { customValidate: true }
     }
 
+    /**
+     * Adds validation rules associated with a CSS class.
+     * @param className - Class name or map of class names to rules.
+     * @param rules - Rules to associate when `className` is a string.
+     */
     static addClassRules(className: (string | any), rules: ValidationRules) {
         if (typeof className === "string") {
             this.classRuleSettings[className] = rules;
@@ -1504,6 +1773,11 @@ export class Validator {
         }
     }
 
+    /**
+     * Gets rules derived from the element's CSS classes.
+     * @param element - Target element.
+     * @returns Rules inferred from classes.
+     */
     static classRules(element: ValidatableElement) {
         let rules: ValidationRules = {};
         let classes = element.getAttribute("class");
@@ -1518,6 +1792,13 @@ export class Validator {
         return rules;
     }
 
+    /**
+     * Normalizes a single attribute rule value (e.g. coercing `min`/`max`/`step` to numbers).
+     * @param rules - Rules object to mutate.
+     * @param type - Element `type` attribute.
+     * @param method - Rule method name.
+     * @param value - Raw attribute value.
+     */
     static normalizeAttributeRule(rules: ValidationRules, type: string, method: string, value: ValidationValue) {
 
         // Convert the value to a number for number inputs, and for text for backwards compability
@@ -1541,6 +1822,11 @@ export class Validator {
         }
     }
 
+    /**
+     * Gets rules derived from HTML attributes (e.g. `required`, `minlength`, `type`).
+     * @param element - Target element.
+     * @returns Attribute-derived rules.
+     */
     static attributeRules(element: ValidatableElement) {
         const rules: ValidationRules = {};
         const type = element.getAttribute("type");
@@ -1578,6 +1864,11 @@ export class Validator {
         return rules;
     }
 
+    /**
+     * Gets rules derived from `data-rule-*` attributes.
+     * @param element - Target element.
+     * @returns Data-attribute rules.
+     */
     static dataRules(element: ValidatableElement) {
         const rules = Object.create(null),
             type = element.getAttribute("type");
@@ -1596,6 +1887,11 @@ export class Validator {
         return rules;
     }
 
+    /**
+     * Gets rules from the validator's static `settings.rules` for the element's name.
+     * @param element - Target element.
+     * @returns Static rules object.
+     */
     static staticRules(element: ValidatableElement): ValidationRules {
         let rules: ValidationRules = {};
         const validator = Validator.getInstance(element.form);
@@ -1607,6 +1903,12 @@ export class Validator {
         return rules;
     }
 
+    /**
+     * Normalizes a merged rules object: handles `depends`, coerces numeric params, and optionally auto-creates ranges.
+     * @param rules - Raw merged rules.
+     * @param element - Target element.
+     * @returns Normalized rules.
+     */
     static normalizeRules(rules: ValidationRules, element: ValidatableElement) {
 
         // Handle dependency check
@@ -1680,6 +1982,12 @@ export class Validator {
         return rules;
     }
 
+    /**
+     * Registers a new validation method.
+     * @param name - Method / rule name.
+     * @param method - Validation function.
+     * @param message - Optional default error message for the method.
+     */
     static addMethod(name: string, method: ValidationProvider, message?: string) {
         Validator.methods[name] = method;
         Validator.messages[name] = message !== undefined ? message : Validator.messages[name];
@@ -1688,6 +1996,12 @@ export class Validator {
         }
     }
 
+    /**
+     * Gets the element that should be highlighted for validation feedback.
+     * Checks `data-vx-highlight`, hidden `textarea` editors, and `select2-offscreen`.
+     * @param el - Source form element.
+     * @returns The highlight target element, or `undefined` if none.
+     */
     static getHighlightTarget(el: HTMLElement) {
         const hl = el.dataset.vxHighlight;
         if (hl)
@@ -1698,6 +2012,12 @@ export class Validator {
             return document.getElementById('s2id_' + el.id);
     }
 
+    /**
+     * Adds a custom validation callback for an element. Multiple callbacks can be registered under distinct `uniqueName` keys.
+     * @param element - Target element or array-like collection (first element is used).
+     * @param rule - Callback returning an error message string when invalid, or `null`/`undefined` when valid.
+     * @param uniqueName - Optional key to allow independent removal; defaults to `""`.
+     */
     static addCustomRule(element: HTMLElement | ArrayLike<HTMLElement>, rule: (input: ValidatableElement) => string,
         uniqueName?: string): void {
         element = isArrayLike(element) ? element[0] : element;
@@ -1718,6 +2038,11 @@ export class Validator {
         customValidateRules.delete(el);
     }
 
+    /**
+     * Removes a custom validation callback previously added with {@link Validator.addCustomRule}.
+     * @param element - Target element or array-like collection.
+     * @param uniqueName - Key under which the rule was registered.
+     */
     static removeCustomRule(element: HTMLElement | ArrayLike<HTMLElement>, uniqueName: string): void {
         element = isArrayLike(element) ? element[0] : element;
         if (!element)
@@ -1734,6 +2059,7 @@ export class Validator {
             element.classList.remove('customValidate');
     }
 
+    /** Modifier / navigation keys that should not trigger `onkeyup` re-validation. */
     static readonly excludedModifierKeys: Set<string> = new Set([
         "Shift", "Control", "Alt", "CapsLock", "End", "Home", "ArrowLeft", "ArrowUp", "ArrowRight", "ArrowDown", "Insert", "NumLock", "AltGr"]);
 }
@@ -1742,5 +2068,7 @@ function isPollutingKey(key: string | null | undefined): boolean {
     return key === '__proto__' || key === 'constructor' || key === 'prototype';
 }
 
+/** Alias for {@link Validator.addCustomRule}. */
 export const addValidationRule = Validator.addCustomRule;
+/** Alias for {@link Validator.removeCustomRule}. */
 export const removeValidationRule = Validator.removeCustomRule;

@@ -1,58 +1,80 @@
 ﻿import { addClass, type RenderableContent, sanitizeHtml } from "./html";
 
 // adapted from https://github.com/JPeer264/toastr2
+/**
+ * Options that control the toast container element.
+ * Shared by individual toast calls and the global {@link Toastr} defaults.
+ */
 export type ToastContainerOptions = {
+    /** DOM id for the container that holds toasts. Defaults to `"toast-container"`. */
     containerId?: string;
+    /** CSS class applied to the container for positioning (e.g. `"toast-top-right"`). */
     positionClass?: string;
+    /** CSS selector for the parent element the container is appended to. Defaults to `"body"`. */
     target?: string;
 }
 
+/**
+ * Full option set for a toast notification. Extends {@link ToastContainerOptions}
+ * with display, timing, styling, and lifecycle callbacks.
+ */
 export type ToastrOptions = ToastContainerOptions & {
-    /** Show a close button, default is false */
+    /** Show a close button, default is false. Pass an HTMLElement for a custom button element. */
     closeButton?: boolean | HTMLElement;
-    /** CSS class for close button */
+    /** CSS class for the close button. Defaults to `"toast-close-button"`. */
     closeClass?: string;
-    /** If true (default) toast keeps open when hovered, and closes after extendedTimeout when mouse leaves the toast */
+    /** If `true` (default) the toast stays open while hovered and closes after {@link ToastrOptions.extendedTimeOut} when the mouse leaves. */
     closeOnHover?: boolean;
-    /** If closeOnHover is true, the toast closes in extendedTimeout duration after the mouse leaves the toast. Default is 1000 */
+    /** Timeout in ms after mouse-leave before the toast closes when {@link ToastrOptions.closeOnHover} is enabled. Defaults to `1000`. */
     extendedTimeOut?: number;
-    /** @deprecated Escape message html, default is true. Pass HTML element to message instead */
+    /** @deprecated Escape message html, default is true. Pass an HTML element to message instead. */
     escapeHtml?: boolean;
-    /** CSS class for icon */
+    /** CSS class for the toast icon (e.g. `"toast-info"`, `"toast-error"`). */
     iconClass?: string;
-    /** CSS class for message */
+    /** CSS class for the message element. Defaults to `"toast-message"`. */
     messageClass?: string;
-    /** Show newest on top */
+    /** When `true` the newest toast is inserted at the top of the container. */
     newestOnTop?: boolean;
-    /** CSS class for toast positioning */
+    /** CSS class for toast positioning (also on container). Defaults to `"toast-top-right"`. */
     positionClass?: string;
-    /** Prevent duplicates of the same toast, default is false */
+    /** When `true` suppresses consecutive toasts with identical messages. Defaults to `false`. */
     preventDuplicates?: boolean;
-    /** If true the toast message element will have a white-space: pre-wrap style */
+    /** When `true` the toast message element is styled with `white-space: pre-wrap`. */
     preWrap?: boolean;
-    /** Right to left */
+    /** Enables right-to-left layout for the toast. */
     rtl?: boolean;
-    /** The container element id */
+    /** CSS selector for the parent element that hosts the container. Defaults to `"body"`. */
     target?: string;
-    /** The duration for the toast to stay in the page. Set to -1 to make the toast sticky, in that case extendedTimeout is ignored. */
+    /** Duration in ms the toast stays visible. Set to `0` for sticky or `-1` to disable auto-hide (extended timeout is then ignored). Defaults to `5000`. */
     timeOut?: number;
-    /** CSS class for toast */
+    /** CSS class for the toast element itself. Defaults to `"toast"`. */
     toastClass?: string;
-    /** Hides the notification when clicked, default is true */
+    /** When `true` (default) clicking the toast dismisses it. */
     tapToDismiss?: boolean;
-    /** CSS class for title */
+    /** CSS class for the title element. Defaults to `"toast-title"`. */
     titleClass?: string;
 
+    /** Callback invoked when the toast element is clicked. */
     onclick?: (event: MouseEvent) => void;
+    /** Callback invoked when the close button is clicked. */
     onCloseClick?: (event: Event) => void;
+    /** Callback invoked after the toast is hidden and removed. */
     onHidden?: () => void;
+    /** Callback invoked after the toast is shown. */
     onShown?: () => void;
 }
 
+/**
+ * Internal descriptor for a toast notification passed to {@link Toastr.notify}.
+ */
 export type NotifyMap = {
+    /** Toast type key (`"success"` | `"info"` | `"warning"` | `"error"`). */
     type: string;
+    /** CSS class for the toast icon corresponding to the type. */
     iconClass: string;
+    /** Optional title content for the toast. */
     title?: RenderableContent;
+    /** Optional message content for the toast. */
     message?: RenderableContent;
 }
 
@@ -82,6 +104,12 @@ const initialOptions: ToastrOptions = {
 
 let initialInstance: Toastr = null;
 
+/**
+ * Toast notification manager. Provides `success` / `info` / `warning` / `error`
+ * helpers, container management, and duplicate suppression. A singleton instance
+ * is exported as the default export; custom instances can be constructed with
+ * overriding {@link ToastrOptions}.
+ */
 export class Toastr {
     declare private listener: any;
 
@@ -89,14 +117,25 @@ export class Toastr {
 
     declare private previousToast: RenderableContent | null;
 
+    /** Effective options for this instance (merged from defaults and constructor overrides). */
     declare public options: ToastrOptions;
 
+    /**
+     * Creates a new Toastr instance.
+     * @param options - Options merged over the global defaults / parent instance options.
+     */
     public constructor(options?: ToastrOptions) {
         this.toastId = 0;
         this.previousToast = null;
         this.options = Object.assign(Object.assign({}, initialInstance?.options ?? initialOptions), options);
     }
 
+    /**
+     * Gets the toast container element, optionally creating it.
+     * @param options - Container options that override instance defaults when resolving `containerId` / `target` / `positionClass`.
+     * @param create - When `true` creates the container if it does not exist.
+     * @returns The container element, or `null` if not found and `create` is `false`.
+     */
     public getContainer(options?: ToastContainerOptions, create = false): HTMLElement {
         let container = document.getElementById(options?.containerId ?? this.options.containerId) as HTMLElement;
         if (container || !create)
@@ -107,6 +146,13 @@ export class Toastr {
         return container;
     }
 
+    /**
+     * Shows an error toast.
+     * @param message - Message content for the toast.
+     * @param title - Optional title content.
+     * @param opt - Per-toast options that override instance defaults.
+     * @returns The created toast element, or `null` if suppressed as a duplicate.
+     */
     public error(message?: RenderableContent, title?: RenderableContent, opt?: ToastrOptions): HTMLElement | null {
         return this.notify({
             type: 'error',
@@ -116,6 +162,13 @@ export class Toastr {
         }, opt);
     }
 
+    /**
+     * Shows a warning toast.
+     * @param message - Message content for the toast.
+     * @param title - Optional title content.
+     * @param opt - Per-toast options that override instance defaults.
+     * @returns The created toast element, or `null` if suppressed as a duplicate.
+     */
     public warning(message?: RenderableContent, title?: RenderableContent, opt?: ToastrOptions): HTMLElement | null {
         return this.notify({
             type: 'warning',
@@ -125,6 +178,13 @@ export class Toastr {
         }, opt);
     }
 
+    /**
+     * Shows a success toast.
+     * @param message - Message content for the toast.
+     * @param title - Optional title content.
+     * @param opt - Per-toast options that override instance defaults.
+     * @returns The created toast element, or `null` if suppressed as a duplicate.
+     */
     public success(message?: RenderableContent, title?: RenderableContent, opt?: ToastrOptions): HTMLElement | null {
         return this.notify({
             type: 'success',
@@ -134,6 +194,13 @@ export class Toastr {
         }, opt);
     }
 
+    /**
+     * Shows an info toast.
+     * @param message - Message content for the toast.
+     * @param title - Optional title content.
+     * @param opt - Per-toast options that override instance defaults.
+     * @returns The created toast element, or `null` if suppressed as a duplicate.
+     */
     public info(
         message?: RenderableContent,
         title?: RenderableContent,
@@ -147,10 +214,18 @@ export class Toastr {
         }, opt);
     }
 
+    /**
+     * Subscribes to toast lifecycle events.
+     * @param callback - Function invoked with toast state on show / hide.
+     */
     public subscribe(callback: (response: Toastr) => void): void {
         this.listener = callback;
     }
 
+    /**
+     * Publishes a toast lifecycle event to the subscriber.
+     * @param args - Toast state payload.
+     */
     public publish(args: Toastr): void {
         if (!this.listener) {
             return;
@@ -167,6 +242,11 @@ export class Toastr {
             container.parentNode.removeChild(container);
     }
 
+    /**
+     * Removes a single toast element from the DOM and cleans up the container if empty.
+     * @param toastElement - The toast element to remove.
+     * @param options - Optional container options used to locate the container for cleanup.
+     */
     public removeToast(toastElement: HTMLElement, options?: ToastContainerOptions) {
         if (!toastElement)
             return;
@@ -178,6 +258,10 @@ export class Toastr {
         }
     }
 
+    /**
+     * Clears all toasts from the container.
+     * @param options - Optional container options to resolve which container to clear.
+     */
     public clear(options?: ToastContainerOptions) {
         let container = this.getContainer(options);
         if (!container)

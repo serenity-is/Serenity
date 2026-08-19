@@ -2,6 +2,10 @@
 import { Widget, WidgetProps } from "../widgets/widget";
 import { FilterStore } from "./filterstore";
 
+/**
+ * Base widget that owns a {@link FilterStore} and reacts to its changes.
+ * @typeParam P - Widget props type.
+ */
 export class FilterWidgetBase<P = {}> extends Widget<P> {
     static override[Symbol.typeInfo] = this.registerClass(nsSerenity);
 
@@ -9,6 +13,10 @@ export class FilterWidgetBase<P = {}> extends Widget<P> {
 
     declare private onFilterStoreChanged: () => void;
 
+    /**
+     * Creates a filter widget base.
+     * @param props - Widget props.
+     */
     constructor(props: WidgetProps<P>) {
         super(props);
 
@@ -17,6 +25,9 @@ export class FilterWidgetBase<P = {}> extends Widget<P> {
         this.store.add_changed(this.onFilterStoreChanged);
     }
 
+    /**
+     * Cleans up the filter store subscription.
+     */
     override destroy() {
 
         if (this.store) {
@@ -28,13 +39,24 @@ export class FilterWidgetBase<P = {}> extends Widget<P> {
         super.destroy();
     }
 
+    /**
+     * Hook invoked when the filter store changes.
+     */
     protected filterStoreChanged() {
     }
 
+    /**
+     * Returns the filter store.
+     * @returns The filter store.
+     */
     get_store(): FilterStore {
         return this.store;
     }
 
+    /**
+     * Sets the filter store and subscribes to its changes.
+     * @param value - The filter store.
+     */
     set_store(value: FilterStore): void {
         if (this.store !== value) {
             if (this.store != null)

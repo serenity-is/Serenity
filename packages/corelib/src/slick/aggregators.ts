@@ -1,13 +1,19 @@
 import { IGroupTotals } from "@serenity-is/sleekgrid";
 import { localText, SummaryType } from "../base";
 
+/** Contract for group/total aggregators (avg/min/max/sum etc.). */
 export interface IAggregator {
+    /** Initializes state before a new group is processed. */
     init(): void;
+    /** Accumulates a single item into the aggregator state. @param item - Row item. */
     accumulate(item: any): void;
+    /** Writes computed totals into the group totals object. @param totals - Totals container keyed by aggregateKey. */
     storeResult(totals: IGroupTotals): void;
 }
 
+/** Built-in aggregator implementations. */
 export namespace Aggregators {
+    /** Average of a numeric field (ignores non-numeric / empty values). */
     export class Avg implements IAggregator {
         public count: number;
         public nonNullCount: number;
@@ -45,6 +51,7 @@ export namespace Aggregators {
         }
     }
 
+    /** Weighted average given a value field and a weight field. */
     export class WeightedAvg implements IAggregator {
         public sum: number;
         public weightedSum: number;
@@ -87,6 +94,7 @@ export namespace Aggregators {
         }
     }
 
+    /** Minimum of a field. */
     export class Min implements IAggregator {
         public readonly field: string;
         public min: any;
@@ -122,6 +130,7 @@ export namespace Aggregators {
         }
     }
 
+    /** Maximum of a field. */
     export class Max implements IAggregator {
         public max: any;
 
@@ -155,6 +164,7 @@ export namespace Aggregators {
         }
     }
 
+    /** Sum of a numeric field. */
     export class Sum implements IAggregator {
         public readonly field: string;
         public sum: number;

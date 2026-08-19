@@ -2,10 +2,14 @@ import { isAssignableFromSymbol, isInstanceOfTypeSymbol } from "./symbols";
 import { StringLiteral, TypeInfo, ensureTypeInfo, getGlobalTypeRegistry, getTypeNameProp, globalObject, interfaceIsAssignableFrom, internalRegisterType, merge, peekTypeInfo } from "./system-internal";
 export { ensureTypeInfo, getGlobalTypeRegistry, getTypeNameProp, peekTypeInfo, setTypeNameProp, type StringLiteral } from "./system-internal";
 
-/** @deprecated Use getGlobalTypeRegistry instead */
+/**
+ * @deprecated Use {@link getGlobalTypeRegistry} instead. Kept for backward compatibility.
+ */
 export const getTypeRegistry = getGlobalTypeRegistry;
 
+/** Namespace prefix `"Serenity."` used when registering types with a fully-qualified name. */
 export const nsSerenity: "Serenity." = "Serenity.";
+/** Root namespace `"Serenity"` without trailing dot. */
 export const SerenityNS: "Serenity" = "Serenity";
 
 declare global {
@@ -39,7 +43,8 @@ export function omitUndefined(x: { [key: string]: any }) {
 }
 
 /**
- * Type alias for a function or object (enum).
+ * Type alias for any runtime type representation.
+ * In Serenity this is either a constructor function (class) or a plain object (enum).
  */
 export type Type = Function | Object;
 
@@ -237,17 +242,27 @@ export function registerClass(type: any, name: string, intfAndAttr?: (InterfaceT
     }
 }
 
+/**
+ * Base class for all Serenity custom attributes (metadata attached to types).
+ * Attributes are stored on `typeInfo.customAttributes` and queried via
+ * {@link getCustomAttribute} / {@link hasCustomAttribute}.
+ */
 export abstract class CustomAttribute {
     static [Symbol.typeInfo] = classTypeInfo(nsSerenity); static { registerType(this); }
     declare private readonly isCustomAttribute: true;
 }
 
 /**
- * Indicates the enum key of an enum type (by default the name of the enum type is used as key)
+ * Attribute that overrides the lookup key under which an enum is registered in the global type registry.
+ * By default the enum's full name is used as the key; this attribute allows an alternative key.
  */
 export class EnumKeyAttribute extends CustomAttribute {
     static override [Symbol.typeInfo] = classTypeInfo(nsSerenity); static { registerType(this); }
 
+    /**
+     * Creates a new enum-key attribute.
+     * @param value - Alternative registry key for the enum (e.g. `"MyApp.MyEnum"`).
+     */
     constructor(public value: string) {
         super();
     }
@@ -333,9 +348,9 @@ export const Enum = {
     },
 
     /**
-     * Get all numeric values of an enum as an array.
-     * @param enumType 
-     * @returns 
+     * Returns all numeric values of an enum as an array.
+     * @param enumType - Enum object to enumerate.
+     * @returns Array of numeric enum values.
      */
     getValues: (enumType: any) => {
         const parts = [];
@@ -416,21 +431,23 @@ export function isPromiseLike(obj: any): obj is PromiseLike<any> {
 }
 
 /**
- * Utility type to prevent type inference in generic types.
- * TypeScript 5.4 has added a built-in NoInfer<T> type that can be used instead of this.
+ * Utility type that prevents TypeScript from inferring `T` from a specific position.
+ * Prefers the inferred type from other positions. TypeScript 5.4+ provides a built-in `NoInfer<T>` that can be used instead.
+ * @typeParam T - Type to block inference for.
  */
 export type SNoInfer<T> = [T][T extends any ? 0 : never];
 
 /**
- * Attribute class for editors. This is used by the editorTypeInfo function
- * and registerEditor function to add EditorAttribute to editors.
+ * Attribute that marks a class as a Serenity editor.
+ * Added automatically by {@link registerEditor} / {@link editorTypeInfo}. Can also be applied manually via `classTypeInfo`.
  */
 export class EditorAttribute extends CustomAttribute { 
     static override [Symbol.typeInfo] = classTypeInfo(nsSerenity); static { registerType(this); }
 }
 
 /**
- * Marker interface for SleekGrid formatters.
+ * Marker interface for SleekGrid / DataGrid formatters.
+ * Formatters implementing this interface declare a `format(ctx)` method and are registered via {@link registerFormatter} / {@link formatterTypeInfo}.
  */
 export abstract class ISlickFormatter { 
     static [Symbol.typeInfo] = interfaceTypeInfo(nsSerenity); static { registerType(this); }
@@ -463,11 +480,10 @@ export function registerEditor(type: any, name: string, intfAndAttr?: (Interface
 }
 
 /**
- * Adds a custom attribute to a type. JavaScript does not have built-in support for attributes,
- * so Serenity uses a customAttributes array on typeInfo to store them. This is used by
- * decorators and some helper functions to add attributes to classes.
- * @param type 
- * @param attr 
+ * Attaches a custom attribute instance to a type's metadata.
+ * JavaScript has no native attribute support, so Serenity stores attributes on `typeInfo.customAttributes`.
+ * @param type - Target type (class / enum object) to attach the attribute to.
+ * @param attr - Attribute instance to add.
  */
 export function addCustomAttribute(type: any, attr: CustomAttribute) {
     let typeInfo = ensureTypeInfo(type);
@@ -542,20 +558,45 @@ export function getCustomAttributes<TAttr>(type: any, attrType: { new(...args: a
 
 export type { TypeInfo } from "./system-internal";
 
-/** Class type information. This is used to make type name available in declaration files unlike decorators that does not show in .d.ts files. */
+/**
+ * TypeInfo for a class. Used with `static override [Symbol.typeInfo] = classTypeInfo("...")` to embed the type name in declaration files (decorators are erased in `.d.ts`).
+ * This is one of the helper types that are used to make the type name available in declaration files, unlike decorators that does not show in .d.ts files.
+ * @typeParam TypeName - String-literal type of the fully-qualified class name.
+ */
 export type ClassTypeInfo<TypeName> = TypeInfo<TypeName>;
-/** Editor type information. This is used to make type name available in declaration files unlike decorators that does not show in .d.ts files. */
+/**
+ * TypeInfo for an editor class. Like {@link ClassTypeInfo} but automatically includes {@link EditorAttribute}.
+ * This is one of the helper types that are used to make the type name available in declaration files, unlike decorators that does not show in .d.ts files.
+ * @typeParam TypeName - String-literal editor type name.
+ */
 export type EditorTypeInfo<TypeName> = TypeInfo<TypeName>;
-/** Formatter type information. This is used to make type name available in declaration files unlike decorators that does not show in .d.ts files. */
+/**
+ * TypeInfo for a formatter class. Like {@link ClassTypeInfo} but automatically includes {@link ISlickFormatter}.
+ * This is one of the helper types that are used to make the type name available in declaration files, unlike decorators that does not show in .d.ts files.
+ * @typeParam TypeName - String-literal formatter type name.
+ */
 export type FormatterTypeInfo<TypeName> = TypeInfo<TypeName>;
-/** Interface type information. This is used to make type name available in declaration files unlike decorators that does not show in .d.ts files. */
+/**
+ * TypeInfo for an interface. Used with `static [Symbol.typeInfo] = interfaceTypeInfo("...")`.
+ * This is one of the helper types that are used to make the type name available in declaration files, unlike decorators that does not show in .d.ts files.
+ * @typeParam TypeName - String-literal interface name.
+ */
 export type InterfaceTypeInfo<TypeName> = TypeInfo<TypeName>;
 
-/** Type for attribute class, attribute instance or attribute factory */
+/**
+ * Union of forms accepted where an attribute can be specified: an attribute instance, an attribute class (instantiated with `new`), or a factory function returning an attribute. Factories are marked with `isAttributeFactory === true`.
+ */
 export type AttributeSpecifier = CustomAttribute | ({ new(): CustomAttribute }) | (() => CustomAttribute);
-/** Type for interface class */
+/** Interface type — a constructor function carrying an {@link InterfaceTypeInfo} via `[Symbol.typeInfo]`. */
 export type InterfaceType = Function & { [Symbol.typeInfo]: InterfaceTypeInfo<string> };
 
+/**
+ * Creates {@link ClassTypeInfo} for a class. Use as `static override [Symbol.typeInfo] = classTypeInfo("MyApp.MyClass")`.
+ * @typeParam TypeName - String-literal fully-qualified type name.
+ * @param typeName - Fully-qualified type name (e.g. `"MyApp.MyClass"`).
+ * @param intfAndAttr - Optional interfaces and attributes the class implements / carries.
+ * @returns A {@link ClassTypeInfo} object to assign to `[Symbol.typeInfo]`.
+ */
 export function classTypeInfo<TypeName>(typeName: StringLiteral<TypeName>, intfAndAttr?: (InterfaceType | AttributeSpecifier)[]): ClassTypeInfo<TypeName> {
     const typeInfo: TypeInfo<TypeName> = {
         typeKind: "class",
@@ -573,6 +614,13 @@ export function classTypeInfo<TypeName>(typeName: StringLiteral<TypeName>, intfA
     return typeInfo;
 }
 
+/**
+ * Creates {@link EditorTypeInfo} for an editor class. Like {@link classTypeInfo} but automatically adds {@link EditorAttribute}.
+ * @typeParam TypeName - String-literal editor type name.
+ * @param typeName - Fully-qualified editor name (e.g. `"MyApp.MyEditor"`).
+ * @param intfAndAttr - Optional interfaces and extra attributes.
+ * @returns An {@link EditorTypeInfo} to assign to `[Symbol.typeInfo]`.
+ */
 export function editorTypeInfo<TypeName>(typeName: StringLiteral<TypeName>, intfAndAttr?: (InterfaceType | AttributeSpecifier)[]): EditorTypeInfo<TypeName> {
     const typeInfo: TypeInfo<TypeName> = {
         typeKind: "class",
@@ -587,6 +635,13 @@ export function editorTypeInfo<TypeName>(typeName: StringLiteral<TypeName>, intf
     return typeInfo;
 }
 
+/**
+ * Creates {@link FormatterTypeInfo} for a formatter class. Automatically includes {@link ISlickFormatter}.
+ * @typeParam TypeName - String-literal formatter type name.
+ * @param typeName - Fully-qualified formatter name (e.g. `"MyApp.MyFormatter"`).
+ * @param intfAndAttr - Optional interfaces and attributes.
+ * @returns A {@link FormatterTypeInfo} to assign to `[Symbol.typeInfo]`.
+ */
 export function formatterTypeInfo<TypeName>(typeName: StringLiteral<TypeName>, intfAndAttr?: (InterfaceType | AttributeSpecifier)[]): FormatterTypeInfo<TypeName> {
     const typeInfo: TypeInfo<TypeName> = {
         typeKind: "class",
@@ -601,6 +656,13 @@ export function formatterTypeInfo<TypeName>(typeName: StringLiteral<TypeName>, i
     return typeInfo;
 }
 
+/**
+ * Creates {@link InterfaceTypeInfo} for an interface.
+ * @typeParam TypeName - String-literal interface name.
+ * @param typeName - Fully-qualified interface name (e.g. `"MyApp.IMyInterface"`).
+ * @param intf - Optional base interfaces this interface extends.
+ * @returns An {@link InterfaceTypeInfo} to assign to `[Symbol.typeInfo]`.
+ */
 export function interfaceTypeInfo<TypeName>(typeName: StringLiteral<TypeName>, intf?: InterfaceType[]): InterfaceTypeInfo<TypeName> {
     const typeInfo: TypeInfo<TypeName> = {
         typeKind: "interface",
@@ -614,6 +676,13 @@ export function interfaceTypeInfo<TypeName>(typeName: StringLiteral<TypeName>, i
     return typeInfo;
 }
 
+/**
+ * Registers a type that already has a `static [Symbol.typeInfo]` declaration.
+ * Called automatically by the `static { registerType(this); }` block that follows the typeInfo declaration.
+ * Validates that the typeInfo exists and has a `typeName`.
+ * @param type - Class / interface object carrying `[Symbol.typeInfo]` and a `name` property.
+ * @throws If `type` is null, lacks `[Symbol.typeInfo]`, or its `typeName` is empty.
+ */
 export function registerType(type: { [Symbol.typeInfo]: TypeInfo<any>, name: string }) {
     if (!type)
         throw new Error("registerType is called with null target!");
@@ -627,4 +696,8 @@ export function registerType(type: { [Symbol.typeInfo]: TypeInfo<any>, name: str
         throw new Error(`registerType is called on type "${type.name}", but it's typeInfo property does not have a typeName!`);
 }
 
+/**
+ * Marker interface used to include column transforms in generated row metadata.
+ * Implementations are generated server-side; this empty interface exists for typing only.
+ */
 export interface TransformInclude { }

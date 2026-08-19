@@ -33,4 +33,5 @@ After applying the fixes, build the project by running "npm run build" from the 
     }
 }
 
+/** Singleton registry for formatter types (keyed by full name and short name without `Formatter` suffix). */
 export const FormatterTypeRegistry = new FormatterTypeRegistryImpl();

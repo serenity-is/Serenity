@@ -10,30 +10,68 @@ import { QuickFilterBar } from "./quickfilterbar";
 import { QuickSearchField, QuickSearchInput } from "./quicksearchinput";
 import type { DataGridEvent } from "./datagrid";
 
+/**
+ * Minimal storage abstraction used for grid persistence.
+ * Implementations may be synchronous (localStorage) or asynchronous.
+ */
 export interface SettingStorage {
+    /**
+     * Retrieves a stored value by key.
+     * @param key - Storage key.
+     * @returns Stored value or a promise that resolves to it.
+     */
     getItem(key: string): string | Promise<string>;
+    /**
+     * Persists a value under the given key.
+     * @param key - Storage key.
+     * @param value - Value to store.
+     * @returns Void or a promise that resolves when the write completes.
+     */
     setItem(key: string, value: string): void | Promise<void>;
 }
 
+/**
+ * Persisted state for a single grid column.
+ */
 export interface PersistedGridColumn {
+    /** Column identifier (matches {@link Column.id}). */
     id: string;
+    /** Persisted width in pixels. */
     width?: number;
+    /** Sort order and direction; positive for ascending, negative for descending. */
     sort?: number;
+    /** Whether the column is visible. */
     visible?: boolean;
+    /** Frozen / pinned state of the column. */
     pin?: "start" | "end" | false;
 }
 
+/**
+ * Snapshot of grid state that can be persisted and later restored.
+ */
 export interface PersistedGridSettings {
+    /** Flags that indicate which parts of the settings were persisted. */
     flags?: GridPersistenceFlags;
+    /** Column state (order, width, visibility, pinning, sort). */
     columns?: PersistedGridColumn[];
+    /** Advanced filter panel items. */
     filterItems?: FilterLine[];
+    /** Quick filter widget states keyed by field name. */
     quickFilters?: { [key: string]: any };
+    /** Concatenated display text for active quick filters. */
     quickFilterText?: string;
+    /** Field selected in the quick search input. */
     quickSearchField?: QuickSearchField;
+    /** Text entered in the quick search input. */
     quickSearchText?: string;
+    /** Whether the include-deleted toggle was pressed. */
     includeDeleted?: boolean;
 }
 
+/**
+ * Flags controlling which parts of grid state are persisted.
+ * Unspecified flags fall back to {@link defaultGridPersistenceFlags}.
+ */
 export interface GridPersistenceFlags {
     /** Column pinning state. Defaults to persist unless explicitly set to false. */
     columnPinning?: boolean;
@@ -55,9 +93,12 @@ export interface GridPersistenceFlags {
     includeDeleted?: boolean;
 }
 
-/** @deprecated Use GridPersistenceFlags, this one has a typo in the name */
+/**
+ * @deprecated Use {@link GridPersistenceFlags}; retained for backwards compatibility (typo in original name).
+ */
 export type GridPersistanceFlags = GridPersistenceFlags;
 
+/** Default persistence flags; most grid state is persisted except transient search text. */
 export const defaultGridPersistenceFlags: GridPersistenceFlags = {
     columnPinning: true,
     columnWidths: true,
@@ -70,6 +111,7 @@ export const defaultGridPersistenceFlags: GridPersistenceFlags = {
     includeDeleted: true
 };
 
+/** Flags that disable persistence for every grid aspect. */
 export const omitAllGridPersistenceFlags: GridPersistenceFlags = {
     columnPinning: false,
     columnWidths: false,
@@ -81,6 +123,11 @@ export const omitAllGridPersistenceFlags: GridPersistenceFlags = {
     quickSearch: false,
     includeDeleted: false
 };
+/**
+ * Builds a {@link PersistedGridSettings} snapshot from the current grid state.
+ * @param opt - Context containing the grid, view, filter store and persistence flags.
+ * @returns Snapshot of the current grid settings.
+ */
 export function getCurrentSettings(this: void, opt: {
     filterStore: FilterStore,
     flags: GridPersistenceFlags,
@@ -190,6 +237,10 @@ export function getCurrentSettings(this: void, opt: {
     return settings;
 }
 
+/**
+ * Restores grid state from a previously persisted snapshot.
+ * @param opt - Context containing the grid, view, stores and the settings to restore.
+ */
 export function restoreSettingsFrom(this: void, opt: {
     canShowColumn?: (column: Column) => boolean,
     filterStore: FilterStore,
@@ -342,13 +393,23 @@ export function restoreSettingsFrom(this: void, opt: {
     }
 }
 
+/**
+ * Event arguments for grid persistence hooks (before/after persist and restore).
+ */
 export interface DataGridPersistenceEvent extends DataGridEvent {
+    /** Whether this is the after phase of the operation. */
     after: boolean;
+    /** Flags passed by the caller. */
     flagsArgument: GridPersistenceFlags;
+    /** Default flags for the grid type. */
     flagsDefault: GridPersistenceFlags;
+    /** Effective flags after merging argument and defaults. */
     flagsToUse: GridPersistenceFlags;
+    /** Settings being persisted or restored. */
     settings: PersistedGridSettings;
+    /** True while the grid is restoring settings. */
     readonly restoring: boolean;
+    /** True while the grid is persisting settings. */
     readonly persisting: boolean;
 }
 

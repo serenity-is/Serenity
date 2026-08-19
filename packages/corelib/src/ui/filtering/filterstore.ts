@@ -1,9 +1,16 @@
 ﻿import { classTypeInfo, Criteria, Culture, FilterPanelTexts, nsSerenity, registerType, tryGetText, type PropertyItem } from "../../base";
 import { FilterLine } from "./filterline";
 
+/**
+ * Stores filter lines for a grid and builds criteria and display text from them.
+ */
 export class FilterStore {
     static [Symbol.typeInfo] = classTypeInfo(nsSerenity); static { registerType(this); }
 
+    /**
+     * Creates a filter store.
+     * @param fields - The filterable fields.
+     */
     constructor(fields: PropertyItem[]) {
 
         this.items = [];
@@ -38,6 +45,11 @@ export class FilterStore {
         }
     }
 
+    /**
+     * Builds a criteria expression from a list of filter lines.
+     * @param items - The filter lines.
+     * @returns The criteria expression.
+     */
     static getCriteriaFor(items: FilterLine[]): any[] {
 
         if (items == null)
@@ -90,6 +102,11 @@ export class FilterStore {
         return criteria;
     }
 
+    /**
+     * Builds the display text for a list of filter lines.
+     * @param items - The filter lines.
+     * @returns The display text.
+     */
     static getDisplayTextFor(items: FilterLine[]): string {
 
         if (items == null)
@@ -131,35 +148,66 @@ export class FilterStore {
     declare private fieldByName: { [key: string]: PropertyItem }
     declare private items: FilterLine[];
 
+    /**
+     * Returns the filterable fields.
+     * @returns The fields.
+     */
     get_fields(): PropertyItem[] {
         return this.fields;
     }
 
+    /**
+     * Returns the fields by name.
+     * @returns The field map.
+     */
     get_fieldByName(): { [key: string]: PropertyItem } {
         return this.fieldByName;
     }
 
+    /**
+     * Returns the filter lines.
+     * @returns The filter lines.
+     */
     get_items(): FilterLine[] {
         return this.items;
     }
 
+    /**
+     * Notifies listeners that the store changed.
+     */
     raiseChanged(): void {
         this.displayText = null;
         this.changed?.forEach(h => h(this));
     }
 
+    /**
+     * Subscribes a listener to store changes.
+     * @param listener - The listener.
+     */
     add_changed(listener: (store: FilterStore) => void): void {
         listener && this.changed.push(listener);
     }
 
+    /**
+     * Unsubscribes a listener from store changes.
+     * @param listener - The listener.
+     */
     remove_changed(listener: (store: FilterStore) => void): void {
         this.changed = this.changed?.filter(h => h !== listener);
     }
 
+    /**
+     * Returns the active criteria for the current filter lines.
+     * @returns The criteria expression.
+     */
     get_activeCriteria(): any[] {
         return FilterStore.getCriteriaFor(this.items);
     }
 
+    /**
+     * Returns the display text for the current filter lines.
+     * @returns The display text.
+     */
     get_displayText(): string {
         if (this.displayText == null)
             this.displayText = FilterStore.getDisplayTextFor(this.items);

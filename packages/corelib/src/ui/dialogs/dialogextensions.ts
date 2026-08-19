@@ -1,8 +1,19 @@
 ﻿import { DialogTexts, faIcon, getjQuery, nsSerenity } from "../../base";
 import { Widget, WidgetProps } from "../widgets/widget";
 
+/**
+ * Helper functions for extending jQuery UI dialogs.
+ */
 export namespace DialogExtensions {
 
+    /**
+     * Makes a jQuery UI dialog resizable and applies optional size constraints.
+     * @param dialog - The dialog element or jQuery collection.
+     * @param w - Optional width.
+     * @param h - Optional height.
+     * @param mw - Optional minimum width.
+     * @param mh - Optional minimum height.
+     */
     export function dialogResizable(dialog: HTMLElement | ArrayLike<HTMLElement>, w?: any, h?: any, mw?: any, mh?: any): void {
         let $ = getjQuery();
         if (!$)
@@ -25,6 +36,10 @@ export namespace DialogExtensions {
         }
     }
 
+    /**
+     * Adds a maximize button to a jQuery UI dialog.
+     * @param dialog - The dialog element or jQuery collection.
+     */
     export function dialogMaximizable(dialog: HTMLElement | ArrayLike<HTMLElement>): void {
         if (!getjQuery())
             return;
@@ -34,8 +49,13 @@ export namespace DialogExtensions {
     }
 }
 
+/**
+ * Options for the {@link UIDialogMaximizer} widget.
+ */
 export interface UIDialogMaximizerProps {
+    /** Whether double-clicking the title bar toggles maximize. */
     dblclick?: boolean;
+    /** Whether to show the maximize/restore buttons. */
     showButton?: boolean;
 }
 
@@ -47,6 +67,7 @@ export interface UIDialogMaximizerProps {
 export class UIDialogMaximizer extends Widget<UIDialogMaximizerProps> {
     static override [Symbol.typeInfo] = this.registerClass(nsSerenity);
 
+    /** Default options for the maximizer. */
     static readonly defaults: UIDialogMaximizerProps = {
         dblclick: true,
         showButton: true
@@ -55,6 +76,10 @@ export class UIDialogMaximizer extends Widget<UIDialogMaximizerProps> {
     private maximized: boolean;
     private snapshot: any;
 
+    /**
+     * Creates a maximizer for the dialog containing the given element.
+     * @param props - Widget props including the dialog element.
+     */
     constructor(props: WidgetProps<UIDialogMaximizerProps>) {
         super({ ...UIDialogMaximizer.defaults, ...props });
         const $ = getjQuery();
@@ -89,7 +114,10 @@ export class UIDialogMaximizer extends Widget<UIDialogMaximizerProps> {
             button.appendTo(titlebar);
     }
 
-    /** Returns the current state, e.g. "normal" or "maximized" */
+    /**
+     * Returns the current state, e.g. "normal" or "maximized".
+     * @returns True when the dialog is maximized.
+     */
     get isMaximized(): boolean {
         return !!this.maximized;
     }
@@ -103,6 +131,9 @@ export class UIDialogMaximizer extends Widget<UIDialogMaximizerProps> {
         this.snapshot?.config?.resizable && uiDialog.triggerHandler("resize");
     }
 
+    /**
+     * Maximizes the dialog to fill the window.
+     */
     maximize(): void {
         let $ = getjQuery();
         let newHeight = $(window).height() - 1;
@@ -127,6 +158,9 @@ export class UIDialogMaximizer extends Widget<UIDialogMaximizerProps> {
         this.setMaximized(true);
     }
 
+    /**
+     * Restores the dialog to its previous size and position.
+     */
     restore(): void {
         this.restoreSnapshot();
         this.setMaximized(false);

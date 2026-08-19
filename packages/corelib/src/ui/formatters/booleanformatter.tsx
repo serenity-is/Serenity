@@ -2,9 +2,23 @@ import { FormatterContext, FormatterResult } from "@serenity-is/sleekgrid";
 import { DialogTexts, formatterTypeInfo, iconClassName, IconClassName, localText, nsSerenity, registerType } from "../../base";
 import { Formatter } from "../../slick";
 
+/**
+ * Renders a boolean value as localized text and/or an icon.
+ * Falls back to `DialogTexts.YesButton` / `NoButton` when no explicit texts are provided.
+ */
 export class BooleanFormatter implements Formatter {
     static [Symbol.typeInfo] = formatterTypeInfo(nsSerenity); static { registerType(this); }
 
+    /**
+     * @param props.falseText - Text for `false` values.
+     * @param props.falseIcon - Icon class for `false` values.
+     * @param props.nullText - Text for `null` values.
+     * @param props.nullIcon - Icon class for `null` values.
+     * @param props.trueText - Text for `true` values.
+     * @param props.trueIcon - Icon class for `true` values.
+     * @param props.showText - Whether to show text alongside icon (default `true`).
+     * @param props.showHint - Whether to show text as `title` hint.
+     */
     constructor(public readonly props: {
         falseText?: string,
         falseIcon?: IconClassName,
@@ -18,6 +32,11 @@ export class BooleanFormatter implements Formatter {
         this.props ??= {};
     }
 
+    /**
+     * Formats the boolean value for display.
+     * @param ctx - Formatter context with value/item/column.
+     * @returns Text, icon, or combined span per `props`.
+     */
     format(ctx: FormatterContext): FormatterResult {
 
         const text = ctx.value == null ?

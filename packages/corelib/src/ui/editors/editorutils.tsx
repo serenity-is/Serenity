@@ -5,8 +5,16 @@ import { type Widget } from "../widgets/widget";
 import { tryGetWidget } from "../widgets/widgetutils";
 import { Combobox } from "./combobox";
 
+/**
+ * Utility functions for working with editor widgets.
+ */
 export namespace EditorUtils {
 
+    /**
+     * Returns the display text of an editor's current value.
+     * @param editor - The editor widget.
+     * @returns The display text.
+     */
     export function getDisplayText(editor: Widget<any>): string {
 
         var combobox = Combobox.getInstance(editor.domNode);
@@ -36,12 +44,23 @@ export namespace EditorUtils {
 
     var dummy: PropertyItem = { name: '_' };
 
+    /**
+     * Returns the current value of an editor.
+     * @param editor - The editor widget.
+     * @returns The value.
+     */
     export function getValue(editor: Widget<any>): any {
         var target: Record<string, any> = {};
         saveValue(editor, dummy, target);
         return target['_'];
     }
 
+    /**
+     * Saves an editor's value into a target object.
+     * @param editor - The editor widget.
+     * @param item - The property item.
+     * @param target - The target object.
+     */
     export function saveValue(editor: Widget<any>, item: PropertyItem, target: any): void {
 
         var getEditValue = safeCast(editor, IGetEditValue);
@@ -81,11 +100,22 @@ export namespace EditorUtils {
         }
     }
 
+    /**
+     * Sets the value of an editor.
+     * @param editor - The editor widget.
+     * @param value - The value to set.
+     */
     export function setValue(editor: Widget<any>, value: any): void {
         var source = { _: value };
         loadValue(editor, dummy, source);
     }
 
+    /**
+     * Loads a value from a source object into an editor.
+     * @param editor - The editor widget.
+     * @param item - The property item.
+     * @param source - The source object.
+     */
     export function loadValue(editor: Widget<any>, item: PropertyItem, source: any): void {
 
         var setEditValue = safeCast(editor, ISetEditValue);
@@ -187,6 +217,11 @@ export namespace EditorUtils {
      */
     export const setReadOnly = setReadonly;
 
+    /**
+     * Sets the required state of an editor.
+     * @param widget - The editor widget.
+     * @param isRequired - Whether the field is required.
+     */
     export function setRequired(widget: Widget<any>, isRequired: boolean): void {
         var req = safeCast(widget, IValidateRequired);
         if (req != null) {
@@ -207,6 +242,11 @@ export namespace EditorUtils {
         }
     }
 
+    /**
+     * Sets all editors within a container to read-only.
+     * @param container - The container element.
+     * @param readOnly - Whether to enable read-only mode.
+     */
     export function setContainerReadOnly(container: ArrayLike<HTMLElement> | HTMLElement, readOnly: boolean) {
 
         container = isArrayLike(container) ? container[0] : container;

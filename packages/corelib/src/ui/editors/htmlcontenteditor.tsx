@@ -6,16 +6,26 @@ import { LazyLoadHelper } from "../helpers/lazyloadhelper";
 import { EditorProps, EditorWidget } from "./editorwidget";
 import { defaultTiptapFileHandlerConfig, getAllTiptapExtensions, getTiptapContent, TiptapToolbar, type TiptapModule, type TiptapToolbarHiddenOption } from "./htmlcontenteditor-tiptap";
 
+/** The HTML editor provider to use. */
 export type HtmlContentEditorProvider = "ckeditor" | "tiptap";
 
 export type { TiptapModule, TiptapToolbarHiddenOption } from "./htmlcontenteditor-tiptap";
 
+/**
+ * Options for the {@link HtmlContentEditor}.
+ */
 export interface HtmlContentEditorOptions {
+    /** Number of columns. */
     cols?: number;
+    /** Number of rows. */
     rows?: number;
+    /** The editor provider to use. */
     editorProvider?: HtmlContentEditorProvider;
 }
 
+/**
+ * Configuration for the CKEditor instance.
+ */
 export interface CKEditorConfig {
 }
 
@@ -23,6 +33,10 @@ export interface CKEditorConfig {
 // via an import map or if in future if we do, this will load that
 const tiptapModuleName = "@serenity-is/tiptap";
 
+/**
+ * An editor that renders rich HTML content using CKEditor or Tiptap.
+ * @typeParam P - Widget props type.
+ */
 export class HtmlContentEditor<P extends HtmlContentEditorOptions = HtmlContentEditorOptions> extends EditorWidget<P>
     implements IStringValue, IReadOnly {
     static override[Symbol.typeInfo] = this.registerEditor(nsSerenity, [IStringValue, IReadOnly]);
@@ -30,6 +44,7 @@ export class HtmlContentEditor<P extends HtmlContentEditorOptions = HtmlContentE
     declare private _ckInstanceReady: boolean;
     declare readonly domNode: HTMLTextAreaElement;
 
+    /** The Tiptap module loader. */
     static tiptapModule: TiptapModule | (() => (TiptapModule | Promise<TiptapModule>)) = async () => {
         try {
             return await import(`${tiptapModuleName}`);
@@ -43,11 +58,17 @@ export class HtmlContentEditor<P extends HtmlContentEditorOptions = HtmlContentE
 
     static override createDefaultElement() { return document.createElement("textarea"); }
 
+    /** Default editor provider. */
     static defaultEditorProvider: HtmlContentEditorProvider;
 
+    /** Default options for the editor. */
     static readonly defaultOptions: Partial<HtmlContentEditorOptions> = {
     };
 
+    /**
+     * Creates an HTML content editor.
+     * @param props - Widget props.
+     */
     constructor(props: EditorProps<P>) {
         super({
             editorProvider: HtmlContentEditor.defaultEditorProvider,
@@ -133,6 +154,10 @@ export class HtmlContentEditor<P extends HtmlContentEditorOptions = HtmlContentE
         }
     }
 
+    /**
+     * Handles the CKEditor instance-ready event.
+     * @param x - The CKEditor event.
+     */
     protected handleCKInstanceReady(x: any): void {
         this._ckInstanceReady = true;
 
@@ -146,6 +171,10 @@ export class HtmlContentEditor<P extends HtmlContentEditorOptions = HtmlContentE
         x.editor.setReadOnly(this.get_readOnly());
     }
 
+    /**
+     * Handles the CKEditor change event.
+     * @param e - The CKEditor event.
+     */
     protected handleCKEditorChange(e: any): void {
         e.editor.updateElement();
         Fluent.trigger(this.domNode, "change");
@@ -160,10 +189,18 @@ export class HtmlContentEditor<P extends HtmlContentEditorOptions = HtmlContentE
         }
     }
 
+    /**
+     * Handles the CKEditor key event.
+     * @param e - The CKEditor event.
+     */
     protected handleCKKey(e: any): void {
         this.triggerKeyupEvent = e?.data?.domEvent?.$;
     }
 
+    /**
+     * Returns the CKEditor language code.
+     * @returns The language code.
+     */
     protected getCKEditorLanguage(): string {
         if (!(window as any)['CKEDITOR'])
             return 'en';
@@ -190,6 +227,10 @@ export class HtmlContentEditor<P extends HtmlContentEditorOptions = HtmlContentE
         return this.getCKEditorConfig();
     }
 
+    /**
+     * Returns the CKEditor configuration.
+     * @returns The CKEditor config.
+     */
     protected getCKEditorConfig(): CKEditorConfig {
         const boundThis = bindThis(this);
 
@@ -240,11 +281,20 @@ export class HtmlContentEditor<P extends HtmlContentEditorOptions = HtmlContentE
         };
     }
 
+    /**
+     * Returns the CKEditor instance for this editor.
+     * @returns The CKEditor instance.
+     */
     protected getCKEditorInstance() {
         const id = this.domNode.getAttribute("id");
         return (window as any)['CKEDITOR']?.instances?.[id];
     }
 
+    /**
+     * Configures a Tiptap extension.
+     * @param extension - The extension to configure.
+     * @returns The configured extension.
+     */
     protected configureTiptapExtension(extension: any): any {
         if (!extension || !extension.name)
             return extension;
@@ -262,20 +312,38 @@ export class HtmlContentEditor<P extends HtmlContentEditorOptions = HtmlContentE
         return extension;
     }
 
+    /**
+     * Returns the Tiptap extensions for this editor.
+     * @param tiptap - The Tiptap module.
+     * @returns The extensions.
+     */
     protected getTiptapExtensions(tiptap: TiptapModule): any[] {
         return getAllTiptapExtensions(tiptap);
     }
 
+    /**
+     * Creates the Tiptap toolbar.
+     * @param editor - The Tiptap editor.
+     * @param hidden - Hidden toolbar options.
+     * @returns The toolbar element.
+     */
     protected createTiptapToolbar(editor: any, hidden: TiptapToolbarHiddenOption): HTMLElement {
         return <TiptapToolbar editor={editor} hidden={hidden} /> as HTMLElement;
     }
 
-    /** Can be overridden to hide some buttons even though they are registered in extensions */
+    /**
+     * Returns the hidden Tiptap toolbar options.
+     * @param editor - The Tiptap editor.
+     * @returns The hidden options.
+     */
     protected getTiptapToolbarHidden(editor: any): TiptapToolbarHiddenOption {
         return {
         };
     }
 
+    /**
+     * Cleans up the editor instance.
+     */
     override destroy(): void {
         if (this.editorProvider === "ckeditor") {
             const ckInstance = this.getCKEditorInstance();
@@ -288,6 +356,10 @@ export class HtmlContentEditor<P extends HtmlContentEditorOptions = HtmlContentE
         super.destroy();
     }
 
+    /**
+     * Returns the current HTML value.
+     * @returns The HTML value.
+     */
     get_value(): string {
         if (this.tiptapEditor) {
             return sanitizeHtml(getTiptapContent(this.tiptapEditor));
@@ -301,10 +373,18 @@ export class HtmlContentEditor<P extends HtmlContentEditorOptions = HtmlContentE
         return sanitizeHtml(this.domNode?.value);
     }
 
+    /**
+     * Returns the current HTML value.
+     * @returns The HTML value.
+     */
     get value(): string {
         return this.get_value();
     }
 
+    /**
+     * Sets the HTML value.
+     * @param value - The HTML value to set.
+     */
     set_value(value: string): void {
         value = sanitizeHtml(value ?? '');
 
@@ -322,14 +402,23 @@ export class HtmlContentEditor<P extends HtmlContentEditorOptions = HtmlContentE
         }
     }
 
+    /** Sets the HTML value. */
     set value(v: string) {
         this.set_value(v);
     }
 
+    /**
+     * Returns whether the editor is read-only.
+     * @returns True when read-only.
+     */
     get_readOnly(): boolean {
         return !!this.domNode.getAttribute("disabled");
     }
 
+    /**
+     * Sets whether the editor is read-only.
+     * @param value - True to enable read-only mode.
+     */
     set_readOnly(value: boolean) {
 
         if (this.get_readOnly() !== value) {
@@ -353,9 +442,15 @@ export class HtmlContentEditor<P extends HtmlContentEditorOptions = HtmlContentE
         }
     }
 
+    /** CKEditor version to load. */
     static CKEditorVer = "4.22.1";
+    /** Base path for CKEditor assets. */
     static CKEditorBasePath: string;
 
+    /**
+     * Returns the base path for CKEditor assets.
+     * @returns The base path.
+     */
     static getCKEditorBasePath(): string {
         var path = HtmlContentEditor.CKEditorBasePath;
         if (path == null) {
@@ -369,6 +464,10 @@ export class HtmlContentEditor<P extends HtmlContentEditorOptions = HtmlContentE
         return path.endsWith('/') ? path : path + '/';
     }
 
+    /**
+     * Includes the CKEditor script and invokes the callback when loaded.
+     * @param then - Callback invoked when CKEditor is available.
+     */
     static includeCKEditor(then: () => void): void {
         if ((window as any)['CKEDITOR']) {
             return then();
@@ -384,6 +483,10 @@ export class HtmlContentEditor<P extends HtmlContentEditorOptions = HtmlContentE
             </script>);
     };
 
+    /**
+     * Returns the active editor provider.
+     * @returns The editor provider.
+     */
     get editorProvider(): HtmlContentEditorProvider {
         return this.domNode?.dataset?.editorProvider as HtmlContentEditorProvider ?? null;
     }

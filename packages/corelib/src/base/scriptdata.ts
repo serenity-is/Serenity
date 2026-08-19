@@ -45,16 +45,18 @@ export function getScriptDataHash(name: string, reload?: boolean): string {
 }
 
 /**
- * Hook for script data related operations
+ * Global hooks for script-data loading.
+ * Allows tests or custom bootstrapping to intercept `fetchScriptData` / `ensureScriptDataSync`.
+ * When the hook returns `undefined` the default `fetch` / XHR implementation is used.
  */
 export const scriptDataHooks = {
     /**
-     * Provides a hook to override the default fetchScriptData implementation,
-     * it falls back to the default implementation if undefined is returned.
-     * It is recommended to use this hook mainly for test purposes.
-     * If the sync parameter is true (legacy/compat), then the result should be returned synchronously.
-     * DynJS parameter is true if the script is requested to be loaded via a dynamic script,
-     * and not a JSON request. This parameter is only true for the legacy/compat sync mode.
+     * Override for script-data fetching.
+     * Return a value / promise to short-circuit the default loader, or `undefined` to fall back.
+     * @param name - Dynamic script name (e.g. `"Lookup.MyLookup"`, `"Form.MyForm"`).
+     * @param sync - When true the caller expects a synchronous result (legacy compat path). The hook must return data directly, not a promise.
+     * @param dynJS - When true the script was requested as a legacy `DynJS.axd` JavaScript payload rather than JSON. Only relevant when `sync` is true.
+     * @returns The script data directly (sync) or a promise of it, or `undefined` to use the default fetch.
      */
     fetchScriptData: void 0 as <TData>(name: string, sync?: boolean, dynJS?: boolean) => TData | Promise<TData>
 }
@@ -62,9 +64,12 @@ export const scriptDataHooks = {
 let fetchPromises: { [key: string]: Promise<any> } = {}
 
 /**
- * Fetches a script data with given name via ~/DynamicData endpoint
- * @param name Dynamic script name
- * @returns A promise that will return data if successfull
+ * Fetches a dynamic script payload by name via the `~/DynamicData/` endpoint.
+ * Results are de-duplicated per `name + hash` while a request is in flight and the request
+ * participates in global AJAX / block-UI tracking. Lookup payloads are wrapped as {@link Lookup} instances.
+ * @typeParam TData - Expected shape of the returned payload.
+ * @param name - Dynamic script name (e.g. `"Lookup.Administration.User"`, `"Form.MyForm"`, `"RemoteData.MyData"`).
+ * @returns A promise that resolves with the parsed payload, or rejects if fetch is unavailable or the HTTP request fails.
  */
 export function fetchScriptData<TData>(name: string): Promise<TData> {
 
@@ -126,11 +131,11 @@ export function fetchScriptData<TData>(name: string): Promise<TData> {
 }
 
 /**
- * Returns the script data from cache if available, or via a fetch
- * request to ~/DynamicData endpoint
- * @param name 
- * @param reload Clear cache and force reload
- * @returns 
+ * Returns cached script data if available, otherwise fetches it via `~/DynamicData/` and caches the result.
+ * @typeParam TData - Expected payload type.
+ * @param name - Dynamic script name.
+ * @param reload - When true, busts the hash cache, clears the in-memory entry and forces a fresh fetch.
+ * @returns A promise resolving to the script data.
  */
 export async function getScriptData<TData = any>(name: string, reload?: boolean): Promise<TData> {
     let data: any;
@@ -147,11 +152,13 @@ export async function getScriptData<TData = any>(name: string, reload?: boolean)
 }
 
 /**
- * Synchronous version of getScriptData for compatibility. Avoid this one where possible, 
- * as it will block the UI thread.
- * @param name 
- * @param dynJS 
- * @returns 
+ * Synchronous (blocking) version of {@link getScriptData} for legacy compatibility.
+ * Avoid in new code — it performs a synchronous XHR and blocks the UI thread.
+ * @typeParam TData - Expected payload type.
+ * @param name - Dynamic script name.
+ * @param dynJS - When true loads via `~/DynJS.axd/*.js` and evaluates the returned script instead of JSON. Legacy path only.
+ * @returns The script data (wrapped as {@link Lookup} for `Lookup.*` keys).
+ * @throws If the hook returns a promise in sync mode or the HTTP request fails.
  */
 export function ensureScriptDataSync<TData = any>(name: string, dynJS?: boolean): TData {
     let data = peekScriptData(name);
@@ -200,42 +207,48 @@ export function ensureScriptDataSync<TData = any>(name: string, dynJS?: boolean)
 }
 
 /**
- * Gets or loads a [ColumnsScript] data 
- * @param key Form key
- * @returns A property items data object containing items and additionalItems properties
+ * Loads a `ColumnsScript` bundle for the given key.
+ * @param key - Columns key (usually the row type name, e.g. `"Administration.User"`).
+ * @returns A promise resolving to a {@link PropertyItemsData} containing `items` and `additionalItems` for grid columns.
  */
 export function getColumnsScript(key: string): Promise<PropertyItemsData> {
     return getScriptData<PropertyItemsData>('Columns.' + key);
 }
 
 /**
- * Gets or loads a [FormScript] data 
- * @param key Form key
- * @returns A property items data object containing items and additionalItems properties
+ * Loads a `FormScript` bundle for the given key.
+ * @param key - Form key (usually the row/form type name, e.g. `"Administration.User"`).
+ * @returns A promise resolving to a {@link PropertyItemsData} describing the form fields.
  */
 export function getFormScript(key: string): Promise<PropertyItemsData> {
     return getScriptData<PropertyItemsData>('Form.' + key);
 }
 
 /**
- * Gets or loads a Lookup
- * @param key Lookup key
+ * Loads a lookup by key.
+ * @typeParam TItem - Row type of the lookup items.
+ * @param key - Lookup key as registered server-side via `[LookupScript]` (e.g. `"Administration.User"`).
+ * @returns A promise resolving to the {@link Lookup} instance.
  */
 export function getLookupAsync<TItem>(key: string): Promise<Lookup<TItem>> {
     return getScriptData<Lookup<TItem>>('Lookup.' + key);
 }
 
 /**
- * Gets or loads a [RemoteData]
- * @param key Remote data key
+ * Loads a `RemoteData` script by key.
+ * @typeParam TData - Expected payload type.
+ * @param key - Remote data key as registered server-side via `[RemoteDataScript]`.
+ * @returns A promise resolving to the remote data payload.
  */
 export function getRemoteDataAsync<TData = any>(key: string): Promise<TData> {
     return getScriptData<TData>('RemoteData.' + key);
 }
 
 /**
- * Synchronous version of getRemoteDataAsync for compatibility
- * @param key Remote data key
+ * Synchronous version of {@link getRemoteDataAsync} for legacy compatibility. Blocks the UI thread.
+ * @typeParam TData - Expected payload type.
+ * @param key - Remote data key.
+ * @returns The remote data payload.
  */
 export function getRemoteData<TData = any>(key: string): TData {
     return ensureScriptDataSync('RemoteData.' + key);
@@ -295,20 +308,31 @@ export function handleScriptDataError(name: string, status?: number, statusText?
     return message;
 }
 
+/**
+ * Returns cached script data without triggering a fetch.
+ * @param name - Dynamic script name.
+ * @returns The cached value or `undefined` if not loaded yet.
+ */
 export function peekScriptData(name: string): any {
     return getGlobalObject()[scriptDataSymbol]?.[name];
 }
 
 /**
- * Forces reload of a lookup from the server. Note that only the
- * client side cache is cleared. This does not force reloading in the server-side.
- * @param key Lookup key
- * @returns Lookup
+ * Forces a reload of a lookup from the server, bypassing the client-side cache.
+ * Note this only clears the browser cache entry; it does not invalidate server-side caches.
+ * @typeParam TItem - Row type of the lookup items.
+ * @param key - Lookup key to reload.
+ * @returns A promise resolving to the freshly loaded {@link Lookup}.
  */
 export async function reloadLookupAsync<TItem = any>(key: string): Promise<Lookup<TItem>> {
     return await getScriptData('Lookup.' + key, true);
 }
 
+/**
+ * Seeds or updates the known script hashes (normally populated from the `RegisteredScripts` script tag).
+ * Useful in tests or when bootstrapping hashes manually.
+ * @param scripts - Map of script name to hash string. Falsy hash values are replaced with the current timestamp.
+ */
 export function setRegisteredScripts(scripts: Record<string, string>) {
     const t = new Date().getTime().toString();
     let scriptDataHash = getGlobalObject()[scriptDataHashSymbol];
@@ -319,6 +343,11 @@ export function setRegisteredScripts(scripts: Record<string, string>) {
     }
 }
 
+/**
+ * Stores a script data value in the in-memory cache and dispatches a `scriptdatachange.<name>` DOM event.
+ * @param name - Dynamic script name.
+ * @param value - Value to cache (use `undefined` to clear).
+ */
 export function setScriptData(name: string, value: any) {
     let scriptDataStore = getGlobalObject()[scriptDataSymbol];
     if (!scriptDataStore)

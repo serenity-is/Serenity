@@ -8,12 +8,18 @@ declare module "@serenity-is/sleekgrid" {
     }
 }
 
+/** Formatting helpers for aggregate / group-totals rows. */
 export namespace AggregateFormatting {
 
     const contentOnly = {
         contentOnly: true
     };
 
+    /**
+     * Formats a group totals cell (aggregate badge/value) based on the column's summaryType.
+     * @param ctx - Formatter context containing group totals item and column.
+     * @returns Rendered aggregate markup or empty string.
+     */
     export function groupTotalsFormat(ctx: FormatterContext<IGroupTotals>): FormatterResult {
         const totals = ctx.item as any;
         const column = ctx.column;

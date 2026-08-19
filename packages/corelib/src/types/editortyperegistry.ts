@@ -32,4 +32,5 @@ After applying the fixes, build the project by running "npm run build" from the 
     }
 }
 
+/** Singleton registry for editor types (keyed by full name and short name without `Editor` suffix). */
 export const EditorTypeRegistry = new EditorTypeRegistryImpl();

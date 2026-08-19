@@ -2,6 +2,7 @@
 import { PropertyItem } from "../base";
 import { IAggregator } from "./aggregators";
 
+/** Formatter function type that maps a formatter context to a result. @typeParam TItem - Row item type. */
 export type Format<TItem = any> = (ctx: FormatterContext<TItem>) => FormatterResult;
 
 declare module "@serenity-is/sleekgrid" {
@@ -17,46 +18,72 @@ declare module "@serenity-is/sleekgrid" {
     }
 }
 
+/** Legacy formatter contract. Prefer {@link Format}. */
 export interface Formatter {
+    /** Formats a cell value. @param ctx - Formatter context with item/column/value/grid. @returns Formatted result. */
     format(ctx: FormatterContext): FormatterResult;
 }
 
+/** Configuration for a single grouping level. */
 export interface GroupInfo<TItem> {
+    /** Field name or getter for the group value. */
     getter?: string | ((item: TItem) => any);
+    /** True if `getter` is a function. */
     getterIsAFn?: boolean;
     /** 
-     * The format function for the group value. Note that the group item is in ctx.item and its value 
-     * is in ctx.item.value, not in ctx.value as it is set by the grid to ctx.item["__groupdisplaycolumnfield__"]
-     * so never use or rely on ctx.value here!
+     * Formats the group header. Note: group value is in `ctx.item.value`, not `ctx.value`.
+     * @param ctx - Formatter context for the group row.
+     * @returns Formatter result.
      */
     format?: (ctx: FormatterContext<Group<TItem>>) => FormatterResult;
-    /** @deprecated use format */
+    /** @deprecated Use `format` instead. @param group - Group object. @returns Formatted group title. */
     formatter?: (group: Group<TItem>) => string;
+    /** Comparator for group ordering. @param a - First group. @param b - Second group. @returns Negative / zero / positive. */
     comparer?: (a: Group<TItem>, b: Group<TItem>) => number;
+    /** Aggregators applied to this group level. */
     aggregators?: IAggregator[];
+    /** Whether to aggregate child groups as well. */
     aggregateChildGroups?: boolean;
+    /** Whether collapsed groups still show aggregates. */
     aggregateCollapsed?: boolean;
+    /** Whether empty groups still show aggregates. */
     aggregateEmpty?: boolean;
+    /** True if groups start collapsed. */
     collapsed?: boolean;
+    /** True to render a totals row for this level. */
     displayTotalsRow?: boolean;
+    /** True to calculate totals lazily. */
     lazyTotalsCalculation?: boolean;
+    /** Predefined group values to ensure groups exist even without data. */
     predefinedValues?: any[];
 }
 
+/** Options for the slick pager control. */
 export interface PagerOptions {
+    /** Data view instance. */
     view?: any;
+    /** Whether to show rows-per-page selector. */
     showRowsPerPage?: boolean;
+    /** Current rows per page. */
     rowsPerPage?: number;
+    /** Choices for rows-per-page selector. */
     rowsPerPageOptions?: number[],
+    /** Callback when page changes. @param newPage - New page index (1-based). */
     onChangePage?: (newPage: number) => void;
+    /** Callback when rows-per-page changes. @param n - New rows-per-page value. */
     onRowsPerPageChange?: (n: number) => void;
 }
 
+/** Aggregator configuration for view-level summaries. */
 export interface SummaryOptions {
+    /** Aggregators used for grand totals. */
     aggregators: IAggregator[];
 }
 
+/** Paging state for a remote/slick data view. */
 export interface PagingOptions {
+    /** Rows per page. */
     rowsPerPage?: number;
+    /** Current page (1-based). */
     page?: number;
 }

@@ -2,14 +2,29 @@
 import { getjQuery, isBS3, isBS5Plus } from "./environment";
 import { isArrayLike } from "./system";
 
+/**
+ * Options for initializing a Bootstrap/jQuery tooltip.
+ */
 export interface TooltipOptions {
+    /** Text shown inside the tooltip. */
     title?: string;
+    /** Trigger events (e.g. `"hover focus"`, `"click"`). Defaults vary by implementation. */
     trigger?: string;
 }
 
+/**
+ * Thin wrapper around Bootstrap / jQuery tooltip plugins with a fallback to the native
+ * `title` attribute. Handles instance reuse, cleanup, and title updates.
+ */
 export class Tooltip {
     declare private el: HTMLElement;
 
+    /**
+     * Creates or wraps a tooltip for an element.
+     * @param el - Target element or array-like collection (first element is used).
+     * @param opt - Tooltip options; if omitted defaults are applied.
+     * @param create - When `true` (default) creates a tooltip if none exists; when `false` only wraps an existing instance.
+     */
     public constructor(el: ArrayLike<HTMLElement> | HTMLElement, opt?: TooltipOptions);
     public constructor(el: ArrayLike<HTMLElement> | HTMLElement, opt?: TooltipOptions, create = true) {
         this.el = isArrayLike(el) ? el[0] : el;
@@ -34,10 +49,14 @@ export class Tooltip {
         }
     }
 
+    /** Default options applied when none are supplied. */
     static defaults: TooltipOptions = {
         trigger: "click hover"
     }
 
+    /**
+     * Disposes the underlying tooltip instance and clears internal Bootstrap state.
+     */
     dispose(): void {
         let instance = Tooltip.existingInstance(this.el);
         if (!instance)
@@ -48,10 +67,18 @@ export class Tooltip {
         instance._element = document.createElement('noscript'); // placeholder with no behavior
     }
 
+    /**
+     * Disposes the tooltip after a delay.
+     * @param delay - Delay in milliseconds before disposing. Defaults to `5000`.
+     */
     delayedDispose(delay: number = 5000) {
         setTimeout(bindThis(this).dispose, delay);
     }
 
+    /**
+     * Hides the tooltip after a delay.
+     * @param delay - Delay in milliseconds before hiding. Defaults to `5000`.
+     */
     delayedHide(delay: number = 5000): void {
         setTimeout(bindThis(this).hide, delay);
     }
@@ -69,6 +96,11 @@ export class Tooltip {
         return null;
     }
 
+    /**
+     * Gets the existing tooltip wrapper for an element, if any.
+     * @param el - Target element or array-like collection.
+     * @returns A `Tooltip` wrapper around the existing instance, or `null` if none exists.
+     */
     static getInstance(el: ArrayLike<HTMLElement> | HTMLElement): Tooltip {
         let instance = Tooltip.existingInstance(isArrayLike(el) ? el[0] : el);
         if (!instance)
@@ -77,11 +109,19 @@ export class Tooltip {
         return new (Tooltip as any)(el, null, false);
     }
 
+    /**
+     * Whether a tooltip implementation (Bootstrap or jQuery) is available in the current environment.
+     */
     static get isAvailable(): boolean {
         return !!((typeof bootstrap !== "undefined" && (bootstrap as any).Tooltip) ||
             getjQuery()?.fn?.tooltip);
     }
 
+    /**
+     * Updates the tooltip title text and synchronizes it with the underlying implementation.
+     * @param value - New title text.
+     * @returns This instance for chaining.
+     */
     setTitle(value: string): Tooltip {
         if (!this.el)
             return this;
@@ -100,6 +140,11 @@ export class Tooltip {
         return this;
     }
 
+    /**
+     * Shows or hides the tooltip.
+     * @param show - `true` to show, `false` to hide.
+     * @returns This instance for chaining.
+     */
     toggle(show: boolean): Tooltip {
         if (!this.el)
             return this;
@@ -112,10 +157,18 @@ export class Tooltip {
         return this;
     }
 
+    /**
+     * Hides the tooltip.
+     * @returns This instance for chaining.
+     */
     hide(): Tooltip {
         return this.toggle(false);
     }
 
+    /**
+     * Shows the tooltip.
+     * @returns This instance for chaining.
+     */
     show(): Tooltip {
         return this.toggle(true);
     }

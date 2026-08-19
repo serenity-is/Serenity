@@ -6,83 +6,122 @@ import { notifyError } from "./notify";
 import { getCookie, isSameOrigin, resolveUrl } from "./services";
 import { isArrayLike } from "./system";
 
+/**
+ * Options controlling file selection, drag-and-drop, batching, and event callbacks for {@link Uploader}.
+ */
 export interface UploaderOptions {
-    /** Accept. If not specified, read from the passed input  */
+    /** MIME / extension filter (e.g. `"image/*,.pdf"`). Falls back to the `accept` attribute of {@link UploaderOptions.input} when omitted. */
     accept?: string;
-    /** Auto clear input value after selection, so when same file selected it works. Default is true */
+    /** When `true` (default) clears the input value after handling the change event so re-selecting the same file re-triggers the handler. */
     autoClear?: boolean;
-    /** Only used for multiple, default is 1 to upload multiple files in batches of size 1 */
+    /** Number of files per batch when `multiple` is enabled. Defaults to `1`. Larger values upload files in groups. */
     batchSize?: number;
-    /** An optional list of dropzones. */
+    /** One or more elements that act as drag-and-drop targets. */
     dropZone?: HTMLElement | ArrayLike<HTMLElement>;
-    /** Progress event that is called before first batch start is about to be uploaded */
+    /** Called once before the first batch starts uploading. */
     allStart?: () => void;
-    /** Progress event that is called after last batch is ended uploading or failed */
+    /** Called once after the last batch completes or fails. */
     allStop?: () => void;
-    /** Progress event that is called when a batch is about to be uploaded */
+    /** Called when an individual batch is about to be uploaded. */
     batchStart?: (data: { batch: UploaderBatch }) => void;
-    /** Progress event that is called when a batch is ended uploading or failed */
+    /** Called when an individual batch finishes uploading or fails. */
     batchStop?: (data: { batch: UploaderBatch }) => void;
-    /** Called after batch is uploaded successfully */
+    /** Called after a batch uploads successfully. */
     batchSuccess?: (data: UploaderSuccessData) => void;
-    /** Progress event that is called during upload */
+    /** Called periodically with upload progress for the current batch. */
     batchProgress?: (data: { batch: UploaderBatch, loaded: number; total: number }) => void;
-    /** Callback to handle a batch. If not specified, a default handler is used. */
+    /** Custom handler for uploading a batch. When omitted {@link Uploader.uploadBatch} is used. */
     batchHandler?: (batch: UploaderBatch, uploader: Uploader) => void | Promise<void>;
-    /** Only called when a change/drop event occurs, but files can't be determined */
+    /** Called when a change / drop / paste event occurs but no files could be resolved. */
     changeCallback?: (e: Event) => void;
-    /** Error handler, if not specified Uploader.errorHandler is used */
+    /** Error handler for upload failures. Defaults to {@link Uploader.errorHandler}. */
     errorHandler?: (data: UploaderErrorData) => void;
-    /** Ignore file types, e.g. don't check accept property of input or this options */
+    /** When `true` disables MIME-type filtering against `accept`. */
     ignoreType?: boolean;
-    /** Target input. If null, dropZone should be specified. */
+    /** File input that triggers selection. When `null`, {@link UploaderOptions.dropZone} must be provided. */
     input?: HTMLInputElement;
-    /** Allow multiple files. If not specified is read from the input */
+    /** Allows multiple file selection. Falls back to the `multiple` attribute of {@link UploaderOptions.input} when omitted. */
     multiple?: boolean;
-    /** The field name to use in FormData object. Default is files[] */
+    /** Form field name used when appending files to `FormData`. Defaults to `"files[]"`. */
     name?: string;
 }
 
+/**
+ * Request configuration for {@link Uploader.uploadBatch}.
+ */
 export interface UploaderRequest {
-    /** A function that will return headers to be sent with request, or static set of headers */
+    /** Extra headers to send with the upload request. */
     headers?: Record<string, string>
-    /** Response type expected from the server. Default is json */
+    /** Expected response type. Defaults to `"json"`. */
     responseType?: "json" | "text";
-    /** URL to send the request to. Default is ~/File/TemporaryUpload */
+    /** Endpoint URL for the upload. Defaults to `~/File/TemporaryUpload`. */
     url?: string;
 }
 
+/**
+ * Represents a single upload batch queued by {@link Uploader}.
+ */
 export interface UploaderBatch {
+    /** Originating DOM event (change / drop / paste). */
     event?: Event;
+    /** Relative paths / names of files in this batch. */
     filePaths?: string[];
+    /** `FormData` payload containing the batched files. */
     formData: FormData;
+    /** `true` for the first batch in a multi-batch sequence. */
     isFirst?: boolean;
 }
 
+/**
+ * Data passed to {@link UploaderOptions.batchSuccess} after a successful upload.
+ */
 export interface UploaderSuccessData {
+    /** The batch that was uploaded. */
     batch: UploaderBatch;
+    /** Request configuration used for the upload. */
     request: UploaderRequest;
+    /** XHR load event. */
     event: ProgressEvent;
+    /** The underlying `XMLHttpRequest`. */
     xhr: XMLHttpRequest;
+    /** Parsed response body (JSON or text depending on {@link UploaderRequest.responseType}). */
     response: any;
 }
 
+/**
+ * Data passed to error handlers when an upload fails.
+ */
 export interface UploaderErrorData {
+    /** The batch that failed, if available. */
     batch?: UploaderBatch,
+    /** XHR progress / error event, if available. */
     event?: ProgressEvent,
+    /** Exception thrown during setup or handling, if any. */
     exception?: any;
+    /** Request configuration used for the failed attempt. */
     request?: UploaderRequest,
+    /** Parsed response body, if available. */
     response?: any,
+    /** The underlying `XMLHttpRequest`, if available. */
     xhr?: XMLHttpRequest
 }
 
 function alwaysTrue() { return true; }
 
+/**
+ * File uploader that handles `input` change, drag-and-drop, paste, and directory
+ * traversal, batching files and uploading each batch via `XMLHttpRequest`.
+ * Supports MIME filtering, progress events, CSRF headers, and custom batch handling.
+ */
 export class Uploader {
 
     declare private opt: UploaderOptions;
     declare private batch: UploaderBatch;
 
+    /**
+     * Creates a new uploader and wires up the configured input and drop zones.
+     * @param opt - Uploader configuration; defaults from {@link Uploader.defaults} are applied.
+     */
     constructor(opt: UploaderOptions) {
         this.opt = opt = Object.assign({}, Uploader.defaults, opt);
 
@@ -139,16 +178,22 @@ export class Uploader {
         }
     }
 
+    /** Default {@link UploaderOptions} applied when constructing an instance. */
     static defaults: Partial<UploaderOptions> = {
         autoClear: true,
         batchSize: 1,
         name: "files[]"
     }
 
+    /** Default {@link UploaderRequest} applied when {@link Uploader.uploadBatch} is called without explicit request options. */
     static requestDefaults: Partial<UploaderRequest> = {
         responseType: "json"
     }
 
+    /**
+     * Whether the uploader is configured for multiple file selection.
+     * @returns `true` if multiple files are allowed.
+     */
     isMultiple() {
         return !!(this.opt.multiple ?? (this.opt?.input as HTMLInputElement)?.multiple);
     }
@@ -344,6 +389,11 @@ export class Uploader {
         this.endBatch(true);
     }
 
+    /**
+     * Uploads a single batch via `XMLHttpRequest`.
+     * @param batch - Batch payload containing `FormData` and file paths.
+     * @param request - Optional request overrides merged over {@link Uploader.requestDefaults}.
+     */
     async uploadBatch(batch: UploaderBatch, request?: UploaderRequest): Promise<void> {
         if (!batch || !batch.formData)
             return;
@@ -461,6 +511,11 @@ export class Uploader {
         }
     }
 
+    /**
+     * Default error handler. Logs the exception, surfaces server error messages,
+     * and falls back to generic notifications or an iframe dialog for HTML responses.
+     * @param data - Error context for the failed upload.
+     */
     static errorHandler(data: UploaderErrorData) {
         if (data?.exception) {
             console.error(data.exception);

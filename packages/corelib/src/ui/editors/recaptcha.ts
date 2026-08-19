@@ -2,14 +2,27 @@
 import { IStringValue } from "../../interfaces";
 import { EditorProps, EditorWidget } from "./editorwidget";
 
+/**
+ * Options for the {@link Recaptcha} editor.
+ */
 export interface RecaptchaOptions {
+    /** The reCAPTCHA site key. */
     siteKey?: string;
+    /** The language code for the reCAPTCHA widget. */
     language?: string;
 }
 
+/**
+ * An editor that renders a Google reCAPTCHA widget and validates its response.
+ * @typeParam P - Widget props type.
+ */
 export class Recaptcha<P extends RecaptchaOptions = RecaptchaOptions> extends EditorWidget<P> implements IStringValue {
     static override[Symbol.typeInfo] = this.registerEditor(nsSerenity, [IStringValue]);
 
+    /**
+     * Creates a reCAPTCHA editor.
+     * @param props - Widget props.
+     */
     constructor(props: EditorProps<P>) {
         super(props);
 
@@ -46,10 +59,18 @@ export class Recaptcha<P extends RecaptchaOptions = RecaptchaOptions> extends Ed
         }, this.uniqueName);
     }
 
+    /**
+     * Returns the reCAPTCHA response token.
+     * @returns The response value.
+     */
     get_value(): string {
         return this.domNode.querySelector<HTMLInputElement>('.g-recaptcha-response').value;
     }
 
+    /**
+     * Sets the reCAPTCHA value; ignored as it is managed by the widget.
+     * @param value - The value to set.
+     */
     set_value(value: string): void {
         // ignore
     }

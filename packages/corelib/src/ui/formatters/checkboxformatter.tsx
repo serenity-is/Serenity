@@ -2,9 +2,23 @@ import { FormatterContext, FormatterResult } from "@serenity-is/sleekgrid";
 import { DialogTexts, formatterTypeInfo, iconClassName, IconClassName, localText, nsSerenity, registerType } from "../../base";
 import { Formatter } from "../../slick";
 
+/**
+ * Renders a boolean as a checkbox-like visual (with optional text). In grid display
+ * the checkbox is read-only; in header-filter context it falls back to text/icon.
+ */
 export class CheckboxFormatter implements Formatter {
     static [Symbol.typeInfo] = formatterTypeInfo(nsSerenity); static { registerType(this); }
 
+    /**
+     * @param props.falseText - Text for `false`.
+     * @param props.falseIcon - Icon for `false`.
+     * @param props.nullText - Text for `null`.
+     * @param props.nullIcon - Icon for `null`.
+     * @param props.trueText - Text for `true`.
+     * @param props.trueIcon - Icon for `true`.
+     * @param props.showText - Whether to show text (defaults to `true`, or `false` in grid cells).
+     * @param props.showHint - Whether to surface text as `title` hint.
+     */
     constructor(public readonly props: {
         falseText?: string,
         falseIcon?: IconClassName,
@@ -18,6 +32,7 @@ export class CheckboxFormatter implements Formatter {
         this.props ??= {};
     }
 
+    /** @param ctx - Formatter context. @returns Checkbox / icon / text markup. */
     format(ctx: FormatterContext): FormatterResult {
         const text = ctx.value == null ?
             localText(this.props.nullText, this.props.nullText ?? '') :

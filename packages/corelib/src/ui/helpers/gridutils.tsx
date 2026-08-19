@@ -5,7 +5,18 @@ import { IRemoteView } from "../../slick";
 import { IDataGrid } from "../datagrid/idatagrid";
 import { QuickSearchField, QuickSearchInput, type QuickSearchArgs } from "../datagrid/quicksearchinput";
 
+/**
+ * Utility functions for working with data grids.
+ */
 export namespace GridUtils {
+    /**
+     * Adds a toggle button to a toolbar.
+     * @param toolDiv - The toolbar element (or array-like of elements).
+     * @param cssClass - The CSS class to add to the button.
+     * @param callback - Callback invoked with the new pressed state when toggled.
+     * @param hint - The tooltip text for the button.
+     * @param initial - Optional initial pressed state.
+     */
     export function addToggleButton(toolDiv: HTMLElement | ArrayLike<HTMLElement>, cssClass: string,
         callback: (p1: boolean) => void, hint: string, initial?: boolean): void {
 
@@ -21,6 +32,14 @@ export namespace GridUtils {
         (isArrayLike(toolDiv) ? toolDiv[0] : toolDiv).prepend(btn);
     }
 
+    /**
+     * Adds an "include deleted" toggle button that sets the IncludeDeleted
+     * parameter on the view's submit requests.
+     * @param toolDiv - The toolbar element (or array-like of elements).
+     * @param view - The remote view.
+     * @param hint - Optional tooltip text.
+     * @param initial - Optional initial state.
+     */
     export function addIncludeDeletedToggle(toolDiv: HTMLElement | ArrayLike<HTMLElement>,
         view: IRemoteView<any>, hint?: string, initial?: boolean): void {
 
@@ -50,6 +69,11 @@ export namespace GridUtils {
         });
     }
 
+    /**
+     * Adds a quick search input to a container and wires it to the given view.
+     * @param options - The quick search options.
+     * @returns The created QuickSearchInput widget.
+     */
     export function addQuickSearch({ container, fields, beforeSearch, search, view }: {
         container: HTMLElement | ArrayLike<HTMLElement>,
         fields?: QuickSearchField[],
@@ -126,7 +150,14 @@ export namespace GridUtils {
     }
 
 
-    /** @deprecated use addQuickSearch with named args */
+    /** @deprecated use addQuickSearch with named args
+     * Adds a quick search input to a toolbar.
+     * @param toolDiv - The toolbar element (or array-like of elements).
+     * @param view - The remote view.
+     * @param fields - Optional quick search fields.
+     * @param onChange - Optional callback invoked before searching.
+     * @returns The created QuickSearchInput widget.
+     */
     export function addQuickSearchInput(toolDiv: HTMLElement | ArrayLike<HTMLElement>,
         view: IRemoteView<any>, fields?: QuickSearchField[], onChange?: () => void): QuickSearchInput {
         return addQuickSearch({
@@ -139,7 +170,13 @@ export namespace GridUtils {
         });
     }
 
-    /** @deprecated use addQuickSearch with named args */
+    /** @deprecated use addQuickSearch with named args
+     * Adds a quick search input with a custom search handler.
+     * @param container - The container element (or array-like of elements).
+     * @param search - The custom search handler.
+     * @param fields - Optional quick search fields.
+     * @returns The created QuickSearchInput widget.
+     */
     export function addQuickSearchInputCustom(container: HTMLElement | ArrayLike<HTMLElement>,
         search: (field: QuickSearchArgs["field"], query: QuickSearchArgs["query"], done: QuickSearchArgs["done"]) => void,
         fields?: QuickSearchField[]): QuickSearchInput {
@@ -151,6 +188,11 @@ export namespace GridUtils {
         });
     }
 
+    /**
+     * Makes the rows of a grid reorderable by dragging.
+     * @param grid - The sleek grid.
+     * @param handleMove - Callback invoked with the moved row indexes and the insert-before index.
+     */
     export function makeOrderable(grid: ISleekGrid,
         handleMove: (rows: number[], insertBefore: number) => void): void {
 
@@ -178,6 +220,17 @@ export namespace GridUtils {
         grid.registerPlugin(moveRowsPlugin);
     }
 
+    /**
+     * Makes the rows of a data grid reorderable and persists the new order by
+     * sending update requests to the server.
+     * @typeParam TItem - The type of the row items.
+     * @typeParam TId - The type of the item id.
+     * @param dataGrid - The data grid.
+     * @param getId - A function that returns the id of an item.
+     * @param getDisplayOrder - A function that returns the display order of an item.
+     * @param service - The service URL to send update requests to.
+     * @param getUpdateRequest - A function that builds an update request for an item id and order.
+     */
     export function makeOrderableWithUpdateRequest<TItem = any, TId = any>(dataGrid: IDataGrid,
         getId: (item: TItem) => TId, getDisplayOrder: (item: TItem) => any, service: string,
         getUpdateRequest: (id: TId, order: number) => SaveRequest<TItem>): void {

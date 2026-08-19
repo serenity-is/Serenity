@@ -4,12 +4,25 @@ import { getjQuery } from "./environment";
 import { ErrorHandling } from "./errorhandling";
 import { RequestErrorInfo, ServiceOptions, ServiceResponse } from "./servicetypes";
 
+/**
+ * Resolves a `~/`-prefixed application-relative URL against {@link Config.applicationPath}.
+ * Non-tilde URLs are returned unchanged.
+ * @param url - URL to resolve; may be `null`/`undefined` or already absolute.
+ * @returns The resolved absolute / root-relative URL.
+ */
 export function resolveUrl(url: string) {
     if (url != null && url.charAt(0) == '~' && url.charAt(1) == '/')
         return Config.applicationPath + url.substring(2);
     return url;
 }
 
+/**
+ * Resolves a Serenity service endpoint to a full URL.
+ * Bare service keys like `"Administration/User/List"` are prefixed with `~/Services/`;
+ * already rooted (`~/`, `/`) or absolute (`://`) URLs are resolved via {@link resolveUrl} unchanged.
+ * @param url - Service key or URL.
+ * @returns The resolved service URL.
+ */
 export function resolveServiceUrl(url: string) {
     if (url && url.length && url.charAt(0) != '~' && url.charAt(0) != '/' && url.indexOf('://') < 0)
         return resolveUrl("~/Services/") + url;
@@ -17,6 +30,12 @@ export function resolveServiceUrl(url: string) {
     return resolveUrl(url);
 }
 
+/**
+ * Reads a cookie value by name.
+ * Prefers jQuery's `$.cookie` when available, otherwise parses `document.cookie`.
+ * @param name - Cookie name to look up.
+ * @returns The cookie value, or `undefined` / empty string when not found.
+ */
 export function getCookie(name: string) {
     let $ = getjQuery();
     if (typeof $?.cookie === "function")
@@ -28,6 +47,12 @@ export function getCookie(name: string) {
             return ca[i].replace(name, '');
 }
 
+/**
+ * Checks whether a URL is same-origin with the current page.
+ * Used to decide whether to attach the `X-CSRF-TOKEN` header.
+ * @param url - URL to test (absolute or relative; relative URLs are resolved against `window.location.origin`).
+ * @returns `true` if the URL shares hostname, port and protocol with `window.location`.
+ */
 export function isSameOrigin(url: string) {
     const loc = window.location;
     try {
@@ -40,6 +65,14 @@ export function isSameOrigin(url: string) {
     }
 }
 
+/**
+ * Normalizes and enriches a {@link ServiceOptions} object with defaults and derived values.
+ * Applies default `method` (`POST`), `allowRedirect`/`async`/`blockUI` flags, resolves `service`/`url`,
+ * and injects `Accept`, `Content-Type` and same-origin `X-CSRF-TOKEN` headers.
+ * @typeParam TResponse - Expected service response type.
+ * @param options - Raw service options supplied by the caller.
+ * @returns The normalized options object with `url` resolved and `headers` populated.
+ */
 export function getServiceOptions<TResponse extends ServiceResponse>(options: ServiceOptions<TResponse>) {
 
     options = Object.assign(<ServiceOptions<TResponse>>{
@@ -64,6 +97,10 @@ export function getServiceOptions<TResponse extends ServiceResponse>(options: Se
 
 let activeRequests: number = 0;
 
+/**
+ * Signals that an AJAX / service request has started.
+ * Increments the internal active-request counter and triggers `ajaxStart` on jQuery (if present) or dispatches an `ajaxStart` DOM event. Used internally by `serviceFetch` / `serviceCall` and script-data loaders.
+ */
 export function requestStarting() {
     activeRequests++;
     let $ = getjQuery();
@@ -75,6 +112,10 @@ export function requestStarting() {
     }
 }
 
+/**
+ * Signals that an AJAX / service request has finished.
+ * Decrements the active-request counter and triggers `ajaxStop` when the count reaches zero.
+ */
 export function requestFinished() {
     activeRequests--;
     let $ = getjQuery();
@@ -86,6 +127,10 @@ export function requestFinished() {
     }
 }
 
+/**
+ * Returns the number of currently active service / AJAX requests.
+ * @returns Active request count (0 when idle).
+ */
 export function getActiveRequests() {
     return activeRequests;
 }
@@ -185,6 +230,14 @@ function reason(message: string, kind: string, extra?: any) {
     return error;
 }
 
+/**
+ * Executes a Serenity service call.
+ * Prefers `fetch` (async) when `options.async` is `true` (default); falls back to synchronous `XMLHttpRequest` when `async` is `false` (blocks the UI — avoid in new code).
+ * Handles CSRF headers, `blockUI`, redirect handling, and delegates error display to the global error handler unless suppressed via `errorMode` or `onError`.
+ * @typeParam TResponse - Service response type (extends {@link ServiceResponse}).
+ * @param options - Service options including `service`/`url`, `request` payload and callbacks.
+ * @returns A `PromiseLike` that resolves with the parsed response on success or rejects with an enriched `Error` (with `kind` and `origin === "serviceCall"`) on failure.
+ */
 export function serviceCall<TResponse extends ServiceResponse>(options: ServiceOptions<TResponse>): PromiseLike<TResponse> {
 
     if (options?.async ?? true)
@@ -254,6 +307,15 @@ export function serviceCall<TResponse extends ServiceResponse>(options: ServiceO
     });
 }
 
+/**
+ * Convenience wrapper around {@link serviceCall} that takes a service key as the first argument.
+ * @typeParam TResponse - Service response type.
+ * @param service - Service endpoint key (e.g. `"Administration/User/List"`) or full URL.
+ * @param request - Request DTO serialized as the POST body.
+ * @param onSuccess - Optional success callback invoked with the response before the promise resolves.
+ * @param options - Additional {@link ServiceOptions} merged with the above (e.g. `errorMode`, `blockUI`, `signal`).
+ * @returns A `PromiseLike` resolving to the service response.
+ */
 export function serviceRequest<TResponse extends ServiceResponse>(service: string, request?: any,
     onSuccess?: (response: TResponse) => void, options?: ServiceOptions<TResponse>): PromiseLike<TResponse> {
     return serviceCall(Object.assign({

@@ -1,27 +1,80 @@
 import { bindThis } from "@serenity-is/domwise";
 import { Dialog, Fluent, isArrayLike } from "../base";
 
+/**
+ * Event payload for the `handleroute` event dispatched by {@link ClassicRouter}.
+ * Extends the native {@link Event} with parsed hash-route information.
+ */
 export interface HandleRouteEvent extends Event {
+    /** The route segment being handled for the current index (e.g., `"new"` or `"edit/5"`). */
     route: string,
+    /** All route parts split by `"/+/"` from the full hash. */
     parts: string[],
+    /** Zero-based index of {@link route} within {@link parts}. */
     index: number,
+    /** `true` during the initial few resolves after page load; may affect handler behavior. */
     isInitial: boolean
 }
 
+/**
+ * Contract for the legacy hash-based router.
+ * Compat shim for the old `Q.Router` / `Serenity.Router` singleton. The router synchronizes dialog open/close state
+ * with the URL hash using `"/+/"` delimited segments and fires `handleroute` events on designated handlers.
+ * @deprecated Hash-based dialog routing is legacy. Prefer explicit client-side routing or modern dialog state management. Kept for backward compatibility.
+ */
 export interface IClassicRouter {
+	/** When `false`, all routing operations become no-ops. */
 	enabled: boolean;
+	/**
+	 * Navigates to a new hash, optionally attempting `history.back()` when the URL matches the previous one.
+	 * @param newHash - Hash string with or without leading `#`. Empty string clears the hash.
+	 * @param tryBack - When `true`, uses `history.back()` if the target matches {@link ClassicRouter.oldURL}.
+	 * @param silent - When `true`, suppresses the subsequent `hashchange` handling via {@link ignoreHashChange}.
+	 */
 	navigate(newHash: string, tryBack?: boolean, silent?: boolean): void;
+	/**
+	 * Replaces the current hash without adding a history entry (silent navigation).
+	 * @param newHash - Target hash (with or without `#`).
+	 * @param tryBack - When `true`, prefers `history.back()` if applicable.
+	 */
 	replace(newHash: string, tryBack?: boolean): void;
+	/**
+	 * Replaces only the last `"/+/"` segment of the current hash.
+	 * @param newHash - Replacement for the last segment; when empty/falsy the last segment is removed.
+	 * @param tryBack - When `true`, prefers `history.back()` if applicable.
+	 */
 	replaceLast(newHash: string, tryBack?: boolean): void;
+	/**
+	 * Registers a dialog open for hash tracking. The actual hash mutation is deferred until the dialog is confirmed open.
+	 * @param owner - Owner element that triggered the dialog (array-like collections use the first element).
+	 * @param element - Dialog content element whose `data-qroute` / `data-qprhash` attributes will be managed.
+	 * @param dialogHash - Factory returning the hash segment for this dialog (e.g., `"!a1"`).
+	 */
 	dialog(owner: HTMLElement | ArrayLike<HTMLElement>, element: HTMLElement | ArrayLike<HTMLElement>, dialogHash: () => string): void;
+	/** Regex used to heuristically detect whether a single hash segment might represent a dialog route (e.g., `new`, `edit/…`, `!…`). */
 	mightBeRouteRegex: RegExp;
+	/**
+	 * Resolves the current (or provided) hash by closing/opening dialogs and dispatching `handleroute`.
+	 * @param newHash - Hash to resolve; defaults to `window.location.hash` when omitted.
+	 * @returns A status string: `"disabled"` if the router is disabled, `"skipped"` if a recent anchor click looks like a non-route hash, `"shebang"` for `!` prefixed routes, `"missinghandler"` when a handler element cannot be found, or `"calledhandler"` when a `handleroute` event was dispatched.
+	 */
 	resolve(newHash?: string): "disabled" | "skipped" | "shebang" | "missinghandler" | "calledhandler";
+	/**
+	 * Temporarily ignores the next `hashchange` event(s).
+	 * @param expiration - Duration in milliseconds to ignore hash changes. Defaults to `1000`.
+	 */
 	ignoreHashChange(expiration?: number): void;
+    /** Removes all event listeners registered by the router and releases resources. */
     destroy(): void;
 }
 
 const ignoredSelector = '.s-MessageDialog, .s-MessageModal, .s-PromptDialog, .route-ignore';
 
+/**
+ * Legacy hash-based router that maps dialog stack to `"/+/"` delimited hash segments.
+ * Compat shim for the old `Q.Router` implementation. Listens to `hashchange`, dialog open/close, and anchor clicks to keep the URL in sync with visible dialogs and to dispatch `handleroute` events.
+ * @deprecated Use explicit routing or state-driven dialog management. Kept solely for backward compatibility with legacy Serenity pages.
+ */
 export class ClassicRouter implements IClassicRouter {
     private oldURL: string;
     private resolving: number = 0;
@@ -36,6 +89,7 @@ export class ClassicRouter implements IClassicRouter {
         return url1 == url2 || url1 == url2 + '#' || url2 == url1 + '#';
     }
 
+    /** @inheritdoc */
     navigate(newHash: string, tryBack?: boolean, silent?: boolean) {
         if (!this.enabled || this.resolving > 0)
             return;
@@ -63,10 +117,12 @@ export class ClassicRouter implements IClassicRouter {
         }
     }
 
+    /** @inheritdoc */
     replace(newHash: string, tryBack?: boolean) {
         this.navigate(newHash, tryBack, true);
     }
 
+    /** @inheritdoc */
     replaceLast(newHash: string, tryBack?: boolean) {
         if (!this.enabled)
             return;
@@ -168,6 +224,7 @@ export class ClassicRouter implements IClassicRouter {
         Router.replace(route.join("/+/"));
     }
 
+    /** @inheritdoc */
     dialog(owner: HTMLElement | ArrayLike<HTMLElement>, element: HTMLElement | ArrayLike<HTMLElement>, dialogHash: () => string) {
         if (!this.enabled)
             return;
@@ -182,8 +239,10 @@ export class ClassicRouter implements IClassicRouter {
     private resolvingPreRoute: string
     private resolveIndex = 0;
 
+    /** @inheritdoc */
     mightBeRouteRegex: RegExp = /^(new$|edit\/|![0-9]+$)/
 
+    /** @inheritdoc */
     resolve(newHash?: string): "disabled" | "skipped" | "shebang" | "missinghandler" | "calledhandler" {
         this.resolveIndex++;
 
@@ -306,6 +365,7 @@ export class ClassicRouter implements IClassicRouter {
         this.resolve();
     }
 
+    /** @inheritdoc */
     ignoreHashChange(expiration?: number) {
         this.ignoreHashLock++;
         this.ignoreHashUntil = Math.max(this.ignoreHashUntil, new Date().getTime() + (expiration ?? 1000));
@@ -398,6 +458,7 @@ export class ClassicRouter implements IClassicRouter {
         Fluent.on(document, "panelclose.qrouter", boundThis.closeHandler);
     }
 
+    /** @inheritdoc */
     destroy() {
         const boundThis = this.boundThis;
         if (!boundThis)
@@ -419,4 +480,9 @@ export class ClassicRouter implements IClassicRouter {
     }
 }
 
+/**
+ * Singleton instance of the legacy hash router.
+ * Compat shim for the global `Q.Router` / `Serenity.Router`. Initialized at module load and wired to `hashchange` and dialog events.
+ * @deprecated Prefer not to use hash-based dialog routing in new code. Kept for legacy pages that rely on `Router.resolve()` / `Router.navigate()`.
+ */
 export const Router = new ClassicRouter() as IClassicRouter;

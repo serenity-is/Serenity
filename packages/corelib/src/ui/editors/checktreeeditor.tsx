@@ -15,17 +15,34 @@ import { stripDiacritics } from "./combobox";
 import { EditorUtils } from "./editorutils";
 import { EditorProps } from "./editorwidget";
 
+/**
+ * A single item in a check tree editor.
+ * @typeParam TSource - The source item type.
+ */
 export interface CheckTreeItem<TSource> {
+    /** Whether the item is selected. */
     isSelected?: boolean;
+    /** Whether to hide the checkbox for this item. */
     hideCheckBox?: boolean;
+    /** Whether all descendants are selected. */
     isAllDescendantsSelected?: boolean;
+    /** Item id. */
     id?: string;
+    /** Display text. */
     text?: string;
+    /** Parent item id. */
     parentId?: string;
+    /** Child items. */
     children?: CheckTreeItem<TSource>[];
+    /** The source item. */
     source?: TSource;
 }
 
+/**
+ * A grid-based editor that renders a hierarchical tree of checkboxes.
+ * @typeParam TItem - The tree item type.
+ * @typeParam P - Widget props type.
+ */
 export class CheckTreeEditor<TItem extends CheckTreeItem<TItem>, P = {}> extends DataGrid<TItem, P>
     implements IGetEditValue, ISetEditValue, IReadOnly {
     static override[Symbol.typeInfo] = this.registerEditor(nsSerenity, [IGetEditValue, ISetEditValue, IReadOnly]);
@@ -34,6 +51,10 @@ export class CheckTreeEditor<TItem extends CheckTreeItem<TItem>, P = {}> extends
 
     declare private itemById: { [key: string]: TItem };
 
+    /**
+     * Creates a check tree editor.
+     * @param props - Widget props.
+     */
     constructor(props: EditorProps<P>) {
         super(props);
 
@@ -41,14 +62,25 @@ export class CheckTreeEditor<TItem extends CheckTreeItem<TItem>, P = {}> extends
         this.updateItems();
     }
 
+    /**
+     * Returns the id property name.
+     * @returns "id".
+     */
     protected override getIdProperty() {
         return "id";
     }
 
+    /**
+     * Returns the tree items to display.
+     * @returns The tree items.
+     */
     protected getTreeItems(): TItem[] {
         return [];
     }
 
+    /**
+     * Loads the tree items into the view.
+     */
     protected updateItems(): void {
         var items = this.getTreeItems();
         var itemById: Record<any, TItem> = Object.create(null) as any;
@@ -70,6 +102,11 @@ export class CheckTreeEditor<TItem extends CheckTreeItem<TItem>, P = {}> extends
         this.updateFlags();
     }
 
+    /**
+     * Gets the edit value into a target object.
+     * @param property - The property item.
+     * @param target - The target object.
+     */
     getEditValue(property: PropertyItem, target: any): void {
         if (this.getDelimited())
             target[property.name] = this.get_value().join(",");
@@ -77,11 +114,20 @@ export class CheckTreeEditor<TItem extends CheckTreeItem<TItem>, P = {}> extends
             target[property.name] = this.get_value();
     }
 
+    /**
+     * Sets the edit value from a source object.
+     * @param source - The source object.
+     * @param property - The property item.
+     */
     setEditValue(source: any, property: PropertyItem): void {
         var value = source[property.name];
         this.set_value(value);
     }
 
+    /**
+     * Returns the toolbar buttons for the editor.
+     * @returns Tool button definitions.
+     */
     protected override getButtons(): ToolButton[] {
         var selectAllText = this.getSelectAllText();
         if (!selectAllText) {
@@ -108,17 +154,32 @@ export class CheckTreeEditor<TItem extends CheckTreeItem<TItem>, P = {}> extends
         return buttons;
     }
 
+    /**
+     * Hook invoked when an item's selection changes.
+     * @param item - The item.
+     */
     protected itemSelectedChanged(item: TItem): void {
     }
 
+    /**
+     * Returns the text for the select-all button.
+     * @returns The select-all text.
+     */
     protected getSelectAllText(): string {
         return CheckTreeEditorTexts.asTry().SelectAll ?? 'Select All';
     }
 
+    /**
+     * Whether the tree uses a three-state hierarchy.
+     * @returns True when three-state.
+     */
     protected isThreeStateHierarchy(): boolean {
         return false;
     }
 
+    /**
+     * Initializes the grid with tree-specific styling.
+     */
     protected override initSleekGrid() {
         this.domNode.classList.add("slick-no-cell-border", "slick-no-odd-even", "slick-hide-header");
 
@@ -127,6 +188,11 @@ export class CheckTreeEditor<TItem extends CheckTreeItem<TItem>, P = {}> extends
         this.sleekGrid.resizeCanvas();
     }
 
+    /**
+     * Filters view items for the tree hierarchy.
+     * @param item - The item to filter.
+     * @returns True when the item matches.
+     */
     protected override onViewFilter(item: TItem): boolean {
         if (!super.onViewFilter(item)) {
             return false;
@@ -153,10 +219,19 @@ export class CheckTreeEditor<TItem extends CheckTreeItem<TItem>, P = {}> extends
         });
     }
 
+    /**
+     * Returns the initial collapse state for tree rows.
+     * @returns True when collapsed.
+     */
     protected getInitialCollapse(): boolean {
         return false;
     }
 
+    /**
+     * Processes the list response, setting tree indents.
+     * @param response - The list response.
+     * @returns The processed response.
+     */
     protected override onViewProcessData(response: ListResponse<TItem>): ListResponse<TItem> {
         response = super.onViewProcessData(response);
         this.itemById = null;
@@ -168,6 +243,12 @@ export class CheckTreeEditor<TItem extends CheckTreeItem<TItem>, P = {}> extends
         return response;
     }
 
+    /**
+     * Handles cell clicks, toggling checkboxes and tree expansion.
+     * @param e - Click event.
+     * @param row - Row index.
+     * @param cell - Cell index.
+     */
     protected override onClick(e: Event, row: number, cell: number): void {
         super.onClick(e, row, cell);
 
@@ -211,12 +292,18 @@ export class CheckTreeEditor<TItem extends CheckTreeItem<TItem>, P = {}> extends
         }
     }
 
+    /**
+     * Updates the select-all button state.
+     */
     protected updateSelectAll(): void {
         GridSelectAllButtonHelper.update(this, function (x) {
             return x.isSelected;
         });
     }
 
+    /**
+     * Updates the selection flags for all items.
+     */
     protected updateFlags(): void {
         var view = this.view;
         var items = view.getItems();
@@ -254,10 +341,21 @@ export class CheckTreeEditor<TItem extends CheckTreeItem<TItem>, P = {}> extends
         }
     }
 
+    /**
+     * Whether all descendants of an item are selected.
+     * @param item - The item.
+     * @returns True when all descendants are selected.
+     */
     protected getDescendantsSelected(item: TItem): boolean {
         return true;
     }
 
+    /**
+     * Sets the selection state of all descendants of an item.
+     * @param item - The item.
+     * @param selected - The selection state.
+     * @returns True when any item changed.
+     */
     protected setAllSubTreeSelected(item: TItem, selected: boolean): boolean {
         var result = false;
         for (var i = 0; i < item.children.length; i++) {
@@ -275,6 +373,10 @@ export class CheckTreeEditor<TItem extends CheckTreeItem<TItem>, P = {}> extends
         return result;
     }
 
+    /**
+     * Whether all items are selected.
+     * @returns True when all items are selected.
+     */
     protected allItemsSelected() {
         for (var i = 0; i < this.rowCount(); i++) {
             var row = this.itemAt(i);
@@ -286,6 +388,11 @@ export class CheckTreeEditor<TItem extends CheckTreeItem<TItem>, P = {}> extends
         return this.rowCount() > 0;
     }
 
+    /**
+     * Whether all descendants of an item are selected.
+     * @param item - The item.
+     * @returns True when all descendants are selected.
+     */
     protected allDescendantsSelected(item: TItem): boolean {
         if (item.children.length > 0) {
             for (var i = 0; i < item.children.length; i++) {
@@ -302,10 +409,19 @@ export class CheckTreeEditor<TItem extends CheckTreeItem<TItem>, P = {}> extends
         return true;
     }
 
+    /**
+     * Returns whether the value is delimited.
+     * @returns True when delimited.
+     */
     protected getDelimited() {
         return !!((this.options as any)['delimited']);
     }
 
+    /**
+     * Whether any descendant of an item is selected.
+     * @param item - The item.
+     * @returns True when any descendant is selected.
+     */
     protected anyDescendantsSelected(item: TItem): boolean {
         if (item.children.length > 0) {
             for (var i = 0; i < item.children.length; i++) {
@@ -321,6 +437,10 @@ export class CheckTreeEditor<TItem extends CheckTreeItem<TItem>, P = {}> extends
         return false;
     }
 
+    /**
+     * Creates the grid columns for the tree.
+     * @returns The columns.
+     */
     protected override createColumns(): Column[] {
         var self = this;
         var columns: Column[] = [];
@@ -344,16 +464,28 @@ export class CheckTreeEditor<TItem extends CheckTreeItem<TItem>, P = {}> extends
         return columns;
     }
 
+    /**
+     * Returns the display text for an item.
+     * @param ctx - The formatter context.
+     * @returns The item text.
+     */
     protected getItemText(ctx: FormatterContext): FormatterResult {
         return ctx.escape();
     }
 
+    /**
+     * Returns the grid options for the editor.
+     * @returns Grid options.
+     */
     protected override getSlickOptions(): GridOptions {
         var opt = super.getSlickOptions();
         opt.forceFitColumns = true;
         return opt;
     }
 
+    /**
+     * Sorts items, moving selected items to the top.
+     */
     protected sortItems(): void {
         if (!this.moveSelectedUp()) {
             return;
@@ -382,16 +514,28 @@ export class CheckTreeEditor<TItem extends CheckTreeItem<TItem>, P = {}> extends
         this.view.setItems(list, true);
     }
 
+    /**
+     * Whether selected items should be moved to the top.
+     * @returns True when moving selected items up.
+     */
     protected moveSelectedUp(): boolean {
         return false;
     }
 
     declare private _readOnly: boolean;
 
+    /**
+     * Returns whether the editor is read-only.
+     * @returns True when read-only.
+     */
     public override get_readOnly() {
         return this._readOnly;
     }
 
+    /**
+     * Sets whether the editor is read-only.
+     * @param value - True to enable read-only mode.
+     */
     public override set_readOnly(value: boolean) {
         if (!!this._readOnly != !!value) {
             this._readOnly = !!value;

@@ -1,56 +1,114 @@
+/**
+ * Global runtime configuration for the Serenity client framework.
+ *
+ * @remarks
+ * Implemented as a mutable singleton object. Values are typically set once during
+ * application startup (e.g. in `ScriptInit.ts`) and read throughout the app.
+ * {@link resetApplicationPath} and {@link resetCspNonce} re-read values from the DOM
+ * and are called automatically on module load.
+ * @example
+ * Config.rootNamespaces.push("MyApp");
+ * Config.emailAllowOnlyAscii = false;
+ */
 const Config = {
     /**
-     * This is the root path of your application. If your application resides under http://localhost/mysite/,
-     * your root path is "/mysite/". This variable is automatically initialized by reading from a <link> element
-     * with ID "ApplicationPath" from current page, which is usually located in your _LayoutHead.cshtml file
+     * Root path of the application, always starting and ending with `/` when read from DOM.
+     *
+     * @remarks
+     * Initialized from `<link id="ApplicationPath" href="/mysite/">` in `_LayoutHead.cshtml`;
+     * falls back to `"/"` if the element is absent or on the server. Change it at runtime
+     * or call {@link resetApplicationPath} after dynamically updating the link element.
+     * @example
+     * // app hosted at http://localhost/mysite/
+     * Config.applicationPath; // "/mysite/"
      */
     applicationPath: '/',
 
     /**
-     * Gets the content Security Policy nonce value to be used in script/style tags. This is usually set from server side
-     * via a meta tag with name "csp-nonce".
+     * Content Security Policy nonce to apply to dynamically created `<script>` / `<style>` tags.
+     *
+     * @remarks
+     * Initialized from `<meta name="csp-nonce">` or the `nonce` attribute of existing
+     * `<script>`/`<style>` elements via {@link resetCspNonce}; `null` when no nonce is present
+     * or on the server. Helpers that inject markup should copy this value to the `nonce` attribute.
      */
     cspNonce: null as string,
 
     /**
-     * Gets a default return URL for the application. This is used when a return URL is not specified
-     * @param purpose Optional purpose for the return URL, for example "login" or "logout"
+     * Returns a fallback URL to redirect to when no explicit return URL is provided.
+     *
+     * @remarks
+     * Default implementation returns {@link Config.applicationPath} regardless of purpose.
+     * Override to provide per-purpose defaults (e.g. different landing pages after login vs. logout).
+     * @param purpose - Optional hint such as `"login"` or `"logout"`.
+     * @returns The URL to use as a return target.
+     * @example
+     * Config.defaultReturnUrl = (purpose) => purpose === "logout" ? "/Goodbye" : Config.applicationPath;
      */
     defaultReturnUrl: (purpose?: string) => Config.applicationPath,
 
     /**
-     * Email validation by default only allows ASCII characters. Set this to true if you want to allow unicode.
+     * Whether e-mail validation should allow only ASCII characters.
+     *
+     * @remarks
+     * `true` (default) rejects non-ASCII characters in the local/domain parts;
+     * set to `false` to allow Unicode/IDN addresses.
      */
     emailAllowOnlyAscii: true,
 
     /**
-     * This is an optional callback that is used to load types lazily when they are not found in the
-     * type registry. This is useful when a type is not available in currently loaded scripts 
-     * (e.g. chunks / entry modules) but is available via some other means (e.g. a separate script file).
-     * The method may return a type or a promise that resolves to a type. If either returns null, 
-     * the type is considered to be not found.
-     * The method is called with the type key and an optional kind parameter, which is used to distinguish
-     * between different kinds of types (e.g. "editor" or "dialog" or "enum") usually based on calling type registry.
+     * Optional callback to lazily resolve a type that is not yet in the type registry.
+     *
+     * @remarks
+     * Useful with code-splitting / lazy chunk loading. Called with the requested type key
+     * and a `kind` hint (`"dialog"`, `"editor"`, `"enum"`, `"formatter"`, `"filtering"`, …).
+     * May return the type synchronously or a `Promise` resolving to it; returning `null`/`undefined`
+     * signals "not found".
+     * @param typeKey - Full type name being requested, e.g. `"MyApp.MyEditor"`.
+     * @param kind - Category of the type, used to narrow search/loading.
+     * @returns The resolved type, a promise for it, or `null` if unavailable.
+     * @example
+     * Config.lazyTypeLoader = async (typeKey) => await import(`./editors/${typeKey}`);
      */
     lazyTypeLoader: <(typeKey: string, kind: "dialog" | "editor" | "enum" | "formatter" | "filtering" | string) => any | Promise<any>>null,
 
     /**
-     * This is the list of root namespaces that may be searched for types. For example, if you specify an editor type
-     * of "MyEditor", first a class with name "MyEditor" will be searched, if not found, search will be followed by
-     * "Serenity.MyEditor" and "MyApp.MyEditor" if you added "MyApp" to the list of root namespaces.
+     * Root namespaces probed when resolving short type names.
      *
-     * You should usually add your application root namespace to this list in ScriptInit(ialization).ts file.
+     * @remarks
+     * When a type is requested as `"MyEditor"`, the registry first tries `"MyEditor"`,
+     * then `"Serenity.MyEditor"`, then `"<each rootNamespace>.MyEditor"`.
+     * Add your application namespace (e.g. `"MyApp"`) in `ScriptInit.ts` so short names resolve.
+     * Defaults to `["Serenity"]`.
+     * @example
+     * Config.rootNamespaces.push("MyApp");
      */
     rootNamespaces: ['Serenity'],
 
     /**
-     * This is an optional method for handling when user is not logged in. If a users session is expired 
-     * and when a NotAuthorized response is received from a service call, Serenity will call this handler, so
-     * you may intercept it and notify user about this situation and ask if she wants to login again...
+     * Optional handler invoked when a service call returns `NotAuthorized` / session expired.
+     *
+     * @remarks
+     * If set, Serenity delegates the "not logged in" flow to this callback so you can
+     * prompt the user, redirect to login, or refresh a token. When `null` (default),
+     * the framework falls back to its built-in handling.
+     * @example
+     * Config.notLoggedInHandler = () => window.location.href = "/Account/Login";
      */
     notLoggedInHandler: <Function>null
 }
 
+/**
+ * Re-reads {@link Config.applicationPath} from the DOM.
+ *
+ * @remarks
+ * Looks for `<link id="ApplicationPath">` and copies its `href`; falls back to `"/"`
+ * if absent or when `document` is unavailable (SSR). Called once on module load;
+ * call again after you change the link element at runtime.
+ * @example
+ * document.getElementById("ApplicationPath").href = "/newPath/";
+ * resetApplicationPath();
+ */
 export function resetApplicationPath() {
     Config.applicationPath = '/';
     if (typeof document !== 'undefined') {
@@ -61,6 +119,13 @@ export function resetApplicationPath() {
     }
 }
 
+/**
+ * Re-reads {@link Config.cspNonce} from the DOM.
+ *
+ * @remarks
+ * Probes in order: `<meta name="csp-nonce">` → `<script nonce>` → `<style nonce>`.
+ * Sets `null` if none found or when `document` is unavailable. Called once on module load.
+ */
 export function resetCspNonce() {
     Config.cspNonce = null;
     if (typeof document !== 'undefined') {

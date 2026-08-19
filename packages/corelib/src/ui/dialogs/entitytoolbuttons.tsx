@@ -1,8 +1,16 @@
 import { EntityDialogTexts, faIcon } from "../../base";
 import { ToolButton } from "../widgets/toolbar";
 
+/**
+ * Identifies how a save operation was initiated.
+ */
 export type SaveInitiator = "save-and-close" | "apply-changes";
 
+/**
+ * Creates a toolbar button that saves the entity and closes the dialog.
+ * @param opt - Optional overrides merged into the button definition.
+ * @returns Tool button definition.
+ */
 export function saveAndCloseToolButton(opt?: ToolButton): ToolButton {
     return {
         title: EntityDialogTexts.SaveButton,
@@ -14,6 +22,11 @@ export function saveAndCloseToolButton(opt?: ToolButton): ToolButton {
     }
 }
 
+/**
+ * Creates a toolbar button that saves the entity and keeps the dialog open.
+ * @param opt - Optional overrides merged into the button definition.
+ * @returns Tool button definition.
+ */
 export function applyChangesToolButton(opt?: ToolButton): ToolButton {
     return {
         title: '',
@@ -26,6 +39,11 @@ export function applyChangesToolButton(opt?: ToolButton): ToolButton {
     }
 }
 
+/**
+ * Creates a toolbar button that deletes the entity.
+ * @param opt - Optional overrides merged into the button definition.
+ * @returns Tool button definition.
+ */
 export function deleteToolButton(opt?: ToolButton): ToolButton {
     return {
         title: EntityDialogTexts.DeleteButton,
@@ -37,6 +55,11 @@ export function deleteToolButton(opt?: ToolButton): ToolButton {
     }
 }
 
+/**
+ * Creates a toolbar button that undeletes a soft-deleted entity.
+ * @param opt - Optional overrides merged into the button definition.
+ * @returns Tool button definition.
+ */
 export function undeleteToolButton(opt?: ToolButton): ToolButton {
     return {
         title: EntityDialogTexts.UndeleteButton,
@@ -46,6 +69,11 @@ export function undeleteToolButton(opt?: ToolButton): ToolButton {
     }
 }
 
+/**
+ * Creates a toolbar button that switches the dialog to edit mode.
+ * @param opt - Optional overrides merged into the button definition.
+ * @returns Tool button definition.
+ */
 export function editToolButton(opt?: ToolButton): ToolButton {
     return {
         title: EntityDialogTexts.EditButton,
@@ -56,6 +84,11 @@ export function editToolButton(opt?: ToolButton): ToolButton {
     }
 }
 
+/**
+ * Creates a toolbar button that toggles the localization editor.
+ * @param opt - Optional overrides merged into the button definition.
+ * @returns Tool button definition.
+ */
 export function localizationToolButton(opt?: ToolButton): ToolButton {
     return {
         title: EntityDialogTexts.LocalizationButton,
@@ -65,6 +98,11 @@ export function localizationToolButton(opt?: ToolButton): ToolButton {
     }
 }
 
+/**
+ * Creates a toolbar button that clones the current entity.
+ * @param opt - Optional overrides merged into the button definition.
+ * @returns Tool button definition.
+ */
 export function cloneToolButton(opt?: ToolButton): ToolButton {
     return {
         title: EntityDialogTexts.CloneButton,

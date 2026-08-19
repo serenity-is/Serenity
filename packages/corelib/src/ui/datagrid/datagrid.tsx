@@ -34,6 +34,13 @@ export type { AutoRegisterArgs, AutoRegisterHandler } from "./datagrid-autoregis
 export { omitAllGridPersistenceFlags } from "./datagrid-persistence";
 export type { DataGridPersistenceEvent, GridPersistenceFlags, PersistedGridColumn, PersistedGridSettings, SettingStorage } from "./datagrid-persistence";
 
+/**
+ * Base data grid widget that renders tabular data using SleekGrid, with
+ * support for columns, sorting, filtering, quick filters, paging, persistence,
+ * and toolbar integration.
+ * @typeParam TItem - Row type displayed in the grid.
+ * @typeParam P - Widget props type.
+ */
 export class DataGrid<TItem, P = {}> extends Widget<P> implements IDataGrid, IReadOnly {
 
     static override[Symbol.typeInfo] = this.registerClass(nsSerenity, [IReadOnly]);
@@ -42,38 +49,69 @@ export class DataGrid<TItem, P = {}> extends Widget<P> implements IDataGrid, IRe
     declare private _initialSettings: PersistedGridSettings;
     declare private _layoutTimer: number;
 
+    /** The title element. */
     declare protected titleDiv: Fluent;
+    /** The toolbar widget. */
     declare protected toolbar: Toolbar;
+    /** The advanced filter bar widget. */
     declare protected filterBar: FilterDisplayBar;
+    /** The quick filters container element. */
     declare protected quickFiltersDiv: Fluent;
+    /** The quick filter bar widget. */
     declare protected quickFiltersBar: QuickFilterBar;
+    /** The container element that hosts the grid. */
     declare protected slickContainer: Fluent;
+    /** The property items data for this grid. */
     declare protected propertyItemsData: PropertyItemsData;
+    /** Counter tracking nested settings restoration. */
     declare protected restoringSettings: number;
+    /** The remote view used for paging and server communication. */
     declare public view: IRemoteView<TItem>;
 
+    /** Whether dialogs opened from this grid should be shown as panels. */
     declare public openDialogsAsPanel: boolean;
 
+    /** Default options shared by all data grid instances. */
     public static readonly defaultOptions = dataGridDefaults;
 
+    /** Default row height used when creating grids. */
     static get defaultRowHeight() { return dataGridDefaults.rowHeight; }
+    /** Default storage used for grid persistence. */
     static get defaultPersistenceStorage() { return dataGridDefaults.persistenceStorage; }
+    /** Sets the default storage used for grid persistence. */
     static set defaultPersistenceStorage(value: SettingStorage) { dataGridDefaults.persistenceStorage = value; }
+    /** Default column width scale applied to all grids. */
     static get defaultColumnWidthScale() { return dataGridDefaults.columnWidthScale; }
+    /** Sets the default column width scale applied to all grids. */
     static set defaultColumnWidthScale(value: number) { dataGridDefaults.columnWidthScale = value; }
+    /** Default column width delta applied to all grids. */
     static get defaultColumnWidthDelta() { return dataGridDefaults.columnWidthDelta; }
+    /** Sets the default column width delta applied to all grids. */
     static set defaultColumnWidthDelta(value: number) { dataGridDefaults.columnWidthDelta = value; }
 
+    /** Static event raised after any grid is initialized. */
     public static readonly onAfterInit = new PubSub<DataGridInitEvent>();
+    /** Raised after this grid is initialized. */
     public readonly onAfterInit = new PubSub<DataGridInitEvent>();
+    /** Raised to determine whether the grid can submit its view. */
     public readonly onCanSubmit = new PubSub<DataGridSubmitEvent>();
+    /** Raised when the grid data changes. */
     public readonly onDataChanged = new PubSub<DataGridChangeEvent>();
+    /** Raised while filtering items in the view. */
     public readonly onFiltering = new PubSub<DataGridFilteringEvent<TItem>>();
+    /** Raised before/after persisting or restoring grid settings. */
     public readonly onPersistence = new PubSub<DataGridPersistenceEvent>();
+    /** Raised when the view processes a list response. */
     public readonly onProcessData = new PubSub<DataGridProcessEvent<TItem>>();
+    /** Raised to determine whether the view submit should proceed. */
     public readonly onSubmitting = new PubSub<DataGridSubmitEvent>();
+    /** Raised after view parameters are prepared for submission. */
     public readonly onSetViewParams = new PubSub<DataGridEvent>();
 
+    /**
+     * Creates a data grid widget.
+     * @param props - Widget props forwarded to the base widget.
+     */
     constructor(props: WidgetProps<P>) {
         super(props);
 
@@ -101,6 +139,10 @@ export class DataGrid<TItem, P = {}> extends Widget<P> implements IDataGrid, IRe
         });
     }
 
+    /**
+     * Hook invoked when the grid is registered as an auto-registering plugin.
+     * @param args - Auto-registration arguments.
+     */
     protected autoRegisteringPlugin(args: AutoRegisterArgs): void {
     }
 
@@ -110,6 +152,11 @@ export class DataGrid<TItem, P = {}> extends Widget<P> implements IDataGrid, IRe
             LayoutTimer.store(this._layoutTimer);
     }
 
+    /**
+     * Called once property items are available; creates the grid, filter bar,
+     * pager, quick filters, and restores persisted settings.
+     * @param itemsData - Property items and additional items for the grid.
+     */
     protected propertyItemsReady(itemsData: PropertyItemsData) {
         this.propertyItemsData = itemsData;
         const sleekGrid = (this as any).createSlickGrid();
@@ -148,17 +195,31 @@ export class DataGrid<TItem, P = {}> extends Widget<P> implements IDataGrid, IRe
             window.setTimeout(() => this.initialPopulate(), 0);
     }
 
+    /**
+     * Hook invoked after the grid is initialized and settings are restored.
+     */
     protected afterInit() {
     }
 
+    /**
+     * Whether the grid should load property items asynchronously.
+     * @returns True when async loading is used.
+     */
     protected useAsync() {
         return false;
     }
 
+    /**
+     * Whether the grid should use the layout timer for responsive resizing.
+     * @returns True when the layout timer is used.
+     */
     protected useLayoutTimer() {
         return true;
     }
 
+    /**
+     * Recalculates the grid layout, handling responsive height behavior.
+     */
     protected layout(): void {
         if (!this.domNode || !Fluent.isVisibleLike(this.domNode) || !this.slickContainer || !this._grid)
             return;
@@ -181,13 +242,24 @@ export class DataGrid<TItem, P = {}> extends Widget<P> implements IDataGrid, IRe
         this._grid.resizeCanvas();
     }
 
+    /**
+     * Returns the initial title shown above the grid.
+     * @returns The title text, or null for no title.
+     */
     protected getInitialTitle(): string {
         return null;
     }
 
+    /**
+     * Hook for subclasses to add extra toolbar buttons or controls.
+     */
     protected createToolbarExtensions(): void {
     }
 
+    /**
+     * Ensures the quick filter bar exists and returns it.
+     * @returns The quick filter bar instance.
+     */
     protected ensureQuickFilterBar(): QuickFilterBar {
 
         if (this.quickFiltersDiv == null)
@@ -196,6 +268,10 @@ export class DataGrid<TItem, P = {}> extends Widget<P> implements IDataGrid, IRe
         return this.quickFiltersBar;
     }
 
+    /**
+     * Creates the quick filter bar with the given filters.
+     * @param filters - Quick filter definitions to render.
+     */
     protected createQuickFilters(filters?: QuickFilter<Widget<any>, any>[]): void {
 
         if (this.quickFiltersDiv == null && (filters != null ||
@@ -218,6 +294,10 @@ export class DataGrid<TItem, P = {}> extends Widget<P> implements IDataGrid, IRe
         }
     }
 
+    /**
+     * Returns the quick filter definitions derived from the grid columns.
+     * @returns Quick filter definitions for columns marked as quick filters.
+     */
     protected getQuickFilters(): QuickFilter<Widget<any>, any>[] {
         return this.allColumns.filter(function (x) {
             return x.sourceItem &&
@@ -228,10 +308,21 @@ export class DataGrid<TItem, P = {}> extends Widget<P> implements IDataGrid, IRe
             .filter(x => x != null);
     }
 
+    /**
+     * Converts a property item to a quick filter definition.
+     * @param item - Property item to convert.
+     * @returns The quick filter definition, or null if not applicable.
+     */
     public static propertyItemToQuickFilter(item: PropertyItem): QuickFilter<any, any> | null {
         return propertyItemToQuickFilter(item);
     }
 
+    /**
+     * Finds a quick filter widget by field name.
+     * @param type - Widget constructor type.
+     * @param field - Field name of the quick filter.
+     * @returns The widget instance.
+     */
     protected findQuickFilter<TWidget>(type: { new(...args: any[]): TWidget }, field: string): TWidget {
         if (this.quickFiltersBar != null)
             return this.quickFiltersBar.find(type, field);
@@ -240,6 +331,12 @@ export class DataGrid<TItem, P = {}> extends Widget<P> implements IDataGrid, IRe
         return getWidgetFrom(this.domNode?.querySelector(selector) ?? selector, type);
     }
 
+    /**
+     * Tries to find a quick filter widget by field name.
+     * @param type - Widget constructor type.
+     * @param field - Field name of the quick filter.
+     * @returns The widget instance, or null if not found.
+     */
     protected tryFindQuickFilter<TWidget>(type: { new(...args: any[]): TWidget }, field: string): TWidget {
         if (this.quickFiltersBar != null)
             return this.quickFiltersBar.tryFind(type, field);
@@ -248,15 +345,25 @@ export class DataGrid<TItem, P = {}> extends Widget<P> implements IDataGrid, IRe
         return tryGetWidget(this.domNode?.querySelector(selector) ?? selector, type);
     }
 
+    /**
+     * Creates the include-deleted toggle button when the row type supports it.
+     */
     protected createIncludeDeletedButton(): void {
         if (this.getIsActiveProperty() || this.getIsDeletedProperty())
             GridUtils.addIncludeDeletedToggle(this.toolbar.domNode, this.view, null, false);
     }
 
+    /**
+     * Returns the quick search fields available for this grid.
+     * @returns The quick search fields, or null for none.
+     */
     protected getQuickSearchFields(): QuickSearchField[] {
         return null;
     }
 
+    /**
+     * Creates the quick search input in the toolbar.
+     */
     protected createQuickSearchInput(): void {
         const input = GridUtils.addQuickSearch({
             container: this.toolbar.domNode, 
@@ -267,6 +374,9 @@ export class DataGrid<TItem, P = {}> extends Widget<P> implements IDataGrid, IRe
         input?.domNode?.setAttribute('id', this.idPrefix + 'QuickSearchInput');
     }
 
+    /**
+     * Cleans up event subscriptions, widgets, and the underlying grid.
+     */
     public override destroy() {
 
         this.onAfterInit?.clear();
@@ -306,10 +416,22 @@ export class DataGrid<TItem, P = {}> extends Widget<P> implements IDataGrid, IRe
         super.destroy();
     }
 
+    /**
+     * Returns the CSS class for a grid row based on its active/deleted state.
+     * @param item - The row item.
+     * @param index - The row index.
+     * @returns The CSS class name, or an empty string.
+     */
     protected getItemCssClass(item: TItem, index: number): string {
         return getItemCssClass(item, this.getIsActiveProperty(), this.getIsDeletedProperty());
     }
 
+    /**
+     * Returns row metadata (e.g. CSS classes) for the given item.
+     * @param item - The row item.
+     * @param index - The row index.
+     * @returns Row metadata object.
+     */
     protected getItemMetadata(item: TItem, index: number): any {
         var itemClass = this.getItemCssClass(item, index);
         if (!itemClass) {
@@ -318,6 +440,11 @@ export class DataGrid<TItem, P = {}> extends Widget<P> implements IDataGrid, IRe
         return { cssClasses: itemClass };
     }
 
+    /**
+     * Applies defaults and width adjustments to the given columns.
+     * @param columns - Columns to post-process.
+     * @returns The processed columns.
+     */
     protected postProcessColumns(columns: Column[]): Column[] {
         SlickHelper.setDefaults(columns, this.getLocalTextDbPrefix());
 
@@ -339,14 +466,25 @@ export class DataGrid<TItem, P = {}> extends Widget<P> implements IDataGrid, IRe
         return columns;
     }
 
+    /**
+     * Returns the width delta applied to all columns.
+     * @returns The column width delta.
+     */
     protected getColumnWidthDelta() {
         return DataGrid.defaultColumnWidthDelta ?? 0;
     }
 
+    /**
+     * Returns the width scale applied to all columns.
+     * @returns The column width scale.
+     */
     protected getColumnWidthScale() {
         return DataGrid.defaultColumnWidthScale ?? 1;
     }
 
+    /**
+     * Performs the initial data population, optionally waiting until visible.
+     */
     protected initialPopulate(): void {
         var self = this;
         if (this.populateWhenVisible()) {
@@ -362,6 +500,11 @@ export class DataGrid<TItem, P = {}> extends Widget<P> implements IDataGrid, IRe
         }
     }
 
+    /**
+     * Whether the given column can be used in the advanced filter bar.
+     * @param column - Column to check.
+     * @returns True when the column is filterable.
+     */
     protected canFilterColumn(column: Column): boolean {
         return (column.sourceItem != null &&
             column.sourceItem.notFilterable !== true &&
@@ -369,6 +512,9 @@ export class DataGrid<TItem, P = {}> extends Widget<P> implements IDataGrid, IRe
                 Authorization.hasPermission(column.sourceItem.readPermission)));
     }
 
+    /**
+     * Initializes the filter bar store with the filterable columns.
+     */
     protected initializeFilterBar() {
 
         this.filterBar.set_store(new FilterStore(
@@ -379,6 +525,9 @@ export class DataGrid<TItem, P = {}> extends Widget<P> implements IDataGrid, IRe
         this.filterBar.get_store().add_changed(bindThis(this).filterStoreChanged);
     }
 
+    /**
+     * Handles filter store changes by persisting settings and refreshing.
+     */
     protected filterStoreChanged() {
         if (this.restoringSettings <= 0) {
             this.persistSettings();
@@ -406,7 +555,10 @@ export class DataGrid<TItem, P = {}> extends Widget<P> implements IDataGrid, IRe
         return this.postProcessColumns(columns || []) || [];
     }
 
-    /** Override initSleekGrid to add plugins to the sleekgrid */
+    /**
+     * Creates the underlying SleekGrid instance with the processed columns.
+     * @returns The created grid instance.
+     */
     protected createSlickGrid(): ISleekGrid<TItem> | null {
         const columns = this.createSleekColumns();
         const slickOptions = this.getSlickOptions();
@@ -416,9 +568,15 @@ export class DataGrid<TItem, P = {}> extends Widget<P> implements IDataGrid, IRe
         return this._grid;
     }
 
+    /**
+     * Hook for subclasses to initialize the grid after creation.
+     */
     protected initSleekGrid(): void {
     }
 
+    /**
+     * Applies the default sort order to the grid and view.
+     */
     protected setInitialSortOrder(): void {
         var sortBy = this.getDefaultSortBy();
 
@@ -442,43 +600,82 @@ export class DataGrid<TItem, P = {}> extends Widget<P> implements IDataGrid, IRe
         this._grid.setSortColumns(mapped);
     }
 
+    /**
+     * Returns the item at the given row index.
+     * @param row - Row index.
+     * @returns The item at that row.
+     */
     itemAt(row: number): TItem {
         return this._grid.getDataItem(row);
     }
 
+    /**
+     * Returns the id of the given item using the grid id property.
+     * @param item - The item.
+     * @returns The item id.
+     */
     itemId(item: TItem): any {
         return (item as any)[this.getIdProperty()];
     }
 
+    /**
+     * Returns the number of rows in the grid.
+     * @returns The row count.
+     */
     rowCount() {
         return this._grid.getDataLength();
     }
 
+    /**
+     * Returns the items currently displayed in the grid.
+     * @returns The grid items.
+     */
     getItems(): TItem[] {
         return this.view.getItems();
     }
 
+    /**
+     * Sets the items displayed in the grid.
+     * @param value - The items to display.
+     */
     setItems(value: TItem[]) {
         this.view.setItems(value, true);
     }
 
+    /**
+     * Handles grid sort events by applying the sort and persisting settings.
+     * @param e - Grid sort event.
+     */
     protected handleGridSort(e: GridSortEvent) {
         sleekGridOnSort(this.view, e.args);
         this.persistSettings();
     }
 
+    /**
+     * Handles grid cell click events by delegating to onClick.
+     * @param e - Cell mouse event.
+     */
     protected handleGridClick(e: CellMouseEvent) {
         this.onClick(e, e.row, e.cell);
     }
 
+    /**
+     * Persists settings when columns are reordered.
+     */
     protected handleGridColumnsReordered() {
         this.persistSettings();
     }
 
+    /**
+     * Persists settings when columns are resized.
+     */
     protected handleGridColumnsResized() {
         this.persistSettings();
     }
 
+    /**
+     * Subscribes to the underlying grid events.
+     */
     protected bindToSlickEvents() {
         const boundThis = bindThis(this);
         this._grid.onSort.subscribe(boundThis.handleGridSort);
@@ -487,18 +684,35 @@ export class DataGrid<TItem, P = {}> extends Widget<P> implements IDataGrid, IRe
         this._grid.onColumnsResized.subscribe(boundThis.handleGridColumnsResized);
     }
 
+    /**
+     * Returns the caption for the add/new button.
+     * @returns The add button caption.
+     */
     protected getAddButtonCaption(): string {
         return DataGridTexts.asTry().NewButton ?? 'New';
     }
 
+    /**
+     * Returns the toolbar buttons for this grid.
+     * @returns Tool button definitions.
+     */
     protected getButtons(): ToolButton[] {
         return [];
     }
 
+    /**
+     * Opens an edit dialog for the given entity or id.
+     * @param entityOrId - Entity instance or identifier to edit.
+     */
     protected editItem(entityOrId: any): void {
         throw new Error("Not Implemented!");
     }
 
+    /**
+     * Opens an edit dialog for a specific item type.
+     * @param itemType - Item type key.
+     * @param entityOrId - Entity instance or identifier to edit.
+     */
     protected editItemOfType(itemType: string, entityOrId: any): void {
         if (itemType === this.getItemType()) {
             this.editItem(entityOrId);
@@ -508,6 +722,12 @@ export class DataGrid<TItem, P = {}> extends Widget<P> implements IDataGrid, IRe
         throw new Error("Not Implemented!");
     }
 
+    /**
+     * Handles cell clicks, opening edit links when clicked.
+     * @param e - Click event.
+     * @param row - Row index.
+     * @param cell - Cell index.
+     */
     protected onClick(e: Event, row: number, cell: number): void {
         if (Fluent.isDefaultPrevented(e)) {
             return;
@@ -524,12 +744,18 @@ export class DataGrid<TItem, P = {}> extends Widget<P> implements IDataGrid, IRe
         }
     }
 
+    /**
+     * Handles view data changes by notifying subscribers and relaying out.
+     */
     protected viewDataChanged(): void {
         this.onDataChanged.notify({ dataGrid: this });
         this.markupReady();
         this.layout();
     }
 
+    /**
+     * Subscribes to view events for filtering, submitting, and processing data.
+     */
     protected bindToViewEvents(): void {
         const boundThis = bindThis(this);
         this.view.onDataChanged.subscribe(boundThis.viewDataChanged);
@@ -538,6 +764,11 @@ export class DataGrid<TItem, P = {}> extends Widget<P> implements IDataGrid, IRe
         this.view.onProcessData = boundThis.handleViewProcessData;
     }
 
+    /**
+     * Filters a view item, notifying the onFiltering subscribers.
+     * @param item - The item to filter.
+     * @returns True when the item matches.
+     */
     protected handleViewFilter(item: TItem): boolean { 
         if (!this.onViewFilter(item))
             return false;
@@ -547,6 +778,11 @@ export class DataGrid<TItem, P = {}> extends Widget<P> implements IDataGrid, IRe
         return e.isMatch;
     }
 
+    /**
+     * Processes a list response, notifying the onProcessData subscribers.
+     * @param response - The list response.
+     * @returns The processed response.
+     */
     protected handleViewProcessData(response: ListResponse<TItem>): ListResponse<TItem> {
         response = this.onViewProcessData(response);
         const e: DataGridProcessEvent<TItem> = { dataGrid: this, response: response };
@@ -554,6 +790,10 @@ export class DataGrid<TItem, P = {}> extends Widget<P> implements IDataGrid, IRe
         return e.response;
     }
 
+    /**
+     * Handles view submission, notifying the onSubmitting subscribers.
+     * @returns True when the submit should proceed.
+     */
     protected handleViewSubmit(): boolean {
         if (!this.onViewSubmit())
             return false;
@@ -563,14 +803,28 @@ export class DataGrid<TItem, P = {}> extends Widget<P> implements IDataGrid, IRe
         return !e.cancel;
     }
 
+    /**
+     * Hook for subclasses to process a list response before it is applied.
+     * @param response - The list response.
+     * @returns The processed response.
+     */
     protected onViewProcessData(response: ListResponse<TItem>): ListResponse<TItem> {
         return response;
     }
 
+    /**
+     * Hook for subclasses to filter view items.
+     * @param item - The item to filter.
+     * @returns True when the item should be included.
+     */
     protected onViewFilter(item: TItem): boolean {
         return true;
     }
 
+    /**
+     * Collects the fields and referenced fields of all columns into the given map.
+     * @param include - Map to populate with column field names.
+     */
     protected getIncludeColumns(include: { [key: string]: boolean }): void {
         var columns = this._grid.getColumns();
         for (var column of columns) {
@@ -586,6 +840,9 @@ export class DataGrid<TItem, P = {}> extends Widget<P> implements IDataGrid, IRe
         }
     }
 
+    /**
+     * Sets the Criteria view parameter from the active filter store criteria.
+     */
     protected setCriteriaParameter(): void {
         delete this.view.params['Criteria'];
         if (this.filterBar) {
@@ -596,10 +853,18 @@ export class DataGrid<TItem, P = {}> extends Widget<P> implements IDataGrid, IRe
         }
     }
 
+    /**
+     * Sets an equality filter on the view parameters.
+     * @param field - Field name.
+     * @param value - Equality value.
+     */
     protected setEquality(field: string, value: any): void {
         setEquality(this.view.params, field, value);
     }
 
+    /**
+     * Sets the IncludeColumns view parameter from the grid columns.
+     */
     protected setIncludeColumnsParameter(): void {
         var include = {};
         this.getIncludeColumns(include);
@@ -610,6 +875,9 @@ export class DataGrid<TItem, P = {}> extends Widget<P> implements IDataGrid, IRe
         this.view.params.IncludeColumns = array;
     }
 
+    /**
+     * Prepares all view parameters and notifies the onSetViewParams subscribers.
+     */
     protected setViewParams(): void {
         this.setCriteriaParameter();
         this.setIncludeColumnsParameter();
@@ -617,6 +885,10 @@ export class DataGrid<TItem, P = {}> extends Widget<P> implements IDataGrid, IRe
         this.onSetViewParams.notify({ dataGrid: this });
     }
 
+    /**
+     * Hook invoked before the view submits; prepares parameters and checks loadability.
+     * @returns True when the view can load.
+     */
     protected onViewSubmit(): boolean {
         this.setViewParams();
 
@@ -626,27 +898,50 @@ export class DataGrid<TItem, P = {}> extends Widget<P> implements IDataGrid, IRe
         return true;
     }
 
+    /**
+     * Hook invoked when the grid markup is ready after data changes.
+     */
     protected markupReady(): void {
 
     }
 
+    /**
+     * Creates the container element that hosts the grid.
+     * @returns The grid container element.
+     */
     protected createSlickContainer(): Fluent {
         return Fluent(<div class="grid-container" />).appendTo(this.domNode);
     }
 
+    /**
+     * Creates the remote view used for paging and server communication.
+     * @returns The remote view instance.
+     */
     protected createView(): IRemoteView<TItem> {
         var opt = this.getViewOptions();
         return new RemoteView<TItem>(opt) as any;
     }
 
+    /**
+     * Returns the default sort order for the grid.
+     * @returns Array of sort descriptors.
+     */
     protected getDefaultSortBy(): any[] {
         return getDefaultSortBy(this._grid);
     }
 
+    /**
+     * Whether the grid should render a pager.
+     * @returns True when paging is enabled.
+     */
     protected usePager(): boolean {
         return false;
     }
 
+    /**
+     * Whether advanced filtering is enabled for this grid.
+     * @returns True when advanced filtering is enabled.
+     */
     protected enableAdvancedFiltering(): boolean {
         return this.getCustomAttribute(AdvancedFilteringAttribute)?.value ??
             (typeof dataGridDefaults.enableAdvancedFiltering === "function" ?
@@ -654,10 +949,17 @@ export class DataGrid<TItem, P = {}> extends Widget<P> implements IDataGrid, IRe
                 : dataGridDefaults.enableAdvancedFiltering) ?? false;
     }
 
+    /**
+     * Whether the grid should wait until visible before populating data.
+     * @returns True when population waits for visibility.
+     */
     protected populateWhenVisible(): boolean {
         return false;
     }
 
+    /**
+     * Creates the advanced filter bar and initializes its store.
+     */
     protected createFilterBar(): void {
         this.filterBar = new FilterDisplayBar({
             element: el => {
@@ -668,6 +970,10 @@ export class DataGrid<TItem, P = {}> extends Widget<P> implements IDataGrid, IRe
         this.initializeFilterBar();
     }
 
+    /**
+     * Returns the pager options for this grid.
+     * @returns Pager options.
+     */
     protected getPagerOptions(): PagerOptions {
         return {
             view: this.view,
@@ -676,10 +982,17 @@ export class DataGrid<TItem, P = {}> extends Widget<P> implements IDataGrid, IRe
         };
     }
 
+    /**
+     * Creates the pager widget for this grid.
+     */
     protected createPager(): void {
         new SlickPager({ ...this.getPagerOptions(), element: el => this.domNode.append(el) });
     }
 
+    /**
+     * Returns the remote view options for this grid.
+     * @returns Remote view options.
+     */
     protected getViewOptions() {
         var opt: RemoteViewOptions = {};
         opt.idField = this.getIdProperty();
@@ -702,6 +1015,10 @@ export class DataGrid<TItem, P = {}> extends Widget<P> implements IDataGrid, IRe
         return opt;
     }
 
+    /**
+     * Creates the toolbar with the given buttons.
+     * @param buttons - Tool button definitions.
+     */
     protected createToolbar(buttons: ToolButton[]): void {
         this.toolbar = new Toolbar({
             buttons: buttons,
@@ -710,6 +1027,10 @@ export class DataGrid<TItem, P = {}> extends Widget<P> implements IDataGrid, IRe
         }).init();
     }
 
+    /**
+     * Returns the current grid title text.
+     * @returns The title text, or null if no title is set.
+     */
     getTitle(): string {
         if (!this.titleDiv) {
             return null;
@@ -718,6 +1039,10 @@ export class DataGrid<TItem, P = {}> extends Widget<P> implements IDataGrid, IRe
         return this.titleDiv.findFirst('.title-text').text();
     }
 
+    /**
+     * Sets the grid title text, creating or removing the title element as needed.
+     * @param value - The title text, or null to remove the title.
+     */
     setTitle(value: string) {
         if (value !== this.getTitle()) {
             if (value == null) {
@@ -738,10 +1063,23 @@ export class DataGrid<TItem, P = {}> extends Widget<P> implements IDataGrid, IRe
         }
     }
 
+    /**
+     * Returns the item type key for this grid.
+     * @returns The item type key.
+     */
     protected getItemType(): string {
         return 'Item';
     }
 
+    /**
+     * Creates a formatter that renders a link to an item.
+     * @param itemType - Item type key; defaults to the grid item type.
+     * @param idField - Id field name; defaults to the grid id property.
+     * @param text - Optional text formatter.
+     * @param cssClass - Optional CSS class formatter.
+     * @param encode - Whether to HTML-encode the link text.
+     * @returns A formatter function.
+     */
     protected itemLink(itemType?: string, idField?: string, text?: Format<TItem>,
         cssClass?: (ctx: FormatterContext) => string, encode: boolean = true): Format<TItem> {
         return SlickFormatting.itemLink(itemType ?? this.getItemType(), idField ?? this.getIdProperty(), text, cssClass, encode);
@@ -790,14 +1128,26 @@ export class DataGrid<TItem, P = {}> extends Widget<P> implements IDataGrid, IRe
         })
     }
 
+    /**
+     * Returns the columns key used to load property items.
+     * @returns The columns key, or null for none.
+     */
     protected getColumnsKey(): string {
         return null;
     }
 
+    /**
+     * Returns the property items for this grid.
+     * @returns The property items.
+     */
     protected getPropertyItems(): PropertyItem[] {
         return this.propertyItemsData?.items || [];
     }
 
+    /**
+     * Loads the property items data, either from script data or local items.
+     * @returns The property items data.
+     */
     protected getPropertyItemsData(): PropertyItemsData {
         var columnsKey = this.getColumnsKey();
 
@@ -818,6 +1168,10 @@ export class DataGrid<TItem, P = {}> extends Widget<P> implements IDataGrid, IRe
         return { items: [], additionalItems: [] };
     }
 
+    /**
+     * Asynchronously loads the property items data.
+     * @returns A promise resolving to the property items data.
+     */
     protected async getPropertyItemsDataAsync(): Promise<PropertyItemsData> {
         var columnsKey = this.getColumnsKey();
         if (columnsKey) {
@@ -832,6 +1186,11 @@ export class DataGrid<TItem, P = {}> extends Widget<P> implements IDataGrid, IRe
         return this.createColumns();
     }
 
+    /**
+     * Wraps a column formatter with an edit link formatter.
+     * @param column - Column to wrap.
+     * @param item - Property item describing the edit link.
+     */
     protected wrapFormatterWithEditLink(column: Column, item: PropertyItem) {
         const orgFormat = column.format;
         const itemType = item.editLinkItemType || null;
@@ -847,6 +1206,11 @@ export class DataGrid<TItem, P = {}> extends Widget<P> implements IDataGrid, IRe
         }
     }
 
+    /**
+     * Converts property items to grid columns, wrapping edit-link columns.
+     * @param propertyItems - Property items to convert.
+     * @returns The grid columns.
+     */
     protected propertyItemsToColumns(propertyItems: PropertyItem[]): Column[] {
         var columns = PropertyItemColumnConverter.toColumns(propertyItems);
         for (var i = 0; i < propertyItems.length; i++) {
@@ -858,6 +1222,10 @@ export class DataGrid<TItem, P = {}> extends Widget<P> implements IDataGrid, IRe
         return columns;
     }
 
+    /**
+     * Returns the SleekGrid options for this grid.
+     * @returns Grid options.
+     */
     protected getSlickOptions(): GridOptions {
         var opt: GridOptions = {};
         opt.multiSelect = false;
@@ -872,14 +1240,24 @@ export class DataGrid<TItem, P = {}> extends Widget<P> implements IDataGrid, IRe
         return opt;
     }
 
+    /**
+     * Locks the view against population.
+     */
     protected populateLock(): void {
         this.view.populateLock();
     }
 
+    /**
+     * Unlocks the view population.
+     */
     protected populateUnlock(): void {
         this.view.populateUnlock();
     }
 
+    /**
+     * Determines whether the grid can load data, notifying onCanSubmit subscribers.
+     * @returns True when the grid can load.
+     */
     protected getGridCanLoad(): boolean {
         const e: DataGridSubmitEvent = { dataGrid: this, cancel: false };
         this.onCanSubmit.notify(e);
@@ -889,9 +1267,11 @@ export class DataGrid<TItem, P = {}> extends Widget<P> implements IDataGrid, IRe
         return true;
     }
 
-    /** 
-     * Prepares submit arguments in this.view.params by calling this.view.onSubmit if available, or this.handleViewSubmit if not. 
-     * Note that if getGridCanLoad returns false, the prepared arguments might be in a incomplete state. */
+    /**
+     * Prepares submit arguments in this.view.params by calling this.view.onSubmit if available, or this.handleViewSubmit if not.
+     * Note that if getGridCanLoad returns false, the prepared arguments might be in an incomplete state.
+     * @returns True when the submit should proceed.
+     */
     public prepareSubmit(): boolean {
         if (this.view?.onSubmit) {
             const result = this.view.onSubmit(this.view);
@@ -901,6 +1281,9 @@ export class DataGrid<TItem, P = {}> extends Widget<P> implements IDataGrid, IRe
         return this.handleViewSubmit();
     }
 
+    /**
+     * Refreshes the grid data, waiting for visibility if configured to do so.
+     */
     public refresh() {
         if (!this.populateWhenVisible()) {
             this.internalRefresh();
@@ -914,6 +1297,9 @@ export class DataGrid<TItem, P = {}> extends Widget<P> implements IDataGrid, IRe
         this.slickContainer.data("needsRefresh", "true");
     }
 
+    /**
+     * Refreshes the grid if a refresh was requested while hidden.
+     */
     protected refreshIfNeeded(): void {
         if (!!this.slickContainer.data("needsRefresh")) {
             this.slickContainer.data('needsRefresh', null);
@@ -921,24 +1307,37 @@ export class DataGrid<TItem, P = {}> extends Widget<P> implements IDataGrid, IRe
         }
     }
 
+    /**
+     * Performs the actual data refresh by populating the view.
+     */
     protected internalRefresh(): void {
         this.view.populate();
     }
 
     declare private _readonly: boolean;
 
+    /** Whether the grid is in read-only mode. */
     public get readOnly(): boolean {
         return this.get_readOnly();
     }
 
+    /** Sets whether the grid is in read-only mode. */
     public set readOnly(value: boolean) {
         this.set_readOnly(value);
     }
 
+    /**
+     * Returns whether the grid is in read-only mode.
+     * @returns True when read-only.
+     */
     public get_readOnly() {
         return !!this._readonly;
     }
 
+    /**
+     * Sets whether the grid is in read-only mode and updates the interface.
+     * @param value - True to enable read-only mode.
+     */
     public set_readOnly(value: boolean) {
         if (!!this._readonly != !!value) {
             this._readonly = !!value;
@@ -946,16 +1345,27 @@ export class DataGrid<TItem, P = {}> extends Widget<P> implements IDataGrid, IRe
         }
     }
 
+    /**
+     * Updates the toolbar interface to reflect the current grid state.
+     */
     public updateInterface() {
         this.toolbar && this.toolbar.updateInterface();
     }
 
+    /**
+     * Returns the row definition for this grid.
+     * @returns The row definition, or null for none.
+     */
     protected getRowDefinition(): IRowDefinition {
         return null;
     }
 
     declare private _localTextDbPrefix: string;
 
+    /**
+     * Returns the local text database prefix for this grid.
+     * @returns The local text db prefix.
+     */
     protected getLocalTextDbPrefix(): string {
 
         if (this._localTextDbPrefix != null)
@@ -968,6 +1378,10 @@ export class DataGrid<TItem, P = {}> extends Widget<P> implements IDataGrid, IRe
         return this._localTextDbPrefix;
     }
 
+    /**
+     * Returns the local text prefix for this grid.
+     * @returns The local text prefix, or undefined.
+     */
     protected getLocalTextPrefix(): string {
         var rowDefinition = this.getRowDefinition();
         if (rowDefinition)
@@ -978,6 +1392,10 @@ export class DataGrid<TItem, P = {}> extends Widget<P> implements IDataGrid, IRe
 
     declare private _idProperty: string;
 
+    /**
+     * Returns the id property name for this grid.
+     * @returns The id property name.
+     */
     protected getIdProperty(): string {
         if (this._idProperty != null)
             return this._idProperty;
@@ -989,12 +1407,20 @@ export class DataGrid<TItem, P = {}> extends Widget<P> implements IDataGrid, IRe
         return this._idProperty = 'ID';
     }
 
+    /**
+     * Returns the is-deleted property name for this grid.
+     * @returns The is-deleted property name, or undefined.
+     */
     protected getIsDeletedProperty(): string {
         return this.getRowDefinition()?.isDeletedProperty;
     }
 
     declare private _isActiveProperty: string;
 
+    /**
+     * Returns the is-active property name for this grid.
+     * @returns The is-active property name.
+     */
     protected getIsActiveProperty(): string {
         if (this._isActiveProperty != null)
             return this._isActiveProperty;
@@ -1006,18 +1432,32 @@ export class DataGrid<TItem, P = {}> extends Widget<P> implements IDataGrid, IRe
         return this._isActiveProperty = '';
     }
 
+    /**
+     * Resizes the underlying grid canvas.
+     */
     protected resizeCanvas(): void {
         this._grid?.resizeCanvas();
     }
 
+    /**
+     * Refreshes the grid when a sub-dialog reports a data change.
+     */
     protected subDialogDataChange(): void {
         this.refresh();
     }
 
+    /**
+     * Adds a separator to the quick filter bar.
+     */
     protected addFilterSeparator(): void {
         this.ensureQuickFilterBar().addSeparator();
     }
 
+    /**
+     * Resolves a localized text using the grid's local text db prefix.
+     * @param getKey - Callback that builds the text key from the prefix.
+     * @returns The localized text, or null if not found.
+     */
     protected determineText(getKey: (prefix: string) => string) {
         var localTextPrefix = this.getLocalTextDbPrefix();
         if (localTextPrefix) {
@@ -1030,52 +1470,112 @@ export class DataGrid<TItem, P = {}> extends Widget<P> implements IDataGrid, IRe
         return null;
     }
 
+    /**
+     * Adds a quick filter to the quick filter bar.
+     * @param opt - Quick filter definition.
+     * @returns The created widget instance.
+     */
     protected addQuickFilter<TWidget extends Widget<any>, P>(opt: QuickFilter<TWidget, P>): TWidget {
         return this.ensureQuickFilterBar().add(opt);
     }
 
+    /**
+     * Adds a date range quick filter for the specified field.
+     * @param field - Field name.
+     * @param title - Optional display title.
+     * @returns The created date editor.
+     */
     protected addDateRangeFilter(field: string, title?: string): DateEditor {
         return this.ensureQuickFilterBar().addDateRange(field, title);
     }
 
+    /**
+     * Creates a date range quick filter definition.
+     * @param field - Field name.
+     * @param title - Optional display title.
+     * @returns A quick filter definition.
+     */
     protected dateRangeQuickFilter(field: string, title?: string) {
         return QuickFilterBar.dateRange(field, title);
     }
 
+    /**
+     * Adds a date-time range quick filter for the specified field.
+     * @param field - Field name.
+     * @param title - Optional display title.
+     * @returns The created date-time editor.
+     */
     protected addDateTimeRangeFilter(field: string, title?: string) {
         return this.ensureQuickFilterBar().addDateTimeRange(field, title);
     }
 
+    /**
+     * Creates a date-time range quick filter definition.
+     * @param field - Field name.
+     * @param title - Optional display title.
+     * @returns A quick filter definition.
+     */
     protected dateTimeRangeQuickFilter(field: string, title?: string) {
         return QuickFilterBar.dateTimeRange(field, title);
     }
 
+    /**
+     * Adds a boolean quick filter for the specified field.
+     * @param field - Field name.
+     * @param title - Optional display title.
+     * @param yes - Optional text for the true option.
+     * @param no - Optional text for the false option.
+     * @returns The created select editor.
+     */
     protected addBooleanFilter(field: string, title?: string, yes?: string, no?: string): SelectEditor {
         return this.ensureQuickFilterBar().addBoolean(field, title, yes, no);
     }
 
+    /**
+     * Creates a boolean quick filter definition.
+     * @param field - Field name.
+     * @param title - Optional display title.
+     * @param yes - Optional text for the true option.
+     * @param no - Optional text for the false option.
+     * @returns A quick filter definition.
+     */
     protected booleanQuickFilter(field: string, title?: string, yes?: string, no?: string) {
         return QuickFilterBar.boolean(field, title, yes, no);
     }
 
+    /**
+     * Invokes the quick filter submit handlers with the current view params.
+     */
     protected invokeSubmitHandlers() {
         if (this.quickFiltersBar != null) {
             this.quickFiltersBar.onSubmit(this.view.params);
         }
     }
 
+    /**
+     * Handles quick filter changes by persisting settings and refreshing.
+     * @param e - Change event.
+     */
     protected quickFilterChange(e: Event) {
         this.persistSettings();
         this.view && (this.view.seekToPage = 1);
         this.refresh();
     }
 
+    /**
+     * Returns the storage used for grid persistence.
+     * @returns The persistence storage.
+     */
     protected getPersistenceStorage(): SettingStorage {
         if ((this as any).getPersistanceStorage) return (this as any).getPersistanceStorage(); // compat
 
         return DataGrid.defaultPersistenceStorage;
     }
 
+    /**
+     * Returns the key used to store grid settings.
+     * @returns The persistence key.
+     */
     protected getPersistenceKey(): string {
         if ((this as any).getPersistanceKey) return ((this as any).getPersistanceKey); // compat
 
@@ -1089,12 +1589,20 @@ export class DataGrid<TItem, P = {}> extends Widget<P> implements IDataGrid, IRe
         return key;
     }
 
+    /**
+     * Returns the default persistence flags for this grid.
+     * @returns Grid persistence flags.
+     */
     protected gridPersistenceFlags(): GridPersistenceFlags {
         if ((this as any).gridPersistanceFlags) return (this as any).gridPersistanceFlags; // compat
 
         return {};
     }
 
+    /**
+     * Retrieves the persisted grid settings from storage.
+     * @returns The persisted settings, or a promise resolving to them.
+     */
     protected getPersistedSettings(): PersistedGridSettings | Promise<PersistedGridSettings> {
         var storage = this.getPersistenceStorage();
         if (storage == null)
@@ -1114,6 +1622,12 @@ export class DataGrid<TItem, P = {}> extends Widget<P> implements IDataGrid, IRe
         return fromJson(jsonOrPromise as string);
     }
 
+    /**
+     * Restores grid settings from the given settings or from storage.
+     * @param settings - Optional settings to restore; defaults to persisted settings.
+     * @param flags - Optional persistence flags.
+     * @returns Void or a promise that resolves when restoration completes.
+     */
     protected restoreSettings(settings?: PersistedGridSettings, flags?: GridPersistenceFlags): void | Promise<void> {
         if (settings != null)
             return this.restoreSettingsFrom(settings, flags);
@@ -1125,6 +1639,11 @@ export class DataGrid<TItem, P = {}> extends Widget<P> implements IDataGrid, IRe
         this.restoreSettingsFrom(settingsOrPromise as PersistedGridSettings);
     }
 
+    /**
+     * Restores grid state from a persisted settings snapshot.
+     * @param settings - The settings to restore.
+     * @param flags - Optional persistence flags.
+     */
     protected restoreSettingsFrom(settings: PersistedGridSettings, flags?: GridPersistenceFlags): void {
         if (!this._grid || !settings)
             return;
@@ -1171,14 +1690,25 @@ export class DataGrid<TItem, P = {}> extends Widget<P> implements IDataGrid, IRe
 
     private _persistenceLock: number = 0;
 
+    /**
+     * Increments the persistence lock, preventing settings from being persisted.
+     */
     public persistenceLock() {
         this._persistenceLock++;
     }
 
+    /**
+     * Decrements the persistence lock.
+     */
     public persistenceUnlock() {
         this._persistenceLock--;
     }
 
+    /**
+     * Persists the current grid settings to storage.
+     * @param flags - Optional persistence flags.
+     * @returns Void or a promise that resolves when the write completes.
+     */
     public persistSettings(flags?: GridPersistenceFlags): void | Promise<void> {
         if (this._persistenceLock > 0)
             return;
@@ -1192,6 +1722,11 @@ export class DataGrid<TItem, P = {}> extends Widget<P> implements IDataGrid, IRe
         return storage.setItem(this.getPersistenceKey(), JSON.stringify(settings));
     }
 
+    /**
+     * Returns the current grid settings snapshot.
+     * @param flags - Optional persistence flags.
+     * @returns The current grid settings.
+     */
     public getCurrentSettings(flags?: GridPersistenceFlags) {
 
         const flagsDefault = this.gridPersistenceFlags();
@@ -1222,31 +1757,53 @@ export class DataGrid<TItem, P = {}> extends Widget<P> implements IDataGrid, IRe
         return event.settings;
     }
 
+    /**
+     * Returns the root DOM element of the grid widget.
+     * @returns The grid container element.
+     */
     getElement(): HTMLElement {
         return this.domNode;
     }
 
+    /**
+     * Returns the underlying SleekGrid instance.
+     * @returns The grid instance.
+     */
     getGrid(): ISleekGrid<TItem> {
         return this._grid;
     }
 
+    /** The underlying SleekGrid instance. */
     public get sleekGrid() { return this._grid; }
+    /** Sets the underlying SleekGrid instance. */
     protected set sleekGrid(value: ISleekGrid<TItem>) { this._grid = value; }
 
     /** @deprecated Use sleekGrid or getGrid() */
     public get slickGrid() { return this._grid; }
 
+    /**
+     * Returns the remote view used for paging and server communication.
+     * @returns The remote view instance.
+     */
     getView(): IRemoteView<TItem> {
         return this.view;
     }
 
+    /**
+     * Returns the filter store owned by the grid.
+     * @returns The filter store, or null if no filter bar exists.
+     */
     getFilterStore(): FilterStore {
         return (this.filterBar == null) ? null : this.filterBar.get_store();
     }
 
+    /** All columns including hidden ones. */
     public get allColumns(): Column[] { return this._grid?.getAllColumns() }
+    /** The currently visible columns. */
     public get columns() { return this._grid?.getColumns(); }
+    /** The initial persisted settings captured at startup. */
     public get initialSettings() { return this._initialSettings; }
+    /** Sets the initial persisted settings. */
     protected set initialSettings(value: PersistedGridSettings) { this._initialSettings = value; }
 
     /** @deprecated use defaultPersistenceStorage, this one has a typo */
@@ -1255,24 +1812,45 @@ export class DataGrid<TItem, P = {}> extends Widget<P> implements IDataGrid, IRe
     public static set defaultPersistanceStorage(value: SettingStorage) { DataGrid.defaultOptions.persistenceStorage = value; }
 }
 
+/**
+ * Base event arguments for data grid events.
+ */
 export interface DataGridEvent {
+    /** The data grid that raised the event. */
     dataGrid: DataGrid<any>;
 }
 
+/** Event raised when the grid data changes. */
 export type DataGridChangeEvent = DataGridEvent;
+/** Event raised after the grid is initialized. */
 export type DataGridInitEvent = DataGridEvent;
 
 
+/**
+ * Event raised to determine whether the grid view submit should proceed.
+ */
 export interface DataGridSubmitEvent extends DataGridEvent {
+    /** When true, the submit is cancelled. */
     cancel?: boolean;
 }
 
+/**
+ * Event raised while filtering items in the view.
+ * @typeParam TItem - Row type displayed in the grid.
+ */
 export interface DataGridFilteringEvent<TItem = any> extends DataGridEvent {
+    /** The item being filtered. */
     item: TItem;
+    /** Whether the item matches the filter; subscribers may change this. */
     isMatch: boolean;
 }
 
+/**
+ * Event raised when the view processes a list response.
+ * @typeParam TItem - Row type displayed in the grid.
+ */
 export interface DataGridProcessEvent<TItem> extends DataGridEvent {
+    /** The list response being processed. */
     response: ListResponse<TItem>;
 }
 

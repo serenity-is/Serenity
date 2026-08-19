@@ -1,20 +1,38 @@
 import { cssEscape, EntityDialogTexts, faIcon, Fluent, LanguageList, localText, PropertyItem, SaveRequest, TranslationConfig } from "../../base";
 import { PropertyGrid, PropertyGridOptions } from "../widgets/propertygrid";
 
+/**
+ * Options for the {@link EntityLocalizer}.
+ */
 export interface EntityLocalizerOptions {
+    /** Resolves an element by id within the dialog. */
     byId: (id: string) => Fluent,
+    /** Id prefix used for generated elements. */
     idPrefix: string,
+    /** Whether the entity is new (no id). */
     isNew: () => boolean,
+    /** Returns the localization toggle button. */
     getButton: () => Fluent;
+    /** Returns the current entity. */
     getEntity: () => any;
+    /** Returns the list of available languages. */
     getLanguages: () => LanguageList,
+    /** Returns the property grid element. */
     getPropertyGrid: () => Fluent,
+    /** Returns the toolbar button elements. */
     getToolButtons: () => HTMLElement[]
+    /** Options for the localization property grid. */
     pgOptions: PropertyGridOptions,
+    /** Retrieves existing localizations for the entity. */
     retrieveLocalizations: () => PromiseLike<{ [languageId: string]: any }>,
+    /** Validates the main form before switching modes. */
     validateForm: () => boolean,
 }
 
+/**
+ * Manages the localization grid for an entity dialog, letting users edit
+ * translations of localizable fields for each language.
+ */
 export class EntityLocalizer {
 
     declare protected grid: PropertyGrid;
@@ -24,6 +42,10 @@ export class EntityLocalizer {
 
     private options: EntityLocalizerOptions;
 
+    /**
+     * Creates a localizer and builds the localization grid.
+     * @param opt - Options for the localizer.
+     */
     constructor(opt: EntityLocalizerOptions) {
         this.options = opt;
         const { pgOptions, idPrefix } = opt;
@@ -120,6 +142,9 @@ export class EntityLocalizer {
         });
     }
 
+    /**
+     * Destroys the localization grid.
+     */
     destroy() {
         if (this.grid) {
             this.grid.destroy();
@@ -127,19 +152,34 @@ export class EntityLocalizer {
         }
     }
 
+    /**
+     * Clears pending and last localization values.
+     */
     public clearValue(): void {
         this.pendingValue = null;
         this.lastValue = null;
     }
 
+    /**
+     * Whether the localization grid is enabled (there are localizable fields).
+     * @returns True when enabled.
+     */
     public isEnabled(): boolean {
         return !!this.grid;
     }
 
+    /**
+     * Whether the dialog is currently in localization mode.
+     * @returns True when in localization mode.
+     */
     protected isLocalizationMode(): boolean {
         return !!(this.isEnabled() && this.options.getButton()?.hasClass('pressed'));
     }
 
+    /**
+     * Whether the localization values changed since the last save.
+     * @returns True when changed.
+     */
     protected isLocalizationModeAndChanged(): boolean {
         if (!this.isLocalizationMode()) {
             return false;
@@ -149,6 +189,9 @@ export class EntityLocalizer {
         return JSON.stringify(this.lastValue) != JSON.stringify(newValue);
     }
 
+    /**
+     * Toggles localization mode and loads/saves localization values.
+     */
     public buttonClick(): void {
         if (this.isLocalizationMode() && !this.options.validateForm()) {
             return;
@@ -167,6 +210,9 @@ export class EntityLocalizer {
         }
     }
 
+    /**
+     * Loads localization values into the grid.
+     */
     protected loadLocalization(): void {
         if (this.lastValue == null && this.options.isNew()) {
             this.grid.load({});
@@ -194,6 +240,9 @@ export class EntityLocalizer {
         });
     }
 
+    /**
+     * Copies current field values into the localization grid as hints.
+     */
     protected setLocalizationGridCurrentValues(): void {
         const valueByName: Record<string, any> = {};
 
@@ -215,6 +264,10 @@ export class EntityLocalizer {
         });
     }
 
+    /**
+     * Returns the localization values from the grid, keyed by language and field.
+     * @returns The localization values.
+     */
     protected getLocalizationGridValue(): any {
         var value: any = {};
         this.grid.save(value);
@@ -228,12 +281,20 @@ export class EntityLocalizer {
         return value;
     }
 
+    /**
+     * Adds pending localizations to a save request.
+     * @param req - The save request to modify.
+     */
     public editSaveRequest(req: SaveRequest<any>) {
         if (this.pendingValue != null) {
             req.Localizations = this.getPendingLocalizations();
         }
     }
 
+    /**
+     * Returns pending localizations grouped by language.
+     * @returns The pending localizations.
+     */
     protected getPendingLocalizations(): any {
         if (this.pendingValue == null) {
             return null;
@@ -257,6 +318,9 @@ export class EntityLocalizer {
         return result;
     }
 
+    /**
+     * Updates the UI to reflect the current localization mode.
+     */
     public updateInterface(): void {
 
         if (!this.isEnabled())

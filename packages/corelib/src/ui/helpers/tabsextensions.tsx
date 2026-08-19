@@ -2,10 +2,20 @@ import { Fluent, getjQuery, isArrayLike } from "../../base";
 
 export { };
 
+/**
+ * Helper functions for working with tab controls, supporting both jQuery UI
+ * tabs and Bootstrap-style tabs.
+ */
 export namespace TabsExtensions {
     var navLinkSelector = ":scope > ul > li > a.nav-link, :scope > li > a.nav-link, :scope > a.nav-link, :scope > ul > li > a.ui-tabs-anchor, :scope > li > a.ui-tabs-anchor";
     var navLinkSelectorActive = ":scope > ul > li > a.nav-link.active, :scope > li > a.nav-link.active, :scope > a.nav-link.active, :scope > ul > li.ui-tabs-active > a, :scope > li.ui-tabs-active > a";
 
+    /**
+     * Enables or disables a tab.
+     * @param tabs - The tabs element (or array-like of elements).
+     * @param tabKey - The tab key or index.
+     * @param isDisabled - Whether the tab should be disabled.
+     */
     export function setDisabled(tabs: ArrayLike<HTMLElement> | HTMLElement, tabKey: string | number, isDisabled: boolean) {
         tabs = isArrayLike(tabs) ? tabs[0] : tabs;
         if (!tabs || typeof tabs === "string")
@@ -46,6 +56,12 @@ export namespace TabsExtensions {
         $(tabs).tabs?.(isDisabled ? 'disable' : 'enable', index);
     }
 
+    /**
+     * Shows or hides a tab.
+     * @param tabs - The tabs element (or array-like of elements).
+     * @param tabKey - The tab key or index.
+     * @param visible - Whether the tab should be visible.
+     */
     export function toggle(tabs: ArrayLike<HTMLElement> | HTMLElement, tabKey: string | number, visible: boolean) {
         tabs = isArrayLike(tabs) ? tabs[0] : tabs;
         if (!tabs || typeof tabs === "string")
@@ -85,6 +101,11 @@ export namespace TabsExtensions {
         $(tabs).children('ul').children('li').eq(index).toggle(visible);
     }
 
+    /**
+     * Returns the key of the currently active tab.
+     * @param tabs - The tabs element (or array-like of elements).
+     * @returns The active tab key.
+     */
     export function activeTabKey(tabs: ArrayLike<HTMLElement> | HTMLElement) {
         tabs = isArrayLike(tabs) ? tabs[0] : tabs;
         if (!tabs || typeof tabs === "string")
@@ -116,6 +137,11 @@ export namespace TabsExtensions {
         return href;
     }
 
+    /**
+     * Returns a mapping of tab keys to their zero-based index.
+     * @param tabs - The tabs element (or array-like of elements).
+     * @returns A record mapping tab keys to indexes.
+     */
     export function indexByKey(tabs: ArrayLike<HTMLElement> | HTMLElement): Record<string, number> {
         var indexByKey: Record<string, number> = {};
         tabs = isArrayLike(tabs) ? tabs[0] : tabs;
@@ -129,6 +155,11 @@ export namespace TabsExtensions {
         return indexByKey;
     }
 
+    /**
+     * Selects (activates) the tab with the given key or index.
+     * @param tabs - The tabs element (or array-like of elements).
+     * @param tabKey - The tab key or index to select.
+     */
     export function selectTab(tabs: HTMLElement | ArrayLike<HTMLElement>, tabKey: string | number) {
         tabs = isArrayLike(tabs) ? tabs[0] : tabs;
         if (!tabs || typeof tabs === "string")
@@ -159,6 +190,13 @@ export namespace TabsExtensions {
         }
     }
 
+    /**
+     * Initializes a tabs control, using jQuery UI tabs if available, otherwise
+     * emulating them with Bootstrap.
+     * @param tabs - The tabs element (or array-like of elements).
+     * @param activeChange - Optional callback invoked when the active tab changes.
+     * @returns A Fluent wrapper around the tabs element, or null if invalid.
+     */
     export function initialize(tabs: HTMLElement | ArrayLike<HTMLElement>, activeChange: () => void): Fluent<HTMLElement> {
         tabs = isArrayLike(tabs) ? tabs[0] : tabs;
         if (!tabs || typeof tabs === "string")
@@ -220,6 +258,10 @@ export namespace TabsExtensions {
         }
     }
 
+    /**
+     * Destroys a tabs control, cleaning up jQuery UI or Bootstrap tab instances.
+     * @param tabs - The tabs element (or array-like of elements).
+     */
     export function destroy(tabs: HTMLElement | ArrayLike<HTMLElement>): void {
         if (!tabs || typeof tabs === "string")
             return;

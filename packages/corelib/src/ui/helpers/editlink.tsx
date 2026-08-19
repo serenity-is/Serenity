@@ -51,6 +51,10 @@ export function EditLink(props: {
     </a> as HTMLAnchorElement;
 }
 
+/**
+ * Formatting purposes for which the edit link should be skipped (e.g. exports,
+ * group headers/totals, header filters, and print).
+ */
 export const skipEditLinkFormatPurposes = new Set<string>([
     "excel-export",
     "group-header",

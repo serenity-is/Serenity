@@ -7,77 +7,112 @@ import { localText } from "./localtext";
 import { isArrayLike, isPromiseLike, omitUndefined } from "./system";
 
 /**
- * Options for a message dialog button
+ * Options that describe a single button rendered in a {@link Dialog} footer.
+ * @remarks
+ * Buttons are rendered as Bootstrap `btn` or jQuery UI button elements depending
+ * on the active dialog provider. When {@link DialogButton.result} is set and the
+ * click handler does not cancel the event, the dialog automatically closes with
+ * that result code.
  */
 export interface DialogButton {
-    /** Button text */
+    /** Visible caption rendered inside the button. Defaults to a localized value when created via helper factories. */
     text?: string;
-    /** Button hint */
+    /** Tooltip / `title` attribute shown on hover. */
     hint?: string;
-    /** Button icon */
+    /** Optional icon displayed before the text; resolved via {@link iconClassName}. */
     icon?: IconClassName;
-    /** Click handler */
+    /**
+     * Click handler invoked when the button is activated.
+     * @param e - The originating mouse event.
+     * @returns `false` to prevent the automatic close, or a `Promise` that resolves to `false` to cancel asynchronously.
+     */
     click?: (e: MouseEvent) => void | false | Promise<void | false>;
-    /** CSS class for button */
+    /** Additional CSS class(es) added to the button element (e.g. `"btn-primary"`, `"btn-danger"`). */
     cssClass?: string;
-    /** The code that is returned from message dialog function when this button is clicked.
-     *  If this is set, and click event will not be defaultPrevented dialog will close.
+    /**
+     * Result code assigned to the dialog when this button is clicked.
+     * The value is stored in `dataset.dialogResult` and passed to `onClose` handlers.
+     * If set and the click handler does not call `preventDefault()` / return `false`, the dialog closes automatically.
      */
     result?: string;
 }
 
+/**
+ * Identifies the underlying UI provider that backs a {@link Dialog} instance.
+ * - `"bsmodal"` — Bootstrap modal (`.modal`).
+ * - `"uidialog"` — jQuery UI dialog (`.ui-dialog`).
+ * - `"panel"` — Inline Serenity panel (`.s-Panel`).
+ */
 export type DialogProviderType = "bsmodal" | "uidialog" | "panel";
 
 /**
- * Options that apply to all dialog types
+ * Options that configure a {@link Dialog} instance across all providers.
+ * @remarks
+ * The dialog provider is chosen automatically from {@link DialogOptions.preferPanel},
+ * {@link DialogOptions.preferBSModal}, and feature detection (`hasBSModal()` / `hasUIDialog()`).
+ * Provider-specific options can be injected via {@link DialogOptions.providerOptions}.
  */
 export interface DialogOptions {
-    /** Auto dispose dialog on close, default is true */
+    /** When `true`, {@link Dialog.dispose} is called automatically on close. @defaultValue `true` */
     autoDispose?: boolean;
-    /** True to auto open dialog */
+    /** When `true`, the dialog opens immediately after construction. @defaultValue `true` */
     autoOpen?: boolean;
-    /** Backdrop type, static to make it modal, e.g. can't be closed by clicking outside */
+    /** Backdrop behavior for Bootstrap modals; `"static"` prevents closing on outside click. @defaultValue `false` */
     backdrop?: boolean | "static"
-    /** List of buttons to show on the dialog */
+    /** Buttons rendered in the dialog footer. */
     buttons?: DialogButton[];
-    /** Vertically center modal */
+    /** Vertically centers a Bootstrap modal via `modal-dialog-centered`. @defaultValue `true` */
     centered?: boolean;
-    /** Show close button, default is true */
+    /** Whether to render the header close (`×` / `btn-close`) button. @defaultValue `true` */
     closeButton?: boolean;
-    /** Close dialog on escape key. Default is true for message dialogs. */
+    /** Whether pressing <kbd>Escape</kbd> closes the dialog. Message dialogs default to `true`. */
     closeOnEscape?: boolean;
-    /** CSS class to use for all dialog types. Is added to the top ui-dialog, panel or modal element */
+    /** Extra CSS class(es) added to the root dialog element (`.modal`, `.ui-dialog`, or `.s-Panel`). */
     dialogClass?: string;
-    /** Dialog content/body element, or callback that will populate the content element */
+    /** Body element or a callback that populates the freshly created body element. Array-like values are treated as the content node. */
     element?: HTMLElement | ArrayLike<HTMLElement> | ((element: HTMLElement) => void);
-    /** Enable / disable animation. Default is false for message dialogs, true for other dialogs */
+    /** Enables fade animation for Bootstrap modals. @defaultValue `false` for message dialogs, `true` otherwise */
     fade?: boolean;
-    /** Sets one of modal-fullscreen{-...-down} classes. Only used for bootstrap modals */
+    /** Applies a `modal-fullscreen[-{breakpoint}-down]` class. Only effective for Bootstrap modals. */
     fullScreen?: boolean | "sm-down" | "md-down" | "lg-down" | "xl-down" | "xxl-down",
-    /** Modal option for jQuery UI dialog compatibility only. Not to be confused with Bootstrap modal. */
+    /** jQuery UI `modal` flag. Retained for backward compatibility; does not affect Bootstrap modals. */
     modal?: boolean;
-    /** Event handler that is called when dialog is opened */
+    /** Callback invoked after the dialog is opened. */
     onOpen?: (e?: Event) => void;
-    /** Event handler that is called when dialog is closed */
+    /** Callback invoked after the dialog is closed, receiving the result code. */
     onClose?: (result: string, e?: Event) => void;
-    /** Prefer Bootstrap modals to jQuery UI dialogs when both are available */
+    /** When both providers are available, prefer Bootstrap modal over jQuery UI dialog. @defaultValue `true` */
     preferBSModal?: boolean;
-    /** Prefer Panel even when Modal / jQuery UI is available */
+    /** Force inline panel mode even when modal / jQuery UI providers are available. */
     preferPanel?: boolean;
-    /** Callback to get options specific to the dialog provider type */
+    /** Returns provider-specific options merged into the underlying call (Bootstrap modal options or jQuery UI dialog options). @param type - Resolved provider type. @param opt - The resolved dialog options. @returns Provider-specific options object. */
     providerOptions?: (type: DialogProviderType, opt: DialogOptions) => any;
-    /** Scrollable, sets content of the modal to scrollable, only for Bootstrap */
+    /** Makes the Bootstrap modal body scrollable via `modal-dialog-scrollable`. */
     scrollable?: boolean;
-    /** Size. Default is null for (500px) message dialogs, lg for normal dialogs */
+    /** Bootstrap modal size. @defaultValue `"lg"` for regular dialogs, `"md"` for message dialogs */
     size?: "sm" | "md" | "lg" | "xl";
-    /** Dialog title */
+    /** Title text shown in the dialog header. */
     title?: string;
-    /** Only used for jQuery UI dialogs for backwards compatibility */
+    /** Initial width in pixels; only used by the jQuery UI dialog provider. */
     width?: number;
 }
 
 /**
- * Wrapper for different types of dialogs, including jQuery UI, Bootstrap modals, and Panels.
+ * Unified wrapper over jQuery UI dialogs, Bootstrap modals, and Serenity inline panels.
+ * @remarks
+ * Provider selection is automatic: `preferPanel` wins, otherwise jQuery UI vs. Bootstrap
+ * is chosen via {@link hasUIDialog}, {@link hasBSModal}, and `preferBSModal`.
+ * Lifecycle events (`panel*`, `dialog*`, `show.bs.modal` / `hide.bs.modal`) are normalized
+ * so that {@link Dialog.onOpen} / {@link Dialog.onClose} work uniformly across providers.
+ * @example
+ * ```ts
+ * const dlg = new Dialog({
+ *   title: "Hello",
+ *   element: el => el.append("Content"),
+ *   buttons: [okDialogButton(), cancelDialogButton()]
+ * });
+ * dlg.onClose(result => console.log(result));
+ * ```
  */
 export class Dialog {
 
@@ -85,9 +120,12 @@ export class Dialog {
     declare private dialogResult: string;
 
     /**
-     * Creates a new dialog. The type of the dialog will be determined based on 
-     * the availability of jQuery UI, Bootstrap, and the options provided.
-     * @param opt Optional configuration for the dialog
+     * Creates a new dialog.
+     * @param opt - Configuration for the dialog; merged over {@link Dialog.defaults}.
+     * @param create - When `false`, skips DOM creation and only binds to an existing element. Used internally by {@link Dialog.getInstance}.
+     * @remarks
+     * The concrete provider (panel / jQuery UI / Bootstrap) is resolved from availability
+     * and `preferPanel` / `preferBSModal` flags.
      */
     constructor(opt?: DialogOptions);
     constructor(opt?: DialogOptions, create = true) {
@@ -138,7 +176,7 @@ export class Dialog {
             this.open();
     }
 
-    /** Default set of dialog options */
+    /** Default options applied to every {@link Dialog} before caller-supplied `opt` is merged. */
     static defaults: DialogOptions = {
         autoDispose: true,
         autoOpen: true,
@@ -152,7 +190,7 @@ export class Dialog {
         size: "lg"
     }
 
-    /** Default set of message dialog options */
+    /** Default options applied to helper message dialogs (`alertDialog`, `confirmDialog`, etc.). */
     static messageDefaults: MessageDialogOptions = {
         autoDispose: true,
         autoOpen: true,
@@ -181,14 +219,22 @@ export class Dialog {
         return new (Dialog as any)({ element: el }, false);
     }
 
-    /** The result code of the button that is clicked. Also attached to the dialog element as data-dialog-result */
+    /**
+     * Result code of the last button that closed the dialog.
+     * @remarks Mirrors `element.dataset.dialogResult`; survives disposal via the fallback field.
+     * @returns The result string (e.g. `"ok"`, `"yes"`, `"cancel"`) or `null`/`undefined` when not yet closed.
+     */
     get result(): string {
         return this.el ? this.el.dataset.dialogResult : this.dialogResult;
     }
 
-    /** Closes dialog setting the result to null */
+    /** Closes the dialog and reports a `null` result. @returns The dialog instance for chaining. */
     close(): this;
-    /** Closes dialog with the result set to value */
+    /**
+     * Closes the dialog with an explicit result code.
+     * @param result - Value stored in `dataset.dialogResult` and passed to `onClose` handlers.
+     * @returns The dialog instance for chaining.
+     */
     close(result: string): this;
     close(result?: string): this {
         this.el && (this.el.dataset.dialogResult = result ?? null);
@@ -216,12 +262,12 @@ export class Dialog {
     }
 
     /**
-     * Adds an event handler that is called when the dialog is closed. If the opt.before is true, the handler is called before the dialog is closed and
-     * the closing can be cancelled by calling preventDefault on the event object.
-     * @param handler The event handler function
-     * @param opt Options to determine whether the handler should be called before the dialog is closed, and whether the handler should be called only once. 
-     * The default for oneOff is true unless opt.before is true.
-     * @returns The dialog instance
+     * Subscribes to the dialog close event.
+     * @param handler - Callback invoked with the dialog result and the close event. Call `preventDefault()` on the event to cancel closing when `opt.before` is `true`.
+     * @param opt - Subscription options.
+     * @param opt.before - When `true`, listens to the cancellable *before-close* event (`panelbeforeclose` / `dialogbeforeclose` / `hide.bs.modal`).
+     * @param opt.oneOff - When `true`, the handler is removed after the first invocation. Defaults to `true` unless `before` is `true`.
+     * @returns The dialog instance for chaining.
      */
 
     onClose(handler: (result?: string, e?: Event) => void, opt?: { before?: boolean, oneOff?: boolean }): this {
@@ -241,13 +287,12 @@ export class Dialog {
     }
 
     /**
-     * Adds an event handler that is called when the dialog is closed. If the opt.before is true, the handler is called before the dialog is closed and
-     * the closing can be cancelled by calling preventDefault on the event object. Note that if the dialog is not yet initialized, the first argument must be
-     * the body element of the dialog.
-     * @param el The dialog body element (.s-Panel, .ui-dialog-content, or .modal-body)
-     * @param handler The event handler function
-     * @param opt Options to determine whether the handler should be called before the dialog is closed, and whether the handler should be called only once. 
-     * The default for oneOff is true unless opt.before is true.
+     * Static helper that subscribes to the close event for a dialog element that may not yet be instantiated.
+     * @param el - Dialog body element (`.s-Panel`, `.ui-dialog-content`, or `.modal-body`) or an array-like wrapper.
+     * @param handler - Callback invoked with the dialog result and the close event; `preventDefault()` cancels the close when `opt.before` is `true`.
+     * @param opt - Subscription options.
+     * @param opt.before - Listen to the cancellable *before-close* event.
+     * @param opt.oneOff - Auto-remove after first invocation. Defaults to `true` unless `before` is `true`.
      */
     static onClose(el: HTMLElement | ArrayLike<HTMLElement>, handler: (result?: string, e?: Event) => void, opt?: { before?: boolean, oneOff?: boolean }) {
         const instance = Dialog.getInstance(el);
@@ -272,13 +317,12 @@ export class Dialog {
     }
 
     /**
-     * Adds an event handler that is called when the dialog is opened. If the second parameter is true, the handler is called before the dialog is opened and
-     * the opening can be cancelled by calling preventDefault on the event object.
-     * Note that if the dialog is not yet initialized, the first argument must be the body element of the dialog.
-     * @param handler The event handler function
-     * @param opt Options to determine whether the handler should be called before the dialog is opened, and whether the handler should be called only once. 
-     * The default for oneOff is true unless opt.before is true.
-     * @returns The dialog instance
+     * Subscribes to the dialog open event.
+     * @param handler - Callback invoked when the dialog is opened; `preventDefault()` cancels the open when `opt.before` is `true`.
+     * @param opt - Subscription options.
+     * @param opt.before - When `true`, listens to the cancellable *before-open* event (`panelbeforeopen` / `dialogbeforeopen` / `show.bs.modal`).
+     * @param opt.oneOff - Auto-remove after first invocation. Defaults to `true` unless `before` is `true`.
+     * @returns The dialog instance for chaining.
      */
     onOpen(handler: (e?: Event) => void, opt?: { before?: boolean, oneOff?: boolean }): this {
         const target = getDialogEventsNode(this.el);
@@ -296,14 +340,12 @@ export class Dialog {
     }
 
     /**
-     * Adds an event handler that is called when the dialog is opened. If the second parameter is true, the handler is called before the dialog is opened and
-     * the opening can be cancelled by calling preventDefault on the event object. Note that if the dialog is not yet initialized, the first argument must be
-     * the body element of the dialog.
-     * @param el The dialog body element (.s-Panel, .ui-dialog-content, or .modal-body)
-     * @param handler The event handler function
-     * @param opt Options to determine whether the handler should be called before the dialog is opened, and whether the handler should be called only once. 
-     * The default for oneOff is true unless opt.before is true.
-     * @returns The dialog instance
+     * Static helper that subscribes to the open event for a dialog element that may not yet be instantiated.
+     * @param el - Dialog body element (`.s-Panel`, `.ui-dialog-content`, or `.modal-body`) or an array-like wrapper.
+     * @param handler - Callback invoked when the dialog is opened; `preventDefault()` cancels the open when `opt.before` is `true`.
+     * @param opt - Subscription options.
+     * @param opt.before - Listen to the cancellable *before-open* event.
+     * @param opt.oneOff - Auto-remove after first invocation. Defaults to `true` unless `before` is `true`.
      */
     static onOpen(el: HTMLElement | ArrayLike<HTMLElement>, handler: (e?: Event) => void, opt?: { before?: boolean, oneOff?: boolean }) {
         const instance = Dialog.getInstance(el);
@@ -327,7 +369,11 @@ export class Dialog {
         }
     }
 
-    /** Opens the dialog */
+    /**
+     * Opens the dialog.
+     * @remarks Dispatches the provider-specific show command (`openPanel`, `jQuery.dialog("open")`, or `bootstrap.Modal.show`).
+     * @returns The dialog instance for chaining.
+     */
     open() {
         const target = getDialogEventsNode(this.el);
         if (!target)
@@ -349,9 +395,16 @@ export class Dialog {
         return this;
     }
 
-    /** Gets the title text of the dialog */
+    /**
+     * Gets the current title text of the dialog.
+     * @returns The header title text, or `undefined` when the dialog has no header.
+     */
     title(): string;
-    /** Sets the title text of the dialog. */
+    /**
+     * Sets the title text of the dialog.
+     * @param value - New title text to display in the header.
+     * @returns The dialog instance for chaining.
+     */
     title(value: string): this;
     title(value?: string): string | this {
         let title = this.getHeaderNode()?.querySelector(".modal-title, .panel-titlebar-text, .ui-dialog-title");
@@ -362,7 +415,10 @@ export class Dialog {
         return this;
     }
 
-    /** Returns the type of the dialog, or null if no dialog on the current element or if the element is null, e.g. dialog was disposed  */
+    /**
+     * Identifies the backing provider for this instance.
+     * @returns `"bsmodal"`, `"uidialog"`, or `"panel"`, or `null` when the element is not attached or the dialog was disposed.
+     */
     get type(): DialogProviderType {
         const root = getDialogNode(this.el);
         if (!root)
@@ -376,27 +432,42 @@ export class Dialog {
         return null;
     }
 
-    /** Gets the body/content element of the dialog */
+    /**
+     * Gets the body / content node of the dialog (`.modal-body`, `.panel-body`, or `.ui-dialog-content`).
+     * @returns The content element, or the raw `el` supplied at construction.
+     */
     getContentNode(): HTMLElement {
         return this.el;
     }
 
-    /** Gets the dialog element of the dialog */
+    /**
+     * Gets the root dialog element (`.modal`, `.ui-dialog`, or `.s-Panel`).
+     * @returns The root element, or `null` when not found.
+     */
     getDialogNode(): HTMLElement {
         return getDialogNode(this.el);
     }
 
-    /** Gets the node that receives events for the dialog. It's .ui-dialog-content, .modal, or .panel-body */
+    /**
+     * Gets the node that receives open/close lifecycle events (`.modal`, `.panel-body`, or `.ui-dialog-content`).
+     * @returns The events node, or a fallback lookup via the root element.
+     */
     getEventsNode(): HTMLElement {
         return getDialogEventsNode(this.el);
     }
 
-    /** Gets the footer element of the dialog */
+    /**
+     * Gets the footer element (`.modal-footer`, `.panel-footer`, or `.ui-dialog-footer`), if present.
+     * @returns The footer element or `null` when there is none.
+     */
     getFooterNode(): HTMLElement {
         return this.getDialogNode()?.querySelector(".modal-footer, .panel-footer, .ui-dialog-footer");
     }
 
-    /** Gets the header element of the dialog */
+    /**
+     * Gets the header element (`.modal-header`, `.panel-titlebar`, or `.ui-dialog-titlebar`), if present.
+     * @returns The header element or `null` when there is none.
+     */
     getHeaderNode(): HTMLElement {
         return this.getDialogNode()?.querySelector(".modal-header, .panel-titlebar, .ui-dialog-titlebar");
     }
@@ -547,7 +618,9 @@ export class Dialog {
 
 
     /**
-     * Disposes the dialog, removing it from the DOM and unbinding all event handlers.
+     * Disposes the dialog, removing it from the DOM and unbinding event handlers.
+     * @remarks
+     * Handles all three providers: destroys a jQuery UI dialog, disposes a Bootstrap modal instance, or removes the panel markup. Falls back to plain DOM removal when no library is present. Safe to call multiple times.
      */
     dispose(): void {
         try {
@@ -586,17 +659,27 @@ export class Dialog {
     }
 }
 
-/** Returns true if Bootstrap modal is available */
+/**
+ * Determines whether a Bootstrap modal provider is available.
+ * @returns `true` when Bootstrap 5+ `bootstrap.Modal` or jQuery `fn.modal` (Bootstrap 3/4) is loaded.
+ */
 export function hasBSModal() {
     return isBS5Plus() || !!(getjQuery()?.fn?.modal);
 }
 
-/** Returns true if jQuery UI dialog is available */
+/**
+ * Determines whether the jQuery UI dialog provider is available.
+ * @returns `true` when `jQuery.ui.dialog` is loaded.
+ */
 export function hasUIDialog() {
     return !!(getjQuery()?.ui?.dialog);
 }
 
-/** Calls Bootstrap button.noConflict method if both jQuery UI and Bootstrap buttons are available in the page */
+/**
+ * Resolves the jQuery UI / Bootstrap button name collision.
+ * @remarks
+ * When both `$.fn.button` (Bootstrap) and `$.ui.button` (jQuery UI) are present, this moves Bootstrap's implementation to `$.fn.btn` via `noConflict()` so jQuery UI dialogs keep their button widget. Invoked automatically on module load.
+ */
 export function uiAndBSButtonNoConflict() {
     const $ = getjQuery();
 
@@ -639,9 +722,13 @@ function dialogButtonToUI(x: DialogButton): any {
 
 
 /**
- * Creates a dialog button which, by default, has "Yes" as caption (localized) and "ok" as the result.
- * @param opt - Optional configuration for the dialog button.
- * @returns The dialog button with the specified configuration.
+ * Creates an "OK" dialog button.
+ * @param opt - Optional overrides for {@link DialogButton} properties. Only `text`, `cssClass`, `result`, and `click` are respected; unspecified fields fall back to localized defaults.
+ * @returns A {@link DialogButton} with `text` defaulting to `DialogTexts.OkButton`, `cssClass` to `"btn-info"`, and `result` to `"ok"`.
+ * @example
+ * ```ts
+ * new Dialog({ buttons: [okDialogButton({ click: () => save() })] });
+ * ```
  */
 export function okDialogButton(opt?: DialogButton): DialogButton {
     return {
@@ -696,7 +783,9 @@ export function cancelDialogButton(opt?: DialogButton): DialogButton {
 
 
 /**
- * Namespace containing localizable text constants for dialogs.
+ * Localizable text constants for dialogs.
+ * @remarks
+ * Each property is a getter that calls `localText("Dialogs." + key, defaultValue)` and HTML-encodes the result. Defaults are in English; override via `Texts.Dialogs.*` localizations.
  */
 export namespace DialogTexts {
     /**
@@ -895,12 +984,19 @@ function getDialogContentNode(element: HTMLElement | ArrayLike<HTMLElement>): HT
 }
 
 /**
- * Options that apply to all message dialog types
+ * Options for helper message dialogs (`alertDialog`, `confirmDialog`, etc.).
+ * @remarks Extends {@link DialogOptions} with message-specific rendering flags.
  */
 export interface MessageDialogOptions extends DialogOptions {
-    /** @deprecated HTML encode the message, default is true */
+    /**
+     * Whether to HTML-encode string messages. @defaultValue `true`
+     * @deprecated Prefer passing a `RenderableContent` node or pre-sanitized HTML. When `false`, the string is sanitized via `sanitizeHtml`.
+     */
     htmlEncode?: boolean;
-    /** Wrap the message in a `<pre>` element, so that line endings are preserved, default is true */
+    /**
+     * Whether to preserve line breaks via `white-space: pre-wrap` on the message container. @defaultValue `true`
+     * @remarks Only applied when the message is a string; element messages manage their own styling.
+     */
     preWrap?: boolean;
 }
 
@@ -973,13 +1069,16 @@ function createMessageDialog(opt: {
     return new Dialog(options);
 }
 
-/** 
- * Displays an alert dialog 
- * @param message The message to display
- * @param options Additional options. 
- * @see AlertOptions 
- * @example 
- * alertDialog("An error occured!"); }
+/**
+ * Displays a modal alert dialog with a single OK button.
+ * @param message - Text or renderable content shown in the dialog body.
+ * @param options - Additional {@link MessageDialogOptions}.
+ * @returns A {@link Dialog} handle (partial when falling back to the native `alert()`), whose `result` is `"ok"`.
+ * @remarks Falls back to the native `alert()` when neither Bootstrap modal nor jQuery UI dialog is available.
+ * @example
+ * ```ts
+ * alertDialog("An error occurred!");
+ * ```
  */
 export function alertDialog(message: RenderableContent, options?: MessageDialogOptions): Partial<Dialog> {
     return createMessageDialog({
@@ -995,26 +1094,32 @@ export function alertDialog(message: RenderableContent, options?: MessageDialogO
     });
 }
 
-/** Additional options for confirm dialog */
+/**
+ * Additional options for {@link confirmDialog}.
+ * @remarks Extends {@link MessageDialogOptions} with callbacks for the secondary buttons.
+ */
 export interface ConfirmDialogOptions extends MessageDialogOptions {
-    /** True to also add a cancel button */
+    /** When `true`, an extra Cancel button (`result` `"cancel"`) is rendered alongside Yes/No. */
     cancelButton?: boolean;
-    /** Event handler for cancel button click */
+    /** Callback invoked when the Cancel button is clicked (only when `cancelButton` is `true`). */
     onCancel?: () => void;
-    /** Event handler for no button click */
+    /** Callback invoked when the No button is clicked. */
     onNo?: () => void;
 }
 
-/** 
- * Display a confirmation dialog 
- * @param message The message to display
- * @param onYes Callback for Yes button click 
- * @param options Additional options. 
- * @see ConfirmOptions 
- * @example 
- * confirmDialog("Are you sure you want to delete?", () => { 
- *     // do something when yes is clicked
- * }
+/**
+ * Displays a confirmation dialog with Yes / No (and optional Cancel) buttons.
+ * @param message - Text or renderable content shown in the dialog body.
+ * @param onYes - Callback invoked when the Yes button is clicked.
+ * @param options - Additional {@link ConfirmDialogOptions}.
+ * @returns A {@link Dialog} handle (partial when falling back to the native `confirm()`), whose `result` is `"yes"`, `"no"`, or `"cancel"`.
+ * @remarks Falls back to the native `confirm()` when neither Bootstrap modal nor jQuery UI dialog is available.
+ * @example
+ * ```ts
+ * confirmDialog("Are you sure you want to delete?", () => {
+ *   // do something when yes is clicked
+ * });
+ * ```
  */
 export function confirmDialog(message: RenderableContent, onYes: () => void, options?: ConfirmDialogOptions): Partial<Dialog> {
     return createMessageDialog({
@@ -1042,16 +1147,18 @@ export function confirmDialog(message: RenderableContent, onYes: () => void, opt
     });
 }
 
-/** 
- * Display an information dialog 
- * @param message The message to display
- * @param onOk Callback for OK button click 
- * @param options Additional options. 
- * @see ConfirmOptions 
- * @example 
- * informationDialog("Operation complete", () => { 
- *     // do something when OK is clicked
- * }
+/**
+ * Displays an informational dialog with a single OK button.
+ * @param message - Text or renderable content shown in the dialog body.
+ * @param onOk - Optional callback invoked when OK is clicked.
+ * @param options - Additional {@link MessageDialogOptions}.
+ * @returns A {@link Dialog} handle (partial when falling back to the native `alert()`).
+ * @example
+ * ```ts
+ * informationDialog("Operation complete", () => {
+ *   // do something when OK is clicked
+ * });
+ * ```
  */
 export function informationDialog(message: RenderableContent, onOk?: () => void, options?: MessageDialogOptions): Partial<Dialog> {
     return createMessageDialog({
@@ -1068,16 +1175,18 @@ export function informationDialog(message: RenderableContent, onOk?: () => void,
     });
 }
 
-/** 
- * Display a success dialog 
- * @param message The message to display
- * @param onOk Callback for OK button click 
- * @param options Additional options. 
- * @see MessageDialogOptions 
- * @example 
- * successDialog("Operation complete", () => { 
- *     // do something when OK is clicked
- * }
+/**
+ * Displays a success dialog with a single OK button.
+ * @param message - Text or renderable content shown in the dialog body.
+ * @param onOk - Optional callback invoked when OK is clicked.
+ * @param options - Additional {@link MessageDialogOptions}.
+ * @returns A {@link Dialog} handle (partial when falling back to the native `alert()`).
+ * @example
+ * ```ts
+ * successDialog("Operation complete", () => {
+ *   // do something when OK is clicked
+ * });
+ * ```
  */
 export function successDialog(message: RenderableContent, onOk?: () => void, options?: MessageDialogOptions): Partial<Dialog> {
     return createMessageDialog({
@@ -1094,13 +1203,15 @@ export function successDialog(message: RenderableContent, onOk?: () => void, opt
     });
 }
 
-/** 
- * Display a warning dialog 
- * @param message The message to display
- * @param options Additional options. 
- * @see MessageDialogOptions 
- * @example 
+/**
+ * Displays a warning dialog with a single OK button.
+ * @param message - Text or renderable content shown in the dialog body.
+ * @param options - Additional {@link MessageDialogOptions}.
+ * @returns A {@link Dialog} handle (partial when falling back to the native `alert()`).
+ * @example
+ * ```ts
  * warningDialog("Something is odd!");
+ * ```
  */
 export function warningDialog(message: RenderableContent, options?: MessageDialogOptions): Partial<Dialog> {
     return createMessageDialog({
@@ -1116,14 +1227,20 @@ export function warningDialog(message: RenderableContent, options?: MessageDialo
     });
 }
 
-/** Options for `iframeDialog` **/
+/**
+ * Options for {@link iframeDialog}.
+ */
 export interface IFrameDialogOptions {
+    /** HTML string rendered inside the sandboxed `iframe` via `srcdoc`. Sanitized before injection. */
     html?: string;
 }
 
-/** 
- * Display a dialog that shows an HTML block in an IFRAME, which is usually returned from server callbacks
- * @param options The options
+/**
+ * Displays a dialog whose content is an `iframe` rendering arbitrary HTML.
+ * @param options - Configuration containing the HTML to display.
+ * @param options.html - Raw HTML placed in the `iframe` `srcdoc` attribute after sanitization; wrapped in `<html>/<body>` when those tags are absent.
+ * @returns A {@link Dialog} handle (partial when falling back to `alert` without modal support).
+ * @remarks Falls back to `window.alert` with sanitized HTML when neither Bootstrap modal nor jQuery UI dialog is available.
  */
 export function iframeDialog(options: IFrameDialogOptions): Partial<Dialog> {
 

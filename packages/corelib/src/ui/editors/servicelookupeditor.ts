@@ -3,25 +3,50 @@ import { ComboboxSearchQuery, ComboboxSearchResult } from "./combobox";
 import { ComboboxEditor, ComboboxEditorOptions } from "./comboboxeditor";
 import { EditorProps } from "./editorwidget";
 
+/**
+ * Options for the {@link ServiceLookupEditor}.
+ */
 export interface ServiceLookupEditorOptions extends ComboboxEditorOptions {
+    /** Service endpoint to load items from. */
     service?: string;
+    /** Id field name. */
     idField?: string;
+    /** Text field name. */
     textField?: string;
+    /** Page size for paged searches. */
     pageSize?: number;
+    /** Minimum results required to show the search box. */
     minimumResultsForSearch?: any;
+    /** Sort order for results. */
     sort?: string[];
+    /** Column selection mode. */
     columnSelection?: ColumnSelection;
+    /** Columns to include. */
     includeColumns?: string[];
+    /** Columns to exclude. */
     excludeColumns?: string[];
+    /** Whether to include deleted rows. */
     includeDeleted?: boolean;
+    /** Field used for contains-text search. */
     containsField?: string;
+    /** Equality filter applied to the request. */
     equalityFilter?: any;
+    /** Criteria applied to the request. */
     criteria?: any[];
 }
 
+/**
+ * Base editor that renders a combobox over service list results.
+ * @typeParam P - Widget props type.
+ * @typeParam TItem - The item type.
+ */
 export abstract class ServiceLookupEditorBase<P extends ServiceLookupEditorOptions, TItem> extends ComboboxEditor<P, TItem> {
     static override[Symbol.typeInfo] = this.registerEditor(nsSerenity);
 
+    /**
+     * Returns the dialog type key for in-place add.
+     * @returns The dialog type key.
+     */
     protected override getDialogTypeKey() {
         var dialogTypeKey = super.getDialogTypeKey();
         if (dialogTypeKey)
@@ -37,10 +62,18 @@ export abstract class ServiceLookupEditorBase<P extends ServiceLookupEditorOptio
         return service.replace("/", ".");
     }
 
+    /**
+     * Returns the service endpoint path.
+     * @returns The service path.
+     */
     protected getService(): string {
         return this.options.service;
     }
 
+    /**
+     * Returns the resolved service URL.
+     * @returns The service URL.
+     */
     protected getServiceUrl() {
         var url = this.getService();
         if (url == null)
@@ -49,6 +82,10 @@ export abstract class ServiceLookupEditorBase<P extends ServiceLookupEditorOptio
         return resolveServiceUrl(url);
     }
 
+    /**
+     * Returns the columns to include in the request.
+     * @returns The include columns.
+     */
     protected getIncludeColumns() {
         var include = this.options.includeColumns?.slice() || [];
         var idField = this.getIdField();
@@ -63,10 +100,18 @@ export abstract class ServiceLookupEditorBase<P extends ServiceLookupEditorOptio
         return include;
     }
 
+    /**
+     * Returns the sort order for results.
+     * @returns The sort descriptors.
+     */
     protected getSort() {
         return this.options.sort || (this.getTextField() ? [this.getTextField()] : null);
     }
 
+    /**
+     * Returns the cascade criteria for the request.
+     * @returns The cascade criteria.
+     */
     protected getCascadeCriteria(): any[] {
 
         var val = this.get_cascadeValue();
@@ -85,6 +130,10 @@ export abstract class ServiceLookupEditorBase<P extends ServiceLookupEditorOptio
         return Criteria(fld).eq(val);
     }
 
+    /**
+     * Returns the filter criteria for the request.
+     * @returns The filter criteria.
+     */
     protected getFilterCriteria(): any[] {
         var val = this.get_filterValue();
 
@@ -96,6 +145,11 @@ export abstract class ServiceLookupEditorBase<P extends ServiceLookupEditorOptio
         return [[fld], '=', val];
     }
 
+    /**
+     * Returns the criteria for the given id list.
+     * @param idList - The id list.
+     * @returns The criteria.
+     */
     protected getIdListCriteria(idList: any[]): any[] {
         if (idList == null)
             return null;
@@ -110,12 +164,22 @@ export abstract class ServiceLookupEditorBase<P extends ServiceLookupEditorOptio
         return Criteria(idField).in(idList);
     }
 
+    /**
+     * Returns the combined criteria for the request.
+     * @param query - The search query.
+     * @returns The criteria.
+     */
     protected getCriteria(query: ComboboxSearchQuery): any[] {
         return Criteria.and(
             Criteria.and(this.getIdListCriteria(query.idList), this.options.criteria),
             Criteria.and(this.getCascadeCriteria(), this.getFilterCriteria()));
     }
 
+    /**
+     * Returns the list request for the given query.
+     * @param query - The search query.
+     * @returns The list request.
+     */
     protected getListRequest(query: ComboboxSearchQuery): ListRequest {
 
         var request: ListRequest = {};
@@ -138,6 +202,11 @@ export abstract class ServiceLookupEditorBase<P extends ServiceLookupEditorOptio
         return request;
     }
 
+    /**
+     * Returns the service call options for the given query.
+     * @param query - The search query.
+     * @returns Service options.
+     */
     protected getServiceCallOptions(query: ComboboxSearchQuery): ServiceOptions<ListResponse<TItem>> {
         return {
             blockUI: false,
@@ -147,10 +216,19 @@ export abstract class ServiceLookupEditorBase<P extends ServiceLookupEditorOptio
         }
     }
 
+    /**
+     * Whether the editor has an asynchronous item source.
+     * @returns True.
+     */
     protected override hasAsyncSource() {
         return true;
     }
 
+    /**
+     * Whether a search can be performed.
+     * @param byId - Whether the search is by id.
+     * @returns True when searchable.
+     */
     protected canSearch(byId: boolean) {
         if (!byId && this.get_cascadeField()) {
             var val = this.get_cascadeValue();
@@ -161,6 +239,11 @@ export abstract class ServiceLookupEditorBase<P extends ServiceLookupEditorOptio
         return true;
     }
 
+    /**
+     * Performs an asynchronous search over the service results.
+     * @param query - The search query.
+     * @returns A promise resolving to the search result.
+     */
     protected override async asyncSearch(query: ComboboxSearchQuery): Promise<ComboboxSearchResult<TItem>> {
         if (!this.canSearch(query.idList != null)) {
             return Promise.resolve({
@@ -184,9 +267,18 @@ export abstract class ServiceLookupEditorBase<P extends ServiceLookupEditorOptio
     }
 }
 
+/**
+ * An editor that renders a combobox over service list results.
+ * @typeParam P - Widget props type.
+ * @typeParam TItem - The item type.
+ */
 export class ServiceLookupEditor<P extends ServiceLookupEditorOptions = ServiceLookupEditorOptions, TItem = any> extends ServiceLookupEditorBase<ServiceLookupEditorOptions, TItem> {
     static override[Symbol.typeInfo] = this.registerEditor(nsSerenity);
 
+    /**
+     * Creates a service lookup editor.
+     * @param props - Widget props.
+     */
     constructor(props: EditorProps<P>) {
         super(props);
     }

@@ -5,10 +5,20 @@ import { clearKeys } from "../../compat";
 import type { IRemoteView } from "../../slick/iremoteview";
 import { IDataGrid } from "../datagrid/idatagrid";
 
+/**
+ * Options for the {@link GridRowSelectionMixin}.
+ */
 export interface GridRowSelectionMixinOptions {
+    /**
+     * A function that determines whether an item can be selected.
+     */
     selectable?: (item: any) => boolean;
 }
 
+/**
+ * A mixin that adds multi (checkbox) row selection behavior to a data grid,
+ * including a select-all header checkbox.
+ */
 export class GridRowSelectionMixin {
 
     static [Symbol.typeInfo] = classTypeInfo(nsSerenity); static { registerType(this); }
@@ -18,6 +28,11 @@ export class GridRowSelectionMixin {
     declare private grid: IDataGrid;
     declare private options: GridRowSelectionMixinOptions;
 
+    /**
+     * Creates a new GridRowSelectionMixin for the given grid.
+     * @param grid - The data grid to attach the mixin to.
+     * @param options - Optional mixin options.
+     */
     constructor(grid: IDataGrid, options?: GridRowSelectionMixinOptions) {
 
         this.include = Object.create(null);
@@ -30,6 +45,9 @@ export class GridRowSelectionMixin {
         (grid.getView() as IRemoteView).onRowsChanged?.subscribe(boundThis.updateSelectAll);
     }
 
+    /**
+     * Detaches the mixin from the grid and cleans up event subscriptions.
+     */
     destroy(): void {
         this.include = Object.create(null);
         this.grid?.getGrid()?.onClick?.unsubscribe(this.handleGridClick);
@@ -87,6 +105,10 @@ export class GridRowSelectionMixin {
         setTimeout(bindThis(this).updateSelectAll, 0);
     }
 
+    /**
+     * Updates the checked state of the select-all header button based on the
+     * current selection.
+     */
     updateSelectAll(): void {
         var selectAllButton = this.grid.getElement()
             .querySelector('.select-all-header .slick-column-name .select-all-items');
@@ -100,17 +122,27 @@ export class GridRowSelectionMixin {
         }
     }
 
+    /**
+     * Clears the current selection.
+     */
     clear(): void {
         clearKeys(this.include);
         this.updateSelectAll();
     }
 
+    /**
+     * Clears the current selection and refreshes the grid view.
+     */
     resetCheckedAndRefresh(): void {
         this.include = Object.create(null);
         this.updateSelectAll();
         this.grid.getView().populate();
     }
 
+    /**
+     * Selects the items with the given keys, keeping any existing selection.
+     * @param keys - The keys of the items to select.
+     */
     selectKeys(keys: string[]): void {
         for (var k of keys) {
             this.include[k] = true;
@@ -119,22 +151,38 @@ export class GridRowSelectionMixin {
         this.updateSelectAll();
     }
 
+    /**
+     * Returns the keys of the currently selected items.
+     * @returns The selected keys.
+     */
     getSelectedKeys(): string[] {
         return Object.keys(this.include);
     }
 
+    /**
+     * Returns the selected keys parsed as 32-bit integers.
+     * @returns The selected keys as int32 values.
+     */
     getSelectedAsInt32(): number[] {
         return Object.keys(this.include).map(function (x) {
             return parseInt(x, 10);
         });
     }
 
+    /**
+     * Returns the selected keys parsed as 64-bit integers.
+     * @returns The selected keys as int64 values.
+     */
     getSelectedAsInt64(): number[] {
         return Object.keys(this.include).map(function (x) {
             return parseInt(x, 10);
         });
     }
 
+    /**
+     * Replaces the current selection with the items having the given keys.
+     * @param keys - The keys of the items to select.
+     */
     setSelectedKeys(keys: string[]): void {
         this.clear();
         for (var k of keys) {
@@ -150,6 +198,12 @@ export class GridRowSelectionMixin {
             this.options.selectable(item));
     }
 
+    /**
+     * Creates a checkbox select column for the grid, including a select-all header.
+     * @param getMixin - A function that returns the mixin instance.
+     * @param columnOptions - Optional column options to merge into the select column.
+     * @returns The select column definition.
+     */
     static createSelectColumn(getMixin: () => GridRowSelectionMixin, columnOptions?: Partial<Column>): Column {
         return {
             name: "[×]",

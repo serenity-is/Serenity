@@ -34,4 +34,5 @@ After applying the fixes, build the project by running "npm run build" from the 
     }
 }
 
+/** Singleton registry for enum types (keyed by full name and optional {@link EnumKeyAttribute} value). */
 export const EnumTypeRegistry = new EnumTypeRegistryImpl();

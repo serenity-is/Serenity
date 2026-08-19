@@ -1,60 +1,109 @@
 import { Fluent, isArrayLike, isPromiseLike } from "../../base";
 import { Select2, Select2Options } from "./select2";
 
+/** The combobox provider type. */
 export type ComboboxType = "select2";
+/** Result of a combobox formatter. */
 export type ComboboxFormatResult = string | Element | DocumentFragment;
 
+/**
+ * A single item in a combobox.
+ * @typeParam TSource - The source item type.
+ */
 export interface ComboboxItem<TSource = any> {
+    /** Item id. */
     id?: string;
+    /** Display text. */
     text?: string;
+    /** The source item. */
     source?: TSource;
+    /** Whether the item is disabled. */
     disabled?: boolean;
 }
 
+/**
+ * Query passed to a combobox search callback.
+ */
 export interface ComboboxSearchQuery {
+    /** The search term. */
     searchTerm?: string;
+    /** List of ids to initialize the selection from. */
     idList?: string[];
+    /** Number of items to skip. */
     skip?: number;
+    /** Number of items to take. */
     take?: number;
+    /** Whether to check for more results. */
     checkMore?: boolean;
+    /** Whether this is an initial selection query. */
     initSelection?: boolean;
+    /** Abort signal for cancelling the query. */
     signal?: AbortSignal;
 }
 
+/**
+ * Result of a combobox search.
+ * @typeParam TItem - The item type.
+ */
 export interface ComboboxSearchResult<TItem> {
+    /** The matching items. */
     items: TItem[];
+    /** Whether there are more results. */
     more: boolean;
 }
 
+/**
+ * Options for the {@link Combobox}.
+ * @typeParam TSource - The source item type.
+ */
 export interface ComboboxOptions<TSource = any> {
+    /** Whether the selection can be cleared. */
     allowClear?: boolean;
+    /** Callback that creates a search choice for arbitrary values. */
     createSearchChoice?: (s: string) => ComboboxItem<TSource>;
+    /** The element to attach the combobox to. */
     element?: HTMLInputElement | HTMLSelectElement | Element[];
-    /** Allow arbitrary values for items */
+    /** Allow arbitrary values for items. */
     arbitraryValues?: boolean;
+    /** Formatter for the selected item. */
     formatSelection?: (p1: ComboboxItem<TSource>) => ComboboxFormatResult;
+    /** Formatter for result items. */
     formatResult?: (p1: ComboboxItem<TSource>) => ComboboxFormatResult;
+    /** Minimum results required to show the search box. */
     minimumResultsForSearch?: number;
+    /** Whether multiple items can be selected. */
     multiple?: boolean;
-    /** Page size to use while loading or displaying results */
+    /** Page size to use while loading or displaying results. */
     pageSize?: number;
+    /** Placeholder text. */
     placeholder?: string;
-    /** Callback to get options specific to the combobox provider type */
+    /** Callback to get options specific to the combobox provider type. */
     providerOptions?: (type: ComboboxType, opt: ComboboxOptions) => any;
+    /** Callback that performs the search. */
     search?: (query: ComboboxSearchQuery) => (PromiseLike<ComboboxSearchResult<ComboboxItem<TSource>>> | ComboboxSearchResult<ComboboxItem<TSource>>);
-    /** Type delay for searching, default is 200 */
+    /** Type delay for searching, default is 200. */
     typeDelay?: number;
 }
 
+/**
+ * A combobox widget that provides searchable selection over a set of items.
+ * @typeParam TItem - The item type.
+ */
 export class Combobox<TItem = any> {
     declare private el: HTMLInputElement | HTMLSelectElement;
 
+    /** Default combobox options. */
     static defaults: ComboboxOptions = {
         pageSize: 100,
         typeDelay: 200
     }
 
     constructor(opt: ComboboxOptions);
+    /**
+     * Creates a combobox.
+     * @param opt - Combobox options.
+     * @param create - When false, only wraps an existing combobox without creating a new one.
+     */
     constructor(opt: ComboboxOptions, create: boolean = true) {
         if (isArrayLike(opt?.element))
             this.el = opt.element[0] as HTMLInputElement;
@@ -214,6 +263,9 @@ export class Combobox<TItem = any> {
         });
     }
 
+    /**
+     * Aborts any pending search query.
+     */
     abortPendingQuery() {
         if (!this.el)
             return;
@@ -227,6 +279,9 @@ export class Combobox<TItem = any> {
         }
     }
 
+    /**
+     * Aborts any pending initial selection query.
+     */
     abortInitSelection() {
         if (!this.el)
             return;
@@ -235,6 +290,9 @@ export class Combobox<TItem = any> {
         delete (this.el as any).initSelectionLoading;
     }
 
+    /**
+     * Disposes the combobox and cleans up its resources.
+     */
     dispose() {
         if (!this.el)
             return;
@@ -244,12 +302,20 @@ export class Combobox<TItem = any> {
         Fluent.off(this.el, "execute-search");
     }
 
+    /**
+     * Returns the combobox container element.
+     * @returns The container element.
+     */
     get container(): HTMLElement {
         if (!this.el)
             return null;
         return Select2.getInstance(this.el)?.container;
     }
 
+    /**
+     * Returns the combobox provider type.
+     * @returns The provider type, or null.
+     */
     get type(): ComboboxType {
         if (!this.el)
             return null;
@@ -260,6 +326,10 @@ export class Combobox<TItem = any> {
         return null;
     }
 
+    /**
+     * Whether the combobox allows multiple selection.
+     * @returns True when multiple.
+     */
     get isMultiple(): boolean {
         if (!this.el)
             return false;
@@ -271,6 +341,10 @@ export class Combobox<TItem = any> {
         return this.el.getAttribute('multiple') != null;
     }
 
+    /**
+     * Returns the first selected item.
+     * @returns The selected item.
+     */
     getSelectedItem(): ComboboxItem {
         var select2 = Select2.getInstance(this.el);
         if (select2) {
@@ -281,6 +355,10 @@ export class Combobox<TItem = any> {
         }
     }
 
+    /**
+     * Returns all selected items.
+     * @returns The selected items.
+     */
     getSelectedItems(): ComboboxItem[] {
         var select2 = Select2.getInstance(this.el);
         if (select2) {
@@ -297,6 +375,10 @@ export class Combobox<TItem = any> {
         return [];
     }
 
+    /**
+     * Returns the current value as a comma-separated string.
+     * @returns The value.
+     */
     getValue(): string {
         if (!this.el)
             return null;
@@ -313,6 +395,10 @@ export class Combobox<TItem = any> {
         return this.el.value;
     }
 
+    /**
+     * Returns the current values as an array.
+     * @returns The values.
+     */
     getValues(): string[] {
         if (!this.el)
             return [];
@@ -333,6 +419,11 @@ export class Combobox<TItem = any> {
         return [val];
     }
 
+    /**
+     * Sets the current value.
+     * @param value - The value to set.
+     * @param triggerChange - When true, triggers a change event.
+     */
     setValue(value: string, triggerChange = false) {
         if (!this.el)
             return;
@@ -365,6 +456,11 @@ export class Combobox<TItem = any> {
         }
     }
 
+    /**
+     * Sets the current values.
+     * @param value - The values to set.
+     * @param triggerChange - When true, triggers a change event.
+     */
     setValues(value: string[], triggerChange = false) {
         if (value == null || value.length === 0) {
             this.setValue(null, triggerChange);
@@ -374,14 +470,25 @@ export class Combobox<TItem = any> {
         this.setValue(value.join(','), triggerChange);
     }
 
+    /**
+     * Closes the dropdown.
+     */
     closeDropdown(): void {
         Select2.getInstance(this.el)?.close();
     }
 
+    /**
+     * Opens the dropdown.
+     */
     openDropdown(): void {
         Select2.getInstance(this.el)?.open();
     }
 
+    /**
+     * Returns the combobox instance attached to an element, or null.
+     * @param el - The element or collection.
+     * @returns The combobox instance, or null.
+     */
     static getInstance(el: Element | ArrayLike<Element>): Combobox {
         if (!el || !Select2.getInstance((isArrayLike(el) ? el[0] : el) as HTMLInputElement))
             return null;
@@ -390,6 +497,11 @@ export class Combobox<TItem = any> {
     }
 }
 
+/**
+ * Strips diacritics from a string for accent-insensitive searching.
+ * @param str - The string to process.
+ * @returns The string with diacritics removed.
+ */
 export function stripDiacritics(str: string) {
     if (!str)
         return str;

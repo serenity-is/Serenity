@@ -1,17 +1,24 @@
 ﻿/**
- * Tests if any of array elements matches given predicate. Prefer Array.some() over this function (e.g. `[1, 2, 3].some(predicate)`).
- * @param array Array to test.
- * @param predicate Predicate to test elements.
- * @returns True if any element matches.
+ * Tests whether any element in the array satisfies the predicate.
+ * @param array - Array to test.
+ * @param predicate - Function invoked per element; should return `true` for a match.
+ * @returns `true` if at least one element matches, otherwise `false`.
+ * @deprecated Prefer native `Array.prototype.some` — e.g. `array.some(predicate)`. Retained as a `Q.any` compat shim.
+ * @example
+ * any([1, 2, 3], x => x > 2); // true
  */
 export function any<TItem>(array: TItem[], predicate: (x: TItem) => boolean): boolean {
     return array.some(predicate);
 }
 
 /**
- * Counts number of array elements that matches a given predicate.
- * @param array Array to test.
- * @param predicate Predicate to test elements.
+ * Counts elements that satisfy the predicate.
+ * @param array - Array to count over.
+ * @param predicate - Function invoked per element; return `true` to count the element.
+ * @returns Number of matching elements.
+ * @deprecated Prefer `array.filter(predicate).length` or a manual loop. Retained as a `Q.count` compat shim.
+ * @example
+ * count([1, 2, 3], x => x % 2 === 1); // 2
  */
 export function count<TItem>(array: TItem[], predicate: (x: TItem) => boolean): number {
     let count = 0;
@@ -23,11 +30,14 @@ export function count<TItem>(array: TItem[], predicate: (x: TItem) => boolean): 
 }
 
 /**
- * Gets first element in an array that matches given predicate similar to LINQ's First.
- * Throws an error if no match is found.
- * @param array Array to test.
- * @param predicate Predicate to test elements.
- * @returns First element that matches.
+ * Returns the first element that satisfies the predicate (LINQ `First` semantics).
+ * @param array - Array to search.
+ * @param predicate - Function invoked per element; return `true` for the desired element.
+ * @returns The first matching element.
+ * @throws {Error} If no element satisfies the predicate (`"first:No element satisfies the condition."`).
+ * @deprecated Prefer `array.find(predicate)` with explicit not-found handling. Retained as a `Q.first` compat shim.
+ * @example
+ * first([1, 2, 3], x => x > 1); // 2
  */
 export function first<TItem>(array: TItem[], predicate: (x: TItem) => boolean): TItem {
     for (let x of array)
@@ -38,24 +48,32 @@ export function first<TItem>(array: TItem[], predicate: (x: TItem) => boolean): 
 }
 
 /**
- * A group item returned by `groupBy()`.
+ * Single group produced by {@link groupBy}.
+ * @typeParam TItem - Element type of the source array.
+ * @example
+ * const g = groupBy(users, u => u.department);
+ * g.inOrder[0].key; // department key
  */
 export type GroupByElement<TItem> = {
-    /** index of the item in `inOrder` array */
+    /** Zero-based position of this group in the {@link GroupByResult.inOrder} array. */
     order: number;
-    /** key of the group */
+    /** Group key as returned by the `getKey` callback (normalized to string). */
     key: string;
-    /** the items in the group */
+    /** Elements belonging to this group, in original encounter order. */
     items: TItem[];
-    /** index of the first item of this group in the original array */
+    /** Index of the first element of this group in the original source array. */
     start: number;
 }
 
 /**
- * Return type of the `groupBy` function.
+ * Result returned by {@link groupBy}.
+ * @typeParam TItem - Element type of the source array.
+ * @remarks Provides both dictionary (`byKey`) and ordered (`inOrder`) access to groups.
  */
 export type GroupByResult<TItem> = {
+    /** Dictionary mapping stringified key to its {@link GroupByElement}. */
     byKey: { [key: string]: GroupByElement<TItem> };
+    /** Groups in order of first encounter in the source array. */
     inOrder: GroupByElement<TItem>[];
 };
 
@@ -64,8 +82,14 @@ export type GroupByResult<TItem> = {
  * Resulting object contains group objects in order and a dictionary to access by key.
  * This is similar to LINQ's ToLookup function with some additional details like start index.
  * @param items Array to group.
- * @param getKey Function that returns key for each item.
- * @returns GroupByResult object.
+ * Groups an array by keys derived from each element.
+ * @param items - Array to group.
+ * @param getKey - Callback returning the group key for an element; `null`/`undefined` is normalized to `""`.
+ * @returns A {@link GroupByResult} with `byKey` dictionary and `inOrder` array. Each group records its `order`, `key`, `items`, and `start` index.
+ * @remarks Similar to LINQ `ToLookup` with extra `order`/`start` metadata. Uses `Object.create(null)` so prototype keys are safe.
+ * @deprecated Kept as a `Q.groupBy` compat shim; for new code consider `Map`-based grouping or `toGrouping`.
+ * @example
+ * groupBy([{k:'a'}, {k:'b'}, {k:'a'}], x => x.k).inOrder.length; // 2
  */
 export function groupBy<TItem>(items: TItem[], getKey: (x: TItem) => any): GroupByResult<TItem> {
     let result: GroupByResult<TItem> = {
@@ -96,9 +120,13 @@ export function groupBy<TItem>(items: TItem[], getKey: (x: TItem) => any): Group
 }
 
 /**
- * Gets index of first element in an array that matches given predicate.
- * @param array Array to test.
- * @param predicate Predicate to test elements.
+ * Returns the index of the first element satisfying the predicate.
+ * @param array - Array to search.
+ * @param predicate - Function invoked per element; return `true` for the target element.
+ * @returns Zero-based index of the first match, or `-1` if none matches.
+ * @deprecated Prefer `Array.prototype.findIndex` — `array.findIndex(predicate)`. Retained as a `Q.indexOf` compat shim (note the predicate overload differs from `Array.indexOf`).
+ * @example
+ * indexOf([1, 2, 3], x => x === 2); // 1
  */
 export function indexOf<TItem>(array: TItem[], predicate: (x: TItem) => boolean): number {
     for (let i = 0; i < array.length; i++)
@@ -109,15 +137,15 @@ export function indexOf<TItem>(array: TItem[], predicate: (x: TItem) => boolean)
 }
 
 /**
- * Inserts an item to the array at specified index. Prefer Array.splice unless
- * you need to support IE.
- * @param obj Array or array like object to insert to.
- * @param index Index to insert at.
- * @param item Item to insert.
- * @throws Error if object does not support insert.
+ * Inserts an item into an array at the given index.
+ * @param obj - Target array or array-like object with an `insert(index, item)` method.
+ * @param index - Zero-based index at which to insert.
+ * @param item - Item to insert.
+ * @throws {Error} If `obj` is neither an array nor exposes `insert`.
+ * @remarks If `obj.insert` exists it is delegated to; otherwise `Array.prototype.splice` is used. No return value.
+ * @deprecated Prefer `array.splice(index, 0, item)` directly. Retained as a `Q.insert` compat shim.
  * @example
  * insert([1, 2, 3], 1, 4); // [1, 4, 2, 3]
- * insert({ insert: (index, item) => { this.splice(index, 0, item); } }
  */
 export function insert(obj: any, index: number, item: any): void {
     if (obj.insert)
@@ -129,8 +157,9 @@ export function insert(obj: any, index: number, item: any): void {
 }
 
 /**
- * Determines if the object is an array. Prefer Array.isArray over this function (e.g. `Array.isArray(obj)`).
- * @returns True if the object is an array.
+ * Tests whether a value is an array.
+ * @remarks Thin re-export of `Array.isArray` for legacy `Q.isArray` call sites.
+ * @deprecated Use `Array.isArray` directly.
  * @example
  * isArray([1, 2, 3]); // true
  * isArray({}); // false
@@ -138,15 +167,15 @@ export function insert(obj: any, index: number, item: any): void {
 export const isArray = Array.isArray;
 
 /**
-* Gets first element in an array that matches given predicate.
-* Throws an error if no matches is found, or there are multiple matches.
-* @param array Array to test.
-* @param predicate Predicate to test elements.
-* @returns First element that matches.
-* @example
-* first([1, 2, 3], x => x == 2); // 2
-* first([1, 2, 3], x => x == 4); // throws error.
-*/
+ * Returns the single element satisfying the predicate (LINQ `Single` semantics).
+ * @param array - Array to search.
+ * @param predicate - Function invoked per element; exactly one element must return `true`.
+ * @returns The sole matching element.
+ * @throws {Error} If no element matches (`"single:No element satisfies the condition."`) or more than one matches (`"single:sequence contains more than one element."`).
+ * @deprecated Retained as a `Q.single` compat shim; prefer explicit `filter` + length check for clarity.
+ * @example
+ * single([1, 2, 3], x => x == 2); // 2
+ */
 export function single<TItem>(array: TItem[], predicate: (x: TItem) => boolean): TItem {
     let match: any;
     let found = false;
@@ -165,14 +194,20 @@ export function single<TItem>(array: TItem[], predicate: (x: TItem) => boolean):
     return match;
 }
 
+/**
+ * Dictionary mapping a stringified key to the array of items sharing that key.
+ * Produced by {@link toGrouping}.
+ * @typeParam TItem - Element type of the source array.
+ */
 export type Grouping<TItem> = { [key: string]: TItem[] };
 
 /**
- * Maps an array into a dictionary with keys determined by specified getKey() callback,
- * and values that are arrays containing elements for a particular key.
- * @param items Array to map.
- * @param getKey Function that returns key for each item.
- * @returns Grouping object.
+ * Groups an array into a dictionary keyed by `getKey`.
+ * @param items - Array to group.
+ * @param getKey - Callback returning the group key for an element; `null`/`undefined` is normalized to `""`.
+ * @returns A {@link Grouping} dictionary whose values are arrays of matching elements. Uses a null-prototype object.
+ * @remarks Lighter alternative to {@link groupBy} when ordered metadata is not needed.
+ * @deprecated Retained as a `Q.toGrouping` compat shim; new code may prefer `Map`-grouping.
  * @example
  * toGrouping([1, 2, 3], x => x % 2 == 0 ? "even" : "odd"); // { odd: [1, 3], even: [2] }
  */
@@ -191,14 +226,14 @@ export function toGrouping<TItem>(items: TItem[], getKey: (x: TItem) => any): Gr
 }
 
 /**
- * Gets first element in an array that matches given predicate (similar to LINQ's FirstOrDefault).
- * Returns undefined if no match is found.
- * @param array Array to test.
- * @param predicate Predicate to test elements.
- * @returns First element that matches.
+ * Returns the first element satisfying the predicate, or `undefined` if none matches (LINQ `FirstOrDefault`).
+ * @param array - Array to search.
+ * @param predicate - Function invoked per element; return `true` for the desired element.
+ * @returns The first matching element, or `undefined` when no match is found.
+ * @deprecated Prefer `Array.prototype.find` — `array.find(predicate)`. Retained as a `Q.tryFirst` compat shim.
  * @example
  * tryFirst([1, 2, 3], x => x == 2); // 2
- * tryFirst([1, 2, 3], x => x == 4); // null
+ * tryFirst([1, 2, 3], x => x == 4); // undefined
  */
 export function tryFirst<TItem>(array: TItem[], predicate: (x: TItem) => boolean): TItem {
     for (let x of array)

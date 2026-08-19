@@ -5,18 +5,32 @@ import { BaseEditorFiltering } from "./baseeditorfiltering";
 import { CriteriaWithText } from "./criteriawithtext";
 import { FilterOperator } from "./filteroperator";
 
+/**
+ * Filtering handler for date-time fields using a date-time editor.
+ */
 export class DateTimeFiltering extends BaseEditorFiltering<DateEditor> {
     static override[Symbol.typeInfo] = this.registerClass(nsSerenity);
 
+    /**
+     * Creates a date-time filtering handler.
+     */
     constructor() {
         super(DateTimeEditor)
     }
 
+    /**
+     * Returns the operators supported by this filtering handler.
+     * @returns The operators.
+     */
     getOperators(): FilterOperator[] {
         return this.appendNullableOperators(
             this.appendComparisonOperators([]));
     }
 
+    /**
+     * Returns the criteria for the current operator, handling day-boundary comparisons.
+     * @returns The criteria with display text.
+     */
     override getCriteria() {
         var result: CriteriaWithText = {};
 

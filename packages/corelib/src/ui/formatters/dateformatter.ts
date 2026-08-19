@@ -2,14 +2,24 @@ import { FormatterContext } from "@serenity-is/sleekgrid";
 import { Culture, formatDate, formatterTypeInfo, htmlEncode, nsSerenity, parseISODateTime, registerType } from "../../base";
 import { Formatter } from "../../slick";
 
+/** Formats date values using {@link formatDate} / {@link Culture.dateFormat}. */
 export class DateFormatter implements Formatter {
     static [Symbol.typeInfo] = formatterTypeInfo(nsSerenity); static { registerType(this); }
 
+    /**
+     * @param props.displayFormat - Date format string (default `Culture.dateFormat`).
+     */
     constructor(public readonly props: { displayFormat?: string } = {}) {
         this.props ??= {};
         this.props.displayFormat ??= Culture.dateFormat;
     }
 
+    /**
+     * Static helper to format any date-like value.
+     * @param value - Date instance or ISO string.
+     * @param format - Format string (defaults to culture format).
+     * @returns HTML-encoded formatted string.
+     */
     static format(value: any, format?: string) {
         if (value == null) {
             return '';
@@ -37,6 +47,7 @@ export class DateFormatter implements Formatter {
     public get displayFormat() { return this.props.displayFormat; }
     public set displayFormat(value) { this.props.displayFormat = value; }
 
+    /** @param ctx - Formatter context. @returns Formatted date string. */
     format(ctx: FormatterContext): string {
         return DateFormatter.format(ctx.value, this.displayFormat);
     }

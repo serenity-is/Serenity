@@ -12,23 +12,45 @@ import type { DataGrid } from "./datagrid";
 import { IDataGrid } from "./idatagrid";
 import type { QuickSearchArgs } from "./quicksearchinput";
 
+/**
+ * Arguments passed to the column picker change callback when columns are
+ * toggled, reordered, or restored to defaults.
+ */
 export type ColumnPickerChangeArgs = {
+    /** Columns whose visibility was toggled. */
     toggledColumns: Column[];
+    /** Whether columns were reordered. */
     reorderedColumns: boolean;
+    /** Whether the default column order/visibility was restored. */
     restoredDefaults: boolean;
 };
 
+/**
+ * Options for the {@link ColumnPickerDialog}.
+ */
 export interface ColumnPickerDialogOptions {
+    /** Columns to display in the picker, or a function returning them. */
     columns?: Column[] | (() => Column[]);
+    /** Default column order, or a function returning it. */
     defaultOrder?: string[] | (() => string[]);
+    /** Default visible column ids, or a function returning them. */
     defaultVisible?: string[] | (() => string[]);
+    /** Data grid the picker is associated with. */
     dataGrid?: IDataGrid;
+    /** SleekGrid instance the picker operates on. */
     sleekGrid?: ISleekGrid;
+    /** Callback invoked when the picker state changes. */
     onChange?: (args: ColumnPickerChangeArgs) => Promise<any>;
+    /** Custom handler for toggling column visibility. */
     toggleColumns?: (columnIds: string[], show?: boolean) => Column[];
+    /** Custom handler for reordering columns. */
     reorderColumns?: (columnIds: string[], setVisible?: string[]) => boolean;
 }
 
+/**
+ * Dialog that lets users show/hide, reorder, and pin grid columns.
+ * @typeParam P - Options type for the dialog.
+ */
 export class ColumnPickerDialog<P extends ColumnPickerDialogOptions = ColumnPickerDialogOptions> extends BaseDialog<P> {
 
     static override[Symbol.typeInfo] = this.registerClass(nsSerenity);
@@ -44,6 +66,10 @@ export class ColumnPickerDialog<P extends ColumnPickerDialogOptions = ColumnPick
     declare private searchInput: HTMLInputElement;
     declare private onChangeHandler: (args: ColumnPickerChangeArgs) => PromiseLike<any>;
 
+    /**
+     * Creates a column picker dialog.
+     * @param opt - Options for the dialog.
+     */
     constructor(opt: P) {
         super(opt);
 
@@ -124,6 +150,9 @@ export class ColumnPickerDialog<P extends ColumnPickerDialogOptions = ColumnPick
         this.element.on("click", ".toggle-visibility", bindThis(this).handleToggleClick);
     }
 
+    /**
+     * Cleans up handlers and delegates to the base destroy.
+     */
     public override destroy() {
         delete this.toggleColumnsHandler;
         delete this.colById;
@@ -138,6 +167,12 @@ export class ColumnPickerDialog<P extends ColumnPickerDialogOptions = ColumnPick
         super.destroy();
     }
 
+    /**
+     * Toggles visibility of the specified columns.
+     * @param columnIds - Column ids to toggle.
+     * @param show - Whether to show (true) or hide (false) the columns; defaults to toggling.
+     * @returns The columns whose visibility changed.
+     */
     protected toggleColumns(columnIds: string[], show?: boolean): Column[] {
         const result = this.toggleColumnsHandler(columnIds, show);
         if (result && result.length) {
@@ -146,10 +181,19 @@ export class ColumnPickerDialog<P extends ColumnPickerDialogOptions = ColumnPick
         return result;
     }
 
+    /**
+     * Invokes the change callback with the given arguments.
+     * @param args - Change arguments.
+     * @returns Result of the change callback.
+     */
     protected onChange(args: ColumnPickerChangeArgs): PromiseLike<any> {
         return this.onChangeHandler(args);
     }
 
+    /**
+     * Handles clicks on a column's visibility toggle.
+     * @param e - Mouse event.
+     */
     protected handleToggleClick(e: MouseEvent) {
         const columnId = (e.target as HTMLElement)?.closest("li")?.dataset.key;
         if (!columnId)
@@ -171,6 +215,10 @@ export class ColumnPickerDialog<P extends ColumnPickerDialogOptions = ColumnPick
         this.updateToggleAllValue();
     }
 
+    /**
+     * Renders the dialog contents.
+     * @returns The rendered dialog content.
+     */
     protected override renderContents(): any {
         this.dialogTitle = ColumnPickerDialogTexts.Title;
 
@@ -196,6 +244,10 @@ export class ColumnPickerDialog<P extends ColumnPickerDialogOptions = ColumnPick
         );
     }
 
+    /**
+     * Creates the quick search input in the dialog.
+     * @param div - Container element for the search bar.
+     */
     protected createSearch(div: HTMLElement) {
         const input = GridUtils.addQuickSearch({ 
             container: div, 
@@ -205,12 +257,21 @@ export class ColumnPickerDialog<P extends ColumnPickerDialogOptions = ColumnPick
         this.searchInput = input.domNode;
     }
 
+    /**
+     * Reorders columns using the configured handler.
+     * @param columnIds - New column order.
+     * @param setVisible - Optional column ids to set visible.
+     * @param restoredDefaults - Whether this reorder restores defaults.
+     */
     protected reorderColumns(columnIds: string[], setVisible?: string[], restoredDefaults?: boolean) {
         if (this.reorderColumnsHandler(columnIds, setVisible)) {
             this.onChange({ toggledColumns: null, reorderedColumns: true, restoredDefaults });
         }
     }
 
+    /**
+     * Restores the default column order and visibility.
+     */
     protected handleRestoreDefaults() {
         this.reorderColumns(this.defaultOrder, this.defaultVisible, true);
 
@@ -255,6 +316,9 @@ export class ColumnPickerDialog<P extends ColumnPickerDialogOptions = ColumnPick
         this.updateToggleAllValue();
     }
 
+    /**
+     * Handles clicks on the toggle-all checkbox.
+     */
     protected handleToggleAllClick() {
         const show = this.toggleAllCheckbox.checked;
         const columnIds: string[] = [];
@@ -272,11 +336,19 @@ export class ColumnPickerDialog<P extends ColumnPickerDialogOptions = ColumnPick
         this.updateToggleAllValue();
     }
 
+    /**
+     * Updates the toggle-all checkbox to reflect the current visibility state.
+     * @returns The new checked state of the toggle-all checkbox.
+     */
     protected updateToggleAllValue(): boolean {
         const inputs = this.list.querySelectorAll<HTMLInputElement>("li:not([hidden]) input.toggle-visibility:not([disabled])");
         return this.toggleAllCheckbox.checked = Array.from(inputs).every(x => x.checked);
     }
 
+    /**
+     * Filters the column list based on the search query.
+     * @param args - Quick search arguments.
+     */
     protected handleSearch({ query, done }: QuickSearchArgs): void {
         query = stripDiacritics(query?.trim().toLowerCase() ?? "");
         if (query.length && !this.list.style.height) {
@@ -299,6 +371,11 @@ export class ColumnPickerDialog<P extends ColumnPickerDialogOptions = ColumnPick
         done(found);
     }
 
+    /**
+     * Creates a toolbar button that opens the column picker dialog.
+     * @param optOrDataGrid - Options or a data grid to derive options from.
+     * @returns Tool button definition.
+     */
     public static createToolButton(optOrDataGrid: IDataGrid | ColumnPickerDialogOptions): ToolButton {
         // for compat
         const opt = optOrDataGrid && 'getGrid' in optOrDataGrid ?
@@ -324,6 +401,10 @@ export class ColumnPickerDialog<P extends ColumnPickerDialogOptions = ColumnPick
         }
     }
 
+    /**
+     * Returns the dialog options, sized for the column picker.
+     * @returns Dialog options.
+     */
     protected override getDialogOptions() {
         var opt = super.getDialogOptions();
         opt.size = "sm";
@@ -331,6 +412,10 @@ export class ColumnPickerDialog<P extends ColumnPickerDialogOptions = ColumnPick
         return opt;
     }
 
+    /**
+     * Returns no dialog buttons; the picker uses its own controls.
+     * @returns Null.
+     */
     protected override getDialogButtons(): DialogButton[] {
         return null;
     }
@@ -394,6 +479,9 @@ export class ColumnPickerDialog<P extends ColumnPickerDialogOptions = ColumnPick
         this.reorderColumns(newOrder, null, false);
     }
 
+    /**
+     * Creates the list items for all columns.
+     */
     protected createColumnItems(): void {
         const columns = this.columns;
 
@@ -414,6 +502,9 @@ export class ColumnPickerDialog<P extends ColumnPickerDialogOptions = ColumnPick
         }
     }
 
+    /**
+     * Called when the dialog opens; builds the column list and focuses search.
+     */
     protected override onDialogOpen(): void {
         this.createColumnItems();
 
@@ -422,6 +513,10 @@ export class ColumnPickerDialog<P extends ColumnPickerDialogOptions = ColumnPick
         this.searchInput?.focus();
     }
 
+    /**
+     * Opens a column picker dialog with the given options.
+     * @param opt - Options for the dialog.
+     */
     static openDialog(opt: ColumnPickerDialogOptions): void {
 
         const picker = new ColumnPickerDialog(opt);

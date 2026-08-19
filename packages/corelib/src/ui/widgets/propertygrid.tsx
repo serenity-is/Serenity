@@ -5,12 +5,25 @@ import { EditorUtils } from "../editors/editorutils";
 import { ReflectionOptionsSetter } from "./reflectionoptionssetter";
 import { Widget } from "./widget";
 
+/**
+ * A field element rendered by the property grid, augmented with the editor
+ * widget, its loading promise and the associated {@link PropertyItem}.
+ */
 export type PropertyFieldElement = HTMLElement & {
+    /** The editor widget created for this field, once loaded. */
     editorWidget?: Widget<any>;
+    /** A promise that resolves when the editor type finishes loading. */
     editorPromise?: PromiseLike<void>;
+    /** The property item this field was rendered from. */
     propertyItem?: PropertyItem;
 }
 
+/**
+ * Renders the caption (label) for a property field, including the required
+ * marker and localized title/hint text.
+ * @param props - Caption rendering props.
+ * @returns The label element for the field.
+ */
 export function PropertyFieldCaption(props: {
     item: Pick<PropertyItem, "name" | "hint" | "labelWidth" | "required" | "title">,
     idPrefix?: string,
@@ -29,6 +42,11 @@ export function PropertyFieldCaption(props: {
     ) as HTMLLabelElement;
 }
 
+/**
+ * Creates and initializes the editor widget for a property field, applying
+ * editor params, max length, placeholder and editor addons.
+ * @param props - Editor rendering props.
+ */
 export function PropertyFieldEditor(props: {
     fieldElement: PropertyFieldElement,
     item: Pick<PropertyItem, "editorCssClass" | "editorType" | "editorParams" | "maxLength" | "name" | "editorAddons" | "placeholder">,
@@ -105,6 +123,12 @@ export function PropertyFieldEditor(props: {
     }
 }
 
+/**
+ * Renders a line-break element when the item's form CSS class requests one at
+ * the current breakpoint, or null otherwise.
+ * @param props - Line-break rendering props.
+ * @returns A line-break element, or null if none is needed.
+ */
 export function PropertyFieldLineBreak(props: {
     item: Pick<PropertyItem, "formCssClass">
 }): HTMLElement {
@@ -127,6 +151,12 @@ export function PropertyFieldLineBreak(props: {
     }
 }
 
+/**
+ * Renders a full property field (caption plus editor) for a property item and
+ * appends it to the given container.
+ * @param props - Field rendering props.
+ * @returns The created field element.
+ */
 export function PropertyField(props: {
     item: PropertyItem,
     container?: ParentNode,
@@ -164,6 +194,11 @@ export function PropertyField(props: {
     return fieldElement;
 }
 
+/**
+ * Renders a category title with localized text.
+ * @param props - Category title rendering props.
+ * @returns The category title element.
+ */
 export function PropertyCategoryTitle(props: { category: string, localTextPrefix: string }): HTMLElement {
     return (
         <div class="category-title">
@@ -172,6 +207,11 @@ export function PropertyCategoryTitle(props: { category: string, localTextPrefix
     ) as HTMLElement;
 }
 
+/**
+ * Renders a collapsible category container holding its child fields.
+ * @param props - Category rendering props.
+ * @returns The category element.
+ */
 export function PropertyCategory(props: { category?: string, children?: any, collapsed?: boolean, localTextPrefix?: string }): HTMLElement {
 
     const categoryDiv = <div class="category" /> as HTMLElement;
@@ -206,6 +246,11 @@ export function PropertyCategory(props: { category?: string, children?: any, col
     return categoryDiv;
 }
 
+/**
+ * Renders a single tab item in the property tab list.
+ * @param props - Tab item rendering props.
+ * @returns The tab list item element.
+ */
 export function PropertyTabItem(props: { title: string, active?: boolean, paneId?: string, localTextPrefix?: string }): HTMLLIElement {
     const bs3 = isBS3();
     return (
@@ -220,6 +265,11 @@ export function PropertyTabItem(props: { title: string, active?: boolean, paneId
     ) as HTMLLIElement;
 }
 
+/**
+ * Renders a single tab pane that hosts the fields of a tab.
+ * @param props - Tab pane rendering props.
+ * @returns The tab pane element.
+ */
 export function PropertyTabPane(props: { active?: boolean, id?: string, children?: any }): HTMLElement {
     return (
         <div id={props.id} class={`tab-pane fade${props.active ? (isBS3() ? " in active" : " show active") : ""}`} role="tabpanel">
@@ -228,6 +278,12 @@ export function PropertyTabPane(props: { active?: boolean, id?: string, children
     ) as HTMLElement;
 }
 
+/**
+ * Renders the categories container and populates it with fields for the given
+ * property items, grouping them by category.
+ * @param props - Categories rendering props.
+ * @returns The categories element.
+ */
 export function PropertyCategories(props: {
     items: PropertyItem[],
     container?: ParentNode,
@@ -259,6 +315,11 @@ export function PropertyCategories(props: {
     return categoriesDiv;
 }
 
+/**
+ * Renders the tab list (nav) element for the property tabs.
+ * @param props - Optional children to place inside the tab list.
+ * @returns The tab list element.
+ */
 export function PropertyTabList(props?: { children?: any }): HTMLElement {
     return (
         <ul class="nav nav-underline property-tabs" role="tablist">
@@ -267,10 +328,21 @@ export function PropertyTabList(props?: { children?: any }): HTMLElement {
     ) as HTMLElement;
 }
 
+/**
+ * Renders the container that holds the tab panes.
+ * @returns The tab panes element.
+ */
 export function PropertyTabPanes(_?: {}): HTMLElement {
     return <div class="tab-content property-panes" /> as HTMLElement;
 }
 
+/**
+ * Renders the full tabbed layout for property items that declare a `tab`,
+ * grouping items without a tab into a leading untabbed section.
+ * @param props - Tabs rendering props.
+ * @returns A document fragment containing the tabs, or null when a container
+ *   was provided and the content was appended directly to it.
+ */
 export function PropertyTabs(props: {
     items: PropertyItem[],
     container?: ParentNode,
@@ -328,12 +400,23 @@ export function PropertyTabs(props: {
     return container ? null : parentNode as DocumentFragment;
 }
 
+/**
+ * A widget that renders a set of {@link PropertyItem}s as a form, organizing
+ * them into categories and/or tabs, and manages loading/saving values to and
+ * from the underlying editors.
+ * @typeParam P - Widget props type, constrained to {@link PropertyGridOptions}.
+ */
 export class PropertyGrid<P extends PropertyGridOptions = PropertyGridOptions> extends Widget<P> {
 
     static override[Symbol.typeInfo] = this.registerClass(nsSerenity);
 
     declare private fieldElements: PropertyFieldElement[];
 
+    /**
+     * Renders the property grid contents, building categories/tabs and loading
+     * the initial value.
+     * @returns The rendered contents.
+     */
     protected override renderContents(): any {
 
         this.domNode.classList.add('s-PropertyGrid');
@@ -363,6 +446,9 @@ export class PropertyGrid<P extends PropertyGridOptions = PropertyGridOptions> e
         this.updateInterface();
     }
 
+    /**
+     * Destroys all field editors and clears the grid contents.
+     */
     override destroy() {
 
         if (this.fieldElements) {
@@ -382,18 +468,35 @@ export class PropertyGrid<P extends PropertyGridOptions = PropertyGridOptions> e
         super.destroy();
     }
 
+    /**
+     * Returns the editor widgets for all rendered fields.
+     * @returns Array of editor widgets.
+     */
     get_editors(): Widget<any>[] {
         return this.fieldElements?.map(x => x.editorWidget) ?? [];
     }
 
+    /**
+     * Returns the property items for all rendered fields.
+     * @returns Array of property items.
+     */
     get_items(): PropertyItem[] {
         return this.fieldElements?.map(x => x.propertyItem) ?? [];
     }
 
+    /**
+     * Returns the id prefix used by this grid.
+     * @returns The id prefix.
+     */
     get_idPrefix(): string {
         return this.idPrefix;
     }
 
+    /**
+     * Invokes a callback for each rendered field with its property item and
+     * editor widget.
+     * @param callback - Callback receiving the property item and editor widget.
+     */
     enumerateItems(callback: (p1: PropertyItem, p2: Widget<any>) => void): void {
         for (let fieldElement of this.fieldElements) {
             var item = fieldElement.propertyItem;
@@ -404,10 +507,18 @@ export class PropertyGrid<P extends PropertyGridOptions = PropertyGridOptions> e
         }
     }
 
+    /**
+     * Returns the current grid mode (insert or update).
+     * @returns The current {@link PropertyGridMode}.
+     */
     get_mode(): PropertyGridMode {
         return this.options.mode;
     }
 
+    /**
+     * Sets the grid mode and refreshes the interface.
+     * @param value - The new {@link PropertyGridMode}.
+     */
     set_mode(value: PropertyGridMode) {
         if (this.options.mode !== value) {
             this.options.mode = value;
@@ -415,6 +526,13 @@ export class PropertyGrid<P extends PropertyGridOptions = PropertyGridOptions> e
         }
     }
 
+    /**
+     * Loads a field's value from a source object into its editor, applying
+     * defaults in insert mode.
+     * @param source - The source object to read values from.
+     * @param fieldElement - The field element whose editor receives the value.
+     * @param mode - The grid mode, used to apply insert defaults.
+     */
     static loadFieldValue(source: any, fieldElement: PropertyFieldElement, mode?: PropertyGridMode) {
         var item = fieldElement.propertyItem;
         if (!!(mode === PropertyGridMode.insert && item.defaultValue != null) &&
@@ -436,6 +554,10 @@ export class PropertyGrid<P extends PropertyGridOptions = PropertyGridOptions> e
         }
     }
 
+    /**
+     * Loads values from a source object into all field editors.
+     * @param source - The source object to read values from.
+     */
     load(source: any): void {
         const mode = this.get_mode();
         for (let fieldElement of this.fieldElements) {
@@ -443,6 +565,14 @@ export class PropertyGrid<P extends PropertyGridOptions = PropertyGridOptions> e
         }
     }
 
+    /**
+     * Saves a field's editor value into a target object when the item is
+     * modifiable.
+     * @param target - The target object to write values into.
+     * @param fieldElement - The field element whose editor value is saved.
+     * @param canModify - Whether the item may be modified; defaults to the
+     *   result of {@link PropertyGrid.canModifyItem}.
+     */
     static saveFieldValue(target: any, fieldElement: PropertyFieldElement, canModify?: boolean): void {
         var item = fieldElement.propertyItem;
         if ((item.unbound ?? item.skipOnSave ?? (item as any).oneWay) !== true && (canModify ?? PropertyGrid.canModifyItem(item))) {
@@ -454,6 +584,11 @@ export class PropertyGrid<P extends PropertyGridOptions = PropertyGridOptions> e
         }
     }
 
+    /**
+     * Saves all field editor values into a target object.
+     * @param target - Optional target object; a new object is created if omitted.
+     * @returns The object containing the saved values.
+     */
     save(target?: any): any {
         if (target == null)
             target = Object.create(null);
@@ -463,6 +598,10 @@ export class PropertyGrid<P extends PropertyGridOptions = PropertyGridOptions> e
         return target;
     }
 
+    /**
+     * Commits pending edits on all editors that support it.
+     * @returns True if all commits succeeded, false if any editor rejected.
+     */
     async commitEdits(): Promise<boolean> {
         for (let fieldElement of this.fieldElements) {
             if (fieldElement.editorWidget &&
@@ -475,16 +614,30 @@ export class PropertyGrid<P extends PropertyGridOptions = PropertyGridOptions> e
         return true;
     }
 
+    /**
+     * Gets the current values of all editors as an object.
+     */
     public get value(): any {
         return this.save();
     }
 
+    /**
+     * Loads values from an object into all editors.
+     * @param val - The object containing values to load.
+     */
     public set value(val: any) {
         if (val == null)
             val = Object.create(null);
         this.load(val);
     }
 
+    /**
+     * Determines whether a property item may be modified in the given mode,
+     * taking insert/update permissions into account.
+     * @param item - The property item to check.
+     * @param mode - The grid mode; defaults to update semantics when omitted.
+     * @returns True if the item can be modified.
+     */
     static canModifyItem(item: PropertyItem, mode?: PropertyGridMode) {
         if (mode === PropertyGridMode.insert) {
             if (item.insertable === false) {
@@ -511,10 +664,22 @@ export class PropertyGrid<P extends PropertyGridOptions = PropertyGridOptions> e
         return true;
     }
 
+    /**
+     * Determines whether a property item may be modified in the current mode.
+     * @param item - The property item to check.
+     * @returns True if the item can be modified.
+     */
     protected canModifyItem(item: PropertyItem) {
         return PropertyGrid.canModifyItem(item, this.get_mode());
     }
 
+    /**
+     * Updates a field element's editor read-only/required state and visibility
+     * based on the item and mode.
+     * @param fieldElement - The field element to update.
+     * @param mode - The grid mode.
+     * @param canModify - Whether the item may be modified.
+     */
     static updateFieldElement(fieldElement: PropertyFieldElement, mode?: PropertyGridMode, canModify?: boolean) {
         var item = fieldElement.propertyItem;
         canModify ??= PropertyGrid.canModifyItem(item, mode);
@@ -548,10 +713,17 @@ export class PropertyGrid<P extends PropertyGridOptions = PropertyGridOptions> e
         }
     }
 
+    /**
+     * Updates a single field element in the current mode.
+     * @param fieldElement - The field element to update.
+     */
     protected updateFieldElement(fieldElement: PropertyFieldElement) {
         PropertyGrid.updateFieldElement(fieldElement, this.get_mode(), !!this.canModifyItem(fieldElement.propertyItem));
     }
 
+    /**
+     * Refreshes the read-only/required state and visibility of all fields.
+     */
     updateInterface() {
         for (let fieldElement of this.fieldElements) {
             this.updateFieldElement(fieldElement);
@@ -609,15 +781,29 @@ function createLineBreak(klass: string): HTMLElement {
     return <div class={klass} style={{ width: "100%" }} /> as HTMLElement;
 }
 
+/**
+ * Determines the editing mode of a {@link PropertyGrid}, which affects how
+ * defaults, permissions and visibility are applied to fields.
+ */
 export enum PropertyGridMode {
+    /** The grid is used for inserting a new record. */
     insert = 1,
+    /** The grid is used for updating an existing record. */
     update = 2
 }
 
+/**
+ * Options for configuring a {@link PropertyGrid}.
+ */
 export interface PropertyGridOptions {
+    /** Optional id prefix used for field element ids. */
     idPrefix?: string;
+    /** The property items to render as fields. */
     items: PropertyItem[];
+    /** Optional local text prefix used to localize captions and hints. */
     localTextPrefix?: string;
+    /** Optional initial value to load into the editors. */
     value?: any;
+    /** The grid mode; defaults to {@link PropertyGridMode.insert}. */
     mode?: PropertyGridMode;
 }

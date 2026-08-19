@@ -6,12 +6,20 @@ import { SlickTreeHelper } from "../helpers/slicktreehelper";
 import { DataGrid } from "./datagrid";
 
 /**
- * A mixin that can be applied to a DataGrid for tree functionality
+ * Adds tree / hierarchy support to a {@link DataGrid} by handling indentation,
+ * expand/collapse toggles, and parent-before-child ordering.
+ * Attach by constructing the mixin with the target grid and hierarchy options.
+ * @typeParam TItem - Row type displayed in the grid.
  */
 export class TreeGridMixin<TItem> {
 
+    /** Underlying data grid this mixin is attached to. */
     declare private dataGrid: DataGrid<TItem, any>;
 
+    /**
+     * Creates a tree mixin for the specified grid.
+     * @param options - Hierarchy configuration including grid reference and parent id accessor.
+     */
     constructor(private options: TreeGridMixinOptions<TItem>) {
         var dg = this.dataGrid = options.grid;
         var idProperty = (dg as any).getIdProperty();
@@ -50,7 +58,8 @@ export class TreeGridMixin<TItem> {
     }
 
     /**
-     * Expands / collapses all rows in a grid automatically
+     * Toggles all rows between collapsed and expanded.
+     * If every row is collapsed, all rows are expanded and vice versa.
      */
     toggleAll(): void {
         SlickTreeHelper.setCollapsed(this.dataGrid.view.getItems(),
@@ -59,11 +68,13 @@ export class TreeGridMixin<TItem> {
         this.dataGrid.view.setItems(this.dataGrid.view.getItems(), true);
     }
 
+    /** Collapses all rows in the associated grid. */
     collapseAll(): void {
         SlickTreeHelper.setCollapsed(this.dataGrid.view.getItems(), true);
         this.dataGrid.view.setItems(this.dataGrid.view.getItems(), true);
     }
 
+    /** Expands all rows in the associated grid. */
     expandAll(): void {
         SlickTreeHelper.setCollapsed(this.dataGrid.view.getItems(), false);
         this.dataGrid.view.setItems(this.dataGrid.view.getItems(), true);
@@ -107,13 +118,17 @@ export class TreeGridMixin<TItem> {
     }
 }
 
+/**
+ * Options for {@link TreeGridMixin}.
+ * @typeParam TItem - Row type displayed in the grid.
+ */
 export interface TreeGridMixinOptions<TItem> {
-    // data grid object
+    /** Target data grid to enhance with tree behaviour. */
     grid: DataGrid<TItem, any>;
-    // a function to get parent id
+    /** Callback that returns the parent identifier for a row. */
     getParentId: (item: TItem) => any;
-    // where should the toggle button be placed
+    /** Field / column id where the expand/collapse toggle is rendered. */
     toggleField: string;
-    // a delegate that should return initial collapsing state
+    /** Optional callback that controls whether rows start collapsed. */
     initialCollapse?: () => boolean;
 }

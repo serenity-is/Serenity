@@ -4,9 +4,17 @@ import { IStringValue } from "../../interfaces";
 import { EditorProps } from "./editorwidget";
 import { StringEditor } from "./stringeditor";
 
+/**
+ * An editor that renders a URL input and auto-prefixes missing schemes on blur.
+ * @typeParam P - Widget props type.
+ */
 export class URLEditor<P = {}> extends StringEditor<P> {
     static override[Symbol.typeInfo] = this.registerEditor(nsSerenity, [IStringValue]);
 
+    /**
+     * Creates a URL editor.
+     * @param props - Widget props.
+     */
     constructor(props: EditorProps<P>) {
         super(props);
 

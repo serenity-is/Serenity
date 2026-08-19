@@ -1,26 +1,50 @@
 import { ensureTypeInfo, getBaseType, getGlobalTypeRegistry, getTypeFullName, isInstanceOfType, peekTypeInfo, Type } from "../base";
 
+/**
+ * A plain-object dictionary mapping string keys to values of type `TItem`.
+ * @deprecated Prefer {@link Record}`<string, TItem>` or {@link Map}`<string, TItem>` over this legacy alias.
+ * @typeParam TItem - The type of each dictionary value.
+ */
 export type Dictionary<TItem> = { [key: string]: TItem };
 
-/** @deprecated Use ?? operator */
+/**
+ * Returns the first argument if it is not `null`/`undefined`, otherwise the second argument.
+ * @deprecated Use the nullish-coalescing operator `??` directly — e.g. `a ?? b`.
+ * @param a - The preferred value; returned when it is not `null`/`undefined`.
+ * @param b - The fallback value returned when `a` is `null`/`undefined`.
+ * @returns `a` if `a != null`, otherwise `b`.
+ */
 export function coalesce(a: any, b: any): any {
     return a ?? b;
 }
 
-/** @deprecated Use a != null */
+/**
+ * Determines whether a value is neither `null` nor `undefined`.
+ * @deprecated Use `a != null` (or `a !== null && a !== undefined`) directly.
+ * @param a - The value to test.
+ * @returns `true` if `a` is not `null` and not `undefined`.
+ */
 export function isValue(a: any): boolean {
     return a != null;
 }
 
-/** Extends an object with properties from another object similar to Object.assign.
- * @deprecated Use Object.assign
+/**
+ * Shallow-copies properties from `b` onto `a`, mutating `a` — equivalent to `Object.assign(a, b)`.
+ * @deprecated Use {@link Object.assign} directly.
+ * @typeParam T - The common object type.
+ * @param a - The target object to extend (mutated and returned).
+ * @param b - The source object whose own properties are copied onto `a`.
+ * @returns The mutated target object `a`.
  */
 export function extend<T = any>(a: T, b: T): T {
     return Object.assign(a, b);
 }
 
 
-/** Returns the current date without time part */
+/**
+ * Returns the current local date with the time component zeroed to midnight.
+ * @returns A `Date` representing today at 00:00:00 in the local time zone.
+ */
 export let today = (): Date => {
     const d = new Date();
     return new Date(d.getFullYear(), d.getMonth(), d.getDate());
@@ -74,18 +98,31 @@ function getRegExpFlags(regExp: RegExp) {
     }
 }
 
-/** Type member information, preserved for compatibility as used by legacy option decorator */
+/**
+ * Describes a single type member collected via the legacy {@link addTypeMember} / option-decorator mechanism.
+ * Preserved for backward compatibility; prefer {@link Symbol.metadata} / `Symbol.typeInfo` where possible.
+ */
 export interface TypeMember {
+    /** Member name (field or property name). */
     name: string;
+    /** Bitmask indicating the member kind (field vs. property). */
     kind: TypeMemberKind;
+    /** Optional attribute/metadata objects attached to the member. */
     attr?: any[];
+    /** Optional getter method name for property members. */
     getter?: string;
+    /** Optional setter method name for property members. */
     setter?: string;
 }
 
-/** Bitmask for type member kinds */
+/**
+ * Bitmask discriminating type-member kinds stored in {@link TypeMember.kind}.
+ * Values are powers of two so they can be combined and filtered with bitwise operators.
+ */
 export enum TypeMemberKind {
+    /** A plain field member. */
     field = 4,
+    /** A property member (with optional getter/setter). */
     property = 16
 }
 
@@ -163,6 +200,10 @@ export function getTypes(): any[] {
     return result;
 }
 
+/**
+ * Removes all own enumerable properties from the given object.
+ * @param d - The dictionary/object to clear. All own properties are deleted in place.
+ */
 export function clearKeys(d: any) {
     for (const n in d) {
         if (Object.prototype.hasOwnProperty.call(d, n))
@@ -170,10 +211,23 @@ export function clearKeys(d: any) {
     }
 }
 
+/**
+ * Identity helper that preserves a property key's type, useful for type-safe `keyof` references.
+ * @typeParam T - The type whose key is being referenced.
+ * @param prop - A key of `T`.
+ * @returns The same key, typed as `keyof T`.
+ */
 export function keyOf<T>(prop: keyof T) {
     return prop;
 }
 
+/**
+ * Casts `instance` to `type`, throwing if the instance is not assignable to the target type.
+ * @param instance - The value to cast; `null`/`undefined` is returned as-is.
+ * @param type - The target {@link Type} to assert.
+ * @returns `instance` typed as the target, if the runtime check passes.
+ * @throws Error string when `instance` is not an instance of `type`.
+ */
 export function cast(instance: any, type: Type) {
     if (instance == null)
         return instance;
@@ -182,6 +236,12 @@ export function cast(instance: any, type: Type) {
     throw 'Cannot cast object to type ' + getTypeFullName(type);
 }
 
+/**
+ * Attempts to cast `instance` to `type`, returning `null` on failure instead of throwing.
+ * @param instance - The value to cast.
+ * @param type - The target {@link Type} to test against.
+ * @returns `instance` if it is an instance of `type`; otherwise `null`.
+ */
 export function safeCast(instance: any, type: Type) {
     return isInstanceOfType(instance, type) ? instance : null;
 };

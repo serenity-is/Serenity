@@ -1,129 +1,186 @@
 /**
- * CriteriaBuilder is a class that allows to build unary or binary criteria with completion support.
+ * Fluent builder for Serenity criteria expressions with completion support.
+ *
+ * @remarks
+ * Extends `Array` so an instance itself acts as a field-reference token (e.g. `["Amount"]`).
+ * Create instances via {@link Criteria}`("FieldName")` rather than `new CriteriaBuilder()`.
+ * Each method returns a Serenity criteria tuple/array that can be combined with
+ * {@link Criteria.and}, {@link Criteria.or}, {@link Criteria.join}, or the
+ * {@link parseCriteria} parser. `bw` stands for "between" (inclusive).
+ * @example
+ * Criteria("Age").ge(18); // [["Age"], ">=", 18]
+ * @example
+ * Criteria("Status").in([1, 2, 3]); // [["Status"], "in", [[1, 2, 3]]]
  */
 export class CriteriaBuilder extends Array {
     /**
-     * Creates a between criteria.
-     * @param fromInclusive from value
-     * @param toInclusive to value
+     * Creates a BETWEEN (inclusive) criteria: `field >= from AND field <= to`.
+     *
+     * @param fromInclusive - Lower bound (inclusive).
+     * @param toInclusive - Upper bound (inclusive).
+     * @returns Composite criteria `[[field, ">=", from], "and", [field, "<=", to]]`.
+     * @example
+     * Criteria("Amount").bw(10, 20);
      */
     bw(fromInclusive: any, toInclusive: any): Array<any> {
         return [[this, '>=', fromInclusive], 'and', [this, '<=', toInclusive]];
     }
 
     /**
-     * Creates a contains criteria
-     * @param value contains value
+     * Creates a `LIKE '%value%'` (contains) criteria.
+     *
+     * @param value - Substring to search for. Wrapped with `%` on both sides.
+     * @returns Criteria `[field, "like", "%value%"]`.
+     * @example
+     * Criteria("Name").contains("ser"); // [["Name"], "like", "%ser%"]
      */
     contains(value: string): Array<any> {
         return [this, 'like', '%' + value + '%'];
     }
 
     /**
-     * Creates a endsWith criteria
-     * @param value endsWith value
+     * Creates a `LIKE '%value'` (ends-with) criteria.
+     *
+     * @param value - Suffix to match. Prefixed with `%`.
+     * @returns Criteria `[field, "like", "%value"]`.
+     * @example
+     * Criteria("Email").endsWith("@example.com");
      */
     endsWith(value: string): Array<any> {
         return [this, 'like', '%' + value];
     }
 
     /**
-     * Creates an equal (=) criteria
-     * @param value equal value
+     * Creates an equality (`=`) criteria.
+     *
+     * @param value - Value to compare for equality.
+     * @returns Criteria `[field, "=", value]`.
+     * @example
+     * Criteria("IsActive").eq(true);
      */
     eq(value: any): Array<any> {
         return [this, '=', value];
     }
 
     /**
-     * Creates a greater than criteria
-     * @param value greater than value
+     * Creates a greater-than (`>`) criteria.
+     *
+     * @param value - Lower exclusive bound.
+     * @returns Criteria `[field, ">", value]`.
      */
     gt(value: any): Array<any> {
         return [this, '>', value];
     }
 
     /**
-     * Creates a greater than or equal criteria
-     * @param value greater than or equal value
+     * Creates a greater-than-or-equal (`>=`) criteria.
+     *
+     * @param value - Lower inclusive bound.
+     * @returns Criteria `[field, ">=", value]`.
      */
     ge(value: any): Array<any> {
         return [this, '>=', value];
     }
 
     /**
-     * Creates a in criteria
-     * @param values in values
+     * Creates an `IN` criteria.
+     *
+     * @param values - Array of allowed values. Wrapped as `[values]` per Serenity wire format.
+     * @returns Criteria `[field, "in", [values]]`.
+     * @example
+     * Criteria("Status").in([1, 2]); // [["Status"], "in", [[1, 2]]]
      */
     in(values: any[]): Array<any> {
         return [this, 'in', [values]];
     }
 
     /**
-     * Creates a IS NULL criteria
+     * Creates an `IS NULL` criteria.
+     *
+     * @returns Criteria `["is null", field]`.
      */
     isNull(): Array<any> {
         return ['is null', this];
     }
 
     /**
-     * Creates a IS NOT NULL criteria
+     * Creates an `IS NOT NULL` criteria.
+     *
+     * @returns Criteria `["is not null", field]`.
      */
     isNotNull(): Array<any> {
         return ['is not null', this];
     }
 
     /**
-     * Creates a less than or equal to criteria
-     * @param value less than or equal to value
+     * Creates a less-than-or-equal (`<=`) criteria.
+     *
+     * @param value - Upper inclusive bound.
+     * @returns Criteria `[field, "<=", value]`.
      */
     le(value: any): Array<any> {
         return [this, '<=', value];
     }
 
     /**
-     * Creates a less than criteria
-     * @param value less than value
+     * Creates a less-than (`<`) criteria.
+     *
+     * @param value - Upper exclusive bound.
+     * @returns Criteria `[field, "<", value]`.
      */
     lt(value: any): Array<any> {
         return [this, '<', value];
     }
 
     /**
-     * Creates a not equal criteria
-     * @param value not equal value
+     * Creates a not-equal (`!=`) criteria.
+     *
+     * @param value - Value that the field must not equal.
+     * @returns Criteria `[field, "!=", value]`.
      */
     ne(value: any): Array<any> {
         return [this, '!=', value];
     }
 
     /**
-     * Creates a LIKE criteria
-     * @param value like value
+     * Creates a `LIKE` criteria with the exact pattern provided.
+     *
+     * @param value - SQL LIKE pattern (use `%` / `_` wildcards as needed).
+     * @returns Criteria `[field, "like", value]`.
+     * @example
+     * Criteria("Name").like("A%");
      */
     like(value: any): Array<any> {
         return [this, 'like', value];
     }
 
     /**
-     * Creates a STARTS WITH criteria
-     * @param value startsWith value
+     * Creates a `LIKE 'value%'` (starts-with) criteria.
+     *
+     * @param value - Prefix to match. Suffixed with `%`.
+     * @returns Criteria `[field, "like", "value%"]`.
+     * @example
+     * Criteria("Name").startsWith("Jo"); // [["Name"], "like", "Jo%"]
      */
     startsWith(value: string): Array<any> {
         return [this, 'like', value + '%'];
     }
 
     /**
-     * Creates a NOT IN criteria
-     * @param values array of NOT IN values
+     * Creates a `NOT IN` criteria.
+     *
+     * @param values - Array of disallowed values. Wrapped as `[values]`.
+     * @returns Criteria `[field, "not in", [values]]`.
      */
     notIn(values: any[]): Array<any> {
         return [this, 'not in', [values]];
     }
 
     /**
-     * Creates a NOT LIKE criteria
-     * @param value not like value
+     * Creates a `NOT LIKE` criteria.
+     *
+     * @param value - SQL LIKE pattern that the field must not match.
+     * @returns Criteria `[field, "not like", value]`.
      */
     notLike(value: any): Array<any> {
         return [this, 'not like', value];
@@ -687,24 +744,31 @@ function internalParse(expression: string, getParam?: (name: string) => any) {
     return rpnTokensToCriteria(rpnTokens, getParam);
 }
 
-/** 
- * Parses a criteria expression to Serenity Criteria array format.
- * The string may optionally contain parameters like `A >= @p1 and B < @p2`.
- * @param expression The criteria expression.
- * @param params The dictionary containing parameter values like { p1: 10, p2: 20 }.
+/**
+ * Parses a criteria expression string to Serenity criteria array format.
+ *
+ * @remarks
+ * Supports named parameters via `@name` placeholders. Operator precedence is handled
+ * via a shunting-yard pass; string literals use single quotes with `''` escaping.
+ * @param expression - Expression text, e.g. `"A >= @p1 and B < @p2"`.
+ * @param params - Dictionary mapping parameter names to values, e.g. `{ p1: 5, p2: 4 }`.
+ * @returns Serenity criteria array, e.g. `[[["A"], ">=", 5], "and", [["B"], "<", 4]]`.
  * @example
  * `parseCriteria('A >= @p1 and B < @p2', { p1: 5, p2: 4 }) // [[[a], '>=' 5], 'and', [[b], '<', 4]]`
  */
 export function parseCriteria(expression: string, params?: any): any[];
-/** 
- * Parses a criteria expression to Serenity Criteria array format.
- * The expression may contain parameter placeholders like `A >= ${p1}`
- * where p1 is a variable in the scope.
- * @param strings The string fragments.
- * @param values The tagged template arguments.
- * @example 
+/**
+ * Parses a tagged-template criteria expression to Serenity criteria array format.
+ *
+ * @remarks
+ * Each interpolated value becomes an auto-named `@__N` parameter, avoiding manual
+ * parameter dictionaries and SQL-injection-prone concatenation.
+ * @param strings - Template string fragments.
+ * @param values - Interpolated values (one per placeholder).
+ * @returns Serenity criteria array.
+ * @example
  * let a = 5, b = 4;
- * parseCriteria`A >= ${a} and B < ${b}` // [[[a], '>=' 5], 'and', [[b], '<', 4]]
+ * parseCriteria`A >= ${a} and B < ${b}`; // [[["A"], ">=", 5], "and", [["B"], "<", 4]]
  */
 export function parseCriteria(strings: TemplateStringsArray, ...values: any[]): any[];
 export function parseCriteria(exprOrStrings: TemplateStringsArray | string, ...values: any[]): any[] {
@@ -724,7 +788,11 @@ export function parseCriteria(exprOrStrings: TemplateStringsArray | string, ...v
 }
 
 /**
- * Enumeration of Criteria operator keys.
+ * String constants for every operator that can appear in a Serenity criteria expression.
+ *
+ * @remarks
+ * Values match the wire-format tokens accepted by the server (e.g. `"="`, `"like"`,
+ * `"is null"`). Exposed also as {@link Criteria.Operator} for convenience.
  */
 export enum CriteriaOperator {
     paren = "()",
@@ -748,8 +816,17 @@ export enum CriteriaOperator {
 }
 
 /**
- * Creates a new criteria builder containg the passed field name.
- * @param field The field name.
+ * Creates a fluent {@link CriteriaBuilder} for the given field.
+ *
+ * @remarks
+ * The returned builder extends `Array` so it doubles as a field token. A prototype
+ * fixup handles environments where subclassing `Array` is unreliable.
+ * @param field - Field name / property key, e.g. `"Amount"` or `"Customer.Name"`.
+ * @returns A {@link CriteriaBuilder} bound to the field.
+ * @example
+ * Criteria("Age").ge(18);
+ * @example
+ * Criteria("Name").contains("acme");
  */
 export function Criteria(field: string) {
     const builder = CriteriaBuilder.of(field);
@@ -758,12 +835,24 @@ export function Criteria(field: string) {
     return builder as CriteriaBuilder
 };
 
+/**
+ * Helpers for composing and inspecting Serenity criteria arrays.
+ *
+ * @remarks
+ * Criteria are plain arrays in the form `[left, operator, right]` (binary),
+ * `[operator, operand]` (unary), or nested with `"and"`/`"or"` joiners.
+ * The static helpers here handle empty-value short-circuiting so callers can
+ * unconditionally combine optional filters.
+ */
 export namespace Criteria {
-    /** Provides access to the `CriteriaOperator` enum, e.g list of operator keys */
+    /** Alias for {@link CriteriaOperator} — the set of valid operator tokens. */
     export const Operator = CriteriaOperator;
 
-    /** 
-     * Determines if a criteria is empty.
+    /**
+     * Returns `true` if the criteria is empty / falsy.
+     *
+     * @param c - Criteria array to test. `null`/`undefined` counts as empty.
+     * @returns `true` if `c` is `null`, `undefined`, `[]`, or `[""]`.
      */
     export function isEmpty(c: any[]): boolean {
         return c == null ||
@@ -772,10 +861,12 @@ export namespace Criteria {
     };
 
     /**
-     * Joins two criteria together.
-     * @param c1 First criteria.
-     * @param op Operator to insert between, e.g. 'or', 'and'.
-     * @param c2 Second criteria
+     * Joins two criteria with an operator, skipping empty sides.
+     *
+     * @param c1 - Left criteria. If empty, `c2` is returned as-is.
+     * @param op - Join operator, typically `"and"` or `"or"` / `"xor"`.
+     * @param c2 - Right criteria. If empty, `c1` is returned as-is.
+     * @returns `[c1, op, c2]` or whichever side is non-empty, if the other is empty.
      */
     export function join(c1: any[], op: string, c2: any[]): any[] {
         if (Criteria.isEmpty(c1))
@@ -788,8 +879,10 @@ export namespace Criteria {
     };
 
     /**
-     * Negates a criteria.
-     * @param c Criteria to negate.
+     * Negates a criteria with the `not` operator.
+     *
+     * @param c - Criteria to negate.
+     * @returns `["not", c]`.
      */
     export function not(c: any[]) {
         return ['not', c]
@@ -797,10 +890,12 @@ export namespace Criteria {
 
 
     /**
-     * Ands two or more criteria together.
-     * @param c1 First criteria.
-     * @param c2 Second criteria.
-     * @param rest Other criteria.
+     * Combines two or more criteria with `and`, skipping empty entries.
+     *
+     * @param c1 - First criteria.
+     * @param c2 - Second criteria.
+     * @param rest - Additional criteria joined incrementally with `and`.
+     * @returns Combined criteria or the sole non-empty input if others are empty.
      */
     export function and(c1: any[], c2: any[], ...rest: any[][]) {
         let result = Criteria.join(c1, 'and', c2);
@@ -813,10 +908,12 @@ export namespace Criteria {
     };
 
     /**
-     * Ors two or more criteria together.
-     * @param c1 First criteria.
-     * @param c2 Second criteria.
-     * @param rest Other criteria.
+     * Combines two or more criteria with `or`, skipping empty entries.
+     *
+     * @param c1 - First criteria.
+     * @param c2 - Second criteria.
+     * @param rest - Additional criteria joined incrementally with `or`.
+     * @returns Combined criteria or the sole non-empty input if others are empty.
      */
     export function or(c1: any[], c2: any[], ...rest: any[][]) {
         let result = Criteria.join(c1, 'or', c2);
@@ -830,27 +927,29 @@ export namespace Criteria {
     }
 
     /**
-     * Puts a criteria in parens. Exists only for compatibility reasons.
+     * Wraps a criteria in parentheses (compatibility helper).
+     *
+     * @remarks
+     * Produces `["()", c]`. The server treats this as a grouping no-op but it can
+     * preserve intended precedence when criteria are serialized. Returns `c` unchanged if empty.
+     * @param c - Criteria to wrap.
+     * @returns `["()", c]` or `c` if empty.
      */
     export function paren(c: any[]): any[] {
         return Criteria.isEmpty(c) ? c : ['()', c];
     }
 
-    /** 
-     * Parses a criteria expression to Serenity Criteria array format.
-     * The expression string may be a string literal, optionally containining 
-     * parameters like `A >= @p1 and B < @p2`.
-     * 
-     * Or, the expression might be a tagged string literal that 
-     * contain parameter placeholders like `A >= ${p1}`
-     * where p1 is a variable in the scope.
+    /**
+     * Alias for {@link parseCriteria} — parses a criteria expression string or tagged template.
      *
+     * @remarks
+     * Accepts either `"A >= @p1"` with a params object, or a tagged template
+     * `` Criteria.parse`A >= ${value}` ``. See {@link parseCriteria} for details.
      * @example
-     * `Criteria.parse("A >= @p1 and B < @p2", { p1: 5, p2: 4 }) // [[[a], '>=' 5], 'and', [[b], '<', 4]]`
-     * 
+     * Criteria.parse("A >= @p1 and B < @p2", { p1: 5, p2: 4 });
      * @example
-     * `let a = 5; b = 4;
-     * Criteria.parse`A >= ${a} and B < ${b}` // [[[a], '>=' 5], 'and', [[b], '<', 4]]`
-    */
+     * let a = 5, b = 4;
+     * Criteria.parse`A >= ${a} and B < ${b}`;
+     */
     export const parse = parseCriteria;
 }

@@ -1,13 +1,26 @@
 import { FileUploadTexts, Fluent, ServiceResponse, Uploader, blockUI, blockUndo, getjQuery, htmlEncode, isArrayLike, notifyError, resolveUrl, round, stringFormat } from "../../base";
 import { replaceAll } from "../../compat";
 
+/**
+ * Helper functions for file uploads, image constraints, and file display.
+ */
 export namespace UploadHelper {
 
 
+    /**
+     * Adds an upload input to a container and returns a Fluent wrapper around it.
+     * @param options - The upload input options.
+     * @returns A Fluent wrapper around the created input element.
+     */
     export function addUploadInput(options: UploadInputOptions): Fluent {
         return Fluent(createUploadInput(options).input);
     }
 
+    /**
+     * Creates an upload input element and its associated Uploader.
+     * @param options - The upload input options.
+     * @returns An object containing the created input element and uploader.
+     */
     export function createUploadInput(options: UploadInputOptions): {
         input: HTMLInputElement,
         uploader: Uploader
@@ -69,6 +82,13 @@ export namespace UploadHelper {
         return { input, uploader };
     }
 
+    /**
+     * Checks an uploaded file against the given image constraints, notifying the
+     * user of any violation.
+     * @param file - The uploaded file response.
+     * @param opt - The constraints to check against.
+     * @returns True if the file satisfies all constraints, otherwise false.
+     */
     export function checkImageConstraints(file: UploadResponse,
         opt: FileUploadConstraints): boolean {
 
@@ -108,10 +128,21 @@ export namespace UploadHelper {
         return true;
     }
 
+    /**
+     * Returns a display string combining a file name and its size.
+     * @param name - The file name.
+     * @param bytes - The file size in bytes.
+     * @returns The combined display string.
+     */
     export function fileNameSizeDisplay(name: string, bytes: number): string {
         return name + ' (' + fileSizeDisplay(bytes) + ')';
     }
 
+    /**
+     * Formats a byte count into a human-readable size string (KB or MB).
+     * @param bytes - The file size in bytes.
+     * @returns The formatted size string.
+     */
     export function fileSizeDisplay(bytes: number): string {
         var byteSize = round(bytes * 100 / 1024) * 0.01;
         var suffix = 'KB';
@@ -130,6 +161,11 @@ export namespace UploadHelper {
         return value + ' ' + suffix;
     }
 
+    /**
+     * Returns whether the given filename has a common image extension.
+     * @param filename - The filename to check.
+     * @returns True if the filename ends with a known image extension.
+     */
     export function hasImageExtension(filename: string): boolean {
         if (!filename) {
             return false;
@@ -140,6 +176,11 @@ export namespace UploadHelper {
             filename.endsWith('.webp');
     }
 
+    /**
+     * Returns the thumbnail file name for the given filename.
+     * @param filename - The original filename.
+     * @returns The thumbnail filename.
+     */
     export function thumbFileName(filename: string): string {
         filename = filename ?? '';
         var idx = filename.lastIndexOf('.');
@@ -149,6 +190,11 @@ export namespace UploadHelper {
         return filename + '_t.jpg';
     }
 
+    /**
+     * Returns the resolved URL for a database-stored file.
+     * @param filename - The filename.
+     * @returns The resolved file URL.
+     */
     export function dbFileUrl(filename: string): string {
         filename = replaceAll(filename ?? '', '\\', '/');
         return resolveUrl('~/upload/') + filename;
@@ -203,9 +249,19 @@ export namespace UploadHelper {
         });
     }
 
-    /** @deprecated use lightbox */
+    /** @deprecated use lightbox
+     * Creates a lightbox for a single upload thumbnail anchor element.
+     * @param link - The anchor element (or array-like of elements) to open in a lightbox.
+     */
     export const colorBox = lightbox;
 
+    /**
+     * Populates a container with file item elements for the given uploaded files.
+     * @param c - The container element (or array-like of elements) to populate.
+     * @param items - The uploaded files to display.
+     * @param displayOriginalName - Whether to display the original file names.
+     * @param urlPrefix - Optional URL prefix prepended to file names.
+     */
     export function populateFileSymbols(c: HTMLElement | ArrayLike<HTMLElement>, items: UploadedFile[],
         displayOriginalName?: boolean, urlPrefix?: string): void {
         let container = isArrayLike(c) ? c[0] : c;
@@ -245,37 +301,118 @@ export namespace UploadHelper {
     }
 }
 
+/**
+ * Represents an uploaded file.
+ */
 export interface UploadedFile {
+    /**
+     * The stored file name.
+     */
     Filename?: string;
+    /**
+     * The original file name.
+     */
     OriginalName?: string;
 }
 
+/**
+ * Options for creating an upload input.
+ */
 export interface UploadInputOptions {
+    /**
+     * The container element to add the input to.
+     */
     container?: HTMLElement | ArrayLike<HTMLElement>;
+    /**
+     * The drop zone element.
+     */
     zone?: HTMLElement | ArrayLike<HTMLElement>;
+    /**
+     * The progress element.
+     */
     progress?: HTMLElement | ArrayLike<HTMLElement>;
+    /**
+     * The name of the input element.
+     */
     inputName?: string;
+    /**
+     * Whether multiple files may be selected.
+     */
     allowMultiple?: boolean;
+    /**
+     * An optional upload intent appended to the upload URL.
+     */
     uploadIntent?: string;
+    /**
+     * The upload URL. Defaults to the temporary upload endpoint.
+     */
     uploadUrl?: string;
+    /**
+     * Callback invoked when a file upload completes.
+     */
     fileDone?: (p1: UploadResponse, p2: string, p3: any) => void;
 }
 
+/**
+ * The response returned by a file upload service.
+ */
 export interface UploadResponse extends ServiceResponse {
+    /**
+     * The temporary file name.
+     */
     TemporaryFile: string;
+    /**
+     * The file size in bytes.
+     */
     Size: number;
+    /**
+     * Whether the file is an image.
+     */
     IsImage: boolean;
+    /**
+     * The image width.
+     */
     Width: number;
+    /**
+     * The image height.
+     */
     Height: number;
 }
 
+/**
+ * Constraints for validating uploaded files.
+ */
 export interface FileUploadConstraints {
+    /**
+     * The minimum image width.
+     */
     minWidth?: number;
+    /**
+     * The maximum image width.
+     */
     maxWidth?: number;
+    /**
+     * The minimum image height.
+     */
     minHeight?: number;
+    /**
+     * The maximum image height.
+     */
     maxHeight?: number;
+    /**
+     * The minimum file size in bytes.
+     */
     minSize?: number;
+    /**
+     * The maximum file size in bytes.
+     */
     maxSize?: number;
+    /**
+     * Whether non-image files are allowed.
+     */
     allowNonImage?: boolean;
+    /**
+     * The name of the property holding the original file name.
+     */
     originalNameProperty?: string;
 }

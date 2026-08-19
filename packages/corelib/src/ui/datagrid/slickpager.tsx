@@ -1,7 +1,12 @@
-﻿import { Fluent, nsSerenity, PagerTexts } from "../../base";
+import { Fluent, nsSerenity, PagerTexts } from "../../base";
 import { PagerOptions } from "../../slick";
 import { Widget, WidgetProps } from "../widgets/widget";
 
+/**
+ * Pager widget for SlickGrid / SleekGrid views that provides page navigation,
+ * page size selection, and status information.
+ * @typeParam P - Options type for the widget.
+ */
 export class SlickPager<P extends PagerOptions = PagerOptions> extends Widget<P> {
     static override[Symbol.typeInfo] = this.registerClass(nsSerenity);
 
@@ -10,6 +15,10 @@ export class SlickPager<P extends PagerOptions = PagerOptions> extends Widget<P>
     declare private pageSize: HTMLSelectElement;
     declare private stat: HTMLSpanElement;
 
+    /**
+     * Creates a pager for the view specified in the options.
+     * @param props - Widget props including the view to page.
+     */
     constructor(props: WidgetProps<P>) {
         super(props);
 
@@ -67,6 +76,11 @@ export class SlickPager<P extends PagerOptions = PagerOptions> extends Widget<P>
         v.onPagingInfoChanged.subscribe(() => this._updatePager());
     }
 
+    /**
+     * Changes the current page based on the requested navigation action.
+     * @param ctype - Navigation action: "first", "prev", "next", "last", or "input".
+     * @returns True if the page change was handled, false otherwise.
+     */
     _changePage(ctype: string) { //change page
 
         var view = this.options.view;
@@ -109,6 +123,9 @@ export class SlickPager<P extends PagerOptions = PagerOptions> extends Widget<P>
         }
     }
 
+    /**
+     * Refreshes the pager UI from the current view paging info.
+     */
     _updatePager() {
 
         var view = this.options.view;

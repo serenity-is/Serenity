@@ -1,25 +1,50 @@
 import { Fluent, IconClassName, iconClassName, isArrayLike, nsSerenity } from "../../base";
 import { Widget } from "./widget";
 
+/**
+ * Props describing a single toolbar button.
+ */
 export interface ToolButtonProps {
+    /** Optional action name stored on the button's `data-action` attribute. */
     action?: string;
+    /** The button's title (text or element). */
     title?: string | HTMLElement | SVGElement | MathMLElement | DocumentFragment;
+    /** Optional tooltip hint shown on hover. */
     hint?: string;
+    /** Optional CSS class(es) applied to the button. */
     cssClass?: string;
+    /** Optional icon class name to display before the title. */
     icon?: IconClassName;
+    /** Handler invoked when the button is clicked. */
     onClick?: (e: MouseEvent & { currentTarget: EventTarget & HTMLElement }) => void;
+    /** Callback invoked with the created button element. */
     ref?: (el: HTMLElement) => void;
+    /** Whether the button is visible; may be a function evaluated on update. */
     visible?: boolean | (() => boolean);
+    /** Whether the button is disabled; may be a function evaluated on update. */
     disabled?: boolean | (() => boolean);
 }
 
+/**
+ * A toolbar button definition, extending {@link ToolButtonProps} with hotkey
+ * and separator support.
+ */
 export interface ToolButton extends ToolButtonProps {
+    /** Optional hotkey binding (e.g. "ctrl+s"). */
     hotkey?: string;
+    /** Whether the browser's default hotkey behavior should be allowed. */
     hotkeyAllowDefault?: boolean;
+    /** Optional context element to which the hotkey is bound. */
     hotkeyContext?: any;
+    /** Whether (and where) a separator should be rendered before the button. */
     separator?: (false | true | 'left' | 'right' | 'both');
 }
 
+/**
+ * Creates a toolbar button element from the given props.
+ * @param tb - The button props.
+ * @returns The created button element.
+ */
 export function ToolbarButton(tb: ToolButtonProps): HTMLElement {
 
     const btn = Fluent(
@@ -62,14 +87,28 @@ export function ToolbarButton(tb: ToolButtonProps): HTMLElement {
     return node;
 }
 
+/**
+ * Options for configuring a {@link Toolbar}.
+ */
 export interface ToolbarOptions {
+    /** The buttons to render in the toolbar. */
     buttons?: ToolButton[];
+    /** Optional default context element for hotkey bindings. */
     hotkeyContext?: any;
 }
 
+/**
+ * A widget that renders a horizontal toolbar of buttons, supporting separators,
+ * hotkeys and dynamic visibility/disabled state.
+ * @typeParam P - Widget props type, constrained to {@link ToolbarOptions}.
+ */
 export class Toolbar<P extends ToolbarOptions = ToolbarOptions> extends Widget<P> {
     static override[Symbol.typeInfo] = this.registerClass(nsSerenity);
 
+    /**
+     * Renders the toolbar contents, creating button groups and buttons.
+     * @returns The rendered tool group element.
+     */
     protected override renderContents(): any {
 
         let group = <div class="tool-group" />;
@@ -93,6 +132,9 @@ export class Toolbar<P extends ToolbarOptions = ToolbarOptions> extends Widget<P
         return group;
     }
 
+    /**
+     * Destroys the toolbar, removing click handlers and hotkey bindings.
+     */
     override destroy() {
         this.domNode.querySelectorAll('div.tool-button').forEach(el => Fluent.off(el, 'click'));
         if (this.mouseTrap) {
@@ -114,8 +156,15 @@ export class Toolbar<P extends ToolbarOptions = ToolbarOptions> extends Widget<P
         super.destroy();
     }
 
+    /** The Mousetrap instance used for hotkey bindings, if any. */
     declare protected mouseTrap: any;
 
+    /**
+     * Creates a button in the given container, handling separators and hotkeys.
+     * @param container - The container (or array-like of containers) to append to.
+     * @param tb - The button definition.
+     * @returns The created button element.
+     */
     createButton(container: ParentNode | ArrayLike<ParentNode>, tb: ToolButton): HTMLElement {
 
         if (isArrayLike(container)) {
@@ -156,6 +205,11 @@ export class Toolbar<P extends ToolbarOptions = ToolbarOptions> extends Widget<P
         return button;
     }
 
+    /**
+     * Finds a button by its CSS class name.
+     * @param className - The button class name, optionally prefixed with `.`.
+     * @returns A {@link Fluent} wrapper for the matching button element.
+     */
     findButton(className: string) {
         if (className != null && className.startsWith('.')) {
             className = className.substring(1);
@@ -164,6 +218,10 @@ export class Toolbar<P extends ToolbarOptions = ToolbarOptions> extends Widget<P
         return Fluent(this.domNode.querySelector<HTMLElement>('div.tool-button.' + className));
     }
 
+    /**
+     * Triggers an `updateInterface` event on all buttons so dynamic
+     * visibility/disabled functions are re-evaluated.
+     */
     updateInterface() {
         this.domNode.querySelectorAll('.tool-button').forEach(function (el: Element) {
             Fluent.trigger(el, 'updateInterface', { bubbles: false });

@@ -3,11 +3,20 @@ import { ValidationHelper } from "../../compat";
 import { IReadOnly, IStringValue } from "../../interfaces";
 import { EditorProps, EditorWidget } from "./editorwidget";
 
+/**
+ * Options for the {@link EmailEditor}.
+ */
 export interface EmailEditorOptions {
+    /** Fixed domain appended to the user part. */
     domain?: string;
+    /** Whether the domain part is read-only. */
     readOnlyDomain?: boolean;
 }
 
+/**
+ * An editor that renders user and domain parts of an email address separately.
+ * @typeParam P - Widget props type.
+ */
 export class EmailEditor<P extends EmailEditorOptions = EmailEditorOptions> extends EditorWidget<P> {
     static override[Symbol.typeInfo] = this.registerEditor(nsSerenity, [IStringValue, IReadOnly]);
 
@@ -15,6 +24,10 @@ export class EmailEditor<P extends EmailEditorOptions = EmailEditorOptions> exte
     declare readonly domNode: HTMLInputElement;
     declare private readonly domain: HTMLInputElement;
 
+    /**
+     * Creates an email editor.
+     * @param props - Widget props.
+     */
     constructor(props: EditorProps<P>) {
         super(props);
         EmailEditor.registerValidationMethods();
@@ -61,6 +74,9 @@ export class EmailEditor<P extends EmailEditorOptions = EmailEditorOptions> exte
         }
     }
 
+    /**
+     * Registers the custom email validation method.
+     */
     static registerValidationMethods(): void {
 
         Validator.addMethod('emailuser', function (value, element) {
@@ -80,6 +96,10 @@ export class EmailEditor<P extends EmailEditorOptions = EmailEditorOptions> exte
         }, FormValidationTexts.Email);
     }
 
+    /**
+     * Returns the full email address.
+     * @returns The email value.
+     */
     get_value(): string {
         var value = this.domNode.value;
         var domainValue = this.domain.value;
@@ -92,10 +112,18 @@ export class EmailEditor<P extends EmailEditorOptions = EmailEditorOptions> exte
         return value + '@' + domainValue;
     }
 
+    /**
+     * Returns the full email address.
+     * @returns The email value.
+     */
     get value(): string {
         return this.get_value();
     }
 
+    /**
+     * Sets the email address, splitting it into user and domain parts.
+     * @param value - The email value.
+     */
     set_value(value: string): void {
         value = value?.trim();
         if (!value) {
@@ -126,15 +154,24 @@ export class EmailEditor<P extends EmailEditorOptions = EmailEditorOptions> exte
         }
     }
 
+    /** Sets the email address. */
     set value(v: string) {
         this.set_value(v);
     }
 
+    /**
+     * Returns whether the editor is read-only.
+     * @returns True when read-only.
+     */
     get_readOnly(): boolean {
         return !(this.domNode.getAttribute("readonly") == null &&
             (this.options.readOnlyDomain || this.domain.getAttribute('readonly') == null));
     }
 
+    /**
+     * Sets whether the editor is read-only.
+     * @param value - True to enable read-only mode.
+     */
     set_readOnly(value: boolean): void {
         setElementReadOnly(this.domNode, value);
         if (!this.options.readOnlyDomain) {

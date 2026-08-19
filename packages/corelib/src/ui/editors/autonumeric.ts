@@ -957,8 +957,12 @@ function getHolder(that: HTMLInputElement, settings?: AutoNumericOptions, update
     return holder;
 }
 
+/**
+ * A jQuery-independent port of the autoNumeric library for formatting numeric inputs.
+ */
 export class AutoNumeric {
 
+    /** Default autoNumeric options. */
     static defaults: AutoNumericOptions = {
         aNum: '0123456789',
         aSep: ',',
@@ -978,6 +982,11 @@ export class AutoNumeric {
         aForm: true
     };
 
+    /**
+     * Initializes autoNumeric on an input element.
+     * @param input - The input element.
+     * @param options - AutoNumeric options.
+     */
     static init(input: HTMLInputElement, options: AutoNumericOptions): void {
         if (!input) {
             throw new Error("autoNumeric called with null element!");
@@ -1166,13 +1175,20 @@ export class AutoNumeric {
         }
     }
 
-    /** method to remove settings and stop autoNumeric() */
+    /**
+     * Removes autoNumeric settings and event handlers from an input.
+     * @param input - The input element.
+     */
     static destroy(input: HTMLInputElement) {
         Fluent.off(input, '.autoNumeric');
         delete (input as any)?.autoNumeric;
     }
 
-    /** method to update settings - can call as many times */
+    /**
+     * Updates autoNumeric settings on an input.
+     * @param input - The input element.
+     * @param options - The options to update.
+     */
     static updateOptions(input: HTMLInputElement, options: AutoNumericOptions) {
         var settings = AutoNumeric.getSettings(input);
         if (typeof settings !== 'object') {
@@ -1191,7 +1207,12 @@ export class AutoNumeric {
         return;
     }
 
-    /** returns a formatted strings for "input:text" fields Uses jQuery's .val() method*/
+    /**
+     * Sets the formatted value of an input.
+     * @param input - The input element.
+     * @param valueIn - The value to set.
+     * @returns The formatted value.
+     */
     static setValue(input: HTMLInputElement, valueIn: number | string) {
         var settings = AutoNumeric.getSettings(input),
             value = valueIn.toString(),
@@ -1229,7 +1250,11 @@ export class AutoNumeric {
         throw new Error("The <" + input.tagName + "> is not supported by autoNumeric()");
     }
 
-    /** method to get the unformatted value from a specific input field, returns a numeric value */
+    /**
+     * Returns the unformatted numeric value of an input.
+     * @param input - The input element.
+     * @returns The numeric value as a string.
+     */
     static getValue(input: HTMLInputElement): string {
         var settings = AutoNumeric.getSettings(input);
         if (typeof settings !== 'object') {
@@ -1265,15 +1290,25 @@ export class AutoNumeric {
         return getValue; /** returned Numeric String */
     }
 
-    /** returns the settings object for those who need to look under the hood */
+    /**
+     * Returns the autoNumeric settings for an input.
+     * @param input - The input element.
+     * @returns The settings.
+     */
     static getSettings(input: HTMLInputElement): AutoNumericOptions {
         return (input as any)?.autoNumeric;
     }
 
+    /**
+     * Whether an input has an autoNumeric instance.
+     * @param input - The input element.
+     * @returns True when initialized.
+     */
     static hasInstance(input: HTMLInputElement) {
         return typeof (input as any)?.autoNumeric === "object";
     }
 
+    /** Setting keys that can be passed through from editor options. */
     static readonly allowedSettingKeys = new Set<string>([
         'aNum', 'aSep', 'dGroup', 'aDec', 'altDec', 'aSign', 'pSign', 'vMax', 'vMin',
         'mDec', 'mRound', 'aPad', 'nBracket', 'wEmpty', 'lZero', 'aForm', 'tagList'

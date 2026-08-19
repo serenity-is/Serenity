@@ -3,9 +3,17 @@ import { type ToolButton, type ToolButtonProps } from "../widgets/toolbar";
 import { FilterDialog } from "./filterdialog";
 import { FilterWidgetBase } from "./filterwidgetbase";
 
+/**
+ * A bar that displays the effective filter and lets users edit or reset it.
+ * @typeParam P - Widget props type.
+ */
 export class FilterDisplayBar<P = {}> extends FilterWidgetBase<P> {
     static override[Symbol.typeInfo] = this.registerClass(nsSerenity);
 
+    /**
+     * Renders the filter display bar contents.
+     * @returns The rendered content.
+     */
     protected override renderContents(): any {
         var openFilterDialog = (e: Event) => {
             e.preventDefault();
@@ -30,6 +38,9 @@ export class FilterDisplayBar<P = {}> extends FilterWidgetBase<P> {
         );
     }
 
+    /**
+     * Updates the display when the filter store changes.
+     */
     protected override filterStoreChanged() {
         super.filterStoreChanged();
 
@@ -44,6 +55,11 @@ export class FilterDisplayBar<P = {}> extends FilterWidgetBase<P> {
         this.element.findFirst('.txt').text('[' + displayText + ']');
     }
 
+    /**
+     * Creates a toolbar button that opens the filter dialog.
+     * @param opt - Tool button overrides.
+     * @returns Tool button definition.
+     */
     public static createToolButton(opt: Partial<ToolButtonProps>): ToolButton {
         return {
             hint: FilterPanelTexts.EditFilter,

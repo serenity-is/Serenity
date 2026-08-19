@@ -1,77 +1,99 @@
 ﻿/**
- * Represents the utility color options for icons corresponding to Bootstrap contextual colors like primary, secondary, success etc.
+ * Bootstrap contextual utility colors usable for icon/background styling.
+ * Maps directly to `bg-*` / `text-*` CSS helper classes (e.g. `bg-primary`, `text-danger`).
  */
 export type UtilityColor = "primary" | "secondary" | "success" | "danger" | "warning" | "info" | "light" | "dark" | "muted" | "white";
 
 
 /**
- * Represents the type of text color.
- * It can be one of the predefined UtilityColor values or one of the following CSS color names:
- * "aqua", "blue", "fuschia", "gray", "green", "light-blue", "lime", "maroon", "navy", "olive", "orange", "purple", "red", "teal", "yellow".
+ * Text color token for {@link textColor} / {@link faIcon} / {@link fabIcon}.
+ * Extends {@link UtilityColor} with additional named CSS colors (`aqua`, `blue`, `fuschia`, `gray`, `green`, `light-blue`, `lime`, `maroon`, `navy`, `olive`, `orange`, `purple`, `red`, `teal`, `yellow`) that map to `text-*` utility classes.
  */
 export type TextColor = UtilityColor | "aqua" | "blue" | "fuschia" | "gray" | "green" | "light-blue" | "lime" | "maroon" | "navy" | "olive" | "orange" | "purple" | "red" | "teal" | "yellow";
 
 
 /**
- * Returns the CSS class name for the background color based on the provided UtilityColor.
- * @param color - The UtilityColor to generate the CSS class name for.
- * @returns The CSS class name for the background color.
+ * Returns the Bootstrap background utility class for a {@link UtilityColor}.
+ * @param color - Utility color token (e.g. `"primary"`, `"danger"`).
+ * @returns CSS class name such as `"bg-primary"`.
+ * @example
+ * ```ts
+ * bgColor("success"); // "bg-success"
+ * ```
  */
 export function bgColor(color: UtilityColor) {
     return "bg-" + color;
 }
 
 /**
- * Returns the CSS class for the specified text color.
- * @param color - The text color.
- * @returns The CSS class for the specified text color.
+ * Returns the text utility class for a {@link TextColor}.
+ * @param color - Text color token.
+ * @returns CSS class name such as `"text-primary"` or `"text-teal"`.
+ * @example
+ * ```ts
+ * textColor("warning"); // "text-warning"
+ * ```
  */
 export function textColor(color: TextColor): string {
     return "text-" + color;
 }
 
 /**
- * Returns the CSS class for a Font Awesome icon.
- * @param key - The key of the Font Awesome icon.
- * @param color - The optional color of the icon.
- * @returns The CSS class for the icon.
+ * Builds the CSS class string for a Font Awesome (solid/regular) icon.
+ * @param key - Icon key from {@link faIconKey} (without the `fa-` prefix).
+ * @param color - Optional {@link TextColor} appended as a `text-*` class.
+ * @returns Class string such as `"fa fa-home"` or `"fa fa-home text-danger"`.
+ * @example
+ * ```ts
+ * faIcon("home"); // "fa fa-home"
+ * faIcon("home", "primary"); // "fa fa-home text-primary"
+ * ```
  */
 export function faIcon(key: faIconKey, color?: TextColor): string {
     return "fa fa-" + key + (color ? " " + textColor(color) : "");
 }
 
 /**
- * Generates a fully qualified class name for a Font Awesome brand icon.
- * @param key - The key of the Font Awesome brand icon.
- * @param color - The optional color of the icon.
- * @returns The fully qualified class name for the icon.
+ * Builds the CSS class string for a Font Awesome Brands icon.
+ * @param key - Brand icon key from {@link fabIconKey} (without the `fa-` prefix).
+ * @param color - Optional {@link TextColor} appended as a `text-*` class.
+ * @returns Class string such as `"fab fa-github"` or `"fab fa-github text-muted"`.
+ * @example
+ * ```ts
+ * fabIcon("github"); // "fab fa-github"
+ * ```
  */
 export function fabIcon(key: fabIconKey, color?: TextColor): string {
     return "fab fa-" + key + (color ? " " + textColor(color) : "");
 }
 
 /**
- * Represents a known icon class.
- * The icon class can be either a Font Awesome icon (`fa fa-${faIconKey}`)
- * or a Font Awesome Brands icon (`fab fa-${fabIconKey}`).
+ * Strongly-typed union of known Font Awesome class strings (`fa fa-*` or `fab fa-*`).
+ * Provides compile-time completion for recognized icon names; use {@link AnyIconClass} to allow arbitrary strings as well.
  */
 export type KnownIconClass = `fa fa-${faIconKey}` | `fab fa-${fabIconKey}`;
 
 /**
- * Represents a type that can be either a known icon class or a string.
+ * Icon class type that accepts either a {@link KnownIconClass} (with completions) or any custom string class.
+ * The `(string & {})` trick preserves autocomplete for known values while still allowing arbitrary classes.
  */
 export type AnyIconClass = KnownIconClass | (string & {});
 
 /**
- * Represents the type for an icon class name.
- * It can be either a single icon class or an array of icon classes.
+ * Flexible icon class input accepted by {@link iconClassName}: a single {@link AnyIconClass} string or an array of them.
  */
 export type IconClassName = AnyIconClass | (AnyIconClass[]);
 
 /**
- * Returns the CSS class name for the given icon.
- * @param icon The icon class name or an array of class names.
- * @returns The CSS class name for the icon.
+ * Normalizes an {@link IconClassName} to a single space-joined class string, adding a missing `fa` prefix.
+ * @param icon - Single icon class or array of classes. Falsy/empty values are returned as-is.
+ * @returns Normalized CSS class string suitable for an `<i>` element.
+ * @remarks If `icon` starts with `fa-` but lacks an explicit `fa` token, `"fa "` is prepended.
+ * @example
+ * ```ts
+ * iconClassName("fa-home"); // "fa fa-home"
+ * iconClassName(["fa fa-home", "text-primary"]); // "fa fa-home text-primary"
+ * ```
  */
 export function iconClassName(icon: IconClassName): string {
     let klass = Array.isArray(icon) ? icon.join(" ") : icon;
@@ -89,6 +111,10 @@ let c = Array.from(document.querySelectorAll('.icons__item')).map(x => x.querySe
     .map((x)=>{if (l + x.length > 120) { l = 0; x = x + '\n' } l += x.length; return x}); 
      let t = (b && "fab") || "fa"; return `export type ${t}Icon =\n${a.join('|')};` }).join('\n\n');
 */
+/**
+ * Union of Font Awesome (solid/regular) icon keys (without the `fa-` prefix).
+ * Generated from the Line-Awesome / Font Awesome catalog; used by {@link faIcon} and {@link KnownIconClass}.
+ */
 export type faIconKey =
     "ad" | "address-book" | "address-card" | "adjust" | "air-freshener" | "align-center" | "align-justify" | "align-left" | "align-right" | "allergies" | "ambulance"
     | "american-sign-language-interpreting" | "anchor" | "angle-double-down" | "angle-double-left" | "angle-double-right" | "angle-double-up"
@@ -190,6 +216,10 @@ export type faIconKey =
     | "window-maximize" | "window-minimize" | "window-restore" | "wine-bottle" | "wine-glass" | "wine-glass-alt" | "won-sign" | "wrench"
     | "x-ray" | "yen-sign" | "yin-yang";
 
+/**
+ * Union of Font Awesome Brands icon keys (without the `fa-` prefix).
+ * Used by {@link fabIcon} and {@link KnownIconClass} for brand icons such as `"github"`, `"twitter"`, etc.
+ */
 export type fabIconKey =
     "500px" | "accessible-icon" | "accusoft" | "acquisitions-incorporated" | "adn" | "adobe" | "adversal" | "affiliatetheme" | "airbnb" | "algolia" | "alipay"
     | "amazon" | "amazon-pay" | "amilia" | "android" | "angellist" | "angrycreative" | "angular" | "app-store" | "app-store-ios" | "apper" | "apple"

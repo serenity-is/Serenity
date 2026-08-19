@@ -2,15 +2,27 @@ import { nsSerenity } from "../../base";
 import { EditorProps } from "./editorwidget";
 import { SelectEditor, SelectEditorOptions } from "./selecteditor";
 
+/**
+ * An editor that renders a select of years around the current year.
+ * @typeParam P - Widget props type.
+ */
 export class DateYearEditor<P extends DateYearEditorOptions = DateYearEditorOptions> extends SelectEditor<P> {
     static override[Symbol.typeInfo] = this.registerEditor(nsSerenity);
 
+    /**
+     * Creates a date year editor.
+     * @param props - Widget props.
+     */
     constructor(props: EditorProps<P>) {
         super(props);
 
         this.updateItems();
     }
 
+    /**
+     * Returns the year options for the editor.
+     * @returns The list of year strings.
+     */
     override getItems() {
         var opt = this.options as DateYearEditorOptions;
 
@@ -59,8 +71,14 @@ export class DateYearEditor<P extends DateYearEditorOptions = DateYearEditorOpti
     }
 }
 
+/**
+ * Options for the {@link DateYearEditor}.
+ */
 export interface DateYearEditorOptions extends SelectEditorOptions {
+    /** Minimum year as an absolute value or relative offset (e.g. "-10" or "+5"). */
     minYear?: string;
+    /** Maximum year as an absolute value or relative offset (e.g. "+10" or "-5"). */
     maxYear?: string;
+    /** Whether years are listed in descending order. */
     descending?: boolean;
 }

@@ -1,64 +1,83 @@
 ﻿/**
- * Interface for number formatting, similar to .NET's NumberFormatInfo
+ * Locale settings for number formatting, mirroring .NET `NumberFormatInfo`.
+ * @remarks Used by {@link formatNumber}, {@link parseDecimal}, and {@link parseInteger} via {@link Culture}.
  */
 export interface NumberFormat {
-    /** Decimal separator */
+    /** Character used as the decimal separator (e.g. `"."` or `","`). */
     decimalSeparator: string;
-    /** Group separator */
+    /** Character used to group thousands (e.g. `","` or `"."`). */
     groupSeparator?: string;
-    /** Number of digits after decimal separator */
+    /** Default number of fractional digits for `"f"` / `"n"` / `"c"` / `"p"` formats. @defaultValue `2` (Invariant). */
     decimalDigits?: number;
-    /** Positive sign */
+    /** Symbol for positive numbers (rarely displayed). @defaultValue `"+"`. */
     positiveSign?: string;
-    /** Negative sign */
+    /** Symbol for negative numbers. @defaultValue `"-"`. */
     negativeSign?: string;
-    /** Zero symbol */
+    /** String rendered for `NaN` values. */
     nanSymbol?: string;
-    /** Percentage symbol */
+    /** Symbol appended for percent (`"p"`) formatting. @defaultValue `"%"`. */
     percentSymbol?: string;
-    /** Currency symbol */
+    /** Symbol appended for currency (`"c"`) formatting. @defaultValue `"$"`. */
     currencySymbol?: string;
 }
 
-/** Interface for date formatting, similar to .NET's DateFormatInfo */
+/**
+ * Locale settings for date/time formatting, mirroring .NET `DateTimeFormatInfo`.
+ * @remarks Consumed by {@link formatDate} and {@link parseDate} via {@link Culture}.
+ */
 export interface DateFormat {
-    /** Date separator */
+    /** Character separating date parts (e.g. `"/"` or `"."`). */
     dateSeparator?: string;
-    /** Default date format string */
+    /** Default date-only format string (e.g. `"dd/MM/yyyy"`). */
     dateFormat?: string;
-    /** Date order, like dmy, or ymd */
+    /** Token order for parsing ambiguous numeric dates: `"dmy"`, `"mdy"`, or `"ymd"`. */
     dateOrder?: string;
-    /** Default date time format string */
+    /** Default combined date+time format string (e.g. `"dd/MM/yyyy HH:mm:ss"`). */
     dateTimeFormat?: string;
-    /** AM designator */
+    /** Designator for AM hours (used with `t`/`tt` tokens). @defaultValue `"AM"`. */
     amDesignator?: string;
-    /** PM designator */
+    /** Designator for PM hours (used with `t`/`tt` tokens). @defaultValue `"PM"`. */
     pmDesignator?: string;
-    /** Time separator */
+    /** Character separating time parts. @defaultValue `":"`. */
     timeSeparator?: string;
-    /** First day of week, 0 = Sunday, 1 = Monday */
+    /** Index of the first day of the week (`0` = Sunday, `1` = Monday). */
     firstDayOfWeek?: number;
-    /** Array of day names */
+    /** Full day names starting with Sunday — 7 entries. */
     dayNames?: string[];
-    /** Array of short day names */
+    /** Abbreviated day names (e.g. `"Sun"`, `"Mon"`). — 7 entries. */
     shortDayNames?: string[];
-    /** Array of two letter day names */
+    /** Two-letter day names (e.g. `"Su"`, `"Mo"`). — 7 entries. */
     minimizedDayNames?: string[];
-    /** Array of month names */
+    /** Full month names starting with January — 12 entries plus a trailing empty slot for compatibility. */
     monthNames?: string[];
-    /** Array of short month names */
+    /** Abbreviated month names (e.g. `"Jan"`, `"Feb"`). — 12 entries plus a trailing empty slot. */
     shortMonthNames?: string[];
 }
 
-/** Interface for a locale, similar to .NET's CultureInfo */
+/**
+ * Combined locale settings, mirroring .NET `CultureInfo`.
+ * @remarks Extends both {@link NumberFormat} and {@link DateFormat} with string comparison helpers.
+ */
 export interface Locale extends NumberFormat, DateFormat {
-    /** Locale string comparison function, similar to .NET's StringComparer */
+    /**
+     * Locale-aware string comparator, analogous to `String.Compare`.
+     * @param a - First string to compare (may be `null`).
+     * @param b - Second string to compare (may be `null`).
+     * @returns Negative if `a < b`, positive if `a > b`, `0` if equal.
+     */
     stringCompare?: (a: string, b: string) => number;
-    /** Locale string to upper case function */
+    /**
+     * Locale-aware upper-casing function.
+     * @param a - String to convert.
+     * @returns The upper-cased string.
+     */
     toUpper?: (a: string) => string;
 }
 
-/** Invariant locale (e.g. CultureInfo.InvariantCulture) */
+/**
+ * Invariant locale with US-English / POSIX defaults, analogous to `CultureInfo.InvariantCulture`.
+ * @remarks Used as the fallback for {@link Culture} and as the baseline for parsing/formatting when no culture is supplied.
+ */
 export let Invariant: Locale = {
     decimalSeparator: '.',
     groupSeparator: ',',
@@ -86,16 +105,18 @@ export let Invariant: Locale = {
 
 
 /**
- * Current culture, e.g. CultureInfo.CurrentCulture. This is overridden by
- * settings passed from a `<script>` element in the page with id `ScriptCulture`
- * containing a JSON object if available. This element is generally created in 
- * the _LayoutHead.cshtml file for Serenity applications, so that the culture
- * settings determined server, can be passed to the client.
+ * Current culture used by all formatting and parsing helpers, analogous to `CultureInfo.CurrentCulture`.
+ * @remarks
+ * Initialized by {@link resetCultureSettings}. When a `<script id="ScriptCulture">` element containing a JSON object is present (rendered by `_LayoutHead.cshtml`), its values override the defaults. The `DecimalSeparator` / `GroupSeparator` keys are mapped explicitly; remaining keys are camel-cased from PascalCase.
  */
 export let Culture: Locale;
 
 /**
- * Resets the culture settings to the default values.
+ * Resets {@link Culture} to its default values derived from {@link Invariant}.
+ * @remarks
+ * - Sets `dateOrder` to `"dmy"`, `dateFormat` to `"dd/MM/yyyy"`, and installs a `stringCompare` based on `String.prototype.localeCompare` with `document.documentElement.lang` when available.
+ * - If a `<script id="ScriptCulture">` JSON block exists, its properties override the defaults (with special handling for `DecimalSeparator` / `GroupSeparator`).
+ * - Exports in `vite8-symbol-typeinfo-workaround.md` note that no `Symbol.typeInfo` side-effects occur here.
  */
 export function resetCultureSettings() {
 
@@ -218,16 +239,25 @@ function _formatString(format: string, l: Locale, values: IArguments, from: numb
 
 
 /**
- * Formats a string with parameters similar to .NET's String.Format function
- * using current `Culture` locale settings.
+ * Formats a string by replacing `{index[:format]}` placeholders with the supplied arguments, using {@link Culture} for locale-aware value formatting.
+ * @param format - Composite format string (e.g. `"Hello {0}, you have {1:n2} messages"`). `{{` / `}}` are escaped to a single brace.
+ * @param prm - Values to substitute; each may be a number, `Date`, or any object with a `format(formatSpec, locale)` method. Nullish values render as empty strings.
+ * @returns The formatted string.
+ * @example
+ * ```ts
+ * stringFormat("Hello {0}, balance {1:c}", "Alice", 1234.5); // uses Culture currency symbol
+ * ```
  */
 export function stringFormat(format: string, ...prm: any[]): string {
     return _formatString(format, Culture, arguments, 1);
 }
 
 /**
- * Formats a string with parameters similar to .NET's String.Format function
- * using the locale passed as the first argument.
+ * Locale-specific variant of {@link stringFormat}.
+ * @param l - Locale whose settings are applied when formatting each argument.
+ * @param format - Composite format string with `{index[:format]}` placeholders.
+ * @param prm - Values to substitute. Numbers and Dates are formatted with `l`; objects with a `format` method are delegated to that method.
+ * @returns The formatted string.
  */
 export function stringFormatLocale(l: Locale, format: string, ...prm: any[]): string {
     return _formatString(format, l, arguments, 2);
@@ -243,12 +273,18 @@ function _formatObject(obj: any, format: string, fmt?: Locale): string {
     return String(obj);
 };
 
-/** 
- * Rounds a number to specified digits or an integer number if digits are not specified.
- * Uses away from zero rounding (e.g. 1.5 rounds to 2, -1.5 rounds to -2) unlike Math.round.
- * @param num the number to round 
- * @param d the number of digits to round to. default is zero.
- * @returns the rounded number
+/**
+ * Rounds a number to the specified number of fractional digits using "away from zero" rounding.
+ * @param num - Value to round; `undefined` / `NaN` is forwarded to `Math.round` semantics.
+ * @param d - Number of digits after the decimal point. @defaultValue `0` (integer rounding).
+ * @returns The rounded value. `0` is normalized to `0` (not `-0`).
+ * @remarks
+ * Unlike `Math.round`, `1.5` rounds to `2` and `-1.5` rounds to `-2`. Implemented via exponent shifting to avoid floating-point artifacts.
+ * @example
+ * ```ts
+ * round(1.005, 2); // 1.01
+ * round(-1.5);     // -2
+ * ```
  */
 export let round = (num: number, d?: number) => {
     if (typeof num == "undefined" || isNaN(num))
@@ -271,16 +307,32 @@ export let round = (num: number, d?: number) => {
 };
 
 /**
- * Truncates a number to an integer number.
+ * Truncates a number toward zero to an integer.
+ * @param n - Value to truncate; `null` / `undefined` returns `null`.
+ * @returns The integer part of `n` (toward zero), or `null` for nullish input.
+ * @example
+ * ```ts
+ * trunc(1.9);  // 1
+ * trunc(-1.9); // -1
+ * ```
  */
 export let trunc = (n: number): number => n != null ? (n > 0 ? Math.floor(n) : Math.ceil(n)) : null;
 
 /**
- * Formats a number using the current `Culture` locale (or the passed locale) settings.
- * It supports format specifiers similar to .NET numeric formatting strings.
- * @param num the number to format
- * @param format the format specifier. default is 'g'.
- * See .NET numeric formatting strings documentation for more information.
+ * Formats a number using .NET-style numeric format strings and locale settings.
+ * @param num - Value to format; `null` / `undefined` yields `""` and `NaN` yields `nanSymbol`.
+ * @param format - Format specifier. `"g"` (general), `"d"`/`"x"`/`"e"`/`"f"`/`"n"`/`"c"`/`"p"`, or a custom pattern (`"#,##0.00"`, `"000"`, etc.). @defaultValue `"g"`.
+ * @param decOrLoc - Either a {@link Locale} / {@link NumberFormat} object, or the decimal separator string for a lightweight inline locale.
+ * @param grp - Group separator when `decOrLoc` is a decimal-separator string. Ignored otherwise.
+ * @returns The formatted number string, applying grouping, decimal separator, and locale symbols from `decOrLoc` or {@link Culture}.
+ * @remarks
+ * - `"n"` / `"N"` insert grouping; `"c"`/`"p"` append `currencySymbol`/`percentSymbol` (percent multiplies by 100).
+ * - Custom patterns quote literals with `'` and escape with `\`.
+ * @example
+ * ```ts
+ * formatNumber(1234.5, "n2"); // e.g. "1,234.50" depending on Culture
+ * formatNumber(0.42, "p0");   // e.g. "42%"
+ * ```
  */
 export function formatNumber(num: number, format?: string, decOrLoc?: string | NumberFormat, grp?: string): string {
 
@@ -510,11 +562,11 @@ export function formatNumber(num: number, format?: string, decOrLoc?: string | N
 }
 
 /**
- * Converts a string to an integer. The difference between parseInt and parseInteger 
- * is that parseInteger will return null if the string is empty or null, whereas
- * parseInt will return NaN and parseInteger will use the current culture's group
- * and decimal separators.
- * @param s the string to parse
+ * Parses a string as an integer using {@link Culture} grouping rules.
+ * @param s - String to parse; `null` or whitespace yields `null`. Group separators for the current culture are stripped before validation.
+ * @returns The parsed integer, `null` for empty/null input, or `NaN` when the string is not a valid integer.
+ * @remarks
+ * Unlike `parseInt`, only strings matching `^[+-]?\d+$` (after group-separator removal) are accepted; trailing characters cause `NaN`.
  */
 export function parseInteger(s: string): number {
     if (s == null)
@@ -532,11 +584,10 @@ export function parseInteger(s: string): number {
 }
 
 /**
- * Converts a string to a decimal. The difference between parseFloat and parseDecimal
- * is that parseDecimal will return null if the string is empty or null, whereas
- * parseFloat will return NaN and parseDecimal will use the current culture's group
- * and decimal separators.
- * @param s the string to parse
+ * Parses a string as a decimal number using {@link Culture} group and decimal separators.
+ * @param s - String to parse; `null` or whitespace yields `null`. Group separators are stripped and the locale decimal separator is normalized to `"."` before `parseFloat`.
+ * @returns The parsed number, `null` for empty/null input, or `NaN` when the string is not a valid decimal.
+ * @remarks Only patterns matching `^\s*[+-]?(\d*)[decimalSep]?(\d*)\s*$` are accepted.
  */
 export function parseDecimal(s: string): number {
     if (s == null)
@@ -558,11 +609,11 @@ export function parseDecimal(s: string): number {
     return parseFloat(s.toString().replace(Culture.decimalSeparator, '.'));
 }
 
-/** 
- * Rounds a number to a specified number of decimal places.
- * @param n the number to round
- * @param dec the number of decimal places to round to
- * @returns the rounded number
+/**
+ * Internal helper that rounds `n` to `dec` decimal places and ensures trailing zeros are preserved before parsing back to a number.
+ * @param n - Value to round.
+ * @param dec - Number of fractional digits. When falsy, integer rounding is applied.
+ * @returns The rounded numeric value.
  */
 function roundNumber(n: number, dec?: number): number {
     let power = Math.pow(10, dec || 0);
@@ -586,11 +637,15 @@ function roundNumber(n: number, dec?: number): number {
 }
 
 /**
- * Converts a string to an ID. If the string is a number, it is returned as-is.
- * If the string is empty, null or whitespace, null is returned.
- * Otherwise, it is converted to a number if possible. If the string is not a
- * valid number or longer than 14 digits, the trimmed string is returned as-is.
- * @param id the string to convert to an ID
+ * Normalizes a value to an ID suitable for entity keys.
+ * @param id - Candidate ID: a number is returned as-is; a string is trimmed and, when it is a plain integer with fewer than 15 characters, parsed to a number; otherwise the trimmed string is returned. `null`, `undefined`, or whitespace yields `null`.
+ * @returns The normalized ID (`number` or `string`) or `null` for empty input.
+ * @example
+ * ```ts
+ * toId(" 42 "); // 42
+ * toId("abc");  // "abc"
+ * toId("");     // null
+ * ```
  */
 export function toId(id: any): any {
     if (id == null)
@@ -608,32 +663,19 @@ export function toId(id: any): any {
 
 const _dateFormatRE = /'.*?[^\\]'|dddd|ddd|dd|d|MMMM|MMM|MM|M|yyyy|yy|y|hh|h|HH|H|mm|m|ss|s|tt|t|fff|ff|f|zzz|zz|z|\//g;
 
-/** 
- * Formats a date using the specified format string and optional culture.
- * Supports .NET style format strings including custom formats.
- * See .NET documentation for supported formats.
- * @param d the date to format. If null, it returns empty string.
- * @param format the format string to use. If null, it uses the current culture's default format.
- * 'G' uses the culture's datetime format.
- * 'g' uses the culture's datetime format with secs removed. 
- * 'd' uses the culture's date format.
- * 't' uses the culture's time format.
- * 'u' uses the sortable ISO format with UTC time.
- * 'U' uses the culture's date format with UTC time.
- * @param locale the locale to use
- * @returns the formatted date
+/**
+ * Formats a `Date` (or date string) using .NET-style format tokens and locale settings.
+ * @param d - Date to format, or an ISO / locale date string that is first parsed. Falsy yields `""`.
+ * @param format - Format string. Special single-letter presets: `"d"` (short date), `"g"` (short datetime without seconds), `"G"` (full datetime), `"t"` (time only), `"s"` (sortable `yyyy-MM-ddTHH:mm:ss`), `"u"` (UTC sortable), `"U"` (locale datetime in UTC), `"i"`/`"id"`/`"it"` (JS `toString` variants). Prefixing with `"%"` forces a custom token (e.g. `"%M"`). When `null`, the locale's `dateFormat` is used.
+ * @param locale - Locale overrides token names and separators. Defaults to {@link Culture}.
+ * @returns The formatted date string, or `""` / the original string on parse failure.
  * @example
- * // returns "2019-01-01"
- * formatDate(new Date(2019, 0, 1), "yyyy-MM-dd");
- * @example
- * // returns "2019-01-01 12:00:00"
- * formatDate(new Date(2019, 0, 1, 12), "yyyy-MM-dd HH:mm:ss");
- * @example
- * // returns "2019-01-01 12:00:00.000"
- * formatDate(new Date(2019, 0, 1, 12), "yyyy-MM-dd HH:mm:ss.fff");
- * @example
- * // returns "2019-01-01 12:00:00.000 AM"
- * formatDate(new Date(2019, 0, 1, 12), "yyyy-MM-dd HH:mm:ss.fff tt");
+ * ```ts
+ * formatDate(new Date(2019, 0, 1), "yyyy-MM-dd");                // "2019-01-01"
+ * formatDate(new Date(2019, 0, 1, 12), "yyyy-MM-dd HH:mm:ss");   // "2019-01-01 12:00:00"
+ * formatDate(new Date(2019, 0, 1, 12), "yyyy-MM-dd HH:mm:ss.fff"); // "2019-01-01 12:00:00.000"
+ * formatDate(new Date(2019, 0, 1, 12), "yyyy-MM-dd HH:mm:ss.fff tt"); // "2019-01-01 12:00:00.000 PM"
+ * ```
  */
 export function formatDate(d: Date | string, format?: string, locale?: Locale) {
     if (!d)
@@ -806,8 +848,9 @@ export function formatDate(d: Date | string, format?: string, locale?: Locale) {
 }
 
 /**
- * Formats a date as the ISO 8601 UTC date/time format.
- * @param d The date.
+ * Formats a date as an ISO 8601 UTC timestamp (`yyyy-MM-ddTHH:mm:ss.sssZ`).
+ * @param d - Date to format. `null` / `undefined` yields `""`.
+ * @returns The UTC ISO string with zero-padded components, or `""` for nullish input.
  */
 export function formatISODateTimeUTC(d: Date): string {
     if (d == null)
@@ -828,8 +871,9 @@ export function formatISODateTimeUTC(d: Date): string {
 let isoRegexp = /(\d{4,})(?:-(\d{1,2})(?:-(\d{1,2})(?:[T ](\d{1,2}):(\d{1,2})(?::(\d{1,2})(?:\.(\d+))?)?(?:(Z)|([+-])(\d{1,2})(?::(\d{1,2}))?)?)?)?)?/;
 
 /**
- * Parses a string in the ISO 8601 UTC date/time format.
- * @param s The string to parse.
+ * Parses a string that is expected to be in ISO 8601 UTC date/time format.
+ * @param s - String to parse; `null` yields `null`, empty string yields `null`, and non-ISO strings yield an invalid `Date` (`NaN`). Bare dates (`yyyy-MM-dd`, length 10) are normalized to midnight UTC.
+ * @returns The parsed `Date`, `null` for null/empty input, or an invalid `Date` when the string does not match the ISO pattern.
  */
 export function parseISODateTime(s: string): Date {
     if (s == null)
@@ -848,11 +892,11 @@ export function parseISODateTime(s: string): Date {
 }
 
 /**
- * Parses a string to a date. If the string is empty or whitespace, returns null.
- * Returns a NaN Date if the string is not a valid date.
- * @param s The string to parse.
- * @param dateOrder The order of the date parts in the string. Defaults to culture's default date order.
-  */
+ * Parses a date string in ISO 8601, locale, or JS date format.
+ * @param s - String to parse; `null` / empty / whitespace yields `null`. ISO prefixes (`yyyy-MM-dd` / `yyyy-MM-ddTHH:mm:ss`) are delegated to {@link parseISODateTime}; strings containing a space and colon are split into date + time halves. Numeric parts are validated and two-digit years are expanded using a 10-year sliding window.
+ * @param dateOrder - Override for ambiguous numeric dates (`"dmy"` / `"mdy"` / `"ymd"`). Defaults to {@link Culture}.`dateOrder`.
+ * @returns The parsed `Date`, `null` for empty input, or an invalid `Date` (`NaN`) when the string is not a valid date.
+ */
 export function parseDate(s: string, dateOrder?: string): Date {
     if (!s || !s.length)
         return null;
@@ -923,9 +967,9 @@ export function parseDate(s: string, dateOrder?: string): Date {
 }
 
 /**
- * Splits a date string into an array of strings, each containing a single date part.
- * It can handle separators "/", ".", "-" and "\".
- * @param s The string to split.
+ * Splits a date string into its numeric parts using the first detected separator.
+ * @param s - String to split; trimmed before inspection. `null` / empty yields `null`.
+ * @returns An array of substrings split by `"/"`, `"."`, `"-"`, or `"\"` (whichever appears first), or a single-element array when none of those separators is present.
  */
 export function splitDateString(s: string): string[] {
     s = s?.trim();

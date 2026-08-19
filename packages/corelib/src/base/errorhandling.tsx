@@ -5,11 +5,25 @@ import { localText } from "./localtext";
 import { notifyError } from "./notify";
 import { RequestErrorInfo, ServiceError } from "./servicetypes";
 
+/**
+ * Centralized error handling helpers for service and runtime errors.
+ * @remarks
+ * `showServiceError` is the default handler for failed service calls;
+ * `runtimeErrorHandler` / `unhandledRejectionHandler` surface uncaught
+ * script errors during development only (see {@link ErrorHandling.isDevelopmentMode}).
+ */
 export namespace ErrorHandling {
 
     /**
-     * Shows a service error as an alert dialog / notification. If the error
-     * is null, has no message or code, it shows a generic error message.
+     * Shows a service error to the user as an alert dialog or toast notification.
+     * @param error - Structured service error returned by the server (`ServiceError`). May be `null` when the failure is transport-level.
+     * @param errorInfo - Low-level request metadata (HTTP status, `responseText`, etc.). When `error` is falsy, this determines the fallback message.
+     * @param errorMode - Presentation mode. `"notification"` uses {@link notifyError}; any other value (or omitted) uses {@link alertDialog} / {@link iframeDialog}.
+     * @remarks
+     * - When `error` has a `Message` or `Code`, that text is shown directly.
+     * - When `error` is `null` and `errorInfo.statusText === "abort"`, the error is silently ignored.
+     * - When `responseText` is HTML and `errorMode` is `"alert"`, it is rendered in an {@link iframeDialog}; otherwise it is shown as a notification.
+     * - In production, a "See browser console (F12)" hint is appended to generic HTTP errors.
      */
     export function showServiceError(error: ServiceError, errorInfo?: RequestErrorInfo, errorMode?: 'alert' | 'notification') {
 
@@ -39,11 +53,16 @@ export namespace ErrorHandling {
     }
 
     /**
-     * Runtime error handler that shows a runtime error as a notification
-     * by default only in development mode (@see isDevelopmentMode)
-     * This function is assigned as window.onerror handler in 
-     * ScriptInit.ts for Serenity applications so that developers
-     * can notice an error without having to check the browser console.
+     * Global runtime error handler suitable for `window.onerror`.
+     * @param messageOrEvent - Error message string, or the `ErrorEvent` dispatched by the browser.
+     * @param filename - Source file URL when the handler is invoked with discrete arguments (`window.onerror` signature).
+     * @param lineno - One-based line number of the error.
+     * @param colno - One-based column number of the error.
+     * @param error - The associated `Error` object, when available.
+     * @remarks
+     * Only surfaces a notification when {@link ErrorHandling.isDevelopmentMode} returns `true`; otherwise the error is ignored.
+     * The handler is wired as `window.onerror` in `ScriptInit.ts` so developers notice failures without opening the console.
+     * The displayed notification includes file, line/column, message, and stack trace when available.
      */
     export function runtimeErrorHandler(messageOrEvent: string | ErrorEvent, filename?: string,
         lineno?: number, colno?: number, error?: Error) {
@@ -94,13 +113,12 @@ export namespace ErrorHandling {
         }, 0);
     }
 
-    /** 
-     * Determines if the current environment is development mode.
-     * The runtimeErrorHandler (window.onerror) shows error notifications only
-     * when this function returns true. The default implementation considers 
-     * the environment as development mode if the host is localhost, 127.0.0.1, ::1,
-     * or a domain name that ends with .local/.localhost.
-     * @returns true if the current environment is development mode, false otherwise. 
+    /**
+     * Determines whether the current host should be treated as a development environment.
+     * @returns `true` when `window.location.hostname` is `localhost`, `127.0.0.1`, `[::1]`, or ends with `.local` / `.localhost`; `false` otherwise.
+     * @remarks
+     * Both {@link ErrorHandling.runtimeErrorHandler} and {@link ErrorHandling.unhandledRejectionHandler} gate their notifications on this check.
+     * Override by replacing `ErrorHandling.isDevelopmentMode` at startup if a different heuristic is needed.
      */
     export function isDevelopmentMode() {
         const hostname = (window.location.hostname ?? "").toLowerCase();
@@ -112,11 +130,15 @@ export namespace ErrorHandling {
     }
 
     /**
-     * Unhandled promise rejection error handler. It's purpose is to
-     * ignore logging serviceCall / serviceFetch errors as they have built-in
-     * error handling but browser logs it in the console, while Node crashes.
-     * Include below code in script-init/errorhandling.ts to enable:
+     * Handler for `unhandledrejection` events that filters expected service errors and surfaces real bugs during development.
+     * @param err - The `PromiseRejectionEvent` fired by the browser.
+     * @remarks
+     * - When `err.reason.origin === "serviceCall"` (Serenity service layer), the rejection is suppressed via `preventDefault()` and, unless `silent` or `kind !== "exception"`, logged to the console. This avoids noisy console errors for handled service failures.
+     * - For all other rejections, a notification is shown only when {@link ErrorHandling.isDevelopmentMode} returns `true`.
+     * @example
+     * ```ts
      * window.addEventListener("unhandledrejection", ErrorHandling.unhandledRejectionHandler);
+     * ```
      */
     export function unhandledRejectionHandler(err: PromiseRejectionEvent) {
         try {

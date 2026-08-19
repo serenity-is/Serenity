@@ -5,99 +5,194 @@
 import { bindThis } from "@serenity-is/domwise";
 import { debounce, Fluent, SelectEditorTexts, serviceCall, stringFormat } from "../../base";
 
+/** Element type that can host a Select2. */
 export type Select2Element = HTMLInputElement | HTMLSelectElement;
+/** Result of a Select2 formatter. */
 export type Select2FormatResult = string | Element | DocumentFragment;
 
+/**
+ * Options passed to a Select2 query callback.
+ */
 export interface Select2QueryOptions {
+    /** The element the query is for. */
     element?: Select2Element;
+    /** The search term. */
     term?: string;
+    /** The page number. */
     page?: number;
+    /** Additional context. */
     context?: any;
+    /** Callback invoked with the results. */
     callback?: (p1: Select2Result) => void;
+    /** Custom matcher function. */
     matcher?: (p1: any, p2: any, p3?: any) => boolean;
 }
 
+/**
+ * A single Select2 item.
+ */
 export interface Select2Item {
+    /** Item id. */
     id?: string;
+    /** Display text. */
     text?: string;
+    /** The source item. */
     source?: any;
+    /** Child items. */
     children?: Select2Item[];
+    /** Whether the item is disabled. */
     disabled?: boolean;
+    /** Whether the item is locked. */
     locked?: boolean;
 }
 
+/**
+ * Result of a Select2 query.
+ */
 export interface Select2Result {
+    /** Whether the query failed. */
     hasError?: boolean;
+    /** Error information. */
     errorInfo?: any;
+    /** The result items. */
     results: Select2Item[];
+    /** Whether there are more results. */
     more?: boolean;
+    /** Additional context. */
     context?: any;
 }
 
+/**
+ * Options for ajax-based Select2 queries.
+ */
 export interface Select2AjaxOptions extends RequestInit {
+    /** Request headers. */
     headers?: Record<string, string>;
+    /** The URL or a function returning it. */
     url?: string | ((term: string, page: number, context: any) => string);
+    /** Delay in milliseconds before the ajax request. */
     quietMillis?: number;
+    /** Callback that builds the request data. */
     data?: (p1: string, p2: number, p3: any) => any;
+    /** Callback that processes the response. */
     results?: (p1: any, p2: number, p3: any) => any;
+    /** Additional request parameters. */
     params?: (() => any) | any;
+    /** Callback invoked on error. */
     onError?(response: any, info?: any): void | boolean;
+    /** Callback invoked on success. */
     onSuccess?(response: any): void;
 }
 
+/**
+ * Options for the {@link Select2} widget.
+ */
 export interface Select2Options {
+    /** The element to attach Select2 to. */
     element?: Select2Element;
+    /** Width of the widget. */
     width?: any;
+    /** Minimum input length before searching. */
     minimumInputLength?: number;
+    /** Maximum input length. */
     maximumInputLength?: number;
+    /** Minimum results required to show the search box. */
     minimumResultsForSearch?: number;
+    /** Maximum number of selectable items. */
     maximumSelectionSize?: any;
+    /** Placeholder text. */
     placeholder?: string;
+    /** Placeholder option. */
     placeholderOption?: any;
+    /** Separator for multiple values. */
     separator?: string;
+    /** Whether the selection can be cleared. */
     allowClear?: boolean;
+    /** Whether multiple items can be selected. */
     multiple?: boolean;
+    /** Whether to close the dropdown on select. */
     closeOnSelect?: boolean;
+    /** Whether to open the dropdown on enter. */
     openOnEnter?: boolean;
+    /** Callback that returns the id of an item. */
     id?: (p1: any) => string;
+    /** Custom matcher function. */
     matcher?: (p1: string, p2: string, p3: HTMLElement) => boolean;
+    /** Callback that sorts results. */
     sortResults?: (p1: any, p2: HTMLElement, p3: any) => any;
+    /** Formatter for ajax errors. */
     formatAjaxError?: (p1: any, p2: any) => Select2FormatResult;
+    /** Formatter for the matches count. */
     formatMatches?: (matches: number) => Select2FormatResult;
+    /** Formatter for selected items. */
     formatSelection?: (p1: any, p2: HTMLElement, p3: (p1: string) => string) => Select2FormatResult;
+    /** Formatter for result items. */
     formatResult?: (p1: any, p2: HTMLElement, p3: any, p4: (p1: string) => string) => Select2FormatResult;
+    /** Formatter for result CSS classes. */
     formatResultCssClass?: (p1: any) => string;
+    /** Formatter for selection CSS classes. */
     formatSelectionCssClass?: (item: Select2Item, container: HTMLElement) => string;
+    /** Formatter for no-matches text. */
     formatNoMatches?: (input: string) => Select2FormatResult;
+    /** Formatter for load-more text. */
     formatLoadMore?: (pageNumber: number) => Select2FormatResult;
+    /** Formatter for searching text. */
     formatSearching?: () => Select2FormatResult;
+    /** Formatter for input-too-long text. */
     formatInputTooLong?: (input: string, max: number) => Select2FormatResult;
+    /** Formatter for input-too-short text. */
     formatInputTooShort?: (input: string, min: number) => Select2FormatResult;
+    /** Formatter for selection-too-big text. */
     formatSelectionTooBig?: (p1: number) => Select2FormatResult;
+    /** Callback that creates a search choice. */
     createSearchChoice?: (p1: string) => Select2Item;
+    /** Position of the create-search-choice item. */
     createSearchChoicePosition?: string | ((list: Select2Item[], item: Select2Item) => void);
+    /** Callback that initializes the selection. */
     initSelection?: (p1: HTMLElement, p2: (p1: any) => void) => void;
+    /** Tokenizer function. */
     tokenizer?: (p1: string, p2: any, p3: (p1: any) => any, p4: any) => string;
+    /** Token separators. */
     tokenSeparators?: any;
+    /** Query callback. */
     query?: (p1: Select2QueryOptions) => void;
+    /** Ajax options. */
     ajax?: Select2AjaxOptions;
+    /** Static data. */
     data?: any;
+    /** Tags for tag mode. */
     tags?: ((string | Select2Item)[]) | (() => (string | Select2Item)[]);
+    /** Container CSS. */
     containerCss?: any;
+    /** Container CSS class. */
     containerCssClass?: any;
+    /** Dropdown CSS. */
     dropdownCss?: any;
+    /** Dropdown CSS class. */
     dropdownCssClass?: any;
+    /** Whether the dropdown auto-widths. */
     dropdownAutoWidth?: boolean;
+    /** Callback that returns the dropdown parent. */
     dropdownParent?: (input: HTMLElement) => HTMLElement;
+    /** Callback that adapts the container CSS class. */
     adaptContainerCssClass?: (p1: string) => string;
+    /** Callback that adapts the dropdown CSS class. */
     adaptDropdownCssClass?: (p1: string) => string;
+    /** Callback that escapes markup. */
     escapeMarkup?: (p1: string) => string;
+    /** Placeholder for the search input. */
     searchInputPlaceholder?: string;
+    /** Whether to select on blur. */
     selectOnBlur?: boolean;
+    /** Whether to blur on change. */
     blurOnChange?: boolean;
+    /** Padding for load-more. */
     loadMorePadding?: number;
+    /** Callback that returns the next search term. */
     nextSearchTerm?: (p1: any, p2: string) => string;
+    /** Callback that populates results. */
     populateResults?: (container: HTMLElement, results: Select2Item[], query: Select2QueryOptions) => void
+    /** Callback that determines whether to focus the input. */
     shouldFocusInput?: (p1: any) => boolean;
 }
 
@@ -464,11 +559,19 @@ function defaultEscapeMarkup(markup: string) {
     });
 }
 
+/**
+ * A searchable select widget ported from Select2.
+ */
 export class Select2 {
 
     declare private el: Select2Element;
 
     constructor(opts?: Select2Options)
+    /**
+     * Creates a Select2 widget.
+     * @param opts - Select2 options.
+     * @param create - When false, only wraps an existing Select2 without creating a new one.
+     */
     constructor(opts?: Select2Options, create: boolean = true) {
 
         this.el = opts.element;
@@ -496,84 +599,151 @@ export class Select2 {
         return (this.el as any).select2;
     }
 
+    /**
+     * Closes the dropdown.
+     */
     close(): void {
         this.instance?.close();
     }
 
+    /**
+     * Returns the container element.
+     * @returns The container element.
+     */
     get container(): HTMLElement {
         return this.instance?.container;
     }
 
+    /**
+     * Returns the dropdown element.
+     * @returns The dropdown element.
+     */
     get dropdown(): HTMLElement {
         return this.instance?.dropdown;
     }
 
+    /**
+     * Destroys the Select2 instance.
+     */
     destroy(): void {
         this.instance?.destroy();
     }
 
+    /**
+     * Returns the current data.
+     * @returns The selected item(s).
+     */
     get data(): (Select2Item | Select2Item[]) {
         return this.instance?.data() as (Select2Item | Select2Item[]);
     }
 
+    /** Sets the current data. */
     set data(value: Select2Item | Select2Item[]) {
         this.instance?.data(value);
     }
 
+    /**
+     * Disables the Select2 widget.
+     */
     disable(): void {
         this.instance?.disable();
     }
 
+    /**
+     * Enables or disables the Select2 widget.
+     * @param enabled - Whether to enable.
+     */
     enable(enabled?: boolean): void {
         this.instance?.enable(enabled);
     }
 
+    /**
+     * Focuses the search input.
+     */
     focus(): void {
         this.instance?.focus();
     }
 
+    /**
+     * Whether the widget is focused.
+     * @returns True when focused.
+     */
     get isFocused(): boolean {
         return this.instance?.isFocused();
     }
 
+    /**
+     * Whether the widget allows multiple selection.
+     * @returns True when multiple.
+     */
     get isMultiple(): boolean {
         return this.instance instanceof MultiSelect2;
     }
 
+    /**
+     * Whether the dropdown is open.
+     * @returns True when open.
+     */
     get opened(): boolean {
         return this.instance?.opened();
     }
 
+    /**
+     * Opens the dropdown.
+     * @returns True when opened.
+     */
     open(): boolean {
         return this.instance?.open();
     }
 
+    /**
+     * Repositions the dropdown.
+     */
     positionDropdown() {
         this.instance?.positionDropdown();
     }
 
+    /**
+     * Sets the read-only state.
+     * @param value - Whether to enable read-only mode.
+     */
     readonly(value?: boolean): void {
         this.instance?.readonly(value);
     }
 
+    /**
+     * Returns the search input element.
+     * @returns The search input.
+     */
     get search(): HTMLInputElement {
         return this.instance?.search;
     }
 
+    /**
+     * Returns the current value.
+     * @returns The value.
+     */
     get val(): (string | string[]) {
         return this.instance?.val();
     }
 
+    /** Sets the current value. */
     set val(value: string | string[]) {
         this.instance?.val(value);
     }
 
+    /**
+     * Returns the Select2 instance attached to an element, or null.
+     * @param el - The element.
+     * @returns The Select2 instance, or null.
+     */
     static getInstance(el: Select2Element): Select2 {
         if (!el || !(el as any).select2)
             return null;
         return new (Select2 as any)({ element: el }, false);
     }
 
+    /** Default ajax options. */
     static readonly ajaxDefaults: Select2AjaxOptions = {
         params: {
             method: "GET",
@@ -643,6 +813,12 @@ export class Select2 {
         }
     };
 
+    /**
+     * Highlights the matching portion of text for a search term.
+     * @param text - The text to highlight.
+     * @param term - The search term.
+     * @returns The highlighted result.
+     */
     static highlightMatch(text: string, term: string): Select2FormatResult {
         if (!text || !term)
             return text;
@@ -656,6 +832,11 @@ export class Select2 {
         return <>{text.substring(0, match)}<span className="select2-match">{text.substring(match, match + tl)}</span>{text.substring(match + tl, text.length)}</>;
     }
 
+    /**
+     * Strips diacritics from a string for accent-insensitive matching.
+     * @param str - The string to process.
+     * @returns The string with diacritics removed.
+     */
     static stripDiacritics(str: string) {
         // Curated overrides first (chars whose Unicode decomposition would differ from the
         // table, e.g. U+1E9B long-s-with-dot -> "s", since its decomposition contains
