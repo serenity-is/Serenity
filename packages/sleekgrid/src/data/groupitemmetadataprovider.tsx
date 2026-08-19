@@ -1,32 +1,74 @@
 import { applyFormatterResultToCellNode, Column, ColumnFormat, CompatFormatter, convertCompatFormatter, FormatterContext, FormatterResult, Group, IGroupTotals, ItemMetadata, type CellKeyboardEvent, type CellMouseEvent, type GridPlugin, type ISleekGrid } from "../core";
 
+/**
+ * Options controlling how {@link GroupItemMetadataProvider} renders group and totals rows.
+ */
 export interface GroupItemMetadataProviderOptions {
+    /** Whether group rows show an expand/collapse toggle and respond to clicks/keys. Defaults to `true`. */
     enableExpandCollapse?: boolean;
+    /** CSS class applied to the group cell (the spanned cell). Defaults to `"slick-group-cell"`. */
     groupCellCssClass?: string;
+    /** CSS class applied to the entire group row. Defaults to `"slick-group"`. */
     groupCssClass?: string;
+    /** Indentation in pixels per grouping level for the toggle. Defaults to `15`. */
     groupIndentation?: number;
+    /** Whether group rows can receive focus. Defaults to `true`. */
     groupFocusable?: boolean;
+    /** Modern formatter for the group title/aggregated content. */
     groupFormat?: ColumnFormat<Group>;
-    /** @deprecated see groupFormat */
+    /**
+     * Legacy formatter for group rows.
+     * @deprecated Use {@link GroupItemMetadataProviderOptions.groupFormat} instead.
+     */
     groupFormatter?: CompatFormatter<Group>;
+    /** CSS class prefix for grouping level (appended with level number). Defaults to `"slick-group-level-"`. */
     groupLevelPrefix?: string;
+    /** Whether totals rows should be considered part of the group row span calculation. */
     groupRowTotals?: boolean;
+    /** CSS class applied to the title span inside the group cell. Defaults to `"slick-group-title"`. */
     groupTitleCssClass?: string;
+    /**
+     * Predicate determining whether a column has a summary/aggregate.
+     * Used to locate the spanned group cell position.
+     * @param column - Column to test.
+     * @returns `true` if the column contributes a total/summary.
+     */
     hasSummaryType?: (column: Column) => boolean;
+    /** CSS class for the expand/collapse toggle element. Defaults to `"slick-group-toggle"`. */
     toggleCssClass?: string;
+    /** CSS class added when the toggle represents an expanded group. Defaults to `"expanded"`. */
     toggleExpandedCssClass?: string;
+    /** CSS class added when the toggle represents a collapsed group. Defaults to `"collapsed"`. */
     toggleCollapsedCssClass?: string;
+    /** CSS class applied to totals rows. Defaults to `"slick-group-totals"`. */
     totalsCssClass?: string;
+    /** Whether totals rows can receive focus. Defaults to `false`. */
     totalsFocusable?: boolean;
+    /** Modern formatter for totals rows. */
     totalsFormat?: ColumnFormat<IGroupTotals>;
-    /** @deprecated use totalsFormat */
+    /**
+     * Legacy formatter for totals rows.
+     * @deprecated Use {@link GroupItemMetadataProviderOptions.totalsFormat} instead.
+     */
     totalsFormatter?: CompatFormatter<IGroupTotals>;
 }
 
+/**
+ * Grid plugin that provides row metadata and formatters for group headers and
+ * group totals rows. Handles expand/collapse UI via click and keyboard
+ * (Space, `+`, `-`) and delegates metadata through `getGroupRowMetadata` /
+ * `getTotalsRowMetadata` for use by `DataView`.
+ */
 export class GroupItemMetadataProvider implements GridPlugin {
+    /** Host grid instance set during {@link GroupItemMetadataProvider.init}. */
     declare protected grid: ISleekGrid;
+    /** Resolved options merged with {@link GroupItemMetadataProvider.defaults}. */
     declare private options: GroupItemMetadataProviderOptions;
 
+    /**
+     * Creates a new provider.
+     * @param opt - Partial options merged with {@link GroupItemMetadataProvider.defaults}.
+     */
     constructor(opt?: GroupItemMetadataProviderOptions) {
         this.options = Object.assign({}, GroupItemMetadataProvider.defaults, opt);
         this.options.groupFormat ??= (opt as any)?.groupFormatter ? convertCompatFormatter((opt as any).groupFormatter) :
@@ -35,6 +77,9 @@ export class GroupItemMetadataProvider implements GridPlugin {
             ctx => GroupItemMetadataProvider.defaultTotalsFormat(ctx, this.grid);
     }
 
+    /**
+     * Default option values. Override per instance via constructor or {@link GroupItemMetadataProvider.setOptions}.
+     */
     public static readonly defaults: GroupItemMetadataProviderOptions = {
         enableExpandCollapse: true,
         groupCellCssClass: "slick-group-cell",
@@ -51,6 +96,13 @@ export class GroupItemMetadataProvider implements GridPlugin {
         totalsFocusable: false
     }
 
+    /**
+     * Default group row formatter. Renders the group title with an optional
+     * expand/collapse toggle indented by `group.level`.
+     * @param ctx - Formatter context whose `item` is the {@link Group} to render.
+     * @param opt - Options controlling indentation and toggle classes; defaults to {@link GroupItemMetadataProvider.defaults}.
+     * @returns Rendered group row content as DOM/JSX.
+     */
     public static defaultGroupFormat(ctx: FormatterContext, opt?: GroupItemMetadataProviderOptions): FormatterResult {
         // note that grid calls the format function provided via getGroupRowMetadata
         // so the ctx.item is always a Group and value of the group is in item.value, not ctx.value
@@ -82,6 +134,13 @@ export class GroupItemMetadataProvider implements GridPlugin {
         </>
     }
 
+    /**
+     * Default totals row formatter. Delegates to the grid's column totals formatter
+     * (or the column's own `groupTotalsFormat`/`groupTotalsFormatter`).
+     * @param ctx - Formatter context whose `item` is the {@link IGroupTotals} row.
+     * @param grid - Optional grid fallback when `ctx.grid` is unavailable.
+     * @returns Rendered totals content, or empty string when no formatter is found.
+     */
     public static defaultTotalsFormat(ctx: FormatterContext, grid?: ISleekGrid): FormatterResult {
         let item = ctx.item as IGroupTotals;
         if (!item.__groupTotals && (item as any).totals)
@@ -98,14 +157,22 @@ export class GroupItemMetadataProvider implements GridPlugin {
         return "";
     }
 
+    /**
+     * Initializes the plugin, attaching click and key handlers for expand/collapse.
+     * @param grid - Host grid instance.
+     */
     init(grid: ISleekGrid): void {
         this.grid = grid;
         grid.onClick.subscribe(this.handleGridClick);
         grid.onKeyDown.subscribe(this.handleGridKeyDown);
     }
 
+    /** Plugin name used for lookup via `grid.getPluginByName()`. */
     readonly pluginName = "GroupItemMetadataProvider";
 
+    /**
+     * Detaches event handlers added during {@link GroupItemMetadataProvider.init}.
+     */
     destroy(): void {
         if (this.grid) {
             this.grid.onClick?.unsubscribe(this.handleGridClick);
@@ -113,14 +180,26 @@ export class GroupItemMetadataProvider implements GridPlugin {
         }
     }
 
+    /**
+     * Returns the current resolved options.
+     * @returns Current options object.
+     */
     getOptions(): GroupItemMetadataProviderOptions {
         return this.options;
     }
 
+    /**
+     * Merges the given values into the current options.
+     * @param value - Partial options to apply.
+     */
     setOptions(value: GroupItemMetadataProviderOptions): void {
         Object.assign(this.options, value);
     }
 
+    /**
+     * Click handler that toggles group collapse when the toggle element is clicked.
+     * @param e - Cell mouse event from the grid's `onClick`.
+     */
     handleGridClick = (e: CellMouseEvent): void => {
         let grid = e?.grid ?? this.grid;
         if (!grid)
@@ -147,6 +226,10 @@ export class GroupItemMetadataProvider implements GridPlugin {
             grid.getData().collapseGroup?.(item.groupingKey);
     }
 
+    /**
+     * Key handler that toggles group collapse on Space / `+` / `-` when a group row is active.
+     * @param e - Cell keyboard event from the grid's `onKeyDown`.
+     */
     handleGridKeyDown = (e: CellKeyboardEvent): void => {
         if (!this.options.enableExpandCollapse ||
             (e.key !== " " && e.key !== "-" && e.key !== "+"))
@@ -183,6 +266,11 @@ export class GroupItemMetadataProvider implements GridPlugin {
             grid.getData().collapseGroup?.(item.groupingKey);
     }
 
+    /**
+     * Computes the cell index and colspan for the spanned group cell, taking
+     * summary columns and frozen columns into account.
+     * @returns Object with `cell` start index and `colspan` span width (`"*"` means full row when no totals).
+     */
     groupCellPosition = (): {
         cell: number;
         colspan: (number | "*");
@@ -223,6 +311,12 @@ export class GroupItemMetadataProvider implements GridPlugin {
         return result;
     }
 
+    /**
+     * Returns row metadata for a group header row. The grid/DataView calls this
+     * to obtain CSS classes, focusability and the spanned column formatter.
+     * @param item - Group row item.
+     * @returns Metadata describing how the group row should be rendered.
+     */
     getGroupRowMetadata: ((item: Group) => ItemMetadata) = (item) => {
 
         const opt = this.options;
@@ -247,6 +341,11 @@ export class GroupItemMetadataProvider implements GridPlugin {
         return result;
     }
 
+    /**
+     * Returns row metadata for a group totals row.
+     * @param item - Totals row item.
+     * @returns Metadata describing how the totals row should be rendered.
+     */
     getTotalsRowMetadata: ((item: IGroupTotals) => ItemMetadata) = (item) => {
         const opt = this.options;
         return {

@@ -3,46 +3,97 @@ import type { AsyncPostCleanup, AsyncPostRender, ColumnFormat, CompatFormatter, 
 import { IGroupTotals } from "./group";
 import type { ISleekGrid } from "./isleekgrid";
 
+/**
+ * Definition of a single grid column.
+ * @template TItem - Row item type the column belongs to.
+ */
 export interface Column<TItem = any> {
+    /** Async post-render hook invoked after the cell node is attached to the DOM. */
     asyncPostRender?: AsyncPostRender<TItem>;
+    /** Cleanup counterpart to `asyncPostRender`; called before the node is removed or re-rendered. */
     asyncPostRenderCleanup?: AsyncPostCleanup<TItem>;
+    /** Arbitrary behavior token consumed by plugins (e.g. `"selectAndMove"`). */
     behavior?: any;
+    /** When `true`, editing this column cannot trigger insertion of a new row. */
     cannotTriggerInsert?: boolean;
+    /** CSS class(es) applied to every body cell in this column. */
     cssClass?: string;
+    /** Default sort direction for this column; `true` means ascending. */
     defaultSortAsc?: boolean;
+    /** Editor class used when the cell enters edit mode. */
     editor?: EditorClass;
+    /** Fixed number of decimal places the editor should preserve (if applicable). */
     editorFixedDecimalPlaces?: number;
+    /** Property name on `TItem` that this column is bound to. */
     field?: string;
+    /** Freezing / pinning of the column. `true`/`"start"` pins to the start side, `"end"` to the end side. */
     frozen?: boolean | "start" | "end";
+    /** Whether cells in this column can receive focus. Defaults to `true`. */
     focusable?: boolean;
+    /** CSS class(es) applied to footer row cells in this column. */
     footerCssClass?: string;
+    /** Modern formatter for body cells. Prefer this over the deprecated `formatter`. */
     format?: ColumnFormat<TItem>;
-    /** @deprecated, use @see format */
+    /**
+     * Legacy formatter for body cells.
+     * @deprecated Use {@link Column.format} instead.
+     */
     formatter?: CompatFormatter<TItem>;
+    /** Formatter used to render group-totals rows for this column. */
     groupTotalsFormat?: (ctx: FormatterContext<IGroupTotals<TItem>>) => FormatterResult;
-    /** @deprecated, use @see groupTotalsFormat */
+    /**
+     * Legacy group-totals formatter.
+     * @deprecated Use {@link Column.groupTotalsFormat} instead.
+     */
     groupTotalsFormatter?: (totals?: IGroupTotals<TItem>, column?: Column<TItem>, grid?: unknown) => string;
+    /** CSS class(es) applied to the header cell. */
     headerCssClass?: string;
+    /** Unique column identifier. Auto-generated from `field` or a fallback if omitted. */
     id?: string;
+    /** Maximum pixel width the column may be resized to. */
     maxWidth?: any;
+    /** Minimum pixel width the column may be resized to. */
     minWidth?: number;
+    /** Display name shown in the header. Defaults to a titleized form of `field`/`id`. */
     name?: string;
+    /** Formatter used to render the header `name` content. */
     nameFormat?: (ctx: FormatterContext<TItem>) => FormatterResult;
+    /** Previous width before the last resize; managed internally for `forceFitColumns`. */
     previousWidth?: number;
+    /** Extra field names the column depends on (besides `field`), used for dirty tracking. */
     referencedFields?: string[];
+    /** When `true`, cells are re-rendered on column resize. */
     rerenderOnResize?: boolean;
+    /** Whether the column can be resized by dragging its header border. */
     resizable?: boolean;
+    /** Whether cells in this column can be selected. */
     selectable?: boolean;
+    /** Whether cells in this column participate in tab navigation. */
     tabbable?: boolean;
+    /** Whether clicking the header sorts by this column. */
     sortable?: boolean;
+    /** Sort priority when multiple columns are sorted; lower numbers sort first. */
     sortOrder?: number;
+    /** Tooltip text for the header cell. */
     toolTip?: string;
+    /**
+     * Optional validator invoked by the editor.
+     * @param value - The value to validate.
+     * @param editorArgs - Additional editor context, if any.
+     * @returns Validation result indicating validity and an optional message.
+     */
     validator?: (value: any, editorArgs?: any) => ValidationResult;
+    /** Whether the column is currently visible. Columns with `visible: false` are hidden but retained. */
     visible?: boolean;
+    /** Current pixel width of the column. */
     width?: number;
 }
 
 
+/**
+ * Default property values applied to each column when none is specified.
+ * Used as a fallback by {@link initColumnProps}.
+ */
 export const columnDefaults: Partial<Column> = {
     resizable: true,
     sortable: false,
@@ -54,34 +105,73 @@ export const columnDefaults: Partial<Column> = {
     tabbable: true
 };
 
+/**
+ * Per-cell metadata that can override column-level settings for a specific row.
+ * @template TItem - Row item type.
+ */
 export interface ColumnMetadata<TItem = any> {
+    /** Column span for this cell. Use `"*"` to span to the end of the row. */
     colspan?: number | '*';
+    /** Extra CSS classes applied to the cell node. */
     cssClasses?: string;
+    /** Whether the cell can receive focus. */
     focusable?: boolean;
+    /** Editor class override for this cell. */
     editor?: EditorClass;
+    /** Formatter override for this cell. */
     format?: ColumnFormat<TItem>;
-    /** @deprecated */
+    /**
+     * Legacy formatter override.
+     * @deprecated Use {@link ColumnMetadata.format} instead.
+     */
     formatter?: CompatFormatter<TItem>;
+    /** Whether the cell can be selected. */
     selectable?: boolean;
+    /** Whether the cell participates in tab navigation. */
     tabbable?: boolean;
 }
 
+/**
+ * Describes a single active sort criterion.
+ */
 export interface ColumnSort {
+    /** Column `id` to sort by. */
     columnId: string;
+    /** Sort direction; `true` for ascending, `false` for descending. */
     sortAsc?: boolean;
 }
 
+/**
+ * Row-level metadata that can influence rendering and interaction.
+ * Returned by `DataView.getItemMetadata(row)`.
+ * @template TItem - Row item type.
+ */
 export interface ItemMetadata<TItem = any> {
+    /** Extra CSS classes applied to the row node. */
     cssClasses?: string;
+    /** Per-column metadata overrides for this row. */
     columns?: { [key: string]: ColumnMetadata<TItem> };
+    /** Whether any cell in the row can receive focus. */
     focusable?: boolean;
+    /** Default formatter for all cells in the row. */
     format?: ColumnFormat<TItem>;
-    /** @deprecated */
+    /**
+     * Legacy default formatter for the row.
+     * @deprecated Use {@link ItemMetadata.format} instead.
+     */
     formatter?: CompatFormatter<TItem>;
+    /** Whether any cell in the row can be selected. */
     selectable?: boolean;
+    /** Whether any cell in the row participates in tab navigation. */
     tabbable?: boolean;
 }
 
+/**
+ * Normalizes column definitions: applies defaults, clamps widths and ensures unique ids/names.
+ * Mutates the `columns` array in place.
+ * @param columns - Column definitions to initialize.
+ * @param defaults - Default values to fall back to for missing properties.
+ */
 export function initColumnProps(columns: Column[], defaults: Partial<Column<any>>): void {
     var usedIds: { [key: string]: boolean } = {};
 
@@ -117,6 +207,12 @@ export function initColumnProps(columns: Column[], defaults: Partial<Column<any>
     }
 }
 
+/**
+ * Converts a field/column identifier to a human-readable Title Case string.
+ * Handles camelCase, PascalCase, snake_case, kebab-case and whitespace separated names.
+ * @param str - Raw identifier to titleize.
+ * @returns Title-cased, space-separated string (e.g. `"firstName"` → `"First Name"`).
+ */
 export function titleize(str: string): string {
     if (!str)
         return str;

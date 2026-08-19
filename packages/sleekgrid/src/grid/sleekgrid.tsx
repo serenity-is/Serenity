@@ -31,6 +31,12 @@ import { renderCell } from "./render-cell";
 import { renderRow } from "./render-row";
 import { absBox, applyColumnWidths, applyLegacyHeightOptions, createCssRules, findStylesheetByUID, getInnerWidth, getMaxSupportedCssHeight, getScrollBarDimensions, setStyleProp } from "./style-utils";
 
+/**
+ * Main virtualized grid implementation. Handles viewport layout, column
+ * sizing, keyboard/cell navigation, editing, selection, and async post rendering.
+ * Implements {@link ISleekGrid}.
+ * @template TItem - Data item type.
+ */
 export class SleekGrid<TItem = any> implements ISleekGrid<TItem> {
     declare private _absoluteColMinWidth: number;
     declare private _activeCanvasNode: HTMLElement;
@@ -124,45 +130,91 @@ export class SleekGrid<TItem = any> implements ISleekGrid<TItem> {
     declare private _groupingPanel: HTMLElement;
     declare private _eventDisposer: AbortController;
 
+    /** Fired when the active cell changes ({@link ArgsCell}). */
     readonly onActiveCellChanged: EventEmitter<ArgsCell> = new EventEmitter<ArgsCell>();
+    /** Fired when the active cell's box/position changes (scroll/ancestor scroll). */
     readonly onActiveCellPositionChanged: EventEmitter<ArgsGrid> = new EventEmitter<ArgsGrid>();
+    /** Fired when the Add-New row attempts to create a new item. */
     readonly onAddNewRow: EventEmitter<ArgsAddNewRow> = new EventEmitter<ArgsAddNewRow>();
+    /** Static emitter also fired after any grid is initialized. */
     static readonly onAfterInit: EventEmitter<ArgsGrid> = new EventEmitter<ArgsGrid>();
+    /** Fired after {@link SleekGrid.init} completes for this instance. */
     readonly onAfterInit: EventEmitter<ArgsGrid> = new EventEmitter<ArgsGrid>();
+    /** Before a cell editor is destroyed (allows intercept). */
     readonly onBeforeCellEditorDestroy: EventEmitter<ArgsEditorDestroy> = new EventEmitter<ArgsEditorDestroy>();
+    /** Before the grid is destroyed. */
     readonly onBeforeDestroy: EventEmitter<ArgsGrid> = new EventEmitter<ArgsGrid>();
+    /** Cancelable; before a cell becomes editable. */
     readonly onBeforeEditCell: EventEmitter<ArgsCellEdit> = new EventEmitter<ArgsCellEdit>();
+    /** Before a footer-row column node is removed. */
     readonly onBeforeFooterRowCellDestroy: EventEmitter<ArgsColumnNode> = new EventEmitter<ArgsColumnNode>();
+    /** Before a header column node is removed. */
     readonly onBeforeHeaderCellDestroy: EventEmitter<ArgsColumnNode> = new EventEmitter<ArgsColumnNode>();
+    /** Before a header-row column node is removed. */
     readonly onBeforeHeaderRowCellDestroy: EventEmitter<ArgsColumnNode> = new EventEmitter<ArgsColumnNode>();
+    /** After an editor commits a cell change. */
     readonly onCellChange: EventEmitter<ArgsCellChange> = new EventEmitter<ArgsCellChange>();
+    /** After `setCellCssStyles`/`addCellCssStyles`/`removeCellCssStyles`. */
     readonly onCellCssStylesChanged: EventEmitter<ArgsCssStyle> = new EventEmitter<ArgsCssStyle>();
+    /** Click on a cell's canvas. */
     readonly onClick: EventEmitter<ArgsCell, MouseEvent> = new EventEmitter<ArgsCell, MouseEvent>();
+    /** After columns are reordered (drag or API). */
     readonly onColumnsReordered: EventEmitter<ArgsGrid> = new EventEmitter<ArgsGrid>();
+    /** After columns are resized. */
     readonly onColumnsResized: EventEmitter<ArgsGrid> = new EventEmitter<ArgsGrid>();
+    /** Forwarded by editors in composite-edit mode when a field value changes. */
     readonly onCompositeEditorChange: EventEmitter<ArgsGrid> = new EventEmitter<ArgsGrid>();
+    /** Context menu on the grid canvas (opportunity to suppress/override). */
     readonly onContextMenu: EventEmitter<ArgsGrid, UIEvent> = new EventEmitter<ArgsGrid, UIEvent>();
+    /** Double-click on a cell. */
     readonly onDblClick: EventEmitter<ArgsCell, MouseEvent> = new EventEmitter<ArgsCell, MouseEvent>();
+    /** Ongoing drag (after threshold). */
     readonly onDrag: EventEmitter<ArgsDrag, UIEvent> = new EventEmitter<ArgsDrag, UIEvent>();
+    /** End of drag lifecycle. */
     readonly onDragEnd: EventEmitter<ArgsDrag, UIEvent> = new EventEmitter<ArgsDrag, UIEvent>();
+    /** Initial drag attempt (cancelable via `stopImmediatePropagation`). */
     readonly onDragInit: EventEmitter<ArgsDrag, UIEvent> = new EventEmitter<ArgsDrag, UIEvent>();
+    /** When drag start threshold is passed. */
     readonly onDragStart: EventEmitter<ArgsDrag, UIEvent> = new EventEmitter<ArgsDrag, UIEvent>();
+    /** After a footer-row cell is created. */
     readonly onFooterRowCellRendered: EventEmitter<ArgsColumnNode> = new EventEmitter<ArgsColumnNode>();
+    /** After a header cell is created. */
     readonly onHeaderCellRendered: EventEmitter<ArgsColumnNode> = new EventEmitter<ArgsColumnNode>();
+    /** Click on a header column. */
     readonly onHeaderClick: EventEmitter<ArgsColumn, MouseEvent> = new EventEmitter<ArgsColumn, MouseEvent>();
+    /** Context menu on a header column. */
     readonly onHeaderContextMenu: EventEmitter<ArgsColumn, MouseEvent> = new EventEmitter<ArgsColumn, MouseEvent>();
+    /** Mouse entered a header column. */
     readonly onHeaderMouseEnter: EventEmitter<ArgsColumn, MouseEvent> = new EventEmitter<ArgsColumn, MouseEvent>();
+    /** Mouse left a header column. */
     readonly onHeaderMouseLeave: EventEmitter<ArgsColumn, MouseEvent> = new EventEmitter<ArgsColumn, MouseEvent>();
+    /** After a header-row (filter) cell is created. */
     readonly onHeaderRowCellRendered: EventEmitter<ArgsColumnNode> = new EventEmitter<ArgsColumnNode>();
+    /** Keydown forwarded from focus sinks/canvases. */
     readonly onKeyDown: EventEmitter<ArgsCell, KeyboardEvent> = new EventEmitter<ArgsCell, KeyboardEvent>();
+    /** Mouse entered a cell's canvas target. */
     readonly onMouseEnter: EventEmitter<ArgsGrid, MouseEvent> = new EventEmitter<ArgsGrid, MouseEvent>();
+    /** Mouse left a cell (entering the canvas background). */
     readonly onMouseLeave: EventEmitter<ArgsGrid, MouseEvent> = new EventEmitter<ArgsGrid, MouseEvent>();
+    /** Raw scroll offsets after `handleScroll` (viewport and H-sync applied). */
     readonly onScroll: EventEmitter<ArgsScroll> = new EventEmitter<ArgsScroll>();
+    /** After the selected-rows set changes (via selection model). */
     readonly onSelectedRowsChanged: EventEmitter<ArgsSelectedRowsChange> = new EventEmitter<ArgsSelectedRowsChange>();
+    /** After header-driven sort toggling (single or multi). */
     readonly onSort: EventEmitter<ArgsSort> = new EventEmitter<ArgsSort>();
+    /** When `commitCurrentEdit()` fails validation. */
     readonly onValidationError: EventEmitter<ArgsValidationError> = new EventEmitter<ArgsValidationError>();
+    /** After the viewport is re-rendered following a scroll. */
     readonly onViewportChanged: EventEmitter<ArgsGrid> = new EventEmitter<ArgsGrid>();
 
+    /**
+     * Constructs and initializes a new SleekGrid inside `container`.
+     * Auto-initializes unless `explicitInitialization` is set.
+     * @param container - Selector, element or jQuery/array-like container.
+     * @param data - DataView or plain array of items.
+     * @param columns - Initial column definitions.
+     * @param options - Grid options merged with {@link gridDefaults}.
+     */
     constructor(container: string | HTMLElement | ArrayLike<HTMLElement>, data: any, columns: Column<TItem>[], options: GridOptions<TItem>) {
 
         this._data = data;
@@ -324,6 +376,11 @@ export class SleekGrid<TItem = any> implements ISleekGrid<TItem> {
         return this._signals;
     }
 
+    /**
+     * Performs one-time DOM and event binding after construction. No-ops if
+     * already initialized. Computes sizes, creates headers/footers and binds
+     * scroll/keyboard/mouse handlers.
+     */
     init(): void {
         if (this._initialized)
             return;
@@ -442,11 +499,19 @@ export class SleekGrid<TItem = any> implements ISleekGrid<TItem> {
         this.onAfterInit.notify({ grid: this });
     }
 
+    /**
+     * Prepend-registers a plugin and calls its `init(this)` immediately.
+     * @param plugin - Grid plugin to add.
+     */
     registerPlugin(plugin: GridPlugin): void {
         this._plugins.unshift(plugin);
         plugin.init(this);
     }
 
+    /**
+     * Unregisters a plugin by identity, calling `destroy()` when available.
+     * @param plugin - Plugin instance previously passed to {@link SleekGrid.registerPlugin}.
+     */
     unregisterPlugin(plugin: GridPlugin): void {
         for (var i = this._plugins.length; i >= 0; i--) {
             if (this._plugins[i] === plugin) {
@@ -459,6 +524,11 @@ export class SleekGrid<TItem = any> implements ISleekGrid<TItem> {
         }
     }
 
+    /**
+     * Looks up a registered plugin by its `pluginName`.
+     * @param name - Plugin name.
+     * @returns Matching plugin or `undefined`.
+     */
     getPluginByName(name: string): GridPlugin {
         for (var i = this._plugins.length - 1; i >= 0; i--) {
             if (this._plugins[i].pluginName === name)
@@ -466,6 +536,10 @@ export class SleekGrid<TItem = any> implements ISleekGrid<TItem> {
         }
     }
 
+    /**
+     * Attaches a selection model, unregistering any previous one.
+     * @param model - The new selection model, or `null` to detach.
+     */
     setSelectionModel(model: SelectionModel): void {
         this.unregisterSelectionModel();
 
@@ -484,10 +558,19 @@ export class SleekGrid<TItem = any> implements ISleekGrid<TItem> {
         this._selectionModel.destroy?.();
     }
 
+    /**
+     * Returns native scrollbar thickness for the current environment.
+     * @returns Object with `width` and `height` in pixels.
+     */
     getScrollBarDimensions(): { width: number; height: number; } {
         return this._scrollDims;
     }
 
+    /**
+     * Returns the currently displayed (reserved) scrollbar space, accounting
+     * for auto/hidden scrollbars.
+     * @returns Object with `width` and `height` of displayed scrollbar area.
+     */
     getDisplayedScrollbarDimensions(): { width: number; height: number; } {
         return {
             width: this._viewportInfo.hasVScroll ? this._scrollDims.width : 0,
@@ -495,10 +578,17 @@ export class SleekGrid<TItem = any> implements ISleekGrid<TItem> {
         };
     }
 
+    /**
+     * Returns the absolute minimum column width derived from header/cell box sizing.
+     */
     getAbsoluteColumnMinWidth(): number {
         return this._absoluteColMinWidth;
     }
 
+    /**
+     * Returns the currently attached selection model, if any.
+     * @returns The active {@link SelectionModel}.
+     */
     getSelectionModel(): SelectionModel {
         return this._selectionModel;
     }
@@ -514,6 +604,10 @@ export class SleekGrid<TItem = any> implements ISleekGrid<TItem> {
         return refs.main;
     }
 
+    /**
+     * Returns summarized layout support/indices for the current layout engine.
+     * @returns {@link GridLayoutInfo} with frozen/pinned counters and capability flags.
+     */
     public getLayoutInfo(): GridLayoutInfo {
         const { frozenTopRows, frozenBottomRows, pinnedStartCols, pinnedEndCols } = this._refs;
         const { supportFrozenRows, supportFrozenBottom, supportPinnedCols, supportPinnedEnd } = this._layout;
@@ -529,6 +623,11 @@ export class SleekGrid<TItem = any> implements ISleekGrid<TItem> {
         };
     }
 
+    /**
+     * Returns the canvas element for the band/pane that owns `row`/`cell`.
+     * @param row - Optional view row hint for frozen-pane disambiguation.
+     * @param cell - Optional cell hint for pinned-band disambiguation.
+     */
     getCanvasNode(row?: number, cell?: number): HTMLElement {
         const refs = this._refs;
         let band = this.getBandRefsForCell(cell);
@@ -542,11 +641,19 @@ export class SleekGrid<TItem = any> implements ISleekGrid<TItem> {
         return band.canvas.body;
     }
 
+    /**
+     * Returns all rendered canvases across bands/panes (jQuery-wrapped when available).
+     */
     getCanvases(): any | HTMLElement[] {
         const canvases = getAllCanvasNodes(this._refs);
         return this._jQuery ? this._jQuery(canvases) : canvases;
     }
 
+    /**
+     * Returns the canvas that last received focus/interaction, optionally
+     * resolving from an event for plugin compatibility.
+     * @param e - Optional event whose target is used to resolve the canvas.
+     */
     getActiveCanvasNode(e?: { target: EventTarget }): HTMLElement {
         if (e) { // compatibility with celldecorator plugin
             this._activeCanvasNode = (e.target as HTMLElement)?.closest?.('.grid-canvas');
@@ -554,6 +661,11 @@ export class SleekGrid<TItem = any> implements ISleekGrid<TItem> {
         return this._activeCanvasNode;
     }
 
+    /**
+     * Returns the viewport that owns `row`/`cell` (the canvas's parent).
+     * @param row - Optional row hint.
+     * @param cell - Optional cell hint.
+     */
     getViewportNode(row?: number, cell?: number): HTMLElement {
         return this.getCanvasNode(row, cell)?.parentElement;
     }
@@ -566,6 +678,10 @@ export class SleekGrid<TItem = any> implements ISleekGrid<TItem> {
         return getAllViewportNodes(this._refs);
     }
 
+    /**
+     * Returns the active viewport, optionally resolving from an event for plugin compat.
+     * @param e - Optional event whose target is used to resolve the viewport.
+     */
     getActiveViewportNode(e?: { target: EventTarget }): HTMLElement {
         if (e) { // compatibility with celldecorator plugin
             this._activeViewportNode = (e.target as HTMLElement)?.closest?.('.slick-viewport');
@@ -694,6 +810,12 @@ export class SleekGrid<TItem = any> implements ISleekGrid<TItem> {
         this._boundAncestorScroll = [];
     }
 
+    /**
+     * Updates a header's title/tooltip in place, re-triggering header lifecycle events.
+     * @param columnId - Target column id.
+     * @param title - New title text or formatter.
+     * @param toolTip - New title attribute.
+     */
     updateColumnHeader(columnId: string, title?: string | ColumnFormat<any>, toolTip?: string): void {
         if (!this._initialized) {
             return;
@@ -747,10 +869,17 @@ export class SleekGrid<TItem = any> implements ISleekGrid<TItem> {
         });
     }
 
+    /**
+     * Returns the header column container for the main band.
+     */
     getHeader(): HTMLElement {
         return this._refs.main.headerCols;
     }
 
+    /**
+     * Returns the header cell node for `cell` (id or visible index).
+     * @param cell - Visible column index or column id.
+     */
     getHeaderColumn(cell: number | string): HTMLElement {
         if (typeof cell === "string")
             cell = this.getColumnIndex(cell);
@@ -762,18 +891,31 @@ export class SleekGrid<TItem = any> implements ISleekGrid<TItem> {
         return band.headerCols?.children.item(cell - band.cellOffset) as HTMLDivElement;
     }
 
+    /**
+     * Returns the grouping panel container, if created.
+     */
     getGroupingPanel(): HTMLElement {
         return this._groupingPanel;
     }
 
+    /**
+     * Returns the (legacy) pre-header panel node inside the grouping panel.
+     */
     getPreHeaderPanel(): HTMLElement {
         return this._groupingPanel?.querySelector('.slick-preheader-panel');
     }
 
+    /**
+     * Returns the header-row (filter row) container for the main band.
+     */
     getHeaderRow(): HTMLElement {
         return this._refs.main.headerRowCols;
     }
 
+    /**
+     * Returns the header-row cell node for `cell`.
+     * @param cell - Visible column index or column id.
+     */
     getHeaderRowColumn(cell: string | number): HTMLElement {
         if (typeof cell === "string")
             cell = this.getColumnIndex(cell);
@@ -785,10 +927,17 @@ export class SleekGrid<TItem = any> implements ISleekGrid<TItem> {
         return band.headerRowCols?.children.item(cell - band.cellOffset) as HTMLDivElement;
     }
 
+    /**
+     * Returns the footer-row container for the main band.
+     */
     getFooterRow(): HTMLElement {
         return this._refs.main.footerRowCols;
     }
 
+    /**
+     * Returns the footer-row cell node for `cell`.
+     * @param cell - Visible column index or column id.
+     */
     getFooterRowColumn(cell: string | number): HTMLElement {
         if (typeof cell === "string")
             cell = this.getColumnIndex(cell);
@@ -1047,6 +1196,11 @@ export class SleekGrid<TItem = any> implements ISleekGrid<TItem> {
         });
     }
 
+    /**
+     * Notifies the grid that column widths changed externally; updates limits,
+     * re-applies column widths and re-renders as needed.
+     * @param invalidate - When `true`, invalidates and re-renders visible rows.
+     */
     public columnsResized(invalidate = true): void {
         this.adjustPinnedColsLimit();
         this.applyColumnHeaderWidths();
@@ -1124,6 +1278,10 @@ export class SleekGrid<TItem = any> implements ISleekGrid<TItem> {
         }
     }
 
+    /**
+     * Tears down the grid, unbinding events, destroying plugins and removing DOM.
+     * Clears all `on*` emitters and instance-owned properties.
+     */
     destroy(): void {
         this.getEditorLock().cancelCurrentEdit();
 
@@ -1187,26 +1345,49 @@ export class SleekGrid<TItem = any> implements ISleekGrid<TItem> {
         }
     }
 
+    /**
+     * Returns the `editorFactory` from current grid options.
+     */
     getEditorFactory(): EditorFactory {
         return this._options.editorFactory;
     }
 
+    /**
+     * Returns the current `EditorLock` controlling concurrent edits.
+     */
     getEditorLock(): EditorLock {
         return this._options.editorLock;
     }
 
+    /**
+     * Returns the grid's internal `EditController` (commit/cancel) bound to this instance.
+     */
     getEditController(): EditController {
         return this._editController;
     }
 
+    /**
+     * Finds a column by its `id` including hidden columns.
+     * @param id - Column id.
+     * @returns Matching column or `null`.
+     */
     getColumnById(id: string): Column<TItem> {
         return id ? this._allCols[this._allColsById[id]] : null;
     }
 
+    /**
+     * Returns the column index for `id`.
+     * @param id - Column id.
+     * @param opt.inAll - When `true`, searches all columns; otherwise visible columns.
+     * @returns Column index or `null` when not found.
+     */
     getColumnIndex(id: string, opt?: { inAll?: boolean }): number {
         return id ? (opt?.inAll ? this._allColsById[id] : this._colById[id]) : null;
     }
 
+    /**
+     * Auto-fits resizable column widths to the available viewport width.
+     */
     autosizeColumns(): void {
         var vpi = this._viewportInfo,
             availWidth = vpi.hasVScroll ? vpi.width - this._scrollDims.width : vpi.width;
@@ -1238,10 +1419,19 @@ export class SleekGrid<TItem = any> implements ISleekGrid<TItem> {
         this.updateViewColLeftRight();
     }
 
+    /**
+     * Sets single-column sorting state.
+     * @param columnId - Column id to sort by.
+     * @param ascending - Whether ascending.
+     */
     setSortColumn(columnId: string, ascending: boolean): void {
         this.setSortColumns([{ columnId: columnId, sortAsc: ascending }]);
     }
 
+    /**
+     * Sets multi-column sorting state and updates header sort indicators.
+     * @param cols - Sort descriptors (`columnId` + `sortAsc`).
+     */
     setSortColumns(cols: ColumnSort[]): void {
         this._sortColumns = cols || [];
 
@@ -1273,6 +1463,9 @@ export class SleekGrid<TItem = any> implements ISleekGrid<TItem> {
         });
     }
 
+    /**
+     * Returns the active sort descriptors.
+     */
     getSortColumns(): ColumnSort[] {
         return this._sortColumns;
     }
@@ -1334,10 +1527,16 @@ export class SleekGrid<TItem = any> implements ISleekGrid<TItem> {
         }
     }
 
+    /**
+     * Returns all columns including hidden ones (in `setColumns` order).
+     */
     getAllColumns(): Column<TItem>[] {
         return this._allCols;
     }
 
+    /**
+     * Returns only the currently visible columns in display order.
+     */
     getColumns(): Column<TItem>[] {
         return this._cols;
     }
@@ -1420,6 +1619,11 @@ export class SleekGrid<TItem = any> implements ISleekGrid<TItem> {
         }
     }
 
+    /**
+     * Replaces the column set and invalidates layout. Tries to preserve
+     * identity when called with a permutation of `getColumns()`.
+     * @param columns - New columns in desired order.
+     */
     setColumns(columns: Column<TItem>[]): void {
 
         let initProps = true;
@@ -1453,6 +1657,12 @@ export class SleekGrid<TItem = any> implements ISleekGrid<TItem> {
         return anyChange;
     }
 
+    /**
+     * Reorders columns by `columnIds` to become the new visible order.
+     * @param columnIds - Desired column id order.
+     * @param opt.notify - Whether to emit `onColumnsReordered` (default `true`).
+     * @param opt.setVisible - When provided, visibility is set to these ids before reorder.
+     */
     public reorderColumns(columnIds: string[], opt?: { notify?: boolean, setVisible?: string[] }): void {
         opt?.setVisible && this.internalSetVisibleColumns(opt.setVisible);
         const newColumns = sortToDesiredOrderAndKeepRest(this._allCols, columnIds);
@@ -1463,6 +1673,12 @@ export class SleekGrid<TItem = any> implements ISleekGrid<TItem> {
         }
     }
 
+    /**
+     * Shows only the columns whose ids are in `columnIds`, optionally reordering them.
+     * @param columnIds - Ids of columns to make visible, in desired order.
+     * @param opt.reorder - When `true` (default), reorders to `columnIds` order.
+     * @param opt.notify - Whether to emit `onColumnsReordered`.
+     */
     public setVisibleColumns(columnIds: string[], opt?: { reorder?: boolean, notify?: boolean }): void {
         const visibilityChange = this.internalSetVisibleColumns(columnIds);
         if (opt?.reorder ?? true) {
@@ -1476,6 +1692,10 @@ export class SleekGrid<TItem = any> implements ISleekGrid<TItem> {
         }
     }
 
+    /**
+     * Invalidates column chrome and virtualization state after column changes.
+     * Recomputes pinning, re-creates headers/footers, rebuilds CSS rules and re-renders.
+     */
     public invalidateColumns(): void {
         this.updateViewCols();
         this.updateViewColLeftRight();
@@ -1497,6 +1717,9 @@ export class SleekGrid<TItem = any> implements ISleekGrid<TItem> {
         }
     }
 
+    /**
+     * Returns current merged grid options.
+     */
     getOptions(): GridOptions<TItem> {
         return this._options;
     }
@@ -1511,6 +1734,14 @@ export class SleekGrid<TItem = any> implements ISleekGrid<TItem> {
         this.makeActiveCellNormal();
     }
 
+    /**
+     * Merges `args` into options, validates/updates layout signals and optionally
+     * re-renders. Commits or cancels the active edit before changing options.
+     * @param args - Partial options to merge.
+     * @param suppressRender - When `true`, suppresses render pass after set.
+     * @param suppressColumnSet - When `true`, suppresses `setColumns` from `args.columns`.
+     * @param suppressSetOverflow - When `true`, suppresses `setOverflow()` adjustment.
+     */
     setOptions(args: GridOptions<TItem>, suppressRender?: boolean, suppressColumnSet?: boolean, suppressSetOverflow?: boolean): void {
 
         this.prepareForOptionsChange();
@@ -1598,6 +1829,11 @@ export class SleekGrid<TItem = any> implements ISleekGrid<TItem> {
         }
     }
 
+    /**
+     * Replaces the data source and rebinds view events.
+     * @param newData - New DataView or plain array.
+     * @param scrollToTop - When `true`, scrolls to `y = 0`.
+     */
     setData(newData: any, scrollToTop?: boolean): void {
         this.unbindFromData();
         this._data = newData;
@@ -1609,10 +1845,16 @@ export class SleekGrid<TItem = any> implements ISleekGrid<TItem> {
         }
     }
 
+    /**
+     * Returns the current data source (DataView or array).
+     */
     getData(): any {
         return this._data;
     }
 
+    /**
+     * Returns view length (via `getLength()` when a DataView is attached).
+     */
     getDataLength(): number {
         if ((this._data as IDataView).getLength) {
             return (this._data as IDataView).getLength();
@@ -1626,6 +1868,10 @@ export class SleekGrid<TItem = any> implements ISleekGrid<TItem> {
             (!this._pagingActive || this._pagingIsLastPage ? 1 : 0));
     }
 
+    /**
+     * Returns the data item for a view row (group/totals rows may be `Group`/`IGroupTotals`).
+     * @param row - View row index.
+     */
     getDataItem(row: number): TItem {
         if ((this._data as IDataView).getItem) {
             return (this._data as IDataView).getItem(row);
@@ -1634,10 +1880,17 @@ export class SleekGrid<TItem = any> implements ISleekGrid<TItem> {
         }
     }
 
+    /**
+     * Returns the top panel container element.
+     */
     getTopPanel(): HTMLElement {
         return this._refs.topPanel;
     }
 
+    /**
+     * Shows or hides the top panel.
+     * @param visible - Whether to show.
+     */
     setTopPanelVisibility(visible: boolean): void {
         if (!this._options.showTopPanel != !visible) {
             this._signals.showTopPanel.value = this._options.showTopPanel = !!visible;
@@ -1645,6 +1898,10 @@ export class SleekGrid<TItem = any> implements ISleekGrid<TItem> {
         }
     }
 
+    /**
+     * Shows or hides column headers.
+     * @param visible - Whether to show.
+     */
     setColumnHeaderVisibility(visible: boolean): void {
         if (!this._options.showColumnHeader != !visible) {
             this._signals.showColumnHeader.value = this._options.showColumnHeader = !!visible;
@@ -1652,6 +1909,10 @@ export class SleekGrid<TItem = any> implements ISleekGrid<TItem> {
         }
     }
 
+    /**
+     * Shows or hides the footer row and updates grand totals when becoming visible.
+     * @param visible - Whether to show.
+     */
     setFooterRowVisibility(visible: boolean): void {
         if (!this._options.showFooterRow != !visible) {
             this._signals.showFooterRow.value = this._options.showFooterRow = !!visible;
@@ -1660,6 +1921,10 @@ export class SleekGrid<TItem = any> implements ISleekGrid<TItem> {
         }
     }
 
+    /**
+     * Shows or hides the grouping panel.
+     * @param visible - Whether to show.
+     */
     setGroupingPanelVisibility(visible: boolean): void {
         if (this._options.showGroupingPanel != visible) {
             this._options.showGroupingPanel = visible;
@@ -1668,10 +1933,18 @@ export class SleekGrid<TItem = any> implements ISleekGrid<TItem> {
         }
     }
 
+    /**
+     * Legacy alias for {@link SleekGrid.setGroupingPanelVisibility}.
+     * @param visible - Whether to show.
+     */
     setPreHeaderPanelVisibility(visible: boolean): void {
         this.setGroupingPanelVisibility(visible);
     }
 
+    /**
+     * Shows or hides the header row (filter row).
+     * @param visible - Whether to show.
+     */
     setHeaderRowVisibility(visible: boolean): void {
         if (!this._options.showHeaderRow != !visible) {
             this._signals.showHeaderRow.value = this._options.showHeaderRow = !!visible;
@@ -1679,10 +1952,16 @@ export class SleekGrid<TItem = any> implements ISleekGrid<TItem> {
         }
     }
 
+    /**
+     * Returns the grid's container element.
+     */
     getContainerNode(): HTMLElement {
         return this._container;
     }
 
+    /**
+     * Returns the unique CSS-namespace UID for this grid instance.
+     */
     getUID(): string {
         return this._uid;
     }
@@ -1734,6 +2013,12 @@ export class SleekGrid<TItem = any> implements ISleekGrid<TItem> {
         }
     }
 
+    /**
+     * Resolves the formatter for a cell, accounting for row/column metadata,
+     * `formatterFactory` and fallbacks (`defaultFormat`/`defaultFormatter`).
+     * @param row - View row index.
+     * @param column - Column definition.
+     */
     getFormatter(row: number, column: Column<TItem>): ColumnFormat<TItem> {
         const view = this._data as IDataView;
         if (view.getItemMetadata) {
@@ -1787,6 +2072,11 @@ export class SleekGrid<TItem = any> implements ISleekGrid<TItem> {
         return defaultColumnFormat;
     }
 
+    /**
+     * Creates a {@link FormatterContext} for the given `row`/`cell`.
+     * @param row - View row index.
+     * @param cell - Cell/column index.
+     */
     getFormatterContext(row: number, cell: number): FormatterContext {
         const column = this._cols[cell];
         const item = this.getDataItem(row);
@@ -1800,6 +2090,10 @@ export class SleekGrid<TItem = any> implements ISleekGrid<TItem> {
         });
     }
 
+    /**
+     * Resolves the group-totals formatter for a column (or its totals variant).
+     * @param column - Column whose totals representation is needed.
+     */
     getTotalsFormatter(column: Column<TItem>): ColumnFormat<TItem> {
         if (column.groupTotalsFormat)
             return column.groupTotalsFormat;
@@ -1832,6 +2126,12 @@ export class SleekGrid<TItem = any> implements ISleekGrid<TItem> {
         return column.editor || (this._options.editorFactory && this._options.editorFactory.getEditor(column, row));
     }
 
+    /**
+     * Extracts the raw cell value for `columnDef` from `item` (or via
+     * `dataItemColumnValueExtractor` when configured).
+     * @param item - Row data item.
+     * @param columnDef - Column definition.
+     */
     getDataItemValueForColumn(item: TItem, columnDef: Column<TItem>): any {
         if (this._options.dataItemColumnValueExtractor)
             return this._options.dataItemColumnValueExtractor(item, columnDef);
@@ -1850,6 +2150,9 @@ export class SleekGrid<TItem = any> implements ISleekGrid<TItem> {
         this.startPostProcessingCleanup();
     }
 
+    /**
+     * Invalidates and re-renders the entire grid (rows and totals).
+     */
     invalidate(): void {
         this.updateRowCount();
         this.invalidateAllRows();
@@ -1857,6 +2160,9 @@ export class SleekGrid<TItem = any> implements ISleekGrid<TItem> {
         this.updateGrandTotals();
     }
 
+    /**
+     * Invalidates all cached rows, forcing a full re-render of visible rows.
+     */
     invalidateAllRows(): void {
         if (this._currentEditor) {
             this.makeActiveCellNormal();
@@ -1928,6 +2234,10 @@ export class SleekGrid<TItem = any> implements ISleekGrid<TItem> {
         delete this._postProcessedRows[row];
     }
 
+    /**
+     * Invalidates specific view rows so they are re-rendered.
+     * @param rows - View row indices to invalidate.
+     */
     invalidateRows(rows: number[]): void {
         var i, rl;
         if (!rows || !rows.length) {
@@ -1946,10 +2256,19 @@ export class SleekGrid<TItem = any> implements ISleekGrid<TItem> {
         this.startPostProcessingCleanup();
     }
 
+    /**
+     * Invalidates a single view row.
+     * @param row - View row index.
+     */
     invalidateRow(row: number): void {
         this.invalidateRows([row]);
     }
 
+    /**
+     * Re-renders a single cell via the cell's formatter and invalidates async post results.
+     * @param row - View row index.
+     * @param cell - Cell/column index.
+     */
     updateCell(row: number, cell: number): void {
         var cellNode = this.getCellNode(row, cell);
         if (!cellNode)
@@ -1976,6 +2295,10 @@ export class SleekGrid<TItem = any> implements ISleekGrid<TItem> {
         applyFormatterResultToCellNode(ctx, fmtResult, cellNode);
     }
 
+    /**
+     * Re-renders all cells of the given row.
+     * @param row - View row index.
+     */
     updateRow(row: number): void {
         var cacheEntry = this._rowsCache[row];
         if (!cacheEntry) {
@@ -2034,6 +2357,10 @@ export class SleekGrid<TItem = any> implements ISleekGrid<TItem> {
         this._refs.config.frozenLimit = this._options.autoHeight ? 0 : Math.floor(vs.height / this._options.rowHeight) - 1;
     }
 
+    /**
+     * Recalculates viewport size and updates virtual height/scroll bounds.
+     * Call when the container size changes externally.
+     */
     resizeCanvas = (): void => {
         if (!this._initialized) {
             return;
@@ -2057,19 +2384,33 @@ export class SleekGrid<TItem = any> implements ISleekGrid<TItem> {
         this.render();
     }
 
+    /**
+     * Updates add-new-row paging state from a paging descriptor.
+     * @param pagingInfo - Page size/num/totalPages.
+     */
     updatePagingStatusFromView(pagingInfo: { pageSize: number, pageNum: number, totalPages: number }): void {
         this._pagingActive = (pagingInfo.pageSize !== 0);
         this._pagingIsLastPage = (pagingInfo.pageNum == pagingInfo.totalPages - 1);
     }
 
+    /**
+     * Returns the horizontal scroll container (main body viewport).
+     */
     public getScrollContainerX(): HTMLElement {
         return this._refs.main.canvas.body.parentElement;
     }
 
+    /**
+     * Returns the vertical scroll container (main body viewport).
+     */
     public getScrollContainerY(): HTMLElement {
         return this._refs.main.canvas.body.parentElement;
     }
 
+    /**
+     * Recomputes virtual/real scroll heights, page offsets and active cell state
+     * after row count or scrollbar visibility changes.
+     */
     updateRowCount(): void {
         if (!this._initialized) {
             return;
@@ -2166,10 +2507,20 @@ export class SleekGrid<TItem = any> implements ISleekGrid<TItem> {
         setStyleProp(style, '--sg-virtual-height', this._viewportInfo.realScrollHeight + "px");
     }
 
+    /**
+     * Returns the current visible viewport range.
+     * @param viewportTop - Optional scroll top override.
+     * @param viewportLeft - Optional scroll left override.
+     */
     getViewport(viewportTop?: number, viewportLeft?: number): ViewRange {
         return this.getVisibleRange(viewportTop, viewportLeft);
     }
 
+    /**
+     * Returns the visible (clipped to viewport) range.
+     * @param viewportTop - Optional scroll top override.
+     * @param viewportLeft - Optional scroll left override.
+     */
     getVisibleRange(viewportTop?: number, viewportLeft?: number): ViewRange {
         if (viewportTop == null) {
             viewportTop = this._scrollTop;
@@ -2188,6 +2539,11 @@ export class SleekGrid<TItem = any> implements ISleekGrid<TItem> {
         };
     }
 
+    /**
+     * Returns the rendered range including buffers (expanded beyond the viewport).
+     * @param viewportTop - Optional scroll top override.
+     * @param viewportLeft - Optional scroll left override.
+     */
     getRenderedRange(viewportTop?: number, viewportLeft?: number): ViewRange {
         var range = this.getVisibleRange(viewportTop, viewportLeft);
         if (this._options.renderAllRows) {
@@ -2571,6 +2927,10 @@ export class SleekGrid<TItem = any> implements ISleekGrid<TItem> {
         }
     }
 
+    /**
+     * Synchronously renders rows/cells for the current viewport, with throttling.
+     * Coalesces calls via a pending `_hRender` timeout when scrolling fast.
+     */
     public render(): void {
         if (!this._initialized) { return; }
         if (this._hRender) {
@@ -2850,6 +3210,11 @@ export class SleekGrid<TItem = any> implements ISleekGrid<TItem> {
         }
     }
 
+    /**
+     * Adds a per-cell CSS hash under `key` and applies it to rendered rows.
+     * @param key - Namespace key.
+     * @param hash - Hash of `row -> columnId -> cssClass`.
+     */
     addCellCssStyles(key: string, hash: CellStylesHash): void {
         if (this._cellCssClasses[key]) {
             throw "addCellCssStyles: cell CSS hash with key '" + key + "' already exists.";
@@ -2861,6 +3226,10 @@ export class SleekGrid<TItem = any> implements ISleekGrid<TItem> {
         this._trigger(this.onCellCssStylesChanged, { key: key, hash: hash });
     }
 
+    /**
+     * Removes styles previously added via {@link SleekGrid.addCellCssStyles}.
+     * @param key - Namespace key.
+     */
     removeCellCssStyles(key: string): void {
         if (!this._cellCssClasses[key]) {
             return;
@@ -2872,6 +3241,11 @@ export class SleekGrid<TItem = any> implements ISleekGrid<TItem> {
         this._trigger(this.onCellCssStylesChanged, { key: key, hash: null });
     }
 
+    /**
+     * Replaces styles for `key` and notifies `onCellCssStylesChanged`.
+     * @param key - Namespace key.
+     * @param hash - New hash.
+     */
     setCellCssStyles(key: string, hash: CellStylesHash): void {
         var prevHash = this._cellCssClasses[key];
 
@@ -2881,10 +3255,20 @@ export class SleekGrid<TItem = any> implements ISleekGrid<TItem> {
         this._trigger(this.onCellCssStylesChanged, { key: key, hash: hash });
     }
 
+    /**
+     * Returns the hash for `key` as stored by `setCellCssStyles`/`addCellCssStyles`.
+     * @param key - Namespace key.
+     */
     getCellCssStyles(key: string): CellStylesHash {
         return this._cellCssClasses[key];
     }
 
+    /**
+     * Briefly toggles the `cellFlashingCssClass` on `row`/`cell` for animation.
+     * @param row - View row index.
+     * @param cell - Cell/column index.
+     * @param speed - Millisecond interval between toggles.
+     */
     flashCell(row: number, cell: number, speed?: number): void {
         speed = speed || 100;
         var klass = this._options.cellFlashingCssClass;
@@ -3162,6 +3546,11 @@ export class SleekGrid<TItem = any> implements ISleekGrid<TItem> {
         return !(row < 0 || row >= this.getDataLength() || cell < 0 || cell >= this._cols.length);
     }
 
+    /**
+     * Resolves a `row`/`cell` for the given content-space point.
+     * @param x - Horizontal pixel offset from the canvas origin.
+     * @param y - Vertical pixel offset.
+     */
     getCellFromPoint(x: number, y: number): { row: number; cell: number; } {
         var row = this.getRowFromPosition(y);
         var cell = 0;
@@ -3179,6 +3568,10 @@ export class SleekGrid<TItem = any> implements ISleekGrid<TItem> {
         return { row: row, cell: cell - 1 };
     }
 
+    /**
+     * Reads the column index from a cell's `data-c` or legacy `.l#` class.
+     * @param cellNode - Cell element.
+     */
     getCellFromNode(cellNode: Element): number {
         if (cellNode == null)
             return null;
@@ -3195,6 +3588,10 @@ export class SleekGrid<TItem = any> implements ISleekGrid<TItem> {
         return parseInt(cls[1], 10);
     }
 
+    /**
+     * Resolves the column definition from a cell's node.
+     * @param cellNode - Cell element.
+     */
     getColumnFromNode(cellNode: Element): Column<TItem> {
         if (cellNode == null)
             return null;
@@ -3206,6 +3603,10 @@ export class SleekGrid<TItem = any> implements ISleekGrid<TItem> {
         return this._cols[cell];
     }
 
+    /**
+     * Resolves the view row index from a row node (`data-row` or cache).
+     * @param rowNode - Row element.
+     */
     getRowFromNode(rowNode: Element): number {
         if (rowNode != null) {
             const srow = (rowNode as HTMLElement).dataset?.row;
@@ -3220,6 +3621,10 @@ export class SleekGrid<TItem = any> implements ISleekGrid<TItem> {
         return null;
     }
 
+    /**
+     * Resolves `row`/`cell` for an event targeting a cell.
+     * @param e - DOM event whose `target` lies inside the desired cell.
+     */
     getCellFromEvent(e: any): { row: number; cell: number; } {
         var row, cell;
         var cellEl = (e.target as HTMLElement).closest(".slick-cell") as HTMLElement;
@@ -3240,6 +3645,11 @@ export class SleekGrid<TItem = any> implements ISleekGrid<TItem> {
         }
     }
 
+    /**
+     * Returns the pixel bounds of a cell's box in canvas coordinates.
+     * @param row - Row index.
+     * @param cell - Cell index.
+     */
     getCellNodeBox(row: number, cell: number): { top: number; right: number; bottom: number; left: number; } {
         if (!this.cellExists(row, cell)) {
             return null;
@@ -3273,10 +3683,16 @@ export class SleekGrid<TItem = any> implements ISleekGrid<TItem> {
     //////////////////////////////////////////////////////////////////////////////////////////////
     // Cell switching
 
+    /**
+     * Clears the currently active cell (without scrolling).
+     */
     resetActiveCell(): void {
         this.setActiveCellInternal(null, false);
     }
 
+    /**
+     * Focuses the active focus sink so subsequent keystrokes reach the grid.
+     */
     focus(): void {
         this.setFocus();
     }
@@ -3289,6 +3705,12 @@ export class SleekGrid<TItem = any> implements ISleekGrid<TItem> {
         }
     }
 
+    /**
+     * Ensures `row`/`cell` is visible, paging when needed.
+     * @param row - Target view row.
+     * @param cell - Target cell.
+     * @param doPaging - When `true`, pages before scrolling.
+     */
     scrollCellIntoView(row: number, cell: number, doPaging?: boolean): void {
         this.scrollRowIntoView(row, doPaging);
         const { pinnedStartLast, pinnedEndFirst } = this._refs;
@@ -3300,6 +3722,10 @@ export class SleekGrid<TItem = any> implements ISleekGrid<TItem> {
         this.internalScrollColumnIntoView(this._colLeft[cell], this._colRight[cell + (colspan > 1 ? colspan - 1 : 0)]);
     }
 
+    /**
+     * Horizontally scrolls `cell` into view.
+     * @param cell - Target visible cell index.
+     */
     scrollColumnIntoView(cell: number): void {
         this.internalScrollColumnIntoView(this._colLeft[cell], this._colRight[cell]);
     }
@@ -3374,6 +3800,9 @@ export class SleekGrid<TItem = any> implements ISleekGrid<TItem> {
         }
     }
 
+    /**
+     * Clears any active text selection, handling IE `selection` when present.
+     */
     clearTextSelection(): void {
         if ((document as any).selection && (document as any).selection.empty) {
             try {
@@ -3431,6 +3860,10 @@ export class SleekGrid<TItem = any> implements ISleekGrid<TItem> {
         this.getEditorLock().deactivate(this._editController);
     }
 
+    /**
+     * Forces the active cell into edit mode (or keeps it active) using `editor` when provided.
+     * @param editor - Optional editor class override.
+     */
     editActiveCell(editor?: EditorClass): void {
         this.makeActiveCellEditable(editor);
     }
@@ -3524,6 +3957,9 @@ export class SleekGrid<TItem = any> implements ISleekGrid<TItem> {
         return absBox(this._activeCellNode);
     }
 
+    /**
+     * Returns the absolute box of the grid container (for editor positioning).
+     */
     getGridPosition(): Position {
         return absBox(this._container);
     }
@@ -3551,10 +3987,16 @@ export class SleekGrid<TItem = any> implements ISleekGrid<TItem> {
         }
     }
 
+    /**
+     * Returns the currently active editor, if any.
+     */
     getCellEditor(): Editor {
         return this._currentEditor;
     }
 
+    /**
+     * Returns the active `row`/`cell`, or `null` when none is active.
+     */
     getActiveCell(): RowCell {
         if (!this._activeCellNode) {
             return null;
@@ -3563,16 +4005,27 @@ export class SleekGrid<TItem = any> implements ISleekGrid<TItem> {
         }
     }
 
+    /**
+     * Returns the DOM node for the active cell, or `null`.
+     */
     getActiveCellNode(): HTMLElement {
         return this._activeCellNode;
     }
 
+    /**
+     * Scrolls the active cell into view if one exists.
+     */
     scrollActiveCellIntoView(): void {
         if (this._activeRow != null && this._activeCell != null) {
             this.scrollCellIntoView(this._activeRow, this._activeCell);
         }
     }
 
+    /**
+     * Vertically scrolls `row` into view (pads for frozen rows).
+     * @param row - View row index.
+     * @param doPaging - When `true`, page-bumps instead of minimal scroll.
+     */
     scrollRowIntoView(row: number, doPaging?: boolean): void {
 
         const { frozenTopLast } = this._refs;
@@ -3601,6 +4054,10 @@ export class SleekGrid<TItem = any> implements ISleekGrid<TItem> {
         }
     }
 
+    /**
+     * Scrolls so that `row` is at the top of the viewport.
+     * @param row - Target row.
+     */
     scrollRowToTop(row: number): void {
         this.scrollTo(row * this._options.rowHeight);
         this.render();
@@ -3639,22 +4096,39 @@ export class SleekGrid<TItem = any> implements ISleekGrid<TItem> {
         }
     }
 
+    /**
+     * Scrolls by one page downward (or paging gap) and updates active cell if navigable.
+     */
     navigatePageDown(): void {
         this.scrollPage(1);
     }
 
+    /**
+     * Scrolls by one page upward and updates active cell if navigable.
+     */
     navigatePageUp(): void {
         this.scrollPage(-1);
     }
 
+    /**
+     * Navigates to the first data row.
+     */
     navigateTop(): void {
         this.navigateToRow(0);
     }
 
+    /**
+     * Navigates to the last data row.
+     */
     navigateBottom(): void {
         this.navigateToRow(this.getDataLength() - 1);
     }
 
+    /**
+     * Navigates to a specific row, preserving current column when possible.
+     * @param row - Target row index.
+     * @returns `true` (always reported as handled).
+     */
     navigateToRow(row: number): boolean {
         var dataLength = this.getDataLength();
         if (!dataLength) {
@@ -3688,6 +4162,11 @@ export class SleekGrid<TItem = any> implements ISleekGrid<TItem> {
         return true;
     }
 
+    /**
+     * Returns column span for `row`/`cell` via row metadata (`colspan`), or `1`.
+     * @param row - View row index.
+     * @param cell - Cell index.
+     */
     getColspan(row: number, cell: number): number {
         var itemMetadata = (this._data as IDataView).getItemMetadata?.(row) as ItemMetadata;
         if (!itemMetadata || !itemMetadata.columns) {
@@ -3706,34 +4185,58 @@ export class SleekGrid<TItem = any> implements ISleekGrid<TItem> {
         return colspan;
     }
 
+    /**
+     * Navigates one cell to the right.
+     */
     navigateRight(): boolean {
         return this.navigate("right");
     }
 
+    /**
+     * Navigates one cell to the left.
+     */
     navigateLeft(): boolean {
         return this.navigate("left");
     }
 
+    /**
+     * Navigates one row downward.
+     */
     navigateDown(): boolean {
         return this.navigate("down");
     }
 
+    /**
+     * Navigates one row upward.
+     */
     navigateUp(): boolean {
         return this.navigate("up");
     }
 
+    /**
+     * Navigates to the next tabbable cell (including next row wrap).
+     */
     navigateNext(): boolean {
         return this.navigate("next");
     }
 
+    /**
+     * Navigates to the previous tabbable cell (including wrap to prior row).
+     */
     navigatePrev(): boolean {
         return this.navigate("prev");
     }
 
+    /**
+     * Navigates to the first focusable cell in the active row.
+     */
     navigateRowStart(): boolean {
         return this.navigate("home");
     }
 
+    /**
+     * Navigates to the last focusable cell in the active row.
+     */
     navigateRowEnd(): boolean {
         return this.navigate("end");
     }
@@ -3750,6 +4253,10 @@ export class SleekGrid<TItem = any> implements ISleekGrid<TItem> {
         this._tabbingDirection = dir;
     }
 
+    /**
+     * Generic navigation dispatcher used by the key handler.
+     * @param dir - Direction (`"up"`, `"down"`, `"left"`, `"right"`, `"next"`, `"prev"`, `"home"`, `"end"`).
+     */
     navigate(dir: string): boolean {
         if (!this._options.enableCellNavigation) {
             return false;
@@ -3799,6 +4306,11 @@ export class SleekGrid<TItem = any> implements ISleekGrid<TItem> {
         }
     }
 
+    /**
+     * Returns the cell DOM node for `row`/`cell` if rendered (`rowsCache` hit).
+     * @param row - View row index.
+     * @param cell - Cell index.
+     */
     getCellNode(row: number, cell: number): HTMLElement {
         if (this._rowsCache[row]) {
             this.ensureCellNodesInRowsCache(row);
@@ -3807,6 +4319,11 @@ export class SleekGrid<TItem = any> implements ISleekGrid<TItem> {
         return null;
     }
 
+    /**
+     * Activates the cell at `row`/`cell` (no-op if un-navigable or out of bounds).
+     * @param row - Target row.
+     * @param cell - Target cell.
+     */
     setActiveCell(row: number, cell: number): void {
         if (!this._initialized) { return; }
         var cols = this._cols;
@@ -3822,6 +4339,12 @@ export class SleekGrid<TItem = any> implements ISleekGrid<TItem> {
         this.setActiveCellInternal(this.getCellNode(row, cell), false);
     }
 
+    /**
+     * Marks a row as active (for row-selection integration) without necessarily changing the active cell DOM.
+     * @param row - Row to activate.
+     * @param cell - Preferred cell to anchor on.
+     * @param suppressScrollIntoView - When `true`, does not scroll the row/cell into view.
+     */
     setActiveRow(row: number, cell: number, suppressScrollIntoView?: boolean): void {
         if (!this._initialized)
             return;
@@ -3834,6 +4357,13 @@ export class SleekGrid<TItem = any> implements ISleekGrid<TItem> {
             this.scrollCellIntoView(row, cell || 0, false);
     }
 
+    /**
+     * Checks whether `row`/`cell` may become the active (focusable) cell.
+     * Consults row/column metadata and `focusable` flags.
+     * @param row - Row index.
+     * @param cell - Cell index.
+     * @param tab - When `true`, additionally checks `tabbable`.
+     */
     canCellBeActive(row: number, cell: number, tab?: boolean): boolean {
         var cols = this._cols;
         if (!this._options.enableCellNavigation || row >= this.getDataLengthIncludingAddNew() ||
@@ -3881,6 +4411,11 @@ export class SleekGrid<TItem = any> implements ISleekGrid<TItem> {
         return true;
     }
 
+    /**
+     * Checks whether `row`/`cell` is selectable (from row/column metadata `selectable`).
+     * @param row - Row index.
+     * @param cell - Cell index.
+     */
     canCellBeSelected(row: number, cell: number): boolean {
         var cols = this._cols;
         if (row >= this.getDataLength() || row < 0 || cell >= cols.length || cell < 0) {
@@ -3900,6 +4435,12 @@ export class SleekGrid<TItem = any> implements ISleekGrid<TItem> {
         return cols[cell].selectable;
     }
 
+    /**
+     * Navigates to `row`/`cell`, optionally forcing edit mode.
+     * @param row - Target row.
+     * @param cell - Target cell.
+     * @param forceEdit - When `true`, forces editor activation.
+     */
     gotoCell(row: number, cell: number, forceEdit?: boolean): void {
         if (!this._initialized) { return; }
         if (!this.canCellBeActive(row, cell)) {
@@ -3926,6 +4467,12 @@ export class SleekGrid<TItem = any> implements ISleekGrid<TItem> {
     //////////////////////////////////////////////////////////////////////////////////////////////
     // IEditor implementation for the editor lock
 
+    /**
+     * Commits the active editor value (if any), running validation and either
+     * executing an {@link EditCommand} via `editCommandHandler` or directly.
+     * @param opt.forceValueChange - When `true`, treats unchanged values as changed.
+     * @returns `true` when the commit succeeds (or no edit was active).
+     */
     commitCurrentEdit(opt?: { forceValueChange?: boolean }): boolean {
         var item = this.getDataItem(this._activeRow);
         var column = this._cols[this._activeCell];
@@ -4005,6 +4552,10 @@ export class SleekGrid<TItem = any> implements ISleekGrid<TItem> {
         return true;
     }
 
+    /**
+     * Cancels the active editor (if any) by delegating to `makeActiveCellNormal()`.
+     * @returns Always `true`.
+     */
     cancelCurrentEdit() {
         this.makeActiveCellNormal();
         return true;
@@ -4019,6 +4570,10 @@ export class SleekGrid<TItem = any> implements ISleekGrid<TItem> {
         return ranges;
     }
 
+    /**
+     * Returns selected view rows (delegates to the attached selection model).
+     * @throws When no selection model is attached.
+     */
     getSelectedRows(): number[] {
         if (!this._selectionModel) {
             throw "Selection model is not set";
@@ -4026,6 +4581,11 @@ export class SleekGrid<TItem = any> implements ISleekGrid<TItem> {
         return this._selectedRows;
     }
 
+    /**
+     * Sets selection from view row indices via the attached selection model.
+     * @param rows - Row indices to select.
+     * @throws When no selection model is attached.
+     */
     setSelectedRows(rows: number[]): void {
         if (!this._selectionModel) {
             throw "Selection model is not set";

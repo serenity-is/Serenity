@@ -1,6 +1,10 @@
 import { bindThis } from "@serenity-is/domwise";
 import { Editor, EditorOptions, parsePx, Position, type ValidationResult } from "../core";
 
+/**
+ * Base class for inline cell editors. Manages the input element, default value
+ * tracking and the standard {@link Editor} contract.
+ */
 abstract class BaseCellEdit {
     declare protected _input: HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement;
     declare protected _defaultValue: any;
@@ -11,24 +15,39 @@ abstract class BaseCellEdit {
         this.init();
     }
 
+    /** Creates and attaches the editor DOM; called by the constructor. */
     abstract init(): void;
 
+    /** Removes the editor input from the DOM. */
     destroy(): void {
         this._input.remove();
     }
 
+    /** Focuses the editor's input element. */
     focus(): void {
         this._input.focus();
     }
 
+    /**
+     * Reads the current input value as a string.
+     * @returns Raw string value from the input.
+     */
     getValue(): string {
         return this._input.value;
     }
 
+    /**
+     * Writes a string value into the input.
+     * @param val - Value to set; `null`/`undefined` becomes empty string.
+     */
     setValue(val: string): void {
         this._input.value = val ?? '';
     }
 
+    /**
+     * Loads the item's field value into the editor and selects it.
+     * @param item - Row data item whose field is being edited.
+     */
     loadValue(item: any): void {
         this._defaultValue = item[this._args.column.field] ?? "";
         this._input.value = this._defaultValue;
@@ -38,18 +57,35 @@ abstract class BaseCellEdit {
         }
     }
 
+    /**
+     * Serializes the current input value for commit.
+     * @returns String content of the input.
+     */
     serializeValue(): any {
         return this._input.value;
     }
 
+    /**
+     * Writes the serialized value back to the data item's field.
+     * @param item - Row data item to mutate.
+     * @param state - Value returned by {@link BaseCellEdit.serializeValue}.
+     */
     applyValue(item: any, state: any): void {
         item[this._args.column.field] = state;
     }
 
+    /**
+     * Tests whether the editor content differs from the loaded default.
+     * @returns `true` if the value has changed.
+     */
     isValueChanged(): boolean {
         return (!(this._input.value === "" && this._defaultValue == null)) && (this._input.value != this._defaultValue);
     }
 
+    /**
+     * Validates the current value using the column's `validator`, if any.
+     * @returns Validation result; always valid when no validator is configured.
+     */
     validate(): ValidationResult {
         if (this._args.column.validator) {
             var validationResults = this._args.column.validator(this._input.value, this._args);
@@ -65,6 +101,10 @@ abstract class BaseCellEdit {
     }
 }
 
+/**
+ * Text editor backed by an `<input type="text">`. Honors `editorCellNavOnLRKeys`
+ * for arrow-key navigation between cells.
+ */
 export class TextCellEdit extends BaseCellEdit {
 
     declare _input: HTMLInputElement;
@@ -79,6 +119,10 @@ export class TextCellEdit extends BaseCellEdit {
     }
 }
 
+/**
+ * Integer editor extending {@link TextCellEdit}. Serializes to `number` and
+ * validates that the input is a valid integer.
+ */
 export class IntegerCellEdit extends TextCellEdit {
 
     serializeValue(): any {
@@ -97,11 +141,21 @@ export class IntegerCellEdit extends TextCellEdit {
     }
 }
 
+/**
+ * Float/decimal editor extending {@link TextCellEdit}. Supports fixed decimal
+ * places via `column.editorFixedDecimalPlaces` or {@link FloatCellEdit.DefaultDecimalPlaces}.
+ */
 export class FloatCellEdit extends TextCellEdit {
 
+    /** When `true`, empty input serializes to empty string rather than `0`. */
     static AllowEmptyValue = false;
+    /** Default number of fixed decimal places when the column does not specify `editorFixedDecimalPlaces`. `null` means no rounding. */
     static DefaultDecimalPlaces: number = null;
 
+    /**
+     * Resolves the number of fixed decimal places to use.
+     * @returns Number of places, or `null` when none is configured.
+     */
     getDecimalPlaces(): number {
         // returns the number of fixed decimal places or null
         var rtn = this._args.column.editorFixedDecimalPlaces;
@@ -157,6 +211,10 @@ export class FloatCellEdit extends TextCellEdit {
     }
 }
 
+/**
+ * Date editor extending {@link TextCellEdit} with a jQuery UI datepicker.
+ * Manages calendar open/close and repositions via {@link DateCellEdit.position}.
+ */
 export class DateCellEdit extends TextCellEdit {
     private _calendarOpen = false;
 
@@ -215,6 +273,9 @@ export class DateCellEdit extends TextCellEdit {
     }
 }
 
+/**
+ * Two-option select editor mapping `"yes"`/`"no"` to boolean `true`/`false`.
+ */
 export class YesNoSelectCellEdit extends BaseCellEdit {
 
     declare _input: HTMLSelectElement;
@@ -250,6 +311,10 @@ export class YesNoSelectCellEdit extends BaseCellEdit {
     }
 }
 
+/**
+ * Checkbox editor backed by `<input type="checkbox">`. Supports `preClick` to
+ * toggle on the click that activates the editor.
+ */
 export class CheckboxCellEdit extends BaseCellEdit {
 
     declare _input: HTMLInputElement;
@@ -290,6 +355,10 @@ export class CheckboxCellEdit extends BaseCellEdit {
     }
 }
 
+/**
+ * Percent-complete editor combining {@link IntegerCellEdit} with a vertical
+ * jQuery UI slider and preset buttons (0/50/100%).
+ */
 export class PercentCompleteCellEdit extends IntegerCellEdit {
     declare protected _picker: HTMLDivElement;
     declare protected _slider: HTMLDivElement;
@@ -357,6 +426,11 @@ export class PercentCompleteCellEdit extends IntegerCellEdit {
 * The UI is added onto document BODY and .position(), .show() and .hide() are implemented.
 * KeyDown events are also handled to provide handling for Tab, Shift-Tab, Esc and Ctrl-Enter.
 */
+/**
+ * Detached multi-line text editor using a floating `<textarea>` overlay.
+ * Renders attached to `document.body` (or inline for composite editors) and
+ * implements `show`/`hide`/`position` for the overlay lifecycle.
+ */
 export class LongTextCellEdit extends BaseCellEdit {
 
     declare _input: HTMLTextAreaElement;
@@ -389,6 +463,11 @@ export class LongTextCellEdit extends BaseCellEdit {
         this._input.select();
     }
 
+    /**
+     * Handles overlay-specific keys: Ctrl+Enter to save, Esc to cancel, Tab/Shift+Tab
+     * to navigate cells, and optionally Left/Right to navigate when at string bounds.
+     * @param e - Keyboard event from the textarea.
+     */
     handleKeyDown(e: KeyboardEvent): void {
         if (e.key === "Enter" && e.ctrlKey) {
             this.save();
@@ -415,23 +494,33 @@ export class LongTextCellEdit extends BaseCellEdit {
         }
     }
 
+    /** Commits the current textarea value via the grid. */
     save(): void {
         this._args.commitChanges();
     };
 
+    /**
+     * Cancels editing, restoring the default value and notifying the grid.
+     */
     cancel(): void {
         this._input.value = this._defaultValue;
         this._args.cancelChanges();
     }
 
+    /** Hides the detached overlay wrapper. */
     hide(): void {
         this._wrapper.hidden = true;
     }
 
+    /** Shows the detached overlay wrapper. */
     show(): void {
         this._wrapper.hidden = false;
     }
 
+    /**
+     * Positions the detached overlay relative to the cell bounds.
+     * @param position - Pixel bounds of the target cell.
+     */
     position(position: Position): void {
         this._wrapper.style.top = (position.top - 5) + 'px';
         this._wrapper.style.left = (position.left - 5) + 'px';

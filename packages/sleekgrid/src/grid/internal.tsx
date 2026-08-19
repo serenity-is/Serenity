@@ -1,5 +1,12 @@
 import { invokeDisposingListeners } from "@serenity-is/domwise";
 
+/**
+ * Tests shallow array equality after sorting both inputs.
+ * Used to compare selected-rows arrays ignoring order.
+ * @param arr1 - First array.
+ * @param arr2 - Second array.
+ * @returns `true` when arrays contain the same numbers.
+ */
 export function simpleArrayEquals(arr1: number[], arr2: number[]): boolean {
     if (!Array.isArray(arr1) || !Array.isArray(arr2) || arr1.length !== arr2.length)
         return false;
@@ -12,6 +19,9 @@ export function simpleArrayEquals(arr1: number[], arr2: number[]): boolean {
     return true;
 }
 
+/**
+ * Per-row DOM cache entry tracking row nodes and lazily populated cell nodes.
+ */
 export interface CachedRow {
     rowNodeS: HTMLElement,
     rowNodeC: HTMLElement,
@@ -32,12 +42,18 @@ export interface CachedRow {
     cellRenderContent: (Element | DocumentFragment)[];
 }
 
+/**
+ * Navigation result from {@link CellNavigator.navigate}.
+ */
 export interface GoToResult {
     row: number;
     cell: number;
     posX: number;
 }
 
+/**
+ * Deferred cleanup entry for async post-rendered rows or cells.
+ */
 export interface PostProcessCleanupEntry {
     groupId: number,
     cellNode?: HTMLElement,
@@ -48,6 +64,10 @@ export interface PostProcessCleanupEntry {
     rowIdx?: number;
 }
 
+/**
+ * Default DOM remover that invokes `domwise` disposing listeners before `remove()`.
+ * @param node - Element to remove.
+ */
 export const defaultRemoveNode = (node: HTMLElement): void => {
     if (!node)
         return;
@@ -55,6 +75,10 @@ export const defaultRemoveNode = (node: HTMLElement): void => {
     node.remove();
 }
 
+/**
+ * Default container emptier that disposes descendants and clears `innerHTML`.
+ * @param node - Element to empty.
+ */
 export const defaultEmptyNode = (node: HTMLElement): void => {
     if (!node)
         return;
@@ -62,6 +86,10 @@ export const defaultEmptyNode = (node: HTMLElement): void => {
     node.innerHTML = "";
 }
 
+/**
+ * jQuery-aware empty helper; falls back to {@link defaultEmptyNode} when jQuery is unavailable.
+ * @param node - Element to empty.
+ */
 export function defaultJQueryEmptyNode(this: { (node: HTMLElement): { empty: () => void }, fn: any }, node: HTMLElement): void {
     if (!node)
         return;
@@ -71,6 +99,10 @@ export function defaultJQueryEmptyNode(this: { (node: HTMLElement): { empty: () 
         this(node).empty();
 }
 
+/**
+ * jQuery-aware remover; falls back to {@link defaultRemoveNode} when jQuery is unavailable.
+ * @param node - Element to remove.
+ */
 export function defaultJQueryRemoveNode(this: { (node: HTMLElement): { remove: () => void }, fn: any }, node: HTMLElement): void {
     if (!node)
         return;

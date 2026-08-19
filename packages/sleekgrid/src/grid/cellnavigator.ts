@@ -1,19 +1,51 @@
 import { bindThis } from "@serenity-is/domwise";
 import { GoToResult } from "./internal";
 
+/**
+ * Host surface consumed by {@link CellNavigator} to query grid navigability.
+ */
 export interface CellNavigatorHost {
+    /** Returns total column count. */
     getColumnCount(): number;
+    /** Returns total row count including the add-new row when enabled. */
     getRowCount(): number;
+    /**
+     * Returns column span for the cell at the given row/cell.
+     * @param row - View row index.
+     * @param cell - Cell/column index.
+     * @returns Number of columns spanned (at least `1`).
+     */
     getColspan(row: number, cell: number): number;
+    /**
+     * Checks whether a cell may become active/focusable.
+     * @param row - Row index.
+     * @param cell - Cell/column index.
+     * @param tab - When `true`, checks for tab-navigation eligibility.
+     * @returns `true` if the cell is navigable.
+     */
     canCellBeActive(row: number, cell: number, tab?: boolean): boolean;
+    /**
+     * Sets the current tabbing direction (e.g. for focus-sink ordering).
+     * @param dir - `-1` for backward, `1` for forward.
+     */
     setTabbingDirection(dir: number): void;
+    /** Whether the grid is rendered right-to-left. */
     isRTL(): boolean;
 }
 
+/**
+ * Implements keyboard navigation between focusable cells, handling colspans,
+ * RTL mirroring and per-direction stepping helpers.
+ */
 export class CellNavigator {
 
+    /** Host provided at construction. */
     declare private host: CellNavigatorHost;
 
+    /**
+     * Creates a navigator bound to `h`.
+     * @param h - Host implementing {@link CellNavigatorHost}.
+     */
     constructor(h: CellNavigatorHost) {
         this.host = h;
     }
@@ -235,8 +267,12 @@ export class CellNavigator {
     }
 
     /**
-     * @param {string} dir Navigation direction.
-     * @return {boolean} Whether navigation resulted in a change of active cell.
+     * Navigates the active cell in the given direction.
+     * @param dir - Direction key (`"up"`, `"down"`, `"left"`, `"right"`, `"next"`, `"prev"`, `"home"`, `"end"`).
+     * @param activeRow - Current active row index.
+     * @param activeCell - Current active cell index.
+     * @param activePosX - Visual X position used for vertical moves (preserves column alignment).
+     * @returns Target navigation result with new row/cell/posX, or `null` when no movement is possible.
      */
     navigate(dir: string, activeRow: number, activeCell: number, activePosX: number): GoToResult {
         var tabbingDirections: Record<string, number> = {

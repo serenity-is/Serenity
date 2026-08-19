@@ -1,76 +1,61 @@
 import { NonDataRow } from "./base";
 import type { FormatterContext, FormatterResult } from "./formatting";
 
-/***
- * Information about a group of rows.
+/**
+ * Represents a group of rows produced by a `DataView` grouping.
+ * @template TEntity - Row item type being grouped.
  */
 export class Group<TEntity = any> extends NonDataRow {
+    /** Marker flag identifying this row as a group header. */
     readonly __group = true;
 
     /**
-     * Grouping level, starting with 0.
-     * @property level
-     * @type {Number}
+     * Grouping level, starting with `0` for top-level groups.
      */
     level: number = 0;
 
-    /***
-     * Number of rows in the group.
-     * @property count
-     * @type {Number}
+    /**
+     * Number of leaf rows in the group (excluding group headers/totals).
      */
     count: number = 0;
 
-    /***
-     * Grouping value.
-     * @property value
-     * @type {Object}
+    /**
+     * Grouping value that all rows in this group share (e.g. the field value).
      */
     value: any;
 
-    /***
-     * Whether a group is collapsed.
-     * @property collapsed
-     * @type {Boolean}
+    /**
+     * Whether the group is currently collapsed (children hidden).
      */
     collapsed: boolean = false;
 
-    /***
-     * GroupTotals, if any.
-     * @property totals
-     * @type {GroupTotals}
+    /**
+     * Associated totals row for the group, if aggregation is enabled.
      */
     totals: GroupTotals<TEntity>;
 
     /**
-     * Rows that are part of the group.
-     * @property rows
-     * @type {Array}
+     * Leaf rows that are part of the group.
      */
     rows: TEntity[] = [];
 
     /**
-     * Sub-groups that are part of the group.
-     * @property groups
-     * @type {Array}
+     * Child groups when multiple grouping levels are active.
      */
     groups: Group<TEntity>[];
 
     /**
-     * A unique key used to identify the group.  This key can be used in calls to DataView
-     * collapseGroup() or expandGroup().
-     * @property groupingKey
-     * @type {Object}
+     * Unique key used to identify the group; pass to `DataView.collapseGroup()` / `expandGroup()`.
      */
     groupingKey: string;
 
-    /** Returns a text representation of the group value. */
+    /** Formatter that renders the group value as text. */
     formatValue: (ctx: FormatterContext<Group<TEntity>>) => FormatterResult;
 
-    /***
-     * Compares two Group instances.
-     * @return {Boolean}
-     * @param group {Group} Group instance to compare to.
+    /**
+     * Compares two groups by `value`, `count` and `collapsed` state.
+     * @param group - Group instance to compare to.
+     * @returns `true` if the groups are equal by the above fields.
      */
     equals(group: Group): boolean {
         return this.value === group.value &&
@@ -79,61 +64,68 @@ export class Group<TEntity = any> extends NonDataRow {
     }
 }
 
+/**
+ * Minimal totals information attached to a {@link Group}. Aggregators populate
+ * `sum`/`avg`/`min`/`max` and arbitrary data on this object.
+ * @template TEntity - Row item type.
+ */
 export interface IGroupTotals<TEntity = any> {
+    /** Whether the row is a non-data row (inherited from {@link NonDataRow}). */
     __nonDataRow?: boolean;
+    /** Marker identifying the row as a group-totals row. */
     __groupTotals?: boolean;
+    /** Parent group this totals row belongs to. */
     group?: Group<TEntity>;
+    /** Whether totals have been fully calculated; `false` for lazy totals. */
     initialized?: boolean;
+    /** Per-field sum values. */
     sum?: Record<string, any>;
+    /** Per-field average values. */
     avg?: Record<string, any>;
+    /** Per-field minimum values. */
     min?: Record<string, any>;
+    /** Per-field maximum values. */
     max?: Record<string, any>;
 }
 
-/***
- * Information about group totals.
- * An instance of GroupTotals will be created for each totals row and passed to the aggregators
- * so that they can store arbitrary data in it.  That data can later be accessed by group totals
- * formatters during the display.
- * @class GroupTotals
- * @extends NonDataRow
+/**
+ * Totales row for a {@link Group}. Created for each group and passed to aggregators
+ * so they can store computed data that is later accessed by group-totals formatters.
+ * @template TEntity - Row item type.
  */
 export class GroupTotals<TEntity = any> extends NonDataRow implements IGroupTotals<TEntity> {
 
+    /** Marker identifying this row as a group-totals row. */
     readonly __groupTotals = true;
 
-    /***
-     * Parent Group.
-     * @param group
-     * @type {Group}
+    /**
+     * Parent group this totals row belongs to.
      */
     group: Group<TEntity>;
 
-    /***
-     * Whether the totals have been fully initialized / calculated.
-     * Will be set to false for lazy-calculated group totals.
-     * @param initialized
-     * @type {Boolean}
+    /**
+     * Whether the totals have been fully initialized/calculated.
+     * Set to `false` for lazy-calculated totals.
      */
     initialized: boolean = false;
 
     /**
-     * Contains sum
+     * Per-field sum values computed by aggregators.
      */
     sum?: Record<string, any>;
 
     /**
-     * Contains avg
+     * Per-field average values computed by aggregators.
      */
     avg?: Record<string, any>;
 
     /**
-     * Contains min
+     * Per-field minimum values computed by aggregators.
      */
     min?: Record<string, any>;
 
     /**
-     * Contains max
+     * Per-field maximum values computed by aggregators.
      */
     max?: Record<string, any>;
 }

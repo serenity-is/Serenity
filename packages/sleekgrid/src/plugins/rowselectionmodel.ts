@@ -1,6 +1,10 @@
 import { CellRange, EventEmitter, EventSubscriber, EventData, type ArgsCell, type ISleekGrid, type GridPlugin, type SelectionModel, type CellEvent } from "../core";
 
+/**
+ * Options for {@link RowSelectionModel}.
+ */
 export interface RowSelectionModelOptions {
+    /** When `true`, moving the active cell also selects the new row. Defaults to `true`. */
     selectActiveRow?: boolean;
 }
 
@@ -28,21 +32,39 @@ function rangesToRows(ranges: CellRange[]) {
     return rows;
 }
 
+/**
+ * Selection model that treats selection as whole rows (full-width ranges).
+ * Supports ActiveCell-driven selection, Shift+Up/Down range extension and
+ * Ctrl/Meta/Shift-click row toggling. Implements {@link SelectionModel}.
+ */
 export class RowSelectionModel implements GridPlugin, SelectionModel {
+    /** Host grid set during {@link RowSelectionModel.init}. */
     declare private grid: ISleekGrid;
     private handler = new EventSubscriber();
+    /** Resolved options merged with {@link RowSelectionModel.defaults}. */
     declare private options: RowSelectionModelOptions;
+    /** Internal full-width ranges representing selected rows. */
     declare private ranges: CellRange[];
+    /** Emits when selected ranges change; used by the grid to update UI state. */
     onSelectedRangesChanged: EventEmitter<CellRange[]> = new EventEmitter<CellRange[]>();
 
+    /**
+     * Creates the selection model.
+     * @param options - Partial options merged with {@link RowSelectionModel.defaults}.
+     */
     constructor(options?: RowSelectionModelOptions) {
         this.options = Object.assign({}, RowSelectionModel.defaults, options);
     }
 
+    /** Default option values. */
     public static readonly defaults: RowSelectionModelOptions = {
         selectActiveRow: true
     }
 
+    /**
+     * Attaches to `onActiveCellChanged`, `onKeyDown` and `onClick` on `grid`.
+     * @param grid - Host grid instance.
+     */
     init(grid: ISleekGrid): void {
         this.grid = grid;
         this.handler.subscribe(grid.onActiveCellChanged, this.wrapHandler(this.handleActiveCellChange));
@@ -50,6 +72,9 @@ export class RowSelectionModel implements GridPlugin, SelectionModel {
         this.handler.subscribe(grid.onClick, this.wrapHandler(this.handleClick));
     }
 
+    /**
+     * Unsubscribes handlers installed by {@link RowSelectionModel.init}.
+     */
     destroy(): void {
         this.handler?.unsubscribeAll();
     }
@@ -74,14 +99,26 @@ export class RowSelectionModel implements GridPlugin, SelectionModel {
     }
 
 
+    /**
+     * Returns selected view row indices derived from the internal ranges.
+     * @returns Array of selected row indices.
+     */
     getSelectedRows(): number[] {
         return rangesToRows(this.ranges);
     }
 
+    /**
+     * Sets selection from a list of row indices.
+     * @param rows - Row indices to select.
+     */
     setSelectedRows(rows: number[]): void {
         this.setSelectedRanges(this.rowsToRanges(rows));
     }
 
+    /**
+     * Sets selection from explicit ranges (each range should span the full row width).
+     * @param ranges - Cell ranges representing row selection.
+     */
     setSelectedRanges(ranges: CellRange[]): void {
         // simle check for: empty selection didn't change, prevent firing onSelectedRangesChanged
         if ((!this.ranges || this.ranges.length === 0) && (!ranges || ranges.length === 0))
@@ -90,6 +127,10 @@ export class RowSelectionModel implements GridPlugin, SelectionModel {
         this.onSelectedRangesChanged.notify(this.ranges);
     }
 
+    /**
+     * Returns the current selection as full-width {@link CellRange} objects.
+     * @returns Current selected ranges.
+     */
     getSelectedRanges(): CellRange[] {
         return this.ranges;
     }

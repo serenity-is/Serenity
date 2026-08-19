@@ -7,6 +7,12 @@ import { mapBands, type GridLayoutRefs } from "../layouts/layout-refs";
 let maxSupportedCssHeight: number;  // browser's breaking point
 let scrollbarDimensions: { width: number, height: number };
 
+/**
+ * Computes the absolute bounding box of `elem` with aggregated offsets and
+ * visibility, walking up through offset parents.
+ * @param elem - Element to measure.
+ * @returns Absolute box with `top`/`left`/`right`/`bottom`/`width`/`height`/`visible`.
+ */
 export function absBox(elem: HTMLElement): Position {
     var box: Position = {
         top: elem.offsetTop,
@@ -48,6 +54,11 @@ export function absBox(elem: HTMLElement): Position {
     return box;
 }
 
+/**
+ * Returns the content width of `el` (outside of `border-box` padding/borders).
+ * @param el - Element to measure.
+ * @returns Inner width in pixels, clamped to `>= 0`.
+ */
 export function getInnerWidth(el: HTMLElement): number {
     if (!el)
         return 0;
@@ -63,12 +74,23 @@ export function getInnerWidth(el: HTMLElement): number {
     return Math.max(width, 0);
 }
 
+/**
+ * Returns the browser's maximum supported CSS height before virtual paging is required.
+ * @param recalc - When `true`, forces re-computation.
+ * @returns Maximum supported pixel height.
+ */
 export function getMaxSupportedCssHeight(recalc?: boolean): number {
     if (!recalc && maxSupportedCssHeight != null)
         return maxSupportedCssHeight;
     return (maxSupportedCssHeight = ((navigator.userAgent.toLowerCase().match(/gecko\//) ? 4000000 : 32000000)));
 }
 
+/**
+ * Measures scrollbar thickness by inserting a scrolled test node.
+ * Results are cached until `recalc` is set.
+ * @param recalc - When `true`, forces re-measurement.
+ * @returns Object with `width` and `height` scrollbar dimensions in pixels.
+ */
 export function getScrollBarDimensions(recalc?: boolean): { width: number; height: number; } {
     if (!scrollbarDimensions || recalc) {
         const c = document.body.appendChild(<div style={{ position: "absolute", top: "-10000px", left: "-10000px", width: "100px", height: "100px", overflow: "scroll", border: "0" }} /> as HTMLElement);
@@ -81,6 +103,12 @@ export function getScrollBarDimensions(recalc?: boolean): { width: number; heigh
     return scrollbarDimensions;
 }
 
+/**
+ * Sets a CSS property only when the new value differs (avoids style recalc churn).
+ * @param styles - Target `CSSStyleDeclaration`.
+ * @param prop - CSS custom property name.
+ * @param value - Value to set.
+ */
 export function setStyleProp(this: void, styles: CSSStyleDeclaration, prop: string, value: string): void {
     if (styles.getPropertyValue(prop) !== value)
         styles.setProperty(prop, value);
@@ -92,6 +120,17 @@ function isStartOfMainOrEnd(colIndex: number, refs: GridLayoutRefs): boolean {
         (refs.pinnedEndFirst === colIndex);
 }
 
+/**
+ * Creates dynamic grid styles (row/cell heights, column slot rules or CSS vars)
+ * and optionally honors CSP `nonce`. Falls back to CSS variables when `useCssVars` is enabled.
+ * @param args.cellHeightDiff - Difference between row and cell heights (borders/padding).
+ * @param args.colCount - Number of columns to reserve slot rules for.
+ * @param args.container - Grid container to toggle `sleek-vars` onto.
+ * @param args.opt - Grid options relevant to styling (`rowHeight`, `useCssVars`, `styleNonce`).
+ * @param args.scrollDims - Measured scrollbar dimensions.
+ * @param args.uid - Grid UID used as the CSS namespace.
+ * @returns Object with the created `styleNode` (or `undefined` when CSS vars are used).
+ */
 export function createCssRules(this: void, { opt, cellHeightDiff, colCount, container, scrollDims, uid }: {
     cellHeightDiff: number,
     colCount: number,
@@ -149,6 +188,13 @@ export function createCssRules(this: void, { opt, cellHeightDiff, colCount, cont
     }
 }
 
+/**
+ * Finds the stylesheet created by {@link createCssRules} for `uid` and indexes
+ * the column slot rules.
+ * @param uid - Grid UID namespace.
+ * @param styleNode - Style element created for the grid.
+ * @returns Object with `stylesheet`, `colCssRulesL`/`colCssRulesR` maps and the root `varRule`.
+ */
 export function findStylesheetByUID(this: void, uid: string, styleNode: HTMLElement): {
     stylesheet: CSSStyleSheet,
     colCssRulesL: Record<number, CSSStyleRule>,
@@ -199,6 +245,16 @@ export function findStylesheetByUID(this: void, uid: string, styleNode: HTMLElem
     }
 }
 
+/**
+ * Applies pixel offsets/widths for each column via either stylesheet rules or
+ * CSS custom properties (depending on the rendering mode).
+ * @param args.cols - Ordered columns with resolved `.width`.
+ * @param args.container - Grid container (used to set CSS vars in var-mode).
+ * @param args.cssColRulesL - Left-anchor stylesheet rules per column (when not using vars).
+ * @param args.cssColRulesR - Right-anchor rules per column.
+ * @param args.opts - Options carrying `rtl`.
+ * @param args.refs - Layout refs for per-band width calculations.
+ */
 export function applyColumnWidths(this: void, { cols, cssColRulesL, cssColRulesR, opts, container, refs }: {
     cols: Column[],
     container: HTMLElement,
@@ -234,6 +290,13 @@ export function applyColumnWidths(this: void, { cols, cssColRulesL, cssColRulesR
     }
 }
 
+/**
+ * Applies optional fixed heights for top panel, grouping panel, header row and
+ * footer row when those heights are provided via options.
+ * @param args.groupingPanel - Optional grouping panel element.
+ * @param args.opt - Optional heights from `GridOptions`.
+ * @param args.refs - Layout refs owning the header/footer row containers.
+ */
 export function applyLegacyHeightOptions(this: void, { groupingPanel, opt, refs }: {
     groupingPanel: HTMLElement,
     opt: { topPanelHeight?: number, groupingPanelHeight?: number, headerRowHeight?: number, footerRowHeight?: number },

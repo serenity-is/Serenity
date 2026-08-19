@@ -1,48 +1,92 @@
 import { computed, signal } from "@serenity-is/domwise";
 import type { GridSignals } from "../core/grid-signals";
 
+/** Logical horizontal band key. `start`/`end` are pinned side bands. */
 export type BandKey = "start" | "main" | "end";
+/** Logical vertical pane key within each band. */
 export type PaneKey = "top" | "body" | "bottom";
 
+/**
+ * DOM and layout state for a single horizontal band (`start`/`main`/`end`).
+ */
 export interface GridBandRefs {
+    /** Band identifier. */
     key: BandKey;
+    /** Header column container for this band, if rendered. */
     headerCols?: HTMLElement;
+    /** Header-row (filter row) column container, if rendered. */
     headerRowCols?: HTMLElement;
+    /** Canvas elements per vertical pane. */
     canvas: {
+        /** Top-frozen pane canvas, if enabled. */
         top?: HTMLElement;
+        /** Main body viewport canvas. */
         body: HTMLElement;
+        /** Bottom-frozen pane canvas, if enabled. */
         bottom?: HTMLElement;
     },
+    /** Footer row column container, if rendered. */
     footerRowCols?: HTMLElement;
+    /** Column index offset for cells inside this band (e.g. pinned count). */
     readonly cellOffset: number;
+    /** Measured canvas width for this band in pixels. */
     canvasWidth: number;
 }
 
+/**
+ * Aggregated refs for all bands and derived pinning/frozen indices.
+ */
 export type GridLayoutRefs = {
+    /** Band refs for the pinned-start side. */
     readonly start: GridBandRefs;
+    /** Band refs for the main (center, scrollable) band. */
     readonly main: GridBandRefs;
+    /** Band refs for the pinned-end side. */
     readonly end: GridBandRefs;
+    /** Top panel container element, if rendered. */
     topPanel?: HTMLElement;
+    /** Number of columns pinned to the start (derived, bounded by `config`). */
     readonly pinnedStartCols: number;
+    /** Last pinned-start column index or `-Infinity` when none. */
     readonly pinnedStartLast: number;
+    /** Number of columns pinned to the end. */
     readonly pinnedEndCols: number;
+    /** First pinned-end column index or `Infinity` when none. */
     readonly pinnedEndFirst: number;
+    /** Number of top-frozen rows. */
     readonly frozenTopRows: number;
+    /** Last top-frozen row index or `-Infinity` when none. */
     readonly frozenTopLast: number;
+    /** Number of bottom-frozen rows. */
     readonly frozenBottomRows: number;
+    /** First bottom-frozen row index or `Infinity` when none. */
     readonly frozenBottomFirst: number;
+    /** Writable config inputs; setters trigger {@link createGridSignalsAndRefs} recalculation. */
     config: {
+        /** Desired start-pinned column count. */
         pinnedStartCols?: number;
+        /** Desired end-pinned column count. */
         pinnedEndCols?: number;
+        /** Maximum total pinned columns, or `null` to allow all. */
         pinnedLimit?: number | null;
+        /** Total column count driving index calculations. */
         colCount?: number;
+        /** Desired top-frozen row count. */
         frozenTopRows?: number;
+        /** Desired bottom-frozen row count. */
         frozenBottomRows?: number;
+        /** Maximum total frozen rows, or `null` to allow all. */
         frozenLimit?: number | null;
+        /** Total data row count driving frozen calculations. */
         dataLength?: number;
     }
 }
 
+/**
+ * Iterates existing bands (`start`, `main`, `end`) and invokes `callback` for each.
+ * @param refs - Aggregate layout refs.
+ * @param callback - Action invoked for each band.
+ */
 export function forEachBand(refs: GridLayoutRefs, callback: (band: GridBandRefs) => void): void {
     if (!refs) return;
     refs.start && callback(refs.start);
@@ -50,6 +94,14 @@ export function forEachBand(refs: GridLayoutRefs, callback: (band: GridBandRefs)
     refs.end && callback(refs.end);
 };
 
+/**
+ * Maps each band to a value, optionally skipping `null`/`undefined` results.
+ * @template T - Mapped value type.
+ * @param refs - Aggregate layout refs.
+ * @param callback - Mapper invoked for each band.
+ * @param skipNullReturns - When `true` (default), nullish results are omitted.
+ * @returns Collected mapped values.
+ */
 export function mapBands<T>(refs: GridLayoutRefs, callback: (band: GridBandRefs) => T, skipNullReturns = true): T[] {
     const result: T[] = [];
     forEachBand(refs, band => {
@@ -62,6 +114,11 @@ export function mapBands<T>(refs: GridLayoutRefs, callback: (band: GridBandRefs)
 
 const paneKeys: PaneKey[] = ["top", "body", "bottom"];
 
+/**
+ * Removes and nulls DOM nodes tracked by a single band.
+ * @param refs - Band refs to dispose.
+ * @param removeNode - Grid-provided removal helper (honors custom sanitizer).
+ */
 export function disposeBandRefs(refs: GridBandRefs, removeNode: (node: HTMLElement) => void): void {
     if (!refs) return;
     refs.headerCols && (refs.headerCols.onselectstart = null);
@@ -80,6 +137,11 @@ export function disposeBandRefs(refs: GridBandRefs, removeNode: (node: HTMLEleme
     }
 }
 
+/**
+ * Collects all existing canvas nodes across bands/panes.
+ * @param refs - Aggregate layout refs.
+ * @returns Array of non-null canvas elements.
+ */
 export function getAllCanvasNodes(refs: GridLayoutRefs): HTMLElement[] {
     const canvasNodes: HTMLElement[] = [];
     forEachBand(refs, (h) => paneKeys.forEach(pane => {
@@ -90,6 +152,11 @@ export function getAllCanvasNodes(refs: GridLayoutRefs): HTMLElement[] {
     return canvasNodes;
 }
 
+/**
+ * Collects viewport containers (`canvas.parentElement`) for all canvases.
+ * @param refs - Aggregate layout refs.
+ * @returns Array of non-null viewport elements.
+ */
 export function getAllViewportNodes(refs: GridLayoutRefs): HTMLElement[] {
     const viewportNodes: HTMLElement[] = [];
     forEachBand(refs, (h) => paneKeys.forEach(pane => {
@@ -100,6 +167,11 @@ export function getAllViewportNodes(refs: GridLayoutRefs): HTMLElement[] {
     return viewportNodes;
 }
 
+/**
+ * Collects containers that scroll horizontally (main header rows and main pane viewports).
+ * @param refs - Aggregate layout refs.
+ * @returns Array of scrollable elements.
+ */
 export function getAllHScrollContainers(refs: GridLayoutRefs): HTMLElement[] {
     const hScrollableNodes: HTMLElement[] = [];
     const main = refs.main;
@@ -114,6 +186,11 @@ export function getAllHScrollContainers(refs: GridLayoutRefs): HTMLElement[] {
     return hScrollableNodes;
 }
 
+/**
+ * Collects body viewport containers that scroll vertically across all bands.
+ * @param refs - Aggregate layout refs.
+ * @returns Array of vertically scrollable viewport elements.
+ */
 export function getAllVScrollContainers(refs: GridLayoutRefs): HTMLElement[] {
     const vScrollableNodes: HTMLElement[] = [];
     forEachBand(refs, (band) => {
@@ -125,6 +202,11 @@ export function getAllVScrollContainers(refs: GridLayoutRefs): HTMLElement[] {
 }
 
 
+/**
+ * Factory for the reactive signals and derived layout refs that drive pinning and frozen rows.
+ * Generates computed visibility signals, bounded pinning/frozen counters and live getters/setters on `refs.config`.
+ * @returns Object containing `signals` and `refs` wired for mutual recalculation.
+ */
 export function createGridSignalsAndRefs(): { signals: GridSignals; refs: GridLayoutRefs } {
     const showColumnHeader = signal();
     const hideColumnHeader = computed(() => !showColumnHeader.value);

@@ -2,6 +2,21 @@ import type { GridOptions } from "../core";
 import type { Column } from "../core/column";
 import type { EditorLock } from "../core/editing";
 
+/**
+ * Attaches drag-to-resize handlers to header cells. Creates resizable handles,
+ * tracks drag deltas and calls `colResizing`/`colResized` to apply/live-preview widths.
+ * @template TItem - Row item type.
+ * @param opts.absoluteColMinWidth - Absolute minimum column width in pixels.
+ * @param opts.container - Grid container element.
+ * @param opts.cols - Ordered column definitions (mutated in place for widths).
+ * @param opts.colResizing - Callback invoked continuously while dragging.
+ * @param opts.colResized - Callback invoked on drag end (notifies `onColumnsResized`).
+ * @param opts.disposer - Abort controller owning the listener lifetimes.
+ * @param opts.headerColsElements - Header column container elements per band.
+ * @param opts.getEditorLock - Accessor for the editor lock (commit/cancel on resize start).
+ * @param opts.options - Grid options relevant to resizing (`forceFitColumns`, `rtl`).
+ * @param opts.removeNode - DOM remover owned by the grid.
+ */
 export function setupColumnResize<TItem>(this: void, { absoluteColMinWidth, container,
     cols, colResizing, colResized, disposer, headerColsElements, getEditorLock, options, removeNode
 }: {
@@ -125,6 +140,14 @@ export function setupColumnResize<TItem>(this: void, { absoluteColMinWidth, cont
     });
 }
 
+/**
+ * Auto-distributes column widths to fit the available viewport width.
+ * Shrinks then grows resizable columns respecting `minWidth`/`maxWidth`.
+ * @param cols - Columns to autosize (mutated in place via `.width`).
+ * @param availWidth - Available width to fit into.
+ * @param absoluteColMinWidth - Global minimum column width.
+ * @returns `true` when any `rerenderOnResize` column changed width (re-render required).
+ */
 export function autosizeColumns(cols: Column[], availWidth: number, absoluteColMinWidth: number): boolean {
     var i, c,
         widths = [],

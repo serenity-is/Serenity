@@ -2,6 +2,12 @@ import type { Column } from "../core/column";
 import type { ISleekGrid } from "../core/isleekgrid";
 import { triggerGridEvent } from "./event-utils";
 
+/**
+ * Click handler for header columns that toggles sorting state and emits
+ * `onSort`. Supports single vs `multiColumnSort`, Shift/Ctrl modifiers and
+ * respects the editor lock and the resize-handle guard.
+ * @param e - Click event originating from the header area.
+ */
 export function columnSortHandler(this: Pick<ISleekGrid, "getColumnFromNode" | "getEditorLock" |
     "getColumnById" | "getSortColumns" | "setSortColumns" | "onSort"> & {
         getOptions: () => { multiColumnSort: boolean }

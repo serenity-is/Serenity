@@ -1,10 +1,16 @@
 
+/**
+ * Column node that may contain nested children (`columns`).
+ */
 export interface TreeColumn {
     columns?: TreeColumn[];
     id?: string;
     visible?: boolean;
 }
 
+/**
+ * Minimal grid surface consumed by {@link TreeColumns} for id-based reordering.
+ */
 export interface TreeColumnsGrid {
     getColumnIndex(id: string): number;
 }
@@ -98,11 +104,9 @@ function extractColumns(node: any): TreeColumn[] {
 }
 
 /**
- *
- * @param {Array} treeColumns Array com levels of columns
- * @returns {{hasDepth: 'hasDepth', getTreeColumns: 'getTreeColumns', extractColumns: 'extractColumns', getDepth: 'getDepth',
- * getColumnsInDepth: 'getColumnsInDepth', getColumnsInGroup: 'getColumnsInGroup', visibleColumns: 'visibleColumns', filter: 'filter', reOrder: reOrder}}
- * @constructor
+ * Helper for grouped/nested column trees. Supports depth queries, filtering,
+ * flattening and id-order reordering.
+ * @param treeColumns - Array of (possibly nested) column nodes.
  */
 export class TreeColumns {
 
@@ -113,8 +117,12 @@ export class TreeColumns {
         this.init();
     }
 
+    /** Index of nodes by their `id`, populated during {@link TreeColumns.init}. */
     columnsById: { [key: string]: TreeColumn } = {};
 
+    /**
+     * Initializes `columnsById` by indexing the entire tree.
+     */
     init(): void {
         this.mapToId(this.treeColumns);
     }
@@ -133,6 +141,10 @@ export class TreeColumns {
         return this.treeColumns.slice();
     }
 
+    /**
+     * Returns `true` when any top-level node has nested `columns`.
+     * @returns Whether the tree has at least two levels.
+     */
     hasDepth(): boolean {
 
         for (var i in this.treeColumns) {
@@ -144,42 +156,88 @@ export class TreeColumns {
         return false;
     };
 
+    /**
+     * Returns the raw tree passed to the constructor.
+     * @returns Original tree array.
+     */
     getTreeColumns(): TreeColumn[] {
         return this.treeColumns;
     };
 
+    /**
+     * Flattens the tree to leaf columns (preserves order).
+     * @returns Array of leaf nodes.
+     */
     extractColumns(): TreeColumn[] {
         return this.hasDepth() ? extractColumns(this.treeColumns) : this.treeColumns;
     };
 
+    /**
+     * Returns the maximum nesting depth of the tree.
+     * @returns Depth (1-based).
+     */
     getDepth(): number {
         return getDepth(this.treeColumns);
     };
 
+    /**
+     * Returns nodes at the given `depth` level.
+     * @param depth - Target depth (0-based).
+     * @returns Nodes at that depth.
+     */
     getColumnsInDepth(depth: number): TreeColumn[] {
         return getColumnsInDepth(this.treeColumns, depth);
     };
 
+    /**
+     * Returns leaf columns contained within the given group nodes.
+     * @param groups - Group nodes to extract from.
+     * @returns Leaf columns within those groups.
+     */
     getColumnsInGroup = function (groups: any): TreeColumn[] {
         return extractColumns(groups);
     };
 
+    /**
+     * Returns a clone of the tree filtered to visible leaves (`visible !== false`).
+     * @returns Visible columns, nested.
+     */
     visibleColumns(): TreeColumn[] {
         return filter(this.cloneTreeColumns(), (column) => column.visible);
     };
 
+    /**
+     * Clones and filters the tree using `condition`, pruning parents whose
+     * children are all filtered out.
+     * @param condition - Predicate to test each node.
+     * @returns Filtered tree.
+     */
     filter(condition: (col: TreeColumn) => boolean): TreeColumn[] {
         return filter(this.cloneTreeColumns(), condition);
     };
 
+    /**
+     * Reorders the tree to match the column order of `grid`.
+     * @param grid - Grid providing `getColumnIndex` for ordering.
+     */
     reOrder(grid: TreeColumnsGrid): void {
         sort(this.treeColumns, grid);
     };
 
+    /**
+     * Looks up a column node by id.
+     * @param id - Column id to find.
+     * @returns Matching node, or `undefined`.
+     */
     getById(id: string): TreeColumn {
         return this.columnsById[id];
     }
 
+    /**
+     * Looks up multiple column nodes by their ids.
+     * @param ids - Column ids in desired order.
+     * @returns Array of matching nodes (may contain `undefined` when missing).
+     */
     getInIds(ids: string[]): TreeColumn[] {
         return ids.map((id) => {
             return this.columnsById[id];

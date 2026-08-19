@@ -2,6 +2,13 @@ import { formatterContext, type FormatterResult } from "../core/formatting";
 import { escapeHtml } from "../core/util";
 import type { CellRenderArgs } from "./render-args";
 
+/**
+ * Renders a single cell into the row's string buffer, applying formatters,
+ * CSS classes, colspans and formatter side effects (classes/attrs/tooltips).
+ * Pushes queue entries onto `cachedRow` for deferred DOM materialization.
+ * @template TItem - Data item type.
+ * @param args - Cell render arguments including formatter context sources.
+ */
 export function renderCell<TItem>(this: void, { activeCell, activeRow, cell, cellCssClasses, colMetadata,
     colspan, grid, item, sb, row, rtl, frozenPinned, cachedRow }: CellRenderArgs<TItem>): void {
     const cols = grid.getColumns();

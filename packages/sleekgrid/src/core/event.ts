@@ -1,20 +1,56 @@
-
+/**
+ * Core event object passed to every grid event handler. Mirrors W3C/jQuery event
+ * semantics with propagation and default-prevent controls.
+ * @template TArgs - Payload specific to the event.
+ * @template TEvent - Native DOM event wrapped by this object.
+ */
 export interface IEventData<TArgs = {}, TEvent = {}> {
+    /** Payload supplied by the event emitter (e.g. `{row, cell, grid}`). */
     args: TArgs;
+    /** Whether {@link IEventData.preventDefault} has been called. */
     defaultPrevented: boolean;
+    /**
+     * Prevents the default action associated with the event.
+     */
     preventDefault(): void;
+    /**
+     * Stops the event from bubbling further, but remaining handlers on the same
+     * emitter still run. Also calls `stopPropagation` on the native event when present.
+     */
     stopPropagation(): void;
+    /**
+     * Prevents remaining handlers from being executed. Also stops DOM propagation.
+     */
     stopImmediatePropagation(): void;
+    /** Returns `true` if {@link IEventData.preventDefault} has been called or the native event is default-prevented. */
     isDefaultPrevented(): boolean;
+    /** Returns `true` if {@link IEventData.stopImmediatePropagation} has been called. */
     isImmediatePropagationStopped(): boolean;
+    /** Returns `true` if {@link IEventData.stopPropagation} has been called. */
     isPropagationStopped(): boolean;
+    /** Returns the last non-`undefined` return value from the handlers that have run. */
     getReturnValue(): any;
+    /** Returns all return values collected from handlers. */
     getReturnValues(): any[];
+    /** The wrapped native DOM event, if any. */
     nativeEvent: TEvent | null | undefined;
 }
 
+/** Shorthand keys that are hoisted from `args` onto `EventData` for ergonomic access (`e.grid`, `e.row`, …). */
 export type MergeArgKeys = "grid" | "column" | "node" | "row" | "cell" | "item";
+/**
+ * Union type representing the actual event object handlers receive. It merges
+ * {@link IEventData} with the native event and hoisted arg keys so callers can
+ * access `e.row`, `e.cell`, `e.grid`, etc. directly.
+ */
 export type EventData<TArgs = {}, TEvent = {}> = IEventData<TArgs, TEvent> & TEvent & { [key in keyof TArgs & (MergeArgKeys)]: TArgs[key] };
+/**
+ * Handler signature for SleekGrid events.
+ * @template TArgs - Event payload type.
+ * @template TEvent - Wrapped native event type.
+ * @param e - Event object with propagation controls and merged fields.
+ * @param args - Optional duplicate of `e.args` for convenience.
+ */
 export type EventCallback<TArgs = {}, TEvent = {}> = (e: EventData<TArgs, TEvent>, args?: TArgs) => void;
 
 let eventDataInitialized = false;
@@ -71,9 +107,13 @@ function initializeEventDataProps() {
     }
 }
 
-/***
- * An event object for passing data to event handlers and letting them control propagation.
- * <p>This is pretty much identical to how W3C and jQuery implement events.</p>
+/**
+ * Wraps a native DOM event and a payload object, exposing propagation controls.
+ * Property access for common DOM fields (e.g. `clientX`, `key`, `target`) and arg keys
+ * (`grid`, `row`, `cell`) is dynamically proxied via getters installed by
+ * `initializeEventDataProps()`.
+ * @template TArgs - Event payload type.
+ * @template TEvent - Wrapped native event type.
  */
 export class EventDataWrapper<TArgs, TEvent = {}> implements IEventData<TArgs, TEvent> {
     private _args: TArgs;
@@ -114,31 +154,33 @@ export class EventDataWrapper<TArgs, TEvent = {}> implements IEventData<TArgs, T
         return false;
     }
 
-    /***
-     * Stops event from propagating up the DOM tree.
+    /**
+     * Stops event from propagating up the DOM tree and marks it as propagation-stopped.
      */
     stopPropagation(): void {
         this._isPropagationStopped = true;
         this._nativeEvent?.stopPropagation();
     }
 
-    /***
-     * Returns whether stopPropagation was called on this event object.
+    /**
+     * Returns whether {@link EventDataWrapper.stopPropagation} was called on this event object.
+     * @returns `true` if propagation was stopped.
      */
     isPropagationStopped(): boolean {
         return this._isPropagationStopped;
     }
 
-    /***
-     * Prevents the rest of the handlers from being executed.
+    /**
+     * Prevents remaining handlers from being executed and stops DOM propagation.
      */
     stopImmediatePropagation(): void {
         this._isImmediatePropagationStopped = true;
         this._nativeEvent?.stopImmediatePropagation();
     }
 
-    /***
-     * Returns whether stopImmediatePropagation was called on this event object.\
+    /**
+     * Returns whether {@link EventDataWrapper.stopImmediatePropagation} was called on this event object.
+     * @returns `true` if immediate propagation was stopped.
      */
     isImmediatePropagationStopped(): boolean {
         return this._isImmediatePropagationStopped;
@@ -167,26 +209,27 @@ export class EventDataWrapper<TArgs, TEvent = {}> implements IEventData<TArgs, T
     }
 }
 
-/***
- * A simple publisher-subscriber implementation.
+/**
+ * Lightweight publish–subscribe implementation used for all SleekGrid events.
+ * @template TArgs - Payload type.
+ * @template TEvent - Wrapped native event type.
  */
 export class EventEmitter<TArgs = any, TEvent = {}> {
 
     private _handlers: EventCallback<TArgs, TEvent>[] = [];
 
-    /***
-     * Adds an event handler to be called when the event is fired.
-     * <p>Event handler will receive two arguments - an <code>EventData</code> and the <code>data</code>
-     * object the event was fired with.<p>
-     * @param fn {Function} Event handler.
+    /**
+     * Registers an event handler to be invoked when the event is fired.
+     * Handlers receive `(eventData, args)` and run in insertion order.
+     * @param fn - Handler to register.
      */
     subscribe(fn: EventCallback<TArgs, TEvent>): void {
         this._handlers.push(fn);
     }
 
-    /***
-     * Removes an event handler added with <code>subscribe(fn)</code>.
-     * @param fn {Function} Event handler to be removed.
+    /**
+     * Removes a previously registered handler.
+     * @param fn - Handler to remove; must be the exact function reference passed to {@link EventEmitter.subscribe}.
      */
     unsubscribe(fn: EventCallback<TArgs, TEvent>): void {
         for (var i = this._handlers.length - 1; i >= 0; i--) {
@@ -196,17 +239,12 @@ export class EventEmitter<TArgs = any, TEvent = {}> {
         }
     }
 
-    /***
-     * Fires an event notifying all subscribers.
-     * @param args {Object} Additional data object to be passed to all handlers.
-     * @param e {EventDataWrapper}
-     *      Optional.
-     *      An <code>EventData</code> object to be passed to all handlers.
-     *      For DOM events, an existing W3C/jQuery event object can be passed in.
-     * @param scope {Object}
-     *      Optional.
-     *      The scope ("this") within which the handler will be executed.
-     *      If not specified, the scope will be set to the <code>Event</code> instance.
+    /**
+     * Fires the event, invoking all subscribers in order until propagation is stopped.
+     * @param args - Payload passed to handlers as `e.args`.
+     * @param e - Optional native DOM event to wrap.
+     * @param scope - `this` value for handlers; defaults to the emitter itself.
+     * @returns The {@link EventData} object created for this notification (carries return values and propagation flags).
      */
     notify(args?: TArgs, e?: TEvent, scope?: object): EventData<TArgs, TEvent> {
         const sed = new EventDataWrapper<TArgs, TEvent>(e, args);
@@ -218,6 +256,9 @@ export class EventEmitter<TArgs = any, TEvent = {}> {
         return sed as unknown as EventData<TArgs, TEvent>;
     }
 
+    /**
+     * Removes all registered handlers.
+     */
     clear(): void {
         this._handlers = [];
     }
@@ -228,9 +269,20 @@ interface EventSubscriberEntry {
     handler: EventCallback<any, any>;
 }
 
+/**
+ * Aggregates subscriptions across multiple emitters and allows bulk unsubscribe.
+ * Useful for plugins/components that subscribe to many grid events and need
+ * a single `unsubscribeAll()` on destroy.
+ */
 export class EventSubscriber {
     private _handlers: EventSubscriberEntry[] = [];
 
+    /**
+     * Subscribes `handler` to `event` and tracks the pair for later bulk cleanup.
+     * @param event - Emitter to subscribe to.
+     * @param handler - Handler to register.
+     * @returns `this` for chaining.
+     */
     subscribe<TArgs, TEvent>(event: EventEmitter<TArgs, TEvent>, handler: EventCallback<TArgs, TEvent>): this {
         this._handlers.push({
             event: event,
@@ -241,6 +293,12 @@ export class EventSubscriber {
         return this;
     }
 
+    /**
+     * Unsubscribes a previously tracked handler.
+     * @param event - Emitter the handler was subscribed to.
+     * @param handler - Handler to remove.
+     * @returns `this` for chaining.
+     */
     unsubscribe<TArgs, TEvent>(event: EventEmitter<TArgs, TEvent>, handler: EventCallback<TArgs, TEvent>): this {
         var i = this._handlers.length;
         while (i--) {
@@ -255,6 +313,10 @@ export class EventSubscriber {
         return this;
     }
 
+    /**
+     * Unsubscribes all tracked handlers.
+     * @returns `this` for chaining.
+     */
     unsubscribeAll(): EventSubscriber {
         var i = this._handlers.length;
         while (i--) {
@@ -266,7 +328,10 @@ export class EventSubscriber {
     }
 }
 
-/** @deprecated */
+/**
+ * Legacy key-code constants.
+ * @deprecated Prefer `KeyboardEvent.key`/`KeyboardEvent.code` checks over numeric codes.
+ */
 export const keyCode = {
     BACKSPACE: 8,
     DELETE: 46,

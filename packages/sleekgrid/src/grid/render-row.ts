@@ -3,6 +3,12 @@ import type { Column, ColumnMetadata } from "../core/column";
 import type { CellRenderArgs, RowRenderArgs } from "./render-args";
 import { renderCell } from "./render-cell";
 
+/**
+ * Renders a row shell and iterates its cells, delegating to {@link renderCell}.
+ * Handles Add-New row styling, metadata-driven `colspan` and pinned-band buffers.
+ * @template TItem - Data item type.
+ * @param args - Row render arguments including range buffers and cached helpers.
+ */
 export function renderRow<TItem>(this: void, args: RowRenderArgs<TItem>): void {
 
     const { activeRow, colLeft, colRight, grid, item, frozenPinned, range, row, sbStart, sbCenter, sbEnd } = args;

@@ -1,5 +1,10 @@
 import type { SignalOrValue } from "@serenity-is/domwise";
 
+/**
+ * Adds one or more CSS classes to an element, supporting space-separated lists.
+ * @param el - Target element.
+ * @param cls - Class name or space-separated class list to add. No-op when empty/null.
+ */
 export function addCssClass(el: Element, cls: string): void {
     if (cls == null || !cls.length)
         return;
@@ -25,6 +30,13 @@ function escFunc(a: string) {
     return esc[a];
 }
 
+/**
+ * Escapes a value for safe insertion as HTML when `enableHtmlRendering` is `true`.
+ * When called as `ctx.escape()` (without arguments) inside a formatter, uses `this.value`.
+ * When `this.enableHtmlRendering === false`, the value is returned as a plain string without escaping.
+ * @param s - Value to escape; when omitted and called with a `FormatterContext` as `this`, escapes `this.value`.
+ * @returns HTML-escaped string (or plain string when HTML rendering is disabled).
+ */
 export function escapeHtml(s: any): string {
     if (!arguments.length && this && this !== globalThis) {
         s = this.value;
@@ -44,6 +56,13 @@ export function escapeHtml(s: any): string {
 
 const maybeHtmlRegex = /<|>|&|"|'/;
 
+/**
+ * Lightweight HTML sanitizer using `DOMParser`. Strips scripts, iframes, event handlers
+ * and dangerous URL protocols; falls back to {@link escapeHtml} when `DOMParser` is unavailable.
+ * Prefer the grid's injected `sanitizer` (DOMPurify when present) for production; this is a safe default.
+ * @param dirtyHtml - Raw HTML string to sanitize.
+ * @returns Sanitized HTML string safe to assign to `innerHTML`.
+ */
 export function basicDOMSanitizer(dirtyHtml: string): string {
     if (!dirtyHtml) {
         return "";
@@ -129,6 +148,10 @@ export function basicDOMSanitizer(dirtyHtml: string): string {
     }
 }
 
+/**
+ * Disables text selection on the target element.
+ * @param target - Element to make unselectable.
+ */
 export function disableSelection(target: HTMLElement): void {
     if (target) {
         target.style.userSelect = "none";
@@ -136,6 +159,11 @@ export function disableSelection(target: HTMLElement): void {
     }
 }
 
+/**
+ * Removes one or more CSS classes from an element, supporting space-separated lists.
+ * @param el - Target element.
+ * @param cls - Class name or space-separated class list to remove. No-op when empty/null.
+ */
 export function removeCssClass(el: Element, cls: string): void {
     if (cls == null || !cls.length)
         return;
@@ -149,6 +177,11 @@ export function removeCssClass(el: Element, cls: string): void {
         el.classList.remove(cls);
 }
 
+/**
+ * Parses a CSS pixel string (e.g. `"20px"`) into a number, returning `0` for non-numeric input.
+ * @param str - CSS length string to parse.
+ * @returns Numeric pixel value or `0` when parsing fails.
+ */
 export function parsePx(str: string): number {
     var value = parseFloat(str);
     if (isNaN(value))
