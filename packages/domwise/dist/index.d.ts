@@ -1,48 +1,160 @@
+/**
+ * Base interface for JSX prop hooks. A prop hook is a callable object that can
+ * be assigned as a value to a JSX attribute to reactively bind to an element.
+ * @typeParam TNode - The type of the DOM node the hook binds to.
+ */
 export interface PropHook<TNode extends Element = Element> {
 }
+/**
+ * A class list manager created by `useClassList`. It wraps a `DOMTokenList`
+ * and provides a subset of the native `classList` API (`add`, `remove`,
+ * `toggle`, `contains`, `size`, `value`). It can also be used as a JSX prop
+ * hook to reactively bind the `class` attribute; see {@link useClassList}.
+ */
 export interface BasicClassList extends PropHook<Element> {
+	/** Returns the underlying `DOMTokenList` (detached before binding, live after). */
 	(): DOMTokenList;
+	/** Number of tokens in the list. */
 	readonly size: number;
+	/** Space-separated string of all tokens (mirrors `DOMTokenList.value`). */
 	readonly value: string;
+	/**
+	 * Adds one or more tokens to the list. Duplicate tokens are ignored.
+	 * @param tokens - Class names to add.
+	 */
 	add(...tokens: string[]): void;
+	/**
+	 * Removes one or more tokens from the list.
+	 * @param tokens - Class names to remove.
+	 */
 	remove(...tokens: string[]): void;
+	/**
+	 * Toggles a token, optionally forcing the presence or absence.
+	 * @param token - Class name to toggle.
+	 * @param force - When provided, forces add (`true`) or remove (`false`).
+	 */
 	toggle(token: string, force?: boolean): void;
+	/**
+	 * Checks whether the list contains the given token.
+	 * @param token - Class name to test.
+	 * @returns `true` if the token is present.
+	 */
 	contains(token: string): boolean;
 }
 export type ClassName = string | {
 	[key: string]: boolean;
 } | false | null | undefined | ClassName[];
+/**
+ * A value that can be used as a `class` attribute: a string, an array of class
+ * names, an iterable, a dictionary of boolean flags, or a `DOMTokenList`.
+ */
 export type ClassNames = ClassName | Iterable<string> | DOMTokenList;
+/**
+ * A mutable reference container with a `current` property.
+ * @typeParam T - The type of the referenced value.
+ */
 export type RefObject<T> = {
 	current: T | null;
 };
+/**
+ * A callback invoked with the referenced instance.
+ * @typeParam T - The type of the referenced instance.
+ */
 export type RefCallback<T> = (instance: T) => void;
+/**
+ * A reference to a DOM node or component instance: either a `RefObject`, a ref
+ * callback, or `null`.
+ * @typeParam T - The type of the referenced value.
+ */
 export type Ref<T> = RefCallback<T> | RefObject<T> | null;
+/**
+ * A function that disposes an effect or subscription.
+ */
 export type EffectDisposer = (() => void) | null;
+/**
+ * A read-only signal-like value that can be subscribed to and peeked.
+ * Compatible with `@preact/signals-core` and any duck-typed signal that
+ * exposes `value`, `peek`, and `subscribe`.
+ * @typeParam T - The type of the signal's value.
+ */
 export interface SignalLike<T> {
+	/** Current value; reading may track a dependency when inside an effect/computed. */
 	get value(): T;
+	/**
+	 * Returns the current value without creating a dependency.
+	 * @returns The current value.
+	 */
 	peek(): T;
+	/**
+	 * Subscribes to value changes.
+	 * @param fn - Callback invoked with each new value (and typically immediately with the current value).
+	 * @returns A disposer that unsubscribes, or `null` if unsubscription is not supported.
+	 */
 	subscribe(fn: (value: T) => void): EffectDisposer;
 }
+/**
+ * A writable signal whose `value` can be set.
+ * @typeParam T - The type of the signal's value.
+ */
 export interface Signal<T> extends SignalLike<T> {
 	set value(value: T);
 }
+/**
+ * A read-only (computed) signal.
+ * @typeParam T - The type of the computed value.
+ */
 export interface Computed<T> extends SignalLike<T> {
 }
+/**
+ * A value or a signal-like value that can be used interchangeably.
+ * @typeParam T - The type of the value.
+ */
 export type SignalOrValue<T> = T | SignalLike<T>;
+/**
+ * A two-way prop binding hook created by `usePropBinding`. It acts as a
+ * getter when called with no arguments and a setter when called with a value;
+ * when attached as a prop hook it synchronizes that value to the bound element
+ * attribute.
+ * @typeParam T - The type of the bound value.
+ * @typeParam TElement - The type of the element the binding is attached to.
+ */
 export interface PropBinding<T = any, TElement extends Element = Element> extends PropHook<TElement> {
+	/**
+	 * Gets the current bound value.
+	 * @returns The current value.
+	 */
 	(): T;
+	/**
+	 * Sets the bound value and synchronizes it to the attached element (if any).
+	 * @param value - New value to store and propagate to the DOM.
+	 * @returns The value that was set.
+	 */
 	(value: T): T;
 }
+/**
+ * A value that can be assigned to a JSX attribute: a plain value, a prop hook,
+ * or a signal-like value.
+ * @typeParam T - The type of the attribute value.
+ */
 export type PropValue<T> = T | PropHook<Element> | SignalLike<T>;
+/**
+ * Custom DOM attributes supported by DomWise on all elements.
+ * Includes `children`, `ref`, `dangerouslySetInnerHTML`, and jsx-dom/react-compatible
+ * `on` / `onCapture` event maps.
+ * @typeParam T - The type of the DOM element.
+ */
 export interface CustomDomAttributes<T> {
+	/** Child nodes / JSX children for the element. */
 	children?: ComponentChildren;
+	/** Raw HTML to assign via `innerHTML`. Use with caution — content is not escaped. */
 	dangerouslySetInnerHTML?: {
 		__html: string;
 	};
+	/** Ref object or callback that receives the created DOM node. */
 	ref?: Ref<T>;
-	/** compat from jsx-dom/react */
+	/** Compatibility event map for `on*` handlers (jsx-dom / React style). */
 	on?: Record<string, Function>;
+	/** Compatibility event map for capture-phase handlers. */
 	onCapture?: Record<string, Function>;
 }
 export interface ElementAttributes<T> {
@@ -95,11 +207,20 @@ export type RemoveIndex<T> = {
 export type ExcludeMethods<T> = Pick<T, {
 	[K in keyof T]: T[K] extends Function ? never : K;
 }[keyof T]>;
+/**
+ * Style properties that can be assigned to the `style` attribute, with methods,
+ * readonly properties, and the index signature filtered out of
+ * `CSSStyleDeclaration`.
+ */
 export type StyleAttributes = Partial<ExcludeMethods<RemoveIndex<Omit<CSSStyleDeclaration, "length" | "parentRules">>>>;
 /** CSSStyleDeclaration contains methods, readonly properties and an index signature, which we all need to filter out. */
 export type StylePropertiesBase = Partial<Pick<CSSStyleDeclaration, {
 	[K in keyof CSSStyleDeclaration]: K extends string ? CSSStyleDeclaration[K] extends string ? K : never : never;
 }[keyof CSSStyleDeclaration]>>;
+/**
+ * Style properties for the `style` JSX attribute, where each CSS property may
+ * be a plain value or a signal-like value that updates reactively.
+ */
 export type StyleProperties = {
 	[K in keyof StylePropertiesBase]: SignalOrValue<StylePropertiesBase[K]>;
 };
@@ -649,7 +770,7 @@ interface HTMLAttributes<T> extends ElementAttributes<T> {
 	exportparts?: PropValue<string | RemoveAttribute>;
 	hidden?: PropValue<EnumeratedAcceptsEmpty | "hidden" | "until-found" | RemoveAttribute>;
 	inert?: PropValue<BooleanAttribute | RemoveAttribute>;
-	inputmode?: PropValue<"decimal" | "email" | "none" | "numeric" | "search" | "tel" | "text" | "url" | RemoveAttribute>;
+	inputmode?: PropValue<"decimal" | "email" | "none" | "numeric" | "search" | "tel" | "text" | "url" | "value" | RemoveAttribute>;
 	is?: PropValue<string | RemoveAttribute>;
 	lang?: PropValue<string | RemoveAttribute>;
 	popover?: PropValue<EnumeratedAcceptsEmpty | "manual" | "auto" | RemoveAttribute>;
@@ -759,7 +880,7 @@ interface ButtonHTMLAttributes<T> extends HTMLAttributes<T> {
 interface CanvasHTMLAttributes<T> extends HTMLAttributes<T> {
 	height?: PropValue<number | string | RemoveAttribute>;
 	width?: PropValue<number | string | RemoveAttribute>;
-	/**@deprecated @non-standard*/
+	/** @deprecated @non-standard */
 	"moz-opaque"?: PropValue<BooleanAttribute | RemoveAttribute>;
 }
 interface CaptionHTMLAttributes<T> extends HTMLAttributes<T> {
@@ -873,7 +994,7 @@ interface IframeHTMLAttributes<T> extends HTMLAttributes<T> {
 	sharedstoragewritable?: PropValue<BooleanAttribute | RemoveAttribute>;
 	/** @deprecated */
 	align?: PropValue<string | RemoveAttribute>;
-	/**@deprecated @non-standard*/
+	/** @deprecated @non-standard */
 	allowpaymentrequest?: PropValue<BooleanAttribute | RemoveAttribute>;
 	/** @deprecated */
 	allowtransparency?: PropValue<BooleanAttribute | RemoveAttribute>;
@@ -1095,7 +1216,7 @@ interface OlHTMLAttributes<T> extends HTMLAttributes<T> {
 	reversed?: PropValue<BooleanAttribute | RemoveAttribute>;
 	start?: PropValue<number | string | RemoveAttribute>;
 	type?: PropValue<"1" | "a" | "A" | "i" | "I" | RemoveAttribute>;
-	/**@deprecated @non-standard*/
+	/** @deprecated @non-standard */
 	compact?: PropValue<BooleanAttribute | RemoveAttribute>;
 }
 interface OptgroupHTMLAttributes<T> extends HTMLAttributes<T> {
@@ -1447,7 +1568,7 @@ interface ShapeElementSVGAttributes<T> extends SVGAttributes<T>, Pick<Presentati
 interface TextContentElementSVGAttributes<T> extends SVGAttributes<T>, Pick<PresentationSVGAttributes, "font-family" | "font-style" | "font-variant" | "font-weight" | "font-stretch" | "font-size" | "font-size-adjust" | "kerning" | "letter-spacing" | "word-spacing" | "text-decoration" | "glyph-orientation-horizontal" | "glyph-orientation-vertical" | "direction" | "unicode-bidi" | "text-anchor" | "dominant-baseline" | "color" | "fill" | "fill-rule" | "fill-opacity" | "stroke" | "stroke-width" | "stroke-linecap" | "stroke-linejoin" | "stroke-miterlimit" | "stroke-dasharray" | "stroke-dashoffset" | "stroke-opacity"> {
 }
 interface ZoomAndPanSVGAttributes {
-	/**@deprecated @non-standard*/
+	/** @deprecated @non-standard */
 	zoomAndPan?: PropValue<"disable" | "magnify" | RemoveAttribute>;
 }
 interface AnimateSVGAttributes<T> extends AnimationElementSVGAttributes<T>, AnimationAttributeTargetSVGAttributes, AnimationTimingSVGAttributes, AnimationValueSVGAttributes, AnimationAdditionSVGAttributes, Pick<PresentationSVGAttributes, "color-interpolation" | "color-rendering"> {
@@ -1752,9 +1873,9 @@ interface MathMLAnnotationXmlElementAttributes<T> extends MathMLAttributes<T> {
 	src?: PropValue<string | RemoveAttribute>;
 }
 interface MathMLMactionElementAttributes<T> extends MathMLAttributes<T> {
-	/**@deprecated @non-standard*/
+	/** @deprecated @non-standard */
 	actiontype?: PropValue<"statusline" | "toggle" | RemoveAttribute>;
-	/**@deprecated @non-standard*/
+	/** @deprecated @non-standard */
 	selection?: PropValue<string | RemoveAttribute>;
 }
 interface MathMLMathElementAttributes<T> extends MathMLAttributes<T> {
@@ -1764,18 +1885,18 @@ interface MathMLMerrorElementAttributes<T> extends MathMLAttributes<T> {
 }
 interface MathMLMfracElementAttributes<T> extends MathMLAttributes<T> {
 	linethickness?: PropValue<string | RemoveAttribute>;
-	/**@deprecated @non-standard*/
+	/** @deprecated @non-standard */
 	denomalign?: PropValue<"center" | "left" | "right" | RemoveAttribute>;
-	/**@deprecated @non-standard*/
+	/** @deprecated @non-standard */
 	numalign?: PropValue<"center" | "left" | "right" | RemoveAttribute>;
 }
 interface MathMLMiElementAttributes<T> extends MathMLAttributes<T> {
 	mathvariant?: PropValue<"normal" | RemoveAttribute>;
 }
 interface MathMLMmultiscriptsElementAttributes<T> extends MathMLAttributes<T> {
-	/**@deprecated @non-standard*/
+	/** @deprecated @non-standard */
 	subscriptshift?: PropValue<string | RemoveAttribute>;
-	/**@deprecated @non-standard*/
+	/** @deprecated @non-standard */
 	superscriptshift?: PropValue<string | RemoveAttribute>;
 }
 interface MathMLMnElementAttributes<T> extends MathMLAttributes<T> {
@@ -1827,15 +1948,15 @@ interface MathMLMspaceElementAttributes<T> extends MathMLAttributes<T> {
 interface MathMLMsqrtElementAttributes<T> extends MathMLAttributes<T> {
 }
 interface MathMLMstyleElementAttributes<T> extends MathMLAttributes<T> {
-	/**@deprecated @non-standard*/
+	/** @deprecated @non-standard */
 	background?: PropValue<string | RemoveAttribute>;
-	/**@deprecated @non-standard*/
+	/** @deprecated @non-standard */
 	color?: PropValue<string | RemoveAttribute>;
-	/**@deprecated @non-standard*/
+	/** @deprecated @non-standard */
 	fontsize?: PropValue<string | RemoveAttribute>;
-	/**@deprecated @non-standard*/
+	/** @deprecated @non-standard */
 	fontstyle?: PropValue<string | RemoveAttribute>;
-	/**@deprecated @non-standard*/
+	/** @deprecated @non-standard */
 	fontweight?: PropValue<string | RemoveAttribute>;
 	/** @deprecated */
 	scriptminsize?: PropValue<string | RemoveAttribute>;
@@ -1843,17 +1964,17 @@ interface MathMLMstyleElementAttributes<T> extends MathMLAttributes<T> {
 	scriptsizemultiplier?: PropValue<string | RemoveAttribute>;
 }
 interface MathMLMsubElementAttributes<T> extends MathMLAttributes<T> {
-	/**@deprecated @non-standard*/
+	/** @deprecated @non-standard */
 	subscriptshift?: PropValue<string | RemoveAttribute>;
 }
 interface MathMLMsubsupElementAttributes<T> extends MathMLAttributes<T> {
-	/**@deprecated @non-standard*/
+	/** @deprecated @non-standard */
 	subscriptshift?: PropValue<string | RemoveAttribute>;
-	/**@deprecated @non-standard*/
+	/** @deprecated @non-standard */
 	superscriptshift?: PropValue<string | RemoveAttribute>;
 }
 interface MathMLMsupElementAttributes<T> extends MathMLAttributes<T> {
-	/**@deprecated @non-standard*/
+	/** @deprecated @non-standard */
 	superscriptshift?: PropValue<string | RemoveAttribute>;
 }
 interface MathMLMtableElementAttributes<T> extends MathMLAttributes<T> {
@@ -2124,27 +2245,46 @@ export interface MathMLElementTags {
 	semantics: MathMLSemanticsElementAttributes<MathMLElement>;
 	/** @non-standard */
 	menclose: MathMLMencloseElementAttributes<MathMLElement>;
-	/** * @deprecated */
+	/** @deprecated */
 	maction: MathMLMactionElementAttributes<MathMLElement>;
-	/**@deprecated @non-standard*/
+	/** @deprecated @non-standard */
 	mfenced: MathMLMfencedElementAttributes<MathMLElement>;
 }
 /**
- * This technically should include `DocumentFragment` as well, but a lot of web APIs expect an `Element`.
+ * The DOM node type returned by JSX expressions.
+ *
+ * Union of `HTMLElement` plus `SVGElement`/`MathMLElement` when those
+ * namespaces are enabled in {@link JSX.ConfigureElement}. Technically this
+ * could also include `DocumentFragment`, but many DOM APIs expect `Element`,
+ * so fragments are typed separately where needed.
  */
 export type JSXElement = HTMLElement | (JSX.ConfigureElement["svg"] extends false ? never : SVGElement) | (JSX.ConfigureElement["mathml"] extends false ? never : MathMLElement);
+/**
+ * A single child that can be rendered inside a JSX element.
+ *
+ * Includes primitives (`string`/`number`), DOM nodes, iterables/arrays of
+ * children, signal-like wrappers, shadow root containers, and the ignorable
+ * `boolean`/`null`/`undefined` values (filtered similarly to React).
+ */
 export type ComponentChild = string | number | Iterable<ComponentChild> | Array<ComponentChild> | {
 	value: ComponentChild;
 	peek: () => ComponentChild;
 	subscribe: (cb: (newValue: ComponentChild) => void) => void;
 } | JSXElement | NodeList | ChildNode | HTMLCollection | ShadowRootContainer | DocumentFragment | Text | Comment | boolean | null | undefined;
+/**
+ * The children of a JSX element: a single child or an array of children.
+ */
 export type ComponentChildren = ComponentChild[] | ComponentChild;
 export namespace JSX {
 	// eslint-disable-next-line @typescript-eslint/no-empty-object-type
+	/** Augment to declare custom HTML element tag/type mappings. */
 	export interface CustomElementsHTML {
 	}
+	/** Toggles for optional JSX element namespaces. Set to `false` to exclude SVG/MathML from `JSXElement` / `IntrinsicElements`. */
 	export interface ConfigureElement {
+		/** When `false`, SVG elements are excluded from the JSX element union. */
 		svg: boolean;
+		/** When `false`, MathML elements are excluded from the JSX element union. */
 		mathml: boolean;
 	}
 	type Element = JSXElement;
@@ -2164,29 +2304,71 @@ export namespace JSX {
 	interface IntrinsicElements extends IntrinsicElementsCombined, CustomElementsHTML {
 	}
 }
+/**
+ * A class-based JSX component. Extend `Component` or implement this interface
+ * and override `render` to return a `JSXElement`.
+ * @typeParam P - The type of the component's props.
+ * @typeParam T - The type of the DOM node the component renders.
+ */
 export interface ComponentClass<P = {}, T extends Node = JSXElement> {
+	/**
+	 * Constructs the component with the given props.
+	 * @param props - Props including optional `children`.
+	 */
 	new (props: P): ComponentClass<P, T>;
+	/**
+	 * Renders the component.
+	 * @returns The rendered `JSXElement` or `null`.
+	 */
 	render(): JSXElement | null;
+	/** Optional default prop values merged in by the JSX factory before construction. */
 	defaultProps?: Partial<P> | undefined;
+	/** Props passed to the instance, including optional `children`. */
 	readonly props?: P & {
 		children?: ComponentChildren;
 	};
+	/** Optional display name used in devtools / error messages. */
 	displayName?: string | undefined;
 }
+/**
+ * A function-based JSX component that receives props (including `children`)
+ * and returns a `JSXElement` or `null`.
+ * @typeParam P - The type of the component's props.
+ * @typeParam T - The type of the DOM node the component renders.
+ */
 export type FunctionComponent<P = {}, T extends Node = JSXElement> = (props: P & {
 	children?: ComponentChildren;
 }) => T | null;
+/**
+ * A JSX component: either a class-based or a function-based component.
+ * @typeParam P - The type of the component's props.
+ * @typeParam T - The type of the DOM node the component renders.
+ */
 export type ComponentType<P = {}, T extends Node = JSXElement> = ComponentClass<P, T> | FunctionComponent<P, T>;
+/**
+ * A virtual descriptor for a `ShadowRoot` created by `ShadowRootNode`.
+ * Recognized by the JSX factory to create a shadow root on the parent element
+ * via `attachShadow`. See {@link ShadowRootNode}.
+ */
 export type ShadowRootContainer = {
+	/** Optional ref that receives the created `ShadowRoot`. */
 	ref: Ref<ShadowRoot>;
+	/** `ShadowRootInit` options forwarded to `attachShadow`. */
 	attr: {
+		/** Whether the shadow root should be clonable. */
 		clonable?: boolean;
+		/** Custom element registry for the shadow tree. */
 		customElementRegistry?: CustomElementRegistry;
+		/** Whether focus should delegate to the shadow host. */
 		delegatesFocus?: boolean;
+		/** Shadow root mode (`"open"` or `"closed"`). */
 		mode: ShadowRootMode;
+		/** Whether the shadow root is serializable. */
 		serializable?: boolean;
+		/** Slot assignment mode (`"manual"` or `"named"`). */
 		slotAssignment?: SlotAssignmentMode;
 	};
+	/** Children rendered inside the shadow root. */
 	children: ComponentChildren;
 };
 /**
@@ -2216,54 +2398,101 @@ export type ShadowRootContainer = {
  */
 export declare function bindThis<T>(obj: T): T;
 /**
- * Converts a value to a className string.
- * Supports strings, arrays (flattened), iterables, and `Dictionary<boolean>` objects
- * where truthy keys are included.
- * @param value - The value to convert. Can be a string, array, iterable, or dictionary.
- * @returns A space-separated className string.
+ * Converts a heterogeneous class value to a normalized space-separated class string.
+ *
+ * Handles strings, nested arrays (recursively flattened), any iterable (e.g. `Set`),
+ * and dictionary objects where only keys with truthy values are included.
+ * Falsy primitives, `true`/`false`, `null` and `undefined` produce an empty string.
+ *
+ * @param value - The class value to normalize. May be a string, array, iterable,
+ * dictionary (`Record<string, boolean>`), primitive, or nested combination thereof.
+ * @returns A space-separated class name string, or `""` when the input yields no classes.
+ * @example
+ * ```ts
+ * className("foo bar") // => "foo bar"
+ * className(["foo", ["bar", { baz: true, qux: false }]]) // => "foo bar baz"
+ * className(new Set(["a", "b"])) // => "a b"
+ * ```
  */
 export declare function className(value: any): string;
 /**
  * Creates a JSX element using the classic (non-automatic) JSX factory signature.
- * Children are passed as additional arguments after `attr` (rest params).
- * If `attr` is a string or array, it is treated as the first child and `attr` becomes `{}`.
- * If `attr.children` exists and no additional children were given, `attr.children` is used.
- * Prefer using the `jsx` function directly when using the automatic JSX runtime.
- * @param tag - The HTML/SVG tag name or component function/class.
- * @param attr - The attributes/props for the element, or the first child if it is a string/array.
+ *
+ * Children are passed as variadic rest arguments after `attr`. For compatibility,
+ * if `attr` itself is a string or array it is treated as the first child and
+ * `attr` is replaced with `{}`. If `attr.children` is set and no explicit
+ * `children` were supplied, the `children` property is extracted from `attr`.
+ *
+ * Prefer {@link jsx} when using the automatic JSX runtime (`"jsx": "automatic"`).
+ *
+ * @param tag - HTML/SVG tag name or a component function/class.
+ * @param attr - Attributes/props for the element, or the first child when a
+ * string or array. May be `null`/`undefined` when no attributes are needed.
  * @param children - Child elements passed as rest arguments.
- * @returns The created JSX element.
+ * @returns The created JSX DOM node.
  */
 export declare function createElement(tag: any, attr: any, ...children: any[]): JSXElement;
 /**
  * Compatibility helper similar to React's `useImperativeHandle`.
- * Calls `setRef` with the result of `init()`. Prefer using `setRef` directly.
- * @param ref - A `RefObject` or ref callback.
- * @param init - A factory function returning the value to assign to the ref.
+ *
+ * Evaluates `init()` and forwards the result to `ref` via {@link setRef}.
+ * Prefer calling {@link setRef} directly in new code.
+ *
+ * @typeParam T - Type of the value exposed through the ref.
+ * @param ref - Target `RefObject` or ref callback to update.
+ * @param init - Factory that produces the value to assign to the ref.
  */
 export declare function useImperativeHandle<T>(ref: Ref<T>, init: () => T): void;
 /**
- * Base class for creating JSX components with optional props, children, and ref support.
- * Extend this class and override the `render` method to return a `JSXElement`.
- * @typeParam T - The type of the component's props.
+ * Base class for class-based JSX components.
+ *
+ * Extend this class and override {@link render} to return a {@link JSXElement}.
+ * Props (including optional `children` and `ref`) are available via {@link props}.
+ *
+ * @typeParam T - The type of the component's props (excluding `children` and `ref` which are added automatically).
+ * @example
+ * ```tsx
+ * class Greeting extends Component<{ name: string }> {
+ *   render() {
+ *     return <div>Hello, {this.props.name}!</div>;
+ *   }
+ * }
+ * // usage: <Greeting name="World" />
+ * ```
  */
 export declare class Component<T = any> {
+	/**
+	 * Marker used by the JSX factory to distinguish class components from function components.
+	 * Do not modify.
+	 */
 	static isComponent: boolean;
+	/**
+	 * Creates a component instance.
+	 * @param props - Props passed to the component, including optional `children` and `ref`.
+	 */
 	constructor(props: T & {
 		children?: ComponentChildren;
 		ref?: Ref<any>;
 	});
+	/** Props passed to this component instance, including optional `children` and `ref`. */
 	readonly props: T & {
 		children?: ComponentChildren;
 		ref?: Ref<any>;
 	};
+	/**
+	 * Renders the component's output.
+	 * Override in subclasses to return a DOM node, fragment, or `null`.
+	 * @returns The rendered {@link JSXElement}, or `null` to render nothing.
+	 */
 	render(): JSXElement | null;
 }
 /**
- * Dispatches a `disposing` event on the target element.
- * @param target - The target element to dispatch the event on.
+ * Dispatches a `disposing` event on the target element, causing any
+ * listeners registered via {@link addDisposingListener} to be invoked.
+ * No-ops when `target` is falsy or `CustomEvent` is unavailable.
+ * @param target - Event target to dispatch the event on.
  * @param opt - Optional event configuration.
- * @param opt.bubbles - Whether the event bubbles. Defaults to `false`.
+ * @param opt.bubbles - Whether the event should bubble. Defaults to `false`.
  * @param opt.cancelable - Whether the event is cancelable. Defaults to `false`.
  */
 export declare function dispatchDisposingEvent(target: EventTarget, opt?: {
@@ -2271,145 +2500,241 @@ export declare function dispatchDisposingEvent(target: EventTarget, opt?: {
 	cancelable?: boolean;
 }): void;
 /**
- * Invokes all registered disposing listeners for the element and removes the
- * global `disposing` event listener from the element as it is no longer needed.
- * Note that this does not dispatch a `disposing` event; to do that,
- * use `dispatchDisposingEvent` instead.
- * @param node - The node that is being disposed.
- * @param opt - Optional configuration.
- * @param opt.descendants - If true, also invokes listeners on descendant nodes.
- * @param opt.excludeSelf - If true, skips invoking listeners on the node itself (only descendants).
+ * Synchronously invokes all disposing listeners registered for `node` and
+ * removes the internal `disposing` DOM listener from the target.
+ *
+ * This does **not** dispatch a `disposing` DOM event; use
+ * {@link dispatchDisposingEvent} for that. Listener errors are swallowed.
+ *
+ * @param node - Target whose disposing listeners should be invoked. No-op when falsy.
+ * @param opt - Optional behavior flags.
+ * @param opt.descendants - When `true`, also invokes listeners registered on descendant elements/text/comment nodes found via `createNodeIterator`.
+ * @param opt.excludeSelf - When `true`, skips listeners registered directly on `node` itself (only descendants are invoked, in combination with `descendants`).
  */
 export declare function invokeDisposingListeners(node: EventTarget, opt?: {
 	descendants?: boolean;
 	excludeSelf?: boolean;
 }): void;
 /**
- * Adds a disposing listener to an element. Note that the listener itself is not added as an event listener,
- * but will be called when the `disposing` event is dispatched on the element, along with other disposing listeners.
- * @param target The element to add the listener to.
- * @param handler The disposing listener to add.
- * @param regKey An optional registration key to identify the listener.
- * @returns The element that the listener was added to.
+ * Registers a disposing listener for an element.
+ *
+ * The `handler` is not added as a direct DOM event listener; instead it is
+ * stored in an internal `WeakMap` and invoked when a `disposing` event is
+ * dispatched on `target` (via {@link dispatchDisposingEvent} or
+ * {@link invokeDisposingListeners}). The first registration on a given target
+ * also installs a one-shot `disposing` event listener to drive the callback
+ * list. Duplicate `handler` references are ignored (with optional `regKey`
+ * tracking), so calling this multiple times with the same callback is safe.
+ *
+ * @typeParam T - Type of the target event target.
+ * @param target - Element/event target to attach the listener to. No-op when `null`/`undefined`.
+ * @param handler - Callback invoked with the element when it is disposing. No-op when `null`/`undefined`.
+ * @param regKey - Optional registration key used to de-duplicate or later remove this listener.
+ * @returns The `target` that was passed in, for chaining.
+ * @throws {Error} When the same `handler` is already registered with a different `regKey`.
  */
 export declare function addDisposingListener<T extends EventTarget>(target: T | null | undefined, handler: ((el: T) => void) | undefined | null, regKey?: string): T | null | undefined;
 /**
- * Removes a disposing listener from an element. Note that this does not remove an event listener from the element,
- * but removes the listener from the list of disposing listeners that will be called when the `disposing` event
- * is dispatched on the element. If no more disposing listeners remain, the `disposing` event listener is also
- * removed from the element.
- * @param target The element to remove the listener from.
- * @param handler The disposing listener to remove.
- * @param regKey An optional registration key to identify the listener.
- * @returns The element that the listener was removed from.
+ * Removes a previously registered disposing listener from an element.
+ *
+ * This removes the entry from the internal disposing-listener registry, not a
+ * direct DOM `EventListener`. A listener matches when either its `handler`
+ * reference equals the stored callback or its `regKey` equals the stored key.
+ * When the last listener is removed the underlying `disposing` DOM listener
+ * is also detached from the target.
+ *
+ * @typeParam T - Type of the target event target.
+ * @param target - Element/event target to remove the listener from. No-op when `null`/`undefined`.
+ * @param handler - Callback whose registration should be removed. If `null`/`undefined`, matching falls back to `regKey`.
+ * @param regKey - Optional registration key to match against.
+ * @returns The `target` that was passed in, for chaining.
  */
 export declare function removeDisposingListener<T extends EventTarget>(target: T | null | undefined, handler: (() => void) | undefined | null, regKey?: string | undefined | null): T | null | undefined;
 /**
- * Gets or sets the current lifecycle root element.
- * When called with an argument, sets the lifecycle root and returns the previous value.
- * When called without arguments, returns the current lifecycle root.
- * @param args - If provided, the first element is set as the new lifecycle root.
- * @returns The current (or previous) lifecycle root element, or `null` if none is set.
+ * Gets or sets the current JSX lifecycle root element used to scope signal subscriptions.
+ *
+ * The lifecycle root is the `EventTarget` whose `disposing` event will dispose
+ * effects created during JSX construction (e.g. via `observeSignal` with
+ * `useLifecycleRoot: true`).
+ *
+ * @param args - When provided, the first element is installed as the new lifecycle root.
+ * When called with no arguments the current root (or `null` if none) is returned.
+ * @returns The current lifecycle root, or the previous root when a new one is being set. Returns `null` if none is set.
  */
 export declare function currentLifecycleRoot(...args: Element[]): Element | null;
 /**
- * Creates a document fragment containing the given children.
- * Useful as a JSX fragment factory (e.g. `<></>`).
- * @param attr - Object with an optional `children` property.
- * @returns A `DocumentFragment` with the appended children.
+ * Creates a `DocumentFragment` containing the given children.
+ *
+ * Intended as the JSX fragment factory (i.e. the target for the `<></>` syntax
+ * when `jsxFragment` is set to `Fragment`). Accepts the standard
+ * `{ children }` props bag produced by the JSX transform.
+ *
+ * @param attr - Props bag with optional `children` to append to the fragment.
+ * @returns A `DocumentFragment` containing the appended children.
  */
 export declare function Fragment(attr: {
 	children?: ComponentChildren | undefined;
 }): any;
 /**
- * Creates a new `RefObject` with `current` initially set to `null`.
- * The returned object is sealed to prevent extension.
- * @typeParam T - The type of the referenced value.
- * @returns A new sealed `RefObject<T>`.
+ * Creates a new sealed `RefObject` whose `current` is initially `null`.
+ *
+ * The returned object is `Object.seal`ed so that no new properties can be
+ * added, matching the `React.createRef` contract.
+ *
+ * @typeParam T - Type of the value held by the ref.
+ * @returns A sealed `RefObject<T>` with `current` set to `null`.
+ * @example
+ * ```tsx
+ * const inputRef = createRef<HTMLInputElement>();
+ * return <input ref={inputRef} />;
+ * // later: inputRef.current?.focus();
+ * ```
  */
 export declare function createRef<T = any>(): RefObject<T>;
 /**
- * Sets the `current` property of a `RefObject`, or calls a ref callback with the given value.
- * @typeParam T - The type of the referenced node.
- * @param ref - A `RefObject` or a ref callback, or `undefined`.
- * @param current - The value to assign to the ref.
+ * Assigns a value to a ref, handling both object and callback forms.
+ *
+ * - If `ref` is a `RefObject`, its `current` property is set to `current`.
+ * - If `ref` is a function, it is invoked with `current`.
+ * - If `ref` is `null`/`undefined` or neither form, no action is taken.
+ *
+ * @typeParam T - Type of the node/value being assigned.
+ * @param ref - Target `RefObject`, callback, or `null`/`undefined`.
+ * @param current - Value to assign to the ref.
  */
 export declare function setRef<T = Node>(ref: Ref<T> | undefined, current: T): void;
 /**
- * Creates a hook-like class list manager that wraps a `DOMTokenList`.
- * Returns a callable object that can be used as a JSX prop hook via `initPropHookSymbol`,
- * allowing reactive `class` attribute binding. Provides `add`, `remove`, `toggle`, `contains`,
- * and `value` / `size` accessors similar to the native `classList` API.
- * @param initialValue - Optional initial class value (string, array, or dictionary).
- * @returns A `BasicClassList` instance.
+ * Creates a `classList`-like manager that can be used as a JSX prop hook for the `class` attribute.
+ *
+ * The returned {@link BasicClassList} is a callable that also implements
+ * `add`/`remove`/`toggle`/`contains` plus `value`/`size`, mirroring the native
+ * `DOMTokenList` API. When assigned to `class` (e.g. `<div class={cls} />`),
+ * the hook binds to the element's `classList` and keeps it in sync; the
+ * binding is cleaned up automatically when the element is disposed.
+ * Before binding, an optional `initialValue` is used to seed a detached
+ * `classList` so that `add`/`remove` calls prior to attachment are preserved.
+ *
+ * @param initialValue - Optional initial class value (string, array, dictionary, iterable, or `DOMTokenList`).
+ * @returns A `BasicClassList` instance that is both callable and a prop hook.
+ * @example
+ * ```tsx
+ * const cls = useClassList("foo");
+ * cls.add("bar");
+ * return <div class={cls} />;
+ * ```
  */
 export declare function useClassList(initialValue?: ClassNames): BasicClassList;
 /**
- * Creates a two-way prop binding hook that synchronizes a value to an element's attribute.
- * The returned function can be used as a JSX prop hook and automatically assigns the value
- * to the bound element's property/attribute when it changes.
- * @param initialValue - Optional initial value for the binding.
- * @returns A `PropBinding<T>` callable that gets/sets the bound value.
+ * Creates a two-way prop binding hook that synchronizes a value to a single element attribute.
+ *
+ * The returned {@link PropBinding} is a callable getter/setter that also
+ * implements the prop-hook protocol. When the binding is assigned to a JSX
+ * attribute (e.g. `<input value={binding} />`), it attaches to that element
+ * and calls `assignProp` on every subsequent `binding(newValue)`. The hook
+ * may only be bound once — reusing the same binding on a different element
+ * or attribute throws.
+ *
+ * @typeParam T - Type of the bound prop value.
+ * @param initialValue - Optional initial value stored prior to element attachment.
+ * @returns A `PropBinding<T>` callable that reads the current value when called
+ * with no arguments, and writes a new value when called with an argument.
+ * @example
+ * ```tsx
+ * const value = usePropBinding("hello");
+ * return <><input value={value} /><button onClick={() => value("world")} /></>;
+ * ```
  */
 export declare function usePropBinding<T>(initialValue?: T | null | undefined | false): PropBinding<T>;
 /**
- * Creates a `Text` node and a setter function to update its content.
- * The text node's `toString` is overridden to return its `textContent`,
- * making it suitable for use as a child in JSX.
- * @param initialValue - Optional initial text content.
- * @returns A tuple of the `Text` node and a setter to update its content.
+ * Creates a `Text` node and a setter to update its content.
+ *
+ * The node's `toString()` is overridden to return `textContent`, so the
+ * returned `Text` can be interpolated directly as a JSX child and will
+ * render its string value.
+ *
+ * @param initialValue - Optional initial text content. If omitted the node starts empty.
+ * @returns A readonly tuple `[textNode, setText]` where `setText` assigns `textContent`.
+ * @example
+ * ```tsx
+ * const [label, setLabel] = useText("hello");
+ * return <><span>{label}</span><button onClick={() => setLabel("world")} /></>;
+ * ```
  */
 export declare function useText(initialValue?: string): readonly [
 	text: Text,
 	setText: (value: string) => void
 ];
 /**
- * Gets or sets the current JSX namespace URI.
- * When called without arguments, returns the current namespace URI.
- * When called with a value, sets the namespace and returns the previous value.
- * @param value - If provided, sets the namespace URI to this value.
- * @returns The current (or previous) namespace URI, or `null` / `undefined`.
+ * Gets or sets the ambient JSX namespace URI used for `createElement`/`jsx`.
+ *
+ * Stored on `globalThis` under `Serenity.jsxNamespaceURI`. When the active
+ * namespace is `"http://www.w3.org/2000/svg"` (or MathML), elements created
+ * without an explicit `namespaceURI` prop are created via `createElementNS`.
+ *
+ * @param value - When arguments are supplied, the namespace is set to this
+ * value (use `null` to reset to the HTML namespace). When called with no
+ * arguments the current value is simply returned.
+ * @returns The current namespace URI (no-arg call), or the previous value
+ * (setter call). May be `null`/`undefined` when no override is active.
  */
 export declare function currentNamespaceURI(value?: string | null | undefined): string | null | undefined;
 /**
- * Executes a children factory within a specific namespace URI context.
- * The namespace is temporarily set for the duration of the call and restored afterwards.
- * @param namespaceURI - The namespace URI to use, or `null` for HTML namespace.
- * @param children - A factory function that returns children to be created in the given namespace.
- * @returns The children produced by the factory.
+ * Executes a children factory within a scoped namespace URI.
+ *
+ * Temporarily sets {@link currentNamespaceURI} to `namespaceURI` for the
+ * duration of `children()`, then restores the previous value (even if the
+ * factory throws). This lets you create SVG/MathML subtrees imperatively
+ * without setting `namespaceURI` on every element.
+ *
+ * @param namespaceURI - Namespace URI to activate, or `null` for the HTML namespace.
+ * @param children - Factory that produces the children to render in the given namespace.
+ * @returns The children returned by the factory.
+ * @example
+ * ```tsx
+ * const icon = inNamespaceURI(SVGNamespace, () => <><circle r={10} /><path d="M0 0" /></>);
+ * ```
  */
 export declare function inNamespaceURI(namespaceURI: string | null, children: () => ComponentChildren): ComponentChildren;
 /**
- * Executes a children factory within the SVG namespace.
- * @param fn - A factory function that returns children.
+ * Executes a children factory within the SVG namespace (`http://www.w3.org/2000/svg`).
+ * Sugar over {@link inNamespaceURI} with {@link SVGNamespace}.
+ * @param fn - Factory that returns children to create as SVG elements.
  * @returns The children produced by the factory.
  */
 export declare function inSVGNamespace(fn: () => ComponentChildren): ComponentChildren;
 /**
- * Executes a children factory within the MathML namespace.
- * @param fn - A factory function that returns children.
+ * Executes a children factory within the MathML namespace (`http://www.w3.org/1998/Math/MathML`).
+ * Sugar over {@link inNamespaceURI} with {@link MathMLNamespace}.
+ * @param fn - Factory that returns children to create as MathML elements.
  * @returns The children produced by the factory.
  */
 export declare function inMathMLNamespace(fn: () => ComponentChildren): ComponentChildren;
 /**
- * Executes a children factory within the HTML namespace (explicitly setting namespace to `null`).
- * @param fn - A factory function that returns children.
+ * Executes a children factory within the HTML namespace (clears any active SVG/MathML override).
+ * Sugar over {@link inNamespaceURI} with `null`.
+ * @param fn - Factory that returns children to create as HTML elements.
  * @returns The children produced by the factory.
  */
 export declare function inHTMLNamespace(fn: () => ComponentChildren): ComponentChildren;
 type DataKeys = `data-${string}`;
 /**
- * Creates a JSX element. Acts as the JSX factory function (used as `jsx()` and `jsxs()`).
- * Supports HTML elements, SVG elements, MathML elements, and custom components.
- * When the tag is a string, it creates a DOM element; when it is a function/class,
- * it instantiates a component.
+ * Creates a JSX element. This is the automatic JSX factory used by the
+ * compiler (imported as `jsx` and `jsxs`). Handles HTML/SVG/MathML elements
+ * and custom function or class components.
  *
- * Unlike `createElement` (or `h`), which takes children as additional arguments,
- * `jsx` expects children as part of the `props` object (`props.children`).
+ * When `type` is a string, a real DOM element is created (with namespace
+ * auto-detection for SVG/MathML), props are assigned via `assignProps`, and
+ * children are appended. `select[value]` signals are resolved and applied.
+ * When `type` is a function/class, it is invoked or instantiated as a
+ * component and the resulting node is returned. `defaultProps` are respected
+ * and `ref` is forwarded via {@link setRef}.
  *
- * @param type - The HTML/SVG/MathML tag name or a component function/class.
- * @param props - The attributes/props for the element. Children are passed via `props.children`.
- * @returns The created JSX element (DOM node).
+ * Unlike {@link createElement} / `h`, children are expected inside `props`
+ * (`props.children`) rather than as rest arguments.
+ *
+ * @param type - HTML/SVG/MathML tag name or a component function/class.
+ * @param props - Attributes/props for the element. Children are read from `props.children`; may be `null`.
+ * @returns The created DOM node (or component render result).
  */
 export declare function jsx<THtmlTag extends (keyof HTMLElementTagNameMap & keyof HTMLElementTags), TElement extends HTMLElementTagNameMap[THtmlTag]>(type: THtmlTag, props?: (HTMLElementTags[THtmlTag] & Record<DataKeys, string | number>) | null): TElement;
 export declare function jsx<TSVGTag extends (keyof SVGElementTagNameMap & keyof SVGElementTags), TElement extends SVGElementTagNameMap[TSVGTag]>(type: TSVGTag, props?: (SVGElementTags[TSVGTag] & Record<DataKeys, string | number>) | null): TElement;
@@ -2420,16 +2745,42 @@ export declare function jsx<P extends {}, TElement extends JSXElement = JSXEleme
 } | null): TElement;
 /** The MathML namespace URI (`http://www.w3.org/1998/Math/MathML`). */
 export declare const MathMLNamespace = "http://www.w3.org/1998/Math/MathML";
+/**
+ * Well-known symbol (`Symbol.for("Serenity.initPropHook")`) that marks a value
+ * as a JSX prop hook.
+ *
+ * When a prop value that carries this symbol is assigned as a JSX attribute,
+ * the renderer invokes `value[initPropHookSymbol](node, propName)` to let the
+ * hook bind itself to the DOM node (e.g. to observe signals or install
+ * class-list synchronization). See also the {@link PropHook} interface.
+ */
 export declare const initPropHookSymbol: unique symbol;
 export interface PropHook<TNode extends Element = Element> {
 	[initPropHookSymbol](node: TNode, propName: string): void;
 }
 /**
- * Creates a virtual node descriptor for a `ShadowRoot` that can be used
- * during JSX element creation. The returned object is recognized by the
- * JSX factory to create a shadow root on the parent element.
- * @param options - An object with `ShadowRootInit` properties plus optional `ref` and `children`.
- * @returns A virtual node descriptor recognized by the JSX factory.
+ * Creates a virtual `ShadowRoot` descriptor recognized by the JSX factory.
+ *
+ * When a `ShadowRootContainer` produced by this function appears among a
+ * parent element's children (e.g. `<div><ShadowRootNode mode="open">…</ShadowRootNode></div>`),
+ * the factory calls `parent.attachShadow(init)` and appends the `children`
+ * into the resulting `ShadowRoot`. An optional `ref` is forwarded to the
+ * created `ShadowRoot`.
+ *
+ * @param options - Shadow root init options (`mode`, `delegatesFocus`, etc.) plus optional `ref` and `children`.
+ * @param options.mode - Shadow root mode (`"open"` or `"closed"`).
+ * @param options.delegatesFocus - Whether focus delegation is enabled.
+ * @param options.slotAssignment - How slots are assigned (`"manual"` or `"named"`).
+ * @param options.clonable - Whether the shadow root is clonable.
+ * @param options.serializable - Whether the shadow root is serializable.
+ * @param options.customElementRegistry - Custom element registry for the shadow tree.
+ * @param options.ref - Optional ref to receive the created `ShadowRoot`.
+ * @param options.children - Children to render inside the shadow root.
+ * @returns A virtual node descriptor that the JSX factory consumes to create the shadow root.
+ * @example
+ * ```tsx
+ * <div><ShadowRootNode mode="open"><span>inside shadow</span></ShadowRootNode></div>
+ * ```
  */
 export declare function ShadowRootNode({ children, ref, ...attr }: ShadowRootInit & {
 	ref?: Ref<ShadowRoot>;
@@ -2443,76 +2794,109 @@ export declare function ShadowRootNode({ children, ref, ...attr }: ShadowRootIni
  */
 export declare function isSignalLike<T = any>(obj: any): obj is SignalLike<T>;
 type SignalObserveArgs<T> = {
-	/** True if this is the initial call upon subscription. */
+	/** `true` on the initial synchronous invocation right after subscription; `false` thereafter. */
 	isInitial: boolean;
-	/** Previous value of the signal. Undefined if initial call. */
+	/** Value from the previous callback invocation. `undefined` on the initial call. */
 	prevValue: T | undefined;
-	/** New value of the signal. Undefined if initial call. */
+	/** Current value of the signal for this invocation. `undefined` if unavailable. */
 	newValue: T | undefined;
-	/** True if the value has changed from previous value. False on initial call. */
+	/** `true` when `newValue !== prevValue`; always `false` on the initial call. */
 	hasChanged: boolean;
-	/** The observed signal. */
+	/** The observed signal instance. */
 	readonly signal: SignalLike<T>;
 	/**
-	 * Disposes the signal subscription. Only available if the signal library supports unsubscription.
+	 * Disposer for the underlying subscription. Only non-null when the signal
+	 * library supports unsubscription; assign `null`/`undefined` to clear it.
+	 * Reassigning also updates the lifecycle-bound disposing listeners.
 	 */
 	effectDisposer: EffectDisposer | null | undefined;
 	/**
-	 * Gets the lifecycle root at the time of subscription if useLifecycleRoot option was true.
+	 * Lifecycle root captured at subscription time when `useLifecycleRoot` was
+	 * `true`; otherwise `undefined`. See {@link currentLifecycleRoot}.
 	 */
 	readonly lifecycleRoot: EventTarget | null | undefined;
 	/**
-	 * Gets the lifecycle node to tie the signal's lifecycle to.
+	 * Lifecycle node that owns the subscription — the disposer is registered
+	 * as a disposing listener on this node. Getter returns the current node.
 	 */
 	get lifecycleNode(): EventTarget | null | undefined;
 	/**
-	 * Sets the lifecycle node to tie the signal's lifecycle to.
+	 * Sets the lifecycle node that owns the subscription. Changing it moves
+	 * the disposing listener registration from the old node to the new one.
 	 */
 	set lifecycleNode(value: EventTarget | null | undefined);
 };
 type ObserveSignalCallback<T> = (args: SignalObserveArgs<T>) => void;
 /**
- * Observes a signal and calls the callback immediately upon subscription and when the signal changes.
- * Returns an effect disposer that can be used to stop observing.
- * @param signal - Signal to observe.
- * @param callback - Callback to execute immediately upon subscription and when the signal value changes.
- * @param opt - Optional configuration. useLifecycleRoot - If true, `currentLifecycleRoot()` at
- * subscription time is recorded as the lifecycle node. lifecycleNode - Optional node to tie the signal's lifecycle
- * to (auto-disposal on dispose).
- * @returns An effect disposer function, or `null`/`undefined` if the signal does not support disposal.
+ * Subscribes to a signal and invokes `callback` immediately and on every subsequent change.
+ *
+ * On subscription a {@link SignalObserveArgs} object is created and `callback` is
+ * invoked synchronously with `isInitial: true`. Future notifications update
+ * `newValue`/`prevValue`/`hasChanged` and invoke `callback` again. The
+ * returned disposer (when non-null) can be used to unsubscribe; it is also
+ * automatically registered as a disposing listener on `lifecycleNode` /
+ * `lifecycleRoot` so it is cleaned up when the owning DOM node is disposed.
+ *
+ * @typeParam T - Type of the signal's value.
+ * @param signal - Signal-like object to observe (must have `subscribe`/`peek`/`value`).
+ * @param callback - Function called initially and on each change.
+ * @param opt - Optional lifecycle wiring.
+ * @param opt.useLifecycleRoot - When `true`, captures {@link currentLifecycleRoot} at call time as the lifecycle root.
+ * @param opt.lifecycleNode - Explicit node whose `disposing` event will dispose the subscription.
+ * @returns A disposer function for the subscription, or `null`/`undefined` if the signal does not expose one.
  */
 export declare function observeSignal<T>(signal: SignalLike<T>, callback: ObserveSignalCallback<T>, opt?: {
 	/**
-	 * If true, `currentLifecycleRoot()` at the time of subscription will be recorded
-	 * to be potentially used as the lifecycle node.
+	 * When `true`, the current lifecycle root (see {@link currentLifecycleRoot})
+	 * at subscription time is recorded as {@link SignalObserveArgs.lifecycleRoot}.
 	 */
 	useLifecycleRoot?: boolean;
 	/**
-	 * Optional node to tie the signal's lifecycle to.
+	 * Optional DOM node whose `disposing` event will automatically dispose the
+	 * subscription via {@link addDisposingListener}.
 	 */
 	lifecycleNode?: EventTarget;
 }): EffectDisposer | null | undefined;
 interface DerivedSignalLike<T> extends SignalLike<T> {
+	/** Optional disposer that unsubscribes the derived signal from its source. */
 	derivedDisposer?: () => void;
 }
 /**
- * Creates a derived (computed) signal from an input signal and a transform function.
- * The returned signal-like object re-computes its value whenever the input signal changes.
- * If the input signal's constructor supports derived computation, it is used; otherwise
- * a `PrimitiveComputed` fallback is created.
- * @typeParam TDerived - The type of the derived value.
- * @typeParam TInput - The type of the input signal's value.
- * @param input - The source signal to observe.
- * @param fn - A transform function that maps the input value to the derived value.
- * @returns A `DerivedSignalLike` that updates when the input signal changes.
+ * Creates a derived (computed) signal from a source signal and a transform.
+ *
+ * When the source signal changes, the derived value is re-computed via `fn`.
+ * If the source signal's constructor appears to be a computed-capable type,
+ * a new instance of that constructor wrapping `() => fn(input.value)` is
+ * attempted; otherwise a lightweight {@link PrimitiveComputed} fallback is
+ * used. The returned signal exposes a `derivedDisposer` that unsubscribes
+ * from the source.
+ *
+ * @typeParam TDerived - Type of the derived/computed value.
+ * @typeParam TInput - Type of the source signal's value.
+ * @param input - Source signal to derive from. Must be signal-like.
+ * @param fn - Transform applied to the source value to produce the derived value.
+ * @returns A `DerivedSignalLike<TDerived>` whose `value` tracks `fn(input.value)`.
+ * @throws {Error} When `input` is not signal-like.
  */
 export declare function derivedSignal<TDerived, TInput = any>(input: SignalLike<TInput>, fn: (value: TInput) => TDerived): DerivedSignalLike<TDerived>;
+/**
+ * Options for creating a signal via {@link signal} / {@link computed}.
+ * Re-exported from `@preact/signals-core`.
+ * @typeParam T - Type of the signal's value.
+ */
 export interface SignalOptions<T> {
+	/** Called when the signal gains its first subscriber. */
 	watched?: (this: SignalLike<T>) => void;
+	/** Called when the signal loses its last subscriber. */
 	unwatched?: (this: SignalLike<T>) => void;
+	/** Optional debug name for the signal. */
 	name?: string;
 }
+/**
+ * Options for creating an effect via {@link effect}.
+ */
 export interface EffectOptions {
+	/** Optional debug name for the effect. */
 	name?: string;
 }
 type EffectFn = ((this: {
@@ -2521,10 +2905,15 @@ type EffectFn = ((this: {
 /**
  * Creates a new writable signal with an optional initial value.
  * Re-exported from `@preact/signals-core` with typed overloads.
- * @typeParam T - The type of the signal's value.
- * @param value - Optional initial value.
+ * @typeParam T - Type of the signal's value.
+ * @param value - Optional initial value for the signal. When omitted the signal starts as `undefined`.
  * @param options - Optional signal options (`watched`, `unwatched`, `name`).
  * @returns A writable `Signal<T>`.
+ * @example
+ * ```ts
+ * const count = signal(0);
+ * count.value++;
+ * ```
  */
 export declare const signal: {
 	<T>(value: T, options?: SignalOptions<T>): Signal<T>;
@@ -2565,18 +2954,35 @@ export declare const batch: (<T>(fn: () => T) => T);
 export declare const untracked: (<T>(fn: () => T) => T);
 /**
  * Creates a writable signal with the given initial value.
- * Convenience wrapper around the `signal()` function.
- * @typeParam T - The type of the signal's value.
- * @param initialValue - The initial value.
+ * Convenience wrapper around {@link signal}.
+ * @typeParam T - Type of the signal's value.
+ * @param initialValue - Initial value for the signal.
  * @returns A `Signal<T>` instance.
+ * @example
+ * ```ts
+ * const name = useSignal("Alice");
+ * name.value = "Bob";
+ * ```
  */
 export declare function useSignal<T>(initialValue: T): Signal<T>;
 /**
- * Creates a factory for computed signals that can be manually refreshed as a batch.
- * Returns an object with a `computed` method that creates computed signals tied to an
- * internal updater signal, and an `update` method that triggers a refresh of all created
- * computed signals.
- * @returns An object with `computed` factory and `update` trigger.
+ * Creates a factory for computed signals that can be manually invalidated in batch.
+ *
+ * Computed signals produced by the returned `computed` wrapper depend on an
+ * internal `updater` signal; calling `update()` bumps that signal so every
+ * derived computed re-evaluates on its next read, without wiring each one to
+ * a separate source.
+ *
+ * @returns An object with:
+ *  - `computed` — factory that wraps a computation so it tracks the shared updater.
+ *  - `update` — bumps the updater, invalidating all computeds created from this factory.
+ * @example
+ * ```ts
+ * const { computed: uc, update } = useUpdatableComputed();
+ * const derived = uc(() => expensiveRead());
+ * // later: after external state changes
+ * update();
+ * ```
  */
 export declare function useUpdatableComputed(): {
 	computed: <T>(fn: () => T) => Computed<T>;

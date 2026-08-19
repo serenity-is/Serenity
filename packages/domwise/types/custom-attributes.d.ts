@@ -2,18 +2,22 @@ import type { Ref, PropValue } from "./basic-types";
 import type { ComponentChildren } from "./jsx-namespace";
 
 /**
- * Custom DOM attributes supported by DomWise on all elements, including
- * `children`, `ref`, `dangerouslySetInnerHTML`, and jsx-dom/react-compatible
+ * Custom DOM attributes supported by DomWise on all elements.
+ * Includes `children`, `ref`, `dangerouslySetInnerHTML`, and jsx-dom/react-compatible
  * `on` / `onCapture` event maps.
  * @typeParam T - The type of the DOM element.
  */
 export interface CustomDomAttributes<T> {
+    /** Child nodes / JSX children for the element. */
     children?: ComponentChildren;
+    /** Raw HTML to assign via `innerHTML`. Use with caution — content is not escaped. */
     dangerouslySetInnerHTML?: { __html: string };
+    /** Ref object or callback that receives the created DOM node. */
     ref?: Ref<T>;
 
-    /** compat from jsx-dom/react */
+    /** Compatibility event map for `on*` handlers (jsx-dom / React style). */
     on?: Record<string, Function>;
+    /** Compatibility event map for capture-phase handlers. */
     onCapture?: Record<string, Function>;
 }
 

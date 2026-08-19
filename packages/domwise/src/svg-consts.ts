@@ -1,4 +1,5 @@
 
+/** Set of tag names that exist only in SVG and never in HTML. Used by the JSX factory to auto-select the SVG namespace. */
 export const svgOnlyTags: Set<string> = /*#__PURE__*/ new Set([
     // "a",
     "animate",
@@ -66,6 +67,7 @@ export const svgOnlyTags: Set<string> = /*#__PURE__*/ new Set([
     "view"
 ]);
 
+/** RegExp matching SVG attribute names that are not presentation attributes (i.e. are set via `setAttribute` rather than `style`). */
 export const nonPresentationSVGAttributes: RegExp =
     /^(a(ll|t|u)|base[FP]|c(al|lipPathU|on)|di|ed|ex|filter[RU]|g(lyphR|r)|ke|l(en|im)|ma(rker[HUW]|s)|n|pat|pr|point[^e]|re[^n]|s[puy]|st[^or]|ta|textL|vi|xC|y|z)/
 

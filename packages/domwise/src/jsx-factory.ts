@@ -12,17 +12,23 @@ import { isComponentClass, isObject, isString } from "./util"
 type DataKeys = `data-${string}`
 
 /**
- * Creates a JSX element. Acts as the JSX factory function (used as `jsx()` and `jsxs()`).
- * Supports HTML elements, SVG elements, MathML elements, and custom components.
- * When the tag is a string, it creates a DOM element; when it is a function/class,
- * it instantiates a component.
+ * Creates a JSX element. This is the automatic JSX factory used by the
+ * compiler (imported as `jsx` and `jsxs`). Handles HTML/SVG/MathML elements
+ * and custom function or class components.
  *
- * Unlike `createElement` (or `h`), which takes children as additional arguments,
- * `jsx` expects children as part of the `props` object (`props.children`).
+ * When `type` is a string, a real DOM element is created (with namespace
+ * auto-detection for SVG/MathML), props are assigned via `assignProps`, and
+ * children are appended. `select[value]` signals are resolved and applied.
+ * When `type` is a function/class, it is invoked or instantiated as a
+ * component and the resulting node is returned. `defaultProps` are respected
+ * and `ref` is forwarded via {@link setRef}.
  *
- * @param type - The HTML/SVG/MathML tag name or a component function/class.
- * @param props - The attributes/props for the element. Children are passed via `props.children`.
- * @returns The created JSX element (DOM node).
+ * Unlike {@link createElement} / `h`, children are expected inside `props`
+ * (`props.children`) rather than as rest arguments.
+ *
+ * @param type - HTML/SVG/MathML tag name or a component function/class.
+ * @param props - Attributes/props for the element. Children are read from `props.children`; may be `null`.
+ * @returns The created DOM node (or component render result).
  */
 // DOM Elements
 export function jsx<THtmlTag extends (keyof HTMLElementTagNameMap & keyof HTMLElementTags), TElement extends HTMLElementTagNameMap[THtmlTag]>(

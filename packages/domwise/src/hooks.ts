@@ -5,12 +5,24 @@ import { assignProp } from "./jsx-assign-props";
 import { initPropHookSymbol } from "./prop-hook";
 
 /**
- * Creates a hook-like class list manager that wraps a `DOMTokenList`.
- * Returns a callable object that can be used as a JSX prop hook via `initPropHookSymbol`,
- * allowing reactive `class` attribute binding. Provides `add`, `remove`, `toggle`, `contains`,
- * and `value` / `size` accessors similar to the native `classList` API.
- * @param initialValue - Optional initial class value (string, array, or dictionary).
- * @returns A `BasicClassList` instance.
+ * Creates a `classList`-like manager that can be used as a JSX prop hook for the `class` attribute.
+ *
+ * The returned {@link BasicClassList} is a callable that also implements
+ * `add`/`remove`/`toggle`/`contains` plus `value`/`size`, mirroring the native
+ * `DOMTokenList` API. When assigned to `class` (e.g. `<div class={cls} />`),
+ * the hook binds to the element's `classList` and keeps it in sync; the
+ * binding is cleaned up automatically when the element is disposed.
+ * Before binding, an optional `initialValue` is used to seed a detached
+ * `classList` so that `add`/`remove` calls prior to attachment are preserved.
+ *
+ * @param initialValue - Optional initial class value (string, array, dictionary, iterable, or `DOMTokenList`).
+ * @returns A `BasicClassList` instance that is both callable and a prop hook.
+ * @example
+ * ```tsx
+ * const cls = useClassList("foo");
+ * cls.add("bar");
+ * return <div class={cls} />;
+ * ```
  */
 export function useClassList(initialValue?: ClassNames): BasicClassList {
     let temp: Element | null = document.createElement("div") as Element;
@@ -102,11 +114,24 @@ function propBindingInit(this: PropBindingThis<any>, el: Element, key: string) {
 }
 
 /**
- * Creates a two-way prop binding hook that synchronizes a value to an element's attribute.
- * The returned function can be used as a JSX prop hook and automatically assigns the value
- * to the bound element's property/attribute when it changes.
- * @param initialValue - Optional initial value for the binding.
- * @returns A `PropBinding<T>` callable that gets/sets the bound value.
+ * Creates a two-way prop binding hook that synchronizes a value to a single element attribute.
+ *
+ * The returned {@link PropBinding} is a callable getter/setter that also
+ * implements the prop-hook protocol. When the binding is assigned to a JSX
+ * attribute (e.g. `<input value={binding} />`), it attaches to that element
+ * and calls `assignProp` on every subsequent `binding(newValue)`. The hook
+ * may only be bound once — reusing the same binding on a different element
+ * or attribute throws.
+ *
+ * @typeParam T - Type of the bound prop value.
+ * @param initialValue - Optional initial value stored prior to element attachment.
+ * @returns A `PropBinding<T>` callable that reads the current value when called
+ * with no arguments, and writes a new value when called with an argument.
+ * @example
+ * ```tsx
+ * const value = usePropBinding("hello");
+ * return <><input value={value} /><button onClick={() => value("world")} /></>;
+ * ```
  */
 export function usePropBinding<T>(initialValue?: T | null | undefined | false): PropBinding<T> {
     const accessorThis: PropBindingThis<T> = {
@@ -119,11 +144,19 @@ export function usePropBinding<T>(initialValue?: T | null | undefined | false): 
 }
 
 /**
- * Creates a `Text` node and a setter function to update its content.
- * The text node's `toString` is overridden to return its `textContent`,
- * making it suitable for use as a child in JSX.
- * @param initialValue - Optional initial text content.
- * @returns A tuple of the `Text` node and a setter to update its content.
+ * Creates a `Text` node and a setter to update its content.
+ *
+ * The node's `toString()` is overridden to return `textContent`, so the
+ * returned `Text` can be interpolated directly as a JSX child and will
+ * render its string value.
+ *
+ * @param initialValue - Optional initial text content. If omitted the node starts empty.
+ * @returns A readonly tuple `[textNode, setText]` where `setText` assigns `textContent`.
+ * @example
+ * ```tsx
+ * const [label, setLabel] = useText("hello");
+ * return <><span>{label}</span><button onClick={() => setLabel("world")} /></>;
+ * ```
  */
 export function useText(initialValue?: string): readonly [text: Text, setText: (value: string) => void] {
     const text = new Text()

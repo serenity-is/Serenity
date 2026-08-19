@@ -3,7 +3,12 @@ import type { ShadowRootContainer } from "./components";
 import type { HTMLElementTags, MathMLElementTags, SVGElementTags } from "./jsx-elements";
 
 /**
- * This technically should include `DocumentFragment` as well, but a lot of web APIs expect an `Element`.
+ * The DOM node type returned by JSX expressions.
+ *
+ * Union of `HTMLElement` plus `SVGElement`/`MathMLElement` when those
+ * namespaces are enabled in {@link JSX.ConfigureElement}. Technically this
+ * could also include `DocumentFragment`, but many DOM APIs expect `Element`,
+ * so fragments are typed separately where needed.
  */
 export type JSXElement = HTMLElement |
     (JSX.ConfigureElement["svg"] extends false ? never : SVGElement) |
@@ -11,6 +16,10 @@ export type JSXElement = HTMLElement |
 
 /**
  * A single child that can be rendered inside a JSX element.
+ *
+ * Includes primitives (`string`/`number`), DOM nodes, iterables/arrays of
+ * children, signal-like wrappers, shadow root containers, and the ignorable
+ * `boolean`/`null`/`undefined` values (filtered similarly to React).
  */
 type ComponentChild =
     | string
@@ -38,10 +47,14 @@ export type ComponentChildren = ComponentChild[] | ComponentChild;
 export namespace JSX {
 
     // eslint-disable-next-line @typescript-eslint/no-empty-object-type
+    /** Augment to declare custom HTML element tag/type mappings. */
     export interface CustomElementsHTML { }
 
+    /** Toggles for optional JSX element namespaces. Set to `false` to exclude SVG/MathML from `JSXElement` / `IntrinsicElements`. */
     export interface ConfigureElement {
+        /** When `false`, SVG elements are excluded from the JSX element union. */
         svg: boolean;
+        /** When `false`, MathML elements are excluded from the JSX element union. */
         mathml: boolean;
     }
 

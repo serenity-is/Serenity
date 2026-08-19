@@ -1,6 +1,12 @@
 const disposingListenersSymbol = Symbol.for("Serenity.disposingListeners");
 const lifecycleRootSymbol = Symbol.for("Serenity.lifecycleRoot");
 
+/**
+ * Returns the global `WeakMap` that stores disposing listeners keyed by
+ * target `EventTarget`. The map is lazily created on `globalThis` under the
+ * `Serenity.disposingListeners` symbol.
+ * @returns The shared `WeakMap` of target → listener array.
+ */
 export function getDisposingListeners(): WeakMap<EventTarget, ({
     callback: (el: EventTarget) => void,
     regKey: string | undefined
@@ -14,10 +20,12 @@ function disposingEventListener(ev: Event): void {
 };
 
 /**
- * Dispatches a `disposing` event on the target element.
- * @param target - The target element to dispatch the event on.
+ * Dispatches a `disposing` event on the target element, causing any
+ * listeners registered via {@link addDisposingListener} to be invoked.
+ * No-ops when `target` is falsy or `CustomEvent` is unavailable.
+ * @param target - Event target to dispatch the event on.
  * @param opt - Optional event configuration.
- * @param opt.bubbles - Whether the event bubbles. Defaults to `false`.
+ * @param opt.bubbles - Whether the event should bubble. Defaults to `false`.
  * @param opt.cancelable - Whether the event is cancelable. Defaults to `false`.
  */
 export function dispatchDisposingEvent(target: EventTarget, opt?: { bubbles?: boolean, cancelable?: boolean }): void {
@@ -33,14 +41,16 @@ export function dispatchDisposingEvent(target: EventTarget, opt?: { bubbles?: bo
 }
 
 /**
- * Invokes all registered disposing listeners for the element and removes the
- * global `disposing` event listener from the element as it is no longer needed.
- * Note that this does not dispatch a `disposing` event; to do that,
- * use `dispatchDisposingEvent` instead.
- * @param node - The node that is being disposed.
- * @param opt - Optional configuration.
- * @param opt.descendants - If true, also invokes listeners on descendant nodes.
- * @param opt.excludeSelf - If true, skips invoking listeners on the node itself (only descendants).
+ * Synchronously invokes all disposing listeners registered for `node` and
+ * removes the internal `disposing` DOM listener from the target.
+ *
+ * This does **not** dispatch a `disposing` DOM event; use
+ * {@link dispatchDisposingEvent} for that. Listener errors are swallowed.
+ *
+ * @param node - Target whose disposing listeners should be invoked. No-op when falsy.
+ * @param opt - Optional behavior flags.
+ * @param opt.descendants - When `true`, also invokes listeners registered on descendant elements/text/comment nodes found via `createNodeIterator`.
+ * @param opt.excludeSelf - When `true`, skips listeners registered directly on `node` itself (only descendants are invoked, in combination with `descendants`).
  */
 export function invokeDisposingListeners(node: EventTarget, opt?: {
     descendants?: boolean,
@@ -88,12 +98,22 @@ export function invokeDisposingListeners(node: EventTarget, opt?: {
 };
 
 /**
- * Adds a disposing listener to an element. Note that the listener itself is not added as an event listener,
- * but will be called when the `disposing` event is dispatched on the element, along with other disposing listeners.
- * @param target The element to add the listener to.
- * @param handler The disposing listener to add.
- * @param regKey An optional registration key to identify the listener.
- * @returns The element that the listener was added to.
+ * Registers a disposing listener for an element.
+ *
+ * The `handler` is not added as a direct DOM event listener; instead it is
+ * stored in an internal `WeakMap` and invoked when a `disposing` event is
+ * dispatched on `target` (via {@link dispatchDisposingEvent} or
+ * {@link invokeDisposingListeners}). The first registration on a given target
+ * also installs a one-shot `disposing` event listener to drive the callback
+ * list. Duplicate `handler` references are ignored (with optional `regKey`
+ * tracking), so calling this multiple times with the same callback is safe.
+ *
+ * @typeParam T - Type of the target event target.
+ * @param target - Element/event target to attach the listener to. No-op when `null`/`undefined`.
+ * @param handler - Callback invoked with the element when it is disposing. No-op when `null`/`undefined`.
+ * @param regKey - Optional registration key used to de-duplicate or later remove this listener.
+ * @returns The `target` that was passed in, for chaining.
+ * @throws {Error} When the same `handler` is already registered with a different `regKey`.
  */
 export function addDisposingListener<T extends EventTarget>(target: T | null | undefined, handler: ((el: T) => void) | undefined | null, regKey?: string): T | null | undefined {
     if (!target || !handler)
@@ -126,14 +146,19 @@ export function addDisposingListener<T extends EventTarget>(target: T | null | u
 }
 
 /**
- * Removes a disposing listener from an element. Note that this does not remove an event listener from the element,
- * but removes the listener from the list of disposing listeners that will be called when the `disposing` event
- * is dispatched on the element. If no more disposing listeners remain, the `disposing` event listener is also 
- * removed from the element.
- * @param target The element to remove the listener from.
- * @param handler The disposing listener to remove.
- * @param regKey An optional registration key to identify the listener.
- * @returns The element that the listener was removed from.
+ * Removes a previously registered disposing listener from an element.
+ *
+ * This removes the entry from the internal disposing-listener registry, not a
+ * direct DOM `EventListener`. A listener matches when either its `handler`
+ * reference equals the stored callback or its `regKey` equals the stored key.
+ * When the last listener is removed the underlying `disposing` DOM listener
+ * is also detached from the target.
+ *
+ * @typeParam T - Type of the target event target.
+ * @param target - Element/event target to remove the listener from. No-op when `null`/`undefined`.
+ * @param handler - Callback whose registration should be removed. If `null`/`undefined`, matching falls back to `regKey`.
+ * @param regKey - Optional registration key to match against.
+ * @returns The `target` that was passed in, for chaining.
  */
 export function removeDisposingListener<T extends EventTarget>(target: T | null | undefined, handler: (() => void) | undefined | null, regKey?: string | undefined | null): T | null | undefined {
     if (!target || (!handler && !regKey))
@@ -159,11 +184,15 @@ export function removeDisposingListener<T extends EventTarget>(target: T | null 
 }
 
 /**
- * Gets or sets the current lifecycle root element.
- * When called with an argument, sets the lifecycle root and returns the previous value.
- * When called without arguments, returns the current lifecycle root.
- * @param args - If provided, the first element is set as the new lifecycle root.
- * @returns The current (or previous) lifecycle root element, or `null` if none is set.
+ * Gets or sets the current JSX lifecycle root element used to scope signal subscriptions.
+ *
+ * The lifecycle root is the `EventTarget` whose `disposing` event will dispose
+ * effects created during JSX construction (e.g. via `observeSignal` with
+ * `useLifecycleRoot: true`).
+ *
+ * @param args - When provided, the first element is installed as the new lifecycle root.
+ * When called with no arguments the current root (or `null` if none) is returned.
+ * @returns The current lifecycle root, or the previous root when a new one is being set. Returns `null` if none is set.
  */
 export function currentLifecycleRoot(...args: Element[]): Element | null {
     if (args.length > 0) {

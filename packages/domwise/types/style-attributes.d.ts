@@ -25,7 +25,8 @@ type StylePropertiesBase = Partial<
 >;
 
 /**
- * Style properties whose values may be plain values or signals.
+ * Style properties for the `style` JSX attribute, where each CSS property may
+ * be a plain value or a signal-like value that updates reactively.
  */
 export type StyleProperties = {
     [K in keyof StylePropertiesBase]: SignalOrValue<StylePropertiesBase[K]>;

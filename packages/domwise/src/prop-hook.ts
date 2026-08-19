@@ -1,7 +1,11 @@
 /**
- * A unique symbol used to mark a value as a JSX prop hook. When a prop hook is
- * assigned to a JSX attribute, the JSX factory calls this method on the hook
- * with the target node and property name to initialize the binding.
+ * Well-known symbol (`Symbol.for("Serenity.initPropHook")`) that marks a value
+ * as a JSX prop hook.
+ *
+ * When a prop value that carries this symbol is assigned as a JSX attribute,
+ * the renderer invokes `value[initPropHookSymbol](node, propName)` to let the
+ * hook bind itself to the DOM node (e.g. to observe signals or install
+ * class-list synchronization). See also the {@link PropHook} interface.
  */
 export const initPropHookSymbol: unique symbol = Symbol.for("Serenity.initPropHook");
 

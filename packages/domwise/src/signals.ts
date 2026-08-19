@@ -2,19 +2,24 @@ import * as signals from "@preact/signals-core";
 import { type Computed, type Signal, type SignalLike } from "../types";
 
 /**
- * Options for creating a signal.
- * @typeParam T - The type of the signal's value.
+ * Options for creating a signal via {@link signal} / {@link computed}.
+ * Re-exported from `@preact/signals-core`.
+ * @typeParam T - Type of the signal's value.
  */
 export interface SignalOptions<T> {
+    /** Called when the signal gains its first subscriber. */
     watched?: (this: SignalLike<T>) => void;
+    /** Called when the signal loses its last subscriber. */
     unwatched?: (this: SignalLike<T>) => void;
+    /** Optional debug name for the signal. */
     name?: string;
 }
 
 /**
- * Options for creating an effect.
+ * Options for creating an effect via {@link effect}.
  */
 export interface EffectOptions {
+    /** Optional debug name for the effect. */
     name?: string;
 }
 
@@ -25,10 +30,15 @@ type EffectFn = ((this: {
 /**
  * Creates a new writable signal with an optional initial value.
  * Re-exported from `@preact/signals-core` with typed overloads.
- * @typeParam T - The type of the signal's value.
- * @param value - Optional initial value.
+ * @typeParam T - Type of the signal's value.
+ * @param value - Optional initial value for the signal. When omitted the signal starts as `undefined`.
  * @param options - Optional signal options (`watched`, `unwatched`, `name`).
  * @returns A writable `Signal<T>`.
+ * @example
+ * ```ts
+ * const count = signal(0);
+ * count.value++;
+ * ```
  */
 export const signal = signals.signal as unknown as {
     <T>(value: T, options?: SignalOptions<T>): Signal<T>;
@@ -71,21 +81,38 @@ export const untracked: (<T>(fn: () => T) => T) = signals.untracked;
 
 /**
  * Creates a writable signal with the given initial value.
- * Convenience wrapper around the `signal()` function.
- * @typeParam T - The type of the signal's value.
- * @param initialValue - The initial value.
+ * Convenience wrapper around {@link signal}.
+ * @typeParam T - Type of the signal's value.
+ * @param initialValue - Initial value for the signal.
  * @returns A `Signal<T>` instance.
+ * @example
+ * ```ts
+ * const name = useSignal("Alice");
+ * name.value = "Bob";
+ * ```
  */
 export function useSignal<T>(initialValue: T): Signal<T> {
     return signal(initialValue);
 }
 
 /**
- * Creates a factory for computed signals that can be manually refreshed as a batch.
- * Returns an object with a `computed` method that creates computed signals tied to an
- * internal updater signal, and an `update` method that triggers a refresh of all created
- * computed signals.
- * @returns An object with `computed` factory and `update` trigger.
+ * Creates a factory for computed signals that can be manually invalidated in batch.
+ *
+ * Computed signals produced by the returned `computed` wrapper depend on an
+ * internal `updater` signal; calling `update()` bumps that signal so every
+ * derived computed re-evaluates on its next read, without wiring each one to
+ * a separate source.
+ *
+ * @returns An object with:
+ *  - `computed` — factory that wraps a computation so it tracks the shared updater.
+ *  - `update` — bumps the updater, invalidating all computeds created from this factory.
+ * @example
+ * ```ts
+ * const { computed: uc, update } = useUpdatableComputed();
+ * const derived = uc(() => expensiveRead());
+ * // later: after external state changes
+ * update();
+ * ```
  */
 export function useUpdatableComputed(): { computed: <T>(fn: () => T) => Computed<T>; update: () => void; } {
     const updater = signal(0);
