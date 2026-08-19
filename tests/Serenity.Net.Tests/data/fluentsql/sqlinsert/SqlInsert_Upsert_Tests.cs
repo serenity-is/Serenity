@@ -143,31 +143,24 @@ public class SqlInsert_Upsert_Tests
     public void FormatUpsert_ThrowsArgumentNullException_ForNullOrEmptyTable()
     {
         Assert.Throws<ArgumentNullException>(() =>
-            SqlInsert.FormatUpsert(null, ["A", "@p1"], ["A"], SqliteDialect.Instance));
+            SqlInsert.FormatUpsert(null, [new("A", "@p1")], ["A"], SqliteDialect.Instance));
 
         Assert.Throws<ArgumentNullException>(() =>
-            SqlInsert.FormatUpsert("", ["A", "@p1"], ["A"], SqliteDialect.Instance));
-    }
-
-    [Fact]
-    public void FormatUpsert_ThrowsArgumentOutOfRangeException_ForOddNameValuePairs()
-    {
-        Assert.Throws<ArgumentOutOfRangeException>(() =>
-            SqlInsert.FormatUpsert("T", ["A", "@p1", "B"], ["A"], SqliteDialect.Instance));
+            SqlInsert.FormatUpsert("", [new("A", "@p1")], ["A"], SqliteDialect.Instance));
     }
 
     [Fact]
     public void FormatUpsert_ThrowsArgumentException_ForMissingKeyField()
     {
         Assert.Throws<ArgumentException>(() =>
-            SqlInsert.FormatUpsert("T", ["A", "@p1"], ["Missing"], SqliteDialect.Instance));
+            SqlInsert.FormatUpsert("T", [new("A", "@p1")], ["Missing"], SqliteDialect.Instance));
     }
 
     [Fact]
     public void FormatUpsert_ThrowsNotSupportedException_ForUnknownDialect()
     {
         Assert.Throws<NotSupportedException>(() =>
-            SqlInsert.FormatUpsert("T", ["A", "@p1"], ["A"], new UnknownDialect()));
+            SqlInsert.FormatUpsert("T", [new ("A", "@p1")], ["A"], new UnknownDialect()));
     }
 
     private class UnknownDialect : SqlServer2012Dialect

@@ -5,25 +5,26 @@ namespace Serenity.Data;
 ///   VALUES (value1, value2..valueN)</c></summary>
 public class SqlInsert : QueryWithParams, ISetFieldByStatement
 {
-    private string tableName;
-    private List<string> nameValuePairs;
+    private readonly string tableName;
+    private readonly List<FieldExpressionPair> fieldExpressions = [];
     private string identityColumn;
     private string cachedQuery;
 
-    private void Initialize(string tableName)
+    /// <summary>
+    ///   Creates a new SqlInsert query.</summary>
+    /// <param name="tableName">
+    ///   Table to insert record (required).</param>
+    public SqlInsert(string tableName)
     {
         if (string.IsNullOrEmpty(tableName))
-            throw new ArgumentNullException("tableName");
+            throw new ArgumentNullException(nameof(tableName));
 
         this.tableName = tableName;
-        nameValuePairs = [];
-        cachedQuery = null;
     }
 
     /// <summary>
     /// Gets the identity column.
     /// </summary>
-    /// <returns></returns>
     public string IdentityColumn()
     {
         return identityColumn;
@@ -41,31 +42,37 @@ public class SqlInsert : QueryWithParams, ISetFieldByStatement
     }
 
     /// <summary>
-    ///   Creates a new SqlInsert query.</summary>
-    /// <param name="tableName">
-    ///   Table to insert record (required).</param>
-    public SqlInsert(string tableName)
+    /// Returns field and value expression pairs
+    /// </summary>
+    public IReadOnlyList<FieldExpressionPair> GetFieldExpressions()
     {
-        Initialize(tableName);
+        return fieldExpressions;
+    }
+
+    /// <summary>
+    /// Gets the table name.
+    /// </summary>
+    public string TableName()
+    {
+        return tableName;
     }
 
     /// <summary>
     ///   Sets field value.</summary>
     /// <param name="field">
     ///   Field name (required).</param>
-    /// <param name="value">
-    ///   Field value (expression, required).</param>
+    /// <param name="expression">
+    ///   Field expression, required.</param>
     /// <returns>
     ///   SqlInsert object itself.</returns>
-    public SqlInsert SetTo(string field, string value)
+    public SqlInsert SetTo(string field, string expression)
     {
         if (field == null || field.Length == 0)
             throw new ArgumentNullException(field);
-        if (value == null || value.Length == 0)
-            throw new ArgumentNullException(value);
+        if (expression == null || expression.Length == 0)
+            throw new ArgumentNullException(expression);
 
-        nameValuePairs.Add(field);
-        nameValuePairs.Add(value);
+        fieldExpressions.Add(new FieldExpressionPair(field, expression));
         cachedQuery = null;
         return this;
     }
@@ -74,19 +81,18 @@ public class SqlInsert : QueryWithParams, ISetFieldByStatement
     ///   Sets field value.</summary>
     /// <param name="field">
     ///   Field name (required).</param>
-    /// <param name="value">
-    ///   Field value (expression, required).</param>
+    /// <param name="expression">
+    ///   Field expression, required.</param>
     /// <returns>
     ///   SqlInsert object itself.</returns>
-    void ISetFieldByStatement.SetTo(string field, string value)
+    void ISetFieldByStatement.SetTo(string field, string expression)
     {
         if (field == null || field.Length == 0)
             throw new ArgumentNullException(field);
-        if (value == null || value.Length == 0)
-            throw new ArgumentNullException(value);
+        if (expression == null || expression.Length == 0)
+            throw new ArgumentNullException(expression);
 
-        nameValuePairs.Add(field);
-        nameValuePairs.Add(value);
+        fieldExpressions.Add(new FieldExpressionPair(field, expression));
         cachedQuery = null;
     }
 
@@ -94,16 +100,16 @@ public class SqlInsert : QueryWithParams, ISetFieldByStatement
     ///   Sets field value.</summary>
     /// <param name="field">
     ///   Field (required).</param>
-    /// <param name="value">
-    ///   Field value (expression, required).</param>
+    /// <param name="expression">
+    ///   Field expression, required.</param>
     /// <returns>
     ///   SqlInsert object itself.</returns>
-    public SqlInsert SetTo(IField field, string value)
+    public SqlInsert SetTo(IField field, string expression)
     {
         ArgumentNullException.ThrowIfNull(field);
 
         cachedQuery = null;
-        return SetTo(field.Name, value);
+        return SetTo(field.Name, expression);
     }
 
     /// <summary>
@@ -117,8 +123,7 @@ public class SqlInsert : QueryWithParams, ISetFieldByStatement
         if (string.IsNullOrEmpty(field))
             throw new ArgumentNullException(field);
 
-        nameValuePairs.Add(field);
-        nameValuePairs.Add(SqlKeywords.Null);
+        fieldExpressions.Add(new FieldExpressionPair(field, SqlKeywords.Null));
         cachedQuery = null;
         return this;
     }
@@ -128,7 +133,7 @@ public class SqlInsert : QueryWithParams, ISetFieldByStatement
     public SqlInsert Clone()
     {
         SqlInsert clone = new(tableName);
-        clone.nameValuePairs.AddRange(nameValuePairs);
+        clone.fieldExpressions.AddRange(fieldExpressions);
         CloneParams(clone);
         clone.cachedQuery = cachedQuery;
         return clone;
@@ -154,7 +159,7 @@ public class SqlInsert : QueryWithParams, ISetFieldByStatement
         if (cachedQuery != null)
             return cachedQuery;
 
-        cachedQuery = Format(tableName, nameValuePairs, dialect);
+        cachedQuery = Format(tableName, fieldExpressions, dialect);
 
         return cachedQuery;
     }
@@ -163,37 +168,59 @@ public class SqlInsert : QueryWithParams, ISetFieldByStatement
     ///   Formats an INSERT query.</summary>
     /// <param name="tableName">
     ///   Table name (required).</param>
-    /// <param name="nameValuePairs">
-    ///   Field names and values. Must be passed in the order of <c>[field1, value1, field2, 
-    ///   value2, ...., fieldN, valueN]</c>. It must have even number of elements.</param>
+    /// <param name="fieldExpressions">
+    ///   Field names and values in the form of [field1, value1, field2, value2, ..., fieldN, valueN].</param>
     /// <param name="dialect">Target dialect</param>
     /// <returns>
     ///   Formatted query.</returns>
-    public static string Format(string tableName, List<string> nameValuePairs, ISqlDialect dialect = null)
+    [Obsolete("Use overload with IEnumerable<FieldExpressionPair>")]
+    public static string Format(string tableName, List<string> fieldExpressions, ISqlDialect dialect = null)
+    {
+        ArgumentNullException.ThrowIfNull(fieldExpressions);
+
+        if (fieldExpressions.Count % 2 != 0)
+            throw new ArgumentOutOfRangeException(nameof(fieldExpressions));
+
+        var list = new List<FieldExpressionPair>(fieldExpressions.Count / 2);
+        for (var i = 0; i < fieldExpressions.Count; i += 2)
+            list.Add(new FieldExpressionPair(fieldExpressions[i], fieldExpressions[i + 1]));
+        return Format(tableName, list, dialect);
+    }
+
+    /// <summary>
+    ///   Formats an INSERT query.</summary>
+    /// <param name="tableName">
+    ///   Table name (required).</param>
+    /// <param name="fieldExpressions">
+    ///   Field names and their value expressions.</param>
+    /// <param name="dialect">Target dialect</param>
+    /// <returns>
+    ///   Formatted query.</returns>
+    public static string Format(string tableName, IEnumerable<FieldExpressionPair> fieldExpressions, ISqlDialect dialect = null)
     {
         if (tableName == null || tableName.Length == 0)
             throw new ArgumentNullException(tableName);
 
-        ArgumentNullException.ThrowIfNull(nameValuePairs);
+        ArgumentNullException.ThrowIfNull(fieldExpressions);
 
-        if (nameValuePairs.Count % 2 != 0)
-            throw new ArgumentOutOfRangeException("nameValuePairs");
-
-        StringBuilder sb = new("INSERT INTO ", 64 + nameValuePairs.Count * 16);
+        var list = fieldExpressions.ToList();
+        StringBuilder sb = new("INSERT INTO ", 64 + list.Count * 16);
         sb.Append(SqlSyntax.AutoBracketValid(tableName, dialect));
         sb.Append(" (");
-        for (int i = 0; i < nameValuePairs.Count; i += 2)
+        var i = 0;
+        foreach (var pair in list)
         {
-            if (i > 0)
+            if (i++ > 0)
                 sb.Append(", ");
-            sb.Append(SqlSyntax.AutoBracket(nameValuePairs[i], dialect));
+            sb.Append(SqlSyntax.AutoBracket(pair.Field, dialect));
         }
         sb.Append(") VALUES (");
-        for (int i = 1; i < nameValuePairs.Count; i += 2)
+        i = 0;
+        foreach (var pair in list)
         {
-            if (i > 1)
+            if (i++ > 0)
                 sb.Append(", ");
-            sb.Append(nameValuePairs[i]);
+            sb.Append(pair.Expression);
         }
         sb.Append(')');
 
@@ -205,27 +232,23 @@ public class SqlInsert : QueryWithParams, ISetFieldByStatement
     ///   or inserts a new row if no such row exists.</summary>
     /// <param name="tableName">
     ///   Table name (required).</param>
-    /// <param name="nameValuePairs">
-    ///   Field names and values. Must be passed in the order of <c>[field1, value1, field2, 
-    ///   value2, ...., fieldN, valueN]</c>. It must have even number of elements.</param>
+    /// <param name="fieldExpressions">
+    ///   Field names and their value expressions.</param>
     /// <param name="keyFields">
     ///   List of key field names (e.g. primary key columns) that should be used to determine 
     ///   whether an existing row is updated or a new row is inserted. Key fields must exist 
-    ///   among the fields in <paramref name="nameValuePairs"/>.</param>
+    ///   among the fields in <paramref name="fieldExpressions"/>.</param>
     /// <param name="dialect">Target dialect</param>
     /// <returns>
     ///   Formatted UPSERT query.</returns>
-    public static string FormatUpsert(string tableName, List<string> nameValuePairs,
+    public static string FormatUpsert(string tableName, IEnumerable<FieldExpressionPair> fieldExpressions,
         IEnumerable<string> keyFields, ISqlDialect dialect = null)
     {
         if (tableName == null || tableName.Length == 0)
             throw new ArgumentNullException(nameof(tableName));
 
-        ArgumentNullException.ThrowIfNull(nameValuePairs);
+        ArgumentNullException.ThrowIfNull(fieldExpressions);
         ArgumentNullException.ThrowIfNull(keyFields);
-
-        if (nameValuePairs.Count % 2 != 0)
-            throw new ArgumentOutOfRangeException(nameof(nameValuePairs));
 
         dialect ??= SqlSettings.DefaultDialect;
 
@@ -233,24 +256,23 @@ public class SqlInsert : QueryWithParams, ISetFieldByStatement
         if (keyFieldList.Count == 0)
             throw new ArgumentOutOfRangeException(nameof(keyFields));
 
-        int fieldCount = nameValuePairs.Count / 2;
+        var list = fieldExpressions.ToList();
+        int fieldCount = list.Count;
         var fields = new List<string>(fieldCount);
         var values = new List<string>(fieldCount);
         var valueByField = new Dictionary<string, string>(StringComparer.OrdinalIgnoreCase);
 
-        for (int i = 0; i < nameValuePairs.Count; i += 2)
+        foreach (var pair in list)
         {
-            var field = nameValuePairs[i];
+            var field = pair.Field;
             if (field == null || field.Length == 0)
-                throw new ArgumentException(string.Format(
-                    "Field name at index {0} is null or empty!", i), nameof(nameValuePairs));
+                throw new ArgumentException("Field name is null or empty!", nameof(fieldExpressions));
 
             fields.Add(SqlSyntax.AutoBracket(field, dialect));
-            values.Add(nameValuePairs[i + 1]);
-            valueByField[field] = nameValuePairs[i + 1];
+            values.Add(pair.Expression);
+            valueByField[field] = pair.Expression;
         }
 
-        var keyFieldsSet = new HashSet<string>(keyFieldList, StringComparer.OrdinalIgnoreCase);
         var keyBracketed = new List<string>(keyFieldList.Count);
         var keyValues = new List<string>(keyFieldList.Count);
         foreach (var keyField in keyFieldList)
@@ -263,11 +285,12 @@ public class SqlInsert : QueryWithParams, ISetFieldByStatement
             keyValues.Add(keyValue);
         }
 
+        var keyFieldsSet = new HashSet<string>(keyFieldList);
         var nonKeyFields = new List<string>();
         var nonKeyValues = new List<string>();
         for (int i = 0; i < fieldCount; i++)
         {
-            if (keyFieldsSet.Contains(nameValuePairs[i * 2]))
+            if (keyFieldsSet.Contains(list[i].Field))
                 continue;
 
             nonKeyFields.Add(fields[i]);
@@ -364,6 +387,6 @@ public class SqlInsert : QueryWithParams, ISetFieldByStatement
     ///   Formatted UPSERT query.</returns>
     public string ToUpsertString(IEnumerable<string> keyFields)
     {
-        return FormatUpsert(tableName, nameValuePairs, keyFields, dialect);
+        return FormatUpsert(tableName, fieldExpressions, keyFields, dialect);
     }
 }

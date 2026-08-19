@@ -9,20 +9,9 @@ namespace Serenity.Data;
 ///   <p>Where expressions determines the record(s) to update.</p></remarks>   
 public class SqlUpdate : QueryWithParams, ISetFieldByStatement, IFilterableQuery
 {
-    private string _tableName;
-    private List<string> _nameValuePairs;
-    private StringBuilder _where;
-    private Dictionary _params;
-
-    private void Initialize(string tableName)
-    {
-        if (string.IsNullOrEmpty(tableName))
-            throw new ArgumentNullException("tableName");
-
-        _tableName = tableName;
-        _nameValuePairs = [];
-        _where = new StringBuilder();
-    }
+    private readonly string tableName;
+    private readonly List<FieldExpressionPair> fieldExpressions = [];
+    private readonly List<string> where = [];
 
     /// <summary>
     ///   Creates a new SqlUpdate query.</summary>
@@ -30,28 +19,56 @@ public class SqlUpdate : QueryWithParams, ISetFieldByStatement, IFilterableQuery
     ///   Table name (required).</param>
     public SqlUpdate(string tableName)
     {
-        Initialize(tableName);
+        if (string.IsNullOrEmpty(tableName))
+            throw new ArgumentNullException(nameof(tableName));
+
+        this.tableName = tableName;
     }
 
+    /// <summary>
+    ///   Gets the table name.</summary>
+    public string TableName()
+    {
+        return tableName;
+    }
 
+    /// <summary>
+    ///   Returns field and value expression pairs.</summary>
+    public IReadOnlyList<FieldExpressionPair> GetFieldExpressions()
+    {
+        return fieldExpressions;
+    }
+
+    /// <summary>
+    ///   Returns the WHERE conditions.</summary>
+    public IReadOnlyList<string> GetWhereConditions()
+    {
+        return where;
+    }
+
+    /// <summary>
+    ///   Returns the WHERE clause (excluding WHERE keyword).</summary>
+    public string GetWhereClause()
+    {
+        return string.Join(SqlKeywords.And, where);
+    }
 
     /// <summary>
     ///   Sets field value to the expression.</summary>
     /// <param name="field">
     ///   Field name (required).</param>
-    /// <param name="value">
-    ///   Field value (expression, required).</param>
+    /// <param name="expression">
+    ///   Field expression, required.</param>
     /// <returns>
     ///   SqlUpdate object itself.</returns>
-    public SqlUpdate SetTo(string field, string value)
+    public SqlUpdate SetTo(string field, string expression)
     {
         if (field == null || field.Length == 0)
             throw new ArgumentNullException(field);
-        if (value == null || value.Length == 0)
-            throw new ArgumentNullException(value);
+        if (expression == null || expression.Length == 0)
+            throw new ArgumentNullException(expression);
 
-        _nameValuePairs.Add(field);
-        _nameValuePairs.Add(value);
+        fieldExpressions.Add(new FieldExpressionPair(field, expression));
         return this;
     }
 
@@ -59,33 +76,32 @@ public class SqlUpdate : QueryWithParams, ISetFieldByStatement, IFilterableQuery
     ///   Sets field value to the expression.</summary>
     /// <param name="field">
     ///   Field name (required).</param>
-    /// <param name="value">
-    ///   Field value (expression, required).</param>
+    /// <param name="expression">
+    ///   Field expression, required.</param>
     /// <returns>
     ///   SqlUpdate object itself.</returns>
-    void ISetFieldByStatement.SetTo(string field, string value)
+    void ISetFieldByStatement.SetTo(string field, string expression)
     {
         if (field == null || field.Length == 0)
             throw new ArgumentNullException(field);
-        if (value == null || value.Length == 0)
-            throw new ArgumentNullException(value);
+        if (expression == null || expression.Length == 0)
+            throw new ArgumentNullException(expression);
 
-        _nameValuePairs.Add(field);
-        _nameValuePairs.Add(value);
+        fieldExpressions.Add(new FieldExpressionPair(field, expression));
     }
 
     /// <summary>
     ///   Sets field value to the expression.</summary>
     /// <param name="field">
     ///   Field name (required).</param>
-    /// <param name="value">
+    /// <param name="expression">
     ///   Field expression (required).</param>
     /// <returns>
     ///   SqlUpdate object itself.</returns>
-    public SqlUpdate SetTo(IField field, string value)
+    public SqlUpdate SetTo(IField field, string expression)
     {
         ArgumentNullException.ThrowIfNull(field);
-        return SetTo(field.Name, value);
+        return SetTo(field.Name, expression);
     }
 
     /// <summary>
@@ -99,8 +115,7 @@ public class SqlUpdate : QueryWithParams, ISetFieldByStatement, IFilterableQuery
         if (field == null || field.Length == 0)
             throw new ArgumentNullException(field);
 
-        _nameValuePairs.Add(field);
-        _nameValuePairs.Add(SqlKeywords.Null);
+        fieldExpressions.Add(new FieldExpressionPair(field, SqlKeywords.Null));
         return this;
     }
 
@@ -167,14 +182,9 @@ public class SqlUpdate : QueryWithParams, ISetFieldByStatement, IFilterableQuery
     public SqlUpdate Where(string condition)
     {
         if (condition == null || condition.Length == 0)
-            throw new ArgumentNullException("condition");
+            throw new ArgumentNullException(nameof(condition));
 
-        condition = RemoveT0Reference(condition);
-
-        if (_where.Length > 0)
-            _where.Append(SqlKeywords.And);
-
-        _where.Append(condition);
+        where.Add(RemoveT0Reference(condition));
 
         return this;
     }
@@ -223,37 +233,15 @@ public class SqlUpdate : QueryWithParams, ISetFieldByStatement, IFilterableQuery
     }
 
     /// <summary>
-    ///   Adds conditions to WHERE clause of the query.</summary>
-    /// <param name="conditions">
-    ///   Condition.</param>
-    /// <returns>
-    ///   SqlUpdate object itself.</returns>
-    public SqlUpdate Where(params string[] conditions)
-    {
-        if (conditions == null || conditions.Length == 0)
-            throw new ArgumentNullException("conditions");
-
-        foreach (var condition in conditions)
-            Where(condition);
-
-        return this;
-    }
-
-    /// <summary>
     ///   Clones this SqlUpdate query.</summary>
     /// <returns>
     ///   A new clone.</returns>
     public SqlUpdate Clone()
     {
-        SqlUpdate clone = new(_tableName);
-        clone._nameValuePairs.AddRange(_nameValuePairs);
-        clone._where.Append(_where.ToString());
-        if (_params != null)
-        {
-            clone._params = [];
-            foreach (var pair in _params)
-                clone._params.Add(pair.Key, pair.Value);
-        }
+        SqlUpdate clone = new(tableName);
+        clone.fieldExpressions.AddRange(fieldExpressions);
+        clone.where.AddRange(where);
+        CloneParams(clone);
         return clone;
     }
 
@@ -263,39 +251,58 @@ public class SqlUpdate : QueryWithParams, ISetFieldByStatement, IFilterableQuery
     ///   String representation.</returns>
     public override string ToString()
     {
-        return Format(_tableName, _where.ToString(), _nameValuePairs, dialect);
+        return Format(tableName, GetWhereClause(), fieldExpressions, dialect);
     }
 
     /// <summary>
     /// Formats an SQL UPDATE statement.</summary>
     /// <param name="tableName">Table name (required).</param>
-    /// <param name="nameValuePairs">Field name and values. Should have structure of <c>[field1, value1, field2, value2, ...., fieldN, valueN]</c>.
-    /// This array is required and must have even number of elements.</param>
+    /// <param name="fieldExpressions">Field names and values in the form of [field1, value1, field2, value2, ..., fieldN, valueN].</param>
+    /// <param name="where">WHERE clause (can be null).</param>
+    /// <param name="dialect">Target dialect</param>
+    /// <returns>Formatted UPDATE query.</returns>
+    [Obsolete("Use overload with IEnumerable<FieldExpressionPair>")]
+    public static string Format(string tableName, string where,
+        List<string> fieldExpressions, ISqlDialect dialect = null)
+    {
+        ArgumentNullException.ThrowIfNull(fieldExpressions);
+
+        if (fieldExpressions.Count % 2 != 0)
+            throw new ArgumentOutOfRangeException(nameof(fieldExpressions));
+
+        var list = new List<FieldExpressionPair>(fieldExpressions.Count / 2);
+        for (var i = 0; i < fieldExpressions.Count; i += 2)
+            list.Add(new FieldExpressionPair(fieldExpressions[i], fieldExpressions[i + 1]));
+        return Format(tableName, where, list, dialect);
+    }
+
+    /// <summary>
+    /// Formats an SQL UPDATE statement.</summary>
+    /// <param name="tableName">Table name (required).</param>
+    /// <param name="fieldExpressions">Field names and their value expressions.</param>
     /// <param name="where">WHERE clause (can be null).</param>
     /// <param name="dialect">Target dialect</param>
     /// <returns>Formatted UPDATE query.</returns>
     public static string Format(string tableName, string where,
-        List<string> nameValuePairs, ISqlDialect dialect = null)
+        IEnumerable<FieldExpressionPair> fieldExpressions, ISqlDialect dialect = null)
     {
         if (tableName == null || tableName.Length == 0)
             throw new ArgumentNullException(tableName);
 
-        ArgumentNullException.ThrowIfNull(nameValuePairs);
+        ArgumentNullException.ThrowIfNull(fieldExpressions);
 
-        if (nameValuePairs.Count % 2 != 0)
-            throw new ArgumentOutOfRangeException("nameValuePairs");
-
-        StringBuilder sb = new("UPDATE ", 64 + where.Length +
-            nameValuePairs.Count * 16);
+        var list = fieldExpressions.ToList();
+        StringBuilder sb = new("UPDATE ", 64 + where.Length + list.Count * 16);
         sb.Append(SqlSyntax.AutoBracketValid(tableName, dialect));
         sb.Append(" SET ");
-        for (int i = 0; i < nameValuePairs.Count - 1; i += 2)
+        var i = 0;
+        foreach (var pair in list)
         {
-            if (i > 0)
+            if (i++ > 0)
                 sb.Append(", ");
-            sb.Append(SqlSyntax.AutoBracket(nameValuePairs[i], dialect));
+            sb.Append(SqlSyntax.AutoBracket(pair.Field, dialect));
             sb.Append(" = ");
-            sb.Append(nameValuePairs[i + 1]);
+            sb.Append(pair.Expression);
         }
 
         if (where != null && where.Length > 0)

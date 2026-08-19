@@ -551,22 +551,6 @@ public partial class SqlQuery : QueryWithParams, ISqlQuery, IFilterableQuery, IG
     }
 
     /// <summary>
-    /// Adds expressions to WHERE clause, inserting AND between them.
-    /// </summary>
-    /// <param name="expressions">An array of expressions</param>
-    /// <returns>The query itself.</returns>
-    public SqlQuery Where(params string[] expressions)
-    {
-        if (expressions == null || expressions.Length == 0)
-            throw new ArgumentNullException("expressions");
-
-        foreach (var expression in expressions)
-            Where(expression);
-
-        return this;
-    }
-
-    /// <summary>
     /// Implements IDBFilterable.Where, by calling original Where method.
     /// </summary>
     /// <param name="expression">An expression</param>
