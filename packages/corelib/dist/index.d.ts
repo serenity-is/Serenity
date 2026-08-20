@@ -522,23 +522,41 @@ export declare function parseCriteria(strings: TemplateStringsArray, ...values: 
  * `"is null"`). Exposed also as {@link Criteria.Operator} for convenience.
  */
 export declare enum CriteriaOperator {
+	/** Parentheses grouping `()` . */
 	paren = "()",
+	/** Logical NOT (`not`). */
 	not = "not",
+	/** IS NULL (`is null`). */
 	isNull = "is null",
+	/** IS NOT NULL (`is not null`). */
 	isNotNull = "is not null",
+	/** EXISTS (`exists`). */
 	exists = "exists",
+	/** Logical AND (`and`). */
 	and = "and",
+	/** Logical OR (`or`). */
 	or = "or",
+	/** Logical XOR (`xor`). */
 	xor = "xor",
+	/** Equality (`=`). */
 	eq = "=",
+	/** Not equal (`!=`). */
 	ne = "!=",
+	/** Greater than (`>`). */
 	gt = ">",
+	/** Greater than or equal (`>=`). */
 	ge = ">=",
+	/** Less than (`<`). */
 	lt = "<",
+	/** Less than or equal (`<=`). */
 	le = "<=",
+	/** IN (`in`). */
 	in = "in",
+	/** NOT IN (`not in`). */
 	notIn = "not in",
+	/** LIKE (`like`). */
 	like = "like",
+	/** NOT LIKE (`not like`). */
 	notLike = "not like"
 }
 /**
@@ -1777,12 +1795,19 @@ export interface Fluent<TElement extends HTMLElement = HTMLElement> extends Arra
 	 */
 	closest<TElement extends HTMLElement = HTMLElement>(selector: string): Fluent<TElement>;
 	/**
-	 * Gets or sets the value of the specified data attribute.
+	 * Gets the value of the specified `data-*` attribute.
 	 *
-	 * @param name The name of the data attribute.
-	 * @returns The value of the data attribute if no value is provided, or the Fluent object itself if a value is provided.
+	 * @param name - Name of the data attribute without the `data-` prefix.
+	 * @returns The attribute value, or `null`/`undefined` when not present.
 	 */
 	data(name: string): string;
+	/**
+	 * Sets the value of the specified `data-*` attribute.
+	 *
+	 * @param name - Name of the data attribute without the `data-` prefix.
+	 * @param value - Value to set; `null`/`undefined` removes the attribute via {@link Fluent.attr}.
+	 * @returns The Fluent object itself.
+	 */
 	data(name: string, value: string): this;
 	/**
 	 * Executes a callback function for the element in the Fluent object if it is not null.
@@ -1839,16 +1864,17 @@ export interface Fluent<TElement extends HTMLElement = HTMLElement> extends Arra
 	 */
 	hasClass(klass: string): boolean;
 	/**
-	 * Gets the value of the hidden attribute/property.
+	 * Gets whether the element is hidden (`hidden` property).
 	 *
-	 * @returns The value of the hidden attribute/property
+	 * @param name - Reserved attribute name parameter for compatibility; not used for the `hidden` property check.
+	 * @returns `true` if the element is hidden, otherwise `false`.
 	 */
 	hidden(name: string): boolean;
 	/**
-	 * Sets the value of the hidden property/attribute.
+	 * Sets whether the element is hidden.
 	 *
-	 * @param value The value of the attribute. If the value is falsy the attribute is removed.
-	 * @returns The Fluent object itself if a value is provided.
+	 * @param value - When `true` sets `element.hidden = true`, otherwise `false`.
+	 * @returns The Fluent object itself.
 	 */
 	hidden(value: boolean): this;
 	/**
@@ -1900,33 +1926,84 @@ export interface Fluent<TElement extends HTMLElement = HTMLElement> extends Arra
 	/**
 	 * Removes an event listener from the element.
 	 *
-	 * @param type The type of the event. It can include a ".namespace" similar to jQuery.
-	 * @param listener The event listener to remove.
+	 * @param type - Event type, may include a `.namespace` suffix (e.g. `"click.myNs"`).
+	 * @param listener - Event listener to remove.
 	 * @returns The Fluent object itself.
 	 */
 	off<K extends keyof HTMLElementEventMap>(type: K, listener: (this: HTMLElement, ev: HTMLElementEventMap[K]) => any): this;
+	/**
+	 * Removes event listener(s) for the given type / namespace.
+	 *
+	 * @param type - Event type or `.namespace`; when only a namespace is handled all matching listeners are removed.
+	 * @returns The Fluent object itself.
+	 */
 	off(type: string): this;
+	/**
+	 * Removes an event listener from the element.
+	 *
+	 * @param type - Event type, may include a `.namespace`.
+	 * @param listener - Event listener to remove.
+	 * @returns The Fluent object itself.
+	 */
 	off(type: string, listener: EventListener): this;
+	/**
+	 * Removes a delegated event listener.
+	 *
+	 * @param type - Event type, may include a `.namespace`.
+	 * @param selector - Delegation selector used when the listener was added.
+	 * @param delegationHandler - Delegated handler to remove.
+	 * @returns The Fluent object itself.
+	 */
 	off(type: string, selector: string, delegationHandler: Function): this;
 	/**
-	 * Adds an event listener to the element. It is possible to use delegated events like jQuery.
+	 * Adds an event listener to the element. Supports namespaced and delegated events via the shared `fluent-events` module.
 	 *
-	 * @param type The type of the event. It can include a ".namespace" similar to jQuery.
-	 * @param listener The event listener to add.
+	 * @param type - Event type, may include a `.namespace` suffix.
+	 * @param listener - Event listener to add.
 	 * @returns The Fluent object itself.
 	 */
 	on<K extends keyof HTMLElementEventMap>(type: K, listener: (this: HTMLElement, ev: HTMLElementEventMap[K]) => any): this;
+	/**
+	 * Adds an event listener to the element.
+	 *
+	 * @param type - Event type, may include a `.namespace`.
+	 * @param listener - Event listener to add.
+	 * @returns The Fluent object itself.
+	 */
 	on(type: string, listener: EventListener): this;
+	/**
+	 * Adds a delegated event listener to the element.
+	 *
+	 * @param type - Event type, may include a `.namespace`.
+	 * @param selector - CSS selector to delegate to.
+	 * @param delegationHandler - Handler invoked when the delegated target matches.
+	 * @returns The Fluent object itself.
+	 */
 	on(type: string, selector: string, delegationHandler: Function): this;
 	/**
-	 * Adds a one-time event listener to the element. It is possible to use delegated events like jQuery.
+	 * Adds a one-time event listener that is automatically removed after the first invocation.
 	 *
-	 * @param type The type of the event. It can include a ".namespace" similar to jQuery.
-	 * @param listener The event listener to add.
+	 * @param type - Event type, may include a `.namespace` suffix.
+	 * @param listener - Event listener to add.
 	 * @returns The Fluent object itself.
 	 */
 	one<K extends keyof HTMLElementEventMap>(type: K, listener: (this: HTMLElement, ev: HTMLElementEventMap[K]) => any): this;
+	/**
+	 * Adds a one-time event listener to the element.
+	 *
+	 * @param type - Event type, may include a `.namespace`.
+	 * @param listener - Event listener to add.
+	 * @returns The Fluent object itself.
+	 */
 	one(type: string, listener: EventListener): this;
+	/**
+	 * Adds a one-time delegated event listener to the element.
+	 *
+	 * @param type - Event type, may include a `.namespace`.
+	 * @param selector - CSS selector to delegate to.
+	 * @param delegationHandler - Handler invoked once when the delegated target matches.
+	 * @returns The Fluent object itself.
+	 */
 	one(type: string, selector: string, delegationHandler: Function): this;
 	/**
 	 * Checks if the element matches the specified selector.
@@ -2003,11 +2080,17 @@ export interface Fluent<TElement extends HTMLElement = HTMLElement> extends Arra
 	 */
 	style(callback: (css: CSSStyleDeclaration) => void): this;
 	/**
-	 * Gets or sets the text content of the element.
+	 * Gets the text content of the element.
 	 *
-	 * @returns The text content of the element if no value is provided, or the Fluent object itself if a value is provided.
+	 * @returns The current `textContent` of the element.
 	 */
 	text(): string;
+	/**
+	 * Sets the text content of the element.
+	 *
+	 * @param value - Text to set as `textContent`.
+	 * @returns The Fluent object itself.
+	 */
 	text(value: string): this;
 	/**
 	 * Toggles the visibility of the element.
@@ -2019,7 +2102,8 @@ export interface Fluent<TElement extends HTMLElement = HTMLElement> extends Arra
 	/**
 	 * Toggles one or more classes on the element. If the class exists, it is removed; otherwise, it is added.
 	 *
-	 * @param value The class or classes to toggle. It can be a string, boolean, or an array of strings or booleans.
+	 * @param value - Class or classes to toggle. Strings are split on whitespace; arrays are flattened; falsy entries are ignored.
+	 * @param add - When `true` forces addition, when `false` forces removal, when omitted toggles.
 	 * @returns The Fluent object itself.
 	 */
 	toggleClass(value: (string | boolean | (string | boolean)[]), add?: boolean): this;
@@ -2041,12 +2125,17 @@ export interface Fluent<TElement extends HTMLElement = HTMLElement> extends Arra
 		new (...args: any[]): TWidget;
 	}): TWidget;
 	/**
-	 * Gets or sets the value of the element.
+	 * Sets the value of the element (input / select / textarea).
 	 *
-	 * @param value The value to set. If no value is provided, returns the current value of the element.
-	 * @returns The value of the element if no value is provided, or the Fluent object itself if a value is provided.
+	 * @param value - Value to set.
+	 * @returns The Fluent object itself.
 	 */
 	val(value: string): this;
+	/**
+	 * Gets the value of the element (input / select / textarea).
+	 *
+	 * @returns The current value of the element.
+	 */
 	val(): string;
 }
 /**
@@ -2087,7 +2176,22 @@ export declare namespace Fluent {
 	 * @returns `void`.
 	 */
 	function on<K extends keyof HTMLElementEventMap>(element: EventTarget, type: K, listener: (this: HTMLElement, ev: HTMLElementEventMap[K]) => any): void;
+	/**
+	 * Adds an event listener.
+	 * @param element - Target element to listen on.
+	 * @param type - Event type; may include a `.namespace` suffix.
+	 * @param listener - Callback to invoke when the event fires.
+	 * @returns `void`.
+	 */
 	function on(element: EventTarget, type: string, listener: EventListener): void;
+	/**
+	 * Adds a delegated event listener.
+	 * @param element - Target element to listen on.
+	 * @param type - Event type; may include a `.namespace` suffix.
+	 * @param selector - CSS selector to delegate to.
+	 * @param delegationHandler - Handler invoked when the delegated target matches.
+	 * @returns `void`.
+	 */
 	function on(element: EventTarget, type: string, selector: string, delegationHandler: Function): void;
 	/**
 	 * Adds a one-time event listener that is automatically removed after the first invocation.
@@ -2097,7 +2201,22 @@ export declare namespace Fluent {
 	 * @returns `void`.
 	 */
 	function one<K extends keyof HTMLElementEventMap>(element: EventTarget, type: K, listener: (this: HTMLElement, ev: HTMLElementEventMap[K]) => any): void;
+	/**
+	 * Adds a one-time event listener.
+	 * @param element - Target element to listen on.
+	 * @param type - Event type; may include a `.namespace` suffix.
+	 * @param listener - Callback to invoke once when the event fires.
+	 * @returns `void`.
+	 */
 	function one(element: EventTarget, type: string, listener: EventListener): void;
+	/**
+	 * Adds a one-time delegated event listener.
+	 * @param element - Target element to listen on.
+	 * @param type - Event type; may include a `.namespace` suffix.
+	 * @param selector - CSS selector to delegate to.
+	 * @param delegationHandler - Handler invoked once when the delegated target matches.
+	 * @returns `void`.
+	 */
 	function one(element: EventTarget, type: string, selector: string, delegationHandler: Function): void;
 	/**
 	 * Removes an event listener (or all listeners for a namespaced type).
@@ -2107,7 +2226,22 @@ export declare namespace Fluent {
 	 * @returns `void`.
 	 */
 	function off<K extends keyof HTMLElementEventMap>(element: EventTarget, type: K, listener?: (this: HTMLElement, ev: HTMLElementEventMap[K]) => any): void;
+	/**
+	 * Removes an event listener.
+	 * @param element - Target element.
+	 * @param type - Event type; may include a `.namespace`.
+	 * @param listener - Specific callback to remove. When omitted, all listeners for `type` are removed.
+	 * @returns `void`.
+	 */
 	function off(element: EventTarget, type: string, listener?: EventListener): void;
+	/**
+	 * Removes a delegated event listener.
+	 * @param element - Target element.
+	 * @param type - Event type; may include a `.namespace`.
+	 * @param selector - Delegation selector used when the listener was added.
+	 * @param delegationHandler - Delegated handler to remove.
+	 * @returns `void`.
+	 */
 	function off(element: EventTarget, type: string, selector?: string, delegationHandler?: Function): void;
 	/**
 	 * Dispatches a synthetic event on the element.
@@ -3116,11 +3250,12 @@ export declare function getRemoteDataAsync<TData = any>(key: string): Promise<TD
  */
 export declare function getRemoteData<TData = any>(key: string): TData;
 /**
- * Shows a suitable error message for errors occured during loading of
- * a dynamic script data.
- * @param name Name of the dynamic script
- * @param status HTTP status returned if available
- * @param statusText HTTP status text returned if available
+ * Shows a suitable error message for errors occurred during loading of a dynamic script data.
+ * @param name - Name of the dynamic script.
+ * @param status - HTTP status returned if available.
+ * @param statusText - HTTP status text returned if available.
+ * @param shouldThrow - When `true` (default) throws the error message after notifying; when `false` only notifies and returns.
+ * @returns The error message string.
  */
 export declare function handleScriptDataError(name: string, status?: number, statusText?: string, shouldThrow?: boolean): string;
 /**
@@ -3261,7 +3396,8 @@ declare global {
 	}
 }
 /**
- * Get the global object  (window in browsers, global in node)
+ * Gets the global object (`window` in browsers, `global` in Node / workers).
+ * @returns The global object instance.
  */
 export declare function getGlobalObject(): any;
 /**
@@ -3294,10 +3430,10 @@ export declare function getNested(from: any, name: string): any;
  */
 export declare function getType(name: string, target?: any): Type;
 /**
- * Get the full name of a type (including namespace if any).
- * This returns the name from typeInfo.typeName if available (e.g. registered via decorators),
- * otherwise tries to get the name from function's name property.
- * @param type Type to get the name of
+ * Gets the full name of a type including its namespace if any.
+ * Prefers the registered `typeInfo.typeName` when available, otherwise falls back to the function's `name` property.
+ * @param type - Type to get the full name of.
+ * @returns Fully-qualified type name (e.g. `"Serenity.StringEditor"`).
  */
 export declare function getTypeFullName(type: Type): string;
 /**
@@ -3945,6 +4081,7 @@ export declare class Tooltip {
 	 * @param el - Target element or array-like collection (first element is used).
 	 * @param opt - Tooltip options; if omitted defaults are applied.
 	 * @param create - When `true` (default) creates a tooltip if none exists; when `false` only wraps an existing instance.
+	 * @returns A `Tooltip` wrapper instance.
 	 */
 	constructor(el: ArrayLike<HTMLElement> | HTMLElement, opt?: TooltipOptions);
 	/** Default options applied when none are supplied. */
@@ -3972,6 +4109,7 @@ export declare class Tooltip {
 	static getInstance(el: ArrayLike<HTMLElement> | HTMLElement): Tooltip;
 	/**
 	 * Whether a tooltip implementation (Bootstrap or jQuery) is available in the current environment.
+	 * @returns `true` if Bootstrap Tooltip or jQuery tooltip is available, otherwise `false`.
 	 */
 	static get isAvailable(): boolean;
 	/**
@@ -4172,8 +4310,9 @@ export type ValidationValue = string | string[] | number | boolean;
  * @returns Validation result or promise thereof.
  */
 export type ValidationProvider = (value: ValidationValue, element: ValidatableElement, params?: any) => boolean | string | Promise<boolean | string>;
-/** Map of field name to error message / flag for fields currently failing validation. */
+/** Map of field name to the current error message or flag for fields failing validation. */
 export interface ValidationErrorMap {
+	/** Error entry for a field key: `string` message or `true`/`false` flag. */
 	[name: string]: (string | boolean);
 }
 /** Single validation failure entry. */
@@ -4189,8 +4328,9 @@ export interface ValidationErrorItem {
 export type ValidationErrorList = ValidationErrorItem[];
 /** Rule set for a single field: method name to parameter (e.g. `{ required: true, minlength: 3 }`). */
 export type ValidationRules = Record<string, any>;
-/** Map of field name to its {@link ValidationRules}. */
+/** Map of field name to its {@link ValidationRules} set. */
 export interface ValidationRulesMap {
+	/** Rule set for a field keyed by field name. */
 	[name: string]: ValidationRules;
 }
 /**
@@ -6278,69 +6418,138 @@ export declare namespace Aggregators {
 	/** Average of a numeric field (ignores non-numeric / empty values). */
 	class Avg implements IAggregator {
 		readonly field: string;
+		/** Number of items processed. */
 		count: number;
+		/** Number of non-null numeric values. */
 		nonNullCount: number;
+		/** Running sum of valid values. */
 		sum: number;
+		/**
+		 * Creates a new average aggregator.
+		 * @param field - The field to average.
+		 */
 		constructor(field: string);
+		/** Initializes the aggregator state for a new group by resetting the item count, non-null count, and running sum to zero so the next group starts from a clean state. @inheritdoc */
 		init(): void;
+		/** Accumulates a single row item into the running average state for the configured field. @param item - Row item to accumulate; the configured field value is parsed as a number when valid. @inheritdoc */
 		accumulate(item: any): void;
+		/** Stores the computed average into the group totals container for the configured field. @param groupTotals - Totals container to write the computed average into, keyed by field name. @inheritdoc */
 		storeResult(groupTotals: IGroupTotals): void;
+		/** Summary type for this aggregator. */
 		static readonly summaryType = SummaryType.Avg;
+		/** Key used to store/lookup this aggregator in totals. */
 		static readonly aggregateKey = "avg";
+		/** Localized display name for this aggregator. */
 		static get displayName(): string;
 	}
 	/** Weighted average given a value field and a weight field. */
 	class WeightedAvg implements IAggregator {
 		readonly field: string;
 		readonly weightedField: string;
+		/** Weighted sum of values. */
 		sum: number;
+		/** Sum of weights. */
 		weightedSum: number;
+		/**
+		 * Creates a new weighted average aggregator.
+		 * @param field - The value field name.
+		 * @param weightedField - The weight field name.
+		 */
 		constructor(field: string, weightedField: string);
+		/** Initializes the weighted average aggregator state for a new group by resetting the weighted value sum and total weight to zero for the next group's calculation. @inheritdoc */
 		init(): void;
+		/** Accumulates a single row item into the weighted average state using the value and weight fields. @param item - Row item to accumulate; both value and weight fields must contain valid numeric values. @inheritdoc */
 		accumulate(item: any): void;
+		/** Stores the computed weighted average into the group totals container for the configured field. @param groupTotals - Totals container to write the computed weighted average into, keyed by field name. @inheritdoc */
 		storeResult(groupTotals: any): void;
+		/**
+		 * Checks if a value is valid for aggregation.
+		 * @param val - The value to check.
+		 * @returns True if valid.
+		 */
 		static isValid(val: any): boolean;
+		/** Key used to store/lookup this aggregator in totals. */
 		static readonly aggregateKey = "weightedAvg";
+		/** Localized display name for this aggregator. */
 		static get displayName(): string;
 	}
 	/** Minimum of a field. */
 	class Min implements IAggregator {
+		/** The field to aggregate. */
 		readonly field: string;
+		/** Current minimum value. */
 		min: any;
+		/**
+		 * Creates a new minimum aggregator.
+		 * @param field - The field to aggregate.
+		 */
 		constructor(field: string);
+		/** Initializes the minimum aggregator state for a new group by resetting the tracked minimum value to null so the next group can determine its own minimum. @inheritdoc */
 		init(): void;
+		/** Accumulates a single row item by updating the tracked minimum when the field value is smaller. @param item - Row item to accumulate; numeric field values are compared against the current minimum. @inheritdoc */
 		accumulate(item: any): void;
+		/** Stores the computed minimum value into the group totals container for the configured field. @param groupTotals - Totals container to write the computed minimum into, keyed by field name. @inheritdoc */
 		storeResult(groupTotals: any): void;
+		/** Summary type for this aggregator. */
 		static readonly summaryType = SummaryType.Min;
+		/** Key used to store/lookup this aggregator in totals. */
 		static readonly aggregateKey = "min";
+		/** Localized display name for this aggregator. */
 		static get displayName(): string;
 	}
 	/** Maximum of a field. */
 	class Max implements IAggregator {
 		readonly field: string;
+		/** Current maximum value. */
 		max: any;
+		/**
+		 * Creates a new maximum aggregator.
+		 * @param field - The field to aggregate.
+		 */
 		constructor(field: string);
+		/** Initializes the maximum aggregator state for a new group by resetting the tracked maximum value to null so the next group can determine its own maximum. @inheritdoc */
 		init(): void;
+		/** Accumulates a single row item by updating the tracked maximum when the field value is larger. @param item - Row item to accumulate; numeric field values are compared against the current maximum. @inheritdoc */
 		accumulate(item: any): void;
+		/** Stores the computed maximum value into the group totals container for the configured field. @param groupTotals - Totals container to write the computed maximum into, keyed by field name. @inheritdoc */
 		storeResult(groupTotals: any): void;
+		/** Summary type for this aggregator. */
 		static readonly summaryType = SummaryType.Max;
+		/** Key used to store/lookup this aggregator in totals. */
 		static readonly aggregateKey = "max";
+		/** Localized display name for this aggregator. */
 		static get displayName(): string;
 	}
 	/** Sum of a numeric field. */
 	class Sum implements IAggregator {
+		/** The field to aggregate. */
 		readonly field: string;
+		/** Running sum of valid values. */
 		sum: number;
+		/**
+		 * Creates a new sum aggregator.
+		 * @param field - The field to aggregate.
+		 */
 		constructor(field: string);
+		/** Initializes the sum aggregator state for a new group by resetting the running sum to zero so aggregation starts fresh for the next group. @inheritdoc */
 		init(): void;
+		/** Accumulates a single row item into the running sum for the configured field. @param item - Row item to accumulate; the configured field value is parsed as a number when valid. @inheritdoc */
 		accumulate(item: any): void;
+		/** Stores the computed sum into the group totals container for the configured field. @param groupTotals - Totals container to write the computed sum into, keyed by field name. @inheritdoc */
 		storeResult(groupTotals: any): void;
+		/** Summary type for this aggregator. */
 		static readonly summaryType = SummaryType.Sum;
+		/** Key used to store/lookup this aggregator in totals. */
 		static readonly aggregateKey = "sum";
+		/** Localized display name for this aggregator. */
 		static get displayName(): string;
 	}
 }
+/**
+ * Constructor interface for aggregator classes.
+ */
 export interface IAggregatorConstructor {
+	/** Creates a new aggregator instance. @param field - The field to aggregate. */
 	new (field: string, ...args: any[]): IAggregator;
 	/**
 	 * A unique key for the aggregator (like 'sum', 'avg', etc.). This is also used in the totals object
@@ -6357,6 +6566,7 @@ export interface IAggregatorConstructor {
 	 */
 	summaryType?: SummaryType;
 }
+/** Registry for aggregator types by key and SummaryType. */
 export declare namespace AggregatorTypeRegistry {
 	/**
 	 * Registers a new aggregator class.
@@ -6472,32 +6682,67 @@ export interface PagingOptions {
 	/** Current page (1-based). */
 	page?: number;
 }
+/**
+ * Arguments for RemoteView data events.
+ */
 export interface ArgsRemoteView {
+	/** The data view that raised the event. */
 	dataView: IRemoteView;
 }
+/**
+ * Arguments for group expand/collapse events.
+ */
 export interface ArgsGroupToggle extends ArgsRemoteView {
+	/** The grouping key of the toggled group. */
 	groupingKey: string;
+	/** The grouping level of the toggled group (0-based). */
 	level: number;
 }
+/**
+ * Arguments for paging info changed events.
+ */
 export interface ArgsPagingInfo extends ArgsRemoteView {
+	/** The current paging information. */
 	pagingInfo: PagingInfo;
 }
+/**
+ * Arguments for row count changed events.
+ */
 export interface ArgsRowCountChanged extends ArgsRemoteView {
+	/** Previous row count. */
 	previous: number;
+	/** Current row count. */
 	current: number;
 }
+/**
+ * Arguments for rows changed events.
+ */
 export interface ArgsRowsChanged extends ArgsRemoteView {
+	/** Indices of the rows that changed. */
 	rows: number[];
 }
+/**
+ * Arguments for rows or row-count changed events.
+ */
 export interface ArgsRowsOrCountChanged extends ArgsRemoteView {
+	/** Indices of the rows that changed. */
 	rowsDiff: number[];
+	/** Previous row count before the change. */
 	previousRowCount: number;
+	/** Current row count after the change. */
 	currentRowCount: number;
+	/** Whether the row count changed. */
 	rowCountChanged: boolean;
+	/** Whether any rows changed. */
 	rowsChanged: boolean;
 }
+/**
+ * Arguments for the recalc rows event.
+ */
 export interface ArgsRecalcRows extends ArgsRemoteView {
+	/** Rows before recalculation. */
 	oldRows: any[];
+	/** Rows after recalculation. */
 	newRows: any[];
 }
 /**
@@ -6539,27 +6784,50 @@ export declare class RemoteView<TItem = any> implements IRemoteView<TItem> {
 	private totalCount;
 	private totalRows;
 	private updated;
+	/** Additional parameters to send with service requests. */
 	params: Record<string, any>;
+	/** The page number to seek to when loading data. */
 	seekToPage: number;
+	/** Sort expressions for the data (e.g. "Name" or "Name desc"). */
 	sortBy: string[];
+	/** The URL of the service endpoint for data requests. */
 	url: string;
+	/** Callback invoked before AJAX calls are made. */
 	onAjaxCall: RemoteViewAjaxCallback<TItem>;
+	/** Callback invoked to process data received from the server. */
 	onProcessData: RemoteViewProcessCallback<TItem>;
+	/** Callback invoked before submitting a request; return false to cancel. */
 	onSubmit: CancellableViewCallback<TItem>;
+	/** Event fired when the underlying data changes. */
 	readonly onDataChanged: EventEmitter<ArgsRemoteView, {}>;
+	/** Event fired when data loading completes. */
 	readonly onDataLoaded: EventEmitter<ArgsRemoteView, {}>;
+	/** Event fired when data loading begins. */
 	readonly onDataLoading: EventEmitter<ArgsRemoteView, {}>;
+	/** Event fired when a group is collapsed. */
 	readonly onGroupCollapsed: EventEmitter<ArgsGroupToggle, {}>;
+	/** Event fired when a group is expanded. */
 	readonly onGroupExpanded: EventEmitter<ArgsGroupToggle, {}>;
+	/** Event fired when paging information changes. */
 	readonly onPagingInfoChanged: EventEmitter<ArgsPagingInfo, {}>;
+	/** Event fired when rows need to be recalculated. */
 	readonly onRecalcRows: EventEmitter<ArgsRecalcRows, {}>;
+	/** Event fired when the row count changes. */
 	readonly onRowCountChanged: EventEmitter<ArgsRowCountChanged, {}>;
+	/** Event fired when row indices change. */
 	readonly onRowsChanged: EventEmitter<ArgsRowsChanged, {}>;
+	/** Event fired when rows or row count change. */
 	readonly onRowsOrCountChanged: EventEmitter<ArgsRowsOrCountChanged, {}>;
+	/**
+	 * Creates a new RemoteView.
+	 * @param options - Configuration options for the view.
+	 */
 	constructor(options: RemoteViewOptions<TItem>);
 	/** Default configuration for grouping information */
 	static readonly groupingInfoDefaults: GroupInfo<any>;
+	/** Begins a batch update; suspends refresh until endUpdate is called. */
 	beginUpdate(): void;
+	/** Ends a batch update and refreshes the view if outermost. */
 	endUpdate(): void;
 	/**
 	 * Sets hints for the next refresh operation to optimize performance.
@@ -6568,28 +6836,116 @@ export declare class RemoteView<TItem = any> implements IRemoteView<TItem> {
 	setRefreshHints(hints: any): void;
 	private updateIdxById;
 	private ensureIdUniqueness;
+	/**
+	 * Gets all items in the view.
+	 * @returns Array of all items.
+	 */
 	getItems(): TItem[];
+	/**
+	 * Gets the name of the property used as the unique identifier for items.
+	 * @returns The ID property name.
+	 */
 	getIdPropertyName(): string;
+	/**
+	 * Sets the items in the view and optionally changes the ID property.
+	 * @param data - Array of items to set.
+	 * @param newIdProperty - Optional new ID property name.
+	 */
 	setItems(data: any[], newIdProperty?: string | boolean): void;
+	/**
+	 * Sets paging options and triggers a data reload if options changed.
+	 * @param args - The paging options to set.
+	 */
 	setPagingOptions(args: PagingOptions): void;
+	/**
+	 * Gets the current paging information.
+	 * @returns Object containing paging state.
+	 */
 	getPagingInfo(): PagingInfo;
 	private getSortComparer;
+	/**
+	 * Sorts the items using the specified comparer.
+	 * @param comparer - Optional custom comparer function.
+	 * @param ascending - Whether to sort in ascending order.
+	 */
 	sort(comparer?: (a: any, b: any) => number, ascending?: boolean): void;
+	/**
+	 * Gets whether local sorting is enabled.
+	 * @returns True if local sorting is enabled.
+	 */
 	getLocalSort(): boolean;
+	/**
+	 * Sets whether to use local sorting.
+	 * @param value - Whether to enable local sorting.
+	 */
 	setLocalSort(value: boolean): void;
+	/** Re-sorts the items using the current sort settings. */
 	reSort(): void;
+	/**
+	 * Gets the filtered items (after applying the current filter).
+	 * @returns Array of filtered items.
+	 */
 	getFilteredItems(): TItem[];
+	/**
+	 * Gets the current filter function.
+	 * @returns The current filter function.
+	 */
 	getFilter(): RemoteViewFilter<TItem>;
+	/**
+	 * Sets the filter function to apply to items.
+	 * @param filterFn - The filter function to apply.
+	 */
 	setFilter(filterFn: RemoteViewFilter<TItem>): void;
+	/**
+	 * Gets the current grouping configuration.
+	 * @returns Array of grouping information.
+	 */
 	getGrouping(): GroupInfo<TItem>[];
+	/**
+	 * Sets summary/aggregation options for the view.
+	 * @param summary - Object containing aggregators and other summary options.
+	 */
 	setSummaryOptions(summary: SummaryOptions): void;
+	/**
+	 * Gets the grand totals for the view.
+	 * @returns The grand totals object.
+	 */
 	getGrandTotals(): IGroupTotals;
+	/**
+	 * Sets the grouping configuration for the view.
+	 * @param groupingInfo - Grouping information or array of grouping information.
+	 */
 	setGrouping(groupingInfo: GroupInfo<TItem> | GroupInfo<TItem>[]): void;
+	/**
+	 * Gets an item by its index in the items array.
+	 * @param i - The index of the item.
+	 * @returns The item at the specified index.
+	 */
 	getItemByIdx(i: number): any;
+	/**
+	 * Gets the index of an item by its ID.
+	 * @param id - The ID of the item.
+	 * @returns The index of the item, or undefined if not found.
+	 */
 	getIdxById(id: any): number;
 	private ensureRowsByIdCache;
+	/**
+	 * Gets the row index for an item.
+	 * @param item - The item to find.
+	 * @returns The row index of the item.
+	 */
 	getRowByItem(item: any): number;
+	/**
+	 * Gets the row index for an item by its ID.
+	 * @param id - The ID of the item.
+	 * @returns The row index of the item.
+	 */
 	getRowById(id: any): number;
+	/**
+	 * Gets an item by its ID.
+	 * @param id - The ID of the item.
+	 * @returns The item with the specified ID.
+	 */
 	getItemById(id: any): TItem;
 	/**
 	 * Maps an array of items to their corresponding row indices.
@@ -6609,24 +6965,89 @@ export declare class RemoteView<TItem = any> implements IRemoteView<TItem> {
 	 * @returns Array of item IDs
 	 */
 	mapRowsToIds(rowArray: any[]): any[];
+	/**
+	 * Updates an existing item in the view.
+	 * @param id - The ID of the item to update.
+	 * @param item - The new item data.
+	 */
 	updateItem(id: any, item: any): void;
+	/**
+	 * Inserts an item at the specified position.
+	 * @param insertBefore - The index to insert before.
+	 * @param item - The item to insert.
+	 */
 	insertItem(insertBefore: number, item: any): void;
+	/**
+	 * Adds an item to the end of the items array.
+	 * @param item - The item to add.
+	 */
 	addItem(item: any): void;
+	/**
+	 * Deletes an item by its ID.
+	 * @param id - The ID of the item to delete.
+	 */
 	deleteItem(id: any): void;
+	/**
+	 * Adds an item in sorted order.
+	 * @param item - The item to add.
+	 */
 	sortedAddItem(item: any): void;
+	/**
+	 * Updates an item while maintaining sorted order.
+	 * @param id - The ID of the item to update.
+	 * @param item - The new item data.
+	 */
 	sortedUpdateItem(id: any, item: any): void;
 	private sortedIndex;
+	/**
+	 * Gets all rows in the view (including group rows and totals rows).
+	 * @returns Array of all rows.
+	 */
 	getRows(): (TItem | Group<any> | GroupTotals<any>)[];
+	/**
+	 * Gets the number of rows in the view.
+	 * @returns The row count.
+	 */
 	getLength(): number;
+	/**
+	 * Gets the item at the specified row index.
+	 * @param i - The row index.
+	 * @returns The item at the row.
+	 */
 	getItem(i: number): any;
+	/**
+	 * Gets metadata for the specified row.
+	 * @param row - The row index.
+	 * @returns The item metadata, or null.
+	 */
 	getItemMetadata(row: number): ItemMetadata<TItem>;
 	private expandCollapseAllGroups;
+	/**
+	 * Collapses all groups at the specified level, or all levels if not specified.
+	 * @param level - Optional level to collapse.
+	 */
 	collapseAllGroups(level?: number): void;
+	/**
+	 * Expands all groups at the specified level, or all levels if not specified.
+	 * @param level - Optional level to expand.
+	 */
 	expandAllGroups(level?: number): void;
 	private resolveLevelAndGroupingKey;
 	private expandCollapseGroup;
+	/**
+	 * Collapses a specific group.
+	 * @param constArgs - Grouping key or values denoting the group path.
+	 */
 	collapseGroup(constArgs: any[]): void;
+	/**
+	 * Expands a specific group.
+	 * @param constArgs - Grouping key or values denoting the group path.
+	 */
 	expandGroup(constArgs: any[]): void;
+	/**
+	 * Gets the current groups.
+	 * @returns Array of groups.
+	 */
 	getGroups(): Group<TItem>[];
 	private getOrCreateGroup;
 	private extractGroups;
@@ -6639,6 +7060,9 @@ export declare class RemoteView<TItem = any> implements IRemoteView<TItem> {
 	private getFilteredAndPagedItems;
 	private getRowDiffs;
 	private recalc;
+	/**
+	 * Refreshes the view by recalculating rows and notifying changes.
+	 */
 	refresh(): void;
 	/***
 	 * Wires the grid and the DataView together to keep row selection tied to item ids.
@@ -6659,16 +7083,51 @@ export declare class RemoteView<TItem = any> implements IRemoteView<TItem> {
 	 *     access to the full list selected row ids, and not just the ones visible to the grid.
 	 */
 	syncGridSelection(sleekGrid: ISleekGrid, preserveHidden?: boolean, preserveHiddenOnSelectionChange?: boolean): EventEmitter<any>;
+	/**
+	 * Syncs cell CSS styles between the grid and the data view.
+	 * @param grid - The grid to sync with.
+	 * @param key - The CSS style key.
+	 */
 	syncGridCellCssStyles(grid: ISleekGrid, key: string): void;
+	/**
+	 * Adds data received from the server to the view.
+	 * @param data - The response data from the server.
+	 * @returns False if the data could not be added.
+	 */
 	addData(data: any): boolean;
+	/**
+	 * Loads data from the server using the configured URL and parameters.
+	 * @returns False if the operation was cancelled or no URL is configured.
+	 */
 	populate(): boolean;
+	/** Locks population to prevent automatic data loading. */
 	populateLock(): void;
+	/** Unlocks population; executes pending populate calls if any. */
 	populateUnlock(): void;
+	/**
+	 * Gets the group item metadata provider.
+	 * @returns The metadata provider.
+	 */
 	getGroupItemMetadataProvider(): GroupItemMetadataProvider;
+	/**
+	 * Sets the group item metadata provider.
+	 * @param value - The metadata provider to set.
+	 */
 	setGroupItemMetadataProvider(value: GroupItemMetadataProvider): void;
+	/**
+	 * Gets the callback for retrieving item metadata.
+	 * @returns The item metadata callback.
+	 */
 	getItemMetadataCallback(): (item: TItem, row: number) => ItemMetadata<TItem> | undefined;
+	/**
+	 * Sets the callback for retrieving item metadata.
+	 * @param value - The item metadata callback.
+	 */
 	setItemMetadataCallback(value: (item: TItem, row: number) => ItemMetadata<TItem>): void;
-	/** @deprecated Gets the ID property name, for compatibility */
+	/**
+	 * @deprecated Gets the ID property name, for compatibility.
+	 * @returns The ID property name.
+	 */
 	get idField(): string;
 	private formatGroupValue;
 }
@@ -6931,6 +7390,7 @@ export interface IRemoteView<TItem = any> extends IDataView<TItem> {
 	setItems(data: any[], newIdProperty?: string | boolean): void;
 	/**
 	 * Sets a callback function to retrieve item metadata. This can be used to dynamically assign CSS classes or other properties to items.
+	 * @param value - The item metadata callback.
 	 */
 	setItemMetadataCallback(value: (item: TItem, row: number) => ItemMetadata<TItem>): void;
 	/**
@@ -6969,10 +7429,15 @@ export interface IRemoteView<TItem = any> extends IDataView<TItem> {
 	sortBy: string[];
 	/**
 	 * Syncs cell CSS styles between the grid and the data view.
+	 * @param grid - The grid to sync with.
+	 * @param key - The CSS style key.
 	 */
 	syncGridCellCssStyles?(grid: ISleekGrid, key: string): void;
 	/***
 	 * Wires the grid and the DataView together to keep row selection tied to item ids.
+	 * @param grid - The grid to sync selection with.
+	 * @param preserveHidden - Whether to keep selected items that go out of view due to filtering.
+	 * @param preserveHiddenOnSelectionChange - Whether to keep hidden items selected when selection changes.
 	 */
 	syncGridSelection?(grid: ISleekGrid, preserveHidden?: boolean, preserveHiddenOnSelectionChange?: boolean): EventEmitter<any, {}>;
 	/**
@@ -7030,33 +7495,41 @@ export type RemoteViewFilter<TItem> = (item: TItem, view: IRemoteView<TItem>) =>
 export type RemoteViewProcessCallback<TItem> = (data: ListResponse<TItem>, view: IRemoteView<TItem>) => ListResponse<TItem>;
 /**
  * Indicates whether a dialog should show a close button in its title bar.
+ * Applied via `static [Symbol.typeInfo]` metadata or the legacy decorator.
  */
 export declare class CloseButtonAttribute extends CustomAttribute {
 	value: boolean;
 	static [Symbol.typeInfo]: ClassTypeInfo<"Serenity.">;
 	/**
-	 * @param value - True to show the close button (default `true`).
+	 * Creates a new {@link CloseButtonAttribute}.
+	 * @param value - Whether the title bar should display a close button. Defaults to `true`.
 	 */
 	constructor(value?: boolean);
 }
 /**
  * Specifies the root element tag for a widget (e.g. `"div"`, `"span"`).
+ * Used by the widget factory to create the default DOM element.
  */
 export declare class ElementAttribute extends CustomAttribute {
 	value: string;
 	static [Symbol.typeInfo]: ClassTypeInfo<"Serenity.">;
 	/**
-	 * @param value - Element tag name.
+	 * Creates a new {@link ElementAttribute}.
+	 * @param value - Tag name for the widget's root element (e.g. `"div"`).
 	 */
 	constructor(value: string);
 }
 /**
  * Indicates whether a grid should expose the advanced filter editor.
+ * When disabled the filter panel and advanced filter dialog are hidden.
  */
 export declare class AdvancedFilteringAttribute extends CustomAttribute {
 	value: boolean;
 	static [Symbol.typeInfo]: ClassTypeInfo<"Serenity.">;
-	/** @param value - True to enable advanced filtering (default `true`). */
+	/**
+	 * Creates a new {@link AdvancedFilteringAttribute}.
+	 * @param value - Whether advanced filtering should be enabled. Defaults to `true`.
+	 */
 	constructor(value?: boolean);
 }
 /**
@@ -7066,7 +7539,10 @@ export declare class AdvancedFilteringAttribute extends CustomAttribute {
 export declare class MaximizableAttribute extends CustomAttribute {
 	value: boolean;
 	static [Symbol.typeInfo]: ClassTypeInfo<"Serenity.">;
-	/** @param value - True to allow maximizing (default `true`). */
+	/**
+	 * Creates a new {@link MaximizableAttribute}.
+	 * @param value - Whether the dialog may be maximized. Defaults to `true`.
+	 */
 	constructor(value?: boolean);
 }
 /**
@@ -7078,30 +7554,42 @@ export declare class OptionAttribute extends CustomAttribute {
 }
 /**
  * Indicates that a dialog should open as a side panel by default.
+ * Panels are rendered docked to the side rather than as centered modals.
  */
 export declare class PanelAttribute extends CustomAttribute {
 	value: boolean;
 	static [Symbol.typeInfo]: ClassTypeInfo<"Serenity.">;
-	/** @param value - True to prefer panel mode (default `true`). */
+	/**
+	 * Creates a new {@link PanelAttribute}.
+	 * @param value - Whether the dialog should prefer panel mode. Defaults to `true`.
+	 */
 	constructor(value?: boolean);
 }
 /**
  * Indicates whether a dialog should be resizable (jQuery UI dialogs only).
+ * Has no effect on Bootstrap modal dialogs.
  */
 export declare class ResizableAttribute extends CustomAttribute {
 	value: boolean;
 	static [Symbol.typeInfo]: ClassTypeInfo<"Serenity.">;
-	/** @param value - True to allow resizing (default `true`). */
+	/**
+	 * Creates a new {@link ResizableAttribute}.
+	 * @param value - Whether the dialog may be resized by the user. Defaults to `true`.
+	 */
 	constructor(value?: boolean);
 }
 /**
  * Indicates that the widget should render as a static panel (plain div embedded
  * in the page without title bar / modal behavior).
+ * Useful for embedding widgets directly in page layout.
  */
 export declare class StaticPanelAttribute extends CustomAttribute {
 	value: boolean;
 	static [Symbol.typeInfo]: ClassTypeInfo<"Serenity.">;
-	/** @param value - True to render as a static panel (default `true`). */
+	/**
+	 * Creates a new {@link StaticPanelAttribute}.
+	 * @param value - Whether the widget should render as a static panel. Defaults to `true`.
+	 */
 	constructor(value?: boolean);
 }
 /**
@@ -7166,7 +7654,13 @@ export declare namespace Decorators {
 	function registerEditor(nameOrIntf?: string | InterfaceType[], intf2?: InterfaceType[]): (target: Function, _context?: any) => void;
 	/** Registers an enum with optional keys. @param target - Enum object. @param enumKey - Legacy lookup key. @param name - Full type name. */
 	function registerEnum(target: any, enumKey?: string, name?: string): void;
-	/** @deprecated Use `registerEnum` instead. @param target - Enum object. @param name - Full type name. @param enumKey - Legacy lookup key. */
+	/**
+	 * Legacy wrapper for {@link registerEnum} kept for backward compatibility.
+	 * @deprecated Use {@link registerEnum} instead. Prefer direct `static [Symbol.typeInfo]` pattern for new code.
+	 * @param target - Enum object to register.
+	 * @param name - Full type name.
+	 * @param enumKey - Legacy lookup key.
+	 */
 	function registerEnumType(target: any, name?: string, enumKey?: string): void;
 	/** Registers a formatter class. @param nameOrIntf - Full type name or interface list (default `[ISlickFormatter]`). @param intf2 - Additional interfaces. @returns Class decorator. */
 	function registerFormatter(nameOrIntf?: string | InterfaceType[], intf2?: InterfaceType[]): (target: Function, _context?: any) => void;
@@ -7174,28 +7668,68 @@ export declare namespace Decorators {
 	function enumKey(value: string): (target: Function, _context?: any) => void;
 	/** Marks a property/field as a reflective option (adds {@link OptionAttribute}). @returns Property decorator. */
 	function option(): (target: Object, propertyKey: string) => void;
-	/** Adds a {@link CloseButtonAttribute}. @param value - True to show close button (default `true`). @returns Class decorator. */
+	/**
+	 * Legacy decorator that attaches a {@link CloseButtonAttribute} to a dialog class.
+	 * @deprecated Prefer `static override [Symbol.typeInfo] = classTypeInfo("...")` with {@link CloseButtonAttribute} metadata instead.
+	 * @param value - Whether the dialog should show a close button. Defaults to `true`.
+	 * @returns Class decorator.
+	 */
 	function closeButton(value?: boolean): (target: Function, _context?: any) => void;
-	/** Adds an {@link EditorAttribute}. @returns Class decorator. */
+	/**
+	 * Legacy decorator that attaches an {@link EditorAttribute} to an editor class.
+	 * @deprecated Prefer `static override [Symbol.typeInfo] = editorTypeInfo("...")` instead.
+	 * @returns Class decorator.
+	 */
 	function editor(): (target: Function, _context?: any) => void;
-	/** Adds an {@link ElementAttribute}. @param value - Element tag name. @returns Class decorator. */
+	/**
+	 * Legacy decorator that attaches an {@link ElementAttribute} specifying the root element tag.
+	 * @deprecated Prefer `static override [Symbol.typeInfo] = classTypeInfo("...", [new ElementAttribute(...)])` or widget `createDefaultElement` override instead.
+	 * @param value - Tag name for the widget root element (e.g. `"div"`).
+	 * @returns Class decorator.
+	 */
 	function element(value: string): (target: Function, _context?: any) => void;
-	/** Adds an {@link AdvancedFilteringAttribute}. @param value - True to enable (default `true`). @returns Class decorator. */
+	/**
+	 * Legacy decorator that attaches an {@link AdvancedFilteringAttribute} to a grid class.
+	 * @deprecated Prefer `static override [Symbol.typeInfo]` with {@link AdvancedFilteringAttribute} metadata instead.
+	 * @param value - Whether advanced filtering should be enabled. Defaults to `true`.
+	 * @returns Class decorator.
+	 */
 	function advancedFiltering(value?: boolean): (target: Function, _context?: any) => void;
 	/** @deprecated Use `advancedFiltering` instead */
 	const filterable: typeof advancedFiltering;
-	/** Adds a {@link MaximizableAttribute}. @param value - True to allow maximizing (default `true`). @returns Class decorator. */
+	/**
+	 * Legacy decorator that attaches a {@link MaximizableAttribute} to a dialog class.
+	 * @deprecated Prefer `static override [Symbol.typeInfo]` with {@link MaximizableAttribute} metadata instead.
+	 * @param value - Whether the dialog may be maximized. Defaults to `true`.
+	 * @returns Class decorator.
+	 */
 	function maximizable(value?: boolean): (target: Function, _context?: any) => void;
-	/** Adds a {@link PanelAttribute}. @param value - True to prefer panel mode (default `true`). @returns Class decorator. */
+	/**
+	 * Legacy decorator that attaches a {@link PanelAttribute} to a dialog class.
+	 * @deprecated Prefer `static override [Symbol.typeInfo]` with {@link PanelAttribute} metadata instead.
+	 * @param value - Whether the dialog should prefer panel mode. Defaults to `true`.
+	 * @returns Class decorator.
+	 */
 	function panel(value?: boolean): (target: Function, _context?: any) => void;
-	/** Adds a {@link ResizableAttribute}. @param value - True to allow resizing (default `true`). @returns Class decorator. */
+	/**
+	 * Legacy decorator that attaches a {@link ResizableAttribute} to a dialog class.
+	 * @deprecated Prefer `static override [Symbol.typeInfo]` with {@link ResizableAttribute} metadata instead.
+	 * @param value - Whether the dialog may be resized. Defaults to `true`.
+	 * @returns Class decorator.
+	 */
 	function resizable(value?: boolean): (target: Function, _context?: any) => void;
 	/**
-	 * Deprecated as all dialogs are responsive.
-	 * @deprecated This is no longer used as all dialogs are responsive.
+	 * Legacy responsive decorator retained for backward compatibility.
+	 * @deprecated This is no longer used as all dialogs are responsive. Prefer direct `static [Symbol.typeInfo]` pattern.
+	 * @param value - Whether responsive behavior should be enabled. Defaults to `true`.
 	 */
 	function responsive(value?: boolean): (target: Function, _context?: any) => void;
-	/** Adds a {@link StaticPanelAttribute}. @param value - True for static panel (default `true`). @returns Class decorator. */
+	/**
+	 * Legacy decorator that attaches a {@link StaticPanelAttribute} to a widget class.
+	 * @deprecated Prefer `static override [Symbol.typeInfo]` with {@link StaticPanelAttribute} metadata instead.
+	 * @param value - Whether the widget should render as a static panel. Defaults to `true`.
+	 * @returns Class decorator.
+	 */
 	function staticPanel(value?: boolean): (target: Function, _context?: any) => void;
 }
 /** Constructor type for dialog widgets registered with {@link DialogTypeRegistry}. */
@@ -7999,7 +8533,10 @@ export interface DateEditorOptions {
  */
 export declare class DateEditor<P extends DateEditorOptions = DateEditorOptions> extends EditorWidget<P> implements IStringValue, IReadOnly {
 	static [Symbol.typeInfo]: EditorTypeInfo<"Serenity.">;
+	/** Creates the default text input element for the date editor.
+	 * @returns The input element. */
 	static createDefaultElement(): HTMLInputElement;
+	/** The text input element that backs the editor. */
 	readonly domNode: HTMLInputElement;
 	/**
 	 * Creates a date editor.
@@ -8030,7 +8567,8 @@ export declare class DateEditor<P extends DateEditorOptions = DateEditorOptions>
 	 * @param value - The date value to set.
 	 */
 	set_value(value: string): void;
-	/** Sets the date value. */
+	/** Sets the date value.
+	 * @param v - The date value to set. */
 	set value(v: string);
 	private get_valueAsDate;
 	/**
@@ -8039,7 +8577,8 @@ export declare class DateEditor<P extends DateEditorOptions = DateEditorOptions>
 	 */
 	get valueAsDate(): Date;
 	private set_valueAsDate;
-	/** Sets the date value as a Date. */
+	/** Sets the date value as a Date.
+	 * @param v - The date value to set. */
 	set valueAsDate(v: Date);
 	/**
 	 * Returns whether the editor is read-only.
@@ -8103,8 +8642,11 @@ export declare class DateEditor<P extends DateEditorOptions = DateEditorOptions>
 	set_sqlMinMax(value: boolean): void;
 	/** Handles date input change events. */
 	static dateInputChange: (e: Event) => void;
-	/** Handles date input keyup events. */
+	/**
+	 * Handles keyup on date inputs to normalize typed dates.
+	 * @param e - Keyboard event. */
 	static dateInputKeyup(e: KeyboardEvent): void;
+	/** Whether to prefer flatpickr over jQuery UI datepicker. */
 	static useFlatpickr: boolean;
 	/**
 	 * Returns the flatpickr options for the given input.
@@ -8112,7 +8654,13 @@ export declare class DateEditor<P extends DateEditorOptions = DateEditorOptions>
 	 * @returns Flatpickr options.
 	 */
 	getFlatpickrOptions(input: HTMLElement): any;
+	/**
+	 * Creates the flatpickr trigger button next to the input.
+	 * @returns The trigger element. */
 	createFlatPickrTrigger(): HTMLElement;
+	/**
+	 * Applies a z-index workaround for the jQuery UI datepicker popup.
+	 * @param el - The input element or array-like collection. */
 	static uiPickerZIndexWorkaround(el: HTMLElement | ArrayLike<HTMLElement>): void;
 }
 /** The combobox provider type. */
@@ -8124,7 +8672,7 @@ export type ComboboxFormatResult = string | Element | DocumentFragment;
  * @typeParam TSource - The source item type.
  */
 export interface ComboboxItem<TSource = any> {
-	/** Item id. */
+	/** Unique identifier of the combobox item. */
 	id?: string;
 	/** Display text. */
 	text?: string;
@@ -8202,6 +8750,10 @@ export declare class Combobox<TItem = any> {
 	private el;
 	/** Default combobox options. */
 	static defaults: ComboboxOptions;
+	/**
+	 * Creates a combobox.
+	 * @param opt - Combobox options.
+	 */
 	constructor(opt: ComboboxOptions);
 	private createSelect2;
 	/**
@@ -8379,7 +8931,10 @@ export interface ComboboxEditorOptions extends ComboboxFilterOptions, ComboboxIn
  */
 export declare class ComboboxEditor<P, TItem> extends EditorWidget<P> implements ISetEditValue, IGetEditValue, IStringValue, IReadOnly {
 	static [Symbol.typeInfo]: ClassTypeInfo<"Serenity.">;
+	/** Creates the default hidden input element for the combobox.
+	 * @returns The hidden input element. */
 	static createDefaultElement(): HTMLInputElement;
+	/** The hidden input element that backs the combobox editor. */
 	readonly domNode: HTMLInputElement;
 	private combobox;
 	private _items;
@@ -8489,7 +9044,8 @@ export declare class ComboboxEditor<P, TItem> extends EditorWidget<P> implements
 	 * @returns The items.
 	 */
 	get items(): ComboboxItem<TItem>[];
-	/** Sets the items in the editor. */
+	/** Sets the items in the editor.
+	 * @param value - The combobox items to set. */
 	set items(value: ComboboxItem<TItem>[]);
 	protected get itemById(): {
 		[key: string]: ComboboxItem<TItem>;
@@ -8591,7 +9147,8 @@ export declare class ComboboxEditor<P, TItem> extends EditorWidget<P> implements
 	 * @param value - The value to set.
 	 */
 	set_value(value: string): void;
-	/** Sets the current value. */
+	/** Sets the current value.
+	 * @param v - The single value to set. */
 	set value(v: string);
 	/**
 	 * Returns the currently selected item.
@@ -8618,7 +9175,8 @@ export declare class ComboboxEditor<P, TItem> extends EditorWidget<P> implements
 	 * @param value - The values to set.
 	 */
 	protected set_values(value: string[]): void;
-	/** Sets the current values. */
+	/** Sets the current values.
+	 * @param value - The array of selected values to set. */
 	set values(value: string[]);
 	/**
 	 * Returns the display text of the current selection.
@@ -8627,8 +9185,7 @@ export declare class ComboboxEditor<P, TItem> extends EditorWidget<P> implements
 	protected get_text(): string;
 	/**
 	 * Returns the display text of the current selection.
-	 * @returns The text.
-	 */
+	 * @returns The comma-joined display text of the selected item(s). */
 	get text(): string;
 	/**
 	 * Returns whether the editor is read-only.
@@ -8668,7 +9225,8 @@ export declare class ComboboxEditor<P, TItem> extends EditorWidget<P> implements
 	 * @param value - The parent id.
 	 */
 	protected set_cascadeFrom(value: string): void;
-	/** Sets the cascade-from parent id. */
+	/** Sets the cascade-from parent id.
+	 * @param value - The parent editor id to cascade from. */
 	set cascadeFrom(value: string);
 	/**
 	 * Returns the cascade field name.
@@ -8685,7 +9243,8 @@ export declare class ComboboxEditor<P, TItem> extends EditorWidget<P> implements
 	 * @param value - The cascade field.
 	 */
 	protected set_cascadeField(value: string): void;
-	/** Sets the cascade field name. */
+	/** Sets the cascade field name.
+	 * @param value - The field name used for cascading. */
 	set cascadeField(value: string);
 	/**
 	 * Returns the cascade value.
@@ -8702,7 +9261,8 @@ export declare class ComboboxEditor<P, TItem> extends EditorWidget<P> implements
 	 * @param value - The cascade value.
 	 */
 	protected set_cascadeValue(value: any): void;
-	/** Sets the cascade value. */
+	/** Sets the cascade value.
+	 * @param value - The cascade value to filter by. */
 	set cascadeValue(value: any);
 	/**
 	 * Returns the filter field name.
@@ -8719,7 +9279,8 @@ export declare class ComboboxEditor<P, TItem> extends EditorWidget<P> implements
 	 * @param value - The filter field.
 	 */
 	protected set_filterField(value: string): void;
-	/** Sets the filter field name. */
+	/** Sets the filter field name.
+	 * @param value - The field name used for filtering. */
 	set filterField(value: string);
 	/**
 	 * Returns the filter value.
@@ -8736,7 +9297,8 @@ export declare class ComboboxEditor<P, TItem> extends EditorWidget<P> implements
 	 * @param value - The filter value.
 	 */
 	protected set_filterValue(value: any): void;
-	/** Sets the filter value. */
+	/** Sets the filter value.
+	 * @param value - The filter value to apply. */
 	set filterValue(value: any);
 	/**
 	 * Filters items by the cascade value.
@@ -8794,7 +9356,9 @@ export declare class ComboboxEditor<P, TItem> extends EditorWidget<P> implements
 	 * @param e - The click event.
 	 */
 	protected inplaceCreateClick(e: Event): void;
+	/** Opens the combobox dropdown. */
 	openDropdown(): void;
+	/** Whether the in-place add dialog opens as a panel. */
 	openDialogAsPanel: boolean;
 }
 /**
@@ -9094,7 +9658,10 @@ export interface QuickFilter<TWidget extends Widget<P>, P> {
  */
 export declare class DateTimeEditor<P extends DateTimeEditorOptions = DateTimeEditorOptions> extends EditorWidget<P> implements IStringValue, IReadOnly {
 	static [Symbol.typeInfo]: EditorTypeInfo<"Serenity.">;
+	/** Creates the default text input element for the date-time editor.
+	 * @returns The input element. */
 	static createDefaultElement(): HTMLInputElement;
+	/** The text input element that backs the editor. */
 	readonly domNode: HTMLInputElement;
 	private time;
 	private lastSetValue;
@@ -9140,7 +9707,8 @@ export declare class DateTimeEditor<P extends DateTimeEditorOptions = DateTimeEd
 	set_value(value: string): void;
 	private getInplaceNowText;
 	private getDisplayFormat;
-	/** Sets the date-time value. */
+	/** Sets the date-time value.
+	 * @param v - The date-time string to set. */
 	set value(v: string);
 	private get_valueAsDate;
 	/**
@@ -9149,7 +9717,8 @@ export declare class DateTimeEditor<P extends DateTimeEditorOptions = DateTimeEd
 	 */
 	get valueAsDate(): Date;
 	private set_valueAsDate;
-	/** Sets the date-time value as a Date. */
+	/** Sets the date-time value as a Date.
+	 * @param value - The date-time value to set. */
 	set valueAsDate(value: Date);
 	/**
 	 * Returns the minimum allowed date-time value.
@@ -9211,19 +9780,45 @@ export declare class DateTimeEditor<P extends DateTimeEditorOptions = DateTimeEd
 	 * @param value - True to enable read-only mode.
 	 */
 	set_readOnly(value: boolean): void;
+	/**
+	 * Rounds a date to the nearest minute step.
+	 * @param date - The date to round.
+	 * @param minutesStep - Step size in minutes.
+	 * @returns The rounded date with seconds and milliseconds zeroed. */
 	static roundToMinutes(date: Date, minutesStep: number): Date;
+	/**
+	 * Generates a list of time strings at a fixed step.
+	 * @param fromHour - Start hour.
+	 * @param fromMin - Start minute.
+	 * @param toHour - End hour.
+	 * @param toMin - End minute.
+	 * @param stepMins - Step size in minutes.
+	 * @returns Array of "HH:mm" time strings. */
 	static getTimeOptions: (fromHour: number, fromMin: number, toHour: number, toMin: number, stepMins: number) => string[];
 }
+/**
+ * Options for the {@link DateTimeEditor}.
+ */
 export interface DateTimeEditorOptions {
+	/** Starting hour for the time select (0-23). */
 	startHour?: any;
+	/** Ending hour for the time select (0-23). */
 	endHour?: any;
+	/** Interval in minutes between time options. */
 	intervalMinutes?: any;
+	/** Minimum allowed date-time as an ISO string. */
 	minValue?: string;
+	/** Maximum allowed date-time as an ISO string. */
 	maxValue?: string;
+	/** Year range for the date picker (e.g. "-100:+50"). */
 	yearRange?: string;
+	/** Whether to store and display values in UTC. */
 	useUtc?: boolean;
+	/** Whether to include seconds in the time picker. */
 	seconds?: boolean;
+	/** Whether to render as a plain input without picker UI. */
 	inputOnly?: boolean;
+	/** Whether to apply SQL min/max date bounds. */
 	sqlMinMax?: boolean;
 }
 /**
@@ -9400,17 +9995,35 @@ export declare class DataGrid<TItem, P = {}> extends Widget<P> implements IDataG
 	};
 	/** Default row height used when creating grids. */
 	static get defaultRowHeight(): number;
-	/** Default storage used for grid persistence. */
+	/**
+	 * Default storage used for grid persistence.
+	 * @returns The current persistence storage.
+	 */
 	static get defaultPersistenceStorage(): SettingStorage;
-	/** Sets the default storage used for grid persistence. */
+	/**
+	 * Sets the default storage used for grid persistence.
+	 * @param value - Persistence storage to use (e.g. `localStorage`-backed).
+	 */
 	static set defaultPersistenceStorage(value: SettingStorage);
-	/** Default column width scale applied to all grids. */
+	/**
+	 * Default column width scale applied to all grids.
+	 * @returns The current column width scale.
+	 */
 	static get defaultColumnWidthScale(): number;
-	/** Sets the default column width scale applied to all grids. */
+	/**
+	 * Sets the default column width scale applied to all grids.
+	 * @param value - Scale factor (e.g. `1.1` for 10% wider).
+	 */
 	static set defaultColumnWidthScale(value: number);
-	/** Default column width delta applied to all grids. */
+	/**
+	 * Default column width delta applied to all grids.
+	 * @returns The current column width delta.
+	 */
 	static get defaultColumnWidthDelta(): number;
-	/** Sets the default column width delta applied to all grids. */
+	/**
+	 * Sets the default column width delta applied to all grids.
+	 * @param value - Delta in pixels added to each column width.
+	 */
 	static set defaultColumnWidthDelta(value: number);
 	/** Static event raised after any grid is initialized. */
 	static readonly onAfterInit: PubSub<DataGridEvent>;
@@ -9918,9 +10531,15 @@ export declare class DataGrid<TItem, P = {}> extends Widget<P> implements IDataG
 	 */
 	protected internalRefresh(): void;
 	private _readonly;
-	/** Whether the grid is in read-only mode. */
+	/**
+	 * Whether the grid is in read-only mode.
+	 * @returns `true` if read-only, otherwise `false`.
+	 */
 	get readOnly(): boolean;
-	/** Sets whether the grid is in read-only mode. */
+	/**
+	 * Sets whether the grid is in read-only mode.
+	 * @param value - `true` to enable read-only mode, `false` to disable.
+	 */
 	set readOnly(value: boolean);
 	/**
 	 * Returns whether the grid is in read-only mode.
@@ -10112,11 +10731,20 @@ export declare class DataGrid<TItem, P = {}> extends Widget<P> implements IDataG
 	 * @returns The grid instance.
 	 */
 	getGrid(): ISleekGrid<TItem>;
-	/** The underlying SleekGrid instance. */
+	/**
+	 * The underlying SleekGrid instance.
+	 * @returns The current SleekGrid instance.
+	 */
 	get sleekGrid(): ISleekGrid<TItem>;
-	/** Sets the underlying SleekGrid instance. */
+	/**
+	 * Sets the underlying SleekGrid instance.
+	 * @param value - SleekGrid instance to set.
+	 */
 	protected set sleekGrid(value: ISleekGrid<TItem>);
-	/** @deprecated Use sleekGrid or getGrid() */
+	/**
+	 * @deprecated Use `sleekGrid` or `getGrid()`.
+	 * @returns The underlying SleekGrid instance.
+	 */
 	get slickGrid(): ISleekGrid<TItem>;
 	/**
 	 * Returns the remote view used for paging and server communication.
@@ -10128,7 +10756,10 @@ export declare class DataGrid<TItem, P = {}> extends Widget<P> implements IDataG
 	 * @returns The filter store, or null if no filter bar exists.
 	 */
 	getFilterStore(): FilterStore;
-	/** All columns including hidden ones. */
+	/**
+	 * All columns including hidden ones.
+	 * @returns All columns from the underlying SleekGrid.
+	 */
 	get allColumns(): Column[];
 	/** The currently visible columns. */
 	get columns(): Column<TItem>[];
@@ -10136,9 +10767,15 @@ export declare class DataGrid<TItem, P = {}> extends Widget<P> implements IDataG
 	get initialSettings(): PersistedGridSettings;
 	/** Sets the initial persisted settings. */
 	protected set initialSettings(value: PersistedGridSettings);
-	/** @deprecated use defaultPersistenceStorage, this one has a typo */
+	/**
+	 * @deprecated Use `defaultPersistenceStorage` — this has a typo.
+	 * @returns The current persistence storage.
+	 */
 	static get defaultPersistanceStorage(): SettingStorage;
-	/** @deprecated use defaultPersistenceStorage, this one has a typo */
+	/**
+	 * @deprecated Use `defaultPersistenceStorage` — this has a typo.
+	 * @param value - Persistence storage to set.
+	 */
 	static set defaultPersistanceStorage(value: SettingStorage);
 }
 /**
@@ -11598,6 +12235,9 @@ export declare class PropertyDialog<TItem, P> extends BaseDialog<P> {
 	 */
 	protected renderContents(): any;
 }
+/**
+ * Options controlling AutoNumeric formatting, parsing and display behavior.
+ */
 export interface AutoNumericOptions {
 	/** allowed decimal separator characters
 	 * period "full stop" = '.'
@@ -11652,8 +12292,6 @@ export interface AutoNumericOptions {
 	 * @default '3'
 	 */
 	dGroup?: string;
-	/** internal */
-	holder?: any;
 	/** controls leading zero behavior
 	 * lZero: 'allow', - allows leading zeros to be entered. Zeros will be truncated when entering additional digits. On focusout zeros will be deleted.
 	 * lZero: 'deny', - allows only one leading zero on values less than one
@@ -11692,8 +12330,6 @@ export interface AutoNumericOptions {
 	 * @default 'p'
 	 */
 	pSign?: string;
-	/** internal */
-	runOnce?: boolean;
 	/** maximum possible value
 	 * value must be enclosed in quotes and use the period for the decimal point
 	 * value must be larger than vMin
@@ -11771,7 +12407,10 @@ export declare class AutoNumeric {
  */
 export declare class BooleanEditor<P = {}> extends EditorWidget<P> {
 	static [Symbol.typeInfo]: EditorTypeInfo<"Serenity.">;
+	/** Creates the default checkbox input element.
+	 * @returns The checkbox input element. */
 	static createDefaultElement(): HTMLInputElement;
+	/** The checkbox input element that backs the editor. */
 	readonly domNode: HTMLInputElement;
 	/**
 	 * Returns the current boolean value.
@@ -11783,9 +12422,11 @@ export declare class BooleanEditor<P = {}> extends EditorWidget<P> {
 	 * @returns True when the checkbox is checked.
 	 */
 	protected get_value(): boolean;
-	/** Sets the boolean value. */
+	/** Sets the boolean value.
+	 * @param value - The boolean value to set. */
 	set value(value: boolean);
-	/** Sets the boolean value. */
+	/** Sets the boolean value.
+	 * @param value - The boolean value to set. */
 	protected set_value(value: boolean): void;
 }
 /**
@@ -11799,7 +12440,7 @@ export interface CheckTreeItem<TSource> {
 	hideCheckBox?: boolean;
 	/** Whether all descendants are selected. */
 	isAllDescendantsSelected?: boolean;
-	/** Item id. */
+	/** Unique identifier of the tree item, used as the node key and selection value. */
 	id?: string;
 	/** Display text. */
 	text?: string;
@@ -11817,6 +12458,8 @@ export interface CheckTreeItem<TSource> {
  */
 export declare class CheckTreeEditor<TItem extends CheckTreeItem<TItem>, P = {}> extends DataGrid<TItem, P> implements IGetEditValue, ISetEditValue, IReadOnly {
 	static [Symbol.typeInfo]: EditorTypeInfo<"Serenity.">;
+	/** Creates the default div element for the check tree editor.
+	 * @returns The div element. */
 	static createDefaultElement(): HTMLDivElement;
 	private itemById;
 	/**
@@ -11978,28 +12621,59 @@ export declare class CheckTreeEditor<TItem extends CheckTreeItem<TItem>, P = {}>
 	 */
 	set_readOnly(value: boolean): void;
 	private get_value;
+	/** Returns the selected item ids.
+	 * @returns Array of selected ids. */
 	get value(): string[];
+	/** Sets the selected item ids.
+	 * @param value - Comma-delimited string or array of ids to select. */
 	private set_value;
+	/** Sets the selected item ids.
+	 * @param v - Array of ids to select. */
 	set value(v: string[]);
 }
+/**
+ * Options for the {@link CheckLookupEditor}.
+ */
 export interface CheckLookupEditorOptions {
+	/** Lookup key for the source lookup. */
 	lookupKey?: string;
+	/** Whether to move checked items to the top of the list. */
 	checkedOnTop?: boolean;
+	/** Whether to show the select-all toolbar button. */
 	showSelectAll?: boolean;
+	/** Whether to hide the quick search box. */
 	hideSearch?: boolean;
+	/** Whether the edit value is a comma-delimited string. */
 	delimited?: boolean;
+	/** Id of the parent editor to cascade from. */
 	cascadeFrom?: string;
+	/** Field name in the lookup used for cascading. */
 	cascadeField?: string;
+	/** Current cascade value used to filter items. */
 	cascadeValue?: any;
+	/** Field name in the lookup used for filtering. */
 	filterField?: string;
+	/** Current filter value used to filter items. */
 	filterValue?: any;
 }
+/**
+ * A {@link CheckTreeEditor} that populates its tree from a lookup, with optional cascading, filtering and search.
+ * @typeParam TItem - The lookup item type.
+ * @typeParam P - Widget props type.
+ */
 export declare class CheckLookupEditor<TItem extends CheckTreeItem<TItem> = any, P extends CheckLookupEditorOptions = CheckLookupEditorOptions> extends CheckTreeEditor<CheckTreeItem<TItem>, P> {
 	static [Symbol.typeInfo]: EditorTypeInfo<"Serenity.">;
 	private searchText;
 	private enableUpdateItems;
 	private lookupChangeOff;
+	/**
+	 * Creates a check lookup editor.
+	 * @param props - Widget props.
+	 */
 	constructor(props: EditorProps<P>);
+	/**
+	 * Cleans up lookup change handlers and delegates to the base destroy.
+	 */
 	destroy(): void;
 	protected updateItems(): void;
 	protected getLookupKey(): string;
@@ -12017,27 +12691,57 @@ export declare class CheckLookupEditor<TItem extends CheckTreeItem<TItem> = any,
 	protected onViewFilter(item: CheckTreeItem<TItem>): boolean;
 	protected moveSelectedUp(): boolean;
 	protected get_cascadeFrom(): string;
+	/** Returns the id of the parent editor to cascade from.
+	 * @returns The cascade source id. */
 	get cascadeFrom(): string;
 	protected getCascadeFromValue(parent: Widget<any>): any;
 	protected cascadeLink: CascadedWidgetLink<Widget<any>>;
 	protected setCascadeFrom(value: string): void;
+	/** Sets the cascade source.
+	 * @param value - Id of the parent editor to cascade from. */
 	protected set_cascadeFrom(value: string): void;
+	/** Sets the cascade source.
+	 * @param value - Id of the parent editor to cascade from. */
 	set cascadeFrom(value: string);
 	protected get_cascadeField(): string;
+	/** Returns the field name used for cascading.
+	 * @returns The cascade field. */
 	get cascadeField(): string;
+	/** Sets the field name used for cascading.
+	 * @param value - The cascade field name. */
 	protected set_cascadeField(value: string): void;
+	/** Sets the field name used for cascading.
+	 * @param value - The cascade field name. */
 	set cascadeField(value: string);
 	protected get_cascadeValue(): any;
+	/** Returns the current cascade filter value.
+	 * @returns The cascade value. */
 	get cascadeValue(): any;
+	/** Sets the cascade filter value and refreshes items.
+	 * @param value - The cascade value to set. */
 	protected set_cascadeValue(value: any): void;
+	/** Sets the cascade filter value.
+	 * @param value - The cascade value to set. */
 	set cascadeValue(value: any);
 	protected get_filterField(): string;
+	/** Returns the field name used for filtering.
+	 * @returns The filter field. */
 	get filterField(): string;
+	/** Sets the field name used for filtering.
+	 * @param value - The filter field name. */
 	protected set_filterField(value: string): void;
+	/** Sets the field name used for filtering.
+	 * @param value - The filter field name. */
 	set filterField(value: string);
 	protected get_filterValue(): any;
+	/** Returns the current filter value.
+	 * @returns The filter value. */
 	get filterValue(): any;
+	/** Sets the filter value and refreshes items.
+	 * @param value - The filter value to set. */
 	protected set_filterValue(value: any): void;
+	/** Sets the filter value.
+	 * @param value - The filter value to set. */
 	set filterValue(value: any);
 }
 /**
@@ -12089,7 +12793,10 @@ export interface DecimalEditorOptions {
  */
 export declare class DecimalEditor<P extends DecimalEditorOptions = DecimalEditorOptions> extends EditorWidget<P> implements IDoubleValue {
 	static [Symbol.typeInfo]: EditorTypeInfo<"Serenity.">;
+	/** Creates the default text input element.
+	 * @returns The text input element. */
 	static createDefaultElement(): HTMLInputElement;
+	/** The text input element that backs the editor. */
 	readonly domNode: HTMLInputElement;
 	/**
 	 * Creates a decimal editor.
@@ -12124,7 +12831,8 @@ export declare class DecimalEditor<P extends DecimalEditorOptions = DecimalEdito
 	 * @param value - The value to set.
 	 */
 	set_value(value: number): void;
-	/** Sets the decimal value. */
+	/** Sets the decimal value.
+	 * @param v - The decimal value to set. */
 	set value(v: number);
 	/**
 	 * Whether the current value is valid.
@@ -12205,7 +12913,10 @@ export declare namespace EditorUtils {
  */
 export declare class StringEditor<P = {}> extends EditorWidget<P> {
 	static [Symbol.typeInfo]: EditorTypeInfo<"Serenity.">;
+	/** The text input element that backs the editor. */
 	readonly domNode: HTMLInputElement;
+	/** Creates the default text input element.
+	 * @returns The text input element. */
 	static createDefaultElement(): HTMLInputElement;
 	/**
 	 * Returns the current string value.
@@ -12217,9 +12928,11 @@ export declare class StringEditor<P = {}> extends EditorWidget<P> {
 	 * @returns The input value.
 	 */
 	protected get_value(): string;
-	/** Sets the string value. */
+	/** Sets the string value.
+	 * @param value - The string value to set. */
 	set value(value: string);
-	/** Sets the string value. */
+	/** Sets the string value.
+	 * @param value - The string value to set. */
 	protected set_value(value: string): void;
 }
 /**
@@ -12525,7 +13238,10 @@ export interface IntegerEditorOptions {
  */
 export declare class IntegerEditor<P extends IntegerEditorOptions = IntegerEditorOptions> extends EditorWidget<P> implements IDoubleValue {
 	static [Symbol.typeInfo]: EditorTypeInfo<"Serenity.">;
+	/** Creates the default text input element.
+	 * @returns The text input element. */
 	static createDefaultElement(): HTMLInputElement;
+	/** The text input element that backs the editor. */
 	readonly domNode: HTMLInputElement;
 	/**
 	 * Creates an integer editor.
@@ -12560,7 +13276,8 @@ export declare class IntegerEditor<P extends IntegerEditorOptions = IntegerEdito
 	 * @param value - The value to set.
 	 */
 	set_value(value: number): void;
-	/** Sets the integer value. */
+	/** Sets the integer value.
+	 * @param v - The integer value to set. */
 	set value(v: number);
 	/**
 	 * Whether the current value is valid.
@@ -12690,7 +13407,10 @@ export declare class LookupEditor<P extends LookupEditorOptions = LookupEditorOp
  */
 export declare class MaskedEditor<P extends MaskedEditorOptions = MaskedEditorOptions> extends EditorWidget<P> {
 	static [Symbol.typeInfo]: EditorTypeInfo<"Serenity.">;
+	/** Creates the default text input element.
+	 * @returns The text input element. */
 	static createDefaultElement(): HTMLInputElement;
+	/** The text input element that backs the editor. */
 	readonly domNode: HTMLInputElement;
 	/**
 	 * Creates a masked editor.
@@ -12707,9 +13427,11 @@ export declare class MaskedEditor<P extends MaskedEditorOptions = MaskedEditorOp
 	 * @returns The input value.
 	 */
 	protected get_value(): string;
-	/** Sets the masked value. */
+	/** Sets the masked value.
+	 * @param value - The masked string to set. */
 	set value(value: string);
-	/** Sets the masked value. */
+	/** Sets the masked value.
+	 * @param value - The masked string to set. */
 	protected set_value(value: string): void;
 }
 /**
@@ -12851,7 +13573,7 @@ export interface Select2QueryOptions {
  * A single Select2 item.
  */
 export interface Select2Item {
-	/** Item id. */
+	/** Unique identifier of the select item. */
 	id?: string;
 	/** Display text. */
 	text?: string;
@@ -12895,9 +13617,12 @@ export interface Select2AjaxOptions extends RequestInit {
 	results?: (p1: any, p2: number, p3: any) => any;
 	/** Additional request parameters. */
 	params?: (() => any) | any;
-	/** Callback invoked on error. */
+	/** Callback invoked when the ajax request fails.
+	 * @param response - The error response payload.
+	 * @param info - Additional error info. */
 	onError?(response: any, info?: any): void | boolean;
-	/** Callback invoked on success. */
+	/** Callback invoked when the ajax request succeeds.
+	 * @param response - The success response payload. */
 	onSuccess?(response: any): void;
 }
 /**
@@ -13016,6 +13741,10 @@ export interface Select2Options {
  */
 export declare class Select2 {
 	private el;
+	/**
+	 * Creates a Select2 widget.
+	 * @param opts - Select2 options.
+	 */
 	constructor(opts?: Select2Options);
 	private get instance();
 	/**
@@ -13041,7 +13770,8 @@ export declare class Select2 {
 	 * @returns The selected item(s).
 	 */
 	get data(): (Select2Item | Select2Item[]);
-	/** Sets the current data. */
+	/** Sets the current data.
+	 * @param value - The data to set. */
 	set data(value: Select2Item | Select2Item[]);
 	/**
 	 * Disables the Select2 widget.
@@ -13095,7 +13825,8 @@ export declare class Select2 {
 	 * @returns The value.
 	 */
 	get val(): (string | string[]);
-	/** Sets the current value. */
+	/** Sets the current value.
+	 * @param value - The value to set. */
 	set val(value: string | string[]);
 	/**
 	 * Returns the Select2 instance attached to an element, or null.
@@ -13105,6 +13836,7 @@ export declare class Select2 {
 	static getInstance(el: Select2Element): Select2;
 	/** Default ajax options. */
 	static readonly ajaxDefaults: Select2AjaxOptions;
+	/** Default options for the Select2 widget. */
 	static readonly defaults: Select2Options;
 	/**
 	 * Highlights the matching portion of text for a search term.
@@ -13263,6 +13995,8 @@ export interface TextAreaEditorOptions {
  */
 export declare class TextAreaEditor<P extends TextAreaEditorOptions = TextAreaEditorOptions> extends EditorWidget<P> {
 	static [Symbol.typeInfo]: EditorTypeInfo<"Serenity.">;
+	/** Creates the default textarea element.
+	 * @returns The textarea element. */
 	static createDefaultElement(): HTMLTextAreaElement;
 	/**
 	 * Creates a textarea editor.
@@ -13279,9 +14013,11 @@ export declare class TextAreaEditor<P extends TextAreaEditorOptions = TextAreaEd
 	 * @returns The value.
 	 */
 	protected get_value(): string;
-	/** Sets the textarea value. */
+	/** Sets the textarea value.
+	 * @param value - The textarea value to set. */
 	set value(value: string);
-	/** Sets the textarea value. */
+	/** Sets the textarea value.
+	 * @param value - The textarea value to set. */
 	protected set_value(value: string): void;
 }
 /**
@@ -13303,7 +14039,10 @@ export interface TimeEditorBaseOptions {
  */
 export declare class TimeEditorBase<P extends TimeEditorBaseOptions> extends EditorWidget<P> {
 	static [Symbol.typeInfo]: EditorTypeInfo<"Serenity.">;
+	/** Creates the default select element for the time editor.
+	 * @returns The hour select element. */
 	static createDefaultElement(): HTMLElement;
+	/** The hour select element that backs the editor. */
 	readonly domNode: HTMLSelectElement;
 	protected minutes: Fluent;
 	/**
@@ -13331,11 +14070,16 @@ export declare class TimeEditorBase<P extends TimeEditorBaseOptions> extends Edi
 	 * @param value - True to enable read-only mode.
 	 */
 	set_readOnly(value: boolean): void;
-	/** Returns value in HH:mm format */
+	/** Returns the combined time value in HH:mm format.
+	 * @returns The time string, or null when empty. */
 	get hourAndMin(): string;
-	/** Sets value in HH:mm format */
+	/** Sets the combined time value in HH:mm format.
+	 * @param value - The time string to set. */
 	set hourAndMin(value: string);
 }
+/**
+ * Options for the {@link TimeEditor}.
+ */
 export interface TimeEditorOptions extends TimeEditorBaseOptions {
 	/** Default is 1. Set to 60 to store seconds, 60000 to store ms in an integer field */
 	multiplier?: number;
@@ -13390,20 +14134,26 @@ export interface TimeSpanEditorOptions extends TimeEditorBaseOptions {
  */
 export declare class TimeSpanEditor<P extends TimeSpanEditorOptions = TimeSpanEditorOptions> extends TimeEditorBase<P> {
 	static [Symbol.typeInfo]: EditorTypeInfo<"Serenity.">;
+	/**
+	 * Creates a time span editor.
+	 * @param props - Widget props.
+	 */
 	constructor(props: EditorProps<P>);
 	/**
 	 * Returns the current time span value.
 	 * @returns The value in "HH:mm" format.
 	 */
 	protected get_value(): string;
-	/** Sets the time span value. */
+	/** Sets the time span value.
+	 * @param value - The time span value to set. */
 	protected set_value(value: string): void;
 	/**
 	 * Returns the current time span value.
 	 * @returns The value in "HH:mm" format.
 	 */
 	get value(): string;
-	/** Sets the time span value. */
+	/** Sets the time span value.
+	 * @param value - The time span string to set. */
 	set value(value: string);
 }
 /**
@@ -13688,7 +14438,8 @@ export declare class FileUploadEditor<P extends FileUploadEditorOptions = FileUp
 	 * @param value - The uploaded file to set.
 	 */
 	set_value(value: UploadedFile): void;
-	/** Sets the uploaded file. */
+	/** Sets the uploaded file.
+	 * @param v - The uploaded file to set. */
 	set value(v: UploadedFile);
 	/**
 	 * Gets the edit value into a target object.
@@ -13808,7 +14559,8 @@ export declare class MultipleFileUploadEditor<P extends MultipleFileUploadEditor
 	 * @param value - The uploaded files to set.
 	 */
 	set_value(value: UploadedFile[]): void;
-	/** Sets the uploaded files. */
+	/** Sets the uploaded files.
+	 * @param v - The uploaded files to set. */
 	set value(v: UploadedFile[]);
 	/**
 	 * Gets the edit value into a target object.
@@ -13827,7 +14579,8 @@ export declare class MultipleFileUploadEditor<P extends MultipleFileUploadEditor
 	 * @returns True when JSON-encoded.
 	 */
 	get jsonEncodeValue(): boolean;
-	/** Sets whether the value is JSON-encoded. */
+	/** Sets whether the value is JSON-encoded.
+	 * @param value - True to JSON-encode the value. */
 	set jsonEncodeValue(value: boolean);
 }
 /**
@@ -14647,6 +15400,8 @@ export declare class BooleanFormatter implements Formatter {
 	};
 	static [Symbol.typeInfo]: FormatterTypeInfo<"Serenity.">;
 	/**
+	 * Creates a new BooleanFormatter.
+	 * @param props - Formatter options.
 	 * @param props.falseText - Text for `false` values.
 	 * @param props.falseIcon - Icon class for `false` values.
 	 * @param props.nullText - Text for `null` values.
@@ -14672,9 +15427,19 @@ export declare class BooleanFormatter implements Formatter {
 	 * @returns Text, icon, or combined span per `props`.
 	 */
 	format(ctx: FormatterContext): FormatterResult;
+	/** Gets the text for `false` values. @returns The false text. */
 	get falseText(): string;
+	/**
+	 * Sets the text for `false` values.
+	 * @param value - The false text.
+	 */
 	set falseText(value: string);
+	/** Gets the text for `true` values. @returns The true text. */
 	get trueText(): string;
+	/**
+	 * Sets the text for `true` values.
+	 * @param value - The true text.
+	 */
 	set trueText(value: string);
 }
 /**
@@ -14694,6 +15459,8 @@ export declare class CheckboxFormatter implements Formatter {
 	};
 	static [Symbol.typeInfo]: FormatterTypeInfo<"Serenity.">;
 	/**
+	 * Creates a new CheckboxFormatter.
+	 * @param props - Formatter options.
 	 * @param props.falseText - Text for `false`.
 	 * @param props.falseIcon - Icon for `false`.
 	 * @param props.nullText - Text for `null`.
@@ -14713,7 +15480,11 @@ export declare class CheckboxFormatter implements Formatter {
 		showText?: boolean;
 		showHint?: boolean;
 	});
-	/** @param ctx - Formatter context. @returns Checkbox / icon / text markup. */
+	/**
+	 * Formats the boolean value as a checkbox or icon/text markup.
+	 * @param ctx - Formatter context containing the cell value.
+	 * @returns Checkbox, icon, or text markup for the cell.
+	 */
 	format(ctx: FormatterContext): FormatterResult;
 }
 /** Formats date values using {@link formatDate} / {@link Culture.dateFormat}. */
@@ -14723,6 +15494,8 @@ export declare class DateFormatter implements Formatter {
 	};
 	static [Symbol.typeInfo]: FormatterTypeInfo<"Serenity.">;
 	/**
+	 * Creates a new DateFormatter.
+	 * @param props - Formatter options.
 	 * @param props.displayFormat - Date format string (default `Culture.dateFormat`).
 	 */
 	constructor(props?: {
@@ -14735,15 +15508,26 @@ export declare class DateFormatter implements Formatter {
 	 * @returns HTML-encoded formatted string.
 	 */
 	static format(value: any, format?: string): any;
+	/** Gets the date display format. @returns The display format string. */
 	get displayFormat(): string;
+	/**
+	 * Sets the date display format.
+	 * @param value - The display format string.
+	 */
 	set displayFormat(value: string);
-	/** @param ctx - Formatter context. @returns Formatted date string. */
+	/**
+	 * Formats the cell value as a date string.
+	 * @param ctx - Formatter context containing the cell value.
+	 * @returns HTML-encoded formatted date string.
+	 */
 	format(ctx: FormatterContext): string;
 }
 /** Variant of {@link DateFormatter} that defaults to `Culture.dateTimeFormat`. */
 export declare class DateTimeFormatter extends DateFormatter {
 	static [Symbol.typeInfo]: FormatterTypeInfo<"Serenity.">;
 	/**
+	 * Creates a new DateTimeFormatter.
+	 * @param props - Formatter options.
 	 * @param props.displayFormat - Date-time format string (default `Culture.dateTimeFormat`).
 	 */
 	constructor(props?: {
@@ -14757,14 +15541,25 @@ export declare class EnumFormatter implements Formatter {
 	};
 	static [Symbol.typeInfo]: FormatterTypeInfo<"Serenity.">;
 	/**
+	 * Creates a new EnumFormatter.
+	 * @param props - Formatter options.
 	 * @param props.enumKey - Full enum key (e.g. `"MyProject.MyEnum"`). Resolved via {@link EnumTypeRegistry}.
 	 */
 	constructor(props?: {
 		enumKey?: string;
 	});
-	/** @param ctx - Formatter context containing enum value. @returns Localized enum text (or async placeholder). */
+	/**
+	 * Formats the enum value as localized text.
+	 * @param ctx - Formatter context containing the enum value.
+	 * @returns Localized enum text or a placeholder element when the enum type loads asynchronously.
+	 */
 	format(ctx: FormatterContext): FormatterResult;
+	/** Gets the enum key used to resolve the enum type. @returns The enum key. */
 	get enumKey(): string;
+	/**
+	 * Sets the enum key used to resolve the enum type.
+	 * @param value - The enum key.
+	 */
 	set enumKey(value: string);
 	/**
 	 * Formats an enum value given an enum type.
@@ -14811,6 +15606,8 @@ export declare class FileDownloadFormatter implements Formatter, IInitializeColu
 	};
 	static [Symbol.typeInfo]: FormatterTypeInfo<"Serenity.">;
 	/**
+	 * Creates a new FileDownloadFormatter.
+	 * @param props - Formatter options.
 	 * @param props.displayFormat - Format string for link text (default `"{0}"`).
 	 * @param props.originalNameProperty - Field holding the original file name.
 	 * @param props.iconClass - Icon class for the download icon.
@@ -14820,7 +15617,11 @@ export declare class FileDownloadFormatter implements Formatter, IInitializeColu
 		originalNameProperty?: string;
 		iconClass?: string;
 	});
-	/** @param ctx - Formatter context. @returns Anchor element for the file. */
+	/**
+	 * Formats the stored file path as a download link.
+	 * @param ctx - Formatter context containing the cell value and row item.
+	 * @returns Anchor element markup or an empty string if the value is empty.
+	 */
 	format(ctx: FormatterContext): FormatterResult;
 	/**
 	 * Builds the download URL for a temp/upload file.
@@ -14833,11 +15634,26 @@ export declare class FileDownloadFormatter implements Formatter, IInitializeColu
 	 * @param column - Column being initialized.
 	 */
 	initializeColumn(column: Column): void;
+	/** Gets the format string for link text. @returns The display format. */
 	get displayFormat(): string;
+	/**
+	 * Sets the format string for link text.
+	 * @param value - The display format string.
+	 */
 	set displayFormat(value: string);
+	/** Gets the field holding the original file name. @returns The original name property. */
 	get originalNameProperty(): string;
+	/**
+	 * Sets the field holding the original file name.
+	 * @param value - The original name property.
+	 */
 	set originalNameProperty(value: string);
+	/** Gets the icon class for the download icon. @returns The icon class. */
 	get iconClass(): string;
+	/**
+	 * Sets the icon class for the download icon.
+	 * @param value - The icon class.
+	 */
 	set iconClass(value: string);
 }
 /**
@@ -14864,7 +15680,11 @@ export declare abstract class FormatterBase implements Formatter {
 /** Formats an integer minute count as `HH:mm` (e.g. 90 → `"01:30"`). */
 export declare class MinuteFormatter implements Formatter {
 	static [Symbol.typeInfo]: FormatterTypeInfo<"Serenity.">;
-	/** @param ctx - Formatter context. @returns `HH:mm` string. */
+	/**
+	 * Formats the cell value as `HH:mm`.
+	 * @param ctx - Formatter context containing the minute value.
+	 * @returns `HH:mm` string.
+	 */
 	format(ctx: FormatterContext): string;
 	/**
 	 * Static helper to format minutes.
@@ -14880,12 +15700,18 @@ export declare class NumberFormatter implements Formatter {
 	};
 	static [Symbol.typeInfo]: FormatterTypeInfo<"Serenity.">;
 	/**
+	 * Creates a new NumberFormatter.
+	 * @param props - Formatter options.
 	 * @param props.displayFormat - Number format string (default `"0.##"`).
 	 */
 	constructor(props?: {
 		displayFormat?: string;
 	});
-	/** @param ctx - Formatter context. @returns Formatted number string. */
+	/**
+	 * Formats the cell value as a number string.
+	 * @param ctx - Formatter context containing the cell value.
+	 * @returns Formatted number string.
+	 */
 	format(ctx: FormatterContext): string;
 	/**
 	 * Static helper to format any numeric-like value.
@@ -14894,7 +15720,12 @@ export declare class NumberFormatter implements Formatter {
 	 * @returns Formatted string.
 	 */
 	static format(value: any, format?: string): string;
+	/** Gets the number display format. @returns The display format string. */
 	get displayFormat(): string;
+	/**
+	 * Sets the number display format.
+	 * @param value - The display format string.
+	 */
 	set displayFormat(value: string);
 }
 /** Renders a value as a hyperlink with configurable URL / display mapping. */
@@ -14908,6 +15739,8 @@ export declare class UrlFormatter implements Formatter, IInitializeColumn {
 	};
 	static [Symbol.typeInfo]: FormatterTypeInfo<"Serenity.">;
 	/**
+	 * Creates a new UrlFormatter.
+	 * @param props - Formatter options.
 	 * @param props.displayProperty - Item field used for link text (defaults to cell value).
 	 * @param props.displayFormat - Format string applied to display value.
 	 * @param props.urlProperty - Item field used for URL (defaults to cell value).
@@ -14921,22 +15754,51 @@ export declare class UrlFormatter implements Formatter, IInitializeColumn {
 		urlFormat?: string;
 		target?: string;
 	});
-	/** @param ctx - Formatter context. @returns Anchor element or empty string. */
+	/**
+	 * Formats the cell value as a hyperlink.
+	 * @param ctx - Formatter context containing the cell value and row item.
+	 * @returns Anchor element markup or an empty string if the URL is empty.
+	 */
 	format(ctx: FormatterContext): FormatterResult;
 	/**
 	 * Declares any referenced fields so they are fetched for formatting.
 	 * @param column - Column being initialized.
 	 */
 	initializeColumn(column: Column): void;
+	/** Gets the field used for link text. @returns The display property name. */
 	get displayProperty(): string;
+	/**
+	 * Sets the field used for link text.
+	 * @param value - The display property name.
+	 */
 	set displayProperty(value: string);
+	/** Gets the format string applied to the display value. @returns The display format. */
 	get displayFormat(): string;
+	/**
+	 * Sets the format string applied to the display value.
+	 * @param value - The display format string.
+	 */
 	set displayFormat(value: string);
+	/** Gets the field used for the URL. @returns The URL property name. */
 	get urlProperty(): string;
+	/**
+	 * Sets the field used for the URL.
+	 * @param value - The URL property name.
+	 */
 	set urlProperty(value: string);
+	/** Gets the format string applied to the URL value. @returns The URL format. */
 	get urlFormat(): string;
+	/**
+	 * Sets the format string applied to the URL value.
+	 * @param value - The URL format string.
+	 */
 	set urlFormat(value: string);
+	/** Gets the anchor target (e.g. `"_blank"`). @returns The target value. */
 	get target(): string;
+	/**
+	 * Sets the anchor target.
+	 * @param value - The target value (e.g. `"_blank"`).
+	 */
 	set target(value: string);
 }
 /**

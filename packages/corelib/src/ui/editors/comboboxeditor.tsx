@@ -70,7 +70,10 @@ export class ComboboxEditor<P, TItem> extends EditorWidget<P> implements
     ISetEditValue, IGetEditValue, IStringValue, IReadOnly {
     static override[Symbol.typeInfo] = this.registerClass(nsSerenity, [ISetEditValue, IGetEditValue, IStringValue, IReadOnly]);
 
+    /** Creates the default hidden input element for the combobox.
+     * @returns The hidden input element. */
     static override createDefaultElement() { return <input type="hidden" /> as HTMLInputElement; }
+    /** The hidden input element that backs the combobox editor. */
     declare readonly domNode: HTMLInputElement;
 
     declare private combobox: Combobox;
@@ -373,7 +376,8 @@ export class ComboboxEditor<P, TItem> extends EditorWidget<P> implements
         return this._items || [];
     }
 
-    /** Sets the items in the editor. */
+    /** Sets the items in the editor.
+     * @param value - The combobox items to set. */
     public set items(value: ComboboxItem<TItem>[]) {
         if (this.hasAsyncSource())
             throw new Error("Can't set items of an async select editor!");
@@ -676,7 +680,8 @@ export class ComboboxEditor<P, TItem> extends EditorWidget<P> implements
         this.updateInplaceReadOnly();
     }
 
-    /** Sets the current value. */
+    /** Sets the current value.
+     * @param v - The single value to set. */
     set value(v: string) {
         this.set_value(v);
     }
@@ -738,7 +743,8 @@ export class ComboboxEditor<P, TItem> extends EditorWidget<P> implements
         this.combobox?.setValues(value);
     }
 
-    /** Sets the current values. */
+    /** Sets the current values.
+     * @param value - The array of selected values to set. */
     set values(value: string[]) {
         this.set_values(value);
     }
@@ -757,8 +763,7 @@ export class ComboboxEditor<P, TItem> extends EditorWidget<P> implements
 
     /**
      * Returns the display text of the current selection.
-     * @returns The text.
-     */
+     * @returns The comma-joined display text of the selected item(s). */
     get text(): string {
         return this.get_text();
     }
@@ -854,7 +859,8 @@ export class ComboboxEditor<P, TItem> extends EditorWidget<P> implements
         }
     }
 
-    /** Sets the cascade-from parent id. */
+    /** Sets the cascade-from parent id.
+     * @param value - The parent editor id to cascade from. */
     set cascadeFrom(value: string) {
         this.set_cascadeFrom(value);
     }
@@ -883,7 +889,8 @@ export class ComboboxEditor<P, TItem> extends EditorWidget<P> implements
         (this.options as ComboboxEditorOptions).cascadeField = value;
     }
 
-    /** Sets the cascade field name. */
+    /** Sets the cascade field name.
+     * @param value - The field name used for cascading. */
     set cascadeField(value: string) {
         this.set_cascadeField(value);
     }
@@ -916,7 +923,8 @@ export class ComboboxEditor<P, TItem> extends EditorWidget<P> implements
         }
     }
 
-    /** Sets the cascade value. */
+    /** Sets the cascade value.
+     * @param value - The cascade value to filter by. */
     set cascadeValue(value: any) {
         this.set_cascadeValue(value);
     }
@@ -945,7 +953,8 @@ export class ComboboxEditor<P, TItem> extends EditorWidget<P> implements
         (this.options as ComboboxEditorOptions).filterField = value;
     }
 
-    /** Sets the filter field name. */
+    /** Sets the filter field name.
+     * @param value - The field name used for filtering. */
     set filterField(value: string) {
         this.set_filterField(value);
     }
@@ -978,7 +987,8 @@ export class ComboboxEditor<P, TItem> extends EditorWidget<P> implements
         }
     }
 
-    /** Sets the filter value. */
+    /** Sets the filter value.
+     * @param value - The filter value to apply. */
     set filterValue(value: any) {
         this.set_filterValue(value);
     }
@@ -1205,10 +1215,12 @@ export class ComboboxEditor<P, TItem> extends EditorWidget<P> implements
         });
     }
 
+    /** Opens the combobox dropdown. */
     public openDropdown() {
         Combobox.getInstance(this.domNode)?.openDropdown();
     }
 
+    /** Whether the in-place add dialog opens as a panel. */
     declare public openDialogAsPanel: boolean;
 }
 

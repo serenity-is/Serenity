@@ -24,7 +24,10 @@ export interface IntegerEditorOptions {
 export class IntegerEditor<P extends IntegerEditorOptions = IntegerEditorOptions> extends EditorWidget<P> implements IDoubleValue {
     static override[Symbol.typeInfo] = this.registerEditor(nsSerenity, [IDoubleValue]);
 
+    /** Creates the default text input element.
+     * @returns The text input element. */
     static override createDefaultElement() { return <input type="text" /> as HTMLInputElement; }
+    /** The text input element that backs the editor. */
     declare readonly domNode: HTMLInputElement;
 
     /**
@@ -115,7 +118,8 @@ export class IntegerEditor<P extends IntegerEditorOptions = IntegerEditorOptions
             this.domNode.value = formatNumber(value);
     }
 
-    /** Sets the integer value. */
+    /** Sets the integer value.
+     * @param v - The integer value to set. */
     set value(v: number) {
         this.set_value(v);
     }

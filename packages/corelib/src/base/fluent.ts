@@ -104,12 +104,19 @@ export interface Fluent<TElement extends HTMLElement = HTMLElement> extends Arra
     closest<TElement extends HTMLElement = HTMLElement>(selector: string): Fluent<TElement>;
 
     /**
-     * Gets or sets the value of the specified data attribute.
+     * Gets the value of the specified `data-*` attribute.
      *
-     * @param name The name of the data attribute.
-     * @returns The value of the data attribute if no value is provided, or the Fluent object itself if a value is provided.
+     * @param name - Name of the data attribute without the `data-` prefix.
+     * @returns The attribute value, or `null`/`undefined` when not present.
      */
     data(name: string): string;
+    /**
+     * Sets the value of the specified `data-*` attribute.
+     *
+     * @param name - Name of the data attribute without the `data-` prefix.
+     * @param value - Value to set; `null`/`undefined` removes the attribute via {@link Fluent.attr}.
+     * @returns The Fluent object itself.
+     */
     data(name: string, value: string): this;
 
     /**
@@ -175,18 +182,18 @@ export interface Fluent<TElement extends HTMLElement = HTMLElement> extends Arra
     hasClass(klass: string): boolean;
 
     /**
-     * Gets the value of the hidden attribute/property. 
+     * Gets whether the element is hidden (`hidden` property).
      *
-     * @returns The value of the hidden attribute/property
+     * @param name - Reserved attribute name parameter for compatibility; not used for the `hidden` property check.
+     * @returns `true` if the element is hidden, otherwise `false`.
      */
     hidden(name: string): boolean;
 
-    
     /**
-     * Sets the value of the hidden property/attribute.
+     * Sets whether the element is hidden.
      *
-     * @param value The value of the attribute. If the value is falsy the attribute is removed.
-     * @returns The Fluent object itself if a value is provided.
+     * @param value - When `true` sets `element.hidden = true`, otherwise `false`.
+     * @returns The Fluent object itself.
      */
     hidden(value: boolean): this;
 
@@ -244,35 +251,86 @@ export interface Fluent<TElement extends HTMLElement = HTMLElement> extends Arra
     /**
      * Removes an event listener from the element.
      *
-     * @param type The type of the event. It can include a ".namespace" similar to jQuery.
-     * @param listener The event listener to remove.
+     * @param type - Event type, may include a `.namespace` suffix (e.g. `"click.myNs"`).
+     * @param listener - Event listener to remove.
      * @returns The Fluent object itself.
      */
     off<K extends keyof HTMLElementEventMap>(type: K, listener: (this: HTMLElement, ev: HTMLElementEventMap[K]) => any): this;
+    /**
+     * Removes event listener(s) for the given type / namespace.
+     *
+     * @param type - Event type or `.namespace`; when only a namespace is handled all matching listeners are removed.
+     * @returns The Fluent object itself.
+     */
     off(type: string): this;
+    /**
+     * Removes an event listener from the element.
+     *
+     * @param type - Event type, may include a `.namespace`.
+     * @param listener - Event listener to remove.
+     * @returns The Fluent object itself.
+     */
     off(type: string, listener: EventListener): this;
+    /**
+     * Removes a delegated event listener.
+     *
+     * @param type - Event type, may include a `.namespace`.
+     * @param selector - Delegation selector used when the listener was added.
+     * @param delegationHandler - Delegated handler to remove.
+     * @returns The Fluent object itself.
+     */
     off(type: string, selector: string, delegationHandler: Function): this;
 
     /**
-     * Adds an event listener to the element. It is possible to use delegated events like jQuery.
+     * Adds an event listener to the element. Supports namespaced and delegated events via the shared `fluent-events` module.
      *
-     * @param type The type of the event. It can include a ".namespace" similar to jQuery.
-     * @param listener The event listener to add.
+     * @param type - Event type, may include a `.namespace` suffix.
+     * @param listener - Event listener to add.
      * @returns The Fluent object itself.
      */
     on<K extends keyof HTMLElementEventMap>(type: K, listener: (this: HTMLElement, ev: HTMLElementEventMap[K]) => any): this;
+    /**
+     * Adds an event listener to the element.
+     *
+     * @param type - Event type, may include a `.namespace`.
+     * @param listener - Event listener to add.
+     * @returns The Fluent object itself.
+     */
     on(type: string, listener: EventListener): this;
+    /**
+     * Adds a delegated event listener to the element.
+     *
+     * @param type - Event type, may include a `.namespace`.
+     * @param selector - CSS selector to delegate to.
+     * @param delegationHandler - Handler invoked when the delegated target matches.
+     * @returns The Fluent object itself.
+     */
     on(type: string, selector: string, delegationHandler: Function): this;
 
     /**
-     * Adds a one-time event listener to the element. It is possible to use delegated events like jQuery.
+     * Adds a one-time event listener that is automatically removed after the first invocation.
      *
-     * @param type The type of the event. It can include a ".namespace" similar to jQuery.
-     * @param listener The event listener to add.
+     * @param type - Event type, may include a `.namespace` suffix.
+     * @param listener - Event listener to add.
      * @returns The Fluent object itself.
      */
     one<K extends keyof HTMLElementEventMap>(type: K, listener: (this: HTMLElement, ev: HTMLElementEventMap[K]) => any): this;
+    /**
+     * Adds a one-time event listener to the element.
+     *
+     * @param type - Event type, may include a `.namespace`.
+     * @param listener - Event listener to add.
+     * @returns The Fluent object itself.
+     */
     one(type: string, listener: EventListener): this;
+    /**
+     * Adds a one-time delegated event listener to the element.
+     *
+     * @param type - Event type, may include a `.namespace`.
+     * @param selector - CSS selector to delegate to.
+     * @param delegationHandler - Handler invoked once when the delegated target matches.
+     * @returns The Fluent object itself.
+     */
     one(type: string, selector: string, delegationHandler: Function): this;
 
     /**
@@ -361,11 +419,17 @@ export interface Fluent<TElement extends HTMLElement = HTMLElement> extends Arra
     style(callback: (css: CSSStyleDeclaration) => void): this;
 
     /**
-     * Gets or sets the text content of the element.
+     * Gets the text content of the element.
      *
-     * @returns The text content of the element if no value is provided, or the Fluent object itself if a value is provided.
+     * @returns The current `textContent` of the element.
      */
     text(): string;
+    /**
+     * Sets the text content of the element.
+     *
+     * @param value - Text to set as `textContent`.
+     * @returns The Fluent object itself.
+     */
     text(value: string): this;
 
     /**
@@ -379,7 +443,8 @@ export interface Fluent<TElement extends HTMLElement = HTMLElement> extends Arra
     /**
      * Toggles one or more classes on the element. If the class exists, it is removed; otherwise, it is added.
      *
-     * @param value The class or classes to toggle. It can be a string, boolean, or an array of strings or booleans.
+     * @param value - Class or classes to toggle. Strings are split on whitespace; arrays are flattened; falsy entries are ignored.
+     * @param add - When `true` forces addition, when `false` forces removal, when omitted toggles.
      * @returns The Fluent object itself.
      */
     toggleClass(value: (string | boolean | (string | boolean)[]), add?: boolean): this;
@@ -402,12 +467,17 @@ export interface Fluent<TElement extends HTMLElement = HTMLElement> extends Arra
     tryGetWidget<TWidget>(type?: { new(...args: any[]): TWidget }): TWidget;
 
     /**
-     * Gets or sets the value of the element.
+     * Sets the value of the element (input / select / textarea).
      *
-     * @param value The value to set. If no value is provided, returns the current value of the element.
-     * @returns The value of the element if no value is provided, or the Fluent object itself if a value is provided.
+     * @param value - Value to set.
+     * @returns The Fluent object itself.
      */
     val(value: string): this;
+    /**
+     * Gets the value of the element (input / select / textarea).
+     *
+     * @returns The current value of the element.
+     */
     val(): string;
 }
 
@@ -464,8 +534,31 @@ export namespace Fluent {
      * @returns `void`.
      */
     export function on<K extends keyof HTMLElementEventMap>(element: EventTarget, type: K, listener: (this: HTMLElement, ev: HTMLElementEventMap[K]) => any): void;
+    /**
+     * Adds an event listener.
+     * @param element - Target element to listen on.
+     * @param type - Event type; may include a `.namespace` suffix.
+     * @param listener - Callback to invoke when the event fires.
+     * @returns `void`.
+     */
     export function on(element: EventTarget, type: string, listener: EventListener): void;
+    /**
+     * Adds a delegated event listener.
+     * @param element - Target element to listen on.
+     * @param type - Event type; may include a `.namespace` suffix.
+     * @param selector - CSS selector to delegate to.
+     * @param delegationHandler - Handler invoked when the delegated target matches.
+     * @returns `void`.
+     */
     export function on(element: EventTarget, type: string, selector: string, delegationHandler: Function): void;
+    /**
+     * Adds an event listener (implementation).
+     * @param element - Target element to listen on.
+     * @param type - Event type; may include a `.namespace` suffix.
+     * @param handler - Event listener or selector when delegating.
+     * @param delegationHandler - Delegated handler when `handler` is a selector.
+     * @returns `void`.
+     */
     export function on(element: EventTarget, type: string, handler: any, delegationHandler?: Function): void {
         addListener(element, type, handler, delegationHandler, /*oneOff*/ false);
     }
@@ -478,8 +571,31 @@ export namespace Fluent {
      * @returns `void`.
      */
     export function one<K extends keyof HTMLElementEventMap>(element: EventTarget, type: K, listener: (this: HTMLElement, ev: HTMLElementEventMap[K]) => any): void;
+    /**
+     * Adds a one-time event listener.
+     * @param element - Target element to listen on.
+     * @param type - Event type; may include a `.namespace` suffix.
+     * @param listener - Callback to invoke once when the event fires.
+     * @returns `void`.
+     */
     export function one(element: EventTarget, type: string, listener: EventListener): void;
+    /**
+     * Adds a one-time delegated event listener.
+     * @param element - Target element to listen on.
+     * @param type - Event type; may include a `.namespace` suffix.
+     * @param selector - CSS selector to delegate to.
+     * @param delegationHandler - Handler invoked once when the delegated target matches.
+     * @returns `void`.
+     */
     export function one(element: EventTarget, type: string, selector: string, delegationHandler: Function): void;
+    /**
+     * Adds a one-time event listener (implementation).
+     * @param element - Target element to listen on.
+     * @param type - Event type; may include a `.namespace` suffix.
+     * @param handler - Event listener or selector when delegating.
+     * @param delegationHandler - Delegated handler when `handler` is a selector.
+     * @returns `void`.
+     */
     export function one(element: EventTarget, type: string, handler: any, delegationHandler?: Function): void {
         addListener(element, type, handler, delegationHandler, true);
     }
@@ -492,8 +608,31 @@ export namespace Fluent {
      * @returns `void`.
      */
     export function off<K extends keyof HTMLElementEventMap>(element: EventTarget, type: K, listener?: (this: HTMLElement, ev: HTMLElementEventMap[K]) => any): void;
+    /**
+     * Removes an event listener.
+     * @param element - Target element.
+     * @param type - Event type; may include a `.namespace`.
+     * @param listener - Specific callback to remove. When omitted, all listeners for `type` are removed.
+     * @returns `void`.
+     */
     export function off(element: EventTarget, type: string, listener?: EventListener): void;
+    /**
+     * Removes a delegated event listener.
+     * @param element - Target element.
+     * @param type - Event type; may include a `.namespace`.
+     * @param selector - Delegation selector used when the listener was added.
+     * @param delegationHandler - Delegated handler to remove.
+     * @returns `void`.
+     */
     export function off(element: EventTarget, type: string, selector?: string, delegationHandler?: Function): void;
+    /**
+     * Removes an event listener (implementation).
+     * @param element - Target element.
+     * @param originalTypeEvent - Event type; may include a `.namespace`.
+     * @param handler - Specific callback to remove.
+     * @param delegationHandler - Delegated handler to remove.
+     * @returns `void`.
+     */
     export function off(element: EventTarget, originalTypeEvent: string, handler?: any, delegationHandler?: Function): void {
         return removeListener(element, originalTypeEvent, handler, delegationHandler);
     }

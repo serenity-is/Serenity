@@ -10,7 +10,10 @@ import { EditorProps, EditorWidget } from "./editorwidget";
 export class MaskedEditor<P extends MaskedEditorOptions = MaskedEditorOptions> extends EditorWidget<P> {
     static override[Symbol.typeInfo] = this.registerEditor(nsSerenity, [IStringValue]);
 
+    /** Creates the default text input element.
+     * @returns The text input element. */
     static override createDefaultElement() { return <input type="text" /> as HTMLInputElement; }
+    /** The text input element that backs the editor. */
     declare readonly domNode: HTMLInputElement;
 
     /**
@@ -48,12 +51,14 @@ export class MaskedEditor<P extends MaskedEditorOptions = MaskedEditorOptions> e
         return this.value;
     }
 
-    /** Sets the masked value. */
+    /** Sets the masked value.
+     * @param value - The masked string to set. */
     public set value(value: string) {
         this.domNode.value = value;
     }
 
-    /** Sets the masked value. */
+    /** Sets the masked value.
+     * @param value - The masked string to set. */
     protected set_value(value: string): void {
         this.value = value;
     }

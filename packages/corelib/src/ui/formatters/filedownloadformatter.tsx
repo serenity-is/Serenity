@@ -9,6 +9,8 @@ export class FileDownloadFormatter implements Formatter, IInitializeColumn {
     static [Symbol.typeInfo] = formatterTypeInfo(nsSerenity, [IInitializeColumn]); static { registerType(this); }
 
     /**
+     * Creates a new FileDownloadFormatter.
+     * @param props - Formatter options.
      * @param props.displayFormat - Format string for link text (default `"{0}"`).
      * @param props.originalNameProperty - Field holding the original file name.
      * @param props.iconClass - Icon class for the download icon.
@@ -17,7 +19,11 @@ export class FileDownloadFormatter implements Formatter, IInitializeColumn {
         this.props ??= {};
     }
 
-    /** @param ctx - Formatter context. @returns Anchor element for the file. */
+    /**
+     * Formats the stored file path as a download link.
+     * @param ctx - Formatter context containing the cell value and row item.
+     * @returns Anchor element markup or an empty string if the value is empty.
+     */
     format(ctx: FormatterContext): FormatterResult {
         var dbFile = ctx.value as string;
         if (!dbFile)
@@ -58,12 +64,27 @@ export class FileDownloadFormatter implements Formatter, IInitializeColumn {
         }
     }
 
+    /** Gets the format string for link text. @returns The display format. */
     get displayFormat() { return this.props.displayFormat; }
+    /**
+     * Sets the format string for link text.
+     * @param value - The display format string.
+     */
     set displayFormat(value) { this.props.displayFormat = value; }
 
+    /** Gets the field holding the original file name. @returns The original name property. */
     get originalNameProperty() { return this.props.originalNameProperty; }
+    /**
+     * Sets the field holding the original file name.
+     * @param value - The original name property.
+     */
     set originalNameProperty(value) { this.props.originalNameProperty = value; }
 
+    /** Gets the icon class for the download icon. @returns The icon class. */
     get iconClass() { return this.props.iconClass; }
+    /**
+     * Sets the icon class for the download icon.
+     * @param value - The icon class.
+     */
     set iconClass(value) { this.props.iconClass = value; }
 }

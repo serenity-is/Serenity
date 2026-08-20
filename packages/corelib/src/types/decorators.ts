@@ -57,7 +57,13 @@ export namespace Decorators {
             addCustomAttribute(target, new EnumKeyAttribute(enumKey));
     }
 
-    /** @deprecated Use `registerEnum` instead. @param target - Enum object. @param name - Full type name. @param enumKey - Legacy lookup key. */
+    /**
+     * Legacy wrapper for {@link registerEnum} kept for backward compatibility.
+     * @deprecated Use {@link registerEnum} instead. Prefer direct `static [Symbol.typeInfo]` pattern for new code.
+     * @param target - Enum object to register.
+     * @param name - Full type name.
+     * @param enumKey - Legacy lookup key.
+     */
     export function registerEnumType(target: any, name?: string, enumKey?: string) {
         registerEnum(target, enumKey ?? name, name);
     }
@@ -96,28 +102,47 @@ export namespace Decorators {
         }
     }
 
-    /** Adds a {@link CloseButtonAttribute}. @param value - True to show close button (default `true`). @returns Class decorator. */
+    /**
+     * Legacy decorator that attaches a {@link CloseButtonAttribute} to a dialog class.
+     * @deprecated Prefer `static override [Symbol.typeInfo] = classTypeInfo("...")` with {@link CloseButtonAttribute} metadata instead.
+     * @param value - Whether the dialog should show a close button. Defaults to `true`.
+     * @returns Class decorator.
+     */
     export function closeButton(value = true) {
         return function (target: Function, _context?: any) {
             addCustomAttribute(target, new CloseButtonAttribute(value));
         }
     }
 
-    /** Adds an {@link EditorAttribute}. @returns Class decorator. */
+    /**
+     * Legacy decorator that attaches an {@link EditorAttribute} to an editor class.
+     * @deprecated Prefer `static override [Symbol.typeInfo] = editorTypeInfo("...")` instead.
+     * @returns Class decorator.
+     */
     export function editor() {
         return function (target: Function, _context?: any) {
             addCustomAttribute(target, new EditorAttribute());
         }
     }
 
-    /** Adds an {@link ElementAttribute}. @param value - Element tag name. @returns Class decorator. */
+    /**
+     * Legacy decorator that attaches an {@link ElementAttribute} specifying the root element tag.
+     * @deprecated Prefer `static override [Symbol.typeInfo] = classTypeInfo("...", [new ElementAttribute(...)])` or widget `createDefaultElement` override instead.
+     * @param value - Tag name for the widget root element (e.g. `"div"`).
+     * @returns Class decorator.
+     */
     export function element(value: string) {
         return function (target: Function, _context?: any) {
             addCustomAttribute(target, new ElementAttribute(value));
         }
     }
 
-    /** Adds an {@link AdvancedFilteringAttribute}. @param value - True to enable (default `true`). @returns Class decorator. */
+    /**
+     * Legacy decorator that attaches an {@link AdvancedFilteringAttribute} to a grid class.
+     * @deprecated Prefer `static override [Symbol.typeInfo]` with {@link AdvancedFilteringAttribute} metadata instead.
+     * @param value - Whether advanced filtering should be enabled. Defaults to `true`.
+     * @returns Class decorator.
+     */
     export function advancedFiltering(value = true) {
         return function (target: Function, _context?: any) {
             addCustomAttribute(target, new AdvancedFilteringAttribute(value));
@@ -127,21 +152,36 @@ export namespace Decorators {
     /** @deprecated Use `advancedFiltering` instead */
     export const filterable = advancedFiltering;
 
-    /** Adds a {@link MaximizableAttribute}. @param value - True to allow maximizing (default `true`). @returns Class decorator. */
+    /**
+     * Legacy decorator that attaches a {@link MaximizableAttribute} to a dialog class.
+     * @deprecated Prefer `static override [Symbol.typeInfo]` with {@link MaximizableAttribute} metadata instead.
+     * @param value - Whether the dialog may be maximized. Defaults to `true`.
+     * @returns Class decorator.
+     */
     export function maximizable(value = true) {
         return function (target: Function, _context?: any) {
             addCustomAttribute(target, new MaximizableAttribute(value));
         }
     }
 
-    /** Adds a {@link PanelAttribute}. @param value - True to prefer panel mode (default `true`). @returns Class decorator. */
+    /**
+     * Legacy decorator that attaches a {@link PanelAttribute} to a dialog class.
+     * @deprecated Prefer `static override [Symbol.typeInfo]` with {@link PanelAttribute} metadata instead.
+     * @param value - Whether the dialog should prefer panel mode. Defaults to `true`.
+     * @returns Class decorator.
+     */
     export function panel(value = true) {
         return function (target: Function, _context?: any) {
             addCustomAttribute(target, new PanelAttribute(value));
         }
     }
 
-    /** Adds a {@link ResizableAttribute}. @param value - True to allow resizing (default `true`). @returns Class decorator. */
+    /**
+     * Legacy decorator that attaches a {@link ResizableAttribute} to a dialog class.
+     * @deprecated Prefer `static override [Symbol.typeInfo]` with {@link ResizableAttribute} metadata instead.
+     * @param value - Whether the dialog may be resized. Defaults to `true`.
+     * @returns Class decorator.
+     */
     export function resizable(value = true) {
         return function (target: Function, _context?: any) {
             addCustomAttribute(target, new ResizableAttribute(value));
@@ -149,15 +189,21 @@ export namespace Decorators {
     }
 
     /**
-     * Deprecated as all dialogs are responsive.
-     * @deprecated This is no longer used as all dialogs are responsive.
+     * Legacy responsive decorator retained for backward compatibility.
+     * @deprecated This is no longer used as all dialogs are responsive. Prefer direct `static [Symbol.typeInfo]` pattern.
+     * @param value - Whether responsive behavior should be enabled. Defaults to `true`.
      */
     export function responsive(value = true) {
         return function (target: Function, _context?: any) {
         }
     }
 
-    /** Adds a {@link StaticPanelAttribute}. @param value - True for static panel (default `true`). @returns Class decorator. */
+    /**
+     * Legacy decorator that attaches a {@link StaticPanelAttribute} to a widget class.
+     * @deprecated Prefer `static override [Symbol.typeInfo]` with {@link StaticPanelAttribute} metadata instead.
+     * @param value - Whether the widget should render as a static panel. Defaults to `true`.
+     * @returns Class decorator.
+     */
     export function staticPanel(value: boolean = true) {
         return function (target: Function, _context?: any) {
             addCustomAttribute(target, new StaticPanelAttribute(value));

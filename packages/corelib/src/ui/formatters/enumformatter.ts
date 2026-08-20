@@ -8,13 +8,19 @@ export class EnumFormatter implements Formatter {
     static [Symbol.typeInfo] = formatterTypeInfo(nsSerenity); static { registerType(this); }
 
     /**
+     * Creates a new EnumFormatter.
+     * @param props - Formatter options.
      * @param props.enumKey - Full enum key (e.g. `"MyProject.MyEnum"`). Resolved via {@link EnumTypeRegistry}.
      */
     constructor(public readonly props: { enumKey?: string } = {}) {
         this.props ??= {};
     }
 
-    /** @param ctx - Formatter context containing enum value. @returns Localized enum text (or async placeholder). */
+    /**
+     * Formats the enum value as localized text.
+     * @param ctx - Formatter context containing the enum value.
+     * @returns Localized enum text or a placeholder element when the enum type loads asynchronously.
+     */
     format(ctx: FormatterContext): FormatterResult {
         var enumType = EnumTypeRegistry.getOrLoad(this.enumKey);
         if (isPromiseLike(enumType)) {
@@ -28,7 +34,12 @@ export class EnumFormatter implements Formatter {
         return EnumFormatter.format(enumType, ctx.value);
     }
 
+    /** Gets the enum key used to resolve the enum type. @returns The enum key. */
     get enumKey() { return this.props.enumKey; }
+    /**
+     * Sets the enum key used to resolve the enum type.
+     * @param value - The enum key.
+     */
     set enumKey(value: string) { this.props.enumKey = value; }
 
     /**

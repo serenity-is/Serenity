@@ -26,7 +26,7 @@ export interface CheckTreeItem<TSource> {
     hideCheckBox?: boolean;
     /** Whether all descendants are selected. */
     isAllDescendantsSelected?: boolean;
-    /** Item id. */
+    /** Unique identifier of the tree item, used as the node key and selection value. */
     id?: string;
     /** Display text. */
     text?: string;
@@ -47,6 +47,8 @@ export class CheckTreeEditor<TItem extends CheckTreeItem<TItem>, P = {}> extends
     implements IGetEditValue, ISetEditValue, IReadOnly {
     static override[Symbol.typeInfo] = this.registerEditor(nsSerenity, [IGetEditValue, ISetEditValue, IReadOnly]);
 
+    /** Creates the default div element for the check tree editor.
+     * @returns The div element. */
     static override createDefaultElement() { return document.createElement("div"); }
 
     declare private itemById: { [key: string]: TItem };
@@ -554,10 +556,14 @@ export class CheckTreeEditor<TItem extends CheckTreeItem<TItem>, P = {}> extends
         return list;
     }
 
+    /** Returns the selected item ids.
+     * @returns Array of selected ids. */
     public get value() {
         return this.get_value();
     }
 
+    /** Sets the selected item ids.
+     * @param value - Comma-delimited string or array of ids to select. */
     private set_value(value: string | string[]) {
 
         var selected: Record<string, boolean> = Object.create(null);
@@ -593,24 +599,44 @@ export class CheckTreeEditor<TItem extends CheckTreeItem<TItem>, P = {}> extends
         }
     }
 
+    /** Sets the selected item ids.
+     * @param v - Array of ids to select. */
     public set value(v: string[]) {
         this.set_value(v);
     }
 }
 
+/**
+ * Options for the {@link CheckLookupEditor}.
+ */
 export interface CheckLookupEditorOptions {
+    /** Lookup key for the source lookup. */
     lookupKey?: string;
+    /** Whether to move checked items to the top of the list. */
     checkedOnTop?: boolean;
+    /** Whether to show the select-all toolbar button. */
     showSelectAll?: boolean;
+    /** Whether to hide the quick search box. */
     hideSearch?: boolean;
+    /** Whether the edit value is a comma-delimited string. */
     delimited?: boolean;
+    /** Id of the parent editor to cascade from. */
     cascadeFrom?: string;
+    /** Field name in the lookup used for cascading. */
     cascadeField?: string;
+    /** Current cascade value used to filter items. */
     cascadeValue?: any;
+    /** Field name in the lookup used for filtering. */
     filterField?: string;
+    /** Current filter value used to filter items. */
     filterValue?: any;
 }
 
+/**
+ * A {@link CheckTreeEditor} that populates its tree from a lookup, with optional cascading, filtering and search.
+ * @typeParam TItem - The lookup item type.
+ * @typeParam P - Widget props type.
+ */
 export class CheckLookupEditor<TItem extends CheckTreeItem<TItem> = any, P extends CheckLookupEditorOptions = CheckLookupEditorOptions> extends CheckTreeEditor<CheckTreeItem<TItem>, P> {
     static override[Symbol.typeInfo] = this.registerEditor(nsSerenity);
 
@@ -618,6 +644,10 @@ export class CheckLookupEditor<TItem extends CheckTreeItem<TItem> = any, P exten
     declare private enableUpdateItems: boolean;
     declare private lookupChangeOff: any;
 
+    /**
+     * Creates a check lookup editor.
+     * @param props - Widget props.
+     */
     constructor(props: EditorProps<P>) {
         super(props);
 
@@ -627,6 +657,9 @@ export class CheckLookupEditor<TItem extends CheckTreeItem<TItem> = any, P exten
         this.lookupChangeOff = ScriptData.bindToChange('Lookup.' + this.getLookupKey(), bindThis(this).updateItems);
     }
 
+    /**
+     * Cleans up lookup change handlers and delegates to the base destroy.
+     */
     public override destroy(): void {
         if (this.lookupChangeOff) {
             this.lookupChangeOff();
@@ -735,6 +768,8 @@ export class CheckLookupEditor<TItem extends CheckTreeItem<TItem> = any, P exten
         return this.options.cascadeFrom;
     }
 
+    /** Returns the id of the parent editor to cascade from.
+     * @returns The cascade source id. */
     get cascadeFrom(): string {
         return this.get_cascadeFrom();
     }
@@ -764,6 +799,8 @@ export class CheckLookupEditor<TItem extends CheckTreeItem<TItem> = any, P exten
         this.options.cascadeFrom = value;
     }
 
+    /** Sets the cascade source.
+     * @param value - Id of the parent editor to cascade from. */
     protected set_cascadeFrom(value: string) {
         if (value !== this.options.cascadeFrom) {
             this.setCascadeFrom(value);
@@ -771,6 +808,8 @@ export class CheckLookupEditor<TItem extends CheckTreeItem<TItem> = any, P exten
         }
     }
 
+    /** Sets the cascade source.
+     * @param value - Id of the parent editor to cascade from. */
     set cascadeFrom(value: string) {
         this.set_cascadeFrom(value);
     }
@@ -779,14 +818,20 @@ export class CheckLookupEditor<TItem extends CheckTreeItem<TItem> = any, P exten
         return (this.options.cascadeField ?? this.options.cascadeFrom);
     }
 
+    /** Returns the field name used for cascading.
+     * @returns The cascade field. */
     get cascadeField(): string {
         return this.get_cascadeField();
     }
 
+    /** Sets the field name used for cascading.
+     * @param value - The cascade field name. */
     protected set_cascadeField(value: string) {
         this.options.cascadeField = value;
     }
 
+    /** Sets the field name used for cascading.
+     * @param value - The cascade field name. */
     set cascadeField(value: string) {
         this.set_cascadeField(value);
     }
@@ -795,10 +840,14 @@ export class CheckLookupEditor<TItem extends CheckTreeItem<TItem> = any, P exten
         return this.options.cascadeValue;
     }
 
+    /** Returns the current cascade filter value.
+     * @returns The cascade value. */
     get cascadeValue(): any {
         return this.get_cascadeValue();
     }
 
+    /** Sets the cascade filter value and refreshes items.
+     * @param value - The cascade value to set. */
     protected set_cascadeValue(value: any) {
         if (this.options.cascadeValue !== value) {
             this.options.cascadeValue = value;
@@ -807,6 +856,8 @@ export class CheckLookupEditor<TItem extends CheckTreeItem<TItem> = any, P exten
         }
     }
 
+    /** Sets the cascade filter value.
+     * @param value - The cascade value to set. */
     set cascadeValue(value: any) {
         this.set_cascadeValue(value);
     }
@@ -815,14 +866,20 @@ export class CheckLookupEditor<TItem extends CheckTreeItem<TItem> = any, P exten
         return this.options.filterField;
     }
 
+    /** Returns the field name used for filtering.
+     * @returns The filter field. */
     get filterField(): string {
         return this.get_filterField();
     }
 
+    /** Sets the field name used for filtering.
+     * @param value - The filter field name. */
     protected set_filterField(value: string) {
         this.options.filterField = value;
     }
 
+    /** Sets the field name used for filtering.
+     * @param value - The filter field name. */
     set filterField(value: string) {
         this.set_filterField(value);
     }
@@ -831,10 +888,14 @@ export class CheckLookupEditor<TItem extends CheckTreeItem<TItem> = any, P exten
         return this.options.filterValue;
     }
 
+    /** Returns the current filter value.
+     * @returns The filter value. */
     get filterValue(): any {
         return this.get_filterValue();
     }
 
+    /** Sets the filter value and refreshes items.
+     * @param value - The filter value to set. */
     protected set_filterValue(value: any) {
         if (this.options.filterValue !== value) {
             this.options.filterValue = value;
@@ -843,6 +904,8 @@ export class CheckLookupEditor<TItem extends CheckTreeItem<TItem> = any, P exten
         }
     }
 
+    /** Sets the filter value.
+     * @param value - The filter value to set. */
     set filterValue(value: any) {
         this.set_filterValue(value);
     }

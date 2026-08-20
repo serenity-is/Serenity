@@ -37,7 +37,10 @@ export interface DecimalEditorOptions {
 export class DecimalEditor<P extends DecimalEditorOptions = DecimalEditorOptions> extends EditorWidget<P> implements IDoubleValue {
     static override[Symbol.typeInfo] = this.registerEditor(nsSerenity, [IDoubleValue]);
 
+    /** Creates the default text input element.
+     * @returns The text input element. */
     static override createDefaultElement() { return <input type="text" /> as HTMLInputElement; }
+    /** The text input element that backs the editor. */
     declare readonly domNode: HTMLInputElement;
 
     /**
@@ -135,7 +138,8 @@ export class DecimalEditor<P extends DecimalEditorOptions = DecimalEditorOptions
             this.domNode.value = formatNumber(value);
     }
 
-    /** Sets the decimal value. */
+    /** Sets the decimal value.
+     * @param v - The decimal value to set. */
     set value(v: number) {
         this.set_value(v);
     }

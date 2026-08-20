@@ -19,6 +19,8 @@ export interface TextAreaEditorOptions {
 export class TextAreaEditor<P extends TextAreaEditorOptions = TextAreaEditorOptions> extends EditorWidget<P> {
     static override[Symbol.typeInfo] = this.registerEditor(nsSerenity, [IStringValue]);
 
+    /** Creates the default textarea element.
+     * @returns The textarea element. */
     static override createDefaultElement() { return document.createElement("textarea"); }
 
     /**
@@ -52,12 +54,14 @@ export class TextAreaEditor<P extends TextAreaEditorOptions = TextAreaEditorOpti
         return this.value;
     }
 
-    /** Sets the textarea value. */
+    /** Sets the textarea value.
+     * @param value - The textarea value to set. */
     public set value(value: string) {
         this.element.val(value ?? "");
     }
 
-    /** Sets the textarea value. */
+    /** Sets the textarea value.
+     * @param value - The textarea value to set. */
     protected set_value(value: string): void {
         this.value = value;
     }

@@ -223,6 +223,7 @@ export interface IRemoteView<TItem = any> extends IDataView<TItem> {
     setItems(data: any[], newIdProperty?: string | boolean): void;
     /**
      * Sets a callback function to retrieve item metadata. This can be used to dynamically assign CSS classes or other properties to items.
+     * @param value - The item metadata callback.
      */
     setItemMetadataCallback(value: (item: TItem, row: number) => ItemMetadata<TItem>): void;
     /**
@@ -261,10 +262,15 @@ export interface IRemoteView<TItem = any> extends IDataView<TItem> {
     sortBy: string[];
     /**
      * Syncs cell CSS styles between the grid and the data view.
+     * @param grid - The grid to sync with.
+     * @param key - The CSS style key.
      */
     syncGridCellCssStyles?(grid: ISleekGrid, key: string): void;
     /***
      * Wires the grid and the DataView together to keep row selection tied to item ids.
+     * @param grid - The grid to sync selection with.
+     * @param preserveHidden - Whether to keep selected items that go out of view due to filtering.
+     * @param preserveHiddenOnSelectionChange - Whether to keep hidden items selected when selection changes.
      */
     syncGridSelection?(grid: ISleekGrid, preserveHidden?: boolean, preserveHiddenOnSelectionChange?: boolean): EventEmitter<any, {}>;
     /**

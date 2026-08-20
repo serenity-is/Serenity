@@ -1,7 +1,11 @@
 import { SummaryType } from "../base";
 import { Aggregators, IAggregator } from "./aggregators";
 
+/**
+ * Constructor interface for aggregator classes.
+ */
 export interface IAggregatorConstructor {
+    /** Creates a new aggregator instance. @param field - The field to aggregate. */
     new(field: string, ...args: any[]): IAggregator;
     /**
      * A unique key for the aggregator (like 'sum', 'avg', etc.). This is also used in the totals object
@@ -19,6 +23,7 @@ export interface IAggregatorConstructor {
     summaryType?: SummaryType;
 }
 
+/** Registry for aggregator types by key and SummaryType. */
 export namespace AggregatorTypeRegistry {
     let byKey: { [key: string]: IAggregatorConstructor } = Object.create(null);
 

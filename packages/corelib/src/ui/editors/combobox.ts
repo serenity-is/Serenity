@@ -11,7 +11,7 @@ export type ComboboxFormatResult = string | Element | DocumentFragment;
  * @typeParam TSource - The source item type.
  */
 export interface ComboboxItem<TSource = any> {
-    /** Item id. */
+    /** Unique identifier of the combobox item. */
     id?: string;
     /** Display text. */
     text?: string;
@@ -98,6 +98,10 @@ export class Combobox<TItem = any> {
         typeDelay: 200
     }
 
+    /**
+     * Creates a combobox.
+     * @param opt - Combobox options.
+     */
     constructor(opt: ComboboxOptions);
     /**
      * Creates a combobox.

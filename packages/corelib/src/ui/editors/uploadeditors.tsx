@@ -283,7 +283,8 @@ export class FileUploadEditor<P extends FileUploadEditorOptions = FileUploadEdit
         this.updateInterface();
     }
 
-    /** Sets the uploaded file. */
+    /** Sets the uploaded file.
+     * @param v - The uploaded file to set. */
     set value(v: UploadedFile) {
         this.set_value(v);
     }
@@ -574,7 +575,8 @@ export class MultipleFileUploadEditor<P extends MultipleFileUploadEditorOptions 
         this.updateInterface();
     }
 
-    /** Sets the uploaded files. */
+    /** Sets the uploaded files.
+     * @param v - The uploaded files to set. */
     set value(v: UploadedFile[]) {
         this.set_value(v);
     }
@@ -622,7 +624,8 @@ export class MultipleFileUploadEditor<P extends MultipleFileUploadEditorOptions 
      * @returns True when JSON-encoded.
      */
     public get jsonEncodeValue() { return this.options.jsonEncodeValue }
-    /** Sets whether the value is JSON-encoded. */
+    /** Sets whether the value is JSON-encoded.
+     * @param value - True to JSON-encode the value. */
     public set jsonEncodeValue(value) { this.options.jsonEncodeValue = value }
 }
 

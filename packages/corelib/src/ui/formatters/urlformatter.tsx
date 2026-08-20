@@ -8,6 +8,8 @@ export class UrlFormatter implements Formatter, IInitializeColumn {
     static [Symbol.typeInfo] = formatterTypeInfo(nsSerenity, [IInitializeColumn]); static { registerType(this); }
 
     /**
+     * Creates a new UrlFormatter.
+     * @param props - Formatter options.
      * @param props.displayProperty - Item field used for link text (defaults to cell value).
      * @param props.displayFormat - Format string applied to display value.
      * @param props.urlProperty - Item field used for URL (defaults to cell value).
@@ -17,7 +19,11 @@ export class UrlFormatter implements Formatter, IInitializeColumn {
     constructor(readonly props: { displayProperty?: string, displayFormat?: string, urlProperty?: string, urlFormat?: string, target?: string } = {}) {
     }
 
-    /** @param ctx - Formatter context. @returns Anchor element or empty string. */
+    /**
+     * Formats the cell value as a hyperlink.
+     * @param ctx - Formatter context containing the cell value and row item.
+     * @returns Anchor element markup or an empty string if the URL is empty.
+     */
     format(ctx: FormatterContext): FormatterResult {
         var url = (this.urlProperty ?
             (ctx.item[this.urlProperty] ?? '').toString() :
@@ -58,18 +64,43 @@ export class UrlFormatter implements Formatter, IInitializeColumn {
         }
     }
 
+    /** Gets the field used for link text. @returns The display property name. */
     get displayProperty() { return this.props.displayProperty }
+    /**
+     * Sets the field used for link text.
+     * @param value - The display property name.
+     */
     set displayProperty(value) { this.props.displayProperty = value }
 
+    /** Gets the format string applied to the display value. @returns The display format. */
     get displayFormat() { return this.props.displayFormat }
+    /**
+     * Sets the format string applied to the display value.
+     * @param value - The display format string.
+     */
     set displayFormat(value) { this.props.displayFormat = value }
 
+    /** Gets the field used for the URL. @returns The URL property name. */
     get urlProperty() { return this.props.urlProperty }
+    /**
+     * Sets the field used for the URL.
+     * @param value - The URL property name.
+     */
     set urlProperty(value) { this.props.urlProperty = value }
 
+    /** Gets the format string applied to the URL value. @returns The URL format. */
     get urlFormat() { return this.props.urlFormat }
+    /**
+     * Sets the format string applied to the URL value.
+     * @param value - The URL format string.
+     */
     set urlFormat(value) { this.props.urlFormat = value }
 
+    /** Gets the anchor target (e.g. `"_blank"`). @returns The target value. */
     get target() { return this.props.target }
+    /**
+     * Sets the anchor target.
+     * @param value - The target value (e.g. `"_blank"`).
+     */
     set target(value) { this.props.target = value }
 }

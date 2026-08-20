@@ -17,6 +17,9 @@ function setElementSelection(that: HTMLInputElement, start: number, end: number)
     that.selectionEnd = end;
 }
 
+/**
+ * Options controlling AutoNumeric formatting, parsing and display behavior.
+ */
 export interface AutoNumericOptions {
     /** allowed decimal separator characters
      * period "full stop" = '.'
@@ -24,9 +27,9 @@ export interface AutoNumericOptions {
      * @default '.'
      */
     aDec?: string;
-    /** @internal regex matching characters not allowed in numeric input */
+    /** @internal regex matching characters stripped from the input as disallowed for numeric entry */
     allowedAutoStrip?: RegExp;
-    /** @internal when false, leading zeros are stripped during focusout */
+    /** @internal when true, leading zeros are preserved during editing; when false, stripped on focusout */
     allowLeading?: boolean;
     /** allow to declare alternative decimal separator which is automatically replaced by aDec
      * developed for countries the use a comma ',' as the decimal character
@@ -45,9 +48,9 @@ export interface AutoNumericOptions {
      * @default '0123456789'
      */
     aNum?: string;
-    /** @internal negative sign string ('-' or ''), derived from vMin */
+    /** @internal negative sign character ('-' or '') derived from the minimum value */
     aNeg?: string;
-    /** @internal regex string matching optional negative sign prefix */
+    /** @internal regex string matching the optional negative sign prefix for auto-strip */
     aNegRegAutoStrip?: string;
     /** allowed thousand separator characters
      * comma = ','
@@ -79,7 +82,7 @@ export interface AutoNumericOptions {
      * @default '3'
      */
     dGroup?: string;
-    /** internal */
+    /** @internal holder element or object used to cache the AutoNumeric instance */
     holder?: any;
     /** controls leading zero behavior
      * lZero: 'allow', - allows leading zeros to be entered. Zeros will be truncated when entering additional digits. On focusout zeros will be deleted.
@@ -94,7 +97,7 @@ export interface AutoNumericOptions {
      * @default null
      */
     mDec?: number;
-    /** @internal maximum number of integer digits, computed from vMax and vMin */
+    /** @internal maximum number of integer digits allowed, computed from the min/max bounds */
     mInt?: number;
     /** method used for rounding
      * mRound: 'S', Round-Half-Up Symmetric (default)
@@ -115,9 +118,9 @@ export interface AutoNumericOptions {
      * @default null
      */
     nBracket?: string;
-    /** @internal regex to extract the numeric portion (sign + digits + decimal) */
+    /** @internal regex used to extract the canonical numeric portion (sign, digits and decimal) */
     numRegAutoStrip?: RegExp;
-    /** @internal tracks the current event type ('keydown', 'keypress', 'focusin', 'focusout', 'set', 'get') */
+    /** @internal current AutoNumeric event type ('keydown', 'keypress', 'focusin', 'focusout', 'set', 'get') */
     oEvent?: any;
     /** placement of currency sign
      * for prefix pSign: 'p',
@@ -125,13 +128,13 @@ export interface AutoNumericOptions {
      * @default 'p'
      */
     pSign?: string;
-    /** internal */
+    /** @internal flag indicating whether one-time AutoNumeric initialization has run */
     runOnce?: boolean;
-    /** @internal regex to strip characters before the first digit */
+    /** @internal regex that strips characters occurring before the first digit */
     skipFirstAutoStrip?: RegExp;
-    /** @internal regex to strip characters after the last digit */
+    /** @internal regex that strips characters occurring after the last digit */
     skipLastAutoStrip?: RegExp;
-    /** @internal HTML tag names that support autoNumeric on textContent */
+    /** @internal list of HTML tag names that support AutoNumeric via textContent */
     tagList?: string[];
     /** maximum possible value
      * value must be enclosed in quotes and use the period for the decimal point

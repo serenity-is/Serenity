@@ -9,8 +9,11 @@ import { EditorWidget } from "./editorwidget";
 export class StringEditor<P = {}> extends EditorWidget<P> {
     static override[Symbol.typeInfo] = this.registerEditor(nsSerenity, [IStringValue]);
 
+    /** The text input element that backs the editor. */
     declare readonly domNode: HTMLInputElement;
 
+    /** Creates the default text input element.
+     * @returns The text input element. */
     static override createDefaultElement() { return <input type="text" /> as HTMLInputElement; }
 
     /**
@@ -29,12 +32,14 @@ export class StringEditor<P = {}> extends EditorWidget<P> {
         return this.value;
     }
 
-    /** Sets the string value. */
+    /** Sets the string value.
+     * @param value - The string value to set. */
     public set value(value: string) {
         (this.domNode as HTMLInputElement).value = value ?? '';
     }
 
-    /** Sets the string value. */
+    /** Sets the string value.
+     * @param value - The string value to set. */
     protected set_value(value: string): void {
         this.value = value;
     }

@@ -7,13 +7,19 @@ export class NumberFormatter implements Formatter {
     static [Symbol.typeInfo] = formatterTypeInfo(nsSerenity); static { registerType(this); }
 
     /**
+     * Creates a new NumberFormatter.
+     * @param props - Formatter options.
      * @param props.displayFormat - Number format string (default `"0.##"`).
      */
     constructor(public readonly props: { displayFormat?: string } = {}) {
         this.props ??= {};
     }
 
-    /** @param ctx - Formatter context. @returns Formatted number string. */
+    /**
+     * Formats the cell value as a number string.
+     * @param ctx - Formatter context containing the cell value.
+     * @returns Formatted number string.
+     */
     format(ctx: FormatterContext): string {
         return NumberFormatter.format(ctx.value, this.displayFormat);
     }
@@ -43,6 +49,11 @@ export class NumberFormatter implements Formatter {
         return htmlEncode(formatNumber(dbl, format));
     }
 
+    /** Gets the number display format. @returns The display format string. */
     get displayFormat() { return this.props.displayFormat; }
+    /**
+     * Sets the number display format.
+     * @param value - The display format string.
+     */
     set displayFormat(value) { this.props.displayFormat = value; }
 }

@@ -43,8 +43,9 @@ export type ValidationValue = string | string[] | number | boolean;
  */
 export type ValidationProvider = (value: ValidationValue, element: ValidatableElement, params?: any) => boolean | string | Promise<boolean | string>;
 
-/** Map of field name to error message / flag for fields currently failing validation. */
+/** Map of field name to the current error message or flag for fields failing validation. */
 export interface ValidationErrorMap {
+    /** Error entry for a field key: `string` message or `true`/`false` flag. */
     [name: string]: (string | boolean);
 }
 
@@ -64,8 +65,9 @@ export type ValidationErrorList = ValidationErrorItem[];
 /** Rule set for a single field: method name to parameter (e.g. `{ required: true, minlength: 3 }`). */
 export type ValidationRules = Record<string, any>;
 
-/** Map of field name to its {@link ValidationRules}. */
+/** Map of field name to its {@link ValidationRules} set. */
 export interface ValidationRulesMap {
+    /** Rule set for a field keyed by field name. */
     [name: string]: ValidationRules;
 }
 

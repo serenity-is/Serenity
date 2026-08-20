@@ -9,8 +9,11 @@ import { EditorWidget } from "./editorwidget";
 export class BooleanEditor<P = {}> extends EditorWidget<P> {
     static override[Symbol.typeInfo] = this.registerEditor(nsSerenity, [IBooleanValue]);
 
+    /** Creates the default checkbox input element.
+     * @returns The checkbox input element. */
     static override createDefaultElement() { return <input type="checkbox" /> as HTMLInputElement; }
 
+    /** The checkbox input element that backs the editor. */
     declare public readonly domNode: HTMLInputElement;
 
     /**
@@ -29,12 +32,14 @@ export class BooleanEditor<P = {}> extends EditorWidget<P> {
         return this.value;
     }
 
-    /** Sets the boolean value. */
+    /** Sets the boolean value.
+     * @param value - The boolean value to set. */
     public set value(value: boolean) {
         (this.domNode as HTMLInputElement).checked = !!value;
     }
 
-    /** Sets the boolean value. */
+    /** Sets the boolean value.
+     * @param value - The boolean value to set. */
     protected set_value(value: boolean): void {
         this.value = value;
     }

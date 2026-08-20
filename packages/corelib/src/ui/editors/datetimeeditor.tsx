@@ -13,7 +13,10 @@ export class DateTimeEditor<P extends DateTimeEditorOptions = DateTimeEditorOpti
 
     static override[Symbol.typeInfo] = this.registerEditor(nsSerenity, [IStringValue, IReadOnly]);
 
+    /** Creates the default text input element for the date-time editor.
+     * @returns The input element. */
     static override createDefaultElement() { return <input type="text" /> as HTMLInputElement; }
+    /** The text input element that backs the editor. */
     declare readonly domNode: HTMLInputElement;
 
     declare private time: HTMLSelectElement;
@@ -307,7 +310,8 @@ export class DateTimeEditor<P extends DateTimeEditorOptions = DateTimeEditorOpti
         return (this.options.seconds ? Culture.dateTimeFormat : Culture.dateTimeFormat.replace(':ss', ''));
     }
 
-    /** Sets the date-time value. */
+    /** Sets the date-time value.
+     * @param v - The date-time string to set. */
     set value(v: string) {
         this.set_value(v);
     }
@@ -336,7 +340,8 @@ export class DateTimeEditor<P extends DateTimeEditorOptions = DateTimeEditorOpti
         this.set_value(formatDate(value, 'yyyy-MM-ddTHH:mm' + (this.options.seconds ? ':ss' : '')));
     }
 
-    /** Sets the date-time value as a Date. */
+    /** Sets the date-time value as a Date.
+     * @param value - The date-time value to set. */
     set valueAsDate(value: Date) {
         this.set_valueAsDate(value);
     }
@@ -455,6 +460,11 @@ export class DateTimeEditor<P extends DateTimeEditorOptions = DateTimeEditorOpti
         }
     }
 
+    /**
+     * Rounds a date to the nearest minute step.
+     * @param date - The date to round.
+     * @param minutesStep - Step size in minutes.
+     * @returns The rounded date with seconds and milliseconds zeroed. */
     static roundToMinutes(date: Date, minutesStep: number) {
         date = new Date(date.getTime());
         var m = trunc(round(date.getMinutes() / minutesStep) * minutesStep);
@@ -464,6 +474,14 @@ export class DateTimeEditor<P extends DateTimeEditorOptions = DateTimeEditorOpti
         return date;
     }
 
+    /**
+     * Generates a list of time strings at a fixed step.
+     * @param fromHour - Start hour.
+     * @param fromMin - Start minute.
+     * @param toHour - End hour.
+     * @param toMin - End minute.
+     * @param stepMins - Step size in minutes.
+     * @returns Array of "HH:mm" time strings. */
     static getTimeOptions = function (fromHour: number, fromMin: number,
         toHour: number, toMin: number, stepMins: number) {
         var list = [];
@@ -491,15 +509,28 @@ export class DateTimeEditor<P extends DateTimeEditorOptions = DateTimeEditorOpti
     };
 }
 
+/**
+ * Options for the {@link DateTimeEditor}.
+ */
 export interface DateTimeEditorOptions {
+    /** Starting hour for the time select (0-23). */
     startHour?: any;
+    /** Ending hour for the time select (0-23). */
     endHour?: any;
+    /** Interval in minutes between time options. */
     intervalMinutes?: any;
+    /** Minimum allowed date-time as an ISO string. */
     minValue?: string;
+    /** Maximum allowed date-time as an ISO string. */
     maxValue?: string;
+    /** Year range for the date picker (e.g. "-100:+50"). */
     yearRange?: string;
+    /** Whether to store and display values in UTC. */
     useUtc?: boolean;
+    /** Whether to include seconds in the time picker. */
     seconds?: boolean;
+    /** Whether to render as a plain input without picker UI. */
     inputOnly?: boolean;
+    /** Whether to apply SQL min/max date bounds. */
     sqlMinMax?: boolean;
 }

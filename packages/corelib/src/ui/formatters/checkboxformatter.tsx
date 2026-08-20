@@ -10,6 +10,8 @@ export class CheckboxFormatter implements Formatter {
     static [Symbol.typeInfo] = formatterTypeInfo(nsSerenity); static { registerType(this); }
 
     /**
+     * Creates a new CheckboxFormatter.
+     * @param props - Formatter options.
      * @param props.falseText - Text for `false`.
      * @param props.falseIcon - Icon for `false`.
      * @param props.nullText - Text for `null`.
@@ -32,7 +34,11 @@ export class CheckboxFormatter implements Formatter {
         this.props ??= {};
     }
 
-    /** @param ctx - Formatter context. @returns Checkbox / icon / text markup. */
+    /**
+     * Formats the boolean value as a checkbox or icon/text markup.
+     * @param ctx - Formatter context containing the cell value.
+     * @returns Checkbox, icon, or text markup for the cell.
+     */
     format(ctx: FormatterContext): FormatterResult {
         const text = ctx.value == null ?
             localText(this.props.nullText, this.props.nullText ?? '') :

@@ -10,6 +10,8 @@ export class BooleanFormatter implements Formatter {
     static [Symbol.typeInfo] = formatterTypeInfo(nsSerenity); static { registerType(this); }
 
     /**
+     * Creates a new BooleanFormatter.
+     * @param props - Formatter options.
      * @param props.falseText - Text for `false` values.
      * @param props.falseIcon - Icon class for `false` values.
      * @param props.nullText - Text for `null` values.
@@ -64,10 +66,20 @@ export class BooleanFormatter implements Formatter {
         return <span title={hint}>{icon} {text}</span>;
     }
 
+    /** Gets the text for `false` values. @returns The false text. */
     public get falseText() { return this.props.falseText; }
+    /**
+     * Sets the text for `false` values.
+     * @param value - The false text.
+     */
     public set falseText(value) { this.props.falseText = value; }
 
+    /** Gets the text for `true` values. @returns The true text. */
     public get trueText() { return this.props.trueText; }
+    /**
+     * Sets the text for `true` values.
+     * @param value - The true text.
+     */
     public set trueText(value) { this.props.trueText = value; }
 }
 

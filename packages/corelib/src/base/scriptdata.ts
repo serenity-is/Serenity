@@ -255,11 +255,12 @@ export function getRemoteData<TData = any>(key: string): TData {
 }
 
 /**
- * Shows a suitable error message for errors occured during loading of
- * a dynamic script data.
- * @param name Name of the dynamic script
- * @param status HTTP status returned if available
- * @param statusText HTTP status text returned if available
+ * Shows a suitable error message for errors occurred during loading of a dynamic script data.
+ * @param name - Name of the dynamic script.
+ * @param status - HTTP status returned if available.
+ * @param statusText - HTTP status text returned if available.
+ * @param shouldThrow - When `true` (default) throws the error message after notifying; when `false` only notifies and returns.
+ * @returns The error message string.
  */
 export function handleScriptDataError(name: string, status?: number, statusText?: string, shouldThrow = true): string {
 

@@ -25,7 +25,10 @@ export interface DateEditorOptions {
 export class DateEditor<P extends DateEditorOptions = DateEditorOptions> extends EditorWidget<P> implements IStringValue, IReadOnly {
     static override[Symbol.typeInfo] = this.registerEditor(nsSerenity, [IStringValue, IReadOnly]);
 
+    /** Creates the default text input element for the date editor.
+     * @returns The input element. */
     static override createDefaultElement() { return <input type="text" /> as HTMLInputElement; }
+    /** The text input element that backs the editor. */
     declare readonly domNode: HTMLInputElement;
 
     /**
@@ -165,7 +168,8 @@ export class DateEditor<P extends DateEditorOptions = DateEditorOptions> extends
         }
     }
 
-    /** Sets the date value. */
+    /** Sets the date value.
+     * @param v - The date value to set. */
     set value(v: string) {
         this.set_value(v);
     }
@@ -194,7 +198,8 @@ export class DateEditor<P extends DateEditorOptions = DateEditorOptions> extends
         this.set_value(formatDate(value, 'yyyy-MM-dd'));
     }
 
-    /** Sets the date value as a Date. */
+    /** Sets the date value as a Date.
+     * @param v - The date value to set. */
     set valueAsDate(v: Date) {
         this.set_valueAsDate(v);
     }
@@ -312,11 +317,14 @@ export class DateEditor<P extends DateEditorOptions = DateEditorOptions> extends
         dateInputChangeHandler(e);
     };
 
-    /** Handles date input keyup events. */
+    /**
+     * Handles keyup on date inputs to normalize typed dates.
+     * @param e - Keyboard event. */
     static dateInputKeyup(e: KeyboardEvent) {
         dateInputKeyupHandler(e as any);
     };
 
+    /** Whether to prefer flatpickr over jQuery UI datepicker. */
     declare public static useFlatpickr: boolean;
 
     /**
@@ -354,12 +362,18 @@ export class DateEditor<P extends DateEditorOptions = DateEditorOptions> extends
         return opt;
     }
 
+    /**
+     * Creates the flatpickr trigger button next to the input.
+     * @returns The trigger element. */
     public createFlatPickrTrigger(): HTMLElement {
         if (!this.domNode)
             return;
         return Fluent(flatPickrTrigger(this.domNode)).insertAfter(this.domNode).getNode();
     }
 
+    /**
+     * Applies a z-index workaround for the jQuery UI datepicker popup.
+     * @param el - The input element or array-like collection. */
     public static uiPickerZIndexWorkaround(el: HTMLElement | ArrayLike<HTMLElement>) {
         let input = isArrayLike(el) ? el[0] : el;
         if (!input)

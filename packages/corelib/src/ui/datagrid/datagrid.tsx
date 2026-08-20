@@ -76,17 +76,35 @@ export class DataGrid<TItem, P = {}> extends Widget<P> implements IDataGrid, IRe
 
     /** Default row height used when creating grids. */
     static get defaultRowHeight() { return dataGridDefaults.rowHeight; }
-    /** Default storage used for grid persistence. */
+    /**
+     * Default storage used for grid persistence.
+     * @returns The current persistence storage.
+     */
     static get defaultPersistenceStorage() { return dataGridDefaults.persistenceStorage; }
-    /** Sets the default storage used for grid persistence. */
+    /**
+     * Sets the default storage used for grid persistence.
+     * @param value - Persistence storage to use (e.g. `localStorage`-backed).
+     */
     static set defaultPersistenceStorage(value: SettingStorage) { dataGridDefaults.persistenceStorage = value; }
-    /** Default column width scale applied to all grids. */
+    /**
+     * Default column width scale applied to all grids.
+     * @returns The current column width scale.
+     */
     static get defaultColumnWidthScale() { return dataGridDefaults.columnWidthScale; }
-    /** Sets the default column width scale applied to all grids. */
+    /**
+     * Sets the default column width scale applied to all grids.
+     * @param value - Scale factor (e.g. `1.1` for 10% wider).
+     */
     static set defaultColumnWidthScale(value: number) { dataGridDefaults.columnWidthScale = value; }
-    /** Default column width delta applied to all grids. */
+    /**
+     * Default column width delta applied to all grids.
+     * @returns The current column width delta.
+     */
     static get defaultColumnWidthDelta() { return dataGridDefaults.columnWidthDelta; }
-    /** Sets the default column width delta applied to all grids. */
+    /**
+     * Sets the default column width delta applied to all grids.
+     * @param value - Delta in pixels added to each column width.
+     */
     static set defaultColumnWidthDelta(value: number) { dataGridDefaults.columnWidthDelta = value; }
 
     /** Static event raised after any grid is initialized. */
@@ -1316,12 +1334,18 @@ export class DataGrid<TItem, P = {}> extends Widget<P> implements IDataGrid, IRe
 
     declare private _readonly: boolean;
 
-    /** Whether the grid is in read-only mode. */
+    /**
+     * Whether the grid is in read-only mode.
+     * @returns `true` if read-only, otherwise `false`.
+     */
     public get readOnly(): boolean {
         return this.get_readOnly();
     }
 
-    /** Sets whether the grid is in read-only mode. */
+    /**
+     * Sets whether the grid is in read-only mode.
+     * @param value - `true` to enable read-only mode, `false` to disable.
+     */
     public set readOnly(value: boolean) {
         this.set_readOnly(value);
     }
@@ -1773,12 +1797,21 @@ export class DataGrid<TItem, P = {}> extends Widget<P> implements IDataGrid, IRe
         return this._grid;
     }
 
-    /** The underlying SleekGrid instance. */
+    /**
+     * The underlying SleekGrid instance.
+     * @returns The current SleekGrid instance.
+     */
     public get sleekGrid() { return this._grid; }
-    /** Sets the underlying SleekGrid instance. */
+    /**
+     * Sets the underlying SleekGrid instance.
+     * @param value - SleekGrid instance to set.
+     */
     protected set sleekGrid(value: ISleekGrid<TItem>) { this._grid = value; }
 
-    /** @deprecated Use sleekGrid or getGrid() */
+    /**
+     * @deprecated Use `sleekGrid` or `getGrid()`.
+     * @returns The underlying SleekGrid instance.
+     */
     public get slickGrid() { return this._grid; }
 
     /**
@@ -1797,7 +1830,10 @@ export class DataGrid<TItem, P = {}> extends Widget<P> implements IDataGrid, IRe
         return (this.filterBar == null) ? null : this.filterBar.get_store();
     }
 
-    /** All columns including hidden ones. */
+    /**
+     * All columns including hidden ones.
+     * @returns All columns from the underlying SleekGrid.
+     */
     public get allColumns(): Column[] { return this._grid?.getAllColumns() }
     /** The currently visible columns. */
     public get columns() { return this._grid?.getColumns(); }
@@ -1806,9 +1842,15 @@ export class DataGrid<TItem, P = {}> extends Widget<P> implements IDataGrid, IRe
     /** Sets the initial persisted settings. */
     protected set initialSettings(value: PersistedGridSettings) { this._initialSettings = value; }
 
-    /** @deprecated use defaultPersistenceStorage, this one has a typo */
+    /**
+     * @deprecated Use `defaultPersistenceStorage` — this has a typo.
+     * @returns The current persistence storage.
+     */
     public static get defaultPersistanceStorage(): SettingStorage { return DataGrid.defaultOptions.persistenceStorage; }
-    /** @deprecated use defaultPersistenceStorage, this one has a typo */
+    /**
+     * @deprecated Use `defaultPersistenceStorage` — this has a typo.
+     * @param value - Persistence storage to set.
+     */
     public static set defaultPersistanceStorage(value: SettingStorage) { DataGrid.defaultOptions.persistenceStorage = value; }
 }
 

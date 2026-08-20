@@ -771,6 +771,12 @@ export function parseCriteria(expression: string, params?: any): any[];
  * parseCriteria`A >= ${a} and B < ${b}`; // [[["A"], ">=", 5], "and", [["B"], "<", 4]]
  */
 export function parseCriteria(strings: TemplateStringsArray, ...values: any[]): any[];
+/**
+ * Parses a criteria expression (string or tagged template) to Serenity criteria array format.
+ * @param exprOrStrings - Expression string or template strings array.
+ * @param values - Parameter values or interpolated template values.
+ * @returns Serenity criteria array.
+ */
 export function parseCriteria(exprOrStrings: TemplateStringsArray | string, ...values: any[]): any[] {
     if (!exprOrStrings?.length)
         return [];
@@ -795,23 +801,41 @@ export function parseCriteria(exprOrStrings: TemplateStringsArray | string, ...v
  * `"is null"`). Exposed also as {@link Criteria.Operator} for convenience.
  */
 export enum CriteriaOperator {
+    /** Parentheses grouping `()` . */
     paren = "()",
+    /** Logical NOT (`not`). */
     not = "not",
+    /** IS NULL (`is null`). */
     isNull = "is null",
+    /** IS NOT NULL (`is not null`). */
     isNotNull = "is not null",
+    /** EXISTS (`exists`). */
     exists = "exists",
+    /** Logical AND (`and`). */
     and = "and",
+    /** Logical OR (`or`). */
     or = "or",
+    /** Logical XOR (`xor`). */
     xor = "xor",
+    /** Equality (`=`). */
     eq = "=",
+    /** Not equal (`!=`). */
     ne = "!=",
+    /** Greater than (`>`). */
     gt = ">",
+    /** Greater than or equal (`>=`). */
     ge = ">=",
+    /** Less than (`<`). */
     lt = "<",
+    /** Less than or equal (`<=`). */
     le = "<=",
+    /** IN (`in`). */
     in = "in",
+    /** NOT IN (`not in`). */
     notIn = "not in",
+    /** LIKE (`like`). */
     like = "like",
+    /** NOT LIKE (`not like`). */
     notLike = "not like"
 }
 

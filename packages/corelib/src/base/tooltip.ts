@@ -24,8 +24,15 @@ export class Tooltip {
      * @param el - Target element or array-like collection (first element is used).
      * @param opt - Tooltip options; if omitted defaults are applied.
      * @param create - When `true` (default) creates a tooltip if none exists; when `false` only wraps an existing instance.
+     * @returns A `Tooltip` wrapper instance.
      */
     public constructor(el: ArrayLike<HTMLElement> | HTMLElement, opt?: TooltipOptions);
+    /**
+     * Creates or wraps a tooltip for an element (implementation).
+     * @param el - Target element or array-like collection (first element is used).
+     * @param opt - Tooltip options; if omitted defaults are applied.
+     * @param create - When `true` (default) creates a tooltip if none exists; when `false` only wraps an existing instance.
+     */
     public constructor(el: ArrayLike<HTMLElement> | HTMLElement, opt?: TooltipOptions, create = true) {
         this.el = isArrayLike(el) ? el[0] : el;
 
@@ -111,6 +118,7 @@ export class Tooltip {
 
     /**
      * Whether a tooltip implementation (Bootstrap or jQuery) is available in the current environment.
+     * @returns `true` if Bootstrap Tooltip or jQuery tooltip is available, otherwise `false`.
      */
     static get isAvailable(): boolean {
         return !!((typeof bootstrap !== "undefined" && (bootstrap as any).Tooltip) ||

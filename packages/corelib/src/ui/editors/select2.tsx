@@ -32,7 +32,7 @@ export interface Select2QueryOptions {
  * A single Select2 item.
  */
 export interface Select2Item {
-    /** Item id. */
+    /** Unique identifier of the select item. */
     id?: string;
     /** Display text. */
     text?: string;
@@ -78,9 +78,12 @@ export interface Select2AjaxOptions extends RequestInit {
     results?: (p1: any, p2: number, p3: any) => any;
     /** Additional request parameters. */
     params?: (() => any) | any;
-    /** Callback invoked on error. */
+    /** Callback invoked when the ajax request fails.
+     * @param response - The error response payload.
+     * @param info - Additional error info. */
     onError?(response: any, info?: any): void | boolean;
-    /** Callback invoked on success. */
+    /** Callback invoked when the ajax request succeeds.
+     * @param response - The success response payload. */
     onSuccess?(response: any): void;
 }
 
@@ -566,6 +569,10 @@ export class Select2 {
 
     declare private el: Select2Element;
 
+    /**
+     * Creates a Select2 widget.
+     * @param opts - Select2 options.
+     */
     constructor(opts?: Select2Options)
     /**
      * Creates a Select2 widget.
@@ -637,7 +644,8 @@ export class Select2 {
         return this.instance?.data() as (Select2Item | Select2Item[]);
     }
 
-    /** Sets the current data. */
+    /** Sets the current data.
+     * @param value - The data to set. */
     set data(value: Select2Item | Select2Item[]) {
         this.instance?.data(value);
     }
@@ -727,7 +735,8 @@ export class Select2 {
         return this.instance?.val();
     }
 
-    /** Sets the current value. */
+    /** Sets the current value.
+     * @param value - The value to set. */
     set val(value: string | string[]) {
         this.instance?.val(value);
     }
@@ -752,7 +761,7 @@ export class Select2 {
         }
     }
 
-    // plugin defaults, accessible to users
+    /** Default options for the Select2 widget. */
     static readonly defaults: Select2Options = {
         width: "copy",
         loadMorePadding: 0,

@@ -6,7 +6,11 @@ import { Formatter } from "../../slick";
 export class MinuteFormatter implements Formatter {
     static [Symbol.typeInfo] = formatterTypeInfo(nsSerenity); static { registerType(this); }
 
-    /** @param ctx - Formatter context. @returns `HH:mm` string. */
+    /**
+     * Formats the cell value as `HH:mm`.
+     * @param ctx - Formatter context containing the minute value.
+     * @returns `HH:mm` string.
+     */
     format(ctx: FormatterContext) {
         return MinuteFormatter.format(ctx.value);
     }

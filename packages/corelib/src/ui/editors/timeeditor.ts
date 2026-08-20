@@ -24,7 +24,10 @@ export interface TimeEditorBaseOptions {
 export class TimeEditorBase<P extends TimeEditorBaseOptions> extends EditorWidget<P> {
     static override[Symbol.typeInfo] = this.registerEditor(nsSerenity);
 
+    /** Creates the default select element for the time editor.
+     * @returns The hour select element. */
     static override createDefaultElement(): HTMLElement { return document.createElement("select"); }
+    /** The hour select element that backs the editor. */
     declare readonly domNode: HTMLSelectElement;
 
     declare protected minutes: Fluent;
@@ -91,7 +94,8 @@ export class TimeEditorBase<P extends TimeEditorBaseOptions> extends EditorWidge
         }
     }
 
-    /** Returns value in HH:mm format */
+    /** Returns the combined time value in HH:mm format.
+     * @returns The time string, or null when empty. */
     public get hourAndMin(): string {
         var hour = this.hour;
         var minute = this.minute;
@@ -101,7 +105,8 @@ export class TimeEditorBase<P extends TimeEditorBaseOptions> extends EditorWidge
         return `${zeroPad(hour, 2)}:${zeroPad(minute, 2)}`;
     }
 
-    /** Sets value in HH:mm format */
+    /** Sets the combined time value in HH:mm format.
+     * @param value - The time string to set. */
     public set hourAndMin(value: string) {
         if (value == null || value === "") {
             if (this.options.noEmptyOption) {
@@ -122,6 +127,9 @@ export class TimeEditorBase<P extends TimeEditorBaseOptions> extends EditorWidge
 }
 
 
+/**
+ * Options for the {@link TimeEditor}.
+ */
 export interface TimeEditorOptions extends TimeEditorBaseOptions {
     /** Default is 1. Set to 60 to store seconds, 60000 to store ms in an integer field */
     multiplier?: number;
@@ -219,6 +227,10 @@ export class TimeSpanEditor<P extends TimeSpanEditorOptions = TimeSpanEditorOpti
 
     static override[Symbol.typeInfo] = this.registerEditor(nsSerenity, [IStringValue, IReadOnly]);
 
+    /**
+     * Creates a time span editor.
+     * @param props - Widget props.
+     */
     constructor(props: EditorProps<P>) {
         super(props);
         this.domNode.classList.add("s-TimeSpanEditor");
@@ -233,7 +245,8 @@ export class TimeSpanEditor<P extends TimeSpanEditorOptions = TimeSpanEditorOpti
         return this.value;
     }
 
-    /** Sets the time span value. */
+    /** Sets the time span value.
+     * @param value - The time span value to set. */
     protected set_value(value: string): void {
         this.value = value;
     }
@@ -246,7 +259,8 @@ export class TimeSpanEditor<P extends TimeSpanEditorOptions = TimeSpanEditorOpti
         return this.hourAndMin;
     }
 
-    /** Sets the time span value. */
+    /** Sets the time span value.
+     * @param value - The time span string to set. */
     public set value(value: string) {
         this.hourAndMin = value;
     }
