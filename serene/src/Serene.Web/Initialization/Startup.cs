@@ -9,7 +9,6 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Serenity.Extensions.DependencyInjection;
-using System.IO;
 
 namespace Serene;
 
@@ -42,13 +41,13 @@ public partial class Startup
                 new AppServices.UserCultureProvider()); // insert it before AcceptLanguage header provider
         });
 
-        var dataProtectionKeysFolder = Configuration?["DataProtectionKeysFolder"];
-        if (!string.IsNullOrEmpty(dataProtectionKeysFolder))
+        var dpBuilder = services.AddDataProtection();
+        if (Configuration["DataProtection:FolderPath"] is string { Length: > 0 } dpFolder)
         {
-            dataProtectionKeysFolder = Path.Combine(HostEnvironment.ContentRootPath, dataProtectionKeysFolder);
-            if (Directory.Exists(dataProtectionKeysFolder))
-                services.AddDataProtection()
-                    .PersistKeysToFileSystem(new DirectoryInfo(dataProtectionKeysFolder));
+            var dpDirInfo = new System.IO.DirectoryInfo(System.IO.Path.Combine(HostEnvironment.ContentRootPath, dpFolder));
+            if (!dpDirInfo.Exists)
+                dpDirInfo.Create();
+            dpBuilder.PersistKeysToFileSystem(dpDirInfo);
         }
 
         services.AddAntiforgery(options => options.HeaderName = "X-CSRF-TOKEN");
