@@ -4,6 +4,8 @@ public partial class ClientTypesGenerator
 {
     private void GenerateBasicType(ExternalType type)
     {
+        if (!OmitComments)
+            cw.IndentedLine($"/// <summary>A class that mirrors the <c>{type.Name}</c> script type.</summary>");
         cw.Indented("public partial class ");
         sb.AppendLine(type.Name);
         
@@ -31,6 +33,8 @@ public partial class ClientTypesGenerator
 
             if (index++ > 0)
                 sb.AppendLine();
+            if (!OmitComments)
+                cw.IndentedLine($"/// <summary>Gets or sets the <c>{option.Name}</c> property.</summary>");
             cw.Indented("public ");
             sb.Append(typeName);
             sb.Append(' ');

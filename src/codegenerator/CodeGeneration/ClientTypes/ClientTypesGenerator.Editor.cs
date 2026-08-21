@@ -4,6 +4,8 @@ public partial class ClientTypesGenerator
 {
     private void GenerateEditor(ExternalType type, string name, string key)
     {
+        if (!OmitComments)
+            cw.IndentedLine($"/// <summary>An attribute that sets the editor type to <c>{key ?? type.FullName}</c> and its options.</summary>");
         cw.Indented("public partial class ");
         sb.Append(name);
 
@@ -19,11 +21,15 @@ public partial class ClientTypesGenerator
 
         cw.InBrace(delegate
         {
+            if (!OmitComments)
+                cw.IndentedLine("/// <summary>The editor type key.</summary>");
             cw.Indented("public const string Key = \"");
             sb.Append(key ?? type.FullName);
             sb.AppendLine("\";");
             sb.AppendLine();
 
+            if (!OmitComments)
+                cw.IndentedLine($"/// <summary>Creates a new instance of the <c>{name}</c> class.</summary>");
             cw.Indented("public ");
             sb.Append(name);
             sb.AppendLine("()");

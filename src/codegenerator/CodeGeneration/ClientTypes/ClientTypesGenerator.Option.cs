@@ -43,11 +43,6 @@ public partial class ClientTypesGenerator
 
             var typeName = GetMemberTypeName(option.Type);
 
-            sb.AppendLine();
-            cw.Indented("public ");
-            sb.Append(typeName);
-            sb.Append(' ');
-
             string jsName = option.Name;
             string optionName = option.Name;
             if (option is ExternalMethod emo && emo.Arguments?.Count == 1)
@@ -61,6 +56,12 @@ public partial class ClientTypesGenerator
                 typeName = GetMemberTypeName(emo.Arguments[0].Type);
             }
 
+            sb.AppendLine();
+            if (!OmitComments)
+                cw.IndentedLine($"/// <summary>Gets or sets the <c>{jsName}</c> option.</summary>");
+            cw.Indented("public ");
+            sb.Append(typeName);
+            sb.Append(' ');
             sb.AppendLine(TranslateJSPropertyName(optionName));
 
             cw.InBrace(() =>

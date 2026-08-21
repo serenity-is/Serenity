@@ -3,6 +3,12 @@ namespace Serenity.CodeGeneration;
 public class ViewPathsGenerator(IFileSystem fileSystem,
     string[] stripViewPaths)
 {
+    /// <summary>
+    /// Gets or sets a value indicating whether to omit XML doc comments
+    /// from the generated code (used by tests that don't care about comments).
+    /// </summary>
+    public bool OmitComments { get; set; }
+
     string GetStrippedName(string s)
     {
         var name = fileSystem.ChangeExtension(s, null).Replace('\\', '/');
@@ -37,6 +43,11 @@ public class ViewPathsGenerator(IFileSystem fileSystem,
     {
         files = [.. files.OrderBy(GetStrippedName)];
 
+        var isPublic = modifiers == "public";
+        var emitComments = isPublic && !OmitComments;
+
+        if (emitComments)
+            cw.IndentedLine("/// <summary>Provides paths to view files.</summary>");
         cw.IndentedLine($"{modifiers} static partial class Views");
         cw.InBrace(() =>
         {
@@ -102,6 +113,8 @@ public class ViewPathsGenerator(IFileSystem fileSystem,
 
                     var indent = new string(' ', i * 4);
                     var u = parts[i];
+                    if (emitComments)
+                        cw.IndentedLine(indent + $"/// <summary>Provides view paths in the <c>{string.Join("/", parts[..(i + 1)])}</c> folder.</summary>");
                     cw.IndentedLine(indent + "public static partial class " + u.Replace(".", "_"));
                     cw.IndentedLine(indent + "{");
                 }
@@ -114,6 +127,8 @@ public class ViewPathsGenerator(IFileSystem fileSystem,
                     needLine = false;
                 }
 
+                if (emitComments)
+                    cw.IndentedLine(new string(' ', (parts.Length - 1) * 4) + $"/// <summary>The path to the <c>{name.Split('/')[^1]}</c> view.</summary>");
                 cw.Indented(parts.Length > 1 ? new string(' ', (parts.Length - 1) * 4) : "");
                 cw.AppendLine("public const string " + CSharpSyntaxRules.EscapeIfKeyword(n) + " = \"~/" +
                     file.Replace('\\', '/') + "\";");
