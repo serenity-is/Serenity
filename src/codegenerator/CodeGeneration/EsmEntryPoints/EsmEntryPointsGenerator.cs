@@ -82,6 +82,8 @@ public class EsmEntryPointsGenerator()
 
         void action()
         {
+            if (!internalAccess)
+                cw.IndentedLine("/// <summary>Provides paths to generated ECMAScript module entry points.</summary>");
             cw.IndentedLine($"{(internalAccess ? "internal" : "public")} static partial class ESM");
             cw.InBrace(() =>
             {
@@ -92,8 +94,12 @@ public class EsmEntryPointsGenerator()
                         x.Count() == 1);
 
                 foreach (var shortName in byShortName)
+                {
+                    if (!internalAccess)
+                        cw.IndentedLine($"/// <summary>The module path for the <c>{CSharpSyntaxRules.EscapeIfKeyword(shortName.Key)}</c> entry point.</summary>");
                     cw.IndentedLine("public const string " + CSharpSyntaxRules.EscapeIfKeyword(shortName.Key) + " = \"~" + EsmAssetBasePath + "/" +
                         System.IO.Path.ChangeExtension(shortName.First(), ".js").Replace('\\', '/') + "\";");
+                }
 
                 if (byShortName.Any())
                     cw.AppendLine();
@@ -162,6 +168,8 @@ public class EsmEntryPointsGenerator()
                             cw.AppendLine();
                             constLine = false;
                         }
+                        if (!internalAccess)
+                            cw.IndentedLine($"/// <summary>Provides module entry points in the <c>{string.Join("/", parts[..(i + 1)])}</c> folder.</summary>");
                         cw.IndentedLine("public static partial class " + u);
                         cw.StartBrace();
                     }
@@ -174,6 +182,8 @@ public class EsmEntryPointsGenerator()
                         endOfBrace = false;
                     }
 
+                    if (!internalAccess)
+                        cw.IndentedLine($"/// <summary>The module path for the <c>{CSharpSyntaxRules.EscapeIfKeyword(n)}</c> entry point.</summary>");
                     cw.IndentedLine("public const string " + CSharpSyntaxRules.EscapeIfKeyword(n) + " = \"~" + EsmAssetBasePath + "/" +
                         System.IO.Path.ChangeExtension(file, ".js").Replace('\\', '/') + "\";");
                     constLine = true;
