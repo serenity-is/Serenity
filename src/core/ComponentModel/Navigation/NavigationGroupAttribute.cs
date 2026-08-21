@@ -1,23 +1,23 @@
 namespace Serenity.Navigation;
 
 /// <summary>
-/// Defines a navigation group, which are usually the icons on the sidebar band
+/// Defines a navigation group, which is usually the icons on the sidebar band.
 /// </summary>
 /// <remarks>
-/// Creates a new instance of the attribute
+/// Creates a new instance of the attribute.
 /// </remarks>
-/// <param name="order">Order</param>
-/// <param name="title">Title</param>
-/// <param name="icon">Icon class</param>
+/// <param name="order">Order.</param>
+/// <param name="title">Title.</param>
+/// <param name="icon">Icon class.</param>
 [AttributeUsage(AttributeTargets.Assembly, AllowMultiple = true)]
 public class NavigationGroupAttribute(int order, string title, string? icon = null) : NavigationItemAttribute(order, title, null, null, icon)
 {
 
     /// <summary>
-    /// Creates a new instance of the attribute
+    /// Creates a new instance of the attribute.
     /// </summary>
-    /// <param name="title">Title</param>
-    /// <param name="icon">Icon</param>
+    /// <param name="title">Title.</param>
+    /// <param name="icon">Icon.</param>
     public NavigationGroupAttribute(string title, string? icon = null)
         : this(int.MaxValue, title, icon)
     {
@@ -34,7 +34,7 @@ public class NavigationGroupAttribute(int order, string title, string? icon = nu
     public string[]? Include { get; set; }
 
     /// <summary>
-    /// This group automatically includes siblings that does not match any other groups
+    /// This group automatically includes siblings that do not match any other groups.
     /// </summary>
     public bool Default { get; set; }
 }

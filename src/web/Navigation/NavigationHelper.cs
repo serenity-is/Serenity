@@ -3,18 +3,19 @@ using Microsoft.Extensions.DependencyInjection;
 namespace Serenity.Navigation;
 
 /// <summary>
-/// Contains helper methods for navigation models and items
+/// Contains helper methods for navigation models and items.
 /// </summary>
 public class NavigationHelper
 {
     /// <summary>
-    /// Gets navigation items
+    /// Gets navigation items.
     /// </summary>
-    /// <param name="permissions">Permission service</param>
-    /// <param name="typeSource">Type source</param>
-    /// <param name="serviceProvider">Service provider</param>
-    /// <param name="resolveUrl">Resolve URL callback</param>
-    /// <param name="filter">Filter function</param>
+    /// <param name="permissions">The permission service.</param>
+    /// <param name="typeSource">The type source.</param>
+    /// <param name="serviceProvider">The service provider.</param>
+    /// <param name="resolveUrl">The resolve URL callback.</param>
+    /// <param name="filter">The filter function.</param>
+    /// <returns>The list of navigation items.</returns>
     public static List<NavigationItem> GetNavigationItems(IPermissionService permissions, 
         ITypeSource typeSource, IServiceProvider serviceProvider, 
         Func<string, string> resolveUrl = null, 
@@ -28,10 +29,11 @@ public class NavigationHelper
     /// Converts a list of <see cref="NavigationItemAttribute"/> objects to a list of
     /// <see cref="NavigationItem"/> classes.
     /// </summary>
-    /// <param name="permissions">Permission service</param>
-    /// <param name="attrByCategory">A lookup to find attributes by their category</param>
-    /// <param name="resolveUrl">Resolve url callback</param>
-    /// <exception cref="ArgumentNullException">One of the arguments is null</exception>
+    /// <param name="permissions">The permission service.</param>
+    /// <param name="attrByCategory">A lookup to find attributes by their category.</param>
+    /// <param name="resolveUrl">The resolve URL callback.</param>
+    /// <returns>The list of navigation items.</returns>
+    /// <exception cref="ArgumentNullException">One of the arguments is <c>null</c>.</exception>
     public static List<NavigationItem> ConvertToNavigationItems(IPermissionService permissions, 
         ILookup<string, NavigationItemAttribute> attrByCategory, Func<string, string> resolveUrl)
     {
@@ -204,10 +206,11 @@ public class NavigationHelper
     }
 
     /// <summary>
-    /// Creates a lookup of navigation item attributes by their category
+    /// Creates a lookup of navigation item attributes by their category.
     /// </summary>
-    /// <param name="list">List with navigation item attributes</param>
-    /// <exception cref="ArgumentNullException">List is null</exception>
+    /// <param name="list">The list with navigation item attributes.</param>
+    /// <returns>A lookup of navigation item attributes by category.</returns>
+    /// <exception cref="ArgumentNullException"><paramref name="list"/> is <c>null</c>.</exception>
     public static ILookup<string, NavigationItemAttribute> ByCategory(
         IEnumerable<NavigationItemAttribute> list)
     {

@@ -6,12 +6,12 @@
 public class DiskUploadStorageOptions
 {
     /// <summary>
-    /// Root path
+    /// Gets or sets the root path.
     /// </summary>
     public string RootPath { get; set; }
 
     /// <summary>
-    /// Root URL
+    /// Gets or sets the root URL.
     /// </summary>
     public string RootUrl { get; set; }
 }

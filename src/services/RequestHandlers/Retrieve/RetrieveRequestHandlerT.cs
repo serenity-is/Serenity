@@ -6,7 +6,7 @@
 /// </summary>
 /// <typeparam name="TRow">The entity type</typeparam>
 /// <remarks>
-/// Creates an instance of the class
+/// Initializes a new instance of the class.
 /// </remarks>
 /// <param name="context">The request context</param>
 public class RetrieveRequestHandler<TRow>(IRequestContext context) : RetrieveRequestHandler<TRow, RetrieveRequest, RetrieveResponse<TRow>>(context),

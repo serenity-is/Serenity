@@ -650,10 +650,10 @@ public partial class RowFieldsBase : Collection<Field>, IAlias, IHaveJoins
     }
 
     /// <summary>
-    /// Gets the fields by attribute.
+    /// Gets the fields that have an attribute of the specified type.
     /// </summary>
     /// <typeparam name="TAttr">The type of the attribute.</typeparam>
-    /// <returns></returns>
+    /// <returns>The fields that have an attribute of the specified type.</returns>
     public Field[] GetFieldsByAttribute<TAttr>()
         where TAttr : Attribute
     {
@@ -661,10 +661,10 @@ public partial class RowFieldsBase : Collection<Field>, IAlias, IHaveJoins
     }
 
     /// <summary>
-    /// Gets the fields by attribute.
+    /// Gets the fields that have an attribute of the specified type.
     /// </summary>
     /// <param name="attrType">Type of the attribute.</param>
-    /// <returns></returns>
+    /// <returns>The fields that have an attribute of the specified type.</returns>
     public Field[] GetFieldsByAttribute(Type attrType)
     {
         var byAttribute = this.byAttribute;

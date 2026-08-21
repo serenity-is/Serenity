@@ -2,16 +2,14 @@
 namespace Serenity.Data;
 
 /// <summary>
-/// SqlQuery interface.
+/// Interface for types that can convert an <see cref="ISqlQuery"/> to its string representation.
 /// </summary>
-/// <seealso cref="IQueryWithParams" />
-/// <seealso cref="IChainable" />
 public interface ISqlQueryToString
 {
     /// <summary>
-    /// Converts the query to string
+    /// Converts the query to string.
     /// </summary>
-    /// <param name="sqlQuery"></param>
-    /// <returns></returns>
+    /// <param name="sqlQuery">The SQL query to convert.</param>
+    /// <returns>The string representation of the query.</returns>
     string ToString(ISqlQuery sqlQuery);
 }

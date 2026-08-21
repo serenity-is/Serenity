@@ -4,10 +4,10 @@ using Serenity.PropertyGrid;
 namespace Serenity.Web;
 
 /// <summary>
-/// Property processor to pass recaptcha site key to client side
+/// Property processor that passes the recaptcha site key to the client side.
 /// </summary>
 /// <remarks>
-/// Creates a new instance of the class
+/// Initializes a new instance of the <see cref="RecaptchaPropertyProcessor"/> class.
 /// </remarks>
 public class RecaptchaPropertyProcessor(IOptions<RecaptchaSettings> options = null) : PropertyProcessor
 {

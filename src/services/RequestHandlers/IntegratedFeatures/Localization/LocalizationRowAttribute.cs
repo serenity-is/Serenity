@@ -1,18 +1,18 @@
 namespace Serenity.Data;
 
 /// <summary>
-/// Maps a row to its localization row
+/// Maps a row to its localization row.
 /// </summary>
 /// <remarks>
-/// Creates a new instance of the attribute
+/// Initializes a new instance of the attribute.
 /// </remarks>
 /// <param name="localizationRow">Localization row type</param>
-/// <exception cref="ArgumentNullException">localizationRow is null</exception>
+/// <exception cref="ArgumentNullException"><paramref name="localizationRow"/> is <c>null</c>.</exception>
 public class LocalizationRowAttribute(Type localizationRow) : Attribute
 {
 
     /// <summary>
-    /// Localization row type
+    /// Gets the localization row type.
     /// </summary>
     public Type LocalizationRow { get; private set; } = localizationRow ?? throw new ArgumentNullException(nameof(localizationRow));
 

@@ -224,12 +224,12 @@ public class WrappedConnection(IDbConnection connection, ISqlDialect dialect, IL
     public ConnectionState State => actualConnection.State;
 
     /// <summary>
-    /// Gets the logger instance for this connection if any
+    /// Gets the logger instance for this connection, if any.
     /// </summary>
     public ILogger Logger => logger;
 
     /// <summary>
-    /// Performs application-defined tasks associated with freeing, releasing, or resetting unmanaged resources.
+    /// Disposes the actual connection.
     /// </summary>
     public void Dispose()
     {

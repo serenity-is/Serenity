@@ -1,7 +1,7 @@
 namespace Serenity.ComponentModel;
 
 /// <summary>
-/// An attribute that can be placed on targets to toggle them at runtime based features.
+/// An attribute that can be placed on targets to toggle them at runtime based on features.
 /// Use FeatureBarrierAttribute for MVC controllers, controller actions, or Razor pages.
 /// </summary>
 [AttributeUsage(AttributeTargets.All, AllowMultiple = false)]
@@ -32,7 +32,7 @@ public class RequiresFeatureAttribute : Attribute
     }
 
     /// <summary>
-    /// The name of the features that the feature attribute will activate for.
+    /// The names of the features that the feature attribute will activate for.
     /// </summary>
     public IEnumerable<string> Features { get; }
 

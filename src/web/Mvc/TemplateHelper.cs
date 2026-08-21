@@ -12,18 +12,19 @@ using System.IO;
 namespace Serenity.Web;
 
 /// <summary>
-/// Helper methods for CSHTML templating
+/// Helper methods for CSHTML templating.
 /// </summary>
 public static class TemplateHelper
 {
     /// <summary>
-    /// Renders a CSHTML view to string
+    /// Renders a CSHTML view to a string.
     /// </summary>
-    /// <param name="serviceProvider">Service provider</param>
-    /// <param name="viewName">View name</param>
-    /// <param name="model">Model object, can also be ViewDataDictionary containing the actual model</param>
-    /// <param name="beforeRender">An optional callback which will be passed the view context before rendering starts</param>
-    /// <exception cref="InvalidOperationException"></exception>
+    /// <param name="serviceProvider">The service provider.</param>
+    /// <param name="viewName">The view name.</param>
+    /// <param name="model">The model object; can also be a <see cref="ViewDataDictionary"/> containing the actual model.</param>
+    /// <param name="beforeRender">An optional callback which will be passed the view context before rendering starts.</param>
+    /// <returns>The rendered view content.</returns>
+    /// <exception cref="ArgumentNullException">The view is not found.</exception>
     public static string RenderViewToString(IServiceProvider serviceProvider, string viewName, object model,
         Action<ViewContext> beforeRender = null)
     {

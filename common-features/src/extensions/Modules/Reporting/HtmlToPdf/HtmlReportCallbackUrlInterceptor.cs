@@ -15,6 +15,12 @@ public class HtmlReportCallbackUrlInterceptor(
     IHttpContextAccessor httpContextAccessor = null,
     IDataProtectionProvider dataProtectionProvider = null) : IReportCallbackInterceptor
 {
+    /// <summary>
+    /// Intercepts a report callback, applying impersonation and transient grants from the report auth cookie.
+    /// </summary>
+    /// <param name="options">The render options.</param>
+    /// <param name="action">The callback action.</param>
+    /// <returns>The report render result.</returns>
     public ReportRenderResult InterceptCallback(ReportRenderOptions options, Func<ReportRenderOptions, ReportRenderResult> action)
     {
         IImpersonator impersonator = userAccessor as IImpersonator;

@@ -47,12 +47,12 @@ public class DatePartAttribute(DateParts part, object expression) : BaseExpressi
     }
 
     /// <summary>
-    /// Date part
+    /// Date part.
     /// </summary>
     public DateParts Part { get; } = part;
 
     /// <summary>
-    /// Date expression
+    /// Date expression.
     /// </summary>
     public object Expression { get; } = expression ?? throw new ArgumentNullException(nameof(expression));
 }

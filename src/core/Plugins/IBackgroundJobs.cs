@@ -1,12 +1,13 @@
 ﻿namespace Serenity.Plugins;
 
 /// <summary>
-/// Interface for plugins that has a list of background jobs
+/// Interface for plugins that have a list of background jobs.
 /// </summary>
 public interface IBackgroundJobs
 {
     /// <summary>
-    /// Gets list of background jobs
+    /// Gets the list of background jobs.
     /// </summary>
+    /// <returns>The list of background job types.</returns>
     IEnumerable<Type> GetBackgroundJobs();
 }

@@ -4,23 +4,23 @@ using Microsoft.AspNetCore.Mvc.ApplicationParts;
 namespace Serenity.Web;
 
 /// <summary>
-/// Implementation for a type source that uses ApplicationPartManager to 
-/// get assemblies. Note that it only includes assemblies that are marked
-/// with TypeSourceAssemblyAttribute which is automatically added to 
-/// assemblies that reference Serenity.Net.Web NuGet package (or Serenity.Net.Web.targets).
+/// Implementation of a type source that uses <see cref="ApplicationPartManager"/> to
+/// get assemblies. Note that it only includes assemblies that are marked with
+/// <see cref="TypeSourceAssemblyAttribute"/>, which is automatically added to
+/// assemblies that reference the Serenity.Net.Web NuGet package (or Serenity.Net.Web.targets).
 /// </summary>
 public class ApplicationPartsTypeSource(ApplicationPartManager partManager,
     bool topologicalSort = true, IFeatureToggles featureToggles = null)
     : BaseAssemblyTypeSource(featureToggles)
 {
     /// <summary>
-    /// Gets the application part manager
+    /// Gets the application part manager.
     /// </summary>
     public readonly ApplicationPartManager PartManager = partManager
         ?? throw new ArgumentNullException(nameof(partManager));
 
     /// <summary>
-    /// Gets all the assemblies from application part manager.
+    /// Gets all the assemblies from the application part manager.
     /// </summary>
     protected virtual IEnumerable<Assembly> GetApplicationPartAssemblies()
     {
@@ -30,17 +30,17 @@ public class ApplicationPartsTypeSource(ApplicationPartManager partManager,
     }
 
     /// <summary>
-    /// Returns true for assemblies that are marked with TypeSourceAssemblyAttribute
+    /// Returns <c>true</c> for assemblies that are marked with <see cref="TypeSourceAssemblyAttribute"/>.
     /// </summary>
-    /// <param name="assembly">Assembly</param>
+    /// <param name="assembly">The assembly.</param>
     protected virtual bool IsTypeSourceAssembly(Assembly assembly)
     {
         return assembly.IsDefined(typeof(TypeSourceAssemblyAttribute));
     }
 
     /// <summary>
-    /// Gets set of implicitly included assemblies, by default Serenity.Net.Core 
-    /// to Serenity.Net.Web
+    /// Gets the set of implicitly included assemblies, by default from
+    /// Serenity.Net.Core to Serenity.Net.Web.
     /// </summary>
     protected virtual IEnumerable<Assembly> GetImplicitAssemblies()
     {
@@ -80,9 +80,9 @@ public class ApplicationPartsTypeSource(ApplicationPartManager partManager,
     }
 
     /// <summary>
-    /// Sorts assemblies by dependency order
+    /// Sorts assemblies by dependency order.
     /// </summary>
-    /// <param name="assemblies">Assemblies</param>
+    /// <param name="assemblies">The assemblies.</param>
     protected virtual IEnumerable<Assembly> TopologicalSort(IEnumerable<Assembly> assemblies)
     {
         return Reflection.AssemblySorter.Sort(assemblies);

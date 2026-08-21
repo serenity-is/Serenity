@@ -3,7 +3,7 @@ using System.Text.Json;
 namespace Serenity.Data;
 
 /// <summary>
-/// Field with JSON value
+/// Field with a JSON value.
 /// </summary>
 /// <typeparam name="TValue">The type of the value.</typeparam>
 /// <remarks>
@@ -31,7 +31,7 @@ public class JsonField<TValue>(ICollection<Field> collection, string name, Local
     /// <param name="flags">The flags.</param>
     /// <param name="getValue">The get value.</param>
     /// <param name="setValue">The set value.</param>
-    /// <returns></returns>
+    /// <returns>A new JsonField instance.</returns>
     public static JsonField<TValue> Factory(ICollection<Field> collection, string name, LocalText caption, int size, FieldFlags flags,
         Func<IRow, TValue> getValue, Action<IRow, TValue> setValue)
     {
@@ -44,7 +44,7 @@ public class JsonField<TValue>(ICollection<Field> collection, string name, Local
     /// <param name="reader">The reader.</param>
     /// <param name="index">The index.</param>
     /// <param name="row">The row.</param>
-    /// <exception cref="ArgumentNullException">reader</exception>
+    /// <exception cref="ArgumentNullException">reader is null.</exception>
     public override void GetFromReader(IDataReader reader, int index, IRow row)
     {
         ArgumentNullException.ThrowIfNull(reader);
@@ -70,7 +70,7 @@ public class JsonField<TValue>(ICollection<Field> collection, string name, Local
     /// Gets the value of this row as an SQL value.
     /// </summary>
     /// <param name="row">The row.</param>
-    /// <returns></returns>
+    /// <returns>The value of the field in the row as an SQL value.</returns>
     public override object AsSqlValue(IRow row)
     {
         var value = AsObject(row);
@@ -81,11 +81,11 @@ public class JsonField<TValue>(ICollection<Field> collection, string name, Local
     }
 
     /// <summary>
-    /// Compares the field values for two rows for an ascending index sort
+    /// Compares the field values for two rows for an ascending index sort.
     /// </summary>
     /// <param name="row1">The row1.</param>
     /// <param name="row2">The row2.</param>
-    /// <returns></returns>
+    /// <returns>A value indicating the relative order of the two rows.</returns>
     public override int IndexCompare(IRow row1, IRow row2)
     {
         var value1 = _getValue(row1);
@@ -108,7 +108,7 @@ public class JsonField<TValue>(ICollection<Field> collection, string name, Local
     }
 
     /// <summary>
-    /// Serializes this fields value to JSON
+    /// Serializes this field's value to JSON.
     /// </summary>
     /// <param name="writer">The writer.</param>
     /// <param name="row">The row.</param>
@@ -119,12 +119,12 @@ public class JsonField<TValue>(ICollection<Field> collection, string name, Local
     }
 
     /// <summary>
-    /// Deserializes this fields value from JSON
+    /// Deserializes this field's value from JSON.
     /// </summary>
     /// <param name="reader">The reader.</param>
     /// <param name="row">The row.</param>
     /// <param name="serializer">The serializer.</param>
-    /// <exception cref="ArgumentNullException">reader</exception>
+    /// <exception cref="ArgumentNullException">reader is null.</exception>
     public override void ValueFromJson(Newtonsoft.Json.JsonReader reader, IRow row, Newtonsoft.Json.JsonSerializer serializer)
     {
         ArgumentNullException.ThrowIfNull(reader);

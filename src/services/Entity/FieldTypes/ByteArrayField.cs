@@ -3,7 +3,7 @@ using System.Text.Json;
 namespace Serenity.Data;
 
 /// <summary>
-/// Field with a byte[] value
+/// Field with a byte[] value.
 /// </summary>
 /// <remarks>
 /// Initializes a new instance of the <see cref="ByteArrayField"/> class.
@@ -29,7 +29,7 @@ public class ByteArrayField(ICollection<Field> collection, string name, LocalTex
     /// <param name="flags">The flags.</param>
     /// <param name="getValue">The get value.</param>
     /// <param name="setValue">The set value.</param>
-    /// <returns></returns>
+    /// <returns>A new ByteArrayField instance.</returns>
     public static ByteArrayField Factory(ICollection<Field> collection, string name, LocalText caption, int size, FieldFlags flags,
         Func<IRow, byte[]> getValue, Action<IRow, byte[]> setValue)
     {
@@ -42,7 +42,7 @@ public class ByteArrayField(ICollection<Field> collection, string name, LocalTex
     /// <param name="reader">The reader.</param>
     /// <param name="index">The index.</param>
     /// <param name="row">The row.</param>
-    /// <exception cref="ArgumentNullException">reader</exception>
+    /// <exception cref="ArgumentNullException">reader is null.</exception>
     public override void GetFromReader(IDataReader reader, int index, IRow row)
     {
         ArgumentNullException.ThrowIfNull(reader);
@@ -76,7 +76,7 @@ public class ByteArrayField(ICollection<Field> collection, string name, LocalTex
     /// </summary>
     /// <param name="value1">The value1.</param>
     /// <param name="value2">The value2.</param>
-    /// <returns></returns>
+    /// <returns>A value indicating the relative order of the two values.</returns>
     protected override int CompareValues(byte[] value1, byte[] value2)
     {
         var length = Math.Min(value1.Length, value2.Length);
@@ -94,14 +94,14 @@ public class ByteArrayField(ICollection<Field> collection, string name, LocalTex
     /// Clones the specified value.
     /// </summary>
     /// <param name="value">The value.</param>
-    /// <returns></returns>
+    /// <returns>A clone of the value.</returns>
     protected override byte[] Clone(byte[] value)
     {
         return (byte[])value.Clone();
     }
 
     /// <summary>
-    /// Serializes this fields value to JSON
+    /// Serializes this field's value to JSON.
     /// </summary>
     /// <param name="writer">The writer.</param>
     /// <param name="row">The row.</param>
@@ -118,12 +118,12 @@ public class ByteArrayField(ICollection<Field> collection, string name, LocalTex
     }
 
     /// <summary>
-    /// Deserializes this fields value from JSON
+    /// Deserializes this field's value from JSON.
     /// </summary>
     /// <param name="reader">The reader.</param>
     /// <param name="row">The row.</param>
     /// <param name="serializer">The serializer.</param>
-    /// <exception cref="ArgumentNullException">reader</exception>
+    /// <exception cref="ArgumentNullException">reader is null.</exception>
     public override void ValueFromJson(Newtonsoft.Json.JsonReader reader, IRow row, Newtonsoft.Json.JsonSerializer serializer)
     {
         ArgumentNullException.ThrowIfNull(reader);

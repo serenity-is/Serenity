@@ -9,7 +9,7 @@ namespace Serenity.ComponentModel;
 public abstract class RegisterServiceAttribute : Attribute
 {
     /// <summary>
-    /// Creates a new instance of RegisterServiceAttribute
+    /// Creates a new instance of RegisterServiceAttribute.
     /// </summary>
     public RegisterServiceAttribute()
     {
@@ -40,7 +40,7 @@ public abstract class RegisterServiceAttribute : Attribute
     public Type[]? Types { get; set; }
     
     /// <summary>
-    /// Gets lifetime, which is transient by default
+    /// Gets the lifetime, which is transient by default.
     /// </summary>
     public ServiceLifetime Lifetime { get; protected set; } = ServiceLifetime.Transient;
 

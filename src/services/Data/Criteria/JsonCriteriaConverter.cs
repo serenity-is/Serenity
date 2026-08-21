@@ -6,7 +6,8 @@ using JsonConverter = Newtonsoft.Json.JsonConverter;
 namespace Serenity.Data;
 
 /// <summary>
-///   Serialize/deserialize a BaseCriteria object</summary>
+/// Serializes and deserializes a <see cref="BaseCriteria"/> object.
+/// </summary>
 public class JsonCriteriaConverter : JsonConverter
 {
     static JsonCriteriaConverter()
@@ -17,13 +18,11 @@ public class JsonCriteriaConverter : JsonConverter
     }
 
     /// <summary>
-    ///   Writes the JSON representation of the object.</summary>
-    /// <param name="writer">
-    ///   The <see cref="JsonWriter"/> to write to.</param>
-    /// <param name="value">
-    ///   The value.</param>
-    /// <param name="serializer">
-    ///   The calling serializer.</param>
+    /// Writes the JSON representation of the object.
+    /// </summary>
+    /// <param name="writer">The <see cref="JsonWriter"/> to write to.</param>
+    /// <param name="value">The value.</param>
+    /// <param name="serializer">The calling serializer.</param>
     public override void WriteJson(JsonWriter writer, object value, JsonSerializer serializer)
     {
         ToJson(writer, (BaseCriteria)value, serializer);
@@ -95,16 +94,13 @@ public class JsonCriteriaConverter : JsonConverter
     }
 
     /// <summary>
-    ///   Reads the JSON representation of the object.</summary>
+    /// Reads the JSON representation of the object.
+    /// </summary>
     /// <param name="reader">The <see cref="JsonReader"/> to read from.</param>
-    /// <param name="objectType">
-    ///   Type of the object.</param>
-    /// <param name="existingValue">
-    ///   The existing value of object being read.</param>
-    /// <param name="serializer">
-    ///   The calling serializer.</param>
-    /// <returns>
-    ///   The object value.</returns>
+    /// <param name="objectType">The type of the object.</param>
+    /// <param name="existingValue">The existing value of the object being read.</param>
+    /// <param name="serializer">The calling serializer.</param>
+    /// <returns>The object value.</returns>
     public override object ReadJson(JsonReader reader, Type objectType, object existingValue, JsonSerializer serializer)
     {
         if (reader.TokenType == JsonToken.Null)

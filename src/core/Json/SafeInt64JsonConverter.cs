@@ -3,11 +3,13 @@ using System.Text.Json;
 namespace Serenity.JsonConverters;
 
 /// <summary>
-///   Serialize/deserialize a long value converting it to string if it is higher than precision double can handle</summary>
+/// Serializes and deserializes a <see cref="long"/> value, converting it to a string when it is
+/// larger than the precision a double can safely handle.
+/// </summary>
 public class SafeInt64JsonConverter : JsonConverter<long>
 {
     /// <summary>
-    /// The default instance
+    /// The default instance of the <see cref="SafeInt64JsonConverter"/>.
     /// </summary>
     public static readonly SafeInt64JsonConverter Instance = new();
 

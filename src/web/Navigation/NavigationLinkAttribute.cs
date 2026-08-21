@@ -4,32 +4,32 @@ using Serenity.Web;
 namespace Serenity.Navigation;
 
 /// <summary>
-/// A navigation item with a link
+/// A navigation item with a link.
 /// </summary>
 [AttributeUsage(AttributeTargets.Assembly, AllowMultiple = true)]
 public class NavigationLinkAttribute : NavigationItemAttribute
 {
     /// <summary>
-    /// Creates a new instance of the attribute
+    /// Initializes a new instance of the <see cref="NavigationLinkAttribute"/> class.
     /// </summary>
-    /// <param name="order">Order</param>
-    /// <param name="path">Path</param>
-    /// <param name="url">URL</param>
-    /// <param name="permission">Permission</param>
-    /// <param name="icon">Icon</param>
+    /// <param name="order">The order.</param>
+    /// <param name="path">The path.</param>
+    /// <param name="url">The URL.</param>
+    /// <param name="permission">The permission.</param>
+    /// <param name="icon">The icon.</param>
     public NavigationLinkAttribute(int order, string path, string url, object permission, string icon = null)
         : base(order, path, url, permission, icon)
     {
     }
 
     /// <summary>
-    /// Creates a new instance of the attribute
+    /// Initializes a new instance of the <see cref="NavigationLinkAttribute"/> class.
     /// </summary>
-    /// <param name="order">Order</param>
-    /// <param name="path">Path</param>
-    /// <param name="controller">Controller to get URL and action from</param>
-    /// <param name="icon">Icon</param>
-    /// <param name="action">Action name</param>
+    /// <param name="order">The order.</param>
+    /// <param name="path">The path.</param>
+    /// <param name="controller">The controller to get the URL and action from.</param>
+    /// <param name="icon">The icon.</param>
+    /// <param name="action">The action name.</param>
     public NavigationLinkAttribute(int order, string path, Type controller, string icon = null, string action = "Index")
         : this(order, path, GetUrlFromController(controller, action), 
               GetPermissionFromController(controller, action), icon)
@@ -42,24 +42,24 @@ public class NavigationLinkAttribute : NavigationItemAttribute
     }
 
     /// <summary>
-    /// Creates a new instance of the attribute
+    /// Initializes a new instance of the <see cref="NavigationLinkAttribute"/> class.
     /// </summary>
-    /// <param name="path">Path</param>
-    /// <param name="url">URL</param>
-    /// <param name="permission">Permission</param>
-    /// <param name="icon">Icon</param>
+    /// <param name="path">The path.</param>
+    /// <param name="url">The URL.</param>
+    /// <param name="permission">The permission.</param>
+    /// <param name="icon">The icon.</param>
     public NavigationLinkAttribute(string path, string url, object permission, string icon = null)
         : base(int.MaxValue, path, url, permission, icon)
     {
     }
 
     /// <summary>
-    /// Creates a new instance of the attribute
+    /// Initializes a new instance of the <see cref="NavigationLinkAttribute"/> class.
     /// </summary>
-    /// <param name="path">Path</param>
-    /// <param name="controller">Controller to get URL and action from</param>
-    /// <param name="icon">Icon</param>
-    /// <param name="action">Action name</param>
+    /// <param name="path">The path.</param>
+    /// <param name="controller">The controller to get the URL and action from.</param>
+    /// <param name="icon">The icon.</param>
+    /// <param name="action">The action name.</param>
     public NavigationLinkAttribute(string path, Type controller, string icon = null, string action = "Index")
         : base(int.MaxValue, path, GetUrlFromController(controller, action), 
             GetPermissionFromController(controller, action), icon)
@@ -72,14 +72,14 @@ public class NavigationLinkAttribute : NavigationItemAttribute
     }
 
     /// <summary>
-    /// Tries to extract URL from a controller action
+    /// Tries to extract the URL from a controller action.
     /// </summary>
-    /// <param name="controller">Controller</param>
-    /// <param name="action">Action name</param>
-    /// <returns></returns>
-    /// <exception cref="ArgumentNullException">Controller or action is null</exception>
-    /// <exception cref="ArgumentOutOfRangeException">Action name is invalid</exception>
-    /// <exception cref="InvalidOperationException">Route attribute is not found</exception>
+    /// <param name="controller">The controller.</param>
+    /// <param name="action">The action name.</param>
+    /// <returns>The resolved URL.</returns>
+    /// <exception cref="ArgumentNullException">Controller or action is <c>null</c>.</exception>
+    /// <exception cref="ArgumentOutOfRangeException">The action name is invalid.</exception>
+    /// <exception cref="InvalidOperationException">The route attribute is not found.</exception>
     public static string GetUrlFromController(Type controller, string action)
     {
         ArgumentNullException.ThrowIfNull(controller);
@@ -151,12 +151,13 @@ public class NavigationLinkAttribute : NavigationItemAttribute
     }
 
     /// <summary>
-    /// Tries to extract permission from a controller action
+    /// Tries to extract the permission from a controller action.
     /// </summary>
-    /// <param name="controller">Controller</param>
-    /// <param name="action">Action</param>
-    /// <exception cref="ArgumentNullException">Controller or action is null</exception>
-    /// <exception cref="ArgumentOutOfRangeException">Action name is invalid</exception>
+    /// <param name="controller">The controller.</param>
+    /// <param name="action">The action.</param>
+    /// <returns>The permission key, or <c>null</c> if none is found.</returns>
+    /// <exception cref="ArgumentNullException">Controller or action is <c>null</c>.</exception>
+    /// <exception cref="ArgumentOutOfRangeException">The action name is invalid.</exception>
     public static string GetPermissionFromController(Type controller, string action)
     {
         ArgumentNullException.ThrowIfNull(controller);
@@ -172,13 +173,14 @@ public class NavigationLinkAttribute : NavigationItemAttribute
     }
 
     /// <summary>
-    /// Tries to extract features from a controller action
+    /// Tries to extract features from a controller action.
     /// </summary>
-    /// <param name="controller">Controller</param>
-    /// <param name="action">Action</param>
-    /// <param name="requireAny">If any of features are required</param>
-    /// <exception cref="ArgumentNullException">Controller or action is null</exception>
-    /// <exception cref="ArgumentOutOfRangeException">Action name is invalid</exception>
+    /// <param name="controller">The controller.</param>
+    /// <param name="action">The action.</param>
+    /// <param name="requireAny">Whether any of the features are required.</param>
+    /// <returns>The list of required features, or <c>null</c> if none is found.</returns>
+    /// <exception cref="ArgumentNullException">Controller or action is <c>null</c>.</exception>
+    /// <exception cref="ArgumentOutOfRangeException">The action name is invalid.</exception>
     public static string[] GetFeaturesFromController(Type controller, string action, out bool requireAny)
     {
         ArgumentNullException.ThrowIfNull(controller);

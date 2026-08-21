@@ -11,9 +11,9 @@
 /// - "d": "dd/MM/yyyy" where DMY order changes based on current UI culture.<br/>
 /// - "g": "dd/MM/yyyy HH:mm" where DMY order changes based on current UI culture.<br/>
 /// - "G": "dd/MM/yyyy HH:mm:ss" where DMY order changes based on current UI culture.<br/>
-/// - "s": "yyydd-MM-ddTHH:mm:ss" ISO sortable date time format.<br/>
-/// - "u": "yyydd-MM-ddTHH:mm:ss.fffZ" ISO 8601 UTC.</para>
-/// <para>If column is an integer, double or decimal it accepts.NET custom numeric format strings like "#,##0.00", "0.#"</para>
+/// - "s": "yyyy-MM-ddTHH:mm:ss" ISO sortable date time format.<br/>
+/// - "u": "yyyy-MM-ddTHH:mm:ss.fffZ" ISO 8601 UTC.</para>
+/// <para>If column is an integer, double or decimal it accepts .NET custom numeric format strings like "#,##0.00", "0.#"</para>
 /// </summary>
 /// <remarks>
 /// public class SomeColumns

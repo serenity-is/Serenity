@@ -10,26 +10,26 @@ namespace Serenity.Web;
 public class DiskUploadStorage : IUploadStorage
 {
     /// <summary>
-    /// File system
+    /// Gets the file system.
     /// </summary>
     protected readonly IDiskUploadFileSystem fileSystem;
 
     /// <summary>
-    /// Root path for the uploads
+    /// Gets the root path for the uploads.
     /// </summary>
     public string RootPath { get; private set; }
 
     /// <summary>
-    /// Root URL for the uploads
+    /// Gets the root URL for the uploads.
     /// </summary>
     public string RootUrl { get; private set; }
     
     /// <summary>
-    /// Creates a new instance of the class
+    /// Initializes a new instance of the class.
     /// </summary>
     /// <param name="options">Upload options</param>
     /// <param name="fileSystem">File system to use</param>
-    /// <exception cref="ArgumentNullException">Options is null</exception>
+    /// <exception cref="ArgumentNullException"><paramref name="options"/> is <c>null</c>.</exception>
     public DiskUploadStorage(DiskUploadStorageOptions options, IDiskUploadFileSystem fileSystem = null)
     {
         this.fileSystem = fileSystem ?? new PhysicalDiskUploadFileSystem();

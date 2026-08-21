@@ -5,14 +5,14 @@ using Microsoft.Extensions.DependencyInjection.Extensions;
 namespace Serenity.Extensions.DependencyInjection;
 
 /// <summary>
-/// DI extension methods related to service endpoints
+/// DI extension methods related to service endpoints.
 /// </summary>
 public static class ServiceEndpointServiceCollectionExtensions
 {
     /// <summary>
-    /// Adds service endpoint related services and conventions to the service collection
+    /// Adds service endpoint related services and conventions to the service collection.
     /// </summary>
-    /// <param name="services"></param>
+    /// <param name="services">The service collection.</param>
     public static void AddServiceEndpointConventions(this IServiceCollection services)
     {
         services.TryAddEnumerable(ServiceDescriptor.Transient<IApplicationModelProvider, ServiceEndpointApplicationModelProvider>());

@@ -3,43 +3,43 @@ using Microsoft.Extensions.Logging;
 namespace Serenity.Web;
 
 /// <summary>
-/// Default implementation for <see cref="IUploadProcessor"/>
+/// Default implementation for <see cref="IUploadProcessor"/>.
 /// </summary>
 /// <remarks>
-/// Creates a new instance of the class
+/// Initializes a new instance of the class.
 /// </remarks>
 /// <param name="imageProcessor">Image processor</param>
 /// <param name="uploadStorage">Upload storage</param>
 /// <param name="uploadValidator">Upload validator</param>
 /// <param name="logger">Logger</param>
 /// <param name="avScanner">Optional antivirus scanner</param>
-/// <exception cref="ArgumentNullException"></exception>
+/// <exception cref="ArgumentNullException"><paramref name="imageProcessor"/>, <paramref name="uploadStorage"/> or <paramref name="uploadValidator"/> is <c>null</c>.</exception>
 public class DefaultUploadProcessor(IImageProcessor imageProcessor, IUploadStorage uploadStorage, IUploadValidator uploadValidator,
     ILogger<DefaultUploadProcessor> logger = null,
     IUploadAVScanner avScanner = null) : IUploadProcessor
 {
     /// <summary>
-    /// Image processor
+    /// Gets the image processor.
     /// </summary>
     protected readonly IImageProcessor imageProcessor = imageProcessor ?? throw new ArgumentNullException(nameof(imageProcessor));
 
     /// <summary>
-    /// Upload storage
+    /// Gets the upload storage.
     /// </summary>
     protected readonly IUploadStorage uploadStorage = uploadStorage ?? throw new ArgumentNullException(nameof(uploadStorage));
 
     /// <summary>
-    /// Upload validator
+    /// Gets the upload validator.
     /// </summary>
     protected readonly IUploadValidator uploadValidator = uploadValidator ?? throw new ArgumentNullException(nameof(uploadValidator));
 
     /// <summary>
-    /// Logger
+    /// Gets the logger.
     /// </summary>
     protected readonly ILogger<DefaultUploadProcessor> logger = logger;
 
     /// <summary>
-    /// AV Scanner
+    /// Gets the AV scanner.
     /// </summary>
     protected readonly IUploadAVScanner avScanner = avScanner;
 
@@ -73,7 +73,7 @@ public class DefaultUploadProcessor(IImageProcessor imageProcessor, IUploadStora
 
                 object image = null;
                 if (isImageExtension)
-                    uploadValidator.ValidateImage(options as IUploadImageContrains ?? new UploadOptions(),
+                    uploadValidator.ValidateImage(options as IUploadImageConstraints ?? new UploadOptions(),
                         stream, filename, out image);
                 try
                 {

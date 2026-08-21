@@ -5,7 +5,7 @@ using CompressionLevel = System.IO.Compression.CompressionLevel;
 namespace Serenity.Web;
 
 /// <summary>
-/// Default implementation for <see cref="IDynamicScriptManager"/>
+/// Default implementation of <see cref="IDynamicScriptManager"/>.
 /// </summary>
 public partial class DynamicScriptManager : IDynamicScriptManager
 {
@@ -20,12 +20,12 @@ public partial class DynamicScriptManager : IDynamicScriptManager
     private static readonly UTF8Encoding utf8Encoding = new(true);
 
     /// <summary>
-    /// Creates a new instance of the class
+    /// Initializes a new instance of the <see cref="DynamicScriptManager"/> class.
     /// </summary>
-    /// <param name="cache">Two level cache</param>
-    /// <param name="permissions">Permission service</param>
-    /// <param name="localizer">Text localizer</param>
-    /// <exception cref="ArgumentNullException"></exception>
+    /// <param name="cache">The two level cache.</param>
+    /// <param name="permissions">The permission service.</param>
+    /// <param name="localizer">The text localizer.</param>
+    /// <exception cref="ArgumentNullException"><paramref name="cache"/> or <paramref name="permissions"/> is <c>null</c>.</exception>
     public DynamicScriptManager(ITwoLevelCache cache, IPermissionService permissions, ITextLocalizer localizer)
     {
         this.cache = cache ?? throw new ArgumentNullException(nameof(cache));
@@ -92,11 +92,12 @@ public partial class DynamicScriptManager : IDynamicScriptManager
     }
 
     /// <summary>
-    /// Peeks the script hash for a script without actually executing it
+    /// Peeks the script hash for a script without actually executing it.
     /// </summary>
-    /// <param name="name">Registration name</param>
-    /// <param name="script">Dynamic script</param>
-    /// <exception cref="ArgumentNullException">name is null</exception>
+    /// <param name="name">The registration name.</param>
+    /// <param name="script">The dynamic script.</param>
+    /// <returns>The cached hash for the script.</returns>
+    /// <exception cref="ArgumentNullException"><paramref name="name"/> is <c>null</c>.</exception>
     public string PeekScriptHash(string name, IDynamicScript script)
     {
         ArgumentNullException.ThrowIfNull(name);

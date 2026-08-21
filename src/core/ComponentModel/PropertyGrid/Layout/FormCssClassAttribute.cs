@@ -1,7 +1,7 @@
 ﻿namespace Serenity.ComponentModel;
 
 /// <summary>
-/// Sets CSS class for field on forms only. 
+/// Sets the CSS class for the field on forms only.
 /// </summary>
 /// <remarks>
 /// Initializes a new instance of the <see cref="FormCssClassAttribute"/> class.
@@ -19,8 +19,8 @@ public class FormCssClassAttribute(string? cssClass) : Attribute
     public string? Value { get; private set; } = cssClass;
 
     /// <summary>
-    /// Applies this form css class to all following fields 
-    /// until next another FormCssClass attribute
+    /// Applies this form CSS class to all following fields
+    /// until another FormCssClass attribute.
     /// </summary>
     public bool UntilNext { get; set; }
 }

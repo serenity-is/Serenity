@@ -3,14 +3,14 @@ using System.Collections;
 namespace Serenity.Services;
 
 /// <summary>
-/// Default implementation for <see cref="IBehaviorProvider"/>
+/// Default implementation for <see cref="IBehaviorProvider"/>.
 /// </summary>
 /// <remarks>
-/// Creates an instance of the class.
+/// Initializes a new instance of the class.
 /// </remarks>
 /// <param name="implicitBehaviors">Registry for implicit behaviors.</param>
 /// <param name="behaviorFactory">Behavior factory</param>
-/// <exception cref="ArgumentNullException"></exception>
+/// <exception cref="ArgumentNullException"><paramref name="implicitBehaviors"/> or <paramref name="behaviorFactory"/> is <c>null</c>.</exception>
 public class DefaultBehaviorProvider(IImplicitBehaviorRegistry implicitBehaviors,
     IBehaviorFactory behaviorFactory) : IBehaviorProvider
 {

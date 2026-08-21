@@ -58,17 +58,17 @@ public class UploadSettings : IOptions<UploadSettings>
     public string ExtensionWhitelistExclude { get; set; }
 
     /// <summary>
-    /// Root path for uploads, default is "App_Data/upload/"
+    /// Gets or sets the root path for uploads, default is "App_Data/upload/".
     /// </summary>
     public string Path { get; set; }
 
     /// <summary>
-    /// Root ur for uploads, default is "~/upload"
+    /// Gets or sets the root URL for uploads, default is "~/upload".
     /// </summary>
     public string Url { get; set; }
 
     /// <summary>
-    /// Creates a new instance of the class
+    /// Initializes a new instance of the class.
     /// </summary>
     public UploadSettings()
     {
@@ -77,7 +77,7 @@ public class UploadSettings : IOptions<UploadSettings>
     }
 
     /// <summary>
-    /// Gets this instance
+    /// Gets this instance.
     /// </summary>
     public UploadSettings Value => this;
 }

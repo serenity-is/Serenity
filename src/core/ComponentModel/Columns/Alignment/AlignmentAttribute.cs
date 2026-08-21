@@ -11,7 +11,7 @@ public abstract class AlignmentAttribute(string align) : Attribute
 {
 
     /// <summary>
-    /// Gets/sets value of the alignment attribute
+    /// Gets or sets the value of the alignment attribute.
     /// </summary>
     public string Value { get; private set; } = align;
 }

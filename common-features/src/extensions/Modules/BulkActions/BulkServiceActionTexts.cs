@@ -1,5 +1,8 @@
 namespace Serenity.Extensions;
 
+/// <summary>
+/// Local text keys for bulk service actions.
+/// </summary>
 [NestedLocalTexts(Prefix = "Site.BulkServiceAction.")]
 public static class BulkServiceActionTexts
 {

@@ -6,7 +6,7 @@
 public class HtmlToPdfOptions : IHtmlToPdfOptions
 {       
     /// <summary>
-    /// Creates a new instance of the class
+    /// Initializes a new instance of the class with default option values.
     /// </summary>
     public HtmlToPdfOptions()
     {

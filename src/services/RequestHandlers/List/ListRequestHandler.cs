@@ -15,26 +15,26 @@ public class ListRequestHandler<TRow, TListRequest, TListResponse> : IListReques
     where TListResponse : ListResponse<TRow>, new()
 {
     /// <summary>
-    /// Set of ignored equality filter entries
+    /// Set of ignored equality filter entries.
     /// </summary>
     protected HashSet<string> ignoredEqualityFilters;
 
     /// <summary>
-    /// Lazy list of behaviors that is activated for this request
+    /// Lazy list of behaviors that is activated for this request.
     /// </summary>
     protected Lazy<IListBehavior[]> behaviors;
 
     /// <summary>
     /// True if the list handler is in lookup access mode, e.g. it only
-    /// allows access to lookup fields
+    /// allows access to lookup fields.
     /// </summary>
     protected bool lookupAccessMode;
 
     /// <summary>
-    /// Creates an instance of the class
+    /// Initializes a new instance of the class.
     /// </summary>
     /// <param name="context">Request context</param>
-    /// <exception cref="ArgumentNullException">Context is null</exception>
+    /// <exception cref="ArgumentNullException"><paramref name="context"/> is <c>null</c>.</exception>
     public ListRequestHandler(IRequestContext context)
     {
         Context = context ?? throw new ArgumentNullException(nameof(context));
@@ -43,7 +43,7 @@ public class ListRequestHandler<TRow, TListRequest, TListResponse> : IListReques
     }
 
     /// <summary>
-    /// Gets the list of list behaviors
+    /// Gets the list of list behaviors.
     /// </summary>
     protected virtual IEnumerable<IListBehavior> GetBehaviors()
     {
@@ -54,7 +54,7 @@ public class ListRequestHandler<TRow, TListRequest, TListResponse> : IListReques
     /// Gets the native sort order, which includes name field by default,
     /// unless the row has [SortOrder] attributes.
     /// </summary>
-    /// <returns></returns>
+    /// <returns>The native sort order, or <c>null</c> if there is none.</returns>
     protected virtual SortBy[] GetNativeSort()
     {
         var sortOrders = Row.GetFields().SortOrders;
@@ -321,7 +321,7 @@ public class ListRequestHandler<TRow, TListRequest, TListResponse> : IListReques
     /// The result should be returned via this argument.</param>
     /// <param name="orFalse">Should return true from this parameter if this contains criteria
     /// should cause search to return no records</param>
-    /// <exception cref="ArgumentOutOfRangeException"></exception>
+    /// <exception cref="ArgumentOutOfRangeException"><paramref name="searchType"/> is not a supported <see cref="SearchType"/>.</exception>
     protected virtual void AddFieldContainsCriteria(Field field, string containsText, long? id,
         SearchType searchType, bool numericOnly, ref BaseCriteria criteria, ref bool orFalse)
     {
@@ -481,10 +481,10 @@ public class ListRequestHandler<TRow, TListRequest, TListResponse> : IListReques
     /// <summary>
     /// Can be overridden in a derived class to make
     /// some changes in a returned entity just before it gets
-    /// added to the Response.Entities list
+    /// added to the Response.Entities list.
     /// </summary>
-    /// <param name="row"></param>
-    /// <returns></returns>
+    /// <param name="row">The row to process.</param>
+    /// <returns>The processed row, or <c>null</c> to skip adding it to the response.</returns>
     protected virtual TRow ProcessEntity(TRow row)
     {
         return row;
@@ -544,7 +544,7 @@ public class ListRequestHandler<TRow, TListRequest, TListResponse> : IListReques
     /// <param name="query">Query</param>
     /// <param name="field">Field</param>
     /// <param name="value">Equality value. Can be a enumerable for multi value filtering.</param>
-    /// <exception cref="ArgumentOutOfRangeException"></exception>
+    /// <exception cref="ArgumentOutOfRangeException">The field is not allowed to be filtered.</exception>
     protected virtual void ApplyFieldEqualityFilter(SqlQuery query, Field field, object value)
     {
         if (field.MinSelectLevel == SelectLevel.Never ||
@@ -808,7 +808,7 @@ public class ListRequestHandler<TRow, TListRequest, TListResponse> : IListReques
     /// </summary>
     /// <param name="connection">Connection</param>
     /// <param name="request">Request</param>
-    /// <exception cref="ArgumentNullException">connection or the request is null</exception>
+    /// <exception cref="ArgumentNullException"><paramref name="connection"/> or <paramref name="request"/> is <c>null</c>.</exception>
     public TListResponse Process(IDbConnection connection, TListRequest request)
     {
         StateBag.Clear();
@@ -880,57 +880,57 @@ public class ListRequestHandler<TRow, TListRequest, TListResponse> : IListReques
     }
 
     /// <summary>
-    /// Gets the two level cache from the request context
+    /// Gets the two level cache from the request context.
     /// </summary>
     public ITwoLevelCache Cache => Context.Cache;
 
     /// <summary>
-    /// Gets the request context
+    /// Gets the request context.
     /// </summary>
     public IRequestContext Context { get; private set; }
 
     /// <summary>
-    /// Gets localizer from the request context
+    /// Gets the localizer from the request context.
     /// </summary>
     public ITextLocalizer Localizer => Context.Localizer;
 
     /// <summary>
-    /// Gets permission service from the request context
+    /// Gets the permission service from the request context.
     /// </summary>
     public IPermissionService Permissions => Context.Permissions;
 
     /// <summary>
-    /// Gets current user from the request context
+    /// Gets the current user from the request context.
     /// </summary>
     public ClaimsPrincipal User => Context.User;
 
     /// <summary>
-    /// Gets list of distinct fields
+    /// Gets the list of distinct fields.
     /// </summary>
     public Field[] DistinctFields { get; private set; }
 
     /// <summary>
-    /// Gets current connection
+    /// Gets the current connection.
     /// </summary>
     public IDbConnection Connection { get; private set; }
 
     /// <summary>
-    /// Gets the select query
+    /// Gets the select query.
     /// </summary>
     public SqlQuery Query { get; private set; }
 
     /// <summary>
-    /// The entity used for querying / metadata lookup
+    /// Gets the entity used for querying / metadata lookup.
     /// </summary>
     public TRow Row { get; protected set; }
 
     /// <summary>
-    /// Response object
+    /// Gets the request object.
     /// </summary>
     public TListRequest Request { get; protected set; }
 
     /// <summary>
-    /// Response object
+    /// Gets the response object.
     /// </summary>
     public TListResponse Response { get; protected set; }
 

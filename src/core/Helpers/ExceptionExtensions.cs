@@ -1,12 +1,12 @@
 namespace Serenity;
 
 /// <summary>
-/// Exception data extensions
+/// Exception data extensions.
 /// </summary>
 public static class ExceptionExtensions
 {
     /// <summary>
-    ///   Sets custom exception data with given property name and value. Sets the data in base exception.</summary>
+    ///   Sets custom exception data with the given property name and value. Sets the data in the base exception.</summary>
     /// <param name="exception">
     ///   Exception to set custom data in.</param>
     /// <param name="property">

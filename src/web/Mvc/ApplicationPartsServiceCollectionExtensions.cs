@@ -6,25 +6,26 @@ using Serenity.Web;
 namespace Serenity.Extensions.DependencyInjection;
 
 /// <summary>
-/// DI extension methods related to application part and type source
+/// DI extension methods related to application parts and type source.
 /// </summary>
 public static class ApplicationPartsServiceCollectionExtensions
 {
     /// <summary>
-    /// Adds IFeatureToggles service to the registry scanning for FeatureKeySetAttribute
-    /// in application parts, setting disabled by default for features that has a [DefaultValue(false)]
-    /// attribute.
-    /// Note that this also calls AddMvcCore() to get the part manager if not provided,
-    /// and is not found in the collection.
+    /// Adds the <see cref="IFeatureToggles"/> service to the registry, scanning for
+    /// <see cref="FeatureKeySetAttribute"/> in application parts and disabling by default
+    /// features that have a <c>[DefaultValue(false)]</c> attribute.
+    /// Note that this also calls <c>AddMvcCore()</c> to get the part manager if it is
+    /// not provided and not found in the collection.
     /// </summary>
     /// <param name="services">The services.</param>
-    /// <param name="configuration">Configuration source</param>
-    /// <param name="applicationPartManager">Optional application part manager to use</param>
-    /// <param name="disableByDefault">Features to disable by default, pass ["*"] to disable
-    /// all features by default</param>
+    /// <param name="configuration">The configuration source.</param>
+    /// <param name="applicationPartManager">Optional application part manager to use.</param>
+    /// <param name="disableByDefault">Features to disable by default; pass <c>["*"]</c> to disable
+    /// all features by default.</param>
     /// <param name="dependencyMap">Feature dependency map. Features are dictionary
-    /// keys and the list of features that they depend on (e.g. all must be enabled)
-    /// for that feature to be enabled.</param>/// 
+    /// keys and the list of features that they depend on (all must be enabled)
+    /// for that feature to be enabled.</param>
+    /// <returns>The same service collection so that calls can be chained.</returns>
     public static IServiceCollection AddApplicationPartsFeatureToggles(this IServiceCollection services,
         IConfiguration configuration,
         ApplicationPartManager applicationPartManager = null,
@@ -88,13 +89,14 @@ public static class ApplicationPartsServiceCollectionExtensions
 
     /// <summary>
     /// Adds an application part type source to the service collection.
-    /// Note that this also calls AddMvcCore() to get the part manager if not provided,
-    /// and is not found in the collection.
+    /// Note that this also calls <c>AddMvcCore()</c> to get the part manager if it is
+    /// not provided and not found in the collection.
     /// </summary>
-    /// <param name="collection">Collection</param>
-    /// <param name="partManager">ApplicationPartManager instance.</param>
-    /// <param name="featureToggles">Feature toggles</param>
-    /// <param name="topologicalSort">Whether to sort assemblies topologically by references</param>
+    /// <param name="collection">The service collection.</param>
+    /// <param name="partManager">The <see cref="ApplicationPartManager"/> instance.</param>
+    /// <param name="featureToggles">The feature toggles.</param>
+    /// <param name="topologicalSort">Whether to sort assemblies topologically by references.</param>
+    /// <returns>The created <see cref="ApplicationPartsTypeSource"/>.</returns>
     public static ApplicationPartsTypeSource AddApplicationPartsTypeSource(this IServiceCollection collection,
         ApplicationPartManager partManager = null, IFeatureToggles featureToggles = null, bool topologicalSort = true)
     {

@@ -7,12 +7,12 @@
 public class UploadedFile
 {
     /// <summary>
-    /// File path
+    /// Gets or sets the file path.
     /// </summary>
     public string Filename { get; set; }
 
     /// <summary>
-    /// Original file name
+    /// Gets or sets the original file name.
     /// </summary>
     public string OriginalName { get; set; }
 }

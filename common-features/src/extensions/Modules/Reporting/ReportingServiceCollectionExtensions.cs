@@ -21,6 +21,10 @@ public static class ReportingServiceCollectionExtensions
         services.TryAddSingleton<IExcelExporter, ExcelExporter>();
     }
 
+    /// <summary>
+    /// Adds HTML to PDF rendering services.
+    /// </summary>
+    /// <param name="services">The service collection.</param>
     public static void AddHtmlToPdf(this IServiceCollection services)
     {
         ArgumentNullException.ThrowIfNull(services);
@@ -34,6 +38,10 @@ public static class ReportingServiceCollectionExtensions
         services.TryAddSingleton<IHtmlReportPdfRenderer, HtmlReportPdfRenderer>();
     }
 
+    /// <summary>
+    /// Adds reporting services, including the report registry, factory, renderer, and tree.
+    /// </summary>
+    /// <param name="services">The service collection.</param>
     public static void AddReporting(this IServiceCollection services)
     {
         services.TryAddSingleton<IReportRegistry, ReportRegistry>();

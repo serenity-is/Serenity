@@ -2,14 +2,15 @@
 namespace Serenity;
 
 /// <summary>
-/// Base file system used by TemporaryFileHelper
+/// A file system abstraction used by <see cref="Serenity.IO.TemporaryFileHelper"/> that
+/// additionally exposes temporary file information.
 /// </summary>
 public interface ITemporaryFileSystem : IFileSystem
 {
     /// <summary>
-    /// Gets temporary file info objects
+    /// Gets the temporary file info objects for the files in the specified directory.
     /// </summary>
-    /// <param name="path">Path</param>
-    /// <returns>Array of temporary file info objects</returns>
+    /// <param name="path">The path of the directory.</param>
+    /// <returns>An array of temporary file info objects.</returns>
     TemporaryFileInfo[] GetTemporaryFileInfos(string path);
 }

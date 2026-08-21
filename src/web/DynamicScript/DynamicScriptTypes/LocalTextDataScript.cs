@@ -5,15 +5,15 @@ using Serenity.Localization;
 namespace Serenity.Web;
 
 /// <summary>
-/// Local text data script to access local texts from an external app like mobile
+/// Local text data script to access local texts from an external app like mobile.
 /// </summary>
 /// <remarks>
-/// Creates an instance of the class
+/// Initializes a new instance of the <see cref="LocalTextDataScript"/> class.
 /// </remarks>
-/// <param name="localTextRegistry">Local text registry</param>
-/// <param name="localTextPackages">Package list</param>
-/// <param name="httpContextAccessor">HTTP context accessor</param>
-/// <exception cref="ArgumentNullException">One of arguments is null</exception>
+/// <param name="localTextRegistry">The local text registry.</param>
+/// <param name="localTextPackages">The package list.</param>
+/// <param name="httpContextAccessor">The HTTP context accessor.</param>
+/// <exception cref="ArgumentNullException">One of the arguments is <c>null</c>.</exception>
 [DataScript("LocalText", CacheDuration = 3600)]
 public partial class LocalTextDataScript(ILocalTextRegistry localTextRegistry, IOptions<LocalTextPackages> localTextPackages, IHttpContextAccessor httpContextAccessor) : DataScript<IDictionary<string, string>>, ICacheSuffix
 {
@@ -47,14 +47,15 @@ public partial class LocalTextDataScript(ILocalTextRegistry localTextRegistry, I
     }
 
     /// <summary>
-    /// Gets a local text package as a dictionary
+    /// Gets a local text package as a dictionary.
     /// </summary>
-    /// <param name="registry">Text registry</param>
-    /// <param name="includes">Includes regex</param>
-    /// <param name="languageId">Language ID</param>
-    /// <param name="isPending">True to include pending text</param>
-    /// <param name="packageId">Package ID</param>
-    /// <exception cref="ArgumentNullException">Registry is null</exception>
+    /// <param name="registry">The text registry.</param>
+    /// <param name="includes">The includes regex.</param>
+    /// <param name="languageId">The language ID.</param>
+    /// <param name="isPending"><c>true</c> to include pending texts.</param>
+    /// <param name="packageId">The package ID.</param>
+    /// <returns>A dictionary of local text keys and values.</returns>
+    /// <exception cref="ArgumentNullException"><paramref name="registry"/> is <c>null</c>.</exception>
     public static IDictionary<string, string> GetPackageData(ILocalTextRegistry registry,
         string includes, string languageId, bool isPending, string packageId = null)
     {

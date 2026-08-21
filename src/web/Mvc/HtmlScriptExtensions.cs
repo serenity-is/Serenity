@@ -8,7 +8,7 @@ using System.Net;
 namespace Serenity.Web;
 
 /// <summary>
-/// Contains Serenity related helper methods that can be used in Razor CSHTML files
+/// Contains Serenity related helper methods that can be used in Razor CSHTML files.
 /// </summary>
 public static partial class HtmlScriptExtensions
 {
@@ -18,9 +18,10 @@ public static partial class HtmlScriptExtensions
     /// the bundle URL instead of the CSS URL. If the bundle containing the CSS file
     /// is already rendered in this context, it will return an empty string.
     /// </summary>
-    /// <param name="helper">HTML helper</param>
-    /// <param name="cssUrl">CSS Url</param>
-    /// <exception cref="ArgumentNullException">HTML helper or cssUrl is null</exception>
+    /// <param name="helper">The HTML helper.</param>
+    /// <param name="cssUrl">The CSS URL.</param>
+    /// <returns>The rendered stylesheet link element.</returns>
+    /// <exception cref="ArgumentNullException">HTML helper or <paramref name="cssUrl"/> is <c>null</c>.</exception>
     public static HtmlString Stylesheet(this IHtmlHelper helper, string cssUrl)
     {
         ArgumentNullException.ThrowIfNull(helper);
@@ -46,12 +47,12 @@ public static partial class HtmlScriptExtensions
     }
 
     /// <summary>
-    /// Automatically includes corresponding .css file for an ES module if it exists next to
-    /// the .js file
+    /// Automatically includes the corresponding <c>.css</c> file for an ES module if it exists next to
+    /// the <c>.js</c> file.
     /// </summary>
-    /// <param name="helper">HTML helper</param>
-    /// <param name="module">ES module</param>
-    /// <returns></returns>
+    /// <param name="helper">The HTML helper.</param>
+    /// <param name="module">The ES module.</param>
+    /// <returns>The rendered stylesheet link element, or an empty string if no CSS file exists.</returns>
     public static HtmlString AutoIncludeModuleCss(this IHtmlHelper helper, string module)
     {
         if (string.IsNullOrEmpty(module))
@@ -69,13 +70,13 @@ public static partial class HtmlScriptExtensions
     }
 
     /// <summary>
-    /// Executes default export of a module page, usually pageInit
+    /// Executes the default export of a module page, usually <c>pageInit</c>.
     /// </summary>
-    /// <param name="html"></param>
-    /// <param name="module"></param>
-    /// <param name="options"></param>
-    /// <param name="css"></param>
-    /// <returns></returns>
+    /// <param name="html">The HTML helper.</param>
+    /// <param name="module">The module.</param>
+    /// <param name="options">The options to pass to the module.</param>
+    /// <param name="css"><c>true</c> to also include the module's CSS file.</param>
+    /// <returns>The rendered module page init script.</returns>
     public static HtmlString ModulePageInit(this IHtmlHelper html, string module, object options = null, bool css = true)
     {
         html.ViewData["ModulePageScript"] ??= module;
@@ -91,9 +92,10 @@ public static partial class HtmlScriptExtensions
     /// Renders individual link elements for all CSS files in a bundle if bundling is disabled,
     /// and renders a single link element containing the bundle URL if it is enabled.
     /// </summary>
-    /// <param name="helper">HTML helper</param>
-    /// <param name="bundleKey">Bundle key</param>
-    /// <exception cref="ArgumentNullException">Helper or bundleKey is null</exception>
+    /// <param name="helper">The HTML helper.</param>
+    /// <param name="bundleKey">The bundle key.</param>
+    /// <returns>The rendered style bundle element.</returns>
+    /// <exception cref="ArgumentNullException">Helper or <paramref name="bundleKey"/> is <c>null</c>.</exception>
     public static HtmlString StyleBundle(this IHtmlHelper helper, string bundleKey)
     {
         ArgumentNullException.ThrowIfNull(helper);
@@ -141,11 +143,12 @@ public static partial class HtmlScriptExtensions
     }
 
     /// <summary>
-    /// Resolves a content URL by adding its hash with "?v=" prefix.
+    /// Resolves a content URL by adding its hash with a <c>?v=</c> prefix.
     /// </summary>
-    /// <param name="helper">HTML helper</param>
-    /// <param name="contentUrl">Content URL</param>
-    /// <exception cref="ArgumentNullException">Helper or contentUrl is null</exception>
+    /// <param name="helper">The HTML helper.</param>
+    /// <param name="contentUrl">The content URL.</param>
+    /// <returns>The resolved URL with its hash.</returns>
+    /// <exception cref="ArgumentNullException">Helper or <paramref name="contentUrl"/> is <c>null</c>.</exception>
     public static HtmlString ResolveWithHash(this IHtmlHelper helper, string contentUrl)
     {
         ArgumentNullException.ThrowIfNull(helper);
@@ -164,9 +167,10 @@ public static partial class HtmlScriptExtensions
     /// the bundle URL instead of the script URL. If the bundle containing the script file
     /// is already rendered in this context, it will return an empty string.
     /// </summary>
-    /// <param name="helper">HTML helper</param>
-    /// <param name="includeJS">Script url</param>
-    /// <exception cref="ArgumentNullException">HTML helper or includeJS is null</exception>
+    /// <param name="helper">The HTML helper.</param>
+    /// <param name="includeJS">The script URL.</param>
+    /// <returns>The rendered script element.</returns>
+    /// <exception cref="ArgumentNullException">HTML helper or <paramref name="includeJS"/> is <c>null</c>.</exception>
     public static HtmlString Script(this IHtmlHelper helper, string includeJS)
     {
         ArgumentNullException.ThrowIfNull(helper);
@@ -192,9 +196,10 @@ public static partial class HtmlScriptExtensions
     /// Renders individual script elements for all JS files in a bundle if bundling is disabled,
     /// and renders a single script element containing the bundle URL if it is enabled.
     /// </summary>
-    /// <param name="helper">HTML helper</param>
-    /// <param name="bundleKey">Bundle key</param>
-    /// <exception cref="ArgumentNullException">Helper or bundleKey is null</exception>
+    /// <param name="helper">The HTML helper.</param>
+    /// <param name="bundleKey">The bundle key.</param>
+    /// <returns>The rendered script bundle element.</returns>
+    /// <exception cref="ArgumentNullException">Helper or <paramref name="bundleKey"/> is <c>null</c>.</exception>
     public static HtmlString ScriptBundle(this IHtmlHelper helper, string bundleKey)
     {
         ArgumentNullException.ThrowIfNull(helper);
@@ -270,11 +275,12 @@ public static partial class HtmlScriptExtensions
     }
 
     /// <summary>
-    /// Gets the text content of a local text script
+    /// Gets the text content of a local text script.
     /// </summary>
-    /// <param name="page">HTML helper</param>
-    /// <param name="package">Package key</param>
-    /// <param name="isPending">True to include pending texts</param>
+    /// <param name="page">The HTML helper.</param>
+    /// <param name="package">The package key.</param>
+    /// <param name="isPending"><c>true</c> to include pending texts.</param>
+    /// <returns>The local text script content.</returns>
     public static string GetLocalTextContent(this IHtmlHelper page, string package, bool isPending = false)
     {
         string languageId = CultureInfo.CurrentUICulture.Name.TrimToNull() ?? "invariant";
@@ -293,11 +299,11 @@ public static partial class HtmlScriptExtensions
     }
 
     /// <summary>
-    /// Gets the script URL for a local text script
+    /// Gets the script URL for a local text script.
     /// </summary>
-    /// <param name="page">HTML helper</param>
-    /// <param name="package">Package key</param>
-    /// <param name="isPending">True to include pending texts</param>
+    /// <param name="page">The HTML helper.</param>
+    /// <param name="package">The package key.</param>
+    /// <param name="isPending"><c>true</c> to include pending texts.</param>
     public static string GetLocalTextInclude(this IHtmlHelper page, string package, bool isPending = false)
     {
         string languageId = CultureInfo.CurrentUICulture.Name.TrimToNull() ?? "invariant";

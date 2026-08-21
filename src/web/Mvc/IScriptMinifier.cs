@@ -1,15 +1,15 @@
 namespace Serenity.Web;
 
 /// <summary>
-/// Abstraction for script minifier
+/// Abstraction for a script minifier.
 /// </summary>
 public interface IScriptMinifier
 {
     /// <summary>
-    /// Minifies the given script
+    /// Minifies the given script.
     /// </summary>
-    /// <param name="source">Javascript content</param>
-    /// <param name="options">Minify options</param>
-    /// <returns>Minify result</returns>
+    /// <param name="source">The JavaScript content.</param>
+    /// <param name="options">The minify options.</param>
+    /// <returns>The minify result.</returns>
     ScriptMinifyResult MinifyScript(string source, ScriptMinifyOptions options);
 }

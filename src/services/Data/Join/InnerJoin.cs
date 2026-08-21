@@ -1,7 +1,7 @@
 ﻿namespace Serenity.Data;
 
 /// <summary>
-/// INNER JOIN type
+/// INNER JOIN type.
 /// </summary>
 /// <seealso cref="Join" />
 public class InnerJoin : Join
@@ -32,7 +32,7 @@ public class InnerJoin : Join
     /// <summary>
     /// Gets the SQL keyword.
     /// </summary>
-    /// <returns></returns>
+    /// <returns>The SQL keyword for this join type.</returns>
     public override string GetKeyword()
     {
         return "INNER JOIN";

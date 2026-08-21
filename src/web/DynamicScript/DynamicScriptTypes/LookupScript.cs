@@ -3,21 +3,21 @@ using System.Collections;
 namespace Serenity.Web;
 
 /// <summary>
-/// Dynamic script type for lookup scripts
+/// Dynamic script type for lookup scripts.
 /// </summary>
 public abstract class LookupScript : DynamicScript, INamedDynamicScript, IGetScriptData
 {
     private readonly Dictionary<string, object> lookupParams;
 
     /// <summary>
-    /// Data format for a lookup script
+    /// Data format for a lookup script.
     /// </summary>
-    /// <param name="Items">Item list</param>
-    /// <param name="Params">Lookup params</param>
+    /// <param name="Items">The item list.</param>
+    /// <param name="Params">The lookup parameters.</param>
     public record Data(IEnumerable Items, Dictionary<string, object> Params);
 
     /// <summary>
-    /// Creates a new instance of the class
+    /// Initializes a new instance of the <see cref="LookupScript"/> class.
     /// </summary>
     protected LookupScript()
     {
@@ -46,7 +46,7 @@ public abstract class LookupScript : DynamicScript, INamedDynamicScript, IGetScr
     }
 
     /// <summary>
-    /// Format string for new Lookup({0}, {1})
+    /// Format string for <c>new Lookup({0}, {1})</c>.
     /// </summary>
     public const string NewLookupFormat =
         "new ((typeof Serenity!=='undefined'&&Serenity.Lookup)||" +
@@ -61,12 +61,12 @@ public abstract class LookupScript : DynamicScript, INamedDynamicScript, IGetScr
         "}}))({0},{1})";
 
     /// <summary>
-    /// Gets lookup parameters dictionary
+    /// Gets the lookup parameters dictionary.
     /// </summary>
     public Dictionary<string, object> LookupParams => lookupParams;
 
     /// <summary>
-    /// Gets / sets lookup ID field
+    /// Gets or sets the lookup ID field.
     /// </summary>
     public string IdField
     {
@@ -84,7 +84,7 @@ public abstract class LookupScript : DynamicScript, INamedDynamicScript, IGetScr
     }
 
     /// <summary>
-    /// Gets / sets lookup text field
+    /// Gets or sets the lookup text field.
     /// </summary>
     public string TextField
     {
@@ -102,7 +102,7 @@ public abstract class LookupScript : DynamicScript, INamedDynamicScript, IGetScr
     }
 
     /// <summary>
-    /// Gets / sets lookup parent ID field
+    /// Gets or sets the lookup parent ID field.
     /// </summary>
 
     public string ParentIdField
@@ -121,7 +121,7 @@ public abstract class LookupScript : DynamicScript, INamedDynamicScript, IGetScr
     }
 
     /// <summary>
-    /// Gets / sets lookup key
+    /// Gets or sets the lookup key.
     /// </summary>
     public string LookupKey { get; set; }
 

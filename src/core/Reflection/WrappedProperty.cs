@@ -35,7 +35,8 @@ public class WrappedProperty(PropertyInfo property) : IPropertyInfo
     /// Gets the attribute.
     /// </summary>
     /// <typeparam name="TAttr">The type of the attribute.</typeparam>
-    /// <returns></returns> 
+    /// <param name="origin">The attribute origin to search.</param>
+    /// <returns>The attribute of the specified type, or <c>null</c> if none is found.</returns>
     public TAttr? GetAttribute<TAttr>(AttributeOrigin origin = AttributeOrigin.All) where TAttr : Attribute
     {
         TAttr? result = null;
@@ -55,7 +56,8 @@ public class WrappedProperty(PropertyInfo property) : IPropertyInfo
     /// Gets the attributes.
     /// </summary>
     /// <typeparam name="TAttr">The type of the attribute.</typeparam>
-    /// <returns></returns>
+    /// <param name="origin">The attribute origin to search.</param>
+    /// <returns>The attributes of the specified type.</returns>
     public IEnumerable<TAttr> GetAttributes<TAttr>(AttributeOrigin origin = AttributeOrigin.All) where TAttr : Attribute
     {
         foreach (var attr in GetCachedAttributes(origin))

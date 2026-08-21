@@ -148,31 +148,31 @@ public class ImageChecker
         return ImageCheckResult.Valid;
     }
 
-    /// <summary>Gets data size of the validated image</summary>
+    /// <summary>Gets the data size of the validated image.</summary>
     public long DataSize { get; private set; }
 
-    /// <summary>Gets width of the validated image</summary>
+    /// <summary>Gets the width of the validated image.</summary>
     public int Width { get; private set; }
 
-    /// <summary>Gets height of the validate image</summary>
+    /// <summary>Gets the height of the validated image.</summary>
     public int Height { get; private set; }
 
-    /// <summary>Gets the time passed during validating the image</summary>
+    /// <summary>Gets the time passed during validating the image.</summary>
     public double Milliseconds { get; private set; }
 
-    /// <summary>Gets/sets maximum file size allowed</summary>
+    /// <summary>Gets or sets the maximum file size allowed.</summary>
     public int MaxDataSize { get; set; }
 
-    /// <summary>Gets/sets maximum width allowed. 0 means any width.</summary>
+    /// <summary>Gets or sets the maximum width allowed. 0 means any width.</summary>
     public int MaxWidth { get; set; }
 
-    /// <summary>Gets/sets maximum height allowed. 0 means any height.</summary>
+    /// <summary>Gets or sets the maximum height allowed. 0 means any height.</summary>
     public int MaxHeight { get; set; }
 
-    /// <summary>Gets/sets minimum width allowed. 0 means any width.</summary>
+    /// <summary>Gets or sets the minimum width allowed. 0 means any width.</summary>
     public int MinWidth { get; set; }
 
-    /// <summary>Gets/sets minimum height allowed. 0 means any height.</summary>
+    /// <summary>Gets or sets the minimum height allowed. 0 means any height.</summary>
     public int MinHeight { get; set; }
 
     /// <summary>

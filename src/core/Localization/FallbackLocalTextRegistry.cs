@@ -1,7 +1,7 @@
 ﻿namespace Serenity.Localization;
 
 /// <summary>
-/// Adds key fallback to any ILocalTextSource implementation
+/// Adds key fallback behavior to any <see cref="ILocalTextRegistry"/> implementation.
 /// </summary>
 /// <remarks>
 /// Initializes a new instance of the <see cref="FallbackLocalTextSource"/> class.
@@ -12,13 +12,13 @@ public class FallbackLocalTextSource(ILocalTextRegistry source) : ILocalTextRegi
     private readonly ILocalTextRegistry source = source ?? throw new ArgumentNullException(nameof(source));
 
     /// <summary>
-    /// Returns localized representation which corresponds to the local text key or the fallback if none 
-    /// found in the registry.
+    /// Returns the localized representation that corresponds to the local text key, or a fallback
+    /// if none is found in the registry.
     /// </summary>
-    /// <param name="key">Local text key (e.g. Enums.Month.June)</param>
-    /// <param name="languageID">Language identifier</param>
-    /// <param name="pending">If pending approval text should be used</param>
-    /// <returns></returns>
+    /// <param name="key">The local text key (e.g. Enums.Month.June).</param>
+    /// <param name="languageID">The language identifier.</param>
+    /// <param name="pending">If pending approval text should be used.</param>
+    /// <returns>The localized text, a fallback, or <c>null</c> if none is found.</returns>
     public string? TryGet(string languageID, string key, bool pending)
     {
         string? text = source.TryGet(languageID, key, pending);
@@ -55,10 +55,10 @@ public class FallbackLocalTextSource(ILocalTextRegistry source) : ILocalTextRegi
     }
 
     /// <summary>
-    /// Get a fallback of the local text key
+    /// Gets a fallback of the local text key.
     /// </summary>
-    /// <param name="key">Local text key</param>
-    /// <returns>Local text key fallback</returns>
+    /// <param name="key">The local text key.</param>
+    /// <returns>The local text key fallback, or <c>null</c> if none can be derived.</returns>
     public static string? TryGetKeyFallback(string key)
     {
         // Get last part of the key after the last dot
@@ -83,22 +83,22 @@ public class FallbackLocalTextSource(ILocalTextRegistry source) : ILocalTextRegi
     }
 
     /// <summary>
-    /// Break up string without spaces (e.g. LastDirectoryUpdate) 
-    /// into a normal string (e.g. 'Last Directory Update')
+    /// Breaks up a string without spaces (e.g. LastDirectoryUpdate) into a normal string
+    /// (e.g. 'Last Directory Update').
     /// </summary>
-    /// <param name="value"></param>
-    /// <returns></returns>
+    /// <param name="value">The string to break up.</param>
+    /// <returns>The string with spaces inserted before each capital letter.</returns>
     public static string BreakUpString(string value)
     {
         return Regex.Replace(value, "((?<=[a-z])[A-Z]|[A-Z](?=[a-z]))", " $1", RegexOptions.Compiled).Trim();
     }
 
     /// <summary>
-    /// Adds a local text entry to the registry
+    /// Adds a local text entry to the registry.
     /// </summary>
-    /// <param name="languageID">Language ID (e.g. en-US, tr-TR)</param>
-    /// <param name="key">Local text key</param>
-    /// <param name="text">Translated text</param>
+    /// <param name="languageID">The language ID (e.g. en-US, tr-TR).</param>
+    /// <param name="key">The local text key.</param>
+    /// <param name="text">The translated text.</param>
     public void Add(string languageID, string key, string? text)
     {
         source.Add(languageID, key, text);

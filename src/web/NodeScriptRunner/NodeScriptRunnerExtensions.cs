@@ -9,21 +9,21 @@ using System.Diagnostics;
 namespace Serenity.Extensions.DependencyInjection;
 
 /// <summary>
-/// Contains extensions for <see cref="NodeScriptRunner"/>
+/// Contains extension methods for <see cref="NodeScriptRunner"/>.
 /// </summary>
 public static class NodeScriptRunnerExtensions
 {
     private const string LogCategoryName = "Serenity.Web.NodeScriptRunner";
 
     /// <summary>
-    /// Starts a node (NPM) script
+    /// Starts a node (NPM) script and attaches its output to the application logger.
     /// </summary>
-    /// <param name="appBuilder">Application builder</param>
-    /// <param name="scriptName">Script name in package.json</param>
-    /// <param name="arguments">Arguments</param>
-    /// <param name="workingDirectory">Working directory</param>
-    /// <param name="envVars">Environment variables</param>
-    /// <param name="pkgManagerCommand">Package manager command (default is "npm")</param>
+    /// <param name="appBuilder">The application builder.</param>
+    /// <param name="scriptName">The script name in <c>package.json</c>.</param>
+    /// <param name="arguments">The arguments to pass to the script.</param>
+    /// <param name="workingDirectory">The working directory; defaults to the content root path.</param>
+    /// <param name="envVars">Optional environment variables to set for the process.</param>
+    /// <param name="pkgManagerCommand">The package manager command (defaults to <c>npm</c>).</param>
     public static void StartNodeScript(this IApplicationBuilder appBuilder, string scriptName, 
         string arguments = null, string workingDirectory = null, 
         IDictionary<string, string> envVars = null, string pkgManagerCommand = "npm")

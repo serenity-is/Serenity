@@ -3,7 +3,7 @@
 /// <summary>
 /// An attribute that indicates this type is based on another row type.
 /// Used with form, columns etc. types to map their properties to
-/// corresponding property in a row, so that they inherit attributes.
+/// the corresponding property in a row, so that they inherit attributes.
 /// </summary>
 /// <remarks>
 /// Initializes a new instance of the <see cref="BasedOnRowAttribute"/> class.

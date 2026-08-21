@@ -14,10 +14,10 @@ public class CollapsibleAttribute(bool value = true) : Attribute
 
 
     /// <summary>
-    /// Gets a value indicating whether this <see cref="CollapsibleAttribute"/> is value.
+    /// Gets a value indicating whether this <see cref="CollapsibleAttribute"/> is enabled.
     /// </summary>
     /// <value>
-    ///   <c>true</c> if value; otherwise, <c>false</c>.
+    ///   <c>true</c> if enabled; otherwise, <c>false</c>.
     /// </value>
     public bool Value { get; private set; } = value;
 

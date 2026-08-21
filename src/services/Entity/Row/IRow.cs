@@ -11,12 +11,12 @@ public interface IRow : IEntityWithJoins
     /// <summary>
     /// Creates a new instance of the row type.
     /// </summary>
-    /// <returns></returns>
+    /// <returns>A new instance of the row type.</returns>
     IRow CreateNew();
     /// <summary>
     /// Clones the row.
     /// </summary>
-    /// <returns></returns>
+    /// <returns>A clone of this row.</returns>
     IRow CloneRow();
     /// <summary>
     /// Gets the fields.
@@ -39,7 +39,7 @@ public interface IRow : IEntityWithJoins
     /// Gets the dictionary data.
     /// </summary>
     /// <param name="key">The key.</param>
-    /// <returns></returns>
+    /// <returns>The value stored under the specified key, or <c>null</c> if not present.</returns>
     object GetDictionaryData(object key);
     /// <summary>
     /// Gets the dictionary data keys.
@@ -56,7 +56,7 @@ public interface IRow : IEntityWithJoins
     /// Gets the indexed data.
     /// </summary>
     /// <param name="index">The index.</param>
-    /// <returns></returns>
+    /// <returns>The value stored at the specified index, or <c>null</c> if not present.</returns>
     object GetIndexedData(int index);
     /// <summary>
     /// Sets the indexed data.

@@ -12,11 +12,6 @@ public class SqlServer2005Dialect : SqlServer2000Dialect
     /// </summary>
     public static new readonly ISqlDialect Instance = new SqlServer2005Dialect();
 
-    /// <summary>
-    /// Gets a value indicating whether the server supports ROWNUMBER.
-    /// </summary>
-    /// <value>
-    ///   <c>true</c> if the server supports ROWNUMBER; otherwise, <c>false</c>.
-    /// </value>
+    /// <inheritdoc/>
     public override bool CanUseRowNumber => true;
 }

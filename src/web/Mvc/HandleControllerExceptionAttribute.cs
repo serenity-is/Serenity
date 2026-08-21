@@ -6,7 +6,7 @@ using Microsoft.AspNetCore.Mvc.ViewFeatures;
 namespace Serenity.Services;
 
 /// <summary>
-/// An exception filter attribute to handle controller exceptions and return as view.
+/// An exception filter attribute to handle controller exceptions and return them as a view.
 /// </summary>
 public class HandleControllerExceptionAttribute : ExceptionFilterAttribute
 {

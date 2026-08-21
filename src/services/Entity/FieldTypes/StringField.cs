@@ -3,7 +3,7 @@ using System.Text.Json;
 namespace Serenity.Data;
 
 /// <summary>
-/// Field with a String value
+/// Field with a String value.
 /// </summary>
 /// <remarks>
 /// Initializes a new instance of the <see cref="StringField"/> class.
@@ -29,7 +29,7 @@ public class StringField(ICollection<Field> collection, string name, LocalText c
     /// <param name="flags">The flags.</param>
     /// <param name="getValue">The get value.</param>
     /// <param name="setValue">The set value.</param>
-    /// <returns></returns>
+    /// <returns>A new StringField instance.</returns>
     public static StringField Factory(ICollection<Field> collection, string name, LocalText caption, int size, FieldFlags flags,
         Func<IRow, string> getValue, Action<IRow, string> setValue)
     {
@@ -42,7 +42,7 @@ public class StringField(ICollection<Field> collection, string name, LocalText c
     /// <param name="reader">The reader.</param>
     /// <param name="index">The index.</param>
     /// <param name="row">The row.</param>
-    /// <exception cref="ArgumentNullException">reader</exception>
+    /// <exception cref="ArgumentNullException">reader is null.</exception>
     public override void GetFromReader(IDataReader reader, int index, IRow row)
     {
         ArgumentNullException.ThrowIfNull(reader);
@@ -56,11 +56,11 @@ public class StringField(ICollection<Field> collection, string name, LocalText c
     }
 
     /// <summary>
-    /// Compares the field values for two rows for an ascending index sort
+    /// Compares the field values for two rows for an ascending index sort.
     /// </summary>
     /// <param name="row1">The row1.</param>
     /// <param name="row2">The row2.</param>
-    /// <returns></returns>
+    /// <returns>A value indicating the relative order of the two rows.</returns>
     public override int IndexCompare(IRow row1, IRow row2)
     {
         var value1 = _getValue(row1);
@@ -82,7 +82,7 @@ public class StringField(ICollection<Field> collection, string name, LocalText c
     }
 
     /// <summary>
-    /// Serializes this fields value to JSON
+    /// Serializes this field's value to JSON.
     /// </summary>
     /// <param name="writer">The writer.</param>
     /// <param name="row">The row.</param>
@@ -93,12 +93,12 @@ public class StringField(ICollection<Field> collection, string name, LocalText c
     }
 
     /// <summary>
-    /// Deserializes this fields value from JSON
+    /// Deserializes this field's value from JSON.
     /// </summary>
     /// <param name="reader">The reader.</param>
     /// <param name="row">The row.</param>
     /// <param name="serializer">The serializer.</param>
-    /// <exception cref="ArgumentNullException">reader</exception>
+    /// <exception cref="ArgumentNullException">reader is null.</exception>
     public override void ValueFromJson(Newtonsoft.Json.JsonReader reader, IRow row, Newtonsoft.Json.JsonSerializer serializer)
     {
         ArgumentNullException.ThrowIfNull(reader);

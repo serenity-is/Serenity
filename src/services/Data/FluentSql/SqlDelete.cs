@@ -28,6 +28,7 @@ public sealed class SqlDelete : QueryWithParams, IFilterableQuery
     ///   Condition.</param>
     /// <returns>
     ///   SqlDelete object itself.</returns>
+    /// <exception cref="ArgumentNullException">condition is null or empty.</exception>
     public SqlDelete Where(string condition)
     {
         if (condition == null || condition.Length == 0)
@@ -60,6 +61,7 @@ public sealed class SqlDelete : QueryWithParams, IFilterableQuery
     ///   Conditions.</param>
     /// <returns>
     ///   SqlDelete object itself.</returns>
+    /// <exception cref="ArgumentNullException">conditions is null or empty.</exception>
     public SqlDelete Where(params string[] conditions)
     {
         if (conditions == null || conditions.Length == 0)
@@ -89,6 +91,7 @@ public sealed class SqlDelete : QueryWithParams, IFilterableQuery
     /// <param name="dialect">Target dialect</param>
     /// <returns>
     ///   Formatted query.</returns>
+    /// <exception cref="ArgumentNullException">tableName is null or empty.</exception>
     public static string Format(string tableName, string where, ISqlDialect dialect = null)
     {
         if (tableName == null || tableName.Length == 0)

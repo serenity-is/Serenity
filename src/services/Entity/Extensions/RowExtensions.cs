@@ -1,7 +1,7 @@
 namespace Serenity.Data;
 
 /// <summary>
-/// Contains extensions for row objects
+/// Contains extensions for row objects.
 /// </summary>
 public static class RowExtensions
 {
@@ -10,7 +10,7 @@ public static class RowExtensions
     /// </summary>
     /// <typeparam name="TRow">The type of the row.</typeparam>
     /// <param name="row">The row.</param>
-    /// <returns></returns>
+    /// <returns>A clone of the row.</returns>
     public static TRow Clone<TRow>(this TRow row) where TRow : IRow
     {
         return (TRow)(row.CloneRow());
@@ -21,9 +21,9 @@ public static class RowExtensions
     /// </summary>
     /// <typeparam name="TRow">The type of the row.</typeparam>
     /// <param name="row">The row.</param>
-    /// <param name="unassignedOnly">if set to <c>true</c> [unassigned only].</param>
-    /// <returns></returns>
-    /// <exception cref="ArgumentNullException">row</exception>
+    /// <param name="unassignedOnly">if set to <c>true</c>, only unassigned fields are set.</param>
+    /// <returns>The row with default values applied.</returns>
+    /// <exception cref="ArgumentNullException">row is null.</exception>
     public static TRow ApplyDefaultValues<TRow>(this TRow row, bool unassignedOnly = false)
         where TRow : IRow
     {
@@ -44,22 +44,22 @@ public static class RowExtensions
     }
 
     /// <summary>
-    /// Finds the field by its name
+    /// Finds the field by its name.
     /// </summary>
     /// <param name="row">The row.</param>
     /// <param name="name">The name.</param>
-    /// <returns></returns>
+    /// <returns>The field with the specified name.</returns>
     public static Field FindField(this IRow row, string name)
     {
         return row.Fields.FindField(name);
     }
 
     /// <summary>
-    /// Finds the field by property name.
+    /// Finds the field by its property name.
     /// </summary>
     /// <param name="row">The row.</param>
     /// <param name="name">The name.</param>
-    /// <returns></returns>
+    /// <returns>The field with the specified property name.</returns>
     public static Field FindFieldByPropertyName(this IRow row, string name)
     {
         return row.Fields.FindFieldByPropertyName(name);
@@ -69,7 +69,7 @@ public static class RowExtensions
     /// Gets the fields.
     /// </summary>
     /// <param name="row">The row.</param>
-    /// <returns></returns>
+    /// <returns>The fields of the row.</returns>
     public static RowFieldsBase GetFields(this IRow row)
     {
         return row.Fields;

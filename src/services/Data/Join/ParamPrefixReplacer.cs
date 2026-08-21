@@ -1,7 +1,7 @@
 ﻿namespace Serenity.Data;
 
 /// <summary>
-/// Param prefix replacer
+/// Replaces the parameter prefix character in SQL expressions.
 /// </summary>
 public static class ParamPrefixReplacer
 {
@@ -10,7 +10,7 @@ public static class ParamPrefixReplacer
     /// </summary>
     /// <param name="expression">The expression.</param>
     /// <param name="paramPrefix">The parameter prefix.</param>
-    /// <returns></returns>
+    /// <returns>The expression with parameter prefixes replaced.</returns>
     public static string Replace(string expression, char paramPrefix)
     {
         if (expression == null)

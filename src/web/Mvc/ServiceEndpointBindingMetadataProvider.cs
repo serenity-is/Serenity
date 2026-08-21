@@ -4,7 +4,7 @@ namespace Serenity.Services;
 
 /// <summary>
 /// An <see cref="IBindingMetadataProvider"/> which configures <c>ModelMetadata.IsBindingAllowed</c> to
-/// <c>false</c> for <see cref="IDbConnection" /> and <see cref="IUnitOfWork" /> types.
+/// <c>false</c> for <see cref="IDbConnection"/> and <see cref="IUnitOfWork"/> types.
 /// </summary>
 public class ServiceEndpointBindingMetadataProvider : IBindingMetadataProvider
 {

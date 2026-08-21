@@ -26,13 +26,7 @@ public class FirebirdSchemaProvider : ISchemaProvider
         public string COLUMN_NULLABLE { get; set; }
     }
 
-    /// <summary>
-    /// Gets the field infos.
-    /// </summary>
-    /// <param name="connection">The connection.</param>
-    /// <param name="schema">The schema.</param>
-    /// <param name="table">The table.</param>
-    /// <returns></returns>
+    /// <inheritdoc/>
     public IEnumerable<FieldInfo> GetFieldInfos(IDbConnection connection, string schema, string table)
     {
         return connection.Query<FieldInfoSource>(@"
@@ -82,13 +76,7 @@ public class FirebirdSchemaProvider : ISchemaProvider
         });
     }
 
-    /// <summary>
-    /// Gets the foreign keys.
-    /// </summary>
-    /// <param name="connection">The connection.</param>
-    /// <param name="schema">The schema.</param>
-    /// <param name="table">The table.</param>
-    /// <returns></returns>
+    /// <inheritdoc/>
     public IEnumerable<ForeignKeyInfo> GetForeignKeys(IDbConnection connection, string schema, string table)
     {
         return connection.Query<ForeignKeyInfo>(@"
@@ -121,13 +109,7 @@ public class FirebirdSchemaProvider : ISchemaProvider
         });
     }
 
-    /// <summary>
-    /// Gets the identity fields.
-    /// </summary>
-    /// <param name="connection">The connection.</param>
-    /// <param name="schema">The schema.</param>
-    /// <param name="table">The table.</param>
-    /// <returns></returns>
+    /// <inheritdoc/>
     public IEnumerable<string> GetIdentityFields(IDbConnection connection, string schema, string table)
     {
         var match = connection.Query<string>(@"
@@ -166,13 +148,7 @@ public class FirebirdSchemaProvider : ISchemaProvider
             .Select(StringHelper.TrimToNull);
     }
 
-    /// <summary>
-    /// Gets the primary key fields.
-    /// </summary>
-    /// <param name="connection">The connection.</param>
-    /// <param name="schema">The schema.</param>
-    /// <param name="table">The table.</param>
-    /// <returns></returns>
+    /// <inheritdoc/>
     public IEnumerable<string> GetPrimaryKeyFields(IDbConnection connection, string schema, string table)
     {
         return connection.Query<string>(@"
@@ -191,11 +167,7 @@ public class FirebirdSchemaProvider : ISchemaProvider
         public string ISVIEW { get; set; }
     }
 
-    /// <summary>
-    /// Gets the table names.
-    /// </summary>
-    /// <param name="connection">The connection.</param>
-    /// <returns></returns>
+    /// <inheritdoc/>
     public IEnumerable<TableName> GetTableNames(IDbConnection connection)
     {
         return connection.Query<TableNameSource>(@"
@@ -239,7 +211,7 @@ public class FirebirdSchemaProvider : ISchemaProvider
     /// <param name="subType">Type of the sub.</param>
     /// <param name="size">The size.</param>
     /// <param name="scale">The scale.</param>
-    /// <returns></returns>
+    /// <returns>The SQL type name.</returns>
     public static string GetSqlTypeFromBlrType(int type, int subType, int size, int scale)
     {
         switch (type)

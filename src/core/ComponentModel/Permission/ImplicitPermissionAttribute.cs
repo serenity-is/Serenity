@@ -1,9 +1,9 @@
 ﻿namespace Serenity.ComponentModel;
 
 /// <summary>
-/// Placed on permission keys to define an implicitly assigned 
+/// Placed on permission keys to define implicitly assigned
 /// permissions when a user / role has the permission.
-/// Currently only implemented in premium app.
+/// Currently only implemented in the premium app.
 /// </summary>
 /// <seealso cref="Attribute" />
 /// <remarks>

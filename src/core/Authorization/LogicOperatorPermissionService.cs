@@ -2,19 +2,19 @@
 namespace Serenity.Web;
 
 /// <summary>
-/// Adds AND OR operator support to any IPermissionService implementation
+/// Decorates an <see cref="IPermissionService"/> to support logical operators (<c>!</c>, <c>&amp;</c>, <c>|</c>, parentheses)
+/// in permission expressions.
 /// </summary>
 /// <remarks>
-/// Register this class in your application start, to allow !, |, &amp;, () operators
-/// in your permission services, e.g.
+/// Register this decorator at application startup to enable expressions such as <c>PermissionA &amp; !PermissionB</c>.
 /// <code>
 /// registrar.RegisterInstance&lt;IPermissionService&gt;(new LogicOperatorPermissionService(new MyPermissionService()))
 /// </code>
 /// </remarks>
 /// <remarks>
-/// Creates a new LogicOperatorPermissionService wrapping passed IPermissionService
+/// Creates a new instance of the <see cref="LogicOperatorPermissionService"/> class wrapping the specified permission service.
 /// </remarks>
-/// <param name="permissionService">Permission service to wrap with AND/OR functionality</param>
+/// <param name="permissionService">The underlying permission service to delegate simple permission checks to.</param>
 public class LogicOperatorPermissionService(IPermissionService permissionService) : IPermissionService, ITransientGrantor
 {
     private static readonly char[] chars = ['|', '&', '!', '(', ')'];
@@ -39,10 +39,10 @@ public class LogicOperatorPermissionService(IPermissionService permissionService
     }
 
     /// <summary>
-    /// Returns true if user has specified permission
+    /// Determines whether the current user has the specified permission or satisfies the given logical permission expression.
     /// </summary>
-    /// <param name="permission">Permission to check</param>
-    /// <returns>True if user has specified permission</returns>
+    /// <param name="permission">The permission key or logical expression (supporting <c>!</c>, <c>&amp;</c>, <c>|</c>, and parentheses).</param>
+    /// <returns><c>true</c> if the expression evaluates to granted; otherwise <c>false</c>.</returns>
     public bool HasPermission(string permission)
     {
         if (string.IsNullOrEmpty(permission) ||

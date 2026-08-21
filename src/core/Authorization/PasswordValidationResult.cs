@@ -1,40 +1,40 @@
 ﻿namespace Serenity.ComponentModel;
 
 /// <summary>
-/// Password validation result
+/// Represents the result of a password validation attempt.
 /// </summary>
 public enum PasswordValidationResult
 {
     /// <summary>
-    /// Username is empty
+    /// The username was empty.
     /// </summary>
     EmptyUsername,
     /// <summary>
-    /// Password is empty
+    /// The password was empty.
     /// </summary>
     EmptyPassword,
     /// <summary>
-    /// User is not active
+    /// The user account is not active.
     /// </summary>
     InactiveUser,
     /// <summary>
-    /// User source is not found
+    /// The user source could not be found.
     /// </summary>
     UnknownSource,
     /// <summary>
-    /// To many retries
+    /// The request was throttled due to too many attempts.
     /// </summary>
     Throttle,
     /// <summary>
-    /// Directory error
+    /// A directory service error occurred.
     /// </summary>
     DirectoryError,
     /// <summary>
-    /// Invalid
+    /// The credentials are invalid.
     /// </summary>
     Invalid,
     /// <summary>
-    /// Valid
+    /// The credentials are valid.
     /// </summary>
     Valid
 }

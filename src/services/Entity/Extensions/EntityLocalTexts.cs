@@ -1,7 +1,7 @@
 namespace Serenity.Localization;
 
 /// <summary>
-/// EntityLocalTexts
+/// Contains extension methods to register local texts for entity rows.
 /// </summary>
 public static class EntityLocalTexts
 {

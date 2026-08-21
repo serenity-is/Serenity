@@ -5,33 +5,33 @@ using Microsoft.AspNetCore.Mvc;
 namespace Serenity.Services;
 
 /// <summary>
-/// An action result type containing a object with status code
+/// An action result type containing an object with a status code.
 /// </summary>
-/// <typeparam name="TResponse">Response data type</typeparam>
+/// <typeparam name="TResponse">The response data type.</typeparam>
 /// <remarks>
-/// Creates a new instance of the class
+/// Initializes a new instance of the <see cref="ResultWithStatus{TResponse}"/> class.
 /// </remarks>
-/// <param name="data">Data object</param>
-/// <param name="statusCode">Status code</param>
+/// <param name="data">The data object.</param>
+/// <param name="statusCode">The status code.</param>
 public class ResultWithStatus<TResponse>(int statusCode, TResponse data) : StatusCodeResult(statusCode)
 {
     /// <summary>
-    /// Content encoding
+    /// Gets or sets the content encoding.
     /// </summary>
     public Encoding ContentEncoding { get; set; }
 
     /// <summary>
-    /// Content type
+    /// Gets or sets the content type.
     /// </summary>
     public string ContentType { get; set; }
 
     /// <summary>
-    /// JSON serializer settings
+    /// Gets or sets the JSON serializer settings.
     /// </summary>
     public JsonSerializerOptions SerializerOptions { get; set; } = JSON.Defaults.Strict;
 
     /// <summary>
-    /// The data
+    /// Gets or sets the data.
     /// </summary>
     public TResponse Data { get; set; } = data;
 

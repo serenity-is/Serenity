@@ -3,17 +3,17 @@ using System.Text.Json;
 namespace Serenity.Localization;
 
 /// <summary>
-/// Contains helper methods for registration of local texts in hierarchical/dictionary formatted JSON files.
+/// Contains helper methods for registration of local texts in hierarchical or dictionary formatted JSON files.
 /// </summary>
 public static class JsonLocalTextRegistration
 {
     /// <summary>
-    /// Adds translation from a hierarchical local text dictionary parsed from JSON file.
+    /// Adds translations from a hierarchical local text dictionary parsed from a JSON file.
     /// </summary>
-    /// <param name="nested">Object parsed from local text JSON string</param>
-    /// <param name="prefix">Prefix to prepend before local text keys</param>
-    /// <param name="languageID">Language ID</param>
-    /// <param name="registry">Registry</param>
+    /// <param name="nested">The object parsed from the local text JSON string.</param>
+    /// <param name="prefix">The prefix to prepend before local text keys.</param>
+    /// <param name="languageID">The language ID.</param>
+    /// <param name="registry">The registry to add texts to.</param>
     public static void AddFromNestedDictionary(IDictionary<string, object> nested, string prefix, string languageID, ILocalTextRegistry registry)
     {
         if (nested == null)
@@ -30,11 +30,11 @@ public static class JsonLocalTextRegistration
     }
 
     /// <summary>
-    /// Converts translation from a hierarchical local text dictionary to a simple dictionary.
+    /// Converts translations from a hierarchical local text dictionary to a simple dictionary.
     /// </summary>
-    /// <param name="nested">Object parsed from local text JSON string</param>
-    /// <param name="prefix">Prefix to prepend before local text keys</param>
-    /// <param name="target">Target dictionary that will contain keys and translations</param>
+    /// <param name="nested">The object parsed from the local text JSON string.</param>
+    /// <param name="prefix">The prefix to prepend before local text keys.</param>
+    /// <param name="target">The target dictionary that will contain the keys and translations.</param>
     public static void ProcessNestedDictionary<TValue>(IDictionary<string, TValue> nested, string prefix, Dictionary<string, string> target)
     {
         if (nested == null)
@@ -61,12 +61,12 @@ public static class JsonLocalTextRegistration
     }
 
     /// <summary>
-    /// Adds translations from JSON files at specified path. File names in this directory should be in format 
-    /// {anyprefix}.{languageID}.json where {languageID} is a language code like 'en', 'en-GB' etc.
+    /// Adds translations from JSON files at the specified path. File names in this directory should be in the format
+    /// {anyprefix}.{languageID}.json where {languageID} is a language code like 'en', 'en-GB', etc.
     /// </summary>
-    /// <param name="registry">Registry</param>
-    /// <param name="path">Path containing JSON files</param>
-    /// <param name="fileSystem">File system</param>
+    /// <param name="registry">The registry to add texts to.</param>
+    /// <param name="path">The path containing the JSON files.</param>
+    /// <param name="fileSystem">The file system to use, or <c>null</c> to use the physical file system.</param>
     public static void AddJsonTexts(this ILocalTextRegistry registry, string path, IFileSystem? fileSystem = null)
     {
         if (registry is null)
@@ -97,12 +97,12 @@ public static class JsonLocalTextRegistration
     }
 
     /// <summary>
-    /// Adds json texts from embedded resources
+    /// Adds JSON texts from embedded resources.
     /// </summary>
-    /// <param name="registry">The text registry</param>
-    /// <param name="typeSource">Type source</param>
-    /// <returns>The text registry</returns>
-    /// <exception cref="ArgumentNullException">registry, provider or sub path is null</exception>
+    /// <param name="registry">The text registry.</param>
+    /// <param name="typeSource">The type source.</param>
+    /// <returns>The text registry.</returns>
+    /// <exception cref="ArgumentNullException">registry or type source is null.</exception>
     public static ILocalTextRegistry AddJsonResourceTexts(this ILocalTextRegistry registry, ITypeSource typeSource)
     {
         if (registry is null)
@@ -118,12 +118,12 @@ public static class JsonLocalTextRegistration
     }
 
     /// <summary>
-    /// Adds json texts from embedded resources
+    /// Adds JSON texts from embedded resources.
     /// </summary>
-    /// <param name="registry">The text registry</param>
-    /// <param name="assemblies">List of assemblies</param>
-    /// <returns>The text registry</returns>
-    /// <exception cref="ArgumentNullException">registry, provider or sub path is null</exception>
+    /// <param name="registry">The text registry.</param>
+    /// <param name="assemblies">The list of assemblies.</param>
+    /// <returns>The text registry.</returns>
+    /// <exception cref="ArgumentNullException">registry or assemblies is null.</exception>
     public static ILocalTextRegistry AddJsonResourceTexts(this ILocalTextRegistry registry, IEnumerable<Assembly> assemblies)
     {
         if (assemblies is null)
@@ -162,9 +162,10 @@ public static class JsonLocalTextRegistration
         new("^[a-z][a-z](-[A-Z][A-Z])?$");
 
     /// <summary>
-    /// Parses language ID from the file path
+    /// Parses the language ID from the file path.
     /// </summary>
-    /// <param name="path">Path</param>
+    /// <param name="path">The path.</param>
+    /// <returns>The language ID, or <c>null</c> if it cannot be determined.</returns>
     public static string? ParseLanguageIdFromPath(string path)
     {
         var langID = System.IO.Path.GetFileNameWithoutExtension(

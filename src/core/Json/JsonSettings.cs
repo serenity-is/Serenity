@@ -4,27 +4,27 @@ using Newtonsoft.Json.Converters;
 namespace Serenity;
 
 /// <summary>
-/// Contains default Serenity JSON serialization settings for Newtonsoft.Json.
+/// Contains the default Serenity JSON serialization settings for Newtonsoft.Json.
 /// </summary>
 public static class JsonSettings
 {
     /// <summary>
-    /// The tolerant settings, ignores missing members, reference loops on deserialization, ignores nulls
+    /// The tolerant settings, which ignore missing members and reference loops on deserialization, and ignore nulls.
     /// </summary>
     public static JsonSerializerSettings Tolerant;
 
     /// <summary>
-    /// The tolerant settings, ignores missing members, reference loops on deserialization, includes nulls
+    /// The tolerant settings, which ignore missing members and reference loops on deserialization, and include nulls.
     /// </summary>
     public static JsonSerializerSettings TolerantIncludeNulls;
 
     /// <summary>
-    /// The stricter settings, raises error on missing members / reference loops, ignores nulls.
+    /// The stricter settings, which raise an error on missing members and reference loops, and ignore nulls.
     /// </summary>
     public static JsonSerializerSettings Strict;
 
     /// <summary>
-    /// The stricter settings, raises error on missing members / reference loops, includes nulls.
+    /// The stricter settings, which raise an error on missing members and reference loops, and include nulls.
     /// </summary>
     public static JsonSerializerSettings StrictIncludeNulls;
 
@@ -46,9 +46,9 @@ public static class JsonSettings
     }
 
     /// <summary>
-    /// Creates a JsonSerializerSettings object with common values and converters.
+    /// Creates a <see cref="JsonSerializerSettings"/> object with the common Serenity values and converters.
     /// </summary>
-    /// <returns></returns>
+    /// <returns>A <see cref="JsonSerializerSettings"/> instance with the default Serenity converters and options.</returns>
     public static JsonSerializerSettings CreateDefaults()
     {
         return new JsonSerializerSettings

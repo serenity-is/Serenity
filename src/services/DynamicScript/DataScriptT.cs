@@ -1,14 +1,14 @@
 ﻿namespace Serenity.Web;
 
 /// <summary>
-/// Generic subclass of the <see cref="DataScript"/>
+/// Generic subclass of the <see cref="DataScript"/>.
 /// </summary>
-/// <typeparam name="TData">Data type</typeparam>
+/// <typeparam name="TData">The data type.</typeparam>
 public abstract class DataScript<TData> : DataScript
     where TData: class
 {
     /// <summary>
-    /// Creates a new instance of the class
+    /// Creates a new instance of the class.
     /// </summary>
     protected DataScript()
     {
@@ -27,7 +27,7 @@ public abstract class DataScript<TData> : DataScript
     }
 
     /// <summary>
-    /// Gets the data object
+    /// Gets the data object.
     /// </summary>
     protected abstract TData GetData();
 }

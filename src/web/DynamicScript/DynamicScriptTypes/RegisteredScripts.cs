@@ -4,7 +4,7 @@ using System.Text.Json;
 namespace Serenity.Web;
 
 /// <summary>
-/// A dynamic script type for registered scripts
+/// A dynamic script type for registered scripts.
 /// </summary>
 public class RegisteredScripts : DynamicScript, INamedDynamicScript, IGetScriptData
 {
@@ -14,9 +14,9 @@ public class RegisteredScripts : DynamicScript, INamedDynamicScript, IGetScriptD
     public string ScriptName => "RegisteredScripts";
 
     /// <summary>
-    /// Creates a new instance of the class
+    /// Initializes a new instance of the <see cref="RegisteredScripts"/> class.
     /// </summary>
-    /// <param name="scriptManager"></param>
+    /// <param name="scriptManager">The dynamic script manager.</param>
     public RegisteredScripts(IDynamicScriptManager scriptManager)
     {
         Expiration = TimeSpan.FromDays(-1);

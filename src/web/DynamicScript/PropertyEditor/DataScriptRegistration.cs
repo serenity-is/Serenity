@@ -3,18 +3,17 @@
 namespace Serenity.Web;
 
 /// <summary>
-/// Contains helper methods for data script registration
+/// Contains helper methods for data script registration.
 /// </summary>
 public class DataScriptRegistration
 {
     /// <summary>
-    /// Creates and registers dynamic scripts for types with <see cref="DataScriptAttribute"/>
+    /// Creates and registers dynamic scripts for types with <see cref="DataScriptAttribute"/>.
     /// </summary>
-    /// <param name="scriptManager">Dynamic script manager</param>
-    /// <param name="typeSource">Type source</param>
-    /// <param name="serviceProvider">Service provider</param>
-    /// <exception cref="ArgumentNullException">Script manager, type source or ,
-    /// service provider is null</exception>
+    /// <param name="scriptManager">The dynamic script manager.</param>
+    /// <param name="typeSource">The type source.</param>
+    /// <param name="serviceProvider">The service provider.</param>
+    /// <exception cref="ArgumentNullException">Script manager, type source or service provider is <c>null</c>.</exception>
     public static void RegisterDataScripts(IDynamicScriptManager scriptManager,
         ITypeSource typeSource, IServiceProvider serviceProvider)
     {

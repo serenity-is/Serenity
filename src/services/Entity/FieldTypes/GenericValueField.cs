@@ -1,7 +1,7 @@
 namespace Serenity.Data;
 
 /// <summary>
-/// Base class for fields with a value type value
+/// Base class for fields with a value type value.
 /// </summary>
 /// <typeparam name="TValue">The type of the value.</typeparam>
 /// <seealso cref="Field" />
@@ -9,15 +9,15 @@ namespace Serenity.Data;
 public abstract class GenericValueField<TValue> : Field, IEnumTypeField where TValue : struct, IComparable<TValue>
 {
     /// <summary>
-    /// The get value
+    /// The get value.
     /// </summary>
     protected internal Func<IRow, TValue?> _getValue;
     /// <summary>
-    /// The set value
+    /// The set value.
     /// </summary>
     protected internal Action<IRow, TValue?> _setValue;
     /// <summary>
-    /// The enum type
+    /// The enum type.
     /// </summary>
     protected internal Type _enumType;
 
@@ -34,7 +34,7 @@ public abstract class GenericValueField<TValue> : Field, IEnumTypeField where TV
     /// </summary>
     /// <param name="source">The source.</param>
     /// <param name="provider">The provider.</param>
-    /// <returns></returns>
+    /// <returns>The converted value.</returns>
     public override object ConvertValue(object source, IFormatProvider provider)
     {
         if (source is Newtonsoft.Json.Linq.JValue jValue)
@@ -129,11 +129,11 @@ public abstract class GenericValueField<TValue> : Field, IEnumTypeField where TV
     }
 
     /// <summary>
-    /// Compares the field values for two rows for an ascending index sort
+    /// Compares the field values for two rows for an ascending index sort.
     /// </summary>
     /// <param name="row1">The row1.</param>
     /// <param name="row2">The row2.</param>
-    /// <returns></returns>
+    /// <returns>A value indicating the relative order of the two rows.</returns>
     public override int IndexCompare(IRow row1, IRow row2)
     {
         var val1 = _getValue(row1);

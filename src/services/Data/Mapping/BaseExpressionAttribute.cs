@@ -14,12 +14,14 @@ public abstract class BaseExpressionAttribute : Attribute
     /// expression via ISqlExpressionTranslator interface.
     /// </summary>
     /// <param name="dialect">Target dialect</param>
+    /// <returns>The translated expression for the specified dialect.</returns>
     public abstract string Translate(ISqlDialect dialect);
 
     /// <summary>
-    /// Converts the expression to string for specified dialect
+    /// Converts the expression to string for specified dialect.
     /// </summary>
     /// <param name="dialect">Target dialect</param>
+    /// <returns>The expression formatted for the specified dialect.</returns>
     public string ToString(ISqlDialect dialect)
     {
         string expression;
@@ -38,7 +40,7 @@ public abstract class BaseExpressionAttribute : Attribute
     }
 
     /// <summary>
-    /// Gets sets an optional format string to apply with
+    /// Gets or sets an optional format string to apply with
     /// {0} placeholder for the expression.
     /// </summary>
     public string Format { get; set; }
@@ -51,7 +53,8 @@ public abstract class BaseExpressionAttribute : Attribute
     /// </summary>
     /// <param name="expression">Expression</param>
     /// <param name="dialect">Target dialect</param>
-    /// <exception cref="ArgumentNullException">Dialect is null</exception>
+    /// <returns>The expression converted to a string.</returns>
+    /// <exception cref="ArgumentNullException">dialect is null.</exception>
     public static string ToString(object expression, ISqlDialect dialect)
     {
         ArgumentNullException.ThrowIfNull(dialect);

@@ -85,13 +85,13 @@ public static class ServiceQueryHelper
     }
 
     /// <summary>
-    /// Applies skip, take and exclude total count parameters to the query
+    /// Applies skip, take and exclude total count parameters to the query.
     /// </summary>
     /// <param name="query">Query</param>
     /// <param name="skip">Skip parameter</param>
     /// <param name="take">Take parameter</param>
     /// <param name="excludeTotalCount">ExcludeTotalCount flag</param>
-    /// <returns></returns>
+    /// <returns>The query.</returns>
     public static SqlQuery ApplySkipTakeAndCount(this SqlQuery query, int skip, int take,
         bool excludeTotalCount)
     {

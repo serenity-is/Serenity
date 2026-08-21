@@ -2,7 +2,7 @@
 namespace Serenity.IO;
 
 /// <summary>
-/// A fast glob implementation, compatible with .gitignore patterns of GIT
+/// A fast glob implementation, compatible with the .gitignore patterns of GIT.
 /// </summary>
 public class GlobFilter
 {
@@ -24,13 +24,13 @@ public class GlobFilter
     private readonly char[] FolderSeps = ['\\', '/'];
 
     /// <summary>
-    /// Creates a new GlobFilter, containing both include and exclude patterns.
-    /// When "include" is null / empty, all files are included by default, unless
-    /// they match a pattern in "exclude" list.
-    /// When "exclude" is null, it is ignored.
+    /// Creates a new <see cref="GlobFilter"/> containing both include and exclude patterns.
+    /// When <paramref name="include"/> is <c>null</c> or empty, all files are included by default,
+    /// unless they match a pattern in the <paramref name="exclude"/> list.
+    /// When <paramref name="exclude"/> is <c>null</c>, it is ignored.
     /// </summary>
-    /// <param name="include">List of include patterns</param>
-    /// <param name="exclude">List of exclude patterns</param>
+    /// <param name="include">The list of include patterns.</param>
+    /// <param name="exclude">The list of exclude patterns.</param>
     public GlobFilter(IEnumerable<string> include, IEnumerable<string> exclude)
         : this(include)
     {
@@ -43,9 +43,9 @@ public class GlobFilter
     }
 
     /// <summary>
-    /// Creates a new GlobFilter, with just "include" globs.
+    /// Creates a new <see cref="GlobFilter"/> with just the include globs.
     /// </summary>
-    /// <param name="globs">List of patterns</param>
+    /// <param name="globs">The list of patterns.</param>
     public GlobFilter(IEnumerable<string> globs)
     {
         matchers = [];
@@ -334,9 +334,10 @@ public class GlobFilter
     }
 
     /// <summary>
-    /// Wildcards to regex conversion. Inspired from NuGet source code.
+    /// Converts a wildcard pattern to a compiled regular expression. Inspired by the NuGet source code.
     /// </summary>
-    /// <param name="wildcard">The wildcard.</param>
+    /// <param name="wildcard">The wildcard pattern.</param>
+    /// <returns>A compiled regular expression that matches the given wildcard pattern.</returns>
     private static Regex WildcardToRegex(string wildcard)
     {
         var pattern = Regex.Escape(wildcard);
@@ -351,10 +352,10 @@ public class GlobFilter
     }
 
     /// <summary>
-    /// Normalizes the glob by replacing back slashes etc.
+    /// Normalizes the glob by replacing back slashes and adding the appropriate recursive prefixes and suffixes.
     /// </summary>
-    /// <param name="glob">The glob.</param>
-    /// <returns></returns>
+    /// <param name="glob">The glob pattern.</param>
+    /// <returns>The normalized glob pattern, or <c>null</c> if the input is null or empty.</returns>
     private static string? NormalizeGlob(string? glob)
     {
         if (string.IsNullOrEmpty(glob))

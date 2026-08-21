@@ -25,6 +25,7 @@ public class SqlInsert : QueryWithParams, ISetFieldByStatement
     /// <summary>
     /// Gets the identity column.
     /// </summary>
+    /// <returns>The identity column name, or <c>null</c> if none is set.</returns>
     public string IdentityColumn()
     {
         return identityColumn;
@@ -34,7 +35,7 @@ public class SqlInsert : QueryWithParams, ISetFieldByStatement
     /// Sets the identity column.
     /// </summary>
     /// <param name="value">The identity column.</param>
-    /// <returns></returns>
+    /// <returns>The SqlInsert object itself.</returns>
     public SqlInsert IdentityColumn(string value)
     {
         identityColumn = value;
@@ -42,8 +43,9 @@ public class SqlInsert : QueryWithParams, ISetFieldByStatement
     }
 
     /// <summary>
-    /// Returns field and value expression pairs
+    /// Returns field and value expression pairs.
     /// </summary>
+    /// <returns>The list of field and value expression pairs.</returns>
     public IReadOnlyList<FieldExpressionPair> GetFieldExpressions()
     {
         return fieldExpressions;
@@ -52,6 +54,7 @@ public class SqlInsert : QueryWithParams, ISetFieldByStatement
     /// <summary>
     /// Gets the table name.
     /// </summary>
+    /// <returns>The table name.</returns>
     public string TableName()
     {
         return tableName;
@@ -65,6 +68,7 @@ public class SqlInsert : QueryWithParams, ISetFieldByStatement
     ///   Field expression, required.</param>
     /// <returns>
     ///   SqlInsert object itself.</returns>
+    /// <exception cref="ArgumentNullException">field or expression is null or empty.</exception>
     public SqlInsert SetTo(string field, string expression)
     {
         if (field == null || field.Length == 0)
@@ -118,6 +122,7 @@ public class SqlInsert : QueryWithParams, ISetFieldByStatement
     ///   Field (required).</param>
     /// <returns>
     ///   SqlInsert object itself.</returns>
+    /// <exception cref="ArgumentNullException">field is null or empty.</exception>
     public SqlInsert SetNull(string field)
     {
         if (string.IsNullOrEmpty(field))
@@ -129,7 +134,7 @@ public class SqlInsert : QueryWithParams, ISetFieldByStatement
     }
 
     /// <summary>Clones the query.</summary>
-    /// <returns>Clone.</returns>
+    /// <returns>A clone of this query.</returns>
     public SqlInsert Clone()
     {
         SqlInsert clone = new(tableName);
@@ -142,6 +147,9 @@ public class SqlInsert : QueryWithParams, ISetFieldByStatement
     /// <summary>
     /// Sets the dialect (SQL server type / version) for query.
     /// </summary>
+    /// <param name="dialect">The dialect to use.</param>
+    /// <returns>The SqlInsert object itself.</returns>
+    /// <exception cref="ArgumentNullException">dialect is null.</exception>
     public SqlInsert Dialect(ISqlDialect dialect)
     {
         this.dialect = dialect ?? throw new ArgumentNullException("dialect");
@@ -173,6 +181,8 @@ public class SqlInsert : QueryWithParams, ISetFieldByStatement
     /// <param name="dialect">Target dialect</param>
     /// <returns>
     ///   Formatted query.</returns>
+    /// <exception cref="ArgumentNullException">tableName or fieldExpressions is null.</exception>
+    /// <exception cref="ArgumentOutOfRangeException">fieldExpressions has an odd number of elements.</exception>
     [Obsolete("Use overload with IEnumerable<FieldExpressionPair>")]
     public static string Format(string tableName, List<string> fieldExpressions, ISqlDialect dialect = null)
     {
@@ -196,6 +206,7 @@ public class SqlInsert : QueryWithParams, ISetFieldByStatement
     /// <param name="dialect">Target dialect</param>
     /// <returns>
     ///   Formatted query.</returns>
+    /// <exception cref="ArgumentNullException">tableName or fieldExpressions is null.</exception>
     public static string Format(string tableName, IEnumerable<FieldExpressionPair> fieldExpressions, ISqlDialect dialect = null)
     {
         if (tableName == null || tableName.Length == 0)

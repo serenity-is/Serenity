@@ -4,15 +4,15 @@ using Serenity.PropertyGrid;
 namespace Serenity.Web;
 
 /// <summary>
-/// Abstract base class for <see cref="ColumnsScript"/> and <see cref="FormScript"/>
+/// Abstract base class for <see cref="ColumnsScript"/> and <see cref="FormScript"/>.
 /// </summary>
 /// <remarks>
-/// Creates a new instance of the class
+/// Creates a new instance of the class.
 /// </remarks>
-/// <param name="scriptName">Script name</param>
-/// <param name="type">Columns or form type</param>
-/// <param name="propertyProvider">Property item provider</param>
-/// <param name="serviceProvider">Service provider</param>
+/// <param name="scriptName">The script name.</param>
+/// <param name="type">The columns or form type.</param>
+/// <param name="propertyProvider">The property item provider.</param>
+/// <param name="serviceProvider">The service provider.</param>
 public abstract partial class PropertyItemsScript(string scriptName, Type type,
     IPropertyItemProvider propertyProvider, IServiceProvider serviceProvider) : INamedDynamicScript, IGetScriptData
 {
@@ -24,11 +24,11 @@ public abstract partial class PropertyItemsScript(string scriptName, Type type,
     private EventHandler scriptChanged;
 
     /// <summary>
-    /// Checks the name if its empty or null
+    /// Checks the name if it is empty or null.
     /// </summary>
-    /// <param name="name"></param>
-    /// <returns></returns>
-    /// <exception cref="ArgumentNullException"></exception>
+    /// <param name="name">The name to check.</param>
+    /// <returns>The validated name.</returns>
+    /// <exception cref="ArgumentNullException">name is null or empty.</exception>
     protected static string CheckName(string name)
     {
         if (string.IsNullOrEmpty(name))

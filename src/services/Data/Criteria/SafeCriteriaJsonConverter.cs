@@ -3,7 +3,8 @@ using System.Text.Json;
 namespace Serenity.JsonConverters;
 
 /// <summary>
-///   Serialize/deserialize a BaseCriteria object and checks for safety of criteria expressions.</summary>
+/// Serializes and deserializes a <see cref="BaseCriteria"/> object and checks for the safety of criteria expressions.
+/// </summary>
 public class SafeCriteriaJsonConverter : CriteriaJsonConverter
 {
     /// <inheritdoc/>

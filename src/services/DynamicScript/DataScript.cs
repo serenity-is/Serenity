@@ -1,33 +1,33 @@
 namespace Serenity.Web;
 
 /// <summary>
-/// Dynamic script that contains remote data
+/// Dynamic script that contains remote data.
 /// </summary>
 public class DataScript : DynamicScript, INamedDynamicScript, IGetScriptData
 {
     /// <summary>
-    /// Key for the data script
+    /// Key for the data script.
     /// </summary>
     protected string key;
 
     /// <summary>
-    /// Callback to get data
+    /// Callback to get the data.
     /// </summary>
     protected Func<object> getData;
 
     /// <summary>
-    /// Creates a new instance of the class
+    /// Creates a new instance of the class.
     /// </summary>
     protected DataScript()
     {
     }
 
     /// <summary>
-    /// Creates a new instance of the class
+    /// Creates a new instance of the class.
     /// </summary>
-    /// <param name="key">Data script key</param>
-    /// <param name="getData">Get data callback</param>
-    /// <exception cref="ArgumentNullException"></exception>
+    /// <param name="key">The data script key.</param>
+    /// <param name="getData">The get data callback.</param>
+    /// <exception cref="ArgumentNullException">getData is null.</exception>
     public DataScript(string key, Func<object> getData)
     {
         this.getData = getData ?? throw new ArgumentNullException(nameof(getData));
@@ -54,7 +54,7 @@ public class DataScript : DynamicScript, INamedDynamicScript, IGetScriptData
     }
 
     /// <summary>
-    /// Format string for Serenity.setScriptData({0}, {1})
+    /// Format string for Serenity.setScriptData({0}, {1}).
     /// </summary>
     public const string SetScriptDataFormat =
         "((typeof Serenity!=='undefined'&&Serenity.setScriptData)||" +

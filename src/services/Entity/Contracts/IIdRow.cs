@@ -1,7 +1,8 @@
 ﻿namespace Serenity.Data;
 
 /// <summary>
-///   Basic interface for rows that has an ID field. You should put [IdProperty] attribute to corresponding field.</summary>
+///   Basic interface for rows that have an ID field. You should put the [IdProperty] attribute on the corresponding field.
+/// </summary>
 public interface IIdRow : IRow
 {
 }

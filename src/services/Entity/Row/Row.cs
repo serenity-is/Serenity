@@ -58,9 +58,9 @@ public abstract partial class Row<TFields> : IRow, IRow<TFields>
     TFields IRow<TFields>.Fields => fields;
     RowFieldsBase IRow.Fields => fields;
     /// <summary>
-    /// Gets the fields.
+    /// Gets the fields instance for this row type.
     /// </summary>
-    /// <returns></returns>
+    /// <returns>The fields instance for this row type.</returns>
     public TFields GetFields() => fields;
     /// <summary>
     /// Gets the fields.
@@ -230,20 +230,20 @@ public abstract partial class Row<TFields> : IRow, IRow<TFields>
     }
 
     /// <summary>
-    /// Finds the field.
+    /// Finds the field with the specified name.
     /// </summary>
     /// <param name="fieldName">Name of the field.</param>
-    /// <returns></returns>
+    /// <returns>The field with the specified name, or <c>null</c> if not found.</returns>
     public Field FindField(string fieldName)
     {
         return fields.FindField(fieldName);
     }
 
     /// <summary>
-    /// Finds the name of the field by property.
+    /// Finds the field with the specified property name.
     /// </summary>
     /// <param name="propertyName">Name of the property.</param>
-    /// <returns></returns>
+    /// <returns>The field with the specified property name, or <c>null</c> if not found.</returns>
     public Field FindFieldByPropertyName(string propertyName)
     {
         return fields.FindFieldByPropertyName(propertyName);

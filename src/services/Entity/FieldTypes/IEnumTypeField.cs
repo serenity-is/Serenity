@@ -1,7 +1,7 @@
 ﻿namespace Serenity.Data;
 
 /// <summary>
-/// Interface for fields with an enum type property
+/// Interface for fields with an enum type property.
 /// </summary>
 public interface IEnumTypeField
 {

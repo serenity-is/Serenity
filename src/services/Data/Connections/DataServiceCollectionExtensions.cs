@@ -5,12 +5,12 @@ using Microsoft.Extensions.DependencyInjection.Extensions;
 namespace Serenity.Extensions.DependencyInjection;
 
 /// <summary>
-/// Contains extensions to register data services
+/// Contains extensions to register data services.
 /// </summary>
 public static class DataServiceCollectionExtensions
 {
     /// <summary>
-    /// Adds default IConnectionStrings and ISqlConnections interfaces
+    /// Adds the default <see cref="IConnectionStrings"/> and <see cref="ISqlConnections"/> interfaces.
     /// </summary>
     /// <param name="services">The service collection.</param>
     public static void AddSqlConnections(this IServiceCollection services)
@@ -24,10 +24,10 @@ public static class DataServiceCollectionExtensions
     }
 
     /// <summary>
-    /// Adds default IConnectionStrings and ISqlConnections interfaces
+    /// Adds the default <see cref="IConnectionStrings"/> and <see cref="ISqlConnections"/> interfaces.
     /// </summary>
     /// <param name="services">The service collection.</param>
-    /// <param name="setupAction">Setup action to manually modify connection strings</param>
+    /// <param name="setupAction">The setup action to manually modify connection strings.</param>
     public static void AddSqlConnections(this IServiceCollection services, 
         Action<ConnectionStringOptions> setupAction)
     {
@@ -41,7 +41,7 @@ public static class DataServiceCollectionExtensions
 
     /// <summary>
     /// Gets the specified connection string entry from the specified configuration's Data:[name] section.
-    /// Only for use in Startup where IConnectionStrings is not yet available.
+    /// Only for use in Startup where <see cref="IConnectionStrings"/> is not yet available.
     /// Throws if no such connection is found.
     /// </summary>
     /// <param name="configuration">The configuration to enumerate.</param>

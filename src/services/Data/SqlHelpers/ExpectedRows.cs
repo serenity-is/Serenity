@@ -1,22 +1,22 @@
 ﻿namespace Serenity.Data;
 
 /// <summary>
-/// Expected number of rows enumeration for SQL Update / Delete operation.
+/// Expected number of rows enumeration for SQL Update / Delete operations.
 /// This enumeration is used to avoid updating/deleting multiple records
-/// by mistake when forgot to add a WHERE statement.
+/// by mistake when one forgets to add a WHERE statement.
 /// </summary>
 public enum ExpectedRows
 {
     /// <summary>
-    /// Query should only affect One row, not zero or more
+    /// Query should only affect one row, not zero or more.
     /// </summary>
     One = 0,
     /// <summary>
-    /// Query may affect zero or one row, not more
+    /// Query may affect zero or one row, not more.
     /// </summary>
     ZeroOrOne = 1,
     /// <summary>
-    /// Ignore number of affected rows
+    /// Ignore the number of affected rows.
     /// </summary>
     Ignore = 2,
 }

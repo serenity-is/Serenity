@@ -16,10 +16,10 @@ public class SafeCriteriaValidator : BaseCriteriaVisitor
     }
 
     /// <summary>
-    /// Visits the criteria returning potentially reworked version.
+    /// Visits the criteria, returning a potentially reworked version.
     /// </summary>
     /// <param name="criteria">The criteria.</param>
-    /// <returns></returns>
+    /// <returns>The visited criteria.</returns>
     /// <exception cref="ValidationError">InvalidCriteriaField</exception>
     protected override BaseCriteria VisitCriteria(Criteria criteria)
     {
@@ -34,11 +34,11 @@ public class SafeCriteriaValidator : BaseCriteriaVisitor
     }
 
     /// <summary>
-    /// Visits the parameter criteria. Parameter criteria is
+    /// Visits the parameter criteria. A parameter criteria is
     /// just a parameter name.
     /// </summary>
     /// <param name="criteria">The parameter criteria.</param>
-    /// <returns></returns>
+    /// <returns>The visited parameter criteria.</returns>
     /// <exception cref="ValidationError">UnsupportedCriteriaType - Param type criterias is not supported!</exception>
     protected override BaseCriteria VisitParam(ParamCriteria criteria)
     {

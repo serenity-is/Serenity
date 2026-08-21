@@ -10,7 +10,7 @@ public class HtmlReportRenderUrl : IDisposable
     private bool disposed;
 
     /// <summary>
-    /// Creates a new instance of the class
+    /// Initializes a new instance of the class.
     /// </summary>
     public HtmlReportRenderUrl()
     {

@@ -1,7 +1,7 @@
 ﻿namespace Serenity.Data;
 
 /// <summary>
-/// Field with a RowList value
+/// Field with a RowList value.
 /// </summary>
 /// <typeparam name="TForeign">The type of the foreign.</typeparam>
 /// <remarks>
@@ -24,7 +24,7 @@ public class RowListField<TForeign>(ICollection<Field> collection, string name, 
     /// </summary>
     /// <param name="value1">The value1.</param>
     /// <param name="value2">The value2.</param>
-    /// <returns></returns>
+    /// <returns>A value indicating the relative order of the two values.</returns>
     protected override int CompareValues(List<TForeign> value1, List<TForeign> value2)
     {
         var length = Math.Min(value1.Count, value2.Count);
@@ -58,7 +58,7 @@ public class RowListField<TForeign>(ICollection<Field> collection, string name, 
     /// Clones the specified value.
     /// </summary>
     /// <param name="value">The value.</param>
-    /// <returns></returns>
+    /// <returns>A clone of the value.</returns>
     protected override List<TForeign> Clone(List<TForeign> value)
     {
         var clone = new List<TForeign>();

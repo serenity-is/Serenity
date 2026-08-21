@@ -1,13 +1,13 @@
 namespace Serenity.Localization;
 
 /// <summary>
-/// Default ILocalTextRegistry implementation.
+/// The default <see cref="ILocalTextRegistry"/> implementation.
 /// </summary>
 /// <seealso cref="ILocalTextRegistry" />
 /// <seealso cref="IRemoveAll" />
 /// <remarks>
 /// This implementation also supports a "pending approval" mode. If your site needs some moderator
-/// approval before translations are published, you may put your site to this mode when
+/// approval before translations are published, you may put your site into this mode when
 /// some moderator is using the site by registering an ILocalTextContext provider. Thus,
 /// moderators can see unapproved texts while they are logged in to the site.
 /// </remarks>
@@ -20,11 +20,11 @@ public class LocalTextRegistry : ILocalTextRegistry, IRemoveAll, IGetAllTexts, I
     private readonly ConcurrentDictionary<string, string> languageFallbacks = new(StringComparer.OrdinalIgnoreCase);
 
     /// <summary>
-    /// Adds a local text entry to the registry
+    /// Adds a local text entry to the registry.
     /// </summary>
-    /// <param name="languageID">Language ID (e.g. en-US, tr-TR)</param>
-    /// <param name="key">Local text key</param>
-    /// <param name="text">Translated text</param>
+    /// <param name="languageID">The language ID (e.g. en-US, tr-TR).</param>
+    /// <param name="key">The local text key.</param>
+    /// <param name="text">The translated text.</param>
     public void Add(string languageID, string key, string? text)
     {
         if (languageID == null)
@@ -46,11 +46,11 @@ public class LocalTextRegistry : ILocalTextRegistry, IRemoveAll, IGetAllTexts, I
     /// <summary>
     /// Adds a pending approval local text entry to the registry. These texts can only be seen
     /// while moderators are browsing the site. You can determine which users are moderators by
-    /// implementing ILocalTextContext interface, and registering it through the service locator.
+    /// implementing the <c>ILocalTextContext</c> interface and registering it through the service locator.
     /// </summary>
-    /// <param name="languageID">Language ID (e.g. en-US, tr-TR)</param>
-    /// <param name="key">Local text key</param>
-    /// <param name="text">Translated text</param>
+    /// <param name="languageID">The language ID (e.g. en-US, tr-TR).</param>
+    /// <param name="key">The local text key.</param>
+    /// <param name="text">The translated text.</param>
     public void AddPending(string languageID, string key, string text)
     {
         if (languageID == null)
@@ -63,13 +63,14 @@ public class LocalTextRegistry : ILocalTextRegistry, IRemoveAll, IGetAllTexts, I
     }
 
     /// <summary>
-    /// Converts the local text key to its representation in requested language. Looks up text
-    /// in requested language, its Fallbacks and invariant language in order. If not found in any,
-    /// null is returned. See SetLanguageFallback for information about language fallbacks.
+    /// Converts the local text key to its representation in the requested language. Looks up the text
+    /// in the requested language, its fallbacks, and the invariant language in order. If not found in any,
+    /// <c>null</c> is returned. See <see cref="SetLanguageFallback"/> for information about language fallbacks.
     /// </summary>
-    /// <param name="languageID">Language ID.</param>
-    /// <param name="textKey">Local text key</param>
-    /// <param name="pending">If pending approval texts to be used, true.</param>
+    /// <param name="languageID">The language ID.</param>
+    /// <param name="textKey">The local text key.</param>
+    /// <param name="pending"><c>true</c> if pending approval texts should be used.</param>
+    /// <returns>The localized text, or <c>null</c> if none is found.</returns>
     public string? TryGet(string languageID, string textKey, bool pending)
     {
         if (languageID == null)
@@ -152,14 +153,12 @@ public class LocalTextRegistry : ILocalTextRegistry, IRemoveAll, IGetAllTexts, I
     }
 
     /// <summary>
-    ///   Gets all available text keys (that has a translation in language or any of its
-    ///   language fallbacks) and their local texts.</summary>
-    /// <param name="languageID">
-    ///   Language ID (required).</param>
-    /// <param name="pending">
-    ///   True if pending texts should be returned (e.g. in preview/edit mode).</param>
-    /// <returns>
-    ///   A dictionary of all texts in the language.</returns>
+    /// Gets all available text keys (that have a translation in the language or any of its
+    /// language fallbacks) and their local texts.
+    /// </summary>
+    /// <param name="languageID">The language ID (required).</param>
+    /// <param name="pending"><c>true</c> if pending texts should be returned (e.g. in preview/edit mode).</param>
+    /// <returns>A dictionary of all texts in the language.</returns>
     public Dictionary<string, string> GetAllAvailableTextsInLanguage(string languageID, bool pending)
     {
         if (languageID == null)
@@ -211,8 +210,10 @@ public class LocalTextRegistry : ILocalTextRegistry, IRemoveAll, IGetAllTexts, I
     }
 
     /// <summary>
-    /// Gets all text keys that is currently registered in any language
+    /// Gets all text keys that are currently registered in any language.
     /// </summary>
+    /// <param name="pending"><c>true</c> to include pending texts.</param>
+    /// <returns>A set of all registered text keys.</returns>
     public HashSet<string> GetAllTextKeys(bool pending)
     {
         var result = new HashSet<string>(StringComparer.OrdinalIgnoreCase);
@@ -222,7 +223,7 @@ public class LocalTextRegistry : ILocalTextRegistry, IRemoveAll, IGetAllTexts, I
     }
 
     /// <summary>
-    /// Removes all cached texts
+    /// Removes all cached texts.
     /// </summary>
     public void RemoveAll()
     {

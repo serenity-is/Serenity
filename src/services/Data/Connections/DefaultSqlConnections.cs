@@ -4,38 +4,38 @@ using System.Data.Common;
 namespace Serenity.Data;
 
 /// <summary>
-/// Default connection factory
+/// The default connection factory.
 /// </summary>
 /// <remarks>
-/// Creates a new instance
+/// Creates a new instance.
 /// </remarks>
-/// <param name="connectionStrings">Named connection strings</param>
-/// <param name="profiler">Profiler if any</param>
-/// <param name="loggerFactory">Optional logger factory (to be used by static SqlHelper methods)</param>
+/// <param name="connectionStrings">The named connection strings.</param>
+/// <param name="profiler">The profiler, if any.</param>
+/// <param name="loggerFactory">The optional logger factory (to be used by static SqlHelper methods).</param>
 public class DefaultSqlConnections(IConnectionStrings connectionStrings, IConnectionProfiler profiler = null, ILoggerFactory loggerFactory = null) : ISqlConnections
 {
-    /// <summary>Connection strings</summary>
+    /// <summary>The connection strings.</summary>
     protected readonly IConnectionStrings connectionStrings = connectionStrings ?? throw new ArgumentNullException(nameof(connectionStrings));
-    /// <summary>Profiler</summary>
+    /// <summary>The profiler.</summary>
     protected readonly IConnectionProfiler profiler = profiler;
-    /// <summary>Logger factory</summary>
+    /// <summary>The logger factory.</summary>
     protected readonly ILoggerFactory loggerFactory = loggerFactory;
 
     /// <summary>
-    /// Lists all known connections strings
+    /// Lists all known connection strings.
     /// </summary>
-    /// <returns>List of all registered connections</returns>
+    /// <returns>The list of all registered connections.</returns>
     public IEnumerable<IConnectionString> ListConnectionStrings()
     {
         return connectionStrings.ListConnectionStrings();
     }
 
     /// <summary>
-    /// Creates an actual connection based on providerName, this should not return a wrapped connection.
+    /// Creates an actual connection based on the provider name. This should not return a wrapped connection.
     /// </summary>
-    /// <param name="connectionString">Connection string</param>
-    /// <param name="providerName">Provider name</param>
-    /// <param name="dialect">Dialect</param>
+    /// <param name="connectionString">The connection string.</param>
+    /// <param name="providerName">The provider name.</param>
+    /// <param name="dialect">The dialect.</param>
     /// <returns>A new <see cref="IDbConnection"/> object.</returns>
     protected virtual IDbConnection CreateConnection(string connectionString, string providerName, ISqlDialect dialect)
     {
@@ -59,12 +59,12 @@ public class DefaultSqlConnections(IConnectionStrings connectionStrings, IConnec
     }
 
     /// <summary>
-    /// Wraps and profiles the actual connection
+    /// Wraps and profiles the actual connection.
     /// </summary>
-    /// <param name="connection">Actual connection</param>
-    /// <param name="providerName">Provider name</param>
-    /// <param name="dialect">Dialect</param>
-    /// <returns></returns>
+    /// <param name="connection">The actual connection.</param>
+    /// <param name="providerName">The provider name.</param>
+    /// <param name="dialect">The dialect.</param>
+    /// <returns>The wrapped connection.</returns>
     protected virtual IDbConnection WrapConnection(IDbConnection connection, string providerName, ISqlDialect dialect)
     {
         if (profiler != null)
@@ -74,10 +74,11 @@ public class DefaultSqlConnections(IConnectionStrings connectionStrings, IConnec
     }
 
     /// <summary>
-    /// Creates a new <see cref="IDbConnection"/> for given connection string, provider name and dialect.</summary>
-    /// <param name="connectionString">Connection string</param>
-    /// <param name="providerName">Provider name</param>
-    /// <param name="dialect">Dialect</param>
+    /// Creates a new <see cref="IDbConnection"/> for the given connection string, provider name, and dialect.
+    /// </summary>
+    /// <param name="connectionString">The connection string.</param>
+    /// <param name="providerName">The provider name.</param>
+    /// <param name="dialect">The dialect.</param>
     /// <returns>A new <see cref="IDbConnection"/> object.</returns>
     public virtual IDbConnection New(string connectionString, string providerName, ISqlDialect dialect)
     {
@@ -86,8 +87,9 @@ public class DefaultSqlConnections(IConnectionStrings connectionStrings, IConnec
     }
 
     /// <summary>
-    /// Creates a new <see cref="IDbConnection"/> for given connection key.</summary>
-    /// <param name="connectionKey">Connection key</param>
+    /// Creates a new <see cref="IDbConnection"/> for the given connection key.
+    /// </summary>
+    /// <param name="connectionKey">The connection key.</param>
     /// <returns>A new <see cref="IDbConnection"/> object.</returns>
     public virtual IDbConnection NewByKey(string connectionKey)
     {
@@ -96,10 +98,10 @@ public class DefaultSqlConnections(IConnectionStrings connectionStrings, IConnec
     }
 
     /// <summary>
-    /// Gets a connection string by its key
+    /// Gets a connection string by its key.
     /// </summary>
-    /// <param name="connectionKey">Connection key</param>
-    /// <returns>Connection string or null if not found</returns>
+    /// <param name="connectionKey">The connection key.</param>
+    /// <returns>The connection string, or <c>null</c> if not found.</returns>
     public virtual IConnectionString TryGetConnectionString(string connectionKey)
     {
         return connectionStrings.TryGetConnectionString(connectionKey);

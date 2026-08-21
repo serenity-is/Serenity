@@ -1,32 +1,32 @@
 ﻿namespace Serenity.Data;
 
 /// <summary>
-/// Contains server type names for common dialects
+/// Contains server type names for common dialects.
 /// </summary>
 public enum ServerType
 {
     /// <summary>
-    /// Firebird
+    /// Firebird server.
     /// </summary>
     Firebird,
     /// <summary>
-    /// MySql
+    /// MySql server.
     /// </summary>
     MySql,
     /// <summary>
-    /// Oracle
+    /// Oracle server.
     /// </summary>
     Oracle,
     /// <summary>
-    /// Postgres
+    /// Postgres server.
     /// </summary>
     Postgres,
     /// <summary>
-    /// Sqlite
+    /// Sqlite server.
     /// </summary>
     Sqlite,
     /// <summary>
-    /// SqlServer
+    /// SqlServer server.
     /// </summary>
     SqlServer
 }

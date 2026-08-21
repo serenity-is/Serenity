@@ -1,9 +1,9 @@
 ﻿namespace Serenity.Data;
 
 /// <summary>
-/// Unit of work implementation without an underlying actual transaction.
-/// Use with care only to pass a IUnitOfWork instance to some methods
-/// that you don't want to actually start a transaction.
+/// A unit of work implementation without an underlying actual transaction.
+/// Use with care, only to pass an <see cref="IUnitOfWork"/> instance to some methods
+/// where you don't want to actually start a transaction.
 /// </summary>
 /// <seealso cref="IDisposable" />
 /// <seealso cref="IUnitOfWork" />
@@ -28,7 +28,7 @@ public class TransactionlessUnitOfWork(IDbConnection connection) : IDisposable, 
     public IDbConnection Connection => connection;
 
     /// <summary>
-    /// Performs application-defined tasks associated with freeing, releasing, or resetting unmanaged resources.
+    /// Invokes the rollback events, as there is no underlying transaction to roll back.
     /// </summary>
     public void Dispose()
     {

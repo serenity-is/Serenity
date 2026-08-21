@@ -1,7 +1,7 @@
 ﻿namespace Serenity.Data.Schema;
 
 /// <summary>
-/// Table schema/name and view information
+/// Table schema/name and view information.
 /// </summary>
 public class TableName
 {

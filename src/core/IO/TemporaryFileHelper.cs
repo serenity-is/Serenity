@@ -1,59 +1,58 @@
 namespace Serenity.IO;
 
 /// <summary>
-///   Contains helper functions for temporary files and folders</summary>
+/// Contains helper functions for temporary files and folders.
+/// </summary>
 public class TemporaryFileHelper
 {
     private static readonly TemporaryPhysicalFileSystem physicalFileSystem = new();
 
     /// <summary>
-    ///   A signature file that marks a folder as a temporary file to ensure that it actually contains temporary
-    ///   files and can be safely cleaned</summary>
+    /// A signature file that marks a folder as a temporary folder, ensuring that it
+    /// actually contains temporary files and can be safely cleaned.
+    /// </summary>
     public const string DefaultTemporaryCheckFile = ".temporary";
 
     /// <summary>
-    ///   By default, files older than 1 hour is cleared</summary>
+    /// By default, files older than this duration are cleared.
+    /// </summary>
     public static readonly TimeSpan DefaultAutoExpireTime = TimeSpan.FromDays(1);
 
     /// <summary>
-    ///   By default, if more than 1000 files exists in directory, they are deleted</summary>
+    /// By default, if more than this many files exist in a directory, they are deleted.
+    /// </summary>
     public const int DefaultMaxFilesInDirectory = 1000;
 
     /// <summary>
-    ///   Clears a folder based on default conditions</summary>
-    /// <param name="directoryToClean">
-    ///   Folder to be cleared</param>
-    /// <param name="fileSystem">File system</param>
+    /// Clears a folder based on the default conditions.
+    /// </summary>
+    /// <param name="directoryToClean">The folder to be cleared.</param>
+    /// <param name="fileSystem">The file system to use, or <c>null</c> to use the physical file system.</param>
     /// <remarks>
-    ///   If any errors occur during cleanup, this doesn't raise an exception
-    ///   and ignored. Other errors might raise an exception. As errors are
-    ///   ignored, method can't guarantee that less than specified number of files
-    ///   will be in the folder after it ends.</remarks>
+    /// If any errors occur during cleanup, they are ignored and do not raise an exception.
+    /// Other errors might raise an exception. As errors are ignored, this method cannot
+    /// guarantee that fewer than the specified number of files will remain in the folder
+    /// after it ends.
+    /// </remarks>
     public static void PurgeDirectoryDefault(string directoryToClean, ITemporaryFileSystem? fileSystem = null)
     {
         PurgeDirectory(directoryToClean, DefaultAutoExpireTime, DefaultMaxFilesInDirectory, DefaultTemporaryCheckFile, fileSystem);
     }
 
     /// <summary>
-    ///   Clears a folder based on specified conditions</summary>
-    /// <param name="directoryToClean">
-    ///   Folder to be cleared</param>
-    /// <param name="autoExpireTime">
-    ///   Files with creation time older than this is deleted. If passed as 0, time
-    ///   based cleanup is skipped.</param>
-    /// <param name="maxFilesInDirectory">
-    ///   If more than this number of files exists, files will be deleted starting from 
-    ///   oldest to newest. By passing 0, all files can be deleted. If passed as -1,
-    ///   file count based cleanup is skipped.</param>
-    /// <param name="checkFileName">
-    ///   Safety file to be checked. If it is specified and it doesn't exists, operation
-    ///   is aborted.</param>
-    /// <param name="fileSystem">File system</param>
+    /// Clears a folder based on the specified conditions.
+    /// </summary>
+    /// <param name="directoryToClean">The folder to be cleared.</param>
+    /// <param name="autoExpireTime">Files with a creation time older than this are deleted. If passed as <see cref="TimeSpan.Zero"/>, time-based cleanup is skipped.</param>
+    /// <param name="maxFilesInDirectory">If more than this number of files exist, files are deleted starting from oldest to newest. Passing <c>0</c> deletes all files; passing <c>-1</c> skips file-count-based cleanup.</param>
+    /// <param name="checkFileName">The safety file to check. If specified and it does not exist, the operation is aborted.</param>
+    /// <param name="fileSystem">The file system to use, or <c>null</c> to use the physical file system.</param>
     /// <remarks>
-    ///   If any errors occur during cleanup, this doesn't raise an exception
-    ///   and ignored. Other errors might raise an exception. As errors are
-    ///   ignored, method can't guarantee that less than specified number of files
-    ///   will be in the folder after it ends.</remarks>
+    /// If any errors occur during cleanup, they are ignored and do not raise an exception.
+    /// Other errors might raise an exception. As errors are ignored, this method cannot
+    /// guarantee that fewer than the specified number of files will remain in the folder
+    /// after it ends.
+    /// </remarks>
     public static void PurgeDirectory(string directoryToClean,
         TimeSpan autoExpireTime, int maxFilesInDirectory, string checkFileName, ITemporaryFileSystem? fileSystem = null)
     {
@@ -125,10 +124,10 @@ public class TemporaryFileHelper
     }
 
     /// <summary>
-    ///   Tries to delete a file with given path.</summary>
-    /// <param name="filePath">
-    ///   File to be deleted (can be null).</param>
-    /// <param name="fileSystem">File system</param>
+    /// Tries to delete the file at the given path, ignoring any errors.
+    /// </summary>
+    /// <param name="filePath">The file to be deleted (can be <c>null</c>).</param>
+    /// <param name="fileSystem">The file system to use, or <c>null</c> to use the physical file system.</param>
     public static void TryDelete(string filePath, IFileSystem? fileSystem = null)
     {
         fileSystem ??= physicalFileSystem;
@@ -145,10 +144,10 @@ public class TemporaryFileHelper
     }
 
     /// <summary>
-    ///   Deletes a file.</summary>
-    /// <param name="filePath">
-    ///   File to be deleted (can be null).</param>
-    /// <param name="fileSystem"></param>
+    /// Deletes the file at the given path.
+    /// </summary>
+    /// <param name="filePath">The file to be deleted (can be <c>null</c>).</param>
+    /// <param name="fileSystem">The file system to use, or <c>null</c> to use the physical file system.</param>
     public static void Delete(string filePath, IFileSystem? fileSystem = null)
     {
         fileSystem ??= physicalFileSystem;
@@ -167,12 +166,11 @@ public class TemporaryFileHelper
     }
 
     /// <summary>
-    ///   Deletes, tries to delete or marks a file for deletion depending on type.</summary>
-    /// <param name="filePath">
-    ///   File to be deleted (can be null).</param>
-    /// <param name="type">
-    ///   Delete type.</param>
-    /// <param name="fileSystem">File system</param>
+    /// Deletes, tries to delete, or marks a file for deletion depending on the specified <see cref="DeleteType"/>.
+    /// </summary>
+    /// <param name="filePath">The file to be deleted (can be <c>null</c>).</param>
+    /// <param name="type">The delete type.</param>
+    /// <param name="fileSystem">The file system to use, or <c>null</c> to use the physical file system.</param>
     public static void Delete(string filePath, DeleteType type, ITemporaryFileSystem? fileSystem = null)
     {
         if (type == DeleteType.Delete)
@@ -184,11 +182,11 @@ public class TemporaryFileHelper
     }
 
     /// <summary>
-    ///   Tries to delete a file or marks it for deletion by DeleteMarkedFiles method by
-    ///   creating a ".delete" file.</summary>
-    /// <param name="filePath">
-    ///   File to be deleted</param>
-    /// <param name="fileSystem">File system</param>
+    /// Tries to delete a file, or marks it for deletion by <see cref="TryDeleteMarkedFiles"/>
+    /// by creating a ".delete" file.
+    /// </summary>
+    /// <param name="filePath">The file to be deleted.</param>
+    /// <param name="fileSystem">The file system to use, or <c>null</c> to use the physical file system.</param>
     public static void TryDeleteOrMark(string filePath, ITemporaryFileSystem? fileSystem = null)
     {
         fileSystem ??= physicalFileSystem;
@@ -208,10 +206,10 @@ public class TemporaryFileHelper
     }
 
     /// <summary>
-    ///   Tries to delete all files that is marked for deletion by TryDeleteOrMark in a folder.</summary>
-    /// <param name="path">
-    ///   Path of marked files to be deleted</param>
-    /// <param name="fileSystem">File system</param>
+    /// Tries to delete all files in a folder that were marked for deletion by <see cref="TryDeleteOrMark"/>.
+    /// </summary>
+    /// <param name="path">The path of the marked files to be deleted.</param>
+    /// <param name="fileSystem">The file system to use, or <c>null</c> to use the physical file system.</param>
     public static void TryDeleteMarkedFiles(string path, ITemporaryFileSystem? fileSystem = null)
     {
         fileSystem ??= physicalFileSystem;
@@ -244,9 +242,9 @@ public class TemporaryFileHelper
     }
 
     /// <summary>
-    ///   Gets a 13 character random code that can be used safely in a filename</summary>
-    /// <returns>
-    ///   A random code.</returns>
+    /// Gets a 13 character random code that can be used safely in a file name.
+    /// </summary>
+    /// <returns>A random code.</returns>
     public static string RandomFileCode()
     {
         Guid guid = Guid.NewGuid();

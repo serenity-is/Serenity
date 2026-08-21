@@ -59,9 +59,9 @@ public partial class CheckLookupEditorAttribute : CustomEditorAttribute
     }
 
     /// <summary>
-    /// Cascade filtering field (items will be filtered on this key, e.g. CountryID)
-    /// Make sure you have [LookupInclude] attribute on this field of lookup row,
-    /// otherwise you'll have empty results as this field won't be available client side.
+    /// Cascade filtering field (items will be filtered on this key, e.g. CountryID).
+    /// Make sure you have the [LookupInclude] attribute on this field of the lookup row,
+    /// otherwise you'll have empty results as this field won't be available on the client side.
     /// </summary>
     public object? CascadeField
     {
@@ -70,8 +70,8 @@ public partial class CheckLookupEditorAttribute : CustomEditorAttribute
     }
 
     /// <summary>
-    /// Cascade filtering value, usually set by CascadeFrom editor, e.g. the integer value of CountryID
-    /// If null or empty, and CascadeField is set, all items are filtered
+    /// Cascade filtering value, usually set by the CascadeFrom editor, e.g. the integer value of CountryID.
+    /// If null or empty, and CascadeField is set, all items are filtered.
     /// </summary>
     public object? CascadeValue
     {
@@ -80,9 +80,9 @@ public partial class CheckLookupEditorAttribute : CustomEditorAttribute
     }
 
     /// <summary>
-    /// Optional filtering field (items will be filtered on this key, e.g. GroupID)
-    /// Make sure you have [LookupInclude] attribute on this field of lookup row,
-    /// otherwise you'll have empty results as this field won't be available client side.
+    /// Optional filtering field (items will be filtered on this key, e.g. GroupID).
+    /// Make sure you have the [LookupInclude] attribute on this field of the lookup row,
+    /// otherwise you'll have empty results as this field won't be available on the client side.
     /// </summary>
     public object? FilterField
     {
@@ -109,7 +109,7 @@ public partial class CheckLookupEditorAttribute : CustomEditorAttribute
     }
 
     /// <summary>
-    /// Move selected items to top on load
+    /// Moves selected items to the top on load.
     /// </summary>
     public bool CheckedOnTop
     {

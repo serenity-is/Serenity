@@ -1,7 +1,7 @@
 namespace Serenity.Data;
 
 /// <summary>
-/// Determines the connection key used for a class
+/// Determines the connection key used for a class.
 /// </summary>
 /// <seealso cref="Attribute" />
 public class ConnectionKeyAttribute : Attribute
@@ -20,7 +20,7 @@ public class ConnectionKeyAttribute : Attribute
     /// with a type that has a ConnectionKey attribute to read the connection key from.
     /// </summary>
     /// <param name="sourceType">Type of the source.</param>
-    /// <exception cref="ArgumentNullException">sourceType is null</exception>
+    /// <exception cref="ArgumentNullException">sourceType is null.</exception>
     /// <exception cref="ArgumentOutOfRangeException">sourceType has no ConnectionKey attribute.</exception>
     public ConnectionKeyAttribute(Type sourceType)
     {

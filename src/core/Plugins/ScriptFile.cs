@@ -1,12 +1,12 @@
 ﻿namespace Serenity.Plugins;
 
 /// <summary>
-/// Plugin script file registration
+/// A plugin script file registration.
 /// </summary>
 public class ScriptFile
 {
     /// <summary>
-    /// Gets or sets the path to file. Should start with "./" corresponding to plugin folder.
+    /// Gets or sets the path to the file. Should start with "./" corresponding to the plugin folder.
     /// </summary>
     /// <value>
     /// The path.

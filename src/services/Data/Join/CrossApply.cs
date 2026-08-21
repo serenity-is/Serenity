@@ -1,7 +1,7 @@
 ﻿namespace Serenity.Data;
 
 /// <summary>
-/// CROSS APPLY type of join
+/// CROSS APPLY type of join.
 /// </summary>
 /// <seealso cref="Join" />
 public class CrossApply : Join
@@ -30,7 +30,7 @@ public class CrossApply : Join
     /// <summary>
     /// Gets the SQL keyword.
     /// </summary>
-    /// <returns></returns>
+    /// <returns>The SQL keyword for this join type.</returns>
     public override string GetKeyword()
     {
         return "CROSS APPLY";

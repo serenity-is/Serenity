@@ -1,7 +1,7 @@
 namespace Serenity.Data;
 
 /// <summary>
-///   This class is based on the Base32 class from DC# 0.31
+///   This class is based on the Base32 class from DC# 0.31.
 ///   All credits to Jonathan Bindel.</summary>
 public sealed class Base32
 {
@@ -33,11 +33,11 @@ public sealed class Base32
     const string errorInvalidChar = "invalid character in Base32 string";
 
     /// <summary>
-    ///   Encode a buffer using the default options</summary>
+    ///   Encodes a buffer using the default options.</summary>
     /// <param name="bytes">
     ///   The buffer (required).</param>
     /// <returns>
-    ///   An encoded string that holds the contents of the inputs</returns>
+    ///   An encoded string that holds the contents of the inputs.</returns>
     public static string Encode(byte[] bytes)
     {
         if (bytes == null)
@@ -101,11 +101,11 @@ public sealed class Base32
     }
 
     /// <summary>
-    ///   Decode a Base32 string into a byte array</summary>
+    ///   Decodes a Base32 string into a byte array.</summary>
     /// <param name="base32">
-    ///   The Base32 string (required)</param>
+    ///   The Base32 string (required).</param>
     /// <returns>
-    ///   The decoded byte array</returns>
+    ///   The decoded byte array.</returns>
     public static byte[] Decode(string base32)
     {
         if (base32 == null)

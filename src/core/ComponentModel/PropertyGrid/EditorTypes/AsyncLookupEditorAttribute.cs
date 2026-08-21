@@ -25,8 +25,8 @@ public partial class AsyncLookupEditorAttribute : LookupEditorAttribute
     /// Initializes a new instance of the <see cref="AsyncLookupEditorAttribute"/> class.
     /// </summary>
     /// <param name="lookupType">Type of the lookup.</param>
-    /// <exception cref="ArgumentNullException">lookupType</exception>
-    /// <exception cref="ArgumentException">lookupType</exception>
+    /// <exception cref="ArgumentNullException">Thrown if <paramref name="lookupType"/> is null.</exception>
+    /// <exception cref="ArgumentException">Thrown if the type has no [LookupScript] attribute.</exception>
     public AsyncLookupEditorAttribute(Type lookupType)
         : base(lookupType)
     {

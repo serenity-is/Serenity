@@ -1,32 +1,32 @@
 ﻿namespace Serenity.Data;
 
 /// <summary>
-/// DateParts type
+/// DateParts type.
 /// </summary>
 public enum DateParts
 {
     /// <summary>
-    /// Year
+    /// Year.
     /// </summary>
     Year,
     /// <summary>
-    /// Month
+    /// Month.
     /// </summary>
     Month,
     /// <summary>
-    /// Day
+    /// Day.
     /// </summary>
     Day,
     /// <summary>
-    /// Hour
+    /// Hour.
     /// </summary>
     Hour,
     /// <summary>
-    /// Minute
+    /// Minute.
     /// </summary>
     Minute,
     /// <summary>
-    /// Second
+    /// Second.
     /// </summary>
     Second
 }

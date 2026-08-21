@@ -114,7 +114,7 @@ public class CaptureLogBehavior : BaseSaveDeleteBehavior, IImplicitBehavior, IUn
     /// <param name="old">Old entity</param>
     /// <param name="row">New entity</param>
     /// <param name="userId">User ID</param>
-    /// <exception cref="ArgumentNullException">old and row is null</exception>
+    /// <exception cref="ArgumentNullException"><paramref name="old"/> and <paramref name="row"/> are both <c>null</c>.</exception>
     /// <exception cref="InvalidOperationException">Capture log row type does not implement ICaptureLogRow interface</exception>
     public void Log(IUnitOfWork uow, IRow old, IRow row, object userId)
     {

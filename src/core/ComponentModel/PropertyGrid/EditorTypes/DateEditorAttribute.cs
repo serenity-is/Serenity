@@ -44,10 +44,10 @@ public class DateEditorAttribute : CustomEditorAttribute
     }
 
     /// <summary>
-    /// Gets or sets a value indicating whether SQL server min max dates should be used.
+    /// Gets or sets a value indicating whether SQL Server min max dates should be used.
     /// </summary>
     /// <value>
-    ///   <c>true</c> if SQL server min max dates should be used; otherwise, <c>false</c>.
+    ///   <c>true</c> if SQL Server min max dates should be used; otherwise, <c>false</c>.
     /// </value>
     public bool SqlMinMax
     {

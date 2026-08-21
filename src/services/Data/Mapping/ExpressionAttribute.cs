@@ -31,7 +31,7 @@ public class ExpressionAttribute(string value) : BaseExpressionAttribute
     }
 
     /// <summary>
-    /// Gets the expression
+    /// Gets the expression.
     /// </summary>
     public string Value { get; } = value ?? throw new ArgumentNullException(nameof(value));
 

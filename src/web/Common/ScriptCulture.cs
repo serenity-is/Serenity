@@ -1,12 +1,13 @@
 namespace Serenity;
 
 /// <summary>
-/// Culture options that are passed to the client side
+/// Culture options that are passed to the client side.
 /// </summary>
 public class ScriptCulture
 {
     /// <summary>
-    /// Creates a new instance of the class using <see cref="CultureInfo.CurrentCulture"/>
+    /// Initializes a new instance of the <see cref="ScriptCulture"/> class
+    /// using <see cref="CultureInfo.CurrentCulture"/>.
     /// </summary>
     public ScriptCulture()
         : this(CultureInfo.CurrentCulture)
@@ -14,9 +15,9 @@ public class ScriptCulture
     }
 
     /// <summary>
-    /// Creates a new instance of the class
+    /// Initializes a new instance of the <see cref="ScriptCulture"/> class.
     /// </summary>
-    /// <param name="culture">The culture to read settings from</param>
+    /// <param name="culture">The culture to read settings from.</param>
     public ScriptCulture(CultureInfo culture)
     {
         var order = DateHelper.DateElementOrderFor(culture.DateTimeFormat.ShortDatePattern);
@@ -31,32 +32,32 @@ public class ScriptCulture
     }
 
     /// <summary>
-    /// Date year month day ordering like d/M/y etc.
+    /// Gets or sets the date year-month-day ordering, e.g. <c>d/M/y</c>.
     /// </summary>
     public string DateOrder { get; set; }
 
     /// <summary>
-    /// Date format
+    /// Gets or sets the date format.
     /// </summary>
     public string DateFormat { get; set; }
 
     /// <summary>
-    /// Date separator
+    /// Gets or sets the date separator.
     /// </summary>
     public string DateSeparator { get; set; }
 
     /// <summary>
-    /// Date/time format
+    /// Gets or sets the date/time format.
     /// </summary>
     public string DateTimeFormat { get; set; }
 
     /// <summary>
-    /// Decimal separator
+    /// Gets or sets the decimal separator.
     /// </summary>
     public string DecimalSeparator { get; set; }
 
     /// <summary>
-    /// Group separator
+    /// Gets or sets the group separator.
     /// </summary>
     public string GroupSeparator { get; set; }
 }

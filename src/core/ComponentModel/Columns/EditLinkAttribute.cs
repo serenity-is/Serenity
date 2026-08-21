@@ -1,12 +1,12 @@
 ﻿namespace Serenity.ComponentModel;
 
 /// <summary>
-/// Indicates that the property this attribute placed on should have an edit link
+/// Indicates that the property this attribute is placed on should have an edit link.
 /// </summary>
 public sealed class EditLinkAttribute : Attribute
 {
     /// <summary>
-    /// Creates a new EditLink attribute
+    /// Creates a new EditLinkAttribute.
     /// </summary>
     public EditLinkAttribute()
     {
@@ -14,16 +14,16 @@ public sealed class EditLinkAttribute : Attribute
     }
 
     /// <summary>
-    /// Creates a new EditLink attribute with enable/disable option
+    /// Creates a new EditLinkAttribute with enable/disable option.
     /// </summary>
-    /// <param name="value">True if edit link should be enabled</param>
+    /// <param name="value">True if edit link should be enabled.</param>
     public EditLinkAttribute(bool value)
     {
         Value = value;
     }
 
     /// <summary>
-    /// Gets/sets edit link enable state
+    /// Gets or sets the edit link enable state.
     /// </summary>
     public bool Value { get; private set; }
 
@@ -34,12 +34,12 @@ public sealed class EditLinkAttribute : Attribute
     public string? ItemType { get; set; }
 
     /// <summary>
-    /// Gets/sets from which property this edit link should get its ID value to edit
+    /// Gets or sets the property from which this edit link should get its ID value to edit.
     /// </summary>
     public string? IdField { get; set; }
 
     /// <summary>
-    /// Gets/sets optional css class to add to edit links
+    /// Gets or sets the optional CSS class to add to edit links.
     /// </summary>
     public string? CssClass { get; set; }
 }

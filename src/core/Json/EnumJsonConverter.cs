@@ -3,12 +3,12 @@ using System.Text.Json;
 namespace Serenity.JsonConverters;
 
 /// <summary>
-/// Serializes enum values as numbers while trying to handle string values while deserializing
+/// Serializes enum values as numbers while trying to handle string values when deserializing.
 /// </summary>
 public class EnumJsonConverter : JsonConverterFactory
 {
     /// <summary>
-    /// Default instance
+    /// The default instance of the <see cref="EnumJsonConverter"/>.
     /// </summary>
     public static readonly EnumJsonConverter Instance = new();
 

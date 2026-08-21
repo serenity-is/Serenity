@@ -1,7 +1,8 @@
 ﻿namespace Serenity.Data;
 
 /// <summary>
-///   Corresponds to an SQL JOIN (INNER, OUTER, CROSS etc.)</summary>
+///   Corresponds to an SQL JOIN (INNER, OUTER, CROSS etc.).
+/// </summary>
 public abstract class Join : Alias
 {
     private readonly IDictionary<string, Join> joins;
@@ -11,7 +12,7 @@ public abstract class Join : Alias
     /// <summary>
     /// Gets the keyword.
     /// </summary>
-    /// <returns></returns>
+    /// <returns>The SQL keyword for this join type.</returns>
     public abstract string GetKeyword();
 
     /// <summary>
@@ -21,7 +22,7 @@ public abstract class Join : Alias
     /// <param name="toTable">To table.</param>
     /// <param name="alias">The alias.</param>
     /// <param name="onCriteria">The ON criteria.</param>
-    /// <exception cref="ArgumentException"></exception>
+    /// <exception cref="ArgumentException">A join with the same alias already exists in the joins dictionary.</exception>
     protected Join(IDictionary<string, Join> joins, string toTable, string alias, ICriteria onCriteria)
         : base(toTable, alias)
     {

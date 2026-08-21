@@ -1,7 +1,7 @@
 namespace Serenity.ComponentModel;
 
 /// <summary>
-/// Sets icon class
+/// Sets the icon class.
 /// </summary>
 /// <seealso cref="Attribute" />
 /// <remarks>
@@ -12,7 +12,7 @@ public class IconClassAttribute(string value) : Attribute
 {
 
     /// <summary>
-    /// Gets the icon class
+    /// Gets the icon class.
     /// </summary>
     public string Value { get; private set; } = value;
 }

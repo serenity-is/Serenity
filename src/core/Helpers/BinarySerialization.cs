@@ -3,7 +3,7 @@
 namespace Serenity.Data;
 
 /// <summary>
-/// Contains helper functions for serialization and deserialization of data items (e.g.cached items)
+/// Contains helper functions for serialization and deserialization of data items (e.g. cached items).
 /// </summary>
 public static class BinarySerialization
 {
@@ -26,11 +26,11 @@ public static class BinarySerialization
     }
 
     /// <summary>
-    /// A helper method to deserialize objects with BinaryWriter. Creates a memory stream 
+    /// A helper method to deserialize objects with BinaryReader. Creates a memory stream
     /// and a BinaryReader on it, and invokes the callback specified.
     /// </summary>
-    /// <param name="input">Input array</param>
-    /// <param name="deserialize">Deserialization delegate</param>
+    /// <param name="input">Input array.</param>
+    /// <param name="deserialize">Deserialization delegate.</param>
     public static TValue Deserialize<TValue>(byte[] input, Func<BinaryReader, TValue> deserialize)
     {
         using var ms = new MemoryStream(input);

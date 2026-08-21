@@ -1,7 +1,7 @@
 namespace Serenity.ComponentModel;
 
 /// <summary>
-/// Sets CSS class for editor on forms only. 
+/// Sets the CSS class for the editor on forms only.
 /// </summary>
 /// <remarks>
 /// Initializes a new instance of the <see cref="EditorCssClassAttribute"/> class.

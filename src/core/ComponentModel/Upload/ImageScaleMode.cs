@@ -5,9 +5,9 @@
 public enum ImageScaleMode
 {
     /// <summary>
-    ///   In this mode, thumbnail is generated just at the size requested.
-    ///   If thumbnail width or height specified only, than thumbnail will have same aspect ratio,
-    ///   otherwise if thumbnail and source is not at same ratio, thumbnail will have a 
+    ///   In this mode, the thumbnail is generated just at the size requested.
+    ///   If only thumbnail width or height is specified, then the thumbnail will have the same aspect ratio,
+    ///   otherwise if the thumbnail and source are not at the same ratio, the thumbnail will have a
     ///   narrowed or widened look.</summary>
     StretchToFit = 0,
     /// <summary>

@@ -2,7 +2,7 @@
 namespace Serenity.Data;
 
 /// <summary>
-/// Interface for rows that has a ParentId field
+/// Interface for rows that have a ParentId field.
 /// </summary>
 /// <seealso cref="IRow" />
 public interface IParentIdRow : IRow

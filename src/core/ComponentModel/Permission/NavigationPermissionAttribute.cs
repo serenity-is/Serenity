@@ -2,9 +2,9 @@
 namespace Serenity.Data;
 
 /// <summary>
-/// Sets navigation permission for the row, which if exists takes 
-/// precedence over ReadPermissionAttribute to determine permission for
-/// row's page and navigation item.
+/// Sets navigation permission for the row, which, if it exists, takes
+/// precedence over ReadPermissionAttribute to determine the permission for
+/// the row's page and navigation item.
 /// </summary>
 /// <seealso cref="PermissionAttributeBase" />
 public class NavigationPermissionAttribute : PermissionAttributeBase

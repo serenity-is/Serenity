@@ -4,7 +4,7 @@ using Microsoft.Extensions.DependencyInjection.Extensions;
 namespace Serenity.Extensions.DependencyInjection;
 
 /// <summary>
-/// Contains extensions to register entity services
+/// Contains extensions to register entity services.
 /// </summary>
 public static class EntityServiceCollectionExtensions
 {

@@ -1,7 +1,7 @@
 ﻿namespace Serenity;
 
 /// <summary>
-/// Null text localizer which returns null for all keys
+/// A text localizer that returns <c>null</c> for all keys.
 /// </summary>
 public class NullTextLocalizer : ITextLocalizer
 {
@@ -10,15 +10,15 @@ public class NullTextLocalizer : ITextLocalizer
     }
 
     /// <summary>
-    /// Null text localizer instance
+    /// The singleton instance of the <see cref="NullTextLocalizer"/>.
     /// </summary>
     public static readonly NullTextLocalizer Instance = new();
 
     /// <summary>
-    /// Returns null for all keys
+    /// Returns <c>null</c> for all keys.
     /// </summary>
-    /// <param name="key">Local text key</param>
-    /// <returns>Null</returns>
+    /// <param name="key">The local text key.</param>
+    /// <returns><c>null</c>.</returns>
     public string? TryGet(string key)
     {
         return null;

@@ -1,30 +1,32 @@
 ﻿namespace Serenity;
 
 /// <summary>
-/// User definition abstraction.
+/// Represents the core identity information for a user.
 /// </summary>
-/// <remarks>Your application might have a class that implements this interface, e.g. UserDefinition, that has these properties plus some more
-/// specific to your app.</remarks>
+/// <remarks>
+/// Applications typically implement this interface with an application-specific
+/// class (for example, <c>UserDefinition</c>) that adds additional properties.
+/// </remarks>
 public interface IUserDefinition
 {
     /// <summary>
-    /// User ID
+    /// Gets the unique user identifier.
     /// </summary>
     string Id { get; }
     /// <summary>
-    /// User login name
+    /// Gets the login name of the user.
     /// </summary>
     string Username { get; }
     /// <summary>
-    /// Display name for user (can be same with Username)
+    /// Gets the display name of the user, which may be the same as <see cref="Username"/>.
     /// </summary>
     string DisplayName { get; }
     /// <summary>
-    /// Email address
+    /// Gets the email address of the user.
     /// </summary>
     string Email { get; }
     /// <summary>
-    /// Is user active (1 = active, 0 = disabled, -1 = deleted)
+    /// Gets a value indicating whether the user is active (1 = active, 0 = disabled, -1 = deleted).
     /// </summary>
     short IsActive { get; }
 }

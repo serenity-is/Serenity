@@ -1,7 +1,7 @@
 ﻿namespace Serenity.Data;
 
 /// <summary>
-/// Field with a Row value
+/// Field with a Row value.
 /// </summary>
 /// <typeparam name="TForeign">The type of the foreign.</typeparam>
 /// <seealso cref="CustomClassField{TForeign}" />
@@ -25,7 +25,7 @@ public class RowField<TForeign>(ICollection<Field> collection, string name, Loca
     /// </summary>
     /// <param name="value1">The value1.</param>
     /// <param name="value2">The value2.</param>
-    /// <returns></returns>
+    /// <returns>A value indicating the relative order of the two values.</returns>
     protected override int CompareValues(TForeign value1, TForeign value2)
     {
         if (value1 == null && value2 == null)
@@ -51,7 +51,7 @@ public class RowField<TForeign>(ICollection<Field> collection, string name, Loca
     /// Clones the specified value.
     /// </summary>
     /// <param name="value">The value.</param>
-    /// <returns></returns>
+    /// <returns>A clone of the value.</returns>
     protected override TForeign Clone(TForeign value)
     {
         if (value == null)

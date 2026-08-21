@@ -5,8 +5,8 @@ namespace Serenity;
 /// It can be used to indicate that the result is optional and
 /// if default is returned, the operation should continue normally.
 /// </summary>
-/// <typeparam name="T">Value type</typeparam>
-/// <param name="value">Value</param>
+/// <typeparam name="T">The value type.</typeparam>
+/// <param name="value">The value.</param>
 public readonly struct OptionalValue<T>(T value)
 {
     private readonly bool hasValue = true;
@@ -30,7 +30,7 @@ public readonly struct OptionalValue<T>(T value)
     /// <summary>
     /// Creates a new object initialized to a meaningful value. 
     /// </summary>
-    /// <param name="value"></param>
+    /// <param name="value">The value.</param>
     public static implicit operator OptionalValue<T>(T value)
     {
         return new OptionalValue<T>(value);

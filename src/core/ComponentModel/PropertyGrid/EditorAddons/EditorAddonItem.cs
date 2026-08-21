@@ -1,7 +1,7 @@
 namespace Serenity.ComponentModel;
 
 /// <summary>
-/// Editor addon item used within PropertyItem class
+/// Editor addon item used within the <see cref="PropertyItem"/> class.
 /// </summary>
 public class EditorAddonItem
 {

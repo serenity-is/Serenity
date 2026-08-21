@@ -1,12 +1,13 @@
 ﻿namespace Serenity.ComponentModel;
 
 /// <summary>
-/// Controls whether this field is visible on new record mode
+/// Controls whether this field is visible in new record mode.
 /// </summary>
 /// <remarks>
-/// Controls whether this field is visible on new record mode
+/// When placed on a field, this attribute controls whether the field
+/// is hidden when creating a new record.
 /// </remarks>
-/// <param name="value">True to hide field on insert</param>
+/// <param name="value">True to hide the field on insert.</param>
 public class HideOnInsertAttribute(bool value = true) : Attribute
 {
 

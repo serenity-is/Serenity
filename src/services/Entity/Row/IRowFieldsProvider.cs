@@ -6,16 +6,16 @@
 public interface IRowFieldsProvider
 {
     /// <summary>
-    /// Resolves the specified fields type.
+    /// Resolves the fields instance for the specified fields type.
     /// </summary>
     /// <param name="fieldsType">Type of the fields.</param>
-    /// <returns></returns>
+    /// <returns>The resolved fields instance for the specified type.</returns>
     RowFieldsBase Resolve(Type fieldsType);
     /// <summary>
-    /// Resolves the with alias.
+    /// Resolves the fields instance for the specified fields type with the given alias applied.
     /// </summary>
     /// <param name="fieldsType">Type of the fields.</param>
     /// <param name="alias">The alias.</param>
-    /// <returns></returns>
+    /// <returns>The resolved fields instance with the specified alias applied.</returns>
     RowFieldsBase ResolveWithAlias(Type fieldsType, string alias);
 }

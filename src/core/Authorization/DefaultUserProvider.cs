@@ -1,13 +1,17 @@
 namespace Serenity.Services;
 
 /// <summary>
-/// Default implementation for <see cref="IUserProvider"/> which is a combination of IUserAccessor and IUserRetrieveService.
+/// Default implementation of <see cref="IUserProvider"/> that delegates to an <see cref="IUserAccessor"/>,
+/// <see cref="IUserClaimCreator"/>, and <see cref="IUserRetrieveService"/>.
 /// </summary>
-/// <param name="userAccessor">User accessor</param>
-/// <param name="userClaimCreator">User claim creator</param>
-/// <param name="userRetriever">User retrieve service</param>
-/// <param name="cache">Optional cache for graceful invalidation if the IUserRetrieveService does not implement IUser</param>
-/// <exception cref="ArgumentNullException"></exception>
+/// <remarks>
+/// Creates a new instance of the <see cref="DefaultUserProvider"/> class.
+/// </remarks>
+/// <param name="userAccessor">The accessor that provides the current user principal.</param>
+/// <param name="userClaimCreator">The service used to create principals for impersonation.</param>
+/// <param name="userRetriever">The service used to retrieve user definitions.</param>
+/// <param name="cache">The two-level cache used for fallback invalidation when the retrieve service does not implement <see cref="IRemoveCachedUser"/>. Optional.</param>
+/// <exception cref="ArgumentNullException"><paramref name="userAccessor"/>, <paramref name="userClaimCreator"/> or <paramref name="userRetriever"/> is <c>null</c>.</exception>
 public class DefaultUserProvider(IUserAccessor userAccessor, IUserClaimCreator userClaimCreator, IUserRetrieveService userRetriever,
     ITwoLevelCache? cache = null) : IUserProvider
 {

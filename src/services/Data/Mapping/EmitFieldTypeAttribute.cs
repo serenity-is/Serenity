@@ -14,7 +14,7 @@ public class EmitFieldTypeAttribute(Type fieldType) : Attribute
 {
 
     /// <summary>
-    /// The field type
+    /// The field type.
     /// </summary>
     public Type FieldType { get; private set; } = fieldType ?? throw new ArgumentNullException(nameof(fieldType));
 }

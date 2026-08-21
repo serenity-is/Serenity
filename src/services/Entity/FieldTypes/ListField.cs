@@ -1,7 +1,7 @@
 ﻿namespace Serenity.Data;
 
 /// <summary>
-/// Field with a list value
+/// Field with a list value.
 /// </summary>
 /// <typeparam name="TItem">The type of the item.</typeparam>
 /// <remarks>
@@ -24,7 +24,7 @@ public class ListField<TItem>(ICollection<Field> collection, string name, LocalT
     /// </summary>
     /// <param name="value1">The value1.</param>
     /// <param name="value2">The value2.</param>
-    /// <returns></returns>
+    /// <returns>A value indicating the relative order of the two values.</returns>
     protected override int CompareValues(List<TItem> value1, List<TItem> value2)
     {
         var comparer = Comparer<TItem>.Default;
@@ -43,7 +43,7 @@ public class ListField<TItem>(ICollection<Field> collection, string name, LocalT
     /// Clones the specified value.
     /// </summary>
     /// <param name="value">The value.</param>
-    /// <returns></returns>
+    /// <returns>A clone of the value.</returns>
     protected override List<TItem> Clone(List<TItem> value)
     {
         var clone = new List<TItem>();

@@ -2,12 +2,29 @@ using Microsoft.AspNetCore.DataProtection;
 
 namespace Serenity.Extensions;
 
+/// <summary>
+/// Base class for account password action pages, such as change password,
+/// set password, forgot password, and reset password.
+/// </summary>
 public abstract class AccountPasswordActionsPageBase<TUserRow> : MembershipPageBase<TUserRow>
     where TUserRow : class, IRow, IIdRow, IEmailRow, IPasswordRow, new()
 {
+    /// <summary>
+    /// The folder containing the password action module scripts.
+    /// </summary>
     protected virtual string ModuleFolder => "~/Serenity.Extensions/esm/Modules/Membership/PasswordActions/";
+    /// <summary>
+    /// Gets the module script path for the specified key.
+    /// </summary>
+    /// <param name="key">The page key.</param>
+    /// <returns>The module script path.</returns>
     protected virtual string ModulePath(string key) => ModuleFolder + key + "Page.js";
 
+    /// <summary>
+    /// Renders the change password page, or the set password page if the user has no password set.
+    /// </summary>
+    /// <param name="userRetriever">The user retrieve service.</param>
+    /// <returns>The change password or set password page result.</returns>
     [HttpGet, PageAuthorize]
     public virtual ActionResult ChangePassword(
         [FromServices] IUserRetrieveService userRetriever)
@@ -22,6 +39,10 @@ public abstract class AccountPasswordActionsPageBase<TUserRow> : MembershipPageB
             ChangePasswordFormTexts.FormTitle);
     }
 
+    /// <summary>
+    /// Renders the set password page.
+    /// </summary>
+    /// <returns>The set password page result.</returns>
     [HttpGet, PageAuthorize]
     public ActionResult SetPassword()
     {
@@ -32,6 +53,15 @@ public abstract class AccountPasswordActionsPageBase<TUserRow> : MembershipPageB
         });
     }
 
+    /// <summary>
+    /// Sends a reset password email to the current user, or returns a demo link in public demo mode.
+    /// </summary>
+    /// <param name="userRetriever">The user retrieve service.</param>
+    /// <param name="emailSender">The email sender.</param>
+    /// <param name="siteAbsoluteUrl">The site absolute URL service.</param>
+    /// <param name="cache">The two level cache.</param>
+    /// <param name="localizer">The text localizer.</param>
+    /// <returns>The send reset password response.</returns>
     [HttpPost, ServiceAuthorize]
     public virtual ActionResult SendResetPassword(
         [FromServices] IUserRetrieveService userRetriever,
@@ -63,6 +93,18 @@ public abstract class AccountPasswordActionsPageBase<TUserRow> : MembershipPageB
 #endif
     }
 
+    /// <summary>
+    /// Changes the password of the current user after validating the old password and strength.
+    /// </summary>
+    /// <param name="request">The change password request.</param>
+    /// <param name="cache">The two level cache.</param>
+    /// <param name="passwordValidator">The password validator.</param>
+    /// <param name="passwordStrengthValidator">The password strength validator.</param>
+    /// <param name="userRetriever">The user retrieve service.</param>
+    /// <param name="membershipOptions">The membership settings.</param>
+    /// <param name="environmentOptions">The environment settings.</param>
+    /// <param name="localizer">The text localizer.</param>
+    /// <returns>The service response.</returns>
     [HttpPost, JsonRequest, ServiceAuthorize]
     public virtual Result<ServiceResponse> ChangePassword(ChangePasswordRequest request,
         [FromServices] ITwoLevelCache cache,
@@ -118,12 +160,20 @@ public abstract class AccountPasswordActionsPageBase<TUserRow> : MembershipPageB
         });
     }
 
+    /// <summary>
+    /// Renders the forgot password page.
+    /// </summary>
+    /// <returns>The forgot password page result.</returns>
     [HttpGet]
     public virtual ActionResult ForgotPassword()
     {
         return this.PanelPage(GetForgotPasswordPageModel());
     }
 
+    /// <summary>
+    /// Gets the module page model for the forgot password page.
+    /// </summary>
+    /// <returns>The forgot password page model.</returns>
     protected virtual ModulePageModel GetForgotPasswordPageModel()
     {
         return new ModulePageModel()
@@ -134,6 +184,15 @@ public abstract class AccountPasswordActionsPageBase<TUserRow> : MembershipPageB
         };
     }
 
+    /// <summary>
+    /// Sends a reset password email to the user with the specified email address.
+    /// </summary>
+    /// <param name="request">The forgot password request.</param>
+    /// <param name="emailSender">The email sender.</param>
+    /// <param name="siteAbsoluteUrl">The site absolute URL service.</param>
+    /// <param name="cache">The two level cache.</param>
+    /// <param name="localizer">The text localizer.</param>
+    /// <returns>The service response.</returns>
     [HttpPost, JsonRequest]
     public virtual Result<ServiceResponse> ForgotPassword(ForgotPasswordRequest request,
         [FromServices] IEmailSender emailSender,
@@ -190,6 +249,11 @@ public abstract class AccountPasswordActionsPageBase<TUserRow> : MembershipPageB
         });
     }
 
+    /// <summary>
+    /// Generates a protected reset password token for the specified user.
+    /// </summary>
+    /// <param name="user">The user row.</param>
+    /// <returns>The reset password token.</returns>
     protected virtual string GenerateResetPasswordToken(TUserRow user)
     {
         return HttpContext.RequestServices.GetDataProtector("ResetPassword").ProtectBinary(bw =>
@@ -200,6 +264,14 @@ public abstract class AccountPasswordActionsPageBase<TUserRow> : MembershipPageB
         });
     }
 
+    /// <summary>
+    /// Validates the reset token and renders the reset password page if it is valid.
+    /// </summary>
+    /// <param name="t">The reset token.</param>
+    /// <param name="sqlConnections">The SQL connections.</param>
+    /// <param name="localizer">The text localizer.</param>
+    /// <param name="options">The membership settings.</param>
+    /// <returns>The reset password page or an error result.</returns>
     [HttpGet]
     public virtual IActionResult ResetPassword(string t,
         [FromServices] ISqlConnections sqlConnections,
@@ -233,6 +305,12 @@ public abstract class AccountPasswordActionsPageBase<TUserRow> : MembershipPageB
         return this.PanelPage(GetResetPasswordPageModel(t, options.Value));
     }
 
+    /// <summary>
+    /// Gets the module page model for the reset password page.
+    /// </summary>
+    /// <param name="token">The reset token.</param>
+    /// <param name="settings">The membership settings.</param>
+    /// <returns>The reset password page model.</returns>
     protected virtual ModulePageModel GetResetPasswordPageModel(string token, MembershipSettings settings)
     {
         return new()
@@ -250,6 +328,17 @@ public abstract class AccountPasswordActionsPageBase<TUserRow> : MembershipPageB
 
     private const string ResetPasswordPurpose = "ResetPassword";
 
+    /// <summary>
+    /// Resets the password of the user identified by the reset token.
+    /// </summary>
+    /// <param name="request">The reset password request.</param>
+    /// <param name="cache">The two level cache.</param>
+    /// <param name="sqlConnections">The SQL connections.</param>
+    /// <param name="localizer">The text localizer.</param>
+    /// <param name="passwordStrengthValidator">The password strength validator.</param>
+    /// <param name="environmentOptions">The environment settings.</param>
+    /// <param name="membershipOptions">The membership settings.</param>
+    /// <returns>The reset password response.</returns>
     [HttpPost, JsonRequest]
     public virtual Result<ResetPasswordResponse> ResetPassword(ResetPasswordRequest request,
         [FromServices] ITwoLevelCache cache,

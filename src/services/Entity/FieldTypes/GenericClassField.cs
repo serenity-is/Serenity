@@ -1,18 +1,18 @@
 namespace Serenity.Data;
 
 /// <summary>
-/// Base class for fields with reference type values
+/// Base class for fields with reference type values.
 /// </summary>
 /// <typeparam name="TValue">The type of the value.</typeparam>
 /// <seealso cref="Field" />
 public abstract class GenericClassField<TValue> : Field where TValue : class
 {
     /// <summary>
-    /// The get value callback
+    /// The get value callback.
     /// </summary>
     protected internal Func<IRow, TValue> _getValue;
     /// <summary>
-    /// The set value callback
+    /// The set value callback.
     /// </summary>
     protected internal Action<IRow, TValue> _setValue;
 
@@ -39,7 +39,7 @@ public abstract class GenericClassField<TValue> : Field where TValue : class
     /// Gets or sets the value of this field with the specified row.
     /// </summary>
     /// <param name="row">The row.</param>
-    /// <returns></returns>
+    /// <returns>The value of the field in the row.</returns>
     public TValue this[IRow row]
     {
         get
@@ -59,7 +59,7 @@ public abstract class GenericClassField<TValue> : Field where TValue : class
     /// </summary>
     /// <param name="source">The source.</param>
     /// <param name="provider">The provider.</param>
-    /// <returns></returns>
+    /// <returns>The converted value.</returns>
     public override object ConvertValue(object source, IFormatProvider provider)
     {
         if (source is Newtonsoft.Json.Linq.JValue jValue)

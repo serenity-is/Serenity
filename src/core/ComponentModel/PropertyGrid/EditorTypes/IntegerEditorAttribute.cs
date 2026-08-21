@@ -60,7 +60,7 @@ public partial class IntegerEditorAttribute : CustomEditorAttribute
 
     /// <summary>
     /// Gets or sets a value indicating whether editors should allow negatives by default.
-    /// This is a global setting that controls default of AllowNegatives property in this attribute.
+    /// This is a global setting that controls the default of the AllowNegatives property in this attribute.
     /// </summary>
     /// <value>
     ///   <c>true</c> if editors should allow negatives by default; otherwise, <c>false</c>.

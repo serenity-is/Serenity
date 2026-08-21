@@ -1,7 +1,7 @@
 namespace Serenity.Data.Mapping;
 
 /// <summary>
-/// Concat expression attribute
+/// Concat expression attribute.
 /// </summary>
 public class ConcatAttribute : BaseExpressionAttribute
 {
@@ -89,7 +89,7 @@ public class ConcatAttribute : BaseExpressionAttribute
     }
 
     /// <summary>
-    /// Gets the expressions
+    /// Gets the expressions.
     /// </summary>
     public object[] Expressions { get; }
 

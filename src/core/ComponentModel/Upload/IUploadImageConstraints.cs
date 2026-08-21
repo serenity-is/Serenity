@@ -3,15 +3,15 @@ namespace Serenity.ComponentModel;
 /// <summary>
 /// Constraints for the uploaded image.
 /// </summary>
-public interface IUploadImageContrains : IUploadOptions
+public interface IUploadImageConstraints : IUploadOptions
 {
     /// <summary>
-    /// If set to false, the upload behavior raises an error when it 
-    /// detects the extension does not match the actual format of 
-    /// the uploaded file. 
+    /// If set to false, the upload behavior raises an error when it
+    /// detects the extension does not match the actual format of
+    /// the uploaded file.
     /// For example, if the uploaded file is "test.jpg" but it has a "png"
-    /// image inside it raises an error.
-    /// Default is true, so such mismatches are ignored
+    /// image inside, it raises an error.
+    /// Default is true, so such mismatches are ignored.
     /// </summary>
     public bool IgnoreExtensionMismatch { get; }
 
@@ -46,4 +46,12 @@ public interface IUploadImageContrains : IUploadOptions
     /// Minimum width in pixels of the uploaded image.
     /// </summary>
     public int MinWidth { get; }
+}
+
+/// <summary>
+/// Obsolete type with a typo
+/// </summary>
+[Obsolete("Had typo in name, use IUploadImageConstraints")]
+public interface IUploadImageContrains : IUploadImageConstraints
+{
 }

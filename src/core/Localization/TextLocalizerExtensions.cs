@@ -1,16 +1,16 @@
 ﻿namespace Serenity;
 
 /// <summary>
-/// Extensions for local text context
+/// Extensions for <see cref="ITextLocalizer"/>.
 /// </summary>
 public static class TextLocalizerExtensions
 {
     /// <summary>
-    /// Gets translation for a key
+    /// Gets the translation for a key.
     /// </summary>
-    /// <param name="localTexts">The local texts</param>
-    /// <param name="key">Key</param>
-    /// <returns>Translated text or key itself if no translation found</returns>
+    /// <param name="localTexts">The text localizer.</param>
+    /// <param name="key">The key.</param>
+    /// <returns>The translated text, or the key itself if no translation is found.</returns>
     public static string Get(this ITextLocalizer localTexts, string key)
     {
         if (localTexts == null)

@@ -40,12 +40,12 @@ public static class ThumbnailGenerator
     }
 
     /// <summary>
-    /// Generates an empty bitmap
+    /// Generates an empty bitmap.
     /// </summary>
     /// <param name="width">Width</param>
     /// <param name="height">Height</param>
     /// <param name="color">Background color</param>
-    /// <returns></returns>
+    /// <returns>The generated empty bitmap.</returns>
     public static Image GenerateEmptyBitmap(int width, int height, Color color)
     {
         return new Image<Rgb24>(width, height, color);

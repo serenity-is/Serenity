@@ -2,7 +2,7 @@
 namespace Serenity.Data;
 
 /// <summary>
-/// Sets default read permission for fields of a row which doesn't have a ModifyPermission
+/// Sets the default modify permission for fields of a row that don't have a ModifyPermission
 /// themselves.
 /// </summary>
 /// <seealso cref="PermissionAttributeBase" />

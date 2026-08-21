@@ -1,7 +1,7 @@
 ﻿namespace Serenity.ComponentModel;
 
 /// <summary>
-/// Indicates that property should use enum type of filtering
+/// Indicates that the property should use enum type of filtering.
 /// </summary>
 /// <seealso cref="CustomFilteringAttribute" />
 public class EnumFilteringAttribute : CustomFilteringAttribute

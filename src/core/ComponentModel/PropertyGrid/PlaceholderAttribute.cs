@@ -2,8 +2,8 @@
 
 /// <summary>
 /// Sets a placeholder for a form field. Placeholder text is shown inside the editor
-/// when its value is empty. Only editors using basic inputs and Select2 editor
-/// supports this.
+/// when its value is empty. Only editors using basic inputs and the Select2 editor
+/// support this.
 /// </summary>
 /// <remarks>
 /// Initializes a new instance of the <see cref="PlaceholderAttribute"/> class.

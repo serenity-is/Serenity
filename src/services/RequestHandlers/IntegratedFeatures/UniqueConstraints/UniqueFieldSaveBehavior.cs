@@ -1,10 +1,10 @@
 namespace Serenity.Services;
 
 /// <summary>
-/// Interface that handles <see cref="UniqueConstraintAttribute"/> on fields
+/// Interface that handles <see cref="UniqueConstraintAttribute"/> on fields.
 /// </summary>
 /// <remarks>
-/// Creates a new instance of the class
+/// Initializes a new instance of the class.
 /// </remarks>
 /// <param name="localizer">Text localizer</param>
 public class UniqueFieldSaveBehavior(ITextLocalizer localizer) : BaseSaveBehavior, IImplicitBehavior, IFieldBehavior

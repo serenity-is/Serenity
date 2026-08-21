@@ -2,7 +2,7 @@
 namespace Serenity.ComponentModel;
 
 /// <summary>
-/// Indicates that property should use integer type of filtering
+/// Indicates that the property should use integer type of filtering.
 /// </summary>
 /// <seealso cref="CustomFilteringAttribute" />
 public class IntegerFilteringAttribute : CustomFilteringAttribute

@@ -1,12 +1,12 @@
 ﻿namespace Serenity.Data;
 
 /// <summary>
-/// Interfaces for types that has a CurrentTransaction property of type IDbTransaction
+/// Interface for types that have a <see cref="CurrentTransaction"/> property of type <see cref="IDbTransaction"/>.
 /// </summary>
 public interface IHasCurrentTransaction
 {
     /// <summary>
-    /// Gets the current transaction
+    /// Gets the current transaction.
     /// </summary>
     IDbTransaction CurrentTransaction { get; }
 }

@@ -1,7 +1,7 @@
 namespace Serenity.Reflection;
 
 /// <summary>
-/// Sorts assemblies based on their dependencies
+/// Sorts assemblies based on their dependencies.
 /// </summary>
 public class AssemblySorter
 {
@@ -16,7 +16,7 @@ public class AssemblySorter
     /// Sorts the specified assemblies based on their dependencies.
     /// </summary>
     /// <param name="assemblies">The assemblies.</param>
-    /// <returns></returns>
+    /// <returns>The assemblies sorted so that dependencies come before dependents.</returns>
     public static IEnumerable<Assembly> Sort(IEnumerable<Assembly> assemblies)
     {
         var assemblyItems = assemblies.Select(a => new AssemblyItem(a)).ToArray();
@@ -41,7 +41,7 @@ public class AssemblySorter
     /// <typeparam name="T">Type of items</typeparam>
     /// <param name="source">The source.</param>
     /// <param name="dependencies">The dependencies.</param>
-    /// <returns></returns>
+    /// <returns>The items sorted so that dependencies come before dependents.</returns>
     public static IEnumerable<T> TSort<T>(IEnumerable<T> source,
         Func<T, IEnumerable<T>> dependencies)
     {

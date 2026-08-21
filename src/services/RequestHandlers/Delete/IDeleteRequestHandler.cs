@@ -7,37 +7,37 @@
 public interface IDeleteRequestHandler : IRequestHandler
 {
     /// <summary>
-    /// New row
+    /// Gets the row being deleted.
     /// </summary>
     IRow Row { get; }
 
     /// <summary>
-    /// Delete request
+    /// Gets the delete request.
     /// </summary>
     DeleteRequest Request { get; }
 
     /// <summary>
-    /// Delete response
+    /// Gets the delete response.
     /// </summary>
     DeleteResponse Response { get; }
 
     /// <summary>
-    /// A state bag that can be used as storage within a request handler context
+    /// Gets a state bag that can be used as storage within a request handler context.
     /// </summary>
     IDictionary<string, object> StateBag { get; }
 
     /// <summary>
-    /// Current connection
+    /// Gets the current connection.
     /// </summary>
     IDbConnection Connection { get; }
 
     /// <summary>
-    /// Current transaction
+    /// Gets the current unit of work.
     /// </summary>
     IUnitOfWork UnitOfWork { get; }
 
     /// <summary>
-    /// Current request context
+    /// Gets the current request context.
     /// </summary>
     IRequestContext Context { get; }
 }

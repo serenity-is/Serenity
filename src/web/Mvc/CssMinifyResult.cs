@@ -1,17 +1,17 @@
 namespace Serenity.Web;
 
 /// <summary>
-/// Result returned from a CSS minifier
+/// Result returned from a CSS minifier.
 /// </summary>
 public class CssMinifyResult
 {
     /// <summary>
-    /// Gets the minified code
+    /// Gets or sets the minified code.
     /// </summary>
     public string Code { get; set; }
 
     /// <summary>
-    /// Gets if minifying had errors
+    /// Gets or sets whether minifying had errors.
     /// </summary>
     public bool HasErrors { get; set; }
 }

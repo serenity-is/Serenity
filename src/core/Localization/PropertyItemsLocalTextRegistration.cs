@@ -3,20 +3,22 @@ using Serenity.Web;
 namespace Serenity.Localization;
 
 /// <summary>
-/// Contains initialization method for adding local text keys implicitly defined by
-/// DisplayName, Tab, Placeholder, Hint etc. attributes used in Form definitions
+/// Contains initialization methods for adding local text keys implicitly defined by
+/// <see cref="DisplayNameAttribute"/>, <see cref="TabAttribute"/>, <see cref="PlaceholderAttribute"/>,
+/// <see cref="HintAttribute"/>, etc. attributes used in Form definitions.
 /// </summary>
 public static class PropertyItemsLocalTextRegistration
 {
     private static readonly Regex LocalTextKeyLike = new(@"^([A-Z][A-za-z0-9_]*\.)+[A-Z][A-za-z0-9_]*$", RegexOptions.Compiled);
 
     /// <summary>
-    /// Adds local text translations defined implicitly by DisplayName, Tab, Placeholder,
-    /// Hint etc. attributes used in Column/Form etc. definitions.
+    /// Adds local text translations defined implicitly by <see cref="DisplayNameAttribute"/>,
+    /// <see cref="TabAttribute"/>, <see cref="PlaceholderAttribute"/>, <see cref="HintAttribute"/>,
+    /// etc. attributes used in Column/Form definitions.
     /// </summary>
-    /// <param name="typeSource">Type source to search for enumeration classes in</param>
-    /// <param name="languageID">Language ID texts will be added (default is invariant language)</param>
-    /// <param name="registry">Registry</param>
+    /// <param name="registry">The registry to add texts to.</param>
+    /// <param name="typeSource">The type source to search for property item types in.</param>
+    /// <param name="languageID">The language ID texts will be added for (default is the invariant language).</param>
     public static void AddPropertyItemsTexts(this ILocalTextRegistry registry, ITypeSource typeSource,
         string languageID = LocalText.InvariantLanguageID)
     {
@@ -82,9 +84,10 @@ public static class PropertyItemsLocalTextRegistration
     }
 
     /// <summary>
-    /// Gets form/column local text key prefix for given type
+    /// Gets the form/column local text key prefix for the given type.
     /// </summary>
-    /// <param name="type">Type with form/column attribute</param>
+    /// <param name="type">The type with a form or column attribute.</param>
+    /// <returns>The local text key prefix, or <c>null</c> if the type has neither a form nor a column attribute.</returns>
     public static string? GetPropertyItemsTextPrefix(Type type)
     {
         var formAttr = type.GetCustomAttribute<FormScriptAttribute>(inherit: false);
@@ -112,11 +115,11 @@ public static class PropertyItemsLocalTextRegistration
     }
 
     /// <summary>
-    /// Returns true if the text value can be a local text key
-    /// that could be passed to the client side
+    /// Returns <c>true</c> if the text value can be a local text key
+    /// that could be passed to the client side.
     /// </summary>
-    /// <param name="text">Key or text</param>
-    /// <returns></returns>
+    /// <param name="text">The key or text.</param>
+    /// <returns><c>true</c> if the text looks like a local text key; otherwise, <c>false</c>.</returns>
     public static bool IsLocalTextKeyCandidate(string text)
     {
         return !string.IsNullOrEmpty(text) &&

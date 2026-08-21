@@ -6,7 +6,7 @@
 public class ImageEncoderParams
 {
     /// <summary>
-    /// JPEG quality
+    /// Gets or sets the JPEG quality.
     /// </summary>
     public int? Quality { get; set; }
 }

@@ -1,7 +1,7 @@
 namespace Serenity.ComponentModel;
 
 /// <summary>
-/// Sets CSS class for field on forms only. Useful for Bootstrap grid, e.g. col-md-4 etc.
+/// Sets the CSS class for the field on forms only. Useful for Bootstrap grid, e.g. col-md-4 etc.
 /// </summary>
 public class FormWidthAttribute : Attribute
 {
@@ -17,14 +17,14 @@ public class FormWidthAttribute : Attribute
     /// Creates a FormWidth attribute with given custom css class,
     /// like col-md-6 col-sm-4 etc.
     /// </summary>
-    /// <param name="cssClass"></param>
+    /// <param name="cssClass">The CSS class to apply to the field, e.g. col-md-6.</param>
     public FormWidthAttribute(string? cssClass)
     {
         Value = cssClass;
     }
 
     /// <summary>
-    /// Gets / sets cols (1..12) in extra small devices (width &lt; 768px, mobile phones)
+    /// Gets or sets the number of columns (1..12) in extra small devices (width &lt; 768px, mobile phones).
     /// </summary>
     public int XSmall
     {
@@ -33,7 +33,7 @@ public class FormWidthAttribute : Attribute
     }
 
     /// <summary>
-    /// Gets / sets cols (1..12) in small devices (width >= 768px, tablets)
+    /// Gets or sets the number of columns (1..12) in small devices (width >= 768px, tablets).
     /// </summary>
     public int Small
     {
@@ -42,7 +42,7 @@ public class FormWidthAttribute : Attribute
     }
 
     /// <summary>
-    /// Gets / sets cols (1..12) in medium devices (width >= 992px, medium desktops)
+    /// Gets or sets the number of columns (1..12) in medium devices (width >= 992px, medium desktops).
     /// </summary>
     public int Medium
     {
@@ -51,7 +51,7 @@ public class FormWidthAttribute : Attribute
     }
 
     /// <summary>
-    /// Gets / sets cols (1..12) in large devices (width >= 1200px, large desktops)
+    /// Gets or sets the number of columns (1..12) in large devices (width >= 1200px, large desktops).
     /// </summary>
     public int Large
     {
@@ -60,21 +60,21 @@ public class FormWidthAttribute : Attribute
     }
 
     /// <summary>
-    /// Gets the css class that will be applied to field
+    /// Gets the CSS class that will be applied to the field.
     /// </summary>
     public string? Value { get; protected set; }
 
     /// <summary>
-    /// Applies this form width (e.g. bootstrap grid size) to all 
-    /// following fields until next another FormWidth attribute
+    /// Applies this form width (e.g. bootstrap grid size) to all
+    /// following fields until another FormWidth attribute.
     /// </summary>
     public bool UntilNext { get; set; }
 
     /// <summary>
-    /// Applies this form width (e.g. bootstrap grid size) to just 
-    /// current field and doesn't cancel prior form width attribute
-    /// with a UntilNext attribute. Don't set UntilNext = true if
-    /// you set JustThis = true, as they are exclusive
+    /// Applies this form width (e.g. bootstrap grid size) to just the
+    /// current field and doesn't cancel a prior form width attribute
+    /// with an UntilNext attribute. Don't set UntilNext = true if
+    /// you set JustThis = true, as they are exclusive.
     /// </summary>
     public bool JustThis { get; set; }
 

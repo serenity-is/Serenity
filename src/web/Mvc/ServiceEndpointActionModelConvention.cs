@@ -4,7 +4,7 @@ using Microsoft.AspNetCore.Mvc.ModelBinding;
 namespace Serenity.Services;
 
 /// <summary>
-/// Action model convention for <see cref="ServiceEndpoint"/> actions
+/// Action model convention for <see cref="ServiceEndpoint"/> actions.
 /// </summary>
 public class ServiceEndpointActionModelConvention : IActionModelConvention
 {

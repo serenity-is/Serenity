@@ -3,7 +3,7 @@ using System.Text.Json;
 namespace Serenity.Data;
 
 /// <summary>
-/// Field with a Guid value
+/// Field with a Guid value.
 /// </summary>
 /// <remarks>
 /// Initializes a new instance of the <see cref="GuidField"/> class.
@@ -29,7 +29,7 @@ public sealed class GuidField(ICollection<Field> collection, string name, LocalT
     /// <param name="flags">The flags.</param>
     /// <param name="getValue">The get value.</param>
     /// <param name="setValue">The set value.</param>
-    /// <returns></returns>
+    /// <returns>A new GuidField instance.</returns>
     public static GuidField Factory(ICollection<Field> collection, string name, LocalText caption, int size, FieldFlags flags,
         Func<IRow, Guid?> getValue, Action<IRow, Guid?> setValue)
     {
@@ -42,7 +42,7 @@ public sealed class GuidField(ICollection<Field> collection, string name, LocalT
     /// <param name="reader">The reader.</param>
     /// <param name="index">The index.</param>
     /// <param name="row">The row.</param>
-    /// <exception cref="ArgumentNullException">reader</exception>
+    /// <exception cref="ArgumentNullException">reader is null.</exception>
     public override void GetFromReader(IDataReader reader, int index, IRow row)
     {
         ArgumentNullException.ThrowIfNull(reader);
@@ -56,7 +56,7 @@ public sealed class GuidField(ICollection<Field> collection, string name, LocalT
     }
 
     /// <summary>
-    /// Serializes this fields value to JSON
+    /// Serializes this field's value to JSON.
     /// </summary>
     /// <param name="writer">The writer.</param>
     /// <param name="row">The row.</param>
@@ -67,12 +67,12 @@ public sealed class GuidField(ICollection<Field> collection, string name, LocalT
     }
 
     /// <summary>
-    /// Deserializes this fields value from JSON
+    /// Deserializes this field's value from JSON.
     /// </summary>
     /// <param name="reader">The reader.</param>
     /// <param name="row">The row.</param>
     /// <param name="serializer">The serializer.</param>
-    /// <exception cref="ArgumentNullException">reader</exception>
+    /// <exception cref="ArgumentNullException">reader is null.</exception>
     public override void ValueFromJson(Newtonsoft.Json.JsonReader reader, IRow row, Newtonsoft.Json.JsonSerializer serializer)
     {
         ArgumentNullException.ThrowIfNull(reader);
@@ -102,7 +102,7 @@ public sealed class GuidField(ICollection<Field> collection, string name, LocalT
     /// </summary>
     /// <param name="source">The source.</param>
     /// <param name="provider">The provider.</param>
-    /// <returns></returns>
+    /// <returns>The converted value.</returns>
     public override object ConvertValue(object source, IFormatProvider provider)
     {
         if (source is Newtonsoft.Json.Linq.JValue jValue)

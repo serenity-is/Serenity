@@ -1,8 +1,8 @@
 ﻿namespace Serenity.Data;
 
 /// <summary>
-/// Determines the transaction isolation level and defer start flag used for 
-/// a service endpoint action use when creating the UnitOfWork class
+/// Determines the transaction isolation level and defer start flag used for
+/// a service endpoint action when creating the <see cref="UnitOfWork"/> class.
 /// </summary>
 public class TransactionSettingsAttribute : Attribute
 {
@@ -33,9 +33,9 @@ public class TransactionSettingsAttribute : Attribute
     public IsolationLevel IsolationLevel { get; private set; } = IsolationLevel.Unspecified;
 
     /// <summary>
-    /// Gets / sets if the transaction start should be deferred if possible
-    /// (generally until the connection property of unit of work object is read).
-    /// This might have undesired side effects so use with care.
+    /// Gets or sets whether the transaction start should be deferred if possible
+    /// (generally until the connection property of the unit of work object is read).
+    /// This might have undesired side effects, so use with care.
     /// </summary>
     public bool DeferStart
     {
@@ -44,7 +44,7 @@ public class TransactionSettingsAttribute : Attribute
     }
 
     /// <summary>
-    /// Gets if DeferStart property is set
+    /// Gets whether the <see cref="DeferStart"/> property is set.
     /// </summary>
     public bool HasDeferStart => deferStart != null;
 }

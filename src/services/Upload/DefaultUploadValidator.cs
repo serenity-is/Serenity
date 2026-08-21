@@ -5,16 +5,16 @@ using System.IO;
 namespace Serenity.Web;
 
 /// <summary>
-/// Default implementation for <see cref="IUploadValidator"/>
+/// Default implementation for <see cref="IUploadValidator"/>.
 /// </summary>
 /// <remarks>
-/// Creates a new instance of the class
+/// Initializes a new instance of the class.
 /// </remarks>
 /// <param name="imageProcessor">Image processor</param>
 /// <param name="localizer">Text localizer</param>
 /// <param name="uploadSettings">Upload settings</param>
 /// <param name="logger">Exception logger</param>
-/// <exception cref="ArgumentNullException">imageProcessor or localizer is null</exception>
+/// <exception cref="ArgumentNullException"><paramref name="imageProcessor"/> or <paramref name="localizer"/> is <c>null</c>.</exception>
 public class DefaultUploadValidator(IImageProcessor imageProcessor, ITextLocalizer localizer,
     ILogger<DefaultUploadValidator> logger = null,
     IOptions<UploadSettings> uploadSettings = null) : IUploadValidator
@@ -122,7 +122,7 @@ public class DefaultUploadValidator(IImageProcessor imageProcessor, ITextLocaliz
     }
 
     /// <inheritdoc/>
-    public void ValidateImage(IUploadImageContrains constraints, Stream stream, 
+    public void ValidateImage(IUploadImageConstraints constraints, Stream stream, 
         string filename, out object image)
     {
         ArgumentNullException.ThrowIfNull(constraints);

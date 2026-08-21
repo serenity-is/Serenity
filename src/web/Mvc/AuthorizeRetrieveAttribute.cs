@@ -2,12 +2,11 @@ namespace Serenity.Services;
 
 /// <summary>
 /// Authorizes retrieve access to a service method by reading <see cref="ReadPermissionAttribute"/>.
-/// <see cref="ServiceLookupPermissionAttribute"/>
 /// </summary>
 /// <remarks>
-/// Creates a new instance of the attribute
+/// Initializes a new instance of the <see cref="AuthorizeRetrieveAttribute"/> class.
 /// </remarks>
-/// <param name="sourceType">Source type</param>
+/// <param name="sourceType">The source type.</param>
 public class AuthorizeRetrieveAttribute(Type sourceType) 
     : ServiceAuthorizeAttribute(sourceType, typeof(ReadPermissionAttribute))
 {

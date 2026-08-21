@@ -1,13 +1,13 @@
 namespace Serenity.Services;
 
 /// <summary>
-/// Behavior that handles <see cref="UpdatableExtensionAttribute"/>
+/// Behavior that handles <see cref="UpdatableExtensionAttribute"/>.
 /// </summary>
 /// <remarks>
-/// Creates a new instance of the class
+/// Initializes a new instance of the class.
 /// </remarks>
 /// <param name="handlerFactory">Default handler factory</param>
-/// <exception cref="ArgumentNullException">handlerFactory is null</exception>
+/// <exception cref="ArgumentNullException"><paramref name="handlerFactory"/> is <c>null</c>.</exception>
 public class UpdatableExtensionBehavior(IDefaultHandlerFactory handlerFactory) : BaseSaveDeleteBehavior, IImplicitBehavior
 {
     private class RelationInfo

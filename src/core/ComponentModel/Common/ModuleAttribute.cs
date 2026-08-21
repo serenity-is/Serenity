@@ -1,8 +1,8 @@
 ﻿namespace Serenity.ComponentModel;
 
 /// <summary>
-/// Sets the module name for the row. Module name is usually the folder name
-/// under ~/Modules folder entity resides in.
+/// Sets the module name for the row. The module name is usually the folder name
+/// under the ~/Modules folder that the entity resides in.
 /// </summary>
 /// <seealso cref="Attribute" />
 /// <remarks>

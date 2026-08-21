@@ -7,22 +7,22 @@ namespace Serenity.Data;
 public interface ICaptureLogRow : IIdRow
 {
     /// <summary>
-    /// Field containing the operation type
+    /// Gets the field containing the operation type.
     /// </summary>
     EnumField<CaptureOperationType> OperationTypeField { get; }
 
     /// <summary>
-    /// Field containing the user ID
+    /// Gets the field containing the user ID.
     /// </summary>
     Field ChangingUserIdField { get; }
 
     /// <summary>
-    /// Field containing ValidFrom date
+    /// Gets the field containing the ValidFrom date.
     /// </summary>
     DateTimeField ValidFromField { get; }
 
     /// <summary>
-    /// Field containing ValidUntil date
+    /// Gets the field containing the ValidUntil date.
     /// </summary>
     DateTimeField ValidUntilField { get; }
 }

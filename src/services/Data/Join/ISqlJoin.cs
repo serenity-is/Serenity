@@ -1,7 +1,7 @@
 ﻿namespace Serenity.Data.Mapping;
 
 /// <summary>
-/// Interface for SQL join types
+/// Interface for SQL join types.
 /// </summary>
 public interface ISqlJoin
 {

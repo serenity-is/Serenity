@@ -6,14 +6,15 @@ using Serenity.Web.EsBuild;
 namespace Serenity.Extensions.DependencyInjection;
 
 /// <summary>
-/// Extensions for adding EsBuild minifiers to IServiceCollection.
+/// Extensions for adding EsBuild minifiers to an <see cref="IServiceCollection"/>.
 /// </summary>
 public static class EsBuildMinifierExtensions
 {
     /// <summary>
-    /// Adds EsBuild minifiers to IServiceCollection.
+    /// Adds both the EsBuild CSS and script minifiers to the service collection.
     /// </summary>
-    /// <param name="collection">Collection</param>
+    /// <param name="collection">The service collection.</param>
+    /// <returns>The same service collection so that calls can be chained.</returns>
     public static IServiceCollection AddEsBuildMinifiers(this IServiceCollection collection)
     {
         AddEsBuildCssMinifier(collection);
@@ -22,9 +23,10 @@ public static class EsBuildMinifierExtensions
     }
 
     /// <summary>
-    /// Adds EsBuild CSS minifier to IServiceCollection.
+    /// Adds the EsBuild CSS minifier to the service collection.
     /// </summary>
-    /// <param name="collection">Collection</param>
+    /// <param name="collection">The service collection.</param>
+    /// <returns>The same service collection so that calls can be chained.</returns>
     public static IServiceCollection AddEsBuildCssMinifier(this IServiceCollection collection)
     {
         collection.TryAddSingleton<ICssMinifier, EsBuildMinifier>();
@@ -32,9 +34,10 @@ public static class EsBuildMinifierExtensions
     }
 
     /// <summary>
-    /// Adds EsBuild script minifier to IServiceCollection.
+    /// Adds the EsBuild script minifier to the service collection.
     /// </summary>
-    /// <param name="collection">Collection</param>
+    /// <param name="collection">The service collection.</param>
+    /// <returns>The same service collection so that calls can be chained.</returns>
     public static IServiceCollection AddEsBuildScriptMinifier(this IServiceCollection collection)
     {
         collection.TryAddSingleton<IScriptMinifier, EsBuildMinifier>();

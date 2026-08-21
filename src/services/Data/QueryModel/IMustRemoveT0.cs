@@ -1,7 +1,7 @@
 ﻿namespace Serenity.Data;
 
 /// <summary>
-/// Obsolete interface
+/// Obsolete interface.
 /// </summary>
 public interface IMustRemoveT0
 {

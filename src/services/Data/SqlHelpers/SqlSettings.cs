@@ -3,7 +3,7 @@ using System.Threading;
 namespace Serenity.Data;
 
 /// <summary>
-/// Global SQL settings
+/// Global SQL settings.
 /// </summary>
 public static class SqlSettings
 {
@@ -18,11 +18,11 @@ public static class SqlSettings
 
     /// <summary>
     /// Gets or sets a value indicating whether to automatically quote identifiers.
-    /// This is used as a fallback if the dialect and SqlSettings.DefaultDialect does 
+    /// This is used as a fallback if the dialect and <see cref="SqlSettings.DefaultDialect"/> do
     /// not provide a value. Default is true.
     /// </summary>
     /// <value>
-    ///   <c>true</c> if should automatically quote identifiers; otherwise, <c>false</c>.
+    ///   <c>true</c> if identifiers should be automatically quoted; otherwise, <c>false</c>.
     /// </value>
     public static bool AutoQuotedIdentifiers { get; set; } = true;
 
@@ -35,10 +35,10 @@ public static class SqlSettings
     public static int? DefaultCommandTimeout { get; set; }
    
     /// <summary>
-    /// The default dialect, returns the local dialect if any set through
-    /// SetLocal, the default dialect otherwise.
-    /// This should be only set on application start.
-    /// Local dialect should be used for unit tests.
+    /// Gets or sets the default dialect. Returns the local dialect if any is set through
+    /// <see cref="SetLocalDialect"/>, otherwise the default dialect.
+    /// This should only be set on application start.
+    /// The local dialect should be used for unit tests.
     /// </summary>
     public static ISqlDialect DefaultDialect
     {
@@ -47,12 +47,12 @@ public static class SqlSettings
     }
 
     /// <summary>
-    /// Sets local dialect for current thread and async context. 
-    /// Useful for background tasks, async methods, and testing to 
-    /// set dialect locally and for auto spawned threads.
+    /// Sets the local dialect for the current thread and async context.
+    /// Useful for background tasks, async methods, and testing to
+    /// set the dialect locally and for auto spawned threads.
     /// </summary>
-    /// <param name="dialect">Dialect. Can be null.</param>
-    /// <returns>Old local dialect if any.</returns>
+    /// <param name="dialect">The dialect. Can be null.</param>
+    /// <returns>The old local dialect, if any.</returns>
     public static ISqlDialect SetLocalDialect(ISqlDialect dialect)
     {
         var old = localDialect.Value;

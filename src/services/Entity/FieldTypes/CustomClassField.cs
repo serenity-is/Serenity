@@ -3,7 +3,7 @@ using System.Text.Json;
 namespace Serenity.Data;
 
 /// <summary>
-/// Base class for custom fields with reference type values
+/// Base class for custom fields with reference type values.
 /// </summary>
 /// <typeparam name="TValue">The type of the value.</typeparam>
 /// <seealso cref="GenericClassField{TValue}" />
@@ -27,8 +27,8 @@ public class CustomClassField<TValue>(ICollection<Field> collection, string name
     /// </summary>
     /// <param name="reader">The reader.</param>
     /// <param name="index">The index.</param>
-    /// <returns></returns>
-    /// <exception cref="NotImplementedException"></exception>
+    /// <returns>The field value read from the reader.</returns>
+    /// <exception cref="NotImplementedException">This method must be overridden in a derived class.</exception>
     protected virtual TValue GetFromReader(IDataReader reader, int index)
     {
         throw new NotImplementedException();
@@ -40,7 +40,7 @@ public class CustomClassField<TValue>(ICollection<Field> collection, string name
     /// <param name="reader">The reader.</param>
     /// <param name="index">The index.</param>
     /// <param name="row">The row.</param>
-    /// <exception cref="ArgumentNullException">reader</exception>
+    /// <exception cref="ArgumentNullException">reader is null.</exception>
     public override void GetFromReader(IDataReader reader, int index, IRow row)
     {
         ArgumentNullException.ThrowIfNull(reader);
@@ -58,18 +58,18 @@ public class CustomClassField<TValue>(ICollection<Field> collection, string name
     /// </summary>
     /// <param name="value1">The value1.</param>
     /// <param name="value2">The value2.</param>
-    /// <returns></returns>
+    /// <returns>A value indicating the relative order of the two values.</returns>
     protected virtual int CompareValues(TValue value1, TValue value2)
     {
         return Comparer<TValue>.Default.Compare(value1, value2);
     }
 
     /// <summary>
-    /// Compares the field values for two rows for an ascending index sort
+    /// Compares the field values for two rows for an ascending index sort.
     /// </summary>
     /// <param name="row1">The row1.</param>
     /// <param name="row2">The row2.</param>
-    /// <returns></returns>
+    /// <returns>A value indicating the relative order of the two rows.</returns>
     public override int IndexCompare(IRow row1, IRow row2)
     {
         var value1 = _getValue(row1);
@@ -91,7 +91,7 @@ public class CustomClassField<TValue>(ICollection<Field> collection, string name
     }
 
     /// <summary>
-    /// Serializes this fields value to JSON
+    /// Serializes this field's value to JSON.
     /// </summary>
     /// <param name="writer">The writer.</param>
     /// <param name="value">The value.</param>
@@ -102,7 +102,7 @@ public class CustomClassField<TValue>(ICollection<Field> collection, string name
     }
 
     /// <summary>
-    /// Serializes this fields value to JSON
+    /// Serializes this field's value to JSON.
     /// </summary>
     /// <param name="writer">The writer.</param>
     /// <param name="row">The row.</param>
@@ -117,23 +117,23 @@ public class CustomClassField<TValue>(ICollection<Field> collection, string name
     }
 
     /// <summary>
-    /// Deserializes this fields value from JSON
+    /// Deserializes this field's value from JSON.
     /// </summary>
     /// <param name="reader">The reader.</param>
     /// <param name="serializer">The serializer.</param>
-    /// <returns></returns>
+    /// <returns>The deserialized value.</returns>
     protected virtual TValue ValueFromJson(Newtonsoft.Json.JsonReader reader, Newtonsoft.Json.JsonSerializer serializer)
     {
         return serializer.Deserialize<TValue>(reader);
     }
 
     /// <summary>
-    /// Deserializes this fields value from JSON
+    /// Deserializes this field's value from JSON.
     /// </summary>
     /// <param name="reader">The reader.</param>
     /// <param name="row">The row.</param>
     /// <param name="serializer">The serializer.</param>
-    /// <exception cref="ArgumentNullException">reader</exception>
+    /// <exception cref="ArgumentNullException">reader is null.</exception>
     public override void ValueFromJson(Newtonsoft.Json.JsonReader reader, IRow row, Newtonsoft.Json.JsonSerializer serializer)
     {
         ArgumentNullException.ThrowIfNull(reader);
@@ -154,10 +154,11 @@ public class CustomClassField<TValue>(ICollection<Field> collection, string name
     }
 
     /// <summary>
-    /// Deserializes this fields value from JSON
+    /// Deserializes this field's value from JSON.
     /// </summary>
     /// <param name="reader">The reader.</param>
-    /// <param name="options">Serializer options</param>
+    /// <param name="options">The serializer options.</param>
+    /// <returns>The deserialized value.</returns>
     protected virtual TValue ValueFromJson(ref Utf8JsonReader reader, JsonSerializerOptions options)
     {
         return JsonSerializer.Deserialize<TValue>(ref reader, options);
@@ -191,11 +192,11 @@ public class CustomClassField<TValue>(ICollection<Field> collection, string name
     }
 
     /// <summary>
-    /// Serializes the value to json
+    /// Serializes the value to JSON.
     /// </summary>
-    /// <param name="writer">Writer</param>
-    /// <param name="value">Value</param>
-    /// <param name="options">Serializer options</param>
+    /// <param name="writer">The writer.</param>
+    /// <param name="value">The value.</param>
+    /// <param name="options">The serializer options.</param>
     public virtual void ValueToJson(Utf8JsonWriter writer, TValue value, JsonSerializerOptions options)
     {
         JsonSerializer.Serialize(writer, value, options);
@@ -205,7 +206,7 @@ public class CustomClassField<TValue>(ICollection<Field> collection, string name
     /// Clones the specified value.
     /// </summary>
     /// <param name="value">The value.</param>
-    /// <returns></returns>
+    /// <returns>A clone of the value.</returns>
     protected virtual TValue Clone(TValue value)
     {
         return value;

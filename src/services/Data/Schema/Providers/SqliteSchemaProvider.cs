@@ -1,7 +1,7 @@
 ﻿namespace Serenity.Data.Schema;
 
 /// <summary>
-/// SQLite metadata provider
+/// SQLite metadata provider.
 /// </summary>
 /// <seealso cref="ISchemaProvider" />
 public class SqliteSchemaProvider : ISchemaProvider
@@ -24,13 +24,7 @@ public class SqliteSchemaProvider : ISchemaProvider
 #pragma warning restore IDE1006 // Naming Styles
     }
 
-    /// <summary>
-    /// Gets the field infos.
-    /// </summary>
-    /// <param name="connection">The connection.</param>
-    /// <param name="schema">The schema.</param>
-    /// <param name="table">The table.</param>
-    /// <returns></returns>
+    /// <inheritdoc/>
     public IEnumerable<FieldInfo> GetFieldInfos(IDbConnection connection, string schema, string table)
     {
         return connection.Query<FieldInfoSource>("PRAGMA table_info([" + table + "])")
@@ -53,13 +47,7 @@ public class SqliteSchemaProvider : ISchemaProvider
 #pragma warning restore IDE1006 // Naming Styles
     }
 
-    /// <summary>
-    /// Gets the foreign keys.
-    /// </summary>
-    /// <param name="connection">The connection.</param>
-    /// <param name="schema">The schema.</param>
-    /// <param name="table">The table.</param>
-    /// <returns></returns>
+    /// <inheritdoc/>
     public IEnumerable<ForeignKeyInfo> GetForeignKeys(IDbConnection connection, string schema, string table)
     {
         return connection.Query<ForeignKeySource>("PRAGMA foreign_key_list([" + table + "])")
@@ -81,13 +69,7 @@ public class SqliteSchemaProvider : ISchemaProvider
 #pragma warning restore IDE1006 // Naming Styles
     }
 
-    /// <summary>
-    /// Gets the identity fields.
-    /// </summary>
-    /// <param name="connection">The connection.</param>
-    /// <param name="schema">The schema.</param>
-    /// <param name="table">The table.</param>
-    /// <returns></returns>
+    /// <inheritdoc/>
     public IEnumerable<string> GetIdentityFields(IDbConnection connection, string schema, string table)
     {
         var fields = connection.Query<IdentitySource>("PRAGMA table_info([" + table + "])")
@@ -110,13 +92,7 @@ public class SqliteSchemaProvider : ISchemaProvider
 #pragma warning restore IDE1006 // Naming Styles
     }
 
-    /// <summary>
-    /// Gets the primary key fields.
-    /// </summary>
-    /// <param name="connection">The connection.</param>
-    /// <param name="schema">The schema.</param>
-    /// <param name="table">The table.</param>
-    /// <returns></returns>
+    /// <inheritdoc/>
     public IEnumerable<string> GetPrimaryKeyFields(IDbConnection connection, string schema, string table)
     {
         return connection.Query<PrimaryKeySource>("PRAGMA table_info([" + table + "])")
@@ -133,11 +109,7 @@ public class SqliteSchemaProvider : ISchemaProvider
 #pragma warning restore IDE1006 // Naming Styles
     }
 
-    /// <summary>
-    /// Gets the table names.
-    /// </summary>
-    /// <param name="connection">The connection.</param>
-    /// <returns></returns>
+    /// <inheritdoc/>
     public IEnumerable<TableName> GetTableNames(IDbConnection connection)
     {
         return connection.Query<TableNameSource>(

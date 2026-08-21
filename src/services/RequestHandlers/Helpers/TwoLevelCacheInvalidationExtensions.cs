@@ -17,13 +17,13 @@ public static class TwoLevelCacheInvalidationExtensions
     }
 
     /// <summary>
-    /// Invalidates cached items related to a group key when the 
-    /// unit of work commits
+    /// Invalidates cached items related to a group key when the
+    /// unit of work commits.
     /// </summary>
     /// <param name="cache">Cache</param>
     /// <param name="uow">Unit of work</param>
     /// <param name="groupKey">Group key</param>
-    /// <exception cref="ArgumentNullException">cache is null</exception>
+    /// <exception cref="ArgumentNullException"><paramref name="cache"/> is <c>null</c>.</exception>
     public static void InvalidateOnCommit(this ITwoLevelCache cache, IUnitOfWork uow, string groupKey)
     {
         ArgumentNullException.ThrowIfNull(cache);
@@ -73,7 +73,7 @@ public static class TwoLevelCacheInvalidationExtensions
     /// <param name="cache">Cache</param>
     /// <param name="uow">Unit of work</param>
     /// <param name="fields">Fields type</param>
-    /// <exception cref="ArgumentNullException">Cache is null</exception>
+    /// <exception cref="ArgumentNullException"><paramref name="fields"/> is <c>null</c>.</exception>
     public static void InvalidateOnCommit(this ITwoLevelCache cache, IUnitOfWork uow, RowFieldsBase fields)
     {
         ArgumentNullException.ThrowIfNull(fields);
@@ -93,7 +93,7 @@ public static class TwoLevelCacheInvalidationExtensions
     /// <param name="cache">Cache</param>
     /// <param name="uow">Unit of work</param>
     /// <param name="row">Row type</param>
-    /// <exception cref="ArgumentNullException">Cache is null</exception>
+    /// <exception cref="ArgumentNullException"><paramref name="row"/> is <c>null</c>.</exception>
     public static void InvalidateOnCommit(this ITwoLevelCache cache, IUnitOfWork uow, IRow row)
     {
         ArgumentNullException.ThrowIfNull(row);

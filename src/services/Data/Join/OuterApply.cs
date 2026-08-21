@@ -1,7 +1,7 @@
 ﻿namespace Serenity.Data;
 
 /// <summary>
-/// OUTER APPLY join type
+/// OUTER APPLY join type.
 /// </summary>
 /// <seealso cref="Join" />
 public class OuterApply : Join
@@ -30,7 +30,7 @@ public class OuterApply : Join
     /// <summary>
     /// Gets the SQL keyword.
     /// </summary>
-    /// <returns></returns>
+    /// <returns>The SQL keyword for this join type.</returns>
     public override string GetKeyword()
     {
         return "OUTER APPLY";

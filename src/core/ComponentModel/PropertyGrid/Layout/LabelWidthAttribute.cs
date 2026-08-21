@@ -1,7 +1,7 @@
 namespace Serenity.ComponentModel;
 
 /// <summary>
-/// Determines label with of target property, and optionally 
+/// Determines the label width of the target property, and optionally
 /// the properties following it until another of this attribute
 /// is used.
 /// </summary>

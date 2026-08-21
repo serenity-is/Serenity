@@ -1,7 +1,7 @@
 ﻿namespace Serenity.ComponentModel;
 
 /// <summary>
-/// Represents a customized column / form script
+/// Represents a customized column / form script.
 /// </summary>
 public interface ICustomizePropertyItems
 {

@@ -1,7 +1,8 @@
 ﻿namespace Serenity.Data;
 
 /// <summary>
-///   Interface for objects setting parameters by PARAM method (like SqlInsert, SqlUpdate, SqlDelete...)</summary>
+///   Interface for objects setting parameters by PARAM method (like SqlInsert, SqlUpdate, SqlDelete...).
+/// </summary>
 public interface IQueryWithParams
 {
     /// <summary>
@@ -21,7 +22,7 @@ public interface IQueryWithParams
     /// <summary>
     /// Creates an automatically named parameter.
     /// </summary>
-    /// <returns></returns>
+    /// <returns>The automatically named parameter.</returns>
     Parameter AutoParam();
 
     /// <summary>

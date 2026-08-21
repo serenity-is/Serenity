@@ -2,14 +2,14 @@
 namespace Serenity;
 
 /// <summary>
-/// Custom validator abstraction
+/// Custom validator abstraction.
 /// </summary>
 public interface ICustomValidator
 {
     /// <summary>
-    /// Validates value using specified context.
+    /// Validates the value using the specified context.
     /// </summary>
     /// <param name="context">The context.</param>
-    /// <returns></returns>
+    /// <returns>The validation error message, or null if the value is valid.</returns>
     string Validate(IValidationContext context);
 }

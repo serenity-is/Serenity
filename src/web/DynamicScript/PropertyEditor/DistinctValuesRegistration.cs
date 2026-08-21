@@ -3,20 +3,19 @@
 namespace Serenity.Web;
 
 /// <summary>
-/// Contains helper methods for distinct values scripts
+/// Contains helper methods for distinct values scripts.
 /// </summary>
 public class DistinctValuesRegistration
 {
     /// <summary>
-    /// Creates and registers dynamic scripts for row properties with 
-    /// <see cref="DistinctValuesEditorAttribute"/>
+    /// Creates and registers dynamic scripts for row properties with
+    /// <see cref="DistinctValuesEditorAttribute"/>.
     /// </summary>
-    /// <param name="scriptManager">Dynamic script manager</param>
-    /// <param name="typeSource">Type source</param>
-    /// <param name="serviceProvider">Service provider</param>
-    /// <exception cref="ArgumentNullException">Script manager, type source or
-    /// service provider is null</exception>
-    /// <exception cref="Exception">DistinctValuesAttribute is placed on a non-row type</exception>
+    /// <param name="scriptManager">The dynamic script manager.</param>
+    /// <param name="typeSource">The type source.</param>
+    /// <param name="serviceProvider">The service provider.</param>
+    /// <exception cref="ArgumentNullException">Script manager, type source or service provider is <c>null</c>.</exception>
+    /// <exception cref="Exception">The <see cref="DistinctValuesEditorAttribute"/> is placed on a non-row type.</exception>
     public static void RegisterDistinctValueScripts(IDynamicScriptManager scriptManager, 
         ITypeSource typeSource, IServiceProvider serviceProvider)
     {

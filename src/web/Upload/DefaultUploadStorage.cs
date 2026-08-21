@@ -5,7 +5,7 @@ using System.IO;
 namespace Serenity.Web;
 
 /// <summary>
-/// Default <see cref="IUploadStorage"/> implementation which uses a combined 
+/// Default <see cref="IUploadStorage"/> implementation which uses a combined
 /// upload storage of two <see cref="DiskUploadStorage"/> instances.
 /// </summary>
 public class DefaultUploadStorage : IUploadStorage
@@ -13,13 +13,13 @@ public class DefaultUploadStorage : IUploadStorage
     private readonly CombinedUploadStorage combined;
 
     /// <summary>
-    /// Creates a new instance of the object
+    /// Initializes a new instance of the <see cref="DefaultUploadStorage"/> class.
     /// </summary>
-    /// <param name="options">Upload storage options</param>
-    /// <param name="hostEnvironment">Web host environment</param>
-    /// <param name="fileSystem">File system</param>
-    /// <exception cref="ArgumentNullException">One of arguments is null</exception>
-    /// <exception cref="ArgumentOutOfRangeException">Options.URL or Options.Path is empty</exception>
+    /// <param name="options">The upload storage options.</param>
+    /// <param name="hostEnvironment">The web host environment.</param>
+    /// <param name="fileSystem">The file system.</param>
+    /// <exception cref="ArgumentNullException">One of the arguments is <c>null</c>.</exception>
+    /// <exception cref="ArgumentException"><c>Options.Url</c> or <c>Options.Path</c> is empty.</exception>
     public DefaultUploadStorage(IOptions<UploadSettings> options, IWebHostEnvironment hostEnvironment = null,
         IDiskUploadFileSystem fileSystem = null)
     {

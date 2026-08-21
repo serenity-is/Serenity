@@ -4,6 +4,10 @@ using System.Reflection;
 
 namespace Serenity.Extensions;
 
+/// <summary>
+/// Base class for permission key listers that enumerate permission keys
+/// from a type source, including nested, assembly, and type-level permissions.
+/// </summary>
 public abstract class BasePermissionKeyLister(ITwoLevelCache cache, ITypeSource typeSource) : IPermissionKeyLister
 {
     protected readonly ITwoLevelCache cache = cache ?? throw new ArgumentNullException(nameof(cache));

@@ -8,11 +8,11 @@ namespace Serenity.Web;
 public static class UploadStorageExtensions
 {
     /// <summary>
-    /// Gets thumbnail URL for the file path
+    /// Gets thumbnail URL for the file path.
     /// </summary>
     /// <param name="uploadStorage">Upload storage</param>
     /// <param name="path">Path</param>
-    /// <returns></returns>
+    /// <returns>The thumbnail URL, or <c>null</c> if the path is empty.</returns>
     public static string GetThumbnailUrl(this IUploadStorage uploadStorage, string path)
     {
         if (string.IsNullOrEmpty(path))
@@ -97,11 +97,11 @@ public static class UploadStorageExtensions
     }
 
     /// <summary>
-    /// Copies a temporary file to its target location
+    /// Copies a temporary file to its target location.
     /// </summary>
     /// <param name="uploadStorage">Upload storage</param>
     /// <param name="options">Copy options</param>
-    /// <exception cref="ArgumentNullException">uploadStorage is null</exception>
+    /// <exception cref="ArgumentNullException"><paramref name="uploadStorage"/> or <paramref name="options"/> is <c>null</c>.</exception>
     public static CopyTemporaryFileResult CopyTemporaryFile(this IUploadStorage uploadStorage,
         CopyTemporaryFileOptions options)
     {
@@ -127,11 +127,11 @@ public static class UploadStorageExtensions
     }
 
     /// <summary>
-    /// Reads all file bytes
+    /// Reads all file bytes.
     /// </summary>
     /// <param name="uploadStorage">Upload storage</param>
     /// <param name="path">File path</param>
-    /// <exception cref="ArgumentNullException">Upload storage is null</exception>
+    /// <exception cref="ArgumentNullException"><paramref name="uploadStorage"/> is <c>null</c>.</exception>
     public static byte[] ReadAllFileBytes(this IUploadStorage uploadStorage, string path)
     {
         ArgumentNullException.ThrowIfNull(uploadStorage);
@@ -144,11 +144,11 @@ public static class UploadStorageExtensions
     }
 
     /// <summary>
-    /// Gets original name of a file
+    /// Gets original name of a file.
     /// </summary>
     /// <param name="uploadStorage">Upload storage</param>
     /// <param name="path">File path</param>
-    /// <exception cref="ArgumentNullException">uploadStorage is null</exception>
+    /// <exception cref="ArgumentNullException"><paramref name="uploadStorage"/> is <c>null</c>.</exception>
     public static string GetOriginalName(this IUploadStorage uploadStorage, string path)
     {
         ArgumentNullException.ThrowIfNull(uploadStorage);
@@ -162,12 +162,12 @@ public static class UploadStorageExtensions
     }
 
     /// <summary>
-    /// Sets original name for a file
+    /// Sets original name for a file.
     /// </summary>
     /// <param name="uploadStorage">Upload storage</param>
     /// <param name="path">File path</param>
     /// <param name="originalName">Original name</param>
-    /// <exception cref="ArgumentNullException">Upload storage is null</exception>
+    /// <exception cref="ArgumentNullException"><paramref name="uploadStorage"/> is <c>null</c>.</exception>
     public static void SetOriginalName(this IUploadStorage uploadStorage, string path, string originalName)
     {
         ArgumentNullException.ThrowIfNull(uploadStorage);

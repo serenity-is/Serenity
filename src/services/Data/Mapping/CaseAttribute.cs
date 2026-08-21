@@ -1,7 +1,7 @@
 namespace Serenity.Data.Mapping;
 
 /// <summary>
-/// Concat expression attribute
+/// Case expression attribute.
 /// </summary>
 public class CaseAttribute : BaseExpressionAttribute
 {
@@ -53,22 +53,22 @@ public class CaseAttribute : BaseExpressionAttribute
     }
 
     /// <summary>
-    /// Gets the switch expression
+    /// Gets the switch expression.
     /// </summary>
     public object Switch { get; set; }
 
     /// <summary>
-    /// Gets the when expressions
+    /// Gets the when expressions.
     /// </summary>
     public object[] When { get; }
 
     /// <summary>
-    /// Gets the then expressions
+    /// Gets the then expressions.
     /// </summary>
     public object[] Then { get; }
 
     /// <summary>
-    /// Gets the else expression
+    /// Gets the else expression.
     /// </summary>
     public object Else { get; set; }
 }

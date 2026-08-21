@@ -20,7 +20,7 @@ public class BooleanFilteringAttribute : CustomFilteringAttribute
     }
 
     /// <summary>
-    /// Gets or sets the text used of false value.
+    /// Gets or sets the text used for the false value.
     /// </summary>
     /// <value>
     /// The false text.

@@ -10,7 +10,7 @@ public enum SummaryType
     /// </summary>
     Disabled = -1,
     /// <summary>
-    /// No aggregate by default, but user might change
+    /// No aggregate by default, but the user might change it.
     /// </summary>
     None = 0,
     /// <summary>

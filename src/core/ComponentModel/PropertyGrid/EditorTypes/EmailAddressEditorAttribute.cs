@@ -1,7 +1,7 @@
 ﻿namespace Serenity.ComponentModel;
 
 /// <summary>
-/// Indicates that the target property should use a "EmailAddress" editor.
+/// Indicates that the target property should use an "EmailAddress" editor.
 /// </summary>
 /// <seealso cref="CustomEditorAttribute" />
 public partial class EmailAddressEditorAttribute : CustomEditorAttribute

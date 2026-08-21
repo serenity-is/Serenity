@@ -1,7 +1,7 @@
 namespace Serenity.ComponentModel;
 
 /// <summary>
-/// Base class for lookup based editor types
+/// Base class for lookup based editor types.
 /// </summary>
 /// <seealso cref="CustomEditorAttribute" />
 /// <remarks>
@@ -11,7 +11,7 @@ namespace Serenity.ComponentModel;
 public abstract class LookupEditorBaseAttribute(string editorType) : CustomEditorAttribute(editorType)
 {
     /// <summary>
-    /// Lookup key, e.g. Northwind.CustomerCity
+    /// Lookup key, e.g. Northwind.CustomerCity.
     /// </summary>
     public string? LookupKey
     {
@@ -22,8 +22,8 @@ public abstract class LookupEditorBaseAttribute(string editorType) : CustomEdito
     /// <summary>
     /// Allows dynamically creating new options from text input by the user in the search box.
     /// This option should only be used for free text inputs, not ID / Text pairs.
-    /// When this option is enabled InplaceAdd cannot be used. 
-    /// Newly created option will have same ID / Text which is user entered text.
+    /// When this option is enabled, InplaceAdd cannot be used.
+    /// A newly created option will have the same ID / Text as the user-entered text.
     /// </summary>
     public bool AutoComplete
     {
@@ -32,7 +32,7 @@ public abstract class LookupEditorBaseAttribute(string editorType) : CustomEdito
     }
 
     /// <summary>
-    /// Enable inplace add / edit functionality
+    /// Enables inplace add / edit functionality.
     /// </summary>
     public bool InplaceAdd
     {
@@ -41,7 +41,7 @@ public abstract class LookupEditorBaseAttribute(string editorType) : CustomEdito
     }
 
     /// <summary>
-    /// Permission required to use inplace add / edit
+    /// Permission required to use inplace add / edit.
     /// </summary>
     public string? InplaceAddPermission
     {
@@ -50,10 +50,10 @@ public abstract class LookupEditorBaseAttribute(string editorType) : CustomEdito
     }
 
     /// <summary>
-    /// This property is meaningful when InplaceAdd is true. By default, dialog type name
-    /// is determined by LookupKey, e.g. if lookup key is "Northwind.CustomerCity", 
-    /// a dialog class named "Northwind.CustomerCityDialog" is used. If dialog type is different
-    /// than lookup key, set this to classname, e.g. "MyModule.MyDialog"
+    /// This property is meaningful when InplaceAdd is true. By default, the dialog type name
+    /// is determined by LookupKey, e.g. if the lookup key is "Northwind.CustomerCity",
+    /// a dialog class named "Northwind.CustomerCityDialog" is used. If the dialog type is different
+    /// than the lookup key, set this to the class name, e.g. "MyModule.MyDialog".
     /// </summary>
     public string? DialogType
     {
@@ -62,7 +62,7 @@ public abstract class LookupEditorBaseAttribute(string editorType) : CustomEdito
     }
 
     /// <summary>
-    /// ID (can be relative) of the editor that this editor will cascade from, e.g. Country
+    /// ID (can be relative) of the editor that this editor will cascade from, e.g. Country.
     /// </summary>
     public string? CascadeFrom
     {
@@ -71,9 +71,9 @@ public abstract class LookupEditorBaseAttribute(string editorType) : CustomEdito
     }
 
     /// <summary>
-    /// Cascade filtering field (items will be filtered on this key, e.g. CountryID)
-    /// Make sure you have [LookupInclude] attribute on this field of lookup row,
-    /// otherwise you'll have empty results as this field won't be available client side.
+    /// Cascade filtering field (items will be filtered on this key, e.g. CountryID).
+    /// Make sure you have the [LookupInclude] attribute on this field of the lookup row,
+    /// otherwise you'll have empty results as this field won't be available on the client side.
     /// </summary>
     public string? CascadeField
     {
@@ -82,8 +82,8 @@ public abstract class LookupEditorBaseAttribute(string editorType) : CustomEdito
     }
 
     /// <summary>
-    /// Cascade filtering value, usually set by CascadeFrom editor, e.g. the integer value of CountryID
-    /// If null or empty, and CascadeField is set, all items are filtered
+    /// Cascade filtering value, usually set by the CascadeFrom editor, e.g. the integer value of CountryID.
+    /// If null or empty, and CascadeField is set, all items are filtered.
     /// </summary>
     public object? CascadeValue
     {
@@ -92,9 +92,9 @@ public abstract class LookupEditorBaseAttribute(string editorType) : CustomEdito
     }
 
     /// <summary>
-    /// Optional filtering field (items will be filtered on this key, e.g. GroupID)
-    /// Make sure you have [LookupInclude] attribute on this field of lookup row,
-    /// otherwise you'll have empty results as this field won't be available client side.
+    /// Optional filtering field (items will be filtered on this key, e.g. GroupID).
+    /// Make sure you have the [LookupInclude] attribute on this field of the lookup row,
+    /// otherwise you'll have empty results as this field won't be available on the client side.
     /// </summary>
     public string? FilterField
     {
@@ -142,7 +142,7 @@ public abstract class LookupEditorBaseAttribute(string editorType) : CustomEdito
     }
 
     /// <summary>
-    /// Open dialogs as panel (default value is null, which uses panel attribute on dialog class)
+    /// Opens dialogs as a panel (default value is null, which uses the panel attribute on the dialog class).
     /// </summary>
     public bool OpenDialogAsPanel
     {
@@ -151,7 +151,7 @@ public abstract class LookupEditorBaseAttribute(string editorType) : CustomEdito
     }
 
     /// <summary>
-    /// Load lookup in async mode, default false
+    /// Loads the lookup in async mode, default false.
     /// </summary>
     public bool Async
     {

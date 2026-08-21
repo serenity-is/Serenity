@@ -1,7 +1,7 @@
 ﻿namespace Serenity.Services;
 
 /// <summary>
-/// A simple parser / evaluator for logic permission expressions
+/// Parses and evaluates logical permission expressions containing <c>!</c>, <c>&amp;</c>, <c>|</c>, and parentheses.
 /// </summary>
 public static class PermissionExpressionParser
 {
@@ -28,10 +28,11 @@ public static class PermissionExpressionParser
     }
 
     /// <summary>
-    /// Tokenizes a permission expression
+    /// Tokenizes a permission expression into individual operators, parentheses, and permission keys.
     /// </summary>
-    /// <param name="expression">Tokenizes a permission expression</param>
-    /// <returns>List of tokens</returns>
+    /// <param name="expression">The permission expression to tokenize.</param>
+    /// <returns>An enumerable of tokens.</returns>
+    /// <exception cref="ArgumentNullException"><paramref name="expression"/> is <c>null</c>.</exception>
     public static IEnumerable<string> Tokenize(string expression)
     {
         if (expression is null)
@@ -64,10 +65,12 @@ public static class PermissionExpressionParser
     const string closeParen = ")";
 
     /// <summary>
-    /// Converts a list of tokens to Reverse Polish Notation using ShuntingYard algorithm.
+    /// Converts tokens to Reverse Polish Notation using the shunting-yard algorithm.
     /// </summary>
-    /// <param name="tokens">List of tokens, produced from Tokenize method</param>
-    /// <returns>Tokens in RPN notation</returns>
+    /// <param name="tokens">The tokens produced by <see cref="Tokenize"/>.</param>
+    /// <returns>Tokens in Reverse Polish Notation.</returns>
+    /// <exception cref="ArgumentNullException"><paramref name="tokens"/> is <c>null</c>.</exception>
+    /// <exception cref="InvalidOperationException">The expression contains mismatched parentheses.</exception>
     public static IEnumerable<string> ShuntingYard(IEnumerable<string> tokens)
     {
         if (tokens == null)
@@ -123,11 +126,13 @@ public static class PermissionExpressionParser
     }
 
     /// <summary>
-    /// Evaluates a list of tokens in RPN notation, produced from ShuntingYard method.
+    /// Evaluates tokens in Reverse Polish Notation produced by <see cref="ShuntingYard"/>.
     /// </summary>
-    /// <param name="rpnTokens">List of tokens in RPN notation</param>
-    /// <param name="hasPermission">A method that returns True if the user has given permission</param>
-    /// <returns>True if expression evaluates to true</returns>
+    /// <param name="rpnTokens">The tokens in Reverse Polish Notation.</param>
+    /// <param name="hasPermission">A function that returns <c>true</c> if the user has the specified permission key.</param>
+    /// <returns><c>true</c> if the expression evaluates to granted; otherwise <c>false</c>.</returns>
+    /// <exception cref="ArgumentNullException"><paramref name="rpnTokens"/> or <paramref name="hasPermission"/> is <c>null</c>.</exception>
+    /// <exception cref="InvalidOperationException">The expression is malformed and cannot be evaluated.</exception>
     public static bool Evaluate(IEnumerable<string> rpnTokens, Func<string, bool> hasPermission)
     {
         if (rpnTokens is null)

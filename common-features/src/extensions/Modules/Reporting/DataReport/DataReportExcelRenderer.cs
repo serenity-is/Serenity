@@ -2,8 +2,17 @@ using System.Collections;
 
 namespace Serenity.Reporting;
 
+/// <summary>
+/// Default implementation of <see cref="IDataReportExcelRenderer"/> that renders
+/// a data report to an Excel package.
+/// </summary>
 public class DataReportExcelRenderer : IDataReportExcelRenderer
 {
+    /// <summary>
+    /// Renders the specified data report to Excel bytes.
+    /// </summary>
+    /// <param name="report">The data report.</param>
+    /// <returns>The generated Excel file bytes.</returns>
     public byte[] Render(IDataOnlyReport report)
     {
         ArgumentNullException.ThrowIfNull(report);

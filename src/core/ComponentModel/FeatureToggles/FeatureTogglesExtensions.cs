@@ -1,7 +1,7 @@
 namespace Serenity;
 
 /// <summary>
-/// Extensions for IFeatureToggles
+/// Extensions for <see cref="IFeatureToggles"/>.
 /// </summary>
 public static class FeatureTogglesExtensions
 {
@@ -22,11 +22,11 @@ public static class FeatureTogglesExtensions
         features != null && features.Any() && features.All(featureToggles.IsEnabled);
 
     /// <summary>
-    /// Gets if a set of features are enabled, requiring just one to be enabled if requireAny is true
+    /// Gets if a set of features is enabled, requiring just one to be enabled if requireAny is true.
     /// </summary>
     /// <param name="featureToggles">Feature toggles</param>
     /// <param name="features">Features</param>
-    /// <param name="requireAny">Require any (true) or all (false) feature</param>
+    /// <param name="requireAny">Require any (true) or all (false) feature.</param>
     public static bool IsEnabled(this IFeatureToggles featureToggles, IEnumerable<string> features, bool requireAny) =>
         features != null && features.Any() && (requireAny ? features.Any(featureToggles.IsEnabled) : features.All(featureToggles.IsEnabled));
 

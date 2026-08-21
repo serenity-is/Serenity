@@ -1,8 +1,8 @@
 ﻿namespace Serenity.ComponentModel;
 
 /// <summary>
-/// Marks form field with "col-md-6" css class, which makes it allocate half of form row
-/// on device widths >= 992px (some desktops)
+/// Marks the form field with the "col-md-6" CSS class, which makes it allocate half of the form row
+/// on device widths >= 992px (some desktops).
 /// </summary>
 public class MediumHalfWidthAttribute : FormWidthAttribute
 {

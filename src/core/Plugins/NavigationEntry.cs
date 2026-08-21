@@ -1,7 +1,7 @@
 ﻿namespace Serenity.Plugins;
 
 /// <summary>
-/// Plugin navigation entry abstraction.
+/// A plugin navigation entry abstraction.
 /// </summary>
 public class NavigationEntry
 {

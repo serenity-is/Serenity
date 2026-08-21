@@ -7,27 +7,27 @@
 public interface IRetrieveRequestHandler : IRequestHandler
 {
     /// <summary>
-    /// Loader row
+    /// Gets the row used for querying / metadata lookup.
     /// </summary>
     IRow Row { get; }
 
     /// <summary>
-    /// Retrieve request
+    /// Gets the retrieve request.
     /// </summary>
     RetrieveRequest Request { get; }
 
     /// <summary>
-    /// Retrieve response
+    /// Gets the retrieve response.
     /// </summary>
     IRetrieveResponse Response { get; }
 
     /// <summary>
-    /// A state bag that can be used as storage within a request handler context
+    /// Gets a state bag that can be used as storage within a request handler context.
     /// </summary>
     IDictionary<string, object> StateBag { get; }
 
     /// <summary>
-    /// Current connection
+    /// Gets the current connection.
     /// </summary>
     IDbConnection Connection { get; }
 
@@ -46,7 +46,7 @@ public interface IRetrieveRequestHandler : IRequestHandler
     bool ShouldSelectField(Field field);
 
     /// <summary>
-    /// Current request context
+    /// Gets the current request context.
     /// </summary>
     IRequestContext Context { get; }
 }

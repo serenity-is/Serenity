@@ -1,18 +1,18 @@
 namespace Serenity.ComponentModel;
 
 /// <summary>
-/// Indicates that this type should generate a columns script, 
-/// which contains information about properties in this type and 
+/// Indicates that this type should generate a columns script,
+/// which contains information about properties in this type and
 /// is an array of PropertyItem objects. Column scripts can be
-/// accessed from client side using Serenity.getColumns("Key")
+/// accessed from the client side using Serenity.getColumns("Key").
 /// </summary>
 /// <seealso cref="Attribute" />
 [AttributeUsage(AttributeTargets.Class, AllowMultiple = false)]
 public sealed class ColumnsScriptAttribute : Attribute
 {
     /// <summary>
-    /// Initializes a new instance of the <see cref="FormScriptAttribute"/> class.
-    /// The key of the form script will be the full name of the type this is placed on.
+    /// Initializes a new instance of the <see cref="ColumnsScriptAttribute"/> class.
+    /// The key of the columns script will be the full name of the type this is placed on.
     /// </summary>
     /// <exception cref="ArgumentNullException">key</exception>
     public ColumnsScriptAttribute()

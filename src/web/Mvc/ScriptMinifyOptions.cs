@@ -1,12 +1,12 @@
 namespace Serenity.Web;
 
 /// <summary>
-/// Set of options for script minifying
+/// Set of options for script minifying.
 /// </summary>
 public class ScriptMinifyOptions
 {
     /// <summary>
-    /// Line break threshold
+    /// Gets or sets the line break threshold.
     /// </summary>
     public int LineBreakThreshold { get; set; }
 }

@@ -1,7 +1,7 @@
 ﻿namespace Serenity;
 
 /// <summary>
-/// Validation context abstraction
+/// Validation context abstraction.
 /// </summary>
 public interface IValidationContext
 {
@@ -17,7 +17,7 @@ public interface IValidationContext
     /// Gets the field value.
     /// </summary>
     /// <param name="fieldName">Name of the field.</param>
-    /// <returns></returns>
+    /// <returns>The value of the field.</returns>
     object GetFieldValue(string fieldName);
 
     /// <summary>
@@ -29,7 +29,7 @@ public interface IValidationContext
     IDbConnection Connection { get; }
 
     /// <summary>
-    /// Localizer
+    /// Gets the localizer used to translate texts.
     /// </summary>
     ITextLocalizer Localizer { get; }
 }

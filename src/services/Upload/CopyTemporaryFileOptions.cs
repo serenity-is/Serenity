@@ -6,12 +6,12 @@
 public class CopyTemporaryFileOptions : FormatFilenameOptions
 {
     /// <summary>
-    /// Temporary file
+    /// Gets or sets the temporary file.
     /// </summary>
     public string TemporaryFile { get; set; }
 
     /// <summary>
-    /// Files to delete container
+    /// Gets or sets the files to delete container.
     /// </summary>
     public IFilesToDelete FilesToDelete { get; set; }
 }

@@ -2,7 +2,7 @@
 namespace Serenity.Data;
 
 /// <summary>
-/// Sets delete permission for the row.
+/// Sets insert permission for the row.
 /// </summary>
 /// <seealso cref="PermissionAttributeBase" />
 public class InsertPermissionAttribute : PermissionAttributeBase

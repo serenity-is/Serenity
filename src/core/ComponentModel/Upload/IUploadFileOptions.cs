@@ -1,13 +1,13 @@
 ﻿namespace Serenity.ComponentModel;
 
 /// <summary>
-/// Upload options related to the file name and encoding
+/// Upload options related to the file name and encoding.
 /// </summary>
 public interface IUploadFileOptions : IUploadOptions
 {
     /// <summary>
-    /// Should a copy of file placed in a special history folder on upload. 
-    /// This helps preserving old files on update.
+    /// Should a copy of the file be placed in a special history folder on upload.
+    /// This helps preserve old files on update.
     /// </summary>
     public bool CopyToHistory { get; }
 

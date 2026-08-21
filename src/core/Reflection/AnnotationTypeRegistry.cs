@@ -1,23 +1,23 @@
 ﻿namespace Serenity.Reflection;
 
 /// <summary>
-/// Default annotation type registry
+/// The default annotation type registry.
 /// </summary>
 /// <seealso cref="IAnnotationTypeRegistry" />
 /// <remarks>
-/// Creates a new instance
+/// Creates a new instance.
 /// </remarks>
-/// <param name="typeSource">Type source</param>
+/// <param name="typeSource">The type source.</param>
 public class AnnotationTypeRegistry(ITypeSource typeSource) : IAnnotationTypeRegistry
 {
     private readonly IEnumerable<Type> annotationTypes = (typeSource ?? throw new ArgumentNullException(nameof(typeSource)))
             .GetTypesWithAttribute(typeof(AnnotationTypeAttribute));
 
     /// <summary>
-    /// Gets the annotation types for given type.
+    /// Gets the annotation types for the given type.
     /// </summary>
     /// <param name="type">The type.</param>
-    /// <returns></returns>
+    /// <returns>The list of annotation types that apply to the given type.</returns>
     public IEnumerable<Type> GetAnnotationTypesFor(Type type)
     {
         var list = new List<Type>();

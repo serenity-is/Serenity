@@ -3,18 +3,19 @@ using Serenity.PropertyGrid;
 namespace Serenity.Web;
 
 /// <summary>
-/// Contains registration methods for <see cref="FormScript"/> types
+/// Contains registration methods for <see cref="FormScript"/> types.
 /// </summary>
 public class FormScriptRegistration
 {
     /// <summary>
-    /// Creates and form scripts
+    /// Creates and registers form scripts.
     /// </summary>
-    /// <param name="scriptManager">Dynamic script manager</param>
-    /// <param name="typeSource">Type source</param>
-    /// <param name="propertyProvider">Property item provider</param>
-    /// <param name="serviceProvider">Service provider</param>
-    /// <exception cref="ArgumentNullException">Script manager or type source is null</exception>
+    /// <param name="scriptManager">The dynamic script manager.</param>
+    /// <param name="typeSource">The type source.</param>
+    /// <param name="propertyProvider">The property item provider.</param>
+    /// <param name="serviceProvider">The service provider.</param>
+    /// <returns>The list of registered form scripts.</returns>
+    /// <exception cref="ArgumentNullException">Script manager, type source or service provider is <c>null</c>.</exception>
     public static IEnumerable<FormScript> RegisterFormScripts(IDynamicScriptManager scriptManager,
         ITypeSource typeSource, IPropertyItemProvider propertyProvider, IServiceProvider serviceProvider)
     {

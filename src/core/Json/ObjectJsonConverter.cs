@@ -3,26 +3,27 @@ using System.Text.Json;
 namespace Serenity.JsonConverters;
 
 /// <summary>
-/// Provides deserialization for object type similar to Newtonsoft
-/// https://learn.microsoft.com/en-us/dotnet/standard/serialization/system-text-json/converters-how-to?pivots=dotnet-8-0#deserialize-inferred-types-to-object-properties
+/// Provides deserialization for the <see cref="object"/> type, inferring the concrete type
+/// from the JSON value, similar to Newtonsoft.
+/// See https://learn.microsoft.com/en-us/dotnet/standard/serialization/system-text-json/converters-how-to?pivots=dotnet-8-0#deserialize-inferred-types-to-object-properties
 /// </summary>
 public class ObjectJsonConverter : JsonConverter<object>
 {
     /// <summary>
-    /// ISO 8601 date time separator position.
+    /// The position of the ISO 8601 date time separator.
     /// </summary>
     private const int IsoDateTimeSeparatorPosition = 10;
     /// <summary>
-    /// Minimum ISO 8601 date time length.
+    /// The minimum length of an ISO 8601 date time string.
     /// </summary>
     private const int MinIsoDateTimeLength = 19;
     /// <summary>
-    /// Maximum ISO 8601 date time length.
+    /// The maximum length of an ISO 8601 date time string.
     /// </summary>
     private const int MaxIsoDateTimeLength = 40;
 
     /// <summary>
-    /// Default instance of the ObjectJsonConverter
+    /// The default instance of the <see cref="ObjectJsonConverter"/>.
     /// </summary>
     public static readonly ObjectJsonConverter Instance = new();
 

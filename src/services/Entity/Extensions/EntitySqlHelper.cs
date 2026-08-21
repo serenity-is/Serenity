@@ -1,7 +1,7 @@
 namespace Serenity.Data;
 
 /// <summary>
-/// Contains extension methods to query entities directly
+/// Contains extension methods to query entities directly.
 /// </summary>
 public static class EntitySqlHelper
 {
@@ -11,7 +11,7 @@ public static class EntitySqlHelper
     /// </summary>
     /// <param name="query">The query.</param>
     /// <param name="connection">The connection.</param>
-    /// <returns>True if any rows returned</returns>
+    /// <returns>True if any rows were returned.</returns>
     public static bool GetFirst(this SqlQuery query, IDbConnection connection)
     {
         using var reader = query.ExecuteReader(connection);
@@ -28,7 +28,7 @@ public static class EntitySqlHelper
     /// </summary>
     /// <param name="query">The query.</param>
     /// <param name="connection">The connection.</param>
-    /// <returns>True if any results returned from data reader</returns>
+    /// <returns>True if any results were returned from the data reader.</returns>
     /// <exception cref="InvalidOperationException">Query returned more than one result!</exception>
     public static bool GetSingle(this SqlQuery query, IDbConnection connection)
     {
@@ -63,7 +63,7 @@ public static class EntitySqlHelper
     /// <param name="query">The query.</param>
     /// <param name="connection">The connection.</param>
     /// <param name="callback">The call back.</param>
-    /// <returns>Number of returned results</returns>
+    /// <returns>Number of returned results.</returns>
     public static int ForEach(this SqlQuery query, IDbConnection connection,
         Action<IDataReader> callback)
     {
@@ -105,7 +105,7 @@ public static class EntitySqlHelper
     /// <param name="query">The query.</param>
     /// <param name="connection">The connection.</param>
     /// <param name="loaderRow">The loader row.</param>
-    /// <returns>List of rows</returns>
+    /// <returns>List of rows.</returns>
     public static List<TRow> List<TRow>(this SqlQuery query,
         IDbConnection connection, TRow loaderRow = null) where TRow : class, IRow
     {

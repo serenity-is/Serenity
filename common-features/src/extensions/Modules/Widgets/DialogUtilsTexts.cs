@@ -1,5 +1,8 @@
 namespace Serenity.Extensions;
 
+/// <summary>
+/// Local text keys for dialog utilities.
+/// </summary>
 [NestedLocalTexts(Prefix = "Site.Dialogs.")]
 public static class DialogUtilsTexts
 {

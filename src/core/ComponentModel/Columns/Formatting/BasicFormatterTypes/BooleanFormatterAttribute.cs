@@ -68,8 +68,8 @@ public class BooleanFormatterAttribute : CustomFormatterAttribute
     }
 
     /// <summary>
-    /// Gets or sets a value indicating whether to show text next to checkbox icon.
-    /// Defaults to true
+    /// Gets or sets a value indicating whether to show text next to the icon.
+    /// Defaults to true.
     /// </summary>
     public bool? ShowText
     {

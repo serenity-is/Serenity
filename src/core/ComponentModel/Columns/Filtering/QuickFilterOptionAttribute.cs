@@ -1,7 +1,7 @@
 ﻿namespace Serenity.ComponentModel;
 
 /// <summary>
-/// Add an option to the quick filtering.
+/// Adds an option to the quick filtering.
 /// </summary>
 /// <seealso cref="Attribute" />
 /// <remarks>

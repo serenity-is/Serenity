@@ -1,7 +1,8 @@
 namespace Serenity.Data;
 
 /// <summary>
-/// Sql Dialect mapper
+/// Default implementation of <see cref="ISqlDialectMapper"/> that maps well-known
+/// provider names and dialect type names to their corresponding <see cref="ISqlDialect"/>.
 /// </summary>
 public class DefaultSqlDialectMapper : ISqlDialectMapper
 {
@@ -21,9 +22,10 @@ public class DefaultSqlDialectMapper : ISqlDialectMapper
        };
 
     /// <summary>
-    /// Returns dialect for a dialect or provider name
+    /// Returns the dialect for a dialect or provider name, or <c>null</c> if none is found.
     /// </summary>
-    /// <param name="dialectOrProviderName">The dialect name or provider name</param>
+    /// <param name="dialectOrProviderName">The dialect name or provider name.</param>
+    /// <returns>The matching <see cref="ISqlDialect"/>, or <c>null</c> if no match is found.</returns>
     public ISqlDialect TryGet(string dialectOrProviderName)
     {
         if (string.IsNullOrEmpty(dialectOrProviderName))

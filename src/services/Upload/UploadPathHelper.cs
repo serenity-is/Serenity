@@ -8,12 +8,12 @@ namespace Serenity.Web;
 public static class UploadPathHelper
 {
     /// <summary>
-    /// Gets thumb file name
+    /// Gets thumb file name.
     /// </summary>
     /// <param name="path">File path</param>
     /// <param name="width">Thumb width</param>
     /// <param name="height">Thumb height</param>
-    /// <returns></returns>
+    /// <returns>The thumbnail file name.</returns>
     public static string GetThumbnailName(string path, int? width = null, int? height = null)
     {
         if (string.IsNullOrEmpty(path))
@@ -86,11 +86,11 @@ public static class UploadPathHelper
     }
 
     /// <summary>
-    /// Checks file name security, e.g. it is a relative file (not rooted) that 
+    /// Checks file name security, e.g. it is a relative file (not rooted) that
     /// does not contain ".." etc.
     /// </summary>
-    /// <param name="path"></param>
-    /// <exception cref="ArgumentOutOfRangeException"></exception>
+    /// <param name="path">The file path to check.</param>
+    /// <exception cref="ArgumentOutOfRangeException"><paramref name="path"/> is not a secure relative file.</exception>
     public static void CheckFileNameSecurity(string path)
     {
         if (!PathHelper.IsSecureRelativeFile(path))
@@ -98,12 +98,12 @@ public static class UploadPathHelper
     }
 
     /// <summary>
-    /// Finds an available name for a file
+    /// Finds an available name for a file.
     /// </summary>
     /// <param name="path">File path</param>
     /// <param name="exists">Function that returns if a file exists</param>
-    /// <returns></returns>
-    /// <exception cref="ArgumentNullException">Path or exists is null</exception>
+    /// <returns>The available file name.</returns>
+    /// <exception cref="ArgumentNullException"><paramref name="path"/> or <paramref name="exists"/> is <c>null</c>.</exception>
     public static string FindAvailableName(string path, Func<string, bool> exists)
     {
         ArgumentNullException.ThrowIfNull(path);

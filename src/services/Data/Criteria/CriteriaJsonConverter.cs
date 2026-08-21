@@ -4,7 +4,8 @@ using System.Text.Json;
 namespace Serenity.JsonConverters;
 
 /// <summary>
-///   Serialize/deserialize a BaseCriteria object</summary>
+/// Serializes and deserializes a <see cref="BaseCriteria"/> object.
+/// </summary>
 public class CriteriaJsonConverter : JsonConverter<BaseCriteria>
 {
     static CriteriaJsonConverter()

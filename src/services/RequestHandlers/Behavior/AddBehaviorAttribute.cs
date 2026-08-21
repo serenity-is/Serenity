@@ -1,16 +1,16 @@
 ﻿namespace Serenity.ComponentModel;
 
 /// <summary>
-/// Attaches an explicit behavior
+/// Attaches an explicit behavior to a class or property.
 /// </summary>
 [AttributeUsage(AttributeTargets.Class | AttributeTargets.Property, AllowMultiple = true)]
 public class AddBehaviorAttribute : Attribute
 {
     /// <summary>
-    /// Creates an instance of the attribute
+    /// Initializes a new instance of the attribute.
     /// </summary>
     /// <param name="behaviorType">Behavior type</param>
-    /// <exception cref="ArgumentException">behaviorType is abstract or an interface</exception>
+    /// <exception cref="ArgumentException"><paramref name="behaviorType"/> is abstract or an interface.</exception>
     public AddBehaviorAttribute(Type behaviorType)
     {
         if (behaviorType.IsAbstract || behaviorType.IsInterface)
@@ -20,7 +20,7 @@ public class AddBehaviorAttribute : Attribute
     }
 
     /// <summary>
-    /// Gets the behavior type
+    /// Gets the behavior type.
     /// </summary>
     public Type Value { get; private set; }
 }

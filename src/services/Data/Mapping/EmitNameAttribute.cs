@@ -14,7 +14,7 @@ public class EmitNameAttribute(string name) : Attribute
 {
 
     /// <summary>
-    /// The property name
+    /// The property name.
     /// </summary>
     public string Name { get; private set; } = name ?? throw new ArgumentNullException(nameof(name));
 }

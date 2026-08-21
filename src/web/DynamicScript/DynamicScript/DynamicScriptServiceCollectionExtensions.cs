@@ -9,15 +9,16 @@ using Serenity.Web.Middleware;
 namespace Serenity.Extensions.DependencyInjection;
 
 /// <summary>
-/// Contains DI extension methods related to dynamic script services
+/// Contains DI extension methods related to dynamic script services.
 /// </summary>
 public static class DynamicScriptServiceCollectionExtensions
 {
     /// <summary>
-    /// Registers he default <see cref="IDynamicScriptManager"/> implementation.
+    /// Registers the default <see cref="IDynamicScriptManager"/> implementation.
     /// </summary>
-    /// <param name="collection">Service collection</param>
-    /// <returns></returns>
+    /// <param name="collection">The service collection.</param>
+    /// <returns>The same service collection so that calls can be chained.</returns>
+    /// <exception cref="ArgumentNullException"><paramref name="collection"/> is <c>null</c>.</exception>
     public static IServiceCollection AddDynamicScriptManager(this IServiceCollection collection)
     {
         ArgumentNullException.ThrowIfNull(collection);
@@ -32,8 +33,8 @@ public static class DynamicScriptServiceCollectionExtensions
     /// Registers the default <see cref="IDynamicScriptManager" /> implementation
     /// in addition to the <see cref="IPropertyItemProvider"/> implementation.
     /// </summary>
-    /// <param name="collection">Service collection</param>
-    /// <returns></returns>
+    /// <param name="collection">The service collection.</param>
+    /// <returns>The same service collection so that calls can be chained.</returns>
     public static IServiceCollection AddDynamicScripts(this IServiceCollection collection)
     {
         AddDynamicScriptManager(collection);
@@ -44,8 +45,9 @@ public static class DynamicScriptServiceCollectionExtensions
     /// <summary>
     /// Registers the default <see cref="IFileWatcherFactory"/> implementation.
     /// </summary>
-    /// <param name="collection">Service collection</param>
-    /// <returns></returns>
+    /// <param name="collection">The service collection.</param>
+    /// <returns>The same service collection so that calls can be chained.</returns>
+    /// <exception cref="ArgumentNullException"><paramref name="collection"/> is <c>null</c>.</exception>
     public static IServiceCollection AddFileWatcherFactory(this IServiceCollection collection)
     {
         ArgumentNullException.ThrowIfNull(collection);
@@ -57,7 +59,8 @@ public static class DynamicScriptServiceCollectionExtensions
     /// <summary>
     /// Registers the default <see cref="IContentHashCache"/> implementation.
     /// </summary>
-    /// <param name="collection">Service collection</param>
+    /// <param name="collection">The service collection.</param>
+    /// <returns>The same service collection so that calls can be chained.</returns>
     public static IServiceCollection AddContentHashCache(this IServiceCollection collection)
     {
         ArgumentNullException.ThrowIfNull(collection);
@@ -72,8 +75,9 @@ public static class DynamicScriptServiceCollectionExtensions
     /// Registers the default service types related to CSS bundling, including
     /// <see cref="ICssBundleManager"/>.
     /// </summary>
-    /// <param name="collection">Service collection</param>
-    /// <exception cref="ArgumentNullException">Collection is null</exception>
+    /// <param name="collection">The service collection.</param>
+    /// <returns>The same service collection so that calls can be chained.</returns>
+    /// <exception cref="ArgumentNullException"><paramref name="collection"/> is <c>null</c>.</exception>
     public static IServiceCollection AddCssBundling(this IServiceCollection collection)
     {
         ArgumentNullException.ThrowIfNull(collection);
@@ -86,10 +90,10 @@ public static class DynamicScriptServiceCollectionExtensions
     }
 
     /// <summary>
-    /// Registers the default service types related to CSS and Script bundling
+    /// Registers the default service types related to CSS and script bundling.
     /// </summary>
-    /// <param name="collection"></param>
-    /// <returns></returns>
+    /// <param name="collection">The service collection.</param>
+    /// <returns>The same service collection so that calls can be chained.</returns>
     public static IServiceCollection AddCssAndScriptBundling(this IServiceCollection collection)
     {
         collection.AddCssBundling();
@@ -100,9 +104,9 @@ public static class DynamicScriptServiceCollectionExtensions
     /// Registers the default service types related to CSS bundling, including
     /// <see cref="ICssBundleManager"/>.
     /// </summary>
-    /// <param name="collection">Service collection</param>
-    /// <param name="setupAction">Action to edit options</param>
-    /// <exception cref="ArgumentNullException">Collection is null</exception>
+    /// <param name="collection">The service collection.</param>
+    /// <param name="setupAction">The action to edit options.</param>
+    /// <exception cref="ArgumentNullException"><paramref name="collection"/> or <paramref name="setupAction"/> is <c>null</c>.</exception>
     public static void AddCssBundling(this IServiceCollection collection,
         Action<CssBundlingOptions> setupAction)
     {
@@ -115,11 +119,12 @@ public static class DynamicScriptServiceCollectionExtensions
     }
 
     /// <summary>
-    /// Registers the default service types related to Script bundling, including
+    /// Registers the default service types related to script bundling, including
     /// <see cref="IScriptBundleManager"/>.
     /// </summary>
-    /// <param name="collection">Service collection</param>
-    /// <exception cref="ArgumentNullException">Collection is null</exception>
+    /// <param name="collection">The service collection.</param>
+    /// <returns>The same service collection so that calls can be chained.</returns>
+    /// <exception cref="ArgumentNullException"><paramref name="collection"/> is <c>null</c>.</exception>
     public static IServiceCollection AddScriptBundling(this IServiceCollection collection)
     {
         ArgumentNullException.ThrowIfNull(collection);
@@ -132,12 +137,12 @@ public static class DynamicScriptServiceCollectionExtensions
     }
 
     /// <summary>
-    /// Registers the default service types related to Script bundling, including
+    /// Registers the default service types related to script bundling, including
     /// <see cref="IScriptBundleManager"/>.
     /// </summary>
-    /// <param name="collection">Service collection</param>
-    /// <param name="setupAction">Action to edit options</param>
-    /// <exception cref="ArgumentNullException">Collection is null</exception>
+    /// <param name="collection">The service collection.</param>
+    /// <param name="setupAction">The action to edit options.</param>
+    /// <exception cref="ArgumentNullException"><paramref name="collection"/> or <paramref name="setupAction"/> is <c>null</c>.</exception>
     public static void AddScriptBundling(this IServiceCollection collection,
         Action<ScriptBundlingOptions> setupAction)
     {
@@ -150,20 +155,20 @@ public static class DynamicScriptServiceCollectionExtensions
     }
 
     /// <summary>
-    /// Adds <see cref="DynamicScriptMiddleware"/> to the application pipeline
+    /// Adds <see cref="DynamicScriptMiddleware"/> to the application pipeline.
     /// </summary>
-    /// <param name="builder">Application builder</param>
+    /// <param name="builder">The application builder.</param>
     public static IApplicationBuilder UseDynamicScriptMiddleware(this IApplicationBuilder builder)
     {
         return builder.UseMiddleware<DynamicScriptMiddleware>();
     }
 
     /// <summary>
-    /// Adds dynamic script related services to the application including
-    /// dynamic script types, css watching, script watching, template scripts, and
-    /// dynamic script middleware
+    /// Adds dynamic script related services to the application, including
+    /// dynamic script types, CSS watching, script watching, template scripts,
+    /// and the dynamic script middleware.
     /// </summary>
-    /// <param name="builder">Application builder</param>
+    /// <param name="builder">The application builder.</param>
     public static IApplicationBuilder UseDynamicScripts(this IApplicationBuilder builder)
     {
         ArgumentNullException.ThrowIfNull(builder);
@@ -176,11 +181,11 @@ public static class DynamicScriptServiceCollectionExtensions
     }
 
     /// <summary>
-    /// Executes registration of dynamic script types including data scripts,
-    /// lookup scripts, distinct values, columns and forms.
+    /// Executes registration of dynamic script types, including data scripts,
+    /// lookup scripts, distinct values, columns, and forms.
     /// </summary>
-    /// <param name="serviceProvider">Service provider</param>
-    /// <returns></returns>
+    /// <param name="serviceProvider">The service provider.</param>
+    /// <returns>The same service provider so that calls can be chained.</returns>
     public static IServiceProvider UseDynamicScriptTypes(this IServiceProvider serviceProvider)
     {
         var scriptManager = serviceProvider.GetRequiredService<IDynamicScriptManager>();
@@ -212,9 +217,9 @@ public static class DynamicScriptServiceCollectionExtensions
     }
 
     /// <summary>
-    /// Actives CSS file watching
+    /// Activates CSS file watching.
     /// </summary>
-    /// <param name="serviceProvider">Service provider</param>
+    /// <param name="serviceProvider">The service provider.</param>
     public static IServiceProvider UseCssWatching(this IServiceProvider serviceProvider)
     {
         var hostEnvironment = serviceProvider.GetRequiredService<IWebHostEnvironment>();
@@ -224,12 +229,13 @@ public static class DynamicScriptServiceCollectionExtensions
     }
 
     /// <summary>
-    /// Activates CSS file watching
+    /// Activates CSS file watching.
     /// </summary>
-    /// <param name="serviceProvider"></param>
-    /// <param name="cssPaths">CSS paths</param>
-    /// <exception cref="ArgumentNullException">serviceProvider is null</exception>
-    /// <exception cref="InvalidOperationException">CSS bundle manager is not registered</exception>
+    /// <param name="serviceProvider">The service provider.</param>
+    /// <param name="cssPaths">The CSS paths to watch.</param>
+    /// <returns>The same service provider so that calls can be chained.</returns>
+    /// <exception cref="ArgumentNullException"><paramref name="serviceProvider"/> or <paramref name="cssPaths"/> is <c>null</c>.</exception>
+    /// <exception cref="InvalidOperationException">No CSS bundle manager or content hash cache is registered.</exception>
     public static IServiceProvider UseCssWatching(this IServiceProvider serviceProvider,
         params string[] cssPaths)
     {
@@ -266,9 +272,9 @@ public static class DynamicScriptServiceCollectionExtensions
     }
 
     /// <summary>
-    /// Activates script file watching
+    /// Activates script file watching.
     /// </summary>
-    /// <param name="serviceProvider">Service provider</param>
+    /// <param name="serviceProvider">The service provider.</param>
     public static IServiceProvider UseScriptWatching(this IServiceProvider serviceProvider)
     {
         var hostEnvironment = serviceProvider.GetRequiredService<IWebHostEnvironment>();
@@ -278,12 +284,13 @@ public static class DynamicScriptServiceCollectionExtensions
     }
 
     /// <summary>
-    /// Activates script file watching
+    /// Activates script file watching.
     /// </summary>
-    /// <param name="serviceProvider">Service provider</param>
-    /// <param name="scriptPaths">List of script paths to watch</param>
-    /// <exception cref="ArgumentNullException">serviceProvider or scriptPaths is null</exception>
-    /// <exception cref="InvalidOperationException">Script bundle manager is not registered</exception>
+    /// <param name="serviceProvider">The service provider.</param>
+    /// <param name="scriptPaths">The list of script paths to watch.</param>
+    /// <returns>The same service provider so that calls can be chained.</returns>
+    /// <exception cref="ArgumentNullException"><paramref name="serviceProvider"/> or <paramref name="scriptPaths"/> is <c>null</c>.</exception>
+    /// <exception cref="InvalidOperationException">No script bundle manager or content hash cache is registered.</exception>
     public static IServiceProvider UseScriptWatching(this IServiceProvider serviceProvider,
         params string[] scriptPaths)
     {
@@ -320,9 +327,10 @@ public static class DynamicScriptServiceCollectionExtensions
     }
 
     /// <summary>
-    /// Registers the default local text initializer
+    /// Registers the default local text initializer.
     /// </summary>
-    /// <param name="collection">Service collection</param>
+    /// <param name="collection">The service collection.</param>
+    /// <returns>The same service collection so that calls can be chained.</returns>
     public static IServiceCollection AddLocalTextInitializer(this IServiceCollection collection)
     {
         collection.TryAddSingleton<ILocalTextInitializer, DefaultLocalTextInitializer>();
@@ -331,7 +339,7 @@ public static class DynamicScriptServiceCollectionExtensions
 
 
     /// <summary>
-    /// Initializes local texts by calling <see cref="ILocalTextInitializer.Initialize"/>
+    /// Initializes local texts by calling <see cref="ILocalTextInitializer.Initialize"/>.
     /// </summary>
     public static void InitializeLocalTexts(this IApplicationBuilder app)
     {

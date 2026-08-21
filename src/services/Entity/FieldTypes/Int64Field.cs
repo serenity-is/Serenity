@@ -3,7 +3,7 @@ using System.Text.Json;
 namespace Serenity.Data;
 
 /// <summary>
-/// Field with Int64 value
+/// Field with an Int64 value.
 /// </summary>
 /// <remarks>
 /// Initializes a new instance of the <see cref="Int64Field"/> class.
@@ -29,7 +29,7 @@ public sealed class Int64Field(ICollection<Field> collection, string name, Local
     /// <param name="flags">The flags.</param>
     /// <param name="getValue">The get value.</param>
     /// <param name="setValue">The set value.</param>
-    /// <returns></returns>
+    /// <returns>A new Int64Field instance.</returns>
     public static Int64Field Factory(ICollection<Field> collection, string name, LocalText caption, int size, FieldFlags flags,
         Func<IRow, long?> getValue, Action<IRow, long?> setValue)
     {
@@ -42,7 +42,7 @@ public sealed class Int64Field(ICollection<Field> collection, string name, Local
     /// <param name="reader">The reader.</param>
     /// <param name="index">The index.</param>
     /// <param name="row">The row.</param>
-    /// <exception cref="ArgumentNullException">reader</exception>
+    /// <exception cref="ArgumentNullException">reader is null.</exception>
     public override void GetFromReader(IDataReader reader, int index, IRow row)
     {
         ArgumentNullException.ThrowIfNull(reader);
@@ -56,7 +56,7 @@ public sealed class Int64Field(ICollection<Field> collection, string name, Local
     }
 
     /// <summary>
-    /// Serializes this fields value to JSON
+    /// Serializes this field's value to JSON.
     /// </summary>
     /// <param name="writer">The writer.</param>
     /// <param name="row">The row.</param>
@@ -78,12 +78,12 @@ public sealed class Int64Field(ICollection<Field> collection, string name, Local
     }
 
     /// <summary>
-    /// Deserializes this fields value from JSON
+    /// Deserializes this field's value from JSON.
     /// </summary>
     /// <param name="reader">The reader.</param>
     /// <param name="row">The row.</param>
     /// <param name="serializer">The serializer.</param>
-    /// <exception cref="ArgumentNullException">reader</exception>
+    /// <exception cref="ArgumentNullException">reader is null.</exception>
     public override void ValueFromJson(Newtonsoft.Json.JsonReader reader, IRow row, Newtonsoft.Json.JsonSerializer serializer)
     {
         ArgumentNullException.ThrowIfNull(reader);

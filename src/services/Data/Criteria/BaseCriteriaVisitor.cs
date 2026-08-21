@@ -16,7 +16,7 @@ public abstract class BaseCriteriaVisitor
     /// Visits the specified criteria.
     /// </summary>
     /// <param name="criteria">The criteria.</param>
-    /// <returns></returns>
+    /// <returns>The visited criteria, which may be a reworked version.</returns>
     /// <exception cref="Exception">Criteria type is unknown.</exception>
     protected virtual BaseCriteria Visit(BaseCriteria criteria)
     {
@@ -45,21 +45,21 @@ public abstract class BaseCriteriaVisitor
     }
 
     /// <summary>
-    /// Visits the criteria returning potentially reworked version.
+    /// Visits the criteria, returning a potentially reworked version.
     /// </summary>
     /// <param name="criteria">The criteria.</param>
-    /// <returns></returns>
+    /// <returns>The visited criteria.</returns>
     protected virtual BaseCriteria VisitCriteria(Criteria criteria)
     {
         return criteria;
     }
 
     /// <summary>
-    /// Visits the binary criteria. Binary criteria is one with
-    /// two operands and an operator between.
+    /// Visits the binary criteria. A binary criteria is one with
+    /// two operands and an operator between them.
     /// </summary>
     /// <param name="criteria">The binary criteria.</param>
-    /// <returns></returns>
+    /// <returns>The visited binary criteria.</returns>
     protected virtual BaseCriteria VisitBinary(BinaryCriteria criteria)
     {
         var left = Visit(criteria.LeftOperand);
@@ -75,11 +75,11 @@ public abstract class BaseCriteriaVisitor
     }
 
     /// <summary>
-    /// Visits the unary criteria. Unary criteria is one with
+    /// Visits the unary criteria. A unary criteria is one with
     /// one operand and one operator.
     /// </summary>
     /// <param name="criteria">The unary criteria.</param>
-    /// <returns></returns>
+    /// <returns>The visited unary criteria.</returns>
     protected virtual BaseCriteria VisitUnary(UnaryCriteria criteria)
     {
         var operand = Visit(criteria.Operand);
@@ -95,28 +95,29 @@ public abstract class BaseCriteriaVisitor
     /// Visits the function call criteria.
     /// </summary>
     /// <param name="criteria">The criteria.</param>
+    /// <returns>The visited function call criteria.</returns>
     protected virtual BaseCriteria VisitFunctionCall(FunctionCallCriteria criteria)
     {
         return criteria;
     }
 
     /// <summary>
-    /// Visits the parameter criteria. Parameter criteria is
+    /// Visits the parameter criteria. A parameter criteria is
     /// just a parameter name.
     /// </summary>
     /// <param name="criteria">The parameter criteria.</param>
-    /// <returns></returns>
+    /// <returns>The visited parameter criteria.</returns>
     protected virtual BaseCriteria VisitParam(ParamCriteria criteria)
     {
         return criteria;
     }
 
     /// <summary>
-    /// Visits the value criteria. Value criteria is just a constant
+    /// Visits the value criteria. A value criteria is just a constant
     /// value.
     /// </summary>
     /// <param name="criteria">The criteria.</param>
-    /// <returns></returns>
+    /// <returns>The visited value criteria.</returns>
     protected virtual BaseCriteria VisitValue(ValueCriteria criteria)
     {
         return criteria;

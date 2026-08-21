@@ -1,16 +1,16 @@
 namespace Serenity.Data;
 
 /// <summary>
-/// Contains SQL expression generation helpers
+/// Contains SQL expression generation helpers.
 /// </summary>
 public static partial class Sql
 {
     /// <summary>
-    /// Creates a SUM() expression
+    /// Creates a SUM() expression.
     /// </summary>
     /// <param name="field">The field.</param>
-    /// <returns></returns>
-    /// <exception cref="ArgumentNullException">field is null or empty</exception>
+    /// <returns>The SUM() expression.</returns>
+    /// <exception cref="ArgumentNullException">field is null or empty.</exception>
     public static string Sum(string field)
     {
         if (field == null || field.Length == 0)
@@ -20,11 +20,11 @@ public static partial class Sql
     }
 
     /// <summary>
-    /// Creates a SUM() expression
+    /// Creates a SUM() expression.
     /// </summary>
     /// <param name="field">The field.</param>
-    /// <returns></returns>
-    /// <exception cref="ArgumentNullException">field is null or empty</exception>
+    /// <returns>The SUM() expression.</returns>
+    /// <exception cref="ArgumentNullException">field is null.</exception>
     public static string Sum(IField field)
     {
         ArgumentNullException.ThrowIfNull(field);
@@ -33,11 +33,11 @@ public static partial class Sql
     }
 
     /// <summary>
-    /// Creates a COUNT() expression
+    /// Creates a COUNT() expression.
     /// </summary>
     /// <param name="field">The field.</param>
-    /// <returns></returns>
-    /// <exception cref="ArgumentNullException">field is null or empty</exception>
+    /// <returns>The COUNT() expression.</returns>
+    /// <exception cref="ArgumentNullException">field is null or empty.</exception>
     public static string Count(string field)
     {
         if (field == null || field.Length == 0)
@@ -46,11 +46,11 @@ public static partial class Sql
     }
 
     /// <summary>
-    /// Creates a COUNT() expression
+    /// Creates a COUNT() expression.
     /// </summary>
     /// <param name="field">The field.</param>
-    /// <returns></returns>
-    /// <exception cref="ArgumentNullException">field is null or empty</exception>
+    /// <returns>The COUNT() expression.</returns>
+    /// <exception cref="ArgumentNullException">field is null.</exception>
     public static string Count(IField field)
     {
         ArgumentNullException.ThrowIfNull(field);
@@ -58,12 +58,12 @@ public static partial class Sql
     }
 
     /// <summary>
-    /// Creates a COUNT() expression
+    /// Creates a COUNT() expression.
     /// </summary>
     /// <param name="joinNumber">The join number.</param>
     /// <param name="field">The field.</param>
-    /// <returns></returns>
-    /// <exception cref="ArgumentNullException">field is null or empty</exception>
+    /// <returns>The COUNT() expression.</returns>
+    /// <exception cref="ArgumentNullException">field is null or empty.</exception>
     public static string Count(int joinNumber, string field)
     {
         if (field == null || field.Length == 0)
@@ -73,9 +73,9 @@ public static partial class Sql
     }
 
     /// <summary>
-    /// Returns COUNT(*)
+    /// Returns COUNT(*).
     /// </summary>
-    /// <returns>COUNT(*)</returns>
+    /// <returns>COUNT(*).</returns>
     public static string Count()
     {
         return "COUNT(*)";
@@ -85,8 +85,8 @@ public static partial class Sql
     /// Creates a COALESCE() expression.
     /// </summary>
     /// <param name="statements">The statements.</param>
-    /// <returns></returns>
-    /// <exception cref="ArgumentNullException">fields is null or empty</exception>
+    /// <returns>The COALESCE() expression.</returns>
+    /// <exception cref="ArgumentNullException">fields is null or empty.</exception>
     public static string Coalesce(params string[] statements)
     {
         if (statements == null || statements.Length == 0)
@@ -104,12 +104,12 @@ public static partial class Sql
     }
 
     /// <summary>
-    /// Creates a COALESCE() expression while adding values to specified query as params.
+    /// Creates a COALESCE() expression while adding values to the specified query as parameters.
     /// </summary>
     /// <param name="query">The query.</param>
     /// <param name="values">The values.</param>
-    /// <returns></returns>
-    /// <exception cref="ArgumentNullException">values is null or empty</exception>
+    /// <returns>The COALESCE() expression.</returns>
+    /// <exception cref="ArgumentNullException">values is null or empty.</exception>
     public static string Coalesce(this IQueryWithParams query, params object[] values)
     {
         if (values == null || values.Length == 0)
@@ -143,11 +143,11 @@ public static partial class Sql
     }
 
     /// <summary>
-    /// Creates a MIN() expression
+    /// Creates a MIN() expression.
     /// </summary>
     /// <param name="field">The field.</param>
-    /// <returns></returns>
-    /// <exception cref="ArgumentNullException">field is null or empty</exception>
+    /// <returns>The MIN() expression.</returns>
+    /// <exception cref="ArgumentNullException">field is null or empty.</exception>
     public static string Min(string field)
     {
         if (field == null || field.Length == 0)
@@ -157,11 +157,11 @@ public static partial class Sql
     }
 
     /// <summary>
-    /// Creates a MIN() expression
+    /// Creates a MIN() expression.
     /// </summary>
     /// <param name="field">The field.</param>
-    /// <returns></returns>
-    /// <exception cref="ArgumentNullException">field is null or empty</exception>
+    /// <returns>The MIN() expression.</returns>
+    /// <exception cref="ArgumentNullException">field is null.</exception>
     public static string Min(IField field)
     {
         ArgumentNullException.ThrowIfNull(field);
@@ -175,8 +175,8 @@ public static partial class Sql
     /// </summary>
     /// <param name="joinNumber">The join number.</param>
     /// <param name="field">The field.</param>
-    /// <returns></returns>
-    /// <exception cref="ArgumentNullException">field is null or empty</exception>
+    /// <returns>The MIN() expression.</returns>
+    /// <exception cref="ArgumentNullException">field is null or empty.</exception>
     public static string Min(int joinNumber, string field)
     {
         if (field == null || field.Length == 0)
@@ -189,8 +189,8 @@ public static partial class Sql
     /// Creates a MAX() expression.
     /// </summary>
     /// <param name="field">The field.</param>
-    /// <returns></returns>
-    /// <exception cref="ArgumentNullException">field is null or empty</exception>
+    /// <returns>The MAX() expression.</returns>
+    /// <exception cref="ArgumentNullException">field is null or empty.</exception>
     public static string Max(string field)
     {
         if (field == null || field.Length == 0)
@@ -203,8 +203,8 @@ public static partial class Sql
     /// Creates a MAX() expression.
     /// </summary>
     /// <param name="field">The field.</param>
-    /// <returns></returns>
-    /// <exception cref="ArgumentNullException">field is null or empty</exception>
+    /// <returns>The MAX() expression.</returns>
+    /// <exception cref="ArgumentNullException">field is null.</exception>
     public static string Max(IField field)
     {
         ArgumentNullException.ThrowIfNull(field);
@@ -217,8 +217,8 @@ public static partial class Sql
     /// </summary>
     /// <param name="joinNumber">The join number.</param>
     /// <param name="field">The field.</param>
-    /// <returns></returns>
-    /// <exception cref="ArgumentNullException">field is null or empty</exception>
+    /// <returns>The MAX() expression.</returns>
+    /// <exception cref="ArgumentNullException">field is null or empty.</exception>
     public static string Max(int joinNumber, string field)
     {
         if (field == null || field.Length == 0)
@@ -232,7 +232,7 @@ public static partial class Sql
     /// </summary>
     /// <param name="joinNumber">The join number.</param>
     /// <param name="field">The field.</param>
-    /// <returns></returns>
+    /// <returns>The SUM() expression.</returns>
     /// <exception cref="ArgumentNullException">field is null or empty.</exception>
     public static string Sum(int joinNumber, string field)
     {
@@ -243,11 +243,11 @@ public static partial class Sql
     }
 
     /// <summary>
-    /// Creates a AVG expression.
+    /// Creates an AVG() expression.
     /// </summary>
     /// <param name="field">The field.</param>
-    /// <returns></returns>
-    /// <exception cref="ArgumentNullException">field is null or empty</exception>
+    /// <returns>The AVG() expression.</returns>
+    /// <exception cref="ArgumentNullException">field is null or empty.</exception>
     public static string Avg(string field)
     {
         if (field == null || field.Length == 0)
@@ -257,11 +257,11 @@ public static partial class Sql
     }
 
     /// <summary>
-    /// Creates a AVG expression.
+    /// Creates an AVG() expression.
     /// </summary>
     /// <param name="field">The field.</param>
-    /// <returns></returns>
-    /// <exception cref="ArgumentNullException">field is null or empty</exception>
+    /// <returns>The AVG() expression.</returns>
+    /// <exception cref="ArgumentNullException">field is null.</exception>
     public static string Avg(IField field)
     {
         ArgumentNullException.ThrowIfNull(field);
@@ -270,12 +270,12 @@ public static partial class Sql
     }
 
     /// <summary>
-    /// Creates a AVG() expression.
+    /// Creates an AVG() expression.
     /// </summary>
     /// <param name="joinNumber">The join number.</param>
     /// <param name="field">The field.</param>
-    /// <returns></returns>
-    /// <exception cref="ArgumentNullException">field is null or empty</exception>
+    /// <returns>The AVG() expression.</returns>
+    /// <exception cref="ArgumentNullException">field is null or empty.</exception>
     public static string Avg(int joinNumber, string field)
     {
         if (field == null || field.Length == 0)
@@ -289,7 +289,7 @@ public static partial class Sql
     /// </summary>
     /// <param name="type">The type.</param>
     /// <param name="field">The field.</param>
-    /// <returns></returns>
+    /// <returns>The Convert() expression.</returns>
     /// <exception cref="ArgumentNullException">
     /// type or field is null or empty.
     /// </exception>
@@ -310,8 +310,8 @@ public static partial class Sql
     /// <param name="expression">The expression.</param>
     /// <param name="startIndex">The start index.</param>
     /// <param name="endIndex">The end index.</param>
-    /// <returns></returns>
-    /// <exception cref="ArgumentNullException">expression</exception>
+    /// <returns>The SUBSTRING() expression.</returns>
+    /// <exception cref="ArgumentNullException">expression is null or empty.</exception>
     public static string SubString(string expression, int startIndex, int endIndex)
     {
         if (string.IsNullOrEmpty(expression))
@@ -324,8 +324,8 @@ public static partial class Sql
     /// Creates a CASE() expression.
     /// </summary>
     /// <param name="query">The query.</param>
-    /// <param name="builder">The action which will receive CASE statement builder.</param>
-    /// <returns></returns>
+    /// <param name="builder">The action which will receive the CASE statement builder.</param>
+    /// <returns>The CASE() expression.</returns>
     public static string Case(this IQueryWithParams query, Action<CaseBuilder> builder)
     {
         var cb = new CaseBuilder();
@@ -336,12 +336,12 @@ public static partial class Sql
     /// <summary>
     /// Builds a CASE statement.
     /// </summary>
-    /// <param name="condition">Optional condition. For example for statement "CASE Field1 WHEN 1 THEN 2 END", condition would be "Field1"</param>
+    /// <param name="condition">Optional condition. For example for statement "CASE Field1 WHEN 1 THEN 2 END", condition would be "Field1".</param>
     /// <param name="whenThenPairs">Pairs of WHEN/THEN statements like ["A = 1", "'Result1'", "A = 2", "'Result2'"] for a case
     /// statement like CASE WHEN A = 1 THEN 'Result1' WHEN A = 2 THEN 'Result2' END.</param>
-    /// <param name="elseStatement">Optional ELSE statement</param>
-    /// <returns></returns>
-    /// <exception cref="ArgumentOutOfRangeException">whenThenPairs is empty or contains odd number of elements</exception>
+    /// <param name="elseStatement">Optional ELSE statement.</param>
+    /// <returns>The CASE statement.</returns>
+    /// <exception cref="ArgumentOutOfRangeException">whenThenPairs is empty or contains an odd number of elements.</exception>
     public static string Case(string condition, string[] whenThenPairs, string elseStatement)
     {
         StringBuilder sb = new("CASE ");
@@ -389,11 +389,11 @@ public static partial class Sql
         }
 
         /// <summary>
-        /// Adds a WHEN THEN part
+        /// Adds a WHEN THEN part.
         /// </summary>
         /// <param name="when">The when.</param>
         /// <param name="then">The then.</param>
-        /// <returns></returns>
+        /// <returns>This builder.</returns>
         public CaseBuilder WhenThen(ICriteria when, object then)
         {
             this.when.Add(when);
@@ -402,10 +402,10 @@ public static partial class Sql
         }
 
         /// <summary>
-        /// Adds a WHEN part
+        /// Adds a WHEN part.
         /// </summary>
         /// <param name="when">The when.</param>
-        /// <returns></returns>
+        /// <returns>This builder.</returns>
         public CaseBuilder When(ICriteria when)
         {
             this.when.Add(when);
@@ -413,10 +413,10 @@ public static partial class Sql
         }
 
         /// <summary>
-        /// Adds a THEN PART
+        /// Adds a THEN part.
         /// </summary>
         /// <param name="then">The then.</param>
-        /// <returns></returns>
+        /// <returns>This builder.</returns>
         public CaseBuilder Then(object then)
         {
             this.then.Add(then);
@@ -424,11 +424,11 @@ public static partial class Sql
         }
 
         /// <summary>
-        /// Adds a ELSE part
+        /// Adds an ELSE part.
         /// </summary>
         /// <param name="elseValue">The else value.</param>
-        /// <returns></returns>
-        /// <exception cref="InvalidOperationException">Internal else value is not null</exception>
+        /// <returns>This builder.</returns>
+        /// <exception cref="InvalidOperationException">Internal else value is not null.</exception>
         public CaseBuilder Else(object elseValue)
         {
             if (this.elseValue is not null)
@@ -449,7 +449,7 @@ public static partial class Sql
         /// <exception cref="InvalidOperationException">
         /// There should be at least one WHEN/THEN pair.
         /// or
-        /// WHEN/THEN pairs doesn't match.
+        /// WHEN/THEN pairs don't match.
         /// </exception>
         public string ToString(IQueryWithParams query)
         {

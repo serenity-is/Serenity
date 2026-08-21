@@ -13,10 +13,10 @@ public interface IRetrieveHandler<TRow, TRetrieveRequest, TRetrieveResponse>
     where TRetrieveResponse : RetrieveResponse<TRow>, new()
 {
     /// <summary>
-    /// Processes a Retrieve request
+    /// Processes a Retrieve request.
     /// </summary>
     /// <param name="connection">Connection</param>
     /// <param name="request">Retrieve request</param>
-    /// <returns></returns>
+    /// <returns>The retrieve response.</returns>
     TRetrieveResponse Retrieve(IDbConnection connection, TRetrieveRequest request);
 }

@@ -1,34 +1,36 @@
 ﻿namespace Serenity.Web;
 
 /// <summary>
-/// Abstraction for css bundling manager
+/// Abstraction for a CSS bundling manager.
 /// </summary>
 public interface ICssBundleManager
 {
     /// <summary>
-    /// Returns true if bundling is enabled
+    /// Returns <c>true</c> if bundling is enabled.
     /// </summary>
     bool IsEnabled { get; }
 
     /// <summary>
-    /// A method that can be called to clear css file cache
+    /// A method that can be called to clear the CSS file cache.
     /// </summary>
     void CssChanged();
 
     /// <summary>
-    /// Gets the list of bundle includes
+    /// Gets the list of bundle includes.
     /// </summary>
-    /// <param name="bundleKey">Bundle key</param>
+    /// <param name="bundleKey">The bundle key.</param>
+    /// <returns>The list of bundle includes.</returns>
     IEnumerable<string> GetBundleIncludes(string bundleKey);
 
     /// <summary>
-    /// Gets the CSS bundle containing a css url
+    /// Gets the CSS bundle containing a CSS URL.
     /// </summary>
-    /// <param name="cssUrl">CSS url</param>
+    /// <param name="cssUrl">The CSS URL.</param>
+    /// <returns>The CSS bundle URL.</returns>
     string GetCssBundle(string cssUrl);
 
     /// <summary>
-    /// Resets the css bundle manager
+    /// Resets the CSS bundle manager.
     /// </summary>
     void Reset();
 }

@@ -15,7 +15,7 @@ public static class MemoryCacheExtensions
     /// <param name="value">value</param>
     /// <param name="expiration">Expire time (Use TimeSpan.Zero to hold value with no expiration). 
     /// If expiration is negative value nothing is added to the cache but removed if exists.</param>
-    /// <returns>The value</returns>
+    /// <returns>The value that was added to the cache.</returns>
     public static TItem Add<TItem>(this IMemoryCache cache, object key, TItem value, TimeSpan expiration)
     {
         if (cache == null)

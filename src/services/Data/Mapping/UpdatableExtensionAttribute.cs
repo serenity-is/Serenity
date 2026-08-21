@@ -82,7 +82,7 @@ public sealed class UpdatableExtensionAttribute : Attribute
     public object PresenceValue { get; set; }
 
     /// <summary>
-    /// Delete extension record if this record is deleted
+    /// Delete extension record if this record is deleted.
     /// </summary>
     public bool CascadeDelete { get; set; }
 }

@@ -1,7 +1,8 @@
 namespace Serenity.Data;
 
 /// <summary>
-///   Contains static extension methods for Field objects.</summary>
+///   Contains static extension methods for Field objects.
+/// </summary>
 public static class EntityFieldExtensions
 {
     private const FieldFlags NonTableFieldFlags =
@@ -22,11 +23,14 @@ public static class EntityFieldExtensions
     }
 
     /// <summary>
-    ///   Gets a dictionary of table fields (e.g. not a foreign or calculated field) in a row.</summary>
+    ///   Gets a dictionary of table fields (e.g. not a foreign or calculated field) in a row.
+    /// </summary>
     /// <param name="row">
-    ///   The row to return dictionary of table fields</param>
+    ///   The row to return the dictionary of table fields for.
+    /// </param>
     /// <returns>
-    ///   A dictionary of table fields in which field objects are keys.</returns>
+    ///   A dictionary of table fields in which field objects are keys.
+    /// </returns>
     public static IEnumerable<Field> EnumerateTableFields(this IRow row)
     {
         var fields = row.Fields;
@@ -39,11 +43,14 @@ public static class EntityFieldExtensions
     }
 
     /// <summary>
-    ///   Gets a dictionary of table fields (e.g. not a foreign or calculated field) in a row.</summary>
+    ///   Gets a dictionary of table fields (e.g. not a foreign or calculated field) in a row.
+    /// </summary>
     /// <param name="row">
-    ///   The row to return dictionary of table fields</param>
+    ///   The row to return the dictionary of table fields for.
+    /// </param>
     /// <returns>
-    ///   A dictionary of table fields in which field objects are keys.</returns>
+    ///   A dictionary of table fields in which field objects are keys.
+    /// </returns>
     public static HashSet<Field> GetTableFields(this IRow row)
     {
         HashSet<Field> tableFields = [];
@@ -81,15 +88,15 @@ public static class EntityFieldExtensions
     }
 
     /// <summary>
-    /// Returns a new field an expression with specified join alias. Avoid using.
+    /// Returns a new field with an expression using the specified join alias. Avoid using.
     /// </summary>
     /// <typeparam name="TField">The type of the field.</typeparam>
     /// <param name="field">The field.</param>
     /// <param name="join">The join.</param>
     /// <param name="origin">The origin.</param>
     /// <param name="extraFlags">The extra flags.</param>
-    /// <returns></returns>
-    /// <exception cref="ArgumentNullException">join</exception>
+    /// <returns>The field with the join alias applied.</returns>
+    /// <exception cref="ArgumentNullException">join is null.</exception>
     public static TField OfJoin<TField>(this TField field, Join join, string origin, FieldFlags extraFlags = FieldFlags.Internal)
         where TField : Field
     {

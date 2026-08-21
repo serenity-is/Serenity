@@ -4,16 +4,19 @@ using Microsoft.AspNetCore.WebUtilities;
 namespace Serenity;
 
 /// <summary>
-/// Extension methods for data protector to support tokens created via BinaryWriter
+/// Extension methods for <see cref="IDataProtector"/> to support tokens
+/// created via a <see cref="System.IO.BinaryWriter"/>.
 /// </summary>
 public static class DataProtectorBinaryTokenExtensions
 {
     /// <summary>
-    /// Encrypts a token populated by the given callback and returns the encrypted token in 
-    /// base64 URL encoded format
+    /// Encrypts a token populated by the given callback and returns the
+    /// encrypted token in base64 URL encoded format.
     /// </summary>
-    /// <param name="protector">Data protector</param>
-    /// <param name="callback">Callback to populate the writer</param>
+    /// <param name="protector">The data protector.</param>
+    /// <param name="callback">The callback used to populate the writer.</param>
+    /// <returns>The protected token in base64 URL encoded format.</returns>
+    /// <exception cref="ArgumentNullException"><paramref name="callback"/> is <c>null</c>.</exception>
     public static string ProtectBinary(this IDataProtector protector, Action<System.IO.BinaryWriter> callback)
     {
         ArgumentNullException.ThrowIfNull(callback);
@@ -28,10 +31,13 @@ public static class DataProtectorBinaryTokenExtensions
     }
 
     /// <summary>
-    /// Decrypts the given token in base64 URL encoded format and return a binary reader with the decrypted data
+    /// Decrypts the given token in base64 URL encoded format and returns a
+    /// binary reader over the decrypted data.
     /// </summary>
-    /// <param name="protector">Data protector</param>
-    /// <param name="token">Encrypted token in base 64 URL encoded format</param>
+    /// <param name="protector">The data protector.</param>
+    /// <param name="token">The encrypted token in base64 URL encoded format.</param>
+    /// <returns>A <see cref="System.IO.BinaryReader"/> over the decrypted data.</returns>
+    /// <exception cref="ArgumentNullException"><paramref name="token"/> is <c>null</c>.</exception>
     public static System.IO.BinaryReader UnprotectBinary(this IDataProtector protector, string token)
     {
         ArgumentNullException.ThrowIfNull(token);

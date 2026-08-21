@@ -5,10 +5,10 @@
 /// When used with fields, turns on or off the updatable flag.
 /// </summary>
 /// <remarks>
-/// Controls if this field is editable in update record mode.
-/// When used with fields, turns on or off the updatable flag.
+/// When placed on a field, this attribute controls whether the field is included
+/// when updating an existing record.
 /// </remarks>
-/// <param name="updatable">True to make field updatable</param>
+/// <param name="updatable">True to make the field updatable.</param>
 public class UpdatableAttribute(bool updatable = true) : Attribute
 {
 

@@ -15,9 +15,9 @@ public static class EntityConnectionExtensions
     /// <typeparam name="TRow">The type of the row.</typeparam>
     /// <param name="connection">The connection.</param>
     /// <param name="id">The identifier.</param>
-    /// <returns>Entity with given ID</returns>
-    /// <exception cref="ValidationError">Record with specified ID is not found</exception>
-    /// <exception cref="InvalidOperationException">Multiple records with the ID found</exception>
+    /// <returns>Entity with the given ID.</returns>
+    /// <exception cref="ValidationError">Record with the specified ID is not found.</exception>
+    /// <exception cref="InvalidOperationException">Multiple records with the ID found.</exception>
     public static TRow ById<TRow>(this IDbConnection connection, object id)
         where TRow : class, IRow, IIdRow, new()
     {
@@ -33,8 +33,8 @@ public static class EntityConnectionExtensions
     /// <typeparam name="TRow">The type of the row.</typeparam>
     /// <param name="connection">The connection.</param>
     /// <param name="id">The identifier.</param>
-    /// <returns>Entity with given ID, or null if not found</returns>
-    /// <exception cref="InvalidOperationException">Multiple records with the ID found</exception>
+    /// <returns>Entity with the given ID, or null if not found.</returns>
+    /// <exception cref="InvalidOperationException">Multiple records with the ID found.</exception>
     public static TRow TryById<TRow>(this IDbConnection connection, object id)
         where TRow : class, IRow, IIdRow, new()
     {
@@ -60,9 +60,9 @@ public static class EntityConnectionExtensions
     /// <param name="connection">The connection.</param>
     /// <param name="id">The identifier.</param>
     /// <param name="editQuery">Callback to edit the query.</param>
-    /// <returns>Entity with given ID</returns>
-    /// <exception cref="ValidationError">Record with specified ID is not found</exception>
-    /// <exception cref="InvalidOperationException">Multiple records with the ID found</exception>
+    /// <returns>Entity with the given ID.</returns>
+    /// <exception cref="ValidationError">Record with the specified ID is not found.</exception>
+    /// <exception cref="InvalidOperationException">Multiple records with the ID found.</exception>
     public static TRow ById<TRow>(this IDbConnection connection, object id, Action<SqlQuery> editQuery)
         where TRow : class, IRow, IIdRow, new()
     {
@@ -80,8 +80,8 @@ public static class EntityConnectionExtensions
     /// <param name="connection">The connection.</param>
     /// <param name="id">The identifier.</param>
     /// <param name="editQuery">Callback to edit the query.</param>
-    /// <returns>Entity with given ID, or null if not found</returns>
-    /// <exception cref="InvalidOperationException">Multiple records with the ID found</exception> 
+    /// <returns>Entity with the given ID, or null if not found.</returns>
+    /// <exception cref="InvalidOperationException">Multiple records with the ID found.</exception> 
     public static TRow TryById<TRow>(this IDbConnection connection, object id, Action<SqlQuery> editQuery)
         where TRow : class, IRow, IIdRow, new()
     {
@@ -110,8 +110,8 @@ public static class EntityConnectionExtensions
     /// <typeparam name="TRow">The type of the row.</typeparam>
     /// <param name="connection">The connection.</param>
     /// <param name="where">The where criteria.</param>
-    /// <returns>The single entity matching the specified criteria</returns>
-    /// <exception cref="ValidationError">No matching records found</exception>
+    /// <returns>The single entity matching the specified criteria.</returns>
+    /// <exception cref="ValidationError">No matching records found.</exception>
     /// <exception cref="InvalidOperationException">Multiple records matching the specified criteria.</exception>
     public static TRow Single<TRow>(this IDbConnection connection, ICriteria where)
         where TRow : class, IRow, new()
@@ -129,8 +129,8 @@ public static class EntityConnectionExtensions
     /// <typeparam name="TRow">The type of the row.</typeparam>
     /// <param name="connection">The connection.</param>
     /// <param name="where">The where criteria.</param>
-    /// <returns>The single entity matching the specified criteria, or null if no matching record found</returns>
-    /// <exception cref="InvalidOperationException">Multiple records matching the criteria found</exception>
+    /// <returns>The single entity matching the specified criteria, or null if no matching record is found.</returns>
+    /// <exception cref="InvalidOperationException">Multiple records matching the criteria found.</exception>
     public static TRow TrySingle<TRow>(this IDbConnection connection, ICriteria where)
         where TRow : class, IRow, new()
     {
@@ -213,7 +213,7 @@ public static class EntityConnectionExtensions
     /// <typeparam name="TRow">The type of the row.</typeparam>
     /// <param name="connection">The connection.</param>
     /// <param name="where">The where criteria.</param>
-    /// <returns>First entity matching the where criteria or null if not found.</returns>
+    /// <returns>First entity matching the where criteria, or null if not found.</returns>
     public static TRow TryFirst<TRow>(this IDbConnection connection, ICriteria where)
         where TRow : class, IRow, new()
     {
@@ -278,7 +278,7 @@ public static class EntityConnectionExtensions
     /// </summary>
     /// <typeparam name="TRow">The type of the row.</typeparam>
     /// <param name="connection">The connection.</param>
-    /// <returns>Number of records in the table</returns>
+    /// <returns>Number of records in the table.</returns>
     public static int Count<TRow>(this IDbConnection connection)
         where TRow : class, IRow, new()
     {
@@ -291,7 +291,7 @@ public static class EntityConnectionExtensions
     /// <typeparam name="TRow">The type of the row.</typeparam>
     /// <param name="connection">The connection.</param>
     /// <param name="where">The where criteria.</param>
-    /// <returns>Number of records matching the specified criteria</returns>
+    /// <returns>Number of records matching the specified criteria.</returns>
     public static int Count<TRow>(this IDbConnection connection, ICriteria where)
         where TRow : class, IRow, new()
     {
@@ -313,7 +313,7 @@ public static class EntityConnectionExtensions
     /// <typeparam name="TRow">The type of the row.</typeparam>
     /// <param name="connection">The connection.</param>
     /// <param name="id">The identifier.</param>
-    /// <returns>True if record exists</returns>
+    /// <returns>True if the record exists.</returns>
     public static bool ExistsById<TRow>(this IDbConnection connection, object id)
         where TRow : class, IRow, IIdRow, new()
     {
@@ -335,7 +335,7 @@ public static class EntityConnectionExtensions
     /// <typeparam name="TRow">The type of the row.</typeparam>
     /// <param name="connection">The connection.</param>
     /// <param name="where">The where criteria.</param>
-    /// <returns>True if record matching criteria exists.</returns>
+    /// <returns>True if a record matching the criteria exists.</returns>
     public static bool Exists<TRow>(this IDbConnection connection, ICriteria where)
         where TRow : class, IRow, new()
     {
@@ -357,7 +357,7 @@ public static class EntityConnectionExtensions
     /// </summary>
     /// <typeparam name="TRow">The type of the row.</typeparam>
     /// <param name="connection">The connection.</param>
-    /// <returns>All records</returns>
+    /// <returns>All records.</returns>
     public static List<TRow> List<TRow>(this IDbConnection connection)
         where TRow : class, IRow, new()
     {
@@ -372,7 +372,7 @@ public static class EntityConnectionExtensions
     /// <typeparam name="TRow">The type of the row.</typeparam>
     /// <param name="connection">The connection.</param>
     /// <param name="where">The where criteria.</param>
-    /// <returns>Records matching the specified criteria</returns>
+    /// <returns>Records matching the specified criteria.</returns>
     public static List<TRow> List<TRow>(this IDbConnection connection, ICriteria where)
         where TRow : class, IRow, new()
     {
@@ -454,8 +454,8 @@ public static class EntityConnectionExtensions
     /// <param name="connection">The connection.</param>
     /// <param name="row">The row.</param>
     /// <param name="expectedRows">The expected number of rows to be updated, by default 1.</param>
-    /// <exception cref="InvalidOperationException">ID field of row has null value!</exception>
-    /// <exception cref="InvalidOperationException">Expected rows and number of updated rows does not match!</exception>
+    /// <exception cref="InvalidOperationException">ID field of the row has a null value!</exception>
+    /// <exception cref="InvalidOperationException">Expected rows and number of updated rows do not match!</exception>
     public static int UpdateById<TRow>(this IDbConnection connection, TRow row, ExpectedRows expectedRows = ExpectedRows.One)
         where TRow : IIdRow
     {
@@ -481,8 +481,8 @@ public static class EntityConnectionExtensions
     /// <param name="connection">The connection.</param>
     /// <param name="id">The identifier.</param>
     /// <param name="expectedRows">The expected number of rows to be deleted, 1 by default.</param>
-    /// <exception cref="InvalidOperationException">Expected rows and number of deleted rows does not match!</exception>
-    /// <returns>Number of deleted rows</returns>
+    /// <exception cref="InvalidOperationException">Expected rows and number of deleted rows do not match!</exception>
+    /// <returns>Number of deleted rows.</returns>
     public static int DeleteById<TRow>(this IDbConnection connection, object id, ExpectedRows expectedRows = ExpectedRows.One)
         where TRow : class, IRow, IIdRow, new()
     {
@@ -501,8 +501,8 @@ public static class EntityConnectionExtensions
     /// the assigned fields.
     /// </summary>
     /// <param name="row">The row with field values to set in new record (must be in TrackAssignments mode).</param>
-    /// <returns>SqlInsert object</returns>
-    /// <exception cref="ArgumentNullException">row is null</exception>
+    /// <returns>SqlInsert object.</returns>
+    /// <exception cref="ArgumentNullException">row is null.</exception>
     public static SqlInsert ToSqlInsert(this IRow row)
     {
         ArgumentNullException.ThrowIfNull(row);
@@ -522,8 +522,8 @@ public static class EntityConnectionExtensions
     /// the assigned fields.
     /// </summary>
     /// <param name="row">The row with field values to set in new record (must be in TrackAssignments mode).</param>
-    /// <returns>SqlUpdate object</returns>
-    /// <exception cref="ArgumentNullException">row is null</exception>
+    /// <returns>SqlUpdate object.</returns>
+    /// <exception cref="ArgumentNullException">row is null.</exception>
     public static SqlUpdate ToSqlUpdateById(this IIdRow row)
     {
         ArgumentNullException.ThrowIfNull(row);

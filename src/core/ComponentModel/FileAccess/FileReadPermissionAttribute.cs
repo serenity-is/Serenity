@@ -1,7 +1,7 @@
 namespace Serenity.Data;
 
 /// <summary>
-/// A subclass of <see cref="FileReadAccessAttribute"/> that specifies a permission
+/// A subclass of <see cref="FileReadAccessAttribute"/> that specifies a permission.
 /// </summary>
 public class FileReadPermissionAttribute : FileReadAccessAttribute
 {

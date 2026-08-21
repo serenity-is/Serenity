@@ -3,21 +3,21 @@
 namespace Serenity.Web;
 
 /// <summary>
-/// Generic lookup script type for rows
+/// Generic lookup script type for rows.
 /// </summary>
-/// <typeparam name="TRow">Row type</typeparam>
+/// <typeparam name="TRow">The row type.</typeparam>
 public class RowLookupScript<TRow> : LookupScript
     where TRow: class, IRow, new()
 {
     /// <summary>
-    /// Sql connections
+    /// The SQL connections.
     /// </summary>
     protected readonly ISqlConnections sqlConnections;
 
     /// <summary>
-    /// Applies the sort order to the query
+    /// Applies the sort order to the query.
     /// </summary>
-    /// <param name="query">Query</param>
+    /// <param name="query">The query.</param>
     protected virtual void ApplyOrder(SqlQuery query)
     {
         var row = (IRow)(query as ISqlQueryExtensible).FirstIntoRow;
@@ -29,9 +29,9 @@ public class RowLookupScript<TRow> : LookupScript
     }
 
     /// <summary>
-    /// Prepares the sql query to select fields
+    /// Prepares the SQL query to select fields.
     /// </summary>
-    /// <param name="query">Sql query</param>
+    /// <param name="query">The SQL query.</param>
     protected virtual void PrepareQuery(SqlQuery query)
     {
         var row = (IRow)(query as ISqlQueryExtensible).FirstIntoRow;
@@ -52,10 +52,10 @@ public class RowLookupScript<TRow> : LookupScript
     }
 
     /// <summary>
-    /// Creates a new instance of the class
+    /// Initializes a new instance of the <see cref="RowLookupScript{TRow}"/> class.
     /// </summary>
-    /// <param name="sqlConnections">Sql connections</param>
-    /// <exception cref="ArgumentNullException">Connections is null</exception>
+    /// <param name="sqlConnections">The SQL connections.</param>
+    /// <exception cref="ArgumentNullException"><paramref name="sqlConnections"/> is <c>null</c>.</exception>
     public RowLookupScript(ISqlConnections sqlConnections)
         : base()
     {

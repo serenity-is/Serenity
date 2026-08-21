@@ -1,9 +1,9 @@
 ﻿namespace Serenity.Web;
 
 /// <summary>
-/// Settings for Recaptcha integration
-/// Get your keys from https://www.google.com/recaptcha/admin/ 
-/// Generate keys for the V2, not V3
+/// Settings for Recaptcha integration.
+/// Get your keys from https://www.google.com/recaptcha/admin/
+/// Generate keys for the V2, not V3.
 /// </summary>
 [DefaultSectionKey(SectionKey)]
 public class RecaptchaSettings

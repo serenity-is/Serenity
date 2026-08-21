@@ -3,7 +3,8 @@
 namespace Serenity.Services;
 
 /// <summary>
-/// An exception filter attribute to handle service exceptions and return them to ServiceResponse objects
+/// An exception filter attribute to handle service exceptions and return them
+/// as <see cref="ServiceResponse"/> objects.
 /// </summary>
 public class HandleServiceExceptionAttribute : ExceptionFilterAttribute
 {

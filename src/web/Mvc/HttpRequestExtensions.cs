@@ -3,16 +3,17 @@
 namespace Serenity.Web;
 
 /// <summary>
-/// Contains HTTP request related extensions
+/// Contains HTTP request related extensions.
 /// </summary>
 public static class HttpRequestExtensions
 {
     /// <summary>
-    /// Gets the base uri for the current request
+    /// Gets the base URI for the current request.
     /// </summary>
-    /// <param name="request">HTTP request</param>
-    /// <param name="pathBase">Include path base</param>
-    /// <exception cref="ArgumentNullException">Request is null</exception>
+    /// <param name="request">The HTTP request.</param>
+    /// <param name="pathBase">Whether to include the path base.</param>
+    /// <returns>The base URI.</returns>
+    /// <exception cref="ArgumentNullException"><paramref name="request"/> is <c>null</c>.</exception>
     public static Uri GetBaseUri(this HttpRequest request, bool pathBase = true)
     {
         ArgumentNullException.ThrowIfNull(request);

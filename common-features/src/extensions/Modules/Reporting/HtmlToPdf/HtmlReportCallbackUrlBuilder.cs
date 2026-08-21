@@ -130,6 +130,12 @@ public class HtmlReportCallbackUrlBuilder(
         }
     }
 
+    /// <summary>
+    /// Gets the render URL for the specified report and options.
+    /// </summary>
+    /// <param name="report">The report.</param>
+    /// <param name="options">The render options.</param>
+    /// <returns>The render URL.</returns>
     public virtual HtmlReportRenderUrl GetRenderUrl(IReport report, ReportRenderOptions options)
     {
         var response = new HtmlReportRenderUrl();

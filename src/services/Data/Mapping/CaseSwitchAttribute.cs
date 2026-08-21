@@ -1,7 +1,7 @@
 ﻿namespace Serenity.Data.Mapping;
 
 /// <summary>
-/// Case expression with simple switch value
+/// Case expression with simple switch value.
 /// </summary>
 public class CaseSwitchAttribute : CaseAttribute
 {

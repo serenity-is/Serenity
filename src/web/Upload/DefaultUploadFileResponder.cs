@@ -4,13 +4,13 @@ using Microsoft.AspNetCore.Mvc;
 namespace Serenity.Web;
 
 /// <summary>
-/// Default implementation for upload file responder
+/// Default implementation of the upload file responder.
 /// </summary>
 /// <remarks>
-/// Creates a new instance of the class
+/// Initializes a new instance of the <see cref="DefaultUploadFileResponder"/> class.
 /// </remarks>
-/// <param name="uploadStorage">Upload storage</param>
-/// <exception cref="ArgumentNullException">One of arguments is null</exception>
+/// <param name="uploadStorage">The upload storage.</param>
+/// <exception cref="ArgumentNullException"><paramref name="uploadStorage"/> is <c>null</c>.</exception>
 public class DefaultUploadFileResponder(IUploadStorage uploadStorage) : IUploadFileResponder
 {
     private readonly IUploadStorage uploadStorage = uploadStorage ?? throw new ArgumentNullException(nameof(uploadStorage));

@@ -7,52 +7,52 @@
 public interface ISaveRequestHandler : IRequestHandler
 {
     /// <summary>
-    /// Old row, if any, otherwise null
+    /// Gets the old row, if any, otherwise <c>null</c>.
     /// </summary>
     IRow Old { get; }
 
     /// <summary>
-    /// New row
+    /// Gets the new row.
     /// </summary>
     IRow Row { get; }
 
     /// <summary>
-    /// Is this an INSERT operation?
+    /// Gets a value indicating whether this is an INSERT operation.
     /// </summary>
     bool IsCreate { get; }
 
     /// <summary>
-    /// Is this an UPDATE operation?
+    /// Gets a value indicating whether this is an UPDATE operation.
     /// </summary>
     bool IsUpdate { get; }
 
     /// <summary>
-    /// Save request
+    /// Gets the save request.
     /// </summary>
     ISaveRequest Request { get; }
 
     /// <summary>
-    /// Save response
+    /// Gets the save response.
     /// </summary>
     SaveResponse Response { get; }
 
     /// <summary>
-    /// A state bag that can be used as storage within a request handler context
+    /// Gets a state bag that can be used as storage within a request handler context.
     /// </summary>
     IDictionary<string, object> StateBag { get; }
 
     /// <summary>
-    /// Current connection
+    /// Gets the current connection.
     /// </summary>
     IDbConnection Connection { get; }
 
     /// <summary>
-    /// Current transaction
+    /// Gets the current unit of work.
     /// </summary>
     IUnitOfWork UnitOfWork { get; }
 
     /// <summary>
-    /// Current request context
+    /// Gets the current request context.
     /// </summary>
     IRequestContext Context { get; }
 }

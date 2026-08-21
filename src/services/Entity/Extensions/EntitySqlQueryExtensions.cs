@@ -1,18 +1,19 @@
 namespace Serenity.Data;
 
 /// <summary>
-///   Extensions for SqlQuery.</summary>
+///   Extensions for <see cref="SqlQuery"/>.
+/// </summary>
 public static class EntitySqlQueryExtensions
 {
     /// <summary>
-    /// Adds a table to the FROM statement with "T0" alias and sets it as target for future field selections.
+    /// Adds a table to the FROM statement with "T0" alias and sets it as the target for future field selections.
     /// </summary>
     /// <param name="query">The query.</param>
     /// <param name="entity">The entity.</param>
     /// <returns>
     /// The query itself.
     /// </returns>
-    /// <exception cref="ArgumentNullException">row</exception>
+    /// <exception cref="ArgumentNullException">entity is null.</exception>
     public static SqlQuery From(this SqlQuery query, IEntity entity)
     {
         ArgumentNullException.ThrowIfNull(entity);
@@ -36,12 +37,12 @@ public static class EntitySqlQueryExtensions
     }
 
     /// <summary>
-    /// Add the specified entity to INTO list of the query, 
-    /// and sets it as current INTO row.
+    /// Adds the specified entity to the INTO list of the query, 
+    /// and sets it as the current INTO row.
     /// </summary>
     /// <param name="query">The query.</param>
     /// <param name="into">The into.</param>
-    /// <returns></returns>
+    /// <returns>The query itself.</returns>
     public static SqlQuery Into(this SqlQuery query, IEntity into)
     {
         var ext = (ISqlQueryExtensible)query;
@@ -53,11 +54,11 @@ public static class EntitySqlQueryExtensions
     /// <summary>
     /// Adds a field's expression to the SELECT statement with its own column name. 
     /// If a join alias is referenced in the field expression, and the join is defined in 
-    /// field's entity class, it is automatically included in the query. 
-    /// The field is marked as a target at current index for future loading from a data reader.
+    /// the field's entity class, it is automatically included in the query. 
+    /// The field is marked as a target at the current index for future loading from a data reader.
     /// </summary>
-    /// <param name="field">Field object</param>
-    /// <param name="query">The sql query</param>
+    /// <param name="field">The field object.</param>
+    /// <param name="query">The SQL query.</param>
     /// <returns>The query itself.</returns>
     public static SqlQuery Select(this SqlQuery query, IField field)
     {
@@ -71,11 +72,11 @@ public static class EntitySqlQueryExtensions
     /// <summary>
     /// Adds a field's expression to the SELECT statement with a given column name.
     /// If a join alias is referenced in the field expression, and the join is defined in
-    /// field's entity class, it is automatically included in the query.
-    /// The field is marked as a target at current index for future loading from a data reader.
+    /// the field's entity class, it is automatically included in the query.
+    /// The field is marked as a target at the current index for future loading from a data reader.
     /// </summary>
     /// <param name="query">The query.</param>
-    /// <param name="field">Field object</param>
+    /// <param name="field">The field object.</param>
     /// <param name="columnName">Name of the column.</param>
     /// <returns>
     /// The query itself.
@@ -100,8 +101,8 @@ public static class EntitySqlQueryExtensions
     /// Adds a field of a given table alias to the SELECT statement.
     /// </summary>
     /// <param name="query">The query.</param>
-    /// <param name="alias">A table alias that will be prepended to the field name with "." between</param>
-    /// <param name="field">A field that only name will be used. It won't be set as a target.</param>
+    /// <param name="alias">A table alias that will be prepended to the field name with "." between.</param>
+    /// <param name="field">A field that only its name will be used. It won't be set as a target.</param>
     /// <returns>
     /// The query itself.
     /// </returns>
@@ -112,7 +113,7 @@ public static class EntitySqlQueryExtensions
     /// </exception>
     /// <remarks>
     /// No column name is set for the selected field.
-    /// Also field is not set as a target, unlike field only overload, only field name is used.
+    /// Also the field is not set as a target, unlike the field only overload, only the field name is used.
     /// </remarks>
     public static SqlQuery Select(this SqlQuery query, IAlias alias, IField field)
     {
@@ -128,9 +129,9 @@ public static class EntitySqlQueryExtensions
     /// Adds a field of a given table alias to the SELECT statement.
     /// </summary>
     /// <param name="query">The query.</param>
-    /// <param name="alias">A table alias that will be prepended to the field name with "." between</param>
+    /// <param name="alias">A table alias that will be prepended to the field name with "." between.</param>
     /// <param name="field">A field that only its field name will be used. It won't be set as a target.</param>
-    /// <param name="columnName">A column name</param>
+    /// <param name="columnName">A column name.</param>
     /// <returns>
     /// The query itself.
     /// </returns>
@@ -142,7 +143,7 @@ public static class EntitySqlQueryExtensions
     /// columnName
     /// </exception>
     /// <remarks>
-    /// Field is not set as a target, unlike field only overload, only field name is used.
+    /// The field is not set as a target, unlike the field only overload, only the field name is used.
     /// </remarks>
     public static SqlQuery Select(this SqlQuery query, IAlias alias, IField field, string columnName)
     {
@@ -156,18 +157,18 @@ public static class EntitySqlQueryExtensions
     }
 
     /// <summary>
-    /// For each field in the fields array, adds expression of the field to
+    /// For each field in the fields array, adds the expression of the field to
     /// the SELECT statement with a column name of its name.
     /// If a join alias is referenced in the field expression, and the join is defined in
-    /// field's entity class, it is automatically included in the query.
-    /// The fields are marked as a target at current index for future loading from a data reader.
+    /// the field's entity class, it is automatically included in the query.
+    /// The fields are marked as a target at the current index for future loading from a data reader.
     /// </summary>
     /// <param name="query">The query.</param>
-    /// <param name="fields">Field objects</param>
+    /// <param name="fields">The field objects.</param>
     /// <returns>
     /// The query itself.
     /// </returns>
-    /// <exception cref="ArgumentNullException">fields</exception>
+    /// <exception cref="ArgumentNullException">fields is null.</exception>
     public static SqlQuery Select(this SqlQuery query, params IField[] fields)
     {
         ArgumentNullException.ThrowIfNull(fields);
@@ -180,12 +181,12 @@ public static class EntitySqlQueryExtensions
 
     /// <summary>
     /// Adds a field or an expression to the SELECT statement with a column name of a
-    /// field's name. The field is marked as a target at current index for future loading
+    /// field's name. The field is marked as a target at the current index for future loading
     /// from a data reader.
     /// </summary>
     /// <param name="query">The query.</param>
-    /// <param name="expression">A field name or an expression</param>
-    /// <param name="intoField">A field object whose name to be used as a column name.</param>
+    /// <param name="expression">A field name or an expression.</param>
+    /// <param name="intoField">A field object whose name is to be used as a column name.</param>
     /// <returns>
     /// The query itself.
     /// </returns>
@@ -206,13 +207,13 @@ public static class EntitySqlQueryExtensions
     }
 
     /// <summary>
-    /// Adds fields expression to order by list
+    /// Adds a field's expression to the order by list.
     /// </summary>
     /// <param name="query">The query.</param>
     /// <param name="field">The field.</param>
-    /// <param name="desc">if set to <c>true</c> [desc].</param>
-    /// <returns></returns>
-    /// <exception cref="ArgumentNullException">field</exception>
+    /// <param name="desc">if set to <c>true</c>, sorts in descending order.</param>
+    /// <returns>The query itself.</returns>
+    /// <exception cref="ArgumentNullException">field is null.</exception>
     public static SqlQuery OrderBy(this SqlQuery query, IField field, bool desc = false)
     {
         ArgumentNullException.ThrowIfNull(field);
@@ -221,12 +222,12 @@ public static class EntitySqlQueryExtensions
     }
 
     /// <summary>
-    /// Adds fields expressions to order by list
+    /// Adds field expressions to the order by list.
     /// </summary>
     /// <param name="query">The query.</param>
     /// <param name="fields">The fields.</param>
-    /// <returns></returns>
-    /// <exception cref="ArgumentNullException">fields</exception>
+    /// <returns>The query itself.</returns>
+    /// <exception cref="ArgumentNullException">fields is null.</exception>
     public static SqlQuery OrderBy(this SqlQuery query, params IField[] fields)
     {
         ArgumentNullException.ThrowIfNull(fields);
@@ -238,12 +239,12 @@ public static class EntitySqlQueryExtensions
     }
 
     /// <summary>
-    /// Adds fields expressions to group by list
+    /// Adds a field's expression to the group by list.
     /// </summary>
     /// <param name="query">The query.</param>
     /// <param name="field">The field.</param>
-    /// <returns></returns>
-    /// <exception cref="ArgumentNullException">field</exception>
+    /// <returns>The query itself.</returns>
+    /// <exception cref="ArgumentNullException">field is null.</exception>
     public static SqlQuery GroupBy(this SqlQuery query, IField field)
     {
         ArgumentNullException.ThrowIfNull(field);
@@ -252,12 +253,12 @@ public static class EntitySqlQueryExtensions
     }
 
     /// <summary>
-    /// Adds fields expression to group by list
+    /// Adds field expressions to the group by list.
     /// </summary>
     /// <param name="query">The query.</param>
     /// <param name="fields">The fields.</param>
-    /// <returns></returns>
-    /// <exception cref="ArgumentNullException">fields</exception>
+    /// <returns>The query itself.</returns>
+    /// <exception cref="ArgumentNullException">fields is null.</exception>
     public static SqlQuery GroupBy(this SqlQuery query, params IField[] fields)
     {
         ArgumentNullException.ThrowIfNull(fields);

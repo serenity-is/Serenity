@@ -2,17 +2,20 @@ namespace Serenity.Localization;
 
 /// <summary>
 /// Contains helper methods for registration of permission keys in nested static classes.
-/// These classes contains string constants containing permission keys.
-/// Display name for permission keys can be set by [DisplayName] attribute.
-/// Display name for groups can be set by [Description] attribute on classes themselves.
-/// For group display name to work, all constants in a class must start with same group prefix.
+/// These classes contain string constants containing permission keys.
+/// The display name for permission keys can be set by a <see cref="DisplayNameAttribute"/>.
+/// The display name for groups can be set by a <see cref="DescriptionAttribute"/> on the classes themselves.
+/// For the group display name to work, all constants in a class must start with the same group prefix.
 /// </summary>
 public static class NestedPermissionKeyRegistration
 {
     /// <summary>
-    /// Gets permission keys and adds texts if any from static nested permission key 
-    /// classes marked with NestedPermissionKeys attribute.
+    /// Gets permission keys and adds texts, if any, from static nested permission key
+    /// classes marked with <see cref="NestedPermissionKeysAttribute"/>.
     /// </summary>
+    /// <param name="registry">The registry to add texts to, or <c>null</c>.</param>
+    /// <param name="typeSource">The type source to search for nested permission key classes in.</param>
+    /// <returns>A set of the permission keys found.</returns>
     public static HashSet<string> AddNestedPermissions(this ILocalTextRegistry? registry, 
         ITypeSource typeSource)
     {

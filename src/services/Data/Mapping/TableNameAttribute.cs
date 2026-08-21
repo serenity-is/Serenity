@@ -10,7 +10,7 @@ public class TableNameAttribute : Attribute
     /// Initializes a new instance of the <see cref="TableNameAttribute"/> class.
     /// </summary>
     /// <param name="name">The name.</param>
-    /// <exception cref="ArgumentNullException">name</exception>
+    /// <exception cref="ArgumentNullException">name is null or empty.</exception>
     public TableNameAttribute(string name)
     {
         if (string.IsNullOrEmpty(name))
@@ -24,7 +24,7 @@ public class TableNameAttribute : Attribute
     /// </summary>
     /// <param name="name">The name.</param>
     /// <param name="serverTypes">Dialects like <see cref="ServerType.MySql" />, <see cref="ServerType.Sqlite" />.</param>
-    /// <exception cref="ArgumentNullException">name</exception>
+    /// <exception cref="ArgumentNullException">name is null or empty.</exception>
     public TableNameAttribute(string name, params ServerType[] serverTypes)
         : this(name)
     {

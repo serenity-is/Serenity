@@ -2,7 +2,8 @@
 namespace Serenity.Data;
 
 /// <summary>
-///   Interface for table aliases.</summary>
+///   Interface for table aliases.
+/// </summary>
 public interface IAlias
 {
     /// <summary>

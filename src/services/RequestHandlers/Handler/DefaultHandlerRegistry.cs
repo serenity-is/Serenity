@@ -1,14 +1,14 @@
 ﻿namespace Serenity.Services;
 
 /// <summary>
-/// Default implentation for the <see cref="IDefaultHandlerFactory"/>
+/// Default implementation for the <see cref="IDefaultHandlerRegistry"/>.
 /// </summary>
 /// <remarks>
-/// Creates an instance of the class
+/// Initializes a new instance of the class.
 /// </remarks>
-/// <param name="typeSource">Type source containing possible 
+/// <param name="typeSource">Type source containing possible
 /// handler classes.</param>
-/// <exception cref="ArgumentNullException">typeSource is null</exception>
+/// <exception cref="ArgumentNullException"><paramref name="typeSource"/> is <c>null</c>.</exception>
 public class DefaultHandlerRegistry(ITypeSource typeSource) : IDefaultHandlerRegistry
 {
     private readonly ITypeSource typeSource = typeSource ?? throw new ArgumentNullException(nameof(typeSource));

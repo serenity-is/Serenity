@@ -4,15 +4,15 @@ using Microsoft.Extensions.DependencyInjection;
 namespace Serenity.Reporting;
 
 /// <summary>
-/// Default implementation for <see cref="IReportFactory" />
+/// Default implementation of <see cref="IReportFactory"/>.
 /// </summary>
 /// <remarks>
-/// Creates an instance of the class
+/// Initializes a new instance of the <see cref="DefaultReportFactory"/> class.
 /// </remarks>
-/// <param name="reportRegistry">Report registry</param>
-/// <param name="serviceProvider">Service provider</param>
-/// <param name="httpContextAccessor">Http context accessor</param>
-/// <exception cref="ArgumentNullException"></exception>
+/// <param name="reportRegistry">The report registry.</param>
+/// <param name="serviceProvider">The service provider.</param>
+/// <param name="httpContextAccessor">The HTTP context accessor.</param>
+/// <exception cref="ArgumentNullException"><paramref name="reportRegistry"/> or <paramref name="serviceProvider"/> is <c>null</c>.</exception>
 public class DefaultReportFactory(IReportRegistry reportRegistry, IServiceProvider serviceProvider,
     IHttpContextAccessor httpContextAccessor = null) : IReportFactory
 {

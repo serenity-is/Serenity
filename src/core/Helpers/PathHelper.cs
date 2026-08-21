@@ -11,10 +11,10 @@ public static class PathHelper
         .Where(x => x != '/' && x != '\\').ToArray();
 
     /// <summary>
-    /// Checks whether given path is a secure relative path
+    /// Checks whether the given path is a secure relative path.
     /// </summary>
-    /// <param name="relativePath">Relative path</param>
-    /// <returns>True if relative path looks safe</returns>
+    /// <param name="relativePath">Relative path.</param>
+    /// <returns>True if the relative path looks safe.</returns>
     public static bool IsSecureRelativePath(string? relativePath)
     {
         var trim = relativePath.TrimToNull();
@@ -33,11 +33,11 @@ public static class PathHelper
     }
 
     /// <summary>
-    /// Combines a path and filename checking security
+    /// Combines a path and filename checking security.
     /// </summary>
-    /// <param name="root">Root path</param>
+    /// <param name="root">Root path.</param>
     /// <param name="relativePath">Relative path. Should not be rooted, not containing .. etc.</param>
-    /// <returns>Combined path</returns>
+    /// <returns>Combined path.</returns>
     public static string SecureCombine(string root, string relativePath)
     {
         if (string.IsNullOrEmpty(root))
@@ -53,10 +53,10 @@ public static class PathHelper
     }
 
     /// <summary>
-    /// Checks whether given path is a secure relative file
+    /// Checks whether the given path is a secure relative file.
     /// </summary>
-    /// <param name="relativeFile">Relative file</param>
-    /// <returns>True if relative file looks safe</returns>
+    /// <param name="relativeFile">Relative file.</param>
+    /// <returns>True if the relative file looks safe.</returns>
     public static bool IsSecureRelativeFile(string? relativeFile)
     {
         if (!IsSecureRelativePath(relativeFile))
@@ -70,9 +70,9 @@ public static class PathHelper
     }
 
     /// <summary>
-    /// Validates if filename is a secure relative file
+    /// Validates if the filename is a secure relative file.
     /// </summary>
-    /// <param name="filename">Relative filename</param>
+    /// <param name="filename">Relative filename.</param>
     public static void ValidateSecureRelativeFile(string? filename)
     {
         if (!IsSecureRelativeFile(filename))

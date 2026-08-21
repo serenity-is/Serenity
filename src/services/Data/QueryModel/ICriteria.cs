@@ -1,7 +1,7 @@
 ﻿namespace Serenity;
 
 /// <summary>
-/// Shared criteria interface
+/// Shared criteria interface.
 /// </summary>
 public interface ICriteria
 {
@@ -34,6 +34,6 @@ public interface ICriteria
     /// Converts the criteria to string while ignoring its params if any.
     /// ToString() raises an exception if a criteria has params, while this not.
     /// </summary>
-    /// <returns></returns>
+    /// <returns>The criteria as a string, ignoring its parameters.</returns>
     string ToStringIgnoreParams();
 }

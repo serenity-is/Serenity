@@ -1,7 +1,7 @@
 namespace Serenity.Abstractions;
 
 /// <summary>
-/// An interface to access feature toggle values
+/// An interface to access feature toggle values.
 /// </summary>
 public interface IFeatureToggles
 {

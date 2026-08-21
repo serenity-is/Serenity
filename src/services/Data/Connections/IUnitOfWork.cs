@@ -1,7 +1,7 @@
 ﻿namespace Serenity.Data;
 
 /// <summary>
-/// An interface to implement unit of work pattern, e.g. a transaction.
+/// An interface to implement the unit of work pattern, e.g. a transaction.
 /// </summary>
 public interface IUnitOfWork
 {
@@ -14,12 +14,12 @@ public interface IUnitOfWork
     IDbConnection Connection { get; }
 
     /// <summary>
-    /// Occurs when transaction is committed.
+    /// Occurs when the transaction is committed.
     /// </summary>
     event Action OnCommit;
 
     /// <summary>
-    /// Occurs when transaction is rolled back.
+    /// Occurs when the transaction is rolled back.
     /// </summary>
     event Action OnRollback;
 }

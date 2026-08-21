@@ -1,7 +1,7 @@
 namespace Serenity.Data;
 
 /// <summary>
-/// Removes T0. references in SQL expression
+/// Removes T0. references in SQL expression.
 /// </summary>
 public static class T0ReferenceRemover
 {
@@ -9,8 +9,8 @@ public static class T0ReferenceRemover
     /// Removes the "t0." aliases in SQL expression.
     /// </summary>
     /// <param name="expression">The expression.</param>
-    /// <returns></returns>
-    /// <exception cref="ArgumentNullException">expression</exception>
+    /// <returns>The expression with T0 references removed.</returns>
+    /// <exception cref="ArgumentNullException">expression is null.</exception>
     public static string RemoveT0Aliases(string expression)
     {
         ArgumentNullException.ThrowIfNull(expression);

@@ -1,16 +1,16 @@
 namespace Serenity.Web;
 
 /// <summary>
-/// A dynamic script that is formed from concatenation of other scripts
+/// A dynamic script that is formed from the concatenation of other scripts.
 /// </summary>
 /// <remarks>
-/// Creates a new instance of the class
+/// Creates a new instance of the class.
 /// </remarks>
-/// <param name="scriptParts">Script parts</param>
-/// <param name="separator">Separator</param>
+/// <param name="scriptParts">The script parts.</param>
+/// <param name="separator">The separator.</param>
 /// <param name="checkRights">Callback to check permissions for individual
-/// scripts</param>
-/// <exception cref="ArgumentNullException">Script parts is null</exception>
+/// scripts.</param>
+/// <exception cref="ArgumentNullException">Script parts are null.</exception>
 public class ConcatenatedScript(IEnumerable<Func<string>> scriptParts,
     string separator = "\r\n;\r\n", Action<IPermissionService, ITextLocalizer> checkRights = null) : DynamicScript
 {

@@ -1,7 +1,7 @@
 ﻿namespace Serenity.ComponentModel;
 
 /// <summary>
-/// Sets editor type of the target property.
+/// Sets the editor type of the target property.
 /// </summary>
 /// <seealso cref="Attribute" />
 /// <remarks>

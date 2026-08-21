@@ -4,14 +4,14 @@ using Microsoft.Extensions.Options;
 namespace Serenity.Reporting;
 
 /// <summary>
-/// Implementation for IWKHtmlToPdfConverter
+/// Implementation of <see cref="IWKHtmlToPdfConverter"/>.
 /// </summary>
 /// <remarks>
-/// Creates a new instance of the class
+/// Initializes a new instance of the <see cref="WKHtmlToPdfConverter"/> class.
 /// </remarks>
-/// <param name="options">Options</param>
-/// <param name="webHostEnvironment">Host environment</param>
-/// <param name="fileSystem">File system</param>
+/// <param name="options">The options.</param>
+/// <param name="webHostEnvironment">The host environment.</param>
+/// <param name="fileSystem">The file system.</param>
 public class WKHtmlToPdfConverter(IOptions<WKHtmlToPdfSettings> options = null,
     IWebHostEnvironment webHostEnvironment = null, IFileSystem fileSystem = null) : IWKHtmlToPdfConverter
 {
@@ -21,9 +21,9 @@ public class WKHtmlToPdfConverter(IOptions<WKHtmlToPdfSettings> options = null,
     private string executablePath;
 
     /// <summary>
-    /// Gets wkhtmltopdf executable path
+    /// Gets the wkhtmltopdf executable path.
     /// </summary>
-    /// <returns></returns>
+    /// <returns>The executable path, or <c>null</c> if not found.</returns>
     public virtual string GetExecutablePath()
     {
         if (!string.IsNullOrEmpty(executablePath) && 

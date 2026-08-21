@@ -1,7 +1,7 @@
 ﻿namespace Serenity.ComponentModel;
 
 /// <summary>
-/// Sets the enumeration key of an enum
+/// Sets the enumeration key of an enum.
 /// </summary>
 /// <seealso cref="Attribute" />
 /// <remarks>

@@ -30,23 +30,23 @@ public interface IUploadStorage
     void DeleteFile(string path);
 
     /// <summary>
-    /// Returns if a file at path exists
+    /// Returns if a file at path exists.
     /// </summary>
     /// <param name="path">File path</param>
-    /// <returns></returns>
+    /// <returns><c>true</c> if the file exists; otherwise, <c>false</c>.</returns>
     bool FileExists(string path);
 
     /// <summary>
-    /// Gets the URL for a file
+    /// Gets the URL for a file.
     /// </summary>
     /// <param name="path">File path</param>
     string GetFileUrl(string path);
 
     /// <summary>
-    /// Gets file size
+    /// Gets the file size.
     /// </summary>
     /// <param name="path">File path</param>
-    /// <returns></returns>
+    /// <returns>The file size in bytes.</returns>
     long GetFileSize(string path);
 
     /// <summary>

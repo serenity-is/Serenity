@@ -1,7 +1,7 @@
 ﻿namespace Serenity.Data;
 
 /// <summary>
-/// A combination of IUpdateLogRow and IInsertLogRow
+/// A combination of <see cref="IUpdateLogRow"/> and <see cref="IInsertLogRow"/>.
 /// </summary>
 /// <seealso cref="IUpdateLogRow" />
 /// <seealso cref="IInsertLogRow" />

@@ -1,7 +1,7 @@
 ﻿namespace Serenity.Data;
 
 /// <summary>
-/// Parameter struct
+/// Parameter struct.
 /// </summary>
 /// <remarks>
 /// Initializes a new instance of the <see cref="Parameter"/> struct.

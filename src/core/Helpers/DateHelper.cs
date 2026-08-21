@@ -1,7 +1,7 @@
 ﻿namespace Serenity;
 
 /// <summary>
-/// Static class with common date utilities and constants
+/// Static class with common date utilities and constants.
 /// </summary>
 public static class DateHelper
 {
@@ -50,10 +50,10 @@ public static class DateHelper
                 .DateTimeFormat.ShortDatePattern);
 
     /// <summary>
-    /// Gets the date element order for specified short date time format.
+    /// Gets the date element order for the specified short date time format.
     /// </summary>
     /// <param name="shortDatePattern">The short date pattern.</param>
-    /// <returns>Date element order</returns>
+    /// <returns>Date element order.</returns>
     public static DateElementOrder DateElementOrderFor(string shortDatePattern)
     {
         int m = shortDatePattern.IndexOf('M');

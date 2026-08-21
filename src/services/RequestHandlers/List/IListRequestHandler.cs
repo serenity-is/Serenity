@@ -7,32 +7,32 @@
 public interface IListRequestHandler : IRequestHandler
 {
     /// <summary>
-    /// Loader row
+    /// Gets the row used for querying / metadata lookup.
     /// </summary>
     IRow Row { get; }
 
     /// <summary>
-    /// List request
+    /// Gets the list request.
     /// </summary>
     ListRequest Request { get; }
 
     /// <summary>
-    /// List response
+    /// Gets the list response.
     /// </summary>
     IListResponse Response { get; }
 
     /// <summary>
-    /// A state bag that can be used as storage within a request handler context
+    /// Gets a state bag that can be used as storage within a request handler context.
     /// </summary>
     IDictionary<string, object> StateBag { get; }
 
     /// <summary>
-    /// Current connection
+    /// Gets the current connection.
     /// </summary>
     IDbConnection Connection { get; }
 
     /// <summary>
-    /// Current request context
+    /// Gets the current request context.
     /// </summary>
     IRequestContext Context { get; }
 
@@ -51,7 +51,7 @@ public interface IListRequestHandler : IRequestHandler
     bool ShouldSelectField(Field field);
 
     /// <summary>
-    /// Use to ignore an equality filter
+    /// Use to ignore an equality filter.
     /// </summary>
     /// <param name="field">Field name or property name</param>
     void IgnoreEqualityFilter(string field);

@@ -1,7 +1,7 @@
 ﻿namespace Serenity.Data.Mapping;
 
 /// <summary>
-/// Dialect specific SQL expression for UTC date/time
+/// Dialect specific SQL expression for UTC date/time.
 /// </summary>
 public class SqlUtcNowAttribute : BaseExpressionAttribute
 {

@@ -8,27 +8,27 @@ public class ProcessedUploadInfo
 {
 
     /// <summary>
-    /// Image height
+    /// Gets or sets the image height.
     /// </summary>
     public int ImageHeight { get; set; }
 
     /// <summary>
-    /// Image width
+    /// Gets or sets the image width.
     /// </summary>
     public int ImageWidth { get; set; }
 
     /// <summary>
-    /// True if the file contains an image
+    /// Gets or sets a value indicating whether the file contains an image.
     /// </summary>
     public bool IsImage { get; set; }
 
     /// <summary>
-    /// File size
+    /// Gets or sets the file size.
     /// </summary>
     public long FileSize { get; set; }
 
     /// <summary>
-    /// Temporary file path
+    /// Gets or sets the temporary file path.
     /// </summary>
     public string TemporaryFile { get; set; }
 

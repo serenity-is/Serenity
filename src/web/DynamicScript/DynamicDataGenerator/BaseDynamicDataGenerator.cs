@@ -9,12 +9,14 @@ using System.IO;
 namespace Serenity.Web;
 
 /// <summary>
-/// Base class for generating .json files under dynamic-data folder for script testing purposes
+/// Base class for generating <c>.json</c> files under the <c>dynamic-data</c>
+/// folder for script testing purposes.
 /// </summary>
 public abstract class BaseDynamicDataGenerator
 {
     /// <summary>
-    /// Generates .json files under dynamic-data folder for script testing purposes
+    /// Generates <c>.json</c> files under the <c>dynamic-data</c> folder
+    /// for script testing purposes.
     /// </summary>
     public virtual void Run()
     {
@@ -66,9 +68,9 @@ public abstract class BaseDynamicDataGenerator
     }
 
     /// <summary>
-    /// Returns true if the script should be skipped
+    /// Returns <c>true</c> if the script should be skipped.
     /// </summary>
-    /// <param name="name">Script name</param>
+    /// <param name="name">The script name.</param>
     protected virtual bool ShouldSkipScript(string name)
     {
         return name == "ColumnsBundle" ||
@@ -78,9 +80,9 @@ public abstract class BaseDynamicDataGenerator
     }
 
     /// <summary>
-    /// Initializes scripts
+    /// Initializes the dynamic scripts.
     /// </summary>
-    /// <param name="services">Service provider</param>
+    /// <param name="services">The service provider.</param>
     protected virtual void InitializeScripts(IServiceProvider services)
     {
         var scriptManager = services.GetRequiredService<IDynamicScriptManager>();
@@ -91,10 +93,10 @@ public abstract class BaseDynamicDataGenerator
     }
 
     /// <summary>
-    /// Initializes services
+    /// Initializes the services used by the generator.
     /// </summary>
-    /// <param name="collection"></param>
-    /// <returns></returns>
+    /// <param name="collection">The service collection to add to.</param>
+    /// <returns>The same service collection so that calls can be chained.</returns>
     protected virtual IServiceCollection AddServices(IServiceCollection collection)
     {
         collection.AddMemoryCache();
@@ -111,7 +113,7 @@ public abstract class BaseDynamicDataGenerator
     }
 
     /// <summary>
-    /// Gets the project rool folder
+    /// Gets the project root folder.
     /// </summary>
     protected virtual string GetProjectRoot()
     {
@@ -119,7 +121,7 @@ public abstract class BaseDynamicDataGenerator
     }
 
     /// <summary>
-    /// Gets the dynamic-data folder
+    /// Gets the <c>dynamic-data</c> folder.
     /// </summary>
     protected virtual string GetDynamicDataFolder()
     {
@@ -128,7 +130,7 @@ public abstract class BaseDynamicDataGenerator
     }
 
     /// <summary>
-    /// Gets the type source
+    /// Gets the type source.
     /// </summary>
     protected virtual ITypeSource GetTypeSource()
     {
@@ -141,9 +143,10 @@ public abstract class BaseDynamicDataGenerator
     }
 
     /// <summary>
-    /// Checks the arguments, if it is "dynamic-data" runs the generator and exits
+    /// Checks the arguments; if they contain <c>dynamic-data</c>, runs the
+    /// generator and exits the process.
     /// </summary>
-    /// <param name="args">Arguments</param>
+    /// <param name="args">The command line arguments.</param>
     public virtual void RunAndExitIf(string[] args)
     {
         if (args?.Length == 1 && args[0] == "dynamic-data")

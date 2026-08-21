@@ -5,21 +5,22 @@ using System.IO;
 namespace Serenity.Reporting;
 
 /// <summary>
-/// HTML to PDF converter class using WKHTMLToPdf
+/// HTML to PDF converter class using WKHTMLToPdf.
 /// </summary>
 /// <remarks>
-/// WKHtmlToPdf converter class
+/// WKHtmlToPdf converter class.
 /// </remarks>
-/// <param name="options">List of options</param>
+/// <param name="options">The list of options.</param>
 public class WKHtmlToPdf(IHtmlToPdfOptions options = null) : IHtmlToPdfOptions
 {
     private readonly IHtmlToPdfOptions options = options ?? new HtmlToPdfOptions();
 
     /// <summary>
-    /// Executes the converter process and returns the PDF bytes
+    /// Executes the converter process and returns the PDF bytes.
     /// </summary>
-    /// <exception cref="ArgumentNullException">UtilityExePath or URL is null</exception>
-    /// <exception cref="InvalidOperationException">An error occurred during process execution</exception>
+    /// <returns>The generated PDF bytes.</returns>
+    /// <exception cref="ArgumentNullException"><see cref="ExecutablePath"/> or <see cref="Url"/> is <c>null</c>.</exception>
+    /// <exception cref="InvalidOperationException">An error occurred during process execution.</exception>
     public byte[] Execute()
     {
         var exePath = ExecutablePath ?? throw new ArgumentNullException(nameof(ExecutablePath));
@@ -202,7 +203,7 @@ public class WKHtmlToPdf(IHtmlToPdfOptions options = null) : IHtmlToPdfOptions
     }
 
     /// <summary>
-    /// Path to the wkhtmltopdf executable
+    /// Gets or sets the path to the wkhtmltopdf executable.
     /// </summary>
     public string ExecutablePath { get; set; }
 
@@ -280,13 +281,13 @@ public class WKHtmlToPdf(IHtmlToPdfOptions options = null) : IHtmlToPdfOptions
 }
 
 /// <summary>
-/// 
+/// Obsolete compatibility class for <see cref="WKHtmlToPdf"/>.
 /// </summary>
 [Obsolete("Use WKHtmlToPdf")]
 public class HtmlToPdfConverter : WKHtmlToPdf
 {
     /// <summary>
-    /// Compatibility property for ExecutablePath
+    /// Compatibility property for <see cref="WKHtmlToPdf.ExecutablePath"/>.
     /// </summary>
     public string UtilityExePath { get => ExecutablePath; set => ExecutablePath = value; }
 }

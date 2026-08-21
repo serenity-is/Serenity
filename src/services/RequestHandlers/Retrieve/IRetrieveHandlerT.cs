@@ -1,7 +1,7 @@
 ﻿namespace Serenity.Services;
 
 /// <summary>
-/// Interface for list request handlers
+/// Interface for retrieve request handlers.
 /// </summary>
 /// <typeparam name="TRow">Row type</typeparam>
 public interface IRetrieveHandler<TRow>

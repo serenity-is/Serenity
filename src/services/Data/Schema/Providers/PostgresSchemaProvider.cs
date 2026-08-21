@@ -1,7 +1,7 @@
 ﻿namespace Serenity.Data.Schema;
 
 /// <summary>
-/// PostgreSQL metadata provider
+/// PostgreSQL metadata provider.
 /// </summary>
 /// <seealso cref="ISchemaProvider" />
 public class PostgresSchemaProvider : ISchemaProvider
@@ -14,13 +14,7 @@ public class PostgresSchemaProvider : ISchemaProvider
     /// </value>
     public string DefaultSchema => "public";
 
-    /// <summary>
-    /// Gets the field infos.
-    /// </summary>
-    /// <param name="connection">The connection.</param>
-    /// <param name="schema">The schema.</param>
-    /// <param name="table">The table.</param>
-    /// <returns></returns>
+    /// <inheritdoc/>
     public IEnumerable<FieldInfo> GetFieldInfos(IDbConnection connection, string schema, string table)
     {
         return connection.Query<FieldInfo>(@"
@@ -41,13 +35,7 @@ public class PostgresSchemaProvider : ISchemaProvider
         });
     }
 
-    /// <summary>
-    /// Gets the foreign keys.
-    /// </summary>
-    /// <param name="connection">The connection.</param>
-    /// <param name="schema">The schema.</param>
-    /// <param name="table">The table.</param>
-    /// <returns></returns>
+    /// <inheritdoc/>
     public IEnumerable<ForeignKeyInfo> GetForeignKeys(IDbConnection connection, string schema, string table)
     {
         return connection.Query<ForeignKeyInfo>(@"
@@ -70,13 +58,7 @@ public class PostgresSchemaProvider : ISchemaProvider
         });
     }
 
-    /// <summary>
-    /// Gets the identity fields.
-    /// </summary>
-    /// <param name="connection">The connection.</param>
-    /// <param name="schema">The schema.</param>
-    /// <param name="table">The table.</param>
-    /// <returns></returns>
+    /// <inheritdoc/>
     public IEnumerable<string> GetIdentityFields(IDbConnection connection, string schema, string table)
     {
         return connection.Query<string>(@"
@@ -90,13 +72,7 @@ public class PostgresSchemaProvider : ISchemaProvider
         });
     }
 
-    /// <summary>
-    /// Gets the primary key fields.
-    /// </summary>
-    /// <param name="connection">The connection.</param>
-    /// <param name="schema">The schema.</param>
-    /// <param name="table">The table.</param>
-    /// <returns></returns>
+    /// <inheritdoc/>
     public IEnumerable<string> GetPrimaryKeyFields(IDbConnection connection, string schema, string table)
     {
         return connection.Query<string>(
@@ -120,11 +96,7 @@ public class PostgresSchemaProvider : ISchemaProvider
 #pragma warning restore IDE1006 // Naming Styles
     }
 
-    /// <summary>
-    /// Gets the table names.
-    /// </summary>
-    /// <param name="connection">The connection.</param>
-    /// <returns></returns>
+    /// <inheritdoc/>
     public IEnumerable<TableName> GetTableNames(IDbConnection connection)
     {
         return connection.Query<TableNameSource>(

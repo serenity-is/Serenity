@@ -8,7 +8,7 @@ using System.Threading.Tasks;
 namespace Serenity.Services;
 
 /// <summary>
-/// Subclass of controller for service endpoints
+/// Subclass of controller for service endpoints.
 /// </summary>
 [HandleServiceException]
 public abstract class ServiceEndpoint : ControllerBase, IActionFilter, IAsyncActionFilter, IDisposable
@@ -163,7 +163,7 @@ public abstract class ServiceEndpoint : ControllerBase, IActionFilter, IAsyncAct
     }
 
     /// <summary>
-    /// Gets the request context
+    /// Gets the request context.
     /// </summary>
     protected IRequestContext Context
     {
@@ -180,17 +180,17 @@ public abstract class ServiceEndpoint : ControllerBase, IActionFilter, IAsyncAct
     }
 
     /// <summary>
-    /// Gets the cache from the request context
+    /// Gets the cache from the request context.
     /// </summary>
     protected ITwoLevelCache Cache => Context?.Cache;
 
     /// <summary>
-    /// Gets the localizer from the request context
+    /// Gets the localizer from the request context.
     /// </summary>
     protected ITextLocalizer Localizer => Context?.Localizer;
 
     /// <summary>
-    /// Gets the permission service from the request context
+    /// Gets the permission service from the request context.
     /// </summary>
     protected IPermissionService Permissions => Context?.Permissions;
 }

@@ -1,7 +1,7 @@
 ﻿namespace Serenity.Data;
 
 /// <summary>
-///   Contains extension method to create aliased fields
+///   Contains extension methods to create aliased fields.
 /// </summary>
 public static class AliasedFields
 {
@@ -10,9 +10,9 @@ public static class AliasedFields
     /// <param name="fields">The fields.</param>
     /// <param name="alias">The alias.</param>
     /// <returns>
-    ///   An instance of RowFieldsBase with T0 replaced with specified alias
+    ///   An instance of RowFieldsBase with T0 replaced with the specified alias.
     /// </returns>
-    /// <exception cref="ArgumentNullException">alias</exception>
+    /// <exception cref="ArgumentNullException">alias is null or whitespace.</exception>
     public static TFields As<TFields>(this TFields fields, string alias)
         where TFields : RowFieldsBase
     {

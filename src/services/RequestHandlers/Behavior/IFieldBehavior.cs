@@ -6,7 +6,7 @@
 public interface IFieldBehavior
 {
     /// <summary>
-    /// Gets / sets the target field that current behavior should operate on
+    /// Gets or sets the target field that the current behavior should operate on.
     /// </summary>
     Field Target { get; set; }
 }

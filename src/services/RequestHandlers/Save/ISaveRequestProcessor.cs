@@ -7,10 +7,10 @@
 public interface ISaveRequestProcessor : ISaveRequestHandler
 {
     /// <summary>
-    /// Processes the <see cref="ISaveRequest"/> and returns a <see cref="SaveResponse"/>
+    /// Processes the <see cref="ISaveRequest"/> and returns a <see cref="SaveResponse"/>.
     /// </summary>
     /// <param name="uow">Unit of work</param>
-    /// <param name="request">List request</param>
+    /// <param name="request">Save request</param>
     /// <param name="type">Save request type, Create or Update</param>
     SaveResponse Process(IUnitOfWork uow, ISaveRequest request, SaveRequestType type);
 }

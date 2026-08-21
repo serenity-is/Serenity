@@ -141,7 +141,7 @@ public static class ReportColumnConverter
     /// </summary>
     /// <param name="field">The field object</param>
     /// <param name="localizer">Text localizer</param>
-    /// <returns></returns>
+    /// <returns>The extracted report column.</returns>
     public static ReportColumn FromField(Field field, ITextLocalizer localizer)
     {
         var column = new ReportColumn

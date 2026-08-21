@@ -1,16 +1,14 @@
 namespace Serenity.Abstractions;
 
 /// <summary>
-/// Abstraction to validate the password strength
+/// Validates that a password meets the configured strength requirements.
 /// </summary>
 public interface IPasswordStrengthValidator
 {
-
     /// <summary>
-    /// Validates password strength
+    /// Validates the strength of the specified password.
     /// </summary>
-    /// <param name="password"></param>
-    /// <exception cref="ValidationError">Throws validation error if password 
-    /// does not match the expected password strength rules</exception>
+    /// <param name="password">The plain-text password to validate.</param>
+    /// <exception cref="ValidationError">Thrown when the password does not satisfy the strength rules.</exception>
     void Validate(string password);
 }

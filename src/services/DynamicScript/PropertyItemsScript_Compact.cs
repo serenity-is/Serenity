@@ -18,10 +18,10 @@ public abstract partial class PropertyItemsScript
     private static readonly char[] separators = ['.', '/', '_', ':'];
 
     /// <summary>
-    /// Generates a compact version of the scripts
+    /// Generates a compact version of the scripts.
     /// </summary>
-    /// <param name="inputs">Inputs</param>
-    /// <exception cref="ArgumentNullException"></exception>
+    /// <param name="inputs">The inputs.</param>
+    /// <exception cref="ArgumentNullException">inputs is null.</exception>
     public static string Compact(IEnumerable<(string scriptName, PropertyItemsData data)> inputs)
     {
         ArgumentNullException.ThrowIfNull(inputs);

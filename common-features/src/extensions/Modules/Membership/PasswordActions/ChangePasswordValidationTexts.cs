@@ -1,5 +1,8 @@
 namespace Serenity.Extensions;
 
+/// <summary>
+/// Local text keys for change password validation.
+/// </summary>
 [NestedLocalTexts(Prefix = "Validation.")]
 public static class ChangePasswordValidationTexts
 {

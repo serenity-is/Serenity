@@ -1,7 +1,8 @@
 namespace Serenity.Data;
 
 /// <summary>
-/// SQL query string builder
+/// SQL query string builder that supports SELECT statements with paging, joins,
+/// unions, grouping, ordering, and sub queries.
 /// </summary>
 /// <seealso cref="QueryWithParams" />
 /// <seealso cref="IFilterableQuery" />
@@ -55,7 +56,7 @@ public partial class SqlQuery : QueryWithParams, ISqlQuery, IFilterableQuery, IG
     /// Adds a FOR XML statement to the query.
     /// </summary>
     /// <param name="forXml">FOR XML type, usually "RAW".</param>
-    /// <returns></returns>
+    /// <returns>The query itself.</returns>
     public SqlQuery ForXml(string forXml)
     {
         this.forXml = forXml;
@@ -66,7 +67,7 @@ public partial class SqlQuery : QueryWithParams, ISqlQuery, IFilterableQuery, IG
     /// Adds a FOR JSON statement to the query.
     /// </summary>
     /// <param name="forJson">FOR JSON type, usually "auto".</param>
-    /// <returns></returns>
+    /// <returns>The query itself.</returns>
     public SqlQuery ForJson(string forJson = "AUTO")
     {
         this.forJson = forJson;
@@ -79,6 +80,7 @@ public partial class SqlQuery : QueryWithParams, ISqlQuery, IFilterableQuery, IG
     /// </summary>
     /// <param name="table">Table name</param>
     /// <returns>The query itself.</returns>
+    /// <exception cref="ArgumentNullException">table is null or empty.</exception>
     public SqlQuery From(string table)
     {
         if (string.IsNullOrEmpty(table))
@@ -176,6 +178,7 @@ public partial class SqlQuery : QueryWithParams, ISqlQuery, IFilterableQuery, IG
     /// </summary>
     /// <param name="expression">Array of fields or expressions.</param>
     /// <returns>The query itself.</returns>
+    /// <exception cref="ArgumentNullException">expression is null or empty.</exception>
     public SqlQuery GroupBy(string expression)
     {
         if (string.IsNullOrEmpty(expression))
@@ -212,6 +215,7 @@ public partial class SqlQuery : QueryWithParams, ISqlQuery, IFilterableQuery, IG
     /// </summary>
     /// <param name="expression">Array of fields or expressions.</param>
     /// <returns>The query itself.</returns>
+    /// <exception cref="ArgumentNullException">expression is null or empty.</exception>
     public SqlQuery Having(string expression)
     {
         if (string.IsNullOrEmpty(expression))
@@ -231,6 +235,7 @@ public partial class SqlQuery : QueryWithParams, ISqlQuery, IFilterableQuery, IG
     /// <param name="expression">A field or an SQL expression.</param>
     /// <param name="desc">True to add " DESC" keyword to the expression.</param>
     /// <returns>The query itself.</returns>
+    /// <exception cref="ArgumentNullException">expression is null or empty.</exception>
     public SqlQuery OrderBy(string expression, bool desc = false)
     {
         if (string.IsNullOrEmpty(expression))
@@ -314,6 +319,7 @@ public partial class SqlQuery : QueryWithParams, ISqlQuery, IFilterableQuery, IG
     /// <param name="expression">A field or an SQL expression.</param>
     /// <returns>The query itself.</returns>
     /// <remarks>No column name is used for the field or expression.</remarks>
+    /// <exception cref="ArgumentNullException">expression is null or empty.</exception>
     public SqlQuery Select(string expression)
     {
         if (string.IsNullOrEmpty(expression))
@@ -355,6 +361,7 @@ public partial class SqlQuery : QueryWithParams, ISqlQuery, IFilterableQuery, IG
     /// <param name="expression">A field name or SQL expression.</param>
     /// <param name="columnName">A column name.</param>
     /// <returns>The query itself.</returns>
+    /// <exception cref="ArgumentNullException">expression or columnName is null or empty.</exception>
     public SqlQuery Select(string expression, string columnName)
     {
         if (string.IsNullOrEmpty(expression))
@@ -501,7 +508,7 @@ public partial class SqlQuery : QueryWithParams, ISqlQuery, IFilterableQuery, IG
     /// Adds a union to query with the specified union type.
     /// </summary>
     /// <param name="unionType">Type of the union.</param>
-    /// <returns></returns>
+    /// <returns>The query itself.</returns>
     public SqlQuery Union(SqlUnionType unionType = SqlUnionType.Union)
     {
         unionQuery = Clone();
@@ -535,6 +542,7 @@ public partial class SqlQuery : QueryWithParams, ISqlQuery, IFilterableQuery, IG
     /// </summary>
     /// <param name="expression">An expression</param>
     /// <returns>The query itself.</returns>
+    /// <exception cref="ArgumentNullException">expression is null or empty.</exception>
     public SqlQuery Where(string expression)
     {
         if (string.IsNullOrEmpty(expression))
@@ -562,6 +570,9 @@ public partial class SqlQuery : QueryWithParams, ISqlQuery, IFilterableQuery, IG
     /// <summary>
     /// Sets the dialect (SQL server type / version) for query.
     /// </summary>
+    /// <param name="dialect">The dialect to use.</param>
+    /// <returns>The query itself.</returns>
+    /// <exception cref="ArgumentNullException">dialect is null.</exception>
     public SqlQuery Dialect(ISqlDialect dialect)
     {
         this.dialect = dialect ?? throw new ArgumentNullException("dialect");
@@ -575,6 +586,7 @@ public partial class SqlQuery : QueryWithParams, ISqlQuery, IFilterableQuery, IG
     /// Parens are normally only included for sub queries.
     /// </summary>
     /// <param name="value">Value</param>
+    /// <returns>The query itself.</returns>
     public SqlQuery OmitParens(bool value = true)
     {
         omitParens = value;

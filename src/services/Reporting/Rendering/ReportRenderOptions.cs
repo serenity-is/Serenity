@@ -1,12 +1,13 @@
 ﻿namespace Serenity.Reporting;
 
 /// <summary>
-/// Render request a report
+/// Options used to render a report.
 /// </summary>
 public class ReportRenderOptions
 {
     /// <summary>
-    /// Gets / set if rendering in preview mode, only useful for HTML output
+    /// Gets or sets a value indicating whether the report is rendered in preview mode,
+    /// which is only useful for HTML output.
     /// </summary>
     public bool PreviewMode { get; set; }
 
@@ -20,7 +21,7 @@ public class ReportRenderOptions
     public string ReportParams { get; set; }
 
     /// <summary>
-    /// The requested export format if specified, like "xlsx", "html", "html", "pdf" etc. This is only
+    /// The requested export format if specified, like "xlsx", "html", "pdf" etc. This is only
     /// useful for cases where a report can be rendered to multiple types.
     /// </summary>
     public string ExportFormat { get; set; }

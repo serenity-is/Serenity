@@ -1,7 +1,7 @@
 namespace Serenity.Data.Schema;
 
 /// <summary>
-/// SQL server metadata provider
+/// SQL server metadata provider.
 /// </summary>
 /// <seealso cref="ISchemaProvider" />
 public class SqlServerSchemaProvider : ISchemaProvider
@@ -14,13 +14,7 @@ public class SqlServerSchemaProvider : ISchemaProvider
     /// </value>
     public string DefaultSchema => "dbo";
 
-    /// <summary>
-    /// Gets the field infos.
-    /// </summary>
-    /// <param name="connection">The connection.</param>
-    /// <param name="schema">The schema.</param>
-    /// <param name="table">The table.</param>
-    /// <returns></returns>
+    /// <inheritdoc/>
     public IEnumerable<FieldInfo> GetFieldInfos(IDbConnection connection, string schema, string table)
     {
         return connection.Query<FieldInfo>(@"
@@ -43,13 +37,7 @@ public class SqlServerSchemaProvider : ISchemaProvider
         });
     }
 
-    /// <summary>
-    /// Gets the foreign keys.
-    /// </summary>
-    /// <param name="connection">The connection.</param>
-    /// <param name="schema">The schema.</param>
-    /// <param name="table">The table.</param>
-    /// <returns></returns>
+    /// <inheritdoc/>
     public IEnumerable<ForeignKeyInfo> GetForeignKeys(IDbConnection connection, string schema, string table)
     {
         return connection.Query<ForeignKeyInfo>(@"
@@ -76,13 +64,7 @@ public class SqlServerSchemaProvider : ISchemaProvider
         });
     }
 
-    /// <summary>
-    /// Gets the identity fields.
-    /// </summary>
-    /// <param name="connection">The connection.</param>
-    /// <param name="schema">The schema.</param>
-    /// <param name="table">The table.</param>
-    /// <returns></returns>
+    /// <inheritdoc/>
     public IEnumerable<string> GetIdentityFields(IDbConnection connection, string schema, string table)
     {
         return connection.Query<string>(@"
@@ -97,13 +79,7 @@ public class SqlServerSchemaProvider : ISchemaProvider
             });
     }
 
-    /// <summary>
-    /// Gets the primary key fields.
-    /// </summary>
-    /// <param name="connection">The connection.</param>
-    /// <param name="schema">The schema.</param>
-    /// <param name="table">The table.</param>
-    /// <returns></returns>
+    /// <inheritdoc/>
     public IEnumerable<string> GetPrimaryKeyFields(IDbConnection connection, string schema, string table)
     {
         return connection.Query<string>(
@@ -129,11 +105,7 @@ public class SqlServerSchemaProvider : ISchemaProvider
         public string TABLE_TYPE { get; set; }
     }
 
-    /// <summary>
-    /// Gets the table names.
-    /// </summary>
-    /// <param name="connection">The connection.</param>
-    /// <returns></returns>
+    /// <inheritdoc/>
     public IEnumerable<TableName> GetTableNames(IDbConnection connection)
     {
         return connection.Query<TableNameSource>(

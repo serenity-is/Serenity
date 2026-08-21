@@ -9,7 +9,7 @@ using System.Security.Cryptography;
 namespace Serenity.Web;
 
 /// <summary>
-/// Default <see cref="IContentHashCache"/> implementation
+/// Default <see cref="IContentHashCache"/> implementation.
 /// </summary>
 public class ContentHashCache : IContentHashCache
 {
@@ -22,43 +22,43 @@ public class ContentHashCache : IContentHashCache
     private readonly IHttpContextAccessor httpContextAccessor;
 
     /// <summary>
-    /// CDN settings for content hash cache
+    /// CDN settings for the content hash cache.
     /// </summary>
     public class CDNSettings
     {
         /// <summary>
-        /// Is CDN enabled
+        /// Gets or sets whether the CDN is enabled.
         /// </summary>
         public bool? Enabled { get; set; }
 
         /// <summary>
-        /// The CDN URL
+        /// Gets or sets the CDN URL.
         /// </summary>
         public string Url { get; set; }
 
         /// <summary>
-        /// HTTPS URL for the CDN
+        /// Gets or sets the HTTPS URL for the CDN.
         /// </summary>
         public string HttpsUrl { get; set; }
 
         /// <summary>
-        /// List of include patterns
+        /// Gets or sets the list of include patterns.
         /// </summary>
         public List<string> Include { get; set; }
 
         /// <summary>
-        /// List of exclude patterns
+        /// Gets or sets the list of exclude patterns.
         /// </summary>
         public List<string> Exclude { get; set; }
     }
 
     /// <summary>
-    /// Creates a new instance of the class
+    /// Initializes a new instance of the <see cref="ContentHashCache"/> class.
     /// </summary>
-    /// <param name="cdnSettings">CDN settings</param>
-    /// <param name="hostEnvironment">Host environment</param>
-    /// <param name="httpContextAccessor">HTTP context accessor</param>
-    /// <exception cref="ArgumentNullException">hostEnvironment of httpContextAccessor is null</exception>
+    /// <param name="cdnSettings">The CDN settings.</param>
+    /// <param name="hostEnvironment">The host environment.</param>
+    /// <param name="httpContextAccessor">The HTTP context accessor.</param>
+    /// <exception cref="ArgumentNullException"><paramref name="hostEnvironment"/> is <c>null</c>.</exception>
     public ContentHashCache(IOptions<CDNSettings> cdnSettings,
         IWebHostEnvironment hostEnvironment, IHttpContextAccessor httpContextAccessor = null)
     {

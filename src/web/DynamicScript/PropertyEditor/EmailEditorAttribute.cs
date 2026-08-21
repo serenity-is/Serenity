@@ -1,18 +1,18 @@
 namespace Serenity.ComponentModel;
 
 /// <summary>
-/// Email editor type with two inputs. Please prefer <see cref="EmailAddressEditorAttribute"/>
+/// Email editor type with two inputs. Prefer <see cref="EmailAddressEditorAttribute"/>
 /// which uses a single input.
 /// </summary>
 public partial class EmailEditorAttribute : CustomEditorAttribute, ICustomValidator
 {
     /// <summary>
-    /// Editor type key
+    /// The editor type key.
     /// </summary>
     public const string Key = "Email";
 
     /// <summary>
-    /// Creates a new instance of the email editor
+    /// Initializes a new instance of the <see cref="EmailEditorAttribute"/> class.
     /// </summary>
     public EmailEditorAttribute()
         : base(Key)
@@ -20,7 +20,7 @@ public partial class EmailEditorAttribute : CustomEditorAttribute, ICustomValida
     }
 
     /// <summary>
-    /// Domain
+    /// Gets or sets the domain.
     /// </summary>
     public string Domain
     {
@@ -29,7 +29,7 @@ public partial class EmailEditorAttribute : CustomEditorAttribute, ICustomValida
     }
 
     /// <summary>
-    /// True if the domain should be readonly
+    /// Gets or sets a value indicating whether the domain should be read-only.
     /// </summary>
     public bool ReadOnlyDomain
     {
@@ -38,15 +38,16 @@ public partial class EmailEditorAttribute : CustomEditorAttribute, ICustomValida
     }
 
     /// <summary>
-    /// Default email validation pattern
+    /// The default email validation pattern.
     /// </summary>
     public static readonly Regex EmailPattern =
         EmailPatternRegexGen();
 
     /// <summary>
-    /// Validates the email address
+    /// Validates the email address.
     /// </summary>
-    /// <param name="context">Validation context</param>
+    /// <param name="context">The validation context.</param>
+    /// <returns>The validation error text, or <c>null</c> if the value is valid.</returns>
     public string Validate(IValidationContext context)
     {
         if (context.Value == null)

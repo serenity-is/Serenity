@@ -1,22 +1,21 @@
 ﻿namespace Serenity.Localization;
 
 /// <summary>
-/// Contains initialization method for adding local text translations defined by
-/// Description attributes in enumeration classes.
+/// Contains initialization methods for adding local text translations defined by
+/// <see cref="DescriptionAttribute"/> attributes in enumeration classes.
 /// </summary>
 public static class EnumLocalTextRegistration
 {
     /// <summary>
-    /// Adds local text translations defined implicitly by Description attributes in 
-    /// enumeration classes. Only enum values that has Description attribute are added as
-    /// local text. By default, enums are registered in format:
-    /// "Enums.{EnumerationTypeFullName}.{EnumValueName}". EnumerationTypeFullName, is
-    /// fullname of the enumeration type. This can be overridden by attaching a EnumKey
-    /// attribute.
+    /// Adds local text translations defined implicitly by <see cref="DescriptionAttribute"/> attributes in
+    /// enumeration classes. Only enum values that have a <see cref="DescriptionAttribute"/> are added as
+    /// local text. By default, enums are registered in the format
+    /// "Enums.{EnumerationTypeFullName}.{EnumValueName}", where EnumerationTypeFullName is the
+    /// full name of the enumeration type. This can be overridden by attaching an <see cref="EnumKeyAttribute"/>.
     /// </summary>
-    /// <param name="typeSource">Type source to search for enumeration classes in</param>
-    /// <param name="languageID">Language ID texts will be added (default is invariant language)</param>
-    /// <param name="registry">Registry</param>
+    /// <param name="registry">The registry to add texts to.</param>
+    /// <param name="typeSource">The type source to search for enumeration classes in.</param>
+    /// <param name="languageID">The language ID texts will be added for (default is the invariant language).</param>
     public static void AddEnumTexts(this ILocalTextRegistry registry, ITypeSource typeSource,
         string languageID = LocalText.InvariantLanguageID)
     {

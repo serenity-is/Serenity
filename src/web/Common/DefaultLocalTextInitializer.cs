@@ -4,11 +4,12 @@ using Serenity.Extensions.DependencyInjection;
 namespace Serenity.Web;
 
 /// <summary>
-/// Default local text initializer
+/// Default <see cref="ILocalTextInitializer"/> that registers base texts and
+/// JSON texts from the <c>App_Data/texts</c> folder.
 /// </summary>
-/// <param name="typeSource">Type source</param>
-/// <param name="rowTypeRegistry">Row type registry</param>
-/// <param name="webHostEnvironment">Web host environment</param>
+/// <param name="typeSource">The type source used to discover text registrations.</param>
+/// <param name="rowTypeRegistry">The row type registry used to discover row texts.</param>
+/// <param name="webHostEnvironment">The web host environment used to locate the texts folder.</param>
 public class DefaultLocalTextInitializer(ITypeSource typeSource,
     IRowTypeRegistry rowTypeRegistry = null,
     IWebHostEnvironment webHostEnvironment = null) : ILocalTextInitializer
@@ -23,9 +24,9 @@ public class DefaultLocalTextInitializer(ITypeSource typeSource,
     }
 
     /// <summary>
-    /// Adds json texts to the local text registry
+    /// Adds JSON texts to the local text registry.
     /// </summary>
-    /// <param name="registry">Target registry</param>
+    /// <param name="registry">The target registry.</param>
     protected virtual void AddJsonTexts(ILocalTextRegistry registry)
     {
         ServiceCollectionExtensions.AddJsonTexts(registry,

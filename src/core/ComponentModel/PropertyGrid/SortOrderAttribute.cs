@@ -2,7 +2,7 @@
 
 /// <summary>
 /// Sets the column as sorted by default, and its index among sorted columns.
-/// Negative values means descending sort. Applies only to columns.
+/// Negative values mean descending sort. Applies only to columns.
 /// </summary>
 /// <seealso cref="Attribute" />
 /// <remarks>

@@ -3,101 +3,105 @@ namespace Serenity.Data;
 public abstract partial class Field
 {
     /// <summary>
-    /// Creates a new "the Field IS NULL" criteria
+    /// Creates a new "the Field IS NULL" criteria.
     /// </summary>
+    /// <returns>The IS NULL criteria.</returns>
     public BaseCriteria IsNull()
     {
         return Criteria.IsNull();
     }
 
     /// <summary>
-    /// Creates a new "the Field IS NOT NULL" criteria
+    /// Creates a new "the Field IS NOT NULL" criteria.
     /// </summary>
-    /// <returns></returns>
+    /// <returns>The IS NOT NULL criteria.</returns>
     public BaseCriteria IsNotNull()
     {
         return Criteria.IsNotNull();
     }
 
     /// <summary>
-    /// Creates a new "the Field LIKE mask" criteria
+    /// Creates a new "the Field LIKE mask" criteria.
     /// </summary>
     /// <param name="mask">The mask.</param>
-    /// <param name="upper">True to use UPPER function both sides</param>
-    /// <returns></returns>
+    /// <param name="upper">True to use the UPPER function on both sides.</param>
+    /// <returns>The LIKE criteria.</returns>
     public BaseCriteria Like(string mask, bool upper = false)
     {
         return Criteria.Like(mask, upper);
     }
 
     /// <summary>
-    /// Creates a new "the Field NOT LIKE mask" criteria
+    /// Creates a new "the Field NOT LIKE mask" criteria.
     /// </summary>
     /// <param name="mask">The mask.</param>
-    /// <returns></returns>
+    /// <returns>The NOT LIKE criteria.</returns>
     public BaseCriteria NotLike(string mask)
     {
         return Criteria.NotLike(mask);
     }
 
     /// <summary>
-    /// Creates a new "the Field STARTS WITH mask" criteria
+    /// Creates a new "the Field STARTS WITH mask" criteria.
     /// </summary>
     /// <param name="mask">The mask.</param>
-    /// <param name="upper">True to use UPPER function both sides</param>
+    /// <param name="upper">True to use the UPPER function on both sides.</param>
+    /// <returns>The STARTS WITH criteria.</returns>
     public BaseCriteria StartsWith(string mask, bool upper = false)
     {
         return Criteria.StartsWith(mask, upper);
     }
 
     /// <summary>
-    /// Creates a new "the Field ENDS WITH mask" criteria
+    /// Creates a new "the Field ENDS WITH mask" criteria.
     /// </summary>
     /// <param name="mask">The mask.</param>
-    /// <param name="upper">True to use UPPER function both sides</param>
+    /// <param name="upper">True to use the UPPER function on both sides.</param>
+    /// <returns>The ENDS WITH criteria.</returns>
     public BaseCriteria EndsWith(string mask, bool upper = false)
     {
         return Criteria.EndsWith(mask, upper);
     }
 
     /// <summary>
-    /// Creates a new "the Field CONTAINS mask" criteria
+    /// Creates a new "the Field CONTAINS mask" criteria.
     /// </summary>
     /// <param name="mask">The mask.</param>
-    /// <param name="upper">True to use UPPER function both sides</param>
-    /// <returns></returns>
+    /// <param name="upper">True to use the UPPER function on both sides.</param>
+    /// <returns>The CONTAINS criteria.</returns>
     public BaseCriteria Contains(string mask, bool upper = false)
     {
         return Criteria.Contains(mask, upper);
     }
 
     /// <summary>
-    /// Creates a new "the Field NOT CONTAINS mask" criteria
+    /// Creates a new "the Field NOT CONTAINS mask" criteria.
     /// </summary>
     /// <param name="mask">The mask.</param>
-    /// <param name="upper">True to use UPPER function both sides</param>
+    /// <param name="upper">True to use the UPPER function on both sides.</param>
+    /// <returns>The NOT CONTAINS criteria.</returns>
     public BaseCriteria NotContains(string mask, bool upper = false)
     {
         return criteria.NotContains(mask, upper);
     }
 
     /// <summary>
-    /// Creates a new "the Field IN (values...)" criteria
+    /// Creates a new "the Field IN (values...)" criteria.
     /// </summary>
-    /// <typeparam name="T"></typeparam>
+    /// <typeparam name="T">The type of the values.</typeparam>
     /// <param name="values">The values.</param>
-    /// <returns></returns>
+    /// <returns>The IN criteria.</returns>
     public BaseCriteria In<T>(params T[] values)
     {
         return Criteria.In(values);
     }
 
     /// <summary>
-    /// Creates a new "the Field NOT IN (values...)" criteria
+    /// Creates a new "the Field NOT IN (values...)" criteria.
     /// </summary>
-    /// <typeparam name="T"></typeparam>
+    /// <typeparam name="T">The type of the values.</typeparam>
     /// <param name="values">The values.</param>
-    /// <returns></returns>
+    /// <returns>The NOT IN criteria.</returns>
     public BaseCriteria NotIn<T>(params T[] values)
     {
         return Criteria.NotIn(values);

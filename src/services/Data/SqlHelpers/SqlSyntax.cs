@@ -11,11 +11,14 @@ public static class SqlSyntax
     private static readonly CultureInfo _invariant = CultureInfo.InvariantCulture;
 
     /// <summary>
-    ///   Returns an indexed parameter name like @p123.</summary>
+    ///   Returns an indexed parameter name like @p123.
+    /// </summary>
     /// <param name="param">
-    ///   Param index.</param>
+    ///   The parameter index.
+    /// </param>
     /// <returns>
-    ///   Param name.</returns>
+    ///   The parameter name.
+    /// </returns>
     public static string IndexParam(this int param)
     {
         if (_indexParam == null)
@@ -33,10 +36,10 @@ public static class SqlSyntax
     }
 
     /// <summary>
-    /// Creates a table alias like T0
+    /// Creates a table alias like T0.
     /// </summary>
     /// <param name="joinIndex">Index of the join.</param>
-    /// <returns></returns>
+    /// <returns>The table alias.</returns>
     public static string TableAlias(this int joinIndex)
     {
         if (_tableAlias == null)
@@ -54,10 +57,10 @@ public static class SqlSyntax
     }
 
     /// <summary>
-    /// Creates a table alias dot like "T0."
+    /// Creates a table alias dot like "T0.".
     /// </summary>
     /// <param name="joinIndex">Index of the join.</param>
-    /// <returns></returns>
+    /// <returns>The table alias dot.</returns>
     public static string TableAliasDot(this int joinIndex)
     {
         if (_tableAliasDot == null)
@@ -88,7 +91,8 @@ public static class SqlSyntax
     /// Returns true if the specified identifier is a SQL keyword in any of the
     /// known dialects.
     /// </summary>
-    /// <param name="identifier">Identifier</param>
+    /// <param name="identifier">The identifier.</param>
+    /// <returns>True if the identifier is a reserved keyword in any dialect; otherwise, false.</returns>
     public static bool IsReservedKeywordForAny(string identifier)
     {
         if (string.IsNullOrEmpty(identifier))
@@ -177,12 +181,12 @@ public static class SqlSyntax
     }
 
     /// <summary>
-    /// Automatically brackets the string based on SqlSettings.AutoQuotedIdentifier setting
+    /// Automatically brackets the string based on the <see cref="SqlSettings.AutoQuotedIdentifiers"/> setting
     /// and keywords for the passed dialect.
     /// </summary>
     /// <param name="s">The string.</param>
-    /// <param name="dialect">The dialect</param>
-    /// <returns></returns>
+    /// <param name="dialect">The dialect.</param>
+    /// <returns>The bracketed string.</returns>
     public static string AutoBracket(string s, ISqlDialect dialect = null)
     {
         if (string.IsNullOrEmpty(s))
@@ -209,11 +213,12 @@ public static class SqlSyntax
     }
 
     /// <summary>
-    /// Automatically brackets the string based on dialect.AutoQuotedIdentifier setting, only if the identifier is valid.
+    /// Automatically brackets the string based on the dialect's <c>AutoQuotedIdentifier</c> setting,
+    /// only if the identifier is valid.
     /// </summary>
     /// <param name="s">The string.</param>
-    /// <param name="dialect">Target dialect, SqlSettings.DefaultDialect is used if null.</param>
-    /// <returns></returns>
+    /// <param name="dialect">Target dialect; <see cref="SqlSettings.DefaultDialect"/> is used if null.</param>
+    /// <returns>The bracketed string.</returns>
     public static string AutoBracketValid(string s, ISqlDialect dialect = null)
     {
         if (!ShouldAutoQuote(dialect) &&
@@ -230,7 +235,7 @@ public static class SqlSyntax
     /// Unquotes the specified string.
     /// </summary>
     /// <param name="s">The string.</param>
-    /// <returns></returns>
+    /// <returns>The unquoted string.</returns>
     public static string Unquote(string s)
     {
         if (!IsQuoted(s))

@@ -3,11 +3,11 @@ using System.Collections;
 namespace Serenity.Data;
 
 /// <summary>
-/// Converts field names in a criteria to their 
+/// Converts field names in a criteria to their
 /// corresponding SQL field expressions.
 /// </summary>
 /// <remarks>
-/// Creates an instance of the class
+/// Initializes a new instance of the class.
 /// </remarks>
 /// <param name="row">The row instance</param>
 /// <param name="permissions">Permission service</param>
@@ -16,7 +16,7 @@ namespace Serenity.Data;
 /// used in the filter. Default is false.</param>
 /// <param name="dialect">Optional dialect</param>
 /// <param name="toCriteria">Optional field to criteria converter</param>
-/// <exception cref="ArgumentNullException">row or permissions is null</exception>
+/// <exception cref="ArgumentNullException"><paramref name="row"/> or <paramref name="permissions"/> is <c>null</c>.</exception>
 public class CriteriaFieldExpressionReplacer(IRow row, IPermissionService permissions,
     bool lookupAccessMode = false, ISqlDialect dialect = null, Func<IField, BaseCriteria> toCriteria = null) : SafeCriteriaValidator
 {
@@ -24,12 +24,12 @@ public class CriteriaFieldExpressionReplacer(IRow row, IPermissionService permis
     private readonly bool lookupAccessMode = lookupAccessMode;
 
     /// <summary>
-    /// The row instance
+    /// Gets the row instance.
     /// </summary>
     protected IRow Row { get; private set; } = row ?? throw new ArgumentNullException(nameof(row));
 
     /// <summary>
-    /// The dialect passed in or default dialect
+    /// Gets the dialect passed in or the default dialect.
     /// </summary>
     protected ISqlDialect Dialect { get; } = dialect ?? SqlSettings.DefaultDialect;
 

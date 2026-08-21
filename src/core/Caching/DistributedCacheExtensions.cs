@@ -69,10 +69,11 @@ public static class DistributedCacheExtensions
     }
 
     /// <summary>
-    /// Sets a value from the cache as byte[], string, or using JSON deserialization depending on type
+    /// Gets a value from the cache as byte[], string, or using JSON deserialization depending on type
     /// </summary>
     /// <param name="cache">Cache</param>
     /// <param name="key">Key</param>
+    /// <returns>The cached value, or <c>null</c> if the key does not exist in the cache.</returns>
     public static TValue? GetAutoJson<TValue>(this IDistributedCache cache, string key)
         where TValue: class
     {

@@ -4,7 +4,8 @@ using Microsoft.Extensions.Caching.Memory;
 namespace Serenity;
 
 /// <summary>
-/// Contains helper functions to use local and distributed cache in sync with optional cache invalidation.
+/// A two level cache that combines an in-memory cache with a distributed cache,
+/// keeping them in sync with optional group-based cache invalidation.
 /// </summary>
 /// <remarks>
 /// Creates a new TwoLevelCache instance

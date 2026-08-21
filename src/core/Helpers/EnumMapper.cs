@@ -1,7 +1,7 @@
 namespace Serenity;
 
 /// <summary>
-/// Contains Enum mapping and other helper functions
+/// Contains Enum mapping and other helper functions.
 /// </summary>
 public static class EnumMapper
 {
@@ -119,7 +119,7 @@ public static class EnumMapper
     /// </summary>
     /// <param name="localizer">Text localizer</param>
     /// <param name="value">The value.</param>
-    /// <returns></returns>
+    /// <returns>The display text of the enum value.</returns>
     public static string GetText(this Enum value, ITextLocalizer localizer)
     {
         if (value == null)
@@ -145,7 +145,7 @@ public static class EnumMapper
     /// <param name="localizer">Text localizer</param>
     /// <param name="enumType">Type of the enum.</param>
     /// <param name="value">The value.</param>
-    /// <returns></returns>
+    /// <returns>The formatted display text of the enum value.</returns>
     public static string FormatEnum(this ITextLocalizer localizer, Type enumType, object value)
     {
         if (value == null)

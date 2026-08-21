@@ -1,7 +1,7 @@
 ﻿namespace Serenity.Data.Mapping;
 
 /// <summary>
-/// LEFT JOIN type
+/// LEFT JOIN type.
 /// </summary>
 /// <seealso cref="Attribute" />
 /// <seealso cref="ISqlJoin" />

@@ -39,6 +39,6 @@ public interface ISqlQueryExtensible
     /// Gets the index of the select into.
     /// </summary>
     /// <param name="field">The field.</param>
-    /// <returns></returns>
+    /// <returns>The index of the select into field, or -1 if not found.</returns>
     int GetSelectIntoIndex(IField field);
 }

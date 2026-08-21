@@ -43,9 +43,9 @@ public class EditorAddonAttribute(string type) : Attribute
     /// <summary>
     /// Gets the editor option.
     /// </summary>
-    /// <typeparam name="TType">The type of the type.</typeparam>
+    /// <typeparam name="TType">The type of the option.</typeparam>
     /// <param name="key">The key.</param>
-    /// <returns></returns>
+    /// <returns>The option value, or the default value of <typeparamref name="TType"/> if not set.</returns>
     [return: MaybeNull]
     protected TType GetOption<TType>(string key)
     {

@@ -4,6 +4,9 @@ using System.Net;
 
 namespace Serenity.Extensions.Pages;
 
+/// <summary>
+/// Controller for rendering and downloading reports.
+/// </summary>
 [Route("Serenity.Extensions/Report/[action]")]
 public class ReportController(IReportFactory reportFactory,
     IReportRenderer reportRenderer,
@@ -12,11 +15,26 @@ public class ReportController(IReportFactory reportFactory,
     protected readonly IReportFactory reportFactory = reportFactory ?? throw new ArgumentNullException(nameof(reportFactory));
     protected readonly IReportRenderer reportRenderer = reportRenderer ?? throw new ArgumentNullException(nameof(reportRenderer));
 
+    /// <summary>
+    /// Renders a report with the specified key and options.
+    /// </summary>
+    /// <param name="key">The report key.</param>
+    /// <param name="opt">The report parameters.</param>
+    /// <param name="ext">The export format extension.</param>
+    /// <param name="print">Whether to render in print mode.</param>
+    /// <returns>The report render result.</returns>
     public ActionResult Render(string key, string opt, string ext, int? print = 0)
     {
         return Execute(key, opt, ext, download: false, printing: print != 0);
     }
 
+    /// <summary>
+    /// Downloads a report with the specified key and options.
+    /// </summary>
+    /// <param name="key">The report key.</param>
+    /// <param name="opt">The report parameters.</param>
+    /// <param name="ext">The export format extension.</param>
+    /// <returns>The report download result.</returns>
     public ActionResult Download(string key, string opt, string ext)
     {
         return Execute(key, opt, ext, download: true, printing: true);
@@ -62,6 +80,12 @@ public class ReportController(IReportFactory reportFactory,
             KnownMimeTypes.Get("_" + result.FileExtension));
     }
 
+    /// <summary>
+    /// Retrieves report information for the specified request.
+    /// </summary>
+    /// <param name="request">The report retrieve request.</param>
+    /// <param name="handler">The report retrieve handler.</param>
+    /// <returns>The report retrieve result.</returns>
     [HttpPost, JsonRequest]
     public ActionResult Retrieve(ReportRetrieveRequest request,
         [FromServices] IReportRetrieveHandler handler)

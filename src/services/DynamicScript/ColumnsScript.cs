@@ -3,15 +3,15 @@
 namespace Serenity.Web;
 
 /// <summary>
-/// Dynamic script type for columns (<see cref="ColumnsScriptAttribute"/>)
+/// Dynamic script type for columns (<see cref="ColumnsScriptAttribute"/>).
 /// </summary>
 /// <remarks>
-/// Creates a new instance of the class
+/// Creates a new instance of the class.
 /// </remarks>
-/// <param name="name">Script name</param>
-/// <param name="columnsType">Columns type</param>
-/// <param name="propertyProvider">Property item provider</param>
-/// <param name="serviceProvider">Service provider</param>
+/// <param name="name">The script name.</param>
+/// <param name="columnsType">The columns type.</param>
+/// <param name="propertyProvider">The property item provider.</param>
+/// <param name="serviceProvider">The service provider.</param>
 public class ColumnsScript(string name, Type columnsType, IPropertyItemProvider propertyProvider,
     IServiceProvider serviceProvider) : PropertyItemsScript("Columns." + CheckName(name), columnsType, 
          propertyProvider, serviceProvider)

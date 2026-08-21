@@ -7,8 +7,8 @@
 public interface ICustomizeHtmlToPdf
 {
     /// <summary>
-    /// Method that is called to customize HTML to PDF options
+    /// Method that is called to customize HTML to PDF options.
     /// </summary>
-    /// <param name="options"></param>
+    /// <param name="options">The HTML to PDF options to customize.</param>
     void Customize(IHtmlToPdfOptions options);
 }

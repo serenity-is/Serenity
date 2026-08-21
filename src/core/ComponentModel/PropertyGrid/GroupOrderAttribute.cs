@@ -1,11 +1,11 @@
 ﻿namespace Serenity.ComponentModel;
 
 /// <summary>
-/// Sets in which order this property should be grouped by.
+/// Sets the order in which this property is grouped by default.
 /// This is only meaningful when a grid has grouping, and it
 /// sets the default grouped columns. The properties with this
 /// attribute are the default ones grouped by and their groupOrder
-/// determines in which order they are grouped by.
+/// determines in which order they are grouped.
 /// </summary>
 /// <seealso cref="Attribute" />
 /// <remarks>

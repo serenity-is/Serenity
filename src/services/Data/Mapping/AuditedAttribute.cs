@@ -12,7 +12,7 @@ namespace Serenity.Data.Mapping;
 public class AuditedAttribute(bool value = true) : Attribute
 {
     /// <summary>
-    /// Gets the value of the attribute
+    /// Gets the value of the attribute.
     /// </summary>
     public bool Value { get; } = value;
 }

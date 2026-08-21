@@ -3,9 +3,9 @@ using System.Collections;
 namespace Serenity.Web;
 
 /// <summary>
-/// A dynamic script type for distinct values of a field
+/// A dynamic script type for distinct values of a field.
 /// </summary>
-/// <typeparam name="TRow"></typeparam>
+/// <typeparam name="TRow">The row type.</typeparam>
 public class DistinctValuesScript<TRow> : LookupScript
    where TRow : class, IRow, new()
 {
@@ -13,11 +13,11 @@ public class DistinctValuesScript<TRow> : LookupScript
     private readonly string propertyName;
 
     /// <summary>
-    /// Creates a new instance of the class
+    /// Initializes a new instance of the <see cref="DistinctValuesScript{TRow}"/> class.
     /// </summary>
-    /// <param name="connections">Sql connections</param>
-    /// <param name="propertyName">Property name</param>
-    /// <exception cref="ArgumentNullException"></exception>
+    /// <param name="connections">The SQL connections.</param>
+    /// <param name="propertyName">The property name.</param>
+    /// <exception cref="ArgumentNullException"><paramref name="connections"/> or <paramref name="propertyName"/> is <c>null</c>.</exception>
     public DistinctValuesScript(ISqlConnections connections, string propertyName)
     {
         this.connections = connections ?? throw new ArgumentNullException(nameof(connections));
@@ -48,9 +48,9 @@ public class DistinctValuesScript<TRow> : LookupScript
     }
 
     /// <summary>
-    /// Applies the sort order to the query
+    /// Applies the sort order to the query.
     /// </summary>
-    /// <param name="query">Query</param>
+    /// <param name="query">The query.</param>
     protected virtual void ApplyOrder(SqlQuery query)
     {
         var row = (IRow)(query as ISqlQueryExtensible).FirstIntoRow;
@@ -58,9 +58,9 @@ public class DistinctValuesScript<TRow> : LookupScript
     }
 
     /// <summary>
-    /// Prepares the sql query
+    /// Prepares the SQL query.
     /// </summary>
-    /// <param name="query">Sql query</param>
+    /// <param name="query">The SQL query.</param>
     protected virtual void PrepareQuery(SqlQuery query)
     {
         var row = (IRow)(query as ISqlQueryExtensible).FirstIntoRow;

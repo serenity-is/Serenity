@@ -7,7 +7,7 @@ using Serenity.Reflection;
 namespace Serenity.Extensions.DependencyInjection;
 
 /// <summary>
-/// Contains extensions to register core services
+/// Contains extensions to register core services.
 /// </summary>
 public static class CoreServiceCollectionExtensions
 {
@@ -56,8 +56,8 @@ public static class CoreServiceCollectionExtensions
     /// Adds a type source to the registry.
     /// </summary>
     /// <param name="services">The services.</param>
-    /// <param name="assemblies">List of assembles</param>
-    /// <param name="featureToggles">Feature toggles</param>
+    /// <param name="assemblies">List of assemblies.</param>
+    /// <param name="featureToggles">Feature toggles.</param>
     public static void AddTypeSource(this IServiceCollection services, Assembly[] assemblies, IFeatureToggles? featureToggles = null)
     {
         if (services is null)
@@ -86,15 +86,15 @@ public static class CoreServiceCollectionExtensions
     }
 
     /// <summary>
-    /// Adds IFeatureToggles service to the registry.
+    /// Adds the IFeatureToggles service to the registry.
     /// </summary>
     /// <param name="services">The services.</param>
-    /// <param name="configuration">Configuration source</param>
+    /// <param name="configuration">Configuration source.</param>
     /// <param name="disableByDefault">Features to disable by default, pass ["*"] to disable
-    /// all features by default</param>
+    /// all features by default.</param>
     /// <param name="dependencyMap">Feature dependency map. Features are dictionary
     /// keys and the list of features that they depend on (e.g. all must be enabled)
-    /// for that feature to be enabled.</param>/// 
+    /// for that feature to be enabled.</param>
     public static IServiceCollection AddFeatureToggles(this IServiceCollection services, 
         IConfiguration? configuration = null, 
         object[]? disableByDefault = null,

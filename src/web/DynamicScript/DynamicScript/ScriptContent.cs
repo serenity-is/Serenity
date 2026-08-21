@@ -6,15 +6,15 @@ using System.Security.Cryptography;
 namespace Serenity.Web;
 
 /// <summary>
-/// Default implementation for <see cref="IScriptContent"/>
+/// Default implementation of <see cref="IScriptContent"/>.
 /// </summary>
 /// <remarks>
-/// Creates a new instance of the class
+/// Initializes a new instance of the <see cref="ScriptContent"/> class.
 /// </remarks>
-/// <param name="content">Content</param>
-/// <param name="time">Time</param>
-/// <param name="compressionLevel">Suggested compression level</param>
-/// <exception cref="ArgumentNullException"></exception>
+/// <param name="content">The content bytes.</param>
+/// <param name="time">The generation time.</param>
+/// <param name="compressionLevel">The suggested compression level.</param>
+/// <exception cref="ArgumentNullException"><paramref name="content"/> is <c>null</c>.</exception>
 public class ScriptContent(byte[] content, DateTime time, CompressionLevel compressionLevel) : IScriptContent
 {
     private readonly CompressionLevel compressionLevel = compressionLevel;
@@ -24,12 +24,12 @@ public class ScriptContent(byte[] content, DateTime time, CompressionLevel compr
     private byte[] brotliContent;
 
     /// <summary>
-    /// Gets script generated time
+    /// Gets the script generation time.
     /// </summary>
     public DateTime Time { get; private set; } = time;
 
     /// <summary>
-    /// Gets script hash
+    /// Gets the script hash.
     /// </summary>
     public string Hash 
     { 

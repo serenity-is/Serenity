@@ -6,16 +6,17 @@ namespace Serenity.Web;
 
 /// <summary>
 /// Recaptcha validation extensions. This was written for a very old version
-/// of Google Recaptcha and might not be working properly.
+/// of Google Recaptcha and might not work properly.
 /// </summary>
 public static class RecaptchaValidation
 {
     /// <summary>
-    /// Validates a recaptcha token
+    /// Validates a recaptcha token against the Google site verify endpoint.
     /// </summary>
-    /// <param name="secretKey">Secret key</param>
-    /// <param name="token">Token</param>
-    /// <param name="localizer">Text localizer</param>
+    /// <param name="secretKey">The secret key.</param>
+    /// <param name="token">The recaptcha token to validate.</param>
+    /// <param name="localizer">The text localizer.</param>
+    /// <exception cref="ValidationError">The token is empty or the verification fails.</exception>
     /// <remarks>Inspired from https://github.com/tanveery/recaptcha-net/blob/master/src/Recaptcha.Web/RecaptchaVerificationHelper.cs</remarks>
     public static void Validate(string secretKey, string token, ITextLocalizer localizer)
     {

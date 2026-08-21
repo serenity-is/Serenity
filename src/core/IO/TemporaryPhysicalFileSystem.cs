@@ -3,7 +3,7 @@
 namespace Serenity;
 
 /// <summary>
-/// Physical file sytem
+/// An <see cref="ITemporaryFileSystem"/> implementation that operates on the physical disk.
 /// </summary>
 public class TemporaryPhysicalFileSystem : PhysicalFileSystem, ITemporaryFileSystem
 {

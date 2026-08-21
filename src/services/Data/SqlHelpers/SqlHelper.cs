@@ -9,10 +9,10 @@ namespace Serenity.Data;
 public static class SqlHelper
 {
     /// <summary>
-    /// Fixes the type of the parameter to something suitable as SQL parameter.
+    /// Fixes the type of the parameter to something suitable as a SQL parameter.
     /// </summary>
     /// <param name="value">The value.</param>
-    /// <returns></returns>
+    /// <returns>The value converted to a suitable SQL parameter type.</returns>
     public static object FixParamType(object value)
     {
         if (value == null)
@@ -57,9 +57,9 @@ public static class SqlHelper
     /// <summary>
     /// Logs the command.
     /// </summary>
-    /// <param name="method">The type.</param>
+    /// <param name="method">The method name.</param>
     /// <param name="command">The command.</param>
-    /// <param name="logger">Logger</param>
+    /// <param name="logger">The logger.</param>
     public static void LogCommand(string method, IDbCommand command, ILogger logger)
     {
         ArgumentNullException.ThrowIfNull(logger);
@@ -81,7 +81,7 @@ public static class SqlHelper
     /// <param name="name">The name.</param>
     /// <param name="value">The value.</param>
     /// <param name="dialect">The dialect.</param>
-    /// <returns>New parameter</returns>
+    /// <returns>The new parameter.</returns>
     public static IDbDataParameter AddParamWithValue(this IDbCommand command, string name, object value, ISqlDialect dialect)
     {
         name = dialect.ParameterPrefix != '@' &&
@@ -139,12 +139,12 @@ public static class SqlHelper
     }
 
     /// <summary>
-    /// Creates new command.
+    /// Creates a new command.
     /// </summary>
     /// <param name="connection">The connection.</param>
     /// <param name="commandText">The command text.</param>
     /// <param name="param">The parameters.</param>
-    /// <returns>New command with specified command text and parameters</returns>
+    /// <returns>A new command with the specified command text and parameters.</returns>
     public static IDbCommand NewCommand(IDbConnection connection, string commandText, IDictionary<string, object> param)
     {
         var command = NewCommand(connection, commandText);
@@ -173,8 +173,8 @@ public static class SqlHelper
     /// </summary>
     /// <param name="connection">The connection.</param>
     /// <param name="commandText">The command text.</param>
-    /// <returns>A new command with specified command text</returns>
-    /// <exception cref="ArgumentNullException">connection</exception>
+    /// <returns>A new command with the specified command text.</returns>
+    /// <exception cref="ArgumentNullException">connection is null.</exception>
     public static IDbCommand NewCommand(IDbConnection connection, string commandText)
     {
         ArgumentNullException.ThrowIfNull(connection);
@@ -216,11 +216,11 @@ public static class SqlHelper
     }
 
     /// <summary>
-    /// Executes the SQL statement, and returns affected rows.
+    /// Executes the SQL statement and returns the number of affected rows.
     /// </summary>
     /// <param name="command">The command.</param>
-    /// <param name="logger">Logger</param>
-    /// <returns></returns>
+    /// <param name="logger">The logger.</param>
+    /// <returns>The number of affected rows.</returns>
     /// <exception cref="ArgumentNullException">
     /// command is null or command.Connection is null.
     /// </exception>
@@ -267,13 +267,13 @@ public static class SqlHelper
     }
 
     /// <summary>
-    /// Executes the statement
+    /// Executes the statement.
     /// </summary>
     /// <param name="connection">The connection.</param>
     /// <param name="commandText">The command text.</param>
     /// <param name="param">The parameters.</param>
-    /// <param name="logger">Logger</param>
-    /// <returns>Number of affected rows</returns>
+    /// <param name="logger">The logger.</param>
+    /// <returns>The number of affected rows.</returns>
     public static int ExecuteNonQuery(IDbConnection connection, string commandText, IDictionary<string, object> param = null, ILogger logger = null)
     {
         if (connection is ISqlOperationInterceptor interceptor &&
@@ -289,9 +289,10 @@ public static class SqlHelper
     /// </summary>
     /// <param name="query">The query.</param>
     /// <param name="connection">The connection.</param>
-    /// <param name="logger">Logger</param>
-    /// <exception cref="ArgumentNullException">query.IdentityColumn is null</exception>
-    /// <exception cref="NotImplementedException">The connection dialect doesn't support returning inserted identity.</exception>
+    /// <param name="logger">The logger.</param>
+    /// <returns>The generated identity value, or null if none was generated.</returns>
+    /// <exception cref="ArgumentNullException">query.IdentityColumn is null.</exception>
+    /// <exception cref="NotImplementedException">The connection dialect doesn't support returning the inserted identity.</exception>
     public static long? ExecuteAndGetID(this SqlInsert query, IDbConnection connection, ILogger logger = null)
     {
         string queryText = query.ToString();
@@ -356,11 +357,11 @@ public static class SqlHelper
     }
 
     /// <summary>
-    /// Executes the specified query on connection.
+    /// Executes the specified query on the connection.
     /// </summary>
     /// <param name="query">The query.</param>
     /// <param name="connection">The connection.</param>
-    /// <param name="logger">Logger</param>
+    /// <param name="logger">The logger.</param>
     public static void Execute(this SqlInsert query, IDbConnection connection, ILogger logger = null)
     {
         string commandText = query.ToString();
@@ -373,15 +374,15 @@ public static class SqlHelper
     }
 
     /// <summary>
-    /// Executes an UPSERT (insert or update) query on the connection and returns number of affected rows.
+    /// Executes an UPSERT (insert or update) query on the connection and returns the number of affected rows.
     /// The key fields are used to determine whether an existing record is updated or a new record is inserted.
     /// </summary>
     /// <param name="query">The insert query.</param>
     /// <param name="connection">The connection.</param>
     /// <param name="keyFields">List of key fields (e.g. primary key columns) used to match an existing record.</param>
-    /// <param name="expectedRows">The expected rows. Used to validate expected number of affected rows.</param>
-    /// <param name="logger">Logger</param>
-    /// <returns>Number of affected rows.</returns>
+    /// <param name="expectedRows">The expected rows. Used to validate the expected number of affected rows.</param>
+    /// <param name="logger">The logger.</param>
+    /// <returns>The number of affected rows.</returns>
     public static int ExecuteUpsert(this SqlInsert query, IDbConnection connection,
         IEnumerable<string> keyFields, ExpectedRows expectedRows = ExpectedRows.Ignore, ILogger logger = null)
     {
@@ -429,13 +430,13 @@ public static class SqlHelper
     }
 
     /// <summary>
-    /// Executes the specified update query on connection and returns number of affected rows.
+    /// Executes the specified update query on the connection and returns the number of affected rows.
     /// </summary>
     /// <param name="query">The query.</param>
     /// <param name="connection">The connection.</param>
-    /// <param name="expectedRows">The expected rows. Used to validate expected number of affected rows.</param>
-    /// <param name="logger">Logger</param>
-    /// <returns>Number of affected rows.</returns>
+    /// <param name="expectedRows">The expected rows. Used to validate the expected number of affected rows.</param>
+    /// <param name="logger">The logger.</param>
+    /// <returns>The number of affected rows.</returns>
     public static int Execute(this SqlUpdate query, IDbConnection connection, ExpectedRows expectedRows = ExpectedRows.One, ILogger logger = null)
     {
         string commandText = query.ToString();
@@ -448,14 +449,14 @@ public static class SqlHelper
     }
 
     /// <summary>
-    /// Executes the specified delete query on connection and returns number of affected rows.
+    /// Executes the specified delete query on the connection and returns the number of affected rows.
     /// </summary>
     /// <param name="query">The query.</param>
     /// <param name="connection">The connection.</param>
-    /// <param name="expectedRows">The expected rows. Used to validate expected number of affected rows.</param>
-    /// <param name="logger">Logger</param>
+    /// <param name="expectedRows">The expected rows. Used to validate the expected number of affected rows.</param>
+    /// <param name="logger">The logger.</param>
     /// <returns>
-    /// Number of affected rows.
+    /// The number of affected rows.
     /// </returns>
     public static int Execute(this SqlDelete query, IDbConnection connection, ExpectedRows expectedRows = ExpectedRows.One, ILogger logger = null)
     {
@@ -517,9 +518,9 @@ public static class SqlHelper
     /// <param name="connection">The connection.</param>
     /// <param name="commandText">The command text.</param>
     /// <param name="param">The parameters.</param>
-    /// <param name="logger">Logger</param>
-    /// <returns></returns>
-    /// <exception cref="ArgumentNullException">connection is null</exception>
+    /// <param name="logger">The logger.</param>
+    /// <returns>A data reader with the results.</returns>
+    /// <exception cref="ArgumentNullException">connection is null.</exception>
     public static IDataReader ExecuteReader(IDbConnection connection, string commandText,
         IDictionary<string, object> param, ILogger logger = null)
     {
@@ -535,8 +536,8 @@ public static class SqlHelper
     /// </summary>
     /// <param name="query">The query.</param>
     /// <param name="connection">The connection.</param>
-    /// <param name="logger">Logger</param>
-    /// <returns>A data reader with results.</returns>
+    /// <param name="logger">The logger.</param>
+    /// <returns>A data reader with the results.</returns>
     public static IDataReader ExecuteReader(this SqlQuery query, IDbConnection connection, ILogger logger = null)
     {
         ArgumentNullException.ThrowIfNull(query);
@@ -595,9 +596,9 @@ public static class SqlHelper
     /// <param name="connection">The connection.</param>
     /// <param name="commandText">The command text.</param>
     /// <param name="param">The parameters.</param>
-    /// <param name="logger">Logger</param>
-    /// <returns></returns>
-    /// <exception cref="ArgumentNullException">connection</exception>
+    /// <param name="logger">The logger.</param>
+    /// <returns>The scalar value.</returns>
+    /// <exception cref="ArgumentNullException">connection is null.</exception>
     public static object ExecuteScalar(IDbConnection connection, string commandText, IDictionary<string, object> param = null, ILogger logger = null)
     {
         if (connection is ISqlOperationInterceptor interceptor &&
@@ -612,9 +613,9 @@ public static class SqlHelper
     /// </summary>
     /// <param name="connection">The connection.</param>
     /// <param name="query">The select query.</param>
-    /// <param name="logger">Logger</param>
-    /// <returns>Scalar value</returns>
-    /// <exception cref="ArgumentNullException">selectQuery is null</exception>
+    /// <param name="logger">The logger.</param>
+    /// <returns>The scalar value.</returns>
+    /// <exception cref="ArgumentNullException">selectQuery is null.</exception>
     public static object ExecuteScalar(IDbConnection connection, SqlQuery query, ILogger logger = null)
     {
         ArgumentNullException.ThrowIfNull(query);
@@ -632,8 +633,8 @@ public static class SqlHelper
     /// </summary>
     /// <param name="query">The query.</param>
     /// <param name="connection">The connection.</param>
-    /// <param name="logger">Logger</param>
-    /// <returns>True if query returns one result.</returns>
+    /// <param name="logger">The logger.</param>
+    /// <returns>True if the query returns at least one result.</returns>
     public static bool Exists(this SqlQuery query, IDbConnection connection, ILogger logger = null)
     {
         using var reader = ExecuteReader(query, connection, logger);

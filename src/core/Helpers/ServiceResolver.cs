@@ -5,12 +5,12 @@ namespace Serenity.Extensions.DependencyInjection;
 /// <summary>
 /// A generic version of IServiceProvider which resolves a service on demand.
 /// </summary>
-/// <typeparam name="TService"></typeparam>
+/// <typeparam name="TService">The type of the service to resolve.</typeparam>
 /// <remarks>
 /// Initializes a new instance.
 /// </remarks>
-/// <param name="serviceProvider">The service provider</param>
-/// <exception cref="ArgumentNullException">Throws when service provider is null</exception>
+/// <param name="serviceProvider">The service provider.</param>
+/// <exception cref="ArgumentNullException">Throws when the service provider is null.</exception>
 public class ServiceResolver<TService>(IServiceProvider serviceProvider) : IServiceResolver<TService> 
     where TService : notnull
 {
@@ -19,7 +19,7 @@ public class ServiceResolver<TService>(IServiceProvider serviceProvider) : IServ
     /// <summary>
     /// Resolves TService using the service provider. If the service was registered as transient, this method acts like a factory.
     /// </summary>
-    /// <returns>TService instance</returns>
+    /// <returns>TService instance.</returns>
     public TService Resolve()
     {
         return serviceProvider.GetRequiredService<TService>();

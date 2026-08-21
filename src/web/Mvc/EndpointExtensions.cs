@@ -8,16 +8,17 @@ using System.Threading.Tasks;
 namespace Serenity.Services;
 
 /// <summary>
-/// Contains some extensions for service endpoints
+/// Contains some extensions for service endpoints.
 /// </summary>
 public static class EndpointExtensions
 {
     /// <summary>
-    /// Converts the exception object to a service response
+    /// Converts the exception object to a service response.
     /// </summary>
-    /// <typeparam name="TResponse">Response object</typeparam>
-    /// <param name="exception">Exception</param>
-    /// <param name="httpContext">HTTP context</param>
+    /// <typeparam name="TResponse">The response object type.</typeparam>
+    /// <param name="exception">The exception.</param>
+    /// <param name="httpContext">The HTTP context.</param>
+    /// <returns>The converted service response.</returns>
     public static TResponse ConvertToResponse<TResponse>(this Exception exception, HttpContext httpContext)
         where TResponse : ServiceResponse, new()
     {
@@ -29,13 +30,14 @@ public static class EndpointExtensions
     }
 
     /// <summary>
-    /// Convert the exception to a service response
+    /// Converts the exception to a service response.
     /// </summary>
-    /// <typeparam name="TResponse"></typeparam>
-    /// <param name="exception">Exception</param>
-    /// <param name="logger">Exception logger</param>
-    /// <param name="localizer">Text localizer</param>
-    /// <param name="showDetails">True to show details</param>
+    /// <typeparam name="TResponse">The response object type.</typeparam>
+    /// <param name="exception">The exception.</param>
+    /// <param name="logger">The exception logger.</param>
+    /// <param name="localizer">The text localizer.</param>
+    /// <param name="showDetails"><c>true</c> to show details.</param>
+    /// <returns>The converted service response.</returns>
     public static TResponse ConvertToResponse<TResponse>(this Exception exception, ILogger logger, 
         ITextLocalizer localizer, bool showDetails)
         where TResponse: ServiceResponse, new()
@@ -78,12 +80,12 @@ public static class EndpointExtensions
     }
 
     /// <summary>
-    /// Executes an action method and converts any exception to a service response
+    /// Executes an action method and converts any exception to a service response.
     /// </summary>
-    /// <typeparam name="TResponse">Response type</typeparam>
-    /// <param name="controller">Controller</param>
-    /// <param name="handler">Handler callback</param>
-    /// <returns></returns>
+    /// <typeparam name="TResponse">The response type.</typeparam>
+    /// <param name="controller">The controller.</param>
+    /// <param name="handler">The handler callback.</param>
+    /// <returns>The action result.</returns>
     public static Result<TResponse> ExecuteMethod<TResponse>(this ControllerBase controller, Func<TResponse> handler)
         where TResponse: ServiceResponse, new()
     {
@@ -103,12 +105,12 @@ public static class EndpointExtensions
     }
 
     /// <summary>
-    /// Executes an action method and converts any exception to a service response
+    /// Executes an action method asynchronously and converts any exception to a service response.
     /// </summary>
-    /// <typeparam name="TResponse">Response type</typeparam>
-    /// <param name="controller">Controller</param>
-    /// <param name="handler">Handler callback</param>
-    /// <returns></returns>
+    /// <typeparam name="TResponse">The response type.</typeparam>
+    /// <param name="controller">The controller.</param>
+    /// <param name="handler">The handler callback.</param>
+    /// <returns>The action result.</returns>
     public static async Task<Result<TResponse>> ExecuteMethodAsync<TResponse>(this ControllerBase controller, Func<Task<TResponse>> handler)
         where TResponse : ServiceResponse, new()
     {
@@ -131,10 +133,11 @@ public static class EndpointExtensions
     /// Executes a callback by passing a connection object and converts
     /// any exception raised inside to a service response.
     /// </summary>
-    /// <typeparam name="TResponse">Response type</typeparam>
-    /// <param name="controller">Controller</param>
-    /// <param name="connectionKey">Connection key</param>
-    /// <param name="handler">Handler callback</param>
+    /// <typeparam name="TResponse">The response type.</typeparam>
+    /// <param name="controller">The controller.</param>
+    /// <param name="connectionKey">The connection key.</param>
+    /// <param name="handler">The handler callback.</param>
+    /// <returns>The action result.</returns>
     public static Result<TResponse> UseConnection<TResponse>(this ControllerBase controller, string connectionKey, Func<IDbConnection, TResponse> handler)
         where TResponse : ServiceResponse, new()
     {
@@ -160,10 +163,11 @@ public static class EndpointExtensions
     /// Executes a callback by passing a unit of work object and converts
     /// any exception raised inside to a service response.
     /// </summary>
-    /// <typeparam name="TResponse">Response type</typeparam>
-    /// <param name="controller">Controller</param>
-    /// <param name="connectionKey">Connection key</param>
-    /// <param name="handler">Handler callback</param>
+    /// <typeparam name="TResponse">The response type.</typeparam>
+    /// <param name="controller">The controller.</param>
+    /// <param name="connectionKey">The connection key.</param>
+    /// <param name="handler">The handler callback.</param>
+    /// <returns>The action result.</returns>
     public static Result<TResponse> InTransaction<TResponse>(this ControllerBase controller, string connectionKey, Func<IUnitOfWork, TResponse> handler)
         where TResponse : ServiceResponse, new()
     {

@@ -26,12 +26,12 @@ public class DialectExpressionSelector(ISqlDialect dialect)
     }
 
     /// <summary>
-    /// Gets the best match.
+    /// Gets the best matching attribute for the current dialect.
     /// </summary>
     /// <typeparam name="TAttribute">The type of the attribute.</typeparam>
     /// <param name="attributes">The expressions.</param>
     /// <param name="getDialect">The get dialect.</param>
-    /// <returns></returns>
+    /// <returns>The best matching attribute, or <c>null</c> if none match.</returns>
     public TAttribute GetBestMatch<TAttribute>(IEnumerable<TAttribute> attributes, 
         Func<TAttribute, string> getDialect)
         where TAttribute: class

@@ -3,7 +3,7 @@
 namespace Serenity.Web;
 
 /// <summary>
-/// Default file watcher implementation for physical file system
+/// Default file watcher implementation for the physical file system.
 /// </summary>
 public class FileWatcher : IFileWatcher, IDisposable
 {
@@ -12,11 +12,11 @@ public class FileWatcher : IFileWatcher, IDisposable
     private readonly FileSystemWatcher watcher;
 
     /// <summary>
-    /// Creates a new instance of the class
+    /// Initializes a new instance of the <see cref="FileWatcher"/> class.
     /// </summary>
-    /// <param name="path">Watch path</param>
-    /// <param name="filter">Watch filter</param>
-    /// <exception cref="ArgumentNullException">One of the arguments is null</exception>
+    /// <param name="path">The directory path to watch.</param>
+    /// <param name="filter">The file filter to watch for.</param>
+    /// <exception cref="ArgumentNullException">One of the arguments is <c>null</c>.</exception>
     public FileWatcher(string path, string filter)
     {
         Path = path ?? throw new ArgumentNullException(nameof(path));

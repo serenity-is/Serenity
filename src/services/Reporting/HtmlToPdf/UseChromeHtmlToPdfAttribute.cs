@@ -7,7 +7,7 @@
 public class UseChromeHtmlToPdfAttribute : UseWKHtmlToPdfAttribute
 {
     /// <summary>
-    /// Creates a new instance of the attribute with False as the value
+    /// Initializes a new instance of the attribute with <c>false</c> as the value.
     /// </summary>
     public UseChromeHtmlToPdfAttribute()
         : base(false)

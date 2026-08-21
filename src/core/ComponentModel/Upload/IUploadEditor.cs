@@ -1,10 +1,10 @@
 ﻿namespace Serenity.ComponentModel;
 
 /// <summary>
-/// Runs FileUploadBehavior or MultipleFileUploadBehavior behaviors.
-/// Make sure you use this attribute in Row.cs, not Form.cs as 
-/// the image upload behavior only works if it is in row, otherwise
-/// your files will stay in temporary directory.
+/// Runs the FileUploadBehavior or MultipleFileUploadBehavior behaviors.
+/// Make sure you use this attribute in Row.cs, not Form.cs as
+/// the image upload behavior only works if it is in the row, otherwise
+/// your files will stay in the temporary directory.
 /// </summary>
 public interface IUploadEditor
 {
@@ -14,8 +14,8 @@ public interface IUploadEditor
     public bool IsMultiple { get; }
 
     /// <summary>
-    /// If you don't want FileUploadBehavior / MultipleFileUploadBehavior to process this upload, 
-    /// and want to handle it manually, set to true (not recommended)
+    /// If you don't want FileUploadBehavior / MultipleFileUploadBehavior to process this upload,
+    /// and want to handle it manually, set it to true (not recommended).
     /// </summary>
     public bool DisableDefaultBehavior { get; }
 

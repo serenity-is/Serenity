@@ -1,64 +1,64 @@
 namespace Serenity.Data;
 
 /// <summary>
-/// Enumeration of field types
+/// Enumeration of field types.
 /// </summary>
 public enum FieldType
 {
     /// <summary>
-    /// String
+    /// String.
     /// </summary>
     String,
     /// <summary>
-    /// Int16
+    /// Int16.
     /// </summary>
     Int16,
     /// <summary>
-    /// Int32
+    /// Int32.
     /// </summary>
     Int32,
     /// <summary>
-    /// Int64
+    /// Int64.
     /// </summary>
     Int64,
     /// <summary>
-    /// Boolean
+    /// Boolean.
     /// </summary>
     Boolean,
     /// <summary>
-    /// Decimal
+    /// Decimal.
     /// </summary>
     Decimal,
     /// <summary>
-    /// Single
+    /// Single.
     /// </summary>
     Single,
     /// <summary>
-    /// Double
+    /// Double.
     /// </summary>
     Double,
     /// <summary>
-    /// Date/Time
+    /// Date/Time.
     /// </summary>
     DateTime,
     /// <summary>
-    /// Time
+    /// Time.
     /// </summary>
     Time,
     /// <summary>
-    /// Guid
+    /// Guid.
     /// </summary>
     Guid,
     /// <summary>
-    /// Stream
+    /// Stream.
     /// </summary>
     Stream,
     /// <summary>
-    /// Other types (Object)
+    /// Other types (Object).
     /// </summary>
     Object,
     /// <summary>
-    /// DateOnly
+    /// DateOnly.
     /// </summary>
     DateOnly
 }

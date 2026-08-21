@@ -6,10 +6,10 @@
 /// files will be kept while the new files will be deleted.
 /// </summary>
 /// <remarks>
-/// Creates a new instance of the class
+/// Initializes a new instance of the class.
 /// </remarks>
 /// <param name="storage">Upload storage</param>
-/// <exception cref="ArgumentNullException">storage is null</exception>
+/// <exception cref="ArgumentNullException"><paramref name="storage"/> is <c>null</c>.</exception>
 public class FilesToDelete(IUploadStorage storage) : List<string>, IDisposable, IFilesToDelete
 {
     private readonly IUploadStorage storage = storage ?? throw new ArgumentNullException(nameof(storage));

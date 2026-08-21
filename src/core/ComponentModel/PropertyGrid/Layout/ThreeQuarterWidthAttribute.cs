@@ -1,8 +1,8 @@
 ﻿namespace Serenity.ComponentModel;
 
 /// <summary>
-/// Marks form field with "col-lg-9" css class, which makes it allocate 
-/// three quarter on device widths >= 1200px
+/// Marks the form field with the "col-lg-9" CSS class, which makes it allocate
+/// three quarters on device widths >= 1200px.
 /// </summary>
 public class ThreeQuarterWidthAttribute : FormWidthAttribute
 {

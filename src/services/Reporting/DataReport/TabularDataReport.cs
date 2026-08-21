@@ -39,23 +39,23 @@ public class TabularDataReport : IDataOnlyReport
     protected List<ReportColumn> ColumnList { get; set; }
 
     /// <summary>
-    /// A group key for caching
+    /// A group key for caching.
     /// </summary>
     public const string CacheGroupKey = nameof(TabularDataReport);
 
     /// <summary>
-    /// Creates an instance of the class.
+    /// Initializes a new instance of the class.
     /// </summary>
     protected TabularDataReport()
     {
     }
 
     /// <summary>
-    /// Creates an instance of the class.
+    /// Initializes a new instance of the class with the given data and report columns.
     /// </summary>
     /// <param name="data">The data objects</param>
     /// <param name="columns">List of report columns</param>
-    /// <exception cref="ArgumentNullException"></exception>
+    /// <exception cref="ArgumentNullException"><paramref name="data"/> or <paramref name="columns"/> is <c>null</c>.</exception>
     public TabularDataReport(IEnumerable data, IEnumerable<ReportColumn> columns)
     {
         Data = data ?? throw new ArgumentNullException(nameof(data));
@@ -63,13 +63,13 @@ public class TabularDataReport : IDataOnlyReport
     }
 
     /// <summary>
-    /// Creates an instance of the class.
+    /// Initializes a new instance of the class with the given data and columns type.
     /// </summary>
     /// <param name="data">The data objects</param>
     /// <param name="columnsType">The columns type</param>
     /// <param name="serviceProvider">Service provider that will be used to
     /// extract PropertyItems from the columns type</param>
-    /// <exception cref="ArgumentNullException"></exception>
+    /// <exception cref="ArgumentNullException"><paramref name="data"/>, <paramref name="columnsType"/> or <paramref name="serviceProvider"/> is <c>null</c>.</exception>
     public TabularDataReport(IEnumerable data, Type columnsType,
         IServiceProvider serviceProvider)
     {
@@ -80,14 +80,14 @@ public class TabularDataReport : IDataOnlyReport
     }
 
     /// <summary>
-    /// Creates an instance of the class.
+    /// Initializes a new instance of the class with the given data, columns type and export columns.
     /// </summary>
     /// <param name="data">The data objects</param>
     /// <param name="columnsType">The columns type</param>
     /// <param name="exportColumns">The list of column property names to export</param>
     /// <param name="serviceProvider">Service provider that will be used to
     /// extract PropertyItems from the columns type</param>
-    /// <exception cref="ArgumentNullException"></exception>
+    /// <exception cref="ArgumentNullException"><paramref name="data"/>, <paramref name="columnsType"/>, <paramref name="exportColumns"/> or <paramref name="serviceProvider"/> is <c>null</c>.</exception>
     public TabularDataReport(IEnumerable data, Type columnsType, IEnumerable<string> exportColumns,
         IServiceProvider serviceProvider)
     {
@@ -124,7 +124,7 @@ public class TabularDataReport : IDataOnlyReport
     /// <param name="columnsType">The columns type</param>
     /// <param name="exportColumns">The list of column property names to export</param>
     /// <param name="serviceProvider">Service provider</param>
-    /// <exception cref="ArgumentNullException">columnsType or serviceProvider is null</exception>
+    /// <exception cref="ArgumentNullException"><paramref name="columnsType"/> or <paramref name="serviceProvider"/> is <c>null</c>.</exception>
     public static List<ReportColumn> GetColumnListFor(Type columnsType,
         IEnumerable<string> exportColumns, IServiceProvider serviceProvider)
     {
@@ -201,7 +201,7 @@ public class TabularDataReport : IDataOnlyReport
     /// <param name="property">PropertyInfo if any</param>
     /// <param name="provider">Service provider</param>
     /// <param name="localizer">Text localizer</param>
-    /// <exception cref="ArgumentNullException">item or localizer is null</exception>
+    /// <exception cref="ArgumentNullException"><paramref name="item"/> or <paramref name="localizer"/> is <c>null</c>.</exception>
     public static ReportColumn FromPropertyItem(PropertyItem item, Field field, 
         PropertyInfo property, IServiceProvider provider, ITextLocalizer localizer)
     {

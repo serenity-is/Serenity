@@ -2,25 +2,25 @@
 namespace Serenity.Localization;
 
 /// <summary>
-/// An interface implemented by LocalText class to access initial translation value.
-/// Some classes like NestedLocalTextRegistration uses this type to avoid re-registering
-/// a initialized local text object, when their Initialization method called more than once.
+/// An interface implemented by the <see cref="LocalText"/> class to access the initial translation value.
+/// Some classes like <see cref="NestedLocalTextRegistration"/> use this type to avoid re-registering
+/// an already initialized local text object when their initialization method is called more than once.
 /// </summary>
 public interface ILocalText
 {
     /// <summary>
-    /// Gets the key
+    /// Gets the local text key.
     /// </summary>
     string Key { get; }
 
     /// <summary>
-    /// Returns original key before the replacement / initialization
+    /// Returns the original key before the replacement or initialization.
     /// </summary>
     string? OriginalKey { get; }
 
     /// <summary>
-    /// Replaces local text key with the new key and stores the original key as initial text
+    /// Replaces the local text key with the new key and stores the original key as the initial text.
     /// </summary>
-    /// <param name="newKey">New key</param>
+    /// <param name="newKey">The new key.</param>
     void ReplaceKey(string newKey);
 }

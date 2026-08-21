@@ -3,7 +3,8 @@ using System.Text.Json;
 namespace Serenity.JsonConverters;
 
 /// <summary>
-///   Serialize/deserialize a HashSet object as string</summary>
+/// Serializes and deserializes a <see cref="HashSet{T}"/> of strings as a JSON array.
+/// </summary>
 public class HashSetStringJsonConverter : JsonConverter<HashSet<string>>
 {
     /// <inheritdoc/>

@@ -6,7 +6,7 @@ public partial class SqlQuery
     ///   Formats SQL Query as string. If paging is used and skip requested, multiple queries 
     ///   might be created one after each other.</summary>
     /// <returns>
-    ///   Formatted SELECT statement</returns>
+    ///   Formatted SELECT statement.</returns>
     public override string ToString()
     {
         return ToString(this, dialect);
@@ -31,8 +31,11 @@ public partial class SqlQuery
     /// <summary>
     ///   Formats SQL Query as string. If paging is used and skip requested, multiple queries 
     ///   might be created one after each other.</summary>
+    /// <param name="query">The query to format.</param>
+    /// <param name="dialect">The target dialect.</param>
     /// <returns>
-    ///   Formatted SELECT statement</returns>
+    ///   Formatted SELECT statement.</returns>
+    /// <exception cref="ArgumentNullException">query is null.</exception>
     public static string ToString(ISqlQuery query, ISqlDialect dialect)
     {
         ArgumentNullException.ThrowIfNull(query);

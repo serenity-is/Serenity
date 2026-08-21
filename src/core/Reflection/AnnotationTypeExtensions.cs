@@ -1,16 +1,16 @@
 namespace Serenity.Reflection;
 
 /// <summary>
-/// Extension methods for annotation types
+/// Extension methods for annotation types.
 /// </summary>
 public static class AnnotationTypeExtensions
 {
     /// <summary>
-    /// Gets the annotated type information for given type.
+    /// Gets the annotated type information for the given type.
     /// </summary>
-    /// <param name="annotationTypes">Annotation types</param>
+    /// <param name="annotationTypes">The annotation types.</param>
     /// <returns>
-    /// Annotated type information
+    /// The annotated type information.
     /// </returns>
     public static IAnnotatedType GetAnnotatedType(this IEnumerable<Type> annotationTypes)
     {

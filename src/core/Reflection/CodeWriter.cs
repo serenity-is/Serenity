@@ -248,8 +248,8 @@ public class CodeWriter(StringBuilder sb, int tabSize)
     /// <summary>
     /// Returns true if the namespace is in list of usings.
     /// </summary>
-    /// <param name="ns"></param>
-    /// <returns></returns>
+    /// <param name="ns">The namespace to check.</param>
+    /// <returns>True if the namespace is in the list of usings; otherwise, false.</returns>
     public bool IsUsing(string ns)
     {
         if (ns == CurrentNamespace)
@@ -262,12 +262,13 @@ public class CodeWriter(StringBuilder sb, int tabSize)
     }
 
     /// <summary>
-    /// Returns true if the namespace is in list of usings.
-    /// If AllowUsing callback is null or returns true, or force is true,
+    /// Returns true if the namespace is in the list of usings.
+    /// If the AllowUsing callback is null or returns true, or force is true,
     /// this may add it to the list of local usings.
     /// </summary>
-    /// <param name="ns"></param>
-    /// <param name="force"></param>
+    /// <param name="ns">The namespace to check.</param>
+    /// <param name="force"><c>true</c> to add the namespace to the local usings regardless of the AllowUsing callback.</param>
+    /// <returns><c>true</c> if the namespace is in the list of usings; otherwise, <c>false</c>.</returns>
     public bool Using(string ns, bool force)
     {
         if (IsUsing(ns))
@@ -284,11 +285,12 @@ public class CodeWriter(StringBuilder sb, int tabSize)
     }
 
     /// <summary>
-    /// Returns true if the namespace is in list of usings.
-    /// If AllowUsing callback is null or returns true, 
+    /// Returns true if the namespace is in the list of usings.
+    /// If the AllowUsing callback is null or returns true,
     /// this may add it to the list of local usings.
     /// </summary>
-    /// <param name="ns"></param>
+    /// <param name="ns">The namespace to check.</param>
+    /// <returns><c>true</c> if the namespace is in the list of usings; otherwise, <c>false</c>.</returns>
     public bool Using(string ns)
     {
         return Using(ns, false);
@@ -326,19 +328,20 @@ public class CodeWriter(StringBuilder sb, int tabSize)
     /// <summary>
     /// Inserts string to internal string builder
     /// </summary>
-    /// <param name="text"></param>
-    /// <param name="index"></param>
+    /// <param name="text">The text to insert.</param>
+    /// <param name="index">The zero-based index at which to insert the text.</param>
     public StringBuilder Insert(int index, string text)
     {
         return sb.Insert(index, text);
     }
 
     /// <summary>
-    /// Tries to add namespace
+    /// Returns the short type name for the given namespace and type name, adding the namespace
+    /// to the local usings if possible.
     /// </summary>
-    /// <param name="ns">Namespace</param>
-    /// <param name="typeName">Type name</param>
-    /// <returns>if succeeds returns only typeName if fails returns fullName</returns>
+    /// <param name="ns">The namespace.</param>
+    /// <param name="typeName">The type name.</param>
+    /// <returns>The type name alone if the namespace can be used, otherwise the fully qualified name.</returns>
     public string ShortTypeName(string ns, string typeName)
     {
         if (string.IsNullOrEmpty(typeName))
@@ -359,9 +362,11 @@ public class CodeWriter(StringBuilder sb, int tabSize)
     }
 
     /// <summary>
-    /// Tries to add namespace
+    /// Returns the short type name for the given fully qualified name, adding the namespace
+    /// to the local usings if possible.
     /// </summary>
-    /// <returns>if succeeds returns only typeName if fails returns fullName</returns>
+    /// <param name="fullName">The fully qualified type name.</param>
+    /// <returns>The type name alone if the namespace can be used, otherwise the fully qualified name.</returns>
     public string ShortTypeName(string fullName)
     {
         var idx = fullName.LastIndexOf('.');
@@ -382,9 +387,10 @@ public class CodeWriter(StringBuilder sb, int tabSize)
     }
 
     /// <summary>
-    /// Determines is Type is a C# primitive keyword
+    /// Determines whether the given type name is a C# primitive keyword.
     /// </summary>
-    /// <param name="dataType"></param>
+    /// <param name="dataType">The type name to check.</param>
+    /// <returns><c>true</c> if the type name is a C# primitive keyword; otherwise, <c>false</c>.</returns>
     public static bool IsCSKeyword(string dataType)
     {
         return dataType switch
@@ -409,9 +415,10 @@ public class CodeWriter(StringBuilder sb, int tabSize)
     }
 
     /// <summary>
-    /// Returns true if the identifier is a reserved JavaScript keyword
+    /// Returns <c>true</c> if the identifier is a reserved JavaScript keyword.
     /// </summary>
-    /// <param name="identifier">Identifier</param>
+    /// <param name="identifier">The identifier to check.</param>
+    /// <returns><c>true</c> if the identifier is a reserved JavaScript keyword; otherwise, <c>false</c>.</returns>
     public static bool IsJSKeyword(string identifier)
     {
         return JsReserved.Contains(identifier);
@@ -489,9 +496,10 @@ public class CodeWriter(StringBuilder sb, int tabSize)
 
 
     /// <summary>
-    /// Converts primitive class to C# keyword if given class is not a primitive class returns null.
+    /// Converts a primitive class name to its C# keyword. If the given class is not a primitive class, returns <c>null</c>.
     /// </summary>
-    /// <param name="dataType"></param>
+    /// <param name="dataType">The class name to convert.</param>
+    /// <returns>The corresponding C# keyword, or <c>null</c> if the class is not a primitive.</returns>
     public static string? ToCSKeyword(string dataType)
     {
         return dataType switch
@@ -516,12 +524,13 @@ public class CodeWriter(StringBuilder sb, int tabSize)
     }
 
     /// <summary>
-    /// Converts datatype with a namespace to datatype without namespace if its namespace 
-    /// is in the allowed usings else returns fullname.
-    /// This can handle nullables, CS keywords and generics to some extent.
-    /// Please see <see cref="IsCSharp"/> if you are using this for C#
+    /// Converts a data type with a namespace to a data type without the namespace if its namespace
+    /// is in the allowed usings, otherwise returns the full name.
+    /// This can handle nullables, C# keywords, and generics to some extent.
+    /// See <see cref="IsCSharp"/> if you are using this for C#.
     /// </summary>
-    /// <param name="fullName">Full name of the class</param>
+    /// <param name="fullName">The full name of the class.</param>
+    /// <returns>The short type reference, or the full name if the namespace cannot be used.</returns>
     public string ShortTypeRef(string fullName)
     {
         fullName = fullName.Trim();

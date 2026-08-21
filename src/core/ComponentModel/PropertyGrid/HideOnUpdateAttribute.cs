@@ -1,12 +1,13 @@
 ﻿namespace Serenity.ComponentModel;
 
 /// <summary>
-/// Controls whether this field is visible on edit record mode
+/// Controls whether this field is visible in edit record mode.
 /// </summary>
 /// <remarks>
-/// Controls whether this field is visible on edit record mode
+/// When placed on a field, this attribute controls whether the field
+/// is hidden when editing an existing record.
 /// </remarks>
-/// <param name="value">True to hide field on update</param>
+/// <param name="value">True to hide the field on update.</param>
 public class HideOnUpdateAttribute(bool value = true) : Attribute
 {
 

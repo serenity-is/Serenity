@@ -15,8 +15,8 @@ public partial class RadioButtonEditorAttribute : CustomEditorAttribute
     /// Initializes a new instance of the <see cref="RadioButtonEditorAttribute"/> class.
     /// </summary>
     /// <param name="enumOrLookupType">Type of the enum or lookup.</param>
-    /// <exception cref="ArgumentNullException">enumOrLookupType</exception>
-    /// <exception cref="ArgumentException">lookupType</exception>
+    /// <exception cref="ArgumentNullException">Thrown if <paramref name="enumOrLookupType"/> is null.</exception>
+    /// <exception cref="ArgumentException">Thrown if the type is not an enum and has no [LookupScript] attribute.</exception>
     public RadioButtonEditorAttribute(Type enumOrLookupType)
         : base(Key)
     {

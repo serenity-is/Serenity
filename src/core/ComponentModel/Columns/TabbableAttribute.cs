@@ -12,7 +12,6 @@ namespace Serenity.ComponentModel;
 /// </remarks>
 /// <param name="value">if set to <c>true</c> (default) column is tabbable.</param>
 [AttributeUsage(AttributeTargets.Property, AllowMultiple = false)]
-
 public class TabbableAttribute(bool value = true) : Attribute
 {
 

@@ -7,12 +7,12 @@
 public static class PrefixHelper
 {
     /// <summary>
-    /// Determines the prefix length
+    /// Determines the prefix length.
     /// </summary>
     /// <typeparam name="T">The item type</typeparam>
     /// <param name="list">List of objects</param>
     /// <param name="getName">Gets the field name from a list element</param>
-    /// <returns></returns>
+    /// <returns>The length of the common prefix, or <c>0</c> if there is none.</returns>
     public static int DeterminePrefixLength<T>(IEnumerable<T> list, Func<T, string> getName)
     {
         if (!Enumerable.Any(list))

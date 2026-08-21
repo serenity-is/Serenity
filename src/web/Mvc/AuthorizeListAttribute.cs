@@ -2,15 +2,15 @@ namespace Serenity.Services;
 
 /// <summary>
 /// Authorizes access to a service method by reading <see cref="ReadPermissionAttribute"/>.
-/// It also allows lookup mode access (as OrPermission) if the source type has 
-/// <see cref="ServiceLookupPermissionAttribute"/>
+/// It also allows lookup mode access (as an OR permission) if the source type has
+/// <see cref="ServiceLookupPermissionAttribute"/>.
 /// </summary>
 public class AuthorizeListAttribute : ServiceAuthorizeAttribute
 {
     /// <summary>
-    /// Creates a new instance of the attribute
+    /// Initializes a new instance of the <see cref="AuthorizeListAttribute"/> class.
     /// </summary>
-    /// <param name="sourceType">Source type</param>
+    /// <param name="sourceType">The source type.</param>
     public AuthorizeListAttribute(Type sourceType)
         : base(sourceType, typeof(ReadPermissionAttribute))
     {

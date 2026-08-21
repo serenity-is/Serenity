@@ -1,7 +1,7 @@
 namespace Serenity.Data;
 
 /// <summary>
-/// Oracle dialect
+/// SQL dialect for Oracle.
 /// </summary>
 /// <seealso cref="ISqlDialect" />
 public class OracleDialect : ISqlDialect
@@ -29,127 +29,49 @@ public class OracleDialect : ISqlDialect
     /// </summary>
     public static readonly ISqlDialect Instance = new OracleDialect();
 
-    /// <summary>
-    /// Gets a value indicating whether the server supports OFFSET FETCH.
-    /// </summary>
-    /// <value>
-    /// <c>true</c> if the server supports OFFSET FETCH; otherwise, <c>false</c>.
-    /// </value>
+    /// <inheritdoc/>
     public virtual bool CanUseOffsetFetch => false;
 
-    /// <summary>
-    /// Gets a value indicating whether the server supports ROWNUMBER.
-    /// </summary>
-    /// <value>
-    /// <c>true</c> if the server supports ROWNUMBER; otherwise, <c>false</c>.
-    /// </value>
+    /// <inheritdoc/>
     public virtual bool CanUseRowNumber => true;
 
-    /// <summary>
-    /// Gets a value indicating whether the server supports SKIP keyword (or a variation of it).
-    /// </summary>
-    /// <value>
-    /// <c>true</c> if the server supports a variation of SKIP keyword; otherwise, <c>false</c>.
-    /// </value>
+    /// <inheritdoc/>
     public virtual bool CanUseSkipKeyword => false;
 
-    /// <summary>
-    /// Gets the open quote character for quoting identifiers.
-    /// </summary>
-    /// <value>
-    /// The open quote.
-    /// </value>
+    /// <inheritdoc/>
     public virtual char OpenQuote => '"';
 
-    /// <summary>
-    /// Gets the close quote character for quoting identifiers.
-    /// </summary>
-    /// <value>
-    /// The close quote.
-    /// </value>
+    /// <inheritdoc/>
     public virtual char CloseQuote => '"';
 
-    /// <summary>
-    /// Gets the CONCAT operator keyword.
-    /// </summary>
-    /// <value>
-    /// The CONCAT operator keyword.
-    /// </value>
+    /// <inheritdoc/>
     public virtual string ConcatOperator => " || ";
 
-    /// <summary>
-    /// Gets the date format.
-    /// </summary>
-    /// <value>
-    /// The date format.
-    /// </value>
+    /// <inheritdoc/>
     public virtual string DateFormat => "\\'dd-MMM-yyyy\\'";
 
-    /// <summary>
-    /// Gets the date time format.
-    /// </summary>
-    /// <value>
-    /// The date time format.
-    /// </value>
+    /// <inheritdoc/>
     public virtual string DateTimeFormat => "\\'dd'-'MMM'-'yyyyTHH':'mm':'ss'.'fff\\'";
 
-    /// <summary>
-    /// Gets a value indicating whether the LIKE operator is case sensitive.
-    /// </summary>
-    /// <value>
-    /// <c>true</c> if the LIKE operator is sensitive; otherwise, <c>false</c>.
-    /// </value>
+    /// <inheritdoc/>
     public virtual bool IsLikeCaseSensitive => true;
 
-    /// <summary>
-    /// Gets a value indicating whether the server supports multiple resultsets.
-    /// </summary>
-    /// <value>
-    /// <c>true</c> if the server supports multiple resultsets; otherwise, <c>false</c>.
-    /// </value>
+    /// <inheritdoc/>
     public virtual bool MultipleResultsets => false;
 
-    /// <summary>
-    /// Gets a value indicating whether the server needs a workaround to handle Boolean values false/true.
-    /// </summary>
-    /// <value>
-    /// <c>true</c> if the server needs a workaround to handle Boolean values false/true; otherwise, <c>false</c>.
-    /// </value>
+    /// <inheritdoc/>
     public virtual bool NeedsBoolWorkaround => true;
 
-    /// <summary>
-    /// Gets a value indicating whether the server needs EXECUTE BLOCK statement.
-    /// </summary>
-    /// <value>
-    /// <c>true</c> if the server needs EXECUTE BLOCK statement; otherwise, <c>false</c>.
-    /// </value>
+    /// <inheritdoc/>
     public virtual bool NeedsExecuteBlockStatement => false;
 
-    /// <summary>
-    /// Gets the format for OFFSET only statements.
-    /// </summary>
-    /// <value>
-    /// The offset format.
-    /// </value>
-    /// <exception cref="NotImplementedException"></exception>
+    /// <inheritdoc/>
     public virtual string OffsetFormat => throw new NotImplementedException();
 
-    /// <summary>
-    /// Gets the format for OFFSET FETCH statements.
-    /// </summary>
-    /// <value>
-    /// The offset fetch format.
-    /// </value>
-    /// <exception cref="NotImplementedException"></exception>
+    /// <inheritdoc/>
     public virtual string OffsetFetchFormat => throw new NotImplementedException();
 
-    /// <summary>
-    /// Quotes the column alias. This usually calls QuoteIdentifier except for Oracle.
-    /// </summary>
-    /// <param name="s">The column alias.</param>
-    /// <returns>
-    /// Quoted column alias
-    /// </returns>
+    /// <inheritdoc/>
     public virtual string QuoteColumnAlias(string s)
     {
         if (string.IsNullOrEmpty(s))
@@ -161,13 +83,7 @@ public class OracleDialect : ISqlDialect
         return '"' + s.ToUpperInvariant() + '"';
     }
 
-    /// <summary>
-    /// Quotes the identifier.
-    /// </summary>
-    /// <param name="s">The identifier.</param>
-    /// <returns>
-    /// Quoted identifier
-    /// </returns>
+    /// <inheritdoc/>
     public virtual string QuoteIdentifier(string s)
     {
         if (string.IsNullOrEmpty(s))
@@ -182,11 +98,7 @@ public class OracleDialect : ISqlDialect
         return s;
     }
 
-    /// <summary>
-    /// Quotes the unicode string.
-    /// </summary>
-    /// <param name="s">The string.</param>
-    /// <returns></returns>
+    /// <inheritdoc/>
     public virtual string QuoteUnicodeString(string s)
     {
         if (s.IndexOf('\'') >= 0)
@@ -195,56 +107,22 @@ public class OracleDialect : ISqlDialect
         return "'" + s + "'";
     }
 
-    /// <summary>
-    /// Gets the SCOPE IDENTITY expression.
-    /// </summary>
-    /// <value>
-    /// The SCOPE IDENTITY expression.
-    /// </value>
-    /// <exception cref="NotImplementedException"></exception>
+    /// <inheritdoc/>
     public virtual string ScopeIdentityExpression => throw new NotImplementedException();
 
-    /// <summary>
-    /// Gets the type of the server.
-    /// </summary>
-    /// <value>
-    /// The type of the server.
-    /// </value>
+    /// <inheritdoc/>
     public virtual string ServerType => nameof(Data.ServerType.Oracle);
 
-    /// <summary>
-    /// Gets the skip keyword.
-    /// </summary>
-    /// <value>
-    /// The skip keyword.
-    /// </value>
-    /// <exception cref="NotImplementedException"></exception>
+    /// <inheritdoc/>
     public virtual string SkipKeyword => throw new NotImplementedException();
 
-    /// <summary>
-    /// Gets the take keyword.
-    /// </summary>
-    /// <value>
-    /// The take keyword.
-    /// </value>
+    /// <inheritdoc/>
     public virtual string TakeKeyword => "RowNum";
 
-    /// <summary>
-    /// Gets the time format.
-    /// </summary>
-    /// <value>
-    /// The time format.
-    /// </value>
+    /// <inheritdoc/>
     public virtual string TimeFormat => "\\'HH':'mm':'ss\\'";
 
-    /// <summary>
-    /// Gets the union keyword for specified union type.
-    /// </summary>
-    /// <param name="unionType">Type of the union.</param>
-    /// <returns>
-    /// Union keyword
-    /// </returns>
-    /// <exception cref="NotImplementedException"></exception>
+    /// <inheritdoc/>
     public string UnionKeyword(SqlUnionType unionType)
     {
         return unionType switch
@@ -257,60 +135,25 @@ public class OracleDialect : ISqlDialect
         };
     }
 
-    /// <summary>
-    /// Gets a value indicating whether use datetime2 type.
-    /// </summary>
-    /// <value>
-    /// <c>true</c> if use datetime2; otherwise, <c>false</c>.
-    /// </value>
+    /// <inheritdoc/>
     public virtual bool UseDateTime2 => false;
 
-    /// <summary>
-    /// Gets a value indicating whether to use returning identity.
-    /// </summary>
-    /// <value>
-    /// <c>true</c> if should use returning identity; otherwise, <c>false</c>.
-    /// </value>
+    /// <inheritdoc/>
     public virtual bool UseReturningIdentity => false;
 
-    /// <summary>
-    /// Gets a value indicating whether use returning into variable.
-    /// </summary>
-    /// <value>
-    /// <c>true</c> if use returning into variable; otherwise, <c>false</c>.
-    /// </value>
+    /// <inheritdoc/>
     public virtual bool UseReturningIntoVar => true;
 
-    /// <summary>
-    /// Gets a value indicating whether to use scope identity.
-    /// </summary>
-    /// <value>
-    /// <c>true</c> if to use scope identity; otherwise, <c>false</c>.
-    /// </value>
+    /// <inheritdoc/>
     public virtual bool UseScopeIdentity => false;
 
-    /// <summary>
-    /// Gets a value indicating whether to use TAKE at end.
-    /// </summary>
-    /// <value>
-    /// <c>true</c> if to use TAKE at end; otherwise, <c>false</c>.
-    /// </value>
+    /// <inheritdoc/>
     public virtual bool UseTakeAtEnd => true;
 
-    /// <summary>
-    /// Gets a value indicating whether ROWNUM.
-    /// </summary>
-    /// <value>
-    /// <c>true</c> if can use ROWNUM; otherwise, <c>false</c>.
-    /// </value>
+    /// <inheritdoc/>
     public virtual bool UseRowNum => true;
 
-    /// <summary>
-    /// Gets the parameter prefix character.
-    /// </summary>
-    /// <value>
-    /// The parameter prefix character.
-    /// </value>
+    /// <inheritdoc/>
     public virtual char ParameterPrefix => ':';
 
     /// <inheritdoc />

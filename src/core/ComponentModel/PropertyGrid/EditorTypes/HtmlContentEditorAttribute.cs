@@ -1,8 +1,8 @@
 namespace Serenity.ComponentModel;
 
 /// <summary>
-/// Indicates that the target property should use a "HtmlContent" editor.
-/// This is generally a CK editor that contains more functionalities
+/// Indicates that the target property should use an "HtmlContent" editor.
+/// This is generally a CK editor that contains more functionality
 /// compared to other ones.
 /// </summary>
 /// <seealso cref="CustomEditorAttribute" />

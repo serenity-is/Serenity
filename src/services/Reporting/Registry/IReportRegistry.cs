@@ -20,7 +20,7 @@ public interface IReportRegistry
     /// </summary>
     /// <param name="reportKey">Report key</param>
     /// <param name="validatePermission">Should validate the permission for report before returning.</param>
-    /// <returns></returns>
+    /// <returns>The report with the given key, or <c>null</c> if it is not found.</returns>
     ReportRegistry.Report GetReport(string reportKey, bool validatePermission = true);
 
     /// <summary>

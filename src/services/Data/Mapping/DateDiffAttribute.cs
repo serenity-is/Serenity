@@ -78,17 +78,17 @@ public class DateDiffAttribute(DateParts part, object start, object end) : BaseE
     }
 
     /// <summary>
-    /// Date part
+    /// Date part.
     /// </summary>
     public DateParts Part { get; } = part;
 
     /// <summary>
-    /// Date expression 1
+    /// Date expression 1.
     /// </summary>
     public object Start { get; } = start ?? throw new ArgumentNullException(nameof(start));
 
     /// <summary>
-    /// Date expression 1
+    /// Date expression 2.
     /// </summary>
     public object End { get; } = end ?? throw new ArgumentNullException(nameof(end));
 }

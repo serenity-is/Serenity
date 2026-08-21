@@ -23,12 +23,9 @@ public partial class DefaultPropertyItemProvider(IServiceProvider provider, ITyp
             .Where(x => !x.IsAbstract && !x.IsInterface)
             .Select(type => ActivatorUtilities.CreateFactory(type, Type.EmptyTypes));
 
-    /// <summary>
     /// <inheritdoc/>
-    /// </summary>
     /// <param name="type">The type.</param>
     /// <param name="predicate"><inheritdoc/></param>
-    /// <returns></returns>
     /// <exception cref="ArgumentNullException">type is null</exception>
     /// <exception cref="InvalidProgramException">CheckNames is true and there is name mismatch</exception>
     public IEnumerable<PropertyItem> GetPropertyItemsFor(Type type, Func<PropertyInfo, bool> predicate)

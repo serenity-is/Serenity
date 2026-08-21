@@ -26,6 +26,7 @@ public partial class SqlQuery
     /// <returns>
     ///   The SqlSelect object itself.
     /// </returns>
+    /// <exception cref="ArgumentNullException">Any of the parameters is null or empty.</exception>
     public SqlQuery FullTextSearchJoin(
         string searchTable, string searchFields, string searchQuery,
         string searchTableAlias, string searchTableKey, string containsAlias)

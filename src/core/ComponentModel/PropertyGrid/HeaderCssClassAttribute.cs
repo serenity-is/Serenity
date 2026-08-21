@@ -1,7 +1,7 @@
 ﻿namespace Serenity.ComponentModel;
 
 /// <summary>
-/// Sets the CSS class for grid column headers. It sets headerCssClass property of SlickColumn.
+/// Sets the CSS class for grid column headers. It sets the headerCssClass property of SlickColumn.
 /// This has no effect for forms.
 /// </summary>
 /// <remarks>

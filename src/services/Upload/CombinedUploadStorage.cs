@@ -13,12 +13,12 @@ public class CombinedUploadStorage : IUploadStorage
     private readonly string subPrefix;
 
     /// <summary>
-    /// Creates a new instance of the class
+    /// Initializes a new instance of the class.
     /// </summary>
     /// <param name="mainStorage">The main storage</param>
     /// <param name="subStorage">The sub storage</param>
     /// <param name="subPrefix">Prefix path for the substorage like "temporary/"</param>
-    /// <exception cref="ArgumentNullException">One of the arguments is null</exception>
+    /// <exception cref="ArgumentNullException">One of the arguments is <c>null</c>.</exception>
     public CombinedUploadStorage(IUploadStorage mainStorage, IUploadStorage subStorage, string subPrefix)
     {
         this.mainStorage = mainStorage ?? throw new ArgumentNullException(nameof(mainStorage));
@@ -30,7 +30,7 @@ public class CombinedUploadStorage : IUploadStorage
     }
 
     /// <summary>
-    /// Returns if the path is under sub path
+    /// Returns a value indicating whether the path is under the sub path.
     /// </summary>
     /// <param name="path">Path</param>
     protected bool UnderSubPath(string path)
@@ -39,7 +39,7 @@ public class CombinedUploadStorage : IUploadStorage
     }
 
     /// <summary>
-    /// Returns true if the path is the subpath
+    /// Returns a value indicating whether the path is the sub path.
     /// </summary>
     /// <param name="path">Path</param>
     protected bool IsSubPath(string path)

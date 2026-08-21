@@ -1,17 +1,24 @@
 namespace Serenity.Data;
 
 /// <summary>
-///   Extensions for objects implementing IDbWhere interface.</summary>
+///   Extensions for objects implementing the <see cref="IFilterableQuery"/> interface.
+/// </summary>
 public static class EntityQueryExtensions
 {
     /// <summary>
-    ///   Adds all field values in a row to where clause with equality operator and auto named parameters 
-    ///   (field name prefixed with '@').</summary>
-    /// <param field="row">
-    ///   The row with modified field values to be added to the where clause (key row).  Must be in TrackAssignments mode, 
-    ///   or an exception is raised.</param>
+    ///   Adds all field values in a row to the where clause with equality operator and auto named parameters 
+    ///   (field name prefixed with '@').
+    /// </summary>
+    /// <param name="self">
+    ///   The query to add the where clause to.
+    /// </param>
+    /// <param name="row">
+    ///   The row with modified field values to be added to the where clause (key row). Must be in TrackAssignments mode, 
+    ///   or an exception is raised.
+    /// </param>
     /// <returns>
-    ///   Object itself.</returns>
+    ///   The object itself.
+    /// </returns>
     public static T WhereEqual<T>(this T self, IRow row) where T : IFilterableQuery
     {
         ArgumentNullException.ThrowIfNull(row);
@@ -25,11 +32,20 @@ public static class EntityQueryExtensions
     }
 
     /// <summary>
-    ///   Sets all field values in a row with auto named parameters (field name prefixed with '@').</summary>
-    /// <param field="row">
-    ///   The row with modified field values. Must be in TrackAssignments mode, or an exception is raised.</param>
+    ///   Sets all field values in a row with auto named parameters (field name prefixed with '@').
+    /// </summary>
+    /// <param name="self">
+    ///   The query to set the field values on.
+    /// </param>
+    /// <param name="row">
+    ///   The row with modified field values. Must be in TrackAssignments mode, or an exception is raised.
+    /// </param>
+    /// <param name="exclude">
+    ///   The field to exclude from being set.
+    /// </param>
     /// <returns>
-    ///   Object itself.</returns>
+    ///   The object itself.
+    /// </returns>
     public static T Set<T>(this T self, IRow row, IField exclude = null) where T : ISetFieldByStatement
     {
         ArgumentNullException.ThrowIfNull(row);
@@ -45,13 +61,17 @@ public static class EntityQueryExtensions
     }
 
     /// <summary>
-    ///   Adds actual table fields in a row to select list of a query.</summary>
+    ///   Adds actual table fields in a row to the select list of a query.
+    /// </summary>
     /// <param name="query">
-    ///   Query to select fields into (required).</param>
+    ///   Query to select fields into (required).
+    /// </param>
     /// <param name="row">
-    ///   Row with fields to be selected (required).</param>
+    ///   Row with fields to be selected (required).
+    /// </param>
     /// <param name="exclude">
-    ///   Fields to be excluded (optional).</param>
+    ///   Fields to be excluded (optional).
+    /// </param>
     public static SqlQuery SelectTableFields(this SqlQuery query, IRow row, params Field[] exclude)
     {
         ArgumentNullException.ThrowIfNull(query);
@@ -78,13 +98,17 @@ public static class EntityQueryExtensions
     }
 
     /// <summary>
-    ///   Adds foreign / calculated table fields in a row to select list of a query.</summary>
+    ///   Adds foreign / calculated table fields in a row to the select list of a query.
+    /// </summary>
     /// <param name="query">
-    ///   Query to select fields into (required).</param>
+    ///   Query to select fields into (required).
+    /// </param>
     /// <param name="row">
-    ///   Row with fields to be selected (required).</param>
+    ///   Row with fields to be selected (required).
+    /// </param>
     /// <param name="exclude">
-    ///   Fields to be excluded (optional).</param>
+    ///   Fields to be excluded (optional).
+    /// </param>
     public static SqlQuery SelectForeignFields(this SqlQuery query, IRow row, params Field[] exclude)
     {
         ArgumentNullException.ThrowIfNull(query);
@@ -112,9 +136,11 @@ public static class EntityQueryExtensions
     }
 
     /// <summary>
-    ///   Adds foreign / calculated table fields in a row to select list of a query.</summary>
+    ///   Adds foreign / calculated table fields in a row to the select list of a query.
+    /// </summary>
     /// <param name="query">
-    ///   Query to select fields into (required).</param>
+    ///   Query to select fields into (required).
+    /// </param>
     public static SqlQuery SelectNonTableFields(this SqlQuery query)
     {
         ArgumentNullException.ThrowIfNull(query);
@@ -134,11 +160,14 @@ public static class EntityQueryExtensions
     }
 
     /// <summary>
-    ///   Adds actual table fields in a row to select list of a query.</summary>
+    ///   Adds actual table fields in a row to the select list of a query.
+    /// </summary>
     /// <param name="query">
-    ///   Query to select fields into (required).</param>
+    ///   Query to select fields into (required).
+    /// </param>
     /// <param name="exclude">
-    ///   Fields to be excluded (optional).</param>
+    ///   Fields to be excluded (optional).
+    /// </param>
     public static SqlQuery SelectTableFields(this SqlQuery query, params Field[] exclude)
     {
         ArgumentNullException.ThrowIfNull(query);
@@ -149,15 +178,20 @@ public static class EntityQueryExtensions
     }
 
     /// <summary>
-    ///   Sets a field value with a parameter.</summary>
-    /// <param field="field">
-    ///   Field name.</param>
-    /// <param field="param">
-    ///   Parameter name</param>
-    /// <param field="value">
-    ///   Parameter value</param>
+    ///   Sets a field value with a parameter.
+    /// </summary>
+    /// <param name="self">
+    ///   The query to set the field value on.
+    /// </param>
+    /// <param name="field">
+    ///   The field name.
+    /// </param>
+    /// <param name="value">
+    ///   The parameter value.
+    /// </param>
     /// <returns>
-    ///   Object itself.</returns>
+    ///   The object itself.
+    /// </returns>
     public static T Set<T>(this T self, IField field, object value) where T : ISetFieldByStatement
     {
         var param = self.AddParam(value);

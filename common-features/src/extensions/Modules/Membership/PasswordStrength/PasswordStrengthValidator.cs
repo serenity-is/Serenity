@@ -1,5 +1,8 @@
 namespace Serenity.Extensions;
 
+/// <summary>
+/// Validates passwords against the configured password strength rules.
+/// </summary>
 public class PasswordStrengthValidator(IOptions<MembershipSettings> membershipSettings, 
     ITextLocalizer localizer) : IPasswordStrengthValidator
 {
@@ -9,6 +12,11 @@ public class PasswordStrengthValidator(IOptions<MembershipSettings> membershipSe
     private readonly ITextLocalizer localizer = localizer 
         ?? throw new ArgumentNullException(nameof(localizer));
 
+    /// <summary>
+    /// Validates the specified password against the configured strength rules,
+    /// throwing a <see cref="ValidationError"/> if it does not meet the requirements.
+    /// </summary>
+    /// <param name="password">The password to validate.</param>
     public virtual void Validate(string password)
     {
         password ??= string.Empty;

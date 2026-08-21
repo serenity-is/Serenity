@@ -24,12 +24,12 @@ public class JsonServiceClient(string baseUrl)
     protected string BaseUrl { get; set; } = baseUrl;
 
     /// <summary>
-    /// Post to JSON service
+    /// Posts a request to a JSON service and returns the typed response.
     /// </summary>
     /// <typeparam name="TResponse">The type of response expected</typeparam>
     /// <param name="relativeUrl">Relative url</param>
     /// <param name="request">Request object</param>
-    /// <returns></returns>
+    /// <returns>The response returned from the service.</returns>
     public virtual TResponse Post<TResponse>(string relativeUrl, object request)
         where TResponse : new()
     {

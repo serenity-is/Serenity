@@ -28,11 +28,10 @@ public abstract class FunctionCallCriteria(params BaseCriteria[] arguments) : Ba
     public abstract string GetFunctionName(ISqlDialect dialect);
 
     /// <summary>
-    /// Appends the function name
+    /// Appends the function name.
     /// </summary>
-    /// <param name="sb">String builder</param>
-    /// <param name="query">Query with params</param>
-    /// <returns></returns>
+    /// <param name="sb">The string builder.</param>
+    /// <param name="query">The query with params.</param>
     protected virtual void AppendFunctionName(StringBuilder sb, IQueryWithParams query)
     {
         sb.Append(GetFunctionName(query.Dialect));

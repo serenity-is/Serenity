@@ -3,9 +3,9 @@ using Serenity.Web;
 namespace Serenity.ComponentModel;
 
 /// <summary>
-/// Set of default upload options
+/// Set of default upload options.
 /// </summary>
-public class UploadOptions : IUploadFileConstraints, IUploadFileOptions, IUploadImageContrains, IUploadImageOptions
+public class UploadOptions : IUploadFileConstraints, IUploadFileOptions, IUploadImageConstraints, IUploadImageOptions
 {
     /// <inheritdoc/>
     public bool AllowNonImage { get; set; } = true;
@@ -41,7 +41,7 @@ public class UploadOptions : IUploadFileConstraints, IUploadFileOptions, IUpload
     public bool ScaleSmaller { get; set; }
 
     /// <summary>
-    /// Default scale mode
+    /// Default scale mode.
     /// </summary>
     public const ImageScaleMode DefaultScaleMode = ImageScaleMode.PreserveRatioNoFill;
 
@@ -61,7 +61,7 @@ public class UploadOptions : IUploadFileConstraints, IUploadFileOptions, IUpload
     public string? ThumbSizes { get; set; }
 
     /// <summary>
-    /// Default thumb mode
+    /// Default thumb mode.
     /// </summary>
     public const ImageScaleMode DefaultThumbMode = ImageScaleMode.PreserveRatioNoFill;
 
@@ -69,7 +69,7 @@ public class UploadOptions : IUploadFileConstraints, IUploadFileOptions, IUpload
     public ImageScaleMode ThumbMode { get; set; } = DefaultThumbMode;
 
     /// <summary>
-    /// Default thumb quality
+    /// Default thumb quality.
     /// </summary>
     public const int DefaultThumbQuality = 80;
 
@@ -96,7 +96,9 @@ public class UploadOptions : IUploadFileConstraints, IUploadFileOptions, IUpload
     /// <inheritdoc/>
     public string? AllowedExtensions { get; set; }
 
+    /// <summary>
     /// Default list of image extensions: ".gif;.jpg;.jpeg;.png;"
+    /// </summary>
     public static string DefaultImageExtensions =
         ".gif;.jpg;.jpeg;.png;";
 

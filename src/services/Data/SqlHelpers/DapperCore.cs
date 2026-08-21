@@ -17,16 +17,16 @@ namespace Serenity.Data;
 public static partial class SqlMapper
 {
     /// <summary>
-    /// Execute parameterized SQL
+    /// Executes a parameterized SQL statement.
     /// </summary>
-    /// <param name="cnn">Connection.</param>
-    /// <param name="sql">SQL query.</param>
+    /// <param name="cnn">The connection.</param>
+    /// <param name="sql">The SQL query.</param>
     /// <param name="param">The parameters.</param>
     /// <param name="transaction">The transaction.</param>
     /// <param name="commandTimeout">The command timeout.</param>
     /// <param name="commandType">Type of the command.</param>
     /// <returns>
-    /// Number of rows affected
+    /// The number of rows affected.
     /// </returns>
     public static int Execute(this IDbConnection cnn, string sql, object param = null, IDbTransaction transaction = null, int? commandTimeout = null, CommandType? commandType = null)
     {
@@ -35,16 +35,16 @@ public static partial class SqlMapper
     }
 
     /// <summary>
-    /// Return a list of dynamic objects, reader is closed after the call
+    /// Returns a list of dynamic objects; the reader is closed after the call.
     /// </summary>
-    /// <param name="cnn">Connection.</param>
-    /// <param name="sql">SQL query.</param>
+    /// <param name="cnn">The connection.</param>
+    /// <param name="sql">The SQL query.</param>
     /// <param name="param">The parameters.</param>
     /// <param name="transaction">The transaction.</param>
-    /// <param name="buffered">if set to <c>true</c> results are buffered.</param>
+    /// <param name="buffered">If set to <c>true</c>, results are buffered.</param>
     /// <param name="commandTimeout">The command timeout.</param>
     /// <param name="commandType">Type of the command.</param>
-    /// <returns>List of dynamic objects</returns>
+    /// <returns>List of dynamic objects.</returns>
     public static IEnumerable<dynamic> Query(this IDbConnection cnn, string sql, object param = null, IDbTransaction transaction = null, bool buffered = true, int? commandTimeout = null, CommandType? commandType = null)
     {
         cnn.EnsureOpen();
@@ -52,16 +52,16 @@ public static partial class SqlMapper
     }
 
     /// <summary>
-    /// Return a list of dynamic objects, reader is closed after the call.
+    /// Returns a list of dynamic objects; the reader is closed after the call.
     /// Serenity specific overload for <see cref="ISqlQuery"/>, not present in Dapper.
     /// </summary>
-    /// <param name="cnn">Connection.</param>
-    /// <param name="sql">SQL query.</param>
+    /// <param name="cnn">The connection.</param>
+    /// <param name="sql">The SQL query.</param>
     /// <param name="transaction">The transaction.</param>
-    /// <param name="buffered">if set to <c>true</c> results are buffered.</param>
+    /// <param name="buffered">If set to <c>true</c>, results are buffered.</param>
     /// <param name="commandTimeout">The command timeout.</param>
     /// <param name="commandType">Type of the command.</param>
-    /// <returns>List of dynamic objects</returns>
+    /// <returns>List of dynamic objects.</returns>
     public static IEnumerable<dynamic> Query(this IDbConnection cnn, ISqlQuery sql, IDbTransaction transaction = null, bool buffered = true, int? commandTimeout = null, CommandType? commandType = null)
     {
         cnn.EnsureOpen();
@@ -69,18 +69,18 @@ public static partial class SqlMapper
     }
 
     /// <summary>
-    /// Return a list of objects, reader is closed after the call
+    /// Returns a list of objects; the reader is closed after the call.
     /// </summary>
-    /// <typeparam name="T"></typeparam>
-    /// <param name="cnn">Connection.</param>
-    /// <param name="sql">SQL query.</param>
+    /// <typeparam name="T">The type of the objects to return.</typeparam>
+    /// <param name="cnn">The connection.</param>
+    /// <param name="sql">The SQL query.</param>
     /// <param name="param">The parameters.</param>
     /// <param name="transaction">The transaction.</param>
-    /// <param name="buffered">if set to <c>true</c> results are buffered.</param>
+    /// <param name="buffered">If set to <c>true</c>, results are buffered.</param>
     /// <param name="commandTimeout">The command timeout.</param>
     /// <param name="commandType">Type of the command.</param>
     /// <returns>
-    /// List of objects
+    /// List of objects.
     /// </returns>
     public static IEnumerable<T> Query<T>(this IDbConnection cnn, string sql, object param = null, IDbTransaction transaction = null, bool buffered = true, int? commandTimeout = null, CommandType? commandType = null)
     {
@@ -89,17 +89,17 @@ public static partial class SqlMapper
     }
 
     /// <summary>
-    /// Return a list of values, reader is closed after the call.
+    /// Returns a list of values; the reader is closed after the call.
     /// Serenity specific overload for <see cref="ISqlQuery"/>, not present in Dapper.
     /// </summary>
     /// <typeparam name="T">The type of the value.</typeparam>
-    /// <param name="cnn">Connection.</param>
-    /// <param name="sql">SQL query.</param>
+    /// <param name="cnn">The connection.</param>
+    /// <param name="sql">The SQL query.</param>
     /// <param name="transaction">The transaction.</param>
-    /// <param name="buffered">if set to <c>true</c> results are buffered.</param>
+    /// <param name="buffered">If set to <c>true</c>, results are buffered.</param>
     /// <param name="commandTimeout">The command timeout.</param>
     /// <param name="commandType">Type of the command.</param>
-    /// <returns>List of values</returns>
+    /// <returns>List of values.</returns>
     public static IEnumerable<T> Query<T>(this IDbConnection cnn, ISqlQuery sql, IDbTransaction transaction = null, bool buffered = true, int? commandTimeout = null, CommandType? commandType = null)
     {
         cnn.EnsureOpen();

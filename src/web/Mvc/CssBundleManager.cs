@@ -6,7 +6,7 @@ using Microsoft.Extensions.Options;
 namespace Serenity.Web;
 
 /// <summary>
-/// Default implementation for <see cref="ICssBundleManager"/>
+/// Default implementation of <see cref="ICssBundleManager"/>.
 /// </summary>
 public partial class CssBundleManager : ICssBundleManager
 {
@@ -30,15 +30,15 @@ public partial class CssBundleManager : ICssBundleManager
     private static HashSet<string> recursionCheck;
 
     /// <summary>
-    /// Creates an instance of the class
+    /// Initializes a new instance of the <see cref="CssBundleManager"/> class.
     /// </summary>
-    /// <param name="options">Options</param>
-    /// <param name="scriptManager">Dynamic script manager</param>
-    /// <param name="cssMinifier"></param>
-    /// <param name="hostEnvironment">Web host environment</param>
-    /// <param name="contextAccessor">HTTP context accessor</param>
-    /// <param name="logger">Exception logger</param>
-    /// <exception cref="ArgumentNullException"></exception>
+    /// <param name="options">The options.</param>
+    /// <param name="scriptManager">The dynamic script manager.</param>
+    /// <param name="cssMinifier">The CSS minifier.</param>
+    /// <param name="hostEnvironment">The web host environment.</param>
+    /// <param name="contextAccessor">The HTTP context accessor.</param>
+    /// <param name="logger">The exception logger.</param>
+    /// <exception cref="ArgumentNullException">One of the required arguments is <c>null</c>.</exception>
     public CssBundleManager(IOptions<CssBundlingOptions> options,
         IDynamicScriptManager scriptManager, 
         ICssMinifier cssMinifier,

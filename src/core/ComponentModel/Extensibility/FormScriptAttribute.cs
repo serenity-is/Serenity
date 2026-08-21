@@ -1,10 +1,10 @@
 namespace Serenity.ComponentModel;
 
 /// <summary>
-/// Indicates that this type should generate a form script, 
-/// which contains information about properties in this type and 
+/// Indicates that this type should generate a form script,
+/// which contains information about properties in this type and
 /// is an array of PropertyItem objects. Form scripts can be
-/// accessed from client side using Serenity.getForm("Key")
+/// accessed from the client side using Serenity.getForm("Key").
 /// </summary>
 /// <seealso cref="Attribute" />
 [AttributeUsage(AttributeTargets.Class, AllowMultiple = false)]

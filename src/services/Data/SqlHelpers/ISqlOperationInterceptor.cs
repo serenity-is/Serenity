@@ -10,28 +10,28 @@ namespace Serenity.Data;
 public interface ISqlOperationInterceptor
 {
     /// <summary>
-    /// Intercepts SqlHelper.Execute(SqlDelete/SqlUpdate/SqlInsert) method.
-    /// <param name="commandText">Command text</param>
-    /// <param name="parameters">Parameters</param>
-    /// <param name="query">The query.</param>
-    /// <param name="expectedRows">Expected rows</param>
-    /// <param name="getNewId">True if InsertAndGetID is called</param>
+    /// Intercepts the <see cref="SqlHelper"/> <c>Execute</c> method (SqlDelete/SqlUpdate/SqlInsert).
     /// </summary>
+    /// <param name="commandText">The command text.</param>
+    /// <param name="parameters">The parameters.</param>
+    /// <param name="expectedRows">The expected rows.</param>
+    /// <param name="query">The query.</param>
+    /// <param name="getNewId">True if <c>InsertAndGetID</c> is called.</param>
     OptionalValue<long?> ExecuteNonQuery(string commandText, IDictionary<string, object> parameters, ExpectedRows expectedRows, IQueryWithParams query, bool getNewId);
 
     /// <summary>
-    /// Intercepts SqlHelper.ExecuteReader method.
+    /// Intercepts the <see cref="SqlHelper"/> <c>ExecuteReader</c> method.
     /// </summary>
-    /// <param name="commandText">Command text</param>
+    /// <param name="commandText">The command text.</param>
     /// <param name="parameters">The parameters.</param>
-    /// <param name="query">The query</param>
+    /// <param name="query">The query.</param>
     OptionalValue<IDataReader> ExecuteReader(string commandText, IDictionary<string, object> parameters, SqlQuery query);
 
     /// <summary>
-    /// Intercepts SqlHelper.ExecuteReader method.
+    /// Intercepts the <see cref="SqlHelper"/> <c>ExecuteScalar</c> method.
     /// </summary>
-    /// <param name="commandText">Command text</param>
+    /// <param name="commandText">The command text.</param>
     /// <param name="parameters">The parameters.</param>
-    /// <param name="query">The query</param>
+    /// <param name="query">The query.</param>
     OptionalValue<object> ExecuteScalar(string commandText, IDictionary<string, object> parameters, SqlQuery query);
 }

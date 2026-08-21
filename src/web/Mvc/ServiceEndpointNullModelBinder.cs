@@ -4,12 +4,12 @@ using System.Threading.Tasks;
 namespace Serenity.Services;
 
 /// <summary>
-/// Null model binder for interface arguments
+/// Null model binder for interface arguments.
 /// </summary>
 public class ServiceEndpointNullModelBinder : IModelBinder
 {
     /// <summary>
-    /// Default instance
+    /// The default instance.
     /// </summary>
     public static readonly ServiceEndpointNullModelBinder Instance = new();
 

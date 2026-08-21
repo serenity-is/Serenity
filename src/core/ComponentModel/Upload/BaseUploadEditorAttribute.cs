@@ -4,17 +4,17 @@ namespace Serenity.ComponentModel;
 
 /// <summary>
 /// Sets editor type as "ImageUpload", which only allows image files.
-/// Make sure you use this attribute in Row.cs, not Form.cs as 
-/// the image upload behavior only works if it is in row, otherwise
-/// your files will stay in temporary directory.
+/// Make sure you use this attribute in Row.cs, not Form.cs as
+/// the image upload behavior only works if it is in the row, otherwise
+/// your files will stay in the temporary directory.
 /// </summary>
 /// <seealso cref="CustomEditorAttribute" />
 /// <remarks>
-/// Initializes a new instance of the <see cref="ImageUploadEditorAttribute"/> class.
+/// Initializes a new instance of the <see cref="BaseUploadEditorAttribute"/> class.
 /// </remarks>
 /// <param name="editorType">Type of the editor.</param>
 public abstract class BaseUploadEditorAttribute(string editorType) : CustomEditorAttribute(editorType),
-    IUploadEditor, IUploadFileConstraints, IUploadFileOptions, IUploadImageContrains, IUploadImageOptions
+    IUploadEditor, IUploadFileConstraints, IUploadFileOptions, IUploadImageConstraints, IUploadImageOptions
 {
 
     /// <inheritdoc/>

@@ -12,12 +12,12 @@ public class ReportRegistry : IReportRegistry
     private readonly ITextLocalizer localizer;
 
     /// <summary>
-    /// Creates an instance of the class.
+    /// Initializes a new instance of the class.
     /// </summary>
     /// <param name="typeSource">The type source to search report types in</param>
     /// <param name="permissions">Permission service</param>
     /// <param name="localizer">Text localizer</param>
-    /// <exception cref="ArgumentNullException"></exception>
+    /// <exception cref="ArgumentNullException"><paramref name="typeSource"/>, <paramref name="permissions"/> or <paramref name="localizer"/> is <c>null</c>.</exception>
     public ReportRegistry(ITypeSource typeSource, IPermissionService permissions, ITextLocalizer localizer)
     {
         types = (typeSource ?? throw new ArgumentNullException(nameof(types)))
@@ -144,12 +144,12 @@ public class ReportRegistry : IReportRegistry
     }
 
     /// <summary>
-    /// Returns report with the report key, 
+    /// Returns report with the report key,
     /// optionally validating its permissions.
     /// </summary>
     /// <param name="reportKey">Report key</param>
     /// <param name="validatePermission">Validate permission. Default true.</param>
-    /// <exception cref="ArgumentNullException">reportKey is n ull</exception>
+    /// <exception cref="ArgumentNullException"><paramref name="reportKey"/> is <c>null</c> or empty.</exception>
     public Report GetReport(string reportKey, bool validatePermission = true)
     {
         if (string.IsNullOrEmpty(reportKey))
@@ -169,41 +169,41 @@ public class ReportRegistry : IReportRegistry
     }
 
     /// <summary>
-    /// Metadata for a registered report
+    /// Metadata for a registered report.
     /// </summary>
     public class Report
     {
         /// <summary>
-        /// Type of the report
+        /// Gets the type of the report.
         /// </summary>
         public Type Type { get; private set; }
 
         /// <summary>
-        /// Report key
+        /// Gets the report key.
         /// </summary>
         public string Key { get; private set; }
 
         /// <summary>
-        /// Report permission
+        /// Gets the report permission.
         /// </summary>
         public string Permission { get; private set; }
 
         /// <summary>
-        /// Report title
+        /// Gets the report title.
         /// </summary>
         public string Title { get; private set; }
 
         /// <summary>
-        /// The category
+        /// Gets the category.
         /// </summary>
         public Category Category { get; private set; }
 
         /// <summary>
-        /// Creates a new instance of the class
+        /// Initializes a new instance of the class.
         /// </summary>
         /// <param name="type">Report type</param>
         /// <param name="localizer">Text localizer</param>
-        /// <exception cref="ArgumentNullException">Type is null</exception>
+        /// <exception cref="ArgumentNullException"><paramref name="type"/> is <c>null</c>.</exception>
         public Report(Type type, ITextLocalizer localizer)
         {
             Type = type ?? throw new ArgumentNullException("type");
@@ -224,22 +224,22 @@ public class ReportRegistry : IReportRegistry
     }
 
     /// <summary>
-    /// Model for a report category
+    /// Model for a report category.
     /// </summary>
     /// <remarks>
-    /// Creates an instance of the class
+    /// Initializes a new instance of the class.
     /// </remarks>
     /// <param name="key">Category key</param>
     /// <param name="title">Category title</param>
     public class Category(string key, string title)
     {
         /// <summary>
-        /// Key for the category
+        /// Gets the key for the category.
         /// </summary>
         public string Key { get; private set; } = key;
 
         /// <summary>
-        /// Category title
+        /// Gets the category title.
         /// </summary>
         public string Title { get; private set; } = title;
     }

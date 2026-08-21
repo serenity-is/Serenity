@@ -1,5 +1,8 @@
 namespace Serenity.Extensions;
 
+/// <summary>
+/// Local text keys for the reset password form.
+/// </summary>
 [NestedLocalTexts(Prefix = "Forms.Membership.ResetPassword.")]
 public static class ResetPasswordFormTexts
 {

@@ -3,22 +3,22 @@ using Serenity.Localization;
 namespace Serenity;
 
 /// <summary>
-/// Defines a localizable text resource. Contains a local text key and has implicit conversions to and 
-/// from String.
+/// Defines a localizable text resource. Contains a local text key and has implicit conversions to and
+/// from <see cref="string"/>.
 /// </summary>
 /// <remarks>
-/// Creates a new LocalText instance that contains the specified local text key
+/// Creates a new <see cref="LocalText"/> instance that contains the specified local text key.
 /// </remarks>
-/// <param name="key">Local text key</param>
+/// <param name="key">The local text key.</param>
 public class LocalText(string? key) : ILocalText
 {
     /// <summary>
-    /// Invariant language ID is an empty string
+    /// The invariant language ID, which is an empty string.
     /// </summary>
     public const string InvariantLanguageID = "";
 
     /// <summary>
-    /// An empty local text instance like string.Empty
+    /// An empty local text instance, similar to <see cref="string.Empty"/>.
     /// </summary>
     public static readonly LocalText Empty;
 
@@ -28,22 +28,23 @@ public class LocalText(string? key) : ILocalText
     }
 
     /// <summary>
-    /// Gets the local text key
+    /// Gets the local text key.
     /// </summary>
     public string Key { get; private set; } = key ?? string.Empty;
 
     /// <summary>
-    /// Implicit conversion from String that creates a new instance of LocalText with the specified key.
+    /// Implicit conversion from <see cref="string"/> that creates a new instance of <see cref="LocalText"/>
+    /// with the specified key.
     /// </summary>
-    /// <param name="key">Local text key</param>
+    /// <param name="key">The local text key.</param>
     public static implicit operator LocalText(string? key)
     {
         return string.IsNullOrEmpty(key) ? Empty : new LocalText(key);
     }
 
     /// <summary>
-    /// Returns the local text key, use overload with ILocalText to get translation.
-    /// </summary>   
+    /// Returns the local text key. Use the overload with <see cref="ITextLocalizer"/> to get a translation.
+    /// </summary>
     [Obsolete("Use ILocalTextContext through DI")]
 #pragma warning disable CS0809 // Obsolete member overrides non-obsolete member
     public override string ToString()
@@ -53,8 +54,10 @@ public class LocalText(string? key) : ILocalText
     }
 
     /// <summary>
-    /// Returns the translation for current context
-    /// </summary>   
+    /// Returns the translation for the current context.
+    /// </summary>
+    /// <param name="localizer">The text localizer used to resolve the translation.</param>
+    /// <returns>The translated text, or the key itself if no translation is found.</returns>
     public string ToString(ITextLocalizer? localizer)
     {
         return localizer?.TryGet(Key) ?? Key;

@@ -2,12 +2,14 @@
 namespace Serenity.Abstractions;
 
 /// <summary>
-/// Abstraction to remove a cached user by its id or username
+/// Removes a cached user entry by identifier or username.
 /// </summary>
 public interface IRemoveCachedUser
 {
     /// <summary>
-    /// Removed cached user by its user ID and/or username
+    /// Removes the cached user with the specified identifier and/or username.
     /// </summary>
+    /// <param name="userId">The user identifier, or <c>null</c> to skip removal by identifier.</param>
+    /// <param name="username">The username, or <c>null</c> to skip removal by username.</param>
     void RemoveCachedUser(string? userId, string? username);
 }

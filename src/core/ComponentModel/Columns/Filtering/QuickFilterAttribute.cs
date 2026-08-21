@@ -1,7 +1,7 @@
 ﻿namespace Serenity.ComponentModel;
 
 /// <summary>
-/// Indicates that this property should have a quick filter on grid.
+/// Indicates that this property should have a quick filter on the grid.
 /// </summary>
 /// <seealso cref="Attribute" />
 /// <remarks>
@@ -20,8 +20,8 @@ public class QuickFilterAttribute(bool value = true) : Attribute
     public bool Value { get; private set; } = value;
 
     /// <summary>
-    /// Gets or sets a value indicating whether this <see cref="QuickFilterAttribute"/> 
-    /// should have a separator before others, e.g. wrap into new line.
+    /// Gets or sets a value indicating whether this <see cref="QuickFilterAttribute"/>
+    /// should have a separator before others, e.g. wrap onto a new line.
     /// </summary>
     /// <value>
     ///   <c>true</c> if separator is enabled; otherwise, <c>false</c>.

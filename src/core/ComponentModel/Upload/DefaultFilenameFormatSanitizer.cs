@@ -1,24 +1,24 @@
 namespace Serenity.ComponentModel;
 
 /// <summary>
-/// Default implementation for IFilenameFormatSanitizer
+/// Default implementation for <see cref="IFilenameFormatSanitizer"/>.
 /// </summary>
 public class DefaultFilenameFormatSanitizer : IFilenameFormatSanitizer
 {
     /// <summary>
-    /// An instance of this class
+    /// An instance of this class.
     /// </summary>
     public static readonly IFilenameFormatSanitizer Instance = new DefaultFilenameFormatSanitizer();
 
     /// <summary>
-    /// Default implementation for sanitizing values of replacement placeholders 
-    /// in a file name format string like |X|/|Y|. Trims the value, 
-    /// if is empty, returns "_". , Characters like '/', '&amp;', and diacricits 
-    /// etc are replaced by calling StringHelper.SanitizeFileName, 
-    /// then replacing backslashes with underscore, double dots and tailing dots with underscore
+    /// Default implementation for sanitizing values of replacement placeholders
+    /// in a file name format string like |X|/|Y|. Trims the value,
+    /// and if it is empty, returns "_". Characters like '/', '&amp;', and diacritics
+    /// etc. are replaced by calling StringHelper.SanitizeFileName,
+    /// then replacing backslashes with underscore, and double dots and trailing dots with underscore.
     /// </summary>
     /// <param name="_">Key for placeholder, ignored by this implementation.</param>
-    /// <param name="value">Value to be sanitized</param>
+    /// <param name="value">Value to be sanitized.</param>
     public virtual string SanitizePlaceholder(string _, string? value)
     {
         value = StringHelper.SanitizeFilename((value ?? "").Replace('\\', '/'), removeDiacritics: true);
@@ -35,8 +35,8 @@ public class DefaultFilenameFormatSanitizer : IFilenameFormatSanitizer
     /// by replacing backslashes with forward slashes,
     /// and replacing double slashes with "/_/".
     /// </summary>
-    /// <param name="result"></param>
-    /// <returns></returns>
+    /// <param name="result">The formatted file name result to sanitize.</param>
+    /// <returns>The sanitized file name result.</returns>
     public virtual string SanitizeResult(string result)
     {
         if (string.IsNullOrEmpty(result))

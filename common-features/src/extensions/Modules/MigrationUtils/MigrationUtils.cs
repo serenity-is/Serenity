@@ -5,6 +5,10 @@ using System.IO;
 
 namespace Serenity.Extensions;
 
+/// <summary>
+/// Helper methods for FluentMigrator migrations, including table creation
+/// with identity keys and database type detection.
+/// </summary>
 public static class MigrationUtils
 {
     /// <summary>
@@ -131,6 +135,12 @@ public static class MigrationUtils
         return syntax;
     }
 
+    /// <summary>
+    /// Adds an Oracle sequence and trigger to generate identity values for the specified column.
+    /// </summary>
+    /// <param name="migration">The migration reference.</param>
+    /// <param name="table">The table name.</param>
+    /// <param name="id">The identity column name.</param>
     public static void AddOracleIdentity(this MigrationBase migration,
         string table, string id)
     {
@@ -160,6 +170,14 @@ END;", table, id, seq));
             .Execute.Sql(@"ALTER TRIGGER " + seq + "_TRG ENABLE");
     }
     
+    /// <summary>
+    /// Invokes the callback only when the predicate is true, otherwise returns the syntax unchanged.
+    /// </summary>
+    /// <typeparam name="TSyntax">The fluent syntax type.</typeparam>
+    /// <param name="syntax">The syntax builder.</param>
+    /// <param name="predicate">The condition to evaluate.</param>
+    /// <param name="callback">The callback to invoke when the predicate is true.</param>
+    /// <returns>The syntax builder.</returns>
     public static TSyntax If<TSyntax>(this TSyntax syntax, bool predicate, Func<TSyntax, TSyntax> callback)
         where TSyntax : FluentMigrator.Infrastructure.IFluentSyntax
     {
@@ -169,11 +187,23 @@ END;", table, id, seq));
         return syntax;
     }
 
+    /// <summary>
+    /// Determines whether the migration is running against a database whose type starts with the specified name.
+    /// </summary>
+    /// <param name="migration">The migration reference.</param>
+    /// <param name="type">The database type prefix, e.g. "SqlServer".</param>
+    /// <returns><c>true</c> if the database type matches; otherwise, <c>false</c>.</returns>
     public static bool IsDatabase(this MigrationBase migration, string type)
     {
         return migration.IsDatabase(x => x.StartsWith(type, StringComparison.OrdinalIgnoreCase));
     }
 
+    /// <summary>
+    /// Determines whether the migration is running against a database matching the specified predicate.
+    /// </summary>
+    /// <param name="migration">The migration reference.</param>
+    /// <param name="predicate">The predicate to test the database type against.</param>
+    /// <returns><c>true</c> if the database type matches; otherwise, <c>false</c>.</returns>
     public static bool IsDatabase(this MigrationBase migration, Predicate<string> predicate)
     {
         bool isMatch = false;
@@ -187,35 +217,71 @@ END;", table, id, seq));
         return isMatch;
     }
 
+    /// <summary>
+    /// Determines whether the migration is running against a Firebird database.
+    /// </summary>
+    /// <param name="migration">The migration reference.</param>
+    /// <returns><c>true</c> if the database is Firebird; otherwise, <c>false</c>.</returns>
     public static bool IsFirebird(this MigrationBase migration)
     {
         return IsDatabase(migration, "Firebird");
     }
 
+    /// <summary>
+    /// Determines whether the migration is running against an Oracle database.
+    /// </summary>
+    /// <param name="migration">The migration reference.</param>
+    /// <returns><c>true</c> if the database is Oracle; otherwise, <c>false</c>.</returns>
     public static bool IsOracle(this MigrationBase migration)
     {
         return IsDatabase(migration, "Oracle");
     }
 
+    /// <summary>
+    /// Determines whether the migration is running against a MySql database.
+    /// </summary>
+    /// <param name="migration">The migration reference.</param>
+    /// <returns><c>true</c> if the database is MySql; otherwise, <c>false</c>.</returns>
     public static bool IsMySql(this MigrationBase migration)
     {
         return IsDatabase(migration, "MySql");
     }
 
+    /// <summary>
+    /// Determines whether the migration is running against a Postgres database.
+    /// </summary>
+    /// <param name="migration">The migration reference.</param>
+    /// <returns><c>true</c> if the database is Postgres; otherwise, <c>false</c>.</returns>
     public static bool IsPostgres(this MigrationBase migration)
     {
         return IsDatabase(migration, "Postgres");
     }
 
+    /// <summary>
+    /// Determines whether the migration is running against a Sqlite database.
+    /// </summary>
+    /// <param name="migration">The migration reference.</param>
+    /// <returns><c>true</c> if the database is Sqlite; otherwise, <c>false</c>.</returns>
     public static bool IsSqlite(this MigrationBase migration)
     {
         return IsDatabase(migration, "Sqlite");
     }
+    /// <summary>
+    /// Determines whether the migration is running against a SqlServer database.
+    /// </summary>
+    /// <param name="migration">The migration reference.</param>
+    /// <returns><c>true</c> if the database is SqlServer; otherwise, <c>false</c>.</returns>
     public static bool IsSqlServer(this MigrationBase migration)
     {
         return IsDatabase(migration, "SqlServer");
     }
 
+    /// <summary>
+    /// Ensures the database for the specified connection key exists, creating it if necessary.
+    /// </summary>
+    /// <param name="databaseKey">The connection key.</param>
+    /// <param name="contentRoot">The content root path, used for local databases and Sqlite files.</param>
+    /// <param name="sqlConnections">The SQL connections.</param>
     public static void EnsureDatabase(string databaseKey, string contentRoot, ISqlConnections sqlConnections)
     {
         var cs = sqlConnections.TryGetConnectionString(databaseKey)

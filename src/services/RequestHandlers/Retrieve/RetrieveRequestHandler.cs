@@ -13,15 +13,15 @@ public class RetrieveRequestHandler<TRow, TRetrieveRequest, TRetrieveResponse> :
     where TRetrieveResponse : RetrieveResponse<TRow>, new()
 {
     /// <summary>
-    /// Lazy list of behaviors that is activated for this request
+    /// Lazy list of behaviors that is activated for this request.
     /// </summary>
     protected Lazy<IRetrieveBehavior[]> behaviors;
 
     /// <summary>
-    /// Creates an instance of the class
+    /// Initializes a new instance of the class.
     /// </summary>
     /// <param name="context">Request context</param>
-    /// <exception cref="ArgumentNullException">Context is null</exception>
+    /// <exception cref="ArgumentNullException"><paramref name="context"/> is <c>null</c>.</exception>
     public RetrieveRequestHandler(IRequestContext context)
     {
         Context = context ?? throw new ArgumentNullException(nameof(context));
@@ -30,7 +30,7 @@ public class RetrieveRequestHandler<TRow, TRetrieveRequest, TRetrieveResponse> :
     }
 
     /// <summary>
-    /// Gets the list of retrieve behaviors
+    /// Gets the list of retrieve behaviors.
     /// </summary>
     protected virtual IEnumerable<IRetrieveBehavior> GetBehaviors()
     {
@@ -39,10 +39,9 @@ public class RetrieveRequestHandler<TRow, TRetrieveRequest, TRetrieveResponse> :
 
     /// <summary>
     /// Returns true if the field should be allowed to be selected,
-    /// based on is read permission, selectlevel.never flag, and lookup
-    /// access mode
+    /// based on its read permission and the SelectLevel.Never flag.
     /// </summary>
-    /// <param name="field"></param>
+    /// <param name="field">The field.</param>
     protected virtual bool AllowSelectField(Field field)
     {
         if (field.MinSelectLevel == SelectLevel.Never)
@@ -277,7 +276,7 @@ public class RetrieveRequestHandler<TRow, TRetrieveRequest, TRetrieveResponse> :
     /// </summary>
     /// <param name="connection">Connection</param>
     /// <param name="request">Request</param>
-    /// <exception cref="ArgumentNullException">connection or the request is null</exception>
+    /// <exception cref="ArgumentNullException"><paramref name="connection"/> or <paramref name="request"/> is <c>null</c>.</exception>
     public TRetrieveResponse Process(IDbConnection connection, TRetrieveRequest request)
     {
         StateBag.Clear();
@@ -319,53 +318,53 @@ public class RetrieveRequestHandler<TRow, TRetrieveRequest, TRetrieveResponse> :
     }
 
     /// <summary>
-    /// Gets the two level cache from the request context
+    /// Gets the two level cache from the request context.
     /// </summary>
     public ITwoLevelCache Cache => Context.Cache;
 
     /// <summary>
-    /// Gets the request context
+    /// Gets the request context.
     /// </summary>
     public IRequestContext Context { get; private set; }
 
     /// <summary>
-    /// Gets localizer from the request context
+    /// Gets the localizer from the request context.
     /// </summary>
     public ITextLocalizer Localizer => Context.Localizer;
 
     /// <summary>
-    /// Gets permission service from the request context
+    /// Gets the permission service from the request context.
     /// </summary>
     public IPermissionService Permissions => Context.Permissions;
 
     /// <summary>
-    /// Gets current user from the request context
+    /// Gets the current user from the request context.
     /// </summary>
     public ClaimsPrincipal User => Context.User;
 
 
     /// <summary>
-    /// Gets current connection
+    /// Gets the current connection.
     /// </summary>
     public IDbConnection Connection { get; private set; }
 
     /// <summary>
-    /// Gets the select query
+    /// Gets the select query.
     /// </summary>
     public SqlQuery Query { get; private set; }
 
     /// <summary>
-    /// The entity used for querying / metadata lookup
+    /// Gets the entity used for querying / metadata lookup.
     /// </summary>
     public TRow Row { get; protected set; }
 
     /// <summary>
-    /// Response object
+    /// Gets the request object.
     /// </summary>
     public TRetrieveRequest Request { get; protected set; }
 
     /// <summary>
-    /// Response object
+    /// Gets the response object.
     /// </summary>
     public TRetrieveResponse Response { get; protected set; }
 

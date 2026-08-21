@@ -1,15 +1,15 @@
 ﻿namespace Serenity.Data;
 
 /// <summary>
-/// Contains a connection string, its key and provider name.
+/// Contains a connection string, its key, and provider name.
 /// </summary>
 /// <remarks>
 /// Initializes a new instance of the <see cref="ConnectionStringInfo"/> class.
 /// </remarks>
 /// <param name="connectionKey">The connection key.</param>
 /// <param name="connectionString">The connection string.</param>
-/// <param name="providerName">Name of the provider.</param>
-/// <param name="dialect">Dialect</param>
+/// <param name="providerName">The name of the provider.</param>
+/// <param name="dialect">The SQL dialect.</param>
 public class ConnectionStringInfo(string connectionKey, string connectionString, string providerName, ISqlDialect dialect) : IConnectionString
 {
 

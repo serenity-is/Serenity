@@ -2,8 +2,8 @@
 
 /// <summary>
 /// Sets the CSS class for columns and form fields.
-/// In forms, class is added to container div with .field class that contains both label and editor.
-/// For columns, it sets cssClass property of SlickColumn, which adds this class to slick cells for all rows.
+/// In forms, the class is added to the container div with the .field class that contains both label and editor.
+/// For columns, it sets the cssClass property of SlickColumn, which adds this class to the slick cells for all rows.
 /// Slick column headers are not affected by this attribute, use HeaderCssClass for that.
 /// </summary>
 /// <remarks>

@@ -1,7 +1,7 @@
 ﻿namespace Serenity.ComponentModel;
 
 /// <summary>
-/// Resets form field width to null. It maybe used to cancel UntilNext flag of a prior width attribute.
+/// Resets the form field width to null. It may be used to cancel the UntilNext flag of a prior width attribute.
 /// </summary>
 public class ResetFormWidthAttribute : FormWidthAttribute
 {

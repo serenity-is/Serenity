@@ -27,6 +27,7 @@ public class SqlUpdate : QueryWithParams, ISetFieldByStatement, IFilterableQuery
 
     /// <summary>
     ///   Gets the table name.</summary>
+    /// <returns>The table name.</returns>
     public string TableName()
     {
         return tableName;
@@ -34,6 +35,7 @@ public class SqlUpdate : QueryWithParams, ISetFieldByStatement, IFilterableQuery
 
     /// <summary>
     ///   Returns field and value expression pairs.</summary>
+    /// <returns>The list of field and value expression pairs.</returns>
     public IReadOnlyList<FieldExpressionPair> GetFieldExpressions()
     {
         return fieldExpressions;
@@ -41,6 +43,7 @@ public class SqlUpdate : QueryWithParams, ISetFieldByStatement, IFilterableQuery
 
     /// <summary>
     ///   Returns the WHERE conditions.</summary>
+    /// <returns>The list of WHERE conditions.</returns>
     public IReadOnlyList<string> GetWhereConditions()
     {
         return where;
@@ -48,6 +51,7 @@ public class SqlUpdate : QueryWithParams, ISetFieldByStatement, IFilterableQuery
 
     /// <summary>
     ///   Returns the WHERE clause (excluding WHERE keyword).</summary>
+    /// <returns>The WHERE clause, or an empty string if there are no conditions.</returns>
     public string GetWhereClause()
     {
         return string.Join(SqlKeywords.And, where);
@@ -61,6 +65,7 @@ public class SqlUpdate : QueryWithParams, ISetFieldByStatement, IFilterableQuery
     ///   Field expression, required.</param>
     /// <returns>
     ///   SqlUpdate object itself.</returns>
+    /// <exception cref="ArgumentNullException">field or expression is null or empty.</exception>
     public SqlUpdate SetTo(string field, string expression)
     {
         if (field == null || field.Length == 0)
@@ -110,6 +115,7 @@ public class SqlUpdate : QueryWithParams, ISetFieldByStatement, IFilterableQuery
     ///   Field (required).</param>
     /// <returns>
     ///   SqlUpdate object itself.</returns>
+    /// <exception cref="ArgumentNullException">field is null or empty.</exception>
     public SqlUpdate SetNull(string field)
     {
         if (field == null || field.Length == 0)
@@ -179,6 +185,7 @@ public class SqlUpdate : QueryWithParams, ISetFieldByStatement, IFilterableQuery
     ///   Condition.</param>
     /// <returns>
     ///   SqlUpdate object itself.</returns>
+    /// <exception cref="ArgumentNullException">condition is null or empty.</exception>
     public SqlUpdate Where(string condition)
     {
         if (condition == null || condition.Length == 0)
@@ -192,6 +199,9 @@ public class SqlUpdate : QueryWithParams, ISetFieldByStatement, IFilterableQuery
     /// <summary>
     /// Sets the dialect (SQL server type / version) for query.
     /// </summary>
+    /// <param name="dialect">The dialect to use.</param>
+    /// <returns>The SqlUpdate object itself.</returns>
+    /// <exception cref="ArgumentNullException">dialect is null.</exception>
     public SqlUpdate Dialect(ISqlDialect dialect)
     {
         this.dialect = dialect ?? throw new ArgumentNullException("dialect");
@@ -204,7 +214,7 @@ public class SqlUpdate : QueryWithParams, ISetFieldByStatement, IFilterableQuery
     /// Removes the t0 reference from an SQL field reference.
     /// </summary>
     /// <param name="expression">The expression.</param>
-    /// <returns></returns>
+    /// <returns>The expression with the T0 reference removed.</returns>
     public static string RemoveT0Reference(string expression)
     {
         var index = expression.IndexOf("T0.", StringComparison.OrdinalIgnoreCase);
@@ -261,6 +271,8 @@ public class SqlUpdate : QueryWithParams, ISetFieldByStatement, IFilterableQuery
     /// <param name="where">WHERE clause (can be null).</param>
     /// <param name="dialect">Target dialect</param>
     /// <returns>Formatted UPDATE query.</returns>
+    /// <exception cref="ArgumentNullException">fieldExpressions is null.</exception>
+    /// <exception cref="ArgumentOutOfRangeException">fieldExpressions has an odd number of elements.</exception>
     [Obsolete("Use overload with IEnumerable<FieldExpressionPair>")]
     public static string Format(string tableName, string where,
         List<string> fieldExpressions, ISqlDialect dialect = null)
@@ -283,6 +295,7 @@ public class SqlUpdate : QueryWithParams, ISetFieldByStatement, IFilterableQuery
     /// <param name="where">WHERE clause (can be null).</param>
     /// <param name="dialect">Target dialect</param>
     /// <returns>Formatted UPDATE query.</returns>
+    /// <exception cref="ArgumentNullException">tableName or fieldExpressions is null.</exception>
     public static string Format(string tableName, string where,
         IEnumerable<FieldExpressionPair> fieldExpressions, ISqlDialect dialect = null)
     {

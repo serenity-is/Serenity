@@ -1,10 +1,10 @@
 namespace Serenity.Services;
 
 /// <summary>
-/// Behavior that handles <see cref="UniqueConstraintAttribute"/>
+/// Behavior that handles <see cref="UniqueConstraintAttribute"/>.
 /// </summary>
 /// <remarks>
-/// Creates a new instance of the class
+/// Initializes a new instance of the class.
 /// </remarks>
 /// <param name="localizer">Text localizer</param>
 public class UniqueConstraintSaveBehavior(ITextLocalizer localizer) : BaseSaveBehavior, IImplicitBehavior

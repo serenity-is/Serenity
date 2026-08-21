@@ -1,7 +1,7 @@
 ﻿namespace Serenity.ComponentModel;
 
 /// <summary>
-/// Indicates that the target property should use a "HtmlReportContent" editor.
+/// Indicates that the target property should use an "HtmlReportContent" editor.
 /// This is generally a CK editor with only functionality compatible with common
 /// reporting tools like SSRS, Telerik, DevExpress etc. enabled.
 /// </summary>

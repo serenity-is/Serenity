@@ -22,16 +22,16 @@ public sealed class NodeScriptRunner : IDisposable
     private static readonly Regex AnsiColorRegex = new("\x001b\\[[0-9;]*m", RegexOptions.None, TimeSpan.FromSeconds(1));
 
     /// <summary>
-    /// Creates a new instance of the class
+    /// Initializes a new instance of the <see cref="NodeScriptRunner"/> class.
     /// </summary>
-    /// <param name="scriptName">Script name</param>
-    /// <param name="arguments">Arguments</param>
-    /// <param name="workingDirectory">Working directory</param>
-    /// <param name="envVars">Environment variables</param>
-    /// <param name="pkgManagerCommand">Package manager command. Defaul is "npm"</param>
-    /// <param name="diagnosticSource">Diagnostics source</param>
-    /// <param name="applicationStoppingToken">Application stopping token</param>
-    /// <exception cref="ArgumentException">One of arguments is null</exception>
+    /// <param name="scriptName">The name of the script to run.</param>
+    /// <param name="arguments">The arguments to pass to the script.</param>
+    /// <param name="workingDirectory">The working directory in which to run the script.</param>
+    /// <param name="envVars">Optional environment variables to set for the process.</param>
+    /// <param name="pkgManagerCommand">The package manager command. Defaults to <c>npm</c>.</param>
+    /// <param name="diagnosticSource">The diagnostics source used to emit start events.</param>
+    /// <param name="applicationStoppingToken">A token that stops the process when the application is shutting down.</param>
+    /// <exception cref="ArgumentException">One of the required arguments is null or empty.</exception>
     public NodeScriptRunner(string scriptName, 
         string arguments = null, string workingDirectory = null,
         IDictionary<string, string> envVars = null, string pkgManagerCommand = "npm", 
@@ -106,9 +106,9 @@ public sealed class NodeScriptRunner : IDisposable
     }
 
     /// <summary>
-    /// Attaches to the logger
+    /// Attaches the runner's output to the given logger.
     /// </summary>
-    /// <param name="logger">Logger</param>
+    /// <param name="logger">The logger to write output to.</param>
     public void AttachToLogger(ILogger logger)
     {
 #pragma warning disable CA2254 // Template should be a static expression

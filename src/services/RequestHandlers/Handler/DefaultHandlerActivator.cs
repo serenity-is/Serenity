@@ -3,13 +3,13 @@
 namespace Serenity.Services;
 
 /// <summary>
-/// Default implementation of the <see cref="IHandlerActivator"/>
+/// Default implementation of the <see cref="IHandlerActivator"/>.
 /// </summary>
 /// <remarks>
-/// Creates an instance of the class
+/// Initializes a new instance of the class.
 /// </remarks>
 /// <param name="provider">Service provider</param>
-/// <exception cref="ArgumentNullException">provider is null</exception>
+/// <exception cref="ArgumentNullException"><paramref name="provider"/> is <c>null</c>.</exception>
 public class DefaultHandlerActivator(IServiceProvider provider) : IHandlerActivator
 {
     private readonly IServiceProvider provider = provider ?? throw new ArgumentNullException(nameof(provider));

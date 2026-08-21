@@ -1,8 +1,8 @@
 ﻿namespace Serenity.ComponentModel;
 
 /// <summary>
-/// Marks form field with "col-md-3" css class, which makes it allocate 
-/// quarter on device widths >= 992px (some desktops)
+/// Marks the form field with the "col-md-3" CSS class, which makes it allocate
+/// a quarter on device widths >= 992px (some desktops).
 /// </summary>
 public class MediumQuarterWidthAttribute : FormWidthAttribute
 {

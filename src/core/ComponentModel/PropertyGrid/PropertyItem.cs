@@ -2,8 +2,8 @@
 namespace Serenity.ComponentModel;
 
 /// <summary>
-/// Corresponds to a property item (e.g. a field in property grid
-/// with a label and editor, or a column specification in a grid)
+/// Corresponds to a property item (e.g. a field in a property grid
+/// with a label and editor, or a column specification in a grid).
 /// </summary>
 public class PropertyItem
 {
@@ -76,12 +76,11 @@ public class PropertyItem
     public Dictionary<string, object>? EditorParams { get; set; }
 
     /// <summary>
-    /// Gets or sets the editor parameters 
-    /// that should be passed to the editor while it
-    /// is being created.
+    /// Gets or sets the editor addons that should be attached
+    /// to the editor while it is being created.
     /// </summary>
     /// <value>
-    /// The editor parameters.
+    /// The editor addons.
     /// </value>
     [Newtonsoft.Json.JsonProperty("editorAddons")]
     [JsonPropertyName("editorAddons")]
@@ -284,7 +283,7 @@ public class PropertyItem
     public bool? HideOnUpdate { get; set; }
 
     /// <summary>
-    /// Gets or sets the ignore on loadflag, which when true field 
+    /// Gets or sets the ignore on load flag, which, when true, the field
     /// won't be read from the entity on load.
     /// </summary>
     [Newtonsoft.Json.JsonProperty("skipOnLoad")]
@@ -292,8 +291,8 @@ public class PropertyItem
     public bool? SkipOnLoad { get; set; }
 
     /// <summary>
-    /// Gets or sets the ignore on save flag, which when true field 
-    /// won't be serialized back to entity on save.
+    /// Gets or sets the ignore on save flag, which, when true, the field
+    /// won't be serialized back to the entity on save.
     /// </summary>
     [Newtonsoft.Json.JsonProperty("skipOnSave")]
     [JsonPropertyName("skipOnSave")]
@@ -534,12 +533,12 @@ public class PropertyItem
 
 
     /// <summary>
-    /// Gets or sets the grouping order of a column, 
+    /// Gets or sets the grouping order of a column,
     /// e.g. in which position this column is grouped by default in the grid.
     /// Only applies to grids, not forms.
     /// </summary>
     /// <value>
-    /// The sort order.
+    /// The group order.
     /// </value>
     [Newtonsoft.Json.JsonProperty("groupOrder")]
     [JsonPropertyName("groupOrder")]
@@ -557,8 +556,8 @@ public class PropertyItem
     public SummaryType? SummaryType { get; set; }
 
     /// <summary>
-    /// Gets or sets the edit link flag. Determines if column
-    /// should have a edit link to open related dialog.
+    /// Gets or sets the edit link flag. Determines if the column
+    /// should have an edit link to open the related dialog.
     /// </summary>
     /// <value>
     /// The edit link.

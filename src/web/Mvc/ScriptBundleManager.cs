@@ -6,7 +6,7 @@ using Microsoft.Extensions.Options;
 namespace Serenity.Web;
 
 /// <summary>
-/// Default implementation for <see cref="IScriptBundleManager"/>
+/// Default implementation of <see cref="IScriptBundleManager"/>.
 /// </summary>
 public class ScriptBundleManager : IScriptBundleManager
 {
@@ -30,15 +30,15 @@ public class ScriptBundleManager : IScriptBundleManager
     private static HashSet<string> recursionCheck;
 
     /// <summary>
-    /// Creates a new instance of the class
+    /// Initializes a new instance of the <see cref="ScriptBundleManager"/> class.
     /// </summary>
-    /// <param name="options">Options</param>
-    /// <param name="scriptManager">Dynamic script manager</param>
-    /// <param name="scriptMinifier">Script minifier</param>
-    /// <param name="hostEnvironment">Web host environment</param>
-    /// <param name="contextAccessor">HTTP context accessor</param>
-    /// <param name="logger">Logger</param>
-    /// <exception cref="ArgumentNullException">One of arguments is null</exception>
+    /// <param name="options">The options.</param>
+    /// <param name="scriptManager">The dynamic script manager.</param>
+    /// <param name="scriptMinifier">The script minifier.</param>
+    /// <param name="hostEnvironment">The web host environment.</param>
+    /// <param name="contextAccessor">The HTTP context accessor.</param>
+    /// <param name="logger">The logger.</param>
+    /// <exception cref="ArgumentNullException">One of the required arguments is <c>null</c>.</exception>
     public ScriptBundleManager(IOptions<ScriptBundlingOptions> options, 
         IScriptMinifier scriptMinifier,
         IDynamicScriptManager scriptManager, 

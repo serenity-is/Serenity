@@ -1,7 +1,7 @@
 namespace Serenity.Data;
 
 /// <summary>
-/// Helper class to find differences between to lists for updating
+/// Helper class to find differences between two lists for updating.
 /// </summary>
 /// <typeparam name="TItem">The type of the item.</typeparam>
 public class DeltaLister<TItem>
@@ -18,13 +18,13 @@ public class DeltaLister<TItem>
     /// </summary>
     /// <param name="oldList">The old list.</param>
     /// <param name="newList">The new list.</param>
-    /// <param name="getItemId">The get item identifier.</param>
+    /// <param name="getItemId">The function used to get the identifier of an item.</param>
     /// <param name="options">The options.</param>
     /// <exception cref="ArgumentNullException">
-    /// oldList or newList or getItemId or oldItem or oldItemId or newItem is null.
+    /// oldList, newList, getItemId, oldItem, oldItemId or newItem is null.
     /// </exception>
-    /// <exception cref="ArgumentOutOfRangeException">newItemId</exception>
-    /// <exception cref="DuplicateNameException">newItemId</exception>
+    /// <exception cref="ArgumentOutOfRangeException">newItemId is not present in the old list.</exception>
+    /// <exception cref="ArgumentException">newItemId is duplicated in the new list.</exception>
     public DeltaLister(IEnumerable<TItem> oldList, IEnumerable<TItem> newList,
         Func<TItem, long?> getItemId, DeltaOptions options = DeltaOptions.Default)
     {

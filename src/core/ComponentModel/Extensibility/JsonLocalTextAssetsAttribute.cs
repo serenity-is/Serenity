@@ -1,8 +1,8 @@
 ﻿namespace Serenity.ComponentModel;
 
 /// <summary>
-/// Registers a folder with json local text files packed as static web assets
-/// for the assembly
+/// Registers a folder with JSON local text files packed as static web assets
+/// for the assembly.
 /// </summary>
 /// <seealso cref="Attribute" />
 /// <remarks>
@@ -13,7 +13,7 @@ public sealed class JsonLocalTextAssetsAttribute(string path) : Attribute
 {
 
     /// <summary>
-    /// The path for static web assets folder with json local text files
+    /// The path for the static web assets folder with JSON local text files.
     /// </summary>
     public string Path { get; } = path ?? throw new ArgumentNullException(nameof(path));
 }

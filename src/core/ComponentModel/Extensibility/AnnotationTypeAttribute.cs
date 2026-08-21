@@ -15,7 +15,7 @@ public class AnnotationTypeAttribute(Type type) : Attribute
 {
 
     /// <summary>
-    /// Other type, interface or type of attribute that other type should have
+    /// The other type, interface, or type of attribute that the other type should have.
     /// </summary>
     public Type AnnotatedType { get; private set; } = type ?? throw new ArgumentNullException("type");
 
@@ -26,8 +26,8 @@ public class AnnotationTypeAttribute(Type type) : Attribute
     public bool Inherited { get; set; } = true;
 
     /// <summary>
-    /// If specified this annotation only applies to types in the namespaces 
-    /// and their sub namespaces if namespace ends with ".*"
+    /// If specified, this annotation only applies to types in the namespaces
+    /// and their sub namespaces if the namespace ends with ".*".
     /// </summary>
     public string[]? Namespaces { get; set; }
 

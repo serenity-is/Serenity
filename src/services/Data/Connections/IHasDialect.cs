@@ -1,12 +1,12 @@
 ﻿namespace Serenity.Data;
 
 /// <summary>
-/// Interfaces for types that has a Dialect property of type ISqlDialect
+/// Interface for types that have a <see cref="Dialect"/> property of type <see cref="ISqlDialect"/>.
 /// </summary>
 public interface IHasDialect
 {
     /// <summary>
-    /// Gets the sql dialect
+    /// Gets the SQL dialect.
     /// </summary>
     ISqlDialect Dialect { get; }
 }

@@ -3,7 +3,7 @@
 namespace Serenity.ComponentModel;
 
 /// <summary>
-/// Base class which other custom filtering types derive from.
+/// Base class from which other custom filtering types derive.
 /// </summary>
 /// <seealso cref="FilteringTypeAttribute" />
 /// <remarks>

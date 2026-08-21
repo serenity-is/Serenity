@@ -1,19 +1,19 @@
 namespace Serenity.Navigation;
 
 /// <summary>
-/// Navigation item attribute
+/// Navigation item attribute.
 /// </summary>
 [AttributeUsage(AttributeTargets.Assembly, AllowMultiple = true)]
 public abstract class NavigationItemAttribute : Attribute
 {
     /// <summary>
-    /// Creates a new instance of the attribute
+    /// Creates a new instance of the attribute.
     /// </summary>
-    /// <param name="order">Order</param>
-    /// <param name="path">Path</param>
-    /// <param name="url">Url</param>
-    /// <param name="permission">Permission</param>
-    /// <param name="icon">Icon class</param>
+    /// <param name="order">Order.</param>
+    /// <param name="path">Path.</param>
+    /// <param name="url">URL.</param>
+    /// <param name="permission">Permission.</param>
+    /// <param name="icon">Icon class.</param>
     protected NavigationItemAttribute(int order, string path, string? url, object? permission, string? icon)
     {
         path ??= "";
@@ -41,45 +41,45 @@ public abstract class NavigationItemAttribute : Attribute
     }
 
     /// <summary>
-    /// Gets / sets the order (only) among its siblings.
+    /// Gets or sets the order (only) among its siblings.
     /// </summary>
     public decimal Order { get; set; }
 
     /// <summary>
-    /// Url of this navigation item, should be null for menu
+    /// URL of this navigation item, should be null for a menu.
     /// </summary>
     public string? Url { get; set; }
     
     /// <summary>
-    /// The full path to navigation item like A/B/C
-    /// This is used to generate local text key for this item
-    /// like Navigation.A/B/C
+    /// The full path to a navigation item like A/B/C.
+    /// This is used to generate the local text key for this item
+    /// like Navigation.A/B/C.
     /// </summary>
     public string? FullPath { get; set; }
 
     /// <summary>
-    /// This is full path of its parent, e.g. A/B for A/B/C
+    /// This is the full path of its parent, e.g. A/B for A/B/C.
     /// </summary>
     public string? Category { get; set; }
 
     /// <summary>
-    /// Title of the navigation item. It is the part after last slash,
-    /// e.g. C for A/B/C
+    /// Title of the navigation item. It is the part after the last slash,
+    /// e.g. C for A/B/C.
     /// </summary>
     public string? Title { get; set; }
 
     /// <summary>
-    /// Icon class
+    /// Icon class.
     /// </summary>
     public string? IconClass { get; set; }
 
     /// <summary>
-    /// Extra css class to apply to its navigation element e.g. LI
+    /// Extra CSS class to apply to its navigation element, e.g. LI.
     /// </summary>
     public string? ItemClass { get; set; }
     
     /// <summary>
-    /// Permission required to view this navigation item
+    /// Permission required to view this navigation item.
     /// </summary>
     public string? Permission { get; set; }
 

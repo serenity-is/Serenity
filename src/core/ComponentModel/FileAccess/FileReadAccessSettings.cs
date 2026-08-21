@@ -3,7 +3,7 @@ using Microsoft.Extensions.Options;
 namespace Serenity.Web;
 
 /// <summary>
-/// Settings for file read access control
+/// Settings for file read access control.
 /// </summary>
 [DefaultSectionKey(SectionKey)]
 public class FileReadAccessSettings : IOptions<FileReadAccessSettings>

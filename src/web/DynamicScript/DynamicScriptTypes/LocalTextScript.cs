@@ -3,17 +3,17 @@ using System.Text.Json;
 namespace Serenity.Web;
 
 /// <summary>
-/// Local text dynamic script
+/// Local text dynamic script.
 /// </summary>
 /// <remarks>
-/// Creates a new instance of the class
+/// Initializes a new instance of the <see cref="LocalTextScript"/> class.
 /// </remarks>
-/// <param name="registry">Text registry</param>
-/// <param name="package">Package key</param>
-/// <param name="includes">Includes regex</param>
-/// <param name="languageId">LanguageID</param>
-/// <param name="isPending">True to include pending texts</param>
-/// <exception cref="ArgumentNullException"></exception>
+/// <param name="registry">The text registry.</param>
+/// <param name="package">The package key.</param>
+/// <param name="includes">The includes regex.</param>
+/// <param name="languageId">The language ID.</param>
+/// <param name="isPending"><c>true</c> to include pending texts.</param>
+/// <exception cref="ArgumentNullException"><paramref name="registry"/> or <paramref name="package"/> is <c>null</c>.</exception>
 public class LocalTextScript(ILocalTextRegistry registry, string package, string includes, string languageId, bool isPending) : DynamicScript, INamedDynamicScript
 {
     private readonly string scriptName = GetScriptName(package, languageId, isPending);
@@ -27,26 +27,27 @@ public class LocalTextScript(ILocalTextRegistry registry, string package, string
     public string ScriptName => scriptName;
 
     /// <summary>
-    /// Gets script registration name for a local text package
+    /// Gets the script registration name for a local text package.
     /// </summary>
-    /// <param name="package">Package key</param>
-    /// <param name="languageId">Language ID</param>
-    /// <param name="isPending">Is pending flag</param>
-    /// <returns></returns>
+    /// <param name="package">The package key.</param>
+    /// <param name="languageId">The language ID.</param>
+    /// <param name="isPending">The pending flag.</param>
+    /// <returns>The script registration name.</returns>
     public static string GetScriptName(string package, string languageId, bool isPending)
     {
         return string.Format(CultureInfo.InvariantCulture, "LocalText.{0}.{1}.{2}", package, languageId, isPending ? "Pending" : "Public");
     }
 
     /// <summary>
-    /// Gets local text package script content
+    /// Gets the local text package script content.
     /// </summary>
-    /// <param name="registry">Text registry</param>
-    /// <param name="packages">Packages setting</param>
-    /// <param name="package">Package key</param>
-    /// <param name="languageId">Language ID</param>
-    /// <param name="isPending">True to include pending texts</param>
-    /// <exception cref="ArgumentNullException">Package key or packages setting is null</exception>
+    /// <param name="registry">The text registry.</param>
+    /// <param name="packages">The packages setting.</param>
+    /// <param name="package">The package key.</param>
+    /// <param name="languageId">The language ID.</param>
+    /// <param name="isPending"><c>true</c> to include pending texts.</param>
+    /// <returns>The script content.</returns>
+    /// <exception cref="ArgumentNullException">The package key or packages setting is <c>null</c>.</exception>
     public static string GetLocalTextPackageScript(ILocalTextRegistry registry, 
         LocalTextPackages packages, string package, string languageId, bool isPending)
     {
@@ -61,14 +62,15 @@ public class LocalTextScript(ILocalTextRegistry registry, string package, string
     }
 
     /// <summary>
-    /// Gets a local text package script content
+    /// Gets a local text package script content.
     /// </summary>
-    /// <param name="registry">Text registry</param>
-    /// <param name="includes">Includes regex</param>
-    /// <param name="languageId">Language ID</param>
-    /// <param name="isPending">True to include pending text</param>
-    /// <param name="packageId">Package ID</param>
-    /// <exception cref="ArgumentNullException">Registry is null</exception>
+    /// <param name="registry">The text registry.</param>
+    /// <param name="includes">The includes regex.</param>
+    /// <param name="languageId">The language ID.</param>
+    /// <param name="isPending"><c>true</c> to include pending texts.</param>
+    /// <param name="packageId">The package ID.</param>
+    /// <returns>The script content.</returns>
+    /// <exception cref="ArgumentNullException"><paramref name="registry"/> is <c>null</c>.</exception>
     public static string GetLocalTextPackageScript(ILocalTextRegistry registry, 
         string includes, string languageId, bool isPending, string packageId = null)
     {

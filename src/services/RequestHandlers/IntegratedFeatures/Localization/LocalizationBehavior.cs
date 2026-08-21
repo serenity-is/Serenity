@@ -3,13 +3,13 @@ using System.Collections;
 namespace Serenity.Services;
 
 /// <summary>
-/// Behavior for handling localizable rows / properties
+/// Behavior for handling localizable rows / properties.
 /// </summary>
 /// <remarks>
-/// Creates an instance of the class
+/// Initializes a new instance of the class.
 /// </remarks>
 /// <param name="handlerFactory">Default handler factory</param>
-/// <exception cref="ArgumentNullException">handlerFactory is null</exception>
+/// <exception cref="ArgumentNullException"><paramref name="handlerFactory"/> is <c>null</c>.</exception>
 public class LocalizationBehavior(IDefaultHandlerFactory handlerFactory) : BaseSaveDeleteBehavior, IImplicitBehavior, IRetrieveBehavior
 {
     private readonly IDefaultHandlerFactory handlerFactory = handlerFactory ?? throw new ArgumentNullException(nameof(handlerFactory));

@@ -4,7 +4,7 @@ using System.IO;
 namespace Serenity;
 
 /// <summary>
-/// Physical file sytem
+/// An <see cref="IFileSystem"/> implementation that operates on the physical disk.
 /// </summary>
 public class PhysicalFileSystem : IFileSystem
 {

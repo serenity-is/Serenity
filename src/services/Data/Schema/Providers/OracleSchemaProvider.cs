@@ -14,13 +14,7 @@ public class OracleSchemaProvider : ISchemaProvider
     /// </value>
     public string DefaultSchema => null;
 
-    /// <summary>
-    /// Gets the field infos.
-    /// </summary>
-    /// <param name="connection">The connection.</param>
-    /// <param name="schema">The schema.</param>
-    /// <param name="table">The table.</param>
-    /// <returns></returns>
+    /// <inheritdoc/>
     public IEnumerable<FieldInfo> GetFieldInfos(IDbConnection connection, string schema, string table)
     {
         return connection.Query<FieldInfo>(@"
@@ -42,13 +36,7 @@ public class OracleSchemaProvider : ISchemaProvider
         });
     }
 
-    /// <summary>
-    /// Gets the foreign keys.
-    /// </summary>
-    /// <param name="connection">The connection.</param>
-    /// <param name="schema">The schema.</param>
-    /// <param name="table">The table.</param>
-    /// <returns></returns>
+    /// <inheritdoc/>
     public IEnumerable<ForeignKeyInfo> GetForeignKeys(IDbConnection connection, string schema, string table)
     {
         return connection.Query<ForeignKeyInfo>(@"
@@ -71,25 +59,13 @@ public class OracleSchemaProvider : ISchemaProvider
         });
     }
 
-    /// <summary>
-    /// Gets the identity fields.
-    /// </summary>
-    /// <param name="connection">The connection.</param>
-    /// <param name="schema">The schema.</param>
-    /// <param name="table">The table.</param>
-    /// <returns></returns>
+    /// <inheritdoc/>
     public IEnumerable<string> GetIdentityFields(IDbConnection connection, string schema, string table)
     {
         return [];
     }
 
-    /// <summary>
-    /// Gets the primary key fields.
-    /// </summary>
-    /// <param name="connection">The connection.</param>
-    /// <param name="schema">The schema.</param>
-    /// <param name="table">The table.</param>
-    /// <returns></returns>
+    /// <inheritdoc/>
     public IEnumerable<string> GetPrimaryKeyFields(IDbConnection connection, string schema, string table)
     {
         return connection.Query<string>("""
@@ -107,11 +83,7 @@ public class OracleSchemaProvider : ISchemaProvider
         });
     }
 
-    /// <summary>
-    /// Gets the table names.
-    /// </summary>
-    /// <param name="connection">The connection.</param>
-    /// <returns></returns>
+    /// <inheritdoc/>
     public IEnumerable<TableName> GetTableNames(IDbConnection connection)
     {
         return connection.Query<TableName>(@"

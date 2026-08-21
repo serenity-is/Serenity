@@ -1,7 +1,7 @@
 namespace Serenity.Data;
 
 /// <summary>
-/// Field with an Enum value
+/// Field with an Enum value.
 /// </summary>
 /// <typeparam name="TEnum">The type of the enum.</typeparam>
 public class EnumField<TEnum> : Int32Field
@@ -18,6 +18,7 @@ public class EnumField<TEnum> : Int32Field
     /// <param name="getValue">The get value.</param>
     /// <param name="setValue">The set value.</param>
     /// <exception cref="InvalidProgramException">
+    /// TEnum is not an enum type or is not based on Int32.
     /// </exception>
     public EnumField(ICollection<Field> collection, string name, LocalText caption = null, int size = 0, FieldFlags flags = FieldFlags.Default,
         Func<IRow, int?> getValue = null, Action<IRow, int?> setValue = null)
@@ -36,7 +37,7 @@ public class EnumField<TEnum> : Int32Field
     /// Gets or sets the value of this field with the specified row.
     /// </summary>
     /// <param name="row">The row.</param>
-    /// <returns></returns>
+    /// <returns>The enum value of the field in the row.</returns>
     public new TEnum? this[IRow row]
     {
         get

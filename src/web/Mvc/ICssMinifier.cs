@@ -1,15 +1,15 @@
 namespace Serenity.Web;
 
 /// <summary>
-/// Abstraction for Css minifier
+/// Abstraction for a CSS minifier.
 /// </summary>
 public interface ICssMinifier
 {
     /// <summary>
-    /// Minifies the given Css
+    /// Minifies the given CSS.
     /// </summary>
-    /// <param name="source">JavaCss content</param>
-    /// <param name="options">Minify options</param>
-    /// <returns>Minify result</returns>
+    /// <param name="source">The CSS content.</param>
+    /// <param name="options">The minify options.</param>
+    /// <returns>The minify result.</returns>
     CssMinifyResult MinifyCss(string source, CssMinifyOptions options);
 }

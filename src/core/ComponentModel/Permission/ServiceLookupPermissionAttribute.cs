@@ -2,10 +2,10 @@
 namespace Serenity.Data;
 
 /// <summary>
-/// Sets a permission to read only lookup fields in a row via List service
+/// Sets a permission to read only lookup fields in a row via the List service.
 /// Lookup field means ID, Name, and [LookupInclude] properties in a row.
-/// You must use [AuthorizeList(typeof(XRow))] instead of ServiceAuthorize in 
-/// service endpoint.
+/// You must use [AuthorizeList(typeof(XRow))] instead of ServiceAuthorize in
+/// the service endpoint.
 /// </summary>
 /// <seealso cref="PermissionAttributeBase" />
 public class ServiceLookupPermissionAttribute : PermissionAttributeBase

@@ -5,7 +5,7 @@ using System.Diagnostics;
 namespace Serenity;
 
 /// <summary>
-/// A value stopwatch
+/// A value stopwatch.
 /// </summary>
 public readonly struct ValueStopwatch
 {
@@ -15,7 +15,7 @@ public readonly struct ValueStopwatch
     private readonly long startTimestamp;
 
     /// <summary>
-    /// Returns if stopwatch is active
+    /// Returns whether the stopwatch is active.
     /// </summary>
     public readonly bool IsActive => startTimestamp != 0;
 
@@ -25,12 +25,12 @@ public readonly struct ValueStopwatch
     }
 
     /// <summary>
-    /// Creates a new ValueStopwatch
+    /// Creates a new ValueStopwatch.
     /// </summary>
     public static ValueStopwatch StartNew() => new(Stopwatch.GetTimestamp());
 
     /// <summary>
-    /// Gets elapsed milliseconds
+    /// Gets the elapsed milliseconds.
     /// </summary>
     public readonly double ElapsedMilliseconds
     {
@@ -43,7 +43,7 @@ public readonly struct ValueStopwatch
     }
 
     /// <summary>
-    /// Gets elapsed time
+    /// Gets the elapsed time.
     /// </summary>
     public readonly TimeSpan ElapsedTime
     {

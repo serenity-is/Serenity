@@ -1,7 +1,7 @@
 namespace Serenity.Data;
 
 /// <summary>
-/// Base generic class for fields with a value
+/// Base generic class for fields with a value.
 /// </summary>
 /// <typeparam name="TValue">The type of the value.</typeparam>
 /// <seealso cref="Field" />
@@ -20,11 +20,11 @@ public abstract class GenericField<TValue>(ICollection<Field> collection, FieldT
     Func<IRow, TValue> getValue, Action<IRow, TValue> setValue) : Field(collection, type, name, caption, size, flags)
 {
     /// <summary>
-    /// The get value
+    /// The get value.
     /// </summary>
     protected internal Func<IRow, TValue> _getValue = getValue;
     /// <summary>
-    /// The set value
+    /// The set value.
     /// </summary>
     protected internal Action<IRow, TValue> _setValue = setValue;
 

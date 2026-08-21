@@ -1,18 +1,18 @@
 ﻿namespace Serenity.Abstractions;
 
 /// <summary>
-/// Interface for authorization services that supports temporary impersonating
+/// Defines a service that supports temporary user impersonation.
 /// </summary>
 public interface IImpersonator
 {
     /// <summary>
-    /// Temporarily impersonates as a user
+    /// Temporarily impersonates the specified user.
     /// </summary>
-    /// <param name="user">User to impersonate as</param>
+    /// <param name="user">The principal to impersonate.</param>
     void Impersonate(ClaimsPrincipal user);
 
     /// <summary>
-    /// Undoes impersonation
+    /// Ends the most recent impersonation and restores the previous principal.
     /// </summary>
     void UndoImpersonate();
 }

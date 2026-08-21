@@ -9,13 +9,15 @@ namespace Serenity.Extensions.DependencyInjection;
 public static class ServiceCollectionConfigureExtensions
 {
     /// <summary>
-    /// Calls `Configure&lt;TOptions&gt;` with the section key determined from 
-    /// DefaultSectionKeyAttribute on TOptions.
+    /// Calls <c>Configure&lt;TOptions&gt;</c> with the section key determined from
+    /// <see cref="DefaultSectionKeyAttribute"/> on <typeparamref name="TOptions"/>.
     /// </summary>
     /// <typeparam name="TOptions">The type of options being configured.</typeparam>
     /// <param name="services">The <see cref="IServiceCollection"/> to add the services to.</param>
     /// <param name="config">The configuration being bound.</param>
     /// <returns>The <see cref="IServiceCollection"/> so that additional calls can be chained.</returns>
+    /// <exception cref="ArgumentNullException"><paramref name="config"/> is <c>null</c>.</exception>
+    /// <exception cref="ArgumentOutOfRangeException"><typeparamref name="TOptions"/> has no <see cref="DefaultSectionKeyAttribute"/>.</exception>
     public static IServiceCollection ConfigureSection<TOptions>(this IServiceCollection services,
         IConfiguration config) where TOptions : class
     {
@@ -32,13 +34,15 @@ public static class ServiceCollectionConfigureExtensions
     }
 
     /// <summary>
-    /// Calls `Configure&lt;TOptionsType&gt;` for all setting classes with DefaultSectionKeyAttribute.
+    /// Calls <c>Configure&lt;TOptionsType&gt;</c> for all setting classes that have a
+    /// <see cref="DefaultSectionKeyAttribute"/>.
     /// </summary>
     /// <param name="services">The <see cref="IServiceCollection"/> to add the services to.</param>
     /// <param name="config">The configuration being bound.</param>
-    /// <param name="typeSource">Type source with setting classes</param>
-    /// <param name="predicate">Optional predicate for type filtering</param>
+    /// <param name="typeSource">The type source with setting classes.</param>
+    /// <param name="predicate">Optional predicate for type filtering.</param>
     /// <returns>The <see cref="IServiceCollection"/> so that additional calls can be chained.</returns>
+    /// <exception cref="ArgumentNullException"><paramref name="config"/> is <c>null</c>, or no <paramref name="typeSource"/> is provided and none is registered.</exception>
     public static IServiceCollection ConfigureSections(this IServiceCollection services,
         IConfiguration config, ITypeSource typeSource = null, Func<Type, bool> predicate = null)
     {

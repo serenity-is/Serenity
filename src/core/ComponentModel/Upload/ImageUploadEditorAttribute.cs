@@ -2,9 +2,9 @@
 
 /// <summary>
 /// Sets editor type as "ImageUpload", which only allows image files.
-/// Make sure you use this attribute in Row.cs, not Form.cs as 
-/// the image upload behavior only works if it is in row, otherwise
-/// your files will stay in temporary directory.
+/// Make sure you use this attribute in Row.cs, not Form.cs as
+/// the image upload behavior only works if it is in the row, otherwise
+/// your files will stay in the temporary directory.
 /// </summary>
 /// <seealso cref="CustomEditorAttribute" />
 public partial class ImageUploadEditorAttribute : BaseUploadEditorAttribute

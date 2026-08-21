@@ -6,12 +6,12 @@ namespace Serenity.Web;
 public class ImageFormatInfo
 {
     /// <summary>
-    /// Default mime type
+    /// Gets or sets the default MIME type.
     /// </summary>
     public string MimeType { get; set; }
 
     /// <summary>
-    /// List of expected file extensions
+    /// Gets or sets the list of expected file extensions.
     /// </summary>
     public IEnumerable<string> FileExtensions { get; set; }
 }

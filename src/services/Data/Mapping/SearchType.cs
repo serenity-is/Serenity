@@ -2,7 +2,7 @@
 namespace Serenity.Data.Mapping;
 
 /// <summary>
-/// Quick search type enumeration
+/// Quick search type enumeration.
 /// </summary>
 public enum SearchType
 {
@@ -12,22 +12,22 @@ public enum SearchType
     Auto = 0,
 
     /// <summary>
-    /// Search with equality
+    /// Search with equality.
     /// </summary>
     Equals = 1,
 
     /// <summary>
-    /// Search with contains
+    /// Search with contains.
     /// </summary>
     Contains = 2,
 
     /// <summary>
-    /// Search with STARTS WITH
+    /// Search with STARTS WITH.
     /// </summary>
     StartsWith = 3,
 
     /// <summary>
-    /// Use full text CONTAINS
+    /// Use full text CONTAINS.
     /// </summary>
     FullTextContains = 4
 }

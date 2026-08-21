@@ -1,17 +1,16 @@
 ﻿namespace Serenity.Data;
 
 /// <summary>
-///   Extension methods for IDataReader objects.</summary>
+/// Extension methods for <see cref="IDataReader"/> objects.
+/// </summary>
 public static class DataReaderExtensions
 {
     /// <summary>
-    ///   Reads value at field index. Returns DbNull as Null.DateTime.</summary>
-    /// <param name="reader">
-    ///   Reader (required).</param>
-    /// <param name="index">
-    ///   Index.</param>
-    /// <returns>
-    ///   Field value or Null.DateTime if value is DbNull.</returns>
+    /// Reads the value at the field index. Returns <c>null</c> if the value is <see cref="DBNull"/>.
+    /// </summary>
+    /// <param name="reader">The reader (required).</param>
+    /// <param name="index">The field index.</param>
+    /// <returns>The field value, or <c>null</c> if the value is <see cref="DBNull"/>.</returns>
     public static DateTime? AsDateTime(this IDataReader reader, int index)
     {
         if (reader.IsDBNull(index))
@@ -21,13 +20,11 @@ public static class DataReaderExtensions
     }
 
     /// <summary>
-    ///   Reads and converts value at field index to DateTime. Returns DbNull as Null.DateTime.</summary>
-    /// <param name="reader">
-    ///   Reader (required).</param>
-    /// <param name="index">
-    ///   Index.</param>
-    /// <returns>
-    ///   Field value or Null.DateTime if value is DbNull.</returns>
+    /// Reads and converts the value at the field index to <see cref="DateTime"/>. Returns <c>null</c> if the value is <see cref="DBNull"/>.
+    /// </summary>
+    /// <param name="reader">The reader (required).</param>
+    /// <param name="index">The field index.</param>
+    /// <returns>The field value, or <c>null</c> if the value is <see cref="DBNull"/>.</returns>
     public static DateTime? ToDateTime(this IDataReader reader, int index)
     {
         if (reader.IsDBNull(index))
@@ -37,13 +34,11 @@ public static class DataReaderExtensions
     }
 
     /// <summary>
-    ///   Reads value at field index. Returns DbNull as Null.Decimal.</summary>
-    /// <param name="reader">
-    ///   Reader (required).</param>
-    /// <param name="index">
-    ///   Index.</param>
-    /// <returns>
-    ///   Field value or Null.Decimal if value is DbNull.</returns>
+    /// Reads the value at the field index. Returns <c>null</c> if the value is <see cref="DBNull"/>.
+    /// </summary>
+    /// <param name="reader">The reader (required).</param>
+    /// <param name="index">The field index.</param>
+    /// <returns>The field value, or <c>null</c> if the value is <see cref="DBNull"/>.</returns>
     public static decimal? AsDecimal(this IDataReader reader, int index)
     {
         if (reader.IsDBNull(index))
@@ -53,13 +48,11 @@ public static class DataReaderExtensions
     }
 
     /// <summary>
-    ///   Reads and converts value at field index to Decimal. Returns DbNull as Null.Decimal.</summary>
-    /// <param name="reader">
-    ///   Reader (required).</param>
-    /// <param name="index">
-    ///   Index.</param>
-    /// <returns>
-    ///   Field value or Null.Decimal if value is DbNull.</returns>
+    /// Reads and converts the value at the field index to <see cref="decimal"/>. Returns <c>null</c> if the value is <see cref="DBNull"/>.
+    /// </summary>
+    /// <param name="reader">The reader (required).</param>
+    /// <param name="index">The field index.</param>
+    /// <returns>The field value, or <c>null</c> if the value is <see cref="DBNull"/>.</returns>
     public static decimal? ToDecimal(this IDataReader reader, int index)
     {
         if (reader.IsDBNull(index))
@@ -69,13 +62,11 @@ public static class DataReaderExtensions
     }
 
     /// <summary>
-    ///   Reads value at field index. Returns DbNull as Null.Double.</summary>
-    /// <param name="reader">
-    ///   Reader (required).</param>
-    /// <param name="index">
-    ///   Index.</param>
-    /// <returns>
-    ///   Field value or Null.Double if value is DbNull.</returns>
+    /// Reads the value at the field index. Returns <c>null</c> if the value is <see cref="DBNull"/>.
+    /// </summary>
+    /// <param name="reader">The reader (required).</param>
+    /// <param name="index">The field index.</param>
+    /// <returns>The field value, or <c>null</c> if the value is <see cref="DBNull"/>.</returns>
     public static double? AsDouble(this IDataReader reader, int index)
     {
         if (reader.IsDBNull(index))
@@ -85,13 +76,11 @@ public static class DataReaderExtensions
     }
 
     /// <summary>
-    ///   Reads and converts value at field index to Double. Returns DbNull as Null.Double.</summary>
-    /// <param name="reader">
-    ///   Reader (required).</param>
-    /// <param name="index">
-    ///   Index.</param>
-    /// <returns>
-    ///   Field value or Null.Double if value is DbNull.</returns>
+    /// Reads and converts the value at the field index to <see cref="double"/>. Returns <c>null</c> if the value is <see cref="DBNull"/>.
+    /// </summary>
+    /// <param name="reader">The reader (required).</param>
+    /// <param name="index">The field index.</param>
+    /// <returns>The field value, or <c>null</c> if the value is <see cref="DBNull"/>.</returns>
     public static double? ToDouble(this IDataReader reader, int index)
     {
         if (reader.IsDBNull(index))
@@ -101,13 +90,11 @@ public static class DataReaderExtensions
     }
 
     /// <summary>
-    ///   Reads value at field index. Returns DbNull as Null.Int32.</summary>
-    /// <param name="reader">
-    ///   Reader (required).</param>
-    /// <param name="index">
-    ///   Index.</param>
-    /// <returns>
-    ///   Field value or Null.Int32 if value is DbNull.</returns>
+    /// Reads the value at the field index. Returns <c>null</c> if the value is <see cref="DBNull"/>.
+    /// </summary>
+    /// <param name="reader">The reader (required).</param>
+    /// <param name="index">The field index.</param>
+    /// <returns>The field value, or <c>null</c> if the value is <see cref="DBNull"/>.</returns>
     public static int? AsInt32(this IDataReader reader, int index)
     {
         if (reader.IsDBNull(index))
@@ -117,13 +104,11 @@ public static class DataReaderExtensions
     }
 
     /// <summary>
-    ///   Reads and converts value at field index to Int32. Returns DbNull as Null.Int32.</summary>
-    /// <param name="reader">
-    ///   Reader (required).</param>
-    /// <param name="index">
-    ///   Index.</param>
-    /// <returns>
-    ///   Field value or Null.Int32 if value is DbNull.</returns>
+    /// Reads and converts the value at the field index to <see cref="int"/>. Returns <c>null</c> if the value is <see cref="DBNull"/>.
+    /// </summary>
+    /// <param name="reader">The reader (required).</param>
+    /// <param name="index">The field index.</param>
+    /// <returns>The field value, or <c>null</c> if the value is <see cref="DBNull"/>.</returns>
     public static int? ToInt32(this IDataReader reader, int index)
     {
         if (reader.IsDBNull(index))
@@ -133,13 +118,11 @@ public static class DataReaderExtensions
     }
 
     /// <summary>
-    ///   Reads value at field index. Returns DbNull as Null.Int64.</summary>
-    /// <param name="reader">
-    ///   Reader (required).</param>
-    /// <param name="index">
-    ///   Index.</param>
-    /// <returns>
-    ///   Field value or Null.Int64 if value is DbNull.</returns>
+    /// Reads the value at the field index. Returns <c>null</c> if the value is <see cref="DBNull"/>.
+    /// </summary>
+    /// <param name="reader">The reader (required).</param>
+    /// <param name="index">The field index.</param>
+    /// <returns>The field value, or <c>null</c> if the value is <see cref="DBNull"/>.</returns>
     public static long? AsInt64(this IDataReader reader, int index)
     {
         if (reader.IsDBNull(index))
@@ -149,13 +132,11 @@ public static class DataReaderExtensions
     }
 
     /// <summary>
-    ///   Reads and converts value at field index to Int64. Returns DbNull as Null.Int64.</summary>
-    /// <param name="reader">
-    ///   Reader (required).</param>
-    /// <param name="index">
-    ///   Index.</param>
-    /// <returns>
-    ///   Field value or Null.Int64 if value is DbNull.</returns>
+    /// Reads and converts the value at the field index to <see cref="long"/>. Returns <c>null</c> if the value is <see cref="DBNull"/>.
+    /// </summary>
+    /// <param name="reader">The reader (required).</param>
+    /// <param name="index">The field index.</param>
+    /// <returns>The field value, or <c>null</c> if the value is <see cref="DBNull"/>.</returns>
     public static long? ToInt64(this IDataReader reader, int index)
     {
         if (reader.IsDBNull(index))
@@ -165,13 +146,11 @@ public static class DataReaderExtensions
     }
 
     /// <summary>
-    ///   Reads value at field index. Returns DbNull as null.</summary>
-    /// <param name="reader">
-    ///   Reader (required).</param>
-    /// <param name="index">
-    ///   Index.</param>
-    /// <returns>
-    ///   Field value or null if value is DbNull.</returns>
+    /// Reads the value at the field index. Returns <c>null</c> if the value is <see cref="DBNull"/>.
+    /// </summary>
+    /// <param name="reader">The reader (required).</param>
+    /// <param name="index">The field index.</param>
+    /// <returns>The field value, or <c>null</c> if the value is <see cref="DBNull"/>.</returns>
     public static string AsString(this IDataReader reader, int index)
     {
         if (reader.IsDBNull(index))
@@ -181,13 +160,11 @@ public static class DataReaderExtensions
     }
 
     /// <summary>
-    ///   Reads and converts value at field index to String. Returns DbNull as null.</summary>
-    /// <param name="reader">
-    ///   Reader (required).</param>
-    /// <param name="index">
-    ///   Index.</param>
-    /// <returns>
-    ///   Field value or null if value is DbNull.</returns>
+    /// Reads and converts the value at the field index to <see cref="string"/>. Returns <c>null</c> if the value is <see cref="DBNull"/>.
+    /// </summary>
+    /// <param name="reader">The reader (required).</param>
+    /// <param name="index">The field index.</param>
+    /// <returns>The field value, or <c>null</c> if the value is <see cref="DBNull"/>.</returns>
     public static string ToString(this IDataReader reader, int index)
     {
         if (reader.IsDBNull(index))

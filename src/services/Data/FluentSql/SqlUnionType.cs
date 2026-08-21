@@ -6,27 +6,27 @@
 public enum SqlUnionType
 {
     /// <summary>
-    /// UNION
+    /// UNION.
     /// </summary>
     Union = 1,
     /// <summary>
-    /// UNION ALL
+    /// UNION ALL.
     /// </summary>
     UnionAll = 2,
     /// <summary>
-    /// INTERSECT
+    /// INTERSECT.
     /// </summary>
     Intersect = 3,
     /// <summary>
-    /// INTERSECT ALL
+    /// INTERSECT ALL.
     /// </summary>
     IntersectAll = 4,
     /// <summary>
-    /// EXCEPT
+    /// EXCEPT.
     /// </summary>
     Except = 5,
     /// <summary>
-    /// EXCEPT ALL
+    /// EXCEPT ALL.
     /// </summary>
     ExceptAll = 6
 }

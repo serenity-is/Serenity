@@ -3,7 +3,7 @@
 namespace Serenity;
 
 /// <summary>
-/// Basic collection extensions
+/// Basic collection extensions.
 /// </summary>
 public static class CollectionExtensions
 {

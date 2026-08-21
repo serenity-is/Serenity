@@ -3,12 +3,12 @@ using System.Text.Json;
 namespace Serenity.JsonConverters;
 
 /// <summary>
-/// Tries to handle empty string for nullable values like JSON.NET does
+/// Tries to handle empty strings for nullable values, similar to how JSON.NET does.
 /// </summary>
 public class NullableJsonConverter : JsonConverterFactory
 {
     /// <summary>
-    /// Default instance
+    /// The default instance of the <see cref="NullableJsonConverter"/>.
     /// </summary>
     public static readonly NullableJsonConverter Instance = new();
 

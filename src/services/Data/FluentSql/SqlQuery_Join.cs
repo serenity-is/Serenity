@@ -36,8 +36,8 @@ public partial class SqlQuery : QueryWithParams, IFilterableQuery, IGetExpressio
     /// Joins the specified join.
     /// </summary>
     /// <param name="join">The join.</param>
-    /// <returns></returns>
-    /// <exception cref="ArgumentNullException">join</exception>
+    /// <returns>The query itself.</returns>
+    /// <exception cref="ArgumentNullException">join is null.</exception>
     /// <exception cref="InvalidOperationException">Another join with different expression is already in the query.</exception>
     public SqlQuery Join(Join join)
     {
@@ -79,7 +79,7 @@ public partial class SqlQuery : QueryWithParams, IFilterableQuery, IGetExpressio
     /// <param name="toTable">To table.</param>
     /// <param name="alias">The alias.</param>
     /// <param name="onCriteria">The on criteria.</param>
-    /// <returns></returns>
+    /// <returns>The query itself.</returns>
     /// <exception cref="ArgumentNullException">
     /// alias is null or alias.table is null or empty
     /// </exception>
@@ -105,7 +105,7 @@ public partial class SqlQuery : QueryWithParams, IFilterableQuery, IGetExpressio
     /// </summary>
     /// <param name="alias">The alias.</param>
     /// <param name="onCriteria">The on criteria.</param>
-    /// <returns></returns>
+    /// <returns>The query itself.</returns>
     /// <exception cref="ArgumentNullException">
     /// alias is null or alias.table is null or empty.
     /// </exception>
@@ -160,7 +160,7 @@ public partial class SqlQuery : QueryWithParams, IFilterableQuery, IGetExpressio
     /// </summary>
     /// <param name="alias">The alias with table name/alias name.</param>
     /// <param name="onCriteria">The ON criteria.</param>
-    /// <returns></returns>
+    /// <returns>The query itself.</returns>
     /// <exception cref="ArgumentNullException">
     /// alias is null
     /// or
@@ -188,7 +188,7 @@ public partial class SqlQuery : QueryWithParams, IFilterableQuery, IGetExpressio
     /// </summary>
     /// <param name="alias">The alias.</param>
     /// <param name="onCriteria">The ON criteria.</param>
-    /// <returns></returns>
+    /// <returns>The query itself.</returns>
     /// <exception cref="ArgumentNullException">
     /// alias is null 
     /// or
@@ -257,7 +257,7 @@ public partial class SqlQuery : QueryWithParams, IFilterableQuery, IGetExpressio
     /// </summary>
     /// <param name="join">The join.</param>
     /// <returns>The query itself.</returns>
-    /// <exception cref="ArgumentNullException">join is null</exception>
+    /// <exception cref="ArgumentNullException">join is null.</exception>
     public SqlQuery EnsureJoin(Join join)
     {
         ArgumentNullException.ThrowIfNull(join);

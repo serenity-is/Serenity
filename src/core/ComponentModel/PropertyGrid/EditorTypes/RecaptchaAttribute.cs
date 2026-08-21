@@ -1,7 +1,7 @@
 ﻿namespace Serenity.ComponentModel;
 
 /// <summary>
-/// Indicates that the target property should use a "Recaptcha" (Google).
+/// Indicates that the target property should use a Google "Recaptcha" editor.
 /// </summary>
 /// <seealso cref="CustomEditorAttribute" />
 public partial class RecaptchaAttribute : CustomEditorAttribute

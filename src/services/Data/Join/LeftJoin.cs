@@ -1,7 +1,7 @@
 ﻿namespace Serenity.Data;
 
 /// <summary>
-/// LEFT JOIN type
+/// LEFT JOIN type.
 /// </summary>
 /// <seealso cref="Join" />
 public class LeftJoin : Join
@@ -32,7 +32,7 @@ public class LeftJoin : Join
     /// <summary>
     /// Gets the SQL keyword.
     /// </summary>
-    /// <returns></returns>
+    /// <returns>The SQL keyword for this join type.</returns>
     public override string GetKeyword()
     {
         return "LEFT JOIN";

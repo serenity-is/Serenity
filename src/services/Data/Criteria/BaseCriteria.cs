@@ -4,7 +4,7 @@ using System.Diagnostics;
 namespace Serenity.Data;
 
 /// <summary>
-/// Base criteria object type
+/// The base criteria object type, from which all criteria types derive.
 /// </summary>
 /// <seealso cref="ICriteria" />
 [DebuggerDisplay("{ToStringIgnoreParams()}")]
@@ -26,7 +26,7 @@ public abstract class BaseCriteria : ICriteria
     /// <summary>
     /// Creates a new unary IsNull criteria containing this criteria as the operand.
     /// </summary>
-    /// <returns></returns>
+    /// <returns>A new unary IsNull criteria.</returns>
     public BaseCriteria IsNull()
     {
         return new UnaryCriteria(CriteriaOperator.IsNull, this);
@@ -35,7 +35,7 @@ public abstract class BaseCriteria : ICriteria
     /// <summary> 
     /// Creates a new unary IsNotNull criteria containing this criteria as the operand.
     /// </summary>
-    /// <returns></returns>
+    /// <returns>A new unary IsNotNull criteria.</returns>
     public BaseCriteria IsNotNull()
     {
         return new UnaryCriteria(CriteriaOperator.IsNotNull, this);
@@ -45,8 +45,8 @@ public abstract class BaseCriteria : ICriteria
     /// Creates a new binary Like criteria containing this criteria as the left operand.
     /// </summary>
     /// <param name="mask">The LIKE mask.</param>
-    /// <param name="upper">True to use UPPER function both sides</param>
-    /// <returns></returns>
+    /// <param name="upper"><c>true</c> to use the UPPER function on both sides.</param>
+    /// <returns>A new binary Like criteria.</returns>
     public BaseCriteria Like(string mask, bool upper = false)
     {
         var left = this;
@@ -62,8 +62,8 @@ public abstract class BaseCriteria : ICriteria
     /// Creates a new binary Not Like criteria containing this criteria as the left operand.
     /// </summary>
     /// <param name="mask">The like mask.</param>
-    /// <param name="upper">True to use UPPER function both sides</param>
-    /// <returns></returns>
+    /// <param name="upper"><c>true</c> to use the UPPER function on both sides.</param>
+    /// <returns>A new binary Not Like criteria.</returns>
     public BaseCriteria NotLike(string mask, bool upper = false)
 {
         var left = this;
@@ -76,11 +76,11 @@ public abstract class BaseCriteria : ICriteria
     }
 
     /// <summary>
-    /// Creates a new binary Stars With (LIKE '...%') criteria containing this criteria as the left operand.
+    /// Creates a new binary Starts With (LIKE '...%') criteria containing this criteria as the left operand.
     /// </summary>
     /// <param name="mask">The starts with mask.</param>
-    /// <param name="upper">True to use UPPER function both sides</param>
-    /// <returns></returns>
+    /// <param name="upper"><c>true</c> to use the UPPER function on both sides.</param>
+    /// <returns>A new binary Starts With criteria.</returns>
     /// <exception cref="ArgumentNullException">mask is null</exception>
     public BaseCriteria StartsWith(string mask, bool upper = false)
     {
@@ -93,8 +93,8 @@ public abstract class BaseCriteria : ICriteria
     /// Creates a new binary Ends With (LIKE '%...') criteria containing this criteria as the left operand.
     /// </summary>
     /// <param name="mask">The ends with mask.</param>
-    /// <param name="upper">True to use UPPER function both sides</param>
-    /// <returns></returns>
+    /// <param name="upper"><c>true</c> to use the UPPER function on both sides.</param>
+    /// <returns>A new binary Ends With criteria.</returns>
     /// <exception cref="ArgumentNullException">mask is null</exception>
     public BaseCriteria EndsWith(string mask, bool upper = false)
     {
@@ -107,8 +107,8 @@ public abstract class BaseCriteria : ICriteria
     /// Creates a new binary Contains criteria (LIKE '%...%') containing this criteria as the left operand.
     /// </summary>
     /// <param name="mask">The contains mask.</param>
-    /// <param name="upper">True to use UPPER function both sides</param>
-    /// <returns></returns>
+    /// <param name="upper"><c>true</c> to use the UPPER function on both sides.</param>
+    /// <returns>A new binary Contains criteria.</returns>
     public BaseCriteria Contains(string mask, bool upper = false)
     {
         return Like("%" + mask + "%", upper);
@@ -118,8 +118,8 @@ public abstract class BaseCriteria : ICriteria
     /// Creates a new binary Not Contains criteria (NOT LIKE '%...%') containing this criteria as the left operand.
     /// </summary>
     /// <param name="mask">The contains mask.</param>
-    /// <param name="upper">True to use UPPER function both sides</param>
-    /// <returns></returns>
+    /// <param name="upper"><c>true</c> to use the UPPER function on both sides.</param>
+    /// <returns>A new binary Not Contains criteria.</returns>
     public BaseCriteria NotContains(string mask, bool upper = false)
     {
         return NotLike("%" + mask + "%", upper);
@@ -128,9 +128,9 @@ public abstract class BaseCriteria : ICriteria
     /// <summary>
     /// Creates a new binary IN criteria containing this criteria as the left operand.
     /// </summary>
-    /// <typeparam name="T">Type of values</typeparam>
+    /// <typeparam name="T">The type of values.</typeparam>
     /// <param name="values">The values.</param>
-    /// <returns></returns>
+    /// <returns>A new binary IN criteria.</returns>
     /// <exception cref="ArgumentNullException">values</exception>
     public BaseCriteria In<T>(params T[] values)
     {
@@ -163,7 +163,7 @@ public abstract class BaseCriteria : ICriteria
     /// Creates a new binary IN criteria containing this criteria as the left operand.
     /// </summary>
     /// <param name="statement">The statement.</param>
-    /// <returns></returns>
+    /// <returns>A new binary IN criteria.</returns>
     /// <exception cref="ArgumentNullException">statement is null or empty</exception>
     public BaseCriteria In(BaseCriteria statement)
     {
@@ -177,7 +177,7 @@ public abstract class BaseCriteria : ICriteria
     /// Creates a new binary IN criteria containing this criteria as the left operand.
     /// </summary>
     /// <param name="statement">The statement.</param>
-    /// <returns></returns>
+    /// <returns>A new binary IN criteria.</returns>
     public BaseCriteria InStatement(BaseCriteria statement)
     {
         return In(statement);
@@ -187,7 +187,7 @@ public abstract class BaseCriteria : ICriteria
     /// Creates a new binary IN criteria containing this criteria as the left operand.
     /// </summary>
     /// <param name="statement">The statement query.</param>
-    /// <returns></returns>
+    /// <returns>A new binary IN criteria.</returns>
     /// <exception cref="ArgumentNullException">statement is null</exception>
     public BaseCriteria In(ISqlQuery statement)
     {
@@ -199,9 +199,9 @@ public abstract class BaseCriteria : ICriteria
     /// <summary>
     /// Creates a new binary NOT IN criteria containing this criteria as the left operand.
     /// </summary>
-    /// <typeparam name="T">Type of values</typeparam>
+    /// <typeparam name="T">The type of values.</typeparam>
     /// <param name="values">The values.</param>
-    /// <returns></returns>
+    /// <returns>A new binary NOT IN criteria.</returns>
     /// <exception cref="ArgumentNullException">values is null or zero length array</exception>
     public BaseCriteria NotIn<T>(params T[] values)
     {
@@ -234,7 +234,7 @@ public abstract class BaseCriteria : ICriteria
     /// Creates a new binary NOT IN criteria containing this criteria as the left operand.
     /// </summary>
     /// <param name="statement">The statement.</param>
-    /// <returns></returns>
+    /// <returns>A new binary NOT IN criteria.</returns>
     /// <exception cref="ArgumentNullException">statement is null or empty</exception>
     public BaseCriteria NotIn(BaseCriteria statement)
     {
@@ -248,7 +248,7 @@ public abstract class BaseCriteria : ICriteria
     /// Creates a new binary NOT IN criteria containing this criteria as the left operand.
     /// </summary>
     /// <param name="statement">The statement.</param>
-    /// <returns></returns>
+    /// <returns>A new binary NOT IN criteria.</returns>
     /// <exception cref="ArgumentNullException">statement is null</exception>
     public BaseCriteria NotIn(ISqlQuery statement)
     {
@@ -1155,10 +1155,10 @@ public abstract class BaseCriteria : ICriteria
     }
 
     /// <summary>
-    /// Converts the criteria to string while ignoring its params if any.
-    /// ToString() raises an exception if a criteria has params, while this not.
+    /// Converts the criteria to a string while ignoring its params, if any.
+    /// <see cref="ToString()"/> raises an exception if a criteria has params, while this does not.
     /// </summary>
-    /// <returns></returns>
+    /// <returns>The string representation of the criteria.</returns>
     public string ToStringIgnoreParams()
     {
         return ToString(ignoreParams);

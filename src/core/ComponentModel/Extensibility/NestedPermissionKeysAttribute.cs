@@ -2,7 +2,7 @@
 
 /// <summary>
 /// Indicates that this class contains permission keys with optional
-/// subclasses that also contains permission keys.
+/// subclasses that also contain permission keys.
 /// </summary>
 /// <seealso cref="Attribute" />
 [AttributeUsage(AttributeTargets.Class, AllowMultiple = false)]
@@ -16,8 +16,8 @@ public sealed class NestedPermissionKeysAttribute : Attribute
     }
 
     /// <summary>
-    /// Gets / sets optional language identifier that specifies
-    /// language for texts specified in [DisplayName] attribute.
+    /// Gets or sets the optional language identifier that specifies
+    /// the language for texts specified in the [DisplayName] attribute.
     /// </summary>
     /// <value>
     /// The language identifier.

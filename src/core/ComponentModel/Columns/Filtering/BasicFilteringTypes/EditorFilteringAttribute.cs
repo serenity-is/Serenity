@@ -1,8 +1,8 @@
 namespace Serenity.ComponentModel;
 
 /// <summary>
-/// Indicates that property should a custom editor for filtering,
-/// which is usually determined by form editor type of the property.
+/// Indicates that the property should have a custom editor for filtering,
+/// which is usually determined by the form editor type of the property.
 /// </summary>
 /// <seealso cref="CustomFilteringAttribute" />
 public class EditorFilteringAttribute : CustomFilteringAttribute
@@ -65,8 +65,8 @@ public class EditorFilteringAttribute : CustomFilteringAttribute
     }
 
     /// <summary>
-    /// Gets or sets a value indicating whether to use LIKE kind of operators including
-    /// starts with, ends with etc.
+    /// Gets or sets a value indicating whether to use LIKE-style operators, including
+    /// starts with, ends with, etc.
     /// </summary>
     /// <value>
     ///   <c>true</c> if should use LIKE operators; otherwise, <c>false</c>.

@@ -1,7 +1,7 @@
 namespace Serenity.ComponentModel;
 
 /// <summary>
-/// Base class for service lookup based editor types
+/// Base class for service lookup based editor types.
 /// </summary>
 /// <seealso cref="CustomEditorAttribute" />
 /// <remarks>
@@ -12,8 +12,8 @@ public abstract class ServiceLookupEditorBaseAttribute(string editorType) : Cust
 {
 
     /// <summary>
-    /// List service url, e.g. Northwind/Customer/List.
-    /// It can be an absolute or relative URL to ~/Services
+    /// List service URL, e.g. Northwind/Customer/List.
+    /// It can be an absolute or relative URL to ~/Services.
     /// </summary>
     public string? Service
     {
@@ -22,7 +22,7 @@ public abstract class ServiceLookupEditorBaseAttribute(string editorType) : Cust
     }
 
     /// <summary>
-    /// Name of the id field
+    /// Name of the ID field.
     /// </summary>
     public string? IdField
     {
@@ -31,16 +31,16 @@ public abstract class ServiceLookupEditorBaseAttribute(string editorType) : Cust
     }
 
     /// <summary>
-    /// Name of the text field
+    /// Name of the text field.
     /// </summary>
     public string? TextField
     {
-        get { return GetOption<string>("idField"); }
+        get { return GetOption<string>("textField"); }
         set { SetOption("textField", value); }
     }
 
     /// <summary>
-    /// Page size used while loading records, default 100
+    /// Page size used while loading records, default 100.
     /// </summary>
     public int? PageSize
     {
@@ -49,7 +49,7 @@ public abstract class ServiceLookupEditorBaseAttribute(string editorType) : Cust
     }
 
     /// <summary>
-    /// Sort order for records, defaults to text field
+    /// Sort order for records, defaults to the text field.
     /// </summary>
     public object? Sort
     {
@@ -58,7 +58,7 @@ public abstract class ServiceLookupEditorBaseAttribute(string editorType) : Cust
     }
 
     /// <summary>
-    /// Column selection, defaults to KeyOnly
+    /// Column selection, defaults to KeyOnly.
     /// </summary>
     public ColumnSelection ColumnSelection
     {
@@ -67,7 +67,7 @@ public abstract class ServiceLookupEditorBaseAttribute(string editorType) : Cust
     }
 
     /// <summary>
-    /// Include columns list, defaults to id, text, and [LookupInclude] columns.
+    /// Include columns list, defaults to ID, text, and [LookupInclude] columns.
     /// </summary>
     public string[]? IncludeColumns
     {
@@ -76,7 +76,7 @@ public abstract class ServiceLookupEditorBaseAttribute(string editorType) : Cust
     }
 
     /// <summary>
-    /// Exclude columns list
+    /// Exclude columns list.
     /// </summary>
     public string[]? ExcludeColumns
     {
@@ -85,19 +85,19 @@ public abstract class ServiceLookupEditorBaseAttribute(string editorType) : Cust
     }
 
     /// <summary>
-    /// Include deleted, defaults to false
+    /// Include deleted, defaults to false.
     /// </summary>
-    public string[]? IncludeDeleted
+    public bool IncludeDeleted
     {
-        get { return GetOption<string[]>("includeDeleted"); }
+        get { return GetOption<bool>("includeDeleted"); }
         set { SetOption("includeDeleted", value); }
     }
 
     /// <summary>
     /// Allows dynamically creating new options from text input by the user in the search box.
     /// This option should only be used for free text inputs, not ID / Text pairs.
-    /// When this option is enabled InplaceAdd cannot be used. 
-    /// Newly created option will have same ID / Text which is user entered text.
+    /// When this option is enabled, InplaceAdd cannot be used.
+    /// A newly created option will have the same ID / Text as the user-entered text.
     /// </summary>
     public bool AutoComplete
     {
@@ -106,7 +106,7 @@ public abstract class ServiceLookupEditorBaseAttribute(string editorType) : Cust
     }
 
     /// <summary>
-    /// Enable inplace add / edit functionality
+    /// Enables inplace add / edit functionality.
     /// </summary>
     public bool InplaceAdd
     {
@@ -115,7 +115,7 @@ public abstract class ServiceLookupEditorBaseAttribute(string editorType) : Cust
     }
 
     /// <summary>
-    /// Permission required to use inplace add / edit
+    /// Permission required to use inplace add / edit.
     /// </summary>
     public string? InplaceAddPermission
     {
@@ -124,10 +124,10 @@ public abstract class ServiceLookupEditorBaseAttribute(string editorType) : Cust
     }
 
     /// <summary>
-    /// This property is meaningful when InplaceAdd is true. By default, dialog type name
-    /// is determined by service, e.g. if service is "Northwind/CustomerCity/List", 
-    /// a dialog class named "Northwind.CustomerCityDialog" is used. If dialog type is different
-    /// than the service, set this to classname, e.g. "MyModule.MyDialog"
+    /// This property is meaningful when InplaceAdd is true. By default, the dialog type name
+    /// is determined by the service, e.g. if the service is "Northwind/CustomerCity/List",
+    /// a dialog class named "Northwind.CustomerCityDialog" is used. If the dialog type is different
+    /// than the service, set this to the class name, e.g. "MyModule.MyDialog".
     /// </summary>
     public string? DialogType
     {
@@ -136,7 +136,7 @@ public abstract class ServiceLookupEditorBaseAttribute(string editorType) : Cust
     }
 
     /// <summary>
-    /// ID (can be relative) of the editor that this editor will cascade from, e.g. Country
+    /// ID (can be relative) of the editor that this editor will cascade from, e.g. Country.
     /// </summary>
     public string? CascadeFrom
     {
@@ -154,8 +154,8 @@ public abstract class ServiceLookupEditorBaseAttribute(string editorType) : Cust
     }
 
     /// <summary>
-    /// Cascade filtering value, usually set by CascadeFrom editor, e.g. the integer value of CountryID
-    /// If null or empty, and CascadeField is set, all items are filtered
+    /// Cascade filtering value, usually set by the CascadeFrom editor, e.g. the integer value of CountryID.
+    /// If null or empty, and CascadeField is set, all items are filtered.
     /// </summary>
     public object? CascadeValue
     {
@@ -212,7 +212,7 @@ public abstract class ServiceLookupEditorBaseAttribute(string editorType) : Cust
     }
 
     /// <summary>
-    /// Open dialogs as panel (default value is null, which uses panel attribute on dialog class)
+    /// Opens dialogs as a panel (default value is null, which uses the panel attribute on the dialog class).
     /// </summary>
     public bool OpenDialogAsPanel
     {
@@ -221,7 +221,7 @@ public abstract class ServiceLookupEditorBaseAttribute(string editorType) : Cust
     }
 
     /// <summary>
-    /// Gets/sets row type related with this service lookup editor
+    /// Gets or sets the row type related to this service lookup editor.
     /// </summary>
     public Type? ItemType { get; set; }
 }

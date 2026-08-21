@@ -1,12 +1,12 @@
 namespace Serenity.Data;
 
 /// <summary>
-/// An interface that provides access to email field
+/// An interface that provides access to the email field.
 /// </summary>
 public interface IEmailRow
 {
     /// <summary>
-    /// Gets email field
+    /// Gets the email field.
     /// </summary>
     StringField EmailField { get; }
 }

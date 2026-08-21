@@ -12,10 +12,10 @@ public class FilteringTypeAttribute(string type) : Attribute
 {
 
     /// <summary>
-    /// Sets the parameters. This is called by filtering system to pass
-    /// additional parameters / options to the filtering object
+    /// Sets the parameters. This is called by the filtering system to pass
+    /// additional parameters / options to the filtering object.
     /// </summary>
-    /// <param name="formatterParams">The formatter parameters.</param>
+    /// <param name="formatterParams">The filtering parameters.</param>
     public virtual void SetParams(IDictionary<string, object?> formatterParams)
     {
     }

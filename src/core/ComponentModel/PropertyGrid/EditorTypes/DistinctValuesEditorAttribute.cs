@@ -38,12 +38,12 @@ public partial class DistinctValuesEditorAttribute : LookupEditorBaseAttribute
     }
 
     /// <summary>
-    /// RowType that this editor will get values from
+    /// The row type that this editor will get values from.
     /// </summary>
     public Type? RowType { get; set; }
 
     /// <summary>
-    /// Property name that this editor will get values from
+    /// The property name that this editor will get values from.
     /// </summary>
     public string? PropertyName { get; set; }
 
@@ -55,7 +55,7 @@ public partial class DistinctValuesEditorAttribute : LookupEditorBaseAttribute
     public string? Permission { get; set; }
 
     /// <summary>
-    /// Cache duration in seconds
+    /// Cache duration in seconds.
     /// </summary>
     public int Expiration { get; set; }
 }

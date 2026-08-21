@@ -3,22 +3,22 @@ using Microsoft.Extensions.Logging;
 namespace Serenity.Data;
 
 /// <summary>
-/// Contains DB connection related extensions
+/// Contains DB connection related extensions.
 /// </summary>
 public static class ConnectionExtensions
 {
     /// <summary>
-    /// Default connection key, this is an optional name
+    /// The default connection key, which is an optional name.
     /// </summary>
     public const string DefaultConnectionKey = "Default";
 
     /// <summary>
-    /// Creates a new connection for specified class, determining 
-    /// the connection key by checking its [ConnectionKey] attribute.
+    /// Creates a new connection for the specified class, determining
+    /// the connection key by checking its <see cref="ConnectionKeyAttribute"/>.
     /// </summary>
     /// <typeparam name="TClass">The type of the class.</typeparam>
-    /// <param name="factory">Connection factory</param>
-    /// <returns>A new connection</returns>
+    /// <param name="factory">The connection factory.</param>
+    /// <returns>A new connection.</returns>
     /// <exception cref="ArgumentOutOfRangeException">Type has no ConnectionKey attribute!</exception>
     public static IDbConnection NewFor<TClass>(this ISqlConnections factory)
     {
@@ -27,11 +27,11 @@ public static class ConnectionExtensions
     }
 
     /// <summary>
-    /// Ensures the connection is open. Warning! This method will not reopen a connection that once was opened
+    /// Ensures the connection is open. Warning! This method will not reopen a connection that was once opened
     /// and will raise an error.
     /// </summary>
     /// <param name="connection">The connection.</param>
-    /// <returns></returns>
+    /// <returns>The connection.</returns>
     /// <exception cref="ArgumentNullException">connection</exception>
     /// <exception cref="InvalidOperationException">Can't auto open a closed connection that was previously open!</exception>
     public static IDbConnection EnsureOpen(this IDbConnection connection)
@@ -51,14 +51,14 @@ public static class ConnectionExtensions
     }
 
     /// <summary>
-    /// Gets the current actual transaction for a connection if any.
-    /// Most of the time, a connection will only have one transaction, 
-    /// but in .NET it is not possible to know what is that transaction.
-    /// Serenity wraps a connection (WrappedConnection) so that running
-    /// transaction if any is available to get from the connection object.
+    /// Gets the current actual transaction for a connection, if any.
+    /// Most of the time, a connection will only have one transaction,
+    /// but in .NET it is not possible to know what that transaction is.
+    /// Serenity wraps a connection (<see cref="WrappedConnection"/>) so that the running
+    /// transaction, if any, is available to get from the connection object.
     /// </summary>
     /// <param name="connection">The connection.</param>
-    /// <returns>The current transaction for a connection</returns>
+    /// <returns>The current transaction for the connection.</returns>
     public static IDbTransaction GetCurrentActualTransaction(this IDbConnection connection)
     {
         if (connection is IHasCurrentTransaction hct &&
@@ -68,9 +68,11 @@ public static class ConnectionExtensions
         return null;
     }
 
-    /// <summary>Sets the default command timeout for given connection. 
-    /// Only works with IHasCommandTimeout (WrappedConnection) instances, which are usually
-    /// created by SqlConnections.NewXyz methods.</summary>
+    /// <summary>
+    /// Sets the default command timeout for the given connection.
+    /// Only works with <see cref="IHasCommandTimeout"/> (<see cref="WrappedConnection"/>) instances, which are usually
+    /// created by SqlConnections.NewXyz methods.
+    /// </summary>
     /// <param name="connection">The connection.</param>
     /// <param name="timeout">The timeout value.</param>
     /// <exception cref="ArgumentOutOfRangeException">Connection is not a WrappedConnection.</exception>
@@ -83,10 +85,10 @@ public static class ConnectionExtensions
     }
 
     /// <summary>
-    /// Gets the dialect for given connection.
+    /// Gets the dialect for the given connection.
     /// </summary>
     /// <param name="connection">The connection.</param>
-    /// <returns>The sql dialect.</returns>
+    /// <returns>The SQL dialect.</returns>
     public static ISqlDialect GetDialect(this IDbConnection connection)
     {
         if (connection is not IHasDialect hasDialect)
@@ -96,11 +98,11 @@ public static class ConnectionExtensions
     }
 
     /// <summary>
-    /// Gets the logger for a connection if it implements IHasLogger
-    /// interface, or null if not.
+    /// Gets the logger for a connection if it implements the <see cref="IHasLogger"/>
+    /// interface, or <c>null</c> if not.
     /// </summary>
     /// <param name="connection">The connection.</param>
-    /// <returns>The logger for connection (used by static SqlHelper methods)</returns>
+    /// <returns>The logger for the connection (used by static SqlHelper methods).</returns>
     public static ILogger GetLogger(this IDbConnection connection)
     {
         return (connection as IHasLogger)?.Logger;

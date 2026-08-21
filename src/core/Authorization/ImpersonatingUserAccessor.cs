@@ -3,14 +3,14 @@ using System.Threading;
 namespace Serenity.Web;
 
 /// <summary>
-/// Adds impersonation support to any IUserContext implementation
+/// Wraps an <see cref="IUserAccessor"/> and adds support for temporary user impersonation.
 /// </summary>
 /// <remarks>
 /// Initializes a new instance of the <see cref="ImpersonatingUserAccessor"/> class
-/// that wraps passed authorization service and adds impersonation support.
+/// that wraps the specified user accessor and adds impersonation support.
 /// </remarks>
-/// <param name="userContext">The user accessor service to wrap with impersonation support.</param>
-/// <param name="itemsAccessor">Request items accessor</param>
+/// <param name="userContext">The underlying user accessor to delegate to when no impersonation is active.</param>
+/// <param name="itemsAccessor">The accessor that provides the per-request item dictionary used to store the impersonation stack.</param>
 public class ImpersonatingUserAccessor(IUserAccessor userContext, IHttpContextItemsAccessor itemsAccessor) : IUserAccessor, IImpersonator
 {
     private readonly ReaderWriterLockSlim sync = new();
@@ -40,7 +40,7 @@ public class ImpersonatingUserAccessor(IUserAccessor userContext, IHttpContextIt
     }
 
     /// <summary>
-    /// Return current user
+    /// Gets the current user principal, returning the top of the impersonation stack when impersonation is active.
     /// </summary>
     public ClaimsPrincipal? User
     {
@@ -64,9 +64,10 @@ public class ImpersonatingUserAccessor(IUserAccessor userContext, IHttpContextIt
     }
 
     /// <summary>
-    /// Temporarily impersonates as a user
+    /// Pushes the specified principal onto the impersonation stack.
     /// </summary>
-    /// <param name="user">User to impersonate as</param>
+    /// <param name="user">The principal to impersonate.</param>
+    /// <exception cref="ArgumentNullException"><paramref name="user"/> is <c>null</c>.</exception>
     public void Impersonate(ClaimsPrincipal user)
     {
         if (user == null)
@@ -85,9 +86,9 @@ public class ImpersonatingUserAccessor(IUserAccessor userContext, IHttpContextIt
     }
 
     /// <summary>
-    /// Undoes impersonation
+    /// Pops the most recent impersonation from the stack.
     /// </summary>
-    /// <exception cref="InvalidOperationException">UndoImpersonate() is called while impersonation stack is empty!</exception>
+    /// <exception cref="InvalidOperationException">The impersonation stack is empty.</exception>
     public void UndoImpersonate()
     {
         sync.EnterWriteLock();

@@ -1,7 +1,7 @@
 namespace Serenity.Data;
 
 /// <summary>
-/// Interface for rows that has a UpdateUserId field
+/// Interface for rows that have an UpdateUserId field.
 /// </summary>
 public interface IUpdateUserIdRow
 {

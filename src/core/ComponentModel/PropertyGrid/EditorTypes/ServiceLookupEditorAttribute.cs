@@ -37,16 +37,16 @@ public class ServiceLookupEditorAttribute : ServiceLookupEditorBaseAttribute
     }
 
     /// <summary>
-    /// When service is null, this method tries to determine the service by looking 
+    /// When service is null, this method tries to determine the service by looking
     /// at the type this attribute is placed on. This is a combination of module identifier and type name.
-    /// If type has a [Module] attribute it is used, otherwise module identifier
-    /// is determined from namespace, by removing ".Entities", ".Scripts", ".Lookups"
-    /// common suffixes and the root namespace (e.g. the first part of namespace 
-    /// before the first dot). Type name is determined from class type name, with
+    /// If the type has a [Module] attribute, it is used, otherwise the module identifier
+    /// is determined from the namespace, by removing ".Entities", ".Scripts", ".Lookups"
+    /// common suffixes and the root namespace (e.g. the first part of the namespace
+    /// before the first dot). Type name is determined from the class type name, with
     /// common suffixes like "Row" or "Lookup" removed.
     /// </summary>
-    /// <param name="type">Type to generate a service for</param>
-    /// <returns>Auto generated service</returns>
+    /// <param name="type">Type to generate a service for.</param>
+    /// <returns>Auto generated service.</returns>
     public static string AutoServiceFor(Type type)
     {
         string module;

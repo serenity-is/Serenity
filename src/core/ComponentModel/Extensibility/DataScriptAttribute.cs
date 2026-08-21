@@ -3,7 +3,7 @@
 /// <summary>
 /// Indicates that this method / type should generate a remote data
 /// script. Data contained by remote data scripts can be accessed
-/// client side using Serenity.getRemoteData("Key") function.
+/// from the client side using the Serenity.getRemoteData("Key") function.
 /// </summary>
 /// <seealso cref="DynamicScriptAttribute" />
 [AttributeUsage(AttributeTargets.Class, AllowMultiple = false)]
@@ -55,10 +55,10 @@ public class DataScriptAttribute : Attribute
     public string? CacheGroupKey { get; set; }
 
     /// <summary>
-    /// Gets the automatically generated key for given type.
+    /// Gets the automatically generated key for the given type.
     /// </summary>
     /// <param name="type">The type.</param>
-    /// <returns></returns>
+    /// <returns>The automatically generated key.</returns>
     public static string AutoKeyFor(Type type)
     {
         string module;

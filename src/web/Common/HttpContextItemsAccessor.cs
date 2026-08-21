@@ -3,13 +3,13 @@
 namespace Serenity.Web;
 
 /// <summary>
-/// Default implementation for <see cref="IHttpContextItemsAccessor"/>
-/// using <see cref="IHttpContextAccessor"/> and its Items property.
+/// Default implementation of <see cref="IHttpContextItemsAccessor"/> that
+/// reads the <see cref="IHttpContextAccessor.HttpContext"/> items.
 /// </summary>
 /// <remarks>
-/// Creates a new instance of the class
+/// Initializes a new instance of the <see cref="HttpContextItemsAccessor"/> class.
 /// </remarks>
-/// <param name="httpContextAccessor">HTTP context accessor</param>
+/// <param name="httpContextAccessor">The HTTP context accessor.</param>
 public class HttpContextItemsAccessor(IHttpContextAccessor httpContextAccessor = null) : IHttpContextItemsAccessor
 {
     private readonly IHttpContextAccessor httpContextAccessor = httpContextAccessor;

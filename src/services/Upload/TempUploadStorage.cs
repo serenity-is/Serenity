@@ -7,7 +7,7 @@
 public class TempUploadStorage : DiskUploadStorage
 {
     /// <summary>
-    /// Creates an instance of the class
+    /// Initializes a new instance of the class.
     /// </summary>
     /// <param name="options">Upload storage options</param>
     /// <param name="fileSystem">File system</param>

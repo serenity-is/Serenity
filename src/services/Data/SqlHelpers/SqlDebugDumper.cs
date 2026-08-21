@@ -8,12 +8,12 @@ namespace Serenity.Data;
 public class SqlDebugDumper
 {
     /// <summary>
-    /// Dumps the specified SQL.
+    /// Dumps the specified SQL, replacing parameters with SQL constants, fixing brackets and database caret references.
     /// </summary>
     /// <param name="sql">The SQL.</param>
     /// <param name="parameters">The parameters.</param>
     /// <param name="dialect">The dialect.</param>
-    /// <returns></returns>
+    /// <returns>The debug version of the SQL.</returns>
     public static string Dump(string sql, IDictionary<string, object> parameters, ISqlDialect dialect = null)
     {
         if (parameters == null)

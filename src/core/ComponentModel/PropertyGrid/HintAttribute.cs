@@ -1,8 +1,8 @@
 ﻿namespace Serenity.ComponentModel;
 
 /// <summary>
-/// Sets a hint for a form field. 
-/// Hint is shown when field label is hovered. 
+/// Sets a hint for a form field.
+/// The hint is shown when the field label is hovered.
 /// This has no effect on columns.
 /// </summary>
 /// <remarks>

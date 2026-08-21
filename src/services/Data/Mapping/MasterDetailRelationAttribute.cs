@@ -1,7 +1,7 @@
 ﻿namespace Serenity.Data.Mapping;
 
 /// <summary>
-/// Defines a master detail relation (1-N) between this row and another
+/// Defines a master detail relation (1-N) between this row and another.
 /// </summary>
 /// <seealso cref="Attribute" />
 /// <remarks>

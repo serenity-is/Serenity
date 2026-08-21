@@ -3,7 +3,7 @@ using Microsoft.AspNetCore.Mvc.ApplicationModels;
 namespace Serenity.Services;
 
 /// <summary>
-/// Applies action model conventions for <see cref="ServiceEndpoint"/> controllers
+/// Applies action model conventions for <see cref="ServiceEndpoint"/> controllers.
 /// </summary>
 public class ServiceEndpointApplicationModelProvider : IApplicationModelProvider
 {

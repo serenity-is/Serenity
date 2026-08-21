@@ -1,7 +1,7 @@
 ﻿namespace Serenity.Data.Schema;
 
 /// <summary>
-/// MySql metadata provider
+/// MySql metadata provider.
 /// </summary>
 /// <seealso cref="ISchemaProvider" />
 public class MySqlSchemaProvider : ISchemaProvider
@@ -24,13 +24,7 @@ public class MySqlSchemaProvider : ISchemaProvider
         public string Extra { get; set; }
     }
 
-    /// <summary>
-    /// Gets the field infos.
-    /// </summary>
-    /// <param name="connection">The connection.</param>
-    /// <param name="schema">The schema.</param>
-    /// <param name="table">The table.</param>
-    /// <returns></returns>
+    /// <inheritdoc/>
     public IEnumerable<FieldInfo> GetFieldInfos(IDbConnection connection, string schema, string table)
     {
         return connection.Query<FieldInfoSource>(string.Format("SHOW FULL COLUMNS FROM `{0}`", table))
@@ -66,13 +60,7 @@ public class MySqlSchemaProvider : ISchemaProvider
             });
     }
 
-    /// <summary>
-    /// Gets the foreign keys.
-    /// </summary>
-    /// <param name="connection">The connection.</param>
-    /// <param name="schema">The schema.</param>
-    /// <param name="table">The table.</param>
-    /// <returns></returns>
+    /// <inheritdoc/>
     public IEnumerable<ForeignKeyInfo> GetForeignKeys(IDbConnection connection, string schema, string table)
     {
         return connection.Query<ForeignKeyInfo>(@"
@@ -93,13 +81,7 @@ public class MySqlSchemaProvider : ISchemaProvider
         });
     }
 
-    /// <summary>
-    /// Gets the identity fields.
-    /// </summary>
-    /// <param name="connection">The connection.</param>
-    /// <param name="schema">The schema.</param>
-    /// <param name="table">The table.</param>
-    /// <returns></returns>
+    /// <inheritdoc/>
     public IEnumerable<string> GetIdentityFields(IDbConnection connection, string schema, string table)
     {
         return connection.Query<string>(@"
@@ -113,13 +95,7 @@ public class MySqlSchemaProvider : ISchemaProvider
             });
     }
 
-    /// <summary>
-    /// Gets the primary key fields.
-    /// </summary>
-    /// <param name="connection">The connection.</param>
-    /// <param name="schema">The schema.</param>
-    /// <param name="table">The table.</param>
-    /// <returns></returns>
+    /// <inheritdoc/>
     public IEnumerable<string> GetPrimaryKeyFields(IDbConnection connection, string schema, string table)
     {
         return connection.Query<string>(@"
@@ -144,11 +120,7 @@ public class MySqlSchemaProvider : ISchemaProvider
         public string TABLE_TYPE { get; set; }
     }
 
-    /// <summary>
-    /// Gets the table names.
-    /// </summary>
-    /// <param name="connection">The connection.</param>
-    /// <returns></returns>
+    /// <inheritdoc/>
     public IEnumerable<TableName> GetTableNames(IDbConnection connection)
     {
         return connection.Query<TableNameSource>(

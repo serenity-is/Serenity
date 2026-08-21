@@ -26,13 +26,13 @@ public static partial class HtmlImportMapExtensions
     /// <remarks>If the import map does not exist in the current HTTP context, a new one is created. This
     /// method is typically used in server-side rendering scenarios to manage JavaScript module imports and CSP
     /// headers.</remarks>
-    /// <param name="context">Http context.</param>
-    /// <param name="specifier">The module specifier to map, such as a package name or relative path. Cannot be null.</param>
-    /// <param name="address">The address or URL where the module can be loaded from. Cannot be null.</param>
-    /// <param name="integrity">An optional integrity hash for the module, used to verify its contents. If null, no integrity value is set.</param>
+    /// <param name="context">The HTTP context.</param>
+    /// <param name="specifier">The module specifier to map, such as a package name or relative path. Cannot be <c>null</c>.</param>
+    /// <param name="address">The address or URL where the module can be loaded from. Cannot be <c>null</c>.</param>
+    /// <param name="integrity">An optional integrity hash for the module, used to verify its contents. If <c>null</c>, no integrity value is set.</param>
     /// <param name="csp">Indicates whether to add a Content Security Policy directive for the module address. Set to <see
     /// langword="true"/> to add the directive; otherwise, <see langword="false"/>.</param>
-    /// <param name="overwrite">True (default) to overwrite existing entries if any</param>
+    /// <param name="overwrite"><c>true</c> (default) to overwrite existing entries if any.</param>
     public static void AddImportMapEntry(this HttpContext context, string specifier, string address, string integrity = null,
         bool? csp = null, bool overwrite = true)
     {
@@ -75,8 +75,8 @@ public static partial class HtmlImportMapExtensions
     /// <summary>
     /// Adds import map entries for modules provided via Serenity.Assets like tiptap, jspdf, etc.
     /// </summary>
-    /// <param name="context">Http context</param>
-    /// <param name="overwrite">True (default) to overwrite existing entries if any</param>
+    /// <param name="context">The HTTP context.</param>
+    /// <param name="overwrite"><c>true</c> (default) to overwrite existing entries if any.</param>
     public static void AddSerenityAssetsImportMapEntries(this HttpContext context, bool overwrite = true)
     {
         context.AddImportMapEntry("jspdf", "~/Serenity.Assets/jspdf/jspdf-autotable.bundle.js", overwrite: overwrite);
@@ -90,9 +90,9 @@ public static partial class HtmlImportMapExtensions
     /// <remarks>Use this method in a Razor view to emit an import map for JavaScript module loading. The
     /// import map is retrieved from the current HTTP context and serialized to JSON. If no import map is configured,
     /// the method returns an empty result.</remarks>
-    /// <param name="html">The HTML helper instance used to access the current view context and import map data. Cannot be null.</param>
-    /// <returns>An HtmlString containing a <script type="importmap" /> element with the serialized import map, or an empty
-    /// HtmlString if no import map is available.</returns>
+    /// <param name="html">The HTML helper instance used to access the current view context and import map data. Cannot be <c>null</c>.</param>
+    /// <returns>An <see cref="HtmlString"/> containing a <c>script type="importmap"</c> element with the serialized import map, or an empty
+    /// <see cref="HtmlString"/> if no import map is available.</returns>
     public static HtmlString RenderImportMap(this IHtmlHelper html)
     {
         ArgumentNullException.ThrowIfNull(html);

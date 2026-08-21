@@ -1,15 +1,18 @@
 namespace Serenity.Data;
 
 /// <summary>
-/// http://stackoverflow.com/questions/265192/get-the-generated-sql-statement-from-a-sqlcommand-object (answer by Mitch)
+/// Generates a debug version of a SQL command, including DECLARE statements for its parameters,
+/// so that it can be executed or inspected outside of the original connection.
+/// Based on the answer by Mitch at
+/// http://stackoverflow.com/questions/265192/get-the-generated-sql-statement-from-a-sqlcommand-object.
 /// </summary>
 public class SqlCommandDumper
 {
     /// <summary>
-    /// Gets the command text.
+    /// Gets the command text for the specified command, including parameter declarations.
     /// </summary>
     /// <param name="sqc">The SQL command.</param>
-    /// <returns></returns>
+    /// <returns>The generated command text.</returns>
     public static string GetCommandText(IDbCommand sqc)
     {
         var sbCommandText = new StringBuilder();

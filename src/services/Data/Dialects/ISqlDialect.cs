@@ -87,7 +87,8 @@ public interface ISqlDialect
     /// <summary>
     /// Returns true if the specified identifier is a SQL keyword.
     /// </summary>
-    /// <param name="keyword"></param>
+    /// <param name="keyword">The identifier to check.</param>
+    /// <returns><c>true</c> if the identifier is a reserved SQL keyword; otherwise, <c>false</c>.</returns>
     bool IsReservedKeyword(string keyword)
     {
         return SqlSyntax.IsReservedKeywordForAny(keyword);
@@ -145,21 +146,21 @@ public interface ISqlDialect
     /// Quotes the column alias. This usually calls QuoteIdentifier except for Oracle.
     /// </summary>
     /// <param name="s">The column alias.</param>
-    /// <returns>Quoted column alias</returns>
+    /// <returns>The quoted column alias.</returns>
     string QuoteColumnAlias(string s);
 
     /// <summary>
     /// Quotes the identifier.
     /// </summary>
     /// <param name="s">The identifier.</param>
-    /// <returns>Quoted identifier</returns>
+    /// <returns>The quoted identifier.</returns>
     string QuoteIdentifier(string s);
 
     /// <summary>
     /// Quotes the unicode string.
     /// </summary>
     /// <param name="s">The string.</param>
-    /// <returns></returns>
+    /// <returns>The quoted unicode string.</returns>
     string QuoteUnicodeString(string s);
 
     /// <summary>
@@ -203,57 +204,57 @@ public interface ISqlDialect
     string TimeFormat { get; }
 
     /// <summary>
-    /// Gets the union keyword for specified union type.
+    /// Gets the union keyword for the specified union type.
     /// </summary>
     /// <param name="unionType">Type of the union.</param>
-    /// <returns>Union keyword</returns>
+    /// <returns>The union keyword.</returns>
     string UnionKeyword(SqlUnionType unionType);
 
     /// <summary>
-    /// Gets a value indicating whether use datetime2 type.
+    /// Gets a value indicating whether the server uses the datetime2 type.
     /// </summary>
     /// <value>
-    ///   <c>true</c> if use datetime2; otherwise, <c>false</c>.
+    ///   <c>true</c> if the server uses datetime2; otherwise, <c>false</c>.
     /// </value>
     bool UseDateTime2 { get; }
 
     /// <summary>
-    /// Gets a value indicating whether to use returning identity.
+    /// Gets a value indicating whether to use RETURNING identity.
     /// </summary>
     /// <value>
-    ///   <c>true</c> if should use returning identity; otherwise, <c>false</c>.
+    ///   <c>true</c> if RETURNING identity should be used; otherwise, <c>false</c>.
     /// </value>
     bool UseReturningIdentity { get; }
 
     /// <summary>
-    /// Gets a value indicating whether use returning into variable.
+    /// Gets a value indicating whether to use RETURNING INTO variable.
     /// </summary>
     /// <value>
-    ///   <c>true</c> if use returning into variable; otherwise, <c>false</c>.
+    ///   <c>true</c> if RETURNING INTO variable should be used; otherwise, <c>false</c>.
     /// </value>
     bool UseReturningIntoVar { get; }
 
     /// <summary>
-    /// Gets a value indicating whether to use scope identity.
+    /// Gets a value indicating whether to use SCOPE IDENTITY.
     /// </summary>
     /// <value>
-    ///   <c>true</c> if to use scope identity; otherwise, <c>false</c>.
+    ///   <c>true</c> if SCOPE IDENTITY should be used; otherwise, <c>false</c>.
     /// </value>
     bool UseScopeIdentity { get; }
 
     /// <summary>
-    /// Gets a value indicating whether to use TAKE at end.
+    /// Gets a value indicating whether to use TAKE at the end.
     /// </summary>
     /// <value>
-    ///   <c>true</c> if to use TAKE at end; otherwise, <c>false</c>.
+    ///   <c>true</c> if TAKE should be used at the end; otherwise, <c>false</c>.
     /// </value>
     bool UseTakeAtEnd { get; }
 
     /// <summary>
-    /// Gets a value indicating whether ROWNUM.
+    /// Gets a value indicating whether the server supports ROWNUM.
     /// </summary>
     /// <value>
-    ///   <c>true</c> if can use ROWNUM; otherwise, <c>false</c>.
+    ///   <c>true</c> if ROWNUM can be used; otherwise, <c>false</c>.
     /// </value>
     bool UseRowNum { get; }
 

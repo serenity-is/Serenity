@@ -6,22 +6,22 @@
 public class CopyTemporaryFileResult
 {
     /// <summary>
-    /// The path of the file
+    /// Gets or sets the path of the file.
     /// </summary>
     public string Path { get; set; }
 
     /// <summary>
-    /// Original name
+    /// Gets or sets the original name.
     /// </summary>
     public string OriginalName { get; set; }
 
     /// <summary>
-    /// If the file has thumbnail
+    /// Gets or sets a value indicating whether the file has a thumbnail.
     /// </summary>
     public bool HasThumbnail { get; set; }
 
     /// <summary>
-    /// File size
+    /// Gets or sets the file size.
     /// </summary>
     public long FileSize { get; set; }
 }

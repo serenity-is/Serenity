@@ -3,15 +3,16 @@ using System.Security.Cryptography;
 namespace Serenity.Web.Providers;
 
 /// <summary>
-/// Used to be a membership provider but now only contains a SHA512 helper
+/// Used to be a membership provider but now only contains a SHA512 helper.
 /// </summary>
 public static class SiteMembershipProvider
 {
     /// <summary>
-    /// Computes SHA512 of the string
+    /// Computes the SHA512 hash of the given string.
     /// </summary>
-    /// <param name="s">String</param>
-    /// <exception cref="ArgumentNullException">String is null or empty</exception>
+    /// <param name="s">The string to hash.</param>
+    /// <returns>The base64 encoded SHA512 hash with padding stripped.</returns>
+    /// <exception cref="ArgumentNullException"><paramref name="s"/> is null or empty.</exception>
     public static string ComputeSHA512(string s)
     {
         if (string.IsNullOrEmpty(s))

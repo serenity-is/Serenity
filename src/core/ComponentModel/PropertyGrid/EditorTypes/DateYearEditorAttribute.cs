@@ -21,8 +21,8 @@ public partial class DateYearEditorAttribute : CustomEditorAttribute
 
     /// <summary>
     /// Gets or sets the maximum year.
-    /// It can be written as an integer value, or +50, -20 etc. 
-    /// corresponding to current year plus or minus years.
+    /// It can be written as an integer value, or +50, -20 etc.,
+    /// corresponding to the current year plus or minus years.
     /// </summary>
     /// <value>
     /// The maximum year.
@@ -35,11 +35,11 @@ public partial class DateYearEditorAttribute : CustomEditorAttribute
 
     /// <summary>
     /// Gets or sets the minimum year.
-    /// It can be written as an integer value, or +50, -20 etc. 
-    /// corresponding to current year plus or minus years.
+    /// It can be written as an integer value, or +50, -20 etc.,
+    /// corresponding to the current year plus or minus years.
     /// </summary>
     /// <value>
-    /// The minimum year. 
+    /// The minimum year.
     /// </value>
     public string? MinYear
     {

@@ -11,7 +11,7 @@ public class UniqueConstraintAttribute : Attribute
     /// Initializes a new instance of the <see cref="UniqueConstraintAttribute"/> class.
     /// </summary>
     /// <param name="fields">The fields.</param>
-    /// <exception cref="ArgumentNullException">fields</exception>
+    /// <exception cref="ArgumentNullException">fields is null or empty.</exception>
     public UniqueConstraintAttribute(params string[] fields)
     {
         if (fields.IsEmptyOrNull())

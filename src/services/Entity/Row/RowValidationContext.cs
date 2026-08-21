@@ -15,10 +15,10 @@ public class RowValidationContext(IDbConnection connection, IRow row, ITextLocal
     private readonly IRow row = row;
 
     /// <summary>
-    /// Gets the field value.
+    /// Gets the value of the field with the specified name.
     /// </summary>
     /// <param name="fieldName">Name of the field.</param>
-    /// <returns></returns>
+    /// <returns>The value of the field, or <c>null</c> if the field is not found.</returns>
     public object GetFieldValue(string fieldName)
     {
         var field = row.Fields.FindFieldByPropertyName(fieldName) ?? row.Fields.FindField(fieldName);

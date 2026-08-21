@@ -1,7 +1,7 @@
 ﻿namespace Serenity.Data.Mapping;
 
 /// <summary>
-/// Adds a OUTER APPLY to the row
+/// Adds an OUTER APPLY to the row.
 /// </summary>
 /// <seealso cref="Attribute" />
 /// <seealso cref="ISqlJoin" />

@@ -10,8 +10,9 @@ namespace Serenity.ComponentModel;
 public class PinColumnAttribute : Attribute
 {
     /// <summary>
-    /// Creates a new PinColumnAttribute for specified side: "start" (or "left") or "end" (or "right").
+    /// Creates a new PinColumnAttribute for the specified side: "start" (or "left") or "end" (or "right").
     /// </summary>
+    /// <param name="side">The side to pin to: "start" (or "left") or "end" (or "right").</param>
     public PinColumnAttribute(string side)
     {
         Value = side == "start" || side == "left" ? "start" : 
@@ -20,9 +21,10 @@ public class PinColumnAttribute : Attribute
     }
 
     /// <summary>
-    /// Creates a new PinColumnAttribute. If pin is true, pins to start side, otherwise unpins.
-    /// Use PinColumnAttribute("end") to pin to end side.
+    /// Creates a new PinColumnAttribute. If pin is true, pins to the start side, otherwise unpins.
+    /// Use PinColumnAttribute("end") to pin to the end side.
     /// </summary>
+    /// <param name="pin">If <c>true</c>, pins the column to the start side; otherwise, unpins it.</param>
     public PinColumnAttribute(bool pin = true)
     {
         Value = pin ? "start" : null;

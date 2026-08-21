@@ -3,13 +3,13 @@ using System.Collections;
 namespace Serenity.Services;
 
 /// <summary>
-/// Behavior class that handles <see cref="MasterDetailRelationAttribute"/>
+/// Behavior class that handles <see cref="MasterDetailRelationAttribute"/>.
 /// </summary>
 /// <remarks>
-/// Creates an instance of the class
+/// Initializes a new instance of the class.
 /// </remarks>
 /// <param name="handlerFactory">Default handler factory</param>
-/// <exception cref="ArgumentNullException">handlerFactory is null</exception>
+/// <exception cref="ArgumentNullException"><paramref name="handlerFactory"/> is <c>null</c>.</exception>
 public class MasterDetailRelationBehavior(IDefaultHandlerFactory handlerFactory) : BaseSaveDeleteBehavior,
     IImplicitBehavior, IRetrieveBehavior, IListBehavior, IFieldBehavior
 {

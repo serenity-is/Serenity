@@ -2,7 +2,7 @@
 namespace Serenity.Data;
 
 /// <summary>
-/// Marks an IIsActiveRow that -1 is used as deleted value
+/// Marks an <see cref="IIsActiveRow"/> where -1 is used as the deleted value.
 /// </summary>
 public interface IIsActiveDeletedRow : IIsActiveRow
 {

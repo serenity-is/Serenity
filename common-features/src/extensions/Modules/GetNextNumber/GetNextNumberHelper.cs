@@ -2,8 +2,18 @@
 
 namespace Serenity.Extensions;
 
+/// <summary>
+/// Helper for generating the next number in a sequence with a prefix.
+/// </summary>
 public static class GetNextNumberHelper
 {
+    /// <summary>
+    /// Gets the next number for the specified field based on the request prefix and length.
+    /// </summary>
+    /// <param name="connection">The database connection.</param>
+    /// <param name="request">The request containing the prefix and length.</param>
+    /// <param name="field">The field to query for the maximum existing number.</param>
+    /// <returns>The next number and its serial representation.</returns>
     public static GetNextNumberResponse GetNextNumber(IDbConnection connection, 
         GetNextNumberRequest request, Field field)
     {

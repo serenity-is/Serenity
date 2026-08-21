@@ -1,13 +1,16 @@
 ﻿namespace Serenity.Abstractions;
 
 /// <summary>
-/// Interface for abstraction that should return HttpContext.Current.Items for web requests,
-/// and null for normal threads.
+/// Provides access to the per-request item dictionary, typically backed by
+/// <c>HttpContext.Items</c> for web requests.
 /// </summary>
+/// <remarks>
+/// Returns <c>null</c> when accessed outside of a web request context.
+/// </remarks>
 public interface IHttpContextItemsAccessor
 {
     /// <summary>
-    /// A dictionary that can be used as a request context specific storage
+    /// Gets the dictionary that can be used as request-scoped storage.
     /// </summary>
     IDictionary<object, object?> Items { get; }
 }

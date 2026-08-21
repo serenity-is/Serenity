@@ -5,8 +5,23 @@ using System.IO;
 
 namespace Serenity.Reporting;
 
+/// <summary>
+/// Helper for generating Excel packages from report columns and data.
+/// </summary>
 public static class ExcelReportGenerator
 {
+    /// <summary>
+    /// Generates an Excel package as bytes from the specified columns and rows.
+    /// </summary>
+    /// <param name="columns">The report columns.</param>
+    /// <param name="rows">The data rows.</param>
+    /// <param name="sheetName">The worksheet name.</param>
+    /// <param name="tableName">The table name.</param>
+    /// <param name="tableStyle">The table theme.</param>
+    /// <param name="startRow">The starting row.</param>
+    /// <param name="startCol">The starting column.</param>
+    /// <param name="autoFitRows">The number of rows to auto-fit.</param>
+    /// <returns>The generated Excel package bytes.</returns>
     public static byte[] GeneratePackageBytes(List<ReportColumn> columns, IList rows,
         string sheetName = "Page1", string tableName = "Table1", XLTableTheme tableStyle = null,
         int startRow = 1, int startCol = 1, int autoFitRows = 250)
@@ -18,6 +33,18 @@ public static class ExcelReportGenerator
         return ms.ToArray();
     }
 
+    /// <summary>
+    /// Generates an Excel workbook from the specified columns and rows.
+    /// </summary>
+    /// <param name="columns">The report columns.</param>
+    /// <param name="rows">The data rows.</param>
+    /// <param name="sheetName">The worksheet name.</param>
+    /// <param name="tableName">The table name.</param>
+    /// <param name="tableStyle">The table theme.</param>
+    /// <param name="startRow">The starting row.</param>
+    /// <param name="startCol">The starting column.</param>
+    /// <param name="autoFitRows">The number of rows to auto-fit.</param>
+    /// <returns>The generated Excel workbook.</returns>
     public static XLWorkbook GeneratePackage(List<ReportColumn> columns, IList rows,
         string sheetName = "Page1", string tableName = "Table1", XLTableTheme tableStyle = null,
         int startRow = 1, int startCol = 1, int autoFitRows = 250)
@@ -51,6 +78,17 @@ public static class ExcelReportGenerator
         return format;
     }
 
+    /// <summary>
+    /// Populates the specified worksheet with the given columns and rows.
+    /// </summary>
+    /// <param name="worksheet">The worksheet to populate.</param>
+    /// <param name="columns">The report columns.</param>
+    /// <param name="rows">The data rows.</param>
+    /// <param name="tableName">The table name.</param>
+    /// <param name="tableStyle">The table theme.</param>
+    /// <param name="startRow">The starting row.</param>
+    /// <param name="startCol">The starting column.</param>
+    /// <param name="autoFitRows">The number of rows to auto-fit.</param>
     public static void PopulateSheet(IXLWorksheet worksheet, List<ReportColumn> columns, IList rows,
         string tableName = "Table1", XLTableTheme tableStyle = null,
         int startRow = 1, int startCol = 1, int autoFitRows = 250)

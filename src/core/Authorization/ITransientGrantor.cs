@@ -2,33 +2,35 @@
 namespace Serenity.Abstractions;
 
 /// <summary>
-/// Interface for permission services that supports granting permissions temporarily
+/// Defines a permission service that supports temporarily granting permissions.
 /// </summary>
 public interface ITransientGrantor
 {
     /// <summary>
-    /// Grants specified permissions temporarily (or makes it look like)
+    /// Temporarily grants the specified permissions.
     /// </summary>
-    /// <param name="permissions">List of permission keys</param>
+    /// <param name="permissions">The permission keys to grant.</param>
     void Grant(params string[] permissions);
 
     /// <summary>
-    /// Grants all permissions temporarily (or makes it look like)
+    /// Temporarily grants all permissions.
     /// </summary>
     void GrantAll();
 
     /// <summary>
-    /// Undoes last grant or grant all operation
+    /// Reverts the most recent <see cref="Grant"/> or <see cref="GrantAll"/> operation.
     /// </summary>
     void UndoGrant();
 
     /// <summary>
-    /// Returns true if currently all permissions are granted via GrantAll.
+    /// Determines whether all permissions are currently granted via <see cref="GrantAll"/>.
     /// </summary>
+    /// <returns><c>true</c> if all permissions are granted; otherwise <c>false</c>.</returns>
     bool IsAllGranted();
 
     /// <summary>
-    /// Returns a list of permissions granted via Grant.
+    /// Gets the permissions that were granted via <see cref="Grant"/>.
     /// </summary>
+    /// <returns>An enumerable of granted permission keys.</returns>
     IEnumerable<string> GetGranted();
 }

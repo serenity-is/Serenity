@@ -3,7 +3,7 @@
 namespace Serenity.Services;
 
 /// <summary>
-/// Provides model binding for service endpoints
+/// Provides model binding for service endpoints.
 /// </summary>
 public class ServiceEndpointModelBinderProvider : IModelBinderProvider
 {

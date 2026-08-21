@@ -2,24 +2,51 @@ using Serenity.Reporting;
 
 namespace Serenity.Extensions;
 
+/// <summary>
+/// A tree of report categories and reports.
+/// </summary>
 public class ReportTree
 {
+    /// <summary>
+    /// The root category of the tree.
+    /// </summary>
     public Category Root { get; set; }
 
     private static readonly char[] slashSeparator = ['/'];
 
+    /// <summary>
+    /// Initializes a new instance of the <see cref="ReportTree"/> class.
+    /// </summary>
     public ReportTree()
     {
         Root = new Category();
     }
 
+    /// <summary>
+    /// A category in the report tree.
+    /// </summary>
     public class Category
     {
+        /// <summary>
+        /// The category key.
+        /// </summary>
         public string Key { get; set; }
+        /// <summary>
+        /// The category title.
+        /// </summary>
         public string Title { get; set; }
+        /// <summary>
+        /// The sub categories.
+        /// </summary>
         public List<Category> SubCategories { get; private set; }
+        /// <summary>
+        /// The reports in this category.
+        /// </summary>
         public List<ReportRegistry.Report> Reports { get; private set; }
 
+        /// <summary>
+        /// Initializes a new instance of the <see cref="Category"/> class.
+        /// </summary>
         public Category()
         {
             SubCategories = [];
@@ -27,6 +54,14 @@ public class ReportTree
         }
     }
 
+    /// <summary>
+    /// Builds a report tree from the specified reports.
+    /// </summary>
+    /// <param name="reports">The reports.</param>
+    /// <param name="localizer">The text localizer.</param>
+    /// <param name="rootPath">The root path.</param>
+    /// <param name="categoryOrder">The category order.</param>
+    /// <returns>The report tree.</returns>
     public static ReportTree FromList(IEnumerable<ReportRegistry.Report> reports, ITextLocalizer localizer,
         string rootPath = null, string categoryOrder = null)
     {

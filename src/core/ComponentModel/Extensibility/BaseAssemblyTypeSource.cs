@@ -1,18 +1,18 @@
 namespace Serenity.Abstractions;
 
 /// <summary>
-/// Base type source implementation that accepts a list of assemblies
+/// Base type source implementation that accepts a list of assemblies.
 /// </summary>
-/// <param name="featureToggles">Feature toggles service used to filter types</param>
+/// <param name="featureToggles">Feature toggles service used to filter types.</param>
 /// <remarks>
-/// Creates a new instance
+/// Creates a new instance.
 /// </remarks>
 public abstract class BaseAssemblyTypeSource(IFeatureToggles? featureToggles = null) : ITypeSource, IGetAssemblies
 {
     /// <summary>
-    /// Gets all attributes for assemblies with given type
+    /// Gets all attributes for assemblies with the given type.
     /// </summary>
-    /// <returns>List of attributes for assemblies</returns>
+    /// <returns>List of attributes for assemblies.</returns>
     public virtual IEnumerable<Attribute> GetAssemblyAttributes(Type attributeType)
     {
         return GetAssemblies().Where(Include).SelectMany(x => x.GetCustomAttributes(attributeType));
@@ -41,9 +41,9 @@ public abstract class BaseAssemblyTypeSource(IFeatureToggles? featureToggles = n
     }
 
     /// <summary>
-    /// Gets all types
+    /// Gets all types.
     /// </summary>
-    /// <returns></returns>
+    /// <returns>All types in the source assemblies.</returns>
     public virtual IEnumerable<Type> GetTypes()
     {
         return GetAssemblies().Where(Include).SelectMany(x => x.GetTypes().Where(Include));

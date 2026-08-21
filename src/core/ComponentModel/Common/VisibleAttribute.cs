@@ -11,10 +11,10 @@ public class VisibleAttribute(bool value = true) : Attribute
 {
 
     /// <summary>
-    /// Gets a value indicating whether this <see cref="VisibleAttribute"/> is ON.
+    /// Gets a value indicating whether this <see cref="VisibleAttribute"/> is on.
     /// </summary>
     /// <value>
-    ///   <c>true</c> if ON; otherwise, <c>false</c>.
+    ///   <c>true</c> if on; otherwise, <c>false</c>.
     /// </value>
     public bool Value { get; private set; } = value;
 }

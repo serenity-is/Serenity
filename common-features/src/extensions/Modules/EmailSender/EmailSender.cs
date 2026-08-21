@@ -5,12 +5,22 @@ using System.IO;
 
 namespace Serenity.Extensions;
 
+/// <summary>
+/// Default implementation of <see cref="IEmailSender"/> that sends emails
+/// via SMTP, a pickup folder, or an email queue.
+/// </summary>
 public class EmailSender(IWebHostEnvironment host, IOptions<SmtpSettings> settings,
     IEmailQueue emailQueue = null) : IEmailSender
 {
     private readonly IWebHostEnvironment host = host ?? throw new ArgumentNullException(nameof(host));
     private readonly SmtpSettings settings = (settings ?? throw new ArgumentNullException(nameof(settings))).Value;
 
+    /// <summary>
+    /// Sends the specified email message, either directly, via the configured
+    /// pickup folder, or by enqueuing it when queueing is enabled.
+    /// </summary>
+    /// <param name="message">The email message to send.</param>
+    /// <param name="skipQueue">Whether to bypass the email queue and send directly.</param>
     public void Send(MimeMessage message, bool skipQueue)
     {
         ArgumentNullException.ThrowIfNull(message);

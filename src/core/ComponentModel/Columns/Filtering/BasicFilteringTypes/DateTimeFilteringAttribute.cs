@@ -19,7 +19,7 @@ public class DateTimeFilteringAttribute : CustomFilteringAttribute
     }
 
     /// <summary>
-    /// Gets/sets optional display format to use for display of filter
+    /// Gets or sets the optional display format to use when displaying the filter.
     /// </summary>
     public string? DisplayFormat
     {

@@ -3,19 +3,19 @@ using System.Threading;
 namespace Serenity.Web;
 
 /// <summary>
-/// Adds temporary granting support to any IPermissionService implementation
+/// Decorates an <see cref="IPermissionService"/> to support temporarily granting permissions.
 /// </summary>
 /// <remarks>
-/// Register this class in your application start, to allow granting permissions temporarily.
+/// Register this decorator at application startup to enable temporary permission grants.
 /// <code>
 /// registrar.RegisterInstance&lt;IPermissionService&gt;(new TransientGrantingPermissionService(new MyPermissionService()))
 /// </code>
-/// </remarks> 
-/// <remarks>
-/// Creates a new TransientGrantingPermissionService wrapping passed service
 /// </remarks>
-/// <param name="permissionService">Permission service to wrap with transient granting ability</param>
-/// <param name="requestContext">Request context</param>
+/// <remarks>
+/// Creates a new instance of the <see cref="TransientGrantingPermissionService"/> class wrapping the specified service.
+/// </remarks>
+/// <param name="permissionService">The underlying permission service to delegate to when no transient grant is active.</param>
+/// <param name="requestContext">The accessor that provides per-request storage for the granting stack.</param>
 public class TransientGrantingPermissionService(IPermissionService? permissionService = null, IHttpContextItemsAccessor? requestContext = null) : IPermissionService, ITransientGrantor
 {
     private readonly ReaderWriterLockSlim sync = new();
@@ -45,10 +45,10 @@ public class TransientGrantingPermissionService(IPermissionService? permissionSe
     }
 
     /// <summary>
-    /// Checks if user has specified permission
+    /// Determines whether the current user has the specified permission, taking transient grants into account.
     /// </summary>
-    /// <param name="permission">Permission to check</param>
-    /// <returns>True if user has the permission</returns>
+    /// <param name="permission">The permission key to check.</param>
+    /// <returns><c>true</c> if the permission is granted; otherwise <c>false</c>.</returns>
     public bool HasPermission(string permission)
     {
         if (string.IsNullOrEmpty(permission))
@@ -78,9 +78,10 @@ public class TransientGrantingPermissionService(IPermissionService? permissionSe
     }
 
     /// <summary>
-    /// Grants specified permissions temporarily (or makes it look like)
+    /// Temporarily grants the specified permissions.
     /// </summary>
-    /// <param name="permissions">List of permission keys</param>
+    /// <param name="permissions">The permission keys to grant.</param>
+    /// <exception cref="ArgumentNullException"><paramref name="permissions"/> is <c>null</c> or empty.</exception>
     public void Grant(params string[] permissions)
     {
         sync.EnterWriteLock();
@@ -115,7 +116,7 @@ public class TransientGrantingPermissionService(IPermissionService? permissionSe
     }
 
     /// <summary>
-    /// Grants all permissions temporarily (or makes it look like)
+    /// Temporarily grants all permissions.
     /// </summary>
     public void GrantAll()
     {
@@ -132,8 +133,9 @@ public class TransientGrantingPermissionService(IPermissionService? permissionSe
     }
 
     /// <summary>
-    /// Undoes last grant or grant all operation
+    /// Reverts the most recent <see cref="Grant"/> or <see cref="GrantAll"/> operation.
     /// </summary>
+    /// <exception cref="InvalidOperationException">The granting stack is empty.</exception>
     public void UndoGrant()
     {
         sync.EnterWriteLock();

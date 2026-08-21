@@ -3,8 +3,17 @@ using MyRow = Serenity.Extensions.Entities.UserPreferenceRow;
 
 namespace Serenity.Extensions.Repositories;
 
+/// <summary>
+/// Repository for managing user preferences.
+/// </summary>
 public class UserPreferenceRepository(IRequestContext context) : BaseRepository(context)
 {
+    /// <summary>
+    /// Updates or deletes a user preference.
+    /// </summary>
+    /// <param name="uow">The unit of work.</param>
+    /// <param name="request">The update request.</param>
+    /// <returns>The save response.</returns>
     public SaveResponse Update(IUnitOfWork uow, UserPreferenceUpdateRequest request)
     {
         ArgumentNullException.ThrowIfNull(request);
@@ -59,6 +68,12 @@ public class UserPreferenceRepository(IRequestContext context) : BaseRepository(
         return new SaveResponse();
     }
 
+    /// <summary>
+    /// Retrieves a user preference.
+    /// </summary>
+    /// <param name="connection">The database connection.</param>
+    /// <param name="request">The retrieve request.</param>
+    /// <returns>The retrieve response.</returns>
     public UserPreferenceRetrieveResponse Retrieve(IDbConnection connection, UserPreferenceRetrieveRequest request)
     {
         ArgumentNullException.ThrowIfNull(request);

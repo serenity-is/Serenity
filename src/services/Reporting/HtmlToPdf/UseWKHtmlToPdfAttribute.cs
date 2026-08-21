@@ -6,14 +6,14 @@ namespace Serenity.Reporting;
 /// in service provider).
 /// </summary>
 /// <remarks>
-/// Creates a new instance of the attribute
+/// Initializes a new instance of the attribute.
 /// </remarks>
-/// <param name="value"></param>
+/// <param name="value">Whether the report should use WKHTML to PDF.</param>
 public class UseWKHtmlToPdfAttribute(bool value = true) : Attribute
 {
 
     /// <summary>
-    /// Gets the value
+    /// Gets a value indicating whether WKHTML to PDF should be used.
     /// </summary>
     public bool Value { get; private set; } = value;
 }

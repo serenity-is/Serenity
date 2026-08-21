@@ -2,20 +2,20 @@
 namespace Serenity.Services;
 
 /// <summary>
-/// Save request type for save request processors
+/// Save request type for save request processors.
 /// </summary>
 public enum SaveRequestType
 {
     /// <summary>
-    /// Create
+    /// Create.
     /// </summary>
     Create,
     /// <summary>
-    /// Update
+    /// Update.
     /// </summary>
     Update,
     /// <summary>
-    /// Auto determine from the request.EntityId parameter
+    /// Auto determine from the request.EntityId parameter.
     /// </summary>
     Auto
 }

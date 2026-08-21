@@ -1,12 +1,12 @@
 ﻿namespace Serenity.Data;
 
 /// <summary>
-/// Interfaces for types that has a connection StateChange event (e.g. connection)
+/// Interface for types that have a connection <see cref="StateChange"/> event (e.g. a connection).
 /// </summary>
 public interface IHasConnectionStateChange
 {
     /// <summary>
-    /// State change event
+    /// The state change event.
     /// </summary>
     event StateChangeEventHandler StateChange;
 }

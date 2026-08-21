@@ -5,52 +5,52 @@ namespace Serenity.Data;
 public class Alias : IAlias
 {
     /// <summary>
-    /// Static t0 alias
+    /// Static t0 alias.
     /// </summary>
     public static readonly Alias T0 = new(0);
 
     /// <summary>
-    /// Static t1 alias
+    /// Static t1 alias.
     /// </summary>
     public static readonly Alias T1 = new(1);
 
     /// <summary>
-    /// Static t2 alias
+    /// Static t2 alias.
     /// </summary>
     public static readonly Alias T2 = new(2);
 
     /// <summary>
-    /// Static t3 alias
+    /// Static t3 alias.
     /// </summary>
     public static readonly Alias T3 = new(3);
 
     /// <summary>
-    /// Static t4 alias
+    /// Static t4 alias.
     /// </summary>
     public static readonly Alias T4 = new(4);
 
     /// <summary>
-    /// Static t5 alias
+    /// Static t5 alias.
     /// </summary>
     public static readonly Alias T5 = new(5);
 
     /// <summary>
-    /// Static t6 alias
+    /// Static t6 alias.
     /// </summary>
     public static readonly Alias T6 = new(6);
 
     /// <summary>
-    /// Static t7 alias
+    /// Static t7 alias.
     /// </summary>
     public static readonly Alias T7 = new(7);
 
     /// <summary>
-    /// Static t8 alias
+    /// Static t8 alias.
     /// </summary>
     public static readonly Alias T8 = new(8);
 
     /// <summary>
-    /// Static t9 alias
+    /// Static t9 alias.
     /// </summary>
     public static readonly Alias T9 = new(9);
 
@@ -72,7 +72,7 @@ public class Alias : IAlias
     /// Initializes a new instance of the <see cref="Alias"/> class.
     /// </summary>
     /// <param name="alias">The alias.</param>
-    /// <exception cref="ArgumentNullException">alias</exception>
+    /// <exception cref="ArgumentNullException">alias is null or empty.</exception>
     public Alias(string alias)
     {
         if (string.IsNullOrEmpty(alias))
@@ -135,7 +135,7 @@ public class Alias : IAlias
     /// The <see cref="string"/>.
     /// </value>
     /// <param name="fieldName">Name of the field.</param>
-    /// <returns>Expression like t0.fieldName</returns>
+    /// <returns>Expression like t0.fieldName.</returns>
     public string this[string fieldName]
     {
         get { return aliasDot + fieldName; }
@@ -148,8 +148,8 @@ public class Alias : IAlias
     /// The <see cref="string"/>.
     /// </value>
     /// <param name="field">The field.</param>
-    /// <returns>Expression like t0.fieldName</returns>
-    /// <exception cref="ArgumentNullException">field</exception>
+    /// <returns>Expression like t0.fieldName.</returns>
+    /// <exception cref="ArgumentNullException">field is null.</exception>
     public string this[IField field]
     {
         get
@@ -165,7 +165,7 @@ public class Alias : IAlias
     /// Only here for backward compatibility.
     /// </summary>
     /// <param name="field">The field.</param>
-    /// <returns>Criteria containing prefixed field</returns>
+    /// <returns>Criteria containing prefixed field.</returns>
     public Criteria _(string field)
     {
         return new Criteria(this[field]);
@@ -176,7 +176,7 @@ public class Alias : IAlias
     /// Only here for backward compatibility.
     /// </summary>
     /// <param name="field">The field.</param>
-    /// <returns>Criteria containing prefixed field</returns>
+    /// <returns>Criteria containing prefixed field.</returns>
     public Criteria _(IField field)
     {
         return new Criteria(this[field]);
@@ -189,7 +189,7 @@ public class Alias : IAlias
     /// <param name="alias">The alias.</param>
     /// <param name="fieldName">Name of the field.</param>
     /// <returns>
-    /// String containing prefixed field
+    /// String containing prefixed field.
     /// </returns>
     public static string operator +(Alias alias, string fieldName)
     {
@@ -203,9 +203,9 @@ public class Alias : IAlias
     /// <param name="alias">The alias.</param>
     /// <param name="field">The field.</param>
     /// <returns>
-    /// String containing prefixed field
+    /// String containing prefixed field.
     /// </returns>
-    /// <exception cref="ArgumentNullException">field</exception>
+    /// <exception cref="ArgumentNullException">field is null.</exception>
     public static string operator +(Alias alias, IField field)
     {
         ArgumentNullException.ThrowIfNull(field);

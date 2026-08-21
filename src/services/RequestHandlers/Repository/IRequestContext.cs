@@ -9,27 +9,27 @@
 public interface IRequestContext
 {
     /// <summary>
-    /// Gets the behavior provider
+    /// Gets the behavior provider.
     /// </summary>
     IBehaviorProvider Behaviors { get; }
 
     /// <summary>
-    /// Get the two level cache
+    /// Gets the two level cache.
     /// </summary>
     ITwoLevelCache Cache { get; }
 
     /// <summary>
-    /// Gets the text localizer
+    /// Gets the text localizer.
     /// </summary>
     ITextLocalizer Localizer { get; }
 
     /// <summary>
-    /// Gets the permission service
+    /// Gets the permission service.
     /// </summary>
     IPermissionService Permissions { get; }
 
     /// <summary>
-    /// Gets current user
+    /// Gets the current user.
     /// </summary>
     ClaimsPrincipal User { get; }
 }

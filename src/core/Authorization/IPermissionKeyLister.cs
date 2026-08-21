@@ -1,13 +1,14 @@
 namespace Serenity.Abstractions;
 
 /// <summary>
-/// Permission key lister abstraction
+/// Enumerates all permission keys registered in the application.
 /// </summary>
 public interface IPermissionKeyLister
 {
     /// <summary>
-    /// List all permission keys
+    /// Lists all permission keys.
     /// </summary>
-    /// <param name="includeRoles">True to include role permission keys like Role:Some</param>
+    /// <param name="includeRoles">When <c>true</c>, includes role-derived keys such as <c>Role:SomeRole</c>.</param>
+    /// <returns>An enumerable of permission keys.</returns>
     IEnumerable<string> ListPermissionKeys(bool includeRoles);
 }

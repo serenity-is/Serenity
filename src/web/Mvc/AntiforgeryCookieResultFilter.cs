@@ -6,13 +6,13 @@ using Microsoft.AspNetCore.Mvc.Filters;
 namespace Serenity.Services;
 
 /// <summary>
-/// Append the anti forgery token as CSRF-TOKEN cookie to the response, 
-/// so that AJAX calls can read it client side and send as a header.
+/// Appends the anti forgery token as a <c>CSRF-TOKEN</c> cookie to the response,
+/// so that AJAX calls can read it client side and send it as a header.
 /// </summary>
 /// <remarks>
-/// Creates a new instance of the class
+/// Initializes a new instance of the <see cref="AntiforgeryCookieResultFilterAttribute"/> class.
 /// </remarks>
-/// <param name="antiforgery">Antiforgery service</param>
+/// <param name="antiforgery">The antiforgery service.</param>
 public class AntiforgeryCookieResultFilterAttribute(IAntiforgery antiforgery) : ResultFilterAttribute
 {
     private readonly IAntiforgery antiforgery = antiforgery;

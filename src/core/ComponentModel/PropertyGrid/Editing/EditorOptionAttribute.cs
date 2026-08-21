@@ -1,8 +1,8 @@
 ﻿namespace Serenity.ComponentModel;
 
 /// <summary>
-/// Sets an editor option for target property editor.
-/// Avoid using this where possible as option keys and values 
+/// Sets an editor option for the target property editor.
+/// Avoid using this where possible as option keys and values
 /// are not checked.
 /// </summary>
 /// <seealso cref="Attribute" />

@@ -6,14 +6,17 @@ using Microsoft.Extensions.DependencyInjection;
 namespace Serenity.Web;
 
 /// <summary>
-/// An attribute that can be placed on MVC controllers, controller actions, or Razor pages to require all or any of a set of features to be enabled.
-/// Note that if no <see cref="IFeatureToggles"/> service is registered, the feature barrier will always pass.
+/// An attribute that can be placed on MVC controllers, controller actions, or Razor pages
+/// to require all or any of a set of features to be enabled.
+/// Note that if no <see cref="IFeatureToggles"/> service is registered, the feature barrier
+/// will always pass.
 /// </summary>
 [AttributeUsage(AttributeTargets.Method | AttributeTargets.Class, AllowMultiple = true)]
 public class FeatureBarrierAttribute : RequiresFeatureAttribute, IActionConstraint, IPageFilter
 {
     /// <summary>
-    /// Creates an attribute that can be used to barrier actions or pages. The barrier can be configured to require all or any of the provided feature(s) to pass.
+    /// Creates an attribute that can be used to barrier actions or pages. The barrier
+    /// can be configured to require all or any of the provided feature(s) to pass.
     /// </summary>
     /// <param name="features">The names of the features that the attribute will represent.</param>
     public FeatureBarrierAttribute(params string[] features) : base(features)
@@ -21,7 +24,8 @@ public class FeatureBarrierAttribute : RequiresFeatureAttribute, IActionConstrai
     }
 
     /// <summary>
-    /// Creates an attribute that can be used to barrier actions or pages. The barrier can be configured to require all or any of the provided feature(s) to pass.
+    /// Creates an attribute that can be used to barrier actions or pages. The barrier
+    /// can be configured to require all or any of the provided feature(s) to pass.
     /// </summary>
     /// <param name="features">A set of enums representing the features that the attribute will represent.</param>
     public FeatureBarrierAttribute(params object[] features) : base(features)

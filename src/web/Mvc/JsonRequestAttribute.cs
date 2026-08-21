@@ -14,7 +14,7 @@ namespace Serenity.Services;
 public class JsonRequestAttribute : ActionFilterAttribute
 {
     /// <summary>
-    /// Creates a new instance of the attribute
+    /// Initializes a new instance of the <see cref="JsonRequestAttribute"/> class.
     /// </summary>
     public JsonRequestAttribute()
     {
@@ -135,14 +135,14 @@ public class JsonRequestAttribute : ActionFilterAttribute
     }
 
     /// <summary>
-    /// The parameter name for "request" argument. 
+    /// Gets or sets the parameter name for the <c>request</c> argument.
     /// </summary>
     public string ParamName { get; set; }
 
     private bool? allowGet;
 
     /// <summary>
-    /// True to allow this filter for GET request
+    /// Gets or sets whether to allow this filter for GET requests.
     /// </summary>
     public bool AllowGet
     {
@@ -153,7 +153,7 @@ public class JsonRequestAttribute : ActionFilterAttribute
     private bool? allowQuery;
 
     /// <summary>
-    /// True to allow getting JSON body from query string
+    /// Gets or sets whether to allow getting the JSON body from the query string.
     /// </summary>
     public bool AllowQuery
     {
@@ -164,7 +164,7 @@ public class JsonRequestAttribute : ActionFilterAttribute
     private bool? allowForm;
 
     /// <summary>
-    /// True to allow getting JSON body from the posted form 
+    /// Gets or sets whether to allow getting the JSON body from the posted form.
     /// </summary>
     public bool AllowForm
     {
@@ -173,17 +173,17 @@ public class JsonRequestAttribute : ActionFilterAttribute
     }
 
     /// <summary>
-    /// The default for AllowGet which is True
+    /// The default for <see cref="AllowGet"/>, which is <c>true</c>.
     /// </summary>
     public static bool DefaultAllowGet { get; set; } = true;
 
     /// <summary>
-    /// The default for AllowQuery which is true
+    /// The default for <see cref="AllowQuery"/>, which is <c>true</c>.
     /// </summary>
     public static bool DefaultAllowQuery { get; set; } = true;
 
     /// <summary>
-    /// The default for AllowForm which is true
+    /// The default for <see cref="AllowForm"/>, which is <c>true</c>.
     /// </summary>
     public static bool DefaultAllowForm { get; set; } = true;
 }

@@ -1,9 +1,9 @@
 ﻿namespace Serenity.ComponentModel;
 
 /// <summary>
-/// Specifies ID field to filter on a field. For example, if this attribute
-/// is placed on EmployeeName field, EmployeeId can be the filtering field,
-/// so that values are filtered on ID not text value.
+/// Specifies the ID field to filter on a field. For example, if this attribute
+/// is placed on the EmployeeName field, EmployeeId can be the filtering field,
+/// so that values are filtered on the ID rather than the text value.
 /// </summary>
 /// <seealso cref="Attribute" />
 /// <remarks>

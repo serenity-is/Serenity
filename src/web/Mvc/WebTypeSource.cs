@@ -1,7 +1,7 @@
 namespace Serenity.Web;
 
 /// <summary>
-/// Base type source for apps using Serenity.Web assembly and its reference chain
+/// Base type source for apps using the Serenity.Web assembly and its reference chain.
 /// </summary>
 public class WebTypeSource(IEnumerable<Assembly> assemblies) : BaseAssemblyTypeSource
 {
@@ -15,22 +15,22 @@ public class WebTypeSource(IEnumerable<Assembly> assemblies) : BaseAssemblyTypeS
     }
 
     /// <summary>
-    /// Reference to Serenity.Net.Core assembly
+    /// Reference to the Serenity.Net.Core assembly.
     /// </summary>
     public static readonly Assembly SerenityNetCoreAssembly = typeof(Localization.ILocalText).Assembly;
 
     /// <summary>
-    /// Reference to Serenity.Net.Services assembly
+    /// Reference to the Serenity.Net.Services assembly.
     /// </summary>
     public static readonly Assembly SerenityNetServicesAssembly = typeof(SaveRequestHandler<>).Assembly;
 
     /// <summary>
-    /// Reference to Serenity.Net.Web assembly
+    /// Reference to the Serenity.Net.Web assembly.
     /// </summary>
     public static readonly Assembly SerenityNetWebAssembly = typeof(HttpContextItemsAccessor).Assembly;
 
     /// <summary>
-    /// List of assemblies up to Serenity.Web
+    /// List of assemblies up to Serenity.Web.
     /// </summary>
     public static readonly Assembly[] SerenityNetWebAssemblyChain =
     [

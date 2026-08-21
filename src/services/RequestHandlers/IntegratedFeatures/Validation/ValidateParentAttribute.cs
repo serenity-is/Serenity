@@ -1,14 +1,14 @@
 namespace Serenity.Services;
 
 /// <summary>
-/// Validation behavior for rows that have a parent record via <see cref="IParentIdRow"/> interface
+/// Validation behavior for rows that have a parent record via <see cref="IParentIdRow"/> interface.
 /// </summary>
 /// <remarks>
-/// Creates an instance of the class
+/// Initializes a new instance of the class.
 /// </remarks>
 /// <param name="rowTypeRegistry">Row type registry</param>
 /// <param name="localizer">Text localizer</param>
-/// <exception cref="ArgumentNullException">rowTypeRegistry or localizer is null</exception>
+/// <exception cref="ArgumentNullException"><paramref name="rowTypeRegistry"/> or <paramref name="localizer"/> is <c>null</c>.</exception>
 public class ValidateParentBehavior(IRowTypeRegistry rowTypeRegistry, ITextLocalizer localizer) : BaseSaveBehavior
 {
     private readonly IRowTypeRegistry rowTypeRegistry = rowTypeRegistry ??

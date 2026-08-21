@@ -1,7 +1,7 @@
 namespace Serenity.Navigation;
 
 /// <summary>
-/// A node in a navigation tree model
+/// A node in a navigation tree model.
 /// </summary>
 public class NavigationItem
 {

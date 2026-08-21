@@ -3,12 +3,12 @@ using System.Text.Json;
 namespace Serenity.JsonConverters;
 
 /// <summary>
-/// Ignores null values while deserializing. Should only be used on Value types!
+/// Ignores null values while deserializing. Should only be used on value types.
 /// </summary>
 public class NullAsDefaultJsonConverter : JsonConverterFactory
 {
     /// <summary>
-    /// Default instance
+    /// The default instance of the <see cref="NullAsDefaultJsonConverter"/>.
     /// </summary>
     public static readonly NullAsDefaultJsonConverter Instance = new ();
 

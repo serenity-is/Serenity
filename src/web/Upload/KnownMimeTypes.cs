@@ -4,7 +4,7 @@ using System.IO;
 namespace Serenity.Web;
 
 /// <summary>
-/// Contains set of known popular mime types
+/// Contains a set of known popular mime types.
 /// </summary>
 public static class KnownMimeTypes
 {
@@ -19,23 +19,23 @@ public static class KnownMimeTypes
     };
 
     /// <summary>
-    ///   Gets MIME type for a given file using information in Win32 HKEY_CLASSES_ROOT 
+    ///   Gets the MIME type for a given file using information in the Win32 HKEY_CLASSES_ROOT
     ///   registry key.</summary>
     /// <param name="path">
-    ///   File name whose MIME type will be determined. Its only extension part will be used.</param>
+    ///   The file name whose MIME type will be determined. Only its extension part will be used.</param>
     /// <returns>
-    ///   Determined mime type for given file. "application/octet-stream" otherwise.</returns>
+    ///   The determined mime type for the given file, or <c>application/octet-stream</c> otherwise.</returns>
     public static string Get(string path)
     {
         return TryGet(path) ?? "application/octet-stream";
     }
 
     /// <summary>
-    ///   Gets MIME type for a given file</summary>
+    ///   Gets the MIME type for a given file.</summary>
     /// <param name="path">
-    ///   File name whose MIME type will be determined. Its only extension part will be used.</param>
+    ///   The file name whose MIME type will be determined. Only its extension part will be used.</param>
     /// <returns>
-    ///   Determined mime type for given file. "application/octet-stream" otherwise.</returns>
+    ///   The determined mime type for the given file, or <c>null</c> if unknown.</returns>
     public static string TryGet(string path)
     {
         ArgumentNullException.ThrowIfNull(path);

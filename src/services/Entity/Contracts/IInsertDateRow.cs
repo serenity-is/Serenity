@@ -1,7 +1,7 @@
 namespace Serenity.Data;
 
 /// <summary>
-/// Interface for rows that has InsertDate field
+/// Interface for rows that have an InsertDate field.
 /// </summary>
 public interface IInsertDateRow
 {

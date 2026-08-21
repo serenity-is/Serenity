@@ -1,7 +1,7 @@
 namespace Serenity.Reflection;
 
 /// <summary>
-/// An interface to virtualize property attribute access
+/// An interface to virtualize property attribute access.
 /// </summary>
 public interface IPropertyInfo
 {
@@ -14,17 +14,19 @@ public interface IPropertyInfo
     string Name { get; }
 
     /// <summary>
-    /// Gets the attribute.
+    /// Gets the attribute of the specified type.
     /// </summary>
     /// <typeparam name="TAttr">The type of the attribute.</typeparam>
-    /// <returns></returns>
+    /// <param name="origin">The attribute origin to search.</param>
+    /// <returns>The attribute of the specified type, or <c>null</c> if none is found.</returns>
     TAttr? GetAttribute<TAttr>(AttributeOrigin origin = AttributeOrigin.All) where TAttr : Attribute;
 
     /// <summary>
-    /// Gets the attributes.
+    /// Gets the attributes of the specified type.
     /// </summary>
     /// <typeparam name="TAttr">The type of the attribute.</typeparam>
-    /// <returns></returns>
+    /// <param name="origin">The attribute origin to search.</param>
+    /// <returns>The attributes of the specified type.</returns>
     IEnumerable<TAttr> GetAttributes<TAttr>(AttributeOrigin origin = AttributeOrigin.All) where TAttr : Attribute;
 
     /// <summary>

@@ -9,6 +9,6 @@ public interface IConnectionProfiler
     /// Wraps the specified connection with a profiled one.
     /// </summary>
     /// <param name="connection">The connection.</param>
-    /// <returns>Wrapped connection.</returns>
+    /// <returns>The wrapped connection.</returns>
     IDbConnection Profile(IDbConnection connection);
 }

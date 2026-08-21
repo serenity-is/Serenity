@@ -4,34 +4,34 @@ using Dictionary = System.Collections.Generic.Dictionary<string, object>;
 namespace Serenity.Data;
 
 /// <summary>
-/// Base class for queries with params like SqlQuery, SqlUpdate, SqlInsert
+/// Base class for queries with params like SqlQuery, SqlUpdate, SqlInsert.
 /// </summary>
 /// <seealso cref="IQueryWithParams" />
 [DebuggerDisplay("{DebugText}")]
 public class QueryWithParams : IQueryWithParams
 {
     /// <summary>
-    /// The dialect
+    /// The dialect.
     /// </summary>
     protected ISqlDialect dialect;
 
     /// <summary>
-    /// Is the dialect overridden
+    /// Is the dialect overridden.
     /// </summary>
     protected bool dialectOverridden;
 
     /// <summary>
-    /// The parent query with param storage
+    /// The parent query with param storage.
     /// </summary>
     protected QueryWithParams parent;
 
     /// <summary>
-    /// The parameters
+    /// The parameters.
     /// </summary>
     protected Dictionary parameters;
 
     /// <summary>
-    /// The next auto param counter
+    /// The next auto param counter.
     /// </summary>
     protected int nextAutoParam;
 
@@ -134,7 +134,7 @@ public class QueryWithParams : IQueryWithParams
     /// <summary>
     /// Creates an automatically named parameter.
     /// </summary>
-    /// <returns></returns>
+    /// <returns>The automatically named parameter.</returns>
     public Parameter AutoParam()
     {
         if (parent != null)
@@ -147,7 +147,8 @@ public class QueryWithParams : IQueryWithParams
     /// Creates a new query that shares parameter dictionary with this query.
     /// </summary>
     /// <returns>
-    /// A new query that shares parameters.</returns>
+    /// A new query that shares parameters.
+    /// </returns>
     public TQuery CreateSubQuery<TQuery>()
         where TQuery : QueryWithParams, new()
     {

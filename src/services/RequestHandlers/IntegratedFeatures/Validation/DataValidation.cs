@@ -50,7 +50,7 @@ public static class DataValidation
     /// </summary>
     /// <param name="row">Row instance</param>
     /// <param name="fields">List of fields</param>
-    /// <param name="localizer"></param>
+    /// <param name="localizer">Text localizer</param>
     public static void ValidateRequired(this IRow row, IEnumerable<Field> fields, ITextLocalizer localizer)
     {
         foreach (var field in fields)
@@ -153,12 +153,12 @@ public static class DataValidation
     }
 
     /// <summary>
-    /// Returns a required validation error
+    /// Returns a required validation error.
     /// </summary>
     /// <param name="name">Field name</param>
     /// <param name="localizer">Text localizer</param>
     /// <param name="title">Field title</param>
-    /// <returns></returns>
+    /// <returns>The required validation error.</returns>
     public static ValidationError RequiredError(string name, ITextLocalizer localizer, string title = null)
     {
         return new ValidationError("Required", name,
@@ -180,12 +180,12 @@ public static class DataValidation
     }
 
     /// <summary>
-    /// Returns an invalid ID error
+    /// Returns an invalid ID error.
     /// </summary>
     /// <param name="field">Field</param>
     /// <param name="value">Value</param>
     /// <param name="localizer">Text localizer</param>
-    /// <returns></returns>
+    /// <returns>The invalid ID error.</returns>
     public static ValidationError InvalidIdError(Field field, long value, ITextLocalizer localizer)
     {
         return new ValidationError("InvalidId", field.Name,
@@ -218,12 +218,12 @@ public static class DataValidation
     }
 
     /// <summary>
-    /// Returns an invalid value error
+    /// Returns an invalid value error.
     /// </summary>
     /// <param name="field">Field</param>
     /// <param name="value">Value</param>
     /// <param name="localizer">Text localizer</param>
-    /// <returns></returns>
+    /// <returns>The invalid value error.</returns>
     public static ValidationError InvalidValueError(Field field, object value, ITextLocalizer localizer)
     {
         return new ValidationError("InvalidValue", field.Name,
@@ -232,12 +232,12 @@ public static class DataValidation
     }
 
     /// <summary>
-    /// Returns an invalid value error
+    /// Returns an invalid value error.
     /// </summary>
     /// <param name="row">Row instance</param>
     /// <param name="field">Field</param>
     /// <param name="localizer">Text localizer</param>
-    /// <returns></returns>
+    /// <returns>The invalid value error.</returns>
     public static ValidationError InvalidValueError(IRow row, Field field, ITextLocalizer localizer)
     {
         return new ValidationError("InvalidValue", field.Name,
@@ -285,11 +285,11 @@ public static class DataValidation
     }
 
     /// <summary>
-    /// Returns a related record exist error
+    /// Returns a related record exist error.
     /// </summary>
     /// <param name="foreignTable">Foreign table</param>
     /// <param name="localizer">Text localizer</param>
-    /// <returns></returns>
+    /// <returns>The related record exist error.</returns>
     public static ValidationError RelatedRecordExist(string foreignTable, ITextLocalizer localizer)
     {
         return new ValidationError("RelatedRecordExist", null,
@@ -342,11 +342,11 @@ public static class DataValidation
     }
 
     /// <summary>
-    /// Returns an argument null error
+    /// Returns an argument null error.
     /// </summary>
     /// <param name="argument">Argument name</param>
     /// <param name="localizer">Text localizer</param>
-    /// <returns></returns>
+    /// <returns>The argument null error.</returns>
     public static ValidationError ArgumentNull(string argument, ITextLocalizer localizer)
     {
         return new ValidationError("ArgumentNull", argument,
@@ -354,11 +354,11 @@ public static class DataValidation
     }
 
     /// <summary>
-    /// Returns an argument out of range error
+    /// Returns an argument out of range error.
     /// </summary>
     /// <param name="argument">Argument name</param>
     /// <param name="localizer">Text localizer</param>
-    /// <returns></returns>
+    /// <returns>The argument out of range error.</returns>
     public static ValidationError ArgumentOutOfRange(string argument, ITextLocalizer localizer)
     {
         return new ValidationError("ArgumentOutOfRange", argument,

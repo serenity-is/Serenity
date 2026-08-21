@@ -1,7 +1,7 @@
 ﻿namespace Serenity.Data;
 
 /// <summary>
-/// Methods and properties of a row to support desktop app grid etc. editing
+/// Methods and properties of a row to support editing in desktop applications, grids, and similar scenarios.
 /// </summary>
 public interface IEditableRow : IRow, IEditableObject, INotifyPropertyChanged
 {

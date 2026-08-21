@@ -1,7 +1,7 @@
 ﻿namespace Serenity.Data.Schema;
 
 /// <summary>
-/// Meta data information for an SQL column
+/// Meta data information for an SQL column.
 /// </summary>
 public class FieldInfo
 {

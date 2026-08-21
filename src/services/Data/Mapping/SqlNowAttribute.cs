@@ -1,7 +1,7 @@
 ﻿namespace Serenity.Data.Mapping;
 
 /// <summary>
-/// Dialect specific SQL expression for current date/time in server's timezone
+/// Dialect specific SQL expression for current date/time in server's timezone.
 /// </summary>
 public class SqlNowAttribute : BaseExpressionAttribute
 {

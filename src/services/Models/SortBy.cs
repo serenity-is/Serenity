@@ -16,20 +16,20 @@ public class SortBy
     }
 
     /// <summary>
-    /// Creates a SortBy object for specified field name.
+    /// Creates a SortBy object for the specified field name.
     /// </summary>
-    /// <param name="field"></param>
+    /// <param name="field">The field name.</param>
     public SortBy(string field)
     {
         Field = field;
     }
 
     /// <summary>
-    /// Creates an instance of the SortBy object containg the 
-    /// specified field name, and descending flag.
+    /// Creates an instance of the SortBy object containing the
+    /// specified field name and descending flag.
     /// </summary>
-    /// <param name="field"></param>
-    /// <param name="descending"></param>
+    /// <param name="field">The field name.</param>
+    /// <param name="descending">Whether to sort in descending order.</param>
     public SortBy(string field, bool descending)
     {
         Field = field;

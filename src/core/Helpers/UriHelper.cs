@@ -6,19 +6,19 @@
 public static class UriHelper
 {
     /// <summary>
-    ///   Combine a url with a filename by inserting "/" char between them.This works like Path.Combine
+    ///   Combines a URL with a filename by inserting a "/" character between them. This works like Path.Combine.
     ///  </summary>
     /// <param name="url">
     ///   URL will be combined (null or empty can be used).</param>
     /// <param name="fileName">
     ///   Filename or Path (required).</param>
     /// <returns>
-    ///   New string which consists of combining URL and Filename by inserting "/" char 
-    ///   between them
+    ///   New string which consists of combining URL and Filename by inserting a "/" character
+    ///   between them.
     /// </returns>
     /// <remarks>
-    ///   This function is used for only simple combining actions. like ".." relative actions 
-    ///   doesn't be checked as well as URL with querystring doesn't be supported. 
+    ///   This function is used for only simple combining actions. like ".." relative actions
+    ///   doesn't be checked as well as URL with querystring doesn't be supported.
     ///  </remarks>
     public static string Combine(string url, string fileName)
     {

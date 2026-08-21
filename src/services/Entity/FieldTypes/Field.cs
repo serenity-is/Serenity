@@ -3,7 +3,7 @@ using System.Text.Json;
 namespace Serenity.Data;
 
 /// <summary>
-/// Base Field class
+/// Base Field class.
 /// </summary>
 /// <seealso cref="IFieldWithJoinInfo" />
 public abstract partial class Field : IFieldWithJoinInfo
@@ -77,7 +77,7 @@ public abstract partial class Field : IFieldWithJoinInfo
     }
 
     /// <summary>
-    /// Column name
+    /// Gets the column name.
     /// </summary>
     public string Name => name;
 
@@ -202,10 +202,10 @@ public abstract partial class Field : IFieldWithJoinInfo
     }
 
     /// <summary>
-    /// Jsons the unexpected token.
+    /// Throws an exception for an unexpected JSON token when deserializing a row.
     /// </summary>
     /// <param name="reader">The reader.</param>
-    /// <returns></returns>
+    /// <returns>This method always throws.</returns>
     /// <exception cref="Newtonsoft.Json.JsonSerializationException">Unexpected token when deserializing row: " + reader.TokenType</exception>
     protected static Exception JsonUnexpectedToken(Newtonsoft.Json.JsonReader reader)
     {
@@ -214,16 +214,17 @@ public abstract partial class Field : IFieldWithJoinInfo
 
 
     /// <summary>
-    /// Jsons the unexpected token.
+    /// Throws an exception for an unexpected JSON token when deserializing a row.
     /// </summary>
     /// <param name="reader">The reader.</param>
+    /// <returns>This method always throws.</returns>
     protected static Exception UnexpectedJsonToken(ref Utf8JsonReader reader)
     {
         throw new JsonException("Unexpected token when deserializing row: " + reader.TokenType);
     }
 
     /// <summary>
-    /// Copies the no assignment.
+    /// Copies the field value without marking the target as assigned.
     /// </summary>
     /// <param name="source">The source.</param>
     /// <param name="target">The target.</param>
@@ -234,7 +235,7 @@ public abstract partial class Field : IFieldWithJoinInfo
     }
 
     /// <summary>
-    /// The expression (can be equal to name if no expression)
+    /// Gets or sets the expression (can be equal to the name if there is no expression).
     /// </summary>
     public string Expression
     {
@@ -462,8 +463,8 @@ public abstract partial class Field : IFieldWithJoinInfo
     /// Creates a left join from the foreign join index.
     /// </summary>
     /// <param name="foreignIndex">Index of the foreign.</param>
-    /// <returns></returns>
-    /// <exception cref="ArgumentNullException">ForeignTable</exception>
+    /// <returns>The created left join.</returns>
+    /// <exception cref="ArgumentNullException">ForeignTable is null or empty.</exception>
     [Obsolete("This method was used by the old ORM")]
     public LeftJoin ForeignJoin(int? foreignIndex = null)
     {
@@ -498,21 +499,21 @@ public abstract partial class Field : IFieldWithJoinInfo
     }
 
     /// <summary>
-    /// Called when [row initialization].
+    /// Called when the row is initialized.
     /// </summary>
     protected internal virtual void OnRowInitialization()
     {
     }
 
     /// <summary>
-    /// Serializes this fields value to JSON
+    /// Serializes this field's value to JSON.
     /// </summary>
     /// <param name="writer">The writer.</param>
     /// <param name="row">The row.</param>
     /// <param name="serializer">The serializer.</param>
     public abstract void ValueToJson(Newtonsoft.Json.JsonWriter writer, IRow row, Newtonsoft.Json.JsonSerializer serializer);
     /// <summary>
-    /// Deserializes this fields value from JSON
+    /// Deserializes this field's value from JSON.
     /// </summary>
     /// <param name="reader">The reader.</param>
     /// <param name="row">The row.</param>
@@ -520,7 +521,7 @@ public abstract partial class Field : IFieldWithJoinInfo
     public abstract void ValueFromJson(Newtonsoft.Json.JsonReader reader, IRow row, Newtonsoft.Json.JsonSerializer serializer);
 
     /// <summary>
-    /// Serializes this fields value to JSON
+    /// Serializes this field's value to JSON.
     /// </summary>
     /// <param name="row">The row.</param>
     /// <param name="writer">The writer.</param>
@@ -528,7 +529,7 @@ public abstract partial class Field : IFieldWithJoinInfo
     public abstract void ValueToJson(Utf8JsonWriter writer, IRow row, JsonSerializerOptions options);
 
     /// <summary>
-    /// Deserializes this fields value from JSON
+    /// Deserializes this field's value from JSON.
     /// </summary>
     /// <param name="reader">The reader.</param>
     /// <param name="row">The row.</param>
@@ -563,7 +564,7 @@ public abstract partial class Field : IFieldWithJoinInfo
     /// </summary>
     /// <param name="source">The source.</param>
     /// <param name="provider">The provider.</param>
-    /// <returns></returns>
+    /// <returns>The converted value.</returns>
     public abstract object ConvertValue(object source, IFormatProvider provider);
 
     /// <summary>
@@ -577,18 +578,18 @@ public abstract partial class Field : IFieldWithJoinInfo
     }
 
     /// <summary>
-    /// Compares the field values for two rows for an ascending index sort
+    /// Compares the field values for two rows for an ascending index sort.
     /// </summary>
     /// <param name="row1">The row1.</param>
     /// <param name="row2">The row2.</param>
-    /// <returns></returns>
+    /// <returns>A value indicating the relative order of the two rows.</returns>
     public abstract int IndexCompare(IRow row1, IRow row2);
 
     /// <summary>
     /// Gets the value of this row as an object.
     /// </summary>
     /// <param name="row">The row.</param>
-    /// <returns></returns>
+    /// <returns>The value of the field in the row as an object.</returns>
     public object AsObject(IRow row)
     {
         row.OnFieldGet(this);
@@ -619,7 +620,7 @@ public abstract partial class Field : IFieldWithJoinInfo
     /// Gets the value of this row as an SQL value.
     /// </summary>
     /// <param name="row">The row.</param>
-    /// <returns></returns>
+    /// <returns>The value of the field in the row as an SQL value.</returns>
     public virtual object AsSqlValue(IRow row)
     {
         return AsObject(row);
@@ -660,14 +661,14 @@ public abstract partial class Field : IFieldWithJoinInfo
     }
 
     /// <summary>
-    /// Gets if this field is one with a LookupInclude attribute or ID or Name field
+    /// Gets if this field is one with a LookupInclude attribute or an ID or Name field.
     /// </summary>
     public bool IsLookup { get; internal set; }
 
     IDictionary<string, Join> IFieldWithJoinInfo.Joins => fields.Joins;
 
     /// <summary>
-    /// Select as column alias. Can be equal to property name or name.
+    /// Gets the column alias. Can be equal to the property name or the name.
     /// </summary>
     public string ColumnAlias => propertyName ?? name;
 
@@ -675,7 +676,7 @@ public abstract partial class Field : IFieldWithJoinInfo
     /// Gets the title.
     /// </summary>
     /// <param name="localizer">The localizer.</param>
-    /// <returns></returns>
+    /// <returns>The localized title of the field.</returns>
     public string GetTitle(ITextLocalizer localizer)
     {
         if (caption is null)

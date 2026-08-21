@@ -3,27 +3,28 @@ using Microsoft.Extensions.Options;
 namespace Serenity.Data;
 
 /// <summary>
-/// Default connection string source
+/// The default connection string source.
 /// </summary>
 /// <remarks>
-/// Creates a new instance of DefaultConnectionStringSource
+/// Creates a new instance of <see cref="DefaultConnectionStrings"/>.
 /// </remarks>
-/// <param name="options">Connection string options</param>
-/// <param name="sqlDialectMapper">Sql Dialect Mapper</param>
+/// <param name="options">The connection string options.</param>
+/// <param name="sqlDialectMapper">The SQL dialect mapper.</param>
 public class DefaultConnectionStrings(IOptions<ConnectionStringOptions> options, ISqlDialectMapper sqlDialectMapper = null) : IConnectionStrings
 {
-    /// <summary>Options</summary>
+    /// <summary>The options.</summary>
     protected readonly IOptions<ConnectionStringOptions> options = options ?? throw new ArgumentNullException(nameof(options));
-    /// <summary>Sql dialect mapper</summary>
+    /// <summary>The SQL dialect mapper.</summary>
     protected readonly ISqlDialectMapper sqlDialectMapper = sqlDialectMapper ?? new DefaultSqlDialectMapper();
-    /// <summary>Cached dictionary of connection string infos</summary>
+    /// <summary>The cached dictionary of connection string infos.</summary>
     protected readonly ConcurrentDictionary<string, ConnectionStringInfo> byKey = new();
 
     /// <summary>
-    /// Determines dialect for a connection
+    /// Determines the dialect for a connection.
     /// </summary>
-    /// <param name="connectionKey">Connection key</param>
-    /// <param name="entry">Connection entry</param>
+    /// <param name="connectionKey">The connection key.</param>
+    /// <param name="entry">The connection entry.</param>
+    /// <returns>The SQL dialect.</returns>
     protected virtual ISqlDialect DetermineDialect(string connectionKey, ConnectionStringEntry entry)
     {
         ArgumentNullException.ThrowIfNull(entry);
@@ -39,10 +40,10 @@ public class DefaultConnectionStrings(IOptions<ConnectionStringOptions> options,
     }
 
     /// <summary>
-    /// Gets a connection string by its key
+    /// Gets a connection string by its key.
     /// </summary>
-    /// <param name="connectionKey">Connection key</param>
-    /// <returns>Connection string or null if not found</returns>
+    /// <param name="connectionKey">The connection key.</param>
+    /// <returns>The connection string, or <c>null</c> if not found.</returns>
     public virtual IConnectionString TryGetConnectionString(string connectionKey)
     {
         if (byKey.TryGetValue(connectionKey, out ConnectionStringInfo info))
@@ -59,9 +60,9 @@ public class DefaultConnectionStrings(IOptions<ConnectionStringOptions> options,
     }
 
     /// <summary>
-    /// Lists all known connections strings
+    /// Lists all known connection strings.
     /// </summary>
-    /// <returns>List of all registered connections</returns>
+    /// <returns>The list of all registered connections.</returns>
     public virtual IEnumerable<IConnectionString> ListConnectionStrings()
     {
         return options.Value.Keys.Select(TryGetConnectionString);

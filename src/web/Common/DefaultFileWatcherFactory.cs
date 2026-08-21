@@ -1,14 +1,15 @@
 ﻿namespace Serenity.Web;
 
 /// <summary>
-/// Default implementation for <see cref="IFileWatcherFactory"/>
+/// Default implementation of <see cref="IFileWatcherFactory"/> that keeps
+/// created watchers alive for the lifetime of the factory.
 /// </summary>
 public class DefaultFileWatcherFactory : IFileWatcherFactory
 {
     private readonly List<IFileWatcher> watchers;
 
     /// <summary>
-    /// Creates a new instance of the class
+    /// Initializes a new instance of the <see cref="DefaultFileWatcherFactory"/> class.
     /// </summary>
     public DefaultFileWatcherFactory()
     {

@@ -6,7 +6,7 @@ using Serenity.Web;
 namespace Serenity.Extensions.DependencyInjection;
 
 /// <summary>
-/// DI extension methods related to upload services
+/// DI extension methods related to upload services.
 /// </summary>
 public static class UploadServiceCollectionExtensions
 {
@@ -15,8 +15,9 @@ public static class UploadServiceCollectionExtensions
     /// <see cref="IUploadValidator"/>, <see cref="IImageProcessor"/> and
     /// <see cref="IUploadProcessor"/> interfaces.
     /// </summary>
-    /// <param name="collection">Service collection</param>
-    /// <exception cref="ArgumentNullException">Collection is null</exception>
+    /// <param name="collection">The service collection.</param>
+    /// <returns>The same service collection so that calls can be chained.</returns>
+    /// <exception cref="ArgumentNullException"><paramref name="collection"/> is <c>null</c>.</exception>
     public static IServiceCollection AddUploadStorage(this IServiceCollection collection)
     {
         collection.AddOptions();
@@ -34,9 +35,10 @@ public static class UploadServiceCollectionExtensions
     /// <see cref="IUploadValidator"/>, <see cref="IImageProcessor"/> and
     /// <see cref="IUploadProcessor"/> interfaces.
     /// </summary>
-    /// <param name="collection">Service collection</param>
-    /// <param name="setupAction">Callback to edit options</param>
-    /// <exception cref="ArgumentNullException">Collection is null</exception>
+    /// <param name="collection">The service collection.</param>
+    /// <param name="setupAction">The callback to edit options.</param>
+    /// <returns>The same service collection so that calls can be chained.</returns>
+    /// <exception cref="ArgumentNullException"><paramref name="collection"/> or <paramref name="setupAction"/> is <c>null</c>.</exception>
     public static IServiceCollection AddUploadStorage(this IServiceCollection collection,
         Action<UploadSettings> setupAction)
     {

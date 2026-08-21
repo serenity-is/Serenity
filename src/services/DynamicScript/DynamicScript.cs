@@ -1,12 +1,12 @@
 ﻿namespace Serenity.Web;
 
 /// <summary>
-/// Base abstract implementation for <see cref="IDynamicScript"/>
+/// Base abstract implementation for <see cref="IDynamicScript"/>.
 /// </summary>
 public abstract class DynamicScript : IDynamicScript
 {
     /// <summary>
-    /// Creates a new instance of the class
+    /// Creates a new instance of the class.
     /// </summary>
     protected DynamicScript()
     {

@@ -1,7 +1,7 @@
 namespace Serenity.Data;
 
 /// <summary>
-/// Interface for rows that has InsertUserId field
+/// Interface for rows that have an InsertUserId field.
 /// </summary>
 public interface IInsertUserIdRow
 {

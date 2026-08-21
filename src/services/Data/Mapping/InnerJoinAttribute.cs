@@ -1,7 +1,7 @@
 namespace Serenity.Data.Mapping;
 
 /// <summary>
-/// INNER JOIN type
+/// INNER JOIN type.
 /// </summary>
 /// <seealso cref="Attribute" />
 /// <seealso cref="ISqlJoin" />
@@ -9,7 +9,7 @@ namespace Serenity.Data.Mapping;
 public class InnerJoinAttribute : Attribute, ISqlJoin
 {
     /// <summary>
-    /// Adds a inner join on foreign key. Use this version only on properties with ForeignKey attribute.
+    /// Adds an inner join on foreign key. Use this version only on properties with ForeignKey attribute.
     /// </summary>
     /// <param name="alias">Foreign join alias</param>
     public InnerJoinAttribute(string alias)
@@ -18,7 +18,7 @@ public class InnerJoinAttribute : Attribute, ISqlJoin
     }
 
     /// <summary>
-    /// Adds a inner join
+    /// Adds an inner join.
     /// </summary>
     /// <param name="alias">Join alias</param>
     /// <param name="toTable">Join table</param>
@@ -32,7 +32,7 @@ public class InnerJoinAttribute : Attribute, ISqlJoin
     }
 
     /// <summary>
-    /// Adds a inner join on foreign key. Use this version only on properties with ForeignKey attribute.
+    /// Adds an inner join on foreign key. Use this version only on properties with ForeignKey attribute.
     /// </summary>
     /// <param name="alias">Foreign join alias</param>
     /// <param name="serverTypes">Dialects like <see cref="ServerType.MySql" />, <see cref="ServerType.Sqlite" />.</param>
@@ -43,7 +43,7 @@ public class InnerJoinAttribute : Attribute, ISqlJoin
     }
 
     /// <summary>
-    /// Adds a inner join
+    /// Adds an inner join.
     /// </summary>
     /// <param name="alias">Join alias</param>
     /// <param name="toTable">Join table</param>

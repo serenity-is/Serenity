@@ -2,9 +2,9 @@
 
 /// <summary>
 /// Indicates that the target property should use a "Time (HH:mm)" editor. The editor does not support editing
-/// seconds or milliseconds. It is a simple dropdown editor that allows selecting a time between StartHour and EndHour
-/// Note that this editor type returns an integer value that is number of minutes from midnight.
-/// Use it only with Integer typed fields. You may use multiplier option to store seconds (60) or milliseconds (60000).
+/// seconds or milliseconds. It is a simple dropdown editor that allows selecting a time between StartHour and EndHour.
+/// Note that this editor type returns an integer value that is the number of minutes from midnight.
+/// Use it only with Integer-typed fields. You may use the multiplier option to store seconds (60) or milliseconds (60000).
 /// Use TimeSpanEditor for TimeSpan fields.
 /// </summary>
 /// <seealso cref="CustomEditorAttribute" />
@@ -24,10 +24,10 @@ public partial class TimeEditorAttribute : CustomEditorAttribute
     }
 
     /// <summary>
-    /// Gets or sets a value indicating whether empty option should be shown.
+    /// Gets or sets a value indicating whether the empty option should be hidden.
     /// </summary>
     /// <value>
-    ///   <c>true</c> if no empty option; otherwise, <c>false</c>.
+    ///   <c>true</c> if the empty option should be hidden; otherwise, <c>false</c>.
     /// </value>
     public bool NoEmptyOption
     {

@@ -12,11 +12,6 @@ public class SqlServer2008Dialect : SqlServer2005Dialect
     /// </summary>
     public static new readonly ISqlDialect Instance = new SqlServer2008Dialect();
 
-    /// <summary>
-    /// Gets a value indicating whether use datetime2 type.
-    /// </summary>
-    /// <value>
-    ///   <c>true</c> if use datetime2; otherwise, <c>false</c>.
-    /// </value>
+    /// <inheritdoc/>
     public override bool UseDateTime2 => true;
 }

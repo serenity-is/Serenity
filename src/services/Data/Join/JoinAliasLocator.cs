@@ -1,7 +1,7 @@
 namespace Serenity.Data;
 
 /// <summary>
-/// Locates alias references in an SQL expression
+/// Locates alias references in an SQL expression.
 /// </summary>
 public class JoinAliasLocator
 {
@@ -9,8 +9,8 @@ public class JoinAliasLocator
     /// Locates the aliases in specified expression.
     /// </summary>
     /// <param name="expression">The expression.</param>
-    /// <returns></returns>
-    /// <exception cref="ArgumentNullException">expression is null</exception>
+    /// <returns>The set of aliases found, or <c>null</c> if none are found.</returns>
+    /// <exception cref="ArgumentNullException">expression is null.</exception>
     public static HashSet<string> Locate(string expression)
     {
         ArgumentNullException.ThrowIfNull(expression);
@@ -30,8 +30,8 @@ public class JoinAliasLocator
     /// </summary>
     /// <param name="expression">The expression.</param>
     /// <param name="singleAlias">The single alias.</param>
-    /// <returns></returns>
-    /// <exception cref="ArgumentNullException">expression is null</exception>
+    /// <returns>The set of aliases found, or <c>null</c> if none are found.</returns>
+    /// <exception cref="ArgumentNullException">expression is null.</exception>
     public static HashSet<string> LocateOptimized(string expression, out string singleAlias)
     {
         ArgumentNullException.ThrowIfNull(expression);
@@ -60,7 +60,7 @@ public class JoinAliasLocator
     /// </summary>
     /// <param name="expression">The expression.</param>
     /// <param name="alias">The alias handler action.</param>
-    /// <returns></returns>
+    /// <returns><c>true</c> if the expression was processed successfully.</returns>
     public static bool EnumerateAliases(string expression, Action<string> alias)
     {
         bool inQuote = false;
@@ -112,7 +112,7 @@ public class JoinAliasLocator
     /// </summary>
     /// <param name="expression">The expression.</param>
     /// <param name="replace">The replace function.</param>
-    /// <returns></returns>
+    /// <returns>The expression with aliases replaced.</returns>
     public static string ReplaceAliases(string expression, Func<string, string> replace)
     {
         bool inQuote = false;

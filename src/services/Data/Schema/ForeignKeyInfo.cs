@@ -1,7 +1,7 @@
 ﻿namespace Serenity.Data.Schema;
 
 /// <summary>
-/// SQL metadata for a foreign key
+/// SQL metadata for a foreign key.
 /// </summary>
 public class ForeignKeyInfo
 {

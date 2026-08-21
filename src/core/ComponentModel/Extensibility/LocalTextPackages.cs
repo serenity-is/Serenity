@@ -1,18 +1,18 @@
 namespace Serenity.Web;
 
 /// <summary>
-/// Corresponds to LocalTextPackages section of the appsettings.json file
+/// Corresponds to the LocalTextPackages section of the appsettings.json file.
 /// </summary>
 [DefaultSectionKey(SectionKey)]
 public class LocalTextPackages : Dictionary<string, string>
 {
     /// <summary>
-    /// Default section key
+    /// Default section key.
     /// </summary>
     public const string SectionKey = "LocalTextPackages";
 
     /// <summary>
-    /// Default regex for set of texts included in Site package
+    /// Default regex for the set of texts included in the Site package.
     /// </summary>
     public static readonly Regex DefaultSitePackageIncludes = new(@"^(Columns|Controls|Db|Dialogs|Enums|Forms|Permission|Site|Validation)\.", RegexOptions.Compiled);
 

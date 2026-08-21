@@ -1,10 +1,10 @@
 ﻿namespace Serenity.ComponentModel;
 
 /// <summary>
-/// Abstraction for sanitizing values of replacement placeholders 
-/// in a file name format string like |X|/|Y|. Sanitizer is called 
-/// for each of the placeholders and for the result. 
-/// Can be implemented by custom subclasses of upload editor 
+/// Abstraction for sanitizing values of replacement placeholders
+/// in a file name format string like |X|/|Y|. The sanitizer is called
+/// for each of the placeholders and for the result.
+/// Can be implemented by custom subclasses of upload editor
 /// attributes or registered in DI.
 /// </summary>
 public interface IFilenameFormatSanitizer
@@ -21,6 +21,6 @@ public interface IFilenameFormatSanitizer
     /// slashes resulting from an empty replacement value with 
     /// /_/ to keep expected directory structure.
     /// </summary>
-    /// <param name="result"></param>
+    /// <param name="result">The formatted file name result to sanitize.</param>
     string SanitizeResult(string result);
 }

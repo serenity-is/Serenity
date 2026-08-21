@@ -10,9 +10,9 @@ public static partial class StringHelper
 {
     /// <summary>
     /// This function is just an extension method version of string.IsNullOrEmpty and is effectively obsolete.
+    /// </summary>
     /// <param name="str">String.</param>
     /// <returns>If <paramref name="str"/> is <c>null</c> or empty, <c>true</c></returns>
-    /// </summary>
     public static bool IsEmptyOrNull([NotNullWhen(false)] this string? str)
     {
         return string.IsNullOrEmpty(str);
@@ -20,9 +20,9 @@ public static partial class StringHelper
 
     /// <summary>
     /// This function is just an extension method version of string.IsNullOrEmpty and is effectively obsolete.
+    /// </summary>
     /// <param name="str">String.</param>
     /// <returns>If <paramref name="str"/> is <c>null</c> or empty, <c>true</c></returns>
-    /// </summary>
     public static bool IsNullOrEmpty([NotNullWhen(false)] this string? str)
     {
         return string.IsNullOrEmpty(str);
@@ -30,9 +30,9 @@ public static partial class StringHelper
 
     /// <summary>
     /// This function is just an extension method version of string.IsNullOrWhitespace and is effectively obsolete.
+    /// </summary>
     /// <param name="str">String.</param>
     /// <returns>If <paramref name="str"/> is <c>null</c>, empty or whitespace, <c>true</c></returns>
-    /// </summary>
     public static bool IsTrimmedEmpty([NotNullWhen(false)] this string? str)
     {
         return string.IsNullOrWhiteSpace(str);
@@ -111,7 +111,7 @@ public static partial class StringHelper
     }
 
     /// <summary>
-    ///   If the string's length is over a specified limit, trims its right and adds three points ("...").</summary>
+    ///   If the string's length is over a specified limit, trims its right side and adds three points ("...").</summary>
     /// <remarks>
     ///   This is an extension method, so it can be called directly as <c>str.ThreeDots()</c>.</remarks> 
     /// <param name="str">
@@ -183,13 +183,13 @@ public static partial class StringHelper
     private const string emptyDoubleQuote = "\"\"";
 
     /// <summary>
-    ///   Quotes a string</summary>
+    ///   Quotes a string.</summary>
     /// <param name="s">
-    ///   String</param>
+    ///   String.</param>
     /// <param name="sb">
-    ///   StringBuilder</param>
+    ///   StringBuilder.</param>
     /// <param name="doubleQuote">
-    ///   True to use double quotes</param>
+    ///   True to use double quotes.</param>
     public static void QuoteString(string s, StringBuilder sb, bool doubleQuote)
     {
         if (string.IsNullOrEmpty(s))
@@ -383,7 +383,7 @@ public static partial class StringHelper
     /// <summary>
     /// Formats a nullable struct
     /// </summary>
-    /// <param name="source"></param>
+    /// <param name="source">The value to format.</param>
     /// <param name="format">The format string 
     /// If <c>null</c> use the default format defined for the type of the IFormattable implementation.</param>
     /// <param name="provider">The format provider 
@@ -403,7 +403,7 @@ public static partial class StringHelper
     /// <summary>
     /// Formats a nullable object
     /// </summary>
-    /// <param name="source"></param>
+    /// <param name="source">The value to format.</param>
     /// <param name="format">The format string 
     /// If <c>null</c> use the default format defined for the type of the IFormattable implementation.</param>
     /// <param name="provider">The format provider 

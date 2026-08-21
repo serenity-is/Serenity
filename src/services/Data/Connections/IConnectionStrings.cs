@@ -1,20 +1,20 @@
 ﻿namespace Serenity.Data;
 
 /// <summary>
-/// Abstraction to access connection strings along with dialect and provider information
+/// Abstraction to access connection strings along with dialect and provider information.
 /// </summary>
 public interface IConnectionStrings
 {
     /// <summary>
-    /// Gets a connection string by its key
+    /// Gets a connection string by its key.
     /// </summary>
-    /// <param name="connectionKey">Connection key</param>
-    /// <returns>Connection string or null if not found</returns>
+    /// <param name="connectionKey">The connection key.</param>
+    /// <returns>The connection string, or <c>null</c> if not found.</returns>
     IConnectionString TryGetConnectionString(string connectionKey);
 
     /// <summary>
-    /// Lists all known connections strings
+    /// Lists all known connection strings.
     /// </summary>
-    /// <returns>List of all registered connections</returns>
+    /// <returns>The list of all registered connections.</returns>
     IEnumerable<IConnectionString> ListConnectionStrings();
 }

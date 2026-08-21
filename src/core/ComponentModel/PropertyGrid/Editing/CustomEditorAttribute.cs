@@ -4,7 +4,7 @@ namespace Serenity.ComponentModel;
 
 /// <summary>
 /// Base attribute class that all other custom editor types
-/// derives from.
+/// derive from.
 /// </summary>
 /// <seealso cref="EditorTypeAttribute" />
 /// <remarks>
@@ -43,9 +43,9 @@ public abstract class CustomEditorAttribute(string editorType) : EditorTypeAttri
     /// <summary>
     /// Gets the editor option.
     /// </summary>
-    /// <typeparam name="TType">The type of the type.</typeparam>
+    /// <typeparam name="TType">The type of the option.</typeparam>
     /// <param name="key">The key.</param>
-    /// <returns></returns>
+    /// <returns>The option value, or the default value of <typeparamref name="TType"/> if not set.</returns>
     [return:MaybeNull]
     protected TType GetOption<TType>(string key)
     {

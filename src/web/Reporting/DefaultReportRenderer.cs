@@ -4,45 +4,46 @@ using Serenity.Web;
 namespace Serenity.Reporting;
 
 /// <summary>
-/// Default implementation for <see cref="IReportRenderer" />
+/// Default implementation of <see cref="IReportRenderer"/>.
 /// </summary>
 /// <remarks>
-/// Creates an instance of the class
+/// Initializes a new instance of the <see cref="DefaultReportRenderer"/> class.
 /// </remarks>
-/// <param name="excelRenderer">Excel renderer</param>
-/// <param name="htmlReportPdfRenderer">HTML report pdf renderer</param>
-/// <param name="serviceProvider">Service provider</param>
-/// <param name="httpContextAccessor">Http context accessor</param>
+/// <param name="excelRenderer">The Excel renderer.</param>
+/// <param name="htmlReportPdfRenderer">The HTML report PDF renderer.</param>
+/// <param name="serviceProvider">The service provider.</param>
+/// <param name="httpContextAccessor">The HTTP context accessor.</param>
 public class DefaultReportRenderer(IDataReportExcelRenderer excelRenderer,
     IHtmlReportPdfRenderer htmlReportPdfRenderer,
     IServiceProvider serviceProvider,
     IHttpContextAccessor httpContextAccessor = null) : IReportRenderer
 {
     /// <summary>
-    /// Excel renderer
+    /// The Excel renderer.
     /// </summary>
     protected readonly IDataReportExcelRenderer excelRenderer = excelRenderer ?? throw new ArgumentNullException(nameof(excelRenderer));
 
     /// <summary>
-    /// Html report pdf renderer
+    /// The HTML report PDF renderer.
     /// </summary>
     protected readonly IHtmlReportPdfRenderer htmlReportPdfRenderer = htmlReportPdfRenderer ?? throw new ArgumentNullException(nameof(htmlReportPdfRenderer));
 
     /// <summary>
-    /// Http context accessor
+    /// The HTTP context accessor.
     /// </summary>
     protected readonly IHttpContextAccessor httpContextAccessor = httpContextAccessor;
 
     /// <summary>
-    /// Service provider
+    /// The service provider.
     /// </summary>
     protected readonly IServiceProvider serviceProvider = serviceProvider ?? throw new ArgumentNullException(nameof(serviceProvider));
 
     /// <summary>
-    /// Renders a data only report
+    /// Renders a data only report.
     /// </summary>
-    /// <param name="report">Report</param>
-    /// <param name="options">Options</param>
+    /// <param name="report">The report.</param>
+    /// <param name="options">The options.</param>
+    /// <returns>The render result.</returns>
     protected virtual ReportRenderResult RenderDataOnlyReport(IDataOnlyReport report, 
         ReportRenderOptions options)
     {
@@ -56,10 +57,11 @@ public class DefaultReportRenderer(IDataReportExcelRenderer excelRenderer,
     }
 
     /// <summary>
-    /// Renders an external report, generally returns a RedirectResult
+    /// Renders an external report, generally returns a <see cref="ReportRenderResult"/> with a redirect URI.
     /// </summary>
-    /// <param name="report">Report</param>
-    /// <param name="options">Options</param>
+    /// <param name="report">The report.</param>
+    /// <param name="options">The options.</param>
+    /// <returns>The render result.</returns>
     protected virtual ReportRenderResult RenderExternalReport(IExternalReport report,
         ReportRenderOptions options)
     {
@@ -74,11 +76,12 @@ public class DefaultReportRenderer(IDataReportExcelRenderer excelRenderer,
     }
 
     /// <summary>
-    /// Renders a report as HTML
+    /// Renders a report as HTML.
     /// </summary>
-    /// <param name="report">Report</param>
-    /// <param name="options">Options</param>
-    /// <exception cref="InvalidOperationException">Report has no design attribute</exception>
+    /// <param name="report">The report.</param>
+    /// <param name="options">The options.</param>
+    /// <returns>The render result.</returns>
+    /// <exception cref="InvalidOperationException">The report has no design attribute.</exception>
     protected virtual ReportRenderResult RenderAsHtml(IReport report, ReportRenderOptions options)
     {
         var result = new ReportRenderResult()
@@ -114,11 +117,12 @@ public class DefaultReportRenderer(IDataReportExcelRenderer excelRenderer,
     }
 
     /// <summary>
-    /// Gets view name for the report
+    /// Gets the view name for the report.
     /// </summary>
-    /// <param name="report">Report</param>
-    /// <param name="options">Options</param>
-    /// <exception cref="InvalidOperationException"></exception>
+    /// <param name="report">The report.</param>
+    /// <param name="options">The options.</param>
+    /// <returns>The view name.</returns>
+    /// <exception cref="InvalidOperationException">The report has no design attribute.</exception>
     protected virtual string GetViewName(IReport report, ReportRenderOptions options)
     {
         var viewName = report.GetType().GetCustomAttribute<ReportDesignAttribute>()?.Design;
@@ -130,10 +134,11 @@ public class DefaultReportRenderer(IDataReportExcelRenderer excelRenderer,
     }
 
     /// <summary>
-    /// Renders an HTML report
+    /// Renders an HTML report.
     /// </summary>
-    /// <param name="report">Report</param>
-    /// <param name="options">Options</param>
+    /// <param name="report">The report.</param>
+    /// <param name="options">The options.</param>
+    /// <returns>The render result.</returns>
     protected ReportRenderResult RenderHtmlReport(IReport report, ReportRenderOptions options)
     {
         var format = options?.ExportFormat ?? "html";
@@ -150,10 +155,11 @@ public class DefaultReportRenderer(IDataReportExcelRenderer excelRenderer,
     }
 
     /// <summary>
-    /// Renders an HTML report as pdf
+    /// Renders an HTML report as PDF.
     /// </summary>
-    /// <param name="report">Report</param>
-    /// <param name="renderOptions">Render options</param>
+    /// <param name="report">The report.</param>
+    /// <param name="renderOptions">The render options.</param>
+    /// <returns>The render result.</returns>
     protected virtual ReportRenderResult RenderAsPdf(IReport report, ReportRenderOptions renderOptions)
     {
         return new ReportRenderResult 
@@ -168,9 +174,10 @@ public class DefaultReportRenderer(IDataReportExcelRenderer excelRenderer,
     /// <summary>
     /// Renders an unknown format. Can be overridden in derived classes.
     /// </summary>
-    /// <param name="report">Report</param>
-    /// <param name="options">Options</param>
-    /// <exception cref="ArgumentOutOfRangeException">Throws argument null by default</exception>
+    /// <param name="report">The report.</param>
+    /// <param name="options">The options.</param>
+    /// <returns>The render result.</returns>
+    /// <exception cref="NotImplementedException">Thrown by default.</exception>
     protected virtual ReportRenderResult RenderUnknownFormat(IReport report, ReportRenderOptions options)
     {
         throw new NotImplementedException();

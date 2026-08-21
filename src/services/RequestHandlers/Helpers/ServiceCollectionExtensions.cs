@@ -265,10 +265,10 @@ public static class ServiceCollectionExtensions
     }
 
     /// <summary>
-    /// Adds type texts and JSON texts from passed folders
+    /// Adds type texts and JSON texts from passed folders.
     /// </summary>
-    /// <param name="provider"></param>
-    /// <param name="jsonTextPaths"></param>
+    /// <param name="provider">The service provider.</param>
+    /// <param name="jsonTextPaths">The JSON text paths to add.</param>
     [Obsolete("Use AddBaseTexts().AddJsonTexts().AddJsonTexts()...")]
     public static void AddAllTexts(this IServiceProvider provider, params string[] jsonTextPaths)
     {

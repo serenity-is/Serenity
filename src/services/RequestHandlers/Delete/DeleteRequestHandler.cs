@@ -13,15 +13,15 @@ public class DeleteRequestHandler<TRow, TDeleteRequest, TDeleteResponse> : IDele
     where TDeleteResponse : DeleteResponse, new()
 {
     /// <summary>
-    /// Lazy list of behaviors that is activated for this request
+    /// Lazy list of behaviors that is activated for this request.
     /// </summary>
     protected Lazy<IDeleteBehavior[]> behaviors;
 
     /// <summary>
-    /// Creates an instance of the class
+    /// Initializes a new instance of the class.
     /// </summary>
     /// <param name="context">Request context</param>
-    /// <exception cref="ArgumentNullException">Context is null</exception>
+    /// <exception cref="ArgumentNullException"><paramref name="context"/> is <c>null</c>.</exception>
     public DeleteRequestHandler(IRequestContext context)
     {
         Context = context ?? throw new ArgumentNullException(nameof(context));
@@ -30,7 +30,7 @@ public class DeleteRequestHandler<TRow, TDeleteRequest, TDeleteResponse> : IDele
     }
 
     /// <summary>
-    /// Gets the list of delete behaviors
+    /// Gets the list of delete behaviors.
     /// </summary>
     protected virtual IEnumerable<IDeleteBehavior> GetBehaviors()
     {
@@ -38,7 +38,7 @@ public class DeleteRequestHandler<TRow, TDeleteRequest, TDeleteResponse> : IDele
     }
 
     /// <summary>
-    /// Gets current connection from the unit of work
+    /// Gets the current connection from the unit of work.
     /// </summary>
     public IDbConnection Connection => UnitOfWork.Connection;
 
@@ -275,7 +275,7 @@ public class DeleteRequestHandler<TRow, TDeleteRequest, TDeleteResponse> : IDele
     /// </summary>
     /// <param name="unitOfWork">Unit of work</param>
     /// <param name="request">Request</param>
-    /// <exception cref="ArgumentNullException">unitofWork or request is null</exception>
+    /// <exception cref="ArgumentNullException"><paramref name="unitOfWork"/> or <paramref name="request"/> is <c>null</c>.</exception>
     public TDeleteResponse Process(IUnitOfWork unitOfWork, TDeleteRequest request)
     {
         StateBag.Clear();
@@ -322,47 +322,47 @@ public class DeleteRequestHandler<TRow, TDeleteRequest, TDeleteResponse> : IDele
     }
 
     /// <summary>
-    /// Gets the two level cache from the request context
+    /// Gets the two level cache from the request context.
     /// </summary>
     public ITwoLevelCache Cache => Context.Cache;
 
     /// <summary>
-    /// Gets the request context
+    /// Gets the request context.
     /// </summary>
     public IRequestContext Context { get; private set; }
 
     /// <summary>
-    /// Gets localizer from the request context
+    /// Gets the localizer from the request context.
     /// </summary>
     public ITextLocalizer Localizer => Context.Localizer;
 
     /// <summary>
-    /// Gets permission service from the request context
+    /// Gets the permission service from the request context.
     /// </summary>
     public IPermissionService Permissions => Context.Permissions;
 
     /// <summary>
-    /// Gets current user from the request context
+    /// Gets the current user from the request context.
     /// </summary>
     public ClaimsPrincipal User => Context.User;
 
     /// <summary>
-    /// Gets current unit of work
+    /// Gets the current unit of work.
     /// </summary>
     public IUnitOfWork UnitOfWork { get; protected set; }
 
     /// <summary>
-    /// The entity
+    /// Gets the entity being deleted.
     /// </summary>
     public TRow Row { get; protected set; }
 
     /// <summary>
-    /// Request object
+    /// Gets the request object.
     /// </summary>
     public TDeleteRequest Request { get; protected set; }
 
     /// <summary>
-    /// Response object
+    /// Gets the response object.
     /// </summary>
     public TDeleteResponse Response { get; protected set; }
 

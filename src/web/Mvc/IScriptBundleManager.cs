@@ -1,36 +1,36 @@
 ﻿namespace Serenity.Web;
 
 /// <summary>
-/// Abstraction for script bundling manager
+/// Abstraction for a script bundling manager.
 /// </summary>
 public interface IScriptBundleManager
 {
     /// <summary>
-    /// Returns true if bundling is enabled
+    /// Returns <c>true</c> if bundling is enabled.
     /// </summary>
     bool IsEnabled { get; }
 
     /// <summary>
-    /// Gets the list of bundle includes
+    /// Gets the list of bundle includes.
     /// </summary>
-    /// <param name="bundleKey">Bundle key</param>
-
+    /// <param name="bundleKey">The bundle key.</param>
+    /// <returns>The list of bundle includes.</returns>
     IEnumerable<string> GetBundleIncludes(string bundleKey);
 
     /// <summary>
-    /// Gets the script bundle containing a script url
+    /// Gets the script bundle containing a script URL.
     /// </summary>
-    /// <param name="scriptUrl">Script url</param>
+    /// <param name="scriptUrl">The script URL.</param>
+    /// <returns>The script bundle URL.</returns>
     string GetScriptBundle(string scriptUrl);
 
-
     /// <summary>
-    /// Resets the css bundle manager
+    /// Resets the script bundle manager.
     /// </summary>
     void Reset();
     
     /// <summary>
-    /// A method that can be called to clear script file cache
+    /// A method that can be called to clear the script file cache.
     /// </summary>
     void ScriptsChanged();
 }

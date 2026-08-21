@@ -1,20 +1,20 @@
 namespace Serenity.Data;
 
 /// <summary>
-/// Value to SQL constant expression conversions
+/// Value to SQL constant expression conversions.
 /// </summary>
 public static class SqlConversions
 {
     /// <summary>
-    /// The NULL constant
+    /// The NULL constant.
     /// </summary>
     public const string Null = "NULL";
 
     /// <summary>
-    /// Converts the value to sql.
+    /// Converts the value to SQL.
     /// </summary>
     /// <param name="value">The value.</param>
-    /// <returns></returns>
+    /// <returns>The SQL constant, or NULL if the value has no value.</returns>
     public static string ToSql(this bool? value)
     {
         if (!value.HasValue)
@@ -24,10 +24,10 @@ public static class SqlConversions
     }
 
     /// <summary>
-    /// Converts the value to sql.
+    /// Converts the value to SQL.
     /// </summary>
     /// <param name="value">The value.</param>
-    /// <returns></returns>
+    /// <returns>The SQL constant, or NULL if the value has no value.</returns>
     public static string ToSql(this double? value)
     {
         if (!value.HasValue)
@@ -36,10 +36,10 @@ public static class SqlConversions
     }
 
     /// <summary>
-    /// Converts the value to sql.
+    /// Converts the value to SQL.
     /// </summary>
     /// <param name="value">The value.</param>
-    /// <returns></returns>
+    /// <returns>The SQL constant, or NULL if the value has no value.</returns>
     public static string ToSql(this decimal? value)
     {
         if (!value.HasValue)
@@ -48,10 +48,10 @@ public static class SqlConversions
     }
 
     /// <summary>
-    /// Converts the value to sql.
+    /// Converts the value to SQL.
     /// </summary>
     /// <param name="value">The value.</param>
-    /// <returns></returns>
+    /// <returns>The SQL constant, or NULL if the value has no value.</returns>
     public static string ToSql(this long? value)
     {
         if (!value.HasValue)
@@ -60,11 +60,11 @@ public static class SqlConversions
     }
 
     /// <summary>
-    /// Converts the value to sql.
+    /// Converts the value to SQL.
     /// </summary>
     /// <param name="value">The value.</param>
     /// <param name="dialect">The dialect.</param>
-    /// <returns></returns>
+    /// <returns>The SQL constant, or NULL if the value has no value.</returns>
     public static string ToSql(this DateTime? value, ISqlDialect dialect = null)
     {
         if (!value.HasValue)
@@ -77,11 +77,11 @@ public static class SqlConversions
     }
 
     /// <summary>
-    /// Converts the value to sql.
+    /// Converts the value to SQL.
     /// </summary>
     /// <param name="value">The value.</param>
     /// <param name="dialect">The dialect.</param>
-    /// <returns></returns>
+    /// <returns>The SQL constant.</returns>
     public static string ToSql(this DateTime value, ISqlDialect dialect = null)
     {
         if (value.Date == value)
@@ -91,11 +91,11 @@ public static class SqlConversions
     }
 
     /// <summary>
-    /// Converts the value to sql date.
+    /// Converts the value to a SQL date.
     /// </summary>
     /// <param name="value">The value.</param>
     /// <param name="dialect">The dialect.</param>
-    /// <returns></returns>
+    /// <returns>The SQL date constant, or NULL if the value has no value.</returns>
     public static string ToSqlDate(this DateTime? value, ISqlDialect dialect = null)
     {
         if (!value.HasValue)
@@ -104,22 +104,22 @@ public static class SqlConversions
     }
 
     /// <summary>
-    /// Converts the value to sql date.
+    /// Converts the value to a SQL date.
     /// </summary>
     /// <param name="value">The value.</param>
     /// <param name="dialect">The dialect.</param>
-    /// <returns></returns>
+    /// <returns>The SQL date constant.</returns>
     public static string ToSqlDate(this DateTime value, ISqlDialect dialect = null)
     {
         return value.ToString((dialect ?? SqlSettings.DefaultDialect).DateFormat, Invariants.DateTimeFormat);
     }
 
     /// <summary>
-    /// Converts the value to sql time.
+    /// Converts the value to a SQL time.
     /// </summary>
     /// <param name="value">The value.</param>
     /// <param name="dialect">The dialect.</param>
-    /// <returns></returns>
+    /// <returns>The SQL time constant, or NULL if the value has no value.</returns>
     public static string ToSqlTime(this DateTime? value, ISqlDialect dialect = null)
     {
         if (!value.HasValue)
@@ -128,21 +128,21 @@ public static class SqlConversions
     }
 
     /// <summary>
-    /// Converts the value to sql time.
+    /// Converts the value to a SQL time.
     /// </summary>
     /// <param name="value">The value.</param>
     /// <param name="dialect">The dialect.</param>
-    /// <returns></returns>
+    /// <returns>The SQL time constant.</returns>
     public static string ToSqlTime(this DateTime value, ISqlDialect dialect = null)
     {
         return value.ToString((dialect ?? SqlSettings.DefaultDialect).TimeFormat, Invariants.DateTimeFormat);
     }
 
     /// <summary>
-    /// Converts the value to sql.
+    /// Converts the value to SQL.
     /// </summary>
     /// <param name="value">The value.</param>
-    /// <returns></returns>
+    /// <returns>The SQL constant, or NULL if the value has no value.</returns>
     public static string ToSql(this Guid? value)
     {
         if (!value.HasValue)
@@ -151,11 +151,11 @@ public static class SqlConversions
     }
 
     /// <summary>
-    /// Converts the value to sql.
+    /// Converts the value to SQL.
     /// </summary>
     /// <param name="value">The value.</param>
     /// <param name="dialect">The dialect.</param>
-    /// <returns></returns>
+    /// <returns>The SQL constant, or NULL if the value is null.</returns>
     public static string ToSql(this string value, ISqlDialect dialect = null)
     {
         if (value == null)
@@ -165,10 +165,10 @@ public static class SqlConversions
     }
 
     /// <summary>
-    /// Converts the value to sql.
+    /// Converts the value to SQL.
     /// </summary>
     /// <param name="value">The value.</param>
-    /// <returns></returns>
+    /// <returns>The SQL constant, or NULL if the value has no value.</returns>
     public static string ToSql(this int? value)
     {
         if (!value.HasValue)
@@ -178,22 +178,22 @@ public static class SqlConversions
     }
 
     /// <summary>
-    /// Translates the command text to target connection dialect by replacing brackets ([]), and parameter prefixes (@).
+    /// Translates the command text to the target connection dialect by replacing brackets ([]) and parameter prefixes (@).
     /// </summary>
     /// <param name="commandText">The command text.</param>
     /// <param name="connection">The connection.</param>
-    /// <returns>Translated query.</returns>
+    /// <returns>The translated query.</returns>
     public static string Translate(string commandText, IDbConnection connection)
     {
         return Translate(commandText, connection.GetDialect());
     }
 
     /// <summary>
-    /// Translates the command text to target dialect by replacing brackets ([]), and parameter prefixes (@).
+    /// Translates the command text to the target dialect by replacing brackets ([]) and parameter prefixes (@).
     /// </summary>
     /// <param name="commandText">The command text.</param>
     /// <param name="dialect">The dialect.</param>
-    /// <returns>Translated query.</returns>
+    /// <returns>The translated query.</returns>
     public static string Translate(string commandText, ISqlDialect dialect)
     {
         ArgumentNullException.ThrowIfNull(dialect);
@@ -213,12 +213,12 @@ public static class SqlConversions
 
 
     /// <summary>
-    /// Translates the command text to target connection dialect by replacing brackets ([]), and parameter prefixes (@).
+    /// Translates the command text to the target connection dialect by replacing brackets ([]) and parameter prefixes (@).
     /// If the query already has a dialect set, it uses that instead of the connection one.
     /// </summary>
-    /// <param name="query">The sql query.</param>
-    /// <param name="connection">The connection to get dialect from.</param>
-    /// <returns>Translated query.</returns>
+    /// <param name="query">The SQL query.</param>
+    /// <param name="connection">The connection to get the dialect from.</param>
+    /// <returns>The translated query.</returns>
     public static string Translate(IQueryWithParams query, IDbConnection connection)
     {
         ArgumentNullException.ThrowIfNull(query);

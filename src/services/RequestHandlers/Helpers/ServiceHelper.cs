@@ -44,7 +44,7 @@ public static class ServiceHelper
     /// <param name="oldRow">Old row</param>
     /// <param name="newRow">New row</param>
     /// <param name="indexFields">List of index fields</param>
-    /// <exception cref="ArgumentNullException">connection or exception is null</exception>
+    /// <exception cref="ArgumentNullException"><paramref name="connection"/> or <paramref name="exception"/> is <c>null</c>.</exception>
     public static bool IsUniqueIndexException(IDbConnection connection,
         Exception exception, string indexName,
         IRow oldRow, IRow newRow, params Field[] indexFields)

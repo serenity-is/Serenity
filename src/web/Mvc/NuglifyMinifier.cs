@@ -1,7 +1,8 @@
 namespace Serenity.Web;
 
 /// <summary>
-/// Default implementation of IScriptMinifier and ICssMinifer interfaces with Nuglify library
+/// Default implementation of <see cref="IScriptMinifier"/> and <see cref="ICssMinifier"/>
+/// using the Nuglify library.
 /// </summary>
 public class NuglifyMinifier : ICssMinifier, IScriptMinifier
 {

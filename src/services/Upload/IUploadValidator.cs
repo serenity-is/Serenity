@@ -1,10 +1,10 @@
-﻿using System.IO;
+using System.IO;
 
 namespace Serenity.Web;
 
 /// <summary>
 /// An upload validator abstraction for checking <see cref="IUploadFileConstraints"/>
-/// and <see cref="IUploadImageContrains"/>
+/// and <see cref="IUploadImageConstraints"/>
 /// </summary>
 public interface IUploadValidator
 {
@@ -26,6 +26,6 @@ public interface IUploadValidator
     /// <param name="stream">Source stream</param>
     /// <param name="filename">File name</param>
     /// <param name="image">Image object</param>
-    void ValidateImage(IUploadImageContrains constraints, Stream stream, 
+    void ValidateImage(IUploadImageConstraints constraints, Stream stream, 
         string filename, out object image);
 }

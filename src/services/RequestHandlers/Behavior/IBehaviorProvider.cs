@@ -9,7 +9,7 @@ namespace Serenity.Services;
 public interface IBehaviorProvider
 {
     /// <summary>
-    /// Resolves a list of behavior instances targeted for a handler, row and behaivor type.
+    /// Resolves a list of behavior instances targeted for a handler, row and behavior type.
     /// </summary>
     /// <param name="handlerType">The handler type requesting list of behaviors</param>
     /// <param name="rowType">Target row type</param>

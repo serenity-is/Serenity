@@ -1,7 +1,7 @@
 namespace Serenity.ComponentModel;
 
 /// <summary>
-/// Indicates that property should use lookup editor type of filtering
+/// Indicates that the property should use lookup editor type of filtering.
 /// </summary>
 /// <seealso cref="CustomFilteringAttribute" />
 public partial class LookupFilteringAttribute : CustomFilteringAttribute
@@ -38,7 +38,7 @@ public partial class LookupFilteringAttribute : CustomFilteringAttribute
     }
 
     /// <summary>
-    /// Gets or sets the ID field editor should filter on.
+    /// Gets or sets the ID field that the editor should filter on.
     /// </summary>
     /// <value>
     /// The identifier field.

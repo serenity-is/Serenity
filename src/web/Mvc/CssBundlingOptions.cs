@@ -3,18 +3,18 @@ using Microsoft.Extensions.Options;
 namespace Serenity.Web;
 
 /// <summary>
-/// Options for css bundling
+/// Options for CSS bundling.
 /// </summary>
 [DefaultSectionKey(SectionKey)]
 public class CssBundlingOptions : IOptions<CssBundlingOptions>
 {
     /// <summary>
-    /// Default section key for this option class
+    /// The default section key for this option class.
     /// </summary>
     public const string SectionKey = "CssBundling";
 
     /// <summary>
-    /// Creates a new instance of the class
+    /// Initializes a new instance of the <see cref="CssBundlingOptions"/> class.
     /// </summary>
     public CssBundlingOptions()
     {
@@ -26,35 +26,35 @@ public class CssBundlingOptions : IOptions<CssBundlingOptions>
     }
 
     /// <summary>
-    /// Gets / sets if CSS bundling is enabled
+    /// Gets or sets whether CSS bundling is enabled.
     /// </summary>
     public bool? Enabled { get; set; }
 
     /// <summary>
-    /// Gets / sets the minimization flag. When true, CSS files are minified
-    /// and their minified versions are used in bundles etc.
+    /// Gets or sets the minimization flag. When <c>true</c>, CSS files are minified
+    /// and their minified versions are used in bundles.
     /// </summary>
     public bool? Minimize { get; set; }
 
     /// <summary>
-    /// Should a ".min.css" file that exists in file system be used if available,
-    /// instead of minifying the file in memory.
+    /// Gets or sets whether a <c>.min.css</c> file that exists in the file system
+    /// should be used if available, instead of minifying the file in memory.
     /// </summary>
     public bool? UseMinCSS { get; set; }
 
     /// <summary>
-    /// A list of relative paths to not minify
+    /// Gets or sets a list of relative paths to not minify.
     /// </summary>
     public string[] NoMinimize { get; set; }
 
     /// <summary>
-    /// Replacement dictionary for placeholders in bundle contents,
-    /// like {Development} etc.
+    /// Gets or sets the replacement dictionary for placeholders in bundle contents,
+    /// like <c>{Development}</c>.
     /// </summary>
     public Dictionary<string, object> Replacements { get; set; }
 
     /// <summary>
-    /// Gets / sets the list of bundles and their contents
+    /// Gets or sets the list of bundles and their contents.
     /// </summary>
     public Dictionary<string, string[]> Bundles { get; set; }
 

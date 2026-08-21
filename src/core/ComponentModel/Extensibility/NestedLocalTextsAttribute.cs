@@ -1,10 +1,10 @@
 ﻿namespace Serenity.ComponentModel;
 
 /// <summary>
-/// Indicates that this class contains local texts with optionally
-/// subclasses that also contains local texts with keys joined by "."
+/// Indicates that this class contains local texts with optional
+/// subclasses that also contain local texts with keys joined by "."
 /// between each class name. The topmost class has no local text
-/// prefix by default and its name doesn't take role in local text 
+/// prefix by default and its name doesn't take part in local text
 /// key generation.
 /// </summary>
 /// <seealso cref="Attribute" />

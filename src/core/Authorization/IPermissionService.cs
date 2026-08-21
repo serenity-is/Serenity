@@ -1,13 +1,14 @@
 ﻿namespace Serenity.Abstractions;
 
 /// <summary>
-/// Permission service abstraction
+/// Checks whether the current user has a given permission.
 /// </summary>
 public interface IPermissionService
 {
     /// <summary>
-    /// Returns true if user has specified permission
+    /// Determines whether the current user has the specified permission.
     /// </summary>
-    /// <param name="permission">The permission key (e.g. Administration)</param>
+    /// <param name="permission">The permission key to check, for example <c>Administration:General</c>.</param>
+    /// <returns><c>true</c> if the user has the permission; otherwise <c>false</c>.</returns>
     bool HasPermission(string permission);
 }

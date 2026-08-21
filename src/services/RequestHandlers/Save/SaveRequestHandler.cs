@@ -15,15 +15,15 @@ public class SaveRequestHandler<TRow, TSaveRequest, TSaveResponse> : ISaveReques
     private bool displayOrderFix;
 
     /// <summary>
-    /// Lazy list of behaviors that is activated for this request
+    /// Lazy list of behaviors that is activated for this request.
     /// </summary>
     protected Lazy<ISaveBehavior[]> behaviors;
 
     /// <summary>
-    /// Creates a new instance of the class
+    /// Initializes a new instance of the class.
     /// </summary>
     /// <param name="context">Request context</param>
-    /// <exception cref="ArgumentNullException">context is null</exception>
+    /// <exception cref="ArgumentNullException"><paramref name="context"/> is <c>null</c>.</exception>
     public SaveRequestHandler(IRequestContext context)
     {
         Context = context ?? throw new ArgumentNullException(nameof(context));
@@ -32,7 +32,7 @@ public class SaveRequestHandler<TRow, TSaveRequest, TSaveResponse> : ISaveReques
     }
 
     /// <summary>
-    /// Gets the list of save behaviors
+    /// Gets the list of save behaviors.
     /// </summary>
     protected virtual IEnumerable<ISaveBehavior> GetBehaviors()
     {
@@ -242,10 +242,10 @@ public class SaveRequestHandler<TRow, TSaveRequest, TSaveResponse> : ISaveReques
 
     /// <summary>
     /// Handles assignment to a non-editable field. If the field did not change
-    /// in an update operation, it will be ignored by clearing the assignment. 
+    /// in an update operation, it will be ignored by clearing the assignment.
     /// For non-table fields it will also be ignored.
     /// </summary>
-    /// <param name="field"></param>
+    /// <param name="field">The field to handle.</param>
     protected virtual void HandleNonEditable(Field field)
     {
         if (IsUpdate && field.IndexCompare(Row, Old) == 0)
@@ -313,9 +313,9 @@ public class SaveRequestHandler<TRow, TSaveRequest, TSaveResponse> : ISaveReques
     }
 
     /// <summary>
-    /// Prepares the query for selecting old record in an update operation
+    /// Prepares the query for selecting old record in an update operation.
     /// </summary>
-    /// <returns></returns>
+    /// <returns>The prepared query.</returns>
     protected virtual SqlQuery PrepareQuery()
     {
         var idField = Row.IdField;
@@ -341,7 +341,7 @@ public class SaveRequestHandler<TRow, TSaveRequest, TSaveResponse> : ISaveReques
     /// <param name="unitOfWork">Unit of work</param>
     /// <param name="request">Request</param>
     /// <param name="requestType">Type of request, Create, Update or Auto</param>
-    /// <exception cref="ArgumentNullException">unitofWork or request is null</exception>
+    /// <exception cref="ArgumentNullException"><paramref name="unitOfWork"/> or <paramref name="request"/> is <c>null</c>.</exception>
     public TSaveResponse Process(IUnitOfWork unitOfWork, TSaveRequest request,
         SaveRequestType requestType = SaveRequestType.Auto)
     {
@@ -474,9 +474,9 @@ public class SaveRequestHandler<TRow, TSaveRequest, TSaveResponse> : ISaveReques
     }
 
     /// <summary>
-    /// Validates editable fields
+    /// Validates editable fields.
     /// </summary>
-    /// <returns></returns>
+    /// <returns>The set of editable fields.</returns>
     protected virtual HashSet<Field> ValidateEditable()
     {
         var editableFields = new HashSet<Field>();
@@ -546,12 +546,12 @@ public class SaveRequestHandler<TRow, TSaveRequest, TSaveResponse> : ISaveReques
     }
 
     /// <summary>
-    /// Calls custom validator
+    /// Calls custom validator.
     /// </summary>
     /// <param name="context">Validation context</param>
     /// <param name="field">Field</param>
     /// <param name="validator">Custom validator</param>
-    /// <returns></returns>
+    /// <returns>The validation error message, or <c>null</c> if the value is valid.</returns>
     protected virtual string CustomValidate(RowValidationContext context, Field field, ICustomValidator validator)
     {
         return validator.Validate(context);
@@ -636,67 +636,67 @@ public class SaveRequestHandler<TRow, TSaveRequest, TSaveResponse> : ISaveReques
     }
 
     /// <summary>
-    /// Gets the two level cache from the request context
+    /// Gets the two level cache from the request context.
     /// </summary>
     public ITwoLevelCache Cache => Context.Cache;
 
     /// <summary>
-    /// Gets the request context
+    /// Gets the request context.
     /// </summary>
     public IRequestContext Context { get; private set; }
 
     /// <summary>
-    /// Gets localizer from the request context
+    /// Gets the localizer from the request context.
     /// </summary>
     public ITextLocalizer Localizer => Context.Localizer;
 
     /// <summary>
-    /// Gets permission service from the request context
+    /// Gets the permission service from the request context.
     /// </summary>
     public IPermissionService Permissions => Context.Permissions;
 
     /// <summary>
-    /// Gets current user from the request context
+    /// Gets the current user from the request context.
     /// </summary>
     public ClaimsPrincipal User => Context.User;
 
     /// <summary>
-    /// Gets connection
+    /// Gets the current connection.
     /// </summary>
     public IDbConnection Connection => UnitOfWork.Connection;
 
     /// <summary>
-    /// Gets the current unit of work
+    /// Gets the current unit of work.
     /// </summary>
     public IUnitOfWork UnitOfWork { get; protected set; }
 
     /// <summary>
-    /// The old entity for update
+    /// Gets the old entity for update.
     /// </summary>
     public TRow Old { get; protected set; }
 
     /// <summary>
-    /// The inserted entity for Create and new entity for Update
+    /// Gets the inserted entity for Create and the new entity for Update.
     /// </summary>
     public TRow Row { get; protected set; }
 
     /// <summary>
-    /// Returns true if this is a Create operation
+    /// Returns true if this is a Create operation.
     /// </summary>
     public bool IsCreate => Old == null;
 
     /// <summary>
-    /// Returns true if this is an Update operation
+    /// Returns true if this is an Update operation.
     /// </summary>
     public bool IsUpdate => Old != null;
 
     /// <summary>
-    /// Request object
+    /// Gets the request object.
     /// </summary>
     public TSaveRequest Request { get; protected set; }
 
     /// <summary>
-    /// Response object
+    /// Gets the response object.
     /// </summary>
     public TSaveResponse Response { get; protected set; }
 

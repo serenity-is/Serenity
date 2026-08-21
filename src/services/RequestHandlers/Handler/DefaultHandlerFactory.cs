@@ -1,14 +1,14 @@
 namespace Serenity.Services;
 
 /// <summary>
-/// Default implementation for the <see cref="IDefaultHandlerFactory"/>
+/// Default implementation for the <see cref="IDefaultHandlerFactory"/>.
 /// </summary>
 /// <remarks>
-/// Creates an instance of the class.
+/// Initializes a new instance of the class.
 /// </remarks>
 /// <param name="registry">Default handler registry</param>
 /// <param name="activator">Handler activator</param>
-/// <exception cref="ArgumentNullException"></exception>
+/// <exception cref="ArgumentNullException"><paramref name="registry"/> or <paramref name="activator"/> is <c>null</c>.</exception>
 public class DefaultHandlerFactory(IDefaultHandlerRegistry registry, IHandlerActivator activator) : IDefaultHandlerFactory
 {
     private readonly IDefaultHandlerRegistry registry = registry ?? throw new ArgumentNullException(nameof(registry));

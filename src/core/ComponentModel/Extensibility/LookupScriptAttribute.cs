@@ -1,12 +1,12 @@
 ﻿namespace Serenity.ComponentModel;
 
 /// <summary>
-/// Placed on rows / or custom lookup classes to denote
-/// it has a lookup script.
-/// When placed on a row class, lookup scripts only transfer ID 
-/// and Name fields by default to client side for 
-/// security / performance reasons. Make sure you add 
-/// [LookupInclude] attribute to properties you'll need to
+/// Placed on rows or custom lookup classes to denote
+/// that they have a lookup script.
+/// When placed on a row class, lookup scripts only transfer ID
+/// and Name fields by default to the client side for
+/// security / performance reasons. Make sure you add
+/// the [LookupInclude] attribute to properties you'll need to
 /// access from script.
 /// </summary>
 [AttributeUsage(AttributeTargets.Class, AllowMultiple = false)]
@@ -106,7 +106,7 @@ public sealed class LookupScriptAttribute : Attribute
     public string? Permission { get; set; }
 
     /// <summary>
-    /// Cache duration in seconds
+    /// Cache duration in seconds.
     /// </summary>
     public int Expiration { get; set; }
 

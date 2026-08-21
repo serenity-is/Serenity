@@ -4,8 +4,8 @@ using System.Text.Unicode;
 namespace Serenity;
 
 /// <summary>
-/// Contains shortcuts to Json serialization / deserialization methods, and default
-/// Serenity settings.
+/// Contains shortcuts to JSON serialization and deserialization methods, along with
+/// the default Serenity settings.
 /// </summary>
 public static class JSON
 {
@@ -180,11 +180,12 @@ public static class JSON
         private static JsonConverter? rowJsonConverter;
 
         /// <summary>
-        /// Creates a JsonSerializerSettings object with common values and converters.
+        /// Creates a <see cref="JsonSerializerOptions"/> object with the common Serenity values and converters.
         /// </summary>
-        /// <param name="options">Options to populate with defaults</param>
-        /// <param name="tolerant">True to ignore deserializing unmapped members</param>
-        /// <param name="writeNulls">True to write null values</param>
+        /// <param name="options">The options to populate with defaults.</param>
+        /// <param name="tolerant"><c>true</c> to ignore unmapped members when deserializing.</param>
+        /// <param name="writeNulls"><c>true</c> to write null values.</param>
+        /// <returns>The populated <see cref="JsonSerializerOptions"/> instance.</returns>
         public static JsonSerializerOptions Populate(JsonSerializerOptions options,
             bool tolerant = false, bool writeNulls = false)
         {

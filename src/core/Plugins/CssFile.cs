@@ -1,12 +1,12 @@
 ﻿namespace Serenity.Plugins;
 
 /// <summary>
-/// CSS file dependency for plugins
+/// A CSS file dependency for plugins.
 /// </summary>
 public class CssFile
 {
     /// <summary>
-    /// Gets or sets the path. Should start with "./" corresponding to plugin folder.
+    /// Gets or sets the path. Should start with "./" corresponding to the plugin folder.
     /// </summary>
     /// <value>
     /// The path.

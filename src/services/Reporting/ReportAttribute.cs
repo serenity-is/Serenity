@@ -1,10 +1,10 @@
 ﻿namespace Serenity.Reporting;
 
 /// <summary>
-/// Marks a class as Report
+/// Marks a class as a report.
 /// </summary>
 /// <remarks>
-/// Creates an instance of the attribute
+/// Initializes a new instance of the attribute.
 /// </remarks>
 /// <param name="reportKey">The report key. If not passed
 /// it is calculated from the class name.</param>
@@ -12,7 +12,7 @@ public class ReportAttribute(string reportKey = null) : Attribute
 {
 
     /// <summary>
-    /// The report key.
+    /// Gets the report key.
     /// </summary>
     public string ReportKey { get; private set; } = reportKey;
 }

@@ -1,7 +1,7 @@
 ﻿namespace Serenity.ComponentModel;
 
 /// <summary>
-/// Options for the uploaded image and thumbnails
+/// Options for the uploaded image and thumbnails.
 /// </summary>
 public interface IUploadImageOptions : IUploadOptions
 {
@@ -21,7 +21,7 @@ public interface IUploadImageOptions : IUploadOptions
     public int ScaleHeight { get; }
 
     /// <summary>
-    /// Should image be scaled up to requested size when its smaller
+    /// Should the image be scaled up to the requested size when it is smaller.
     /// </summary>
     public bool ScaleSmaller { get; }
 
@@ -31,7 +31,7 @@ public interface IUploadImageOptions : IUploadOptions
     public Web.ImageScaleMode ScaleMode { get; }
     
     /// <summary>
-    /// Background color to use when padding image
+    /// Background color to use when padding the image.
     /// </summary>
     public string? ScaleBackColor { get; set; }
 
@@ -62,7 +62,7 @@ public interface IUploadImageOptions : IUploadOptions
     public int ThumbQuality { get; }
     
     /// <summary>
-    /// Background color to use when padding thumbnails
+    /// Background color to use when padding thumbnails.
     /// </summary>
     public string? ThumbBackColor { get; set; }
 }

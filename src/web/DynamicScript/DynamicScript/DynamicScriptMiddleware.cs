@@ -7,12 +7,12 @@ using System.Threading.Tasks;
 namespace Serenity.Web.Middleware;
 
 /// <summary>
-/// Dynamic script middleware that handles "/DynJS.axd/" and "/DynamicData/" paths.
+/// Dynamic script middleware that handles <c>/DynJS.axd/</c> and <c>/DynamicData/</c> paths.
 /// </summary>
 /// <remarks>
-/// Creates a new instance of the middleware
+/// Initializes a new instance of the <see cref="DynamicScriptMiddleware"/> class.
 /// </remarks>
-/// <param name="next">Next request delegate</param>
+/// <param name="next">The next request delegate.</param>
 public class DynamicScriptMiddleware(RequestDelegate next)
 {
     private readonly RequestDelegate next = next;
@@ -20,9 +20,9 @@ public class DynamicScriptMiddleware(RequestDelegate next)
     const string dynamicDataPath = "/DynamicData/";
 
     /// <summary>
-    /// Invokes the middleware in the context
+    /// Invokes the middleware in the given context.
     /// </summary>
-    /// <param name="context">HTTP context</param>
+    /// <param name="context">The HTTP context.</param>
     public Task Invoke(HttpContext context)
     {
         bool dynJS = context.Request.Path.Value.StartsWith(dynJSPath, StringComparison.OrdinalIgnoreCase);
@@ -53,12 +53,12 @@ public class DynamicScriptMiddleware(RequestDelegate next)
     }
 
     /// <summary>
-    /// Returns a dynamic script by its key
+    /// Returns a dynamic script by its key.
     /// </summary>
-    /// <param name="context">HTTP context</param>
-    /// <param name="scriptKey">Script key</param>
-    /// <param name="contentType">Content type</param>
-    /// <param name="json">True to return JSON</param>
+    /// <param name="context">The HTTP context.</param>
+    /// <param name="scriptKey">The script key.</param>
+    /// <param name="contentType">The content type.</param>
+    /// <param name="json"><c>true</c> to return JSON.</param>
     public async static Task ReturnScript(HttpContext context, string scriptKey, string contentType, bool json)
     {
         IScriptContent scriptContent;
@@ -132,12 +132,12 @@ public class DynamicScriptMiddleware(RequestDelegate next)
     }
 
     /// <summary>
-    /// Writes a file content to the response with modified since control
+    /// Writes file content to the response with If-Modified-Since control.
     /// </summary>
-    /// <param name="context">HTTP context</param>
-    /// <param name="bytes">Content bytes</param>
-    /// <param name="lastWriteTime">Last write time</param>
-    /// <exception cref="ArgumentNullException">Context is null</exception>
+    /// <param name="context">The HTTP context.</param>
+    /// <param name="bytes">The content bytes.</param>
+    /// <param name="lastWriteTime">The last write time.</param>
+    /// <exception cref="ArgumentNullException"><paramref name="context"/> is <c>null</c>.</exception>
     public async static Task WriteWithIfModifiedSinceControl(HttpContext context, byte[] bytes, DateTime lastWriteTime)
     {
         ArgumentNullException.ThrowIfNull(context);

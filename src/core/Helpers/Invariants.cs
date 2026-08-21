@@ -23,7 +23,7 @@ public static class Invariants
     }
 
     /// <summary>
-    /// Determines whether type of the value is an integer type (<see cref="short"/>, <see cref="int"/>, <see cref="long"/>).
+    /// Determines whether the type of the value is an integer type (<see cref="short"/>, <see cref="int"/>, <see cref="long"/>).
     /// Avoid using this function as it is obsolete.
     /// </summary>
     /// <param name="value">The value.</param>
@@ -42,7 +42,7 @@ public static class Invariants
     /// Converts value to string using invariant culture.
     /// </summary>
     /// <param name="value">The value.</param>
-    /// <returns></returns>
+    /// <returns>The value converted to a string using the invariant culture.</returns>
     public static string ToInvariant(this int value)
     {
         return value.ToString(NumberFormat);

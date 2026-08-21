@@ -34,8 +34,9 @@ public static partial class HtmlCspExtensions
     /// Automatically generates and stores it in the current HTTP context items and
     /// adds it to the CSP directives.
     /// </summary>
-    /// <param name="html">Html helper</param>
-    /// <param name="addDirectives">True to add CSP directives for script-src, style-src, font-src</param>
+    /// <param name="html">The HTML helper.</param>
+    /// <param name="addDirectives"><c>true</c> to add CSP directives for <c>script-src</c>, <c>style-src</c>, <c>font-src</c>.</param>
+    /// <returns>The generated nonce value.</returns>
     public static string CspNonce(this IHtmlHelper html, bool addDirectives = true)
     {
         ArgumentNullException.ThrowIfNull(html);
@@ -68,9 +69,9 @@ public static partial class HtmlCspExtensions
     /// <summary>
     /// Adds a Content Security Policy directive to the current HTTP context items.
     /// </summary>
-    /// <param name="html">Html helper</param>
-    /// <param name="directiveName">CSP directive name</param>
-    /// <param name="values">CSP directive values. Note that these values will be automatically quoted if they look like keywords ([A-Za-z0-9_-] only)
+    /// <param name="html">The HTML helper.</param>
+    /// <param name="directiveName">The CSP directive name.</param>
+    /// <param name="values">The CSP directive values. Note that these values will be automatically quoted if they look like keywords (<c>[A-Za-z0-9_-]</c> only)
     /// and are not already quoted.</param>
     public static void AddCspDirective(this IHtmlHelper html, string directiveName, params string[] values)
     {
@@ -80,9 +81,9 @@ public static partial class HtmlCspExtensions
     /// <summary>
     /// Adds a Content Security Policy directive to the current HTTP context items.
     /// </summary>
-    /// <param name="context">Http context</param>
-    /// <param name="directiveName">CSP directive name</param>
-    /// <param name="values">CSP directive values. Note that these values will be automatically quoted if they look like keywords ([A-Za-z0-9_-] only)
+    /// <param name="context">The HTTP context.</param>
+    /// <param name="directiveName">The CSP directive name.</param>
+    /// <param name="values">The CSP directive values. Note that these values will be automatically quoted if they look like keywords (<c>[A-Za-z0-9_-]</c> only)
     /// and are not already quoted.</param>
     public static void AddCspDirective(this HttpContext context, string directiveName, params string[] values)
     {
@@ -92,9 +93,9 @@ public static partial class HtmlCspExtensions
     /// <summary>
     /// Adds a Content Security Policy directive to the current HTTP context items.
     /// </summary>
-    /// <param name="controller">Controller</param>
-    /// <param name="directiveName">CSP directive name</param>
-    /// <param name="values">CSP directive values. Note that these values will be automatically quoted if they look like keywords ([A-Za-z0-9_-] only)
+    /// <param name="controller">The controller.</param>
+    /// <param name="directiveName">The CSP directive name.</param>
+    /// <param name="values">The CSP directive values. Note that these values will be automatically quoted if they look like keywords (<c>[A-Za-z0-9_-]</c> only)
     /// and are not already quoted.</param>
     public static void AddCspDirective(this ControllerBase controller, string directiveName, params string[] values)
     {
@@ -141,12 +142,12 @@ public static partial class HtmlCspExtensions
     }
 
     /// <summary>
-    /// Adds a Content Security Policy script-src directive for the given URL
+    /// Adds a Content Security Policy <c>script-src</c> directive for the given URL
     /// and returns the URL. This can be used in script include helpers for external URLs.
     /// </summary>
-    /// <param name="html">Html helper</param>
-    /// <param name="url">Url</param>
-    /// <returns></returns>
+    /// <param name="html">The HTML helper.</param>
+    /// <param name="url">The URL.</param>
+    /// <returns>The URL.</returns>
     public static string AddCspScriptUrl(this IHtmlHelper html, string url)
     {
         AddCspDirective(html, "script-src", url);
@@ -154,15 +155,16 @@ public static partial class HtmlCspExtensions
     }
 
     /// <summary>
-    /// Gets a Content Security Policy directive added via AddCspDirective
+    /// Gets a Content Security Policy directive added via <see cref="AddCspDirective(IHtmlHelper, string, string[])"/>
     /// merged with any manual values provided. The string includes the final semicolon.
     /// This can be used to render parts of the CSP header or meta tag content.
     /// </summary>
-    /// <param name="html">Html helper</param>
-    /// <param name="directiveName">CSP directive name</param>
-    /// <param name="manualValues">Manual values to include in the directive.
-    /// Note that these values will be automatically quoted if they look like keywords ([A-Za-z0-9_-] only)
+    /// <param name="html">The HTML helper.</param>
+    /// <param name="directiveName">The CSP directive name.</param>
+    /// <param name="manualValues">The manual values to include in the directive.
+    /// Note that these values will be automatically quoted if they look like keywords (<c>[A-Za-z0-9_-]</c> only)
     /// and are not already quoted.</param>
+    /// <returns>The rendered CSP directive.</returns>
     public static HtmlString GetCspDirective(this IHtmlHelper html, string directiveName, params string[] manualValues)
     {
         ArgumentNullException.ThrowIfNull(html);

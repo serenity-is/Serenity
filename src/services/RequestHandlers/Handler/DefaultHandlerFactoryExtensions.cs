@@ -6,13 +6,13 @@
 public static class DefaultHandlerFactoryExtensions
 {
     /// <summary>
-    /// Creates an instance of the default handler for 
+    /// Creates an instance of the default handler for
     /// the requested handler interface type.
     /// </summary>
     /// <typeparam name="THandler">Handler interface type</typeparam>
     /// <param name="handlerFactory">Default handler factory</param>
     /// <param name="rowType">Row type</param>
-    /// <returns></returns>
+    /// <returns>The created handler instance.</returns>
     public static THandler CreateHandler<THandler>(this IDefaultHandlerFactory handlerFactory, Type rowType)
     {
         return (THandler)handlerFactory.CreateHandler(rowType, typeof(THandler));

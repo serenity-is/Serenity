@@ -9,11 +9,11 @@ namespace Serenity;
 public static class ArgumentExceptions
 {
     /// <summary>
-    /// Creates an ArgumentOutOfRangeException
+    /// Creates an <see cref="ArgumentOutOfRangeException"/> for the given argument.
     /// </summary>
-    /// <param name="argument">Argument value, ignored</param>
-    /// <param name="paramName"></param>
-    /// <exception cref="ArgumentNullException"></exception>
+    /// <param name="argument">The argument value; ignored by this method.</param>
+    /// <param name="paramName">The name of the parameter that caused the exception.</param>
+    /// <returns>A new <see cref="ArgumentOutOfRangeException"/> instance.</returns>
 #pragma warning disable IDE0060 // Remove unused parameter
     public static ArgumentOutOfRangeException OutOfRange(object argument, 
         [CallerArgumentExpression(nameof(argument))] string paramName = null)
