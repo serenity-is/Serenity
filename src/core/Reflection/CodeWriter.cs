@@ -621,6 +621,16 @@ public class CodeWriter(StringBuilder sb, int tabSize)
 
         nsb.Append(sb);
 
+        if (PragmaSuppressions.Any())
+        {
+            if (nsb[^1] != '\n')
+                nsb.AppendLine();
+
+            nsb.AppendLine();
+            nsb.AppendLine("#pragma warning restore " + string.Join(", ",
+                PragmaSuppressions.OrderBy(x => x, StringComparer.OrdinalIgnoreCase).Select(x => x)));
+        }
+
         return nsb.ToString().TrimEnd();
     }
 
