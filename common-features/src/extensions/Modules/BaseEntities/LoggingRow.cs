@@ -10,7 +10,15 @@ namespace Serenity.Extensions.Entities;
 public abstract class LoggingRow<TFields> : Row<TFields>, ILoggingRow
     where TFields : LoggingRowFields
 {
+    /// <summary>
+    /// Creates a new instance of the class with the specified fields.
+    /// </summary>
+    /// <param name="fields">Fields</param>
     protected LoggingRow(TFields fields) : base(fields) { }
+
+    /// <summary>
+    /// Creates a new instance of the class.
+    /// </summary>
     protected LoggingRow() : base() { }
 
     /// <summary>

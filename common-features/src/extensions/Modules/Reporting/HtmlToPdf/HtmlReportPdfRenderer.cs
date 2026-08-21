@@ -11,12 +11,38 @@ public class HtmlReportPdfRenderer(
     IHtmlReportRenderUrlBuilder renderUrlBuilder,
     IWKHtmlToPdfConverter wkHtmlToPdfConverter = null) : IHtmlReportPdfRenderer
 {
+    /// <summary>
+    /// The environment settings used to resolve the internal URL of the web site.
+    /// </summary>
     protected readonly EnvironmentSettings environmentSettings;
+
+    /// <summary>
+    /// The HTTP context accessor used to access the current request.
+    /// </summary>
     protected readonly IHttpContextAccessor httpContextAccessor;
+
+    /// <summary>
+    /// The HTML to PDF converter used to render the report.
+    /// </summary>
     protected readonly IHtmlToPdfConverter htmlToPdfConverter = htmlToPdfConverter ?? throw new ArgumentNullException(nameof(htmlToPdfConverter));
+
+    /// <summary>
+    /// The render URL builder used to build the report callback URL.
+    /// </summary>
     protected readonly IHtmlReportRenderUrlBuilder renderUrlBuilder = renderUrlBuilder ?? throw new ArgumentNullException(nameof(renderUrlBuilder));
+
+    /// <summary>
+    /// The optional WKHtmlToPdf converter used when a report requests it.
+    /// </summary>
     protected readonly IWKHtmlToPdfConverter wkHtmlToPdfConverter = wkHtmlToPdfConverter;
 
+    /// <summary>
+    /// Forwards the cookies from the render URL to the converter options.
+    /// </summary>
+    /// <param name="report">The report.</param>
+    /// <param name="renderOptions">The render options.</param>
+    /// <param name="converterOptions">The converter options.</param>
+    /// <param name="renderUrl">The render URL.</param>
     protected virtual void ForwardCookies(IReport report, ReportRenderOptions renderOptions,
         IHtmlToPdfOptions converterOptions, HtmlReportRenderUrl renderUrl)
     {
@@ -24,6 +50,12 @@ public class HtmlReportPdfRenderer(
             converterOptions.Cookies[cookie.Name] = cookie.Value;
     }
 
+    /// <summary>
+    /// Gets the converter options for the specified report, building the render URL and forwarding cookies.
+    /// </summary>
+    /// <param name="report">The report.</param>
+    /// <param name="renderOptions">The render options.</param>
+    /// <param name="renderUrl">The render URL created for the report.</param>
     protected virtual IHtmlToPdfOptions GetConverterOptions(IReport report, ReportRenderOptions renderOptions,
         out HtmlReportRenderUrl renderUrl)
     {
@@ -52,6 +84,12 @@ public class HtmlReportPdfRenderer(
         }
     }
 
+    /// <summary>
+    /// Gets the converter to use for the specified report, preferring the WKHtmlToPdf
+    /// converter when the report is marked with <see cref="UseWKHtmlToPdfAttribute"/>.
+    /// </summary>
+    /// <param name="report">The report.</param>
+    /// <param name="renderOptions">The render options.</param>
     protected virtual IHtmlToPdfConverter GetConverterFor(IReport report, ReportRenderOptions renderOptions)
     {
         return wkHtmlToPdfConverter != null &&

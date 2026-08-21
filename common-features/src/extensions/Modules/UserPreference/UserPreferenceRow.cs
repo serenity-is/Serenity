@@ -39,12 +39,34 @@ public sealed class UserPreferenceRow : Row<UserPreferenceRow.RowFields>, IIdRow
     [DisplayName("Value")]
     public string Value { get => fields.Value[this]; set => fields.Value[this] = value; }
 
+    /// <summary>
+    /// The fields of the <see cref="UserPreferenceRow"/>.
+    /// </summary>
     public class RowFields : RowFieldsBase
     {
+        /// <summary>
+        /// The user preference ID field.
+        /// </summary>
         public readonly Int32Field UserPreferenceId;
+
+        /// <summary>
+        /// The ID of the user the preference belongs to.
+        /// </summary>
         public readonly Int32Field UserId;
+
+        /// <summary>
+        /// The preference type field.
+        /// </summary>
         public readonly StringField PreferenceType;
+
+        /// <summary>
+        /// The preference name field.
+        /// </summary>
         public readonly StringField Name;
+
+        /// <summary>
+        /// The preference value field.
+        /// </summary>
         public readonly StringField Value;
     }
 }

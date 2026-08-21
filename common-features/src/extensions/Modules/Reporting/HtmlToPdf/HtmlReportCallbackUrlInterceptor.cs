@@ -4,7 +4,7 @@ using Microsoft.AspNetCore.Http;
 namespace Serenity.Reporting;
 
 /// <summary>
-/// Implementation for <see cref="IReportExecutor" /> that uses callback report cookie
+/// Implementation for <see cref="IReportCallbackInterceptor"/> that uses callback report cookie
 /// to impersonate / transient grant permissions
 /// </summary>
 public class HtmlReportCallbackUrlInterceptor(

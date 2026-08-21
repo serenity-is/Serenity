@@ -17,15 +17,26 @@ public class HtmlReportCallbackUrlBuilder(
     IHttpContextAccessor httpContextAccessor = null,
     IDataProtectionProvider dataProtectionProvider = null) : IHtmlReportCallbackUrlBuilder
 {
+    /// <summary>
+    /// The site absolute URL service used to resolve the internal URL of the web site.
+    /// </summary>
     protected readonly ISiteAbsoluteUrl siteAbsoluteUrl = siteAbsoluteUrl ?? throw new ArgumentNullException(nameof(siteAbsoluteUrl));
 
     internal const string ReportAuthCookieName = ".ReportAuth";
 
+    /// <summary>
+    /// Gets the render action path for the specified report.
+    /// </summary>
+    /// <param name="report">The report.</param>
     protected virtual string GetRenderAction(IReport report)
     {
         return "Serenity.Extensions/Report/Render";
     }
 
+    /// <summary>
+    /// Gets the report key for the specified report, using its <see cref="ReportAttribute"/> key or its full type name.
+    /// </summary>
+    /// <param name="report">The report.</param>
     protected virtual string GetReportKey(IReport report)
     {
         ArgumentNullException.ThrowIfNull(report);
@@ -37,16 +48,25 @@ public class HtmlReportCallbackUrlBuilder(
         return attr.ReportKey;
     }
 
+    /// <summary>
+    /// Gets the internal URL of the web site used to build the report callback URL.
+    /// </summary>
     protected virtual string GetSiteInternalUrl()
     {
         return siteAbsoluteUrl.GetInternalUrl();
     }
 
+    /// <summary>
+    /// Gets the name of the authentication cookie to forward to the report callback.
+    /// </summary>
     protected virtual string GetAuthCookieName()
     {
         return cookieOptions?.Get(CookieAuthenticationDefaults.AuthenticationScheme)?.Cookie?.Name ?? ".AspNetAuth";
     }
 
+    /// <summary>
+    /// Gets the name of the language preference cookie to forward to the report callback.
+    /// </summary>
     protected virtual string GetLanguageCookieName()
     {
         return "LanguagePreference";
@@ -65,6 +85,10 @@ public class HtmlReportCallbackUrlBuilder(
         return 0;
     }
 
+    /// <summary>
+    /// Gets the cookies to forward to the report callback, including the report auth
+    /// cookie and the current request's authentication and language cookies.
+    /// </summary>
     protected virtual IEnumerable<Cookie> GetCookiesToForward()
     {
         if (dataProtectionProvider != null)

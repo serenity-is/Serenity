@@ -4,9 +4,10 @@ namespace Serenity.Extensions;
 /// <summary>
 /// Base permission service that provides common functionality for permission services.
 /// </summary>
-/// <param name="userAccessor">User accessor</param>
-/// <param name="rolePermissions">Role permission service</param>
-/// <param name="httpContextItemsAccessor">HTTP context items accessor</param>
+/// <typeparam name="TRolePermissionRow">Role permission row type</typeparam>
+/// <param name="cache">Cache</param>
+/// <param name="sqlConnections">SQL connections</param>
+/// <param name="typeSource">Type source</param>
 public abstract class BaseRolePermissionService<TRolePermissionRow>(
     ITwoLevelCache cache, ISqlConnections sqlConnections, ITypeSource typeSource) : IRolePermissionService
     where TRolePermissionRow : class, IRolePermissionRow, new()
@@ -19,7 +20,7 @@ public abstract class BaseRolePermissionService<TRolePermissionRow>(
     /// Gets whether the specified role is a valid role key or name.
     /// By default, a role is valid if it is not null or empty.
     /// </summary>
-    /// <param name="key">Role key</param>
+    /// <param name="role">Role key or name</param>
     protected virtual bool IsValidRoleKeyOrName(string role)
     {
         return !string.IsNullOrEmpty(role);

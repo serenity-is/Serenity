@@ -10,7 +10,14 @@ namespace Serenity.Extensions;
 /// </summary>
 public abstract class BasePermissionKeyLister(ITwoLevelCache cache, ITypeSource typeSource) : IPermissionKeyLister
 {
+    /// <summary>
+    /// The two level cache used to cache permission keys.
+    /// </summary>
     protected readonly ITwoLevelCache cache = cache ?? throw new ArgumentNullException(nameof(cache));
+
+    /// <summary>
+    /// The type source used to enumerate permission keys.
+    /// </summary>
     protected readonly ITypeSource typeSource = typeSource ?? throw new ArgumentNullException(nameof(typeSource));
 
     /// <summary>

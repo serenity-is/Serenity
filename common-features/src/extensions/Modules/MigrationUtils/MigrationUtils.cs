@@ -58,7 +58,8 @@ public static class MigrationUtils
     /// Declares column as Identity() if the database is something other than Oracle,
     /// defines an Oracle sequence otherwise. It sets the column as PrimaryKey() and
     /// also calls NotNullable() as it is not possible for identity / sequence columns 
-    /// to be nullable. 
+    /// to be nullable.
+    /// </summary>
     /// <param name="syntax">The WithColumn syntax builder</param>
     /// <param name="migration">The migration reference to determine the database type</param>
     public static ICreateTableColumnOptionOrWithColumnSyntax IdentityKey(this ICreateTableColumnOptionOrWithColumnSyntax syntax,
@@ -87,6 +88,7 @@ public static class MigrationUtils
     /// As MySql does not support AUTO_INCREMENT without primary key or an index, this
     /// first creates the column as a regular one, then creates an index and modifies it
     /// to be an AUTO_INCREMENT.
+    /// </summary>
     /// <param name="syntax">The WithColumn syntax builder</param>
     /// <param name="migration">The migration reference to determine the database type</param>
     public static ICreateTableColumnOptionOrWithColumnSyntax AutoIncrement(this ICreateTableColumnOptionOrWithColumnSyntax syntax,

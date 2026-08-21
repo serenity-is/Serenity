@@ -1,9 +1,16 @@
 
 namespace Serenity.Extensions;
 
+/// <summary>
+/// Settings related to the environment the application runs in, such as the
+/// externally and internally accessible URLs of the web site.
+/// </summary>
 [DefaultSectionKey(SectionKey)]
 public class EnvironmentSettings
 {
+    /// <summary>
+    /// Default section key for environment settings.
+    /// </summary>
     public const string SectionKey = "EnvironmentSettings";
 
     /// <summary>

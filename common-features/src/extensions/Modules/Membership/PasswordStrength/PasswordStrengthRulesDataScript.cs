@@ -10,6 +10,9 @@ public class PasswordStrengthRulesDataScript(IOptions<MembershipSettings> member
     private readonly IOptions<MembershipSettings> membershipSettings = membershipSettings 
         ?? Options.Create(new MembershipSettings());
 
+    /// <summary>
+    /// Gets the password strength rules from the configured membership settings.
+    /// </summary>
     protected override PasswordStrengthRules GetData()
     {
         return new PasswordStrengthRules()

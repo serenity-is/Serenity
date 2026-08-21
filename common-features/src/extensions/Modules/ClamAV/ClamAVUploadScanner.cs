@@ -1,11 +1,6 @@
 using nClam;
 using System.IO;
 
-/// <summary>
-/// Implementation of <see cref="IUploadAVScanner"/> which connects to ClamAV service
-/// (https://www.clamav.net/ - Windows: https://oss.netfarm.it/clamav/), 
-/// using the nClam library (https://github.com/tekmaven/nClam)
-/// </summary>
 namespace Serenity.Extensions;
 
 /// <summary>

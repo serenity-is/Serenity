@@ -12,7 +12,14 @@ public class ReportController(IReportFactory reportFactory,
     IReportRenderer reportRenderer,
     IReportCallbackInterceptor callbackInterceptor = null) : Controller
 {
+    /// <summary>
+    /// The report factory used to create report instances.
+    /// </summary>
     protected readonly IReportFactory reportFactory = reportFactory ?? throw new ArgumentNullException(nameof(reportFactory));
+
+    /// <summary>
+    /// The report renderer used to render reports.
+    /// </summary>
     protected readonly IReportRenderer reportRenderer = reportRenderer ?? throw new ArgumentNullException(nameof(reportRenderer));
 
     /// <summary>

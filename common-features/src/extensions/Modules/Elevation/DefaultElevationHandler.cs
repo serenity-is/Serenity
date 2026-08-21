@@ -10,6 +10,10 @@ public class DefaultElevationHandler(IRequestContext context, IHttpContextAccess
     IDataProtectionProvider dataProtectionProvider, TimeProvider systemClock = null) : BaseRequestHandler(context), IElevationHandler
 {
     private const string ElevationPurpose = "Elevation";
+
+    /// <summary>
+    /// The duration in minutes that an elevation token remains valid.
+    /// </summary>
     public const int ElevationTokenDuration = 15;
 
     private readonly IHttpContextAccessor httpContextAccessor = httpContextAccessor ?? throw new ArgumentNullException(nameof(httpContextAccessor));

@@ -9,6 +9,9 @@ namespace Serenity.Extensions;
 public class ExtensionsTypeSource(IEnumerable<Assembly> assemblies)
     : WebTypeSource([])
 {
+    /// <summary>
+    /// Gets the assemblies in the Serenity.Extensions reference chain, plus any additional assemblies.
+    /// </summary>
     public override IEnumerable<Assembly> GetAssemblies()
     {
         return SerenityExtensionsAssemblyChain.Concat(assemblies);

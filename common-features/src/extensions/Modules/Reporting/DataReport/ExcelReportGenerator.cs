@@ -332,6 +332,12 @@ public static class ExcelReportGenerator
     }
 
 
+    /// <summary>
+    /// Converts the specified <see cref="XLCellValue"/> to its corresponding .NET object.
+    /// </summary>
+    /// <param name="value">The cell value to convert.</param>
+    /// <returns>The converted object, or <c>null</c> for a blank cell.</returns>
+    /// <exception cref="InvalidCastException">The cell value type is not supported.</exception>
     public static object AsObject(this XLCellValue value)
     {
         return value.Type switch

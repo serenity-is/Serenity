@@ -104,7 +104,7 @@ public abstract class BasePermissionService(
     /// <summary>
     /// Gets whether the specified user is a super admin.
     /// </summary>
-    /// <param name="username">Username</param>
+    /// <param name="user">User</param>
     protected virtual bool IsSuperAdmin(ClaimsPrincipal user)
     {
         return false;
@@ -114,7 +114,7 @@ public abstract class BasePermissionService(
     /// Checks if the super admin has the specified permission.
     /// By default, super admin has all permissions.
     /// </summary>
-    /// <param name="username">Username</param>
+    /// <param name="user">User</param>
     /// <param name="permission">Permission</param>
     /// <returns></returns>
     protected virtual bool SuperAdminHasPermission(ClaimsPrincipal user, string permission)
