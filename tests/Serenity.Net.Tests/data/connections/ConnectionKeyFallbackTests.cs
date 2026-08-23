@@ -38,14 +38,9 @@ public class ConnectionKeyFallbackTests
         public IEnumerable<Type> GetTypesWithInterface(Type interfaceType) => [];
     }
 
-    private sealed class BasicConnectionStrings : IConnectionStrings
+    private sealed class BasicConnectionStrings(params string[] keys) : IConnectionStrings
     {
-        private readonly string[] keys;
-
-        public BasicConnectionStrings(params string[] keys)
-        {
-            this.keys = keys;
-        }
+        private readonly string[] keys = keys;
 
         public IConnectionString TryGetConnectionString(string connectionKey)
             => keys.Any(k => string.Equals(k, connectionKey, StringComparison.OrdinalIgnoreCase))
@@ -57,14 +52,9 @@ public class ConnectionKeyFallbackTests
             => keys.Select(TryGetConnectionString);
     }
 
-    private sealed class CountingConnectionStrings : DefaultConnectionStrings
+    private sealed class CountingConnectionStrings(IOptions<ConnectionStringOptions> options, ITypeSource typeSource) : DefaultConnectionStrings(options, typeSource: typeSource)
     {
         public int BuildCount;
-
-        public CountingConnectionStrings(IOptions<ConnectionStringOptions> options, ITypeSource typeSource)
-            : base(options, typeSource: typeSource)
-        {
-        }
 
         public void Invalidate() => fallbackMap = null;
 
@@ -76,16 +66,10 @@ public class ConnectionKeyFallbackTests
         }
     }
 
-    private sealed class NoCacheConnectionStrings : DefaultConnectionStrings
+    private sealed class NoCacheConnectionStrings(IOptions<ConnectionStringOptions> options, ITypeSource typeSource) : DefaultConnectionStrings(options, typeSource: typeSource)
     {
-        private readonly ITypeSource typeSource;
+        private readonly ITypeSource typeSource = typeSource;
         public int BuildCount;
-
-        public NoCacheConnectionStrings(IOptions<ConnectionStringOptions> options, ITypeSource typeSource)
-            : base(options, typeSource: typeSource)
-        {
-            this.typeSource = typeSource;
-        }
 
         protected override Dictionary<string, string> GetFallbackMap()
         {
@@ -222,7 +206,7 @@ public class ConnectionKeyFallbackTests
     {
         var cs = Create(["Default", "AnotherKey"], new ConnectionKeyFallbackAttribute("AnotherKey", "Default"));
         var result = cs.GetConnectionKeysResolvingTo("Default").OrderBy(x => x).ToArray();
-        Assert.Equal(new[] { "Default" }, result);
+        Assert.Equal(["Default"], result);
     }
 
     [Fact]
@@ -247,14 +231,14 @@ public class ConnectionKeyFallbackTests
     {
         var cs = Create(["Default"], new ConnectionKeyFallbackAttribute("AnotherKey", "Default"));
         var keys = cs.ListConnectionStrings().Select(x => x.ConnectionKey).ToArray();
-        Assert.Equal(new[] { "Default" }, keys);
+        Assert.Equal(["Default"], keys);
     }
 
     [Fact]
     public void DefaultSqlConnections_Degrades_WhenInnerDoesNotSupportFallbacks()
     {
         var sqlConnections = new DefaultSqlConnections(new BasicConnectionStrings("Default"));
-        var fallbacks = Assert.IsAssignableFrom<IConnectionKeyFallbacks>(sqlConnections);
+        var fallbacks = Assert.IsType<IConnectionKeyFallbacks>(sqlConnections, exactMatch: false);
 
         Assert.Equal(["AnotherKey"], fallbacks.GetConnectionKeyFallbacks("AnotherKey"));
         Assert.Equal("Default", fallbacks.ResolveConnectionKey("Default"));
@@ -267,7 +251,7 @@ public class ConnectionKeyFallbackTests
     {
         var inner = Create(["Default"], new ConnectionKeyFallbackAttribute("AnotherKey", "Default"));
         var sqlConnections = new DefaultSqlConnections(inner);
-        var fallbacks = Assert.IsAssignableFrom<IConnectionKeyFallbacks>(sqlConnections);
+        var fallbacks = Assert.IsType<IConnectionKeyFallbacks>(sqlConnections, exactMatch: false);
 
         Assert.Equal(["AnotherKey", "Default"], fallbacks.GetConnectionKeyFallbacks("AnotherKey"));
         Assert.Equal("Default", fallbacks.ResolveConnectionKey("AnotherKey"));
