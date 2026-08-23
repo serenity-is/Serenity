@@ -12,10 +12,13 @@ namespace Serenity.Data;
 /// <param name="connectionStrings">The named connection strings.</param>
 /// <param name="profiler">The profiler, if any.</param>
 /// <param name="loggerFactory">The optional logger factory (to be used by static SqlHelper methods).</param>
-public class DefaultSqlConnections(IConnectionStrings connectionStrings, IConnectionProfiler profiler = null, ILoggerFactory loggerFactory = null) : ISqlConnections
+public class DefaultSqlConnections(IConnectionStrings connectionStrings, IConnectionProfiler profiler = null, ILoggerFactory loggerFactory = null)
+    : ISqlConnections, IConnectionKeyFallbacks
 {
     /// <summary>The connection strings.</summary>
     protected readonly IConnectionStrings connectionStrings = connectionStrings ?? throw new ArgumentNullException(nameof(connectionStrings));
+    /// <summary>The connection key fallbacks, if the connection string source supports them.</summary>
+    protected readonly IConnectionKeyFallbacks connectionKeyFallbacks = connectionStrings as IConnectionKeyFallbacks;
     /// <summary>The profiler.</summary>
     protected readonly IConnectionProfiler profiler = profiler;
     /// <summary>The logger factory.</summary>
@@ -105,5 +108,28 @@ public class DefaultSqlConnections(IConnectionStrings connectionStrings, IConnec
     public virtual IConnectionString TryGetConnectionString(string connectionKey)
     {
         return connectionStrings.TryGetConnectionString(connectionKey);
+    }
+
+    /// <inheritdoc/>
+    public IEnumerable<string> GetConnectionKeyFallbacks(string connectionKey)
+    {
+        ArgumentException.ThrowIfNullOrEmpty(connectionKey);
+        return connectionKeyFallbacks?.GetConnectionKeyFallbacks(connectionKey) ?? [connectionKey];
+    }
+
+    /// <inheritdoc/>
+    public string ResolveConnectionKey(string connectionKey)
+    {
+        ArgumentException.ThrowIfNullOrEmpty(connectionKey);
+        return connectionKeyFallbacks?.ResolveConnectionKey(connectionKey) ??
+               (connectionStrings.TryGetConnectionString(connectionKey) != null ? connectionKey : null);
+    }
+
+    /// <inheritdoc/>
+    public IEnumerable<string> GetConnectionKeysResolvingTo(string connectionKey)
+    {
+        ArgumentException.ThrowIfNullOrEmpty(connectionKey);
+        return connectionKeyFallbacks?.GetConnectionKeysResolvingTo(connectionKey) ??
+               (connectionStrings.TryGetConnectionString(connectionKey) != null ? [connectionKey] : []);
     }
 }

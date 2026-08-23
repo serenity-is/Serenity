@@ -64,7 +64,9 @@ public class DataMigrations(ITypeSource typeSource,
             })
             .Configure<RunnerOptions>(options =>
             {
-                options.Tags = [databaseKey + "DB"];
+                options.Tags = (sqlConnections as IConnectionKeyFallbacks)?
+                    .GetConnectionKeysResolvingTo(databaseKey)?
+                    .Select(x => x + "DB").ToArray() ?? [databaseKey + "DB"];
                 options.IncludeUntaggedMigrations = databaseKey == "Default";
             })
             .ConfigureRunner(builder =>
