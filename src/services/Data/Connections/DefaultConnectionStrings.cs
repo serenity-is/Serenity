@@ -160,7 +160,16 @@ public class DefaultConnectionStrings(IOptions<ConnectionStringOptions> options,
     /// or invalidation behavior, e.g. to return a fresh map each access (no caching).
     /// </summary>
     protected virtual Dictionary<string, string> GetFallbackMap()
-        => fallbackMap ??= BuildFallbackMap(typeSource);
+    {
+        var map = fallbackMap;
+        if (map is not null)
+            return map;
+
+        map = BuildFallbackMap(typeSource);
+        ApplyConfigFallbacks(map);
+        fallbackMap = map;
+        return fallbackMap;
+    }
 
     /// <summary>
     /// Builds the connection key fallback map from the given type source.
@@ -181,5 +190,39 @@ public class DefaultConnectionStrings(IOptions<ConnectionStringOptions> options,
             map[attr.ConnectionKey] = attr.FallbackConnectionKey;
         }
         return map;
+    }
+
+    /// <summary>
+    /// Applies config-driven fallbacks declared via <see cref="ConnectionStringEntry.FallbackFor"/>
+    /// to the given map. These override any fallback declared by assembly attributes. If two
+    /// configured connections declare the same connection key in <see cref="ConnectionStringEntry.FallbackFor"/>,
+    /// an <see cref="InvalidOperationException"/> is thrown because the fallback target is ambiguous.
+    /// </summary>
+    /// <param name="map">The fallback map to apply configuration fallbacks to.</param>
+    protected virtual void ApplyConfigFallbacks(Dictionary<string, string> map)
+    {
+        var configOwners = new Dictionary<string, string>(StringComparer.OrdinalIgnoreCase);
+
+        foreach (var (key, entry) in options.Value)
+        {
+            if (entry.FallbackForKeys.Count == 0)
+                continue;
+
+            foreach (var sourceKey in entry.FallbackForKeys)
+            {
+                if (configOwners.TryGetValue(sourceKey, out var existingOwner))
+                {
+                    if (string.Equals(existingOwner, key, StringComparison.OrdinalIgnoreCase))
+                        continue; // duplicate within the same connection, not a conflict
+
+                    throw new InvalidOperationException(
+                        $"Connection fallback conflict: key '{sourceKey}' is declared as a fallback " +
+                        $"for both '{existingOwner}' and '{key}'.");
+                }
+
+                configOwners[sourceKey] = key;
+                map[sourceKey] = key;
+            }
+        }
     }
 }

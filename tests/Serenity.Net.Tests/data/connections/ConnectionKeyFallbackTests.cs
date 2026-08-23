@@ -24,6 +24,21 @@ public class ConnectionKeyFallbackTests
         return new DefaultConnectionStrings(Options.Create(TestOptions(configuredKeys)), typeSource: typeSource);
     }
 
+    private static DefaultConnectionStrings CreateWithFallbacks(Dictionary<string, string> fallbackFor, params Attribute[] attributes)
+    {
+        var options = new ConnectionStringOptions();
+        foreach (var kv in fallbackFor)
+        {
+            options[kv.Key] = new ConnectionStringEntry
+            {
+                ConnectionString = "Server=.;Database=Test;",
+                ProviderName = "System.Data.SqlClient",
+                FallbackFor = kv.Value
+            };
+        }
+        return new DefaultConnectionStrings(Options.Create(options), typeSource: new FakeTypeSource(attributes));
+    }
+
     private sealed class FakeTypeSource(params Attribute[] attributes) : ITypeSource
     {
         private readonly Attribute[] attributes = attributes;
@@ -293,5 +308,66 @@ public class ConnectionKeyFallbackTests
         cs.GetConnectionKeyFallbacks("AnotherKey");
         cs.GetConnectionKeyFallbacks("AnotherKey");
         Assert.Equal(2, cs.BuildCount);
+    }
+
+    [Fact]
+    public void FallbackFor_ConfigCreatesMapping()
+    {
+        var cs = CreateWithFallbacks(new() { ["Default"] = "ProFeatures" });
+        Assert.Equal(["ProFeatures", "Default"], cs.GetConnectionKeyFallbacks("ProFeatures"));
+        Assert.Equal("Default", cs.ResolveConnectionKey("ProFeatures"));
+        Assert.Equal("Default", cs.TryGetConnectionString("ProFeatures")?.ConnectionKey);
+    }
+
+    [Fact]
+    public void FallbackFor_ConfigOverridesAssemblyAttribute()
+    {
+        var cs = CreateWithFallbacks(new() { ["MyConn"] = "ProFeatures" },
+            new ConnectionKeyFallbackAttribute("ProFeatures", "Default"));
+        Assert.Equal("MyConn", cs.ResolveConnectionKey("ProFeatures"));
+    }
+
+    [Fact]
+    public void FallbackFor_MultipleSources()
+    {
+        var cs = CreateWithFallbacks(new() { ["MyConn"] = "ProFeatures;ProWorkLog" });
+        Assert.Equal("MyConn", cs.ResolveConnectionKey("ProFeatures"));
+        Assert.Equal("MyConn", cs.ResolveConnectionKey("ProWorkLog"));
+    }
+
+    [Fact]
+    public void FallbackFor_IgnoresBlankAndWhitespace()
+    {
+        var cs = CreateWithFallbacks(new() { ["Default"] = "ProFeatures; ;  " });
+        Assert.Equal("Default", cs.ResolveConnectionKey("ProFeatures"));
+        Assert.Equal(["ProFeatures", "Default"], cs.GetConnectionKeyFallbacks("ProFeatures"));
+    }
+
+    [Fact]
+    public void FallbackFor_ConflictThrows()
+    {
+        var cs = CreateWithFallbacks(new()
+        {
+            ["Default"] = "ProFeatures",
+            ["MyConn"] = "ProFeatures"
+        });
+        var ex = Assert.Throws<InvalidOperationException>(() => cs.GetConnectionKeyFallbacks("ProFeatures"));
+        Assert.Contains("conflict", ex.Message, StringComparison.OrdinalIgnoreCase);
+    }
+
+    [Fact]
+    public void FallbackFor_DuplicateInSameEntry_NoConflict()
+    {
+        var cs = CreateWithFallbacks(new() { ["Default"] = "ProFeatures;ProFeatures" });
+        Assert.Equal("Default", cs.ResolveConnectionKey("ProFeatures"));
+    }
+
+    [Fact]
+    public void FallbackFor_LazyParseIsCachedOnEntry()
+    {
+        var entry = new ConnectionStringEntry { FallbackFor = "ProFeatures;ProWorkLog" };
+        var first = entry.FallbackForKeys;
+        Assert.Equal(2, first.Count);
+        Assert.Same(first, entry.FallbackForKeys);
     }
 }
