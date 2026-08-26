@@ -1,4 +1,4 @@
-﻿namespace Serenity.Reporting;
+namespace Serenity.Reporting;
 
 /// <summary>
 /// Set of options for HTML to PDF converter (WKHTMLToPdf)
@@ -124,4 +124,14 @@ public interface IHtmlToPdfOptions
     /// A list of custom arguments to pass to HTML to PDF converter
     /// </summary>
     List<string> CustomArgs { get; }
+
+    /// <summary>
+    /// Allows editing LaunchOptions, only available for Puppeteer
+    /// </summary>
+    Action<object> EditLaunchOptions { get; set; }
+
+    /// <summary>
+    /// Allows editing PdfOptions, only available for Puppeteer
+    /// </summary>
+    Action<object> EditPdfOptions { get; set; }
 }

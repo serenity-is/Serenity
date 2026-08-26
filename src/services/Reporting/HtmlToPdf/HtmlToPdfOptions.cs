@@ -1,10 +1,10 @@
-﻿namespace Serenity.Reporting;
+namespace Serenity.Reporting;
 
 /// <summary>
 /// HTML to PDF options
 /// </summary>
 public class HtmlToPdfOptions : IHtmlToPdfOptions
-{       
+{
     /// <summary>
     /// Initializes a new instance of the class with default option values.
     /// </summary>
@@ -40,7 +40,7 @@ public class HtmlToPdfOptions : IHtmlToPdfOptions
 
     /// <inheritdoc/>
     public string PageHeight { get; set; }
-    
+
     /// <inheritdoc/>
     public string PageSize { get; set; }
 
@@ -100,4 +100,10 @@ public class HtmlToPdfOptions : IHtmlToPdfOptions
 
     /// <inheritdoc/>
     public List<string> CustomArgs { get; private set; }
+
+    /// <inheritdoc />
+    public Action<object> EditLaunchOptions { get; set; }
+
+    /// <inheritdoc />
+    public Action<object> EditPdfOptions { get; set; }
 }

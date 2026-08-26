@@ -278,6 +278,16 @@ public class WKHtmlToPdf(IHtmlToPdfOptions options = null) : IHtmlToPdfOptions
 
     /// <inheritdoc/>
     public List<string> CustomArgs => options.CustomArgs;
+
+    /// <summary>
+    /// Unused for WKHtmlToPdf
+    /// </summary>
+    public Action<object> EditLaunchOptions { get => options.EditLaunchOptions; set => options.EditLaunchOptions = value; }
+
+    /// <summary>
+    /// Unused for WKHtmlToPdf
+    /// </summary>
+    public Action<object> EditPdfOptions { get => options.EditPdfOptions; set => options.EditPdfOptions = value; }
 }
 
 /// <summary>
