@@ -28,13 +28,13 @@ public sealed class NodeScriptRunner : IDisposable
     /// <param name="arguments">The arguments to pass to the script.</param>
     /// <param name="workingDirectory">The working directory in which to run the script.</param>
     /// <param name="envVars">Optional environment variables to set for the process.</param>
-    /// <param name="pkgManagerCommand">The package manager command. Defaults to <c>npm</c>.</param>
+    /// <param name="pkgManagerCommand">The package manager command. Defaults to <c>node</c>.</param>
     /// <param name="diagnosticSource">The diagnostics source used to emit start events.</param>
     /// <param name="applicationStoppingToken">A token that stops the process when the application is shutting down.</param>
     /// <exception cref="ArgumentException">One of the required arguments is null or empty.</exception>
     public NodeScriptRunner(string scriptName, 
         string arguments = null, string workingDirectory = null,
-        IDictionary<string, string> envVars = null, string pkgManagerCommand = "npm", 
+        IDictionary<string, string> envVars = null, string pkgManagerCommand = "node", 
         DiagnosticSource diagnosticSource = null, CancellationToken applicationStoppingToken = default)
     {
         if (string.IsNullOrEmpty(workingDirectory))
@@ -53,10 +53,11 @@ public sealed class NodeScriptRunner : IDisposable
         }
 
         var exeToRun = pkgManagerCommand;
-        var completeArguments = $"run {scriptName} -- {arguments ?? string.Empty}";
-        if (OperatingSystem.IsWindows())
+        var isNode = exeToRun == "node";
+        var completeArguments = $"{(isNode ? "--run" : "run")} {scriptName} -- {arguments ?? string.Empty}";
+        if (!isNode && OperatingSystem.IsWindows())
         {
-            // On Windows, the node executable is a .cmd file, so it can't be executed
+            // On Windows, the npm executable is a .cmd file, so it can't be executed
             // directly (except with UseShellExecute=true, but that's no good, because
             // it prevents capturing stdio). So we need to invoke it via "cmd /c".
             exeToRun = "cmd";

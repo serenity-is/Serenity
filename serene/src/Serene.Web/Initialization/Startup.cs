@@ -109,16 +109,7 @@ public partial class Startup
     {
         RowFieldsProvider.SetDefaultFrom(app.ApplicationServices);
         app.InitializeLocalTexts();
-
-        var startNodeScripts = Configuration["StartNodeScripts"];
-        if (!string.IsNullOrEmpty(startNodeScripts))
-        {
-            foreach (var script in startNodeScripts.Split(';', StringSplitOptions.RemoveEmptyEntries))
-            {
-                app.StartNodeScript(script);
-            }
-        }
-
+        app.UseNodeScriptRunner();
         app.UseRequestLocalization();
 
         if (Configuration["UseForwardedHeaders"] == "True")

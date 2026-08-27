@@ -1,5 +1,6 @@
-﻿using Microsoft.AspNetCore.Builder;
+using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
+using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Serenity.Web;
@@ -23,10 +24,10 @@ public static class NodeScriptRunnerExtensions
     /// <param name="arguments">The arguments to pass to the script.</param>
     /// <param name="workingDirectory">The working directory; defaults to the content root path.</param>
     /// <param name="envVars">Optional environment variables to set for the process.</param>
-    /// <param name="pkgManagerCommand">The package manager command (defaults to <c>npm</c>).</param>
+    /// <param name="pkgManagerCommand">The package manager command (defaults to <c>node</c>).</param>
     public static void StartNodeScript(this IApplicationBuilder appBuilder, string scriptName, 
         string arguments = null, string workingDirectory = null, 
-        IDictionary<string, string> envVars = null, string pkgManagerCommand = "npm")
+        IDictionary<string, string> envVars = null, string pkgManagerCommand = "node")
     {
         var applicationStoppingToken = appBuilder.ApplicationServices
             .GetRequiredService<IHostApplicationLifetime>().ApplicationStopping;
@@ -37,5 +38,20 @@ public static class NodeScriptRunnerExtensions
         new NodeScriptRunner(scriptName, arguments, workingDirectory, envVars, pkgManagerCommand,
             diagnosticSource, applicationStoppingToken)
                 .AttachToLogger(logger);
+    }
+
+    /// <summary>
+    /// Starts node scripts configured in configuration "StartNodeScripts" key as a semicolon separated strings.
+    /// </summary>
+    /// <param name="appBuilder">The application builder.</param>
+    /// <param name="workingDirectory">The working directory; defaults to the content root path.</param>
+    /// <param name="envVars">Optional environment variables to set for the process.</param>
+    /// <param name="pkgManagerCommand">The package manager command (defaults to <c>node</c>).</param>
+    public static void UseNodeScriptRunner(this IApplicationBuilder appBuilder,
+        string workingDirectory = null, IDictionary<string, string> envVars = null, string pkgManagerCommand = "node")
+    {
+        if (appBuilder.ApplicationServices.GetRequiredService<IConfiguration>()["StartNodeScripts"] is string { Length: > 0 } startNodeScripts)
+            foreach (var script in startNodeScripts.Split(';', StringSplitOptions.RemoveEmptyEntries))
+                appBuilder.StartNodeScript(script, arguments: null, workingDirectory, envVars, pkgManagerCommand);
     }
 }
