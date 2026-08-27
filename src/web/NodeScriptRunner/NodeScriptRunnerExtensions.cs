@@ -50,8 +50,19 @@ public static class NodeScriptRunnerExtensions
     public static void UseNodeScriptRunner(this IApplicationBuilder appBuilder,
         string workingDirectory = null, IDictionary<string, string> envVars = null, string pkgManagerCommand = "node")
     {
-        if (appBuilder.ApplicationServices.GetRequiredService<IConfiguration>()["StartNodeScripts"] is string { Length: > 0 } startNodeScripts)
-            foreach (var script in startNodeScripts.Split(';', StringSplitOptions.RemoveEmptyEntries))
-                appBuilder.StartNodeScript(script, arguments: null, workingDirectory, envVars, pkgManagerCommand);
+        var configuration = appBuilder.ApplicationServices.GetRequiredService<IConfiguration>();
+        if (configuration["StartNodeScripts"] is string { Length: > 0 } startNodeScripts)
+            foreach (var entry in startNodeScripts.Split(';', StringSplitOptions.RemoveEmptyEntries))
+            {
+                string script = entry;
+                string arguments = null;
+                var idx = script.IndexOf(' ');
+                if (idx >= 0)
+                {
+                    arguments = script[idx..].TrimToNull();
+                    script = script[0..idx].Trim();
+                }
+                appBuilder.StartNodeScript(script, arguments, workingDirectory, envVars, pkgManagerCommand);
+            }
     }
 }
