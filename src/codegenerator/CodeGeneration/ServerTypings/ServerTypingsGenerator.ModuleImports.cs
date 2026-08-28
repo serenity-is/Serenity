@@ -154,9 +154,13 @@ public partial class ServerTypingsGenerator
 
         if (!toModule.StartsWith('/'))
         {
-            if (System.IO.Path.GetDirectoryName(fromModule) ==
-                System.IO.Path.GetDirectoryName(toModule))
+            var fromModuleDir = System.IO.Path.GetDirectoryName(fromModule);
+            var toModuleDir = System.IO.Path.GetDirectoryName(toModule);
+            if (fromModuleDir ==
+                toModuleDir)
                 return "./" + System.IO.Path.GetFileName(toModule);
+            else if (string.IsNullOrEmpty(fromModuleDir))
+                return "./" + toModule;
             else
                 return "../" + toModule;
         }
