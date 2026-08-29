@@ -1,3 +1,6 @@
+using Microsoft.Extensions.Primitives;
+using System.Threading;
+
 namespace Serenity.Abstractions;
 
 /// <summary>
@@ -7,8 +10,30 @@ namespace Serenity.Abstractions;
 /// <remarks>
 /// Creates a new instance.
 /// </remarks>
-public abstract class BaseAssemblyTypeSource(IFeatureToggles? featureToggles = null) : ITypeSource, IGetAssemblies
+public abstract class BaseAssemblyTypeSource(IFeatureToggles? featureToggles = null) : ITypeSource, IGetAssemblies, IChangeTokenProvider, IChangeNotifier, IDisposable
 {
+    private CancellationTokenSource changeTokenCts = new();
+
+    /// <inheritdoc/>
+    public IChangeToken GetChangeToken()
+    {
+        return new CancellationChangeToken(changeTokenCts.Token);
+    }
+
+    /// <inheritdoc/>
+    public void NotifyChanged()
+    {
+        var old = Interlocked.Exchange(ref changeTokenCts, new CancellationTokenSource());
+        old.Cancel();
+        old.Dispose();
+    }
+
+    /// <inheritdoc/>
+    public void Dispose()
+    {
+        changeTokenCts.Dispose();
+    }
+
     /// <summary>
     /// Gets all attributes for assemblies with the given type.
     /// </summary>

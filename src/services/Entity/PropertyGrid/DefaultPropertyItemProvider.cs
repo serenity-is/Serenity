@@ -1,4 +1,5 @@
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Primitives;
 using Serenity.Reflection;
 
 namespace Serenity.PropertyGrid;
@@ -7,21 +8,46 @@ namespace Serenity.PropertyGrid;
 /// Default property item provider
 /// </summary>
 /// <seealso cref="IPropertyItemProvider" />
-/// <remarks>
-/// Initializes a new instance of the <see cref="DefaultPropertyItemProvider"/> class.
-/// </remarks>
-/// <param name="provider">The provider.</param>
-/// <param name="typeSource">The type source.</param>
-/// <exception cref="ArgumentNullException">
-/// provider or typeSource is null
-/// </exception>
-public partial class DefaultPropertyItemProvider(IServiceProvider provider, ITypeSource typeSource) : IPropertyItemProvider
+public partial class DefaultPropertyItemProvider : IPropertyItemProvider, IDisposable
 {
-    private readonly IServiceProvider provider = provider ?? throw new ArgumentNullException(nameof(provider));
-    private readonly IEnumerable<ObjectFactory> processorFactories = (typeSource ?? throw new ArgumentNullException(nameof(typeSource)))
-            .GetTypesWithInterface(typeof(IPropertyProcessor))
+    private readonly IServiceProvider provider;
+    private readonly ITypeSource typeSource;
+    private ObjectFactory[] processorFactories;
+    private IDisposable? changeSubscription;
+
+    /// <summary>
+    /// Initializes a new instance of the <see cref="DefaultPropertyItemProvider"/> class.
+    /// </summary>
+    /// <param name="provider">The provider.</param>
+    /// <param name="typeSource">The type source.</param>
+    /// <exception cref="ArgumentNullException">
+    /// provider or typeSource is null
+    /// </exception>
+    public DefaultPropertyItemProvider(IServiceProvider provider, ITypeSource typeSource)
+    {
+        this.provider = provider ?? throw new ArgumentNullException(nameof(provider));
+        this.typeSource = typeSource ?? throw new ArgumentNullException(nameof(typeSource));
+        processorFactories = BuildProcessorFactories(this.typeSource);
+
+        if (this.typeSource is IChangeTokenProvider changeTokenProvider)
+        {
+            changeSubscription = ChangeToken.OnChange(changeTokenProvider.GetChangeToken,
+                () => processorFactories = BuildProcessorFactories(this.typeSource));
+        }
+    }
+
+    private static ObjectFactory[] BuildProcessorFactories(ITypeSource typeSource)
+        => typeSource.GetTypesWithInterface(typeof(IPropertyProcessor))
             .Where(x => !x.IsAbstract && !x.IsInterface)
-            .Select(type => ActivatorUtilities.CreateFactory(type, Type.EmptyTypes));
+            .Select(type => ActivatorUtilities.CreateFactory(type, Type.EmptyTypes))
+            .ToArray();
+
+    /// <inheritdoc/>
+    public void Dispose()
+    {
+        changeSubscription?.Dispose();
+        changeSubscription = null;
+    }
 
     /// <inheritdoc/>
     /// <param name="type">The type.</param>
