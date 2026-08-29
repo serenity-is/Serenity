@@ -185,7 +185,7 @@ public class DefaultConnectionStrings(IOptions<ConnectionStringOptions> options,
         // The application assembly typically appears last in the type source, so a later
         // assembly's fallback overrides an earlier one, allowing applications to override
         // framework defaults.
-        foreach (ConnectionKeyFallbackAttribute attr in typeSource.GetAssemblyAttributes(typeof(ConnectionKeyFallbackAttribute)))
+        foreach (ConnectionKeyFallbackAttribute attr in typeSource.GetAssemblyAttributes<ConnectionKeyFallbackAttribute>())
         {
             map[attr.ConnectionKey] = attr.FallbackConnectionKey;
         }

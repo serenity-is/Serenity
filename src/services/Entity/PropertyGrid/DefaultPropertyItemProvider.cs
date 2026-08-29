@@ -13,7 +13,7 @@ public partial class DefaultPropertyItemProvider : IPropertyItemProvider, IDispo
     private readonly IServiceProvider provider;
     private readonly ITypeSource typeSource;
     private ObjectFactory[] processorFactories;
-    private IDisposable? changeSubscription;
+    private IDisposable changeSubscription;
 
     /// <summary>
     /// Initializes a new instance of the <see cref="DefaultPropertyItemProvider"/> class.
@@ -37,14 +37,14 @@ public partial class DefaultPropertyItemProvider : IPropertyItemProvider, IDispo
     }
 
     private static ObjectFactory[] BuildProcessorFactories(ITypeSource typeSource)
-        => typeSource.GetTypesWithInterface(typeof(IPropertyProcessor))
+        => [.. typeSource.GetTypesWithInterface(typeof(IPropertyProcessor))
             .Where(x => !x.IsAbstract && !x.IsInterface)
-            .Select(type => ActivatorUtilities.CreateFactory(type, Type.EmptyTypes))
-            .ToArray();
+            .Select(type => ActivatorUtilities.CreateFactory(type, Type.EmptyTypes))];
 
     /// <inheritdoc/>
     public void Dispose()
     {
+        GC.SuppressFinalize(this);
         changeSubscription?.Dispose();
         changeSubscription = null;
     }

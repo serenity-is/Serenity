@@ -72,8 +72,8 @@ public class ApplicationPartsTypeSource(ApplicationPartManager partManager,
 
         this.sortCache = sortCache = new()
         {
-            Unsorted = assemblies.ToArray(),
-            Sorted = TopologicalSort(assemblies).ToArray()
+            Unsorted = [.. assemblies],
+            Sorted = [.. TopologicalSort(assemblies)]
         };
 
         return sortCache.Sorted;
