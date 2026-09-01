@@ -9,7 +9,7 @@
   <ItemGroup>
     <ProjectReference Include="..\services\Serenity.Net.Services.csproj" />
     <FrameworkReference Include="Microsoft.AspNetCore.App" />
-    <PackageReference Include="NUglify" Version="1.22.3" />
+    <PackageReference Include="NUglify" Version="1.22.4" />
     <None Include=".\*Task.cs;.\Serenity.Net.Web.targets" Pack="true" PackagePath="build" />
   </ItemGroup>
 </Project>
