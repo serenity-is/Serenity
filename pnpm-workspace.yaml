@@ -16,12 +16,12 @@ catalogs:
   serenity:
     "@floating-ui/dom": "1.8.0"
     "@preact/signals-core": "1.14.4"
-    "@vitest/coverage-v8": "4.1.10"
+    "@vitest/coverage-v8": "4.1.11"
     "chart.js": "4.5.1"
-    "dompurify": "3.4.13"
+    "dompurify": "3.4.14"
     "dts-bundle-generator": "9.5.1"
     "esbuild": "0.28.2"
-    "es-module-lexer": "2.3.1"
+    "es-module-lexer": "2.3.2"
     "flatpickr": "4.6.13"
     "glightbox": "3.3.1"
     "jsdom": "30.0.1"
@@ -29,11 +29,11 @@ catalogs:
     "preact": "10.29.8"
     "tinyglobby": "0.2.17"
     "typescript": "7.0.2"
-    "vite": "8.2.1"
-    "vitest": "4.1.10"
+    "vite": "8.2.2"
+    "vitest": "4.1.11"
 
 overrides:
   dts-bundle-generator>typescript: 6.0.3
-  dompurify@<3.4.13: ^3.4.13
-  undici@<7.28.0: ^7.28.0
-  nanoid@<3.3.17: ^3.3.17
+  dompurify@<3.4.14: ^3.4.14
+  undici@<7.29.0: ^7.29.0
+  nanoid@<3.3.18: ^3.3.18
