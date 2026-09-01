@@ -4,7 +4,7 @@
   <PropertyGroup>
     <ArtifactsPath>$(MSBuildThisFileDirectory)..\..\artifacts</ArtifactsPath>
     <GenerateDocumentationFile Condition="'$(GenerateDocumentationFile)' == ''">true</GenerateDocumentationFile>
-    <SerenityVersion Condition="'$(SerenityVersion)' == ''">10.3.7</SerenityVersion>
+    <SerenityVersion Condition="'$(SerenityVersion)' == ''">10.4.0</SerenityVersion>
     <SergenTransform Condition="'$(SergenTransform)' == '' And '$(BuildingProject)' != 'false' And '$(DesignTimeBuild)' != 'true'">all</SergenTransform>
     <TargetFramework>net10.0</TargetFramework>
     <DotnetToolManifestFile>$(MSBuildProjectDirectory)\..\.config\dotnet-tools.json</DotnetToolManifestFile>
