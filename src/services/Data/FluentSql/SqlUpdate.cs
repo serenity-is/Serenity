@@ -1,5 +1,3 @@
-using Dictionary = System.Collections.Generic.Dictionary<string, object>;
-
 namespace Serenity.Data;
 
 /// <summary>

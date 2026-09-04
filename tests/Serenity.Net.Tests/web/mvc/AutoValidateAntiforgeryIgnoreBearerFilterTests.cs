@@ -1,7 +1,6 @@
 using Microsoft.AspNetCore.Antiforgery;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
-using System.Threading.Tasks;
 
 namespace Serenity.Web;
 

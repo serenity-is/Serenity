@@ -5,7 +5,6 @@ using Microsoft.Extensions.Logging;
 using Serenity.Web.SpaServices;
 using System.Diagnostics;
 using System.Diagnostics.CodeAnalysis;
-using System.Threading;
 
 namespace Serenity.Web;
 

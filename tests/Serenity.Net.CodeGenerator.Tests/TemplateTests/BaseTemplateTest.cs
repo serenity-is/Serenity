@@ -1,5 +1,3 @@
-using Serenity.CodeGenerator;
-
 namespace Serenity.CodeGenerator;
 
 public abstract class BaseTemplateTest

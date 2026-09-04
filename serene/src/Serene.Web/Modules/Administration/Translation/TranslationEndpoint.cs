@@ -1,5 +1,4 @@
 using Microsoft.AspNetCore.Hosting;
-using Microsoft.Extensions.DependencyInjection;
 using MyRepository = Serene.Administration.Repositories.TranslationRepository;
 
 namespace Serene.Administration.Endpoints;

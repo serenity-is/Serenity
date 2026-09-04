@@ -2,7 +2,6 @@ using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Net.Http.Headers;
 using System.Net;
-using System.Threading.Tasks;
 
 namespace Serenity.Web.Middleware;
 

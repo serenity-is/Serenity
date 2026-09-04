@@ -1,4 +1,3 @@
-using System.Threading.Tasks;
 using Xunit.Sdk;
 using Xunit.v3;
 using CallType = Serenity.TestUtils.MockGeneratorConsole.CallType;

@@ -1,5 +1,3 @@
-using System.IO;
-
 namespace Serenity.Demo.Northwind;
 
 [ConnectionKey("Northwind"), Module("Northwind"), TableName("Categories")]

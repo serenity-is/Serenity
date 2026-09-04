@@ -1,5 +1,4 @@
 using Microsoft.AspNetCore.Antiforgery;
-using System.Threading.Tasks;
 
 namespace Serenity.TestUtils;
 

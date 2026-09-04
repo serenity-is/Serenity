@@ -48,5 +48,7 @@
     <Using Include="System.Text" />
     <Using Include="System.Text.Json.Serialization" />
     <Using Include="System.Text.RegularExpressions" />
+    <Using Include="System.Threading" />
+    <Using Include="System.Threading.Tasks" />
   </ItemGroup>
 </Project>

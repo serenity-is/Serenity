@@ -1,6 +1,4 @@
-using Microsoft.Extensions.Options;
 using Serenity.IO;
-using System.Net.NetworkInformation;
 
 namespace Serenity.Web;
 

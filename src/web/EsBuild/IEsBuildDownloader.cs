@@ -1,5 +1,3 @@
-using System.Threading.Tasks;
-
 namespace Serenity.Web.EsBuild;
 
 internal interface IEsBuildDownloader
