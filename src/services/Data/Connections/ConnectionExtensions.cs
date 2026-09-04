@@ -51,6 +51,36 @@ public static class ConnectionExtensions
     }
 
     /// <summary>
+    /// Ensures the connection is open asynchronously. Warning! This method will not reopen a connection
+    /// that was once opened and will raise an error.
+    /// </summary>
+    /// <param name="connection">The connection.</param>
+    /// <param name="cancellationToken">The cancellation token.</param>
+    /// <returns>A task that represents the asynchronous operation. The task result contains the connection.</returns>
+    /// <exception cref="ArgumentNullException">connection</exception>
+    /// <exception cref="InvalidOperationException">Can't auto open a closed connection that was previously open!</exception>
+    public static async Task<IDbConnection> EnsureOpenAsync(this IDbConnection connection, CancellationToken cancellationToken = default)
+    {
+        ArgumentNullException.ThrowIfNull(connection);
+
+        if (connection.State != ConnectionState.Open)
+        {
+            if (connection is IHasOpenedOnce hoo && hoo.OpenedOnce)
+                throw new InvalidOperationException("Can't auto open a closed connection " +
+                    "that was previously open!");
+
+            if (connection is WrappedConnection wrapped)
+                await wrapped.OpenAsync(cancellationToken).ConfigureAwait(false);
+            else if (connection is System.Data.Common.DbConnection dbConnection)
+                await dbConnection.OpenAsync(cancellationToken).ConfigureAwait(false);
+            else
+                connection.Open();
+        }
+
+        return connection;
+    }
+
+    /// <summary>
     /// Gets the current actual transaction for a connection, if any.
     /// Most of the time, a connection will only have one transaction,
     /// but in .NET it is not possible to know what that transaction is.

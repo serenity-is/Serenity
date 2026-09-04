@@ -219,6 +219,32 @@ public class WrappedConnection(IDbConnection connection, ISqlDialect dialect, IL
     }
 
     /// <summary>
+    /// Opens a database connection asynchronously with the settings specified by the ConnectionString
+    /// property of the provider-specific Connection object.
+    /// </summary>
+    /// <returns>A task that represents the asynchronous operation.</returns>
+    public Task OpenAsync()
+    {
+        return OpenAsync(CancellationToken.None);
+    }
+
+    /// <summary>
+    /// Opens a database connection asynchronously with the settings specified by the ConnectionString
+    /// property of the provider-specific Connection object.
+    /// </summary>
+    /// <param name="cancellationToken">The cancellation token.</param>
+    /// <returns>A task that represents the asynchronous operation.</returns>
+    public async Task OpenAsync(CancellationToken cancellationToken)
+    {
+        if (actualConnection is DbConnection dbConnection)
+            await dbConnection.OpenAsync(cancellationToken).ConfigureAwait(false);
+        else
+            actualConnection.Open();
+
+        openedOnce = true;
+    }
+
+    /// <summary>
     /// Gets the current state of the connection.
     /// </summary>
     public ConnectionState State => actualConnection.State;
