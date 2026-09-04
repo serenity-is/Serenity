@@ -102,6 +102,105 @@ public static class EntityConnectionExtensions
     }
 
     /// <summary>
+    /// Asynchronously finds an entity by its ID value. This method selects only the table fields,
+    /// and no foreign / calculated fields. Use other overloads if you want to 
+    /// select different set of fields.
+    /// </summary>
+    /// <typeparam name="TRow">The type of the row.</typeparam>
+    /// <param name="connection">The connection.</param>
+    /// <param name="id">The identifier.</param>
+    /// <param name="cancellationToken">The cancellation token.</param>
+    /// <returns>A task representing the asynchronous operation. The task result is the entity with the given ID.</returns>
+    /// <exception cref="ValidationError">Record with the specified ID is not found.</exception>
+    /// <exception cref="InvalidOperationException">Multiple records with the ID found.</exception>
+    public static async Task<TRow> ByIdAsync<TRow>(this IDbConnection connection, object id, CancellationToken cancellationToken = default)
+        where TRow : class, IRow, IIdRow, new()
+    {
+        var row = await TryByIdAsync<TRow>(connection, id, cancellationToken).ConfigureAwait(false)
+            ?? throw new ValidationError("RecordNotFound", string.Format("Can't locate '{0}' record with ID {1}!", new TRow().Table, id));
+        return row;
+    }
+
+    /// <summary>
+    /// Asynchronously tries to find an entity by its ID value. This method selects only the table fields,
+    /// and no foreign / calculated fields. Use other overloads if you want to 
+    /// select different set of fields.
+    /// </summary>
+    /// <typeparam name="TRow">The type of the row.</typeparam>
+    /// <param name="connection">The connection.</param>
+    /// <param name="id">The identifier.</param>
+    /// <param name="cancellationToken">The cancellation token.</param>
+    /// <returns>A task representing the asynchronous operation. The task result is the entity with the given ID, or null if not found.</returns>
+    /// <exception cref="InvalidOperationException">Multiple records with the ID found.</exception>
+    public static async Task<TRow> TryByIdAsync<TRow>(this IDbConnection connection, object id, CancellationToken cancellationToken = default)
+        where TRow : class, IRow, IIdRow, new()
+    {
+        if (connection is IRowOperationInterceptor interceptor &&
+            interceptor.FindRow(typeof(TRow), id, where: null, editQuery: null, byIdOrSingle: true) is { HasValue: true } intres)
+            return (TRow)intres.Value;
+
+        var row = new TRow() { TrackWithChecks = true };
+        if (await new SqlQuery().From(row)
+                .SelectTableFields()
+                .Where(new Criteria(row.IdField) == new ValueCriteria(id))
+                .GetSingleAsync(connection, cancellationToken).ConfigureAwait(false))
+            return row;
+
+        return null;
+    }
+
+    /// <summary>
+    /// Asynchronously finds an entity by its ID value. This method does not select any fields
+    /// by default and allows you to edit the query to select fields you want.
+    /// </summary>
+    /// <typeparam name="TRow">The type of the row.</typeparam>
+    /// <param name="connection">The connection.</param>
+    /// <param name="id">The identifier.</param>
+    /// <param name="editQuery">Callback to edit the query.</param>
+    /// <param name="cancellationToken">The cancellation token.</param>
+    /// <returns>A task representing the asynchronous operation. The task result is the entity with the given ID.</returns>
+    /// <exception cref="ValidationError">Record with the specified ID is not found.</exception>
+    /// <exception cref="InvalidOperationException">Multiple records with the ID found.</exception>
+    public static async Task<TRow> ByIdAsync<TRow>(this IDbConnection connection, object id, Action<SqlQuery> editQuery, CancellationToken cancellationToken = default)
+        where TRow : class, IRow, IIdRow, new()
+    {
+        var row = await TryByIdAsync<TRow>(connection, id, editQuery, cancellationToken).ConfigureAwait(false)
+            ?? throw new ValidationError("RecordNotFound", string.Format(
+                "Can't locate '{0}' record with ID {1}!", new TRow().Table, id));
+        return row;
+    }
+
+    /// <summary>
+    /// Asynchronously tries to find an entity by its ID value. This method does not select any fields
+    /// by default and allows you to edit the query to select fields you want.
+    /// </summary>
+    /// <typeparam name="TRow">The type of the row.</typeparam>
+    /// <param name="connection">The connection.</param>
+    /// <param name="id">The identifier.</param>
+    /// <param name="editQuery">Callback to edit the query.</param>
+    /// <param name="cancellationToken">The cancellation token.</param>
+    /// <returns>A task representing the asynchronous operation. The task result is the entity with the given ID, or null if not found.</returns>
+    /// <exception cref="InvalidOperationException">Multiple records with the ID found.</exception>
+    public static async Task<TRow> TryByIdAsync<TRow>(this IDbConnection connection, object id, Action<SqlQuery> editQuery, CancellationToken cancellationToken = default)
+        where TRow : class, IRow, IIdRow, new()
+    {
+        if (connection is IRowOperationInterceptor interceptor &&
+            interceptor.FindRow(typeof(TRow), id, where: null, editQuery, byIdOrSingle: true) is { HasValue: true } intres)
+            return (TRow)intres.Value;
+
+        var row = new TRow() { TrackWithChecks = true };
+        var query = new SqlQuery().From(row)
+            .Where(new Criteria(row.IdField) == new ValueCriteria(id));
+
+        editQuery(query);
+
+        if (await query.GetSingleAsync(connection, cancellationToken).ConfigureAwait(false))
+            return row;
+
+        return null;
+    }
+
+    /// <summary>
     /// Finds a single entity matching the specified criteria.
     /// This method selects only the table fields,
     /// and no foreign / calculated fields. Use other overloads if you want to 
@@ -193,6 +292,103 @@ public static class EntityConnectionExtensions
     }
 
     /// <summary>
+    /// Asynchronously finds a single entity matching the specified criteria.
+    /// This method selects only the table fields,
+    /// and no foreign / calculated fields. Use other overloads if you want to 
+    /// select different set of fields.
+    /// </summary>
+    /// <typeparam name="TRow">The type of the row.</typeparam>
+    /// <param name="connection">The connection.</param>
+    /// <param name="where">The where criteria.</param>
+    /// <param name="cancellationToken">The cancellation token.</param>
+    /// <returns>A task representing the asynchronous operation. The task result is the single entity matching the specified criteria.</returns>
+    /// <exception cref="ValidationError">No matching records found.</exception>
+    /// <exception cref="InvalidOperationException">Multiple records matching the specified criteria.</exception>
+    public static async Task<TRow> SingleAsync<TRow>(this IDbConnection connection, ICriteria where, CancellationToken cancellationToken = default)
+        where TRow : class, IRow, new()
+    {
+        var row = await TrySingleAsync<TRow>(connection, where, cancellationToken).ConfigureAwait(false)
+            ?? throw new ValidationError("RecordNotFound", "Query returned no results!");
+        return row;
+    }
+
+    /// <summary>
+    /// Asynchronously tries to find a single entity matching the specified criteria. 
+    /// This method selects only the table fields,
+    /// and no foreign / calculated fields. Use other overloads if you want to 
+    /// select different set of fields.
+    /// </summary>
+    /// <typeparam name="TRow">The type of the row.</typeparam>
+    /// <param name="connection">The connection.</param>
+    /// <param name="where">The where criteria.</param>
+    /// <param name="cancellationToken">The cancellation token.</param>
+    /// <returns>A task representing the asynchronous operation. The task result is the single entity matching the specified criteria, or null if no matching record is found.</returns>
+    /// <exception cref="InvalidOperationException">Multiple records matching the criteria found.</exception>
+    public static async Task<TRow> TrySingleAsync<TRow>(this IDbConnection connection, ICriteria where, CancellationToken cancellationToken = default)
+        where TRow : class, IRow, new()
+    {
+        if (connection is IRowOperationInterceptor interceptor &&
+            interceptor.FindRow(typeof(TRow), id: default, where, editQuery: null, byIdOrSingle: true) is { HasValue: true } intres)
+            return (TRow)intres.Value;
+
+        var row = new TRow() { TrackWithChecks = true };
+        if (await new SqlQuery().From(row)
+                .SelectTableFields()
+                .Where(where)
+                .GetSingleAsync(connection, cancellationToken).ConfigureAwait(false))
+            return row;
+
+        return null;
+    }
+
+    /// <summary>
+    /// Asynchronously finds a single entity, allowing caller to edit the criteria
+    /// and set of fields to load through a editQuery callback.
+    /// </summary>
+    /// <typeparam name="TRow">The type of the row.</typeparam>
+    /// <param name="connection">The connection.</param>
+    /// <param name="editQuery">The callback to edit query.</param>
+    /// <param name="cancellationToken">The cancellation token.</param>
+    /// <returns>A task representing the asynchronous operation. The task result is the single entity matching the criteria set by editQuery.</returns>
+    /// <exception cref="ValidationError">No records matching the specified criteria.</exception>
+    /// <exception cref="InvalidOperationException">Multiple records matching the specified criteria.</exception>
+    public static async Task<TRow> SingleAsync<TRow>(this IDbConnection connection, Action<SqlQuery> editQuery, CancellationToken cancellationToken = default)
+        where TRow : class, IRow, new()
+    {
+        var row = await TrySingleAsync<TRow>(connection, editQuery, cancellationToken).ConfigureAwait(false)
+            ?? throw new ValidationError("RecordNotFound", "Query returned no results!");
+        return row;
+    }
+
+    /// <summary>
+    /// Asynchronously tries to find a single entity, allowing caller to edit the criteria
+    /// and set of fields to load through a editQuery callback.
+    /// </summary>
+    /// <typeparam name="TRow">The type of the row.</typeparam>
+    /// <param name="connection">The connection.</param>
+    /// <param name="editQuery">The edit query.</param>
+    /// <param name="cancellationToken">The cancellation token.</param>
+    /// <returns>A task representing the asynchronous operation. The task result is the single entity matching the criteria set by editQuery, or null if not found.</returns>
+    /// <exception cref="InvalidOperationException">Multiple records matching the specified criteria.</exception>
+    public static async Task<TRow> TrySingleAsync<TRow>(this IDbConnection connection, Action<SqlQuery> editQuery, CancellationToken cancellationToken = default)
+        where TRow : class, IRow, new()
+    {
+        if (connection is IRowOperationInterceptor interceptor &&
+            interceptor.FindRow(typeof(TRow), id: default, where: null, editQuery, byIdOrSingle: true) is { HasValue: true } intres)
+            return (TRow)intres.Value;
+
+        var row = new TRow() { TrackWithChecks = true };
+        var query = new SqlQuery().From(row);
+
+        editQuery(query);
+
+        if (await query.GetSingleAsync(connection, cancellationToken).ConfigureAwait(false))
+            return row;
+
+        return null;
+    }
+
+    /// <summary>
     /// Finds first entity matching a where criteria.
     /// </summary>
     /// <typeparam name="TRow">The type of the row.</typeparam>
@@ -274,6 +470,93 @@ public static class EntityConnectionExtensions
     }
 
     /// <summary>
+    /// Asynchronously finds first entity matching a where criteria.
+    /// </summary>
+    /// <typeparam name="TRow">The type of the row.</typeparam>
+    /// <param name="connection">The connection.</param>
+    /// <param name="where">The where criteria.</param>
+    /// <param name="cancellationToken">The cancellation token.</param>
+    /// <returns>A task representing the asynchronous operation. The task result is the first entity matching the where criteria.</returns>
+    /// <exception cref="ValidationError">No records matching the specified criteria.</exception>
+    public static async Task<TRow> FirstAsync<TRow>(this IDbConnection connection, ICriteria where, CancellationToken cancellationToken = default)
+        where TRow : class, IRow, new()
+    {
+        var row = await TryFirstAsync<TRow>(connection, where, cancellationToken).ConfigureAwait(false)
+            ?? throw new ValidationError("RecordNotFound", "Query returned no results!");
+        return row;
+    }
+
+    /// <summary>
+    /// Asynchronously tries to find first entity matching a where criteria.
+    /// </summary>
+    /// <typeparam name="TRow">The type of the row.</typeparam>
+    /// <param name="connection">The connection.</param>
+    /// <param name="where">The where criteria.</param>
+    /// <param name="cancellationToken">The cancellation token.</param>
+    /// <returns>A task representing the asynchronous operation. The task result is the first entity matching the where criteria, or null if not found.</returns>
+    public static async Task<TRow> TryFirstAsync<TRow>(this IDbConnection connection, ICriteria where, CancellationToken cancellationToken = default)
+        where TRow : class, IRow, new()
+    {
+        if (connection is IRowOperationInterceptor interceptor &&
+            interceptor.FindRow(typeof(TRow), id: default, where, editQuery: null, byIdOrSingle: false) is { HasValue: true } intres)
+            return (TRow)intres.Value;
+
+        var row = new TRow() { TrackWithChecks = true };
+        if (await new SqlQuery().From(row)
+                .SelectTableFields()
+                .Where(where)
+                .GetFirstAsync(connection, cancellationToken).ConfigureAwait(false))
+            return row;
+
+        return null;
+    }
+
+    /// <summary>
+    /// Asynchronously finds first entity, allowing the caller to set criteria and fields to select 
+    /// through an editQuery callback.
+    /// </summary>
+    /// <typeparam name="TRow">The type of the row.</typeparam>
+    /// <param name="connection">The connection.</param>
+    /// <param name="editQuery">The edit query callback.</param>
+    /// <param name="cancellationToken">The cancellation token.</param>
+    /// <returns>A task representing the asynchronous operation. The task result is the first entity matching the criteria.</returns>
+    /// <exception cref="ValidationError">No records matching the specified criteria.</exception>
+    public static async Task<TRow> FirstAsync<TRow>(this IDbConnection connection, Action<SqlQuery> editQuery, CancellationToken cancellationToken = default)
+        where TRow : class, IRow, new()
+    {
+        var row = await TryFirstAsync<TRow>(connection, editQuery, cancellationToken).ConfigureAwait(false)
+            ?? throw new ValidationError("RecordNotFound", "Query returned no results!");
+        return row;
+    }
+
+    /// <summary>
+    /// Asynchronously tries to find first entity, allowing the caller to set criteria and fields to select 
+    /// through an editQuery callback.
+    /// </summary>
+    /// <typeparam name="TRow">The type of the row.</typeparam>
+    /// <param name="connection">The connection.</param>
+    /// <param name="editQuery">The edit query callback.</param>
+    /// <param name="cancellationToken">The cancellation token.</param>
+    /// <returns>A task representing the asynchronous operation. The task result is the first entity matching the criteria, or null if not found.</returns>
+    public static async Task<TRow> TryFirstAsync<TRow>(this IDbConnection connection, Action<SqlQuery> editQuery, CancellationToken cancellationToken = default)
+        where TRow : class, IRow, new()
+    {
+        if (connection is IRowOperationInterceptor interceptor &&
+            interceptor.FindRow(typeof(TRow), id: default, where: null, editQuery, byIdOrSingle: false) is { HasValue: true } intres)
+            return (TRow)intres.Value;
+
+        var row = new TRow() { TrackWithChecks = true };
+        var query = new SqlQuery().From(row);
+
+        editQuery(query);
+
+        if (await query.GetFirstAsync(connection, cancellationToken).ConfigureAwait(false))
+            return row;
+
+        return null;
+    }
+
+    /// <summary>
     /// Gets count of all records.
     /// </summary>
     /// <typeparam name="TRow">The type of the row.</typeparam>
@@ -308,6 +591,43 @@ public static class EntityConnectionExtensions
     }
 
     /// <summary>
+    /// Asynchronously gets count of all records.
+    /// </summary>
+    /// <typeparam name="TRow">The type of the row.</typeparam>
+    /// <param name="connection">The connection.</param>
+    /// <param name="cancellationToken">The cancellation token.</param>
+    /// <returns>A task representing the asynchronous operation. The task result is the number of records in the table.</returns>
+    public static Task<int> CountAsync<TRow>(this IDbConnection connection, CancellationToken cancellationToken = default)
+        where TRow : class, IRow, new()
+    {
+        return connection.CountAsync<TRow>(null, cancellationToken);
+    }
+
+    /// <summary>
+    /// Asynchronously gets count of records matching a specified criteria.
+    /// </summary>
+    /// <typeparam name="TRow">The type of the row.</typeparam>
+    /// <param name="connection">The connection.</param>
+    /// <param name="where">The where criteria.</param>
+    /// <param name="cancellationToken">The cancellation token.</param>
+    /// <returns>A task representing the asynchronous operation. The task result is the number of records matching the specified criteria.</returns>
+    public static async Task<int> CountAsync<TRow>(this IDbConnection connection, ICriteria where, CancellationToken cancellationToken = default)
+        where TRow : class, IRow, new()
+    {
+        if (connection is IRowOperationInterceptor interceptor &&
+            interceptor.ListRows(typeof(TRow), where, editQuery: null, countOnly: true) is { HasValue: true } intres)
+            return intres.Value?.Count ?? 0;
+
+        var row = new TRow() { TrackWithChecks = true };
+
+        return Convert.ToInt32(await SqlHelper.ExecuteScalarAsync(connection,
+            new SqlQuery().From(row)
+                .Select(Sql.Count())
+                .Where(where),
+            cancellationToken: cancellationToken).ConfigureAwait(false));
+    }
+
+    /// <summary>
     /// Checks if the record with specified ID exists.
     /// </summary>
     /// <typeparam name="TRow">The type of the row.</typeparam>
@@ -330,6 +650,29 @@ public static class EntityConnectionExtensions
     }
 
     /// <summary>
+    /// Asynchronously checks if the record with specified ID exists.
+    /// </summary>
+    /// <typeparam name="TRow">The type of the row.</typeparam>
+    /// <param name="connection">The connection.</param>
+    /// <param name="id">The identifier.</param>
+    /// <param name="cancellationToken">The cancellation token.</param>
+    /// <returns>A task representing the asynchronous operation. The task result is true if the record exists.</returns>
+    public static async Task<bool> ExistsByIdAsync<TRow>(this IDbConnection connection, object id, CancellationToken cancellationToken = default)
+        where TRow : class, IRow, IIdRow, new()
+    {
+        if (connection is IRowOperationInterceptor interceptor &&
+            interceptor.FindRow(typeof(TRow), id, where: null, editQuery: null, byIdOrSingle: false) is { HasValue: true } intres)
+            return intres.Value != null;
+
+        var row = new TRow();
+        return await new SqlQuery()
+                .From(row)
+                .Select("1")
+                .Where(new Criteria(row.IdField) == new ValueCriteria(id))
+                .ExistsAsync(connection, cancellationToken: cancellationToken).ConfigureAwait(false);
+    }
+
+    /// <summary>
     /// Checks if record matching specified criteria exists.
     /// </summary>
     /// <typeparam name="TRow">The type of the row.</typeparam>
@@ -348,6 +691,28 @@ public static class EntityConnectionExtensions
                 .Select("1")
                 .Where(where)
                 .Exists(connection);
+    }
+
+    /// <summary>
+    /// Asynchronously checks if record matching specified criteria exists.
+    /// </summary>
+    /// <typeparam name="TRow">The type of the row.</typeparam>
+    /// <param name="connection">The connection.</param>
+    /// <param name="where">The where criteria.</param>
+    /// <param name="cancellationToken">The cancellation token.</param>
+    /// <returns>A task representing the asynchronous operation. The task result is true if a record matching the criteria exists.</returns>
+    public static async Task<bool> ExistsAsync<TRow>(this IDbConnection connection, ICriteria where, CancellationToken cancellationToken = default)
+        where TRow : class, IRow, new()
+    {
+        if (connection is IRowOperationInterceptor interceptor &&
+            interceptor.FindRow(typeof(TRow), id: default, where: null, editQuery: null, byIdOrSingle: false) is { HasValue: true } intres)
+            return intres.Value != null;
+
+        var row = new TRow() { TrackWithChecks = true };
+        return await new SqlQuery().From(row)
+                .Select("1")
+                .Where(where)
+                .ExistsAsync(connection, cancellationToken: cancellationToken).ConfigureAwait(false);
     }
 
     /// <summary>
@@ -411,6 +776,69 @@ public static class EntityConnectionExtensions
     }
 
     /// <summary>
+    /// Asynchronously lists all records. This method selects only the table fields,
+    /// and no foreign / calculated fields. Use other overloads if you want to 
+    /// select different set of fields.
+    /// </summary>
+    /// <typeparam name="TRow">The type of the row.</typeparam>
+    /// <param name="connection">The connection.</param>
+    /// <param name="cancellationToken">The cancellation token.</param>
+    /// <returns>A task representing the asynchronous operation. The task result is all records.</returns>
+    public static Task<List<TRow>> ListAsync<TRow>(this IDbConnection connection, CancellationToken cancellationToken = default)
+        where TRow : class, IRow, new()
+    {
+        return connection.ListAsync<TRow>((Criteria)null, cancellationToken);
+    }
+
+    /// <summary>
+    /// Asynchronously lists the records matching specified where criteria.
+    /// This method selects only the table fields, and no foreign / calculated fields. 
+    /// Use other overloads if you want to select different set of fields.
+    /// </summary>
+    /// <typeparam name="TRow">The type of the row.</typeparam>
+    /// <param name="connection">The connection.</param>
+    /// <param name="where">The where criteria.</param>
+    /// <param name="cancellationToken">The cancellation token.</param>
+    /// <returns>A task representing the asynchronous operation. The task result is the records matching the specified criteria.</returns>
+    public static async Task<List<TRow>> ListAsync<TRow>(this IDbConnection connection, ICriteria where, CancellationToken cancellationToken = default)
+        where TRow : class, IRow, new()
+    {
+        if (connection is IRowOperationInterceptor interceptor &&
+            interceptor.ListRows(typeof(TRow), where, editQuery: null, countOnly: false) is { HasValue: true } intres)
+            return (List<TRow>)intres.Value;
+
+        var row = new TRow() { TrackWithChecks = true };
+        return await new SqlQuery().From(row)
+                .SelectTableFields()
+                .Where(where)
+                .ListAsync(connection, row, cancellationToken).ConfigureAwait(false);
+    }
+
+    /// <summary>
+    /// Asynchronously lists the records, allowing the caller to specify criteria and 
+    /// set of fields to select through an editQuery callback.
+    /// </summary>
+    /// <typeparam name="TRow">The type of the row.</typeparam>
+    /// <param name="connection">The connection.</param>
+    /// <param name="editQuery">The edit query callback.</param>
+    /// <param name="cancellationToken">The cancellation token.</param>
+    /// <returns>A task representing the asynchronous operation. The task result is the list of records matching the edited query.</returns>
+    public static async Task<List<TRow>> ListAsync<TRow>(this IDbConnection connection, Action<SqlQuery> editQuery, CancellationToken cancellationToken = default)
+        where TRow : class, IRow, new()
+    {
+        if (connection is IRowOperationInterceptor interceptor &&
+            interceptor.ListRows(typeof(TRow), where: null, editQuery, countOnly: false) is { HasValue: true } intres)
+            return (List<TRow>)intres.Value;
+
+        var row = new TRow() { TrackWithChecks = true };
+        var query = new SqlQuery().From(row);
+
+        editQuery(query);
+
+        return await query.ListAsync(connection, row, cancellationToken).ConfigureAwait(false);
+    }
+
+    /// <summary>
     /// Inserts the specified entity. Note that this operates at a low level,
     /// it does not perform any validation or permission check, and does not call service behaviors / handlers.
     /// </summary>
@@ -425,6 +853,25 @@ public static class EntityConnectionExtensions
             return;
 
         ToSqlInsert(row).Execute(connection);
+    }
+
+    /// <summary>
+    /// Asynchronously inserts the specified entity. Note that this operates at a low level,
+    /// it does not perform any validation or permission check, and does not call service behaviors / handlers.
+    /// </summary>
+    /// <typeparam name="TRow">The type of the row.</typeparam>
+    /// <param name="connection">The connection.</param>
+    /// <param name="row">The row.</param>
+    /// <param name="cancellationToken">The cancellation token.</param>
+    /// <returns>A task that represents the asynchronous operation.</returns>
+    public static async Task InsertAsync<TRow>(this IDbConnection connection, TRow row, CancellationToken cancellationToken = default)
+        where TRow : IRow
+    {
+        if (connection is IRowOperationInterceptor interceptor &&
+            interceptor.ManipulateRow(typeof(TRow), id: default, row, ExpectedRows.Ignore, getNewId: false) is { HasValue: true })
+            return;
+
+        await ToSqlInsert(row).ExecuteAsync(connection, cancellationToken: cancellationToken).ConfigureAwait(false);
     }
 
     /// <summary>
@@ -444,6 +891,26 @@ public static class EntityConnectionExtensions
             return intres.Value;
 
         return ToSqlInsert(row).ExecuteAndGetID(connection);
+    }
+
+    /// <summary>
+    /// Asynchronously inserts the specified entity and returns the ID of record inserted.
+    /// Only works for identity columns of integer type. Note that this operates at a low level,
+    /// it does not perform any validation or permission check and does not call service behaviors / handlers.
+    /// </summary>
+    /// <typeparam name="TRow">The type of the row.</typeparam>
+    /// <param name="connection">The connection.</param>
+    /// <param name="row">The row.</param>
+    /// <param name="cancellationToken">The cancellation token.</param>
+    /// <returns>A task representing the asynchronous operation. The task result is the ID of the record inserted.</returns>
+    public static async Task<long?> InsertAndGetIDAsync<TRow>(this IDbConnection connection, TRow row, CancellationToken cancellationToken = default)
+        where TRow : IRow
+    {
+        if (connection is IRowOperationInterceptor interceptor &&
+            interceptor.ManipulateRow(typeof(TRow), id: default, row, ExpectedRows.Ignore, getNewId: true) is { HasValue: true } intres)
+            return intres.Value;
+
+        return await ToSqlInsert(row).ExecuteAndGetIDAsync(connection, cancellationToken: cancellationToken).ConfigureAwait(false);
     }
 
     /// <summary>
@@ -474,6 +941,35 @@ public static class EntityConnectionExtensions
     }
 
     /// <summary>
+    /// Asynchronously updates the entity by its identifier. Note that this operates at a low level,
+    /// it does not perform any validation or permission check and does not call service behaviors / handlers.
+    /// </summary>
+    /// <typeparam name="TRow">The type of the row.</typeparam>
+    /// <param name="connection">The connection.</param>
+    /// <param name="row">The row.</param>
+    /// <param name="expectedRows">The expected number of rows to be updated, by default 1.</param>
+    /// <param name="cancellationToken">The cancellation token.</param>
+    /// <returns>A task representing the asynchronous operation. The task result is the number of updated rows.</returns>
+    /// <exception cref="InvalidOperationException">ID field of the row has a null value!</exception>
+    /// <exception cref="InvalidOperationException">Expected rows and number of updated rows do not match!</exception>
+    public static async Task<int> UpdateByIdAsync<TRow>(this IDbConnection connection, TRow row, ExpectedRows expectedRows = ExpectedRows.One, CancellationToken cancellationToken = default)
+        where TRow : IIdRow
+    {
+        var idField = row.IdField;
+        var r = (IRow)(object)row;
+
+        if (idField.IsNull(r))
+            throw new InvalidOperationException("ID field of row has null value!");
+
+        if (connection is IRowOperationInterceptor interceptor &&
+            interceptor.ManipulateRow(typeof(TRow), id: idField.AsObject(row), row, expectedRows, getNewId: false) is { HasValue: true } intres)
+            return (int)intres.Value;
+
+        return await row.ToSqlUpdateById()
+            .ExecuteAsync(connection, expectedRows, cancellationToken: cancellationToken).ConfigureAwait(false);
+    }
+
+    /// <summary>
     /// Deletes the entity by its identifier. Note that this operates at a low level,
     /// it does not perform any validation or permission check and does not call service behaviors / handlers.
     /// </summary>
@@ -494,6 +990,30 @@ public static class EntityConnectionExtensions
         return new SqlDelete(row.Table)
             .Where(row.IdField == new ValueCriteria(id))
             .Execute(connection, expectedRows);
+    }
+
+    /// <summary>
+    /// Asynchronously deletes the entity by its identifier. Note that this operates at a low level,
+    /// it does not perform any validation or permission check and does not call service behaviors / handlers.
+    /// </summary>
+    /// <typeparam name="TRow">The type of the row.</typeparam>
+    /// <param name="connection">The connection.</param>
+    /// <param name="id">The identifier.</param>
+    /// <param name="expectedRows">The expected number of rows to be deleted, 1 by default.</param>
+    /// <param name="cancellationToken">The cancellation token.</param>
+    /// <returns>A task representing the asynchronous operation. The task result is the number of deleted rows.</returns>
+    /// <exception cref="InvalidOperationException">Expected rows and number of deleted rows do not match!</exception>
+    public static async Task<int> DeleteByIdAsync<TRow>(this IDbConnection connection, object id, ExpectedRows expectedRows = ExpectedRows.One, CancellationToken cancellationToken = default)
+        where TRow : class, IRow, IIdRow, new()
+    {
+        if (connection is IRowOperationInterceptor interceptor &&
+            interceptor.ManipulateRow(typeof(TRow), id, row: null, expectedRows, getNewId: false) is { HasValue: true } intres)
+            return (int)intres.Value;
+
+        var row = new TRow();
+        return await new SqlDelete(row.Table)
+            .Where(row.IdField == new ValueCriteria(id))
+            .ExecuteAsync(connection, expectedRows, cancellationToken: cancellationToken).ConfigureAwait(false);
     }
 
     /// <summary>

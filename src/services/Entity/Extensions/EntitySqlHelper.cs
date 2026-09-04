@@ -45,6 +45,61 @@ public static class EntitySqlHelper
     }
 
     /// <summary>
+    /// Gets the first entity returned by executing the query asynchronously.
+    /// The result is loaded into the loader row of the query.
+    /// </summary>
+    /// <param name="query">The query.</param>
+    /// <param name="connection">The connection.</param>
+    /// <param name="cancellationToken">The cancellation token.</param>
+    /// <returns>A task that represents the asynchronous operation. The task result is true if any rows were returned.</returns>
+    public static async Task<bool> GetFirstAsync(this SqlQuery query, IDbConnection connection, CancellationToken cancellationToken = default)
+    {
+        using var reader = await query.ExecuteReaderAsync(connection, cancellationToken: cancellationToken).ConfigureAwait(false);
+        if (!await ReadAsync(reader, cancellationToken).ConfigureAwait(false))
+            return false;
+
+        query.GetFromReader(reader);
+        return true;
+    }
+
+    /// <summary>
+    /// Reads the next record from the data reader asynchronously, falling back to synchronous read
+    /// for readers that do not support async operations.
+    /// </summary>
+    /// <param name="reader">The data reader.</param>
+    /// <param name="cancellationToken">The cancellation token.</param>
+    /// <returns>A task that represents the asynchronous operation. The task result is true if there is another row to read.</returns>
+    private static async Task<bool> ReadAsync(IDataReader reader, CancellationToken cancellationToken)
+    {
+        if (reader is System.Data.Common.DbDataReader dbReader)
+            return await dbReader.ReadAsync(cancellationToken).ConfigureAwait(false);
+        return reader.Read();
+    }
+
+    /// <summary>
+    /// Gets the single entity returned by executing the query asynchronously.
+    /// The values are loaded into the loader row of the query.
+    /// </summary>
+    /// <param name="query">The query.</param>
+    /// <param name="connection">The connection.</param>
+    /// <param name="cancellationToken">The cancellation token.</param>
+    /// <returns>A task that represents the asynchronous operation. The task result is true if any results were returned from the data reader.</returns>
+    /// <exception cref="InvalidOperationException">Query returned more than one result!</exception>
+    public static async Task<bool> GetSingleAsync(this SqlQuery query, IDbConnection connection, CancellationToken cancellationToken = default)
+    {
+        using IDataReader reader = await query.ExecuteReaderAsync(connection, cancellationToken: cancellationToken).ConfigureAwait(false);
+        if (!await ReadAsync(reader, cancellationToken).ConfigureAwait(false))
+            return false;
+
+        query.GetFromReader(reader);
+
+        if (await ReadAsync(reader, cancellationToken).ConfigureAwait(false))
+            throw new InvalidOperationException("Query returned more than one result!");
+
+        return true;
+    }
+
+    /// <summary>
     /// Executes the specified callback for all rows returned from executing the query.
     /// </summary>
     /// <param name="query">The query.</param>
@@ -115,6 +170,101 @@ public static class EntitySqlHelper
             list.Add(loaderRow.Clone());
         });
         return list;
+    }
+
+    /// <summary>
+    /// Asynchronously lists the rows returned from executing the query.
+    /// </summary>
+    /// <typeparam name="TRow">The type of the row.</typeparam>
+    /// <param name="query">The query.</param>
+    /// <param name="connection">The connection.</param>
+    /// <param name="loaderRow">The loader row.</param>
+    /// <param name="cancellationToken">The cancellation token.</param>
+    /// <returns>A task representing the asynchronous operation. The task result is the list of rows.</returns>
+    public static async Task<List<TRow>> ListAsync<TRow>(this SqlQuery query,
+        IDbConnection connection, TRow loaderRow = null, CancellationToken cancellationToken = default) where TRow : class, IRow
+    {
+        var list = new List<TRow>();
+
+        using var reader = await query.ExecuteReaderAsync(connection, cancellationToken: cancellationToken).ConfigureAwait(false);
+        while (await ReadAsync(reader, cancellationToken).ConfigureAwait(false))
+        {
+            query.GetFromReader(reader);
+            list.Add(loaderRow.Clone());
+        }
+
+        return list;
+    }
+
+    /// <summary>
+    /// Moves the data reader to the next result set asynchronously, falling back to synchronous
+    /// movement for readers that do not support async operations.
+    /// </summary>
+    /// <param name="reader">The data reader.</param>
+    /// <param name="cancellationToken">The cancellation token.</param>
+    /// <returns>A task that represents the asynchronous operation. The task result is true if there are more result sets.</returns>
+    private static async Task<bool> NextResultAsync(IDataReader reader, CancellationToken cancellationToken)
+    {
+        if (reader is System.Data.Common.DbDataReader dbReader)
+            return await dbReader.NextResultAsync(cancellationToken).ConfigureAwait(false);
+        return reader.NextResult();
+    }
+
+    /// <summary>
+    /// Asynchronously executes the specified callback for all rows returned from executing the query.
+    /// </summary>
+    /// <param name="query">The query.</param>
+    /// <param name="connection">The connection.</param>
+    /// <param name="callBack">The call back.</param>
+    /// <param name="cancellationToken">The cancellation token.</param>
+    /// <returns>A task representing the asynchronous operation. The task result is the number of returned results.</returns>
+    public static Task<int> ForEachAsync(this SqlQuery query, IDbConnection connection,
+        Action callBack, CancellationToken cancellationToken = default)
+    {
+        return ForEachAsync(query, connection, _ => callBack(), cancellationToken);
+    }
+
+    /// <summary>
+    /// Asynchronously executes the specified data reader callback for all rows returned from executing the query.
+    /// </summary>
+    /// <param name="query">The query.</param>
+    /// <param name="connection">The connection.</param>
+    /// <param name="callback">The call back.</param>
+    /// <param name="cancellationToken">The cancellation token.</param>
+    /// <returns>A task representing the asynchronous operation. The task result is the number of returned results.</returns>
+    public static async Task<int> ForEachAsync(this SqlQuery query, IDbConnection connection,
+        Action<IDataReader> callback, CancellationToken cancellationToken = default)
+    {
+        int count = 0;
+
+        if (connection.GetDialect().MultipleResultsets)
+        {
+            using IDataReader reader = await query.ExecuteReaderAsync(connection, cancellationToken: cancellationToken).ConfigureAwait(false);
+            while (await ReadAsync(reader, cancellationToken).ConfigureAwait(false))
+            {
+                query.GetFromReader(reader);
+                callback(reader);
+            }
+
+            if (query.CountRecords && await NextResultAsync(reader, cancellationToken).ConfigureAwait(false) &&
+                await ReadAsync(reader, cancellationToken).ConfigureAwait(false))
+                return Convert.ToInt32(reader.GetValue(0));
+        }
+        else
+        {
+            string[] queries = query.ToString().Split(["\n---\n"], StringSplitOptions.RemoveEmptyEntries);
+            if (queries.Length > 1)
+                count = Convert.ToInt32(await SqlHelper.ExecuteScalarAsync(connection, queries[1], query.Params, cancellationToken: cancellationToken).ConfigureAwait(false));
+
+            using IDataReader reader = await SqlHelper.ExecuteReaderAsync(connection, queries[0], query.Params, cancellationToken: cancellationToken).ConfigureAwait(false);
+            while (await ReadAsync(reader, cancellationToken).ConfigureAwait(false))
+            {
+                query.GetFromReader(reader);
+                callback(reader);
+            }
+        }
+
+        return count;
     }
 
     /// <summary>
