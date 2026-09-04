@@ -1,23 +1,20 @@
+using System.Data.Common;
+
 namespace Serenity.TestUtils;
 
-internal class MockDbTransaction(IDbConnection dbConnection) : IDbTransaction
+internal class MockDbTransaction(IDbConnection dbConnection) : DbTransaction
 {
     private readonly IDbConnection dbConnection = dbConnection ?? throw new ArgumentNullException(nameof(dbConnection));
 
-    public IDbConnection Connection => dbConnection;
+    public override IsolationLevel IsolationLevel => throw new NotImplementedException();
 
-    public IsolationLevel IsolationLevel => throw new NotImplementedException();
+    protected override DbConnection DbConnection => (DbConnection)dbConnection;
 
-
-    public void Commit()
+    public override void Commit()
     {
     }
 
-    public void Dispose()
-    {
-    }
-
-    public void Rollback()
+    public override void Rollback()
     {
     }
 }

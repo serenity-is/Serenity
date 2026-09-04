@@ -3,39 +3,37 @@ using System.Data.Common;
 
 namespace Serenity.TestUtils;
 
-public class MockDbConnection : IDbConnection, IRowOperationInterceptor, ISqlOperationInterceptor, IHasDialect
+public class MockDbConnection : DbConnection, IRowOperationInterceptor, ISqlOperationInterceptor, IHasDialect
 {
-    public virtual string ConnectionString { get; set; }
-    public virtual int ConnectionTimeout { get; set; }
-    public virtual string Database { get; set; }
-    public virtual ConnectionState State { get; set; }
+    private ConnectionState state = ConnectionState.Closed;
+    public override string ConnectionString { get; set; }
+    public override int ConnectionTimeout => 0;
+    public override string Database => string.Empty;
+    public override string DataSource => throw new NotImplementedException();
+    public override string ServerVersion => throw new NotImplementedException();
+    public override ConnectionState State => state;
 
     public MockDbConnection()
     {
-        State = ConnectionState.Closed;
+        state = ConnectionState.Closed;
     }
 
-    public virtual IDbTransaction BeginTransaction()
+    protected override DbTransaction BeginDbTransaction(IsolationLevel isolationLevel)
     {
         return new MockDbTransaction(this);
     }
 
-    public virtual IDbTransaction BeginTransaction(IsolationLevel il)
-    {
-        return new MockDbTransaction(this);
-    }
-
-    public virtual void ChangeDatabase(string databaseName)
+    public override void ChangeDatabase(string databaseName)
     {
         throw new NotImplementedException();
     }
 
-    public virtual void Close()
+    public override void Close()
     {
-        State = ConnectionState.Closed;
+        state = ConnectionState.Closed;
     }
 
-    public virtual IDbCommand CreateCommand()
+    protected override DbCommand CreateDbCommand()
     {
         var command = new MockDbCommand(this);
 
@@ -58,6 +56,7 @@ public class MockDbConnection : IDbConnection, IRowOperationInterceptor, ISqlOpe
         return command;
     }
 
+    public int OpenCalls { get; protected set; }
     public int DbCommandExecuteReaderCallCount { get; protected set; } = 0;
     public int DbCommandExecuteNonQueryCallCount { get; protected set; } = 0;
     public int DbCommandCallCount => DbCommandExecuteReaderCallCount + DbCommandExecuteNonQueryCallCount;
@@ -77,17 +76,20 @@ public class MockDbConnection : IDbConnection, IRowOperationInterceptor, ISqlOpe
         return this;
     }
 
-    public virtual void Dispose()
+    protected override void Dispose(bool disposing)
     {
-        Close();
-        GC.SuppressFinalize(this);
+        if (disposing)
+            Close();
+        base.Dispose(disposing);
     }
 
-    public virtual void Open()
+    public override void Open()
     {
-        if (State != ConnectionState.Closed &&
-            State != ConnectionState.Broken)
+        if (state != ConnectionState.Closed &&
+            state != ConnectionState.Broken)
             throw new InvalidOperationException("The connection is already open!");
+        state = ConnectionState.Open;
+        OpenCalls++;
     }
 
 

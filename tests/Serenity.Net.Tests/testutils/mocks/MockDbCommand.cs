@@ -2,28 +2,24 @@ using System.Data.Common;
 
 namespace Serenity.TestUtils;
 
-public class MockDbCommand(IDbConnection connection = null) : IDbCommand
+public class MockDbCommand(IDbConnection connection = null) : DbCommand
 {
-    public string CommandText { get; set; }
-    public int CommandTimeout { get; set; }
-    public CommandType CommandType { get; set; }
-    public IDbConnection Connection { get; set; } = connection;
-    public IDataParameterCollection Parameters { get; init; } = new MockDbParameterCollection();
-    public IDbTransaction Transaction { get; set; }
-    public UpdateRowSource UpdatedRowSource { get; set; }
+    public override string CommandText { get; set; }
+    public override int CommandTimeout { get; set; }
+    public override CommandType CommandType { get; set; }
+    public override bool DesignTimeVisible { get; set; }
+    public override UpdateRowSource UpdatedRowSource { get; set; }
+    protected override DbConnection DbConnection { get => (DbConnection)connection; set => connection = value; }
+    protected override DbParameterCollection DbParameterCollection { get; } = new MockDbParameterCollection();
+    protected override DbTransaction DbTransaction { get; set; }
 
-    public void Cancel()
+    public override void Cancel()
     {
     }
 
-    public IDbDataParameter CreateParameter()
+    protected override DbParameter CreateDbParameter()
     {
         return new MockDbParameter();
-    }
-
-    public void Dispose()
-    {
-        GC.SuppressFinalize(this);
     }
 
     public MockDbCommand OnExecuteNonQuery(Func<int> func)
@@ -34,7 +30,7 @@ public class MockDbCommand(IDbConnection connection = null) : IDbCommand
 
     protected Func<int> onExecuteNonQuery;
 
-    public int ExecuteNonQuery()
+    public override int ExecuteNonQuery()
     {
         if (onExecuteNonQuery != null)
             return onExecuteNonQuery();
@@ -50,7 +46,7 @@ public class MockDbCommand(IDbConnection connection = null) : IDbCommand
 
     protected Func<DbDataReader> onExecuteReader;
 
-    public IDataReader ExecuteReader()
+    protected override DbDataReader ExecuteDbDataReader(CommandBehavior behavior)
     {
         if (onExecuteReader != null)
             return onExecuteReader();
@@ -58,17 +54,12 @@ public class MockDbCommand(IDbConnection connection = null) : IDbCommand
         throw new NotImplementedException();
     }
 
-    public IDataReader ExecuteReader(CommandBehavior behavior)
-    {
-        return ExecuteReader();
-    }
-
-    public object ExecuteScalar()
+    public override object ExecuteScalar()
     {
         throw new NotImplementedException();
     }
 
-    public void Prepare()
+    public override void Prepare()
     {
     }
 }
