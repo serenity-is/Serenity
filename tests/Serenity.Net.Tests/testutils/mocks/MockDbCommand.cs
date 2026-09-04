@@ -54,8 +54,19 @@ public class MockDbCommand(IDbConnection connection = null) : DbCommand
         throw new NotImplementedException();
     }
 
+    public MockDbCommand OnExecuteScalar(Func<object> func)
+    {
+        onExecuteScalar = func;
+        return this;
+    }
+
+    protected Func<object> onExecuteScalar;
+
     public override object ExecuteScalar()
     {
+        if (onExecuteScalar != null)
+            return onExecuteScalar();
+
         throw new NotImplementedException();
     }
 

@@ -53,16 +53,27 @@ public class MockDbConnection : DbConnection, IRowOperationInterceptor, ISqlOper
             });
         }
 
+        if (onDbCommandExecuteScalar != null)
+        {
+            command.OnExecuteScalar(() =>
+            {
+                DbCommandExecuteScalarCallCount++;
+                return onDbCommandExecuteScalar(command);
+            });
+        }
+
         return command;
     }
 
     public int OpenCalls { get; protected set; }
     public int DbCommandExecuteReaderCallCount { get; protected set; } = 0;
     public int DbCommandExecuteNonQueryCallCount { get; protected set; } = 0;
-    public int DbCommandCallCount => DbCommandExecuteReaderCallCount + DbCommandExecuteNonQueryCallCount;
+    public int DbCommandExecuteScalarCallCount { get; protected set; } = 0;
+    public int DbCommandCallCount => DbCommandExecuteReaderCallCount + DbCommandExecuteNonQueryCallCount + DbCommandExecuteScalarCallCount;
 
     protected Func<MockDbCommand, DbDataReader> onDbCommandExecuteReader;
     protected Func<MockDbCommand, int> onDbCommandExecuteNonQuery;
+    protected Func<MockDbCommand, object> onDbCommandExecuteScalar;
 
     public MockDbConnection OnDbCommandExecuteReader(Func<MockDbCommand, DbDataReader> func)
     {
@@ -73,6 +84,12 @@ public class MockDbConnection : DbConnection, IRowOperationInterceptor, ISqlOper
     public MockDbConnection OnDbCommandExecuteNonQuery(Func<MockDbCommand, int> func)
     {
         onDbCommandExecuteNonQuery = func;
+        return this;
+    }
+
+    public MockDbConnection OnDbCommandExecuteScalar(Func<MockDbCommand, object> func)
+    {
+        onDbCommandExecuteScalar = func;
         return this;
     }
 

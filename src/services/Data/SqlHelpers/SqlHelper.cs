@@ -1017,7 +1017,7 @@ public static class SqlHelper
 
         string commandText = query.ToString();
         if (connection is ISqlOperationInterceptor interceptor &&
-            interceptor.ExecuteReader(commandText, query.Params, query) is { HasValue: true } intres)
+            interceptor.ExecuteScalar(commandText, query.Params, query) is { HasValue: true } intres)
             return intres.Value;
 
         return InternalExecuteScalar(connection, commandText, query.Params, logger);
@@ -1038,7 +1038,7 @@ public static class SqlHelper
 
         string commandText = query.ToString();
         if (connection is ISqlOperationInterceptor interceptor &&
-            interceptor.ExecuteReader(commandText, query.Params, query) is { HasValue: true } intres)
+            interceptor.ExecuteScalar(commandText, query.Params, query) is { HasValue: true } intres)
             return intres.Value;
 
         return await InternalExecuteScalarAsync(connection, commandText, query.Params, logger, cancellationToken).ConfigureAwait(false);
