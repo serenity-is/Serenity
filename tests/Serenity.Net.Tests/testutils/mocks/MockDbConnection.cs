@@ -196,9 +196,9 @@ public class MockDbConnection : DbConnection, IRowOperationInterceptor, ISqlOper
         return interceptExecuteReader?.Invoke(args) ?? default;
     }
 
-    protected Func<InterceptExecuteScalarArgs, OptionalValue<IDataReader>> interceptExecuteScalar;
+    protected Func<InterceptExecuteScalarArgs, OptionalValue<object>> interceptExecuteScalar;
 
-    public MockDbConnection InterceptExecuteScalar(Func<InterceptExecuteScalarArgs, OptionalValue<IDataReader>> callback)
+    public MockDbConnection InterceptExecuteScalar(Func<InterceptExecuteScalarArgs, OptionalValue<object>> callback)
     {
         interceptExecuteScalar = callback;
         return this;
