@@ -1,4 +1,6 @@
-﻿namespace Serenity.Data;
+﻿using System.Data.Common;
+
+namespace Serenity.Data;
 
 /// <summary>
 /// Extension methods for <see cref="IDataReader"/> objects.
@@ -171,5 +173,41 @@ public static class DataReaderExtensions
             return null;
 
         return Convert.ToString(reader.GetValue(index));
+    }
+
+    /// <summary>
+    /// Asynchronously advances the data reader to the next record, using the native
+    /// <see cref="DbDataReader.ReadAsync(CancellationToken)"/> when available, and falling
+    /// back to a synchronous <see cref="IDataReader.Read"/> for readers that do not
+    /// support async operations.
+    /// </summary>
+    /// <param name="reader">The data reader.</param>
+    /// <param name="cancellationToken">The cancellation token.</param>
+    /// <returns>A task that represents the asynchronous operation. The task result is true if there is another row to read.</returns>
+    public static async Task<bool> ReadAsync(this IDataReader reader, CancellationToken cancellationToken = default)
+    {
+        ArgumentNullException.ThrowIfNull(reader);
+
+        if (reader is DbDataReader dbReader)
+            return await dbReader.ReadAsync(cancellationToken).ConfigureAwait(false);
+        return reader.Read();
+    }
+
+    /// <summary>
+    /// Asynchronously advances the data reader to the next result set, using the native
+    /// <see cref="DbDataReader.NextResultAsync(CancellationToken)"/> when available, and falling
+    /// back to a synchronous <see cref="IDataReader.NextResult"/> for readers that do not
+    /// support async operations.
+    /// </summary>
+    /// <param name="reader">The data reader.</param>
+    /// <param name="cancellationToken">The cancellation token.</param>
+    /// <returns>A task that represents the asynchronous operation. The task result is true if there are more result sets.</returns>
+    public static async Task<bool> NextResultAsync(this IDataReader reader, CancellationToken cancellationToken = default)
+    {
+        ArgumentNullException.ThrowIfNull(reader);
+
+        if (reader is DbDataReader dbReader)
+            return await dbReader.NextResultAsync(cancellationToken).ConfigureAwait(false);
+        return reader.NextResult();
     }
 }

@@ -195,6 +195,49 @@ public static class SqlHelper
     /// <returns>True if exception is 10054, e.g. connection pool.</returns>
     private static bool CheckConnectionPoolException(IDbConnection connection, Exception exception)
     {
+        if (!CheckConnectionPoolExceptionCore(connection, exception))
+            return false;
+
+        connection.Close();
+        connection.Open();
+        return true;
+    }
+
+    /// <summary>
+    /// Checks for the connection pool exception asynchronously.
+    /// </summary>
+    /// <param name="connection">The connection.</param>
+    /// <param name="exception">The exception.</param>
+    /// <param name="cancellationToken">The cancellation token.</param>
+    /// <returns>A task that represents the asynchronous operation. The task result is true if exception is 10054, e.g. connection pool.</returns>
+    private static async Task<bool> CheckConnectionPoolExceptionAsync(IDbConnection connection, Exception exception, CancellationToken cancellationToken = default)
+    {
+        if (!CheckConnectionPoolExceptionCore(connection, exception))
+            return false;
+
+        if (connection is System.Data.Common.DbConnection dbConnection)
+        {
+            await dbConnection.CloseAsync().ConfigureAwait(false);
+            await dbConnection.OpenAsync(cancellationToken).ConfigureAwait(false);
+        }
+        else
+        {
+            connection.Close();
+            connection.Open();
+        }
+        return true;
+    }
+
+    /// <summary>
+    /// Clears the connection pool and returns true if the exception is a connection pool
+    /// exception (e.g. error 10054). The caller should close and reopen the connection
+    /// when this returns true.
+    /// </summary>
+    /// <param name="connection">The connection.</param>
+    /// <param name="exception">The exception.</param>
+    /// <returns>True if exception is 10054, e.g. connection pool.</returns>
+    private static bool CheckConnectionPoolExceptionCore(IDbConnection connection, Exception exception)
+    {
         var exceptionType = exception.GetType();
 
         if ((connection is IHasOpenedOnce hoo && hoo.OpenedOnce) ||
@@ -208,8 +251,6 @@ public static class SqlHelper
             var sqlConnectionType = exceptionType.Assembly.GetType(exceptionType.FullName.Replace("Exception", "Connection"));
             var clearAllPools = sqlConnectionType?.GetMethod("ClearAllPools", BindingFlags.Static | BindingFlags.Public);
             clearAllPools?.Invoke(null, null);
-            connection.Close();
-            connection.Open();
             return true;
         }
 
@@ -286,9 +327,11 @@ public static class SqlHelper
 
     private static Task<int> ExecuteNonQueryAsync(IDbCommand command, CancellationToken cancellationToken)
     {
-        return command is System.Data.Common.DbCommand dbCommand
-            ? dbCommand.ExecuteNonQueryAsync(cancellationToken)
-            : Task.Run(() => command.ExecuteNonQuery(), cancellationToken);
+        if (command is System.Data.Common.DbCommand dbCommand)
+            return dbCommand.ExecuteNonQueryAsync(cancellationToken);
+
+        cancellationToken.ThrowIfCancellationRequested();
+        return Task.FromResult(command.ExecuteNonQuery());
     }
 
     /// <summary>
@@ -324,7 +367,7 @@ public static class SqlHelper
             }
             catch (Exception ex)
             {
-                if (CheckConnectionPoolException(command.Connection, ex))
+                if (await CheckConnectionPoolExceptionAsync(command.Connection, ex, cancellationToken).ConfigureAwait(false))
                     return await ExecuteNonQueryAsync(command, cancellationToken).ConfigureAwait(false);
                 else
                     throw;
@@ -430,7 +473,7 @@ public static class SqlHelper
             queryText += ";\nSELECT " + dialect.ScopeIdentityExpression + " AS IDCOLUMNVALUE";
 
             using IDataReader reader = await InternalExecuteReaderAsync(connection, queryText, query.Params, logger, cancellationToken).ConfigureAwait(false);
-            return await ReadAsync(reader, cancellationToken).ConfigureAwait(false) ? ReadIdentityValue(reader) : null;
+            return await reader.ReadAsync(cancellationToken).ConfigureAwait(false) ? ReadIdentityValue(reader) : null;
         }
 
         throw new NotImplementedException();
@@ -770,14 +813,9 @@ public static class SqlHelper
     {
         if (command is System.Data.Common.DbCommand dbCommand)
             return await dbCommand.ExecuteReaderAsync(cancellationToken).ConfigureAwait(false);
-        return await Task.Run(() => command.ExecuteReader(), cancellationToken).ConfigureAwait(false);
-    }
 
-    private static async Task<bool> ReadAsync(IDataReader reader, CancellationToken cancellationToken)
-    {
-        if (reader is System.Data.Common.DbDataReader dbReader)
-            return await dbReader.ReadAsync(cancellationToken).ConfigureAwait(false);
-        return reader.Read();
+        cancellationToken.ThrowIfCancellationRequested();
+        return command.ExecuteReader();
     }
 
     private static async Task<IDataReader> InternalExecuteReaderAsync(IDbConnection connection, string commandText, IDictionary<string, object> param, ILogger logger, CancellationToken cancellationToken = default)
@@ -807,7 +845,7 @@ public static class SqlHelper
             }
             catch (Exception ex)
             {
-                if (CheckConnectionPoolException(connection, ex))
+                if (await CheckConnectionPoolExceptionAsync(connection, ex, cancellationToken).ConfigureAwait(false))
                     return await ExecuteReaderAsync(command, cancellationToken).ConfigureAwait(false);
                 else
                     throw;
@@ -939,9 +977,11 @@ public static class SqlHelper
 
     private static Task<object> ExecuteScalarAsync(IDbCommand command, CancellationToken cancellationToken)
     {
-        return command is System.Data.Common.DbCommand dbCommand
-            ? dbCommand.ExecuteScalarAsync(cancellationToken)
-            : Task.Run(() => command.ExecuteScalar(), cancellationToken);
+        if (command is System.Data.Common.DbCommand dbCommand)
+            return dbCommand.ExecuteScalarAsync(cancellationToken);
+
+        cancellationToken.ThrowIfCancellationRequested();
+        return Task.FromResult(command.ExecuteScalar());
     }
 
     private static async Task<object> InternalExecuteScalarAsync(IDbConnection connection, string commandText, IDictionary<string, object> param, ILogger logger, CancellationToken cancellationToken = default)
@@ -971,7 +1011,7 @@ public static class SqlHelper
             }
             catch (Exception ex)
             {
-                if (CheckConnectionPoolException(connection, ex))
+                if (await CheckConnectionPoolExceptionAsync(connection, ex, cancellationToken).ConfigureAwait(false))
                     return await ExecuteScalarAsync(command, cancellationToken).ConfigureAwait(false);
                 else
                     throw;
@@ -1068,6 +1108,6 @@ public static class SqlHelper
     public static async Task<bool> ExistsAsync(this SqlQuery query, IDbConnection connection, ILogger logger = null, CancellationToken cancellationToken = default)
     {
         using var reader = await ExecuteReaderAsync(query, connection, logger, cancellationToken).ConfigureAwait(false);
-        return await ReadAsync(reader, cancellationToken).ConfigureAwait(false);
+        return await reader.ReadAsync(cancellationToken).ConfigureAwait(false);
     }
 }

@@ -20,3 +20,4 @@ StyleCop.Cache
 /build/tools/Addins/
 package-lock.json
 tsconfig.tsbuildinfo
+/.com*/

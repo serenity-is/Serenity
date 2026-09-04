@@ -55,25 +55,11 @@ public static class EntitySqlHelper
     public static async Task<bool> GetFirstAsync(this SqlQuery query, IDbConnection connection, CancellationToken cancellationToken = default)
     {
         using var reader = await query.ExecuteReaderAsync(connection, cancellationToken: cancellationToken).ConfigureAwait(false);
-        if (!await ReadAsync(reader, cancellationToken).ConfigureAwait(false))
+        if (!await reader.ReadAsync(cancellationToken).ConfigureAwait(false))
             return false;
 
         query.GetFromReader(reader);
         return true;
-    }
-
-    /// <summary>
-    /// Reads the next record from the data reader asynchronously, falling back to synchronous read
-    /// for readers that do not support async operations.
-    /// </summary>
-    /// <param name="reader">The data reader.</param>
-    /// <param name="cancellationToken">The cancellation token.</param>
-    /// <returns>A task that represents the asynchronous operation. The task result is true if there is another row to read.</returns>
-    private static async Task<bool> ReadAsync(IDataReader reader, CancellationToken cancellationToken)
-    {
-        if (reader is System.Data.Common.DbDataReader dbReader)
-            return await dbReader.ReadAsync(cancellationToken).ConfigureAwait(false);
-        return reader.Read();
     }
 
     /// <summary>
@@ -88,12 +74,12 @@ public static class EntitySqlHelper
     public static async Task<bool> GetSingleAsync(this SqlQuery query, IDbConnection connection, CancellationToken cancellationToken = default)
     {
         using IDataReader reader = await query.ExecuteReaderAsync(connection, cancellationToken: cancellationToken).ConfigureAwait(false);
-        if (!await ReadAsync(reader, cancellationToken).ConfigureAwait(false))
+        if (!await reader.ReadAsync(cancellationToken).ConfigureAwait(false))
             return false;
 
         query.GetFromReader(reader);
 
-        if (await ReadAsync(reader, cancellationToken).ConfigureAwait(false))
+        if (await reader.ReadAsync(cancellationToken).ConfigureAwait(false))
             throw new InvalidOperationException("Query returned more than one result!");
 
         return true;
@@ -185,29 +171,11 @@ public static class EntitySqlHelper
         IDbConnection connection, TRow loaderRow = null, CancellationToken cancellationToken = default) where TRow : class, IRow
     {
         var list = new List<TRow>();
-
-        using var reader = await query.ExecuteReaderAsync(connection, cancellationToken: cancellationToken).ConfigureAwait(false);
-        while (await ReadAsync(reader, cancellationToken).ConfigureAwait(false))
+        await ForEachAsync(query, connection, delegate ()
         {
-            query.GetFromReader(reader);
             list.Add(loaderRow.Clone());
-        }
-
+        }, cancellationToken).ConfigureAwait(false);
         return list;
-    }
-
-    /// <summary>
-    /// Moves the data reader to the next result set asynchronously, falling back to synchronous
-    /// movement for readers that do not support async operations.
-    /// </summary>
-    /// <param name="reader">The data reader.</param>
-    /// <param name="cancellationToken">The cancellation token.</param>
-    /// <returns>A task that represents the asynchronous operation. The task result is true if there are more result sets.</returns>
-    private static async Task<bool> NextResultAsync(IDataReader reader, CancellationToken cancellationToken)
-    {
-        if (reader is System.Data.Common.DbDataReader dbReader)
-            return await dbReader.NextResultAsync(cancellationToken).ConfigureAwait(false);
-        return reader.NextResult();
     }
 
     /// <summary>
@@ -240,14 +208,14 @@ public static class EntitySqlHelper
         if (connection.GetDialect().MultipleResultsets)
         {
             using IDataReader reader = await query.ExecuteReaderAsync(connection, cancellationToken: cancellationToken).ConfigureAwait(false);
-            while (await ReadAsync(reader, cancellationToken).ConfigureAwait(false))
+            while (await reader.ReadAsync(cancellationToken).ConfigureAwait(false))
             {
                 query.GetFromReader(reader);
                 callback(reader);
             }
 
-            if (query.CountRecords && await NextResultAsync(reader, cancellationToken).ConfigureAwait(false) &&
-                await ReadAsync(reader, cancellationToken).ConfigureAwait(false))
+            if (query.CountRecords && await reader.NextResultAsync(cancellationToken).ConfigureAwait(false) &&
+                await reader.ReadAsync(cancellationToken).ConfigureAwait(false))
                 return Convert.ToInt32(reader.GetValue(0));
         }
         else
@@ -257,7 +225,7 @@ public static class EntitySqlHelper
                 count = Convert.ToInt32(await SqlHelper.ExecuteScalarAsync(connection, queries[1], query.Params, cancellationToken: cancellationToken).ConfigureAwait(false));
 
             using IDataReader reader = await SqlHelper.ExecuteReaderAsync(connection, queries[0], query.Params, cancellationToken: cancellationToken).ConfigureAwait(false);
-            while (await ReadAsync(reader, cancellationToken).ConfigureAwait(false))
+            while (await reader.ReadAsync(cancellationToken).ConfigureAwait(false))
             {
                 query.GetFromReader(reader);
                 callback(reader);
