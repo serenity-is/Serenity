@@ -6,43 +6,32 @@ namespace Serenity.Data;
 /// <summary>
 /// Wraps a connection to add current transaction and dialect support.
 /// </summary>
-/// <seealso cref="IDbConnection" />
-/// <remarks>
-/// Initializes a new instance of the <see cref="WrappedConnection"/> class.
-/// </remarks>
-/// <param name="connection">The actual connection.</param>
-/// <param name="dialect">The dialect.</param>
-/// <param name="logger">Optional logger for this connection (generally to be used by static SqlHelper methods)</param>
-public class WrappedConnection(IDbConnection connection, ISqlDialect dialect, ILogger logger = null) : IDbConnection, IHasActualConnection, IHasCommandTimeout, 
+/// <seealso cref="DbConnection" />
+public class WrappedConnection : DbConnection, IDbConnection, IHasActualConnection, IHasCommandTimeout,
     IHasCurrentTransaction, IHasDialect, IHasLogger, IHasOpenedOnce, IHasConnectionStateChange
 {
-    private readonly IDbConnection actualConnection = connection ?? throw new ArgumentNullException(nameof(connection));
+    private readonly IDbConnection actualConnection;
+    private ISqlDialect dialect;
+    private readonly ILogger logger;
     private bool openedOnce;
     private WrappedTransaction currentTransaction;
 
     /// <summary>
-    /// Implements state change event by proxying it to the actual connection
+    /// Initializes a new instance of the <see cref="WrappedConnection"/> class.
     /// </summary>
-    public event StateChangeEventHandler StateChange 
-    { 
-        add 
-        {
-            if (actualConnection is DbConnection dbConnection)
-                dbConnection.StateChange += value;
-            else if (actualConnection is IHasConnectionStateChange hasStateChange)
-                hasStateChange.StateChange += value;
-            else
-                throw new NotImplementedException();
-        } 
-        remove 
-        {
-            if (actualConnection is DbConnection dbConnection)
-                dbConnection.StateChange -= value;
-            else if (actualConnection is IHasConnectionStateChange hasStateChange)
-                hasStateChange.StateChange -= value;
-            else
-                throw new NotImplementedException();
-        }
+    /// <param name="connection">The actual connection.</param>
+    /// <param name="dialect">The dialect.</param>
+    /// <param name="logger">Optional logger for this connection (generally to be used by static SqlHelper methods)</param>
+    public WrappedConnection(IDbConnection connection, ISqlDialect dialect, ILogger logger = null)
+    {
+        actualConnection = connection ?? throw new ArgumentNullException(nameof(connection));
+        this.dialect = dialect;
+        this.logger = logger;
+
+        if (actualConnection is DbConnection dbConnection)
+            dbConnection.StateChange += (s, e) => OnStateChange(e);
+        else if (actualConnection is IHasConnectionStateChange hasStateChange)
+            hasStateChange.StateChange += (s, e) => OnStateChange(e);
     }
 
     /// <summary>
@@ -84,26 +73,35 @@ public class WrappedConnection(IDbConnection connection, ISqlDialect dialect, IL
     /// <summary>
     /// Begins a database transaction with the specified <see cref="T:System.Data.IsolationLevel"></see> value.
     /// </summary>
-    /// <param name="il">One of the <see cref="T:System.Data.IsolationLevel"></see> values.</param>
+    /// <param name="isolationLevel">One of the <see cref="T:System.Data.IsolationLevel"></see> values.</param>
     /// <returns>
     /// An object representing the new transaction.
     /// </returns>
-    public IDbTransaction BeginTransaction(IsolationLevel il)
+    protected override DbTransaction BeginDbTransaction(IsolationLevel isolationLevel)
     {
-        var actualTransaction = actualConnection.BeginTransaction(il);
+        var actualTransaction = isolationLevel == IsolationLevel.Unspecified
+            ? actualConnection.BeginTransaction()
+            : actualConnection.BeginTransaction(isolationLevel);
         currentTransaction = new WrappedTransaction(this, actualTransaction);
         return currentTransaction;
     }
 
     /// <summary>
-    /// Begins a database transaction.
+    /// Begins a database transaction asynchronously with the specified <see cref="T:System.Data.IsolationLevel"></see> value.
     /// </summary>
-    /// <returns>
-    /// An object representing the new transaction.
-    /// </returns>
-    public IDbTransaction BeginTransaction()
+    /// <param name="isolationLevel">One of the <see cref="T:System.Data.IsolationLevel"></see> values.</param>
+    /// <param name="cancellationToken">The cancellation token.</param>
+    /// <returns>A value task that represents the asynchronous operation. The task result contains the new transaction.</returns>
+    protected override async ValueTask<DbTransaction> BeginDbTransactionAsync(IsolationLevel isolationLevel, CancellationToken cancellationToken)
     {
-        var actualTransaction = actualConnection.BeginTransaction();
+        IDbTransaction actualTransaction;
+        if (actualConnection is DbConnection dbConnection)
+            actualTransaction = await dbConnection.BeginTransactionAsync(isolationLevel, cancellationToken).ConfigureAwait(false);
+        else
+            actualTransaction = isolationLevel == IsolationLevel.Unspecified
+                ? actualConnection.BeginTransaction()
+                : actualConnection.BeginTransaction(isolationLevel);
+
         currentTransaction = new WrappedTransaction(this, actualTransaction);
         return currentTransaction;
     }
@@ -120,7 +118,7 @@ public class WrappedConnection(IDbConnection connection, ISqlDialect dialect, IL
     /// Changes the current database for an open Connection object.
     /// </summary>
     /// <param name="databaseName">The name of the database to use in place of the current database.</param>
-    public void ChangeDatabase(string databaseName)
+    public override void ChangeDatabase(string databaseName)
     {
         actualConnection.ChangeDatabase(databaseName);
     }
@@ -128,15 +126,26 @@ public class WrappedConnection(IDbConnection connection, ISqlDialect dialect, IL
     /// <summary>
     /// Closes the connection to the database.
     /// </summary>
-    public void Close()
+    public override void Close()
     {
         actualConnection.Close();
     }
 
     /// <summary>
+    /// Closes the connection to the database asynchronously.
+    /// </summary>
+    /// <returns>A task that represents the asynchronous operation.</returns>
+    public override Task CloseAsync()
+    {
+        if (actualConnection is DbConnection dbConnection)
+            return dbConnection.CloseAsync();
+        return Task.Run(() => actualConnection.Close());
+    }
+
+    /// <summary>
     /// Gets or sets the string used to open a database.
     /// </summary>
-    public string ConnectionString
+    public override string ConnectionString
     {
         get
         {
@@ -159,7 +168,7 @@ public class WrappedConnection(IDbConnection connection, ISqlDialect dialect, IL
     /// <summary>
     /// Gets the time to wait while trying to establish a connection before terminating the attempt and generating an error.
     /// </summary>
-    public int ConnectionTimeout => actualConnection.ConnectionTimeout;
+    public override int ConnectionTimeout => actualConnection.ConnectionTimeout;
 
     /// <summary>
     /// Creates and returns a Command object associated with the connection.
@@ -174,45 +183,101 @@ public class WrappedConnection(IDbConnection connection, ISqlDialect dialect, IL
     /// Can't set transaction for command! " +
     ///                         "Connection was probably closed unexpectedly!
     /// </exception>
-    public IDbCommand CreateCommand()
+    IDbCommand IDbConnection.CreateCommand()
     {
         var command = actualConnection.CreateCommand();
         try
         {
-            if (CommandTimeout.HasValue)
-                command.CommandTimeout = CommandTimeout.Value;
-            else if (SqlSettings.DefaultCommandTimeout.HasValue)
-                command.CommandTimeout = SqlSettings.DefaultCommandTimeout.Value;
-
-            var transaction = currentTransaction?.ActualTransaction;
-            if (transaction != null && transaction.Connection == null)
-                throw new System.Exception("Active transaction for connection is in invalid state! " +
-                    "Connection was probably closed unexpectedly!");
-
-            command.Transaction = transaction;
-
-            if (transaction != null && command.Transaction == null)
-                throw new System.Exception("Can't set transaction for command! " +
-                    "Connection was probably closed unexpectedly!");
+            SetupCommand(command);
+            return command;
         }
         catch
         {
             command.Dispose();
             throw;
         }
+    }
 
-        return command;
+    /// <summary>
+    /// Creates and returns a Command object associated with the connection.
+    /// </summary>
+    /// <returns>
+    /// A Command object associated with the connection.
+    /// </returns>
+    /// <exception cref="System.Exception">
+    /// Active transaction for connection is in invalid state! " + 
+    ///                         "Connection was probably closed unexpectedly!
+    /// or
+    /// Can't set transaction for command! " +
+    ///                         "Connection was probably closed unexpectedly!
+    /// </exception>
+    protected override DbCommand CreateDbCommand()
+    {
+        var command = actualConnection.CreateCommand();
+        try
+        {
+            if (command is not DbCommand dbCommand)
+                throw new NotSupportedException("CreateCommand is not supported for connections that do not return a DbCommand from CreateCommand()!");
+
+            SetupCommand(dbCommand);
+            return dbCommand;
+        }
+        catch
+        {
+            command.Dispose();
+            throw;
+        }
+    }
+
+    private void SetupCommand(IDbCommand command)
+    {
+        if (CommandTimeout.HasValue)
+            command.CommandTimeout = CommandTimeout.Value;
+        else if (SqlSettings.DefaultCommandTimeout.HasValue)
+            command.CommandTimeout = SqlSettings.DefaultCommandTimeout.Value;
+
+        var transaction = currentTransaction?.ActualTransaction;
+        if (transaction != null && transaction.Connection == null)
+            throw new System.Exception("Active transaction for connection is in invalid state! " +
+                "Connection was probably closed unexpectedly!");
+
+        command.Transaction = transaction;
+
+        if (transaction != null && command.Transaction == null)
+            throw new System.Exception("Can't set transaction for command! " +
+                "Connection was probably closed unexpectedly!");
     }
 
     /// <summary>
     /// Gets the name of the current database or the database to be used after a connection is opened.
     /// </summary>
-    public string Database => actualConnection.Database;
+    public override string Database => actualConnection.Database;
+
+    /// <summary>
+    /// Gets the name of the database server to which to connect.
+    /// </summary>
+    public override string DataSource =>
+        actualConnection is DbConnection dbConnection ? dbConnection.DataSource
+        : throw new NotSupportedException("DataSource is not supported for connections that do not derive from DbConnection!");
+
+    /// <summary>
+    /// Gets the version of the database server.
+    /// </summary>
+    public override string ServerVersion =>
+        actualConnection is DbConnection dbConnection ? dbConnection.ServerVersion
+        : throw new NotSupportedException("ServerVersion is not supported for connections that do not derive from DbConnection!");
+
+    /// <summary>
+    /// Gets the associated provider factory for the connection, or <c>null</c> if the actual
+    /// connection is not a <see cref="DbConnection"/>.
+    /// </summary>
+    protected override DbProviderFactory DbProviderFactory =>
+        actualConnection is DbConnection dbConnection ? DbProviderFactories.GetFactory(dbConnection) : null;
 
     /// <summary>
     /// Opens a database connection with the settings specified by the ConnectionString property of the provider-specific Connection object.
     /// </summary>
-    public void Open()
+    public override void Open()
     {
         actualConnection.Open();
         openedOnce = true;
@@ -222,19 +287,9 @@ public class WrappedConnection(IDbConnection connection, ISqlDialect dialect, IL
     /// Opens a database connection asynchronously with the settings specified by the ConnectionString
     /// property of the provider-specific Connection object.
     /// </summary>
-    /// <returns>A task that represents the asynchronous operation.</returns>
-    public Task OpenAsync()
-    {
-        return OpenAsync(CancellationToken.None);
-    }
-
-    /// <summary>
-    /// Opens a database connection asynchronously with the settings specified by the ConnectionString
-    /// property of the provider-specific Connection object.
-    /// </summary>
     /// <param name="cancellationToken">The cancellation token.</param>
     /// <returns>A task that represents the asynchronous operation.</returns>
-    public async Task OpenAsync(CancellationToken cancellationToken)
+    public override async Task OpenAsync(CancellationToken cancellationToken)
     {
         if (actualConnection is DbConnection dbConnection)
             await dbConnection.OpenAsync(cancellationToken).ConfigureAwait(false);
@@ -247,7 +302,7 @@ public class WrappedConnection(IDbConnection connection, ISqlDialect dialect, IL
     /// <summary>
     /// Gets the current state of the connection.
     /// </summary>
-    public ConnectionState State => actualConnection.State;
+    public override ConnectionState State => actualConnection.State;
 
     /// <summary>
     /// Gets the logger instance for this connection, if any.
@@ -257,8 +312,22 @@ public class WrappedConnection(IDbConnection connection, ISqlDialect dialect, IL
     /// <summary>
     /// Disposes the actual connection.
     /// </summary>
-    public void Dispose()
+    protected override void Dispose(bool disposing)
     {
+        if (disposing)
+            actualConnection.Dispose();
+        base.Dispose(disposing);
+    }
+
+    /// <summary>
+    /// Disposes the actual connection asynchronously.
+    /// </summary>
+    /// <returns>A value task that represents the asynchronous operation.</returns>
+    public override ValueTask DisposeAsync()
+    {
+        if (actualConnection is DbConnection dbConnection)
+            return dbConnection.DisposeAsync();
         actualConnection.Dispose();
+        return ValueTask.CompletedTask;
     }
 }

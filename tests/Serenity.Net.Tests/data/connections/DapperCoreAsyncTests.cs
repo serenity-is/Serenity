@@ -147,6 +147,50 @@ public class DapperCoreAsyncTests
         Assert.Equal("Test", list[0].Name);
     }
 
+    [Fact]
+    public async Task EnsureOpenAsync_Opens_WrappedConnection()
+    {
+        using var actual = new AsyncTestConnection();
+        using var connection = new WrappedConnection(actual, SqlServer2012Dialect.Instance);
+        await connection.EnsureOpenAsync(TestContext.Current.CancellationToken);
+        Assert.Equal(ConnectionState.Open, connection.State);
+        Assert.True(connection.OpenedOnce);
+    }
+
+    [Fact]
+    public void CreateCommand_AsIDbConnection_Works_ForNonDbConnectionActual()
+    {
+        using var actual = new MockDbConnection();
+        using var connection = new WrappedConnection(actual, SqlServer2012Dialect.Instance);
+        var command = ((IDbConnection)connection).CreateCommand();
+        Assert.IsType<MockDbCommand>(command);
+    }
+
+    [Fact]
+    public void CreateCommand_AsDbConnection_Works_ForDbConnectionActual()
+    {
+        using var actual = new AsyncTestConnection();
+        using var connection = new WrappedConnection(actual, SqlServer2012Dialect.Instance);
+        var command = connection.CreateCommand();
+        Assert.IsType<AsyncTestCommand>(command);
+    }
+
+    [Fact]
+    public void DbProviderFactory_ReturnsNull_ForNonDbConnectionActual()
+    {
+        using var actual = new MockDbConnection();
+        using var connection = new WrappedConnection(actual, SqlServer2012Dialect.Instance);
+        Assert.Null(DbProviderFactories.GetFactory(connection));
+    }
+
+    [Fact]
+    public void DbProviderFactory_ReturnsNull_ForDbConnectionActual_WithNoFactory()
+    {
+        using var actual = new AsyncTestConnection();
+        using var connection = new WrappedConnection(actual, SqlServer2012Dialect.Instance);
+        Assert.Null(DbProviderFactories.GetFactory(connection));
+    }
+
     private class TestRow
     {
         public int Id { get; set; }
@@ -186,7 +230,6 @@ public class DapperCoreAsyncTests
         }
         protected override DbTransaction BeginDbTransaction(IsolationLevel isolationLevel) => throw new NotImplementedException();
         protected override DbCommand CreateDbCommand() => new AsyncTestCommand(this);
-        protected override DbProviderFactory DbProviderFactory => throw new NotImplementedException();
     }
 
     private class AsyncTestCommand : DbCommand
@@ -203,7 +246,7 @@ public class DapperCoreAsyncTests
         public override UpdateRowSource UpdatedRowSource { get; set; }
         protected override DbConnection DbConnection { get => connection; set => throw new NotImplementedException(); }
         protected override DbParameterCollection DbParameterCollection { get; } = new MockDbParameterCollection();
-        protected override DbTransaction DbTransaction { get => throw new NotImplementedException(); set => throw new NotImplementedException(); }
+        protected override DbTransaction DbTransaction { get; set; }
         public override void Cancel() { }
         public override int ExecuteNonQuery() => connection.NonQueryCallback?.Invoke(CommandText) ?? 0;
         public override object ExecuteScalar() => throw new NotImplementedException();

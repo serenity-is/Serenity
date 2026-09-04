@@ -69,9 +69,7 @@ public static class ConnectionExtensions
                 throw new InvalidOperationException("Can't auto open a closed connection " +
                     "that was previously open!");
 
-            if (connection is WrappedConnection wrapped)
-                await wrapped.OpenAsync(cancellationToken).ConfigureAwait(false);
-            else if (connection is System.Data.Common.DbConnection dbConnection)
+            if (connection is System.Data.Common.DbConnection dbConnection)
                 await dbConnection.OpenAsync(cancellationToken).ConfigureAwait(false);
             else
                 connection.Open();
