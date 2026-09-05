@@ -1,9 +1,9 @@
 ﻿namespace Serenity.Services;
 
 /// <summary>
-/// Base class for behaviors implementing <see cref="IListBehavior"/>
+/// Base class for behaviors implementing <see cref="IListBehaviorSync"/>
 /// </summary>
-public abstract class BaseListBehavior : IListBehavior
+public abstract class BaseListBehavior : IListBehaviorSync
 {
     /// <inheritdoc/>
     public virtual void OnValidateRequest(IListRequestHandler handler)

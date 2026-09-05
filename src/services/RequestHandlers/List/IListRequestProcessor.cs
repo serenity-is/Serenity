@@ -4,6 +4,7 @@
 /// Abstraction for list request handlers with a Process method.
 /// </summary>
 [GenericHandlerType(typeof(ListRequestHandler<>))]
+[CompanionHandlerType(typeof(IListRequestProcessorAsync), typeof(AsyncToSyncListRequestProcessorWrapper<>))]
 public interface IListRequestProcessor : IListRequestHandler
 {
     /// <summary>

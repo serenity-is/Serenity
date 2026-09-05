@@ -1,16 +1,14 @@
-using System.Collections;
-
 namespace Serenity.Services;
 
 /// <summary>
-/// Generic base class for list request handlers
+/// Generic base class for asynchronous list request handlers
 /// </summary>
 /// <typeparam name="TRow">Entity type</typeparam>
 /// <typeparam name="TListRequest">List request type</typeparam>
 /// <typeparam name="TListResponse">List response type</typeparam>
-public class ListRequestHandler<TRow, TListRequest, TListResponse> :
-    ListRequestHandlerBase<TRow, TListRequest, TListResponse>, IListRequestProcessor,
-    IListHandler<TRow, TListRequest, TListResponse>
+public class ListRequestHandlerAsync<TRow, TListRequest, TListResponse> :
+    ListRequestHandlerBase<TRow, TListRequest, TListResponse>, IListRequestProcessorAsync,
+    IListHandlerAsync<TRow, TListRequest, TListResponse>
     where TRow : class, IRow, new()
     where TListRequest : ListRequest
     where TListResponse : ListResponse<TRow>, new()
@@ -18,18 +16,18 @@ public class ListRequestHandler<TRow, TListRequest, TListResponse> :
     /// <summary>
     /// Lazy list of behaviors that is activated for this request.
     /// </summary>
-    protected Lazy<IListBehaviorSync[]> behaviors;
+    protected Lazy<IListBehaviorAsync[]> behaviors;
 
     /// <summary>
     /// Initializes a new instance of the class.
     /// </summary>
     /// <param name="context">Request context</param>
     /// <exception cref="ArgumentNullException"><paramref name="context"/> is <c>null</c>.</exception>
-    public ListRequestHandler(IRequestContext context) : base(context)
+    public ListRequestHandlerAsync(IRequestContext context) : base(context)
     {
-        behaviors = new Lazy<IListBehaviorSync[]>(() =>
-            BehaviorProviderExtensions.AutoWrapBehaviors<IListBehavior, IListBehaviorAsync, IListBehaviorSync>(
-                GetBehaviors(), behavior => new AsyncToSyncListBehaviorWrapper(behavior)).ToArray());
+        behaviors = new Lazy<IListBehaviorAsync[]>(() =>
+            BehaviorProviderExtensions.AutoWrapBehaviors<IListBehavior, IListBehaviorSync, IListBehaviorAsync>(
+                GetBehaviors(), behavior => new SyncToAsyncListBehaviorWrapper(behavior)).ToArray());
     }
 
     /// <inheritdoc/>
@@ -48,50 +46,51 @@ public class ListRequestHandler<TRow, TListRequest, TListResponse> :
     /// Prepares query by selecting fields.
     /// </summary>
     /// <param name="query">Query</param>
-    protected virtual void PrepareQuery(SqlQuery query)
+    /// <param name="cancellationToken">Cancellation token</param>
+    protected virtual async Task PrepareQueryAsync(SqlQuery query, CancellationToken cancellationToken = default)
     {
         SelectFields(query);
 
         foreach (var behavior in behaviors.Value)
-            behavior.OnPrepareQuery(this, query);
+            await behavior.OnPrepareQueryAsync(this, query, cancellationToken).ConfigureAwait(false);
     }
 
     /// <summary>
     /// Called before executing the list query
     /// </summary>
-    protected virtual void OnBeforeExecuteQuery()
+    protected virtual async Task OnBeforeExecuteQueryAsync(CancellationToken cancellationToken = default)
     {
         foreach (var behavior in behaviors.Value)
-            behavior.OnBeforeExecuteQuery(this);
+            await behavior.OnBeforeExecuteQueryAsync(this, cancellationToken).ConfigureAwait(false);
     }
 
     /// <summary>
     /// Called after executing the list query
     /// </summary>
-    protected virtual void OnAfterExecuteQuery()
+    protected virtual async Task OnAfterExecuteQueryAsync(CancellationToken cancellationToken = default)
     {
         foreach (var behavior in behaviors.Value)
-            behavior.OnAfterExecuteQuery(this);
+            await behavior.OnAfterExecuteQueryAsync(this, cancellationToken).ConfigureAwait(false);
     }
 
     /// <summary>
     /// Called just before returning the response
     /// </summary>
-    protected virtual void OnReturn()
+    protected virtual async Task OnReturnAsync(CancellationToken cancellationToken = default)
     {
         foreach (var behavior in behaviors.Value)
-            behavior.OnReturn(this);
+            await behavior.OnReturnAsync(this, cancellationToken).ConfigureAwait(false);
     }
 
     /// <summary>
     /// Validates the request by checking permissions.
     /// </summary>
-    protected virtual void ValidateRequest()
+    protected virtual async Task ValidateRequestAsync(CancellationToken cancellationToken = default)
     {
         ValidatePermissions();
 
         foreach (var behavior in behaviors.Value)
-            behavior.OnValidateRequest(this);
+            await behavior.OnValidateRequestAsync(this, cancellationToken).ConfigureAwait(false);
     }
 
     /// <summary>
@@ -99,24 +98,25 @@ public class ListRequestHandler<TRow, TListRequest, TListResponse> :
     /// Request.IncludeDeleted to the query.
     /// </summary>
     /// <param name="query">Query</param>
-    protected virtual void ApplyFilters(SqlQuery query)
+    /// <param name="cancellationToken">Cancellation token</param>
+    protected virtual async Task ApplyFiltersAsync(SqlQuery query, CancellationToken cancellationToken = default)
     {
         ApplyEqualityFilter(query);
         ApplyCriteria(query);
         ApplyIncludeDeletedFilter(query);
 
         foreach (var behavior in behaviors.Value)
-            behavior.OnApplyFilters(this, query);
+            await behavior.OnApplyFiltersAsync(this, query, cancellationToken).ConfigureAwait(false);
     }
 
     /// <summary>
     /// Executes the query sets values / entities and total count.
     /// </summary>
-    protected virtual void ExecuteQuery()
+    protected virtual async Task ExecuteQueryAsync(CancellationToken cancellationToken = default)
     {
         try
         {
-            Response.TotalCount = Query.ForEach(Connection, delegate ()
+            Response.TotalCount = await Query.ForEachAsync(Connection, delegate ()
             {
                 var clone = ProcessEntity(Row.Clone());
                 if (clone == null)
@@ -129,7 +129,7 @@ public class ListRequestHandler<TRow, TListRequest, TListResponse> :
                 }
                 else
                     Response.Entities.Add(clone);
-            });
+            }, cancellationToken).ConfigureAwait(false);
         }
         catch (Exception exception)
         {
@@ -144,19 +144,21 @@ public class ListRequestHandler<TRow, TListRequest, TListResponse> :
     }
 
     /// <summary>
-    /// Processes the list request. This is the entry point for the handler.
+    /// Processes the list request asynchronously. This is the entry point for the handler.
     /// </summary>
     /// <param name="connection">Connection</param>
     /// <param name="request">Request</param>
+    /// <param name="cancellationToken">Cancellation token</param>
     /// <exception cref="ArgumentNullException"><paramref name="connection"/> or <paramref name="request"/> is <c>null</c>.</exception>
-    public TListResponse Process(IDbConnection connection, TListRequest request)
+    public async Task<TListResponse> ProcessAsync(IDbConnection connection, TListRequest request,
+        CancellationToken cancellationToken = default)
     {
         StateBag.Clear();
         lookupAccessMode = false;
         ignoredEqualityFilters = null;
         Connection = connection ?? throw new ArgumentNullException("connection");
         Request = request ?? throw new ArgumentNullException(nameof(request));
-        ValidateRequest();
+        await ValidateRequestAsync(cancellationToken).ConfigureAwait(false);
 
         Response = new TListResponse
         {
@@ -172,7 +174,7 @@ public class ListRequestHandler<TRow, TListRequest, TListResponse> :
         if (DistinctFields != null)
             Response.Values = [];
 
-        PrepareQuery(query);
+        await PrepareQueryAsync(query, cancellationToken).ConfigureAwait(false);
 
         if (DistinctFields == null)
             ApplyKeyOrder(query);
@@ -185,13 +187,13 @@ public class ListRequestHandler<TRow, TListRequest, TListResponse> :
         if (DistinctFields == null)
             ApplySort(query);
 
-        ApplyFilters(query);
+        await ApplyFiltersAsync(query, cancellationToken).ConfigureAwait(false);
 
-        OnBeforeExecuteQuery();
+        await OnBeforeExecuteQueryAsync(cancellationToken).ConfigureAwait(false);
 
         if (DistinctFields == null || DistinctFields.Length > 0)
         {
-            ExecuteQuery();
+            await ExecuteQueryAsync(cancellationToken).ConfigureAwait(false);
         }
         else
         {
@@ -201,21 +203,22 @@ public class ListRequestHandler<TRow, TListRequest, TListResponse> :
 
         Response.SetSkipTakeTotal(query);
 
-        OnAfterExecuteQuery();
+        await OnAfterExecuteQueryAsync(cancellationToken).ConfigureAwait(false);
 
-        OnReturn();
+        await OnReturnAsync(cancellationToken).ConfigureAwait(false);
 
         return Response;
     }
 
-    IListResponse IListRequestProcessor.Process(IDbConnection connection, ListRequest request)
+    async Task<IListResponse> IListRequestProcessorAsync.ProcessAsync(IDbConnection connection, ListRequest request,
+        CancellationToken cancellationToken)
     {
-        return Process(connection, (TListRequest)request);
+        return await ProcessAsync(connection, (TListRequest)request, cancellationToken).ConfigureAwait(false);
     }
 
     /// <inheritdoc/>
-    public TListResponse List(IDbConnection connection, TListRequest request)
+    public Task<TListResponse> ListAsync(IDbConnection connection, TListRequest request, CancellationToken cancellationToken = default)
     {
-        return Process(connection, request);
+        return ProcessAsync(connection, request, cancellationToken);
     }
 }
