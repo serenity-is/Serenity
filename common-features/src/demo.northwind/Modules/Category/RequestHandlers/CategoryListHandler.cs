@@ -2,9 +2,9 @@
 
 namespace Serenity.Demo.Northwind;
 
-public interface ICategoryListHandler : IListHandler<MyRow> { }
+public interface ICategoryListHandler : IListHandlerAsync<MyRow> { }
 
 public class CategoryListHandler(IRequestContext context) :
-    ListRequestHandler<MyRow>(context), ICategoryListHandler
+    ListRequestHandlerAsync<MyRow>(context), ICategoryListHandler
 {
 }

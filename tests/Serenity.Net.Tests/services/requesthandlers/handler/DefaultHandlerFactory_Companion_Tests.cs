@@ -12,7 +12,9 @@ public class DefaultHandlerFactory_Companion_Tests
 
         public class RowFields : RowFieldsBase
         {
+#pragma warning disable CS0649
             public Int32Field ID;
+#pragma warning restore CS0649
         }
     }
 
@@ -72,7 +74,7 @@ public class DefaultHandlerFactory_Companion_Tests
         var handler = factory.CreateHandler(typeof(TestRow), typeof(ISaveRequestProcessorAsync));
 
         var wrapper = Assert.IsType<SyncToAsyncSaveRequestProcessorWrapper<TestRow>>(handler);
-        var inner = Assert.IsType<CustomSyncSaveHandler>(wrapper.WrappedHandler);
+        Assert.IsType<CustomSyncSaveHandler>(wrapper.WrappedHandler);
     }
 
     [Fact]
@@ -83,7 +85,7 @@ public class DefaultHandlerFactory_Companion_Tests
         var handler = factory.CreateHandler(typeof(TestRow), typeof(ISaveRequestProcessor));
 
         var wrapper = Assert.IsType<AsyncToSyncSaveRequestProcessorWrapper<TestRow>>(handler);
-        var inner = Assert.IsType<CustomAsyncSaveHandler>(wrapper.WrappedHandler);
+        Assert.IsType<CustomAsyncSaveHandler>(wrapper.WrappedHandler);
     }
 
     [Fact]
@@ -145,7 +147,7 @@ public class DefaultHandlerFactory_Companion_Tests
 
         var proxy = provider.GetRequiredService<ICreateHandlerAsync<TestRow>>();
 
-        Assert.IsAssignableFrom<ICreateHandlerAsync<TestRow>>(proxy);
+        Assert.IsType<ICreateHandlerAsync<TestRow>>(proxy, exactMatch: false);
     }
 
     [Fact]
@@ -155,6 +157,6 @@ public class DefaultHandlerFactory_Companion_Tests
 
         var proxy = provider.GetRequiredService<ICreateHandler<TestRow>>();
 
-        Assert.IsAssignableFrom<ICreateHandler<TestRow>>(proxy);
+        Assert.IsType<ICreateHandler<TestRow>>(proxy, exactMatch: false);
     }
 }
