@@ -39,7 +39,7 @@ public class ListRequestHandler<TRow, TListRequest, TListResponse> : IListReques
     {
         Context = context ?? throw new ArgumentNullException(nameof(context));
         StateBag = new Dictionary<string, object>();
-        behaviors = new Lazy<IListBehavior[]>(() => GetBehaviors().ToArray());
+        behaviors = new Lazy<IListBehavior[]>(() => [.. GetBehaviors()]);
     }
 
     /// <summary>
@@ -59,7 +59,7 @@ public class ListRequestHandler<TRow, TListRequest, TListResponse> : IListReques
     {
         var sortOrders = Row.GetFields().SortOrders;
         if (!sortOrders.IsEmptyOrNull())
-            return sortOrders.Select(x => new SortBy(x.Item1.PropertyName ?? x.Item1.Name, x.Item2)).ToArray();
+            return [.. sortOrders.Select(x => new SortBy(x.Item1.PropertyName ?? x.Item1.Name, x.Item2))];
 
         var nameField = Row.NameField;
         if (nameField is not null)

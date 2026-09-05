@@ -1,14 +1,14 @@
 namespace Serenity.Services;
 
 /// <summary>
-/// Generic base class for delete request handlers
+/// Generic base class for asynchronous delete request handlers
 /// </summary>
 /// <typeparam name="TRow">Entity type</typeparam>
 /// <typeparam name="TDeleteRequest">Delete request type</typeparam>
 /// <typeparam name="TDeleteResponse">Delete response type</typeparam>
-public class DeleteRequestHandler<TRow, TDeleteRequest, TDeleteResponse> :
-    DeleteRequestHandlerBase<TRow, TDeleteRequest, TDeleteResponse>, IDeleteRequestProcessor,
-    IDeleteHandler<TRow, TDeleteRequest, TDeleteResponse>
+public class DeleteRequestHandlerAsync<TRow, TDeleteRequest, TDeleteResponse> :
+    DeleteRequestHandlerBase<TRow, TDeleteRequest, TDeleteResponse>, IDeleteRequestProcessorAsync,
+    IDeleteHandlerAsync<TRow, TDeleteRequest, TDeleteResponse>
     where TRow : class, IRow, IIdRow, new()
     where TDeleteRequest : DeleteRequest
     where TDeleteResponse : DeleteResponse, new()
@@ -16,69 +16,71 @@ public class DeleteRequestHandler<TRow, TDeleteRequest, TDeleteResponse> :
     /// <summary>
     /// Lazy list of behaviors that is activated for this request.
     /// </summary>
-    protected Lazy<IDeleteBehaviorSync[]> behaviors;
+    protected Lazy<IDeleteBehaviorAsync[]> behaviors;
 
     /// <summary>
     /// Initializes a new instance of the class.
     /// </summary>
     /// <param name="context">Request context</param>
     /// <exception cref="ArgumentNullException"><paramref name="context"/> is <c>null</c>.</exception>
-    public DeleteRequestHandler(IRequestContext context) : base(context)
+    public DeleteRequestHandlerAsync(IRequestContext context) : base(context)
     {
-        behaviors = new Lazy<IDeleteBehaviorSync[]>(() =>
-            [.. BehaviorProviderExtensions.AutoWrapBehaviors<IDeleteBehavior, IDeleteBehaviorAsync, IDeleteBehaviorSync>(
-                GetBehaviors(), behavior => new AsyncToSyncDeleteBehaviorWrapper(behavior))]);
+        behaviors = new Lazy<IDeleteBehaviorAsync[]>(() =>
+            [.. BehaviorProviderExtensions.AutoWrapBehaviors<IDeleteBehavior, IDeleteBehaviorSync, IDeleteBehaviorAsync>(
+                GetBehaviors(), behavior => new SyncToAsyncDeleteBehaviorWrapper(behavior))]);
     }
 
     /// <summary>
     /// Method that is executed before the actual SQL delete operation.
     /// </summary>
-    protected virtual void OnBeforeDelete()
+    protected virtual async Task OnBeforeDeleteAsync(CancellationToken cancellationToken = default)
     {
         foreach (var behavior in behaviors.Value)
-            behavior.OnBeforeDelete(this);
+            await behavior.OnBeforeDeleteAsync(this, cancellationToken).ConfigureAwait(false);
     }
 
     /// <summary>
     /// Method that is executed after the actual SQL delete operation
     /// </summary>
-    protected virtual void OnAfterDelete()
+    protected virtual async Task OnAfterDeleteAsync(CancellationToken cancellationToken = default)
     {
         if (Row is IDisplayOrderRow displayOrderRow)
         {
             var filter = GetDisplayOrderFilter();
-            DisplayOrderHelper.ReorderValues(Connection, displayOrderRow, filter, -1, 1, false);
+            await DisplayOrderHelper.ReorderValuesAsync(Connection, displayOrderRow, filter, -1, 1,
+                hasUniqueConstraint: false, cancellationToken: cancellationToken).ConfigureAwait(false);
         }
 
         foreach (var behavior in behaviors.Value)
-            behavior.OnAfterDelete(this);
+            await behavior.OnAfterDeleteAsync(this, cancellationToken).ConfigureAwait(false);
     }
 
     /// <summary>
     /// Validates the parameters of the delete request.
     /// </summary>
-    protected virtual void ValidateRequest()
+    protected virtual async Task ValidateRequestAsync(CancellationToken cancellationToken = default)
     {
         foreach (var behavior in behaviors.Value)
-            behavior.OnValidateRequest(this);
+            await behavior.OnValidateRequestAsync(this, cancellationToken).ConfigureAwait(false);
     }
 
     /// <summary>
     /// Prepares the query used to select the existing record
     /// </summary>
     /// <param name="query">The query</param>
-    protected virtual void PrepareQuery(SqlQuery query)
+    /// <param name="cancellationToken">Cancellation token</param>
+    protected virtual async Task PrepareQueryAsync(SqlQuery query, CancellationToken cancellationToken = default)
     {
         query.SelectTableFields();
 
         foreach (var behavior in behaviors.Value)
-            behavior.OnPrepareQuery(this, query);
+            await behavior.OnPrepareQueryAsync(this, query, cancellationToken).ConfigureAwait(false);
     }
 
     /// <summary>
     /// Loads the entity that is going to be deleted
     /// </summary>
-    protected virtual void LoadEntity()
+    protected virtual async Task LoadEntityAsync(CancellationToken cancellationToken = default)
     {
         var idField = Row.IdField;
         var id = idField.ConvertValue(Request.EntityId, CultureInfo.InvariantCulture);
@@ -88,9 +90,9 @@ public class DeleteRequestHandler<TRow, TDeleteRequest, TDeleteResponse> :
             .From(Row)
             .WhereEqual(idField, id);
 
-        PrepareQuery(query);
+        await PrepareQueryAsync(query, cancellationToken).ConfigureAwait(false);
 
-        if (!query.GetFirst(Connection))
+        if (!await query.GetFirstAsync(Connection, cancellationToken).ConfigureAwait(false))
             throw DataValidation.EntityNotFoundError(Row, Request.EntityId, Localizer);
     }
 
@@ -98,11 +100,12 @@ public class DeleteRequestHandler<TRow, TDeleteRequest, TDeleteResponse> :
     /// Invokes the passed delete action method
     /// </summary>
     /// <param name="action">Delete action method</param>
-    protected virtual void InvokeDeleteAction(Action action)
+    /// <param name="cancellationToken">Cancellation token</param>
+    protected virtual async Task InvokeDeleteActionAsync(Func<Task> action, CancellationToken cancellationToken = default)
     {
         try
         {
-            action();
+            await action().ConfigureAwait(false);
         }
         catch (Exception exception)
         {
@@ -119,7 +122,7 @@ public class DeleteRequestHandler<TRow, TDeleteRequest, TDeleteResponse> :
     /// <summary>
     /// Executes the actual SQL delete operation
     /// </summary>
-    protected virtual void ExecuteDelete()
+    protected virtual async Task ExecuteDeleteAsync(CancellationToken cancellationToken = default)
     {
         var isActiveDeletedRow = Row as IIsActiveDeletedRow;
         var isDeletedRow = Row as IIsDeletedRow;
@@ -132,11 +135,11 @@ public class DeleteRequestHandler<TRow, TDeleteRequest, TDeleteResponse> :
             var delete = new SqlDelete(Row.Table)
                 .WhereEqual(idField, id);
 
-            InvokeDeleteAction(() =>
+            await InvokeDeleteActionAsync(async () =>
             {
-                if (delete.Execute(Connection) != 1)
+                if (await delete.ExecuteAsync(Connection, cancellationToken: cancellationToken).ConfigureAwait(false) != 1)
                     throw DataValidation.EntityNotFoundError(Row, id, Localizer);
-            });
+            }, cancellationToken).ConfigureAwait(false);
         }
         else
         {
@@ -171,11 +174,11 @@ public class DeleteRequestHandler<TRow, TDeleteRequest, TDeleteResponse> :
                     }
                 }
 
-                InvokeDeleteAction(() =>
+                await InvokeDeleteActionAsync(async () =>
                 {
-                    if (update.Execute(Connection) != 1)
+                    if (await update.ExecuteAsync(Connection, ExpectedRows.One, cancellationToken: cancellationToken).ConfigureAwait(false) != 1)
                         throw DataValidation.EntityNotFoundError(Row, id, Localizer);
-                });
+                }, cancellationToken).ConfigureAwait(false);
             }
             else //if (deleteLogRow != null)
             {
@@ -186,11 +189,11 @@ public class DeleteRequestHandler<TRow, TDeleteRequest, TDeleteResponse> :
                     .WhereEqual(idField, id)
                     .Where(new Criteria(deleteLogRow.DeleteUserIdField).IsNull());
 
-                InvokeDeleteAction(() =>
+                await InvokeDeleteActionAsync(async () =>
                 {
-                    if (update.Execute(Connection) != 1)
+                    if (await update.ExecuteAsync(Connection, ExpectedRows.One, cancellationToken: cancellationToken).ConfigureAwait(false) != 1)
                         throw DataValidation.EntityNotFoundError(Row, id, Localizer);
-                });
+                }, cancellationToken).ConfigureAwait(false);
             }
         }
 
@@ -200,28 +203,30 @@ public class DeleteRequestHandler<TRow, TDeleteRequest, TDeleteResponse> :
     /// <summary>
     /// Performs auditing
     /// </summary>
-    protected virtual void DoAudit()
+    protected virtual async Task DoAuditAsync(CancellationToken cancellationToken = default)
     {
         foreach (var behavior in behaviors.Value)
-            behavior.OnAudit(this);
+            await behavior.OnAuditAsync(this, cancellationToken).ConfigureAwait(false);
     }
 
     /// <summary>
     /// The method that is called just before the response is returned.
     /// </summary>
-    protected virtual void OnReturn()
+    protected virtual async Task OnReturnAsync(CancellationToken cancellationToken = default)
     {
         foreach (var behavior in behaviors.Value)
-            behavior.OnReturn(this);
+            await behavior.OnReturnAsync(this, cancellationToken).ConfigureAwait(false);
     }
 
     /// <summary>
-    /// Processes the delete request. This is the entry point for the handler.
+    /// Processes the delete request asynchronously. This is the entry point for the handler.
     /// </summary>
     /// <param name="unitOfWork">Unit of work</param>
     /// <param name="request">Request</param>
+    /// <param name="cancellationToken">Cancellation token</param>
     /// <exception cref="ArgumentNullException"><paramref name="unitOfWork"/> or <paramref name="request"/> is <c>null</c>.</exception>
-    public TDeleteResponse Process(IUnitOfWork unitOfWork, TDeleteRequest request)
+    public async Task<TDeleteResponse> ProcessAsync(IUnitOfWork unitOfWork, TDeleteRequest request,
+        CancellationToken cancellationToken = default)
     {
         StateBag.Clear();
         UnitOfWork = unitOfWork ?? throw new ArgumentNullException(nameof(unitOfWork));
@@ -233,36 +238,37 @@ public class DeleteRequestHandler<TRow, TDeleteRequest, TDeleteResponse> :
 
         Row = new TRow();
 
-        LoadEntity();
+        await LoadEntityAsync(cancellationToken).ConfigureAwait(false);
         ValidatePermissions();
-        ValidateRequest();
+        await ValidateRequestAsync(cancellationToken).ConfigureAwait(false);
 
         if (IsDeleted())
             Response.WasAlreadyDeleted = true;
         else
         {
-            OnBeforeDelete();
+            await OnBeforeDeleteAsync(cancellationToken).ConfigureAwait(false);
 
-            ExecuteDelete();
+            await ExecuteDeleteAsync(cancellationToken).ConfigureAwait(false);
 
-            OnAfterDelete();
+            await OnAfterDeleteAsync(cancellationToken).ConfigureAwait(false);
 
-            DoAudit();
+            await DoAuditAsync(cancellationToken).ConfigureAwait(false);
         }
 
-        OnReturn();
+        await OnReturnAsync(cancellationToken).ConfigureAwait(false);
 
         return Response;
     }
 
-    DeleteResponse IDeleteRequestProcessor.Process(IUnitOfWork uow, DeleteRequest request)
+    async Task<DeleteResponse> IDeleteRequestProcessorAsync.ProcessAsync(IUnitOfWork uow, DeleteRequest request,
+        CancellationToken cancellationToken)
     {
-        return Process(uow, (TDeleteRequest)request);
+        return await ProcessAsync(uow, (TDeleteRequest)request, cancellationToken).ConfigureAwait(false);
     }
 
     /// <inheritdoc/>
-    public TDeleteResponse Delete(IUnitOfWork uow, TDeleteRequest request)
+    public Task<TDeleteResponse> DeleteAsync(IUnitOfWork uow, TDeleteRequest request, CancellationToken cancellationToken = default)
     {
-        return Process(uow, request);
+        return ProcessAsync(uow, request, cancellationToken);
     }
 }

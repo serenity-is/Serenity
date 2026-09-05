@@ -8,22 +8,16 @@ namespace Serenity.Services;
 /// <typeparam name="TRow">Entity type</typeparam>
 /// <typeparam name="TSaveRequest">Save request type</typeparam>
 /// <typeparam name="TSaveResponse">Save response type</typeparam>
-public abstract class SaveRequestHandlerBase<TRow, TSaveRequest, TSaveResponse> : ISaveRequestHandler
+/// <remarks>
+/// Initializes a new instance of the class.
+/// </remarks>
+/// <param name="context">Request context</param>
+/// <exception cref="ArgumentNullException"><paramref name="context"/> is <c>null</c>.</exception>
+public abstract class SaveRequestHandlerBase<TRow, TSaveRequest, TSaveResponse>(IRequestContext context) : ISaveRequestHandler
     where TRow : class, IRow, IIdRow, new()
     where TSaveResponse : SaveResponse, new()
     where TSaveRequest : SaveRequest<TRow>, new()
 {
-    /// <summary>
-    /// Initializes a new instance of the class.
-    /// </summary>
-    /// <param name="context">Request context</param>
-    /// <exception cref="ArgumentNullException"><paramref name="context"/> is <c>null</c>.</exception>
-    protected SaveRequestHandlerBase(IRequestContext context)
-    {
-        Context = context ?? throw new ArgumentNullException(nameof(context));
-        StateBag = new Dictionary<string, object>();
-    }
-
     /// <summary>
     /// Gets the list of save behaviors.
     /// </summary>
@@ -347,7 +341,7 @@ public abstract class SaveRequestHandlerBase<TRow, TSaveRequest, TSaveResponse> 
     /// <summary>
     /// Gets the request context.
     /// </summary>
-    public IRequestContext Context { get; private set; }
+    public IRequestContext Context { get; private set; } = context ?? throw new ArgumentNullException(nameof(context));
 
     /// <summary>
     /// Gets the localizer from the request context.
@@ -408,7 +402,7 @@ public abstract class SaveRequestHandlerBase<TRow, TSaveRequest, TSaveResponse> 
     /// A state bag for behaviors to preserve state among their methods.
     /// It will be cleared before each request, e.g. Process call.
     /// </summary>
-    public IDictionary<string, object> StateBag { get; private set; }
+    public IDictionary<string, object> StateBag { get; private set; } = new Dictionary<string, object>();
 
     ISaveRequest ISaveRequestHandler.Request => Request;
     SaveResponse ISaveRequestHandler.Response => Response;

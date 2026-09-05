@@ -1,4 +1,4 @@
-﻿namespace Serenity.Services;
+namespace Serenity.Services;
 
 /// <summary>
 /// Generic base class for retrieve request handlers
@@ -26,7 +26,7 @@ public class RetrieveRequestHandler<TRow, TRetrieveRequest, TRetrieveResponse> :
     {
         Context = context ?? throw new ArgumentNullException(nameof(context));
         StateBag = new Dictionary<string, object>();
-        behaviors = new Lazy<IRetrieveBehavior[]>(() => GetBehaviors().ToArray());
+        behaviors = new Lazy<IRetrieveBehavior[]>(() => [.. GetBehaviors()]);
     }
 
     /// <summary>

@@ -4,6 +4,7 @@
 /// Abstraction for delete request handlers with a Process method.
 /// </summary>
 [GenericHandlerType(typeof(DeleteRequestHandler<>))]
+[CompanionHandlerType(typeof(IDeleteRequestProcessorAsync), typeof(AsyncToSyncDeleteRequestProcessorWrapper<>))]
 public interface IDeleteRequestProcessor : IDeleteRequestHandler
 {
     /// <summary>

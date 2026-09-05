@@ -1,4 +1,4 @@
-﻿namespace Serenity.Services;
+namespace Serenity.Services;
 
 /// <summary>
 /// Generic base class for undelete request handlers
@@ -26,7 +26,7 @@ public class UndeleteRequestHandler<TRow, TUndeleteRequest, TUndeleteResponse> :
     {
         Context = context ?? throw new ArgumentNullException(nameof(context));
         StateBag = new Dictionary<string, object>();
-        behaviors = new Lazy<IUndeleteBehavior[]>(() => GetBehaviors().ToArray());
+        behaviors = new Lazy<IUndeleteBehavior[]>(() => [.. GetBehaviors()]);
     }
 
     /// <summary>

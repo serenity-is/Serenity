@@ -28,8 +28,8 @@ public class SaveRequestHandlerAsync<TRow, TSaveRequest, TSaveResponse> :
     public SaveRequestHandlerAsync(IRequestContext context) : base(context)
     {
         behaviors = new Lazy<ISaveBehaviorAsync[]>(() =>
-            BehaviorProviderExtensions.AutoWrapBehaviors<ISaveBehavior, ISaveBehaviorSync, ISaveBehaviorAsync>(
-                GetBehaviors(), behavior => new SyncToAsyncSaveBehaviorWrapper(behavior)).ToArray());
+            [.. BehaviorProviderExtensions.AutoWrapBehaviors<ISaveBehavior, ISaveBehaviorSync, ISaveBehaviorAsync>(
+                GetBehaviors(), behavior => new SyncToAsyncSaveBehaviorWrapper(behavior))]);
     }
 
     /// <summary>

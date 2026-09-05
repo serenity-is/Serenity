@@ -1,9 +1,9 @@
 ﻿namespace Serenity.Services;
 
 /// <summary>
-/// Base class for types implementing <see cref="IDeleteBehavior"/>
+/// Base class for types implementing <see cref="IDeleteBehaviorSync"/>
 /// </summary>
-public abstract class BaseDeleteBehavior : IDeleteBehavior, IDeleteExceptionBehavior
+public abstract class BaseDeleteBehavior : IDeleteBehaviorSync, IDeleteExceptionBehavior
 {
     /// <inheritdoc/>
     public virtual void OnPrepareQuery(IDeleteRequestHandler handler, SqlQuery query)
