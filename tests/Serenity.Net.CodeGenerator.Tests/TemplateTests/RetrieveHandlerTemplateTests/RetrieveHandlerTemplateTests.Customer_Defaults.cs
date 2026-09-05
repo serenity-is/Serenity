@@ -11,10 +11,10 @@ public partial class RetrieveHandlerTemplateTests : BaseTemplateTest
 
         namespace TestNamespace.TestModule
         {
-            public interface ICustomerRetrieveHandler : IRetrieveHandler<MyRow, RetrieveRequest, RetrieveResponse<MyRow>> { }
+            public interface ICustomerRetrieveHandler : IRetrieveHandlerAsync<MyRow, RetrieveRequest, RetrieveResponse<MyRow>> { }
 
             public class CustomerRetrieveHandler(IRequestContext context) :
-                RetrieveRequestHandler<MyRow, RetrieveRequest, RetrieveResponse<MyRow>>(context),
+                RetrieveRequestHandlerAsync<MyRow, RetrieveRequest, RetrieveResponse<MyRow>>(context),
                 ICustomerRetrieveHandler
             {
             }

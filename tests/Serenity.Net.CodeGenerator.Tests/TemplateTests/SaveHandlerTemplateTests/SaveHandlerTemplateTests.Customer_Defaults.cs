@@ -11,10 +11,10 @@ public partial class SaveHandlerTemplateTests : BaseTemplateTest
 
         namespace TestNamespace.TestModule
         {
-            public interface ICustomerSaveHandler : ISaveHandler<MyRow, SaveRequest<MyRow>, SaveResponse> { }
+            public interface ICustomerSaveHandler : ISaveHandlerAsync<MyRow, SaveRequest<MyRow>, SaveResponse> { }
 
             public class CustomerSaveHandler(IRequestContext context) :
-                SaveRequestHandler<MyRow, SaveRequest<MyRow>, SaveResponse>(context),
+                SaveRequestHandlerAsync<MyRow, SaveRequest<MyRow>, SaveResponse>(context),
                 ICustomerSaveHandler
             {
             }

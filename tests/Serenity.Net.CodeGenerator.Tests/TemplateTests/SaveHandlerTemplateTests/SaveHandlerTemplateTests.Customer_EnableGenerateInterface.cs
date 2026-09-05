@@ -11,7 +11,7 @@ public partial class SaveHandlerTemplateTests : BaseTemplateTest
         {
             [GenerateInterface]
             public class CustomerSaveHandler(IRequestContext context) :
-                SaveRequestHandler<MyRow, SaveRequest<MyRow>, SaveResponse>(context),
+                SaveRequestHandlerAsync<MyRow, SaveRequest<MyRow>, SaveResponse>(context),
                 ICustomerSaveHandler
             {
             }

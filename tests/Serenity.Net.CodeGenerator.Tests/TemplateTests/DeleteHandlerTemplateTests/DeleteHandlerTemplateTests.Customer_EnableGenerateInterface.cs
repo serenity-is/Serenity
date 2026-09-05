@@ -11,7 +11,7 @@ public partial class DeleteHandlerTemplateTests : BaseTemplateTest
         {
             [GenerateInterface]
             public class CustomerDeleteHandler(IRequestContext context) :
-                DeleteRequestHandler<MyRow, DeleteRequest, DeleteResponse>(context),
+                DeleteRequestHandlerAsync<MyRow, DeleteRequest, DeleteResponse>(context),
                 ICustomerDeleteHandler
             {
             }

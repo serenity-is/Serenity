@@ -11,7 +11,7 @@ public partial class ListHandlerTemplateTests : BaseTemplateTest
         {
             [GenerateInterface]
             public class CustomerListHandler(IRequestContext context) :
-                ListRequestHandler<MyRow, ListRequest, ListResponse<MyRow>>(context),
+                ListRequestHandlerAsync<MyRow, ListRequest, ListResponse<MyRow>>(context),
                 ICustomerListHandler
             {
             }

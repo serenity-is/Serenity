@@ -11,10 +11,10 @@ public partial class ListHandlerTemplateTests : BaseTemplateTest
 
         namespace TestNamespace.TestModule
         {
-            public interface ICustomerListHandler : IListHandler<MyRow, ListRequest, ListResponse<MyRow>> { }
+            public interface ICustomerListHandler : IListHandlerAsync<MyRow, ListRequest, ListResponse<MyRow>> { }
 
             public class CustomerListHandler(IRequestContext context) :
-                ListRequestHandler<MyRow, ListRequest, ListResponse<MyRow>>(context),
+                ListRequestHandlerAsync<MyRow, ListRequest, ListResponse<MyRow>>(context),
                 ICustomerListHandler
             {
             }

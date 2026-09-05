@@ -5,11 +5,11 @@
 {{~if EnableGenerateInterface~}}
 [GenerateInterface]
 {{~else~}}
-public interface I{{ClassName}}SaveHandler : ISaveHandler<MyRow, SaveRequest<MyRow>, SaveResponse> { }
+public interface I{{ClassName}}SaveHandler : ISaveHandlerAsync<MyRow, SaveRequest<MyRow>, SaveResponse> { }
 
 {{~end~}}
 public class {{ClassName}}SaveHandler{{~if NET8Plus~}}(IRequestContext context){{~end}} :
-    SaveRequestHandler<MyRow, SaveRequest<MyRow>, SaveResponse>{{~if NET8Plus~}}(context){{~end~}},
+    SaveRequestHandlerAsync<MyRow, SaveRequest<MyRow>, SaveResponse>{{~if NET8Plus~}}(context){{~end~}},
     I{{ClassName}}SaveHandler
 {
 {{~if !NET8Plus~}}

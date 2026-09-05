@@ -11,7 +11,7 @@ public partial class RetrieveHandlerTemplateTests : BaseTemplateTest
         {
             [GenerateInterface]
             public class CustomerRetrieveHandler(IRequestContext context) :
-                RetrieveRequestHandler<MyRow, RetrieveRequest, RetrieveResponse<MyRow>>(context),
+                RetrieveRequestHandlerAsync<MyRow, RetrieveRequest, RetrieveResponse<MyRow>>(context),
                 ICustomerRetrieveHandler
             {
             }

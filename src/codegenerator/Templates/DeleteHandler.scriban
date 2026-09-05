@@ -5,11 +5,11 @@
 {{~if EnableGenerateInterface~}}
 [GenerateInterface]
 {{~else~}}
-public interface I{{ClassName}}DeleteHandler : IDeleteHandler<MyRow, DeleteRequest, DeleteResponse> { }
+public interface I{{ClassName}}DeleteHandler : IDeleteHandlerAsync<MyRow, DeleteRequest, DeleteResponse> { }
 
 {{~end~}}
 public class {{ClassName}}DeleteHandler{{~if NET8Plus~}}(IRequestContext context){{~end}} :
-    DeleteRequestHandler<MyRow, DeleteRequest, DeleteResponse>{{~if NET8Plus~}}(context){{~end~}},
+    DeleteRequestHandlerAsync<MyRow, DeleteRequest, DeleteResponse>{{~if NET8Plus~}}(context){{~end~}},
     I{{ClassName}}DeleteHandler
 {
 {{~if !NET8Plus~}}

@@ -11,10 +11,10 @@ public partial class DeleteHandlerTemplateTests : BaseTemplateTest
 
         namespace TestNamespace.TestModule
         {
-            public interface ICustomerDeleteHandler : IDeleteHandler<MyRow, DeleteRequest, DeleteResponse> { }
+            public interface ICustomerDeleteHandler : IDeleteHandlerAsync<MyRow, DeleteRequest, DeleteResponse> { }
 
             public class CustomerDeleteHandler(IRequestContext context) :
-                DeleteRequestHandler<MyRow, DeleteRequest, DeleteResponse>(context),
+                DeleteRequestHandlerAsync<MyRow, DeleteRequest, DeleteResponse>(context),
                 ICustomerDeleteHandler
             {
             }
