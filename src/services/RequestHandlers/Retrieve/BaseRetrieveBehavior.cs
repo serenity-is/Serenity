@@ -1,9 +1,9 @@
 ﻿namespace Serenity.Services;
 
 /// <summary>
-/// Base class for behaviors implementing <see cref="IRetrieveBehavior"/>
+/// Base class for behaviors implementing <see cref="IRetrieveBehaviorSync"/>
 /// </summary>
-public abstract class BaseRetrieveBehavior : IRetrieveBehavior
+public abstract class BaseRetrieveBehavior : IRetrieveBehaviorSync
 {
     /// <inheritdoc/>
     public virtual void OnValidateRequest(IRetrieveRequestHandler handler)

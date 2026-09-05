@@ -4,6 +4,7 @@
 /// Abstraction for retrieve request handlers with a Process method.
 /// </summary>
 [GenericHandlerType(typeof(RetrieveRequestHandler<>))]
+[CompanionHandlerType(typeof(IRetrieveRequestProcessorAsync), typeof(AsyncToSyncRetrieveRequestProcessorWrapper<>))]
 public interface IRetrieveRequestProcessor : IRetrieveRequestHandler
 {
     /// <summary>
