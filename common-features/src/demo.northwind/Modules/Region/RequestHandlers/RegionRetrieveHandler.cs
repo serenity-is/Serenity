@@ -2,9 +2,9 @@
 
 namespace Serenity.Demo.Northwind;
 
-public interface IRegionRetrieveHandler : IRetrieveHandler<MyRow> { }
+public interface IRegionRetrieveHandler : IRetrieveHandlerAsync<MyRow> { }
 
 public class RegionRetrieveHandler(IRequestContext context) :
-    RetrieveRequestHandler<MyRow>(context), IRegionRetrieveHandler
+    RetrieveRequestHandlerAsync<MyRow>(context), IRegionRetrieveHandler
 {
 }

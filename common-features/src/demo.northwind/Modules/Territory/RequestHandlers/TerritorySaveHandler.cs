@@ -2,9 +2,9 @@
 
 namespace Serenity.Demo.Northwind;
 
-public interface ITerritorySaveHandler : ISaveHandler<MyRow> { }
+public interface ITerritorySaveHandler : ISaveHandlerAsync<MyRow> { }
 
 public class TerritorySaveHandler(IRequestContext context) :
-    SaveRequestHandler<MyRow>(context), ITerritorySaveHandler
+    SaveRequestHandlerAsync<MyRow>(context), ITerritorySaveHandler
 {
 }

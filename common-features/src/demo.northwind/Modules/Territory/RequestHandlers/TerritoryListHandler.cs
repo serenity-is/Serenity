@@ -2,9 +2,9 @@
 
 namespace Serenity.Demo.Northwind;
 
-public interface ITerritoryListHandler : IListHandler<MyRow> { }
+public interface ITerritoryListHandler : IListHandlerAsync<MyRow> { }
 
 public class TerritoryListHandler(IRequestContext context) :
-    ListRequestHandler<MyRow>(context), ITerritoryListHandler
+    ListRequestHandlerAsync<MyRow>(context), ITerritoryListHandler
 {
 }

@@ -2,9 +2,9 @@
 
 namespace Serenity.Demo.Northwind;
 
-public interface IRegionListHandler : IListHandler<MyRow> { }
+public interface IRegionListHandler : IListHandlerAsync<MyRow> { }
 
 public class RegionListHandler(IRequestContext context) :
-    ListRequestHandler<MyRow>(context), IRegionListHandler
+    ListRequestHandlerAsync<MyRow>(context), IRegionListHandler
 {
 }
