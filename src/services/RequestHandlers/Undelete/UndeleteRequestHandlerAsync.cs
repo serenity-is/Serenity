@@ -1,14 +1,14 @@
 namespace Serenity.Services;
 
 /// <summary>
-/// Generic base class for undelete request handlers
+/// Generic base class for asynchronous undelete request handlers
 /// </summary>
 /// <typeparam name="TRow">Entity type</typeparam>
 /// <typeparam name="TUndeleteRequest">Undelete request type</typeparam>
 /// <typeparam name="TUndeleteResponse">Undelete response type</typeparam>
-public class UndeleteRequestHandler<TRow, TUndeleteRequest, TUndeleteResponse> :
-    UndeleteRequestHandlerBase<TRow, TUndeleteRequest, TUndeleteResponse>, IUndeleteRequestProcessor,
-    IUndeleteHandler<TRow, TUndeleteRequest, TUndeleteResponse>
+public class UndeleteRequestHandlerAsync<TRow, TUndeleteRequest, TUndeleteResponse> :
+    UndeleteRequestHandlerBase<TRow, TUndeleteRequest, TUndeleteResponse>, IUndeleteRequestProcessorAsync,
+    IUndeleteHandlerAsync<TRow, TUndeleteRequest, TUndeleteResponse>
     where TRow : class, IRow, IIdRow, new()
     where TUndeleteRequest : UndeleteRequest
     where TUndeleteResponse : UndeleteResponse, new()
@@ -16,70 +16,72 @@ public class UndeleteRequestHandler<TRow, TUndeleteRequest, TUndeleteResponse> :
     /// <summary>
     /// Lazy list of behaviors that is activated for this request.
     /// </summary>
-    protected Lazy<IUndeleteBehaviorSync[]> behaviors;
+    protected Lazy<IUndeleteBehaviorAsync[]> behaviors;
 
     /// <summary>
     /// Initializes a new instance of the class.
     /// </summary>
     /// <param name="context">Request context</param>
     /// <exception cref="ArgumentNullException"><paramref name="context"/> is <c>null</c>.</exception>
-    public UndeleteRequestHandler(IRequestContext context) : base(context)
+    public UndeleteRequestHandlerAsync(IRequestContext context) : base(context)
     {
-        behaviors = new Lazy<IUndeleteBehaviorSync[]>(() =>
-            BehaviorProviderExtensions.AutoWrapBehaviors<IUndeleteBehavior, IUndeleteBehaviorAsync, IUndeleteBehaviorSync>(
-                GetBehaviors(), behavior => new AsyncToSyncUndeleteBehaviorWrapper(behavior)).ToArray());
+        behaviors = new Lazy<IUndeleteBehaviorAsync[]>(() =>
+            BehaviorProviderExtensions.AutoWrapBehaviors<IUndeleteBehavior, IUndeleteBehaviorSync, IUndeleteBehaviorAsync>(
+                GetBehaviors(), behavior => new SyncToAsyncUndeleteBehaviorWrapper(behavior)).ToArray());
     }
 
     /// <summary>
     /// Method that is executed before the actual SQL undelete operation.
     /// </summary>
-    protected virtual void OnBeforeUndelete()
+    protected virtual async Task OnBeforeUndeleteAsync(CancellationToken cancellationToken = default)
     {
         foreach (var behavior in behaviors.Value)
-            behavior.OnBeforeUndelete(this);
+            await behavior.OnBeforeUndeleteAsync(this, cancellationToken).ConfigureAwait(false);
     }
 
     /// <summary>
     /// Method that is executed after the actual SQL undelete operation
     /// </summary>
-    protected virtual void OnAfterUndelete()
+    protected virtual async Task OnAfterUndeleteAsync(CancellationToken cancellationToken = default)
     {
         if (Row is IDisplayOrderRow displayOrderRow)
         {
             var filter = GetDisplayOrderFilter();
-            DisplayOrderHelper.ReorderValues(Connection, displayOrderRow, filter,
-                Row.IdField.AsObject(Row), displayOrderRow.DisplayOrderField[Row].Value, false);
+            await DisplayOrderHelper.ReorderValuesAsync(Connection, displayOrderRow, filter,
+                Row.IdField.AsObject(Row), displayOrderRow.DisplayOrderField[Row].Value,
+                hasUniqueConstraint: false, cancellationToken: cancellationToken).ConfigureAwait(false);
         }
 
         foreach (var behavior in behaviors.Value)
-            behavior.OnAfterUndelete(this);
+            await behavior.OnAfterUndeleteAsync(this, cancellationToken).ConfigureAwait(false);
     }
 
     /// <summary>
     /// Validates the parameters of the undelete request.
     /// </summary>
-    protected virtual void ValidateRequest()
+    protected virtual async Task ValidateRequestAsync(CancellationToken cancellationToken = default)
     {
         foreach (var behavior in behaviors.Value)
-            behavior.OnValidateRequest(this);
+            await behavior.OnValidateRequestAsync(this, cancellationToken).ConfigureAwait(false);
     }
 
     /// <summary>
     /// Prepares the query used to select the existing record
     /// </summary>
     /// <param name="query">The query</param>
-    protected virtual void PrepareQuery(SqlQuery query)
+    /// <param name="cancellationToken">Cancellation token</param>
+    protected virtual async Task PrepareQueryAsync(SqlQuery query, CancellationToken cancellationToken = default)
     {
         query.SelectTableFields();
 
         foreach (var behavior in behaviors.Value)
-            behavior.OnPrepareQuery(this, query);
+            await behavior.OnPrepareQueryAsync(this, query, cancellationToken).ConfigureAwait(false);
     }
 
     /// <summary>
     /// Loads the entity that is going to be undeleted
     /// </summary>
-    protected virtual void LoadEntity()
+    protected virtual async Task LoadEntityAsync(CancellationToken cancellationToken = default)
     {
         var idField = Row.IdField;
         var id = idField.ConvertValue(Request.EntityId, CultureInfo.InvariantCulture);
@@ -89,9 +91,9 @@ public class UndeleteRequestHandler<TRow, TUndeleteRequest, TUndeleteResponse> :
             .From(Row)
             .WhereEqual(idField, id);
 
-        PrepareQuery(query);
+        await PrepareQueryAsync(query, cancellationToken).ConfigureAwait(false);
 
-        if (!query.GetFirst(Connection))
+        if (!await query.GetFirstAsync(Connection, cancellationToken).ConfigureAwait(false))
             throw DataValidation.EntityNotFoundError(Row, id, Localizer);
     }
 
@@ -99,11 +101,12 @@ public class UndeleteRequestHandler<TRow, TUndeleteRequest, TUndeleteResponse> :
     /// Invokes the passed undelete action method
     /// </summary>
     /// <param name="action">Undelete action method</param>
-    protected virtual void InvokeUndeleteAction(Action action)
+    /// <param name="cancellationToken">Cancellation token</param>
+    protected virtual async Task InvokeUndeleteActionAsync(Func<Task> action, CancellationToken cancellationToken = default)
     {
         try
         {
-            action();
+            await action().ConfigureAwait(false);
         }
         catch (Exception exception)
         {
@@ -120,7 +123,7 @@ public class UndeleteRequestHandler<TRow, TUndeleteRequest, TUndeleteResponse> :
     /// <summary>
     /// Executes the actual SQL undelete/update operation
     /// </summary>
-    protected virtual void ExecuteUndelete()
+    protected virtual async Task ExecuteUndeleteAsync(CancellationToken cancellationToken = default)
     {
         var idField = Row.IdField;
         var id = idField.ConvertValue(Request.EntityId, CultureInfo.InvariantCulture);
@@ -151,11 +154,11 @@ public class UndeleteRequestHandler<TRow, TUndeleteRequest, TUndeleteResponse> :
                 update.Where(deleteLogRow.DeleteUserIdField.IsNotNull());
         }
 
-        InvokeUndeleteAction(() =>
+        await InvokeUndeleteActionAsync(async () =>
         {
-            if (update.Execute(Connection) != 1)
+            if (await update.ExecuteAsync(Connection, ExpectedRows.One, cancellationToken: cancellationToken).ConfigureAwait(false) != 1)
                 throw DataValidation.EntityNotFoundError(Row, id, Localizer);
-        });
+        }, cancellationToken).ConfigureAwait(false);
 
         InvalidateCacheOnCommit();
     }
@@ -163,69 +166,72 @@ public class UndeleteRequestHandler<TRow, TUndeleteRequest, TUndeleteResponse> :
     /// <summary>
     /// Performs auditing
     /// </summary>
-    protected virtual void DoAudit()
+    protected virtual async Task DoAuditAsync(CancellationToken cancellationToken = default)
     {
         foreach (var behavior in behaviors.Value)
-            behavior.OnAudit(this);
+            await behavior.OnAuditAsync(this, cancellationToken).ConfigureAwait(false);
     }
 
     /// <summary>
     /// The method that is called just before the response is returned.
     /// </summary>
-    protected virtual void OnReturn()
+    protected virtual async Task OnReturnAsync(CancellationToken cancellationToken = default)
     {
         foreach (var behavior in behaviors.Value)
-            behavior.OnReturn(this);
+            await behavior.OnReturnAsync(this, cancellationToken).ConfigureAwait(false);
     }
 
     /// <summary>
-    /// Processes the undelete request. This is the entry point for the handler.
+    /// Processes the undelete request asynchronously. This is the entry point for the handler.
     /// </summary>
     /// <param name="unitOfWork">Unit of work</param>
     /// <param name="request">Request</param>
+    /// <param name="cancellationToken">Cancellation token</param>
     /// <exception cref="ArgumentNullException"><paramref name="unitOfWork"/> is <c>null</c>.</exception>
-    public TUndeleteResponse Process(IUnitOfWork unitOfWork, TUndeleteRequest request)
+    public async Task<TUndeleteResponse> ProcessAsync(IUnitOfWork unitOfWork, TUndeleteRequest request,
+        CancellationToken cancellationToken = default)
     {
         StateBag.Clear();
-        UnitOfWork = unitOfWork ?? throw new ArgumentNullException("unitOfWork");
-        Request = request;
+        UnitOfWork = unitOfWork ?? throw new ArgumentNullException(nameof(unitOfWork));
+        Request = request ?? throw new ArgumentNullException(nameof(request));
         Response = new TUndeleteResponse();
 
         if (request.EntityId == null)
-            throw DataValidation.RequiredError("EntityId", Localizer);
+            throw DataValidation.RequiredError(nameof(request.EntityId), Localizer);
 
         Row = new TRow();
 
-        LoadEntity();
+        await LoadEntityAsync(cancellationToken).ConfigureAwait(false);
         ValidatePermissions();
-        ValidateRequest();
+        await ValidateRequestAsync(cancellationToken).ConfigureAwait(false);
 
         if (!IsDeleted())
             Response.WasNotDeleted = true;
         else
         {
-            OnBeforeUndelete();
+            await OnBeforeUndeleteAsync(cancellationToken).ConfigureAwait(false);
 
-            ExecuteUndelete();
+            await ExecuteUndeleteAsync(cancellationToken).ConfigureAwait(false);
 
-            OnAfterUndelete();
+            await OnAfterUndeleteAsync(cancellationToken).ConfigureAwait(false);
 
-            DoAudit();
+            await DoAuditAsync(cancellationToken).ConfigureAwait(false);
         }
 
-        OnReturn();
+        await OnReturnAsync(cancellationToken).ConfigureAwait(false);
 
         return Response;
     }
 
-    UndeleteResponse IUndeleteRequestProcessor.Process(IUnitOfWork uow, UndeleteRequest request)
+    async Task<UndeleteResponse> IUndeleteRequestProcessorAsync.ProcessAsync(IUnitOfWork uow, UndeleteRequest request,
+        CancellationToken cancellationToken)
     {
-        return Process(uow, (TUndeleteRequest)request);
+        return await ProcessAsync(uow, (TUndeleteRequest)request, cancellationToken).ConfigureAwait(false);
     }
 
     /// <inheritdoc/>
-    public TUndeleteResponse Undelete(IUnitOfWork uow, TUndeleteRequest request)
+    public Task<TUndeleteResponse> UndeleteAsync(IUnitOfWork uow, TUndeleteRequest request, CancellationToken cancellationToken = default)
     {
-        return Process(uow, request);
+        return ProcessAsync(uow, request, cancellationToken);
     }
 }

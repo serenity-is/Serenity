@@ -4,6 +4,7 @@
 /// Abstraction for undelete request handlers with a Process method.
 /// </summary>
 [GenericHandlerType(typeof(UndeleteRequestHandler<>))]
+[CompanionHandlerType(typeof(IUndeleteRequestProcessorAsync), typeof(AsyncToSyncUndeleteRequestProcessorWrapper<>))]
 public interface IUndeleteRequestProcessor : IUndeleteRequestHandler
 {
     /// <summary>

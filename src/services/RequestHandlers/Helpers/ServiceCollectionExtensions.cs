@@ -58,6 +58,8 @@ public static class ServiceCollectionExtensions
         collection.TryAddTransient(typeof(IDeleteHandlerAsync<>), typeof(DeleteHandlerProxyAsync<>));
         collection.TryAddTransient(typeof(IUndeleteHandler<,,>), typeof(UndeleteHandlerProxy<,,>));
         collection.TryAddTransient(typeof(IUndeleteHandler<>), typeof(UndeleteHandlerProxy<>));
+        collection.TryAddTransient(typeof(IUndeleteHandlerAsync<,,>), typeof(UndeleteHandlerProxyAsync<,,>));
+        collection.TryAddTransient(typeof(IUndeleteHandlerAsync<>), typeof(UndeleteHandlerProxyAsync<>));
         collection.TryAddTransient(typeof(IListHandler<,,>), typeof(ListHandlerProxy<,,>));
         collection.TryAddTransient(typeof(IListHandler<,>), typeof(ListHandlerProxy<,>));
         collection.TryAddTransient(typeof(IListHandler<>), typeof(ListHandlerProxy<>));
@@ -118,6 +120,7 @@ public static class ServiceCollectionExtensions
                     intf == typeof(IDeleteRequestProcessorAsync) ||
                     intf == typeof(IDeleteRequestHandler) ||
                     intf == typeof(IUndeleteRequestProcessor) ||
+                    intf == typeof(IUndeleteRequestProcessorAsync) ||
                     intf == typeof(IUndeleteRequestHandler))
                     continue;
 
