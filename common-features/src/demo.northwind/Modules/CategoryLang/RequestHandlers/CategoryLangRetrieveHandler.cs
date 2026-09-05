@@ -2,9 +2,9 @@
 
 namespace Serenity.Demo.Northwind;
 
-public interface ICategoryLangRetrieveHandler : IRetrieveHandler<MyRow> { }
+public interface ICategoryLangRetrieveHandler : IRetrieveHandlerAsync<MyRow> { }
 
 public class CategoryLangRetrieveHandler(IRequestContext context) :
-    RetrieveRequestHandler<MyRow>(context), ICategoryLangRetrieveHandler
+    RetrieveRequestHandlerAsync<MyRow>(context), ICategoryLangRetrieveHandler
 {
 }

@@ -2,9 +2,9 @@
 
 namespace Serenity.Demo.Northwind;
 
-public interface IProductLangSaveHandler : ISaveHandler<MyRow> { }
+public interface IProductLangSaveHandler : ISaveHandlerAsync<MyRow> { }
 
 public class ProductLangSaveHandler(IRequestContext context) :
-    SaveRequestHandler<MyRow>(context), IProductLangSaveHandler
+    SaveRequestHandlerAsync<MyRow>(context), IProductLangSaveHandler
 {
 }

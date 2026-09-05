@@ -8,43 +8,43 @@ namespace Serenity.Demo.Northwind.Endpoints;
 public class ProductEndpoint : ServiceEndpoint
 {
     [HttpPost, AuthorizeCreate(typeof(MyRow))]
-    public SaveResponse Create(IUnitOfWork uow, SaveRequest<MyRow> request,
-        [FromServices] IProductSaveHandler handler)
+    public Task<SaveResponse> Create(IUnitOfWork uow, SaveRequest<MyRow> request,
+        [FromServices] IProductSaveHandler handler, CancellationToken cancellationToken = default)
     {
-        return handler.Create(uow, request);
+        return handler.CreateAsync(uow, request, cancellationToken);
     }
 
     [HttpPost, AuthorizeUpdate(typeof(MyRow))]
-    public SaveResponse Update(IUnitOfWork uow, SaveRequest<MyRow> request,
-        [FromServices] IProductSaveHandler handler)
+    public Task<SaveResponse> Update(IUnitOfWork uow, SaveRequest<MyRow> request,
+        [FromServices] IProductSaveHandler handler, CancellationToken cancellationToken = default)
     {
-        return handler.Update(uow, request);
+        return handler.UpdateAsync(uow, request, cancellationToken);
     }
 
     [HttpPost, AuthorizeDelete(typeof(MyRow))]
-    public DeleteResponse Delete(IUnitOfWork uow, DeleteRequest request,
-        [FromServices] IProductDeleteHandler handler)
+    public Task<DeleteResponse> Delete(IUnitOfWork uow, DeleteRequest request,
+        [FromServices] IProductDeleteHandler handler, CancellationToken cancellationToken = default)
     {
-        return handler.Delete(uow, request);
+        return handler.DeleteAsync(uow, request, cancellationToken);
     }
 
-    public RetrieveResponse<MyRow> Retrieve(IDbConnection connection, RetrieveRequest request,
-        [FromServices] IProductRetrieveHandler handler)
+    public Task<RetrieveResponse<MyRow>> Retrieve(IDbConnection connection, RetrieveRequest request,
+        [FromServices] IProductRetrieveHandler handler, CancellationToken cancellationToken = default)
     {
-        return handler.Retrieve(connection, request);
+        return handler.RetrieveAsync(connection, request, cancellationToken);
     }
 
-    public ListResponse<MyRow> List(IDbConnection connection, ListRequest request,
-        [FromServices] IProductListHandler handler)
+    public Task<ListResponse<MyRow>> List(IDbConnection connection, ListRequest request,
+        [FromServices] IProductListHandler handler, CancellationToken cancellationToken = default)
     {
-        return handler.List(connection, request);
+        return handler.ListAsync(connection, request, cancellationToken);
     }
 
-    public FileContentResult ListExcel(IDbConnection connection, ListRequest request,
+    public async Task<FileContentResult> ListExcel(IDbConnection connection, ListRequest request,
         [FromServices] IExcelExporter exporter,
-        [FromServices] IProductListHandler handler)
+        [FromServices] IProductListHandler handler, CancellationToken cancellationToken = default)
     {
-        var data = List(connection, request, handler).Entities;
+        var data = (await List(connection, request, handler, cancellationToken).ConfigureAwait(false)).Entities;
         var bytes = exporter.Export(data, typeof(Columns.ProductColumns), request.ExportColumns);
         return ExcelContentResult.Create(bytes, "ProductList_" +
             DateTime.Now.ToString("yyyyMMdd_HHmmss", CultureInfo.InvariantCulture) + ".xlsx");

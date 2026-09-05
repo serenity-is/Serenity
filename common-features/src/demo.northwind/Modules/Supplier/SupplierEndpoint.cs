@@ -7,35 +7,35 @@ namespace Serenity.Demo.Northwind.Endpoints;
 public class SupplierEndpoint : ServiceEndpoint
 {
     [HttpPost, AuthorizeCreate(typeof(MyRow))]
-    public SaveResponse Create(IUnitOfWork uow, SaveRequest<MyRow> request,
-        [FromServices] ISupplierSaveHandler handler)
+    public Task<SaveResponse> Create(IUnitOfWork uow, SaveRequest<MyRow> request,
+        [FromServices] ISupplierSaveHandler handler, CancellationToken cancellationToken = default)
     {
-        return handler.Create(uow, request);
+        return handler.CreateAsync(uow, request, cancellationToken);
     }
 
     [HttpPost, AuthorizeUpdate(typeof(MyRow))]
-    public SaveResponse Update(IUnitOfWork uow, SaveRequest<MyRow> request,
-        [FromServices] ISupplierSaveHandler handler)
+    public Task<SaveResponse> Update(IUnitOfWork uow, SaveRequest<MyRow> request,
+        [FromServices] ISupplierSaveHandler handler, CancellationToken cancellationToken = default)
     {
-        return handler.Update(uow, request);
+        return handler.UpdateAsync(uow, request, cancellationToken);
     }
 
     [HttpPost, AuthorizeDelete(typeof(MyRow))]
-    public DeleteResponse Delete(IUnitOfWork uow, DeleteRequest request,
-        [FromServices] ISupplierDeleteHandler handler)
+    public Task<DeleteResponse> Delete(IUnitOfWork uow, DeleteRequest request,
+        [FromServices] ISupplierDeleteHandler handler, CancellationToken cancellationToken = default)
     {
-        return handler.Delete(uow, request);
+        return handler.DeleteAsync(uow, request, cancellationToken);
     }
 
-    public RetrieveResponse<MyRow> Retrieve(IDbConnection connection, RetrieveRequest request,
-        [FromServices] ISupplierRetrieveHandler handler)
+    public Task<RetrieveResponse<MyRow>> Retrieve(IDbConnection connection, RetrieveRequest request,
+        [FromServices] ISupplierRetrieveHandler handler, CancellationToken cancellationToken = default)
     {
-        return handler.Retrieve(connection, request);
+        return handler.RetrieveAsync(connection, request, cancellationToken);
     }
 
-    public ListResponse<MyRow> List(IDbConnection connection, ListRequest request,
-        [FromServices] ISupplierListHandler handler)
+    public Task<ListResponse<MyRow>> List(IDbConnection connection, ListRequest request,
+        [FromServices] ISupplierListHandler handler, CancellationToken cancellationToken = default)
     {
-        return handler.List(connection, request);
+        return handler.ListAsync(connection, request, cancellationToken);
     }
 }

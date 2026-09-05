@@ -2,9 +2,9 @@
 
 namespace Serenity.Demo.Northwind;
 
-public interface IOrderDetailListHandler : IListHandler<MyRow> { }
+public interface IOrderDetailListHandler : IListHandlerAsync<MyRow> { }
 
 public class OrderDetailListHandler(IRequestContext context) :
-    ListRequestHandler<MyRow>(context), IOrderDetailListHandler
+    ListRequestHandlerAsync<MyRow>(context), IOrderDetailListHandler
 {
 }

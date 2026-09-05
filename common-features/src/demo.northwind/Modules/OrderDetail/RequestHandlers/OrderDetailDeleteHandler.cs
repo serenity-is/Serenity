@@ -2,9 +2,9 @@
 
 namespace Serenity.Demo.Northwind;
 
-public interface IOrderDetailDeleteHandler : IDeleteHandler<MyRow> { }
+public interface IOrderDetailDeleteHandler : IDeleteHandlerAsync<MyRow> { }
 
 public class OrderDetailDeleteHandler(IRequestContext context) :
-    DeleteRequestHandler<MyRow>(context), IOrderDetailDeleteHandler
+    DeleteRequestHandlerAsync<MyRow>(context), IOrderDetailDeleteHandler
 {
 }

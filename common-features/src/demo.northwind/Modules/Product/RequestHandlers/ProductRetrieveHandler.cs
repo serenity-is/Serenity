@@ -2,9 +2,9 @@
 
 namespace Serenity.Demo.Northwind;
 
-public interface IProductRetrieveHandler : IRetrieveHandler<MyRow> { }
+public interface IProductRetrieveHandler : IRetrieveHandlerAsync<MyRow> { }
 
 public class ProductRetrieveHandler(IRequestContext context) :
-    RetrieveRequestHandler<MyRow>(context), IProductRetrieveHandler
+    RetrieveRequestHandlerAsync<MyRow>(context), IProductRetrieveHandler
 {
 }

@@ -2,9 +2,9 @@
 
 namespace Serenity.Demo.Northwind;
 
-public interface IProductLangDeleteHandler : IDeleteHandler<MyRow> { }
+public interface IProductLangDeleteHandler : IDeleteHandlerAsync<MyRow> { }
 
 public class ProductLangDeleteHandler(IRequestContext context) :
-    DeleteRequestHandler<MyRow>(context), IProductLangDeleteHandler
+    DeleteRequestHandlerAsync<MyRow>(context), IProductLangDeleteHandler
 {
 }

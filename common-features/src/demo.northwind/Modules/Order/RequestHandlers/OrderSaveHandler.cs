@@ -2,9 +2,9 @@ using MyRow = Serenity.Demo.Northwind.OrderRow;
 
 namespace Serenity.Demo.Northwind;
 
-public interface IOrderSaveHandler : ISaveHandler<MyRow> { }
+public interface IOrderSaveHandler : ISaveHandlerAsync<MyRow> { }
 
 public class OrderSaveHandler(IRequestContext context) :
-    SaveRequestHandler<MyRow>(context), IOrderSaveHandler
+    SaveRequestHandlerAsync<MyRow>(context), IOrderSaveHandler
 {
 }

@@ -2,9 +2,9 @@
 
 namespace Serenity.Demo.Northwind;
 
-public interface IOrderDetailRetrieveHandler : IRetrieveHandler<MyRow> { }
+public interface IOrderDetailRetrieveHandler : IRetrieveHandlerAsync<MyRow> { }
 
 public class OrderDetailRetrieveHandler(IRequestContext context) :
-    RetrieveRequestHandler<MyRow>(context), IOrderDetailRetrieveHandler
+    RetrieveRequestHandlerAsync<MyRow>(context), IOrderDetailRetrieveHandler
 {
 }

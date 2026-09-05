@@ -2,9 +2,9 @@
 
 namespace Serenity.Demo.Northwind;
 
-public interface IShipperRetrieveHandler : IRetrieveHandler<MyRow> { }
+public interface IShipperRetrieveHandler : IRetrieveHandlerAsync<MyRow> { }
 
 public class ShipperRetrieveHandler(IRequestContext context) :
-    RetrieveRequestHandler<MyRow>(context), IShipperRetrieveHandler
+    RetrieveRequestHandlerAsync<MyRow>(context), IShipperRetrieveHandler
 {
 }

@@ -2,14 +2,14 @@
 
 namespace Serenity.Demo.Northwind;
 
-public interface IOrderListHandler : IListHandler<MyRow, OrderListRequest, ListResponse<MyRow>> { }
+public interface IOrderListHandler : IListHandlerAsync<MyRow, OrderListRequest, ListResponse<MyRow>> { }
 
 public class OrderListHandler(IRequestContext context) :
-    ListRequestHandler<MyRow, OrderListRequest, ListResponse<MyRow>>(context), IOrderListHandler
+    ListRequestHandlerAsync<MyRow, OrderListRequest, ListResponse<MyRow>>(context), IOrderListHandler
 {
-    protected override void ApplyFilters(SqlQuery query)
+    protected override async Task ApplyFiltersAsync(SqlQuery query, CancellationToken cancellationToken = default)
     {
-        base.ApplyFilters(query);
+        await base.ApplyFiltersAsync(query, cancellationToken).ConfigureAwait(false);
 
         if (Request.ProductID != null)
         {
