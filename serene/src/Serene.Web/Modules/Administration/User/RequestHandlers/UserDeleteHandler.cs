@@ -3,36 +3,36 @@ using MyRow = Serene.Administration.UserRow;
 
 namespace Serene.Administration;
 
-public interface IUserDeleteHandler : IDeleteHandler<MyRow> { }
+public interface IUserDeleteHandler : IDeleteHandlerAsync<MyRow> { }
 
 public class UserDeleteHandler(IRequestContext context,
     IOptions<EnvironmentSettings> environmentOptions)
-    : DeleteRequestHandler<MyRow>(context), IUserDeleteHandler
+    : DeleteRequestHandlerAsync<MyRow>(context), IUserDeleteHandler
 {
     private readonly IOptions<EnvironmentSettings> environmentOptions = environmentOptions ??
         throw new ArgumentNullException(nameof(environmentOptions));
 
-    protected override void ValidateRequest()
+    protected override async Task ValidateRequestAsync(CancellationToken cancellationToken = default)
     {
-        base.ValidateRequest();
+        await base.ValidateRequestAsync(cancellationToken).ConfigureAwait(false);
 
         environmentOptions.CheckPublicDemo(Row.UserId);
     }
 
-    protected override void OnBeforeDelete()
+    protected override async Task OnBeforeDeleteAsync(CancellationToken cancellationToken = default)
     {
-        base.OnBeforeDelete();
+        await base.OnBeforeDeleteAsync(cancellationToken).ConfigureAwait(false);
 
-        new SqlDelete(UserPreferenceRow.Fields.TableName)
+        await new SqlDelete(UserPreferenceRow.Fields.TableName)
             .Where(UserPreferenceRow.Fields.UserId == Row.UserId.Value)
-            .Execute(Connection, ExpectedRows.Ignore);
+            .ExecuteAsync(Connection, ExpectedRows.Ignore, cancellationToken: cancellationToken).ConfigureAwait(false);
 
-        new SqlDelete(UserRoleRow.Fields.TableName)
+        await new SqlDelete(UserRoleRow.Fields.TableName)
             .Where(UserRoleRow.Fields.UserId == Row.UserId.Value)
-            .Execute(Connection, ExpectedRows.Ignore);
+            .ExecuteAsync(Connection, ExpectedRows.Ignore, cancellationToken: cancellationToken).ConfigureAwait(false);
 
-        new SqlDelete(UserPermissionRow.Fields.TableName)
+        await new SqlDelete(UserPermissionRow.Fields.TableName)
             .Where(UserPermissionRow.Fields.UserId == Row.UserId.Value)
-            .Execute(Connection, ExpectedRows.Ignore);
+            .ExecuteAsync(Connection, ExpectedRows.Ignore, cancellationToken: cancellationToken).ConfigureAwait(false);
     }
 }

@@ -2,9 +2,9 @@ using MyRow = Serene.Administration.RoleRow;
 
 namespace Serene.Administration;
 
-public interface IRoleDeleteHandler : IDeleteHandler<MyRow> { }
+public interface IRoleDeleteHandler : IDeleteHandlerAsync<MyRow> { }
 
 public class RoleDeleteHandler(IRequestContext context)
-    : DeleteRequestHandler<MyRow>(context), IRoleDeleteHandler
+    : DeleteRequestHandlerAsync<MyRow>(context), IRoleDeleteHandler
 {
 }

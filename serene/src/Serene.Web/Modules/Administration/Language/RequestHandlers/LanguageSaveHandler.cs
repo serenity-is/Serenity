@@ -2,9 +2,9 @@ using MyRow = Serene.Administration.LanguageRow;
 
 namespace Serene.Administration;
 
-public interface ILanguageSaveHandler : ISaveHandler<MyRow> { }
+public interface ILanguageSaveHandler : ISaveHandlerAsync<MyRow> { }
 
 public class LanguageSaveHandler(IRequestContext context)
-    : SaveRequestHandler<MyRow>(context), ILanguageSaveHandler
+    : SaveRequestHandlerAsync<MyRow>(context), ILanguageSaveHandler
 {
 }

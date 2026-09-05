@@ -2,10 +2,10 @@ using MyRow = Serene.Administration.UserRow;
 
 namespace Serene.Administration;
 
-public interface IUserSaveHandler : ISaveHandler<MyRow> { }
+public interface IUserSaveHandler : ISaveHandlerAsync<MyRow> { }
 
 public class UserSaveHandler(IRequestContext context, IOptions<EnvironmentSettings> environmentOptions)
-    : SaveRequestHandler<MyRow>(context), IUserSaveHandler
+    : SaveRequestHandlerAsync<MyRow>(context), IUserSaveHandler
 {
     private static MyRow.RowFields Fld { get { return MyRow.Fields; } }
 
@@ -24,21 +24,18 @@ public class UserSaveHandler(IRequestContext context, IOptions<EnvironmentSettin
         }
     }
 
-    public static string ValidateUsername(IDbConnection connection, string username, int? existingUserId,
-        ITextLocalizer localizer)
+    private static async Task<string> ValidateUsernameAsync(IDbConnection connection, string username,
+        int? existingUserId, ITextLocalizer localizer, CancellationToken cancellationToken = default)
     {
-        username = username.TrimToNull();
-
-        if (username == null)
-            throw DataValidation.RequiredError(Fld.Username, localizer);
-
+        username = username.TrimToNull() ?? throw DataValidation.RequiredError(Fld.Username, localizer);
         if (!UserHelper.IsValidUsername(username))
             throw new ValidationError("InvalidUsername", "Username",
                 "Usernames should start with letters, only contain letters and numbers!");
 
-        var existing = UserHelper.GetUser(connection,
+        var existing = await UserHelper.GetUserAsync(connection,
             new Criteria(Fld.Username) == username |
-            new Criteria(Fld.Username) == username.Replace('I', 'İ'));
+            new Criteria(Fld.Username) == username.Replace('I', 'İ'),
+            cancellationToken).ConfigureAwait(false);
 
         if (existing != null && existingUserId != existing.UserId)
             throw new ValidationError("UniqueViolation", "Username",
@@ -47,16 +44,17 @@ public class UserSaveHandler(IRequestContext context, IOptions<EnvironmentSettin
         return username;
     }
 
-    protected override void ValidateRequest()
+    protected override async Task ValidateRequestAsync(CancellationToken cancellationToken = default)
     {
-        base.ValidateRequest();
+        await base.ValidateRequestAsync(cancellationToken).ConfigureAwait(false);
 
         if (IsUpdate)
         {
             environmentOptions.CheckPublicDemo(Row.UserId);
 
             if (Row.Username != Old.Username)
-                Row.Username = ValidateUsername(Connection, Row.Username, Old.UserId.Value, Localizer);
+                Row.Username = await ValidateUsernameAsync(Connection, Row.Username, Old.UserId.Value,
+                    Localizer, cancellationToken).ConfigureAwait(false);
 
             if (Row.DisplayName != Old.DisplayName)
                 Row.DisplayName = UserHelper.ValidateDisplayName(Row.DisplayName, Localizer);
@@ -64,7 +62,8 @@ public class UserSaveHandler(IRequestContext context, IOptions<EnvironmentSettin
 
         if (IsCreate)
         {
-            Row.Username = ValidateUsername(Connection, Row.Username, null, Localizer);
+            Row.Username = await ValidateUsernameAsync(Connection, Row.Username, null,
+                Localizer, cancellationToken).ConfigureAwait(false);
             Row.DisplayName = UserHelper.ValidateDisplayName(Row.DisplayName, Localizer);
         }
 
@@ -79,9 +78,9 @@ public class UserSaveHandler(IRequestContext context, IOptions<EnvironmentSettin
         }
     }
 
-    protected override void SetInternalFields()
+    protected override async Task SetInternalFieldsAsync(CancellationToken cancellationToken = default)
     {
-        base.SetInternalFields();
+        await base.SetInternalFieldsAsync(cancellationToken).ConfigureAwait(false);
 
         if (IsCreate)
         {
@@ -97,9 +96,9 @@ public class UserSaveHandler(IRequestContext context, IOptions<EnvironmentSettin
         }
     }
 
-    protected override void AfterSave()
+    protected override async Task AfterSaveAsync(CancellationToken cancellationToken = default)
     {
-        base.AfterSave();
+        await base.AfterSaveAsync(cancellationToken).ConfigureAwait(false);
 
         Cache.InvalidateOnCommit(UnitOfWork, Fld);
     }

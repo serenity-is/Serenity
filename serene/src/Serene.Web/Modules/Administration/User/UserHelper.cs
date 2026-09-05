@@ -17,12 +17,7 @@ public static class UserHelper
 
     public static string ValidateDisplayName(string displayName, ITextLocalizer localizer)
     {
-        displayName = displayName.TrimToNull();
-
-        if (displayName == null)
-            throw DataValidation.RequiredError(Fld.DisplayName, localizer);
-
-        return displayName;
+        return displayName.TrimToNull() ?? throw DataValidation.RequiredError(Fld.DisplayName, localizer);
     }
 
     public static string ValidatePassword(string password, ITextLocalizer localizer)
@@ -48,9 +43,10 @@ public static class UserHelper
         return CalculateHash(password, salt);
     }
 
-    public static MyRow GetUser(IDbConnection connection, BaseCriteria filter)
+    public static Task<MyRow> GetUserAsync(IDbConnection connection, BaseCriteria filter,
+        CancellationToken cancellationToken = default)
     {
-        return connection.TryFirst<MyRow>(query => query
+        return connection.TryFirstAsync<MyRow>(query => query
             .Select(
                 Fld.UserId,
                 Fld.Username,
@@ -58,7 +54,7 @@ public static class UserHelper
                 Fld.PasswordHash,
                 Fld.PasswordSalt,
                 Fld.IsActive)
-            .Where(filter));
+            .Where(filter), cancellationToken);
     }
 
     public static bool IsInvariantLetter(char c)

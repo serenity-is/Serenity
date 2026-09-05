@@ -2,9 +2,9 @@ using MyRow = Serene.Administration.LanguageRow;
 
 namespace Serene.Administration;
 
-public interface ILanguageDeleteHandler : IDeleteHandler<MyRow> { }
+public interface ILanguageDeleteHandler : IDeleteHandlerAsync<MyRow> { }
 
 public class LanguageDeleteHandler(IRequestContext context)
-    : DeleteRequestHandler<MyRow>(context), ILanguageDeleteHandler
+    : DeleteRequestHandlerAsync<MyRow>(context), ILanguageDeleteHandler
 {
 }

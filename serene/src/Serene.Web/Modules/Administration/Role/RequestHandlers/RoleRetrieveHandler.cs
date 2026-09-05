@@ -2,8 +2,8 @@ using MyRow = Serene.Administration.RoleRow;
 
 namespace Serene.Administration;
 
-public interface IRoleRetrieveHandler : IRetrieveHandler<MyRow> { }
+public interface IRoleRetrieveHandler : IRetrieveHandlerAsync<MyRow> { }
 public class RoleRetrieveHandler(IRequestContext context)
-    : RetrieveRequestHandler<MyRow>(context), IRoleRetrieveHandler
+    : RetrieveRequestHandlerAsync<MyRow>(context), IRoleRetrieveHandler
 {
 }
