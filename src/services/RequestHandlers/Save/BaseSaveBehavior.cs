@@ -1,9 +1,9 @@
 ﻿namespace Serenity.Services;
 
 /// <summary>
-/// Base class for behaviors implementing <see cref="ISaveBehavior"/>
+/// Base class for behaviors implementing <see cref="ISaveBehaviorSync"/>
 /// </summary>
-public abstract class BaseSaveBehavior : ISaveBehavior, ISaveExceptionBehavior
+public abstract class BaseSaveBehavior : ISaveBehaviorSync, ISaveExceptionBehavior
 {
     /// <inheritdoc/>
     public virtual void OnPrepareQuery(ISaveRequestHandler handler, SqlQuery query)

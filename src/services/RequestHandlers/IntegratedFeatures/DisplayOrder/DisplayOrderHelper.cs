@@ -93,15 +93,176 @@ public static class DisplayOrderHelper
         ArgumentNullException.ThrowIfNull(keyField);
         ArgumentNullException.ThrowIfNull(orderField);
 
-        // last assigned display order value
-        int order = 0;
+        // query to fetch id and display order values of the records in the group
+        SqlQuery query = new SqlQuery()
+            .Select(
+                keyField,
+                orderField)
+            .From(
+                tableName, Alias.T0)
+            .Where(
+                filter)
+            .OrderBy(
+                orderField);
 
-        // a list that will contain an element for each record, and hold old and new display 
-        // order values of records
-        List<OrderRecord> orderRecords = [];
+        // determine display order for records with same display order values 
+        // based on ID ordering set
+        query.OrderBy(keyField.Name, desc: descendingKeyOrder);
 
-        // link to the order entry for record whose display order value is asked to be changed
+        var orderRecords = new List<OrderRecord>();
         OrderRecord changing = null;
+
+        // read all existing records
+        using (IDataReader reader = query.ExecuteReader(connection))
+        {
+            var recordIDStr = recordID == null ? null :
+                IdToSql(recordID, connection.GetDialect());
+
+            int order = 0;
+            while (reader.Read())
+            {
+                order++;
+                OrderRecord r = new()
+                {
+                    recordID = reader.GetValue(0),
+                    oldOrder = Convert.ToInt32(reader.GetValue(1)),
+                    newOrder = order
+                };
+                orderRecords.Add(r);
+
+                if (recordID != null && recordIDStr ==
+                        IdToSql(r.recordID, connection.GetDialect()))
+                    changing = r;
+            }
+        }
+
+        newDisplayOrder = ComputeNewOrders(orderRecords, changing, newDisplayOrder);
+
+        return UpdateOrders(connection, orderRecords, tableName, keyField, orderField, hasUniqueConstraint);
+    }
+
+    /// <summary>
+    ///   Asynchronously gets the next display order value for a table or a group of records.</summary>
+    /// <param name="connection">
+    ///   Connection (required).</param>
+    /// <param name="tableName">
+    ///   Table name (required).</param>
+    /// <param name="orderField">
+    ///   Display order field meta (required).</param>
+    /// <param name="filter">
+    ///   Filter for records (can be null).</param>
+    /// <param name="cancellationToken">Cancellation token</param>
+    /// <returns>
+    ///   A task whose result is one more of maximum display order values of records in the group.
+    ///   If none, 1.</returns>
+    public static async Task<int> GetNextValueAsync(IDbConnection connection, string tableName,
+        Field orderField, ICriteria filter, CancellationToken cancellationToken = default)
+    {
+        ArgumentNullException.ThrowIfNull(connection);
+        if (tableName == null || tableName.Length == 0)
+            throw new ArgumentNullException("tableName");
+        ArgumentNullException.ThrowIfNull(orderField);
+
+        using IDataReader reader = await new SqlQuery()
+            .Select(
+                Sql.Max(orderField.Name))
+            .From(
+                tableName, Alias.T0)
+            .Where(
+                filter)
+            .ExecuteReaderAsync(connection, cancellationToken: cancellationToken).ConfigureAwait(false);
+        if (await reader.ReadAsync(cancellationToken).ConfigureAwait(false) && !reader.IsDBNull(0))
+            return Convert.ToInt32(reader.GetValue(0)) + 1;
+        else
+            return 1;
+    }
+
+    /// <summary>
+    ///   Asynchronously gets the next display order value for a table or a group of records.</summary>
+    /// <param name="connection">
+    ///   Connection (required).</param>
+    /// <param name="row">
+    ///   Row with a display order field (required).</param>
+    /// <param name="filter">
+    ///   Filter for records (can be null).</param>
+    /// <param name="cancellationToken">Cancellation token</param>
+    /// <returns>
+    ///   A task whose result is one more of maximum display order values of records in the group.
+    ///   If none, 1.</returns>
+    public static Task<int> GetNextValueAsync(IDbConnection connection, IDisplayOrderRow row, ICriteria filter = null,
+        CancellationToken cancellationToken = default)
+    {
+        return GetNextValueAsync(connection, row.Table, row.DisplayOrderField, filter, cancellationToken);
+    }
+
+    /// <summary>
+    ///   Asynchronously sets a records display order to to requested value, and also renumbers other records
+    ///   in the group as required.</summary>
+    /// <param name="connection">
+    ///   Connection (required).</param>
+    /// <param name="tableName">
+    ///   Table name (required).</param>
+    /// <param name="keyField">
+    ///   ID field meta that will be used to locate the record (required).</param>
+    /// <param name="orderField">
+    ///   Display order field meta.</param>
+    /// <param name="filter">
+    ///   Filter that will determine the record group (can be null).</param>
+    /// <param name="recordID">
+    ///   ID value of the record.</param>
+    /// <param name="newDisplayOrder">
+    ///   New display order of the record.</param>
+    /// <param name="descendingKeyOrder">
+    ///   Will records with same display order values be sorted in ascending or descending ID order?</param>
+    /// <param name="hasUniqueConstraint">True if the entity has a unique constraint on display order
+    /// column.</param>
+    /// <param name="cancellationToken">Cancellation token</param>
+    /// <returns>
+    ///   A task whose result is true if any of the display order values is changed.</returns>
+    public static Task<bool> ReorderValuesAsync(IDbConnection connection, string tableName, Field keyField, Field orderField,
+        ICriteria filter = null, object recordID = null, int newDisplayOrder = 1,
+        bool descendingKeyOrder = false, bool hasUniqueConstraint = false, CancellationToken cancellationToken = default)
+    {
+        return ReorderValuesCoreAsync(connection, tableName, keyField, orderField, filter, recordID,
+            newDisplayOrder, descendingKeyOrder, hasUniqueConstraint, cancellationToken);
+    }
+
+    /// <summary>
+    ///   Sets a records display order to to requested value, and also renumbers other records
+    ///   in the group as required.</summary>
+    /// <param name="connection">
+    ///   Connection (required).</param>
+    /// <param name="row">
+    ///   Row with a display order and ID field (should implement IDbIdRow interface).</param>
+    /// <param name="filter">
+    ///   Filter that will determine the record group (can be null).</param>
+    /// <param name="recordID">
+    ///   ID value of the record.</param>
+    /// <param name="newDisplayOrder">
+    ///   New display order of the record.</param>
+    /// <param name="descendingKeyOrder">
+    ///   Will records with same display order values be sorted in ascending or descending ID order?</param>
+    /// <param name="hasUniqueConstraint">True if the display order field has a unique index</param>
+    /// <param name="cancellationToken">Cancellation token</param>
+    /// <returns>
+    ///   A task whose result is true if any of the display order values is changed.</returns>
+    public static Task<bool> ReorderValuesAsync(IDbConnection connection, IDisplayOrderRow row, ICriteria filter = null,
+        object recordID = null, int newDisplayOrder = 1, bool descendingKeyOrder = false,
+        bool hasUniqueConstraint = false, CancellationToken cancellationToken = default)
+    {
+        return ReorderValuesCoreAsync(connection, row.Table, row.IdField, row.DisplayOrderField, filter, recordID,
+            newDisplayOrder, descendingKeyOrder, hasUniqueConstraint, cancellationToken);
+    }
+
+    private static async Task<bool> ReorderValuesCoreAsync(IDbConnection connection, string tableName, Field keyField, Field orderField,
+        ICriteria filter, object recordID, int newDisplayOrder, bool descendingKeyOrder, bool hasUniqueConstraint,
+        CancellationToken cancellationToken)
+    {
+        ArgumentNullException.ThrowIfNull(connection);
+        if (tableName == null || tableName.Length == 0)
+            throw new ArgumentNullException("tableName");
+        ArgumentNullException.ThrowIfNull(keyField);
+        ArgumentNullException.ThrowIfNull(orderField);
 
         // query to fetch id and display order values of the records in the group
         SqlQuery query = new SqlQuery()
@@ -119,34 +280,43 @@ public static class DisplayOrderHelper
         // based on ID ordering set
         query.OrderBy(keyField.Name, desc: descendingKeyOrder);
 
+        var orderRecords = new List<OrderRecord>();
+        OrderRecord changing = null;
+
         // read all existing records
-        using (IDataReader reader = query.ExecuteReader(connection))
+        using (IDataReader reader = await query.ExecuteReaderAsync(connection, cancellationToken: cancellationToken).ConfigureAwait(false))
         {
             var recordIDStr = recordID == null ? null :
                 IdToSql(recordID, connection.GetDialect());
-            while (reader.Read())
+
+            int order = 0;
+            while (await reader.ReadAsync(cancellationToken).ConfigureAwait(false))
             {
-                // each records actual display order value is one more than previous one
                 order++;
-                // create an entry to hold current and new display order value of the record
                 OrderRecord r = new()
                 {
-                    // record ID
                     recordID = reader.GetValue(0),
-                    // old display order field value (not the actual display order!)
                     oldOrder = Convert.ToInt32(reader.GetValue(1)),
-                    // new display order value (actual one to be set)
                     newOrder = order
                 };
-
                 orderRecords.Add(r);
 
-                // if this is the one that is requested to be changed, hold a link to its entry
                 if (recordID != null && recordIDStr ==
                         IdToSql(r.recordID, connection.GetDialect()))
                     changing = r;
             }
         }
+
+        newDisplayOrder = ComputeNewOrders(orderRecords, changing, newDisplayOrder);
+
+        return await UpdateOrdersAsync(connection, orderRecords, tableName, keyField, orderField,
+            hasUniqueConstraint, cancellationToken).ConfigureAwait(false);
+    }
+
+    private static int ComputeNewOrders(List<OrderRecord> orderRecords, OrderRecord changing, int newDisplayOrder)
+    {
+        // last assigned display order value is the count of records read
+        int order = orderRecords.Count;
 
         // ensure that the new display order is within limits
         // if its lower than 1 or bigger than record count, fix it
@@ -177,7 +347,7 @@ public static class DisplayOrderHelper
             changing.newOrder = newDisplayOrder;
         }
 
-        return UpdateOrders(connection, orderRecords, tableName, keyField, orderField, hasUniqueConstraint);
+        return newDisplayOrder;
     }
 
     private static string IdToSql(object id, ISqlDialect dialect)
@@ -219,6 +389,52 @@ public static class DisplayOrderHelper
 
         ArgumentNullException.ThrowIfNull(orderField);
 
+        var queries = BuildUpdateQueries(connection, orderRecords, tableName, keyField, orderField, hasUniqueConstraint);
+        if (queries.Length == 0)
+            return false;
+
+        SqlHelper.ExecuteNonQuery(connection, queries);
+        // one or more records has changed display order values
+        return true;
+    }
+
+    /// <summary>
+    /// Asynchronously updates display order values in a table
+    /// </summary>
+    /// <param name="connection">Connection</param>
+    /// <param name="orderRecords">List of records with new orders</param>
+    /// <param name="tableName">Tablename</param>
+    /// <param name="keyField">Key field</param>
+    /// <param name="orderField">Order field</param>
+    /// <param name="hasUniqueConstraint">True if order field has a unique constraint</param>
+    /// <param name="cancellationToken">Cancellation token</param>
+    /// <exception cref="ArgumentNullException">connection, tableName, keyField or orderField is null</exception>
+    /// <returns>A task whose result is true if any display order values were updated</returns>
+    public static async Task<bool> UpdateOrdersAsync(IDbConnection connection, List<OrderRecord> orderRecords,
+        string tableName, Field keyField, Field orderField, bool hasUniqueConstraint = false,
+        CancellationToken cancellationToken = default)
+    {
+        ArgumentNullException.ThrowIfNull(connection);
+
+        if (string.IsNullOrEmpty(tableName))
+            throw new ArgumentNullException("tableName");
+
+        ArgumentNullException.ThrowIfNull(keyField);
+
+        ArgumentNullException.ThrowIfNull(orderField);
+
+        var queries = BuildUpdateQueries(connection, orderRecords, tableName, keyField, orderField, hasUniqueConstraint);
+        if (queries.Length == 0)
+            return false;
+
+        await SqlHelper.ExecuteNonQueryAsync(connection, queries, cancellationToken: cancellationToken).ConfigureAwait(false);
+        // one or more records has changed display order values
+        return true;
+    }
+
+    private static string BuildUpdateQueries(IDbConnection connection, List<OrderRecord> orderRecords,
+        string tableName, Field keyField, Field orderField, bool hasUniqueConstraint)
+    {
         // StringBuilder that will contain query(s)
         StringBuilder queries = new();
 
@@ -351,21 +567,10 @@ public static class DisplayOrderHelper
             }
         }
 
-        if (queries.Length > 0 && updateCount > 0)
-        {
-            if (connection.GetDialect().NeedsExecuteBlockStatement)
-                queries.AppendLine("END;");
+        if (connection.GetDialect().NeedsExecuteBlockStatement && updateCount > 0)
+            queries.AppendLine("END;");
 
-            SqlHelper.ExecuteNonQuery(connection, queries.ToString());
-            // one ore more records has changed display order values
-
-            return true;
-        }
-        else
-        {
-            // nothing changed, all display orders are same
-            return false;
-        }
+        return updateCount > 0 ? queries.ToString() : string.Empty;
     }
 
     /// <summary>

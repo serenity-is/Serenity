@@ -162,6 +162,23 @@ public class ServiceCollectionExtensions_AddCustomRequestHandlersTests
     }
 
     [Fact]
+    public void SaveRequestHandlerAsync_Correct_Interfaces_Are_Generated()
+    {
+        var typeSource = new MockTypeSource(
+            typeof(TestSaveHandlerAsync1));
+        var collection = new ServiceCollection();
+        collection.AddCustomRequestHandlers(typeSource);
+        Assert.Collection(collection.OrderBy(x => x.ServiceType?.Name),
+            x => Assert.Equal(typeof(ICreateHandlerAsync<TestRow>), x.ServiceType),
+            x => Assert.Equal(typeof(ICreateHandlerAsync<TestRow, SaveRequest<TestRow>, SaveResponse>), x.ServiceType),
+            x => Assert.Equal(typeof(ISaveHandlerAsync<TestRow>), x.ServiceType),
+            x => Assert.Equal(typeof(ISaveHandlerAsync<TestRow, SaveRequest<TestRow>, SaveResponse>), x.ServiceType),
+            x => Assert.Equal(typeof(IUpdateHandlerAsync<TestRow>), x.ServiceType),
+            x => Assert.Equal(typeof(IUpdateHandlerAsync<TestRow, SaveRequest<TestRow>, SaveResponse>), x.ServiceType),
+            x => Assert.Equal(typeof(TestSaveHandlerAsync1), x.ServiceType));
+    }
+
+    [Fact]
     public void DeleteRequestHandler_Correct_Interfaces_Are_Generated()
     {
         var typeSource = new MockTypeSource(
@@ -321,6 +338,10 @@ public class ServiceCollectionExtensions_AddCustomRequestHandlersTests
     }
 
     private class TestSaveHandler1(IRequestContext context) : SaveRequestHandler<TestRow>(context)
+    {
+    }
+
+    private class TestSaveHandlerAsync1(IRequestContext context) : SaveRequestHandlerAsync<TestRow>(context)
     {
     }
 

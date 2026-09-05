@@ -4,6 +4,7 @@
 /// Abstraction for save request handlers with a Process method.
 /// </summary>
 [GenericHandlerType(typeof(SaveRequestHandler<>))]
+[CompanionHandlerType(typeof(ISaveRequestProcessorAsync), typeof(AsyncToSyncSaveRequestProcessorWrapper<>))]
 public interface ISaveRequestProcessor : ISaveRequestHandler
 {
     /// <summary>
