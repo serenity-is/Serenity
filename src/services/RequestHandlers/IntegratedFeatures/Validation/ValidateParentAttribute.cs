@@ -48,14 +48,14 @@ public class ValidateParentBehavior(IRowTypeRegistry rowTypeRegistry, ITextLocal
         if (row is not IParentIdRow parentIdRow)
             return false;
 
-        var parentId = parentIdRow.ParentIdField.AsObject(row);
+        var parentIdField = parentIdRow.ParentIdField;
+        var parentId = parentIdField.AsObject(row);
         if (parentId == null)
             return false;
 
-        if (isUpdate && parentId == parentIdRow.ParentIdField.AsObject(old))
+        if (isUpdate && parentIdField.IndexCompare(old, row) == 0)
             return false;
 
-        var parentIdField = parentIdRow.ParentIdField;
         if (string.IsNullOrEmpty(parentIdField.ForeignTable))
             return false;
 
