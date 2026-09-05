@@ -14,29 +14,29 @@ public interface ISaveBehaviorSync : ISaveBehavior
     /// <summary>Called when query to load old entity is built</summary>
     /// <param name="handler">Calling save request handler</param>
     /// <param name="query">Query</param>
-    void OnPrepareQuery(ISaveRequestHandler handler, SqlQuery query);
+    void OnPrepareQuery(ISaveRequestHandler handler, SqlQuery query) { }
 
     /// <summary>Called when save request is validated</summary>
     /// <param name="handler">Calling save request handler</param>
-    void OnValidateRequest(ISaveRequestHandler handler);
+    void OnValidateRequest(ISaveRequestHandler handler) { }
 
     /// <summary>Called when internal fields in row is being set</summary>
     /// <param name="handler">Calling save request handler</param>
-    void OnSetInternalFields(ISaveRequestHandler handler);
+    void OnSetInternalFields(ISaveRequestHandler handler) { }
 
     /// <summary>Called just before row is inserted to / updated in database</summary>
     /// <param name="handler">Calling save request handler</param>
-    void OnBeforeSave(ISaveRequestHandler handler);
+    void OnBeforeSave(ISaveRequestHandler handler) { }
 
     /// <summary>Called after row is inserted to / updated in database</summary>
     /// <param name="handler">Calling save request handler</param>
-    void OnAfterSave(ISaveRequestHandler handler);
+    void OnAfterSave(ISaveRequestHandler handler) { }
 
     /// <summary>Called after row is inserted to / updated and auditing should be performed</summary>
     /// <param name="handler">Calling save request handler</param>
-    void OnAudit(ISaveRequestHandler handler);
+    void OnAudit(ISaveRequestHandler handler) { }
 
     /// <summary>Called before handler is returning the result</summary>
     /// <param name="handler">Calling save request handler</param>
-    void OnReturn(ISaveRequestHandler handler);
+    void OnReturn(ISaveRequestHandler handler) { }
 }

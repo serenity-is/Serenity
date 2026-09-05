@@ -14,25 +14,25 @@ public interface IUndeleteBehaviorSync : IUndeleteBehavior
     /// <summary>Called when query to load old entity is built</summary>
     /// <param name="handler">Calling undelete request handler</param>
     /// <param name="query">The query</param>
-    void OnPrepareQuery(IUndeleteRequestHandler handler, SqlQuery query);
+    void OnPrepareQuery(IUndeleteRequestHandler handler, SqlQuery query) { }
 
     /// <summary>Called when undelete request is validated</summary>
     /// <param name="handler">Calling undelete request handler</param>
-    void OnValidateRequest(IUndeleteRequestHandler handler);
+    void OnValidateRequest(IUndeleteRequestHandler handler) { }
 
     /// <summary>Called just before row is undeleted in database</summary>
     /// <param name="handler">Calling undelete request handler</param>
-    void OnBeforeUndelete(IUndeleteRequestHandler handler);
+    void OnBeforeUndelete(IUndeleteRequestHandler handler) { }
 
     /// <summary>Called after row is undeleted in database</summary>
     /// <param name="handler">Calling undelete request handler</param>
-    void OnAfterUndelete(IUndeleteRequestHandler handler);
+    void OnAfterUndelete(IUndeleteRequestHandler handler) { }
 
     /// <summary>Called after row is undeleted and auditing should be performed</summary>
     /// <param name="handler">Calling undelete request handler</param>
-    void OnAudit(IUndeleteRequestHandler handler);
+    void OnAudit(IUndeleteRequestHandler handler) { }
 
     /// <summary>Called before handler is returning the result</summary>
     /// <param name="handler">Calling undelete request handler</param>
-    void OnReturn(IUndeleteRequestHandler handler);
+    void OnReturn(IUndeleteRequestHandler handler) { }
 }

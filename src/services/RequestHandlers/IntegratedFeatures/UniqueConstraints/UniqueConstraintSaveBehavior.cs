@@ -7,7 +7,7 @@ namespace Serenity.Services;
 /// Initializes a new instance of the class.
 /// </remarks>
 /// <param name="localizer">Text localizer</param>
-public class UniqueConstraintSaveBehavior(ITextLocalizer localizer) : BaseSaveBehavior, IImplicitBehavior
+public class UniqueConstraintSaveBehavior(ITextLocalizer localizer) : BaseSaveBehaviorAsync, ISaveBehaviorSync, IImplicitBehavior
 {
     private UniqueConstraintAttribute[] attrList;
     private IEnumerable<Field>[] attrFields;
@@ -27,23 +27,12 @@ public class UniqueConstraintSaveBehavior(ITextLocalizer localizer) : BaseSaveBe
     }
 
     /// <inheritdoc/>
-    public override void OnBeforeSave(ISaveRequestHandler handler)
+    public virtual void OnBeforeSave(ISaveRequestHandler handler)
     {
         if (attrList == null)
             return;
 
-        attrFields ??= attrList.Select(attr =>
-            {
-                return attr.Fields.Select(x =>
-                {
-                    var field = handler.Row.FindFieldByPropertyName(x) ?? handler.Row.FindField(x);
-                    return field is null
-                        ? throw new InvalidOperationException(string.Format(
-                            "Can't find field '{0}' of unique constraint in row type '{1}'",
-                                x, handler.Row.GetType().FullName))
-                        : field;
-                });
-            }).ToArray();
+        EnsureAttrFields(handler);
 
         for (var i = 0; i < attrList.Length; i++)
         {
@@ -53,5 +42,43 @@ public class UniqueConstraintSaveBehavior(ITextLocalizer localizer) : BaseSaveBe
             UniqueFieldSaveBehavior.ValidateUniqueConstraint(handler, fields, localizer, attr.ErrorMessage,
                 attrList[i].IgnoreDeleted ? ServiceQueryHelper.GetNotDeletedCriteria(handler.Row) : Criteria.Empty);
         }
+    }
+
+    /// <inheritdoc/>
+    public override async Task OnBeforeSaveAsync(ISaveRequestHandler handler, CancellationToken cancellationToken = default)
+    {
+        if (attrList == null)
+            return;
+
+        EnsureAttrFields(handler);
+
+        for (var i = 0; i < attrList.Length; i++)
+        {
+            var attr = attrList[i];
+            var fields = attrFields[i];
+
+            await UniqueFieldSaveBehavior.ValidateUniqueConstraintAsync(handler, fields, localizer, attr.ErrorMessage,
+                attrList[i].IgnoreDeleted ? ServiceQueryHelper.GetNotDeletedCriteria(handler.Row) : Criteria.Empty,
+                cancellationToken).ConfigureAwait(false);
+        }
+    }
+
+    private void EnsureAttrFields(ISaveRequestHandler handler)
+    {
+        if (attrFields != null)
+            return;
+
+        attrFields = attrList.Select(attr =>
+        {
+            return attr.Fields.Select(x =>
+            {
+                var field = handler.Row.FindFieldByPropertyName(x) ?? handler.Row.FindField(x);
+                return field is null
+                    ? throw new InvalidOperationException(string.Format(
+                        "Can't find field '{0}' of unique constraint in row type '{1}'",
+                            x, handler.Row.GetType().FullName))
+                    : field;
+            });
+        }).ToArray();
     }
 }

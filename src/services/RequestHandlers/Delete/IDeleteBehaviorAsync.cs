@@ -15,30 +15,30 @@ public interface IDeleteBehaviorAsync : IDeleteBehavior
     /// <param name="handler">Calling delete request handler</param>
     /// <param name="query">Query</param>
     /// <param name="cancellationToken">Cancellation token</param>
-    Task OnPrepareQueryAsync(IDeleteRequestHandler handler, SqlQuery query, CancellationToken cancellationToken = default);
+    Task OnPrepareQueryAsync(IDeleteRequestHandler handler, SqlQuery query, CancellationToken cancellationToken = default) => Task.CompletedTask;
 
     /// <summary>Called when delete request is validated</summary>
     /// <param name="handler">Calling delete request handler</param>
     /// <param name="cancellationToken">Cancellation token</param>
-    Task OnValidateRequestAsync(IDeleteRequestHandler handler, CancellationToken cancellationToken = default);
+    Task OnValidateRequestAsync(IDeleteRequestHandler handler, CancellationToken cancellationToken = default) => Task.CompletedTask;
 
     /// <summary>Called just before row is deleted from database</summary>
     /// <param name="handler">Calling delete request handler</param>
     /// <param name="cancellationToken">Cancellation token</param>
-    Task OnBeforeDeleteAsync(IDeleteRequestHandler handler, CancellationToken cancellationToken = default);
+    Task OnBeforeDeleteAsync(IDeleteRequestHandler handler, CancellationToken cancellationToken = default) => Task.CompletedTask;
 
     /// <summary>Called after row is deleted from database</summary>
     /// <param name="handler">Calling delete request handler</param>
     /// <param name="cancellationToken">Cancellation token</param>
-    Task OnAfterDeleteAsync(IDeleteRequestHandler handler, CancellationToken cancellationToken = default);
+    Task OnAfterDeleteAsync(IDeleteRequestHandler handler, CancellationToken cancellationToken = default) => Task.CompletedTask;
 
     /// <summary>Called after row is deleted and auditing should be performed</summary>
     /// <param name="handler">Calling delete request handler</param>
     /// <param name="cancellationToken">Cancellation token</param>
-    Task OnAuditAsync(IDeleteRequestHandler handler, CancellationToken cancellationToken = default);
+    Task OnAuditAsync(IDeleteRequestHandler handler, CancellationToken cancellationToken = default) => Task.CompletedTask;
 
     /// <summary>Called before handler is returning the result</summary>
     /// <param name="handler">Calling delete request handler</param>
     /// <param name="cancellationToken">Cancellation token</param>
-    Task OnReturnAsync(IDeleteRequestHandler handler, CancellationToken cancellationToken = default);
+    Task OnReturnAsync(IDeleteRequestHandler handler, CancellationToken cancellationToken = default) => Task.CompletedTask;
 }

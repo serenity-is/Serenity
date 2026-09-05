@@ -15,30 +15,30 @@ public interface IUndeleteBehaviorAsync : IUndeleteBehavior
     /// <param name="handler">Calling undelete request handler</param>
     /// <param name="query">Query</param>
     /// <param name="cancellationToken">Cancellation token</param>
-    Task OnPrepareQueryAsync(IUndeleteRequestHandler handler, SqlQuery query, CancellationToken cancellationToken = default);
+    Task OnPrepareQueryAsync(IUndeleteRequestHandler handler, SqlQuery query, CancellationToken cancellationToken = default) => Task.CompletedTask;
 
     /// <summary>Called when undelete request is validated</summary>
     /// <param name="handler">Calling undelete request handler</param>
     /// <param name="cancellationToken">Cancellation token</param>
-    Task OnValidateRequestAsync(IUndeleteRequestHandler handler, CancellationToken cancellationToken = default);
+    Task OnValidateRequestAsync(IUndeleteRequestHandler handler, CancellationToken cancellationToken = default) => Task.CompletedTask;
 
     /// <summary>Called just before row is undeleted in database</summary>
     /// <param name="handler">Calling undelete request handler</param>
     /// <param name="cancellationToken">Cancellation token</param>
-    Task OnBeforeUndeleteAsync(IUndeleteRequestHandler handler, CancellationToken cancellationToken = default);
+    Task OnBeforeUndeleteAsync(IUndeleteRequestHandler handler, CancellationToken cancellationToken = default) => Task.CompletedTask;
 
     /// <summary>Called after row is undeleted in database</summary>
     /// <param name="handler">Calling undelete request handler</param>
     /// <param name="cancellationToken">Cancellation token</param>
-    Task OnAfterUndeleteAsync(IUndeleteRequestHandler handler, CancellationToken cancellationToken = default);
+    Task OnAfterUndeleteAsync(IUndeleteRequestHandler handler, CancellationToken cancellationToken = default) => Task.CompletedTask;
 
     /// <summary>Called after row is undeleted and auditing should be performed</summary>
     /// <param name="handler">Calling undelete request handler</param>
     /// <param name="cancellationToken">Cancellation token</param>
-    Task OnAuditAsync(IUndeleteRequestHandler handler, CancellationToken cancellationToken = default);
+    Task OnAuditAsync(IUndeleteRequestHandler handler, CancellationToken cancellationToken = default) => Task.CompletedTask;
 
     /// <summary>Called before handler is returning the result</summary>
     /// <param name="handler">Calling undelete request handler</param>
     /// <param name="cancellationToken">Cancellation token</param>
-    Task OnReturnAsync(IUndeleteRequestHandler handler, CancellationToken cancellationToken = default);
+    Task OnReturnAsync(IUndeleteRequestHandler handler, CancellationToken cancellationToken = default) => Task.CompletedTask;
 }

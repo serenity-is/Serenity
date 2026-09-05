@@ -9,50 +9,71 @@ namespace Serenity.Services;
 /// <param name="rowTypeRegistry">Row type registry</param>
 /// <param name="localizer">Text localizer</param>
 /// <exception cref="ArgumentNullException"><paramref name="rowTypeRegistry"/> or <paramref name="localizer"/> is <c>null</c>.</exception>
-public class ValidateParentBehavior(IRowTypeRegistry rowTypeRegistry, ITextLocalizer localizer) : BaseSaveBehavior
+public class ValidateParentBehavior(IRowTypeRegistry rowTypeRegistry, ITextLocalizer localizer) :
+    BaseSaveBehaviorAsync, ISaveBehaviorSync
 {
     private readonly IRowTypeRegistry rowTypeRegistry = rowTypeRegistry ??
             throw new ArgumentNullException(nameof(rowTypeRegistry));
     private readonly ITextLocalizer localizer = localizer ?? throw new ArgumentNullException(nameof(localizer));
 
     /// <inheritdoc/>
-    public override void OnValidateRequest(ISaveRequestHandler handler)
+    public virtual void OnValidateRequest(ISaveRequestHandler handler)
     {
-        base.OnValidateRequest(handler);
+        if (!TryGetParentCheck(handler, out var tableName, out var criteria))
+            return;
+
+        ServiceHelper.CheckParentNotDeleted(handler.UnitOfWork.Connection,
+            tableName, query => query.Where(criteria), localizer);
+    }
+
+    /// <inheritdoc/>
+    public override async Task OnValidateRequestAsync(ISaveRequestHandler handler, CancellationToken cancellationToken = default)
+    {
+        if (!TryGetParentCheck(handler, out var tableName, out var criteria))
+            return;
+
+        await ServiceHelper.CheckParentNotDeletedAsync(handler.UnitOfWork.Connection,
+            tableName, query => query.Where(criteria), localizer, cancellationToken).ConfigureAwait(false);
+    }
+
+    private bool TryGetParentCheck(ISaveRequestHandler handler, out string tableName, out BaseCriteria criteria)
+    {
+        tableName = null;
+        criteria = null;
 
         var row = handler.Row;
         var old = handler.Old;
-        var isUpdate = old == null;
+        var isUpdate = old != null;
 
         if (row is not IParentIdRow parentIdRow)
-            return;
+            return false;
 
         var parentId = parentIdRow.ParentIdField.AsObject(row);
         if (parentId == null)
-            return;
+            return false;
 
         if (isUpdate && parentId == parentIdRow.ParentIdField.AsObject(old))
-            return;
+            return false;
 
         var parentIdField = parentIdRow.ParentIdField;
         if (string.IsNullOrEmpty(parentIdField.ForeignTable))
-            return;
+            return false;
 
         var foreignRowType = rowTypeRegistry.ByConnectionKey(row.GetFields().ConnectionKey)
-            .FirstOrDefault(x => x.GetCustomAttribute<TableNameAttribute>()?.Name == 
+            .FirstOrDefault(x => x.GetCustomAttribute<TableNameAttribute>()?.Name ==
                 parentIdField.ForeignTable);
 
         if (foreignRowType == null)
-            return;
+            return false;
 
         if (Activator.CreateInstance(foreignRowType) is not IIdRow foreignRow ||
             foreignRow is not IIsActiveRow iar)
-            return;
+            return false;
 
-        ServiceHelper.CheckParentNotDeleted(handler.UnitOfWork.Connection, 
-            foreignRow.Table,
-            query => query.Where(
-                new Criteria(foreignRow.IdField) == new ValueCriteria(parentId) &
-                new Criteria(iar.IsActiveField) < 0), localizer);
+        tableName = foreignRow.Table;
+        criteria = new Criteria(foreignRow.IdField) == new ValueCriteria(parentId) &
+            new Criteria(iar.IsActiveField) < 0;
+
+        return true;
     }
 }

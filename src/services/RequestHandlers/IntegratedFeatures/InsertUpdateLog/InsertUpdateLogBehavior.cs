@@ -5,7 +5,7 @@ namespace Serenity.Services;
 /// for rows with <see cref="IInsertLogRow"/> 
 /// and <see cref="IUpdateLogRow"/> interfaces
 /// </summary>
-public class UpdateInsertLogBehavior : BaseSaveBehavior, IImplicitBehavior
+public class UpdateInsertLogBehavior : BaseSaveBehaviorAsync, ISaveBehaviorSync, IImplicitBehavior
 {
     /// <inheritdoc/>
     public bool ActivateFor(IRow row)
@@ -15,7 +15,7 @@ public class UpdateInsertLogBehavior : BaseSaveBehavior, IImplicitBehavior
     }
 
     /// <inheritdoc/>
-    public override void OnSetInternalFields(ISaveRequestHandler handler)
+    public virtual void OnSetInternalFields(ISaveRequestHandler handler)
     {
         var row = handler.Row;
         var insertDateRow = row as IInsertDateRow;
@@ -40,5 +40,12 @@ public class UpdateInsertLogBehavior : BaseSaveBehavior, IImplicitBehavior
         {
             insertUserIdRow.InsertUserIdField.AsInvariant(row, handler.Context.User?.GetIdentifier());
         }
+    }
+
+    /// <inheritdoc/>
+    public override Task OnSetInternalFieldsAsync(ISaveRequestHandler handler, CancellationToken cancellationToken = default)
+    {
+        OnSetInternalFields(handler);
+        return Task.CompletedTask;
     }
 }

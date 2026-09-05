@@ -10,7 +10,8 @@ namespace Serenity.Services;
 /// </remarks>
 /// <param name="handlerFactory">Default handler factory</param>
 /// <exception cref="ArgumentNullException"><paramref name="handlerFactory"/> is <c>null</c>.</exception>
-public class LocalizationBehavior(IDefaultHandlerFactory handlerFactory) : BaseSaveDeleteBehavior, IImplicitBehavior, IRetrieveBehavior
+public class LocalizationBehavior(IDefaultHandlerFactory handlerFactory) : BaseSaveDeleteBehaviorAsync,
+    ISaveBehaviorSync, IDeleteBehaviorSync, IRetrieveBehaviorSync, IRetrieveBehaviorAsync, IImplicitBehavior
 {
     private readonly IDefaultHandlerFactory handlerFactory = handlerFactory ?? throw new ArgumentNullException(nameof(handlerFactory));
     private LocalizationRowAttribute attr;
@@ -169,28 +170,35 @@ public class LocalizationBehavior(IDefaultHandlerFactory handlerFactory) : BaseS
     private object GetOldLocalizationRowId(IDbConnection connection, object recordId, string cultureId)
     {
         var row = localRowInstance.CreateNew();
-        if (new SqlQuery()
-                .From(row)
-                .Select(localRowIdField)
-                .WhereEqual(foreignKeyField, recordId)
-                .WhereEqual(cultureIdField, cultureId)
+        if (BuildOldLocalizationRowQuery(row, recordId, cultureId)
                 .GetFirst(connection))
             return localRowIdField.AsObject(row);
 
         return null;
     }
 
-    /// <inheritdoc/>
-    public void OnAfterExecuteQuery(IRetrieveRequestHandler handler) { }
-    /// <inheritdoc/>
-    public void OnBeforeExecuteQuery(IRetrieveRequestHandler handler) { }
-    /// <inheritdoc/>
-    public void OnPrepareQuery(IRetrieveRequestHandler handler, SqlQuery query) { }
-    /// <inheritdoc/>
-    public void OnValidateRequest(IRetrieveRequestHandler handler) { }
+    private async Task<object> GetOldLocalizationRowIdAsync(IDbConnection connection, object recordId, string cultureId,
+        CancellationToken cancellationToken = default)
+    {
+        var row = localRowInstance.CreateNew();
+        if (await BuildOldLocalizationRowQuery(row, recordId, cultureId)
+                .GetFirstAsync(connection, cancellationToken).ConfigureAwait(false))
+            return localRowIdField.AsObject(row);
+
+        return null;
+    }
+
+    private SqlQuery BuildOldLocalizationRowQuery(IRow row, object recordId, string cultureId)
+    {
+        return new SqlQuery()
+            .From(row)
+            .Select(localRowIdField)
+            .WhereEqual(foreignKeyField, recordId)
+            .WhereEqual(cultureIdField, cultureId);
+    }
 
     /// <inheritdoc/>
-    public void OnReturn(IRetrieveRequestHandler handler)
+    public virtual void OnReturn(IRetrieveRequestHandler handler)
     {
         if (handler.Request == null ||
             handler.Request.IncludeColumns == null ||
@@ -201,12 +209,43 @@ public class LocalizationBehavior(IDefaultHandlerFactory handlerFactory) : BaseS
 
         var listHandler = handlerFactory.CreateHandler<IListRequestProcessor>(localRowType);
         var listRequest = listHandler.CreateRequest();
+        PopulateListRequest(listRequest, localIdField, handler);
 
+        var response = listHandler.Process(handler.Connection, listRequest);
+        FillLocalizations(handler, response);
+    }
+
+    /// <inheritdoc/>
+    public virtual Task OnReturnAsync(IRetrieveRequestHandler handler, CancellationToken cancellationToken = default)
+    {
+        if (handler.Request == null ||
+            handler.Request.IncludeColumns == null ||
+            !handler.Request.IncludeColumns.Contains("Localizations"))
+            return Task.CompletedTask;
+
+        return OnReturnAsyncCore(handler, cancellationToken);
+    }
+
+    private async Task OnReturnAsyncCore(IRetrieveRequestHandler handler, CancellationToken cancellationToken)
+    {
+        var localIdField = handler.Row.IdField;
+
+        var listHandler = handlerFactory.CreateHandler<IListRequestProcessorAsync>(localRowType);
+        var listRequest = listHandler.CreateRequest();
+        PopulateListRequest(listRequest, localIdField, handler);
+
+        var response = await listHandler.ProcessAsync(handler.Connection, listRequest, cancellationToken).ConfigureAwait(false);
+        FillLocalizations(handler, response);
+    }
+
+    private void PopulateListRequest(ListRequest listRequest, Field localIdField, IRetrieveRequestHandler handler)
+    {
         listRequest.ColumnSelection = ColumnSelection.List;
         listRequest.Criteria = foreignKeyCriteria == new ValueCriteria(localIdField.AsObject(handler.Row));
+    }
 
-        IListResponse response = listHandler.Process(handler.Connection, listRequest);
-
+    private void FillLocalizations(IRetrieveRequestHandler handler, IListResponse response)
+    {
         var row = rowFactory();
         var rowIdField = row.IdField;
         var fields = row.GetFields();
@@ -258,6 +297,21 @@ public class LocalizationBehavior(IDefaultHandlerFactory handlerFactory) : BaseS
         saveHandler.Process(uow, saveRequest, localRowId == null ? SaveRequestType.Create : SaveRequestType.Update);
     }
 
+    private async Task SaveLocalRowAsync(IUnitOfWork uow, ILocalizationRow localRow, object masterId, object localRowId,
+        CancellationToken cancellationToken = default)
+    {
+        localRow = localRow.Clone();
+
+        foreignKeyField.AsObject(localRow, masterId);
+        localRow.IdField.AsObject(localRow, localRowId);
+
+        var saveHandler = handlerFactory.CreateHandler<ISaveRequestProcessorAsync>(localRowType);
+        var saveRequest = saveHandler.CreateRequest();
+        saveRequest.Entity = localRow;
+        await saveHandler.ProcessAsync(uow, saveRequest,
+            localRowId == null ? SaveRequestType.Create : SaveRequestType.Update, cancellationToken).ConfigureAwait(false);
+    }
+
     private void DeleteLocalRow(IUnitOfWork uow, object detailId)
     {
         var deleteHandler = handlerFactory.CreateHandler<IDeleteRequestProcessor>(localRowType);
@@ -266,8 +320,16 @@ public class LocalizationBehavior(IDefaultHandlerFactory handlerFactory) : BaseS
         deleteHandler.Process(uow, deleteRequest);
     }
 
+    private Task DeleteLocalRowAsync(IUnitOfWork uow, object detailId, CancellationToken cancellationToken = default)
+    {
+        var deleteHandler = handlerFactory.CreateHandler<IDeleteRequestProcessorAsync>(localRowType);
+        var deleteRequest = deleteHandler.CreateRequest();
+        deleteRequest.EntityId = detailId;
+        return deleteHandler.ProcessAsync(uow, deleteRequest, cancellationToken);
+    }
+
     /// <inheritdoc/>
-    public override void OnAfterSave(ISaveRequestHandler handler)
+    public virtual void OnAfterSave(ISaveRequestHandler handler)
     {
         var localizations = handler.Request.Localizations;
         if (localizations == null)
@@ -317,11 +379,81 @@ public class LocalizationBehavior(IDefaultHandlerFactory handlerFactory) : BaseS
     }
 
     /// <inheritdoc/>
-    public override void OnBeforeDelete(IDeleteRequestHandler handler)
+    public override async Task OnAfterSaveAsync(ISaveRequestHandler handler, CancellationToken cancellationToken = default)
+    {
+        var localizations = handler.Request.Localizations;
+        if (localizations == null)
+            return;
+
+        var idField = handler.Row.IdField;
+        var masterId = idField.AsObject(handler.Row);
+
+        foreach (DictionaryEntry pair in localizations)
+        {
+            var cultureId = cultureIdField.ConvertValue(pair.Key, CultureInfo.InvariantCulture)?.ToString();
+            var oldId = handler.IsCreate ? null : await GetOldLocalizationRowIdAsync(handler.UnitOfWork.Connection, masterId, cultureId, cancellationToken).ConfigureAwait(false);
+            var localRow = localRowFactory();
+            localRow.TrackAssignments = true;
+            if (oldId == null)
+                cultureIdField[localRow] = cultureId;
+
+            var row = pair.Value as IRow;
+
+            bool anyNonEmpty = false;
+
+            foreach (var field in row.GetFields())
+            {
+                if (ReferenceEquals(field, idField))
+                    continue;
+
+                if (!row.IsAssigned(field))
+                    continue;
+
+                var match = GetLocalizationMatch(field) ?? throw new ValidationError("CantLocalize", field.Name, string.Format("{0} field is not localizable!",
+                        field.PropertyName ?? field.Name));
+                var value = field.AsObject(row);
+                match.AsObject(localRow, value);
+
+                if (value != null &&
+                    (value is not string || !string.IsNullOrWhiteSpace(value as string)))
+                {
+                    anyNonEmpty = true;
+                }
+            }
+
+            if (anyNonEmpty)
+                await SaveLocalRowAsync(handler.UnitOfWork, localRow, masterId, oldId, cancellationToken).ConfigureAwait(false);
+            else if (oldId != null)
+                await DeleteLocalRowAsync(handler.UnitOfWork, oldId, cancellationToken).ConfigureAwait(false);
+        }
+    }
+
+    /// <inheritdoc/>
+    public virtual void OnBeforeDelete(IDeleteRequestHandler handler)
     {
         if (ServiceQueryHelper.UseSoftDelete(handler.Row))
             return;
 
+        var deleteList = GetLocalRowIdList(handler);
+
+        foreach (var localId in deleteList)
+            DeleteLocalRow(handler.UnitOfWork, localId);
+    }
+
+    /// <inheritdoc/>
+    public override async Task OnBeforeDeleteAsync(IDeleteRequestHandler handler, CancellationToken cancellationToken = default)
+    {
+        if (ServiceQueryHelper.UseSoftDelete(handler.Row))
+            return;
+
+        var deleteList = await GetLocalRowIdListAsync(handler, cancellationToken).ConfigureAwait(false);
+
+        foreach (var localId in deleteList)
+            await DeleteLocalRowAsync(handler.UnitOfWork, localId, cancellationToken).ConfigureAwait(false);
+    }
+
+    private List<object> GetLocalRowIdList(IDeleteRequestHandler handler)
+    {
         var idField = handler.Row.IdField;
         var localRow = localRowFactory();
 
@@ -337,7 +469,27 @@ public class LocalizationBehavior(IDefaultHandlerFactory handlerFactory) : BaseS
                     deleteList.Add(localRowIdField.AsObject(localRow));
                 });
 
-        foreach (var localId in deleteList)
-            DeleteLocalRow(handler.UnitOfWork, localId);
+        return deleteList;
+    }
+
+    private async Task<List<object>> GetLocalRowIdListAsync(IDeleteRequestHandler handler,
+        CancellationToken cancellationToken = default)
+    {
+        var idField = handler.Row.IdField;
+        var localRow = localRowFactory();
+
+        var deleteList = new List<object>();
+        await new SqlQuery()
+                .Dialect(handler.Connection.GetDialect())
+                .From(localRow)
+                .Select(localRowIdField)
+                .Where(
+                    foreignKeyField == new ValueCriteria(idField.AsSqlValue(handler.Row)))
+                .ForEachAsync(handler.Connection, () =>
+                {
+                    deleteList.Add(localRowIdField.AsObject(localRow));
+                }, cancellationToken).ConfigureAwait(false);
+
+        return deleteList;
     }
 }

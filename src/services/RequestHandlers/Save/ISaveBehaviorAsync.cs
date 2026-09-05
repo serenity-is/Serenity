@@ -15,35 +15,35 @@ public interface ISaveBehaviorAsync : ISaveBehavior
     /// <param name="handler">Calling save request handler</param>
     /// <param name="query">Query</param>
     /// <param name="cancellationToken">Cancellation token</param>
-    Task OnPrepareQueryAsync(ISaveRequestHandler handler, SqlQuery query, CancellationToken cancellationToken = default);
+    Task OnPrepareQueryAsync(ISaveRequestHandler handler, SqlQuery query, CancellationToken cancellationToken = default) => Task.CompletedTask;
 
     /// <summary>Called when save request is validated</summary>
     /// <param name="handler">Calling save request handler</param>
     /// <param name="cancellationToken">Cancellation token</param>
-    Task OnValidateRequestAsync(ISaveRequestHandler handler, CancellationToken cancellationToken = default);
+    Task OnValidateRequestAsync(ISaveRequestHandler handler, CancellationToken cancellationToken = default) => Task.CompletedTask;
 
     /// <summary>Called when internal fields in row is being set</summary>
     /// <param name="handler">Calling save request handler</param>
     /// <param name="cancellationToken">Cancellation token</param>
-    Task OnSetInternalFieldsAsync(ISaveRequestHandler handler, CancellationToken cancellationToken = default);
+    Task OnSetInternalFieldsAsync(ISaveRequestHandler handler, CancellationToken cancellationToken = default) => Task.CompletedTask;
 
     /// <summary>Called just before row is inserted to / updated in database</summary>
     /// <param name="handler">Calling save request handler</param>
     /// <param name="cancellationToken">Cancellation token</param>
-    Task OnBeforeSaveAsync(ISaveRequestHandler handler, CancellationToken cancellationToken = default);
+    Task OnBeforeSaveAsync(ISaveRequestHandler handler, CancellationToken cancellationToken = default) => Task.CompletedTask;
 
     /// <summary>Called after row is inserted to / updated in database</summary>
     /// <param name="handler">Calling save request handler</param>
     /// <param name="cancellationToken">Cancellation token</param>
-    Task OnAfterSaveAsync(ISaveRequestHandler handler, CancellationToken cancellationToken = default);
+    Task OnAfterSaveAsync(ISaveRequestHandler handler, CancellationToken cancellationToken = default) => Task.CompletedTask;
 
     /// <summary>Called after row is inserted to / updated and auditing should be performed</summary>
     /// <param name="handler">Calling save request handler</param>
     /// <param name="cancellationToken">Cancellation token</param>
-    Task OnAuditAsync(ISaveRequestHandler handler, CancellationToken cancellationToken = default);
+    Task OnAuditAsync(ISaveRequestHandler handler, CancellationToken cancellationToken = default) => Task.CompletedTask;
 
     /// <summary>Called before handler is returning the result</summary>
     /// <param name="handler">Calling save request handler</param>
     /// <param name="cancellationToken">Cancellation token</param>
-    Task OnReturnAsync(ISaveRequestHandler handler, CancellationToken cancellationToken = default);
+    Task OnReturnAsync(ISaveRequestHandler handler, CancellationToken cancellationToken = default) => Task.CompletedTask;
 }

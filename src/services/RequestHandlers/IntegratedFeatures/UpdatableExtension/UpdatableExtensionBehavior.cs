@@ -8,7 +8,8 @@ namespace Serenity.Services;
 /// </remarks>
 /// <param name="handlerFactory">Default handler factory</param>
 /// <exception cref="ArgumentNullException"><paramref name="handlerFactory"/> is <c>null</c>.</exception>
-public class UpdatableExtensionBehavior(IDefaultHandlerFactory handlerFactory) : BaseSaveDeleteBehavior, IImplicitBehavior
+public class UpdatableExtensionBehavior(IDefaultHandlerFactory handlerFactory) : BaseSaveDeleteBehaviorAsync,
+    ISaveBehaviorSync, IDeleteBehaviorSync, IImplicitBehavior
 {
     private class RelationInfo
     {
@@ -215,7 +216,7 @@ public class UpdatableExtensionBehavior(IDefaultHandlerFactory handlerFactory) :
     }
 
     /// <inheritdoc/>
-    public override void OnBeforeSave(ISaveRequestHandler handler)
+    public virtual void OnBeforeSave(ISaveRequestHandler handler)
     {
         foreach (var info in infoList)
         {
@@ -230,8 +231,45 @@ public class UpdatableExtensionBehavior(IDefaultHandlerFactory handlerFactory) :
         }
     }
 
+    /// <inheritdoc/>
+    public override async Task OnBeforeSaveAsync(ISaveRequestHandler handler, CancellationToken cancellationToken = default)
+    {
+        foreach (var info in infoList)
+        {
+            var mappings = info.Mappings.Where(x => handler.Row.IsAssigned(x.Item1)).ToList();
+
+            if (!mappings.Any())
+                continue;
+
+            handler.StateBag["UpdatableExtensionBehavior_Assignments_" + info.Attr.Alias] = mappings;
+
+            await HandleSaveAsync(handler, info, beforeSave: true, cancellationToken).ConfigureAwait(false);
+        }
+    }
+
     private object GetExistingID(IDbConnection connection, RelationInfo info,
         object thisKey)
+    {
+        var listHandler = handlerFactory.CreateHandler<IListRequestProcessor>(info.Attr.RowType);
+        var listRequest = listHandler.CreateRequest();
+        ApplyFilter(listRequest, info, thisKey);
+
+        var existing = listHandler.Process(connection, listRequest).Entities;
+        return GetExistingID(existing, info);
+    }
+
+    private async Task<object> GetExistingIDAsync(IDbConnection connection, RelationInfo info,
+        object thisKey, CancellationToken cancellationToken)
+    {
+        var listHandler = handlerFactory.CreateHandler<IListRequestProcessorAsync>(info.Attr.RowType);
+        var listRequest = listHandler.CreateRequest();
+        ApplyFilter(listRequest, info, thisKey);
+
+        var existing = (await listHandler.ProcessAsync(connection, listRequest, cancellationToken).ConfigureAwait(false)).Entities;
+        return GetExistingID(existing, info);
+    }
+
+    private static void ApplyFilter(ListRequest listRequest, RelationInfo info, object thisKey)
     {
         var criteria = new Criteria(info.OtherKeyField.PropertyName ?? info.OtherKeyField.Name) ==
             new ValueCriteria(thisKey);
@@ -245,13 +283,12 @@ public class UpdatableExtensionBehavior(IDefaultHandlerFactory handlerFactory) :
                 criteria &= flt == new ValueCriteria(info.FilterValue);
         }
 
-        var listHandler = handlerFactory.CreateHandler<IListRequestProcessor>(info.Attr.RowType);
-        var listRequest = listHandler.CreateRequest();
         listRequest.ColumnSelection = ColumnSelection.KeyOnly;
         listRequest.Criteria = criteria;
+    }
 
-        var existing = listHandler.Process(connection, listRequest).Entities;
-
+    private static object GetExistingID(System.Collections.IList existing, RelationInfo info)
+    {
         if (existing.Count > 1)
             throw new Exception(string.Format("Found multiple extension rows for UpdatableExtension '{0}'", 
                 info.Attr.Alias));
@@ -333,6 +370,65 @@ public class UpdatableExtensionBehavior(IDefaultHandlerFactory handlerFactory) :
         var response = saveHandler.Process(handler.UnitOfWork,
             request, oldID == null ? SaveRequestType.Create : SaveRequestType.Update);
 
+        FinishSave(handler, info, beforeSave, stateKey, thisKey, oldID, extension, response);
+    }
+
+    private async Task HandleSaveAsync(ISaveRequestHandler handler, RelationInfo info, bool beforeSave,
+        CancellationToken cancellationToken)
+    {
+        if (beforeSave && ReferenceEquals(info.ThisKeyField, handler.Row.IdField))
+        {
+            // need to handle this after save, as we need the main row's identity
+            // even if the main row has no auto increment identity, if the extension row
+            // has a fk to the main row, we still need to wait
+            return;
+        }
+
+        string stateKey = "UpdatableExtensionBehavior_Assignments_" + info.Attr.Alias;
+        if (!handler.StateBag.TryGetValue(stateKey, out object mappingsObj))
+            return;
+
+        var mappings = (IEnumerable<Tuple<Field, Field>>)mappingsObj;
+        if (mappings == null || !mappings.Any())
+            return;
+
+        var thisKey = info.ThisKeyField.AsObject(handler.Row);
+        if (!beforeSave && thisKey is null)
+            return;
+
+        object oldID = thisKey == null ? null : await GetExistingIDAsync(handler.Connection, info, thisKey, cancellationToken).ConfigureAwait(false);
+        if (oldID == null && !CheckPresenceValue(info, handler.Row))
+        {
+            // don't check presence again in after save
+            handler.StateBag.Remove(stateKey);
+            return;
+        }
+
+        var extension = info.RowFactory();
+
+        if (oldID != null)
+            ((IIdRow)extension).IdField.AsInvariant(extension, oldID);
+
+        info.OtherKeyField.AsInvariant(extension, thisKey);
+        info.FilterField?.AsInvariant(extension, info.FilterValue);
+
+        var saveHandler = handlerFactory.CreateHandler<ISaveRequestProcessorAsync>(info.Attr.RowType);
+        var request = saveHandler.CreateRequest();
+        request.Entity = extension;
+        request.EntityId = oldID;
+
+        foreach (var mapping in mappings)
+            mapping.Item2.AsInvariant(extension, mapping.Item1.AsObject(handler.Row));
+
+        var response = await saveHandler.ProcessAsync(handler.UnitOfWork,
+            request, oldID == null ? SaveRequestType.Create : SaveRequestType.Update, cancellationToken).ConfigureAwait(false);
+
+        FinishSave(handler, info, beforeSave, stateKey, thisKey, oldID, extension, response);
+    }
+
+    private static void FinishSave(ISaveRequestHandler handler, RelationInfo info, bool beforeSave,
+        string stateKey, object thisKey, object oldID, IRow extension, SaveResponse response)
+    {
         if (oldID == null &&
             thisKey == null &&
             response.EntityId != null &&
@@ -349,7 +445,7 @@ public class UpdatableExtensionBehavior(IDefaultHandlerFactory handlerFactory) :
     }
 
     /// <inheritdoc/>
-    public override void OnAfterSave(ISaveRequestHandler handler)
+    public virtual void OnAfterSave(ISaveRequestHandler handler)
     {
         foreach (var info in infoList)
         {
@@ -358,7 +454,16 @@ public class UpdatableExtensionBehavior(IDefaultHandlerFactory handlerFactory) :
     }
 
     /// <inheritdoc/>
-    public override void OnBeforeDelete(IDeleteRequestHandler handler)
+    public override async Task OnAfterSaveAsync(ISaveRequestHandler handler, CancellationToken cancellationToken = default)
+    {
+        foreach (var info in infoList)
+        {
+            await HandleSaveAsync(handler, info, beforeSave: false, cancellationToken).ConfigureAwait(false);
+        }
+    }
+
+    /// <inheritdoc/>
+    public virtual void OnBeforeDelete(IDeleteRequestHandler handler)
     {
         foreach (var info in infoList)
         {
@@ -377,6 +482,29 @@ public class UpdatableExtensionBehavior(IDefaultHandlerFactory handlerFactory) :
             var deleteRequest = deleteHandler.CreateRequest();
             deleteRequest.EntityId = oldID;
             deleteHandler.Process(handler.UnitOfWork, deleteRequest);
+        }
+    }
+
+    /// <inheritdoc/>
+    public override async Task OnBeforeDeleteAsync(IDeleteRequestHandler handler, CancellationToken cancellationToken = default)
+    {
+        foreach (var info in infoList)
+        {
+            if (!info.Attr.CascadeDelete)
+                continue;
+
+            var thisKey = info.ThisKeyField.AsObject(handler.Row);
+            if (thisKey is null)
+                continue;
+
+            var oldID = await GetExistingIDAsync(handler.Connection, info, thisKey, cancellationToken).ConfigureAwait(false);
+            if (oldID == null)
+                continue;
+
+            var deleteHandler = handlerFactory.CreateHandler<IDeleteRequestProcessorAsync>(info.Attr.RowType);
+            var deleteRequest = deleteHandler.CreateRequest();
+            deleteRequest.EntityId = oldID;
+            await deleteHandler.ProcessAsync(handler.UnitOfWork, deleteRequest, cancellationToken).ConfigureAwait(false);
         }
     }
 }

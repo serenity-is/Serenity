@@ -15,10 +15,33 @@ public static class ServiceHelper
     public static void CheckParentNotDeleted(IDbConnection connection, string tableName,
         Action<SqlQuery> filter, ITextLocalizer localizer)
     {
+        var query = BuildParentNotDeletedQuery(connection, tableName, filter);
+        if (query.Exists(connection))
+            throw DataValidation.ParentRecordDeleted(tableName, localizer);
+    }
+
+    /// <summary>
+    /// Asynchronously checks that parent record is not soft deleted
+    /// </summary>
+    /// <param name="connection">Connection</param>
+    /// <param name="tableName">Table name</param>
+    /// <param name="filter">Filter callback</param>
+    /// <param name="localizer">Text localizer</param>
+    /// <param name="cancellationToken">Cancellation token</param>
+    public static async Task CheckParentNotDeletedAsync(IDbConnection connection, string tableName,
+        Action<SqlQuery> filter, ITextLocalizer localizer, CancellationToken cancellationToken = default)
+    {
+        var query = BuildParentNotDeletedQuery(connection, tableName, filter);
+        if (await query.ExistsAsync(connection, cancellationToken: cancellationToken).ConfigureAwait(false))
+            throw DataValidation.ParentRecordDeleted(tableName, localizer);
+    }
+
+    private static SqlQuery BuildParentNotDeletedQuery(IDbConnection connection, string tableName,
+        Action<SqlQuery> filter)
+    {
         var query = new SqlQuery().Dialect(connection.GetDialect()).Select("1").From(tableName, Alias.T0);
         filter(query);
-        if (query.Take(1).Exists(connection))
-            throw DataValidation.ParentRecordDeleted(tableName, localizer);
+        return query.Take(1);
     }
 
     /// <summary>

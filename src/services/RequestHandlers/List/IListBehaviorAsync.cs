@@ -14,32 +14,32 @@ public interface IListBehaviorAsync : IListBehavior
     /// <summary>Called when list request is validated</summary>
     /// <param name="handler">Calling list request handler</param>
     /// <param name="cancellationToken">Cancellation token</param>
-    Task OnValidateRequestAsync(IListRequestHandler handler, CancellationToken cancellationToken = default);
+    Task OnValidateRequestAsync(IListRequestHandler handler, CancellationToken cancellationToken = default) => Task.CompletedTask;
 
     /// <summary>Called when query is built</summary>
     /// <param name="handler">Calling list request handler</param>
     /// <param name="query">Query</param>
     /// <param name="cancellationToken">Cancellation token</param>
-    Task OnPrepareQueryAsync(IListRequestHandler handler, SqlQuery query, CancellationToken cancellationToken = default);
+    Task OnPrepareQueryAsync(IListRequestHandler handler, SqlQuery query, CancellationToken cancellationToken = default) => Task.CompletedTask;
 
     /// <summary>Called when filters are applied to query</summary>
     /// <param name="handler">Calling list request handler</param>
     /// <param name="query">Query</param>
     /// <param name="cancellationToken">Cancellation token</param>
-    Task OnApplyFiltersAsync(IListRequestHandler handler, SqlQuery query, CancellationToken cancellationToken = default);
+    Task OnApplyFiltersAsync(IListRequestHandler handler, SqlQuery query, CancellationToken cancellationToken = default) => Task.CompletedTask;
 
     /// <summary>Called just before query is sent to database</summary>
     /// <param name="handler">Calling list request handler</param>
     /// <param name="cancellationToken">Cancellation token</param>
-    Task OnBeforeExecuteQueryAsync(IListRequestHandler handler, CancellationToken cancellationToken = default);
+    Task OnBeforeExecuteQueryAsync(IListRequestHandler handler, CancellationToken cancellationToken = default) => Task.CompletedTask;
 
     /// <summary>Called after query is sent to database</summary>
     /// <param name="handler">Calling list request handler</param>
     /// <param name="cancellationToken">Cancellation token</param>
-    Task OnAfterExecuteQueryAsync(IListRequestHandler handler, CancellationToken cancellationToken = default);
+    Task OnAfterExecuteQueryAsync(IListRequestHandler handler, CancellationToken cancellationToken = default) => Task.CompletedTask;
 
     /// <summary>Called before handler is returning the result</summary>
     /// <param name="handler">Calling list request handler</param>
     /// <param name="cancellationToken">Cancellation token</param>
-    Task OnReturnAsync(IListRequestHandler handler, CancellationToken cancellationToken = default);
+    Task OnReturnAsync(IListRequestHandler handler, CancellationToken cancellationToken = default) => Task.CompletedTask;
 }

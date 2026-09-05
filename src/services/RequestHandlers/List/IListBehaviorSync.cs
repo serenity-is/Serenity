@@ -13,27 +13,27 @@ public interface IListBehaviorSync : IListBehavior
 {
     /// <summary>Called when list request is validated</summary>
     /// <param name="handler">Calling list request handler</param>
-    void OnValidateRequest(IListRequestHandler handler);
+    void OnValidateRequest(IListRequestHandler handler) { }
 
     /// <summary>Called when query is built</summary>
     /// <param name="handler">Calling list request handler</param>
     /// <param name="query">Query</param>
-    void OnPrepareQuery(IListRequestHandler handler, SqlQuery query);
+    void OnPrepareQuery(IListRequestHandler handler, SqlQuery query) { }
 
     /// <summary>Called when filters are applied to query</summary>
     /// <param name="handler">Calling list request handler</param>
     /// <param name="query">Query</param>
-    void OnApplyFilters(IListRequestHandler handler, SqlQuery query);
+    void OnApplyFilters(IListRequestHandler handler, SqlQuery query) { }
 
     /// <summary>Called just before query is sent to database</summary>
     /// <param name="handler">Calling list request handler</param>
-    void OnBeforeExecuteQuery(IListRequestHandler handler);
+    void OnBeforeExecuteQuery(IListRequestHandler handler) { }
 
     /// <summary>Called after query is sent to database</summary>
     /// <param name="handler">Calling list request handler</param>
-    void OnAfterExecuteQuery(IListRequestHandler handler);
+    void OnAfterExecuteQuery(IListRequestHandler handler) { }
 
     /// <summary>Called before handler is returning the result</summary>
     /// <param name="handler">Calling list request handler</param>
-    void OnReturn(IListRequestHandler handler);
+    void OnReturn(IListRequestHandler handler) { }
 }

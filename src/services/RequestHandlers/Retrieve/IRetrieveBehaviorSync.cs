@@ -13,22 +13,22 @@ public interface IRetrieveBehaviorSync : IRetrieveBehavior
 {
     /// <summary>Called when retrieve request is validated</summary>
     /// <param name="handler">Calling retrieve request handler</param>
-    void OnValidateRequest(IRetrieveRequestHandler handler);
+    void OnValidateRequest(IRetrieveRequestHandler handler) { }
 
     /// <summary>Called when query is built</summary>
     /// <param name="handler">Calling retrieve request handler</param>
     /// <param name="query">Query</param>
-    void OnPrepareQuery(IRetrieveRequestHandler handler, SqlQuery query);
+    void OnPrepareQuery(IRetrieveRequestHandler handler, SqlQuery query) { }
 
     /// <summary>Called just before query is sent to database</summary>
     /// <param name="handler">Calling retrieve request handler</param>
-    void OnBeforeExecuteQuery(IRetrieveRequestHandler handler);
+    void OnBeforeExecuteQuery(IRetrieveRequestHandler handler) { }
 
     /// <summary>Called after query is sent to database</summary>
     /// <param name="handler">Calling retrieve request handler</param>
-    void OnAfterExecuteQuery(IRetrieveRequestHandler handler);
+    void OnAfterExecuteQuery(IRetrieveRequestHandler handler) { }
 
     /// <summary>Called before handler is returning the result</summary>
     /// <param name="handler">Calling retrieve request handler</param>
-    void OnReturn(IRetrieveRequestHandler handler);
+    void OnReturn(IRetrieveRequestHandler handler) { }
 }
