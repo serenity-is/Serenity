@@ -1,5 +1,6 @@
 using System.Collections;
 using System.Data.Common;
+using System.Threading;
 
 namespace Serenity.TestUtils;
 
@@ -213,6 +214,54 @@ public class MockDbConnection : DbConnection, IRowOperationInterceptor, ISqlOper
         return interceptExecuteScalar?.Invoke(args) ?? default;
     }
 
+    public async Task<OptionalValue<IRow>> FindRowAsync(Type rowType, OptionalValue<object> id, ICriteria where, Action<SqlQuery> editQuery, bool byIdOrSingle, CancellationToken cancellationToken = default)
+    {
+        await Task.CompletedTask.ConfigureAwait(false);
+        var args = new InterceptFindRowArgs(rowType, id, where, editQuery, byIdOrSingle, IsAsync: true);
+        FindRowCalls.Add(args);
+        return interceptFindRow?.Invoke(args) ?? default;
+    }
+
+    public async Task<OptionalValue<IList>> ListRowsAsync(Type rowType, ICriteria where, Action<SqlQuery> editQuery, bool countOnly, CancellationToken cancellationToken = default)
+    {
+        await Task.CompletedTask.ConfigureAwait(false);
+        var args = new InterceptListRowsArgs(rowType, where, editQuery, countOnly, IsAsync: true);
+        ListRowsCalls.Add(args);
+        return interceptListRows?.Invoke(args) ?? default;
+    }
+
+    public async Task<OptionalValue<long?>> ManipulateRowAsync(Type rowType, OptionalValue<object> id, IRow row, ExpectedRows expectedRows, bool getNewId, CancellationToken cancellationToken = default)
+    {
+        await Task.CompletedTask.ConfigureAwait(false);
+        var args = new InterceptManipulateRowArgs(rowType, id, row, expectedRows, getNewId, IsAsync: true);
+        ManipulateRowCalls.Add(args);
+        return interceptManipulateRow?.Invoke(args) ?? default;
+    }
+
+    public async Task<OptionalValue<long?>> ExecuteNonQueryAsync(string commandText, IDictionary<string, object> parameters, ExpectedRows expectedRows, IQueryWithParams query, bool getNewId, CancellationToken cancellationToken = default)
+    {
+        await Task.CompletedTask.ConfigureAwait(false);
+        var args = new InterceptExecuteNonQueryArgs(commandText, parameters, expectedRows, query, getNewId, IsAsync: true);
+        ExecuteNonQueryCalls.Add(args);
+        return interceptExecuteNonQuery?.Invoke(args) ?? default;
+    }
+
+    public async Task<OptionalValue<IDataReader>> ExecuteReaderAsync(string commandText, IDictionary<string, object> parameters, SqlQuery query, CancellationToken cancellationToken = default)
+    {
+        await Task.CompletedTask.ConfigureAwait(false);
+        var args = new InterceptExecuteReaderArgs(commandText, parameters, query, IsAsync: true);
+        ExecuteReaderCalls.Add(args);
+        return interceptExecuteReader?.Invoke(args) ?? default;
+    }
+
+    public async Task<OptionalValue<object>> ExecuteScalarAsync(string commandText, IDictionary<string, object> parameters, SqlQuery query, CancellationToken cancellationToken = default)
+    {
+        await Task.CompletedTask.ConfigureAwait(false);
+        var args = new InterceptExecuteScalarArgs(commandText, parameters, query, IsAsync: true);
+        ExecuteScalarCalls.Add(args);
+        return interceptExecuteScalar?.Invoke(args) ?? default;
+    }
+
     
     public int InterceptedCallCount =>
         FindRowCalls.Count + ListRowsCalls.Count + ManipulateRowCalls.Count +
@@ -223,9 +272,9 @@ public class MockDbConnection : DbConnection, IRowOperationInterceptor, ISqlOper
     public ISqlDialect Dialect { get; set; }
 }
 
-public record InterceptFindRowArgs(Type Type, OptionalValue<object> Id, ICriteria Where, Action<SqlQuery> EditQuery, bool GetFirst);
-public record InterceptListRowsArgs(Type Type, ICriteria Where, Action<SqlQuery> EditQuery, bool CountOnly);
-public record InterceptManipulateRowArgs(Type Type, OptionalValue<object> Id, IRow Row, ExpectedRows ExpectedRows, bool GetNewId);
-public record InterceptExecuteNonQueryArgs(string CommandText, IDictionary<string, object> Parameters, ExpectedRows ExpectedRows, IQueryWithParams Query, bool GetNewId);
-public record InterceptExecuteReaderArgs(string CommandText, IDictionary<string, object> Parameters, SqlQuery Query);
-public record InterceptExecuteScalarArgs(string CommandText, IDictionary<string, object> Parameters, SqlQuery Query);
+public record InterceptFindRowArgs(Type Type, OptionalValue<object> Id, ICriteria Where, Action<SqlQuery> EditQuery, bool GetFirst, bool IsAsync = false);
+public record InterceptListRowsArgs(Type Type, ICriteria Where, Action<SqlQuery> EditQuery, bool CountOnly, bool IsAsync = false);
+public record InterceptManipulateRowArgs(Type Type, OptionalValue<object> Id, IRow Row, ExpectedRows ExpectedRows, bool GetNewId, bool IsAsync = false);
+public record InterceptExecuteNonQueryArgs(string CommandText, IDictionary<string, object> Parameters, ExpectedRows ExpectedRows, IQueryWithParams Query, bool GetNewId, bool IsAsync = false);
+public record InterceptExecuteReaderArgs(string CommandText, IDictionary<string, object> Parameters, SqlQuery Query, bool IsAsync = false);
+public record InterceptExecuteScalarArgs(string CommandText, IDictionary<string, object> Parameters, SqlQuery Query, bool IsAsync = false);

@@ -398,7 +398,7 @@ public static class SqlHelper
     public static async Task<int> ExecuteNonQueryAsync(IDbConnection connection, string commandText, IDictionary<string, object> param = null, ILogger logger = null, CancellationToken cancellationToken = default)
     {
         if (connection is ISqlOperationInterceptor interceptor &&
-            interceptor.ExecuteNonQuery(commandText, param, ExpectedRows.Ignore, query: null, getNewId: false) is { HasValue: true } intres)
+            await interceptor.ExecuteNonQueryAsync(commandText, param, ExpectedRows.Ignore, query: null, getNewId: false, cancellationToken).ConfigureAwait(false) is { HasValue: true } intres)
             return (int)intres.Value;
         using IDbCommand command = NewCommand(connection, commandText, param);
         return await InternalExecuteNonQueryAsync(command, logger, cancellationToken).ConfigureAwait(false);
@@ -457,7 +457,7 @@ public static class SqlHelper
         string queryText = query.ToString();
 
         if (connection is ISqlOperationInterceptor interceptor &&
-            interceptor.ExecuteNonQuery(queryText, query.Params, ExpectedRows.One, query, getNewId: true) is { HasValue: true } intres)
+            await interceptor.ExecuteNonQueryAsync(queryText, query.Params, ExpectedRows.One, query, getNewId: true, cancellationToken).ConfigureAwait(false) is { HasValue: true } intres)
             return intres.Value;
 
         var dialect = connection.GetDialect();
@@ -572,7 +572,7 @@ public static class SqlHelper
     {
         string commandText = query.ToString();
         if (connection is ISqlOperationInterceptor interceptor &&
-            interceptor.ExecuteNonQuery(commandText, query.Params, ExpectedRows.One, query, true) is { HasValue: true })
+            await interceptor.ExecuteNonQueryAsync(commandText, query.Params, ExpectedRows.One, query, true, cancellationToken).ConfigureAwait(false) is { HasValue: true })
             return;
 
         using var command = NewCommand(connection, commandText, query.Params);
@@ -657,7 +657,7 @@ public static class SqlHelper
         }
 
         if (connection is ISqlOperationInterceptor interceptor &&
-            interceptor.ExecuteNonQuery(commandText, query.Params, expectedRows, query, getNewId: false) is { HasValue: true } intres)
+            await interceptor.ExecuteNonQueryAsync(commandText, query.Params, expectedRows, query, getNewId: false, cancellationToken).ConfigureAwait(false) is { HasValue: true } intres)
             return (int)intres.Value;
 
         using var command = NewCommand(connection, commandText, query.Params);
@@ -696,7 +696,7 @@ public static class SqlHelper
     {
         string commandText = query.ToString();
         if (connection is ISqlOperationInterceptor interceptor &&
-            interceptor.ExecuteNonQuery(commandText, query.Params, ExpectedRows.One, query, true) is { HasValue: true } intres)
+            await interceptor.ExecuteNonQueryAsync(commandText, query.Params, ExpectedRows.One, query, true, cancellationToken).ConfigureAwait(false) is { HasValue: true } intres)
             return (int)intres.Value;
 
         using var command = NewCommand(connection, commandText, query.Params);
@@ -743,7 +743,7 @@ public static class SqlHelper
         var commandText = query.ToString();
 
         if (connection is ISqlOperationInterceptor interceptor &&
-            interceptor.ExecuteNonQuery(commandText, query.Params, expectedRows, query, getNewId: false) is { HasValue: true } intres)
+            await interceptor.ExecuteNonQueryAsync(commandText, query.Params, expectedRows, query, getNewId: false, cancellationToken).ConfigureAwait(false) is { HasValue: true } intres)
             return (int)intres.Value;
 
         using var command = NewCommand(connection, commandText, query.Params);
@@ -872,7 +872,7 @@ public static class SqlHelper
         IDictionary<string, object> param, ILogger logger = null, CancellationToken cancellationToken = default)
     {
         if (connection is ISqlOperationInterceptor interceptor &&
-            interceptor.ExecuteReader(commandText, param, query: null) is { HasValue: true } intres)
+            await interceptor.ExecuteReaderAsync(commandText, param, query: null, cancellationToken).ConfigureAwait(false) is { HasValue: true } intres)
             return intres.Value;
 
         return await InternalExecuteReaderAsync(connection, commandText, param, logger, cancellationToken).ConfigureAwait(false);
@@ -911,7 +911,7 @@ public static class SqlHelper
 
         var commandText = query.ToString();
         if (connection is ISqlOperationInterceptor interceptor &&
-            interceptor.ExecuteReader(commandText, query.Params, query) is { HasValue: true } intres)
+            await interceptor.ExecuteReaderAsync(commandText, query.Params, query, cancellationToken).ConfigureAwait(false) is { HasValue: true } intres)
             return intres.Value;
 
         return await InternalExecuteReaderAsync(connection, commandText, query.Params, logger, cancellationToken).ConfigureAwait(false);
@@ -1037,7 +1037,7 @@ public static class SqlHelper
     public static async Task<object> ExecuteScalarAsync(IDbConnection connection, string commandText, IDictionary<string, object> param = null, ILogger logger = null, CancellationToken cancellationToken = default)
     {
         if (connection is ISqlOperationInterceptor interceptor &&
-            interceptor.ExecuteScalar(commandText, param, query: null) is { HasValue: true } intres)
+            await interceptor.ExecuteScalarAsync(commandText, param, query: null, cancellationToken).ConfigureAwait(false) is { HasValue: true } intres)
             return intres.Value;
 
         return await InternalExecuteScalarAsync(connection, commandText, param, logger, cancellationToken).ConfigureAwait(false);
@@ -1078,7 +1078,7 @@ public static class SqlHelper
 
         string commandText = query.ToString();
         if (connection is ISqlOperationInterceptor interceptor &&
-            interceptor.ExecuteScalar(commandText, query.Params, query) is { HasValue: true } intres)
+            await interceptor.ExecuteScalarAsync(commandText, query.Params, query, cancellationToken).ConfigureAwait(false) is { HasValue: true } intres)
             return intres.Value;
 
         return await InternalExecuteScalarAsync(connection, commandText, query.Params, logger, cancellationToken).ConfigureAwait(false);
