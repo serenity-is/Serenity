@@ -1,9 +1,12 @@
+using System.Threading;
+
 namespace Serenity.Demo.Northwind;
 
 public class NotesBehavior(IUserRetrieveService userRetriever,
     IServiceResolver<INoteListHandler> listHandlerResolver,
     IServiceResolver<INoteSaveHandler> saveHandlerResolver,
-    IServiceResolver<INoteDeleteHandler> deleteHandlerResolver) : BaseSaveDeleteBehavior, IImplicitBehavior, IRetrieveBehavior, IFieldBehavior
+    IServiceResolver<INoteDeleteHandler> deleteHandlerResolver) : BaseSaveDeleteBehaviorAsync,
+    IRetrieveBehaviorAsync, IImplicitBehavior, IFieldBehavior
 {
     public Field Target { get; set; }
 
@@ -32,12 +35,8 @@ public class NotesBehavior(IUserRetrieveService userRetriever,
         return true;
     }
 
-    public void OnAfterExecuteQuery(IRetrieveRequestHandler handler) { }
-    public void OnBeforeExecuteQuery(IRetrieveRequestHandler handler) { }
-    public void OnPrepareQuery(IRetrieveRequestHandler handler, SqlQuery query) { }
-    public void OnValidateRequest(IRetrieveRequestHandler handler) { }
-
-    public void OnReturn(IRetrieveRequestHandler handler)
+    /// <inheritdoc/>
+    public virtual async Task OnReturnAsync(IRetrieveRequestHandler handler, CancellationToken cancellationToken = default)
     {
         if (Target is null ||
             !handler.AllowSelectField(Target) ||
@@ -57,7 +56,8 @@ public class NotesBehavior(IUserRetrieveService userRetriever,
             }
         };
 
-        var notes = listHandlerResolver.Resolve().List(handler.Connection, listRequest).Entities;
+        var notes = (await listHandlerResolver.Resolve().ListAsync(handler.Connection,
+            listRequest, cancellationToken).ConfigureAwait(false)).Entities;
 
         var userIdList = notes.Where(x => x.InsertUserId != null)
             .Select(x => x.InsertUserId.Value).Distinct();
@@ -77,8 +77,8 @@ public class NotesBehavior(IUserRetrieveService userRetriever,
         Target.AsObject(handler.Row, notes);
     }
 
-    private void SaveNote(IUnitOfWork uow, NoteRow note, string entityType, 
-        string entityId, long? noteId)
+    private async Task SaveNoteAsync(IUnitOfWork uow, NoteRow note, string entityType,
+        string entityId, long? noteId, CancellationToken cancellationToken)
     {
         note = note.Clone();
         note.NoteId = noteId;
@@ -90,20 +90,20 @@ public class NotesBehavior(IUserRetrieveService userRetriever,
         var saveRequest = new SaveRequest<NoteRow> { Entity = note };
 
         if (noteId == null)
-            saveHandlerResolver.Resolve().Create(uow, saveRequest);
+            await saveHandlerResolver.Resolve().CreateAsync(uow, saveRequest, cancellationToken).ConfigureAwait(false);
         else
-            saveHandlerResolver.Resolve().Update(uow, saveRequest);
+            await saveHandlerResolver.Resolve().UpdateAsync(uow, saveRequest, cancellationToken).ConfigureAwait(false);
     }
 
-    private void DeleteNote(IUnitOfWork uow, long noteId)
+    private Task DeleteNoteAsync(IUnitOfWork uow, long noteId, CancellationToken cancellationToken)
     {
-        deleteHandlerResolver.Resolve().Delete(uow, new DeleteRequest { EntityId = noteId });
+        return deleteHandlerResolver.Resolve().DeleteAsync(uow, new DeleteRequest { EntityId = noteId }, cancellationToken);
     }
 
-    private void NoteListSave(IUnitOfWork uow, string entityType, string entityId, 
-        List<NoteRow> oldList, List<NoteRow> newList)
+    private async Task NoteListSaveAsync(IUnitOfWork uow, string entityType, string entityId,
+        List<NoteRow> oldList, List<NoteRow> newList, CancellationToken cancellationToken)
     {
-        var row = oldList.Count > 0 ? oldList[0] : 
+        var row = oldList.Count > 0 ? oldList[0] :
             (newList.Count > 0) ? newList[0] : null;
 
         if (row == null)
@@ -112,7 +112,7 @@ public class NotesBehavior(IUserRetrieveService userRetriever,
         if (oldList.Count == 0)
         {
             foreach (var note in newList)
-                SaveNote(uow, note, entityType, entityId, null);
+                await SaveNoteAsync(uow, note, entityType, entityId, null, cancellationToken).ConfigureAwait(false);
 
             return;
         }
@@ -122,8 +122,8 @@ public class NotesBehavior(IUserRetrieveService userRetriever,
         if (newList.Count == 0)
         {
             foreach (var note in oldList)
-                DeleteNote(uow, Convert.ToInt64(rowIdField.AsObject(note), 
-                    CultureInfo.InvariantCulture));
+                await DeleteNoteAsync(uow, Convert.ToInt64(rowIdField.AsObject(note),
+                    CultureInfo.InvariantCulture), cancellationToken).ConfigureAwait(false);
 
             return;
         }
@@ -144,14 +144,14 @@ public class NotesBehavior(IUserRetrieveService userRetriever,
         {
             var id = Convert.ToInt64(rowIdField.AsObject(item), CultureInfo.InvariantCulture);
             if (!newById.ContainsKey(id))
-                DeleteNote(uow, id);
+                await DeleteNoteAsync(uow, id, cancellationToken).ConfigureAwait(false);
         }
 
         foreach (var item in newList)
         {
             var id = rowIdField.AsObject(item);
 
-            if (id == null || !oldById.TryGetValue(Convert.ToInt64(id, 
+            if (id == null || !oldById.TryGetValue(Convert.ToInt64(id,
                 CultureInfo.InvariantCulture), out NoteRow old))
                 continue;
 
@@ -170,20 +170,21 @@ public class NotesBehavior(IUserRetrieveService userRetriever,
             if (!anyChanges)
                 continue;
 
-            SaveNote(uow, item, entityType, entityId, Convert.ToInt64(id, 
-                CultureInfo.InvariantCulture));
+            await SaveNoteAsync(uow, item, entityType, entityId, Convert.ToInt64(id,
+                CultureInfo.InvariantCulture), cancellationToken).ConfigureAwait(false);
         }
 
         foreach (var item in newList)
         {
             var id = rowIdField.AsObject(item);
-            if (id == null || !oldById.ContainsKey(Convert.ToInt64(id, 
+            if (id == null || !oldById.ContainsKey(Convert.ToInt64(id,
                 CultureInfo.InvariantCulture)))
-                SaveNote(uow, item, entityType, entityId, null);
+                await SaveNoteAsync(uow, item, entityType, entityId, null, cancellationToken).ConfigureAwait(false);
         }
     }
 
-    public override void OnAfterSave(ISaveRequestHandler handler)
+    /// <inheritdoc/>
+    public override async Task OnAfterSaveAsync(ISaveRequestHandler handler, CancellationToken cancellationToken = default)
     {
         if (Target.AsObject(handler.Row) is not List<NoteRow> newList)
             return;
@@ -195,7 +196,7 @@ public class NotesBehavior(IUserRetrieveService userRetriever,
         if (handler.IsCreate)
         {
             foreach (var note in newList)
-                SaveNote(handler.UnitOfWork, note, handler.Row.Table, entityId, null);
+                await SaveNoteAsync(handler.UnitOfWork, note, handler.Row.Table, entityId, null, cancellationToken).ConfigureAwait(false);
 
             return;
         }
@@ -210,12 +211,15 @@ public class NotesBehavior(IUserRetrieveService userRetriever,
                 { fld.EntityId.PropertyName, entityId }
             }
         };
-        
-        var oldList = listHandlerResolver.Resolve().List(handler.Connection, listRequest).Entities;
-        NoteListSave(handler.UnitOfWork, handler.Row.Table, entityId, oldList, newList);
+
+        var oldList = (await listHandlerResolver.Resolve().ListAsync(handler.Connection,
+            listRequest, cancellationToken).ConfigureAwait(false)).Entities;
+        await NoteListSaveAsync(handler.UnitOfWork, handler.Row.Table, entityId, oldList, newList,
+            cancellationToken).ConfigureAwait(false);
     }
 
-    public override void OnBeforeDelete(IDeleteRequestHandler handler)
+    /// <inheritdoc/>
+    public override async Task OnBeforeDeleteAsync(IDeleteRequestHandler handler, CancellationToken cancellationToken = default)
     {
         if (Target is null ||
             (Target.Flags & FieldFlags.Updatable) != FieldFlags.Updatable)
@@ -226,19 +230,19 @@ public class NotesBehavior(IUserRetrieveService userRetriever,
         var fld = NoteRow.Fields;
 
         var deleteList = new List<long>();
-        new SqlQuery()
+        await new SqlQuery()
                 .From(row)
                 .Select(fld.NoteId)
                 .Where(
                     fld.EntityType == handler.Row.Table &
-                    fld.EntityId == Convert.ToString(idField.AsObject(handler.Row), 
+                    fld.EntityId == Convert.ToString(idField.AsObject(handler.Row),
                         CultureInfo.InvariantCulture))
-                .ForEach(handler.Connection, () =>
+                .ForEachAsync(handler.Connection, () =>
                 {
                     deleteList.Add(row.NoteId.Value);
-                });
+                }, cancellationToken).ConfigureAwait(false);
 
         foreach (var id in deleteList)
-            DeleteNote(handler.UnitOfWork, id);
+            await DeleteNoteAsync(handler.UnitOfWork, id, cancellationToken).ConfigureAwait(false);
     }
 }

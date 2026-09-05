@@ -2,9 +2,9 @@
 
 namespace Serenity.Demo.Northwind;
 
-public interface INoteListHandler : IListHandler<MyRow> { }
+public interface INoteListHandler : IListHandlerAsync<MyRow> { }
 
 public class NoteListHandler(IRequestContext context) :
-    ListRequestHandler<MyRow>(context), INoteListHandler
+    ListRequestHandlerAsync<MyRow>(context), INoteListHandler
 {
 }
