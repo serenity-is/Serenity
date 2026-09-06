@@ -1,3 +1,23 @@
+## 10.5.0 (2026-09-06)
+
+### Features
+- Add full async request handler support for Save, Delete, Retrieve, List and Undelete request handlers. `SaveRequestHandler`, `DeleteRequestHandler`, `RetrieveRequestHandler`, `ListRequestHandler` and `UndeleteRequestHandler` are split into sync base classes and new `...Async` variants (e.g. `SaveRequestHandlerAsync`, `ListRequestHandlerAsync`). New interfaces like `ISaveHandlerAsync`, `IDeleteHandlerAsync`, `IRetrieveHandlerAsync`, `IListHandlerAsync`, `IUndeleteHandlerAsync` and `I...RequestProcessorAsync` expose async `Process` methods. **[Breaking Change]** `ISaveBehavior`, `IDeleteBehavior`, `IRetrieveBehavior`, `IListBehavior` and `IUndeleteBehavior` are now just marker interfaces. Implement the corresponding `I...BehaviorSync` / `I...BehaviorAsync` interface, or derive from `BaseSaveBehavior` / `BaseSaveBehaviorAsync` (or the other `Base...Behavior(Async)` classes) instead.
+- Add auto-wrapping between sync and async behaviors and handlers for compatibility. `SyncToAsync...` / `AsyncToSync...` wrappers allow synchronous behaviors to run in async handlers and async behaviors to run in sync handlers, and the default handler factory can resolve a custom handler of either mode when the other mode is requested.
+- Add default empty implementations to behavior interface methods (e.g. async interface methods return `Task.CompletedTask` by default), and make integrated behaviors like CaptureLog, InsertUpdateLog, LinkingSetRelation, Localization, MasterDetailRelation, UniqueConstraintSave, UniqueFieldSave, UpdatableExtension and ValidateParent implement both sync and async behavior interfaces.
+- Add async SQL / data access support. Add async variants of `SqlHelper` methods (`ExecuteNonQueryAsync`, `ExecuteAndGetIDAsync`, `ExecuteAsync`, `ExecuteUpsertAsync`, `ExecuteReaderAsync`, `ExecuteScalarAsync`, `ExistsAsync`), async variants of `EntityConnectionExtensions` methods (`ByIdAsync`, `TryByIdAsync`, `FirstAsync`, `TryFirstAsync`, `SingleAsync`, `TrySingleAsync`, `ListAsync`, `CountAsync`, `ExistsByIdAsync`, `ExistsAsync`, `InsertAsync`, `InsertAndGetIDAsync`, `UpdateByIdAsync`, `DeleteByIdAsync`), async `EntitySqlHelper` methods (`GetFirstAsync`, `GetSingleAsync`, `ListAsync`, `ForEachAsync`) and async Dapper `ExecuteAsync` / `QueryAsync` overloads in `DapperCore`.
+- Add `EnsureOpenAsync` connection extension and implement `OpenAsync` in `WrappedConnection`, which now extends `DbConnection` instead of implementing `IDbConnection`. Add `DataReaderExtensions.ReadAsync` / `NextResultAsync` which use the native async method on `DbDataReader` and fall back to the synchronous method otherwise, instead of using `Task.Run`.
+- Add async variants of `ISqlOperationInterceptor` and `IRowOperationInterceptor` methods (`ExecuteNonQueryAsync`, `ExecuteReaderAsync`, `ExecuteScalarAsync`, `FindRowAsync`, `ListRowsAsync`, `ManipulateRowAsync`) that route to their sync variants by default, so existing interceptor implementations continue to work.
+- Update sergen scriban templates so generated handlers derive from the async request handler base classes, generated handler interfaces derive from the async handler interfaces (e.g. `IListHandlerAsync`), and generated endpoint methods are async and take a `CancellationToken`.
+- Update the `Pro.Coder` interface source generator to recognize async request handler base classes (e.g. `SaveRequestHandlerAsync`) so it generates the correct async handler interfaces (StartSharp).
+- Add async variants of the mock handlers / `MockDbConnection` in test utils, and add tests for the integrated behaviors, particularly for async handling.
+- Make `SqlHelper.LogCommand` public again for compatibility and add a null check for the command.
+- Convert Serene sample handlers (administration: Language, Role, User) and Northwind handlers (Category, Customer, Order, OrderDetail, Product, Region, Territory, Shipper, Supplier, note handlers) to async, and convert StartSharp sample handlers in administration, meeting, demo.advancedsamples, pro.extensions and worklog modules. Endpoints were updated to call the async handler methods (StartSharp).
+- Add a pnpm override for `fflate` to resolve a consistent version across the workspace (also applied in StartSharp).
+
+### Bugfixes
+- Fix `getNewId` being passed as `true` for interceptor methods that do not generate a new ID.
+- Fix `SqlHelper.ExecuteScalar` to use the interceptor's `ExecuteScalar` instead of `ExecuteReader`, and make `MockDbConnection.interceptExecuteScalar` take an `object` argument.
+
 ## 10.4.0 (2026-09-01)
 
 ### Features
