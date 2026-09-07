@@ -40,7 +40,7 @@ export class FileUploadEditor<P extends FileUploadEditorOptions = FileUploadEdit
     constructor(props: EditorProps<P>) {
         super(props);
 
-        if (!this.options || this.options.allowNonImage == null)
+        if (this.options.allowNonImage == null)
             this.options.allowNonImage = this.getDefaultAllowNonImage();
 
         this.domNode.classList.add('s-FileUploadEditor');
@@ -348,7 +348,8 @@ export class ImageUploadEditor<P extends ImageUploadEditorOptions = ImageUploadE
     constructor(props: EditorProps<P>) {
         super(props);
 
-        this.options.allowNonImage = this.getDefaultAllowNonImage();
+        if (this.options.allowNonImage == null)
+            this.options.allowNonImage = this.getDefaultAllowNonImage();
 
         this.domNode.classList.add("s-ImageUploadEditor")
     }
