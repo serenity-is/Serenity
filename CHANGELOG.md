@@ -1,3 +1,11 @@
+## 10.5.1 (2026-09-08)
+
+### Features
+- Serenity Docs (https://serenity.is/docs) now allows viewing documentation for older versions.
+
+### Bugfixes
+- ImageUploadEditor not allowing normal files even when allowNonImage option is true (e.g. when using [FileUploadEditor]).
+
 ## 10.5.0 (2026-09-06)
 
 ### Features
