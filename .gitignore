@@ -21,3 +21,4 @@ StyleCop.Cache
 package-lock.json
 tsconfig.tsbuildinfo
 /.com*/
+/*+*.code-workspace
