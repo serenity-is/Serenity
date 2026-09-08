@@ -1,3 +1,5 @@
+using Serenity.Localization;
+
 namespace Serenity;
 
 public class LocalTextTests
@@ -115,5 +117,50 @@ public class LocalTextTests
         string translation2 = new LocalText("Translation2").ToString(localizer);
         Assert.Equal("es:Translation1", translation1);
         Assert.Equal("es:Translation2", translation2);
+    }
+
+    [Fact]
+    public void ToString_ReturnsKey()
+    {
+        var text = new LocalText("Some.Key");
+        Assert.Equal("Some.Key", text.ToString());
+    }
+
+    [Fact]
+    public void ToString_WithNullLocalizer_ReturnsKey()
+    {
+        var text = new LocalText("Some.Key");
+        Assert.Equal("Some.Key", text.ToString(localizer: null));
+    }
+
+    [Fact]
+    public void OriginalKey_IsNull_ByDefault()
+    {
+        var text = new LocalText("Some.Key");
+        Assert.Null(((ILocalText)text).OriginalKey);
+    }
+
+    [Fact]
+    public void ReplaceKey_ReplacesKeyAndSetsOriginalKey()
+    {
+        var text = new LocalText("Old.Key");
+        ((ILocalText)text).ReplaceKey("New.Key");
+        Assert.Equal("New.Key", text.Key);
+        Assert.Equal("Old.Key", ((ILocalText)text).OriginalKey);
+    }
+
+    [Fact]
+    public void ReplaceKey_ThrowsArgumentNullException_ForNullKey()
+    {
+        var text = new LocalText("Old.Key");
+        Assert.Throws<ArgumentNullException>(() => ((ILocalText)text).ReplaceKey(null));
+    }
+
+    [Fact]
+    public void ReplaceKey_ThrowsInvalidOperationException_WhenAlreadyReplaced()
+    {
+        var text = new LocalText("Old.Key");
+        ((ILocalText)text).ReplaceKey("New.Key");
+        Assert.Throws<InvalidOperationException>(() => ((ILocalText)text).ReplaceKey("Another.Key"));
     }
 }

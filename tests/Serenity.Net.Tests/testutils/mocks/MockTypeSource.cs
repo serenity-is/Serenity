@@ -11,7 +11,7 @@ public class MockTypeSource : ITypeSource
         attributes = [];
     }
 
-    public MockTypeSource(params Attribute[] attributes)
+    public MockTypeSource(Attribute[] attributes)
     {
         this.attributes = attributes ?? throw new ArgumentNullException(nameof(attributes));
         types = [];

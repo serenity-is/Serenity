@@ -210,7 +210,7 @@ public partial class BasicPropertyProcessorTests
     [InlineData("NullString", null)]
     [InlineData("NullString2", null)]
     public void Tab_Should_Use_Row_Properties_If_Available(string propertyName,
-        string key)
+        string? key)
     {
         var processor = new BasicPropertyProcessor();
 

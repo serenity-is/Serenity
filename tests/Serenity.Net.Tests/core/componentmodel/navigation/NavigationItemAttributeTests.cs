@@ -224,5 +224,33 @@ public class NavigationItemAttributeTests
         };
         Assert.Null(attribute.Target);
     }
+
+    [Fact]
+    public void Constructor_HandlesDoubleSlashInPath()
+    {
+        var attribute = new MyNavigationItemAttribute(1, "a//b", null, null, null);
+        Assert.Null(attribute.Category);
+        Assert.Equal("a//b", attribute.Title);
+    }
+
+    [Fact]
+    public void RequireFeatures_CanBeSet()
+    {
+        var attribute = new MyNavigationItemAttribute(1, "path", null, null, null)
+        {
+            RequireFeatures = ["Feature1"]
+        };
+        Assert.Equal(new[] { "Feature1" }, attribute.RequireFeatures);
+    }
+
+    [Fact]
+    public void RequireAnyFeature_CanBeSet()
+    {
+        var attribute = new MyNavigationItemAttribute(1, "path", null, null, null)
+        {
+            RequireAnyFeature = true
+        };
+        Assert.True(attribute.RequireAnyFeature);
+    }
 }
 

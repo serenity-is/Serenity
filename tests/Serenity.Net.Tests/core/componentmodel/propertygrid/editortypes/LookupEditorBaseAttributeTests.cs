@@ -248,5 +248,45 @@ public class LookupEditorBaseAttributeTests
             };
             Assert.False(attribute.Async);
         }
+
+        [Fact]
+        public void InplaceAdd_CanBeSet_ToTrue()
+        {
+            var attribute = new MyLookupEditorBaseAttribute()
+            {
+                InplaceAdd = true
+            };
+            Assert.True(attribute.InplaceAdd);
+        }
+
+        [Fact]
+        public void InplaceAdd_CanBeSet_ToFalse()
+        {
+            var attribute = new MyLookupEditorBaseAttribute()
+            {
+                InplaceAdd = false
+            };
+            Assert.False(attribute.InplaceAdd);
+        }
+
+        [Fact]
+        public void Delimited_CanBeSet_ToTrue()
+        {
+            var attribute = new MyLookupEditorBaseAttribute()
+            {
+                Delimited = true
+            };
+            Assert.True(attribute.Delimited);
+        }
+
+        [Fact]
+        public void Delimited_CanBeSet_ToFalse()
+        {
+            var attribute = new MyLookupEditorBaseAttribute()
+            {
+                Delimited = false
+            };
+            Assert.False(attribute.Delimited);
+        }
     }
 }

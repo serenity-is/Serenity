@@ -217,4 +217,11 @@ public class NavigationItemTests
         };
         Assert.False(attribute.IsSection);
     }
+
+    [Fact]
+    public void Order_CanBeSet()
+    {
+        var attribute = new NavigationItem { Order = 5m };
+        Assert.Equal(5m, attribute.Order);
+    }
 }

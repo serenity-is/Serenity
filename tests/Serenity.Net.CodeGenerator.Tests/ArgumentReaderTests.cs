@@ -163,7 +163,6 @@ public partial class ArgumentReaderTests
             reader.GetStrings(["test", "alt"]));
     }
 
-#pragma warning disable CA1861 // Avoid constant arrays as arguments
     [InlineData(new string[] { "/test", "val" }, new string[] { "val" }, 2)]
     [InlineData(new string[] { "/p:test", "/alt", "val1" }, new string[] { "val1" }, 2)]
     [InlineData(new string[] { "-test:val1", "--test", "val2", "/x" }, new string[] { "val1", "val2" }, 3)]
@@ -178,7 +177,6 @@ public partial class ArgumentReaderTests
         Assert.Equal(expected, reader.GetStrings(["test", "alt"]));
         Assert.Equal(arguments.Length - minus, reader.Remaining);
     }
-#pragma warning restore CA1861 // Avoid constant arrays as arguments
 
     [InlineData(null)]
     [InlineData("")]
@@ -189,7 +187,7 @@ public partial class ArgumentReaderTests
     [InlineData("/")]
     [InlineData("/a/b")]
     [Theory]
-    public void IsSwitch_Returns_False_ForNonSwitches(string argument)
+    public void IsSwitch_Returns_False_ForNonSwitches(string? argument)
     {
         Assert.False(ArgumentReader.IsSwitch(argument));
     }
@@ -242,7 +240,7 @@ public partial class ArgumentReaderTests
     [InlineData("-test-param=value", "test-param", "value")]
     [Theory]
     public void ParseSwitch_Returns_ExpectedName_And_Value_ForSwitches(string argument,
-        string expectedName, string expectedValue)
+        string expectedName, string? expectedValue)
     {
         Assert.Equal(expectedName, ArgumentReader.ParseSwitch(argument, out string actualValue));
         Assert.Equal(expectedValue, actualValue);

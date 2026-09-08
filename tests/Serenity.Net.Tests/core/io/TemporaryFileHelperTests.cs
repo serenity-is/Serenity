@@ -228,4 +228,104 @@ public class TemporaryFileHelperTests
             x => Assert.Equal("file3.cantdeletethis", x),
             x => Assert.Equal("file4.txt", x));
     }
+
+    [Fact]
+    public void TryDelete_DeletesExistingFile()
+    {
+        var fileSystem = CreateTestFileSystem();
+        var tempPath = fileSystem.Directory.GetCurrentDirectory();
+        fileSystem.AddFile("file.txt", new MockFile(Array.Empty<byte>()));
+        TemporaryFileHelper.TryDelete(fileSystem.Combine(tempPath, "file.txt"), fileSystem);
+        Assert.False(fileSystem.FileExists(fileSystem.Combine(tempPath, "file.txt")));
+    }
+
+    [Fact]
+    public void TryDelete_IgnoresMissingFile()
+    {
+        var fileSystem = CreateTestFileSystem();
+        var tempPath = fileSystem.Directory.GetCurrentDirectory();
+        TemporaryFileHelper.TryDelete(fileSystem.Combine(tempPath, "missing.txt"), fileSystem);
+    }
+
+    [Fact]
+    public void Delete_DeletesFileAndDeleteMarker()
+    {
+        var fileSystem = CreateTestFileSystem();
+        var tempPath = fileSystem.Directory.GetCurrentDirectory();
+        fileSystem.AddFile("file.txt", new MockFile(Array.Empty<byte>()));
+        fileSystem.AddFile("file.txt.delete", new MockFile(Array.Empty<byte>()));
+        TemporaryFileHelper.Delete(fileSystem.Combine(tempPath, "file.txt"), fileSystem);
+        Assert.False(fileSystem.FileExists(fileSystem.Combine(tempPath, "file.txt")));
+        Assert.False(fileSystem.FileExists(fileSystem.Combine(tempPath, "file.txt.delete")));
+    }
+
+    [Fact]
+    public void Delete_WithDeleteType_DeletesFile()
+    {
+        var fileSystem = CreateTestFileSystem();
+        var tempPath = fileSystem.Directory.GetCurrentDirectory();
+        fileSystem.AddFile("file.txt", new MockFile(Array.Empty<byte>()));
+        TemporaryFileHelper.Delete(fileSystem.Combine(tempPath, "file.txt"), DeleteType.Delete, fileSystem);
+        Assert.False(fileSystem.FileExists(fileSystem.Combine(tempPath, "file.txt")));
+    }
+
+    [Fact]
+    public void Delete_WithTryDeleteType_DeletesFile()
+    {
+        var fileSystem = CreateTestFileSystem();
+        var tempPath = fileSystem.Directory.GetCurrentDirectory();
+        fileSystem.AddFile("file.txt", new MockFile(Array.Empty<byte>()));
+        TemporaryFileHelper.Delete(fileSystem.Combine(tempPath, "file.txt"), DeleteType.TryDelete, fileSystem);
+        Assert.False(fileSystem.FileExists(fileSystem.Combine(tempPath, "file.txt")));
+    }
+
+    [Fact]
+    public void Delete_WithTryDeleteOrMarkType_MarksFile()
+    {
+        var fileSystem = CreateTestFileSystem();
+        var tempPath = fileSystem.Directory.GetCurrentDirectory();
+        fileSystem.AddFile("file.cantdeletethis", new MockFile(Array.Empty<byte>()));
+        TemporaryFileHelper.Delete(fileSystem.Combine(tempPath, "file.cantdeletethis"), DeleteType.TryDeleteOrMark, fileSystem);
+        Assert.True(fileSystem.FileExists(fileSystem.Combine(tempPath, "file.cantdeletethis.delete")));
+    }
+
+    [Fact]
+    public void TryDeleteOrMark_CreatesDeleteMarker()
+    {
+        var fileSystem = CreateTestFileSystem();
+        var tempPath = fileSystem.Directory.GetCurrentDirectory();
+        fileSystem.AddFile("file.cantdeletethis", new MockFile(Array.Empty<byte>()));
+        TemporaryFileHelper.TryDeleteOrMark(fileSystem.Combine(tempPath, "file.cantdeletethis"), fileSystem);
+        Assert.True(fileSystem.FileExists(fileSystem.Combine(tempPath, "file.cantdeletethis.delete")));
+    }
+
+    [Fact]
+    public void TryDeleteMarkedFiles_DeletesMarkedFiles()
+    {
+        var fileSystem = CreateTestFileSystem();
+        var tempPath = fileSystem.Directory.GetCurrentDirectory();
+        var filePath = fileSystem.Combine(tempPath, "file.txt");
+        fileSystem.AddFile("file.txt", new MockFile(Array.Empty<byte>()));
+        var fileTime = fileSystem.GetLastWriteTimeUtc(filePath).ToFileTimeUtc();
+        fileSystem.AddFile("file.txt.delete", new MockFile(fileTime.ToInvariant()));
+
+        TemporaryFileHelper.TryDeleteMarkedFiles(tempPath, fileSystem);
+        Assert.False(fileSystem.FileExists(filePath));
+        Assert.False(fileSystem.FileExists(filePath + ".delete"));
+    }
+
+    [Fact]
+    public void TryDeleteMarkedFiles_DoesNothing_IfDirectoryDoesNotExist()
+    {
+        var fileSystem = CreateTestFileSystem();
+        TemporaryFileHelper.TryDeleteMarkedFiles(fileSystem.Combine("C:/", "Missing"), fileSystem);
+    }
+
+    [Fact]
+    public void RandomFileCode_Returns13CharacterCode()
+    {
+        var code = TemporaryFileHelper.RandomFileCode();
+        Assert.Equal(13, code.Length);
+        Assert.NotEqual(code, TemporaryFileHelper.RandomFileCode());
+    }
 }

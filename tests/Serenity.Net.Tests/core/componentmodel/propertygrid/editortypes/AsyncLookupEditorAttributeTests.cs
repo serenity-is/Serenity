@@ -60,4 +60,25 @@ public class AsyncLookupEditorAttributeTests
         attribute.SetOptionPublic("async", true);
         Assert.True(attribute.GetOptionPublic<bool>("async"));
     }
+
+    [LookupScript("MyLookup")]
+    private class LookupType
+    {
+    }
+
+    [Fact]
+    public void ConstructorWithLookupType_SetsAsyncOption()
+    {
+        var attribute = new AsyncLookupEditorAttribute(typeof(LookupType));
+        var dict = new Dictionary<string, object?>();
+        attribute.SetParams(dict);
+        Assert.Equal("MyLookup", dict["lookupKey"]);
+        Assert.True((bool)dict["async"]);
+    }
+
+    [Fact]
+    public void ConstructorWithNullLookupType_ThrowsArgumentNullException()
+    {
+        Assert.Throws<ArgumentNullException>(() => new AsyncLookupEditorAttribute((Type)null));
+    }
 }

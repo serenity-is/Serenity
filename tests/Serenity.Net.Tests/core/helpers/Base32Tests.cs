@@ -34,4 +34,51 @@ public class Base32Tests
         rng.GetBytes(bytes);
         return bytes;
     }
+
+    [Fact]
+    public void Encode_ThrowsArgumentNullException_WhenBytesIsNull()
+    {
+        Assert.Throws<ArgumentNullException>(() => Base32.Encode(null));
+    }
+
+    [Fact]
+    public void Decode_ThrowsArgumentNullException_WhenBase32IsNull()
+    {
+        Assert.Throws<ArgumentNullException>(() => Base32.Decode(null));
+    }
+
+    [Fact]
+    public void Decode_ThrowsArgumentException_ForInvalidCharacter()
+    {
+        Assert.Throws<ArgumentException>(() => Base32.Decode("!"));
+        Assert.Throws<ArgumentException>(() => Base32.Decode("0"));
+        Assert.Throws<ArgumentException>(() => Base32.Decode("1"));
+    }
+
+    [Theory]
+    [InlineData("a")]      // length % 8 == 1
+    [InlineData("abc")]    // length % 8 == 3
+    [InlineData("abcdef")] // length % 8 == 6
+    public void Decode_ThrowsArgumentException_ForNonCanonicalLength(string value)
+    {
+        Assert.Throws<ArgumentException>(() => Base32.Decode(value));
+    }
+
+    [Fact]
+    public void Decode_ThrowsArgumentException_ForNonCanonicalEndBits()
+    {
+        Assert.Throws<ArgumentException>(() => Base32.Decode("ab"));
+    }
+
+    [Fact]
+    public void Encode_EmptyArray_ReturnsEmptyString()
+    {
+        Assert.Equal(string.Empty, Base32.Encode([]));
+    }
+
+    [Fact]
+    public void Decode_EmptyString_ReturnsEmptyArray()
+    {
+        Assert.Empty(Base32.Decode(""));
+    }
 }

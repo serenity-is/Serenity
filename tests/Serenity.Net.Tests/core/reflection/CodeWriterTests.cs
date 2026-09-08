@@ -501,4 +501,306 @@ public class CodeWriterTests
         var actual = cw.ToString().Replace("\r", "").TrimEnd();
         Assert.Equal("\t\tnamespace Z\n\t\t{\n\t\t\tTest\n\t\t}\n\tY", actual);
     }
+
+    [Fact]
+    public void InNamespace_Uses_FileScoped_Namespace_When_Enabled()
+    {
+        var cw = new CodeWriter(new(), tab: "\t")
+        {
+            CurrentNamespace = "X",
+            FileScopedNamespaces = true,
+            IsCSharp = true
+        };
+        cw.InNamespace("Z", () =>
+        {
+            cw.IndentedLine("Test");
+            Assert.Equal("Z", cw.CurrentNamespace);
+        });
+        Assert.Equal("X", cw.CurrentNamespace);
+        var actual = cw.ToString().Replace("\r", "").TrimEnd();
+        Assert.Equal("namespace Z;\n\nTest", actual);
+    }
+
+    [Fact]
+    public void InNamespace_DoesNotUseFileScoped_WhenNotCSharp()
+    {
+        var cw = new CodeWriter(new(), tab: "\t")
+        {
+            CurrentNamespace = "X",
+            FileScopedNamespaces = true,
+            IsCSharp = false
+        };
+        cw.InNamespace("Z", () => cw.IndentedLine("Test"));
+        var actual = cw.ToString().Replace("\r", "").TrimEnd();
+        Assert.Equal("namespace Z\n{\n\tTest\n}", actual);
+    }
+
+    [Fact]
+    public void IsUsing_ReturnsTrue_ForCurrentNamespace()
+    {
+        var cw = new CodeWriter { CurrentNamespace = "Serenity" };
+        Assert.True(cw.IsUsing("Serenity"));
+    }
+
+    [Fact]
+    public void IsUsing_ReturnsTrue_ForGlobalUsings()
+    {
+        var cw = new CodeWriter { GlobalUsings = ["System"] };
+        Assert.True(cw.IsUsing("System"));
+    }
+
+    [Fact]
+    public void IsUsing_ReturnsTrue_ForLocalUsings()
+    {
+        var cw = new CodeWriter();
+        cw.Using("System.IO", force: true);
+        Assert.True(cw.IsUsing("System.IO"));
+    }
+
+    [Fact]
+    public void IsUsing_ReturnsFalse_ForUnknownNamespace()
+    {
+        var cw = new CodeWriter();
+        Assert.False(cw.IsUsing("Unknown"));
+    }
+
+    [Fact]
+    public void Using_ReturnsTrue_WhenAlreadyUsed()
+    {
+        var cw = new CodeWriter { CurrentNamespace = "Serenity" };
+        Assert.True(cw.Using("Serenity"));
+    }
+
+    [Fact]
+    public void Using_AddsToLocalUsings_WhenAllowed()
+    {
+        var cw = new CodeWriter();
+        Assert.True(cw.Using("System.IO"));
+        Assert.Contains("System.IO", cw.LocalUsings);
+    }
+
+    [Fact]
+    public void Using_Force_AddsEvenWhenNotAllowed()
+    {
+        var cw = new CodeWriter { AllowUsing = ns => false };
+        Assert.True(cw.Using("System.IO", force: true));
+        Assert.Contains("System.IO", cw.LocalUsings);
+    }
+
+    [Fact]
+    public void Using_ReturnsFalse_WhenNotAllowed()
+    {
+        var cw = new CodeWriter { AllowUsing = ns => false };
+        Assert.False(cw.Using("System.IO"));
+        Assert.Null(cw.LocalUsings);
+    }
+
+    [Fact]
+    public void ShortTypeName_ReturnsEmpty_ForEmptyTypeName()
+    {
+        var cw = new CodeWriter();
+        Assert.Equal(string.Empty, cw.ShortTypeName("System", ""));
+    }
+
+    [Fact]
+    public void ShortTypeName_ReturnsTypeName_ForEmptyNamespace()
+    {
+        var cw = new CodeWriter();
+        Assert.Equal("String", cw.ShortTypeName("", "String"));
+    }
+
+    [Fact]
+    public void ShortTypeName_ReturnsTypeName_WhenNamespaceUsed()
+    {
+        var cw = new CodeWriter();
+        Assert.Equal("String", cw.ShortTypeName("System", "String"));
+    }
+
+    [Fact]
+    public void ShortTypeName_ReturnsFullName_WhenNamespaceNotUsed()
+    {
+        var cw = new CodeWriter { AllowUsing = ns => false };
+        Assert.Equal("System.String", cw.ShortTypeName("System", "String"));
+    }
+
+    [Fact]
+    public void ShortTypeName_TrimsSharedRootNamespace()
+    {
+        var cw = new CodeWriter { CurrentNamespace = "Serenity.Data", AllowUsing = ns => false };
+        Assert.Equal("Data.Mapping.Field", cw.ShortTypeName("Serenity.Data.Mapping", "Field"));
+    }
+
+    [Fact]
+    public void ShortTypeName_FromFullName_ReturnsTypeName()
+    {
+        var cw = new CodeWriter();
+        Assert.Equal("String", cw.ShortTypeName("System.String"));
+    }
+
+    [Fact]
+    public void ShortTypeName_FromFullName_WithoutNamespace_ReturnsAsIs()
+    {
+        var cw = new CodeWriter();
+        Assert.Equal("String", cw.ShortTypeName("String"));
+    }
+
+    [Fact]
+    public void ShortTypeRef_ReturnsEmpty_ForEmptyString()
+    {
+        var cw = new CodeWriter();
+        Assert.Equal(string.Empty, cw.ShortTypeRef(""));
+    }
+
+    [Fact]
+    public void ShortTypeRef_HandlesNullableSuffix()
+    {
+        var cw = new CodeWriter { IsCSharp = true };
+        Assert.Equal("int?", cw.ShortTypeRef("int?"));
+    }
+
+    [Fact]
+    public void ShortTypeRef_ReturnsKeyword_ForCSharpPrimitive()
+    {
+        var cw = new CodeWriter { IsCSharp = true };
+        Assert.Equal("string", cw.ShortTypeRef("string"));
+    }
+
+    [Fact]
+    public void ShortTypeRef_MapsStream_ToSystemIOStream()
+    {
+        var cw = new CodeWriter { IsCSharp = true, AllowUsing = ns => false };
+        Assert.Equal("System.IO.Stream", cw.ShortTypeRef("Stream"));
+    }
+
+    [Fact]
+    public void ShortTypeRef_ResolvesSystemType()
+    {
+        var cw = new CodeWriter { IsCSharp = true, AllowUsing = ns => false };
+        Assert.Equal("System.Int32", cw.ShortTypeRef("Int32"));
+    }
+
+    [Fact]
+    public void ShortTypeRef_ReturnsAsIs_ForUnknownType()
+    {
+        var cw = new CodeWriter { IsCSharp = true };
+        Assert.Equal("SomeUnknownType", cw.ShortTypeRef("SomeUnknownType"));
+    }
+
+    [Fact]
+    public void ShortTypeRef_HandlesGenericTypes()
+    {
+        var cw = new CodeWriter { IsCSharp = true };
+        Assert.Equal("List<String>", cw.ShortTypeRef("System.Collections.Generic.List<System.String>"));
+    }
+
+    [Fact]
+    public void ShortTypeRef_NonCSharp_UsesShortTypeName()
+    {
+        var cw = new CodeWriter { IsCSharp = false };
+        Assert.Equal("String", cw.ShortTypeRef("System.String"));
+    }
+
+    [Fact]
+    public void IsCSKeyword_ReturnsTrue_ForKeywords()
+    {
+        Assert.True(CodeWriter.IsCSKeyword("string"));
+        Assert.True(CodeWriter.IsCSKeyword("int"));
+        Assert.True(CodeWriter.IsCSKeyword("bool"));
+    }
+
+    [Fact]
+    public void IsCSKeyword_ReturnsFalse_ForNonKeywords()
+    {
+        Assert.False(CodeWriter.IsCSKeyword("String"));
+        Assert.False(CodeWriter.IsCSKeyword("MyType"));
+    }
+
+    [Fact]
+    public void IsJSKeyword_ReturnsTrue_ForReservedWords()
+    {
+        Assert.True(CodeWriter.IsJSKeyword("class"));
+        Assert.True(CodeWriter.IsJSKeyword("function"));
+        Assert.True(CodeWriter.IsJSKeyword("var"));
+    }
+
+    [Fact]
+    public void IsJSKeyword_ReturnsFalse_ForNonReservedWords()
+    {
+        Assert.False(CodeWriter.IsJSKeyword("myVariable"));
+    }
+
+    [Fact]
+    public void ToCSKeyword_ReturnsKeyword_ForPrimitiveClassNames()
+    {
+        Assert.Equal("string", CodeWriter.ToCSKeyword("String"));
+        Assert.Equal("int", CodeWriter.ToCSKeyword("Int32"));
+        Assert.Equal("bool", CodeWriter.ToCSKeyword("Boolean"));
+    }
+
+    [Fact]
+    public void ToCSKeyword_ReturnsNull_ForNonPrimitive()
+    {
+        Assert.Null(CodeWriter.ToCSKeyword("MyType"));
+    }
+
+    [Fact]
+    public void AppendLine_AppendsLine()
+    {
+        var cw = new CodeWriter();
+        cw.AppendLine("Test");
+        Assert.Equal("Test", cw.ToString());
+    }
+
+    [Fact]
+    public void Append_AppendsText()
+    {
+        var cw = new CodeWriter();
+        cw.Append("Test");
+        Assert.Equal("Test", cw.ToString());
+    }
+
+    [Fact]
+    public void Append_Char_AppendsChar()
+    {
+        var cw = new CodeWriter();
+        cw.Append('X');
+        Assert.Equal("X", cw.ToString());
+    }
+
+    [Fact]
+    public void Insert_InsertsText()
+    {
+        var cw = new CodeWriter();
+        cw.Append("AB");
+        cw.Insert(1, "X");
+        Assert.Equal("AXB", cw.ToString());
+    }
+
+    [Fact]
+    public void ToString_Includes_FileComment()
+    {
+        var cw = new CodeWriter { FileComment = "// comment" };
+        cw.Append("class Test { }");
+        var actual = cw.ToString().Replace("\r", "");
+        Assert.Equal("// comment\n\nclass Test { }", actual);
+    }
+
+    [Fact]
+    public void ToString_Includes_LocalUsings()
+    {
+        var cw = new CodeWriter();
+        cw.Using("System.IO");
+        cw.Using("System.Text");
+        cw.Append("class Test { }");
+        var actual = cw.ToString().Replace("\r", "");
+        Assert.Equal("using System.IO;\nusing System.Text;\n\nclass Test { }", actual);
+    }
+
+    [Fact]
+    public void SafeSetOfUsings_ContainsCommonNamespaces()
+    {
+        Assert.Contains("Serenity", CodeWriter.SafeSetOfUsings);
+        Assert.Contains("System", CodeWriter.SafeSetOfUsings);
+        Assert.Contains("System.Collections.Generic", CodeWriter.SafeSetOfUsings);
+    }
 }

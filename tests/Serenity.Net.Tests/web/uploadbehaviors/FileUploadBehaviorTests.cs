@@ -941,7 +941,7 @@ public partial class FileUploadBehaviorTests
     [InlineData(2000, "2")]
     [InlineData(20000, "20")]
     [InlineData(200000, "200")]
-    public void ProcessReplaceFields_FormatsOneAs_IdentityValueDividedByThousand(object id, string groupKey)
+    public void ProcessReplaceFields_FormatsOneAs_IdentityValueDividedByThousand(object? id, string groupKey)
     {
         var processResult = TestProcessReplaceFields("{1}", row: new TestIIdRow()
         {

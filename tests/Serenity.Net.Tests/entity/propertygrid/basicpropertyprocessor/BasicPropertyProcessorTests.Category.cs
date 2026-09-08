@@ -116,7 +116,7 @@ public partial class BasicPropertyProcessorTests
     [InlineData(nameof(CategoryWithRegularText.Empty), "")]
     [InlineData(nameof(CategoryWithRegularText.Null), null)]
     public void Category_Should_Use_CategoryAttribute_With_Regular_Text_AsIs(
-        string propertyName, string category)
+        string propertyName, string? category)
     {
         var processor = new BasicPropertyProcessor();
 

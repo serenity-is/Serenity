@@ -213,7 +213,7 @@ public partial class BasicPropertyProcessorTests
     [InlineData("WithNullStringInForm", null)]
     [InlineData("WithNullStringInForm2", null)]
     public void Title_Should_Use_Row_Properties_If_Available(string propertyName,
-        string key)
+        string? key)
     {
         var processor = new BasicPropertyProcessor();
 

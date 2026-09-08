@@ -56,4 +56,18 @@ public class QuickFilterAttributeTests
         };
         Assert.Null(attribute.CssClass);
     }
+
+    [Fact]
+    public void Separator_IsFalse_ByDefault()
+    {
+        var attribute = new QuickFilterAttribute();
+        Assert.False(attribute.Separator);
+    }
+
+    [Fact]
+    public void Separator_CanBeSet_ToTrue()
+    {
+        var attribute = new QuickFilterAttribute { Separator = true };
+        Assert.True(attribute.Separator);
+    }
 }

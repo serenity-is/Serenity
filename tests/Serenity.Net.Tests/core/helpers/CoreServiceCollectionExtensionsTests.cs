@@ -1,3 +1,7 @@
+using System.Security.Principal;
+using Microsoft.Extensions.Configuration;
+using Serenity.Reflection;
+
 namespace Serenity.Extensions.DependencyInjection;
 
 public class CoreServiceCollectionExtensionsTests
@@ -421,5 +425,152 @@ public class CoreServiceCollectionExtensionsTests
         collection.AddAutoRegisteredServices(new MockTypeSource(typeof(TestRegReplaceExisting)));
 
         Assert.IsType<TestRegReplaceExisting>(collection.BuildServiceProvider().GetService<ITestService1>());
+    }
+
+    [Fact]
+    public void AddCaching_ThrowsArgumentNullException_WhenServicesIsNull()
+    {
+        Assert.Throws<ArgumentNullException>(() => CoreServiceCollectionExtensions.AddCaching(null));
+    }
+
+    [Fact]
+    public void AddCaching_RegistersTwoLevelCache()
+    {
+        var collection = new ServiceCollection();
+        collection.AddCaching();
+        var provider = collection.BuildServiceProvider();
+        Assert.NotNull(provider.GetService<ITwoLevelCache>());
+    }
+
+    [Fact]
+    public void AddTextRegistry_ThrowsArgumentNullException_WhenServicesIsNull()
+    {
+        Assert.Throws<ArgumentNullException>(() => CoreServiceCollectionExtensions.AddTextRegistry(null));
+    }
+
+    [Fact]
+    public void AddTextRegistry_RegistersLocalTextRegistryAndLocalizer()
+    {
+        var collection = new ServiceCollection();
+        collection.AddTextRegistry();
+        var provider = collection.BuildServiceProvider();
+        Assert.NotNull(provider.GetService<ILocalTextRegistry>());
+        Assert.NotNull(provider.GetService<ITextLocalizer>());
+    }
+
+    [Fact]
+    public void AddAnnotationTypes_ThrowsArgumentNullException_WhenServicesIsNull()
+    {
+        Assert.Throws<ArgumentNullException>(() => CoreServiceCollectionExtensions.AddAnnotationTypes(null));
+    }
+
+    [Fact]
+    public void AddAnnotationTypes_RegistersAnnotationTypeRegistry()
+    {
+        var collection = new ServiceCollection();
+        collection.AddSingleton<ITypeSource>(new MockTypeSource(Array.Empty<Type>()));
+        collection.AddAnnotationTypes();
+        var provider = collection.BuildServiceProvider();
+        Assert.NotNull(provider.GetService<IAnnotationTypeRegistry>());
+    }
+
+    [Fact]
+    public void AddTypeSource_ThrowsArgumentNullException_WhenServicesIsNull()
+    {
+        Assert.Throws<ArgumentNullException>(() =>
+            CoreServiceCollectionExtensions.AddTypeSource(null, []));
+    }
+
+    [Fact]
+    public void AddTypeSource_RegistersTypeSource()
+    {
+        var collection = new ServiceCollection();
+        collection.AddTypeSource([typeof(CoreServiceCollectionExtensionsTests).Assembly]);
+        var provider = collection.BuildServiceProvider();
+        Assert.NotNull(provider.GetService<ITypeSource>());
+    }
+
+    [Fact]
+    public void AddServiceResolver_ThrowsArgumentNullException_WhenServicesIsNull()
+    {
+        Assert.Throws<ArgumentNullException>(() => CoreServiceCollectionExtensions.AddServiceResolver(null));
+    }
+
+    [Fact]
+    public void AddServiceResolver_RegistersServiceResolver()
+    {
+        var collection = new ServiceCollection();
+        collection.AddServiceResolver();
+        var provider = collection.BuildServiceProvider();
+        Assert.NotNull(provider.GetService<IServiceResolver<ITestService1>>());
+    }
+
+    [Fact]
+    public void AddFeatureToggles_ThrowsArgumentNullException_WhenServicesIsNull()
+    {
+        Assert.Throws<ArgumentNullException>(() =>
+            CoreServiceCollectionExtensions.AddFeatureToggles(null));
+    }
+
+    [Fact]
+    public void AddFeatureToggles_RegistersFeatureToggles()
+    {
+        var collection = new ServiceCollection();
+        collection.AddSingleton<IConfiguration>(new ConfigurationBuilder().Build());
+        collection.AddFeatureToggles();
+        var provider = collection.BuildServiceProvider();
+        Assert.NotNull(provider.GetService<IFeatureToggles>());
+    }
+
+    [Fact]
+    public void AddUserProvider_ThrowsArgumentNullException_WhenServicesIsNull()
+    {
+        Assert.Throws<ArgumentNullException>(() => CoreServiceCollectionExtensions.AddUserProvider(null));
+    }
+
+    [Fact]
+    public void AddUserProvider_RegistersUserProvider()
+    {
+        var collection = new ServiceCollection();
+        collection.AddSingleton<IUserAccessor>(new TestUserAccessor());
+        collection.AddSingleton<IUserRetrieveService>(new MockUserRetrieveService());
+        collection.AddUserProvider();
+        var provider = collection.BuildServiceProvider();
+        Assert.NotNull(provider.GetService<IUserClaimCreator>());
+        Assert.NotNull(provider.GetService<IUserProvider>());
+    }
+
+    [Fact]
+    public void AddUserProvider_WithAccessorAndRetriever_RegistersServices()
+    {
+        var collection = new ServiceCollection();
+        collection.AddUserProvider<TestUserAccessor, MockUserRetrieveService>();
+        var provider = collection.BuildServiceProvider();
+        Assert.NotNull(provider.GetService<IUserAccessor>());
+        Assert.NotNull(provider.GetService<IUserRetrieveService>());
+        Assert.NotNull(provider.GetService<IUserProvider>());
+    }
+
+    [Fact]
+    public void AddUserProvider_WithAccessorRetrieverAndClaimCreator_RegistersServices()
+    {
+        var collection = new ServiceCollection();
+        collection.AddUserProvider<TestUserAccessor, MockUserRetrieveService, MockUserClaimCreator>();
+        var provider = collection.BuildServiceProvider();
+        Assert.NotNull(provider.GetService<IUserClaimCreator>());
+        Assert.NotNull(provider.GetService<IUserProvider>());
+    }
+
+    private class TestUserAccessor : IUserAccessor
+    {
+        public ClaimsPrincipal User => null;
+    }
+
+    private class MockUserClaimCreator : IUserClaimCreator
+    {
+        public ClaimsPrincipal CreatePrincipal(string username, string authType)
+        {
+            return new ClaimsPrincipal(new GenericIdentity(username, authType));
+        }
     }
 }

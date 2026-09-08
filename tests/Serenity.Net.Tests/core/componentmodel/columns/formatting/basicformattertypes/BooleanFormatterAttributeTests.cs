@@ -62,4 +62,32 @@ public class BooleanFormatterAttributeTests
         var attribute = new BooleanFormatterAttribute();
         Assert.Null(attribute.TrueText);
     }
+
+    [Fact]
+    public void FalseIcon_CanBeSet()
+    {
+        var attribute = new BooleanFormatterAttribute { FalseIcon = "icon-false" };
+        Assert.Equal("icon-false", attribute.FalseIcon);
+    }
+
+    [Fact]
+    public void TrueIcon_CanBeSet()
+    {
+        var attribute = new BooleanFormatterAttribute { TrueIcon = "icon-true" };
+        Assert.Equal("icon-true", attribute.TrueIcon);
+    }
+
+    [Fact]
+    public void ShowText_CanBeSet()
+    {
+        var attribute = new BooleanFormatterAttribute { ShowText = true };
+        Assert.True(attribute.ShowText);
+    }
+
+    [Fact]
+    public void ShowHint_CanBeSet()
+    {
+        var attribute = new BooleanFormatterAttribute { ShowHint = false };
+        Assert.False(attribute.ShowHint);
+    }
 }

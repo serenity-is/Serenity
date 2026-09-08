@@ -158,4 +158,142 @@ public class LocalTextRegistryTests
             x => Assert.Equal("tr", x),
             x => Assert.Equal(LocalText.InvariantLanguageID, x));
     }
+
+    [Fact]
+    public void SetLanguageFallback_ThrowsArgumentNull_IfLanguageIDIsNull()
+    {
+        Assert.Throws<ArgumentNullException>(() => new LocalTextRegistry().SetLanguageFallback(null, "en"));
+    }
+
+    [Fact]
+    public void SetLanguageFallback_ThrowsArgumentNull_IfFallbackIDIsNull()
+    {
+        Assert.Throws<ArgumentNullException>(() => new LocalTextRegistry().SetLanguageFallback("tr", null));
+    }
+
+    [Fact]
+    public void SetLanguageFallback_WorksProperly()
+    {
+        var registry = new LocalTextRegistry();
+        registry.SetLanguageFallback("tr", "en");
+        registry.Add("en", "key", "english");
+
+        Assert.Equal("english", registry.TryGet("tr", "key", false));
+    }
+
+    [Fact]
+    public void GetAllAvailableTextsInLanguage_ThrowsArgumentNull_IfLanguageIDIsNull()
+    {
+        Assert.Throws<ArgumentNullException>(() =>
+            new LocalTextRegistry().GetAllAvailableTextsInLanguage(null, false));
+    }
+
+    [Fact]
+    public void GetAllAvailableTextsInLanguage_ReturnsTexts()
+    {
+        var registry = new LocalTextRegistry();
+        registry.Add("en", "key1", "value1");
+        registry.Add("en", "key2", "value2");
+
+        var texts = registry.GetAllAvailableTextsInLanguage("en", false);
+
+        Assert.Equal(2, texts.Count);
+        Assert.Equal("value1", texts["key1"]);
+        Assert.Equal("value2", texts["key2"]);
+    }
+
+    [Fact]
+    public void GetAllAvailableTextsInLanguage_IncludesFallbackLanguageTexts()
+    {
+        var registry = new LocalTextRegistry();
+        registry.Add("en", "key1", "english");
+        registry.Add("tr", "key2", "turkish");
+
+        var texts = registry.GetAllAvailableTextsInLanguage("tr", false);
+
+        Assert.Equal("turkish", texts["key2"]);
+    }
+
+    [Fact]
+    public void GetAllTexts_ReturnsApprovedTexts()
+    {
+        var registry = new LocalTextRegistry();
+        registry.Add("en", "key", "value");
+
+        var texts = registry.GetAllTexts(false);
+        Assert.Single(texts);
+    }
+
+    [Fact]
+    public void GetAllTexts_ReturnsPendingTexts()
+    {
+        var registry = new LocalTextRegistry();
+        registry.AddPending("en", "key", "value");
+
+        var texts = registry.GetAllTexts(true);
+        Assert.Single(texts);
+    }
+
+    [Fact]
+    public void GetAllTextKeys_ReturnsKeys()
+    {
+        var registry = new LocalTextRegistry();
+        registry.Add("en", "key1", "value1");
+        registry.Add("en", "key2", "value2");
+
+        var keys = registry.GetAllTextKeys(false);
+        Assert.Equal(2, keys.Count);
+        Assert.Contains("key1", keys);
+        Assert.Contains("key2", keys);
+    }
+
+    [Fact]
+    public void RemoveAll_ClearsAllTexts()
+    {
+        var registry = new LocalTextRegistry();
+        registry.Add("en", "key", "value");
+        registry.AddPending("en", "pending", "value");
+        registry.SetLanguageFallback("tr", "en");
+
+        registry.RemoveAll();
+
+        Assert.Empty(registry.GetAllTexts(false));
+        Assert.Empty(registry.GetAllTexts(true));
+        Assert.Empty(registry.GetAllTextKeys(false));
+    }
+
+    [Fact]
+    public void TryGet_ReturnsNull_ForInvariantLanguage_WhenNotFound()
+    {
+        var registry = new LocalTextRegistry();
+        Assert.Null(registry.TryGet(LocalText.InvariantLanguageID, "missing", false));
+    }
+
+    [Fact]
+    public void GetLanguageFallbacks_ReturnsEmpty_ForEmptyLanguage()
+    {
+        var registry = new LocalTextRegistry();
+        Assert.Empty(registry.GetLanguageFallbacks(""));
+    }
+
+    [Fact]
+    public void GetAllAvailableTextsInLanguage_WithPending_IncludesPendingTexts()
+    {
+        var registry = new LocalTextRegistry();
+        registry.AddPending("en", "pending", "value");
+
+        var texts = registry.GetAllAvailableTextsInLanguage("en", pending: true);
+        Assert.Equal("value", texts["pending"]);
+    }
+
+    [Fact]
+    public void GetAllAvailableTextsInLanguage_SkipsDuplicateKeys()
+    {
+        var registry = new LocalTextRegistry();
+        registry.Add("en", "key", "value1");
+        registry.Add("en", "key", "value2");
+
+        var texts = registry.GetAllAvailableTextsInLanguage("en", false);
+        Assert.Equal("value2", texts["key"]);
+    }
 }

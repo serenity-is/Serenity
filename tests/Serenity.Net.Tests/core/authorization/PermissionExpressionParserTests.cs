@@ -88,4 +88,30 @@ public class PermissionExpressionParserTests
             PermissionExpressionParser.Evaluate(rpn, HasPermission);
         });
     }
+
+    [Fact]
+    public void Tokenize_ThrowsArgumentNullException_ForNullExpression()
+    {
+        Assert.Throws<ArgumentNullException>(() => PermissionExpressionParser.Tokenize(null).ToList());
+    }
+
+    [Fact]
+    public void ShuntingYard_ThrowsArgumentNullException_ForNullTokens()
+    {
+        Assert.Throws<ArgumentNullException>(() => PermissionExpressionParser.ShuntingYard(null).ToList());
+    }
+
+    [Fact]
+    public void Evaluate_ThrowsArgumentNullException_ForNullRpnTokens()
+    {
+        Assert.Throws<ArgumentNullException>(() => PermissionExpressionParser.Evaluate(null, HasPermission));
+    }
+
+    [Fact]
+    public void Evaluate_ThrowsArgumentNullException_ForNullHasPermission()
+    {
+        var tokens = PermissionExpressionParser.Tokenize("A");
+        var rpn = PermissionExpressionParser.ShuntingYard(tokens);
+        Assert.Throws<ArgumentNullException>(() => PermissionExpressionParser.Evaluate(rpn, null));
+    }
 }

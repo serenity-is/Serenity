@@ -1,3 +1,6 @@
+using System.IO;
+using System.Reflection;
+
 namespace Serenity.Localization;
 
 public class JsonLocalTextRegistrationTests
@@ -223,5 +226,112 @@ public class JsonLocalTextRegistrationTests
             x => Assert.Equal("4", x.text),
             x => Assert.Equal("3", x.text),
             x => Assert.Equal("1", x.text));
+    }
+
+    [Fact]
+    public void AddJsonTexts_SkipsFiles_WithInvalidLanguageId()
+    {
+        var fileSystem = new MockFileSystem();
+        fileSystem.AddFile(@"C:/My/notalang.json", @"{""x"":""1""}");
+        fileSystem.AddFile(@"C:/My/texts.en.json", @"{""x"":""hello""}");
+
+        var registry = new MockLocalTextRegistry();
+        JsonLocalTextRegistration.AddJsonTexts(registry, @"C:/My/", fileSystem);
+
+        Assert.Equal(("en", "x", "hello"), Assert.Single(registry.AddedList));
+    }
+
+    [Fact]
+    public void AddJsonTexts_UsesPhysicalFileSystem_WhenFileSystemIsNull()
+    {
+        var tempPath = Path.Combine(Path.GetTempPath(), "Serenity_JsonTexts_" + Guid.NewGuid().ToString("N"));
+        Directory.CreateDirectory(tempPath);
+        try
+        {
+            File.WriteAllText(Path.Combine(tempPath, "texts.en.json"), @"{""x"":""hello""}");
+            var registry = new MockLocalTextRegistry();
+            JsonLocalTextRegistration.AddJsonTexts(registry, tempPath);
+            Assert.Equal(("en", "x", "hello"), Assert.Single(registry.AddedList));
+        }
+        finally
+        {
+            Directory.Delete(tempPath, recursive: true);
+        }
+    }
+
+    [Theory]
+    [InlineData("texts.en.json", "en")]
+    [InlineData("texts.en-GB.json", "en-GB")]
+    [InlineData("texts.invariant.json", "")]
+    [InlineData("texts.tr.json", "tr")]
+    public void ParseLanguageIdFromPath_ReturnsExpected(string path, string expected)
+    {
+        Assert.Equal(expected, JsonLocalTextRegistration.ParseLanguageIdFromPath(path));
+    }
+
+    [Theory]
+    [InlineData("texts.notalang.json")]
+    [InlineData("texts.en_US.json")]
+    [InlineData("texts.123.json")]
+    public void ParseLanguageIdFromPath_ReturnsNull_ForInvalid(string path)
+    {
+        Assert.Null(JsonLocalTextRegistration.ParseLanguageIdFromPath(path));
+    }
+
+    [Fact]
+    public void AddJsonResourceTexts_ThrowsArgumentNull_If_Registry_IsNull()
+    {
+        Assert.Throws<ArgumentNullException>(() =>
+            JsonLocalTextRegistration.AddJsonResourceTexts(null, new MockTypeSource()));
+    }
+
+    [Fact]
+    public void AddJsonResourceTexts_ThrowsArgumentNull_If_TypeSource_IsNull()
+    {
+        Assert.Throws<ArgumentNullException>(() =>
+            new MockLocalTextRegistry().AddJsonResourceTexts((ITypeSource)null));
+    }
+
+    [Fact]
+    public void AddJsonResourceTexts_ReturnsRegistry_If_TypeSourceIsNotGetAssemblies()
+    {
+        var registry = new MockLocalTextRegistry();
+        var result = registry.AddJsonResourceTexts(new MockTypeSource());
+        Assert.Same(registry, result);
+    }
+
+    [Fact]
+    public void AddJsonResourceTexts_ThrowsArgumentNull_If_Assemblies_IsNull()
+    {
+        Assert.Throws<ArgumentNullException>(() =>
+            new MockLocalTextRegistry().AddJsonResourceTexts((IEnumerable<Assembly>)null));
+    }
+
+    [Fact]
+    public void AddJsonResourceTexts_WithEmptyAssemblies_ReturnsRegistry()
+    {
+        var registry = new MockLocalTextRegistry();
+        var result = registry.AddJsonResourceTexts([]);
+        Assert.Same(registry, result);
+    }
+
+    private class MockGetAssembliesTypeSource(params Assembly[] assemblies) : ITypeSource, IGetAssemblies
+    {
+        private readonly Assembly[] assemblies = assemblies;
+
+        public IEnumerable<Attribute> GetAssemblyAttributes(Type attributeType) => [];
+        public IEnumerable<Type> GetTypes() => [];
+        public IEnumerable<Type> GetTypesWithAttribute(Type attributeType) => [];
+        public IEnumerable<Type> GetTypesWithInterface(Type interfaceType) => [];
+        public IEnumerable<Assembly> GetAssemblies() => assemblies;
+    }
+
+    [Fact]
+    public void AddJsonResourceTexts_WithGetAssemblies_ReturnsRegistry()
+    {
+        var registry = new MockLocalTextRegistry();
+        var typeSource = new MockGetAssembliesTypeSource(typeof(JsonLocalTextRegistrationTests).Assembly);
+        var result = registry.AddJsonResourceTexts(typeSource);
+        Assert.Same(registry, result);
     }
 }

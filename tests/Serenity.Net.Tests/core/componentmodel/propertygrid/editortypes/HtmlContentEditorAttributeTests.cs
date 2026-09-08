@@ -28,4 +28,11 @@ public class HtmlContentEditorAttributeTests
         };
         Assert.Equal(1, attribute.Rows);
     }
+
+    [Fact]
+    public void EditorProvider_CanBeSet()
+    {
+        var attribute = new HtmlContentEditorAttribute { EditorProvider = "ckeditor" };
+        Assert.Equal("ckeditor", attribute.EditorProvider);
+    }
 }
