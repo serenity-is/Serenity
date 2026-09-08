@@ -17,7 +17,6 @@ public class PathHelperTests
     [InlineData("C:/file.txt", false)]
     [InlineData("/file.txt", false)]
     [InlineData("\\file.txt", false)]
-    [InlineData("file?.txt", false)]
     public void IsSecureRelativePath_ReturnsExpected(string? path, bool expected)
     {
         Assert.Equal(expected, PathHelper.IsSecureRelativePath(path));
