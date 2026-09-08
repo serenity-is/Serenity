@@ -70,8 +70,12 @@ public class Throttler
 
     private class HitInfo
     {
-        public int Counter;
-        public DateTime CreatedAt;
+        public HitInfo()
+        {
+        }
+
+        public int Counter { get; set; }
+        public DateTime CreatedAt { get; set; }
     }
 
     /// <summary>
