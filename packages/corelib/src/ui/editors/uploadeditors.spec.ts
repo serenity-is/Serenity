@@ -46,6 +46,16 @@ describe("FileUploadEditor", () => {
         editor.destroy();
     });
 
+    it("can override allowNonImage during construction", () => {
+        const editor = create({ allowNonImage: false });
+        expect(editor["options"]?.allowNonImage).toBe(false);
+        editor.destroy();
+
+        const editor2 = create({ allowNonImage: true });
+        expect(editor2["options"]?.allowNonImage).toBe(true);
+        editor2.destroy();
+    });
+
     it("keeps the original-name hint when originalNameProperty is set", () => {
         const editor = create({ originalNameProperty: "OriginalName" });
         expect(editor.domNode.classList.contains("hide-original-name")).toBe(false);
@@ -204,6 +214,16 @@ describe("ImageUploadEditor", () => {
         expect(editor.domNode.classList.contains("s-ImageUploadEditor")).toBe(true);
         editor.destroy();
     });
+
+    it("can override allowNonImage during construction", () => {
+        const editor = new ImageUploadEditor({ element: el => document.body.appendChild(el), allowNonImage: false } as any);
+        expect(editor["options"]?.allowNonImage).toBe(false);
+        editor.destroy();
+
+        const editor2 = new ImageUploadEditor({ element: el => document.body.appendChild(el), allowNonImage: true } as any);
+        expect(editor2["options"]?.allowNonImage).toBe(true);
+        editor2.destroy();
+    });
 });
 
 describe("MultipleFileUploadEditor", () => {
@@ -229,6 +249,22 @@ describe("MultipleFileUploadEditor", () => {
             ...options
         } as any);
     }
+
+    it("defaults allowNonImage", () => {
+        const editor = create();
+        expect(editor["options"]?.allowNonImage).toBe(true);
+        editor.destroy();
+    });
+
+    it("can override allowNonImage during construction", () => {
+        const editor = create({ allowNonImage: false });
+        expect(editor["options"]?.allowNonImage).toBe(false);
+        editor.destroy();
+        
+        const editor2 = create({ allowNonImage: true });
+        expect(editor2["options"]?.allowNonImage).toBe(true);
+        editor2.destroy();
+    });
 
     it("sets up the DOM with only an add button", () => {
         const editor = create();
@@ -337,6 +373,22 @@ describe("MultipleImageUploadEditor", () => {
     afterEach(() => {
         vi.restoreAllMocks();
         document.body.innerHTML = "";
+    });
+
+        it("defaults allowNonImage to false", () => {
+        const editor = new MultipleImageUploadEditor({ element: el => document.body.appendChild(el) } as any);
+        expect(editor["options"]?.allowNonImage).toBe(false);
+        editor.destroy();
+    });
+
+    it("can override allowNonImage during construction", () => {
+        const editor = new MultipleImageUploadEditor({ element: el => document.body.appendChild(el), allowNonImage: false } as any);
+        expect(editor["options"]?.allowNonImage).toBe(false);
+        editor.destroy();
+        
+        const editor2 = new MultipleImageUploadEditor({ element: el => document.body.appendChild(el), allowNonImage: true } as any);
+        expect(editor2["options"]?.allowNonImage).toBe(true);
+        editor2.destroy();
     });
 
     it("adds the multiple-image class", () => {

@@ -40,8 +40,7 @@ export class FileUploadEditor<P extends FileUploadEditorOptions = FileUploadEdit
     constructor(props: EditorProps<P>) {
         super(props);
 
-        if (this.options.allowNonImage == null)
-            this.options.allowNonImage = this.getDefaultAllowNonImage();
+        this.options.allowNonImage ??= this.getDefaultAllowNonImage();
 
         this.domNode.classList.add('s-FileUploadEditor');
 
@@ -348,11 +347,9 @@ export class ImageUploadEditor<P extends ImageUploadEditorOptions = ImageUploadE
     constructor(props: EditorProps<P>) {
         super(props);
 
-        if (this.options.allowNonImage == null)
-            this.options.allowNonImage = this.getDefaultAllowNonImage();
-
         this.domNode.classList.add("s-ImageUploadEditor")
     }
+
     /**
      * Whether non-image files are allowed.
      * @returns False for image editors.
@@ -391,6 +388,8 @@ export class MultipleFileUploadEditor<P extends MultipleFileUploadEditorOptions 
      */
     constructor(props: EditorProps<P>) {
         super(props);
+
+        this.options.allowNonImage ??= this.getDefaultAllowNonImage();
 
         this.entities = [];
         this.domNode.classList.add('s-MultipleFileUploadEditor');
@@ -628,6 +627,14 @@ export class MultipleFileUploadEditor<P extends MultipleFileUploadEditorOptions 
     /** Sets whether the value is JSON-encoded.
      * @param value - True to JSON-encode the value. */
     public set jsonEncodeValue(value) { this.options.jsonEncodeValue = value }
+
+    /**
+     * Whether non-image files are allowed.
+     * @returns True for multiple file editors.
+     */
+    protected getDefaultAllowNonImage(): boolean {
+        return true;
+    }
 }
 
 /**
@@ -643,6 +650,18 @@ export class MultipleImageUploadEditor<P extends ImageUploadEditorOptions = Imag
      */
     constructor(props: EditorProps<P>) {
         super(props);
+
+        if (this.options.allowNonImage == null)
+            this.options.allowNonImage = this.getDefaultAllowNonImage();
+
         this.domNode.classList.add("s-MultipleImageUploadEditor")
+    }
+
+    /**
+     * Whether non-image files are allowed.
+     * @returns False for multiple image editors.
+     */
+    protected override getDefaultAllowNonImage(): boolean {
+        return false;
     }
 }
