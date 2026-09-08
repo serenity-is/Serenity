@@ -1,3 +1,5 @@
+using System.Globalization;
+
 namespace Serenity.Localization;
 
 public class DefaultTextLocalizerTests
@@ -12,7 +14,7 @@ public class DefaultTextLocalizerTests
     public void TryGet_ReturnsTranslation_FromRegistry()
     {
         var registry = new MockLocalTextRegistry();
-        registry.Add("en", "key", "value");
+        registry.Add(CultureInfo.CurrentUICulture.Name, "key", "value");
         var localizer = new DefaultTextLocalizer(registry);
 
         Assert.Equal("value", localizer.TryGet("key"));
