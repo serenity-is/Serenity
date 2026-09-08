@@ -4,7 +4,7 @@ namespace Serenity.Services;
 /// Abstraction for list request handlers with an async Process method.
 /// </summary>
 [GenericHandlerType(typeof(ListRequestHandlerAsync<>))]
-[CompanionHandlerType(typeof(IListRequestProcessor), typeof(AsyncToSyncListRequestProcessorWrapper<>))]
+[CompanionHandlerType(typeof(IListRequestProcessor), typeof(SyncToAsyncListRequestProcessorWrapper<>))]
 public interface IListRequestProcessorAsync : IListRequestHandler
 {
     /// <summary>

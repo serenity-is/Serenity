@@ -4,7 +4,7 @@ namespace Serenity.Services;
 /// Abstraction for delete request handlers with an async Process method.
 /// </summary>
 [GenericHandlerType(typeof(DeleteRequestHandlerAsync<>))]
-[CompanionHandlerType(typeof(IDeleteRequestProcessor), typeof(AsyncToSyncDeleteRequestProcessorWrapper<>))]
+[CompanionHandlerType(typeof(IDeleteRequestProcessor), typeof(SyncToAsyncDeleteRequestProcessorWrapper<>))]
 public interface IDeleteRequestProcessorAsync : IDeleteRequestHandler
 {
     /// <summary>

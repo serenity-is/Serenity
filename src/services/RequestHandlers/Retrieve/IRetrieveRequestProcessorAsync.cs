@@ -4,7 +4,7 @@ namespace Serenity.Services;
 /// Abstraction for retrieve request handlers with an async Process method.
 /// </summary>
 [GenericHandlerType(typeof(RetrieveRequestHandlerAsync<>))]
-[CompanionHandlerType(typeof(IRetrieveRequestProcessor), typeof(AsyncToSyncRetrieveRequestProcessorWrapper<>))]
+[CompanionHandlerType(typeof(IRetrieveRequestProcessor), typeof(SyncToAsyncRetrieveRequestProcessorWrapper<>))]
 public interface IRetrieveRequestProcessorAsync : IRetrieveRequestHandler
 {
     /// <summary>
