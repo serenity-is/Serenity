@@ -4,6 +4,7 @@
     <TargetFramework>net10.0</TargetFramework>
     <DefaultItemExcludes>$(DefaultItemExcludes);TestResults\**</DefaultItemExcludes>
     <AccelerateBuildsInVisualStudio>true</AccelerateBuildsInVisualStudio>
+    <Nullable>annotations</Nullable>
     <UseArtifactsOutput>true</UseArtifactsOutput>
     <ReferencePlaywright>false</ReferencePlaywright>
     <ReferenceTestSdk>true</ReferenceTestSdk>
